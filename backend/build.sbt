@@ -42,6 +42,7 @@ val reactiveMongoPlayVersion = s"$reactiveMongoVersion-play30.RC14"
 val playVersion              = "3.0.5"
 // Play framework 3.x is still bound to older guice version
 val guiceVersion = "6.0.0"
+val playOAuth2ProviderVersion = "1.5.0"
 
 libraryDependencies ++= Seq(
   ("org.reactivemongo" %% "play2-reactivemongo" % reactiveMongoPlayVersion),
@@ -69,6 +70,9 @@ libraryDependencies ++= Seq(
   "net.openhft"          % "zero-allocation-hashing"         % "0.27ea0",
   // depend on this plugin to be able to provide custom OutputTransformer
   "io.github.play-swagger" %% "play-swagger" % "2.0.4",
+  // oauth2 provider dependencies
+  "com.nulab-inc" %% "scala-oauth2-core"     % playOAuth2ProviderVersion,
+  "com.nulab-inc" %% "play2-oauth2-provider" % playOAuth2ProviderVersion,
   ehcache,
   ws,
   specs2 % Test,
