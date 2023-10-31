@@ -117,7 +117,7 @@ class SecuritySpec
         .withCookies(Cookie(controller.AuthTokenCookieKey, token))
         .withHeaders((controller.AuthTokenHeader, token2))
         .asInstanceOf[Request[Unit]]
-      cache.set(token2, EntityReference(UserId(), "userId"))
+      authTokenCache.set(token2, EntityReference(UserId(), "userId"))
 
       // execute
       val result = runHasToken(controller, request)
@@ -135,7 +135,7 @@ class SecuritySpec
         .withCookies(Cookie(controller.AuthTokenCookieKey, token))
         .withHeaders(controller.AuthTokenHeader -> token)
         .asInstanceOf[Request[Unit]]
-      cache.set(token, EntityReference(UserId(), "userId"))
+      authTokenCache.set(token, EntityReference(UserId(), "userId"))
       implicit val req = FakeRequest()
 
       // execute
