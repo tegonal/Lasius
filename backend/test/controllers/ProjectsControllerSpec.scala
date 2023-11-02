@@ -25,7 +25,6 @@ import core.{SystemServices, TestApplication}
 import models._
 import mongo.EmbedMongo
 import org.joda.time.DateTime
-import org.mindrot.jbcrypt.BCrypt
 import org.specs2.mock.Mockito
 import org.specs2.mock.mockito.MockitoMatchers
 import play.api.mvc._
@@ -419,7 +418,6 @@ class ProjectsControllerSpec
         UserId(),
         "anotherUser",
         email = email,
-        password = BCrypt.hashpw("somePassword", BCrypt.gensalt()),
         firstName = "test",
         lastName = "user",
         active = true,
@@ -506,7 +504,6 @@ class ProjectsControllerSpec
         UserId(),
         "anotherUser",
         email = "user2@user.com",
-        password = BCrypt.hashpw("somePassword", BCrypt.gensalt()),
         firstName = "test",
         lastName = "user",
         active = true,
@@ -617,7 +614,7 @@ class ProjectsControllerSpec
         projectReference = controller.project.getReference(),
         role = ProjectAdministrator
       )
-      val userOrganisation2 = UserOrganisation(
+      private val userOrganisation2 = UserOrganisation(
         organisationReference = controller.organisation.getReference(),
         `private` = controller.organisation.`private`,
         role = OrganisationMember,
@@ -628,7 +625,6 @@ class ProjectsControllerSpec
         UserId(),
         "anotherUser",
         email = "user2@user.com",
-        password = BCrypt.hashpw("somePassword", BCrypt.gensalt()),
         firstName = "test",
         lastName = "user",
         active = true,
@@ -645,7 +641,7 @@ class ProjectsControllerSpec
                                   controller.project.id)(request)
 
       status(result) must equalTo(OK)
-      val remainingUsers = withDBSession()(implicit dbSession =>
+      private val remainingUsers = withDBSession()(implicit dbSession =>
         controller.userRepository.findByProject(controller.project.id))
         .awaitResult()
       remainingUsers should haveSize(1)
@@ -758,15 +754,14 @@ class ProjectsControllerSpec
         controllers.ProjectsControllerMock(systemServices,
                                            authConfig,
                                            reactiveMongoApi)
-      val newKey       = "newProjectKey"
-      val invitationId = InvitationId()
+      val newKey               = "newProjectKey"
+      private val invitationId = InvitationId()
 
       // create second user with different project structure
       val anotherUser: User = User(
         UserId(),
         "second-user",
         email = "user@user.com",
-        password = BCrypt.hashpw("no-pwd", BCrypt.gensalt()),
         firstName = "test",
         lastName = "user",
         active = true,
@@ -825,12 +820,12 @@ class ProjectsControllerSpec
                                  controller.project.id)(request)
 
       status(result) must equalTo(OK)
-      val updatedProject = contentAsJson(result).as[Project]
+      private val updatedProject = contentAsJson(result).as[Project]
 
       updatedProject.key === newKey
 
       // verify references where updated as well
-      val updatedInvitation = withDBSession()(implicit dbSession =>
+      private val updatedInvitation = withDBSession()(implicit dbSession =>
         controller.invitationRepository.findById(invitationId)).awaitResult()
       updatedInvitation must beSome
       updatedInvitation.get
@@ -838,7 +833,7 @@ class ProjectsControllerSpec
         .projectReference
         .key === newKey
 
-      val user = withDBSession()(implicit dbSession =>
+      private val user = withDBSession()(implicit dbSession =>
         controller.userRepository.findById(controller.userId)).awaitResult()
       user must beSome
 
@@ -848,7 +843,7 @@ class ProjectsControllerSpec
         .map(_.projectReference.key) === Some(newKey)
 
       // check project was changed in second user
-      val user2 = withDBSession()(implicit dbSession =>
+      private val user2 = withDBSession()(implicit dbSession =>
         controller.userRepository.findById(anotherUser.id)).awaitResult()
       user2 must beSome
       user2.get.organisations

@@ -19,26 +19,16 @@
  * along with Lasius. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package models
+package modules
 
-import models.BaseFormat.UUIDBaseId
-import models.UserId.UserReference
-import org.joda.time.DateTime
-import play.api.libs.json.{Json, OFormat}
+import actors.LasiusSupervisorActor
+import com.google.inject.AbstractModule
+import play.api.libs.concurrent.PekkoGuiceSupport
+import core.SystemServices
 
-import java.util.UUID
-
-case class AuthTokenId(value: UUID = UUID.randomUUID()) extends UUIDBaseId
-
-object AuthTokenId {
-  implicit val format: OFormat[AuthTokenId] =
-    Json.format[AuthTokenId]
-}
-
-case class AuthToken(id: AuthTokenId, expiration: DateTime, user: UserReference)
-    extends BaseEntity[AuthTokenId] {}
-
-object AuthToken {
-  implicit val format: OFormat[AuthToken] =
-    Json.format[AuthToken]
+class LasiusModule extends AbstractModule with PekkoGuiceSupport {
+  override def configure() = {
+    bindActor[LasiusSupervisorActor](LasiusSupervisorActor.name)
+    bind(classOf[SystemServices]).asEagerSingleton()
+  }
 }

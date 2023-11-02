@@ -25,22 +25,23 @@ import core.SystemServices
 import models._
 import org.apache.pekko.util.Timeout
 import org.joda.time._
-import play.api.cache.AsyncCacheApi
+import org.pac4j.core.context.session.SessionStore
+import org.pac4j.play.scala.SecurityComponents
 import play.api.libs.json._
-import play.api.mvc.{Action, ControllerComponents}
+import play.api.mvc.Action
 import play.modules.reactivemongo.ReactiveMongoApi
-import repositories._
+import repositories.BookingHistoryRepository
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class TimeBookingHistoryController @Inject() (
-                                               controllerComponents: ControllerComponents,
-                                               override val systemServices: SystemServices,
-                                               override val authConfig: AuthConfig,
-                                               override val authTokenCache: AsyncCacheApi,
-                                               override val reactiveMongoApi: ReactiveMongoApi,
-                                               bookingHistoryRepository: BookingHistoryRepository)(implicit
+    override val controllerComponents: SecurityComponents,
+    override val systemServices: SystemServices,
+    override val authConfig: AuthConfig,
+    override val reactiveMongoApi: ReactiveMongoApi,
+    override val playSessionStore: SessionStore,
+    bookingHistoryRepository: BookingHistoryRepository)(implicit
     ec: ExecutionContext)
     extends BaseLasiusController(controllerComponents) {
 

@@ -43,6 +43,7 @@ val playVersion              = "3.0.5"
 // Play framework 3.x is still bound to older guice version
 val guiceVersion = "6.0.0"
 val playOAuth2ProviderVersion = "1.5.0"
+val pac4jVersion              = "5.7.2"
 
 libraryDependencies ++= Seq(
   ("org.reactivemongo" %% "play2-reactivemongo" % reactiveMongoPlayVersion),
@@ -70,15 +71,36 @@ libraryDependencies ++= Seq(
   "net.openhft"          % "zero-allocation-hashing"         % "0.27ea0",
   // depend on this plugin to be able to provide custom OutputTransformer
   "io.github.play-swagger" %% "play-swagger" % "2.0.4",
+  "com.github.fdimuccio"   %% "play2-sockjs" % "0.8.2",
   // oauth2 provider dependencies
+
+  // pac4j security libraries
+  "org.pac4j" %% "play-pac4j"   % "11.1.0-PLAY2.8",
+  "org.pac4j"  % "pac4j-config" % pac4jVersion,
+  // use oauth as default indirect authentication mechanism for the lasius frontend
+  "org.pac4j" % "pac4j-oauth" % pac4jVersion,
+  // use http and jwt to provide direct authentication for machine-to-machine integration
+  "org.pac4j" % "pac4j-http" % pac4jVersion,
+  "org.pac4j" % "pac4j-jwt"  % pac4jVersion,
+  // enable more pac4j modules in case needed
+// oauth2 provider dependencies to be able to provide a simple oauth server packed with lasius
   "com.nulab-inc" %% "scala-oauth2-core"     % playOAuth2ProviderVersion,
   "com.nulab-inc" %% "play2-oauth2-provider" % playOAuth2ProviderVersion,
+  // used for cookie encryption
+  "org.apache.shiro" % "shiro-core" % "1.12.0",
   ehcache,
   ws,
   specs2 % Test,
   guice,
   "org.webjars" % "swagger-ui" % "5.18.3"
 )
+
+//dependencyOverrides ++= Seq(
+//  "com.fasterxml.jackson.module" % "jackson-module-scala_2.13" % "2.18.2",
+//  "com.fasterxml.jackson.core"   % "jackson-databind"          % "2.18.2",
+//  "com.fasterxml.jackson.core"   % "jackson-core"              % "2.18.2",
+//  "com.fasterxml.jackson.core"   % "jackson-annotations"       % "2.18.2",
+//)
 
 Test / javaOptions += "-Dconfig.file=conf/test.conf"
 
