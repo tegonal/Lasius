@@ -28,11 +28,12 @@ import core.db.InitialDataLoader
 import domain.LoginStateAggregate
 import domain.views.CurrentOrganisationTimeBookingsView
 import models.UserId.UserReference
-import models.{EntityReference, Subject, UserId}
+import models.{ApplicationConfig, EntityReference, Subject, UserId}
 import org.apache.pekko.actor.{ActorRef, ActorSystem}
 import org.apache.pekko.pattern.ask
 import org.apache.pekko.stream.Materializer
 import org.apache.pekko.util.Timeout
+import org.pac4j.core.profile.CommonProfile
 import play.api.Logging
 import play.api.inject.Injector
 import play.api.libs.ws.WSClient
@@ -55,7 +56,8 @@ import scala.language.postfixOps
 trait SystemServices {
   val systemUser: UserId
   val systemUserReference: UserReference
-  val systemSubject: Subject
+  val systemUserProfile: CommonProfile
+  val systemSubject: Subject[_]
   val timeout: Timeout
   val duration: Duration
   val timeBookingViewService: ActorRef
@@ -70,6 +72,7 @@ trait SystemServices {
   val system: ActorSystem
   val materializer: Materializer
   val supportTransaction: Boolean
+  val appConfig: ApplicationConfig
 
   def initialize(): Unit
 }
@@ -102,9 +105,12 @@ class DefaultSystemServices @Inject() (
   private val systemUUID =
     UUID.fromString("0000000-0000-0000-0000-000000000000")
   val systemUser: UserId = UserId(systemUUID)
-  implicit val systemUserReference: UserReference =
+  implicit val systemUserReference: UserReference = {
     EntityReference(systemUser, "system")
-  val systemSubject: Subject    = Subject("system", systemUserReference)
+  }
+  override val systemUserProfile: CommonProfile = new CommonProfile()
+  val systemSubject: Subject[_] =
+    Subject(systemUserProfile, systemUserReference)
   implicit val timeout: Timeout = Timeout(5 seconds) // needed for `?` below
   val duration: FiniteDuration  = Duration.create(30, SECONDS)
   override val timeBookingViewService: ActorRef = Await
@@ -172,6 +178,17 @@ class DefaultSystemServices @Inject() (
 
   // initialize login handler
   LoginHandler.subscribe(loginHandler, system.eventStream)
+
+  val appConfig: ApplicationConfig = {
+    ApplicationConfig(
+      title = config.getString("lasius.title"),
+      instance = config.getString("lasius.instance"),
+      lasiusOAuthProviderEnabled =
+        config.getBoolean("lasius.oauth2_provider.enabled"),
+      lasiusOAuthProviderAllowUserRegistration =
+        config.getBoolean("lasius.oauth2_provider.allow_register_users")
+    )
+  }
 
   override def initialize(): Unit = {
 

@@ -39,6 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @unused
 class InitialBaseDataLoader @Inject() (
     val reactiveMongoApi: ReactiveMongoApi,
+    OAuthUserRepository: OAuthUserRepository,
     userRepository: UserRepository,
     projectRepository: ProjectRepository,
     organisationRepository: OrganisationRepository)(implicit
@@ -121,17 +122,28 @@ class InitialBaseDataLoader @Inject() (
       Seq(UserProject(None, project.getReference(), ProjectAdministrator))
     )
 
+    OAuthUserRepository.upsert(
+      OAuthUser(
+        OAuthUserId(),
+        email = initialUserEmail,
+        password = initialUserPasswordHash,
+        firstName = Some("Admin"),
+        lastName = Some("Admin"),
+        active = true,
+      ))
+
     userRepository.upsert(
-      User(UserId(),
-           initialUserKey,
-           initialUserEmail,
-           initialUserPasswordHash,
-           "Admin",
-           "Admin",
-           active = true,
-           FreeUser,
-           Seq(userOrg),
-           settings = None))
+      User(
+        id = UserId(),
+        key = initialUserKey,
+        email = initialUserEmail,
+        firstName = "Admin",
+        lastName = "Admin",
+        active = true,
+        role = FreeUser,
+        organisations = Seq(userOrg),
+        settings = None
+      ))
 
   }
 }
