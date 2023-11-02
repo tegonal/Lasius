@@ -113,16 +113,16 @@ class OrganisationsControllerSpec
         controller.createOrganisation()(request)
 
       status(result) must equalTo(CREATED)
-      val resultingOrganisation = contentAsJson(result).as[Organisation]
+      private val resultingOrganisation = contentAsJson(result).as[Organisation]
       resultingOrganisation.key === newOrganisationKey
 
       // verify user gets automatically assigned to this project
-      val maybeUser = withDBSession()(implicit dbSession =>
+      private val maybeUser = withDBSession()(implicit dbSession =>
         controller.userRepository.findByUserReference(controller.userReference))
         .awaitResult()
       maybeUser must beSome
-      val user = maybeUser.get
-      val userOrg = user.organisations.find(
+      private val user = maybeUser.get
+      private val userOrg = user.organisations.find(
         _.organisationReference == resultingOrganisation.getReference())
       userOrg must beSome
       userOrg.get.role === OrganisationAdministrator
@@ -139,7 +139,7 @@ class OrganisationsControllerSpec
         controllers.OrganisationsControllerMock(systemServices,
                                                 authConfig,
                                                 reactiveMongoApi)
-      val newOrganisationId = OrganisationId()
+      private val newOrganisationId = OrganisationId()
 
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
       val result: Future[Result] =
@@ -164,12 +164,12 @@ class OrganisationsControllerSpec
       status(result) must equalTo(OK)
 
       // verify user gets unassigned from project
-      val maybeUser = withDBSession()(implicit dbSession =>
+      private val maybeUser = withDBSession()(implicit dbSession =>
         controller.userRepository.findByUserReference(controller.userReference))
         .awaitResult()
       maybeUser must beSome
-      val user = maybeUser.get
-      val userOrg = user.organisations.find(
+      private val user = maybeUser.get
+      private val userOrg = user.organisations.find(
         _.organisationReference.id == controller.organisationId)
       userOrg must beNone
     }
@@ -346,12 +346,12 @@ class OrganisationsControllerSpec
                                                 reactiveMongoApi)
 
       // initialize second user
-      val userProject2 = UserProject(
+      private val userProject2 = UserProject(
         sharedByOrganisationReference = None,
         projectReference = controller.project.getReference(),
         role = ProjectMember
       )
-      val userOrganisation2 = UserOrganisation(
+      private val userOrganisation2 = UserOrganisation(
         organisationReference = controller.organisation.getReference(),
         `private` = controller.organisation.`private`,
         role = OrganisationMember,
@@ -362,7 +362,6 @@ class OrganisationsControllerSpec
         UserId(),
         "anotherUser",
         email = "user2@user.com",
-        password = BCrypt.hashpw("somePassword", BCrypt.gensalt()),
         firstName = "test",
         lastName = "user",
         active = true,
@@ -381,7 +380,7 @@ class OrganisationsControllerSpec
 
       status(result) must equalTo(OK)
 
-      val remainingUsers = withDBSession()(implicit dbSession =>
+      private val remainingUsers = withDBSession()(implicit dbSession =>
         controller.userRepository.findByOrganisation(
           controller.organisation.getReference()))
         .awaitResult()
@@ -463,12 +462,12 @@ class OrganisationsControllerSpec
                                                 OrganisationMember)
 
       // initialize second user to be able to remove ourself
-      val userProject2 = UserProject(
+      private val userProject2 = UserProject(
         sharedByOrganisationReference = None,
         projectReference = controller.project.getReference(),
         role = ProjectAdministrator
       )
-      val userOrganisation2 = UserOrganisation(
+      private val userOrganisation2 = UserOrganisation(
         organisationReference = controller.organisation.getReference(),
         `private` = controller.organisation.`private`,
         role = OrganisationAdministrator,
@@ -479,7 +478,6 @@ class OrganisationsControllerSpec
         UserId(),
         "anotherUser",
         email = "user2@user.com",
-        password = BCrypt.hashpw("somePassword", BCrypt.gensalt()),
         firstName = "test",
         lastName = "user",
         active = true,
@@ -495,7 +493,7 @@ class OrganisationsControllerSpec
         controller.unassignMyUser(controller.organisationId)(request)
 
       status(result) must equalTo(OK)
-      val remainingUsers = withDBSession()(implicit dbSession =>
+      private val remainingUsers = withDBSession()(implicit dbSession =>
         controller.userRepository.findByOrganisation(
           controller.organisation.getReference()))
         .awaitResult()
@@ -575,7 +573,7 @@ class OrganisationsControllerSpec
 
       status(result) must equalTo(BAD_REQUEST)
       contentAsString(result) must equalTo(
-        s"Cannot create organisation with same key ${organisation2Key}")
+        s"Cannot create organisation with same key $organisation2Key")
     }
 
     "successful updated key in all references of main-entities" in new WithTestApplication {
@@ -587,15 +585,14 @@ class OrganisationsControllerSpec
         controllers.OrganisationsControllerMock(systemServices,
                                                 authConfig,
                                                 reactiveMongoApi)
-      val newKey       = "newOrgKey"
-      val invitationId = InvitationId()
+      val newKey               = "newOrgKey"
+      private val invitationId = InvitationId()
 
       // create second user with different project structure
       val anotherUser: User = User(
         UserId(),
         "second-user",
         email = "user@user.com",
-        password = BCrypt.hashpw("no-pwd", BCrypt.gensalt()),
         firstName = "test",
         lastName = "user",
         active = true,
@@ -619,7 +616,7 @@ class OrganisationsControllerSpec
         settings = None
       )
 
-      val invitation = JoinOrganisationInvitation(
+      private val invitation = JoinOrganisationInvitation(
         id = invitationId,
         invitedEmail = "someEmail",
         createDate = DateTime.now(),
@@ -644,12 +641,12 @@ class OrganisationsControllerSpec
         controller.updateOrganisation(controller.organisationId)(request)
 
       status(result) must equalTo(OK)
-      val updatedOrganisation = contentAsJson(result).as[Organisation]
+      private val updatedOrganisation = contentAsJson(result).as[Organisation]
 
       updatedOrganisation.key === newKey
 
       // verify references where updated as well
-      val updatedInvitation = withDBSession()(implicit dbSession =>
+      private val updatedInvitation = withDBSession()(implicit dbSession =>
         controller.invitationRepository.findById(invitationId)).awaitResult()
       updatedInvitation must beSome
       updatedInvitation.get
@@ -657,7 +654,7 @@ class OrganisationsControllerSpec
         .organisationReference
         .key === newKey
 
-      val user = withDBSession()(implicit dbSession =>
+      private val user = withDBSession()(implicit dbSession =>
         controller.userRepository.findById(controller.userId)).awaitResult()
       user must beSome
 
@@ -665,7 +662,7 @@ class OrganisationsControllerSpec
         .find(_.organisationReference.id == controller.organisationId)
         .map(_.organisationReference.key) === Some(newKey)
 
-      val user2 = withDBSession()(implicit dbSession =>
+      private val user2 = withDBSession()(implicit dbSession =>
         controller.userRepository.findById(controller.userId)).awaitResult()
       user2 must beSome
 
@@ -675,7 +672,7 @@ class OrganisationsControllerSpec
 
       user2.get.organisations
         .filter(_.organisationReference.id != controller.organisationId)
-        .map(_.organisationReference.key) must not contain (newKey)
+        .map(_.organisationReference.key) must not contain newKey
     }
   }
 }

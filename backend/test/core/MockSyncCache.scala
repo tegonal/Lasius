@@ -19,26 +19,27 @@
  * along with Lasius. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package models
+package core
 
-import models.BaseFormat.UUIDBaseId
-import models.UserId.UserReference
-import org.joda.time.DateTime
-import play.api.libs.json.{Json, OFormat}
+import play.api.cache.SyncCacheApi
 
-import java.util.UUID
+import scala.concurrent.duration.Duration
+import scala.reflect.ClassTag
 
-case class AuthTokenId(value: UUID = UUID.randomUUID()) extends UUIDBaseId
+class MockSyncCache extends SyncCacheApi {
+  var cacheMap: Map[String, Any] = Map()
+  override def set(key: String, value: Any, expiration: Duration): Unit =
+    cacheMap = cacheMap + (key -> value)
 
-object AuthTokenId {
-  implicit val format: OFormat[AuthTokenId] =
-    Json.format[AuthTokenId]
-}
+  override def remove(key: String): Unit = cacheMap = cacheMap - key
 
-case class AuthToken(id: AuthTokenId, expiration: DateTime, user: UserReference)
-    extends BaseEntity[AuthTokenId] {}
+  override def getOrElseUpdate[A: ClassTag](key: String, expiration: Duration)(
+      orElse: => A): A = cacheMap.getOrElse(key, orElse).asInstanceOf[A]
 
-object AuthToken {
-  implicit val format: OFormat[AuthToken] =
-    Json.format[AuthToken]
+  override def get[T: ClassTag](key: String): Option[T] =
+    cacheMap.get(key).asInstanceOf[Option[T]]
+
+  def removeAll(): Unit = {
+    cacheMap = Map()
+  }
 }

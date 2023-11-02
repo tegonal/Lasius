@@ -235,7 +235,7 @@ class InvitationsControllerSpec
     }
   }
 
-  "register user" should {
+  /*"register user" should {
     "badrequest for non existing invitation" in new WithTestApplication {
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
@@ -454,7 +454,7 @@ class InvitationsControllerSpec
         .awaitResult()
       loginResult must beSome
     }
-  }
+  }*/
 
   "decline invitation" should {
     "badrequest for non existing invitation" in new WithTestApplication {

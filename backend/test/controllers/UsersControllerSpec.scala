@@ -21,16 +21,7 @@
 
 package controllers
 
-import controllers.TimeBookingStatisticsControllerMock.mock
-import core.{
-  DBSession,
-  DBSupport,
-  MockCache,
-  MockCacheAware,
-  SystemServices,
-  TestApplication,
-  TestDBSupport
-}
+import core._
 import models._
 import mongo.EmbedMongo
 import org.specs2.mock.Mockito
@@ -39,7 +30,7 @@ import play.api.mvc._
 import play.api.test._
 import play.modules.reactivemongo.ReactiveMongoApi
 import repositories.{UserMongoRepository, UserRepository}
-import util.{Awaitable, MockAwaitable}
+import util.{Awaitable, MockAwaitable, SecurityComponents}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
@@ -56,13 +47,13 @@ class UsersControllerSpec
     "badrequest if no update field is specified" in new WithTestApplication {
 
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
-      val systemServices: SystemServices              = inject[SystemServices]
-      val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller
+      private val systemServices                      = inject[SystemServices]
+      private val authConfig                          = inject[AuthConfig]
+      private val controller
           : UsersController with SecurityControllerMock with MockCacheAware =
         UsersControllerMock(systemServices, authConfig, reactiveMongoApi)
 
-      val request: FakeRequest[PersonalDataUpdate] = FakeRequest()
+      private val request: FakeRequest[PersonalDataUpdate] = FakeRequest()
         .withBody(
           PersonalDataUpdate(
             email = None,
@@ -78,13 +69,13 @@ class UsersControllerSpec
 
     "badrequest if tried to update with no email" in new WithTestApplication {
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
-      val systemServices: SystemServices              = inject[SystemServices]
-      val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller
+      private val systemServices: SystemServices      = inject[SystemServices]
+      private val authConfig: AuthConfig              = inject[AuthConfig]
+      private val controller
           : UsersController with SecurityControllerMock with MockCacheAware =
         UsersControllerMock(systemServices, authConfig, reactiveMongoApi)
 
-      val request: FakeRequest[PersonalDataUpdate] = FakeRequest()
+      private val request: FakeRequest[PersonalDataUpdate] = FakeRequest()
         .withBody(
           PersonalDataUpdate(
             email = Some("incorrectEmail"),
@@ -112,7 +103,6 @@ class UsersControllerSpec
       val user2: User = User(UserId(),
                              "user2",
                              "my-email@test.com",
-                             "no-hash",
                              "my",
                              "name",
                              active = true,
@@ -196,7 +186,7 @@ class UsersControllerSpec
     }
   }
 
-  "change password" should {
+  /*"change password" should {
     "badrequest if password does not match" in new WithTestApplication {
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
@@ -268,7 +258,7 @@ class UsersControllerSpec
         .awaitResult()
       loginResult must beSome
     }
-  }
+  }*/
 
   "updateUserOrganisation" should {
     "forbidden if user is not assigned to organisation" in new WithTestApplication {
@@ -328,12 +318,13 @@ object UsersControllerMock extends MockAwaitable with Mockito with Awaitable {
     with TestDBSupport = {
     val mongoUserRepository = new UserMongoRepository()
 
-    val controller = new UsersController(Helpers.stubControllerComponents(),
-                                         systemServices,
-                                         authConfig,
-                                         MockCache,
-                                         reactiveMongoApi,
-                                         mongoUserRepository)
+    val controller = new UsersController(
+      SecurityComponents.stubSecurityComponents(),
+      systemServices,
+      authConfig,
+      reactiveMongoApi,
+      new MockSessionStore(),
+      mongoUserRepository)
       with SecurityControllerMock
       with MockCacheAware
       with TestDBSupport {
