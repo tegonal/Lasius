@@ -28,6 +28,7 @@ import core.SystemServices
 import models._
 import play.api.libs.ws.WSClient
 
+import java.net.URL
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -37,6 +38,7 @@ object PlaneTagParseWorker {
   def props(wsClient: WSClient,
             systemServices: SystemServices,
             config: ServiceConfiguration,
+            baseURL: URL,
             settings: PlaneSettings,
             projectSettings: PlaneProjectSettings,
             auth: ServiceAuthentication,
@@ -45,6 +47,7 @@ object PlaneTagParseWorker {
           wsClient,
           systemServices,
           config,
+          baseURL,
           settings,
           projectSettings,
           auth,
@@ -57,6 +60,7 @@ object PlaneTagParseWorker {
 class PlaneTagParseWorker(wsClient: WSClient,
                           systemServices: SystemServices,
                           config: ServiceConfiguration,
+                          baseURL: URL,
                           settings: PlaneSettings,
                           projectSettings: PlaneProjectSettings,
                           implicit val auth: ServiceAuthentication,
@@ -103,29 +107,30 @@ class PlaneTagParseWorker(wsClient: WSClient,
 
   private def toPlaneIssueTag(issue: PlaneIssue): PlaneIssueTag = {
 
-    val nameTag = projectSettings.tagConfiguration.useTitle match {
-      case false => None
-      case _     => Some(SimpleTag(TagId(issue.name)))
+    val nameTag = if (projectSettings.tagConfiguration.useTitle) {
+      Some(SimpleTag(TagId(issue.name)))
+    } else {
+      None
     }
 
-    val labelTags = projectSettings.tagConfiguration.useLabels match {
-      case false => Seq()
-      case _ =>
-        issue.labels match {
-          case Some(labels) =>
-            labels
-              .filterNot(l =>
-                projectSettings.tagConfiguration.labelFilter.contains(l.name))
-              .map(l => SimpleTag(TagId(l.name)))
-          case None => Seq()
-        }
+    val labelTags = if (projectSettings.tagConfiguration.useLabels) {
+      issue.labels match {
+        case Some(labels) =>
+          labels
+            .filterNot(l =>
+              projectSettings.tagConfiguration.labelFilter.contains(l.name))
+            .map(l => SimpleTag(TagId(l.name)))
+        case None => Seq()
+      }
+    } else {
+      Seq()
     }
 
     val tags =
       nameTag.map(t => labelTags :+ t).getOrElse(labelTags)
 
     val issueLink =
-      s"https://organise.tegonal.com/tegonal-intern/projects/${issue.project.id}/issues/${issue.id}"
+      s"${baseURL}/${projectSettings.planeWorkspace}/projects/${issue.project.id}/issues/${issue.id}"
 
     PlaneIssueTag(
       TagId(
@@ -170,7 +175,7 @@ class PlaneTagParseWorker(wsClient: WSClient,
       s"Parse label projectId=${projectId.value}, project=${projectSettings.planeProjectId}")
     val query = projectSettings.params.getOrElse(defaultParams)
     apiService
-      .getLabels(projectSettings.planeProjectId)
+      .getLabels(projectSettings.planeWorkspace, projectSettings.planeProjectId)
   }
 
   def issues(offset: Int, max: Int): Future[PlaneIssuesSearchResult] = {
@@ -178,7 +183,8 @@ class PlaneTagParseWorker(wsClient: WSClient,
       s"Parse issues projectId=${projectId.value}, project=${projectSettings.planeProjectId}, offset:$offset, max:$max")
     val query = projectSettings.params.getOrElse(defaultParams)
     apiService
-      .findIssues(projectSettings.planeProjectId,
+      .findIssues(projectSettings.planeWorkspace,
+                  projectSettings.planeProjectId,
                   query,
                   Some(offset),
                   Some(max))

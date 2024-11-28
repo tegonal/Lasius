@@ -129,7 +129,6 @@ class InitialDemoDataLoader @Inject() (
       for {
         (user1org, user2org, org) <- initializeOrganisations()
         projects                  <- initializeProjects(org)
-        planeConfig               <- initializePlaneConfig(projects)
         users <- initializeUsers(user1org, user2org, org, projects)
         _     <- initializeTimeBookings(org, projects, users)
       } yield ()
@@ -168,60 +167,6 @@ class InitialDemoDataLoader @Inject() (
     organisationRepository
       .bulkInsert(List(user1org, user2org, org))
       .map(_ => (user1org, user2org, org))
-  }
-
-  protected def initializePlaneConfig(projects: Seq[Project])(implicit
-      dbSession: DBSession,
-      userReference: UserReference): Future[PlaneConfig] = {
-    val apiKey = config.getString(
-      "lasius.plane.api_key"
-    )
-
-    if (apiKey == "none") {
-      logger.info("Skipping Plane configuration")
-      return Future.successful(null)
-    }
-    val planeAuth = PlaneAuth(
-      apiKey = apiKey,
-    )
-
-    val planeSettings = PlaneSettings(
-      checkFrequency = 60000
-    )
-
-    val projectConfigList = projects.map(p => {
-      val labels = p.key match {
-        case "KnowHow" => Set("Infrastructure")
-        case _         => Set.empty[String]
-      }
-
-      PlaneProjectMapping(
-        p.getReference().id,
-        PlaneProjectSettings(config.getString(
-                               "lasius.plane.project_id"
-                             ),
-                             maxResults = Some(100),
-                             None,
-                             Some(p.key),
-                             PlaneTagConfiguration(useLabels = true, labels))
-      )
-    })
-
-    val planeConfig = PlaneConfig(
-      PlaneConfigId(),
-      "organize.tegonal.com - Internal Stuff",
-      new URI(
-        config.getString(
-          "lasius.plane.base_url"
-        )).toURL,
-      planeAuth,
-      planeSettings,
-      projectConfigList
-    )
-
-    planeConfigRepository
-      .bulkInsert(List(planeConfig))
-      .map(_ => planeConfig)
   }
 
   protected def initializeProjects(org: Organisation)(implicit

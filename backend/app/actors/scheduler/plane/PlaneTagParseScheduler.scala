@@ -22,7 +22,6 @@
 package actors.scheduler.plane
 
 import java.util.UUID
-
 import actors.scheduler.plane.PlaneTagParseWorker.StartParsing
 import actors.scheduler.{ServiceAuthentication, ServiceConfiguration}
 import akka.actor.SupervisorStrategy._
@@ -31,6 +30,7 @@ import core.SystemServices
 import models._
 import play.api.libs.ws.WSClient
 
+import java.net.URL
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
@@ -39,6 +39,7 @@ object PlaneTagParseScheduler {
     Props(classOf[PlaneTagParseScheduler], wsClient, systemServices)
 
   case class StartScheduler(config: ServiceConfiguration,
+                            baseURL: URL,
                             settings: PlaneSettings,
                             projectSettings: PlaneProjectSettings,
                             auth: ServiceAuthentication,
@@ -60,7 +61,12 @@ class PlaneTagParseScheduler(wsClient: WSClient, systemServices: SystemServices)
     }
 
   val receive: Receive = {
-    case StartScheduler(config, settings, projectSettings, auth, projectId) =>
+    case StartScheduler(config,
+                        baseURL,
+                        settings,
+                        projectSettings,
+                        auth,
+                        projectId) =>
       log.debug(
         s"StartScheduler: $config, $auth, $projectId, ${projectSettings.planeProjectId}")
       val uuid = UUID.randomUUID
@@ -68,6 +74,7 @@ class PlaneTagParseScheduler(wsClient: WSClient, systemServices: SystemServices)
         PlaneTagParseWorker.props(wsClient,
                                   systemServices,
                                   config,
+                                  baseURL,
                                   settings,
                                   projectSettings,
                                   auth,

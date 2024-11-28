@@ -42,7 +42,7 @@ case class PlaneIssueWrapper(
 
 case class PlaneLabel(
     id: String,
-    // created_at: DateTime, // Nannosecond format not parsable by joda time "2024-08-27T14:33:01.364694+02:00"
+    // created_at: DateTime, // Nanosecond format not parsable by joda time "2024-08-27T14:33:01.364694+02:00"
     // updated_at: DateTime,
     name: String,
     description: String,
@@ -67,7 +67,7 @@ case class PlaneProject(
     identifier: String,
     name: String,
     cover_image: String,
-// icon_prop: IconProp,
+    // icon_prop: IconProp,
     emoji: Option[String],
     description: String
 )

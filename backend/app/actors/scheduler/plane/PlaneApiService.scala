@@ -21,30 +21,29 @@
 
 package actors.scheduler.plane
 
-import actors.scheduler.jira.JiraVersion
 import actors.scheduler.{
   ApiServiceBase,
   ServiceAuthentication,
   ServiceConfiguration
 }
-import akka.actor.ActorLogging
 import play.api.libs.ws.WSClient
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Try
 
 trait PlaneApiService {
 
   /** Searches for issues using post params.
     */
-  def findIssues(projectId: String,
+
+  def findIssues(workspace: String,
+                 projectId: String,
                  query: String,
                  page: Option[Int] = None,
                  maxResults: Option[Int] = None)(implicit
       auth: ServiceAuthentication,
       executionContext: ExecutionContext): Future[PlaneIssuesSearchResult]
 
-  def getLabels(projectId: String)(implicit
+  def getLabels(workspace: String, projectId: String)(implicit
       auth: ServiceAuthentication,
       executionContext: ExecutionContext): Future[Seq[PlaneLabel]]
 }
@@ -54,18 +53,19 @@ class PlaneApiServiceImpl(override val ws: WSClient,
     extends PlaneApiService
     with ApiServiceBase {
 
-  val findIssuesUrl = s"/api/v1/workspaces/tegonal-intern/projects/%s/issues/?"
-  val fetchLabelUrl = s"/api/v1/workspaces/tegonal-intern/projects/%s/labels/?"
+  private val findIssuesUrl = s"/api/v1/workspaces/%s/projects/%s/issues/?"
+  private val fetchLabelUrl = s"/api/v1/workspaces/%s/projects/%s/labels/?"
 
-  def getLabels(projectId: String)(implicit
+  def getLabels(workspace: String, projectId: String)(implicit
       auth: ServiceAuthentication,
       executionContext: ExecutionContext): Future[Seq[PlaneLabel]] = {
     val params = getParamList(getParam("per_page", 100))
-    val url    = fetchLabelUrl.format(projectId) + params
+    val url    = fetchLabelUrl.format(workspace, projectId) + params
     getList[PlaneLabel](url).map(_._1)
   }
 
-  def findIssues(projectId: String,
+  def findIssues(workspace: String,
+                 projectId: String,
                  paramString: String,
                  page: Option[Int] = None,
                  maxResults: Option[Int] = None)(implicit
@@ -73,24 +73,24 @@ class PlaneApiServiceImpl(override val ws: WSClient,
       executionContext: ExecutionContext): Future[PlaneIssuesSearchResult] = {
 
     val currentPage       = page.getOrElse(0)
-    val currentMaxResults = maxResults.getOrElse(100)
+    val currentMaxResults = maxResults.getOrElse(100).max(100)
 
     val params = getParamList(
       Some(paramString),
       getParam("cursor", s"${currentMaxResults}:${currentPage}:0"),
       getParam("per_page", currentMaxResults))
 
-    val url = findIssuesUrl.format(projectId) + params
+    val url = findIssuesUrl.format(workspace, projectId) + params
     logger.debug(s"findIssues: $url")
-    getSingleValue[PlaneIssueWrapper](url).map { pair =>
+    getSingleValue[PlaneIssueWrapper](url).map { case (planeIssueWrapper, _) =>
       PlaneIssuesSearchResult(
-        pair._1.results,
-        Some(pair._1.total_results),
-        Some(pair._1.total_pages),
+        planeIssueWrapper.results,
+        Some(planeIssueWrapper.total_results),
+        Some(planeIssueWrapper.total_pages),
         maxResults,
-        Some(pair._1.count),
-        Some(pair._1.next_page_results),
-        Some(pair._1.prev_page_results)
+        Some(planeIssueWrapper.count),
+        Some(planeIssueWrapper.next_page_results),
+        Some(planeIssueWrapper.prev_page_results)
       )
     }
   }

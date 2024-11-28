@@ -37,7 +37,8 @@ case class PlaneTagConfiguration(useLabels: Boolean,
                                  useMilestone: Boolean = false,
                                  useTitle: Boolean = false)
 
-case class PlaneProjectSettings(planeProjectId: String,
+case class PlaneProjectSettings(planeWorkspace: String,
+                                planeProjectId: String,
                                 maxResults: Option[Int] = None,
                                 params: Option[String] = None,
                                 projectKeyPrefix: Option[String] = None,

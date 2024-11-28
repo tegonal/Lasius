@@ -205,6 +205,7 @@ class PluginHandler(userRepository: UserRepository,
               s"Start parsing for the following configuration:$serviceConfig - $proj")
             planeTagParseScheduler ! PlaneTagParseScheduler.StartScheduler(
               serviceConfig,
+              config.baseUrl,
               config.settings,
               proj.settings,
               auth,
