@@ -39,13 +39,19 @@ trait PlaneApiService {
                  projectId: String,
                  query: String,
                  page: Option[Int] = None,
-                 maxResults: Option[Int] = None)(implicit
+                 maxResults: Option[Int] = None,
+                 includeOnlyIssuesWithLabelsIds: Seq[String],
+                 includeOnlyIssuesWithStateIds: Seq[String])(implicit
       auth: ServiceAuthentication,
       executionContext: ExecutionContext): Future[PlaneIssuesSearchResult]
 
   def getLabels(workspace: String, projectId: String)(implicit
       auth: ServiceAuthentication,
       executionContext: ExecutionContext): Future[Seq[PlaneLabel]]
+
+  def getStates(workspace: String, projectId: String)(implicit
+      auth: ServiceAuthentication,
+      executionContext: ExecutionContext): Future[Seq[PlaneState]]
 }
 
 class PlaneApiServiceImpl(override val ws: WSClient,
@@ -55,6 +61,7 @@ class PlaneApiServiceImpl(override val ws: WSClient,
 
   private val findIssuesUrl = s"/api/v1/workspaces/%s/projects/%s/issues/?"
   private val fetchLabelUrl = s"/api/v1/workspaces/%s/projects/%s/labels/?"
+  private val fetchStateUrl = s"/api/v1/workspaces/%s/projects/%s/states/?"
 
   def getLabels(workspace: String, projectId: String)(implicit
       auth: ServiceAuthentication,
@@ -64,11 +71,21 @@ class PlaneApiServiceImpl(override val ws: WSClient,
     getList[PlaneLabel](url).map(_._1)
   }
 
+  def getStates(workspace: String, projectId: String)(implicit
+      auth: ServiceAuthentication,
+      executionContext: ExecutionContext): Future[Seq[PlaneState]] = {
+    val params = getParamList(getParam("per_page", 100))
+    val url    = fetchStateUrl.format(workspace, projectId) + params
+    getList[PlaneState](url).map(_._1)
+  }
+
   def findIssues(workspace: String,
                  projectId: String,
                  paramString: String,
                  page: Option[Int] = None,
-                 maxResults: Option[Int] = None)(implicit
+                 maxResults: Option[Int] = None,
+                 includeOnlyIssuesWithLabelsIds: Seq[String] = Seq(),
+                 includeOnlyIssuesWithStateIds: Seq[String] = Seq())(implicit
       auth: ServiceAuthentication,
       executionContext: ExecutionContext): Future[PlaneIssuesSearchResult] = {
 
@@ -78,7 +95,9 @@ class PlaneApiServiceImpl(override val ws: WSClient,
     val params = getParamList(
       Some(paramString),
       getParam("cursor", s"${currentMaxResults}:${currentPage}:0"),
-      getParam("per_page", currentMaxResults))
+      getParam("per_page", currentMaxResults),
+      if(includeOnlyIssuesWithLabelsIds.isEmpty) None else getParam("labels", includeOnlyIssuesWithStateIds.mkString(",")),
+      if(includeOnlyIssuesWithStateIds.isEmpty) None else getParam("state", includeOnlyIssuesWithStateIds.mkString(",")))
 
     val url = findIssuesUrl.format(workspace, projectId) + params
     logger.debug(s"findIssues: $url")

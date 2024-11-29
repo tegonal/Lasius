@@ -81,7 +81,30 @@ class PlaneTagParseWorker(wsClient: WSClient,
   }
 
   val parsing: Receive = { case Parse =>
-    loadIssues(0, None)
+    val labelF = loadLabels()
+    // load labelIds from projectSettings.tagConfiguration.includeOnlyIssuesWithLabels
+    val labelIds = labelF
+      .map { labels =>
+        val excludeLabels = projectSettings.tagConfiguration.includeOnlyIssuesWithLabels
+        val filteredLabels = labels.filter(l =>
+          excludeLabels.contains(l.name))
+        log.debug(
+          s"Filtered labels: ${filteredLabels.map(_.name).mkString(",")}")
+        filteredLabels.map(_.id)
+      }
+    // load stateIds from projectSettings.tagConfiguration.includeOnlyIssuesWithState
+    val stateF = loadStates()
+    val stateIds = stateF
+      .map { states =>
+        val includeStates = projectSettings.tagConfiguration.includeOnlyIssuesWithState
+        val filteredStates = states.filter(s =>
+          includeStates.contains(s.name))
+        log.debug(
+          s"Filtered states: ${filteredStates.map(_.name).mkString(",")}")
+        filteredStates.map(_.id)
+      }
+
+    loadIssues(0, None, labelIds, stateIds)
       .map { result =>
         // fetched all results, notify
         if (log.isDebugEnabled) {
@@ -143,13 +166,29 @@ class PlaneTagParseWorker(wsClient: WSClient,
     )
   }
 
+  private def loadLabels(): Future[Seq[PlaneLabel]] = {
+    log.debug(
+      s"Fetch labels for projectId=${projectId.value}, planeProjectId=${projectSettings.planeProjectId}")
+    apiService
+      .getLabels(projectSettings.planeWorkspace, projectSettings.planeProjectId)
+  }
+
+  private def loadStates(): Future[Seq[PlaneState]] = {
+    log.debug(
+      s"Fetch states for projectId=${projectId.value}, planeProjectId=${projectSettings.planeProjectId}")
+    apiService
+      .getStates(projectSettings.planeWorkspace, projectSettings.planeProjectId)
+  }
+
   def loadIssues(
       offset: Int,
       max: Option[Int],
+      labelIds: Future[Seq[String]],
+      stateIds: Future[Seq[String]],
       lastResult: Set[PlaneIssue] = Set()): Future[Set[PlaneIssue]] = {
     val newMax = max.getOrElse(maxResults)
 
-    issues(offset, newMax).flatMap { result =>
+    issues(offset, newMax, labelIds, stateIds).flatMap { result =>
       val concat: Set[PlaneIssue] = lastResult ++ result.issues.toSet
       log.debug(
         s"loaded issues: maxResults:${result.totalNumberOfItems}, fetch count${concat.size}")
@@ -165,7 +204,7 @@ class PlaneTagParseWorker(wsClient: WSClient,
         Future.successful(concat)
       } else {
         // load next page
-        loadIssues(offset + 1, max, concat)
+        loadIssues(offset + 1, max, labelIds, stateIds, concat)
       }
     }
   }
@@ -178,16 +217,23 @@ class PlaneTagParseWorker(wsClient: WSClient,
       .getLabels(projectSettings.planeWorkspace, projectSettings.planeProjectId)
   }
 
-  def issues(offset: Int, max: Int): Future[PlaneIssuesSearchResult] = {
+  def issues(offset: Int, max: Int, labelIds: Future[Seq[String]], stateIds: Future[Seq[String]]): Future[PlaneIssuesSearchResult] = {
     log.debug(
       s"Parse issues projectId=${projectId.value}, project=${projectSettings.planeProjectId}, offset:$offset, max:$max")
     val query = projectSettings.params.getOrElse(defaultParams)
-    apiService
-      .findIssues(projectSettings.planeWorkspace,
-                  projectSettings.planeProjectId,
-                  query,
-                  Some(offset),
-                  Some(max))
+    labelIds.map { labelIdsL => {
+      stateIds.map { stateIdsL =>
+          apiService
+            .findIssues(projectSettings.planeWorkspace,
+              projectSettings.planeProjectId,
+              query,
+              Some(offset),
+              Some(max),
+              labelIdsL,
+              stateIdsL)
+        }
+      } flatten
+    } flatten
   }
 
   override def postStop(): Unit = {

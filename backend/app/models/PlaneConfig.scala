@@ -35,7 +35,9 @@ case class PlaneSettings(checkFrequency: Long)
 case class PlaneTagConfiguration(useLabels: Boolean,
                                  labelFilter: Set[String],
                                  useMilestone: Boolean = false,
-                                 useTitle: Boolean = false)
+                                 useTitle: Boolean = false,
+                                 includeOnlyIssuesWithLabels: Set[String] = Set(),
+                                 includeOnlyIssuesWithState: Set[String] = Set())
 
 case class PlaneProjectSettings(planeWorkspace: String,
                                 planeProjectId: String,
