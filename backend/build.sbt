@@ -63,7 +63,7 @@ libraryDependencies ++= Seq(
   "com.chuusai"         %% "shapeless"                 % "2.3.12",
   "net.openhft"          % "zero-allocation-hashing"   % "0.16",
   // depend on this plugin to be able to provide custom OutputTransformer
-  "io.github.play-swagger" %% "play-swagger" % "2.0.2",
+  "io.github.play-swagger" %% "play-swagger" % "2.0.4",
   ehcache,
   ws,
   specs2 % Test,
