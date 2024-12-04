@@ -61,7 +61,7 @@ libraryDependencies ++= Seq(
   "com.github.dnvriend" %% "akka-persistence-inmemory" % "2.5.15.2" % "test",
   "io.kontainers"       %% "purecsv"                   % "1.3.10",
   "com.chuusai"         %% "shapeless"                 % "2.3.12",
-  "net.openhft"          % "zero-allocation-hashing"   % "0.16",
+  "net.openhft"          % "zero-allocation-hashing"   % "0.27ea0",
   // depend on this plugin to be able to provide custom OutputTransformer
   "io.github.play-swagger" %% "play-swagger" % "2.0.4",
   ehcache,
