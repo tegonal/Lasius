@@ -21,6 +21,7 @@
 
 package core.db
 
+import com.typesafe.config.Config
 import core.{DBSession, DBSupport, SystemServices}
 import domain.UserTimeBookingAggregate.AddBookingCommand
 import models.UserId.UserReference
@@ -31,6 +32,7 @@ import play.api.Logging
 import play.modules.reactivemongo.ReactiveMongoApi
 import repositories._
 
+import java.net.{URI, URL}
 import javax.inject.Inject
 import scala.annotation.tailrec
 import scala.concurrent.{ExecutionContext, Future}
@@ -41,7 +43,9 @@ class InitialDemoDataLoader @Inject() (
     userRepository: UserRepository,
     projectRepository: ProjectRepository,
     organisationRepository: OrganisationRepository,
-    systemServices: SystemServices)(implicit executionContext: ExecutionContext)
+    planeConfigRepository: PlaneConfigRepository,
+    systemServices: SystemServices,
+    config: Config)(implicit executionContext: ExecutionContext)
     extends Logging
     with DBSupport
     with InitialDataLoader {
