@@ -96,7 +96,7 @@
     "eslint-plugin-license-header": "^0.6.1",
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-react": "^7.35.0",
-    "i18next-parser": "^8.13.0",
+    "i18next-parser": "^9.0.0",
     "orval": "7.3.0",
     "prettier": "^3.3.3",
     "svgo": "^3.3.2",
