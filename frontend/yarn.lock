@@ -8964,13 +8964,13 @@ __metadata:
   linkType: hard
 
 "next-plausible@npm:^3.12.2":
-  version: 3.12.2
-  resolution: "next-plausible@npm:3.12.2"
+  version: 3.12.4
+  resolution: "next-plausible@npm:3.12.4"
   peerDependencies:
-    next: ^11.1.0 || ^12.0.0 || ^13.0.0 || ^14.0.0
-    react: ^16.8.0 || ^17.0.0 || ^18.0.0
-    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
-  checksum: 10/b0e7ccb221d12e5815cc6e080d85a0115402fd3cc163ef4c941c994794d64aedaa16c933716202a43595daf78177c5698e0d32ed7c4b31a500d86bf7ef8eec76
+    next: "^11.1.0 || ^12.0.0 || ^13.0.0 || ^14.0.0 || ^15.0.0 "
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  checksum: 10/fb5cfd14e855ac067244b9b5cb58f6ac60936764e36161170a422aa485762eebce1e788d17c907c66b368775ebac9adffd2085591f407eab22c4aa4927e46225
   languageName: node
   linkType: hard
 
