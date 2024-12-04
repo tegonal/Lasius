@@ -36,7 +36,7 @@ resolvers += "Tegonal releases".at(
 resolvers += "Sonatype OSS Releases".at(
   "https://oss.sonatype.org/content/repositories/releases")
 
-val akkaVersion              = "2.6.21"
+val akkaVersion              = "2.8.8"
 val reactiveMongoVersion     = "1.1.0"
 val reactiveMongoPlayVersion = s"$reactiveMongoVersion-play29.RC13"
 val playVersion              = "2.9.5"
