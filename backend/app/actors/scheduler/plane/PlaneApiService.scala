@@ -103,13 +103,13 @@ class PlaneApiServiceImpl(override val ws: WSClient,
     logger.debug(s"findIssues: $url")
     getSingleValue[PlaneIssueWrapper](url).map { case (planeIssueWrapper, _) =>
       PlaneIssuesSearchResult(
-        planeIssueWrapper.results,
-        Some(planeIssueWrapper.total_results),
-        Some(planeIssueWrapper.total_pages),
-        maxResults,
-        Some(planeIssueWrapper.count),
-        Some(planeIssueWrapper.next_page_results),
-        Some(planeIssueWrapper.prev_page_results)
+        issues = planeIssueWrapper.results,
+        totalNumberOfItems = Some(planeIssueWrapper.total_results),
+        totalPages = Some(planeIssueWrapper.total_pages),
+        perPage = maxResults,
+        page = Some(planeIssueWrapper.count),
+        nextPage = Some(planeIssueWrapper.next_page_results),
+        prevPage = Some(planeIssueWrapper.prev_page_results)
       )
     }
   }
