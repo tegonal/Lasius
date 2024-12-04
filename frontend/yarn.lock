@@ -1975,17 +1975,17 @@ __metadata:
   linkType: hard
 
 "@headlessui/react@npm:^2.1.2":
-  version: 2.1.3
-  resolution: "@headlessui/react@npm:2.1.3"
+  version: 2.2.0
+  resolution: "@headlessui/react@npm:2.2.0"
   dependencies:
     "@floating-ui/react": "npm:^0.26.16"
     "@react-aria/focus": "npm:^3.17.1"
     "@react-aria/interactions": "npm:^3.21.3"
     "@tanstack/react-virtual": "npm:^3.8.1"
   peerDependencies:
-    react: ^18
-    react-dom: ^18
-  checksum: 10/8cb723ef690fd1fb42c3ec8872071881c6c856d7ca31c75f53bde32f4a314a3dd8186defca786bc089fce50e2b8cbd4390dd5b3971273c5c4515064199befca8
+    react: ^18 || ^19 || ^19.0.0-rc
+    react-dom: ^18 || ^19 || ^19.0.0-rc
+  checksum: 10/baaa65f2cadf87d6ef5a15de5c8e532b79f491258166af6f3fe7b05a9196de4db9f3414b62192b4588c610786acb6623e3d775fc23d9001f6b31d13c4a5854c1
   languageName: node
   linkType: hard
 
