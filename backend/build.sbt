@@ -39,7 +39,7 @@ resolvers += "Sonatype OSS Releases".at(
 val akkaVersion              = "2.6.21"
 val reactiveMongoVersion     = "1.1.0"
 val reactiveMongoPlayVersion = s"$reactiveMongoVersion-play29.RC13"
-val playVersion              = "2.9.5"
+val playVersion              = "2.9.6"
 
 libraryDependencies ++= Seq(
   ("org.reactivemongo" %% "play2-reactivemongo" % reactiveMongoPlayVersion)
@@ -48,8 +48,8 @@ libraryDependencies ++= Seq(
   "com.tegonal"                 %% "play-json-typedid"              % "1.0.3",
   "org.julienrf"                %% "play-json-derived-codecs"       % "11.0.0",
   "com.typesafe.play"           %% "play-json-joda"                 % "2.10.6",
-  "com.google.inject"            % "guice"                          % "5.1.0",
-  "com.google.inject.extensions" % "guice-assistedinject"           % "5.1.0",
+  "com.google.inject"            % "guice"                          % "6.0.0",
+  "com.google.inject.extensions" % "guice-assistedinject"           % "6.0.0",
   // support more than 22 fields in case classes
   "com.typesafe.akka" %% "akka-persistence"       % akkaVersion,
   "com.typesafe.akka" %% "akka-persistence-query" % akkaVersion,
@@ -57,7 +57,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-testkit"           % akkaVersion % "test",
   // reativemongo based connector for persistent akka
   "org.mindrot"          % "jbcrypt"                   % "0.4",
-  "de.flapdoodle.embed"  % "de.flapdoodle.embed.mongo" % "4.18.1"    % "test",
+  "de.flapdoodle.embed"  % "de.flapdoodle.embed.mongo" % "4.18.1"   % "test",
   "com.github.dnvriend" %% "akka-persistence-inmemory" % "2.5.15.2" % "test",
   "io.kontainers"       %% "purecsv"                   % "1.3.10",
   "com.chuusai"         %% "shapeless"                 % "2.3.12",
