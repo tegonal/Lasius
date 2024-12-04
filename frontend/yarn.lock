@@ -5646,12 +5646,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"date-fns-tz@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "date-fns-tz@npm:2.0.1"
+"date-fns-tz@npm:^3.2.0":
+  version: 3.2.0
+  resolution: "date-fns-tz@npm:3.2.0"
   peerDependencies:
-    date-fns: 2.x
-  checksum: 10/f12e684bc13c9fe7ef7910c5b25437e15290a655d45102b7420f046cecdf9fa5715bf333d6dfb6bab6c382c7abc6b58241a50c216e9ab0b60d6fdb388f473d6b
+    date-fns: ^3.0.0 || ^4.0.0
+  checksum: 10/8ab4745f00b40381220f0a7a2ec16e217cb629d4018a19047264d289dd260322baa23e19b3ed63c7e553f9ad34bea9dea105391132930a3e141e9a0a53e54af2
   languageName: node
   linkType: hard
 
@@ -8570,7 +8570,7 @@ __metadata:
     boring-avatars: "npm:^1.10.2"
     concurrently: "npm:^9.0.0"
     date-fns: "npm:^4.0.0"
-    date-fns-tz: "npm:^2.0.1"
+    date-fns-tz: "npm:^3.2.0"
     eslint: "npm:9.16.0"
     eslint-config-airbnb: "npm:^19.0.4"
     eslint-config-next: "npm:^15.0.0"
