@@ -4566,9 +4566,9 @@ __metadata:
   linkType: hard
 
 "boring-avatars@npm:^1.10.2":
-  version: 1.10.2
-  resolution: "boring-avatars@npm:1.10.2"
-  checksum: 10/914d5cfa3e7448f623e7ca7fb28648ebcb8b0692c75f51a7e9258497b753f78de1a3fa55963f2be4265f740f7170978029575afa09a00b8c3daaf64d9352e850
+  version: 1.11.2
+  resolution: "boring-avatars@npm:1.11.2"
+  checksum: 10/247595b36396cf196789ace883428d3712c3c5ffc730b68aa698fb103fe99530bea22bc326dc93a2a97f8a5c6d1b2a7d82fb6d7af7e00376c4c95a5c37918359
   languageName: node
   linkType: hard
 
