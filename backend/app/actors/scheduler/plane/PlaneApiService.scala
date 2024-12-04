@@ -96,8 +96,11 @@ class PlaneApiServiceImpl(override val ws: WSClient,
       Some(paramString),
       getParam("cursor", s"${currentMaxResults}:${currentPage}:0"),
       getParam("per_page", currentMaxResults),
-      if(includeOnlyIssuesWithLabelsIds.isEmpty) None else getParam("labels", includeOnlyIssuesWithStateIds.mkString(",")),
-      if(includeOnlyIssuesWithStateIds.isEmpty) None else getParam("state", includeOnlyIssuesWithStateIds.mkString(",")))
+      if (includeOnlyIssuesWithLabelsIds.isEmpty) None
+      else getParam("labels", includeOnlyIssuesWithStateIds.mkString(",")),
+      if (includeOnlyIssuesWithStateIds.isEmpty) None
+      else getParam("state", includeOnlyIssuesWithStateIds.mkString(","))
+    )
 
     val url = findIssuesUrl.format(workspace, projectId) + params
     logger.debug(s"findIssues: $url")

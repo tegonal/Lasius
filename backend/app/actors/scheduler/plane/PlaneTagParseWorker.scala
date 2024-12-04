@@ -85,9 +85,9 @@ class PlaneTagParseWorker(wsClient: WSClient,
     // load labelIds from projectSettings.tagConfiguration.includeOnlyIssuesWithLabels
     val labelIds = allLabels
       .map { labels =>
-        val labelFilter = projectSettings.tagConfiguration.includeOnlyIssuesWithLabels
-        val filteredLabels = labels.filter(l =>
-          labelFilter.contains(l.name))
+        val labelFilter =
+          projectSettings.tagConfiguration.includeOnlyIssuesWithLabels
+        val filteredLabels = labels.filter(l => labelFilter.contains(l.name))
         log.debug(
           s"Filtered labels: ${filteredLabels.map(_.name).mkString(",")}")
         filteredLabels.map(_.id)
@@ -95,9 +95,9 @@ class PlaneTagParseWorker(wsClient: WSClient,
     val allStates = loadStates()
     val stateIds = allStates
       .map { states =>
-        val stateFilter = projectSettings.tagConfiguration.includeOnlyIssuesWithState
-        val filteredStates = states.filter(s =>
-          stateFilter.contains(s.name))
+        val stateFilter =
+          projectSettings.tagConfiguration.includeOnlyIssuesWithState
+        val filteredStates = states.filter(s => stateFilter.contains(s.name))
         log.debug(
           s"Filtered states: ${filteredStates.map(_.name).mkString(",")}")
         filteredStates.map(_.id)
@@ -216,20 +216,24 @@ class PlaneTagParseWorker(wsClient: WSClient,
       .getLabels(projectSettings.planeWorkspace, projectSettings.planeProjectId)
   }
 
-  def issues(offset: Int, max: Int, labelIds: Future[Seq[String]], stateIds: Future[Seq[String]]): Future[PlaneIssuesSearchResult] = {
+  def issues(offset: Int,
+             max: Int,
+             labelIds: Future[Seq[String]],
+             stateIds: Future[Seq[String]]): Future[PlaneIssuesSearchResult] = {
     log.debug(
       s"Parse issues projectId=${projectId.value}, project=${projectSettings.planeProjectId}, offset:$offset, max:$max")
     val query = projectSettings.params.getOrElse(defaultParams)
-    labelIds.map { labelIdsL => {
-      stateIds.map { stateIdsL =>
+    labelIds.map { labelIdsL =>
+      {
+        stateIds.map { stateIdsL =>
           apiService
             .findIssues(projectSettings.planeWorkspace,
-              projectSettings.planeProjectId,
-              query,
-              Some(offset),
-              Some(max),
-              labelIdsL,
-              stateIdsL)
+                        projectSettings.planeProjectId,
+                        query,
+                        Some(offset),
+                        Some(max),
+                        labelIdsL,
+                        stateIdsL)
         }
       } flatten
     } flatten
