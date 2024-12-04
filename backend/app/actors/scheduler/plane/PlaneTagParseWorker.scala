@@ -81,24 +81,23 @@ class PlaneTagParseWorker(wsClient: WSClient,
   }
 
   val parsing: Receive = { case Parse =>
-    val labelF = loadLabels()
+    val allLabels = loadLabels()
     // load labelIds from projectSettings.tagConfiguration.includeOnlyIssuesWithLabels
-    val labelIds = labelF
+    val labelIds = allLabels
       .map { labels =>
-        val excludeLabels = projectSettings.tagConfiguration.includeOnlyIssuesWithLabels
+        val labelFilter = projectSettings.tagConfiguration.includeOnlyIssuesWithLabels
         val filteredLabels = labels.filter(l =>
-          excludeLabels.contains(l.name))
+          labelFilter.contains(l.name))
         log.debug(
           s"Filtered labels: ${filteredLabels.map(_.name).mkString(",")}")
         filteredLabels.map(_.id)
       }
-    // load stateIds from projectSettings.tagConfiguration.includeOnlyIssuesWithState
-    val stateF = loadStates()
-    val stateIds = stateF
+    val allStates = loadStates()
+    val stateIds = allStates
       .map { states =>
-        val includeStates = projectSettings.tagConfiguration.includeOnlyIssuesWithState
+        val stateFilter = projectSettings.tagConfiguration.includeOnlyIssuesWithState
         val filteredStates = states.filter(s =>
-          includeStates.contains(s.name))
+          stateFilter.contains(s.name))
         log.debug(
           s"Filtered states: ${filteredStates.map(_.name).mkString(",")}")
         filteredStates.map(_.id)

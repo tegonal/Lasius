@@ -90,7 +90,7 @@ class PlaneApiServiceImpl(override val ws: WSClient,
       executionContext: ExecutionContext): Future[PlaneIssuesSearchResult] = {
 
     val currentPage       = page.getOrElse(0)
-    val currentMaxResults = maxResults.getOrElse(100).max(100)
+    val currentMaxResults = maxResults.getOrElse(100).min(100)
 
     val params = getParamList(
       Some(paramString),
