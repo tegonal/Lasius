@@ -12,6 +12,6 @@ addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.12.0")
 
 addSbtPlugin("io.github.play-swagger" % "sbt-play-swagger" % "1.7.3")
 
-addSbtPlugin("de.heikoseeberger" % "sbt-header" % "5.7.0")
+addSbtPlugin("de.heikoseeberger" % "sbt-header" % "5.10.0")
 
 addDependencyTreePlugin
