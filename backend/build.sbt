@@ -72,7 +72,7 @@ libraryDependencies ++= Seq(
 )
 
 dependencyOverrides ++= Seq(
-  "com.fasterxml.jackson.module" % "jackson-module-scala_2.13" % "2.17.2",
+  "com.fasterxml.jackson.module" % "jackson-module-scala_2.13" % "2.18.2",
 )
 
 Test / javaOptions += "-Dconfig.file=conf/test.conf"
