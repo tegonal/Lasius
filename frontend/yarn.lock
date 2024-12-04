@@ -3335,107 +3335,107 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@theme-ui/color-modes@npm:^0.16.2":
-  version: 0.16.2
-  resolution: "@theme-ui/color-modes@npm:0.16.2"
+"@theme-ui/color-modes@npm:^0.17.1":
+  version: 0.17.1
+  resolution: "@theme-ui/color-modes@npm:0.17.1"
   dependencies:
-    "@theme-ui/core": "npm:^0.16.2"
-    "@theme-ui/css": "npm:^0.16.2"
+    "@theme-ui/core": "npm:^0.17.1"
+    "@theme-ui/css": "npm:^0.17.1"
     deepmerge: "npm:^4.2.2"
   peerDependencies:
-    "@emotion/react": ^11.11.1
+    "@emotion/react": ^11.13.3
     react: ">=18"
-  checksum: 10/370594675e1c298b450d2b0774058190a1f0c3e22e1fb6d515b86aa288291a9e401abd88db8df8757d08eb87c6cd4860e00132246a759e5172b39fd323f22371
+  checksum: 10/405c20de8d2bddb157fc07fd4f6eec8568300761c328c6a81637d331b9ba82852a6f76833926b95ab3da342c6454dac11016c6a89484bfd6534ce27670a614e7
   languageName: node
   linkType: hard
 
-"@theme-ui/color@npm:^0.16.2":
-  version: 0.16.2
-  resolution: "@theme-ui/color@npm:0.16.2"
+"@theme-ui/color@npm:^0.17.0":
+  version: 0.17.1
+  resolution: "@theme-ui/color@npm:0.17.1"
   dependencies:
-    "@theme-ui/css": "npm:^0.16.2"
+    "@theme-ui/css": "npm:^0.17.1"
     polished: "npm:^4.0.5"
-  checksum: 10/b4cfd03a4bd496dfc61f889b2ccce570688d31c16404515d3e1679d00533d7fdaa6e97f9951c40bcb598e1dcd819d3a4867bb3f23df61021ba3aa7e35df1e9ac
+  checksum: 10/6cc636dda33ec84e1533c3dad46c5647304163a2ed3dd77a0aa59cf28e813061b9787d7bc9f41a5725c395b0ddb8492087d3e26d291c43232e03d523d05389fe
   languageName: node
   linkType: hard
 
-"@theme-ui/components@npm:^0.16.2":
-  version: 0.16.2
-  resolution: "@theme-ui/components@npm:0.16.2"
+"@theme-ui/components@npm:^0.17.1":
+  version: 0.17.1
+  resolution: "@theme-ui/components@npm:0.17.1"
   dependencies:
     "@styled-system/color": "npm:^5.1.2"
     "@styled-system/should-forward-prop": "npm:^5.1.2"
     "@styled-system/space": "npm:^5.1.2"
-    "@theme-ui/core": "npm:^0.16.2"
-    "@theme-ui/css": "npm:^0.16.2"
+    "@theme-ui/core": "npm:^0.17.1"
+    "@theme-ui/css": "npm:^0.17.1"
     "@types/styled-system": "npm:^5.1.13"
   peerDependencies:
-    "@emotion/react": ^11.11.1
-    "@theme-ui/theme-provider": ^0.16.2
+    "@emotion/react": ^11.13.3
+    "@theme-ui/theme-provider": ^0.17.1
     react: ">=18"
-  checksum: 10/9f27328b17a74889d6dce948639e9f8e25a562d34d244c8db01014f999949561e89e2db1a094cb29c5d07b94d87cacee49a4ebfc604ade2aef5fbdd3776ee258
+  checksum: 10/09b8ccf8caf02cf7c625fe5cc214741db11a709ad64a871e9b65eff0bcbdf45865855ef70689b254f4f68daecda08ab9cadb90a827f2b32450a7ceccae29f906
   languageName: node
   linkType: hard
 
-"@theme-ui/core@npm:^0.16.2":
-  version: 0.16.2
-  resolution: "@theme-ui/core@npm:0.16.2"
+"@theme-ui/core@npm:^0.17.1":
+  version: 0.17.1
+  resolution: "@theme-ui/core@npm:0.17.1"
   dependencies:
-    "@theme-ui/css": "npm:^0.16.2"
+    "@theme-ui/css": "npm:^0.17.1"
     deepmerge: "npm:^4.2.2"
   peerDependencies:
-    "@emotion/react": ^11.11.1
+    "@emotion/react": ^11.13.3
     react: ">=18"
-  checksum: 10/2b87bb9aa38914dbac905c4389f5467351e1ea80680444649dbc092f0b9e42d48692a46bfb537d1ad22784564722a72f2ee17c840d115a741819620c2f139236
+  checksum: 10/50bb2ce05dd8b7ad3fdfe55f552b4a6d5040af781e694ee773a74558220afe6defd0d0ad475d98e023791130a815fa7104290ad7ede0b032ceeac73ddb86a44c
   languageName: node
   linkType: hard
 
-"@theme-ui/css@npm:^0.16.2":
-  version: 0.16.2
-  resolution: "@theme-ui/css@npm:0.16.2"
+"@theme-ui/css@npm:^0.17.1":
+  version: 0.17.1
+  resolution: "@theme-ui/css@npm:0.17.1"
   dependencies:
     csstype: "npm:^3.0.10"
   peerDependencies:
     "@emotion/react": ^11.11.1
-  checksum: 10/45b4c9a1690ca5b14a6543cd79a6c83789103242bb61f9d0aff6dd49178bd57065fab65c3bfb793b64704c539c7c0fddde76992fa84eab50c6c75da484fc8ae2
+  checksum: 10/708fb1c075ccf043d975fa44a7cab36fef008dde84629af58afc91c6a398fcdafb454629d0c96c7c86d2336615ed74895f353da009fa95794f47315506e10f2a
   languageName: node
   linkType: hard
 
-"@theme-ui/global@npm:^0.16.2":
-  version: 0.16.2
-  resolution: "@theme-ui/global@npm:0.16.2"
+"@theme-ui/global@npm:^0.17.1":
+  version: 0.17.1
+  resolution: "@theme-ui/global@npm:0.17.1"
   dependencies:
-    "@theme-ui/core": "npm:^0.16.2"
-    "@theme-ui/css": "npm:^0.16.2"
+    "@theme-ui/core": "npm:^0.17.1"
+    "@theme-ui/css": "npm:^0.17.1"
   peerDependencies:
-    "@emotion/react": ^11.11.1
+    "@emotion/react": ^11.13.3
     react: ">=18"
-  checksum: 10/71d1498b0714c5ebfe27319e42767cb600484bcbb98987d9b9272e67caf1cae0de8122770faba11b59f331f4e243d736fbcaa6ecf5115683b615058470198bfc
+  checksum: 10/7f8263064b94c34b9950ff65f06a101a4d13cd3caeb6d3afb92c3dfeddcf7bd16e4b74c18cd11596e11008771eeb11b28ee049f42e93612051b71037a1ec85a1
   languageName: node
   linkType: hard
 
-"@theme-ui/match-media@npm:^0.16.2":
-  version: 0.16.2
-  resolution: "@theme-ui/match-media@npm:0.16.2"
+"@theme-ui/match-media@npm:^0.17.0":
+  version: 0.17.1
+  resolution: "@theme-ui/match-media@npm:0.17.1"
   peerDependencies:
-    "@theme-ui/core": ^0.16.2
-    "@theme-ui/css": ^0.16.2
+    "@theme-ui/core": ^0.17.1
+    "@theme-ui/css": ^0.17.1
     react: ">=18"
-  checksum: 10/085bf8aa5dc94a546a1f7ecf8e02bf3a27276c6e64c295f93476282188acb5efb7af0f46c6f910328c73550c2db9c0a66748474ae960bdd5a207966fa262efd8
+  checksum: 10/8e040193f189f5d351dc68e44a3f70e10ee9b11ecd2a806f50099a0f61eae6511de8a245dcdf539d7c6e0077ea6bea830c287bebeeb5a0289f3f7328e418a651
   languageName: node
   linkType: hard
 
-"@theme-ui/theme-provider@npm:^0.16.2":
-  version: 0.16.2
-  resolution: "@theme-ui/theme-provider@npm:0.16.2"
+"@theme-ui/theme-provider@npm:^0.17.1":
+  version: 0.17.1
+  resolution: "@theme-ui/theme-provider@npm:0.17.1"
   dependencies:
-    "@theme-ui/color-modes": "npm:^0.16.2"
-    "@theme-ui/core": "npm:^0.16.2"
-    "@theme-ui/css": "npm:^0.16.2"
+    "@theme-ui/color-modes": "npm:^0.17.1"
+    "@theme-ui/core": "npm:^0.17.1"
+    "@theme-ui/css": "npm:^0.17.1"
   peerDependencies:
-    "@emotion/react": ^11.11.1
+    "@emotion/react": ^11.13.3
     react: ">=18"
-  checksum: 10/e02863806f462743c9b94853bbe0a1c17993aff6bfe03842c76798b4562929c1f57743655e914077746859f341850844d18460c5858f0c2654eebbf752723d5c
+  checksum: 10/a282f4733daa6ba9b3473c4ae8ebf3e855850d00d76e16ef8fc83bee11efa9e5b5a1c8993087b38d6b0b69edf9e3ccef29492fdb0346ca4809ec86f4484e5b8d
   languageName: node
   linkType: hard
 
@@ -8338,8 +8338,8 @@ __metadata:
     "@nivo/pie": "npm:^0.87.0"
     "@openapitools/openapi-generator-cli": "npm:^2.13.5"
     "@popperjs/core": "npm:^2.11.8"
-    "@theme-ui/color": "npm:^0.16.2"
-    "@theme-ui/match-media": "npm:^0.16.2"
+    "@theme-ui/color": "npm:^0.17.0"
+    "@theme-ui/match-media": "npm:^0.17.0"
     "@types/cookie": "npm:^0.6.0"
     "@types/d3-shape": "npm:^3.1.6"
     "@types/js-cookie": "npm:^3.0.6"
@@ -8390,7 +8390,7 @@ __metadata:
     svgo: "npm:^3.3.2"
     svgstore-cli: "npm:^2.0.1"
     swr: "npm:^2.2.5"
-    theme-ui: "npm:^0.16.2"
+    theme-ui: "npm:^0.17.0"
     ts-export-to-csv: "npm:^0.3.3"
     tslog: "npm:^4.9.3"
     typescript: "npm:5.5.4"
@@ -11246,20 +11246,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"theme-ui@npm:^0.16.2":
-  version: 0.16.2
-  resolution: "theme-ui@npm:0.16.2"
+"theme-ui@npm:^0.17.0":
+  version: 0.17.1
+  resolution: "theme-ui@npm:0.17.1"
   dependencies:
-    "@theme-ui/color-modes": "npm:^0.16.2"
-    "@theme-ui/components": "npm:^0.16.2"
-    "@theme-ui/core": "npm:^0.16.2"
-    "@theme-ui/css": "npm:^0.16.2"
-    "@theme-ui/global": "npm:^0.16.2"
-    "@theme-ui/theme-provider": "npm:^0.16.2"
+    "@theme-ui/color-modes": "npm:^0.17.1"
+    "@theme-ui/components": "npm:^0.17.1"
+    "@theme-ui/core": "npm:^0.17.1"
+    "@theme-ui/css": "npm:^0.17.1"
+    "@theme-ui/global": "npm:^0.17.1"
+    "@theme-ui/theme-provider": "npm:^0.17.1"
   peerDependencies:
     "@emotion/react": ">=11.1.1"
     react: ">=18"
-  checksum: 10/0be10dfce7bcbac3209457169d646afaa67a5c302696acdef77454f41c17a4af3033d071b45ac29657b8a08b2c2adf2e23dae0dcda4e7407aeeadd75f1dfced0
+  checksum: 10/de168c5032b31372cd28604798ff9bca448ade3797bd20e9161cf29a27b5cdc08df02841ad692c68ab31cefcbf48fcb46d3c0b3ac4d284834508646605552818
   languageName: node
   linkType: hard
 
