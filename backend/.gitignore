@@ -23,4 +23,3 @@ activator-*.sbt
 .bloop/
 .metals/
 metals.sbt
-conf/demo.conf
