@@ -45,7 +45,7 @@
     "boring-avatars": "^1.10.2",
     "cookie": "^0.7.0",
     "date-fns": "^2.30.0",
-    "date-fns-tz": "^2.0.1",
+    "date-fns-tz": "^3.0.0",
     "framer-motion": "^11.3.29",
     "i18next": "^24.0.0",
     "js-cookie": "^3.0.5",
