@@ -49,7 +49,7 @@ libraryDependencies ++= Seq(
   "org.julienrf"                %% "play-json-derived-codecs"       % "11.0.0",
   "com.typesafe.play"           %% "play-json-joda"                 % "2.10.6",
   "com.google.inject"            % "guice"                          % "6.0.0",
-  "com.google.inject.extensions" % "guice-assistedinject"           % "6.0.0",
+  "com.google.inject.extensions" % "guice-assistedinject"           % "7.0.0",
   // support more than 22 fields in case classes
   "com.typesafe.akka" %% "akka-persistence"       % akkaVersion,
   "com.typesafe.akka" %% "akka-persistence-query" % akkaVersion,
