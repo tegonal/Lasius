@@ -28,7 +28,7 @@ import {
   startOfMonth,
   startOfWeek,
 } from 'date-fns';
-import { utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz';
+import { toZonedTime, fromZonedTime } from 'date-fns-tz';
 import { ModelsLocalDateTimeWithTimeZone } from 'lib/api/lasius';
 import { Granularity } from 'types/common';
 
@@ -125,7 +125,7 @@ export const modelsLocalDateTimeWithTimeZoneToString = (
   m: ModelsLocalDateTimeWithTimeZone
 ): string => {
   const isoDate = parseISO(m.dateTime);
-  const asUtc = zonedTimeToUtc(isoDate, m.zone);
-  const zoned = utcToZonedTime(asUtc, m.zone);
+  const asUtc = fromZonedTime(isoDate, m.zone);
+  const zoned = toZonedTime(asUtc, m.zone);
   return zoned.toISOString();
 };
