@@ -26,7 +26,7 @@ type Props = {
 };
 
 export const Portal = ({ children, selector }: Props) => {
-  const ref = useRef<Element | null>();
+  const ref = useRef<Element | null>(null);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
