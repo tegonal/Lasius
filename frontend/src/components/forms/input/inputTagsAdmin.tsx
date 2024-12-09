@@ -17,7 +17,13 @@
  *
  */
 
-import { Combobox } from '@headlessui/react';
+import {
+  Combobox,
+  ComboboxButton,
+  ComboboxInput,
+  ComboboxOptions,
+  ComboboxOption,
+} from '@headlessui/react';
 import { Tag, TagList } from 'components/shared/tagList';
 import { differenceBy, filter, noop, uniqBy } from 'lodash';
 import { useTranslation } from 'next-i18next';
@@ -108,8 +114,8 @@ export const InputTagsAdmin: React.FC<Props> = ({ name, tags = [], tagGroupIndex
                 <>
                   {/* Wrapping the input with a Button is a hack for https://github.com/tailwindlabs/headlessui/discussions/1236,
                     Without that the combobox does not open when you click in the input */}
-                  <Combobox.Button as={Box}>
-                    <Combobox.Input
+                  <ComboboxButton as={Box}>
+                    <ComboboxInput
                       as={Input}
                       onChange={(e) => setInputText(e.currentTarget.value)}
                       onClick={preventDefault}
@@ -131,12 +137,12 @@ export const InputTagsAdmin: React.FC<Props> = ({ name, tags = [], tagGroupIndex
                         <Icon name="remove-circle-interface-essential" size={20} />
                       </Box>
                     )}
-                  </Combobox.Button>
-                  <Combobox.Options as={Box}>
+                  </ComboboxButton>
+                  <ComboboxOptions as={Box}>
                     {open && displayCreateTag && (
                       <DropdownList sx={{ px: 2, display: 'flex', gap: 0, flexWrap: 'wrap' }}>
                         {displayCreateTag && (
-                          <Combobox.Option
+                          <ComboboxOption
                             as={Flex}
                             key="create_tag"
                             sx={{
@@ -160,11 +166,11 @@ export const InputTagsAdmin: React.FC<Props> = ({ name, tags = [], tagGroupIndex
                                 />
                               </>
                             )}
-                          </Combobox.Option>
+                          </ComboboxOption>
                         )}
                       </DropdownList>
                     )}
-                  </Combobox.Options>
+                  </ComboboxOptions>
                 </>
               )}
             </Combobox>

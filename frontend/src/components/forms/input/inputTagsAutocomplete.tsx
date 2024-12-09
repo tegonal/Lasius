@@ -154,11 +154,11 @@ export const InputTagsAutocomplete: React.FC<Props> = ({ suggestions = [], name 
                             }}
                             value={inputTag}
                           >
-                            {({ active }) => (
+                            {({ focus }) => (
                               <>
                                 <Box sx={{ fontSize: 1 }}>{`${t('Custom tag')}: `}</Box>
                                 <Tag
-                                  active={active}
+                                  active={focus}
                                   item={inputTag}
                                   clickHandler={noop}
                                   hideRemoveIcon
