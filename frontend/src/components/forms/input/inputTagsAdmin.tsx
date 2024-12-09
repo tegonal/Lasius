@@ -17,13 +17,7 @@
  *
  */
 
-import {
-  Combobox,
-  ComboboxButton,
-  ComboboxInput,
-  ComboboxOptions,
-  ComboboxOption,
-} from '@headlessui/react';
+import { Combobox, ComboboxInput, ComboboxOptions, ComboboxOption } from '@headlessui/react';
 import { Tag, TagList } from 'components/shared/tagList';
 import { differenceBy, filter, noop, uniqBy } from 'lodash';
 import { useTranslation } from 'next-i18next';
@@ -75,15 +69,17 @@ export const InputTagsAdmin: React.FC<Props> = ({ name, tags = [], tagGroupIndex
   };
 
   const addTag = (tag: any) => {
-    const tags = uniqBy([...selectedTags, tag], 'id');
-    setInputText('');
-    setSelectedTags(tags);
-    if (name === 'tagGroups') {
-      const currentTags = parentFormContext.getValues(name);
-      currentTags[tagGroupIndex].relatedTags = tags;
-      parentFormContext.setValue(name, currentTags);
-    } else {
-      parentFormContext.setValue(name, tags);
+    if (tag) {
+      const tags = uniqBy([...selectedTags, tag], 'id');
+      setInputText('');
+      setSelectedTags(tags);
+      if (name === 'tagGroups') {
+        const currentTags = parentFormContext.getValues(name);
+        currentTags[tagGroupIndex].relatedTags = tags;
+        parentFormContext.setValue(name, currentTags);
+      } else {
+        parentFormContext.setValue(name, tags);
+      }
     }
   };
 
@@ -95,6 +91,15 @@ export const InputTagsAdmin: React.FC<Props> = ({ name, tags = [], tagGroupIndex
 
   const preventDefault = (e: any) => {
     if (inputText) e.preventDefault();
+  };
+
+  const inputValueChanged = (e: any) => {
+    if (e.currentTarget.value == ' ') {
+      // ignore initial space as this should only open the combobox
+      setInputText('');
+    } else {
+      setInputText(e.currentTarget.value);
+    }
   };
 
   return (
@@ -112,32 +117,28 @@ export const InputTagsAdmin: React.FC<Props> = ({ name, tags = [], tagGroupIndex
             <Combobox value={selectedTags} onChange={addTag}>
               {({ open }) => (
                 <>
-                  {/* Wrapping the input with a Button is a hack for https://github.com/tailwindlabs/headlessui/discussions/1236,
-                    Without that the combobox does not open when you click in the input */}
-                  <ComboboxButton as={Box}>
-                    <ComboboxInput
-                      as={Input}
-                      onChange={(e) => setInputText(e.currentTarget.value)}
-                      onClick={preventDefault}
-                      displayValue={() => inputText}
-                      placeholder={t('Enter a tag to add it')}
-                      autoComplete="off"
-                    />
-                    {inputText && (
-                      <Box
-                        sx={{
-                          position: 'absolute',
-                          right: 2,
-                          top: '50%',
-                          transform: 'translateY(-50%)',
-                          ...clickableStyle(),
-                        }}
-                        onClick={() => setInputText('')}
-                      >
-                        <Icon name="remove-circle-interface-essential" size={20} />
-                      </Box>
-                    )}
-                  </ComboboxButton>
+                  <ComboboxInput
+                    as={Input}
+                    onChange={inputValueChanged}
+                    onClick={preventDefault}
+                    displayValue={() => inputText}
+                    placeholder={t('Enter a tag to add it')}
+                    autoComplete="off"
+                  />
+                  {inputText && (
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        right: 2,
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        ...clickableStyle(),
+                      }}
+                      onClick={() => setInputText('')}
+                    >
+                      <Icon name="remove-circle-interface-essential" size={20} />
+                    </Box>
+                  )}
                   <ComboboxOptions as={Box}>
                     {open && displayCreateTag && (
                       <DropdownList sx={{ px: 2, display: 'flex', gap: 0, flexWrap: 'wrap' }}>

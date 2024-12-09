@@ -17,13 +17,7 @@
  *
  */
 
-import {
-  Combobox,
-  ComboboxInput,
-  ComboboxButton,
-  ComboboxOptions,
-  ComboboxOption,
-} from '@headlessui/react';
+import { Combobox, ComboboxInput, ComboboxOptions, ComboboxOption } from '@headlessui/react';
 import { DropdownList } from 'components/forms/input/shared/dropdownList';
 import { Tag, TagList } from 'components/shared/tagList';
 import { cleanStrForCmp } from 'lib/strings';
@@ -96,6 +90,15 @@ export const InputTagsAutocomplete: React.FC<Props> = ({ suggestions = [], name 
     if (inputText) e.preventDefault();
   };
 
+  const inputValueChanged = (e: any) => {
+    if (e.currentTarget.value == ' ') {
+      // ignore initial space as this should only open the combobox
+      setInputText('');
+    } else {
+      setInputText(e.currentTarget.value);
+    }
+  };
+
   return (
     <Box sx={{ label: 'InputTagsAutocomplete' }}>
       {selectedTags.length > 0 && (
@@ -111,32 +114,29 @@ export const InputTagsAutocomplete: React.FC<Props> = ({ suggestions = [], name 
             <Combobox value={selectedTags} onChange={addTag}>
               {({ open }) => (
                 <>
-                  {/* Wrapping the input with a Button is a hack for https://github.com/tailwindlabs/headlessui/discussions/1236,
-                    Without that the combobox does not open when you click in the input */}
-                  <ComboboxButton as={Box}>
-                    <ComboboxInput
-                      as={Input}
-                      onChange={(e) => setInputText(e.currentTarget.value)}
-                      onClick={preventDefault}
-                      displayValue={() => inputText}
-                      placeholder={t('Choose or enter tags')}
-                      autoComplete="off"
-                    />
-                    {inputText && (
-                      <Box
-                        sx={{
-                          position: 'absolute',
-                          right: 2,
-                          top: '50%',
-                          transform: 'translateY(-50%)',
-                          ...clickableStyle(),
-                        }}
-                        onClick={() => setInputText('')}
-                      >
-                        <Icon name="remove-circle-interface-essential" size={20} />
-                      </Box>
-                    )}
-                  </ComboboxButton>
+                  <ComboboxInput
+                    as={Input}
+                    onChange={inputValueChanged}
+                    onClick={preventDefault}
+                    displayValue={() => inputText}
+                    placeholder={t('Choose or enter tags')}
+                    autoComplete="off"
+                    value={inputText}
+                  />
+                  {inputText && (
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        right: 2,
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        ...clickableStyle(),
+                      }}
+                      onClick={() => setInputText('')}
+                    >
+                      <Icon name="remove-circle-interface-essential" size={20} />
+                    </Box>
+                  )}
                   <ComboboxOptions as={Box}>
                     {open && (displayCreateTag || availableSuggestions.length > 0) && (
                       <DropdownList sx={{ px: 2, display: 'flex', gap: 0, flexWrap: 'wrap' }}>

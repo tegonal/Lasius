@@ -108,7 +108,11 @@ export const InputSelectAutocomplete: React.FC<Props> = ({
             render={({ field: { value, onChange } }) => (
               <Combobox
                 value={value}
-                onChange={(change: SelectAutocompleteSuggestionType) => onChange(change.id)}
+                onChange={(change: SelectAutocompleteSuggestionType) => {
+                  if (change?.id) {
+                    onChange(change.id);
+                  }
+                }}
               >
                 {({ open }) => (
                   <>
