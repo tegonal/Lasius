@@ -8588,7 +8588,7 @@ __metadata:
     json-stable-stringify: "npm:^1.1.1"
     lodash: "npm:^4.17.21"
     next: "npm:^15.0.0"
-    next-auth: "npm:4.24.10"
+    next-auth: "npm:4.24.11"
     next-i18next: "npm:^15.3.1"
     next-plausible: "npm:^3.12.2"
     next-pwa: "npm:^5.6.0"
@@ -9179,9 +9179,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"next-auth@npm:4.24.10":
-  version: 4.24.10
-  resolution: "next-auth@npm:4.24.10"
+"next-auth@npm:4.24.11":
+  version: 4.24.11
+  resolution: "next-auth@npm:4.24.11"
   dependencies:
     "@babel/runtime": "npm:^7.20.13"
     "@panva/hkdf": "npm:^1.0.2"
@@ -9196,14 +9196,14 @@ __metadata:
     "@auth/core": 0.34.2
     next: ^12.2.5 || ^13 || ^14 || ^15
     nodemailer: ^6.6.5
-    react: ^17.0.2 || ^18
-    react-dom: ^17.0.2 || ^18
+    react: ^17.0.2 || ^18 || ^19
+    react-dom: ^17.0.2 || ^18 || ^19
   peerDependenciesMeta:
     "@auth/core":
       optional: true
     nodemailer:
       optional: true
-  checksum: 10/59ba0c7dc20caf4f0004aa29bae2c15421988a158421435d640b758ef3b27625d556b83b85d3e2a43e1e05bde90e41d84b516ef908423e1e2dfc4a6998c675cc
+  checksum: 10/736ed5d274e46d245713a620783e4476a13b64b73f19802f53337e62f96cf6bd7031c6a6d85cf9c42a5c18f06419fb054e42aacc45c5dd149aae1a44d6afa5f7
   languageName: node
   linkType: hard
 
