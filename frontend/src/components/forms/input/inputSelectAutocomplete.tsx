@@ -17,7 +17,13 @@
  *
  */
 
-import { Combobox } from '@headlessui/react';
+import {
+  Combobox,
+  ComboboxButton,
+  ComboboxInput,
+  ComboboxOptions,
+  ComboboxOption,
+} from '@headlessui/react';
 import { DropdownList } from 'components/forms/input/shared/dropdownList';
 import { DropdownListItem } from 'components/forms/input/shared/dropdownListItem';
 import { cleanStrForCmp } from 'lib/strings';
@@ -102,21 +108,25 @@ export const InputSelectAutocomplete: React.FC<Props> = ({
             render={({ field: { value, onChange } }) => (
               <Combobox
                 value={value}
-                onChange={(change: SelectAutocompleteSuggestionType) => onChange(change.id)}
+                onChange={(change: SelectAutocompleteSuggestionType) => {
+                  if (change?.id) {
+                    onChange(change.id);
+                  }
+                }}
               >
                 {({ open }) => (
                   <>
                     {/* Wrapping the input with a Button is a hack for https://github.com/tailwindlabs/headlessui/discussions/1236,
                     Without that the combobox does not open when you click in the input */}
-                    <Combobox.Button as={Box}>
-                      <Combobox.Input
+                    <ComboboxButton as={Box}>
+                      <ComboboxInput
                         as={Input}
                         onChange={(e) => setInputText(e.currentTarget.value)}
                         placeholder={t('Select project')}
                         autoComplete="off"
                         value={inputText}
                       />
-                    </Combobox.Button>
+                    </ComboboxButton>
                     {(selected || inputText) && (
                       <Box
                         sx={{
@@ -131,11 +141,11 @@ export const InputSelectAutocomplete: React.FC<Props> = ({
                         <Icon name="remove-circle-interface-essential" size={20} />
                       </Box>
                     )}
-                    <Combobox.Options as={Box}>
+                    <ComboboxOptions as={Box}>
                       {open && availableSuggestions.length > 0 && (
                         <DropdownList>
                           {availableSuggestions.map((suggestion) => (
-                            <Combobox.Option as={Box} key={suggestion.key} value={suggestion}>
+                            <ComboboxOption as={Box} key={suggestion.key} value={suggestion}>
                               {({ active, selected }) => (
                                 <DropdownListItem
                                   key={suggestion.id}
@@ -145,11 +155,11 @@ export const InputSelectAutocomplete: React.FC<Props> = ({
                                   selected={selected}
                                 />
                               )}
-                            </Combobox.Option>
+                            </ComboboxOption>
                           ))}
                         </DropdownList>
                       )}
-                    </Combobox.Options>
+                    </ComboboxOptions>
                   </>
                 )}
               </Combobox>

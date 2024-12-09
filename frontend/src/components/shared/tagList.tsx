@@ -122,7 +122,7 @@ export const TagList: React.FC<Props> = ({ items, clickHandler, hideRemoveIcon =
   return (
     <Flex sx={{ label: 'TagList', gap: 1, flexWrap: 'wrap' }}>
       {items
-        .filter((item) => !!item.id.trim())
+        .filter((item) => !!item?.id?.trim())
         .map((item) => (
           <Tag
             key={item.id}

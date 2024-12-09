@@ -2047,7 +2047,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@headlessui/react@npm:^2.1.2":
+"@headlessui/react@npm:^2.2.0":
   version: 2.2.0
   resolution: "@headlessui/react@npm:2.2.0"
   dependencies:
@@ -8545,7 +8545,7 @@ __metadata:
   dependencies:
     "@emotion/eslint-plugin": "npm:^11.12.0"
     "@emotion/react": "npm:^11.13.3"
-    "@headlessui/react": "npm:^2.1.2"
+    "@headlessui/react": "npm:^2.2.0"
     "@hookform/error-message": "npm:^2.0.1"
     "@next/bundle-analyzer": "npm:^15.0.0"
     "@nivo/bar": "npm:^0.88.0"
