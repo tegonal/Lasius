@@ -41,7 +41,7 @@ const numberLeftpadded = (value: number, from: number, to: number, leftpad: numb
  * @param leftpad
  */
 export const AnimateNumber: React.FC<Props> = ({ from, to, leftpad = 0 }) => {
-  const nodeRef: any = useRef();
+  const nodeRef: any = useRef(null);
 
   useEffect(() => {
     const node = nodeRef.current;

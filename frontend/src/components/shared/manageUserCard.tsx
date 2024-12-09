@@ -68,6 +68,8 @@ export const UserCard: React.FC<Props> = ({ canRemove = false, onRemove, user })
   const { t } = useTranslation('common');
   const { userId } = useProfile();
 
+  // @ts-expect-error React 19 type compatibility, nullable ref can be ignored.
+  // see https://github.com/juliencrn/usehooks-ts/issues/602
   useOnClickOutside(ref, () => setShowContext(false));
 
   const handleConfirm = () => {
