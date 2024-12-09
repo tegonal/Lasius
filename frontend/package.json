@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "@emotion/react": "^11.13.3",
-    "@headlessui/react": "^2.1.2",
+    "@headlessui/react": "^2.2.0",
     "@hookform/error-message": "^2.0.1",
     "@nivo/bar": "^0.88.0",
     "@nivo/core": "^0.88.0",
