@@ -7063,16 +7063,16 @@ __metadata:
   linkType: hard
 
 "framer-motion@npm:^11.3.29":
-  version: 11.13.1
-  resolution: "framer-motion@npm:11.13.1"
+  version: 11.13.5
+  resolution: "framer-motion@npm:11.13.5"
   dependencies:
     motion-dom: "npm:^11.13.0"
     motion-utils: "npm:^11.13.0"
     tslib: "npm:^2.4.0"
   peerDependencies:
     "@emotion/is-prop-valid": "*"
-    react: ^18.0.0
-    react-dom: ^18.0.0
+    react: ^18.0.0 || ^19.0.0
+    react-dom: ^18.0.0 || ^19.0.0
   peerDependenciesMeta:
     "@emotion/is-prop-valid":
       optional: true
@@ -7080,7 +7080,7 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 10/621419951160d1506931554595a977abf603a8ecb92c6481481c23c48b18f90691fcff3cc8570b4c86e8fe65d1fec98210c7d18ff5a3c6953e48bf603b833c02
+  checksum: 10/a47fb5932caff88638579da8539b88ccaeb615c30137fa239eab94df3bad5c0fea811a5153379d5e9d46dc0c0c6d006674badf8f681b9c067de947786e3c5dac
   languageName: node
   linkType: hard
 
