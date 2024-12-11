@@ -7681,17 +7681,17 @@ __metadata:
   linkType: hard
 
 "i18next@npm:^23.5.1":
-  version: 23.14.0
-  resolution: "i18next@npm:23.14.0"
+  version: 23.16.8
+  resolution: "i18next@npm:23.16.8"
   dependencies:
     "@babel/runtime": "npm:^7.23.2"
-  checksum: 10/661c1b22ae20bf75a616b3a804b96fd55bd04ed880853a05ef93912ed37f65b9546d8f8bbe55dfe2967a5b0f2ce110a7e9f4b7a6a3d90eb097d06c858d2b3e3f
+  checksum: 10/d5c38011de4d3b4aa466fac6773520eb28007b9d6138e03432bfbfc0d041c04df45e15c67d96f22cd660088cc9b24d3eda32cddc9fb4c6508c5afada6c2e6290
   languageName: node
   linkType: hard
 
 "i18next@npm:^24.0.0":
-  version: 24.0.5
-  resolution: "i18next@npm:24.0.5"
+  version: 24.1.0
+  resolution: "i18next@npm:24.1.0"
   dependencies:
     "@babel/runtime": "npm:^7.23.2"
   peerDependencies:
@@ -7699,7 +7699,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10/d0a310c7a0b171ae8265d178d5ef5c378ceafb83852338d042fa9483b720355dc1e2c84c69c77fec1b3e23da6f59e91c5170ada05cd174afc9be3fc218ebd195
+  checksum: 10/3a71b5052d84388a9097b594c2b8dc8bfba3f3198d1ca89217e5fb4836d528aa1aee54432269ae092c439e2a12bb71c2abe05abc03cd3e657a001fe5e6883b51
   languageName: node
   linkType: hard
 
