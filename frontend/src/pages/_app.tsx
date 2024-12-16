@@ -23,7 +23,7 @@ import { ThemeUIProvider } from 'theme-ui';
 import { globalStyles } from 'styles/theme/globalStyles';
 import { theme } from 'styles/theme';
 import { getSession, SessionProvider } from 'next-auth/react';
-import React, { ReactElement, ReactNode } from 'react';
+import React, { JSX, ReactElement, ReactNode } from 'react';
 import { appWithTranslation } from 'next-i18next';
 import { NextPage } from 'next';
 import { BootstrapTasks } from 'components/system/bootstrapTasks';
@@ -58,7 +58,7 @@ import dynamic from 'next/dynamic';
 import PlausibleProvider from 'next-plausible';
 
 export type NextPageWithLayout<P = Record<string, unknown>, IP = P> = NextPage<P, IP> & {
-  getLayout?: (page: ReactElement) => ReactNode;
+  getLayout?: (page: ReactElement<P>) => ReactNode;
 };
 
 type AppPropsWithLayout = AppProps & {
