@@ -22,7 +22,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Box } from '@theme-ui/components';
 import { useBoolean, useHover } from 'usehooks-ts';
 import { usePopper } from 'react-popper';
-import { Popover } from '@headlessui/react';
+import { Popover, PopoverPanel } from '@headlessui/react';
 import { Badge } from 'theme-ui';
 
 type Props = {
@@ -68,6 +68,8 @@ export const ToolTip: React.FC<Props> = ({
   });
 
   const hoverRef = useRef(null);
+  // @ts-expect-error React 19 type compatibility, nullable ref can be ignored.
+  // see https://github.com/juliencrn/usehooks-ts/issues/602
   const isHover = useHover(hoverRef);
 
   useEffect(() => {
@@ -85,7 +87,7 @@ export const ToolTip: React.FC<Props> = ({
           {children}
         </Box>
         {visible.value && (
-          <Popover.Panel
+          <PopoverPanel
             static
             as={Box}
             ref={setPopperElement as any}
@@ -97,7 +99,7 @@ export const ToolTip: React.FC<Props> = ({
                 {toolTipContent}
               </Badge>
             )}
-          </Popover.Panel>
+          </PopoverPanel>
         )}
       </Popover>
     </Box>
