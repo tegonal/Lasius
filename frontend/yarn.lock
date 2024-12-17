@@ -7053,8 +7053,8 @@ __metadata:
   linkType: hard
 
 "framer-motion@npm:^11.14.4":
-  version: 11.14.4
-  resolution: "framer-motion@npm:11.14.4"
+  version: 11.15.0
+  resolution: "framer-motion@npm:11.15.0"
   dependencies:
     motion-dom: "npm:^11.14.3"
     motion-utils: "npm:^11.14.3"
@@ -7070,7 +7070,7 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 10/303e996fb309bddf7b3fc220d0d4c07186b397a38589ed7d35175e03c1ea96243a2182780403d0dd7f5a510720ab9f08955b45b7ef5913ad05915ffea388219e
+  checksum: 10/e31b03fb5c91095279452a8aff2c483d8a379c79a05c2c5d38520923d083168d1f21507185f47b3372adf6b5e2043dd1ccf08d747734747453b1754c7da7a3b1
   languageName: node
   linkType: hard
 
