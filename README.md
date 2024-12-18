@@ -62,7 +62,7 @@ Our time tracker had to be based on open source components, meet our high privac
 # Development 
 ## Requirements
 
-* mongoDB >= 5.0.9
+* mongoDB >= 5.0.9, but <= 6.x
 
 ## Environment Variables
 
