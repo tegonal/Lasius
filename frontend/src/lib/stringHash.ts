@@ -25,8 +25,11 @@ import stringify from 'json-stable-stringify';
  * @return {Number}    A 32bit integer
  * @see http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/
  */
-function hashCode(str: string) {
+function hashCode(str: string | undefined) {
   let hash = 0;
+  if (!str) {
+    return hash;
+  }
   for (let i = 0, len = str.length; i < len; i += 1) {
     const chr = str.charCodeAt(i);
     // eslint-disable-next-line no-bitwise
