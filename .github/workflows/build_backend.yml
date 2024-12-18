@@ -5,16 +5,16 @@ on:
   pull_request:
   push:
     paths:
-      - 'backend/**'
+      - "backend/**"
     branches:
-      - '**'
+      - "**"
     tags-ignore:
-      - '**'
+      - "**"
 
 jobs:
   Build-Backend:
     name: Build & test backend application
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
