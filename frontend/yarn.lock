@@ -8464,15 +8464,15 @@ __metadata:
   linkType: hard
 
 "json-stable-stringify@npm:^1.1.1":
-  version: 1.2.0
-  resolution: "json-stable-stringify@npm:1.2.0"
+  version: 1.2.1
+  resolution: "json-stable-stringify@npm:1.2.1"
   dependencies:
     call-bind: "npm:^1.0.8"
     call-bound: "npm:^1.0.3"
     isarray: "npm:^2.0.5"
     jsonify: "npm:^0.0.1"
     object-keys: "npm:^1.1.1"
-  checksum: 10/02e54b459608db80d091f27a9d97478f77046af98b56e1c6dea1d42234bc446d29ba1cabc64cd477745886dc2c27e8c214fbe8dcfe9df7cb724fe87862313e2f
+  checksum: 10/f4600d34605e1da81a615ddf7dc62f021a5a5c822aee38b3c878e9a703bbd72623402944dbd7848140602c9ec54bfa2df65dfe75cc40afcfd79f3f072ca5307b
   languageName: node
   linkType: hard
 
