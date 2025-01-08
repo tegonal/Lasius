@@ -24,11 +24,25 @@ package actors.scheduler.plane
 import play.api.libs.json._
 
 import java.util.Date
+import scala.annotation.unused
 
-case class PlaneIssueWrapper(
+sealed trait PaginatedQueryResult[T] {
+  val grouped_by: Option[String]
+  val sub_grouped_by: Option[String]
+  val next_cursor: String
+  val prev_cursor: String
+  val next_page_results: Boolean
+  val prev_page_results: Boolean
+  val count: Int
+  val total_pages: Int
+  val total_results: Int
+  val extra_stats: Option[String]
+  val results: Seq[T]
+}
+
+case class PlaneIssuesQueryResult(
     grouped_by: Option[String],
     sub_grouped_by: Option[String],
-    total_count: Int,
     next_cursor: String,
     prev_cursor: String,
     next_page_results: Boolean,
@@ -38,7 +52,35 @@ case class PlaneIssueWrapper(
     total_results: Int,
     extra_stats: Option[String],
     results: Seq[PlaneIssue],
-)
+) extends PaginatedQueryResult[PlaneIssue]
+
+case class PlaneLabelsQueryResult(
+    grouped_by: Option[String],
+    sub_grouped_by: Option[String],
+    next_cursor: String,
+    prev_cursor: String,
+    next_page_results: Boolean,
+    prev_page_results: Boolean,
+    count: Int,
+    total_pages: Int,
+    total_results: Int,
+    extra_stats: Option[String],
+    results: Seq[PlaneLabel],
+) extends PaginatedQueryResult[PlaneLabel]
+
+case class PlaneStatesQueryResult(
+    grouped_by: Option[String],
+    sub_grouped_by: Option[String],
+    next_cursor: String,
+    prev_cursor: String,
+    next_page_results: Boolean,
+    prev_page_results: Boolean,
+    count: Int,
+    total_pages: Int,
+    total_results: Int,
+    extra_stats: Option[String],
+    results: Seq[PlaneState],
+) extends PaginatedQueryResult[PlaneState]
 
 case class PlaneLabel(
     id: String,
@@ -98,19 +140,19 @@ case class PlaneIssue(
     labels: Option[Seq[PlaneLabel]],
 )
 
-case class PlaneIssuesSearchResult(
-    issues: Seq[PlaneIssue],
-    totalNumberOfItems: Option[Int],
-    totalPages: Option[Int],
-    perPage: Option[Int],
-    page: Option[Int],
-    nextPage: Option[Boolean],
-    prevPage: Option[Boolean]
-)
+object PlaneIssuesQueryResult {
+  implicit val jsonFormat: Format[PlaneIssuesQueryResult] =
+    Json.format[PlaneIssuesQueryResult]
+}
 
-object PlaneIssueWrapper {
-  implicit val jsonFormat: Format[PlaneIssueWrapper] =
-    Json.format[PlaneIssueWrapper]
+object PlaneLabelsQueryResult {
+  implicit val jsonFormat: Format[PlaneLabelsQueryResult] =
+    Json.format[PlaneLabelsQueryResult]
+}
+
+object PlaneStatesQueryResult {
+  implicit val jsonFormat: Format[PlaneStatesQueryResult] =
+    Json.format[PlaneStatesQueryResult]
 }
 
 object PlaneLabel {
@@ -121,15 +163,11 @@ object PlaneState {
   implicit val jsonFormat: Format[PlaneState] = Json.format[PlaneState]
 }
 
+@unused("Used to build json format of PlaneIssue")
 object PlaneProject {
   implicit val jsonFormat: Format[PlaneProject] = Json.format[PlaneProject]
 }
 
 object PlaneIssue {
   implicit val jsonFormat: Format[PlaneIssue] = Json.format[PlaneIssue]
-}
-
-object PlaneIssuesSearchResult {
-  implicit val jsonFormat: Format[PlaneIssuesSearchResult] =
-    Json.format[PlaneIssuesSearchResult]
 }
