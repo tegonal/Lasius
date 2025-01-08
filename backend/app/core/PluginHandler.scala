@@ -150,7 +150,7 @@ class PluginHandler(userRepository: UserRepository,
         case Success(_) =>
           log.debug(s"Successfully loaded jira plugins")
         case Failure(exception) =>
-          log.warning(s"Failed loading jira configuration", exception)
+          log.warning(exception, "Failed loading jira configuration")
       }
     ()
   }
@@ -184,7 +184,7 @@ class PluginHandler(userRepository: UserRepository,
         case Success(_) =>
           log.debug(s"Successfully loaded gitlab plugins")
         case Failure(exception) =>
-          log.warning(s"Failed loading gitlab configuration", exception)
+          log.warning(exception, "Failed loading gitlab configuration")
       }
     ()
   }
@@ -217,7 +217,7 @@ class PluginHandler(userRepository: UserRepository,
         case Success(_) =>
           log.debug(s"Successfully loaded plane plugins")
         case Failure(exception) =>
-          log.warning(s"Failed loading plane configuration", exception)
+          log.warning(exception, "Failed loading plane configuration")
       }
     ()
   }

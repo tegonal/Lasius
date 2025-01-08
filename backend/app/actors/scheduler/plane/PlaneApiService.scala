@@ -26,6 +26,7 @@ import actors.scheduler.{
   ServiceAuthentication,
   ServiceConfiguration
 }
+import play.api.libs.json.Reads
 import play.api.libs.ws.WSClient
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -37,21 +38,20 @@ trait PlaneApiService {
 
   def findIssues(workspace: String,
                  projectId: String,
-                 query: String,
-                 page: Option[Int] = None,
-                 maxResults: Option[Int] = None,
-                 includeOnlyIssuesWithLabelsIds: Seq[String],
-                 includeOnlyIssuesWithStateIds: Seq[String])(implicit
+                 paramString: String,
+                 maxResults: Int,
+                 includeOnlyIssuesWithLabelsIds: Set[String],
+                 includeOnlyIssuesWithStateIds: Set[String])(implicit
       auth: ServiceAuthentication,
-      executionContext: ExecutionContext): Future[PlaneIssuesSearchResult]
+      executionContext: ExecutionContext): Future[Seq[PlaneIssue]]
 
-  def getLabels(workspace: String, projectId: String)(implicit
+  def getLabels(maxResults: Int, workspace: String, projectId: String)(implicit
       auth: ServiceAuthentication,
-      executionContext: ExecutionContext): Future[Seq[PlaneLabel]]
+      executionContext: ExecutionContext): Future[Set[PlaneLabel]]
 
-  def getStates(workspace: String, projectId: String)(implicit
+  def getStates(maxResults: Int, workspace: String, projectId: String)(implicit
       auth: ServiceAuthentication,
-      executionContext: ExecutionContext): Future[Seq[PlaneState]]
+      executionContext: ExecutionContext): Future[Set[PlaneState]]
 }
 
 class PlaneApiServiceImpl(override val ws: WSClient,
@@ -63,57 +63,97 @@ class PlaneApiServiceImpl(override val ws: WSClient,
   private val fetchLabelUrl = s"/api/v1/workspaces/%s/projects/%s/labels/?"
   private val fetchStateUrl = s"/api/v1/workspaces/%s/projects/%s/states/?"
 
-  def getLabels(workspace: String, projectId: String)(implicit
+  def getLabels(maxResults: Int, workspace: String, projectId: String)(implicit
       auth: ServiceAuthentication,
-      executionContext: ExecutionContext): Future[Seq[PlaneLabel]] = {
-    val params = getParamList(getParam("per_page", 100))
-    val url    = fetchLabelUrl.format(workspace, projectId) + params
-    getList[PlaneLabel](url).map(_._1)
+      executionContext: ExecutionContext): Future[Set[PlaneLabel]] = {
+    val url = fetchLabelUrl.format(workspace, projectId)
+    loadResults[PlaneLabel, PlaneLabelsQueryResult](
+      baseUrl = url,
+      maxResults = maxResults).map(_.toSet)
   }
 
-  def getStates(workspace: String, projectId: String)(implicit
+  def getStates(maxResults: Int, workspace: String, projectId: String)(implicit
       auth: ServiceAuthentication,
-      executionContext: ExecutionContext): Future[Seq[PlaneState]] = {
-    val params = getParamList(getParam("per_page", 100))
-    val url    = fetchStateUrl.format(workspace, projectId) + params
-    getList[PlaneState](url).map(_._1)
+      executionContext: ExecutionContext): Future[Set[PlaneState]] = {
+    val url = fetchStateUrl.format(workspace, projectId)
+    loadResults[PlaneState, PlaneStatesQueryResult](
+      baseUrl = url,
+      maxResults = maxResults).map(_.toSet)
   }
 
   def findIssues(workspace: String,
                  projectId: String,
                  paramString: String,
-                 page: Option[Int] = None,
-                 maxResults: Option[Int] = None,
-                 includeOnlyIssuesWithLabelsIds: Seq[String] = Seq(),
-                 includeOnlyIssuesWithStateIds: Seq[String] = Seq())(implicit
+                 maxResults: Int,
+                 includeOnlyIssuesWithLabelsIds: Set[String] = Set(),
+                 includeOnlyIssuesWithStateIds: Set[String] = Set())(implicit
       auth: ServiceAuthentication,
-      executionContext: ExecutionContext): Future[PlaneIssuesSearchResult] = {
+      executionContext: ExecutionContext): Future[Seq[PlaneIssue]] = {
 
-    val currentPage       = page.getOrElse(0)
-    val currentMaxResults = maxResults.getOrElse(100).min(100)
-
-    val params = getParamList(
+    val params = Seq(
       Some(paramString),
-      getParam("cursor", s"${currentMaxResults}:${currentPage}:0"),
-      getParam("per_page", currentMaxResults),
       if (includeOnlyIssuesWithLabelsIds.isEmpty) None
       else getParam("labels", includeOnlyIssuesWithStateIds.mkString(",")),
       if (includeOnlyIssuesWithStateIds.isEmpty) None
       else getParam("state", includeOnlyIssuesWithStateIds.mkString(","))
     )
 
-    val url = findIssuesUrl.format(workspace, projectId) + params
+    val url = findIssuesUrl.format(workspace, projectId)
     logger.debug(s"findIssues: $url")
-    getSingleValue[PlaneIssueWrapper](url).map { case (planeIssueWrapper, _) =>
-      PlaneIssuesSearchResult(
-        issues = planeIssueWrapper.results,
-        totalNumberOfItems = Some(planeIssueWrapper.total_results),
-        totalPages = Some(planeIssueWrapper.total_pages),
-        perPage = maxResults,
-        page = Some(planeIssueWrapper.count),
-        nextPage = Some(planeIssueWrapper.next_page_results),
-        prevPage = Some(planeIssueWrapper.prev_page_results)
-      )
+    loadResults[PlaneIssue, PlaneIssuesQueryResult](baseUrl = url,
+                                                    maxResults = maxResults,
+                                                    params = params)
+  }
+
+  private def loadResults[R, P <: PaginatedQueryResult[R]](
+      baseUrl: String,
+      maxResults: Int,
+      params: Seq[Option[String]] = Seq())(implicit
+      auth: ServiceAuthentication,
+      executionContext: ExecutionContext,
+      reads: Reads[P]): Future[Seq[R]] =
+    loadPage[R, P](baseUrl = baseUrl,
+                   page = 0,
+                   maxResults = maxResults,
+                   params = params,
+                   lastResult = Seq())
+
+  private def loadPage[R, P <: PaginatedQueryResult[R]](
+      baseUrl: String,
+      page: Int,
+      maxResults: Int,
+      params: Seq[Option[String]] = Seq(),
+      lastResult: Seq[R] = Seq())(implicit
+      auth: ServiceAuthentication,
+      executionContext: ExecutionContext,
+      reads: Reads[P]): Future[Seq[R]] = {
+    val queryParams = getParamList(
+      params :+
+        getParam("cursor", s"$maxResults:$page:0") :+
+        getParam("per_page", maxResults): _*,
+    )
+
+    val url = baseUrl + queryParams
+    logger.debug(s"loadPage: $url")
+    getSingleValue[P](url).flatMap { case (pageWrapper, _) =>
+      val concat = lastResult ++ pageWrapper.results
+      if (concat.size >= pageWrapper.total_results) {
+        // fetched all results, notify
+        Future.successful(concat)
+      } else if (page >= pageWrapper.total_pages) {
+        // fetched all pages
+        Future.successful(concat)
+      } else if (!pageWrapper.next_page_results) {
+        // no next page
+        Future.successful(concat)
+      } else {
+        // load next page
+        loadPage(baseUrl = baseUrl,
+                 page = page,
+                 maxResults = maxResults,
+                 params = params,
+                 lastResult = concat)
+      }
     }
   }
 }
