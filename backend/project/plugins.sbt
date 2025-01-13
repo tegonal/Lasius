@@ -4,7 +4,7 @@ resolvers += "Typesafe repository".at(
 // The Play plugin
 addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.9.6")
 
-addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.2")
+addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.3")
 
 addSbtPlugin("com.dwijnand" % "sbt-dynver" % "4.1.1")
 
