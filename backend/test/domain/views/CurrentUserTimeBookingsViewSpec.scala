@@ -22,11 +22,11 @@
 package domain.views
 
 import actors.ClientReceiver
-import akka.PersistentActorTestScope
-import akka.actor._
-import akka.pattern.StatusReply
-import akka.pattern.StatusReply.Ack
-import akka.testkit._
+import pekko.PersistentActorTestScope
+import org.apache.pekko.actor._
+import org.apache.pekko.pattern.StatusReply
+import org.apache.pekko.pattern.StatusReply.Ack
+import org.apache.pekko.testkit._
 import domain.AggregateRoot.InitializeViewLive
 import domain.views.CurrentUserTimeBookingsView.{
   CurrentTimeBookings,

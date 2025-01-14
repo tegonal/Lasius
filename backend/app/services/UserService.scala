@@ -21,7 +21,7 @@
 
 package services
 
-import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import org.apache.pekko.actor.{Actor, ActorLogging, ActorRef, Props}
 import domain.AggregateRoot.{
   ForwardPersistentEvent,
   InitializeViewLive,
@@ -41,7 +41,7 @@ abstract class UserService[C] extends Actor with ActorLogging {
   import UserService._
 
   /** Implicit convertion from userid object model to string based
-    * representation used in akka system
+    * representation used in pekko system
     */
   implicit def userId2String(userReference: UserReference): String =
     userReference.id.value.toString()

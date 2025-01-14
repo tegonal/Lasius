@@ -21,7 +21,7 @@
 
 package core
 
-import akka.actor.ActorSystem
+import org.apache.pekko.actor.ActorSystem
 import play.api.{ApplicationLoader, Logger}
 import play.api.i18n.Lang
 import play.api.inject.bind

@@ -22,7 +22,7 @@
 package actors
 
 import actors.ControlCommands._
-import akka.actor._
+import org.apache.pekko.actor._
 import com.google.inject.ImplementedBy
 import models._
 

@@ -21,8 +21,8 @@
 
 package core
 
-import akka.actor._
-import akka.event.EventStream
+import org.apache.pekko.actor._
+import org.apache.pekko.event.EventStream
 import models.UserId.UserReference
 import models._
 

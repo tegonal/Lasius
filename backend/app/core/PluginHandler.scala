@@ -29,7 +29,7 @@ import actors.scheduler.{
   OAuth2Authentication,
   ServiceConfiguration
 }
-import akka.actor._
+import org.apache.pekko.actor._
 import core.LoginHandler.InitializeUserViews
 import play.api.libs.ws.WSClient
 import play.modules.reactivemongo.ReactiveMongoApi

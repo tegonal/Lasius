@@ -22,8 +22,8 @@
 package domain
 
 import actors.ClientReceiver
-import akka.actor._
-import akka.persistence._
+import org.apache.pekko.actor._
+import org.apache.pekko.persistence._
 import core.{DBSupport, SystemServices}
 import models.LocalDateTimeWithTimeZone.DateTimeHelper
 import models.OrganisationId.OrganisationReference

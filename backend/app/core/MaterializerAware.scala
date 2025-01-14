@@ -21,7 +21,7 @@
 
 package core
 
-import akka.stream.Materializer
+import org.apache.pekko.stream.Materializer
 
 trait MaterializerAware {
   implicit protected val materializer: Materializer

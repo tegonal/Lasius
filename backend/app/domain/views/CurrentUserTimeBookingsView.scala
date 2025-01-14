@@ -22,8 +22,8 @@
 package domain.views
 
 import actors.ClientReceiver
-import akka.actor.{ActorLogging, Props}
-import akka.pattern.StatusReply.Ack
+import org.apache.pekko.actor.{ActorLogging, Props}
+import org.apache.pekko.pattern.StatusReply.Ack
 import domain.UserTimeBookingAggregate.UserTimeBooking
 import models.LocalDateTimeWithTimeZone.DateTimeHelper
 import models.UserId.UserReference

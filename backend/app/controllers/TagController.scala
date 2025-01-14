@@ -22,8 +22,8 @@
 package controllers
 
 import actors.TagCache.{CachedTags, GetTags}
-import akka.pattern.ask
-import akka.util.Timeout
+import org.apache.pekko.pattern.ask
+import org.apache.pekko.util.Timeout
 import core.SystemServices
 import models._
 import play.api.cache.AsyncCacheApi

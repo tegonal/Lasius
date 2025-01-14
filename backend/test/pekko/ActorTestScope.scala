@@ -19,10 +19,10 @@
  * along with Lasius. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package akka
+package pekko
 
-import akka.actor.ActorSystem
-import akka.testkit.TestKit
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.testkit.TestKit
 import org.specs2.matcher.Scope
 
 class ActorTestScope

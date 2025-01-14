@@ -21,7 +21,7 @@
 
 package core
 
-import akka.Done
+import org.apache.pekko.Done
 import play.api.cache.{AsyncCacheApi, SyncCacheApi}
 
 import scala.concurrent.Future

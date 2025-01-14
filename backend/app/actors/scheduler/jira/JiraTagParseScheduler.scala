@@ -26,8 +26,8 @@ import java.util.UUID
 import _root_.models.{JiraProjectSettings, JiraSettings, ProjectId}
 import actors.scheduler.{ServiceAuthentication, ServiceConfiguration}
 import actors.scheduler.jira.JiraTagParseWorker.StartParsing
-import akka.actor.SupervisorStrategy._
-import akka.actor.{OneForOneStrategy, Props, _}
+import org.apache.pekko.actor.SupervisorStrategy._
+import org.apache.pekko.actor.{OneForOneStrategy, Props, _}
 import core.SystemServices
 import play.api.libs.ws.WSClient
 

@@ -23,9 +23,9 @@ package core
 
 import actors.LasiusSupervisorActor
 import com.google.inject.AbstractModule
-import play.api.libs.concurrent.AkkaGuiceSupport
+import play.api.libs.concurrent.PekkoGuiceSupport
 
-class LasiusModule extends AbstractModule with AkkaGuiceSupport {
+class LasiusModule extends AbstractModule with PekkoGuiceSupport {
   override def configure = {
     bindActor[LasiusSupervisorActor](LasiusSupervisorActor.name)
     bind(classOf[SystemServices]).asEagerSingleton

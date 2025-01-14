@@ -22,10 +22,10 @@
 package domain.views
 
 import actors.ClientReceiver
-import akka.PersistentActorTestScope
-import akka.actor.Props
-import akka.pattern.StatusReply.Ack
-import akka.testkit._
+import pekko.PersistentActorTestScope
+import org.apache.pekko.actor.Props
+import org.apache.pekko.pattern.StatusReply.Ack
+import org.apache.pekko.testkit._
 import core.{DBSession, DBSupportMock, MockServices, TestDBSupport}
 import domain.views.CurrentOrganisationTimeBookingsView.{
   GetCurrentOrganisationTimeBookings,

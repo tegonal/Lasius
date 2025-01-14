@@ -22,10 +22,10 @@
 package core
 
 import actors.{ClientReceiver, LasiusSupervisorActor, TagCache}
-import akka.actor.{ActorRef, ActorSystem}
-import akka.pattern.ask
-import akka.stream.Materializer
-import akka.util.Timeout
+import org.apache.pekko.actor.{ActorRef, ActorSystem}
+import org.apache.pekko.pattern.ask
+import org.apache.pekko.stream.Materializer
+import org.apache.pekko.util.Timeout
 import com.google.inject.ImplementedBy
 import com.typesafe.config.Config
 import core.db.InitialDataLoader

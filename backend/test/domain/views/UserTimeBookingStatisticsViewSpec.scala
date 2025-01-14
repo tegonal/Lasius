@@ -22,10 +22,10 @@
 package domain.views
 
 import actors.ClientReceiver
-import akka.PersistentActorTestScope
-import akka.actor.{ActorSystem, Props}
-import akka.pattern.StatusReply.Ack
-import akka.testkit._
+import pekko.PersistentActorTestScope
+import org.apache.pekko.actor.{ActorSystem, Props}
+import org.apache.pekko.pattern.StatusReply.Ack
+import org.apache.pekko.testkit._
 import core.{DBSession, SystemServices}
 import domain.AggregateRoot.{InitializeViewLive, RestoreViewFromState}
 import domain.UserTimeBookingAggregate.UserTimeBooking

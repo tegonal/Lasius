@@ -22,8 +22,8 @@
 package services
 
 import actors.ClientReceiver
-import akka.actor.Props
-import akka.pattern.StatusReply.Ack
+import org.apache.pekko.actor.Props
+import org.apache.pekko.pattern.StatusReply.Ack
 import domain.views.LatestUserTimeBookingsView
 import domain.views.LatestUserTimeBookingsView._
 import domain.AggregateRoot.{

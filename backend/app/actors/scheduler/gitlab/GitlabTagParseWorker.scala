@@ -23,7 +23,7 @@ package actors.scheduler.gitlab
 
 import actors.TagCache.TagsUpdated
 import actors.scheduler.{ServiceAuthentication, ServiceConfiguration}
-import akka.actor._
+import org.apache.pekko.actor._
 import core.SystemServices
 import models._
 import play.api.libs.ws.WSClient

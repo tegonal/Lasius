@@ -22,7 +22,7 @@
 package core
 
 import javax.inject.Singleton
-import akka.actor.{ActorSystem, _}
+import org.apache.pekko.actor.{ActorSystem, _}
 import play.api.inject.{BindingKey, Injector}
 import play.api.libs.concurrent.ActorSystemProvider
 import play.api.{Configuration, Environment}
@@ -38,12 +38,12 @@ class PlayAwareActorSystemProvider @Inject() (environment: Environment,
   lazy val get: ActorSystem = {
     val actorSystem =
       ActorSystemProvider.start(environment.classLoader, configuration)
-    PlayAkkaExtension(actorSystem).initialize(injector)
+    PlayPekkoExtension(actorSystem).initialize(injector)
     actorSystem
   }
 }
 
-class PlayAkkaExtensionImpl extends Extension {
+class PlayPekkoExtensionImpl extends Extension {
   private var injector: Injector = _
 
   def initialize(injector: Injector): Unit = {
@@ -57,13 +57,13 @@ class PlayAkkaExtensionImpl extends Extension {
   def instanceOf[T](key: BindingKey[T]): T = injector.instanceOf(key)
 }
 
-object PlayAkkaExtension
-    extends ExtensionId[PlayAkkaExtensionImpl]
+object PlayPekkoExtension
+    extends ExtensionId[PlayPekkoExtensionImpl]
     with ExtensionIdProvider {
-  override def lookup = PlayAkkaExtension
+  override def lookup = PlayPekkoExtension
 
   override def createExtension(system: ExtendedActorSystem) =
-    new PlayAkkaExtensionImpl
-  override def get(system: ActorSystem): PlayAkkaExtensionImpl =
+    new PlayPekkoExtensionImpl
+  override def get(system: ActorSystem): PlayPekkoExtensionImpl =
     super.get(system)
 }

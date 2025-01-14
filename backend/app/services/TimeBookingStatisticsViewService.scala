@@ -22,7 +22,7 @@
 package services
 
 import actors.ClientReceiver
-import akka.actor.Props
+import org.apache.pekko.actor.Props
 import core.SystemServices
 import domain.AggregateRoot.{
   ForwardPersistentEvent,
@@ -33,7 +33,7 @@ import domain.views.UserTimeBookingStatisticsView
 import models.{EntityReference, UserId}
 import repositories.{BookingByProjectRepository, BookingByTagRepository}
 import services.UserService.StartUserTimeBookingView
-import akka.pattern.StatusReply.Ack
+import org.apache.pekko.pattern.StatusReply.Ack
 import models.UserId.UserReference
 import play.modules.reactivemongo.ReactiveMongoApi
 

@@ -22,9 +22,9 @@
 package domain.views
 
 import actors.ClientReceiver
-import akka.actor.{ActorLogging, Props}
-import akka.pattern.StatusReply.Ack
-import akka.stream.{ActorMaterializer, Materializer}
+import org.apache.pekko.actor.{ActorLogging, Props}
+import org.apache.pekko.pattern.StatusReply.Ack
+import org.apache.pekko.stream.{ActorMaterializer, Materializer}
 import domain.UserTimeBookingAggregate.UserTimeBooking
 import models.UserId.UserReference
 import models._
