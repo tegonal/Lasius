@@ -146,3 +146,12 @@ As we are strongly committed to open source software, we make Lasius available t
 If you would like us to set up or run Lasius for you then please contact us here for an offer: <https://tegonal.com>
 
 If you need help, discover a bug or have a feature request, please open an issue in this repo.
+
+## Migration
+
+# Migrating from 1.0.x to 1.1.x
+The migration from 1.0.x to 1.1.x includes a version bump of the underlying reactivemongo driver version. This version cannot read former created binary snapshots from the persistence layer. Therefore you need to manually drop the snapshots. The snapshots are rebuilt from the journal once a user logs in or tries to start a new booking.
+The snapshots can be removed by running the following command in the mongo-shell:
+```
+db.snapshots.remove({})
+```
