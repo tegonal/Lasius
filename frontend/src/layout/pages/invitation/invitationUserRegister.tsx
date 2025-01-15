@@ -93,8 +93,9 @@ export const InvitationUserRegister: React.FC<Props> = ({ invitation }) => {
     });
 
     if (response) {
+      const email = encodeURIComponent(data.email);
       await router.replace(
-        `/login?invitationId=${invitation.invitation.id}&email=${data.email}&registered=true`
+        `/login?invitationId=${invitation.invitation.id}&email=${email}&registered=true`
       );
     } else {
       setError('registerUserFailedUnknown');
