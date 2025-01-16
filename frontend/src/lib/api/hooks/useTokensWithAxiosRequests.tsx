@@ -16,7 +16,7 @@
  * If not, see <https://www.gnu.org/licenses/>.
  *
  */
-import { useSession } from 'next-auth/react';
+//import { useSession } from 'next-auth/react';
 import { COOKIE_NAMES } from 'projectConfig/constants';
 import { useIsClient } from 'usehooks-ts';
 import { logger } from 'lib/logger';
@@ -34,10 +34,10 @@ export const getClientSideRequestHeaders = () => {
 };
 
 export const useTokensWithAxiosRequests = () => {
-  const session = useSession();
+  //const session = useSession();
   const isClient = useIsClient();
   const windowIsDefined = typeof window !== 'undefined';
-  const sessionToken = session?.data?.user.sessionToken;
+  const sessionToken = undefined; //session?.data?.user.sessionToken;
   const axiosServerSideConfig = getServerSideRequestHeaders(sessionToken || '');
   const axiosClientSideConfig = getClientSideRequestHeaders();
   if (!isClient && !sessionToken) {

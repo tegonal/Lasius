@@ -22,12 +22,12 @@ import useWebSocket, { ReadyState } from 'react-use-websocket';
 import { CONNECTION_STATUS, IS_SERVER, LASIUS_API_WEBSOCKET_URL } from 'projectConfig/constants';
 import parseJson from 'parse-json';
 import { logger } from 'lib/logger';
-import { useSession } from 'next-auth/react';
+//import { useSession } from 'next-auth/react';
 import useIsWindowFocused from 'lib/hooks/useIsWindowFocused';
 
 export const useLasiusWebsocket = () => {
-  const { data } = useSession();
-  const token = data?.user?.sessionToken;
+  //const { data } = useSession();
+  const token = 'TODO_REPLACE'; //data?.user?.sessionToken;
   const isWindowFocused = useIsWindowFocused();
 
   if (!token) logger.warn('[useLasiusWebsocket][tokenUndefined]');

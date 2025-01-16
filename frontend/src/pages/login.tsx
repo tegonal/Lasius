@@ -23,7 +23,7 @@ import { Button, Input, Label } from 'theme-ui';
 import { isEmailAddress } from 'lib/validators';
 import { GetServerSideProps, NextPage } from 'next';
 import { FormErrorBadge } from 'components/forms/formErrorBadge';
-import { getCsrfToken, signIn } from 'next-auth/react';
+//import { getCsrfToken, signIn } from 'next-auth/react';
 import { CardContainer } from 'components/cardContainer';
 import { LoginLayout } from 'layout/pages/login/loginLayout';
 import { Logo } from 'components/logo';
@@ -44,6 +44,8 @@ import { usePlausible } from 'next-plausible';
 import { LasiusPlausibleEvents } from 'lib/telemetry/plausibleEvents';
 import { useStore } from 'storeContext/store';
 import { formatISOLocale } from 'lib/dates';
+import { login } from 'lib/api/lasius/oauth2-provider/oauth2-provider';
+import { useParams } from 'next/navigation';
 
 const Login: NextPage<{ csrfToken: string }> = ({ csrfToken }) => {
   const plausible = usePlausible<LasiusPlausibleEvents>();
@@ -52,7 +54,7 @@ const Login: NextPage<{ csrfToken: string }> = ({ csrfToken }) => {
   const [error, setError] = useState<keyof typeof LoginError>();
   const { t } = useTranslation('common');
   const router = useRouter();
-  const { invitationId = null, email = null, registered = null } = router.query;
+  const { invitationId = null, email = null, registered = null } = router.query;  
 
   const {
     register,
@@ -70,7 +72,11 @@ const Login: NextPage<{ csrfToken: string }> = ({ csrfToken }) => {
     setFocus('email');
   }, [setFocus]);
 
+  const {client_id, redirect_uri} = useParams()
+
   const onSubmit = async () => {
+
+    console.log('start login');
     plausible('login', {
       props: {
         status: 'start',
@@ -80,12 +86,14 @@ const Login: NextPage<{ csrfToken: string }> = ({ csrfToken }) => {
     const data = getValues();
     setIsSubmitting(true);
 
-    const res = await signIn('credentials', {
-      redirect: false,
+    const res = await login( {
       email: data.email,
       password: data.password,
-      callbackUrl: '/user/home',
-    });
+      redirectUri: redirect_uri,
+      clientId: client_id,
+      // TODO: generate random code
+      code: 'random_code'
+    })
 
     if (res?.status === 401) {
       setError('usernameOrPasswordWrong');
@@ -194,7 +202,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const { locale = '' } = context;
   return {
     props: {
-      csrfToken: await getCsrfToken(context),
+      //csrfToken: await getCsrfToken(context),
       ...(await serverSideTranslations(locale, ['common'])),
     },
   };

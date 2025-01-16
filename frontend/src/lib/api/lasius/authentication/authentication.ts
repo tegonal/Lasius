@@ -44,20 +44,3 @@ export const signOut = (options?: SecondParameter<typeof lasiusAxiosInstance>) =
   return lasiusAxiosInstance<void>({ url: `/signout`, method: 'POST' }, options);
 };
 
-/**
- * @summary Authenticate with user and password
- */
-export const signIn = (
-  controllersLoginForm: BodyType<ControllersLoginForm>,
-  options?: SecondParameter<typeof lasiusAxiosInstance>
-) => {
-  return lasiusAxiosInstance<SignIn200>(
-    {
-      url: `/signin`,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      data: controllersLoginForm,
-    },
-    options
-  );
-};
