@@ -32,9 +32,9 @@ import play.api.Logging
 import play.api.libs.json.Reads
 import play.api.mvc._
 
-import scala.compat.java8.OptionConverters.RichOptionalGeneric
 import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
+import scala.jdk.javaapi.OptionConverters
 import scala.language.postfixOps
 import scala.reflect.ClassTag
 
@@ -99,11 +99,11 @@ trait Security[P <: CommonProfile] extends Logging {
       ct: ClassTag[P]): Future[Option[P]] = {
     val webContext     = new PlayWebContext(request)
     val profileManager = new ProfileManager(webContext, playSessionStore)
-    val clazz          = implicitly[ClassTag[P]].runtimeClass
-    Future.successful(profileManager.getProfile().asScala.flatMap {
-      case p if clazz.isInstance(p) => Some(p.asInstanceOf[P])
-      case _                        => None
-    })
+    Future.successful(
+      OptionConverters.toScala(profileManager.getProfile()).flatMap {
+        case p: P => Some(p)
+        case _    => None
+      })
   }
 
   def HasUserRole[A, R <: UserRole](role: R, withinTransaction: Boolean)(

@@ -1,5 +1,5 @@
 import play.sbt.routes.RoutesKeys
-import org.scalafmt.sbt.ScalafmtPlugin.autoImport._
+import org.scalafmt.sbt.ScalafmtPlugin.autoImport.*
 
 name := """lasius"""
 
@@ -41,12 +41,12 @@ val reactiveMongoVersion     = "1.1.0"
 val reactiveMongoPlayVersion = s"$reactiveMongoVersion-play30.RC14"
 val playVersion              = "3.0.5"
 // Play framework 3.x is still bound to older guice version
-val guiceVersion = "6.0.0"
-val playOAuth2ProviderVersion = "1.5.0"
-val pac4jVersion              = "5.7.2"
+val guiceVersion              = "6.0.0"
+val playOAuth2ProviderVersion = "1.6.0"
+val pac4jVersion              = "6.1.0"
 
 libraryDependencies ++= Seq(
-  ("org.reactivemongo" %% "play2-reactivemongo" % reactiveMongoPlayVersion),
+  "org.reactivemongo" %% "play2-reactivemongo" % reactiveMongoPlayVersion,
   "com.github.scullxbones"      %% "pekko-persistence-mongodb" % "1.2.2",
   "com.tegonal"                 %% "play-json-typedid"         % "2.0.0",
   "org.julienrf"                %% "play-json-derived-codecs"  % "11.0.0",
@@ -71,11 +71,11 @@ libraryDependencies ++= Seq(
   "net.openhft"          % "zero-allocation-hashing"         % "0.27ea0",
   // depend on this plugin to be able to provide custom OutputTransformer
   "io.github.play-swagger" %% "play-swagger" % "2.0.4",
-  "com.github.fdimuccio"   %% "play2-sockjs" % "0.8.2",
+  "com.github.fdimuccio"   %% "play2-sockjs" % "0.10.0",
   // oauth2 provider dependencies
 
   // pac4j security libraries
-  "org.pac4j" %% "play-pac4j"   % "11.1.0-PLAY2.8",
+  "org.pac4j" %% "play-pac4j"   % "12.0.2-PLAY3.0",
   "org.pac4j"  % "pac4j-config" % pac4jVersion,
   // use oauth as default indirect authentication mechanism for the lasius frontend
   "org.pac4j" % "pac4j-oauth" % pac4jVersion,
@@ -86,8 +86,8 @@ libraryDependencies ++= Seq(
 // oauth2 provider dependencies to be able to provide a simple oauth server packed with lasius
   "com.nulab-inc" %% "scala-oauth2-core"     % playOAuth2ProviderVersion,
   "com.nulab-inc" %% "play2-oauth2-provider" % playOAuth2ProviderVersion,
-  // used for cookie encryption
-  "org.apache.shiro" % "shiro-core" % "1.12.0",
+  // used for cookie encryption, bind to version used in pac4j
+  "org.apache.shiro" % "shiro-core" % "1.13.0",
   ehcache,
   ws,
   specs2 % Test,
@@ -95,12 +95,12 @@ libraryDependencies ++= Seq(
   "org.webjars" % "swagger-ui" % "5.18.3"
 )
 
-//dependencyOverrides ++= Seq(
-//  "com.fasterxml.jackson.module" % "jackson-module-scala_2.13" % "2.18.2",
-//  "com.fasterxml.jackson.core"   % "jackson-databind"          % "2.18.2",
-//  "com.fasterxml.jackson.core"   % "jackson-core"              % "2.18.2",
-//  "com.fasterxml.jackson.core"   % "jackson-annotations"       % "2.18.2",
-//)
+dependencyOverrides ++= Seq(
+  "com.fasterxml.jackson.module" % "jackson-module-scala_2.13" % "2.18.2",
+  "com.fasterxml.jackson.core"   % "jackson-databind"          % "2.18.2",
+  "com.fasterxml.jackson.core"   % "jackson-core"              % "2.18.2",
+  "com.fasterxml.jackson.core"   % "jackson-annotations"       % "2.18.2",
+)
 
 Test / javaOptions += "-Dconfig.file=conf/test.conf"
 
