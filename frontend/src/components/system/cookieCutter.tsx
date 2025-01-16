@@ -24,20 +24,20 @@ import { COOKIE_NAMES } from 'projectConfig/constants';
 import { logger } from 'lib/logger';
 
 export const CookieCutter: React.FC = () => {
-  const session = useSession();
+  // const session = useSession();
 
-  // Set the token for client side requests to use
-  useEffect(() => {
-    const sessionToken = session?.data?.user.sessionToken;
-    logger.log('SessionToken', sessionToken);
-    if (sessionToken) {
-      cookie.set(COOKIE_NAMES.PLAY_SESSION, sessionToken, { sameSite: 'strict', path: '/' });
-    } else {
-      // legacy
-      cookie.remove(COOKIE_NAMES.PLAY_SESSION, { sameSite: 'strict', path: '/' });
-      cookie.remove(COOKIE_NAMES.PLAY_SESSION);
-    }
-  }, [session]);
+  // // Set the token for client side requests to use
+  // useEffect(() => {
+  //   const sessionToken = session?.data?.user.sessionToken;
+  //   logger.info('SessionToken', sessionToken);
+  //   if (sessionToken) {
+  //     cookie.set(COOKIE_NAMES.PLAY_SESSION, sessionToken, { sameSite: 'strict', path: '/' });
+  //   } else {
+  //     // legacy
+  //     cookie.remove(COOKIE_NAMES.PLAY_SESSION, { sameSite: 'strict', path: '/' });
+  //     cookie.remove(COOKIE_NAMES.PLAY_SESSION);
+  //   }
+  // }, [session]);
 
   return null;
 };
