@@ -25,6 +25,7 @@ import com.google.inject.{AbstractModule, Provides}
 import com.typesafe.config.{Config => TypesafeConfig}
 import org.pac4j.config.client.PropertiesConfigFactory
 import org.pac4j.core.config.Config
+import org.pac4j.core.context.FrameworkParameters
 import org.pac4j.core.context.session.{SessionStore, SessionStoreFactory}
 import org.pac4j.core.matching.matcher.PathMatcher
 import org.pac4j.http.client.direct.{DirectBearerAuthClient, HeaderClient}
@@ -120,10 +121,7 @@ class SecurityModule(environment: Environment, configuration: Configuration)
                         .excludeBranch("/backend/oauth2")
                         .excludeBranch("/backend/auth/callback"))
 
-    config.setSessionStoreFactory(new SessionStoreFactory {
-      override def newSessionStore(parameters: AnyRef*): SessionStore =
-        sessionStore
-    });
+    config.setSessionStoreFactory((_: FrameworkParameters) => sessionStore);
     config.setHttpActionAdapter(new PlayHttpActionAdapter())
     config
   }

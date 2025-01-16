@@ -26,8 +26,11 @@ import com.google.inject.AbstractModule
 import play.api.libs.concurrent.PekkoGuiceSupport
 import core.SystemServices
 
+import scala.annotation.unused
+
+@unused
 class LasiusModule extends AbstractModule with PekkoGuiceSupport {
-  override def configure() = {
+  override def configure(): Unit = {
     bindActor[LasiusSupervisorActor](LasiusSupervisorActor.name)
     bind(classOf[SystemServices]).asEagerSingleton()
   }
