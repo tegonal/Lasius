@@ -22,9 +22,9 @@
 package controllers
 
 import actors.ClientMessagingWebsocketActor
-import akka.actor.ActorSystem
-import akka.stream.{Materializer, OverflowStrategy}
-import akka.util.Timeout
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.stream.{Materializer, OverflowStrategy}
+import org.apache.pekko.util.Timeout
 import controllers.MessagingController.AuthOneTimeTokenQueryParamKey
 import core.SystemServices
 import models._

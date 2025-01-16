@@ -21,16 +21,14 @@
 
 package controllers
 
-import akka.http.scaladsl.model.StatusCodes
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.google.inject.Inject
 import com.typesafe.config.Config
 import core.SystemServices
 import models._
+import org.apache.pekko.http.scaladsl.model.StatusCodes
 import org.pac4j.core.context.session.SessionStore
-import org.pac4j.core.profile.CommonProfile
 import org.pac4j.play.scala.SecurityComponents
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.Json
 import play.api.mvc._
 import play.modules.reactivemongo.ReactiveMongoApi
 import repositories.{
@@ -41,7 +39,6 @@ import repositories.{
 import scalaoauth2.provider._
 
 import java.net.URLEncoder
-import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
 class OAuth2Controller @Inject() (

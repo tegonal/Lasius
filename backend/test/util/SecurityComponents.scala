@@ -21,9 +21,8 @@
 
 package util
 
-import akka.stream.testkit.NoMaterializer
+import org.apache.pekko.stream.testkit.NoMaterializer
 import org.pac4j.core.config.Config
-import org.pac4j.core.context.session.SessionStore
 import org.pac4j.play.scala.DefaultSecurityComponents
 import org.specs2.mock.Mockito.mock
 import play.api.mvc.BodyParsers
@@ -32,7 +31,6 @@ import play.api.test.Helpers
 object SecurityComponents {
   def stubSecurityComponents(): DefaultSecurityComponents =
     DefaultSecurityComponents(
-      sessionStore = mock[SessionStore],
       config = mock[Config],
       parser =
         new BodyParsers.Default(Helpers.stubPlayBodyParsers(NoMaterializer)),

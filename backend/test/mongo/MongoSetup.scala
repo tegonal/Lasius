@@ -69,7 +69,7 @@ object LazyMongo {
       override def net(): Transition[Net] =
         Start.to(classOf[Net]).initializedWith(Net.defaults.withPort(port))
     }
-    mongod.start(Version.Main.V4_4)
+    mongod.start(Version.Main.V7_0)
 
     implicit lazy val app: Application = new GuiceApplicationBuilder()
       .configure(Map(
