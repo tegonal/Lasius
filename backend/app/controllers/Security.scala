@@ -57,14 +57,7 @@ trait Security[P <: CommonProfile] extends Logging {
       context: ExecutionContext,
       reader: Reads[A],
       ct: ClassTag[P]): Action[A] = {
-    HasToken(parse.json[A], withinTransaction, null)(f)
-  }
-
-  def HasToken[A](p: BodyParser[A], withinTransaction: Boolean)(
-      f: DBSession => Subject[P] => Request[A] => Future[Result])(implicit
-      context: ExecutionContext,
-      ct: ClassTag[P]): Action[A] = {
-    HasToken(p, withinTransaction, null)(f)
+    HasToken(parse.json[A], withinTransaction)(f)
   }
 
   /** Checks that the token is:
@@ -72,25 +65,22 @@ trait Security[P <: CommonProfile] extends Logging {
     *   - either in the header or in the query string,
     *   - matches a token already stored in the play cache
     */
-  def HasToken[A](p: BodyParser[A],
-                  withinTransaction: Boolean,
-                  clients: String)(
+  def HasToken[A](p: BodyParser[A], withinTransaction: Boolean)(
       f: DBSession => Subject[P] => AuthenticatedRequest[A] => Future[Result])(
       implicit
       context: ExecutionContext,
       ct: ClassTag[P]): Action[A] = {
-    Secure(clients = clients).async(p) {
-      implicit request: AuthenticatedRequest[A] =>
-        withDBSession(withinTransaction) { implicit dbSession =>
-          getUserProfile.flatMap {
-            case Some(profile) =>
-              authConfig.resolveOrCreateUserByProfile(profile).flatMap { user =>
-                f(dbSession)(Subject(profile, user))(request)
-              }
-            case None =>
-              successful(Unauthorized("Could not resolve users profile"))
-          }
+    Secure().async(p) { implicit request: AuthenticatedRequest[A] =>
+      withDBSession(withinTransaction) { implicit dbSession =>
+        getUserProfile.flatMap {
+          case Some(profile) =>
+            authConfig.resolveOrCreateUserByProfile(profile).flatMap { user =>
+              f(dbSession)(Subject(profile, user))(request)
+            }
+          case None =>
+            successful(Unauthorized("Could not resolve users profile"))
         }
+      }
     }
   }
 

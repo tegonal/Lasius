@@ -84,6 +84,7 @@ class OAuth2Controller @Inject() (
 
   def login(): Action[OAuthAuthorizationCodeLoginRequest] =
     Action.async(validateJson[OAuthAuthorizationCodeLoginRequest]) { request =>
+      logger.info(s"login")
       ifLasiusOAuth2ProviderEnabled {
         checked {
           withinTransaction { implicit dbSession =>

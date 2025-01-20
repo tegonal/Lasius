@@ -77,11 +77,8 @@ libraryDependencies ++= Seq(
   // pac4j security libraries
   "org.pac4j" %% "play-pac4j"   % "12.0.2-PLAY3.0",
   "org.pac4j"  % "pac4j-config" % pac4jVersion,
-  // use oauth as default indirect authentication mechanism for the lasius frontend
-  "org.pac4j" % "pac4j-oauth" % pac4jVersion,
-  // use http and jwt to provide direct authentication for machine-to-machine integration
-  "org.pac4j" % "pac4j-http" % pac4jVersion,
-  "org.pac4j" % "pac4j-jwt"  % pac4jVersion,
+  // use jwt to provide direct authentication for machine-to-machine integration
+  "org.pac4j" % "pac4j-jwt" % pac4jVersion,
   // enable more pac4j modules in case needed
 // oauth2 provider dependencies to be able to provide a simple oauth server packed with lasius
   "com.nulab-inc" %% "scala-oauth2-core"     % playOAuth2ProviderVersion,
