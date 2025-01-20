@@ -18,18 +18,34 @@
  */
 
 import CredentialsProvider from 'next-auth/providers/credentials';
+import OAuthProvider from 'next-auth/providers';
 
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { logger } from 'lib/logger';
-import { oauthAccessToken } from 'lib/api/lasius/oauth2-provider/oauth2-provider';
-import { getUserProfile, updateUserSettings } from 'lib/api/lasius/user/user';
+//import { signIn } from 'lib/api/lasius/authentication/authentication';
+//import { getUserProfile, updateUserSettings } from 'lib/api/lasius/user/user';
 import { getServerSideRequestHeaders } from 'lib/api/hooks/useTokensWithAxiosRequests';
 
 const nextAuthOptions = (): NextAuthOptions => {
   return {
     providers: [
-      CredentialsProvider({
+      OAuthProvider({
+        id: 'lasius-internal',
+        name: 'Internal Lasius',
+        type: 'oauth',
+        authorization: 'http://localhost:3000/login',
+        token: 'http://localhost:3000/oauth/token',
+        userinfo: 'http://localhost:3000/backend',
+        profile(profile) {
+          return {
+            id: profile.id,
+            name: profile.name,
+            email: profile.email,
+          };
+        },
+      }),
+      /*CredentialsProvider({
         id: 'credentials',
         name: 'Basic auth on Lasius',
         credentials: {
@@ -46,7 +62,7 @@ const nextAuthOptions = (): NextAuthOptions => {
           let signInResponse;
 
           try {
-            signInResponse = await oauthAccessToken({ email, password });
+            signInResponse = await signIn({ email, password });
           } catch (error) {
             logger.error('[nextauth][signInFailed]', error);
           }
@@ -93,7 +109,7 @@ const nextAuthOptions = (): NextAuthOptions => {
 
           return null;
         },
-      }),
+      }),*/
     ],
     pages: {
       signIn: '/login',

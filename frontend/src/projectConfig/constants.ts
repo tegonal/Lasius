@@ -65,7 +65,7 @@ export const ROLES = {
 export type ROLES = typeof ROLES;
 
 export const COOKIE_NAMES = {
-  PLAY_SESSION: 'PLAY_SESSION',
+  XSRF_TOKEN: 'XSRF-TOKEN',
 };
 export type COOKIE_NAMES = typeof COOKIE_NAMES;
 

@@ -16,31 +16,32 @@
  * If not, see <https://www.gnu.org/licenses/>.
  *
  */
-//import { useSession } from 'next-auth/react';
+
+import { useSession } from 'next-auth/react';
 import { COOKIE_NAMES } from 'projectConfig/constants';
 import { useIsClient } from 'usehooks-ts';
 import { logger } from 'lib/logger';
 
-export const getServerSideRequestHeaders = (session: string) => {
+export const getServerSideRequestHeaders = (token: string) => {
   return {
-    headers: { Cookie: `${COOKIE_NAMES.PLAY_SESSION}=${session}` },
+    headers: { 'X-XSRF-TOKEN': token, Cookie: `${COOKIE_NAMES.XSRF_TOKEN}=${token}` },
   };
 };
 
-export const getClientSideRequestHeaders = () => {
+export const getClientSideRequestHeaders = (token: string) => {
   return {
-    headers: { },
+    headers: { 'X-XSRF-TOKEN': token },
   };
 };
 
 export const useTokensWithAxiosRequests = () => {
-  //const session = useSession();
+  const session = useSession();
   const isClient = useIsClient();
   const windowIsDefined = typeof window !== 'undefined';
-  const sessionToken = undefined; //session?.data?.user.sessionToken;
-  const axiosServerSideConfig = getServerSideRequestHeaders(sessionToken || '');
-  const axiosClientSideConfig = getClientSideRequestHeaders();
-  if (!isClient && !sessionToken) {
+  const token = session?.data?.user.xsrfToken;
+  const axiosServerSideConfig = getServerSideRequestHeaders(token || '');
+  const axiosClientSideConfig = getClientSideRequestHeaders(token || '');
+  if (!isClient && !token) {
     logger.error('[useAxiosServerSideToken][NoTokenSetOnServerRequest]');
   }
   return {
