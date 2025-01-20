@@ -22,7 +22,7 @@ import Axios from 'axios';
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import { IS_BROWSER } from 'projectConfig/constants';
 import { logger } from 'lib/logger';
-//import { signOut } from 'next-auth/react';
+import { signOut } from 'next-auth/react';
 import clientAxiosInstance from 'lib/api/ClientAxiosInstance';
 import { removeAccessibleCookies } from 'lib/removeAccessibleCookies';
 
@@ -61,7 +61,7 @@ export const lasiusAxiosInstance = <T>(
           window.location.pathname !== '/'
         ) {
           await removeAccessibleCookies();
-          //await signOut();
+          await signOut();
         } else {
           logger.info('[lasiusAxiosInstance][Unauthorized]', error);
           throw new Error(error);

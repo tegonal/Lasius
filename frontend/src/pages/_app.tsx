@@ -22,7 +22,7 @@ import Head from 'next/head';
 import { ThemeUIProvider } from 'theme-ui';
 import { globalStyles } from 'styles/theme/globalStyles';
 import { theme } from 'styles/theme';
-//import { getSession, SessionProvider } from 'next-auth/react';
+import { getSession, SessionProvider } from 'next-auth/react';
 import React, { JSX, ReactElement, ReactNode } from 'react';
 import { appWithTranslation } from 'next-i18next';
 import { NextPage } from 'next';
@@ -86,11 +86,12 @@ const App = ({
   pageProps,
   statusCode = 0,
   fallback,
+  session,
   profile,
 }: AppPropsWithLayout): JSX.Element => {
   // Use the layout defined at the page level, if available
   const getLayout = Component.getLayout ?? ((page) => page);
-  const lasiusIsLoggedIn = false; //!!(session?.user?.xsrfToken && profile?.id);
+  const lasiusIsLoggedIn = !!(session?.user?.xsrfToken && profile?.id);
   const store = useStore();
 
   useAsync(async () => {
@@ -109,6 +110,7 @@ const App = ({
           use: [swrLogger as any],
         }}
       >
+        <SessionProvider session={session}>
           <CookieCutter />
           <Head>
             <meta
@@ -155,7 +157,8 @@ const App = ({
                 </PlausibleProvider>
               </ThemeUIProvider>
             </LazyMotion>
-          </StoreContextProvider>        
+          </StoreContextProvider>
+        </SessionProvider>
       </SWRConfig>
     </>
   );
@@ -175,9 +178,9 @@ App.getInitialProps = async ({
   ctx,
   ctx: { res, req, pathname },
 }: ExtendedAppContext) => {
-  const session = undefined; //await getSession({ req });
+  const session = await getSession({ req });
   let profile = null;
-  const token = undefined; //session?.user?.sessionToken;
+  const token = session?.user?.xsrfToken;
 
   if (token && session) {
     logger.info('App.getInitialProps', { token, session });
