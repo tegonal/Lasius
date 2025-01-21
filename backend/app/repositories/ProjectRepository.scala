@@ -46,12 +46,12 @@ trait ProjectRepository
 
   def create(organisationReference: OrganisationReference,
              createProject: CreateProject)(implicit
-      subject: Subject[_],
+      subject: Subject,
       dbSession: DBSession): Future[Project]
 
   def deactivate(organisationReference: OrganisationReference,
                  projectId: ProjectId)(implicit
-      subject: Subject[_],
+      subject: Subject,
       dbSession: DBSession): Future[Boolean]
 
   def updateOrganisationKey(organisationId: OrganisationId, newKey: String)(
@@ -60,7 +60,7 @@ trait ProjectRepository
   def update(organisationReference: OrganisationReference,
              projectId: ProjectId,
              update: UpdateProject)(implicit
-      subject: Subject[_],
+      subject: Subject,
       dbSession: DBSession): Future[Project]
 }
 
@@ -104,7 +104,7 @@ class ProjectMongoRepository @Inject() (
 
   override def create(organisationReference: OrganisationReference,
                       createProject: CreateProject)(implicit
-      subject: Subject[_],
+      subject: Subject,
       dbSession: DBSession): Future[Project] = {
     for {
       existingProject <- findByOrganisationAndKey(organisationReference,
@@ -127,7 +127,7 @@ class ProjectMongoRepository @Inject() (
 
   override def deactivate(organisationReference: OrganisationReference,
                           projectId: ProjectId)(implicit
-      subject: Subject[_],
+      subject: Subject,
       dbSession: DBSession): Future[Boolean] = {
     updateFields(
       Json.obj("id"                       -> projectId,
@@ -150,7 +150,7 @@ class ProjectMongoRepository @Inject() (
   override def update(organisationReference: OrganisationReference,
                       projectId: ProjectId,
                       update: UpdateProject)(implicit
-      subject: Subject[_],
+      subject: Subject,
       dbSession: DBSession): Future[Project] = {
     val updateObject: Seq[(String, JsValueWrapper)] = Seq(
       update.key.map(key => "key" -> Json.toJsFieldJsValueWrapper(key)),

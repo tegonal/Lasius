@@ -21,27 +21,22 @@
 
 package controllers
 
+import com.typesafe.config.Config
 import core.{DBSession, MockCacheAware, TestApplication, TestDBSupport}
 import models._
 import mongo.EmbedMongo
 import org.apache.http.HttpStatus
-import org.pac4j.core.profile.CommonProfile
-import org.pac4j.play.scala.{
-  AuthenticatedRequest,
-  Security => Pac4jSecurity,
-  SecurityComponents
-}
 import org.specs2.mock.Mockito
+import pdi.jwt.{JwtClaim, JwtSession}
+import play.api.Configuration
 import play.api.mvc._
 import play.api.test._
 import play.modules.reactivemongo.ReactiveMongoApi
-import util.SecurityComponents
 
 import javax.inject.Inject
 import scala.concurrent._
 import scala.concurrent.duration._
 import scala.language.postfixOps
-import scala.reflect.ClassTag
 
 class SecuritySpec
     extends PlaySpecification
@@ -73,7 +68,7 @@ class SecuritySpec
 
     "return unauthorized when user can't get resolved" in new WithTestApplication {
       // prepare
-      val controller = new HasRoleSecurityMock(reactiveMongoApi)
+      val controller = new HasRoleSecurityMock(reactiveMongoApi, config)
       controller.authConfig
         .resolveUser(any[EntityReference[UserId]])(any[ExecutionContext],
                                                    any[DBSession])
@@ -90,7 +85,7 @@ class SecuritySpec
 
     "return unauthorized when authorization failed" in new WithTestApplication {
       // prepare
-      val controller = new HasRoleSecurityMock(reactiveMongoApi)
+      val controller = new HasRoleSecurityMock(reactiveMongoApi, config)
       controller.authConfig
         .authorizeUser(any[User], any[UserRole])(any[ExecutionContext])
         .returns(Future.successful(false))
@@ -110,7 +105,7 @@ class SecuritySpec
 
     "return InternalServerError on any failure" in new WithTestApplication {
       // prepare
-      val controller = new HasRoleSecurityMock(reactiveMongoApi)
+      val controller = new HasRoleSecurityMock(reactiveMongoApi, config)
       controller.authConfig
         .authorizeUser(any[User], any[UserRole])(any[ExecutionContext])
         .returns(Future.failed(new RuntimeException))
@@ -126,9 +121,9 @@ class SecuritySpec
       status(result) === HttpStatus.SC_INTERNAL_SERVER_ERROR
     }
 
-    "Succeed if authorized" in new WithApplication {
+    "Succeed if authorized" in new WithTestApplication {
       // prepare
-      val controller = new HasRoleSecurityMock(reactiveMongoApi)
+      val controller = new HasRoleSecurityMock(reactiveMongoApi, config)
       controller.authConfig
         .authorizeUser(any[User], any[UserRole])(any[ExecutionContext])
         .returns(Future.successful(true))
@@ -146,16 +141,15 @@ class SecuritySpec
   }
 }
 
-class SecurityMock[P <: CommonProfile](
-    @Inject
-    override val reactiveMongoApi: ReactiveMongoApi,
-    override val controllerComponents: SecurityComponents)
+class SecurityMock(@Inject
+                   override val conf: Config,
+                   override val reactiveMongoApi: ReactiveMongoApi,
+                   override val controllerComponents: ControllerComponents)
     extends BaseController
-    with Security[P]
+    with Security
     with SecurityComponentMock
     with MockCacheAware
-    with TestDBSupport
-    with Pac4jSecurity[P] {}
+    with TestDBSupport {}
 
 object UserMock {
   def mock(role: UserRole): User =
@@ -172,28 +166,25 @@ object UserMock {
 
 class HasRoleSecurityMock(
     override val reactiveMongoApi: ReactiveMongoApi,
-    override val controllerComponents: SecurityComponents =
-      SecurityComponents.stubSecurityComponents(),
-    private val subject: Subject[CommonProfile] =
-      Subject(new CommonProfile(), EntityReference(UserId(), "123")))
+    override val conf: Config,
+    override val controllerComponents: ControllerComponents =
+      Helpers.stubControllerComponents())
     extends BaseController
-    with Security[CommonProfile]
+    with Security
     with SecurityComponentMock
     with MockCacheAware
-    with TestDBSupport
-    with Pac4jSecurity[CommonProfile] {
+    with TestDBSupport {
 
-  override def HasToken[A](p: BodyParser[A],
-                           withinTransaction: Boolean,
-                           clients: String)(
-      f: DBSession => Subject[CommonProfile] => AuthenticatedRequest[
-        A] => Future[Result])(implicit
-      context: ExecutionContext,
-      ct: ClassTag[CommonProfile]): Action[A] =
+  implicit val playConfig: Configuration = Configuration(conf)
+  private val subject: Subject =
+    Subject(JwtSession(JwtClaim()), EntityReference(UserId(), "123"))
+
+  override def HasToken[A](p: BodyParser[A], withinTransaction: Boolean)(
+      f: DBSession => Subject => Request[A] => Future[Result])(implicit
+      context: ExecutionContext): Action[A] =
     Action.async(p) { implicit request =>
       withDBSession() { session =>
-        f(session)(subject)(
-          AuthenticatedRequest(List(subject.profile), request))
+        f(session)(subject)(request)
       }
     }
 }

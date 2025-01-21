@@ -21,15 +21,13 @@
 
 package controllers
 
+import com.typesafe.config.Config
 import core.Validation.ValidationFailedException
 import core.{DBSession, SystemServices}
 import models._
 import org.joda.time.DateTime
-import org.pac4j.core.context.session.SessionStore
-import org.pac4j.core.profile.CommonProfile
-import org.pac4j.play.scala.SecurityComponents
 import play.api.libs.json.Json
-import play.api.mvc.Action
+import play.api.mvc.{Action, ControllerComponents}
 import play.modules.reactivemongo.ReactiveMongoApi
 import repositories.{
   InvitationRepository,
@@ -42,16 +40,17 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class InvitationsController @Inject() (
-    override val controllerComponents: SecurityComponents,
+    override val conf: Config,
+    override val controllerComponents: ControllerComponents,
     override val systemServices: SystemServices,
     userRepository: UserRepository,
     organisationRepository: OrganisationRepository,
     invitationRepository: InvitationRepository,
     projectRepository: ProjectRepository,
     override val authConfig: AuthConfig,
-    override val reactiveMongoApi: ReactiveMongoApi,
-    override val playSessionStore: SessionStore)(implicit ec: ExecutionContext)
-    extends BaseLasiusController(controllerComponents) {
+    override val reactiveMongoApi: ReactiveMongoApi)(implicit
+    ec: ExecutionContext)
+    extends BaseLasiusController() {
 
   /** Unauthenticated endpoint
     */
@@ -84,11 +83,10 @@ class InvitationsController @Inject() (
 
   def getDetails(invitationId: InvitationId): Action[Unit] = {
     HasUserRole(FreeUser, parse.empty, withinTransaction = false) {
-      implicit dbSession => implicit subject => implicit user =>
-        implicit request =>
-          for {
-            invitation <- validateInvitationAndUser(invitationId)
-          } yield Ok(Json.toJson(invitation))
+      implicit dbSession => _ => implicit user => _ =>
+        for {
+          invitation <- validateInvitationAndUser(invitationId)
+        } yield Ok(Json.toJson(invitation))
     }
   }
 
@@ -156,16 +154,15 @@ class InvitationsController @Inject() (
 
   def decline(invitationId: InvitationId): Action[Unit] = {
     HasUserRole(FreeUser, parse.empty, withinTransaction = true) {
-      implicit dbSession => implicit subject => implicit user =>
-        implicit request =>
-          for {
-            _ <- validateInvitationAndUser(invitationId)
-            result <- invitationRepository.updateInvitationStatus(
-              invitationId,
-              InvitationDeclined)
-            _          <- validate(result, "failed_update_status")
-            invitation <- invitationRepository.findById(invitationId)
-          } yield Ok(Json.toJson(invitation))
+      implicit dbSession => implicit subject => implicit user => _ =>
+        for {
+          _ <- validateInvitationAndUser(invitationId)
+          result <- invitationRepository.updateInvitationStatus(
+            invitationId,
+            InvitationDeclined)
+          _          <- validate(result, "failed_update_status")
+          invitation <- invitationRepository.findById(invitationId)
+        } yield Ok(Json.toJson(invitation))
     }
   }
 

@@ -50,7 +50,8 @@ class OrganisationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: OrganisationsControllerMock =
-        controllers.OrganisationsControllerMock(systemServices,
+        controllers.OrganisationsControllerMock(config,
+                                                systemServices,
                                                 authConfig,
                                                 reactiveMongoApi)
 
@@ -74,7 +75,8 @@ class OrganisationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: OrganisationsControllerMock =
-        controllers.OrganisationsControllerMock(systemServices,
+        controllers.OrganisationsControllerMock(config,
+                                                systemServices,
                                                 authConfig,
                                                 reactiveMongoApi)
 
@@ -98,7 +100,8 @@ class OrganisationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: OrganisationsControllerMock =
-        controllers.OrganisationsControllerMock(systemServices,
+        controllers.OrganisationsControllerMock(config,
+                                                systemServices,
                                                 authConfig,
                                                 reactiveMongoApi)
       val newOrganisationKey: String = "someGreateOrg"
@@ -136,7 +139,8 @@ class OrganisationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: OrganisationsControllerMock =
-        controllers.OrganisationsControllerMock(systemServices,
+        controllers.OrganisationsControllerMock(config,
+                                                systemServices,
                                                 authConfig,
                                                 reactiveMongoApi)
       private val newOrganisationId = OrganisationId()
@@ -154,7 +158,8 @@ class OrganisationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: OrganisationsControllerMock =
-        controllers.OrganisationsControllerMock(systemServices,
+        controllers.OrganisationsControllerMock(config,
+                                                systemServices,
                                                 authConfig,
                                                 reactiveMongoApi)
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
@@ -182,7 +187,8 @@ class OrganisationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: OrganisationsControllerMock =
-        controllers.OrganisationsControllerMock(systemServices,
+        controllers.OrganisationsControllerMock(config,
+                                                systemServices,
                                                 authConfig,
                                                 reactiveMongoApi)
 
@@ -204,7 +210,8 @@ class OrganisationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: OrganisationsControllerMock =
-        controllers.OrganisationsControllerMock(systemServices,
+        controllers.OrganisationsControllerMock(config,
+                                                systemServices,
                                                 authConfig,
                                                 reactiveMongoApi)
       val email = "newUserEmail@test.com"
@@ -232,7 +239,8 @@ class OrganisationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: OrganisationsControllerMock =
-        controllers.OrganisationsControllerMock(systemServices,
+        controllers.OrganisationsControllerMock(config,
+                                                systemServices,
                                                 authConfig,
                                                 reactiveMongoApi,
                                                 organisationActive = false)
@@ -256,7 +264,8 @@ class OrganisationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: OrganisationsControllerMock =
-        controllers.OrganisationsControllerMock(systemServices,
+        controllers.OrganisationsControllerMock(config,
+                                                systemServices,
                                                 authConfig,
                                                 reactiveMongoApi)
       val email = "newUserEmail@test.com"
@@ -282,7 +291,8 @@ class OrganisationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: OrganisationsControllerMock =
-        controllers.OrganisationsControllerMock(systemServices,
+        controllers.OrganisationsControllerMock(config,
+                                                systemServices,
                                                 authConfig,
                                                 reactiveMongoApi,
                                                 OrganisationMember)
@@ -300,7 +310,8 @@ class OrganisationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: OrganisationsControllerMock =
-        controllers.OrganisationsControllerMock(systemServices,
+        controllers.OrganisationsControllerMock(config,
+                                                systemServices,
                                                 authConfig,
                                                 reactiveMongoApi)
 
@@ -320,7 +331,8 @@ class OrganisationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: OrganisationsControllerMock =
-        controllers.OrganisationsControllerMock(systemServices,
+        controllers.OrganisationsControllerMock(config,
+                                                systemServices,
                                                 authConfig,
                                                 reactiveMongoApi,
                                                 isOrganisationPrivate = true)
@@ -341,7 +353,8 @@ class OrganisationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: OrganisationsControllerMock =
-        controllers.OrganisationsControllerMock(systemServices,
+        controllers.OrganisationsControllerMock(config,
+                                                systemServices,
                                                 authConfig,
                                                 reactiveMongoApi)
 
@@ -386,7 +399,7 @@ class OrganisationsControllerSpec
         .awaitResult()
       remainingUsers should haveSize(1)
 
-      val updatedUser = withDBSession()(implicit dbSession =>
+      val updatedUser: Option[User] = withDBSession()(implicit dbSession =>
         controller.userRepository.findById(user2.id))
         .awaitResult()
       updatedUser.get.settings shouldEqual Some(UserSettings(None))
@@ -400,7 +413,8 @@ class OrganisationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: OrganisationsControllerMock =
-        controllers.OrganisationsControllerMock(systemServices,
+        controllers.OrganisationsControllerMock(config,
+                                                systemServices,
                                                 authConfig,
                                                 reactiveMongoApi)
 
@@ -417,7 +431,8 @@ class OrganisationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: OrganisationsControllerMock =
-        controllers.OrganisationsControllerMock(systemServices,
+        controllers.OrganisationsControllerMock(config,
+                                                systemServices,
                                                 authConfig,
                                                 reactiveMongoApi)
 
@@ -436,7 +451,8 @@ class OrganisationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: OrganisationsControllerMock =
-        controllers.OrganisationsControllerMock(systemServices,
+        controllers.OrganisationsControllerMock(config,
+                                                systemServices,
                                                 authConfig,
                                                 reactiveMongoApi,
                                                 isOrganisationPrivate = true)
@@ -456,7 +472,8 @@ class OrganisationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: OrganisationsControllerMock =
-        controllers.OrganisationsControllerMock(systemServices,
+        controllers.OrganisationsControllerMock(config,
+                                                systemServices,
                                                 authConfig,
                                                 reactiveMongoApi,
                                                 OrganisationMember)
@@ -508,7 +525,8 @@ class OrganisationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: OrganisationsControllerMock =
-        controllers.OrganisationsControllerMock(systemServices,
+        controllers.OrganisationsControllerMock(config,
+                                                systemServices,
                                                 authConfig,
                                                 reactiveMongoApi)
 
@@ -528,7 +546,8 @@ class OrganisationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: OrganisationsControllerMock =
-        controllers.OrganisationsControllerMock(systemServices,
+        controllers.OrganisationsControllerMock(config,
+                                                systemServices,
                                                 authConfig,
                                                 reactiveMongoApi)
 
@@ -548,7 +567,8 @@ class OrganisationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: OrganisationsControllerMock =
-        controllers.OrganisationsControllerMock(systemServices,
+        controllers.OrganisationsControllerMock(config,
+                                                systemServices,
                                                 authConfig,
                                                 reactiveMongoApi)
 
@@ -582,7 +602,8 @@ class OrganisationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: OrganisationsControllerMock =
-        controllers.OrganisationsControllerMock(systemServices,
+        controllers.OrganisationsControllerMock(config,
+                                                systemServices,
                                                 authConfig,
                                                 reactiveMongoApi)
       val newKey               = "newOrgKey"

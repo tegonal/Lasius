@@ -21,6 +21,7 @@
 
 package core
 
+import com.typesafe.config.Config
 import org.apache.pekko.actor.ActorSystem
 import play.api.inject
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -39,5 +40,7 @@ trait TestApplication {
                        .bind[ActorSystem]
                        .toProvider[PlayAwareActorSystemProvider])
           .build())
-      with Injecting
+      with Injecting {
+    lazy val config: Config = app.configuration.underlying
+  }
 }

@@ -23,95 +23,74 @@ package controllers
 
 import core.Validation.ValidationFailedException
 import core.{DBSession, DBSupport}
+import models.Subject.ExtendedJwtSession
 import models._
-import org.pac4j.core.context.session.SessionStore
-import org.pac4j.core.profile.{CommonProfile, ProfileManager}
-import org.pac4j.play.PlayWebContext
-import org.pac4j.play.scala.{Security => Pac4jSecurity}
-import play.api.Logging
+import pdi.jwt.JwtSession.RichRequestHeader
+import play.api.{Configuration, Logging}
 import play.api.libs.json.Reads
 import play.api.mvc._
+import com.typesafe.config.Config
 
+import java.time.Clock
 import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
-import scala.jdk.javaapi.OptionConverters
 import scala.language.postfixOps
-import scala.reflect.ClassTag
 
 /** Security actions that should be used by all controllers that need to protect
   * their actions. Can be composed to fine-tune access control.
   */
 trait SecurityComponent {
   val authConfig: AuthConfig
-  val playSessionStore: SessionStore
+
+  val conf: Config
+  implicit val playConf: Configuration = Configuration(conf)
+
+  implicit val clock: Clock = Clock.systemUTC
 }
 
-trait Security[P <: CommonProfile] extends Logging {
-  self: BaseController
-    with SecurityComponent
-    with DBSupport
-    with Pac4jSecurity[P] =>
+trait Security extends Logging {
+  self: BaseController with SecurityComponent with DBSupport =>
 
   def HasToken[A](withinTransaction: Boolean)(
-      f: DBSession => Subject[P] => Request[A] => Future[Result])(implicit
+      f: DBSession => Subject => Request[A] => Future[Result])(implicit
       context: ExecutionContext,
-      reader: Reads[A],
-      ct: ClassTag[P]): Action[A] = {
+      reader: Reads[A]): Action[A] = {
     HasToken(parse.json[A], withinTransaction)(f)
   }
 
-  /** Checks that the token is:
-    *   - present in the cookie header of the request,
-    *   - either in the header or in the query string,
-    *   - matches a token already stored in the play cache
-    */
+  /** */
   def HasToken[A](p: BodyParser[A], withinTransaction: Boolean)(
-      f: DBSession => Subject[P] => AuthenticatedRequest[A] => Future[Result])(
-      implicit
-      context: ExecutionContext,
-      ct: ClassTag[P]): Action[A] = {
-    Secure().async(p) { implicit request: AuthenticatedRequest[A] =>
-      withDBSession(withinTransaction) { implicit dbSession =>
-        getUserProfile.flatMap {
-          case Some(profile) =>
-            authConfig.resolveOrCreateUserByProfile(profile).flatMap { user =>
-              f(dbSession)(Subject(profile, user))(request)
+      f: DBSession => Subject => Request[A] => Future[Result])(implicit
+      context: ExecutionContext): Action[A] = {
+    Action.async(p) { request =>
+      if (request.hasJwtHeader) {
+        // TODO: verify issuer based on configuration
+
+        withDBSession(withinTransaction) { implicit dbSession =>
+          authConfig
+            .resolveOrCreateUserByJwt(ExtendedJwtSession(request.jwtSession))
+            .flatMap { user =>
+              f(dbSession)(Subject(request.jwtSession, user))(request)
             }
-          case None =>
-            successful(Unauthorized("Could not resolve users profile"))
         }
+      } else {
+        successful(Unauthorized("No JWT header found"))
       }
     }
   }
 
-  private def getUserProfile[A](implicit
-      request: Request[A],
-      ct: ClassTag[P]): Future[Option[P]] = {
-    val webContext     = new PlayWebContext(request)
-    val profileManager = new ProfileManager(webContext, playSessionStore)
-    Future.successful(
-      OptionConverters.toScala(profileManager.getProfile()).flatMap {
-        case p: P => Some(p)
-        case _    => None
-      })
-  }
-
   def HasUserRole[A, R <: UserRole](role: R, withinTransaction: Boolean)(
-      f: DBSession => Subject[P] => User => Request[A] => Future[Result])(
-      implicit
+      f: DBSession => Subject => User => Request[A] => Future[Result])(implicit
       context: ExecutionContext,
-      reader: Reads[A],
-      ct: ClassTag[P]): Action[A] = {
+      reader: Reads[A]): Action[A] = {
     HasUserRole(role, parse.json[A], withinTransaction)(f)
   }
 
   def HasUserRole[A, R <: UserRole](role: R,
                                     p: BodyParser[A],
                                     withinTransaction: Boolean)(
-      f: DBSession => Subject[P] => User => Request[A] => Future[Result])(
-      implicit
-      context: ExecutionContext,
-      ct: ClassTag[P]): Action[A] = {
+      f: DBSession => Subject => User => Request[A] => Future[Result])(implicit
+      context: ExecutionContext): Action[A] = {
     HasToken(p, withinTransaction) {
       implicit dbSession => implicit subject => implicit request =>
         {
@@ -220,6 +199,11 @@ trait Security[P <: CommonProfile] extends Logging {
         logger.debug(s"Validation error", e)
         successful(
           BadRequest(Option(e.getMessage).getOrElse(e.getClass.getSimpleName)))
+      case e: UnauthorizedException =>
+        logger.debug(s"UnauthorizedException", e)
+        successful(
+          Unauthorized(
+            Option(e.getMessage).getOrElse(e.getClass.getSimpleName)))
       case e =>
         logger.error(s"Unknown Error", e)
         successful(
@@ -228,3 +212,6 @@ trait Security[P <: CommonProfile] extends Logging {
     }
   }
 }
+
+case class UnauthorizedException(message: String)
+    extends RuntimeException(message)

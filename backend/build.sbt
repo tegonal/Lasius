@@ -72,19 +72,14 @@ libraryDependencies ++= Seq(
   // depend on this plugin to be able to provide custom OutputTransformer
   "io.github.play-swagger" %% "play-swagger" % "2.0.4",
   "com.github.fdimuccio"   %% "play2-sockjs" % "0.10.0",
-  // oauth2 provider dependencies
 
-  // pac4j security libraries
-  "org.pac4j" %% "play-pac4j"   % "12.0.2-PLAY3.0",
-  "org.pac4j"  % "pac4j-config" % pac4jVersion,
-  // use jwt to provide direct authentication for machine-to-machine integration
-  "org.pac4j" % "pac4j-jwt" % pac4jVersion,
-  // enable more pac4j modules in case needed
-// oauth2 provider dependencies to be able to provide a simple oauth server packed with lasius
+  // basic jwt token support
+  "com.github.jwt-scala" %% "jwt-play" % "10.0.1",
+
+  // oauth2 provider dependencies
+  // oauth2 provider dependencies to be able to provide a simple oauth server packed with lasius
   "com.nulab-inc" %% "scala-oauth2-core"     % playOAuth2ProviderVersion,
   "com.nulab-inc" %% "play2-oauth2-provider" % playOAuth2ProviderVersion,
-  // used for cookie encryption, bind to version used in pac4j
-  "org.apache.shiro" % "shiro-core" % "1.13.0",
   ehcache,
   ws,
   specs2 % Test,

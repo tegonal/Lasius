@@ -35,7 +35,7 @@ trait PersistentUserViewRepository[T <: BaseEntity[ID], ID <: BaseId[_]] {
       dbSession: DBSession): Future[Boolean]
 }
 
-trait MongoPeristentUserViewRepository[T <: BaseEntity[ID], ID <: BaseId[_]]
+trait MongoPersistentUserViewRepository[T <: BaseEntity[ID], ID <: BaseId[_]]
     extends PersistentUserViewRepository[T, ID] {
   self: BaseReactiveMongoRepository[T, ID] with BaseRepository[T, ID] =>
 

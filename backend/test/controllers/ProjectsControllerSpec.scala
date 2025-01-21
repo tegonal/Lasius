@@ -49,7 +49,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
@@ -71,7 +72,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
@@ -95,7 +97,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
@@ -119,7 +122,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
       val newProjectKey: String = "someNewProjectKey"
@@ -162,7 +166,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
@@ -179,7 +184,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi,
                                            organisationRole =
@@ -202,7 +208,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
@@ -234,7 +241,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
@@ -254,7 +262,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi,
                                            organisationRole =
@@ -278,7 +287,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
@@ -300,7 +310,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
       val email = "newUserEmail@test.com"
@@ -328,7 +339,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi,
                                            projectActive = false)
@@ -352,7 +364,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi,
                                            organisationRole =
@@ -378,7 +391,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
       val email = "newUserEmail@test.com"
@@ -402,7 +416,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
@@ -451,7 +466,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
@@ -470,7 +486,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi,
                                            organisationRole =
@@ -535,7 +552,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi,
                                            organisationRole =
@@ -550,7 +568,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi,
                                            organisationRole =
@@ -567,7 +586,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
@@ -585,7 +605,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
@@ -603,7 +624,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi,
                                            projectRole = ProjectMember)
@@ -655,7 +677,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
@@ -674,7 +697,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
@@ -695,7 +719,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
@@ -716,7 +741,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
@@ -751,7 +777,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
       val newKey               = "newProjectKey"

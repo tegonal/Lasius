@@ -32,7 +32,7 @@ case class StartBookingRequest(projectId: ProjectId,
                                start: Option[DateTime]) {
   def toCommand(organisationReference: OrganisationReference,
                 projectReference: ProjectReference)(implicit
-      subject: Subject[_]): StartBookingCommand =
+      subject: Subject): StartBookingCommand =
     StartBookingCommand(subject.userReference,
                         organisationReference,
                         projectReference,

@@ -21,7 +21,7 @@
 
 package controllers
 
-import core.{MockCacheAware, MockSessionStore, SystemServices, TestApplication}
+import core.{MockCacheAware, SystemServices, TestApplication}
 import models._
 import mongo.EmbedMongo
 import org.joda.time.DateTime
@@ -30,7 +30,8 @@ import org.specs2.mock.mockito.MockitoMatchers
 import play.api.mvc._
 import play.api.test._
 import play.modules.reactivemongo.ReactiveMongoApi
-import util.{MockAwaitable, SecurityComponents}
+import util.MockAwaitable
+import com.typesafe.config.Config
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -52,7 +53,10 @@ class TimeBookingControllerSpec
       val controller: TimeBookingController
         with SecurityControllerMock
         with MockCacheAware =
-        TimeBookingControllerMock(systemServices, authConfig, reactiveMongoApi)
+        TimeBookingControllerMock(config,
+                                  systemServices,
+                                  authConfig,
+                                  reactiveMongoApi)
       val projectId: ProjectId = ProjectId()
       val request: FakeRequest[StartBookingRequest] = FakeRequest()
         .withBody(
@@ -74,7 +78,10 @@ class TimeBookingControllerSpec
       val controller: TimeBookingController
         with SecurityControllerMock
         with MockCacheAware =
-        TimeBookingControllerMock(systemServices, authConfig, reactiveMongoApi)
+        TimeBookingControllerMock(config,
+                                  systemServices,
+                                  authConfig,
+                                  reactiveMongoApi)
 
       val request: FakeRequest[StartBookingRequest] = FakeRequest()
         .withBody(
@@ -99,7 +106,10 @@ class TimeBookingControllerSpec
       val controller: TimeBookingController
         with SecurityControllerMock
         with MockCacheAware =
-        TimeBookingControllerMock(systemServices, authConfig, reactiveMongoApi)
+        TimeBookingControllerMock(config,
+                                  systemServices,
+                                  authConfig,
+                                  reactiveMongoApi)
 
       val projectId: ProjectId = ProjectId()
       val request: FakeRequest[EditBookingRequest] = FakeRequest()
@@ -123,7 +133,10 @@ class TimeBookingControllerSpec
       val controller: TimeBookingController
         with SecurityControllerMock
         with MockCacheAware =
-        TimeBookingControllerMock(systemServices, authConfig, reactiveMongoApi)
+        TimeBookingControllerMock(config,
+                                  systemServices,
+                                  authConfig,
+                                  reactiveMongoApi)
 
       val request: FakeRequest[EditBookingRequest] = FakeRequest()
         .withBody(
@@ -147,7 +160,10 @@ class TimeBookingControllerSpec
       val controller: TimeBookingController
         with SecurityControllerMock
         with MockCacheAware =
-        TimeBookingControllerMock(systemServices, authConfig, reactiveMongoApi)
+        TimeBookingControllerMock(config,
+                                  systemServices,
+                                  authConfig,
+                                  reactiveMongoApi)
 
       val from: DateTime = DateTime.now()
       val to: DateTime   = from.minusDays(1)
@@ -177,7 +193,10 @@ class TimeBookingControllerSpec
       val controller: TimeBookingController
         with SecurityControllerMock
         with MockCacheAware =
-        TimeBookingControllerMock(systemServices, authConfig, reactiveMongoApi)
+        TimeBookingControllerMock(config,
+                                  systemServices,
+                                  authConfig,
+                                  reactiveMongoApi)
 
       val from: DateTime       = DateTime.now()
       val to: DateTime         = from.plusHours(1)
@@ -201,7 +220,10 @@ class TimeBookingControllerSpec
       val controller: TimeBookingController
         with SecurityControllerMock
         with MockCacheAware =
-        TimeBookingControllerMock(systemServices, authConfig, reactiveMongoApi)
+        TimeBookingControllerMock(config,
+                                  systemServices,
+                                  authConfig,
+                                  reactiveMongoApi)
 
       val from: DateTime = DateTime.now()
       val to: DateTime   = from.plusHours(1)
@@ -224,7 +246,10 @@ class TimeBookingControllerSpec
       val controller: TimeBookingController
         with SecurityControllerMock
         with MockCacheAware =
-        TimeBookingControllerMock(systemServices, authConfig, reactiveMongoApi)
+        TimeBookingControllerMock(config,
+                                  systemServices,
+                                  authConfig,
+                                  reactiveMongoApi)
 
       val from: DateTime = DateTime.now()
       val to: DateTime   = from.minusHours(1)
@@ -245,7 +270,8 @@ class TimeBookingControllerSpec
 }
 
 object TimeBookingControllerMock extends MockAwaitable with Mockito {
-  def apply(systemServices: SystemServices,
+  def apply(config: Config,
+            systemServices: SystemServices,
             authConfig: AuthConfig,
             reactiveMongoApi: ReactiveMongoApi)(implicit
       ec: ExecutionContext): TimeBookingController
@@ -253,10 +279,10 @@ object TimeBookingControllerMock extends MockAwaitable with Mockito {
     with MockCacheAware = {
 
     new TimeBookingController(
-      SecurityComponents.stubSecurityComponents(),
+      config,
+      Helpers.stubControllerComponents(),
       authConfig,
       reactiveMongoApi,
-      systemServices,
-      new MockSessionStore()) with SecurityControllerMock with MockCacheAware
+      systemServices) with SecurityControllerMock with MockCacheAware
   }
 }

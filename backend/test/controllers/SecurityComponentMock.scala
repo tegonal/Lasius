@@ -21,7 +21,6 @@
 
 package controllers
 
-import org.pac4j.core.context.session.SessionStore
 import org.specs2.mock.Mockito
 
 import scala.concurrent.Future
@@ -29,7 +28,4 @@ import scala.concurrent.Future
 trait SecurityComponentMock extends SecurityComponent with Mockito {
   override val authConfig: AuthConfig =
     mock[AuthConfig].defaultReturn(Future.successful(true))
-
-  override val playSessionStore: SessionStore =
-    mock[SessionStore].defaultReturn(true)
 }

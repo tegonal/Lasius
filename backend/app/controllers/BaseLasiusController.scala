@@ -23,23 +23,18 @@ package controllers
 
 import core.{DBSupport, SystemServices}
 import helpers.FutureHelper
-import org.pac4j.core.profile.CommonProfile
-import org.pac4j.play.scala.SecurityComponents
 import play.api.Logging
-import play.api.mvc.{AbstractController, BaseController, ControllerComponents}
-import play.mvc.Controller
+import play.api.mvc.BaseController
 
-abstract class BaseLasiusController(
-    override val controllerComponents: SecurityComponents)
+abstract class BaseLasiusController()
     extends BaseController
     with Logging
-    with Security[CommonProfile]
+    with Security
     with SecurityComponent
     with ControllerValidation
     with FutureHelper
-    with DBSupport
-    with org.pac4j.play.scala.Security[CommonProfile] {
-  override val supportTransaction: Boolean = systemServices.supportTransaction
+    with DBSupport {
 
   val systemServices: SystemServices
+  override val supportTransaction: Boolean = systemServices.supportTransaction
 }

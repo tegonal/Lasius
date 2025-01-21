@@ -27,7 +27,6 @@ import models._
 import org.joda.time.DateTime
 import play.api.libs.json._
 import reactivemongo.api.bson.collection.BSONCollection
-import scalaoauth2.provider.AuthInfo
 
 import javax.inject.Inject
 import scala.concurrent._

@@ -121,45 +121,6 @@ POST    /oauth2/login    controllers.OAuth2Controller.login()
 GET    /oauth2/profile    controllers.OAuth2Controller.userProfile()
 
 #######
-####### Authentication #######
-#######
-
-###l
-#  security:
-#    - oAuth2: []
-#  tags: 
-#    - authentication
-#  summary: Log current user out
-#  operationId: logout
-#  responses:
-#    200:
-#      description: success
-###
-GET  /auth/logout     @org.pac4j.play.LogoutController.logout(request: play.mvc.Http.Request)
-
-###l
-#  tags:
-#    - authentication
-#  summary: Log current user out
-#  operationId: callback
-#  responses:
-#    200:
-#      description: success
-###
-GET         /auth/callback                                @org.pac4j.play.CallbackController.callback(request: Request)
-
-###l
-#  tags:
-#    - authentication
-#  summary: Log current user out
-#  operationId: callback
-#  responses:
-#    200:
-#      description: success
-###
-POST        /auth/callback                                @org.pac4j.play.CallbackController.callback(request: Request)
-
-#######
 ####### Current User #######
 #######
 

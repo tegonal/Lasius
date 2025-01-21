@@ -22,12 +22,11 @@
 package controllers
 
 import com.google.inject.ImplementedBy
-import com.typesafe.config.Config
 import core.{DBSession, SystemServices}
 import helpers.UserHelper
+import models.Subject.ExtendedJwtSession
 import models.UserId.UserReference
 import models._
-import org.pac4j.core.profile.CommonProfile
 import play.api.libs.json.Json.toJsFieldJsValueWrapper
 import play.api.libs.json._
 import play.api.mvc._
@@ -63,8 +62,7 @@ trait AuthConfig {
 
   /** Lookup user by token
     */
-  def resolveOrCreateUserByProfile[P <: CommonProfile](
-      commonProfile: P)(implicit
+  def resolveOrCreateUserByJwt(jwt: ExtendedJwtSession)(implicit
       context: ExecutionContext,
       dbSession: DBSession): Future[UserReference]
 
@@ -114,22 +112,21 @@ class DefaultAuthConfig @Inject() (
       dbSession: DBSession): Future[Option[User]] =
     userRepository.findByUserReference(userReference)
 
-  override def resolveOrCreateUserByProfile[P <: CommonProfile](
-      commonProfile: P)(implicit
+  override def resolveOrCreateUserByJwt(jwt: ExtendedJwtSession)(implicit
       context: ExecutionContext,
       dbSession: DBSession): Future[UserReference] = {
 
-    userRepository.findByEmail(commonProfile.getEmail).flatMap {
+    userRepository.findByEmail(jwt.email).flatMap {
       _.map(user => Future.successful(user.getReference()))
         .getOrElse {
           for {
             // Create new private organisation
             newOrg <- organisationRepository.create(
-              commonProfile.getUsername,
+              jwt.subject,
               `private` = true)(systemServices.systemSubject, dbSession)
             // Create new user and assign to private organisation
             user <- userRepository.createInitialUserBasedOnProfile(
-              commonProfile,
+              jwt,
               newOrg,
               OrganisationAdministrator)
           } yield user.getReference()

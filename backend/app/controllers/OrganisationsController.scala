@@ -21,13 +21,12 @@
 
 package controllers
 
+import com.typesafe.config.Config
 import core.SystemServices
 import models._
 import org.joda.time.DateTime
-import org.pac4j.core.context.session.SessionStore
-import org.pac4j.play.scala.SecurityComponents
 import play.api.libs.json.Json
-import play.api.mvc.Action
+import play.api.mvc.{Action, ControllerComponents}
 import play.modules.reactivemongo.ReactiveMongoApi
 import repositories.{
   InvitationRepository,
@@ -40,20 +39,21 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class OrganisationsController @Inject() (
-    override val controllerComponents: SecurityComponents,
+    override val conf: Config,
+    override val controllerComponents: ControllerComponents,
     override val systemServices: SystemServices,
     organisationRepository: OrganisationRepository,
     userRepository: UserRepository,
     invitationRepository: InvitationRepository,
     projectRepository: ProjectRepository,
     override val authConfig: AuthConfig,
-    override val reactiveMongoApi: ReactiveMongoApi,
-    override val playSessionStore: SessionStore)(implicit ec: ExecutionContext)
-    extends BaseLasiusController(controllerComponents) {
+    override val reactiveMongoApi: ReactiveMongoApi)(implicit
+    ec: ExecutionContext)
+    extends BaseLasiusController() {
 
   def getOrganisation(organisationId: OrganisationId): Action[Unit] =
     HasUserRole(FreeUser, parse.empty, withinTransaction = false) {
-      implicit dbSession => implicit subject => user => implicit request =>
+      implicit dbSession => _ => user => implicit request =>
         HasOrganisationRole(user, organisationId, OrganisationMember) { _ =>
           organisationRepository
             .findById(organisationId)
@@ -127,7 +127,7 @@ class OrganisationsController @Inject() (
 
   def getUsers(organisationId: OrganisationId): Action[Unit] =
     HasUserRole(FreeUser, parse.empty, withinTransaction = false) {
-      implicit dbSession => implicit subject => user => implicit request =>
+      implicit dbSession => _ => user => implicit request =>
         HasOrganisationRole(user, organisationId, OrganisationMember) {
           userOrg =>
             userRepository
@@ -172,7 +172,7 @@ class OrganisationsController @Inject() (
 
   def unassignUser(orgId: OrganisationId, userId: UserId): Action[Unit] =
     HasUserRole(FreeUser, parse.empty, withinTransaction = false) {
-      implicit dbSession => implicit subject => user => implicit request =>
+      implicit dbSession => _ => user => implicit request =>
         HasOrganisationRole(user, orgId, OrganisationAdministrator) { userOrg =>
           for {
             org <- organisationRepository

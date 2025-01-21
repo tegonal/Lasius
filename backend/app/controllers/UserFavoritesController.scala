@@ -22,13 +22,12 @@
 package controllers
 
 import actors.ClientReceiver
+import com.typesafe.config.Config
 import org.apache.pekko.util.Timeout
 import core.SystemServices
 import models._
-import org.pac4j.core.context.session.SessionStore
-import org.pac4j.play.scala.SecurityComponents
 import play.api.libs.json._
-import play.api.mvc.Action
+import play.api.mvc.{Action, ControllerComponents}
 import play.modules.reactivemongo.ReactiveMongoApi
 import repositories._
 
@@ -36,14 +35,14 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class UserFavoritesController @Inject() (
-    override val controllerComponents: SecurityComponents,
+    override val conf: Config,
+    override val controllerComponents: ControllerComponents,
     override val systemServices: SystemServices,
     override val authConfig: AuthConfig,
     override val reactiveMongoApi: ReactiveMongoApi,
-    override val playSessionStore: SessionStore,
     userFavoritesRepository: UserFavoritesRepository,
     clientReceiver: ClientReceiver)(implicit ec: ExecutionContext)
-    extends BaseLasiusController(controllerComponents) {
+    extends BaseLasiusController() {
 
   implicit val timeout: Timeout = systemServices.timeout
 

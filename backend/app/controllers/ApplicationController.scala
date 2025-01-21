@@ -21,33 +21,25 @@
 
 package controllers
 
+import core.SystemServices
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.stream.Materializer
 import org.apache.pekko.util.Timeout
-import core.SystemServices
-import org.pac4j.core.context.session.SessionStore
-import org.pac4j.play.scala.SecurityComponents
 import play.api.libs.json._
 import play.api.mvc._
 import play.modules.reactivemongo.ReactiveMongoApi
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
-
-case class LoginForm(email: String, password: String)
-
-object LoginForm {
-  implicit val loginFormFormat: OFormat[LoginForm] = Json.format[LoginForm]
-}
+import scala.concurrent.Future
+import com.typesafe.config.Config
 
 class ApplicationController @Inject() (
-    override val controllerComponents: SecurityComponents,
+    override val conf: Config,
+    override val controllerComponents: ControllerComponents,
     override val authConfig: AuthConfig,
-    override val systemServices: SystemServices,
-    override val playSessionStore: SessionStore)(implicit
-    executionContext: ExecutionContext,
+    override val systemServices: SystemServices)(implicit
     override val reactiveMongoApi: ReactiveMongoApi)
-    extends BaseLasiusController(controllerComponents) {
+    extends BaseLasiusController() {
 
   implicit val timeout: Timeout = systemServices.timeout
 
