@@ -18,7 +18,6 @@
  */
 
 import CredentialsProvider from 'next-auth/providers/credentials';
-import OAuthProvider from 'next-auth/providers';
 
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -26,25 +25,36 @@ import { logger } from 'lib/logger';
 //import { signIn } from 'lib/api/lasius/authentication/authentication';
 //import { getUserProfile, updateUserSettings } from 'lib/api/lasius/user/user';
 import { getServerSideRequestHeaders } from 'lib/api/hooks/useTokensWithAxiosRequests';
+import { OAuthConfig } from 'next-auth/providers';
+
+const internalProvider: OAuthConfig<any> = {
+  id: 'lasius-internal',
+  name: 'Internal Lasius',
+  version: '2.0',
+  type: 'oauth',
+  scope: 'openid email',
+  // redirect to local login page
+  authorization: 'http://localhost:3000/login',
+  token: 'http://localhost:3000/backend/oauth/access_token',
+  userinfo: 'http://localhost:3000/backend/oauth2/profile',
+  clientId: process.env.CLIENT_ID,
+  clientSecret: process.env.CLIENT_SECRET,
+  checks: ['pkce', 'state'],
+  profile: (profile: any, tokens) => {
+    console.log('profile', profile, tokens)
+    return {
+      id: profile.user.id.toString(),
+      name: profile.user.username,
+      email: profile.user.email
+    }
+  },
+}
 
 const nextAuthOptions = (): NextAuthOptions => {
   return {
+    debug: true,
     providers: [
-      OAuthProvider({
-        id: 'lasius-internal',
-        name: 'Internal Lasius',
-        type: 'oauth',
-        authorization: 'http://localhost:3000/login',
-        token: 'http://localhost:3000/oauth/token',
-        userinfo: 'http://localhost:3000/backend',
-        profile(profile) {
-          return {
-            id: profile.id,
-            name: profile.name,
-            email: profile.email,
-          };
-        },
-      }),
+      internalProvider,
       /*CredentialsProvider({
         id: 'credentials',
         name: 'Basic auth on Lasius',
@@ -111,6 +121,10 @@ const nextAuthOptions = (): NextAuthOptions => {
         },
       }),*/
     ],
+    jwt: {
+      secret: process.env.SECRET,
+      encryption: true,
+    },
     pages: {
       signIn: '/login',
       signOut: '/',
