@@ -101,7 +101,8 @@ class InvitationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: InvitationsControllerMock =
-        controllers.InvitationsControllerMock(systemServices,
+        controllers.InvitationsControllerMock(config,
+                                              systemServices,
                                               authConfig,
                                               reactiveMongoApi)
 
@@ -119,7 +120,8 @@ class InvitationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: InvitationsControllerMock =
-        controllers.InvitationsControllerMock(systemServices,
+        controllers.InvitationsControllerMock(config,
+                                              systemServices,
                                               authConfig,
                                               reactiveMongoApi)
 
@@ -141,7 +143,8 @@ class InvitationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: InvitationsControllerMock =
-        controllers.InvitationsControllerMock(systemServices,
+        controllers.InvitationsControllerMock(config,
+                                              systemServices,
                                               authConfig,
                                               reactiveMongoApi)
 
@@ -166,7 +169,8 @@ class InvitationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: InvitationsControllerMock =
-        controllers.InvitationsControllerMock(systemServices,
+        controllers.InvitationsControllerMock(config,
+                                              systemServices,
                                               authConfig,
                                               reactiveMongoApi,
                                               userActive = false)
@@ -189,7 +193,8 @@ class InvitationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: InvitationsControllerMock =
-        controllers.InvitationsControllerMock(systemServices,
+        controllers.InvitationsControllerMock(config,
+                                              systemServices,
                                               authConfig,
                                               reactiveMongoApi)
 
@@ -214,7 +219,8 @@ class InvitationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: InvitationsControllerMock =
-        controllers.InvitationsControllerMock(systemServices,
+        controllers.InvitationsControllerMock(config,
+                                              systemServices,
                                               authConfig,
                                               reactiveMongoApi)
 
@@ -462,7 +468,8 @@ class InvitationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: InvitationsControllerMock =
-        controllers.InvitationsControllerMock(systemServices,
+        controllers.InvitationsControllerMock(config,
+                                              systemServices,
                                               authConfig,
                                               reactiveMongoApi)
 
@@ -480,7 +487,8 @@ class InvitationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: InvitationsControllerMock =
-        controllers.InvitationsControllerMock(systemServices,
+        controllers.InvitationsControllerMock(config,
+                                              systemServices,
                                               authConfig,
                                               reactiveMongoApi)
 
@@ -501,7 +509,8 @@ class InvitationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: InvitationsControllerMock =
-        controllers.InvitationsControllerMock(systemServices,
+        controllers.InvitationsControllerMock(config,
+                                              systemServices,
                                               authConfig,
                                               reactiveMongoApi)
 
@@ -527,7 +536,8 @@ class InvitationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: InvitationsControllerMock =
-        controllers.InvitationsControllerMock(systemServices,
+        controllers.InvitationsControllerMock(config,
+                                              systemServices,
                                               authConfig,
                                               reactiveMongoApi)
 
@@ -545,7 +555,8 @@ class InvitationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: InvitationsControllerMock =
-        controllers.InvitationsControllerMock(systemServices,
+        controllers.InvitationsControllerMock(config,
+                                              systemServices,
                                               authConfig,
                                               reactiveMongoApi)
 
@@ -566,7 +577,8 @@ class InvitationsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: InvitationsControllerMock =
-        controllers.InvitationsControllerMock(systemServices,
+        controllers.InvitationsControllerMock(config,
+                                              systemServices,
                                               authConfig,
                                               reactiveMongoApi)
 
@@ -590,7 +602,8 @@ class InvitationsControllerSpec
         val systemServices: SystemServices = inject[SystemServices]
         val authConfig: AuthConfig         = inject[AuthConfig]
         val controller: InvitationsControllerMock =
-          controllers.InvitationsControllerMock(systemServices,
+          controllers.InvitationsControllerMock(config,
+                                                systemServices,
                                                 authConfig,
                                                 reactiveMongoApi)
 
@@ -614,7 +627,8 @@ class InvitationsControllerSpec
         val systemServices: SystemServices = inject[SystemServices]
         val authConfig: AuthConfig         = inject[AuthConfig]
         val controller: InvitationsControllerMock =
-          controllers.InvitationsControllerMock(systemServices,
+          controllers.InvitationsControllerMock(config,
+                                                systemServices,
                                                 authConfig,
                                                 reactiveMongoApi)
 
@@ -640,7 +654,8 @@ class InvitationsControllerSpec
         val systemServices: SystemServices = inject[SystemServices]
         val authConfig: AuthConfig         = inject[AuthConfig]
         val controller: InvitationsControllerMock =
-          controllers.InvitationsControllerMock(systemServices,
+          controllers.InvitationsControllerMock(config,
+                                                systemServices,
                                                 authConfig,
                                                 reactiveMongoApi)
 
@@ -668,7 +683,8 @@ class InvitationsControllerSpec
         val systemServices: SystemServices = inject[SystemServices]
         val authConfig: AuthConfig         = inject[AuthConfig]
         val controller: InvitationsControllerMock =
-          controllers.InvitationsControllerMock(systemServices,
+          controllers.InvitationsControllerMock(config,
+                                                systemServices,
                                                 authConfig,
                                                 reactiveMongoApi)
 
@@ -708,7 +724,8 @@ class InvitationsControllerSpec
         val systemServices: SystemServices = inject[SystemServices]
         val authConfig: AuthConfig         = inject[AuthConfig]
         val controller: InvitationsControllerMock =
-          controllers.InvitationsControllerMock(systemServices,
+          controllers.InvitationsControllerMock(config,
+                                                systemServices,
                                                 authConfig,
                                                 reactiveMongoApi)
 
@@ -767,7 +784,8 @@ class InvitationsControllerSpec
         val systemServices: SystemServices = inject[SystemServices]
         val authConfig: AuthConfig         = inject[AuthConfig]
         val controller: InvitationsControllerMock =
-          controllers.InvitationsControllerMock(systemServices,
+          controllers.InvitationsControllerMock(config,
+                                                systemServices,
                                                 authConfig,
                                                 reactiveMongoApi)
 
@@ -793,7 +811,8 @@ class InvitationsControllerSpec
         val systemServices: SystemServices = inject[SystemServices]
         val authConfig: AuthConfig         = inject[AuthConfig]
         val controller: InvitationsControllerMock =
-          controllers.InvitationsControllerMock(systemServices,
+          controllers.InvitationsControllerMock(config,
+                                                systemServices,
                                                 authConfig,
                                                 reactiveMongoApi)
 
@@ -829,7 +848,8 @@ class InvitationsControllerSpec
         val systemServices: SystemServices = inject[SystemServices]
         val authConfig: AuthConfig         = inject[AuthConfig]
         val controller: InvitationsControllerMock =
-          controllers.InvitationsControllerMock(systemServices,
+          controllers.InvitationsControllerMock(config,
+                                                systemServices,
                                                 authConfig,
                                                 reactiveMongoApi)
 

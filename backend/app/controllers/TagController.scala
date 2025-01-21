@@ -22,14 +22,13 @@
 package controllers
 
 import actors.TagCache.{CachedTags, GetTags}
+import com.typesafe.config.Config
 import org.apache.pekko.pattern.ask
 import org.apache.pekko.util.Timeout
 import core.SystemServices
 import models._
-import org.pac4j.core.context.session.SessionStore
-import org.pac4j.play.scala.SecurityComponents
 import play.api.libs.json.Json
-import play.api.mvc.Action
+import play.api.mvc.{Action, ControllerComponents}
 import play.modules.reactivemongo.ReactiveMongoApi
 import repositories._
 
@@ -39,21 +38,21 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 
 class TagController @Inject() (
-    override val controllerComponents: SecurityComponents,
+    override val conf: Config,
+    override val controllerComponents: ControllerComponents,
     override val systemServices: SystemServices,
     override val authConfig: AuthConfig,
     override val userRepository: UserRepository,
     override val reactiveMongoApi: ReactiveMongoApi,
-    override val playSessionStore: SessionStore,
     projectRepository: ProjectRepository)(implicit ec: ExecutionContext)
-    extends BaseLasiusController(controllerComponents)
+    extends BaseLasiusController()
     with SecurityRepositoryComponent {
 
   def getTags(orgId: OrganisationId, projectId: ProjectId): Action[Unit] = {
     HasUserRole(FreeUser, parse.empty, withinTransaction = false) {
-      implicit dbSession => implicit subject => user => implicit request =>
+      implicit session => _ => user => implicit request =>
         HasOrganisationRole(user, orgId, OrganisationMember) { userOrg =>
-          HasProjectRole(userOrg, projectId, ProjectMember) { userProject =>
+          HasProjectRole(userOrg, projectId, ProjectMember) { _ =>
             implicit val timeout: Timeout =
               Timeout(5 seconds) // needed for `?` below
             val future = systemServices.tagCache ? GetTags(projectId)

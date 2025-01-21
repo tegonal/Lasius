@@ -24,26 +24,22 @@ package controllers
 import core.{CacheAware, DBSession, DBSupport}
 import helpers.UserHelper
 import models._
-import org.pac4j.core.profile.CommonProfile
-import org.pac4j.core.profile.definition.CommonProfileDefinition
-import org.pac4j.play.scala.{AuthenticatedRequest, Security => Pac4jSecurity}
 import org.specs2.mock.Mockito
+import pdi.jwt.{JwtClaim, JwtSession}
 import play.api.Logging
 import play.api.mvc._
 import repositories.{SecurityRepositoryComponent, UserRepository}
 import util.MockAwaitable
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.reflect.ClassTag
 
 trait SecurityControllerMock
     extends Logging
-    with Security[CommonProfile]
+    with Security
     with UserHelper
     with SecurityRepositoryComponent
     with MockAwaitable
-    with Mockito
-    with Pac4jSecurity[CommonProfile] {
+    with Mockito {
   self: BaseController with CacheAware with DBSupport with SecurityComponent =>
   val userRepository: UserRepository = mockAwaitable[UserRepository]
 
@@ -63,6 +59,11 @@ trait SecurityControllerMock
     createdBy = userReference,
     deactivatedBy = None
   )
+
+  val jwtSession: JwtSession = JwtSession(JwtClaim("""{
+      |"subject": "test_user",
+      |"email": "test@lasius.com"
+      |}""".stripMargin))
 
   val projectActive: Boolean = true
   val project: Project =
@@ -101,21 +102,13 @@ trait SecurityControllerMock
     settings = None
   )
   val authorizationFailedResult: Result = null
-  val profile: CommonProfile            = new CommonProfile()
-  profile.addAttribute(CommonProfileDefinition.EMAIL, user.email)
 
-  override def HasToken[A](p: BodyParser[A],
-                           withinTransaction: Boolean,
-                           clients: String)(f: DBSession => Subject[
-    CommonProfile] => SecurityControllerMock#AuthenticatedRequest[A] => Future[
-    Result])(implicit
-      context: ExecutionContext,
-      ct: ClassTag[CommonProfile]): Action[A] = {
+  override def HasToken[A](p: BodyParser[A], withinTransaction: Boolean)(
+      f: DBSession => Subject => Request[A] => Future[Result])(implicit
+      context: ExecutionContext): Action[A] = {
     Action.async(p) { implicit request =>
       withDBSession() { dbSession =>
-        checked(
-          f(dbSession)(Subject(profile, userReference))(
-            AuthenticatedRequest(List(profile), request)))
+        checked(f(dbSession)(Subject(jwtSession, userReference))(request))
       }
     }
   }
@@ -123,15 +116,11 @@ trait SecurityControllerMock
   override def HasUserRole[A, R <: UserRole](role: R,
                                              p: BodyParser[A],
                                              withinTransaction: Boolean)(
-      f: DBSession => Subject[CommonProfile] => User => Request[A] => Future[
-        Result])(implicit
-      context: ExecutionContext,
-      ct: ClassTag[CommonProfile]): Action[A] = {
+      f: DBSession => Subject => User => Request[A] => Future[Result])(implicit
+      context: ExecutionContext): Action[A] = {
     Action.async(p) { implicit request =>
       withDBSession() { dbSession =>
-        checked(
-          f(dbSession)(Subject(profile, userReference))(user)(
-            AuthenticatedRequest(List(profile), request)))
+        checked(f(dbSession)(Subject(jwtSession, userReference))(user)(request))
       }
     }
   }

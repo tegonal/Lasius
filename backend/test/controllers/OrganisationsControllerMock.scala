@@ -21,19 +21,21 @@
 
 package controllers
 
-import core.{MockCacheAware, MockSessionStore, SystemServices, TestDBSupport}
+import com.typesafe.config.Config
+import core.{MockCacheAware, SystemServices, TestDBSupport}
 import models.{OrganisationAdministrator, OrganisationRole}
-import org.pac4j.core.context.session.SessionStore
-import org.pac4j.play.scala.SecurityComponents
 import org.specs2.mock.Mockito
+import play.api.mvc.ControllerComponents
+import play.api.test.Helpers
 import play.modules.reactivemongo.ReactiveMongoApi
 import repositories._
-import util.{Awaitable, MockAwaitable, SecurityComponents}
+import util.{Awaitable, MockAwaitable}
 
 import scala.concurrent.ExecutionContext
 
 class OrganisationsControllerMock(
-    controllerComponents: SecurityComponents,
+    config: Config,
+    controllerComponents: ControllerComponents,
     systemServices: SystemServices,
     val organisationRepository: OrganisationMongoRepository,
     userMongoRepository: UserMongoRepository,
@@ -41,19 +43,18 @@ class OrganisationsControllerMock(
     val projectRepository: ProjectMongoRepository,
     authConfig: AuthConfig,
     reactiveMongoApi: ReactiveMongoApi,
-    playSessionStore: SessionStore,
     override val organisationRole: OrganisationRole,
     override val isOrganisationPrivate: Boolean,
     override val organisationActive: Boolean)(implicit ec: ExecutionContext)
-    extends OrganisationsController(controllerComponents,
+    extends OrganisationsController(config,
+                                    controllerComponents,
                                     systemServices,
                                     organisationRepository,
                                     userMongoRepository,
                                     invitationRepository,
                                     projectRepository,
                                     authConfig,
-                                    reactiveMongoApi,
-                                    playSessionStore)
+                                    reactiveMongoApi)
     with SecurityControllerMock
     with MockCacheAware
     with TestDBSupport {
@@ -66,7 +67,8 @@ object OrganisationsControllerMock
     extends MockAwaitable
     with Mockito
     with Awaitable {
-  def apply(systemServices: SystemServices,
+  def apply(config: Config,
+            systemServices: SystemServices,
             authConfig: AuthConfig,
             reactiveMongoApi: ReactiveMongoApi,
             organisationRole: OrganisationRole = OrganisationAdministrator,
@@ -79,7 +81,8 @@ object OrganisationsControllerMock
     val organisationMongoRepository = new OrganisationMongoRepository()
 
     val controller = new OrganisationsControllerMock(
-      SecurityComponents.stubSecurityComponents(),
+      config,
+      Helpers.stubControllerComponents(),
       systemServices,
       organisationMongoRepository,
       userMongoRepository,
@@ -87,7 +90,6 @@ object OrganisationsControllerMock
       projectMongoRepository,
       authConfig,
       reactiveMongoApi,
-      new MockSessionStore(),
       organisationRole,
       isOrganisationPrivate = isOrganisationPrivate,
       organisationActive = organisationActive)

@@ -33,8 +33,8 @@ import org.apache.pekko.actor.{ActorRef, ActorSystem}
 import org.apache.pekko.pattern.ask
 import org.apache.pekko.stream.Materializer
 import org.apache.pekko.util.Timeout
-import org.pac4j.core.profile.CommonProfile
-import play.api.Logging
+import pdi.jwt.{JwtClaim, JwtSession}
+import play.api.{Configuration, Logging}
 import play.api.inject.Injector
 import play.api.libs.ws.WSClient
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -46,6 +46,7 @@ import services.{
   TimeBookingViewService
 }
 
+import java.time.Clock
 import java.util.UUID
 import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.duration._
@@ -56,8 +57,7 @@ import scala.language.postfixOps
 trait SystemServices {
   val systemUser: UserId
   val systemUserReference: UserReference
-  val systemUserProfile: CommonProfile
-  val systemSubject: Subject[_]
+  val systemSubject: Subject
   val timeout: Timeout
   val duration: Duration
   val timeBookingViewService: ActorRef
@@ -98,6 +98,8 @@ class DefaultSystemServices @Inject() (
   // possibly:
   implicit val system: ActorSystem        = ActorSystem("lasius-actor-system")
   override val materializer: Materializer = Materializer.matFromSystem
+  implicit val clock: Clock               = Clock.systemUTC
+  implicit val playConfig: Configuration  = Configuration(config)
 
   override val supportTransaction: Boolean =
     config.getBoolean("db.support_transactions")
@@ -108,9 +110,8 @@ class DefaultSystemServices @Inject() (
   implicit val systemUserReference: UserReference = {
     EntityReference(systemUser, "system")
   }
-  override val systemUserProfile: CommonProfile = new CommonProfile()
-  val systemSubject: Subject[_] =
-    Subject(systemUserProfile, systemUserReference)
+  val systemSubject: Subject =
+    Subject(JwtSession(JwtClaim("")), systemUserReference)
   implicit val timeout: Timeout = Timeout(5 seconds) // needed for `?` below
   val duration: FiniteDuration  = Duration.create(30, SECONDS)
   override val timeBookingViewService: ActorRef = Await

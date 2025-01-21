@@ -22,7 +22,8 @@
 package controllers
 
 import actors.ClientReceiver
-import core.{MockCacheAware, MockSessionStore, SystemServices, TestApplication}
+import com.typesafe.config.Config
+import core.{MockCacheAware, SystemServices, TestApplication}
 import models._
 import mongo.EmbedMongo
 import org.specs2.mock.Mockito
@@ -31,7 +32,7 @@ import play.api.mvc._
 import play.api.test._
 import play.modules.reactivemongo.ReactiveMongoApi
 import repositories.UserFavoritesRepository
-import util.{MockAwaitable, SecurityComponents}
+import util.MockAwaitable
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -53,7 +54,8 @@ class UserFavoritesControllerSpec
       val controller: UserFavoritesController
         with SecurityControllerMock
         with MockCacheAware =
-        UserFavoritesControllerMock(systemServices,
+        UserFavoritesControllerMock(config,
+                                    systemServices,
                                     reactiveMongoApi,
                                     authConfig,
                                     userFavoritesRepository)
@@ -80,7 +82,8 @@ class UserFavoritesControllerSpec
       val controller: UserFavoritesController
         with SecurityControllerMock
         with MockCacheAware =
-        UserFavoritesControllerMock(systemServices,
+        UserFavoritesControllerMock(config,
+                                    systemServices,
                                     reactiveMongoApi,
                                     authConfig,
                                     userFavoritesRepository)
@@ -110,7 +113,8 @@ class UserFavoritesControllerSpec
       val controller: UserFavoritesController
         with SecurityControllerMock
         with MockCacheAware =
-        UserFavoritesControllerMock(systemServices,
+        UserFavoritesControllerMock(config,
+                                    systemServices,
                                     reactiveMongoApi,
                                     authConfig,
                                     userFavoritesRepository)
@@ -139,7 +143,8 @@ class UserFavoritesControllerSpec
     val controller: UserFavoritesController
       with SecurityControllerMock
       with MockCacheAware =
-      UserFavoritesControllerMock(systemServices,
+      UserFavoritesControllerMock(config,
+                                  systemServices,
                                   reactiveMongoApi,
                                   authConfig,
                                   userFavoritesRepository)
@@ -160,7 +165,8 @@ class UserFavoritesControllerSpec
 }
 
 object UserFavoritesControllerMock extends MockAwaitable with Mockito {
-  def apply(systemServices: SystemServices,
+  def apply(config: Config,
+            systemServices: SystemServices,
             reactiveMongoApi: ReactiveMongoApi,
             authConfig: AuthConfig,
             userFavoritesRepository: UserFavoritesRepository)(implicit
@@ -170,11 +176,11 @@ object UserFavoritesControllerMock extends MockAwaitable with Mockito {
     val clientReceiver = mock[ClientReceiver]
 
     new UserFavoritesController(
-      SecurityComponents.stubSecurityComponents(),
+      config,
+      Helpers.stubControllerComponents(),
       systemServices,
       authConfig,
       reactiveMongoApi,
-      new MockSessionStore(),
       userFavoritesRepository,
       clientReceiver) with SecurityControllerMock with MockCacheAware
   }
