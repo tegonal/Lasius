@@ -29,7 +29,7 @@ import util.Awaitable
 import play.api.libs.json._
 import reactivemongo.api.bson.BSONObjectID
 
-class MongoPeristentUserViewRepositorySpec extends EmbedMongo with Awaitable {
+class MongoPersistentUserViewRepositorySpec extends EmbedMongo with Awaitable {
 
   val repository = new BookingHistoryMongoRepository()
   "BookingV2 history delete" should {

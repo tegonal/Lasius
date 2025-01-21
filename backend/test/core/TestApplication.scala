@@ -21,7 +21,7 @@
 
 package core
 
-import akka.actor.ActorSystem
+import org.apache.pekko.actor.ActorSystem
 import play.api.inject
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.{Injecting, PlaySpecification, WithApplication}

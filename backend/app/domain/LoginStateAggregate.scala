@@ -21,10 +21,10 @@
 
 package domain
 
-import akka.actor._
-import akka.event.LoggingReceive
-import akka.pattern.StatusReply.Ack
-import akka.persistence._
+import org.apache.pekko.actor._
+import org.apache.pekko.event.LoggingReceive
+import org.apache.pekko.pattern.StatusReply.Ack
+import org.apache.pekko.persistence._
 import domain.UserTimeBookingAggregate.StartAggregate
 import domain.views.RestoreViewFromStateSuccess
 import models.UserId.UserReference

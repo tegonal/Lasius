@@ -21,7 +21,7 @@
 
 package actors.serializers
 
-import akka.serialization._
+import org.apache.pekko.serialization._
 import models._
 import play.api.Logging
 import play.api.libs.json._

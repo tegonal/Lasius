@@ -26,7 +26,7 @@ import models.PersistedEvent
 class PersistedEventJsonSerializer extends JsonSerializer[PersistedEvent] {
   // Pick a unique identifier for your Serializer,
   // you've got a couple of billions to choose from,
-  // 0 - 16 is reserved by Akka itself
+  // 0 - 16 is reserved by pekko itself
   def identifier = 523452349
 
   override protected def acceptManifest(manifest: String) = {

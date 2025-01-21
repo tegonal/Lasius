@@ -21,10 +21,10 @@
 
 package domain
 
-import akka.actor.SupervisorStrategy.Restart
-import akka.actor._
-import akka.pattern.StatusReply
-import akka.persistence._
+import org.apache.pekko.actor.SupervisorStrategy.Restart
+import org.apache.pekko.actor._
+import org.apache.pekko.pattern.StatusReply
+import org.apache.pekko.persistence._
 import domain.UserTimeBookingAggregate.UserTimeBooking
 import domain.views.RestoreViewFromStateSuccess
 import models.PersistedEvent

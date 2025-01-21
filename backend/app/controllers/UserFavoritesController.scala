@@ -22,7 +22,7 @@
 package controllers
 
 import actors.ClientReceiver
-import akka.util.Timeout
+import org.apache.pekko.util.Timeout
 import core.SystemServices
 import models._
 import play.api.cache.AsyncCacheApi

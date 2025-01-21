@@ -21,8 +21,8 @@
 
 package controllers
 
-import akka.pattern.ask
-import akka.util.Timeout
+import org.apache.pekko.pattern.ask
+import org.apache.pekko.util.Timeout
 import core.{CacheAware, DBSupport, SystemServices}
 import domain.views.CurrentUserTimeBookingsView._
 

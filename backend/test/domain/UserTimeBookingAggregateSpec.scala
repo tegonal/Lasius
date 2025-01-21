@@ -22,9 +22,9 @@
 package domain
 
 import actors.ClientReceiver
-import akka.PersistentActorTestScope
-import akka.actor._
-import akka.testkit.TestProbe
+import pekko.PersistentActorTestScope
+import org.apache.pekko.actor._
+import org.apache.pekko.testkit.TestProbe
 import core.{DBSession, MockServices, SystemServices}
 import domain.AggregateRoot.Initialize
 import domain.UserTimeBookingAggregate._

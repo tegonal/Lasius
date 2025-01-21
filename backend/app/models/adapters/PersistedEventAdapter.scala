@@ -21,9 +21,9 @@
 
 package models.adapters
 
-import akka.actor.ExtendedActorSystem
-import akka.persistence.journal.{EventSeq, ReadEventAdapter}
-import core.{DBSession, DBSupport, PlayAkkaExtension}
+import org.apache.pekko.actor.ExtendedActorSystem
+import org.apache.pekko.persistence.journal.{EventSeq, ReadEventAdapter}
+import core.{DBSession, DBSupport, PlayPekkoExtension}
 import models._
 import play.modules.reactivemongo.ReactiveMongoApi
 import repositories.{ProjectRepository, UserRepository}
@@ -39,10 +39,10 @@ class PersistedEventAdapter(system: ExtendedActorSystem)
   implicit val executionContext: ExecutionContextExecutor = system.dispatcher
 
   lazy val allUsers = {
-    val reactiveMongoApi = PlayAkkaExtension(system)
+    val reactiveMongoApi = PlayPekkoExtension(system)
       .instanceOf[ReactiveMongoApi](classOf[ReactiveMongoApi])
     val userRepository: UserRepository =
-      PlayAkkaExtension(system).instanceOf[UserRepository](
+      PlayPekkoExtension(system).instanceOf[UserRepository](
         classOf[UserRepository])
 
     Await.result(DBSession
@@ -54,10 +54,10 @@ class PersistedEventAdapter(system: ExtendedActorSystem)
   }
 
   lazy val allProjects = {
-    val reactiveMongoApi = PlayAkkaExtension(system)
+    val reactiveMongoApi = PlayPekkoExtension(system)
       .instanceOf[ReactiveMongoApi](classOf[ReactiveMongoApi])
     val projectRepository: ProjectRepository =
-      PlayAkkaExtension(system).instanceOf[ProjectRepository](
+      PlayPekkoExtension(system).instanceOf[ProjectRepository](
         classOf[ProjectRepository])
 
     Await.result(DBSession

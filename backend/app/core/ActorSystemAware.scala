@@ -21,7 +21,7 @@
 
 package core
 
-import akka.actor.ActorSystem
+import org.apache.pekko.actor.ActorSystem
 
 import scala.concurrent.ExecutionContext
 

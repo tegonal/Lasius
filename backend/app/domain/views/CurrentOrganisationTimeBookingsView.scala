@@ -22,8 +22,8 @@
 package domain.views
 
 import actors._
-import akka.actor._
-import akka.pattern.StatusReply
+import org.apache.pekko.actor._
+import org.apache.pekko.pattern.StatusReply
 import core.DBSupport
 import models._
 import org.joda.time.{Duration, LocalDate}

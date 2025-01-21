@@ -21,16 +21,16 @@
 
 package domain.views
 
-import akka.NotUsed
-import akka.actor.SupervisorStrategy.Restart
-import akka.actor.{Actor, ActorLogging, OneForOneStrategy}
-import akka.contrib.persistence.mongodb.{
+import org.apache.pekko.NotUsed
+import org.apache.pekko.actor.SupervisorStrategy.Restart
+import org.apache.pekko.actor.{Actor, ActorLogging, OneForOneStrategy}
+import pekko.contrib.persistence.mongodb.{
   MongoReadJournal,
   ScalaDslMongoReadJournal
 }
-import akka.persistence.query.{EventEnvelope, PersistenceQuery}
-import akka.stream.Materializer
-import akka.stream.scaladsl.Source
+import org.apache.pekko.persistence.query.{EventEnvelope, PersistenceQuery}
+import org.apache.pekko.stream.Materializer
+import org.apache.pekko.stream.scaladsl.Source
 import domain.AggregateRoot.{InitializeViewLive, RestoreViewFromState}
 import domain.UserTimeBookingAggregate.UserTimeBooking
 import models.PersistedEvent

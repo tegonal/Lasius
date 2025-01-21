@@ -25,8 +25,8 @@ import java.util.UUID
 
 import actors.scheduler.gitlab.GitlabTagParseWorker.StartParsing
 import actors.scheduler.{ServiceAuthentication, ServiceConfiguration}
-import akka.actor.SupervisorStrategy._
-import akka.actor.{OneForOneStrategy, _}
+import org.apache.pekko.actor.SupervisorStrategy._
+import org.apache.pekko.actor.{OneForOneStrategy, _}
 import core.SystemServices
 import models._
 import play.api.libs.ws.WSClient

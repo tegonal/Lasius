@@ -21,8 +21,8 @@
 
 package domain
 
-import akka.PersistentActorTestScope
-import akka.testkit.TestProbe
+import pekko.PersistentActorTestScope
+import org.apache.pekko.testkit.TestProbe
 import domain.AggregateRoot._
 import domain.LoginStateAggregate._
 import models.{EntityReference, UserId, UserLoggedInV2, UserLoggedOutV2}

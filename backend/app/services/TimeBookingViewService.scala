@@ -22,7 +22,7 @@
 package services
 
 import actors.ClientReceiver
-import akka.actor.Props
+import org.apache.pekko.actor.Props
 import core.SystemServices
 import domain.UserTimeBookingAggregate
 import models.UserId.UserReference

@@ -22,10 +22,10 @@
 package core
 
 import actors.LasiusSupervisorActor
-import akka.actor.{ActorRef, ActorSystem}
-import akka.stream.Materializer
-import akka.testkit.TestProbe
-import akka.util.Timeout
+import org.apache.pekko.actor.{ActorRef, ActorSystem}
+import org.apache.pekko.stream.Materializer
+import org.apache.pekko.testkit.TestProbe
+import org.apache.pekko.util.Timeout
 import models.{EntityReference, Subject, UserId}
 import models.UserId.UserReference
 import org.specs2.mock.Mockito.mock

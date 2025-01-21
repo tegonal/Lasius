@@ -21,13 +21,13 @@
 
 package actors
 
-import akka.actor.{Actor, Props}
+import org.apache.pekko.actor.{Actor, Props}
 
 import scala.language.postfixOps
 
 class LasiusSupervisorActor extends Actor {
-  import akka.actor.OneForOneStrategy
-  import akka.actor.SupervisorStrategy._
+  import org.apache.pekko.actor.OneForOneStrategy
+  import org.apache.pekko.actor.SupervisorStrategy._
 
   import scala.concurrent.duration._
 

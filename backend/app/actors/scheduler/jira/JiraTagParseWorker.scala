@@ -24,7 +24,7 @@ package actors.scheduler.jira
 import models._
 import actors.TagCache.TagsUpdated
 import actors.scheduler.{ServiceAuthentication, ServiceConfiguration}
-import akka.actor._
+import org.apache.pekko.actor._
 import core.SystemServices
 import play.api.libs.ws.WSClient
 

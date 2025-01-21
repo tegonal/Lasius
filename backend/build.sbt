@@ -36,32 +36,37 @@ resolvers += "Tegonal releases".at(
 resolvers += "Sonatype OSS Releases".at(
   "https://oss.sonatype.org/content/repositories/releases")
 
-val akkaVersion              = "2.6.21"
+val pekkoVersion             = "1.1.3"
 val reactiveMongoVersion     = "1.1.0"
-val reactiveMongoPlayVersion = s"$reactiveMongoVersion-play29.RC13"
-val playVersion              = "2.9.6"
+val reactiveMongoPlayVersion = s"$reactiveMongoVersion-play30.RC14"
+val playVersion              = "3.0.5"
+// Play framework 3.x is still bound to older guice version
+val guiceVersion = "6.0.0"
 
 libraryDependencies ++= Seq(
-  ("org.reactivemongo" %% "play2-reactivemongo" % reactiveMongoPlayVersion)
-    .exclude("org.apache.logging.log4j", "log4j-api"),
-  "com.github.scullxbones"      %% "akka-persistence-mongo-rxmongo" % "3.1.3",
-  "com.tegonal"                 %% "play-json-typedid"              % "1.0.3",
-  "org.julienrf"                %% "play-json-derived-codecs"       % "11.0.0",
-  "com.typesafe.play"           %% "play-json-joda"                 % "2.10.6",
-  "com.google.inject"            % "guice"                          % "6.0.0",
-  "com.google.inject.extensions" % "guice-assistedinject"           % "6.0.0",
+  ("org.reactivemongo" %% "play2-reactivemongo" % reactiveMongoPlayVersion),
+  "com.github.scullxbones"      %% "pekko-persistence-mongodb" % "1.2.2",
+  "com.tegonal"                 %% "play-json-typedid"         % "2.0.0",
+  "org.julienrf"                %% "play-json-derived-codecs"  % "11.0.0",
+  "org.playframework"           %% "play-json-joda"            % "3.0.4",
+  "com.google.inject"            % "guice"                     % guiceVersion,
+  "com.google.inject.extensions" % "guice-assistedinject"      % guiceVersion,
   // support more than 22 fields in case classes
-  "com.typesafe.akka" %% "akka-persistence"       % akkaVersion,
-  "com.typesafe.akka" %% "akka-persistence-query" % akkaVersion,
-  "com.typesafe.akka" %% "akka-slf4j"             % akkaVersion,
-  "com.typesafe.akka" %% "akka-testkit"           % akkaVersion % "test",
+  "org.apache.pekko" %% "pekko-persistence"           % pekkoVersion,
+  "org.apache.pekko" %% "pekko-actor"                 % pekkoVersion,
+  "org.apache.pekko" %% "pekko-actor-typed"           % pekkoVersion,
+  "org.apache.pekko" %% "pekko-serialization-jackson" % pekkoVersion,
+  "org.apache.pekko" %% "pekko-persistence-query"     % pekkoVersion,
+  "org.apache.pekko" %% "pekko-slf4j"                 % pekkoVersion,
+  "org.apache.pekko" %% "pekko-testkit"               % pekkoVersion % "test",
+  "org.apache.pekko" %% "pekko-persistence-testkit"   % pekkoVersion % "test",
   // reativemongo based connector for persistent akka
-  "org.mindrot"          % "jbcrypt"                   % "0.4",
-  "de.flapdoodle.embed"  % "de.flapdoodle.embed.mongo" % "4.18.1"   % "test",
-  "com.github.dnvriend" %% "akka-persistence-inmemory" % "2.5.15.2" % "test",
-  "io.kontainers"       %% "purecsv"                   % "1.3.10",
-  "com.chuusai"         %% "shapeless"                 % "2.3.12",
-  "net.openhft"          % "zero-allocation-hashing"   % "0.27ea0",
+  "org.mindrot"         % "jbcrypt"                   % "0.4",
+  "de.flapdoodle.embed" % "de.flapdoodle.embed.mongo" % "4.18.1" % "test",
+  "io.github.alstanchev" % "pekko-persistence-inmemory_2.13" % "1.2.1" % "test",
+  "io.kontainers"       %% "purecsv"                         % "1.3.10",
+  "com.chuusai"         %% "shapeless"                       % "2.3.12",
+  "net.openhft"          % "zero-allocation-hashing"         % "0.27ea0",
   // depend on this plugin to be able to provide custom OutputTransformer
   "io.github.play-swagger" %% "play-swagger" % "2.0.4",
   ehcache,
@@ -69,10 +74,6 @@ libraryDependencies ++= Seq(
   specs2 % Test,
   guice,
   "org.webjars" % "swagger-ui" % "5.18.2"
-)
-
-dependencyOverrides ++= Seq(
-  "com.fasterxml.jackson.module" % "jackson-module-scala_2.13" % "2.18.2",
 )
 
 Test / javaOptions += "-Dconfig.file=conf/test.conf"

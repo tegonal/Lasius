@@ -21,7 +21,7 @@
 
 package actors
 
-import akka.actor._
+import org.apache.pekko.actor._
 import core.SystemServices
 import models._
 import shapeless._

@@ -1,8 +1,8 @@
-resolvers += "Typesafe repository".at(
-  "https://repo.typesafe.com/typesafe/releases/")
+//resolvers += "Typesafe repository".at(
+//  "https://repo.typesafe.com/typesafe/releases/")
 
 // The Play plugin
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.9.6")
+addSbtPlugin("org.playframework" % "sbt-plugin" % "3.0.6")
 
 addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.3")
 
