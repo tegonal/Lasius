@@ -28,7 +28,7 @@ for (const file of filesUnclean) {
   if (file.endsWith('.SVG') || file.startsWith('streamlinehq-') || file.includes('')) {
     fs.renameSync(
       `${directory}/${file}`,
-      `${directory}/${file.replace('.SVG', '.svg').replace('', '').replace('streamlinehq-', '')}`
+      `${directory}/${file.replace('.SVG', '.svg').replace('streamlinehq-', '')}`
     );
   }
 }
