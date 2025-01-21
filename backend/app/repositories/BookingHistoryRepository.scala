@@ -23,20 +23,17 @@ package repositories
 
 import com.google.inject.ImplementedBy
 import core.DBSession
-
-import javax.inject.Inject
 import models.BaseFormat._
 import models.UserId.UserReference
 import models._
-import org.joda.time.{DateTime, LocalDateTime}
+import org.joda.time.LocalDateTime
 import play.api.Logging
 import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
-import play.modules.reactivemongo.ReactiveMongoApi
-import reactivemongo.api.bson.BSONObjectID
 import reactivemongo.api.bson.collection.BSONCollection
 import repositories.MongoDBCommandSet._
 
+import javax.inject.Inject
 import scala.concurrent._
 
 @ImplementedBy(classOf[BookingHistoryMongoRepository])
@@ -74,7 +71,7 @@ class BookingHistoryMongoRepository @Inject() ()(
     override implicit protected val executionContext: ExecutionContext)
     extends BaseReactiveMongoRepository[BookingV2, BookingId]()
     with BookingHistoryRepository
-    with MongoPeristentUserViewRepository[BookingV2, BookingId]
+    with MongoPersistentUserViewRepository[BookingV2, BookingId]
     with Logging {
   override protected[repositories] def coll(implicit
       dbSession: DBSession): BSONCollection =
@@ -126,9 +123,9 @@ class BookingHistoryMongoRepository @Inject() ()(
 
     val sortConditions = Seq[Option[(String, JsValueWrapper)]](
       Some("start.dateTime" -> 1),
-      userReference.map(ref => "userReference.id" -> 1),
-      orgId.map(ref => "organisationReference.id" -> 1),
-      projectId.map(ref => "projectReference.id" -> 1),
+      userReference.map(_ => "userReference.id" -> 1),
+      orgId.map(_ => "organisationReference.id" -> 1),
+      projectId.map(_ => "projectReference.id" -> 1),
       Some("_id" -> 1)
     )
     val sort = Json.obj(sortConditions.flatten: _*)

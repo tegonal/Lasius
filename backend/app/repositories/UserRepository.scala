@@ -25,9 +25,9 @@ import com.google.inject.ImplementedBy
 import core.{DBSession, Validation}
 import models.OrganisationId.OrganisationReference
 import models.ProjectId.ProjectReference
+import models.Subject.ExtendedJwtSession
 import models.UserId.UserReference
 import models._
-import org.pac4j.core.profile.CommonProfile
 import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
 import reactivemongo.api.bson.collection.BSONCollection
@@ -74,7 +74,7 @@ trait UserRepository
   def findByEmail(email: String)(implicit
       dbSession: DBSession): Future[Option[User]]
 
-  def createInitialUserBasedOnProfile(userProfile: CommonProfile,
+  def createInitialUserBasedOnProfile(jwt: ExtendedJwtSession,
                                       org: Organisation,
                                       orgRole: OrganisationRole)(implicit
       dbSession: DBSession): Future[User]
@@ -386,7 +386,7 @@ class UserMongoRepository @Inject() (
     } yield true
   }
 
-  override def createInitialUserBasedOnProfile(userProfile: CommonProfile,
+  override def createInitialUserBasedOnProfile(jwt: ExtendedJwtSession,
                                                org: Organisation,
                                                orgRole: OrganisationRole)(
       implicit dbSession: DBSession): Future[User] = {
@@ -394,10 +394,10 @@ class UserMongoRepository @Inject() (
       newUser <- Future.successful(
         User(
           id = UserId(),
-          key = userProfile.getUsername,
-          email = userProfile.getEmail,
-          firstName = userProfile.getFirstName,
-          lastName = userProfile.getFamilyName,
+          key = jwt.subject,
+          email = jwt.email,
+          firstName = jwt.givenName.getOrElse(""),
+          lastName = jwt.familyName.getOrElse(""),
           active = true,
           role = FreeUser,
           organisations = Seq(

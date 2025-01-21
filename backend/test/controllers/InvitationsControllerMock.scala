@@ -21,13 +21,14 @@
 
 package controllers
 
-import core.{MockCacheAware, MockSessionStore, SystemServices, TestDBSupport}
-import org.pac4j.core.context.session.SessionStore
-import org.pac4j.play.scala.SecurityComponents
+import com.typesafe.config.Config
+import core.{MockCacheAware, SystemServices, TestDBSupport}
 import org.specs2.mock.Mockito
+import play.api.mvc.ControllerComponents
+import play.api.test.Helpers
 import play.modules.reactivemongo.ReactiveMongoApi
 import repositories._
-import util.{Awaitable, MockAwaitable, SecurityComponents}
+import util.{Awaitable, MockAwaitable}
 /*   __                          __                                          *\
  *   / /____ ___ ____  ___  ___ _/ /       lasius                      *
  *  / __/ -_) _ `/ _ \/ _ \/ _ `/ /        contributed by tegonal              *
@@ -51,7 +52,8 @@ import util.{Awaitable, MockAwaitable, SecurityComponents}
 import scala.concurrent.ExecutionContext
 
 class InvitationsControllerMock(
-    controllerComponents: SecurityComponents,
+    config: Config,
+    controllerComponents: ControllerComponents,
     systemServices: SystemServices,
     val organisationRepository: OrganisationMongoRepository,
     userMongoRepository: UserMongoRepository,
@@ -59,17 +61,16 @@ class InvitationsControllerMock(
     val projectRepository: ProjectMongoRepository,
     authConfig: AuthConfig,
     reactiveMongoApi: ReactiveMongoApi,
-    playSessionStore: SessionStore,
     override val userActive: Boolean)(implicit ec: ExecutionContext)
-    extends InvitationsController(controllerComponents,
+    extends InvitationsController(config,
+                                  controllerComponents,
                                   systemServices,
                                   userMongoRepository,
                                   organisationRepository,
                                   invitationRepository,
                                   projectRepository,
                                   authConfig,
-                                  reactiveMongoApi,
-                                  playSessionStore)
+                                  reactiveMongoApi)
     with SecurityControllerMock
     with MockCacheAware
     with TestDBSupport {
@@ -82,7 +83,8 @@ object InvitationsControllerMock
     extends MockAwaitable
     with Mockito
     with Awaitable {
-  def apply(systemServices: SystemServices,
+  def apply(config: Config,
+            systemServices: SystemServices,
             authConfig: AuthConfig,
             reactiveMongoApi: ReactiveMongoApi,
             userActive: Boolean = true)(implicit
@@ -93,7 +95,8 @@ object InvitationsControllerMock
     val projectMongoRepository      = new ProjectMongoRepository()
 
     val controller = new InvitationsControllerMock(
-      SecurityComponents.stubSecurityComponents(),
+      config,
+      Helpers.stubControllerComponents(),
       systemServices,
       organisationMongoRepository,
       userMongoRepository,
@@ -101,7 +104,6 @@ object InvitationsControllerMock
       projectMongoRepository,
       authConfig,
       reactiveMongoApi,
-      new MockSessionStore(),
       userActive)
 
     // initialize data

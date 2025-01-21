@@ -68,8 +68,7 @@ class OAuthUserMongoRepository @Inject() (
     findFirst(sel).map(_.map(_._1))
   }
 
-  private def checkPwd(user: OAuthUser, password: String)(implicit
-      dbSession: DBSession): Boolean =
+  private def checkPwd(user: OAuthUser, password: String): Boolean =
     BCrypt.checkpw(password, user.password)
 
   override def authenticate(email: String, password: String)(implicit

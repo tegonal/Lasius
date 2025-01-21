@@ -23,7 +23,6 @@ package repositories
 
 import com.google.inject.ImplementedBy
 import core.{DBSession, Validation}
-import models.UserId.UserReference
 import models._
 import org.joda.time.DateTime
 import play.api.libs.json.Json
@@ -38,7 +37,7 @@ trait InvitationRepository
     with Validation {
   def updateInvitationStatus(invitationId: InvitationId,
                              status: InvitationOutcomeStatus)(implicit
-      subject: Subject[_],
+      subject: Subject,
       dbSession: DBSession): Future[Boolean]
 
   def updateOrganisationKey(organisationId: OrganisationId, newKey: String)(
@@ -58,7 +57,7 @@ class InvitationMongoRepository @Inject() (
 
   override def updateInvitationStatus(invitationId: InvitationId,
                                       status: InvitationOutcomeStatus)(implicit
-      subject: Subject[_],
+      subject: Subject,
       dbSession: DBSession): Future[Boolean] = {
     val sel = Json.obj("id" -> invitationId)
     update(

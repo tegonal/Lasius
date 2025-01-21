@@ -21,11 +21,10 @@
 
 package controllers
 
+import com.typesafe.config.Config
 import org.apache.pekko.util.Timeout
 import core.SystemServices
 import models._
-import org.pac4j.core.context.session.SessionStore
-import org.pac4j.play.scala.SecurityComponents
 import play.api.libs.json._
 import play.api.mvc._
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -35,13 +34,13 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class UsersController @Inject() (
-    override val controllerComponents: SecurityComponents,
+    override val conf: Config,
+    override val controllerComponents: ControllerComponents,
     override val systemServices: SystemServices,
     override val authConfig: AuthConfig,
     override val reactiveMongoApi: ReactiveMongoApi,
-    override val playSessionStore: SessionStore,
     userRepository: UserRepository)(implicit ec: ExecutionContext)
-    extends BaseLasiusController(controllerComponents) {
+    extends BaseLasiusController() {
 
   implicit val timeout: Timeout = systemServices.timeout
 
@@ -53,7 +52,7 @@ class UsersController @Inject() (
     */
   def authUser(): Action[Unit] =
     HasToken(parse.empty, withinTransaction = false) {
-      implicit dbSession => subject => implicit request =>
+      implicit dbSession => subject => _ =>
         {
           userRepository
             .findByUserReference(subject.userReference)
@@ -91,7 +90,7 @@ class UsersController @Inject() (
     HasUserRole(FreeUser,
                 validateJson[PersonalDataUpdate],
                 withinTransaction = false) {
-      implicit dbSession => implicit subject => user => implicit request =>
+      implicit dbSession => _ => user => implicit request =>
         HasOrganisationRole(user, orgId, OrganisationAdministrator) { _ =>
           for {
             user <- userRepository

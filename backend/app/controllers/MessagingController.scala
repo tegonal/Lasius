@@ -22,14 +22,13 @@
 package controllers
 
 import actors.ClientMessagingWebsocketActor
+import com.typesafe.config.Config
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.stream.{Materializer, OverflowStrategy}
 import org.apache.pekko.util.Timeout
 import controllers.MessagingController.AuthOneTimeTokenQueryParamKey
 import core.SystemServices
 import models._
-import org.pac4j.core.context.session.SessionStore
-import org.pac4j.play.scala.SecurityComponents
 import play.api.cache.{AsyncCacheApi, NamedCache}
 import play.api.libs.json._
 import play.api.libs.streams._
@@ -45,14 +44,15 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
 
 class MessagingController @Inject() (
-    override val controllerComponents: SecurityComponents,
+    override val conf: Config,
+    override val controllerComponents: ControllerComponents,
     override val authConfig: AuthConfig,
     override val systemServices: SystemServices,
-    @NamedCache("one-time-tokens") val oneTimeAccessTokenCache: AsyncCacheApi,
-    override val playSessionStore: SessionStore)(implicit
+    @NamedCache("one-time-tokens") val oneTimeAccessTokenCache: AsyncCacheApi)(
+    implicit
     executionContext: ExecutionContext,
     override val reactiveMongoApi: ReactiveMongoApi)
-    extends BaseLasiusController(controllerComponents)
+    extends BaseLasiusController()
     with InjectedSockJSRouter {
 
   implicit val timeout: Timeout = systemServices.timeout
@@ -67,7 +67,7 @@ class MessagingController @Inject() (
   def sockjs: SockJS = SockJS.acceptOrResult[InEvent, OutEvent](messageHandler)
 
   private val messageHandler = { implicit request: RequestHeader =>
-    withDBSession() { implicit dbSession =>
+    withDBSession() { _ =>
       checkOneTimeAuthToken().map {
         case Left(result) =>
           logger.warn(
@@ -88,7 +88,7 @@ class MessagingController @Inject() (
 
   def acquireOneTimeToken(): Action[Unit] =
     HasToken(parse.empty, withinTransaction = false) {
-      implicit dbSession => implicit subject => implicit request =>
+      _ => implicit subject => _ =>
         val newToken = UUID.randomUUID().toString
         oneTimeAccessTokenCache.set(newToken, subject, 1 minute)
         Future.successful(Ok(Json.toJson(OneTimeToken(newToken))))
@@ -98,15 +98,15 @@ class MessagingController @Inject() (
     * either in header or as query parameter used for websocket authentication.
     * Perform user reference lookup within cache or db
     */
-  def checkOneTimeAuthToken()(implicit
-      request: RequestHeader): Future[Either[Result, Subject[_]]] = {
+  private def checkOneTimeAuthToken()(implicit
+      request: RequestHeader): Future[Either[Result, Subject]] = {
     val maybeOneTimeToken =
       request.getQueryString(AuthOneTimeTokenQueryParamKey)
     logger.debug("One-time token from headers:" + maybeOneTimeToken)
     maybeOneTimeToken
       .map { oneTimeToken =>
         oneTimeAccessTokenCache
-          .get[Subject[_]](oneTimeToken)
+          .get[Subject](oneTimeToken)
           .flatMap { maybeSubject =>
             oneTimeAccessTokenCache.remove(oneTimeToken).map { _ =>
               maybeSubject.toRight(

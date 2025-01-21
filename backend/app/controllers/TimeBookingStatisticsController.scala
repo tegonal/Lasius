@@ -21,15 +21,14 @@
 
 package controllers
 
+import com.typesafe.config.Config
 import org.apache.pekko.util.Timeout
 import core.SystemServices
 import core.Validation.ValidationFailedException
 import models._
 import org.joda.time._
-import org.pac4j.core.context.session.SessionStore
-import org.pac4j.play.scala.{DefaultSecurityComponents, SecurityComponents}
 import play.api.libs.json._
-import play.api.mvc.Action
+import play.api.mvc.{Action, ControllerComponents}
 import play.modules.reactivemongo.ReactiveMongoApi
 import repositories.{BookingByProjectRepository, BookingByTagRepository}
 
@@ -37,15 +36,15 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class TimeBookingStatisticsController @Inject() (
-    override val controllerComponents: SecurityComponents,
+    override val conf: Config,
+    override val controllerComponents: ControllerComponents,
     override val systemServices: SystemServices,
     override val authConfig: AuthConfig,
     override val reactiveMongoApi: ReactiveMongoApi,
-    override val playSessionStore: SessionStore,
     val bookingByProjectRepository: BookingByProjectRepository,
     val bookingByTagRepository: BookingByTagRepository)(implicit
     ec: ExecutionContext)
-    extends BaseLasiusController(controllerComponents) {
+    extends BaseLasiusController() {
 
   implicit val timeout: Timeout = systemServices.timeout
 
@@ -91,7 +90,7 @@ class TimeBookingStatisticsController @Inject() (
       to: LocalDate,
       granularity: Granularity): Action[Unit] =
     HasUserRole(FreeUser, parse.empty, withinTransaction = false) {
-      implicit dbSession => implicit subject => user => implicit request =>
+      implicit dbSession => _ => user => implicit request =>
         HasOrganisationRole(user, orgId, OrganisationAdministrator) { _ =>
           logger.debug(
             s"getAggregatedStatisticsByOrganisation, source:$source, orgId: ${orgId.value}, from:$from, to:$to")
@@ -133,7 +132,7 @@ class TimeBookingStatisticsController @Inject() (
                                        to: LocalDate,
                                        granularity: Granularity): Action[Unit] =
     HasUserRole(FreeUser, parse.empty, withinTransaction = false) {
-      implicit dbSession => implicit subject => user => implicit request =>
+      implicit dbSession => _ => user => implicit request =>
         HasOrganisationRole(user, orgId, OrganisationMember) { userOrg =>
           HasProjectRole(userOrg, projectId, ProjectAdministrator) { _ =>
             logger.debug(

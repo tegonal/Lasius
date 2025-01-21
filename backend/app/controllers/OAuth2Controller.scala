@@ -26,8 +26,6 @@ import com.typesafe.config.Config
 import core.SystemServices
 import models._
 import org.apache.pekko.http.scaladsl.model.StatusCodes
-import org.pac4j.core.context.session.SessionStore
-import org.pac4j.play.scala.SecurityComponents
 import play.api.libs.json.Json
 import play.api.mvc._
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -42,16 +40,16 @@ import java.net.URLEncoder
 import scala.concurrent.{ExecutionContext, Future}
 
 class OAuth2Controller @Inject() (
-    override val controllerComponents: SecurityComponents,
+    override val conf: Config,
+    override val controllerComponents: ControllerComponents,
     override val systemServices: SystemServices,
     override val authConfig: AuthConfig,
     override val reactiveMongoApi: ReactiveMongoApi,
-    override val playSessionStore: SessionStore,
     private val oauthUserRepository: OAuthUserRepository,
     private val oauthAccessTokenRepository: OAuthAccessTokenRepository,
     private val oauthAuthorizationCodeRepository: OAuthAuthorizationCodeRepository,
     typesafeConfig: Config)(implicit ec: ExecutionContext)
-    extends BaseLasiusController(controllerComponents)
+    extends BaseLasiusController()
     with OAuth2Provider {
 
   override val tokenEndpoint: TokenEndpoint = new OAuth2TokenEndpoint()
@@ -108,7 +106,7 @@ class OAuth2Controller @Inject() (
     }
 
   def userProfile(): Action[Unit] =
-    HasAccessToken(p = parse.empty) { implicit request => user =>
+    HasAccessToken(p = parse.empty) { _ => user =>
       ifLasiusOAuth2ProviderEnabled {
         Future.successful(Ok(Json.toJson(user.user.copy(password = ""))))
       }
@@ -118,9 +116,13 @@ class OAuth2Controller @Inject() (
     HasToken(validateJson[PasswordChangeRequest], withinTransaction = false) {
       implicit dbSession => implicit subject => implicit request =>
         ifLasiusOAuth2ProviderEnabled {
-          oauthUserRepository
-            .changePassword(subject.profile.getEmail, request.body)
-            .map(_ => Ok(""))
+          checked {
+            for {
+              _ <- oauthUserRepository.changePassword(
+                subject.extendedJwtClaims.email,
+                request.body)
+            } yield Ok("")
+          }
         }
     }
 

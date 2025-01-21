@@ -87,7 +87,7 @@ abstract class BookingStatisticMongoRepository[
     format: play.api.libs.json.Format[M])
     extends BaseReactiveMongoRepository[M, I]
     with BookingStatisticRepository[M, I]
-    with MongoPeristentUserViewRepository[M, I]
+    with MongoPersistentUserViewRepository[M, I]
     with Logging {
 
   override def findAggregatedByUserAndRange(userReference: UserReference,
@@ -140,7 +140,6 @@ abstract class BookingStatisticMongoRepository[
                                     to: LocalDate,
                                     aggregationProperty: String,
                                     granularity: Granularity)(implicit
-      format: play.api.libs.json.Format[M],
       dbSession: DBSession): Future[List[BookingStats]] = {
 
     val collection = coll

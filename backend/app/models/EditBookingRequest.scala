@@ -34,7 +34,7 @@ case class EditBookingRequest(projectId: Option[ProjectId],
   def toCommand(bookingId: BookingId,
                 organisationReference: OrganisationReference,
                 projectReference: Option[ProjectReference])(implicit
-      subject: Subject[_]): EditBookingCommand =
+      subject: Subject): EditBookingCommand =
     EditBookingCommand(subject.userReference,
                        organisationReference,
                        bookingId,

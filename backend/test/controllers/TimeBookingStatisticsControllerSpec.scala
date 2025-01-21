@@ -21,13 +21,14 @@
 
 package controllers
 
+import com.typesafe.config.Config
 import core._
 import models._
 import mongo.EmbedMongo
 import org.joda.time.LocalDate
 import org.specs2.mock.Mockito
 import org.specs2.mock.mockito.MockitoMatchers
-import util.{MockAwaitable, SecurityComponents}
+import util.MockAwaitable
 import play.api.libs.json._
 import play.api.mvc._
 import play.api.test._
@@ -52,7 +53,8 @@ class TimeBookingStatisticsControllerSpec
       val controller: TimeBookingStatisticsController
         with SecurityControllerMock
         with MockCacheAware =
-        TimeBookingStatisticsControllerMock(systemServices,
+        TimeBookingStatisticsControllerMock(config,
+                                            systemServices,
                                             authConfig,
                                             reactiveMongoApi)
 
@@ -86,7 +88,8 @@ class TimeBookingStatisticsControllerSpec
       val controller: TimeBookingStatisticsController
         with SecurityControllerMock
         with MockCacheAware =
-        TimeBookingStatisticsControllerMock(systemServices,
+        TimeBookingStatisticsControllerMock(config,
+                                            systemServices,
                                             authConfig,
                                             reactiveMongoApi)
 
@@ -106,7 +109,8 @@ class TimeBookingStatisticsControllerSpec
 }
 
 object TimeBookingStatisticsControllerMock extends MockAwaitable with Mockito {
-  def apply(systemServices: SystemServices,
+  def apply(config: Config,
+            systemServices: SystemServices,
             authConfig: AuthConfig,
             reactiveMongoApi: ReactiveMongoApi)(implicit
       ec: ExecutionContext): TimeBookingStatisticsController
@@ -116,11 +120,11 @@ object TimeBookingStatisticsControllerMock extends MockAwaitable with Mockito {
     val bookingByTagRepository     = mockAwaitable[BookingByTagRepository]
 
     new TimeBookingStatisticsController(
-      SecurityComponents.stubSecurityComponents(),
+      config,
+      Helpers.stubControllerComponents(),
       systemServices,
       authConfig,
       reactiveMongoApi,
-      new MockSessionStore(),
       bookingByProjectRepository,
       bookingByTagRepository) with SecurityControllerMock with MockCacheAware
   }
