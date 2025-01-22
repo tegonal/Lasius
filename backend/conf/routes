@@ -34,7 +34,7 @@ GET /config             controllers.ApplicationController.getConfig
 #    200:
 #      description: success
 ###
--> /messaging    controllers.MessagingController
+-> /messaging/connect    controllers.MessagingController
 
 ###
 #  security:
@@ -44,6 +44,10 @@ GET /config             controllers.ApplicationController.getConfig
 #  responses:
 #    200:
 #      description: success
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.OneTimeToken'
 ###
 GET /messaging/token    controllers.MessagingController.acquireOneTimeToken()
 
@@ -108,6 +112,9 @@ POST    /oauth2/access_token    controllers.OAuth2Controller.accessToken
 #      application/json:
 #        schema:
 #          $ref: '#/components/schemas/models.OAuthAuthorizationCodeLoginRequest'
+#  responses:
+#    302:
+#      description: redirect on success
 ###
 +nocsrf
 POST    /oauth2/login    controllers.OAuth2Controller.login()

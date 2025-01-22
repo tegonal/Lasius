@@ -24,7 +24,7 @@ package models
 import models.BaseFormat.UUIDBaseId
 import org.joda.time.DateTime
 import play.api.libs.json.{Format, Json, OFormat}
-import scalaoauth2.provider.AccessToken
+import scalaoauth2.provider.{AccessToken, CodeChallengeMethod}
 
 import java.util.UUID
 
@@ -42,6 +42,9 @@ case class OAuthAuthorizationCode(id: OAuthAuthorizationCodeId,
                                   clientId: String,
                                   scope: Option[String],
                                   redirectUri: String,
+                                  // used for PKCE validation
+                                  codeChallenge: Option[String] = None,
+                                  codeChallengeMethod: Option[String] = None,
                                   userId: OAuthUserId,
                                   createdAt: DateTime)
     extends BaseEntity[OAuthAuthorizationCodeId] {}

@@ -24,7 +24,7 @@ package controllers
 import com.google.inject.ImplementedBy
 import core.{DBSession, SystemServices}
 import helpers.UserHelper
-import models.Subject.ExtendedJwtSession
+import models.ExtendedJwtSession
 import models.UserId.UserReference
 import models._
 import play.api.libs.json.Json.toJsFieldJsValueWrapper

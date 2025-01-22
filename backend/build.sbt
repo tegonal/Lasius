@@ -41,9 +41,7 @@ val reactiveMongoVersion     = "1.1.0"
 val reactiveMongoPlayVersion = s"$reactiveMongoVersion-play30.RC14"
 val playVersion              = "3.0.5"
 // Play framework 3.x is still bound to older guice version
-val guiceVersion              = "6.0.0"
-val playOAuth2ProviderVersion = "1.6.0"
-val pac4jVersion              = "6.1.0"
+val guiceVersion = "6.0.0"
 
 libraryDependencies ++= Seq(
   "org.reactivemongo" %% "play2-reactivemongo" % reactiveMongoPlayVersion,
@@ -78,8 +76,8 @@ libraryDependencies ++= Seq(
 
   // oauth2 provider dependencies
   // oauth2 provider dependencies to be able to provide a simple oauth server packed with lasius
-  "com.nulab-inc" %% "scala-oauth2-core"     % playOAuth2ProviderVersion,
-  "com.nulab-inc" %% "play2-oauth2-provider" % playOAuth2ProviderVersion,
+  "com.nulab-inc" %% "scala-oauth2-core"     % "1.6.0",
+  "com.nulab-inc" %% "play2-oauth2-provider" % "2.0.0",
   ehcache,
   ws,
   specs2 % Test,

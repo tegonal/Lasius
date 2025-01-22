@@ -23,12 +23,16 @@ package models
 
 import play.api.libs.json._
 
-case class OAuthAuthorizationCodeLoginRequest(clientId: String,
-                                              email: String,
-                                              password: String,
-                                              code: String,
-                                              scope: Option[String],
-                                              redirectUri: String)
+case class OAuthAuthorizationCodeLoginRequest(
+    clientId: String,
+    email: String,
+    password: String,
+    scope: Option[String],
+    redirectUri: String,
+    // used for PKCE validation
+    codeChallenge: Option[String] = None,
+    codeChallengeMethod: Option[String] = None,
+    state: Option[String] = None)
 
 object OAuthAuthorizationCodeLoginRequest {
   implicit val userFormat: Format[OAuthAuthorizationCodeLoginRequest] =

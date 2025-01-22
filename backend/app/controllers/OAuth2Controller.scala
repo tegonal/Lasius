@@ -28,6 +28,7 @@ import models._
 import org.apache.pekko.http.scaladsl.model.StatusCodes
 import play.api.libs.json.Json
 import play.api.mvc._
+import play.api.routing.sird.QueryStringParameterExtractor
 import play.modules.reactivemongo.ReactiveMongoApi
 import repositories.{
   OAuthAccessTokenRepository,
@@ -82,7 +83,6 @@ class OAuth2Controller @Inject() (
 
   def login(): Action[OAuthAuthorizationCodeLoginRequest] =
     Action.async(validateJson[OAuthAuthorizationCodeLoginRequest]) { request =>
-      logger.info(s"login")
       ifLasiusOAuth2ProviderEnabled {
         checked {
           withinTransaction { implicit dbSession =>
@@ -94,10 +94,14 @@ class OAuth2Controller @Inject() (
                 Future.successful(Unauthorized)) { user =>
                 oauthAuthorizationCodeRepository
                   .register(request.body, user)
-                  .map(code =>
+                  .map { code =>
                     Redirect(
-                      s"${code.redirectUri}&code=${URLEncoder.encode(code.code, "UTF-8")}",
-                      StatusCodes.Found.intValue))
+                      s"${code.redirectUri}?state=${request.body.state
+                        .map(URLEncoder.encode(_, "UTF-8"))
+                        .getOrElse("")}&code=${URLEncoder.encode(code.code, "UTF-8")}",
+                      StatusCodes.Found.intValue
+                    )
+                  }
               }
             } yield result
           }

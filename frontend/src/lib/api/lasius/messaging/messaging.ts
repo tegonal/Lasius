@@ -22,17 +22,21 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 1.0.10+21-16e4799e
+ * OpenAPI spec version: 1.0.10+22-55ea4c04+20250122-1556
  */
 import useSwr from 'swr';
 import type { Key, SWRConfiguration } from 'swr';
+import type { ModelsOneTimeToken } from '..';
 import { lasiusAxiosInstance } from '../../lasiusAxiosInstance';
 import type { ErrorType } from '../../lasiusAxiosInstance';
 
 type SecondParameter<T extends (...args: any) => any> = Parameters<T>[1];
 
 export const acquireOneTimeToken = (options?: SecondParameter<typeof lasiusAxiosInstance>) => {
-  return lasiusAxiosInstance<void>({ url: `/messaging/token`, method: 'GET' }, options);
+  return lasiusAxiosInstance<ModelsOneTimeToken>(
+    { url: `/messaging/token`, method: 'GET' },
+    options
+  );
 };
 
 export const getAcquireOneTimeTokenKey = () => [`/messaging/token`] as const;
