@@ -64,11 +64,6 @@ export const ROLES = {
 };
 export type ROLES = typeof ROLES;
 
-export const COOKIE_NAMES = {
-  XSRF_TOKEN: 'XSRF-TOKEN',
-};
-export type COOKIE_NAMES = typeof COOKIE_NAMES;
-
 export const WEBSOCKET_EVENT = {
   UserLoggedOutV2: 'UserLoggedOutV2',
   CurrentOrganisationTimeBookings: 'CurrentOrganisationTimeBookings',

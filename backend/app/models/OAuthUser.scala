@@ -23,7 +23,7 @@ package models
 
 import models.BaseFormat.UUIDBaseId
 import play.api.libs.json._
-import scalaoauth2.provider.AuthInfo
+import scalaoauth2.provider.{AuthInfo, CodeChallengeMethod}
 
 import java.util.UUID
 
@@ -54,7 +54,10 @@ case class OAuthUser(id: OAuthUserId,
       user = this,
       clientId = Some(code.clientId),
       scope = code.scope,
-      redirectUri = Some(code.redirectUri)
+      redirectUri = Some(code.redirectUri),
+      codeChallenge = code.codeChallenge,
+      codeChallengeMethod = code.codeChallengeMethod
+        .flatMap(CodeChallengeMethod(_).toOption)
     )
 }
 

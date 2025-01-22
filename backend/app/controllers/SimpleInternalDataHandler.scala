@@ -23,7 +23,9 @@ package controllers
 
 import com.typesafe.config.Config
 import core.{DBSession, DBSupport}
-import models.{OAuthAccessToken, OAuthUser}
+import models.{OAuthAccessToken, OAuthAuthorizationCode, OAuthUser}
+import org.joda.time.DateTime
+import play.api.Logging
 import play.modules.reactivemongo.ReactiveMongoApi
 import repositories.{
   OAuthAccessTokenRepository,
@@ -43,12 +45,16 @@ class SimpleInternalDataHandler(
     typesafeConfig: Config
 )(implicit ec: ExecutionContext)
     extends DataHandler[OAuthUser]
-    with DBSupport {
+    with DBSupport
+    with Logging {
 
   private val oauthClientId =
     typesafeConfig.getString("lasius.oauth2_provider.client_id")
   private val oauthClientSecret =
     typesafeConfig.getString("lasius.oauth2_provider.client_secret")
+  private val authorizationTokenLifespan =
+    typesafeConfig.getDuration(
+      "lasius.oauth2_provider.authorization_code_lifespan")
 
   def validateClient(maybeClientCredential: Option[ClientCredential],
                      request: AuthorizationRequest): Future[Boolean] =
@@ -98,11 +104,25 @@ class SimpleInternalDataHandler(
           .getOrElse(Future.successful(None))
       } yield {
         (maybeCode, maybeUser) match {
-          case (Some(code), Some(user)) => Some(user.toAuthInfo(code))
+          case (Some(code), Some(user)) => validateCodeAndUser(code, user)
           case _                        => None
         }
       }
     }
+  }
+
+  private def validateCodeAndUser(
+      code: OAuthAuthorizationCode,
+      user: OAuthUser): Option[AuthInfo[OAuthUser]] = (code, user) match {
+    case (c, _)
+        if c.createdAt.isBefore(
+          DateTime.now().minus(authorizationTokenLifespan.toMillis)) =>
+      logger.warn(s"authorization code expired")
+      None
+    case (_, u) if !u.active =>
+      logger.warn(s"associated user inactive")
+      None
+    case _ => Some(user.toAuthInfo(code))
   }
 
   def findAuthInfoByRefreshToken(

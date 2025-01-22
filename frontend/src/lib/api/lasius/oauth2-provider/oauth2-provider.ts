@@ -22,7 +22,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 1.0.10+21-16e4799e
+ * OpenAPI spec version: 1.0.10+22-55ea4c04+20250122-1556
  */
 import type { Arguments, Key } from 'swr';
 import useSWRMutation from 'swr/mutation';
@@ -224,12 +224,12 @@ export const getLoginMutationFetcher = (options?: SecondParameter<typeof lasiusA
 export const getLoginMutationKey = () => [`/oauth2/login`] as const;
 
 export type LoginMutationResult = NonNullable<Awaited<ReturnType<typeof login>>>;
-export type LoginMutationError = ErrorType<unknown>;
+export type LoginMutationError = ErrorType<void>;
 
 /**
  * @summary login to the oauth provider with the authorization code flow
  */
-export const useLogin = <TError = ErrorType<unknown>>(options?: {
+export const useLogin = <TError = ErrorType<void>>(options?: {
   swr?: SWRMutationConfiguration<
     Awaited<ReturnType<typeof login>>,
     TError,

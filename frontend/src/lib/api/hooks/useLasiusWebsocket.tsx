@@ -22,20 +22,29 @@ import useWebSocket, { ReadyState } from 'react-use-websocket';
 import { CONNECTION_STATUS, IS_SERVER, LASIUS_API_WEBSOCKET_URL } from 'projectConfig/constants';
 import parseJson from 'parse-json';
 import { logger } from 'lib/logger';
-import { useSession } from 'next-auth/react';
 import useIsWindowFocused from 'lib/hooks/useIsWindowFocused';
+import { useAcquireOneTimeToken } from '../lasius/messaging/messaging';
 
 export const useLasiusWebsocket = () => {
-  const { data } = useSession();
-  const token = data?.user?.xsrfToken;
   const isWindowFocused = useIsWindowFocused();
 
-  if (!token) logger.warn('[useLasiusWebsocket][tokenUndefined]');
-
   const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([]);
+  const oneTimeTokenResult = useAcquireOneTimeToken();
+  if (!oneTimeTokenResult.data?.token) {
+    logger.warn('[useLasiusWebsocket][tokenUndefined]', oneTimeTokenResult.data);
+    return {
+      sendJsonMessage: () => {
+        logger.info('[useLasiusWebsocket][cannotSendNnotConnected]');
+      },
+      connectionStatus: CONNECTION_STATUS.DISCONNECTED,
+    };
+  }
+  const token = oneTimeTokenResult.data?.token;
+
+  logger.info('[useLasiusWebsocket][token]', token);
 
   const { sendJsonMessage, lastMessage, readyState } = useWebSocket(
-    IS_SERVER ? null : `${LASIUS_API_WEBSOCKET_URL}/messagingSocket?auth=${token}`,
+    IS_SERVER ? null : `${LASIUS_API_WEBSOCKET_URL}/messagingSocket?otoken=${token}`,
     {
       share: true,
       shouldReconnect: (closeEvent) => {

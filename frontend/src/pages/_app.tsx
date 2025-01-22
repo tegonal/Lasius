@@ -52,7 +52,7 @@ import { ModelsUser } from 'lib/api/lasius';
 import { CookieCutter } from 'components/system/cookieCutter';
 import { useAsync } from 'react-async-hook';
 import { removeAccessibleCookies } from 'lib/removeAccessibleCookies';
-import { getServerSideRequestHeaders } from 'lib/api/hooks/useTokensWithAxiosRequests';
+import { getRequestHeaders } from 'lib/api/hooks/useTokensWithAxiosRequests';
 import { logger } from 'lib/logger';
 import dynamic from 'next/dynamic';
 import PlausibleProvider from 'next-plausible';
@@ -91,7 +91,7 @@ const App = ({
 }: AppPropsWithLayout): JSX.Element => {
   // Use the layout defined at the page level, if available
   const getLayout = Component.getLayout ?? ((page) => page);
-  const lasiusIsLoggedIn = !!(session?.user?.xsrfToken && profile?.id);
+  const lasiusIsLoggedIn = !!(session?.user && profile?.id);
   const store = useStore();
 
   useAsync(async () => {
@@ -180,14 +180,14 @@ App.getInitialProps = async ({
 }: ExtendedAppContext) => {
   const session = await getSession({ req });
   let profile = null;
-  const token = session?.user?.xsrfToken;
+  const accessToken = session?.accessToken;
 
-  if (token && session) {
-    logger.info('App.getInitialProps', { token, session });
+  if (accessToken) {
     try {
-      profile = await getUserProfile(getServerSideRequestHeaders(token));
+      profile = await getUserProfile(getRequestHeaders(accessToken));
     } catch (error) {
       logger.error(error);
+
       if (res && !pathname.includes('/login')) {
         res.writeHead(307, { Location: '/login' });
         res.end();

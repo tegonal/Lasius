@@ -25,11 +25,13 @@ import com.google.inject.ImplementedBy
 import core.{DBSession, Validation}
 import models._
 import org.joda.time.DateTime
+import play.api.Logging
 import play.api.libs.json._
 import reactivemongo.api.bson.collection.BSONCollection
 
 import javax.inject.Inject
 import scala.concurrent._
+import scala.util.Random
 
 @ImplementedBy(classOf[OAuthAuthorizationCodeMongoRepository])
 trait OAuthAuthorizationCodeRepository
@@ -43,6 +45,8 @@ trait OAuthAuthorizationCodeRepository
       dbSession: DBSession): Future[Option[OAuthAuthorizationCode]]
 
   def removeByCode(code: String)(implicit dbSession: DBSession): Future[Boolean]
+
+  val MAX_CODE_LENGTH = 45
 }
 
 class OAuthAuthorizationCodeMongoRepository @Inject() (
@@ -51,7 +55,8 @@ class OAuthAuthorizationCodeMongoRepository @Inject() (
                                         OAuthAuthorizationCodeId]
     with OAuthAuthorizationCodeRepository
     with MongoDropAllSupport[OAuthAuthorizationCode, OAuthAuthorizationCodeId]
-    with Validation {
+    with Validation
+    with Logging {
   override protected[repositories] def coll(implicit
       dbSession: DBSession): BSONCollection =
     dbSession.db.collection[BSONCollection]("OAuthAuthorizationCode")
@@ -59,21 +64,27 @@ class OAuthAuthorizationCodeMongoRepository @Inject() (
   override def register(loginRequest: OAuthAuthorizationCodeLoginRequest,
                         user: OAuthUser)(implicit
       dbSession: DBSession): Future[OAuthAuthorizationCode] = {
+    val code = generateRandomCode()
     for {
-      _ <- findByCode(loginRequest.code).someToFailed(s"Duplicate code")
+      _ <- findByCode(code).someToFailed(s"Duplicate code")
       newCode <- Future.successful(
         OAuthAuthorizationCode(
           id = OAuthAuthorizationCodeId(),
           clientId = loginRequest.clientId,
-          code = loginRequest.code,
+          code = code,
           scope = loginRequest.scope,
           redirectUri = loginRequest.redirectUri,
+          codeChallenge = loginRequest.codeChallenge,
+          codeChallengeMethod = loginRequest.codeChallengeMethod,
           userId = user.id,
           createdAt = DateTime.now(),
         ))
       _ <- upsert(newCode)
     } yield newCode
   }
+
+  private def generateRandomCode(): String =
+    Random.alphanumeric.take(MAX_CODE_LENGTH).mkString
 
   override def findByCode(code: String)(implicit
       dbSession: DBSession): Future[Option[OAuthAuthorizationCode]] = {

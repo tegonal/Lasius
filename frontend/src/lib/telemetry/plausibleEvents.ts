@@ -20,6 +20,7 @@
 export type LasiusPlausibleEvents = {
   uiAction: { name: string };
   login: { status: string };
+  internalOAuthLogin: { status: string };
   logout: { status: string };
   organisation: { status: string };
   invitation: { status: string };
