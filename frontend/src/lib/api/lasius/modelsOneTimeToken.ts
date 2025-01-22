@@ -25,11 +25,6 @@
  * OpenAPI spec version: 1.0.10+22-55ea4c04+20250122-1556
  */
 
-export interface ModelsPersonalDataUpdate {
-  /** @nullable */
-  email?: string | null;
-  /** @nullable */
-  firstName?: string | null;
-  /** @nullable */
-  lastName?: string | null;
+export interface ModelsOneTimeToken {
+  token: string;
 }

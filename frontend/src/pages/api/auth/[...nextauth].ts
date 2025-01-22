@@ -17,14 +17,9 @@
  *
  */
 
-import CredentialsProvider from 'next-auth/providers/credentials';
-
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { logger } from 'lib/logger';
-//import { signIn } from 'lib/api/lasius/authentication/authentication';
-//import { getUserProfile, updateUserSettings } from 'lib/api/lasius/user/user';
-import { getServerSideRequestHeaders } from 'lib/api/hooks/useTokensWithAxiosRequests';
 import { OAuthConfig } from 'next-auth/providers';
 
 const internalProvider: OAuthConfig<any> = {
@@ -32,109 +27,58 @@ const internalProvider: OAuthConfig<any> = {
   name: 'Internal Lasius',
   version: '2.0',
   type: 'oauth',
-  scope: 'openid email',
   // redirect to local login page
-  authorization: 'http://localhost:3000/login',
-  token: 'http://localhost:3000/backend/oauth/access_token',
+  authorization: 'http://localhost:3000/internal_oauth',
+  token: 'http://localhost:3000/backend/oauth2/access_token',
   userinfo: 'http://localhost:3000/backend/oauth2/profile',
-  clientId: process.env.CLIENT_ID,
-  clientSecret: process.env.CLIENT_SECRET,
+  clientId: process.env.LASIUS_OAUTH_CLIENT_ID,
+  clientSecret: process.env.LASIUS_OAUTH_CLIENT_SECRET,
   checks: ['pkce', 'state'],
-  profile: (profile: any, tokens) => {
-    console.log('profile', profile, tokens)
+  idToken: false,
+  profile(profile: any, tokens) {
+    console.log('profile', profile, tokens);
     return {
-      id: profile.user.id.toString(),
-      name: profile.user.username,
-      email: profile.user.email
-    }
+      id: profile.id.toString(),
+      name: profile.firstName + ' ' + profile.lastName,
+      email: profile.email,
+      accessToken: tokens.access_token,
+    };
   },
-}
+};
 
 const nextAuthOptions = (): NextAuthOptions => {
   return {
-    debug: true,
-    providers: [
-      internalProvider,
-      /*CredentialsProvider({
-        id: 'credentials',
-        name: 'Basic auth on Lasius',
-        credentials: {
-          email: { label: 'E-Mail', type: 'text', placeholder: 'E-Mail' },
-          password: { label: 'Password', type: 'password' },
-        },
-        async authorize(credentials) {
-          if (!credentials?.email || !credentials?.password) {
-            throw new Error('oneOfCredentialsMissing');
-          }
-
-          const { email, password } = credentials;
-
-          let signInResponse;
-
-          try {
-            signInResponse = await signIn({ email, password });
-          } catch (error) {
-            logger.error('[nextauth][signInFailed]', error);
-          }
-
-          if (!signInResponse?.token) {
-            logger.info('usernameOrPasswordWrong');
-            throw new Error('usernameOrPasswordWrong');
-          }
-
-          if (signInResponse.token) {
-            const { token: xsrfToken } = signInResponse;
-
-            const user = await getUserProfile(getServerSideRequestHeaders(xsrfToken));
-
-            //  TODO: remove this once the backend sets a lastselectedorganisation on profile creation
-            if (!user.settings.lastSelectedOrganisation) {
-              await updateUserSettings(
-                {
-                  lastSelectedOrganisation: user.organisations.filter((item) => item.private)[0]
-                    .organisationReference,
-                },
-                getServerSideRequestHeaders(xsrfToken)
-              );
-            }
-
-            if (!user) {
-              logger.info('noUserFoundOnBackend', user);
-              throw new Error('noUserFoundOnBackend');
-            }
-
-            const { id, key: name, email } = user;
-
-            if (id) {
-              return {
-                id,
-                name,
-                email,
-                // Hack: We need to store the xsrfToken in the user object. next auth strips unknown properties ...
-                image: xsrfToken,
-                xsrfToken,
-              };
-            }
-          }
-
-          return null;
-        },
-      }),*/
-    ],
-    jwt: {
-      secret: process.env.SECRET,
-      encryption: true,
+    debug: false,
+    providers: [internalProvider],
+    session: {
+      strategy: 'jwt',
     },
+    jwt: {
+      secret: process.env.NEXTAUTH_JWT_SECRET,
+    },
+    secret: process.env.NEXTAUTH_SECRET,
     pages: {
       signIn: '/login',
       signOut: '/',
     },
     callbacks: {
-      async session({ session }) {
+      async session({ session, token }) {
+        if (token) {
+          session.accessToken = token.accessToken;
+        }
         return {
           ...session,
-          user: { ...session.user, image: undefined, xsrfToken: session.user?.image || '' },
+
+          user: { ...session.user, image: undefined },
         };
+      },
+      async jwt({ token, user }) {
+        // the user object is what returned from the Credentials login, it has `accessToken` from the server `/login` endpoint
+        // assign the accessToken to the `token` object, so it will be available on the `session` callback
+        if (user) {
+          token.accessToken = user.accessToken;
+        }
+        return token;
       },
     },
     events: {

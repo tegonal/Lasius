@@ -26,7 +26,7 @@ import { Error } from 'components/error';
 import { isAdminOfCurrentOrg } from 'lib/api/functions/isAdminOfCurrentOrg';
 import { ModelsUser } from 'lib/api/lasius';
 import { getUserProfile } from 'lib/api/lasius/user/user';
-import { getServerSideRequestHeaders } from 'lib/api/hooks/useTokensWithAxiosRequests';
+import { getRequestHeaders } from 'lib/api/hooks/useTokensWithAxiosRequests';
 import { getSession } from 'next-auth/react';
 
 const AllProjectsPage: NextPageWithLayout = ({ profile }) => {
@@ -39,7 +39,7 @@ const AllProjectsPage: NextPageWithLayout = ({ profile }) => {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { locale = '' } = context;
   const session = await getSession({ req: context.req });
-  const profile = await getUserProfile(getServerSideRequestHeaders(session?.user.xsrfToken || ''));
+  const profile = await getUserProfile(getRequestHeaders(session?.accessToken || ''));
   return {
     props: {
       profile,

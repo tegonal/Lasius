@@ -25,7 +25,7 @@ import com.google.inject.ImplementedBy
 import core.{DBSession, Validation}
 import models.OrganisationId.OrganisationReference
 import models.ProjectId.ProjectReference
-import models.Subject.ExtendedJwtSession
+import models.ExtendedJwtSession
 import models.UserId.UserReference
 import models._
 import play.api.libs.json.Json.JsValueWrapper

@@ -22,7 +22,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 1.0.10+21-16e4799e
+ * OpenAPI spec version: 1.0.10+22-55ea4c04+20250122-1556
  */
 
 export * from './getAggregatedStatisticsByProjectGranularity';
@@ -69,6 +69,7 @@ export * from './modelsLocalDateTimeWithTimeZone';
 export * from './modelsOAuthAuthorizationCodeLoginRequest';
 export * from './modelsOAuthUserId';
 export * from './modelsOAuthUserRegistration';
+export * from './modelsOneTimeToken';
 export * from './modelsOrganisation';
 export * from './modelsPasswordChangeRequest';
 export * from './modelsPersonalDataUpdate';

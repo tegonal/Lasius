@@ -36,7 +36,7 @@ export const lasiusAxiosInstance = <T>(
     ...config,
     headers: { ...defaultHeaders, ...config.headers },
   };
-  logger.info(newConfig, options);
+  logger.debug(newConfig, options);
 
   const source = Axios.CancelToken.source();
   const promise = clientAxiosInstance({
@@ -60,8 +60,9 @@ export const lasiusAxiosInstance = <T>(
           window.location.pathname !== '/login' &&
           window.location.pathname !== '/'
         ) {
-          await removeAccessibleCookies();
-          await signOut();
+          // TODO remove again
+          //await removeAccessibleCookies();
+          //await signOut();
         } else {
           logger.info('[lasiusAxiosInstance][Unauthorized]', error);
           throw new Error(error);

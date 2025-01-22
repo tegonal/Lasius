@@ -22,6 +22,8 @@
 package repositories
 
 import com.google.inject.ImplementedBy
+import com.typesafe.config.Config
+import controllers.JWTSessionSupport
 import core.{DBSession, Validation}
 import models._
 import org.joda.time.DateTime
@@ -54,11 +56,13 @@ trait OAuthAccessTokenRepository
 }
 
 class OAuthAccessTokenMongoRepository @Inject() (
-    override implicit protected val executionContext: ExecutionContext)
+    override val conf: Config
+)(override implicit protected val executionContext: ExecutionContext)
     extends BaseReactiveMongoRepository[OAuthAccessToken, OAuthAccessTokenId]
     with OAuthAccessTokenRepository
     with MongoDropAllSupport[OAuthAccessToken, OAuthAccessTokenId]
-    with Validation {
+    with Validation
+    with JWTSessionSupport {
   override protected[repositories] def coll(implicit
       dbSession: DBSession): BSONCollection =
     dbSession.db.collection[BSONCollection]("OAuthAccessToken")
@@ -66,6 +70,10 @@ class OAuthAccessTokenMongoRepository @Inject() (
   private def generateToken(): String = {
     val key = java.util.UUID.randomUUID.toString
     new String(Base64.getEncoder.encode(key.getBytes()))
+  }
+
+  private def generateJwtAccessToken(user: OAuthUser): String = {
+    ExtendedJwtSession.newSession(user).serialize
   }
 
   override def create(authInfo: AuthInfo[OAuthUser])(implicit
@@ -77,7 +85,7 @@ class OAuthAccessTokenMongoRepository @Inject() (
       newToken <- Future.successful(
         OAuthAccessToken(
           id = OAuthAccessTokenId(),
-          accessToken = generateToken(),
+          accessToken = generateJwtAccessToken(authInfo.user),
           refreshToken = Some(generateToken()),
           userId = authInfo.user.id,
           scope = authInfo.scope,

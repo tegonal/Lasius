@@ -23,13 +23,14 @@ package controllers
 
 import core.Validation.ValidationFailedException
 import core.{DBSession, DBSupport}
-import models.Subject.ExtendedJwtSession
+import models.ExtendedJwtSession
 import models._
 import pdi.jwt.JwtSession.RichRequestHeader
 import play.api.{Configuration, Logging}
 import play.api.libs.json.Reads
 import play.api.mvc._
 import com.typesafe.config.Config
+import pdi.jwt.{JwtOptions, JwtSession}
 
 import java.time.Clock
 import scala.concurrent.Future.successful
@@ -39,13 +40,16 @@ import scala.language.postfixOps
 /** Security actions that should be used by all controllers that need to protect
   * their actions. Can be composed to fine-tune access control.
   */
-trait SecurityComponent {
-  val authConfig: AuthConfig
 
+trait JWTSessionSupport {
   val conf: Config
   implicit val playConf: Configuration = Configuration(conf)
 
   implicit val clock: Clock = Clock.systemUTC
+}
+
+trait SecurityComponent extends JWTSessionSupport {
+  val authConfig: AuthConfig
 }
 
 trait Security extends Logging {
@@ -58,23 +62,55 @@ trait Security extends Logging {
     HasToken(parse.json[A], withinTransaction)(f)
   }
 
+  private def sanitizeHeader(header: String): String =
+    if (header.startsWith(JwtSession.TOKEN_PREFIX)) {
+      header.substring(JwtSession.TOKEN_PREFIX.length()).trim
+    } else {
+      header.trim
+    }
+
+  /** Override extracting jwt session to be able to overrule validation
+    * behaviour
+    * @param request
+    * @return
+    */
+  private def extractJwtSession(
+      request: RequestHeader
+  ): Option[JwtSession] =
+    request.headers
+      .get(JwtSession.REQUEST_HEADER_NAME)
+      .map(sanitizeHeader)
+      .map(
+        JwtSession.deserialize(_,
+                               JwtOptions(
+                                 signature = false,
+                                 notBefore = false,
+                                 expiration = false,
+                                 leeway = 60
+                               )))
+
   /** */
   def HasToken[A](p: BodyParser[A], withinTransaction: Boolean)(
       f: DBSession => Subject => Request[A] => Future[Result])(implicit
       context: ExecutionContext): Action[A] = {
     Action.async(p) { request =>
       if (request.hasJwtHeader) {
-        // TODO: verify issuer based on configuration
-
-        withDBSession(withinTransaction) { implicit dbSession =>
-          authConfig
-            .resolveOrCreateUserByJwt(ExtendedJwtSession(request.jwtSession))
-            .flatMap { user =>
-              f(dbSession)(Subject(request.jwtSession, user))(request)
-            }
+        val jwtSession = extractJwtSession(request)
+        if (jwtSession.flatMap(_.claim.issuer).isEmpty) {
+          successful(Unauthorized(s"Invalid JWT token provided $jwtSession"))
+        } else {
+          logger.debug(s"Got token: ${jwtSession}")
+          // TODO: verify issuer based on configuration
+          withDBSession(withinTransaction) { implicit dbSession =>
+            authConfig
+              .resolveOrCreateUserByJwt(ExtendedJwtSession(jwtSession.get))
+              .flatMap { user =>
+                f(dbSession)(Subject(request.jwtSession, user))(request)
+              }
+          }
         }
       } else {
-        successful(Unauthorized("No JWT header found"))
+        successful(Unauthorized("No JWT token found"))
       }
     }
   }

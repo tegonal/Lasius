@@ -21,26 +21,25 @@ import React, { useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import axios from 'axios';
 import cookie from 'js-cookie';
-import { COOKIE_NAMES } from 'projectConfig/constants';
 import { logger } from 'lib/logger';
 
 export const CookieCutter: React.FC = () => {
   const session = useSession();
 
   // Set the token for client side requests to use
-  useEffect(() => {
-    const token = session?.data?.user.xsrfToken;
-    logger.info('AxiosConfig', token);
-    if (token) {
-      cookie.set(COOKIE_NAMES.XSRF_TOKEN, token, { sameSite: 'strict', path: '/' });
-      axios.defaults.headers.common['X-XSRF-TOKEN'] = token;
-    } else {
-      // legacy
-      cookie.remove(COOKIE_NAMES.XSRF_TOKEN, { sameSite: 'strict', path: '/' });
-      cookie.remove(COOKIE_NAMES.XSRF_TOKEN);
-      delete axios.defaults.headers.common['X-XSRF-TOKEN'];
-    }
-  }, [session]);
+  // useEffect(() => {
+  //   const token = session?.data?.user.xsrfToken;
+  //   logger.info('AxiosConfig', token);
+  //   if (token) {
+  //     cookie.set(COOKIE_NAMES.XSRF_TOKEN, token, { sameSite: 'strict', path: '/' });
+  //     axios.defaults.headers.common['X-XSRF-TOKEN'] = token;
+  //   } else {
+  //     // legacy
+  //     cookie.remove(COOKIE_NAMES.XSRF_TOKEN, { sameSite: 'strict', path: '/' });
+  //     cookie.remove(COOKIE_NAMES.XSRF_TOKEN);
+  //     delete axios.defaults.headers.common['X-XSRF-TOKEN'];
+  //   }
+  // }, [session]);
 
   return null;
 };

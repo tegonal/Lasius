@@ -21,27 +21,9 @@
 
 package models
 
-import controllers.UnauthorizedException
-import models.Subject.ExtendedJwtSession
 import models.UserId.UserReference
 import pdi.jwt.JwtSession
 
 case class Subject(jwt: JwtSession, userReference: UserReference) {
   def extendedJwtClaims: ExtendedJwtSession = ExtendedJwtSession(jwt)
-}
-
-object Subject {
-  private val EMAIL_CLAIM       = "email"
-  private val GIVEN_NAME_CLAIM  = "given_name"
-  private val FAMILY_NAME_CLAIM = "family_name"
-
-  case class ExtendedJwtSession(private val jwt: JwtSession) {
-    def subject: String = jwt.claim.subject.getOrElse(
-      throw UnauthorizedException("Missing claim 'subject'"))
-    def email: String = jwt
-      .getAs[String](EMAIL_CLAIM)
-      .getOrElse(throw UnauthorizedException(s"Missing claim '$EMAIL_CLAIM'"))
-    def givenName: Option[String]  = jwt.getAs[String](GIVEN_NAME_CLAIM)
-    def familyName: Option[String] = jwt.getAs[String](FAMILY_NAME_CLAIM)
-  }
 }
