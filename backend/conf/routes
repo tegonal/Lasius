@@ -26,30 +26,13 @@ GET /config             controllers.ApplicationController.getConfig
 #######
 
 ###
-#  security:
-#    - oneTimeTokenAuth: []
 #  tags: 
 #    - messaging
 #  responses:
 #    200:
 #      description: success
 ###
--> /messaging/connect    controllers.MessagingController
-
-###
-#  security:
-#    - oAuth2: []
-#  tags:
-#    - messaging
-#  responses:
-#    200:
-#      description: success
-#      content:
-#        application/json:
-#          schema:
-#            $ref: '#/components/schemas/models.OneTimeToken'
-###
-GET /messaging/token    controllers.MessagingController.acquireOneTimeToken()
+-> /messaging    controllers.MessagingController
 
 #######
 ####### Internal OAuth2 identity provider #######

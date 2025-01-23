@@ -28,8 +28,7 @@ import org.apache.pekko.actor._
 import core.SystemServices
 import play.api.libs.ws.WSClient
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
@@ -65,12 +64,14 @@ class JiraTagParseWorker(wsClient: WSClient,
     with ActorLogging {
   import JiraTagParseWorker._
 
-  var cancellable: Option[Cancellable] = None
-  var lastIssueSize: Option[Int]       = None
-  val jiraApiService = new JiraApiServiceImpl(wsClient, config)
-  val defaultJql =
+  var cancellable: Option[Cancellable]   = None
+  private var lastIssueSize: Option[Int] = None
+  private val jiraApiService = new JiraApiServiceImpl(wsClient, config)
+  private val defaultJql =
     s"project=${projectSettings.jiraProjectKey} and resolution=Unresolved ORDER BY created DESC"
   val maxResults: Int = projectSettings.maxResults.getOrElse(100)
+  implicit val executionContext: ExecutionContextExecutor =
+    context.system.dispatcher
 
   val receive: Receive = { case StartParsing =>
     cancellable = Some(
@@ -106,7 +107,7 @@ class JiraTagParseWorker(wsClient: WSClient,
       }
   }
 
-  def toJiraIssueTag(issue: JiraIssue): JiraIssueTag = {
+  private def toJiraIssueTag(issue: JiraIssue): JiraIssueTag = {
     issue.fields
       .map { fields =>
         JiraIssueTag(TagId(issue.key),

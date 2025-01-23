@@ -66,7 +66,7 @@ export const LasiusBackendWebsocketEventHandler: React.FC = () => {
           break;
 
         case type === WEBSOCKET_EVENT.HelloClient:
-          logger.info('[AppWebsocketEventHandler][pong!]');
+          logger.info('[AppWebsocketEventHandler][HelloClient!]');
           break;
 
         case type === WEBSOCKET_EVENT.FavoriteAdded:
@@ -84,6 +84,10 @@ export const LasiusBackendWebsocketEventHandler: React.FC = () => {
         case type === WEBSOCKET_EVENT.UserTimeBookingByTagEntryRemoved:
         case type === WEBSOCKET_EVENT.UserTimeBookingByTagEntryAdded:
           //  Unhandled events - these clog up the ws connection on simple updates
+          break;
+
+        case type === WEBSOCKET_EVENT.Pong:
+          // ignore
           break;
 
         default:

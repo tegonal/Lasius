@@ -28,7 +28,6 @@ import org.joda.time.{DateTime, Duration, LocalDate}
 import play.api.libs.json._
 import play.api.mvc.WebSocket.MessageFlowTransformer
 
-import java.util.UUID
 import scala.annotation.nowarn
 
 sealed trait PersistedEvent
@@ -134,13 +133,15 @@ case class UserTimeBookingStartTimeChanged(bookingId: BookingId,
 
 sealed trait InEvent
 
-case class HelloServer(client: String) extends InEvent
+case class HelloServer(client: String, token: String) extends InEvent
 
 case object Ping extends InEvent
 
 case object Pong extends OutEvent
 
 sealed trait OutEvent
+
+case object AuthenticationFailed extends OutEvent
 
 case object HelloClient extends OutEvent
 

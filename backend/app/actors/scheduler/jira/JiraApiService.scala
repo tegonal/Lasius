@@ -21,22 +21,14 @@
 
 package actors.scheduler.jira
 
-import java.net.URLEncoder
-
 import actors.scheduler.{
   ApiServiceBase,
   ServiceAuthentication,
-  ServiceConfiguration,
-  WebServiceHelper
+  ServiceConfiguration
 }
-import com.google.inject.ImplementedBy
-import javax.inject.Inject
-import play.api._
-import play.api.libs.json.{Json, Reads, _}
 import play.api.libs.ws.WSClient
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
 
 trait JiraApiService {
 
@@ -82,10 +74,10 @@ class JiraApiServiceImpl(override val ws: WSClient,
     extends JiraApiService
     with ApiServiceBase {
 
-  val allProjectsUrl     = "/rest/api/2/project?"
-  val projectVersionsUrl = "/rest/api/2/project/%s/version?"
-  val versionsUrl        = "/rest/api/2/project/%s/versions?"
-  val findIssuesUrl      = "/rest/api/2/search?"
+  private val allProjectsUrl     = "/rest/api/2/project?"
+  private val projectVersionsUrl = "/rest/api/2/project/%s/version?"
+  private val versionsUrl        = "/rest/api/2/project/%s/versions?"
+  val findIssuesUrl              = "/rest/api/2/search?"
 
   def getAllProjects(expand: Option[String] = None)(implicit
       auth: ServiceAuthentication,
