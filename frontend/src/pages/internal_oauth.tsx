@@ -43,10 +43,9 @@ import { usePlausible } from 'next-plausible';
 import { LasiusPlausibleEvents } from 'lib/telemetry/plausibleEvents';
 import { useStore } from 'storeContext/store';
 import { formatISOLocale } from 'lib/dates';
-import { login } from 'lib/api/lasius/oauth2-provider/oauth2-provider';
-import { IS_SERVER, LASIUS_API_URL, LASIUS_API_URL_INTERNAL } from 'projectConfig/constants';
+import { LASIUS_API_URL } from 'projectConfig/constants';
 
-const Login: NextPage<{ csrfToken: string }> = ({ csrfToken }) => {
+const InternalOAuthLogin: NextPage<{ csrfToken: string }> = () => {
   const plausible = usePlausible<LasiusPlausibleEvents>();
   const store = useStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -210,4 +209,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   };
 };
 
-export default Login;
+export default InternalOAuthLogin;

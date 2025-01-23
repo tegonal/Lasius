@@ -23,34 +23,25 @@ package controllers
 
 import actors.ClientMessagingWebsocketActor
 import com.typesafe.config.Config
+import core.SystemServices
+import models._
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.stream.{Materializer, OverflowStrategy}
 import org.apache.pekko.util.Timeout
-import controllers.MessagingController.AuthOneTimeTokenQueryParamKey
-import core.SystemServices
-import models._
-import play.api.cache.{AsyncCacheApi, NamedCache}
-import play.api.libs.json._
 import play.api.libs.streams._
 import play.api.mvc._
 import play.modules.reactivemongo.ReactiveMongoApi
 import play.sockjs.api._
 
-import java.util.UUID
 import javax.inject.Inject
-import scala.concurrent.Future.successful
-import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 import scala.language.postfixOps
 
 class MessagingController @Inject() (
     override val conf: Config,
     override val controllerComponents: ControllerComponents,
     override val authConfig: AuthConfig,
-    override val systemServices: SystemServices,
-    @NamedCache("one-time-tokens") val oneTimeAccessTokenCache: AsyncCacheApi)(
-    implicit
-    executionContext: ExecutionContext,
+    override val systemServices: SystemServices)(implicit
     override val reactiveMongoApi: ReactiveMongoApi)
     extends BaseLasiusController()
     with InjectedSockJSRouter {
@@ -66,61 +57,19 @@ class MessagingController @Inject() (
 
   def sockjs: SockJS = SockJS.acceptOrResult[InEvent, OutEvent](messageHandler)
 
-  private val messageHandler = { implicit request: RequestHeader =>
-    withDBSession() { _ =>
-      checkOneTimeAuthToken().map {
-        case Left(result) =>
-          logger.warn(
-            s"Couldn't create Websocket for client ${result.header} - ${result.body}")
-          Left(result)
-        case Right(subject) =>
-          Right({
-            logger.debug(
-              s"Create Websocket for client ${subject.userReference.id}")
-            ActorFlow.actorRef(
-              ClientMessagingWebsocketActor.props(subject.userReference.id),
-              1000,
-              OverflowStrategy.dropNew)
-          })
-      }
-    }
+  private val messageHandler = { _: RequestHeader =>
+    Future.successful(Right({
+      logger.debug(s"Create unauthenticated Websocket for client")
+      ActorFlow.actorRef(
+        ClientMessagingWebsocketActor.props(
+          systemServices = systemServices,
+          conf = conf,
+          reactiveMongoApi = reactiveMongoApi,
+          authConfig = authConfig
+        ),
+        1000,
+        OverflowStrategy.dropNew
+      )
+    }))
   }
-
-  def acquireOneTimeToken(): Action[Unit] =
-    HasToken(parse.empty, withinTransaction = false) {
-      _ => implicit subject => _ =>
-        val newToken = UUID.randomUUID().toString
-        oneTimeAccessTokenCache.set(newToken, subject, 1 minute)
-        Future.successful(Ok(Json.toJson(OneTimeToken(newToken))))
-    }
-
-  /** check auth token by validating xsrf-token cookie with xsrf-token provided
-    * either in header or as query parameter used for websocket authentication.
-    * Perform user reference lookup within cache or db
-    */
-  private def checkOneTimeAuthToken()(implicit
-      request: RequestHeader): Future[Either[Result, Subject]] = {
-    val maybeOneTimeToken =
-      request.getQueryString(AuthOneTimeTokenQueryParamKey)
-    logger.debug("One-time token from headers:" + maybeOneTimeToken)
-    maybeOneTimeToken
-      .map { oneTimeToken =>
-        oneTimeAccessTokenCache
-          .get[Subject](oneTimeToken)
-          .flatMap { maybeSubject =>
-            oneTimeAccessTokenCache.remove(oneTimeToken).map { _ =>
-              maybeSubject.toRight(
-                Unauthorized(Json.obj("message" -> "No Token found")))
-            }
-          }
-      }
-      .getOrElse {
-        successful(
-          Left(Unauthorized(Json.obj("message" -> "No Token provided"))))
-      }
-  }
-}
-
-object MessagingController {
-  val AuthOneTimeTokenQueryParamKey = "otoken"
 }

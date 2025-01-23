@@ -79,6 +79,7 @@ export const WEBSOCKET_EVENT = {
   UserTimeBookingHistoryEntryRemoved: 'UserTimeBookingHistoryEntryRemoved',
   UserTimeBookingByTagEntryAdded: 'UserTimeBookingByTagEntryAdded',
   UserTimeBookingByTagEntryRemoved: 'UserTimeBookingByTagEntryRemoved',
+  Pong: 'Pong',
 };
 
 export enum CONNECTION_STATUS {
