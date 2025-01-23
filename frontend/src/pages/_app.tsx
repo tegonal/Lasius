@@ -49,7 +49,7 @@ import { Toasts } from 'components/toasts/toasts';
 import { LazyMotion } from 'framer-motion';
 import { getGetUserProfileKey, getUserProfile } from 'lib/api/lasius/user/user';
 import { ModelsUser } from 'lib/api/lasius';
-import { CookieCutter } from 'components/system/cookieCutter';
+import { HttpHeaderProvider } from 'components/system/httpHeaderProvider';
 import { useAsync } from 'react-async-hook';
 import { removeAccessibleCookies } from 'lib/removeAccessibleCookies';
 import { getRequestHeaders } from 'lib/api/hooks/useTokensWithAxiosRequests';
@@ -91,7 +91,7 @@ const App = ({
 }: AppPropsWithLayout): JSX.Element => {
   // Use the layout defined at the page level, if available
   const getLayout = Component.getLayout ?? ((page) => page);
-  const lasiusIsLoggedIn = !!(session?.user && profile?.id);
+  const lasiusIsLoggedIn = !!(session?.accessToken && profile?.id);
   const store = useStore();
 
   useAsync(async () => {
@@ -111,7 +111,7 @@ const App = ({
         }}
       >
         <SessionProvider session={session}>
-          <CookieCutter />
+          <HttpHeaderProvider />
           <Head>
             <meta
               name="viewport"
@@ -182,7 +182,7 @@ App.getInitialProps = async ({
   let profile = null;
   const accessToken = session?.accessToken;
 
-  if (accessToken) {
+  if (accessToken) {    
     try {
       profile = await getUserProfile(getRequestHeaders(accessToken));
     } catch (error) {

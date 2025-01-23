@@ -146,7 +146,7 @@ class SecurityMock(@Inject
                    override val reactiveMongoApi: ReactiveMongoApi,
                    override val controllerComponents: ControllerComponents)
     extends BaseController
-    with Security
+    with ControllerSecurity
     with SecurityComponentMock
     with MockCacheAware
     with TestDBSupport {}
@@ -170,7 +170,7 @@ class HasRoleSecurityMock(
     override val controllerComponents: ControllerComponents =
       Helpers.stubControllerComponents())
     extends BaseController
-    with Security
+    with ControllerSecurity
     with SecurityComponentMock
     with MockCacheAware
     with TestDBSupport {

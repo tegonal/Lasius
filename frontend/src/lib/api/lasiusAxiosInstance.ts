@@ -25,6 +25,7 @@ import { logger } from 'lib/logger';
 import { signOut } from 'next-auth/react';
 import clientAxiosInstance from 'lib/api/ClientAxiosInstance';
 import { removeAccessibleCookies } from 'lib/removeAccessibleCookies';
+import _ from 'lodash';
 
 // add a second `options` argument here if you want to pass extra options to each generated query
 export const lasiusAxiosInstance = <T>(
@@ -32,16 +33,18 @@ export const lasiusAxiosInstance = <T>(
   options?: AxiosRequestConfig
 ): Promise<T> => {
   const defaultHeaders = axios.defaults.headers.common;
-  const newConfig = {
-    ...config,
-    headers: { ...defaultHeaders, ...config.headers },
-  };
-  logger.debug(newConfig, options);
+  const newConfig = _.merge(
+    {
+      headers: { ...defaultHeaders },
+    },
+    config,
+    options
+  );
+  logger.debug(newConfig);
 
   const source = Axios.CancelToken.source();
   const promise = clientAxiosInstance({
     ...newConfig,
-    ...options,
     cancelToken: source.token,
   })
     .then(({ data }) => data)

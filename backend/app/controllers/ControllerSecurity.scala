@@ -52,7 +52,62 @@ trait SecurityComponent extends JWTSessionSupport {
   val authConfig: AuthConfig
 }
 
-trait Security extends Logging {
+trait TokenSecurity extends Logging {
+  self: SecurityComponent with DBSupport =>
+  private def sanitizeHeader(header: String): String =
+    if (header.startsWith(JwtSession.TOKEN_PREFIX)) {
+      header.substring(JwtSession.TOKEN_PREFIX.length()).trim
+    } else {
+      header.trim
+    }
+
+  private def deserializeJwtSession(token: String) = {
+    JwtSession.deserialize(token,
+                           JwtOptions(
+                             signature = false,
+                             notBefore = false,
+                             expiration = false,
+                             leeway = 60
+                           ))
+  }
+
+  /** Override extracting jwt session to be able to overrule validation
+    * behaviour
+    * @param request
+    * @return
+    */
+  protected def extractJwtToken(
+      request: RequestHeader
+  ): Option[String] =
+    request.headers
+      .get(JwtSession.REQUEST_HEADER_NAME)
+      .map(sanitizeHeader)
+
+  def withToken[R](token: String,
+                   withinTransaction: Boolean,
+                   canCreateNewUser: Boolean)(failed: => Future[R])(
+      success: DBSession => Subject => Future[R])(implicit
+      context: ExecutionContext): Future[R] = {
+    val jwtSession = deserializeJwtSession(token)
+    if (jwtSession.claim.issuer.isEmpty) {
+      failed
+    } else {
+      logger.debug(s"Got token: $jwtSession")
+      // TODO: verify issuer based on configuration
+
+      withDBSession(withinTransaction) { implicit dbSession =>
+        authConfig
+          .resolveOrCreateUserByJwt(jwt = ExtendedJwtSession(jwtSession),
+                                    canCreateNewUser = canCreateNewUser)
+          .flatMap { user =>
+            success(dbSession)(Subject(jwtSession, user))
+          }
+      }
+    }
+  }
+}
+
+trait ControllerSecurity extends TokenSecurity {
   self: BaseController with SecurityComponent with DBSupport =>
 
   def HasToken[A](withinTransaction: Boolean)(
@@ -62,51 +117,21 @@ trait Security extends Logging {
     HasToken(parse.json[A], withinTransaction)(f)
   }
 
-  private def sanitizeHeader(header: String): String =
-    if (header.startsWith(JwtSession.TOKEN_PREFIX)) {
-      header.substring(JwtSession.TOKEN_PREFIX.length()).trim
-    } else {
-      header.trim
-    }
-
-  /** Override extracting jwt session to be able to overrule validation
-    * behaviour
-    * @param request
-    * @return
-    */
-  private def extractJwtSession(
-      request: RequestHeader
-  ): Option[JwtSession] =
-    request.headers
-      .get(JwtSession.REQUEST_HEADER_NAME)
-      .map(sanitizeHeader)
-      .map(
-        JwtSession.deserialize(_,
-                               JwtOptions(
-                                 signature = false,
-                                 notBefore = false,
-                                 expiration = false,
-                                 leeway = 60
-                               )))
-
   /** */
   def HasToken[A](p: BodyParser[A], withinTransaction: Boolean)(
       f: DBSession => Subject => Request[A] => Future[Result])(implicit
       context: ExecutionContext): Action[A] = {
     Action.async(p) { request =>
       if (request.hasJwtHeader) {
-        val jwtSession = extractJwtSession(request)
-        if (jwtSession.flatMap(_.claim.issuer).isEmpty) {
-          successful(Unauthorized(s"Invalid JWT token provided $jwtSession"))
-        } else {
-          logger.debug(s"Got token: ${jwtSession}")
-          // TODO: verify issuer based on configuration
-          withDBSession(withinTransaction) { implicit dbSession =>
-            authConfig
-              .resolveOrCreateUserByJwt(ExtendedJwtSession(jwtSession.get))
-              .flatMap { user =>
-                f(dbSession)(Subject(request.jwtSession, user))(request)
-              }
+        extractJwtToken(request).fold {
+          successful(Unauthorized("No JWT token found"))
+        } { token =>
+          withToken(token = token,
+                    withinTransaction = withinTransaction,
+                    canCreateNewUser = true) {
+            successful(Unauthorized(s"Invalid JWT token provided $token"))
+          } { dbSession => subject =>
+            f(dbSession)(subject)(request)
           }
         }
       } else {

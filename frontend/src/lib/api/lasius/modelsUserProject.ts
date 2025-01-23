@@ -22,7 +22,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 1.0.10+22-55ea4c04+20250122-1556
+ * OpenAPI spec version: 1.0.10+23-0966de2e+20250123-1143
  */
 import type { ModelsEntityReferenceModelsOrganisationId } from './modelsEntityReferenceModelsOrganisationId';
 import type { ModelsEntityReference } from './modelsEntityReference';

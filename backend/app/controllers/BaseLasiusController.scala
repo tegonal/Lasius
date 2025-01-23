@@ -29,7 +29,7 @@ import play.api.mvc.BaseController
 abstract class BaseLasiusController()
     extends BaseController
     with Logging
-    with Security
+    with ControllerSecurity
     with SecurityComponent
     with ControllerValidation
     with FutureHelper

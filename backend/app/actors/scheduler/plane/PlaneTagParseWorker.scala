@@ -29,8 +29,7 @@ import models._
 import play.api.libs.ws.WSClient
 
 import java.net.URL
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
@@ -73,6 +72,8 @@ class PlaneTagParseWorker(wsClient: WSClient,
   val apiService      = new PlaneApiServiceImpl(wsClient, config)
   val defaultParams   = "expand=labels,state,project"
   val maxResults: Int = projectSettings.maxResults.getOrElse(100)
+  implicit val executionContext: ExecutionContextExecutor =
+    context.system.dispatcher
 
   val receive: Receive = { case StartParsing =>
     cancellable = Some(

@@ -28,30 +28,39 @@ import { useLasiusWebsocket } from 'lib/api/hooks/useLasiusWebsocket';
 import { logger } from 'lib/logger';
 import { ToolTip } from 'components/shared/toolTip';
 import { useInterval, useIsClient } from 'usehooks-ts';
+import { useSession } from 'next-auth/react';
 
 export const LasiusBackendWebsocketStatus: React.FC = () => {
   const { t } = useTranslation('common');
   const { connectionStatus, sendJsonMessage } = useLasiusWebsocket();
   const [status, setStatus] = React.useState<CONNECTION_STATUS>(CONNECTION_STATUS.DISCONNECTED);
   const isClient = useIsClient();
+  const session = useSession();
+
+  const sendClientAuthentication =() =>  {    
+    sendJsonMessage({ type: 'HelloServer', client: 'lasius-nextjs-frontend', token: session.data?.accessToken }, false);
+  }
 
   useEffect(() => {
-    if (
-      connectionStatus === CONNECTION_STATUS.DISCONNECTED ||
-      connectionStatus === CONNECTION_STATUS.ERROR
-    ) {
-      logger.info('[AppWebsocketStatus][Disconnected]');
-    } else {
-      logger.info('[AppWebsocketStatus]', connectionStatus);
+    logger.info('[AppWebsocketStatus]', connectionStatus);
+    
+    if (connectionStatus === CONNECTION_STATUS.CONNECTED) {
+      logger.info('[useLasiusWebsocket][connectionStatus][sendHelloServerAndAuthenticate');
+      sendClientAuthentication()
     }
-    setStatus(connectionStatus);
+
+    setStatus(connectionStatus);    
   }, [connectionStatus]);
+
+  useEffect(() => {
+    logger.info('[useLasiusWebsocket][onOpen][sendHelloServerAndAuthenticate');
+    sendClientAuthentication()
+  }, [session.data?.accessToken]);
 
   //  In an effort to keep the websocket connection alive, we send a ping message every 5 seconds
   useInterval(() => {
     if (connectionStatus === CONNECTION_STATUS.CONNECTED) {
-      logger.info('[AppWebsocketStatus][SendingPing]');
-      sendJsonMessage({ type: 'HelloServer', client: 'lasius-nextjs-frontend' }, false);
+      sendJsonMessage({ type: 'Ping' }, false);
     }
   }, 5000);
 

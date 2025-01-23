@@ -23,39 +23,24 @@ import { CONNECTION_STATUS, IS_SERVER, LASIUS_API_WEBSOCKET_URL } from 'projectC
 import parseJson from 'parse-json';
 import { logger } from 'lib/logger';
 import useIsWindowFocused from 'lib/hooks/useIsWindowFocused';
-import { useAcquireOneTimeToken } from '../lasius/messaging/messaging';
 
 export const useLasiusWebsocket = () => {
   const isWindowFocused = useIsWindowFocused();
 
   const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([]);
-  const oneTimeTokenResult = useAcquireOneTimeToken();
-  if (!oneTimeTokenResult.data?.token) {
-    logger.warn('[useLasiusWebsocket][tokenUndefined]', oneTimeTokenResult.data);
-    return {
-      sendJsonMessage: () => {
-        logger.info('[useLasiusWebsocket][cannotSendNnotConnected]');
-      },
-      connectionStatus: CONNECTION_STATUS.DISCONNECTED,
-    };
-  }
-  const token = oneTimeTokenResult.data?.token;
-
-  logger.info('[useLasiusWebsocket][token]', token);
-
-  const { sendJsonMessage, lastMessage, readyState } = useWebSocket(
-    IS_SERVER ? null : `${LASIUS_API_WEBSOCKET_URL}/messagingSocket?otoken=${token}`,
-    {
-      share: true,
-      shouldReconnect: (closeEvent) => {
-        logger.warn('[useLasiusWebsocket][shouldReconnect]', closeEvent);
-        return true;
-      },
-      retryOnError: true,
-      reconnectInterval: 1000,
-      reconnectAttempts: 30,
-    }
-  );
+  
+  const websocketUrl = IS_SERVER ? null : `${LASIUS_API_WEBSOCKET_URL}/messaging/websocket`;
+  const { sendJsonMessage, lastMessage, readyState } = useWebSocket(websocketUrl, {
+    share: true,
+    shouldReconnect: (closeEvent) => {
+      logger.warn('[useLasiusWebsocket][shouldReconnect]', closeEvent);
+      return true;
+    },
+    retryOnError: true,
+    //exponential backoff reconnect interval
+    reconnectInterval: (attemptNumber) => Math.min(Math.pow(2, attemptNumber) * 1000, 10000),
+    reconnectAttempts: 30,
+  });
 
   useEffect(() => {
     if (isWindowFocused && readyState === ReadyState.OPEN) {

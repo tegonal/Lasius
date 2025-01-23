@@ -48,7 +48,7 @@ const internalProvider: OAuthConfig<any> = {
 
 const nextAuthOptions = (): NextAuthOptions => {
   return {
-    debug: false,
+    debug: true,
     providers: [internalProvider],
     session: {
       strategy: 'jwt',

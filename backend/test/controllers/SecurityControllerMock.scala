@@ -35,7 +35,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait SecurityControllerMock
     extends Logging
-    with Security
+    with ControllerSecurity
     with UserHelper
     with SecurityRepositoryComponent
     with MockAwaitable

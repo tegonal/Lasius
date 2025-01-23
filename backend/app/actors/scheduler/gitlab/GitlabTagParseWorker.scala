@@ -28,8 +28,7 @@ import core.SystemServices
 import models._
 import play.api.libs.ws.WSClient
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
@@ -69,6 +68,8 @@ class GitlabTagParseWorker(wsClient: WSClient,
   val apiService      = new GitlabApiServiceImpl(wsClient, config)
   val defaultParams   = s"state=opened&order_by=created_at&sort=desc"
   val maxResults: Int = projectSettings.maxResults.getOrElse(500)
+  implicit val executionContext: ExecutionContextExecutor =
+    context.system.dispatcher
 
   val receive: Receive = { case StartParsing =>
     cancellable = Some(
@@ -105,22 +106,24 @@ class GitlabTagParseWorker(wsClient: WSClient,
 
   private def toGitlabIssueTag(issue: GitlabIssue): GitlabIssueTag = {
     // create tag for milestone
-    val milestoneTag = projectSettings.tagConfiguration.useMilestone match {
-      case false => None
-      case _     => issue.milestone.map(m => SimpleTag(TagId(m.title)))
+    val milestoneTag = if (projectSettings.tagConfiguration.useMilestone) {
+      issue.milestone.map(m => SimpleTag(TagId(m.title)))
+    } else {
+      None
     }
 
-    val titleTag = projectSettings.tagConfiguration.useTitle match {
-      case false => None
-      case _     => Some(SimpleTag(TagId(issue.title)))
+    val titleTag = if (projectSettings.tagConfiguration.useTitle) {
+      Some(SimpleTag(TagId(issue.title)))
+    } else {
+      None
     }
 
-    val labelTags = projectSettings.tagConfiguration.useLabels match {
-      case false => Seq()
-      case _ =>
-        issue.labels
-          .filterNot(projectSettings.tagConfiguration.labelFilter.contains(_))
-          .map(l => SimpleTag(TagId(l)))
+    val labelTags = if (projectSettings.tagConfiguration.useLabels) {
+      issue.labels
+        .filterNot(projectSettings.tagConfiguration.labelFilter.contains(_))
+        .map(l => SimpleTag(TagId(l)))
+    } else {
+      Seq()
     }
 
     val tags =
