@@ -48,7 +48,7 @@ case class OAuthAccessToken(id: OAuthAccessTokenId,
   def toAccessToken: AccessToken =
     AccessToken(
       token = accessToken,
-      refreshToken = refreshToken: Option[String],
+      refreshToken = refreshToken,
       scope = scope,
       lifeSeconds = Some(expiresIn),
       createdAt = createdAt.toDate

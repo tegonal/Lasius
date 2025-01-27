@@ -17,7 +17,7 @@
  *
  */
 
-import NextAuth, { NextAuthOptions } from 'next-auth';
+import NextAuth, { JWT, NextAuthOptions } from 'next-auth';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { logger } from 'lib/logger';
 import { OAuthConfig } from 'next-auth/providers';
@@ -28,7 +28,12 @@ const internalProvider: OAuthConfig<any> = {
   version: '2.0',
   type: 'oauth',
   // redirect to local login page
-  authorization: 'http://localhost:3000/internal_oauth',
+  authorization: {
+    url: 'http://localhost:3000/internal_oauth',
+    params: {
+      scope: 'profile openid email',
+    },
+  },
   token: 'http://localhost:3000/backend/oauth2/access_token',
   userinfo: 'http://localhost:3000/backend/oauth2/profile',
   clientId: process.env.LASIUS_OAUTH_CLIENT_ID,
@@ -45,6 +50,57 @@ const internalProvider: OAuthConfig<any> = {
     };
   },
 };
+
+/**
+ * Takes a token, and returns a new token with updated
+ * `accessToken` and `accessTokenExpires`. If an error occurs,
+ * returns the old token and an error property
+ */
+async function refreshAccessToken(token) {
+  try {
+    // TODO: support other providers
+    const url =
+      'http://localhost:3000/backend/oauth2/access_token?' +
+      new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token: token.refreshToken,
+      });
+
+    const response = await fetch(url, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: Buffer.from(
+          'Basic ' +
+            process.env.LASIUS_OAUTH_CLIENT_ID +
+            ':' +
+            process.env.LASIUS_OAUTH_CLIENT_SECRET,
+          'binary'
+        ).toString('base64'),
+      },
+      method: 'POST',
+    });
+
+    const refreshedTokens = await response.json();
+
+    if (!response.ok) {
+      throw refreshedTokens;
+    }
+
+    return {
+      ...token,
+      accessToken: refreshedTokens.access_token,
+      accessTokenExpires: Date.now() + refreshedTokens.expires_in * 1000,
+      refreshToken: refreshedTokens.refresh_token ?? token.refreshToken, // Fall back to old refresh token
+    };
+  } catch (error) {
+    console.log('[NextAuth][RefreshAccessTokenError]', error);
+
+    return {
+      ...token,
+      error: 'RefreshAccessTokenError',
+    };
+  }
+}
 
 const nextAuthOptions = (): NextAuthOptions => {
   return {
@@ -63,22 +119,35 @@ const nextAuthOptions = (): NextAuthOptions => {
     },
     callbacks: {
       async session({ session, token }) {
-        if (token) {
-          session.accessToken = token.accessToken;
-        }
-        return {
-          ...session,
+        console.log('[NextAuth][session]', session, token);
+        session.user = token.user;
+        session.accessToken = token.accessToken;
+        session.error = token.error;
 
-          user: { ...session.user, image: undefined },
-        };
+        return session;
       },
-      async jwt({ token, user }) {
-        // the user object is what returned from the Credentials login, it has `accessToken` from the server `/login` endpoint
-        // assign the accessToken to the `token` object, so it will be available on the `session` callback
-        if (user) {
-          token.accessToken = user.accessToken;
+      async jwt({ token, user, account, profile }) {
+        console.log('[NextAuth][jwt][token]', token);
+        console.log('[NextAuth][jwt][user]', user);
+        console.log('[NextAuth][jwt][account]', account);
+        console.log('[NextAuth][jwt][profile]', profile);
+        // Initial sign in
+        if (account && user) {
+          return {
+            accessToken: account.access_token,
+            accessTokenExpires: Date.now() + account.expires_in * 1000,
+            refreshToken: account.refresh_token,
+            user,
+          };
         }
-        return token;
+
+        // Return previous token if the access token has not expired yet or has no expiration set
+        if (!token.accessTokenExpires || Date.now() < token.accessTokenExpires) {
+          return token;
+        }
+
+        // Access token has expired, try to update it
+        return refreshAccessToken(token);
       },
     },
     events: {
