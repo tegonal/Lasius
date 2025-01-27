@@ -68,7 +68,6 @@ object ExtendedJwtSession {
         audience = Some(Set(issuer)),
         expiration =
           Some(DateTime.now().plus(tokenLifespan.toMillis).getMillis),
-        notBefore = Some(DateTime.now().getMillis),
       )) ++ (
       EMAIL_CLAIM       -> user.email,
       GIVEN_NAME_CLAIM  -> user.firstName,

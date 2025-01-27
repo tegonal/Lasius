@@ -31,14 +31,20 @@ export const getRequestHeaders = (token?: string) => {
 };
 
 export const useTokensWithAxiosRequests = () => {
-  const session = useSession();
   const isClient = useIsClient();
-  const token = session?.data?.accessToken;
-  const axiosConfig = getRequestHeaders(token);
-  if (!token) {
-    logger.error('[useAxiosToken][NoTokenSetOnServerRequest]', isClient, session);
+  const session = useSession();
+  if (isClient) {
+    const token = session?.data?.accessToken;
+    const axiosConfig = getRequestHeaders(token);
+    if (!token) {
+      logger.error('[useAxiosToken][NoTokenSetOnRequest]', isClient, session.data, session.status);
+    }
+    return {
+      axiosConfig: axiosConfig,
+    };
+  } else {
+    return {
+      axiosConfig: undefined,
+    };
   }
-  return {
-    axiosConfig: axiosConfig,
-  };
 };

@@ -99,6 +99,8 @@ const App = ({
       logger.info('[App][UserNotLoggedIn]');
       store.dispatch({ type: 'reset' });
       await removeAccessibleCookies();
+    } else {
+      logger.info('[App][UserLoggedIn]', session);
     }
   }, [lasiusIsLoggedIn]);
 
@@ -182,7 +184,7 @@ App.getInitialProps = async ({
   let profile = null;
   const accessToken = session?.accessToken;
 
-  if (accessToken) {    
+  if (accessToken) {
     try {
       profile = await getUserProfile(getRequestHeaders(accessToken));
     } catch (error) {

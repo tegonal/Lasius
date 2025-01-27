@@ -64,9 +64,9 @@ trait TokenSecurity extends Logging {
   private def deserializeJwtSession(token: String) = {
     JwtSession.deserialize(token,
                            JwtOptions(
-                             signature = false,
-                             notBefore = false,
-                             expiration = false,
+                             signature = true,
+                             notBefore = true,
+                             expiration = true,
                              leeway = 60
                            ))
   }

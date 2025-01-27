@@ -53,7 +53,7 @@ export const lasiusAxiosInstance = <T>(
       if (Axios.isCancel(error)) {
         logger.info('[lasiusAxiosInstance][RequestCanceled]', error.message);
       } else if (error.response.status === 401) {
-        logger.info('[lasiusAxiosInstance][Unauthorized]', {
+        logger.error('[lasiusAxiosInstance][Unauthorized]', {
           path: error.request.pathname,
           message: error.data,
         });
@@ -63,7 +63,6 @@ export const lasiusAxiosInstance = <T>(
           window.location.pathname !== '/login' &&
           window.location.pathname !== '/'
         ) {
-          // TODO remove again
           //await removeAccessibleCookies();
           //await signOut();
         } else {
