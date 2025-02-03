@@ -22,11 +22,10 @@
 package services
 
 import actors.ClientReceiver
-import org.apache.pekko.actor.Props
 import core.SystemServices
 import domain.UserTimeBookingAggregate
 import models.UserId.UserReference
-import models.{EntityReference, UserId}
+import org.apache.pekko.actor.Props
 import play.modules.reactivemongo.ReactiveMongoApi
 import repositories.BookingHistoryRepository
 

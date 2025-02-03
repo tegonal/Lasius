@@ -41,7 +41,7 @@ trait SecurityControllerMock
     with MockAwaitable
     with Mockito {
   self: BaseController with CacheAware with DBSupport with SecurityComponent =>
-  val userRepository = mockAwaitable[UserRepository]
+  val userRepository: UserRepository = mockAwaitable[UserRepository]
 
   val token: String                          = ""
   val userId: UserId                         = UserId()
@@ -62,7 +62,7 @@ trait SecurityControllerMock
   )
 
   val projectActive: Boolean = true
-  val project =
+  val project: Project =
     Project(
       id = ProjectId(),
       key = "project1",
@@ -74,12 +74,12 @@ trait SecurityControllerMock
     )
   val password                 = "password"
   val projectRole: ProjectRole = ProjectAdministrator
-  val userProject = UserProject(
+  val userProject: UserProject = UserProject(
     sharedByOrganisationReference = None,
     projectReference = project.getReference(),
     role = projectRole
   )
-  val userOrganisation = UserOrganisation(
+  val userOrganisation: UserOrganisation = UserOrganisation(
     organisationReference = organisation.getReference(),
     `private` = organisation.`private`,
     role = organisationRole,

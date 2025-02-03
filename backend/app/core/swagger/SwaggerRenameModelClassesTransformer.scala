@@ -26,8 +26,10 @@ import core.swagger.SwaggerRenameModelClassesTransformer.customModelNames
 import models._
 import play.api.libs.json.{JsObject, JsString}
 
+import scala.annotation.unused
 import scala.util.{Success, Try}
 
+@unused
 class SwaggerRenameModelClassesTransformer extends OutputTransformer {
   override def apply(obj: JsObject): Try[JsObject] = Success(tf(obj))
 
@@ -41,7 +43,7 @@ class SwaggerRenameModelClassesTransformer extends OutputTransformer {
     }
   }
 
-  private final val renameModel: String => String = { case className =>
+  private final val renameModel: String => String = { className =>
     customModelNames.find { case (k, _) =>
       className.endsWith(k.getName)
     } match {

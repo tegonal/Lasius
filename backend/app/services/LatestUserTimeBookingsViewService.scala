@@ -22,17 +22,16 @@
 package services
 
 import actors.ClientReceiver
-import org.apache.pekko.actor.Props
-import org.apache.pekko.pattern.StatusReply.Ack
-import domain.views.LatestUserTimeBookingsView
-import domain.views.LatestUserTimeBookingsView._
 import domain.AggregateRoot.{
   ForwardPersistentEvent,
   InitializeViewLive,
   RestoreViewFromState
 }
+import domain.views.LatestUserTimeBookingsView
+import domain.views.LatestUserTimeBookingsView._
 import models.UserId.UserReference
-import models.{EntityReference, UserId}
+import org.apache.pekko.actor.Props
+import org.apache.pekko.pattern.StatusReply.Ack
 
 object LatestUserTimeBookingsViewService {
 

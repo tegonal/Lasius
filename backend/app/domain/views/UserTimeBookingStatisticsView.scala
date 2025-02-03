@@ -22,26 +22,18 @@
 package domain.views
 
 import actors.ClientReceiver
-import org.apache.pekko.actor._
-import org.apache.pekko.pattern.StatusReply.Ack
 import core.{DBSupport, SystemServices}
 import domain.UserTimeBookingAggregate.UserTimeBooking
 import models.UserId.UserReference
 import models._
-import org.joda.time.{
-  DateTime,
-  Days,
-  Duration,
-  Interval,
-  LocalDate,
-  LocalDateTime
-}
+import org.apache.pekko.actor._
+import org.apache.pekko.pattern.StatusReply.Ack
+import org.joda.time.{Days, Duration, Interval, LocalDate}
 import play.modules.reactivemongo.ReactiveMongoApi
 import repositories._
 
-import scala.annotation.tailrec
-import scala.concurrent.{Await, ExecutionContextExecutor}
 import scala.concurrent.duration._
+import scala.concurrent.{Await, ExecutionContextExecutor}
 import scala.language.postfixOps
 import scala.util.{Failure, Success}
 
@@ -86,7 +78,7 @@ class UserTimeBookingStatisticsView(
 
   override def restoreViewFromState(snapshot: UserTimeBooking): Unit = {
     println(
-      s"~~~~~~~~~~~~~~~~~ Started building STATISTICS FOR ${userReference}: ${snapshot.bookings.size}")
+      s"~~~~~~~~~~~~~~~~~ Started building STATISTICS FOR $userReference: ${snapshot.bookings.size}")
 
     val startTime = System.currentTimeMillis()
 
@@ -172,8 +164,8 @@ class UserTimeBookingStatisticsView(
       sender() ! Ack
   }
 
-  protected def handleBookingAddedOrStopped(booking: BookingV2,
-                                            silent: Boolean = false): Unit = {
+  private def handleBookingAddedOrStopped(booking: BookingV2,
+                                          silent: Boolean = false): Unit = {
     if (booking.end.isDefined) {
       log.debug(
         s"UserTimeBookingStatisticsView -> handleBookingAddedOrStopped:$booking")
@@ -189,8 +181,8 @@ class UserTimeBookingStatisticsView(
     }
   }
 
-  protected def handleBookingEdited(oldBooking: BookingV2,
-                                    editedBooking: BookingV2): Unit = {
+  private def handleBookingEdited(oldBooking: BookingV2,
+                                  editedBooking: BookingV2): Unit = {
     // first remove durations of 'old' booking
     val durations = calculateDurations(oldBooking)
     removeDurations(durations)
@@ -205,8 +197,7 @@ class UserTimeBookingStatisticsView(
     sender() ! Ack
   }
 
-  protected def storeDurations(
-      durations: Seq[OperatorEntity[_, _]]): Seq[Any] = {
+  private def storeDurations(durations: Seq[OperatorEntity[_, _]]): Seq[Any] = {
     durations.map {
       case b: BookingByProject =>
         Await.ready(withDBSession()(implicit dbSession =>
@@ -221,7 +212,7 @@ class UserTimeBookingStatisticsView(
     }
   }
 
-  protected def removeDurations(
+  private def removeDurations(
       durations: Seq[OperatorEntity[_, _]]): Seq[Any] = {
     durations.map {
       case b: BookingByProject =>
@@ -237,8 +228,8 @@ class UserTimeBookingStatisticsView(
     }
   }
 
-  protected def getEventsDurations(durations: Seq[_],
-                                   add: Boolean): Seq[OutEvent] = {
+  private def getEventsDurations(durations: Seq[_],
+                                 add: Boolean): Seq[OutEvent] = {
     if (add) {
       durations.flatMap(_ match {
         case b: BookingByProject =>
@@ -258,7 +249,7 @@ class UserTimeBookingStatisticsView(
     }
   }
 
-  protected def calculateDurations(
+  private def calculateDurations(
       booking: BookingV2): Seq[OperatorEntity[_, _]] = {
     // split booking by dates
     booking.end match {

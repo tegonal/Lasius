@@ -76,7 +76,7 @@ object Validation {
   // taken from https://github.com/angular/angular/blob/fc64fa8e1af9e0bbab40d1b441743744a40c5581/packages/forms/src/validators.ts#L98
   // covers less cases than the one we had previously but is in sync with the client validation
   // see EmailTests for cases which would be valid/invalid but are not detected
-  val emailPattern: Pattern = Pattern.compile(
+  private val emailPattern: Pattern = Pattern.compile(
     """^(?=.{1,254}$)(?=.{1,64}@)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"""
   )
 

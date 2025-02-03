@@ -30,7 +30,7 @@ import models.UserId.UserReference
 import models._
 import org.joda.time.{Duration, _}
 
-import scala.annotation.nowarn
+import scala.annotation.{nowarn, unused}
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
@@ -59,6 +59,7 @@ class CurrentUserTimeBookingsView(val clientReceiver: ClientReceiver,
   var state: CurrentTimeBookings =
     CurrentTimeBookings(None, LocalDate.now, Map())
 
+  @unused
   def autoUpdateInterval: FiniteDuration = 100 millis
 
   override val receive: Receive = ({ case InitializeCurrentTimeBooking(state) =>
@@ -201,7 +202,7 @@ class CurrentUserTimeBookingsView(val clientReceiver: ClientReceiver,
         notifyClient()
       }
       sender() ! Ack
-    case GetCurrentTimeBooking(userReference) =>
+    case GetCurrentTimeBooking(_) =>
       // check if still on same day
       val day = LocalDate.now
       if (!day.equals(state.currentDay)) {
@@ -244,7 +245,7 @@ class CurrentUserTimeBookingsView(val clientReceiver: ClientReceiver,
                              dailyTotal))
   }
 
-  protected def addDailyDuration(
+  private def addDailyDuration(
       booking: BookingV2): Map[BookingStub, Duration] = {
     val currentBookings = getMapForDay(booking.end.get.dateTime.toLocalDate)
     val duration        = calculateDuration(booking.start, booking.end.get)
@@ -255,7 +256,7 @@ class CurrentUserTimeBookingsView(val clientReceiver: ClientReceiver,
     currentBookings + (stub -> total)
   }
 
-  protected def removeDailyDuration(
+  private def removeDailyDuration(
       booking: BookingV2): Map[BookingStub, Duration] = {
     val currentBookings = getMapForDay(booking.end.get.dateTime.toLocalDate)
     val duration =
@@ -267,7 +268,7 @@ class CurrentUserTimeBookingsView(val clientReceiver: ClientReceiver,
     currentBookings + (stub -> total)
   }
 
-  protected def getMapForDay(day: LocalDate): Map[BookingStub, Duration] = {
+  private def getMapForDay(day: LocalDate): Map[BookingStub, Duration] = {
     if (day.isEqual(state.currentDay)) {
       state.dailyBookingsMap
     } else {
@@ -275,7 +276,7 @@ class CurrentUserTimeBookingsView(val clientReceiver: ClientReceiver,
     }
   }
 
-  protected def calculateDuration(
+  private def calculateDuration(
       startDate: LocalDateTimeWithTimeZone,
       endDate: LocalDateTimeWithTimeZone): Duration = {
     // split booking by dates

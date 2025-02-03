@@ -27,15 +27,16 @@ import models._
 import org.mindrot.jbcrypt.BCrypt
 import play.api.Logging
 import play.modules.reactivemongo.ReactiveMongoApi
-import reactivemongo.api.bson.BSONObjectID
 import repositories._
 
 import javax.inject.Inject
+import scala.annotation.unused
 import scala.concurrent.{ExecutionContext, Future}
 
 /*
  * Initialize database with a single user assign to a single organisation
  */
+@unused
 class InitialBaseDataLoader @Inject() (
     val reactiveMongoApi: ReactiveMongoApi,
     userRepository: UserRepository,
@@ -46,14 +47,14 @@ class InitialBaseDataLoader @Inject() (
     with DBSupport
     with InitialDataLoader {
 
-  // get's overridden b the withinTransaction call
+  // gets overridden b the withinTransaction call
   override val supportTransaction = true
 
-  val initialUserKey: String =
+  private val initialUserKey: String =
     sys.env.getOrElse("LASIUS_INITIAL_USER_KEY", "admin")
-  val initialUserEmail: String =
+  private val initialUserEmail: String =
     sys.env.getOrElse("LASIUS_INITIAL_USER_EMAIL", "admin@lasius.ch")
-  val initialUserPasswordHash: String = BCrypt.hashpw(
+  private val initialUserPasswordHash: String = BCrypt.hashpw(
     sys.env.getOrElse("LASIUS_INITIAL_USER_PASSWORD", "admin"),
     BCrypt.gensalt())
 
@@ -69,7 +70,7 @@ class InitialBaseDataLoader @Inject() (
     }
   }
 
-  protected def initializeOrganisation()(implicit
+  private def initializeOrganisation()(implicit
       dbSession: DBSession,
       userReference: UserReference): Future[Organisation] = {
     val org =
@@ -83,7 +84,7 @@ class InitialBaseDataLoader @Inject() (
     organisationRepository.upsert(org).map(_ => org)
   }
 
-  protected def initializeProject(org: Organisation)(implicit
+  private def initializeProject(org: Organisation)(implicit
       dbSession: DBSession,
       userReference: UserReference): Future[Project] = {
     val project = Project(
@@ -109,9 +110,8 @@ class InitialBaseDataLoader @Inject() (
       .map(_ => project)
   }
 
-  protected def initializeUser(org: Organisation, project: Project)(implicit
-      dbSession: DBSession,
-      userReference: UserReference): Future[Unit] = {
+  private def initializeUser(org: Organisation, project: Project)(implicit
+      dbSession: DBSession): Future[Unit] = {
 
     val userOrg = UserOrganisation(
       org.getReference(),

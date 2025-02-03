@@ -28,7 +28,7 @@ import models._
 
 object LoginHandler {
 
-  def subscribe(ref: ActorRef, eventStream: EventStream) = {
+  def subscribe(ref: ActorRef, eventStream: EventStream): Boolean = {
     eventStream.subscribe(ref, classOf[UserLoggedInV2])
     eventStream.subscribe(ref, classOf[UserLoggedOutV2])
   }
@@ -55,13 +55,13 @@ class LoginHandler(systemServices: SystemServices)
       handleLoggedOut(userReference)
   }
 
-  def initializeUserViews(userReference: UserReference) = {
-    log.debug(s"user logged in:${userReference}, start persistentViews")
-    // initialize persistentviews
+  def initializeUserViews(userReference: UserReference): Unit = {
+    log.debug(s"user logged in:$userReference, start persistentViews")
+    // initialize persistent views
     systemServices.timeBookingViewService ! StartAggregate(userReference)
   }
 
-  def handleLoggedOut(userReference: UserReference) = {
-    log.debug(s"user logged in:${userReference}, stop persistentViews")
+  private def handleLoggedOut(userReference: UserReference): Unit = {
+    log.debug(s"user logged in:$userReference, stop persistentViews")
   }
 }

@@ -60,7 +60,7 @@ class PlayPekkoExtensionImpl extends Extension {
 object PlayPekkoExtension
     extends ExtensionId[PlayPekkoExtensionImpl]
     with ExtensionIdProvider {
-  override def lookup = PlayPekkoExtension
+  override def lookup: PlayPekkoExtension.type = PlayPekkoExtension
 
   override def createExtension(system: ExtendedActorSystem) =
     new PlayPekkoExtensionImpl

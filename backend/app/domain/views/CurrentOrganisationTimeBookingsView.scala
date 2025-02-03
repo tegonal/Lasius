@@ -193,7 +193,7 @@ class CurrentOrganisationTimeBookingsView(
   private def notifyOrganisations(userId: UserId,
                                   day: LocalDate,
                                   organisationId: OrganisationId,
-                                  newState: OrganisationBookingState) = {
+                                  newState: OrganisationBookingState): Unit = {
     val today = LocalDate.now()
 
     if (!today.isAfter(day)) {

@@ -23,8 +23,10 @@ package core
 
 import org.apache.pekko.actor.ActorSystem
 
+import scala.annotation.unused
 import scala.concurrent.ExecutionContext
 
+@unused
 trait ActorSystemAware extends ExecutionContextAware with MaterializerAware {
   implicit val system: ActorSystem
   implicit lazy val executionContext: ExecutionContext = system.dispatcher

@@ -26,6 +26,7 @@ import models.UserId.UserReference
 import models.{EntityReference, Subject, User, UserId}
 import repositories.SecurityRepositoryComponent
 
+import scala.annotation.unused
 import scala.concurrent.{ExecutionContext, Future}
 
 trait UserHelper {

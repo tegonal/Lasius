@@ -21,7 +21,6 @@
 
 package core.db
 
-import com.typesafe.config.Config
 import core.{DBSession, DBSupport, SystemServices}
 import domain.UserTimeBookingAggregate.AddBookingCommand
 import models.UserId.UserReference
@@ -32,25 +31,23 @@ import play.api.Logging
 import play.modules.reactivemongo.ReactiveMongoApi
 import repositories._
 
-import java.net.{URI, URL}
 import javax.inject.Inject
-import scala.annotation.tailrec
+import scala.annotation.{tailrec, unused}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 
+@unused
 class InitialDemoDataLoader @Inject() (
     val reactiveMongoApi: ReactiveMongoApi,
     userRepository: UserRepository,
     projectRepository: ProjectRepository,
     organisationRepository: OrganisationRepository,
-    planeConfigRepository: PlaneConfigRepository,
-    systemServices: SystemServices,
-    config: Config)(implicit executionContext: ExecutionContext)
+    systemServices: SystemServices)(implicit executionContext: ExecutionContext)
     extends Logging
     with DBSupport
     with InitialDataLoader {
 
-  val randomPhraseList: List[SimpleTag] =
+  private val randomPhraseList: List[SimpleTag] =
     """   You Can't Teach an Old Dog New Tricks
           Shot In the Dark
           Jack of All Trades Master of None
@@ -108,17 +105,17 @@ class InitialDemoDataLoader @Inject() (
   // get's overridden b the withinTransaction call
   override val supportTransaction = true
 
-  val user1Key: String = sys.env.getOrElse("DEMO_USER1_KEY", "demo1")
-  val user1Email: String =
+  private val user1Key: String = sys.env.getOrElse("DEMO_USER1_KEY", "demo1")
+  private val user1Email: String =
     sys.env.getOrElse("DEMO_USER1_EMAIL", "demo1@lasius.ch")
-  val user1PasswordHash: String = BCrypt.hashpw(
+  private val user1PasswordHash: String = BCrypt.hashpw(
     sys.env.getOrElse("DEMO_USER1_PASSWORD", "demo"),
     BCrypt.gensalt())
 
-  val user2Key: String = sys.env.getOrElse("DEMO_USER2_KEY", "demo2")
-  val user2Email: String =
+  private val user2Key: String = sys.env.getOrElse("DEMO_USER2_KEY", "demo2")
+  private val user2Email: String =
     sys.env.getOrElse("DEMO_USER2_EMAIL", "demo2@lasius.ch")
-  val user2PasswordHash: String = BCrypt.hashpw(
+  private val user2PasswordHash: String = BCrypt.hashpw(
     sys.env.getOrElse("DEMO_USER2_PASSWORD", "demo"),
     BCrypt.gensalt())
 
@@ -135,7 +132,7 @@ class InitialDemoDataLoader @Inject() (
     }
   }
 
-  protected def initializeOrganisations()(implicit
+  private def initializeOrganisations()(implicit
       dbSession: DBSession,
       userReference: UserReference)
       : Future[(Organisation, Organisation, Organisation)] = {
@@ -169,7 +166,7 @@ class InitialDemoDataLoader @Inject() (
       .map(_ => (user1org, user2org, org))
   }
 
-  protected def initializeProjects(org: Organisation)(implicit
+  private def initializeProjects(org: Organisation)(implicit
       dbSession: DBSession,
       userReference: UserReference): Future[Seq[Project]] = {
     val projects = List(
@@ -228,12 +225,11 @@ class InitialDemoDataLoader @Inject() (
     projectRepository.bulkInsert(projects).map(_ => projects)
   }
 
-  protected def initializeUsers(user1Org: Organisation,
-                                user2Org: Organisation,
-                                publicOrg: Organisation,
-                                projects: Seq[Project])(implicit
-      dbSession: DBSession,
-      userReference: UserReference): Future[List[User]] = {
+  private def initializeUsers(user1Org: Organisation,
+                              user2Org: Organisation,
+                              publicOrg: Organisation,
+                              projects: Seq[Project])(implicit
+      dbSession: DBSession): Future[List[User]] = {
     val user1 = User(
       UserId(),
       user1Key,
@@ -309,21 +305,19 @@ class InitialDemoDataLoader @Inject() (
     userRepository.bulkInsert(users).map(_ => users)
   }
 
-  protected def initializeTimeBookings(org: Organisation,
-                                       projects: Seq[Project],
-                                       users: Seq[User])(implicit
-      dbSession: DBSession,
-      userReference: UserReference): Future[Seq[Seq[Seq[Unit]]]] =
+  private def initializeTimeBookings(
+      org: Organisation,
+      projects: Seq[Project],
+      users: Seq[User]): Future[Seq[Seq[Seq[Unit]]]] =
     Future {
       users.map(initializeUserTimeBookings(org, projects, _))
     }
 
   /** Generate time bookings for a given user for the last 60 days
     */
-  protected def initializeUserTimeBookings(org: Organisation,
-                                           projects: Seq[Project],
-                                           user: User)(implicit
-      dbSession: DBSession): Seq[Seq[Unit]] = {
+  private def initializeUserTimeBookings(org: Organisation,
+                                         projects: Seq[Project],
+                                         user: User): Seq[Seq[Unit]] = {
     val now           = DateTime.now()
     val orgRef        = org.getReference()
     val random        = new Random

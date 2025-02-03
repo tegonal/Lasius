@@ -78,11 +78,11 @@ class PluginHandler(userRepository: UserRepository,
 
   implicit val executionContext: ExecutionContextExecutor = context.dispatcher
 
-  val jiraTagParseScheduler: ActorRef =
+  private val jiraTagParseScheduler: ActorRef =
     context.actorOf(JiraTagParseScheduler.props(wsClient, systemServices))
-  val gitlabTagParseScheduler: ActorRef =
+  private val gitlabTagParseScheduler: ActorRef =
     context.actorOf(GitlabTagParseScheduler.props(wsClient, systemServices))
-  val planeTagParseScheduler: ActorRef =
+  private val planeTagParseScheduler: ActorRef =
     context.actorOf(PlaneTagParseScheduler.props(wsClient, systemServices))
 
   log.debug(s"PluginHandler started")

@@ -27,8 +27,8 @@ import scala.annotation.tailrec
 
 trait GzipCompression {
 
-  protected val minimalBytesToCompress = 100
-  private final val BufferSize         = 1024 * 4
+  private val minimalBytesToCompress = 100
+  private final val BufferSize       = 1024 * 4
 
   protected def compress(bytes: Array[Byte]): Array[Byte] = {
     if (bytes.length < minimalBytesToCompress) {
@@ -63,7 +63,7 @@ trait GzipCompression {
     }
   }
 
-  protected def isGZipped(bytes: Array[Byte]): Boolean = {
+  private def isGZipped(bytes: Array[Byte]): Boolean = {
     (bytes != null) && (bytes.length >= 2) &&
     (bytes(0) == GZIPInputStream.GZIP_MAGIC.toByte) &&
     (bytes(1) == (GZIPInputStream.GZIP_MAGIC >> 8).toByte)

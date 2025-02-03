@@ -22,17 +22,17 @@
 package core
 
 import actors.{ClientReceiver, LasiusSupervisorActor, TagCache}
-import org.apache.pekko.actor.{ActorRef, ActorSystem}
-import org.apache.pekko.pattern.ask
-import org.apache.pekko.stream.Materializer
-import org.apache.pekko.util.Timeout
 import com.google.inject.ImplementedBy
 import com.typesafe.config.Config
 import core.db.InitialDataLoader
 import domain.LoginStateAggregate
 import domain.views.CurrentOrganisationTimeBookingsView
 import models.UserId.UserReference
-import models.{EntityReference, PersistedEvent, Subject, UserId}
+import models.{EntityReference, Subject, UserId}
+import org.apache.pekko.actor.{ActorRef, ActorSystem}
+import org.apache.pekko.pattern.ask
+import org.apache.pekko.stream.Materializer
+import org.apache.pekko.util.Timeout
 import play.api.Logging
 import play.api.inject.Injector
 import play.api.libs.ws.WSClient
@@ -80,8 +80,6 @@ class DefaultSystemServices @Inject() (
     @Named(LasiusSupervisorActor.name) supervisor: ActorRef,
     override val reactiveMongoApi: ReactiveMongoApi,
     userRepository: UserRepository,
-    projectRepository: ProjectRepository,
-    organisationRepository: OrganisationRepository,
     jiraConfigRepository: JiraConfigRepository,
     gitlabConfigRepository: GitlabConfigRepository,
     planeConfigRepository: PlaneConfigRepository,
@@ -101,7 +99,8 @@ class DefaultSystemServices @Inject() (
   override val supportTransaction: Boolean =
     config.getBoolean("db.support_transactions")
 
-  val systemUUID = UUID.fromString("0000000-0000-0000-0000-000000000000")
+  private val systemUUID =
+    UUID.fromString("0000000-0000-0000-0000-000000000000")
   val systemUser: UserId = UserId(systemUUID)
   implicit val systemUserReference: UserReference =
     EntityReference(systemUser, "system")
@@ -171,7 +170,7 @@ class DefaultSystemServices @Inject() (
     .result(supervisor ? LoginHandler.props(this), duration)
     .asInstanceOf[ActorRef]
 
-  // initialite login handler
+  // initialize login handler
   LoginHandler.subscribe(loginHandler, system.eventStream)
 
   override def initialize(): Unit = {
@@ -185,7 +184,7 @@ class DefaultSystemServices @Inject() (
 
     val hasUsers =
       Await.result(withDBSession()(implicit dbSession =>
-                     userRepository.findAll(limit = 1).map(!_.isEmpty)),
+                     userRepository.findAll(limit = 1).map(_.nonEmpty)),
                    10 seconds)
 
     val initData: Boolean = config.getBoolean("db.initialize_data")
@@ -200,7 +199,7 @@ class DefaultSystemServices @Inject() (
       Await.result(dataLoader.initializeData(supportTransaction), 1 minute)
     }
 
-    // start pluginhandler
+    // start plugin-handler
     pluginHandler ! PluginHandler.Startup
 
     currentOrganisationTimeBookingsView ! CurrentOrganisationTimeBookingsView.Initialize

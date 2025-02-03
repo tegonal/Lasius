@@ -21,17 +21,18 @@
 
 package services
 
-import org.apache.pekko.actor.{Actor, ActorLogging, ActorRef, Props}
 import domain.AggregateRoot.{
   ForwardPersistentEvent,
   InitializeViewLive,
   RestoreViewFromState
 }
 import models.UserId.UserReference
-import models.{EntityReference, UserId}
+import org.apache.pekko.actor.{Actor, ActorLogging, ActorRef, Props}
+
+import scala.language.implicitConversions
 
 object UserService {
-  case class StopUserView(userReference: UserReference)
+  private case class StopUserView(userReference: UserReference)
 
   case class StartUserTimeBookingView(userReference: UserReference)
 }
@@ -44,9 +45,9 @@ abstract class UserService[C] extends Actor with ActorLogging {
     * representation used in pekko system
     */
   implicit def userId2String(userReference: UserReference): String =
-    userReference.id.value.toString()
+    userReference.id.value.toString
 
-  protected def findOrCreate(id: UserReference): ActorRef =
+  private def findOrCreate(id: UserReference): ActorRef =
     context.child(id).getOrElse(create(id))
 
   /** Processes aggregate command. oCreates an aggregate (if not already
@@ -60,7 +61,7 @@ abstract class UserService[C] extends Actor with ActorLogging {
   def processAggregateCommand(aggregateId: UserReference, command: C): Unit = {
     val maybeChild = context.child(aggregateId)
     log.debug(
-      s"processAgregateCommand -> addregateId:$aggregateId, child:$maybeChild")
+      s"processAggregateCommand -> aggregateId:$aggregateId, child:$maybeChild")
     maybeChild match {
       case Some(child) =>
         child.forward(command)
@@ -94,7 +95,7 @@ abstract class UserService[C] extends Actor with ActorLogging {
       .forward(forwardPersistentEvent.event)
   }
 
-  def removeUserView(userReference: UserReference): Unit = {
+  private def removeUserView(userReference: UserReference): Unit = {
     val maybeChild = context.child(userReference)
     maybeChild match {
       case Some(child) =>

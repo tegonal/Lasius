@@ -31,7 +31,7 @@ import models._
 import org.joda.time.DateTime
 import utils.DateTimeUtils._
 
-import scala.annotation.nowarn
+import scala.annotation.{nowarn, unused}
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
@@ -53,10 +53,10 @@ class LatestUserTimeBookingsView(clientReceiver: ClientReceiver,
   val persistenceId: String = s"user-time-booking-${userReference.id.value}"
   // val viewId = userId.value + "-latest-time-bookings"
 
-  val oldDateTime: DateTime = DateTime.parse("2000-01-01")
-  val maxInternalHistory    = 100
+  private val oldDateTime: DateTime = DateTime.parse("2000-01-01")
+  private val maxInternalHistory    = 100
 
-  val ordering: Ordering[BookingStub] =
+  private val ordering: Ordering[BookingStub] =
     Ordering.by[BookingStub, DateTime](b => getStartTime(b)).reverse
 
   case class TimeBookingsHistory(maxHistory: Int = maxInternalHistory,
@@ -66,6 +66,7 @@ class LatestUserTimeBookingsView(clientReceiver: ClientReceiver,
 
   var state: TimeBookingsHistory = TimeBookingsHistory()
 
+  @unused
   def autoUpdateInterval: FiniteDuration = 100 millis
 
   private def getStartTime(booking: BookingStub): DateTime = {

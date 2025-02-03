@@ -67,16 +67,16 @@ trait AggregateRoot extends PersistentActor with ActorLogging {
   import AggregateRoot._
 
   var state: State
-  protected var snapshotReceived = false
+  private var snapshotReceived = false
 
   def updateState(evt: PersistedEvent): Unit
 
   def restoreFromSnapshot(metadata: SnapshotMetadata, state: State): Unit
 
   // snapshot after every x event
-  protected val SnapshotInterval = 100
+  private val SnapshotInterval = 100
   // max number of snapshots to keep per aggregate
-  protected val KeepSnapshots = 1
+  private val KeepSnapshots = 1
 
   protected var recovering = true
 

@@ -26,13 +26,14 @@ import play.api.{ApplicationLoader, Logger}
 import play.api.i18n.Lang
 import play.api.inject.bind
 import play.api.inject.guice.{GuiceApplicationLoader, GuiceableModule}
-import play.api.mvc.RequestHeader
+import play.api.mvc.{RequestHeader, Result}
 import play.api.mvc.Results._
 
+import scala.annotation.unused
 import scala.concurrent.Future
 
 class CustomApplicationLoader extends GuiceApplicationLoader with ConfigAware {
-  lazy val logger = Logger(getClass().getName())
+  lazy val logger: Logger = Logger(getClass.getName)
 
   protected override def overrides(
       context: ApplicationLoader.Context): Seq[GuiceableModule] = {
@@ -40,7 +41,8 @@ class CustomApplicationLoader extends GuiceApplicationLoader with ConfigAware {
       .toProvider[PlayAwareActorSystemProvider]: GuiceableModule)
   }
 
-  def onError(request: RequestHeader, ex: Throwable) = {
+  @unused
+  def onError(request: RequestHeader, ex: Throwable): Future[Result] = {
     Future.successful(
       InternalServerError(views.html.errorPage(ex)(Lang.defaultLang)))
   }

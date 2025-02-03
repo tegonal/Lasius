@@ -56,7 +56,7 @@ object UserTimeBookingAggregate {
       Json.using[Json.WithDefaultValues].format[UserTimeBooking]
   }
 
-  case object KillAggregate extends Command
+  private case object KillAggregate extends Command
 
   trait UserTimeBookingCommand extends Command {
     val userReference: UserReference
@@ -144,7 +144,7 @@ class UserTimeBookingAggregate(
 
   implicit val executionContext: ExecutionContextExecutor = context.dispatcher
 
-  def newBookingId: BookingId = BookingId()
+  private def newBookingId: BookingId = BookingId()
 
   /** Updates internal processor state according to event that is to be applied.
     *
@@ -170,6 +170,7 @@ class UserTimeBookingAggregate(
           case ub: UserTimeBooking => endAndLogUserBooking(ub, booking)
           case _                   => state
         }
+      // noinspection ScalaDeprecation
       case e: UserTimeBookingPaused @nowarn("cat=deprecation") =>
         log.debug(s"UserBookingPaused - ${e.bookingId}")
         state = state match {
@@ -200,15 +201,15 @@ class UserTimeBookingAggregate(
           s"UserBookingStartTimeChanged - $bookingId - $fromStart -> $toStart")
         state = state match {
           case ub: UserTimeBooking =>
-            updateStartTime(ub, bookingId, fromStart, toStart)
+            updateStartTime(ub, bookingId, toStart)
           case _ => state
         }
       case _ =>
     }
   }
 
-  def startUserBooking(ub: UserTimeBooking,
-                       booking: BookingV2): UserTimeBooking = {
+  private def startUserBooking(ub: UserTimeBooking,
+                               booking: BookingV2): UserTimeBooking = {
     if (booking.end.isDefined) {
       notifyClient(UserTimeBookingHistoryEntryAdded(booking))
       Await.ready(withDBSession()(implicit dbSession =>
@@ -219,8 +220,8 @@ class UserTimeBookingAggregate(
     ub.copy(bookings = ub.bookings :+ booking)
   }
 
-  def endAndLogUserBooking(ub: UserTimeBooking,
-                           booking: BookingV2): UserTimeBooking = {
+  private def endAndLogUserBooking(ub: UserTimeBooking,
+                                   booking: BookingV2): UserTimeBooking = {
     notifyClient(UserTimeBookingHistoryEntryAdded(booking))
     Await.ready(withDBSession()(implicit dbSession =>
                   bookingHistoryRepository.upsert(booking)),
@@ -228,9 +229,10 @@ class UserTimeBookingAggregate(
     endUserBooking(ub, booking.id, booking.end.get)
   }
 
-  def endUserBooking(ub: UserTimeBooking,
-                     bookingId: BookingId,
-                     endTime: LocalDateTimeWithTimeZone): UserTimeBooking = {
+  private def endUserBooking(
+      ub: UserTimeBooking,
+      bookingId: BookingId,
+      endTime: LocalDateTimeWithTimeZone): UserTimeBooking = {
     val newBookings = ub.bookings.map { b =>
       if (b.id == bookingId)
         b.copy(end = Some(endTime))
@@ -239,8 +241,8 @@ class UserTimeBookingAggregate(
     ub.copy(bookings = newBookings)
   }
 
-  def removeUserBooking(ub: UserTimeBooking,
-                        booking: BookingV2): UserTimeBooking = {
+  private def removeUserBooking(ub: UserTimeBooking,
+                                booking: BookingV2): UserTimeBooking = {
     notifyClient(UserTimeBookingHistoryEntryRemoved(booking.id))
     Await.ready(withDBSession()(implicit dbSession =>
                   bookingHistoryRepository.remove(booking)),
@@ -250,8 +252,8 @@ class UserTimeBookingAggregate(
     ub.copy(bookings = newBookings)
   }
 
-  def editUserBooking(ub: UserTimeBooking,
-                      newBooking: BookingV2): UserTimeBooking = {
+  private def editUserBooking(ub: UserTimeBooking,
+                              newBooking: BookingV2): UserTimeBooking = {
     notifyClient(UserTimeBookingHistoryEntryChanged(newBooking))
     Await.ready(
       withDBSession()(implicit dbSession =>
@@ -270,10 +272,9 @@ class UserTimeBookingAggregate(
     ub.copy(bookings = newBookings)
   }
 
-  def updateStartTime(ub: UserTimeBooking,
-                      bookingId: BookingId,
-                      fromStart: DateTime,
-                      toStart: DateTime): UserTimeBooking = {
+  private def updateStartTime(ub: UserTimeBooking,
+                              bookingId: BookingId,
+                              toStart: DateTime): UserTimeBooking = {
     val newBookings = ub.bookings.map { b =>
       if (b.id == bookingId)
         b.copy(start = toStart.toLocalDateTimeWithZone())
@@ -325,7 +326,7 @@ class UserTimeBookingAggregate(
     systemServices.currentOrganisationTimeBookingsView ! message
   }
 
-  val uninitialized: Receive = defaultReceive.orElse {
+  private val uninitialized: Receive = defaultReceive.orElse {
     case GetState =>
       sender() ! state
     case Initialize(state) =>
@@ -339,7 +340,7 @@ class UserTimeBookingAggregate(
       created(e)
   }
 
-  val created: Receive = defaultReceive.orElse {
+  private val created: Receive = defaultReceive.orElse {
     case StartBookingCommand(_,
                              organisationReference,
                              projectReference,
@@ -473,7 +474,8 @@ class UserTimeBookingAggregate(
       log.warning(s"Received unknown command $other")
   }
 
-  def stopBookingInProgress(b: UserTimeBooking, time: DateTime): Unit = {
+  private def stopBookingInProgress(b: UserTimeBooking,
+                                    time: DateTime): Unit = {
     b.bookingInProgress.foreach { b =>
       val stoppedB = b.copy(end = Some(time.toLocalDateTimeWithZone()))
       persist(UserTimeBookingStoppedV2(stoppedB))(afterEventPersisted)

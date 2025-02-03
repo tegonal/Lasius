@@ -37,7 +37,7 @@ trait DBSupport {
   protected def withDBSession[R](withTransaction: Boolean = false)(
       f: DBSession => Future[R])(implicit
       executionContext: ExecutionContext): Future[R] = {
-    (for {
+    for {
       dbSession <- DBSession.start(reactiveMongoApi,
                                    withTransaction && supportTransaction)
       result <- f(dbSession)
@@ -45,6 +45,6 @@ trait DBSupport {
         .recoverWith { case exception =>
           dbSession.abort().flatMap(_ => Future.failed(exception))
         }
-    } yield result)
+    } yield result
   }
 }
