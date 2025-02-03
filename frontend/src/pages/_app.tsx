@@ -91,7 +91,7 @@ const App = ({
 }: AppPropsWithLayout): JSX.Element => {
   // Use the layout defined at the page level, if available
   const getLayout = Component.getLayout ?? ((page) => page);
-  const lasiusIsLoggedIn = !!(session?.accessToken && profile?.id);
+  const lasiusIsLoggedIn = !!(session?.access_token && profile?.id);
   const store = useStore();
 
   useAsync(async () => {
@@ -113,7 +113,7 @@ const App = ({
         }}
       >
         <SessionProvider session={session}>
-          <HttpHeaderProvider />
+          <HttpHeaderProvider session={session} />
           <Head>
             <meta
               name="viewport"
@@ -182,11 +182,11 @@ App.getInitialProps = async ({
 }: ExtendedAppContext) => {
   const session = await getSession({ req });
   let profile = null;
-  const accessToken = session?.accessToken;
+  const access_token = session?.access_token;
 
-  if (accessToken) {
+  if (access_token) {
     try {
-      profile = await getUserProfile(getRequestHeaders(accessToken));
+      profile = await getUserProfile(getRequestHeaders(access_token));
     } catch (error) {
       logger.error(error);
 

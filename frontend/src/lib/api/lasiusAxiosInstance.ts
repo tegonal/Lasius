@@ -61,10 +61,12 @@ export const lasiusAxiosInstance = <T>(
           IS_BROWSER &&
           window.location.pathname !== '/auth/signin' &&
           window.location.pathname !== '/login' &&
-          window.location.pathname !== '/'
+          window.location.pathname !== '/' &&
+          config.headers?.Authorization
         ) {
-          //await removeAccessibleCookies();
-          //await signOut();
+          // perform logout as token might not be valid anymore
+          await removeAccessibleCookies();
+          await signOut();
         } else {
           logger.info('[lasiusAxiosInstance][Unauthorized]', error);
           throw new Error(error);
