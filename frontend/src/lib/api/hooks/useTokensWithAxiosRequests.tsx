@@ -17,10 +17,6 @@
  *
  */
 
-import { useSession } from 'next-auth/react';
-import { useIsClient } from 'usehooks-ts';
-import { logger } from 'lib/logger';
-
 export const getRequestHeaders = (token?: string) => {
   if (!token) {
     return {};
@@ -28,23 +24,4 @@ export const getRequestHeaders = (token?: string) => {
   return {
     headers: { Authorization: `Bearer ${token}` },
   };
-};
-
-export const useTokensWithAxiosRequests = () => {
-  const isClient = useIsClient();
-  const session = useSession();
-  if (isClient) {
-    const token = session?.data?.accessToken;
-    const axiosConfig = getRequestHeaders(token);
-    if (!token) {
-      logger.error('[useAxiosToken][NoTokenSetOnRequest]', isClient, session.data, session.status);
-    }
-    return {
-      axiosConfig: axiosConfig,
-    };
-  } else {
-    return {
-      axiosConfig: undefined,
-    };
-  }
 };

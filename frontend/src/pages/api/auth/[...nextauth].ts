@@ -46,14 +46,14 @@ const internalProvider: OAuthConfig<any> = {
       id: profile.id.toString(),
       name: profile.firstName + ' ' + profile.lastName,
       email: profile.email,
-      accessToken: tokens.access_token,
+      access_token: tokens.access_token,
     };
   },
 };
 
 /**
  * Takes a token, and returns a new token with updated
- * `accessToken` and `accessTokenExpires`. If an error occurs,
+ * `access_token` and `expires_at`. If an error occurs,
  * returns the old token and an error property
  */
 async function refreshAccessToken(token) {
@@ -80,17 +80,24 @@ async function refreshAccessToken(token) {
       method: 'POST',
     });
 
-    const refreshedTokens = await response.json();
+    const tokensOrError = await response.json();
 
     if (!response.ok) {
-      throw refreshedTokens;
+      throw tokensOrError;
     }
+
+    const newTokens = tokensOrError as {
+      access_token: string;
+      expires_in: number;
+      refresh_token?: string;
+    };
 
     return {
       ...token,
-      accessToken: refreshedTokens.access_token,
-      accessTokenExpires: Date.now() + refreshedTokens.expires_in * 1000,
-      refreshToken: refreshedTokens.refresh_token ?? token.refreshToken, // Fall back to old refresh token
+      access_token: newTokens.access_token,
+      expires_at: Math.floor(Date.now() / 1000 + newTokens.expires_in),
+      // Some providers only issue refresh tokens once, so preserve if we did not get a new one
+      refresh_token: newTokens.refresh_token ? newTokens.refresh_token : token.refresh_token,
     };
   } catch (error) {
     console.log('[NextAuth][RefreshAccessTokenError]', error);
@@ -119,35 +126,32 @@ const nextAuthOptions = (): NextAuthOptions => {
     },
     callbacks: {
       async session({ session, token }) {
-        console.log('[NextAuth][session]', session, token);
         session.user = token.user;
-        session.accessToken = token.accessToken;
+        session.access_token = token.access_token;
         session.error = token.error;
 
         return session;
       },
-      async jwt({ token, user, account, profile }) {
-        console.log('[NextAuth][jwt][token]', token);
-        console.log('[NextAuth][jwt][user]', user);
-        console.log('[NextAuth][jwt][account]', account);
-        console.log('[NextAuth][jwt][profile]', profile);
+      async jwt({ token, account }) {
         // Initial sign in
-        if (account && user) {
+        if (account) {
+          // First-time login, save the `access_token`, its expiry and the `refresh_token`
           return {
-            accessToken: account.access_token,
-            accessTokenExpires: Date.now() + account.expires_in * 1000,
-            refreshToken: account.refresh_token,
-            user,
+            ...token,
+            access_token: account.access_token,
+            expires_at: account.expires_at,
+            refresh_token: account.refresh_token,
           };
-        }
-
-        // Return previous token if the access token has not expired yet or has no expiration set
-        if (!token.accessTokenExpires || Date.now() < token.accessTokenExpires) {
+        } else if (!token.expires_at || Date.now() < token.expires_at * 1000) {
+          // Subsequent logins, but the `access_token` is still valid
           return token;
-        }
+        } else {
+          // Subsequent logins, but the `access_token` has expired, try to refresh it
+          if (!token.refresh_token) throw new TypeError('Missing refresh_token');
 
-        // Access token has expired, try to update it
-        return refreshAccessToken(token);
+          // Access token has expired, try to update it
+          return refreshAccessToken(token);
+        }
       },
     },
     events: {

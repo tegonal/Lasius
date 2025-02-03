@@ -19,10 +19,8 @@
 
 import { updateUserSettings, useGetUserProfile } from 'lib/api/lasius/user/user';
 import { ModelsUserSettings } from 'lib/api/lasius';
-import { useTokensWithAxiosRequests } from 'lib/api/hooks/useTokensWithAxiosRequests';
 
 export const useProfile = () => {
-  const { axiosConfig } = useTokensWithAxiosRequests();
   const { data, mutate } = useGetUserProfile({
     swr: {
       revalidateOnFocus: true,
@@ -30,7 +28,6 @@ export const useProfile = () => {
       revalidateOnReconnect: true,
       shouldRetryOnError: true,
     },
-    request: axiosConfig,
   });
 
   const updateSettings = async (updateData: Partial<ModelsUserSettings>) => {

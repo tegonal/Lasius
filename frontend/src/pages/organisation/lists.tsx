@@ -39,7 +39,7 @@ const ListsPage: NextPageWithLayout = ({ profile }) => {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { locale = '' } = context;
   const session = await getSession({ req: context.req });
-  const profile = await getUserProfile(getRequestHeaders(session?.accessToken || ''));
+  const profile = await getUserProfile(getRequestHeaders(session?.access_token || ''));
   return {
     props: {
       profile,

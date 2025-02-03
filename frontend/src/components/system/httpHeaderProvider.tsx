@@ -18,17 +18,18 @@
  */
 
 import React, { useEffect } from 'react';
-import { useSession } from 'next-auth/react';
 import axios from 'axios';
-import { logger } from 'lib/logger';
+import { Session } from 'next-auth';
+import { useSession } from 'next-auth/react';
 
-export const HttpHeaderProvider: React.FC = () => {
-  const session = useSession();
+type HttpHeaderProviderProps = {
+  session: Session;
+};
 
+export const HttpHeaderProvider: React.FC<HttpHeaderProviderProps> = ({ session }) => {
   // Set the token for client side requests to use
   useEffect(() => {
-    const token = session?.data?.accessToken;
-    logger.info('AxiosConfig', token);
+    const token = session?.access_token;
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     } else {
