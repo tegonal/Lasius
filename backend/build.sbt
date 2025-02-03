@@ -73,7 +73,7 @@ libraryDependencies ++= Seq(
   ws,
   specs2 % Test,
   guice,
-  "org.webjars" % "swagger-ui" % "5.18.2"
+  "org.webjars" % "swagger-ui" % "5.18.3"
 )
 
 Test / javaOptions += "-Dconfig.file=conf/test.conf"
