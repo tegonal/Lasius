@@ -22,13 +22,15 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 1.0.10+23-0966de2e+20250123-1143
+ * OpenAPI spec version: 1.1.0+14-d516163a+20250204-1552
  */
-import type { Arguments, Key } from 'swr';
+import useSwr from 'swr';
+import type { Arguments, Key, SWRConfiguration } from 'swr';
 import useSWRMutation from 'swr/mutation';
 import type { SWRMutationConfiguration } from 'swr/mutation';
 import type {
   ModelsOAuthAuthorizationCodeLoginRequest,
+  ModelsOAuthUser,
   ModelsOAuthUserId,
   ModelsOAuthUserRegistration,
   ModelsPasswordChangeRequest,
@@ -156,13 +158,13 @@ export const useUpdateUserPassword = <TError = ErrorType<unknown>>(options?: {
  * @summary access to internally provided oauth2 provider. Use for demo purposes only!
  */
 export const oauthAccessToken = (options?: SecondParameter<typeof lasiusAxiosInstance>) => {
-  return lasiusAxiosInstance<unknown>({ url: `/oauth2/access_token`, method: 'POST' }, options);
+  return lasiusAxiosInstance<void>({ url: `/oauth2/access_token`, method: 'POST' }, options);
 };
 
 export const getOauthAccessTokenMutationFetcher = (
   options?: SecondParameter<typeof lasiusAxiosInstance>
 ) => {
-  return (_: Key, __: { arg: Arguments }): Promise<unknown> => {
+  return (_: Key, __: { arg: Arguments }): Promise<void> => {
     return oauthAccessToken(options);
   };
 };
@@ -245,6 +247,43 @@ export const useLogin = <TError = ErrorType<void>>(options?: {
   const swrFn = getLoginMutationFetcher(requestOptions);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * @summary access to internally provided oauth2 provider. Use for demo purposes only!
+ */
+export const getUOAuthUserProfile = (options?: SecondParameter<typeof lasiusAxiosInstance>) => {
+  return lasiusAxiosInstance<ModelsOAuthUser>({ url: `/oauth2/profile`, method: 'GET' }, options);
+};
+
+export const getGetUOAuthUserProfileKey = () => [`/oauth2/profile`] as const;
+
+export type GetUOAuthUserProfileQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getUOAuthUserProfile>>
+>;
+export type GetUOAuthUserProfileQueryError = ErrorType<unknown>;
+
+/**
+ * @summary access to internally provided oauth2 provider. Use for demo purposes only!
+ */
+export const useGetUOAuthUserProfile = <TError = ErrorType<unknown>>(options?: {
+  swr?: SWRConfiguration<Awaited<ReturnType<typeof getUOAuthUserProfile>>, TError> & {
+    swrKey?: Key;
+    enabled?: boolean;
+  };
+  request?: SecondParameter<typeof lasiusAxiosInstance>;
+}) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey = swrOptions?.swrKey ?? (() => (isEnabled ? getGetUOAuthUserProfileKey() : null));
+  const swrFn = () => getUOAuthUserProfile(requestOptions);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(swrKey, swrFn, swrOptions);
 
   return {
     swrKey,

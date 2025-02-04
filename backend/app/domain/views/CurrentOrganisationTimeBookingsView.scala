@@ -89,7 +89,7 @@ class CurrentOrganisationTimeBookingsView(
         if (users.nonEmpty) {
           val userMap = users.filter(_.active).flatMap { user =>
             user.organisations.map(t =>
-              (t.organisationReference, user.getReference()))
+              (t.organisationReference, user.getReference))
           }
           val today = LocalDate.now()
 

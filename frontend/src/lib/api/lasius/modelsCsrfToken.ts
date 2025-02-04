@@ -25,6 +25,6 @@
  * OpenAPI spec version: 1.1.0+14-d516163a+20250204-1552
  */
 
-export type GetUserBookingLatestListByOrganisationParams = {
-  maxHistory?: number;
-};
+export interface ModelsCsrfToken {
+  value: string;
+}

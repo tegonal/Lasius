@@ -117,7 +117,7 @@ const nextAuthOptions = (): NextAuthOptions => {
       strategy: 'jwt',
     },
     jwt: {
-      secret: process.env.NEXTAUTH_JWT_SECRET,
+      secret: process.env.NEXTAUTH_SECRET,
     },
     secret: process.env.NEXTAUTH_SECRET,
     pages: {

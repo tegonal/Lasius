@@ -47,7 +47,7 @@ export const LasiusBackendWebsocketStatus: React.FC = () => {
   useEffect(() => {
     logger.info('[AppWebsocketStatus]', connectionStatus);
 
-    if (connectionStatus === CONNECTION_STATUS.CONNECTED) {
+    if (connectionStatus === CONNECTION_STATUS.CONNECTED && session.data?.access_token) {
       logger.info('[useLasiusWebsocket][connectionStatus][sendHelloServerAndAuthenticate');
       sendClientAuthentication();
     }

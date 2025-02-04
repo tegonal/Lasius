@@ -21,11 +21,11 @@
 
 package models
 
+import models.BaseFormat._
 import models.LocalDateTimeWithTimeZone.DateTimeHelper
 import models.ProjectId.ProjectReference
 import org.joda.time.DateTime
 import play.api.libs.json._
-import models.BaseFormat._
 
 import scala.annotation.nowarn
 
@@ -71,13 +71,13 @@ case class Booking(id: BookingId,
       .find(_.key == projectKey)
       .getOrElse(sys.error(
         s"Cannot migrate current booking $this, project with key $projectKey not found"))
-    val projectReference = project.getReference()
+    val projectReference = project.getReference
     val allTags          = tags + SimpleTag(TagId(categoryId))
     BookingV2(
       id,
       start.toLocalDateTimeWithZone(),
       end.map(_.toLocalDateTimeWithZone()),
-      user.getReference(),
+      user.getReference,
       project.organisationReference,
       projectReference,
       allTags,

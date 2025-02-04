@@ -140,8 +140,7 @@ class ProjectsControllerSpec
       status(result) must equalTo(CREATED)
       val resultingProject: Project = contentAsJson(result).as[Project]
       resultingProject.key === newProjectKey
-      resultingProject.organisationReference === controller.organisation
-        .getReference()
+      resultingProject.organisationReference === controller.organisation.getReference
 
       // verify user gets automatically assigned to this project
       val maybeUser: Option[User] = withDBSession()(implicit dbSession =>
@@ -153,7 +152,7 @@ class ProjectsControllerSpec
         _.organisationReference.id == controller.organisationId)
       userOrg must beSome
       val userProject: Option[UserProject] = userOrg.get.projects.find(
-        _.projectReference == resultingProject.getReference())
+        _.projectReference == resultingProject.getReference)
       userProject must beSome
       userProject.get.role === ProjectAdministrator
     }
@@ -229,7 +228,7 @@ class ProjectsControllerSpec
         _.organisationReference.id == controller.organisationId)
       userOrg must beSome
       val userProject: Option[UserProject] = userOrg.get.projects.find(
-        _.projectReference == controller.project.getReference())
+        _.projectReference == controller.project.getReference)
       userProject must beNone
     }
   }
@@ -423,7 +422,7 @@ class ProjectsControllerSpec
 
       val email = "ivnitedUser@test.com"
       val userOrganisation: UserOrganisation = UserOrganisation(
-        organisationReference = controller.organisation.getReference(),
+        organisationReference = controller.organisation.getReference,
         `private` = controller.organisation.`private`,
         role = OrganisationMember,
         plannedWorkingHours = WorkingHours(),
@@ -507,11 +506,11 @@ class ProjectsControllerSpec
       // initialize second user
       val userProject = UserProject(
         sharedByOrganisationReference = None,
-        projectReference = controller.project.getReference(),
+        projectReference = controller.project.getReference,
         role = ProjectMember
       )
       val userOrganisation = UserOrganisation(
-        organisationReference = controller.organisation.getReference(),
+        organisationReference = controller.organisation.getReference,
         `private` = controller.organisation.`private`,
         role = OrganisationMember,
         plannedWorkingHours = WorkingHours(),
@@ -630,14 +629,14 @@ class ProjectsControllerSpec
                                            reactiveMongoApi,
                                            projectRole = ProjectMember)
 
-      // initialize second user to be able to remove ourself
+      // initialize second user to be able to remove himeself
       val userProject2: UserProject = UserProject(
         sharedByOrganisationReference = None,
-        projectReference = controller.project.getReference(),
+        projectReference = controller.project.getReference,
         role = ProjectAdministrator
       )
       private val userOrganisation2 = UserOrganisation(
-        organisationReference = controller.organisation.getReference(),
+        organisationReference = controller.organisation.getReference,
         `private` = controller.organisation.`private`,
         role = OrganisationMember,
         plannedWorkingHours = WorkingHours(),
@@ -753,7 +752,7 @@ class ProjectsControllerSpec
         controller.projectRepository.upsert(Project(
           id = ProjectId(),
           key = project2Key,
-          organisationReference = controller.organisation.getReference(),
+          organisationReference = controller.organisation.getReference,
           bookingCategories = Set(),
           active = true,
           createdBy = controller.userReference,
@@ -795,7 +794,7 @@ class ProjectsControllerSpec
         role = Administrator,
         organisations = Seq(
           UserOrganisation(
-            organisationReference = controller.organisation.getReference(),
+            organisationReference = controller.organisation.getReference,
             `private` = false,
             role = OrganisationMember,
             plannedWorkingHours = WorkingHours(),
@@ -805,7 +804,7 @@ class ProjectsControllerSpec
                             EntityReference(ProjectId(), "anotherProject"),
                           role = ProjectMember),
               UserProject(sharedByOrganisationReference = None,
-                          projectReference = controller.project.getReference(),
+                          projectReference = controller.project.getReference,
                           role = ProjectMember),
             )
           ),
@@ -826,8 +825,8 @@ class ProjectsControllerSpec
         createDate = DateTime.now(),
         createdBy = controller.userReference,
         expiration = DateTime.now().plusDays(1),
-        sharedByOrganisationReference = controller.organisation.getReference(),
-        projectReference = controller.project.getReference(),
+        sharedByOrganisationReference = controller.organisation.getReference,
+        projectReference = controller.project.getReference,
         role = ProjectMember,
         outcome = None
       )

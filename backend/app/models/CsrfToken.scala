@@ -20,11 +20,10 @@
  */
 
 package models
+import play.api.libs.json._
 
-import play.api.libs.json.{Format, Json}
+case class CsrfToken(value: String)
 
-case class OneTimeToken(token: String)
-
-object OneTimeToken {
-  implicit val format: Format[OneTimeToken] = Json.format[OneTimeToken]
+object CsrfToken {
+  implicit val format: Format[CsrfToken] = Json.format[CsrfToken]
 }

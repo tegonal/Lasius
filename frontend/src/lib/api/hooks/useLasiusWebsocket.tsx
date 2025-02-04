@@ -28,7 +28,7 @@ export const useLasiusWebsocket = () => {
   const isWindowFocused = useIsWindowFocused();
 
   const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([]);
-  
+
   const websocketUrl = IS_SERVER ? null : `${LASIUS_API_WEBSOCKET_URL}/messaging/websocket`;
   const { sendJsonMessage, lastMessage, readyState } = useWebSocket(websocketUrl, {
     share: true,

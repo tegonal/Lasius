@@ -22,11 +22,11 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 1.0.10+23-0966de2e+20250123-1143
+ * OpenAPI spec version: 1.1.0+14-d516163a+20250204-1552
  */
 import useSwr from 'swr';
 import type { Key, SWRConfiguration } from 'swr';
-import type { ModelsApplicationConfig } from '..';
+import type { ModelsApplicationConfig, ModelsCsrfToken } from '..';
 import { lasiusAxiosInstance } from '../../lasiusAxiosInstance';
 import type { ErrorType } from '../../lasiusAxiosInstance';
 
@@ -59,6 +59,41 @@ export const useGetConfiguration = <TError = ErrorType<unknown>>(options?: {
   const isEnabled = swrOptions?.enabled !== false;
   const swrKey = swrOptions?.swrKey ?? (() => (isEnabled ? getGetConfigurationKey() : null));
   const swrFn = () => getConfiguration(requestOptions);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * @summary Get csrf token
+ */
+export const getCsrfToken = (options?: SecondParameter<typeof lasiusAxiosInstance>) => {
+  return lasiusAxiosInstance<ModelsCsrfToken>({ url: `/csrf-token`, method: 'GET' }, options);
+};
+
+export const getGetCsrfTokenKey = () => [`/csrf-token`] as const;
+
+export type GetCsrfTokenQueryResult = NonNullable<Awaited<ReturnType<typeof getCsrfToken>>>;
+export type GetCsrfTokenQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get csrf token
+ */
+export const useGetCsrfToken = <TError = ErrorType<unknown>>(options?: {
+  swr?: SWRConfiguration<Awaited<ReturnType<typeof getCsrfToken>>, TError> & {
+    swrKey?: Key;
+    enabled?: boolean;
+  };
+  request?: SecondParameter<typeof lasiusAxiosInstance>;
+}) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey = swrOptions?.swrKey ?? (() => (isEnabled ? getGetCsrfTokenKey() : null));
+  const swrFn = () => getCsrfToken(requestOptions);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(swrKey, swrFn, swrOptions);
 

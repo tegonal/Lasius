@@ -22,7 +22,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 1.0.10+23-0966de2e+20250123-1143
+ * OpenAPI spec version: 1.1.0+14-d516163a+20250204-1552
  */
 
 export * from './getAggregatedStatisticsByProjectGranularity';
@@ -46,6 +46,7 @@ export * from './modelsBookingStatsCategory';
 export * from './modelsBookingStub';
 export * from './modelsCreateOrganisation';
 export * from './modelsCreateProject';
+export * from './modelsCsrfToken';
 export * from './modelsCurrentOrganisationTimeBookings';
 export * from './modelsCurrentUserTimeBooking';
 export * from './modelsEditBookingRequest';
@@ -67,6 +68,7 @@ export * from './modelsJoinProjectInvitation';
 export * from './modelsJoinProjectInvitationRole';
 export * from './modelsLocalDateTimeWithTimeZone';
 export * from './modelsOAuthAuthorizationCodeLoginRequest';
+export * from './modelsOAuthUser';
 export * from './modelsOAuthUserId';
 export * from './modelsOAuthUserRegistration';
 export * from './modelsOrganisation';

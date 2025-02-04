@@ -5,9 +5,11 @@ info:
   description: "Track your time"
 components:
   securitySchemes:
-    oAuth2: # <---- arbitrary name
-      type: oauth2
-      description: This API uses OAuth 2 with the grant flow depending on the server used
+    bearerHttpAuthentication:
+      description: Bearer token using a JWT
+      type: http
+      scheme: Bearer
+      bearerFormat: JWT
   schemas:
     models.Invitation:
       oneOf:

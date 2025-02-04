@@ -91,7 +91,7 @@ class InitialBaseDataLoader @Inject() (
     val project = Project(
       ProjectId(),
       "MyProject",
-      org.getReference(),
+      org.getReference,
       Set(
         TagGroup(TagId("Development"),
                  relatedTags = Seq(SimpleTag(TagId("Billable")))),
@@ -115,11 +115,11 @@ class InitialBaseDataLoader @Inject() (
       dbSession: DBSession): Future[Unit] = {
 
     val userOrg = UserOrganisation(
-      org.getReference(),
+      org.getReference,
       `private` = org.`private`,
       OrganisationAdministrator,
       WorkingHours(),
-      Seq(UserProject(None, project.getReference(), ProjectAdministrator))
+      Seq(UserProject(None, project.getReference, ProjectAdministrator))
     )
 
     OAuthUserRepository.upsert(

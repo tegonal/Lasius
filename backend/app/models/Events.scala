@@ -41,7 +41,7 @@ case class UserLoggedIn(userId: String) extends PersistedEvent {
       .find(_.key == userId)
       .getOrElse(sys.error(
         s"Cannot migrate Event $this, User with key $userId not found"))
-      .getReference()
+      .getReference
   )
 }
 
@@ -55,7 +55,7 @@ case class UserTimeBookingInitialized(userId: String) extends PersistedEvent {
         .find(_.key == userId)
         .getOrElse(sys.error(
           s"Cannot migrate Event $this, User with key $userId not found"))
-        .getReference())
+        .getReference)
 }
 
 case class UserTimeBookingInitializedV2(userReference: UserReference)
@@ -153,7 +153,7 @@ case class UserLoggedOut(userId: String) extends OutEvent with PersistedEvent {
         .find(_.key == userId)
         .getOrElse(sys.error(
           s"Cannot migrate Event $this, User with key $userId not found"))
-        .getReference())
+        .getReference)
 }
 
 case class UserLoggedOutV2(userReference: UserReference)

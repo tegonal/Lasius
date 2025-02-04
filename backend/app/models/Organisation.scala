@@ -32,7 +32,7 @@ case class Organisation(id: OrganisationId,
                         createdBy: UserReference,
                         deactivatedBy: Option[UserReference])
     extends BaseEntity[OrganisationId] {
-  def getReference(): OrganisationReference = EntityReference(id, key)
+  def getReference: OrganisationReference = EntityReference(id, key)
 }
 
 object Organisation {
