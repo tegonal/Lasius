@@ -24,7 +24,15 @@
  * Track your time
  * OpenAPI spec version: 1.1.0+14-d516163a+20250204-1552
  */
+import type { ModelsOAuthUserId } from './modelsOAuthUserId';
 
-export type GetUserBookingLatestListByOrganisationParams = {
-  maxHistory?: number;
-};
+export interface ModelsOAuthUser {
+  id: ModelsOAuthUserId;
+  email: string;
+  password: string;
+  /** @nullable */
+  firstName?: string | null;
+  /** @nullable */
+  lastName?: string | null;
+  active: boolean;
+}

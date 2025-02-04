@@ -132,7 +132,7 @@ class OrganisationsController @Inject() (
           userOrg =>
             userRepository
               .findByOrganisation(userOrg.organisationReference)
-              .map(users => Ok(Json.toJson(users.map(_.toStub()))))
+              .map(users => Ok(Json.toJson(users.map(_.toStub))))
         }
     }
 

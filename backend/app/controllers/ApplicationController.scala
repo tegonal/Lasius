@@ -32,6 +32,8 @@ import play.modules.reactivemongo.ReactiveMongoApi
 import javax.inject.Inject
 import scala.concurrent.Future
 import com.typesafe.config.Config
+import models.CsrfToken
+import play.filters.csrf.CSRF
 
 class ApplicationController @Inject() (
     override val conf: Config,
@@ -52,5 +54,10 @@ class ApplicationController @Inject() (
     */
   def getConfig: Action[AnyContent] = Action.async {
     Future.successful(Ok(Json.toJson(systemServices.appConfig)))
+  }
+
+  def getCsrfToken: Action[AnyContent] = Action.async { implicit request =>
+    Future.successful(CSRF.getToken.fold(NotFound(""))(token =>
+      Ok(Json.toJson(CsrfToken(token.value)))))
   }
 }

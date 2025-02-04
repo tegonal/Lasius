@@ -126,7 +126,7 @@ class OrganisationsControllerSpec
       maybeUser must beSome
       private val user = maybeUser.get
       private val userOrg = user.organisations.find(
-        _.organisationReference == resultingOrganisation.getReference())
+        _.organisationReference == resultingOrganisation.getReference)
       userOrg must beSome
       userOrg.get.role === OrganisationAdministrator
     }
@@ -361,11 +361,11 @@ class OrganisationsControllerSpec
       // initialize second user
       private val userProject2 = UserProject(
         sharedByOrganisationReference = None,
-        projectReference = controller.project.getReference(),
+        projectReference = controller.project.getReference,
         role = ProjectMember
       )
       private val userOrganisation2 = UserOrganisation(
-        organisationReference = controller.organisation.getReference(),
+        organisationReference = controller.organisation.getReference,
         `private` = controller.organisation.`private`,
         role = OrganisationMember,
         plannedWorkingHours = WorkingHours(),
@@ -382,7 +382,7 @@ class OrganisationsControllerSpec
         organisations = Seq(userOrganisation2),
         settings = Some(
           UserSettings(lastSelectedOrganisation =
-            Some(controller.organisation.getReference())))
+            Some(controller.organisation.getReference)))
       )
       withDBSession()(implicit dbSession =>
         controller.userRepository.upsert(user2)).awaitResult()
@@ -395,7 +395,7 @@ class OrganisationsControllerSpec
 
       private val remainingUsers = withDBSession()(implicit dbSession =>
         controller.userRepository.findByOrganisation(
-          controller.organisation.getReference()))
+          controller.organisation.getReference))
         .awaitResult()
       remainingUsers should haveSize(1)
 
@@ -481,11 +481,11 @@ class OrganisationsControllerSpec
       // initialize second user to be able to remove ourself
       private val userProject2 = UserProject(
         sharedByOrganisationReference = None,
-        projectReference = controller.project.getReference(),
+        projectReference = controller.project.getReference,
         role = ProjectAdministrator
       )
       private val userOrganisation2 = UserOrganisation(
-        organisationReference = controller.organisation.getReference(),
+        organisationReference = controller.organisation.getReference,
         `private` = controller.organisation.`private`,
         role = OrganisationAdministrator,
         plannedWorkingHours = WorkingHours(),
@@ -512,7 +512,7 @@ class OrganisationsControllerSpec
       status(result) must equalTo(OK)
       private val remainingUsers = withDBSession()(implicit dbSession =>
         controller.userRepository.findByOrganisation(
-          controller.organisation.getReference()))
+          controller.organisation.getReference))
         .awaitResult()
       remainingUsers should haveSize(1)
     }
@@ -620,7 +620,7 @@ class OrganisationsControllerSpec
         role = Administrator,
         organisations = Seq(
           UserOrganisation(
-            organisationReference = controller.organisation.getReference(),
+            organisationReference = controller.organisation.getReference,
             `private` = false,
             role = OrganisationMember,
             plannedWorkingHours = WorkingHours(),
@@ -643,7 +643,7 @@ class OrganisationsControllerSpec
         createDate = DateTime.now(),
         createdBy = controller.userReference,
         expiration = DateTime.now().plusDays(1),
-        organisationReference = controller.organisation.getReference(),
+        organisationReference = controller.organisation.getReference,
         role = OrganisationMember,
         outcome = None
       )

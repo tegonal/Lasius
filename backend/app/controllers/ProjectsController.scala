@@ -69,7 +69,7 @@ class ProjectsController @Inject() (
             _ <- userRepository.assignUserToProject(
               subject.userReference.id,
               userOrg.organisationReference,
-              project.getReference(),
+              project.getReference,
               ProjectAdministrator)
           } yield Created(Json.toJson(project))
         }
@@ -142,7 +142,7 @@ class ProjectsController @Inject() (
                                                  ProjectMember) { _ =>
           userRepository
             .findByProject(projectId)
-            .map(users => Ok(Json.toJson(users.map(_.toStub()))))
+            .map(users => Ok(Json.toJson(users.map(_.toStub))))
         }
     }
 
@@ -180,7 +180,7 @@ class ProjectsController @Inject() (
                     .assignUserToProject(
                       userId = maybeExistingUser.get.id,
                       organisationReference = project.organisationReference,
-                      projectReference = project.getReference(),
+                      projectReference = project.getReference,
                       role = request.body.role
                     )
                     .map(_ => None)
@@ -196,7 +196,7 @@ class ProjectsController @Inject() (
                       expiration = DateTime.now().plusDays(7),
                       sharedByOrganisationReference =
                         userOrg.organisationReference,
-                      projectReference = project.getReference(),
+                      projectReference = project.getReference,
                       role = request.body.role,
                       outcome = None
                     ))
@@ -221,7 +221,7 @@ class ProjectsController @Inject() (
               .findById(projectId)
               .noneToFailed(s"Project ${projectId.value} does not exist")
             _ <- userRepository.unassignUserFromProject(userId,
-                                                        project.getReference())
+                                                        project.getReference)
           } yield Ok("")
         }
     }

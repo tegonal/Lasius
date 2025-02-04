@@ -216,7 +216,7 @@ class CurrentOrganisationTimeBookingsViewSpec
     private val expectedResult = CurrentOrganisationTimeBookings(
       organisationReference.id,
       Seq(
-        CurrentUserTimeBooking(user1.getReference(),
+        CurrentUserTimeBooking(user1.getReference,
                                today,
                                None,
                                None,

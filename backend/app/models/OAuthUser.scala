@@ -21,7 +21,7 @@
 
 package models
 
-import models.BaseFormat.UUIDBaseId
+import models.BaseFormat._
 import play.api.libs.json._
 import scalaoauth2.provider.{AuthInfo, CodeChallengeMethod}
 

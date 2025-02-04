@@ -120,7 +120,7 @@ class DefaultAuthConfig @Inject() (
       dbSession: DBSession): Future[UserReference] = {
 
     userRepository.findByEmail(jwt.email).flatMap {
-      _.map(user => Future.successful(user.getReference()))
+      _.map(user => Future.successful(user.getReference))
         .getOrElse {
           if (canCreateNewUser) {
             for {
@@ -133,7 +133,7 @@ class DefaultAuthConfig @Inject() (
                 jwt,
                 newOrg,
                 OrganisationAdministrator)
-            } yield user.getReference()
+            } yield user.getReference
           } else {
             Future.failed(
               UnauthorizedException("Cannot find user for provided jwt token"))

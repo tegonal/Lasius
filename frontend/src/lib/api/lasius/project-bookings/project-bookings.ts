@@ -22,7 +22,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 1.0.10+23-0966de2e+20250123-1143
+ * OpenAPI spec version: 1.1.0+14-d516163a+20250204-1552
  */
 import useSwr from 'swr';
 import type { Key, SWRConfiguration } from 'swr';
