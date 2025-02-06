@@ -1,4 +1,5 @@
 {
+  "{provider.name}": "{provider.name}",
   "% of planned hours": "% of planned hours",
   "Accept invitation": "Accept invitation",
   "Account": "Account",
@@ -70,6 +71,7 @@
   "Hours": "Hours",
   "Inactive": "Inactive",
   "Insert booking": "Insert booking",
+  "Internal Lasius Sign in": "Internal Lasius Sign in",
   "Internal server error": "Internal server error",
   "Invite": "Invite",
   "Invite by E-Mail": "Invite by E-Mail",
@@ -119,6 +121,8 @@
   "Password update failed. Make sure you entered your current password and that it is correct.": "Password update failed. Make sure you entered your current password and that it is correct.",
   "Password updated": "Password updated",
   "Passwords don't match": "Passwords don't match",
+  "Please choose a login provider": "Please choose a login provider",
+  "Prepare login...": "Prepare login...",
   "Previous month": "Previous month",
   "Profile changes are not allowed in demo mode": "Profile changes are not allowed in demo mode",
   "Project": "Project",
@@ -205,8 +209,8 @@
   "You are a member of this organisation and don't have the rights to add or remove members. Get in touch with an organisation administrator if you would like to invite someone.": "You are a member of this organisation and don't have the rights to add or remove members. Get in touch with an organisation administrator if you would like to invite someone.",
   "You are an administrator of this organisation. You can add and remove members and change the organisation name, or create a new one.": "You are an administrator of this organisation. You can add and remove members and change the organisation name, or create a new one.",
   "You are offline. This application requires an online connection. It will update automatically when a network connection is detected.": "You are offline. This application requires an online connection. It will update automatically when a network connection is detected.",
-  "You have been invited by {{inviter}} to create an account so that you can use Lasius to track your working hours.": "You have been invited by {{inviter}} to create an account so that you can use Lasius to track your working hours.",
   "You have been invited by {{inviter}} to join organisation {{organisation}}.": "You have been invited by {{inviter}} to join organisation {{organisation}}.",
   "You have been invited by {{inviter}} to join project {{project}}.": "You have been invited by {{inviter}} to join project {{project}}.",
+  "You have been invited to create an account so that you can use Lasius to track your working hours.": "You have been invited to create an account so that you can use Lasius to track your working hours.",
   "Your time booking view": "Your time booking view"
 }

@@ -26,26 +26,22 @@ import { signOut } from 'next-auth/react';
 import clientAxiosInstance from 'lib/api/ClientAxiosInstance';
 import { removeAccessibleCookies } from 'lib/removeAccessibleCookies';
 import _ from 'lodash';
-import cookie from 'js-cookie';
 
 // add a second `options` argument here if you want to pass extra options to each generated query
 export const lasiusAxiosInstance = <T>(
   config: AxiosRequestConfig,
   options?: AxiosRequestConfig
 ): Promise<T> => {
-  const defaultHeaders = axios.defaults.headers.common;  
+  const defaultHeaders = axios.defaults.headers.common;
 
-  let methodBasedHeaders = {}
+  let methodBasedHeaders = {};
   if (config.method === 'POST') {
     methodBasedHeaders = axios.defaults.headers.post;
-  }
-  else if (config.method === 'PUT') {
+  } else if (config.method === 'PUT') {
     methodBasedHeaders = axios.defaults.headers.put;
-  }
-  else if (config.method === 'DELETE') {
+  } else if (config.method === 'DELETE') {
     methodBasedHeaders = axios.defaults.headers.delete;
-  }
-  else if (config.method === 'PATCH') {
+  } else if (config.method === 'PATCH') {
     methodBasedHeaders = axios.defaults.headers.patch;
   }
 

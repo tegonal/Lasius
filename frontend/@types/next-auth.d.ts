@@ -17,17 +17,28 @@
  *
  */
 
-import { DefaultSession } from 'next-auth';
+import { DefaultSession, DefaultUser } from 'next-auth';
+import { DefaultJWT } from 'next-auth/jwt';
 
 declare module 'next-auth' {
-  interface Session {
+  interface Session extends DefaultSession {
     access_token?: string;
-    user: DefaultSession['user'];
+    user: DefaultSession['user'] & User;
+    error?: string;
   }
-  interface User {
+  interface User extends DefaultUser {
     access_token?: string;
+    provider?: string
   }
-  interface JWT {
+}
+
+
+declare module 'next-auth/jwt' {
+  interface JWT extends DefaultJWT {
     access_token?: string;
+    user: User;
+    error?: string;
+    expires_at?: number;
+    refreshToken?: string;
   }
 }

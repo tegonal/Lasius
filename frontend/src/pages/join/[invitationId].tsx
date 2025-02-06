@@ -20,13 +20,12 @@
 import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
-import { InvitationUserRegister } from 'layout/pages/invitation/invitationUserRegister';
 import { InvitationInvalid } from 'layout/pages/invitation/invitationInvalid';
 import { InvitationUserConfirm } from 'layout/pages/invitation/invitationUserConfirm';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { InvitationOtherSession } from 'layout/pages/invitation/InvitationOtherSession';
-import { getInvitationStatus } from 'lib/api/lasius/invitations-public/invitations-public';
 import { useAsync } from 'react-async-hook';
+import { getInvitationStatus } from 'lib/api/lasius/invitations-public/invitations-public';
 
 const Join: NextPage = () => {
   const router = useRouter();
@@ -35,7 +34,7 @@ const Join: NextPage = () => {
 
   const invitationStatus = useAsync((id: string) => getInvitationStatus(id), [invitationId]);
 
-  if (invitationStatus.loading) return null;
+  if (invitationStatus.loading || session.status === 'loading') return null;
 
   if (invitationStatus.status === 'error') {
     return <InvitationInvalid />;
@@ -44,12 +43,19 @@ const Join: NextPage = () => {
   const invitation = invitationStatus.result;
 
   if (
-    invitation &&
-    session.status !== 'authenticated' &&
-    invitationStatus.result?.status === 'UnregisteredUser'
+    invitation?.invitation?.id &&
+    invitation?.invitation?.invitedEmail &&
+    session.status !== 'authenticated'
   ) {
-    // handle user setup and confirm invitation
-    return <InvitationUserRegister invitation={invitation} />;
+    console.log('[join][notAuthenticated]]', session.status);
+    // login user and handle invitation logic again
+    const url =
+      '/login?' +
+      new URLSearchParams({
+        invitation_id: invitation.invitation?.id,
+        email: invitation.invitation?.invitedEmail,
+      });
+    router.replace(url);
   }
 
   if (invitation && session.status === 'authenticated') {
@@ -60,17 +66,6 @@ const Join: NextPage = () => {
 
     // handle invite for logged in user, confirm
     return <InvitationUserConfirm invitation={invitation} />;
-  }
-
-  if (
-    session.status !== 'authenticated' &&
-    invitation?.invitation?.id &&
-    invitation?.invitation?.invitedEmail
-  ) {
-    // login user and handle invitation logic again
-    router.replace(
-      `/login?invitationId=${invitation.invitation?.id}&email=${invitation.invitation?.invitedEmail}`
-    );
   }
 
   return null;

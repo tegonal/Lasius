@@ -32,24 +32,20 @@ import { useRouter } from 'next/router';
 import { FormErrorsMultiple } from 'components/forms/formErrorsMultiple';
 import { Icon } from 'components/shared/icon';
 import { BoxInfo } from 'components/shared/notifications/boxInfo';
-import { ModelsInvitationStatusResponse } from 'lib/api/lasius';
-import { plannedWorkingHoursStub } from 'lib/stubPlannedWorkingHours';
-import { random } from 'lodash';
-import { registerInvitationUser } from 'lib/api/lasius/invitations-public/invitations-public';
 import { TegonalFooter } from 'components/shared/tegonalFooter';
 import { usePlausible } from 'next-plausible';
 import { LasiusPlausibleEvents } from 'lib/telemetry/plausibleEvents';
+import { registerOAuthUser } from 'lib/api/lasius/oauth2-provider/oauth2-provider';
+import { GetServerSideProps, NextPage } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
-type Props = {
-  invitation: ModelsInvitationStatusResponse;
-};
-
-export const InvitationUserRegister: React.FC<Props> = ({ invitation }) => {
+export const OAuthUserRegister: NextPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPasswords, setShowPasswords] = useState(false);
   const [error, setError] = useState('');
   const { t } = useTranslation('common');
   const router = useRouter();
+  const { invitation_id = undefined, email = undefined } = router.query;
   const plausible = usePlausible<LasiusPlausibleEvents>();
 
   const {
@@ -66,13 +62,17 @@ export const InvitationUserRegister: React.FC<Props> = ({ invitation }) => {
       lastName: '',
       password: '',
       confirmPassword: '',
-      email: invitation.invitation.invitedEmail,
+      email: email?.toString() || '',
     },
   });
 
   useEffect(() => {
-    setFocus('firstName');
-  }, [setFocus]);
+    if (email) {
+      setFocus('firstName');
+    } else {
+      setFocus('email');
+    }
+  }, [setFocus, email]);
 
   const onSubmit = async () => {
     const data = getValues();
@@ -84,19 +84,22 @@ export const InvitationUserRegister: React.FC<Props> = ({ invitation }) => {
     });
 
     setIsSubmitting(true);
-    const response = await registerInvitationUser(invitation.invitation.id, {
-      key: `${data.firstName[0]}.${data.lastName}-${random(1, 999)}`,
+    const response = await registerOAuthUser({
       firstName: data.firstName,
       lastName: data.lastName,
       password: data.confirmPassword,
-      plannedWorkingHours: { ...plannedWorkingHoursStub },
+      email: data.email,
     });
 
     if (response) {
       const email = encodeURIComponent(data.email);
-      await router.replace(
-        `/login?invitationId=${invitation.invitation.id}&email=${email}&registered=true`
-      );
+      const url =
+        '/login?' +
+        new URLSearchParams({
+          invitation_id: invitation_id?.toString() || '',
+          email: email?.toString() || '',
+        });
+      await router.replace(url);
     } else {
       setError('registerUserFailedUnknown');
     }
@@ -112,24 +115,19 @@ export const InvitationUserRegister: React.FC<Props> = ({ invitation }) => {
     <LoginLayout>
       <Logo />
       {error && <BoxWarning>{t(error as any)}</BoxWarning>}
-      <BoxInfo>
-        {t(
-          'You have been invited by {{inviter}} to create an account so that you can use Lasius to track your working hours.',
-          { inviter: invitation.invitation.createdBy.key }
-        )}
-      </BoxInfo>
+      {invitation_id && (
+        <BoxInfo>
+          {t(
+            'You have been invited to create an account so that you can use Lasius to track your working hours.'
+          )}
+        </BoxInfo>
+      )}
       <CardContainer>
         <form onSubmit={handleSubmit(onSubmit)}>
           <FormBody>
             <FormElement>
               <Label htmlFor="email">{t('E-Mail')}</Label>
-              <Input
-                readOnly
-                disabled
-                {...register('email', { required: true })}
-                autoComplete="off"
-                autoFocus
-              />
+              <Input {...register('email', { required: true })} autoComplete="off" autoFocus />
               <FormErrorBadge error={errors.email} />
             </FormElement>
             <FormElement>
@@ -154,6 +152,7 @@ export const InvitationUserRegister: React.FC<Props> = ({ invitation }) => {
                   },
                 })}
                 autoComplete="off"
+                autoFocus
                 type={showPasswords ? 'text' : 'password'}
               />
               <FormErrorsMultiple errors={errors.password as any} />
@@ -168,6 +167,7 @@ export const InvitationUserRegister: React.FC<Props> = ({ invitation }) => {
                   },
                 })}
                 autoComplete="off"
+                autoFocus
                 type={showPasswords ? 'text' : 'password'}
               />
               <FormErrorBadge error={errors.confirmPassword} />
@@ -199,3 +199,14 @@ export const InvitationUserRegister: React.FC<Props> = ({ invitation }) => {
     </LoginLayout>
   );
 };
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { locale = '' } = context;
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common'])),
+    },
+  };
+};
+
+export default OAuthUserRegister;

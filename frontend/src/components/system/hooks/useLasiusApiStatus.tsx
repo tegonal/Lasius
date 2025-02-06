@@ -21,19 +21,15 @@ import React from 'react';
 import { CONNECTION_STATUS, IS_BROWSER } from 'projectConfig/constants';
 import { useInterval } from 'usehooks-ts';
 import { API_STATUS_INTERVAL } from 'projectConfig/intervals';
-import { lasiusAxiosInstance } from 'lib/api/lasiusAxiosInstance';
 import { useBrowserConnectionStatus } from 'components/system/hooks/useBrowserConnectionStatus';
-import { getGetConfigurationKey } from 'lib/api/lasius/general/general';
+import { getConfiguration } from 'lib/api/lasius/general/general';
 import { logger } from 'lib/logger';
 import { LasiusPlausibleEvents } from 'lib/telemetry/plausibleEvents';
 import { usePlausible } from 'next-plausible';
 
 const testApiConnection = async () => {
   try {
-    await lasiusAxiosInstance({
-      url: getGetConfigurationKey().toString(),
-      method: 'get',
-    });
+    await getConfiguration();
     return CONNECTION_STATUS.CONNECTED;
   } catch (error) {
     logger.info(error);

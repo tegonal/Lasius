@@ -22,7 +22,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 1.1.0+14-d516163a+20250204-1552
+ * OpenAPI spec version: 1.1.0+15-0f9d0d82+20250206-0746
  */
 
 export interface ModelsWorkingHours {

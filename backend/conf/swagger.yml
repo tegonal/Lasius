@@ -8,7 +8,7 @@ components:
     bearerHttpAuthentication:
       description: Bearer token using a JWT
       type: http
-      scheme: Bearer
+      scheme: bearer
       bearerFormat: JWT
   schemas:
     models.Invitation:

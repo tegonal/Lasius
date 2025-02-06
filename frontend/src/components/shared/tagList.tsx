@@ -19,7 +19,6 @@
 
 import React from 'react';
 import { Badge, Box, Flex } from 'theme-ui';
-import { noop } from 'lodash';
 import { ModelsTags } from 'types/common';
 import { ToolTip } from 'components/shared/toolTip';
 import { Icon } from 'components/shared/icon';
