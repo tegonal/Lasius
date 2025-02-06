@@ -90,3 +90,5 @@ export enum CONNECTION_STATUS {
   DISCONNECTED = 'DISCONNECTED',
   ERROR = 'ERROR',
 }
+
+export const AUTH_PROVIDER_INTERNAL_LASIUS = 'internal_lasius';

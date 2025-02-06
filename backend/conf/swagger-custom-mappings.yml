@@ -38,6 +38,10 @@
   specAsParameter:
     - type: string
       format: uuid
+- type: uuid
+  specAsParameter:
+    - type: string
+      format: uuid
 - type: models\.OrganisationId
   specAsParameter:
     - type: string

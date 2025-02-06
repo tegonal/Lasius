@@ -28,7 +28,7 @@ type HttpHeaderProviderProps = {
 
 export const HttpHeaderProvider: React.FC<HttpHeaderProviderProps> = ({ session }) => {
   const getCSRFToken = async () => {
-    const response = await getCsrfToken()
+    const response = await getCsrfToken();
     axios.defaults.headers.post['Csrf-token'] = response.value;
     axios.defaults.headers.put['Csrf-token'] = response.value;
     axios.defaults.headers.delete['Csrf-token'] = response.value;

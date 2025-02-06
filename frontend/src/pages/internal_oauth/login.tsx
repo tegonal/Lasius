@@ -44,8 +44,11 @@ import { LasiusPlausibleEvents } from 'lib/telemetry/plausibleEvents';
 import { useStore } from 'storeContext/store';
 import { formatISOLocale } from 'lib/dates';
 import { LASIUS_API_URL } from 'projectConfig/constants';
+import { getConfiguration } from 'lib/api/lasius/general/general';
+import { ModelsApplicationConfig } from 'lib/api/lasius';
+import { getLoginMutationKey } from 'lib/api/lasius/oauth2-provider/oauth2-provider';
 
-const InternalOAuthLogin: NextPage<{ csrfToken: string }> = () => {
+const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig }> = ({ config }) => {
   const plausible = usePlausible<LasiusPlausibleEvents>();
   const store = useStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -53,7 +56,8 @@ const InternalOAuthLogin: NextPage<{ csrfToken: string }> = () => {
   const { t } = useTranslation('common');
   const router = useRouter();
   const {
-    email = null,
+    email = undefined,
+    invitation_id = undefined,
     registered = null,
     redirect_uri = '',
     client_id = '',
@@ -93,7 +97,7 @@ const InternalOAuthLogin: NextPage<{ csrfToken: string }> = () => {
     // We need to use fetch here as on client side the
     // browser will automatically follow the redirect when resolving the
     // XHTMLRequest and return this result instead
-    const res = await fetch(LASIUS_API_URL + `/oauth2/login`, {
+    const res = await fetch(LASIUS_API_URL + getLoginMutationKey()[0], {
       method: 'POST',
       redirect: 'follow',
       body: JSON.stringify({
@@ -131,6 +135,17 @@ const InternalOAuthLogin: NextPage<{ csrfToken: string }> = () => {
     }
 
     setIsSubmitting(false);
+  };
+
+  const onRegister = async () => {
+    // login user and handle invitation logic again
+    const url =
+      '/internal_oauth/register?' +
+      new URLSearchParams({
+        invitation_id: invitation_id?.toString() || '',
+        email: email?.toString() || '',
+      });
+    router.replace(url);
   };
 
   return (
@@ -194,6 +209,13 @@ const InternalOAuthLogin: NextPage<{ csrfToken: string }> = () => {
             </FormElement>
           </FormBody>
         </form>
+        {config.lasiusOAuthProviderAllowUserRegistration && (
+          <FormElement>
+            <Button variant="secondary" disabled={isSubmitting} onClick={() => onRegister()}>
+              {t('Sign up')}
+            </Button>
+          </FormElement>
+        )}
       </CardContainer>
       <TegonalFooter />
     </LoginLayout>
@@ -202,8 +224,10 @@ const InternalOAuthLogin: NextPage<{ csrfToken: string }> = () => {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { locale = '' } = context;
+  const config = await getConfiguration();
   return {
     props: {
+      config: config,
       ...(await serverSideTranslations(locale, ['common'])),
     },
   };

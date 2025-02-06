@@ -17,36 +17,40 @@
  *
  */
 
-import NextAuth, { JWT, NextAuthOptions } from 'next-auth';
+import NextAuth, { NextAuthOptions } from 'next-auth';
+import { JWT } from 'next-auth/jwt';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { logger } from 'lib/logger';
 import { OAuthConfig } from 'next-auth/providers';
+import { AUTH_PROVIDER_INTERNAL_LASIUS } from 'projectConfig/constants';
+import { t } from 'i18next';
 
 const internalProvider: OAuthConfig<any> = {
-  id: 'lasius-internal',
-  name: 'Internal Lasius',
+  id: AUTH_PROVIDER_INTERNAL_LASIUS,
+  // wrap into `t` to ensure we have a translation to it
+  name: t('Internal Lasius Sign in') || 'Internal Lasius Sign in',
   version: '2.0',
   type: 'oauth',
   // redirect to local login page
   authorization: {
-    url: 'http://localhost:3000/internal_oauth',
+    url: process.env.NEXTAUTH_URL + '/internal_oauth/login',
     params: {
       scope: 'profile openid email',
     },
   },
-  token: 'http://localhost:3000/backend/oauth2/access_token',
-  userinfo: 'http://localhost:3000/backend/oauth2/profile',
+  token: process.env.NEXTAUTH_URL + '/backend/oauth2/access_token',
+  userinfo: process.env.NEXTAUTH_URL + '/backend/oauth2/profile',
   clientId: process.env.LASIUS_OAUTH_CLIENT_ID,
   clientSecret: process.env.LASIUS_OAUTH_CLIENT_SECRET,
   checks: ['pkce', 'state'],
   idToken: false,
   profile(profile: any, tokens) {
-    console.log('profile', profile, tokens);
     return {
       id: profile.id.toString(),
       name: profile.firstName + ' ' + profile.lastName,
       email: profile.email,
       access_token: tokens.access_token,
+      provider: AUTH_PROVIDER_INTERNAL_LASIUS,
     };
   },
 };
@@ -56,14 +60,15 @@ const internalProvider: OAuthConfig<any> = {
  * `access_token` and `expires_at`. If an error occurs,
  * returns the old token and an error property
  */
-async function refreshAccessToken(token) {
+async function refreshAccessToken(token: JWT): Promise<JWT> {
   try {
     // TODO: support other providers
     const url =
-      'http://localhost:3000/backend/oauth2/access_token?' +
+      process.env.NEXTAUTH_URL +
+      '/backend/oauth2/access_token?' +
       new URLSearchParams({
         grant_type: 'refresh_token',
-        refresh_token: token.refreshToken,
+        refresh_token: token.refreshToken || '',
       });
 
     const response = await fetch(url, {
@@ -109,65 +114,63 @@ async function refreshAccessToken(token) {
   }
 }
 
-const nextAuthOptions = (): NextAuthOptions => {
-  return {
-    debug: true,
-    providers: [internalProvider],
-    session: {
-      strategy: 'jwt',
-    },
-    jwt: {
-      secret: process.env.NEXTAUTH_SECRET,
-    },
+export const nextAuthOptions: NextAuthOptions = {
+  debug: true,
+  providers: [internalProvider],
+  session: {
+    strategy: 'jwt',
+  },
+  jwt: {
     secret: process.env.NEXTAUTH_SECRET,
-    pages: {
-      signIn: '/login',
-      signOut: '/',
-    },
-    callbacks: {
-      async session({ session, token }) {
-        session.user = token.user;
-        session.access_token = token.access_token;
-        session.error = token.error;
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+  pages: {
+    signIn: '/login',
+    signOut: '/',
+  },
+  callbacks: {
+    async session({ session, token }) {
+      session.user = token.user;
+      session.access_token = token.access_token;
+      session.error = token.error;
 
-        return session;
-      },
-      async jwt({ token, account }) {
-        // Initial sign in
-        if (account) {
-          // First-time login, save the `access_token`, its expiry and the `refresh_token`
-          return {
-            ...token,
-            access_token: account.access_token,
-            expires_at: account.expires_at,
-            refresh_token: account.refresh_token,
-          };
-        } else if (!token.expires_at || Date.now() < token.expires_at * 1000) {
-          // Subsequent logins, but the `access_token` is still valid
-          return token;
-        } else {
-          // Subsequent logins, but the `access_token` has expired, try to refresh it
-          if (!token.refresh_token) throw new TypeError('Missing refresh_token');
+      return session;
+    },
+    async jwt({ token, account }) {
+      // Initial sign in
+      if (account) {
+        // First-time login, save the `access_token`, its expiry and the `refresh_token`
+        return {
+          ...token,
+          access_token: account.access_token,
+          expires_at: account.expires_at,
+          refresh_token: account.refresh_token,
+        };
+      } else if (!token.expires_at || Date.now() < token.expires_at * 1000) {
+        // Subsequent logins, but the `access_token` is still valid
+        return token;
+      } else {
+        // Subsequent logins, but the `access_token` has expired, try to refresh it
+        if (!token.refresh_token) throw new TypeError('Missing refresh_token');
 
-          // Access token has expired, try to update it
-          return refreshAccessToken(token);
-        }
-      },
+        // Access token has expired, try to update it
+        return refreshAccessToken(token);
+      }
     },
-    events: {
-      async signOut() {
-        logger.info('[nextauth][events][signOut]');
-      },
-      async signIn() {
-        logger.info('[nextauth][events][signIn]');
-      },
+  },
+  events: {
+    async signOut() {
+      logger.info('[nextauth][events][signOut]');
     },
-  };
+    async signIn() {
+      logger.info('[nextauth][events][signIn]');
+    },
+  },
 };
 
 // eslint-disable-next-line
 export default (req: NextApiRequest, res: NextApiResponse) => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  return NextAuth(req, res, nextAuthOptions(req, res));
+  return NextAuth(req, res, nextAuthOptions);
 };
