@@ -17,7 +17,7 @@
  *
  */
 
-import NextAuth, { NextAuthOptions } from 'next-auth';
+import NextAuth, { NextAuthOptions, User } from 'next-auth';
 import { JWT } from 'next-auth/jwt';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { logger } from 'lib/logger';
@@ -44,7 +44,7 @@ const internalProvider: OAuthConfig<any> = {
   clientSecret: process.env.LASIUS_OAUTH_CLIENT_SECRET,
   checks: ['pkce', 'state'],
   idToken: false,
-  profile(profile: any, tokens) {
+  profile: async (profile: any, tokens) => {
     return {
       id: profile.id.toString(),
       name: profile.firstName + ' ' + profile.lastName,
@@ -129,14 +129,12 @@ export const nextAuthOptions: NextAuthOptions = {
     signOut: '/',
   },
   callbacks: {
-    async session({ session, token }) {
-      session.user = token.user;
-      session.access_token = token.access_token;
-      session.error = token.error;
+    async session({ session, token, user }) {
+      session.user = token.user || user;
 
       return session;
     },
-    async jwt({ token, account }) {
+    async jwt({ token, account, user, profile, trigger }) {
       // Initial sign in
       if (account) {
         // First-time login, save the `access_token`, its expiry and the `refresh_token`
@@ -145,6 +143,10 @@ export const nextAuthOptions: NextAuthOptions = {
           access_token: account.access_token,
           expires_at: account.expires_at,
           refresh_token: account.refresh_token,
+          user: user || {
+            ...profile,
+            access_token: account.access_token,
+          },
         };
       } else if (!token.expires_at || Date.now() < token.expires_at * 1000) {
         // Subsequent logins, but the `access_token` is still valid
