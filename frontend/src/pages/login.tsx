@@ -98,13 +98,11 @@ const Login: NextPage<{ csrfToken: string; providers: ClientSafeProvider[] }> = 
 
   useEffect(() => {
     if (providers.length === 1) {
-      // why does this trigger an endless loop?
-      //signInToProvider(providers[0].id)
+      signInToProvider(providers[0].id);
     }
   }, [providers.length]);
 
-  //if (providers.length === 1) {
-  if (providers.length === 0) {
+  if (providers.length === 1) {
     return (
       <LoginLayout>
         <Logo />
