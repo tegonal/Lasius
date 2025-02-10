@@ -22,16 +22,13 @@ import { DefaultJWT } from 'next-auth/jwt';
 
 declare module 'next-auth' {
   interface Session extends DefaultSession {
-    access_token?: string;
-    user: DefaultSession['user'] & User;
-    error?: string;
+    user?: DefaultSession['user'] & User;
   }
   interface User extends DefaultUser {
     access_token?: string;
-    provider?: string
+    provider?: string;
   }
 }
-
 
 declare module 'next-auth/jwt' {
   interface JWT extends DefaultJWT {

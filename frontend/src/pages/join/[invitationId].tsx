@@ -19,35 +19,32 @@
 
 import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/react';
 import { InvitationInvalid } from 'layout/pages/invitation/invitationInvalid';
 import { InvitationUserConfirm } from 'layout/pages/invitation/invitationUserConfirm';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { InvitationOtherSession } from 'layout/pages/invitation/InvitationOtherSession';
 import { useAsync } from 'react-async-hook';
 import { getInvitationStatus } from 'lib/api/lasius/invitations-public/invitations-public';
+import { getServerSession, Session } from 'next-auth';
+import { nextAuthOptions } from 'pages/api/auth/[...nextauth]';
 
-const Join: NextPage = () => {
+const Join: NextPage<{ session: Session }> = ({ session }) => {
   const router = useRouter();
-  const session = useSession();
   const { invitationId = '' } = router.query as { invitationId: string };
 
   const invitationStatus = useAsync((id: string) => getInvitationStatus(id), [invitationId]);
 
-  if (invitationStatus.loading || session.status === 'loading') return null;
+  if (invitationStatus.loading) return null;
 
   if (invitationStatus.status === 'error') {
     return <InvitationInvalid />;
   }
 
   const invitation = invitationStatus.result;
+  console.log('session', session);
 
-  if (
-    invitation?.invitation?.id &&
-    invitation?.invitation?.invitedEmail &&
-    session.status !== 'authenticated'
-  ) {
-    console.log('[join][notAuthenticated]]', session.status);
+  if (invitation?.invitation?.id && invitation?.invitation?.invitedEmail && session === null) {
+    console.log('[join][notAuthenticated]]', session);
     // login user and handle invitation logic again
     const url =
       '/login?' +
@@ -58,9 +55,9 @@ const Join: NextPage = () => {
     router.replace(url);
   }
 
-  if (invitation && session.status === 'authenticated') {
+  if (invitation && session !== null) {
     // check if invitation matches current users session
-    if (session.data.user && session.data.user.email !== invitation.invitation.invitedEmail) {
+    if (session.user && session.user.email !== invitation.invitation.invitedEmail) {
       return <InvitationOtherSession invitation={invitation} />;
     }
 
@@ -73,8 +70,10 @@ const Join: NextPage = () => {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { locale = '' } = context;
+  const session = await getServerSession(context.req, context.res, nextAuthOptions);
   return {
     props: {
+      session,
       ...(await serverSideTranslations(locale, ['common'])),
     },
   };

@@ -27,7 +27,8 @@ import { isAdminOfCurrentOrg } from 'lib/api/functions/isAdminOfCurrentOrg';
 import { ModelsUser } from 'lib/api/lasius';
 import { getUserProfile } from 'lib/api/lasius/user/user';
 import { getRequestHeaders } from 'lib/api/hooks/useTokensWithAxiosRequests';
-import { getSession } from 'next-auth/react';
+import { getServerSession } from 'next-auth';
+import { nextAuthOptions } from 'pages/api/auth/[...nextauth]';
 
 const AllProjectsPage: NextPageWithLayout = ({ profile }) => {
   if (isAdminOfCurrentOrg(profile as ModelsUser)) {
@@ -38,8 +39,10 @@ const AllProjectsPage: NextPageWithLayout = ({ profile }) => {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { locale = '' } = context;
-  const session = await getSession({ req: context.req });
-  const profile = await getUserProfile(getRequestHeaders(session?.access_token || ''));
+  const session = await getServerSession(context.req, context.res, nextAuthOptions);
+  const profile = session?.user?.access_token
+    ? await getUserProfile(getRequestHeaders(session.user?.access_token))
+    : undefined;
   return {
     props: {
       profile,

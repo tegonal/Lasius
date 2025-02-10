@@ -40,7 +40,8 @@ export const HttpHeaderProvider: React.FC<HttpHeaderProviderProps> = ({ session 
 
   // Set the token for client side requests to use
   useEffect(() => {
-    const token = session?.access_token;
+    console.log('session', session);
+    const token = session?.user?.access_token;
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     } else {

@@ -26,8 +26,9 @@ import { BookingHistoryLayout } from 'components/bookingHistory/bookingHistoryLa
 import { getUserProfile } from 'lib/api/lasius/user/user';
 import { isAdminOfCurrentOrg } from 'lib/api/functions/isAdminOfCurrentOrg';
 import { ModelsUser } from 'lib/api/lasius';
-import { getSession } from 'next-auth/react';
 import { getRequestHeaders } from 'lib/api/hooks/useTokensWithAxiosRequests';
+import { nextAuthOptions } from 'pages/api/auth/[...nextauth]';
+import { getServerSession } from 'next-auth';
 
 const ListsPage: NextPageWithLayout = ({ profile }) => {
   if (isAdminOfCurrentOrg(profile as ModelsUser)) {
@@ -38,8 +39,10 @@ const ListsPage: NextPageWithLayout = ({ profile }) => {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { locale = '' } = context;
-  const session = await getSession({ req: context.req });
-  const profile = await getUserProfile(getRequestHeaders(session?.access_token || ''));
+  const session = await getServerSession(context.req, context.res, nextAuthOptions);
+  const profile = session?.user?.access_token
+    ? await getUserProfile(getRequestHeaders(session.user?.access_token))
+    : undefined;
   return {
     props: {
       profile,

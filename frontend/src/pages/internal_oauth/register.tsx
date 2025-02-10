@@ -38,6 +38,7 @@ import { LasiusPlausibleEvents } from 'lib/telemetry/plausibleEvents';
 import { registerOAuthUser } from 'lib/api/lasius/oauth2-provider/oauth2-provider';
 import { GetServerSideProps, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { AxiosError } from 'axios';
 
 export const OAuthUserRegister: NextPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -47,6 +48,12 @@ export const OAuthUserRegister: NextPage = () => {
   const router = useRouter();
   const { invitation_id = undefined, email = undefined } = router.query;
   const plausible = usePlausible<LasiusPlausibleEvents>();
+
+  // list of known error response codes, used tp provide translations only
+  const translations = [
+    t('register_user_unkown_error'),
+    t('register_user_user_already_registered'),
+  ];
 
   const {
     register,
@@ -84,24 +91,31 @@ export const OAuthUserRegister: NextPage = () => {
     });
 
     setIsSubmitting(true);
-    const response = await registerOAuthUser({
-      firstName: data.firstName,
-      lastName: data.lastName,
-      password: data.confirmPassword,
-      email: data.email,
-    });
+    try {
+      const response = await registerOAuthUser({
+        firstName: data.firstName,
+        lastName: data.lastName,
+        password: data.confirmPassword,
+        email: data.email,
+      });
 
-    if (response) {
-      const email = encodeURIComponent(data.email);
-      const url =
-        '/login?' +
-        new URLSearchParams({
-          invitation_id: invitation_id?.toString() || '',
-          email: email?.toString() || '',
-        });
-      await router.replace(url);
-    } else {
-      setError('registerUserFailedUnknown');
+      if (response) {
+        const url =
+          '/login?' +
+          new URLSearchParams({
+            invitation_id: invitation_id?.toString() || '',
+            email: data.email?.toString() || '',
+          });
+        await router.replace(url);
+      } else {
+        setError('registerUserFailedUnknown');
+      }
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        setError(error.response?.data || 'unknown_error');
+      } else {
+        setError('unknown_error');
+      }
     }
     setIsSubmitting(false);
   };
@@ -114,7 +128,7 @@ export const OAuthUserRegister: NextPage = () => {
   return (
     <LoginLayout>
       <Logo />
-      {error && <BoxWarning>{t(error as any)}</BoxWarning>}
+      {error && <BoxWarning>{t(('register_user_' + error) as any)}</BoxWarning>}
       {invitation_id && (
         <BoxInfo>
           {t(

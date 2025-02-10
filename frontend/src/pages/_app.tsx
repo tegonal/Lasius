@@ -91,7 +91,7 @@ const App = ({
 }: AppPropsWithLayout): JSX.Element => {
   // Use the layout defined at the page level, if available
   const getLayout = Component.getLayout ?? ((page) => page);
-  const lasiusIsLoggedIn = !!(session?.access_token && profile?.id);
+  const lasiusIsLoggedIn = !!(session?.user?.access_token && profile?.id);
   const store = useStore();
 
   useAsync(async () => {
@@ -182,11 +182,9 @@ App.getInitialProps = async ({
 }: ExtendedAppContext) => {
   const session = await getSession({ req });
   let profile = null;
-  const access_token = session?.access_token;
-
-  if (access_token) {
+  if (session?.user?.access_token) {
     try {
-      profile = await getUserProfile(getRequestHeaders(access_token));
+      profile = await getUserProfile(getRequestHeaders(session.user?.access_token));
     } catch (error) {
       logger.error(error);
 
