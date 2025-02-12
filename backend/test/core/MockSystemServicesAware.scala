@@ -52,7 +52,8 @@ class MockServices(actorSystem: ActorSystem) extends SystemServices {
     title = "Lasius",
     instance = "Test",
     lasiusOAuthProviderEnabled = true,
-    lasiusOAuthProviderAllowUserRegistration = true
+    lasiusOAuthProviderAllowUserRegistration = true,
+    allowedIssuers = Seq()
   )
   val supervisor: ActorRef =
     actorSystem.actorOf(LasiusSupervisorActor.props, "lasius-test-supervisor")

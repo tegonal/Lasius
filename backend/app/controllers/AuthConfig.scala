@@ -42,6 +42,8 @@ import scala.concurrent.{ExecutionContext, Future}
 @ImplementedBy(classOf[DefaultAuthConfig])
 trait AuthConfig {
 
+  def authorizeIssuer(issuer: String): Boolean
+
   /** Map usertype to permission role.
     */
   def authorizeUser(user: User, role: UserRole)(implicit
@@ -82,6 +84,9 @@ class DefaultAuthConfig @Inject() (
     with AuthConfig
     with UserHelper
     with SecurityRepositoryComponent {
+
+  override def authorizeIssuer(issuer: String): Boolean =
+    systemServices.appConfig.allowedIssuers.contains(issuer)
 
   /** Map usertype to permission role.
     */

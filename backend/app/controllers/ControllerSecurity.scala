@@ -89,19 +89,21 @@ trait TokenSecurity extends Logging {
       success: DBSession => Subject => Future[R])(implicit
       context: ExecutionContext): Future[R] = {
     val jwtSession = deserializeJwtSession(token)
-    if (jwtSession.claim.issuer.isEmpty) {
-      failed
-    } else {
+    jwtSession.claim.issuer.fold(failed) { issuer =>
       logger.debug(s"Got token: $jwtSession")
-      // TODO: verify issuer based on configuration
-
-      withDBSession(withinTransaction) { implicit dbSession =>
-        authConfig
-          .resolveOrCreateUserByJwt(jwt = ExtendedJwtSession(jwtSession),
-                                    canCreateNewUser = canCreateNewUser)
-          .flatMap { user =>
-            success(dbSession)(Subject(jwtSession, user))
-          }
+      if (authConfig.authorizeIssuer(issuer)) {
+        withDBSession(withinTransaction) { implicit dbSession =>
+          authConfig
+            .resolveOrCreateUserByJwt(jwt = ExtendedJwtSession(jwtSession),
+                                      canCreateNewUser = canCreateNewUser)
+            .flatMap { user =>
+              success(dbSession)(Subject(jwtSession, user))
+            }
+        }
+      } else {
+        logger.warn(
+          s"Trying to access endpoint with unsupported issuers: $issuer")
+        failed
       }
     }
   }
