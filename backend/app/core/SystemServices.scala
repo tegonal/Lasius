@@ -52,6 +52,7 @@ import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext}
 import scala.language.postfixOps
+import scala.jdk.CollectionConverters._
 
 @ImplementedBy(classOf[DefaultSystemServices])
 trait SystemServices {
@@ -181,13 +182,21 @@ class DefaultSystemServices @Inject() (
   LoginHandler.subscribe(loginHandler, system.eventStream)
 
   val appConfig: ApplicationConfig = {
+    val oauthEnabled   = config.getBoolean("lasius.oauth2_provider.enabled")
+    val internalIssuer = config.getString("lasius.oauth2_provider.issuer")
+    val externalAllowedIssuers =
+      config.getStringList("lasius.allowed_external_issuers").asScala.toSeq
+    val allowedIssuers =
+      if (oauthEnabled) internalIssuer +: externalAllowedIssuers
+      else externalAllowedIssuers
+
     ApplicationConfig(
       title = config.getString("lasius.title"),
       instance = config.getString("lasius.instance"),
-      lasiusOAuthProviderEnabled =
-        config.getBoolean("lasius.oauth2_provider.enabled"),
+      lasiusOAuthProviderEnabled = oauthEnabled,
       lasiusOAuthProviderAllowUserRegistration =
-        config.getBoolean("lasius.oauth2_provider.allow_register_users")
+        config.getBoolean("lasius.oauth2_provider.allow_register_users"),
+      allowedIssuers = allowedIssuers
     )
   }
 
