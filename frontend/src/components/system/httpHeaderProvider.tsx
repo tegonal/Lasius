@@ -20,11 +20,18 @@
 import React, { useEffect } from 'react';
 import axios from 'axios';
 import { getCsrfToken } from 'lib/api/lasius/general/general';
-import { useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
+import { Session } from 'next-auth';
+import { useRouter } from 'next/router';
+import { removeAccessibleCookies } from 'lib/removeAccessibleCookies';
 
+type HttpHeaderProviderProps = {
+  initialSession: Session
+}
 
-export const HttpHeaderProvider: React.FC = () => {
+export const HttpHeaderProvider: React.FC<HttpHeaderProviderProps> = ({initialSession}) => {
   const { data: session } = useSession();
+  const router = useRouter();
 
   const getCSRFToken = async () => {
     const response = await getCsrfToken();
@@ -39,15 +46,20 @@ export const HttpHeaderProvider: React.FC = () => {
 
   // Set the token for client side requests to use
   useEffect(() => {
-    console.error('session changed', session);
-    const token = session?.user?.access_token;
+    console.error('session changed', session, initialSession);
+    const token = session?.user?.access_token || initialSession?.user?.access_token;
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     } else {
       // legacy
       delete axios.defaults.headers.common['Authorization'];
     }
-  }, [session]);
+    if (session?.error && session?.user?.access_token) {
+      console.error('Updating session failed', session.error);
+      removeAccessibleCookies();
+      signOut();
+    }
+  }, [initialSession, session]);
 
   return null;
 };

@@ -113,7 +113,7 @@ const App = ({
         }}
       >
         <SessionProvider session={session} refetchOnWindowFocus={true}>
-          <HttpHeaderProvider />
+          <HttpHeaderProvider initialSession={session}/>
           <Head>
             <meta
               name="viewport"
