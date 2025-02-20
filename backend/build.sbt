@@ -67,12 +67,15 @@ libraryDependencies ++= Seq(
   "io.kontainers"       %% "purecsv"                         % "1.3.10",
   "com.chuusai"         %% "shapeless"                       % "2.3.12",
   "net.openhft"          % "zero-allocation-hashing"         % "0.27ea0",
+  "com.github.pureconfig" %% "pureconfig" % "0.17.8",
   // depend on this plugin to be able to provide custom OutputTransformer
   "io.github.play-swagger" %% "play-swagger" % "2.0.4",
   "com.github.fdimuccio"   %% "play2-sockjs" % "0.10.0",
 
-  // basic jwt token support
-  "com.github.jwt-scala" %% "jwt-play" % "10.0.1",
+  // basic jwt token and jwks support
+  // "com.github.jwt-scala" %% "jwt-play" % "10.0.1",
+  "com.auth0" % "java-jwt" % "4.5.0",
+  "com.auth0" % "jwks-rsa" % "0.22.1",
 
   // oauth2 provider dependencies
   // oauth2 provider dependencies to be able to provide a simple oauth server packed with lasius

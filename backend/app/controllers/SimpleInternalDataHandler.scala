@@ -21,9 +21,13 @@
 
 package controllers
 
-import com.typesafe.config.Config
 import core.{DBSession, DBSupport}
-import models.{OAuthAccessToken, OAuthAuthorizationCode, OAuthUser}
+import models.{
+  LasiusConfig,
+  OAuthAccessToken,
+  OAuthAuthorizationCode,
+  OAuthUser
+}
 import org.joda.time.DateTime
 import play.api.Logging
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -42,25 +46,17 @@ class SimpleInternalDataHandler(
     oauthUserRepository: OAuthUserRepository,
     oauthAccessTokenRepository: OAuthAccessTokenRepository,
     oauthAuthorizationCodeRepository: OAuthAuthorizationCodeRepository,
-    typesafeConfig: Config
+    implicit val config: LasiusConfig
 )(implicit ec: ExecutionContext)
     extends DataHandler[OAuthUser]
     with DBSupport
     with Logging {
 
-  private val oauthClientId =
-    typesafeConfig.getString("lasius.oauth2_provider.client_id")
-  private val oauthClientSecret =
-    typesafeConfig.getString("lasius.oauth2_provider.client_secret")
-  private val authorizationTokenLifespan =
-    typesafeConfig.getDuration(
-      "lasius.oauth2_provider.authorization_code_lifespan")
-
   def validateClient(maybeClientCredential: Option[ClientCredential],
                      request: AuthorizationRequest): Future[Boolean] =
     Future.successful(maybeClientCredential.exists { clientCredential =>
-      clientCredential.clientId == oauthClientId && clientCredential.clientSecret
-        .contains(oauthClientSecret)
+      clientCredential.clientId == config.security.oauth2Provider.clientId && clientCredential.clientSecret
+        .contains(config.security.oauth2Provider.clientSecret)
     })
 
   def findUser(maybeClientCredential: Option[ClientCredential],
@@ -115,8 +111,10 @@ class SimpleInternalDataHandler(
       code: OAuthAuthorizationCode,
       user: OAuthUser): Option[AuthInfo[OAuthUser]] = (code, user) match {
     case (c, _)
-        if c.createdAt.isBefore(
-          DateTime.now().minus(authorizationTokenLifespan.toMillis)) =>
+        if c.createdAt.isBefore(DateTime
+          .now()
+          .minus(
+            config.security.oauth2Provider.authorizationCode.lifespan.toMillis)) =>
       logger.warn(s"authorization code expired")
       None
     case (_, u) if !u.active =>

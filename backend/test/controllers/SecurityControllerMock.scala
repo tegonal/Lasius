@@ -21,15 +21,17 @@
 
 package controllers
 
+import com.auth0.jwt.interfaces.DecodedJWT
 import core.{CacheAware, DBSession, DBSupport}
 import helpers.UserHelper
 import models._
 import org.specs2.mock.Mockito
-import pdi.jwt.{JwtClaim, JwtSession}
 import play.api.Logging
 import play.api.mvc._
 import repositories.{SecurityRepositoryComponent, UserRepository}
 import util.MockAwaitable
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -60,10 +62,12 @@ trait SecurityControllerMock
     deactivatedBy = None
   )
 
-  val jwtSession: JwtSession = JwtSession(JwtClaim("""{
-      |"subject": "test_user",
-      |"email": "test@lasius.com"
-      |}""".stripMargin))
+  val jwtToken: DecodedJWT = JWT.decode(
+    JWT
+      .create()
+      .withSubject("test_user")
+      .withClaim(LasiusJWT.EMAIL_CLAIM, "test@lasius.com")
+      .sign(Algorithm.none()))
 
   val projectActive: Boolean = true
   val project: Project =
@@ -108,7 +112,7 @@ trait SecurityControllerMock
       context: ExecutionContext): Action[A] = {
     Action.async(p) { implicit request =>
       withDBSession() { dbSession =>
-        checked(f(dbSession)(Subject(jwtSession, userReference))(request))
+        checked(f(dbSession)(Subject(jwtToken, userReference))(request))
       }
     }
   }
@@ -120,7 +124,7 @@ trait SecurityControllerMock
       context: ExecutionContext): Action[A] = {
     Action.async(p) { implicit request =>
       withDBSession() { dbSession =>
-        checked(f(dbSession)(Subject(jwtSession, userReference))(user)(request))
+        checked(f(dbSession)(Subject(jwtToken, userReference))(user)(request))
       }
     }
   }

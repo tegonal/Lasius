@@ -22,15 +22,17 @@
 package core
 
 import actors.LasiusSupervisorActor
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
+import com.auth0.jwt.interfaces.DecodedJWT
 import com.typesafe.config.ConfigFactory
+import models.UserId.UserReference
+import models._
 import org.apache.pekko.actor.{ActorRef, ActorSystem}
 import org.apache.pekko.stream.Materializer
 import org.apache.pekko.testkit.TestProbe
 import org.apache.pekko.util.Timeout
-import models.{ApplicationConfig, EntityReference, Subject, UserId}
-import models.UserId.UserReference
 import org.specs2.mock.Mockito.mock
-import pdi.jwt.{JwtClaim, JwtSession}
 import play.api.Configuration
 import play.modules.reactivemongo.ReactiveMongoApi
 
@@ -48,12 +50,28 @@ class MockServicesProvider @Inject() (actorSystem: ActorSystem)
 
 class MockServices(actorSystem: ActorSystem) extends SystemServices {
 
-  override val appConfig: ApplicationConfig = ApplicationConfig(
+  override val lasiusConfig: LasiusConfig = LasiusConfig(
     title = "Lasius",
     instance = "Test",
-    lasiusOAuthProviderEnabled = true,
-    lasiusOAuthProviderAllowUserRegistration = true,
-    allowedIssuers = Seq()
+    initializeViewsOnStartup = false,
+    security = LasiusSecurityConfig(
+      accessRestriction = None,
+      externalIssuers = Seq(),
+      oauth2Provider = InternalOauth2ProviderConfig(
+        enabled = true,
+        allowRegisterUsers = true,
+        clientId = "",
+        clientSecret = "",
+        authorizationCode = AuthorizationCodeConfig(
+          lifespan = java.time.Duration.ofMinutes(1),
+        ),
+        jwtToken = JWTTokenConfig(
+          issuer = "lasius",
+          lifespan = java.time.Duration.ofDays(1),
+          privateKey = "sadasdddfasddasd"
+        )
+      )
+    )
   )
   val supervisor: ActorRef =
     actorSystem.actorOf(LasiusSupervisorActor.props, "lasius-test-supervisor")
@@ -69,12 +87,14 @@ class MockServices(actorSystem: ActorSystem) extends SystemServices {
 
   implicit val clock: Clock              = Clock.systemUTC
   implicit val playConfig: Configuration = Configuration(ConfigFactory.load())
-  val jwtSession: JwtSession = JwtSession(JwtClaim("""{
-      |"subject": "test_user",
-      |"email": "test@lasius.com"
-      |}""".stripMargin))
+  val jwtToken: DecodedJWT = JWT.decode(
+    JWT
+      .create()
+      .withSubject("test_user")
+      .withClaim(LasiusJWT.EMAIL_CLAIM, "test@lasius.com")
+      .sign(Algorithm.none()))
   override val systemSubject: Subject =
-    Subject(jwtSession, systemUserReference)
+    Subject(jwtToken, systemUserReference)
   implicit val timeout: Timeout = Timeout(5 seconds) // needed for `?` below
   val duration: Duration        = Duration.create(5, SECONDS)
   val timeBookingViewService: ActorRef = TestProbe().ref

@@ -28,6 +28,7 @@ import mongo.EmbedMongo
 import org.joda.time.LocalDate
 import org.specs2.mock.Mockito
 import org.specs2.mock.mockito.MockitoMatchers
+import play.api.cache.SyncCacheApi
 import util.MockAwaitable
 import play.api.libs.json._
 import play.api.mvc._
@@ -56,7 +57,8 @@ class TimeBookingStatisticsControllerSpec
         TimeBookingStatisticsControllerMock(config,
                                             systemServices,
                                             authConfig,
-                                            reactiveMongoApi)
+                                            reactiveMongoApi,
+                                            jwkProviderCache)
 
       controller.bookingByTagRepository
         .findAggregatedByUserAndRange(any[EntityReference[UserId]],
@@ -91,7 +93,8 @@ class TimeBookingStatisticsControllerSpec
         TimeBookingStatisticsControllerMock(config,
                                             systemServices,
                                             authConfig,
-                                            reactiveMongoApi)
+                                            reactiveMongoApi,
+                                            jwkProviderCache)
 
       val to: LocalDate          = LocalDate.now()
       val from: LocalDate        = to.minusDays(1)
@@ -112,7 +115,8 @@ object TimeBookingStatisticsControllerMock extends MockAwaitable with Mockito {
   def apply(config: Config,
             systemServices: SystemServices,
             authConfig: AuthConfig,
-            reactiveMongoApi: ReactiveMongoApi)(implicit
+            reactiveMongoApi: ReactiveMongoApi,
+            jwkProviderCache: SyncCacheApi)(implicit
       ec: ExecutionContext): TimeBookingStatisticsController
     with SecurityControllerMock
     with MockCacheAware = {
@@ -120,12 +124,15 @@ object TimeBookingStatisticsControllerMock extends MockAwaitable with Mockito {
     val bookingByTagRepository     = mockAwaitable[BookingByTagRepository]
 
     new TimeBookingStatisticsController(
-      config,
-      Helpers.stubControllerComponents(),
-      systemServices,
-      authConfig,
-      reactiveMongoApi,
-      bookingByProjectRepository,
-      bookingByTagRepository) with SecurityControllerMock with MockCacheAware
+      conf = config,
+      controllerComponents = Helpers.stubControllerComponents(),
+      systemServices = systemServices,
+      authConfig = authConfig,
+      reactiveMongoApi = reactiveMongoApi,
+      bookingByProjectRepository = bookingByProjectRepository,
+      bookingByTagRepository = bookingByTagRepository,
+      jwkProviderCache = jwkProviderCache)
+      with SecurityControllerMock
+      with MockCacheAware
   }
 }

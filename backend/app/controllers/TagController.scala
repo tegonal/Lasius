@@ -27,6 +27,7 @@ import org.apache.pekko.pattern.ask
 import org.apache.pekko.util.Timeout
 import core.SystemServices
 import models._
+import play.api.cache.SyncCacheApi
 import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -44,6 +45,7 @@ class TagController @Inject() (
     override val authConfig: AuthConfig,
     override val userRepository: UserRepository,
     override val reactiveMongoApi: ReactiveMongoApi,
+    override val jwkProviderCache: SyncCacheApi,
     projectRepository: ProjectRepository)(implicit ec: ExecutionContext)
     extends BaseLasiusController()
     with SecurityRepositoryComponent {

@@ -22,22 +22,25 @@
 package core
 
 import actors.{ClientReceiver, LasiusSupervisorActor, TagCache}
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
 import com.google.inject.ImplementedBy
 import com.typesafe.config.Config
 import core.db.InitialDataLoader
 import domain.LoginStateAggregate
 import domain.views.CurrentOrganisationTimeBookingsView
 import models.UserId.UserReference
-import models.{ApplicationConfig, EntityReference, Subject, UserId}
+import models.{EntityReference, LasiusConfig, Subject, UserId}
 import org.apache.pekko.actor.{ActorRef, ActorSystem}
 import org.apache.pekko.pattern.ask
 import org.apache.pekko.stream.Materializer
 import org.apache.pekko.util.Timeout
-import pdi.jwt.{JwtClaim, JwtSession}
-import play.api.{Configuration, Logging}
 import play.api.inject.Injector
 import play.api.libs.ws.WSClient
+import play.api.{Configuration, Logging}
 import play.modules.reactivemongo.ReactiveMongoApi
+import pureconfig._
+import pureconfig.generic.auto._
 import repositories._
 import services.{
   CurrentUserTimeBookingsViewService,
@@ -52,7 +55,6 @@ import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext}
 import scala.language.postfixOps
-import scala.jdk.CollectionConverters._
 
 @ImplementedBy(classOf[DefaultSystemServices])
 trait SystemServices {
@@ -73,7 +75,7 @@ trait SystemServices {
   val system: ActorSystem
   val materializer: Materializer
   val supportTransaction: Boolean
-  val appConfig: ApplicationConfig
+  val lasiusConfig: LasiusConfig
 
   def initialize(): Unit
 }
@@ -105,14 +107,24 @@ class DefaultSystemServices @Inject() (
   override val supportTransaction: Boolean =
     config.getBoolean("db.support_transactions")
 
+  lazy val lasiusConfig: LasiusConfig =
+    ConfigSource
+      .fromConfig(config.getConfig("lasius"))
+      .loadOrThrow[LasiusConfig]
+
   private val systemUUID =
     UUID.fromString("0000000-0000-0000-0000-000000000000")
   val systemUser: UserId = UserId(systemUUID)
   implicit val systemUserReference: UserReference = {
     EntityReference(systemUser, "system")
   }
+  private val systemJWT = JWT.decode(
+    JWT
+      .create()
+      .withSubject("system")
+      .sign(Algorithm.none()))
   val systemSubject: Subject =
-    Subject(JwtSession(JwtClaim("")), systemUserReference)
+    Subject(systemJWT, systemUserReference)
   implicit val timeout: Timeout = Timeout(5 seconds) // needed for `?` below
   val duration: FiniteDuration  = Duration.create(30, SECONDS)
   override val timeBookingViewService: ActorRef = Await
@@ -169,6 +181,7 @@ class DefaultSystemServices @Inject() (
                planeConfigRepository,
                this,
                wsClient,
+               lasiusConfig,
                reactiveMongoApi),
       duration
     )
@@ -180,25 +193,6 @@ class DefaultSystemServices @Inject() (
 
   // initialize login handler
   LoginHandler.subscribe(loginHandler, system.eventStream)
-
-  val appConfig: ApplicationConfig = {
-    val oauthEnabled   = config.getBoolean("lasius.oauth2_provider.enabled")
-    val internalIssuer = config.getString("lasius.oauth2_provider.issuer")
-    val externalAllowedIssuers =
-      config.getStringList("lasius.allowed_external_issuers").asScala.toSeq
-    val allowedIssuers =
-      if (oauthEnabled) internalIssuer +: externalAllowedIssuers
-      else externalAllowedIssuers
-
-    ApplicationConfig(
-      title = config.getString("lasius.title"),
-      instance = config.getString("lasius.instance"),
-      lasiusOAuthProviderEnabled = oauthEnabled,
-      lasiusOAuthProviderAllowUserRegistration =
-        config.getBoolean("lasius.oauth2_provider.allow_register_users"),
-      allowedIssuers = allowedIssuers
-    )
-  }
 
   override def initialize(): Unit = {
 

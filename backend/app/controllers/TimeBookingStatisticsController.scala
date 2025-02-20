@@ -27,6 +27,7 @@ import core.SystemServices
 import core.Validation.ValidationFailedException
 import models._
 import org.joda.time._
+import play.api.cache.SyncCacheApi
 import play.api.libs.json._
 import play.api.mvc.{Action, ControllerComponents}
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -41,6 +42,7 @@ class TimeBookingStatisticsController @Inject() (
     override val systemServices: SystemServices,
     override val authConfig: AuthConfig,
     override val reactiveMongoApi: ReactiveMongoApi,
+    override val jwkProviderCache: SyncCacheApi,
     val bookingByProjectRepository: BookingByProjectRepository,
     val bookingByTagRepository: BookingByTagRepository)(implicit
     ec: ExecutionContext)

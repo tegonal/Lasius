@@ -27,6 +27,7 @@ import models._
 import mongo.EmbedMongo
 import org.specs2.mock.Mockito
 import org.specs2.mock.mockito.MockitoMatchers
+import play.api.cache.SyncCacheApi
 import play.api.mvc._
 import play.api.test._
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -55,7 +56,8 @@ class UsersControllerSpec
         UsersControllerMock(config,
                             systemServices,
                             authConfig,
-                            reactiveMongoApi)
+                            reactiveMongoApi,
+                            jwkProviderCache)
 
       private val request: FakeRequest[PersonalDataUpdate] = FakeRequest()
         .withBody(
@@ -80,7 +82,8 @@ class UsersControllerSpec
         UsersControllerMock(config,
                             systemServices,
                             authConfig,
-                            reactiveMongoApi)
+                            reactiveMongoApi,
+                            jwkProviderCache)
 
       private val request: FakeRequest[PersonalDataUpdate] = FakeRequest()
         .withBody(
@@ -107,7 +110,8 @@ class UsersControllerSpec
         UsersControllerMock(config,
                             systemServices,
                             authConfig,
-                            reactiveMongoApi)
+                            reactiveMongoApi,
+                            jwkProviderCache)
 
       // initialize
       val user2: User = User(UserId(),
@@ -147,7 +151,8 @@ class UsersControllerSpec
         UsersControllerMock(config,
                             systemServices,
                             authConfig,
-                            reactiveMongoApi)
+                            reactiveMongoApi,
+                            jwkProviderCache)
 
       val request: FakeRequest[PersonalDataUpdate] = FakeRequest()
         .withBody(
@@ -184,7 +189,8 @@ class UsersControllerSpec
         UsersControllerMock(config,
                             systemServices,
                             authConfig,
-                            reactiveMongoApi)
+                            reactiveMongoApi,
+                            jwkProviderCache)
 
       val request: FakeRequest[PersonalDataUpdate] = FakeRequest()
         .withBody(
@@ -286,7 +292,8 @@ class UsersControllerSpec
         UsersControllerMock(config,
                             systemServices,
                             authConfig,
-                            reactiveMongoApi)
+                            reactiveMongoApi,
+                            jwkProviderCache)
 
       val request: FakeRequest[UpdateUserOrganisation] = FakeRequest()
         .withBody(
@@ -308,7 +315,8 @@ class UsersControllerSpec
         UsersControllerMock(config,
                             systemServices,
                             authConfig,
-                            reactiveMongoApi)
+                            reactiveMongoApi,
+                            jwkProviderCache)
 
       val workingHours: WorkingHours =
         WorkingHours(monday = 8, tuesday = 4, wednesday = 2, sunday = 1)
@@ -334,19 +342,22 @@ object UsersControllerMock extends MockAwaitable with Mockito with Awaitable {
   def apply(config: Config,
             systemServices: SystemServices,
             authConfig: AuthConfig,
-            reactiveMongoApi: ReactiveMongoApi)(implicit
+            reactiveMongoApi: ReactiveMongoApi,
+            jwkProviderCache: SyncCacheApi)(implicit
       ec: ExecutionContext): UsersController
     with SecurityControllerMock
     with MockCacheAware
     with TestDBSupport = {
     val mongoUserRepository = new UserMongoRepository()
 
-    val controller = new UsersController(config,
-                                         Helpers.stubControllerComponents(),
-                                         systemServices,
-                                         authConfig,
-                                         reactiveMongoApi,
-                                         mongoUserRepository)
+    val controller = new UsersController(conf = config,
+                                         controllerComponents =
+                                           Helpers.stubControllerComponents(),
+                                         systemServices = systemServices,
+                                         authConfig = authConfig,
+                                         reactiveMongoApi = reactiveMongoApi,
+                                         jwkProviderCache = jwkProviderCache,
+                                         userRepository = mongoUserRepository)
       with SecurityControllerMock
       with MockCacheAware
       with TestDBSupport {

@@ -21,9 +21,9 @@
 
 package models
 
+import com.auth0.jwt.interfaces.DecodedJWT
 import models.UserId.UserReference
-import pdi.jwt.JwtSession
 
-case class Subject(jwt: JwtSession, userReference: UserReference) {
-  def extendedJwtClaims: ExtendedJwtSession = ExtendedJwtSession(jwt)
+case class Subject(jwt: DecodedJWT, userReference: UserReference) {
+  def extendedJwtClaims: LasiusJWT = LasiusJWT(jwt)
 }

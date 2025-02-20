@@ -31,6 +31,7 @@ import actors.scheduler.{
 }
 import org.apache.pekko.actor._
 import core.LoginHandler.InitializeUserViews
+import models.LasiusConfig
 import play.api.libs.ws.WSClient
 import play.modules.reactivemongo.ReactiveMongoApi
 import repositories._
@@ -45,15 +46,19 @@ object PluginHandler {
             planeConfigRepository: PlaneConfigRepository,
             systemServices: SystemServices,
             wsClient: WSClient,
+            config: LasiusConfig,
             reactiveMongoApi: ReactiveMongoApi): Props =
-    Props(classOf[PluginHandler],
-          userRepository,
-          jiraConfigRepository,
-          gitlabConfigRepository,
-          planeConfigRepository,
-          systemServices,
-          wsClient,
-          reactiveMongoApi)
+    Props(
+      classOf[PluginHandler],
+      userRepository,
+      jiraConfigRepository,
+      gitlabConfigRepository,
+      planeConfigRepository,
+      systemServices,
+      wsClient,
+      config,
+      reactiveMongoApi
+    )
 
   case object Startup
 
@@ -66,10 +71,10 @@ class PluginHandler(userRepository: UserRepository,
                     planeConfigRepository: PlaneConfigRepository,
                     systemServices: SystemServices,
                     wsClient: WSClient,
+                    config: LasiusConfig,
                     override val reactiveMongoApi: ReactiveMongoApi)
     extends Actor
     with ActorLogging
-    with ConfigAware
     with DBSupport {
 
   override val supportTransaction: Boolean = systemServices.supportTransaction
@@ -108,10 +113,8 @@ class PluginHandler(userRepository: UserRepository,
   }
 
   private def initializeUserViews()(implicit dbSession: DBSession): Unit = {
-    val initializeViews = config
-      .getBoolean("lasius.persistence.on_startup.initialize_views")
-    log.debug(s"initializeUserViews:$initializeViews")
-    if (initializeViews) {
+    log.debug(s"initializeUserViews:${config.initializeViewsOnStartup}")
+    if (config.initializeViewsOnStartup) {
       userRepository.findAll().foreach { users =>
         log.debug(s"findAllUsers:${users.map(_.getReference)}")
         users.foreach(user =>

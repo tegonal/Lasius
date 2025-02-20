@@ -32,6 +32,7 @@ import play.api.test._
 import play.modules.reactivemongo.ReactiveMongoApi
 import util.MockAwaitable
 import com.typesafe.config.Config
+import play.api.cache.SyncCacheApi
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -56,7 +57,8 @@ class TimeBookingControllerSpec
         TimeBookingControllerMock(config,
                                   systemServices,
                                   authConfig,
-                                  reactiveMongoApi)
+                                  reactiveMongoApi,
+                                  jwkProviderCache)
       val projectId: ProjectId = ProjectId()
       val request: FakeRequest[StartBookingRequest] = FakeRequest()
         .withBody(
@@ -81,7 +83,8 @@ class TimeBookingControllerSpec
         TimeBookingControllerMock(config,
                                   systemServices,
                                   authConfig,
-                                  reactiveMongoApi)
+                                  reactiveMongoApi,
+                                  jwkProviderCache)
 
       val request: FakeRequest[StartBookingRequest] = FakeRequest()
         .withBody(
@@ -109,7 +112,8 @@ class TimeBookingControllerSpec
         TimeBookingControllerMock(config,
                                   systemServices,
                                   authConfig,
-                                  reactiveMongoApi)
+                                  reactiveMongoApi,
+                                  jwkProviderCache)
 
       val projectId: ProjectId = ProjectId()
       val request: FakeRequest[EditBookingRequest] = FakeRequest()
@@ -136,7 +140,8 @@ class TimeBookingControllerSpec
         TimeBookingControllerMock(config,
                                   systemServices,
                                   authConfig,
-                                  reactiveMongoApi)
+                                  reactiveMongoApi,
+                                  jwkProviderCache)
 
       val request: FakeRequest[EditBookingRequest] = FakeRequest()
         .withBody(
@@ -163,7 +168,8 @@ class TimeBookingControllerSpec
         TimeBookingControllerMock(config,
                                   systemServices,
                                   authConfig,
-                                  reactiveMongoApi)
+                                  reactiveMongoApi,
+                                  jwkProviderCache)
 
       val from: DateTime = DateTime.now()
       val to: DateTime   = from.minusDays(1)
@@ -196,7 +202,8 @@ class TimeBookingControllerSpec
         TimeBookingControllerMock(config,
                                   systemServices,
                                   authConfig,
-                                  reactiveMongoApi)
+                                  reactiveMongoApi,
+                                  jwkProviderCache)
 
       val from: DateTime       = DateTime.now()
       val to: DateTime         = from.plusHours(1)
@@ -223,7 +230,8 @@ class TimeBookingControllerSpec
         TimeBookingControllerMock(config,
                                   systemServices,
                                   authConfig,
-                                  reactiveMongoApi)
+                                  reactiveMongoApi,
+                                  jwkProviderCache)
 
       val from: DateTime = DateTime.now()
       val to: DateTime   = from.plusHours(1)
@@ -249,7 +257,8 @@ class TimeBookingControllerSpec
         TimeBookingControllerMock(config,
                                   systemServices,
                                   authConfig,
-                                  reactiveMongoApi)
+                                  reactiveMongoApi,
+                                  jwkProviderCache)
 
       val from: DateTime = DateTime.now()
       val to: DateTime   = from.minusHours(1)
@@ -273,16 +282,20 @@ object TimeBookingControllerMock extends MockAwaitable with Mockito {
   def apply(config: Config,
             systemServices: SystemServices,
             authConfig: AuthConfig,
-            reactiveMongoApi: ReactiveMongoApi)(implicit
+            reactiveMongoApi: ReactiveMongoApi,
+            jwkProviderCache: SyncCacheApi)(implicit
       ec: ExecutionContext): TimeBookingController
     with SecurityControllerMock
     with MockCacheAware = {
 
-    new TimeBookingController(
-      config,
-      Helpers.stubControllerComponents(),
-      authConfig,
-      reactiveMongoApi,
-      systemServices) with SecurityControllerMock with MockCacheAware
+    new TimeBookingController(conf = config,
+                              controllerComponents =
+                                Helpers.stubControllerComponents(),
+                              authConfig = authConfig,
+                              reactiveMongoApi = reactiveMongoApi,
+                              systemServices = systemServices,
+                              jwkProviderCache = jwkProviderCache)
+      with SecurityControllerMock
+      with MockCacheAware
   }
 }

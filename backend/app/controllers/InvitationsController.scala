@@ -26,6 +26,7 @@ import core.Validation.ValidationFailedException
 import core.{DBSession, SystemServices}
 import models._
 import org.joda.time.DateTime
+import play.api.cache.SyncCacheApi
 import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -43,13 +44,13 @@ class InvitationsController @Inject() (
     override val conf: Config,
     override val controllerComponents: ControllerComponents,
     override val systemServices: SystemServices,
+    override val authConfig: AuthConfig,
+    override val reactiveMongoApi: ReactiveMongoApi,
+    override val jwkProviderCache: SyncCacheApi,
     userRepository: UserRepository,
     organisationRepository: OrganisationRepository,
     invitationRepository: InvitationRepository,
-    projectRepository: ProjectRepository,
-    override val authConfig: AuthConfig,
-    override val reactiveMongoApi: ReactiveMongoApi)(implicit
-    ec: ExecutionContext)
+    projectRepository: ProjectRepository)(implicit ec: ExecutionContext)
     extends BaseLasiusController() {
 
   /** Unauthenticated endpoint

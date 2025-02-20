@@ -25,6 +25,7 @@ import com.typesafe.config.Config
 import core.{MockCacheAware, SystemServices, TestDBSupport}
 import models.{OrganisationAdministrator, OrganisationRole}
 import org.specs2.mock.Mockito
+import play.api.cache.SyncCacheApi
 import play.api.mvc.ControllerComponents
 import play.api.test.Helpers
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -43,18 +44,21 @@ class OrganisationsControllerMock(
     val projectRepository: ProjectMongoRepository,
     authConfig: AuthConfig,
     reactiveMongoApi: ReactiveMongoApi,
+    jwkProviderCache: SyncCacheApi,
     override val organisationRole: OrganisationRole,
     override val isOrganisationPrivate: Boolean,
     override val organisationActive: Boolean)(implicit ec: ExecutionContext)
-    extends OrganisationsController(config,
-                                    controllerComponents,
-                                    systemServices,
-                                    organisationRepository,
-                                    userMongoRepository,
-                                    invitationRepository,
-                                    projectRepository,
-                                    authConfig,
-                                    reactiveMongoApi)
+    extends OrganisationsController(conf = config,
+                                    controllerComponents = controllerComponents,
+                                    systemServices = systemServices,
+                                    authConfig = authConfig,
+                                    reactiveMongoApi = reactiveMongoApi,
+                                    jwkProviderCache = jwkProviderCache,
+                                    organisationRepository =
+                                      organisationRepository,
+                                    userRepository = userMongoRepository,
+                                    invitationRepository = invitationRepository,
+                                    projectRepository = projectRepository)
     with SecurityControllerMock
     with MockCacheAware
     with TestDBSupport {
@@ -71,6 +75,7 @@ object OrganisationsControllerMock
             systemServices: SystemServices,
             authConfig: AuthConfig,
             reactiveMongoApi: ReactiveMongoApi,
+            jwkProviderCache: SyncCacheApi,
             organisationRole: OrganisationRole = OrganisationAdministrator,
             isOrganisationPrivate: Boolean = false,
             organisationActive: Boolean = true)(implicit
@@ -81,18 +86,19 @@ object OrganisationsControllerMock
     val organisationMongoRepository = new OrganisationMongoRepository()
 
     val controller = new OrganisationsControllerMock(
-      config,
-      Helpers.stubControllerComponents(),
-      systemServices,
-      organisationMongoRepository,
-      userMongoRepository,
-      invitationMongoRepository,
-      projectMongoRepository,
-      authConfig,
-      reactiveMongoApi,
-      organisationRole,
+      config = config,
+      controllerComponents = Helpers.stubControllerComponents(),
+      systemServices = systemServices,
+      organisationRepository = organisationMongoRepository,
+      userMongoRepository = userMongoRepository,
+      invitationRepository = invitationMongoRepository,
+      projectRepository = projectMongoRepository,
+      authConfig = authConfig,
+      reactiveMongoApi = reactiveMongoApi,
+      jwkProviderCache = jwkProviderCache,
       isOrganisationPrivate = isOrganisationPrivate,
-      organisationActive = organisationActive)
+      organisationActive = organisationActive,
+      organisationRole = organisationRole)
 
     // initialize data
     controller

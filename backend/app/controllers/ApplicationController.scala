@@ -33,13 +33,15 @@ import javax.inject.Inject
 import scala.concurrent.Future
 import com.typesafe.config.Config
 import models.CsrfToken
+import play.api.cache.SyncCacheApi
 import play.filters.csrf.CSRF
 
 class ApplicationController @Inject() (
     override val conf: Config,
     override val controllerComponents: ControllerComponents,
     override val authConfig: AuthConfig,
-    override val systemServices: SystemServices)(implicit
+    override val systemServices: SystemServices,
+    override val jwkProviderCache: SyncCacheApi)(implicit
     override val reactiveMongoApi: ReactiveMongoApi)
     extends BaseLasiusController() {
 
@@ -53,7 +55,8 @@ class ApplicationController @Inject() (
   /** Load application config
     */
   def getConfig: Action[AnyContent] = Action.async {
-    Future.successful(Ok(Json.toJson(systemServices.appConfig)))
+    Future.successful(
+      Ok(Json.toJson(systemServices.lasiusConfig.toApplicationConfig)))
   }
 
   def getCsrfToken: Action[AnyContent] = Action.async { implicit request =>

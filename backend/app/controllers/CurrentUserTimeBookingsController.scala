@@ -29,6 +29,7 @@ import domain.views.CurrentUserTimeBookingsView._
 import models._
 import play.api.libs.json._
 import play.api.mvc.{Action, ControllerComponents}
+import play.api.cache.SyncCacheApi
 import play.modules.reactivemongo.ReactiveMongoApi
 
 import javax.inject.{Inject, Singleton}
@@ -40,8 +41,8 @@ class CurrentUserTimeBookingsController @Inject() (
     override val controllerComponents: ControllerComponents,
     override val systemServices: SystemServices,
     override val authConfig: AuthConfig,
-    override val reactiveMongoApi: ReactiveMongoApi)(implicit
-    ec: ExecutionContext)
+    override val reactiveMongoApi: ReactiveMongoApi,
+    override val jwkProviderCache: SyncCacheApi)(implicit ec: ExecutionContext)
     extends BaseLasiusController() {
 
   implicit val timeout: Timeout = systemServices.timeout

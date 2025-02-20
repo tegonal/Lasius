@@ -24,7 +24,6 @@ package controllers
 import com.google.inject.ImplementedBy
 import core.{DBSession, SystemServices}
 import helpers.UserHelper
-import models.ExtendedJwtSession
 import models.UserId.UserReference
 import models._
 import play.api.libs.json.Json.toJsFieldJsValueWrapper
@@ -42,7 +41,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @ImplementedBy(classOf[DefaultAuthConfig])
 trait AuthConfig {
 
-  def authorizeIssuer(issuer: String): Boolean
+  def resolveIssuerConfig(issuer: String): Option[JWTIssuerConfig]
 
   /** Map usertype to permission role.
     */
@@ -64,7 +63,7 @@ trait AuthConfig {
 
   /** Lookup user by token
     */
-  def resolveOrCreateUserByJwt(jwt: ExtendedJwtSession,
+  def resolveOrCreateUserByJwt(jwt: LasiusJWT,
                                canCreateNewUser: Boolean = true)(implicit
       context: ExecutionContext,
       dbSession: DBSession): Future[UserReference]
@@ -85,8 +84,8 @@ class DefaultAuthConfig @Inject() (
     with UserHelper
     with SecurityRepositoryComponent {
 
-  override def authorizeIssuer(issuer: String): Boolean =
-    systemServices.appConfig.allowedIssuers.contains(issuer)
+  override def resolveIssuerConfig(issuer: String): Option[JWTIssuerConfig] =
+    systemServices.lasiusConfig.security.allowedIssuers.find(_.issuer == issuer)
 
   /** Map usertype to permission role.
     */
@@ -119,7 +118,7 @@ class DefaultAuthConfig @Inject() (
     userRepository.findByUserReference(userReference)
 
   override def resolveOrCreateUserByJwt(
-      jwt: ExtendedJwtSession,
+      jwt: LasiusJWT,
       canCreateNewUser: Boolean = true)(implicit
       context: ExecutionContext,
       dbSession: DBSession): Future[UserReference] = {

@@ -21,91 +21,161 @@
 
 package controllers
 
+import com.auth0.jwk.JwkProviderBuilder
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
+import com.auth0.jwt.interfaces.DecodedJWT
+import com.typesafe.config.Config
 import core.Validation.ValidationFailedException
 import core.{DBSession, DBSupport}
-import models.ExtendedJwtSession
 import models._
-import pdi.jwt.JwtSession.RichRequestHeader
-import play.api.{Configuration, Logging}
+import play.api.Logging
+import play.api.cache.SyncCacheApi
 import play.api.libs.json.Reads
 import play.api.mvc._
-import com.typesafe.config.Config
-import pdi.jwt.{JwtOptions, JwtSession}
 
-import java.time.Clock
+import java.security.interfaces.{ECPublicKey, RSAPublicKey}
+import java.security.spec.X509EncodedKeySpec
+import java.security.{KeyFactory, PublicKey}
+import java.util.Base64
+import java.util.concurrent.TimeUnit
 import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
+import scala.util.Try
 
 /** Security actions that should be used by all controllers that need to protect
   * their actions. Can be composed to fine-tune access control.
   */
 
-trait JWTSessionSupport {
-  val conf: Config
-  implicit val playConf: Configuration = Configuration(conf)
-
-  implicit val clock: Clock = Clock.systemUTC
+trait ConfigAware {
+  implicit val conf: Config
 }
 
-trait SecurityComponent extends JWTSessionSupport {
+trait SecurityComponent extends ConfigAware {
   val authConfig: AuthConfig
+  val jwkProviderCache: SyncCacheApi
 }
 
 trait TokenSecurity extends Logging {
   self: SecurityComponent with DBSupport =>
-  private def sanitizeHeader(header: String): String =
-    if (header.startsWith(JwtSession.TOKEN_PREFIX)) {
-      header.substring(JwtSession.TOKEN_PREFIX.length()).trim
-    } else {
-      header.trim
+
+  private def decodeJWT(token: String) =
+    Try(JWT.decode(token))
+
+  private def evaluateSigningAlgorithm(token: DecodedJWT,
+                                       config: JWTIssuerConfig) = {
+
+    def algorithmFromPublicKey(pubKey: PublicKey) =
+      (token.getAlgorithm, pubKey) match {
+        case ("RS256", key: RSAPublicKey) => Some(Algorithm.RSA256(key))
+        case ("RS384", key: RSAPublicKey) => Some(Algorithm.RSA384(key))
+        case ("RS512", key: RSAPublicKey) => Some(Algorithm.RSA512(key))
+        case ("ES256", key: ECPublicKey)  => Some(Algorithm.ECDSA256(key))
+        case ("ES384", key: ECPublicKey)  => Some(Algorithm.ECDSA384(key))
+        case ("ES512", key: ECPublicKey)  => Some(Algorithm.ECDSA512(key))
+        case _                            => None
+      }
+
+    def loadJWKProvider(jwk: JWKConfig) = {
+      val builder = new JwkProviderBuilder(jwk.url)
+      jwk.cache.foreach { cache =>
+        builder.cached(cache.cacheSize, cache.expiresIn)
+      }
+      jwk.rateLimit.foreach { rateLimit =>
+        builder.rateLimited(rateLimit.bucketSize,
+                            rateLimit.refillRate.toSeconds,
+                            TimeUnit.SECONDS)
+      }
+      jwk.timeouts.foreach { timeouts =>
+        builder.timeouts(timeouts.connectTimeout.toMillis.toInt,
+                         timeouts.readTimeout.toMillis.toInt)
+      }
+      builder.build()
     }
 
-  private def deserializeJwtSession(token: String) = {
-    JwtSession.deserialize(token,
-                           JwtOptions(
-                             signature = true,
-                             notBefore = true,
-                             expiration = true,
-                             leeway = 60
-                           ))
+    config match {
+      // first prio validate by private key
+      case JWTIssuerConfig(_, _, Some(pk), _) =>
+        token.getAlgorithm match {
+          case "HS256" => Some(Algorithm.HMAC256(pk))
+          case "HS384" => Some(Algorithm.HMAC384(pk))
+          case "HS512" => Some(Algorithm.HMAC512(pk))
+          case _       => None
+        }
+      // second prio validate by static public key
+      case JWTIssuerConfig(_, Some(pk), _, _) =>
+        val kf =
+          if (token.getAlgorithm.startsWith("RSA"))
+            KeyFactory.getInstance("RSA")
+          else KeyFactory.getInstance("EC")
+        val keySpecX509 = new X509EncodedKeySpec(Base64.getDecoder.decode(pk))
+        val pubKey      = kf.generatePublic(keySpecX509)
+
+        algorithmFromPublicKey(pubKey)
+
+      // third prio validate by jwk
+      case JWTIssuerConfig(issuer, _, _, Some(jwkConfig)) =>
+        val provider = jwkProviderCache.getOrElseUpdate(issuer) {
+          loadJWKProvider(jwkConfig)
+        }
+        val jwk = provider.get(token.getKeyId)
+        algorithmFromPublicKey(jwk.getPublicKey)
+
+      // else validate without a signing key
+      case JWTIssuerConfig(_, _, _, _) =>
+        Some(Algorithm.none())
+    }
   }
 
-  /** Override extracting jwt session to be able to overrule validation
-    * behaviour
-    * @param request
-    * @return
-    */
-  protected def extractJwtToken(
-      request: RequestHeader
-  ): Option[String] =
-    request.headers
-      .get(JwtSession.REQUEST_HEADER_NAME)
-      .map(sanitizeHeader)
+  private def validateToken(token: DecodedJWT,
+                            config: JWTIssuerConfig,
+                            algorithm: Algorithm) =
+    Try(
+      JWT
+        .require(algorithm)
+        .withIssuer(config.issuer)
+        // Maybe extract to config
+        .acceptLeeway(60)
+        .build()
+        .verify(token))
+
+  private def resolveAndValidateToken(
+      token: String): Either[Throwable, DecodedJWT] = {
+    for {
+      jwt <- decodeJWT(token).toEither
+      config <- authConfig
+        .resolveIssuerConfig(jwt.getIssuer)
+        .toRight(ValidationFailedException("Could not resolve issuer"))
+      algorithm <- evaluateSigningAlgorithm(jwt, config).toRight(
+        ValidationFailedException("Could not evaluate singing algorithm"))
+      validatedToken <- validateToken(jwt, config, algorithm).toEither
+      // TODO validate email against allowed users to access
+    } yield validatedToken
+  }
 
   def withToken[R](token: String,
                    withinTransaction: Boolean,
                    canCreateNewUser: Boolean)(failed: => Future[R])(
       success: DBSession => Subject => Future[R])(implicit
       context: ExecutionContext): Future[R] = {
-    val jwtSession = deserializeJwtSession(token)
-    jwtSession.claim.issuer.fold(failed) { issuer =>
-      logger.debug(s"Got token: $jwtSession")
-      if (authConfig.authorizeIssuer(issuer)) {
+    resolveAndValidateToken(token).fold(
+      { error =>
+        logger.debug(s"Failed decoding JWT token: ${error.getMessage}")
+        failed
+      },
+      { jwt =>
+        logger.debug(s"Got validated token: $jwt")
         withDBSession(withinTransaction) { implicit dbSession =>
           authConfig
-            .resolveOrCreateUserByJwt(jwt = ExtendedJwtSession(jwtSession),
+            .resolveOrCreateUserByJwt(jwt = LasiusJWT(jwt),
                                       canCreateNewUser = canCreateNewUser)
             .flatMap { user =>
-              success(dbSession)(Subject(jwtSession, user))
+              success(dbSession)(Subject(jwt, user))
             }
         }
-      } else {
-        logger.warn(
-          s"Trying to access endpoint with unsupported issuers: $issuer")
-        failed
       }
-    }
+    )
   }
 }
 
@@ -119,25 +189,35 @@ trait ControllerSecurity extends TokenSecurity {
     HasToken(parse.json[A], withinTransaction)(f)
   }
 
+  private def sanitizeHeader(header: String): String =
+    if (header.startsWith(LasiusJWT.TOKEN_PREFIX)) {
+      header.substring(LasiusJWT.TOKEN_PREFIX.length()).trim
+    } else {
+      header.trim
+    }
+
+  private def extractJwtToken(
+      request: RequestHeader
+  ): Option[String] =
+    request.headers
+      .get(LasiusJWT.REQUEST_HEADER_NAME)
+      .map(sanitizeHeader)
+
   /** */
   def HasToken[A](p: BodyParser[A], withinTransaction: Boolean)(
       f: DBSession => Subject => Request[A] => Future[Result])(implicit
       context: ExecutionContext): Action[A] = {
     Action.async(p) { request =>
-      if (request.hasJwtHeader) {
-        extractJwtToken(request).fold {
-          successful(Unauthorized("No JWT token found"))
-        } { token =>
-          withToken(token = token,
-                    withinTransaction = withinTransaction,
-                    canCreateNewUser = true) {
-            successful(Unauthorized(s"Invalid JWT token provided $token"))
-          } { dbSession => subject =>
-            f(dbSession)(subject)(request)
-          }
-        }
-      } else {
+      extractJwtToken(request).fold {
         successful(Unauthorized("No JWT token found"))
+      } { token =>
+        withToken(token = token,
+                  withinTransaction = withinTransaction,
+                  canCreateNewUser = true) {
+          successful(Unauthorized(s"Invalid JWT token provided $token"))
+        } { dbSession => subject =>
+          f(dbSession)(subject)(request)
+        }
       }
     }
   }
