@@ -95,7 +95,7 @@ object ClientMessagingWebsocketActor {
 }
 
 class ClientMessagingWebsocketActor(
-    systemServices: SystemServices,
+    override val systemServices: SystemServices,
     override val conf: Config,
     override val reactiveMongoApi: ReactiveMongoApi,
     override val authConfig: AuthConfig,

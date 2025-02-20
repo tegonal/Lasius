@@ -139,7 +139,12 @@ class OAuth2Controller @Inject() (
         checked {
           withinTransaction { implicit dbSession =>
             for {
-              // TODO: validate email address matches regex of allowed users to access lasius
+              // Validate email to register will have access to lasius afterwards
+              _ <- failIf(
+                systemServices.lasiusConfig.security.accessRestriction
+                  .fold(false)(_.canAccess(request.body.email)),
+                s"Cannot register with email address ${request.body.email}, access not granted"
+              )
               // Create new user
               user <- oauthUserRepository.create(request.body)
             } yield Ok(Json.toJson(user.id))

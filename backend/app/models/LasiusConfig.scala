@@ -57,7 +57,9 @@ case class LasiusSecurityConfig(
 
 case class AccessRestrictionConfig(
     emailRegex: String
-)
+) {
+  def canAccess(email: String): Boolean = email.matches(emailRegex)
+}
 
 case class InternalOauth2ProviderConfig(
     enabled: Boolean,
