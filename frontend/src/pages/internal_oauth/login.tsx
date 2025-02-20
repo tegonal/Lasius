@@ -114,6 +114,8 @@ const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig }> = ({ con
         'Content-type': 'application/json; charset=UTF-8',
       },
     });
+
+    setIsSubmitting(false);
     if (res?.status === 401) {
       setError('usernameOrPasswordWrong');
       setValue('password', '');
@@ -130,11 +132,11 @@ const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig }> = ({ con
           status: 'success',
         },
       });
-      store.dispatch({ type: 'calendar.setSelectedDate', payload: formatISOLocale(new Date()) });
+
+      store.dispatch({ type: 'calendar.setSelectedDate', payload: formatISOLocale(new Date()) });      
+
       await router.push(res.url);
     }
-
-    setIsSubmitting(false);
   };
 
   const onRegister = async () => {

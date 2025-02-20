@@ -93,14 +93,14 @@ const App = ({
   const getLayout = Component.getLayout ?? ((page) => page);
   const lasiusIsLoggedIn = !!(session?.user?.access_token && profile?.id);
   const store = useStore();
-
+  
   useAsync(async () => {
     if (!lasiusIsLoggedIn) {
       logger.info('[App][UserNotLoggedIn]');
       store.dispatch({ type: 'reset' });
       await removeAccessibleCookies();
     } else {
-      logger.info('[App][UserLoggedIn]', session);
+      logger.info('[App][UserLoggedIn]');
     }
   }, [lasiusIsLoggedIn]);
 
@@ -112,8 +112,8 @@ const App = ({
           use: [swrLogger as any],
         }}
       >
-        <SessionProvider session={session}>
-          <HttpHeaderProvider session={session} />
+        <SessionProvider session={session} refetchOnWindowFocus={true}>
+          <HttpHeaderProvider />
           <Head>
             <meta
               name="viewport"
@@ -186,7 +186,7 @@ App.getInitialProps = async ({
     try {
       profile = await getUserProfile(getRequestHeaders(session.user?.access_token));
     } catch (error) {
-      logger.error(error);
+      //logger.error(error);
 
       if (res && !pathname.includes('/login')) {
         res.writeHead(307, { Location: '/login' });

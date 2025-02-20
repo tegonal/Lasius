@@ -19,14 +19,13 @@
 
 import React, { useEffect } from 'react';
 import axios from 'axios';
-import { Session } from 'next-auth';
 import { getCsrfToken } from 'lib/api/lasius/general/general';
+import { useSession } from 'next-auth/react';
 
-type HttpHeaderProviderProps = {
-  session: Session;
-};
 
-export const HttpHeaderProvider: React.FC<HttpHeaderProviderProps> = ({ session }) => {
+export const HttpHeaderProvider: React.FC = () => {
+  const { data: session } = useSession();
+
   const getCSRFToken = async () => {
     const response = await getCsrfToken();
     axios.defaults.headers.post['Csrf-token'] = response.value;
@@ -40,7 +39,7 @@ export const HttpHeaderProvider: React.FC<HttpHeaderProviderProps> = ({ session 
 
   // Set the token for client side requests to use
   useEffect(() => {
-    console.log('session', session);
+    console.error('session changed', session);
     const token = session?.user?.access_token;
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
