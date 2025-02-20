@@ -25,9 +25,8 @@ import com.auth0.jwk.JwkProviderBuilder
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.DecodedJWT
-import com.typesafe.config.Config
 import core.Validation.ValidationFailedException
-import core.{DBSession, DBSupport}
+import core.{ConfigAware, DBSession, DBSupport, SystemServices}
 import models._
 import play.api.Logging
 import play.api.cache.SyncCacheApi
@@ -47,17 +46,13 @@ import scala.util.Try
 /** Security actions that should be used by all controllers that need to protect
   * their actions. Can be composed to fine-tune access control.
   */
-
-trait ConfigAware {
-  implicit val conf: Config
-}
-
-trait SecurityComponent extends ConfigAware {
+trait SecurityComponent {
+  val systemServices: SystemServices
   val authConfig: AuthConfig
   val jwkProviderCache: SyncCacheApi
 }
 
-trait TokenSecurity extends Logging {
+trait TokenSecurity extends Logging with ConfigAware {
   self: SecurityComponent with DBSupport =>
 
   private def decodeJWT(token: String) =
@@ -140,17 +135,27 @@ trait TokenSecurity extends Logging {
         .build()
         .verify(token))
 
+  private def validateSubjectHasAccess(token: DecodedJWT) =
+    systemServices.lasiusConfig.security.accessRestriction.fold(true) {
+      accessConfig => accessConfig.canAccess(token.getSubject)
+    }
+
   private def resolveAndValidateToken(
       token: String): Either[Throwable, DecodedJWT] = {
     for {
       jwt <- decodeJWT(token).toEither
+      _ =
+        if (validateSubjectHasAccess(jwt)) Right(true)
+        else
+          Left(
+            UnauthorizedException(
+              s"Access for subject '${jwt.getSubject}' not granted'"))
       config <- authConfig
         .resolveIssuerConfig(jwt.getIssuer)
-        .toRight(ValidationFailedException("Could not resolve issuer"))
+        .toRight(UnauthorizedException("Could not resolve issuer"))
       algorithm <- evaluateSigningAlgorithm(jwt, config).toRight(
-        ValidationFailedException("Could not evaluate singing algorithm"))
+        UnauthorizedException("Could not evaluate singing algorithm"))
       validatedToken <- validateToken(jwt, config, algorithm).toEither
-      // TODO validate email against allowed users to access
     } yield validatedToken
   }
 
