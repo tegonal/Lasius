@@ -23,6 +23,7 @@ import { DefaultJWT } from 'next-auth/jwt';
 declare module 'next-auth' {
   interface Session extends DefaultSession {
     user?: DefaultSession['user'] & User;
+    error?: string;
   }
   interface User extends DefaultUser {
     access_token?: string;

@@ -31,7 +31,6 @@ import {
   getCsrfToken,
   signIn,
   ClientSafeProvider,
-  useSession,
 } from 'next-auth/react';
 import { Trans, useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
