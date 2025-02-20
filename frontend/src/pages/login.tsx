@@ -51,7 +51,6 @@ const Login: NextPage<{ csrfToken: string; providers: ClientSafeProvider[] }> = 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { t } = useTranslation('common');
   const router = useRouter();
-  const { update } = useSession();
   const { invitation_id = null, email = null } = router.query;
 
   const signInToProvider = async (provider: string) => {
@@ -77,6 +76,8 @@ const Login: NextPage<{ csrfToken: string; providers: ClientSafeProvider[] }> = 
         invitation_id: invitation_id?.toString() || '',
       })
     );
+  
+    setIsSubmitting(false);
 
     if (!res?.error && res?.url) {
       plausible('login', {
@@ -84,16 +85,12 @@ const Login: NextPage<{ csrfToken: string; providers: ClientSafeProvider[] }> = 
           status: 'success',
           provider: provider,
         },
-      });
-
-      // update session manually
-      update();
+      });      
 
       store.dispatch({ type: 'calendar.setSelectedDate', payload: formatISOLocale(new Date()) });
       await router.push(res.url);
     }
-
-    setIsSubmitting(false);
+      
   };
 
   useEffect(() => {

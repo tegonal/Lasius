@@ -62,7 +62,7 @@ export const lasiusAxiosInstance = <T>(
   })
     .then(({ data }) => data)
     .catch(async (error) => {
-      logger.info('error', error);
+      //logger.info('error', error);
       if (Axios.isCancel(error)) {
         logger.info('[lasiusAxiosInstance][RequestCanceled]', error.message);
       } else if (error.response.status === 401) {
@@ -78,11 +78,11 @@ export const lasiusAxiosInstance = <T>(
           config.headers?.Authorization
         ) {
           // perform logout as token might not be valid anymore
-          logger.info('[lasiusAxiosInstance][TokenNotValidAnymore]', error);
+          logger.info('[lasiusAxiosInstance][TokenNotValidAnymore]', error.status);
           await removeAccessibleCookies();
           await signOut();
         } else {
-          logger.info('[lasiusAxiosInstance][Unauthorized]', error);
+          logger.info('[lasiusAxiosInstance][Unauthorized]', error.status);
           throw new Error(error);
         }
       } else {

@@ -49,8 +49,8 @@ const internalProvider: OAuthConfig<any> = {
       id: profile.id.toString(),
       name: profile.firstName + ' ' + profile.lastName,
       email: profile.email,
-      access_token: tokens.access_token,
       provider: AUTH_PROVIDER_INTERNAL_LASIUS,
+      access_token: tokens.access_token
     };
   },
 };
@@ -62,20 +62,20 @@ const internalProvider: OAuthConfig<any> = {
  */
 async function refreshAccessToken(token: JWT): Promise<JWT> {
   try {
-    // TODO: support other providers
     const url =
       process.env.NEXTAUTH_URL +
       '/backend/oauth2/access_token?' +
       new URLSearchParams({
-        grant_type: 'refresh_token',
-        refresh_token: token.refreshToken || '',
+        grant_type: 'refresh_token'
       });
 
+    const data = new URLSearchParams();
+    data.append('refresh_token', token.refresh_token || '');
+    
     const response = await fetch(url, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        Authorization: Buffer.from(
-          'Basic ' +
+        Authorization: 'Basic ' + Buffer.from(          
             process.env.LASIUS_OAUTH_CLIENT_ID +
             ':' +
             process.env.LASIUS_OAUTH_CLIENT_SECRET,
@@ -83,10 +83,11 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
         ).toString('base64'),
       },
       method: 'POST',
+      body: data
     });
 
     const tokensOrError = await response.json();
-
+    
     if (!response.ok) {
       throw tokensOrError;
     }
@@ -131,6 +132,9 @@ export const nextAuthOptions: NextAuthOptions = {
   callbacks: {
     async session({ session, token, user }) {
       session.user = token.user || user;
+      if (session.user) {
+        session.user.access_token = token.access_token
+      }
 
       return session;
     },

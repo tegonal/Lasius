@@ -79,12 +79,11 @@ class OAuthAccessTokenMongoRepository @Inject() ()(
   override def create(authInfo: AuthInfo[OAuthUser])(implicit
       dbSession: DBSession,
       config: LasiusConfig): Future[OAuthAccessToken] = {
-    val accessTokenExpiresIn = 60 * 60 // 1 hour
     for {
       _ <- findByAuthInfo(authInfo).someToFailed(
         s"Duplicate accessToken for user ${authInfo.user.id.value} and client ${authInfo.clientId}")
       jwt <- generateJwtAccessToken(authInfo.user).toOption.noneToFailed(
-        s"Could not generate jwt acces token for user ${authInfo.user.id.value} and client ${authInfo.clientId}")
+        s"Could not generate jwt access token for user ${authInfo.user.id.value} and client ${authInfo.clientId}")
       newToken <- Future.successful(
         OAuthAccessToken(
           id = OAuthAccessTokenId(),
@@ -92,7 +91,8 @@ class OAuthAccessTokenMongoRepository @Inject() ()(
           refreshToken = Some(generateToken()),
           userId = authInfo.user.id,
           scope = authInfo.scope,
-          expiresIn = accessTokenExpiresIn,
+          expiresIn =
+            config.security.oauth2Provider.jwtToken.lifespan.toSeconds,
           createdAt = DateTime.now(),
           clientId = authInfo.clientId
         ))
