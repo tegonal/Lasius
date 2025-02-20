@@ -30,6 +30,7 @@ import models.{
   ProjectRole
 }
 import org.specs2.mock.Mockito
+import play.api.cache.SyncCacheApi
 import play.api.mvc.ControllerComponents
 import play.api.test.Helpers
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -52,17 +53,19 @@ class ProjectsControllerMock(
     val invitationRepository: InvitationMongoRepository,
     authConfig: AuthConfig,
     reactiveMongoApi: ReactiveMongoApi,
+    jwkProviderCache: SyncCacheApi,
     override val organisationRole: OrganisationRole,
     override val projectRole: ProjectRole,
     override val projectActive: Boolean)(implicit ec: ExecutionContext)
-    extends ProjectsController(conf,
-                               controllerComponents,
-                               systemServices,
-                               projectRepository,
-                               userMongoRepository,
-                               invitationRepository,
-                               authConfig,
-                               reactiveMongoApi)
+    extends ProjectsController(conf = conf,
+                               controllerComponents = controllerComponents,
+                               systemServices = systemServices,
+                               projectRepository = projectRepository,
+                               userRepository = userMongoRepository,
+                               invitationRepository = invitationRepository,
+                               authConfig = authConfig,
+                               reactiveMongoApi = reactiveMongoApi,
+                               jwkProviderCache = jwkProviderCache)
     with SecurityControllerMock
     with MockCacheAware
     with TestDBSupport {
@@ -79,6 +82,7 @@ object ProjectsControllerMock
             systemServices: SystemServices,
             authConfig: AuthConfig,
             reactiveMongoApi: ReactiveMongoApi,
+            jwkProviderCache: SyncCacheApi,
             organisationRole: OrganisationRole = OrganisationMember,
             projectRole: ProjectRole = ProjectAdministrator,
             projectActive: Boolean = true)(implicit
@@ -88,17 +92,19 @@ object ProjectsControllerMock
     val invitationMongoRepository = new InvitationMongoRepository()
 
     val controller = new ProjectsControllerMock(
-      conf,
-      Helpers.stubControllerComponents(),
-      systemServices,
-      projectMongoRepository,
-      userMongoRepository,
-      invitationMongoRepository,
-      authConfig,
-      reactiveMongoApi,
-      organisationRole,
-      projectRole,
-      projectActive)
+      conf = conf,
+      controllerComponents = Helpers.stubControllerComponents(),
+      systemServices = systemServices,
+      projectRepository = projectMongoRepository,
+      userMongoRepository = userMongoRepository,
+      invitationRepository = invitationMongoRepository,
+      authConfig = authConfig,
+      reactiveMongoApi = reactiveMongoApi,
+      jwkProviderCache = jwkProviderCache,
+      organisationRole = organisationRole,
+      projectRole = projectRole,
+      projectActive = projectActive
+    )
 
     // initialize data
     controller

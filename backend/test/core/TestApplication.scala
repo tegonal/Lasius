@@ -41,6 +41,7 @@ trait TestApplication {
                        .toProvider[PlayAwareActorSystemProvider])
           .build())
       with Injecting {
-    lazy val config: Config = app.configuration.underlying
+    lazy val config: Config   = app.configuration.underlying
+    lazy val jwkProviderCache = new MockSyncCache
   }
 }

@@ -103,7 +103,8 @@ class InvitationsControllerSpec
         controllers.InvitationsControllerMock(config,
                                               systemServices,
                                               authConfig,
-                                              reactiveMongoApi)
+                                              reactiveMongoApi,
+                                              jwkProviderCache)
 
       val request: FakeRequest[Unit] = FakeRequest()
         .withBody(())
@@ -122,7 +123,8 @@ class InvitationsControllerSpec
         controllers.InvitationsControllerMock(config,
                                               systemServices,
                                               authConfig,
-                                              reactiveMongoApi)
+                                              reactiveMongoApi,
+                                              jwkProviderCache)
 
       val invitationId =
         createJoinProjectInvitation(controller)(
@@ -145,7 +147,8 @@ class InvitationsControllerSpec
         controllers.InvitationsControllerMock(config,
                                               systemServices,
                                               authConfig,
-                                              reactiveMongoApi)
+                                              reactiveMongoApi,
+                                              jwkProviderCache)
 
       val invitationId =
         createJoinProjectInvitation(controller)(
@@ -172,6 +175,7 @@ class InvitationsControllerSpec
                                               systemServices,
                                               authConfig,
                                               reactiveMongoApi,
+                                              jwkProviderCache,
                                               userActive = false)
 
       val invitationId =
@@ -195,7 +199,8 @@ class InvitationsControllerSpec
         controllers.InvitationsControllerMock(config,
                                               systemServices,
                                               authConfig,
-                                              reactiveMongoApi)
+                                              reactiveMongoApi,
+                                              jwkProviderCache)
 
       val invitationId =
         createJoinProjectInvitation(controller)()
@@ -221,7 +226,8 @@ class InvitationsControllerSpec
         controllers.InvitationsControllerMock(config,
                                               systemServices,
                                               authConfig,
-                                              reactiveMongoApi)
+                                              reactiveMongoApi,
+                                              jwkProviderCache)
 
       val invitationId =
         createJoinProjectInvitation(controller)(
@@ -470,7 +476,8 @@ class InvitationsControllerSpec
         controllers.InvitationsControllerMock(config,
                                               systemServices,
                                               authConfig,
-                                              reactiveMongoApi)
+                                              reactiveMongoApi,
+                                              jwkProviderCache)
 
       val request: FakeRequest[Unit] = FakeRequest()
         .withBody(())
@@ -489,7 +496,8 @@ class InvitationsControllerSpec
         controllers.InvitationsControllerMock(config,
                                               systemServices,
                                               authConfig,
-                                              reactiveMongoApi)
+                                              reactiveMongoApi,
+                                              jwkProviderCache)
 
       val invitationId =
         createJoinProjectInvitation(controller)(invitedEmail = "someOtherEmail")
@@ -511,7 +519,8 @@ class InvitationsControllerSpec
         controllers.InvitationsControllerMock(config,
                                               systemServices,
                                               authConfig,
-                                              reactiveMongoApi)
+                                              reactiveMongoApi,
+                                              jwkProviderCache)
 
       val invitationId =
         createJoinProjectInvitation(controller)(
@@ -538,7 +547,8 @@ class InvitationsControllerSpec
         controllers.InvitationsControllerMock(config,
                                               systemServices,
                                               authConfig,
-                                              reactiveMongoApi)
+                                              reactiveMongoApi,
+                                              jwkProviderCache)
 
       val request: FakeRequest[AcceptInvitationRequest] = FakeRequest()
         .withBody(AcceptInvitationRequest(organisationReference = None))
@@ -557,7 +567,8 @@ class InvitationsControllerSpec
         controllers.InvitationsControllerMock(config,
                                               systemServices,
                                               authConfig,
-                                              reactiveMongoApi)
+                                              reactiveMongoApi,
+                                              jwkProviderCache)
 
       val invitationId =
         createJoinProjectInvitation(controller)(invitedEmail = "someOtherEmail")
@@ -579,7 +590,8 @@ class InvitationsControllerSpec
         controllers.InvitationsControllerMock(config,
                                               systemServices,
                                               authConfig,
-                                              reactiveMongoApi)
+                                              reactiveMongoApi,
+                                              jwkProviderCache)
 
       val invitationId =
         createJoinProjectInvitation(controller)(invitedEmail = "someOtherEmail")
@@ -604,7 +616,8 @@ class InvitationsControllerSpec
           controllers.InvitationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
-                                                reactiveMongoApi)
+                                                reactiveMongoApi,
+                                                jwkProviderCache)
 
         val invitationId =
           createJoinProjectInvitation(controller)(
@@ -629,7 +642,8 @@ class InvitationsControllerSpec
           controllers.InvitationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
-                                                reactiveMongoApi)
+                                                reactiveMongoApi,
+                                                jwkProviderCache)
 
         val invitationId =
           createJoinProjectInvitation(controller)(
@@ -656,7 +670,8 @@ class InvitationsControllerSpec
           controllers.InvitationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
-                                                reactiveMongoApi)
+                                                reactiveMongoApi,
+                                                jwkProviderCache)
 
         val invitationId =
           createJoinProjectInvitation(controller)(
@@ -685,7 +700,8 @@ class InvitationsControllerSpec
           controllers.InvitationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
-                                                reactiveMongoApi)
+                                                reactiveMongoApi,
+                                                jwkProviderCache)
 
         val project = Project(
           id = ProjectId(),
@@ -726,7 +742,8 @@ class InvitationsControllerSpec
           controllers.InvitationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
-                                                reactiveMongoApi)
+                                                reactiveMongoApi,
+                                                jwkProviderCache)
 
         val project = Project(
           id = ProjectId(),
@@ -786,7 +803,8 @@ class InvitationsControllerSpec
           controllers.InvitationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
-                                                reactiveMongoApi)
+                                                reactiveMongoApi,
+                                                jwkProviderCache)
 
         val invitationId =
           createJoinOrganisationInvitation(controller)(
@@ -813,7 +831,8 @@ class InvitationsControllerSpec
           controllers.InvitationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
-                                                reactiveMongoApi)
+                                                reactiveMongoApi,
+                                                jwkProviderCache)
 
         val organisation = Organisation(
           id = OrganisationId(),
@@ -850,7 +869,8 @@ class InvitationsControllerSpec
           controllers.InvitationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
-                                                reactiveMongoApi)
+                                                reactiveMongoApi,
+                                                jwkProviderCache)
 
         val organisation = Organisation(
           id = OrganisationId(),

@@ -25,7 +25,7 @@ import com.google.inject.ImplementedBy
 import core.{DBSession, Validation}
 import models.OrganisationId.OrganisationReference
 import models.ProjectId.ProjectReference
-import models.ExtendedJwtSession
+import models.LasiusJWT
 import models.UserId.UserReference
 import models._
 import play.api.libs.json.Json.JsValueWrapper
@@ -74,7 +74,7 @@ trait UserRepository
   def findByEmail(email: String)(implicit
       dbSession: DBSession): Future[Option[User]]
 
-  def createInitialUserBasedOnProfile(jwt: ExtendedJwtSession,
+  def createInitialUserBasedOnProfile(jwt: LasiusJWT,
                                       org: Organisation,
                                       orgRole: OrganisationRole)(implicit
       dbSession: DBSession): Future[User]
@@ -386,7 +386,7 @@ class UserMongoRepository @Inject() (
     } yield true
   }
 
-  override def createInitialUserBasedOnProfile(jwt: ExtendedJwtSession,
+  override def createInitialUserBasedOnProfile(jwt: LasiusJWT,
                                                org: Organisation,
                                                orgRole: OrganisationRole)(
       implicit dbSession: DBSession): Future[User] = {

@@ -27,6 +27,7 @@ import org.apache.pekko.util.Timeout
 import core.SystemServices
 import domain.views.CurrentOrganisationTimeBookingsView._
 import models._
+import play.api.cache.SyncCacheApi
 import play.api.libs.json._
 import play.api.mvc.{Action, ControllerComponents}
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -39,8 +40,8 @@ class OrganisationTimeBookingsController @Inject() (
     override val controllerComponents: ControllerComponents,
     override val systemServices: SystemServices,
     override val authConfig: AuthConfig,
-    override val reactiveMongoApi: ReactiveMongoApi)(implicit
-    ec: ExecutionContext)
+    override val reactiveMongoApi: ReactiveMongoApi,
+    override val jwkProviderCache: SyncCacheApi)(implicit ec: ExecutionContext)
     extends BaseLasiusController() {
 
   implicit val timeout: Timeout = systemServices.timeout

@@ -21,14 +21,17 @@
 
 package controllers
 
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
+import com.auth0.jwt.interfaces.DecodedJWT
 import com.typesafe.config.Config
 import core.{DBSession, MockCacheAware, TestApplication, TestDBSupport}
 import models._
 import mongo.EmbedMongo
 import org.apache.http.HttpStatus
 import org.specs2.mock.Mockito
-import pdi.jwt.{JwtClaim, JwtSession}
 import play.api.Configuration
+import play.api.cache.SyncCacheApi
 import play.api.mvc._
 import play.api.test._
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -68,7 +71,8 @@ class SecuritySpec
 
     "return unauthorized when user can't get resolved" in new WithTestApplication {
       // prepare
-      val controller = new HasRoleSecurityMock(reactiveMongoApi, config)
+      val controller =
+        new HasRoleSecurityMock(reactiveMongoApi, config, jwkProviderCache)
       controller.authConfig
         .resolveUser(any[EntityReference[UserId]])(any[ExecutionContext],
                                                    any[DBSession])
@@ -85,7 +89,8 @@ class SecuritySpec
 
     "return unauthorized when authorization failed" in new WithTestApplication {
       // prepare
-      val controller = new HasRoleSecurityMock(reactiveMongoApi, config)
+      val controller =
+        new HasRoleSecurityMock(reactiveMongoApi, config, jwkProviderCache)
       controller.authConfig
         .authorizeUser(any[User], any[UserRole])(any[ExecutionContext])
         .returns(Future.successful(false))
@@ -105,7 +110,8 @@ class SecuritySpec
 
     "return InternalServerError on any failure" in new WithTestApplication {
       // prepare
-      val controller = new HasRoleSecurityMock(reactiveMongoApi, config)
+      val controller =
+        new HasRoleSecurityMock(reactiveMongoApi, config, jwkProviderCache)
       controller.authConfig
         .authorizeUser(any[User], any[UserRole])(any[ExecutionContext])
         .returns(Future.failed(new RuntimeException))
@@ -123,7 +129,8 @@ class SecuritySpec
 
     "Succeed if authorized" in new WithTestApplication {
       // prepare
-      val controller = new HasRoleSecurityMock(reactiveMongoApi, config)
+      val controller =
+        new HasRoleSecurityMock(reactiveMongoApi, config, jwkProviderCache)
       controller.authConfig
         .authorizeUser(any[User], any[UserRole])(any[ExecutionContext])
         .returns(Future.successful(true))
@@ -144,7 +151,8 @@ class SecuritySpec
 class SecurityMock(@Inject
                    override val conf: Config,
                    override val reactiveMongoApi: ReactiveMongoApi,
-                   override val controllerComponents: ControllerComponents)
+                   override val controllerComponents: ControllerComponents,
+                   override val jwkProviderCache: SyncCacheApi)
     extends BaseController
     with ControllerSecurity
     with SecurityComponentMock
@@ -167,6 +175,7 @@ object UserMock {
 class HasRoleSecurityMock(
     override val reactiveMongoApi: ReactiveMongoApi,
     override val conf: Config,
+    override val jwkProviderCache: SyncCacheApi,
     override val controllerComponents: ControllerComponents =
       Helpers.stubControllerComponents())
     extends BaseController
@@ -176,8 +185,14 @@ class HasRoleSecurityMock(
     with TestDBSupport {
 
   implicit val playConfig: Configuration = Configuration(conf)
+  private val jwtToken: DecodedJWT = JWT.decode(
+    JWT
+      .create()
+      .withSubject("test_user")
+      .withClaim(LasiusJWT.EMAIL_CLAIM, "test@lasius.com")
+      .sign(Algorithm.none()))
   private val subject: Subject =
-    Subject(JwtSession(JwtClaim()), EntityReference(UserId(), "123"))
+    Subject(jwtToken, EntityReference(UserId(), "123"))
 
   override def HasToken[A](p: BodyParser[A], withinTransaction: Boolean)(
       f: DBSession => Subject => Request[A] => Future[Result])(implicit

@@ -41,6 +41,19 @@ trait FutureHelper {
 
   }
 
+  implicit class OptionHelper[T](self: Option[T]) {
+    def noneToFailed(errorMsg: => String): Future[T] = self match {
+      case Some(result) => Future.successful(result)
+      case _            => Future.failed(ValidationFailedException(errorMsg))
+    }
+
+    def someToFailed(errorMsg: => String): Future[Option[T]] = self match {
+      case Some(_) => Future.failed(ValidationFailedException(errorMsg))
+      case _       => Future.successful(None)
+    }
+
+  }
+
   implicit class FutureHelper[T](self: Future[T]) {
 
     def failIf(predicate: T => Boolean, errorMsg: => String)(implicit

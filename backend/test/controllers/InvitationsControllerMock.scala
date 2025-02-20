@@ -24,6 +24,7 @@ package controllers
 import com.typesafe.config.Config
 import core.{MockCacheAware, SystemServices, TestDBSupport}
 import org.specs2.mock.Mockito
+import play.api.cache.SyncCacheApi
 import play.api.mvc.ControllerComponents
 import play.api.test.Helpers
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -61,16 +62,19 @@ class InvitationsControllerMock(
     val projectRepository: ProjectMongoRepository,
     authConfig: AuthConfig,
     reactiveMongoApi: ReactiveMongoApi,
+    jwkProviderCache: SyncCacheApi,
     override val userActive: Boolean)(implicit ec: ExecutionContext)
-    extends InvitationsController(config,
-                                  controllerComponents,
-                                  systemServices,
-                                  userMongoRepository,
-                                  organisationRepository,
-                                  invitationRepository,
-                                  projectRepository,
-                                  authConfig,
-                                  reactiveMongoApi)
+    extends InvitationsController(conf = config,
+                                  controllerComponents = controllerComponents,
+                                  systemServices = systemServices,
+                                  authConfig = authConfig,
+                                  reactiveMongoApi = reactiveMongoApi,
+                                  jwkProviderCache = jwkProviderCache,
+                                  userRepository = userMongoRepository,
+                                  organisationRepository =
+                                    organisationRepository,
+                                  invitationRepository = invitationRepository,
+                                  projectRepository = projectRepository)
     with SecurityControllerMock
     with MockCacheAware
     with TestDBSupport {
@@ -87,6 +91,7 @@ object InvitationsControllerMock
             systemServices: SystemServices,
             authConfig: AuthConfig,
             reactiveMongoApi: ReactiveMongoApi,
+            jwkProviderCache: SyncCacheApi,
             userActive: Boolean = true)(implicit
       ec: ExecutionContext): InvitationsControllerMock = {
     val userMongoRepository         = new UserMongoRepository()
@@ -95,16 +100,17 @@ object InvitationsControllerMock
     val projectMongoRepository      = new ProjectMongoRepository()
 
     val controller = new InvitationsControllerMock(
-      config,
-      Helpers.stubControllerComponents(),
-      systemServices,
-      organisationMongoRepository,
-      userMongoRepository,
-      invitationMongoRepository,
-      projectMongoRepository,
-      authConfig,
-      reactiveMongoApi,
-      userActive)
+      config = config,
+      controllerComponents = Helpers.stubControllerComponents(),
+      systemServices = systemServices,
+      organisationRepository = organisationMongoRepository,
+      userMongoRepository = userMongoRepository,
+      invitationRepository = invitationMongoRepository,
+      projectRepository = projectMongoRepository,
+      authConfig = authConfig,
+      reactiveMongoApi = reactiveMongoApi,
+      jwkProviderCache = jwkProviderCache,
+      userActive = userActive)
 
     // initialize data
     controller

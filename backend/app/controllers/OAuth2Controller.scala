@@ -26,9 +26,9 @@ import com.typesafe.config.Config
 import core.SystemServices
 import models._
 import org.apache.pekko.http.scaladsl.model.StatusCodes
+import play.api.cache.SyncCacheApi
 import play.api.libs.json.Json
 import play.api.mvc._
-import play.api.routing.sird.QueryStringParameterExtractor
 import play.modules.reactivemongo.ReactiveMongoApi
 import repositories.{
   OAuthAccessTokenRepository,
@@ -49,7 +49,7 @@ class OAuth2Controller @Inject() (
     private val oauthUserRepository: OAuthUserRepository,
     private val oauthAccessTokenRepository: OAuthAccessTokenRepository,
     private val oauthAuthorizationCodeRepository: OAuthAuthorizationCodeRepository,
-    typesafeConfig: Config)(implicit ec: ExecutionContext)
+    override val jwkProviderCache: SyncCacheApi)(implicit ec: ExecutionContext)
     extends BaseLasiusController()
     with OAuth2Provider {
 
@@ -61,11 +61,12 @@ class OAuth2Controller @Inject() (
     oauthUserRepository = oauthUserRepository,
     oauthAccessTokenRepository = oauthAccessTokenRepository,
     oauthAuthorizationCodeRepository = oauthAuthorizationCodeRepository,
-    typesafeConfig = typesafeConfig
+    config = systemServices.lasiusConfig
   )
 
   private def ifLasiusOAuth2ProviderEnabled(block: => Future[Result]) =
-    ifFeatureEnabled(systemServices.appConfig.lasiusOAuthProviderEnabled)(block)
+    ifFeatureEnabled(
+      systemServices.lasiusConfig.security.oauth2Provider.enabled)(block)
 
   private def ifFeatureEnabled(featureEnabled: Boolean)(
       block: => Future[Result]) =
@@ -133,11 +134,12 @@ class OAuth2Controller @Inject() (
   def registerUser(): Action[OAuthUserRegistration] =
     Action.async(validateJson[OAuthUserRegistration]) { request =>
       ifFeatureEnabled(
-        systemServices.appConfig.lasiusOAuthProviderEnabled &&
-          systemServices.appConfig.lasiusOAuthProviderAllowUserRegistration) {
+        systemServices.lasiusConfig.security.oauth2Provider.enabled &&
+          systemServices.lasiusConfig.security.oauth2Provider.allowRegisterUsers) {
         checked {
           withinTransaction { implicit dbSession =>
             for {
+              // TODO: validate email address matches regex of allowed users to access lasius
               // Create new user
               user <- oauthUserRepository.create(request.body)
             } yield Ok(Json.toJson(user.id))
@@ -146,7 +148,7 @@ class OAuth2Controller @Inject() (
       }
     }
 
-  def HasAccessToken[A](p: BodyParser[A])(
+  private def HasAccessToken[A](p: BodyParser[A])(
       f: Request[A] => AuthInfo[OAuthUser] => Future[Result]): Action[A] = {
     Action.async(p) { implicit request =>
       val x = request.headers
@@ -170,5 +172,5 @@ class OAuth2Controller @Inject() (
     }
   }
 
-  val bearerRegex = "Bearer (.*)".r
+  private val bearerRegex = "Bearer (.*)".r
 }

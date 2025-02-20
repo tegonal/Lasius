@@ -22,8 +22,6 @@
 package repositories
 
 import com.google.inject.ImplementedBy
-import com.typesafe.config.Config
-import controllers.JWTSessionSupport
 import core.{DBSession, Validation}
 import models._
 import org.joda.time.DateTime
@@ -34,13 +32,15 @@ import scalaoauth2.provider.AuthInfo
 import java.util.Base64
 import javax.inject.Inject
 import scala.concurrent._
+import scala.util.Try
 
 @ImplementedBy(classOf[OAuthAccessTokenMongoRepository])
 trait OAuthAccessTokenRepository
     extends BaseRepository[OAuthAccessToken, OAuthAccessTokenId]
     with DropAllSupport[OAuthAccessToken, OAuthAccessTokenId] {
   def create(authInfo: AuthInfo[OAuthUser])(implicit
-      dbSession: DBSession): Future[OAuthAccessToken]
+      dbSession: DBSession,
+      config: LasiusConfig): Future[OAuthAccessToken]
 
   def findByAuthInfo(authInfo: AuthInfo[OAuthUser])(implicit
       dbSession: DBSession): Future[Option[OAuthAccessToken]]
@@ -52,17 +52,16 @@ trait OAuthAccessTokenRepository
       dbSession: DBSession): Future[Option[OAuthAccessToken]]
 
   def refreshToken(authInfo: AuthInfo[OAuthUser], refreshToken: String)(implicit
-      dbSession: DBSession): Future[OAuthAccessToken]
+      dbSession: DBSession,
+      config: LasiusConfig): Future[OAuthAccessToken]
 }
 
-class OAuthAccessTokenMongoRepository @Inject() (
-    override val conf: Config
-)(override implicit protected val executionContext: ExecutionContext)
+class OAuthAccessTokenMongoRepository @Inject() ()(
+    override implicit protected val executionContext: ExecutionContext)
     extends BaseReactiveMongoRepository[OAuthAccessToken, OAuthAccessTokenId]
     with OAuthAccessTokenRepository
     with MongoDropAllSupport[OAuthAccessToken, OAuthAccessTokenId]
-    with Validation
-    with JWTSessionSupport {
+    with Validation {
   override protected[repositories] def coll(implicit
       dbSession: DBSession): BSONCollection =
     dbSession.db.collection[BSONCollection]("OAuthAccessToken")
@@ -72,20 +71,24 @@ class OAuthAccessTokenMongoRepository @Inject() (
     new String(Base64.getEncoder.encode(key.getBytes()))
   }
 
-  private def generateJwtAccessToken(user: OAuthUser): String = {
-    ExtendedJwtSession.newSession(user).serialize
+  private def generateJwtAccessToken(user: OAuthUser)(implicit
+      config: LasiusConfig): Try[String] = {
+    LasiusJWT.newJWT(user)
   }
 
   override def create(authInfo: AuthInfo[OAuthUser])(implicit
-      dbSession: DBSession): Future[OAuthAccessToken] = {
+      dbSession: DBSession,
+      config: LasiusConfig): Future[OAuthAccessToken] = {
     val accessTokenExpiresIn = 60 * 60 // 1 hour
     for {
       _ <- findByAuthInfo(authInfo).someToFailed(
         s"Duplicate accessToken for user ${authInfo.user.id.value} and client ${authInfo.clientId}")
+      jwt <- generateJwtAccessToken(authInfo.user).toOption.noneToFailed(
+        s"Could not generate jwt acces token for user ${authInfo.user.id.value} and client ${authInfo.clientId}")
       newToken <- Future.successful(
         OAuthAccessToken(
           id = OAuthAccessTokenId(),
-          accessToken = generateJwtAccessToken(authInfo.user),
+          accessToken = jwt,
           refreshToken = Some(generateToken()),
           userId = authInfo.user.id,
           scope = authInfo.scope,
@@ -120,7 +123,8 @@ class OAuthAccessTokenMongoRepository @Inject() (
 
   override def refreshToken(authInfo: AuthInfo[OAuthUser],
                             refreshToken: String)(implicit
-      dbSession: DBSession): Future[OAuthAccessToken] = {
+      dbSession: DBSession,
+      config: LasiusConfig): Future[OAuthAccessToken] = {
     for {
       existingToken <- findByAuthInfo(authInfo).noneToFailed(
         s"Could not find existing accessToken for user ${authInfo.user.id.value} and client ${authInfo.clientId}")

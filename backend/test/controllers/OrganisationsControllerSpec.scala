@@ -25,7 +25,6 @@ import core.{SystemServices, TestApplication}
 import models._
 import mongo.EmbedMongo
 import org.joda.time.DateTime
-import org.mindrot.jbcrypt.BCrypt
 import org.specs2.mock.Mockito
 import org.specs2.mock.mockito.MockitoMatchers
 import play.api.mvc._
@@ -53,7 +52,8 @@ class OrganisationsControllerSpec
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
-                                                reactiveMongoApi)
+                                                reactiveMongoApi,
+                                                jwkProviderCache)
 
       val request: FakeRequest[CreateOrganisation] = FakeRequest()
         .withBody(
@@ -78,7 +78,8 @@ class OrganisationsControllerSpec
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
-                                                reactiveMongoApi)
+                                                reactiveMongoApi,
+                                                jwkProviderCache)
 
       val request: FakeRequest[CreateOrganisation] = FakeRequest()
         .withBody(
@@ -103,7 +104,8 @@ class OrganisationsControllerSpec
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
-                                                reactiveMongoApi)
+                                                reactiveMongoApi,
+                                                jwkProviderCache)
       val newOrganisationKey: String = "someGreateOrg"
 
       val request: FakeRequest[CreateOrganisation] = FakeRequest()
@@ -142,7 +144,8 @@ class OrganisationsControllerSpec
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
-                                                reactiveMongoApi)
+                                                reactiveMongoApi,
+                                                jwkProviderCache)
       private val newOrganisationId = OrganisationId()
 
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
@@ -161,7 +164,8 @@ class OrganisationsControllerSpec
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
-                                                reactiveMongoApi)
+                                                reactiveMongoApi,
+                                                jwkProviderCache)
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
       val result: Future[Result] =
         controller.deactivateOrganisation(controller.organisationId)(request)
@@ -190,7 +194,8 @@ class OrganisationsControllerSpec
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
-                                                reactiveMongoApi)
+                                                reactiveMongoApi,
+                                                jwkProviderCache)
 
       val request: FakeRequest[UserToOrganisationAssignment] =
         FakeRequest().withBody(
@@ -213,7 +218,8 @@ class OrganisationsControllerSpec
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
-                                                reactiveMongoApi)
+                                                reactiveMongoApi,
+                                                jwkProviderCache)
       val email = "newUserEmail@test.com"
 
       // delete organisation
@@ -243,6 +249,7 @@ class OrganisationsControllerSpec
                                                 systemServices,
                                                 authConfig,
                                                 reactiveMongoApi,
+                                                jwkProviderCache,
                                                 organisationActive = false)
       val email = "newUserEmail@test.com"
 
@@ -267,7 +274,8 @@ class OrganisationsControllerSpec
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
-                                                reactiveMongoApi)
+                                                reactiveMongoApi,
+                                                jwkProviderCache)
       val email = "newUserEmail@test.com"
 
       val request: FakeRequest[UserToOrganisationAssignment] =
@@ -295,6 +303,7 @@ class OrganisationsControllerSpec
                                                 systemServices,
                                                 authConfig,
                                                 reactiveMongoApi,
+                                                jwkProviderCache,
                                                 OrganisationMember)
 
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
@@ -313,7 +322,8 @@ class OrganisationsControllerSpec
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
-                                                reactiveMongoApi)
+                                                reactiveMongoApi,
+                                                jwkProviderCache)
 
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
       val result: Future[Result] =
@@ -335,6 +345,7 @@ class OrganisationsControllerSpec
                                                 systemServices,
                                                 authConfig,
                                                 reactiveMongoApi,
+                                                jwkProviderCache,
                                                 isOrganisationPrivate = true)
 
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
@@ -356,7 +367,8 @@ class OrganisationsControllerSpec
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
-                                                reactiveMongoApi)
+                                                reactiveMongoApi,
+                                                jwkProviderCache)
 
       // initialize second user
       private val userProject2 = UserProject(
@@ -416,7 +428,8 @@ class OrganisationsControllerSpec
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
-                                                reactiveMongoApi)
+                                                reactiveMongoApi,
+                                                jwkProviderCache)
 
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
       val result: Future[Result] =
@@ -434,7 +447,8 @@ class OrganisationsControllerSpec
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
-                                                reactiveMongoApi)
+                                                reactiveMongoApi,
+                                                jwkProviderCache)
 
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
       val result: Future[Result] =
@@ -455,6 +469,7 @@ class OrganisationsControllerSpec
                                                 systemServices,
                                                 authConfig,
                                                 reactiveMongoApi,
+                                                jwkProviderCache,
                                                 isOrganisationPrivate = true)
 
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
@@ -476,6 +491,7 @@ class OrganisationsControllerSpec
                                                 systemServices,
                                                 authConfig,
                                                 reactiveMongoApi,
+                                                jwkProviderCache,
                                                 OrganisationMember)
 
       // initialize second user to be able to remove ourself
@@ -528,7 +544,8 @@ class OrganisationsControllerSpec
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
-                                                reactiveMongoApi)
+                                                reactiveMongoApi,
+                                                jwkProviderCache)
 
       val request: FakeRequest[UpdateOrganisation] =
         FakeRequest().withBody(UpdateOrganisation(key = None))
@@ -549,7 +566,8 @@ class OrganisationsControllerSpec
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
-                                                reactiveMongoApi)
+                                                reactiveMongoApi,
+                                                jwkProviderCache)
 
       val request: FakeRequest[UpdateOrganisation] =
         FakeRequest().withBody(UpdateOrganisation(key = Some("")))
@@ -570,7 +588,8 @@ class OrganisationsControllerSpec
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
-                                                reactiveMongoApi)
+                                                reactiveMongoApi,
+                                                jwkProviderCache)
 
       val organisation2Key: String = "org2"
 
@@ -605,7 +624,8 @@ class OrganisationsControllerSpec
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
-                                                reactiveMongoApi)
+                                                reactiveMongoApi,
+                                                jwkProviderCache)
       val newKey               = "newOrgKey"
       private val invitationId = InvitationId()
 

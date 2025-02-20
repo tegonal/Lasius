@@ -25,6 +25,7 @@ import com.typesafe.config.Config
 import core.SystemServices
 import models._
 import org.joda.time.DateTime
+import play.api.cache.SyncCacheApi
 import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -37,12 +38,12 @@ class ProjectsController @Inject() (
     override val conf: Config,
     override val controllerComponents: ControllerComponents,
     override val systemServices: SystemServices,
+    override val authConfig: AuthConfig,
+    override val reactiveMongoApi: ReactiveMongoApi,
+    override val jwkProviderCache: SyncCacheApi,
     projectRepository: ProjectRepository,
     userRepository: UserRepository,
-    invitationRepository: InvitationRepository,
-    override val authConfig: AuthConfig,
-    override val reactiveMongoApi: ReactiveMongoApi)(implicit
-    ec: ExecutionContext)
+    invitationRepository: InvitationRepository)(implicit ec: ExecutionContext)
     extends BaseLasiusController() {
   def getProjects(orgId: OrganisationId): Action[Unit] =
     HasUserRole(FreeUser, parse.empty, withinTransaction = false) {

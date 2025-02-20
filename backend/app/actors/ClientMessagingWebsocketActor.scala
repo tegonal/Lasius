@@ -28,6 +28,7 @@ import controllers.{AuthConfig, SecurityComponent, TokenSecurity}
 import core.{DBSupport, SystemServices}
 import models._
 import org.apache.pekko.actor._
+import play.api.cache.SyncCacheApi
 import play.modules.reactivemongo.ReactiveMongoApi
 
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -81,13 +82,15 @@ object ClientMessagingWebsocketActor {
   def props(systemServices: SystemServices,
             conf: Config,
             reactiveMongoApi: ReactiveMongoApi,
-            authConfig: AuthConfig)(out: ActorRef): Props =
+            authConfig: AuthConfig,
+            jwkProviderCache: SyncCacheApi)(out: ActorRef): Props =
     Props(
       new ClientMessagingWebsocketActor(systemServices = systemServices,
                                         conf = conf,
                                         reactiveMongoApi = reactiveMongoApi,
                                         authConfig = authConfig,
-                                        out = out))
+                                        out = out,
+                                        jwkProviderCache = jwkProviderCache))
   var actors: ConcurrentLinkedQueue[ActorRef] = new ConcurrentLinkedQueue()
 }
 
@@ -96,6 +99,7 @@ class ClientMessagingWebsocketActor(
     override val conf: Config,
     override val reactiveMongoApi: ReactiveMongoApi,
     override val authConfig: AuthConfig,
+    override val jwkProviderCache: SyncCacheApi,
     out: ActorRef)
     extends Actor
     with ActorLogging
