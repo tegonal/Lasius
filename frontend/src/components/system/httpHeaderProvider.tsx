@@ -22,16 +22,14 @@ import axios from 'axios';
 import { getCsrfToken } from 'lib/api/lasius/general/general';
 import { signOut, useSession } from 'next-auth/react';
 import { Session } from 'next-auth';
-import { useRouter } from 'next/router';
 import { removeAccessibleCookies } from 'lib/removeAccessibleCookies';
 
 type HttpHeaderProviderProps = {
-  initialSession: Session
-}
+  initialSession: Session;
+};
 
-export const HttpHeaderProvider: React.FC<HttpHeaderProviderProps> = ({initialSession}) => {
+export const HttpHeaderProvider: React.FC<HttpHeaderProviderProps> = ({ initialSession }) => {
   const { data: session } = useSession();
-  const router = useRouter();
 
   const getCSRFToken = async () => {
     const response = await getCsrfToken();
@@ -50,16 +48,22 @@ export const HttpHeaderProvider: React.FC<HttpHeaderProviderProps> = ({initialSe
     const token = session?.user?.access_token || initialSession?.user?.access_token;
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+      // workaround: update client session cookie as session cookie doesn't get updated with
+      // refreshing a token through the jwt callback of next-auth
+      fetch('/api/session_cookie').then((res) =>
+        console.log('session changed. Updated session coookie', res)
+      );
     } else {
       // legacy
       delete axios.defaults.headers.common['Authorization'];
     }
     if (session?.error && session?.user?.access_token) {
       console.error('Updating session failed', session.error);
-      removeAccessibleCookies();
-      signOut();
+      //removeAccessibleCookies();
+      //signOut();
     }
-  }, [initialSession, session]);
+  }, [initialSession?.user?.access_token, session?.user?.access_token, session?.error]);
 
   return null;
 };

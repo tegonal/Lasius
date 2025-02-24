@@ -93,7 +93,7 @@ const App = ({
   const getLayout = Component.getLayout ?? ((page) => page);
   const lasiusIsLoggedIn = !!(session?.user?.access_token && profile?.id);
   const store = useStore();
-  
+
   useAsync(async () => {
     if (!lasiusIsLoggedIn) {
       logger.info('[App][UserNotLoggedIn]');
@@ -112,8 +112,8 @@ const App = ({
           use: [swrLogger as any],
         }}
       >
-        <SessionProvider session={session} refetchOnWindowFocus={true}>
-          <HttpHeaderProvider initialSession={session}/>
+        <SessionProvider session={session} refetchInterval={5} refetchOnWindowFocus={true}>
+          <HttpHeaderProvider initialSession={session} />
           <Head>
             <meta
               name="viewport"
@@ -187,11 +187,10 @@ App.getInitialProps = async ({
       profile = await getUserProfile(getRequestHeaders(session.user?.access_token));
     } catch (error) {
       //logger.error(error);
-
-      if (res && !pathname.includes('/login')) {
-        res.writeHead(307, { Location: '/login' });
-        res.end();
-      }
+      //if (res && !pathname.includes('/login')) {
+      //  res.writeHead(307, { Location: '/login' });
+      //  res.end();
+      //}
     }
   }
 

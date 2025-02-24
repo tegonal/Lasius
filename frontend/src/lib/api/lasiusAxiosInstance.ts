@@ -79,8 +79,8 @@ export const lasiusAxiosInstance = <T>(
         ) {
           // perform logout as token might not be valid anymore
           logger.info('[lasiusAxiosInstance][TokenNotValidAnymore]', error.status);
-          await removeAccessibleCookies();
-          await signOut();
+          //await removeAccessibleCookies();
+          //await signOut();
         } else {
           logger.info('[lasiusAxiosInstance][Unauthorized]', error.status);
           throw new Error(error);

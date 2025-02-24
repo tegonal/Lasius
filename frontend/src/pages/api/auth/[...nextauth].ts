@@ -50,7 +50,7 @@ const internalProvider: OAuthConfig<any> = {
       name: profile.firstName + ' ' + profile.lastName,
       email: profile.email,
       provider: AUTH_PROVIDER_INTERNAL_LASIUS,
-      access_token: tokens.access_token
+      access_token: tokens.access_token,
     };
   },
 };
@@ -63,20 +63,20 @@ const internalProvider: OAuthConfig<any> = {
 async function refreshAccessToken(token: JWT): Promise<JWT> {
   console.debug('[NextAuth][refreshAccessToken]', token?.refresh_token);
   try {
-    const url = process.env.NEXTAUTH_URL + '/backend/oauth2/access_token'
+    const url = process.env.NEXTAUTH_URL + '/backend/oauth2/access_token';
 
     const response = await fetch(url, {
       method: 'POST',
       body: new URLSearchParams({
         grant_type: 'refresh_token',
-        refresh_token:  token.refresh_token || '',
+        refresh_token: token.refresh_token || '',
         client_id: process.env.LASIUS_OAUTH_CLIENT_ID || '',
-        client_secret: process.env.LASIUS_OAUTH_CLIENT_SECRET || ''
-      })
+        client_secret: process.env.LASIUS_OAUTH_CLIENT_SECRET || '',
+      }),
     });
 
     const tokensOrError = await response.json();
-    
+
     if (!response.ok) {
       throw tokensOrError;
     }
@@ -110,6 +110,17 @@ export const nextAuthOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt',
   },
+  cookies: {
+    sessionToken: {
+      name: `lasius-session`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: true,
+      },
+    },
+  },
   jwt: {
     secret: process.env.NEXTAUTH_SECRET,
   },
@@ -123,12 +134,14 @@ export const nextAuthOptions: NextAuthOptions = {
       session.user = token.user || user;
       session.error = token.error;
       if (session.user) {
-        session.user.access_token = token.access_token        
+        session.user.access_token = token.access_token;
+        console.log('[NextAuth][session]', session);
       }
 
       return session;
     },
-    async jwt({ token, account, user, profile }) {
+    async jwt({ token, account, user, profile, session }) {
+      console.log('jwt', session);
       // Initial sign in
       if (account) {
         // First-time login, save the `access_token`, its expiry and the `refresh_token`
@@ -149,8 +162,8 @@ export const nextAuthOptions: NextAuthOptions = {
         // Subsequent logins, but the `access_token` has expired, try to refresh it
         if (!token.refresh_token) throw new TypeError('Missing refresh_token');
         //if (token.error === 'RefreshAccessTokenError') return undefined;
-        if (token.error === "RefreshAccessTokenError") {
-          console.log("Token refresh already failed, not trying again.");
+        if (token.error === 'RefreshAccessTokenError') {
+          console.log('Token refresh already failed, not trying again.');
           return token;
         }
 
