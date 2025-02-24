@@ -100,10 +100,10 @@ trait TokenSecurity extends Logging with ConfigAware {
         }
       // second prio validate by static public key
       case JWTIssuerConfig(_, Some(pk), _, _) =>
-        val kf =
-          if (token.getAlgorithm.startsWith("RSA"))
-            KeyFactory.getInstance("RSA")
-          else KeyFactory.getInstance("EC")
+        val kf = KeyFactory.getInstance(token.getAlgorithm match {
+          case alg if alg.startsWith("RS") => "RSA"
+          case alg if alg.startsWith("EC") => "EC"
+        })
         val keySpecX509 = new X509EncodedKeySpec(Base64.getDecoder.decode(pk))
         val pubKey      = kf.generatePublic(keySpecX509)
 
@@ -131,20 +131,25 @@ trait TokenSecurity extends Logging with ConfigAware {
         .require(algorithm)
         .withIssuer(config.issuer)
         // Maybe extract to config
-        .acceptLeeway(60)
+        .acceptLeeway(10)
         .build()
         .verify(token))
 
-  private def validateSubjectHasAccess(token: DecodedJWT) =
+  private def validateSubjectHasAccess(token: DecodedJWT) = {
     systemServices.lasiusConfig.security.accessRestriction.fold(true) {
-      accessConfig => accessConfig.canAccess(token.getSubject)
+      accessConfig =>
+        logger.error(
+          s"validateSubjectHasAccess: $accessConfig => ${token.getSubject} == ${accessConfig
+            .canAccess(token.getSubject)}")
+        accessConfig.canAccess(token.getSubject)
     }
+  }
 
   private def resolveAndValidateToken(
       token: String): Either[Throwable, DecodedJWT] = {
     for {
       jwt <- decodeJWT(token).toEither
-      _ =
+      _ <-
         if (validateSubjectHasAccess(jwt)) Right(true)
         else
           Left(
@@ -154,7 +159,7 @@ trait TokenSecurity extends Logging with ConfigAware {
         .resolveIssuerConfig(jwt.getIssuer)
         .toRight(UnauthorizedException("Could not resolve issuer"))
       algorithm <- evaluateSigningAlgorithm(jwt, config).toRight(
-        UnauthorizedException("Could not evaluate singing algorithm"))
+        UnauthorizedException("Could not evaluate signing algorithm"))
       validatedToken <- validateToken(jwt, config, algorithm).toEither
     } yield validatedToken
   }

@@ -55,7 +55,11 @@ class MockServices(actorSystem: ActorSystem) extends SystemServices {
     instance = "Test",
     initializeViewsOnStartup = false,
     security = LasiusSecurityConfig(
-      accessRestriction = None,
+      accessRestriction = Some(
+        AccessRestrictionConfig(
+          emailRegex = ".*@lasius\\.com"
+        )
+      ),
       externalIssuers = Seq(),
       oauth2Provider = InternalOauth2ProviderConfig(
         enabled = true,
