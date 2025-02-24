@@ -26,6 +26,5 @@ import org.specs2.mock.Mockito
 import scala.concurrent.Future
 
 trait SecurityComponentMock extends SecurityComponent with Mockito {
-  override val authConfig: AuthConfig =
-    mock[AuthConfig].defaultReturn(Future.successful(true))
+  override val authConfig: AuthConfig = mock[AuthConfig]
 }
