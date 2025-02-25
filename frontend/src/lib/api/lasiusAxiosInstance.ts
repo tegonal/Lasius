@@ -18,13 +18,11 @@
  */
 
 // custom-instance.ts
-import Axios from 'axios';
+import Axios, { CancelTokenSource } from 'axios';
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import { IS_BROWSER } from 'projectConfig/constants';
 import { logger } from 'lib/logger';
-import { signOut } from 'next-auth/react';
 import clientAxiosInstance from 'lib/api/ClientAxiosInstance';
-import { removeAccessibleCookies } from 'lib/removeAccessibleCookies';
 import _ from 'lodash';
 
 // add a second `options` argument here if you want to pass extra options to each generated query
@@ -47,6 +45,39 @@ export const lasiusAxiosInstance = <T>(
 
   const headers = { ...defaultHeaders, ...methodBasedHeaders };
 
+  const handleRequest = (config: AxiosRequestConfig, source: CancelTokenSource) => {
+    return clientAxiosInstance({
+      ...config,
+      cancelToken: source.token,
+    })
+      .then(({ data }) => data)
+      .catch(async (error) => {
+        if (Axios.isCancel(error)) {
+          logger.debug('[lasiusAxiosInstance][RequestCanceled]', error.message);
+        } else if (error.response.status === 401) {
+          logger.debug('[lasiusAxiosInstance][Unauthorized]', {
+            path: error.request.pathname,
+            message: error.data,
+          });
+          if (
+            IS_BROWSER &&
+            window.location.pathname !== '/auth/signin' &&
+            window.location.pathname !== '/login' &&
+            window.location.pathname !== '/' &&
+            config.headers?.Authorization
+          ) {
+            logger.debug('[lasiusAxiosInstance][TokenNotValidAnymore]', error.status);
+
+            throw error;
+          } else {
+            logger.info('[lasiusAxiosInstance][Unauthorized]', error.status);
+            throw new Error(error);
+          }
+        } else {
+          throw error;
+        }
+      });
+  };
   const newConfig = _.merge(
     {
       headers: headers,
@@ -56,40 +87,7 @@ export const lasiusAxiosInstance = <T>(
   );
 
   const source = Axios.CancelToken.source();
-  const promise = clientAxiosInstance({
-    ...newConfig,
-    cancelToken: source.token,
-  })
-    .then(({ data }) => data)
-    .catch(async (error) => {
-      //logger.info('error', error);
-      if (Axios.isCancel(error)) {
-        logger.info('[lasiusAxiosInstance][RequestCanceled]', error.message);
-      } else if (error.response.status === 401) {
-        logger.error('[lasiusAxiosInstance][Unauthorized]', {
-          path: error.request.pathname,
-          message: error.data,
-        });
-        if (
-          IS_BROWSER &&
-          window.location.pathname !== '/auth/signin' &&
-          window.location.pathname !== '/login' &&
-          window.location.pathname !== '/' &&
-          config.headers?.Authorization
-        ) {
-          // perform logout as token might not be valid anymore
-          logger.info('[lasiusAxiosInstance][TokenNotValidAnymore]', error.status);
-          await removeAccessibleCookies();
-          await signOut();
-        } else {
-          logger.info('[lasiusAxiosInstance][Unauthorized]', error.status);
-          throw new Error(error);
-        }
-      } else {
-        throw error;
-      }
-    });
-
+  const promise = handleRequest(newConfig, source);
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   promise.cancel = () => {

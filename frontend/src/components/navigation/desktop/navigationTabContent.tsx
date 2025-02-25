@@ -63,8 +63,7 @@ export const NavigationTabContent: React.FC<Props> = ({ branch }) => {
       {getNavigation({
         id: branch,
         isOrganisationAdministrator: isAdministrator,
-        isUserOfInternalOAuthProvider:
-          session.data?.user?.provider === AUTH_PROVIDER_INTERNAL_LASIUS,
+        isUserOfInternalOAuthProvider: session.data?.provider === AUTH_PROVIDER_INTERNAL_LASIUS,
       }).map((item) => (
         <NavigationButton key={item.name} item={item} />
       ))}

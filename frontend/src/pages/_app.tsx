@@ -91,9 +91,9 @@ const App = ({
 }: AppPropsWithLayout): JSX.Element => {
   // Use the layout defined at the page level, if available
   const getLayout = Component.getLayout ?? ((page) => page);
-  const lasiusIsLoggedIn = !!(session?.user?.access_token && profile?.id);
+  const lasiusIsLoggedIn = !!(session?.access_token && profile?.id);
   const store = useStore();
-  
+
   useAsync(async () => {
     if (!lasiusIsLoggedIn) {
       logger.info('[App][UserNotLoggedIn]');
@@ -113,7 +113,7 @@ const App = ({
         }}
       >
         <SessionProvider session={session} refetchOnWindowFocus={true}>
-          <HttpHeaderProvider initialSession={session}/>
+          <HttpHeaderProvider session={session} />
           <Head>
             <meta
               name="viewport"
@@ -182,12 +182,10 @@ App.getInitialProps = async ({
 }: ExtendedAppContext) => {
   const session = await getSession({ req });
   let profile = null;
-  if (session?.user?.access_token) {
+  if (session?.access_token) {
     try {
-      profile = await getUserProfile(getRequestHeaders(session.user?.access_token));
-    } catch (error) {
-      //logger.error(error);
-
+      profile = await getUserProfile(getRequestHeaders(session.access_token));
+    } catch {
       if (res && !pathname.includes('/login')) {
         res.writeHead(307, { Location: '/login' });
         res.end();

@@ -133,7 +133,7 @@ const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig }> = ({ con
         },
       });
 
-      store.dispatch({ type: 'calendar.setSelectedDate', payload: formatISOLocale(new Date()) });      
+      store.dispatch({ type: 'calendar.setSelectedDate', payload: formatISOLocale(new Date()) });
 
       await router.push(res.url);
     }

@@ -26,18 +26,13 @@ import { getConfiguration } from 'lib/api/lasius/general/general';
 import { formatISOLocale } from 'lib/dates';
 import { LasiusPlausibleEvents } from 'lib/telemetry/plausibleEvents';
 import { GetServerSideProps, NextPage } from 'next';
-import {
-  getProviders,
-  getCsrfToken,
-  signIn,
-  ClientSafeProvider,
-} from 'next-auth/react';
+import { getProviders, getCsrfToken, signIn, ClientSafeProvider } from 'next-auth/react';
 import { Trans, useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { usePlausible } from 'next-plausible';
 import { useRouter } from 'next/router';
 import { AUTH_PROVIDER_INTERNAL_LASIUS } from 'projectConfig/constants';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useStore } from 'storeContext/store';
 import { Button } from 'theme-ui';
 
@@ -52,51 +47,53 @@ const Login: NextPage<{ csrfToken: string; providers: ClientSafeProvider[] }> = 
   const router = useRouter();
   const { invitation_id = null, email = null } = router.query;
 
-  const signInToProvider = async (provider: string) => {
-    plausible('login', {
-      props: {
-        status: 'start',
-        provider: provider,
-      },
-    });
-
-    setIsSubmitting(true);
-
-    const callbackUrl = invitation_id ? '/join/' + invitation_id : '/user/home';
-    const res = await signIn(
-      provider,
-      {
-        csrfToken: csrfToken,
-        redirect: false,
-        callbackUrl: callbackUrl,
-      },
-      new URLSearchParams({
-        email: email?.toString() || '',
-        invitation_id: invitation_id?.toString() || '',
-      })
-    );
-  
-    setIsSubmitting(false);
-
-    if (!res?.error && res?.url) {
+  const signInToProvider = useCallback(
+    async (provider: string) => {
       plausible('login', {
         props: {
-          status: 'success',
+          status: 'start',
           provider: provider,
         },
-      });      
+      });
 
-      store.dispatch({ type: 'calendar.setSelectedDate', payload: formatISOLocale(new Date()) });
-      await router.push(res.url);
-    }
-      
-  };
+      setIsSubmitting(true);
+
+      const callbackUrl = invitation_id ? '/join/' + invitation_id : '/user/home';
+      const res = await signIn(
+        provider,
+        {
+          csrfToken: csrfToken,
+          redirect: false,
+          callbackUrl: callbackUrl,
+        },
+        new URLSearchParams({
+          email: email?.toString() || '',
+          invitation_id: invitation_id?.toString() || '',
+        })
+      );
+
+      setIsSubmitting(false);
+
+      if (!res?.error && res?.url) {
+        plausible('login', {
+          props: {
+            status: 'success',
+            provider: provider,
+          },
+        });
+
+        store.dispatch({ type: 'calendar.setSelectedDate', payload: formatISOLocale(new Date()) });
+        await router.push(res.url);
+      }
+    },
+    [csrfToken, email, invitation_id, plausible, router, store]
+  );
 
   useEffect(() => {
     if (providers.length === 1) {
       signInToProvider(providers[0].id);
     }
-  }, [providers.length]);
+  }, [providers, signInToProvider]);
 
   if (providers.length === 1) {
     return (

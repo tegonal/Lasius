@@ -17,7 +17,7 @@
  *
  */
 
-import NextAuth, { NextAuthOptions, User } from 'next-auth';
+import NextAuth, { NextAuthOptions } from 'next-auth';
 import { JWT } from 'next-auth/jwt';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { logger } from 'lib/logger';
@@ -44,13 +44,12 @@ const internalProvider: OAuthConfig<any> = {
   clientSecret: process.env.LASIUS_OAUTH_CLIENT_SECRET,
   checks: ['pkce', 'state'],
   idToken: false,
-  profile: async (profile: any, tokens) => {
+  profile: async (profile: any) => {
     return {
       id: profile.id.toString(),
       name: profile.firstName + ' ' + profile.lastName,
       email: profile.email,
       provider: AUTH_PROVIDER_INTERNAL_LASIUS,
-      access_token: tokens.access_token
     };
   },
 };
@@ -63,20 +62,20 @@ const internalProvider: OAuthConfig<any> = {
 async function refreshAccessToken(token: JWT): Promise<JWT> {
   console.debug('[NextAuth][refreshAccessToken]', token?.refresh_token);
   try {
-    const url = process.env.NEXTAUTH_URL + '/backend/oauth2/access_token'
+    const url = process.env.NEXTAUTH_URL + '/backend/oauth2/access_token';
 
     const response = await fetch(url, {
       method: 'POST',
       body: new URLSearchParams({
         grant_type: 'refresh_token',
-        refresh_token:  token.refresh_token || '',
+        refresh_token: token.refresh_token || '',
         client_id: process.env.LASIUS_OAUTH_CLIENT_ID || '',
-        client_secret: process.env.LASIUS_OAUTH_CLIENT_SECRET || ''
-      })
+        client_secret: process.env.LASIUS_OAUTH_CLIENT_SECRET || '',
+      }),
     });
 
     const tokensOrError = await response.json();
-    
+
     if (!response.ok) {
       throw tokensOrError;
     }
@@ -94,7 +93,7 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
       access_token: newTokens.access_token,
       expires_at: Math.floor(Date.now() / 1000 + newTokens.expires_in),
       // Some providers only issue refresh tokens once, so preserve if we did not get a new one
-      refresh_token: newTokens.refresh_token ? newTokens.refresh_token : token.refresh_token,
+      refresh_token: newTokens.refresh_token ?? token.refresh_token,
     };
   } catch (error) {
     console.log('[NextAuth][RefreshAccessTokenError]', error);
@@ -120,11 +119,13 @@ export const nextAuthOptions: NextAuthOptions = {
   },
   callbacks: {
     async session({ session, token, user }) {
-      session.user = token.user || user;
-      session.error = token.error;
-      if (session.user) {
-        session.user.access_token = token.access_token        
+      if (token) {
+        session.user = token?.user;
+        session.access_token = token.access_token;
+        session.error = token?.error;
       }
+      session.user = session.user || user;
+      console.debug('[NextAuth][Session]', session);
 
       return session;
     },
@@ -149,15 +150,15 @@ export const nextAuthOptions: NextAuthOptions = {
         // Subsequent logins, but the `access_token` has expired, try to refresh it
         if (!token.refresh_token) throw new TypeError('Missing refresh_token');
         //if (token.error === 'RefreshAccessTokenError') return undefined;
-        if (token.error === "RefreshAccessTokenError") {
-          console.log("Token refresh already failed, not trying again.");
+        if (token.error === 'RefreshAccessTokenError') {
+          console.log('Token refresh already failed, not trying again.');
           return token;
         }
 
         // Access token has expired, try to update it
-        console.log('before refresh', token);
+        console.debug('before refresh', token);
         const result = await refreshAccessToken(token);
-        console.log('after refresh', result);
+        console.debug('after refresh', result);
         return Promise.resolve(result);
       }
     },

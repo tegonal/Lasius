@@ -138,7 +138,7 @@ trait TokenSecurity extends Logging with ConfigAware {
   private def validateSubjectHasAccess(token: DecodedJWT) = {
     systemServices.lasiusConfig.security.accessRestriction.fold(true) {
       accessConfig =>
-        logger.error(
+        logger.debug(
           s"validateSubjectHasAccess: $accessConfig => ${token.getSubject} == ${accessConfig
             .canAccess(token.getSubject)}")
         accessConfig.canAccess(token.getSubject)
