@@ -40,8 +40,8 @@ const ListsPage: NextPageWithLayout = ({ profile }) => {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { locale = '' } = context;
   const session = await getServerSession(context.req, context.res, nextAuthOptions);
-  const profile = session?.user?.access_token
-    ? await getUserProfile(getRequestHeaders(session.user?.access_token))
+  const profile = session?.access_token
+    ? await getUserProfile(getRequestHeaders(session.access_token))
     : undefined;
   return {
     props: {

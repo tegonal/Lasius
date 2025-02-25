@@ -101,7 +101,7 @@ export const AccountForm: React.FC = () => {
             <FormElement>
               <Label htmlFor="email">{t('E-Mail')}</Label>
               <Input
-                readOnly={session?.data?.user?.provider !== AUTH_PROVIDER_INTERNAL_LASIUS}
+                readOnly={session?.data?.provider !== AUTH_PROVIDER_INTERNAL_LASIUS}
                 {...hookForm.register('email', { required: true, pattern: emailValidationPattern })}
                 autoComplete="off"
               />

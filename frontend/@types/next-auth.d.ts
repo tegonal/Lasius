@@ -24,19 +24,19 @@ declare module 'next-auth' {
   interface Session extends DefaultSession {
     user?: DefaultSession['user'] & User;
     error?: string;
-  }
-  interface User extends DefaultUser {
     access_token?: string;
     provider?: string;
+  }
+  interface User extends DefaultUser {    
   }
 }
 
 declare module 'next-auth/jwt' {
   interface JWT extends DefaultJWT {
     access_token?: string;
+    refresh_token?: string;
     user: User;
     error?: string;
-    expires_at?: number;
-    refresh_token?: string;
+    expires_at?: number;    
   }
 }

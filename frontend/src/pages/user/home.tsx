@@ -24,6 +24,8 @@ import { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { LayoutMobile } from 'layout/layoutMobile';
 import { LayoutDesktop } from 'layout/layoutDesktop';
+import { getServerSession } from 'next-auth';
+import { nextAuthOptions } from 'pages/api/auth/[...nextauth]';
 
 type DeviceType = {
   deviceType: 'desktop' | 'mobile';
@@ -37,6 +39,8 @@ const Home: NextPageWithLayout<DeviceType> = (context) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getServerSession(context.req, context.res, nextAuthOptions);
+  console.info('[Home][Session]', session);
   const { locale = '' } = context;
   const UA = context.req.headers['user-agent'];
   const isMobile = Boolean(
