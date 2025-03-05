@@ -140,7 +140,7 @@ class OAuth2Controller @Inject() (
           withinTransaction { implicit dbSession =>
             for {
               // Validate email to register will have access to lasius afterwards
-              _ <- failIf(
+              _ <- failIfNot(
                 systemServices.lasiusConfig.security.accessRestriction
                   .fold(false)(_.canAccess(request.body.email)),
                 s"Cannot register with email address ${request.body.email}, access not granted"
