@@ -126,4 +126,16 @@ class UsersController @Inject() (
           } yield Ok(Json.toJson(user.toDTO))
         }
     }
+
+  def acceptTOS(): Action[AcceptTOSRequest] =
+    HasUserRole(FreeUser,
+                validateJson[AcceptTOSRequest],
+                withinTransaction = false) {
+      implicit dbSession => implicit subject => _ => implicit request =>
+        {
+          userRepository
+            .acceptTOS(subject.userReference, request.body)
+            .map(user => Ok(Json.toJson(user.toDTO)))
+        }
+    }
 }

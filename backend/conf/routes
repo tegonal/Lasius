@@ -41,7 +41,7 @@ GET /csrf-token             controllers.ApplicationController.getCsrfToken
 #######
 
 ###
-#  tags: 
+#  tags:
 #    - messaging
 #  responses:
 #    200:
@@ -217,6 +217,28 @@ POST /user/profile          controllers.UsersController.updatePersonalData()
 #            $ref: '#/components/schemas/models.UserDTO'
 ###
 POST /user/profile/settings          controllers.UsersController.updateUserSettings()
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - user
+#  summary: Accept terms of service (TOS)
+#  operationId: acceptUserTOS
+#  requestBody:
+#    content:
+#      application/json:
+#        schema:
+#          $ref: '#/components/schemas/models.AcceptTOSRequest'
+#  responses:
+#    200:
+#      description: success
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.UserDTO'
+###
+POST /user/accept-tos      controllers.UsersController.acceptTOS()
 
 #######
 ####### Users #######

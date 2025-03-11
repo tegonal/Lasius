@@ -21,9 +21,10 @@
 
 package models
 
-import models.BaseFormat.UUIDBaseId
+import models.BaseFormat.{localDateFormat, UUIDBaseId}
 import models.UserId.UserReference
 import play.api.libs.json._
+import org.joda.time.LocalDate
 
 import java.util.UUID
 
@@ -36,6 +37,12 @@ object UserId {
   type UserReference = EntityReference[UserId]
 }
 
+case class AcceptedTOS(version: String, date: LocalDate)
+
+object AcceptedTOS {
+  implicit val format: Format[AcceptedTOS] = Json.format[AcceptedTOS]
+}
+
 case class User(id: UserId,
                 key: String,
                 email: String,
@@ -44,7 +51,8 @@ case class User(id: UserId,
                 active: Boolean,
                 role: UserRole,
                 organisations: Seq[UserOrganisation],
-                settings: Option[UserSettings])
+                settings: Option[UserSettings],
+                acceptedTOS: Option[AcceptedTOS])
     extends BaseEntity[UserId] {
   def getReference: UserReference = EntityReference(id, key)
 
@@ -60,7 +68,8 @@ case class User(id: UserId,
     settings = settings.getOrElse(
       UserSettings(
         lastSelectedOrganisation = None
-      ))
+      )),
+    acceptedTOS = acceptedTOS
   )
 
   def toStub: UserStub = UserStub(id = id,
@@ -84,7 +93,8 @@ case class UserDTO(id: UserId,
                    active: Boolean,
                    role: UserRole,
                    organisations: Seq[UserOrganisation],
-                   settings: UserSettings)
+                   settings: UserSettings,
+                   acceptedTOS: Option[AcceptedTOS])
 
 object UserDTO {
   implicit val userFormat: Format[UserDTO] = Json.format[UserDTO]
