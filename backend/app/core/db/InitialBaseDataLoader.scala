@@ -142,7 +142,8 @@ class InitialBaseDataLoader @Inject() (
         active = true,
         role = FreeUser,
         organisations = Seq(userOrg),
-        settings = None
+        settings = None,
+        acceptedTOS = None
       ))
 
   }

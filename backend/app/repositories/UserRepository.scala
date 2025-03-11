@@ -31,6 +31,7 @@ import models._
 import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
 import reactivemongo.api.bson.collection.BSONCollection
+import org.joda.time.LocalDate
 
 import javax.inject.Inject
 import scala.concurrent._
@@ -106,6 +107,10 @@ trait UserRepository
 
   def updateProjectKey(projectId: ProjectId, newKey: String)(implicit
       dbSession: DBSession): Future[Boolean]
+
+  def acceptTOS(userReference: UserReference,
+                acceptTOSRequest: AcceptTOSRequest)(implicit
+      dbSession: DBSession): Future[User]
 }
 
 class UserMongoRepository @Inject() (
@@ -409,7 +414,8 @@ class UserMongoRepository @Inject() (
               projects = Seq()
             )
           ),
-          settings = None
+          settings = None,
+          acceptedTOS = None
         ))
       _ <- validateCreate(newUser)
       _ <- upsert(newUser)
@@ -440,6 +446,29 @@ class UserMongoRepository @Inject() (
       multi = true,
       arrayFilters = Seq(Json.obj("element.projectReference.id" -> projectId))
     )
+  }
+
+  def acceptTOS(userReference: UserReference,
+                acceptTOSRequest: AcceptTOSRequest)(implicit
+      dbSession: DBSession): Future[User] = {
+    val sel         = userSelection(userReference)
+    val acceptedTOS = AcceptedTOS(acceptTOSRequest.version, LocalDate.now)
+    for {
+      _ <- validateNonBlankString("acceptTOSRequest.version",
+                                  acceptTOSRequest.version)
+      /*_ <- validate(acceptTOSRequest.version.length < 10,
+                    s"TOS version string is too long!")*/
+      result <- updateFields(
+        sel,
+        Seq[(String, JsValueWrapper)](
+          "acceptedTOS" -> acceptedTOS
+        )
+      )
+      _ <- validate(result,
+                    s"Failed accepting TOS for user: ${userReference.key}")
+      user <- findByUserReference(userReference).noneToFailed(
+        s"Could not find user with id ${userReference.key}")
+    } yield user
   }
 }
 
