@@ -51,9 +51,8 @@ class TimeBookingStatisticsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: TimeBookingStatisticsController
-        with SecurityControllerMock
-        with MockCacheAware =
+      val controller
+          : TimeBookingStatisticsController with SecurityControllerMock =
         TimeBookingStatisticsControllerMock(config,
                                             systemServices,
                                             authConfig,
@@ -87,9 +86,8 @@ class TimeBookingStatisticsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: TimeBookingStatisticsController
-        with SecurityControllerMock
-        with MockCacheAware =
+      val controller
+          : TimeBookingStatisticsController with SecurityControllerMock =
         TimeBookingStatisticsControllerMock(config,
                                             systemServices,
                                             authConfig,
@@ -116,10 +114,8 @@ object TimeBookingStatisticsControllerMock extends MockAwaitable with Mockito {
             systemServices: SystemServices,
             authConfig: AuthConfig,
             reactiveMongoApi: ReactiveMongoApi,
-            jwkProviderCache: SyncCacheApi)(implicit
-      ec: ExecutionContext): TimeBookingStatisticsController
-    with SecurityControllerMock
-    with MockCacheAware = {
+            jwkProviderCache: SyncCacheApi)(implicit ec: ExecutionContext)
+      : TimeBookingStatisticsController with SecurityControllerMock = {
     val bookingByProjectRepository = mockAwaitable[BookingByProjectRepository]
     val bookingByTagRepository     = mockAwaitable[BookingByTagRepository]
 
@@ -131,8 +127,6 @@ object TimeBookingStatisticsControllerMock extends MockAwaitable with Mockito {
       reactiveMongoApi = reactiveMongoApi,
       bookingByProjectRepository = bookingByProjectRepository,
       bookingByTagRepository = bookingByTagRepository,
-      jwkProviderCache = jwkProviderCache)
-      with SecurityControllerMock
-      with MockCacheAware
+      jwkProviderCache = jwkProviderCache) with SecurityControllerMock
   }
 }

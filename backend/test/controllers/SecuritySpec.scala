@@ -49,7 +49,6 @@ class SecuritySpec
     extends PlaySpecification
     with Results
     with Mockito
-    with MockCacheAware
     with BodyParserUtils
     with TestApplication
     with EmbedMongo {
@@ -352,7 +351,7 @@ class SecuritySpec
                             publicKey = None,
                             jwk = None)))
       controller.authConfig
-        .resolveOrCreateUserByJwt(any[LasiusJWT], any[Boolean])(
+        .resolveOrCreateUserByUserInfo(any[UserInfo], any[Boolean])(
           any[ExecutionContext],
           any[DBSession])
         .returns(Future.successful(EntityReference[UserId](UserId(), "user")))
@@ -390,7 +389,7 @@ class SecuritySpec
                             publicKey = None,
                             jwk = None)))
       controller.authConfig
-        .resolveOrCreateUserByJwt(any[LasiusJWT], any[Boolean])(
+        .resolveOrCreateUserByUserInfo(any[UserInfo], any[Boolean])(
           any[ExecutionContext],
           any[DBSession])
         .returns(Future.successful(EntityReference[UserId](UserId(), "user")))
@@ -429,7 +428,7 @@ class SecuritySpec
                             publicKey = None,
                             jwk = None)))
       controller.authConfig
-        .resolveOrCreateUserByJwt(any[LasiusJWT], any[Boolean])(
+        .resolveOrCreateUserByUserInfo(any[UserInfo], any[Boolean])(
           any[ExecutionContext],
           any[DBSession])
         .returns(Future.successful(EntityReference[UserId](UserId(), "user")))
@@ -472,7 +471,7 @@ class SecuritySpec
                               keyPair1.getPublic.getEncoded)),
                             jwk = None)))
       controller.authConfig
-        .resolveOrCreateUserByJwt(any[LasiusJWT], any[Boolean])(
+        .resolveOrCreateUserByUserInfo(any[UserInfo], any[Boolean])(
           any[ExecutionContext],
           any[DBSession])
         .returns(Future.successful(EntityReference[UserId](UserId(), "user")))
@@ -514,7 +513,7 @@ class SecuritySpec
                               keyPair.getPublic.getEncoded)),
                             jwk = None)))
       controller.authConfig
-        .resolveOrCreateUserByJwt(any[LasiusJWT], any[Boolean])(
+        .resolveOrCreateUserByUserInfo(any[UserInfo], any[Boolean])(
           any[ExecutionContext],
           any[DBSession])
         .returns(Future.successful(EntityReference[UserId](UserId(), "user")))
@@ -545,7 +544,6 @@ class SecurityMock(@Inject
     extends BaseController
     with ControllerSecurity
     with SecurityComponentMock
-    with MockCacheAware
     with TestDBSupport {}
 
 object UserMock {
@@ -571,18 +569,17 @@ class HasRoleSecurityMock(
     extends BaseController
     with ControllerSecurity
     with SecurityComponentMock
-    with MockCacheAware
     with TestDBSupport {
 
   implicit val playConfig: Configuration = Configuration(conf)
-  private val jwtToken: DecodedJWT = JWT.decode(
-    JWT
-      .create()
-      .withSubject("test_user@lasius.com")
-      .withClaim(LasiusJWT.EMAIL_CLAIM, "test@lasius.com")
-      .sign(Algorithm.none()))
+  private val userInfo = UserInfo(
+    key = "system",
+    email = "system@lasius.ch",
+    firstName = None,
+    lastName = None
+  )
   private val subject: Subject =
-    Subject(jwtToken, EntityReference(UserId(), "123"))
+    Subject(userInfo, EntityReference(UserId(), "123"))
 
   override def HasToken[A](p: BodyParser[A], withinTransaction: Boolean)(
       f: DBSession => Subject => Request[A] => Future[Result])(implicit
@@ -604,7 +601,6 @@ class HasTokenSecurityMock(
     extends BaseController
     with ControllerSecurity
     with SecurityComponentMock
-    with MockCacheAware
     with TestDBSupport {
 
   implicit val playConfig: Configuration = Configuration(conf)

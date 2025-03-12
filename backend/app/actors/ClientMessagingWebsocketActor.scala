@@ -24,7 +24,8 @@ package actors
 import actors.ControlCommands._
 import com.google.inject.ImplementedBy
 import com.typesafe.config.Config
-import controllers.{AuthConfig, SecurityComponent, TokenSecurity}
+import controllers.security.TokenSecurity
+import controllers.{AuthConfig, SecurityComponent}
 import core.{DBSupport, SystemServices}
 import models._
 import org.apache.pekko.actor._
@@ -124,7 +125,10 @@ class ClientMessagingWebsocketActor(
   private def unauthenticated: Receive = default.orElse {
     case HelloServer(client, token) =>
       log.debug(s"Received HelloServer($client)")
-      withToken(token, withinTransaction = true, canCreateNewUser = false) {
+      withToken(tokenIssuer = None,
+                token = token,
+                withinTransaction = true,
+                canCreateNewUser = false) {
         out ! AuthenticationFailed
         userId = None
         context.become(unauthenticated)

@@ -21,7 +21,7 @@
 
 package controllers
 
-import core.{MockCacheAware, SystemServices, TestApplication}
+import core.{SystemServices, TestApplication}
 import models._
 import mongo.EmbedMongo
 import org.joda.time.DateTime
@@ -51,9 +51,7 @@ class TimeBookingControllerSpec
       private val systemServices                      = inject[SystemServices]
       private val authConfig                          = inject[AuthConfig]
 
-      val controller: TimeBookingController
-        with SecurityControllerMock
-        with MockCacheAware =
+      val controller: TimeBookingController with SecurityControllerMock =
         TimeBookingControllerMock(config,
                                   systemServices,
                                   authConfig,
@@ -77,9 +75,7 @@ class TimeBookingControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       private val systemServices                      = inject[SystemServices]
       private val authConfig                          = inject[AuthConfig]
-      val controller: TimeBookingController
-        with SecurityControllerMock
-        with MockCacheAware =
+      val controller: TimeBookingController with SecurityControllerMock =
         TimeBookingControllerMock(config,
                                   systemServices,
                                   authConfig,
@@ -106,9 +102,7 @@ class TimeBookingControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       private val systemServices                      = inject[SystemServices]
       private val authConfig                          = inject[AuthConfig]
-      val controller: TimeBookingController
-        with SecurityControllerMock
-        with MockCacheAware =
+      val controller: TimeBookingController with SecurityControllerMock =
         TimeBookingControllerMock(config,
                                   systemServices,
                                   authConfig,
@@ -134,9 +128,7 @@ class TimeBookingControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       private val systemServices                      = inject[SystemServices]
       private val authConfig                          = inject[AuthConfig]
-      val controller: TimeBookingController
-        with SecurityControllerMock
-        with MockCacheAware =
+      val controller: TimeBookingController with SecurityControllerMock =
         TimeBookingControllerMock(config,
                                   systemServices,
                                   authConfig,
@@ -162,9 +154,7 @@ class TimeBookingControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       private val systemServices                      = inject[SystemServices]
       private val authConfig                          = inject[AuthConfig]
-      val controller: TimeBookingController
-        with SecurityControllerMock
-        with MockCacheAware =
+      val controller: TimeBookingController with SecurityControllerMock =
         TimeBookingControllerMock(config,
                                   systemServices,
                                   authConfig,
@@ -196,9 +186,7 @@ class TimeBookingControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       private val systemServices                      = inject[SystemServices]
       private val authConfig                          = inject[AuthConfig]
-      val controller: TimeBookingController
-        with SecurityControllerMock
-        with MockCacheAware =
+      val controller: TimeBookingController with SecurityControllerMock =
         TimeBookingControllerMock(config,
                                   systemServices,
                                   authConfig,
@@ -224,9 +212,7 @@ class TimeBookingControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       private val systemServices                      = inject[SystemServices]
       private val authConfig                          = inject[AuthConfig]
-      val controller: TimeBookingController
-        with SecurityControllerMock
-        with MockCacheAware =
+      val controller: TimeBookingController with SecurityControllerMock =
         TimeBookingControllerMock(config,
                                   systemServices,
                                   authConfig,
@@ -251,9 +237,7 @@ class TimeBookingControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       private val systemServices                      = inject[SystemServices]
       private val authConfig                          = inject[AuthConfig]
-      val controller: TimeBookingController
-        with SecurityControllerMock
-        with MockCacheAware =
+      val controller: TimeBookingController with SecurityControllerMock =
         TimeBookingControllerMock(config,
                                   systemServices,
                                   authConfig,
@@ -283,19 +267,15 @@ object TimeBookingControllerMock extends MockAwaitable with Mockito {
             systemServices: SystemServices,
             authConfig: AuthConfig,
             reactiveMongoApi: ReactiveMongoApi,
-            jwkProviderCache: SyncCacheApi)(implicit
-      ec: ExecutionContext): TimeBookingController
-    with SecurityControllerMock
-    with MockCacheAware = {
+            jwkProviderCache: SyncCacheApi)(implicit ec: ExecutionContext)
+      : TimeBookingController with SecurityControllerMock = {
 
-    new TimeBookingController(conf = config,
-                              controllerComponents =
-                                Helpers.stubControllerComponents(),
-                              authConfig = authConfig,
-                              reactiveMongoApi = reactiveMongoApi,
-                              systemServices = systemServices,
-                              jwkProviderCache = jwkProviderCache)
-      with SecurityControllerMock
-      with MockCacheAware
+    new TimeBookingController(
+      conf = config,
+      controllerComponents = Helpers.stubControllerComponents(),
+      authConfig = authConfig,
+      reactiveMongoApi = reactiveMongoApi,
+      systemServices = systemServices,
+      jwkProviderCache = jwkProviderCache) with SecurityControllerMock
   }
 }
