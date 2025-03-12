@@ -30,7 +30,7 @@ import core.db.InitialDataLoader
 import domain.LoginStateAggregate
 import domain.views.CurrentOrganisationTimeBookingsView
 import models.UserId.UserReference
-import models.{EntityReference, LasiusConfig, Subject, UserId}
+import models.{EntityReference, LasiusConfig, Subject, UserId, UserInfo}
 import org.apache.pekko.actor.{ActorRef, ActorSystem}
 import org.apache.pekko.pattern.ask
 import org.apache.pekko.stream.Materializer
@@ -118,13 +118,14 @@ class DefaultSystemServices @Inject() (
   implicit val systemUserReference: UserReference = {
     EntityReference(systemUser, "system")
   }
-  private val systemJWT = JWT.decode(
-    JWT
-      .create()
-      .withSubject("system")
-      .sign(Algorithm.none()))
+  private val systemUserInfo = UserInfo(
+    key = "system",
+    email = "system@lasius.ch",
+    firstName = None,
+    lastName = None
+  )
   val systemSubject: Subject =
-    Subject(systemJWT, systemUserReference)
+    Subject(systemUserInfo, systemUserReference)
   implicit val timeout: Timeout = Timeout(5 seconds) // needed for `?` below
   val duration: FiniteDuration  = Duration.create(30, SECONDS)
   override val timeBookingViewService: ActorRef = Await

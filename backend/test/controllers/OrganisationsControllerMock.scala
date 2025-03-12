@@ -22,7 +22,7 @@
 package controllers
 
 import com.typesafe.config.Config
-import core.{MockCacheAware, SystemServices, TestDBSupport}
+import core.{SystemServices, TestDBSupport}
 import models.{OrganisationAdministrator, OrganisationRole}
 import org.specs2.mock.Mockito
 import play.api.cache.SyncCacheApi
@@ -60,7 +60,6 @@ class OrganisationsControllerMock(
                                     invitationRepository = invitationRepository,
                                     projectRepository = projectRepository)
     with SecurityControllerMock
-    with MockCacheAware
     with TestDBSupport {
 
   // override mock as we deal with a real db backend in this spec

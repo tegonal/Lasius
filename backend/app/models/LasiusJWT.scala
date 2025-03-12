@@ -42,23 +42,19 @@ case class LasiusJWT(private val jwt: DecodedJWT) {
     .map(_.asString())
   def familyName: Option[String] = Option(jwt.getClaim(FAMILY_NAME_CLAIM))
     .map(_.asString())
+
+  def toUserInfo: UserInfo = UserInfo(
+    key = subject,
+    email = email,
+    firstName = givenName,
+    lastName = familyName
+  )
 }
 
 object LasiusJWT {
   val EMAIL_CLAIM               = "email"
   private val GIVEN_NAME_CLAIM  = "given_name"
   private val FAMILY_NAME_CLAIM = "family_name"
-
-  def REQUEST_HEADER_NAME(implicit conf: Config): String =
-    if (conf.hasPath("play.http.session.jwtName"))
-      conf.getString("play.http.session.jwtName")
-    else "Authorization"
-
-  def TOKEN_PREFIX(implicit conf: Config): String = {
-    if (conf.hasPath("play.http.session.tokenPrefix"))
-      conf.getString("play.http.session.tokenPrefix")
-    else "Bearer "
-  }
 
   def newJWT(user: OAuthUser)(implicit config: LasiusConfig): Try[String] = {
 

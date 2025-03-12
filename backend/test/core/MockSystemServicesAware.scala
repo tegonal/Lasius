@@ -91,14 +91,14 @@ class MockServices(actorSystem: ActorSystem) extends SystemServices {
 
   implicit val clock: Clock              = Clock.systemUTC
   implicit val playConfig: Configuration = Configuration(ConfigFactory.load())
-  val jwtToken: DecodedJWT = JWT.decode(
-    JWT
-      .create()
-      .withSubject("test_user")
-      .withClaim(LasiusJWT.EMAIL_CLAIM, "test@lasius.com")
-      .sign(Algorithm.none()))
+  val userInfo: UserInfo = UserInfo(
+    key = "system",
+    email = "system@lasius.ch",
+    firstName = None,
+    lastName = None
+  )
   override val systemSubject: Subject =
-    Subject(jwtToken, systemUserReference)
+    Subject(userInfo, systemUserReference)
   implicit val timeout: Timeout = Timeout(5 seconds) // needed for `?` below
   val duration: Duration        = Duration.create(5, SECONDS)
   val timeBookingViewService: ActorRef = TestProbe().ref

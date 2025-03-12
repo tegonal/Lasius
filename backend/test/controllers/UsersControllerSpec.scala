@@ -51,8 +51,7 @@ class UsersControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       private val systemServices                      = inject[SystemServices]
       private val authConfig                          = inject[AuthConfig]
-      private val controller
-          : UsersController with SecurityControllerMock with MockCacheAware =
+      private val controller: UsersController with SecurityControllerMock =
         UsersControllerMock(config,
                             systemServices,
                             authConfig,
@@ -77,8 +76,7 @@ class UsersControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       private val systemServices: SystemServices      = inject[SystemServices]
       private val authConfig: AuthConfig              = inject[AuthConfig]
-      private val controller
-          : UsersController with SecurityControllerMock with MockCacheAware =
+      private val controller: UsersController with SecurityControllerMock =
         UsersControllerMock(config,
                             systemServices,
                             authConfig,
@@ -103,10 +101,8 @@ class UsersControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: UsersController
-        with SecurityControllerMock
-        with MockCacheAware
-        with TestDBSupport =
+      val controller
+          : UsersController with SecurityControllerMock with TestDBSupport =
         UsersControllerMock(config,
                             systemServices,
                             authConfig,
@@ -146,8 +142,7 @@ class UsersControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller
-          : UsersController with SecurityControllerMock with MockCacheAware =
+      val controller: UsersController with SecurityControllerMock =
         UsersControllerMock(config,
                             systemServices,
                             authConfig,
@@ -184,8 +179,7 @@ class UsersControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller
-          : UsersController with SecurityControllerMock with MockCacheAware =
+      val controller: UsersController with SecurityControllerMock =
         UsersControllerMock(config,
                             systemServices,
                             authConfig,
@@ -287,8 +281,7 @@ class UsersControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller
-          : UsersController with SecurityControllerMock with MockCacheAware =
+      val controller: UsersController with SecurityControllerMock =
         UsersControllerMock(config,
                             systemServices,
                             authConfig,
@@ -310,8 +303,7 @@ class UsersControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller
-          : UsersController with SecurityControllerMock with MockCacheAware =
+      val controller: UsersController with SecurityControllerMock =
         UsersControllerMock(config,
                             systemServices,
                             authConfig,
@@ -343,11 +335,8 @@ object UsersControllerMock extends MockAwaitable with Mockito with Awaitable {
             systemServices: SystemServices,
             authConfig: AuthConfig,
             reactiveMongoApi: ReactiveMongoApi,
-            jwkProviderCache: SyncCacheApi)(implicit
-      ec: ExecutionContext): UsersController
-    with SecurityControllerMock
-    with MockCacheAware
-    with TestDBSupport = {
+            jwkProviderCache: SyncCacheApi)(implicit ec: ExecutionContext)
+      : UsersController with SecurityControllerMock with TestDBSupport = {
     val mongoUserRepository = new UserMongoRepository()
 
     val controller = new UsersController(conf = config,
@@ -359,7 +348,6 @@ object UsersControllerMock extends MockAwaitable with Mockito with Awaitable {
                                          jwkProviderCache = jwkProviderCache,
                                          userRepository = mongoUserRepository)
       with SecurityControllerMock
-      with MockCacheAware
       with TestDBSupport {
       // override mock as we deal with a real db backend in this spec
       override val userRepository: UserRepository = mongoUserRepository
