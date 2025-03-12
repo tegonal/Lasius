@@ -452,7 +452,8 @@ class ProjectsControllerSpec
         active = true,
         role = Administrator,
         organisations = Seq(userOrganisation),
-        settings = None
+        settings = None,
+        acceptedTOS = None
       )
 
       withDBSession()(implicit dbSession =>
@@ -542,7 +543,8 @@ class ProjectsControllerSpec
         active = true,
         role = Administrator,
         organisations = Seq(userOrganisation),
-        settings = None
+        settings = None,
+        acceptedTOS = None
       )
 
       withDBSession()(implicit dbSession =>
@@ -673,7 +675,8 @@ class ProjectsControllerSpec
         active = true,
         role = Administrator,
         organisations = Seq(userOrganisation2),
-        settings = None
+        settings = None,
+        acceptedTOS = None
       )
       withDBSession()(implicit dbSession =>
         controller.userRepository.upsert(user2)).awaitResult()
@@ -843,7 +846,8 @@ class ProjectsControllerSpec
             projects = Seq()
           )
         ),
-        settings = None
+        settings = None,
+        acceptedTOS = None
       )
 
       val invitation: JoinProjectInvitation = JoinProjectInvitation(

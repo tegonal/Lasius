@@ -394,7 +394,8 @@ class OrganisationsControllerSpec
         organisations = Seq(userOrganisation2),
         settings = Some(
           UserSettings(lastSelectedOrganisation =
-            Some(controller.organisation.getReference)))
+            Some(controller.organisation.getReference))),
+        acceptedTOS = None
       )
       withDBSession()(implicit dbSession =>
         controller.userRepository.upsert(user2)).awaitResult()
@@ -516,7 +517,8 @@ class OrganisationsControllerSpec
         active = true,
         role = Administrator,
         organisations = Seq(userOrganisation2),
-        settings = None
+        settings = None,
+        acceptedTOS = None
       )
       withDBSession()(implicit dbSession =>
         controller.userRepository.upsert(user2)).awaitResult()
@@ -654,7 +656,8 @@ class OrganisationsControllerSpec
             projects = Seq()
           )
         ),
-        settings = None
+        settings = None,
+        acceptedTOS = None
       )
 
       private val invitation = JoinOrganisationInvitation(
