@@ -887,15 +887,18 @@ class SecurityMock(@Inject
 
 object UserMock {
   def mock(role: UserRole): User =
-    User(id = UserId(),
-         key = "123",
-         email = "email",
-         firstName = "firstname",
-         lastName = "lastname",
-         active = true,
-         role = role,
-         organisations = Seq(),
-         settings = None)
+    User(
+      id = UserId(),
+      key = "123",
+      email = "email",
+      firstName = "firstname",
+      lastName = "lastname",
+      active = true,
+      role = role,
+      organisations = Seq(),
+      settings = None,
+      acceptedTOS = None
+    )
 }
 
 class HasRoleSecurityMock(
