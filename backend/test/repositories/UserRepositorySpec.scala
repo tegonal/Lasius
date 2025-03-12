@@ -30,15 +30,18 @@ class UserRepositorySpec extends EmbedMongo {
   "UserRepository findByEmail" should {
     "find user by email" in {
       val email = "email"
-      val user = User(id = UserId(),
-                      key = "user",
-                      email = email,
-                      firstName = "firstname",
-                      lastName = "lastname",
-                      active = true,
-                      role = FreeUser,
-                      organisations = Seq(),
-                      settings = None)
+      val user = User(
+        id = UserId(),
+        key = "user",
+        email = email,
+        firstName = "firstname",
+        lastName = "lastname",
+        active = true,
+        role = FreeUser,
+        organisations = Seq(),
+        settings = None,
+        acceptedTOS = None
+      )
 
       // initialize
       withDBSession()(implicit dbSession => repository.upsert(user))
@@ -50,15 +53,18 @@ class UserRepositorySpec extends EmbedMongo {
     }
     "find none" in {
       val email = "email"
-      val user = User(id = UserId(),
-                      key = "user",
-                      email = email,
-                      firstName = "firstname",
-                      lastName = "lastname",
-                      active = true,
-                      role = FreeUser,
-                      organisations = Seq(),
-                      settings = None)
+      val user = User(
+        id = UserId(),
+        key = "user",
+        email = email,
+        firstName = "firstname",
+        lastName = "lastname",
+        active = true,
+        role = FreeUser,
+        organisations = Seq(),
+        settings = None,
+        acceptedTOS = None
+      )
 
       // initialize
       withDBSession()(implicit dbSession => repository.upsert(user))

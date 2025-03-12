@@ -32,6 +32,7 @@ import play.api.test._
 import play.modules.reactivemongo.ReactiveMongoApi
 import repositories.{UserMongoRepository, UserRepository}
 import util.{Awaitable, MockAwaitable}
+import org.joda.time.LocalDate
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
@@ -114,7 +115,8 @@ class UsersControllerSpec
                              active = true,
                              FreeUser,
                              Seq(),
-                             settings = None)
+                             settings = None,
+                             acceptedTOS = None)
       controller
         .withDBSession() { implicit dbSession =>
           controller.userRepository.upsert(user2)
@@ -161,6 +163,7 @@ class UsersControllerSpec
                      "newFirstName",
                      "newLastName",
                      true,
+                     _,
                      _,
                      _,
                      _) =>
@@ -320,6 +323,58 @@ class UsersControllerSpec
         .map(_.plannedWorkingHours) must beSome(workingHours)
     }
   }
+
+  "acceptTOS" should {
+    "badrequest if TOS version is empty" in new WithTestApplication {
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller
+          : UsersController with SecurityControllerMock with MockCacheAware =
+        UsersControllerMock(config,
+                            systemServices,
+                            authConfig,
+                            reactiveMongoApi,
+                            jwkProviderCache)
+
+      val request: FakeRequest[AcceptTOSRequest] = FakeRequest().withBody(
+        AcceptTOSRequest(version = "")
+      )
+      val result: Future[Result] =
+        controller.acceptTOS()(request)
+
+      status(result) must equalTo(BAD_REQUEST)
+      contentAsString(result) must equalTo(
+        "expected non-blank String for field 'acceptTOSRequest.version'")
+    }
+
+    "update user profile with accepted TOS version and current date" in new WithTestApplication {
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller
+          : UsersController with SecurityControllerMock with MockCacheAware =
+        UsersControllerMock(config,
+                            systemServices,
+                            authConfig,
+                            reactiveMongoApi,
+                            jwkProviderCache)
+
+      val testVersion = "1.0"
+      val request: FakeRequest[AcceptTOSRequest] = FakeRequest().withBody(
+        AcceptTOSRequest(version = testVersion)
+      )
+      val result: Future[Result] =
+        controller.acceptTOS()(request)
+
+      status(result) must equalTo(OK)
+      val user: UserDTO = contentAsJson(result).as[UserDTO]
+      val acceptedTOSExpect: Option[AcceptedTOS] =
+        Some(AcceptedTOS(testVersion, LocalDate.now))
+      user.acceptedTOS must equalTo(acceptedTOSExpect)
+    }
+  }
+
 }
 
 object UsersControllerMock extends MockAwaitable with Mockito with Awaitable {

@@ -455,8 +455,6 @@ class UserMongoRepository @Inject() (
     for {
       _ <- validateNonBlankString("acceptTOSRequest.version",
                                   acceptTOSRequest.version)
-      /*_ <- validate(acceptTOSRequest.version.length < 10,
-                    s"TOS version string is too long!")*/
       result <- updateFields(
         sel,
         Seq[(String, JsValueWrapper)](
