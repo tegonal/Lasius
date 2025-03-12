@@ -46,13 +46,23 @@ case class LasiusSecurityConfig(
     externalIssuers: Seq[JWTIssuerConfig],
     oauth2Provider: InternalOauth2ProviderConfig
 ) {
-  lazy val allowedIssuers: Seq[JWTIssuerConfig] =
+  lazy val allowedIssuers: Seq[IssuerConfig] =
     if (oauth2Provider.enabled)
       JWTIssuerConfig(
         issuer = oauth2Provider.jwtToken.issuer,
         privateKey = Some(oauth2Provider.jwtToken.privateKey)
       ) +: externalIssuers
     else externalIssuers
+
+  lazy val allowedJWTIssuers: Seq[JWTIssuerConfig] =
+    allowedIssuers
+      .filter(_.isInstanceOf[JWTIssuerConfig])
+      .map(_.asInstanceOf[JWTIssuerConfig])
+
+  lazy val allowedOpaqueTokenIssuers: Seq[OpaqueTokenIssuerConfig] =
+    allowedIssuers
+      .filter(_.isInstanceOf[OpaqueTokenIssuerConfig])
+      .map(_.asInstanceOf[OpaqueTokenIssuerConfig])
 }
 
 case class AccessRestrictionConfig(
@@ -80,10 +90,23 @@ case class JWTTokenConfig(
     privateKey: String
 )
 
+sealed trait IssuerConfig {
+  val issuer: String
+}
+
+case class OpaqueTokenIssuerConfig(
+    issuer: String,
+    clientId: String,
+    clientSecret: String,
+    introspectionUri: String,
+    userInfoUri: String
+) extends IssuerConfig
+
 case class JWTIssuerConfig(issuer: String,
                            publicKey: Option[String] = None,
                            privateKey: Option[String] = None,
                            jwk: Option[JWKConfig] = None)
+    extends IssuerConfig
 
 case class JWKConfig(url: String,
                      cache: Option[JWKProviderCacheConfig] = None,

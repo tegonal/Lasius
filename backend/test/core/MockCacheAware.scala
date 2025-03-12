@@ -29,10 +29,6 @@ import scala.concurrent.Future
 import scala.concurrent.duration.Duration
 import scala.reflect.ClassTag
 
-trait MockCacheAware extends CacheAware {
-  override val oneTimeAccessTokenCache: AsyncCacheApi = new MockAsyncCache()
-}
-
 class MockAsyncCache extends AsyncCacheApi {
   val mockSyncCache = new MockSyncCache()
 

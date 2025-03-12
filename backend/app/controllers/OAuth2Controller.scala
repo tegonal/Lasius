@@ -123,9 +123,8 @@ class OAuth2Controller @Inject() (
         ifLasiusOAuth2ProviderEnabled {
           checked {
             for {
-              _ <- oauthUserRepository.changePassword(
-                subject.extendedJwtClaims.email,
-                request.body)
+              _ <- oauthUserRepository.changePassword(subject.userInfo.email,
+                                                      request.body)
             } yield Ok("")
           }
         }

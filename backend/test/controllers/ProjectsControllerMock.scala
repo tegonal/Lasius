@@ -22,7 +22,7 @@
 package controllers
 
 import com.typesafe.config.Config
-import core.{MockCacheAware, SystemServices, TestDBSupport}
+import core.{SystemServices, TestDBSupport}
 import models.{
   OrganisationMember,
   OrganisationRole,
@@ -67,7 +67,6 @@ class ProjectsControllerMock(
                                reactiveMongoApi = reactiveMongoApi,
                                jwkProviderCache = jwkProviderCache)
     with SecurityControllerMock
-    with MockCacheAware
     with TestDBSupport {
 
   // override mock as we deal with a real db backend in this spec

@@ -21,8 +21,7 @@
 
 package controllers
 
-import com.auth0.jwt.interfaces.DecodedJWT
-import core.{CacheAware, DBSession, DBSupport}
+import core.{DBSession, DBSupport}
 import helpers.UserHelper
 import models._
 import org.specs2.mock.Mockito
@@ -30,8 +29,6 @@ import play.api.Logging
 import play.api.mvc._
 import repositories.{SecurityRepositoryComponent, UserRepository}
 import util.MockAwaitable
-import com.auth0.jwt.JWT
-import com.auth0.jwt.algorithms.Algorithm
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -42,7 +39,7 @@ trait SecurityControllerMock
     with SecurityRepositoryComponent
     with MockAwaitable
     with Mockito {
-  self: BaseController with CacheAware with DBSupport with SecurityComponent =>
+  self: BaseController with DBSupport with SecurityComponent =>
   val userRepository: UserRepository = mockAwaitable[UserRepository]
 
   val token: String                          = ""
@@ -62,12 +59,12 @@ trait SecurityControllerMock
     deactivatedBy = None
   )
 
-  val jwtToken: DecodedJWT = JWT.decode(
-    JWT
-      .create()
-      .withSubject("test_user")
-      .withClaim(LasiusJWT.EMAIL_CLAIM, "test@lasius.com")
-      .sign(Algorithm.none()))
+  val userInfo: UserInfo = UserInfo(
+    key = "system",
+    email = "system@lasius.ch",
+    firstName = None,
+    lastName = None
+  )
 
   val projectActive: Boolean = true
   val project: Project =
@@ -112,7 +109,7 @@ trait SecurityControllerMock
       context: ExecutionContext): Action[A] = {
     Action.async(p) { implicit request =>
       withDBSession() { dbSession =>
-        checked(f(dbSession)(Subject(jwtToken, userReference))(request))
+        checked(f(dbSession)(Subject(userInfo, userReference))(request))
       }
     }
   }
@@ -124,7 +121,7 @@ trait SecurityControllerMock
       context: ExecutionContext): Action[A] = {
     Action.async(p) { implicit request =>
       withDBSession() { dbSession =>
-        checked(f(dbSession)(Subject(jwtToken, userReference))(user)(request))
+        checked(f(dbSession)(Subject(userInfo, userReference))(user)(request))
       }
     }
   }
