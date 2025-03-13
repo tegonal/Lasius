@@ -59,7 +59,7 @@ export const HttpHeaderProvider: React.FC<HttpHeaderProviderProps> = ({ session 
       removeAccessibleCookies();
       signOut();
     }
-  }, [session?.access_token, session?.error]);
+  }, [session?.access_token, session?.access_token_issuer, session?.error]);
 
   return null;
 };

@@ -24,11 +24,11 @@ import { logger } from 'lib/logger';
 import { OAuthConfig } from 'next-auth/providers';
 import { AUTH_PROVIDER_INTERNAL_LASIUS } from 'projectConfig/constants';
 import { t } from 'i18next';
-import GitLab from "next-auth/providers/gitlab";
-import GitHub from "next-auth/providers/github";
+import GitLab from 'next-auth/providers/gitlab';
+import GitHub from 'next-auth/providers/github';
 
-const gitlabUrl = process.env.GITLAB_OAUTH_URL || 'https://gitlab.com'
-const githubUrl = 'https://api.github.com/'
+const gitlabUrl = process.env.GITLAB_OAUTH_URL || 'https://gitlab.com';
+const githubUrl = 'https://api.github.com/';
 
 const internalProvider: OAuthConfig<any> = {
   id: AUTH_PROVIDER_INTERNAL_LASIUS,
@@ -80,7 +80,7 @@ async function requestRefreshToken(refresh_token: string, provider?: string): Pr
           client_secret: process.env.GITHUB_OAUTH_CLIENT_SECRET || '',
         }),
       });
-    default: 
+    default:
       return await fetch(process.env.NEXTAUTH_URL + '/backend/oauth2/access_token', {
         method: 'POST',
         body: new URLSearchParams({
@@ -134,41 +134,45 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
     return token;
   }
 }
-const providers = []
+const providers = [];
 if (process.env.LASIUS_OAUTH_CLIENT_ID && process.env.LASIUS_OAUTH_CLIENT_SECRET) {
-  providers.push(internalProvider)
+  providers.push(internalProvider);
 }
 if (process.env.GITLAB_OAUTH_CLIENT_ID && process.env.GITLAB_OAUTH_CLIENT_SECRET) {
-  providers.push(GitLab({
-    clientId: process.env.GITLAB_OAUTH_CLIENT_ID,
-    clientSecret: process.env.GITLAB_OAUTH_CLIENT_SECRET,
-    wellKnown: gitlabUrl + '/.well-known/openid-configuration',
-    authorization: { params: { scope: "openid email profile" } },
-    profile(profile) {
-      return {
-        id: (profile.id || profile.sub).toString(),
-        name: profile.name ?? profile.username,
-        email: profile.email,
-        image: profile.avatar_url,
-        access_token_issuer: gitlabUrl
-      }
-    },
-  }))
+  providers.push(
+    GitLab({
+      clientId: process.env.GITLAB_OAUTH_CLIENT_ID,
+      clientSecret: process.env.GITLAB_OAUTH_CLIENT_SECRET,
+      wellKnown: gitlabUrl + '/.well-known/openid-configuration',
+      authorization: { params: { scope: 'openid email profile' } },
+      profile(profile) {
+        return {
+          id: (profile.id || profile.sub).toString(),
+          name: profile.name ?? profile.username,
+          email: profile.email,
+          image: profile.avatar_url,
+          access_token_issuer: gitlabUrl,
+        };
+      },
+    })
+  );
 }
 if (process.env.GITHUB_OAUTH_CLIENT_ID && process.env.GITHUB_OAUTH_CLIENT_SECRET) {
-  providers.push(GitHub({
-    clientId: process.env.GITHUB_OAUTH_CLIENT_ID,
-    clientSecret: process.env.GITHUB_OAUTH_CLIENT_SECRET,
-    profile(profile) {
-      return {
-        id: profile.id.toString(),
-        name: profile.name ?? profile.login,
-        email: profile.email,
-        image: profile.avatar_url,
-        access_token_issuer: githubUrl
-      }
-    },
-  }))
+  providers.push(
+    GitHub({
+      clientId: process.env.GITHUB_OAUTH_CLIENT_ID,
+      clientSecret: process.env.GITHUB_OAUTH_CLIENT_SECRET,
+      profile(profile) {
+        return {
+          id: profile.id.toString(),
+          name: profile.name ?? profile.login,
+          email: profile.email,
+          image: profile.avatar_url,
+          access_token_issuer: githubUrl,
+        };
+      },
+    })
+  );
 }
 
 export const nextAuthOptions: NextAuthOptions = {
@@ -213,7 +217,7 @@ export const nextAuthOptions: NextAuthOptions = {
             ...profile,
             access_token: account.access_token,
           },
-          provider: account.provider
+          provider: account.provider,
         };
       } else if (!token.expires_at || Date.now() < token.expires_at * 1000) {
         // Subsequent logins, but the `access_token` is still valid

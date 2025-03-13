@@ -46,7 +46,7 @@ export const LasiusBackendWebsocketStatus: React.FC = () => {
           type: 'HelloServer',
           client: 'lasius-nextjs-frontend',
           token: session.data?.access_token,
-          tokenIssuer: session.data?.access_token_issuer
+          tokenIssuer: session.data?.access_token_issuer,
         },
         false
       );
@@ -58,7 +58,12 @@ export const LasiusBackendWebsocketStatus: React.FC = () => {
     }
 
     setStatus(connectionStatus);
-  }, [connectionStatus, session.data?.access_token, sendJsonMessage]);
+  }, [
+    connectionStatus,
+    session.data?.access_token,
+    session.data?.access_token_issuer,
+    sendJsonMessage,
+  ]);
 
   //  In an effort to keep the websocket connection alive, we send a ping message every 5 seconds
   useInterval(() => {
