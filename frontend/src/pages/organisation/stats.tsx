@@ -41,8 +41,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const { locale = '' } = context;
   const session = await getServerSession(context.req, context.res, nextAuthOptions);
   const profile = session?.access_token
-    ? await getUserProfile(getRequestHeaders(session.access_token, session.access_token_issuer)
-  )
+    ? await getUserProfile(getRequestHeaders(session.access_token, session.access_token_issuer))
     : undefined;
   return {
     props: {

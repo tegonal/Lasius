@@ -184,7 +184,9 @@ App.getInitialProps = async ({
   let profile = null;
   if (session?.access_token) {
     try {
-      profile = await getUserProfile(getRequestHeaders(session.access_token, session.access_token_issuer));
+      profile = await getUserProfile(
+        getRequestHeaders(session.access_token, session.access_token_issuer)
+      );
     } catch {
       if (res && !pathname.includes('/login')) {
         res.writeHead(307, { Location: '/login' });
