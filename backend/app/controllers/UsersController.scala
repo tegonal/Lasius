@@ -22,10 +22,9 @@
 package controllers
 
 import com.typesafe.config.Config
-import org.apache.pekko.util.Timeout
 import core.SystemServices
 import models._
-import play.api.cache.SyncCacheApi
+import org.apache.pekko.util.Timeout
 import play.api.libs.json._
 import play.api.mvc._
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -40,7 +39,6 @@ class UsersController @Inject() (
     override val systemServices: SystemServices,
     override val authConfig: AuthConfig,
     override val reactiveMongoApi: ReactiveMongoApi,
-    override val jwkProviderCache: SyncCacheApi,
     userRepository: UserRepository)(implicit ec: ExecutionContext)
     extends BaseLasiusController() {
 

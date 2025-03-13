@@ -43,7 +43,7 @@ case class LasiusConfig(
 
 case class LasiusSecurityConfig(
     accessRestriction: Option[AccessRestrictionConfig],
-    externalIssuers: Seq[JWTIssuerConfig],
+    externalIssuers: Seq[IssuerConfig],
     oauth2Provider: InternalOauth2ProviderConfig
 ) {
   lazy val allowedIssuers: Seq[IssuerConfig] =
@@ -53,16 +53,6 @@ case class LasiusSecurityConfig(
         privateKey = Some(oauth2Provider.jwtToken.privateKey)
       ) +: externalIssuers
     else externalIssuers
-
-  lazy val allowedJWTIssuers: Seq[JWTIssuerConfig] =
-    allowedIssuers
-      .filter(_.isInstanceOf[JWTIssuerConfig])
-      .map(_.asInstanceOf[JWTIssuerConfig])
-
-  lazy val allowedOpaqueTokenIssuers: Seq[OpaqueTokenIssuerConfig] =
-    allowedIssuers
-      .filter(_.isInstanceOf[OpaqueTokenIssuerConfig])
-      .map(_.asInstanceOf[OpaqueTokenIssuerConfig])
 }
 
 case class AccessRestrictionConfig(
@@ -98,9 +88,12 @@ case class OpaqueTokenIssuerConfig(
     issuer: String,
     clientId: String,
     clientSecret: String,
-    introspectionUri: String,
-    userInfoUri: String
-) extends IssuerConfig
+    introspectionPath: String,
+    userInfoPath: String
+) extends IssuerConfig {
+  val introspectionUri: String = s"$issuer$introspectionPath"
+  val userInfoUri: String      = s"$issuer$userInfoPath"
+}
 
 case class JWTIssuerConfig(issuer: String,
                            publicKey: Option[String] = None,

@@ -24,12 +24,11 @@ package actors
 import actors.ControlCommands._
 import com.google.inject.ImplementedBy
 import com.typesafe.config.Config
-import controllers.security.TokenSecurity
-import controllers.{AuthConfig, SecurityComponent}
+import controllers.AuthConfig
+import controllers.security.{SecurityComponent, TokenSecurity}
 import core.{DBSupport, SystemServices}
 import models._
 import org.apache.pekko.actor._
-import play.api.cache.SyncCacheApi
 import play.modules.reactivemongo.ReactiveMongoApi
 
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -83,15 +82,13 @@ object ClientMessagingWebsocketActor {
   def props(systemServices: SystemServices,
             conf: Config,
             reactiveMongoApi: ReactiveMongoApi,
-            authConfig: AuthConfig,
-            jwkProviderCache: SyncCacheApi)(out: ActorRef): Props =
+            authConfig: AuthConfig)(out: ActorRef): Props =
     Props(
       new ClientMessagingWebsocketActor(systemServices = systemServices,
                                         conf = conf,
                                         reactiveMongoApi = reactiveMongoApi,
                                         authConfig = authConfig,
-                                        out = out,
-                                        jwkProviderCache = jwkProviderCache))
+                                        out = out))
   var actors: ConcurrentLinkedQueue[ActorRef] = new ConcurrentLinkedQueue()
 }
 
@@ -100,7 +97,6 @@ class ClientMessagingWebsocketActor(
     override val conf: Config,
     override val reactiveMongoApi: ReactiveMongoApi,
     override val authConfig: AuthConfig,
-    override val jwkProviderCache: SyncCacheApi,
     out: ActorRef)
     extends Actor
     with ActorLogging
@@ -123,9 +119,9 @@ class ClientMessagingWebsocketActor(
   }
 
   private def unauthenticated: Receive = default.orElse {
-    case HelloServer(client, token) =>
+    case HelloServer(client, token, tokenIssuer) =>
       log.debug(s"Received HelloServer($client)")
-      withToken(tokenIssuer = None,
+      withToken(tokenIssuer = tokenIssuer,
                 token = token,
                 withinTransaction = true,
                 canCreateNewUser = false) {

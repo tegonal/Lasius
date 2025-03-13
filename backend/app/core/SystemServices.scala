@@ -22,22 +22,22 @@
 package core
 
 import actors.{ClientReceiver, LasiusSupervisorActor, TagCache}
-import com.auth0.jwt.JWT
-import com.auth0.jwt.algorithms.Algorithm
 import com.google.inject.ImplementedBy
 import com.typesafe.config.Config
 import core.db.InitialDataLoader
 import domain.LoginStateAggregate
 import domain.views.CurrentOrganisationTimeBookingsView
 import models.UserId.UserReference
-import models.{EntityReference, LasiusConfig, Subject, UserId, UserInfo}
+import models._
 import org.apache.pekko.actor.{ActorRef, ActorSystem}
 import org.apache.pekko.pattern.ask
 import org.apache.pekko.stream.Materializer
 import org.apache.pekko.util.Timeout
+import play.api.cache.{AsyncCacheApi, SyncCacheApi}
 import play.api.inject.Injector
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logging}
+import play.cache.NamedCache
 import play.modules.reactivemongo.ReactiveMongoApi
 import pureconfig._
 import pureconfig.generic.auto._
@@ -76,6 +76,9 @@ trait SystemServices {
   val materializer: Materializer
   val supportTransaction: Boolean
   val lasiusConfig: LasiusConfig
+  val jwkProviderCache: SyncCacheApi
+  val opaqueTokenIssuerCache: AsyncCacheApi
+  val userInfoCache: AsyncCacheApi
 
   def initialize(): Unit
 }
@@ -94,7 +97,12 @@ class DefaultSystemServices @Inject() (
     bookingByTagRepository: BookingByTagRepository,
     bookingHistoryRepository: BookingHistoryRepository,
     wsClient: WSClient,
-    injector: Injector)(implicit ec: ExecutionContext)
+    injector: Injector,
+    @NamedCache("jwk") override val jwkProviderCache: SyncCacheApi,
+    @NamedCache("opaque-token-issuer")
+    override val opaqueTokenIssuerCache: AsyncCacheApi,
+    @NamedCache("user-info") override val userInfoCache: AsyncCacheApi)(implicit
+    ec: ExecutionContext)
     extends SystemServices
     with DBSupport
     with Logging {
@@ -225,5 +233,10 @@ class DefaultSystemServices @Inject() (
     pluginHandler ! PluginHandler.Startup
 
     currentOrganisationTimeBookingsView ! CurrentOrganisationTimeBookingsView.Initialize
+
+    if (lasiusConfig.security.oauth2Provider.enabled) {
+      logger.info(
+        s"You're running lasius with the internal oauth provider. Please be aware that this implementation is not meant to be used in production mode!")
+    }
   }
 }

@@ -46,6 +46,7 @@ export const LasiusBackendWebsocketStatus: React.FC = () => {
           type: 'HelloServer',
           client: 'lasius-nextjs-frontend',
           token: session.data?.access_token,
+          tokenIssuer: session.data?.access_token_issuer
         },
         false
       );

@@ -25,7 +25,6 @@ import com.typesafe.config.Config
 import core.SystemServices
 import models._
 import org.joda.time.DateTime
-import play.api.cache.SyncCacheApi
 import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -45,7 +44,6 @@ class OrganisationsController @Inject() (
     override val systemServices: SystemServices,
     override val authConfig: AuthConfig,
     override val reactiveMongoApi: ReactiveMongoApi,
-    override val jwkProviderCache: SyncCacheApi,
     organisationRepository: OrganisationRepository,
     userRepository: UserRepository,
     invitationRepository: InvitationRepository,
