@@ -19,6 +19,7 @@
 
 import { CardContainer } from 'components/cardContainer';
 import { Logo } from 'components/logo';
+import { Icon } from 'components/shared/icon';
 import { BoxInfo } from 'components/shared/notifications/boxInfo';
 import { TegonalFooter } from 'components/shared/tegonalFooter';
 import { LoginLayout } from 'layout/pages/login/loginLayout';
@@ -34,7 +35,7 @@ import { useRouter } from 'next/router';
 import { AUTH_PROVIDER_INTERNAL_LASIUS } from 'projectConfig/constants';
 import { useCallback, useEffect, useState } from 'react';
 import { useStore } from 'storeContext/store';
-import { Button } from 'theme-ui';
+import { Box, Button } from 'theme-ui';
 
 const Login: NextPage<{ csrfToken: string; providers: ClientSafeProvider[] }> = ({
   csrfToken,
@@ -108,15 +109,43 @@ const Login: NextPage<{ csrfToken: string; providers: ClientSafeProvider[] }> = 
         <Logo />
         <BoxInfo>{t('Please choose a login provider')}</BoxInfo>
         <CardContainer>
-          {providers.map((provider) => (
-            <Button
-              key={provider.name}
-              disabled={isSubmitting}
-              onClick={() => signInToProvider(provider.id)}
-            >
-              <Trans t={t}>{provider.name}</Trans>
-            </Button>
-          ))}
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1.5rem',
+            }}
+          >
+            {providers.map((provider) => {
+              let icon = undefined;
+              const size = 60;
+              switch (provider.id) {
+                case 'internal_lasius':
+                  icon = <Icon name="lasius" size={size} />;
+                  break;
+                case 'gitlab':
+                  icon = <Icon name="gitlab" size={size} />;
+                  break;
+                case 'github':
+                  icon = <Icon name="github" size={size} />;
+                  break;
+              }
+
+              return (
+                <Button
+                  key={provider.id}
+                  disabled={isSubmitting}
+                  onClick={() => signInToProvider(provider.id)}
+                  variant="secondary"
+                  style={{ padding: 25 }}
+                >
+                  {icon}
+                  {t('Sign in with ')}
+                  <Trans t={t}>{provider.name}</Trans>
+                </Button>
+              );
+            })}
+          </Box>
         </CardContainer>
         <TegonalFooter />
       </LoginLayout>
