@@ -41,7 +41,8 @@ val reactiveMongoVersion     = "1.1.0"
 val reactiveMongoPlayVersion = s"$reactiveMongoVersion-play30.RC14"
 val playVersion              = "3.0.5"
 // Play framework 3.x is still bound to older guice version
-val guiceVersion = "6.0.0"
+val guiceVersion      = "6.0.0"
+val pureConfigVersion = "0.17.8"
 
 libraryDependencies ++= Seq(
   "org.reactivemongo" %% "play2-reactivemongo" % reactiveMongoPlayVersion,
@@ -67,7 +68,7 @@ libraryDependencies ++= Seq(
   "io.kontainers"       %% "purecsv"                         % "1.3.10",
   "com.chuusai"         %% "shapeless"                       % "2.3.12",
   "net.openhft"          % "zero-allocation-hashing"         % "0.27ea0",
-  "com.github.pureconfig" %% "pureconfig" % "0.17.8",
+  "com.github.pureconfig" %% "pureconfig" % pureConfigVersion,
   // depend on this plugin to be able to provide custom OutputTransformer
   "io.github.play-swagger" %% "play-swagger" % "2.0.4",
   "com.github.fdimuccio"   %% "play2-sockjs" % "0.10.0",
