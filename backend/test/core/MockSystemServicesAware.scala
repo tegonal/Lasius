@@ -22,9 +22,6 @@
 package core
 
 import actors.LasiusSupervisorActor
-import com.auth0.jwt.JWT
-import com.auth0.jwt.algorithms.Algorithm
-import com.auth0.jwt.interfaces.DecodedJWT
 import com.typesafe.config.ConfigFactory
 import models.UserId.UserReference
 import models._
@@ -34,6 +31,7 @@ import org.apache.pekko.testkit.TestProbe
 import org.apache.pekko.util.Timeout
 import org.specs2.mock.Mockito.mock
 import play.api.Configuration
+import play.api.cache.{AsyncCacheApi, SyncCacheApi}
 import play.modules.reactivemongo.ReactiveMongoApi
 
 import java.time.Clock
@@ -112,6 +110,10 @@ class MockServices(actorSystem: ActorSystem) extends SystemServices {
   val tagCache: ActorRef                            = TestProbe().ref
   val pluginHandler: ActorRef                       = TestProbe().ref
   val loginHandler: ActorRef                        = TestProbe().ref
+
+  override val jwkProviderCache: SyncCacheApi        = new MockSyncCache()
+  override val opaqueTokenIssuerCache: AsyncCacheApi = new MockAsyncCache()
+  override val userInfoCache: AsyncCacheApi          = new MockAsyncCache()
 
   override def initialize(): Unit = {}
 }

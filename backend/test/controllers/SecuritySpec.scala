@@ -25,6 +25,7 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.typesafe.config.Config
+import controllers.security.ControllerSecurity
 import core._
 import models._
 import mongo.EmbedMongo
@@ -76,10 +77,7 @@ class SecuritySpec
       // prepare
       val systemServices: SystemServices = inject[SystemServices]
       val controller =
-        new HasRoleSecurityMock(systemServices,
-                                reactiveMongoApi,
-                                config,
-                                jwkProviderCache)
+        new HasRoleSecurityMock(systemServices, reactiveMongoApi, config)
       controller.authConfig
         .resolveUser(any[EntityReference[UserId]])(any[ExecutionContext],
                                                    any[DBSession])
@@ -98,10 +96,7 @@ class SecuritySpec
       // prepare
       val systemServices: SystemServices = inject[SystemServices]
       val controller =
-        new HasRoleSecurityMock(systemServices,
-                                reactiveMongoApi,
-                                config,
-                                jwkProviderCache)
+        new HasRoleSecurityMock(systemServices, reactiveMongoApi, config)
       controller.authConfig
         .authorizeUser(any[User], any[UserRole])(any[ExecutionContext])
         .returns(Future.successful(false))
@@ -123,10 +118,7 @@ class SecuritySpec
       // prepare
       val systemServices: SystemServices = inject[SystemServices]
       val controller =
-        new HasRoleSecurityMock(systemServices,
-                                reactiveMongoApi,
-                                config,
-                                jwkProviderCache)
+        new HasRoleSecurityMock(systemServices, reactiveMongoApi, config)
       controller.authConfig
         .authorizeUser(any[User], any[UserRole])(any[ExecutionContext])
         .returns(Future.failed(new RuntimeException))
@@ -146,10 +138,7 @@ class SecuritySpec
       // prepare
       val systemServices: SystemServices = inject[SystemServices]
       val controller =
-        new HasRoleSecurityMock(systemServices,
-                                reactiveMongoApi,
-                                config,
-                                jwkProviderCache)
+        new HasRoleSecurityMock(systemServices, reactiveMongoApi, config)
       controller.authConfig
         .authorizeUser(any[User], any[UserRole])(any[ExecutionContext])
         .returns(Future.successful(true))
@@ -198,10 +187,7 @@ class SecuritySpec
       // prepare
       val systemServices: SystemServices = inject[SystemServices]
       val controller =
-        new HasTokenSecurityMock(systemServices,
-                                 reactiveMongoApi,
-                                 config,
-                                 jwkProviderCache)
+        new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
       controller.authConfig
         .resolveUser(any[EntityReference[UserId]])(any[ExecutionContext],
                                                    any[DBSession])
@@ -219,10 +205,7 @@ class SecuritySpec
       // prepare
       val systemServices: SystemServices = inject[SystemServices]
       val controller =
-        new HasTokenSecurityMock(systemServices,
-                                 reactiveMongoApi,
-                                 config,
-                                 jwkProviderCache)
+        new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
       controller.authConfig
         .resolveIssuerConfig(any[String])
         .returns(None)
@@ -247,10 +230,7 @@ class SecuritySpec
       // prepare
       val systemServices: SystemServices = inject[SystemServices]
       val controller =
-        new HasTokenSecurityMock(systemServices,
-                                 reactiveMongoApi,
-                                 config,
-                                 jwkProviderCache)
+        new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
       controller.authConfig
         .resolveIssuerConfig(any[String])
         .returns(None)
@@ -274,10 +254,7 @@ class SecuritySpec
       // prepare
       val systemServices: SystemServices = inject[SystemServices]
       val controller =
-        new HasTokenSecurityMock(systemServices,
-                                 reactiveMongoApi,
-                                 config,
-                                 jwkProviderCache)
+        new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
       controller.authConfig
         .resolveIssuerConfig("test")
         .returns(
@@ -306,10 +283,7 @@ class SecuritySpec
       // prepare
       val systemServices: SystemServices = inject[SystemServices]
       val controller =
-        new HasTokenSecurityMock(systemServices,
-                                 reactiveMongoApi,
-                                 config,
-                                 jwkProviderCache)
+        new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
       controller.authConfig
         .resolveIssuerConfig("test")
         .returns(
@@ -338,10 +312,7 @@ class SecuritySpec
       // prepare
       val systemServices: SystemServices = inject[SystemServices]
       val controller =
-        new HasTokenSecurityMock(systemServices,
-                                 reactiveMongoApi,
-                                 config,
-                                 jwkProviderCache)
+        new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
       controller.authConfig
         .resolveIssuerConfig("test")
         .returns(
@@ -375,10 +346,7 @@ class SecuritySpec
       // prepare
       val systemServices: SystemServices = inject[SystemServices]
       val controller =
-        new HasTokenSecurityMock(systemServices,
-                                 reactiveMongoApi,
-                                 config,
-                                 jwkProviderCache)
+        new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
       controller.authConfig
         .resolveIssuerConfig("test")
         .returns(
@@ -414,10 +382,7 @@ class SecuritySpec
       // prepare
       val systemServices: SystemServices = inject[SystemServices]
       val controller =
-        new HasTokenSecurityMock(systemServices,
-                                 reactiveMongoApi,
-                                 config,
-                                 jwkProviderCache)
+        new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
       val randomString = "dasddasdasfse32q1231231313eqdsasd"
       controller.authConfig
         .resolveIssuerConfig("test")
@@ -452,10 +417,7 @@ class SecuritySpec
       // prepare
       val systemServices: SystemServices = inject[SystemServices]
       val controller =
-        new HasTokenSecurityMock(systemServices,
-                                 reactiveMongoApi,
-                                 config,
-                                 jwkProviderCache)
+        new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
 
       private val keyPairGenerator = KeyPairGenerator.getInstance("RSA")
       private val keyPair1         = keyPairGenerator.generateKeyPair
@@ -496,10 +458,7 @@ class SecuritySpec
       // prepare
       val systemServices: SystemServices = inject[SystemServices]
       val controller =
-        new HasTokenSecurityMock(systemServices,
-                                 reactiveMongoApi,
-                                 config,
-                                 jwkProviderCache)
+        new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
       private val keyPairGenerator = KeyPairGenerator.getInstance("RSA")
       private val keyPair          = keyPairGenerator.generateKeyPair
 
@@ -539,8 +498,7 @@ class SecurityMock(@Inject
                    override val systemServices: SystemServices,
                    override val conf: Config,
                    override val reactiveMongoApi: ReactiveMongoApi,
-                   override val controllerComponents: ControllerComponents,
-                   override val jwkProviderCache: SyncCacheApi)
+                   override val controllerComponents: ControllerComponents)
     extends BaseController
     with ControllerSecurity
     with SecurityComponentMock
@@ -563,7 +521,6 @@ class HasRoleSecurityMock(
     override val systemServices: SystemServices,
     override val reactiveMongoApi: ReactiveMongoApi,
     override val conf: Config,
-    override val jwkProviderCache: SyncCacheApi,
     override val controllerComponents: ControllerComponents =
       Helpers.stubControllerComponents())
     extends BaseController
@@ -595,7 +552,6 @@ class HasTokenSecurityMock(
     override val systemServices: SystemServices,
     override val reactiveMongoApi: ReactiveMongoApi,
     override val conf: Config,
-    override val jwkProviderCache: SyncCacheApi,
     override val controllerComponents: ControllerComponents =
       Helpers.stubControllerComponents())
     extends BaseController

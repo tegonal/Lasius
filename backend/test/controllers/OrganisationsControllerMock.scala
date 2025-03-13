@@ -25,7 +25,6 @@ import com.typesafe.config.Config
 import core.{SystemServices, TestDBSupport}
 import models.{OrganisationAdministrator, OrganisationRole}
 import org.specs2.mock.Mockito
-import play.api.cache.SyncCacheApi
 import play.api.mvc.ControllerComponents
 import play.api.test.Helpers
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -44,7 +43,6 @@ class OrganisationsControllerMock(
     val projectRepository: ProjectMongoRepository,
     authConfig: AuthConfig,
     reactiveMongoApi: ReactiveMongoApi,
-    jwkProviderCache: SyncCacheApi,
     override val organisationRole: OrganisationRole,
     override val isOrganisationPrivate: Boolean,
     override val organisationActive: Boolean)(implicit ec: ExecutionContext)
@@ -53,7 +51,6 @@ class OrganisationsControllerMock(
                                     systemServices = systemServices,
                                     authConfig = authConfig,
                                     reactiveMongoApi = reactiveMongoApi,
-                                    jwkProviderCache = jwkProviderCache,
                                     organisationRepository =
                                       organisationRepository,
                                     userRepository = userMongoRepository,
@@ -74,7 +71,6 @@ object OrganisationsControllerMock
             systemServices: SystemServices,
             authConfig: AuthConfig,
             reactiveMongoApi: ReactiveMongoApi,
-            jwkProviderCache: SyncCacheApi,
             organisationRole: OrganisationRole = OrganisationAdministrator,
             isOrganisationPrivate: Boolean = false,
             organisationActive: Boolean = true)(implicit
@@ -94,7 +90,6 @@ object OrganisationsControllerMock
       projectRepository = projectMongoRepository,
       authConfig = authConfig,
       reactiveMongoApi = reactiveMongoApi,
-      jwkProviderCache = jwkProviderCache,
       isOrganisationPrivate = isOrganisationPrivate,
       organisationActive = organisationActive,
       organisationRole = organisationRole)

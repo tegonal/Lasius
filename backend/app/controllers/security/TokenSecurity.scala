@@ -25,6 +25,7 @@ import com.auth0.jwk.JwkProviderBuilder
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.DecodedJWT
+import core.Validation.ValidationFailedException
 import core.{ConfigAware, DBSession, DBSupport}
 import helpers.FutureHelper
 import models._
@@ -98,7 +99,7 @@ trait TokenSecurity extends Logging with ConfigAware with FutureHelper {
 
       // third priority validate by jwk
       case JWTIssuerConfig(issuer, _, _, Some(jwkConfig)) =>
-        val provider = jwkProviderCache.getOrElseUpdate(issuer) {
+        val provider = systemServices.jwkProviderCache.getOrElseUpdate(issuer) {
           loadJWKProvider(jwkConfig)
         }
         val jwk = provider.get(token.getKeyId)
@@ -155,7 +156,7 @@ trait TokenSecurity extends Logging with ConfigAware with FutureHelper {
     } yield LasiusJWT(validatedToken).toUserInfo
   }
 
-  private def introspectOpaqueToken(
+  private def introspectOpaqueTokenFromIssuer(
       issuer: OpaqueTokenIssuerConfig,
       opaqueToken: String
   )(implicit
@@ -168,11 +169,58 @@ trait TokenSecurity extends Logging with ConfigAware with FutureHelper {
   private def resolveUserInfoFromOpaqueToken(issuer: OpaqueTokenIssuerConfig,
                                              opaqueToken: String)(implicit
       ec: ExecutionContext): Future[Option[UserInfo]] = {
-    userInfoCache.getOrElseUpdate(opaqueToken) {
+    systemServices.userInfoCache.getOrElseUpdate(opaqueToken) {
       authConfig.opaqueTokenService
         .userInfo(issuer, opaqueToken)
     }
   }
+
+  private def resolveIssuerAndIntrospectOpaqueToken(
+      opaqueToken: String)(implicit
+      ec: ExecutionContext): Future[(OpaqueTokenIssuerConfig, Boolean)] = {
+    systemServices.opaqueTokenIssuerCache
+      .get[OpaqueTokenIssuerConfig](opaqueToken)
+      .flatMap {
+        case Some(issuer) =>
+          // revalidate token
+          introspectOpaqueTokenFromIssuer(issuer, opaqueToken)
+        case None =>
+          {
+            logger.debug(
+              s"resolveAndValidateOpaqueToken: no cache, determine issuer")
+            // iterate through all issuers
+            Future
+              .find(
+                authConfig
+                  .issuerConfigs()
+                  .filter(_.isInstanceOf[OpaqueTokenIssuerConfig])
+                  .map(issuer =>
+                    introspectOpaqueTokenFromIssuer(
+                      issuer.asInstanceOf[OpaqueTokenIssuerConfig],
+                      opaqueToken)))(_._2)
+              .noneToFailed("no valid opaque token provider found")
+          }.flatMap(value =>
+            systemServices.opaqueTokenIssuerCache
+              .set(opaqueToken, value._1)
+              .map(_ => value))
+      }
+  }
+
+  private def resolveIssuerConfigAndIntrospectOpaqueToken(
+      tokenIssuer: String,
+      opaqueToken: String
+  )(implicit ec: ExecutionContext): Future[(OpaqueTokenIssuerConfig, Boolean)] =
+    authConfig
+      .resolveIssuerConfig(tokenIssuer)
+      .filter(_.isInstanceOf[OpaqueTokenIssuerConfig])
+      .fold[Future[(OpaqueTokenIssuerConfig, Boolean)]](
+        failed(ValidationFailedException(
+          s"Could not resolve provided opaque token issuer $tokenIssuer from configuration"))) {
+        issuer =>
+          introspectOpaqueTokenFromIssuer(
+            issuer.asInstanceOf[OpaqueTokenIssuerConfig],
+            opaqueToken)
+      }
 
   /** resolving and verifying applies to following steps:
     *   - resolve accepting issuer by sequentially checking token against
@@ -185,41 +233,22 @@ trait TokenSecurity extends Logging with ConfigAware with FutureHelper {
     */
   private def resolveAndValidateOpaqueToken(tokenIssuer: Option[String],
                                             opaqueToken: String)(implicit
-      ec: ExecutionContext): Future[UserInfo] =
+      ec: ExecutionContext): Future[UserInfo] = {
+    logger.debug(s"resolveAndValidateOpaqueToken: issuer=$tokenIssuer")
     for {
       validTokenIssuer <- tokenIssuer
-        .fold {
-          opaqueTokenIssuerCache.getOrElseUpdate(opaqueToken) {
-            // iterate through all issuers
-            Future
-              .find(
-                authConfig
-                  .issuerConfigs()
-                  .filter(_.isInstanceOf[OpaqueTokenIssuerConfig])
-                  .map(issuer =>
-                    introspectOpaqueToken(
-                      issuer.asInstanceOf[OpaqueTokenIssuerConfig],
-                      opaqueToken)))(_._2)
-              .map(_.map(_._1))
-          }
-        } { issuer =>
-          authConfig
-            .resolveIssuerConfig(issuer)
-            .filter(_.isInstanceOf[OpaqueTokenIssuerConfig])
-            .fold(Future.successful[Option[OpaqueTokenIssuerConfig]](None)) {
-              issuer =>
-                introspectOpaqueToken(
-                  issuer.asInstanceOf[OpaqueTokenIssuerConfig],
-                  opaqueToken).map {
-                  case (issuer, true) => Some(issuer)
-                  case _              => None
-                }
-            }
+        .fold(resolveIssuerAndIntrospectOpaqueToken(opaqueToken)) { issuer =>
+          resolveIssuerConfigAndIntrospectOpaqueToken(issuer, opaqueToken)
         }
-        .noneToFailed("No valid opaque token provided")
+        .map {
+          case (issuer, true) => Some(issuer)
+          case _              => None
+        }
+        .noneToFailed("No valid opaque token or provider found")
       userInfo <- resolveUserInfoFromOpaqueToken(validTokenIssuer, opaqueToken)
         .noneToFailed("Could not load userInfo")
     } yield userInfo
+  }
 
   /** Resolve and validate token. Token might be either a JWT token or an
     * opaque_token. To improve performance token validation and reduce lookup,
@@ -253,7 +282,7 @@ trait TokenSecurity extends Logging with ConfigAware with FutureHelper {
         }
       }
       .recoverWith { error =>
-        logger.debug(s"Failed decoding token: ${error.getMessage}")
+        logger.warn(s"Failed decoding token", error)
         failed
       }
   }

@@ -28,7 +28,6 @@ import models._
 import mongo.EmbedMongo
 import org.specs2.mock.Mockito
 import org.specs2.mock.mockito.MockitoMatchers
-import play.api.cache.SyncCacheApi
 import play.api.mvc._
 import play.api.test._
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -57,7 +56,6 @@ class UserFavoritesControllerSpec
                                     systemServices,
                                     reactiveMongoApi,
                                     authConfig,
-                                    jwkProviderCache,
                                     userFavoritesRepository)
 
       val projectId: ProjectId = ProjectId()
@@ -84,7 +82,6 @@ class UserFavoritesControllerSpec
                                     systemServices,
                                     reactiveMongoApi,
                                     authConfig,
-                                    jwkProviderCache,
                                     userFavoritesRepository)
 
       val request: FakeRequest[FavoritesRequest] = FakeRequest()
@@ -114,7 +111,6 @@ class UserFavoritesControllerSpec
                                     systemServices,
                                     reactiveMongoApi,
                                     authConfig,
-                                    jwkProviderCache,
                                     userFavoritesRepository)
 
       val projectId: ProjectId = ProjectId()
@@ -143,7 +139,6 @@ class UserFavoritesControllerSpec
                                   systemServices,
                                   reactiveMongoApi,
                                   authConfig,
-                                  jwkProviderCache,
                                   userFavoritesRepository)
 
     val request: FakeRequest[FavoritesRequest] = FakeRequest()
@@ -166,7 +161,6 @@ object UserFavoritesControllerMock extends MockAwaitable with Mockito {
             systemServices: SystemServices,
             reactiveMongoApi: ReactiveMongoApi,
             authConfig: AuthConfig,
-            jwkProviderCache: SyncCacheApi,
             userFavoritesRepository: UserFavoritesRepository)(implicit
       ec: ExecutionContext)
       : UserFavoritesController with SecurityControllerMock = {
@@ -178,7 +172,6 @@ object UserFavoritesControllerMock extends MockAwaitable with Mockito {
       systemServices = systemServices,
       authConfig = authConfig,
       reactiveMongoApi = reactiveMongoApi,
-      jwkProviderCache = jwkProviderCache,
       userFavoritesRepository = userFavoritesRepository,
       clientReceiver = clientReceiver) with SecurityControllerMock
   }

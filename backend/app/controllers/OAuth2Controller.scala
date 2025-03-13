@@ -26,7 +26,6 @@ import com.typesafe.config.Config
 import core.SystemServices
 import models._
 import org.apache.pekko.http.scaladsl.model.StatusCodes
-import play.api.cache.SyncCacheApi
 import play.api.libs.json.Json
 import play.api.mvc._
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -48,8 +47,8 @@ class OAuth2Controller @Inject() (
     override val reactiveMongoApi: ReactiveMongoApi,
     private val oauthUserRepository: OAuthUserRepository,
     private val oauthAccessTokenRepository: OAuthAccessTokenRepository,
-    private val oauthAuthorizationCodeRepository: OAuthAuthorizationCodeRepository,
-    override val jwkProviderCache: SyncCacheApi)(implicit ec: ExecutionContext)
+    private val oauthAuthorizationCodeRepository: OAuthAuthorizationCodeRepository)(
+    implicit ec: ExecutionContext)
     extends BaseLasiusController()
     with OAuth2Provider {
 

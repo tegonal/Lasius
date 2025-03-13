@@ -26,12 +26,9 @@ import controllers.AuthConfig
 import core.Validation.ValidationFailedException
 import core.{DBSession, DBSupport, SystemServices}
 import models._
-import play.api.cache.{AsyncCacheApi, SyncCacheApi}
 import play.api.libs.json.Reads
 import play.api.mvc._
-import play.cache.NamedCache
 
-import javax.inject.Inject
 import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
@@ -42,18 +39,6 @@ import scala.language.postfixOps
 trait SecurityComponent {
   val systemServices: SystemServices
   val authConfig: AuthConfig
-
-  @Inject
-  @NamedCache("jwk")
-  val jwkProviderCache: SyncCacheApi = null
-
-  @Inject
-  @NamedCache("opaque-token-issuer")
-  val opaqueTokenIssuerCache: AsyncCacheApi = null
-
-  @Inject
-  @NamedCache("user-info")
-  val userInfoCache: AsyncCacheApi = null
 }
 
 trait ControllerSecurity extends TokenSecurity {
@@ -73,7 +58,7 @@ trait ControllerSecurity extends TokenSecurity {
   private def TOKEN_ISSUER_REQUEST_HEADER_NAME(implicit conf: Config): String =
     if (conf.hasPath("play.http.session.tokenIssuerHeaderName"))
       conf.getString("play.http.session.tokenIssuerHeaderName")
-    else "X-Issuer"
+    else "X-Token-Issuer"
 
   def HasToken[A](withinTransaction: Boolean)(
       f: DBSession => Subject => Request[A] => Future[Result])(implicit

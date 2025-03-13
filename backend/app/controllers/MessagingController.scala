@@ -28,7 +28,6 @@ import models._
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.stream.{Materializer, OverflowStrategy}
 import org.apache.pekko.util.Timeout
-import play.api.cache.SyncCacheApi
 import play.api.libs.streams._
 import play.api.mvc._
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -42,8 +41,7 @@ class MessagingController @Inject() (
     override val conf: Config,
     override val controllerComponents: ControllerComponents,
     override val authConfig: AuthConfig,
-    override val systemServices: SystemServices,
-    override val jwkProviderCache: SyncCacheApi)(implicit
+    override val systemServices: SystemServices)(implicit
     override val reactiveMongoApi: ReactiveMongoApi)
     extends BaseLasiusController()
     with InjectedSockJSRouter {
@@ -67,8 +65,7 @@ class MessagingController @Inject() (
           systemServices = systemServices,
           conf = conf,
           reactiveMongoApi = reactiveMongoApi,
-          authConfig = authConfig,
-          jwkProviderCache = jwkProviderCache
+          authConfig = authConfig
         ),
         1000,
         OverflowStrategy.dropNew

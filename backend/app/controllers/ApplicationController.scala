@@ -21,27 +21,25 @@
 
 package controllers
 
+import com.typesafe.config.Config
 import core.SystemServices
+import models.CsrfToken
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.stream.Materializer
 import org.apache.pekko.util.Timeout
 import play.api.libs.json._
 import play.api.mvc._
+import play.filters.csrf.CSRF
 import play.modules.reactivemongo.ReactiveMongoApi
 
 import javax.inject.Inject
 import scala.concurrent.Future
-import com.typesafe.config.Config
-import models.CsrfToken
-import play.api.cache.SyncCacheApi
-import play.filters.csrf.CSRF
 
 class ApplicationController @Inject() (
     override val conf: Config,
     override val controllerComponents: ControllerComponents,
     override val authConfig: AuthConfig,
-    override val systemServices: SystemServices,
-    override val jwkProviderCache: SyncCacheApi)(implicit
+    override val systemServices: SystemServices)(implicit
     override val reactiveMongoApi: ReactiveMongoApi)
     extends BaseLasiusController() {
 

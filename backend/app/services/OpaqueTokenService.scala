@@ -23,6 +23,7 @@ package services
 
 import com.google.inject.ImplementedBy
 import models.{OpaqueTokenIssuerConfig, UserInfo}
+import play.api.Logging
 import play.api.libs.json.Json
 import play.api.libs.ws.{WSAuthScheme, WSClient}
 
@@ -38,38 +39,53 @@ trait OpaqueTokenService {
       ec: ExecutionContext): Future[Option[UserInfo]]
 }
 
+case class ExternalServiceCallFailed(msg: String) extends Exception
+
 class OpaqueTokenServiceImpl @Inject() (ws: WSClient)
-    extends OpaqueTokenService {
+    extends OpaqueTokenService
+    with Logging {
   override def introspectToken(config: OpaqueTokenIssuerConfig,
                                opaqueToken: String)(implicit
       ec: ExecutionContext): Future[Boolean] = {
     val request = ws.url(config.introspectionUri)
     val data = Json.obj(
-      "clientId"     -> config.clientId,
-      "clientSecret" -> config.clientSecret,
-      "token"        -> opaqueToken
+      "token" -> opaqueToken
     )
+    logger.debug(s"introspectToken: url=${config.introspectionUri}")
     request
       .addHttpHeaders("Accept" -> "application/json")
+      .withAuth(config.clientId, config.clientSecret, WSAuthScheme.BASIC)
       .post(data)
-      .map { response =>
+      .flatMap { response =>
         response.status match {
-          case 200 => (response.json \ "active").as[Boolean]
-          case _   => false
+          case 200 =>
+            val active = (response.json \ "active").as[Boolean]
+            logger.debug(s"introspectToken: request succeeded, active: $active")
+            Future.successful(active)
+          case code =>
+            logger.debug(
+              s"introspectToken: request failed, response code $code, ${response.body}")
+            Future.failed(
+              ExternalServiceCallFailed(
+                s"introspectToken: request failed, response code $code"))
         }
       }
   }
 
   override def userInfo(config: OpaqueTokenIssuerConfig, opaqueToken: String)(
       implicit ec: ExecutionContext): Future[Option[UserInfo]] = {
-    val request = ws.url(config.introspectionUri)
+    val request = ws.url(config.userInfoUri)
+    logger.debug(s"userInfo: url=${config.userInfoUri}")
     request
       .addHttpHeaders("Accept" -> "application/json")
-      .withAuth(opaqueToken, "", WSAuthScheme.BASIC)
+      // TODO: verify that other providers expect the token without base64 encoding. Otherwise introduce a configuration flag
+      .addHttpHeaders("Authorization" -> s"Bearer $opaqueToken")
       .get()
       .map { response =>
         response.status match {
           case 200 =>
+            logger.debug(
+              s"userInfo: request succeeded, active: ${response.json}")
             Some(
               UserInfo(
                 key = (response.json \ "email").as[String],
@@ -81,7 +97,10 @@ class OpaqueTokenServiceImpl @Inject() (ws: WSClient)
                   .asOpt[String]
                   .orElse((response.json \ "lastname").asOpt[String])
               ))
-          case _ => None
+          case code =>
+            logger.debug(
+              s"userInfo: request failed, response code $code, ${response.body}")
+            None
         }
       }
   }
