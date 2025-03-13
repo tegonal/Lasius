@@ -22,9 +22,9 @@ export const getRequestHeaders = (token?: string, tokenIssuer?: string) => {
     return {};
   }
   return {
-    headers: { 
+    headers: {
       Authorization: `Bearer ${token}`,
-      'X-Token-Issuer': tokenIssuer
+      'X-Token-Issuer': tokenIssuer,
     },
   };
 };
