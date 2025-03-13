@@ -27,6 +27,9 @@ import { t } from 'i18next';
 import GitLab from "next-auth/providers/gitlab";
 import GitHub from "next-auth/providers/github";
 
+const gitlabUrl = process.env.GITLAB_OAUTH_URL || 'https://gitlab.com'
+const githubUrl = 'https://api.github.com/'
+
 const internalProvider: OAuthConfig<any> = {
   id: AUTH_PROVIDER_INTERNAL_LASIUS,
   // wrap into `t` to ensure we have a translation to it
@@ -51,10 +54,44 @@ const internalProvider: OAuthConfig<any> = {
       id: profile.id.toString(),
       name: profile.firstName + ' ' + profile.lastName,
       email: profile.email,
-      provider: AUTH_PROVIDER_INTERNAL_LASIUS,
     };
   },
 };
+
+async function requestRefreshToken(refresh_token: string, provider?: string): Promise<any> {
+  switch (provider) {
+    case 'gitlab':
+      return await fetch(gitlabUrl + '/oauth/access_token', {
+        method: 'POST',
+        body: new URLSearchParams({
+          grant_type: 'refresh_token',
+          refresh_token: refresh_token || '',
+          client_id: process.env.GITLAB_OAUTH_CLIENT_ID || '',
+          client_secret: process.env.GITLAB_OAUTH_CLIENT_SECRET || '',
+        }),
+      });
+    case 'github':
+      return await fetch(githubUrl + '/oauth/access_token', {
+        method: 'POST',
+        body: new URLSearchParams({
+          grant_type: 'refresh_token',
+          refresh_token: refresh_token || '',
+          client_id: process.env.GITHUB_OAUTH_CLIENT_ID || '',
+          client_secret: process.env.GITHUB_OAUTH_CLIENT_SECRET || '',
+        }),
+      });
+    default: 
+      return await fetch(process.env.NEXTAUTH_URL + '/backend/oauth2/access_token', {
+        method: 'POST',
+        body: new URLSearchParams({
+          grant_type: 'refresh_token',
+          refresh_token: refresh_token || '',
+          client_id: process.env.LASIUS_OAUTH_CLIENT_ID || '',
+          client_secret: process.env.LASIUS_OAUTH_CLIENT_SECRET || '',
+        }),
+      });
+  }
+}
 
 /**
  * Takes a token, and returns a new token with updated
@@ -63,18 +100,11 @@ const internalProvider: OAuthConfig<any> = {
  */
 async function refreshAccessToken(token: JWT): Promise<JWT> {
   console.debug('[NextAuth][refreshAccessToken]', token?.refresh_token);
+  if (!token?.refresh_token) {
+    return token;
+  }
   try {
-    const url = process.env.NEXTAUTH_URL + '/backend/oauth2/access_token';
-
-    const response = await fetch(url, {
-      method: 'POST',
-      body: new URLSearchParams({
-        grant_type: 'refresh_token',
-        refresh_token: token.refresh_token || '',
-        client_id: process.env.LASIUS_OAUTH_CLIENT_ID || '',
-        client_secret: process.env.LASIUS_OAUTH_CLIENT_SECRET || '',
-      }),
-    });
+    const response = await requestRefreshToken(token.refresh_token, token.provider);
 
     const tokensOrError = await response.json();
 
@@ -82,7 +112,7 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
       throw tokensOrError;
     }
 
-    console.info('[NextAuth][refreshAccessToken][RenewedToken', tokensOrError?.refresh_token);
+    console.info('[NextAuth][refreshAccessToken][RenewedToken]', tokensOrError?.refresh_token);
 
     const newTokens = tokensOrError as {
       access_token: string;
@@ -108,27 +138,36 @@ const providers = []
 if (process.env.LASIUS_OAUTH_CLIENT_ID && process.env.LASIUS_OAUTH_CLIENT_SECRET) {
   providers.push(internalProvider)
 }
-if (process.env.GITLAB_CLIENT_ID && process.env.GITLAB_CLIENT_SECRET) {
+if (process.env.GITLAB_OAUTH_CLIENT_ID && process.env.GITLAB_OAUTH_CLIENT_SECRET) {
   providers.push(GitLab({
-    clientId: process.env.GITLAB_CLIENT_ID,
-    clientSecret: process.env.GITLAB_CLIENT_SECRET,
-    wellKnown: (process.env.GITLAB_URL || 'https://gitlab.com') + '/.well-known/openid-configuration',
+    clientId: process.env.GITLAB_OAUTH_CLIENT_ID,
+    clientSecret: process.env.GITLAB_OAUTH_CLIENT_SECRET,
+    wellKnown: gitlabUrl + '/.well-known/openid-configuration',
     authorization: { params: { scope: "openid email profile" } },
     profile(profile) {
-      console.log('gitlab profile', profile)
       return {
         id: (profile.id || profile.sub).toString(),
         name: profile.name ?? profile.username,
         email: profile.email,
         image: profile.avatar_url,
+        access_token_issuer: gitlabUrl
       }
     },
   }))
 }
-if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
+if (process.env.GITHUB_OAUTH_CLIENT_ID && process.env.GITHUB_OAUTH_CLIENT_SECRET) {
   providers.push(GitHub({
-    clientId: process.env.GITHUB_CLIENT_ID,
-    clientSecret: process.env.GITHUB_CLIENT_SECRET
+    clientId: process.env.GITHUB_OAUTH_CLIENT_ID,
+    clientSecret: process.env.GITHUB_OAUTH_CLIENT_SECRET,
+    profile(profile) {
+      return {
+        id: profile.id.toString(),
+        name: profile.name ?? profile.login,
+        email: profile.email,
+        image: profile.avatar_url,
+        access_token_issuer: githubUrl
+      }
+    },
   }))
 }
 
@@ -151,7 +190,9 @@ export const nextAuthOptions: NextAuthOptions = {
       if (token) {
         session.user = token?.user;
         session.access_token = token.access_token;
+        session.access_token_issuer = token.access_token_issuer;
         session.error = token?.error;
+        session.provider = token.provider;
       }
       session.user = session.user || user;
       console.debug('[NextAuth][Session]', session);
@@ -165,12 +206,14 @@ export const nextAuthOptions: NextAuthOptions = {
         return {
           ...token,
           access_token: account.access_token,
+          access_token_issuer: user?.access_token_issuer,
           expires_at: account.expires_at,
           refresh_token: account.refresh_token,
           user: user || {
             ...profile,
             access_token: account.access_token,
           },
+          provider: account.provider
         };
       } else if (!token.expires_at || Date.now() < token.expires_at * 1000) {
         // Subsequent logins, but the `access_token` is still valid
@@ -178,17 +221,13 @@ export const nextAuthOptions: NextAuthOptions = {
       } else {
         // Subsequent logins, but the `access_token` has expired, try to refresh it
         if (!token.refresh_token) throw new TypeError('Missing refresh_token');
-        //if (token.error === 'RefreshAccessTokenError') return undefined;
         if (token.error === 'RefreshAccessTokenError') {
           console.log('Token refresh already failed, not trying again.');
           return token;
         }
 
         // Access token has expired, try to update it
-        console.debug('before refresh', token);
-        const result = await refreshAccessToken(token);
-        console.debug('after refresh', result);
-        return Promise.resolve(result);
+        return await refreshAccessToken(token);
       }
     },
   },

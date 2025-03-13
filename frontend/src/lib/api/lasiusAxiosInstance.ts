@@ -54,7 +54,7 @@ export const lasiusAxiosInstance = <T>(
       .catch(async (error) => {
         if (Axios.isCancel(error)) {
           logger.debug('[lasiusAxiosInstance][RequestCanceled]', error.message);
-        } else if (error.response.status === 401) {
+        } else if (error.response?.status === 401) {
           logger.debug('[lasiusAxiosInstance][Unauthorized]', {
             path: error.request.pathname,
             message: error.data,

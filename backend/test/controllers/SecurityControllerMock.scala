@@ -21,6 +21,7 @@
 
 package controllers
 
+import controllers.security.{ControllerSecurity, SecurityComponent}
 import core.{DBSession, DBSupport}
 import helpers.UserHelper
 import models._

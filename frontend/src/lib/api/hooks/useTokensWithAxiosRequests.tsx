@@ -17,11 +17,14 @@
  *
  */
 
-export const getRequestHeaders = (token?: string) => {
+export const getRequestHeaders = (token?: string, tokenIssuer?: string) => {
   if (!token) {
     return {};
   }
   return {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { 
+      Authorization: `Bearer ${token}`,
+      'X-Token-Issuer': tokenIssuer
+    },
   };
 };

@@ -13,7 +13,7 @@
     />
 
     <cache name="jwk"
-           maxBytesLocalHeap="256000000"
+           maxEntriesLocalHeap="100"
            eternal="false"
            timeToIdleSeconds="86400"
            timeToLiveSeconds="86400"
@@ -25,7 +25,7 @@
     />
 
     <cache name="opaque-token-issuer"
-           maxBytesLocalHeap="256000000"
+           maxEntriesLocalHeap="1000"
            eternal="false"
            timeToIdleSeconds="86400"
            timeToLiveSeconds="86400"
@@ -37,7 +37,7 @@
     />
 
     <cache name="user-info"
-           maxBytesLocalHeap="256000000"
+           maxEntriesLocalHeap="1000"
            eternal="false"
            timeToIdleSeconds="86400"
            timeToLiveSeconds="86400"

@@ -22,6 +22,7 @@
 package controllers
 
 import com.google.inject.ImplementedBy
+import controllers.security.UnauthorizedException
 import core.{DBSession, SystemServices}
 import helpers.UserHelper
 import models.UserId.UserReference

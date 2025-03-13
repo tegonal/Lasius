@@ -46,7 +46,6 @@ class InvitationsController @Inject() (
     override val systemServices: SystemServices,
     override val authConfig: AuthConfig,
     override val reactiveMongoApi: ReactiveMongoApi,
-    override val jwkProviderCache: SyncCacheApi,
     userRepository: UserRepository,
     organisationRepository: OrganisationRepository,
     invitationRepository: InvitationRepository,

@@ -50,6 +50,10 @@ export const HttpHeaderProvider: React.FC<HttpHeaderProviderProps> = ({ session 
       // legacy
       delete axios.defaults.headers.common['Authorization'];
     }
+    const tokenIssuer = session?.access_token_issuer;
+    if (tokenIssuer) {
+      axios.defaults.headers.common['X-Token-Issuer'] = tokenIssuer;
+    }
     if (session?.error && session?.access_token) {
       console.error('Updating session failed', session.error);
       removeAccessibleCookies();

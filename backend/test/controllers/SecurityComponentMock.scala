@@ -21,9 +21,8 @@
 
 package controllers
 
+import controllers.security.SecurityComponent
 import org.specs2.mock.Mockito
-
-import scala.concurrent.Future
 
 trait SecurityComponentMock extends SecurityComponent with Mockito {
   override val authConfig: AuthConfig = mock[AuthConfig]

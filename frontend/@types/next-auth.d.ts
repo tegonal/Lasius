@@ -25,18 +25,22 @@ declare module 'next-auth' {
     user?: DefaultSession['user'] & User;
     error?: string;
     access_token?: string;
+    access_token_issuer?: string;
     provider?: string;
   }
   interface User extends DefaultUser {    
+    access_token_issuer?: string;
   }
 }
 
 declare module 'next-auth/jwt' {
   interface JWT extends DefaultJWT {
     access_token?: string;
+    access_token_issuer?: string;
     refresh_token?: string;
-    user: User;
+    user?: User;
     error?: string;
     expires_at?: number;    
+    provider?: string;
   }
 }
