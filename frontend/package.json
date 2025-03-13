@@ -41,7 +41,7 @@
     "@popperjs/core": "^2.11.8",
     "@theme-ui/color": "^0.17.0",
     "@theme-ui/match-media": "^0.17.0",
-    "axios": "^1.7.4",
+    "axios": "^1.8.2",
     "boring-avatars": "^1.10.2",
     "date-fns": "^4.0.0",
     "date-fns-tz": "^3.2.0",
