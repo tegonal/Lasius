@@ -23,7 +23,6 @@ package controllers
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import com.auth0.jwt.interfaces.DecodedJWT
 import com.typesafe.config.Config
 import controllers.security.ControllerSecurity
 import core._
@@ -31,12 +30,14 @@ import models._
 import mongo.EmbedMongo
 import org.apache.http.HttpStatus
 import org.joda.time.DateTime
+import org.mockito.Mockito.{never, verify}
 import org.specs2.mock.Mockito
+import org.specs2.matcher.StringMatchers
 import play.api.Configuration
-import play.api.cache.SyncCacheApi
 import play.api.mvc._
 import play.api.test._
 import play.modules.reactivemongo.ReactiveMongoApi
+import services.ExternalServiceCallFailed
 
 import java.security.KeyPairGenerator
 import java.security.interfaces.RSAPrivateKey
@@ -52,8 +53,16 @@ class SecuritySpec
     with Mockito
     with BodyParserUtils
     with TestApplication
-    with EmbedMongo {
+    with EmbedMongo
+    with StringMatchers {
   sequential =>
+
+  private val userInfo = UserInfo(
+    key = "system",
+    email = "system@lasius.ch",
+    firstName = None,
+    lastName = None
+  )
 
   "HasRole" should {
     def runHasRole(controller: HasRoleSecurityMock,
@@ -157,16 +166,20 @@ class SecuritySpec
 
   "HasToken" should {
     def runHasToken(controller: HasTokenSecurityMock,
-                    token: Option[String] = None) = {
+                    token: Option[String] = None,
+                    issuer: Option[String] = None) = {
       // prepare
       val request = FakeRequest()
         .withHeaders(
           Headers(
-            Seq(
-              token
-                .map { tokenString =>
-                  "Authorization" -> s"Bearer $tokenString"
-                }).flatten: _*
+            Seq(token
+                  .map { tokenString =>
+                    "Authorization" -> s"Bearer $tokenString"
+                  },
+                issuer
+                  .map { issuerString =>
+                    "X-Token-Issuer" -> issuerString
+                  }).flatten: _*
           )
         )
         .asInstanceOf[Request[Unit]]
@@ -198,298 +211,666 @@ class SecuritySpec
 
       // check results
       status(result) === HttpStatus.SC_UNAUTHORIZED
-      contentAsString(result) === "No JWT token found"
+      contentAsString(result) must startWith("No token found")
     }
 
-    "return unauthorized when token in header expired longer than leeway time" in new WithTestApplication {
-      // prepare
-      val systemServices: SystemServices = inject[SystemServices]
-      val controller =
-        new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
-      controller.authConfig
-        .resolveIssuerConfig(any[String])
-        .returns(None)
+    "with JWT Token" should {
 
-      private val jwtToken =
-        JWT
+      "return unauthorized when token in header expired longer than leeway time" in new WithTestApplication {
+        // prepare
+        val systemServices: SystemServices = inject[SystemServices]
+        val controller =
+          new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
+        controller.authConfig
+          .resolveIssuerConfig(any[String])
+          .returns(None)
+
+        private val jwtToken =
+          JWT
+            .create()
+            .withSubject("test_user@lasius.com")
+            .withClaim(LasiusJWT.EMAIL_CLAIM, "test@lasius.com")
+            .withExpiresAt(DateTime.now().minusSeconds(60).toDate)
+            .sign(Algorithm.none())
+
+        // execute
+        private val result = runHasToken(controller, Some(jwtToken))
+
+        // check results
+        status(result) === HttpStatus.SC_UNAUTHORIZED
+        contentAsString(result) must startWith("Invalid token provided")
+      }
+
+      "return unauthorized when token issuer is not configured" in new WithTestApplication {
+        // prepare
+        val systemServices: SystemServices = inject[SystemServices]
+        val controller =
+          new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
+        controller.authConfig
+          .resolveIssuerConfig(any[String])
+          .returns(None)
+
+        private val jwtToken =
+          JWT
+            .create()
+            .withSubject("test_user@lasius.com")
+            .withClaim(LasiusJWT.EMAIL_CLAIM, "test@lasius.com")
+            .sign(Algorithm.none())
+
+        // execute
+        private val result = runHasToken(controller, Some(jwtToken))
+
+        // check results
+        status(result) === HttpStatus.SC_UNAUTHORIZED
+        contentAsString(result) must startWith("Invalid token provided")
+      }
+
+      "return unauthorized when token subject/email does not match restrictions" in new WithTestApplication {
+        // prepare
+        val systemServices: SystemServices = inject[SystemServices]
+        val controller =
+          new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
+        controller.authConfig
+          .resolveIssuerConfig("test")
+          .returns(
+            Some(
+              JWTIssuerConfig(issuer = "test",
+                              privateKey = None,
+                              publicKey = None,
+                              jwk = None)))
+
+        private val jwtToken =
+          JWT
+            .create()
+            .withIssuer("test")
+            .withSubject("test_user@mydomain.com")
+            .sign(Algorithm.none())
+
+        // execute
+        private val result = runHasToken(controller, Some(jwtToken))
+
+        // check results
+        status(result) === HttpStatus.SC_UNAUTHORIZED
+        contentAsString(result) must startWith("Invalid token provided")
+      }
+
+      "return unauthorized when token was not signed but signature was expected" in new WithTestApplication {
+        // prepare
+        val systemServices: SystemServices = inject[SystemServices]
+        val controller =
+          new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
+        controller.authConfig
+          .resolveIssuerConfig("test")
+          .returns(
+            Some(
+              JWTIssuerConfig(issuer = "test",
+                              privateKey = Some("some_random_key"),
+                              publicKey = None,
+                              jwk = None)))
+
+        private val jwtToken =
+          JWT
+            .create()
+            .withSubject("test_user@lasius.com")
+            .withIssuer("test")
+            .sign(Algorithm.none())
+
+        // execute
+        private val result = runHasToken(controller, Some(jwtToken))
+
+        // check results
+        status(result) === HttpStatus.SC_UNAUTHORIZED
+        contentAsString(result) must startWith("Invalid token provided")
+      }
+
+      "succeed with valid token without signature" in new WithTestApplication {
+        // prepare
+        val systemServices: SystemServices = inject[SystemServices]
+        val controller =
+          new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
+        controller.authConfig
+          .resolveIssuerConfig("test")
+          .returns(
+            Some(
+              JWTIssuerConfig(issuer = "test",
+                              privateKey = None,
+                              publicKey = None,
+                              jwk = None)))
+        controller.authConfig
+          .resolveOrCreateUserByUserInfo(any[UserInfo], any[Boolean])(
+            any[ExecutionContext],
+            any[DBSession])
+          .returns(Future.successful(EntityReference[UserId](UserId(), "user")))
+
+        private val jwtToken = JWT
           .create()
           .withSubject("test_user@lasius.com")
-          .withClaim(LasiusJWT.EMAIL_CLAIM, "test@lasius.com")
-          .withExpiresAt(DateTime.now().minusSeconds(60).toDate)
-          .sign(Algorithm.none())
-
-      // execute
-      private val result = runHasToken(controller, Some(jwtToken))
-
-      // check results
-      status(result) === HttpStatus.SC_UNAUTHORIZED
-      contentAsString(result).startsWith("Invalid JWT token provided")
-    }
-
-    "return unauthorized when token issuer is not configured" in new WithTestApplication {
-      // prepare
-      val systemServices: SystemServices = inject[SystemServices]
-      val controller =
-        new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
-      controller.authConfig
-        .resolveIssuerConfig(any[String])
-        .returns(None)
-
-      private val jwtToken =
-        JWT
-          .create()
-          .withSubject("test_user@lasius.com")
-          .withClaim(LasiusJWT.EMAIL_CLAIM, "test@lasius.com")
-          .sign(Algorithm.none())
-
-      // execute
-      private val result = runHasToken(controller, Some(jwtToken))
-
-      // check results
-      status(result) === HttpStatus.SC_UNAUTHORIZED
-      contentAsString(result).startsWith("Invalid JWT token provided")
-    }
-
-    "return unauthorized when token subject/email does not match restrictions" in new WithTestApplication {
-      // prepare
-      val systemServices: SystemServices = inject[SystemServices]
-      val controller =
-        new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
-      controller.authConfig
-        .resolveIssuerConfig("test")
-        .returns(
-          Some(
-            JWTIssuerConfig(issuer = "test",
-                            privateKey = None,
-                            publicKey = None,
-                            jwk = None)))
-
-      private val jwtToken =
-        JWT
-          .create()
           .withIssuer("test")
-          .withSubject("test_user@mydomain.com")
+          .withClaim(LasiusJWT.EMAIL_CLAIM, "test@lasius.com")
           .sign(Algorithm.none())
 
-      // execute
-      private val result = runHasToken(controller, Some(jwtToken))
+        // execute
+        private val result = runHasToken(controller, Some(jwtToken))
 
-      // check results
-      status(result) === HttpStatus.SC_UNAUTHORIZED
-      contentAsString(result).startsWith("Invalid JWT token provided")
-    }
+        // check results
+        contentAsString(result) === ""
+        status(result) === HttpStatus.SC_OK
+      }
 
-    "return unauthorized when token was not signed but signature was expected" in new WithTestApplication {
-      // prepare
-      val systemServices: SystemServices = inject[SystemServices]
-      val controller =
-        new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
-      controller.authConfig
-        .resolveIssuerConfig("test")
-        .returns(
-          Some(
-            JWTIssuerConfig(issuer = "test",
-                            privateKey = Some("some_random_key"),
-                            publicKey = None,
-                            jwk = None)))
+      "return unauthorized when token was signed with different symmetric private key" in new WithTestApplication {
+        // prepare
+        val systemServices: SystemServices = inject[SystemServices]
+        val controller =
+          new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
+        controller.authConfig
+          .resolveIssuerConfig("test")
+          .returns(
+            Some(
+              JWTIssuerConfig(issuer = "test",
+                              privateKey =
+                                Some("dasddasdasfse32q1231231313eqdsasd"),
+                              publicKey = None,
+                              jwk = None)))
+        controller.authConfig
+          .resolveOrCreateUserByUserInfo(any[UserInfo], any[Boolean])(
+            any[ExecutionContext],
+            any[DBSession])
+          .returns(Future.successful(EntityReference[UserId](UserId(), "user")))
 
-      private val jwtToken =
-        JWT
+        private val jwtToken = JWT
           .create()
           .withSubject("test_user@lasius.com")
           .withIssuer("test")
-          .sign(Algorithm.none())
+          .withClaim(LasiusJWT.EMAIL_CLAIM, "test@lasius.com")
+          .sign(Algorithm.HMAC256("my_other_key"))
 
-      // execute
-      private val result = runHasToken(controller, Some(jwtToken))
+        // execute
+        private val result = runHasToken(controller, Some(jwtToken))
 
-      // check results
-      status(result) === HttpStatus.SC_UNAUTHORIZED
-      contentAsString(result).startsWith("Invalid JWT token provided")
+        // check results
+
+        status(result) === HttpStatus.SC_UNAUTHORIZED
+        contentAsString(result) must startWith("Invalid token provided")
+      }
+
+      "succeed with valid token with signature based on symmetric private key" in new WithTestApplication {
+        // prepare
+        val systemServices: SystemServices = inject[SystemServices]
+        val controller =
+          new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
+        val randomString = "dasddasdasfse32q1231231313eqdsasd"
+        controller.authConfig
+          .resolveIssuerConfig("test")
+          .returns(
+            Some(
+              JWTIssuerConfig(issuer = "test",
+                              privateKey = Some(randomString),
+                              publicKey = None,
+                              jwk = None)))
+        controller.authConfig
+          .resolveOrCreateUserByUserInfo(any[UserInfo], any[Boolean])(
+            any[ExecutionContext],
+            any[DBSession])
+          .returns(Future.successful(EntityReference[UserId](UserId(), "user")))
+
+        private val jwtToken = JWT
+          .create()
+          .withSubject("test_user@lasius.com")
+          .withIssuer("test")
+          .withClaim(LasiusJWT.EMAIL_CLAIM, "test@lasius.com")
+          .sign(Algorithm.HMAC256(randomString))
+
+        // execute
+        private val result = runHasToken(controller, Some(jwtToken))
+
+        // check results
+        contentAsString(result) === ""
+        status(result) === HttpStatus.SC_OK
+      }
+
+      "return unauthorized when token was signed with different wrong public/private key" in new WithTestApplication {
+        // prepare
+        val systemServices: SystemServices = inject[SystemServices]
+        val controller =
+          new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
+
+        private val keyPairGenerator = KeyPairGenerator.getInstance("RSA")
+        private val keyPair1         = keyPairGenerator.generateKeyPair
+        private val keyPair2         = keyPairGenerator.generateKeyPair
+
+        controller.authConfig
+          .resolveIssuerConfig("test")
+          .returns(
+            Some(
+              JWTIssuerConfig(issuer = "test",
+                              privateKey = None,
+                              publicKey = Some(Base64.getEncoder.encodeToString(
+                                keyPair1.getPublic.getEncoded)),
+                              jwk = None)))
+        controller.authConfig
+          .resolveOrCreateUserByUserInfo(any[UserInfo], any[Boolean])(
+            any[ExecutionContext],
+            any[DBSession])
+          .returns(Future.successful(EntityReference[UserId](UserId(), "user")))
+
+        private val jwtToken = JWT
+          .create()
+          .withSubject("test_user@lasius.com")
+          .withIssuer("test")
+          .withClaim(LasiusJWT.EMAIL_CLAIM, "test@lasius.com")
+          .sign(
+            Algorithm.RSA256(keyPair2.getPrivate.asInstanceOf[RSAPrivateKey]))
+
+        // execute
+        private val result = runHasToken(controller, Some(jwtToken))
+
+        // check results
+
+        status(result) === HttpStatus.SC_UNAUTHORIZED
+        contentAsString(result) must startWith("Invalid token provided")
+      }
+
+      "succeed with valid token with signature based on correct public/private key pair" in new WithTestApplication {
+        // prepare
+        val systemServices: SystemServices = inject[SystemServices]
+        val controller =
+          new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
+        private val keyPairGenerator = KeyPairGenerator.getInstance("RSA")
+        private val keyPair          = keyPairGenerator.generateKeyPair
+
+        controller.authConfig
+          .resolveIssuerConfig("test")
+          .returns(
+            Some(
+              JWTIssuerConfig(issuer = "test",
+                              privateKey = None,
+                              publicKey = Some(Base64.getEncoder.encodeToString(
+                                keyPair.getPublic.getEncoded)),
+                              jwk = None)))
+        controller.authConfig
+          .resolveOrCreateUserByUserInfo(any[UserInfo], any[Boolean])(
+            any[ExecutionContext],
+            any[DBSession])
+          .returns(Future.successful(EntityReference[UserId](UserId(), "user")))
+
+        private val jwtToken = JWT
+          .create()
+          .withSubject("test_user@lasius.com")
+          .withIssuer("test")
+          .withClaim(LasiusJWT.EMAIL_CLAIM, "test@lasius.com")
+          .sign(
+            Algorithm.RSA256(keyPair.getPrivate.asInstanceOf[RSAPrivateKey]))
+
+        // execute
+        private val result = runHasToken(controller, Some(jwtToken))
+
+        // check results
+        contentAsString(result) === ""
+        status(result) === HttpStatus.SC_OK
+      }
     }
+    "With opaque token in header" should {
+      "return unauthorized when token in header was not found through the introspection endpoint of one of the configured opaque token providers" in new WithTestApplication {
+        // prepare
+        val systemServices: SystemServices = inject[SystemServices]
+        val controller =
+          new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
+        val tokenConfig = OpaqueTokenIssuerConfig(
+          issuer = "test-issuer",
+          clientId = "",
+          clientSecret = "",
+          tokenValidatorType = TokenValidatorType.OIDC,
+          introspectionPath = None,
+          userInfoPath = None
+        )
 
-    "succeed with valid token without signature" in new WithTestApplication {
-      // prepare
-      val systemServices: SystemServices = inject[SystemServices]
-      val controller =
-        new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
-      controller.authConfig
-        .resolveIssuerConfig("test")
-        .returns(
-          Some(
-            JWTIssuerConfig(issuer = "test",
-                            privateKey = None,
-                            publicKey = None,
-                            jwk = None)))
-      controller.authConfig
-        .resolveOrCreateUserByUserInfo(any[UserInfo], any[Boolean])(
-          any[ExecutionContext],
-          any[DBSession])
-        .returns(Future.successful(EntityReference[UserId](UserId(), "user")))
+        private val token = "random_string_value"
 
-      private val jwtToken = JWT
-        .create()
-        .withSubject("test_user@lasius.com")
-        .withIssuer("test")
-        .withClaim(LasiusJWT.EMAIL_CLAIM, "test@lasius.com")
-        .sign(Algorithm.none())
+        controller.authConfig
+          .issuerConfigs()
+          .returns(Seq(tokenConfig))
+        controller.authConfig.opaqueTokenService
+          .introspectToken(tokenConfig, token)
+          .returns(
+            Future.failed(ExternalServiceCallFailed("Could not find token")))
 
-      // execute
-      private val result = runHasToken(controller, Some(jwtToken))
+        // execute
+        private val result = runHasToken(controller, Some(token))
 
-      // check results
-      contentAsString(result) === ""
-      status(result) === HttpStatus.SC_OK
-    }
+        // check results
+        status(result) === HttpStatus.SC_UNAUTHORIZED
+        contentAsString(result) must startWith("Invalid token provided")
 
-    "return unauthorized when token was signed with different symmetric private key" in new WithTestApplication {
-      // prepare
-      val systemServices: SystemServices = inject[SystemServices]
-      val controller =
-        new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
-      controller.authConfig
-        .resolveIssuerConfig("test")
-        .returns(
-          Some(
-            JWTIssuerConfig(issuer = "test",
-                            privateKey =
-                              Some("dasddasdasfse32q1231231313eqdsasd"),
-                            publicKey = None,
-                            jwk = None)))
-      controller.authConfig
-        .resolveOrCreateUserByUserInfo(any[UserInfo], any[Boolean])(
-          any[ExecutionContext],
-          any[DBSession])
-        .returns(Future.successful(EntityReference[UserId](UserId(), "user")))
+        // no provider was cached
+        systemServices.opaqueTokenIssuerCache.sync.get(token) === None
+      }
 
-      private val jwtToken = JWT
-        .create()
-        .withSubject("test_user@lasius.com")
-        .withIssuer("test")
-        .withClaim(LasiusJWT.EMAIL_CLAIM, "test@lasius.com")
-        .sign(Algorithm.HMAC256("my_other_key"))
+      "return unauthorized when token in header is not active, but cache issuer for introspection" in new WithTestApplication {
+        // prepare
+        val systemServices: SystemServices = inject[SystemServices]
+        val controller =
+          new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
+        val tokenConfig = OpaqueTokenIssuerConfig(
+          issuer = "test-issuer",
+          clientId = "",
+          clientSecret = "",
+          tokenValidatorType = TokenValidatorType.OIDC,
+          introspectionPath = None,
+          userInfoPath = None
+        )
 
-      // execute
-      private val result = runHasToken(controller, Some(jwtToken))
+        private val token = "random_string_value"
 
-      // check results
+        controller.authConfig
+          .issuerConfigs()
+          .returns(Seq(tokenConfig))
+        controller.authConfig.opaqueTokenService
+          .introspectToken(tokenConfig, token)
+          .returns(Future.successful(false))
 
-      status(result) === HttpStatus.SC_UNAUTHORIZED
-      contentAsString(result).startsWith("Invalid JWT token provided")
-    }
+        // execute
+        private val result = runHasToken(controller, Some(token))
 
-    "succeed with valid token with signature based on symmetric private key" in new WithTestApplication {
-      // prepare
-      val systemServices: SystemServices = inject[SystemServices]
-      val controller =
-        new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
-      val randomString = "dasddasdasfse32q1231231313eqdsasd"
-      controller.authConfig
-        .resolveIssuerConfig("test")
-        .returns(
-          Some(
-            JWTIssuerConfig(issuer = "test",
-                            privateKey = Some(randomString),
-                            publicKey = None,
-                            jwk = None)))
-      controller.authConfig
-        .resolveOrCreateUserByUserInfo(any[UserInfo], any[Boolean])(
-          any[ExecutionContext],
-          any[DBSession])
-        .returns(Future.successful(EntityReference[UserId](UserId(), "user")))
+        // check results
+        status(result) === HttpStatus.SC_UNAUTHORIZED
+        contentAsString(result) must startWith("Invalid token provided")
 
-      private val jwtToken = JWT
-        .create()
-        .withSubject("test_user@lasius.com")
-        .withIssuer("test")
-        .withClaim(LasiusJWT.EMAIL_CLAIM, "test@lasius.com")
-        .sign(Algorithm.HMAC256(randomString))
+        // provider was cached
+        systemServices.opaqueTokenIssuerCache.sync.get(token) === Some(
+          tokenConfig)
+      }
+      "return unauthorized when userinfo could not get fetched with valid token and not cache provider" in new WithTestApplication {
+        // prepare
+        val systemServices: SystemServices = inject[SystemServices]
+        val controller =
+          new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
+        val tokenConfig = OpaqueTokenIssuerConfig(
+          issuer = "test-issuer",
+          clientId = "",
+          clientSecret = "",
+          tokenValidatorType = TokenValidatorType.OIDC,
+          introspectionPath = None,
+          userInfoPath = None
+        )
 
-      // execute
-      private val result = runHasToken(controller, Some(jwtToken))
+        private val token = "random_string_value"
 
-      // check results
-      contentAsString(result) === ""
-      status(result) === HttpStatus.SC_OK
-    }
+        controller.authConfig
+          .issuerConfigs()
+          .returns(Seq(tokenConfig))
+        controller.authConfig.opaqueTokenService
+          .introspectToken(tokenConfig, token)
+          .returns(Future.successful(true))
+        controller.authConfig.opaqueTokenService
+          .userInfo(tokenConfig, token)
+          .returns(Future.failed(
+            ExternalServiceCallFailed("Could not find user info")))
 
-    "return unauthorized when token was signed with different wrong public/private key" in new WithTestApplication {
-      // prepare
-      val systemServices: SystemServices = inject[SystemServices]
-      val controller =
-        new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
+        // execute
+        private val result = runHasToken(controller, Some(token))
 
-      private val keyPairGenerator = KeyPairGenerator.getInstance("RSA")
-      private val keyPair1         = keyPairGenerator.generateKeyPair
-      private val keyPair2         = keyPairGenerator.generateKeyPair
+        // check results
+        status(result) === HttpStatus.SC_UNAUTHORIZED
+        contentAsString(result) must startWith("Invalid token provided")
 
-      controller.authConfig
-        .resolveIssuerConfig("test")
-        .returns(
-          Some(
-            JWTIssuerConfig(issuer = "test",
-                            privateKey = None,
-                            publicKey = Some(Base64.getEncoder.encodeToString(
-                              keyPair1.getPublic.getEncoded)),
-                            jwk = None)))
-      controller.authConfig
-        .resolveOrCreateUserByUserInfo(any[UserInfo], any[Boolean])(
-          any[ExecutionContext],
-          any[DBSession])
-        .returns(Future.successful(EntityReference[UserId](UserId(), "user")))
+        // provider was cached
+        systemServices.opaqueTokenIssuerCache.sync.get(token) === Some(
+          tokenConfig)
+        systemServices.userInfoCache.sync.get(token) === None
+      }
+      "succeed with valid token and cache provider" in new WithTestApplication {
+        // prepare
+        val systemServices: SystemServices = inject[SystemServices]
+        val controller =
+          new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
+        val tokenConfig = OpaqueTokenIssuerConfig(
+          issuer = "test-issuer",
+          clientId = "",
+          clientSecret = "",
+          tokenValidatorType = TokenValidatorType.OIDC,
+          introspectionPath = None,
+          userInfoPath = None
+        )
 
-      private val jwtToken = JWT
-        .create()
-        .withSubject("test_user@lasius.com")
-        .withIssuer("test")
-        .withClaim(LasiusJWT.EMAIL_CLAIM, "test@lasius.com")
-        .sign(Algorithm.RSA256(keyPair2.getPrivate.asInstanceOf[RSAPrivateKey]))
+        private val token = "random_string_value"
 
-      // execute
-      private val result = runHasToken(controller, Some(jwtToken))
+        controller.authConfig
+          .issuerConfigs()
+          .returns(Seq(tokenConfig))
+        controller.authConfig.opaqueTokenService
+          .introspectToken(tokenConfig, token)
+          .returns(Future.successful(true))
+        controller.authConfig.opaqueTokenService
+          .userInfo(tokenConfig, token)
+          .returns(Future.successful(userInfo))
+        controller.authConfig
+          .resolveOrCreateUserByUserInfo(any[UserInfo], any[Boolean])(
+            any[ExecutionContext],
+            any[DBSession])
+          .returns(Future.successful(EntityReference[UserId](UserId(), "user")))
 
-      // check results
+        // execute
+        private val result = runHasToken(controller, Some(token))
 
-      status(result) === HttpStatus.SC_UNAUTHORIZED
-      contentAsString(result).startsWith("Invalid JWT token provided")
-    }
+        // check results
+        status(result) === HttpStatus.SC_OK
+        contentAsString(result) === ""
 
-    "succeed with valid token with signature based on correct public/private key pair" in new WithTestApplication {
-      // prepare
-      val systemServices: SystemServices = inject[SystemServices]
-      val controller =
-        new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
-      private val keyPairGenerator = KeyPairGenerator.getInstance("RSA")
-      private val keyPair          = keyPairGenerator.generateKeyPair
+        // token issuer provider and user info where cached
+        systemServices.opaqueTokenIssuerCache.sync.get(token) === Some(
+          tokenConfig)
+        systemServices.userInfoCache.sync.get(token) === Some(userInfo)
+      }
+      "succeed with valid token through inspection endpoint and lookup user info from cache" in new WithTestApplication {
+        // prepare
+        val systemServices: SystemServices = inject[SystemServices]
+        val controller =
+          new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
+        val tokenConfig = OpaqueTokenIssuerConfig(
+          issuer = "test-issuer",
+          clientId = "",
+          clientSecret = "",
+          tokenValidatorType = TokenValidatorType.OIDC,
+          introspectionPath = None,
+          userInfoPath = None
+        )
 
-      controller.authConfig
-        .resolveIssuerConfig("test")
-        .returns(
-          Some(
-            JWTIssuerConfig(issuer = "test",
-                            privateKey = None,
-                            publicKey = Some(Base64.getEncoder.encodeToString(
-                              keyPair.getPublic.getEncoded)),
-                            jwk = None)))
-      controller.authConfig
-        .resolveOrCreateUserByUserInfo(any[UserInfo], any[Boolean])(
-          any[ExecutionContext],
-          any[DBSession])
-        .returns(Future.successful(EntityReference[UserId](UserId(), "user")))
+        private val token = "random_string_value"
 
-      private val jwtToken = JWT
-        .create()
-        .withSubject("test_user@lasius.com")
-        .withIssuer("test")
-        .withClaim(LasiusJWT.EMAIL_CLAIM, "test@lasius.com")
-        .sign(Algorithm.RSA256(keyPair.getPrivate.asInstanceOf[RSAPrivateKey]))
+        controller.authConfig
+          .issuerConfigs()
+          .returns(Seq(tokenConfig))
+        controller.authConfig.opaqueTokenService
+          .introspectToken(tokenConfig, token)
+          .returns(Future.successful(true))
+        controller.authConfig
+          .resolveOrCreateUserByUserInfo(any[UserInfo], any[Boolean])(
+            any[ExecutionContext],
+            any[DBSession])
+          .returns(Future.successful(EntityReference[UserId](UserId(), "user")))
 
-      // execute
-      private val result = runHasToken(controller, Some(jwtToken))
+        systemServices.userInfoCache.sync.set(token, userInfo)
 
-      // check results
-      contentAsString(result) === ""
-      status(result) === HttpStatus.SC_OK
+        // execute
+        private val result = runHasToken(controller, Some(token))
+
+        // check results
+        status(result) === HttpStatus.SC_OK
+        contentAsString(result) === ""
+
+        // should not lookup user info from remote server
+        verify(controller.authConfig.opaqueTokenService, never())
+          .userInfo(tokenConfig, token)
+      }
+
+      "succeed with valid token through inspection endpoint and lookup user info from cache" in new WithTestApplication {
+        // prepare
+        val systemServices: SystemServices = inject[SystemServices]
+        val controller =
+          new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
+        val tokenConfig = OpaqueTokenIssuerConfig(
+          issuer = "test-issuer",
+          clientId = "",
+          clientSecret = "",
+          tokenValidatorType = TokenValidatorType.OIDC,
+          introspectionPath = None,
+          userInfoPath = None
+        )
+
+        private val token = "random_string_value"
+
+        controller.authConfig
+          .issuerConfigs()
+          .returns(Seq(tokenConfig))
+        controller.authConfig.opaqueTokenService
+          .introspectToken(tokenConfig, token)
+          .returns(Future.successful(true))
+        controller.authConfig
+          .resolveOrCreateUserByUserInfo(any[UserInfo], any[Boolean])(
+            any[ExecutionContext],
+            any[DBSession])
+          .returns(Future.successful(EntityReference[UserId](UserId(), "user")))
+
+        systemServices.userInfoCache.sync.set(token, userInfo)
+
+        // execute
+        private val result = runHasToken(controller, Some(token))
+
+        // check results
+        status(result) === HttpStatus.SC_OK
+        contentAsString(result) === ""
+
+        // should not lookup user info from remote server
+        verify(controller.authConfig.opaqueTokenService, never())
+          .userInfo(tokenConfig, token)
+      }
+
+      "don't loop through all issuers if issuerConfig is already in the cache" in new WithTestApplication {
+        // prepare
+        val systemServices: SystemServices = inject[SystemServices]
+        val controller =
+          new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
+        val tokenConfig1 = OpaqueTokenIssuerConfig(
+          issuer = "test-issuer1",
+          clientId = "",
+          clientSecret = "",
+          tokenValidatorType = TokenValidatorType.OIDC,
+          introspectionPath = None,
+          userInfoPath = None
+        )
+        val tokenConfig2 = OpaqueTokenIssuerConfig(
+          issuer = "test-issuer2",
+          clientId = "",
+          clientSecret = "",
+          tokenValidatorType = TokenValidatorType.OIDC,
+          introspectionPath = None,
+          userInfoPath = None
+        )
+
+        private val token = "random_string_value"
+
+        controller.authConfig
+          .issuerConfigs()
+          .returns(Seq(tokenConfig1, tokenConfig2))
+        controller.authConfig.opaqueTokenService
+          .introspectToken(tokenConfig1, token)
+          .returns(Future.successful(false))
+        controller.authConfig.opaqueTokenService
+          .introspectToken(tokenConfig2, token)
+          .returns(Future.successful(true))
+        controller.authConfig.opaqueTokenService
+          .userInfo(tokenConfig2, token)
+          .returns(Future.successful(userInfo))
+        controller.authConfig
+          .resolveOrCreateUserByUserInfo(any[UserInfo], any[Boolean])(
+            any[ExecutionContext],
+            any[DBSession])
+          .returns(Future.successful(EntityReference[UserId](UserId(), "user")))
+
+        systemServices.opaqueTokenIssuerCache.sync.set(token, tokenConfig2)
+
+        // execute
+        private val result = runHasToken(controller, Some(token))
+
+        // check results
+        status(result) === HttpStatus.SC_OK
+        contentAsString(result) === ""
+
+        verify(controller.authConfig.opaqueTokenService, never())
+          .userInfo(tokenConfig1, token)
+      }
+
+      "unauthorized if issuer provided in header doesn't exist" in new WithTestApplication {
+        // prepare
+        val systemServices: SystemServices = inject[SystemServices]
+        val controller =
+          new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
+
+        val tokenConfig = OpaqueTokenIssuerConfig(
+          issuer = "test-issuer2",
+          clientId = "",
+          clientSecret = "",
+          tokenValidatorType = TokenValidatorType.OIDC,
+          introspectionPath = None,
+          userInfoPath = None
+        )
+
+        private val token = "random_string_value"
+
+        controller.authConfig
+          .resolveIssuerConfig(tokenConfig.issuer)
+          .returns(None)
+
+        // execute
+        private val result = runHasToken(controller,
+                                         token = Some(token),
+                                         issuer = Some(tokenConfig.issuer))
+
+        // check results
+        status(result) === HttpStatus.SC_UNAUTHORIZED
+        contentAsString(result) must startWith("Invalid token provided")
+      }
+
+      "succeed if issuer is provided in header" in new WithTestApplication {
+        // prepare
+        val systemServices: SystemServices = inject[SystemServices]
+        val controller =
+          new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
+        val tokenConfig2 = OpaqueTokenIssuerConfig(
+          issuer = "test-issuer2",
+          clientId = "",
+          clientSecret = "",
+          tokenValidatorType = TokenValidatorType.OIDC,
+          introspectionPath = None,
+          userInfoPath = None
+        )
+
+        private val token = "random_string_value"
+
+        controller.authConfig
+          .resolveIssuerConfig(tokenConfig2.issuer)
+          .returns(Some(tokenConfig2))
+        controller.authConfig.opaqueTokenService
+          .introspectToken(tokenConfig2, token)
+          .returns(Future.successful(true))
+        controller.authConfig.opaqueTokenService
+          .userInfo(tokenConfig2, token)
+          .returns(Future.successful(userInfo))
+        controller.authConfig
+          .resolveOrCreateUserByUserInfo(any[UserInfo], any[Boolean])(
+            any[ExecutionContext],
+            any[DBSession])
+          .returns(Future.successful(EntityReference[UserId](UserId(), "user")))
+
+        // execute
+        private val result = runHasToken(controller,
+                                         token = Some(token),
+                                         issuer = Some(tokenConfig2.issuer))
+
+        // check results
+        status(result) === HttpStatus.SC_OK
+        contentAsString(result) === ""
+      }
     }
   }
 }

@@ -23,7 +23,13 @@ package controllers
 
 import controllers.security.SecurityComponent
 import org.specs2.mock.Mockito
+import services.OpaqueTokenService
 
 trait SecurityComponentMock extends SecurityComponent with Mockito {
-  override val authConfig: AuthConfig = mock[AuthConfig]
+  override val authConfig: AuthConfig = {
+    val authConfig = mock[AuthConfig]
+    authConfig.opaqueTokenService.returns(mock[OpaqueTokenService])
+
+    authConfig
+  }
 }
