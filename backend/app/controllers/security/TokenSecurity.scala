@@ -161,6 +161,7 @@ trait TokenSecurity extends Logging with ConfigAware with FutureHelper {
       opaqueToken: String
   )(implicit
       ec: ExecutionContext): Future[(OpaqueTokenIssuerConfig, Boolean)] = {
+    logger.debug(s"introspectOpaqueTokenFromIssuer: issuer: $issuer")
     authConfig.opaqueTokenService
       .introspectToken(issuer, opaqueToken)
       .map(result => (issuer, result))
@@ -168,7 +169,7 @@ trait TokenSecurity extends Logging with ConfigAware with FutureHelper {
 
   private def resolveUserInfoFromOpaqueToken(issuer: OpaqueTokenIssuerConfig,
                                              opaqueToken: String)(implicit
-      ec: ExecutionContext): Future[Option[UserInfo]] = {
+      ec: ExecutionContext): Future[UserInfo] = {
     systemServices.userInfoCache.getOrElseUpdate(opaqueToken) {
       authConfig.opaqueTokenService
         .userInfo(issuer, opaqueToken)
@@ -197,7 +198,11 @@ trait TokenSecurity extends Logging with ConfigAware with FutureHelper {
                   .map(issuer =>
                     introspectOpaqueTokenFromIssuer(
                       issuer.asInstanceOf[OpaqueTokenIssuerConfig],
-                      opaqueToken)))(_._2)
+                      opaqueToken))) { _ =>
+                // don't filter here as we do want to cache false result
+                // returning an inactive result means the provided recognized the token but it's not valid anymore
+                true
+              }
               .noneToFailed("no valid opaque token provider found")
           }.flatMap(value =>
             systemServices.opaqueTokenIssuerCache
@@ -246,7 +251,6 @@ trait TokenSecurity extends Logging with ConfigAware with FutureHelper {
         }
         .noneToFailed("No valid opaque token or provider found")
       userInfo <- resolveUserInfoFromOpaqueToken(validTokenIssuer, opaqueToken)
-        .noneToFailed("Could not load userInfo")
     } yield userInfo
   }
 
