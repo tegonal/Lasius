@@ -10,44 +10,44 @@ Lasius is a modern web application with a backend written in Scala and a NextJS 
 
 ## Time Tracking
 
-* Start-Stop tracking: Record time spent on a task in real-time
-* Labels & Tags: Assign labels to each booking and edit labels on project level
-* Favorites: Save your most used bookings as favorites and start booking with one click
-* Progressive Web App: Use Lasius on your mobile device as a PWA and add it to your homescreen
-* Dark-mode: Switch between light and dark mode
-* Statistics & Reports: See your organisation, project or personal statistics for a given time period
-* Export: Export organisation, project or personal bookings using various filters as CSV for a given time period
-* ACL: Assign roles to users in a project or organisation to allow or restrict access to certain features
+- Start-Stop tracking: Record time spent on a task in real-time
+- Labels & Tags: Assign labels to each booking and edit labels on project level
+- Favorites: Save your most used bookings as favorites and start booking with one click
+- Progressive Web App: Use Lasius on your mobile device as a PWA and add it to your homescreen
+- Dark-mode: Switch between light and dark mode
+- Statistics & Reports: See your organisation, project or personal statistics for a given time period
+- Export: Export organisation, project or personal bookings using various filters as CSV for a given time period
+- ACL: Assign roles to users in a project or organisation to allow or restrict access to certain features
 
 ## Team Features
 
-* Organisations: Be a member of multiple organisations and invite users with an invitation link, switch between them
+- Organisations: Be a member of multiple organisations and invite users with an invitation link, switch between them
   anytime and see only organisation specific data
-* Projects: Create projects, assign them to organisations and invite users with an invitation link
-* Team View: See what everybody is currently working on and book on the same task with one click
+- Projects: Create projects, assign them to organisations and invite users with an invitation link
+- Team View: See what everybody is currently working on and book on the same task with one click
 
 ## Integrations
 
-* Issue trackers: Connect your issue tracker to Lasius and use issue numbers as labels. Currently supported:
-  * GitLab
-  * Jira
-  * Plane.io
+- Issue trackers: Connect your issue tracker to Lasius and use issue numbers as labels. Currently supported:
+  - GitLab
+  - Jira
+  - Plane.io
 
 ## Personal Time Management
 
-* Set your personal hourly target per weekday and organisation
-* See your progress in real-time
+- Set your personal hourly target per weekday and organisation
+- See your progress in real-time
 
 # Roadmap
 
 We plan to implement the following features in the near future (no specific order, no ETA):
 
-* [ ] Make GitLab, Jira and Plane integration configurable in the frontend (currently hardcoded)
-* [ ] Add support for GitHub issue tracker
-* [ ] Make tags and labels configuration configurable in the frontend (currently hardcoded)
-* [ ] Add support for sending E-Mails via SMTP for password reset, invitation links, etc.
-* [ ] Quick onboarding for new users with basic usage instructions
-* [ ] Special project to book sick days, holidays, etc. per organization
+- [ ] Make GitLab, Jira and Plane integration configurable in the frontend (currently hardcoded)
+- [ ] Add support for GitHub issue tracker
+- [ ] Make tags and labels configuration configurable in the frontend (currently hardcoded)
+- [ ] Add support for sending E-Mails via SMTP for password reset, invitation links, etc.
+- [ ] Quick onboarding for new users with basic usage instructions
+- [ ] Special project to book sick days, holidays, etc. per organization
 
 If you plan to use Lasius for your company or organisation, and you depend on one of the above features, we are happy to discuss sponsoring the development.
 
@@ -59,10 +59,11 @@ The development of Lasius started in 2015. It is the exclusive time tracking too
 
 Our time tracker had to be based on open source components, meet our high privacy standards and be able to be hosted wherever we wanted. The feature set of Lasius has been continuously adapted to our needs in everyday project work and we are happy that we can share it with you.
 
-# Development 
+# Development
+
 ## Requirements
 
-* mongoDB >= 5.0.9, but <= 7.x
+- mongoDB >= 5.0.9, but <= 7.x
 
 ## Environment Variables
 
@@ -74,7 +75,7 @@ The following variables are suggested to be used in an `.env` file alongside doc
 containers, containing secrets that only might be available during CI/CD.
 
 | Variable name              | Description                                                                                                             | Default value            |
-|----------------------------|-------------------------------------------------------------------------------------------------------------------------|--------------------------|
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------ |
 | LASIUS_HOSTNAME            | Hostname (i.e. localhost, domain.com, ...)                                                                              | localhost                |
 | LASIUS_VERSION             | The current version, corresponds with docker image tags. We suggest using specific versions in production, not `latest` | latest                   |
 | MONGODB_URI                | Override connection to mongodb                                                                                          | see `docker-compose.yml` |
@@ -90,7 +91,7 @@ containers, containing secrets that only might be available during CI/CD.
 Specific to `backend` container:
 
 | Variable name                    | Description                                                                                                                                                    | Default value            |
-|----------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------|
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
 | LASIUS_CLEAN_DATABASE_ON_STARTUP | If true, drop on startup all data                                                                                                                              | 'false'                  |
 | LASIUS_INITIALIZE_DATA           | `'true'` if database should automatically get initialized in case no user accounts are configured                                                              | 'true'                   |
 | LASIUS_INITIAL_USER_EMAIL        | Username of initial admin user to login. Only used when `LASIUS_INITIALIZE_DATA` is set to `'true'` and no users where found in the database.                  | admin@lasius.ch          |
@@ -101,13 +102,13 @@ Specific to `backend` container:
 
 Specific to `frontend` container:
 
-| Variable name                | Description                                                                                 | Default value |
-|------------------------------|---------------------------------------------------------------------------------------------|---------------|
-| ENVIRONMENT                  | `production` - any other value runs NextJS in dev mode. Not suggested in deployments.       | production    |
-| NEXT_AUTH_SECRET             | Hash for next-auth session salting, e.g. the output of `openssl rand -base64 32`            | random string |
-| LASIUS_DEMO_MODE             | Enables or disables demo mode                                                               | `false`       |
-| LASIUS_TELEMETRY_PLAUSIBLE_HOST | Hostname/FQDN of a matomo instance to collect anonymous usage data, e.g. `stats.domain.com` | undefined     |
-| LASIUS_TELEMETRY_PLAUSIBLE_SOURCE_DOMAIN   | Matomo site ID, e.g. `42`                                                                   | undefined     |
+| Variable name                            | Description                                                                                 | Default value |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------- | ------------- |
+| ENVIRONMENT                              | `production` - any other value runs NextJS in dev mode. Not suggested in deployments.       | production    |
+| NEXT_AUTH_SECRET                         | Hash for next-auth session salting, e.g. the output of `openssl rand -base64 32`            | random string |
+| LASIUS_DEMO_MODE                         | Enables or disables demo mode                                                               | `false`       |
+| LASIUS_TELEMETRY_PLAUSIBLE_HOST          | Hostname/FQDN of a matomo instance to collect anonymous usage data, e.g. `stats.domain.com` | undefined     |
+| LASIUS_TELEMETRY_PLAUSIBLE_SOURCE_DOMAIN | Matomo site ID, e.g. `42`                                                                   | undefined     |
 
 We suggest you use a `.env` file and save it in the same directory as the `docker-compose.yml` for build dependent configuration and edit all other variables in the `docker-compose.yml` file directly if they are not dependent on CI/CD variables.
 
@@ -120,6 +121,8 @@ To bring up a local dev Environment please install:
 - node
 
 Copy the frontent `frontend/.env.template` file to `frontend/.env.local`.
+
+To enable external OAuth support, register application in provider and configure the external provider settings (`GITLAB_OAUTH_*` or `GITHUB_OAUTH_*`) before starting backend and frontend.
 
 Start the backend with `yarn run backend` and the frontend with `yarn run dev` from the `frontend` directory.
 
@@ -150,8 +153,10 @@ If you need help, discover a bug or have a feature request, please open an issue
 ## Migration
 
 # Migrating from 1.0.x to 1.1.x
+
 The migration from 1.0.x to 1.1.x includes a version bump of the underlying reactivemongo driver version. This version cannot read former created binary snapshots from the persistence layer. Therefore you need to manually drop the snapshots. The snapshots are rebuilt from the journal once a user logs in or tries to start a new booking.
 The snapshots can be removed by running the following command in the mongo-shell:
+
 ```
 db.snapshots.remove({})
 ```
