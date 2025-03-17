@@ -94,13 +94,13 @@ trait ControllerSecurity extends TokenSecurity {
       context: ExecutionContext): Action[A] = {
     Action.async(p) { request =>
       extractBearerToken(request).fold {
-        successful(Unauthorized("No JWT token found"))
+        successful(Unauthorized("No token found"))
       } { token =>
         withToken(tokenIssuer = extractTokenIssuerHeader(request),
                   token = token,
                   withinTransaction = withinTransaction,
                   canCreateNewUser = true) {
-          successful(Unauthorized(s"Invalid JWT token provided $token"))
+          successful(Unauthorized(s"Invalid token provided $token"))
         } { dbSession => subject =>
           f(dbSession)(subject)(request)
         }

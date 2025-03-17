@@ -46,9 +46,10 @@ class MockAsyncCache extends AsyncCacheApi {
 
   override def getOrElseUpdate[A](key: String, expiration: Duration)(
       orElse: => Future[A])(implicit evidence$1: ClassTag[A]): Future[A] = {
-    orElse.map { orElseValue =>
-      mockSyncCache.getOrElseUpdate[A](key, expiration)(orElseValue)
-    }
+    mockSyncCache
+      .get(key)
+      .fold(orElse.map(mockSyncCache.getOrElseUpdate[A](key, expiration)(_)))(
+        Future.successful(_))
   }
 
   override def get[A](key: String)(implicit

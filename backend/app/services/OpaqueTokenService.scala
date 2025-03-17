@@ -37,10 +37,10 @@ trait OpaqueTokenService {
       implicit ec: ExecutionContext): Future[Boolean]
 
   def userInfo(config: OpaqueTokenIssuerConfig, opaqueToken: String)(implicit
-      ec: ExecutionContext): Future[Option[UserInfo]]
+      ec: ExecutionContext): Future[UserInfo]
 }
 
-case class ExternalServiceCallFailed(msg: String) extends Exception
+case class ExternalServiceCallFailed(message: String) extends Exception(message)
 
 class OpaqueTokenServiceImpl @Inject() (ws: WSClient)
     extends OpaqueTokenService
@@ -73,7 +73,7 @@ class OpaqueTokenServiceImpl @Inject() (ws: WSClient)
   }
 
   override def userInfo(config: OpaqueTokenIssuerConfig, opaqueToken: String)(
-      implicit ec: ExecutionContext): Future[Option[UserInfo]] = {
+      implicit ec: ExecutionContext): Future[UserInfo] = {
     val tokenValidator = resolveTokenValidator(config)
     val userInfoUri    = tokenValidator.userInfoUri(config)
     logger.debug(s"userInfo: url=${userInfoUri}")
@@ -109,7 +109,7 @@ sealed trait AuthTokenValidator extends Logging {
     response.status match {
       case 200 =>
         handleIntrospectionSuccessResult(wsClient, config, token, response)
-      case code =>
+      case _ =>
         handleIntrospectionFailedResult(wsClient, config, token, response)
     }
   }
@@ -139,7 +139,7 @@ sealed trait AuthTokenValidator extends Logging {
                            config: OpaqueTokenIssuerConfig,
                            token: String,
                            response: WSResponse)(implicit
-      ec: ExecutionContext): Future[Option[UserInfo]] = {
+      ec: ExecutionContext): Future[UserInfo] = {
     response.status match {
       case 200 =>
         handleUserInfoSuccessResult(wsClient, config, token, response)
@@ -152,13 +152,13 @@ sealed trait AuthTokenValidator extends Logging {
                                             config: OpaqueTokenIssuerConfig,
                                             token: String,
                                             response: WSResponse)(implicit
-      ec: ExecutionContext): Future[Option[UserInfo]]
+      ec: ExecutionContext): Future[UserInfo]
 
   protected def handleUserInfoFailedResult(wsClient: WSClient,
                                            config: OpaqueTokenIssuerConfig,
                                            token: String,
                                            response: WSResponse)(implicit
-      ec: ExecutionContext): Future[Option[UserInfo]] = {
+      ec: ExecutionContext): Future[UserInfo] = {
     logger.debug(
       s"userInfo: request failed, response code ${response.status}, ${response.body}")
     Future.failed(
@@ -187,22 +187,20 @@ class OIDCTokenValidator extends AuthTokenValidator with Logging {
       wsClient: WSClient,
       config: OpaqueTokenIssuerConfig,
       token: String,
-      response: WSResponse)(implicit
-      ec: ExecutionContext): Future[Option[UserInfo]] = {
+      response: WSResponse)(implicit ec: ExecutionContext): Future[UserInfo] = {
     logger.debug(s"userInfo: request succeeded: ${response.json}")
     Future.successful(
-      Some(
-        UserInfo(
-          key = (response.json \ "email").as[String],
-          email = (response.json \ "email").as[String],
-          firstName = (response.json \ "given_name")
-            .asOpt[String]
-            .orElse((response.json \ "firstname").asOpt[String])
-            .orElse((response.json \ "name").asOpt[String]),
-          lastName = (response.json \ "family_name")
-            .asOpt[String]
-            .orElse((response.json \ "lastname").asOpt[String])
-        )))
+      UserInfo(
+        key = (response.json \ "email").as[String],
+        email = (response.json \ "email").as[String],
+        firstName = (response.json \ "given_name")
+          .asOpt[String]
+          .orElse((response.json \ "firstname").asOpt[String])
+          .orElse((response.json \ "name").asOpt[String]),
+        lastName = (response.json \ "family_name")
+          .asOpt[String]
+          .orElse((response.json \ "lastname").asOpt[String])
+      ))
   }
 }
 
@@ -231,27 +229,25 @@ class GithubTokenValidator extends AuthTokenValidator {
       wsClient: WSClient,
       config: OpaqueTokenIssuerConfig,
       token: String,
-      response: WSResponse)(implicit
-      ec: ExecutionContext): Future[Option[UserInfo]] = {
+      response: WSResponse)(implicit ec: ExecutionContext): Future[UserInfo] = {
     logger.debug(s"userInfo: request succeeded: ${response.json}")
 
     (response.json \ "email")
       .asOpt[String]
       .fold(requestEmailAddress(wsClient, config, token))(Future.successful)
       .map { email =>
-        Some(
-          UserInfo(
-            key = email,
-            email = email,
-            firstName = (response.json \ "given_name")
-              .asOpt[String]
-              .orElse((response.json \ "firstname").asOpt[String])
-              .orElse((response.json \ "name").asOpt[String])
-              .orElse((response.json \ "login").asOpt[String]),
-            lastName = (response.json \ "family_name")
-              .asOpt[String]
-              .orElse((response.json \ "lastname").asOpt[String])
-          ))
+        UserInfo(
+          key = email,
+          email = email,
+          firstName = (response.json \ "given_name")
+            .asOpt[String]
+            .orElse((response.json \ "firstname").asOpt[String])
+            .orElse((response.json \ "name").asOpt[String])
+            .orElse((response.json \ "login").asOpt[String]),
+          lastName = (response.json \ "family_name")
+            .asOpt[String]
+            .orElse((response.json \ "lastname").asOpt[String])
+        )
       }
   }
 
