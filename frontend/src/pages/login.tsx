@@ -118,16 +118,16 @@ const Login: NextPage<{ csrfToken: string; providers: ClientSafeProvider[] }> = 
           >
             {providers.map((provider) => {
               let icon = undefined;
-              const size = 60;
+              const size = 40;
               switch (provider.id) {
                 case 'internal_lasius':
                   icon = <Icon name="lasius" size={size} />;
                   break;
                 case 'gitlab':
-                  icon = <Icon name="gitlab" size={size} />;
+                  icon = <Icon name="gitlab" size={size} color="none" />;
                   break;
                 case 'github':
-                  icon = <Icon name="github" size={size} />;
+                  icon = <Icon name="github" size={size} color="black" />;
                   break;
               }
 
