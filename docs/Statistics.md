@@ -1,4 +1,4 @@
 # Statistics and exports
 
 ***
-Switch Language: [DE](DE:Statistics.md)
+Switch Language: [DE](DE%3AStatistics.md)

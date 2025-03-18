@@ -6,8 +6,8 @@
   * [Statistics](Statistics.md)
 
 # DE
-* [Startseite](DE:Home.md)
-  * [Tag und Tag-Gruppen](DE:Tags.md)
-  * [Organisationen verwalten](DE:Organizations.md)
-  * [Projekte verwalten](DE:Projects.md)
-  * [Statistiken](DE:Statistics.md)
+* [Startseite](DE%3AHome.md)
+  * [Tag und Tag-Gruppen](DE%3ATags.md)
+  * [Organisationen verwalten](DE%3AOrganizations.md)
+  * [Projekte verwalten](DE%3AProjects.md)
+  * [Statistiken](DE%3AStatistics.md)
