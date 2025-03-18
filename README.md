@@ -155,3 +155,7 @@ The snapshots can be removed by running the following command in the mongo-shell
 ```
 db.snapshots.remove({})
 ```
+
+## Wiki / Documentation
+The wiki documentation of this project is part of the main repository and will be published on every build of the main branch. Therefore don't edit the wiki online as those changes will be overwritten on the next build.
+If you want to change the wiki documentation please create a PR to the main branch.
