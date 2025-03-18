@@ -1,2 +1,2 @@
 ***
-Andere Sprache wählen: [EN](https://github.com/tegonal/Lasius/wiki/Tags)
+Andere Sprache wählen: [EN](./Tags.md)

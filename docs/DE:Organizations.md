@@ -1,2 +1,2 @@
 ***
-Andere Sprache wählen: [EN](https://github.com/tegonal/Lasius/wiki/Organizations)
+Andere Sprache wählen: [EN](/Organizations.md)

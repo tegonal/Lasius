@@ -1,2 +1,2 @@
 ***
-Switch Language: [DE](https://github.com/tegonal/Lasius/wiki/DE:Projects)
+Switch Language: [DE](./DE:Projects.md)

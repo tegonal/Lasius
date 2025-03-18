@@ -1,2 +1,2 @@
 ***
-Switch Language: [DE](https://github.com/tegonal/Lasius/wiki/DE:Tags)
+Switch Language: [DE](./DE:Tags.md)

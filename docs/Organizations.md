@@ -1,2 +1,2 @@
 ***
-Switch Language: [DE](https://github.com/tegonal/Lasius/wiki/DE:Organizations)
+Switch Language: [DE](./DE:Organizations.md)

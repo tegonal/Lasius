@@ -1,3 +1,3 @@
 Welcome to the Lasius wiki!
 ***
-Switch Language: [DE](https://github.com/tegonal/Lasius/wiki/DE:Home)
+Switch Language: [DE](./DE:Home.md)
