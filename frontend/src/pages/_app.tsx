@@ -31,6 +31,7 @@ import { DevInfoBadge } from 'components/system/devInfoBadge';
 import { LasiusBackendWebsocketStatus } from 'components/system/lasiusBackendWebsocketStatus';
 import { BrowserOnlineStatusCheck } from 'components/system/browserOnlineStatusCheck';
 import { LasiusBackendOnlineCheck } from 'components/system/lasiusBackendOnlineCheck';
+import { LasiusTOSCheck } from 'components/system/lasiusTOSCheck';
 import { Session } from 'next-auth';
 import { BundleVersionCheck } from 'components/system/bundleVersionCheck';
 import { LasiusBackendWebsocketEventHandler } from 'components/system/lasiusBackendWebsocketEventHandler';
@@ -154,6 +155,7 @@ const App = ({
                       <LasiusBackendWebsocketStatus />
                       <LasiusBackendWebsocketEventHandler />
                       <DevInfoBadge />
+                      <LasiusTOSCheck />
                     </>
                   )}
                 </PlausibleProvider>

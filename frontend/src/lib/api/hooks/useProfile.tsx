@@ -17,8 +17,8 @@
  *
  */
 
-import { updateUserSettings, useGetUserProfile } from 'lib/api/lasius/user/user';
-import { ModelsUserSettings } from 'lib/api/lasius';
+import { updateUserSettings, useGetUserProfile, acceptUserTOS } from 'lib/api/lasius/user/user';
+import { ModelsUserSettings, ModelsAcceptTOSRequest } from 'lib/api/lasius';
 
 export const useProfile = () => {
   const { data, mutate } = useGetUserProfile({
@@ -38,6 +38,14 @@ export const useProfile = () => {
     }
   };
 
+  const acceptTOS = async (currentTOSVersion: string) => {
+    if (data) {
+      const acceptTOSRequest: ModelsAcceptTOSRequest = { version: currentTOSVersion };
+      const profile = await acceptUserTOS(acceptTOSRequest);
+      await mutate(profile);
+    }
+  };
+
   return {
     firstName: data?.firstName || '',
     lastName: data?.lastName || '',
@@ -47,5 +55,7 @@ export const useProfile = () => {
     userId: data?.id || '',
     lasiusIsLoggedIn: !!data,
     updateSettings,
+    acceptedTOSVersion: data?.acceptedTOS?.version || '',
+    acceptTOS,
   };
 };

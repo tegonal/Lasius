@@ -25,14 +25,8 @@
  * OpenAPI spec version: 1.1.0+28-5f3a3dc5
  */
 
-export type GetOrganisationBookingAggregatedStatsGranularity =
-  (typeof GetOrganisationBookingAggregatedStatsGranularity)[keyof typeof GetOrganisationBookingAggregatedStatsGranularity];
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const GetOrganisationBookingAggregatedStatsGranularity = {
-  All: 'All',
-  Year: 'Year',
-  Month: 'Month',
-  Week: 'Week',
-  Day: 'Day',
-} as const;
+export interface ModelsAcceptedTOS {
+  version: string;
+  /** @pattern yyyy-MM-dd */
+  date: string;
+}
