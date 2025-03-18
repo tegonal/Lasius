@@ -28,7 +28,12 @@ import useSwr from 'swr';
 import type { Key, SWRConfiguration } from 'swr';
 import useSWRMutation from 'swr/mutation';
 import type { SWRMutationConfiguration } from 'swr/mutation';
-import type { ModelsPersonalDataUpdate, ModelsUser, ModelsUserSettings } from '..';
+import type {
+  ModelsAcceptTOSRequest,
+  ModelsPersonalDataUpdate,
+  ModelsUser,
+  ModelsUserSettings,
+} from '..';
 import { lasiusAxiosInstance } from '../../lasiusAxiosInstance';
 import type { ErrorType, BodyType } from '../../lasiusAxiosInstance';
 
@@ -175,6 +180,61 @@ export const useUpdateUserSettings = <TError = ErrorType<unknown>>(options?: {
 
   const swrKey = swrOptions?.swrKey ?? getUpdateUserSettingsMutationKey();
   const swrFn = getUpdateUserSettingsMutationFetcher(requestOptions);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * @summary Accept terms of service (TOS)
+ */
+export const acceptUserTOS = (
+  modelsAcceptTOSRequest: BodyType<ModelsAcceptTOSRequest>,
+  options?: SecondParameter<typeof lasiusAxiosInstance>
+) => {
+  return lasiusAxiosInstance<ModelsUser>(
+    {
+      url: `/user/accept-tos`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: modelsAcceptTOSRequest,
+    },
+    options
+  );
+};
+
+export const getAcceptUserTOSMutationFetcher = (
+  options?: SecondParameter<typeof lasiusAxiosInstance>
+) => {
+  return (_: Key, { arg }: { arg: ModelsAcceptTOSRequest }): Promise<ModelsUser> => {
+    return acceptUserTOS(arg, options);
+  };
+};
+export const getAcceptUserTOSMutationKey = () => [`/user/accept-tos`] as const;
+
+export type AcceptUserTOSMutationResult = NonNullable<Awaited<ReturnType<typeof acceptUserTOS>>>;
+export type AcceptUserTOSMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Accept terms of service (TOS)
+ */
+export const useAcceptUserTOS = <TError = ErrorType<unknown>>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof acceptUserTOS>>,
+    TError,
+    Key,
+    ModelsAcceptTOSRequest,
+    Awaited<ReturnType<typeof acceptUserTOS>>
+  > & { swrKey?: string };
+  request?: SecondParameter<typeof lasiusAxiosInstance>;
+}) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getAcceptUserTOSMutationKey();
+  const swrFn = getAcceptUserTOSMutationFetcher(requestOptions);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

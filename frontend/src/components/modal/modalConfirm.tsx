@@ -36,6 +36,7 @@ type Props = {
   onConfirm: () => void;
   children?: React.ReactNode;
   hideButtons?: boolean;
+  autoSize?: boolean;
 };
 
 export const ModalConfirm: React.FC<Props> = ({
@@ -45,6 +46,7 @@ export const ModalConfirm: React.FC<Props> = ({
   dangerLevel = 'notification',
   children,
   hideButtons = false,
+  autoSize = false,
 }) => {
   const { modalId, closeModal, openModal } = useModal('ConfirmationDialog');
   const { t } = useTranslation('common');
@@ -65,7 +67,7 @@ export const ModalConfirm: React.FC<Props> = ({
   }, []);
 
   return (
-    <ModalResponsive modalId={modalId} blockViewport>
+    <ModalResponsive modalId={modalId} blockViewport autoSize={autoSize}>
       {text && <Box sx={{ mb: 3 }}>{text.action}</Box>}
       {children && <Box sx={{ mb: 3 }}>{children}</Box>}
       {!hideButtons && (
