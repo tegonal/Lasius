@@ -22,23 +22,11 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 1.1.0+38-bb6ecdec+20250320-1641
+ * OpenAPI spec version: 1.1.0+28-5f3a3dc5
  */
-import type { ModelsUserRole } from './modelsUserRole';
-import type { ModelsUserOrganisation } from './modelsUserOrganisation';
-import type { ModelsUserSettings } from './modelsUserSettings';
-import type { ModelsAcceptedTOS } from './modelsAcceptedTOS';
 
-export interface ModelsUser {
-  id: string;
-  key: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  active: boolean;
-  role: ModelsUserRole;
-  organisations: ModelsUserOrganisation[];
-  settings: ModelsUserSettings;
-  /** @nullable */
-  acceptedTOS?: ModelsAcceptedTOS;
+export interface ModelsAcceptedTOS {
+  version: string;
+  /** @pattern yyyy-MM-dd */
+  date: string;
 }

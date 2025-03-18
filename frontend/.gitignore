@@ -9,6 +9,8 @@ package-lock.json
 dump
 .history
 .env.local
+/public/locales/termsofservice.json
+/public/locales/*/termsofservice.html
 
 # PWA files
 **/public/sw.js
