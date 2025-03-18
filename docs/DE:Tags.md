@@ -1,2 +1,2 @@
 ***
-Andere Sprache wählen: [EN](./Tags.md)
+Andere Sprache wählen: [EN](Tags.md)

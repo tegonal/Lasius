@@ -1,2 +1,2 @@
 ***
-Switch Language: [DE](./DE:Tags.md)
+Switch Language: [DE](DE:Tags.md)

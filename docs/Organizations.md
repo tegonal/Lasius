@@ -1,2 +1,2 @@
 ***
-Switch Language: [DE](./DE:Organizations.md)
+Switch Language: [DE](DE:Organizations.md)

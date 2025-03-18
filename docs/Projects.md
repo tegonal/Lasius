@@ -1,2 +1,2 @@
 ***
-Switch Language: [DE](./DE:Projects.md)
+Switch Language: [DE](DE:Projects.md)

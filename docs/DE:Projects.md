@@ -1,2 +1,2 @@
 ***
-Andere Sprache wählen: [EN](./Projects.md)
+Andere Sprache wählen: [EN](Projects.md)

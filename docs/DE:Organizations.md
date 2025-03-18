@@ -1,2 +1,2 @@
 ***
-Andere Sprache wählen: [EN](/Organizations.md)
+Andere Sprache wählen: [EN](Organizations.md)

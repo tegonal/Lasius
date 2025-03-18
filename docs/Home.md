@@ -1,3 +1,3 @@
 Welcome to the Lasius wiki!
 ***
-Switch Language: [DE](./DE:Home.md)
+Switch Language: [DE](DE:Home.md)
