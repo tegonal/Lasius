@@ -1,4 +1,4 @@
 # Manage projects
 
 ***
-Switch Language: [DE](DE:Projects.md)
+Switch Language: [DE](DE%3AProjects.md)

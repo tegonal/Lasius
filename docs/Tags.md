@@ -1,4 +1,4 @@
 # Tags and Tag-groups
 
 ***
-Switch Language: [DE](DE:Tags.md)
+Switch Language: [DE](DE%3ATags.md)
