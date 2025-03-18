@@ -36,6 +36,8 @@ export * from './getUserBookingAggregatedStatsByOrganisationParams';
 export * from './getUserBookingLatestListByOrganisationParams';
 export * from './getUserBookingListByOrganisationParams';
 export * from './modelsAcceptInvitationRequest';
+export * from './modelsAcceptTOSRequest';
+export * from './modelsAcceptedTOS';
 export * from './modelsAddBookingRequest';
 export * from './modelsApplicationConfig';
 export * from './modelsBooking';
