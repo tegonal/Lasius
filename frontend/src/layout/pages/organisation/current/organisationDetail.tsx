@@ -74,7 +74,15 @@ export const OrganisationDetail: React.FC = () => {
           )}
       </Heading>
       {selectedOrganisation?.private && (
-        <Flex sx={{ ...flexColumnJustifyCenterAlignCenter(3), mb: 4 }}>
+        <Flex
+          sx={{
+            ...flexColumnJustifyCenterAlignCenter(3),
+            mb: 4,
+            maxWidth: 500,
+            textAlign: 'center',
+            mx: 'auto',
+          }}
+        >
           <Icon name="lock-1-interface-essential" size={24} />
           <Box>
             {t(
