@@ -36,7 +36,6 @@ export const LasiusTOSCheck: React.FC = () => {
 
   const TOSi18nNamespace = 'termsofservice';
   const TOSi18nKey = 'text';
-
   if ('addResourceBundle' in i18n) {
     for (const lang in termsofservice) {
       const key = lang as keyof typeof termsofservice;

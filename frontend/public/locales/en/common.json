@@ -135,7 +135,7 @@
   "Project updated": "Project updated",
   "Projects": "Projects",
   "Projects where you are a member and can book time. Restricted by the currently selected organisation.": "Projects where you are a member and can book time. Restricted by the currently selected organisation.",
-  "register_user_unkown_error": "An unknown error occured.",
+  "register_user_unknown_error": "An unknown error occurred.",
   "register_user_user_already_registered": "User already exist",
   "Reject and logout": "Reject and logout from Lasius",
   "Reject invitation": "Reject invitation",
