@@ -107,13 +107,14 @@ Specific to `backend` container:
 
 Specific to `frontend` container:
 
-| Variable name                            | Description                                                                                 | Default value |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------- | ------------- |
-| ENVIRONMENT                              | `production` - any other value runs NextJS in dev mode. Not suggested in deployments.       | production    |
-| NEXT_AUTH_SECRET                         | Hash for next-auth session salting, e.g. the output of `openssl rand -base64 32`            | random string |
-| LASIUS_DEMO_MODE                         | Enables or disables demo mode                                                               | `false`       |
-| LASIUS_TELEMETRY_PLAUSIBLE_HOST          | Hostname/FQDN of a matomo instance to collect anonymous usage data, e.g. `stats.domain.com` | undefined     |
-| LASIUS_TELEMETRY_PLAUSIBLE_SOURCE_DOMAIN | Matomo site ID, e.g. `42`                                                                   | undefined     |
+| Variable name                            | Description                                                                                                             | Default value |
+|------------------------------------------|-------------------------------------------------------------------------------------------------------------------------| ------------- |
+| ENVIRONMENT                              | `production` - any other value runs NextJS in dev mode. Not suggested in deployments.                                   | production    |
+| NEXT_AUTH_SECRET                         | Hash for next-auth session salting, e.g. the output of `openssl rand -base64 32`                                        | random string |
+| LASIUS_DEMO_MODE                         | Enables or disables demo mode                                                                                           | `false`       |
+| LASIUS_TELEMETRY_PLAUSIBLE_HOST          | Hostname/FQDN of a matomo instance to collect anonymous usage data, e.g. `stats.domain.com`                             | undefined     |
+| LASIUS_TELEMETRY_PLAUSIBLE_SOURCE_DOMAIN | Matomo site ID, e.g. `42`                                                                                               | undefined     |
+| LASIUS_TERMSOFSERVICE_VERSION            | Enables the Terms of Service dialog. You also need to provide the terms in `public/locales/<lang>/termsofservice.html`. | undefined     |
 
 We suggest you use a `.env` file and save it in the same directory as the `docker-compose.yml` for build dependent configuration and edit all other variables in the `docker-compose.yml` file directly if they are not dependent on CI/CD variables.
 
