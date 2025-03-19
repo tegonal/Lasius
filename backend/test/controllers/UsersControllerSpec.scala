@@ -329,13 +329,11 @@ class UsersControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller
-          : UsersController with SecurityControllerMock with MockCacheAware =
+      val controller: UsersController with SecurityControllerMock =
         UsersControllerMock(config,
                             systemServices,
                             authConfig,
-                            reactiveMongoApi,
-                            jwkProviderCache)
+                            reactiveMongoApi)
 
       val request: FakeRequest[AcceptTOSRequest] = FakeRequest().withBody(
         AcceptTOSRequest(version = "")
@@ -352,13 +350,11 @@ class UsersControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller
-          : UsersController with SecurityControllerMock with MockCacheAware =
+      val controller: UsersController with SecurityControllerMock =
         UsersControllerMock(config,
                             systemServices,
                             authConfig,
-                            reactiveMongoApi,
-                            jwkProviderCache)
+                            reactiveMongoApi)
 
       val testVersion = "1.0"
       val request: FakeRequest[AcceptTOSRequest] = FakeRequest().withBody(
