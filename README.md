@@ -127,7 +127,6 @@ To bring up a local dev Environment please install:
 - sbt
 - docker
 - node
-- dotenv
 
 Copy the frontent `frontend/.env.template` file to `frontend/.env.local`.
 
