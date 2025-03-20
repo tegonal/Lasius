@@ -35,7 +35,7 @@ import { useRouter } from 'next/router';
 import { AUTH_PROVIDER_INTERNAL_LASIUS } from 'projectConfig/constants';
 import { useCallback, useEffect, useState } from 'react';
 import { useStore } from 'storeContext/store';
-import { Box, Button } from 'theme-ui';
+import { Button } from 'theme-ui';
 
 const Login: NextPage<{ csrfToken: string; providers: ClientSafeProvider[] }> = ({
   csrfToken,
@@ -107,45 +107,44 @@ const Login: NextPage<{ csrfToken: string; providers: ClientSafeProvider[] }> = 
     return (
       <LoginLayout>
         <Logo />
-        <BoxInfo>{t('Please choose a login provider')}</BoxInfo>
-        <CardContainer>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '1.5rem',
-            }}
-          >
-            {providers.map((provider) => {
-              let icon = undefined;
-              const size = 40;
-              switch (provider.id) {
-                case 'internal_lasius':
-                  icon = <Icon name="lasius" size={size} />;
-                  break;
-                case 'gitlab':
-                  icon = <Icon name="gitlab" size={size} color="none" />;
-                  break;
-                case 'github':
-                  icon = <Icon name="github" size={size} color="black" />;
-                  break;
-              }
+        <CardContainer
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1.5rem',
+            background: 'containerBackgroundDarker',
+          }}
+        >
+          <BoxInfo>{t('Please choose a login provider')}</BoxInfo>
+          {providers.map((provider) => {
+            let icon = undefined;
+            const size = 40;
+            switch (provider.id) {
+              case 'internal_lasius':
+                icon = <Icon name="lasius" size={size} />;
+                break;
+              case 'gitlab':
+                icon = <Icon name="gitlab" size={size} color="none" />;
+                break;
+              case 'github':
+                icon = <Icon name="github" size={size} color="black" />;
+                break;
+            }
 
-              return (
-                <Button
-                  key={provider.id}
-                  disabled={isSubmitting}
-                  onClick={() => signInToProvider(provider.id)}
-                  variant="secondary"
-                  style={{ padding: 25 }}
-                >
-                  {icon}
-                  {t('Sign in with ')}
-                  <Trans t={t}>{provider.name}</Trans>
-                </Button>
-              );
-            })}
-          </Box>
+            return (
+              <Button
+                key={provider.id}
+                disabled={isSubmitting}
+                onClick={() => signInToProvider(provider.id)}
+                variant="secondary"
+                style={{ padding: 25 }}
+              >
+                {icon}
+                {t('Sign in with ')}
+                <Trans t={t}>{provider.name}</Trans>
+              </Button>
+            );
+          })}
         </CardContainer>
         <TegonalFooter />
       </LoginLayout>
