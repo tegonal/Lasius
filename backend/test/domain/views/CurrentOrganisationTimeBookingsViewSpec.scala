@@ -180,7 +180,8 @@ class CurrentOrganisationTimeBookingsViewSpec
           projects = Seq()
         )
       ),
-      settings = None
+      settings = None,
+      acceptedTOS = None
     )
 
     private val user2 = User(
@@ -200,7 +201,8 @@ class CurrentOrganisationTimeBookingsViewSpec
           projects = Seq()
         )
       ),
-      settings = None
+      settings = None,
+      acceptedTOS = None
     )
 
     userRepository

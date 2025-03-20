@@ -101,7 +101,8 @@ trait SecurityControllerMock
     active = userActive,
     role = Administrator,
     organisations = Seq(userOrganisation),
-    settings = None
+    settings = None,
+    acceptedTOS = None
   )
   val authorizationFailedResult: Result = null
 

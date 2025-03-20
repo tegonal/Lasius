@@ -12,7 +12,8 @@ lazy val root = (project in file("."))
                  AutomateHeaderPlugin)
   .settings(
     RoutesKeys.routesImport += "binders.Binders._",
-    swaggerV3 := true
+    swaggerV3 := true,
+    maintainer := "Tegonal Genossenschaft, https://tegonal.com"
   )
 
 swaggerDomainNameSpaces := Seq("models", "controllers")
