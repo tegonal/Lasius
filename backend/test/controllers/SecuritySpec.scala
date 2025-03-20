@@ -517,8 +517,8 @@ class SecuritySpec
           new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
         val tokenConfig = OpaqueTokenIssuerConfig(
           issuer = "test-issuer",
-          clientId = "",
-          clientSecret = "",
+          clientId = Some(""),
+          clientSecret = Some(""),
           tokenValidatorType = TokenValidatorType.OIDC,
           introspectionPath = None,
           userInfoPath = None
@@ -552,8 +552,8 @@ class SecuritySpec
           new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
         val tokenConfig = OpaqueTokenIssuerConfig(
           issuer = "test-issuer",
-          clientId = "",
-          clientSecret = "",
+          clientId = Some(""),
+          clientSecret = Some(""),
           tokenValidatorType = TokenValidatorType.OIDC,
           introspectionPath = None,
           userInfoPath = None
@@ -586,8 +586,8 @@ class SecuritySpec
           new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
         val tokenConfig = OpaqueTokenIssuerConfig(
           issuer = "test-issuer",
-          clientId = "",
-          clientSecret = "",
+          clientId = Some(""),
+          clientSecret = Some(""),
           tokenValidatorType = TokenValidatorType.OIDC,
           introspectionPath = None,
           userInfoPath = None
@@ -625,8 +625,8 @@ class SecuritySpec
           new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
         val tokenConfig = OpaqueTokenIssuerConfig(
           issuer = "test-issuer",
-          clientId = "",
-          clientSecret = "",
+          clientId = Some(""),
+          clientSecret = Some(""),
           tokenValidatorType = TokenValidatorType.OIDC,
           introspectionPath = None,
           userInfoPath = None
@@ -668,8 +668,8 @@ class SecuritySpec
           new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
         val tokenConfig = OpaqueTokenIssuerConfig(
           issuer = "test-issuer",
-          clientId = "",
-          clientSecret = "",
+          clientId = Some(""),
+          clientSecret = Some(""),
           tokenValidatorType = TokenValidatorType.OIDC,
           introspectionPath = None,
           userInfoPath = None
@@ -710,8 +710,8 @@ class SecuritySpec
           new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
         val tokenConfig = OpaqueTokenIssuerConfig(
           issuer = "test-issuer",
-          clientId = "",
-          clientSecret = "",
+          clientId = Some(""),
+          clientSecret = Some(""),
           tokenValidatorType = TokenValidatorType.OIDC,
           introspectionPath = None,
           userInfoPath = None
@@ -752,16 +752,16 @@ class SecuritySpec
           new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
         val tokenConfig1 = OpaqueTokenIssuerConfig(
           issuer = "test-issuer1",
-          clientId = "",
-          clientSecret = "",
+          clientId = Some(""),
+          clientSecret = Some(""),
           tokenValidatorType = TokenValidatorType.OIDC,
           introspectionPath = None,
           userInfoPath = None
         )
         val tokenConfig2 = OpaqueTokenIssuerConfig(
           issuer = "test-issuer2",
-          clientId = "",
-          clientSecret = "",
+          clientId = Some(""),
+          clientSecret = Some(""),
           tokenValidatorType = TokenValidatorType.OIDC,
           introspectionPath = None,
           userInfoPath = None
@@ -808,8 +808,8 @@ class SecuritySpec
 
         val tokenConfig = OpaqueTokenIssuerConfig(
           issuer = "test-issuer2",
-          clientId = "",
-          clientSecret = "",
+          clientId = Some(""),
+          clientSecret = Some(""),
           tokenValidatorType = TokenValidatorType.OIDC,
           introspectionPath = None,
           userInfoPath = None
@@ -838,8 +838,8 @@ class SecuritySpec
           new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
         val tokenConfig2 = OpaqueTokenIssuerConfig(
           issuer = "test-issuer2",
-          clientId = "",
-          clientSecret = "",
+          clientId = Some(""),
+          clientSecret = Some(""),
           tokenValidatorType = TokenValidatorType.OIDC,
           introspectionPath = None,
           userInfoPath = None

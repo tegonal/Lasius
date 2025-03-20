@@ -112,6 +112,8 @@ Specific to `frontend` container:
 
 We suggest you use a `.env` file and save it in the same directory as the `docker-compose.yml` for build dependent configuration and edit all other variables in the `docker-compose.yml` file directly if they are not dependent on CI/CD variables.
 
+Authentication providers need to be configured in the frontend environment configuration and in the backend `lasius.security.external-issuers` configuration. Please have a look at the `conf/dev.conf` to get an idea how to enable with [GitLab](https://gitlab.com), [GitHub](https://github.com) or a custom [Keycloak](https://keycloak.org) instance.
+
 ## Dev Environment
 
 To bring up a local dev Environment please install:
@@ -122,7 +124,7 @@ To bring up a local dev Environment please install:
 
 Copy the frontent `frontend/.env.template` file to `frontend/.env.local`.
 
-To enable external OAuth support, register application in provider and configure the external provider settings (`GITLAB_OAUTH_*` or `GITHUB_OAUTH_*`) before starting backend and frontend.
+To enable external OAuth support, register application in provider and configure the external provider settings (`GITLAB_OAUTH_*` or `GITHUB_OAUTH_*`) before starting backend and frontend. Those environment variables are re-used in the backend configuration and enable the provider there as well.
 
 Start the backend with `yarn run backend` and the frontend with `yarn run dev` from the `frontend` directory.
 
