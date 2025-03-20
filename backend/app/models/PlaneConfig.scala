@@ -44,7 +44,6 @@ case class PlaneProjectSettings(planeWorkspace: String,
                                 planeProjectId: String,
                                 maxResults: Option[Int] = None,
                                 params: Option[String] = None,
-                                projectKeyPrefix: Option[String] = None,
                                 tagConfiguration: PlaneTagConfiguration)
 
 case class PlaneProjectMapping(projectId: ProjectId,

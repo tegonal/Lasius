@@ -119,7 +119,7 @@ class GitlabTagParseWorker(wsClient: WSClient,
       case false => Seq()
       case _ =>
         issue.labels
-          .filterNot(projectSettings.tagConfiguration.labelFilter.contains(_))
+          .filterNot(projectSettings.tagConfiguration.labelFilter.contains)
           .map(l => SimpleTag(TagId(l)))
     }
 

@@ -1,11 +1,11 @@
-# EN
+# English
 * [Home](Home.md)
   * [Tags and Tag-Groups](Tags.md)
   * [Manage Organizations](Organizations.md)
   * [Manage Projects](Projects.md)
   * [Statistics](Statistics.md)
 
-# DE
+# Deutsch
 * [Startseite](DE%3AHome.md)
   * [Tag und Tag-Gruppen](DE%3ATags.md)
   * [Organisationen verwalten](DE%3AOrganizations.md)

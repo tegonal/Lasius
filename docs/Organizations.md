@@ -1,4 +1,3 @@
-# Manage organizations
+[DE](DE%3AOrganizations.md)
 
-***
-Switch Language: [DE](DE%3AOrganizations.md)
+# Manage organizations

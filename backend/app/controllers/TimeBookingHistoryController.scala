@@ -21,14 +21,13 @@
 
 package controllers
 
-import org.apache.pekko.util.Timeout
-import core.{CacheAware, DBSupport, SystemServices}
+import core.SystemServices
 import models._
+import org.apache.pekko.util.Timeout
 import org.joda.time._
-import play.api.Logging
 import play.api.cache.AsyncCacheApi
 import play.api.libs.json._
-import play.api.mvc.{AbstractController, Action, ControllerComponents}
+import play.api.mvc.{Action, ControllerComponents}
 import play.modules.reactivemongo.ReactiveMongoApi
 import repositories._
 
