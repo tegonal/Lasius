@@ -26,6 +26,7 @@ import { AUTH_PROVIDER_INTERNAL_LASIUS } from 'projectConfig/constants';
 import { t } from 'i18next';
 import GitLab from 'next-auth/providers/gitlab';
 import GitHub from 'next-auth/providers/github';
+import Keyclaok from 'next-auth/providers/keycloak';
 
 const gitlabUrl = process.env.GITLAB_OAUTH_URL || 'https://gitlab.com';
 const githubUrl = 'https://api.github.com/';
@@ -171,6 +172,16 @@ if (process.env.GITHUB_OAUTH_CLIENT_ID && process.env.GITHUB_OAUTH_CLIENT_SECRET
           access_token_issuer: githubUrl,
         };
       },
+    })
+  );
+}
+if (process.env.KEYCLOAK_OAUTH_CLIENT_ID && process.env.KEYCLOAK_OAUTH_CLIENT_SECRET) {
+  providers.push(
+    Keyclaok({
+      id: 'custom_keycloak',
+      clientId: process.env.KEYCLOAK_OAUTH_CLIENT_ID,
+      clientSecret: process.env.KEYCLOAK_OAUTH_CLIENT_SECRET,
+      issuer: process.env.KEYCLOAK_OAUTH_URL,
     })
   );
 }
