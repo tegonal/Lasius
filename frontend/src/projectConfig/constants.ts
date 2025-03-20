@@ -92,3 +92,4 @@ export enum CONNECTION_STATUS {
 }
 
 export const AUTH_PROVIDER_INTERNAL_LASIUS = 'internal_lasius';
+export const AUTH_PROVIDER_CUSTOMER_KEYCLOAK = 'custom_keycloak';

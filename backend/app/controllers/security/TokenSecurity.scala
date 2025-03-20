@@ -282,7 +282,10 @@ trait TokenSecurity extends Logging with ConfigAware with FutureHelper {
             .resolveOrCreateUserByUserInfo(userInfo = userInfo,
                                            canCreateNewUser = canCreateNewUser)
             .flatMap { user =>
-              success(dbSession)(Subject(userInfo, user))
+              success(dbSession)(
+                Subject(token = token,
+                        userInfo = userInfo,
+                        userReference = user))
             }
         }
       }

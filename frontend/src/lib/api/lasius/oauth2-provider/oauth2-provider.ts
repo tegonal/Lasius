@@ -22,7 +22,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 1.1.0+15-0f9d0d82+20250206-0746
+ * OpenAPI spec version: 1.1.0+38-bb6ecdec+20250320-1641
  */
 import useSwr from 'swr';
 import type { Arguments, Key, SWRConfiguration } from 'swr';
@@ -245,6 +245,48 @@ export const useLogin = <TError = ErrorType<void>>(options?: {
 
   const swrKey = swrOptions?.swrKey ?? getLoginMutationKey();
   const swrFn = getLoginMutationFetcher(requestOptions);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * @summary logout from the internal oauth provider, token will not be valid anymore afterwards
+ */
+export const logout = (options?: SecondParameter<typeof lasiusAxiosInstance>) => {
+  return lasiusAxiosInstance<void>({ url: `/oauth2/logout`, method: 'POST' }, options);
+};
+
+export const getLogoutMutationFetcher = (options?: SecondParameter<typeof lasiusAxiosInstance>) => {
+  return (_: Key, __: { arg: Arguments }): Promise<void> => {
+    return logout(options);
+  };
+};
+export const getLogoutMutationKey = () => [`/oauth2/logout`] as const;
+
+export type LogoutMutationResult = NonNullable<Awaited<ReturnType<typeof logout>>>;
+export type LogoutMutationError = ErrorType<unknown>;
+
+/**
+ * @summary logout from the internal oauth provider, token will not be valid anymore afterwards
+ */
+export const useLogout = <TError = ErrorType<unknown>>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof logout>>,
+    TError,
+    Key,
+    Arguments,
+    Awaited<ReturnType<typeof logout>>
+  > & { swrKey?: string };
+  request?: SecondParameter<typeof lasiusAxiosInstance>;
+}) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getLogoutMutationKey();
+  const swrFn = getLogoutMutationFetcher(requestOptions);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 
