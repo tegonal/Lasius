@@ -66,7 +66,9 @@ class OpaqueTokenServiceImpl @Inject() (ws: WSClient)
 
     request
       .addHttpHeaders("Accept" -> "application/json")
-      .withAuth(config.clientId, config.clientSecret, WSAuthScheme.BASIC)
+      .withAuth(config.clientId.getOrElse(""),
+                config.clientSecret.getOrElse(""),
+                WSAuthScheme.BASIC)
       .post(data)
       .flatMap(
         tokenValidator.handleIntrospectionResult(ws, config, opaqueToken, _))

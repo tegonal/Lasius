@@ -99,8 +99,8 @@ object TokenValidatorType {
 
 case class OpaqueTokenIssuerConfig(
     issuer: String,
-    clientId: String,
-    clientSecret: String,
+    clientId: Option[String],
+    clientSecret: Option[String],
     tokenValidatorType: TokenValidatorType,
     introspectionPath: Option[String],
     userInfoPath: Option[String]
