@@ -42,7 +42,6 @@ class TimeBookingStatisticsController @Inject() (
     override val systemServices: SystemServices,
     override val authConfig: AuthConfig,
     override val reactiveMongoApi: ReactiveMongoApi,
-    override val jwkProviderCache: SyncCacheApi,
     val bookingByProjectRepository: BookingByProjectRepository,
     val bookingByTagRepository: BookingByTagRepository)(implicit
     ec: ExecutionContext)

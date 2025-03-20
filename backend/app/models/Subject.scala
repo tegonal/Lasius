@@ -21,9 +21,11 @@
 
 package models
 
-import com.auth0.jwt.interfaces.DecodedJWT
 import models.UserId.UserReference
 
-case class Subject(jwt: DecodedJWT, userReference: UserReference) {
-  def extendedJwtClaims: LasiusJWT = LasiusJWT(jwt)
-}
+case class UserInfo(key: String,
+                    firstName: Option[String],
+                    lastName: Option[String],
+                    email: String)
+
+case class Subject(userInfo: UserInfo, userReference: UserReference)

@@ -19,6 +19,7 @@
 
 import { CardContainer } from 'components/cardContainer';
 import { Logo } from 'components/logo';
+import { Icon } from 'components/shared/icon';
 import { BoxInfo } from 'components/shared/notifications/boxInfo';
 import { TegonalFooter } from 'components/shared/tegonalFooter';
 import { LoginLayout } from 'layout/pages/login/loginLayout';
@@ -106,17 +107,44 @@ const Login: NextPage<{ csrfToken: string; providers: ClientSafeProvider[] }> = 
     return (
       <LoginLayout>
         <Logo />
-        <BoxInfo>{t('Please choose a login provider')}</BoxInfo>
-        <CardContainer>
-          {providers.map((provider) => (
-            <Button
-              key={provider.name}
-              disabled={isSubmitting}
-              onClick={() => signInToProvider(provider.id)}
-            >
-              <Trans t={t}>{provider.name}</Trans>
-            </Button>
-          ))}
+        <CardContainer
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1.5rem',
+            background: 'containerBackgroundDarker',
+          }}
+        >
+          <BoxInfo>{t('Please choose a login provider')}</BoxInfo>
+          {providers.map((provider) => {
+            let icon = undefined;
+            const size = 40;
+            switch (provider.id) {
+              case 'internal_lasius':
+                icon = <Icon name="lasius" size={size} />;
+                break;
+              case 'gitlab':
+                icon = <Icon name="gitlab" size={size} color="none" />;
+                break;
+              case 'github':
+                icon = <Icon name="github" size={size} color="black" />;
+                break;
+            }
+
+            return (
+              <Button
+                key={provider.id}
+                disabled={isSubmitting}
+                onClick={() => signInToProvider(provider.id)}
+                variant="secondary"
+                style={{ padding: 25 }}
+              >
+                {icon}
+                {t('Sign in with ')}
+                <Trans t={t}>{provider.name}</Trans>
+              </Button>
+            );
+          })}
         </CardContainer>
         <TegonalFooter />
       </LoginLayout>

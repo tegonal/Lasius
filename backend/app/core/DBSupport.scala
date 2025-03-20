@@ -23,10 +23,12 @@ package core
 
 import play.modules.reactivemongo.ReactiveMongoApi
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 trait DBSupport {
-  val reactiveMongoApi: ReactiveMongoApi
+  @Inject
+  val reactiveMongoApi: ReactiveMongoApi = null
   val supportTransaction: Boolean
 
   protected def withinTransaction[R](f: DBSession => Future[R])(implicit

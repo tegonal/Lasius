@@ -22,6 +22,7 @@
 package controllers
 
 import com.google.inject.ImplementedBy
+import controllers.security.UnauthorizedException
 import core.{DBSession, SystemServices}
 import helpers.UserHelper
 import models.UserId.UserReference
@@ -34,6 +35,7 @@ import repositories.{
   SecurityRepositoryComponent,
   UserRepository
 }
+import services.OpaqueTokenService
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -41,7 +43,11 @@ import scala.concurrent.{ExecutionContext, Future}
 @ImplementedBy(classOf[DefaultAuthConfig])
 trait AuthConfig {
 
-  def resolveIssuerConfig(issuer: String): Option[JWTIssuerConfig]
+  val opaqueTokenService: OpaqueTokenService
+
+  def resolveIssuerConfig(issuer: String): Option[IssuerConfig]
+
+  def issuerConfigs(): Seq[IssuerConfig]
 
   /** Map usertype to permission role.
     */
@@ -63,8 +69,8 @@ trait AuthConfig {
 
   /** Lookup user by token
     */
-  def resolveOrCreateUserByJwt(jwt: LasiusJWT,
-                               canCreateNewUser: Boolean = true)(implicit
+  def resolveOrCreateUserByUserInfo(userInfo: UserInfo,
+                                    canCreateNewUser: Boolean = true)(implicit
       context: ExecutionContext,
       dbSession: DBSession): Future[UserReference]
 
@@ -78,14 +84,18 @@ class DefaultAuthConfig @Inject() (
     controllerComponents: ControllerComponents,
     systemServices: SystemServices,
     override val userRepository: UserRepository,
+    override val opaqueTokenService: OpaqueTokenService,
     val organisationRepository: OrganisationRepository)
     extends AbstractController(controllerComponents)
     with AuthConfig
     with UserHelper
     with SecurityRepositoryComponent {
 
-  override def resolveIssuerConfig(issuer: String): Option[JWTIssuerConfig] =
+  override def resolveIssuerConfig(issuer: String): Option[IssuerConfig] =
     systemServices.lasiusConfig.security.allowedIssuers.find(_.issuer == issuer)
+
+  override def issuerConfigs(): Seq[IssuerConfig] =
+    systemServices.lasiusConfig.security.allowedIssuers
 
   /** Map usertype to permission role.
     */
@@ -117,24 +127,24 @@ class DefaultAuthConfig @Inject() (
       dbSession: DBSession): Future[Option[User]] =
     userRepository.findByUserReference(userReference)
 
-  override def resolveOrCreateUserByJwt(
-      jwt: LasiusJWT,
+  override def resolveOrCreateUserByUserInfo(
+      userInfo: UserInfo,
       canCreateNewUser: Boolean = true)(implicit
       context: ExecutionContext,
       dbSession: DBSession): Future[UserReference] = {
 
-    userRepository.findByEmail(jwt.email).flatMap {
+    userRepository.findByEmail(userInfo.email).flatMap {
       _.map(user => Future.successful(user.getReference))
         .getOrElse {
           if (canCreateNewUser) {
             for {
               // Create new private organisation
               newOrg <- organisationRepository.create(
-                jwt.subject,
+                userInfo.key,
                 `private` = true)(systemServices.systemSubject, dbSession)
               // Create new user and assign to private organisation
               user <- userRepository.createInitialUserBasedOnProfile(
-                jwt,
+                userInfo,
                 newOrg,
                 OrganisationAdministrator)
             } yield user.getReference

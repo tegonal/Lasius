@@ -22,7 +22,7 @@
 package controllers
 
 import com.typesafe.config.Config
-import core.{MockCacheAware, SystemServices, TestDBSupport}
+import core.{SystemServices, TestDBSupport}
 import models.{
   OrganisationMember,
   OrganisationRole,
@@ -30,7 +30,6 @@ import models.{
   ProjectRole
 }
 import org.specs2.mock.Mockito
-import play.api.cache.SyncCacheApi
 import play.api.mvc.ControllerComponents
 import play.api.test.Helpers
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -53,7 +52,6 @@ class ProjectsControllerMock(
     val invitationRepository: InvitationMongoRepository,
     authConfig: AuthConfig,
     reactiveMongoApi: ReactiveMongoApi,
-    jwkProviderCache: SyncCacheApi,
     override val organisationRole: OrganisationRole,
     override val projectRole: ProjectRole,
     override val projectActive: Boolean)(implicit ec: ExecutionContext)
@@ -64,10 +62,8 @@ class ProjectsControllerMock(
                                userRepository = userMongoRepository,
                                invitationRepository = invitationRepository,
                                authConfig = authConfig,
-                               reactiveMongoApi = reactiveMongoApi,
-                               jwkProviderCache = jwkProviderCache)
+                               reactiveMongoApi = reactiveMongoApi)
     with SecurityControllerMock
-    with MockCacheAware
     with TestDBSupport {
 
   // override mock as we deal with a real db backend in this spec
@@ -82,7 +78,6 @@ object ProjectsControllerMock
             systemServices: SystemServices,
             authConfig: AuthConfig,
             reactiveMongoApi: ReactiveMongoApi,
-            jwkProviderCache: SyncCacheApi,
             organisationRole: OrganisationRole = OrganisationMember,
             projectRole: ProjectRole = ProjectAdministrator,
             projectActive: Boolean = true)(implicit
@@ -100,7 +95,6 @@ object ProjectsControllerMock
       invitationRepository = invitationMongoRepository,
       authConfig = authConfig,
       reactiveMongoApi = reactiveMongoApi,
-      jwkProviderCache = jwkProviderCache,
       organisationRole = organisationRole,
       projectRole = projectRole,
       projectActive = projectActive

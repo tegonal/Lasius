@@ -6243,6 +6243,34 @@ __metadata:
   languageName: node
   linkType: hard
 
+"dotenv-cli@npm:^8.0.0":
+  version: 8.0.0
+  resolution: "dotenv-cli@npm:8.0.0"
+  dependencies:
+    cross-spawn: "npm:^7.0.6"
+    dotenv: "npm:^16.3.0"
+    dotenv-expand: "npm:^10.0.0"
+    minimist: "npm:^1.2.6"
+  bin:
+    dotenv: cli.js
+  checksum: 10/3acbc2712f97de5a7b916e2e611682377b5f62efb7ebe63ede314800bedd9c63e9ae1e8b1f819efe0e87f9d813842695cfed991a276290a79cac63d48c60df05
+  languageName: node
+  linkType: hard
+
+"dotenv-expand@npm:^10.0.0":
+  version: 10.0.0
+  resolution: "dotenv-expand@npm:10.0.0"
+  checksum: 10/b41eb278bc96b92cbf3037ca5f3d21e8845bf165dc06b6f9a0a03d278c2bd5a01c0cfbb3528ae3a60301ba1a8a9cace30e748c54b460753bc00d4c014b675597
+  languageName: node
+  linkType: hard
+
+"dotenv@npm:^16.3.0":
+  version: 16.4.7
+  resolution: "dotenv@npm:16.4.7"
+  checksum: 10/f13bfe97db88f0df4ec505eeffb8925ec51f2d56a3d0b6d916964d8b4af494e6fb1633ba5d09089b552e77ab2a25de58d70259b2c5ed45ec148221835fc99a0c
+  languageName: node
+  linkType: hard
+
 "dunder-proto@npm:^1.0.0, dunder-proto@npm:^1.0.1":
   version: 1.0.1
   resolution: "dunder-proto@npm:1.0.1"
@@ -9332,6 +9360,7 @@ __metadata:
     concurrently: "npm:^9.1.2"
     date-fns: "npm:^4.0.0"
     date-fns-tz: "npm:^3.2.0"
+    dotenv-cli: "npm:^8.0.0"
     eslint: "npm:9.19.0"
     eslint-config-airbnb: "npm:^19.0.4"
     eslint-config-next: "npm:^15.1.6"

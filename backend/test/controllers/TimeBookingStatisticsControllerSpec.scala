@@ -28,7 +28,6 @@ import mongo.EmbedMongo
 import org.joda.time.LocalDate
 import org.specs2.mock.Mockito
 import org.specs2.mock.mockito.MockitoMatchers
-import play.api.cache.SyncCacheApi
 import util.MockAwaitable
 import play.api.libs.json._
 import play.api.mvc._
@@ -51,14 +50,12 @@ class TimeBookingStatisticsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: TimeBookingStatisticsController
-        with SecurityControllerMock
-        with MockCacheAware =
+      val controller
+          : TimeBookingStatisticsController with SecurityControllerMock =
         TimeBookingStatisticsControllerMock(config,
                                             systemServices,
                                             authConfig,
-                                            reactiveMongoApi,
-                                            jwkProviderCache)
+                                            reactiveMongoApi)
 
       controller.bookingByTagRepository
         .findAggregatedByUserAndRange(any[EntityReference[UserId]],
@@ -87,14 +84,12 @@ class TimeBookingStatisticsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: TimeBookingStatisticsController
-        with SecurityControllerMock
-        with MockCacheAware =
+      val controller
+          : TimeBookingStatisticsController with SecurityControllerMock =
         TimeBookingStatisticsControllerMock(config,
                                             systemServices,
                                             authConfig,
-                                            reactiveMongoApi,
-                                            jwkProviderCache)
+                                            reactiveMongoApi)
 
       val to: LocalDate          = LocalDate.now()
       val from: LocalDate        = to.minusDays(1)
@@ -115,11 +110,8 @@ object TimeBookingStatisticsControllerMock extends MockAwaitable with Mockito {
   def apply(config: Config,
             systemServices: SystemServices,
             authConfig: AuthConfig,
-            reactiveMongoApi: ReactiveMongoApi,
-            jwkProviderCache: SyncCacheApi)(implicit
-      ec: ExecutionContext): TimeBookingStatisticsController
-    with SecurityControllerMock
-    with MockCacheAware = {
+            reactiveMongoApi: ReactiveMongoApi)(implicit ec: ExecutionContext)
+      : TimeBookingStatisticsController with SecurityControllerMock = {
     val bookingByProjectRepository = mockAwaitable[BookingByProjectRepository]
     val bookingByTagRepository     = mockAwaitable[BookingByTagRepository]
 
@@ -130,9 +122,7 @@ object TimeBookingStatisticsControllerMock extends MockAwaitable with Mockito {
       authConfig = authConfig,
       reactiveMongoApi = reactiveMongoApi,
       bookingByProjectRepository = bookingByProjectRepository,
-      bookingByTagRepository = bookingByTagRepository,
-      jwkProviderCache = jwkProviderCache)
+      bookingByTagRepository = bookingByTagRepository)
       with SecurityControllerMock
-      with MockCacheAware
   }
 }

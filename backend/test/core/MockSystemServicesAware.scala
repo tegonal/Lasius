@@ -22,9 +22,6 @@
 package core
 
 import actors.LasiusSupervisorActor
-import com.auth0.jwt.JWT
-import com.auth0.jwt.algorithms.Algorithm
-import com.auth0.jwt.interfaces.DecodedJWT
 import com.typesafe.config.ConfigFactory
 import models.UserId.UserReference
 import models._
@@ -34,6 +31,7 @@ import org.apache.pekko.testkit.TestProbe
 import org.apache.pekko.util.Timeout
 import org.specs2.mock.Mockito.mock
 import play.api.Configuration
+import play.api.cache.{AsyncCacheApi, SyncCacheApi}
 import play.modules.reactivemongo.ReactiveMongoApi
 
 import java.time.Clock
@@ -91,14 +89,14 @@ class MockServices(actorSystem: ActorSystem) extends SystemServices {
 
   implicit val clock: Clock              = Clock.systemUTC
   implicit val playConfig: Configuration = Configuration(ConfigFactory.load())
-  val jwtToken: DecodedJWT = JWT.decode(
-    JWT
-      .create()
-      .withSubject("test_user")
-      .withClaim(LasiusJWT.EMAIL_CLAIM, "test@lasius.com")
-      .sign(Algorithm.none()))
+  val userInfo: UserInfo = UserInfo(
+    key = "system",
+    email = "system@lasius.ch",
+    firstName = None,
+    lastName = None
+  )
   override val systemSubject: Subject =
-    Subject(jwtToken, systemUserReference)
+    Subject(userInfo, systemUserReference)
   implicit val timeout: Timeout = Timeout(5 seconds) // needed for `?` below
   val duration: Duration        = Duration.create(5, SECONDS)
   val timeBookingViewService: ActorRef = TestProbe().ref
@@ -112,6 +110,10 @@ class MockServices(actorSystem: ActorSystem) extends SystemServices {
   val tagCache: ActorRef                            = TestProbe().ref
   val pluginHandler: ActorRef                       = TestProbe().ref
   val loginHandler: ActorRef                        = TestProbe().ref
+
+  override val jwkProviderCache: SyncCacheApi        = new MockSyncCache()
+  override val opaqueTokenIssuerCache: AsyncCacheApi = new MockAsyncCache()
+  override val userInfoCache: AsyncCacheApi          = new MockAsyncCache()
 
   override def initialize(): Unit = {}
 }

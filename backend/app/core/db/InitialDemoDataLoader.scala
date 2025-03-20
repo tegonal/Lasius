@@ -28,7 +28,6 @@ import models._
 import org.joda.time.{DateTime, Interval}
 import org.mindrot.jbcrypt.BCrypt
 import play.api.Logging
-import play.modules.reactivemongo.ReactiveMongoApi
 import repositories._
 
 import javax.inject.Inject
@@ -38,7 +37,6 @@ import scala.util.Random
 
 @unused
 class InitialDemoDataLoader @Inject() (
-    val reactiveMongoApi: ReactiveMongoApi,
     oauthUserRepository: OAuthUserRepository,
     userRepository: UserRepository,
     projectRepository: ProjectRepository,

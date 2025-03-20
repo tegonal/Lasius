@@ -41,8 +41,8 @@ class CurrentUserTimeBookingsController @Inject() (
     override val controllerComponents: ControllerComponents,
     override val systemServices: SystemServices,
     override val authConfig: AuthConfig,
-    override val reactiveMongoApi: ReactiveMongoApi,
-    override val jwkProviderCache: SyncCacheApi)(implicit ec: ExecutionContext)
+    override val reactiveMongoApi: ReactiveMongoApi)(implicit
+    ec: ExecutionContext)
     extends BaseLasiusController() {
 
   implicit val timeout: Timeout = systemServices.timeout

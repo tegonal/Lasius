@@ -21,6 +21,7 @@
 
 package controllers
 
+import controllers.security.{ControllerSecurity, SecurityComponent}
 import core.{DBSupport, SystemServices}
 import helpers.FutureHelper
 import play.api.Logging

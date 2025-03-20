@@ -34,7 +34,13 @@ class MockSyncCache extends SyncCacheApi {
   override def remove(key: String): Unit = cacheMap = cacheMap - key
 
   override def getOrElseUpdate[A: ClassTag](key: String, expiration: Duration)(
-      orElse: => A): A = cacheMap.getOrElse(key, orElse).asInstanceOf[A]
+      orElse: => A): A =
+    cacheMap
+      .getOrElse(key, {
+                   set(key, orElse)
+                   orElse
+                 })
+      .asInstanceOf[A]
 
   override def get[T: ClassTag](key: String): Option[T] =
     cacheMap.get(key).asInstanceOf[Option[T]]

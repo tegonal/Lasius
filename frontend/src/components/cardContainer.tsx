@@ -18,15 +18,16 @@
  */
 
 import React from 'react';
-import { Box } from 'theme-ui';
+import { Box, ThemeUIStyleObject, Theme } from 'theme-ui';
 
 type Props = {
+  sx?: ThemeUIStyleObject<Theme>;
   children: React.ReactNode;
 };
 
-export const CardContainer: React.FC<Props> = ({ children }) => {
+export const CardContainer: React.FC<Props> = ({ sx, children }) => {
   return (
-    <Box sx={{ label: 'CardContainer' }} variant="styles.cardContainer">
+    <Box sx={{ ...sx, label: 'CardContainer' }} variant="styles.cardContainer">
       {children}
     </Box>
   );
