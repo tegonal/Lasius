@@ -109,6 +109,18 @@ class OAuth2Controller @Inject() (
       }
     }
 
+  def logout(): Action[Unit] =
+    HasToken(p = parse.empty, withinTransaction = false) {
+      implicit dbSession => implicit subject => _ =>
+        ifLasiusOAuth2ProviderEnabled {
+          checked {
+            for {
+              _ <- oauthAccessTokenRepository.deleteAccessToken(subject.token)
+            } yield Ok("")
+          }
+        }
+    }
+
   def userProfile(): Action[Unit] =
     HasAccessToken(p = parse.empty) { _ => user =>
       ifLasiusOAuth2ProviderEnabled {

@@ -125,6 +125,18 @@ POST    /oauth2/access_token    controllers.OAuth2Controller.accessToken
 POST    /oauth2/login    controllers.OAuth2Controller.login()
 
 ###
+#  tags:
+#    - oauth2-provider
+#  summary: logout from the internal oauth provider, token will not be valid anymore afterwards
+#  operationId: logout
+#  responses:
+#    200:
+#      description: ok, if access token was removed
+###
++nocsrf
+POST    /oauth2/logout    controllers.OAuth2Controller.logout()
+
+###
 #  security:
 #    - bearerHttpAuthentication: []
 #  tags:

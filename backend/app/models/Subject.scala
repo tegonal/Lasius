@@ -28,4 +28,6 @@ case class UserInfo(key: String,
                     lastName: Option[String],
                     email: String)
 
-case class Subject(userInfo: UserInfo, userReference: UserReference)
+case class Subject(token: String,
+                   userInfo: UserInfo,
+                   userReference: UserReference)
