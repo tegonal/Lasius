@@ -31,6 +31,7 @@ import helpers.FutureHelper
 import models._
 import play.api.Logging
 
+import java.net.URI
 import java.security.interfaces.{ECPublicKey, RSAPublicKey}
 import java.security.spec.X509EncodedKeySpec
 import java.security.{KeyFactory, PublicKey}
@@ -61,7 +62,7 @@ trait TokenSecurity extends Logging with ConfigAware with FutureHelper {
       }
 
     def loadJWKProvider(jwk: JWKConfig) = {
-      val builder = new JwkProviderBuilder(jwk.url)
+      val builder = new JwkProviderBuilder(new URI(jwk.url).normalize().toURL)
       jwk.cache.foreach { cache =>
         builder.cached(cache.cacheSize, cache.expiresIn)
       }
@@ -281,7 +282,10 @@ trait TokenSecurity extends Logging with ConfigAware with FutureHelper {
             .resolveOrCreateUserByUserInfo(userInfo = userInfo,
                                            canCreateNewUser = canCreateNewUser)
             .flatMap { user =>
-              success(dbSession)(Subject(userInfo, user))
+              success(dbSession)(
+                Subject(token = token,
+                        userInfo = userInfo,
+                        userReference = user))
             }
         }
       }

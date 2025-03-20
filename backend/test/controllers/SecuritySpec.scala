@@ -917,7 +917,7 @@ class HasRoleSecurityMock(
     lastName = None
   )
   private val subject: Subject =
-    Subject(userInfo, EntityReference(UserId(), "123"))
+    Subject("", userInfo, EntityReference(UserId(), "123"))
 
   override def HasToken[A](p: BodyParser[A], withinTransaction: Boolean)(
       f: DBSession => Subject => Request[A] => Future[Result])(implicit

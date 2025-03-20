@@ -133,7 +133,7 @@ class DefaultSystemServices @Inject() (
     lastName = None
   )
   val systemSubject: Subject =
-    Subject(systemUserInfo, systemUserReference)
+    Subject("", systemUserInfo, systemUserReference)
   implicit val timeout: Timeout = Timeout(5 seconds) // needed for `?` below
   val duration: FiniteDuration  = Duration.create(30, SECONDS)
   override val timeBookingViewService: ActorRef = Await
