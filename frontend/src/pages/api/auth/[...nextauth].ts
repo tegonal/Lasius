@@ -22,7 +22,10 @@ import { JWT } from 'next-auth/jwt';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { logger } from 'lib/logger';
 import { OAuthConfig } from 'next-auth/providers';
-import { AUTH_PROVIDER_INTERNAL_LASIUS } from 'projectConfig/constants';
+import {
+  AUTH_PROVIDER_CUSTOMER_KEYCLOAK,
+  AUTH_PROVIDER_INTERNAL_LASIUS,
+} from 'projectConfig/constants';
 import { t } from 'i18next';
 import GitLab from 'next-auth/providers/gitlab';
 import GitHub from 'next-auth/providers/github';
@@ -175,10 +178,14 @@ if (process.env.GITHUB_OAUTH_CLIENT_ID && process.env.GITHUB_OAUTH_CLIENT_SECRET
     })
   );
 }
-if (process.env.KEYCLOAK_OAUTH_CLIENT_ID && process.env.KEYCLOAK_OAUTH_CLIENT_SECRET) {
+if (
+  process.env.KEYCLOAK_OAUTH_CLIENT_ID &&
+  process.env.KEYCLOAK_OAUTH_CLIENT_SECRET &&
+  process.env.KEYCLOAK_AUTH_URL
+) {
   providers.push(
     Keyclaok({
-      id: 'custom_keycloak',
+      id: AUTH_PROVIDER_CUSTOMER_KEYCLOAK,
       clientId: process.env.KEYCLOAK_OAUTH_CLIENT_ID,
       clientSecret: process.env.KEYCLOAK_OAUTH_CLIENT_SECRET,
       issuer: process.env.KEYCLOAK_OAUTH_URL,
@@ -247,8 +254,20 @@ export const nextAuthOptions: NextAuthOptions = {
     },
   },
   events: {
-    async signOut() {
+    async signOut({ token }: { token: JWT }) {
       logger.info('[nextauth][events][signOut]');
+      // auto logout from keycloak instance
+      if (token.provider === AUTH_PROVIDER_CUSTOMER_KEYCLOAK) {
+        const logOutUrl = new URL(
+          process.env.KEYCLOAK_OAUTH_URL + '/protocol/openid-connect/logout'
+        );
+        await fetch(logOutUrl);
+      }
+      // or internal lasius provider
+      else if (token.provider === AUTH_PROVIDER_INTERNAL_LASIUS) {
+        const logOutUrl = new URL(process.env.NEXTAUTH_URL + '/internal_oauth/logout');
+        await fetch(logOutUrl);
+      }
     },
     async signIn() {
       logger.info('[nextauth][events][signIn]');
