@@ -9,10 +9,10 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "build": "yarn run svgstore && yarn run i18n-assemble && next build",
+    "build": "yarn run svgstore && next build",
     "start": "next start",
     "start-local": "next start -p 3001",
-    "dev": "yarn run svgstore && yarn run i18n-assemble && next dev -p 3001",
+    "dev": "yarn run svgstore &&  next dev -p 3001",
     "svgstore": "node ./scripts/iconNames.js && prettier --check --write './src/types/iconNames.d.ts' && svgstore -o ./public/symbols.svg ./public/icons/**/*.svg",
     "lint": "next lint",
     "lint-fix": "next lint --fix",
@@ -22,7 +22,6 @@
     "clean-prod": "yarn workspaces focus --production && yarn cache clean --all",
     "up": "yarn upgrade-interactive",
     "i18n-extract": "i18next",
-    "i18n-assemble": "./scripts/assemble_termsofservice.sh",
     "_dev-backend-proxy": "docker run --add-host=host.docker.internal:host-gateway -p 3000:3000 -v $(pwd)/nginx-dev-proxy.conf:/etc/nginx/nginx.conf:ro --rm nginx:latest",
     "_dev-backend-db": "docker run -p 27017:27017 --rm mongo:7.0.16",
     "_dev-backend-sbt": "cd ../backend && dotenv -e ../frontend/.env.local -- sbt run -Dconfig.resource=dev.conf",

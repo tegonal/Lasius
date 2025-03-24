@@ -36,7 +36,6 @@ declare module 'i18next' {
     // custom resources type
     resources: {
       common: typeof en;
-      termsofservice: {text: string};
     };
   }
 }
