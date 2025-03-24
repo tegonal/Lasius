@@ -74,31 +74,36 @@ Please see the `docker-compose.yml` file for container specific environment vari
 The following variables are suggested to be used in an `.env` file alongside docker-compose and could be used by all
 containers, containing secrets that only might be available during CI/CD.
 
-| Variable name              | Description                                                                                                             | Default value            |
-| -------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------ |
-| LASIUS_HOSTNAME            | Hostname (i.e. localhost, domain.com, ...)                                                                              | localhost                |
-| LASIUS_VERSION             | The current version, corresponds with docker image tags. We suggest using specific versions in production, not `latest` | latest                   |
-| MONGODB_URI                | Override connection to mongodb                                                                                          | see `docker-compose.yml` |
-| MONGO_INITDB_PASSWORD      | Password of mongoDB user                                                                                                | lasius                   |
-| MONGO_INITDB_ROOT_PASSWORD | Password of root user of mongoDB                                                                                        | admin                    |
-| MONGO_INITDB_ROOT_USERNAME | Username of root user of mongoDB                                                                                        | admin                    |
-| MONGO_INITDB_USERNAME      | Username of mongoDB user                                                                                                | lasius                   |
-| NEXT_AUTH_SECRET           | Hash for next-auth session salting, e.g. the output of `openssl rand -base64 32`                                        | random string            |
-| TRAEFIK_CERT_EMAIL         | E-mail address to use when fetching a certificate from LE                                                               | ssladmin@lasius.ch       |
-| TRAEFIK_CERT_RESOLVER      | LetsEncrypt resolver, use `letsencrpyt` in production, empty value for testing (mind the LE rate limit)                 | letsencrypt              |
-| TZ                         | Your desired timezone                                                                                                   | CET                      |
+| Variable name                   | Description                                                                                                             | Default value            |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| LASIUS_HOSTNAME                 | Hostname (i.e. localhost, domain.com, ...)                                                                              | localhost                |
+| LASIUS_VERSION                  | The current version, corresponds with docker image tags. We suggest using specific versions in production, not `latest` | latest                   |
+| MONGODB_URI                     | Override connection to mongodb                                                                                          | see `docker-compose.yml` |
+| MONGO_INITDB_PASSWORD           | Password of mongoDB user                                                                                                | lasius                   |
+| MONGO_INITDB_ROOT_PASSWORD      | Password of root user of mongoDB                                                                                        | admin                    |
+| MONGO_INITDB_ROOT_USERNAME      | Username of root user of mongoDB                                                                                        | admin                    |
+| MONGO_INITDB_USERNAME           | Username of mongoDB user                                                                                                | lasius                   |
+| NEXT_AUTH_SECRET                | Hash for next-auth session salting, e.g. the output of `openssl rand -base64 32`                                        | random string            |
+| TRAEFIK_CERT_EMAIL              | E-mail address to use when fetching a certificate from LE                                                               | ssladmin@lasius.ch       |
+| TRAEFIK_CERT_RESOLVER           | LetsEncrypt resolver, use `letsencrpyt` in production, empty value for testing (mind the LE rate limit)                 | letsencrypt              |
+| TZ                              | Your desired timezone                                                                                                   | CET                      |
+| LASIUS_OAUTH_CLIENT_ID          | Internal Oauth client id                                                                                                |                          |
+| LASIUS_OAUTH_CLIENT_SECRET      | Internal Oauth client secret                                                                                            |                          |
+| LASIUS_INTERNAL_JWT_PRIVATE_KEY | Internal Oauth providers JWT private key to sign tokens                                                                 |                          |
 
 Specific to `backend` container:
 
-| Variable name                    | Description                                                                                                                                                    | Default value            |
-| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
-| LASIUS_CLEAN_DATABASE_ON_STARTUP | If true, drop on startup all data                                                                                                                              | 'false'                  |
-| LASIUS_INITIALIZE_DATA           | `'true'` if database should automatically get initialized in case no user accounts are configured                                                              | 'true'                   |
-| LASIUS_INITIAL_USER_EMAIL        | Username of initial admin user to login. Only used when `LASIUS_INITIALIZE_DATA` is set to `'true'` and no users where found in the database.                  | admin@lasius.ch          |
-| LASIUS_INITIAL_USER_KEY          | Initial internal user key for to the intial user account. Only used when `LASIUS_INITIALIZE_DATA` is set to `'true'` and no users where found in the database. | admin                    |
-| LASIUS_INITIAL_USER_PASSWORD     | Password of initial admin user to login. Only used when `LASIUS_INITIALIZE_DATA` is set to `true` and no users where found in the database.                    | admin                    |
-| LASIUS_START_PARAMS              | Provide special start arguments to the play server. Might be used to inject a different `application.conf` to the server.                                      | see `docker-compose.yml` |
-| LASIUS_SUPPORTS_TRANSACTIONS     | To be able to benefit of transactions in MongoDB you need a replica set first.                                                                                 | 'false'                  |
+| Variable name                              | Description                                                                                                                                                    | Default value            |
+| ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| LASIUS_CLEAN_DATABASE_ON_STARTUP           | If true, drop on startup all data                                                                                                                              | 'false'                  |
+| LASIUS_INITIALIZE_DATA                     | `'true'` if database should automatically get initialized in case no user accounts are configured                                                              | 'true'                   |
+| LASIUS_INITIAL_USER_EMAIL                  | Username of initial admin user to login. Only used when `LASIUS_INITIALIZE_DATA` is set to `'true'` and no users where found in the database.                  | admin@lasius.ch          |
+| LASIUS_INITIAL_USER_KEY                    | Initial internal user key for to the intial user account. Only used when `LASIUS_INITIALIZE_DATA` is set to `'true'` and no users where found in the database. | admin                    |
+| LASIUS_INITIAL_USER_PASSWORD               | Password of initial admin user to login. Only used when `LASIUS_INITIALIZE_DATA` is set to `true` and no users where found in the database.                    | admin                    |
+| LASIUS_START_PARAMS                        | Provide special start arguments to the play server. Might be used to inject a different `application.conf` to the server.                                      | see `docker-compose.yml` |
+| LASIUS_SUPPORTS_TRANSACTIONS               | To be able to benefit of transactions in MongoDB you need a replica set first.                                                                                 | 'false'                  |
+| LASIUS_OAUTH_PROVIDER_ENABLED              | Enable or disable internal oauth provider                                                                                                                      | 'false'                  |
+| LASIUS_OAUTH_PROVIDER_ALLOW_REGISTER_USERS | Enable or disable registering new users in internal oauth provider, required internal oauth provider to be enabled                                             | 'false'                  |
 
 Specific to `frontend` container:
 
