@@ -30,6 +30,8 @@ import { t } from 'i18next';
 import GitLab from 'next-auth/providers/gitlab';
 import GitHub from 'next-auth/providers/github';
 import Keyclaok from 'next-auth/providers/keycloak';
+import { logout } from 'lib/api/lasius/oauth2-provider/oauth2-provider';
+import { getRequestHeaders } from 'lib/api/hooks/useTokensWithAxiosRequests';
 
 const gitlabUrl = process.env.GITLAB_OAUTH_URL || 'https://gitlab.com';
 const githubUrl = 'https://api.github.com/';
@@ -82,6 +84,16 @@ async function requestRefreshToken(refresh_token: string, provider?: string): Pr
           refresh_token: refresh_token || '',
           client_id: process.env.GITHUB_OAUTH_CLIENT_ID || '',
           client_secret: process.env.GITHUB_OAUTH_CLIENT_SECRET || '',
+        }),
+      });
+    case AUTH_PROVIDER_CUSTOMER_KEYCLOAK:
+      return await fetch(process.env.KEYCLOAK_OAUTH_URL + '/protocol/openid-connect/token', {
+        method: 'POST',
+        body: new URLSearchParams({
+          grant_type: 'refresh_token',
+          refresh_token: refresh_token || '',
+          client_id: process.env.KEYCLOAK_OAUTH_CLIENT_ID || '',
+          client_secret: process.env.KEYCLOAK_OAUTH_CLIENT_SECRET || '',
         }),
       });
     default:
@@ -142,6 +154,21 @@ const providers = [];
 if (process.env.LASIUS_OAUTH_CLIENT_ID && process.env.LASIUS_OAUTH_CLIENT_SECRET) {
   providers.push(internalProvider);
 }
+if (
+  process.env.KEYCLOAK_OAUTH_CLIENT_ID &&
+  process.env.KEYCLOAK_OAUTH_CLIENT_SECRET &&
+  process.env.KEYCLOAK_OAUTH_URL
+) {
+  providers.push(
+    Keyclaok({
+      id: AUTH_PROVIDER_CUSTOMER_KEYCLOAK,
+      name: process.env.KEYCLOAK_OAUTH_PROVIDER_NAME || 'Keycloak',
+      clientId: process.env.KEYCLOAK_OAUTH_CLIENT_ID,
+      clientSecret: process.env.KEYCLOAK_OAUTH_CLIENT_SECRET,
+      issuer: process.env.KEYCLOAK_OAUTH_URL,
+    })
+  );
+}
 if (process.env.GITLAB_OAUTH_CLIENT_ID && process.env.GITLAB_OAUTH_CLIENT_SECRET) {
   providers.push(
     GitLab({
@@ -175,20 +202,6 @@ if (process.env.GITHUB_OAUTH_CLIENT_ID && process.env.GITHUB_OAUTH_CLIENT_SECRET
           access_token_issuer: githubUrl,
         };
       },
-    })
-  );
-}
-if (
-  process.env.KEYCLOAK_OAUTH_CLIENT_ID &&
-  process.env.KEYCLOAK_OAUTH_CLIENT_SECRET &&
-  process.env.KEYCLOAK_AUTH_URL
-) {
-  providers.push(
-    Keyclaok({
-      id: AUTH_PROVIDER_CUSTOMER_KEYCLOAK,
-      clientId: process.env.KEYCLOAK_OAUTH_CLIENT_ID,
-      clientSecret: process.env.KEYCLOAK_OAUTH_CLIENT_SECRET,
-      issuer: process.env.KEYCLOAK_OAUTH_URL,
     })
   );
 }
@@ -255,18 +268,30 @@ export const nextAuthOptions: NextAuthOptions = {
   },
   events: {
     async signOut({ token }: { token: JWT }) {
-      logger.info('[nextauth][events][signOut]');
+      logger.info('[nextauth][events][signOut]', token.provider);
       // auto logout from keycloak instance
       if (token.provider === AUTH_PROVIDER_CUSTOMER_KEYCLOAK) {
-        const logOutUrl = new URL(
+        logger.info(
+          'auto-logout from keycloak at',
           process.env.KEYCLOAK_OAUTH_URL + '/protocol/openid-connect/logout'
         );
-        await fetch(logOutUrl);
+
+        await fetch(process.env.KEYCLOAK_OAUTH_URL + '/protocol/openid-connect/logout', {
+          method: 'POST',
+          headers: {
+            Authorization: 'Bearer ' + token.access_token,
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            client_id: process.env.KEYCLOAK_OAUTH_CLIENT_ID || '',
+            client_secret: process.env.KEYCLOAK_OAUTH_CLIENT_SECRET || '',
+            refresh_token: token.refresh_token || '',
+          }),
+        });
       }
       // or internal lasius provider
       else if (token.provider === AUTH_PROVIDER_INTERNAL_LASIUS) {
-        const logOutUrl = new URL(process.env.NEXTAUTH_URL + '/internal_oauth/logout');
-        await fetch(logOutUrl);
+        await logout(getRequestHeaders(token.access_token, token.access_token_issuer));
       }
     },
     async signIn() {
