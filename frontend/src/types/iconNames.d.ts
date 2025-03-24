@@ -27,6 +27,7 @@ export type IconNames =
   | 'human-resources-search-team-work-office-companies'
   | 'information-circle'
   | 'insert-row'
+  | 'keycloak'
   | 'lasius'
   | 'lock-1-interface-essential'
   | 'logout-2-interface-essential'
