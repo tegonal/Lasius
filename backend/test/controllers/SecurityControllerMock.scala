@@ -110,7 +110,7 @@ trait SecurityControllerMock
       context: ExecutionContext): Action[A] = {
     Action.async(p) { implicit request =>
       withDBSession() { dbSession =>
-        checked(f(dbSession)(Subject(userInfo, userReference))(request))
+        checked(f(dbSession)(Subject("", userInfo, userReference))(request))
       }
     }
   }
@@ -122,7 +122,8 @@ trait SecurityControllerMock
       context: ExecutionContext): Action[A] = {
     Action.async(p) { implicit request =>
       withDBSession() { dbSession =>
-        checked(f(dbSession)(Subject(userInfo, userReference))(user)(request))
+        checked(
+          f(dbSession)(Subject("", userInfo, userReference))(user)(request))
       }
     }
   }
