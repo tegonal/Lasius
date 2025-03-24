@@ -25,25 +25,15 @@ import { useProfile } from 'lib/api/hooks/useProfile';
 import { Container } from 'theme-ui';
 import { LASIUS_TERMSOFSERVICE_VERSION } from 'projectConfig/constants';
 
-import termsofservice from '../../../public/locales/termsofservice.json';
-
 export const LasiusTOSCheck: React.FC = () => {
   const [showAcceptTOSDialog, setShowAcceptTOSDialog] = useState<boolean>(false);
+  const defaultTosHtml =
+    '<p>The Terms of Service are not available in the current language. Please change to a supported language.</p>';
+  const [tosHtml, setTosHtml] = useState<string>(defaultTosHtml);
   const { i18n, t } = useTranslation('common');
   const { acceptedTOSVersion, acceptTOS, lasiusIsLoggedIn } = useProfile();
 
   const currentTOSVersion = LASIUS_TERMSOFSERVICE_VERSION;
-
-  const TOSi18nNamespace = 'termsofservice';
-  const TOSi18nKey = 'text';
-  if ('addResourceBundle' in i18n) {
-    for (const lang in termsofservice) {
-      const key = lang as keyof typeof termsofservice;
-      i18n.addResourceBundle(lang, TOSi18nNamespace, {
-        [TOSi18nKey]: termsofservice[key],
-      });
-    }
-  }
 
   const handleConfirm = () => {
     acceptTOS(currentTOSVersion);
@@ -55,12 +45,23 @@ export const LasiusTOSCheck: React.FC = () => {
     setShowAcceptTOSDialog(false);
   };
 
+  const setLocalizedTosText = () => {
+    fetch('/termsofservice/' + i18n.language + '.html').then((response) => {
+      if (response.status == 200) {
+        response.text().then((resultsHTML) => {
+          setTosHtml(resultsHTML);
+        });
+      }
+    });
+  };
+
   useEffect(() => {
     if (lasiusIsLoggedIn && currentTOSVersion && acceptedTOSVersion != currentTOSVersion) {
+      setLocalizedTosText();
       setShowAcceptTOSDialog(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [acceptedTOSVersion, lasiusIsLoggedIn]);
+  }, [acceptedTOSVersion, lasiusIsLoggedIn, i18n.language]);
 
   return (
     showAcceptTOSDialog && (
@@ -81,7 +82,7 @@ export const LasiusTOSCheck: React.FC = () => {
           p={3}
           bg="muted"
           sx={{ maxHeight: '400px', overflow: 'scroll' }}
-          dangerouslySetInnerHTML={{ __html: t(TOSi18nKey, { ns: TOSi18nNamespace }) }}
+          dangerouslySetInnerHTML={{ __html: tosHtml }}
         />
       </ModalConfirm>
     )
