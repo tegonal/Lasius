@@ -115,7 +115,9 @@ async function requestRefreshToken(refresh_token: string, provider?: string): Pr
  * returns the old token and an error property
  */
 async function refreshAccessToken(token: JWT): Promise<JWT> {
-  console.debug('[NextAuth][refreshAccessToken]', token?.refresh_token);
+  if (process.env.LASIUS_DEBUG) {
+    console.debug('[NextAuth][refreshAccessToken]', token?.refresh_token);
+  }
   if (!token?.refresh_token) {
     return token;
   }
@@ -128,7 +130,9 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
       throw tokensOrError;
     }
 
-    console.info('[NextAuth][refreshAccessToken][RenewedToken]', tokensOrError?.refresh_token);
+    if (process.env.LASIUS_DEBUG) {
+      console.info('[NextAuth][refreshAccessToken][RenewedToken]', tokensOrError?.refresh_token);
+    }
 
     const newTokens = tokensOrError as {
       access_token: string;
@@ -144,7 +148,9 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
       refresh_token: newTokens.refresh_token ?? token.refresh_token,
     };
   } catch (error) {
-    console.log('[NextAuth][RefreshAccessTokenError]', error);
+    if (process.env.LASIUS_DEBUG) {
+      console.log('[NextAuth][RefreshAccessTokenError]', error);
+    }
 
     token.error = 'RefreshAccessTokenError';
     return token;
@@ -207,7 +213,7 @@ if (process.env.GITHUB_OAUTH_CLIENT_ID && process.env.GITHUB_OAUTH_CLIENT_SECRET
 }
 
 export const nextAuthOptions: NextAuthOptions = {
-  debug: true,
+  debug: process.env.LASIUS_DEBUG === 'true',
   providers: providers,
   session: {
     strategy: 'jwt',
@@ -230,7 +236,9 @@ export const nextAuthOptions: NextAuthOptions = {
         session.provider = token.provider;
       }
       session.user = session.user || user;
-      console.debug('[NextAuth][Session]', session);
+      if (process.env.LASIUS_DEBUG) {
+        console.debug('[NextAuth][Session]', session);
+      }
 
       return session;
     },
@@ -257,7 +265,9 @@ export const nextAuthOptions: NextAuthOptions = {
         // Subsequent logins, but the `access_token` has expired, try to refresh it
         if (!token.refresh_token) throw new TypeError('Missing refresh_token');
         if (token.error === 'RefreshAccessTokenError') {
-          console.log('Token refresh already failed, not trying again.');
+          if (process.env.LASIUS_DEBUG) {
+            logger.info('Token refresh already failed, not trying again.');
+          }
           return token;
         }
 
@@ -268,13 +278,17 @@ export const nextAuthOptions: NextAuthOptions = {
   },
   events: {
     async signOut({ token }: { token: JWT }) {
-      logger.info('[nextauth][events][signOut]', token.provider);
+      if (process.env.LASIUS_DEBUG) {
+        logger.info('[nextauth][events][signOut]', token.provider);
+      }
       // auto logout from keycloak instance
       if (token.provider === AUTH_PROVIDER_CUSTOMER_KEYCLOAK) {
-        logger.info(
-          'auto-logout from keycloak at',
-          process.env.KEYCLOAK_OAUTH_URL + '/protocol/openid-connect/logout'
-        );
+        if (process.env.LASIUS_DEBUG) {
+          logger.info(
+            'auto-logout from keycloak at',
+            process.env.KEYCLOAK_OAUTH_URL + '/protocol/openid-connect/logout'
+          );
+        }
 
         await fetch(process.env.KEYCLOAK_OAUTH_URL + '/protocol/openid-connect/logout', {
           method: 'POST',
@@ -295,7 +309,9 @@ export const nextAuthOptions: NextAuthOptions = {
       }
     },
     async signIn() {
-      logger.info('[nextauth][events][signIn]');
+      if (process.env.LASIUS_DEBUG) {
+        logger.info('[nextauth][events][signIn]');
+      }
     },
   },
 };
