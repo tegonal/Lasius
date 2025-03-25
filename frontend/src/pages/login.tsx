@@ -17,6 +17,27 @@
  *
  */
 
+'use server';
+import { ProcessEnvOptions } from 'child_process';
+/**
+ * Lasius - Open source time tracker for teams
+ * Copyright (c) Tegonal Genossenschaft (https://tegonal.com)
+ *
+ * This file is part of Lasius.
+ *
+ * Lasius is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * Lasius is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with Lasius.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 import { CardContainer } from 'components/cardContainer';
 import { Logo } from 'components/logo';
 import { Icon } from 'components/shared/icon';
@@ -31,16 +52,24 @@ import { getProviders, getCsrfToken, signIn, ClientSafeProvider } from 'next-aut
 import { Trans, useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { usePlausible } from 'next-plausible';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { AUTH_PROVIDER_INTERNAL_LASIUS } from 'projectConfig/constants';
+import {
+  AUTH_PROVIDER_CUSTOMER_KEYCLOAK,
+  AUTH_PROVIDER_INTERNAL_LASIUS,
+} from 'projectConfig/constants';
 import { useCallback, useEffect, useState } from 'react';
 import { useStore } from 'storeContext/store';
 import { Button } from 'theme-ui';
 
-const Login: NextPage<{ csrfToken: string; providers: ClientSafeProvider[] }> = ({
-  csrfToken,
-  providers,
-}) => {
+type CustomizedClientSafeProvider = ClientSafeProvider & {
+  custom_logo?: string;
+};
+
+const Login: NextPage<{
+  csrfToken: string;
+  providers: CustomizedClientSafeProvider[];
+}> = ({ csrfToken, providers }) => {
   const plausible = usePlausible<LasiusPlausibleEvents>();
   const store = useStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -119,16 +148,25 @@ const Login: NextPage<{ csrfToken: string; providers: ClientSafeProvider[] }> = 
           {providers.map((provider) => {
             let icon = undefined;
             const size = 40;
-            switch (provider.id) {
-              case 'internal_lasius':
-                icon = <Icon name="lasius" size={size} />;
-                break;
-              case 'gitlab':
-                icon = <Icon name="gitlab" size={size} color="none" />;
-                break;
-              case 'github':
-                icon = <Icon name="github" size={size} color="black" />;
-                break;
+            if (provider.custom_logo) {
+              icon = (
+                <Image alt={provider.name} src={provider.custom_logo} width={size} height={size} />
+              );
+            } else {
+              switch (provider.id) {
+                case AUTH_PROVIDER_INTERNAL_LASIUS:
+                  icon = <Icon name="lasius" size={size} />;
+                  break;
+                case 'gitlab':
+                  icon = <Icon name="gitlab" size={size} color="none" />;
+                  break;
+                case 'github':
+                  icon = <Icon name="github" size={size} color="black" />;
+                  break;
+                case AUTH_PROVIDER_CUSTOMER_KEYCLOAK:
+                  icon = <Icon name="keycloak" size={size} />;
+                  break;
+              }
             }
 
             return (
@@ -156,9 +194,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const { locale = '' } = context;
   const providers = Object.values((await getProviders()) || []);
   const config = await getConfiguration();
-  const availableProviders = providers.filter(
-    (p) => p.id !== AUTH_PROVIDER_INTERNAL_LASIUS || config.lasiusOAuthProviderEnabled
-  );
+  const availableProviders = providers
+    .filter((p) => p.id !== AUTH_PROVIDER_INTERNAL_LASIUS || config.lasiusOAuthProviderEnabled)
+    .map((p) => {
+      if (p.id === AUTH_PROVIDER_CUSTOMER_KEYCLOAK) {
+        (p as CustomizedClientSafeProvider).custom_logo = process.env.KEYCLOAK_OAUTH_PROVIDER_ICON;
+      }
+      return p;
+    });
 
   return {
     props: {
