@@ -25,7 +25,7 @@
     "_dev-backend-proxy": "docker run --add-host=host.docker.internal:host-gateway -p 3000:3000 -v $(pwd)/nginx-dev-proxy.conf:/etc/nginx/nginx.conf:ro --rm nginx:latest",
     "_dev-backend-db": "docker run -p 27017:27017 --rm mongo:7.0.16",
     "_dev-backend-sbt": "cd ../backend && dotenv -e ../frontend/.env.local -- sbt run -Dconfig.resource=dev.conf",
-    "_dev-backend-keycloak": "docker run --add-host=host.docker.internal:host-gateway --rm -p 8080:8080 -v ./keycloak-local-realm.json:/opt/keycloak/data/import/lasius-local-realm.json -e KC_BOOTSTRAP_ADMIN_USERNAME=admin -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:26.1.4 start-dev --import-realm",
+    "_dev-backend-keycloak": "docker run --add-host=host.docker.internal:host-gateway --rm -p 8080:8080 -v $(pwd)/keycloak-local-realm.json:/opt/keycloak/data/import/lasius-local-realm.json -e KC_BOOTSTRAP_ADMIN_USERNAME=admin -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:26.1.4 start-dev --import-realm",
     "_dev-backend-mailhog": " docker run --rm -p 8025:8025 -p 1025:1025 mailhog/mailhog",
     "backend": "concurrently --kill-others-on-fail --names \"BACKEND,PROXY,DB,KEYCLOAK,MAILHOG\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"sleep 3 && yarn run _dev-backend-sbt\" \"yarn run _dev-backend-proxy\" \"yarn run _dev-backend-db\"  \"yarn run _dev-backend-keycloak\" \"yarn run _dev-backend-mailhog\"",
     "orval": "rm -rf ./src/lib/api/lasius && orval --config ./orval.config.js && yarn run lint-fix",

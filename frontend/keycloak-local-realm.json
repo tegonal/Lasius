@@ -309,7 +309,7 @@
     },
     {
       "id": "d83087c0-131a-4d34-a010-80aa2d6702a7",
-      "clientId": "lasius-frontent",
+      "clientId": "lasius-frontend",
       "name": "Lasius Frontend",
       "description": "",
       "rootUrl": "http://localhost:3000",
