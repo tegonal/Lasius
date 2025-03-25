@@ -18,7 +18,6 @@
  */
 
 'use server';
-import { ProcessEnvOptions } from 'child_process';
 /**
  * Lasius - Open source time tracker for teams
  * Copyright (c) Tegonal Genossenschaft (https://tegonal.com)
