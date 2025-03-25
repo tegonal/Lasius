@@ -189,8 +189,9 @@ App.getInitialProps = async ({
       profile = await getUserProfile(
         getRequestHeaders(session.access_token, session.access_token_issuer)
       );
-    } catch {
+    } catch (error) {
       if (res && !pathname.includes('/login')) {
+        logger.warn('[App][UserProfile][Failed]', error);
         res.writeHead(307, { Location: '/login' });
         res.end();
       }
