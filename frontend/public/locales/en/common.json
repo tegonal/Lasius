@@ -1,4 +1,5 @@
 {
+  "{error}": "{error}",
   "{provider.name}": "{provider.name}",
   "% of planned hours": "% of planned hours",
   "Accept invitation": "Accept invitation",
@@ -64,6 +65,7 @@
   "Export data": "Export data",
   "Exporting all bookings for {{project}}. This includes time booked by any user, even those not part of your organisation.": "Exporting all bookings for {{project}}. This includes time booked by any user, even those not part of your organisation.",
   "Favorite removed": "Favorite removed",
+  "fetchProfileFailed": "Couldn't load user profile, please try to re-login.",
   "Filter": "Filter",
   "Firstname": "Firstname",
   "From": "From",

@@ -1,4 +1,5 @@
 {
+  "{error}": "{error}",
   "{provider.name}": "{provider.name}",
   "% of planned hours": "% der geplanten Stunden",
   "Accept invitation": "Einladung annehmen",
@@ -64,6 +65,7 @@
   "Export data": "Daten exportieren",
   "Exporting all bookings for {{project}}. This includes time booked by any user, even those not part of your organisation.": "Exportieren aller Buchungen für {{Projekt}}. Dies schliesst Zeit ein, die von beliebigen Benutzern gebucht wurde, auch von solchen, die nicht zu deiner Organisation gehören.",
   "Favorite removed": "Favorit entfernt",
+  "fetchProfileFailed": "Benutzerinformationen konnten nicht geladen werden, bitte erneut Einloggen.",
   "Filter": "Filter",
   "Firstname": "Vorname",
   "From": "Aus",
