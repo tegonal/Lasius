@@ -42,6 +42,7 @@ export const themeComponentStyles: Record<string, ThemeUIStyleObject> = {
     textAlign: 'center',
     background: 'containerBackground',
     width: ['100%'],
+    maxWidth: ['100%', '375px'],
     p: 3,
     borderRadius: themeRadii.small,
     ...defaultAnchorStyle,

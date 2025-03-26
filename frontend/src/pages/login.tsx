@@ -41,6 +41,7 @@ import { CardContainer } from 'components/cardContainer';
 import { Logo } from 'components/logo';
 import { Icon } from 'components/shared/icon';
 import { BoxInfo } from 'components/shared/notifications/boxInfo';
+import { BoxWarning } from 'components/shared/notifications/boxWarning';
 import { TegonalFooter } from 'components/shared/tegonalFooter';
 import { LoginLayout } from 'layout/pages/login/loginLayout';
 import { getConfiguration } from 'lib/api/lasius/general/general';
@@ -74,7 +75,7 @@ const Login: NextPage<{
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { t } = useTranslation('common');
   const router = useRouter();
-  const { invitation_id = null, email = null } = router.query;
+  const { invitation_id = null, email = null, error = null } = router.query;
 
   const signInToProvider = useCallback(
     async (provider: string) => {
@@ -119,12 +120,12 @@ const Login: NextPage<{
   );
 
   useEffect(() => {
-    if (providers.length === 1) {
+    if (providers.length === 1 && !error) {
       signInToProvider(providers[0].id);
     }
-  }, [providers, signInToProvider]);
+  }, [providers, signInToProvider, error]);
 
-  if (providers.length === 1) {
+  if (providers.length === 1 && !error) {
     return (
       <LoginLayout>
         <Logo />
@@ -135,6 +136,11 @@ const Login: NextPage<{
     return (
       <LoginLayout>
         <Logo />
+        {error && (
+          <BoxWarning>
+            <Trans>{error}</Trans>
+          </BoxWarning>
+        )}
         <CardContainer
           sx={{
             display: 'flex',
@@ -143,7 +149,7 @@ const Login: NextPage<{
             background: 'containerBackgroundDarker',
           }}
         >
-          <BoxInfo>{t('Please choose a login provider')}</BoxInfo>
+          {providers.length > 1 && <BoxInfo>{t('Please choose a login provider')}</BoxInfo>}
           {providers.map((provider) => {
             let icon = undefined;
             const size = 40;
