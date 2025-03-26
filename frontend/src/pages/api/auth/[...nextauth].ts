@@ -49,8 +49,9 @@ const internalProvider: OAuthConfig<any> = {
       scope: 'profile openid email',
     },
   },
-  token: process.env.NEXTAUTH_URL + '/backend/oauth2/access_token',
-  userinfo: process.env.NEXTAUTH_URL + '/backend/oauth2/profile',
+  token:
+    (process.env.LASIUS_API_URL_INTERNAL || process.env.LASIUS_API_URL) + '/oauth2/access_token',
+  userinfo: (process.env.LASIUS_API_URL_INTERNAL || process.env.LASIUS_API_URL) + '/oauth2/profile',
   clientId: process.env.LASIUS_OAUTH_CLIENT_ID,
   clientSecret: process.env.LASIUS_OAUTH_CLIENT_SECRET,
   checks: ['pkce', 'state'],

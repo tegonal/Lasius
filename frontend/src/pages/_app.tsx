@@ -57,6 +57,7 @@ import { getRequestHeaders } from 'lib/api/hooks/useTokensWithAxiosRequests';
 import { logger } from 'lib/logger';
 import dynamic from 'next/dynamic';
 import PlausibleProvider from 'next-plausible';
+import { t } from 'i18next';
 
 export type NextPageWithLayout<P = Record<string, unknown>, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement<P>) => ReactNode;
@@ -177,6 +178,10 @@ type ExtendedAppContext = AppContext & {
   };
 };
 
+// list of known error response codes, used tp provide translations only
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const translations = [t('fetchProfileFailed')];
+
 App.getInitialProps = async ({
   Component,
   ctx,
@@ -192,7 +197,7 @@ App.getInitialProps = async ({
     } catch (error) {
       if (res && !pathname.includes('/login')) {
         logger.warn('[App][UserProfile][Failed]', error);
-        res.writeHead(307, { Location: '/login' });
+        res.writeHead(307, { Location: '/login?error=fetchProfileFailed' });
         res.end();
       }
     }
