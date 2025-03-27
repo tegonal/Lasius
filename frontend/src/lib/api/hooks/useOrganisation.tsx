@@ -20,8 +20,7 @@
 import { ModelsEntityReference } from 'lib/api/lasius';
 import { ROLES } from 'projectConfig/constants';
 import { useProfile } from 'lib/api/hooks/useProfile';
-import { useEffect } from 'react';
-import { MyProjectsLayout } from 'layout/pages/user/projects/myProjectsLayout';
+import { useCallback, useEffect } from 'react';
 
 export const useOrganisation = () => {
   const { profile: data, updateSettings } = useProfile();
@@ -32,11 +31,14 @@ export const useOrganisation = () => {
     (org) => org.organisationReference.id === lastSelectedOrganisationId
   );
 
-  const setSelectedOrganisation = async (organisationReference: ModelsEntityReference) => {
-    if (organisationReference) {
-      await updateSettings({ lastSelectedOrganisation: organisationReference });
-    }
-  };
+  const setSelectedOrganisation = useCallback(
+    async (organisationReference: ModelsEntityReference) => {
+      if (organisationReference) {
+        await updateSettings({ lastSelectedOrganisation: organisationReference });
+      }
+    },
+    [updateSettings]
+  );
 
   useEffect(() => {
     if (!data?.settings.lastSelectedOrganisation?.id) {
@@ -46,7 +48,7 @@ export const useOrganisation = () => {
         setSelectedOrganisation(myPrivateOrg);
       }
     }
-  }, [data]);
+  }, [data, setSelectedOrganisation]);
 
   return {
     selectedOrganisationId: selectedOrganisation?.organisationReference?.id || '',
