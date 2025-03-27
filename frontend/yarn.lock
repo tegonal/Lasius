@@ -3836,15 +3836,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/json-stable-stringify@npm:^1.2.0":
-  version: 1.2.0
-  resolution: "@types/json-stable-stringify@npm:1.2.0"
-  dependencies:
-    json-stable-stringify: "npm:*"
-  checksum: 10/5eddbcb45dc5a8fbdf8e186bd8a6b1ea2568b9571fc0e821a25b701f7e7f9c30ef242fb91b8a037aa6cf30dd034944806603795e99b5bfcc7587d126eadf6ff0
-  languageName: node
-  linkType: hard
-
 "@types/json5@npm:^0.0.29":
   version: 0.0.29
   resolution: "@types/json5@npm:0.0.29"
@@ -9040,7 +9031,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"json-stable-stringify@npm:*, json-stable-stringify@npm:^1.2.1":
+"json-stable-stringify@npm:^1.2.1":
   version: 1.2.1
   resolution: "json-stable-stringify@npm:1.2.1"
   dependencies:
@@ -9195,7 +9186,6 @@ __metadata:
     "@theme-ui/match-media": "npm:^0.17.2"
     "@types/d3-shape": "npm:^3.1.7"
     "@types/js-cookie": "npm:^3.0.6"
-    "@types/json-stable-stringify": "npm:^1.2.0"
     "@types/lodash": "npm:^4.17.16"
     "@types/node": "npm:22.13.14"
     "@types/react": "npm:19.0.12"
