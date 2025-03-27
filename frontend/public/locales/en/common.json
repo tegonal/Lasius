@@ -107,6 +107,7 @@
   "New password": "New password",
   "Next month": "Next month",
   "Next week": "Next week",
+  "No authentication provider available": "No authentication provider available, please check the configuration.",
   "No data available": "No data available",
   "No Internet connection. Please make sure that your device is connected to the Internet.": "No Internet connection. Please make sure that your device is connected to the Internet.",
   "Not enough characters (min. 8)": "Not enough characters (min. 8)",
