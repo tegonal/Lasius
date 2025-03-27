@@ -20,35 +20,29 @@
 import { ModelsEntityReference } from 'lib/api/lasius';
 import { ROLES } from 'projectConfig/constants';
 import { useProfile } from 'lib/api/hooks/useProfile';
-import { useCallback, useEffect } from 'react';
 
 export const useOrganisation = () => {
   const { profile: data, updateSettings } = useProfile();
 
-  const lastSelectedOrganisationId = data?.settings.lastSelectedOrganisation?.id;
+  const setSelectedOrganisation = async (organisationReference: ModelsEntityReference) => {
+    if (organisationReference) {
+      await updateSettings({ lastSelectedOrganisation: organisationReference });
+    }
+  };
+
+  let lastSelectedOrganisationId = data?.settings.lastSelectedOrganisation?.id;
+  if (!lastSelectedOrganisationId) {
+    const myPrivateOrg = data?.organisations.filter((item) => item.private)[0]
+      .organisationReference;
+    if (myPrivateOrg) {
+      setSelectedOrganisation(myPrivateOrg);
+      lastSelectedOrganisationId = myPrivateOrg.id;
+    }
+  }
 
   const selectedOrganisation = data?.organisations.find(
     (org) => org.organisationReference.id === lastSelectedOrganisationId
   );
-
-  const setSelectedOrganisation = useCallback(
-    async (organisationReference: ModelsEntityReference) => {
-      if (organisationReference) {
-        await updateSettings({ lastSelectedOrganisation: organisationReference });
-      }
-    },
-    [updateSettings]
-  );
-
-  useEffect(() => {
-    if (!data?.settings.lastSelectedOrganisation?.id) {
-      const myPrivateOrg = data?.organisations.filter((item) => item.private)[0]
-        .organisationReference;
-      if (myPrivateOrg) {
-        setSelectedOrganisation(myPrivateOrg);
-      }
-    }
-  }, [data, setSelectedOrganisation]);
 
   return {
     selectedOrganisationId: selectedOrganisation?.organisationReference?.id || '',

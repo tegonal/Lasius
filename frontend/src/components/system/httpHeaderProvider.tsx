@@ -42,7 +42,9 @@ export const HttpHeaderProvider: React.FC<HttpHeaderProviderProps> = ({ session 
 
   // Set the token for client side requests to use
   useEffect(() => {
-    console.debug('session changed', session?.access_token, session?.error);
+    if (process.env.LASIUS_DEBUG) {
+      console.debug('[HttpHeaderProvider][SessionChanged]', session?.access_token, session?.error);
+    }
     const token = session?.access_token;
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -55,7 +57,7 @@ export const HttpHeaderProvider: React.FC<HttpHeaderProviderProps> = ({ session 
       axios.defaults.headers.common['X-Token-Issuer'] = tokenIssuer;
     }
     if (session?.error && session?.access_token) {
-      console.error('Updating session failed', session.error);
+      console.error('[HttpHeaderProvider][UpdateSessionFailed]', session.error);
       removeAccessibleCookies();
       signOut();
     }
