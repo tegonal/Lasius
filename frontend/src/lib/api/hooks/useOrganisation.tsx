@@ -20,13 +20,13 @@
 import { ModelsEntityReference } from 'lib/api/lasius';
 import { ROLES } from 'projectConfig/constants';
 import { useProfile } from 'lib/api/hooks/useProfile';
+import { useEffect } from 'react';
+import { MyProjectsLayout } from 'layout/pages/user/projects/myProjectsLayout';
 
 export const useOrganisation = () => {
   const { profile: data, updateSettings } = useProfile();
 
-  const lastSelectedOrganisationId =
-    data?.settings.lastSelectedOrganisation?.id ||
-    data?.organisations.filter((item) => item.private)[0].organisationReference.id;
+  const lastSelectedOrganisationId = data?.settings.lastSelectedOrganisation?.id;
 
   const selectedOrganisation = data?.organisations.find(
     (org) => org.organisationReference.id === lastSelectedOrganisationId
@@ -38,9 +38,19 @@ export const useOrganisation = () => {
     }
   };
 
+  useEffect(() => {
+    if (!data?.settings.lastSelectedOrganisation?.id) {
+      const myPrivateOrg = data?.organisations.filter((item) => item.private)[0]
+        .organisationReference;
+      if (myPrivateOrg) {
+        setSelectedOrganisation(myPrivateOrg);
+      }
+    }
+  }, [data]);
+
   return {
-    selectedOrganisationId: data?.settings.lastSelectedOrganisation?.id || '',
-    selectedOrganisationKey: data?.settings.lastSelectedOrganisation?.key || '',
+    selectedOrganisationId: selectedOrganisation?.organisationReference?.id || '',
+    selectedOrganisationKey: selectedOrganisation?.organisationReference?.key || '',
     selectedOrganisation,
     organisations: data?.organisations || [],
     setSelectedOrganisation,

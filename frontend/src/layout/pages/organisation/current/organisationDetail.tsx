@@ -84,7 +84,7 @@ export const OrganisationDetail: React.FC = () => {
           }}
         >
           <Icon name="lock-1-interface-essential" size={24} />
-          <Box>
+          <Box sx={{ maxWidth: 500, width: '100%' }}>
             {t(
               'This organisation is only visible to you. You can use it to track private projects that you do not want others to have access to. If you want to invite people, invite them to an existing organisation or create a new one.'
             )}

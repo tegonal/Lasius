@@ -63,7 +63,7 @@ import { useStore } from 'storeContext/store';
 import { Button } from 'theme-ui';
 
 type CustomizedClientSafeProvider = ClientSafeProvider & {
-  custom_logo?: string;
+  custom_logo: string | null;
 };
 
 const Login: NextPage<{
@@ -213,7 +213,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     .filter((p) => p.id !== AUTH_PROVIDER_INTERNAL_LASIUS || config.lasiusOAuthProviderEnabled)
     .map((p) => {
       if (p.id === AUTH_PROVIDER_CUSTOMER_KEYCLOAK) {
-        (p as CustomizedClientSafeProvider).custom_logo = process.env.KEYCLOAK_OAUTH_PROVIDER_ICON;
+        (p as CustomizedClientSafeProvider).custom_logo =
+          process.env.KEYCLOAK_OAUTH_PROVIDER_ICON || null;
+      } else {
+        (p as CustomizedClientSafeProvider).custom_logo = null;
       }
       return p;
     });
