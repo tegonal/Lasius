@@ -19,10 +19,20 @@
 
 import { updateUserSettings, useGetUserProfile, acceptUserTOS } from 'lib/api/lasius/user/user';
 import { ModelsUserSettings, ModelsAcceptTOSRequest } from 'lib/api/lasius';
+import { useSession } from 'next-auth/react';
+import { useEffect, useState } from 'react';
 
 export const useProfile = () => {
+  const session = useSession();
+  const [enabled, setEnabled] = useState(false);
+
+  useEffect(() => {
+    setEnabled(session.data?.access_token !== undefined);
+  }, [session.data?.access_token]);
+
   const { data, mutate } = useGetUserProfile({
     swr: {
+      enabled: enabled,
       revalidateOnFocus: true,
       revalidateOnMount: true,
       revalidateOnReconnect: true,

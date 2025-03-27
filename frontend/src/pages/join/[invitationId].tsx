@@ -41,7 +41,6 @@ const Join: NextPage<{ session: Session }> = ({ session }) => {
   }
 
   const invitation = invitationStatus.result;
-  console.log('session', session);
 
   if (invitation?.invitation?.id && invitation?.invitation?.invitedEmail && session === null) {
     console.log('[join][notAuthenticated]]', session);
