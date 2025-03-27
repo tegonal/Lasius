@@ -141,54 +141,64 @@ const Login: NextPage<{
             <Trans>{error}</Trans>
           </BoxWarning>
         )}
-        <CardContainer
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1.5rem',
-            background: 'containerBackgroundDarker',
-          }}
-        >
-          {providers.length > 1 && <BoxInfo>{t('Please choose a login provider')}</BoxInfo>}
-          {providers.map((provider) => {
-            let icon = undefined;
-            const size = 40;
-            if (provider.custom_logo) {
-              icon = (
-                <Image alt={provider.name} src={provider.custom_logo} width={size} height={size} />
-              );
-            } else {
-              switch (provider.id) {
-                case AUTH_PROVIDER_INTERNAL_LASIUS:
-                  icon = <Icon name="lasius" size={size} />;
-                  break;
-                case 'gitlab':
-                  icon = <Icon name="gitlab" size={size} color="none" />;
-                  break;
-                case 'github':
-                  icon = <Icon name="github" size={size} color="black" />;
-                  break;
-                case AUTH_PROVIDER_CUSTOMER_KEYCLOAK:
-                  icon = <Icon name="keycloak" size={size} />;
-                  break;
+        {providers.length === 0 && (
+          <BoxWarning>{t('No authentication provider available')}</BoxWarning>
+        )}
+        {providers.length > 0 && (
+          <CardContainer
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1.5rem',
+              background: 'containerBackgroundDarker',
+            }}
+          >
+            {providers.length > 1 && <BoxInfo>{t('Please choose a login provider')}</BoxInfo>}
+            {providers.map((provider) => {
+              let icon = undefined;
+              const size = 40;
+              if (provider.custom_logo) {
+                icon = (
+                  <Image
+                    alt={provider.name}
+                    src={provider.custom_logo}
+                    width={size}
+                    height={size}
+                  />
+                );
+              } else {
+                switch (provider.id) {
+                  case AUTH_PROVIDER_INTERNAL_LASIUS:
+                    icon = <Icon name="lasius" size={size} />;
+                    break;
+                  case 'gitlab':
+                    icon = <Icon name="gitlab" size={size} color="none" />;
+                    break;
+                  case 'github':
+                    icon = <Icon name="github" size={size} color="black" />;
+                    break;
+                  case AUTH_PROVIDER_CUSTOMER_KEYCLOAK:
+                    icon = <Icon name="keycloak" size={size} />;
+                    break;
+                }
               }
-            }
 
-            return (
-              <Button
-                key={provider.id}
-                disabled={isSubmitting}
-                onClick={() => signInToProvider(provider.id)}
-                variant="secondary"
-                style={{ padding: 25 }}
-              >
-                {icon}
-                {t('Sign in with ')}
-                <Trans t={t}>{provider.name}</Trans>
-              </Button>
-            );
-          })}
-        </CardContainer>
+              return (
+                <Button
+                  key={provider.id}
+                  disabled={isSubmitting}
+                  onClick={() => signInToProvider(provider.id)}
+                  variant="secondary"
+                  style={{ padding: 25 }}
+                >
+                  {icon}
+                  {t('Sign in with ')}
+                  <Trans t={t}>{provider.name}</Trans>
+                </Button>
+              );
+            })}
+          </CardContainer>
+        )}
         <TegonalFooter />
       </LoginLayout>
     );

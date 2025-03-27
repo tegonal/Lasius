@@ -107,6 +107,7 @@
   "New password": "Neues Kennwort",
   "Next month": "Nächsten Monat",
   "Next week": "Nächste Woche",
+  "No authentication provider available": "Es wurde steht kein Anbieter für die Anmeldung zur Verfügung, bitte überprüfen Sie die Konfiguration.",
   "No data available": "Keine Daten verfügbar",
   "No Internet connection. Please make sure that your device is connected to the Internet.": "Keine Internetverbindung. Bitte stelle sicher, dass dein Gerät mit dem Internet verbunden ist.",
   "Not enough characters (min. 8)": "Zu wenig Zeichen (min. 8)",
