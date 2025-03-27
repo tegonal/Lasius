@@ -61,25 +61,29 @@ export const InputTagsAdmin: React.FC<Props> = ({ name, tags = [], tagGroupIndex
     return () => subscription.unsubscribe();
   }, [name, parentFormContext, tagGroupIndex]);
 
+  const updateTags = (tags: ModelsTags[]) => {
+    if (name === 'tagGroups') {
+      const currentTags = parentFormContext.getValues(name);
+      currentTags[tagGroupIndex].relatedTags = tags;
+      parentFormContext.setValue(name, currentTags);
+    } else {
+      parentFormContext.setValue(name, tags);
+    }
+    setSelectedTags(tags);
+  };
+
   const removeTag = (tag: ModelsTags) => {
     const toRemove = filter(selectedTags, { id: tag.id });
     const tags = differenceBy(selectedTags, toRemove, 'id');
-    setSelectedTags(tags);
-    parentFormContext.setValue(name, tags);
+
+    updateTags(tags);
   };
 
   const addTag = (tag: any) => {
     if (tag) {
       const tags = uniqBy([...selectedTags, tag], 'id');
       setInputText('');
-      setSelectedTags(tags);
-      if (name === 'tagGroups') {
-        const currentTags = parentFormContext.getValues(name);
-        currentTags[tagGroupIndex].relatedTags = tags;
-        parentFormContext.setValue(name, currentTags);
-      } else {
-        parentFormContext.setValue(name, tags);
-      }
+      updateTags(tags);
     }
   };
 
