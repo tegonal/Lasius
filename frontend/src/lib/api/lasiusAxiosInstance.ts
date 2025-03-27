@@ -24,6 +24,8 @@ import { IS_BROWSER } from 'projectConfig/constants';
 import { logger } from 'lib/logger';
 import clientAxiosInstance from 'lib/api/ClientAxiosInstance';
 import _ from 'lodash';
+import { getSession } from 'next-auth/react';
+import { getRequestHeaders } from 'lib/api/hooks/useTokensWithAxiosRequests';
 
 // add a second `options` argument here if you want to pass extra options to each generated query
 export const lasiusAxiosInstance = <T>(
@@ -72,6 +74,22 @@ export const lasiusAxiosInstance = <T>(
           ) {
             if (process.env.LASIUS_DEBUG) {
               logger.debug('[lasiusAxiosInstance][TokenNotValidAnymore]', error.status);
+            }
+
+            // try to load session from middleware
+            const session = await getSession();
+            if (process.env.LASIUS_DEBUG) {
+              console.log('[lasiusAxiosInstance][ReloadSession]', session);
+            }
+            if (session != null && !session.error) {
+              const headers = getRequestHeaders(session.access_token, session.access_token_issuer);
+              return lasiusAxiosInstance(
+                {
+                  ...config,
+                  ...headers,
+                },
+                options
+              );
             }
 
             throw error;
