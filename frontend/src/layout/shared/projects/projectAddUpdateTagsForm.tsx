@@ -198,6 +198,7 @@ export const ProjectAddUpdateTagsForm: React.FC<Props> = ({ item, onSave, onCanc
     };
     tagGroups.push(newTagGroup);
     hookForm.setValue('tagGroups', tagGroups);
+    hookForm.setValue('newTagGroupName', '');
     hookForm.trigger('tagGroups');
   };
 
