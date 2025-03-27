@@ -17,12 +17,22 @@
  *
  */
 
-import { updateUserSettings, useGetUserProfile } from 'lib/api/lasius/user/user';
-import { ModelsUserSettings } from 'lib/api/lasius';
+import { updateUserSettings, useGetUserProfile, acceptUserTOS } from 'lib/api/lasius/user/user';
+import { ModelsUserSettings, ModelsAcceptTOSRequest } from 'lib/api/lasius';
+import { useSession } from 'next-auth/react';
+import { useEffect, useState } from 'react';
 
 export const useProfile = () => {
+  const session = useSession();
+  const [enabled, setEnabled] = useState(false);
+
+  useEffect(() => {
+    setEnabled(session.data?.access_token !== undefined);
+  }, [session.data?.access_token]);
+
   const { data, mutate } = useGetUserProfile({
     swr: {
+      enabled: enabled,
       revalidateOnFocus: true,
       revalidateOnMount: true,
       revalidateOnReconnect: true,
@@ -38,6 +48,14 @@ export const useProfile = () => {
     }
   };
 
+  const acceptTOS = async (currentTOSVersion: string) => {
+    if (data) {
+      const acceptTOSRequest: ModelsAcceptTOSRequest = { version: currentTOSVersion };
+      const profile = await acceptUserTOS(acceptTOSRequest);
+      await mutate(profile);
+    }
+  };
+
   return {
     firstName: data?.firstName || '',
     lastName: data?.lastName || '',
@@ -47,5 +65,7 @@ export const useProfile = () => {
     userId: data?.id || '',
     lasiusIsLoggedIn: !!data,
     updateSettings,
+    acceptedTOSVersion: data?.acceptedTOS?.version || '',
+    acceptTOS,
   };
 };

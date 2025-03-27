@@ -52,7 +52,7 @@ export const OAuthUserRegister: NextPage = () => {
   // list of known error response codes, used tp provide translations only
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const translations = [
-    t('register_user_unkown_error'),
+    t('register_user_unknown_error'),
     t('register_user_user_already_registered'),
   ];
 

@@ -25,12 +25,12 @@ import com.google.inject.ImplementedBy
 import core.{DBSession, Validation}
 import models.OrganisationId.OrganisationReference
 import models.ProjectId.ProjectReference
-import models.LasiusJWT
 import models.UserId.UserReference
 import models._
 import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
 import reactivemongo.api.bson.collection.BSONCollection
+import org.joda.time.LocalDate
 
 import javax.inject.Inject
 import scala.concurrent._
@@ -74,7 +74,7 @@ trait UserRepository
   def findByEmail(email: String)(implicit
       dbSession: DBSession): Future[Option[User]]
 
-  def createInitialUserBasedOnProfile(jwt: LasiusJWT,
+  def createInitialUserBasedOnProfile(userInfo: UserInfo,
                                       org: Organisation,
                                       orgRole: OrganisationRole)(implicit
       dbSession: DBSession): Future[User]
@@ -106,6 +106,10 @@ trait UserRepository
 
   def updateProjectKey(projectId: ProjectId, newKey: String)(implicit
       dbSession: DBSession): Future[Boolean]
+
+  def acceptTOS(userReference: UserReference,
+                acceptTOSRequest: AcceptTOSRequest)(implicit
+      dbSession: DBSession): Future[User]
 }
 
 class UserMongoRepository @Inject() (
@@ -386,7 +390,7 @@ class UserMongoRepository @Inject() (
     } yield true
   }
 
-  override def createInitialUserBasedOnProfile(jwt: LasiusJWT,
+  override def createInitialUserBasedOnProfile(userInfo: UserInfo,
                                                org: Organisation,
                                                orgRole: OrganisationRole)(
       implicit dbSession: DBSession): Future[User] = {
@@ -394,10 +398,10 @@ class UserMongoRepository @Inject() (
       newUser <- Future.successful(
         User(
           id = UserId(),
-          key = jwt.subject,
-          email = jwt.email,
-          firstName = jwt.givenName.getOrElse(""),
-          lastName = jwt.familyName.getOrElse(""),
+          key = userInfo.key,
+          email = userInfo.email,
+          firstName = userInfo.firstName.getOrElse(""),
+          lastName = userInfo.lastName.getOrElse(""),
           active = true,
           role = FreeUser,
           organisations = Seq(
@@ -409,7 +413,8 @@ class UserMongoRepository @Inject() (
               projects = Seq()
             )
           ),
-          settings = None
+          settings = None,
+          acceptedTOS = None
         ))
       _ <- validateCreate(newUser)
       _ <- upsert(newUser)
@@ -440,6 +445,27 @@ class UserMongoRepository @Inject() (
       multi = true,
       arrayFilters = Seq(Json.obj("element.projectReference.id" -> projectId))
     )
+  }
+
+  def acceptTOS(userReference: UserReference,
+                acceptTOSRequest: AcceptTOSRequest)(implicit
+      dbSession: DBSession): Future[User] = {
+    val sel         = userSelection(userReference)
+    val acceptedTOS = AcceptedTOS(acceptTOSRequest.version, LocalDate.now)
+    for {
+      _ <- validateNonBlankString("acceptTOSRequest.version",
+                                  acceptTOSRequest.version)
+      result <- updateFields(
+        sel,
+        Seq[(String, JsValueWrapper)](
+          "acceptedTOS" -> acceptedTOS
+        )
+      )
+      _ <- validate(result,
+                    s"Failed accepting TOS for user: ${userReference.key}")
+      user <- findByUserReference(userReference).noneToFailed(
+        s"Could not find user with id ${userReference.key}")
+    } yield user
   }
 }
 

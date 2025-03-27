@@ -23,12 +23,11 @@ package controllers
 
 import actors.ClientReceiver
 import com.typesafe.config.Config
-import core.{MockCacheAware, SystemServices, TestApplication}
+import core.{SystemServices, TestApplication}
 import models._
 import mongo.EmbedMongo
 import org.specs2.mock.Mockito
 import org.specs2.mock.mockito.MockitoMatchers
-import play.api.cache.SyncCacheApi
 import play.api.mvc._
 import play.api.test._
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -52,14 +51,11 @@ class UserFavoritesControllerSpec
       private val authConfig                          = inject[AuthConfig]
       private val userFavoritesRepository = inject[UserFavoritesRepository]
 
-      val controller: UserFavoritesController
-        with SecurityControllerMock
-        with MockCacheAware =
+      val controller: UserFavoritesController with SecurityControllerMock =
         UserFavoritesControllerMock(config,
                                     systemServices,
                                     reactiveMongoApi,
                                     authConfig,
-                                    jwkProviderCache,
                                     userFavoritesRepository)
 
       val projectId: ProjectId = ProjectId()
@@ -81,14 +77,11 @@ class UserFavoritesControllerSpec
       private val authConfig                          = inject[AuthConfig]
       private val userFavoritesRepository = inject[UserFavoritesRepository]
 
-      val controller: UserFavoritesController
-        with SecurityControllerMock
-        with MockCacheAware =
+      val controller: UserFavoritesController with SecurityControllerMock =
         UserFavoritesControllerMock(config,
                                     systemServices,
                                     reactiveMongoApi,
                                     authConfig,
-                                    jwkProviderCache,
                                     userFavoritesRepository)
 
       val request: FakeRequest[FavoritesRequest] = FakeRequest()
@@ -113,14 +106,11 @@ class UserFavoritesControllerSpec
       private val authConfig                          = inject[AuthConfig]
       private val userFavoritesRepository = inject[UserFavoritesRepository]
 
-      val controller: UserFavoritesController
-        with SecurityControllerMock
-        with MockCacheAware =
+      val controller: UserFavoritesController with SecurityControllerMock =
         UserFavoritesControllerMock(config,
                                     systemServices,
                                     reactiveMongoApi,
                                     authConfig,
-                                    jwkProviderCache,
                                     userFavoritesRepository)
 
       val projectId: ProjectId = ProjectId()
@@ -144,14 +134,11 @@ class UserFavoritesControllerSpec
     private val authConfig                          = inject[AuthConfig]
     private val userFavoritesRepository = inject[UserFavoritesRepository]
 
-    val controller: UserFavoritesController
-      with SecurityControllerMock
-      with MockCacheAware =
+    val controller: UserFavoritesController with SecurityControllerMock =
       UserFavoritesControllerMock(config,
                                   systemServices,
                                   reactiveMongoApi,
                                   authConfig,
-                                  jwkProviderCache,
                                   userFavoritesRepository)
 
     val request: FakeRequest[FavoritesRequest] = FakeRequest()
@@ -174,11 +161,9 @@ object UserFavoritesControllerMock extends MockAwaitable with Mockito {
             systemServices: SystemServices,
             reactiveMongoApi: ReactiveMongoApi,
             authConfig: AuthConfig,
-            jwkProviderCache: SyncCacheApi,
             userFavoritesRepository: UserFavoritesRepository)(implicit
-      ec: ExecutionContext): UserFavoritesController
-    with SecurityControllerMock
-    with MockCacheAware = {
+      ec: ExecutionContext)
+      : UserFavoritesController with SecurityControllerMock = {
     val clientReceiver = mock[ClientReceiver]
 
     new UserFavoritesController(
@@ -187,10 +172,7 @@ object UserFavoritesControllerMock extends MockAwaitable with Mockito {
       systemServices = systemServices,
       authConfig = authConfig,
       reactiveMongoApi = reactiveMongoApi,
-      jwkProviderCache = jwkProviderCache,
       userFavoritesRepository = userFavoritesRepository,
-      clientReceiver = clientReceiver)
-      with SecurityControllerMock
-      with MockCacheAware
+      clientReceiver = clientReceiver) with SecurityControllerMock
   }
 }

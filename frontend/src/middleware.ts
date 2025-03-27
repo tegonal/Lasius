@@ -89,6 +89,7 @@ export default withAuth(
 export const config = {
   //  Require authentication for the following routes
   matcher: [
+    '/api/auth/session',
     '/user',
     '/user/(.*)',
     '/organisation',

@@ -135,7 +135,8 @@ const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig }> = ({ con
 
       store.dispatch({ type: 'calendar.setSelectedDate', payload: formatISOLocale(new Date()) });
 
-      await router.push(res.url);
+      // force redirect through browser to correctly re-initialize users session
+      window.location.href = res.url;
     }
   };
 

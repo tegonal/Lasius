@@ -24,23 +24,29 @@ import { useProfile } from 'lib/api/hooks/useProfile';
 export const useOrganisation = () => {
   const { profile: data, updateSettings } = useProfile();
 
-  const lastSelectedOrganisationId =
-    data?.settings.lastSelectedOrganisation?.id ||
-    data?.organisations.filter((item) => item.private)[0].organisationReference.id;
-
-  const selectedOrganisation = data?.organisations.find(
-    (org) => org.organisationReference.id === lastSelectedOrganisationId
-  );
-
   const setSelectedOrganisation = async (organisationReference: ModelsEntityReference) => {
     if (organisationReference) {
       await updateSettings({ lastSelectedOrganisation: organisationReference });
     }
   };
 
+  let lastSelectedOrganisationId = data?.settings.lastSelectedOrganisation?.id;
+  if (!lastSelectedOrganisationId) {
+    const myPrivateOrg = data?.organisations.filter((item) => item.private)[0]
+      .organisationReference;
+    if (myPrivateOrg) {
+      setSelectedOrganisation(myPrivateOrg);
+      lastSelectedOrganisationId = myPrivateOrg.id;
+    }
+  }
+
+  const selectedOrganisation = data?.organisations.find(
+    (org) => org.organisationReference.id === lastSelectedOrganisationId
+  );
+
   return {
-    selectedOrganisationId: data?.settings.lastSelectedOrganisation?.id || '',
-    selectedOrganisationKey: data?.settings.lastSelectedOrganisation?.key || '',
+    selectedOrganisationId: selectedOrganisation?.organisationReference?.id || '',
+    selectedOrganisationKey: selectedOrganisation?.organisationReference?.key || '',
     selectedOrganisation,
     organisations: data?.organisations || [],
     setSelectedOrganisation,

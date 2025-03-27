@@ -51,6 +51,9 @@
   <logger name="repositories" level="DEBUG" />
   <logger name="domain" level="DEBUG" />
   <logger name="mongo" level="DEBUG" />
+  <logger name="o.m.d.cluster" level="INFO" />
+  <logger name="org.mongo" level="INFO" />
+  <logger name="org.mongodb" level="INFO" />
 
   <root level="DEBUG">
     <appender-ref ref="ASYNCSTDOUT" />

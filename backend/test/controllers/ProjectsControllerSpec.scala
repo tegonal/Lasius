@@ -52,8 +52,7 @@ class ProjectsControllerSpec
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
-                                           reactiveMongoApi,
-                                           jwkProviderCache)
+                                           reactiveMongoApi)
 
       val request: FakeRequest[CreateProject] = FakeRequest()
         .withBody(
@@ -76,8 +75,7 @@ class ProjectsControllerSpec
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
-                                           reactiveMongoApi,
-                                           jwkProviderCache)
+                                           reactiveMongoApi)
 
       val request: FakeRequest[CreateProject] = FakeRequest()
         .withBody(
@@ -102,8 +100,7 @@ class ProjectsControllerSpec
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
-                                           reactiveMongoApi,
-                                           jwkProviderCache)
+                                           reactiveMongoApi)
 
       val request: FakeRequest[CreateProject] = FakeRequest()
         .withBody(
@@ -128,8 +125,7 @@ class ProjectsControllerSpec
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
-                                           reactiveMongoApi,
-                                           jwkProviderCache)
+                                           reactiveMongoApi)
       val newProjectKey: String = "someNewProjectKey"
 
       val request: FakeRequest[CreateProject] = FakeRequest()
@@ -172,8 +168,7 @@ class ProjectsControllerSpec
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
-                                           reactiveMongoApi,
-                                           jwkProviderCache)
+                                           reactiveMongoApi)
 
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
       val result: Future[Result] =
@@ -192,7 +187,6 @@ class ProjectsControllerSpec
                                            systemServices,
                                            authConfig,
                                            reactiveMongoApi,
-                                           jwkProviderCache,
                                            organisationRole =
                                              OrganisationAdministrator)
       val newProjectId: ProjectId = ProjectId()
@@ -216,8 +210,7 @@ class ProjectsControllerSpec
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
-                                           reactiveMongoApi,
-                                           jwkProviderCache)
+                                           reactiveMongoApi)
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
       val result: Future[Result] =
         controller.deactivateProject(controller.organisationId,
@@ -250,8 +243,7 @@ class ProjectsControllerSpec
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
-                                           reactiveMongoApi,
-                                           jwkProviderCache)
+                                           reactiveMongoApi)
 
       val request: FakeRequest[UserToProjectAssignment] =
         FakeRequest().withBody(
@@ -273,7 +265,6 @@ class ProjectsControllerSpec
                                            systemServices,
                                            authConfig,
                                            reactiveMongoApi,
-                                           jwkProviderCache,
                                            organisationRole =
                                              OrganisationMember,
                                            projectRole = ProjectMember)
@@ -298,8 +289,7 @@ class ProjectsControllerSpec
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
-                                           reactiveMongoApi,
-                                           jwkProviderCache)
+                                           reactiveMongoApi)
 
       val request: FakeRequest[UserToProjectAssignment] =
         FakeRequest().withBody(
@@ -322,8 +312,7 @@ class ProjectsControllerSpec
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
-                                           reactiveMongoApi,
-                                           jwkProviderCache)
+                                           reactiveMongoApi)
       val email = "newUserEmail@test.com"
 
       // delete project
@@ -353,7 +342,6 @@ class ProjectsControllerSpec
                                            systemServices,
                                            authConfig,
                                            reactiveMongoApi,
-                                           jwkProviderCache,
                                            projectActive = false)
       val email = "newUserEmail@test.com"
 
@@ -379,7 +367,6 @@ class ProjectsControllerSpec
                                            systemServices,
                                            authConfig,
                                            reactiveMongoApi,
-                                           jwkProviderCache,
                                            organisationRole =
                                              OrganisationAdministrator,
                                            projectRole = ProjectMember)
@@ -406,8 +393,7 @@ class ProjectsControllerSpec
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
-                                           reactiveMongoApi,
-                                           jwkProviderCache)
+                                           reactiveMongoApi)
       val email = "newUserEmail@test.com"
       val request: FakeRequest[UserToProjectAssignment] =
         FakeRequest().withBody(
@@ -432,8 +418,7 @@ class ProjectsControllerSpec
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
-                                           reactiveMongoApi,
-                                           jwkProviderCache)
+                                           reactiveMongoApi)
 
       val email = "ivnitedUser@test.com"
       val userOrganisation: UserOrganisation = UserOrganisation(
@@ -452,7 +437,8 @@ class ProjectsControllerSpec
         active = true,
         role = Administrator,
         organisations = Seq(userOrganisation),
-        settings = None
+        settings = None,
+        acceptedTOS = None
       )
 
       withDBSession()(implicit dbSession =>
@@ -483,8 +469,7 @@ class ProjectsControllerSpec
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
-                                           reactiveMongoApi,
-                                           jwkProviderCache)
+                                           reactiveMongoApi)
 
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
       val result: Future[Result] =
@@ -505,7 +490,6 @@ class ProjectsControllerSpec
                                            systemServices,
                                            authConfig,
                                            reactiveMongoApi,
-                                           jwkProviderCache,
                                            organisationRole =
                                              OrganisationMember,
                                            projectRole = ProjectMember)
@@ -542,7 +526,8 @@ class ProjectsControllerSpec
         active = true,
         role = Administrator,
         organisations = Seq(userOrganisation),
-        settings = None
+        settings = None,
+        acceptedTOS = None
       )
 
       withDBSession()(implicit dbSession =>
@@ -572,7 +557,6 @@ class ProjectsControllerSpec
                                            systemServices,
                                            authConfig,
                                            reactiveMongoApi,
-                                           jwkProviderCache,
                                            organisationRole =
                                              OrganisationAdministrator,
                                            projectRole = ProjectMember)
@@ -589,7 +573,6 @@ class ProjectsControllerSpec
                                            systemServices,
                                            authConfig,
                                            reactiveMongoApi,
-                                           jwkProviderCache,
                                            organisationRole =
                                              OrganisationMember,
                                            projectRole = ProjectAdministrator)
@@ -607,8 +590,7 @@ class ProjectsControllerSpec
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
-                                           reactiveMongoApi,
-                                           jwkProviderCache)
+                                           reactiveMongoApi)
 
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
       val result: Future[Result] =
@@ -627,8 +609,7 @@ class ProjectsControllerSpec
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
-                                           reactiveMongoApi,
-                                           jwkProviderCache)
+                                           reactiveMongoApi)
 
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
       val result: Future[Result] =
@@ -648,7 +629,6 @@ class ProjectsControllerSpec
                                            systemServices,
                                            authConfig,
                                            reactiveMongoApi,
-                                           jwkProviderCache,
                                            projectRole = ProjectMember)
 
       // initialize second user to be able to remove himeself
@@ -673,7 +653,8 @@ class ProjectsControllerSpec
         active = true,
         role = Administrator,
         organisations = Seq(userOrganisation2),
-        settings = None
+        settings = None,
+        acceptedTOS = None
       )
       withDBSession()(implicit dbSession =>
         controller.userRepository.upsert(user2)).awaitResult()
@@ -701,8 +682,7 @@ class ProjectsControllerSpec
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
-                                           reactiveMongoApi,
-                                           jwkProviderCache)
+                                           reactiveMongoApi)
 
       val request: FakeRequest[UpdateProject] = FakeRequest().withBody(
         UpdateProject(key = Some("newKey"), bookingCategories = None))
@@ -722,8 +702,7 @@ class ProjectsControllerSpec
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
-                                           reactiveMongoApi,
-                                           jwkProviderCache)
+                                           reactiveMongoApi)
 
       val request: FakeRequest[UpdateProject] = FakeRequest().withBody(
         UpdateProject(key = None, bookingCategories = None))
@@ -745,8 +724,7 @@ class ProjectsControllerSpec
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
-                                           reactiveMongoApi,
-                                           jwkProviderCache)
+                                           reactiveMongoApi)
 
       val request: FakeRequest[UpdateProject] = FakeRequest().withBody(
         UpdateProject(key = Some(""), bookingCategories = None))
@@ -768,8 +746,7 @@ class ProjectsControllerSpec
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
-                                           reactiveMongoApi,
-                                           jwkProviderCache)
+                                           reactiveMongoApi)
 
       val project2Key: String = "project2"
 
@@ -805,8 +782,7 @@ class ProjectsControllerSpec
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
-                                           reactiveMongoApi,
-                                           jwkProviderCache)
+                                           reactiveMongoApi)
       val newKey               = "newProjectKey"
       private val invitationId = InvitationId()
 
@@ -843,7 +819,8 @@ class ProjectsControllerSpec
             projects = Seq()
           )
         ),
-        settings = None
+        settings = None,
+        acceptedTOS = None
       )
 
       val invitation: JoinProjectInvitation = JoinProjectInvitation(

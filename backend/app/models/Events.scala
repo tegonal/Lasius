@@ -133,7 +133,10 @@ case class UserTimeBookingStartTimeChanged(bookingId: BookingId,
 
 sealed trait InEvent
 
-case class HelloServer(client: String, token: String) extends InEvent
+case class HelloServer(client: String,
+                       token: String,
+                       tokenIssuer: Option[String])
+    extends InEvent
 
 case object Ping extends InEvent
 

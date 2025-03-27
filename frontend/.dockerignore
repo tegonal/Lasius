@@ -1,0 +1,5 @@
+.env.local
+.next
+.idea
+target
+node_modules

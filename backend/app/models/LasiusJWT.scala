@@ -24,10 +24,9 @@ package models
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.DecodedJWT
-import controllers.UnauthorizedException
+import controllers.security.UnauthorizedException
 import models.LasiusJWT.{EMAIL_CLAIM, FAMILY_NAME_CLAIM, GIVEN_NAME_CLAIM}
 import org.joda.time.DateTime
-import com.typesafe.config.Config
 
 import scala.util.Try
 
@@ -38,27 +37,24 @@ case class LasiusJWT(private val jwt: DecodedJWT) {
   def email: String = Option(jwt.getClaim(EMAIL_CLAIM))
     .map(_.asString())
     .getOrElse(subject)
-  def givenName: Option[String] = Option(jwt.getClaim(GIVEN_NAME_CLAIM))
+  private def givenName: Option[String] = Option(jwt.getClaim(GIVEN_NAME_CLAIM))
     .map(_.asString())
-  def familyName: Option[String] = Option(jwt.getClaim(FAMILY_NAME_CLAIM))
-    .map(_.asString())
+  private def familyName: Option[String] =
+    Option(jwt.getClaim(FAMILY_NAME_CLAIM))
+      .map(_.asString())
+
+  def toUserInfo: UserInfo = UserInfo(
+    key = subject,
+    email = email,
+    firstName = givenName,
+    lastName = familyName
+  )
 }
 
 object LasiusJWT {
   val EMAIL_CLAIM               = "email"
   private val GIVEN_NAME_CLAIM  = "given_name"
   private val FAMILY_NAME_CLAIM = "family_name"
-
-  def REQUEST_HEADER_NAME(implicit conf: Config): String =
-    if (conf.hasPath("play.http.session.jwtName"))
-      conf.getString("play.http.session.jwtName")
-    else "Authorization"
-
-  def TOKEN_PREFIX(implicit conf: Config): String = {
-    if (conf.hasPath("play.http.session.tokenPrefix"))
-      conf.getString("play.http.session.tokenPrefix")
-    else "Bearer "
-  }
 
   def newJWT(user: OAuthUser)(implicit config: LasiusConfig): Try[String] = {
 

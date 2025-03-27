@@ -20,6 +20,8 @@
  */
 
 package models
+import pureconfig._
+import pureconfig.generic.semiauto._
 
 import java.time.Duration
 
@@ -43,10 +45,10 @@ case class LasiusConfig(
 
 case class LasiusSecurityConfig(
     accessRestriction: Option[AccessRestrictionConfig],
-    externalIssuers: Seq[JWTIssuerConfig],
+    externalIssuers: Seq[IssuerConfig],
     oauth2Provider: InternalOauth2ProviderConfig
 ) {
-  lazy val allowedIssuers: Seq[JWTIssuerConfig] =
+  lazy val allowedIssuers: Seq[IssuerConfig] =
     if (oauth2Provider.enabled)
       JWTIssuerConfig(
         issuer = oauth2Provider.jwtToken.issuer,
@@ -80,10 +82,35 @@ case class JWTTokenConfig(
     privateKey: String
 )
 
+sealed trait IssuerConfig {
+  val issuer: String
+}
+
+sealed trait TokenValidatorType
+
+object TokenValidatorType {
+  case object OIDC   extends TokenValidatorType
+  case object Github extends TokenValidatorType
+
+  implicit val reader: ConfigReader[TokenValidatorType] =
+    deriveEnumerationReader[TokenValidatorType](
+      ConfigFieldMapping(PascalCase, SnakeCase))
+}
+
+case class OpaqueTokenIssuerConfig(
+    issuer: String,
+    clientId: Option[String],
+    clientSecret: Option[String],
+    tokenValidatorType: TokenValidatorType,
+    introspectionPath: Option[String],
+    userInfoPath: Option[String]
+) extends IssuerConfig
+
 case class JWTIssuerConfig(issuer: String,
                            publicKey: Option[String] = None,
                            privateKey: Option[String] = None,
                            jwk: Option[JWKConfig] = None)
+    extends IssuerConfig
 
 case class JWKConfig(url: String,
                      cache: Option[JWKProviderCacheConfig] = None,

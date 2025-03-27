@@ -34,6 +34,7 @@ export const {
   LASIUS_TELEMETRY_PLAUSIBLE_HOST,
   LASIUS_TELEMETRY_PLAUSIBLE_SOURCE_DOMAIN,
   LASIUS_DEMO_MODE,
+  LASIUS_TERMSOFSERVICE_VERSION,
 } = publicRuntimeConfig as { [key: string]: string };
 
 export const DEV = ENVIRONMENT !== 'production';
@@ -92,3 +93,4 @@ export enum CONNECTION_STATUS {
 }
 
 export const AUTH_PROVIDER_INTERNAL_LASIUS = 'internal_lasius';
+export const AUTH_PROVIDER_CUSTOMER_KEYCLOAK = 'custom_keycloak';

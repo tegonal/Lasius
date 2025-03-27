@@ -41,7 +41,6 @@ class TimeBookingHistoryController @Inject() (
     override val systemServices: SystemServices,
     override val authConfig: AuthConfig,
     override val reactiveMongoApi: ReactiveMongoApi,
-    override val jwkProviderCache: SyncCacheApi,
     bookingHistoryRepository: BookingHistoryRepository)(implicit
     ec: ExecutionContext)
     extends BaseLasiusController() {

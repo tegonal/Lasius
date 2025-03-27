@@ -39,8 +39,7 @@ class TimeBookingController @Inject() (
     override val controllerComponents: ControllerComponents,
     override val authConfig: AuthConfig,
     override val reactiveMongoApi: ReactiveMongoApi,
-    override val systemServices: SystemServices,
-    override val jwkProviderCache: SyncCacheApi)(implicit ec: ExecutionContext)
+    override val systemServices: SystemServices)(implicit ec: ExecutionContext)
     extends BaseLasiusController() {
 
   override val supportTransaction: Boolean = systemServices.supportTransaction

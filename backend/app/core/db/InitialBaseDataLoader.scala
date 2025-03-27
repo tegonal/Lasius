@@ -38,7 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
  */
 @unused
 class InitialBaseDataLoader @Inject() (
-    val reactiveMongoApi: ReactiveMongoApi,
+    override val reactiveMongoApi: ReactiveMongoApi,
     OAuthUserRepository: OAuthUserRepository,
     userRepository: UserRepository,
     projectRepository: ProjectRepository,
@@ -142,7 +142,8 @@ class InitialBaseDataLoader @Inject() (
         active = true,
         role = FreeUser,
         organisations = Seq(userOrg),
-        settings = None
+        settings = None,
+        acceptedTOS = None
       ))
 
   }

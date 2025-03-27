@@ -68,8 +68,8 @@ export const AvatarUser: React.FC<Props> = ({ firstName, lastName, size = 39 }) 
           }}
         >
           <Strong>
-            {firstName[0].toUpperCase()}
-            {lastName[0].toUpperCase()}
+            {firstName[0]?.toUpperCase()}
+            {lastName[0]?.toUpperCase()}
           </Strong>
         </Flex>
       </Box>

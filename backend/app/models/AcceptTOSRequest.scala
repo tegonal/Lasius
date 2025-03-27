@@ -19,13 +19,13 @@
  * along with Lasius. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package core
+package models
 
-import play.api.cache.AsyncCacheApi
+import play.api.libs.json.{Json, OFormat}
 
-trait CacheAware {
+case class AcceptTOSRequest(version: String)
 
-  /** Token cache used to store short living nonce (one-time) tokens
-    */
-  val oneTimeAccessTokenCache: AsyncCacheApi
+object AcceptTOSRequest {
+  implicit val format: OFormat[AcceptTOSRequest] =
+    Json.format[AcceptTOSRequest]
 }

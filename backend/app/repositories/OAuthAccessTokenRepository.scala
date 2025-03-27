@@ -54,6 +54,9 @@ trait OAuthAccessTokenRepository
   def refreshToken(authInfo: AuthInfo[OAuthUser], refreshToken: String)(implicit
       dbSession: DBSession,
       config: LasiusConfig): Future[OAuthAccessToken]
+
+  def deleteAccessToken(accessToken: String)(implicit
+      dbSession: DBSession): Future[Boolean]
 }
 
 class OAuthAccessTokenMongoRepository @Inject() ()(
@@ -119,6 +122,17 @@ class OAuthAccessTokenMongoRepository @Inject() ()(
     val sel =
       Json.obj("accessToken" -> accessToken)
     findFirst(sel).map(_.map(_._1))
+  }
+
+  override def deleteAccessToken(accessToken: String)(implicit
+      dbSession: DBSession): Future[Boolean] = {
+    val sel = {
+      Json.obj("accessToken" -> accessToken)
+    }
+    findFirst(sel).map(_.map(_._1)).flatMap {
+      case Some(id) => removeById(id.id)
+      case _        => Future.successful(true)
+    }
   }
 
   override def refreshToken(authInfo: AuthInfo[OAuthUser],
