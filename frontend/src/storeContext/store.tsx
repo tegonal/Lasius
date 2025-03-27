@@ -54,7 +54,7 @@ type StoreProps = {
   children: React.ReactNode;
 };
 
-const getLocalStorage = (): Store => {
+const getLocalStorage = (): Store | null => {
   const value = IS_BROWSER && window.localStorage.getItem('lasius.uiState');
   return value ? JSON.parse(value) : null;
 };
