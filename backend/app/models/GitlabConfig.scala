@@ -46,9 +46,7 @@ case class GitlabProjectSettings(gitlabProjectId: String,
 case class GitlabProjectMapping(projectId: ProjectId,
                                 settings: GitlabProjectSettings)
 
-case class GitlabAuth(consumerKey: String,
-                      privateKey: String,
-                      accessToken: String)
+case class GitlabAuth(accessToken: String)
 
 case class GitlabConfig(_id: GitlabConfigId,
                         name: String,

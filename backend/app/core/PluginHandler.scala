@@ -130,9 +130,7 @@ class PluginHandler(userRepository: UserRepository,
         s.map { config =>
           log.debug(s"Start Jira Scheduler for config:$config")
           val jiraConfig = ServiceConfiguration(config.baseUrl.toString)
-          val auth = OAuth2Authentication(config.auth.consumerKey,
-                                          config.auth.privateKey,
-                                          config.auth.accessToken)
+          val auth       = OAuth2Authentication(config.auth.accessToken)
 
           config.projects.map { proj =>
             log.debug(
@@ -164,9 +162,7 @@ class PluginHandler(userRepository: UserRepository,
         s.map { config =>
           log.debug(s"Start Gitlab Scheduler for config:$config")
           val serviceConfig = ServiceConfiguration(config.baseUrl.toString)
-          val auth = OAuth2Authentication(config.auth.consumerKey,
-                                          config.auth.privateKey,
-                                          config.auth.accessToken)
+          val auth          = OAuth2Authentication(config.auth.accessToken)
 
           config.projects.map { proj =>
             log.debug(

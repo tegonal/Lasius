@@ -30,10 +30,7 @@ case class OAuthAuthentication(consumerKey: String,
                                tokenSecret: String)
     extends ServiceAuthentication
 
-case class OAuth2Authentication(consumerKey: String,
-                                privateKey: String,
-                                token: String)
-    extends ServiceAuthentication
+case class OAuth2Authentication(token: String) extends ServiceAuthentication
 
 case class ApiKeyAuthentication(apiKey: String) extends ServiceAuthentication
 
