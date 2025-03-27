@@ -1,12 +1,14 @@
 [EN](Integrations.md)
 
 # Integrationen
+
 Lasius bietet die Möglichkeit basierend auf Issues in externen Issue-Tracking Systemen `Tags` in einem Projekt automatisch zu erstellen.
 
 ℹ️ Die Verwaltung der Konfiguration erfolgt derzeit in der Datenbank. Für die Verwaltung der Konfiguration in der Applikation ist ein entsprechendes [Issue](https://github.com/tegonal/Lasius/issues/190) geplant.
 Deshalb muss aktuell nach dem Anpassen der Konfiguration in der Datenbank der Lasius Backend Service neu gestartet werden.
 
 ## Plane
+
 Lasius unterstützt das Auslesen von [Plane](https://plane.so/) Issues.
 
 Dazu muss in die Tabelle `PlaneConfig` ein Eintrag mit dem folgenden JSON Schema erstellt/hinzugefügt werden:
@@ -183,6 +185,7 @@ Hier ein Beispiel-Kommando:
 ```
 
 ## Gitlab
+
 Lasius unterstützt das Auslesen von [Gitlab](https://gitlab.com/) Issues aus der SaaS oder eine eigens gehosteten Gitlab Instanz.
 
 Dazu muss in die Tabelle `GitlabConfig` ein Eintrag mit dem folgenden JSON Schema erstellt/hinzugefügt werden:

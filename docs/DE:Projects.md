@@ -1,10 +1,12 @@
 [EN](Projects.md)
 
 # Projekte
+
 Zeitbuchungen werden nebst der [Organisation](DE%3AOrganisations.md) ebenfalls einem Projekt zugeordnet. Ein Projekt besteht dabei lediglich aus einer frei wählbaren Bezeichnung.
 
 
 ## Rollen und Berechtigungen
+
 In einer Organisation bestehen die Rollen `Member` und `Administrator`. Benutzer mit der Rolle `Member` stehen dabei folgende Funktionen zur Verfügung:
 
 - Erfassen und verwalten eigener Zeitbuchungen innerhalb dieses Projektes
@@ -16,6 +18,7 @@ Ein `Administrator` besitzt zudem folgende *zusätzlichen* Funktionen:
 - Einsehen und exportieren der Zeitbuchungen und Statistiken aller Benutzer, welche innerhalb dieses Projektes erstellt wurden
 
 ## Zugewiesene Projekte verwalten
+
 Die einem Benutzer zugewiesenen Projekte stehen einerseits in der Auswahlliste beim Erfassen einer Zeitbuchung zur Verfügung:
 
 ![Projektliste beim Erfassen einer Zeitbuchung](images/Lasius_TimeBooking_Projects.png)
@@ -45,6 +48,7 @@ Weitere Aktionen werten im Menu (3) angeboten und umfassen (von rechts nach link
 5. [Mitgliedschaft der Organisation verwalten](#benutzer-einladen)
 
 ### Benutzer einladen
+
 Weitere Benutzer innerhalb oder ausserhalb der zum Projekt gehörenden Organisation können mittels Eingabe der Email-Adresse eingeladen werden.
 
 ![Verwalten Projekt-Mitglieder](images/Lasius_Projects_Invite.png)
@@ -58,6 +62,7 @@ Nach erfolgreicher Anmeldung kann der Benutzer die Einladung akzeptieren oder ab
 ![Projekteinladung akzeptieren](images/Lasius_Projects_Invitation.png)
 
 #### Externe Benutzer des Projektes
+
 Wird ein Benutzer einer anderen Organisation zu einem Projekt hinzugefügt, dann gilt:
 
 - Der Benutzer sieht das Projekt in seinen [zugewiesenen Projekten](#zugewiesene-projekte-verwalten) und kann darauf eigene Zeitbuchungen verwalten
