@@ -5,7 +5,7 @@
 
 Lasius enables users to record time bookings across multiple organizations. An organization can represent a team, a department within a company, a company, or any other grouping. This allows collaboration within a group independent of a specific project.
 
-## Roles and permissions
+## Roles and permissions for organizations
 
 Within an organization, there are two roles: `Member` and `Administrator`. Users with the `Member` role have access to the following functions:
 
@@ -48,7 +48,7 @@ After joining, the organization becomes available to the user.
 
 ### Selecting an organization
 
-A logged-in user always records and manages their time bookings within the context of an organization. The currently selected organization is visible to the user.
+A logged-in user always records and manages their time bookings within the context of an organization even if it is the personal organization metioned previously. The currently selected organization is visible to the user.
 
 ![Current organization](images/Lasius_Org_Current.png)
 
@@ -58,6 +58,7 @@ By clicking on the organization, the user can switch to another available organi
 
 ## Planned working hours
 
+Each user can set their planned working hours for each day of the week. While vacation scheduling isn’t available yet, it’s a planned feature. The defined working hours are used to generate platform visuals and track progress toward goals.
 A user can record their planned working hours per assigned organization under `Working hours`.
 
 ![Planned working hours](Lasius_Org_Workinghours.png)
@@ -66,6 +67,6 @@ The recorded planned working hours are used to display the work schedule as a pr
 
 ![Current progress](images/Lasius_TimeBooking_Current_Progress.png)
 
-Additionally, under `This Month`, a summary of scheduled working hours is provided in the form of statistics (1) or a small progress indicator per day (2).
+Additionally, under `This Month`, a summary of scheduled working hours is provided in the form of statistics (1) or a progress indicator per day (2).
 
 ![This months view](images/Lasius_TimeBooking_This_Month.png)

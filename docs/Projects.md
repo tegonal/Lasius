@@ -4,7 +4,7 @@
 
 Time bookings are associated not only with an [organization](Organisations.md) but also with a project. A project consists simply of a freely chosen designation.
 
-## Roles and permissions
+## Roles and permissions for projects
 
 Within an organization, there are two roles: `Member` and `Administrator`. Users with the `Member` role have access to the following functions:
 
@@ -42,7 +42,7 @@ In this view, the administrator can also create new projects for this organizati
 Additional actions are offered in the menu (3) and include (from right to left):
 
 1. Deactivate project
-2. [Edit project tag and tag group assignment](Tags.md#erfassen-von-tags-und-tag-gruppen)
+2. [Edit project tag and tag group assignment](Tags.md#managing-tags-and-tag-groups)
 3. Export all time bookings for the organization
 4. Display organization statistics (Not yet implemented)
 5. [Manage organization membership](#inviting-users)
@@ -61,7 +61,7 @@ After successful login, the user can accept or decline the invitation. If the us
 
 ![Accepting project invitation](images/Lasius_Projects_Invitation.png)
 
-#### Projects users from other organizations
+#### Users of projects from other organizations
 
 When a user from another organization is added to a project, the following applies:
 
