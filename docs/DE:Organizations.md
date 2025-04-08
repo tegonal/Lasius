@@ -4,7 +4,7 @@
 
 Lasius ermöglicht das Erfassen von Zeitbuchungen einer Person in mehreren Organisationen. Eine Organisation kann dabei ein Team, eine Organisationseinheit in einer Unternehmen, ein Unternehmen oder eine sonstige Gruppierung abbilden. Diese soll das Zusammenarbeiten in einer Gruppierung unabhängig von einem spezifischen Projekt ermöglichen.
 
-## Rollen und Berechtigungen
+## Rollen und Berechtigungen für Organisationen
 
 In einer Organisation bestehen die Rollen `Member` und `Administrator`. Benutzer mit der Rolle `Member` stehen dabei folgende Funktionen zur Verfügung:
 
@@ -49,7 +49,7 @@ Nach dem Beitreten steht die Organisation dem Benutzer zur Auswahl zur Verfügun
 
 ### Organisation wählen
 
-Ein eingeloggter Benutzer erfasst und verwaltet seine Zeitbuchungen immer im Kontext einer Organisation. Die aktuell ausgewählte Organisation ist für den Benutzer ersichtlich. 
+Ein eingeloggter Benutzer erfasst und verwaltet seine Zeitbuchungen immer im Kontext einer Organisation, auch wenn es sich hierbei um die vorher erwähnte persönliche Organisation handelt. Die aktuell ausgewählte Organisation ist für den Benutzer ersichtlich. 
 
 ![Aktuelle Organisation](images/Lasius_Org_Current.png)
 
@@ -59,7 +59,7 @@ Mittels Klick auf die Organisation kann der Benutzer zu einer ihm zur Verfügung
 
 ## Geplante Arbeitszeiten
 
-Ein Benutzer kann unter `Working hours` seine geplanten Arbeitszeiten je zugewiesener Organisation erfassen.
+Ein Benutzer kann unter `Working hours` seine geplanten Arbeitszeiten je zugewiesener Organisation erfassen. Diese Zeiten werden dazu verwendet, um den Fortschritt der Zeitbuchungen in Bezug auf die geplanten Arbeitszeiten zu visualisieren. In einem geplanten späteren Featuren sollen damit auch einfacher Abwesenheiten erfasst werden können.
 
 ![Geplante Arbeitszeiten](Lasius_Org_Workinghours.png)
 
@@ -67,6 +67,6 @@ Die eingetragenen geplanten Arbeitszeiten dazu, das Arbeits-Soll in Form einer F
 
 ![Aktueller Fortschritt](images/Lasius_TimeBooking_Current_Progress.png)
 
-Zudem wird unter `This Month` eine Zusammenfassung der Soll-Arbeitsstunden in Form von Statistiken (1) oder als kleine Fortschrittsanzeige je Tag (2) zur Verfügung gestellt.
+Zudem wird unter `This Month` eine Zusammenfassung der Soll-Arbeitsstunden in Form von Statistiken (1) oder als Fortschrittsanzeige je Tag (2) zur Verfügung gestellt.
 
 ![Aktueller Monat](images/Lasius_TimeBooking_This_Month.png)

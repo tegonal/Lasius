@@ -30,9 +30,9 @@ On the other hand, tags are also used to automatically group time bookings in th
 
 A tag group is, as the name suggests, a grouping of multiple `tags` that are displayed together under a single name. In the selection list of available tags and in the list of time bookings, tag groups are only displayed under the group name.
 
-However, the corresponding time booking is automatically assigned to all tags assigned to the tag group, so that they are taken into account in the [statistics](Statistics.md#tags) for all tags.
+However, the corresponding time booking is automatically assigned to all tags included in the tag group, so that they are taken into account in the [statistics](Statistics.md#tags) for all tags.
 
-A small example should illustrate this. Two tag groups `Customer Projects` and `Support` are recorded. Both tag groups are assigned the tag `Billable` and additional tags. Time bookings for both tag groups are automatically assigned to the tag `Billable`.
+A small example should illustrate this. Two tag groups `Customer Projects` and `Support` are recorded. Both tag groups include the tag `Billable` and additional tags. Time bookings for both tag groups are automatically assigned to the tag `Billable`.
 
 ## Managing tags and tag groups
 

@@ -25,7 +25,7 @@ Each user can view and export their own time bookings.
 
 ![User statistics layout](images/Lasius_Stats_User.png)
 
-1. Display statistics can be filtered.
+1. Displayed statistics can be filtered.
 2. Total time bookings
 3. Timeline of time bookings, grouped by projects or [tags](#tags)
 4. Aggregated time bookings by projects
@@ -37,7 +37,7 @@ The organization statistics include all time bookings recorded in the context of
 
 ![Organization statistics layout](images/Lasius_Stats_Org.png)
 
-1. Display statistics can be filtered.
+1. Displayed statistics can be filtered.
 2. Total time bookings
 3. Timeline of time bookings, grouped by [tags](#tags) or users
 4. Aggregated time bookings by projects or users

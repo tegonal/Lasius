@@ -5,7 +5,7 @@
 Zeitbuchungen werden nebst der [Organisation](DE%3AOrganisations.md) ebenfalls einem Projekt zugeordnet. Ein Projekt besteht dabei lediglich aus einer frei wählbaren Bezeichnung.
 
 
-## Rollen und Berechtigungen
+## Rollen und Berechtigungen für Projekte
 
 In einer Organisation bestehen die Rollen `Member` und `Administrator`. Benutzer mit der Rolle `Member` stehen dabei folgende Funktionen zur Verfügung:
 

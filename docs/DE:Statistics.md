@@ -13,7 +13,7 @@ Eine Zeitbuchung wird immer den folgenden vier Einheiten zugeordnet:
 - Einen Benutzer
 - Einer Organisation
 - Einem Projekt
-- Ein oder mehreren Tag und/oder Tag-Gruppen
+- Keinem, einem oder mehreren Tag und/oder Tag-Gruppen
 
 Auf Basis dieser Einheiten stehen dem Benutzer je nach Rolle innerhalb des Projektes oder der Organisation verschiedene Ansichten und Exporte auf die Zeitbuchungen zur Verfügung.
 
@@ -25,10 +25,10 @@ Jeder Benutzer kann seine eigenen Zeitbuchungen einsehen und exportieren.
 
 ![Aufbau Benutzer-Statistiken](images/Lasius_Stats_User.png)
 
-1. Mittels einfachem Filter können die anzuzeigenden Statistiken gefiltert werden.
+1. Angezeigte Statistiken können gefiltert werden.
 2. Total der Zeitbuchungen
-3. Zeitlicher Verlauf der Zeitbuchungen, gruppiert nach Projekten oder [Tags](#tags)
-4. Aggregiert und grupperte Zeitbuchungen nach Projekten
+3. Zeitlicher Verlauf der Zeitbuchungen, aggregiert nach Projekten oder [Tags](#tags)
+4. Aggregierte Zeitbuchungen nach Projekten
 5. Aggregierte Zeitbuchungen nach [Tags](#tags)
 
 #### Organisation
@@ -37,10 +37,10 @@ Die Statistiken der Organisation beinhalten alle Zeitbuchungen, welche im Kontex
 
 ![Aufbau Orgamnisations-Statistiken](images/Lasius_Stats_Org.png)
 
-1. Mittels einfachem Filter können die anzuzeigenden Statistiken gefiltert werden.
+1. Angezeigte Statistiken können gefiltert werden.
 2. Total der Zeitbuchungen
-3. Zeitlicher Verlauf der Zeitbuchungen, gruppiert nach [Tags](#tags) oder Benutzer
-4. Aggregiert und grupperte Zeitbuchungen nach Projekten oder Benutzer
+3. Zeitlicher Verlauf der Zeitbuchungen, aggregiert nach [Tags](#tags) oder Benutzer
+4. Aggregierte Zeitbuchungen nach Projekten oder Benutzer
 5. Aggregierte Zeitbuchungen nach [Tags](#tags)
 
 #### Projekte

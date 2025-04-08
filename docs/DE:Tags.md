@@ -4,7 +4,7 @@
 
 ## Erstellen von Zeitbuchungen mit Tags
 
-Zeitbuchungen können mit einem oder mehreren `Tags` erstellt werden. Tags sollen dabei helfen, eine Zeitbuchung zu identifizieren aber auch mehrere Zeitbuchungen einander zuordnen zu können. 
+Zeitbuchungen können mit keinem, einem oder mehreren `Tags` erstellt werden. Tags sollen dabei helfen, eine Zeitbuchung zu identifizieren aber auch mehrere Zeitbuchungen einander zuordnen zu können. 
 
 Beim Erfassen einer Zeitbuchung können entweder manuelle Tags erstellt werden, indem im entsprechenden Eingabefeld ein Text eingetragen wird, oder ein dem ausgewählten Projekt zugewiesenen Tag ausgewählt wird. 
 
@@ -28,7 +28,7 @@ Andererseits werden die Tags auch dazu genutzt, um Zeitbuchungen in den [Statist
 
 Tag-Gruppen ist, wie der Name bereits aussagt, eine Gruppierung von mehreren `Tags`, welche zusammengefasst unter einem Namen angezeigt werden. In der Auswahlliste der zur Verfügung stehenden Tags sowie in der Listen der Zeitbuchungen werden Tag-Gruppen nur unter dem Gruppen-Namen angezeigt. 
 
-Die entsprechende Zugewiesene Zeitbuchung wird dabei aber automatisch allen der Tag-Gruppe zugewiesenen `Tags` zugewiesen, so dass diese in den [Statistiken](DE%3AStatistis.md#Tags) bei allen `Tags` berücksichtigt werden.
+Die entsprechende Zugewiesene Zeitbuchung wird dabei aber automatisch allen in der Tag-Gruppe inkludierten `Tags` zugewiesen, so dass diese in den [Statistiken](DE%3AStatistis.md#Tags) bei allen `Tags` berücksichtigt werden.
 
 Ein kleines Beispiel soll dies Verdeutlichen. Es werden zwei Tag-Gruppen `Kundenprojekte` und `Support` erfasst. Beiden Tag-Gruppen wird das Tag `Verrechenbar`und weitere Tags hinzugefügt. Zeitbuchungen beider Tag-Gruppen werden dabei automatisch dem Tag `Verrechenbar` zugewiesen.
 
