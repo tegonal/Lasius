@@ -21,12 +21,12 @@
 
 package controllers
 
-import core.{DBSession, SystemServices}
+import core.SystemServices
 import models._
 import org.joda.time.DateTime
 import play.api.cache.AsyncCacheApi
 import play.api.libs.json.Json
-import play.api.mvc.{Action, ControllerComponents, Request, Result}
+import play.api.mvc.{Action, ControllerComponents}
 import play.modules.reactivemongo.ReactiveMongoApi
 import repositories.{InvitationRepository, ProjectRepository, UserRepository}
 
