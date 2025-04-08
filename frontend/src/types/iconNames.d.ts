@@ -40,6 +40,7 @@ export type IconNames =
   | 'pencil-2-interface-essential'
   | 'photo-adjust-brightness-images-photography'
   | 'pie-line-graph-interface-essential'
+  | 'question-circle'
   | 'rating-star-add-social-medias-rewards-rating'
   | 'rating-star-social-medias-rewards-rating'
   | 'remove-circle-interface-essential'

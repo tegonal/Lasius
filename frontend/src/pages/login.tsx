@@ -38,6 +38,8 @@
  */
 
 import { CardContainer } from 'components/cardContainer';
+import { ColorModeToggle } from 'components/colorModeToggle';
+import { HelpButton } from 'components/help';
 import { Logo } from 'components/logo';
 import { Icon } from 'components/shared/icon';
 import { BoxInfo } from 'components/shared/notifications/boxInfo';
@@ -60,7 +62,7 @@ import {
 } from 'projectConfig/constants';
 import { useCallback, useEffect, useState } from 'react';
 import { useStore } from 'storeContext/store';
-import { Button } from 'theme-ui';
+import { Button, Flex } from 'theme-ui';
 
 type CustomizedClientSafeProvider = ClientSafeProvider & {
   custom_logo: string | null;
@@ -153,6 +155,10 @@ const Login: NextPage<{
               background: 'containerBackgroundDarker',
             }}
           >
+            <Flex sx={{ alignItems: 'center', gap: 2, justifyContent: 'flex-end' }}>
+              <ColorModeToggle />
+              <HelpButton />
+            </Flex>
             {providers.length > 1 && <BoxInfo>{t('Please choose a login provider')}</BoxInfo>}
             {providers.map((provider) => {
               let icon = undefined;

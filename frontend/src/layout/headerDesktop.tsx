@@ -29,6 +29,7 @@ import { SelectUserOrganisation } from 'components/shared/selectUserOrganisation
 import { useRouter } from 'next/router';
 import { ROUTES } from 'projectConfig/routes';
 import { AnimateChange } from 'components/shared/motion/animateChange';
+import { HelpButton } from 'components/help';
 
 export const HeaderDesktop: React.FC = () => {
   const router = useRouter();
@@ -55,9 +56,10 @@ export const HeaderDesktop: React.FC = () => {
             {showCalendar ? <CalendarWeekResponsive /> : <BookingCurrent inContainer={false} />}
           </Flex>
         </AnimateChange>
-        <Flex sx={{ alignItems: 'center', gap: 4, justifyContent: 'flex-end', pr: 4 }}>
+        <Flex sx={{ alignItems: 'center', gap: 2, justifyContent: 'flex-end', pr: 4 }}>
           <SelectUserOrganisation />
           <ColorModeToggle />
+          <HelpButton />
         </Flex>
       </ContainerColumnsDesktop>
     </Box>
