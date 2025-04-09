@@ -50,7 +50,7 @@ Damit eine Authentisierung via öffentlicher [Gitlab](https://gitlab.com) Instan
 
 https://gitlab.com/-/profile/applications
 
-Danach kann Gitlab über folgende Umgebungsvariablen konfiguriert werden, insofern der Anbieter in der Backend-Konfiguration erfasst wurde:
+Danach kann die Gitlab-Integration über folgende Umgebungsvariablen konfiguriert werden, insofern der Anbieter in der Backend-Konfiguration erfasst wurde:
 
 | Umgebungsvariable | Beschreibung |
 |---|--|
@@ -66,7 +66,7 @@ Für die Integration von [Github](https://github.com) als Authentication Provide
 
 https://github.com/settings/apps
 
-Danach kann Github über folgende Umgebungsvariablen konfiguriert werden, insofern der Anbieter in der Backend-Konfiguration erfasst wurde:
+Danach kann die Github-Integration über folgende Umgebungsvariablen konfiguriert werden, insofern der Anbieter in der Backend-Konfiguration erfasst wurde:
 
 | Umgebungsvariable | Beschreibung |
 |---|--|

@@ -1,7 +1,7 @@
 [DE](DE%3AAuth.md)
 
 
-# Autorization (Login)
+# Authentication (Login)
 
 Lasius supports [OAuth2](https://auth0.com/de/intro-to-iam/what-is-oauth-2) and [OpenId Connect](https://openid.net/developers/how-connect-works/-based user authentication. That allows Lasius to be operated with existing identity providers (IDPs) and support single sign-on or machine-to-machine communication.
 
