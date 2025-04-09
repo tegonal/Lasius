@@ -23,14 +23,12 @@ import { LayoutDesktop } from 'layout/layoutDesktop';
 import { NextPageWithLayout } from 'pages/_app';
 import { Error } from 'components/error';
 import { BookingHistoryLayout } from 'components/bookingHistory/bookingHistoryLayout';
-import { getUserProfile } from 'lib/api/lasius/user/user';
 import { isAdminOfCurrentOrg } from 'lib/api/functions/isAdminOfCurrentOrg';
 import { ModelsUser } from 'lib/api/lasius';
-import { getRequestHeaders } from 'lib/api/hooks/useTokensWithAxiosRequests';
-import { nextAuthOptions } from 'pages/api/auth/[...nextauth]';
-import { getServerSession } from 'next-auth';
+import { useProfile } from 'lib/api/hooks/useProfile';
 
-const ListsPage: NextPageWithLayout = ({ profile }) => {
+const ListsPage: NextPageWithLayout = () => {
+  const { profile } = useProfile();
   if (isAdminOfCurrentOrg(profile as ModelsUser)) {
     return <BookingHistoryLayout dataSource="organisationBookings" />;
   }
@@ -39,13 +37,8 @@ const ListsPage: NextPageWithLayout = ({ profile }) => {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { locale = '' } = context;
-  const session = await getServerSession(context.req, context.res, nextAuthOptions);
-  const profile = session?.access_token
-    ? await getUserProfile(getRequestHeaders(session.access_token, session.access_token_issuer))
-    : undefined;
   return {
     props: {
-      profile,
       ...(await serverSideTranslations(locale, ['common'])),
     },
   };

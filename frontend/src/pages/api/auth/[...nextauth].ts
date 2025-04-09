@@ -36,6 +36,11 @@ import { getRequestHeaders } from 'lib/api/hooks/useTokensWithAxiosRequests';
 const gitlabUrl = process.env.GITLAB_OAUTH_URL || 'https://gitlab.com';
 const githubUrl = 'https://api.github.com/';
 
+type MapType = {
+  [key: string]: boolean;
+};
+const REFRESH_TOKEN_PROGRESS: MapType = {};
+
 const internalProvider: OAuthConfig<any> = {
   id: AUTH_PROVIDER_INTERNAL_LASIUS,
   // wrap into `t` to ensure we have a translation to it
@@ -116,13 +121,20 @@ async function requestRefreshToken(refresh_token: string, provider?: string): Pr
  * returns the old token and an error property
  */
 async function refreshAccessToken(token: JWT): Promise<JWT> {
-  if (process.env.LASIUS_DEBUG) {
-    console.debug('[NextAuth][refreshAccessToken]', token?.refresh_token);
-  }
   if (!token?.refresh_token) {
     return token;
   }
+  if (REFRESH_TOKEN_PROGRESS[token.refresh_token]) {
+    if (process.env.LASIUS_DEBUG) {
+      console.debug('[NextAuth][refreshAccessToken][AlreadyRefreshing]', token.refresh_token);
+    }
+    return token;
+  }
+  if (process.env.LASIUS_DEBUG) {
+    console.debug('[NextAuth][refreshAccessToken]', token?.refresh_token);
+  }
   try {
+    REFRESH_TOKEN_PROGRESS[token.refresh_token] = true;
     const response = await requestRefreshToken(token.refresh_token, token.provider);
 
     const tokensOrError = await response.json();
@@ -155,6 +167,8 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
 
     token.error = 'RefreshAccessTokenError';
     return token;
+  } finally {
+    delete REFRESH_TOKEN_PROGRESS[token.refresh_token];
   }
 }
 const providers = [];

@@ -25,6 +25,7 @@ import com.google.inject.ImplementedBy
 import core.{DBSession, Validation}
 import models._
 import org.joda.time.DateTime
+import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
 import reactivemongo.api.bson.collection.BSONCollection
 import scalaoauth2.provider.AuthInfo
@@ -42,7 +43,8 @@ trait OAuthAccessTokenRepository
       dbSession: DBSession,
       config: LasiusConfig): Future[OAuthAccessToken]
 
-  def findByAuthInfo(authInfo: AuthInfo[OAuthUser])(implicit
+  def findByAuthInfo(authInfo: AuthInfo[OAuthUser],
+                     additionalWhere: (String, JsValueWrapper)*)(implicit
       dbSession: DBSession): Future[Option[OAuthAccessToken]]
 
   def findByRefreshToken(refreshToken: String)(implicit
@@ -83,8 +85,6 @@ class OAuthAccessTokenMongoRepository @Inject() ()(
       dbSession: DBSession,
       config: LasiusConfig): Future[OAuthAccessToken] = {
     for {
-      _ <- findByAuthInfo(authInfo).someToFailed(
-        s"Duplicate accessToken for user ${authInfo.user.id.value} and client ${authInfo.clientId}")
       jwt <- generateJwtAccessToken(authInfo.user).toOption.noneToFailed(
         s"Could not generate jwt access token for user ${authInfo.user.id.value} and client ${authInfo.clientId}")
       newToken <- Future.successful(
@@ -103,10 +103,15 @@ class OAuthAccessTokenMongoRepository @Inject() ()(
     } yield newToken
   }
 
-  override def findByAuthInfo(authInfo: AuthInfo[OAuthUser])(implicit
-      dbSession: DBSession): Future[Option[OAuthAccessToken]] = {
+  override def findByAuthInfo(authInfo: AuthInfo[OAuthUser],
+                              additionalWhere: (String, JsValueWrapper)*)(
+      implicit dbSession: DBSession): Future[Option[OAuthAccessToken]] = {
+    val defaultFilter: Seq[(String, JsValueWrapper)] = Seq(
+      "userId"   -> authInfo.user.id,
+      "clientId" -> authInfo.clientId
+    )
     val sel =
-      Json.obj("userId" -> authInfo.user.id, "clientId" -> authInfo.clientId)
+      Json.obj(additionalWhere ++ defaultFilter: _*)
     findFirst(sel).map(_.map(_._1))
   }
 
@@ -140,11 +145,8 @@ class OAuthAccessTokenMongoRepository @Inject() ()(
       dbSession: DBSession,
       config: LasiusConfig): Future[OAuthAccessToken] = {
     for {
-      existingToken <- findByAuthInfo(authInfo).noneToFailed(
-        s"Could not find existing accessToken for user ${authInfo.user.id.value} and client ${authInfo.clientId}")
-      _ <- failIfNot(
-        existingToken.refreshToken.contains(refreshToken),
-        s"Refresh token of user ${authInfo.user.id.value} and client ${authInfo.clientId} doesn't match")
+      existingToken <- findByAuthInfo(authInfo, "refreshToken" -> refreshToken).noneToFailed(
+        s"Could not find existing accessToken for user ${authInfo.user.id.value}, client ${authInfo.clientId} and refreshToken $refreshToken")
       _        <- remove(Json.obj("id" -> existingToken.id))
       newToken <- create(authInfo)
     } yield newToken

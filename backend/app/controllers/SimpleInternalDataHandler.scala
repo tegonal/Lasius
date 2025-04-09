@@ -76,12 +76,10 @@ class SimpleInternalDataHandler(
     }
 
   def getStoredAccessToken(
-      authInfo: AuthInfo[OAuthUser]): Future[Option[AccessToken]] =
-    withDBSession() { implicit dbSession =>
-      oauthAccessTokenRepository
-        .findByAuthInfo(authInfo)
-        .map(_.map(_.toAccessToken))
-    }
+      authInfo: AuthInfo[OAuthUser]): Future[Option[AccessToken]] = {
+    // always create new token to allow multiple concurrent sessions of the same user
+    Future.successful(None)
+  }
 
   def refreshAccessToken(authInfo: AuthInfo[OAuthUser],
                          refreshToken: String): Future[AccessToken] =

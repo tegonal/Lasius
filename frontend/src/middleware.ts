@@ -23,7 +23,9 @@ import { NextResponse } from 'next/server';
 
 export default withAuth(
   async (request: NextRequestWithAuth) => {
-    console.debug('[Middleware][Request]', request.url, request.nextauth.token);
+    if (process.env.LASIUS_DEBUG) {
+      console.debug('[Middleware][Request]', request.url, request.nextauth.token);
+    }
 
     //
     // This middleware implements a workaround as next-auth has some issues storing the
@@ -39,7 +41,9 @@ export default withAuth(
       request.nextauth.token?.expires_at &&
       Date.now() >= request.nextauth.token.expires_at * 1000
     ) {
-      console.debug('[Middleware][AccessTokenExpired]');
+      if (process.env.LASIUS_DEBUG) {
+        console.debug('[Middleware][AccessTokenExpired]');
+      }
       const session = await fetch(`${process.env.NEXTAUTH_URL}/api/auth/session`, {
         headers: {
           'content-type': 'application/json',
@@ -49,7 +53,9 @@ export default withAuth(
       const json = await session.json();
       const data = Object.keys(json).length > 0 ? json : null;
 
-      console.debug('[Middleware][AccessTokenChanged]', data);
+      if (process.env.LASIUS_DEBUG) {
+        console.debug('[Middleware][AccessTokenChanged]', data);
+      }
       setCookies = session.headers.getSetCookie();
 
       // use cookie already for queued request
@@ -60,7 +66,9 @@ export default withAuth(
           request.cookies.set(cookieName, setCookieValues[0]);
         });
         requestHeaders.set('Cookie', request.cookies.toString());
-        console.debug('[Middleware][Request][UpgradedCookies]', request.cookies);
+        if (process.env.LASIUS_DEBUG) {
+          console.debug('[Middleware][UpgradedCookies]', request.cookies);
+        }
       }
     }
 
@@ -73,7 +81,9 @@ export default withAuth(
       setCookies.forEach((cookie) => {
         res.headers.append('Set-Cookie', cookie);
       });
-      console.debug('[Middleware][Response][SetCookies]', setCookies);
+      if (process.env.LASIUS_DEBUG) {
+        console.debug('[Middleware][Response][SetCookies]', setCookies);
+      }
     }
 
     return res;
@@ -89,7 +99,6 @@ export default withAuth(
 export const config = {
   //  Require authentication for the following routes
   matcher: [
-    '/api/auth/session',
     '/user',
     '/user/(.*)',
     '/organisation',
