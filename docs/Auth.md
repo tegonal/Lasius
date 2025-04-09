@@ -1,27 +1,27 @@
 [DE](DE%3AAuth.md)
 
 
-# Authentisierung (Anmeldung)
+# Autorization (Login)
 
-Lasius supports [OAuth2](https://auth0.com/de/intro-to-iam/what-is-oauth-2) und [OpenId Connect](https://openid.net/developers/how-connect-works/-based user authentication, allowing Lasius to be operated with existing identity providers (IDPs) and supporting single sign-on or machine-to-machine communication.
+Lasius supports [OAuth2](https://auth0.com/de/intro-to-iam/what-is-oauth-2) and [OpenId Connect](https://openid.net/developers/how-connect-works/-based user authentication. That allows Lasius to be operated with existing identity providers (IDPs) and support single sign-on or machine-to-machine communication.
 
-Lasius supports configuring different authentication providers. If multiple authentication providers are configured, they will be displayed to the user for selection. If only one authentication provider is configured, the user will be automatically redirected to the corresponding login mask.
+Lasius supports the configuration of several authentication providers. If multiple authentication providers are configured, they will be displayed to the user for selection. If only one authentication provider is configured, the user will be automatically redirected to the corresponding login mask.
 
 ![Selection of authentication providers](images/Lasius_Login_Provider_Selection.png)
 
 ### Configuration
 
-The available authentication providers must be enabled both in the frontend and backend if login via the Lasius frontend should be possible.
+Available authentication providers must be enabled both in the frontend and backend if login via the Lasius frontend is possible.
 
 #### Backend Configuration
 
-The providers allowed by the backend must be recorded in the backend configuration under the property `lasius.security.external-issuer`s. As a starting point, all previously available providers are provided exemplarily in the `all_providers.conf` configuration. However, it is recommended to copy this configuration according to the application case and only list the providers that should be allowed for login.
-Provider-specific credentials are made available through corresponding environment variables.
+Providers allowed by the backend must be registered in the backend configuration under the property `lasius.security.external-issuer`. As a starting point, all previously available providers are provided as examples in the `all_providers.conf` configuration file. However, it is recommended to copy this configuration according to the application case and to list the providers that should be allowed for login.
+Provider-specific credentials are available through corresponding environment variables.
 
 #### Frontend Configuration
 
-In the frontend, the available authentication providers are automatically activated when the corresponding environment variables are available at startup.
-In the example backend configuration, care was taken to ensure that the providers are also configured using the same environment variables, so that the same `.env` file can be used for both the backend and frontend.
+In the frontend, the available authentication providers are automatically enabled if the corresponding environment variables are available at startup.
+In the example backend configuration, care has been taken to ensure that the providers are also configured whit the same environment variables, so that the same `.env` file can be used for both the backend and the frontend.
 
 ## Providers
 
@@ -50,7 +50,7 @@ To enable authentication via a public [Gitlab](https://gitlab.com) instance or a
 
 https://gitlab.com/-/profile/applications
 
-Afterwards, Gitlab can be configured using the following environment variables, provided that the provider has been recorded in the backend configuration:
+Once the provider is entered in the backend configuration, Gitlab integration can be configured using the following environment variables:
 
 | Environment variable | Description |
 |---|--|
@@ -66,7 +66,7 @@ To integrate  [Github](https://github.com) as an authentication provider, the ap
 
 https://github.com/settings/apps
 
-Afterwards, Github can be configured using the following environment variables, provided that the provider has been recorded in the backend configuration:
+Once the provider is entered in the backend configuration, Github integration can be configured using the following environment variables:
 
 | Environment variable | Description |
 |---|--|
@@ -78,7 +78,7 @@ Afterwards, Github can be configured using the following environment variables, 
 
 Lasius supports the integration of a [Keycloak](https://keycloak.org) instance as an authentication provider. To do this, a corresponding [OpenID Connect client](https://www.keycloak.org/docs/latest/server_admin/index.html#_oidc_clients) must be registered in the Keycloak instance.
 
-Afterwards, the Keycloak instance can be configured using the following environment variables, provided that the provider has been recorded in the backend configuration:
+Once the client is entered in the Keycloak configuration, Keycloak integration can be configured using the following environment variables:
 
 | Environment variable | Description |
 |---|--|
