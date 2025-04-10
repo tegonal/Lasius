@@ -72,12 +72,13 @@ class UserFavoritesController @Inject() (
                                userProject.projectReference,
                                request.body.tags)
               } yield {
-                clientReceiver ! (subject.userReference.id, FavoriteAdded(
+                clientReceiver ! (
                   subject.userReference.id,
-                  orgId,
-                  BookingStub(userProject.projectReference,
-                              request.body.tags)), List(
-                  subject.userReference.id))
+                  FavoriteAdded(subject.userReference.id,
+                                orgId,
+                                BookingStub(userProject.projectReference,
+                                            request.body.tags)),
+                  List(subject.userReference.id))
                 Ok(Json.toJson(favorites))
               }
           }
@@ -99,12 +100,13 @@ class UserFavoritesController @Inject() (
                                   BookingStub(userProject.projectReference,
                                               request.body.tags))
               } yield {
-                clientReceiver ! (subject.userReference.id, FavoriteRemoved(
+                clientReceiver ! (
                   subject.userReference.id,
-                  orgId,
-                  BookingStub(userProject.projectReference,
-                              request.body.tags)), List(
-                  subject.userReference.id))
+                  FavoriteRemoved(subject.userReference.id,
+                                  orgId,
+                                  BookingStub(userProject.projectReference,
+                                              request.body.tags)),
+                  List(subject.userReference.id))
                 Ok(Json.toJson(favorites))
               }
           }

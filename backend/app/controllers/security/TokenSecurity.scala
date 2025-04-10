@@ -129,7 +129,7 @@ trait TokenSecurity extends Logging with ConfigAware with FutureHelper {
       accessConfig =>
         logger.debug(
           s"validateSubjectHasAccess: $accessConfig => ${token.getSubject} == ${accessConfig
-            .canAccess(token.getSubject)}")
+              .canAccess(token.getSubject)}")
         accessConfig.canAccess(token.getSubject)
     }
   }

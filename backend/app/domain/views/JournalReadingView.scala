@@ -50,7 +50,7 @@ trait JournalReadingView extends Actor with ActorLogging {
       .readJournalFor[ScalaDslMongoReadJournal](MongoReadJournal.Identifier)
 
   override val supervisorStrategy: OneForOneStrategy =
-    OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1 minute) {
+    OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1.minute) {
       case _ =>
         Restart
     }

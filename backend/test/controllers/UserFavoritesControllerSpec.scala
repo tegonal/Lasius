@@ -173,6 +173,7 @@ object UserFavoritesControllerMock extends MockAwaitable with Mockito {
       authConfig = authConfig,
       reactiveMongoApi = reactiveMongoApi,
       userFavoritesRepository = userFavoritesRepository,
-      clientReceiver = clientReceiver) with SecurityControllerMock
+      clientReceiver = clientReceiver
+    ) with SecurityControllerMock
   }
 }

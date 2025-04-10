@@ -199,9 +199,11 @@ class CurrentOrganisationTimeBookingsView(
     if (!today.isAfter(day)) {
       val orgMembers = newState.timeBookings.keys
       log.debug(s"Notify org members:$orgMembers -> $newState")
-      clientReceiver ! (userId, CurrentOrganisationTimeBookings(
-        organisationId,
-        newState.timeBookings.values.toSeq.flatten), orgMembers.toList)
+      clientReceiver ! (userId,
+                        CurrentOrganisationTimeBookings(
+                          organisationId,
+                          newState.timeBookings.values.toSeq.flatten),
+                        orgMembers.toList)
     }
   }
 }

@@ -2,7 +2,7 @@
 //  "https://repo.typesafe.com/typesafe/releases/")
 
 // The Play plugin
-addSbtPlugin("org.playframework" % "sbt-plugin" % "3.0.6")
+addSbtPlugin("org.playframework" % "sbt-plugin" % "3.0.7")
 
 addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.4")
 

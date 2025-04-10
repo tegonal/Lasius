@@ -43,16 +43,17 @@ class InvitationsControllerMock(
     authConfig: AuthConfig,
     reactiveMongoApi: ReactiveMongoApi,
     override val userActive: Boolean)(implicit ec: ExecutionContext)
-    extends InvitationsController(conf = config,
-                                  controllerComponents = controllerComponents,
-                                  systemServices = systemServices,
-                                  authConfig = authConfig,
-                                  reactiveMongoApi = reactiveMongoApi,
-                                  userRepository = userMongoRepository,
-                                  organisationRepository =
-                                    organisationRepository,
-                                  invitationRepository = invitationRepository,
-                                  projectRepository = projectRepository)
+    extends InvitationsController(
+      conf = config,
+      controllerComponents = controllerComponents,
+      systemServices = systemServices,
+      authConfig = authConfig,
+      reactiveMongoApi = reactiveMongoApi,
+      userRepository = userMongoRepository,
+      organisationRepository = organisationRepository,
+      invitationRepository = invitationRepository,
+      projectRepository = projectRepository
+    )
     with SecurityControllerMock
     with TestDBSupport {
 
@@ -85,7 +86,8 @@ object InvitationsControllerMock
       projectRepository = projectMongoRepository,
       authConfig = authConfig,
       reactiveMongoApi = reactiveMongoApi,
-      userActive = userActive)
+      userActive = userActive
+    )
 
     // initialize data
     controller

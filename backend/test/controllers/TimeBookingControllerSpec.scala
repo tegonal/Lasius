@@ -265,6 +265,7 @@ object TimeBookingControllerMock extends MockAwaitable with Mockito {
       controllerComponents = Helpers.stubControllerComponents(),
       authConfig = authConfig,
       reactiveMongoApi = reactiveMongoApi,
-      systemServices = systemServices) with SecurityControllerMock
+      systemServices = systemServices
+    ) with SecurityControllerMock
   }
 }

@@ -53,7 +53,7 @@ trait BaseRepository[T <: BaseEntity[ID], ID <: BaseId[_]]
       dbSession: DBSession): BSONCollection
 
   def failoverStrategy: FailoverStrategy =
-    FailoverStrategy(initialDelay = 100 milliseconds, retries = 16)
+    FailoverStrategy(initialDelay = 100.milliseconds, retries = 16)
 
   def upsert(
       t: T)(implicit writer: Writes[ID], dbSession: DBSession): Future[Unit]

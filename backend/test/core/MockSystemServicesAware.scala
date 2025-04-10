@@ -97,7 +97,7 @@ class MockServices(actorSystem: ActorSystem) extends SystemServices {
   )
   override val systemSubject: Subject =
     Subject("", userInfo, systemUserReference)
-  implicit val timeout: Timeout = Timeout(5 seconds) // needed for `?` below
+  implicit val timeout: Timeout = Timeout(5.seconds) // needed for `?` below
   val duration: Duration        = Duration.create(5, SECONDS)
   val timeBookingViewService: ActorRef = TestProbe().ref
 

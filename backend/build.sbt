@@ -12,7 +12,7 @@ lazy val root = (project in file("."))
                  AutomateHeaderPlugin)
   .settings(
     RoutesKeys.routesImport += "binders.Binders._",
-    swaggerV3 := true,
+    swaggerV3  := true,
     maintainer := "Tegonal Genossenschaft, https://tegonal.com"
   )
 
@@ -44,6 +44,7 @@ val playVersion              = "3.0.5"
 // Play framework 3.x is still bound to older guice version
 val guiceVersion      = "6.0.0"
 val pureConfigVersion = "0.17.8"
+val jacksonVersion    = "2.18.3"
 
 libraryDependencies ++= Seq(
   "org.reactivemongo" %% "play2-reactivemongo" % reactiveMongoPlayVersion,
@@ -64,10 +65,10 @@ libraryDependencies ++= Seq(
   "org.apache.pekko" %% "pekko-persistence-testkit"   % pekkoVersion % "test",
   // reativemongo based connector for persistent akka
   "org.mindrot"         % "jbcrypt"                   % "0.4",
-  "de.flapdoodle.embed" % "de.flapdoodle.embed.mongo" % "4.18.1" % "test",
-  "io.github.alstanchev" % "pekko-persistence-inmemory_2.13" % "1.2.1" % "test",
+  "de.flapdoodle.embed" % "de.flapdoodle.embed.mongo" % "4.20.0" % "test",
+  "io.github.alstanchev" % "pekko-persistence-inmemory_2.13" % "1.3.0" % "test",
   "io.kontainers"       %% "purecsv"                         % "1.3.10",
-  "com.chuusai"         %% "shapeless"                       % "2.3.12",
+  "com.chuusai"         %% "shapeless"                       % "2.3.13",
   "net.openhft"          % "zero-allocation-hashing"         % "0.27ea0",
   "com.github.pureconfig" %% "pureconfig" % pureConfigVersion,
   // depend on this plugin to be able to provide custom OutputTransformer
@@ -87,14 +88,14 @@ libraryDependencies ++= Seq(
   ws,
   specs2 % Test,
   guice,
-  "org.webjars" % "swagger-ui" % "5.18.3"
+  "org.webjars" % "swagger-ui" % "5.20.7"
 )
 
 dependencyOverrides ++= Seq(
-  "com.fasterxml.jackson.module" % "jackson-module-scala_2.13" % "2.18.2",
-  "com.fasterxml.jackson.core"   % "jackson-databind"          % "2.18.2",
-  "com.fasterxml.jackson.core"   % "jackson-core"              % "2.18.2",
-  "com.fasterxml.jackson.core"   % "jackson-annotations"       % "2.18.2",
+  "com.fasterxml.jackson.module" % "jackson-module-scala_2.13" % jacksonVersion,
+  "com.fasterxml.jackson.core"   % "jackson-databind"          % jacksonVersion,
+  "com.fasterxml.jackson.core"   % "jackson-core"              % jacksonVersion,
+  "com.fasterxml.jackson.core"   % "jackson-annotations"       % jacksonVersion,
 )
 
 Test / javaOptions += "-Dconfig.file=conf/test.conf"

@@ -46,7 +46,7 @@ object LazyMongo {
   lazy val mongo: ReactiveMongoApi = {
     lazy val rnd    = new scala.util.Random
     lazy val range  = 12000 to 12999
-    lazy val port   = range(rnd.nextInt(range length))
+    lazy val port   = range(rnd.nextInt(range.length))
     lazy val dbName = BSONObjectID.generate().stringify
 
     lazy val logger = LoggerFactory.getLogger(getClass.getName)
@@ -72,14 +72,15 @@ object LazyMongo {
     mongod.start(Version.Main.V7_0)
 
     implicit lazy val app: Application = new GuiceApplicationBuilder()
-      .configure(Map(
-        ("mongodb.uri",
-         s"mongodb://localhost:$port/$dbName?w=majority&readConcernLevel=majority&maxPoolSize=1&rm.nbChannelsPerNode=1"),
-        ("mongodb.channels", "1"),
-        ("akka.contrib.persistence.mongodb.mongo.urls",
-         List(s"localhost:$port")),
-        ("akka.contrib.persistence.mongodb.mongo.db", dbName)
-      ))
+      .configure(
+        Map(
+          ("mongodb.uri",
+           s"mongodb://localhost:$port/$dbName?w=majority&readConcernLevel=majority&maxPoolSize=1&rm.nbChannelsPerNode=1"),
+          ("mongodb.channels", "1"),
+          ("akka.contrib.persistence.mongodb.mongo.urls",
+           List(s"localhost:$port")),
+          ("akka.contrib.persistence.mongodb.mongo.db", dbName)
+        ))
       .build()
 
     lazy val reactiveMongoApi = app.injector.instanceOf[ReactiveMongoApi]

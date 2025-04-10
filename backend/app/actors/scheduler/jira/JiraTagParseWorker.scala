@@ -75,7 +75,7 @@ class JiraTagParseWorker(wsClient: WSClient,
 
   val receive: Receive = { case StartParsing =>
     cancellable = Some(
-      context.system.scheduler.scheduleOnce(0 milliseconds, self, Parse))
+      context.system.scheduler.scheduleOnce(0.milliseconds, self, Parse))
     context.become(parsing)
   }
 
@@ -103,7 +103,7 @@ class JiraTagParseWorker(wsClient: WSClient,
         log.debug(s"andThen:restart time $s")
         cancellable = Some(
           context.system.scheduler
-            .scheduleOnce(settings.checkFrequency milliseconds, self, Parse))
+            .scheduleOnce(settings.checkFrequency.milliseconds, self, Parse))
       }
   }
 

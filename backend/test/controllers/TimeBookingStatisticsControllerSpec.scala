@@ -122,7 +122,7 @@ object TimeBookingStatisticsControllerMock extends MockAwaitable with Mockito {
       authConfig = authConfig,
       reactiveMongoApi = reactiveMongoApi,
       bookingByProjectRepository = bookingByProjectRepository,
-      bookingByTagRepository = bookingByTagRepository)
-      with SecurityControllerMock
+      bookingByTagRepository = bookingByTagRepository
+    ) with SecurityControllerMock
   }
 }

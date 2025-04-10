@@ -60,7 +60,7 @@ class CurrentUserTimeBookingsView(val clientReceiver: ClientReceiver,
     CurrentTimeBookings(None, LocalDate.now, Map())
 
   @unused
-  def autoUpdateInterval: FiniteDuration = 100 millis
+  def autoUpdateInterval: FiniteDuration = 100.millis
 
   override val receive: Receive = ({ case InitializeCurrentTimeBooking(state) =>
     this.state = state

@@ -46,16 +46,17 @@ class OrganisationsControllerMock(
     override val organisationRole: OrganisationRole,
     override val isOrganisationPrivate: Boolean,
     override val organisationActive: Boolean)(implicit ec: ExecutionContext)
-    extends OrganisationsController(conf = config,
-                                    controllerComponents = controllerComponents,
-                                    systemServices = systemServices,
-                                    authConfig = authConfig,
-                                    reactiveMongoApi = reactiveMongoApi,
-                                    organisationRepository =
-                                      organisationRepository,
-                                    userRepository = userMongoRepository,
-                                    invitationRepository = invitationRepository,
-                                    projectRepository = projectRepository)
+    extends OrganisationsController(
+      conf = config,
+      controllerComponents = controllerComponents,
+      systemServices = systemServices,
+      authConfig = authConfig,
+      reactiveMongoApi = reactiveMongoApi,
+      organisationRepository = organisationRepository,
+      userRepository = userMongoRepository,
+      invitationRepository = invitationRepository,
+      projectRepository = projectRepository
+    )
     with SecurityControllerMock
     with TestDBSupport {
 
@@ -92,7 +93,8 @@ object OrganisationsControllerMock
       reactiveMongoApi = reactiveMongoApi,
       isOrganisationPrivate = isOrganisationPrivate,
       organisationActive = organisationActive,
-      organisationRole = organisationRole)
+      organisationRole = organisationRole
+    )
 
     // initialize data
     controller

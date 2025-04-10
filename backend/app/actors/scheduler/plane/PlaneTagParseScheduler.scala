@@ -56,7 +56,7 @@ class PlaneTagParseScheduler(wsClient: WSClient, systemServices: SystemServices)
   var workers: Map[UUID, ActorRef] = Map()
 
   override val supervisorStrategy: OneForOneStrategy =
-    OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1 minute) {
+    OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1.minute) {
       case _ => Restart
     }
 

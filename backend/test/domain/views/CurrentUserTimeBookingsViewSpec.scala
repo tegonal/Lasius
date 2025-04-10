@@ -84,9 +84,12 @@ class CurrentUserTimeBookingsViewSpec extends Specification with Mockito {
       probe.expectMsg(Ack)
 
       there.was(
-        one(clientReceiver) ! (org.mockito.ArgumentMatchers
-          .eq(userReference.id), org.mockito.ArgumentMatchers
-          .eq(state), org.mockito.ArgumentMatchers.eq(List(userReference.id))))
+        one(clientReceiver) ! (
+          org.mockito.ArgumentMatchers
+            .eq(userReference.id),
+          org.mockito.ArgumentMatchers
+            .eq(state),
+          org.mockito.ArgumentMatchers.eq(List(userReference.id))))
     }
   }
 
@@ -138,9 +141,12 @@ class CurrentUserTimeBookingsViewSpec extends Specification with Mockito {
                                None,
                                Duration.ZERO))
       there.was(
-        one(clientReceiver) ! (org.mockito.ArgumentMatchers
-          .eq(userReference.id), org.mockito.ArgumentMatchers
-          .eq(state), org.mockito.ArgumentMatchers.eq(List(userReference.id))))
+        one(clientReceiver) ! (
+          org.mockito.ArgumentMatchers
+            .eq(userReference.id),
+          org.mockito.ArgumentMatchers
+            .eq(state),
+          org.mockito.ArgumentMatchers.eq(List(userReference.id))))
     }
   }
 
@@ -193,9 +199,12 @@ class CurrentUserTimeBookingsViewSpec extends Specification with Mockito {
                                None,
                                Duration.ZERO))
       there.was(
-        one(clientReceiver) ! (org.mockito.ArgumentMatchers
-          .eq(userReference.id), org.mockito.ArgumentMatchers
-          .eq(state), org.mockito.ArgumentMatchers.eq(List(userReference.id))))
+        one(clientReceiver) ! (
+          org.mockito.ArgumentMatchers
+            .eq(userReference.id),
+          org.mockito.ArgumentMatchers
+            .eq(state),
+          org.mockito.ArgumentMatchers.eq(List(userReference.id))))
     }
 
     "adjusted daily total of booking when editing booking" in new PersistentActorTestScope {
@@ -236,9 +245,12 @@ class CurrentUserTimeBookingsViewSpec extends Specification with Mockito {
       probe.expectMsg(Ack)
 
       there.was(
-        one(clientReceiver) ! (org.mockito.ArgumentMatchers
-          .eq(userReference.id), org.mockito.ArgumentMatchers
-          .eq(state), org.mockito.ArgumentMatchers.eq(List(userReference.id))))
+        one(clientReceiver) ! (
+          org.mockito.ArgumentMatchers
+            .eq(userReference.id),
+          org.mockito.ArgumentMatchers
+            .eq(state),
+          org.mockito.ArgumentMatchers.eq(List(userReference.id))))
 
       // edit time booking
       val newDuration = Duration.standardHours(4)
@@ -254,9 +266,13 @@ class CurrentUserTimeBookingsViewSpec extends Specification with Mockito {
                                 end = Some(end.toLocalDateTimeWithZone()))))
       probe.expectMsg(Ack)
 
-      there.was(one(clientReceiver) ! (org.mockito.ArgumentMatchers
-        .eq(userReference.id), org.mockito.ArgumentMatchers
-        .eq(newState), org.mockito.ArgumentMatchers.eq(List(userReference.id))))
+      there.was(
+        one(clientReceiver) ! (
+          org.mockito.ArgumentMatchers
+            .eq(userReference.id),
+          org.mockito.ArgumentMatchers
+            .eq(newState),
+          org.mockito.ArgumentMatchers.eq(List(userReference.id))))
     }
   }
 
@@ -321,9 +337,13 @@ class CurrentUserTimeBookingsViewSpec extends Specification with Mockito {
                                None,
                                Duration.ZERO))
 
-      there.was(one(clientReceiver) ! (org.mockito.ArgumentMatchers
-        .eq(userReference.id), org.mockito.ArgumentMatchers
-        .eq(newState), org.mockito.ArgumentMatchers.eq(List(userReference.id))))
+      there.was(
+        one(clientReceiver) ! (
+          org.mockito.ArgumentMatchers
+            .eq(userReference.id),
+          org.mockito.ArgumentMatchers
+            .eq(newState),
+          org.mockito.ArgumentMatchers.eq(List(userReference.id))))
     }
 
     "adjusted daily total of booking when current booking in same day was deleted" in new PersistentActorTestScope {
@@ -382,9 +402,13 @@ class CurrentUserTimeBookingsViewSpec extends Specification with Mockito {
       val newState = CurrentUserTimeBookingEvent(
         CurrentUserTimeBooking(userReference, day, None, None, duration))
 
-      there.was(one(clientReceiver) ! (org.mockito.ArgumentMatchers
-        .eq(userReference.id), org.mockito.ArgumentMatchers
-        .eq(newState), org.mockito.ArgumentMatchers.eq(List(userReference.id))))
+      there.was(
+        one(clientReceiver) ! (
+          org.mockito.ArgumentMatchers
+            .eq(userReference.id),
+          org.mockito.ArgumentMatchers
+            .eq(newState),
+          org.mockito.ArgumentMatchers.eq(List(userReference.id))))
     }
   }
 }
