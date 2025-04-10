@@ -65,7 +65,7 @@ libraryDependencies ++= Seq(
   // reativemongo based connector for persistent akka
   "org.mindrot"         % "jbcrypt"                   % "0.4",
   "de.flapdoodle.embed" % "de.flapdoodle.embed.mongo" % "4.18.1" % "test",
-  "io.github.alstanchev" % "pekko-persistence-inmemory_2.13" % "1.2.1" % "test",
+  "io.github.alstanchev" % "pekko-persistence-inmemory_2.13" % "1.3.0" % "test",
   "io.kontainers"       %% "purecsv"                         % "1.3.10",
   "com.chuusai"         %% "shapeless"                       % "2.3.12",
   "net.openhft"          % "zero-allocation-hashing"         % "0.27ea0",
