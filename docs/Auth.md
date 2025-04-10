@@ -50,6 +50,8 @@ To enable authentication via a public [Gitlab](https://gitlab.com) instance or a
 
 https://gitlab.com/-/profile/applications
 
+The callback-Url need to be created based on the following pattern: `https://<hostname>/api/auth/callback/gitlab`, where `<hostname>` needs to be replaced with the public name of the lasius instance. Die application needs to have the scopes `openid`, `profile` and `email`.
+
 Once the provider is entered in the backend configuration, Gitlab integration can be configured using the following environment variables:
 
 | Environment variable | Description |
@@ -62,9 +64,11 @@ Once the provider is entered in the backend configuration, Gitlab integration ca
 
 ### Github
 
-To integrate  [Github](https://github.com) as an authentication provider, the application must be registered with Github:
+To integrate  [Github](https://github.com) as an authentication provider, the Oauth application must be registered with Github:
 
-https://github.com/settings/apps
+https://github.com/settings/developers
+
+The callback-Url need to be created based on the following pattern: `https://<hostname>/api/auth/callback/github`, where `<hostname>` needs to be replaced with the public name of the lasius instance.
 
 Once the provider is entered in the backend configuration, Github integration can be configured using the following environment variables:
 
@@ -72,11 +76,13 @@ Once the provider is entered in the backend configuration, Github integration ca
 |---|--|
 | GITHUB_OAUTH_CLIENT_ID | Client ID of the application registered with Github |
 | GITHUB_OAUTH_CLIENT_SECRET | Client secret of the application registered with Github |
-| GITHUB_OAUTH_APPLICATION_ID | ID of the application registered with Github |
+| GITHUB_OAUTH_APPLICATION_ID | ID of the application registered with Github. This ID needs to be read from the URL path in the detail view of the application, i.e.:  ![Github application id](images/Lasius_Github_ApplicationId.png) |
 
 ### Keycloak
 
 Lasius supports the integration of a [Keycloak](https://keycloak.org) instance as an authentication provider. To do this, a corresponding [OpenID Connect client](https://www.keycloak.org/docs/latest/server_admin/index.html#_oidc_clients) must be registered in the Keycloak instance.
+
+The callback-Url need to be created based on the following pattern: `https://<hostname>/api/auth/callback/custom_keycloak`, where `<hostname>` needs to be replaced with the public name of the lasius instance.
 
 Once the client is entered in the Keycloak configuration, Keycloak integration can be configured using the following environment variables:
 

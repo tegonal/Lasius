@@ -50,6 +50,8 @@ Damit eine Authentisierung via öffentlicher [Gitlab](https://gitlab.com) Instan
 
 https://gitlab.com/-/profile/applications
 
+Die Callback-Url muss wie folgt erfasst werden: `https://<hostname>/api/auth/callback/gitlab`, wobei `<hostname>` mit dem öffentlich erreichbaren Namen der Instanz ersetzt werden muss. Die Applikation benötigt die Scopes `openid`, `profile` und `email`.
+
 Danach kann die Gitlab-Integration über folgende Umgebungsvariablen konfiguriert werden, insofern der Anbieter in der Backend-Konfiguration erfasst wurde:
 
 | Umgebungsvariable | Beschreibung |
@@ -62,9 +64,11 @@ Danach kann die Gitlab-Integration über folgende Umgebungsvariablen konfigurier
 
 ### Github
 
-Für die Integration von [Github](https://github.com) als Authentication Provider muss die Applikation bei github erfasst werden:
+Für die Integration von [Github](https://github.com) als Authentication Provider muss die OAuth Applikation bei github erfasst werden:
 
-https://github.com/settings/apps
+https://github.com/settings/developers
+
+Die Callback-Url muss wie folgt erfasst werden: `https://<hostname>/api/auth/callback/github`, wobei `<hostname>` mit dem öffentlich erreichbaren Namen der Instanz ersetzt werden muss.
 
 Danach kann die Github-Integration über folgende Umgebungsvariablen konfiguriert werden, insofern der Anbieter in der Backend-Konfiguration erfasst wurde:
 
@@ -72,11 +76,16 @@ Danach kann die Github-Integration über folgende Umgebungsvariablen konfigurier
 |---|--|
 | GITHUB_OAUTH_CLIENT_ID | Client Id der bei Github registrierten Applikation |
 | GITHUB_OAUTH_CLIENT_SECRET | Client secret der bei Github registrierten Applikation |
-| GITHUB_OAUTH_APPLICATION_ID | Id der bei Github registrierten Applikation |
+| GITHUB_OAUTH_APPLICATION_ID | Id der bei Github registrierten Applikation. Diese ID muss aus dem URL-Pfad in der Detailansicht der Applikation gelesen werden, bspw.:  ![Github application id](images/Lasius_Github_ApplicationId.png) |
+
+
 
 ### Keycloak
 
 Lasius unterstützt die Integration einer [Keycloak](https://keycloak.org) Instanz als Authentication Provider. Dazu muss in der Keycloak Instanz ein entsprechender [OpenID Connect Client](https://www.keycloak.org/docs/latest/server_admin/index.html#_oidc_clients) registriert werden. 
+
+
+Die Callback-Url muss wie folgt erfasst werden: `https://<hostname>/api/auth/callback/custom_keycloak`, wobei `<hostname>` mit dem öffentlich erreichbaren Namen der Instanz ersetzt werden muss.
 
 
 Danach kann die Keycloak Instanz über folgende Umgebungsvariablen konfiguriert werden, insofern der Anbieter in der Backend-Konfiguration erfasst wurde:
