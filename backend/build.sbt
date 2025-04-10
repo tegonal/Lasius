@@ -67,7 +67,7 @@ libraryDependencies ++= Seq(
   "de.flapdoodle.embed" % "de.flapdoodle.embed.mongo" % "4.18.1" % "test",
   "io.github.alstanchev" % "pekko-persistence-inmemory_2.13" % "1.2.1" % "test",
   "io.kontainers"       %% "purecsv"                         % "1.3.10",
-  "com.chuusai"         %% "shapeless"                       % "2.3.12",
+  "com.chuusai"         %% "shapeless"                       % "2.3.13",
   "net.openhft"          % "zero-allocation-hashing"         % "0.27ea0",
   "com.github.pureconfig" %% "pureconfig" % pureConfigVersion,
   // depend on this plugin to be able to provide custom OutputTransformer
