@@ -27,11 +27,14 @@ import { useRouter } from 'next/router';
 import { getNavigation, NavigationRouteType } from 'projectConfig/routes';
 import { useOrganisation } from 'lib/api/hooks/useOrganisation';
 import { useIsClient } from 'usehooks-ts';
+import { useSession } from 'next-auth/react';
+import { AUTH_PROVIDER_INTERNAL_LASIUS } from 'projectConfig/constants';
 
 const NavigationButton: React.FC<{ item: NavigationRouteType }> = ({ item }) => {
   const router = useRouter();
   const { t } = useTranslation('common');
   const isClient = useIsClient();
+
   if (!isClient) return null;
 
   return (
@@ -53,12 +56,14 @@ type Props = {
 
 export const NavigationTabContent: React.FC<Props> = ({ branch }) => {
   const { isAdministrator } = useOrganisation();
+  const session = useSession();
 
   return (
     <Flex sx={{ ...flexColumnJustifyStartAlignStart(3) }}>
       {getNavigation({
         id: branch,
         isOrganisationAdministrator: isAdministrator,
+        isUserOfInternalOAuthProvider: session.data?.provider === AUTH_PROVIDER_INTERNAL_LASIUS,
       }).map((item) => (
         <NavigationButton key={item.name} item={item} />
       ))}

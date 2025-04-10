@@ -21,6 +21,8 @@
 
 package core
 
+import com.typesafe.config.ConfigFactory
+import com.typesafe.config.Config
 import org.apache.pekko.actor.ActorSystem
 import play.api.{ApplicationLoader, Logger}
 import play.api.i18n.Lang
@@ -34,6 +36,7 @@ import scala.concurrent.Future
 
 class CustomApplicationLoader extends GuiceApplicationLoader with ConfigAware {
   lazy val logger: Logger = Logger(getClass.getName)
+  lazy val conf: Config   = ConfigFactory.load()
 
   protected override def overrides(
       context: ApplicationLoader.Context): Seq[GuiceableModule] = {

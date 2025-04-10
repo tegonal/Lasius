@@ -17,184 +17,220 @@
  *
  */
 
-import React, { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { Button, Input, Label } from 'theme-ui';
-import { isEmailAddress } from 'lib/validators';
-import { GetServerSideProps, NextPage } from 'next';
-import { FormErrorBadge } from 'components/forms/formErrorBadge';
-import { getCsrfToken, signIn } from 'next-auth/react';
-import { CardContainer } from 'components/cardContainer';
-import { LoginLayout } from 'layout/pages/login/loginLayout';
-import { Logo } from 'components/logo';
-import { FormElement } from 'components/forms/formElement';
-import { FormBody } from 'components/forms/formBody';
-import { BoxWarning } from 'components/shared/notifications/boxWarning';
-import { useRouter } from 'next/router';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { Trans, useTranslation } from 'next-i18next';
-import { LoginError } from 'dynamicTranslationStrings';
-import { logger } from 'lib/logger';
-import { TegonalFooter } from 'components/shared/tegonalFooter';
-import { BoxInfo } from 'components/shared/notifications/boxInfo';
-import { P } from 'components/tags/p';
-import { Link } from '@theme-ui/components';
-import { LASIUS_DEMO_MODE } from 'projectConfig/constants';
-import { usePlausible } from 'next-plausible';
-import { LasiusPlausibleEvents } from 'lib/telemetry/plausibleEvents';
-import { useStore } from 'storeContext/store';
-import { formatISOLocale } from 'lib/dates';
+'use server';
+/**
+ * Lasius - Open source time tracker for teams
+ * Copyright (c) Tegonal Genossenschaft (https://tegonal.com)
+ *
+ * This file is part of Lasius.
+ *
+ * Lasius is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * Lasius is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with Lasius.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
 
-const Login: NextPage<{ csrfToken: string }> = ({ csrfToken }) => {
+import { CardContainer } from 'components/cardContainer';
+import { ColorModeToggle } from 'components/colorModeToggle';
+import { HelpButton } from 'components/help';
+import { Logo } from 'components/logo';
+import { Icon } from 'components/shared/icon';
+import { BoxInfo } from 'components/shared/notifications/boxInfo';
+import { BoxWarning } from 'components/shared/notifications/boxWarning';
+import { TegonalFooter } from 'components/shared/tegonalFooter';
+import { LoginLayout } from 'layout/pages/login/loginLayout';
+import { getConfiguration } from 'lib/api/lasius/general/general';
+import { formatISOLocale } from 'lib/dates';
+import { LasiusPlausibleEvents } from 'lib/telemetry/plausibleEvents';
+import { GetServerSideProps, NextPage } from 'next';
+import { getProviders, getCsrfToken, signIn, ClientSafeProvider } from 'next-auth/react';
+import { Trans, useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { usePlausible } from 'next-plausible';
+import Image from 'next/image';
+import { useRouter } from 'next/router';
+import {
+  AUTH_PROVIDER_CUSTOMER_KEYCLOAK,
+  AUTH_PROVIDER_INTERNAL_LASIUS,
+} from 'projectConfig/constants';
+import { useCallback, useEffect, useState } from 'react';
+import { useStore } from 'storeContext/store';
+import { Button, Flex } from 'theme-ui';
+
+type CustomizedClientSafeProvider = ClientSafeProvider & {
+  custom_logo: string | null;
+};
+
+const Login: NextPage<{
+  csrfToken: string;
+  providers: CustomizedClientSafeProvider[];
+}> = ({ csrfToken, providers }) => {
   const plausible = usePlausible<LasiusPlausibleEvents>();
   const store = useStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<keyof typeof LoginError>();
   const { t } = useTranslation('common');
   const router = useRouter();
-  const { invitationId = null, email = null, registered = null } = router.query;
+  const { invitation_id = null, email = null, error = null } = router.query;
 
-  const {
-    register,
-    handleSubmit,
-    setFocus,
-    getValues,
-    setValue,
-    formState: { errors },
-  } = useForm({
-    mode: 'onChange',
-    defaultValues: { email: email || '', password: '', csrfToken },
-  });
+  const signInToProvider = useCallback(
+    async (provider: string) => {
+      plausible('login', {
+        props: {
+          status: 'start',
+          provider: provider,
+        },
+      });
+
+      setIsSubmitting(true);
+
+      const callbackUrl = invitation_id ? '/join/' + invitation_id : '/user/home';
+      const res = await signIn(
+        provider,
+        {
+          csrfToken: csrfToken,
+          redirect: false,
+          callbackUrl: callbackUrl,
+        },
+        new URLSearchParams({
+          email: email?.toString() || '',
+          invitation_id: invitation_id?.toString() || '',
+        })
+      );
+
+      setIsSubmitting(false);
+
+      if (!res?.error && res?.url) {
+        plausible('login', {
+          props: {
+            status: 'success',
+            provider: provider,
+          },
+        });
+
+        store.dispatch({ type: 'calendar.setSelectedDate', payload: formatISOLocale(new Date()) });
+        await router.push(res.url);
+      }
+    },
+    [csrfToken, email, invitation_id, plausible, router, store]
+  );
 
   useEffect(() => {
-    setFocus('email');
-  }, [setFocus]);
-
-  const onSubmit = async () => {
-    plausible('login', {
-      props: {
-        status: 'start',
-      },
-    });
-
-    const data = getValues();
-    setIsSubmitting(true);
-
-    const res = await signIn('credentials', {
-      redirect: false,
-      email: data.email,
-      password: data.password,
-      callbackUrl: '/user/home',
-    });
-
-    if (res?.status === 401) {
-      setError('usernameOrPasswordWrong');
-      setValue('password', '');
-      setFocus('email');
-      plausible('login', {
-        props: {
-          status: 'failed',
-        },
-      });
-      logger.info(res);
+    if (providers.length === 1 && !error) {
+      signInToProvider(providers[0].id);
     }
+  }, [providers, signInToProvider, error]);
 
-    if (!res?.error && invitationId) {
-      await router.replace(`/join/${invitationId}`);
-      return;
-    }
+  if (providers.length === 1 && !error) {
+    return (
+      <LoginLayout>
+        <Logo />
+        <BoxInfo>{t('Prepare login...')}</BoxInfo>
+      </LoginLayout>
+    );
+  } else {
+    return (
+      <LoginLayout>
+        <Logo />
+        {error && (
+          <BoxWarning>
+            <Trans>{error}</Trans>
+          </BoxWarning>
+        )}
+        {providers.length === 0 && (
+          <BoxWarning>{t('No authentication provider available')}</BoxWarning>
+        )}
+        {providers.length > 0 && (
+          <CardContainer
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1.5rem',
+              background: 'containerBackgroundDarker',
+            }}
+          >
+            <Flex sx={{ alignItems: 'center', gap: 2, justifyContent: 'flex-end' }}>
+              <ColorModeToggle />
+              <HelpButton />
+            </Flex>
+            {providers.length > 1 && <BoxInfo>{t('Please choose a login provider')}</BoxInfo>}
+            {providers.map((provider) => {
+              let icon = undefined;
+              const size = 40;
+              if (provider.custom_logo) {
+                icon = (
+                  <Image
+                    alt={provider.name}
+                    src={provider.custom_logo}
+                    width={size}
+                    height={size}
+                  />
+                );
+              } else {
+                switch (provider.id) {
+                  case AUTH_PROVIDER_INTERNAL_LASIUS:
+                    icon = <Icon name="lasius" size={size} />;
+                    break;
+                  case 'gitlab':
+                    icon = <Icon name="gitlab" size={size} color="none" />;
+                    break;
+                  case 'github':
+                    icon = <Icon name="github" size={size} color="black" />;
+                    break;
+                  case AUTH_PROVIDER_CUSTOMER_KEYCLOAK:
+                    icon = <Icon name="keycloak" size={size} />;
+                    break;
+                }
+              }
 
-    if (!res?.error && res?.url) {
-      plausible('login', {
-        props: {
-          status: 'success',
-        },
-      });
-
-      store.dispatch({ type: 'calendar.setSelectedDate', payload: formatISOLocale(new Date()) });
-      await router.push(res.url);
-    }
-
-    setIsSubmitting(false);
-  };
-
-  return (
-    <LoginLayout>
-      <Logo />
-      {error && <BoxWarning>{LoginError[error]}</BoxWarning>}
-      {registered && (
-        <BoxInfo>
-          {t(
-            'Thank you for registering. You can now log in using your email address and password. Welcome to Lasius!'
-          )}
-        </BoxInfo>
-      )}
-      {LASIUS_DEMO_MODE === 'true' && (
-        <BoxInfo>
-          <P>
-            {t(
-              'Welcome to the Lasius demo instance. Use "demo1@lasius.ch" and password "demo" to log in and have a look around. The demo instance is reset once a day.'
-            )}
-          </P>
-          <P>
-            <Trans
-              t={t}
-              i18nKey="We appreciate your feedback. Please leave a comment on <0>GitHub</0>"
-              components={[
-                <Link key="gitHubLink" target="_blank" href="https://github.com/tegonal/lasius" />,
-              ]}
-            />
-          </P>
-        </BoxInfo>
-      )}
-      <CardContainer>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <FormBody>
-            <FormElement>
-              <input
-                {...register('csrfToken', { required: true })}
-                type="hidden"
-                defaultValue={csrfToken}
-              />
-              <Label htmlFor="email">{t('E-Mail')}</Label>
-              <Input
-                {...register('email', {
-                  required: true,
-                  validate: { isEmailAddress: (v) => isEmailAddress(v.toString()) },
-                })}
-                autoComplete="off"
-                autoFocus
-                type="email"
-              />
-              <FormErrorBadge error={errors.email} />
-            </FormElement>
-            <FormElement>
-              <Label htmlFor="password">{t('Password')}</Label>
-              <Input
-                {...register('password', { required: true })}
-                type="password"
-                autoComplete="off"
-              />
-              <FormErrorBadge error={errors.password} />
-            </FormElement>
-            <FormElement>
-              <Button disabled={isSubmitting} type="submit">
-                {t('Sign in')}
-              </Button>
-            </FormElement>
-          </FormBody>
-        </form>
-      </CardContainer>
-      <TegonalFooter />
-    </LoginLayout>
-  );
+              return (
+                <Button
+                  key={provider.id}
+                  disabled={isSubmitting}
+                  onClick={() => signInToProvider(provider.id)}
+                  variant="secondary"
+                  style={{ padding: 25 }}
+                >
+                  {icon}
+                  {t('Sign in with ')}
+                  <Trans t={t}>{provider.name}</Trans>
+                </Button>
+              );
+            })}
+          </CardContainer>
+        )}
+        <TegonalFooter />
+      </LoginLayout>
+    );
+  }
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { locale = '' } = context;
+  const providers = Object.values((await getProviders()) || []);
+  const config = await getConfiguration();
+  const availableProviders = providers
+    .filter((p) => p.id !== AUTH_PROVIDER_INTERNAL_LASIUS || config.lasiusOAuthProviderEnabled)
+    .map((p) => {
+      if (p.id === AUTH_PROVIDER_CUSTOMER_KEYCLOAK) {
+        (p as CustomizedClientSafeProvider).custom_logo =
+          process.env.KEYCLOAK_OAUTH_PROVIDER_ICON || null;
+      } else {
+        (p as CustomizedClientSafeProvider).custom_logo = null;
+      }
+      return p;
+    });
+
   return {
     props: {
       csrfToken: await getCsrfToken(context),
+      providers: availableProviders,
       ...(await serverSideTranslations(locale, ['common'])),
     },
   };

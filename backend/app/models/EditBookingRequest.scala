@@ -26,7 +26,6 @@ import models.OrganisationId.OrganisationReference
 import models.ProjectId.ProjectReference
 import org.joda.time.DateTime
 import play.api.libs.json._
-import models.BaseFormat._
 
 case class EditBookingRequest(projectId: Option[ProjectId],
                               tags: Option[Set[Tag]],
@@ -46,6 +45,7 @@ case class EditBookingRequest(projectId: Option[ProjectId],
 }
 
 object EditBookingRequest {
+  import models.BaseFormat._
   implicit val editBookingFormat: OFormat[EditBookingRequest] =
     Json.format[EditBookingRequest]
 }

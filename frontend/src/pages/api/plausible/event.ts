@@ -18,7 +18,6 @@
  */
 
 import { NextApiRequest, NextApiResponse } from 'next';
-import { userAgent } from 'next/server';
 import { logger } from 'lib/logger';
 import { LASIUS_TELEMETRY_PLAUSIBLE_HOST } from 'projectConfig/constants';
 

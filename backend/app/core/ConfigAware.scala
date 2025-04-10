@@ -21,8 +21,8 @@
 
 package core
 
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.Config
 
 trait ConfigAware {
-  lazy val config = ConfigFactory.load()
+  implicit val conf: Config
 }

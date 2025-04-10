@@ -22,9 +22,17 @@
 package actors
 
 import actors.ControlCommands._
-import org.apache.pekko.actor._
 import com.google.inject.ImplementedBy
+import com.typesafe.config.Config
+import controllers.AuthConfig
+import controllers.security.{SecurityComponent, TokenSecurity}
+import core.{DBSupport, SystemServices}
 import models._
+import org.apache.pekko.actor._
+import play.modules.reactivemongo.ReactiveMongoApi
+
+import java.util.concurrent.ConcurrentLinkedQueue
+import scala.concurrent.{ExecutionContextExecutor, Future}
 
 object ControlCommands {
   case class SendToClient(senderUserId: UserId,
@@ -47,64 +55,116 @@ class ClientReceiverWebsocket extends ClientReceiver {
 
   /** Broadcast OutEvent to every client except sender itself
     */
-  def broadcast(senderUserId: UserId, event: OutEvent) = {
-    ClientMessagingWebsocketActor.actors.values
-      .map(_ ! SendToClient(senderUserId, event))
+  def broadcast(senderUserId: UserId, event: OutEvent): Unit = {
+    ClientMessagingWebsocketActor.actors
+      .iterator()
+      .forEachRemaining(_ ! SendToClient(senderUserId, event))
   }
 
   /** Send OutEvent to a list of receiving clients exclusing sender itself
     */
-  def send(senderUserId: UserId, event: OutEvent, receivers: List[UserId]) = {
-    ClientMessagingWebsocketActor.actors.values
-      .map(_ ! SendToClient(senderUserId, event, receivers))
+  def send(senderUserId: UserId,
+           event: OutEvent,
+           receivers: List[UserId]): Unit = {
+    ClientMessagingWebsocketActor.actors
+      .iterator()
+      .forEachRemaining(_ ! SendToClient(senderUserId, event, receivers))
   }
 
-  def !(senderUserId: UserId, event: OutEvent, receivers: List[UserId]) = {
+  def !(senderUserId: UserId,
+        event: OutEvent,
+        receivers: List[UserId]): Unit = {
     send(senderUserId, event, receivers)
   }
 }
 
 object ClientMessagingWebsocketActor {
-  def props(userId: UserId)(out: ActorRef) =
-    Props(new ClientMessagingWebsocketActor(out, userId))
-  var actors: Map[UserId, ActorRef] = Map()
+  def props(systemServices: SystemServices,
+            conf: Config,
+            reactiveMongoApi: ReactiveMongoApi,
+            authConfig: AuthConfig)(out: ActorRef): Props =
+    Props(
+      new ClientMessagingWebsocketActor(systemServices = systemServices,
+                                        conf = conf,
+                                        reactiveMongoApi = reactiveMongoApi,
+                                        authConfig = authConfig,
+                                        out = out))
+  var actors: ConcurrentLinkedQueue[ActorRef] = new ConcurrentLinkedQueue()
 }
 
-class ClientMessagingWebsocketActor(out: ActorRef, userId: UserId)
+class ClientMessagingWebsocketActor(
+    override val systemServices: SystemServices,
+    override val conf: Config,
+    override val reactiveMongoApi: ReactiveMongoApi,
+    override val authConfig: AuthConfig,
+    out: ActorRef)
     extends Actor
-    with ActorLogging {
+    with ActorLogging
+    with DBSupport
+    with SecurityComponent
+    with TokenSecurity {
+
+  override val supportTransaction: Boolean = systemServices.supportTransaction
+  implicit val executionContext: ExecutionContextExecutor =
+    context.system.dispatcher
+  private var userId: Option[UserId] = None
   // val (enumerator, channel) = Concurrent.broadcast[OutEvent]
 
   // append to map of active actors
-  ClientMessagingWebsocketActor.actors += (userId -> self)
+  ClientMessagingWebsocketActor.actors.add(self)
 
-  def receive = {
-    case HelloServer(client) =>
+  private def default: Receive = { case Ping =>
+    log.debug("Answer with pong")
+    out ! Pong
+  }
+
+  private def unauthenticated: Receive = default.orElse {
+    case HelloServer(client, token, tokenIssuer) =>
       log.debug(s"Received HelloServer($client)")
+      withToken(tokenIssuer = tokenIssuer,
+                token = token,
+                withinTransaction = true,
+                canCreateNewUser = false) {
+        out ! AuthenticationFailed
+        userId = None
+        context.become(unauthenticated)
+        Future.successful(())
+      } { _ => user =>
+        userId = Some(user.userReference.id)
+        log.debug(s"Successfully authenticated websocket for client ($client)")
+        out ! HelloClient
+        context.become(authenticated)
+        Future.successful(())
+      }
+      ()
+  }
 
-      out ! HelloClient
-    case Ping =>
-      out ! Pong
+  private def authenticated: Receive = unauthenticated.orElse {
     case SendToClient(senderUserId, event, Nil) =>
       // broadcast to all others
-      if (senderUserId != userId) {
+      if (userId.isDefined && !userId.contains(senderUserId)) {
         out ! event
       }
-    case SendToClient(senderUserId, event, receivers) =>
+    case SendToClient(_, event, receivers) =>
       // send to specific clients only
-      if (receivers.contains(userId)) {
+      if (userId.isDefined && receivers.contains(userId.get)) {
         out ! event
       }
   }
 
-  def broadcast(event: OutEvent) = {
-    ClientMessagingWebsocketActor.actors.values.map(_ ! event)
+  def receive: Receive = unauthenticated
+
+  def broadcast(event: OutEvent): Unit = {
+    ClientMessagingWebsocketActor.actors
+      .iterator()
+      .forEachRemaining(ref => ref ! event)
   }
 
-  override def postStop() = {
+  override def postStop(): Unit = {
     // remove from active actors
-    ClientMessagingWebsocketActor.actors -= (userId)
-    log.debug(s"Websocket connection closed for user ${userId.value}")
+    ClientMessagingWebsocketActor.actors.remove(self)
+    log.debug(
+      s"Websocket connection closed for user ${userId.map(_.value).getOrElse("'Unauthenticated'")}")
     super.postStop()
   }
 }

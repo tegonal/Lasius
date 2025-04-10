@@ -17,110 +17,323 @@
  *
  */
 
-import CredentialsProvider from 'next-auth/providers/credentials';
-
 import NextAuth, { NextAuthOptions } from 'next-auth';
+import { JWT } from 'next-auth/jwt';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { logger } from 'lib/logger';
-import { signIn } from 'lib/api/lasius/authentication/authentication';
-import { getUserProfile, updateUserSettings } from 'lib/api/lasius/user/user';
-import { getServerSideRequestHeaders } from 'lib/api/hooks/useTokensWithAxiosRequests';
+import { OAuthConfig } from 'next-auth/providers';
+import {
+  AUTH_PROVIDER_CUSTOMER_KEYCLOAK,
+  AUTH_PROVIDER_INTERNAL_LASIUS,
+} from 'projectConfig/constants';
+import { t } from 'i18next';
+import GitLab from 'next-auth/providers/gitlab';
+import GitHub from 'next-auth/providers/github';
+import Keyclaok from 'next-auth/providers/keycloak';
+import { logout } from 'lib/api/lasius/oauth2-provider/oauth2-provider';
+import { getRequestHeaders } from 'lib/api/hooks/useTokensWithAxiosRequests';
 
-const nextAuthOptions = (): NextAuthOptions => {
-  return {
-    providers: [
-      CredentialsProvider({
-        id: 'credentials',
-        name: 'Basic auth on Lasius',
-        credentials: {
-          email: { label: 'E-Mail', type: 'text', placeholder: 'E-Mail' },
-          password: { label: 'Password', type: 'password' },
-        },
-        async authorize(credentials) {
-          if (!credentials?.email || !credentials?.password) {
-            throw new Error('oneOfCredentialsMissing');
-          }
+const gitlabUrl = process.env.GITLAB_OAUTH_URL || 'https://gitlab.com';
+const githubUrl = 'https://api.github.com/';
 
-          const { email, password } = credentials;
+type MapType = {
+  [key: string]: boolean;
+};
+const REFRESH_TOKEN_PROGRESS: MapType = {};
 
-          let signInResponse;
-
-          try {
-            signInResponse = await signIn({ email, password });
-          } catch (error) {
-            logger.error('[nextauth][signInFailed]', error);
-          }
-
-          if (!signInResponse?.token) {
-            logger.info('usernameOrPasswordWrong');
-            throw new Error('usernameOrPasswordWrong');
-          }
-
-          if (signInResponse.token) {
-            const { token: xsrfToken } = signInResponse;
-
-            const user = await getUserProfile(getServerSideRequestHeaders(xsrfToken));
-
-            //  TODO: remove this once the backend sets a lastselectedorganisation on profile creation
-            if (!user.settings.lastSelectedOrganisation) {
-              await updateUserSettings(
-                {
-                  lastSelectedOrganisation: user.organisations.filter((item) => item.private)[0]
-                    .organisationReference,
-                },
-                getServerSideRequestHeaders(xsrfToken)
-              );
-            }
-
-            if (!user) {
-              logger.info('noUserFoundOnBackend', user);
-              throw new Error('noUserFoundOnBackend');
-            }
-
-            const { id, key: name, email } = user;
-
-            if (id) {
-              return {
-                id,
-                name,
-                email,
-                // Hack: We need to store the xsrfToken in the user object. next auth strips unknown properties ...
-                image: xsrfToken,
-                xsrfToken,
-              };
-            }
-          }
-
-          return null;
-        },
-      }),
-    ],
-    pages: {
-      signIn: '/login',
-      signOut: '/',
+const internalProvider: OAuthConfig<any> = {
+  id: AUTH_PROVIDER_INTERNAL_LASIUS,
+  // wrap into `t` to ensure we have a translation to it
+  name: t('Internal Lasius Sign in') || 'Internal Lasius Sign in',
+  version: '2.0',
+  type: 'oauth',
+  // redirect to local login page
+  authorization: {
+    url: process.env.NEXTAUTH_URL + '/internal_oauth/login',
+    params: {
+      scope: 'profile openid email',
     },
-    callbacks: {
-      async session({ session }) {
+  },
+  token:
+    (process.env.LASIUS_API_URL_INTERNAL || process.env.LASIUS_API_URL) + '/oauth2/access_token',
+  userinfo: (process.env.LASIUS_API_URL_INTERNAL || process.env.LASIUS_API_URL) + '/oauth2/profile',
+  clientId: process.env.LASIUS_OAUTH_CLIENT_ID,
+  clientSecret: process.env.LASIUS_OAUTH_CLIENT_SECRET,
+  checks: ['pkce', 'state'],
+  idToken: false,
+  profile: async (profile: any) => {
+    return {
+      id: profile.id.toString(),
+      name: profile.firstName + ' ' + profile.lastName,
+      email: profile.email,
+    };
+  },
+};
+
+async function requestRefreshToken(refresh_token: string, provider?: string): Promise<any> {
+  switch (provider) {
+    case 'gitlab':
+      return await fetch(gitlabUrl + '/oauth/access_token', {
+        method: 'POST',
+        body: new URLSearchParams({
+          grant_type: 'refresh_token',
+          refresh_token: refresh_token || '',
+          client_id: process.env.GITLAB_OAUTH_CLIENT_ID || '',
+          client_secret: process.env.GITLAB_OAUTH_CLIENT_SECRET || '',
+        }),
+      });
+    case 'github':
+      return await fetch(githubUrl + '/oauth/access_token', {
+        method: 'POST',
+        body: new URLSearchParams({
+          grant_type: 'refresh_token',
+          refresh_token: refresh_token || '',
+          client_id: process.env.GITHUB_OAUTH_CLIENT_ID || '',
+          client_secret: process.env.GITHUB_OAUTH_CLIENT_SECRET || '',
+        }),
+      });
+    case AUTH_PROVIDER_CUSTOMER_KEYCLOAK:
+      return await fetch(process.env.KEYCLOAK_OAUTH_URL + '/protocol/openid-connect/token', {
+        method: 'POST',
+        body: new URLSearchParams({
+          grant_type: 'refresh_token',
+          refresh_token: refresh_token || '',
+          client_id: process.env.KEYCLOAK_OAUTH_CLIENT_ID || '',
+          client_secret: process.env.KEYCLOAK_OAUTH_CLIENT_SECRET || '',
+        }),
+      });
+    default:
+      return await fetch(process.env.NEXTAUTH_URL + '/backend/oauth2/access_token', {
+        method: 'POST',
+        body: new URLSearchParams({
+          grant_type: 'refresh_token',
+          refresh_token: refresh_token || '',
+          client_id: process.env.LASIUS_OAUTH_CLIENT_ID || '',
+          client_secret: process.env.LASIUS_OAUTH_CLIENT_SECRET || '',
+        }),
+      });
+  }
+}
+
+/**
+ * Takes a token, and returns a new token with updated
+ * `access_token` and `expires_at`. If an error occurs,
+ * returns the old token and an error property
+ */
+async function refreshAccessToken(token: JWT): Promise<JWT> {
+  if (!token?.refresh_token) {
+    return token;
+  }
+  if (REFRESH_TOKEN_PROGRESS[token.refresh_token]) {
+    if (process.env.LASIUS_DEBUG) {
+      console.debug('[NextAuth][refreshAccessToken][AlreadyRefreshing]', token.refresh_token);
+    }
+    return token;
+  }
+  if (process.env.LASIUS_DEBUG) {
+    console.debug('[NextAuth][refreshAccessToken]', token?.refresh_token);
+  }
+  try {
+    REFRESH_TOKEN_PROGRESS[token.refresh_token] = true;
+    const response = await requestRefreshToken(token.refresh_token, token.provider);
+
+    const tokensOrError = await response.json();
+
+    if (!response.ok) {
+      throw tokensOrError;
+    }
+
+    if (process.env.LASIUS_DEBUG) {
+      console.info('[NextAuth][refreshAccessToken][RenewedToken]', tokensOrError?.refresh_token);
+    }
+
+    const newTokens = tokensOrError as {
+      access_token: string;
+      expires_in: number;
+      refresh_token?: string;
+    };
+
+    return {
+      ...token,
+      access_token: newTokens.access_token,
+      expires_at: Math.floor(Date.now() / 1000 + newTokens.expires_in),
+      // Some providers only issue refresh tokens once, so preserve if we did not get a new one
+      refresh_token: newTokens.refresh_token ?? token.refresh_token,
+    };
+  } catch (error) {
+    if (process.env.LASIUS_DEBUG) {
+      console.log('[NextAuth][RefreshAccessTokenError]', error);
+    }
+
+    token.error = 'RefreshAccessTokenError';
+    return token;
+  } finally {
+    delete REFRESH_TOKEN_PROGRESS[token.refresh_token];
+  }
+}
+const providers = [];
+if (process.env.LASIUS_OAUTH_CLIENT_ID && process.env.LASIUS_OAUTH_CLIENT_SECRET) {
+  providers.push(internalProvider);
+}
+if (
+  process.env.KEYCLOAK_OAUTH_CLIENT_ID &&
+  process.env.KEYCLOAK_OAUTH_CLIENT_SECRET &&
+  process.env.KEYCLOAK_OAUTH_URL
+) {
+  providers.push(
+    Keyclaok({
+      id: AUTH_PROVIDER_CUSTOMER_KEYCLOAK,
+      name: process.env.KEYCLOAK_OAUTH_PROVIDER_NAME || 'Keycloak',
+      clientId: process.env.KEYCLOAK_OAUTH_CLIENT_ID,
+      clientSecret: process.env.KEYCLOAK_OAUTH_CLIENT_SECRET,
+      issuer: process.env.KEYCLOAK_OAUTH_URL,
+    })
+  );
+}
+if (process.env.GITLAB_OAUTH_CLIENT_ID && process.env.GITLAB_OAUTH_CLIENT_SECRET) {
+  providers.push(
+    GitLab({
+      clientId: process.env.GITLAB_OAUTH_CLIENT_ID,
+      clientSecret: process.env.GITLAB_OAUTH_CLIENT_SECRET,
+      wellKnown: gitlabUrl + '/.well-known/openid-configuration',
+      authorization: { params: { scope: 'openid email profile' } },
+      profile(profile) {
         return {
-          ...session,
-          user: { ...session.user, image: undefined, xsrfToken: session.user?.image || '' },
+          id: (profile.id || profile.sub).toString(),
+          name: profile.name ?? profile.username,
+          email: profile.email,
+          image: profile.avatar_url,
+          access_token_issuer: gitlabUrl,
         };
       },
-    },
-    events: {
-      async signOut() {
-        logger.info('[nextauth][events][signOut]');
+    })
+  );
+}
+if (process.env.GITHUB_OAUTH_CLIENT_ID && process.env.GITHUB_OAUTH_CLIENT_SECRET) {
+  providers.push(
+    GitHub({
+      clientId: process.env.GITHUB_OAUTH_CLIENT_ID,
+      clientSecret: process.env.GITHUB_OAUTH_CLIENT_SECRET,
+      profile(profile) {
+        return {
+          id: profile.id.toString(),
+          name: profile.name ?? profile.login,
+          email: profile.email,
+          image: profile.avatar_url,
+          access_token_issuer: githubUrl,
+        };
       },
-      async signIn() {
+    })
+  );
+}
+
+export const nextAuthOptions: NextAuthOptions = {
+  debug: process.env.LASIUS_DEBUG === 'true',
+  providers: providers,
+  session: {
+    strategy: 'jwt',
+  },
+  jwt: {
+    secret: process.env.NEXTAUTH_SECRET,
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+  pages: {
+    signIn: '/login',
+    signOut: '/',
+  },
+  callbacks: {
+    async session({ session, token, user }) {
+      if (token) {
+        session.user = token?.user;
+        session.access_token = token.access_token;
+        session.access_token_issuer = token.access_token_issuer;
+        session.error = token?.error;
+        session.provider = token.provider;
+      }
+      session.user = session.user || user;
+      if (process.env.LASIUS_DEBUG) {
+        console.debug('[NextAuth][Session]', session);
+      }
+
+      return session;
+    },
+    async jwt({ token, account, user, profile }) {
+      // Initial sign in
+      if (account) {
+        // First-time login, save the `access_token`, its expiry and the `refresh_token`
+        return {
+          ...token,
+          access_token: account.access_token,
+          access_token_issuer: user?.access_token_issuer,
+          expires_at: account.expires_at,
+          refresh_token: account.refresh_token,
+          user: user || {
+            ...profile,
+            access_token: account.access_token,
+          },
+          provider: account.provider,
+        };
+      } else if (!token.expires_at || Date.now() < token.expires_at * 1000) {
+        // Subsequent logins, but the `access_token` is still valid
+        return token;
+      } else {
+        // Subsequent logins, but the `access_token` has expired, try to refresh it
+        if (!token.refresh_token) throw new TypeError('Missing refresh_token');
+        if (token.error === 'RefreshAccessTokenError') {
+          if (process.env.LASIUS_DEBUG) {
+            logger.info('Token refresh already failed, not trying again.');
+          }
+          return token;
+        }
+
+        // Access token has expired, try to update it
+        return await refreshAccessToken(token);
+      }
+    },
+  },
+  events: {
+    async signOut({ token }: { token: JWT }) {
+      if (process.env.LASIUS_DEBUG) {
+        logger.info('[nextauth][events][signOut]', token.provider);
+      }
+      // auto logout from keycloak instance
+      if (token.provider === AUTH_PROVIDER_CUSTOMER_KEYCLOAK) {
+        if (process.env.LASIUS_DEBUG) {
+          logger.info(
+            'auto-logout from keycloak at',
+            process.env.KEYCLOAK_OAUTH_URL + '/protocol/openid-connect/logout'
+          );
+        }
+
+        await fetch(process.env.KEYCLOAK_OAUTH_URL + '/protocol/openid-connect/logout', {
+          method: 'POST',
+          headers: {
+            Authorization: 'Bearer ' + token.access_token,
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            client_id: process.env.KEYCLOAK_OAUTH_CLIENT_ID || '',
+            client_secret: process.env.KEYCLOAK_OAUTH_CLIENT_SECRET || '',
+            refresh_token: token.refresh_token || '',
+          }),
+        });
+      }
+      // or internal lasius provider
+      else if (token.provider === AUTH_PROVIDER_INTERNAL_LASIUS) {
+        await logout(getRequestHeaders(token.access_token, token.access_token_issuer));
+      }
+    },
+    async signIn() {
+      if (process.env.LASIUS_DEBUG) {
         logger.info('[nextauth][events][signIn]');
-      },
+      }
     },
-  };
+  },
 };
 
 // eslint-disable-next-line
 export default (req: NextApiRequest, res: NextApiResponse) => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  return NextAuth(req, res, nextAuthOptions(req, res));
+  return NextAuth(req, res, nextAuthOptions);
 };

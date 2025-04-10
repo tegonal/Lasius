@@ -23,14 +23,53 @@ package helpers
 
 import core.Validation.ValidationFailedException
 
+import scala.concurrent.Future.{failed, successful}
 import scala.concurrent.{ExecutionContext, Future}
 
 trait FutureHelper {
   implicit class FutureOptionHelper[T](self: Future[Option[T]]) {
     def noneToFailed(errorMsg: => String)(implicit
         executionContext: ExecutionContext): Future[T] = self.flatMap {
-      case Some(result) => Future.successful(result)
-      case _            => Future.failed(ValidationFailedException(errorMsg))
+      case Some(result) => successful(result)
+      case _            => failed(ValidationFailedException(errorMsg))
     }
+
+    def someToFailed(errorMsg: => String)(implicit
+        executionContext: ExecutionContext): Future[Option[T]] = self.flatMap {
+      case Some(_) => failed(ValidationFailedException(errorMsg))
+      case _       => successful(None)
+    }
+
+  }
+
+  implicit class OptionHelper[T](self: Option[T]) {
+    def noneToFailed(errorMsg: => String): Future[T] = self match {
+      case Some(result) => successful(result)
+      case _            => failed(ValidationFailedException(errorMsg))
+    }
+
+    def someToFailed(errorMsg: => String): Future[Option[T]] = self match {
+      case Some(_) => failed(ValidationFailedException(errorMsg))
+      case _       => successful(None)
+    }
+
+  }
+
+  implicit class FutureHelper[T](self: Future[T]) {
+
+    def failIf(predicate: T => Boolean, errorMsg: => String)(implicit
+        executionContext: ExecutionContext): Future[T] = self.flatMap {
+      result =>
+        if (predicate(result))
+          failed(ValidationFailedException(errorMsg))
+        else successful(result)
+    }
+  }
+
+  implicit class FutureBooleanHelper(self: Future[Boolean]) {
+
+    def failIfTrue(errorMsg: => String)(implicit
+        executionContext: ExecutionContext): Future[Boolean] =
+      self.failIf(_ == true, errorMsg)
   }
 }

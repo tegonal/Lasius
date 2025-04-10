@@ -27,10 +27,10 @@ import models.OrganisationId.OrganisationReference
 import models.ProjectId.ProjectReference
 import models.UserId.UserReference
 import models._
-import org.mindrot.jbcrypt.BCrypt
 import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
 import reactivemongo.api.bson.collection.BSONCollection
+import org.joda.time.LocalDate
 
 import javax.inject.Inject
 import scala.concurrent._
@@ -74,6 +74,11 @@ trait UserRepository
   def findByEmail(email: String)(implicit
       dbSession: DBSession): Future[Option[User]]
 
+  def createInitialUserBasedOnProfile(userInfo: UserInfo,
+                                      org: Organisation,
+                                      orgRole: OrganisationRole)(implicit
+      dbSession: DBSession): Future[User]
+
   def findByOrganisationAndUserId(id: UserId, orgId: OrganisationId)(implicit
       dbSession: DBSession): Future[Option[User]]
 
@@ -92,32 +97,19 @@ trait UserRepository
   def updateUserSettings(ence: UserReference, userSettings: UserSettings)(
       implicit dbSession: DBSession): Future[User]
 
-  def changePassword(userReference: UserReference,
-                     passwordChangeRequest: PasswordChangeRequest)(implicit
-      dbSession: DBSession): Future[Boolean]
-
   def updateUserOrganisation(userReference: UserReference,
                              organisationReference: OrganisationReference,
                              updateData: UpdateUserOrganisation)(implicit
       dbSession: DBSession): Future[User]
-
-  def authenticate(email: String, password: String)(implicit
-      dbSession: DBSession): Future[Option[User]]
-
-  def validateCreate(email: String, registration: UserRegistration)(implicit
-      dbSession: DBSession): Future[Boolean]
-
-  def create(email: String,
-             registration: UserRegistration,
-             organisation: Organisation,
-             organisationRole: OrganisationRole)(implicit
-      dbSession: DBSession): Future[User]
-
   def updateOrganisationKey(organisationId: OrganisationId, newKey: String)(
       implicit dbSession: DBSession): Future[Boolean]
 
   def updateProjectKey(projectId: ProjectId, newKey: String)(implicit
       dbSession: DBSession): Future[Boolean]
+
+  def acceptTOS(userReference: UserReference,
+                acceptTOSRequest: AcceptTOSRequest)(implicit
+      dbSession: DBSession): Future[User]
 }
 
 class UserMongoRepository @Inject() (
@@ -244,44 +236,6 @@ class UserMongoRepository @Inject() (
     } yield updatedUser
   }
 
-  private def checkPwd(user: User, password: String)(implicit
-      dbSession: DBSession): Boolean =
-    BCrypt.checkpw(password, user.password)
-
-  override def authenticate(email: String, password: String)(implicit
-      dbSession: DBSession): Future[Option[User]] = {
-    findByEmail(email).map {
-      case Some(user) if checkPwd(user, password) => Some(user)
-      case _                                      => None
-    }
-  }
-
-  override def changePassword(userReference: UserReference,
-                              passwordChangeRequest: PasswordChangeRequest)(
-      implicit dbSession: DBSession): Future[Boolean] = {
-    val sel = userSelection(userReference)
-
-    for {
-      _ <- validate(
-        passwordChangeRequest.password != passwordChangeRequest.newPassword,
-        s"It is not allowed to use the old password as new password")
-      _ <- validatePasswordPolicy(passwordChangeRequest.newPassword)
-      user <- findByUserReference(userReference).noneToFailed(
-        s"Could not find user with id ${userReference.id.value}")
-      _ <- validate(checkPwd(user, passwordChangeRequest.password),
-                    s"Provided password does not match")
-      result <- updateFields(
-        sel,
-        Seq(
-          "password" -> BCrypt.hashpw(passwordChangeRequest.newPassword,
-                                      BCrypt.gensalt())))
-      updatedUser <- findByUserReference(userReference).noneToFailed(
-        s"Could not find user with id ${userReference.id.value}")
-      _ <- validate(checkPwd(updatedUser, passwordChangeRequest.newPassword),
-                    s"Failed changing password")
-    } yield result
-  }
-
   override def findByProject(projectId: ProjectId)(implicit
       dbSession: DBSession): Future[Seq[User]] = {
     find(Json.obj("organisations.projects.projectReference.id" -> projectId))
@@ -347,7 +301,7 @@ class UserMongoRepository @Inject() (
                                         role: OrganisationRole,
                                         plannedWorkingHours: WorkingHours)(
       implicit dbSession: DBSession): Future[Boolean] = {
-    val organisationReference = organisation.getReference()
+    val organisationReference = organisation.getReference
     for {
       existingAssignment <- findFirst(
         Json.obj(
@@ -425,48 +379,46 @@ class UserMongoRepository @Inject() (
     find(sel).map(_.map(_._1).toSeq)
   }
 
-  override def create(email: String,
-                      registration: UserRegistration,
-                      organisation: Organisation,
-                      organisationRole: OrganisationRole)(implicit
-      dbSession: DBSession): Future[User] = {
-    for {
-      _ <- validateCreate(email, registration)
-      newUser = User(
-        id = UserId(),
-        key = registration.key,
-        email = email,
-        password = BCrypt.hashpw(registration.password, BCrypt.gensalt()),
-        firstName = registration.firstName,
-        lastName = registration.lastName,
-        active = true,
-        role = FreeUser,
-        organisations = Seq(
-          UserOrganisation(
-            organisationReference = organisation.getReference(),
-            `private` = organisation.`private`,
-            role = organisationRole,
-            plannedWorkingHours =
-              registration.plannedWorkingHours.getOrElse(WorkingHours()),
-            projects = Seq()
-          )
-        ),
-        settings = None
-      )
-      _ <- upsert(newUser)
-    } yield newUser
-  }
-
-  override def validateCreate(email: String, registration: UserRegistration)(
-      implicit dbSession: DBSession): Future[Boolean] = {
+  def validateCreate(registration: User)(implicit
+      dbSession: DBSession): Future[Boolean] = {
     for {
       _            <- validateNonBlankString("key", registration.key)
-      existingUser <- findByEmail(email)
+      existingUser <- findByEmail(registration.email)
       _            <- validate(existingUser.isEmpty, s"user_already_registered")
       existingKey  <- findByKey(registration.key)
       _            <- validate(existingKey.isEmpty, s"user_key_already_exists")
-      _            <- validatePasswordPolicy(registration.password)
     } yield true
+  }
+
+  override def createInitialUserBasedOnProfile(userInfo: UserInfo,
+                                               org: Organisation,
+                                               orgRole: OrganisationRole)(
+      implicit dbSession: DBSession): Future[User] = {
+    for {
+      newUser <- Future.successful(
+        User(
+          id = UserId(),
+          key = userInfo.key,
+          email = userInfo.email,
+          firstName = userInfo.firstName.getOrElse(""),
+          lastName = userInfo.lastName.getOrElse(""),
+          active = true,
+          role = FreeUser,
+          organisations = Seq(
+            UserOrganisation(
+              organisationReference = org.getReference,
+              `private` = org.`private`,
+              role = orgRole,
+              plannedWorkingHours = WorkingHours(),
+              projects = Seq()
+            )
+          ),
+          settings = None,
+          acceptedTOS = None
+        ))
+      _ <- validateCreate(newUser)
+      _ <- upsert(newUser)
+    } yield newUser
   }
 
   override def updateOrganisationKey(organisationId: OrganisationId,
@@ -493,6 +445,27 @@ class UserMongoRepository @Inject() (
       multi = true,
       arrayFilters = Seq(Json.obj("element.projectReference.id" -> projectId))
     )
+  }
+
+  def acceptTOS(userReference: UserReference,
+                acceptTOSRequest: AcceptTOSRequest)(implicit
+      dbSession: DBSession): Future[User] = {
+    val sel         = userSelection(userReference)
+    val acceptedTOS = AcceptedTOS(acceptTOSRequest.version, LocalDate.now)
+    for {
+      _ <- validateNonBlankString("acceptTOSRequest.version",
+                                  acceptTOSRequest.version)
+      result <- updateFields(
+        sel,
+        Seq[(String, JsValueWrapper)](
+          "acceptedTOS" -> acceptedTOS
+        )
+      )
+      _ <- validate(result,
+                    s"Failed accepting TOS for user: ${userReference.key}")
+      user <- findByUserReference(userReference).noneToFailed(
+        s"Could not find user with id ${userReference.key}")
+    } yield user
   }
 }
 

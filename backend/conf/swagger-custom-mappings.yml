@@ -34,6 +34,14 @@
 - type: java\.net\.uri
   specAsParameter:
     - type: string
+- type: java\.util\.UUID
+  specAsParameter:
+    - type: string
+      format: uuid
+- type: uuid
+  specAsParameter:
+    - type: string
+      format: uuid
 - type: models\.OrganisationId
   specAsParameter:
     - type: string

@@ -19,10 +19,16 @@
  * along with Lasius. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package core
+package controllers
 
-import play.api.cache.AsyncCacheApi
+import scalaoauth2.provider._
 
-trait CacheAware {
-  val cache: AsyncCacheApi
+class OAuth2TokenEndpoint extends TokenEndpoint {
+  override val handlers: Map[String, GrantHandler] = Map(
+    OAuthGrantType.AUTHORIZATION_CODE -> new AuthorizationCode(),
+    OAuthGrantType.REFRESH_TOKEN      -> new RefreshToken(),
+    OAuthGrantType.CLIENT_CREDENTIALS -> new ClientCredentials(),
+    // OAuthGrantType.PASSWORD -> new Password(),
+    // OAuthGrantType.IMPLICIT           -> new Implicit()
+  )
 }

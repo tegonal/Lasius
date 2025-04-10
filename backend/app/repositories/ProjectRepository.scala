@@ -165,12 +165,12 @@ class ProjectMongoRepository @Inject() (
                                                       key)
           result <- validate(
             existingProject.isEmpty,
-            s"Cannot update project with duplicate key ${key} in organisation ${organisationReference.id.value}")
+            s"Cannot update project with duplicate key $key in organisation ${organisationReference.id.value}")
         } yield result
       }
 
       _ <- validate(
-        !updateObject.isEmpty,
+        updateObject.nonEmpty,
         s"cannot update project ${projectId.value} in organisation ${organisationReference.id.value}, at least one field must be specified"
       )
       _ <- updateFields(

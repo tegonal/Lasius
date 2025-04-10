@@ -22,31 +22,25 @@ import useWebSocket, { ReadyState } from 'react-use-websocket';
 import { CONNECTION_STATUS, IS_SERVER, LASIUS_API_WEBSOCKET_URL } from 'projectConfig/constants';
 import parseJson from 'parse-json';
 import { logger } from 'lib/logger';
-import { useSession } from 'next-auth/react';
 import useIsWindowFocused from 'lib/hooks/useIsWindowFocused';
 
 export const useLasiusWebsocket = () => {
-  const { data } = useSession();
-  const token = data?.user?.xsrfToken;
   const isWindowFocused = useIsWindowFocused();
-
-  if (!token) logger.warn('[useLasiusWebsocket][tokenUndefined]');
 
   const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([]);
 
-  const { sendJsonMessage, lastMessage, readyState } = useWebSocket(
-    IS_SERVER ? null : `${LASIUS_API_WEBSOCKET_URL}/messagingSocket?auth=${token}`,
-    {
-      share: true,
-      shouldReconnect: (closeEvent) => {
-        logger.warn('[useLasiusWebsocket][shouldReconnect]', closeEvent);
-        return true;
-      },
-      retryOnError: true,
-      reconnectInterval: 1000,
-      reconnectAttempts: 30,
-    }
-  );
+  const websocketUrl = IS_SERVER ? null : `${LASIUS_API_WEBSOCKET_URL}/messaging/websocket`;
+  const { sendJsonMessage, lastMessage, readyState } = useWebSocket(websocketUrl, {
+    share: true,
+    shouldReconnect: (closeEvent) => {
+      logger.warn('[useLasiusWebsocket][shouldReconnect]', closeEvent);
+      return true;
+    },
+    retryOnError: true,
+    //exponential backoff reconnect interval
+    reconnectInterval: (attemptNumber) => Math.min(Math.pow(2, attemptNumber) * 1000, 10000),
+    reconnectAttempts: 30,
+  });
 
   useEffect(() => {
     if (isWindowFocused && readyState === ReadyState.OPEN) {

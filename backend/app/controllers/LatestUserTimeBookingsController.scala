@@ -21,34 +21,32 @@
 
 package controllers
 
-import org.apache.pekko.util.Timeout
-import core.{CacheAware, DBSupport, SystemServices}
+import com.typesafe.config.Config
+import core.SystemServices
 import domain.views.LatestUserTimeBookingsView._
-
-import javax.inject.Inject
 import models.{FreeUser, OrganisationId, OrganisationMember}
-import play.api.Logging
-import play.api.cache.AsyncCacheApi
-import play.api.mvc.{AbstractController, Action, ControllerComponents}
+import org.apache.pekko.util.Timeout
+import play.api.mvc.{Action, ControllerComponents}
 import play.modules.reactivemongo.ReactiveMongoApi
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class LatestUserTimeBookingsController @Inject() (
-    controllerComponents: ControllerComponents,
+    override val conf: Config,
+    override val controllerComponents: ControllerComponents,
     override val systemServices: SystemServices,
     override val authConfig: AuthConfig,
-    override val cache: AsyncCacheApi,
     override val reactiveMongoApi: ReactiveMongoApi)(implicit
     ec: ExecutionContext)
-    extends BaseLasiusController(controllerComponents) {
+    extends BaseLasiusController() {
 
   implicit val timeout: Timeout = systemServices.timeout
 
   def getLatestTimeBooking(orgId: OrganisationId,
                            maxHistory: Int): Action[Unit] =
     HasUserRole(FreeUser, parse.empty, withinTransaction = false) {
-      implicit dbSession => implicit subject => user => implicit request =>
+      _ => implicit subject => user => implicit request =>
         HasOrganisationRole(user, orgId, OrganisationMember) { _ =>
           systemServices.latestUserTimeBookingsViewService ! GetLatestTimeBooking(
             subject.userReference,

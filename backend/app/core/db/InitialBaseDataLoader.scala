@@ -38,7 +38,8 @@ import scala.concurrent.{ExecutionContext, Future}
  */
 @unused
 class InitialBaseDataLoader @Inject() (
-    val reactiveMongoApi: ReactiveMongoApi,
+    override val reactiveMongoApi: ReactiveMongoApi,
+    OAuthUserRepository: OAuthUserRepository,
     userRepository: UserRepository,
     projectRepository: ProjectRepository,
     organisationRepository: OrganisationRepository)(implicit
@@ -90,7 +91,7 @@ class InitialBaseDataLoader @Inject() (
     val project = Project(
       ProjectId(),
       "MyProject",
-      org.getReference(),
+      org.getReference,
       Set(
         TagGroup(TagId("Development"),
                  relatedTags = Seq(SimpleTag(TagId("Billable")))),
@@ -114,24 +115,36 @@ class InitialBaseDataLoader @Inject() (
       dbSession: DBSession): Future[Unit] = {
 
     val userOrg = UserOrganisation(
-      org.getReference(),
+      org.getReference,
       `private` = org.`private`,
       OrganisationAdministrator,
       WorkingHours(),
-      Seq(UserProject(None, project.getReference(), ProjectAdministrator))
+      Seq(UserProject(None, project.getReference, ProjectAdministrator))
     )
 
+    OAuthUserRepository.upsert(
+      OAuthUser(
+        OAuthUserId(),
+        email = initialUserEmail,
+        password = initialUserPasswordHash,
+        firstName = Some("Admin"),
+        lastName = Some("Admin"),
+        active = true,
+      ))
+
     userRepository.upsert(
-      User(UserId(),
-           initialUserKey,
-           initialUserEmail,
-           initialUserPasswordHash,
-           "Admin",
-           "Admin",
-           active = true,
-           FreeUser,
-           Seq(userOrg),
-           settings = None))
+      User(
+        id = UserId(),
+        key = initialUserKey,
+        email = initialUserEmail,
+        firstName = "Admin",
+        lastName = "Admin",
+        active = true,
+        role = FreeUser,
+        organisations = Seq(userOrg),
+        settings = None,
+        acceptedTOS = None
+      ))
 
   }
 }

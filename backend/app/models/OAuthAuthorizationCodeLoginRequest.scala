@@ -21,15 +21,20 @@
 
 package models
 
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json._
 
-case class UserRegistration(key: String,
-                            password: String,
-                            firstName: String,
-                            lastName: String,
-                            plannedWorkingHours: Option[WorkingHours])
+case class OAuthAuthorizationCodeLoginRequest(
+    clientId: String,
+    email: String,
+    password: String,
+    scope: Option[String],
+    redirectUri: String,
+    // used for PKCE validation
+    codeChallenge: Option[String] = None,
+    codeChallengeMethod: Option[String] = None,
+    state: Option[String] = None)
 
-object UserRegistration {
-  implicit val userFormat: Format[UserRegistration] =
-    Json.format[UserRegistration]
+object OAuthAuthorizationCodeLoginRequest {
+  implicit val userFormat: Format[OAuthAuthorizationCodeLoginRequest] =
+    Json.format[OAuthAuthorizationCodeLoginRequest]
 }

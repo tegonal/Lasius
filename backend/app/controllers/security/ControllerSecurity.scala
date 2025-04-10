@@ -19,47 +19,46 @@
  * along with Lasius. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package controllers
+package controllers.security
 
+import com.typesafe.config.Config
+import controllers.AuthConfig
 import core.Validation.ValidationFailedException
-import core.{CacheAware, DBSession, DBSupport}
-import models.OrganisationId.OrganisationReference
-import models.UserId.UserReference
-import models.{
-  EntityReference,
-  OrganisationAdministrator,
-  OrganisationId,
-  OrganisationMember,
-  OrganisationRole,
-  ProjectId,
-  ProjectRole,
-  Subject,
-  User,
-  UserId,
-  UserOrganisation,
-  UserProject,
-  UserRole
-}
-import play.api.Logging
-import play.api.libs.json.Json.toJsFieldJsValueWrapper
-import play.api.libs.json.{Json, Reads}
+import core.{DBSession, DBSupport, SystemServices}
+import models._
+import play.api.libs.json.Reads
 import play.api.mvc._
 
+import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
+import scala.language.postfixOps
 
 /** Security actions that should be used by all controllers that need to protect
   * their actions. Can be composed to fine-tune access control.
   */
 trait SecurityComponent {
+  val systemServices: SystemServices
   val authConfig: AuthConfig
 }
 
-trait Security extends Logging {
-  self: BaseController with SecurityComponent with CacheAware with DBSupport =>
+trait ControllerSecurity extends TokenSecurity {
+  self: BaseController with SecurityComponent with DBSupport =>
 
-  val AuthTokenHeader    = "X-XSRF-TOKEN"
-  val AuthTokenCookieKey = "XSRF-TOKEN"
-  val AuthTokenUrlKey    = "auth"
+  private def TOKEN_REQUEST_HEADER_NAME(implicit conf: Config): String =
+    if (conf.hasPath("play.http.session.tokenHeaderName"))
+      conf.getString("play.http.session.tokenHeaderName")
+    else "Authorization"
+
+  private def TOKEN_PREFIX(implicit conf: Config): String = {
+    if (conf.hasPath("play.http.session.tokenPrefix"))
+      conf.getString("play.http.session.tokenPrefix")
+    else "Bearer "
+  }
+
+  private def TOKEN_ISSUER_REQUEST_HEADER_NAME(implicit conf: Config): String =
+    if (conf.hasPath("play.http.session.tokenIssuerHeaderName"))
+      conf.getString("play.http.session.tokenIssuerHeaderName")
+    else "X-Token-Issuer"
 
   def HasToken[A](withinTransaction: Boolean)(
       f: DBSession => Subject => Request[A] => Future[Result])(implicit
@@ -68,65 +67,45 @@ trait Security extends Logging {
     HasToken(parse.json[A], withinTransaction)(f)
   }
 
-  /** Checks that the token is:
-    *   - present in the cookie header of the request,
-    *   - either in the header or in the query string,
-    *   - matches a token already stored in the play cache
-    */
+  private def sanitizeHeader(header: String): String =
+    if (header.startsWith(TOKEN_PREFIX)) {
+      header.substring(TOKEN_PREFIX.length()).trim
+    } else {
+      header.trim
+    }
+
+  private def extractBearerToken(
+      request: RequestHeader
+  ): Option[String] =
+    request.headers
+      .get(TOKEN_REQUEST_HEADER_NAME)
+      .map(sanitizeHeader)
+
+  private def extractTokenIssuerHeader(
+      request: RequestHeader
+  ): Option[String] =
+    request.headers
+      .get(TOKEN_ISSUER_REQUEST_HEADER_NAME)
+      .map(_.trim)
+
+  /** */
   def HasToken[A](p: BodyParser[A], withinTransaction: Boolean)(
       f: DBSession => Subject => Request[A] => Future[Result])(implicit
       context: ExecutionContext): Action[A] = {
-    Action.async(p) { implicit request =>
-      withDBSession(withinTransaction) { implicit dbSession =>
-        checkToken().flatMap {
-          case Left(subject) =>
-            f(dbSession)(subject)(request)
-          case Right(result) =>
-            Future.successful(result)
+    Action.async(p) { request =>
+      extractBearerToken(request).fold {
+        successful(Unauthorized("No token found"))
+      } { token =>
+        withToken(tokenIssuer = extractTokenIssuerHeader(request),
+                  token = token,
+                  withinTransaction = withinTransaction,
+                  canCreateNewUser = true) {
+          successful(Unauthorized(s"Invalid token provided $token"))
+        } { dbSession => subject =>
+          f(dbSession)(subject)(request)
         }
       }
     }
-  }
-
-  /** check is user has a token
-    */
-  def checkToken[A]()(implicit
-      request: RequestHeader,
-      context: ExecutionContext): Future[Either[Subject, Result]] = {
-    request.cookies
-      .get(AuthTokenCookieKey)
-      .map { xsrfTokenCookie =>
-        val maybeToken = request.headers
-          .get(AuthTokenHeader)
-          .orElse(request.getQueryString(AuthTokenUrlKey))
-        logger.debug("Token from headers:" + maybeToken)
-        maybeToken
-          .map { token =>
-            logger.debug(
-              s"Check security token in cache:$token, " + cache.sync.get(token))
-            cache.get[UserReference](token).map {
-              _.map { userReference =>
-                logger.debug(s"Found userId: ${userReference.id}")
-                if (xsrfTokenCookie.value.equals(token)) {
-                  val subject = Subject(token, userReference)
-                  Left(subject)
-                } else {
-                  Right(Unauthorized(Json.obj("message" -> "Invalid Token")))
-                }
-              }.getOrElse(Right(
-                Unauthorized(Json.obj("message" -> "No Token"))))
-            }
-          }
-          .getOrElse {
-            Future.successful(
-              Right(Unauthorized(Json.obj("message" -> "No Token"))))
-          }
-      }
-      .getOrElse {
-        Future.successful(
-          Right(
-            Unauthorized(Json.obj("message" -> "Invalid XSRF Token cookie"))))
-      }
   }
 
   def HasUserRole[A, R <: UserRole](role: R, withinTransaction: Boolean)(
@@ -163,7 +142,6 @@ trait Security extends Logging {
       maybeOrganisation: Option[OrganisationId],
       role: R)(f: Option[UserOrganisation] => Future[Result])(implicit
       context: ExecutionContext,
-      dbSession: DBSession,
       request: Request[A]): Future[Result] = {
     maybeOrganisation
       .fold(f(None))(orgId =>
@@ -175,7 +153,6 @@ trait Security extends Logging {
                                                     role: R)(
       f: UserOrganisation => Future[Result])(implicit
       context: ExecutionContext,
-      dbSession: DBSession,
       request: Request[A]): Future[Result] = {
     checked(user.organisations.find(_.organisationReference.id == orgId) match {
       case Some(userOrganisation) =>
@@ -194,7 +171,6 @@ trait Security extends Logging {
                                           role: R)(
       f: UserProject => Future[Result])(implicit
       context: ExecutionContext,
-      dbSession: DBSession,
       request: Request[A]): Future[Result] = {
     checked(
       userOrganisation.projects.find(_.projectReference.id == projectId) match {
@@ -219,7 +195,6 @@ trait Security extends Logging {
       projectId: ProjectId,
       projectRole: ProjectRole)(f: UserOrganisation => Future[Result])(implicit
       context: ExecutionContext,
-      dbSession: DBSession,
       request: Request[A]): Future[Result] = {
     HasOrganisationRole(user, orgId, OrganisationMember) { userOrg =>
       // either org admin or project admin
@@ -239,7 +214,6 @@ trait Security extends Logging {
       maybeProjectId: Option[ProjectId],
       role: R)(f: Option[UserProject] => Future[Result])(implicit
       context: ExecutionContext,
-      dbSession: DBSession,
       request: Request[A]): Future[Result] = {
     maybeProjectId
       .fold(f(None))(projectId =>
@@ -251,17 +225,22 @@ trait Security extends Logging {
       context: ExecutionContext): Future[Result] = {
     f.recoverWith {
       case e: ValidationFailedException =>
-        logger.debug(s"Validation errror", e)
-        Future.successful(
-          BadRequest(
-            Option(e.getMessage()).getOrElse(e.getClass.getSimpleName)))
+        logger.debug(s"Validation error", e)
+        successful(
+          BadRequest(Option(e.getMessage).getOrElse(e.getClass.getSimpleName)))
+      case e: UnauthorizedException =>
+        logger.debug(s"UnauthorizedException", e)
+        successful(
+          Unauthorized(
+            Option(e.getMessage).getOrElse(e.getClass.getSimpleName)))
       case e =>
         logger.error(s"Unknown Error", e)
-        Future.successful(
+        successful(
           InternalServerError(
-            Option(e.getMessage()).getOrElse(e.getClass.getSimpleName)))
+            Option(e.getMessage).getOrElse(e.getClass.getSimpleName)))
     }
   }
-
-  def checkSSOAlive(): Unit = {}
 }
+
+case class UnauthorizedException(message: String)
+    extends RuntimeException(message)

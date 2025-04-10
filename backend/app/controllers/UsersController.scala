@@ -21,10 +21,10 @@
 
 package controllers
 
-import org.apache.pekko.util.Timeout
+import com.typesafe.config.Config
 import core.SystemServices
 import models._
-import play.api.cache.AsyncCacheApi
+import org.apache.pekko.util.Timeout
 import play.api.libs.json._
 import play.api.mvc._
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -34,13 +34,13 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class UsersController @Inject() (
-    controllerComponents: ControllerComponents,
+    override val conf: Config,
+    override val controllerComponents: ControllerComponents,
     override val systemServices: SystemServices,
     override val authConfig: AuthConfig,
-    override val cache: AsyncCacheApi,
     override val reactiveMongoApi: ReactiveMongoApi,
     userRepository: UserRepository)(implicit ec: ExecutionContext)
-    extends BaseLasiusController(controllerComponents) {
+    extends BaseLasiusController() {
 
   implicit val timeout: Timeout = systemServices.timeout
 
@@ -52,11 +52,11 @@ class UsersController @Inject() (
     */
   def authUser(): Action[Unit] =
     HasToken(parse.empty, withinTransaction = false) {
-      implicit dbSession => subject => implicit request =>
+      implicit dbSession => subject => _ =>
         {
           userRepository
             .findByUserReference(subject.userReference)
-            .map(_.map(user => Ok(Json.toJson(user.toDTO())))
+            .map(_.map(user => Ok(Json.toJson(user.toDTO)))
               .getOrElse(BadRequest))
         }
     }
@@ -69,7 +69,7 @@ class UsersController @Inject() (
         {
           userRepository
             .updateUserSettings(subject.userReference, request.body)
-            .map(user => Ok(Json.toJson(user.toDTO())))
+            .map(user => Ok(Json.toJson(user.toDTO)))
         }
     }
 
@@ -81,19 +81,7 @@ class UsersController @Inject() (
         {
           userRepository
             .updateUserData(subject.userReference, request.body)
-            .map(user => Ok(Json.toJson(user.toDTO())))
-        }
-    }
-
-  def changePassword(): Action[PasswordChangeRequest] =
-    HasUserRole(FreeUser,
-                validateJson[PasswordChangeRequest],
-                withinTransaction = false) {
-      implicit dbSession => implicit subject => _ => implicit request =>
-        {
-          userRepository
-            .changePassword(subject.userReference, request.body)
-            .map(_ => Ok(""))
+            .map(user => Ok(Json.toJson(user.toDTO)))
         }
     }
 
@@ -102,7 +90,7 @@ class UsersController @Inject() (
     HasUserRole(FreeUser,
                 validateJson[PersonalDataUpdate],
                 withinTransaction = false) {
-      implicit dbSession => implicit subject => user => implicit request =>
+      implicit dbSession => _ => user => implicit request =>
         HasOrganisationRole(user, orgId, OrganisationAdministrator) { _ =>
           for {
             user <- userRepository
@@ -110,8 +98,8 @@ class UsersController @Inject() (
               .noneToFailed(
                 s"Could not find user with user with id ${userId.value} in organisation ${orgId.value}")
             result <- userRepository
-              .updateUserData(user.getReference(), request.body)
-              .map(user => Ok(Json.toJson(user.toDTO())))
+              .updateUserData(user.getReference, request.body)
+              .map(user => Ok(Json.toJson(user.toDTO)))
           } yield result
         }
     }
@@ -135,7 +123,19 @@ class UsersController @Inject() (
               .updateUserOrganisation(subject.userReference,
                                       organisationReference,
                                       request.body)
-          } yield Ok(Json.toJson(user.toDTO()))
+          } yield Ok(Json.toJson(user.toDTO))
+        }
+    }
+
+  def acceptTOS(): Action[AcceptTOSRequest] =
+    HasUserRole(FreeUser,
+                validateJson[AcceptTOSRequest],
+                withinTransaction = false) {
+      implicit dbSession => implicit subject => _ => implicit request =>
+        {
+          userRepository
+            .acceptTOS(subject.userReference, request.body)
+            .map(user => Ok(Json.toJson(user.toDTO)))
         }
     }
 }

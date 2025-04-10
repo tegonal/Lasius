@@ -21,16 +21,15 @@
 
 package controllers
 
-import core.{MockCache, MockCacheAware, SystemServices, TestDBSupport}
+import com.typesafe.config.Config
+import core.{SystemServices, TestDBSupport}
 import models.{
-  OrganisationAdministrator,
   OrganisationMember,
   OrganisationRole,
   ProjectAdministrator,
   ProjectRole
 }
 import org.specs2.mock.Mockito
-import play.api.cache.AsyncCacheApi
 import play.api.mvc.ControllerComponents
 import play.api.test.Helpers
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -45,27 +44,26 @@ import util.{Awaitable, MockAwaitable}
 import scala.concurrent.ExecutionContext
 
 class ProjectsControllerMock(
+    conf: Config,
     controllerComponents: ControllerComponents,
     systemServices: SystemServices,
     val projectRepository: ProjectMongoRepository,
     userMongoRepository: UserMongoRepository,
     val invitationRepository: InvitationMongoRepository,
     authConfig: AuthConfig,
-    cache: AsyncCacheApi,
     reactiveMongoApi: ReactiveMongoApi,
     override val organisationRole: OrganisationRole,
     override val projectRole: ProjectRole,
     override val projectActive: Boolean)(implicit ec: ExecutionContext)
-    extends ProjectsController(controllerComponents,
-                               systemServices,
-                               projectRepository,
-                               userMongoRepository,
-                               invitationRepository,
-                               authConfig,
-                               cache,
-                               reactiveMongoApi)
+    extends ProjectsController(conf = conf,
+                               controllerComponents = controllerComponents,
+                               systemServices = systemServices,
+                               projectRepository = projectRepository,
+                               userRepository = userMongoRepository,
+                               invitationRepository = invitationRepository,
+                               authConfig = authConfig,
+                               reactiveMongoApi = reactiveMongoApi)
     with SecurityControllerMock
-    with MockCacheAware
     with TestDBSupport {
 
   // override mock as we deal with a real db backend in this spec
@@ -76,7 +74,8 @@ object ProjectsControllerMock
     extends MockAwaitable
     with Mockito
     with Awaitable {
-  def apply(systemServices: SystemServices,
+  def apply(conf: Config,
+            systemServices: SystemServices,
             authConfig: AuthConfig,
             reactiveMongoApi: ReactiveMongoApi,
             organisationRole: OrganisationRole = OrganisationMember,
@@ -88,17 +87,18 @@ object ProjectsControllerMock
     val invitationMongoRepository = new InvitationMongoRepository()
 
     val controller = new ProjectsControllerMock(
-      Helpers.stubControllerComponents(),
-      systemServices,
-      projectMongoRepository,
-      userMongoRepository,
-      invitationMongoRepository,
-      authConfig,
-      MockCache,
-      reactiveMongoApi,
-      organisationRole,
-      projectRole,
-      projectActive)
+      conf = conf,
+      controllerComponents = Helpers.stubControllerComponents(),
+      systemServices = systemServices,
+      projectRepository = projectMongoRepository,
+      userMongoRepository = userMongoRepository,
+      invitationRepository = invitationMongoRepository,
+      authConfig = authConfig,
+      reactiveMongoApi = reactiveMongoApi,
+      organisationRole = organisationRole,
+      projectRole = projectRole,
+      projectActive = projectActive
+    )
 
     // initialize data
     controller

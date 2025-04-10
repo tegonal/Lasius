@@ -22,56 +22,136 @@
 GET /config             controllers.ApplicationController.getConfig
 
 ###
-#  security:
-#    - cookieAuth: []
-#  tags: 
-#    - general
-#  responses:
-#    200:
-#      description: success
-###
-GET /messagingSocket    controllers.ApplicationController.messagingSocket
-
-#######
-####### Authentication #######
-#######
-
-###
-#  security:
-#    - cookieAuth: []
-#  tags: 
-#    - authentication
-#  summary: Log current user out
-#  operationId: signOut
-#  responses:
-#    200:
-#      description: success
-###
-POST /signout           controllers.ApplicationController.logout()
-
-###
 #  tags:
-#    - authentication
-#  summary: Authenticate with user and password
-#  operationId: signIn
-#  requestBody:
-#     content:
-#       application/json:
-#         schema:
-#           id: LoginPost
-#           $ref: '#/components/schemas/controllers.LoginForm'
+#    - general
+#  summary: Get csrf token
+#  operationId: getCsrfToken
 #  responses:
 #     200:
 #       description: success
 #       content:
 #         application/json:
 #           schema:
-#             type: object
-#             properties:
-#                "token":
-#                  type: string
+#             $ref: '#/components/schemas/models.CsrfToken'
 ###
-POST /signin            controllers.ApplicationController.login
+GET /csrf-token             controllers.ApplicationController.getCsrfToken
+
+#######
+####### Messaging #######
+#######
+
+###
+#  tags:
+#    - messaging
+#  responses:
+#    200:
+#      description: success
+###
+-> /messaging    controllers.MessagingController
+
+#######
+####### Internal OAuth2 identity provider #######
+#######
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - oauth2-provider
+#  summary: --------please annotate------
+#  operationId: registerOAuthUser
+#  requestBody:
+#    content:
+#      application/json:
+#        schema:
+#          $ref: '#/components/schemas/models.OAuthUserRegistration'
+#  responses:
+#    200:
+#      description: success
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.OAuthUserId'
+###
+POST /oauth2/user/register      controllers.OAuth2Controller.registerUser()
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - oauth2-provider
+#  summary: Change current user's password
+#  operationId: updateUserPassword
+#  requestBody:
+#    content:
+#      application/json:
+#        schema:
+#          $ref: '#/components/schemas/models.PasswordChangeRequest'
+#  responses:
+#    200:
+#      description: success
+###
+POST /oauth2/user/update-password      controllers.OAuth2Controller.changePassword()
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - oauth2-provider
+#  summary: access to internally provided oauth2 provider. Use for demo purposes only!
+#  operationId: oauthAccessToken
+#  responses:
+#    200:
+#      description: success
+###
++nocsrf
+POST    /oauth2/access_token    controllers.OAuth2Controller.accessToken
+
+###
+#  tags:
+#    - oauth2-provider
+#  summary: login to the oauth provider with the authorization code flow
+#  operationId: login
+#  requestBody:
+#    content:
+#      application/json:
+#        schema:
+#          $ref: '#/components/schemas/models.OAuthAuthorizationCodeLoginRequest'
+#  responses:
+#    302:
+#      description: redirect on success
+###
++nocsrf
+POST    /oauth2/login    controllers.OAuth2Controller.login()
+
+###
+#  tags:
+#    - oauth2-provider
+#  summary: logout from the internal oauth provider, token will not be valid anymore afterwards
+#  operationId: logout
+#  responses:
+#    200:
+#      description: ok, if access token was removed
+###
++nocsrf
+POST    /oauth2/logout    controllers.OAuth2Controller.logout()
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - oauth2-provider
+#  summary: access to internally provided oauth2 provider. Use for demo purposes only!
+#  operationId: getUOAuthUserProfile
+#  responses:
+#    200:
+#      description: success
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.OAuthUser'
+###
+GET    /oauth2/profile    controllers.OAuth2Controller.userProfile()
 
 #######
 ####### Current User #######
@@ -79,7 +159,7 @@ POST /signin            controllers.ApplicationController.login
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags: 
 #    - user
 #  summary: Get current user's profile
@@ -96,7 +176,7 @@ GET /user/profile         controllers.UsersController.authUser()
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags: 
 #    - user
 #  summary: Change current user's profile
@@ -118,7 +198,7 @@ POST /user/profile          controllers.UsersController.updatePersonalData()
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags:
 #    - user
 #  summary: Change current user's settings
@@ -140,21 +220,25 @@ POST /user/profile/settings          controllers.UsersController.updateUserSetti
 
 ###
 #  security:
-#    - cookieAuth: []
-#  tags: 
+#    - bearerHttpAuthentication: []
+#  tags:
 #    - user
-#  summary: Change current user's password
-#  operationId: updateUserPassword
+#  summary: Accept terms of service (TOS)
+#  operationId: acceptUserTOS
 #  requestBody:
 #    content:
 #      application/json:
 #        schema:
-#          $ref: '#/components/schemas/models.PasswordChangeRequest'
+#          $ref: '#/components/schemas/models.AcceptTOSRequest'
 #  responses:
 #    200:
 #      description: success
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.UserDTO'
 ###
-POST /user/update-password      controllers.UsersController.changePassword()
+POST /user/accept-tos      controllers.UsersController.acceptTOS()
 
 #######
 ####### Users #######
@@ -162,7 +246,7 @@ POST /user/update-password      controllers.UsersController.changePassword()
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags:
 #    - users
 #  summary: Change selected user's profile in selected organisation
@@ -188,7 +272,7 @@ POST /users/organisations/:orgId/users/:userId      controllers.UsersController.
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags: 
 #    - user-organisations
 #  summary: Change current user's working hours for the selected organisation
@@ -210,7 +294,7 @@ POST /user-organisations/organisations/:orgId/working-hours     controllers.User
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags:
 #    - user-organisations
 #  summary: Remove current user's membership from selected organisation
@@ -223,7 +307,7 @@ DELETE /user-organisations/organisations/:orgId/leave           controllers.Orga
 
 ###
 #  security:
-#     - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  summary: TagController
 #  tags:
 #     - user-organisations
@@ -248,7 +332,7 @@ GET /user-organisations/organisations/:orgId/projects/:projectId/tags          c
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags: 
 #    - user-bookings
 #  summary: Start booking time on selected organisation for the current user
@@ -266,7 +350,7 @@ POST /user-bookings/organisations/:orgId/bookings/start         controllers.Time
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags: 
 #    - user-bookings
 #  summary: Stop the currently running booking by organisation and booking id for the current user
@@ -284,7 +368,7 @@ POST /user-bookings/organisations/:orgId/bookings/:bookingId/stop       controll
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags: 
 #    - user-bookings
 #  summary: Change the currently running booking by organisation and booking id for the current user
@@ -302,7 +386,7 @@ POST /user-bookings/organisations/:orgId/bookings/:bookingId/start-time     cont
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags: 
 #    - user-bookings
 #  summary: Remove a booking by organisation and booking id for the current user
@@ -315,7 +399,7 @@ DELETE /user-bookings/organisations/:orgId/bookings/:bookingId          controll
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags: 
 #    - user-bookings
 #  summary: Create a booking by organisation for the current user
@@ -333,7 +417,7 @@ POST /user-bookings/organisations/:orgId/bookings           controllers.TimeBook
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags: 
 #    - user-bookings
 #  summary: Change a booking by organisation for the current user
@@ -351,7 +435,7 @@ POST /user-bookings/organisations/:orgId/bookings/:bookingId            controll
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags: 
 #    - user-bookings
 #  summary: Get current user's booking history for selected organisation
@@ -370,7 +454,7 @@ GET /user-bookings/organisations/:orgId/bookings/history            controllers.
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags:
 #    - user-bookings
 #  summary: Get aggregated stats for current user in selected organisation
@@ -389,7 +473,7 @@ GET /user-bookings/organisations/:orgId/bookings/stats/aggregated               
 
 ###
 #  security:
-#     - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags:
 #     - user-bookings
 #  summary: Get current user's currently running booking
@@ -406,7 +490,7 @@ GET /user-bookings/current                                  controllers.CurrentU
 
 ###
 #  security:
-#     - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags:
 #    - user-bookings
 #  summary: Get currently running bookings of members in selected organisation
@@ -423,7 +507,7 @@ GET /user-bookings/organisations/:orgId/current           			            control
 
 ###
 #  security:
-#     - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags:
 #     - user-bookings
 #  summary: Get latest bookings of members in selected organisation
@@ -441,7 +525,7 @@ GET /user-bookings/organisations/:orgId/latest						controllers.LatestUserTimeBo
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags:
 #    - user-favorites
 #  summary: Get current user's favorite bookings list for the selected organisation
@@ -458,7 +542,7 @@ GET /user-favorites/organisations/:orgId	                controllers.UserFavorit
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags:
 #    - user-favorites
 #  summary: Save a new favorite booking for the current user in the selected organisation
@@ -482,7 +566,7 @@ POST /user-favorites/organisations/:orgId                    controllers.UserFav
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags:
 #    - user-favorites
 #  summary: Remove a favorite booking for the current user from the selected organisation
@@ -504,7 +588,7 @@ DELETE /user-favorites/organisations/:orgId                    controllers.UserF
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags: 
 #    - organisation-bookings
 #  summary: Get bookings for the selected organisation within the selected timeframe
@@ -523,7 +607,7 @@ GET /organisation-bookings/organisations/:orgId/bookings/history                
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags:
 #    - organisation-bookings
 #  summary: Get aggregated statistics about bookings for the selected organisation within the selected timeframe
@@ -546,7 +630,7 @@ GET /organisation-bookings/organisations/:orgId/bookings/stats/aggregated       
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags: 
 #    - project-bookings
 #  summary: Get statistics about bookings for the selected project within the selected timeframe
@@ -565,8 +649,8 @@ GET /organisations/:orgId/projects/:projectId/bookings/history                  
 
 ###
 #  security:
-#    - cookieAuth: []
-#  tags: 
+#    - bearerHttpAuthentication: []
+#  tags:
 #    - project-bookings
 #  responses:
 #    200:
@@ -586,7 +670,7 @@ GET /organisations/:orgId/projects/:projectId/bookings/stats/aggregated         
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags: 
 #    - projects
 #  operationId: getProjectList
@@ -604,7 +688,7 @@ GET /organisations/:orgId/projects                                      controll
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags: 
 #    - projects
 #  requestBody:
@@ -624,7 +708,7 @@ POST /organisations/:orgId/projects                                      control
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  summary: update a project
 #  tags:
 #    - projects
@@ -645,7 +729,7 @@ POST /organisations/:orgId/projects/:projectId                                  
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  summary: Deactivate a project
 #  tags:
 #    - projects
@@ -657,7 +741,7 @@ DELETE /organisations/:orgId/projects/:projectId                           contr
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags:
 #    - projects
 #  operationId: getProjectUserList
@@ -675,7 +759,7 @@ GET /organisations/:orgId/projects/:projectId/users                     controll
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags: 
 #    - projects
 #  operationId: inviteProjectUser
@@ -696,7 +780,7 @@ POST /organisations/:orgId/projects/:projectId/users                     control
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags: 
 #    - projects
 #  operationId: removeProjectUser
@@ -708,7 +792,7 @@ DELETE /organisations/:orgId/projects/:projectId/users/:userId             contr
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags:
 #    - projects
 #  summary: Remove current user's membership from selected project and selected organisation
@@ -726,7 +810,7 @@ DELETE /organisations/:orgId/projects/:projectId/leave             controllers.P
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  summary: create an organisation
 #  tags: 
 #    - organisations
@@ -747,7 +831,7 @@ POST /organisations                                               controllers.Or
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags:
 #    - organisations
 #  responses:
@@ -762,7 +846,7 @@ GET /organisations/:orgId                                 controllers.Organisati
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  summary: update an organisation
 #  tags:
 #    - organisations
@@ -783,7 +867,7 @@ POST /organisations/:orgId                                               control
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  summary: delete/deactivate an organisation
 #  tags: 
 #    - organisations
@@ -795,7 +879,7 @@ DELETE /organisations/:orgId                                        controllers.
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags:
 #    - organisations
 #  operationId: getOrganisationUserList
@@ -813,7 +897,7 @@ GET /organisations/:orgId/users                                  controllers.Org
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  summary: assign a user to an organisation
 #  tags: 
 #    - organisations
@@ -835,7 +919,7 @@ POST /organisations/:orgId/invite                                  controllers.O
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags:
 #    - organisations
 #  summary: Remove selected user's membership from selected organisation
@@ -853,7 +937,7 @@ DELETE /organisations/:orgId/users/:userId                           controllers
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  summary: get detail of an invitation
 #  operationId: getInvitation
 #  tags: 
@@ -872,7 +956,7 @@ GET /invitations/:invitationId                          controllers.InvitationsC
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags: 
 #    - invitations-private
 #  operationId: acceptInvitation
@@ -893,7 +977,7 @@ POST /invitations/:invitationId/accept                  controllers.InvitationsC
 
 ###
 #  security:
-#    - cookieAuth: []
+#    - bearerHttpAuthentication: []
 #  tags: 
 #    - invitations-private
 #  operationId: declineInvitation
@@ -927,27 +1011,6 @@ POST /invitations/:invitationId/decline                 controllers.InvitationsC
 #      description: invalid or non existing invitation
 ###
 GET /invitations/:invitationId/status               controllers.InvitationsController.getStatus(invitationId: models.InvitationId)
-
-###
-#  tags:
-#    - invitations-public
-#  summary: --------please annotate------
-#  operationId: registerInvitationUser
-#  requestBody:
-#    content:
-#      application/json:
-#        schema:
-#          $ref: '#/components/schemas/models.UserRegistration'
-#  responses:
-#    200:
-#      description: success
-#      content:
-#        application/json:
-#          schema:
-#            $ref: '#/components/schemas/models.Invitation'
-###
-POST /invitations/:invitationId/register                controllers.InvitationsController.registerUser(invitationId: models.InvitationId)
-
 
 #######
 ####### Static Files #######

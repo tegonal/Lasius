@@ -19,15 +19,13 @@
  * along with Lasius. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package core
+package models
 
-import actors.LasiusSupervisorActor
-import com.google.inject.AbstractModule
-import play.api.libs.concurrent.PekkoGuiceSupport
+import play.api.libs.json.{Json, OFormat}
 
-class LasiusModule extends AbstractModule with PekkoGuiceSupport {
-  override def configure() = {
-    bindActor[LasiusSupervisorActor](LasiusSupervisorActor.name)
-    bind(classOf[SystemServices]).asEagerSingleton()
-  }
+case class AcceptTOSRequest(version: String)
+
+object AcceptTOSRequest {
+  implicit val format: OFormat[AcceptTOSRequest] =
+    Json.format[AcceptTOSRequest]
 }

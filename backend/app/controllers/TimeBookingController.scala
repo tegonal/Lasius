@@ -21,12 +21,13 @@
 
 package controllers
 
+import com.typesafe.config.Config
 import org.apache.pekko.util.Timeout
 import core.SystemServices
 import domain.UserTimeBookingAggregate._
 import models._
 import org.joda.time.DateTime
-import play.api.cache.AsyncCacheApi
+import play.api.cache.SyncCacheApi
 import play.api.mvc.{Action, ControllerComponents}
 import play.modules.reactivemongo.ReactiveMongoApi
 
@@ -34,12 +35,12 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class TimeBookingController @Inject() (
-    controllerComponents: ControllerComponents,
+    override val conf: Config,
+    override val controllerComponents: ControllerComponents,
     override val authConfig: AuthConfig,
-    override val cache: AsyncCacheApi,
     override val reactiveMongoApi: ReactiveMongoApi,
     override val systemServices: SystemServices)(implicit ec: ExecutionContext)
-    extends BaseLasiusController(controllerComponents) {
+    extends BaseLasiusController() {
 
   override val supportTransaction: Boolean = systemServices.supportTransaction
 
@@ -49,7 +50,7 @@ class TimeBookingController @Inject() (
     HasUserRole(FreeUser,
                 validateJson[StartBookingRequest],
                 withinTransaction = false) {
-      implicit dbSession => implicit subject => user => implicit request =>
+      _ => implicit subject => user => implicit request =>
         HasOrganisationRole(user, orgId, OrganisationMember) { userOrg =>
           HasProjectRole(userOrg, request.body.projectId, ProjectMember) {
             userProject =>
@@ -70,7 +71,7 @@ class TimeBookingController @Inject() (
     HasUserRole(FreeUser,
                 validateJson[StopBookingRequest],
                 withinTransaction = false) {
-      implicit dbSession => implicit subject => user => implicit request =>
+      _ => implicit subject => user => implicit request =>
         HasOrganisationRole(user, orgId, OrganisationMember) { userOrg =>
           systemServices.timeBookingViewService ! EndBookingCommand(
             subject.userReference,
@@ -83,7 +84,7 @@ class TimeBookingController @Inject() (
 
   def remove(orgId: OrganisationId, bookingId: BookingId): Action[Unit] =
     HasUserRole(FreeUser, parse.empty, withinTransaction = false) {
-      implicit dbSession => implicit subject => user => implicit request =>
+      _ => implicit subject => user => implicit request =>
         HasOrganisationRole(user, orgId, OrganisationMember) {
           userOrganisation =>
             systemServices.timeBookingViewService ! RemoveBookingCommand(
@@ -99,7 +100,7 @@ class TimeBookingController @Inject() (
     HasUserRole(FreeUser,
                 validateJson[EditBookingRequest],
                 withinTransaction = false) {
-      implicit dbSession => implicit subject => user => implicit request =>
+      _ => implicit subject => user => implicit request =>
         HasOrganisationRole(user, orgId, OrganisationMember) { userOrg =>
           HasOptionalProjectRole(userOrg,
                                  request.body.projectId,
@@ -124,7 +125,7 @@ class TimeBookingController @Inject() (
     HasUserRole(FreeUser,
                 validateJson[BookingChangeStartRequest],
                 withinTransaction = false) {
-      implicit dbSession => implicit subject => user => implicit request =>
+      _ => implicit subject => user => implicit request =>
         HasOrganisationRole(user, orgId, OrganisationMember) {
           userOrganisation =>
             systemServices.timeBookingViewService ! ChangeStartTimeOfBooking(
@@ -140,7 +141,7 @@ class TimeBookingController @Inject() (
     HasUserRole(FreeUser,
                 validateJson[AddBookingRequest],
                 withinTransaction = false) {
-      implicit dbSession => implicit subject => user => implicit request =>
+      _ => implicit subject => user => implicit request =>
         HasOrganisationRole(user, orgId, OrganisationMember) { userOrg =>
           HasProjectRole(userOrg, request.body.projectId, ProjectMember) {
             userProject =>

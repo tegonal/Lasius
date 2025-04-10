@@ -31,6 +31,7 @@ import { DevInfoBadge } from 'components/system/devInfoBadge';
 import { LasiusBackendWebsocketStatus } from 'components/system/lasiusBackendWebsocketStatus';
 import { BrowserOnlineStatusCheck } from 'components/system/browserOnlineStatusCheck';
 import { LasiusBackendOnlineCheck } from 'components/system/lasiusBackendOnlineCheck';
+import { LasiusTOSCheck } from 'components/system/lasiusTOSCheck';
 import { Session } from 'next-auth';
 import { BundleVersionCheck } from 'components/system/bundleVersionCheck';
 import { LasiusBackendWebsocketEventHandler } from 'components/system/lasiusBackendWebsocketEventHandler';
@@ -49,13 +50,14 @@ import { Toasts } from 'components/toasts/toasts';
 import { LazyMotion } from 'framer-motion';
 import { getGetUserProfileKey, getUserProfile } from 'lib/api/lasius/user/user';
 import { ModelsUser } from 'lib/api/lasius';
-import { CookieCutter } from 'components/system/cookieCutter';
+import { HttpHeaderProvider } from 'components/system/httpHeaderProvider';
 import { useAsync } from 'react-async-hook';
 import { removeAccessibleCookies } from 'lib/removeAccessibleCookies';
-import { getServerSideRequestHeaders } from 'lib/api/hooks/useTokensWithAxiosRequests';
+import { getRequestHeaders } from 'lib/api/hooks/useTokensWithAxiosRequests';
 import { logger } from 'lib/logger';
 import dynamic from 'next/dynamic';
 import PlausibleProvider from 'next-plausible';
+import { t } from 'i18next';
 
 export type NextPageWithLayout<P = Record<string, unknown>, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement<P>) => ReactNode;
@@ -91,7 +93,7 @@ const App = ({
 }: AppPropsWithLayout): JSX.Element => {
   // Use the layout defined at the page level, if available
   const getLayout = Component.getLayout ?? ((page) => page);
-  const lasiusIsLoggedIn = !!(session?.user?.xsrfToken && profile?.id);
+  const lasiusIsLoggedIn = !!(session?.access_token && profile?.id);
   const store = useStore();
 
   useAsync(async () => {
@@ -99,6 +101,8 @@ const App = ({
       logger.info('[App][UserNotLoggedIn]');
       store.dispatch({ type: 'reset' });
       await removeAccessibleCookies();
+    } else {
+      logger.info('[App][UserLoggedIn]');
     }
   }, [lasiusIsLoggedIn]);
 
@@ -110,8 +114,8 @@ const App = ({
           use: [swrLogger as any],
         }}
       >
-        <SessionProvider session={session}>
-          <CookieCutter />
+        <SessionProvider session={session} refetchOnWindowFocus={true}>
+          <HttpHeaderProvider session={session} />
           <Head>
             <meta
               name="viewport"
@@ -152,6 +156,7 @@ const App = ({
                       <LasiusBackendWebsocketStatus />
                       <LasiusBackendWebsocketEventHandler />
                       <DevInfoBadge />
+                      <LasiusTOSCheck />
                     </>
                   )}
                 </PlausibleProvider>
@@ -173,6 +178,10 @@ type ExtendedAppContext = AppContext & {
   };
 };
 
+// list of known error response codes, used tp provide translations only
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const translations = [t('fetchProfileFailed')];
+
 App.getInitialProps = async ({
   Component,
   ctx,
@@ -180,16 +189,15 @@ App.getInitialProps = async ({
 }: ExtendedAppContext) => {
   const session = await getSession({ req });
   let profile = null;
-  const token = session?.user?.xsrfToken;
-
-  if (token && session) {
-    logger.info('App.getInitialProps', { token, session });
+  if (session?.access_token) {
     try {
-      profile = await getUserProfile(getServerSideRequestHeaders(token));
+      profile = await getUserProfile(
+        getRequestHeaders(session.access_token, session.access_token_issuer)
+      );
     } catch (error) {
-      logger.error(error);
       if (res && !pathname.includes('/login')) {
-        res.writeHead(307, { Location: '/login' });
+        logger.warn('[App][UserProfile][Failed]', error);
+        res.writeHead(307, { Location: '/login?error=fetchProfileFailed' });
         res.end();
       }
     }

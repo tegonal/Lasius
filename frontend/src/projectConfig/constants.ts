@@ -34,6 +34,7 @@ export const {
   LASIUS_TELEMETRY_PLAUSIBLE_HOST,
   LASIUS_TELEMETRY_PLAUSIBLE_SOURCE_DOMAIN,
   LASIUS_DEMO_MODE,
+  LASIUS_TERMSOFSERVICE_VERSION,
 } = publicRuntimeConfig as { [key: string]: string };
 
 export const DEV = ENVIRONMENT !== 'production';
@@ -64,11 +65,6 @@ export const ROLES = {
 };
 export type ROLES = typeof ROLES;
 
-export const COOKIE_NAMES = {
-  XSRF_TOKEN: 'XSRF-TOKEN',
-};
-export type COOKIE_NAMES = typeof COOKIE_NAMES;
-
 export const WEBSOCKET_EVENT = {
   UserLoggedOutV2: 'UserLoggedOutV2',
   CurrentOrganisationTimeBookings: 'CurrentOrganisationTimeBookings',
@@ -84,6 +80,7 @@ export const WEBSOCKET_EVENT = {
   UserTimeBookingHistoryEntryRemoved: 'UserTimeBookingHistoryEntryRemoved',
   UserTimeBookingByTagEntryAdded: 'UserTimeBookingByTagEntryAdded',
   UserTimeBookingByTagEntryRemoved: 'UserTimeBookingByTagEntryRemoved',
+  Pong: 'Pong',
 };
 
 export enum CONNECTION_STATUS {
@@ -94,3 +91,6 @@ export enum CONNECTION_STATUS {
   DISCONNECTED = 'DISCONNECTED',
   ERROR = 'ERROR',
 }
+
+export const AUTH_PROVIDER_INTERNAL_LASIUS = 'internal_lasius';
+export const AUTH_PROVIDER_CUSTOMER_KEYCLOAK = 'custom_keycloak';

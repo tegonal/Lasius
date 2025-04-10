@@ -28,7 +28,6 @@ import org.joda.time.{DateTime, Duration, LocalDate}
 import play.api.libs.json._
 import play.api.mvc.WebSocket.MessageFlowTransformer
 
-import java.util.UUID
 import scala.annotation.nowarn
 
 sealed trait PersistedEvent
@@ -42,7 +41,7 @@ case class UserLoggedIn(userId: String) extends PersistedEvent {
       .find(_.key == userId)
       .getOrElse(sys.error(
         s"Cannot migrate Event $this, User with key $userId not found"))
-      .getReference()
+      .getReference
   )
 }
 
@@ -56,7 +55,7 @@ case class UserTimeBookingInitialized(userId: String) extends PersistedEvent {
         .find(_.key == userId)
         .getOrElse(sys.error(
           s"Cannot migrate Event $this, User with key $userId not found"))
-        .getReference())
+        .getReference)
 }
 
 case class UserTimeBookingInitializedV2(userReference: UserReference)
@@ -134,13 +133,18 @@ case class UserTimeBookingStartTimeChanged(bookingId: BookingId,
 
 sealed trait InEvent
 
-case class HelloServer(client: String) extends InEvent
+case class HelloServer(client: String,
+                       token: String,
+                       tokenIssuer: Option[String])
+    extends InEvent
 
 case object Ping extends InEvent
 
 case object Pong extends OutEvent
 
 sealed trait OutEvent
+
+case object AuthenticationFailed extends OutEvent
 
 case object HelloClient extends OutEvent
 
@@ -152,7 +156,7 @@ case class UserLoggedOut(userId: String) extends OutEvent with PersistedEvent {
         .find(_.key == userId)
         .getOrElse(sys.error(
           s"Cannot migrate Event $this, User with key $userId not found"))
-        .getReference())
+        .getReference)
 }
 
 case class UserLoggedOutV2(userReference: UserReference)

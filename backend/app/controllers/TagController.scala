@@ -22,11 +22,11 @@
 package controllers
 
 import actors.TagCache.{CachedTags, GetTags}
-import org.apache.pekko.pattern.ask
-import org.apache.pekko.util.Timeout
+import com.typesafe.config.Config
 import core.SystemServices
 import models._
-import play.api.cache.AsyncCacheApi
+import org.apache.pekko.pattern.ask
+import org.apache.pekko.util.Timeout
 import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -37,22 +37,22 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-class TagController @Inject() (controllerComponents: ControllerComponents,
-                               override val systemServices: SystemServices,
-                               override val authConfig: AuthConfig,
-                               override val cache: AsyncCacheApi,
-                               override val userRepository: UserRepository,
-                               override val reactiveMongoApi: ReactiveMongoApi,
-                               projectRepository: ProjectRepository)(implicit
-    ec: ExecutionContext)
-    extends BaseLasiusController(controllerComponents)
+class TagController @Inject() (
+    override val conf: Config,
+    override val controllerComponents: ControllerComponents,
+    override val systemServices: SystemServices,
+    override val authConfig: AuthConfig,
+    override val userRepository: UserRepository,
+    override val reactiveMongoApi: ReactiveMongoApi,
+    projectRepository: ProjectRepository)(implicit ec: ExecutionContext)
+    extends BaseLasiusController()
     with SecurityRepositoryComponent {
 
   def getTags(orgId: OrganisationId, projectId: ProjectId): Action[Unit] = {
     HasUserRole(FreeUser, parse.empty, withinTransaction = false) {
-      implicit dbSession => implicit subject => user => implicit request =>
+      implicit session => _ => user => implicit request =>
         HasOrganisationRole(user, orgId, OrganisationMember) { userOrg =>
-          HasProjectRole(userOrg, projectId, ProjectMember) { userProject =>
+          HasProjectRole(userOrg, projectId, ProjectMember) { _ =>
             implicit val timeout: Timeout =
               Timeout(5 seconds) // needed for `?` below
             val future = systemServices.tagCache ? GetTags(projectId)

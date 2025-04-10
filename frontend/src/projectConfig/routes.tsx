@@ -21,7 +21,7 @@ import { IconNames } from 'types/iconNames';
 import { NavigationTabContent } from 'components/navigation/desktop/navigationTabContent';
 import React from 'react';
 import { NavigationLogout } from 'components/navigation/desktop/navigationLogout';
-import { ROLES } from 'projectConfig/constants';
+import { AUTH_PROVIDER_INTERNAL_LASIUS, ROLES } from 'projectConfig/constants';
 
 const t = (s: string) => s;
 
@@ -142,6 +142,7 @@ export const NAVIGATION: NavigationType = [
         route: ROUTES.SETTINGS.ACCOUNT_SECURITY,
         name: t('Security'),
         icon: 'lock-1-interface-essential',
+        restrictTo: [AUTH_PROVIDER_INTERNAL_LASIUS],
       },
     ],
   },
@@ -157,15 +158,18 @@ export const NAVIGATION: NavigationType = [
 export const getNavigation = ({
   id,
   isOrganisationAdministrator,
+  isUserOfInternalOAuthProvider,
 }: {
   id: string;
   isOrganisationAdministrator: boolean;
+  isUserOfInternalOAuthProvider: boolean;
 }) => {
   const branch = NAVIGATION.filter((item) => item.level === id)[0].routes;
   return branch.filter((item) => {
     return (
       !item.restrictTo ||
-      (item.restrictTo?.includes(ROLES.ORGANISATION_ADMIN) && isOrganisationAdministrator)
+      (item.restrictTo?.includes(ROLES.ORGANISATION_ADMIN) && isOrganisationAdministrator) ||
+      (item.restrictTo?.includes(AUTH_PROVIDER_INTERNAL_LASIUS) && isUserOfInternalOAuthProvider)
     );
   });
 };

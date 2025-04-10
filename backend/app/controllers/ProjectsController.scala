@@ -21,10 +21,10 @@
 
 package controllers
 
+import com.typesafe.config.Config
 import core.SystemServices
 import models._
 import org.joda.time.DateTime
-import play.api.cache.AsyncCacheApi
 import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -34,16 +34,15 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class ProjectsController @Inject() (
-    controllerComponents: ControllerComponents,
+    override val conf: Config,
+    override val controllerComponents: ControllerComponents,
     override val systemServices: SystemServices,
+    override val authConfig: AuthConfig,
+    override val reactiveMongoApi: ReactiveMongoApi,
     projectRepository: ProjectRepository,
     userRepository: UserRepository,
-    invitationRepository: InvitationRepository,
-    override val authConfig: AuthConfig,
-    override val cache: AsyncCacheApi,
-    override val reactiveMongoApi: ReactiveMongoApi)(implicit
-    ec: ExecutionContext)
-    extends BaseLasiusController(controllerComponents) {
+    invitationRepository: InvitationRepository)(implicit ec: ExecutionContext)
+    extends BaseLasiusController() {
   def getProjects(orgId: OrganisationId): Action[Unit] =
     HasUserRole(FreeUser, parse.empty, withinTransaction = false) {
       implicit dbSession => implicit subject => user => implicit request =>
@@ -69,7 +68,7 @@ class ProjectsController @Inject() (
             _ <- userRepository.assignUserToProject(
               subject.userReference.id,
               userOrg.organisationReference,
-              project.getReference(),
+              project.getReference,
               ProjectAdministrator)
           } yield Created(Json.toJson(project))
         }
@@ -142,7 +141,7 @@ class ProjectsController @Inject() (
                                                  ProjectMember) { _ =>
           userRepository
             .findByProject(projectId)
-            .map(users => Ok(Json.toJson(users.map(_.toStub()))))
+            .map(users => Ok(Json.toJson(users.map(_.toStub))))
         }
     }
 
@@ -180,7 +179,7 @@ class ProjectsController @Inject() (
                     .assignUserToProject(
                       userId = maybeExistingUser.get.id,
                       organisationReference = project.organisationReference,
-                      projectReference = project.getReference(),
+                      projectReference = project.getReference,
                       role = request.body.role
                     )
                     .map(_ => None)
@@ -196,7 +195,7 @@ class ProjectsController @Inject() (
                       expiration = DateTime.now().plusDays(7),
                       sharedByOrganisationReference =
                         userOrg.organisationReference,
-                      projectReference = project.getReference(),
+                      projectReference = project.getReference,
                       role = request.body.role,
                       outcome = None
                     ))
@@ -221,7 +220,7 @@ class ProjectsController @Inject() (
               .findById(projectId)
               .noneToFailed(s"Project ${projectId.value} does not exist")
             _ <- userRepository.unassignUserFromProject(userId,
-                                                        project.getReference())
+                                                        project.getReference)
           } yield Ok("")
         }
     }

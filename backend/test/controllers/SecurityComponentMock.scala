@@ -21,11 +21,15 @@
 
 package controllers
 
+import controllers.security.SecurityComponent
 import org.specs2.mock.Mockito
-
-import scala.concurrent.Future
+import services.OpaqueTokenService
 
 trait SecurityComponentMock extends SecurityComponent with Mockito {
-  override val authConfig: AuthConfig =
-    mock[AuthConfig].defaultReturn(Future.successful(true))
+  override val authConfig: AuthConfig = {
+    val authConfig = mock[AuthConfig]
+    authConfig.opaqueTokenService.returns(mock[OpaqueTokenService])
+
+    authConfig
+  }
 }

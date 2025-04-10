@@ -21,11 +21,12 @@
 
 package controllers
 
+import com.typesafe.config.Config
 import core.Validation.ValidationFailedException
 import core.{DBSession, SystemServices}
 import models._
 import org.joda.time.DateTime
-import play.api.cache.AsyncCacheApi
+import play.api.cache.SyncCacheApi
 import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -40,17 +41,16 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class InvitationsController @Inject() (
-    controllerComponents: ControllerComponents,
+    override val conf: Config,
+    override val controllerComponents: ControllerComponents,
     override val systemServices: SystemServices,
+    override val authConfig: AuthConfig,
+    override val reactiveMongoApi: ReactiveMongoApi,
     userRepository: UserRepository,
     organisationRepository: OrganisationRepository,
     invitationRepository: InvitationRepository,
-    projectRepository: ProjectRepository,
-    override val authConfig: AuthConfig,
-    override val cache: AsyncCacheApi,
-    override val reactiveMongoApi: ReactiveMongoApi)(implicit
-    ec: ExecutionContext)
-    extends BaseLasiusController(controllerComponents) {
+    projectRepository: ProjectRepository)(implicit ec: ExecutionContext)
+    extends BaseLasiusController() {
 
   /** Unauthenticated endpoint
     */
@@ -80,39 +80,13 @@ class InvitationsController @Inject() (
 
   /** Unauthenticated endpoint
     */
-  def registerUser(invitationId: InvitationId): Action[UserRegistration] = {
-    Action.async(validateJson[UserRegistration]) { request =>
-      checked {
-        withinTransaction { implicit dbSession =>
-          for {
-            invitation <- validateInvitation(invitationId)
-            _          <- validateNonBlankString("key", request.body.key)
-            // first validate user before applying any changes to support
-            // setup without real transactions
-            _ <- userRepository.validateCreate(invitation.invitedEmail,
-                                               request.body)
-            // Create new private organisation
-            newOrg <- organisationRepository.create(request.body.key, true)(
-              systemServices.systemSubject,
-              dbSession)
-            // Create new user and assign to private organisation
-            _ <- userRepository.create(invitation.invitedEmail,
-                                       request.body,
-                                       newOrg,
-                                       OrganisationAdministrator)
-          } yield Ok(Json.toJson(invitation))
-        }
-      }
-    }
-  }
 
   def getDetails(invitationId: InvitationId): Action[Unit] = {
     HasUserRole(FreeUser, parse.empty, withinTransaction = false) {
-      implicit dbSession => implicit subject => implicit user =>
-        implicit request =>
-          for {
-            invitation <- validateInvitationAndUser(invitationId)
-          } yield Ok(Json.toJson(invitation))
+      implicit dbSession => _ => implicit user => _ =>
+        for {
+          invitation <- validateInvitationAndUser(invitationId)
+        } yield Ok(Json.toJson(invitation))
     }
   }
 
@@ -136,7 +110,7 @@ class InvitationsController @Inject() (
                     userOrg <- maybeUserOrg.fold[Future[UserOrganisation]](
                       Future.failed(ValidationFailedException(
                         "Need to specify binding organisation when joining a project")))(
-                      Future.successful(_))
+                      Future.successful)
                     project <- projectRepository
                       .findById(i.projectReference.id)
                       .noneToFailed(
@@ -180,16 +154,15 @@ class InvitationsController @Inject() (
 
   def decline(invitationId: InvitationId): Action[Unit] = {
     HasUserRole(FreeUser, parse.empty, withinTransaction = true) {
-      implicit dbSession => implicit subject => implicit user =>
-        implicit request =>
-          for {
-            _ <- validateInvitationAndUser(invitationId)
-            result <- invitationRepository.updateInvitationStatus(
-              invitationId,
-              InvitationDeclined)
-            _          <- validate(result, "failed_update_status")
-            invitation <- invitationRepository.findById(invitationId)
-          } yield Ok(Json.toJson(invitation))
+      implicit dbSession => implicit subject => implicit user => _ =>
+        for {
+          _ <- validateInvitationAndUser(invitationId)
+          result <- invitationRepository.updateInvitationStatus(
+            invitationId,
+            InvitationDeclined)
+          _          <- validate(result, "failed_update_status")
+          invitation <- invitationRepository.findById(invitationId)
+        } yield Ok(Json.toJson(invitation))
     }
   }
 

@@ -31,11 +31,11 @@ import { FormBodyAsColumns } from 'components/forms/formBodyAsColumns';
 import { FormElementSpacer } from 'components/forms/formElementSpacer';
 import { FormErrorsMultiple } from 'components/forms/formErrorsMultiple';
 import { Icon } from 'components/shared/icon';
-import { updateUserPassword } from 'lib/api/lasius/user/user';
 import { useProfile } from 'lib/api/hooks/useProfile';
 import { useIsClient } from 'usehooks-ts';
 import { useToast } from 'components/toasts/hooks/useToast';
 import { DEV, LASIUS_DEMO_MODE } from 'projectConfig/constants';
+import { updateUserPassword } from 'lib/api/lasius/oauth2-provider/oauth2-provider';
 
 type Form = {
   password: string;
@@ -79,7 +79,7 @@ export const AccountSecurityForm: React.FC = () => {
       await updateUserPassword(payload);
       addToast({ message: t('Password updated'), type: 'SUCCESS' });
       resetForm();
-    } catch (error) {
+    } catch {
       addToast({
         message: t(
           'Password update failed. Make sure you entered your current password and that it is correct.'

@@ -24,7 +24,11 @@ package models
 import play.api.libs.json._
 
 @SerialVersionUID(1241414)
-case class ApplicationConfig(title: String, instance: String)
+case class ApplicationConfig(title: String,
+                             instance: String,
+                             lasiusOAuthProviderEnabled: Boolean,
+                             lasiusOAuthProviderAllowUserRegistration: Boolean,
+                             allowedIssuers: Seq[String])
 
 object ApplicationConfig {
   implicit val appConfigFormat: Format[ApplicationConfig] =

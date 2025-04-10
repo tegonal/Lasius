@@ -34,7 +34,8 @@ import { updateUserProfile } from 'lib/api/lasius/user/user';
 import { useProfile } from 'lib/api/hooks/useProfile';
 import { useIsClient } from 'usehooks-ts';
 import { useToast } from 'components/toasts/hooks/useToast';
-import { LASIUS_DEMO_MODE } from 'projectConfig/constants';
+import { AUTH_PROVIDER_INTERNAL_LASIUS, LASIUS_DEMO_MODE } from 'projectConfig/constants';
+import { useSession } from 'next-auth/react';
 
 type Form = {
   email: string;
@@ -47,6 +48,7 @@ export const AccountForm: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { firstName, lastName, email, role } = useProfile();
   const isClient = useIsClient();
+  const session = useSession();
   const { addToast } = useToast();
 
   const { t } = useTranslation('common');
@@ -99,6 +101,7 @@ export const AccountForm: React.FC = () => {
             <FormElement>
               <Label htmlFor="email">{t('E-Mail')}</Label>
               <Input
+                readOnly={session?.data?.provider !== AUTH_PROVIDER_INTERNAL_LASIUS}
                 {...hookForm.register('email', { required: true, pattern: emailValidationPattern })}
                 autoComplete="off"
               />

@@ -22,6 +22,7 @@
 package controllers
 
 import com.google.inject.ImplementedBy
+import controllers.security.UnauthorizedException
 import core.{DBSession, SystemServices}
 import helpers.UserHelper
 import models.UserId.UserReference
@@ -29,13 +30,24 @@ import models._
 import play.api.libs.json.Json.toJsFieldJsValueWrapper
 import play.api.libs.json._
 import play.api.mvc._
-import repositories.{SecurityRepositoryComponent, UserRepository}
+import repositories.{
+  OrganisationRepository,
+  SecurityRepositoryComponent,
+  UserRepository
+}
+import services.OpaqueTokenService
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 @ImplementedBy(classOf[DefaultAuthConfig])
 trait AuthConfig {
+
+  val opaqueTokenService: OpaqueTokenService
+
+  def resolveIssuerConfig(issuer: String): Option[IssuerConfig]
+
+  def issuerConfigs(): Seq[IssuerConfig]
 
   /** Map usertype to permission role.
     */
@@ -55,19 +67,35 @@ trait AuthConfig {
       context: ExecutionContext,
       dbSession: DBSession): Future[Option[User]]
 
-  /** Defined handling of authorizationFailed
+  /** Lookup user by token
+    */
+  def resolveOrCreateUserByUserInfo(userInfo: UserInfo,
+                                    canCreateNewUser: Boolean = true)(implicit
+      context: ExecutionContext,
+      dbSession: DBSession): Future[UserReference]
+
+  /** Defined handling of authorizationfailed
     */
   def authorizationFailed(request: RequestHeader)(implicit
       context: ExecutionContext): Future[Result]
 }
 
-class DefaultAuthConfig @Inject() (controllerComponents: ControllerComponents,
-                                   systemServices: SystemServices,
-                                   override val userRepository: UserRepository)
+class DefaultAuthConfig @Inject() (
+    controllerComponents: ControllerComponents,
+    systemServices: SystemServices,
+    override val userRepository: UserRepository,
+    override val opaqueTokenService: OpaqueTokenService,
+    val organisationRepository: OrganisationRepository)
     extends AbstractController(controllerComponents)
     with AuthConfig
     with UserHelper
     with SecurityRepositoryComponent {
+
+  override def resolveIssuerConfig(issuer: String): Option[IssuerConfig] =
+    systemServices.lasiusConfig.security.allowedIssuers.find(_.issuer == issuer)
+
+  override def issuerConfigs(): Seq[IssuerConfig] =
+    systemServices.lasiusConfig.security.allowedIssuers
 
   /** Map usertype to permission role.
     */
@@ -98,6 +126,35 @@ class DefaultAuthConfig @Inject() (controllerComponents: ControllerComponents,
       context: ExecutionContext,
       dbSession: DBSession): Future[Option[User]] =
     userRepository.findByUserReference(userReference)
+
+  override def resolveOrCreateUserByUserInfo(
+      userInfo: UserInfo,
+      canCreateNewUser: Boolean = true)(implicit
+      context: ExecutionContext,
+      dbSession: DBSession): Future[UserReference] = {
+
+    userRepository.findByEmail(userInfo.email).flatMap {
+      _.map(user => Future.successful(user.getReference))
+        .getOrElse {
+          if (canCreateNewUser) {
+            for {
+              // Create new private organisation
+              newOrg <- organisationRepository.create(
+                userInfo.key,
+                `private` = true)(systemServices.systemSubject, dbSession)
+              // Create new user and assign to private organisation
+              user <- userRepository.createInitialUserBasedOnProfile(
+                userInfo,
+                newOrg,
+                OrganisationAdministrator)
+            } yield user.getReference
+          } else {
+            Future.failed(
+              UnauthorizedException("Cannot find user for provided jwt token"))
+          }
+        }
+    }
+  }
 
   override def authorizationFailed(request: RequestHeader)(implicit
       context: ExecutionContext): Future[Result] =

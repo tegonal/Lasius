@@ -1,5 +1,5 @@
 import play.sbt.routes.RoutesKeys
-import org.scalafmt.sbt.ScalafmtPlugin.autoImport._
+import org.scalafmt.sbt.ScalafmtPlugin.autoImport.*
 
 name := """lasius"""
 
@@ -12,7 +12,8 @@ lazy val root = (project in file("."))
                  AutomateHeaderPlugin)
   .settings(
     RoutesKeys.routesImport += "binders.Binders._",
-    swaggerV3 := true
+    swaggerV3 := true,
+    maintainer := "Tegonal Genossenschaft, https://tegonal.com"
   )
 
 swaggerDomainNameSpaces := Seq("models", "controllers")
@@ -41,10 +42,11 @@ val reactiveMongoVersion     = "1.1.0"
 val reactiveMongoPlayVersion = s"$reactiveMongoVersion-play30.RC14"
 val playVersion              = "3.0.5"
 // Play framework 3.x is still bound to older guice version
-val guiceVersion = "6.0.0"
+val guiceVersion      = "6.0.0"
+val pureConfigVersion = "0.17.8"
 
 libraryDependencies ++= Seq(
-  ("org.reactivemongo" %% "play2-reactivemongo" % reactiveMongoPlayVersion),
+  "org.reactivemongo" %% "play2-reactivemongo" % reactiveMongoPlayVersion,
   "com.github.scullxbones"      %% "pekko-persistence-mongodb" % "1.2.2",
   "com.tegonal"                 %% "play-json-typedid"         % "2.0.0",
   "org.julienrf"                %% "play-json-derived-codecs"  % "11.0.0",
@@ -67,13 +69,32 @@ libraryDependencies ++= Seq(
   "io.kontainers"       %% "purecsv"                         % "1.3.10",
   "com.chuusai"         %% "shapeless"                       % "2.3.12",
   "net.openhft"          % "zero-allocation-hashing"         % "0.27ea0",
+  "com.github.pureconfig" %% "pureconfig" % pureConfigVersion,
   // depend on this plugin to be able to provide custom OutputTransformer
   "io.github.play-swagger" %% "play-swagger" % "2.0.4",
+  "com.github.fdimuccio"   %% "play2-sockjs" % "0.10.0",
+
+  // basic jwt token and jwks support
+  // "com.github.jwt-scala" %% "jwt-play" % "10.0.1",
+  "com.auth0" % "java-jwt" % "4.5.0",
+  "com.auth0" % "jwks-rsa" % "0.22.1",
+
+  // oauth2 provider dependencies
+  // oauth2 provider dependencies to be able to provide a simple oauth server packed with lasius
+  "com.nulab-inc" %% "scala-oauth2-core"     % "1.6.0",
+  "com.nulab-inc" %% "play2-oauth2-provider" % "2.0.0",
   ehcache,
   ws,
   specs2 % Test,
   guice,
   "org.webjars" % "swagger-ui" % "5.18.3"
+)
+
+dependencyOverrides ++= Seq(
+  "com.fasterxml.jackson.module" % "jackson-module-scala_2.13" % "2.18.2",
+  "com.fasterxml.jackson.core"   % "jackson-databind"          % "2.18.2",
+  "com.fasterxml.jackson.core"   % "jackson-core"              % "2.18.2",
+  "com.fasterxml.jackson.core"   % "jackson-annotations"       % "2.18.2",
 )
 
 Test / javaOptions += "-Dconfig.file=conf/test.conf"

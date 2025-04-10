@@ -23,7 +23,6 @@ package repositories
 
 import com.google.inject.ImplementedBy
 import core.{DBSession, Validation}
-import models.UserId.UserReference
 import models._
 import org.joda.time.DateTime
 import play.api.libs.json.Json

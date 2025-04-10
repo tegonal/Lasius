@@ -22,8 +22,8 @@
 package controllers
 
 import actors.ClientReceiver
-import controllers.TimeBookingStatisticsControllerMock.mock
-import core.{MockCache, MockCacheAware, SystemServices, TestApplication}
+import com.typesafe.config.Config
+import core.{SystemServices, TestApplication}
 import models._
 import mongo.EmbedMongo
 import org.specs2.mock.Mockito
@@ -31,7 +31,6 @@ import org.specs2.mock.mockito.MockitoMatchers
 import play.api.mvc._
 import play.api.test._
 import play.modules.reactivemongo.ReactiveMongoApi
-import reactivemongo.api.bson.BSONObjectID
 import repositories.UserFavoritesRepository
 import util.MockAwaitable
 
@@ -48,14 +47,13 @@ class UserFavoritesControllerSpec
   "add favorite" should {
     "forbidden if for authenticated user project id does not exist" in new WithTestApplication {
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
-      val systemServices: SystemServices              = inject[SystemServices]
-      val authConfig: AuthConfig                      = inject[AuthConfig]
-      val userFavoritesRepository = inject[UserFavoritesRepository]
+      private val systemServices                      = inject[SystemServices]
+      private val authConfig                          = inject[AuthConfig]
+      private val userFavoritesRepository = inject[UserFavoritesRepository]
 
-      val controller: UserFavoritesController
-        with SecurityControllerMock
-        with MockCacheAware =
-        UserFavoritesControllerMock(systemServices,
+      val controller: UserFavoritesController with SecurityControllerMock =
+        UserFavoritesControllerMock(config,
+                                    systemServices,
                                     reactiveMongoApi,
                                     authConfig,
                                     userFavoritesRepository)
@@ -75,14 +73,13 @@ class UserFavoritesControllerSpec
 
     "forbidden if for authenticated user team does not exist" in new WithTestApplication {
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
-      val systemServices: SystemServices              = inject[SystemServices]
-      val authConfig: AuthConfig                      = inject[AuthConfig]
-      val userFavoritesRepository = inject[UserFavoritesRepository]
+      private val systemServices                      = inject[SystemServices]
+      private val authConfig                          = inject[AuthConfig]
+      private val userFavoritesRepository = inject[UserFavoritesRepository]
 
-      val controller: UserFavoritesController
-        with SecurityControllerMock
-        with MockCacheAware =
-        UserFavoritesControllerMock(systemServices,
+      val controller: UserFavoritesController with SecurityControllerMock =
+        UserFavoritesControllerMock(config,
+                                    systemServices,
                                     reactiveMongoApi,
                                     authConfig,
                                     userFavoritesRepository)
@@ -105,14 +102,13 @@ class UserFavoritesControllerSpec
     "forbidden if for authenticated user project id does not exist" in new WithTestApplication
       with Injecting {
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
-      val systemServices: SystemServices              = inject[SystemServices]
-      val authConfig: AuthConfig                      = inject[AuthConfig]
-      val userFavoritesRepository = inject[UserFavoritesRepository]
+      private val systemServices                      = inject[SystemServices]
+      private val authConfig                          = inject[AuthConfig]
+      private val userFavoritesRepository = inject[UserFavoritesRepository]
 
-      val controller: UserFavoritesController
-        with SecurityControllerMock
-        with MockCacheAware =
-        UserFavoritesControllerMock(systemServices,
+      val controller: UserFavoritesController with SecurityControllerMock =
+        UserFavoritesControllerMock(config,
+                                    systemServices,
                                     reactiveMongoApi,
                                     authConfig,
                                     userFavoritesRepository)
@@ -134,14 +130,13 @@ class UserFavoritesControllerSpec
   "forbidden if for authenticated user team does not exist" in new WithTestApplication
     with Injecting {
     implicit val executionContext: ExecutionContext = inject[ExecutionContext]
-    val systemServices: SystemServices              = inject[SystemServices]
-    val authConfig: AuthConfig                      = inject[AuthConfig]
-    val userFavoritesRepository = inject[UserFavoritesRepository]
+    private val systemServices                      = inject[SystemServices]
+    private val authConfig                          = inject[AuthConfig]
+    private val userFavoritesRepository = inject[UserFavoritesRepository]
 
-    val controller: UserFavoritesController
-      with SecurityControllerMock
-      with MockCacheAware =
-      UserFavoritesControllerMock(systemServices,
+    val controller: UserFavoritesController with SecurityControllerMock =
+      UserFavoritesControllerMock(config,
+                                  systemServices,
                                   reactiveMongoApi,
                                   authConfig,
                                   userFavoritesRepository)
@@ -162,22 +157,22 @@ class UserFavoritesControllerSpec
 }
 
 object UserFavoritesControllerMock extends MockAwaitable with Mockito {
-  def apply(systemServices: SystemServices,
+  def apply(config: Config,
+            systemServices: SystemServices,
             reactiveMongoApi: ReactiveMongoApi,
             authConfig: AuthConfig,
             userFavoritesRepository: UserFavoritesRepository)(implicit
-      ec: ExecutionContext): UserFavoritesController
-    with SecurityControllerMock
-    with MockCacheAware = {
+      ec: ExecutionContext)
+      : UserFavoritesController with SecurityControllerMock = {
     val clientReceiver = mock[ClientReceiver]
 
     new UserFavoritesController(
-      Helpers.stubControllerComponents(),
-      systemServices,
-      authConfig,
-      MockCache,
-      reactiveMongoApi,
-      userFavoritesRepository,
-      clientReceiver) with SecurityControllerMock with MockCacheAware
+      conf = config,
+      controllerComponents = Helpers.stubControllerComponents(),
+      systemServices = systemServices,
+      authConfig = authConfig,
+      reactiveMongoApi = reactiveMongoApi,
+      userFavoritesRepository = userFavoritesRepository,
+      clientReceiver = clientReceiver) with SecurityControllerMock
   }
 }

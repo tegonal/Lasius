@@ -28,15 +28,19 @@ import core.db.InitialDataLoader
 import domain.LoginStateAggregate
 import domain.views.CurrentOrganisationTimeBookingsView
 import models.UserId.UserReference
-import models.{EntityReference, Subject, UserId}
+import models._
 import org.apache.pekko.actor.{ActorRef, ActorSystem}
 import org.apache.pekko.pattern.ask
 import org.apache.pekko.stream.Materializer
 import org.apache.pekko.util.Timeout
-import play.api.Logging
+import play.api.cache.{AsyncCacheApi, SyncCacheApi}
 import play.api.inject.Injector
 import play.api.libs.ws.WSClient
+import play.api.{Configuration, Logging}
+import play.cache.NamedCache
 import play.modules.reactivemongo.ReactiveMongoApi
+import pureconfig._
+import pureconfig.generic.auto._
 import repositories._
 import services.{
   CurrentUserTimeBookingsViewService,
@@ -45,6 +49,7 @@ import services.{
   TimeBookingViewService
 }
 
+import java.time.Clock
 import java.util.UUID
 import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.duration._
@@ -70,6 +75,10 @@ trait SystemServices {
   val system: ActorSystem
   val materializer: Materializer
   val supportTransaction: Boolean
+  val lasiusConfig: LasiusConfig
+  val jwkProviderCache: SyncCacheApi
+  val opaqueTokenIssuerCache: AsyncCacheApi
+  val userInfoCache: AsyncCacheApi
 
   def initialize(): Unit
 }
@@ -88,23 +97,43 @@ class DefaultSystemServices @Inject() (
     bookingByTagRepository: BookingByTagRepository,
     bookingHistoryRepository: BookingHistoryRepository,
     wsClient: WSClient,
-    injector: Injector)(implicit ec: ExecutionContext)
+    injector: Injector,
+    @NamedCache("jwk") override val jwkProviderCache: SyncCacheApi,
+    @NamedCache("opaque-token-issuer")
+    override val opaqueTokenIssuerCache: AsyncCacheApi,
+    @NamedCache("user-info") override val userInfoCache: AsyncCacheApi)(implicit
+    ec: ExecutionContext)
     extends SystemServices
     with DBSupport
     with Logging {
   // possibly:
   implicit val system: ActorSystem        = ActorSystem("lasius-actor-system")
   override val materializer: Materializer = Materializer.matFromSystem
+  implicit val clock: Clock               = Clock.systemUTC
+  implicit val playConfig: Configuration  = Configuration(config)
 
   override val supportTransaction: Boolean =
     config.getBoolean("db.support_transactions")
 
+  lazy val lasiusConfig: LasiusConfig =
+    ConfigSource
+      .fromConfig(config.getConfig("lasius"))
+      .loadOrThrow[LasiusConfig]
+
   private val systemUUID =
     UUID.fromString("0000000-0000-0000-0000-000000000000")
   val systemUser: UserId = UserId(systemUUID)
-  implicit val systemUserReference: UserReference =
+  implicit val systemUserReference: UserReference = {
     EntityReference(systemUser, "system")
-  val systemSubject: Subject    = Subject("system", systemUserReference)
+  }
+  private val systemUserInfo = UserInfo(
+    key = "system",
+    email = "system@lasius.ch",
+    firstName = None,
+    lastName = None
+  )
+  val systemSubject: Subject =
+    Subject("", systemUserInfo, systemUserReference)
   implicit val timeout: Timeout = Timeout(5 seconds) // needed for `?` below
   val duration: FiniteDuration  = Duration.create(30, SECONDS)
   override val timeBookingViewService: ActorRef = Await
@@ -161,6 +190,7 @@ class DefaultSystemServices @Inject() (
                planeConfigRepository,
                this,
                wsClient,
+               lasiusConfig,
                reactiveMongoApi),
       duration
     )
@@ -203,5 +233,10 @@ class DefaultSystemServices @Inject() (
     pluginHandler ! PluginHandler.Startup
 
     currentOrganisationTimeBookingsView ! CurrentOrganisationTimeBookingsView.Initialize
+
+    if (lasiusConfig.security.oauth2Provider.enabled) {
+      logger.info(
+        s"You're running lasius with the internal oauth provider. Please be aware that this implementation is not meant to be used in production mode!")
+    }
   }
 }

@@ -17,26 +17,41 @@
  *
  */
 
-import { updateUserSettings, useGetUserProfile } from 'lib/api/lasius/user/user';
-import { ModelsUserSettings } from 'lib/api/lasius';
-import { useTokensWithAxiosRequests } from 'lib/api/hooks/useTokensWithAxiosRequests';
+import { updateUserSettings, useGetUserProfile, acceptUserTOS } from 'lib/api/lasius/user/user';
+import { ModelsUserSettings, ModelsAcceptTOSRequest } from 'lib/api/lasius';
+import { useSession } from 'next-auth/react';
+import { useEffect, useState } from 'react';
 
 export const useProfile = () => {
-  const { axiosServerSideConfig } = useTokensWithAxiosRequests();
+  const session = useSession();
+  const [enabled, setEnabled] = useState(false);
+
+  useEffect(() => {
+    setEnabled(session.data?.access_token !== undefined);
+  }, [session.data?.access_token]);
+
   const { data, mutate } = useGetUserProfile({
     swr: {
+      enabled: enabled,
       revalidateOnFocus: true,
       revalidateOnMount: true,
       revalidateOnReconnect: true,
       shouldRetryOnError: true,
     },
-    request: axiosServerSideConfig,
   });
 
   const updateSettings = async (updateData: Partial<ModelsUserSettings>) => {
     if (data) {
       const modifiedSettings: ModelsUserSettings = { ...data.settings, ...updateData };
       const profile = await updateUserSettings(modifiedSettings);
+      await mutate(profile);
+    }
+  };
+
+  const acceptTOS = async (currentTOSVersion: string) => {
+    if (data) {
+      const acceptTOSRequest: ModelsAcceptTOSRequest = { version: currentTOSVersion };
+      const profile = await acceptUserTOS(acceptTOSRequest);
       await mutate(profile);
     }
   };
@@ -50,5 +65,7 @@ export const useProfile = () => {
     userId: data?.id || '',
     lasiusIsLoggedIn: !!data,
     updateSettings,
+    acceptedTOSVersion: data?.acceptedTOS?.version || '',
+    acceptTOS,
   };
 };

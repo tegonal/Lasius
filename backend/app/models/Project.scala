@@ -34,7 +34,7 @@ case class Project(id: ProjectId,
                    createdBy: UserReference,
                    deactivatedBy: Option[UserReference])
     extends BaseEntity[ProjectId] {
-  def getReference(): ProjectReference = EntityReference(id, key)
+  def getReference: ProjectReference = EntityReference(id, key)
 }
 
 object Project {

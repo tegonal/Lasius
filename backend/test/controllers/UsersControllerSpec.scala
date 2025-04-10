@@ -21,16 +21,8 @@
 
 package controllers
 
-import controllers.TimeBookingStatisticsControllerMock.mock
-import core.{
-  DBSession,
-  DBSupport,
-  MockCache,
-  MockCacheAware,
-  SystemServices,
-  TestApplication,
-  TestDBSupport
-}
+import com.typesafe.config.Config
+import core._
 import models._
 import mongo.EmbedMongo
 import org.specs2.mock.Mockito
@@ -40,6 +32,7 @@ import play.api.test._
 import play.modules.reactivemongo.ReactiveMongoApi
 import repositories.{UserMongoRepository, UserRepository}
 import util.{Awaitable, MockAwaitable}
+import org.joda.time.LocalDate
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
@@ -56,13 +49,15 @@ class UsersControllerSpec
     "badrequest if no update field is specified" in new WithTestApplication {
 
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
-      val systemServices: SystemServices              = inject[SystemServices]
-      val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller
-          : UsersController with SecurityControllerMock with MockCacheAware =
-        UsersControllerMock(systemServices, authConfig, reactiveMongoApi)
+      private val systemServices                      = inject[SystemServices]
+      private val authConfig                          = inject[AuthConfig]
+      private val controller: UsersController with SecurityControllerMock =
+        UsersControllerMock(config,
+                            systemServices,
+                            authConfig,
+                            reactiveMongoApi)
 
-      val request: FakeRequest[PersonalDataUpdate] = FakeRequest()
+      private val request: FakeRequest[PersonalDataUpdate] = FakeRequest()
         .withBody(
           PersonalDataUpdate(
             email = None,
@@ -78,13 +73,15 @@ class UsersControllerSpec
 
     "badrequest if tried to update with no email" in new WithTestApplication {
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
-      val systemServices: SystemServices              = inject[SystemServices]
-      val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller
-          : UsersController with SecurityControllerMock with MockCacheAware =
-        UsersControllerMock(systemServices, authConfig, reactiveMongoApi)
+      private val systemServices: SystemServices      = inject[SystemServices]
+      private val authConfig: AuthConfig              = inject[AuthConfig]
+      private val controller: UsersController with SecurityControllerMock =
+        UsersControllerMock(config,
+                            systemServices,
+                            authConfig,
+                            reactiveMongoApi)
 
-      val request: FakeRequest[PersonalDataUpdate] = FakeRequest()
+      private val request: FakeRequest[PersonalDataUpdate] = FakeRequest()
         .withBody(
           PersonalDataUpdate(
             email = Some("incorrectEmail"),
@@ -102,23 +99,24 @@ class UsersControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: UsersController
-        with SecurityControllerMock
-        with MockCacheAware
-        with TestDBSupport =
-        UsersControllerMock(systemServices, authConfig, reactiveMongoApi)
+      val controller
+          : UsersController with SecurityControllerMock with TestDBSupport =
+        UsersControllerMock(config,
+                            systemServices,
+                            authConfig,
+                            reactiveMongoApi)
 
       // initialize
       val user2: User = User(UserId(),
                              "user2",
                              "my-email@test.com",
-                             "no-hash",
                              "my",
                              "name",
                              active = true,
                              FreeUser,
                              Seq(),
-                             settings = None)
+                             settings = None,
+                             acceptedTOS = None)
       controller
         .withDBSession() { implicit dbSession =>
           controller.userRepository.upsert(user2)
@@ -142,9 +140,11 @@ class UsersControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller
-          : UsersController with SecurityControllerMock with MockCacheAware =
-        UsersControllerMock(systemServices, authConfig, reactiveMongoApi)
+      val controller: UsersController with SecurityControllerMock =
+        UsersControllerMock(config,
+                            systemServices,
+                            authConfig,
+                            reactiveMongoApi)
 
       val request: FakeRequest[PersonalDataUpdate] = FakeRequest()
         .withBody(
@@ -165,6 +165,7 @@ class UsersControllerSpec
                      true,
                      _,
                      _,
+                     _,
                      _) =>
           1 === 1
       }
@@ -176,9 +177,11 @@ class UsersControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller
-          : UsersController with SecurityControllerMock with MockCacheAware =
-        UsersControllerMock(systemServices, authConfig, reactiveMongoApi)
+      val controller: UsersController with SecurityControllerMock =
+        UsersControllerMock(config,
+                            systemServices,
+                            authConfig,
+                            reactiveMongoApi)
 
       val request: FakeRequest[PersonalDataUpdate] = FakeRequest()
         .withBody(
@@ -196,14 +199,14 @@ class UsersControllerSpec
     }
   }
 
-  "change password" should {
+  /*"change password" should {
     "badrequest if password does not match" in new WithTestApplication {
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller
           : UsersController with SecurityControllerMock with MockCacheAware =
-        UsersControllerMock(systemServices, authConfig, reactiveMongoApi)
+        UsersControllerMock(config,systemServices, authConfig, reactiveMongoApi)
 
       val request: FakeRequest[PasswordChangeRequest] = FakeRequest()
         .withBody(
@@ -223,7 +226,7 @@ class UsersControllerSpec
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller
           : UsersController with SecurityControllerMock with MockCacheAware =
-        UsersControllerMock(systemServices, authConfig, reactiveMongoApi)
+        UsersControllerMock(config,systemServices, authConfig, reactiveMongoApi)
 
       val request: FakeRequest[PasswordChangeRequest] = FakeRequest()
         .withBody(
@@ -246,7 +249,7 @@ class UsersControllerSpec
         with SecurityControllerMock
         with MockCacheAware
         with TestDBSupport =
-        UsersControllerMock(systemServices, authConfig, reactiveMongoApi)
+        UsersControllerMock(config,systemServices, authConfig, reactiveMongoApi)
       val newPassword = "1d3dsaAad34212"
 
       val request: FakeRequest[PasswordChangeRequest] = FakeRequest()
@@ -268,16 +271,18 @@ class UsersControllerSpec
         .awaitResult()
       loginResult must beSome
     }
-  }
+  }*/
 
   "updateUserOrganisation" should {
     "forbidden if user is not assigned to organisation" in new WithTestApplication {
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller
-          : UsersController with SecurityControllerMock with MockCacheAware =
-        UsersControllerMock(systemServices, authConfig, reactiveMongoApi)
+      val controller: UsersController with SecurityControllerMock =
+        UsersControllerMock(config,
+                            systemServices,
+                            authConfig,
+                            reactiveMongoApi)
 
       val request: FakeRequest[UpdateUserOrganisation] = FakeRequest()
         .withBody(
@@ -294,9 +299,11 @@ class UsersControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller
-          : UsersController with SecurityControllerMock with MockCacheAware =
-        UsersControllerMock(systemServices, authConfig, reactiveMongoApi)
+      val controller: UsersController with SecurityControllerMock =
+        UsersControllerMock(config,
+                            systemServices,
+                            authConfig,
+                            reactiveMongoApi)
 
       val workingHours: WorkingHours =
         WorkingHours(monday = 8, tuesday = 4, wednesday = 2, sunday = 1)
@@ -316,26 +323,72 @@ class UsersControllerSpec
         .map(_.plannedWorkingHours) must beSome(workingHours)
     }
   }
+
+  "acceptTOS" should {
+    "badrequest if TOS version is empty" in new WithTestApplication {
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: UsersController with SecurityControllerMock =
+        UsersControllerMock(config,
+                            systemServices,
+                            authConfig,
+                            reactiveMongoApi)
+
+      val request: FakeRequest[AcceptTOSRequest] = FakeRequest().withBody(
+        AcceptTOSRequest(version = "")
+      )
+      val result: Future[Result] =
+        controller.acceptTOS()(request)
+
+      status(result) must equalTo(BAD_REQUEST)
+      contentAsString(result) must equalTo(
+        "expected non-blank String for field 'acceptTOSRequest.version'")
+    }
+
+    "update user profile with accepted TOS version and current date" in new WithTestApplication {
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: UsersController with SecurityControllerMock =
+        UsersControllerMock(config,
+                            systemServices,
+                            authConfig,
+                            reactiveMongoApi)
+
+      val testVersion = "1.0"
+      val request: FakeRequest[AcceptTOSRequest] = FakeRequest().withBody(
+        AcceptTOSRequest(version = testVersion)
+      )
+      val result: Future[Result] =
+        controller.acceptTOS()(request)
+
+      status(result) must equalTo(OK)
+      val user: UserDTO = contentAsJson(result).as[UserDTO]
+      val acceptedTOSExpect: Option[AcceptedTOS] =
+        Some(AcceptedTOS(testVersion, LocalDate.now))
+      user.acceptedTOS must equalTo(acceptedTOSExpect)
+    }
+  }
+
 }
 
 object UsersControllerMock extends MockAwaitable with Mockito with Awaitable {
-  def apply(systemServices: SystemServices,
+  def apply(config: Config,
+            systemServices: SystemServices,
             authConfig: AuthConfig,
-            reactiveMongoApi: ReactiveMongoApi)(implicit
-      ec: ExecutionContext): UsersController
-    with SecurityControllerMock
-    with MockCacheAware
-    with TestDBSupport = {
+            reactiveMongoApi: ReactiveMongoApi)(implicit ec: ExecutionContext)
+      : UsersController with SecurityControllerMock with TestDBSupport = {
     val mongoUserRepository = new UserMongoRepository()
 
-    val controller = new UsersController(Helpers.stubControllerComponents(),
-                                         systemServices,
-                                         authConfig,
-                                         MockCache,
-                                         reactiveMongoApi,
-                                         mongoUserRepository)
+    val controller = new UsersController(conf = config,
+                                         controllerComponents =
+                                           Helpers.stubControllerComponents(),
+                                         systemServices = systemServices,
+                                         authConfig = authConfig,
+                                         reactiveMongoApi = reactiveMongoApi,
+                                         userRepository = mongoUserRepository)
       with SecurityControllerMock
-      with MockCacheAware
       with TestDBSupport {
       // override mock as we deal with a real db backend in this spec
       override val userRepository: UserRepository = mongoUserRepository

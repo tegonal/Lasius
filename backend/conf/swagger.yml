@@ -5,10 +5,11 @@ info:
   description: "Track your time"
 components:
   securitySchemes:
-    cookieAuth: # arbitrary name for the security scheme; will be used in the "security" key later
-      type: apiKey
-      in: cookie
-      name: XSRF-TOKEN  # cookie name
+    bearerHttpAuthentication:
+      description: Bearer token using a JWT
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     models.Invitation:
       oneOf:

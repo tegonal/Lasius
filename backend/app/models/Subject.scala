@@ -23,4 +23,11 @@ package models
 
 import models.UserId.UserReference
 
-case class Subject(token: String, userReference: UserReference)
+case class UserInfo(key: String,
+                    firstName: Option[String],
+                    lastName: Option[String],
+                    email: String)
+
+case class Subject(token: String,
+                   userInfo: UserInfo,
+                   userReference: UserReference)

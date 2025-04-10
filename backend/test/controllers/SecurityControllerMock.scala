@@ -21,10 +21,10 @@
 
 package controllers
 
-import core.{CacheAware, DBSession, DBSupport}
+import controllers.security.{ControllerSecurity, SecurityComponent}
+import core.{DBSession, DBSupport}
 import helpers.UserHelper
 import models._
-import org.mindrot.jbcrypt.BCrypt
 import org.specs2.mock.Mockito
 import play.api.Logging
 import play.api.mvc._
@@ -35,19 +35,18 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait SecurityControllerMock
     extends Logging
-    with Security
+    with ControllerSecurity
     with UserHelper
     with SecurityRepositoryComponent
     with MockAwaitable
     with Mockito {
-  self: BaseController with CacheAware with DBSupport with SecurityComponent =>
+  self: BaseController with DBSupport with SecurityComponent =>
   val userRepository: UserRepository = mockAwaitable[UserRepository]
 
   val token: String                          = ""
   val userId: UserId                         = UserId()
   val userKey: String                        = "someUserId"
   val userReference: EntityReference[UserId] = EntityReference(userId, userKey)
-  val authorized: Future[Boolean]            = Future.successful(true)
   val organisationId: OrganisationId         = OrganisationId()
   val organisationRole: OrganisationRole     = OrganisationAdministrator
   val isOrganisationPrivate: Boolean         = false
@@ -61,26 +60,32 @@ trait SecurityControllerMock
     deactivatedBy = None
   )
 
+  val userInfo: UserInfo = UserInfo(
+    key = "system",
+    email = "system@lasius.ch",
+    firstName = None,
+    lastName = None
+  )
+
   val projectActive: Boolean = true
   val project: Project =
     Project(
       id = ProjectId(),
       key = "project1",
-      organisationReference = organisation.getReference(),
+      organisationReference = organisation.getReference,
       bookingCategories = Set(SimpleTag(TagId("tag1"))),
       active = projectActive,
       createdBy = userReference,
       deactivatedBy = None
     )
-  val password                 = "password"
   val projectRole: ProjectRole = ProjectAdministrator
   val userProject: UserProject = UserProject(
     sharedByOrganisationReference = None,
-    projectReference = project.getReference(),
+    projectReference = project.getReference,
     role = projectRole
   )
   val userOrganisation: UserOrganisation = UserOrganisation(
-    organisationReference = organisation.getReference(),
+    organisationReference = organisation.getReference,
     `private` = organisation.`private`,
     role = organisationRole,
     plannedWorkingHours = WorkingHours(),
@@ -91,13 +96,13 @@ trait SecurityControllerMock
     userId,
     userKey,
     email = "user@user.com",
-    password = BCrypt.hashpw(password, BCrypt.gensalt()),
     firstName = "test",
     lastName = "user",
     active = userActive,
     role = Administrator,
     organisations = Seq(userOrganisation),
-    settings = None
+    settings = None,
+    acceptedTOS = None
   )
   val authorizationFailedResult: Result = null
 
@@ -106,7 +111,7 @@ trait SecurityControllerMock
       context: ExecutionContext): Action[A] = {
     Action.async(p) { implicit request =>
       withDBSession() { dbSession =>
-        checked(f(dbSession)(Subject(token, userReference))(request))
+        checked(f(dbSession)(Subject("", userInfo, userReference))(request))
       }
     }
   }
@@ -118,7 +123,8 @@ trait SecurityControllerMock
       context: ExecutionContext): Action[A] = {
     Action.async(p) { implicit request =>
       withDBSession() { dbSession =>
-        checked(f(dbSession)(Subject(token, userReference))(user)(request))
+        checked(
+          f(dbSession)(Subject("", userInfo, userReference))(user)(request))
       }
     }
   }

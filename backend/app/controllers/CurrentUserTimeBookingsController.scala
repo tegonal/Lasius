@@ -21,36 +21,35 @@
 
 package controllers
 
+import com.typesafe.config.Config
 import org.apache.pekko.pattern.ask
 import org.apache.pekko.util.Timeout
-import core.{CacheAware, DBSupport, SystemServices}
+import core.SystemServices
 import domain.views.CurrentUserTimeBookingsView._
-
-import javax.inject.{Inject, Singleton}
 import models._
-import play.api.Logging
-import play.api.cache.AsyncCacheApi
 import play.api.libs.json._
-import play.api.mvc.{AbstractController, Action, ControllerComponents}
+import play.api.mvc.{Action, ControllerComponents}
+import play.api.cache.SyncCacheApi
 import play.modules.reactivemongo.ReactiveMongoApi
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
 class CurrentUserTimeBookingsController @Inject() (
-    controllerComponents: ControllerComponents,
+    override val conf: Config,
+    override val controllerComponents: ControllerComponents,
     override val systemServices: SystemServices,
     override val authConfig: AuthConfig,
-    override val cache: AsyncCacheApi,
     override val reactiveMongoApi: ReactiveMongoApi)(implicit
     ec: ExecutionContext)
-    extends BaseLasiusController(controllerComponents) {
+    extends BaseLasiusController() {
 
   implicit val timeout: Timeout = systemServices.timeout
 
-  def getCurrentTimeBooking(): Action[Unit] =
+  def getCurrentTimeBooking: Action[Unit] =
     HasUserRole(FreeUser, parse.empty, withinTransaction = false) {
-      _ => implicit subject => _ => implicit request =>
+      _ => implicit subject => _ => _ =>
         (systemServices.currentUserTimeBookingsViewService ? GetCurrentTimeBooking(
           subject.userReference)).map {
           case c: CurrentUserTimeBookingEvent =>

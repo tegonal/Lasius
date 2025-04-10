@@ -28,7 +28,6 @@ import models._
 import org.joda.time.{DateTime, Interval}
 import org.mindrot.jbcrypt.BCrypt
 import play.api.Logging
-import play.modules.reactivemongo.ReactiveMongoApi
 import repositories._
 
 import javax.inject.Inject
@@ -38,7 +37,7 @@ import scala.util.Random
 
 @unused
 class InitialDemoDataLoader @Inject() (
-    val reactiveMongoApi: ReactiveMongoApi,
+    oauthUserRepository: OAuthUserRepository,
     userRepository: UserRepository,
     projectRepository: ProjectRepository,
     organisationRepository: OrganisationRepository,
@@ -173,7 +172,7 @@ class InitialDemoDataLoader @Inject() (
       Project(
         ProjectId(),
         "Lasius",
-        org.getReference(),
+        org.getReference,
         Set(
           TagGroup(TagId("Development"),
                    relatedTags = Seq(SimpleTag(TagId("Billable")))),
@@ -191,7 +190,7 @@ class InitialDemoDataLoader @Inject() (
       Project(
         ProjectId(),
         "Marketing",
-        org.getReference(),
+        org.getReference,
         Set(
           TagGroup(TagId("Sales"),
                    relatedTags = Seq(SimpleTag(TagId("Non-Billable")),
@@ -207,7 +206,7 @@ class InitialDemoDataLoader @Inject() (
       Project(
         ProjectId(),
         "KnowHow",
-        org.getReference(),
+        org.getReference,
         Set(SimpleTag(TagId("Billable")), SimpleTag(TagId("Non-Billable"))),
         active = true,
         userReference,
@@ -215,7 +214,7 @@ class InitialDemoDataLoader @Inject() (
       Project(
         ProjectId(),
         "Others",
-        org.getReference(),
+        org.getReference,
         Set(SimpleTag(TagId("Billable")), SimpleTag(TagId("Non-Billable"))),
         active = true,
         userReference,
@@ -230,78 +229,96 @@ class InitialDemoDataLoader @Inject() (
                               publicOrg: Organisation,
                               projects: Seq[Project])(implicit
       dbSession: DBSession): Future[List[User]] = {
-    val user1 = User(
-      UserId(),
-      user1Key,
-      user1Email,
-      user1PasswordHash,
-      "Demo",
-      "User 1",
+
+    val oauthUser1 = OAuthUser(
+      id = OAuthUserId(),
+      email = user1Email,
+      password = user1PasswordHash,
+      firstName = Some("Demo"),
+      lastName = Some("User 1"),
       active = true,
-      FreeUser,
-      Seq(
+    )
+
+    val user1 = User(
+      id = UserId(),
+      key = user1Key,
+      email = user1Email,
+      firstName = "Demo",
+      lastName = "User 1",
+      active = true,
+      role = FreeUser,
+      organisations = Seq(
         UserOrganisation(
-          user1Org.getReference(),
+          user1Org.getReference,
           `private` = user1Org.`private`,
           OrganisationAdministrator,
           WorkingHours(),
           Seq()
         ),
         UserOrganisation(
-          publicOrg.getReference(),
+          publicOrg.getReference,
           publicOrg.`private`,
           OrganisationAdministrator,
           WorkingHours(monday = 8, tuesday = 4, wednesday = 2),
           projects
             .filter(p => Seq("Lasius", "KnowHow").contains(p.key))
             .map(p =>
-              UserProject(None, p.getReference(), ProjectAdministrator)) ++
+              UserProject(None, p.getReference, ProjectAdministrator)) ++
             projects
               .filter(p => Seq("Marketing", "Others").contains(p.key))
-              .map(p => UserProject(None, p.getReference(), ProjectMember))
+              .map(p => UserProject(None, p.getReference, ProjectMember))
         )
       ),
       settings = Some(
-        UserSettings(lastSelectedOrganisation = Some(publicOrg.getReference())))
+        UserSettings(lastSelectedOrganisation = Some(publicOrg.getReference))),
+      acceptedTOS = None
     )
 
-    val user2 = User(
-      UserId(),
-      user2Key,
-      user2Email,
-      user2PasswordHash,
-      "Demo",
-      "User 2",
+    val oauthUser2 = OAuthUser(
+      id = OAuthUserId(),
+      email = user2Email,
+      password = user2PasswordHash,
+      firstName = Some("Demo"),
+      lastName = Some("User 2"),
       active = true,
-      FreeUser,
-      Seq(
+    )
+    val user2 = User(
+      id = UserId(),
+      key = user2Key,
+      email = user2Email,
+      firstName = "Demo",
+      lastName = "User 2",
+      active = true,
+      role = FreeUser,
+      organisations = Seq(
         UserOrganisation(
-          user2Org.getReference(),
+          user2Org.getReference,
           `private` = user2Org.`private`,
           OrganisationAdministrator,
           WorkingHours(),
           Seq()
         ),
         UserOrganisation(
-          publicOrg.getReference(),
+          publicOrg.getReference,
           `private` = publicOrg.`private`,
           OrganisationAdministrator,
           WorkingHours(monday = 8, tuesday = 4, wednesday = 2),
           projects
             .filter(p => Seq("Lasius", "KnowHow").contains(p.key))
-            .map(p => UserProject(None, p.getReference(), ProjectMember)) ++
+            .map(p => UserProject(None, p.getReference, ProjectMember)) ++
             projects
               .filter(p => Seq("Marketing", "Others").contains(p.key))
-              .map(p =>
-                UserProject(None, p.getReference(), ProjectAdministrator))
+              .map(p => UserProject(None, p.getReference, ProjectAdministrator))
         )
       ),
       settings = Some(
-        UserSettings(lastSelectedOrganisation = Some(publicOrg.getReference())))
+        UserSettings(lastSelectedOrganisation = Some(publicOrg.getReference))),
+      acceptedTOS = None
     )
 
     val users = List(user1, user2)
 
+    oauthUserRepository.bulkInsert(List(oauthUser1, oauthUser2))
     userRepository.bulkInsert(users).map(_ => users)
   }
 
@@ -319,9 +336,9 @@ class InitialDemoDataLoader @Inject() (
                                          projects: Seq[Project],
                                          user: User): Seq[Seq[Unit]] = {
     val now           = DateTime.now()
-    val orgRef        = org.getReference()
+    val orgRef        = org.getReference
     val random        = new Random
-    val userReference = user.getReference()
+    val userReference = user.getReference
     (1 to 60).map { dayDiff =>
       val day = now.minusDays(dayDiff)
       generateRandomTimeSlots(day).map { timeSlot =>
@@ -337,7 +354,7 @@ class InitialDemoDataLoader @Inject() (
         systemServices.timeBookingViewService ! AddBookingCommand(
           userReference = userReference,
           organisationReference = orgRef,
-          projectReference = project.getReference(),
+          projectReference = project.getReference,
           tags = projectTags + randomPhrase,
           start = timeSlot._1,
           end = timeSlot._2

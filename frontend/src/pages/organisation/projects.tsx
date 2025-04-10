@@ -25,11 +25,10 @@ import { NextPageWithLayout } from 'pages/_app';
 import { Error } from 'components/error';
 import { isAdminOfCurrentOrg } from 'lib/api/functions/isAdminOfCurrentOrg';
 import { ModelsUser } from 'lib/api/lasius';
-import { getUserProfile } from 'lib/api/lasius/user/user';
-import { getServerSideRequestHeaders } from 'lib/api/hooks/useTokensWithAxiosRequests';
-import { getSession } from 'next-auth/react';
+import { useProfile } from 'lib/api/hooks/useProfile';
 
-const AllProjectsPage: NextPageWithLayout = ({ profile }) => {
+const AllProjectsPage: NextPageWithLayout = () => {
+  const { profile } = useProfile();
   if (isAdminOfCurrentOrg(profile as ModelsUser)) {
     return <AllProjectsLayout />;
   }
@@ -38,11 +37,8 @@ const AllProjectsPage: NextPageWithLayout = ({ profile }) => {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { locale = '' } = context;
-  const session = await getSession({ req: context.req });
-  const profile = await getUserProfile(getServerSideRequestHeaders(session?.user.xsrfToken || ''));
   return {
     props: {
-      profile,
       ...(await serverSideTranslations(locale, ['common'])),
     },
   };

@@ -30,6 +30,6 @@ case class OrganisationId(value: UUID = UUID.randomUUID()) extends UUIDBaseId
 
 object OrganisationId {
   implicit val idFormat: Format[OrganisationId] =
-    BaseFormat.idformat[OrganisationId](OrganisationId.apply)
+    BaseFormat.idformat[OrganisationId](OrganisationId.apply _)
   type OrganisationReference = EntityReference[OrganisationId]
 }

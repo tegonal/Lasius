@@ -111,7 +111,7 @@ class OrganisationMongoRepository @Inject() (
         } yield result
       }
       _ <- validate(
-        !updateObject.isEmpty,
+        updateObject.nonEmpty,
         s"cannot update organisation ${organisationReference.key}, at least one field must be specified")
       _ <- updateFields(Json.obj("id" -> organisationReference.id),
                         updateObject)

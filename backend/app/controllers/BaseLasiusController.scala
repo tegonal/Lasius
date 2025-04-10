@@ -21,21 +21,21 @@
 
 package controllers
 
-import core.{CacheAware, DBSupport, SystemServices}
+import controllers.security.{ControllerSecurity, SecurityComponent}
+import core.{DBSupport, SystemServices}
 import helpers.FutureHelper
 import play.api.Logging
-import play.api.mvc.{AbstractController, ControllerComponents}
+import play.api.mvc.BaseController
 
-abstract class BaseLasiusController(controllerComponents: ControllerComponents)
-    extends AbstractController(controllerComponents)
+abstract class BaseLasiusController()
+    extends BaseController
     with Logging
-    with Security
+    with ControllerSecurity
     with SecurityComponent
-    with CacheAware
     with ControllerValidation
     with FutureHelper
     with DBSupport {
-  override val supportTransaction: Boolean = systemServices.supportTransaction
 
   val systemServices: SystemServices
+  override val supportTransaction: Boolean = systemServices.supportTransaction
 }

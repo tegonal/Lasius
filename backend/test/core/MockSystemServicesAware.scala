@@ -22,15 +22,19 @@
 package core
 
 import actors.LasiusSupervisorActor
+import com.typesafe.config.ConfigFactory
+import models.UserId.UserReference
+import models._
 import org.apache.pekko.actor.{ActorRef, ActorSystem}
 import org.apache.pekko.stream.Materializer
 import org.apache.pekko.testkit.TestProbe
 import org.apache.pekko.util.Timeout
-import models.{EntityReference, Subject, UserId}
-import models.UserId.UserReference
 import org.specs2.mock.Mockito.mock
+import play.api.Configuration
+import play.api.cache.{AsyncCacheApi, SyncCacheApi}
 import play.modules.reactivemongo.ReactiveMongoApi
 
+import java.time.Clock
 import javax.inject.{Inject, Provider, Singleton}
 import scala.concurrent.duration._
 import scala.language.postfixOps
@@ -44,6 +48,33 @@ class MockServicesProvider @Inject() (actorSystem: ActorSystem)
 
 class MockServices(actorSystem: ActorSystem) extends SystemServices {
 
+  override val lasiusConfig: LasiusConfig = LasiusConfig(
+    title = "Lasius",
+    instance = "Test",
+    initializeViewsOnStartup = false,
+    security = LasiusSecurityConfig(
+      accessRestriction = Some(
+        AccessRestrictionConfig(
+          emailRegex = ".*@lasius\\.com"
+        )
+      ),
+      externalIssuers = Seq(),
+      oauth2Provider = InternalOauth2ProviderConfig(
+        enabled = true,
+        allowRegisterUsers = true,
+        clientId = "",
+        clientSecret = "",
+        authorizationCode = AuthorizationCodeConfig(
+          lifespan = java.time.Duration.ofMinutes(1),
+        ),
+        jwtToken = JWTTokenConfig(
+          issuer = "lasius",
+          lifespan = java.time.Duration.ofDays(1),
+          privateKey = "sadasdddfasddasd"
+        )
+      )
+    )
+  )
   val supervisor: ActorRef =
     actorSystem.actorOf(LasiusSupervisorActor.props, "lasius-test-supervisor")
   val reactiveMongoApi: ReactiveMongoApi   = mock[ReactiveMongoApi]
@@ -52,9 +83,20 @@ class MockServices(actorSystem: ActorSystem) extends SystemServices {
   implicit val system: ActorSystem        = actorSystem
   override val materializer: Materializer = Materializer.matFromSystem
   val systemUser: UserId                  = UserId()
-  override val systemUserReference: UserReference =
+  override val systemUserReference: UserReference = {
     EntityReference(systemUser, "system")
-  override val systemSubject: Subject = Subject("", systemUserReference)
+  }
+
+  implicit val clock: Clock              = Clock.systemUTC
+  implicit val playConfig: Configuration = Configuration(ConfigFactory.load())
+  val userInfo: UserInfo = UserInfo(
+    key = "system",
+    email = "system@lasius.ch",
+    firstName = None,
+    lastName = None
+  )
+  override val systemSubject: Subject =
+    Subject("", userInfo, systemUserReference)
   implicit val timeout: Timeout = Timeout(5 seconds) // needed for `?` below
   val duration: Duration        = Duration.create(5, SECONDS)
   val timeBookingViewService: ActorRef = TestProbe().ref
@@ -68,6 +110,10 @@ class MockServices(actorSystem: ActorSystem) extends SystemServices {
   val tagCache: ActorRef                            = TestProbe().ref
   val pluginHandler: ActorRef                       = TestProbe().ref
   val loginHandler: ActorRef                        = TestProbe().ref
+
+  override val jwkProviderCache: SyncCacheApi        = new MockSyncCache()
+  override val opaqueTokenIssuerCache: AsyncCacheApi = new MockAsyncCache()
+  override val userInfoCache: AsyncCacheApi          = new MockAsyncCache()
 
   override def initialize(): Unit = {}
 }

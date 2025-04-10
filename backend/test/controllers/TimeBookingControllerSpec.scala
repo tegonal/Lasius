@@ -21,13 +21,8 @@
 
 package controllers
 
-import core.{
-  MockCache,
-  MockCacheAware,
-  MockServices,
-  SystemServices,
-  TestApplication
-}
+import com.typesafe.config.Config
+import core.{SystemServices, TestApplication}
 import models._
 import mongo.EmbedMongo
 import org.joda.time.DateTime
@@ -52,13 +47,14 @@ class TimeBookingControllerSpec
 
     "forbidden if for authenticated user project id does not exist" in new WithTestApplication {
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
-      val systemServices                              = inject[SystemServices]
-      val authConfig                                  = inject[AuthConfig]
+      private val systemServices                      = inject[SystemServices]
+      private val authConfig                          = inject[AuthConfig]
 
-      val controller: TimeBookingController
-        with SecurityControllerMock
-        with MockCacheAware =
-        TimeBookingControllerMock(systemServices, authConfig, reactiveMongoApi)
+      val controller: TimeBookingController with SecurityControllerMock =
+        TimeBookingControllerMock(config,
+                                  systemServices,
+                                  authConfig,
+                                  reactiveMongoApi)
       val projectId: ProjectId = ProjectId()
       val request: FakeRequest[StartBookingRequest] = FakeRequest()
         .withBody(
@@ -75,12 +71,13 @@ class TimeBookingControllerSpec
 
     "forbidden if for authenticated user organisation does not exist" in new WithTestApplication {
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
-      val systemServices                              = inject[SystemServices]
-      val authConfig                                  = inject[AuthConfig]
-      val controller: TimeBookingController
-        with SecurityControllerMock
-        with MockCacheAware =
-        TimeBookingControllerMock(systemServices, authConfig, reactiveMongoApi)
+      private val systemServices                      = inject[SystemServices]
+      private val authConfig                          = inject[AuthConfig]
+      val controller: TimeBookingController with SecurityControllerMock =
+        TimeBookingControllerMock(config,
+                                  systemServices,
+                                  authConfig,
+                                  reactiveMongoApi)
 
       val request: FakeRequest[StartBookingRequest] = FakeRequest()
         .withBody(
@@ -100,12 +97,13 @@ class TimeBookingControllerSpec
 
     "forbidden if for authenticated user project id does not exist" in new WithTestApplication {
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
-      val systemServices                              = inject[SystemServices]
-      val authConfig                                  = inject[AuthConfig]
-      val controller: TimeBookingController
-        with SecurityControllerMock
-        with MockCacheAware =
-        TimeBookingControllerMock(systemServices, authConfig, reactiveMongoApi)
+      private val systemServices                      = inject[SystemServices]
+      private val authConfig                          = inject[AuthConfig]
+      val controller: TimeBookingController with SecurityControllerMock =
+        TimeBookingControllerMock(config,
+                                  systemServices,
+                                  authConfig,
+                                  reactiveMongoApi)
 
       val projectId: ProjectId = ProjectId()
       val request: FakeRequest[EditBookingRequest] = FakeRequest()
@@ -124,12 +122,13 @@ class TimeBookingControllerSpec
 
     "forbidden if for authenticated user organisation does not exist" in new WithTestApplication {
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
-      val systemServices                              = inject[SystemServices]
-      val authConfig                                  = inject[AuthConfig]
-      val controller: TimeBookingController
-        with SecurityControllerMock
-        with MockCacheAware =
-        TimeBookingControllerMock(systemServices, authConfig, reactiveMongoApi)
+      private val systemServices                      = inject[SystemServices]
+      private val authConfig                          = inject[AuthConfig]
+      val controller: TimeBookingController with SecurityControllerMock =
+        TimeBookingControllerMock(config,
+                                  systemServices,
+                                  authConfig,
+                                  reactiveMongoApi)
 
       val request: FakeRequest[EditBookingRequest] = FakeRequest()
         .withBody(
@@ -148,12 +147,13 @@ class TimeBookingControllerSpec
 
     "badrequest if end date is before start date" in new WithTestApplication {
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
-      val systemServices                              = inject[SystemServices]
-      val authConfig                                  = inject[AuthConfig]
-      val controller: TimeBookingController
-        with SecurityControllerMock
-        with MockCacheAware =
-        TimeBookingControllerMock(systemServices, authConfig, reactiveMongoApi)
+      private val systemServices                      = inject[SystemServices]
+      private val authConfig                          = inject[AuthConfig]
+      val controller: TimeBookingController with SecurityControllerMock =
+        TimeBookingControllerMock(config,
+                                  systemServices,
+                                  authConfig,
+                                  reactiveMongoApi)
 
       val from: DateTime = DateTime.now()
       val to: DateTime   = from.minusDays(1)
@@ -178,12 +178,13 @@ class TimeBookingControllerSpec
 
     "forbidden if for authenticated user project id does not exist" in new WithTestApplication {
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
-      val systemServices                              = inject[SystemServices]
-      val authConfig                                  = inject[AuthConfig]
-      val controller: TimeBookingController
-        with SecurityControllerMock
-        with MockCacheAware =
-        TimeBookingControllerMock(systemServices, authConfig, reactiveMongoApi)
+      private val systemServices                      = inject[SystemServices]
+      private val authConfig                          = inject[AuthConfig]
+      val controller: TimeBookingController with SecurityControllerMock =
+        TimeBookingControllerMock(config,
+                                  systemServices,
+                                  authConfig,
+                                  reactiveMongoApi)
 
       val from: DateTime       = DateTime.now()
       val to: DateTime         = from.plusHours(1)
@@ -202,12 +203,13 @@ class TimeBookingControllerSpec
 
     "forbidden if for authenticated user organisation does not exist" in new WithTestApplication {
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
-      val systemServices                              = inject[SystemServices]
-      val authConfig                                  = inject[AuthConfig]
-      val controller: TimeBookingController
-        with SecurityControllerMock
-        with MockCacheAware =
-        TimeBookingControllerMock(systemServices, authConfig, reactiveMongoApi)
+      private val systemServices                      = inject[SystemServices]
+      private val authConfig                          = inject[AuthConfig]
+      val controller: TimeBookingController with SecurityControllerMock =
+        TimeBookingControllerMock(config,
+                                  systemServices,
+                                  authConfig,
+                                  reactiveMongoApi)
 
       val from: DateTime = DateTime.now()
       val to: DateTime   = from.plusHours(1)
@@ -225,12 +227,13 @@ class TimeBookingControllerSpec
 
     "badrequest if end date is before start date" in new WithTestApplication {
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
-      val systemServices                              = inject[SystemServices]
-      val authConfig                                  = inject[AuthConfig]
-      val controller: TimeBookingController
-        with SecurityControllerMock
-        with MockCacheAware =
-        TimeBookingControllerMock(systemServices, authConfig, reactiveMongoApi)
+      private val systemServices                      = inject[SystemServices]
+      private val authConfig                          = inject[AuthConfig]
+      val controller: TimeBookingController with SecurityControllerMock =
+        TimeBookingControllerMock(config,
+                                  systemServices,
+                                  authConfig,
+                                  reactiveMongoApi)
 
       val from: DateTime = DateTime.now()
       val to: DateTime   = from.minusHours(1)
@@ -251,18 +254,17 @@ class TimeBookingControllerSpec
 }
 
 object TimeBookingControllerMock extends MockAwaitable with Mockito {
-  def apply(systemServices: SystemServices,
+  def apply(config: Config,
+            systemServices: SystemServices,
             authConfig: AuthConfig,
-            reactiveMongoApi: ReactiveMongoApi)(implicit
-      ec: ExecutionContext): TimeBookingController
-    with SecurityControllerMock
-    with MockCacheAware = {
+            reactiveMongoApi: ReactiveMongoApi)(implicit ec: ExecutionContext)
+      : TimeBookingController with SecurityControllerMock = {
 
     new TimeBookingController(
-      Helpers.stubControllerComponents(),
-      authConfig,
-      MockCache,
-      reactiveMongoApi,
-      systemServices) with SecurityControllerMock with MockCacheAware
+      conf = config,
+      controllerComponents = Helpers.stubControllerComponents(),
+      authConfig = authConfig,
+      reactiveMongoApi = reactiveMongoApi,
+      systemServices = systemServices) with SecurityControllerMock
   }
 }

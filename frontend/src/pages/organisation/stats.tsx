@@ -23,13 +23,12 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { LayoutDesktop } from 'layout/layoutDesktop';
 import { NextPageWithLayout } from 'pages/_app';
 import { Error } from 'components/error';
-import { getUserProfile } from 'lib/api/lasius/user/user';
 import { isAdminOfCurrentOrg } from 'lib/api/functions/isAdminOfCurrentOrg';
 import { ModelsUser } from 'lib/api/lasius';
-import { getSession } from 'next-auth/react';
-import { getServerSideRequestHeaders } from 'lib/api/hooks/useTokensWithAxiosRequests';
+import { useProfile } from 'lib/api/hooks/useProfile';
 
-const StatsPage: NextPageWithLayout = ({ profile }) => {
+const StatsPage: NextPageWithLayout = () => {
+  const { profile } = useProfile();
   if (isAdminOfCurrentOrg(profile as ModelsUser)) {
     return <StatsLayout />;
   }
@@ -38,11 +37,8 @@ const StatsPage: NextPageWithLayout = ({ profile }) => {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { locale = '' } = context;
-  const session = await getSession({ req: context.req });
-  const profile = await getUserProfile(getServerSideRequestHeaders(session?.user.xsrfToken || ''));
   return {
     props: {
-      profile,
       ...(await serverSideTranslations(locale, ['common'])),
     },
   };

@@ -25,7 +25,6 @@ import core.{SystemServices, TestApplication}
 import models._
 import mongo.EmbedMongo
 import org.joda.time.DateTime
-import org.mindrot.jbcrypt.BCrypt
 import org.specs2.mock.Mockito
 import org.specs2.mock.mockito.MockitoMatchers
 import play.api.mvc._
@@ -50,7 +49,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
@@ -72,7 +72,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
@@ -96,7 +97,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
@@ -120,7 +122,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
       val newProjectKey: String = "someNewProjectKey"
@@ -137,8 +140,7 @@ class ProjectsControllerSpec
       status(result) must equalTo(CREATED)
       val resultingProject: Project = contentAsJson(result).as[Project]
       resultingProject.key === newProjectKey
-      resultingProject.organisationReference === controller.organisation
-        .getReference()
+      resultingProject.organisationReference === controller.organisation.getReference
 
       // verify user gets automatically assigned to this project
       val maybeUser: Option[User] = withDBSession()(implicit dbSession =>
@@ -150,7 +152,7 @@ class ProjectsControllerSpec
         _.organisationReference.id == controller.organisationId)
       userOrg must beSome
       val userProject: Option[UserProject] = userOrg.get.projects.find(
-        _.projectReference == resultingProject.getReference())
+        _.projectReference == resultingProject.getReference)
       userProject must beSome
       userProject.get.role === ProjectAdministrator
     }
@@ -163,7 +165,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
@@ -180,7 +183,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi,
                                            organisationRole =
@@ -203,7 +207,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
@@ -223,7 +228,7 @@ class ProjectsControllerSpec
         _.organisationReference.id == controller.organisationId)
       userOrg must beSome
       val userProject: Option[UserProject] = userOrg.get.projects.find(
-        _.projectReference == controller.project.getReference())
+        _.projectReference == controller.project.getReference)
       userProject must beNone
     }
   }
@@ -235,7 +240,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
@@ -255,7 +261,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi,
                                            organisationRole =
@@ -279,7 +286,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
@@ -301,7 +309,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
       val email = "newUserEmail@test.com"
@@ -329,7 +338,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi,
                                            projectActive = false)
@@ -353,7 +363,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi,
                                            organisationRole =
@@ -379,7 +390,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
       val email = "newUserEmail@test.com"
@@ -403,13 +415,14 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
       val email = "ivnitedUser@test.com"
       val userOrganisation: UserOrganisation = UserOrganisation(
-        organisationReference = controller.organisation.getReference(),
+        organisationReference = controller.organisation.getReference,
         `private` = controller.organisation.`private`,
         role = OrganisationMember,
         plannedWorkingHours = WorkingHours(),
@@ -419,13 +432,13 @@ class ProjectsControllerSpec
         UserId(),
         "anotherUser",
         email = email,
-        password = BCrypt.hashpw("somePassword", BCrypt.gensalt()),
         firstName = "test",
         lastName = "user",
         active = true,
         role = Administrator,
         organisations = Seq(userOrganisation),
-        settings = None
+        settings = None,
+        acceptedTOS = None
       )
 
       withDBSession()(implicit dbSession =>
@@ -453,7 +466,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
@@ -472,7 +486,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi,
                                            organisationRole =
@@ -492,11 +507,11 @@ class ProjectsControllerSpec
       // initialize second user
       val userProject = UserProject(
         sharedByOrganisationReference = None,
-        projectReference = controller.project.getReference(),
+        projectReference = controller.project.getReference,
         role = ProjectMember
       )
       val userOrganisation = UserOrganisation(
-        organisationReference = controller.organisation.getReference(),
+        organisationReference = controller.organisation.getReference,
         `private` = controller.organisation.`private`,
         role = OrganisationMember,
         plannedWorkingHours = WorkingHours(),
@@ -506,13 +521,13 @@ class ProjectsControllerSpec
         UserId(),
         "anotherUser",
         email = "user2@user.com",
-        password = BCrypt.hashpw("somePassword", BCrypt.gensalt()),
         firstName = "test",
         lastName = "user",
         active = true,
         role = Administrator,
         organisations = Seq(userOrganisation),
-        settings = None
+        settings = None,
+        acceptedTOS = None
       )
 
       withDBSession()(implicit dbSession =>
@@ -538,7 +553,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi,
                                            organisationRole =
@@ -553,7 +569,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi,
                                            organisationRole =
@@ -570,7 +587,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
@@ -588,7 +606,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
@@ -606,19 +625,20 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi,
                                            projectRole = ProjectMember)
 
-      // initialize second user to be able to remove ourself
+      // initialize second user to be able to remove himeself
       val userProject2: UserProject = UserProject(
         sharedByOrganisationReference = None,
-        projectReference = controller.project.getReference(),
+        projectReference = controller.project.getReference,
         role = ProjectAdministrator
       )
-      val userOrganisation2 = UserOrganisation(
-        organisationReference = controller.organisation.getReference(),
+      private val userOrganisation2 = UserOrganisation(
+        organisationReference = controller.organisation.getReference,
         `private` = controller.organisation.`private`,
         role = OrganisationMember,
         plannedWorkingHours = WorkingHours(),
@@ -628,13 +648,13 @@ class ProjectsControllerSpec
         UserId(),
         "anotherUser",
         email = "user2@user.com",
-        password = BCrypt.hashpw("somePassword", BCrypt.gensalt()),
         firstName = "test",
         lastName = "user",
         active = true,
         role = Administrator,
         organisations = Seq(userOrganisation2),
-        settings = None
+        settings = None,
+        acceptedTOS = None
       )
       withDBSession()(implicit dbSession =>
         controller.userRepository.upsert(user2)).awaitResult()
@@ -645,7 +665,7 @@ class ProjectsControllerSpec
                                   controller.project.id)(request)
 
       status(result) must equalTo(OK)
-      val remainingUsers = withDBSession()(implicit dbSession =>
+      private val remainingUsers = withDBSession()(implicit dbSession =>
         controller.userRepository.findByProject(controller.project.id))
         .awaitResult()
       remainingUsers should haveSize(1)
@@ -659,7 +679,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
@@ -678,7 +699,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
@@ -699,7 +721,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
@@ -720,7 +743,8 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
@@ -731,7 +755,7 @@ class ProjectsControllerSpec
         controller.projectRepository.upsert(Project(
           id = ProjectId(),
           key = project2Key,
-          organisationReference = controller.organisation.getReference(),
+          organisationReference = controller.organisation.getReference,
           bookingCategories = Set(),
           active = true,
           createdBy = controller.userReference,
@@ -755,25 +779,25 @@ class ProjectsControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: ProjectsControllerMock =
-        controllers.ProjectsControllerMock(systemServices,
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
                                            authConfig,
                                            reactiveMongoApi)
-      val newKey       = "newProjectKey"
-      val invitationId = InvitationId()
+      val newKey               = "newProjectKey"
+      private val invitationId = InvitationId()
 
       // create second user with different project structure
       val anotherUser: User = User(
         UserId(),
         "second-user",
         email = "user@user.com",
-        password = BCrypt.hashpw("no-pwd", BCrypt.gensalt()),
         firstName = "test",
         lastName = "user",
         active = true,
         role = Administrator,
         organisations = Seq(
           UserOrganisation(
-            organisationReference = controller.organisation.getReference(),
+            organisationReference = controller.organisation.getReference,
             `private` = false,
             role = OrganisationMember,
             plannedWorkingHours = WorkingHours(),
@@ -783,7 +807,7 @@ class ProjectsControllerSpec
                             EntityReference(ProjectId(), "anotherProject"),
                           role = ProjectMember),
               UserProject(sharedByOrganisationReference = None,
-                          projectReference = controller.project.getReference(),
+                          projectReference = controller.project.getReference,
                           role = ProjectMember),
             )
           ),
@@ -795,7 +819,8 @@ class ProjectsControllerSpec
             projects = Seq()
           )
         ),
-        settings = None
+        settings = None,
+        acceptedTOS = None
       )
 
       val invitation: JoinProjectInvitation = JoinProjectInvitation(
@@ -804,8 +829,8 @@ class ProjectsControllerSpec
         createDate = DateTime.now(),
         createdBy = controller.userReference,
         expiration = DateTime.now().plusDays(1),
-        sharedByOrganisationReference = controller.organisation.getReference(),
-        projectReference = controller.project.getReference(),
+        sharedByOrganisationReference = controller.organisation.getReference,
+        projectReference = controller.project.getReference,
         role = ProjectMember,
         outcome = None
       )
@@ -825,12 +850,12 @@ class ProjectsControllerSpec
                                  controller.project.id)(request)
 
       status(result) must equalTo(OK)
-      val updatedProject = contentAsJson(result).as[Project]
+      private val updatedProject = contentAsJson(result).as[Project]
 
       updatedProject.key === newKey
 
       // verify references where updated as well
-      val updatedInvitation = withDBSession()(implicit dbSession =>
+      private val updatedInvitation = withDBSession()(implicit dbSession =>
         controller.invitationRepository.findById(invitationId)).awaitResult()
       updatedInvitation must beSome
       updatedInvitation.get
@@ -838,7 +863,7 @@ class ProjectsControllerSpec
         .projectReference
         .key === newKey
 
-      val user = withDBSession()(implicit dbSession =>
+      private val user = withDBSession()(implicit dbSession =>
         controller.userRepository.findById(controller.userId)).awaitResult()
       user must beSome
 
@@ -848,7 +873,7 @@ class ProjectsControllerSpec
         .map(_.projectReference.key) === Some(newKey)
 
       // check project was changed in second user
-      val user2 = withDBSession()(implicit dbSession =>
+      private val user2 = withDBSession()(implicit dbSession =>
         controller.userRepository.findById(anotherUser.id)).awaitResult()
       user2 must beSome
       user2.get.organisations
