@@ -76,7 +76,6 @@ Once the provider is entered in the backend configuration, Github integration ca
 |---|--|
 | GITHUB_OAUTH_CLIENT_ID | Client ID of the application registered with Github |
 | GITHUB_OAUTH_CLIENT_SECRET | Client secret of the application registered with Github |
-| GITHUB_OAUTH_APPLICATION_ID | ID of the application registered with Github. This ID needs to be read from the URL path in the detail view of the application, i.e.:  ![Github application id](images/Lasius_Github_ApplicationId.png) |
 
 ### Keycloak
 

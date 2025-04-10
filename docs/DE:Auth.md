@@ -76,8 +76,6 @@ Danach kann die Github-Integration über folgende Umgebungsvariablen konfigurier
 |---|--|
 | GITHUB_OAUTH_CLIENT_ID | Client Id der bei Github registrierten Applikation |
 | GITHUB_OAUTH_CLIENT_SECRET | Client secret der bei Github registrierten Applikation |
-| GITHUB_OAUTH_APPLICATION_ID | Id der bei Github registrierten Applikation. Diese ID muss aus dem URL-Pfad in der Detailansicht der Applikation gelesen werden, bspw.:  ![Github application id](images/Lasius_Github_ApplicationId.png) |
-
 
 
 ### Keycloak
