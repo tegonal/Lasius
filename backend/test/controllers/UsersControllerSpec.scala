@@ -381,15 +381,14 @@ object UsersControllerMock extends MockAwaitable with Mockito with Awaitable {
       : UsersController with SecurityControllerMock with TestDBSupport = {
     val mongoUserRepository = new UserMongoRepository()
 
-    val controller = new UsersController(conf = config,
-                                         controllerComponents =
-                                           Helpers.stubControllerComponents(),
-                                         systemServices = systemServices,
-                                         authConfig = authConfig,
-                                         reactiveMongoApi = reactiveMongoApi,
-                                         userRepository = mongoUserRepository)
-      with SecurityControllerMock
-      with TestDBSupport {
+    val controller = new UsersController(
+      conf = config,
+      controllerComponents = Helpers.stubControllerComponents(),
+      systemServices = systemServices,
+      authConfig = authConfig,
+      reactiveMongoApi = reactiveMongoApi,
+      userRepository = mongoUserRepository
+    ) with SecurityControllerMock with TestDBSupport {
       // override mock as we deal with a real db backend in this spec
       override val userRepository: UserRepository = mongoUserRepository
     }

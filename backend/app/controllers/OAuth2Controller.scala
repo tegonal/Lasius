@@ -97,8 +97,8 @@ class OAuth2Controller @Inject() (
                   .map { code =>
                     Redirect(
                       s"${code.redirectUri}?state=${request.body.state
-                        .map(URLEncoder.encode(_, "UTF-8"))
-                        .getOrElse("")}&code=${URLEncoder.encode(code.code, "UTF-8")}",
+                          .map(URLEncoder.encode(_, "UTF-8"))
+                          .getOrElse("")}&code=${URLEncoder.encode(code.code, "UTF-8")}",
                       StatusCodes.Found.intValue
                     )
                   }

@@ -79,7 +79,7 @@ class SecuritySpec
         .apply(request)
 
       // return results & wait until future is complete for testing purposes
-      Await.ready(result, 2 seconds)
+      Await.ready(result, 2.seconds)
     }
 
     "return unauthorized when user can't get resolved" in new WithTestApplication {
@@ -193,7 +193,7 @@ class SecuritySpec
         .apply(request)
 
       // return results & wait until future is complete for testing purposes
-      Await.ready(result, 2 seconds)
+      Await.ready(result, 2.seconds)
     }
 
     "return unauthorized when no token was found in request header" in new WithTestApplication {

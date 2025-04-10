@@ -187,18 +187,19 @@ class ProjectsController @Inject() (
                   // otherwise create invitation
                   val invitationId = InvitationId()
                   invitationRepository
-                    .upsert(JoinProjectInvitation(
-                      id = invitationId,
-                      invitedEmail = request.body.email,
-                      createDate = DateTime.now(),
-                      createdBy = subject.userReference,
-                      expiration = DateTime.now().plusDays(7),
-                      sharedByOrganisationReference =
-                        userOrg.organisationReference,
-                      projectReference = project.getReference,
-                      role = request.body.role,
-                      outcome = None
-                    ))
+                    .upsert(
+                      JoinProjectInvitation(
+                        id = invitationId,
+                        invitedEmail = request.body.email,
+                        createDate = DateTime.now(),
+                        createdBy = subject.userReference,
+                        expiration = DateTime.now().plusDays(7),
+                        sharedByOrganisationReference =
+                          userOrg.organisationReference,
+                        projectReference = project.getReference,
+                        role = request.body.role,
+                        outcome = None
+                      ))
                     .map(_ => Some(invitationId))
                 }
             } yield Created(

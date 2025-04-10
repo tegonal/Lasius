@@ -54,7 +54,7 @@ class TagController @Inject() (
         HasOrganisationRole(user, orgId, OrganisationMember) { userOrg =>
           HasProjectRole(userOrg, projectId, ProjectMember) { _ =>
             implicit val timeout: Timeout =
-              Timeout(5 seconds) // needed for `?` below
+              Timeout(5.seconds) // needed for `?` below
             val future = systemServices.tagCache ? GetTags(projectId)
             for {
               cachedTags <- future.map { result =>

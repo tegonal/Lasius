@@ -134,7 +134,7 @@ class DefaultSystemServices @Inject() (
   )
   val systemSubject: Subject =
     Subject("", systemUserInfo, systemUserReference)
-  implicit val timeout: Timeout = Timeout(5 seconds) // needed for `?` below
+  implicit val timeout: Timeout = Timeout(5.seconds) // needed for `?` below
   val duration: FiniteDuration  = Duration.create(30, SECONDS)
   override val timeBookingViewService: ActorRef = Await
     .result(supervisor ? TimeBookingViewService.props(this,
@@ -209,13 +209,13 @@ class DefaultSystemServices @Inject() (
     if (cleanData) {
       logger.info(s"Drop database on startup")
       Await.result(withDBSession()(implicit dbSession => dbSession.db.drop()),
-                   20 seconds)
+                   20.seconds)
     }
 
     val hasUsers =
       Await.result(withDBSession()(implicit dbSession =>
                      userRepository.findAll(limit = 1).map(_.nonEmpty)),
-                   10 seconds)
+                   10.seconds)
 
     val initData: Boolean = config.getBoolean("db.initialize_data")
     if (!hasUsers && initData) {
@@ -226,7 +226,7 @@ class DefaultSystemServices @Inject() (
           getClass.getClassLoader
             .loadClass(dataLoaderClassname)
             .asInstanceOf[Class[InitialDataLoader]])
-      Await.result(dataLoader.initializeData(supportTransaction), 1 minute)
+      Await.result(dataLoader.initializeData(supportTransaction), 1.minute)
     }
 
     // start plugin-handler

@@ -71,7 +71,7 @@ class UserTimeBookingStatisticsView(
 
   val persistenceId: String = s"user-time-booking-${userReference.id.value}"
 
-  private val waitTime = 5 seconds
+  private val waitTime = 5.seconds
 
   private implicit val executionContext: ExecutionContextExecutor =
     context.dispatcher
@@ -132,13 +132,13 @@ class UserTimeBookingStatisticsView(
       case Success(_) =>
         println(
           s"~~~~~~~~~~~~~~~~~ STATISTICS FOR ${userReference} COMPLETED IN ${System
-            .currentTimeMillis() - startTime}ms")
+              .currentTimeMillis() - startTime}ms")
         notifyClient(UserTimeBookingByProjectEntryCleaned(userReference.id))
         notifyClient(UserTimeBookingByTagEntryCleaned(userReference.id))
       case Failure(th) =>
         println(
           s"~~~~~~~~~~~~~~~~~ STATISTICS FOR ${userReference} FAILED IN ${System
-            .currentTimeMillis() - startTime}ms, failure:${th.getMessage}")
+              .currentTimeMillis() - startTime}ms, failure:${th.getMessage}")
     }
   }
 

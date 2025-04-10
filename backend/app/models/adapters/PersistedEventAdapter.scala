@@ -50,7 +50,7 @@ class PersistedEventAdapter(system: ExtendedActorSystem)
                    .flatMap { implicit dbSession =>
                      userRepository.findAll()
                    },
-                 30 seconds)
+                 30.seconds)
   }
 
   lazy val allProjects = {
@@ -65,7 +65,7 @@ class PersistedEventAdapter(system: ExtendedActorSystem)
                    .flatMap { implicit dbSession =>
                      projectRepository.findAll().map(_.map(_._1).toSeq)
                    },
-                 30 seconds)
+                 30.seconds)
   }
 
   override def fromJournal(event: Any, manifest: String): EventSeq =

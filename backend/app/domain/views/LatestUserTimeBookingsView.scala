@@ -67,7 +67,7 @@ class LatestUserTimeBookingsView(clientReceiver: ClientReceiver,
   var state: TimeBookingsHistory = TimeBookingsHistory()
 
   @unused
-  def autoUpdateInterval: FiniteDuration = 100 millis
+  def autoUpdateInterval: FiniteDuration = 100.millis
 
   private def getStartTime(booking: BookingStub): DateTime = {
     state.startTimeMap.getOrElse(booking, oldDateTime)
@@ -121,9 +121,9 @@ class LatestUserTimeBookingsView(clientReceiver: ClientReceiver,
 
   private def notifyClient(): Unit = {
     val result = state.history.toSeq.sorted(ordering).take(state.maxHistory)
-    clientReceiver ! (userReference.id, LatestTimeBooking(userReference.id,
-                                                          result), List(
-      userReference.id))
+    clientReceiver ! (userReference.id,
+                      LatestTimeBooking(userReference.id, result),
+                      List(userReference.id))
   }
 
 }

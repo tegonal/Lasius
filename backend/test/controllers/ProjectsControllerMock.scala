@@ -55,14 +55,16 @@ class ProjectsControllerMock(
     override val organisationRole: OrganisationRole,
     override val projectRole: ProjectRole,
     override val projectActive: Boolean)(implicit ec: ExecutionContext)
-    extends ProjectsController(conf = conf,
-                               controllerComponents = controllerComponents,
-                               systemServices = systemServices,
-                               projectRepository = projectRepository,
-                               userRepository = userMongoRepository,
-                               invitationRepository = invitationRepository,
-                               authConfig = authConfig,
-                               reactiveMongoApi = reactiveMongoApi)
+    extends ProjectsController(
+      conf = conf,
+      controllerComponents = controllerComponents,
+      systemServices = systemServices,
+      projectRepository = projectRepository,
+      userRepository = userMongoRepository,
+      invitationRepository = invitationRepository,
+      authConfig = authConfig,
+      reactiveMongoApi = reactiveMongoApi
+    )
     with SecurityControllerMock
     with TestDBSupport {
 

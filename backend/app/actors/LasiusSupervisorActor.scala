@@ -32,7 +32,7 @@ class LasiusSupervisorActor extends Actor {
   import scala.concurrent.duration._
 
   override val supervisorStrategy: OneForOneStrategy =
-    OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1 minute) {
+    OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1.minute) {
       case _ =>
         Restart
     }

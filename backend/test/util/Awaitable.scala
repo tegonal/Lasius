@@ -28,7 +28,7 @@ import scala.language.postfixOps
 trait Awaitable {
 
   implicit class AwaitableFuture[R](self: Future[R]) {
-    def awaitResult(timeout: Duration = 15 seconds): R =
+    def awaitResult(timeout: Duration = 15.seconds): R =
       Await.result(self, timeout)
   }
 }
