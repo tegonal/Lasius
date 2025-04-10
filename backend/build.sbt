@@ -92,9 +92,9 @@ libraryDependencies ++= Seq(
 
 dependencyOverrides ++= Seq(
   "com.fasterxml.jackson.module" % "jackson-module-scala_2.13" % "2.18.2",
-  "com.fasterxml.jackson.core"   % "jackson-databind"          % "2.18.2",
-  "com.fasterxml.jackson.core"   % "jackson-core"              % "2.18.2",
-  "com.fasterxml.jackson.core"   % "jackson-annotations"       % "2.18.2",
+  "com.fasterxml.jackson.core"   % "jackson-databind"          % "2.18.3",
+  "com.fasterxml.jackson.core"   % "jackson-core"              % "2.18.3",
+  "com.fasterxml.jackson.core"   % "jackson-annotations"       % "2.18.3",
 )
 
 Test / javaOptions += "-Dconfig.file=conf/test.conf"
