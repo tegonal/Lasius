@@ -38,9 +38,7 @@ resolvers += "Sonatype OSS Releases".at(
   "https://oss.sonatype.org/content/repositories/releases")
 
 val pekkoVersion             = "1.1.3"
-val reactiveMongoVersion     = "1.1.0"
-val reactiveMongoPlayVersion = s"$reactiveMongoVersion-play30.RC14"
-val playVersion              = "3.0.5"
+val reactiveMongoPlayVersion = "1.1.0-play30.RC15"
 // Play framework 3.x is still bound to older guice version
 val guiceVersion      = "6.0.0"
 val pureConfigVersion = "0.17.8"
@@ -63,7 +61,7 @@ libraryDependencies ++= Seq(
   "org.apache.pekko" %% "pekko-slf4j"                 % pekkoVersion,
   "org.apache.pekko" %% "pekko-testkit"               % pekkoVersion % "test",
   "org.apache.pekko" %% "pekko-persistence-testkit"   % pekkoVersion % "test",
-  // reativemongo based connector for persistent akka
+  // reactivemongo based connector for persistent akka
   "org.mindrot"         % "jbcrypt"                   % "0.4",
   "de.flapdoodle.embed" % "de.flapdoodle.embed.mongo" % "4.20.0" % "test",
   "io.github.alstanchev" % "pekko-persistence-inmemory_2.13" % "1.3.0" % "test",

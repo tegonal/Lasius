@@ -107,14 +107,14 @@ Specific to `backend` container:
 
 Specific to `frontend` container:
 
-| Variable name                            | Description                                                                                                             | Default value |
-|------------------------------------------|-------------------------------------------------------------------------------------------------------------------------| ------------- |
-| ENVIRONMENT                              | `production` - any other value runs NextJS in dev mode. Not suggested in deployments.                                   | production    |
-| NEXT_AUTH_SECRET                         | Hash for next-auth session salting, e.g. the output of `openssl rand -base64 32`                                        | random string |
-| LASIUS_DEMO_MODE                         | Enables or disables demo mode                                                                                           | `false`       |
-| LASIUS_TELEMETRY_PLAUSIBLE_HOST          | Hostname/FQDN of a matomo instance to collect anonymous usage data, e.g. `stats.domain.com`                             | undefined     |
-| LASIUS_TELEMETRY_PLAUSIBLE_SOURCE_DOMAIN | Matomo site ID, e.g. `42`                                                                                               | undefined     |
-| LASIUS_TERMSOFSERVICE_VERSION            | Enables the Terms of Service dialog. You also need to provide the terms in `public/termsofservice/<lang>.html`.         | undefined     |
+| Variable name                            | Description                                                                                                     | Default value |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ------------- |
+| ENVIRONMENT                              | `production` - any other value runs NextJS in dev mode. Not suggested in deployments.                           | production    |
+| NEXT_AUTH_SECRET                         | Hash for next-auth session salting, e.g. the output of `openssl rand -base64 32`                                | random string |
+| LASIUS_DEMO_MODE                         | Enables or disables demo mode                                                                                   | `false`       |
+| LASIUS_TELEMETRY_PLAUSIBLE_HOST          | Hostname/FQDN of a matomo instance to collect anonymous usage data, e.g. `stats.domain.com`                     | undefined     |
+| LASIUS_TELEMETRY_PLAUSIBLE_SOURCE_DOMAIN | Matomo site ID, e.g. `42`                                                                                       | undefined     |
+| LASIUS_TERMSOFSERVICE_VERSION            | Enables the Terms of Service dialog. You also need to provide the terms in `public/termsofservice/<lang>.html`. | undefined     |
 
 We suggest you use a `.env` file and save it in the same directory as the `docker-compose.yml` for build dependent configuration and edit all other variables in the `docker-compose.yml` file directly if they are not dependent on CI/CD variables.
 
@@ -158,9 +158,9 @@ If you would like us to set up or run Lasius for you then please contact us here
 
 If you need help, discover a bug or have a feature request, please open an issue in this repo.
 
-## Migration
+# Migration
 
-# Migrating from 1.0.x to 1.1.x
+## Migrating from 1.0.x to 1.1.x
 
 The migration from 1.0.x to 1.1.x includes a version bump of the underlying reactivemongo driver version. This version cannot read former created binary snapshots from the persistence layer. Therefore you need to manually drop the snapshots. The snapshots are rebuilt from the journal once a user logs in or tries to start a new booking.
 The snapshots can be removed by running the following command in the mongo-shell:
@@ -168,6 +168,24 @@ The snapshots can be removed by running the following command in the mongo-shell
 ```
 db.snapshots.remove({})
 ```
+
+## Migration to 2.0.x
+
+With the Lasius release 2.0.0 several changed where applied which might be incompatible to your current setup.
+
+### 1. Migrate to an OAuth provider
+
+If you run Lasius in a production environment, we recommand to migration to an external OAuth provider. Lasius currently support one of those three OAuth providers:
+
+- [Github](https://github.com)
+- [Gitlab](https://gitlab.com)
+- Custom [Keycloak](https://keycloak.org) instance
+
+To enable and configure those authentication providers you need to either manually adjust your backend configuration or, if you're using a standard configuration, provide the correct environment variables. Consult the [wiki](https://github.com/tegonal/Lasius/wiki/Auth) documentation for more information about the configuration possibilities.
+
+### 2. MongoDB
+
+We bumped to the latest available mongo database version 8.x. If you consider migrating you current installation to this release, please follow the [migration documentation](https://www.mongodb.com/docs/manual/release-notes/8.0-upgrade-replica-set/) of mongodb.
 
 ## Wiki / Documentation
 
