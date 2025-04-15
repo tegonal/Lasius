@@ -90,8 +90,6 @@ case class PlaneLabel(
     description: String,
     color: String,
     sort_order: Double,
-    created_by: String,
-    updated_by: String,
     project: String,
     workspace: String,
     parent: Option[String]
