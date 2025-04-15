@@ -7483,7 +7483,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next@npm:^23.5.1 || ^24.2.0, i18next@npm:^24.2.3":
+"i18next@npm:^23.5.1 || ^24.2.0":
   version: 24.2.3
   resolution: "i18next@npm:24.2.3"
   dependencies:
@@ -7494,6 +7494,20 @@ __metadata:
     typescript:
       optional: true
   checksum: 10/6c73d964f2a98b1aa2c2717fe6da66fc265bcbbc5fcd52b2bfff51ff013d30d4f7d7449c4eb7f464d27af43e2e73f2e7f1d46a144d731bd3bdb1385d4c199e4c
+  languageName: node
+  linkType: hard
+
+"i18next@npm:^25.0.0":
+  version: 25.0.0
+  resolution: "i18next@npm:25.0.0"
+  dependencies:
+    "@babel/runtime": "npm:^7.26.10"
+  peerDependencies:
+    typescript: ^5
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 10/49fc1bb94661a1253f0decb837fa4ad7b26a09e04dacf29e453bd396ba9c05a5bc38575133a4a893b0b65da143ad0493867d2e2c41a4d3d10f9fce4b71c45fc0
   languageName: node
   linkType: hard
 
@@ -8367,7 +8381,7 @@ __metadata:
     eslint-plugin-prettier: "npm:^5.2.6"
     eslint-plugin-react: "npm:^7.37.5"
     framer-motion: "npm:^12.6.5"
-    i18next: "npm:^24.2.3"
+    i18next: "npm:^25.0.0"
     i18next-parser: "npm:^9.3.0"
     js-cookie: "npm:^3.0.5"
     json-stable-stringify: "npm:^1.2.1"
