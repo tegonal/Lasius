@@ -73,7 +73,7 @@ const internalProvider: OAuthConfig<any> = {
 async function requestRefreshToken(refresh_token: string, provider?: string): Promise<any> {
   switch (provider) {
     case 'gitlab':
-      return await fetch(gitlabUrl + '/oauth/access_token', {
+      return await fetch(gitlabUrl + '/oauth/token', {
         method: 'POST',
         body: new URLSearchParams({
           grant_type: 'refresh_token',
@@ -83,7 +83,7 @@ async function requestRefreshToken(refresh_token: string, provider?: string): Pr
         }),
       });
     case 'github':
-      return await fetch(githubUrl + '/oauth/access_token', {
+      return await fetch('https://github.com/login/oauth/access_token', {
         method: 'POST',
         body: new URLSearchParams({
           grant_type: 'refresh_token',
@@ -196,7 +196,7 @@ if (process.env.GITLAB_OAUTH_CLIENT_ID && process.env.GITLAB_OAUTH_CLIENT_SECRET
       clientId: process.env.GITLAB_OAUTH_CLIENT_ID,
       clientSecret: process.env.GITLAB_OAUTH_CLIENT_SECRET,
       wellKnown: gitlabUrl + '/.well-known/openid-configuration',
-      authorization: { params: { scope: 'openid email profile' } },
+      authorization: { params: { scope: 'openid email' } },
       profile(profile) {
         return {
           id: (profile.id || profile.sub).toString(),
@@ -214,6 +214,10 @@ if (process.env.GITHUB_OAUTH_CLIENT_ID && process.env.GITHUB_OAUTH_CLIENT_SECRET
     GitHub({
       clientId: process.env.GITHUB_OAUTH_CLIENT_ID,
       clientSecret: process.env.GITHUB_OAUTH_CLIENT_SECRET,
+      authorization: {
+        url: 'https://github.com/login/oauth/authorize',
+        params: { scope: 'user:email' },
+      },
       profile(profile) {
         return {
           id: profile.id.toString(),

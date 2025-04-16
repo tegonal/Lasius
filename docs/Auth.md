@@ -1,6 +1,5 @@
 [DE](DE%3AAuth.md)
 
-
 # Authentication (Login)
 
 Lasius supports [OAuth2](https://auth0.com/de/intro-to-iam/what-is-oauth-2) and [OpenId Connect](https://openid.net/developers/how-connect-works/-based user authentication. That allows Lasius to be operated with existing identity providers (IDPs) and support single sign-on or machine-to-machine communication.
@@ -34,15 +33,16 @@ However, to simplify installations for demonstration purposes and development en
 The internal OAuth2 provider can be activated and configured either using environment variables or a separate backend configuration. For the frontend, only `LASIUS_OAUTH_CLIENT_ID` and `LASIUS_OAUTH_CLIENT_SECRET` need to be defined, so that the provider appears in the list of authentication providers.
 
 #### Configuration
-| Environment variable | Description |
-|---|--|
-| LASIUS_OAUTH_PROVIDER_ENABLED              | Enable or disable the internal OAuth2 provider |
-| LASIUS_OAUTH_PROVIDER_ALLOW_REGISTER_USERS | Allow registration of new users on the internal OAuth provider |
-| LASIUS_OAUTH_CLIENT_ID | Client ID of the frontend application. It is recommended to use a unique ID per application case |
-| LASIUS_OAUTH_CLIENT_SECRET | Client secret of the frontend application. It is recommended to use a unique secret per application case |
-| LASIUS_INTERNAL_JWT_PRIVATE_KEY | Private key used for signing the internal JWT token. It is recommended to use a unique key per application case |
 
-Additional parameters such as the lifespan of the JWT token must be defined using a separate backend configuration. The corresponding default values in the `lasius.security.oauth-2-provider` section of the [application.conf](https://github.com/tegonal/Lasius/blob/main/backend/conf/application.conf)  configuration can be overridden accordingly.
+| Environment variable                       | Description                                                                                                     |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| LASIUS_OAUTH_PROVIDER_ENABLED              | Enable or disable the internal OAuth2 provider                                                                  |
+| LASIUS_OAUTH_PROVIDER_ALLOW_REGISTER_USERS | Allow registration of new users on the internal OAuth provider                                                  |
+| LASIUS_OAUTH_CLIENT_ID                     | Client ID of the frontend application. It is recommended to use a unique ID per application case                |
+| LASIUS_OAUTH_CLIENT_SECRET                 | Client secret of the frontend application. It is recommended to use a unique secret per application case        |
+| LASIUS_INTERNAL_JWT_PRIVATE_KEY            | Private key used for signing the internal JWT token. It is recommended to use a unique key per application case |
+
+Additional parameters such as the lifespan of the JWT token must be defined using a separate backend configuration. The corresponding default values in the `lasius.security.oauth-2-provider` section of the [application.conf](https://github.com/tegonal/Lasius/blob/main/backend/conf/application.conf) configuration can be overridden accordingly.
 
 ### Gitlab
 
@@ -50,21 +50,21 @@ To enable authentication via a public [Gitlab](https://gitlab.com) instance or a
 
 https://gitlab.com/-/profile/applications
 
-The callback-Url need to be created based on the following pattern: `https://<hostname>/api/auth/callback/gitlab`, where `<hostname>` needs to be replaced with the public name of the lasius instance. Die application needs to have the scopes `openid`, `profile` and `email`.
+The callback-Url need to be created based on the following pattern: `https://<hostname>/api/auth/callback/gitlab`, where `<hostname>` needs to be replaced with the public name of the lasius instance. Die application needs to have the scopes `openid` and `email`.
 
 Once the provider is entered in the backend configuration, Gitlab integration can be configured using the following environment variables:
 
-| Environment variable | Description |
-|---|--|
-| GITLAB_OAUTH_URL (optional) | URL of the Gitlab instance to be used as an authentication provider |
-| GITLAB_OAUTH_CLIENT_ID | Client ID of the application registered with Gitlab |
-| GITLAB_OAUTH_CLIENT_SECRET | Client secret of the application registered with Gitlab |
-| GITLAB_OAUTH_INTROSPECTION_PATH (optional) | Path for the introspection endpoint to verify the access token |
-| GITLAB_OAUTH_USER_INFO_PATH (optional) | Path for loading the user profile |
+| Environment variable                       | Description                                                         |
+| ------------------------------------------ | ------------------------------------------------------------------- |
+| GITLAB_OAUTH_URL (optional)                | URL of the Gitlab instance to be used as an authentication provider |
+| GITLAB_OAUTH_CLIENT_ID                     | Client ID of the application registered with Gitlab                 |
+| GITLAB_OAUTH_CLIENT_SECRET                 | Client secret of the application registered with Gitlab             |
+| GITLAB_OAUTH_INTROSPECTION_PATH (optional) | Path for the introspection endpoint to verify the access token      |
+| GITLAB_OAUTH_USER_INFO_PATH (optional)     | Path for loading the user profile                                   |
 
 ### Github
 
-To integrate  [Github](https://github.com) as an authentication provider, the Oauth application must be registered with Github:
+To integrate [Github](https://github.com) as an authentication provider, the Oauth application must be registered with Github:
 
 https://github.com/settings/developers
 
@@ -72,9 +72,9 @@ The callback-Url need to be created based on the following pattern: `https://<ho
 
 Once the provider is entered in the backend configuration, Github integration can be configured using the following environment variables:
 
-| Environment variable | Description |
-|---|--|
-| GITHUB_OAUTH_CLIENT_ID | Client ID of the application registered with Github |
+| Environment variable       | Description                                             |
+| -------------------------- | ------------------------------------------------------- |
+| GITHUB_OAUTH_CLIENT_ID     | Client ID of the application registered with Github     |
 | GITHUB_OAUTH_CLIENT_SECRET | Client secret of the application registered with Github |
 
 ### Keycloak
@@ -85,10 +85,10 @@ The callback-Url need to be created based on the following pattern: `https://<ho
 
 Once the client is entered in the Keycloak configuration, Keycloak integration can be configured using the following environment variables:
 
-| Environment variable | Description |
-|---|--|
-| KEYCLOAK_OAUTH_URL | URL of the Keycloak instance |
-| KEYCLOAK_OAUTH_CLIENT_ID | Client ID of the registered application |
+| Environment variable         | Description                                 |
+| ---------------------------- | ------------------------------------------- |
+| KEYCLOAK_OAUTH_URL           | URL of the Keycloak instance                |
+| KEYCLOAK_OAUTH_CLIENT_ID     | Client ID of the registered application     |
 | KEYCLOAK_OAUTH_CLIENT_SECRET | Client secret of the registered application |
 
 Additionally, the integration in the frontend can be customized using the following environment variables:
@@ -96,4 +96,3 @@ Additionally, the integration in the frontend can be customized using the follow
 |---|--|
 | KEYCLOAK_OAUTH_PROVIDER_NAME | Name in the list of authentication providers |
 | KEYCLOAK_OAUTH_PROVIDER_ICON | Path to a specific icon. This must be included in the frontend, either through a custom build or by including a local file when starting a Docker image |
-
