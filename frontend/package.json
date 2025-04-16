@@ -75,7 +75,7 @@
   "devDependencies": {
     "@emotion/eslint-plugin": "^11.12.0",
     "@next/bundle-analyzer": "^15.3.0",
-    "@openapitools/openapi-generator-cli": "^2.18.4",
+    "@openapitools/openapi-generator-cli": "^2.19.0",
     "@types/d3-shape": "^3.1.7",
     "@types/js-cookie": "^3.0.6",
     "@types/lodash": "^4.17.16",
