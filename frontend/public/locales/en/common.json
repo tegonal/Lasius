@@ -111,6 +111,7 @@
   "No data available": "No data available",
   "No Internet connection. Please make sure that your device is connected to the Internet.": "No Internet connection. Please make sure that your device is connected to the Internet.",
   "Not enough characters (min. 8)": "Not enough characters (min. 8)",
+  "OAuthCallbackError": "Login to authentication provider failed, please try again.",
   "of": "of",
   "Ok": "Ok",
   "Open context menu": "Open context menu",
