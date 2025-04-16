@@ -111,6 +111,7 @@
   "No data available": "Keine Daten verfügbar",
   "No Internet connection. Please make sure that your device is connected to the Internet.": "Keine Internetverbindung. Bitte stelle sicher, dass dein Gerät mit dem Internet verbunden ist.",
   "Not enough characters (min. 8)": "Zu wenig Zeichen (min. 8)",
+  "OAuthCallbackError": "Die Anmeldung beim Anmelde-Anbieter ist fehlgeschlagen. Bitte versuchen Sie es erneut.",
   "of": "von",
   "Ok": "OK",
   "Open context menu": "Kontextmenü öffnen",

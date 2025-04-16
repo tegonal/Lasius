@@ -45,6 +45,7 @@ import { Icon } from 'components/shared/icon';
 import { BoxInfo } from 'components/shared/notifications/boxInfo';
 import { BoxWarning } from 'components/shared/notifications/boxWarning';
 import { TegonalFooter } from 'components/shared/tegonalFooter';
+import { t } from 'i18next';
 import { LoginLayout } from 'layout/pages/login/loginLayout';
 import { getConfiguration } from 'lib/api/lasius/general/general';
 import { formatISOLocale } from 'lib/dates';
@@ -67,6 +68,10 @@ import { Button, Flex } from 'theme-ui';
 type CustomizedClientSafeProvider = ClientSafeProvider & {
   custom_logo: string | null;
 };
+
+// list of known error response codes, used tp provide translations only
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const loginErrorTranslations = [t('fetchProfileFailed'), t('OAuthCallbackError')];
 
 const Login: NextPage<{
   csrfToken: string;
