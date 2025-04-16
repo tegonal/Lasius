@@ -25,6 +25,10 @@
  * OpenAPI spec version: 2.0.0-beta2+0-3aa2f9ce+20250416-1330
  */
 
-export type GetUserBookingLatestListByOrganisationParams = {
-  maxHistory?: number;
-};
+export type ModelsJoinProjectInvitationType =
+  (typeof ModelsJoinProjectInvitationType)[keyof typeof ModelsJoinProjectInvitationType];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ModelsJoinProjectInvitationType = {
+  JoinProjectInvitation: 'JoinProjectInvitation',
+} as const;

@@ -25,6 +25,9 @@
  * OpenAPI spec version: 2.0.0-beta2+0-3aa2f9ce+20250416-1330
  */
 
-export type GetUserBookingLatestListByOrganisationParams = {
-  maxHistory?: number;
-};
+export type ModelsTagGroupType = (typeof ModelsTagGroupType)[keyof typeof ModelsTagGroupType];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ModelsTagGroupType = {
+  TagGroup: 'TagGroup',
+} as const;
