@@ -1702,17 +1702,18 @@ __metadata:
   linkType: hard
 
 "@headlessui/react@npm:^2.2.1":
-  version: 2.2.1
-  resolution: "@headlessui/react@npm:2.2.1"
+  version: 2.2.2
+  resolution: "@headlessui/react@npm:2.2.2"
   dependencies:
     "@floating-ui/react": "npm:^0.26.16"
     "@react-aria/focus": "npm:^3.17.1"
     "@react-aria/interactions": "npm:^3.21.3"
-    "@tanstack/react-virtual": "npm:^3.11.1"
+    "@tanstack/react-virtual": "npm:^3.13.6"
+    use-sync-external-store: "npm:^1.5.0"
   peerDependencies:
     react: ^18 || ^19 || ^19.0.0-rc
     react-dom: ^18 || ^19 || ^19.0.0-rc
-  checksum: 10/16ca4fc5e59f5d402f29df11e882ff540feecf000bc3659ddf5ed694fddd9c2a05925e9ac07ad95200da0ec1b1b48226a607e51600c728ff37112013180a3c9a
+  checksum: 10/59a0686816f332b366a2e314408bccf71ff528580ee7223052316326cebe0536dc0b63c9cf50772a04147b240fa35c2434fdc84a386e45dc9339ca2485e1f22d
   languageName: node
   linkType: hard
 
@@ -3326,7 +3327,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/react-virtual@npm:^3.11.1":
+"@tanstack/react-virtual@npm:^3.13.6":
   version: 3.13.6
   resolution: "@tanstack/react-virtual@npm:3.13.6"
   dependencies:
@@ -12143,7 +12144,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"use-sync-external-store@npm:^1.4.0":
+"use-sync-external-store@npm:^1.4.0, use-sync-external-store@npm:^1.5.0":
   version: 1.5.0
   resolution: "use-sync-external-store@npm:1.5.0"
   peerDependencies:
