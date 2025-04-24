@@ -32,14 +32,18 @@ import GitHub from 'next-auth/providers/github';
 import Keyclaok from 'next-auth/providers/keycloak';
 import { logout } from 'lib/api/lasius/oauth2-provider/oauth2-provider';
 import { getRequestHeaders } from 'lib/api/hooks/useTokensWithAxiosRequests';
+import { keyBy } from 'lodash';
 
 const gitlabUrl = process.env.GITLAB_OAUTH_URL || 'https://gitlab.com';
 const githubUrl = 'https://api.github.com/';
 
-type MapType = {
-  [key: string]: boolean;
-};
-const REFRESH_TOKEN_PROGRESS: MapType = {};
+const REFRESH_TOKEN_PROGRESS: Map<string, boolean> = new Map();
+interface CacheItem {
+  token: JWT;
+  expiry: number;
+}
+const REFRESH_TOKEN_CACHE: Map<string, CacheItem> = new Map();
+const REFRESH_TOKEN_CACHE_LIFESPAN_MS = 30000;
 
 const internalProvider: OAuthConfig<any> = {
   id: AUTH_PROVIDER_INTERNAL_LASIUS,
@@ -124,17 +128,48 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
   if (!token?.refresh_token) {
     return token;
   }
-  if (REFRESH_TOKEN_PROGRESS[token.refresh_token]) {
+  if (REFRESH_TOKEN_PROGRESS.get(token.refresh_token)) {
     if (process.env.LASIUS_DEBUG) {
       console.debug('[NextAuth][refreshAccessToken][AlreadyRefreshing]', token.refresh_token);
     }
     return token;
   }
+  const cachedResult = REFRESH_TOKEN_CACHE.get(token.refresh_token);
+  const now = Date.now();
+  if (cachedResult) {
+    if (process.env.LASIUS_DEBUG) {
+      console.debug(
+        '[NextAuth][refreshAccessToken][CachedRefresh]',
+        token.refresh_token,
+        cachedResult.token
+      );
+    }
+    if (cachedResult.expiry < now) {
+      if (process.env.LASIUS_DEBUG) {
+        console.debug(
+          '[NextAuth][refreshAccessToken][RemoveExpiredRefreshToken]',
+          token.refresh_token
+        );
+      }
+      REFRESH_TOKEN_CACHE.delete(token.refresh_token);
+    }
+    return cachedResult.token;
+  }
+
+  // clean refresh token cache
+  const expiredCachedRefreshTokens = Array.from(REFRESH_TOKEN_CACHE.entries())
+    .filter(([_, item]) => item.expiry < now)
+    .map(([key, _]) => key);
+  if (process.env.LASIUS_DEBUG) {
+    console.debug('[NextAuth][CleanCachedRefreshTokens]', expiredCachedRefreshTokens.length);
+  }
+  expiredCachedRefreshTokens.forEach((token) => REFRESH_TOKEN_CACHE.delete(token));
+
   if (process.env.LASIUS_DEBUG) {
     console.debug('[NextAuth][refreshAccessToken]', token?.refresh_token);
   }
   try {
-    REFRESH_TOKEN_PROGRESS[token.refresh_token] = true;
+    REFRESH_TOKEN_PROGRESS.set(token.refresh_token, true);
     const response = await requestRefreshToken(token.refresh_token, token.provider);
 
     const tokensOrError = await response.json();
@@ -144,7 +179,11 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
     }
 
     if (process.env.LASIUS_DEBUG) {
-      console.info('[NextAuth][refreshAccessToken][RenewedToken]', tokensOrError?.refresh_token);
+      console.info(
+        '[NextAuth][refreshAccessToken][RenewedToken]',
+        tokensOrError?.refresh_token,
+        tokensOrError?.access_token
+      );
     }
 
     const newTokens = tokensOrError as {
@@ -152,14 +191,20 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
       expires_in: number;
       refresh_token?: string;
     };
-
-    return {
+    const newTokenResult = {
       ...token,
       access_token: newTokens.access_token,
       expires_at: Math.floor(Date.now() / 1000 + newTokens.expires_in),
       // Some providers only issue refresh tokens once, so preserve if we did not get a new one
       refresh_token: newTokens.refresh_token ?? token.refresh_token,
     };
+
+    REFRESH_TOKEN_CACHE.set(token.refresh_token, {
+      token: newTokenResult,
+      expiry: now + REFRESH_TOKEN_CACHE_LIFESPAN_MS,
+    });
+
+    return newTokenResult;
   } catch (error) {
     if (process.env.LASIUS_DEBUG) {
       console.log('[NextAuth][RefreshAccessTokenError]', error);
@@ -168,7 +213,7 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
     token.error = 'RefreshAccessTokenError';
     return token;
   } finally {
-    delete REFRESH_TOKEN_PROGRESS[token.refresh_token];
+    REFRESH_TOKEN_PROGRESS.delete(token.refresh_token);
   }
 }
 const providers = [];
