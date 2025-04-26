@@ -36,10 +36,13 @@ import { getRequestHeaders } from 'lib/api/hooks/useTokensWithAxiosRequests';
 const gitlabUrl = process.env.GITLAB_OAUTH_URL || 'https://gitlab.com';
 const githubUrl = 'https://api.github.com/';
 
-type MapType = {
-  [key: string]: boolean;
-};
-const REFRESH_TOKEN_PROGRESS: MapType = {};
+const REFRESH_TOKEN_PROGRESS: Map<string, boolean> = new Map();
+interface CacheItem {
+  token: JWT;
+  expiry: number;
+}
+const REFRESH_TOKEN_CACHE: Map<string, CacheItem> = new Map();
+const REFRESH_TOKEN_CACHE_LIFESPAN_MS = 30000;
 
 const internalProvider: OAuthConfig<any> = {
   id: AUTH_PROVIDER_INTERNAL_LASIUS,
@@ -115,27 +118,10 @@ async function requestRefreshToken(refresh_token: string, provider?: string): Pr
   }
 }
 
-/**
- * Takes a token, and returns a new token with updated
- * `access_token` and `expires_at`. If an error occurs,
- * returns the old token and an error property
- */
-async function refreshAccessToken(token: JWT): Promise<JWT> {
-  if (!token?.refresh_token) {
-    return token;
-  }
-  if (REFRESH_TOKEN_PROGRESS[token.refresh_token]) {
-    if (process.env.LASIUS_DEBUG) {
-      console.debug('[NextAuth][refreshAccessToken][AlreadyRefreshing]', token.refresh_token);
-    }
-    return token;
-  }
-  if (process.env.LASIUS_DEBUG) {
-    console.debug('[NextAuth][refreshAccessToken]', token?.refresh_token);
-  }
+async function fetchRefreshAccessToken(refresh_token: string, token: JWT): Promise<JWT> {
   try {
-    REFRESH_TOKEN_PROGRESS[token.refresh_token] = true;
-    const response = await requestRefreshToken(token.refresh_token, token.provider);
+    REFRESH_TOKEN_PROGRESS.set(refresh_token, true);
+    const response = await requestRefreshToken(refresh_token, token.provider);
 
     const tokensOrError = await response.json();
 
@@ -144,7 +130,11 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
     }
 
     if (process.env.LASIUS_DEBUG) {
-      console.info('[NextAuth][refreshAccessToken][RenewedToken]', tokensOrError?.refresh_token);
+      console.info(
+        '[NextAuth][refreshAccessToken][RenewedToken] refresh_token=%s, access_token=%s',
+        tokensOrError?.refresh_token,
+        tokensOrError?.access_token
+      );
     }
 
     const newTokens = tokensOrError as {
@@ -152,14 +142,20 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
       expires_in: number;
       refresh_token?: string;
     };
-
-    return {
+    const newTokenResult = {
       ...token,
       access_token: newTokens.access_token,
       expires_at: Math.floor(Date.now() / 1000 + newTokens.expires_in),
       // Some providers only issue refresh tokens once, so preserve if we did not get a new one
       refresh_token: newTokens.refresh_token ?? token.refresh_token,
     };
+
+    REFRESH_TOKEN_CACHE.set(refresh_token, {
+      token: newTokenResult,
+      expiry: Date.now() + REFRESH_TOKEN_CACHE_LIFESPAN_MS,
+    });
+
+    return newTokenResult;
   } catch (error) {
     if (process.env.LASIUS_DEBUG) {
       console.log('[NextAuth][RefreshAccessTokenError]', error);
@@ -168,8 +164,68 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
     token.error = 'RefreshAccessTokenError';
     return token;
   } finally {
-    delete REFRESH_TOKEN_PROGRESS[token.refresh_token];
+    REFRESH_TOKEN_PROGRESS.delete(refresh_token);
   }
+}
+
+/**
+ * Takes a token, and returns a new token with updated
+ * `access_token` and `expires_at`. If an error occurs,
+ * returns the old token and an error property
+ */
+function refreshAccessToken(token: JWT): undefined | Promise<JWT> {
+  if (!token?.refresh_token) {
+    return undefined;
+  }
+  if (REFRESH_TOKEN_PROGRESS.get(token.refresh_token)) {
+    if (process.env.LASIUS_DEBUG) {
+      console.debug(
+        '[NextAuth][refreshAccessToken][AlreadyRefreshing] refresh_token=%s',
+        token.refresh_token
+      );
+    }
+    return undefined;
+  }
+  const cachedResult = REFRESH_TOKEN_CACHE.get(token.refresh_token);
+  const now = Date.now();
+  if (cachedResult) {
+    if (process.env.LASIUS_DEBUG) {
+      console.debug(
+        '[NextAuth][refreshAccessToken][CachedRefresh] refresh_token=%s, access_token=%s, time_remaining=%s',
+        token.refresh_token,
+        cachedResult.token,
+        now - cachedResult.expiry
+      );
+    }
+    if (cachedResult.expiry < now) {
+      if (process.env.LASIUS_DEBUG) {
+        console.debug(
+          '[NextAuth][refreshAccessToken][RemoveExpiredRefreshToken] refresh_token=%s, time_remaining=%s',
+          token.refresh_token,
+          now - cachedResult.expiry
+        );
+      }
+      REFRESH_TOKEN_CACHE.delete(token.refresh_token);
+    }
+    return Promise.resolve(cachedResult.token);
+  }
+
+  // clean refresh token cache
+  const expiredCachedRefreshTokens = Array.from(REFRESH_TOKEN_CACHE.entries())
+    .filter(([_, item]) => item.expiry < now)
+    .map(([key, _]) => key);
+  if (process.env.LASIUS_DEBUG) {
+    console.debug(
+      '[NextAuth][CleanCachedRefreshTokens] number_of_expired_tokens=%s',
+      expiredCachedRefreshTokens.length
+    );
+  }
+  expiredCachedRefreshTokens.forEach((token) => REFRESH_TOKEN_CACHE.delete(token));
+
+  if (process.env.LASIUS_DEBUG) {
+    console.debug('[NextAuth][refreshAccessToken] refresh_token=%s', token?.refresh_token);
+  }
+  return fetchRefreshAccessToken(token.refresh_token, token);
 }
 const providers = [];
 if (process.env.LASIUS_OAUTH_CLIENT_ID && process.env.LASIUS_OAUTH_CLIENT_SECRET) {
@@ -261,7 +317,15 @@ export const nextAuthOptions: NextAuthOptions = {
 
       return session;
     },
-    async jwt({ token, account, user, profile }) {
+    async jwt({ token, account, user, profile, trigger }) {
+      if (process.env.LASIUS_DEBUG) {
+        console.debug(
+          '[NextAuth][JWT] refresh_token=%s, token_expires_at=%s, trigger=%s',
+          token.refresh_token,
+          token.expires_at,
+          trigger
+        );
+      }
       // Initial sign in
       if (account) {
         // First-time login, save the `access_token`, its expiry and the `refresh_token`
@@ -291,7 +355,11 @@ export const nextAuthOptions: NextAuthOptions = {
         }
 
         // Access token has expired, try to update it
-        return await refreshAccessToken(token);
+        const refreshTokenResult = refreshAccessToken(token);
+        if (refreshTokenResult === undefined) {
+          throw new Error('Refresh expired token failed');
+        }
+        return await refreshTokenResult;
       }
     },
   },
