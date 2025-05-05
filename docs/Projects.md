@@ -1,8 +1,8 @@
-[DE](DE%3AProjects.md)
+[DE](DE%3AProjects)
 
 # Projects
 
-Time bookings are associated not only with an [organization](Organisations.md) but also with a project. A project consists simply of a freely chosen designation.
+Time bookings are associated not only with an [organization](Organisations) but also with a project. A project consists simply of a freely chosen designation.
 
 ## Roles and permissions for projects
 

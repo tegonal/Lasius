@@ -1,4 +1,4 @@
-[DE](DE%3AStatistics.md)
+[DE](DE%3AStatistics)
 
 # Statistics and exports
 
@@ -49,9 +49,9 @@ Project statistics are available as pre-calculated data via API in the Lasius ba
 
 #### Tags
 
-Statistics by [tags](Tags.md) show aggregated values of time bookings according to the assigned `tags`. Since a time booking can be assigned to one or more tags/tag groups, the value of the time booking is considered in **all** assigned tag aggregations.
+Statistics by [tags](Tags) show aggregated values of time bookings according to the assigned `tags`. Since a time booking can be assigned to one or more tags/tag groups, the value of the time booking is considered in **all** assigned tag aggregations.
 
-This means that the sum of aggregated time bookings by tags does *not* correspond to the sum of all time bookings, as the same time booking can be counted multiple times.
+This means that the sum of aggregated time bookings by tags does _not_ correspond to the sum of all time bookings, as the same time booking can be counted multiple times.
 
 The statistics by tags are intended to show a relationship between individual `tags` (e.g., `Billable` vs. `Non-billable`).
 

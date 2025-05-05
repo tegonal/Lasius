@@ -1,4 +1,4 @@
-[EN](Statistics.md)
+[EN](Statistics)
 
 # Statistiken und Exporte
 
@@ -49,9 +49,9 @@ Die Projekt-Statistiken stehen als vorberechnete Daten mittels API im Lasius-Bac
 
 #### Tags
 
-Statistiken nach [Tags](DE%3ATags.md) zeigen aggregierte Werte der Zeitbuchungen nach den zugeordneten `Tags`. Da eine Zeitbuchung einem oder mehreren Tags/Tag-Gruppen zugeordnet werden kann, wir der Wert der Zeitbuchung bei **allen** zugeordneten Tag-Aggregationen berücksichtigt. 
+Statistiken nach [Tags](DE%3ATags) zeigen aggregierte Werte der Zeitbuchungen nach den zugeordneten `Tags`. Da eine Zeitbuchung einem oder mehreren Tags/Tag-Gruppen zugeordnet werden kann, wir der Wert der Zeitbuchung bei **allen** zugeordneten Tag-Aggregationen berücksichtigt.
 
-Dies bedeutet, dass die Summe der aggregierten Zeitbuchungen nach Tags *nicht* der Summer aller Zeitbuchungen entspricht, da die gleiche Zeitbuchung mehrfach einberechnet werden kann.
+Dies bedeutet, dass die Summe der aggregierten Zeitbuchungen nach Tags _nicht_ der Summer aller Zeitbuchungen entspricht, da die gleiche Zeitbuchung mehrfach einberechnet werden kann.
 
 Die Statistiken nach `Tags` sollen lediglich eine Relation zu den einzelnen `Tags` untereinander aufzeigen (bspw. `Verrechnbar` vs. `Nicht verrechenbar`)
 

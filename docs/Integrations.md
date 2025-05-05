@@ -1,4 +1,4 @@
-[DE](DE%3AIntegrations.md)
+[DE](DE%3AIntegrations)
 
 # Integrations
 
@@ -148,6 +148,7 @@ To set up this integration, you need to add an entry to the `PlaneConfig` table 
 ```
 
 As an example:
+
 ```mongosh
   db.PlaneConfig.insertOne({
 	"name" : "Plane Integration",
@@ -172,7 +173,7 @@ As an example:
 					],
 					"useMilestone" : false,
 					"useTitle" : false,
-					"includeOnlyIssuesWithState" : [ 
+					"includeOnlyIssuesWithState" : [
                       "Backlog",
                       "Todo",
                       "In Progress"
@@ -214,9 +215,7 @@ To configure this integration, you'll need to add an entry to the `GitlabConfig`
           "description": "Long living accesstoken to the linked gitlab project"
         }
       },
-      "required": [
-        "accessToken"
-      ]
+      "required": ["accessToken"]
     },
     "settings": {
       "type": "object",
@@ -226,9 +225,7 @@ To configure this integration, you'll need to add an entry to the `GitlabConfig`
           "description": "Interval in millis to check for new issues"
         }
       },
-      "required": [
-        "checkFrequency"
-      ]
+      "required": ["checkFrequency"]
     },
     "projects": {
       "type": "array",
@@ -278,11 +275,11 @@ To configure this integration, you'll need to add an entry to the `GitlabConfig`
                     },
                     "useMilestone": {
                       "type": "boolean",
-                      "description": "If true, add milestone name as tag",
+                      "description": "If true, add milestone name as tag"
                     },
                     "useTitle": {
                       "type": "boolean",
-                      "description": "If true, add issue title as tag",
+                      "description": "If true, add issue title as tag"
                     }
                   },
                   "required": [
@@ -293,32 +290,20 @@ To configure this integration, you'll need to add an entry to the `GitlabConfig`
                   ]
                 }
               },
-              "required": [
-                "gitlabProjectId",
-                "tagConfiguration"
-              ]
+              "required": ["gitlabProjectId", "tagConfiguration"]
             }
           },
-          "required": [
-            "projectId",
-            "settings"
-          ]
+          "required": ["projectId", "settings"]
         }
       ]
     }
   },
-  "required": [
-    "_id",
-    "name",
-    "baseUrl",
-    "auth",
-    "settings",
-    "projects"
-  ]
+  "required": ["_id", "name", "baseUrl", "auth", "settings", "projects"]
 }
 ```
 
 As an example:
+
 ```mongosh
   db.GitlabConfig.insertOne({
 	"_id" : "63031f5b6dbea8d2c0ae47ed",
@@ -356,4 +341,3 @@ As an example:
 ## Jira
 
 ℹ️ Warning: The Jira integration uses a deprecated API version and must be updated before use to ensure compatibility.
-

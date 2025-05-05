@@ -1,4 +1,4 @@
-[EN](Organizations.md)
+[EN](Organizations)
 
 # Organisationen
 
@@ -11,7 +11,7 @@ In einer Organisation bestehen die Rollen `Member` und `Administrator`. Benutzer
 - Wechseln der Organisation
 - Erfassen und verwalten eigener Zeitbuchungen innerhalb dieser Organisation
 
-Ein `Administrator` besitzt zudem folgende *zusätzlichen* Funktionen:
+Ein `Administrator` besitzt zudem folgende _zusätzlichen_ Funktionen:
 
 - Verwalten der Mitgliedschaften in einer Organisation
 - Verwalten der Projekte in einer Organisation
@@ -29,7 +29,7 @@ Jeder Benutzer wird bei der ersten Anmeldung an einer Lasius-Instanz automatisch
 
 Unter dem Menupunkt Organisationen kann eine neue Organisation erstellt werden (1).
 
-Der Benutzer, welcher eine Organisation erstellt, wird dieser automatisch mit der Rolle `Administrator` zugewiesen. Somit können dieser Organisation weitere Benutzer hinzugefügt werden, indem Einladungen mit der gewünschten Rolle erstellt werden (2). 
+Der Benutzer, welcher eine Organisation erstellt, wird dieser automatisch mit der Rolle `Administrator` zugewiesen. Somit können dieser Organisation weitere Benutzer hinzugefügt werden, indem Einladungen mit der gewünschten Rolle erstellt werden (2).
 
 Der Organisations-Name kann zu einem späteren Zeitpunk mittels `Edit Organisation` (3) angepasst werden.
 
@@ -49,7 +49,7 @@ Nach dem Beitreten steht die Organisation dem Benutzer zur Auswahl zur Verfügun
 
 ### Organisation wählen
 
-Ein eingeloggter Benutzer erfasst und verwaltet seine Zeitbuchungen immer im Kontext einer Organisation, auch wenn es sich hierbei um die vorher erwähnte persönliche Organisation handelt. Die aktuell ausgewählte Organisation ist für den Benutzer ersichtlich. 
+Ein eingeloggter Benutzer erfasst und verwaltet seine Zeitbuchungen immer im Kontext einer Organisation, auch wenn es sich hierbei um die vorher erwähnte persönliche Organisation handelt. Die aktuell ausgewählte Organisation ist für den Benutzer ersichtlich.
 
 ![Aktuelle Organisation](images/Lasius_Org_Current.png)
 

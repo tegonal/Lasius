@@ -1,4 +1,4 @@
-[EN](Integrations.md)
+[EN](Integrations)
 
 # Integrationen
 
@@ -12,6 +12,7 @@ Deshalb muss aktuell nach dem Anpassen der Konfiguration in der Datenbank der La
 Lasius unterstützt das Auslesen von [Plane](https://plane.so/) Issues.
 
 Dazu muss in die Tabelle `PlaneConfig` ein Eintrag mit dem folgenden JSON Schema erstellt/hinzugefügt werden:
+
 ```json
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
@@ -147,6 +148,7 @@ Dazu muss in die Tabelle `PlaneConfig` ein Eintrag mit dem folgenden JSON Schema
 ```
 
 Hier ein Beispiel-Kommando:
+
 ```mongosh
   db.PlaneConfig.insertOne({
 	"name" : "Plane Integration",
@@ -171,7 +173,7 @@ Hier ein Beispiel-Kommando:
 					],
 					"useMilestone" : false,
 					"useTitle" : false,
-					"includeOnlyIssuesWithState" : [ 
+					"includeOnlyIssuesWithState" : [
                       "Backlog",
                       "Todo",
                       "In Progress"
@@ -189,6 +191,7 @@ Hier ein Beispiel-Kommando:
 Lasius unterstützt das Auslesen von [Gitlab](https://gitlab.com/) Issues aus der SaaS oder eine eigens gehosteten Gitlab Instanz.
 
 Dazu muss in die Tabelle `GitlabConfig` ein Eintrag mit dem folgenden JSON Schema erstellt/hinzugefügt werden:
+
 ```json
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
@@ -212,9 +215,7 @@ Dazu muss in die Tabelle `GitlabConfig` ein Eintrag mit dem folgenden JSON Schem
           "description": "Long living accesstoken to the linked gitlab project"
         }
       },
-      "required": [
-        "accessToken"
-      ]
+      "required": ["accessToken"]
     },
     "settings": {
       "type": "object",
@@ -224,9 +225,7 @@ Dazu muss in die Tabelle `GitlabConfig` ein Eintrag mit dem folgenden JSON Schem
           "description": "Interval in millis to check for new issues"
         }
       },
-      "required": [
-        "checkFrequency"
-      ]
+      "required": ["checkFrequency"]
     },
     "projects": {
       "type": "array",
@@ -276,11 +275,11 @@ Dazu muss in die Tabelle `GitlabConfig` ein Eintrag mit dem folgenden JSON Schem
                     },
                     "useMilestone": {
                       "type": "boolean",
-                      "description": "If true, add milestone name as tag",
+                      "description": "If true, add milestone name as tag"
                     },
                     "useTitle": {
                       "type": "boolean",
-                      "description": "If true, add issue title as tag",
+                      "description": "If true, add issue title as tag"
                     }
                   },
                   "required": [
@@ -291,32 +290,20 @@ Dazu muss in die Tabelle `GitlabConfig` ein Eintrag mit dem folgenden JSON Schem
                   ]
                 }
               },
-              "required": [
-                "gitlabProjectId",
-                "tagConfiguration"
-              ]
+              "required": ["gitlabProjectId", "tagConfiguration"]
             }
           },
-          "required": [
-            "projectId",
-            "settings"
-          ]
+          "required": ["projectId", "settings"]
         }
       ]
     }
   },
-  "required": [
-    "_id",
-    "name",
-    "baseUrl",
-    "auth",
-    "settings",
-    "projects"
-  ]
+  "required": ["_id", "name", "baseUrl", "auth", "settings", "projects"]
 }
 ```
 
 Hier ein Beispiel-Kommando:
+
 ```mongosh
   db.GitlabConfig.insertOne({
 	"_id" : "63031f5b6dbea8d2c0ae47ed",
