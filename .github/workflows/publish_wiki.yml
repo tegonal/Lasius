@@ -20,7 +20,7 @@ jobs:
           path: ./docs/
           ignore-filter: |
             # Ignore all image files
-            *: "**/*.png"
+            "*": "**/*.png"
 
       - uses: Andrew-Chen-Wang/github-wiki-action@50650fccf3a10f741995523cf9708c53cec8912a #v4.4.0
         with:
