@@ -18,6 +18,9 @@ jobs:
       - uses: impresscms-dev/strip-markdown-extensions-from-links-action@d0c399c808a98edc0f938bdeed738d2cb41fba66 # v2.0.0
         with:
           path: ./docs/
+          ignore-filter: |
+            # Ignore all image files
+            *:*.png
       - uses: Andrew-Chen-Wang/github-wiki-action@50650fccf3a10f741995523cf9708c53cec8912a #v4.4.0
         with:
           path: ./docs/
