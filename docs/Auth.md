@@ -1,4 +1,4 @@
-[DE](DE%3AAuth.md)
+[DE](DE%3AAuth)
 
 # Authentication (Login)
 

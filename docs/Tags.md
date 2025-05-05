@@ -1,4 +1,4 @@
-[DE](DE%3ATags.md)
+[DE](DE%3ATags)
 
 # Tags and Tag-groups
 
@@ -12,9 +12,9 @@ When recording a time booking, either manual tags can be created by entering tex
 
 The list of available tags can also be opened using the down arrow key or the space bar.
 
-*If the same text is entered as a tag when manually recording, it will be identified as the same tag.*
+_If the same text is entered as a tag when manually recording, it will be identified as the same tag._
 
-By configuring an [integration](Integrations.md), tags can also be automatically imported from a third-party application like Gitlab, Plane, or Jira, making them available for selection. For externally defined tags, a link is also stored behind the tag, allowing reference to the corresponding application when clicked.
+By configuring an [integration](Integrations), tags can also be automatically imported from a third-party application like Gitlab, Plane, or Jira, making them available for selection. For externally defined tags, a link is also stored behind the tag, allowing reference to the corresponding application when clicked.
 
 ## Benefits of tags
 
@@ -24,7 +24,6 @@ The tags assigned to time bookings are visible in the current time bookings and 
 ![Tags in time bookings](images/Lasius_TimeBooking_List_Tags.png)
 
 On the other hand, tags are also used to automatically group time bookings in the [statistics](Statistics.md#tags), providing a quick overview of time bookings.
-
 
 ## Tag groups
 
@@ -41,6 +40,7 @@ Tags and tag groups can be managed by an organization administrator under the `P
 ![Managing tags](images/Lasius_TimeBooking_Manage_Tags.png)
 
 Here, you can:
+
 1. Assign a standard set of tag groups to a project
 2. Manually create, delete, or edit tag groups
 3. Create or delete individual tags

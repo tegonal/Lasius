@@ -1,4 +1,4 @@
-[EN](Auth.md)
+[EN](Auth)
 
 # Authentisierung (Anmeldung)
 

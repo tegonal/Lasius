@@ -1,9 +1,8 @@
-[EN](Projects.md)
+[EN](Projects)
 
 # Projekte
 
-Zeitbuchungen werden nebst der [Organisation](DE%3AOrganisations.md) ebenfalls einem Projekt zugeordnet. Ein Projekt besteht dabei lediglich aus einer frei wählbaren Bezeichnung.
-
+Zeitbuchungen werden nebst der [Organisation](DE%3AOrganisations) ebenfalls einem Projekt zugeordnet. Ein Projekt besteht dabei lediglich aus einer frei wählbaren Bezeichnung.
 
 ## Rollen und Berechtigungen für Projekte
 
@@ -12,7 +11,7 @@ In einer Organisation bestehen die Rollen `Member` und `Administrator`. Benutzer
 - Erfassen und verwalten eigener Zeitbuchungen innerhalb dieses Projektes
 - Verlassen des Projektes
 
-Ein `Administrator` besitzt zudem folgende *zusätzlichen* Funktionen:
+Ein `Administrator` besitzt zudem folgende _zusätzlichen_ Funktionen:
 
 - Verwalten der Mitgliedschaften innerhalb des Projektes
 - Einsehen und exportieren der Zeitbuchungen und Statistiken aller Benutzer, welche innerhalb dieses Projektes erstellt wurden
@@ -41,6 +40,7 @@ Als Administrator einer Organisation können sämtliche der Organisation zugeord
 
 Der Administrator kann in dieser Ansicht ebenfalls neue Projekte für diese Organisation erstellen (2).
 Weitere Aktionen werten im Menu (3) angeboten und umfassen (von rechts nach links):
+
 1. Projekt deaktivieren
 2. [Tag und Tag Gruppen Zurordnung des Projektes bearbeiten](DE%3ATags.md#erfassen-von-tags-und-tag-gruppen)
 3. Exportieren aller Zeitbuchungen der Organisation

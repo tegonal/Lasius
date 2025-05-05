@@ -1,5 +1,4 @@
-[DE](DE%3AOrganizations.md)
-
+[DE](DE%3AOrganizations)
 
 # Organisations
 

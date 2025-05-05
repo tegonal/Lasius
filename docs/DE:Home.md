@@ -1,4 +1,4 @@
-[EN](Home.md)
+[EN](Home)
 
 ![Logo](images/lasius.svg)
 
@@ -9,12 +9,12 @@ Auf dieser Seite soll eine Basis Dokumentation für Benutzer und Administratoren
 
 ## Benutzer
 
-  * [Tag und Tag-Gruppen](DE%3ATags.md)
-  * [Organisationen verwalten](DE%3AOrganizations.md)
-  * [Projekte verwalten](DE%3AProjects.md)
-  * [Statistiken](DE%3AStatistics.md)
+- [Tag und Tag-Gruppen](DE%3ATags)
+- [Organisationen verwalten](DE%3AOrganizations)
+- [Projekte verwalten](DE%3AProjects)
+- [Statistiken](DE%3AStatistics)
 
 ## Administratoren
 
-  * [Authentisierung](DE%3AAuth.md)
-  * [Integrationen](DE%3AIntegrations.md)
+- [Authentisierung](DE%3AAuth)
+- [Integrationen](DE%3AIntegrations)
