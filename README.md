@@ -44,9 +44,6 @@ We plan to implement the following features in the near future (no specific orde
 
 - [ ] Make GitLab, Jira and Plane integration configurable in the frontend (currently hardcoded)
 - [ ] Add support for GitHub issue tracker
-- [ ] Make tags and labels configuration configurable in the frontend (currently hardcoded)
-- [ ] Add support for sending E-Mails via SMTP for password reset, invitation links, etc.
-- [ ] Quick onboarding for new users with basic usage instructions
 - [ ] Special project to book sick days, holidays, etc. per organization
 
 If you plan to use Lasius for your company or organisation, and you depend on one of the above features, we are happy to discuss sponsoring the development.
@@ -63,7 +60,7 @@ Our time tracker had to be based on open source components, meet our high privac
 
 ## Requirements
 
-- mongoDB >= 5.0.9, but <= 7.x
+- mongoDB >= 5.0.9, but <= 8.x
 
 ## Environment Variables
 
