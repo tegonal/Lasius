@@ -18,3 +18,4 @@ Auf dieser Seite soll eine Basis Dokumentation für Benutzer und Administratoren
 
 - [Authentisierung](DE%3AAuth)
 - [Integrationen](DE%3AIntegrations)
+- [Nutzungsbedingungen](DE%3ATOS)

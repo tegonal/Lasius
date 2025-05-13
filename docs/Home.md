@@ -18,3 +18,4 @@ This page is intended to provide basic documentation for users and administrator
 
 - [Authentication](Auth)
 - [Integrations](Integrations)
+- [Terms of services](TOS)
