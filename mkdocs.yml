@@ -1,0 +1,6 @@
+site_name: Lasius documentation
+plugins:
+  - techdocs-core
+nav:
+  - Home.md
+  - DE:Home.md

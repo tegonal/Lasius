@@ -5,6 +5,7 @@ metadata:
   description: Open source time booking app
   annotations:
     github.com/project-slug: tegonal/lasius
+    backstage.io/techdocs-ref: dir:.
   links:
     - url: https://lasius.ch
       title: Homepage
