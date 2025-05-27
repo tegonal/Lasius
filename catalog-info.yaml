@@ -1,0 +1,68 @@
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: lasius
+  description: Open source time booking app
+  annotations:
+    github.com/project-slug: tegonal/lasius
+  links:
+    - url: https://lasius.ch
+      title: Homepage
+      icon: note
+      type: documentation
+spec:
+  type: product
+  owner: intern
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: lasius-api
+  description: lasius backend API
+spec:
+  type: openapi
+  lifecycle: production
+  owner: intern
+  system: lasius
+  definition:
+    $text: https://time.lasius.ch/backend/assets/swagger.json
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: lasius-frontend
+spec:
+  type: other
+  lifecycle: production
+  owner: intern
+  system: lasius
+  consumesApis:
+    - lasius-api
+  dependsOn:
+    - component:lasius-backend
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: lasius-backend
+spec:
+  type: other
+  lifecycle: production
+  owner: intern
+  system: lasius
+  providesApis:
+    - lasius-api
+  dependsOn:
+    - resource:lasius-db
+    - system:auth-provider
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: lasius-db
+spec:
+  type: database
+  lifecycle: production
+  owner: intern
+  system: lasius
+---
