@@ -37,7 +37,7 @@ metadata:
   annotations:
     github.com/project-slug: tegonal/lasius
 spec:
-  type: other
+  type: website
   lifecycle: production
   owner: intern
   system: lasius
@@ -53,7 +53,7 @@ metadata:
   annotations:
     github.com/project-slug: tegonal/lasius
 spec:
-  type: other
+  type: service
   lifecycle: production
   owner: intern
   system: lasius
