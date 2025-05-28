@@ -20,6 +20,8 @@ kind: API
 metadata:
   name: lasius-api
   description: lasius backend API
+  annotations:
+    github.com/project-slug: tegonal/lasius
 spec:
   type: openapi
   lifecycle: production
@@ -32,6 +34,8 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: lasius-frontend
+  annotations:
+    github.com/project-slug: tegonal/lasius
 spec:
   type: other
   lifecycle: production
@@ -46,6 +50,8 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: lasius-backend
+  annotations:
+    github.com/project-slug: tegonal/lasius
 spec:
   type: other
   lifecycle: production
@@ -67,3 +73,4 @@ spec:
   owner: intern
   system: lasius
 ---
+
