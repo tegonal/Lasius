@@ -92,12 +92,18 @@ class ProjectMongoRepository @Inject() (
     }
   }
 
-  private def findByOrganisationAndKey(
+  private def findByOrganisationAndKeyIgnoreProjectId(
       organisationReference: OrganisationReference,
-      key: String)(implicit dbSession: DBSession): Future[Option[Project]] = {
-    find(
-      Json.obj("organisationReference.id" -> organisationReference.id,
-               "key"                      -> key)).map { proj =>
+      key: String,
+      projectId: Option[ProjectId] = None)(implicit
+      dbSession: DBSession): Future[Option[Project]] = {
+    val filter: Seq[Option[(String, JsValueWrapper)]] = Seq(
+      Some("organisationReference.id" -> organisationReference.id),
+      Some("key"                      -> key),
+      projectId.map(id => "id" -> Json.obj("$not" -> Json.obj("$eq" -> id)))
+    )
+
+    find(Json.obj(filter.flatten: _*)).map { proj =>
       proj.map(_._1).headOption
     }
   }
@@ -107,8 +113,9 @@ class ProjectMongoRepository @Inject() (
       subject: Subject,
       dbSession: DBSession): Future[Project] = {
     for {
-      existingProject <- findByOrganisationAndKey(organisationReference,
-                                                  createProject.key)
+      existingProject <- findByOrganisationAndKeyIgnoreProjectId(
+        organisationReference,
+        createProject.key)
       _ <- validate(
         existingProject.isEmpty,
         s"Cannot create project with same key ${createProject.key} in organisation ${organisationReference.id.value}")
@@ -161,8 +168,10 @@ class ProjectMongoRepository @Inject() (
       _ <- update.key.fold(success()) { key =>
         for {
           _ <- validateNonBlankString("key", key)
-          existingProject <- findByOrganisationAndKey(organisationReference,
-                                                      key)
+          existingProject <- findByOrganisationAndKeyIgnoreProjectId(
+            organisationReference = organisationReference,
+            key = key,
+            projectId = Some(projectId))
           result <- validate(
             existingProject.isEmpty,
             s"Cannot update project with duplicate key $key in organisation ${organisationReference.id.value}")

@@ -886,5 +886,32 @@ class ProjectsControllerSpec
         .filter(_.projectReference.id != controller.project.id)
         .map(_.projectReference.key) must not contain newKey
     }
+
+    "successful updated booking categories of existing project" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: ProjectsControllerMock =
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
+                                           authConfig,
+                                           reactiveMongoApi)
+
+      val request: FakeRequest[UpdateProject] = FakeRequest().withBody(
+        UpdateProject(key = Some(controller.project.key),
+                      bookingCategories = Some(
+                        Set(SimpleTag(TagId("myTag")))
+                      )))
+      val result: Future[Result] =
+        controller.updateProject(controller.organisationId,
+                                 controller.project.id)(request)
+
+      status(result) must equalTo(OK)
+      private val updatedProject = contentAsJson(result).as[Project]
+
+      updatedProject.bookingCategories must containTheSameElementsAs(
+        Seq(SimpleTag(TagId("myTag"))))
+    }
   }
 }
