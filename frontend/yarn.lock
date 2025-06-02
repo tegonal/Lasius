@@ -9005,7 +9005,7 @@ __metadata:
     react: "npm:19.1.0"
     react-async-hook: "npm:^4.0.0"
     react-dom: "npm:19.1.0"
-    react-hook-form: "npm:7.56.3"
+    react-hook-form: "npm:7.57.0"
     react-i18next: "npm:^15.5.1"
     react-popper: "npm:^2.3.0"
     react-use-websocket: "npm:^4.13.0"
@@ -10794,12 +10794,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-hook-form@npm:7.56.3":
-  version: 7.56.3
-  resolution: "react-hook-form@npm:7.56.3"
+"react-hook-form@npm:7.57.0":
+  version: 7.57.0
+  resolution: "react-hook-form@npm:7.57.0"
   peerDependencies:
     react: ^16.8.0 || ^17 || ^18 || ^19
-  checksum: 10/2c393bde939c1b75ae424344b3652b6bed61b6515e543dae6b4111361ff0ba234cf624085ba31a3d897e65d8afe2a3c7a4cee46da5d4f0ccf862d13397af0fdb
+  checksum: 10/f3f5029dff03613e8070405f3c6fcec64c9d81c0264db066fdd88e888fc3dd186824e38c2168e6d9e56d5067445e4f699155bbf02f6efbeaba8383c6179173e0
   languageName: node
   linkType: hard
 

@@ -61,7 +61,7 @@
     "react": "19.1.0",
     "react-async-hook": "^4.0.0",
     "react-dom": "19.1.0",
-    "react-hook-form": "7.56.3",
+    "react-hook-form": "7.57.0",
     "react-i18next": "^15.5.1",
     "react-popper": "^2.3.0",
     "react-use-websocket": "^4.13.0",
