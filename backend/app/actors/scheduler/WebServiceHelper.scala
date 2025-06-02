@@ -75,7 +75,7 @@ object WebServiceHelper {
       .get()
       .map { result =>
         result.status match {
-          case 200 => Success((result.json, result.headers))
+          case 200   => Success((result.json, result.headers))
           case error =>
             Failure(new IOException(s"Http status:$error:${result.statusText}"))
         }
@@ -95,7 +95,7 @@ object WebServiceHelper {
       .get()
       .map { result =>
         result.status match {
-          case 200 => Success((result.json, result.headers))
+          case 200   => Success((result.json, result.headers))
           case error =>
             Failure(new IOException(s"Http status:$error:${result.statusText}"))
         }
@@ -114,7 +114,7 @@ object WebServiceHelper {
       .get()
       .map { result =>
         result.status match {
-          case 200 => Success((result.json, result.headers))
+          case 200   => Success((result.json, result.headers))
           case error =>
             Failure(
               new IOException(
@@ -130,7 +130,7 @@ object WebServiceHelper {
                         auth: BasicAuthentication)(implicit
       executionContext: ExecutionContext)
       : Future[Try[(JsValue, Map[String, scala.collection.Seq[String]])]] = {
-    val pair = s"${auth.username}:${auth.password}"
+    val pair    = s"${auth.username}:${auth.password}"
     val encPart =
       new String(Base64.encodeBase64(pair.getBytes("utf-8")), "utf-8")
     val enc = s"Basic $encPart"

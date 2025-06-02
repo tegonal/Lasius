@@ -66,7 +66,7 @@ class OAuthAuthorizationCodeMongoRepository @Inject() (
       dbSession: DBSession): Future[OAuthAuthorizationCode] = {
     val code = generateRandomCode()
     for {
-      _ <- findByCode(code).someToFailed(s"Duplicate code")
+      _       <- findByCode(code).someToFailed(s"Duplicate code")
       newCode <- Future.successful(
         OAuthAuthorizationCode(
           id = OAuthAuthorizationCodeId(),

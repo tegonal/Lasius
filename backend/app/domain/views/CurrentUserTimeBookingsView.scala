@@ -89,7 +89,7 @@ class CurrentUserTimeBookingsView(val clientReceiver: ClientReceiver,
     case e: UserTimeBookingStartedV2 =>
       log.debug(
         s"CurrentUserTimeBookingsView -> UserTimeBookingStarted($e.booking)")
-      val day = e.booking.start.dateTime.toLocalDate
+      val day       = e.booking.start.dateTime.toLocalDate
       val durations = state.booking
         .filter(_.end.isDefined)
         .map(b => addDailyDuration(b))
@@ -259,7 +259,7 @@ class CurrentUserTimeBookingsView(val clientReceiver: ClientReceiver,
   private def removeDailyDuration(
       booking: BookingV2): Map[BookingStub, Duration] = {
     val currentBookings = getMapForDay(booking.end.get.dateTime.toLocalDate)
-    val duration =
+    val duration        =
       calculateDuration(booking.start, booking.end.get)
     val stub            = booking.createStub
     val currentDuration = currentBookings.get(stub)
@@ -281,7 +281,7 @@ class CurrentUserTimeBookingsView(val clientReceiver: ClientReceiver,
       endDate: LocalDateTimeWithTimeZone): Duration = {
     // split booking by dates
     val endDateTimeAtStartOfDay = endDate.withTimeAtStartOfDay
-    val start =
+    val start                   =
       if (startDate.dateTime.isBefore(endDateTimeAtStartOfDay))
         endDateTimeAtStartOfDay
       else startDate.dateTime

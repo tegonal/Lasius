@@ -44,7 +44,7 @@ class CurrentUserTimeBookingsViewService(clientReceiver: ClientReceiver)
       domain.views.CurrentUserTimeBookingsView.GetCurrentTimeBooking] {
 
   override def processCommand: Receive = {
-    case Ack =>
+    case Ack                        =>
     case cmd: GetCurrentTimeBooking =>
       log.debug(
         s"CurrentUserTimeBookingsViewService -> processCommand:$cmd -> ${sender()}")

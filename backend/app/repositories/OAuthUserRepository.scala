@@ -112,7 +112,7 @@ class OAuthUserMongoRepository @Inject() (
       _ <- validate(
         passwordChangeRequest.password != passwordChangeRequest.newPassword,
         s"It is not allowed to use the old password as new password")
-      _ <- validatePasswordPolicy(passwordChangeRequest.newPassword)
+      _    <- validatePasswordPolicy(passwordChangeRequest.newPassword)
       user <- findByEmail(email).noneToFailed(
         s"Could not find user with email $email")
       _ <- validate(checkPwd(user, passwordChangeRequest.password),

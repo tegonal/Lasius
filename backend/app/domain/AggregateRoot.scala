@@ -112,7 +112,7 @@ trait AggregateRoot extends PersistentActor with ActorLogging {
                                        state: State): Unit = {}
 
   protected val defaultReceive: Receive = {
-    case StatusReply.Ack =>
+    case StatusReply.Ack        =>
     case _: SaveSnapshotSuccess =>
       log.debug("Successfully saved snapshot")
     case SaveSnapshotFailure(_, cause) =>

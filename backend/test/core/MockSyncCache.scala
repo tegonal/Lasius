@@ -27,7 +27,7 @@ import scala.concurrent.duration.Duration
 import scala.reflect.ClassTag
 
 class MockSyncCache extends SyncCacheApi {
-  var cacheMap: Map[String, Any] = Map()
+  var cacheMap: Map[String, Any]                                        = Map()
   override def set(key: String, value: Any, expiration: Duration): Unit =
     cacheMap = cacheMap + (key -> value)
 

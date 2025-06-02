@@ -57,7 +57,7 @@ class UserTimeBookingAggregateSpec
       val systemServices = new MockServices(system)
       val probe          = TestProbe()
       val stream         = TestProbe()
-      val userReference =
+      val userReference  =
         EntityReference(UserId(), "noob")
       val projectReference =
         EntityReference(ProjectId(), "proj")
@@ -65,7 +65,7 @@ class UserTimeBookingAggregateSpec
         EntityReference(OrganisationId(), "team")
 
       val bookingHistoryRepository = mockAwaitable[BookingHistoryRepository]
-      val actorRef =
+      val actorRef                 =
         system.actorOf(
           UserTimeBookingAggregateMock.props(systemServices,
                                              clientReceiver,
@@ -103,10 +103,10 @@ class UserTimeBookingAggregateSpec
       val systemServices = new MockServices(system)
       val probe          = TestProbe()
       val stream         = TestProbe()
-      val userReference =
+      val userReference  =
         EntityReference(UserId(), "noob")
       val bookingHistoryRepository = mockAwaitable[BookingHistoryRepository]
-      val actorRef =
+      val actorRef                 =
         system.actorOf(
           UserTimeBookingAggregateMock.props(systemServices,
                                              clientReceiver,
@@ -138,14 +138,14 @@ class UserTimeBookingAggregateSpec
       val systemServices = new MockServices(system)
       val probe          = TestProbe()
       val stream         = TestProbe()
-      val userReference =
+      val userReference  =
         EntityReference(UserId(), "noob")
       val projectReference =
         EntityReference(ProjectId(), "proj")
       val teamReference =
         EntityReference(OrganisationId(), "team")
       val bookingHistoryRepository = mockAwaitable[BookingHistoryRepository]
-      val actorRef =
+      val actorRef                 =
         system.actorOf(
           UserTimeBookingAggregateMock.props(systemServices,
                                              clientReceiver,
@@ -215,14 +215,14 @@ class UserTimeBookingAggregateSpec
       val systemServices = new MockServices(system)
       val probe          = TestProbe()
       val stream         = TestProbe()
-      val userReference =
+      val userReference  =
         EntityReference(UserId(), "noob")
       val projectReference =
         EntityReference(ProjectId(), "proj")
       val teamReference =
         EntityReference(OrganisationId(), "team")
       val bookingHistoryRepository = mockAwaitable[BookingHistoryRepository]
-      val actorRef =
+      val actorRef                 =
         system.actorOf(
           UserTimeBookingAggregateMock.props(systemServices,
                                              clientReceiver,
@@ -276,14 +276,14 @@ class UserTimeBookingAggregateSpec
       val systemServices = new MockServices(system)
       val probe          = TestProbe()
       val stream         = TestProbe()
-      val userReference =
+      val userReference  =
         EntityReference(UserId(), "noob")
       val projectReference =
         EntityReference(ProjectId(), "proj")
       val teamReference =
         EntityReference(OrganisationId(), "team")
       val bookingHistoryRepository = mockAwaitable[BookingHistoryRepository]
-      val actorRef =
+      val actorRef                 =
         system.actorOf(
           UserTimeBookingAggregateMock.props(systemServices,
                                              clientReceiver,
@@ -325,14 +325,14 @@ class UserTimeBookingAggregateSpec
       val systemServices = new MockServices(system)
       val probe          = TestProbe()
       val stream         = TestProbe()
-      val userReference =
+      val userReference  =
         EntityReference(UserId(), "noob")
       val projectReference =
         EntityReference(ProjectId(), "proj")
       val teamReference =
         EntityReference(OrganisationId(), "team")
       val bookingHistoryRepository = mockAwaitable[BookingHistoryRepository]
-      val actorRef =
+      val actorRef                 =
         system.actorOf(
           UserTimeBookingAggregateMock.props(systemServices,
                                              clientReceiver,
@@ -350,7 +350,7 @@ class UserTimeBookingAggregateSpec
                   teamReference,
                   projectReference,
                   Set())
-      var date = DateTime.now
+      var date          = DateTime.now
       val closedBooking =
         currentBooking.copy(end = Some(date.toLocalDateTimeWithZone()))
 
@@ -378,14 +378,14 @@ class UserTimeBookingAggregateSpec
       val systemServices = new MockServices(system)
       val probe          = TestProbe()
       val stream         = TestProbe()
-      val userReference =
+      val userReference  =
         EntityReference(UserId(), "noob")
       val projectReference =
         EntityReference(ProjectId(), "proj")
       val teamReference =
         EntityReference(OrganisationId(), "team")
       val bookingHistoryRepository = mockAwaitable[BookingHistoryRepository]
-      val actorRef =
+      val actorRef                 =
         system.actorOf(
           UserTimeBookingAggregateMock.props(systemServices,
                                              clientReceiver,
@@ -402,7 +402,7 @@ class UserTimeBookingAggregateSpec
                   teamReference,
                   projectReference,
                   Set())
-      var date = DateTime.now.plusHours(2)
+      var date          = DateTime.now.plusHours(2)
       val closedBooking =
         currentBooking.copy(end = Some(date.toLocalDateTimeWithZone()))
 
@@ -433,14 +433,14 @@ class UserTimeBookingAggregateSpec
       val systemServices = new MockServices(system)
       val probe          = TestProbe()
       val stream         = TestProbe()
-      val userReference =
+      val userReference  =
         EntityReference(UserId(), "noob")
       val projectReference =
         EntityReference(ProjectId(), "proj")
       val teamReference =
         EntityReference(OrganisationId(), "team")
       val bookingHistoryRepository = mockAwaitable[BookingHistoryRepository]
-      val actorRef =
+      val actorRef                 =
         system.actorOf(
           UserTimeBookingAggregateMock.props(systemServices,
                                              clientReceiver,
@@ -491,14 +491,14 @@ class UserTimeBookingAggregateSpec
       val systemServices = new MockServices(system)
       val probe          = TestProbe()
       val stream         = TestProbe()
-      val userReference =
+      val userReference  =
         EntityReference(UserId(), "noob")
       val projectReference =
         EntityReference(ProjectId(), "proj")
       val teamReference =
         EntityReference(OrganisationId(), "team")
       val bookingHistoryRepository = mockAwaitable[BookingHistoryRepository]
-      val actorRef =
+      val actorRef                 =
         system.actorOf(
           UserTimeBookingAggregateMock.props(systemServices,
                                              clientReceiver,
@@ -507,9 +507,9 @@ class UserTimeBookingAggregateSpec
                                              reactiveMongoApi))
 
       system.eventStream.subscribe(stream.ref, classOf[PersistedEvent])
-      val end      = DateTime.now()
-      val start    = end.minusHours(2)
-      val newStart = start.minusHours(2)
+      val end            = DateTime.now()
+      val start          = end.minusHours(2)
+      val newStart       = start.minusHours(2)
       val currentBooking = BookingV2(BookingId(),
                                      start.toLocalDateTimeWithZone(),
                                      Some(end.toLocalDateTimeWithZone()),
@@ -557,14 +557,14 @@ class UserTimeBookingAggregateSpec
       val systemServices = new MockServices(system)
       val probe          = TestProbe()
       val stream         = TestProbe()
-      val userReference =
+      val userReference  =
         EntityReference(UserId(), "noob")
       val projectReference =
         EntityReference(ProjectId(), "proj")
       val teamReference =
         EntityReference(OrganisationId(), "team")
       val bookingHistoryRepository = mockAwaitable[BookingHistoryRepository]
-      val actorRef =
+      val actorRef                 =
         system.actorOf(
           UserTimeBookingAggregateMock.props(systemServices,
                                              clientReceiver,
@@ -605,14 +605,14 @@ class UserTimeBookingAggregateSpec
       val systemServices = new MockServices(system)
       val probe          = TestProbe()
       val stream         = TestProbe()
-      val userReference =
+      val userReference  =
         EntityReference(UserId(), "noob")
       val projectReference =
         EntityReference(ProjectId(), "proj")
       val teamReference =
         EntityReference(OrganisationId(), "team")
       val bookingHistoryRepository = mockAwaitable[BookingHistoryRepository]
-      val actorRef =
+      val actorRef                 =
         system.actorOf(
           UserTimeBookingAggregateMock.props(systemServices,
                                              clientReceiver,

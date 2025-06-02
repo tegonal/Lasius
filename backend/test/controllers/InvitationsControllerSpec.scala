@@ -99,7 +99,7 @@ class InvitationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: InvitationsControllerMock =
+      val controller: InvitationsControllerMock       =
         controllers.InvitationsControllerMock(config,
                                               systemServices,
                                               authConfig,
@@ -118,7 +118,7 @@ class InvitationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: InvitationsControllerMock =
+      val controller: InvitationsControllerMock       =
         controllers.InvitationsControllerMock(config,
                                               systemServices,
                                               authConfig,
@@ -141,7 +141,7 @@ class InvitationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: InvitationsControllerMock =
+      val controller: InvitationsControllerMock       =
         controllers.InvitationsControllerMock(config,
                                               systemServices,
                                               authConfig,
@@ -167,7 +167,7 @@ class InvitationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: InvitationsControllerMock =
+      val controller: InvitationsControllerMock       =
         controllers.InvitationsControllerMock(config,
                                               systemServices,
                                               authConfig,
@@ -191,7 +191,7 @@ class InvitationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: InvitationsControllerMock =
+      val controller: InvitationsControllerMock       =
         controllers.InvitationsControllerMock(config,
                                               systemServices,
                                               authConfig,
@@ -217,7 +217,7 @@ class InvitationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: InvitationsControllerMock =
+      val controller: InvitationsControllerMock       =
         controllers.InvitationsControllerMock(config,
                                               systemServices,
                                               authConfig,
@@ -466,7 +466,7 @@ class InvitationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: InvitationsControllerMock =
+      val controller: InvitationsControllerMock       =
         controllers.InvitationsControllerMock(config,
                                               systemServices,
                                               authConfig,
@@ -485,7 +485,7 @@ class InvitationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: InvitationsControllerMock =
+      val controller: InvitationsControllerMock       =
         controllers.InvitationsControllerMock(config,
                                               systemServices,
                                               authConfig,
@@ -507,7 +507,7 @@ class InvitationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: InvitationsControllerMock =
+      val controller: InvitationsControllerMock       =
         controllers.InvitationsControllerMock(config,
                                               systemServices,
                                               authConfig,
@@ -534,7 +534,7 @@ class InvitationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: InvitationsControllerMock =
+      val controller: InvitationsControllerMock       =
         controllers.InvitationsControllerMock(config,
                                               systemServices,
                                               authConfig,
@@ -553,7 +553,7 @@ class InvitationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: InvitationsControllerMock =
+      val controller: InvitationsControllerMock       =
         controllers.InvitationsControllerMock(config,
                                               systemServices,
                                               authConfig,
@@ -575,7 +575,7 @@ class InvitationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: InvitationsControllerMock =
+      val controller: InvitationsControllerMock       =
         controllers.InvitationsControllerMock(config,
                                               systemServices,
                                               authConfig,
@@ -598,8 +598,8 @@ class InvitationsControllerSpec
       "badrequest if no organisationReference was provided" in new WithTestApplication {
         implicit val executionContext: ExecutionContext =
           inject[ExecutionContext]
-        val systemServices: SystemServices = inject[SystemServices]
-        val authConfig: AuthConfig         = inject[AuthConfig]
+        val systemServices: SystemServices        = inject[SystemServices]
+        val authConfig: AuthConfig                = inject[AuthConfig]
         val controller: InvitationsControllerMock =
           controllers.InvitationsControllerMock(config,
                                                 systemServices,
@@ -623,8 +623,8 @@ class InvitationsControllerSpec
       "badrequest if user is already assigned to project and organisation" in new WithTestApplication {
         implicit val executionContext: ExecutionContext =
           inject[ExecutionContext]
-        val systemServices: SystemServices = inject[SystemServices]
-        val authConfig: AuthConfig         = inject[AuthConfig]
+        val systemServices: SystemServices        = inject[SystemServices]
+        val authConfig: AuthConfig                = inject[AuthConfig]
         val controller: InvitationsControllerMock =
           controllers.InvitationsControllerMock(config,
                                                 systemServices,
@@ -650,8 +650,8 @@ class InvitationsControllerSpec
       "badrequest project does not exist" in new WithTestApplication {
         implicit val executionContext: ExecutionContext =
           inject[ExecutionContext]
-        val systemServices: SystemServices = inject[SystemServices]
-        val authConfig: AuthConfig         = inject[AuthConfig]
+        val systemServices: SystemServices        = inject[SystemServices]
+        val authConfig: AuthConfig                = inject[AuthConfig]
         val controller: InvitationsControllerMock =
           controllers.InvitationsControllerMock(config,
                                                 systemServices,
@@ -679,8 +679,8 @@ class InvitationsControllerSpec
       "badrequest if project is inactive" in new WithTestApplication {
         implicit val executionContext: ExecutionContext =
           inject[ExecutionContext]
-        val systemServices: SystemServices = inject[SystemServices]
-        val authConfig: AuthConfig         = inject[AuthConfig]
+        val systemServices: SystemServices        = inject[SystemServices]
+        val authConfig: AuthConfig                = inject[AuthConfig]
         val controller: InvitationsControllerMock =
           controllers.InvitationsControllerMock(config,
                                                 systemServices,
@@ -720,8 +720,8 @@ class InvitationsControllerSpec
       "successful user assigned to project in provided organisation with correct role" in new WithTestApplication {
         implicit val executionContext: ExecutionContext =
           inject[ExecutionContext]
-        val systemServices: SystemServices = inject[SystemServices]
-        val authConfig: AuthConfig         = inject[AuthConfig]
+        val systemServices: SystemServices        = inject[SystemServices]
+        val authConfig: AuthConfig                = inject[AuthConfig]
         val controller: InvitationsControllerMock =
           controllers.InvitationsControllerMock(config,
                                                 systemServices,
@@ -780,8 +780,8 @@ class InvitationsControllerSpec
       "badrequest organisation does not exist" in new WithTestApplication {
         implicit val executionContext: ExecutionContext =
           inject[ExecutionContext]
-        val systemServices: SystemServices = inject[SystemServices]
-        val authConfig: AuthConfig         = inject[AuthConfig]
+        val systemServices: SystemServices        = inject[SystemServices]
+        val authConfig: AuthConfig                = inject[AuthConfig]
         val controller: InvitationsControllerMock =
           controllers.InvitationsControllerMock(config,
                                                 systemServices,
@@ -807,8 +807,8 @@ class InvitationsControllerSpec
       "badrequest if organisation is inactive" in new WithTestApplication {
         implicit val executionContext: ExecutionContext =
           inject[ExecutionContext]
-        val systemServices: SystemServices = inject[SystemServices]
-        val authConfig: AuthConfig         = inject[AuthConfig]
+        val systemServices: SystemServices        = inject[SystemServices]
+        val authConfig: AuthConfig                = inject[AuthConfig]
         val controller: InvitationsControllerMock =
           controllers.InvitationsControllerMock(config,
                                                 systemServices,
@@ -844,8 +844,8 @@ class InvitationsControllerSpec
       "successful user assigned to organisation with correct role" in new WithTestApplication {
         implicit val executionContext: ExecutionContext =
           inject[ExecutionContext]
-        val systemServices: SystemServices = inject[SystemServices]
-        val authConfig: AuthConfig         = inject[AuthConfig]
+        val systemServices: SystemServices        = inject[SystemServices]
+        val authConfig: AuthConfig                = inject[AuthConfig]
         val controller: InvitationsControllerMock =
           controllers.InvitationsControllerMock(config,
                                                 systemServices,

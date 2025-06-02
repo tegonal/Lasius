@@ -104,7 +104,7 @@ class UserFavoritesMongoRepository @Inject() (
            upsert = false)
       .flatMap {
         case true => getByUser(userReference, orgId)
-        case _ =>
+        case _    =>
           throw new RuntimeException(
             "Couldn't remove favorites"
           ) // correct error handling?

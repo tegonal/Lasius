@@ -167,7 +167,7 @@ class ProjectMongoRepository @Inject() (
     for {
       _ <- update.key.fold(success()) { key =>
         for {
-          _ <- validateNonBlankString("key", key)
+          _               <- validateNonBlankString("key", key)
           existingProject <- findByOrganisationAndKeyIgnoreProjectId(
             organisationReference = organisationReference,
             key = key,

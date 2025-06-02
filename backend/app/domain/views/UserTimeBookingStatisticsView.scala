@@ -253,7 +253,7 @@ class UserTimeBookingStatisticsView(
       booking: BookingV2): Seq[OperatorEntity[_, _]] = {
     // split booking by dates
     booking.end match {
-      case None => Seq()
+      case None      => Seq()
       case Some(end) =>
         val startDate           = booking.start.toDateTime()
         val startDateStartOfDay = startDate.toDateTime().withTimeAtStartOfDay

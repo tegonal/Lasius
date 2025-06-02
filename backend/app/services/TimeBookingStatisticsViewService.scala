@@ -60,7 +60,7 @@ class TimeBookingStatisticsViewService(
     extends UserService[StartUserTimeBookingView] {
 
   override def processCommand: Receive = {
-    case Ack =>
+    case Ack                           =>
     case cmd: StartUserTimeBookingView =>
       log.debug(s"TimeBookingHistoryViewService -> processCommand:$cmd")
       processAggregateCommand(cmd.userReference, cmd)

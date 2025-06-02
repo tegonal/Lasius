@@ -356,7 +356,7 @@ class UsersControllerSpec
                             authConfig,
                             reactiveMongoApi)
 
-      val testVersion = "1.0"
+      val testVersion                            = "1.0"
       val request: FakeRequest[AcceptTOSRequest] = FakeRequest().withBody(
         AcceptTOSRequest(version = testVersion)
       )

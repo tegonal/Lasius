@@ -55,7 +55,7 @@ class TimeBookingControllerSpec
                                   systemServices,
                                   authConfig,
                                   reactiveMongoApi)
-      val projectId: ProjectId = ProjectId()
+      val projectId: ProjectId                      = ProjectId()
       val request: FakeRequest[StartBookingRequest] = FakeRequest()
         .withBody(
           StartBookingRequest(
@@ -105,7 +105,7 @@ class TimeBookingControllerSpec
                                   authConfig,
                                   reactiveMongoApi)
 
-      val projectId: ProjectId = ProjectId()
+      val projectId: ProjectId                     = ProjectId()
       val request: FakeRequest[EditBookingRequest] = FakeRequest()
         .withBody(
           EditBookingRequest(
@@ -139,7 +139,7 @@ class TimeBookingControllerSpec
             end = None
           ))
       val organisationId: OrganisationId = OrganisationId()
-      val result: Future[Result] =
+      val result: Future[Result]         =
         controller.edit(organisationId, BookingId())(request)
 
       status(result) must equalTo(FORBIDDEN)
@@ -155,8 +155,8 @@ class TimeBookingControllerSpec
                                   authConfig,
                                   reactiveMongoApi)
 
-      val from: DateTime = DateTime.now()
-      val to: DateTime   = from.minusDays(1)
+      val from: DateTime                           = DateTime.now()
+      val to: DateTime                             = from.minusDays(1)
       val request: FakeRequest[EditBookingRequest] = FakeRequest()
         .withBody(
           EditBookingRequest(
@@ -186,9 +186,9 @@ class TimeBookingControllerSpec
                                   authConfig,
                                   reactiveMongoApi)
 
-      val from: DateTime       = DateTime.now()
-      val to: DateTime         = from.plusHours(1)
-      val projectId: ProjectId = ProjectId()
+      val from: DateTime                          = DateTime.now()
+      val to: DateTime                            = from.plusHours(1)
+      val projectId: ProjectId                    = ProjectId()
       val request: FakeRequest[AddBookingRequest] = FakeRequest()
         .withBody(
           models.AddBookingRequest(projectId = projectId,
@@ -211,8 +211,8 @@ class TimeBookingControllerSpec
                                   authConfig,
                                   reactiveMongoApi)
 
-      val from: DateTime = DateTime.now()
-      val to: DateTime   = from.plusHours(1)
+      val from: DateTime                          = DateTime.now()
+      val to: DateTime                            = from.plusHours(1)
       val request: FakeRequest[AddBookingRequest] = FakeRequest()
         .withBody(
           models.AddBookingRequest(projectId = controller.project.id,
@@ -235,8 +235,8 @@ class TimeBookingControllerSpec
                                   authConfig,
                                   reactiveMongoApi)
 
-      val from: DateTime = DateTime.now()
-      val to: DateTime   = from.minusHours(1)
+      val from: DateTime                          = DateTime.now()
+      val to: DateTime                            = from.minusHours(1)
       val request: FakeRequest[AddBookingRequest] = FakeRequest()
         .withBody(
           models.AddBookingRequest(projectId = controller.project.id,

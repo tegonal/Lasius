@@ -64,7 +64,7 @@ class JiraTagParseScheduler(wsClient: WSClient, systemServices: SystemServices)
       log.debug(
         s"StartScheduler: $config, $auth, $projectId, ${projectSettings.jiraProjectKey}")
       val uuid = UUID.randomUUID
-      val ref = context.actorOf(
+      val ref  = context.actorOf(
         JiraTagParseWorker.props(wsClient,
                                  systemServices,
                                  config,

@@ -67,7 +67,7 @@ class JiraTagParseWorker(wsClient: WSClient,
   var cancellable: Option[Cancellable]   = None
   private var lastIssueSize: Option[Int] = None
   private val jiraApiService = new JiraApiServiceImpl(wsClient, config)
-  private val defaultJql =
+  private val defaultJql     =
     s"project=${projectSettings.jiraProjectKey} and resolution=Unresolved ORDER BY created DESC"
   val maxResults: Int = projectSettings.maxResults.getOrElse(100)
   implicit val executionContext: ExecutionContextExecutor =

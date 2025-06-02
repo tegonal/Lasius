@@ -67,7 +67,7 @@ abstract class JsonSerializer[C <: AnyRef: Format](implicit mf: Manifest[C])
       val json = Json.parse(new String(uncompressedContent, charset))
       Json.fromJson[C](json) match {
         case JsSuccess(obj, _) => obj
-        case JsError(e) =>
+        case JsError(e)        =>
           logger.error(s"Couldn't convert json value $json: $e")
           UndefinedEvent
       }

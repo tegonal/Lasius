@@ -238,7 +238,7 @@ object Binders {
               val fmt = DateTimeFormat.forPattern(dateTimePattern)
               Try(fmt.parseDateTime(dateStr)) match {
                 case Success(result) => Right(result)
-                case Failure(e) =>
+                case Failure(e)      =>
                   Left(
                     "Cannot parse parameter " + key + " as small DateTime: " + e.getMessage)
               }
@@ -268,7 +268,7 @@ object Binders {
               val fmt = DateTimeFormat.forPattern(localDateTimePattern)
               Try(fmt.parseDateTime(dateStr)) match {
                 case Success(result) => Right(result.toLocalDateTime)
-                case Failure(e) =>
+                case Failure(e)      =>
                   Left(
                     "Cannot parse parameter " + key + " as small LocalDateTime: " + e.getMessage)
               }
@@ -297,7 +297,7 @@ object Binders {
               val fmt = DateTimeFormat.forPattern(localDatePattern)
               Try(fmt.parseDateTime(dateStr)) match {
                 case Success(result) => Right(result.toLocalDate)
-                case Failure(e) =>
+                case Failure(e)      =>
                   Left(
                     "Cannot parse parameter " + key + " as small LocalDate: " + e.getMessage)
               }
@@ -321,7 +321,7 @@ object Binders {
           : Option[Either[String, Granularity]] = {
         strBinder.bind(key, params).map { bindResult =>
           for {
-            str <- bindResult
+            str         <- bindResult
             parseResult <- Json
               .fromJson[Granularity](JsString(str))
               .asEither
@@ -353,7 +353,7 @@ object Binders {
           values     <- params.get(key).toList
           rawValue   <- values
           splitValue <- rawValue.split(",")
-          bound <- implicitly[QueryStringBindable[T]]
+          bound      <- implicitly[QueryStringBindable[T]]
             .bind(key, Map(key -> Seq(splitValue)))
           value <- bound.toOption
         } yield value

@@ -156,7 +156,7 @@ class InvitationsController @Inject() (
     HasUserRole(FreeUser, parse.empty, withinTransaction = true) {
       implicit dbSession => implicit subject => implicit user => _ =>
         for {
-          _ <- validateInvitationAndUser(invitationId)
+          _      <- validateInvitationAndUser(invitationId)
           result <- invitationRepository.updateInvitationStatus(
             invitationId,
             InvitationDeclined)

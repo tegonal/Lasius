@@ -104,14 +104,14 @@ class InitialDemoDataLoader @Inject() (
   // get's overridden b the withinTransaction call
   override val supportTransaction = true
 
-  private val user1Key: String = sys.env.getOrElse("DEMO_USER1_KEY", "demo1")
+  private val user1Key: String   = sys.env.getOrElse("DEMO_USER1_KEY", "demo1")
   private val user1Email: String =
     sys.env.getOrElse("DEMO_USER1_EMAIL", "demo1@lasius.ch")
   private val user1PasswordHash: String = BCrypt.hashpw(
     sys.env.getOrElse("DEMO_USER1_PASSWORD", "demo"),
     BCrypt.gensalt())
 
-  private val user2Key: String = sys.env.getOrElse("DEMO_USER2_KEY", "demo2")
+  private val user2Key: String   = sys.env.getOrElse("DEMO_USER2_KEY", "demo2")
   private val user2Email: String =
     sys.env.getOrElse("DEMO_USER2_EMAIL", "demo2@lasius.ch")
   private val user2PasswordHash: String = BCrypt.hashpw(

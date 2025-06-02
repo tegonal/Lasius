@@ -111,7 +111,7 @@ class CurrentOrganisationTimeBookingsViewSpec
                                        project2Reference,
                                        Set())
       private val newState1 = state1.copy(booking = None)
-      private val state2 = CurrentUserTimeBooking(userReference,
+      private val state2    = CurrentUserTimeBooking(userReference,
                                                   day,
                                                   Some(booking2),
                                                   None,
@@ -214,7 +214,7 @@ class CurrentOrganisationTimeBookingsViewSpec
 
     probe.send(actorRef,
                GetCurrentOrganisationTimeBookings(organisationReference.id))
-    private val today = LocalDate.now()
+    private val today          = LocalDate.now()
     private val expectedResult = CurrentOrganisationTimeBookings(
       organisationReference.id,
       Seq(

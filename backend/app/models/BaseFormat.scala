@@ -136,7 +136,7 @@ object BaseFormat {
     Format[T](reads, writes)
   }
 
-  val dateTimePattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZZ"
+  val dateTimePattern                       = "yyyy-MM-dd'T'HH:mm:ss.SSSZZ"
   implicit val dateFormat: Format[DateTime] = Format[DateTime](
     JodaReads.jodaDateReads(dateTimePattern),
     JodaWrites.jodaDateWrites(dateTimePattern))
@@ -153,7 +153,7 @@ object BaseFormat {
         case JsString(s) =>
           parseDate(s) match {
             case Some(d) => JsSuccess(d)
-            case _ =>
+            case _       =>
               JsError(
                 Seq(
                   JsPath() -> Seq(
@@ -181,7 +181,7 @@ object BaseFormat {
   implicit val localDateTimeFormat: Format[LocalDateTime] =
     Format[LocalDateTime](localDateTimeReads, localDateTimeWrites)
 
-  val localDatePattern = "yyyy-MM-dd"
+  val localDatePattern                         = "yyyy-MM-dd"
   private val localDateReads: Reads[LocalDate] = {
     new Reads[LocalDate] {
       private val df =
@@ -191,7 +191,7 @@ object BaseFormat {
         case JsString(s) =>
           parseDate(s) match {
             case Some(d) => JsSuccess(d)
-            case _ =>
+            case _       =>
               JsError(
                 Seq(
                   JsPath() -> Seq(

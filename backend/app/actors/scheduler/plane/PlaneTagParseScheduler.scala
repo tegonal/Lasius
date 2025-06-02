@@ -70,7 +70,7 @@ class PlaneTagParseScheduler(wsClient: WSClient, systemServices: SystemServices)
       log.debug(
         s"StartScheduler: $config, $auth, $projectId, ${projectSettings.planeProjectId}")
       val uuid = UUID.randomUUID
-      val ref = context.actorOf(
+      val ref  = context.actorOf(
         PlaneTagParseWorker.props(wsClient,
                                   systemServices,
                                   config,

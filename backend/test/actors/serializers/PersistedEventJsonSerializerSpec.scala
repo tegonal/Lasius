@@ -62,7 +62,7 @@ class PersistedEventJsonSerializerSpec extends Specification with Matchers {
 
       // read through serializer
       val serializer = new PersistedEventJsonSerializer()
-      val result =
+      val result     =
         serializer.fromBinary(bookingAsJson.getBytes,
                               Some(classOf[UserTimeBookingStarted]))
 

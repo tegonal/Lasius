@@ -74,7 +74,7 @@ class OrganisationMongoRepository @Inject() (
     for {
       _                    <- validateNonBlankString("key", key)
       existingOrganisation <- findByKey(key)
-      _ <- validate(existingOrganisation.isEmpty,
+      _                    <- validate(existingOrganisation.isEmpty,
                     s"Cannot create organisation with same key $key")
       organisation = Organisation(id = OrganisationId(),
                                   key = key,
@@ -106,7 +106,7 @@ class OrganisationMongoRepository @Inject() (
         for {
           _                    <- validateNonBlankString("key", key)
           existingOrganisation <- findByKey(key)
-          result <- validate(existingOrganisation.isEmpty,
+          result               <- validate(existingOrganisation.isEmpty,
                              s"Cannot create organisation with same key $key")
         } yield result
       }

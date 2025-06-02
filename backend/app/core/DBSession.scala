@@ -44,8 +44,8 @@ object DBSession {
   def start(reactiveMongoApi: ReactiveMongoApi, withTransaction: Boolean)(
       implicit ec: ExecutionContext): Future[DBSession] = {
     for {
-      db      <- reactiveMongoApi.database
-      session <- db.startSession()
+      db       <- reactiveMongoApi.database
+      session  <- db.startSession()
       dbWithTx <-
         if (withTransaction) session.startTransaction(None)
         else Future.successful(session)
