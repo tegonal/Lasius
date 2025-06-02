@@ -72,7 +72,7 @@ object Tag {
       JsPath().read[String].map[Tag](tag => SimpleTag(TagId(tag)))
     case Some(_) => defaultTagReads
   }
-  implicit val tagFormat: Format[Tag] = Format(tagReads, tagWrites)
+  implicit val tagFormat: Format[Tag]         = Format(tagReads, tagWrites)
   implicit val setTagFormat: Format[Set[Tag]] =
     Format(Reads.set(tagReads), Writes.set(tagWrites))
   implicit val seqTagFormat: Format[Seq[Tag]] =

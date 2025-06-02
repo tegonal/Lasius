@@ -63,7 +63,7 @@ case class Booking(id: BookingId,
     */
   def toV2(users: Seq[User], projects: Seq[Project]): BookingV2 = {
     val projectKey = projectId + "@" + categoryId
-    val user = users
+    val user       = users
       .find(_.key == userId)
       .getOrElse(sys.error(
         s"Cannot migrate current booking $this, user with key $userId not found"))

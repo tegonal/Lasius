@@ -44,7 +44,7 @@ class LatestUserTimeBookingsViewService(clientReceiver: ClientReceiver)
       domain.views.LatestUserTimeBookingsView.GetLatestTimeBooking] {
 
   override def processCommand: Receive = {
-    case Ack =>
+    case Ack                       =>
     case cmd: GetLatestTimeBooking =>
       processAggregateCommand(cmd.userReference, cmd)
     case r: RestoreViewFromState =>

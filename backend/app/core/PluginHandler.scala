@@ -101,7 +101,7 @@ class PluginHandler(userRepository: UserRepository,
         }
       }
     case Shutdown =>
-    case e =>
+    case e        =>
       log.warning(s"Received unknown event:$e")
   }
 

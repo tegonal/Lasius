@@ -48,7 +48,7 @@ class OrganisationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: OrganisationsControllerMock =
+      val controller: OrganisationsControllerMock     =
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
@@ -73,7 +73,7 @@ class OrganisationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: OrganisationsControllerMock =
+      val controller: OrganisationsControllerMock     =
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
@@ -98,7 +98,7 @@ class OrganisationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: OrganisationsControllerMock =
+      val controller: OrganisationsControllerMock     =
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
@@ -123,7 +123,7 @@ class OrganisationsControllerSpec
         controller.userRepository.findByUserReference(controller.userReference))
         .awaitResult()
       maybeUser must beSome
-      private val user = maybeUser.get
+      private val user    = maybeUser.get
       private val userOrg = user.organisations.find(
         _.organisationReference == resultingOrganisation.getReference)
       userOrg must beSome
@@ -137,7 +137,7 @@ class OrganisationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: OrganisationsControllerMock =
+      val controller: OrganisationsControllerMock     =
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
@@ -145,7 +145,7 @@ class OrganisationsControllerSpec
       private val newOrganisationId = OrganisationId()
 
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
-      val result: Future[Result] =
+      val result: Future[Result]     =
         controller.deactivateOrganisation(newOrganisationId)(request)
 
       status(result) must equalTo(FORBIDDEN)
@@ -156,13 +156,13 @@ class OrganisationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: OrganisationsControllerMock =
+      val controller: OrganisationsControllerMock     =
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
                                                 reactiveMongoApi)
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
-      val result: Future[Result] =
+      val result: Future[Result]     =
         controller.deactivateOrganisation(controller.organisationId)(request)
 
       status(result) must equalTo(OK)
@@ -172,7 +172,7 @@ class OrganisationsControllerSpec
         controller.userRepository.findByUserReference(controller.userReference))
         .awaitResult()
       maybeUser must beSome
-      private val user = maybeUser.get
+      private val user    = maybeUser.get
       private val userOrg = user.organisations.find(
         _.organisationReference.id == controller.organisationId)
       userOrg must beNone
@@ -185,7 +185,7 @@ class OrganisationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: OrganisationsControllerMock =
+      val controller: OrganisationsControllerMock     =
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
@@ -208,7 +208,7 @@ class OrganisationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: OrganisationsControllerMock =
+      val controller: OrganisationsControllerMock     =
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
@@ -237,7 +237,7 @@ class OrganisationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: OrganisationsControllerMock =
+      val controller: OrganisationsControllerMock     =
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
@@ -262,7 +262,7 @@ class OrganisationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: OrganisationsControllerMock =
+      val controller: OrganisationsControllerMock     =
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
@@ -289,7 +289,7 @@ class OrganisationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: OrganisationsControllerMock =
+      val controller: OrganisationsControllerMock     =
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
@@ -297,7 +297,7 @@ class OrganisationsControllerSpec
                                                 OrganisationMember)
 
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
-      val result: Future[Result] =
+      val result: Future[Result]     =
         controller.unassignUser(controller.organisationId, UserId())(request)
 
       status(result) must equalTo(FORBIDDEN)
@@ -308,14 +308,14 @@ class OrganisationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: OrganisationsControllerMock =
+      val controller: OrganisationsControllerMock     =
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
                                                 reactiveMongoApi)
 
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
-      val result: Future[Result] =
+      val result: Future[Result]     =
         controller.unassignUser(controller.organisationId, controller.userId)(
           request)
 
@@ -329,7 +329,7 @@ class OrganisationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: OrganisationsControllerMock =
+      val controller: OrganisationsControllerMock     =
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
@@ -337,7 +337,7 @@ class OrganisationsControllerSpec
                                                 isOrganisationPrivate = true)
 
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
-      val result: Future[Result] =
+      val result: Future[Result]     =
         controller.unassignUser(controller.organisationId, controller.userId)(
           request)
 
@@ -351,7 +351,7 @@ class OrganisationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: OrganisationsControllerMock =
+      val controller: OrganisationsControllerMock     =
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
@@ -388,7 +388,7 @@ class OrganisationsControllerSpec
         controller.userRepository.upsert(user2)).awaitResult()
 
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
-      val result: Future[Result] =
+      val result: Future[Result]     =
         controller.unassignUser(controller.organisationId, user2.id)(request)
 
       status(result) must equalTo(OK)
@@ -412,14 +412,14 @@ class OrganisationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: OrganisationsControllerMock =
+      val controller: OrganisationsControllerMock     =
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
                                                 reactiveMongoApi)
 
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
-      val result: Future[Result] =
+      val result: Future[Result]     =
         controller.unassignMyUser(OrganisationId())(request)
 
       status(result) must equalTo(FORBIDDEN)
@@ -430,14 +430,14 @@ class OrganisationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: OrganisationsControllerMock =
+      val controller: OrganisationsControllerMock     =
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
                                                 reactiveMongoApi)
 
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
-      val result: Future[Result] =
+      val result: Future[Result]     =
         controller.unassignMyUser(controller.organisationId)(request)
 
       status(result) must equalTo(BAD_REQUEST)
@@ -450,7 +450,7 @@ class OrganisationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: OrganisationsControllerMock =
+      val controller: OrganisationsControllerMock     =
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
@@ -458,7 +458,7 @@ class OrganisationsControllerSpec
                                                 isOrganisationPrivate = true)
 
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
-      val result: Future[Result] =
+      val result: Future[Result]     =
         controller.unassignMyUser(controller.organisationId)(request)
 
       status(result) must equalTo(BAD_REQUEST)
@@ -471,7 +471,7 @@ class OrganisationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: OrganisationsControllerMock =
+      val controller: OrganisationsControllerMock     =
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
@@ -507,7 +507,7 @@ class OrganisationsControllerSpec
         controller.userRepository.upsert(user2)).awaitResult()
 
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
-      val result: Future[Result] =
+      val result: Future[Result]     =
         controller.unassignMyUser(controller.organisationId)(request)
 
       status(result) must equalTo(OK)
@@ -525,7 +525,7 @@ class OrganisationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: OrganisationsControllerMock =
+      val controller: OrganisationsControllerMock     =
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
@@ -546,7 +546,7 @@ class OrganisationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: OrganisationsControllerMock =
+      val controller: OrganisationsControllerMock     =
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
@@ -567,7 +567,7 @@ class OrganisationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: OrganisationsControllerMock =
+      val controller: OrganisationsControllerMock     =
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,
@@ -602,7 +602,7 @@ class OrganisationsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: OrganisationsControllerMock =
+      val controller: OrganisationsControllerMock     =
         controllers.OrganisationsControllerMock(config,
                                                 systemServices,
                                                 authConfig,

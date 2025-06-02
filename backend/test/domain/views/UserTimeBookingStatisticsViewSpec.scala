@@ -141,7 +141,7 @@ class UserTimeBookingStatisticsViewSpec
       val probe                      = TestProbe()
       val bookingByProjectRepository = mockAwaitable[BookingByProjectRepository]
       val bookingByTagRepository = mockAwaitable[BookingByTagMongoRepository]
-      val actorRef = system.actorOf(
+      val actorRef               = system.actorOf(
         UserTimeBookingStatisticsViewMock.props(userReference,
                                                 bookingByProjectRepository,
                                                 bookingByTagRepository,
@@ -175,7 +175,7 @@ class UserTimeBookingStatisticsViewSpec
       val probe                      = TestProbe()
       val bookingByProjectRepository = mockAwaitable[BookingByProjectRepository]
       val bookingByTagRepository = mockAwaitable[BookingByTagMongoRepository]
-      val actorRef = system.actorOf(
+      val actorRef               = system.actorOf(
         UserTimeBookingStatisticsViewMock.props(userReference,
                                                 bookingByProjectRepository,
                                                 bookingByTagRepository,
@@ -216,8 +216,8 @@ class UserTimeBookingStatisticsViewSpec
                                Set(tag1))
 
       // booking 2
-      val start2 = end1
-      val end2   = start2.withHourOfDay(12).withMinuteOfHour(2)
+      val start2   = end1
+      val end2     = start2.withHourOfDay(12).withMinuteOfHour(2)
       val booking2 = BookingV2(BookingId(),
                                start2.toLocalDateTimeWithZone(),
                                Some(end2.toLocalDateTimeWithZone()),
@@ -227,8 +227,8 @@ class UserTimeBookingStatisticsViewSpec
                                Set(tag2))
 
       // booking 3
-      val start3 = start2.withHourOfDay(12).withMinuteOfHour(50)
-      val end3   = start2.withHourOfDay(15).withMinuteOfHour(30)
+      val start3   = start2.withHourOfDay(12).withMinuteOfHour(50)
+      val end3     = start2.withHourOfDay(15).withMinuteOfHour(30)
       val booking3 = BookingV2(BookingId(),
                                start3.toLocalDateTimeWithZone(),
                                Some(end3.toLocalDateTimeWithZone()),
@@ -238,8 +238,8 @@ class UserTimeBookingStatisticsViewSpec
                                Set(tag2))
 
       // booking 4
-      val start4 = start2.withHourOfDay(16).withMinuteOfHour(28)
-      val end4   = start2.withHourOfDay(21).withMinuteOfHour(41)
+      val start4   = start2.withHourOfDay(16).withMinuteOfHour(28)
+      val end4     = start2.withHourOfDay(21).withMinuteOfHour(41)
       val booking4 = BookingV2(BookingId(),
                                start4.toLocalDateTimeWithZone(),
                                Some(end4.toLocalDateTimeWithZone()),
@@ -787,17 +787,17 @@ class UserTimeBookingStatisticsViewSpec
     val probe                      = TestProbe()
     val bookingByProjectRepository = mockAwaitable[BookingByProjectRepository]
     val bookingByTagRepository     = mockAwaitable[BookingByTagMongoRepository]
-    val actorRef = system.actorOf(
+    val actorRef                   = system.actorOf(
       UserTimeBookingStatisticsViewMock
         .props(userReference,
                bookingByProjectRepository,
                bookingByTagRepository,
                reactiveMongoApi))
-    val day1  = LocalDateTime.parse("2000-01-01")
-    val day2  = day1.plusDays(1)
-    val day3  = day1.plusDays(2)
-    val stop  = day3.plusHours(10).toDateTime
-    val start = day1.plusHours(5).toDateTime
+    val day1             = LocalDateTime.parse("2000-01-01")
+    val day2             = day1.plusDays(1)
+    val day3             = day1.plusDays(2)
+    val stop             = day3.plusHours(10).toDateTime
+    val start            = day1.plusHours(5).toDateTime
     val projectReference =
       EntityReference(ProjectId(), "proj")
     val tagId1 = TagId("tag1")
@@ -1211,15 +1211,15 @@ class UserTimeBookingStatisticsViewSpec
     val probe                      = TestProbe()
     val bookingByProjectRepository = mockAwaitable[BookingByProjectRepository]
     val bookingByTagRepository     = mockAwaitable[BookingByTagMongoRepository]
-    val actorRef = system.actorOf(
+    val actorRef                   = system.actorOf(
       UserTimeBookingStatisticsViewMock
         .props(userReference,
                bookingByProjectRepository,
                bookingByTagRepository,
                reactiveMongoApi))
-    val day   = LocalDateTime.parse("2000-01-01")
-    val stop  = day.plusHours(10).toDateTime
-    val start = stop.minusHours(2).toDateTime
+    val day              = LocalDateTime.parse("2000-01-01")
+    val stop             = day.plusHours(10).toDateTime
+    val start            = stop.minusHours(2).toDateTime
     val projectReference =
       EntityReference(ProjectId(), "proj")
     val tagId1   = TagId("tag1")
@@ -1227,7 +1227,7 @@ class UserTimeBookingStatisticsViewSpec
     val tagId3   = TagId("tag3")
     val duration = Duration.standardHours(2)
     val tag1     = SimpleTag(tagId1)
-    val tag2 = GitlabIssueTag(tagId2,
+    val tag2     = GitlabIssueTag(tagId2,
                               projectId = 1,
                               summary = None,
                               relatedTags = Seq(SimpleTag(tagId3)),
@@ -1267,13 +1267,13 @@ class UserTimeBookingStatisticsViewSpec
     val probe                      = TestProbe()
     val bookingByProjectRepository = mockAwaitable[BookingByProjectRepository]
     val bookingByTagRepository     = mockAwaitable[BookingByTagMongoRepository]
-    val actorRef = system.actorOf(
+    val actorRef                   = system.actorOf(
       UserTimeBookingStatisticsViewMock
         .props(userReference,
                bookingByProjectRepository,
                bookingByTagRepository,
                reactiveMongoApi))
-    val start = DateTime.now().minusHours(2)
+    val start            = DateTime.now().minusHours(2)
     val projectReference =
       EntityReference(ProjectId(), "proj")
     val tag1 = SimpleTag(TagId("tag1"))

@@ -142,7 +142,7 @@ class OrganisationsController @Inject() (
       implicit dbSession => implicit subject => user => implicit request =>
         HasOrganisationRole(user, orgId, OrganisationAdministrator) { userOrg =>
           for {
-            _ <- validateEmail(request.body.email)
+            _            <- validateEmail(request.body.email)
             organisation <- organisationRepository
               .findById(orgId)
               .noneToFailed(

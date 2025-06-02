@@ -50,7 +50,7 @@ trait GzipCompression {
 
       @tailrec def readChunk(): Unit = in.read(buffer) match {
         case -1 => ()
-        case n =>
+        case n  =>
           out.write(buffer, 0, n)
           readChunk()
       }

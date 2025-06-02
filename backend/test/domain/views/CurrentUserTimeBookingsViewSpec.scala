@@ -104,7 +104,7 @@ class CurrentUserTimeBookingsViewSpec extends Specification with Mockito {
         EntityReference(OrganisationId(), "team")
       val probe          = TestProbe()
       val clientReceiver = mock[ClientReceiver]
-      val actorRef = system.actorOf(
+      val actorRef       = system.actorOf(
         CurrentUserTimeBookingsViewMock.props(userReference, clientReceiver))
 
       probe.send(actorRef, InitializeViewLive(userReference, 0))
@@ -134,7 +134,7 @@ class CurrentUserTimeBookingsViewSpec extends Specification with Mockito {
       probe.expectMsg(Ack)
 
       val newBooking = booking.copy(start = newStart.toLocalDateTimeWithZone())
-      val state = CurrentUserTimeBookingEvent(
+      val state      = CurrentUserTimeBookingEvent(
         CurrentUserTimeBooking(userReference,
                                day,
                                Some(newBooking),
@@ -163,7 +163,7 @@ class CurrentUserTimeBookingsViewSpec extends Specification with Mockito {
         EntityReference(OrganisationId(), "team")
       val probe          = TestProbe()
       val clientReceiver = mock[ClientReceiver]
-      val actorRef = system.actorOf(
+      val actorRef       = system.actorOf(
         CurrentUserTimeBookingsViewMock.props(userReference, clientReceiver))
 
       probe.send(actorRef, InitializeViewLive(userReference, 0))
@@ -217,7 +217,7 @@ class CurrentUserTimeBookingsViewSpec extends Specification with Mockito {
         EntityReference(OrganisationId(), "team")
       val probe          = TestProbe()
       val clientReceiver = mock[ClientReceiver]
-      val actorRef = system.actorOf(
+      val actorRef       = system.actorOf(
         CurrentUserTimeBookingsViewMock.props(userReference, clientReceiver))
 
       probe.send(actorRef, InitializeViewLive(userReference, 0))
@@ -287,7 +287,7 @@ class CurrentUserTimeBookingsViewSpec extends Specification with Mockito {
         EntityReference(OrganisationId(), "team")
       val probe          = TestProbe()
       val clientReceiver = mock[ClientReceiver]
-      val actorRef = system.actorOf(
+      val actorRef       = system.actorOf(
         CurrentUserTimeBookingsViewMock.props(userReference, clientReceiver))
 
       val day      = LocalDate.now()
@@ -356,7 +356,7 @@ class CurrentUserTimeBookingsViewSpec extends Specification with Mockito {
         EntityReference(OrganisationId(), "team")
       val probe          = TestProbe()
       val clientReceiver = mock[ClientReceiver]
-      val actorRef = system.actorOf(
+      val actorRef       = system.actorOf(
         CurrentUserTimeBookingsViewMock.props(userReference, clientReceiver))
 
       val day      = LocalDate.now()

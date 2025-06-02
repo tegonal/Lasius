@@ -22,7 +22,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.0.0-beta4+24-e2734fd1+20250508-0804
+ * OpenAPI spec version: 2.0.0+4-3a603fde+20250602-1535
  */
 import type { ModelsBookingStatsCategory } from './modelsBookingStatsCategory';
 import type { ModelsBookingStatsByCategory } from './modelsBookingStatsByCategory';

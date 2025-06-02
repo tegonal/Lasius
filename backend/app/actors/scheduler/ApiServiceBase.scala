@@ -59,7 +59,7 @@ trait ApiServiceBase extends Logging {
         Json
           .fromJson[Seq[T]](json)
           .asEither match {
-          case Right(j) => Future.successful((j, headers))
+          case Right(j)      => Future.successful((j, headers))
           case Left(jsError) =>
             logger.error(s"Couldn't parse json:$jsError")
             Future.failed(new RuntimeException(s"Could not parse $json"))
@@ -69,7 +69,7 @@ trait ApiServiceBase extends Logging {
         Json
           .fromJson[T](json)
           .asEither match {
-          case Right(j) => Future.successful((Seq(j), headers))
+          case Right(j)      => Future.successful((Seq(j), headers))
           case Left(jsError) =>
             logger.error(s"Couldn't parse json:$jsError")
             Future.failed(new RuntimeException(s"Could not parse $json"))
@@ -93,7 +93,7 @@ trait ApiServiceBase extends Logging {
         Json
           .fromJson[T](json)
           .asEither match {
-          case Right(j) => Future.successful((j, headers))
+          case Right(j)      => Future.successful((j, headers))
           case Left(jsError) =>
             logger.error(s"Couldn't parse json:$jsError")
             Future.failed(new RuntimeException(s"Could not parse $json"))

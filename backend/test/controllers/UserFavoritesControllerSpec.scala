@@ -58,7 +58,7 @@ class UserFavoritesControllerSpec
                                     authConfig,
                                     userFavoritesRepository)
 
-      val projectId: ProjectId = ProjectId()
+      val projectId: ProjectId                   = ProjectId()
       val request: FakeRequest[FavoritesRequest] = FakeRequest()
         .withBody(
           FavoritesRequest(
@@ -91,7 +91,7 @@ class UserFavoritesControllerSpec
             tags = Set(SimpleTag(TagId("tag1")))
           ))
       val organisationId: OrganisationId = OrganisationId()
-      val result: Future[Result] =
+      val result: Future[Result]         =
         controller.addFavorite(organisationId)(request)
 
       status(result) must equalTo(FORBIDDEN)
@@ -113,7 +113,7 @@ class UserFavoritesControllerSpec
                                     authConfig,
                                     userFavoritesRepository)
 
-      val projectId: ProjectId = ProjectId()
+      val projectId: ProjectId                   = ProjectId()
       val request: FakeRequest[FavoritesRequest] = FakeRequest()
         .withBody(
           FavoritesRequest(
@@ -148,7 +148,7 @@ class UserFavoritesControllerSpec
           tags = Set(SimpleTag(TagId("tag1")))
         ))
     val organisationId: OrganisationId = OrganisationId()
-    val result: Future[Result] =
+    val result: Future[Result]         =
       controller.removeFavorite(organisationId)(request)
 
     status(result) must equalTo(FORBIDDEN)

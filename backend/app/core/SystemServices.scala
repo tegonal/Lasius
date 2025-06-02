@@ -122,7 +122,7 @@ class DefaultSystemServices @Inject() (
 
   private val systemUUID =
     UUID.fromString("0000000-0000-0000-0000-000000000000")
-  val systemUser: UserId = UserId(systemUUID)
+  val systemUser: UserId                          = UserId(systemUUID)
   implicit val systemUserReference: UserReference = {
     EntityReference(systemUser, "system")
   }

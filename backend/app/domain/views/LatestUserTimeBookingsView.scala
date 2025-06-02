@@ -103,7 +103,7 @@ class LatestUserTimeBookingsView(clientReceiver: ClientReceiver,
   }
 
   private def addBooking(booking: BookingV2): Unit = {
-    val stub = booking.createStub
+    val stub       = booking.createStub
     val newHistory = (state.history + stub).toSeq
       .sorted(ordering)
       .take(maxInternalHistory)

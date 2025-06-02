@@ -65,7 +65,7 @@ class GitlabTagParseScheduler(wsClient: WSClient,
       log.debug(
         s"StartScheduler: $config, $auth, $projectId, ${projectSettings.gitlabProjectId}")
       val uuid = UUID.randomUUID
-      val ref = context.actorOf(
+      val ref  = context.actorOf(
         GitlabTagParseWorker.props(wsClient,
                                    systemServices,
                                    config,

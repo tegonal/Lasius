@@ -85,7 +85,7 @@ class SecuritySpec
     "return unauthorized when user can't get resolved" in new WithTestApplication {
       // prepare
       val systemServices: SystemServices = inject[SystemServices]
-      val controller =
+      val controller                     =
         new HasRoleSecurityMock(systemServices, reactiveMongoApi, config)
       controller.authConfig
         .resolveUser(any[EntityReference[UserId]])(any[ExecutionContext],
@@ -104,7 +104,7 @@ class SecuritySpec
     "return unauthorized when authorization failed" in new WithTestApplication {
       // prepare
       val systemServices: SystemServices = inject[SystemServices]
-      val controller =
+      val controller                     =
         new HasRoleSecurityMock(systemServices, reactiveMongoApi, config)
       controller.authConfig
         .authorizeUser(any[User], any[UserRole])(any[ExecutionContext])
@@ -126,7 +126,7 @@ class SecuritySpec
     "return InternalServerError on any failure" in new WithTestApplication {
       // prepare
       val systemServices: SystemServices = inject[SystemServices]
-      val controller =
+      val controller                     =
         new HasRoleSecurityMock(systemServices, reactiveMongoApi, config)
       controller.authConfig
         .authorizeUser(any[User], any[UserRole])(any[ExecutionContext])
@@ -146,7 +146,7 @@ class SecuritySpec
     "Succeed if authorized" in new WithTestApplication {
       // prepare
       val systemServices: SystemServices = inject[SystemServices]
-      val controller =
+      val controller                     =
         new HasRoleSecurityMock(systemServices, reactiveMongoApi, config)
       controller.authConfig
         .authorizeUser(any[User], any[UserRole])(any[ExecutionContext])
@@ -199,7 +199,7 @@ class SecuritySpec
     "return unauthorized when no token was found in request header" in new WithTestApplication {
       // prepare
       val systemServices: SystemServices = inject[SystemServices]
-      val controller =
+      val controller                     =
         new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
       controller.authConfig
         .resolveUser(any[EntityReference[UserId]])(any[ExecutionContext],
@@ -219,7 +219,7 @@ class SecuritySpec
       "return unauthorized when token in header expired longer than leeway time" in new WithTestApplication {
         // prepare
         val systemServices: SystemServices = inject[SystemServices]
-        val controller =
+        val controller                     =
           new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
         controller.authConfig
           .resolveIssuerConfig(any[String])
@@ -244,7 +244,7 @@ class SecuritySpec
       "return unauthorized when token issuer is not configured" in new WithTestApplication {
         // prepare
         val systemServices: SystemServices = inject[SystemServices]
-        val controller =
+        val controller                     =
           new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
         controller.authConfig
           .resolveIssuerConfig(any[String])
@@ -268,7 +268,7 @@ class SecuritySpec
       "return unauthorized when token subject/email does not match restrictions" in new WithTestApplication {
         // prepare
         val systemServices: SystemServices = inject[SystemServices]
-        val controller =
+        val controller                     =
           new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
         controller.authConfig
           .resolveIssuerConfig("test")
@@ -297,7 +297,7 @@ class SecuritySpec
       "return unauthorized when token was not signed but signature was expected" in new WithTestApplication {
         // prepare
         val systemServices: SystemServices = inject[SystemServices]
-        val controller =
+        val controller                     =
           new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
         controller.authConfig
           .resolveIssuerConfig("test")
@@ -326,7 +326,7 @@ class SecuritySpec
       "succeed with valid token without signature" in new WithTestApplication {
         // prepare
         val systemServices: SystemServices = inject[SystemServices]
-        val controller =
+        val controller                     =
           new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
         controller.authConfig
           .resolveIssuerConfig("test")
@@ -360,7 +360,7 @@ class SecuritySpec
       "return unauthorized when token was signed with different symmetric private key" in new WithTestApplication {
         // prepare
         val systemServices: SystemServices = inject[SystemServices]
-        val controller =
+        val controller                     =
           new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
         controller.authConfig
           .resolveIssuerConfig("test")
@@ -396,7 +396,7 @@ class SecuritySpec
       "succeed with valid token with signature based on symmetric private key" in new WithTestApplication {
         // prepare
         val systemServices: SystemServices = inject[SystemServices]
-        val controller =
+        val controller                     =
           new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
         val randomString = "dasddasdasfse32q1231231313eqdsasd"
         controller.authConfig
@@ -431,7 +431,7 @@ class SecuritySpec
       "return unauthorized when token was signed with different wrong public/private key" in new WithTestApplication {
         // prepare
         val systemServices: SystemServices = inject[SystemServices]
-        val controller =
+        val controller                     =
           new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
 
         private val keyPairGenerator = KeyPairGenerator.getInstance("RSA")
@@ -473,7 +473,7 @@ class SecuritySpec
       "succeed with valid token with signature based on correct public/private key pair" in new WithTestApplication {
         // prepare
         val systemServices: SystemServices = inject[SystemServices]
-        val controller =
+        val controller                     =
           new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
         private val keyPairGenerator = KeyPairGenerator.getInstance("RSA")
         private val keyPair          = keyPairGenerator.generateKeyPair
@@ -513,7 +513,7 @@ class SecuritySpec
       "return unauthorized when token in header was not found through the introspection endpoint of one of the configured opaque token providers" in new WithTestApplication {
         // prepare
         val systemServices: SystemServices = inject[SystemServices]
-        val controller =
+        val controller                     =
           new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
         val tokenConfig = OpaqueTokenIssuerConfig(
           issuer = "test-issuer",
@@ -548,7 +548,7 @@ class SecuritySpec
       "return unauthorized when token in header is not active, but cache issuer for introspection" in new WithTestApplication {
         // prepare
         val systemServices: SystemServices = inject[SystemServices]
-        val controller =
+        val controller                     =
           new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
         val tokenConfig = OpaqueTokenIssuerConfig(
           issuer = "test-issuer",
@@ -582,7 +582,7 @@ class SecuritySpec
       "return unauthorized when userinfo could not get fetched with valid token and not cache provider" in new WithTestApplication {
         // prepare
         val systemServices: SystemServices = inject[SystemServices]
-        val controller =
+        val controller                     =
           new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
         val tokenConfig = OpaqueTokenIssuerConfig(
           issuer = "test-issuer",
@@ -621,7 +621,7 @@ class SecuritySpec
       "succeed with valid token and cache provider" in new WithTestApplication {
         // prepare
         val systemServices: SystemServices = inject[SystemServices]
-        val controller =
+        val controller                     =
           new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
         val tokenConfig = OpaqueTokenIssuerConfig(
           issuer = "test-issuer",
@@ -664,7 +664,7 @@ class SecuritySpec
       "succeed with valid token through inspection endpoint and lookup user info from cache" in new WithTestApplication {
         // prepare
         val systemServices: SystemServices = inject[SystemServices]
-        val controller =
+        val controller                     =
           new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
         val tokenConfig = OpaqueTokenIssuerConfig(
           issuer = "test-issuer",
@@ -706,7 +706,7 @@ class SecuritySpec
       "succeed with valid token through inspection endpoint and lookup user info from cache" in new WithTestApplication {
         // prepare
         val systemServices: SystemServices = inject[SystemServices]
-        val controller =
+        val controller                     =
           new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
         val tokenConfig = OpaqueTokenIssuerConfig(
           issuer = "test-issuer",
@@ -748,7 +748,7 @@ class SecuritySpec
       "don't loop through all issuers if issuerConfig is already in the cache" in new WithTestApplication {
         // prepare
         val systemServices: SystemServices = inject[SystemServices]
-        val controller =
+        val controller                     =
           new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
         val tokenConfig1 = OpaqueTokenIssuerConfig(
           issuer = "test-issuer1",
@@ -803,7 +803,7 @@ class SecuritySpec
       "unauthorized if issuer provided in header doesn't exist" in new WithTestApplication {
         // prepare
         val systemServices: SystemServices = inject[SystemServices]
-        val controller =
+        val controller                     =
           new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
 
         val tokenConfig = OpaqueTokenIssuerConfig(
@@ -834,7 +834,7 @@ class SecuritySpec
       "succeed if issuer is provided in header" in new WithTestApplication {
         // prepare
         val systemServices: SystemServices = inject[SystemServices]
-        val controller =
+        val controller                     =
           new HasTokenSecurityMock(systemServices, reactiveMongoApi, config)
         val tokenConfig2 = OpaqueTokenIssuerConfig(
           issuer = "test-issuer2",
@@ -913,7 +913,7 @@ class HasRoleSecurityMock(
     with TestDBSupport {
 
   implicit val playConfig: Configuration = Configuration(conf)
-  private val userInfo = UserInfo(
+  private val userInfo                   = UserInfo(
     key = "system",
     email = "system@lasius.ch",
     firstName = None,

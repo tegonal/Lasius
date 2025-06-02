@@ -157,7 +157,7 @@ class ProjectsController @Inject() (
                                                  ProjectAdministrator) {
           userOrg =>
             for {
-              _ <- validateEmail(request.body.email)
+              _       <- validateEmail(request.body.email)
               project <- projectRepository
                 .findById(projectId)
                 .noneToFailed(s"Project ${projectId.value} does not exist")

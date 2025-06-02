@@ -48,7 +48,7 @@ class ProjectsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: ProjectsControllerMock =
+      val controller: ProjectsControllerMock          =
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
@@ -71,7 +71,7 @@ class ProjectsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: ProjectsControllerMock =
+      val controller: ProjectsControllerMock          =
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
@@ -96,7 +96,7 @@ class ProjectsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: ProjectsControllerMock =
+      val controller: ProjectsControllerMock          =
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
@@ -121,7 +121,7 @@ class ProjectsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: ProjectsControllerMock =
+      val controller: ProjectsControllerMock          =
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
@@ -147,7 +147,7 @@ class ProjectsControllerSpec
         controller.userRepository.findByUserReference(controller.userReference))
         .awaitResult()
       maybeUser must beSome
-      val user: User = maybeUser.get
+      val user: User                        = maybeUser.get
       val userOrg: Option[UserOrganisation] = user.organisations.find(
         _.organisationReference.id == controller.organisationId)
       userOrg must beSome
@@ -164,14 +164,14 @@ class ProjectsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: ProjectsControllerMock =
+      val controller: ProjectsControllerMock          =
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
-      val result: Future[Result] =
+      val result: Future[Result]     =
         controller.deactivateProject(OrganisationId(), controller.project.id)(
           request)
 
@@ -182,7 +182,7 @@ class ProjectsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: ProjectsControllerMock =
+      val controller: ProjectsControllerMock          =
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
@@ -192,7 +192,7 @@ class ProjectsControllerSpec
       val newProjectId: ProjectId = ProjectId()
 
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
-      val result: Future[Result] =
+      val result: Future[Result]     =
         controller.deactivateProject(controller.organisationId, newProjectId)(
           request)
 
@@ -206,13 +206,13 @@ class ProjectsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: ProjectsControllerMock =
+      val controller: ProjectsControllerMock          =
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
                                            reactiveMongoApi)
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
-      val result: Future[Result] =
+      val result: Future[Result]     =
         controller.deactivateProject(controller.organisationId,
                                      controller.project.id)(request)
 
@@ -223,7 +223,7 @@ class ProjectsControllerSpec
         controller.userRepository.findByUserReference(controller.userReference))
         .awaitResult()
       maybeUser must beSome
-      val user: User = maybeUser.get
+      val user: User                        = maybeUser.get
       val userOrg: Option[UserOrganisation] = user.organisations.find(
         _.organisationReference.id == controller.organisationId)
       userOrg must beSome
@@ -239,7 +239,7 @@ class ProjectsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: ProjectsControllerMock =
+      val controller: ProjectsControllerMock          =
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
@@ -260,7 +260,7 @@ class ProjectsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: ProjectsControllerMock =
+      val controller: ProjectsControllerMock          =
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
@@ -285,7 +285,7 @@ class ProjectsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: ProjectsControllerMock =
+      val controller: ProjectsControllerMock          =
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
@@ -308,7 +308,7 @@ class ProjectsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: ProjectsControllerMock =
+      val controller: ProjectsControllerMock          =
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
@@ -337,7 +337,7 @@ class ProjectsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: ProjectsControllerMock =
+      val controller: ProjectsControllerMock          =
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
@@ -362,7 +362,7 @@ class ProjectsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: ProjectsControllerMock =
+      val controller: ProjectsControllerMock          =
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
@@ -389,7 +389,7 @@ class ProjectsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: ProjectsControllerMock =
+      val controller: ProjectsControllerMock          =
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
@@ -414,13 +414,13 @@ class ProjectsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: ProjectsControllerMock =
+      val controller: ProjectsControllerMock          =
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
-      val email = "ivnitedUser@test.com"
+      val email                              = "ivnitedUser@test.com"
       val userOrganisation: UserOrganisation = UserOrganisation(
         organisationReference = controller.organisation.getReference,
         `private` = controller.organisation.`private`,
@@ -465,14 +465,14 @@ class ProjectsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: ProjectsControllerMock =
+      val controller: ProjectsControllerMock          =
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
-      val result: Future[Result] =
+      val result: Future[Result]     =
         controller.unassignUser(OrganisationId(),
                                 controller.project.id,
                                 UserId())(request)
@@ -485,7 +485,7 @@ class ProjectsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: ProjectsControllerMock =
+      val controller: ProjectsControllerMock          =
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
@@ -495,7 +495,7 @@ class ProjectsControllerSpec
                                            projectRole = ProjectMember)
 
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
-      val result: Future[Result] =
+      val result: Future[Result]     =
         controller.unassignUser(controller.organisationId,
                                 controller.project.id,
                                 UserId())(request)
@@ -534,7 +534,7 @@ class ProjectsControllerSpec
         controller.userRepository.upsert(user2)).awaitResult()
 
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
-      val result: Future[Result] =
+      val result: Future[Result]     =
         controller.unassignUser(controller.organisationId,
                                 controller.project.id,
                                 user2.id)(request)
@@ -552,7 +552,7 @@ class ProjectsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: ProjectsControllerMock =
+      val controller: ProjectsControllerMock          =
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
@@ -568,7 +568,7 @@ class ProjectsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: ProjectsControllerMock =
+      val controller: ProjectsControllerMock          =
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
@@ -586,14 +586,14 @@ class ProjectsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: ProjectsControllerMock =
+      val controller: ProjectsControllerMock          =
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
-      val result: Future[Result] =
+      val result: Future[Result]     =
         controller.unassignMyUser(OrganisationId(), controller.project.id)(
           request)
 
@@ -605,14 +605,14 @@ class ProjectsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: ProjectsControllerMock =
+      val controller: ProjectsControllerMock          =
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
                                            reactiveMongoApi)
 
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
-      val result: Future[Result] =
+      val result: Future[Result]     =
         controller.unassignMyUser(OrganisationId(), controller.project.id)(
           request)
 
@@ -624,7 +624,7 @@ class ProjectsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: ProjectsControllerMock =
+      val controller: ProjectsControllerMock          =
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
@@ -660,7 +660,7 @@ class ProjectsControllerSpec
         controller.userRepository.upsert(user2)).awaitResult()
 
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
-      val result: Future[Result] =
+      val result: Future[Result]     =
         controller.unassignMyUser(controller.organisationId,
                                   controller.project.id)(request)
 
@@ -678,7 +678,7 @@ class ProjectsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: ProjectsControllerMock =
+      val controller: ProjectsControllerMock          =
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
@@ -698,7 +698,7 @@ class ProjectsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: ProjectsControllerMock =
+      val controller: ProjectsControllerMock          =
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
@@ -720,7 +720,7 @@ class ProjectsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: ProjectsControllerMock =
+      val controller: ProjectsControllerMock          =
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
@@ -742,7 +742,7 @@ class ProjectsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: ProjectsControllerMock =
+      val controller: ProjectsControllerMock          =
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
@@ -778,7 +778,7 @@ class ProjectsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: ProjectsControllerMock =
+      val controller: ProjectsControllerMock          =
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,
@@ -892,7 +892,7 @@ class ProjectsControllerSpec
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
-      val controller: ProjectsControllerMock =
+      val controller: ProjectsControllerMock          =
         controllers.ProjectsControllerMock(config,
                                            systemServices,
                                            authConfig,

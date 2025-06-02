@@ -158,8 +158,8 @@ abstract class BookingStatisticMongoRepository[
     val sel = Json.obj(conditions.flatten: _*)
 
     val (additionalGroupByFunctions, sort) = granularity match {
-      case All  => (Seq(), Seq(Descending("total")))
-      case Year => (Seq("year" -> "$year"), Seq(Ascending("_id.year")))
+      case All   => (Seq(), Seq(Descending("total")))
+      case Year  => (Seq("year" -> "$year"), Seq(Ascending("_id.year")))
       case Month =>
         (Seq("year" -> "$year", "month" -> "$month"),
          Seq(Ascending("_id.year"), Ascending("_id.month")))

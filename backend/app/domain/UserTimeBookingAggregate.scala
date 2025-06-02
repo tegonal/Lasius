@@ -286,9 +286,9 @@ class UserTimeBookingAggregate(
   override def restoreFromSnapshot(metadata: SnapshotMetadata,
                                    state: State): Unit = {
     state match {
-      case Removed => context.become(removed)
-      case Created => context.become(created)
-      case _: User => context.become(uninitialized)
+      case Removed            => context.become(removed)
+      case Created            => context.become(created)
+      case _: User            => context.become(uninitialized)
       case s: UserTimeBooking =>
         this.state = s
         Await.ready(
@@ -418,7 +418,7 @@ class UserTimeBookingAggregate(
                 // recalculate hash
                 bookingHash = (projectReference, tags) match {
                   case (None, None) => edited.bookingHash
-                  case (_, _) =>
+                  case (_, _)       =>
                     BookingHash.createHash(
                       projectReference.getOrElse(edited.projectReference),
                       tags.getOrElse(edited.tags))

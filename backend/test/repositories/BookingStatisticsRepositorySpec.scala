@@ -69,7 +69,7 @@ class BookingStatisticsRepositorySpec
 
       // initialize
       val newDuration = Duration.standardHours(1)
-      val newValue = BookingByProject(BookingByProjectId(),
+      val newValue    = BookingByProject(BookingByProjectId(),
                                       user,
                                       organisation,
                                       day,
@@ -133,7 +133,7 @@ class BookingStatisticsRepositorySpec
       }.awaitResult()
 
       val newDuration = Duration.standardHours(1)
-      val newValue = BookingByProject(BookingByProjectId(),
+      val newValue    = BookingByProject(BookingByProjectId(),
                                       user,
                                       organisation,
                                       day,
@@ -227,7 +227,7 @@ class BookingStatisticsRepositorySpec
       }.awaitResult()
 
       val newDuration = Duration.standardHours(1)
-      val newValue = BookingByProject(BookingByProjectId(),
+      val newValue    = BookingByProject(BookingByProjectId(),
                                       user,
                                       organisation,
                                       day,

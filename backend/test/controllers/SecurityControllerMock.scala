@@ -51,7 +51,7 @@ trait SecurityControllerMock
   val organisationRole: OrganisationRole     = OrganisationAdministrator
   val isOrganisationPrivate: Boolean         = false
   val organisationActive: Boolean            = true
-  val organisation: Organisation = Organisation(
+  val organisation: Organisation             = Organisation(
     id = organisationId,
     key = "MyOrg",
     `private` = isOrganisationPrivate,
@@ -68,7 +68,7 @@ trait SecurityControllerMock
   )
 
   val projectActive: Boolean = true
-  val project: Project =
+  val project: Project       =
     Project(
       id = ProjectId(),
       key = "project1",
@@ -92,7 +92,7 @@ trait SecurityControllerMock
     projects = Seq(userProject)
   )
   val userActive: Boolean = true
-  val user: User = User(
+  val user: User          = User(
     userId,
     userKey,
     email = "user@user.com",

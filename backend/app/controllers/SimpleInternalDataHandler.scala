@@ -140,7 +140,7 @@ class SimpleInternalDataHandler(
       dbSession: DBSession): Future[Option[AuthInfo[OAuthUser]]] =
     for {
       maybeToken <- tokenResolver(token)
-      maybeUser <- maybeToken
+      maybeUser  <- maybeToken
         .map(token => oauthUserRepository.findById(token.userId))
         .getOrElse(Future.successful(None))
     } yield {

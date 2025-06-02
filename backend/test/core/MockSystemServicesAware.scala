@@ -80,16 +80,16 @@ class MockServices(actorSystem: ActorSystem) extends SystemServices {
   val reactiveMongoApi: ReactiveMongoApi   = mock[ReactiveMongoApi]
   override val supportTransaction: Boolean = false
 
-  implicit val system: ActorSystem        = actorSystem
-  override val materializer: Materializer = Materializer.matFromSystem
-  val systemUser: UserId                  = UserId()
+  implicit val system: ActorSystem                = actorSystem
+  override val materializer: Materializer         = Materializer.matFromSystem
+  val systemUser: UserId                          = UserId()
   override val systemUserReference: UserReference = {
     EntityReference(systemUser, "system")
   }
 
   implicit val clock: Clock              = Clock.systemUTC
   implicit val playConfig: Configuration = Configuration(ConfigFactory.load())
-  val userInfo: UserInfo = UserInfo(
+  val userInfo: UserInfo                 = UserInfo(
     key = "system",
     email = "system@lasius.ch",
     firstName = None,
