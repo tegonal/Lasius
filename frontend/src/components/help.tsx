@@ -22,7 +22,7 @@ import { Button } from '@theme-ui/components';
 import { Icon } from 'components/shared/icon';
 import { usePlausible } from 'next-plausible';
 import { LasiusPlausibleEvents } from 'lib/telemetry/plausibleEvents';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'next-i18next';
 
 export const HelpButton: React.FC = () => {
   const plausible = usePlausible<LasiusPlausibleEvents>();

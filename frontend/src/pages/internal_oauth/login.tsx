@@ -48,7 +48,10 @@ import { getConfiguration } from 'lib/api/lasius/general/general';
 import { ModelsApplicationConfig } from 'lib/api/lasius';
 import { getLoginMutationKey } from 'lib/api/lasius/oauth2-provider/oauth2-provider';
 
-const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig }> = ({ config }) => {
+const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig; locale?: string }> = ({
+  config,
+  locale,
+}) => {
   const plausible = usePlausible<LasiusPlausibleEvents>();
   const store = useStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -147,6 +150,7 @@ const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig }> = ({ con
       new URLSearchParams({
         invitation_id: invitation_id?.toString() || '',
         email: email?.toString() || '',
+        locale: locale || '',
       });
     router.replace(url);
   };
@@ -226,12 +230,14 @@ const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig }> = ({ con
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { locale = '' } = context;
+  const { locale, query } = context;
+  const resolvedLocale = query.locale?.toString() || locale;
   const config = await getConfiguration();
   return {
     props: {
       config: config,
-      ...(await serverSideTranslations(locale, ['common'])),
+      ...(await serverSideTranslations(resolvedLocale || '', ['common'])),
+      locale: resolvedLocale,
     },
   };
 };

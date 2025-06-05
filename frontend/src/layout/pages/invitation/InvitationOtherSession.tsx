@@ -51,7 +51,7 @@ export const InvitationOtherSession: React.FC<Props> = ({ invitation }) => {
 
   const handleSignOut = async () => {
     await signOut();
-    await router.reload();
+    router.reload();
   };
 
   return (
