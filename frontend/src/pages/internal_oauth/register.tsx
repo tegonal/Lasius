@@ -40,7 +40,7 @@ import { GetServerSideProps, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { AxiosError } from 'axios';
 
-export const OAuthUserRegister: NextPage = () => {
+export const OAuthUserRegister: NextPage<{ locale?: string }> = ({ locale }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPasswords, setShowPasswords] = useState(false);
   const [error, setError] = useState('');
@@ -106,6 +106,7 @@ export const OAuthUserRegister: NextPage = () => {
           new URLSearchParams({
             invitation_id: invitation_id?.toString() || '',
             email: data.email?.toString() || '',
+            locale: locale || '',
           });
         await router.replace(url);
       } else {
@@ -216,10 +217,12 @@ export const OAuthUserRegister: NextPage = () => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { locale = '' } = context;
+  const { locale, query } = context;
+  const resolvedLocale = query.locale?.toString() || locale;
   return {
     props: {
-      ...(await serverSideTranslations(locale, ['common'])),
+      ...(await serverSideTranslations(resolvedLocale || '', ['common'])),
+      locale: resolvedLocale,
     },
   };
 };

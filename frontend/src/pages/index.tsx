@@ -17,17 +17,19 @@
  *
  */
 
-import { NextPage } from 'next';
+import { GetServerSidePropsContext, NextPage } from 'next';
 
 const Index: NextPage = () => {
   return null;
 };
 
-export async function getServerSideProps() {
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const { locale, query } = context;
+  const resolvedLocale = query.locale || locale;
   return {
     redirect: {
       permanent: false,
-      destination: `/user/home`,
+      destination: `${resolvedLocale ? '/' + resolvedLocale : ''}/user/home`,
     },
   };
 }

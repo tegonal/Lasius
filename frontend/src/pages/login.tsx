@@ -50,7 +50,7 @@ import { LoginLayout } from 'layout/pages/login/loginLayout';
 import { getConfiguration } from 'lib/api/lasius/general/general';
 import { formatISOLocale } from 'lib/dates';
 import { LasiusPlausibleEvents } from 'lib/telemetry/plausibleEvents';
-import { GetServerSideProps, NextPage } from 'next';
+import { GetServerSidePropsContext, NextPage } from 'next';
 import { getProviders, getCsrfToken, signIn, ClientSafeProvider } from 'next-auth/react';
 import { Trans, useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -76,13 +76,15 @@ const loginErrorTranslations = [t('fetchProfileFailed'), t('OAuthCallbackError')
 const Login: NextPage<{
   csrfToken: string;
   providers: CustomizedClientSafeProvider[];
-}> = ({ csrfToken, providers }) => {
+  locale?: string;
+  defaultLocale?: string;
+}> = ({ csrfToken, providers, locale, defaultLocale }) => {
   const plausible = usePlausible<LasiusPlausibleEvents>();
   const store = useStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { t } = useTranslation('common');
   const router = useRouter();
-  const { invitation_id = null, email = null, error = null } = router.query;
+  const { invitation_id = null, email = null, error = null, callbackUrl = null } = router.query;
 
   const signInToProvider = useCallback(
     async (provider: string) => {
@@ -95,17 +97,23 @@ const Login: NextPage<{
 
       setIsSubmitting(true);
 
-      const callbackUrl = invitation_id ? '/join/' + invitation_id : '/user/home';
+      const localePath = `${locale ? '/' + locale : ''}`;
+      const resolvedCallbackUrl = invitation_id
+        ? `${localePath}/join/${invitation_id}`
+        : callbackUrl?.toString() || `${localePath}/user/home`;
       const res = await signIn(
         provider,
         {
           csrfToken: csrfToken,
           redirect: false,
-          callbackUrl: callbackUrl,
+          callbackUrl: resolvedCallbackUrl,
         },
         new URLSearchParams({
           email: email?.toString() || '',
           invitation_id: invitation_id?.toString() || '',
+          locale: locale || defaultLocale || '',
+          // so far we need to add the keycloak specific query parameter here as there is no other possiblity to map the locale somewhere else
+          kc_locale: locale || defaultLocale || '',
         })
       );
 
@@ -123,7 +131,7 @@ const Login: NextPage<{
         await router.push(res.url);
       }
     },
-    [csrfToken, email, invitation_id, plausible, router, store]
+    [csrfToken, email, invitation_id, plausible, router, store, locale, defaultLocale, callbackUrl]
   );
 
   useEffect(() => {
@@ -216,8 +224,9 @@ const Login: NextPage<{
   }
 };
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { locale = '' } = context;
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const { locale, query, defaultLocale } = context;
+  const resolvedLocale = query.locale?.toString() || locale;
   const providers = Object.values((await getProviders()) || []);
   const config = await getConfiguration();
   const availableProviders = providers
@@ -236,9 +245,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props: {
       csrfToken: await getCsrfToken(context),
       providers: availableProviders,
-      ...(await serverSideTranslations(locale, ['common'])),
+      ...(await serverSideTranslations(resolvedLocale || '', ['common'])),
+      locale: resolvedLocale,
+      defaultLocale,
     },
   };
-};
+}
 
 export default Login;
