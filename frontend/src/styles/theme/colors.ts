@@ -24,6 +24,8 @@ export const colorPalette1 = ['#256917', '#9fab76', '#716e20', '#9c3f31', '#7234
 export const colorPalette2 = ['#3C3852', '#368b84', '#8aa251', '#bc6f23', '#DA651D'];
 export const colorPalette3 = ['#363d6b', '#3371a4', '#44bf79', '#b2a149', '#D9832D'];
 
+export const combinedColorPalette = colorPalette1.concat(colorPalette2, colorPalette3);
+
 export const organisationAvatarPalette = ['#4a4343', '#52fbba', '#fffa45', '#ff1d00', '#723431'];
 export const projectAvatarPalette = ['#32911b', '#a9bb5a', '#8e8a1e', '#b03727', '#723431'];
 export const userAvatarPalette = ['#212020', '#0f455b', '#224431', '#836c02', '#D9832D'];
