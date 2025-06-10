@@ -17,13 +17,11 @@
  *
  */
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import { ResponsivePie } from '@nivo/pie';
 import React from 'react';
 import { nivoTheme } from 'components/charts/nivoTheme';
 import { NivoChartDataType } from 'types/common';
-import { colorPalette3 } from 'styles/theme/colors';
+import { colorById } from 'lib/chartColors';
 
 type Props = {
   stats: { data: NivoChartDataType | undefined };
@@ -36,7 +34,7 @@ const PieDiagram: React.FC<Props> = ({ stats /* see data tab */ }) => {
     <ResponsivePie
       data={data}
       theme={nivoTheme}
-      colors={colorPalette3}
+      colors={colorById}
       margin={{ top: 40, right: 80, bottom: 40, left: 80 }}
       innerRadius={0.5}
       padAngle={0.75}

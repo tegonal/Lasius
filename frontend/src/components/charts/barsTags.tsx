@@ -17,17 +17,18 @@
  *
  */
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
-
 import { ResponsiveBar } from '@nivo/bar';
 import React from 'react';
 import { NivoChartDataType } from 'types/common';
-import { colorPalette2 } from 'styles/theme/colors';
 import { nivoTheme } from 'components/charts/nivoTheme';
+import { colorById } from 'lib/chartColors';
 
 type Props = {
   stats: { data: NivoChartDataType | undefined };
+};
+
+const colorByWrappedDataId: (item: { data: { id?: string } }) => string = (item) => {
+  return colorById(item.data);
 };
 
 const BarsTags: React.FC<Props> = ({ stats }) => {
@@ -41,7 +42,7 @@ const BarsTags: React.FC<Props> = ({ stats }) => {
       layout="horizontal"
       enableGridX
       enableGridY={false}
-      colors={colorPalette2}
+      colors={colorByWrappedDataId}
       margin={{ top: 60, right: 50, bottom: 60, left: 110 }}
       padding={0.3}
       valueScale={{ type: 'linear' }}
@@ -50,7 +51,7 @@ const BarsTags: React.FC<Props> = ({ stats }) => {
         from: 'color',
         modifiers: [['brighter', 2]],
       }}
-      cornerRadius={3}
+      borderRadius={3}
       axisTop={{
         tickSize: 5,
         tickPadding: 5,
