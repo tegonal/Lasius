@@ -65,21 +65,18 @@ export const InputSelectAutocomplete: React.FC<Props> = ({
   };
 
   useEffect(() => {
-    if (!parentFormContext) return () => null;
-    const subscription = parentFormContext.watch((value, { name: fieldname }) => {
-      if (name === fieldname && value[name]) {
-        const preSelected = find(suggestions, { id: value[name] });
-        if (preSelected) {
-          setSelected(preSelected);
-          setInputText(preSelected.key);
-        }
+    if (!parentFormContext) return;
+    const formValue = parentFormContext.getValues()[name];
+    if (formValue) {
+      const preSelected = find(suggestions, { id: formValue });
+      if (preSelected) {
+        setSelected(preSelected);
+        setInputText(preSelected.key);
       }
-      if (name === fieldname && !value[name]) {
-        setSelected('');
-        setInputText('');
-      }
-    });
-    return () => subscription.unsubscribe();
+    } else {
+      setSelected('');
+      setInputText('');
+    }
   }, [name, parentFormContext, selected, suggestions]);
 
   const availableSuggestions = sortBy(

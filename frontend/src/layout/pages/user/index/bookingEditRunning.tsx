@@ -86,7 +86,7 @@ export const BookingEditRunning: React.FC<Props> = ({ item, onSave, onCancel }) 
       hookForm.setValue('start', formatISOLocale(new Date(item.start.dateTime)));
       hookForm.trigger();
     }
-  }, [hookForm, item.projectReference.id, item.tags, item.start.dateTime, item]);
+  }, [hookForm, item, item?.projectReference.id, item?.tags, item?.start.dateTime]);
 
   const onSubmit = async (data: any) => {
     const { projectId, tags = [], start } = data;
@@ -119,6 +119,7 @@ export const BookingEditRunning: React.FC<Props> = ({ item, onSave, onCancel }) 
         case 'projectId':
           if (value.projectId) {
             hookForm.setFocus('tags');
+            hookForm.trigger();
           }
           break;
         default:
@@ -143,8 +144,8 @@ export const BookingEditRunning: React.FC<Props> = ({ item, onSave, onCancel }) 
           <FormBody>
             <FormElement>
               <InputSelectAutocomplete
-                suggestions={projectSuggestions()}
                 name="projectId"
+                suggestions={projectSuggestions()}
                 required
               />
             </FormElement>
