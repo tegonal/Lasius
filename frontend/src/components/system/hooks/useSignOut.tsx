@@ -38,7 +38,7 @@ export const useSignOut = () => {
           status: 'success',
         },
       });
-      await signOut({ callbackUrl: '/login' });
+      await signOut();
     }
   };
 

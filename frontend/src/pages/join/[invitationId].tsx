@@ -28,7 +28,7 @@ import { getInvitationStatus } from 'lib/api/lasius/invitations-public/invitatio
 import { getServerSession, Session } from 'next-auth';
 import { nextAuthOptions } from 'pages/api/auth/[...nextauth]';
 
-const Join: NextPage<{ session: Session }> = ({ session }) => {
+const Join: NextPage<{ session: Session; locale?: string }> = ({ session, locale }) => {
   const router = useRouter();
   const { invitationId = '' } = router.query as { invitationId: string };
 
@@ -50,6 +50,7 @@ const Join: NextPage<{ session: Session }> = ({ session }) => {
       new URLSearchParams({
         invitation_id: invitation.invitation?.id,
         email: invitation.invitation?.invitedEmail,
+        locale: locale || '',
       });
     router.replace(url);
   }
@@ -68,12 +69,13 @@ const Join: NextPage<{ session: Session }> = ({ session }) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { locale = '' } = context;
-  const session = await getServerSession(context.req, context.res, nextAuthOptions);
+  const { locale } = context;
+  const session = await getServerSession(context.req, context.res, nextAuthOptions(locale));
   return {
     props: {
       session,
-      ...(await serverSideTranslations(locale, ['common'])),
+      ...(await serverSideTranslations(locale || '', ['common'])),
+      locale,
     },
   };
 };
