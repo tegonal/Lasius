@@ -86,7 +86,7 @@ libraryDependencies ++= Seq(
   ws,
   specs2 % Test,
   guice,
-  "org.webjars" % "swagger-ui" % "5.24.0"
+  "org.webjars" % "swagger-ui" % "5.24.1-1"
 )
 
 dependencyOverrides ++= Seq(
