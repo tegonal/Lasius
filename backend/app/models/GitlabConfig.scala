@@ -22,6 +22,7 @@
 package models
 
 import models.BaseFormat._
+import models.OrganisationId.OrganisationReference
 import play.api.libs.json._
 import reactivemongo.api.bson.BSONObjectID
 
@@ -48,15 +49,37 @@ case class GitlabProjectMapping(projectId: ProjectId,
 
 case class GitlabAuth(accessToken: String)
 
-case class GitlabConfig(_id: GitlabConfigId,
+case class GitlabConfig(id: GitlabConfigId,
+                        organisationReference: OrganisationReference,
                         name: String,
                         baseUrl: URL,
                         auth: GitlabAuth,
                         settings: GitlabSettings,
                         projects: Seq[GitlabProjectMapping])
-    extends BaseEntity[GitlabConfigId] {
-  val id: GitlabConfigId = _id
+    extends BaseEntity[GitlabConfigId]
+
+case class GitlabConfigCreate(name: String,
+                              baseUrl: URL,
+                              auth: GitlabAuth,
+                              settings: GitlabSettings) {
+  def buildConfig(organisationReference: OrganisationReference): GitlabConfig =
+    GitlabConfig(
+      id = GitlabConfigId(),
+      organisationReference = organisationReference,
+      name = name,
+      baseUrl = baseUrl,
+      auth = auth,
+      settings = settings,
+      projects = Seq()
+    )
 }
+
+case class GitlabConfigUpdate(id: GitlabConfigId,
+                              name: Option[String],
+                              baseUrl: Option[URL],
+                              auth: Option[GitlabAuth],
+                              settings: Option[GitlabSettings])
+    extends BaseEntity[GitlabConfigId]
 
 object GitlabConfigId {
   implicit val idFormat: Format[GitlabConfigId] =
@@ -69,12 +92,12 @@ object GitlabProjectMapping {
 }
 
 object GitlabSettings {
-  implicit val GitlabSettingsFormat: Format[GitlabSettings] =
+  implicit val gitlabSettingsFormat: Format[GitlabSettings] =
     Json.format[GitlabSettings]
 }
 
 object GitlabAuth {
-  implicit val GitlabAuthFormat: Format[GitlabAuth] = Json.format[GitlabAuth]
+  implicit val gitlabAuthFormat: Format[GitlabAuth] = Json.format[GitlabAuth]
 }
 
 object GitlabTagConfiguration {
@@ -88,6 +111,16 @@ object GitlabProjectSettings {
 }
 
 object GitlabConfig {
-  implicit val GitlabConfigFormat: Format[GitlabConfig] =
+  implicit val gitlabConfigFormat: Format[GitlabConfig] =
     Json.format[GitlabConfig]
+}
+
+object GitlabConfigCreate {
+  implicit val gitlabConfigCreateFormat: Format[GitlabConfigCreate] =
+    Json.format[GitlabConfigCreate]
+}
+
+object GitlabConfigUpdate {
+  implicit val gitlabConfigUpdateFormat: Format[GitlabConfigUpdate] =
+    Json.format[GitlabConfigUpdate]
 }

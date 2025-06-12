@@ -22,6 +22,7 @@
 package models
 
 import models.BaseFormat._
+import models.OrganisationId.OrganisationReference
 import play.api.libs.json._
 import reactivemongo.api.bson.BSONObjectID
 
@@ -39,6 +40,7 @@ case class JiraAuth(consumerKey: String,
                     privateKey: String,
                     accessToken: String)
 case class JiraConfig(_id: JiraConfigId,
+                      organisationReference: OrganisationReference,
                       name: String,
                       baseUrl: URL,
                       auth: JiraAuth,

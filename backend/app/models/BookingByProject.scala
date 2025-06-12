@@ -24,7 +24,7 @@ package models
 import models.OrganisationId.OrganisationReference
 import models.ProjectId.ProjectReference
 import models.UserId.UserReference
-import org.joda.time.{DateTime, Duration, LocalDate, LocalDateTime}
+import org.joda.time.{Duration, LocalDate}
 import play.api.libs.json.{Json, OFormat}
 import models.BaseFormat._
 

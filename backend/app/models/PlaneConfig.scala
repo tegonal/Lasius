@@ -22,6 +22,7 @@
 package models
 
 import models.BaseFormat._
+import models.OrganisationId.OrganisationReference
 import play.api.libs.json._
 import reactivemongo.api.bson.BSONObjectID
 
@@ -52,6 +53,7 @@ case class PlaneProjectMapping(projectId: ProjectId,
 case class PlaneAuth(apiKey: String)
 
 case class PlaneConfig(_id: PlaneConfigId,
+                       organisationReference: OrganisationReference,
                        name: String,
                        baseUrl: URL,
                        auth: PlaneAuth,

@@ -1013,6 +1013,52 @@ POST /invitations/:invitationId/decline                 controllers.InvitationsC
 GET /invitations/:invitationId/status               controllers.InvitationsController.getStatus(invitationId: models.InvitationId)
 
 #######
+####### Integration configuration endpoints #######
+#######
+
+####### Gitlab #######
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - integrations-gitlab
+#  summary: get list of gitlab integrations
+#  operationId: getGitlabConfigurations
+#  responses:
+#    200:
+#      description: success
+#      content:
+#        application/json:
+#          schema:
+#             type: array
+#             items:
+#               $ref: '#/components/schemas/models.GitlabConfig'
+###
+GET /organisations/:orgId/integrations/gitlab               controllers.integrations.GitlabConfigController.list(orgId: models.OrganisationId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - integrations-gitlab
+#  operationId: updateGitlabConfiguration
+#  requestBody:
+#    content:
+#      application/json:
+#        schema:
+#          $ref: '#/components/schemas/models.GitlabConfigUpdate'
+#  responses:
+#    200:
+#      description: success
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.Invitation'
+###
+POST /organisations/:orgId/integrations/gitlab/:gitlabId                 controllers.integrations.GitlabConfigController.update(orgId: models.OrganisationId)
+
+#######
 ####### Static Files #######
 #######
 
