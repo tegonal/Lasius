@@ -1135,6 +1135,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.27.6":
+  version: 7.27.6
+  resolution: "@babel/runtime@npm:7.27.6"
+  checksum: 10/cc957a12ba3781241b83d528eb69ddeb86ca5ac43179a825e83aa81263a6b3eb88c57bed8a937cdeacfc3192e07ec24c73acdfea4507d0c0428c8e23d6322bfe
+  languageName: node
+  linkType: hard
+
 "@babel/template@npm:^7.25.9, @babel/template@npm:^7.26.9, @babel/template@npm:^7.27.0":
   version: 7.27.0
   resolution: "@babel/template@npm:7.27.0"
@@ -10572,10 +10579,10 @@ __metadata:
   linkType: hard
 
 "react-i18next@npm:^15.5.2":
-  version: 15.5.2
-  resolution: "react-i18next@npm:15.5.2"
+  version: 15.6.0
+  resolution: "react-i18next@npm:15.6.0"
   dependencies:
-    "@babel/runtime": "npm:^7.25.0"
+    "@babel/runtime": "npm:^7.27.6"
     html-parse-stringify: "npm:^3.0.1"
   peerDependencies:
     i18next: ">= 23.2.3"
@@ -10588,7 +10595,7 @@ __metadata:
       optional: true
     typescript:
       optional: true
-  checksum: 10/16e2e71177290ec3e3ca71403d101c511e0a0111f6eaabf5a84477fb5588cc83e27e5fc23d5f4404e6d3ca9f187752c349dd827d386218add27a169e9930fc63
+  checksum: 10/d8549c364eb32ea078be0e87df35ee23b8c9d6a30af4fe2a41099c12f62b5ce4268f9997132a9b5abcb4556e30fb37f4ba7f5548429333548b5b9856627c6a50
   languageName: node
   linkType: hard
 
