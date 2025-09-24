@@ -164,12 +164,11 @@ async function handleAuthMiddleware(
 
 export async function middleware(request: NextRequest) {
   return await handleAuthMiddleware(request, undefined, async (token) => {
-    return withAuthMiddleware({
-      ...request,
+    return withAuthMiddleware(Object.assign(request, {
       nextauth: {
         token,
       },
-    } as NextRequestWithAuth);
+    }) as NextRequestWithAuth);
   });
 }
 

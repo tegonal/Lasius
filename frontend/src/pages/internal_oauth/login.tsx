@@ -232,7 +232,22 @@ const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig; locale?: s
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { locale, query } = context;
   const resolvedLocale = query.locale?.toString() || locale;
-  const config = await getConfiguration();
+
+  let config;
+  try {
+    config = await getConfiguration();
+  } catch (error) {
+    console.error('Failed to fetch configuration from backend:', error);
+    // Provide a default config when backend is unavailable
+    config = {
+      title: 'Lasius',
+      instance: 'local',
+      lasiusOAuthProviderEnabled: false,
+      lasiusOAuthProviderAllowUserRegistration: false,
+      allowedIssuers: []
+    };
+  }
+
   return {
     props: {
       config: config,

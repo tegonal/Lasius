@@ -61,8 +61,8 @@ export const lasiusAxiosInstance = <T>(
         } else if (error.response?.status === 401) {
           if (process.env.LASIUS_DEBUG) {
             logger.debug('[lasiusAxiosInstance][Unauthorized]', {
-              path: error.request.pathname,
-              message: error.data,
+              path: error.request?.pathname,
+              message: error.response?.data,
             });
           }
           if (
@@ -73,7 +73,7 @@ export const lasiusAxiosInstance = <T>(
             config.headers?.Authorization
           ) {
             if (process.env.LASIUS_DEBUG) {
-              logger.debug('[lasiusAxiosInstance][TokenNotValidAnymore]', error.status);
+              logger.debug('[lasiusAxiosInstance][TokenNotValidAnymore]', error.response?.status);
             }
 
             // try to load session from middleware
@@ -95,9 +95,9 @@ export const lasiusAxiosInstance = <T>(
             throw error;
           } else {
             if (process.env.LASIUS_DEBUG) {
-              logger.info('[lasiusAxiosInstance][Unauthorized]', error.status);
+              logger.info('[lasiusAxiosInstance][Unauthorized]', error.response?.status);
             }
-            throw new Error(error);
+            throw error;
           }
         } else {
           throw error;

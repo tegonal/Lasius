@@ -228,7 +228,19 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const { locale, query, defaultLocale } = context;
   const resolvedLocale = query.locale?.toString() || locale;
   const providers = Object.values((await getProviders()) || []);
-  const config = await getConfiguration();
+
+  let config;
+  try {
+    config = await getConfiguration();
+  } catch (error) {
+    console.error('Failed to fetch configuration from backend:', error);
+    // Provide a default config when backend is unavailable
+    config = {
+      lasiusOAuthProviderEnabled: false,
+      lasiusOAuthProviderAllowUserRegistration: false
+    };
+  }
+
   const availableProviders = providers
     .filter((p) => p.id !== AUTH_PROVIDER_INTERNAL_LASIUS || config.lasiusOAuthProviderEnabled)
     .map((p) => {
