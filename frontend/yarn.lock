@@ -7327,11 +7327,11 @@ __metadata:
   linkType: hard
 
 "framer-motion@npm:^12.16.0":
-  version: 12.16.0
-  resolution: "framer-motion@npm:12.16.0"
+  version: 12.23.22
+  resolution: "framer-motion@npm:12.23.22"
   dependencies:
-    motion-dom: "npm:^12.16.0"
-    motion-utils: "npm:^12.12.1"
+    motion-dom: "npm:^12.23.21"
+    motion-utils: "npm:^12.23.6"
     tslib: "npm:^2.4.0"
   peerDependencies:
     "@emotion/is-prop-valid": "*"
@@ -7344,7 +7344,7 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 10/039d17448643bdaa62442158766e08b62b89951279f7c3275d69db7279c1c988a1ed1f17fe656d26d6a16f07dfed36ac1368680b2c6ab92c0aea6aec1a5fceff
+  checksum: 10/ea16b23a7587634e42a5fd0ac0fafaaee34ec720947f9cd4c7f80d7e8a68c3371df43309c1216302387b7d3682d132c27d376b2b63628df56270539046c3acda
   languageName: node
   linkType: hard
 
@@ -9396,19 +9396,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"motion-dom@npm:^12.16.0":
-  version: 12.16.0
-  resolution: "motion-dom@npm:12.16.0"
+"motion-dom@npm:^12.23.21":
+  version: 12.23.21
+  resolution: "motion-dom@npm:12.23.21"
   dependencies:
-    motion-utils: "npm:^12.12.1"
-  checksum: 10/0b41e01f82f780a27064ae27b76b2b643a962a0af19178110bd0e67c7fb1ce0973dc0ed37392eda462baabb6da23ef2be6d63853faebb4eeebca6130f6c7b82d
+    motion-utils: "npm:^12.23.6"
+  checksum: 10/567b9926f28cc1e3cd2df27384fe39a86b51f557362f7b9c00f478d2abb64a0866a6cfadc6d4d546c767ad749029251ef076fa492de88637099b3d7ed82bc307
   languageName: node
   linkType: hard
 
-"motion-utils@npm:^12.12.1":
-  version: 12.12.1
-  resolution: "motion-utils@npm:12.12.1"
-  checksum: 10/679503df10a1cd7ad58f9ed2f864acb5ecbadf380a668874f0cc6bdc1155278bac0cce73e3f703df19532f2bd922e3500fde179e8f76386e9651f8b1bd0cfe6d
+"motion-utils@npm:^12.23.6":
+  version: 12.23.6
+  resolution: "motion-utils@npm:12.23.6"
+  checksum: 10/fae741319e72389eca8f3e73e644ffe6501409d00c7febb2f9b836629ae86ef735e73d670d0591706ca5e93ce10228ddbcff0ecdeb09b4cd8df14df7007aedd9
   languageName: node
   linkType: hard
 
