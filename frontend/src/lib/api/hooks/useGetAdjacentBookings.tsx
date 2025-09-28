@@ -17,30 +17,30 @@
  *
  */
 
-import { apiTimespanDay } from 'lib/api/apiDateHandling';
-import { useGetUserBookingListByOrganisation } from 'lib/api/lasius/user-bookings/user-bookings';
-import { useMemo } from 'react';
-import { useOrganisation } from 'lib/api/hooks/useOrganisation';
-import { ModelsBooking } from 'lib/api/lasius';
-import { sortBookingsByDate } from 'lib/api/functions/sortBookingsByDate';
-import { formatISOLocale } from 'lib/dates';
+import { apiTimespanDay } from 'lib/api/apiDateHandling'
+import { sortBookingsByDate } from 'lib/api/functions/sortBookingsByDate'
+import { useOrganisation } from 'lib/api/hooks/useOrganisation'
+import { ModelsBooking } from 'lib/api/lasius'
+import { useGetUserBookingListByOrganisation } from 'lib/api/lasius/user-bookings/user-bookings'
+import { formatISOLocale } from 'lib/utils/date/dates'
+import { useMemo } from 'react'
 
 export const useGetAdjacentBookings = (item: ModelsBooking | undefined) => {
-  const { selectedOrganisationId } = useOrganisation();
+  const { selectedOrganisationId } = useOrganisation()
   const { data: bookings } = useGetUserBookingListByOrganisation(
     selectedOrganisationId,
-    apiTimespanDay(item?.start.dateTime || formatISOLocale(new Date()))
-  );
+    apiTimespanDay(item?.start.dateTime || formatISOLocale(new Date())),
+  )
 
-  const sorted = sortBookingsByDate(bookings || []);
-  const indexCurrent = sorted.findIndex((b) => b.id === item?.id);
+  const sorted = sortBookingsByDate(bookings || [])
+  const indexCurrent = sorted.findIndex((b) => b.id === item?.id)
   const data = useMemo(
     () => ({
       previous: sorted[indexCurrent + 1] || null,
       next: sorted[indexCurrent - 1] || null,
     }),
-    [sorted, indexCurrent]
-  );
+    [sorted, indexCurrent],
+  )
 
-  return data;
-};
+  return data
+}

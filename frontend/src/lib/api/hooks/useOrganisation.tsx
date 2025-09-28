@@ -17,39 +17,59 @@
  *
  */
 
-import { ModelsEntityReference } from 'lib/api/lasius';
-import { ROLES } from 'projectConfig/constants';
-import { useProfile } from 'lib/api/hooks/useProfile';
+import { useProfile } from 'lib/api/hooks/useProfile'
+import { ModelsEntityReference } from 'lib/api/lasius'
+import { ROLES } from 'projectConfig/constants'
+import { useCallback, useEffect } from 'react'
+import { useOrganisationStore, useSelectedOrganisationId } from 'stores/organisationStore'
 
 export const useOrganisation = () => {
-  const { profile: data, updateSettings } = useProfile();
+  const { profile: data, updateSettings } = useProfile()
 
-  const setSelectedOrganisation = async (organisationReference: ModelsEntityReference) => {
-    if (organisationReference) {
-      await updateSettings({ lastSelectedOrganisation: organisationReference });
-    }
-  };
+  // Use Zustand store for selectedOrganisationId
+  const selectedOrganisationId = useSelectedOrganisationId()
+  const setSelectedOrganisationIdStore = useOrganisationStore(
+    (state) => state.setSelectedOrganisationId,
+  )
 
-  let lastSelectedOrganisationId = data?.settings.lastSelectedOrganisation?.id;
-  if (!lastSelectedOrganisationId) {
-    const myPrivateOrg = data?.organisations.filter((item) => item.private)[0]
-      .organisationReference;
-    if (myPrivateOrg) {
-      setSelectedOrganisation(myPrivateOrg);
-      lastSelectedOrganisationId = myPrivateOrg.id;
+  const setSelectedOrganisation = useCallback(
+    async (organisationReference: ModelsEntityReference) => {
+      if (organisationReference) {
+        // Update both backend and local store
+        await updateSettings({ lastSelectedOrganisation: organisationReference })
+        setSelectedOrganisationIdStore(organisationReference.id)
+      }
+    },
+    [updateSettings, setSelectedOrganisationIdStore],
+  )
+
+  // Initialize organisation ID on first load if not set
+  useEffect(() => {
+    if (!selectedOrganisationId && data?.settings.lastSelectedOrganisation?.id) {
+      // Set from user's lastSelectedOrganisation
+      setSelectedOrganisationIdStore(data.settings.lastSelectedOrganisation.id)
+    } else if (!selectedOrganisationId && data?.organisations) {
+      // Fallback to private organisation
+      const myPrivateOrg = data.organisations.filter((item) => item.private)[0]
+        ?.organisationReference
+      if (myPrivateOrg) {
+        setSelectedOrganisationIdStore(myPrivateOrg.id)
+        // Also update backend
+        setSelectedOrganisation(myPrivateOrg)
+      }
     }
-  }
+  }, [data, selectedOrganisationId, setSelectedOrganisationIdStore, setSelectedOrganisation])
 
   const selectedOrganisation = data?.organisations.find(
-    (org) => org.organisationReference.id === lastSelectedOrganisationId
-  );
+    (org) => org.organisationReference.id === selectedOrganisationId,
+  )
 
   return {
-    selectedOrganisationId: selectedOrganisation?.organisationReference?.id || '',
+    selectedOrganisationId: selectedOrganisationId || '',
     selectedOrganisationKey: selectedOrganisation?.organisationReference?.key || '',
     selectedOrganisation,
     organisations: data?.organisations || [],
     setSelectedOrganisation,
     isAdministrator: selectedOrganisation?.role === ROLES.ORGANISATION_ADMIN,
-  };
-};
+  }
+}

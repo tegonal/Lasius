@@ -17,10 +17,10 @@
  *
  */
 
-import { ModelsBooking } from 'lib/api/lasius';
-import { format } from 'date-fns';
-import { DATE_FORMAT_SHORT, durationAsString, durationInHoursAsNumber } from 'lib/dates';
-import { TIME_FORMAT } from 'projectConfig/dateFormat';
+import { format } from 'date-fns'
+import { ModelsBooking } from 'lib/api/lasius'
+import { TIME_FORMAT } from 'lib/utils/date/dateFormat'
+import { DATE_FORMAT_SHORT, durationAsString, durationInHoursAsNumber } from 'lib/utils/date/dates'
 
 export const getExtendedModelsBookingList = (list: ModelsBooking[]) =>
   list.map((booking) => {
@@ -29,9 +29,9 @@ export const getExtendedModelsBookingList = (list: ModelsBooking[]) =>
       date: format(new Date(booking.start.dateTime), DATE_FORMAT_SHORT),
       fromTo: `${format(new Date(booking.start.dateTime), TIME_FORMAT)} - ${format(
         new Date(booking.end?.dateTime || ''),
-        TIME_FORMAT
+        TIME_FORMAT,
       )}`,
       duration: durationInHoursAsNumber(booking.start.dateTime, booking.end?.dateTime || ''),
       durationString: durationAsString(booking.start.dateTime, booking.end?.dateTime || ''),
-    };
-  });
+    }
+  })

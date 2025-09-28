@@ -26,6 +26,6 @@
  */
 
 export interface ModelsEntityReferenceModelsUserId {
-  id: string;
-  key: string;
+  id: string
+  key: string
 }

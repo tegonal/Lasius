@@ -17,19 +17,19 @@
  *
  */
 
-import { ModelsUser } from 'lib/api/lasius';
-import { ROLES } from 'projectConfig/constants';
+import { ModelsUser } from 'lib/api/lasius'
+import { ROLES } from 'projectConfig/constants'
 
 export const isAdminOfProject = (
   profile: ModelsUser | undefined,
   organisationId: string,
-  projectId: string
+  projectId: string,
 ) => {
   const selectedOrganisation = profile?.organisations.find(
-    (org) => org.organisationReference.id === organisationId
-  );
+    (org) => org.organisationReference.id === organisationId,
+  )
   const selectProject = selectedOrganisation?.projects.find(
-    (proj) => proj.projectReference.id === projectId
-  );
-  return selectProject?.role === ROLES.PROJECT_ADMIN;
-};
+    (proj) => proj.projectReference.id === projectId,
+  )
+  return selectProject?.role === ROLES.PROJECT_ADMIN
+}

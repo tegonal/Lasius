@@ -27,6 +27,6 @@
 
 export interface ModelsInvitationResult {
   /** @nullable */
-  invitationLinkId?: string | null;
-  email: string;
+  invitationLinkId?: string | null
+  email: string
 }

@@ -19,12 +19,12 @@
 
 export const getRequestHeaders = (token?: string, tokenIssuer?: string) => {
   if (!token) {
-    return {};
+    return {}
   }
   return {
     headers: {
       Authorization: `Bearer ${token}`,
       'X-Token-Issuer': tokenIssuer,
     },
-  };
-};
+  }
+}

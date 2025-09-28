@@ -26,10 +26,10 @@
  */
 
 export interface ModelsOAuthUserRegistration {
-  email: string;
-  password: string;
+  email: string
+  password: string
   /** @nullable */
-  firstName?: string | null;
+  firstName?: string | null
   /** @nullable */
-  lastName?: string | null;
+  lastName?: string | null
 }

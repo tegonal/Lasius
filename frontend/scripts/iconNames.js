@@ -17,13 +17,13 @@
  *
  */
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const fs = require('fs');
 
 const directory = './public/icons';
 const filesUnclean = fs.readdirSync(directory);
 
-// eslint-disable-next-line no-restricted-syntax
+ 
 for (const file of filesUnclean) {
   if (file.endsWith('.SVG') || file.startsWith('streamlinehq-') || file.includes('')) {
     fs.renameSync(
@@ -36,7 +36,7 @@ for (const file of filesUnclean) {
 const filesCleaned = fs.readdirSync(directory);
 
 const names = filesCleaned
-  .filter((item) => !/(^|\/)\.[^\/\.]/g.test(item))
+  .filter((item) => !/(^|\/)\.([^/.])/g.test(item))
   .filter((item) => item !== 'default.svg')
   .map((name) => `'${name.replace('.svg', '')}'`);
 

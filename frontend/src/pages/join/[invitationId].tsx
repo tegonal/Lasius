@@ -17,33 +17,33 @@
  *
  */
 
-import { GetServerSideProps, NextPage } from 'next';
-import { useRouter } from 'next/router';
-import { InvitationInvalid } from 'layout/pages/invitation/invitationInvalid';
-import { InvitationUserConfirm } from 'layout/pages/invitation/invitationUserConfirm';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { InvitationOtherSession } from 'layout/pages/invitation/InvitationOtherSession';
-import { useAsync } from 'react-async-hook';
-import { getInvitationStatus } from 'lib/api/lasius/invitations-public/invitations-public';
-import { getServerSession, Session } from 'next-auth';
-import { nextAuthOptions } from 'pages/api/auth/[...nextauth]';
+import { InvitationInvalid } from 'components/features/invitation/invitationInvalid'
+import { InvitationOtherSession } from 'components/features/invitation/InvitationOtherSession'
+import { InvitationUserConfirm } from 'components/features/invitation/invitationUserConfirm'
+import { getInvitationStatus } from 'lib/api/lasius/invitations-public/invitations-public'
+import { GetServerSideProps, NextPage } from 'next'
+import { getServerSession, Session } from 'next-auth'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { useRouter } from 'next/router'
+import { nextAuthOptions } from 'pages/api/auth/[...nextauth]'
+import { useAsync } from 'react-async-hook'
 
 const Join: NextPage<{ session: Session; locale?: string }> = ({ session, locale }) => {
-  const router = useRouter();
-  const { invitationId = '' } = router.query as { invitationId: string };
+  const router = useRouter()
+  const { invitationId = '' } = router.query as { invitationId: string }
 
-  const invitationStatus = useAsync((id: string) => getInvitationStatus(id), [invitationId]);
+  const invitationStatus = useAsync((id: string) => getInvitationStatus(id), [invitationId])
 
-  if (invitationStatus.loading) return null;
+  if (invitationStatus.loading) return null
 
   if (invitationStatus.status === 'error') {
-    return <InvitationInvalid />;
+    return <InvitationInvalid />
   }
 
-  const invitation = invitationStatus.result;
+  const invitation = invitationStatus.result
 
   if (invitation?.invitation?.id && invitation?.invitation?.invitedEmail && session === null) {
-    console.log('[join][notAuthenticated]]', session);
+    console.log('[join][notAuthenticated]]', session)
     // login user and handle invitation logic again
     const url =
       '/login?' +
@@ -51,33 +51,33 @@ const Join: NextPage<{ session: Session; locale?: string }> = ({ session, locale
         invitation_id: invitation.invitation?.id,
         email: invitation.invitation?.invitedEmail,
         locale: locale || '',
-      });
-    router.replace(url);
+      })
+    router.replace(url)
   }
 
   if (invitation && session !== null) {
     // check if invitation matches current users session
     if (session.user && session.user.email !== invitation.invitation.invitedEmail) {
-      return <InvitationOtherSession invitation={invitation} />;
+      return <InvitationOtherSession invitation={invitation} />
     }
 
     // handle invite for logged in user, confirm
-    return <InvitationUserConfirm invitation={invitation} />;
+    return <InvitationUserConfirm invitation={invitation} />
   }
 
-  return null;
-};
+  return null
+}
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { locale } = context;
-  const session = await getServerSession(context.req, context.res, nextAuthOptions(locale));
+  const { locale } = context
+  const session = await getServerSession(context.req, context.res, nextAuthOptions(locale))
   return {
     props: {
       session,
       ...(await serverSideTranslations(locale || '', ['common'])),
       locale,
     },
-  };
-};
+  }
+}
 
-export default Join;
+export default Join

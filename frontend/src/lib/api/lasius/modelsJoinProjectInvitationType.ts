@@ -26,9 +26,8 @@
  */
 
 export type ModelsJoinProjectInvitationType =
-  (typeof ModelsJoinProjectInvitationType)[keyof typeof ModelsJoinProjectInvitationType];
+  (typeof ModelsJoinProjectInvitationType)[keyof typeof ModelsJoinProjectInvitationType]
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ModelsJoinProjectInvitationType = {
   JoinProjectInvitation: 'JoinProjectInvitation',
-} as const;
+} as const

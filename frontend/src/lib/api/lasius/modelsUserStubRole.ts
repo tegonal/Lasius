@@ -25,10 +25,9 @@
  * OpenAPI spec version: 2.0.0+4-3a603fde+20250602-1535
  */
 
-export type ModelsUserStubRole = (typeof ModelsUserStubRole)[keyof typeof ModelsUserStubRole];
+export type ModelsUserStubRole = (typeof ModelsUserStubRole)[keyof typeof ModelsUserStubRole]
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ModelsUserStubRole = {
   FreeUser: 'FreeUser',
   Administrator: 'Administrator',
-} as const;
+} as const

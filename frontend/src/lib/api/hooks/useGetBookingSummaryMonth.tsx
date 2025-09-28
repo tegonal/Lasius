@@ -17,17 +17,17 @@
  *
  */
 
-import { isToday } from 'date-fns';
-import { apiTimespanMonth, IsoDateString } from 'lib/api/apiDateHandling';
-import { useGetUserBookingListByOrganisation } from 'lib/api/lasius/user-bookings/user-bookings';
-import { useMemo } from 'react';
-import { UI_SLOW_DATA_DEDUPE_INTERVAL } from 'projectConfig/intervals';
-import { useOrganisation } from 'lib/api/hooks/useOrganisation';
-import { getModelsBookingSummary } from 'lib/api/functions/getModelsBookingSummary';
+import { isToday } from 'date-fns'
+import { apiTimespanMonth, IsoDateString } from 'lib/api/apiDateHandling'
+import { getModelsBookingSummary } from 'lib/api/functions/getModelsBookingSummary'
+import { useOrganisation } from 'lib/api/hooks/useOrganisation'
+import { useGetUserBookingListByOrganisation } from 'lib/api/lasius/user-bookings/user-bookings'
+import { UI_SLOW_DATA_DEDUPE_INTERVAL } from 'projectConfig/intervals'
+import { useMemo } from 'react'
 
 export const useGetBookingSummaryMonth = (date: IsoDateString) => {
-  const { selectedOrganisationId } = useOrganisation();
-  const day = new Date(date);
+  const { selectedOrganisationId } = useOrganisation()
+  const day = new Date(date)
 
   const { data: bookings } = useGetUserBookingListByOrganisation(
     selectedOrganisationId,
@@ -39,12 +39,12 @@ export const useGetBookingSummaryMonth = (date: IsoDateString) => {
         revalidateIfStale: isToday(day),
         dedupingInterval: isToday(day) ? 2000 : UI_SLOW_DATA_DEDUPE_INTERVAL,
       },
-    }
-  );
+    },
+  )
 
-  const summary = useMemo(() => getModelsBookingSummary(bookings || []), [bookings]);
+  const summary = useMemo(() => getModelsBookingSummary(bookings || []), [bookings])
 
   return {
     ...summary,
-  };
-};
+  }
+}

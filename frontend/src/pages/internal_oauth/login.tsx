@@ -17,47 +17,46 @@
  *
  */
 
-import React, { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { Button, Input, Label } from 'theme-ui';
-import { isEmailAddress } from 'lib/validators';
-import { GetServerSideProps, NextPage } from 'next';
-import { FormErrorBadge } from 'components/forms/formErrorBadge';
-import { CardContainer } from 'components/cardContainer';
-import { LoginLayout } from 'layout/pages/login/loginLayout';
-import { Logo } from 'components/logo';
-import { FormElement } from 'components/forms/formElement';
-import { FormBody } from 'components/forms/formBody';
-import { BoxWarning } from 'components/shared/notifications/boxWarning';
-import { useRouter } from 'next/router';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { Trans, useTranslation } from 'next-i18next';
-import { LoginError } from 'dynamicTranslationStrings';
-import { logger } from 'lib/logger';
-import { TegonalFooter } from 'components/shared/tegonalFooter';
-import { BoxInfo } from 'components/shared/notifications/boxInfo';
-import { P } from 'components/tags/p';
-import { Link } from '@theme-ui/components';
-import { LASIUS_DEMO_MODE } from 'projectConfig/constants';
-import { usePlausible } from 'next-plausible';
-import { LasiusPlausibleEvents } from 'lib/telemetry/plausibleEvents';
-import { useStore } from 'storeContext/store';
-import { formatISOLocale } from 'lib/dates';
-import { LASIUS_API_URL } from 'projectConfig/constants';
-import { getConfiguration } from 'lib/api/lasius/general/general';
-import { ModelsApplicationConfig } from 'lib/api/lasius';
-import { getLoginMutationKey } from 'lib/api/lasius/oauth2-provider/oauth2-provider';
+import { LoginLayout } from 'components/features/login/loginLayout'
+import { Button } from 'components/primitives/buttons/Button'
+import { Input } from 'components/primitives/inputs/Input'
+import { Label } from 'components/primitives/typography/Label'
+import { P } from 'components/primitives/typography/Paragraph'
+import { Card, CardBody } from 'components/ui/cards/Card'
+import { Alert } from 'components/ui/feedback/Alert'
+import { FormBody } from 'components/ui/forms/formBody'
+import { FormButtonContainer } from 'components/ui/forms/formButtonContainer'
+import { FormElement } from 'components/ui/forms/formElement'
+import { FormErrorBadge } from 'components/ui/forms/formErrorBadge'
+import { Logo } from 'components/ui/icons/Logo'
+import { TegonalFooter } from 'components/ui/navigation/TegonalFooter'
+import { LoginError } from 'dynamicTranslationStrings'
+import { ModelsApplicationConfig } from 'lib/api/lasius'
+import { getConfiguration } from 'lib/api/lasius/general/general'
+import { getLoginMutationKey } from 'lib/api/lasius/oauth2-provider/oauth2-provider'
+import { logger } from 'lib/logger'
+import { LasiusPlausibleEvents } from 'lib/telemetry/plausibleEvents'
+import { usePlausible } from 'lib/telemetry/usePlausible'
+import { isEmailAddress } from 'lib/utils/data/validators'
+import { formatISOLocale } from 'lib/utils/date/dates'
+import { GetServerSideProps, NextPage } from 'next'
+import { Trans, useTranslation } from 'next-i18next'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { useRouter } from 'next/router'
+import { LASIUS_API_URL, LASIUS_DEMO_MODE } from 'projectConfig/constants'
+import React, { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { useCalendarActions } from 'stores/calendarStore'
 
 const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig; locale?: string }> = ({
   config,
   locale,
 }) => {
-  const plausible = usePlausible<LasiusPlausibleEvents>();
-  const store = useStore();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<keyof typeof LoginError>();
-  const { t } = useTranslation('common');
-  const router = useRouter();
+  const plausible = usePlausible<LasiusPlausibleEvents>()
+  const { setSelectedDate } = useCalendarActions()
+  const [error, setError] = useState<keyof typeof LoginError>()
+  const { t } = useTranslation('common')
+  const router = useRouter()
   const {
     email = undefined,
     invitation_id = undefined,
@@ -68,7 +67,7 @@ const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig; locale?: s
     code_challenge = undefined,
     code_challenge_method = undefined,
     state = undefined,
-  } = router.query;
+  } = router.query
 
   const {
     register,
@@ -80,22 +79,21 @@ const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig; locale?: s
   } = useForm({
     mode: 'onChange',
     defaultValues: { email: email || '', password: '' },
-  });
+  })
 
   useEffect(() => {
-    setFocus('email');
-  }, [setFocus]);
+    setFocus('email')
+  }, [setFocus])
 
   const onSubmit = async () => {
     plausible('internalOAuthLogin', {
       props: {
         status: 'start',
       },
-    });
+    })
 
-    const data = getValues();
-    setIsSubmitting(true);
-    setError(undefined);
+    const data = getValues()
+    setError(undefined)
 
     // We need to use fetch here as on client side the
     // browser will automatically follow the redirect when resolving the
@@ -116,32 +114,31 @@ const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig; locale?: s
       headers: {
         'Content-type': 'application/json; charset=UTF-8',
       },
-    });
+    })
 
-    setIsSubmitting(false);
     if (res?.status === 401) {
-      setError('usernameOrPasswordWrong');
-      setValue('password', '');
-      setFocus('email');
+      setError('usernameOrPasswordWrong')
+      setValue('password', '')
+      setFocus('email')
       plausible('internalOAuthLogin', {
         props: {
           status: 'failed',
         },
-      });
-      logger.info(res);
+      })
+      logger.info(res)
     } else if (res?.ok && res?.url) {
       plausible('internalOAuthLogin', {
         props: {
           status: 'success',
         },
-      });
+      })
 
-      store.dispatch({ type: 'calendar.setSelectedDate', payload: formatISOLocale(new Date()) });
+      setSelectedDate(formatISOLocale(new Date()))
 
       // force redirect through browser to correctly re-initialize users session
-      window.location.href = res.url;
+      window.location.href = res.url
     }
-  };
+  }
 
   const onRegister = async () => {
     // login user and handle invitation logic again
@@ -151,101 +148,131 @@ const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig; locale?: s
         invitation_id: invitation_id?.toString() || '',
         email: email?.toString() || '',
         locale: locale || '',
-      });
-    router.replace(url);
-  };
+      })
+    void router.replace(url)
+  }
 
   return (
     <LoginLayout>
-      <Logo />
-      {error && <BoxWarning>{LoginError[error]}</BoxWarning>}
+      {error && (
+        <Alert variant="warning" className="max-w-md">
+          {LoginError[error]}
+        </Alert>
+      )}
       {registered && (
-        <BoxInfo>
-          {t(
-            'Thank you for registering. You can now log in using your email address and password. Welcome to Lasius!'
-          )}
-        </BoxInfo>
+        <Alert variant="info" className="max-w-md">
+          {t('auth.thankYouForRegistering', {
+            defaultValue:
+              'Thank you for registering. You can now log in using your email address and password. Welcome to Lasius!',
+          })}
+        </Alert>
       )}
       {LASIUS_DEMO_MODE === 'true' && (
-        <BoxInfo>
-          <P>
-            {t(
-              'Welcome to the Lasius demo instance. Use "demo1@lasius.ch" and password "demo" to log in and have a look around. The demo instance is reset once a day.'
-            )}
-          </P>
-          <P>
-            <Trans
-              t={t}
-              i18nKey="We appreciate your feedback. Please leave a comment on <0>GitHub</0>"
-              components={[
-                <Link key="gitHubLink" target="_blank" href="https://github.com/tegonal/lasius" />,
-              ]}
-            />
-          </P>
-        </BoxInfo>
+        <Alert variant="info" className="max-w-md">
+          <div className="max-w-lg">
+            <P>
+              {t('demo.welcome', {
+                defaultValue:
+                  'Welcome to the Lasius demo instance. Use "demo1@lasius.ch" and password "demo" to log in and have a look around. The demo instance is reset once a day.',
+              })}
+            </P>
+            <P>
+              <Trans
+                t={t}
+                i18nKey="footer.feedbackOnGithub"
+                defaults="We appreciate your feedback. Please leave a comment on <0>GitHub</0>"
+                components={[
+                  <a
+                    key="gitHubLink"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href="https://github.com/tegonal/lasius"
+                    className="text-primary hover:underline"
+                  />,
+                ]}
+              />
+            </P>
+          </div>
+        </Alert>
       )}
-      <CardContainer>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <FormBody>
-            <FormElement>
-              <Label htmlFor="email">{t('E-Mail')}</Label>
-              <Input
-                {...register('email', {
-                  required: true,
-                  validate: { isEmailAddress: (v) => isEmailAddress(v.toString()) },
-                })}
-                autoComplete="off"
-                autoFocus
-                type="email"
-              />
-              <FormErrorBadge error={errors.email} />
-            </FormElement>
-            <FormElement>
-              <Label htmlFor="password">{t('Password')}</Label>
-              <Input
-                {...register('password', { required: true })}
-                type="password"
-                autoComplete="off"
-              />
-              <FormErrorBadge error={errors.password} />
-            </FormElement>
-            <FormElement>
-              <Button disabled={isSubmitting} type="submit">
-                {t('Sign in')}
-              </Button>
-            </FormElement>
-          </FormBody>
-        </form>
-        {config.lasiusOAuthProviderAllowUserRegistration && (
-          <FormElement>
-            <Button variant="secondary" disabled={isSubmitting} onClick={() => onRegister()}>
-              {t('Sign up')}
-            </Button>
-          </FormElement>
-        )}
-      </CardContainer>
+      <Card shadow="xl" className="border-base-300 bg-base-100 w-full max-w-md border">
+        <CardBody className="gap-6 p-8">
+          <div className="flex justify-center">
+            <Logo />
+          </div>
+          <div className="h-4" />
+          <div className="space-y-3 text-center">
+            <p className="text-xl font-semibold">
+              {t('auth.signInToLasius', { defaultValue: 'Sign in to Lasius' })}
+            </p>
+            <p className="text-base-content/70 text-sm">
+              {t('auth.enterEmailAndPassword', {
+                defaultValue: 'Enter your email and password to access your account',
+              })}
+            </p>
+          </div>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <FormBody>
+              <FormElement>
+                <Label htmlFor="email">{t('common.forms.email', { defaultValue: 'E-Mail' })}</Label>
+                <Input
+                  {...register('email', {
+                    required: true,
+                    validate: { isEmailAddress: (v) => isEmailAddress(v.toString()) },
+                  })}
+                  autoComplete="off"
+                  autoFocus
+                  type="email"
+                />
+                <FormErrorBadge error={errors.email} />
+              </FormElement>
+              <FormElement>
+                <Label htmlFor="password">
+                  {t('common.forms.password', { defaultValue: 'Password' })}
+                </Label>
+                <Input
+                  {...register('password', { required: true })}
+                  type="password"
+                  autoComplete="off"
+                />
+                <FormErrorBadge error={errors.password} />
+              </FormElement>
+              <FormButtonContainer>
+                <Button type="submit" fullWidth>
+                  {t('auth.signIn', { defaultValue: 'Sign in' })}
+                </Button>
+                {config.lasiusOAuthProviderAllowUserRegistration && (
+                  <Button variant="ghost" onClick={() => onRegister()} fullWidth>
+                    {t('common.actions.signUp', { defaultValue: 'Sign up' })}
+                  </Button>
+                )}
+              </FormButtonContainer>
+            </FormBody>
+          </form>
+        </CardBody>
+      </Card>
       <TegonalFooter />
     </LoginLayout>
-  );
-};
+  )
+}
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { locale, query } = context;
-  const resolvedLocale = query.locale?.toString() || locale;
+  const { locale, query } = context
+  const resolvedLocale = query.locale?.toString() || locale
 
-  let config;
+  let config
   try {
-    config = await getConfiguration();
+    config = await getConfiguration()
   } catch (error) {
-    console.error('Failed to fetch configuration from backend:', error);
+    console.error('Failed to fetch configuration from backend:', error)
     // Provide a default config when backend is unavailable
     config = {
       title: 'Lasius',
       instance: 'local',
       lasiusOAuthProviderEnabled: false,
       lasiusOAuthProviderAllowUserRegistration: false,
-      allowedIssuers: []
-    };
+      allowedIssuers: [],
+    }
   }
 
   return {
@@ -254,7 +281,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       ...(await serverSideTranslations(resolvedLocale || '', ['common'])),
       locale: resolvedLocale,
     },
-  };
-};
+  }
+}
 
-export default InternalOAuthLogin;
+export default InternalOAuthLogin

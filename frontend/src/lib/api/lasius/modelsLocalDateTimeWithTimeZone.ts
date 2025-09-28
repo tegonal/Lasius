@@ -27,6 +27,6 @@
 
 export interface ModelsLocalDateTimeWithTimeZone {
   /** @pattern yyyy-MM-dd'T'HH:mm:ss.SSS */
-  dateTime: string;
-  zone: string;
+  dateTime: string
+  zone: string
 }

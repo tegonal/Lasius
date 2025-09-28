@@ -26,13 +26,12 @@
  */
 
 export type GetUserBookingAggregatedStatsByOrganisationGranularity =
-  (typeof GetUserBookingAggregatedStatsByOrganisationGranularity)[keyof typeof GetUserBookingAggregatedStatsByOrganisationGranularity];
+  (typeof GetUserBookingAggregatedStatsByOrganisationGranularity)[keyof typeof GetUserBookingAggregatedStatsByOrganisationGranularity]
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const GetUserBookingAggregatedStatsByOrganisationGranularity = {
   All: 'All',
   Year: 'Year',
   Month: 'Month',
   Week: 'Week',
   Day: 'Day',
-} as const;
+} as const

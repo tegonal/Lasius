@@ -24,11 +24,10 @@
  * Track your time
  * OpenAPI spec version: 2.0.0+4-3a603fde+20250602-1535
  */
-import useSwr from 'swr';
-import type { Arguments, Key, SWRConfiguration } from 'swr';
+import useSwr from 'swr'
+import useSWRMutation from 'swr/mutation'
 
-import useSWRMutation from 'swr/mutation';
-import type { SWRMutationConfiguration } from 'swr/mutation';
+import { lasiusAxiosInstance } from '../../lasiusAxiosInstance'
 
 import type {
   GetUserBookingAggregatedStatsByOrganisationParams,
@@ -43,12 +42,12 @@ import type {
   ModelsEditBookingRequest,
   ModelsStartBookingRequest,
   ModelsStopBookingRequest,
-} from '..';
+} from '..'
+import type { BodyType, ErrorType } from '../../lasiusAxiosInstance'
+import type { Arguments, Key, SWRConfiguration } from 'swr'
+import type { SWRMutationConfiguration } from 'swr/mutation'
 
-import { lasiusAxiosInstance } from '../../lasiusAxiosInstance';
-import type { ErrorType, BodyType } from '../../lasiusAxiosInstance';
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
 
 /**
  * @summary Start booking time on selected organisation for the current user
@@ -56,7 +55,7 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 export const startUserBookingCurrent = (
   orgId: string,
   modelsStartBookingRequest: BodyType<ModelsStartBookingRequest>,
-  options?: SecondParameter<typeof lasiusAxiosInstance>
+  options?: SecondParameter<typeof lasiusAxiosInstance>,
 ) => {
   return lasiusAxiosInstance<void>(
     {
@@ -65,25 +64,25 @@ export const startUserBookingCurrent = (
       headers: { 'Content-Type': 'application/json' },
       data: modelsStartBookingRequest,
     },
-    options
-  );
-};
+    options,
+  )
+}
 
 export const getStartUserBookingCurrentMutationFetcher = (
   orgId: string,
-  options?: SecondParameter<typeof lasiusAxiosInstance>
+  options?: SecondParameter<typeof lasiusAxiosInstance>,
 ) => {
   return (_: Key, { arg }: { arg: ModelsStartBookingRequest }): Promise<void> => {
-    return startUserBookingCurrent(orgId, arg, options);
-  };
-};
+    return startUserBookingCurrent(orgId, arg, options)
+  }
+}
 export const getStartUserBookingCurrentMutationKey = (orgId: string) =>
-  [`/user-bookings/organisations/${orgId}/bookings/start`] as const;
+  [`/user-bookings/organisations/${orgId}/bookings/start`] as const
 
 export type StartUserBookingCurrentMutationResult = NonNullable<
   Awaited<ReturnType<typeof startUserBookingCurrent>>
->;
-export type StartUserBookingCurrentMutationError = ErrorType<unknown>;
+>
+export type StartUserBookingCurrentMutationError = ErrorType<unknown>
 
 /**
  * @summary Start booking time on selected organisation for the current user
@@ -97,22 +96,22 @@ export const useStartUserBookingCurrent = <TError = ErrorType<unknown>>(
       Key,
       ModelsStartBookingRequest,
       Awaited<ReturnType<typeof startUserBookingCurrent>>
-    > & { swrKey?: string };
-    request?: SecondParameter<typeof lasiusAxiosInstance>;
-  }
+    > & { swrKey?: string }
+    request?: SecondParameter<typeof lasiusAxiosInstance>
+  },
 ) => {
-  const { swr: swrOptions, request: requestOptions } = options ?? {};
+  const { swr: swrOptions, request: requestOptions } = options ?? {}
 
-  const swrKey = swrOptions?.swrKey ?? getStartUserBookingCurrentMutationKey(orgId);
-  const swrFn = getStartUserBookingCurrentMutationFetcher(orgId, requestOptions);
+  const swrKey = swrOptions?.swrKey ?? getStartUserBookingCurrentMutationKey(orgId)
+  const swrFn = getStartUserBookingCurrentMutationFetcher(orgId, requestOptions)
 
-  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+  const query = useSWRMutation(swrKey, swrFn, swrOptions)
 
   return {
     swrKey,
     ...query,
-  };
-};
+  }
+}
 /**
  * @summary Stop the currently running booking by organisation and booking id for the current user
  */
@@ -120,7 +119,7 @@ export const stopUserBookingCurrent = (
   orgId: string,
   bookingId: string,
   modelsStopBookingRequest: BodyType<ModelsStopBookingRequest>,
-  options?: SecondParameter<typeof lasiusAxiosInstance>
+  options?: SecondParameter<typeof lasiusAxiosInstance>,
 ) => {
   return lasiusAxiosInstance<void>(
     {
@@ -129,26 +128,26 @@ export const stopUserBookingCurrent = (
       headers: { 'Content-Type': 'application/json' },
       data: modelsStopBookingRequest,
     },
-    options
-  );
-};
+    options,
+  )
+}
 
 export const getStopUserBookingCurrentMutationFetcher = (
   orgId: string,
   bookingId: string,
-  options?: SecondParameter<typeof lasiusAxiosInstance>
+  options?: SecondParameter<typeof lasiusAxiosInstance>,
 ) => {
   return (_: Key, { arg }: { arg: ModelsStopBookingRequest }): Promise<void> => {
-    return stopUserBookingCurrent(orgId, bookingId, arg, options);
-  };
-};
+    return stopUserBookingCurrent(orgId, bookingId, arg, options)
+  }
+}
 export const getStopUserBookingCurrentMutationKey = (orgId: string, bookingId: string) =>
-  [`/user-bookings/organisations/${orgId}/bookings/${bookingId}/stop`] as const;
+  [`/user-bookings/organisations/${orgId}/bookings/${bookingId}/stop`] as const
 
 export type StopUserBookingCurrentMutationResult = NonNullable<
   Awaited<ReturnType<typeof stopUserBookingCurrent>>
->;
-export type StopUserBookingCurrentMutationError = ErrorType<unknown>;
+>
+export type StopUserBookingCurrentMutationError = ErrorType<unknown>
 
 /**
  * @summary Stop the currently running booking by organisation and booking id for the current user
@@ -163,22 +162,22 @@ export const useStopUserBookingCurrent = <TError = ErrorType<unknown>>(
       Key,
       ModelsStopBookingRequest,
       Awaited<ReturnType<typeof stopUserBookingCurrent>>
-    > & { swrKey?: string };
-    request?: SecondParameter<typeof lasiusAxiosInstance>;
-  }
+    > & { swrKey?: string }
+    request?: SecondParameter<typeof lasiusAxiosInstance>
+  },
 ) => {
-  const { swr: swrOptions, request: requestOptions } = options ?? {};
+  const { swr: swrOptions, request: requestOptions } = options ?? {}
 
-  const swrKey = swrOptions?.swrKey ?? getStopUserBookingCurrentMutationKey(orgId, bookingId);
-  const swrFn = getStopUserBookingCurrentMutationFetcher(orgId, bookingId, requestOptions);
+  const swrKey = swrOptions?.swrKey ?? getStopUserBookingCurrentMutationKey(orgId, bookingId)
+  const swrFn = getStopUserBookingCurrentMutationFetcher(orgId, bookingId, requestOptions)
 
-  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+  const query = useSWRMutation(swrKey, swrFn, swrOptions)
 
   return {
     swrKey,
     ...query,
-  };
-};
+  }
+}
 /**
  * @summary Change the currently running booking by organisation and booking id for the current user
  */
@@ -186,7 +185,7 @@ export const updateUserBookingCurrent = (
   orgId: string,
   bookingId: string,
   modelsBookingChangeStartRequest: BodyType<ModelsBookingChangeStartRequest>,
-  options?: SecondParameter<typeof lasiusAxiosInstance>
+  options?: SecondParameter<typeof lasiusAxiosInstance>,
 ) => {
   return lasiusAxiosInstance<void>(
     {
@@ -195,26 +194,26 @@ export const updateUserBookingCurrent = (
       headers: { 'Content-Type': 'application/json' },
       data: modelsBookingChangeStartRequest,
     },
-    options
-  );
-};
+    options,
+  )
+}
 
 export const getUpdateUserBookingCurrentMutationFetcher = (
   orgId: string,
   bookingId: string,
-  options?: SecondParameter<typeof lasiusAxiosInstance>
+  options?: SecondParameter<typeof lasiusAxiosInstance>,
 ) => {
   return (_: Key, { arg }: { arg: ModelsBookingChangeStartRequest }): Promise<void> => {
-    return updateUserBookingCurrent(orgId, bookingId, arg, options);
-  };
-};
+    return updateUserBookingCurrent(orgId, bookingId, arg, options)
+  }
+}
 export const getUpdateUserBookingCurrentMutationKey = (orgId: string, bookingId: string) =>
-  [`/user-bookings/organisations/${orgId}/bookings/${bookingId}/start-time`] as const;
+  [`/user-bookings/organisations/${orgId}/bookings/${bookingId}/start-time`] as const
 
 export type UpdateUserBookingCurrentMutationResult = NonNullable<
   Awaited<ReturnType<typeof updateUserBookingCurrent>>
->;
-export type UpdateUserBookingCurrentMutationError = ErrorType<unknown>;
+>
+export type UpdateUserBookingCurrentMutationError = ErrorType<unknown>
 
 /**
  * @summary Change the currently running booking by organisation and booking id for the current user
@@ -229,52 +228,52 @@ export const useUpdateUserBookingCurrent = <TError = ErrorType<unknown>>(
       Key,
       ModelsBookingChangeStartRequest,
       Awaited<ReturnType<typeof updateUserBookingCurrent>>
-    > & { swrKey?: string };
-    request?: SecondParameter<typeof lasiusAxiosInstance>;
-  }
+    > & { swrKey?: string }
+    request?: SecondParameter<typeof lasiusAxiosInstance>
+  },
 ) => {
-  const { swr: swrOptions, request: requestOptions } = options ?? {};
+  const { swr: swrOptions, request: requestOptions } = options ?? {}
 
-  const swrKey = swrOptions?.swrKey ?? getUpdateUserBookingCurrentMutationKey(orgId, bookingId);
-  const swrFn = getUpdateUserBookingCurrentMutationFetcher(orgId, bookingId, requestOptions);
+  const swrKey = swrOptions?.swrKey ?? getUpdateUserBookingCurrentMutationKey(orgId, bookingId)
+  const swrFn = getUpdateUserBookingCurrentMutationFetcher(orgId, bookingId, requestOptions)
 
-  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+  const query = useSWRMutation(swrKey, swrFn, swrOptions)
 
   return {
     swrKey,
     ...query,
-  };
-};
+  }
+}
 /**
  * @summary Remove a booking by organisation and booking id for the current user
  */
 export const deleteUserBooking = (
   orgId: string,
   bookingId: string,
-  options?: SecondParameter<typeof lasiusAxiosInstance>
+  options?: SecondParameter<typeof lasiusAxiosInstance>,
 ) => {
   return lasiusAxiosInstance<void>(
     { url: `/user-bookings/organisations/${orgId}/bookings/${bookingId}`, method: 'DELETE' },
-    options
-  );
-};
+    options,
+  )
+}
 
 export const getDeleteUserBookingMutationFetcher = (
   orgId: string,
   bookingId: string,
-  options?: SecondParameter<typeof lasiusAxiosInstance>
+  options?: SecondParameter<typeof lasiusAxiosInstance>,
 ) => {
   return (_: Key, __: { arg: Arguments }): Promise<void> => {
-    return deleteUserBooking(orgId, bookingId, options);
-  };
-};
+    return deleteUserBooking(orgId, bookingId, options)
+  }
+}
 export const getDeleteUserBookingMutationKey = (orgId: string, bookingId: string) =>
-  [`/user-bookings/organisations/${orgId}/bookings/${bookingId}`] as const;
+  [`/user-bookings/organisations/${orgId}/bookings/${bookingId}`] as const
 
 export type DeleteUserBookingMutationResult = NonNullable<
   Awaited<ReturnType<typeof deleteUserBooking>>
->;
-export type DeleteUserBookingMutationError = ErrorType<unknown>;
+>
+export type DeleteUserBookingMutationError = ErrorType<unknown>
 
 /**
  * @summary Remove a booking by organisation and booking id for the current user
@@ -289,22 +288,22 @@ export const useDeleteUserBooking = <TError = ErrorType<unknown>>(
       Key,
       Arguments,
       Awaited<ReturnType<typeof deleteUserBooking>>
-    > & { swrKey?: string };
-    request?: SecondParameter<typeof lasiusAxiosInstance>;
-  }
+    > & { swrKey?: string }
+    request?: SecondParameter<typeof lasiusAxiosInstance>
+  },
 ) => {
-  const { swr: swrOptions, request: requestOptions } = options ?? {};
+  const { swr: swrOptions, request: requestOptions } = options ?? {}
 
-  const swrKey = swrOptions?.swrKey ?? getDeleteUserBookingMutationKey(orgId, bookingId);
-  const swrFn = getDeleteUserBookingMutationFetcher(orgId, bookingId, requestOptions);
+  const swrKey = swrOptions?.swrKey ?? getDeleteUserBookingMutationKey(orgId, bookingId)
+  const swrFn = getDeleteUserBookingMutationFetcher(orgId, bookingId, requestOptions)
 
-  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+  const query = useSWRMutation(swrKey, swrFn, swrOptions)
 
   return {
     swrKey,
     ...query,
-  };
-};
+  }
+}
 /**
  * @summary Change a booking by organisation for the current user
  */
@@ -312,7 +311,7 @@ export const updateUserBooking = (
   orgId: string,
   bookingId: string,
   modelsEditBookingRequest: BodyType<ModelsEditBookingRequest>,
-  options?: SecondParameter<typeof lasiusAxiosInstance>
+  options?: SecondParameter<typeof lasiusAxiosInstance>,
 ) => {
   return lasiusAxiosInstance<void>(
     {
@@ -321,26 +320,26 @@ export const updateUserBooking = (
       headers: { 'Content-Type': 'application/json' },
       data: modelsEditBookingRequest,
     },
-    options
-  );
-};
+    options,
+  )
+}
 
 export const getUpdateUserBookingMutationFetcher = (
   orgId: string,
   bookingId: string,
-  options?: SecondParameter<typeof lasiusAxiosInstance>
+  options?: SecondParameter<typeof lasiusAxiosInstance>,
 ) => {
   return (_: Key, { arg }: { arg: ModelsEditBookingRequest }): Promise<void> => {
-    return updateUserBooking(orgId, bookingId, arg, options);
-  };
-};
+    return updateUserBooking(orgId, bookingId, arg, options)
+  }
+}
 export const getUpdateUserBookingMutationKey = (orgId: string, bookingId: string) =>
-  [`/user-bookings/organisations/${orgId}/bookings/${bookingId}`] as const;
+  [`/user-bookings/organisations/${orgId}/bookings/${bookingId}`] as const
 
 export type UpdateUserBookingMutationResult = NonNullable<
   Awaited<ReturnType<typeof updateUserBooking>>
->;
-export type UpdateUserBookingMutationError = ErrorType<unknown>;
+>
+export type UpdateUserBookingMutationError = ErrorType<unknown>
 
 /**
  * @summary Change a booking by organisation for the current user
@@ -355,29 +354,29 @@ export const useUpdateUserBooking = <TError = ErrorType<unknown>>(
       Key,
       ModelsEditBookingRequest,
       Awaited<ReturnType<typeof updateUserBooking>>
-    > & { swrKey?: string };
-    request?: SecondParameter<typeof lasiusAxiosInstance>;
-  }
+    > & { swrKey?: string }
+    request?: SecondParameter<typeof lasiusAxiosInstance>
+  },
 ) => {
-  const { swr: swrOptions, request: requestOptions } = options ?? {};
+  const { swr: swrOptions, request: requestOptions } = options ?? {}
 
-  const swrKey = swrOptions?.swrKey ?? getUpdateUserBookingMutationKey(orgId, bookingId);
-  const swrFn = getUpdateUserBookingMutationFetcher(orgId, bookingId, requestOptions);
+  const swrKey = swrOptions?.swrKey ?? getUpdateUserBookingMutationKey(orgId, bookingId)
+  const swrFn = getUpdateUserBookingMutationFetcher(orgId, bookingId, requestOptions)
 
-  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+  const query = useSWRMutation(swrKey, swrFn, swrOptions)
 
   return {
     swrKey,
     ...query,
-  };
-};
+  }
+}
 /**
  * @summary Create a booking by organisation for the current user
  */
 export const addUserBookingByOrganisation = (
   orgId: string,
   modelsAddBookingRequest: BodyType<ModelsAddBookingRequest>,
-  options?: SecondParameter<typeof lasiusAxiosInstance>
+  options?: SecondParameter<typeof lasiusAxiosInstance>,
 ) => {
   return lasiusAxiosInstance<void>(
     {
@@ -386,25 +385,25 @@ export const addUserBookingByOrganisation = (
       headers: { 'Content-Type': 'application/json' },
       data: modelsAddBookingRequest,
     },
-    options
-  );
-};
+    options,
+  )
+}
 
 export const getAddUserBookingByOrganisationMutationFetcher = (
   orgId: string,
-  options?: SecondParameter<typeof lasiusAxiosInstance>
+  options?: SecondParameter<typeof lasiusAxiosInstance>,
 ) => {
   return (_: Key, { arg }: { arg: ModelsAddBookingRequest }): Promise<void> => {
-    return addUserBookingByOrganisation(orgId, arg, options);
-  };
-};
+    return addUserBookingByOrganisation(orgId, arg, options)
+  }
+}
 export const getAddUserBookingByOrganisationMutationKey = (orgId: string) =>
-  [`/user-bookings/organisations/${orgId}/bookings`] as const;
+  [`/user-bookings/organisations/${orgId}/bookings`] as const
 
 export type AddUserBookingByOrganisationMutationResult = NonNullable<
   Awaited<ReturnType<typeof addUserBookingByOrganisation>>
->;
-export type AddUserBookingByOrganisationMutationError = ErrorType<unknown>;
+>
+export type AddUserBookingByOrganisationMutationError = ErrorType<unknown>
 
 /**
  * @summary Create a booking by organisation for the current user
@@ -418,46 +417,46 @@ export const useAddUserBookingByOrganisation = <TError = ErrorType<unknown>>(
       Key,
       ModelsAddBookingRequest,
       Awaited<ReturnType<typeof addUserBookingByOrganisation>>
-    > & { swrKey?: string };
-    request?: SecondParameter<typeof lasiusAxiosInstance>;
-  }
+    > & { swrKey?: string }
+    request?: SecondParameter<typeof lasiusAxiosInstance>
+  },
 ) => {
-  const { swr: swrOptions, request: requestOptions } = options ?? {};
+  const { swr: swrOptions, request: requestOptions } = options ?? {}
 
-  const swrKey = swrOptions?.swrKey ?? getAddUserBookingByOrganisationMutationKey(orgId);
-  const swrFn = getAddUserBookingByOrganisationMutationFetcher(orgId, requestOptions);
+  const swrKey = swrOptions?.swrKey ?? getAddUserBookingByOrganisationMutationKey(orgId)
+  const swrFn = getAddUserBookingByOrganisationMutationFetcher(orgId, requestOptions)
 
-  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+  const query = useSWRMutation(swrKey, swrFn, swrOptions)
 
   return {
     swrKey,
     ...query,
-  };
-};
+  }
+}
 /**
  * @summary Get current user's booking history for selected organisation
  */
 export const getUserBookingListByOrganisation = (
   orgId: string,
   params: GetUserBookingListByOrganisationParams,
-  options?: SecondParameter<typeof lasiusAxiosInstance>
+  options?: SecondParameter<typeof lasiusAxiosInstance>,
 ) => {
   return lasiusAxiosInstance<ModelsBooking[]>(
     { url: `/user-bookings/organisations/${orgId}/bookings/history`, method: 'GET', params },
-    options
-  );
-};
+    options,
+  )
+}
 
 export const getGetUserBookingListByOrganisationKey = (
   orgId: string,
-  params: GetUserBookingListByOrganisationParams
+  params: GetUserBookingListByOrganisationParams,
 ) =>
-  [`/user-bookings/organisations/${orgId}/bookings/history`, ...(params ? [params] : [])] as const;
+  [`/user-bookings/organisations/${orgId}/bookings/history`, ...(params ? [params] : [])] as const
 
 export type GetUserBookingListByOrganisationQueryResult = NonNullable<
   Awaited<ReturnType<typeof getUserBookingListByOrganisation>>
->;
-export type GetUserBookingListByOrganisationQueryError = ErrorType<unknown>;
+>
+export type GetUserBookingListByOrganisationQueryError = ErrorType<unknown>
 
 /**
  * @summary Get current user's booking history for selected organisation
@@ -467,34 +466,34 @@ export const useGetUserBookingListByOrganisation = <TError = ErrorType<unknown>>
   params: GetUserBookingListByOrganisationParams,
   options?: {
     swr?: SWRConfiguration<Awaited<ReturnType<typeof getUserBookingListByOrganisation>>, TError> & {
-      swrKey?: Key;
-      enabled?: boolean;
-    };
-    request?: SecondParameter<typeof lasiusAxiosInstance>;
-  }
+      swrKey?: Key
+      enabled?: boolean
+    }
+    request?: SecondParameter<typeof lasiusAxiosInstance>
+  },
 ) => {
-  const { swr: swrOptions, request: requestOptions } = options ?? {};
+  const { swr: swrOptions, request: requestOptions } = options ?? {}
 
-  const isEnabled = swrOptions?.enabled !== false && !!orgId;
+  const isEnabled = swrOptions?.enabled !== false && !!orgId
   const swrKey =
     swrOptions?.swrKey ??
-    (() => (isEnabled ? getGetUserBookingListByOrganisationKey(orgId, params) : null));
-  const swrFn = () => getUserBookingListByOrganisation(orgId, params, requestOptions);
+    (() => (isEnabled ? getGetUserBookingListByOrganisationKey(orgId, params) : null))
+  const swrFn = () => getUserBookingListByOrganisation(orgId, params, requestOptions)
 
-  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(swrKey, swrFn, swrOptions);
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(swrKey, swrFn, swrOptions)
 
   return {
     swrKey,
     ...query,
-  };
-};
+  }
+}
 /**
  * @summary Get aggregated stats for current user in selected organisation
  */
 export const getUserBookingAggregatedStatsByOrganisation = (
   orgId: string,
   params: GetUserBookingAggregatedStatsByOrganisationParams,
-  options?: SecondParameter<typeof lasiusAxiosInstance>
+  options?: SecondParameter<typeof lasiusAxiosInstance>,
 ) => {
   return lasiusAxiosInstance<ModelsBookingStats[]>(
     {
@@ -502,23 +501,23 @@ export const getUserBookingAggregatedStatsByOrganisation = (
       method: 'GET',
       params,
     },
-    options
-  );
-};
+    options,
+  )
+}
 
 export const getGetUserBookingAggregatedStatsByOrganisationKey = (
   orgId: string,
-  params: GetUserBookingAggregatedStatsByOrganisationParams
+  params: GetUserBookingAggregatedStatsByOrganisationParams,
 ) =>
   [
     `/user-bookings/organisations/${orgId}/bookings/stats/aggregated`,
     ...(params ? [params] : []),
-  ] as const;
+  ] as const
 
 export type GetUserBookingAggregatedStatsByOrganisationQueryResult = NonNullable<
   Awaited<ReturnType<typeof getUserBookingAggregatedStatsByOrganisation>>
->;
-export type GetUserBookingAggregatedStatsByOrganisationQueryError = ErrorType<unknown>;
+>
+export type GetUserBookingAggregatedStatsByOrganisationQueryError = ErrorType<unknown>
 
 /**
  * @summary Get aggregated stats for current user in selected organisation
@@ -530,85 +529,85 @@ export const useGetUserBookingAggregatedStatsByOrganisation = <TError = ErrorTyp
     swr?: SWRConfiguration<
       Awaited<ReturnType<typeof getUserBookingAggregatedStatsByOrganisation>>,
       TError
-    > & { swrKey?: Key; enabled?: boolean };
-    request?: SecondParameter<typeof lasiusAxiosInstance>;
-  }
+    > & { swrKey?: Key; enabled?: boolean }
+    request?: SecondParameter<typeof lasiusAxiosInstance>
+  },
 ) => {
-  const { swr: swrOptions, request: requestOptions } = options ?? {};
+  const { swr: swrOptions, request: requestOptions } = options ?? {}
 
-  const isEnabled = swrOptions?.enabled !== false && !!orgId;
+  const isEnabled = swrOptions?.enabled !== false && !!orgId
   const swrKey =
     swrOptions?.swrKey ??
-    (() => (isEnabled ? getGetUserBookingAggregatedStatsByOrganisationKey(orgId, params) : null));
-  const swrFn = () => getUserBookingAggregatedStatsByOrganisation(orgId, params, requestOptions);
+    (() => (isEnabled ? getGetUserBookingAggregatedStatsByOrganisationKey(orgId, params) : null))
+  const swrFn = () => getUserBookingAggregatedStatsByOrganisation(orgId, params, requestOptions)
 
-  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(swrKey, swrFn, swrOptions);
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(swrKey, swrFn, swrOptions)
 
   return {
     swrKey,
     ...query,
-  };
-};
+  }
+}
 /**
  * @summary Get current user's currently running booking
  */
 export const getUserBookingCurrent = (options?: SecondParameter<typeof lasiusAxiosInstance>) => {
   return lasiusAxiosInstance<ModelsCurrentUserTimeBooking>(
     { url: `/user-bookings/current`, method: 'GET' },
-    options
-  );
-};
+    options,
+  )
+}
 
-export const getGetUserBookingCurrentKey = () => [`/user-bookings/current`] as const;
+export const getGetUserBookingCurrentKey = () => [`/user-bookings/current`] as const
 
 export type GetUserBookingCurrentQueryResult = NonNullable<
   Awaited<ReturnType<typeof getUserBookingCurrent>>
->;
-export type GetUserBookingCurrentQueryError = ErrorType<unknown>;
+>
+export type GetUserBookingCurrentQueryError = ErrorType<unknown>
 
 /**
  * @summary Get current user's currently running booking
  */
 export const useGetUserBookingCurrent = <TError = ErrorType<unknown>>(options?: {
   swr?: SWRConfiguration<Awaited<ReturnType<typeof getUserBookingCurrent>>, TError> & {
-    swrKey?: Key;
-    enabled?: boolean;
-  };
-  request?: SecondParameter<typeof lasiusAxiosInstance>;
+    swrKey?: Key
+    enabled?: boolean
+  }
+  request?: SecondParameter<typeof lasiusAxiosInstance>
 }) => {
-  const { swr: swrOptions, request: requestOptions } = options ?? {};
+  const { swr: swrOptions, request: requestOptions } = options ?? {}
 
-  const isEnabled = swrOptions?.enabled !== false;
-  const swrKey = swrOptions?.swrKey ?? (() => (isEnabled ? getGetUserBookingCurrentKey() : null));
-  const swrFn = () => getUserBookingCurrent(requestOptions);
+  const isEnabled = swrOptions?.enabled !== false
+  const swrKey = swrOptions?.swrKey ?? (() => (isEnabled ? getGetUserBookingCurrentKey() : null))
+  const swrFn = () => getUserBookingCurrent(requestOptions)
 
-  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(swrKey, swrFn, swrOptions);
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(swrKey, swrFn, swrOptions)
 
   return {
     swrKey,
     ...query,
-  };
-};
+  }
+}
 /**
  * @summary Get currently running bookings of members in selected organisation
  */
 export const getUserBookingCurrentListByOrganisation = (
   orgId: string,
-  options?: SecondParameter<typeof lasiusAxiosInstance>
+  options?: SecondParameter<typeof lasiusAxiosInstance>,
 ) => {
   return lasiusAxiosInstance<ModelsCurrentOrganisationTimeBookings>(
     { url: `/user-bookings/organisations/${orgId}/current`, method: 'GET' },
-    options
-  );
-};
+    options,
+  )
+}
 
 export const getGetUserBookingCurrentListByOrganisationKey = (orgId: string) =>
-  [`/user-bookings/organisations/${orgId}/current`] as const;
+  [`/user-bookings/organisations/${orgId}/current`] as const
 
 export type GetUserBookingCurrentListByOrganisationQueryResult = NonNullable<
   Awaited<ReturnType<typeof getUserBookingCurrentListByOrganisation>>
->;
-export type GetUserBookingCurrentListByOrganisationQueryError = ErrorType<unknown>;
+>
+export type GetUserBookingCurrentListByOrganisationQueryError = ErrorType<unknown>
 
 /**
  * @summary Get currently running bookings of members in selected organisation
@@ -619,48 +618,48 @@ export const useGetUserBookingCurrentListByOrganisation = <TError = ErrorType<un
     swr?: SWRConfiguration<
       Awaited<ReturnType<typeof getUserBookingCurrentListByOrganisation>>,
       TError
-    > & { swrKey?: Key; enabled?: boolean };
-    request?: SecondParameter<typeof lasiusAxiosInstance>;
-  }
+    > & { swrKey?: Key; enabled?: boolean }
+    request?: SecondParameter<typeof lasiusAxiosInstance>
+  },
 ) => {
-  const { swr: swrOptions, request: requestOptions } = options ?? {};
+  const { swr: swrOptions, request: requestOptions } = options ?? {}
 
-  const isEnabled = swrOptions?.enabled !== false && !!orgId;
+  const isEnabled = swrOptions?.enabled !== false && !!orgId
   const swrKey =
     swrOptions?.swrKey ??
-    (() => (isEnabled ? getGetUserBookingCurrentListByOrganisationKey(orgId) : null));
-  const swrFn = () => getUserBookingCurrentListByOrganisation(orgId, requestOptions);
+    (() => (isEnabled ? getGetUserBookingCurrentListByOrganisationKey(orgId) : null))
+  const swrFn = () => getUserBookingCurrentListByOrganisation(orgId, requestOptions)
 
-  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(swrKey, swrFn, swrOptions);
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(swrKey, swrFn, swrOptions)
 
   return {
     swrKey,
     ...query,
-  };
-};
+  }
+}
 /**
  * @summary Get latest bookings of members in selected organisation
  */
 export const getUserBookingLatestListByOrganisation = (
   orgId: string,
   params?: GetUserBookingLatestListByOrganisationParams,
-  options?: SecondParameter<typeof lasiusAxiosInstance>
+  options?: SecondParameter<typeof lasiusAxiosInstance>,
 ) => {
   return lasiusAxiosInstance<void>(
     { url: `/user-bookings/organisations/${orgId}/latest`, method: 'GET', params },
-    options
-  );
-};
+    options,
+  )
+}
 
 export const getGetUserBookingLatestListByOrganisationKey = (
   orgId: string,
-  params?: GetUserBookingLatestListByOrganisationParams
-) => [`/user-bookings/organisations/${orgId}/latest`, ...(params ? [params] : [])] as const;
+  params?: GetUserBookingLatestListByOrganisationParams,
+) => [`/user-bookings/organisations/${orgId}/latest`, ...(params ? [params] : [])] as const
 
 export type GetUserBookingLatestListByOrganisationQueryResult = NonNullable<
   Awaited<ReturnType<typeof getUserBookingLatestListByOrganisation>>
->;
-export type GetUserBookingLatestListByOrganisationQueryError = ErrorType<unknown>;
+>
+export type GetUserBookingLatestListByOrganisationQueryError = ErrorType<unknown>
 
 /**
  * @summary Get latest bookings of members in selected organisation
@@ -672,22 +671,22 @@ export const useGetUserBookingLatestListByOrganisation = <TError = ErrorType<unk
     swr?: SWRConfiguration<
       Awaited<ReturnType<typeof getUserBookingLatestListByOrganisation>>,
       TError
-    > & { swrKey?: Key; enabled?: boolean };
-    request?: SecondParameter<typeof lasiusAxiosInstance>;
-  }
+    > & { swrKey?: Key; enabled?: boolean }
+    request?: SecondParameter<typeof lasiusAxiosInstance>
+  },
 ) => {
-  const { swr: swrOptions, request: requestOptions } = options ?? {};
+  const { swr: swrOptions, request: requestOptions } = options ?? {}
 
-  const isEnabled = swrOptions?.enabled !== false && !!orgId;
+  const isEnabled = swrOptions?.enabled !== false && !!orgId
   const swrKey =
     swrOptions?.swrKey ??
-    (() => (isEnabled ? getGetUserBookingLatestListByOrganisationKey(orgId, params) : null));
-  const swrFn = () => getUserBookingLatestListByOrganisation(orgId, params, requestOptions);
+    (() => (isEnabled ? getGetUserBookingLatestListByOrganisationKey(orgId, params) : null))
+  const swrFn = () => getUserBookingLatestListByOrganisation(orgId, params, requestOptions)
 
-  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(swrKey, swrFn, swrOptions);
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(swrKey, swrFn, swrOptions)
 
   return {
     swrKey,
     ...query,
-  };
-};
+  }
+}

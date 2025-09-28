@@ -26,5 +26,5 @@
  */
 
 export interface ModelsAcceptTOSRequest {
-  version: string;
+  version: string
 }

@@ -26,5 +26,5 @@
  */
 
 export type GetUserBookingLatestListByOrganisationParams = {
-  maxHistory?: number;
-};
+  maxHistory?: number
+}

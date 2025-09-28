@@ -26,16 +26,16 @@
  */
 
 export interface ModelsOAuthAuthorizationCodeLoginRequest {
-  clientId: string;
-  email: string;
-  password: string;
+  clientId: string
+  email: string
+  password: string
   /** @nullable */
-  scope?: string | null;
-  redirectUri: string;
+  scope?: string | null
+  redirectUri: string
   /** @nullable */
-  codeChallenge?: string | null;
+  codeChallenge?: string | null
   /** @nullable */
-  codeChallengeMethod?: string | null;
+  codeChallengeMethod?: string | null
   /** @nullable */
-  state?: string | null;
+  state?: string | null
 }

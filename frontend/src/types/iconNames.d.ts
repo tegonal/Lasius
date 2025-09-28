@@ -22,12 +22,9 @@ export type IconNames =
   | 'folder-download-files-folders'
   | 'folder-files-folders'
   | 'folder-settings-files-folders'
-  | 'github'
-  | 'gitlab'
   | 'human-resources-search-team-work-office-companies'
   | 'information-circle'
   | 'insert-row'
-  | 'keycloak'
   | 'lasius'
   | 'lock-1-interface-essential'
   | 'logout-2-interface-essential'
@@ -61,4 +58,4 @@ export type IconNames =
   | 'view-1-interface-essential'
   | 'view-off-interface-essential'
   | 'window-error-500-programing-apps-websites'
-  | 'workflow-teammate-circle-work-office-companies';
+  | 'workflow-teammate-circle-work-office-companies'

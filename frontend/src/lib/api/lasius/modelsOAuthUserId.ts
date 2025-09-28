@@ -26,5 +26,5 @@
  */
 
 export interface ModelsOAuthUserId {
-  value: string;
+  value: string
 }

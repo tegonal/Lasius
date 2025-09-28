@@ -24,11 +24,11 @@
  * Track your time
  * OpenAPI spec version: 2.0.0+4-3a603fde+20250602-1535
  */
-import type { ModelsEntityReference } from './modelsEntityReference';
-import type { ModelsTag } from './modelsTag';
+import type { ModelsEntityReference } from './modelsEntityReference'
+import type { ModelsTag } from './modelsTag'
 
 export interface ModelsBookingStub {
-  projectReference: ModelsEntityReference;
-  tags: ModelsTag[];
-  bookingHash: number;
+  projectReference: ModelsEntityReference
+  tags: ModelsTag[]
+  bookingHash: number
 }

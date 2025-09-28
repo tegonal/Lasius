@@ -17,20 +17,20 @@
  *
  */
 
-import { isToday } from 'date-fns';
-import { apiTimespanWeek, IsoDateString } from 'lib/api/apiDateHandling';
-import { useGetUserBookingListByOrganisation } from 'lib/api/lasius/user-bookings/user-bookings';
-import { useMemo } from 'react';
-import { useGetPlannedWorkingHoursByDate } from 'lib/api/hooks/useGetPlannedWorkingHoursByDate';
-import { UI_SLOW_DATA_DEDUPE_INTERVAL } from 'projectConfig/intervals';
-import { useOrganisation } from 'lib/api/hooks/useOrganisation';
-import { getExpectedVsBookedPercentage } from 'lib/api/functions/getExpectedVsBookedPercentage';
-import { getModelsBookingSummary } from 'lib/api/functions/getModelsBookingSummary';
+import { isToday } from 'date-fns'
+import { apiTimespanWeek, IsoDateString } from 'lib/api/apiDateHandling'
+import { getExpectedVsBookedPercentage } from 'lib/api/functions/getExpectedVsBookedPercentage'
+import { getModelsBookingSummary } from 'lib/api/functions/getModelsBookingSummary'
+import { useGetPlannedWorkingHoursByDate } from 'lib/api/hooks/useGetPlannedWorkingHoursByDate'
+import { useOrganisation } from 'lib/api/hooks/useOrganisation'
+import { useGetUserBookingListByOrganisation } from 'lib/api/lasius/user-bookings/user-bookings'
+import { UI_SLOW_DATA_DEDUPE_INTERVAL } from 'projectConfig/intervals'
+import { useMemo } from 'react'
 
 export const useGetBookingSummaryWeek = (date: IsoDateString) => {
-  const { selectedOrganisationId } = useOrganisation();
-  const { plannedHoursWeek: plannedWorkingHours } = useGetPlannedWorkingHoursByDate(date);
-  const day = new Date(date);
+  const { selectedOrganisationId } = useOrganisation()
+  const { plannedHoursWeek: plannedWorkingHours } = useGetPlannedWorkingHoursByDate(date)
+  const day = new Date(date)
 
   const { data: bookings } = useGetUserBookingListByOrganisation(
     selectedOrganisationId,
@@ -42,20 +42,20 @@ export const useGetBookingSummaryWeek = (date: IsoDateString) => {
         revalidateIfStale: isToday(day),
         dedupingInterval: isToday(day) ? 2000 : UI_SLOW_DATA_DEDUPE_INTERVAL,
       },
-    }
-  );
+    },
+  )
 
-  const summary = useMemo(() => getModelsBookingSummary(bookings || []), [bookings]);
+  const summary = useMemo(() => getModelsBookingSummary(bookings || []), [bookings])
 
   const { fulfilledPercentage, progressBarPercentage } = getExpectedVsBookedPercentage(
     plannedWorkingHours,
-    summary.hours
-  );
+    summary.hours,
+  )
 
   return {
     ...summary,
     plannedWorkingHours,
     fulfilledPercentage,
     progressBarPercentage,
-  };
-};
+  }
+}

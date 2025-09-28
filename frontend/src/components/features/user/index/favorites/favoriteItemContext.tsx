@@ -1,0 +1,92 @@
+/**
+ * Lasius - Open source time tracker for teams
+ * Copyright (c) Tegonal Genossenschaft (https://tegonal.com)
+ *
+ * This file is part of Lasius.
+ *
+ * Lasius is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * Lasius is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with Lasius.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
+import { ContextButtonClose } from 'components/features/contextMenu/buttons/contextButtonClose'
+import { ContextButtonOpen } from 'components/features/contextMenu/buttons/contextButtonOpen'
+import { ContextButtonStartBooking } from 'components/features/contextMenu/buttons/contextButtonStartBooking'
+import { ContextBar } from 'components/features/contextMenu/contextBar'
+import { ContextCompactAnimatePresence } from 'components/features/contextMenu/contextCompactAnimatePresence'
+import { ContextCompactBody } from 'components/features/contextMenu/contextCompactBody'
+import { ContextCompactButtonWrapper } from 'components/features/contextMenu/contextCompactButtonWrapper'
+import { useContextMenu } from 'components/features/contextMenu/hooks/useContextMenu'
+import { Button } from 'components/primitives/buttons/Button'
+import { Icon } from 'components/ui/icons/Icon'
+import { AnimatePresence } from 'framer-motion'
+import { useOrganisation } from 'lib/api/hooks/useOrganisation'
+import { ModelsBookingStub } from 'lib/api/lasius'
+import {
+  deleteFavoriteBooking,
+  getGetFavoriteBookingListKey,
+} from 'lib/api/lasius/user-favorites/user-favorites'
+import { stringHash } from 'lib/utils/string/stringHash'
+import { useTranslation } from 'next-i18next'
+import React from 'react'
+import { useSWRConfig } from 'swr'
+
+type Props = {
+  item: ModelsBookingStub
+}
+
+export const FavoriteItemContext: React.FC<Props> = ({ item }) => {
+  const { t } = useTranslation('common')
+  const { mutate } = useSWRConfig()
+
+  const itemHash = stringHash(item)
+  const { selectedOrganisationId } = useOrganisation()
+  const { currentOpenContextMenuId, handleCloseAll } = useContextMenu()
+
+  const deleteFavorite = async () => {
+    const {
+      projectReference: { id: projectId },
+      tags,
+    } = item
+    await deleteFavoriteBooking(selectedOrganisationId, { projectId, tags })
+    await mutate(getGetFavoriteBookingListKey(selectedOrganisationId))
+    handleCloseAll()
+  }
+
+  return (
+    <>
+      <ContextCompactBody>
+        <ContextButtonOpen hash={itemHash} />
+        <AnimatePresence>
+          {currentOpenContextMenuId === itemHash && (
+            <ContextCompactAnimatePresence>
+              <ContextBar>
+                <ContextButtonStartBooking variant="compact" item={item} />
+                <ContextCompactButtonWrapper>
+                  <Button
+                    variant="contextIcon"
+                    title={t('favorites.actions.delete', { defaultValue: 'Delete favorite' })}
+                    aria-label={t('favorites.actions.delete', { defaultValue: 'Delete favorite' })}
+                    onClick={() => deleteFavorite()}
+                    fullWidth={false}
+                    shape="circle">
+                    <Icon name="bin-2-alternate-interface-essential" size={24} />
+                  </Button>
+                </ContextCompactButtonWrapper>
+                <ContextButtonClose variant="compact" />
+              </ContextBar>
+            </ContextCompactAnimatePresence>
+          )}
+        </AnimatePresence>
+      </ContextCompactBody>
+    </>
+  )
+}

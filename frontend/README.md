@@ -1,120 +1,181 @@
 # Lasius Frontend
 
-This project should run cross-platform but is currently only being tested and used on Linux and MacOS, including the M1 variety.
+Open source time tracker for teams built with Next.js, React, TypeScript, Tailwind CSS, and DaisyUI.
+
+This project runs cross-platform and is tested on Linux and macOS (including Apple Silicon).
 
 ## Prerequisites
 
-```
-> nvm --version
-0.39.7
-```
-```
-> node --version
-v20.11.0
-```
-```
-> docker --version
-Docker version 20.10.14, build a224086`
+### Node.js (v24)
+```bash
+# Using nvm (recommended)
+nvm install 24
+nvm use 24
+
+# Verify installation
+node --version  # Should show v24.x.x
 ```
 
+### Package Manager Setup
+```bash
+# Enable Corepack for Yarn management
+corepack enable
+
+# Verify Yarn is available
+yarn --version  # Should show 3.x or 4.x
 ```
-npm i -g yarn
+
+### Docker
+```bash
+docker --version  # Docker version 20.10 or higher
 ```
 
-Yarn 3.x is installed as a local dependency within this directory (`.yarn`), your global yarn v1 will pick up this version whenever launched in this directory.
+## Tech Stack
 
-All dev dependencies (`prettier`, `eslint`, `concurrently`, ...) are available as local dependencies within this project.
-You don't need to (shouldn't) use your global installs of these.
+- **Framework**: Next.js 15 with Pages Router
+- **UI Library**: React 19
+- **Language**: TypeScript 5
+- **Styling**: Tailwind CSS v4 + DaisyUI
+- **State Management**: Zustand
+- **Data Fetching**: SWR
+- **Form Handling**: React Hook Form + Zod
+- **Code Quality**: ESLint, Prettier, TypeScript strict mode
 
 
-## Install
+## Installation
 
-Browse to this folder and run `yarn`, after you made sure your system has the required software mentioned above.
+```bash
+# Clone the repository
+git clone https://github.com/tegonal/lasius.git
+cd lasius/frontend
 
+# Enable Corepack if not already done
+corepack enable
+
+# Install dependencies
+yarn install
+```
 
 ## Development
 
-`yarn run backend`
-
-Launches current backend from `../backend` (specifically `sbt run`) and two docker containers: Nginx to be used as transparent
-proxy and mongoDB. The backend will populate itself with demo data and pregenerate views on the first request.
-
-`yarn run dev`
-
-Run NextJS in development mode with live reload etc.
-
-Hint: Nginx proxies both backend and frontend requests, so make sure to start both scripts in order to have a running dev env.
-
-Once all service are online, browse to
-
-`http://localhost:3000` - NextJS in development mode
-`http://localhost:9000/backend/docs/swagger-ui/index.html?url=/backend/assets/swagger.json` - OpenAPI UI
-`http://localhost:9000/backend/` - Summary of Play routes
-
-You can use the following demo users to login:
-
+### Start Backend Services
+```bash
+yarn run backend
 ```
-demo1@lasius.ch
-demo
+Starts the backend server (sbt run) and Docker containers for MongoDB and Nginx proxy.
+
+### Start Development Server
+```bash
+yarn run dev
 ```
+Runs Next.js in development mode with hot reload on port 3001.
+
+### Access Points
+- Frontend: `http://localhost:3001`
+- API Documentation: `http://localhost:9000/backend/docs/swagger-ui/index.html?url=/backend/assets/swagger.json`
+- Backend Routes: `http://localhost:9000/backend/`
+
+### Demo Credentials
 ```
-demo2@lasius.ch
-demo
+Username: demo1@lasius.ch
+Password: demo
+
+Username: demo2@lasius.ch
+Password: demo
 ```
 
+## Code Quality
+
+### Run All Checks
+```bash
+yarn check
+```
+Runs linting, formatting, and type checking in sequence.
+
+### Individual Commands
+```bash
+yarn run lint        # ESLint checking
+yarn run lint:fix    # Auto-fix ESLint issues
+yarn run prettier    # Format code with Prettier
+yarn run typecheck   # TypeScript type checking
+```
 
 ## Build
 
-`yarn run build` builds locally, using the development environment.
+```bash
+yarn run build       # Production build
+yarn run start       # Start production server
+```
 
-See `package.json` for more build options and options to start the server locally.
+## API Client Generation
 
+```bash
+yarn run orval
+```
+Regenerates the TypeScript API client from OpenAPI spec. Requires backend to be running.
 
-## Chores
-
-### Updating dependencies
-
-`yarn run up`
-
-Interactive dependency updates.
-
-Please note that the following packages are currently pinned to their major version and should not be updated:
-
-`@mdx-js/react` as peer dependency of themeUI
-`@types/node` tied to the system node version, usually the current Node JS LTS release in use
-
-`yarn run openapi`
-
-Re-generates the TypeScript API client. Requires `yarn run backend` to be running in the background.
+**Note**: Never manually edit files in `src/lib/api/lasius/` - they are auto-generated.
 
 
-### Cleaning house
+## Maintenance
 
-`yarn run cleaner`
+### Update Dependencies
+```bash
+yarn run up          # Interactive dependency updates
+```
 
-Removes all packages, dist files, lock files, package cache et al. Reinstalls dependencies, often resolving to newer peer deps.
+### Clean Install
+```bash
+yarn run cleaner     # Remove all packages and reinstall
+yarn rebuild         # Rebuild platform-specific binaries
+```
 
-`yarn rebuild`
+## Project Structure
 
-Rebuilds only platform specific binaries found in dependencies.
+```
+frontend/
+├── @types/                 # TypeScript global type definitions
+├── public/                 # Static assets (images, fonts, icons)
+│   └── locales/           # i18n translation files
+├── scripts/               # Build and helper scripts
+└── src/
+    ├── components/        # React components (see Component Architecture)
+    │   ├── primitives/    # Basic building blocks
+    │   ├── ui/           # Composed UI components
+    │   └── features/     # Business logic components
+    ├── lib/              # Utilities and helpers
+    │   ├── api/          # API client and hooks
+    │   ├── schemas/      # Zod validation schemas
+    │   └── utils/        # Utility functions
+    ├── pages/            # Next.js pages (routes)
+    ├── stores/           # Zustand state management
+    └── styles/           # Global styles and Tailwind config
+```
 
-`yarn run lint`
+## Component Architecture
 
-Lint the source.
+The project follows atomic design principles with three component layers:
 
+- **[Primitives](src/components/primitives/README.md)**: Foundation components (buttons, inputs, typography)
+- **[UI Components](src/components/ui/README.md)**: Composed, reusable patterns (modals, cards, tables)
+- **[Features](src/components/features/README.md)**: Domain-specific business components
 
-## Project structure
+See the [Component Architecture Guide](src/components/README.md) for detailed information.
 
-`/@types` TS global overrides/interfaces
+## Additional Documentation
 
-`/env` dotenv files providing environment variables for multiple environments
+- [Component Architecture](src/components/README.md) - Overview of component organization
+- [Primitives Guide](src/components/primitives/README.md) - Foundation component guidelines
+- [UI Components Guide](src/components/ui/README.md) - Composed component patterns
+- [Features Guide](src/components/features/README.md) - Business logic components
+- [CLAUDE.md](CLAUDE.md) - AI assistant instructions and project conventions
 
-`/public` static files that are reachable from the servers html root, like images, fonts, et al
+## Contributing
 
-`/scripts` build and helper scripts fir build tasks
+Please ensure all code passes quality checks before submitting:
 
-`/src` source root, React components
+```bash
+yarn check  # Must pass without errors
+```
 
-`/src/pages` NextJS routes and API routes
-
-`/src/messages/{country code}.json` UI strings and translations
+Follow the established patterns and conventions documented in the component guides.

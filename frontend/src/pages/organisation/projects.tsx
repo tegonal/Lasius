@@ -17,35 +17,35 @@
  *
  */
 
-import { GetServerSideProps } from 'next';
-import { AllProjectsLayout } from 'layout/pages/organisation/projects/allProjectsLayout';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { LayoutDesktop } from 'layout/layoutDesktop';
-import { NextPageWithLayout } from 'pages/_app';
-import { Error } from 'components/error';
-import { isAdminOfCurrentOrg } from 'lib/api/functions/isAdminOfCurrentOrg';
-import { ModelsUser } from 'lib/api/lasius';
-import { useProfile } from 'lib/api/hooks/useProfile';
+import { AllProjectsLayout } from 'components/features/organisation/projects/allProjectsLayout'
+import { Error } from 'components/ui/feedback/Error'
+import { LayoutResponsive } from 'components/ui/layouts/layoutResponsive'
+import { isAdminOfCurrentOrg } from 'lib/api/functions/isAdminOfCurrentOrg'
+import { useProfile } from 'lib/api/hooks/useProfile'
+import { ModelsUser } from 'lib/api/lasius'
+import { GetServerSideProps } from 'next'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { NextPageWithLayout } from 'pages/_app'
 
 const AllProjectsPage: NextPageWithLayout = () => {
-  const { profile } = useProfile();
+  const { profile } = useProfile()
   if (isAdminOfCurrentOrg(profile as ModelsUser)) {
-    return <AllProjectsLayout />;
+    return <AllProjectsLayout />
   }
-  return <Error statusCode={401} />;
-};
+  return <Error statusCode={401} />
+}
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { locale = '' } = context;
+  const { locale = '' } = context
   return {
     props: {
       ...(await serverSideTranslations(locale, ['common'])),
     },
-  };
-};
+  }
+}
 
 AllProjectsPage.getLayout = function getLayout(page) {
-  return <LayoutDesktop>{page}</LayoutDesktop>;
-};
+  return <LayoutResponsive>{page}</LayoutResponsive>
+}
 
-export default AllProjectsPage;
+export default AllProjectsPage

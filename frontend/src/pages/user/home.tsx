@@ -17,45 +17,65 @@
  *
  */
 
-import { HomeLayoutDesktop } from 'layout/pages/user/index/homeLayoutDesktop';
-import { HomeLayoutMobile } from 'layout/pages/user/index/homeLayoutMobile';
-import { NextPageWithLayout } from 'pages/_app';
-import { GetServerSideProps } from 'next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { LayoutMobile } from 'layout/layoutMobile';
-import { LayoutDesktop } from 'layout/layoutDesktop';
+import { BookingAddMobileButton } from 'components/features/user/index/bookingAddMobileButton'
+import { BookingDayStatsProgressBar } from 'components/features/user/index/bookingDayStatsProgressBar'
+import { BookingCurrent } from 'components/features/user/index/current/bookingCurrent'
+import { IndexColumnTabs } from 'components/features/user/index/indexColumnTabs'
+import { BookingListSelectedDay } from 'components/features/user/index/list/bookingListSelectedDay'
+import { ScrollContainer } from 'components/primitives/layout/ScrollContainer'
+import { LayoutResponsive } from 'components/ui/layouts/layoutResponsive'
+import { getLocaleFromCookie } from 'lib/utils/auth/getLocaleFromCookie'
+import { GetServerSideProps } from 'next'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { NextPageWithLayout } from 'pages/_app'
 
-type DeviceType = {
-  deviceType: 'desktop' | 'mobile';
-};
-
-const Home: NextPageWithLayout<DeviceType> = (context) => {
-  if (context.deviceType === 'mobile') {
-    return <HomeLayoutMobile />;
-  }
-  return <HomeLayoutDesktop />;
-};
+const Home: NextPageWithLayout = () => {
+  return null // Content is handled in getLayout
+}
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { locale = '' } = context;
-  const UA = context.req.headers['user-agent'];
-  const isMobile = Boolean(
-    UA?.match(/Android|BlackBerry|iPhone|iPod|Opera Mini|IEMobile|WPDesktop/i)
-  );
+  // Without i18n config, context.locale doesn't exist - we must use our helper
+  const locale = getLocaleFromCookie(context)
 
   return {
     props: {
-      deviceType: isMobile ? 'mobile' : 'desktop',
       ...(await serverSideTranslations(locale, ['common'])),
     },
-  };
-};
-
-Home.getLayout = function getLayout(page) {
-  if (page.props.deviceType === 'mobile') {
-    return <LayoutMobile>{page}</LayoutMobile>;
   }
-  return <LayoutDesktop>{page}</LayoutDesktop>;
-};
+}
 
-export default Home;
+Home.getLayout = function getLayout() {
+  // Desktop center column content
+  const desktopCenterContent = (
+    <div className="border-base-100 bg-base-100 text-base-content grid h-full w-full grid-rows-[min-content_min-content_auto] gap-1 overflow-auto border-l">
+      <BookingDayStatsProgressBar />
+      <BookingCurrent />
+      <ScrollContainer>
+        <BookingListSelectedDay />
+      </ScrollContainer>
+    </div>
+  )
+
+  // Mobile content with different order and structure
+  const mobileContent = (
+    <>
+      <section className="bg-base-300 text-base-content relative grid h-full w-full grid-rows-[min-content_min-content_auto] gap-1 overflow-auto rounded-t-xl">
+        <BookingCurrent />
+        <BookingDayStatsProgressBar />
+        <BookingListSelectedDay />
+      </section>
+      {/* Mobile Add Booking FAB */}
+      <div className="fixed bottom-4 left-1/2 z-10 -translate-x-1/2">
+        <BookingAddMobileButton />
+      </div>
+    </>
+  )
+
+  return (
+    <LayoutResponsive rightColumn={<IndexColumnTabs />} mobileContent={mobileContent}>
+      {desktopCenterContent}
+    </LayoutResponsive>
+  )
+}
+
+export default Home

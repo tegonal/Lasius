@@ -26,10 +26,9 @@
  */
 
 export type ModelsJoinProjectInvitationRole =
-  (typeof ModelsJoinProjectInvitationRole)[keyof typeof ModelsJoinProjectInvitationRole];
+  (typeof ModelsJoinProjectInvitationRole)[keyof typeof ModelsJoinProjectInvitationRole]
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ModelsJoinProjectInvitationRole = {
   ProjectMember: 'ProjectMember',
   ProjectAdministrator: 'ProjectAdministrator',
-} as const;
+} as const

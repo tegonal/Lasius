@@ -24,15 +24,15 @@
  * Track your time
  * OpenAPI spec version: 2.0.0+4-3a603fde+20250602-1535
  */
-import type { ModelsOAuthUserId } from './modelsOAuthUserId';
+import type { ModelsOAuthUserId } from './modelsOAuthUserId'
 
 export interface ModelsOAuthUser {
-  id: ModelsOAuthUserId;
-  email: string;
-  password: string;
+  id: ModelsOAuthUserId
+  email: string
+  password: string
   /** @nullable */
-  firstName?: string | null;
+  firstName?: string | null
   /** @nullable */
-  lastName?: string | null;
-  active: boolean;
+  lastName?: string | null
+  active: boolean
 }

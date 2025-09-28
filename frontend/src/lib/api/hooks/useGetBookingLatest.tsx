@@ -17,22 +17,22 @@
  *
  */
 
-import { apiTimespanDay, IsoDateString } from 'lib/api/apiDateHandling';
-import { useGetUserBookingListByOrganisation } from 'lib/api/lasius/user-bookings/user-bookings';
-import { useMemo } from 'react';
-import { useOrganisation } from 'lib/api/hooks/useOrganisation';
-import { sortBookingsByDate } from 'lib/api/functions/sortBookingsByDate';
+import { apiTimespanDay, IsoDateString } from 'lib/api/apiDateHandling'
+import { sortBookingsByDate } from 'lib/api/functions/sortBookingsByDate'
+import { useOrganisation } from 'lib/api/hooks/useOrganisation'
+import { useGetUserBookingListByOrganisation } from 'lib/api/lasius/user-bookings/user-bookings'
+import { useMemo } from 'react'
 
 export const useGetBookingLatest = (selectedDay: IsoDateString) => {
-  const { selectedOrganisationId } = useOrganisation();
+  const { selectedOrganisationId } = useOrganisation()
   const { data: bookings } = useGetUserBookingListByOrganisation(
     selectedOrganisationId,
-    apiTimespanDay(selectedDay)
-  );
-  const sorted = sortBookingsByDate(bookings || []);
-  const latestBooking = useMemo(() => sorted[0], [sorted]);
+    apiTimespanDay(selectedDay),
+  )
+  const sorted = sortBookingsByDate(bookings || [])
+  const latestBooking = useMemo(() => sorted[0], [sorted])
 
   return {
     data: latestBooking || null,
-  };
-};
+  }
+}

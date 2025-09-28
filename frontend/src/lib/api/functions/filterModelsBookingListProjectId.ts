@@ -17,7 +17,7 @@
  *
  */
 
-import { ModelsBooking } from 'lib/api/lasius';
+import { ModelsBooking } from 'lib/api/lasius'
 
 export const filterModelsBookingListProjectId = (list: ModelsBooking[], projectId: string) =>
-  list.filter((booking) => (projectId ? booking.projectReference.id === projectId : true));
+  list.filter((booking) => (projectId ? booking.projectReference.id === projectId : true))

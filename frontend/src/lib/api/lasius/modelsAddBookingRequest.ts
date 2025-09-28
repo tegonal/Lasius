@@ -24,13 +24,13 @@
  * Track your time
  * OpenAPI spec version: 2.0.0+4-3a603fde+20250602-1535
  */
-import type { ModelsTag } from './modelsTag';
+import type { ModelsTag } from './modelsTag'
 
 export interface ModelsAddBookingRequest {
-  projectId: string;
-  tags: ModelsTag[];
+  projectId: string
+  tags: ModelsTag[]
   /** @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ */
-  start: string;
+  start: string
   /** @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ */
-  end: string;
+  end: string
 }

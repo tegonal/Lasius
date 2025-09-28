@@ -26,9 +26,8 @@
  */
 
 export type ModelsJiraIssueTagType =
-  (typeof ModelsJiraIssueTagType)[keyof typeof ModelsJiraIssueTagType];
+  (typeof ModelsJiraIssueTagType)[keyof typeof ModelsJiraIssueTagType]
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ModelsJiraIssueTagType = {
   JiraIssueTag: 'JiraIssueTag',
-} as const;
+} as const

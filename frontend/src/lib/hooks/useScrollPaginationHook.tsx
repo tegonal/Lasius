@@ -17,38 +17,38 @@
  *
  */
 
-import { UIEvent, useEffect, useState } from 'react';
+import { UIEvent, useEffect, useState } from 'react'
 
 interface UseScrollPagination<E> {
-  onScroll: (event: UIEvent<HTMLDivElement>) => void;
-  visibleElements: E[];
+  onScroll: (event: UIEvent<HTMLDivElement>) => void
+  visibleElements: E[]
 }
 
 function useScrollPagination<E>(
   elements: E[],
   showItemsPerStep = 30,
-  scrollBeforeEnd = 50
+  scrollBeforeEnd = 50,
 ): UseScrollPagination<E> {
-  const [shownNumberOfItems, setShownNumberOfItems] = useState(showItemsPerStep);
+  const [shownNumberOfItems, setShownNumberOfItems] = useState(showItemsPerStep)
 
   const onScroll = (event: UIEvent<HTMLDivElement>) => {
-    if (!event.target) return;
-    const { scrollHeight, scrollTop, clientHeight } = event.target as HTMLDivElement;
-    const scroll = scrollHeight - scrollTop - clientHeight;
+    if (!event.target) return
+    const { scrollHeight, scrollTop, clientHeight } = event.target as HTMLDivElement
+    const scroll = scrollHeight - scrollTop - clientHeight
 
     if (scroll < scrollBeforeEnd && elements.length > shownNumberOfItems) {
-      const newNumberOfItems = Math.min(shownNumberOfItems + showItemsPerStep, elements.length);
+      const newNumberOfItems = Math.min(shownNumberOfItems + showItemsPerStep, elements.length)
       if (newNumberOfItems > shownNumberOfItems) {
-        setShownNumberOfItems(newNumberOfItems);
+        setShownNumberOfItems(newNumberOfItems)
       }
     }
-  };
+  }
 
   useEffect(() => {
-    setShownNumberOfItems(showItemsPerStep);
-  }, [elements.length, showItemsPerStep]);
+    setShownNumberOfItems(showItemsPerStep)
+  }, [elements.length, showItemsPerStep])
 
-  return { onScroll, visibleElements: elements.slice(0, shownNumberOfItems) };
+  return { onScroll, visibleElements: elements.slice(0, shownNumberOfItems) }
 }
 
-export default useScrollPagination;
+export default useScrollPagination

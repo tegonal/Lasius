@@ -17,57 +17,57 @@
  *
  */
 
-import { formatISOLocale, getWorkingHoursWeekdayString } from 'lib/dates';
-import { eachDayOfInterval, lastDayOfMonth, lastDayOfWeek } from 'date-fns';
-import { plannedWorkingHoursStub } from 'lib/stubPlannedWorkingHours';
-import { getPlannedWorkingHoursForDateRange } from 'lib/api/functions/getPlannedWorkingHoursForDateRange';
-import { ModelsBookingStatsCategory } from 'lib/api/lasius';
-import { Granularity } from 'types/common';
+import { eachDayOfInterval, lastDayOfMonth, lastDayOfWeek } from 'date-fns'
+import { getPlannedWorkingHoursForDateRange } from 'lib/api/functions/getPlannedWorkingHoursForDateRange'
+import { ModelsBookingStatsCategory } from 'lib/api/lasius'
+import { formatISOLocale, getWorkingHoursWeekdayString } from 'lib/utils/date/dates'
+import { plannedWorkingHoursStub } from 'lib/utils/date/stubPlannedWorkingHours'
+import { Granularity } from 'types/common'
 
 // Returns the first day (Monday) of the specified week
 // Year defaults to the current local calendar year
 function getISOWeek(w: number, y: number = new Date().getFullYear()) {
-  const d = new Date(y, 0, 4);
-  d.setDate(d.getDate() - (d.getDay() || 7) + 1 + 7 * (w - 1));
-  return d;
+  const d = new Date(y, 0, 4)
+  d.setDate(d.getDate() - (d.getDay() || 7) + 1 + 7 * (w - 1))
+  return d
 }
 
 export const getCeilingValues = (
   granularity: Granularity,
   item: ModelsBookingStatsCategory,
-  plannedWorkingHours: typeof plannedWorkingHoursStub
+  plannedWorkingHours: typeof plannedWorkingHoursStub,
 ) => {
   switch (granularity) {
     case 'Day': {
       const weekday = getWorkingHoursWeekdayString(
-        formatISOLocale(new Date(item.year as number, item.month as number, item.day as number))
-      );
-      return plannedWorkingHours[weekday];
+        formatISOLocale(new Date(item.year as number, item.month as number, item.day as number)),
+      )
+      return plannedWorkingHours[weekday]
     }
     case 'Week': {
-      const dateOfWeek = getISOWeek(item.week || 0, item.year || undefined);
+      const dateOfWeek = getISOWeek(item.week || 0, item.year || undefined)
       const datesInMonth = eachDayOfInterval({
         start: dateOfWeek,
         end: lastDayOfWeek(dateOfWeek),
-      });
-      return getPlannedWorkingHoursForDateRange(datesInMonth, plannedWorkingHours);
+      })
+      return getPlannedWorkingHoursForDateRange(datesInMonth, plannedWorkingHours)
     }
     case 'Month': {
-      const dateOfMonth = new Date(`${item.year}-${item.month}-01`);
+      const dateOfMonth = new Date(`${item.year}-${item.month}-01`)
       const datesInMonth = eachDayOfInterval({
         start: dateOfMonth,
         end: lastDayOfMonth(dateOfMonth),
-      });
-      return getPlannedWorkingHoursForDateRange(datesInMonth, plannedWorkingHours);
+      })
+      return getPlannedWorkingHoursForDateRange(datesInMonth, plannedWorkingHours)
     }
     case 'Year': {
       const datesInYear = eachDayOfInterval({
         start: new Date(`${item.year}-01-01`),
         end: new Date(`${item.year}-12-31`),
-      });
-      return getPlannedWorkingHoursForDateRange(datesInYear, plannedWorkingHours);
+      })
+      return getPlannedWorkingHoursForDateRange(datesInYear, plannedWorkingHours)
     }
     default:
-      return 0;
+      return 0
   }
-};
+}

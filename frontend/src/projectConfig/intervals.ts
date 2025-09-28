@@ -17,11 +17,6 @@
  *
  */
 
-export const API_STATUS_INTERVAL = 1000 * 10; // ms
-export const LOCAL_VERSION_CHECK_INTERVAL = 1000 * 60; // ms
-export const LOGIN_STATUS_CHECK_INTERVAL = 10000;
-export const WS_PING_INTERVAL = 25000;
-
-export const UI_DATA_RELOAD_INTERVAL = 1000 * 20; // ms
-export const UI_FAST_DATA_DEDUPE_INTERVAL = 1000 * 5; // ms
-export const UI_SLOW_DATA_DEDUPE_INTERVAL = 1000 * 60; // ms
+export const API_STATUS_INTERVAL = 1000 * 10 // ms
+export const LOCAL_VERSION_CHECK_INTERVAL = 1000 * 60 // ms
+export const UI_SLOW_DATA_DEDUPE_INTERVAL = 1000 * 60 // ms

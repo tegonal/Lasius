@@ -17,14 +17,14 @@
  *
  */
 
-import { apiDatespanFromTo, granularityFromDatespanFromTo } from 'lib/api/apiDateHandling';
-import { useMemo } from 'react';
-import { getNivoChartDataFromApiStatsData } from 'lib/api/functions/getNivoChartDataFromApiStatsData';
-import { useGetWeeklyPlannedWorkingHoursAggregate } from 'lib/api/hooks/useGetWeeklyPlannedWorkingHoursAggregate';
-import { OrganisationBookingSource } from 'types/booking';
-import { Granularity } from 'types/common';
-import { useGetOrganisationBookingAggregatedStats } from 'lib/api/lasius/organisation-bookings/organisation-bookings';
-import { statsSwrConfig } from 'components/shared/stats/statsSwrConfig';
+import { statsSwrConfig } from 'components/ui/data-display/stats/statsSwrConfig'
+import { apiDatespanFromTo, granularityFromDatespanFromTo } from 'lib/api/apiDateHandling'
+import { getNivoChartDataFromApiStatsData } from 'lib/api/functions/getNivoChartDataFromApiStatsData'
+import { useGetWeeklyPlannedWorkingHoursAggregate } from 'lib/api/hooks/useGetWeeklyPlannedWorkingHoursAggregate'
+import { useGetOrganisationBookingAggregatedStats } from 'lib/api/lasius/organisation-bookings/organisation-bookings'
+import { useMemo } from 'react'
+import { OrganisationBookingSource } from 'types/booking'
+import { Granularity } from 'types/common'
 
 export const useGetOrganisationStatsBySourceAndDay = (
   orgId: string,
@@ -33,10 +33,10 @@ export const useGetOrganisationStatsBySourceAndDay = (
     from,
     to,
     granularity,
-  }: { source: OrganisationBookingSource; from: string; to: string; granularity?: Granularity }
+  }: { source: OrganisationBookingSource; from: string; to: string; granularity?: Granularity },
 ) => {
-  const localGranularity = granularity || granularityFromDatespanFromTo(from, to);
-  const { selectedOrganisationWorkingHours } = useGetWeeklyPlannedWorkingHoursAggregate();
+  const localGranularity = granularity || granularityFromDatespanFromTo(from, to)
+  const { selectedOrganisationWorkingHours } = useGetWeeklyPlannedWorkingHoursAggregate()
   const { data, isValidating, error } = useGetOrganisationBookingAggregatedStats(
     orgId,
     {
@@ -44,19 +44,19 @@ export const useGetOrganisationStatsBySourceAndDay = (
       ...apiDatespanFromTo(from, to),
       granularity: localGranularity,
     },
-    statsSwrConfig
-  );
+    statsSwrConfig,
+  )
 
   const transformedData = useMemo(() => {
     if (data) {
       return getNivoChartDataFromApiStatsData(
         data,
         localGranularity,
-        selectedOrganisationWorkingHours
-      );
+        selectedOrganisationWorkingHours,
+      )
     }
-    return undefined;
-  }, [data, localGranularity, selectedOrganisationWorkingHours]);
+    return undefined
+  }, [data, localGranularity, selectedOrganisationWorkingHours])
 
-  return { data: transformedData, isValidating, error };
-};
+  return { data: transformedData, isValidating, error }
+}

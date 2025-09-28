@@ -24,11 +24,10 @@
  * Track your time
  * OpenAPI spec version: 2.0.0+4-3a603fde+20250602-1535
  */
-import useSwr from 'swr';
-import type { Arguments, Key, SWRConfiguration } from 'swr';
+import useSwr from 'swr'
+import useSWRMutation from 'swr/mutation'
 
-import useSWRMutation from 'swr/mutation';
-import type { SWRMutationConfiguration } from 'swr/mutation';
+import { lasiusAxiosInstance } from '../../lasiusAxiosInstance'
 
 import type {
   ModelsCreateOrganisation,
@@ -37,19 +36,19 @@ import type {
   ModelsUpdateOrganisation,
   ModelsUserStub,
   ModelsUserToOrganisationAssignment,
-} from '..';
+} from '..'
+import type { BodyType, ErrorType } from '../../lasiusAxiosInstance'
+import type { Arguments, Key, SWRConfiguration } from 'swr'
+import type { SWRMutationConfiguration } from 'swr/mutation'
 
-import { lasiusAxiosInstance } from '../../lasiusAxiosInstance';
-import type { ErrorType, BodyType } from '../../lasiusAxiosInstance';
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
 
 /**
  * @summary create an organisation
  */
 export const createOrganisation = (
   modelsCreateOrganisation: BodyType<ModelsCreateOrganisation>,
-  options?: SecondParameter<typeof lasiusAxiosInstance>
+  options?: SecondParameter<typeof lasiusAxiosInstance>,
 ) => {
   return lasiusAxiosInstance<ModelsOrganisation>(
     {
@@ -58,23 +57,23 @@ export const createOrganisation = (
       headers: { 'Content-Type': 'application/json' },
       data: modelsCreateOrganisation,
     },
-    options
-  );
-};
+    options,
+  )
+}
 
 export const getCreateOrganisationMutationFetcher = (
-  options?: SecondParameter<typeof lasiusAxiosInstance>
+  options?: SecondParameter<typeof lasiusAxiosInstance>,
 ) => {
   return (_: Key, { arg }: { arg: ModelsCreateOrganisation }): Promise<ModelsOrganisation> => {
-    return createOrganisation(arg, options);
-  };
-};
-export const getCreateOrganisationMutationKey = () => [`/organisations`] as const;
+    return createOrganisation(arg, options)
+  }
+}
+export const getCreateOrganisationMutationKey = () => [`/organisations`] as const
 
 export type CreateOrganisationMutationResult = NonNullable<
   Awaited<ReturnType<typeof createOrganisation>>
->;
-export type CreateOrganisationMutationError = ErrorType<unknown>;
+>
+export type CreateOrganisationMutationError = ErrorType<unknown>
 
 /**
  * @summary create an organisation
@@ -86,66 +85,66 @@ export const useCreateOrganisation = <TError = ErrorType<unknown>>(options?: {
     Key,
     ModelsCreateOrganisation,
     Awaited<ReturnType<typeof createOrganisation>>
-  > & { swrKey?: string };
-  request?: SecondParameter<typeof lasiusAxiosInstance>;
+  > & { swrKey?: string }
+  request?: SecondParameter<typeof lasiusAxiosInstance>
 }) => {
-  const { swr: swrOptions, request: requestOptions } = options ?? {};
+  const { swr: swrOptions, request: requestOptions } = options ?? {}
 
-  const swrKey = swrOptions?.swrKey ?? getCreateOrganisationMutationKey();
-  const swrFn = getCreateOrganisationMutationFetcher(requestOptions);
+  const swrKey = swrOptions?.swrKey ?? getCreateOrganisationMutationKey()
+  const swrFn = getCreateOrganisationMutationFetcher(requestOptions)
 
-  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+  const query = useSWRMutation(swrKey, swrFn, swrOptions)
 
   return {
     swrKey,
     ...query,
-  };
-};
+  }
+}
 export const getOrganisation = (
   orgId: string,
-  options?: SecondParameter<typeof lasiusAxiosInstance>
+  options?: SecondParameter<typeof lasiusAxiosInstance>,
 ) => {
   return lasiusAxiosInstance<ModelsOrganisation>(
     { url: `/organisations/${orgId}`, method: 'GET' },
-    options
-  );
-};
+    options,
+  )
+}
 
-export const getGetOrganisationKey = (orgId: string) => [`/organisations/${orgId}`] as const;
+export const getGetOrganisationKey = (orgId: string) => [`/organisations/${orgId}`] as const
 
-export type GetOrganisationQueryResult = NonNullable<Awaited<ReturnType<typeof getOrganisation>>>;
-export type GetOrganisationQueryError = ErrorType<unknown>;
+export type GetOrganisationQueryResult = NonNullable<Awaited<ReturnType<typeof getOrganisation>>>
+export type GetOrganisationQueryError = ErrorType<unknown>
 
 export const useGetOrganisation = <TError = ErrorType<unknown>>(
   orgId: string,
   options?: {
     swr?: SWRConfiguration<Awaited<ReturnType<typeof getOrganisation>>, TError> & {
-      swrKey?: Key;
-      enabled?: boolean;
-    };
-    request?: SecondParameter<typeof lasiusAxiosInstance>;
-  }
+      swrKey?: Key
+      enabled?: boolean
+    }
+    request?: SecondParameter<typeof lasiusAxiosInstance>
+  },
 ) => {
-  const { swr: swrOptions, request: requestOptions } = options ?? {};
+  const { swr: swrOptions, request: requestOptions } = options ?? {}
 
-  const isEnabled = swrOptions?.enabled !== false && !!orgId;
-  const swrKey = swrOptions?.swrKey ?? (() => (isEnabled ? getGetOrganisationKey(orgId) : null));
-  const swrFn = () => getOrganisation(orgId, requestOptions);
+  const isEnabled = swrOptions?.enabled !== false && !!orgId
+  const swrKey = swrOptions?.swrKey ?? (() => (isEnabled ? getGetOrganisationKey(orgId) : null))
+  const swrFn = () => getOrganisation(orgId, requestOptions)
 
-  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(swrKey, swrFn, swrOptions);
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(swrKey, swrFn, swrOptions)
 
   return {
     swrKey,
     ...query,
-  };
-};
+  }
+}
 /**
  * @summary update an organisation
  */
 export const updateOrganisation = (
   orgId: string,
   modelsUpdateOrganisation: BodyType<ModelsUpdateOrganisation>,
-  options?: SecondParameter<typeof lasiusAxiosInstance>
+  options?: SecondParameter<typeof lasiusAxiosInstance>,
 ) => {
   return lasiusAxiosInstance<ModelsOrganisation>(
     {
@@ -154,25 +153,25 @@ export const updateOrganisation = (
       headers: { 'Content-Type': 'application/json' },
       data: modelsUpdateOrganisation,
     },
-    options
-  );
-};
+    options,
+  )
+}
 
 export const getUpdateOrganisationMutationFetcher = (
   orgId: string,
-  options?: SecondParameter<typeof lasiusAxiosInstance>
+  options?: SecondParameter<typeof lasiusAxiosInstance>,
 ) => {
   return (_: Key, { arg }: { arg: ModelsUpdateOrganisation }): Promise<ModelsOrganisation> => {
-    return updateOrganisation(orgId, arg, options);
-  };
-};
+    return updateOrganisation(orgId, arg, options)
+  }
+}
 export const getUpdateOrganisationMutationKey = (orgId: string) =>
-  [`/organisations/${orgId}`] as const;
+  [`/organisations/${orgId}`] as const
 
 export type UpdateOrganisationMutationResult = NonNullable<
   Awaited<ReturnType<typeof updateOrganisation>>
->;
-export type UpdateOrganisationMutationError = ErrorType<unknown>;
+>
+export type UpdateOrganisationMutationError = ErrorType<unknown>
 
 /**
  * @summary update an organisation
@@ -186,47 +185,47 @@ export const useUpdateOrganisation = <TError = ErrorType<unknown>>(
       Key,
       ModelsUpdateOrganisation,
       Awaited<ReturnType<typeof updateOrganisation>>
-    > & { swrKey?: string };
-    request?: SecondParameter<typeof lasiusAxiosInstance>;
-  }
+    > & { swrKey?: string }
+    request?: SecondParameter<typeof lasiusAxiosInstance>
+  },
 ) => {
-  const { swr: swrOptions, request: requestOptions } = options ?? {};
+  const { swr: swrOptions, request: requestOptions } = options ?? {}
 
-  const swrKey = swrOptions?.swrKey ?? getUpdateOrganisationMutationKey(orgId);
-  const swrFn = getUpdateOrganisationMutationFetcher(orgId, requestOptions);
+  const swrKey = swrOptions?.swrKey ?? getUpdateOrganisationMutationKey(orgId)
+  const swrFn = getUpdateOrganisationMutationFetcher(orgId, requestOptions)
 
-  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+  const query = useSWRMutation(swrKey, swrFn, swrOptions)
 
   return {
     swrKey,
     ...query,
-  };
-};
+  }
+}
 /**
  * @summary delete/deactivate an organisation
  */
 export const deactivateOrganisation = (
   orgId: string,
-  options?: SecondParameter<typeof lasiusAxiosInstance>
+  options?: SecondParameter<typeof lasiusAxiosInstance>,
 ) => {
-  return lasiusAxiosInstance<void>({ url: `/organisations/${orgId}`, method: 'DELETE' }, options);
-};
+  return lasiusAxiosInstance<void>({ url: `/organisations/${orgId}`, method: 'DELETE' }, options)
+}
 
 export const getDeactivateOrganisationMutationFetcher = (
   orgId: string,
-  options?: SecondParameter<typeof lasiusAxiosInstance>
+  options?: SecondParameter<typeof lasiusAxiosInstance>,
 ) => {
   return (_: Key, __: { arg: Arguments }): Promise<void> => {
-    return deactivateOrganisation(orgId, options);
-  };
-};
+    return deactivateOrganisation(orgId, options)
+  }
+}
 export const getDeactivateOrganisationMutationKey = (orgId: string) =>
-  [`/organisations/${orgId}`] as const;
+  [`/organisations/${orgId}`] as const
 
 export type DeactivateOrganisationMutationResult = NonNullable<
   Awaited<ReturnType<typeof deactivateOrganisation>>
->;
-export type DeactivateOrganisationMutationError = ErrorType<unknown>;
+>
+export type DeactivateOrganisationMutationError = ErrorType<unknown>
 
 /**
  * @summary delete/deactivate an organisation
@@ -240,71 +239,71 @@ export const useDeactivateOrganisation = <TError = ErrorType<unknown>>(
       Key,
       Arguments,
       Awaited<ReturnType<typeof deactivateOrganisation>>
-    > & { swrKey?: string };
-    request?: SecondParameter<typeof lasiusAxiosInstance>;
-  }
+    > & { swrKey?: string }
+    request?: SecondParameter<typeof lasiusAxiosInstance>
+  },
 ) => {
-  const { swr: swrOptions, request: requestOptions } = options ?? {};
+  const { swr: swrOptions, request: requestOptions } = options ?? {}
 
-  const swrKey = swrOptions?.swrKey ?? getDeactivateOrganisationMutationKey(orgId);
-  const swrFn = getDeactivateOrganisationMutationFetcher(orgId, requestOptions);
+  const swrKey = swrOptions?.swrKey ?? getDeactivateOrganisationMutationKey(orgId)
+  const swrFn = getDeactivateOrganisationMutationFetcher(orgId, requestOptions)
 
-  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+  const query = useSWRMutation(swrKey, swrFn, swrOptions)
 
   return {
     swrKey,
     ...query,
-  };
-};
+  }
+}
 export const getOrganisationUserList = (
   orgId: string,
-  options?: SecondParameter<typeof lasiusAxiosInstance>
+  options?: SecondParameter<typeof lasiusAxiosInstance>,
 ) => {
   return lasiusAxiosInstance<ModelsUserStub[]>(
     { url: `/organisations/${orgId}/users`, method: 'GET' },
-    options
-  );
-};
+    options,
+  )
+}
 
 export const getGetOrganisationUserListKey = (orgId: string) =>
-  [`/organisations/${orgId}/users`] as const;
+  [`/organisations/${orgId}/users`] as const
 
 export type GetOrganisationUserListQueryResult = NonNullable<
   Awaited<ReturnType<typeof getOrganisationUserList>>
->;
-export type GetOrganisationUserListQueryError = ErrorType<unknown>;
+>
+export type GetOrganisationUserListQueryError = ErrorType<unknown>
 
 export const useGetOrganisationUserList = <TError = ErrorType<unknown>>(
   orgId: string,
   options?: {
     swr?: SWRConfiguration<Awaited<ReturnType<typeof getOrganisationUserList>>, TError> & {
-      swrKey?: Key;
-      enabled?: boolean;
-    };
-    request?: SecondParameter<typeof lasiusAxiosInstance>;
-  }
+      swrKey?: Key
+      enabled?: boolean
+    }
+    request?: SecondParameter<typeof lasiusAxiosInstance>
+  },
 ) => {
-  const { swr: swrOptions, request: requestOptions } = options ?? {};
+  const { swr: swrOptions, request: requestOptions } = options ?? {}
 
-  const isEnabled = swrOptions?.enabled !== false && !!orgId;
+  const isEnabled = swrOptions?.enabled !== false && !!orgId
   const swrKey =
-    swrOptions?.swrKey ?? (() => (isEnabled ? getGetOrganisationUserListKey(orgId) : null));
-  const swrFn = () => getOrganisationUserList(orgId, requestOptions);
+    swrOptions?.swrKey ?? (() => (isEnabled ? getGetOrganisationUserListKey(orgId) : null))
+  const swrFn = () => getOrganisationUserList(orgId, requestOptions)
 
-  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(swrKey, swrFn, swrOptions);
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(swrKey, swrFn, swrOptions)
 
   return {
     swrKey,
     ...query,
-  };
-};
+  }
+}
 /**
  * @summary assign a user to an organisation
  */
 export const inviteOrganisationUser = (
   orgId: string,
   modelsUserToOrganisationAssignment: BodyType<ModelsUserToOrganisationAssignment>,
-  options?: SecondParameter<typeof lasiusAxiosInstance>
+  options?: SecondParameter<typeof lasiusAxiosInstance>,
 ) => {
   return lasiusAxiosInstance<ModelsInvitationResult>(
     {
@@ -313,28 +312,28 @@ export const inviteOrganisationUser = (
       headers: { 'Content-Type': 'application/json' },
       data: modelsUserToOrganisationAssignment,
     },
-    options
-  );
-};
+    options,
+  )
+}
 
 export const getInviteOrganisationUserMutationFetcher = (
   orgId: string,
-  options?: SecondParameter<typeof lasiusAxiosInstance>
+  options?: SecondParameter<typeof lasiusAxiosInstance>,
 ) => {
   return (
     _: Key,
-    { arg }: { arg: ModelsUserToOrganisationAssignment }
+    { arg }: { arg: ModelsUserToOrganisationAssignment },
   ): Promise<ModelsInvitationResult> => {
-    return inviteOrganisationUser(orgId, arg, options);
-  };
-};
+    return inviteOrganisationUser(orgId, arg, options)
+  }
+}
 export const getInviteOrganisationUserMutationKey = (orgId: string) =>
-  [`/organisations/${orgId}/invite`] as const;
+  [`/organisations/${orgId}/invite`] as const
 
 export type InviteOrganisationUserMutationResult = NonNullable<
   Awaited<ReturnType<typeof inviteOrganisationUser>>
->;
-export type InviteOrganisationUserMutationError = ErrorType<unknown>;
+>
+export type InviteOrganisationUserMutationError = ErrorType<unknown>
 
 /**
  * @summary assign a user to an organisation
@@ -348,52 +347,52 @@ export const useInviteOrganisationUser = <TError = ErrorType<unknown>>(
       Key,
       ModelsUserToOrganisationAssignment,
       Awaited<ReturnType<typeof inviteOrganisationUser>>
-    > & { swrKey?: string };
-    request?: SecondParameter<typeof lasiusAxiosInstance>;
-  }
+    > & { swrKey?: string }
+    request?: SecondParameter<typeof lasiusAxiosInstance>
+  },
 ) => {
-  const { swr: swrOptions, request: requestOptions } = options ?? {};
+  const { swr: swrOptions, request: requestOptions } = options ?? {}
 
-  const swrKey = swrOptions?.swrKey ?? getInviteOrganisationUserMutationKey(orgId);
-  const swrFn = getInviteOrganisationUserMutationFetcher(orgId, requestOptions);
+  const swrKey = swrOptions?.swrKey ?? getInviteOrganisationUserMutationKey(orgId)
+  const swrFn = getInviteOrganisationUserMutationFetcher(orgId, requestOptions)
 
-  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+  const query = useSWRMutation(swrKey, swrFn, swrOptions)
 
   return {
     swrKey,
     ...query,
-  };
-};
+  }
+}
 /**
  * @summary Remove selected user's membership from selected organisation
  */
 export const removeOrganisationUser = (
   orgId: string,
   userId: string,
-  options?: SecondParameter<typeof lasiusAxiosInstance>
+  options?: SecondParameter<typeof lasiusAxiosInstance>,
 ) => {
   return lasiusAxiosInstance<void>(
     { url: `/organisations/${orgId}/users/${userId}`, method: 'DELETE' },
-    options
-  );
-};
+    options,
+  )
+}
 
 export const getRemoveOrganisationUserMutationFetcher = (
   orgId: string,
   userId: string,
-  options?: SecondParameter<typeof lasiusAxiosInstance>
+  options?: SecondParameter<typeof lasiusAxiosInstance>,
 ) => {
   return (_: Key, __: { arg: Arguments }): Promise<void> => {
-    return removeOrganisationUser(orgId, userId, options);
-  };
-};
+    return removeOrganisationUser(orgId, userId, options)
+  }
+}
 export const getRemoveOrganisationUserMutationKey = (orgId: string, userId: string) =>
-  [`/organisations/${orgId}/users/${userId}`] as const;
+  [`/organisations/${orgId}/users/${userId}`] as const
 
 export type RemoveOrganisationUserMutationResult = NonNullable<
   Awaited<ReturnType<typeof removeOrganisationUser>>
->;
-export type RemoveOrganisationUserMutationError = ErrorType<unknown>;
+>
+export type RemoveOrganisationUserMutationError = ErrorType<unknown>
 
 /**
  * @summary Remove selected user's membership from selected organisation
@@ -408,19 +407,19 @@ export const useRemoveOrganisationUser = <TError = ErrorType<unknown>>(
       Key,
       Arguments,
       Awaited<ReturnType<typeof removeOrganisationUser>>
-    > & { swrKey?: string };
-    request?: SecondParameter<typeof lasiusAxiosInstance>;
-  }
+    > & { swrKey?: string }
+    request?: SecondParameter<typeof lasiusAxiosInstance>
+  },
 ) => {
-  const { swr: swrOptions, request: requestOptions } = options ?? {};
+  const { swr: swrOptions, request: requestOptions } = options ?? {}
 
-  const swrKey = swrOptions?.swrKey ?? getRemoveOrganisationUserMutationKey(orgId, userId);
-  const swrFn = getRemoveOrganisationUserMutationFetcher(orgId, userId, requestOptions);
+  const swrKey = swrOptions?.swrKey ?? getRemoveOrganisationUserMutationKey(orgId, userId)
+  const swrFn = getRemoveOrganisationUserMutationFetcher(orgId, userId, requestOptions)
 
-  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+  const query = useSWRMutation(swrKey, swrFn, swrOptions)
 
   return {
     swrKey,
     ...query,
-  };
-};
+  }
+}

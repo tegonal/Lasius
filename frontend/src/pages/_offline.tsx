@@ -19,23 +19,24 @@
 
 // This page is shown to users using the app as PWA, if the device is offline
 
-import { NextPage } from 'next';
-import { LoginLayout } from 'layout/pages/login/loginLayout';
-import { BoxWarning } from 'components/shared/notifications/boxWarning';
-import { useTranslation } from 'next-i18next';
+import { LoginLayout } from 'components/features/login/loginLayout'
+import { Alert } from 'components/ui/feedback/Alert'
+import { NextPage } from 'next'
+import { useTranslation } from 'next-i18next'
 
 const OfflinePage: NextPage = () => {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation('common')
 
   return (
     <LoginLayout>
-      <BoxWarning>
-        {t(
-          'You are offline. This application requires an online connection. It will update automatically when a network connection is detected.'
-        )}
-      </BoxWarning>
+      <Alert variant="warning">
+        {t('offline.message', {
+          defaultValue:
+            'You are offline. This application requires an online connection. It will update automatically when a network connection is detected.',
+        })}
+      </Alert>
     </LoginLayout>
-  );
-};
+  )
+}
 
-export default OfflinePage;
+export default OfflinePage

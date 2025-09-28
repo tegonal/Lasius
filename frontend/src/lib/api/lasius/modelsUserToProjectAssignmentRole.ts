@@ -26,10 +26,9 @@
  */
 
 export type ModelsUserToProjectAssignmentRole =
-  (typeof ModelsUserToProjectAssignmentRole)[keyof typeof ModelsUserToProjectAssignmentRole];
+  (typeof ModelsUserToProjectAssignmentRole)[keyof typeof ModelsUserToProjectAssignmentRole]
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ModelsUserToProjectAssignmentRole = {
   ProjectMember: 'ProjectMember',
   ProjectAdministrator: 'ProjectAdministrator',
-} as const;
+} as const

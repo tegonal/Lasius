@@ -17,40 +17,39 @@
  *
  */
 
-import { SelectAutocompleteSuggestionType } from 'components/forms/input/inputSelectAutocomplete';
-import { ModelsUserProject } from 'lib/api/lasius';
-import { orderBy } from 'lodash';
-import { useProfile } from 'lib/api/hooks/useProfile';
+import { SelectAutocompleteSuggestionType } from 'components/ui/forms/input/inputSelectAutocomplete'
+import { orderBy } from 'es-toolkit'
+import { useProfile } from 'lib/api/hooks/useProfile'
+import { ModelsUserProject } from 'lib/api/lasius'
 
 export const useProjects = () => {
-  const { profile } = useProfile();
+  const { profile } = useProfile()
   const projectSuggestions = (): SelectAutocompleteSuggestionType[] => {
     if (profile?.organisations) {
       const org = profile.organisations.find(
-        (item) => item.organisationReference.id === profile.settings?.lastSelectedOrganisation?.id
-      );
-      return (
-        orderBy(
-          org?.projects.map((item) => item.projectReference),
-          (data) => data.key
-        ) || []
-      );
+        (item) => item.organisationReference.id === profile.settings?.lastSelectedOrganisation?.id,
+      )
+      return orderBy(
+        org?.projects.map((item) => item.projectReference) || [],
+        [(data) => data.key],
+        ['asc'],
+      )
     }
-    return [];
-  };
+    return []
+  }
 
   const userProjects = (): ModelsUserProject[] => {
     if (profile?.organisations) {
       const org = profile?.organisations.find(
-        (item) => item.organisationReference.id === profile.settings?.lastSelectedOrganisation?.id
-      );
-      return orderBy(org?.projects, (data) => data.projectReference.key) || [];
+        (item) => item.organisationReference.id === profile.settings?.lastSelectedOrganisation?.id,
+      )
+      return orderBy(org?.projects || [], [(data) => data.projectReference.key], ['asc'])
     }
-    return [];
-  };
+    return []
+  }
 
   return {
     projectSuggestions,
     userProjects,
-  };
-};
+  }
+}

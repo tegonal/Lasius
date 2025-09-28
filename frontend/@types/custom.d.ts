@@ -18,6 +18,7 @@
  */
 
 import 'react-i18next';
+
 import en from '../public/locales/en/common.json';
 
 declare module '*.svg' {

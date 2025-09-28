@@ -24,9 +24,9 @@
  * Track your time
  * OpenAPI spec version: 2.0.0+4-3a603fde+20250602-1535
  */
-import type { ModelsUserToOrganisationAssignmentRole } from './modelsUserToOrganisationAssignmentRole';
+import type { ModelsUserToOrganisationAssignmentRole } from './modelsUserToOrganisationAssignmentRole'
 
 export interface ModelsUserToOrganisationAssignment {
-  email: string;
-  role: ModelsUserToOrganisationAssignmentRole;
+  email: string
+  role: ModelsUserToOrganisationAssignmentRole
 }

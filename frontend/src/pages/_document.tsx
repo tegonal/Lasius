@@ -17,21 +17,32 @@
  *
  */
 
-import { InitializeColorMode } from 'theme-ui';
-import NextDocument, { DocumentContext, Head, Html, Main, NextScript } from 'next/document';
-import React from 'react';
-
-import { googleFontLoaderString } from 'styles/themeConstants';
-import { BUILD_ID, ENVIRONMENT } from 'projectConfig/constants';
+import NextDocument, { DocumentContext, Head, Html, Main, NextScript } from 'next/document'
+import { BUILD_ID, ENVIRONMENT } from 'projectConfig/constants'
+import React from 'react'
 
 class MyDocument extends NextDocument {
   static async getInitialProps(ctx: DocumentContext) {
-    return NextDocument.getInitialProps(ctx);
+    const initialProps = await NextDocument.getInitialProps(ctx)
+    // Without i18n config, we must read locale from cookie or header
+    const locale =
+      (ctx.req?.headers['x-middleware-request-locale'] as string) ||
+      ctx.req?.headers.cookie
+        ?.split(';')
+        .find((c) => c.trim().startsWith('NEXT_LOCALE='))
+        ?.split('=')[1]
+        ?.trim() ||
+      'en'
+
+    return { ...initialProps, locale }
   }
 
   render() {
+    // Type assertion to access locale from props
+    const { locale } = this.props as any
+
     return (
-      <Html>
+      <Html lang={locale}>
         <Head>
           <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
           <link rel="manifest" href="/manifest.json" />
@@ -50,7 +61,44 @@ class MyDocument extends NextDocument {
           <meta httpEquiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
           <meta name="build-id" content={`${BUILD_ID}`} />
           <meta name="environment" content={`${ENVIRONMENT}`} />
-          <link href={googleFontLoaderString} rel="stylesheet" />
+          {/* Script to initialize DaisyUI/Tailwind theme before render to avoid FOUC */}
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function() { 
+                  try {
+                    // Check for saved theme in localStorage
+                    var savedTheme = localStorage.getItem('theme');
+
+                    // If no saved theme, check for Theme-UI mode
+                    if (!savedTheme) {
+                      var themeUIMode = localStorage.getItem('theme-ui-color-mode');
+                      if (themeUIMode === 'dark') {
+                        savedTheme = 'dark';
+                      } else if (themeUIMode === 'light') {
+                        savedTheme = 'light';
+                      }
+                    }
+
+                    // If still no theme, check system preference
+                    if (!savedTheme) {
+                      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                        savedTheme = 'dark';
+                      } else {
+                        savedTheme = 'light';
+                      }
+                    }
+
+                    // Apply the theme
+                    document.documentElement.setAttribute('data-theme', savedTheme);
+                  } catch (e) {
+                    // Fallback to light theme if anything goes wrong
+                    document.documentElement.setAttribute('data-theme', 'light');
+                  }
+                })();
+              `,
+            }}
+          />
         </Head>
         <body id="body">
           <svg style={{ display: 'none' }}>
@@ -59,14 +107,13 @@ class MyDocument extends NextDocument {
           <noscript>
             <p>Please enable JavaScript in your browser settings and reload this page.</p>
           </noscript>
-          <InitializeColorMode />
           <Main />
           <div id="modal" />
           <NextScript />
         </body>
       </Html>
-    );
+    )
   }
 }
 
-export default MyDocument;
+export default MyDocument

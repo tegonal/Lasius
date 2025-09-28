@@ -17,27 +17,29 @@
  *
  */
 
-import { GetServerSideProps } from 'next';
-import { StatsLayout } from 'layout/pages/user/stats/statsLayout';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { LayoutDesktop } from 'layout/layoutDesktop';
-import { NextPageWithLayout } from 'pages/_app';
+import { StatsLayout } from 'components/features/user/stats/statsLayout'
+import { LayoutResponsive } from 'components/ui/layouts/layoutResponsive'
+import { GetServerSideProps } from 'next'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { NextPageWithLayout } from 'pages/_app'
 
 const StatsPage: NextPageWithLayout = () => {
-  return <StatsLayout />;
-};
+  return <StatsLayout />
+}
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { locale = '' } = context;
+  const { locale = '' } = context
   return {
     props: {
       ...(await serverSideTranslations(locale, ['common'])),
     },
-  };
-};
+  }
+}
 
 StatsPage.getLayout = function getLayout(page) {
-  return <LayoutDesktop>{page}</LayoutDesktop>;
-};
+  // Stats page doesn't have a right column or custom mobile content
+  // It will use the same content for both desktop center and mobile
+  return <LayoutResponsive>{page}</LayoutResponsive>
+}
 
-export default StatsPage;
+export default StatsPage

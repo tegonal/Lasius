@@ -24,11 +24,11 @@
  * Track your time
  * OpenAPI spec version: 2.0.0+4-3a603fde+20250602-1535
  */
-import type { GetAggregatedStatisticsByProjectGranularity } from './getAggregatedStatisticsByProjectGranularity';
+import type { GetAggregatedStatisticsByProjectGranularity } from './getAggregatedStatisticsByProjectGranularity'
 
 export type GetAggregatedStatisticsByProjectParams = {
-  source: string;
-  from: string;
-  to: string;
-  granularity: GetAggregatedStatisticsByProjectGranularity;
-};
+  source: string
+  from: string
+  to: string
+  granularity: GetAggregatedStatisticsByProjectGranularity
+}

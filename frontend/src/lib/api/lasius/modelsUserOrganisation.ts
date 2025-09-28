@@ -24,15 +24,15 @@
  * Track your time
  * OpenAPI spec version: 2.0.0+4-3a603fde+20250602-1535
  */
-import type { ModelsEntityReference } from './modelsEntityReference';
-import type { ModelsUserOrganisationRole } from './modelsUserOrganisationRole';
-import type { ModelsWorkingHours } from './modelsWorkingHours';
-import type { ModelsUserProject } from './modelsUserProject';
+import type { ModelsEntityReference } from './modelsEntityReference'
+import type { ModelsUserOrganisationRole } from './modelsUserOrganisationRole'
+import type { ModelsUserProject } from './modelsUserProject'
+import type { ModelsWorkingHours } from './modelsWorkingHours'
 
 export interface ModelsUserOrganisation {
-  organisationReference: ModelsEntityReference;
-  private: boolean;
-  role: ModelsUserOrganisationRole;
-  plannedWorkingHours: ModelsWorkingHours;
-  projects: ModelsUserProject[];
+  organisationReference: ModelsEntityReference
+  private: boolean
+  role: ModelsUserOrganisationRole
+  plannedWorkingHours: ModelsWorkingHours
+  projects: ModelsUserProject[]
 }

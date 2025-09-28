@@ -17,46 +17,46 @@
  *
  */
 
-import { useEffect, useState } from 'react';
-import useWebSocket, { ReadyState } from 'react-use-websocket';
-import { CONNECTION_STATUS, IS_SERVER, LASIUS_API_WEBSOCKET_URL } from 'projectConfig/constants';
-import parseJson from 'parse-json';
-import { logger } from 'lib/logger';
-import useIsWindowFocused from 'lib/hooks/useIsWindowFocused';
+import useIsWindowFocused from 'lib/hooks/useIsWindowFocused'
+import { logger } from 'lib/logger'
+import parseJson from 'parse-json'
+import { CONNECTION_STATUS, IS_SERVER, LASIUS_API_WEBSOCKET_URL } from 'projectConfig/constants'
+import { useEffect, useState } from 'react'
+import useWebSocket, { ReadyState } from 'react-use-websocket'
 
 export const useLasiusWebsocket = () => {
-  const isWindowFocused = useIsWindowFocused();
+  const isWindowFocused = useIsWindowFocused()
 
-  const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([]);
+  const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([])
 
-  const websocketUrl = IS_SERVER ? null : `${LASIUS_API_WEBSOCKET_URL}/messaging/websocket`;
+  const websocketUrl = IS_SERVER ? null : `${LASIUS_API_WEBSOCKET_URL}/messaging/websocket`
   const { sendJsonMessage, lastMessage, readyState } = useWebSocket(websocketUrl, {
     share: true,
     shouldReconnect: (closeEvent) => {
-      logger.warn('[useLasiusWebsocket][shouldReconnect]', closeEvent);
-      return true;
+      logger.warn('[useLasiusWebsocket][shouldReconnect]', closeEvent)
+      return true
     },
     retryOnError: true,
     //exponential backoff reconnect interval
     reconnectInterval: (attemptNumber) => Math.min(Math.pow(2, attemptNumber) * 1000, 10000),
     reconnectAttempts: 30,
-  });
+  })
 
   useEffect(() => {
     if (isWindowFocused && readyState === ReadyState.OPEN) {
-      logger.info('[useLasiusWebsocket][onReturn][connected]');
+      logger.info('[useLasiusWebsocket][onReturn][connected]')
     }
     if (isWindowFocused && readyState !== ReadyState.OPEN) {
-      logger.info('[useLasiusWebsocket][onReturn][disconnected]');
-      setMessageHistory([]);
+      logger.info('[useLasiusWebsocket][onReturn][disconnected]')
+      setMessageHistory([])
     }
-  }, [isWindowFocused, readyState]);
+  }, [isWindowFocused, readyState])
 
   useEffect(() => {
     if (lastMessage !== null) {
-      setMessageHistory((prev) => [...prev, lastMessage]);
+      setMessageHistory((prev) => [...prev, lastMessage])
     }
-  }, [lastMessage, setMessageHistory]);
+  }, [lastMessage, setMessageHistory])
 
   const connectionStatus = {
     [ReadyState.CONNECTING]: CONNECTION_STATUS.CONNECTING,
@@ -64,12 +64,12 @@ export const useLasiusWebsocket = () => {
     [ReadyState.CLOSING]: CONNECTION_STATUS.DISCONNECTED,
     [ReadyState.CLOSED]: CONNECTION_STATUS.ERROR,
     [ReadyState.UNINSTANTIATED]: CONNECTION_STATUS.ERROR,
-  }[readyState];
+  }[readyState]
 
   return {
     sendJsonMessage,
     lastMessage: lastMessage?.data ? parseJson(lastMessage?.data) : null,
     connectionStatus,
     messageHistory,
-  };
-};
+  }
+}

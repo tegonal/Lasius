@@ -24,9 +24,9 @@
  * Track your time
  * OpenAPI spec version: 2.0.0+4-3a603fde+20250602-1535
  */
-import type { ModelsEntityReferenceModelsOrganisationId } from './modelsEntityReferenceModelsOrganisationId';
+import type { ModelsEntityReferenceModelsOrganisationId } from './modelsEntityReferenceModelsOrganisationId'
 
 export interface ModelsAcceptInvitationRequest {
   /** @nullable */
-  organisationReference?: ModelsEntityReferenceModelsOrganisationId;
+  organisationReference?: ModelsEntityReferenceModelsOrganisationId
 }

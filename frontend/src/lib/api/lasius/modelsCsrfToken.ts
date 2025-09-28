@@ -26,5 +26,5 @@
  */
 
 export interface ModelsCsrfToken {
-  value: string;
+  value: string
 }

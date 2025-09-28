@@ -17,23 +17,23 @@
  *
  */
 
-import { round } from 'lodash';
+import { round } from 'es-toolkit'
 
 export const getExpectedVsBookedPercentage = (expected: number, worked: number) => {
-  let fulfilledPercentage = 0;
-  if (worked === 0) fulfilledPercentage = 0;
-  if (expected === 0 && worked > 0) fulfilledPercentage = 100;
-  if (expected > 0 && worked > 0) fulfilledPercentage = round((worked / expected) * 100, 2);
+  let fulfilledPercentage = 0
+  if (worked === 0) fulfilledPercentage = 0
+  if (expected === 0 && worked > 0) fulfilledPercentage = 100
+  if (expected > 0 && worked > 0) fulfilledPercentage = round((worked / expected) * 100, 2)
 
   const progressBarPercentage =
     fulfilledPercentage > 90 && fulfilledPercentage < 100
       ? 90
       : fulfilledPercentage > 100
         ? 100
-        : fulfilledPercentage;
+        : fulfilledPercentage
 
   return {
     fulfilledPercentage,
     progressBarPercentage,
-  };
-};
+  }
+}

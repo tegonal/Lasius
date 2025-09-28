@@ -26,6 +26,6 @@
  */
 
 export interface ModelsEntityReference {
-  id: string;
-  key: string;
+  id: string
+  key: string
 }

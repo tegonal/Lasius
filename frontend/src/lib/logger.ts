@@ -17,13 +17,14 @@
  *
  */
 
-import { DEV } from 'projectConfig/constants';
-import type { ILogObj } from 'tslog';
-import { Logger } from 'tslog';
+import { DEV } from 'projectConfig/constants'
+import { Logger } from 'tslog'
 
-const dev: ILogObj = { type: 'pretty', minLevel: 0 };
-const prod: ILogObj = { type: 'json', minLevel: 4, hideLogPositionForProduction: true };
+import type { ILogObj } from 'tslog'
 
-const logger: Logger<ILogObj> = new Logger(DEV ? dev : prod);
+const dev: ILogObj = { type: 'pretty', minLevel: 0 }
+const prod: ILogObj = { type: 'json', minLevel: 4, hideLogPositionForProduction: true }
 
-export { logger };
+const logger: Logger<ILogObj> = new Logger(DEV ? dev : prod)
+
+export { logger }

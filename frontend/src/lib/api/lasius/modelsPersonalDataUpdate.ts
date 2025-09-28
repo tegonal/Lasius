@@ -27,9 +27,9 @@
 
 export interface ModelsPersonalDataUpdate {
   /** @nullable */
-  email?: string | null;
+  email?: string | null
   /** @nullable */
-  firstName?: string | null;
+  firstName?: string | null
   /** @nullable */
-  lastName?: string | null;
+  lastName?: string | null
 }

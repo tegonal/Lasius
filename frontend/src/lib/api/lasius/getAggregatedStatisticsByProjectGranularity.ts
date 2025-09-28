@@ -26,13 +26,12 @@
  */
 
 export type GetAggregatedStatisticsByProjectGranularity =
-  (typeof GetAggregatedStatisticsByProjectGranularity)[keyof typeof GetAggregatedStatisticsByProjectGranularity];
+  (typeof GetAggregatedStatisticsByProjectGranularity)[keyof typeof GetAggregatedStatisticsByProjectGranularity]
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const GetAggregatedStatisticsByProjectGranularity = {
   All: 'All',
   Year: 'Year',
   Month: 'Month',
   Week: 'Week',
   Day: 'Day',
-} as const;
+} as const

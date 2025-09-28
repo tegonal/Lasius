@@ -27,105 +27,105 @@ import {
   startOfDay,
   startOfMonth,
   startOfWeek,
-} from 'date-fns';
-import { toZonedTime, fromZonedTime } from 'date-fns-tz';
-import { ModelsLocalDateTimeWithTimeZone } from 'lib/api/lasius';
-import { Granularity } from 'types/common';
+} from 'date-fns'
+import { fromZonedTime, toZonedTime } from 'date-fns-tz'
+import { ModelsLocalDateTimeWithTimeZone } from 'lib/api/lasius'
+import { Granularity } from 'types/common'
 
-export type ApiDateParam = string;
-export type IsoDateString = string;
-export const apiUrlDateParamFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS";
-export const apiUrlDateFormat = 'yyyy-MM-dd';
+export type ApiDateParam = string
+export type IsoDateString = string
+export const apiUrlDateParamFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS"
+export const apiUrlDateFormat = 'yyyy-MM-dd'
 
 export const formatDateTimeToURLParam = (date: Date) => {
-  return format(date, apiUrlDateParamFormat);
-};
+  return format(date, apiUrlDateParamFormat)
+}
 
 export const formatDateToURLParam = (date: Date) => {
-  return format(date, apiUrlDateFormat);
-};
+  return format(date, apiUrlDateFormat)
+}
 
 export const apiTimespanFromTo = (
   from: IsoDateString,
-  to: IsoDateString
+  to: IsoDateString,
 ): { from: ApiDateParam; to: ApiDateParam } => {
   return {
     from: formatDateTimeToURLParam(startOfDay(new Date(from))),
     to: formatDateTimeToURLParam(endOfDay(new Date(to))),
-  };
-};
+  }
+}
 
 export const apiDatespanFromTo = (
   from: IsoDateString,
-  to: IsoDateString
+  to: IsoDateString,
 ): { from: ApiDateParam; to: ApiDateParam } => {
   return {
     from: formatDateToURLParam(startOfDay(new Date(from))),
     to: formatDateToURLParam(endOfDay(new Date(to))),
-  };
-};
+  }
+}
 
 export const granularityFromDatespanFromTo = (
   from: IsoDateString,
-  to: IsoDateString
+  to: IsoDateString,
 ): Granularity => {
-  const days = differenceInCalendarDays(new Date(to), new Date(from));
+  const days = differenceInCalendarDays(new Date(to), new Date(from))
   if (!days) {
-    return 'Day';
+    return 'Day'
   }
   if (days > 400) {
-    return 'Year';
+    return 'Year'
   }
   if (days > 95) {
-    return 'Month';
+    return 'Month'
   }
   if (days > 15) {
-    return 'Week';
+    return 'Week'
   }
-  return 'Day';
-};
+  return 'Day'
+}
 
 /**
  * Get from and to date based on a given day, spanning the entire day
  * @param date
  */
 export const apiTimespanDay = (date: IsoDateString): { from: ApiDateParam; to: ApiDateParam } => {
-  const dateObj = new Date(date);
+  const dateObj = new Date(date)
   return {
     from: formatDateTimeToURLParam(startOfDay(dateObj)),
     to: formatDateTimeToURLParam(endOfDay(dateObj)),
-  };
-};
+  }
+}
 
 /**
  * Get from and to date based on a given day, spanning the entire week this day is part of
  * @param date
  */
 export const apiTimespanWeek = (date: IsoDateString): { from: ApiDateParam; to: ApiDateParam } => {
-  const dateObj = new Date(date);
+  const dateObj = new Date(date)
   return {
     from: formatDateTimeToURLParam(startOfDay(startOfWeek(dateObj, { weekStartsOn: 1 }))),
     to: formatDateTimeToURLParam(endOfDay(endOfWeek(dateObj, { weekStartsOn: 1 }))),
-  };
-};
+  }
+}
 
 /**
  * Get from and to date based on a given day, spanning the entire month this day is part of
  * @param date
  */
 export const apiTimespanMonth = (date: IsoDateString): { from: ApiDateParam; to: ApiDateParam } => {
-  const dateObj = new Date(date);
+  const dateObj = new Date(date)
   return {
     from: formatDateTimeToURLParam(startOfDay(startOfMonth(dateObj))),
     to: formatDateTimeToURLParam(endOfDay(endOfMonth(dateObj))),
-  };
-};
+  }
+}
 
 export const modelsLocalDateTimeWithTimeZoneToString = (
-  m: ModelsLocalDateTimeWithTimeZone
+  m: ModelsLocalDateTimeWithTimeZone,
 ): string => {
-  const isoDate = parseISO(m.dateTime);
-  const asUtc = fromZonedTime(isoDate, m.zone);
-  const zoned = toZonedTime(asUtc, m.zone);
-  return zoned.toISOString();
-};
+  const isoDate = parseISO(m.dateTime)
+  const asUtc = fromZonedTime(isoDate, m.zone)
+  const zoned = toZonedTime(asUtc, m.zone)
+  return zoned.toISOString()
+}

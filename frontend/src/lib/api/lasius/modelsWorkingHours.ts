@@ -26,11 +26,11 @@
  */
 
 export interface ModelsWorkingHours {
-  monday: number;
-  tuesday: number;
-  wednesday: number;
-  thursday: number;
-  friday: number;
-  saturday: number;
-  sunday: number;
+  monday: number
+  tuesday: number
+  wednesday: number
+  thursday: number
+  friday: number
+  saturday: number
+  sunday: number
 }

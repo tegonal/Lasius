@@ -17,18 +17,18 @@
  *
  */
 
-import { updateUserSettings, useGetUserProfile, acceptUserTOS } from 'lib/api/lasius/user/user';
-import { ModelsUserSettings, ModelsAcceptTOSRequest } from 'lib/api/lasius';
-import { useSession } from 'next-auth/react';
-import { useEffect, useState } from 'react';
+import { ModelsAcceptTOSRequest, ModelsUserSettings } from 'lib/api/lasius'
+import { acceptUserTOS, updateUserSettings, useGetUserProfile } from 'lib/api/lasius/user/user'
+import { useSession } from 'next-auth/react'
+import { useEffect, useState } from 'react'
 
 export const useProfile = () => {
-  const session = useSession();
-  const [enabled, setEnabled] = useState(false);
+  const session = useSession()
+  const [enabled, setEnabled] = useState(false)
 
   useEffect(() => {
-    setEnabled(session.data?.access_token !== undefined);
-  }, [session.data?.access_token]);
+    setEnabled(session.data?.access_token !== undefined)
+  }, [session.data?.access_token])
 
   const { data, mutate } = useGetUserProfile({
     swr: {
@@ -38,23 +38,23 @@ export const useProfile = () => {
       revalidateOnReconnect: true,
       shouldRetryOnError: true,
     },
-  });
+  })
 
   const updateSettings = async (updateData: Partial<ModelsUserSettings>) => {
     if (data) {
-      const modifiedSettings: ModelsUserSettings = { ...data.settings, ...updateData };
-      const profile = await updateUserSettings(modifiedSettings);
-      await mutate(profile);
+      const modifiedSettings: ModelsUserSettings = { ...data.settings, ...updateData }
+      const profile = await updateUserSettings(modifiedSettings)
+      await mutate(profile)
     }
-  };
+  }
 
   const acceptTOS = async (currentTOSVersion: string) => {
     if (data) {
-      const acceptTOSRequest: ModelsAcceptTOSRequest = { version: currentTOSVersion };
-      const profile = await acceptUserTOS(acceptTOSRequest);
-      await mutate(profile);
+      const acceptTOSRequest: ModelsAcceptTOSRequest = { version: currentTOSVersion }
+      const profile = await acceptUserTOS(acceptTOSRequest)
+      await mutate(profile)
     }
-  };
+  }
 
   return {
     firstName: data?.firstName || '',
@@ -67,5 +67,5 @@ export const useProfile = () => {
     updateSettings,
     acceptedTOSVersion: data?.acceptedTOS?.version || '',
     acceptTOS,
-  };
-};
+  }
+}

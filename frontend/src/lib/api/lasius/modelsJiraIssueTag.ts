@@ -24,14 +24,14 @@
  * Track your time
  * OpenAPI spec version: 2.0.0+4-3a603fde+20250602-1535
  */
-import type { ModelsJiraIssueTagType } from './modelsJiraIssueTagType';
+import type { ModelsJiraIssueTagType } from './modelsJiraIssueTagType'
 
 export interface ModelsJiraIssueTag {
-  id: string;
-  baseUrl: string;
+  id: string
+  baseUrl: string
   /** @nullable */
-  summary?: string | null;
-  url: string;
-  projectKey: string;
-  type: ModelsJiraIssueTagType;
+  summary?: string | null
+  url: string
+  projectKey: string
+  type: ModelsJiraIssueTagType
 }

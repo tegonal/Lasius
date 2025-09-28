@@ -26,6 +26,6 @@
  */
 
 export interface ModelsPasswordChangeRequest {
-  password: string;
-  newPassword: string;
+  password: string
+  newPassword: string
 }

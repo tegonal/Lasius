@@ -1,0 +1,88 @@
+/**
+ * Lasius - Open source time tracker for teams
+ * Copyright (c) Tegonal Genossenschaft (https://tegonal.com)
+ *
+ * This file is part of Lasius.
+ *
+ * Lasius is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * Lasius is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with Lasius.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
+import { Button } from 'components/primitives/buttons/Button'
+import { FormElement } from 'components/ui/forms/formElement'
+import useModal from 'components/ui/overlays/modal/hooks/useModal'
+import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
+import { useTranslation } from 'next-i18next'
+import React, { useEffect } from 'react'
+
+type Props = {
+  text?: {
+    action: string
+    confirm?: string
+    cancel?: string
+  }
+  dangerLevel?: 'notification' | 'destructive'
+  onCancel?: () => void
+  onConfirm: () => void
+  children?: React.ReactNode
+  hideButtons?: boolean
+  autoSize?: boolean
+}
+
+export const ModalConfirm: React.FC<Props> = ({
+  text,
+  onConfirm,
+  onCancel,
+  dangerLevel = 'notification',
+  children,
+  hideButtons = false,
+  autoSize = false,
+}) => {
+  const { modalId, closeModal, openModal } = useModal('ConfirmationDialog')
+  const { t } = useTranslation('common')
+
+  const handleConfirm = () => {
+    onConfirm()
+    closeModal()
+  }
+
+  const handleCancel = () => {
+    if (onCancel) onCancel()
+    closeModal()
+  }
+
+  useEffect(() => {
+    openModal()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  return (
+    <ModalResponsive modalId={modalId} blockViewport autoSize={autoSize}>
+      {text && <div className="mb-3">{text.action}</div>}
+      {children && <div className="mb-3">{children}</div>}
+      {!hideButtons && (
+        <FormElement>
+          <Button
+            variant={dangerLevel === 'notification' ? 'primary' : 'secondary'}
+            onClick={handleConfirm}>
+            {text?.confirm || t('common.ok', { defaultValue: 'Ok' })}
+          </Button>
+          {onCancel && (
+            <Button variant="secondary" onClick={handleCancel}>
+              {text?.cancel || t('common.actions.cancel', { defaultValue: 'Cancel' })}
+            </Button>
+          )}
+        </FormElement>
+      )}
+    </ModalResponsive>
+  )
+}

@@ -24,9 +24,9 @@
  * Track your time
  * OpenAPI spec version: 2.0.0+4-3a603fde+20250602-1535
  */
-import type { ModelsSimpleTagType } from './modelsSimpleTagType';
+import type { ModelsSimpleTagType } from './modelsSimpleTagType'
 
 export interface ModelsSimpleTag {
-  id: string;
-  type: ModelsSimpleTagType;
+  id: string
+  type: ModelsSimpleTagType
 }

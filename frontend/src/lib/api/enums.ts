@@ -20,15 +20,15 @@
 export const ModelsUserOrganisationRoleEnum = {
   OrganisationMember: 'OrganisationMember',
   OrganisationAdministrator: 'OrganisationAdministrator',
-} as const;
+} as const
 
 export type ModelsUserOrganisationRoleEnum =
-  (typeof ModelsUserOrganisationRoleEnum)[keyof typeof ModelsUserOrganisationRoleEnum];
+  (typeof ModelsUserOrganisationRoleEnum)[keyof typeof ModelsUserOrganisationRoleEnum]
 
 export const ModelsUserProjectRoleEnum = {
   ProjectMember: 'ProjectMember',
   ProjectAdministrator: 'ProjectAdministrator',
-} as const;
+} as const
 
 export type ModelsUserProjectRoleEnum =
-  (typeof ModelsUserProjectRoleEnum)[keyof typeof ModelsUserProjectRoleEnum];
+  (typeof ModelsUserProjectRoleEnum)[keyof typeof ModelsUserProjectRoleEnum]

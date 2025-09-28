@@ -17,27 +17,27 @@
  *
  */
 
-import { millisToHours } from 'lib/dates';
-import { sortBy } from 'lodash';
-import { ModelsBookingStats } from 'lib/api/lasius';
+import { sortBy } from 'es-toolkit'
+import { ModelsBookingStats } from 'lib/api/lasius'
+import { millisToHours } from 'lib/utils/date/dates'
 
 export const getTransformedChartDataAggregate = (
   data: ModelsBookingStats[] | undefined,
-  limit = -1
+  limit = -1,
 ) => {
-  if (!data || data.length < 1 || data[0].values.length < 1) return { data: undefined };
-  const keys = data[0].values.map((item) => item.label);
+  if (!data || data.length < 1 || data[0].values.length < 1) return { data: undefined }
+  const keys = data[0].values.map((item) => item.label)
   const chartData = data[0].values
     .map((item) => ({
       id: item.label || '',
       value: millisToHours(item.duration || 0),
     }))
-    .filter((item) => item.value > 0);
+    .filter((item) => item.value > 0)
 
-  const sortedData = sortBy(chartData, 'value');
+  const sortedData = sortBy(chartData, ['value'])
   if (limit < 1 || limit > sortedData.length) {
-    return { data: sortedData, keys };
+    return { data: sortedData, keys }
   }
-  const limitedData = sortedData.slice(sortedData.length - limit);
-  return { data: limitedData, keys };
-};
+  const limitedData = sortedData.slice(sortedData.length - limit)
+  return { data: limitedData, keys }
+}

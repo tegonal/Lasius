@@ -17,19 +17,19 @@
  *
  */
 
-import { plannedWorkingHoursStub } from 'lib/stubPlannedWorkingHours';
-import { ModelsWorkingHoursWeekdays } from 'types/common';
+import { plannedWorkingHoursStub } from 'lib/utils/date/stubPlannedWorkingHours'
+import { ModelsWorkingHoursWeekdays } from 'types/common'
 
 export const getPlannedWorkingHoursForDateRange = (
   days: Date[],
-  workingHours: typeof plannedWorkingHoursStub
+  workingHours: typeof plannedWorkingHoursStub,
 ) => {
   return days
     .map((day) => {
       const weekday = day
         .toLocaleDateString('en', { weekday: 'long' })
-        .toLocaleLowerCase() as ModelsWorkingHoursWeekdays;
-      return workingHours[weekday];
+        .toLocaleLowerCase() as ModelsWorkingHoursWeekdays
+      return workingHours[weekday]
     })
-    .reduce((a, b) => a + b);
-};
+    .reduce((a, b) => a + b)
+}

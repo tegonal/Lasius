@@ -18,34 +18,34 @@
  */
 
 // custom-instance.ts
-import Axios, { CancelTokenSource } from 'axios';
-import axios, { AxiosError, AxiosRequestConfig } from 'axios';
-import { IS_BROWSER } from 'projectConfig/constants';
-import { logger } from 'lib/logger';
-import clientAxiosInstance from 'lib/api/ClientAxiosInstance';
-import _ from 'lodash';
-import { getSession } from 'next-auth/react';
-import { getRequestHeaders } from 'lib/api/hooks/useTokensWithAxiosRequests';
+import Axios, { CancelTokenSource } from 'axios'
+import axios, { AxiosError, AxiosRequestConfig } from 'axios'
+import { merge } from 'es-toolkit/compat'
+import clientAxiosInstance from 'lib/api/ClientAxiosInstance'
+import { getRequestHeaders } from 'lib/api/hooks/useTokensWithAxiosRequests'
+import { logger } from 'lib/logger'
+import { getSession } from 'next-auth/react'
+import { IS_BROWSER } from 'projectConfig/constants'
 
 // add a second `options` argument here if you want to pass extra options to each generated query
 export const lasiusAxiosInstance = <T>(
   config: AxiosRequestConfig,
-  options?: AxiosRequestConfig
+  options?: AxiosRequestConfig,
 ): Promise<T> => {
-  const defaultHeaders = axios.defaults.headers.common;
+  const defaultHeaders = axios.defaults.headers.common
 
-  let methodBasedHeaders = {};
+  let methodBasedHeaders = {}
   if (config.method === 'POST') {
-    methodBasedHeaders = axios.defaults.headers.post;
+    methodBasedHeaders = axios.defaults.headers.post
   } else if (config.method === 'PUT') {
-    methodBasedHeaders = axios.defaults.headers.put;
+    methodBasedHeaders = axios.defaults.headers.put
   } else if (config.method === 'DELETE') {
-    methodBasedHeaders = axios.defaults.headers.delete;
+    methodBasedHeaders = axios.defaults.headers.delete
   } else if (config.method === 'PATCH') {
-    methodBasedHeaders = axios.defaults.headers.patch;
+    methodBasedHeaders = axios.defaults.headers.patch
   }
 
-  const headers = { ...defaultHeaders, ...methodBasedHeaders };
+  const headers = { ...defaultHeaders, ...methodBasedHeaders }
 
   const handleRequest = (config: AxiosRequestConfig, source: CancelTokenSource) => {
     return clientAxiosInstance({
@@ -56,14 +56,14 @@ export const lasiusAxiosInstance = <T>(
       .catch(async (error) => {
         if (Axios.isCancel(error)) {
           if (process.env.LASIUS_DEBUG) {
-            logger.debug('[lasiusAxiosInstance][RequestCanceled]', error.message);
+            logger.debug('[lasiusAxiosInstance][RequestCanceled]', error.message)
           }
         } else if (error.response?.status === 401) {
           if (process.env.LASIUS_DEBUG) {
             logger.debug('[lasiusAxiosInstance][Unauthorized]', {
               path: error.request?.pathname,
               message: error.response?.data,
-            });
+            })
           }
           if (
             IS_BROWSER &&
@@ -72,59 +72,59 @@ export const lasiusAxiosInstance = <T>(
             window.location.pathname !== '/' &&
             config.headers?.Authorization
           ) {
-            if (process.env.LASIUS_DEBUG) {
-              logger.debug('[lasiusAxiosInstance][TokenNotValidAnymore]', error.response?.status);
-            }
-
             // try to load session from middleware
-            const session = await getSession();
-            if (process.env.LASIUS_DEBUG) {
-              console.log('[lasiusAxiosInstance][ReloadSession]', session);
-            }
-            if (session != null && !session.error) {
-              const headers = getRequestHeaders(session.access_token, session.access_token_issuer);
+            const session = await getSession()
+
+            if (session != null && !session.error && session.access_token) {
+              // Update axios defaults with the new token
+              axios.defaults.headers.common['Authorization'] = `Bearer ${session.access_token}`
+              if (session.access_token_issuer) {
+                axios.defaults.headers.common['X-Token-Issuer'] = session.access_token_issuer
+              }
+
+              const headers = getRequestHeaders(session.access_token, session.access_token_issuer)
               return lasiusAxiosInstance(
                 {
                   ...config,
                   ...headers,
                 },
-                options
-              );
+                options,
+              )
             }
 
-            throw error;
+            throw error
           } else {
             if (process.env.LASIUS_DEBUG) {
-              logger.info('[lasiusAxiosInstance][Unauthorized]', error.response?.status);
+              logger.info('[lasiusAxiosInstance][Unauthorized]', error.response?.status)
             }
-            throw error;
+            throw error
           }
         } else {
-          throw error;
+          throw error
         }
-      });
-  };
-  const newConfig = _.merge(
+      })
+  }
+  const newConfig = merge(
     {
       headers: headers,
     },
     config,
-    options
-  );
+    options,
+  )
 
-  const source = Axios.CancelToken.source();
-  const promise = handleRequest(newConfig, source);
+  const source = Axios.CancelToken.source()
+  const promise = handleRequest(newConfig, source)
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   promise.cancel = () => {
-    source.cancel('Query was cancelled');
-  };
+    source.cancel('Query was cancelled')
+  }
 
-  return promise;
-};
+  return promise
+}
 
 // In some case with react-query and swr you want to be able to override the return error type so you can also do it here like this
-export type ErrorType<Error> = AxiosError<Error>;
+export type ErrorType<Error> = AxiosError<Error>
 // // In case you want to wrap the body type (optional)
 // // (if the custom instance is processing data before sending it, like changing the case for example)
-export type BodyType<BodyData> = BodyData;
+export type BodyType<BodyData> = BodyData

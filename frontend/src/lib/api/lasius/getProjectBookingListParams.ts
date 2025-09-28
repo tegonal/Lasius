@@ -26,8 +26,8 @@
  */
 
 export type GetProjectBookingListParams = {
-  from: string;
-  to: string;
-  limit?: number | null;
-  skip?: number | null;
-};
+  from: string
+  to: string
+  limit?: number | null
+  skip?: number | null
+}

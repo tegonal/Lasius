@@ -26,9 +26,9 @@
  */
 
 export interface ModelsApplicationConfig {
-  title: string;
-  instance: string;
-  lasiusOAuthProviderEnabled: boolean;
-  lasiusOAuthProviderAllowUserRegistration: boolean;
-  allowedIssuers: string[];
+  title: string
+  instance: string
+  lasiusOAuthProviderEnabled: boolean
+  lasiusOAuthProviderAllowUserRegistration: boolean
+  allowedIssuers: string[]
 }

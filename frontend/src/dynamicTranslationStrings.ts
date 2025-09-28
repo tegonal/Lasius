@@ -19,41 +19,88 @@
 
 /*
 Dynamic translation strings, to be picked up by the extractor:
+These use semantic keys with defaultValue for the extractor
  */
 
-const t = (s: string) => s;
+const t = (key: string, options?: { defaultValue?: string }) => options?.defaultValue || key
 
 export const LoginError = {
-  usernameOrPasswordWrong: t('Wrong password or e-mail. Try again.'),
-  oneOfCredentialsMissing: t('Username or password missing'),
-};
+  usernameOrPasswordWrong: t('auth.errors.wrongPasswordOrEmail', {
+    defaultValue: 'Wrong password or e-mail. Try again.',
+  }),
+  oneOfCredentialsMissing: t('auth.errors.credentialsMissing', {
+    defaultValue: 'Username or password missing',
+  }),
+}
 
 export const FormError = {
-  required: t('Required'),
-  pattern: t('Wrong format'),
-  isEmailAddress: t('Should be a valid e-mail address'),
-  notEnoughCharactersPassword: t('Not enough characters (min. 8)'),
-  noUppercase: t('Missing uppercase character'),
-  noSpecialCharacters: t('Missing special character'),
-  notEqualPassword: t("Passwords don't match"),
-  startInPast: t('Must be in the past'),
-  endAfterStart: t('Must be after start'),
-  startBeforeEnd: t('Must be before end'),
-  noNumber: t('Missing number digit'),
-  toAfterFrom: t('Must be after the "from" date'),
-  fromBeforeTo: t('Must be before the "to" date'),
-};
+  required: t('common.validation.required', {
+    defaultValue: 'Required',
+  }),
+  pattern: t('common.validation.wrongFormat', {
+    defaultValue: 'Wrong format',
+  }),
+  isEmailAddress: t('common.validation.emailInvalid', {
+    defaultValue: 'Should be a valid e-mail address',
+  }),
+  notEnoughCharactersPassword: t('common.validation.passwordTooShort', {
+    defaultValue: 'Not enough characters (min. 8)',
+  }),
+  noUppercase: t('common.validation.missingUppercase', {
+    defaultValue: 'Missing uppercase character',
+  }),
+  noSpecialCharacters: t('common.validation.missingSpecialChar', {
+    defaultValue: 'Missing special character',
+  }),
+  notEqualPassword: t('common.validation.passwordMismatch', {
+    defaultValue: "Passwords don't match",
+  }),
+  startInPast: t('common.validation.mustBeInPast', {
+    defaultValue: 'Must be in the past',
+  }),
+  endAfterStart: t('common.validation.mustBeAfterStart', {
+    defaultValue: 'Must be after start',
+  }),
+  startBeforeEnd: t('common.validation.mustBeBeforeEnd', {
+    defaultValue: 'Must be before end',
+  }),
+  noNumber: t('common.validation.missingNumber', {
+    defaultValue: 'Missing number digit',
+  }),
+  toAfterFrom: t('common.validation.toMustBeAfterFrom', {
+    defaultValue: 'Must be after the "from" date',
+  }),
+  fromBeforeTo: t('common.validation.fromMustBeBeforeTo', {
+    defaultValue: 'Must be before the "to" date',
+  }),
+}
 
 export const PageError: Record<string, string> = {
-  404: t('Page not found'),
-  500: t('Internal server error'),
-  401: t('Unauthorized'),
-  undefined: t('Something went wrong'),
-};
+  404: t('common.errors.pageNotFound', {
+    defaultValue: 'Page not found',
+  }),
+  500: t('common.errors.internalServerError', {
+    defaultValue: 'Internal server error',
+  }),
+  401: t('common.errors.unauthorized', {
+    defaultValue: 'Unauthorized',
+  }),
+  undefined: t('common.errors.somethingWentWrong', {
+    defaultValue: 'Something went wrong',
+  }),
+}
 
 export const UserRoles = {
-  ProjectAdministrator: t('Administrator'),
-  ProjectMember: t('Member'),
-  OrganisationAdministrator: t('Administrator'),
-  OrganisationMember: t('Member'),
-};
+  ProjectAdministrator: t('common.roles.administrator', {
+    defaultValue: 'Administrator',
+  }),
+  ProjectMember: t('common.roles.member', {
+    defaultValue: 'Member',
+  }),
+  OrganisationAdministrator: t('common.roles.administrator', {
+    defaultValue: 'Administrator',
+  }),
+  OrganisationMember: t('common.roles.member', {
+    defaultValue: 'Member',
+  }),
+}

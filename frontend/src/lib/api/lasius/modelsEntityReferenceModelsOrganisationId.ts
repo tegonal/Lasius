@@ -26,6 +26,6 @@
  */
 
 export interface ModelsEntityReferenceModelsOrganisationId {
-  id: string;
-  key: string;
+  id: string
+  key: string
 }

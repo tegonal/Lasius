@@ -24,10 +24,10 @@
  * Track your time
  * OpenAPI spec version: 2.0.0+4-3a603fde+20250602-1535
  */
-import type { ModelsWorkingHours } from './modelsWorkingHours';
+import type { ModelsWorkingHours } from './modelsWorkingHours'
 
 export interface ModelsCreateOrganisation {
-  key: string;
+  key: string
   /** @nullable */
-  plannedWorkingHours?: ModelsWorkingHours;
+  plannedWorkingHours?: ModelsWorkingHours
 }

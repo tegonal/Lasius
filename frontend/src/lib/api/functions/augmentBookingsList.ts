@@ -17,33 +17,33 @@
  *
  */
 
-import { ModelsBooking } from 'lib/api/lasius';
-import { sortBookingsByDate } from 'lib/api/functions/sortBookingsByDate';
-import { differenceInMinutes, isBefore } from 'date-fns';
+import { differenceInMinutes, isBefore } from 'date-fns'
+import { sortBookingsByDate } from 'lib/api/functions/sortBookingsByDate'
+import { ModelsBooking } from 'lib/api/lasius'
 
 type Item = (ModelsBooking & {
-  overlapsWithNext?: ModelsBooking;
-  isMostRecent?: boolean;
-  hasNextItem?: boolean;
-  allowInsert?: boolean;
-})[];
+  overlapsWithNext?: ModelsBooking
+  isMostRecent?: boolean
+  hasNextItem?: boolean
+  allowInsert?: boolean
+})[]
 
 export const augmentBookingsList = (bookings: ModelsBooking[]): Item => {
-  const sortedBookings = sortBookingsByDate(bookings);
+  const sortedBookings = sortBookingsByDate(bookings)
 
   return sortedBookings.map((booking, index) => {
-    const nextBooking = sortedBookings[index + 1];
-    const isMostRecent = index === 0;
-    const hasNextItem = index < sortedBookings.length - 1;
+    const nextBooking = sortedBookings[index + 1]
+    const isMostRecent = index === 0
+    const hasNextItem = index < sortedBookings.length - 1
 
     if (nextBooking && booking.end && nextBooking.end) {
       const isOverlapping =
         nextBooking.end.dateTime !== booking.start.dateTime &&
-        !isBefore(new Date(nextBooking.end.dateTime), new Date(booking.start.dateTime));
+        !isBefore(new Date(nextBooking.end.dateTime), new Date(booking.start.dateTime))
 
       const hasGap =
         differenceInMinutes(new Date(booking.start.dateTime), new Date(nextBooking.end.dateTime)) >
-        1;
+        1
 
       return {
         ...booking,
@@ -51,13 +51,13 @@ export const augmentBookingsList = (bookings: ModelsBooking[]): Item => {
         isMostRecent,
         hasNextItem,
         allowInsert: hasGap,
-      };
+      }
     }
 
     return {
       ...booking,
       isMostRecent,
       hasNextItem,
-    };
-  });
-};
+    }
+  })
+}

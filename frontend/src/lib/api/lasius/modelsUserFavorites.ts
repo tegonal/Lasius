@@ -24,10 +24,10 @@
  * Track your time
  * OpenAPI spec version: 2.0.0+4-3a603fde+20250602-1535
  */
-import type { ModelsBookingStub } from './modelsBookingStub';
+import type { ModelsBookingStub } from './modelsBookingStub'
 
 export interface ModelsUserFavorites {
-  id: string;
-  orgId: string;
-  favorites: ModelsBookingStub[];
+  id: string
+  orgId: string
+  favorites: ModelsBookingStub[]
 }

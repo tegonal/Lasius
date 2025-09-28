@@ -17,12 +17,22 @@
  *
  */
 
+// Define the props for each event type
+export type LasiusPlausibleEventProps = {
+  uiAction: { name: string }
+  login: { status: string; provider: string }
+  internalOAuthLogin: { status: string }
+  logout: { status: string }
+  organisation: { status: string }
+  invitation: { status: string }
+  error: { status: string; message: string }
+}
+
+// This type matches the PlausibleOptions structure from usePlausible
 export type LasiusPlausibleEvents = {
-  uiAction: { name: string };
-  login: { status: string; provider: string };
-  internalOAuthLogin: { status: string };
-  logout: { status: string };
-  organisation: { status: string };
-  invitation: { status: string };
-  error: { status: string; message: string };
-};
+  [K in keyof LasiusPlausibleEventProps]: {
+    props?: LasiusPlausibleEventProps[K]
+    callback?: () => void
+    revenue?: { currency: string; amount: number | string }
+  }
+}

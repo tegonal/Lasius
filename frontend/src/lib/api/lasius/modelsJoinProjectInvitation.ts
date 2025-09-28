@@ -24,23 +24,23 @@
  * Track your time
  * OpenAPI spec version: 2.0.0+4-3a603fde+20250602-1535
  */
-import type { ModelsEntityReference } from './modelsEntityReference';
-import type { ModelsJoinProjectInvitationRole } from './modelsJoinProjectInvitationRole';
-import type { ModelsInvitationOutcome } from './modelsInvitationOutcome';
-import type { ModelsJoinProjectInvitationType } from './modelsJoinProjectInvitationType';
+import type { ModelsEntityReference } from './modelsEntityReference'
+import type { ModelsInvitationOutcome } from './modelsInvitationOutcome'
+import type { ModelsJoinProjectInvitationRole } from './modelsJoinProjectInvitationRole'
+import type { ModelsJoinProjectInvitationType } from './modelsJoinProjectInvitationType'
 
 export interface ModelsJoinProjectInvitation {
-  id: string;
-  invitedEmail: string;
+  id: string
+  invitedEmail: string
   /** @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ */
-  createDate: string;
-  createdBy: ModelsEntityReference;
+  createDate: string
+  createdBy: ModelsEntityReference
   /** @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ */
-  expiration: string;
-  sharedByOrganisationReference: ModelsEntityReference;
-  projectReference: ModelsEntityReference;
-  role: ModelsJoinProjectInvitationRole;
+  expiration: string
+  sharedByOrganisationReference: ModelsEntityReference
+  projectReference: ModelsEntityReference
+  role: ModelsJoinProjectInvitationRole
   /** @nullable */
-  outcome?: ModelsInvitationOutcome;
-  type: ModelsJoinProjectInvitationType;
+  outcome?: ModelsInvitationOutcome
+  type: ModelsJoinProjectInvitationType
 }

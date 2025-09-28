@@ -24,9 +24,9 @@
  * Track your time
  * OpenAPI spec version: 2.0.0+4-3a603fde+20250602-1535
  */
-import type { ModelsTag } from './modelsTag';
+import type { ModelsTag } from './modelsTag'
 
 export interface ModelsFavoritesRequest {
-  projectId: string;
-  tags: ModelsTag[];
+  projectId: string
+  tags: ModelsTag[]
 }

@@ -20,7 +20,13 @@ dump
 **/public/worker-*.js.map
 **/public/fallback-*.js.map
 
+# MCP/Agents
 CLAUDE.md
 /.serena
 /.claude
 /.playwright*
+
+# Migration files
+**/*.backup
+**/*.backup2
+**/*.bak

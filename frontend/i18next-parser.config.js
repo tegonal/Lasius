@@ -1,4 +1,4 @@
-/* eslint-disable license-header/header */
+ 
 
 module.exports = {
   contextSeparator: '_',
@@ -10,9 +10,7 @@ module.exports = {
   defaultNamespace: 'common',
   // Default namespace used in your i18next config
 
-  defaultValue: (locale, namespace, key, value) => {
-    return key;
-  },
+  defaultValue: '',
   // Default value to give to empty keys
   // You may also specify a function accepting the locale, namespace, and key as arguments
 
@@ -22,7 +20,7 @@ module.exports = {
   keepRemoved: false,
   // Keep keys from the catalog that are no longer in code
 
-  keySeparator: false,
+  keySeparator: '.',
   // Key separator used in your translation keys
   // If you want to use plain english keys, separators such as `.` and `:` will conflict. You might want to set `keySeparator: false` and `namespaceSeparator: false`. That way, `t('Status: Loading...')` will not think that there are a namespace and three separator dots for instance.
 
@@ -49,7 +47,7 @@ module.exports = {
   locales: ['en', 'de'],
   // An array of the locales in your applications
 
-  namespaceSeparator: false,
+  namespaceSeparator: ':',
   // Namespace separator used in your translation keys
   // If you want to use plain english keys, separators such as `.` and `:` will conflict. You might want to set `keySeparator: false` and `namespaceSeparator: false`. That way, `t('Status: Loading...')` will not think that there are a namespace and three separator dots for instance.
 
@@ -73,7 +71,7 @@ module.exports = {
   // Whether to ignore default values
   // You may also specify a function accepting the locale and namespace as arguments
 
-  useKeysAsDefaultValue: true,
+  useKeysAsDefaultValue: false,
   // Whether to use the keys as the default value; ex. "Hello": "Hello", "World": "World"
   // This option takes precedence over the `defaultValue` and `skipDefaultValues` options
   // You may also specify a function accepting the locale and namespace as arguments

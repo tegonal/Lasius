@@ -1,0 +1,82 @@
+/**
+ * Lasius - Open source time tracker for teams
+ * Copyright (c) Tegonal Genossenschaft (https://tegonal.com)
+ *
+ * This file is part of Lasius.
+ *
+ * Lasius is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * Lasius is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with Lasius.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
+import { ResponsiveBar } from '@nivo/bar'
+import { nivoTheme } from 'components/ui/charts/nivoTheme'
+import React from 'react'
+import { nivoPalette } from 'styles/colors'
+import { NivoChartDataType } from 'types/common'
+
+import { TooltipContainer, TooltipItem } from './shared/chartTooltips'
+import { getContrastLabelTextColor } from './shared/chartUtils'
+
+type Props = {
+  stats: { data: NivoChartDataType | undefined }
+}
+
+const BarsTags: React.FC<Props> = ({ stats }) => {
+  const { data } = stats
+  if (!data) return null
+  return (
+    <ResponsiveBar
+      data={data}
+      theme={nivoTheme}
+      indexBy="id"
+      layout="horizontal"
+      enableGridX
+      enableGridY={false}
+      colors={nivoPalette}
+      margin={{ top: 60, right: 50, bottom: 60, left: 110 }}
+      padding={0.3}
+      valueScale={{ type: 'linear' }}
+      indexScale={{ type: 'band', round: true }}
+      borderWidth={0}
+      cornerRadius={3}
+      axisTop={{
+        tickSize: 5,
+        tickPadding: 5,
+        tickRotation: 0,
+      }}
+      axisRight={null}
+      axisBottom={{
+        tickSize: 5,
+        tickPadding: 5,
+        tickRotation: 0,
+      }}
+      axisLeft={{
+        tickSize: 5,
+        tickPadding: 5,
+        tickRotation: 0,
+      }}
+      labelSkipWidth={30}
+      labelSkipHeight={12}
+      labelTextColor={getContrastLabelTextColor}
+      tooltip={({ value, color, indexValue }) => (
+        <TooltipContainer>
+          <TooltipItem color={color} label={String(indexValue)} value={`${value}h`} />
+        </TooltipContainer>
+      )}
+    />
+  )
+}
+
+export default BarsTags

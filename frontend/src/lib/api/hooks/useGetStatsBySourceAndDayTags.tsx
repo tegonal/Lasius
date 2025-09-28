@@ -17,13 +17,13 @@
  *
  */
 
-import { apiDatespanFromTo, granularityFromDatespanFromTo } from 'lib/api/apiDateHandling';
-import { useGetUserBookingAggregatedStatsByOrganisation } from 'lib/api/lasius/user-bookings/user-bookings';
-import { useMemo } from 'react';
-import { getNivoChartDataFromApiStatsData } from 'lib/api/functions/getNivoChartDataFromApiStatsData';
-import { useGetWeeklyPlannedWorkingHoursAggregate } from 'lib/api/hooks/useGetWeeklyPlannedWorkingHoursAggregate';
-import { UserBookingSource } from 'types/booking';
-import { Granularity } from 'types/common';
+import { apiDatespanFromTo, granularityFromDatespanFromTo } from 'lib/api/apiDateHandling'
+import { getNivoChartDataFromApiStatsData } from 'lib/api/functions/getNivoChartDataFromApiStatsData'
+import { useGetWeeklyPlannedWorkingHoursAggregate } from 'lib/api/hooks/useGetWeeklyPlannedWorkingHoursAggregate'
+import { useGetUserBookingAggregatedStatsByOrganisation } from 'lib/api/lasius/user-bookings/user-bookings'
+import { useMemo } from 'react'
+import { UserBookingSource } from 'types/booking'
+import { Granularity } from 'types/common'
 
 export const useGetStatsBySourceAndDayTags = (
   orgId: string,
@@ -32,26 +32,26 @@ export const useGetStatsBySourceAndDayTags = (
     from,
     to,
     granularity,
-  }: { source: UserBookingSource; from: string; to: string; granularity?: Granularity }
+  }: { source: UserBookingSource; from: string; to: string; granularity?: Granularity },
 ) => {
-  const localGranularity = granularity || granularityFromDatespanFromTo(from, to);
-  const { selectedOrganisationWorkingHours } = useGetWeeklyPlannedWorkingHoursAggregate();
+  const localGranularity = granularity || granularityFromDatespanFromTo(from, to)
+  const { selectedOrganisationWorkingHours } = useGetWeeklyPlannedWorkingHoursAggregate()
   const { data, isValidating, error } = useGetUserBookingAggregatedStatsByOrganisation(orgId, {
     source,
     ...apiDatespanFromTo(from, to),
     granularity: localGranularity,
-  });
+  })
 
   const transformedData = useMemo(() => {
     if (data) {
       return getNivoChartDataFromApiStatsData(
         data,
         localGranularity,
-        selectedOrganisationWorkingHours
-      );
+        selectedOrganisationWorkingHours,
+      )
     }
-    return undefined;
-  }, [data, localGranularity, selectedOrganisationWorkingHours]);
+    return undefined
+  }, [data, localGranularity, selectedOrganisationWorkingHours])
 
-  return { data: transformedData, isValidating, error };
-};
+  return { data: transformedData, isValidating, error }
+}

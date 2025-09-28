@@ -17,10 +17,10 @@
  *
  */
 
-import { useGetUserProfile } from 'lib/api/lasius/user/user';
-import { plannedWorkingHoursStub } from 'lib/stubPlannedWorkingHours';
-import { getWorkingHoursWeekdayString } from 'lib/dates';
-import { UI_SLOW_DATA_DEDUPE_INTERVAL } from 'projectConfig/intervals';
+import { useGetUserProfile } from 'lib/api/lasius/user/user'
+import { getWorkingHoursWeekdayString } from 'lib/utils/date/dates'
+import { plannedWorkingHoursStub } from 'lib/utils/date/stubPlannedWorkingHours'
+import { UI_SLOW_DATA_DEDUPE_INTERVAL } from 'projectConfig/intervals'
 
 export const useGetPlannedWorkingHoursByDate = (date: string) => {
   const { data } = useGetUserProfile({
@@ -29,40 +29,40 @@ export const useGetPlannedWorkingHoursByDate = (date: string) => {
       revalidateOnFocus: false,
       dedupingInterval: UI_SLOW_DATA_DEDUPE_INTERVAL,
     },
-  });
+  })
 
   const lastSelectedOrganisationId =
     data?.settings.lastSelectedOrganisation?.id ||
-    data?.organisations.filter((item) => item.private)[0].organisationReference.id;
+    data?.organisations.filter((item) => item.private)[0].organisationReference.id
 
   const filteredWeeks = data?.organisations.filter(
-    (org) => org.organisationReference.id === lastSelectedOrganisationId
-  );
+    (org) => org.organisationReference.id === lastSelectedOrganisationId,
+  )
 
   const week =
     Array.isArray(filteredWeeks) && filteredWeeks[0]?.plannedWorkingHours
       ? filteredWeeks[0].plannedWorkingHours
-      : plannedWorkingHoursStub;
+      : plannedWorkingHoursStub
 
   const plannedHoursDay = { ...plannedWorkingHoursStub, ...week }[
     getWorkingHoursWeekdayString(date)
-  ];
+  ]
 
-  const allOrganisationsByDay = { ...plannedWorkingHoursStub };
+  const allOrganisationsByDay = { ...plannedWorkingHoursStub }
   data?.organisations.forEach((item) => {
-    const { plannedWorkingHours } = item;
+    const { plannedWorkingHours } = item
     if (plannedWorkingHours) {
       Object.keys(plannedWorkingHours).forEach((day) => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        allOrganisationsByDay[day] += plannedWorkingHours[day];
-      });
+        allOrganisationsByDay[day] += plannedWorkingHours[day]
+      })
     }
-  });
+  })
 
   const plannedHoursWeek = Object.entries({ ...plannedWorkingHoursStub, ...week }).reduce(
-    (acc, [_key, value]) => ['total', acc[1] + value]
-  )[1];
+    (acc, [_key, value]) => ['total', acc[1] + value],
+  )[1]
 
-  return { plannedHoursWeek, plannedHoursDay, allOrganisationsByDay };
-};
+  return { plannedHoursWeek, plannedHoursDay, allOrganisationsByDay }
+}

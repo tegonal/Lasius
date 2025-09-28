@@ -27,6 +27,7 @@ declare module 'next-auth' {
     access_token?: string;
     access_token_issuer?: string;
     provider?: string;
+    expires_at?: number;
   }
   interface User extends DefaultUser {    
     access_token_issuer?: string;

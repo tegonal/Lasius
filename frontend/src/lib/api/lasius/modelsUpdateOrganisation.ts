@@ -27,5 +27,5 @@
 
 export interface ModelsUpdateOrganisation {
   /** @nullable */
-  key?: string | null;
+  key?: string | null
 }

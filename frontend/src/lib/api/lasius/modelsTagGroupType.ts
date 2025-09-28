@@ -25,9 +25,8 @@
  * OpenAPI spec version: 2.0.0+4-3a603fde+20250602-1535
  */
 
-export type ModelsTagGroupType = (typeof ModelsTagGroupType)[keyof typeof ModelsTagGroupType];
+export type ModelsTagGroupType = (typeof ModelsTagGroupType)[keyof typeof ModelsTagGroupType]
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ModelsTagGroupType = {
   TagGroup: 'TagGroup',
-} as const;
+} as const

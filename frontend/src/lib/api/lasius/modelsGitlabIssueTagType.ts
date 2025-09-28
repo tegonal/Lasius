@@ -26,9 +26,8 @@
  */
 
 export type ModelsGitlabIssueTagType =
-  (typeof ModelsGitlabIssueTagType)[keyof typeof ModelsGitlabIssueTagType];
+  (typeof ModelsGitlabIssueTagType)[keyof typeof ModelsGitlabIssueTagType]
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ModelsGitlabIssueTagType = {
   GitlabIssueTag: 'GitlabIssueTag',
-} as const;
+} as const

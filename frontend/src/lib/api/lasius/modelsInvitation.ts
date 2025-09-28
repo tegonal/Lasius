@@ -24,9 +24,9 @@
  * Track your time
  * OpenAPI spec version: 2.0.0+4-3a603fde+20250602-1535
  */
-import type { ModelsJoinOrganisationInvitation } from './modelsJoinOrganisationInvitation';
-import type { ModelsJoinProjectInvitation } from './modelsJoinProjectInvitation';
+import type { ModelsJoinOrganisationInvitation } from './modelsJoinOrganisationInvitation'
+import type { ModelsJoinProjectInvitation } from './modelsJoinProjectInvitation'
 
 export type ModelsInvitation =
   | (ModelsJoinOrganisationInvitation & unknown)
-  | (ModelsJoinProjectInvitation & unknown);
+  | (ModelsJoinProjectInvitation & unknown)

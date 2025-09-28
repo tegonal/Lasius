@@ -17,9 +17,9 @@
  *
  */
 
-import { Error } from 'components/error';
-import React from 'react';
+import { Error } from 'components/ui/feedback/Error'
+import React from 'react'
 
-const Error500: React.FC = () => <Error statusCode={500} />;
+const Error500: React.FC = () => <Error statusCode={500} />
 
-export default Error500;
+export default Error500

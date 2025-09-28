@@ -24,36 +24,36 @@
  * Track your time
  * OpenAPI spec version: 2.0.0+4-3a603fde+20250602-1535
  */
-import useSwr from 'swr';
-import type { Key, SWRConfiguration } from 'swr';
+import useSwr from 'swr'
 
-import type { ModelsInvitationStatusResponse } from '..';
+import { lasiusAxiosInstance } from '../../lasiusAxiosInstance'
 
-import { lasiusAxiosInstance } from '../../lasiusAxiosInstance';
-import type { ErrorType } from '../../lasiusAxiosInstance';
+import type { ModelsInvitationStatusResponse } from '..'
+import type { ErrorType } from '../../lasiusAxiosInstance'
+import type { Key, SWRConfiguration } from 'swr'
 
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
 
 /**
  * @summary get status of an invitation
  */
 export const getInvitationStatus = (
   invitationId: string,
-  options?: SecondParameter<typeof lasiusAxiosInstance>
+  options?: SecondParameter<typeof lasiusAxiosInstance>,
 ) => {
   return lasiusAxiosInstance<ModelsInvitationStatusResponse>(
     { url: `/invitations/${invitationId}/status`, method: 'GET' },
-    options
-  );
-};
+    options,
+  )
+}
 
 export const getGetInvitationStatusKey = (invitationId: string) =>
-  [`/invitations/${invitationId}/status`] as const;
+  [`/invitations/${invitationId}/status`] as const
 
 export type GetInvitationStatusQueryResult = NonNullable<
   Awaited<ReturnType<typeof getInvitationStatus>>
->;
-export type GetInvitationStatusQueryError = ErrorType<void>;
+>
+export type GetInvitationStatusQueryError = ErrorType<void>
 
 /**
  * @summary get status of an invitation
@@ -62,23 +62,23 @@ export const useGetInvitationStatus = <TError = ErrorType<void>>(
   invitationId: string,
   options?: {
     swr?: SWRConfiguration<Awaited<ReturnType<typeof getInvitationStatus>>, TError> & {
-      swrKey?: Key;
-      enabled?: boolean;
-    };
-    request?: SecondParameter<typeof lasiusAxiosInstance>;
-  }
+      swrKey?: Key
+      enabled?: boolean
+    }
+    request?: SecondParameter<typeof lasiusAxiosInstance>
+  },
 ) => {
-  const { swr: swrOptions, request: requestOptions } = options ?? {};
+  const { swr: swrOptions, request: requestOptions } = options ?? {}
 
-  const isEnabled = swrOptions?.enabled !== false && !!invitationId;
+  const isEnabled = swrOptions?.enabled !== false && !!invitationId
   const swrKey =
-    swrOptions?.swrKey ?? (() => (isEnabled ? getGetInvitationStatusKey(invitationId) : null));
-  const swrFn = () => getInvitationStatus(invitationId, requestOptions);
+    swrOptions?.swrKey ?? (() => (isEnabled ? getGetInvitationStatusKey(invitationId) : null))
+  const swrFn = () => getInvitationStatus(invitationId, requestOptions)
 
-  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(swrKey, swrFn, swrOptions);
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(swrKey, swrFn, swrOptions)
 
   return {
     swrKey,
     ...query,
-  };
-};
+  }
+}

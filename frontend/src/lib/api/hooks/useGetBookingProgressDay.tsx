@@ -17,25 +17,25 @@
  *
  */
 
-import { differenceInSeconds, isToday } from 'date-fns';
-import { apiTimespanDay, IsoDateString } from 'lib/api/apiDateHandling';
+import { differenceInSeconds, isToday } from 'date-fns'
+import { apiTimespanDay, IsoDateString } from 'lib/api/apiDateHandling'
+import { getExpectedVsBookedPercentage } from 'lib/api/functions/getExpectedVsBookedPercentage'
+import { getModelsBookingSummary } from 'lib/api/functions/getModelsBookingSummary'
+import { useGetPlannedWorkingHoursByDate } from 'lib/api/hooks/useGetPlannedWorkingHoursByDate'
+import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import {
   useGetUserBookingCurrent,
   useGetUserBookingListByOrganisation,
-} from 'lib/api/lasius/user-bookings/user-bookings';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useGetPlannedWorkingHoursByDate } from 'lib/api/hooks/useGetPlannedWorkingHoursByDate';
-import { useInterval } from 'usehooks-ts';
-import { UI_SLOW_DATA_DEDUPE_INTERVAL } from 'projectConfig/intervals';
-import { useOrganisation } from 'lib/api/hooks/useOrganisation';
-import { getExpectedVsBookedPercentage } from 'lib/api/functions/getExpectedVsBookedPercentage';
-import { getModelsBookingSummary } from 'lib/api/functions/getModelsBookingSummary';
+} from 'lib/api/lasius/user-bookings/user-bookings'
+import { UI_SLOW_DATA_DEDUPE_INTERVAL } from 'projectConfig/intervals'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useInterval } from 'usehooks-ts'
 
 export const useGetBookingProgressDay = (date: IsoDateString) => {
-  const { selectedOrganisationId } = useOrganisation();
-  const { plannedHoursDay: plannedWorkingHours } = useGetPlannedWorkingHoursByDate(date);
-  const day = useMemo(() => new Date(date), [date]);
-  const [currentDuration, setCurrentDuration] = useState(0);
+  const { selectedOrganisationId } = useOrganisation()
+  const { plannedHoursDay: plannedWorkingHours } = useGetPlannedWorkingHoursByDate(date)
+  const day = useMemo(() => new Date(date), [date])
+  const [currentDuration, setCurrentDuration] = useState(0)
 
   const { data: bookings } = useGetUserBookingListByOrganisation(
     selectedOrganisationId,
@@ -47,40 +47,42 @@ export const useGetBookingProgressDay = (date: IsoDateString) => {
         revalidateIfStale: isToday(day),
         dedupingInterval: isToday(day) ? 2000 : UI_SLOW_DATA_DEDUPE_INTERVAL,
       },
-    }
-  );
+    },
+  )
 
-  const { data: currentBooking } = useGetUserBookingCurrent();
+  const { data: currentBooking } = useGetUserBookingCurrent()
 
   const currentBookingDuration = useCallback(() => {
     if (isToday(day) && currentBooking?.booking?.start.dateTime) {
       setCurrentDuration(
-        differenceInSeconds(new Date(), new Date(currentBooking?.booking?.start.dateTime)) / 60 / 60
-      );
+        differenceInSeconds(new Date(), new Date(currentBooking?.booking?.start.dateTime)) /
+          60 /
+          60,
+      )
     } else {
-      setCurrentDuration(0);
+      setCurrentDuration(0)
     }
-  }, [currentBooking?.booking?.start.dateTime, day]);
+  }, [currentBooking?.booking?.start.dateTime, day])
 
   useEffect(() => {
-    currentBookingDuration();
-  }, [currentBookingDuration]);
+    currentBookingDuration()
+  }, [currentBookingDuration])
 
-  useInterval(currentBookingDuration, 1000);
+  useInterval(currentBookingDuration, 1000)
 
-  const summaryInit = useMemo(() => getModelsBookingSummary(bookings || []), [bookings]);
+  const summaryInit = useMemo(() => getModelsBookingSummary(bookings || []), [bookings])
 
-  const summary = { ...summaryInit, hours: summaryInit.hours + currentDuration };
+  const summary = { ...summaryInit, hours: summaryInit.hours + currentDuration }
 
   const { fulfilledPercentage, progressBarPercentage } = getExpectedVsBookedPercentage(
     plannedWorkingHours,
-    summary.hours
-  );
+    summary.hours,
+  )
 
   return {
     ...summary,
     plannedWorkingHours,
     fulfilledPercentage,
     progressBarPercentage,
-  };
-};
+  }
+}

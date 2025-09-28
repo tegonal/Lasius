@@ -24,14 +24,14 @@
  * Track your time
  * OpenAPI spec version: 2.0.0+4-3a603fde+20250602-1535
  */
-import type { ModelsUserStubRole } from './modelsUserStubRole';
+import type { ModelsUserStubRole } from './modelsUserStubRole'
 
 export interface ModelsUserStub {
-  id: string;
-  key: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  active: boolean;
-  role: ModelsUserStubRole;
+  id: string
+  key: string
+  email: string
+  firstName: string
+  lastName: string
+  active: boolean
+  role: ModelsUserStubRole
 }

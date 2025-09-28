@@ -17,11 +17,11 @@
  *
  */
 
-import Axios from 'axios';
-import { IS_SERVER, LASIUS_API_URL, LASIUS_API_URL_INTERNAL } from 'projectConfig/constants';
+import Axios from 'axios'
+import { IS_SERVER, LASIUS_API_URL, LASIUS_API_URL_INTERNAL } from 'projectConfig/constants'
 
 const clientAxiosInstance = Axios.create({
   baseURL: IS_SERVER ? LASIUS_API_URL_INTERNAL : LASIUS_API_URL,
-}); // use your own URL here or environment variable
+}) // use your own URL here or environment variable
 
-export default clientAxiosInstance;
+export default clientAxiosInstance

@@ -17,16 +17,16 @@
  *
  */
 
-import { ModelsBooking } from 'lib/api/lasius';
-import { orderBy } from 'lodash';
-import { ExtendedHistoryBooking } from 'types/booking';
+import { orderBy } from 'es-toolkit'
+import { ModelsBooking } from 'lib/api/lasius'
+import { ExtendedHistoryBooking } from 'types/booking'
 
 export const sortBookingsByDate = (bookings: ModelsBooking[]) => {
-  if (bookings.length === 0) return [];
-  return orderBy(bookings, (data) => data.start.dateTime, 'desc');
-};
+  if (bookings.length === 0) return []
+  return orderBy(bookings, [(data) => data.start.dateTime], ['desc'])
+}
 
 export const sortExtendedBookingsByDate = (bookings: ExtendedHistoryBooking[]) => {
-  if (bookings.length === 0) return [];
-  return orderBy(bookings, (data) => data.date, 'desc');
-};
+  if (bookings.length === 0) return []
+  return orderBy(bookings, [(data) => data.date], ['desc'])
+}

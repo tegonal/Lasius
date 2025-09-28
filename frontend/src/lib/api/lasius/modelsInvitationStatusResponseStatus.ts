@@ -26,10 +26,9 @@
  */
 
 export type ModelsInvitationStatusResponseStatus =
-  (typeof ModelsInvitationStatusResponseStatus)[keyof typeof ModelsInvitationStatusResponseStatus];
+  (typeof ModelsInvitationStatusResponseStatus)[keyof typeof ModelsInvitationStatusResponseStatus]
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ModelsInvitationStatusResponseStatus = {
   UnregisteredUser: 'UnregisteredUser',
   InvitationOk: 'InvitationOk',
-} as const;
+} as const

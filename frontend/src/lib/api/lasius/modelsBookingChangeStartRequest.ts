@@ -27,5 +27,5 @@
 
 export interface ModelsBookingChangeStartRequest {
   /** @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ */
-  newStart: string;
+  newStart: string
 }

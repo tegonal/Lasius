@@ -17,27 +17,27 @@
  *
  */
 
-import { GetServerSideProps } from 'next';
-import { ThisMonthLayout } from 'layout/pages/user/thisMonth/thisMonthLayout';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { LayoutDesktop } from 'layout/layoutDesktop';
-import { NextPageWithLayout } from 'pages/_app';
+import { ThisMonthLayout } from 'components/features/user/thisMonth/thisMonthLayout'
+import { LayoutResponsive } from 'components/ui/layouts/layoutResponsive'
+import { GetServerSideProps } from 'next'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { NextPageWithLayout } from 'pages/_app'
 
 const ThisMonthPage: NextPageWithLayout = () => {
-  return <ThisMonthLayout />;
-};
+  return <ThisMonthLayout />
+}
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { locale = '' } = context;
+  const { locale = '' } = context
   return {
     props: {
       ...(await serverSideTranslations(locale, ['common'])),
     },
-  };
-};
+  }
+}
 
 ThisMonthPage.getLayout = function getLayout(page) {
-  return <LayoutDesktop>{page}</LayoutDesktop>;
-};
+  return <LayoutResponsive>{page}</LayoutResponsive>
+}
 
-export default ThisMonthPage;
+export default ThisMonthPage

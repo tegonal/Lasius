@@ -24,22 +24,22 @@
  * Track your time
  * OpenAPI spec version: 2.0.0+4-3a603fde+20250602-1535
  */
-import type { ModelsEntityReference } from './modelsEntityReference';
-import type { ModelsJoinOrganisationInvitationRole } from './modelsJoinOrganisationInvitationRole';
-import type { ModelsInvitationOutcome } from './modelsInvitationOutcome';
-import type { ModelsJoinOrganisationInvitationType } from './modelsJoinOrganisationInvitationType';
+import type { ModelsEntityReference } from './modelsEntityReference'
+import type { ModelsInvitationOutcome } from './modelsInvitationOutcome'
+import type { ModelsJoinOrganisationInvitationRole } from './modelsJoinOrganisationInvitationRole'
+import type { ModelsJoinOrganisationInvitationType } from './modelsJoinOrganisationInvitationType'
 
 export interface ModelsJoinOrganisationInvitation {
-  id: string;
-  invitedEmail: string;
+  id: string
+  invitedEmail: string
   /** @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ */
-  createDate: string;
-  createdBy: ModelsEntityReference;
+  createDate: string
+  createdBy: ModelsEntityReference
   /** @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ */
-  expiration: string;
-  organisationReference: ModelsEntityReference;
-  role: ModelsJoinOrganisationInvitationRole;
+  expiration: string
+  organisationReference: ModelsEntityReference
+  role: ModelsJoinOrganisationInvitationRole
   /** @nullable */
-  outcome?: ModelsInvitationOutcome;
-  type: ModelsJoinOrganisationInvitationType;
+  outcome?: ModelsInvitationOutcome
+  type: ModelsJoinOrganisationInvitationType
 }

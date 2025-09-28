@@ -17,11 +17,11 @@
  *
  */
 
-import { useGetUserProfile } from 'lib/api/lasius/user/user';
-import { plannedWorkingHoursStub } from 'lib/stubPlannedWorkingHours';
-import { UI_SLOW_DATA_DEDUPE_INTERVAL } from 'projectConfig/intervals';
-import { useMemo } from 'react';
-import { ModelsWorkingHours } from 'lib/api/lasius';
+import { ModelsWorkingHours } from 'lib/api/lasius'
+import { useGetUserProfile } from 'lib/api/lasius/user/user'
+import { plannedWorkingHoursStub } from 'lib/utils/date/stubPlannedWorkingHours'
+import { UI_SLOW_DATA_DEDUPE_INTERVAL } from 'projectConfig/intervals'
+import { useMemo } from 'react'
 
 export const useGetWeeklyPlannedWorkingHoursAggregate = () => {
   const { data } = useGetUserProfile({
@@ -29,42 +29,42 @@ export const useGetWeeklyPlannedWorkingHoursAggregate = () => {
       revalidateOnFocus: false,
       dedupingInterval: UI_SLOW_DATA_DEDUPE_INTERVAL,
     },
-  });
+  })
 
   const allOrganisationsWorkingHours = useMemo(() => {
-    const allOrganisations: ModelsWorkingHours = { ...plannedWorkingHoursStub };
+    const allOrganisations: ModelsWorkingHours = { ...plannedWorkingHoursStub }
     data?.organisations.forEach((item) => {
-      const { plannedWorkingHours } = item;
+      const { plannedWorkingHours } = item
       if (plannedWorkingHours) {
         Object.keys(plannedWorkingHours).forEach((day: any) => {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
-          allOrganisations[day] += plannedWorkingHours[day];
-        });
+          allOrganisations[day] += plannedWorkingHours[day]
+        })
       }
-    });
-    return allOrganisations;
-  }, [data]);
+    })
+    return allOrganisations
+  }, [data])
 
   const selectedOrganisationWorkingHours = useMemo(() => {
     if (data && data.organisations && data.organisations.length > 0) {
       const workingHours = data.organisations.find(
-        (org) => org.organisationReference.id === data?.settings?.lastSelectedOrganisation?.id
-      );
-      return workingHours ? workingHours.plannedWorkingHours : plannedWorkingHoursStub;
+        (org) => org.organisationReference.id === data?.settings?.lastSelectedOrganisation?.id,
+      )
+      return workingHours ? workingHours.plannedWorkingHours : plannedWorkingHoursStub
     }
-    return plannedWorkingHoursStub;
-  }, [data]);
+    return plannedWorkingHoursStub
+  }, [data])
 
   const selectedOrganisationWorkingHoursTotal = useMemo(
     () =>
       Object.entries(selectedOrganisationWorkingHours).reduce((a, c) => ['total', a[1] + c[1]])[1],
-    [selectedOrganisationWorkingHours]
-  );
+    [selectedOrganisationWorkingHours],
+  )
 
   return {
     allOrganisationsWorkingHours,
     selectedOrganisationWorkingHours,
     selectedOrganisationWorkingHoursTotal,
-  };
-};
+  }
+}
