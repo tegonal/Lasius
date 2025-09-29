@@ -20,9 +20,11 @@
 import { Button } from 'components/primitives/buttons/Button'
 import { Input } from 'components/primitives/inputs/Input'
 import { Label } from 'components/primitives/typography/Label'
-import { FormElement } from 'components/ui/forms/formElement'
+import { ButtonGroup } from 'components/ui/forms/ButtonGroup'
+import { FieldSet } from 'components/ui/forms/FieldSet'
+import { FormBody } from 'components/ui/forms/FormBody'
+import { FormElement } from 'components/ui/forms/FormElement'
 import { FormErrorBadge } from 'components/ui/forms/formErrorBadge'
-import { FormGroup } from 'components/ui/forms/formGroup'
 import { Icon } from 'components/ui/icons/Icon'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { ModalConfirm } from 'components/ui/overlays/modal/modalConfirm'
@@ -42,6 +44,7 @@ type Props = {
   organisation: string | undefined
   project?: string
   onSave: () => void
+  onCancel?: () => void
 }
 
 type Form = {
@@ -50,7 +53,12 @@ type Form = {
   organisationRole: ModelsUserOrganisationRoleEnum
 }
 
-export const ManageUserInviteByEmailForm: React.FC<Props> = ({ onSave, organisation, project }) => {
+export const ManageUserInviteByEmailForm: React.FC<Props> = ({
+  onSave,
+  onCancel,
+  organisation,
+  project,
+}) => {
   const { t } = useTranslation('common')
   const mode = project && organisation ? 'project' : 'organisation'
   const hookForm = useForm<Form>({
@@ -101,82 +109,89 @@ export const ManageUserInviteByEmailForm: React.FC<Props> = ({ onSave, organisat
 
   return (
     <form onSubmit={hookForm.handleSubmit(onSubmit)}>
-      <FormGroup>
-        <FormElement>
-          <Label htmlFor="inviteMemberByEmailAddress">
-            {t('invitations.inviteByEmail', { defaultValue: 'Invite by E-Mail' })}
-          </Label>
-          <Input
-            {...hookForm.register('inviteMemberByEmailAddress', {
-              required: true,
-              pattern: emailValidationPattern,
-            })}
-            autoComplete="off"
-          />
-          <FormErrorBadge error={hookForm.formState.errors.inviteMemberByEmailAddress} />
-        </FormElement>
-        {mode === 'project' && (
+      <FormBody>
+        <FieldSet>
           <FormElement>
-            <Label htmlFor="projectRole">
-              {t('projects.projectRole', { defaultValue: 'Project role' })}
+            <Label htmlFor="inviteMemberByEmailAddress">
+              {t('invitations.inviteByEmail', { defaultValue: 'Invite by E-Mail' })}
             </Label>
-            <div className="relative">
-              <select
-                className="input input-bordered w-full cursor-pointer appearance-none pr-8"
-                {...hookForm.register('projectRole', {
-                  required: true,
-                })}>
-                <option
-                  key={ModelsUserProjectRoleEnum.ProjectMember}
-                  value={ModelsUserProjectRoleEnum.ProjectMember}>
-                  {UserRoles[ModelsUserProjectRoleEnum.ProjectMember]}
-                </option>
-                <option
-                  key={ModelsUserProjectRoleEnum.ProjectAdministrator}
-                  value={ModelsUserProjectRoleEnum.ProjectAdministrator}>
-                  {UserRoles[ModelsUserProjectRoleEnum.ProjectAdministrator]}
-                </option>
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                <LucideIcon icon={ChevronDown} size={16} strokeWidth={2} className="opacity-50" />
-              </div>
-            </div>
+            <Input
+              {...hookForm.register('inviteMemberByEmailAddress', {
+                required: true,
+                pattern: emailValidationPattern,
+              })}
+              autoComplete="off"
+            />
+            <FormErrorBadge error={hookForm.formState.errors.inviteMemberByEmailAddress} />
           </FormElement>
-        )}
-        {mode === 'organisation' && (
-          <FormElement>
-            <Label htmlFor="organisationRole">
-              {t('organizations.organizationRole', { defaultValue: 'Organisation role' })}
-            </Label>
-            <div className="relative">
-              <select
-                className="input input-bordered w-full cursor-pointer appearance-none pr-8"
-                {...hookForm.register('organisationRole', {
-                  required: true,
-                })}>
-                <option
-                  key={ModelsUserOrganisationRoleEnum.OrganisationMember}
-                  value={ModelsUserOrganisationRoleEnum.OrganisationMember}>
-                  {UserRoles[ModelsUserOrganisationRoleEnum.OrganisationMember]}
-                </option>
-                <option
-                  key={ModelsUserOrganisationRoleEnum.OrganisationAdministrator}
-                  value={ModelsUserOrganisationRoleEnum.OrganisationAdministrator}>
-                  {UserRoles[ModelsUserOrganisationRoleEnum.OrganisationAdministrator]}
-                </option>
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                <LucideIcon icon={ChevronDown} size={16} strokeWidth={2} className="opacity-50" />
+          {mode === 'project' && (
+            <FormElement>
+              <Label htmlFor="projectRole">
+                {t('projects.projectRole', { defaultValue: 'Project role' })}
+              </Label>
+              <div className="relative">
+                <select
+                  className="input input-bordered w-full cursor-pointer appearance-none pr-8"
+                  {...hookForm.register('projectRole', {
+                    required: true,
+                  })}>
+                  <option
+                    key={ModelsUserProjectRoleEnum.ProjectMember}
+                    value={ModelsUserProjectRoleEnum.ProjectMember}>
+                    {UserRoles[ModelsUserProjectRoleEnum.ProjectMember]}
+                  </option>
+                  <option
+                    key={ModelsUserProjectRoleEnum.ProjectAdministrator}
+                    value={ModelsUserProjectRoleEnum.ProjectAdministrator}>
+                    {UserRoles[ModelsUserProjectRoleEnum.ProjectAdministrator]}
+                  </option>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                  <LucideIcon icon={ChevronDown} size={16} strokeWidth={2} className="opacity-50" />
+                </div>
               </div>
-            </div>
-          </FormElement>
-        )}
-        <FormElement>
+            </FormElement>
+          )}
+          {mode === 'organisation' && (
+            <FormElement>
+              <Label htmlFor="organisationRole">
+                {t('organizations.organizationRole', { defaultValue: 'Organisation role' })}
+              </Label>
+              <div className="relative">
+                <select
+                  className="input input-bordered w-full cursor-pointer appearance-none pr-8"
+                  {...hookForm.register('organisationRole', {
+                    required: true,
+                  })}>
+                  <option
+                    key={ModelsUserOrganisationRoleEnum.OrganisationMember}
+                    value={ModelsUserOrganisationRoleEnum.OrganisationMember}>
+                    {UserRoles[ModelsUserOrganisationRoleEnum.OrganisationMember]}
+                  </option>
+                  <option
+                    key={ModelsUserOrganisationRoleEnum.OrganisationAdministrator}
+                    value={ModelsUserOrganisationRoleEnum.OrganisationAdministrator}>
+                    {UserRoles[ModelsUserOrganisationRoleEnum.OrganisationAdministrator]}
+                  </option>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                  <LucideIcon icon={ChevronDown} size={16} strokeWidth={2} className="opacity-50" />
+                </div>
+              </div>
+            </FormElement>
+          )}
+        </FieldSet>
+        <ButtonGroup>
           <Button type="submit" disabled={isSubmitting}>
             {t('common.actions.invite', { defaultValue: 'Invite' })}
           </Button>
-        </FormElement>
-      </FormGroup>
+          {onCancel && (
+            <Button type="button" variant="secondary" onClick={onCancel}>
+              {t('common.actions.cancel', { defaultValue: 'Cancel' })}
+            </Button>
+          )}
+        </ButtonGroup>
+      </FormBody>
       {showResult && invitationResult && invitationResult.invitationLinkId && (
         <ModalConfirm onConfirm={handleCloseResult}>
           <div>

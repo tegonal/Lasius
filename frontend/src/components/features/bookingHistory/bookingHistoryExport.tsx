@@ -19,7 +19,7 @@
 
 import { Button } from 'components/primitives/buttons/Button'
 import { Heading } from 'components/primitives/typography/Heading'
-import { FormElement } from 'components/ui/forms/formElement'
+import { FormElement } from 'components/ui/forms/FormElement'
 import { exportBookingListToCsv } from 'lib/utils/data/csv'
 import { useTranslation } from 'next-i18next'
 import React from 'react'

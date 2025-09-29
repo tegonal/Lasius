@@ -21,11 +21,8 @@ import React from 'react'
 
 type Props = {
   children: React.ReactNode
-  sx?: any
 }
 
-export const FormElement: React.FC<Props> = ({ children }) => {
-  return (
-    <fieldset className="fieldset relative w-full [&:last-child>button]:mt-4">{children}</fieldset>
-  )
+export const FormBody: React.FC<Props> = ({ children }) => {
+  return <div className="flex w-full flex-col gap-2 sm:gap-4">{children}</div>
 }

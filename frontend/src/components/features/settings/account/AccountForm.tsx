@@ -19,14 +19,14 @@
 
 import { Button } from 'components/primitives/buttons/Button'
 import { Input } from 'components/primitives/inputs/Input'
-import { Label } from 'components/primitives/typography/Label'
 import { Card, CardBody } from 'components/ui/cards/Card'
 import { useToast } from 'components/ui/feedback/hooks/useToast'
-import { FormBody } from 'components/ui/forms/formBody'
-import { FormElement } from 'components/ui/forms/formElement'
+import { ButtonGroup } from 'components/ui/forms/ButtonGroup'
+import { FieldSet } from 'components/ui/forms/FieldSet'
+import { FormBody } from 'components/ui/forms/FormBody'
+import { FormElement } from 'components/ui/forms/FormElement'
 import { FormElementSpacer } from 'components/ui/forms/formElementSpacer'
 import { FormErrorBadge } from 'components/ui/forms/formErrorBadge'
-import { FormGroup } from 'components/ui/forms/formGroup'
 import { preventEnterOnForm } from 'components/ui/forms/input/shared/preventEnterOnForm'
 import { useProfile } from 'lib/api/hooks/useProfile'
 import { updateUserProfile } from 'lib/api/lasius/user/user'
@@ -90,54 +90,62 @@ export const AccountForm: React.FC = () => {
           {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
           <form onSubmit={hookForm.handleSubmit(onSubmit)} onKeyDown={(e) => preventEnterOnForm(e)}>
             <FormBody>
-              <FormGroup>
-                <FormElement>
-                  <Label htmlFor="role">{t('common.forms.role', { defaultValue: 'Role' })}</Label>
-                  <Input readOnly value={role} tabIndex={-1} disabled />
+              <FieldSet>
+                <FormElement
+                  label={t('common.forms.role', { defaultValue: 'Role' })}
+                  htmlFor="role">
+                  <Input id="role" readOnly value={role} tabIndex={-1} disabled />
                 </FormElement>
-                <FormElement>
-                  <Label htmlFor="firstName">
-                    {t('common.forms.firstName', { defaultValue: 'Firstname' })}
-                  </Label>
+                <FormElement
+                  label={t('common.forms.firstName', { defaultValue: 'Firstname' })}
+                  htmlFor="firstName"
+                  required>
                   <Input
+                    id="firstName"
                     {...hookForm.register('firstName', { required: true })}
-                    autoComplete="off"
+                    aria-describedby="firstName-error"
+                    autoComplete="given-name"
                   />
-                  <FormErrorBadge error={hookForm.formState.errors.firstName} />
+                  <FormErrorBadge
+                    id="firstName-error"
+                    error={hookForm.formState.errors.firstName}
+                  />
                 </FormElement>
-                <FormElement>
-                  <Label htmlFor="lastName">
-                    {t('common.forms.lastName', { defaultValue: 'Lastname' })}
-                  </Label>
+                <FormElement
+                  label={t('common.forms.lastName', { defaultValue: 'Lastname' })}
+                  htmlFor="lastName"
+                  required>
                   <Input
+                    id="lastName"
                     {...hookForm.register('lastName', { required: true })}
-                    autoComplete="off"
+                    aria-describedby="lastName-error"
+                    autoComplete="family-name"
                   />
-                  <FormErrorBadge error={hookForm.formState.errors.lastName} />
+                  <FormErrorBadge id="lastName-error" error={hookForm.formState.errors.lastName} />
                 </FormElement>
                 <FormElementSpacer />
-                <FormElement>
-                  <Label htmlFor="email">
-                    {t('common.forms.email', { defaultValue: 'E-Mail' })}
-                  </Label>
+                <FormElement
+                  label={t('common.forms.email', { defaultValue: 'E-Mail' })}
+                  htmlFor="email"
+                  required>
                   <Input
+                    id="email"
                     readOnly={session?.data?.provider !== AUTH_PROVIDER_INTERNAL_LASIUS}
                     {...hookForm.register('email', {
                       required: true,
                       pattern: emailValidationPattern,
                     })}
-                    autoComplete="off"
+                    aria-describedby="email-error"
+                    autoComplete="email"
                   />
-                  <FormErrorBadge error={hookForm.formState.errors.email} />
+                  <FormErrorBadge id="email-error" error={hookForm.formState.errors.email} />
                 </FormElement>
-              </FormGroup>
-              <FormElement>
-                <div className="flex justify-end pt-4">
-                  <Button type="submit" disabled={isSubmitting}>
-                    {t('common.actions.saveChanges', { defaultValue: 'Save changes' })}
-                  </Button>
-                </div>
-              </FormElement>
+              </FieldSet>
+              <ButtonGroup className="justify-end">
+                <Button type="submit" disabled={isSubmitting}>
+                  {t('common.actions.saveChanges', { defaultValue: 'Save changes' })}
+                </Button>
+              </ButtonGroup>
             </FormBody>
           </form>
         </CardBody>

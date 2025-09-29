@@ -22,14 +22,16 @@ import { BookingDuration } from 'components/features/user/index/bookingDuration'
 import { BookingFromTo } from 'components/features/user/index/bookingFromTo'
 import { BookingFromToMobile } from 'components/features/user/index/bookingFromToMobile'
 import { BookingName } from 'components/features/user/index/bookingName'
+import { BookingInsertActions } from 'components/features/user/index/list/bookingInsertActions'
 import { BookingItemContext } from 'components/features/user/index/list/bookingItemContext'
+import { BookingOverlapActions } from 'components/features/user/index/list/bookingOverlapActions'
 import { Button } from 'components/primitives/buttons/Button'
 import { TagList } from 'components/ui/data-display/TagList'
-import { ToolTip } from 'components/ui/feedback/Tooltip'
 import { Icon } from 'components/ui/icons/Icon'
 import useModal from 'components/ui/overlays/modal/hooks/useModal'
 import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
 import { augmentBookingsList } from 'lib/api/functions/augmentBookingsList'
+import { ModelsBooking } from 'lib/api/lasius'
 import { cn } from 'lib/utils/cn'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
@@ -38,9 +40,10 @@ type ItemType = ReturnType<typeof augmentBookingsList>[number]
 
 type Props = {
   item: ItemType
+  nextItem?: ModelsBooking
 }
 
-export const BookingItem: React.FC<Props> = ({ item }) => {
+export const BookingItem: React.FC<Props> = ({ item, nextItem }) => {
   const { t } = useTranslation()
   const editModal = useModal(`EditModal-${item.id}`)
   const addModal = useModal(`AddModal-${item.id}`)
@@ -71,25 +74,11 @@ export const BookingItem: React.FC<Props> = ({ item }) => {
         <BookingItemContext item={item} />
       </div>
       {item.overlapsWithNext && (
-        <div className="absolute inset-x-0 bottom-0 flex items-center justify-center text-center">
-          <div className="bg-base-100 text-warning absolute rounded-full p-1">
-            <ToolTip
-              toolTipContent={t('bookings.overlapsWarning', {
-                defaultValue:
-                  'These two bookings overlap. Click to edit the top one and adjust the time.',
-              })}
-              width="lg">
-              <Button
-                variant="icon"
-                shape="circle"
-                type="button"
-                onClick={editModal.openModal}
-                fullWidth={false}>
-                <Icon name="alert-triangle" size={18} />
-              </Button>
-            </ToolTip>
-          </div>
-        </div>
+        <BookingOverlapActions
+          currentItem={item}
+          overlappingItem={item.overlapsWithNext}
+          onEdit={editModal.openModal}
+        />
       )}
       {item.isMostRecent && (
         <div className="absolute inset-x-0 top-0 flex items-center justify-center text-center">
@@ -107,26 +96,11 @@ export const BookingItem: React.FC<Props> = ({ item }) => {
         </div>
       )}
       {item.allowInsert && (
-        <div className="absolute inset-x-0 bottom-0 flex items-center justify-center text-center">
-          <div className="bg-base-100 absolute rounded-full p-1">
-            <ToolTip
-              toolTipContent={t('bookings.gapInfo', {
-                defaultValue:
-                  'There is a gap between these two bookings. Click to add a booking in between.',
-              })}
-              width="lg">
-              <Button
-                variant="icon"
-                shape="circle"
-                type="button"
-                title={t('bookings.actions.insert', { defaultValue: 'Insert booking' })}
-                onClick={addBetweenModal.openModal}
-                fullWidth={false}>
-                <Icon name="expand-vertical-4" size={18} />
-              </Button>
-            </ToolTip>
-          </div>
-        </div>
+        <BookingInsertActions
+          currentItem={item}
+          nextItem={nextItem}
+          onAddBetween={addBetweenModal.openModal}
+        />
       )}
       <ModalResponsive modalId={editModal.modalId}>
         <BookingAddUpdateForm

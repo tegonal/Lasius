@@ -19,6 +19,7 @@
 
 import axios from 'axios'
 import { getCsrfToken } from 'lib/api/lasius/general/general'
+import { logger } from 'lib/logger'
 import { removeAccessibleCookies } from 'lib/utils/auth/removeAccessibleCookies'
 import { signOut, useSession } from 'next-auth/react'
 import React, { useEffect } from 'react'
@@ -43,7 +44,7 @@ export const HttpHeaderProvider: React.FC<HttpHeaderProviderProps> = () => {
 
   // Set the token for client side requests to use
   useEffect(() => {
-    console.debug('[HttpHeaderProvider][SessionChanged]', {
+    logger.debug('[HttpHeaderProvider][SessionChanged]', {
       hasToken: !!session?.access_token,
       tokenPreview: session?.access_token?.slice(-10),
       expires_at: session?.expires_at,
@@ -53,7 +54,7 @@ export const HttpHeaderProvider: React.FC<HttpHeaderProviderProps> = () => {
     const token = session?.access_token
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-      console.log('[HttpHeaderProvider] Axios defaults updated with new token')
+      logger.info('[HttpHeaderProvider] Axios defaults updated with new token')
     } else {
       // legacy
       delete axios.defaults.headers.common['Authorization']
@@ -63,7 +64,7 @@ export const HttpHeaderProvider: React.FC<HttpHeaderProviderProps> = () => {
       axios.defaults.headers.common['X-Token-Issuer'] = tokenIssuer
     }
     if (session?.error && session?.access_token) {
-      console.error('[HttpHeaderProvider][UpdateSessionFailed]', session.error)
+      logger.error('[HttpHeaderProvider][UpdateSessionFailed]', session.error)
       void removeAccessibleCookies()
       void signOut()
     }

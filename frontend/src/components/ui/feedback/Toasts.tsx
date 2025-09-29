@@ -21,38 +21,108 @@ import { useToast } from 'components/ui/feedback/hooks/useToast'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { AnimatePresence, m } from 'framer-motion'
 import { cn } from 'lib/utils/cn'
-import { XIcon } from 'lucide-react'
-import React, { useEffect } from 'react'
+import { AlertCircle, AlertTriangle, CheckCircle, Info, X } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
 import { ToastViewType } from 'types/dynamicViews'
 import { useIsClient } from 'usehooks-ts'
 
 const ToastItem: React.FC<{ item: ToastViewType }> = ({ item }) => {
   const { removeToast } = useToast()
+  const [progress, setProgress] = useState(100)
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      removeToast(item)
-    }, item.ttl)
-    return () => clearTimeout(timer)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    // Use default TTL of 5000ms if not specified
+    const ttl = item.ttl || 5000
+    const interval = 10 // Update every 10ms for smooth animation
+    const decrement = (100 * interval) / ttl
 
-  const alertClass = {
-    WARNING: 'alert-warning',
-    ERROR: 'alert-error',
-    NOTIFICATION: 'alert-info',
-    SUCCESS: 'alert-success',
+    const progressTimer = setInterval(() => {
+      setProgress((prev) => {
+        const next = prev - decrement
+        if (next <= 0) {
+          clearInterval(progressTimer)
+          return 0
+        }
+        return next
+      })
+    }, interval)
+
+    const removeTimer = setTimeout(() => {
+      removeToast(item)
+    }, ttl)
+
+    return () => {
+      clearInterval(progressTimer)
+      clearTimeout(removeTimer)
+    }
+  }, [item, removeToast])
+
+  const toastConfig = {
+    WARNING: {
+      bgColor: 'bg-warning/10',
+      borderColor: 'border-warning',
+      textColor: 'text-warning',
+      icon: AlertTriangle,
+    },
+    ERROR: {
+      bgColor: 'bg-error/10',
+      borderColor: 'border-error',
+      textColor: 'text-error',
+      icon: AlertCircle,
+    },
+    NOTIFICATION: {
+      bgColor: 'bg-info/10',
+      borderColor: 'border-info',
+      textColor: 'text-info',
+      icon: Info,
+    },
+    SUCCESS: {
+      bgColor: 'bg-success/10',
+      borderColor: 'border-success',
+      textColor: 'text-success',
+      icon: CheckCircle,
+    },
   }
 
+  const config = toastConfig[item.type]
+  const Icon = config.icon
+
   return (
-    <div className={cn('alert shadow-lg', alertClass[item.type])} role="alert">
-      <span>{item.message}</span>
-      <button
-        className="btn btn-ghost btn-sm btn-square"
-        onClick={() => removeToast(item)}
-        aria-label="Close">
-        <LucideIcon icon={XIcon} size={16} />
-      </button>
+    <div
+      className={cn(
+        'relative overflow-hidden rounded-lg border shadow-md backdrop-blur-sm',
+        config.bgColor,
+        config.borderColor,
+      )}
+      role="alert">
+      <div className="flex items-center gap-3 px-4 py-3">
+        <LucideIcon
+          icon={Icon}
+          size={20}
+          className={cn(config.textColor, 'flex-shrink-0', item.description && 'self-start')}
+        />
+        <div className="min-w-0 flex-1">
+          <p className="text-sm leading-5 font-medium">{item.message}</p>
+          {item.description && (
+            <p className="text-base-content/60 mt-0.5 text-xs leading-4">{item.description}</p>
+          )}
+        </div>
+        <button
+          className={cn(
+            'hover:bg-base-content/10 flex-shrink-0 rounded-md p-1 transition-colors',
+            'focus:ring-base-content/20 focus:ring-2 focus:ring-offset-2 focus:outline-none',
+          )}
+          onClick={() => removeToast(item)}
+          aria-label="Close notification">
+          <LucideIcon icon={X} size={16} className="text-base-content/60" />
+        </button>
+      </div>
+      <div className="bg-base-content/10 absolute bottom-0 left-0 h-0.5">
+        <div
+          className={cn('h-full transition-all duration-100 ease-linear', config.bgColor)}
+          style={{ width: `${progress}%` }}
+        />
+      </div>
     </div>
   )
 }
@@ -63,15 +133,16 @@ export const Toasts: React.FC = () => {
   if (!isClient) return null
 
   return (
-    <div className="toast toast-end toast-bottom">
+    <div className="toast toast-end toast-bottom z-[9999]">
       <AnimatePresence mode="sync">
         {toastViews.map((toast) => (
           <m.div
             key={toast.id}
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 50 }}
-            className="mb-2">
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="mb-2 max-w-md min-w-[320px]">
             <ToastItem item={toast} />
           </m.div>
         ))}

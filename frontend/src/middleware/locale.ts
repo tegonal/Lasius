@@ -18,6 +18,7 @@
  */
 
 import { match as matchLocale } from '@formatjs/intl-localematcher'
+import { logger } from 'lib/loggerMiddleware'
 import Negotiator from 'negotiator'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -44,7 +45,7 @@ function getPreferredLocale(request: NextRequest): string {
     const browserLocales = negotiator.languages()
 
     if (process.env.LASIUS_DEBUG) {
-      console.debug('[LocaleMiddleware][BrowserLocales]', browserLocales)
+      logger.debug('[LocaleMiddleware][BrowserLocales]', browserLocales)
     }
 
     // Match against our supported locales
@@ -54,7 +55,7 @@ function getPreferredLocale(request: NextRequest): string {
     return matchedLocale.substring(0, 2).toLowerCase()
   } catch (error) {
     if (process.env.LASIUS_DEBUG) {
-      console.debug('[LocaleMiddleware][DetectionError]', error)
+      logger.debug('[LocaleMiddleware][DetectionError]', error)
     }
     return DEFAULT_LOCALE
   }
@@ -65,23 +66,23 @@ function getPreferredLocale(request: NextRequest): string {
  * Sets NEXT_LOCALE cookie if not present and updates Next.js locale context
  */
 export async function localeMiddleware(request: NextRequest): Promise<NextResponse | undefined> {
-  console.log('[LocaleMiddleware] Checking for cookie')
+  logger.info('[LocaleMiddleware] Checking for cookie')
 
   // Check if locale cookie already exists
   let locale = request.cookies.get(COOKIE_NAME)?.value
   let shouldSetCookie = false
 
-  console.log('[LocaleMiddleware] Existing cookie:', locale)
+  logger.info('[LocaleMiddleware] Existing cookie:', locale)
 
   // Validate existing cookie or detect new locale
   if (!locale || !SUPPORTED_LOCALES.includes(locale)) {
     // No valid cookie found - detect from browser preferences
     locale = getPreferredLocale(request)
     shouldSetCookie = true
-    console.log('[LocaleMiddleware] Detected locale from browser:', locale)
+    logger.info('[LocaleMiddleware] Detected locale from browser:', locale)
 
     if (process.env.LASIUS_DEBUG) {
-      console.debug('[LocaleMiddleware][DetectedLocale]', {
+      logger.debug('[LocaleMiddleware][DetectedLocale]', {
         detectedLocale: locale,
         pathname: request.nextUrl.pathname,
         acceptLanguage: request.headers.get('accept-language'),
@@ -89,7 +90,7 @@ export async function localeMiddleware(request: NextRequest): Promise<NextRespon
     }
   } else {
     if (process.env.LASIUS_DEBUG) {
-      console.debug('[LocaleMiddleware][ExistingCookie]', {
+      logger.debug('[LocaleMiddleware][ExistingCookie]', {
         locale,
         pathname: request.nextUrl.pathname,
       })
@@ -109,7 +110,7 @@ export async function localeMiddleware(request: NextRequest): Promise<NextRespon
 
   // Set cookie if needed
   if (shouldSetCookie) {
-    console.log('[LocaleMiddleware] Setting cookie:', locale)
+    logger.info('[LocaleMiddleware] Setting cookie:', locale)
     response.cookies.set(COOKIE_NAME, locale, {
       path: '/',
       maxAge: COOKIE_MAX_AGE,
@@ -118,7 +119,7 @@ export async function localeMiddleware(request: NextRequest): Promise<NextRespon
     })
 
     if (process.env.LASIUS_DEBUG) {
-      console.debug('[LocaleMiddleware][SetCookie]', {
+      logger.debug('[LocaleMiddleware][SetCookie]', {
         locale,
         cookieName: COOKIE_NAME,
       })

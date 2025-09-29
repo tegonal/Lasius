@@ -24,15 +24,18 @@ import { useTranslation } from 'next-i18next'
 import React from 'react'
 import { FieldError, FieldErrors, Merge } from 'react-hook-form'
 
-type Props = { errors?: FieldError | Merge<FieldError, FieldErrors<any>> }
+type Props = {
+  errors?: FieldError | Merge<FieldError, FieldErrors<any>>
+  id?: string
+}
 
-export const FormErrorsMultiple: React.FC<Props> = ({ errors = null }) => {
+export const FormErrorsMultiple: React.FC<Props> = ({ errors = null, id }) => {
   const { t } = useTranslation('common')
   if (!errors) return null
   const { types = {} } = errors
   logger.warn('[form][FormErrorsMultiple]', errors)
   return (
-    <div className="relative top-0 right-0 pb-2">
+    <div className="relative top-0 right-0 pb-2" id={id}>
       <div className="flex max-w-full flex-row flex-wrap items-center justify-end gap-2">
         {Object.keys(types).map((key) => (
           <div key={key} className="badge badge-warning translate-x-[6px] -translate-y-1/2">

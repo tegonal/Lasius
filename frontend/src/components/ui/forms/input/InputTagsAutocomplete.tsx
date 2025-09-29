@@ -34,14 +34,16 @@ const sortById = (items: ModelsTags[]) => sortBy(items, ['id'])
 type Props = {
   suggestions: ModelsTags[] | undefined
   name: string
+  id?: string
 }
 
-export const InputTagsAutocomplete: React.FC<Props> = ({ suggestions = [], name }) => {
+export const InputTagsAutocomplete: React.FC<Props> = ({ suggestions = [], name, id }) => {
   const { t } = useTranslation('common')
   const parentFormContext = useFormContext()
 
   const [inputText, setInputText] = useState<string>('')
   const [selectedTags, setSelectedTags] = useState<ModelsTags[]>([])
+  const [isFocused, setIsFocused] = useState<boolean>(false)
 
   useEffect(() => {
     if (!parentFormContext) return () => null
@@ -53,12 +55,26 @@ export const InputTagsAutocomplete: React.FC<Props> = ({ suggestions = [], name 
     return () => subscription.unsubscribe()
   }, [name, parentFormContext])
 
+  // Get the current projectId from the form
+  const projectId = parentFormContext?.watch('projectId')
+
+  // Control whether to show the dropdown
+  // const shouldShowDropdown = isFocused && projectId // Commented out - not currently used
+
+  // Show all tags when focused with a project selected and no input text
+  // Otherwise filter by input text
   const availableSuggestions = sortById(
-    differenceBy(suggestions as ModelsTagWithSummary[], selectedTags ?? [], 'id').filter(
-      (tag) =>
+    differenceBy(suggestions as ModelsTagWithSummary[], selectedTags ?? [], 'id').filter((tag) => {
+      // If no input text, show all tags
+      if (!inputText) {
+        return true
+      }
+      // Otherwise filter by input text
+      return (
         cleanStrForCmp(tag.summary || '').includes(cleanStrForCmp(inputText)) ||
-        cleanStrForCmp(tag.id).includes(cleanStrForCmp(inputText)),
-    ),
+        cleanStrForCmp(tag.id).includes(cleanStrForCmp(inputText))
+      )
+    }),
   )
 
   const removeTag = (tag: ModelsTags) => {
@@ -84,17 +100,12 @@ export const InputTagsAutocomplete: React.FC<Props> = ({ suggestions = [], name 
 
   if (!parentFormContext) return null
 
-  const preventDefault = (e: any) => {
-    if (inputText) e.preventDefault()
-  }
+  // const preventDefault = (e: any) => {
+  //   if (inputText) e.preventDefault()
+  // } // Commented out - not currently used
 
   const inputValueChanged = (e: any) => {
-    if (e.currentTarget.value == ' ') {
-      // ignore initial space as this should only open the combobox
-      setInputText('')
-    } else {
-      setInputText(e.currentTarget.value)
-    }
+    setInputText(e.currentTarget.value)
   }
 
   return (
@@ -113,9 +124,11 @@ export const InputTagsAutocomplete: React.FC<Props> = ({ suggestions = [], name 
               {({ open }) => (
                 <>
                   <ComboboxInput
+                    id={id || name}
                     className="input input-bordered w-full pr-10 text-sm"
                     onChange={inputValueChanged}
-                    onClick={preventDefault}
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => setIsFocused(false)}
                     displayValue={() => inputText}
                     placeholder={t('tags.chooseOrEnter', { defaultValue: 'Choose or enter tags' })}
                     autoComplete="off"
@@ -128,37 +141,47 @@ export const InputTagsAutocomplete: React.FC<Props> = ({ suggestions = [], name 
                       <Icon name="remove-circle-interface-essential" size={20} />
                     </div>
                   )}
-                  <ComboboxOptions as="div">
-                    {open && (displayCreateTag || availableSuggestions.length > 0) && (
-                      <DropdownList className="flex flex-wrap gap-0 px-2">
-                        {displayCreateTag && (
-                          <ComboboxOption
-                            as="div"
-                            key="create_tag"
-                            className="mb-2 flex w-fit basis-full items-center gap-2 p-1"
-                            value={inputTag}>
-                            {({ focus }) => (
-                              <>
-                                <div className="text-sm">{`${t('tags.customTag', { defaultValue: 'Custom tag' })}: `}</div>
+                  <ComboboxOptions as="div" static={isFocused && projectId && !open}>
+                    {(open || (isFocused && projectId)) &&
+                      (displayCreateTag || availableSuggestions.length > 0) && (
+                        <DropdownList className="flex flex-wrap gap-0 px-2">
+                          {displayCreateTag && (
+                            <ComboboxOption
+                              as="div"
+                              key="create_tag"
+                              className="mb-2 flex w-fit basis-full items-center gap-2 p-1"
+                              value={inputTag}>
+                              {({ focus }) => (
+                                <>
+                                  <div className="text-sm">{`${t('tags.customTag', { defaultValue: 'Custom tag' })}: `}</div>
+                                  <Tag
+                                    active={focus}
+                                    item={inputTag}
+                                    clickHandler={noop}
+                                    hideRemoveIcon
+                                  />
+                                </>
+                              )}
+                            </ComboboxOption>
+                          )}
+                          {availableSuggestions.map((item) => (
+                            <ComboboxOption
+                              as="div"
+                              key={item.id}
+                              value={item}
+                              className="w-fit p-1">
+                              {({ active }) => (
                                 <Tag
-                                  active={focus}
-                                  item={inputTag}
+                                  active={active}
+                                  item={item}
                                   clickHandler={noop}
                                   hideRemoveIcon
                                 />
-                              </>
-                            )}
-                          </ComboboxOption>
-                        )}
-                        {availableSuggestions.map((item) => (
-                          <ComboboxOption as="div" key={item.id} value={item} className="w-fit p-1">
-                            {({ active }) => (
-                              <Tag active={active} item={item} clickHandler={noop} hideRemoveIcon />
-                            )}
-                          </ComboboxOption>
-                        ))}
-                      </DropdownList>
-                    )}
+                              )}
+                            </ComboboxOption>
+                          ))}
+                        </DropdownList>
+                      )}
                   </ComboboxOptions>
                 </>
               )}

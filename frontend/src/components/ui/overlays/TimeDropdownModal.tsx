@@ -20,16 +20,14 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { Button } from 'components/primitives/buttons/Button'
 import { Heading } from 'components/primitives/typography/Heading'
-import { FormElement } from 'components/ui/forms/formElement'
-import { FormGroup } from 'components/ui/forms/formGroup'
-import { InputDatePicker } from 'components/ui/forms/input/datePicker/inputDatePicker'
+import { FieldSet } from 'components/ui/forms/FieldSet'
+import { FormElement } from 'components/ui/forms/FormElement'
+import { InputDurationStandalone } from 'components/ui/forms/input/datePicker2/InputDurationStandalone'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import useModal from 'components/ui/overlays/modal/hooks/useModal'
 import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
-import { getHours, getMinutes } from 'date-fns'
 import { round } from 'es-toolkit'
 import { cn } from 'lib/utils/cn'
-import { decimalHoursToDate } from 'lib/utils/date/dates'
 import { ChevronDown, Clock } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React, { useEffect } from 'react'
@@ -67,7 +65,7 @@ export const TimeDropdownWithModal: React.FC<Props> = ({
   const hookForm = useForm()
 
   useEffect(() => {
-    hookForm.setValue('timeValue', decimalHoursToDate(value))
+    hookForm.setValue('timeValue', value)
   }, [hookForm, value])
 
   const formatHours = (decimal: number) => {
@@ -84,9 +82,8 @@ export const TimeDropdownWithModal: React.FC<Props> = ({
   }
 
   const handleCustomSubmit = () => {
-    const date = new Date(hookForm.getValues().timeValue)
-    const hours = round(getHours(date) + getMinutes(date) / 60, 2)
-    onChange(hours)
+    const hours = hookForm.getValues().timeValue || 0
+    onChange(round(hours, 2))
     closeModal()
   }
 
@@ -149,7 +146,7 @@ export const TimeDropdownWithModal: React.FC<Props> = ({
       {/* Modal for custom time selection */}
       <FormProvider {...hookForm}>
         <ModalResponsive autoSize modalId={modalId}>
-          <FormGroup>
+          <FieldSet>
             <FormElement>
               <Heading as="h3" variant="section" className="mb-4">
                 {t('common.time.setCustom', { defaultValue: 'Set custom time' })}
@@ -157,7 +154,7 @@ export const TimeDropdownWithModal: React.FC<Props> = ({
             </FormElement>
             <FormElement>
               <div className="time-picker-modal w-full [&_.bg-base-300]:w-full [&_.bg-base-300]:justify-center">
-                <InputDatePicker name="timeValue" withDate={false} withTime={true} label="" />
+                <InputDurationStandalone name="timeValue" />
               </div>
             </FormElement>
             <FormElement>
@@ -170,7 +167,7 @@ export const TimeDropdownWithModal: React.FC<Props> = ({
                 </Button>
               </div>
             </FormElement>
-          </FormGroup>
+          </FieldSet>
         </ModalResponsive>
       </FormProvider>
     </>

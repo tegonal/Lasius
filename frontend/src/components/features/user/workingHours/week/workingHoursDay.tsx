@@ -20,9 +20,9 @@
 import { Button } from 'components/primitives/buttons/Button'
 import { FormatDate } from 'components/ui/data-display/FormatDate'
 import { useToast } from 'components/ui/feedback/hooks/useToast'
-import { FormElement } from 'components/ui/forms/formElement'
-import { FormGroup } from 'components/ui/forms/formGroup'
-import { InputDatePicker } from 'components/ui/forms/input/datePicker/inputDatePicker'
+import { FieldSet } from 'components/ui/forms/FieldSet'
+import { FormElement } from 'components/ui/forms/FormElement'
+import { InputDatePicker2 } from 'components/ui/forms/input/datePicker2/InputDatePicker2'
 import { Icon } from 'components/ui/icons/Icon'
 import useModal from 'components/ui/overlays/modal/hooks/useModal'
 import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
@@ -99,21 +99,21 @@ export const WorkingHoursDay: React.FC<Props> = ({ item, organisation }) => {
         </div>
       </div>
       <ModalResponsive autoSize modalId={modalId}>
-        <FormGroup>
+        <FieldSet>
           <FormElement>
             <div className="text-center">
               <FormatDate date={item.date} format="dayNameShort" />
             </div>
           </FormElement>
           <FormElement>
-            <InputDatePicker name={item.day} withDate={false} />
+            <InputDatePicker2 name={item.day} withDate={false} />
           </FormElement>
           <FormElement>
             <Button onClick={() => onSubmit()}>
               {t('common.actions.save', { defaultValue: 'Save' })}
             </Button>
           </FormElement>
-        </FormGroup>
+        </FieldSet>
       </ModalResponsive>
     </FormProvider>
   )

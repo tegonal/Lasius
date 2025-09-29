@@ -131,7 +131,7 @@ async function fetchRefreshAccessToken(refresh_token: string, token: JWT): Promi
     }
 
     if (process.env.LASIUS_DEBUG) {
-      console.info(
+      logger.info(
         '[NextAuth][refreshAccessToken][RenewedToken] refresh_token=%s, access_token=%s',
         tokensOrError?.refresh_token,
         tokensOrError?.access_token,
@@ -159,7 +159,7 @@ async function fetchRefreshAccessToken(refresh_token: string, token: JWT): Promi
     return newTokenResult
   } catch (error) {
     if (process.env.LASIUS_DEBUG) {
-      console.log('[NextAuth][RefreshAccessTokenError]', error)
+      logger.warn('[NextAuth][RefreshAccessTokenError]', error)
     }
 
     token.error = 'RefreshAccessTokenError'
@@ -181,7 +181,7 @@ function refreshAccessToken(token: JWT): undefined | Promise<JWT> {
   const inProgressRefresh = REFRESH_TOKEN_PROGRESS.get(token.refresh_token)
   if (inProgressRefresh) {
     if (process.env.LASIUS_DEBUG) {
-      console.debug(
+      logger.debug(
         '[NextAuth][refreshAccessToken][WaitingForRefresh] refresh_token=%s',
         token.refresh_token,
       )
@@ -193,7 +193,7 @@ function refreshAccessToken(token: JWT): undefined | Promise<JWT> {
   const now = Date.now()
   if (cachedResult) {
     if (process.env.LASIUS_DEBUG) {
-      console.debug(
+      logger.debug(
         '[NextAuth][refreshAccessToken][CachedRefresh] refresh_token=%s, access_token=%s, time_remaining=%s',
         token.refresh_token,
         cachedResult.token,
@@ -202,7 +202,7 @@ function refreshAccessToken(token: JWT): undefined | Promise<JWT> {
     }
     if (cachedResult.expiry < now) {
       if (process.env.LASIUS_DEBUG) {
-        console.debug(
+        logger.debug(
           '[NextAuth][refreshAccessToken][RemoveExpiredRefreshToken] refresh_token=%s, time_remaining=%s',
           token.refresh_token,
           now - cachedResult.expiry,
@@ -218,7 +218,7 @@ function refreshAccessToken(token: JWT): undefined | Promise<JWT> {
     .filter(([_, item]) => item.expiry < now)
     .map(([key, _]) => key)
   if (process.env.LASIUS_DEBUG) {
-    console.debug(
+    logger.debug(
       '[NextAuth][CleanCachedRefreshTokens] number_of_expired_tokens=%s',
       expiredCachedRefreshTokens.length,
     )
@@ -226,7 +226,7 @@ function refreshAccessToken(token: JWT): undefined | Promise<JWT> {
   expiredCachedRefreshTokens.forEach((token) => REFRESH_TOKEN_CACHE.delete(token))
 
   if (process.env.LASIUS_DEBUG) {
-    console.debug('[NextAuth][refreshAccessToken] refresh_token=%s', token?.refresh_token)
+    logger.debug('[NextAuth][refreshAccessToken] refresh_token=%s', token?.refresh_token)
   }
 
   // Create and store the refresh promise
@@ -329,14 +329,14 @@ export const nextAuthOptions: (locale?: string) => NextAuthOptions = (locale) =>
         }
         session.user = session.user || user
         if (process.env.LASIUS_DEBUG) {
-          console.debug('[NextAuth][Session]', session)
+          logger.debug('[NextAuth][Session]', session)
         }
 
         return session
       },
       async jwt({ token, account, user, profile, trigger }) {
         if (process.env.LASIUS_DEBUG) {
-          console.debug(
+          logger.debug(
             '[NextAuth][JWT] refresh_token=%s, token_expires_at=%s, trigger=%s',
             token.refresh_token,
             token.expires_at,

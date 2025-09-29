@@ -17,7 +17,7 @@
  *
  */
 
-import { AccountLayout } from 'components/features/settings/account/accountLayout'
+import { AccountLayout } from 'components/features/settings/account/AccountLayout'
 import { LayoutResponsive } from 'components/ui/layouts/layoutResponsive'
 import { GetServerSideProps } from 'next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'

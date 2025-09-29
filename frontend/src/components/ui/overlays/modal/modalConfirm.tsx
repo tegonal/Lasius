@@ -18,7 +18,7 @@
  */
 
 import { Button } from 'components/primitives/buttons/Button'
-import { FormElement } from 'components/ui/forms/formElement'
+import { FormElement } from 'components/ui/forms/FormElement'
 import useModal from 'components/ui/overlays/modal/hooks/useModal'
 import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
 import { useTranslation } from 'next-i18next'
@@ -67,8 +67,8 @@ export const ModalConfirm: React.FC<Props> = ({
 
   return (
     <ModalResponsive modalId={modalId} blockViewport autoSize={autoSize}>
-      {text && <div className="mb-3">{text.action}</div>}
-      {children && <div className="mb-3">{children}</div>}
+      {text && <div className="mb-4">{text.action}</div>}
+      {children && <div className="mb-4">{children}</div>}
       {!hideButtons && (
         <FormElement>
           <Button

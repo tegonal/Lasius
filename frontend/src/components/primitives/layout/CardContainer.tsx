@@ -21,7 +21,7 @@ import { Card, CardBody } from 'components/ui/cards/Card'
 import React from 'react'
 
 type Props = {
-  sx?: any // Keeping sx prop for backward compatibility, but it's ignored
+  // Keeping sx prop for backward compatibility, but it's ignored
   className?: string
   children: React.ReactNode
 }

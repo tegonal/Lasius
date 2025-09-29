@@ -57,33 +57,35 @@ export const SelectUserOrganisationModal: React.FC<Props> = ({ selected, onSelec
   }
 
   return (
-    <div className="grid grid-cols-3 gap-3">
-      <Heading as="h1" className="col-span-3">
+    <div>
+      <Heading as="h1" className="mb-4">
         {t('organizations.selectOrganisation', { defaultValue: 'Select organisation' })}
       </Heading>
-      {organisations.map((item) => (
-        <CardSmall
-          key={item.organisationReference.id}
-          onClick={() => selectOrganisation(item.organisationReference)}>
-          <div className="flex flex-col items-center justify-center pt-2">
-            <AvatarOrganisation name={item.organisationReference.key} size={64} />
-          </div>
-          <div className="leading-normal">
-            {item.private
-              ? t('organizations.myPersonalOrganisation', {
-                  defaultValue: 'My personal organisation',
-                })
-              : item.organisationReference.key}
-          </div>
-          {isCurrent(item) && (
-            <div
-              title={t('common.selected', { defaultValue: 'Selected' })}
-              className="absolute top-2 right-2">
-              <Icon name="check-circle-1-interface-essential" size={18} />
+      <div className="grid grid-cols-3 gap-3">
+        {organisations.map((item) => (
+          <CardSmall
+            key={item.organisationReference.id}
+            onClick={() => selectOrganisation(item.organisationReference)}>
+            <div className="flex flex-col items-center justify-center pt-2">
+              <AvatarOrganisation name={item.organisationReference.key} size={64} />
             </div>
-          )}
-        </CardSmall>
-      ))}
+            <div className="leading-normal">
+              {item.private
+                ? t('organizations.myPersonalOrganisation', {
+                    defaultValue: 'My personal organisation',
+                  })
+                : item.organisationReference.key}
+            </div>
+            {isCurrent(item) && (
+              <div
+                title={t('common.selected', { defaultValue: 'Selected' })}
+                className="absolute top-2 right-2">
+                <Icon name="check-circle-1-interface-essential" size={18} />
+              </div>
+            )}
+          </CardSmall>
+        ))}
+      </div>
     </div>
   )
 }

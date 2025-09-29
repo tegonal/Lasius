@@ -19,6 +19,7 @@
 
 import { useCalendarStore } from './calendarStore'
 import { useOrganisationStore } from './organisationStore'
+import { useTokenStore } from './tokenStore'
 import { useUIStore } from './uiStore'
 
 /**
@@ -37,6 +38,9 @@ export const resetAllStores = () => {
 
   // Reset organisation store
   useOrganisationStore.getState().resetOrganisation()
+
+  // Reset token store
+  useTokenStore.getState().reset()
 
   // Clear persisted storage
   localStorage.removeItem('lasius-calendar-store')

@@ -21,6 +21,7 @@ import { InvitationInvalid } from 'components/features/invitation/invitationInva
 import { InvitationOtherSession } from 'components/features/invitation/InvitationOtherSession'
 import { InvitationUserConfirm } from 'components/features/invitation/invitationUserConfirm'
 import { getInvitationStatus } from 'lib/api/lasius/invitations-public/invitations-public'
+import { logger } from 'lib/logger'
 import { GetServerSideProps, NextPage } from 'next'
 import { getServerSession, Session } from 'next-auth'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
@@ -43,7 +44,7 @@ const Join: NextPage<{ session: Session; locale?: string }> = ({ session, locale
   const invitation = invitationStatus.result
 
   if (invitation?.invitation?.id && invitation?.invitation?.invitedEmail && session === null) {
-    console.log('[join][notAuthenticated]]', session)
+    logger.info('[Join][NotAuthenticated]', session)
     // login user and handle invitation logic again
     const url =
       '/login?' +

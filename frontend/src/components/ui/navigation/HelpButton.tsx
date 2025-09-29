@@ -45,7 +45,7 @@ export const HelpButton: React.FC = () => {
   return (
     <ToolTip toolTipContent={t('common.actions.help', { defaultValue: 'Help' })} placement="bottom">
       <Button onClick={openDocumentation} fullWidth={false} variant="ghost" shape="circle">
-        <LucideIcon icon={HelpCircleIcon} />
+        <LucideIcon icon={HelpCircleIcon} size={20} />
       </Button>
     </ToolTip>
   )

@@ -20,13 +20,13 @@
 import { LoginLayout } from 'components/features/login/loginLayout'
 import { Button } from 'components/primitives/buttons/Button'
 import { Input } from 'components/primitives/inputs/Input'
-import { Label } from 'components/primitives/typography/Label'
 import { P } from 'components/primitives/typography/Paragraph'
 import { Card, CardBody } from 'components/ui/cards/Card'
 import { Alert } from 'components/ui/feedback/Alert'
-import { FormBody } from 'components/ui/forms/formBody'
-import { FormButtonContainer } from 'components/ui/forms/formButtonContainer'
-import { FormElement } from 'components/ui/forms/formElement'
+import { ButtonGroup } from 'components/ui/forms/ButtonGroup'
+import { FieldSet } from 'components/ui/forms/FieldSet'
+import { FormBody } from 'components/ui/forms/FormBody'
+import { FormElement } from 'components/ui/forms/FormElement'
 import { FormErrorBadge } from 'components/ui/forms/formErrorBadge'
 import { Logo } from 'components/ui/icons/Logo'
 import { TegonalFooter } from 'components/ui/navigation/TegonalFooter'
@@ -213,31 +213,37 @@ const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig; locale?: s
           </div>
           <form onSubmit={handleSubmit(onSubmit)}>
             <FormBody>
-              <FormElement>
-                <Label htmlFor="email">{t('common.forms.email', { defaultValue: 'E-Mail' })}</Label>
-                <Input
-                  {...register('email', {
-                    required: true,
-                    validate: { isEmailAddress: (v) => isEmailAddress(v.toString()) },
-                  })}
-                  autoComplete="off"
-                  autoFocus
-                  type="email"
-                />
-                <FormErrorBadge error={errors.email} />
-              </FormElement>
-              <FormElement>
-                <Label htmlFor="password">
-                  {t('common.forms.password', { defaultValue: 'Password' })}
-                </Label>
-                <Input
-                  {...register('password', { required: true })}
-                  type="password"
-                  autoComplete="off"
-                />
-                <FormErrorBadge error={errors.password} />
-              </FormElement>
-              <FormButtonContainer>
+              <FieldSet>
+                <FormElement
+                  label={t('common.forms.email', { defaultValue: 'E-Mail' })}
+                  htmlFor="email">
+                  <Input
+                    id="email"
+                    {...register('email', {
+                      required: true,
+                      validate: { isEmailAddress: (v) => isEmailAddress(v.toString()) },
+                    })}
+                    aria-describedby="email-error"
+                    autoComplete="email"
+                    autoFocus
+                    type="email"
+                  />
+                  <FormErrorBadge id="email-error" error={errors.email} />
+                </FormElement>
+                <FormElement
+                  label={t('common.forms.password', { defaultValue: 'Password' })}
+                  htmlFor="password">
+                  <Input
+                    id="password"
+                    {...register('password', { required: true })}
+                    aria-describedby="password-error"
+                    type="password"
+                    autoComplete="current-password"
+                  />
+                  <FormErrorBadge id="password-error" error={errors.password} />
+                </FormElement>
+              </FieldSet>
+              <ButtonGroup>
                 <Button type="submit" fullWidth>
                   {t('auth.signIn', { defaultValue: 'Sign in' })}
                 </Button>
@@ -246,7 +252,7 @@ const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig; locale?: s
                     {t('common.actions.signUp', { defaultValue: 'Sign up' })}
                   </Button>
                 )}
-              </FormButtonContainer>
+              </ButtonGroup>
             </FormBody>
           </form>
         </CardBody>
@@ -264,7 +270,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   try {
     config = await getConfiguration()
   } catch (error) {
-    console.error('Failed to fetch configuration from backend:', error)
+    logger.error('[InternalOAuth][Login] Failed to fetch configuration from backend:', error)
     // Provide a default config when backend is unavailable
     config = {
       title: 'Lasius',

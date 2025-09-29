@@ -20,9 +20,10 @@
 import { useContextMenu } from 'components/features/contextMenu/hooks/useContextMenu'
 import { ProjectAddUpdateForm } from 'components/features/projects/projectAddUpdateForm'
 import { Button } from 'components/primitives/buttons/Button'
+import { Divider } from 'components/primitives/divider/Divider'
 import { Heading } from 'components/primitives/typography/Heading'
 import { Text } from 'components/primitives/typography/Text'
-import { FormElement } from 'components/ui/forms/formElement'
+import { FormElement } from 'components/ui/forms/FormElement'
 import useModal from 'components/ui/overlays/modal/hooks/useModal'
 import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
 import { useTranslation } from 'next-i18next'
@@ -49,6 +50,7 @@ export const AllProjectsRightColumn: React.FC = () => {
             'All projects of the current organization which you can administer. Create billing reports that contain time booked by project members not part of your organisation.',
         })}
       </Text>
+      <Divider className="my-4" />
       <FormElement>
         <Button onClick={() => addProject()}>
           {t('projects.actions.create', { defaultValue: 'Create a project' })}

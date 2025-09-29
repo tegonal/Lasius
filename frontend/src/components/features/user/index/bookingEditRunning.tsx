@@ -18,11 +18,13 @@
  */
 
 import { Button } from 'components/primitives/buttons/Button'
-import { FormBody } from 'components/ui/forms/formBody'
-import { FormElement } from 'components/ui/forms/formElement'
-import { InputDatePicker } from 'components/ui/forms/input/datePicker/inputDatePicker'
-import { InputSelectAutocomplete } from 'components/ui/forms/input/inputSelectAutocomplete'
-import { InputTagsAutocomplete } from 'components/ui/forms/input/inputTagsAutocomplete'
+import { ButtonGroup } from 'components/ui/forms/ButtonGroup'
+import { FieldSet } from 'components/ui/forms/FieldSet'
+import { FormBody } from 'components/ui/forms/FormBody'
+import { FormElement } from 'components/ui/forms/FormElement'
+import { InputDatePicker2 } from 'components/ui/forms/input/datePicker2/InputDatePicker2'
+import { InputSelectAutocomplete } from 'components/ui/forms/input/InputSelectAutocomplete'
+import { InputTagsAutocomplete } from 'components/ui/forms/input/InputTagsAutocomplete'
 import { addSeconds, isFuture } from 'date-fns'
 import { useGetBookingLatest } from 'lib/api/hooks/useGetBookingLatest'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
@@ -35,7 +37,7 @@ import {
 import { useGetTagsByProject } from 'lib/api/lasius/user-organisations/user-organisations'
 import { logger } from 'lib/logger'
 import { formatISOLocale } from 'lib/utils/date/dates'
-import { MoveLeft } from 'lucide-react'
+import { ArrowDownToLine } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import { DEFAULT_STRING_VALUE } from 'projectConfig/constants'
 import React, { useEffect, useState } from 'react'
@@ -132,7 +134,7 @@ export const BookingEditRunning: React.FC<Props> = ({ item, onSave, onCancel }) 
           defaultValue: 'Use end time of latest booking as start time for this one',
         }),
         presetDate: formatISOLocale(addSeconds(new Date(latestBooking?.end?.dateTime || ''), 1)),
-        presetIcon: MoveLeft,
+        presetIcon: ArrowDownToLine,
       }
     : {}
 
@@ -141,37 +143,49 @@ export const BookingEditRunning: React.FC<Props> = ({ item, onSave, onCancel }) 
       <FormProvider {...hookForm}>
         <form onSubmit={hookForm.handleSubmit(onSubmit)}>
           <FormBody>
-            <FormElement>
-              <InputSelectAutocomplete
-                name="projectId"
-                suggestions={projectSuggestions()}
-                required
-              />
-            </FormElement>
-            <FormElement>
-              <InputTagsAutocomplete name="tags" suggestions={projectTags} />
-            </FormElement>
-            <FormElement>
-              <InputDatePicker
-                name="start"
+            <FieldSet>
+              <FormElement
+                label={t('projects.label', { defaultValue: 'Project' })}
+                htmlFor="projectId"
+                required>
+                <InputSelectAutocomplete
+                  id="projectId"
+                  name="projectId"
+                  suggestions={projectSuggestions()}
+                  required
+                />
+              </FormElement>
+              <FormElement label={t('tags.label', { defaultValue: 'Tags' })} htmlFor="tags">
+                <InputTagsAutocomplete id="tags" name="tags" suggestions={projectTags} />
+              </FormElement>
+              <FormElement
                 label={t('common.time.starts', { defaultValue: 'Starts' })}
-                withDate={false}
-                rules={{
-                  validate: {
-                    startInPast: (v) => !isFuture(new Date(v)),
-                  },
-                }}
-                {...presetStart}
-              />
-            </FormElement>
-            <FormElement>
+                htmlFor="start">
+                <InputDatePicker2
+                  name="start"
+                  withDate={false}
+                  withTime={true}
+                  rules={{
+                    validate: {
+                      startInPast: (v: string) =>
+                        !isFuture(new Date(v)) ||
+                        t('validation.startMustBeInPast', {
+                          defaultValue: 'Start time must be in the past',
+                        }),
+                    },
+                  }}
+                  {...presetStart}
+                />
+              </FormElement>
+            </FieldSet>
+            <ButtonGroup>
               <Button type="submit" disabled={isSubmitting}>
                 {t('common.actions.save', { defaultValue: 'Save' })}
               </Button>
               <Button type="button" variant="secondary" onClick={onCancel}>
                 {t('common.actions.close', { defaultValue: 'Close' })}
               </Button>
-            </FormElement>
+            </ButtonGroup>
           </FormBody>
         </form>
       </FormProvider>

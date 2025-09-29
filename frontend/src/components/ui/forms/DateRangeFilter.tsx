@@ -17,15 +17,14 @@
  *
  */
 
-import { FormBody } from 'components/ui/forms/formBody'
-import { FormElement } from 'components/ui/forms/formElement'
-import { InputDatePicker } from 'components/ui/forms/input/datePicker/inputDatePicker'
-import { LucideIcon } from 'components/ui/icons/LucideIcon'
+import { FormBody } from 'components/ui/forms/FormBody'
+import { FormElement } from 'components/ui/forms/FormElement'
+import { InputDatePicker2 } from 'components/ui/forms/input/datePicker2/InputDatePicker2'
+import { Select, SelectOption } from 'components/ui/forms/input/Select'
 import { isAfter, isBefore } from 'date-fns'
 import { dateOptions } from 'lib/utils/date/dateOptions'
-import { ChevronDown } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
 
 type Props = {
@@ -34,9 +33,17 @@ type Props = {
 
 export const DateRangeFilter: React.FC<Props> = ({ name: rangeFieldName }) => {
   const { t } = useTranslation('common')
-  const dateRangeRef = useRef<HTMLSelectElement>(null)
-
   const parentFormContext = useFormContext()
+
+  // Convert dateOptions to SelectOption format
+  const selectOptions: SelectOption[] = useMemo(
+    () =>
+      dateOptions.map((option) => ({
+        value: option.name,
+        label: t(option.name as any),
+      })),
+    [t],
+  )
 
   const resetForm = () => {
     const { from, to } = dateOptions[0].dateRangeFn(new Date())
@@ -71,21 +78,23 @@ export const DateRangeFilter: React.FC<Props> = ({ name: rangeFieldName }) => {
     const to = watchTo
 
     // check matching dateRange
-
     const today = new Date()
-    if (dateRangeRef.current) {
-      const option = dateOptions.find((option) => {
-        if (!option.dateRangeFn) {
-          return true
-        }
-        const dateRange = option.dateRangeFn(today)
-        return dateRange.from === from && dateRange.to === to
-      })
-      if (option && dateRangeRef.current.value !== option.name) {
-        dateRangeRef.current.value = option.name
+    const option = dateOptions.find((option) => {
+      if (!option.dateRangeFn) {
+        return true
+      }
+      const dateRange = option.dateRangeFn(today)
+      return dateRange.from === from && dateRange.to === to
+    })
+
+    // Update the form value if we found a matching option
+    if (option) {
+      const currentRange = parentFormContext.getValues(rangeFieldName)
+      if (currentRange !== option.name) {
+        parentFormContext.setValue(rangeFieldName, option.name)
       }
     }
-  }, [watchFrom, watchTo])
+  }, [watchFrom, watchTo, parentFormContext, rangeFieldName])
 
   useEffect(() => {
     if (!parentFormContext) return () => null
@@ -123,40 +132,24 @@ export const DateRangeFilter: React.FC<Props> = ({ name: rangeFieldName }) => {
               required: (v: string | undefined) => !!v,
             },
           }}
-          render={({ field: { onChange, name } }) => (
-            <div className="relative">
-              <select
-                className="input input-bordered w-full cursor-pointer appearance-none pr-8"
-                name={name}
-                ref={dateRangeRef}
-                onChange={onChange}
-                defaultValue={dateOptions[0].name}>
-                {dateOptions.map((option) => (
-                  <option key={option.name} value={option.name}>
-                    {t(option.name as any)}
-                  </option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                <LucideIcon icon={ChevronDown} size={16} strokeWidth={2} className="opacity-50" />
-              </div>
-            </div>
+          render={({ field: { onChange, value, name } }) => (
+            <Select
+              id={name}
+              name={name}
+              value={value || dateOptions[0].name}
+              onChange={onChange}
+              options={selectOptions}
+              placeholder={t('common.time.selectRange', { defaultValue: 'Select time range' })}
+              variant="joined"
+            />
           )}
         />
       </FormElement>
-      <FormElement>
-        <InputDatePicker
-          name="from"
-          label={t('common.time.from', { defaultValue: 'From' })}
-          withTime={false}
-        />
+      <FormElement label={t('common.time.from', { defaultValue: 'From' })} htmlFor="from">
+        <InputDatePicker2 name="from" withDate />
       </FormElement>
-      <FormElement>
-        <InputDatePicker
-          name="to"
-          label={t('common.time.to', { defaultValue: 'To' })}
-          withTime={false}
-        />
+      <FormElement label={t('common.time.to', { defaultValue: 'To' })} htmlFor="to">
+        <InputDatePicker2 name="to" withDate />
       </FormElement>
     </FormBody>
   )

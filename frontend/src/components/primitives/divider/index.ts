@@ -17,26 +17,5 @@
  *
  */
 
-import {
-  InputDatePickerComponent,
-  InputDatePickerComponentProps,
-} from 'components/ui/forms/input/datePicker/inputDatePickerComponent'
-import { InputDatepickerStoreProvider } from 'components/ui/forms/input/datePicker/store/store'
-import React from 'react'
-import { useFormContext } from 'react-hook-form'
-
-export const InputDatePicker: React.FC<InputDatePickerComponentProps> = (props) => {
-  const parentFormContext = useFormContext()
-  if (!parentFormContext) return null
-
-  const parentFormValue = parentFormContext.getValues(props.name)
-
-  return (
-    <InputDatepickerStoreProvider
-      initialDate={parentFormValue}
-      name={props.name}
-      parentFormContext={parentFormContext}>
-      <InputDatePickerComponent {...props} />
-    </InputDatepickerStoreProvider>
-  )
-}
+export { Divider } from './Divider'
+export type { DividerColor, DividerOrientation, DividerProps, DividerTextAlign } from './Divider'

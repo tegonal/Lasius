@@ -20,10 +20,10 @@
 import { Button } from 'components/primitives/buttons/Button'
 import { Heading } from 'components/primitives/typography/Heading'
 import { DateRangeFilter } from 'components/ui/forms/DateRangeFilter'
-import { FormBody } from 'components/ui/forms/formBody'
-import { FormElement } from 'components/ui/forms/formElement'
-import { InputSelectAutocomplete } from 'components/ui/forms/input/inputSelectAutocomplete'
-import { InputTagsAutocomplete } from 'components/ui/forms/input/inputTagsAutocomplete'
+import { FormBody } from 'components/ui/forms/FormBody'
+import { FormElement } from 'components/ui/forms/FormElement'
+import { InputSelectAutocomplete } from 'components/ui/forms/input/InputSelectAutocomplete'
+import { InputTagsAutocomplete } from 'components/ui/forms/input/InputTagsAutocomplete'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { useProjects } from 'lib/api/hooks/useProjects'
 import { useGetTagsByProject } from 'lib/api/lasius/user-organisations/user-organisations'
@@ -68,11 +68,15 @@ export const BookingHistoryFilter: React.FC = () => {
     <div className="w-full">
       <Heading variant="section">{t('common.filter.title', { defaultValue: 'Filter' })}</Heading>
       <FormBody>
-        <FormElement>
-          <InputSelectAutocomplete suggestions={projectSuggestions()} name="projectId" />
+        <FormElement label={t('projects.label', { defaultValue: 'Project' })} htmlFor="projectId">
+          <InputSelectAutocomplete
+            id="projectId"
+            suggestions={projectSuggestions()}
+            name="projectId"
+          />
         </FormElement>
-        <FormElement>
-          <InputTagsAutocomplete name="tags" suggestions={projectTags} />
+        <FormElement label={t('tags.label', { defaultValue: 'Tags' })} htmlFor="tags">
+          <InputTagsAutocomplete id="tags" name="tags" suggestions={projectTags} />
         </FormElement>
         <DateRangeFilter name="dateRange" />
         <FormElement>

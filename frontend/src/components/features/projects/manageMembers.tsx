@@ -20,12 +20,11 @@
 import { UserCard } from 'components/features/user/manageUserCard'
 import { ManageUserInviteByEmailForm } from 'components/features/user/manageUserInviteByEmailForm'
 import { Heading } from 'components/primitives/typography/Heading'
-import { FormGroup } from 'components/ui/forms/formGroup'
+import { FieldSet } from 'components/ui/forms/FieldSet'
 import { isAdminOfProject } from 'lib/api/functions/isAdminOfProject'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { useProfile } from 'lib/api/hooks/useProfile'
-import { ModelsProject, ModelsUserProject } from 'lib/api/lasius'
-import { ModelsUserStub } from 'lib/api/lasius'
+import { ModelsProject, ModelsUserProject, ModelsUserStub } from 'lib/api/lasius'
 import { getProjectUserList, removeProjectUser } from 'lib/api/lasius/projects/projects'
 import { useTranslation } from 'next-i18next'
 import React, { useEffect, useState } from 'react'
@@ -62,7 +61,7 @@ export const ManageProjectMembers: React.FC<Props> = ({ item }) => {
   }
 
   return (
-    <FormGroup>
+    <FieldSet>
       <div className="relative w-full">
         <div className="grid grid-cols-[2fr_1fr] gap-3">
           <div>
@@ -95,6 +94,6 @@ export const ManageProjectMembers: React.FC<Props> = ({ item }) => {
           </div>
         </div>
       </div>
-    </FormGroup>
+    </FieldSet>
   )
 }

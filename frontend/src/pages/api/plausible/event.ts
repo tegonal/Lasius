@@ -74,7 +74,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   // Validate Plausible host is configured
   if (!LASIUS_TELEMETRY_PLAUSIBLE_HOST) {
-    console.error('❌ LASIUS_TELEMETRY_PLAUSIBLE_HOST not configured')
+    logger.error('❌ LASIUS_TELEMETRY_PLAUSIBLE_HOST not configured')
     return res.status(500).json({ error: 'Plausible host not configured' })
   }
 
@@ -83,7 +83,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const clientIp = getClientIp(req)
     const debugMode = req.headers['x-debug-request'] === 'true'
 
-    console.log('📊 Plausible event received:', {
+    logger.info('📊 Plausible event received:', {
       event: body.n,
       url: body.u,
       domain: body.d,
@@ -118,7 +118,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       ? `${LASIUS_TELEMETRY_PLAUSIBLE_HOST}/api/event`
       : `https://${LASIUS_TELEMETRY_PLAUSIBLE_HOST}/api/event`
 
-    console.log('📤 Forwarding to Plausible:', {
+    logger.info('📤 Forwarding to Plausible:', {
       url: plausibleUrl,
       ip: debugMode ? clientIp : 'hidden',
     })
@@ -133,7 +133,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const responseText = await response.text()
 
     if (response.ok) {
-      console.log('✅ Plausible response:', response.status, debugMode ? responseText : '')
+      logger.info('✅ Plausible response:', response.status, debugMode ? responseText : '')
 
       // Return the response from Plausible
       if (responseText) {
@@ -148,7 +148,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(response.status).end()
       }
     } else {
-      console.error('❌ Plausible error response:', response.status, responseText)
+      logger.error('❌ Plausible error response:', response.status, responseText)
       logger.error('Plausible API error', {
         status: response.status,
         response: responseText,
@@ -160,7 +160,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       })
     }
   } catch (error) {
-    console.error('❌ Error forwarding to Plausible:', error)
+    logger.error('❌ Error forwarding to Plausible:', error)
     logger.error('Error forwarding event to Plausible', error)
     return res.status(500).json({
       error: 'Internal server error',

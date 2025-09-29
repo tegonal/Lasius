@@ -20,9 +20,9 @@
 import { useSignOut } from 'components/features/system/hooks/useSignOut'
 import { MODAL_SELECT_ORGANISATION } from 'components/features/user/selectUserOrganisation'
 import { Button } from 'components/primitives/buttons/Button'
-import { FormElement } from 'components/ui/forms/formElement'
+import { FieldSet } from 'components/ui/forms/FieldSet'
+import { FormElement } from 'components/ui/forms/FormElement'
 import { FormElementSpacer } from 'components/ui/forms/formElementSpacer'
-import { FormGroup } from 'components/ui/forms/formGroup'
 import { Icon } from 'components/ui/icons/Icon'
 import useModal from 'components/ui/overlays/modal/hooks/useModal'
 import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
@@ -49,7 +49,7 @@ export const MobileNavigationButton: React.FC = () => {
         <Icon name="navigation-menu-vertical-interface-essential" size={24} />
       </Button>
       <ModalResponsive modalId={modalId}>
-        <FormGroup>
+        <FieldSet>
           <FormElement>
             <Button
               onClick={organisationSelectModal.openModal}
@@ -96,7 +96,7 @@ export const MobileNavigationButton: React.FC = () => {
               {t('common.actions.cancel', { defaultValue: 'Cancel' })}
             </Button>
           </FormElement>
-        </FormGroup>
+        </FieldSet>
       </ModalResponsive>
     </>
   )

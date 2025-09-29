@@ -19,21 +19,26 @@
 
 import { useContextMenu } from 'components/features/contextMenu/hooks/useContextMenu'
 import { OrganisationAddUpdateForm } from 'components/features/organisation/current/organisationAddUpdateForm'
+import { ManageUserInviteByEmailForm } from 'components/features/user/manageUserInviteByEmailForm'
 import { Button } from 'components/primitives/buttons/Button'
+import { Divider } from 'components/primitives/divider/Divider'
 import { Heading } from 'components/primitives/typography/Heading'
 import { Text } from 'components/primitives/typography/Text'
-import { FormElement } from 'components/ui/forms/formElement'
+import { ButtonGroup } from 'components/ui/forms/ButtonGroup'
 import useModal from 'components/ui/overlays/modal/hooks/useModal'
 import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
 import { isAdminOfCurrentOrg } from 'lib/api/functions/isAdminOfCurrentOrg'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { useProfile } from 'lib/api/hooks/useProfile'
 import { useTranslation } from 'next-i18next'
+import { ROLES } from 'projectConfig/constants'
 import React from 'react'
 
 export const OrganisationsRightColumn: React.FC = () => {
   const { t } = useTranslation('common')
   const { modalId, openModal, closeModal } = useModal('AddOrganisationModal')
+  const updateModal = useModal('EditOrganisationModal')
+  const inviteModal = useModal('InviteMemberModal')
   const { handleCloseAll } = useContextMenu()
   const { profile } = useProfile()
   const { selectedOrganisation } = useOrganisation()
@@ -41,6 +46,16 @@ export const OrganisationsRightColumn: React.FC = () => {
 
   const addOrganisation = () => {
     openModal()
+    handleCloseAll()
+  }
+
+  const editOrganisation = () => {
+    updateModal.openModal()
+    handleCloseAll()
+  }
+
+  const inviteMember = () => {
+    inviteModal.openModal()
     handleCloseAll()
   }
 
@@ -73,14 +88,50 @@ export const OrganisationsRightColumn: React.FC = () => {
           defaultValue: 'Add a new organisation by clicking on the button below.',
         })}
       </Text>
-      <FormElement>
-        <Button onClick={() => addOrganisation()}>
-          {t('organizations.actions.create', { defaultValue: 'Create organisation' })}
-        </Button>
-      </FormElement>
+      <Divider className="my-4" />
+      {/* Only show ButtonGroup if there are buttons to display */}
+      {selectedOrganisation?.role === ROLES.ORGANISATION_ADMIN && !selectedOrganisation?.private ? (
+        <ButtonGroup>
+          <Button variant="primary" onClick={() => inviteMember()}>
+            {t('members.actions.invite', { defaultValue: 'Invite member' })}
+          </Button>
+          <Button variant="secondary" onClick={() => editOrganisation()}>
+            {t('organizations.actions.edit', { defaultValue: 'Edit organisation' })}
+          </Button>
+          <Button variant="neutral" onClick={() => addOrganisation()}>
+            {t('organizations.actions.create', { defaultValue: 'Create organisation' })}
+          </Button>
+        </ButtonGroup>
+      ) : (
+        // Show only create button for non-admins or private orgs
+        <ButtonGroup>
+          <Button variant="neutral" onClick={() => addOrganisation()}>
+            {t('organizations.actions.create', { defaultValue: 'Create organisation' })}
+          </Button>
+        </ButtonGroup>
+      )}
       <ModalResponsive modalId={modalId}>
         <OrganisationAddUpdateForm mode="add" onSave={closeModal} onCancel={closeModal} />
       </ModalResponsive>
+      {selectedOrganisation?.role === ROLES.ORGANISATION_ADMIN && (
+        <>
+          <ModalResponsive modalId={updateModal.modalId}>
+            <OrganisationAddUpdateForm
+              mode="update"
+              item={selectedOrganisation}
+              onSave={updateModal.closeModal}
+              onCancel={updateModal.closeModal}
+            />
+          </ModalResponsive>
+          <ModalResponsive modalId={inviteModal.modalId}>
+            <ManageUserInviteByEmailForm
+              organisation={selectedOrganisation?.organisationReference.id}
+              onSave={inviteModal.closeModal}
+              onCancel={inviteModal.closeModal}
+            />
+          </ModalResponsive>
+        </>
+      )}
     </div>
   )
 }

@@ -17,15 +17,25 @@
  *
  */
 
-import { getYear } from 'date-fns'
+import { Label } from 'components/primitives/typography/Label'
+import React from 'react'
 
-export const dateToObj = (date: Date) => {
-  return {
-    years: getYear(date).toString(),
-    months: date.getMonth().toString(),
-    days: date.getDate().toString(),
-    hours: date.getHours().toString(),
-    minutes: date.getMinutes().toString(),
-    seconds: date.getSeconds().toString(),
-  }
+type Props = {
+  children: React.ReactNode
+  label?: string
+  htmlFor?: string
+  required?: boolean
+}
+
+export const FormElement: React.FC<Props> = ({ children, label, htmlFor, required }) => {
+  return (
+    <div className="space-y-2">
+      {label && (
+        <Label htmlFor={htmlFor} required={required}>
+          {label}
+        </Label>
+      )}
+      {children}
+    </div>
+  )
 }

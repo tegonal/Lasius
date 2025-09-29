@@ -22,12 +22,12 @@ import { Input } from 'components/primitives/inputs/Input'
 import { Label } from 'components/primitives/typography/Label'
 import { Card, CardBody } from 'components/ui/cards/Card'
 import { useToast } from 'components/ui/feedback/hooks/useToast'
-import { FormBody } from 'components/ui/forms/formBody'
-import { FormElement } from 'components/ui/forms/formElement'
+import { FieldSet } from 'components/ui/forms/FieldSet'
+import { FormBody } from 'components/ui/forms/FormBody'
+import { FormElement } from 'components/ui/forms/FormElement'
 import { FormElementSpacer } from 'components/ui/forms/formElementSpacer'
 import { FormErrorBadge } from 'components/ui/forms/formErrorBadge'
 import { FormErrorsMultiple } from 'components/ui/forms/formErrorsMultiple'
-import { FormGroup } from 'components/ui/forms/formGroup'
 import { preventEnterOnForm } from 'components/ui/forms/input/shared/preventEnterOnForm'
 import { Icon } from 'components/ui/icons/Icon'
 import { useProfile } from 'lib/api/hooks/useProfile'
@@ -114,7 +114,7 @@ export const AccountSecurityForm: React.FC = () => {
           {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
           <form onSubmit={hookForm.handleSubmit(onSubmit)} onKeyDown={(e) => preventEnterOnForm(e)}>
             <FormBody>
-              <FormGroup>
+              <FieldSet>
                 <FormElement>
                   <Label htmlFor="password">
                     {t('common.forms.password', { defaultValue: 'Password' })}
@@ -182,7 +182,7 @@ export const AccountSecurityForm: React.FC = () => {
                     )}
                   </Button>
                 </FormElement>
-              </FormGroup>
+              </FieldSet>
               <FormElement>
                 <div className="flex justify-end pt-4">
                   <Button type="submit" disabled={isSubmitting}>

@@ -17,15 +17,14 @@
  *
  */
 
+import { cn } from 'lib/utils/cn'
 import React from 'react'
 
 type Props = {
-  separator: string
+  children: React.ReactNode
+  className?: string
 }
-export const DatePickerFieldSeparator: React.FC<Props> = ({ separator }) => {
-  return (
-    <div className="grid grid-rows-1 gap-0 px-px text-center select-none">
-      <div className="flex items-center justify-center">{separator}</div>
-    </div>
-  )
+
+export const FieldSet: React.FC<Props> = ({ children, className }) => {
+  return <div className={cn('fieldset gap-6 rounded-lg p-2', className)}>{children}</div>
 }

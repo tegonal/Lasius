@@ -183,7 +183,7 @@ export const ColorModeDropdown: React.FC = () => {
         toolTipContent={t('common.themes.title', { defaultValue: 'Theme' })}
         placement="bottom">
         <MenuButton as={Button} variant="ghost" shape="circle">
-          <LucideIcon icon={CurrentIcon} size={26} />
+          <LucideIcon icon={CurrentIcon} size={20} />
         </MenuButton>
       </ToolTip>
 

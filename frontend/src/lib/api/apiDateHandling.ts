@@ -23,6 +23,7 @@ import {
   endOfMonth,
   endOfWeek,
   format,
+  isValid,
   parseISO,
   startOfDay,
   startOfMonth,
@@ -38,6 +39,9 @@ export const apiUrlDateParamFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS"
 export const apiUrlDateFormat = 'yyyy-MM-dd'
 
 export const formatDateTimeToURLParam = (date: Date) => {
+  if (!date || !isValid(date)) {
+    throw new Error(`Invalid date provided to formatDateTimeToURLParam: ${date}`)
+  }
   return format(date, apiUrlDateParamFormat)
 }
 
@@ -48,20 +52,44 @@ export const formatDateToURLParam = (date: Date) => {
 export const apiTimespanFromTo = (
   from: IsoDateString,
   to: IsoDateString,
-): { from: ApiDateParam; to: ApiDateParam } => {
+): { from: ApiDateParam; to: ApiDateParam } | null => {
+  // Handle empty or invalid date strings - return null to skip API call
+  if (!from || !to) {
+    return null
+  }
+
+  const fromDate = new Date(from)
+  const toDate = new Date(to)
+
+  if (!isValid(fromDate) || !isValid(toDate)) {
+    return null
+  }
+
   return {
-    from: formatDateTimeToURLParam(startOfDay(new Date(from))),
-    to: formatDateTimeToURLParam(endOfDay(new Date(to))),
+    from: formatDateTimeToURLParam(startOfDay(fromDate)),
+    to: formatDateTimeToURLParam(endOfDay(toDate)),
   }
 }
 
 export const apiDatespanFromTo = (
   from: IsoDateString,
   to: IsoDateString,
-): { from: ApiDateParam; to: ApiDateParam } => {
+): { from: ApiDateParam; to: ApiDateParam } | null => {
+  // Handle empty or invalid date strings - return null to skip API call
+  if (!from || !to) {
+    return null
+  }
+
+  const fromDate = new Date(from)
+  const toDate = new Date(to)
+
+  if (!isValid(fromDate) || !isValid(toDate)) {
+    return null
+  }
+
   return {
-    from: formatDateToURLParam(startOfDay(new Date(from))),
-    to: formatDateToURLParam(endOfDay(new Date(to))),
+    from: formatDateToURLParam(startOfDay(fromDate)),
+    to: formatDateToURLParam(endOfDay(toDate)),
   }
 }
 

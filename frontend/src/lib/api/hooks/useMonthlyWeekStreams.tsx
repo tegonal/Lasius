@@ -23,6 +23,7 @@ import { getModelsBookingSummary } from 'lib/api/functions/getModelsBookingSumma
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { ModelsBooking } from 'lib/api/lasius'
 import { useGetUserBookingListByOrganisation } from 'lib/api/lasius/user-bookings/user-bookings'
+import { logger } from 'lib/logger'
 import {
   MonthlyWeekStreamChartData,
   MonthlyWeekStreamDataItem,
@@ -136,7 +137,10 @@ export const useMonthlyWeekStreams = (date: string): MonthlyWeekStreamChartData 
     try {
       validateMonthlyWeekStreamChartData(result)
     } catch (error) {
-      console.error('Monthly week stream chart data validation failed:', error)
+      logger.error(
+        '[useMonthlyWeekStreams] Monthly week stream chart data validation failed:',
+        error,
+      )
     }
   }
 

@@ -39,7 +39,7 @@ export const LogoutButton: React.FC = () => {
         variant="ghost"
         shape="circle"
         aria-label={t('auth.actions.signOut', { defaultValue: 'Sign out' })}>
-        <LucideIcon icon={LogOutIcon} />
+        <LucideIcon icon={LogOutIcon} size={20} />
       </Button>
     </ToolTip>
   )

@@ -22,7 +22,7 @@ import React from 'react'
 
 type Props = {
   children: React.ReactNode
-  sx?: any
+
   className?: string
 }
 

@@ -17,29 +17,17 @@
  *
  */
 
-import { dateToObj } from 'components/ui/forms/input/datePicker/store/dateToObj'
-import { Store } from 'components/ui/forms/input/datePicker/store/store'
-import { IsoDateString } from 'lib/api/apiDateHandling'
-import { FieldValues, UseFormReturn } from 'react-hook-form'
+import { Logger } from 'tslog'
 
-export type initializerType = {
-  initialDate: IsoDateString
-  name: string
-  parentFormContext: UseFormReturn<FieldValues, any>
-}
+import type { ILogObj } from 'tslog'
 
-export const datePickerCreateInitialState = ({
-  initialDate,
-  parentFormContext,
-  name,
-}: initializerType): Store => {
-  const date = new Date(initialDate)
-  return {
-    ...dateToObj(date),
-    initialDate,
-    date: new Date(initialDate),
-    isoString: initialDate,
-    parentFormContext,
-    name,
-  }
-}
+// Middleware-safe logger that doesn't depend on getConfig()
+// Uses environment variables directly
+const isDev = process.env.NODE_ENV !== 'production'
+
+const dev: ILogObj = { type: 'pretty', minLevel: 0 }
+const prod: ILogObj = { type: 'json', minLevel: 4, hideLogPositionForProduction: true }
+
+const logger: Logger<ILogObj> = new Logger(isDev ? dev : prod)
+
+export { logger }

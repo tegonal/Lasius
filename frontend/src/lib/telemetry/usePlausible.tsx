@@ -17,6 +17,7 @@
  *
  */
 
+import { logger } from 'lib/logger'
 import { LASIUS_TELEMETRY_PLAUSIBLE_SOURCE_DOMAIN } from 'projectConfig/constants'
 import { useCallback } from 'react'
 
@@ -44,7 +45,7 @@ export function usePlausible<T extends Record<string, PlausibleOptions> = any>()
   return useCallback((eventName: Extract<keyof T, string>, options?: PlausibleOptions) => {
     // Only track if domain is configured
     if (!LASIUS_TELEMETRY_PLAUSIBLE_SOURCE_DOMAIN) {
-      console.debug('Plausible tracking disabled: no domain configured')
+      logger.debug('[Plausible] Tracking disabled: no domain configured')
       return
     }
 
@@ -86,7 +87,7 @@ export function usePlausible<T extends Record<string, PlausibleOptions> = any>()
       })
         .then((response) => {
           if (!response.ok) {
-            console.warn(`Plausible event failed: ${response.status}`)
+            logger.warn(`[Plausible] Event failed: ${response.status}`)
           }
           // Call the callback if provided
           if (options?.callback) {
@@ -94,10 +95,10 @@ export function usePlausible<T extends Record<string, PlausibleOptions> = any>()
           }
         })
         .catch((error) => {
-          console.error('Failed to send Plausible event:', error)
+          logger.error('[Plausible] Failed to send event:', error)
         })
     } catch (error) {
-      console.error('Error preparing Plausible event:', error)
+      logger.error('[Plausible] Error preparing event:', error)
     }
   }, [])
 }

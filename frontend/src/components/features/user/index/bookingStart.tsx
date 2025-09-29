@@ -18,10 +18,12 @@
  */
 
 import { Button } from 'components/primitives/buttons/Button'
-import { FormBody } from 'components/ui/forms/formBody'
-import { FormElement } from 'components/ui/forms/formElement'
-import { InputSelectAutocomplete } from 'components/ui/forms/input/inputSelectAutocomplete'
-import { InputTagsAutocomplete } from 'components/ui/forms/input/inputTagsAutocomplete'
+import { ButtonGroup } from 'components/ui/forms/ButtonGroup'
+import { FieldSet } from 'components/ui/forms/FieldSet'
+import { FormBody } from 'components/ui/forms/FormBody'
+import { FormElement } from 'components/ui/forms/FormElement'
+import { InputSelectAutocomplete } from 'components/ui/forms/input/InputSelectAutocomplete'
+import { InputTagsAutocomplete } from 'components/ui/forms/input/InputTagsAutocomplete'
 import { Icon } from 'components/ui/icons/Icon'
 import useModal from 'components/ui/overlays/modal/hooks/useModal'
 import { roundToNearestMinutes } from 'date-fns'
@@ -96,22 +98,28 @@ export const BookingStart: React.FC = () => {
       <FormProvider {...hookForm}>
         <form onSubmit={hookForm.handleSubmit(onSubmit)}>
           <FormBody>
-            <FormElement>
-              <InputSelectAutocomplete
-                name="projectId"
-                suggestions={projectSuggestions()}
-                required
-              />
-            </FormElement>
-            <FormElement>
-              <InputTagsAutocomplete suggestions={projectTags} name="tags" />
-            </FormElement>
-            <FormElement>
+            <FieldSet>
+              <FormElement
+                label={t('projects.label', { defaultValue: 'Project' })}
+                htmlFor="projectId"
+                required>
+                <InputSelectAutocomplete
+                  id="projectId"
+                  name="projectId"
+                  suggestions={projectSuggestions()}
+                  required
+                />
+              </FormElement>
+              <FormElement label={t('tags.label', { defaultValue: 'Tags' })} htmlFor="tags">
+                <InputTagsAutocomplete id="tags" suggestions={projectTags} name="tags" />
+              </FormElement>
+            </FieldSet>
+            <ButtonGroup>
               <Button type="submit" disabled={isSubmitting}>
                 <Icon name="stopwatch-interface-essential" size={24} />
                 {t('bookings.actions.start', { defaultValue: 'Start booking' })}
               </Button>
-            </FormElement>
+            </ButtonGroup>
           </FormBody>
         </form>
       </FormProvider>

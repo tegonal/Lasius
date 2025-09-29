@@ -17,6 +17,7 @@
  *
  */
 
+import { logger } from 'lib/loggerMiddleware'
 import { JWT } from 'next-auth/jwt'
 import { getToken } from 'next-auth/jwt'
 import { NextAuthMiddlewareOptions, NextRequestWithAuth } from 'next-auth/middleware'
@@ -65,7 +66,7 @@ async function handleAuthMiddleware(
 
   const secret = options?.secret ?? process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET
   if (!secret) {
-    console.error(`[next-auth][error][NO_SECRET]`, `\nhttps://next-auth.js.org/errors#no_secret`)
+    logger.error(`[next-auth][error][NO_SECRET]`, `\nhttps://next-auth.js.org/errors#no_secret`)
 
     const errorUrl = new URL(`${basePath}${errorPage}`, origin)
     errorUrl.searchParams.append('error', 'Configuration')
@@ -100,9 +101,9 @@ async function handleAuthMiddleware(
  * This middleware implements a workaround as next-auth has some issues storing the
  * updated token in the session-cookie after refreshing it.
  */
-async function handleTokenRefresh(request: NextRequestWithAuth) {
+async function handleTokenRefresh(request: NextRequestWithAuth): Promise<NextResponse> {
   if (process.env.LASIUS_DEBUG) {
-    console.debug('[AuthMiddleware][Request]', request.url, request.nextauth.token)
+    logger.debug('[AuthMiddleware][Request]', request.url, request.nextauth.token)
   }
 
   let setCookies: string[] = []
@@ -114,7 +115,7 @@ async function handleTokenRefresh(request: NextRequestWithAuth) {
     Date.now() >= request.nextauth.token.expires_at * 1000
   ) {
     if (process.env.LASIUS_DEBUG) {
-      console.debug('[AuthMiddleware][AccessTokenExpired]')
+      logger.debug('[AuthMiddleware][AccessTokenExpired]')
     }
 
     // Fetch new session
@@ -125,11 +126,41 @@ async function handleTokenRefresh(request: NextRequestWithAuth) {
       },
     } satisfies RequestInit)
 
-    const json = await session.json()
-    const data = Object.keys(json).length > 0 ? json : null
+    let json = {}
+    let data = null
+
+    try {
+      // Check if response is ok and content-type is JSON
+      if (session.ok && session.headers.get('content-type')?.includes('application/json')) {
+        json = await session.json()
+        data = Object.keys(json).length > 0 ? json : null
+      } else {
+        // Log error response for debugging
+        const errorText = await session.text()
+        if (process.env.LASIUS_DEBUG) {
+          logger.error('[AuthMiddleware][SessionRefreshError]', {
+            status: session.status,
+            statusText: session.statusText,
+            response: errorText.substring(0, 200), // Log first 200 chars
+          })
+        }
+        // If session refresh fails, redirect to login
+        const signInUrl = new URL('/login', request.url)
+        signInUrl.searchParams.append('callbackUrl', request.url)
+        return NextResponse.redirect(signInUrl)
+      }
+    } catch (error) {
+      if (process.env.LASIUS_DEBUG) {
+        logger.error('[AuthMiddleware][SessionRefreshJSONError]', error)
+      }
+      // If JSON parsing fails, redirect to login
+      const signInUrl = new URL('/login', request.url)
+      signInUrl.searchParams.append('callbackUrl', request.url)
+      return NextResponse.redirect(signInUrl)
+    }
 
     if (process.env.LASIUS_DEBUG) {
-      console.debug('[AuthMiddleware][AccessTokenChanged]', data)
+      logger.debug('[AuthMiddleware][AccessTokenChanged]', data)
     }
 
     setCookies = session.headers.getSetCookie()
@@ -143,7 +174,7 @@ async function handleTokenRefresh(request: NextRequestWithAuth) {
       })
       requestHeaders.set('Cookie', request.cookies.toString())
       if (process.env.LASIUS_DEBUG) {
-        console.debug('[AuthMiddleware][UpgradedCookies]', request.cookies)
+        logger.debug('[AuthMiddleware][UpgradedCookies]', request.cookies)
       }
     }
   }
@@ -158,7 +189,7 @@ async function handleTokenRefresh(request: NextRequestWithAuth) {
       res.headers.append('Set-Cookie', cookie)
     })
     if (process.env.LASIUS_DEBUG) {
-      console.debug('[AuthMiddleware][Response][SetCookies]', setCookies)
+      logger.debug('[AuthMiddleware][Response][SetCookies]', setCookies)
     }
   }
 
@@ -182,15 +213,15 @@ function isProtectedPath(pathname: string): boolean {
 export async function authMiddleware(request: NextRequest): Promise<NextMiddlewareResult> {
   const { pathname } = request.nextUrl
 
-  console.log('[AuthMiddleware] Checking path:', pathname)
+  logger.info('[AuthMiddleware] Checking path:', pathname)
 
   // Skip auth check if not a protected path
   if (!isProtectedPath(pathname)) {
-    console.log('[AuthMiddleware] Not protected, skipping')
+    logger.info('[AuthMiddleware] Not protected, skipping')
     return undefined
   }
 
-  console.log('[AuthMiddleware] Protected path, checking auth')
+  logger.info('[AuthMiddleware] Protected path, checking auth')
 
   // Handle authentication for protected paths
   return await handleAuthMiddleware(request, undefined, async (token) => {

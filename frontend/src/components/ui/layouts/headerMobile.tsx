@@ -18,7 +18,7 @@
  */
 
 import { BookingCurrent } from 'components/features/user/index/current/bookingCurrent'
-import { CalendarWeekResponsive } from 'components/ui/calendar/calendarWeekResponsive'
+import { CalendarWeekResponsive } from 'components/ui/calendar/CalendarWeekResponsive'
 import { useRouter } from 'next/router'
 import { ROUTES } from 'projectConfig/routes'
 import React from 'react'

@@ -20,8 +20,8 @@
 import { Button } from 'components/primitives/buttons/Button'
 import { Text } from 'components/primitives/typography/Text'
 import { DateRangeFilter } from 'components/ui/forms/DateRangeFilter'
-import { FormBody } from 'components/ui/forms/formBody'
-import { FormElement } from 'components/ui/forms/formElement'
+import { FormBody } from 'components/ui/forms/FormBody'
+import { FormElement } from 'components/ui/forms/FormElement'
 import { apiTimespanFromTo } from 'lib/api/apiDateHandling'
 import { getExtendedModelsBookingList } from 'lib/api/functions/getExtendedModelsBookingList'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
@@ -55,10 +55,11 @@ export const ProjectBookingsCsvExport: React.FC<Props> = ({ item }) => {
   const handleDownload = async () => {
     setIsLoading(true)
     const { from, to } = hookForm.getValues()
+    const timespan = apiTimespanFromTo(from, to)
     const data = await getProjectBookingList(
       selectedOrganisationId,
       item.id,
-      apiTimespanFromTo(from, to),
+      timespan || { from: '', to: '' },
     )
     const extendedHistory = getExtendedModelsBookingList(data)
     exportBookingListToCsv(extendedHistory)

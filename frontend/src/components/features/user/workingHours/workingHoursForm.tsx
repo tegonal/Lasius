@@ -19,8 +19,8 @@
 
 import { WorkingHoursSummary } from 'components/features/user/workingHours/week/workingHoursSummary'
 import { WorkingHoursWeek } from 'components/features/user/workingHours/week/workingHoursWeek'
-import { FormElement } from 'components/ui/forms/formElement'
-import { FormGroup } from 'components/ui/forms/formGroup'
+import { FieldSet } from 'components/ui/forms/FieldSet'
+import { FormElement } from 'components/ui/forms/FormElement'
 import { useGetWeeklyPlannedWorkingHoursAggregate } from 'lib/api/hooks/useGetWeeklyPlannedWorkingHoursAggregate'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import React from 'react'
@@ -36,19 +36,19 @@ export const WorkingHoursForm: React.FC = () => {
   return (
     <>
       <div className="mb-3 w-full">
-        <FormGroup>
+        <FieldSet>
           <FormElement>
             <WorkingHoursSummary aggregatedPlannedWorkingHours={allOrganisationsWorkingHours} />
           </FormElement>
-        </FormGroup>
+        </FieldSet>
       </div>
       {organisations?.map((org) => (
         <div key={org.organisationReference.id} className="mb-3 w-full">
-          <FormGroup>
+          <FieldSet>
             <FormElement>
               <WorkingHoursWeek organisation={org} />
             </FormElement>
-          </FormGroup>
+          </FieldSet>
         </div>
       ))}
     </>

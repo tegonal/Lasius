@@ -34,11 +34,10 @@ export const StatsOverview: React.FC = () => {
   const { selectedOrganisationId } = useOrganisation()
   const parentFormContext = useFormContext()
 
+  const timespan = apiTimespanFromTo(parentFormContext.watch('from'), parentFormContext.watch('to'))
   const { data, isValidating } = useGetOrganisationBookingList(
     selectedOrganisationId,
-    {
-      ...apiTimespanFromTo(parentFormContext.watch('from'), parentFormContext.watch('to')),
-    },
+    timespan || { from: '', to: '' },
     statsSwrConfig,
   )
 

@@ -35,11 +35,13 @@ export const StatsBarsByAggregatedTags: React.FC = () => {
   const { selectedOrganisationId } = useOrganisation()
   const parentFormContext = useFormContext()
 
+  const datespan = apiDatespanFromTo(parentFormContext.watch('from'), parentFormContext.watch('to'))
   const { data, isValidating } = useGetUserBookingAggregatedStatsByOrganisation(
     selectedOrganisationId,
     {
       source: 'tag',
-      ...apiDatespanFromTo(parentFormContext.watch('from'), parentFormContext.watch('to')),
+      from: datespan?.from || '',
+      to: datespan?.to || '',
       granularity: 'All',
     },
     statsSwrConfig,

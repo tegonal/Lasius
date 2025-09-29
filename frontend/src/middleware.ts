@@ -17,6 +17,7 @@
  *
  */
 
+import { logger } from 'lib/loggerMiddleware'
 import { NextRequest, NextResponse } from 'next/server'
 
 import { authMiddleware } from './middleware/auth'
@@ -29,7 +30,7 @@ import { localeMiddleware } from './middleware/locale'
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  console.log('[Middleware] Processing:', pathname)
+  logger.info('[Middleware] Processing:', pathname)
 
   // Skip middleware for Next.js internals and static files
   if (
@@ -52,12 +53,12 @@ export async function middleware(request: NextRequest) {
     localeResponse?.cookies.getAll().forEach((cookie) => {
       authResponse.cookies.set(cookie)
     })
-    console.log('[Middleware] Auth redirect')
+    logger.info('[Middleware] Auth redirect')
     return authResponse
   }
 
   // Return locale response (with any new cookies)
-  console.log('[Middleware] Continue with locale response')
+  logger.info('[Middleware] Continue with locale response')
   return localeResponse || NextResponse.next()
 }
 

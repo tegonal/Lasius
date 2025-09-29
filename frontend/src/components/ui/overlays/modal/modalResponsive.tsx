@@ -45,7 +45,7 @@ const overlayVariants = {
 }
 
 const modalContainerVariants = cva(
-  'bg-base-100 text-base-content mx-2 rounded-lg p-4 shadow-lg md:mx-0',
+  'bg-base-100 text-base-content mx-2 rounded-lg p-6 shadow-lg md:mx-0 md:p-8',
   {
     variants: {
       size: {

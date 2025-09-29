@@ -126,13 +126,13 @@
   --root-bg: oklch(95% 0 0); /* body background */
 
   /* Semantic colors - balanced for light theme */
-  --color-info: oklch(60% 0.15 240); /* Blue - informational */
+  --color-info: oklch(55% 0.15 240); /* Blue - informational */
   --color-info-content: oklch(98% 0 0); /* White text */
-  --color-success: oklch(70% 0.25 145); /* Green - success/confirmation */
-  --color-success-content: oklch(20% 0 0); /* Dark text for contrast */
-  --color-warning: oklch(75% 0.18 70); /* Orange/amber - warning */
-  --color-warning-content: oklch(20% 0 0); /* Dark text for contrast */
-  --color-error: oklch(60% 0.22 25); /* Red - error/danger */
+  --color-success: oklch(55% 0.35 145); /* Green - success/confirmation */
+  --color-success-content: oklch(98% 0 0); /* Dark text for contrast */
+  --color-warning: oklch(65% 0.18 70); /* Orange/amber - warning */
+  --color-warning-content: oklch(98% 0 0); /* Dark text for contrast */
+  --color-error: oklch(55% 0.22 25); /* Red - error/danger */
   --color-error-content: oklch(98% 0 0); /* White text */
 
   /* Border radius */
@@ -174,14 +174,14 @@
   --root-bg: oklch(from var(--brand-palette-5) calc(l * 0.25) c h);
 
   /* Semantic colors - balanced for dark theme */
-  --color-info: oklch(65% 0.18 240);
-  --color-info-content: oklch(98% 0 0);
-  --color-success: oklch(75% 0.20 145);
-  --color-success-content: oklch(15% 0 0);
-  --color-warning: oklch(80% 0.16 70);
-  --color-warning-content: oklch(15% 0 0);
-  --color-error: oklch(65% 0.25 25);
-  --color-error-content: oklch(98% 0 0);
+  --color-info: oklch(55% 0.15 240); /* Blue - informational */
+  --color-info-content: oklch(98% 0 0); /* White text */
+  --color-success: oklch(55% 0.35 145); /* Green - success/confirmation */
+  --color-success-content: oklch(98% 0 0); /* Dark text for contrast */
+  --color-warning: oklch(65% 0.18 70); /* Orange/amber - warning */
+  --color-warning-content: oklch(98% 0 0); /* Dark text for contrast */
+  --color-error: oklch(55% 0.22 25); /* Red - error/danger */
+  --color-error-content: oklch(98% 0 0); /* White text */
 
   /* Border radius */
   --rounded-box: 0.25rem;
@@ -283,5 +283,26 @@
   .btn-circle {
     border-radius: 9999px !important;
     aspect-ratio: 1 / 1;
+  }
+
+  /* Animations for modern login page */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 }

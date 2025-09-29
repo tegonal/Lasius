@@ -37,11 +37,13 @@ export const useGetOrganisationStatsBySourceAndDay = (
 ) => {
   const localGranularity = granularity || granularityFromDatespanFromTo(from, to)
   const { selectedOrganisationWorkingHours } = useGetWeeklyPlannedWorkingHoursAggregate()
+  const datespan = apiDatespanFromTo(from, to)
   const { data, isValidating, error } = useGetOrganisationBookingAggregatedStats(
     orgId,
     {
       source,
-      ...apiDatespanFromTo(from, to),
+      from: datespan?.from || '',
+      to: datespan?.to || '',
       granularity: localGranularity,
     },
     statsSwrConfig,

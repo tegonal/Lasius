@@ -17,16 +17,18 @@
  *
  */
 
+import { cn } from 'lib/utils/cn'
 import React from 'react'
 
 type Props = {
   children: React.ReactNode
+  className?: string
 }
 
-export const FormGroup: React.FC<Props> = ({ children }) => {
-  return (
-    <div className="bg-neutral/5 flex w-full flex-col items-center justify-center gap-4 rounded-lg px-4 pt-4 pb-4">
-      {children}
-    </div>
-  )
+/**
+ * Container for form action buttons (submit, cancel, etc.)
+ * Should be placed as the last FormElement in a form
+ */
+export const ButtonGroup: React.FC<Props> = ({ children, className }) => {
+  return <div className={cn('fieldset mt-2 gap-4 p-2', className)}>{children}</div>
 }

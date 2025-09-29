@@ -30,6 +30,7 @@ export type TabViewType = {
 export type ToastViewType = {
   id: string
   message: string
+  description?: string
   ttl?: number
   type: 'WARNING' | 'ERROR' | 'NOTIFICATION' | 'SUCCESS'
 }

@@ -21,8 +21,10 @@ import { Button } from 'components/primitives/buttons/Button'
 import { Input } from 'components/primitives/inputs/Input'
 import { Label } from 'components/primitives/typography/Label'
 import { useToast } from 'components/ui/feedback/hooks/useToast'
-import { FormBody } from 'components/ui/forms/formBody'
-import { FormElement } from 'components/ui/forms/formElement'
+import { ButtonGroup } from 'components/ui/forms/ButtonGroup'
+import { FieldSet } from 'components/ui/forms/FieldSet'
+import { FormBody } from 'components/ui/forms/FormBody'
+import { FormElement } from 'components/ui/forms/FormElement'
 import { FormErrorBadge } from 'components/ui/forms/formErrorBadge'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { ModelsUserOrganisation } from 'lib/api/lasius'
@@ -92,24 +94,26 @@ export const OrganisationAddUpdateForm: React.FC<Props> = ({ item, onSave, onCan
       <div className="relative w-full">
         <form onSubmit={hookForm.handleSubmit(onSubmit)}>
           <FormBody>
-            <FormElement>
-              <Label htmlFor="organisationName">
-                {t('organizations.organizationName', { defaultValue: 'Organisation name' })}
-              </Label>
-              <Input
-                {...hookForm.register('organisationName', { required: true })}
-                autoComplete="off"
-              />
-              <FormErrorBadge error={hookForm.formState.errors.organisationName} />
-            </FormElement>
-            <FormElement>
+            <FieldSet>
+              <FormElement>
+                <Label htmlFor="organisationName">
+                  {t('organizations.organizationName', { defaultValue: 'Organisation name' })}
+                </Label>
+                <Input
+                  {...hookForm.register('organisationName', { required: true })}
+                  autoComplete="off"
+                />
+                <FormErrorBadge error={hookForm.formState.errors.organisationName} />
+              </FormElement>
+            </FieldSet>
+            <ButtonGroup>
               <Button type="submit" disabled={isSubmitting} className="relative z-0">
                 {t('common.actions.save', { defaultValue: 'Save' })}
               </Button>
               <Button type="button" variant="secondary" onClick={onCancel}>
                 {t('common.actions.cancel', { defaultValue: 'Cancel' })}
               </Button>
-            </FormElement>
+            </ButtonGroup>
           </FormBody>
         </form>
       </div>

@@ -59,8 +59,8 @@ export const BookingListSelectedDay: React.FC = () => {
         <DataFetchEmpty />
       ) : (
         <AnimateList popLayout>
-          {sortedList.map((item) => (
-            <BookingItem key={stringHash(item)} item={item} />
+          {sortedList.map((item, index) => (
+            <BookingItem key={stringHash(item)} item={item} nextItem={sortedList[index + 1]} />
           ))}
         </AnimateList>
       )}

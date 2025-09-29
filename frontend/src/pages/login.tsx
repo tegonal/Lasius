@@ -30,13 +30,14 @@ import { HelpButton } from 'components/ui/navigation/HelpButton'
 import { TegonalFooter } from 'components/ui/navigation/TegonalFooter'
 import { t } from 'i18next'
 import { getConfiguration } from 'lib/api/lasius/general/general'
+import { logger } from 'lib/logger'
 import { LasiusPlausibleEvents } from 'lib/telemetry/plausibleEvents'
 import { usePlausible } from 'lib/telemetry/usePlausible'
 import { getLocaleFromCookie } from 'lib/utils/auth/getLocaleFromCookie'
 import { formatISOLocale } from 'lib/utils/date/dates'
 import { GetServerSidePropsContext, NextPage } from 'next'
 import { ClientSafeProvider, getCsrfToken, getProviders, signIn } from 'next-auth/react'
-import { Trans, useTranslation } from 'next-i18next'
+import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
@@ -157,9 +158,7 @@ const Login: NextPage<{
       <LoginLayout>
         {error && (
           <Alert variant="warning" className="max-w-md">
-            <Trans t={t} i18nKey="auth.errors.general" defaults="{error}" values={{ error }}>
-              {error}
-            </Trans>
+            {error}
           </Alert>
         )}
         {providers.length === 0 && (
@@ -244,15 +243,7 @@ const Login: NextPage<{
                       <span className="flex h-6 w-6 items-center justify-center">{icon}</span>
                       <span className="text-center">
                         {t('auth.continueWith', { defaultValue: 'Continue with' })}{' '}
-                        <span className="font-semibold">
-                          <Trans
-                            t={t}
-                            i18nKey="auth.providerName"
-                            defaults="{name}"
-                            values={{ name: provider.name }}>
-                            {provider.name}
-                          </Trans>
-                        </span>
+                        <span className="font-semibold">{provider.name}</span>
                       </span>
                     </Button>
                   )
@@ -284,7 +275,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   try {
     config = await getConfiguration()
   } catch (error) {
-    console.error('Failed to fetch configuration from backend:', error)
+    logger.error('[Login] Failed to fetch configuration from backend:', error)
     // Provide a default config when backend is unavailable
     config = {
       lasiusOAuthProviderEnabled: false,

@@ -21,12 +21,12 @@ import { AxiosError } from 'axios'
 import { LoginLayout } from 'components/features/login/loginLayout'
 import { Button } from 'components/primitives/buttons/Button'
 import { Input } from 'components/primitives/inputs/Input'
-import { Label } from 'components/primitives/typography/Label'
 import { Card, CardBody } from 'components/ui/cards/Card'
 import { Alert } from 'components/ui/feedback/Alert'
-import { FormBody } from 'components/ui/forms/formBody'
-import { FormButtonContainer } from 'components/ui/forms/formButtonContainer'
-import { FormElement } from 'components/ui/forms/formElement'
+import { ButtonGroup } from 'components/ui/forms/ButtonGroup'
+import { FieldSet } from 'components/ui/forms/FieldSet'
+import { FormBody } from 'components/ui/forms/FormBody'
+import { FormElement } from 'components/ui/forms/FormElement'
 import { FormErrorBadge } from 'components/ui/forms/formErrorBadge'
 import { FormErrorsMultiple } from 'components/ui/forms/formErrorsMultiple'
 import { Icon } from 'components/ui/icons/Icon'
@@ -161,66 +161,85 @@ export const OAuthUserRegister: NextPage<{ locale?: string }> = ({ locale }) => 
           </div>
           <form onSubmit={handleSubmit(onSubmit)}>
             <FormBody>
-              <FormElement>
-                <Label htmlFor="email">{t('common.forms.email', { defaultValue: 'E-Mail' })}</Label>
-                <Input {...register('email', { required: true })} autoComplete="off" autoFocus />
-                <FormErrorBadge error={errors.email} />
-              </FormElement>
-              <FormElement>
-                <Label htmlFor="firstName">
-                  {t('common.forms.firstName', { defaultValue: 'Firstname' })}
-                </Label>
-                <Input
-                  {...register('firstName', { required: true })}
-                  autoComplete="off"
-                  autoFocus
-                />
-                <FormErrorBadge error={errors.firstName} />
-              </FormElement>
-              <FormElement>
-                <Label htmlFor="lastName">
-                  {t('common.forms.lastName', { defaultValue: 'Lastname' })}
-                </Label>
-                <Input {...register('lastName', { required: true })} autoComplete="off" autoFocus />
-                <FormErrorBadge error={errors.lastName} />
-              </FormElement>
-              <FormElement>
-                <Label htmlFor="password">
-                  {t('common.forms.password', { defaultValue: 'Password' })}
-                </Label>
-                <Input
-                  {...register('password', {
-                    required: true,
-                    validate: {
-                      notEnoughCharactersPassword: (value: string) => value.length > 8,
-                      noUppercase: (value: string) => /(?=.*[A-Z])/.test(value),
-                      noNumber: (value: string) => /\d/.test(value),
-                    },
-                  })}
-                  autoComplete="off"
-                  autoFocus
-                  type={showPasswords ? 'text' : 'password'}
-                />
-                <FormErrorsMultiple errors={errors.password as any} />
-              </FormElement>
-              <FormElement>
-                <Label htmlFor="confirmPassword">
-                  {t('common.forms.confirmPassword', { defaultValue: 'Confirm password' })}
-                </Label>
-                <Input
-                  {...register('confirmPassword', {
-                    required: true,
-                    validate: {
-                      noPasswordConfirmNewEqual: (value: string) => value === getValues('password'),
-                    },
-                  })}
-                  autoComplete="off"
-                  autoFocus
-                  type={showPasswords ? 'text' : 'password'}
-                />
-                <FormErrorBadge error={errors.confirmPassword} />
-              </FormElement>
-              <FormButtonContainer>
+              <FieldSet>
+                <FormElement
+                  label={t('common.forms.email', { defaultValue: 'E-Mail' })}
+                  htmlFor="email"
+                  required>
+                  <Input
+                    id="email"
+                    {...register('email', { required: true })}
+                    aria-describedby="email-error"
+                    autoComplete="email"
+                    autoFocus
+                  />
+                  <FormErrorBadge id="email-error" error={errors.email} />
+                </FormElement>
+                <FormElement
+                  label={t('common.forms.firstName', { defaultValue: 'Firstname' })}
+                  htmlFor="firstName"
+                  required>
+                  <Input
+                    id="firstName"
+                    {...register('firstName', { required: true })}
+                    aria-describedby="firstName-error"
+                    autoComplete="given-name"
+                  />
+                  <FormErrorBadge id="firstName-error" error={errors.firstName} />
+                </FormElement>
+                <FormElement
+                  label={t('common.forms.lastName', { defaultValue: 'Lastname' })}
+                  htmlFor="lastName"
+                  required>
+                  <Input
+                    id="lastName"
+                    {...register('lastName', { required: true })}
+                    aria-describedby="lastName-error"
+                    autoComplete="family-name"
+                  />
+                  <FormErrorBadge id="lastName-error" error={errors.lastName} />
+                </FormElement>
+                <FormElement
+                  label={t('common.forms.password', { defaultValue: 'Password' })}
+                  htmlFor="password"
+                  required>
+                  <Input
+                    id="password"
+                    {...register('password', {
+                      required: true,
+                      validate: {
+                        notEnoughCharactersPassword: (value: string) => value.length > 8,
+                        noUppercase: (value: string) => /(?=.*[A-Z])/.test(value),
+                        noNumber: (value: string) => /\d/.test(value),
+                      },
+                    })}
+                    aria-describedby="password-errors"
+                    autoComplete="new-password"
+                    type={showPasswords ? 'text' : 'password'}
+                  />
+                  <FormErrorsMultiple id="password-errors" errors={errors.password as any} />
+                </FormElement>
+                <FormElement
+                  label={t('common.forms.confirmPassword', { defaultValue: 'Confirm password' })}
+                  htmlFor="confirmPassword"
+                  required>
+                  <Input
+                    id="confirmPassword"
+                    {...register('confirmPassword', {
+                      required: true,
+                      validate: {
+                        noPasswordConfirmNewEqual: (value: string) =>
+                          value === getValues('password'),
+                      },
+                    })}
+                    aria-describedby="confirmPassword-error"
+                    autoComplete="new-password"
+                    type={showPasswords ? 'text' : 'password'}
+                  />
+                  <FormErrorBadge id="confirmPassword-error" error={errors.confirmPassword} />
+                </FormElement>
+              </FieldSet>
+              <ButtonGroup>
                 <Button
                   onClick={handleTogglePasswordsVisible}
                   variant="ghost"
@@ -241,7 +260,7 @@ export const OAuthUserRegister: NextPage<{ locale?: string }> = ({ locale }) => 
                 <Button type="submit" fullWidth>
                   {t('common.actions.signUp', { defaultValue: 'Sign up' })}
                 </Button>
-              </FormButtonContainer>
+              </ButtonGroup>
             </FormBody>
           </form>
         </CardBody>

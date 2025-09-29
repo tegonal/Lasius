@@ -17,13 +17,30 @@
  *
  */
 
-import { IsoDateString } from 'lib/api/apiDateHandling'
+import { create } from 'zustand'
 
-export type InputDatePickerActionType =
-  | { type: 'setDateFromIsoString'; payload: IsoDateString }
-  | { type: 'setYear'; payload: string }
-  | { type: 'setMonth'; payload: string }
-  | { type: 'setDay'; payload: string }
-  | { type: 'setHours'; payload: string }
-  | { type: 'setMinutes'; payload: string }
-  | { type: 'setSeconds'; payload: string }
+export type TokenState = 'valid' | 'expired' | 'refreshing' | 'no_session'
+
+interface TokenStore {
+  tokenState: TokenState
+  tokenTimeRemaining: string
+  expiresAt: number | null
+  setTokenState: (state: TokenState) => void
+  setTokenTimeRemaining: (time: string) => void
+  setExpiresAt: (expiresAt: number | null) => void
+  reset: () => void
+}
+
+const initialState = {
+  tokenState: 'no_session' as TokenState,
+  tokenTimeRemaining: 'N/A',
+  expiresAt: null,
+}
+
+export const useTokenStore = create<TokenStore>((set) => ({
+  ...initialState,
+  setTokenState: (state) => set({ tokenState: state }),
+  setTokenTimeRemaining: (time) => set({ tokenTimeRemaining: time }),
+  setExpiresAt: (expiresAt) => set({ expiresAt }),
+  reset: () => set(initialState),
+}))

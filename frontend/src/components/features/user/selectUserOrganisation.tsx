@@ -20,7 +20,7 @@
 import { SelectUserOrganisationModal } from 'components/features/user/selectUserOrganisationModal'
 import { Button } from 'components/primitives/buttons/Button'
 import { AvatarOrganisation } from 'components/ui/data-display/avatar/avatarOrganisation'
-import { FormElement } from 'components/ui/forms/formElement'
+import { ButtonGroup } from 'components/ui/forms/ButtonGroup'
 import useModal from 'components/ui/overlays/modal/hooks/useModal'
 import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
@@ -51,11 +51,11 @@ export const SelectUserOrganisation: React.FC = () => {
       </Button>
       <ModalResponsive modalId={modalId}>
         <SelectUserOrganisationModal />
-        <FormElement>
+        <ButtonGroup>
           <Button variant="secondary" onClick={closeModal}>
             {t('common.actions.cancel', { defaultValue: 'Cancel' })}
           </Button>
-        </FormElement>
+        </ButtonGroup>
       </ModalResponsive>
     </>
   )

@@ -17,6 +17,7 @@
  *
  */
 
+import { logger } from 'lib/logger'
 import { z } from 'zod'
 
 // ============= Monthly Week Stream Chart Schemas =============
@@ -61,7 +62,7 @@ export function validateMonthlyWeekStreamChartData(data: unknown): MonthlyWeekSt
     return monthlyWeekStreamChartDataSchema.parse(data)
   } catch (error) {
     if (error instanceof z.ZodError) {
-      console.error('Monthly week stream chart data validation failed:', error.issues)
+      logger.error('[ChartSchemas] Monthly week stream chart data validation failed:', error.issues)
       throw new Error(
         `Invalid monthly week stream chart data: ${error.issues.map((e: any) => e.message).join(', ')}`,
       )

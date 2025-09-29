@@ -17,8 +17,8 @@
  *
  */
 
-import { AccountForm } from 'components/features/settings/account/accountForm'
-import { AccountRightColumn } from 'components/features/settings/account/accountRightColumn'
+import { AccountForm } from 'components/features/settings/account/AccountForm'
+import { AccountRightColumn } from 'components/features/settings/account/AccountRightColumn'
 import { ScrollContainer } from 'components/primitives/layout/ScrollContainer'
 import React from 'react'
 

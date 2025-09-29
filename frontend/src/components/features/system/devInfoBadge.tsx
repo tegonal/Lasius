@@ -19,20 +19,19 @@
 
 import { Badge } from 'components/ui/data-display/Badge'
 import { useColorMode } from 'lib/hooks/useColorMode'
-import { useSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import { BUILD_ID, DEV } from 'projectConfig/constants'
 import React, { useEffect, useState } from 'react'
+import { useTokenStore } from 'stores/tokenStore'
 import { useIsClient, useMediaQuery } from 'usehooks-ts'
 
 export const DevInfoBadge: React.FC = () => {
   const { locale } = useRouter()
   const { t } = useTranslation('common')
-  const { data: session, update } = useSession()
+  const { tokenTimeRemaining } = useTokenStore()
   const [mode] = useColorMode()
   const [colorMode, setColorMode] = useState<string>('light')
-  const [tokenTimeRemaining, setTokenTimeRemaining] = useState<string>('')
   const isClient = useIsClient()
 
   // Media queries matching Tailwind breakpoints
@@ -45,33 +44,6 @@ export const DevInfoBadge: React.FC = () => {
   useEffect(() => {
     setColorMode(mode || 'light')
   }, [mode])
-
-  useEffect(() => {
-    // Update token time remaining every second
-    const updateTokenTime = async () => {
-      if (session?.expires_at) {
-        const expiresAt = new Date(session.expires_at * 1000)
-        const now = new Date()
-        const diffMs = expiresAt.getTime() - now.getTime()
-
-        if (diffMs <= 0) {
-          setTokenTimeRemaining('EXPIRED - Refreshing...')
-          // Token expired, trigger a session update to get the new token
-          await update()
-        } else {
-          const diffMinutes = Math.floor(diffMs / 60000)
-          const diffSeconds = Math.floor((diffMs % 60000) / 1000)
-          setTokenTimeRemaining(`${diffMinutes}m ${diffSeconds}s`)
-        }
-      } else {
-        setTokenTimeRemaining('N/A')
-      }
-    }
-
-    updateTokenTime()
-    const interval = setInterval(updateTokenTime, 1000)
-    return () => clearInterval(interval)
-  }, [session, update])
 
   if (!isClient || !DEV) return null
 

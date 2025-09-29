@@ -17,56 +17,29 @@
  *
  */
 
-import { useContextMenu } from 'components/features/contextMenu/hooks/useContextMenu'
-import { OrganisationAddUpdateForm } from 'components/features/organisation/current/organisationAddUpdateForm'
 import { OrganisationMembers } from 'components/features/organisation/current/organisationMembers'
-import { Button } from 'components/primitives/buttons/Button'
 import { Heading } from 'components/primitives/typography/Heading'
 import { Icon } from 'components/ui/icons/Icon'
-import useModal from 'components/ui/overlays/modal/hooks/useModal'
-import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { useTranslation } from 'next-i18next'
-import { ROLES } from 'projectConfig/constants'
 import React from 'react'
 import { useIsClient } from 'usehooks-ts'
 
 export const OrganisationDetail: React.FC = () => {
   const { t } = useTranslation('common')
-  const updateModal = useModal(`EditOrganisationModal`)
   const { selectedOrganisation } = useOrganisation()
-  const { handleCloseAll } = useContextMenu()
   const isClient = useIsClient()
-
-  const editOrganisation = () => {
-    updateModal.openModal()
-    handleCloseAll()
-  }
 
   if (!isClient) return null
 
   return (
-    <>
-      <Heading as="h2" variant="h2" className="flex items-center justify-between">
-        <div>
-          {selectedOrganisation?.private
-            ? t('organizations.myPersonalOrganisation', {
-                defaultValue: 'My personal organisation',
-              })
-            : selectedOrganisation?.organisationReference.key}
-        </div>
-        {selectedOrganisation?.role === ROLES.ORGANISATION_ADMIN &&
-          !selectedOrganisation?.private && (
-            <Button
-              variant="primary"
-              size="sm"
-              title={t('organizations.actions.edit', { defaultValue: 'Edit organisation' })}
-              aria-label={t('organizations.actions.edit', { defaultValue: 'Edit organisation' })}
-              onClick={() => editOrganisation()}
-              className="w-auto">
-              {t('organizations.actions.edit', { defaultValue: 'Edit organisation' })}
-            </Button>
-          )}
+    <div className="flex flex-col gap-8">
+      <Heading as="h2" variant="h2">
+        {selectedOrganisation?.private
+          ? t('organizations.myPersonalOrganisation', {
+              defaultValue: 'My personal organisation',
+            })
+          : selectedOrganisation?.organisationReference.key}
       </Heading>
       {selectedOrganisation?.private && (
         <div className="mx-auto mb-4 flex max-w-[500px] flex-col items-center justify-center gap-3 text-center">
@@ -80,19 +53,6 @@ export const OrganisationDetail: React.FC = () => {
         </div>
       )}
       {!selectedOrganisation?.private && <OrganisationMembers item={selectedOrganisation} />}
-
-      {selectedOrganisation?.role === ROLES.ORGANISATION_ADMIN ? (
-        <>
-          <ModalResponsive modalId={updateModal.modalId}>
-            <OrganisationAddUpdateForm
-              mode="update"
-              item={selectedOrganisation}
-              onSave={updateModal.closeModal}
-              onCancel={updateModal.closeModal}
-            />
-          </ModalResponsive>
-        </>
-      ) : null}
-    </>
+    </div>
   )
 }

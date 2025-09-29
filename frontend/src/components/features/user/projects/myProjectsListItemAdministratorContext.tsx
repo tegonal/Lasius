@@ -31,7 +31,7 @@ import { ProjectAddUpdateForm } from 'components/features/projects/projectAddUpd
 import { ProjectAddUpdateTagsForm } from 'components/features/projects/projectAddUpdateTagsForm'
 import { ProjectBookingsCsvExport } from 'components/features/projects/projectBookingsCsvExport'
 import { Button } from 'components/primitives/buttons/Button'
-import { FormElement } from 'components/ui/forms/formElement'
+import { FormElement } from 'components/ui/forms/FormElement'
 import { Icon } from 'components/ui/icons/Icon'
 import useModal from 'components/ui/overlays/modal/hooks/useModal'
 import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'

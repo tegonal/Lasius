@@ -23,6 +23,7 @@
 import { ResponsiveStream } from '@nivo/stream'
 import { format } from 'date-fns'
 import { de, enUS } from 'date-fns/locale'
+import { logger } from 'lib/logger'
 import {
   isValidMonthlyWeekStreamData,
   MonthlyWeekStreamData,
@@ -62,7 +63,10 @@ export const MonthStreamChartImpl: React.FC<Props> = ({ data, keys }) => {
 
   // Validate data structure using type guard
   if (!isValidMonthlyWeekStreamData(data)) {
-    console.error('Invalid monthly week stream data structure:', { data, keys })
+    logger.error('[MonthStreamChartImpl] Invalid monthly week stream data structure:', {
+      data,
+      keys,
+    })
     return (
       <div className="bg-base-200 flex h-64 w-full items-center justify-center rounded-lg p-4">
         <div className="text-base-content/60 text-sm">
@@ -74,7 +78,7 @@ export const MonthStreamChartImpl: React.FC<Props> = ({ data, keys }) => {
 
   // Defensive checks
   if (!data || !keys || !Array.isArray(data) || !Array.isArray(keys) || data.length !== 7) {
-    console.error('Invalid data or keys:', { data, keys })
+    logger.error('[MonthStreamChartImpl] Invalid data or keys:', { data, keys })
     return (
       <div className="bg-base-200 flex h-64 w-full items-center justify-center rounded-lg p-4">
         <div className="text-base-content/60 text-sm">

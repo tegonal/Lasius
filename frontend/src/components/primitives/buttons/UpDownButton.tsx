@@ -24,7 +24,7 @@ import { IconNames } from 'types/iconNames'
 
 type Props = {
   onClick: React.MouseEventHandler<HTMLDivElement>
-  sx?: any
+
   direction: 'up' | 'down'
   className?: string
 }

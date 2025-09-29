@@ -17,7 +17,6 @@
  *
  */
 
-import { MarkSubString } from 'components/ui/data-display/MarkSubString'
 import { cn } from 'lib/utils/cn'
 import React from 'react'
 
@@ -31,7 +30,7 @@ type Props = {
 
 export const DropdownListItem: React.FC<Props> = ({
   prependString = '',
-  itemSearchString,
+  itemSearchString: _itemSearchString,
   itemValue,
   active,
   selected,
@@ -46,7 +45,7 @@ export const DropdownListItem: React.FC<Props> = ({
         !active && !selected && 'hover:bg-base-200',
       )}>
       {prependString}
-      <MarkSubString str={itemValue} substr={itemSearchString} />
+      {itemValue}
     </div>
   )
 }

@@ -23,19 +23,24 @@ import { logger } from 'lib/logger'
 import React from 'react'
 import { FieldError, FieldErrors, Merge } from 'react-hook-form'
 
-type Props = { error?: FieldError | Merge<FieldError, FieldErrors<any>> }
+type Props = {
+  error?: FieldError | Merge<FieldError, FieldErrors<any>>
+  id?: string
+}
 
-export const FormErrorBadge: React.FC<Props> = ({ error }) => {
+export const FormErrorBadge: React.FC<Props> = ({ error, id }) => {
   if (!error) return null
   logger.info('[form][FormErrorBadge]', error.type)
 
   return (
-    <div className="absolute right-0 bottom-0 translate-x-[6px] translate-y-1/2">
+    <div className="-mt-2" id={id}>
       <div className="badge badge-warning">
         <ErrorSign />
         {
-          // @ts-expect-error - error.type is a string
-          FormError[error.type]
+          // Use the error message if available, otherwise use the type from FormError
+          error.message ||
+            // @ts-expect-error - error.type is a string
+            FormError[error.type]
         }
       </div>
     </div>

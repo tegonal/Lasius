@@ -23,11 +23,12 @@ import { BundleVersionCheck } from 'components/features/system/bundleVersionChec
 import { DevInfoBadge } from 'components/features/system/devInfoBadge'
 import { HttpHeaderProvider } from 'components/features/system/httpHeaderProvider'
 import { LasiusBackendOnlineCheck } from 'components/features/system/lasiusBackendOnlineCheck'
-import 'styles/globals.css'
 import { LasiusBackendWebsocketEventHandler } from 'components/features/system/lasiusBackendWebsocketEventHandler'
+import 'styles/globals.css'
 import { LasiusBackendWebsocketStatus } from 'components/features/system/lasiusBackendWebsocketStatus'
 import { LasiusTOSCheck } from 'components/features/system/lasiusTOSCheck'
 import { RouteProgressBar } from 'components/features/system/routeProgressBar'
+import { TokenWatcher } from 'components/features/system/tokenWatcher'
 import { Error } from 'components/ui/feedback/Error'
 import { Toasts } from 'components/ui/feedback/Toasts'
 import { LazyMotion } from 'framer-motion'
@@ -156,6 +157,7 @@ const App = ({
           refetchInterval={10} // Refetch every 10 seconds to catch token refreshes
         >
           <HttpHeaderProvider session={session} />
+          <TokenWatcher />
           <Head>
             <meta
               name="viewport"

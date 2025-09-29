@@ -19,7 +19,7 @@
 
 import { IndexColumnTabs } from 'components/features/user/index/indexColumnTabs'
 import { Button } from 'components/primitives/buttons/Button'
-import { FormElement } from 'components/ui/forms/formElement'
+import { FormElement } from 'components/ui/forms/FormElement'
 import { FormElementSpacer } from 'components/ui/forms/formElementSpacer'
 import { Icon } from 'components/ui/icons/Icon'
 import useModal from 'components/ui/overlays/modal/hooks/useModal'

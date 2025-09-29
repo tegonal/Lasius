@@ -42,9 +42,11 @@ export const StatsBarsBySource: React.FC<Props> = ({ source, groupMode }) => {
   const { selectedOrganisationId } = useOrganisation()
   const parentFormContext = useFormContext()
 
+  const datespan = apiDatespanFromTo(parentFormContext.watch('from'), parentFormContext.watch('to'))
   const { data, isValidating } = useGetOrganisationStatsBySourceAndDay(selectedOrganisationId, {
     source,
-    ...apiDatespanFromTo(parentFormContext.watch('from'), parentFormContext.watch('to')),
+    from: datespan?.from || '',
+    to: datespan?.to || '',
   })
 
   if (isValidating) {

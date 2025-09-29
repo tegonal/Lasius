@@ -17,7 +17,7 @@
  *
  */
 
-import { SelectAutocompleteSuggestionType } from 'components/ui/forms/input/inputSelectAutocomplete'
+import { SelectAutocompleteSuggestionType } from 'components/ui/forms/input/InputSelectAutocomplete'
 import { orderBy } from 'es-toolkit'
 import { useProfile } from 'lib/api/hooks/useProfile'
 import { ModelsUserProject } from 'lib/api/lasius'

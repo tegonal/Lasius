@@ -75,19 +75,23 @@ export const BookingHistoryLayout: React.FC<Props> = ({ dataSource }) => {
     swrKey?: string | false | Record<any, any>
   }
 
+  const timespan = apiTimespanFromTo(hookForm.getValues('from'), hookForm.getValues('to'))
+
   switch (dataSource) {
     case 'userBookings':
       // eslint-disable-next-line react-hooks/rules-of-hooks
-      response = useGetUserBookingListByOrganisation(selectedOrganisationId, {
-        ...apiTimespanFromTo(hookForm.getValues('from'), hookForm.getValues('to')),
-      })
+      response = useGetUserBookingListByOrganisation(
+        selectedOrganisationId,
+        timespan || { from: '', to: '' },
+      )
       break
     case 'organisationBookings':
     default:
       // eslint-disable-next-line react-hooks/rules-of-hooks
-      response = useGetOrganisationBookingList(selectedOrganisationId, {
-        ...apiTimespanFromTo(hookForm.getValues('from'), hookForm.getValues('to')),
-      })
+      response = useGetOrganisationBookingList(
+        selectedOrganisationId,
+        timespan || { from: '', to: '' },
+      )
       break
   }
 

@@ -64,9 +64,11 @@ export const ThisMonthStats: React.FC = () => {
   // Get project stats for the selected month
   const monthStart = formatISOLocale(startOfMonth(selectedDateObj))
   const monthEnd = formatISOLocale(endOfMonth(selectedDateObj))
+  const datespan = apiDatespanFromTo(monthStart, monthEnd)
   const { data: projectStats } = useGetUserStatsBySourceAndDay(selectedOrganisationId, {
     source: 'project',
-    ...apiDatespanFromTo(monthStart, monthEnd),
+    from: datespan?.from || '',
+    to: datespan?.to || '',
   })
 
   // Calculate top 5 projects for the month

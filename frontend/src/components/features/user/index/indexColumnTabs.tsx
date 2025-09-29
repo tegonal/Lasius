@@ -21,7 +21,7 @@ import { BookingAddButton } from 'components/features/user/index/bookingAddButto
 import { BookingStart } from 'components/features/user/index/bookingStart'
 import { FavoriteListCompact } from 'components/features/user/index/favorites/favoriteListCompact'
 import { OrganisationListCompact } from 'components/features/user/index/organisation/organisationListCompact'
-import { FormElementSpacer } from 'components/ui/forms/formElementSpacer'
+import { Divider } from 'components/primitives/divider'
 import { IconTabs, IconTabsItem } from 'components/ui/navigation/IconTabs'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
@@ -36,7 +36,7 @@ export const IndexColumnTabs: React.FC = () => {
       component: (
         <div className="flex w-full flex-col items-center justify-center gap-1 px-2 py-4 sm:gap-4 sm:px-3">
           <BookingStart />
-          <FormElementSpacer />
+          <Divider text={t('common.or', { defaultValue: 'or' })} />
           <BookingAddButton />
         </div>
       ),

@@ -37,11 +37,13 @@ export const StatsCircleCategoryRange: React.FC = () => {
   const { selectedOrganisationId } = useOrganisation()
   const parentFormContext = useFormContext()
 
+  const datespan = apiDatespanFromTo(parentFormContext.watch('from'), parentFormContext.watch('to'))
   const { data, isValidating } = useGetUserBookingAggregatedStatsByOrganisation(
     selectedOrganisationId,
     {
       source: 'project',
-      ...apiDatespanFromTo(parentFormContext.watch('from'), parentFormContext.watch('to')),
+      from: datespan?.from || '',
+      to: datespan?.to || '',
       granularity: 'All',
     },
     statsSwrConfig,

@@ -19,14 +19,15 @@
 
 import { Button } from 'components/primitives/buttons/Button'
 import { Icon } from 'components/ui/icons/Icon'
+import { cn } from 'lib/utils/cn'
 import React from 'react'
 
 type Props = {
   onClick: () => void
-  sx?: any
+  className?: string
 }
 
-export const CalendarButton: React.FC<Props> = ({ onClick }) => {
+export const CalendarButton: React.FC<Props> = ({ onClick, className }) => {
   return (
     <Button
       type="button"
@@ -34,7 +35,7 @@ export const CalendarButton: React.FC<Props> = ({ onClick }) => {
       tabIndex={-1}
       onClick={onClick}
       fullWidth={false}
-      className="text-base-content w-auto p-0 outline-none">
+      className={cn('text-base-content w-auto p-0 outline-none', className)}>
       <Icon name="calendar-1-interface-essential" size={24} />
     </Button>
   )
