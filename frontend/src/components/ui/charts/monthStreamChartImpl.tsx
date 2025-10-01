@@ -22,13 +22,13 @@
 
 import { ResponsiveStream } from '@nivo/stream'
 import { format } from 'date-fns'
-import { de, enUS } from 'date-fns/locale'
 import { logger } from 'lib/logger'
 import {
   isValidMonthlyWeekStreamData,
   MonthlyWeekStreamData,
   MonthlyWeekStreamKeys,
 } from 'lib/schemas/chartSchemas'
+import { getDateLocale } from 'lib/utils/date/dateFormat'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
 import { nivoPalette } from 'styles/colors'
@@ -43,8 +43,8 @@ type Props = {
 export const MonthStreamChartImpl: React.FC<Props> = ({ data, keys }) => {
   const { t, i18n } = useTranslation('common')
 
-  // Get the correct locale for date-fns based on i18n language
-  const dateLocale = i18n.language === 'de' ? de : enUS
+  // Get the correct locale for date-fns from centralized config
+  const dateLocale = getDateLocale(i18n.language)
 
   // Generate translated weekday labels using date-fns
   const weekDays = React.useMemo(() => {

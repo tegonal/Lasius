@@ -30,7 +30,7 @@ export const CardSmall: React.FC<Props> = ({ children, onClick, disabled = false
   return (
     <button
       className={cn(
-        'bg-base-content/5 relative flex w-full flex-col items-center justify-center gap-4 rounded-lg p-4',
+        'bg-base-content/5 relative flex w-full cursor-pointer flex-col items-center justify-center gap-4 rounded-lg p-4',
         !disabled && 'hover:bg-base-content/11',
         disabled && 'cursor-not-allowed opacity-50',
         className,

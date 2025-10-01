@@ -19,8 +19,9 @@
 
 import { Text } from 'components/primitives/typography/Text'
 import { FormatDate } from 'components/ui/data-display/FormatDate'
-import { Icon } from 'components/ui/icons/Icon'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { ModelsBooking } from 'lib/api/lasius'
+import { ArrowUpDown } from 'lucide-react'
 import React from 'react'
 
 type Props = {
@@ -38,7 +39,7 @@ export const BookingFromTo: React.FC<Props> = ({ item }) => {
       </div>
       <div className="flex items-center justify-center gap-1">
         <Text variant="small">
-          <Icon name="expand-vertical-4" size={12} />
+          <LucideIcon icon={ArrowUpDown} size={12} />
         </Text>
       </div>
       <div>

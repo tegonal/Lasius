@@ -19,6 +19,21 @@
 
 import { useSWRConfig } from 'swr'
 
+/**
+ * Custom hook for mutating multiple SWR cache entries at once using a pattern matcher.
+ * Useful for invalidating or updating multiple related cache keys simultaneously.
+ *
+ * @returns Function that accepts a matcher and optional mutation arguments
+ *
+ * @example
+ * const mutateMany = useSwrMutateMany()
+ *
+ * // Invalidate all booking-related cache entries
+ * await mutateMany(/^\/api\/bookings/)
+ *
+ * // Update multiple cache entries with new data
+ * await mutateMany({ test: (key) => key.includes('user') }, newData, false)
+ */
 export const useSwrMutateMany = () => {
   const { cache, mutate } = useSWRConfig()
   return (matcher: { test: (arg0: any) => any }, ...args: any) => {

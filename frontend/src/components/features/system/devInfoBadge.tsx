@@ -20,15 +20,13 @@
 import { Badge } from 'components/ui/data-display/Badge'
 import { useColorMode } from 'lib/hooks/useColorMode'
 import { useTranslation } from 'next-i18next'
-import { useRouter } from 'next/router'
 import { BUILD_ID, DEV } from 'projectConfig/constants'
 import React, { useEffect, useState } from 'react'
 import { useTokenStore } from 'stores/tokenStore'
 import { useIsClient, useMediaQuery } from 'usehooks-ts'
 
 export const DevInfoBadge: React.FC = () => {
-  const { locale } = useRouter()
-  const { t } = useTranslation('common')
+  const { t, i18n } = useTranslation('common')
   const { tokenTimeRemaining } = useTokenStore()
   const [mode] = useColorMode()
   const [colorMode, setColorMode] = useState<string>('light')
@@ -47,7 +45,7 @@ export const DevInfoBadge: React.FC = () => {
 
   if (!isClient || !DEV) return null
 
-  const info = `(${breakpointIndex}) | ${locale} | ${BUILD_ID} | ${colorMode} | Token: ${tokenTimeRemaining} | ${t('app.name', { defaultValue: 'Lasius' })}`
+  const info = `(${breakpointIndex}) | ${i18n.language} | ${BUILD_ID} | ${colorMode} | Token: ${tokenTimeRemaining} | ${t('app.name', { defaultValue: 'Lasius' })}`
 
   return (
     <div className="fixed bottom-2 left-2">

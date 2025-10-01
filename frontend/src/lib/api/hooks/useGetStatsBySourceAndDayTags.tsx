@@ -25,6 +25,43 @@ import { useMemo } from 'react'
 import { UserBookingSource } from 'types/booking'
 import { Granularity } from 'types/common'
 
+/**
+ * Custom hook for fetching and transforming booking statistics by source and day with tags.
+ * Retrieves aggregated booking data for a specific organisation and date range, then transforms
+ * it into Nivo chart-compatible format for visualization.
+ *
+ * @param orgId - Organisation ID to fetch statistics for
+ * @param options - Configuration object containing:
+ *   - source: Source type to filter bookings (e.g., 'UserBooking', 'ProjectBooking')
+ *   - from: Start date of the date range (ISO date string)
+ *   - to: End date of the date range (ISO date string)
+ *   - granularity: Optional time granularity for aggregation (auto-calculated from date range if not provided)
+ *
+ * @returns Object containing:
+ *   - data: Transformed statistics data in Nivo chart format (undefined if loading/no data)
+ *   - isValidating: Boolean indicating if data is currently being revalidated
+ *   - error: Error object if the request failed
+ *
+ * @example
+ * const { data, isValidating } = useGetStatsBySourceAndDayTags(
+ *   'org-123',
+ *   {
+ *     source: 'UserBooking',
+ *     from: '2025-01-01',
+ *     to: '2025-01-31',
+ *     granularity: 'Day'
+ *   }
+ * )
+ *
+ * if (isValidating) return <Loading />
+ * if (data) return <NivoChart data={data} />
+ *
+ * @remarks
+ * - Automatically determines granularity from date range if not specified
+ * - Includes planned working hours context for comparison in charts
+ * - Data is memoized to prevent unnecessary transformations
+ * - Transformed data structure is optimized for Nivo chart rendering
+ */
 export const useGetStatsBySourceAndDayTags = (
   orgId: string,
   {

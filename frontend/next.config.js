@@ -1,12 +1,10 @@
- 
-
 /** @type {import('next').NextConfig} */
 
-const { i18n } = require('./next-i18next.config');
-const { generateBuildId, generateBuildIdSync } = require('./next.buildId');
-const { redirects } = require('./next.redirects');
+const { i18n } = require('./next-i18next.config')
+const { generateBuildId, generateBuildIdSync } = require('./next.buildId')
+const { redirects } = require('./next.redirects')
 
-const { ENVIRONMENT } = process.env;
+const { ENVIRONMENT } = process.env
 
 const {
   LASIUS_API_WEBSOCKET_URL,
@@ -16,7 +14,7 @@ const {
   LASIUS_TELEMETRY_PLAUSIBLE_SOURCE_DOMAIN,
   LASIUS_DEMO_MODE,
   LASIUS_TERMSOFSERVICE_VERSION,
-} = process.env;
+} = process.env
 
 const nextConfiguration = {
   redirects,
@@ -24,14 +22,6 @@ const nextConfiguration = {
   i18n,
   poweredByHeader: false,
   compiler: {},
-  modularizeImports: {
-    lodash: {
-      transform: 'lodash/{{member}}',
-    },
-    'date-fns': {
-      transform: 'date-fns/{{member}}',
-    },
-  },
   productionBrowserSourceMaps: process.env.NODE_ENV !== 'production',
   reactStrictMode: true,
   publicRuntimeConfig: {
@@ -58,6 +48,6 @@ const nextConfiguration = {
       ],
     },
   ],
-};
+}
 
-module.exports = nextConfiguration;
+module.exports = nextConfiguration

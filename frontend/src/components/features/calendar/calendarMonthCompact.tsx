@@ -19,16 +19,17 @@
 
 import { FormatDate } from 'components/ui/data-display/FormatDate'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
-import { addMonths, intervalToDuration, isToday, startOfWeek, toDate } from 'date-fns'
+import { addMonths, format, intervalToDuration, isToday, startOfWeek, toDate } from 'date-fns'
 import { uniqueId } from 'es-toolkit/compat'
 import { AnimatePresence, m } from 'framer-motion'
 import { IsoDateString } from 'lib/api/apiDateHandling'
 import { useGetBookingSummaryDay } from 'lib/api/hooks/useGetBookingSummaryDay'
 import { cn } from 'lib/utils/cn'
+import { getDateLocale } from 'lib/utils/date/dateFormat'
 import { formatISOLocale, getMonthOfDate } from 'lib/utils/date/dates'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
-import React, { useEffect } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { useCalendarActions, useSelectedDate } from 'stores/calendarStore'
 import { useIsClient } from 'usehooks-ts'
 
@@ -64,7 +65,6 @@ const CalendarDayCompact: React.FC<CalendarDayCompactProps> = ({
         )}
         onClick={() => onDayClick(day)}
         aria-label={`Select ${dayDate.toLocaleDateString()}`}>
-        {/* Progress bar background */}
         {progressBarPercentage > 0 && (
           <div
             className={cn(
@@ -74,7 +74,6 @@ const CalendarDayCompact: React.FC<CalendarDayCompactProps> = ({
             style={{ height: `${progressBarPercentage <= 100 ? progressBarPercentage : 100}%` }}
           />
         )}
-        {/* Day number */}
         <span className="relative z-10">{dayNumber}</span>
       </button>
     </m.div>
@@ -82,7 +81,7 @@ const CalendarDayCompact: React.FC<CalendarDayCompactProps> = ({
 }
 
 export const CalendarMonthCompact: React.FC = () => {
-  const { t } = useTranslation('common')
+  const { t, i18n } = useTranslation('common')
   const selectedDate = useSelectedDate()
   const { setSelectedDate } = useCalendarActions()
   const isClient = useIsClient()
@@ -99,11 +98,21 @@ export const CalendarMonthCompact: React.FC = () => {
   }
 
   const nextMonth = () => {
+    const currentDay = toDate(new Date(selectedDay))
+    const nextMonthDate = addMonths(currentDay, 1)
+    const newSelectedDate = formatISOLocale(nextMonthDate)
     setMonth(getMonthOfDate(addMonths(new Date(month[0]), 1)))
+    setSelectedDay(newSelectedDate)
+    setSelectedDate(newSelectedDate)
   }
 
   const previousMonth = () => {
+    const currentDay = toDate(new Date(selectedDay))
+    const prevMonthDate = addMonths(currentDay, -1)
+    const newSelectedDate = formatISOLocale(prevMonthDate)
     setMonth(getMonthOfDate(addMonths(new Date(month[0]), -1)))
+    setSelectedDay(newSelectedDate)
+    setSelectedDate(newSelectedDate)
   }
 
   const showToday = () => {
@@ -126,13 +135,18 @@ export const CalendarMonthCompact: React.FC = () => {
     return new Array(filler).fill(() => uniqueId(), 0, filler)
   }
 
-  const weekDays = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+  const weekDays = useMemo(() => {
+    const dateLocale = getDateLocale(i18n.language)
+    return Array.from({ length: 7 }, (_, i) => {
+      const date = new Date(2025, 0, 6 + i) // Jan 6, 2025 is a Monday
+      return format(date, 'EEEEE', { locale: dateLocale })
+    })
+  }, [i18n.language])
 
   if (!isClient) return null
 
   return (
     <div className="w-full">
-      {/* Month header with navigation */}
       <div className="mb-3 flex items-center justify-between">
         <button
           className="btn btn-ghost btn-sm btn-circle"
@@ -156,7 +170,6 @@ export const CalendarMonthCompact: React.FC = () => {
         </button>
       </div>
 
-      {/* Today button */}
       {!isToday(new Date(selectedDay)) && (
         <div className="mb-2 flex justify-center">
           <button
@@ -168,7 +181,6 @@ export const CalendarMonthCompact: React.FC = () => {
         </div>
       )}
 
-      {/* Weekday headers */}
       <div className="mb-1 grid grid-cols-7 gap-1 text-center">
         {weekDays.map((day, index) => (
           <div key={index} className="text-base-content/60 text-xs font-medium">
@@ -177,7 +189,6 @@ export const CalendarMonthCompact: React.FC = () => {
         ))}
       </div>
 
-      {/* Calendar grid */}
       <AnimatePresence>
         <div className="grid w-full grid-cols-7 gap-1">
           {topFiller().map((item) => (

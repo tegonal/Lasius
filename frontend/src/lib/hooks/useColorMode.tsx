@@ -21,6 +21,24 @@ import { useEffect, useState } from 'react'
 
 type ColorMode = 'light' | 'dark'
 
+/**
+ * Custom hook for managing and observing the application's color mode (light/dark theme).
+ * Automatically syncs with the data-theme attribute on the document root element
+ * and listens for external theme changes.
+ *
+ * @returns A tuple containing:
+ *   - The current color mode ('light' or 'dark')
+ *   - A setter function to update the color mode
+ *
+ * @example
+ * const [colorMode, setColorMode] = useColorMode()
+ *
+ * // Get current mode
+ * console.log(colorMode) // 'light' or 'dark'
+ *
+ * // Toggle theme
+ * setColorMode(colorMode === 'light' ? 'dark' : 'light')
+ */
 export const useColorMode = (): [ColorMode, (mode: ColorMode) => void] => {
   const [mode, setModeState] = useState<ColorMode>('light')
 

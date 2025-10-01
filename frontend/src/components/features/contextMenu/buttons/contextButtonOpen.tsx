@@ -29,7 +29,6 @@ type Props = {
   hash: string
 }
 
-//  Should not be wrapped in ContextButtonWrapper
 export const ContextButtonOpen: React.FC<Props> = ({ hash }) => {
   const { handleOpenContextMenu, handleCloseContextMenu } = useContextMenu()
   const { t } = useTranslation('common')

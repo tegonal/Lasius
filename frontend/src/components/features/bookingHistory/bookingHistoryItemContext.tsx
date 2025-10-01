@@ -21,19 +21,21 @@ import { ContextButtonClose } from 'components/features/contextMenu/buttons/cont
 import { ContextButtonOpen } from 'components/features/contextMenu/buttons/contextButtonOpen'
 import { ContextButtonStartBooking } from 'components/features/contextMenu/buttons/contextButtonStartBooking'
 import { ContextBar } from 'components/features/contextMenu/contextBar'
+import { ContextBarDivider } from 'components/features/contextMenu/contextBarDivider'
 import { ContextCompactAnimatePresence } from 'components/features/contextMenu/contextCompactAnimatePresence'
 import { ContextCompactBody } from 'components/features/contextMenu/contextCompactBody'
 import { ContextCompactButtonWrapper } from 'components/features/contextMenu/contextCompactButtonWrapper'
 import { useContextMenu } from 'components/features/contextMenu/hooks/useContextMenu'
 import { BookingAddUpdateForm } from 'components/features/user/index/bookingAddUpdateForm'
 import { Button } from 'components/primitives/buttons/Button'
-import { Icon } from 'components/ui/icons/Icon'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import useModal from 'components/ui/overlays/modal/hooks/useModal'
 import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
 import { AnimatePresence } from 'framer-motion'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { ModelsBooking } from 'lib/api/lasius'
 import { deleteUserBooking } from 'lib/api/lasius/user-bookings/user-bookings'
+import { Pencil, Star, Trash2 } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
 
@@ -81,7 +83,7 @@ export const BookingHistoryItemContext: React.FC<Props> = ({
                       onClick={() => updateItem()}
                       fullWidth={false}
                       shape="circle">
-                      <Icon name="time-clock-file-edit-interface-essential" size={24} />
+                      <LucideIcon icon={Pencil} size={24} />
                     </Button>
                   </ContextCompactButtonWrapper>
                 )}
@@ -93,7 +95,7 @@ export const BookingHistoryItemContext: React.FC<Props> = ({
                     onClick={() => actionAddBookingToFavorites(selectedOrganisationId, item)}
                     fullWidth={false}
                     shape="circle">
-                    <Icon name="rating-star-add-social-medias-rewards-rating" size={24} />
+                    <LucideIcon icon={Star} size={24} />
                   </Button>
                 </ContextCompactButtonWrapper>
                 {allowDelete && (
@@ -105,10 +107,11 @@ export const BookingHistoryItemContext: React.FC<Props> = ({
                       onClick={() => deleteItem()}
                       fullWidth={false}
                       shape="circle">
-                      <Icon name="bin-2-alternate-interface-essential" size={24} />
+                      <LucideIcon icon={Trash2} size={24} />
                     </Button>
                   </ContextCompactButtonWrapper>
                 )}
+                <ContextBarDivider />
                 <ContextButtonClose variant="compact" />
               </ContextBar>
             </ContextCompactAnimatePresence>

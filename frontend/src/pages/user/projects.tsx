@@ -19,8 +19,8 @@
 
 import { MyProjectsLayout } from 'components/features/user/projects/myProjectsLayout'
 import { LayoutResponsive } from 'components/ui/layouts/layoutResponsive'
+import { getServerSidePropsWithAuthRequired } from 'lib/auth/getServerSidePropsWithAuth'
 import { GetServerSideProps } from 'next'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { NextPageWithLayout } from 'pages/_app'
 
 const MyProjectsPage: NextPageWithLayout = () => {
@@ -28,12 +28,7 @@ const MyProjectsPage: NextPageWithLayout = () => {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { locale = '' } = context
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, ['common'])),
-    },
-  }
+  return getServerSidePropsWithAuthRequired(context)
 }
 
 MyProjectsPage.getLayout = function getLayout(page) {

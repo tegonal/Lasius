@@ -40,6 +40,28 @@ const testApiConnection = async () => {
   }
 }
 
+/**
+ * Custom hook for monitoring the Lasius API connection status.
+ * Periodically tests the API connection and tracks whether the backend is reachable.
+ * Works in conjunction with browser connection status to distinguish between
+ * network issues and API-specific problems.
+ *
+ * @returns Object containing:
+ *   - status: Current API connection status (CONNECTED, DISCONNECTED, or NOT_AUTHENTICATED)
+ *
+ * @example
+ * const { status } = useLasiusApiStatus()
+ *
+ * if (status === CONNECTION_STATUS.DISCONNECTED) {
+ *   return <ApiOfflineWarning />
+ * }
+ *
+ * @remarks
+ * - Tests API connection at regular intervals (defined by API_STATUS_INTERVAL)
+ * - Only tests when browser is online (relies on useBrowserConnectionStatus)
+ * - Tracks analytics events when API connection is lost
+ * - Distinguishes between network errors and authentication errors (401)
+ */
 export const useLasiusApiStatus = () => {
   const [status, setStatus] = React.useState(CONNECTION_STATUS.CONNECTED)
   const { status: browserStatus } = useBrowserConnectionStatus()

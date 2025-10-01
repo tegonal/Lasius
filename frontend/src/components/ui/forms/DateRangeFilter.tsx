@@ -123,7 +123,9 @@ export const DateRangeFilter: React.FC<Props> = ({ name: rangeFieldName }) => {
 
   return (
     <FormBody>
-      <FormElement>
+      <FormElement
+        label={t('common.time.timeRange', { defaultValue: 'Time range' })}
+        htmlFor={rangeFieldName}>
         <Controller
           name={rangeFieldName}
           control={parentFormContext.control}
@@ -140,7 +142,6 @@ export const DateRangeFilter: React.FC<Props> = ({ name: rangeFieldName }) => {
               onChange={onChange}
               options={selectOptions}
               placeholder={t('common.time.selectRange', { defaultValue: 'Select time range' })}
-              variant="joined"
             />
           )}
         />

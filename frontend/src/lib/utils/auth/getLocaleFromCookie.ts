@@ -17,12 +17,13 @@
  *
  */
 
+import { DEFAULT_LOCALE, LOCALE_COOKIE_NAME } from 'lib/config/locales'
 import { GetServerSidePropsContext } from 'next'
 
 /**
- * Extract locale from middleware header or NEXT_LOCALE cookie
+ * Extract locale from middleware header or locale cookie
  * @param context - Next.js GetServerSideProps context
- * @returns The locale from header/cookie or 'en' as default
+ * @returns The locale from header/cookie or default locale from config
  */
 export function getLocaleFromCookie(context: GetServerSidePropsContext): string {
   // First check if middleware set the locale in headers
@@ -33,7 +34,7 @@ export function getLocaleFromCookie(context: GetServerSidePropsContext): string 
 
   // Fall back to reading directly from cookie
   const cookies = context.req.headers.cookie || ''
-  const localeCookie = cookies.split(';').find((c) => c.trim().startsWith('NEXT_LOCALE='))
+  const localeCookie = cookies.split(';').find((c) => c.trim().startsWith(`${LOCALE_COOKIE_NAME}=`))
 
-  return localeCookie?.split('=')[1]?.trim() || 'en'
+  return localeCookie?.split('=')[1]?.trim() || DEFAULT_LOCALE
 }

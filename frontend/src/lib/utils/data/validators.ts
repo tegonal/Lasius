@@ -17,5 +17,26 @@
  *
  */
 
+/**
+ * Regular expression pattern for basic email address validation.
+ * Checks for the presence of '@' symbol and domain with at least one dot.
+ */
 export const emailValidationPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+/**
+ * Validates whether a string is a properly formatted email address.
+ * Uses a basic regex pattern that checks for:
+ * - Characters before @
+ * - @ symbol
+ * - Domain name with at least one dot
+ * - No whitespace
+ *
+ * @param string - The string to validate
+ * @returns True if the string matches email format, false otherwise
+ *
+ * @example
+ * isEmailAddress('user@example.com') // true
+ * isEmailAddress('invalid.email') // false
+ * isEmailAddress('test@domain') // false (no TLD)
+ */
 export const isEmailAddress = (string: string): boolean => emailValidationPattern.test(string)

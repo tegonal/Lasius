@@ -23,8 +23,33 @@ import { useToastViews, useUIStore } from 'stores/uiStore'
 import { ToastViewType } from 'types/dynamicViews'
 
 /**
- * Hook for managing toast notifications
- * Now uses Zustand store for better performance
+ * Custom hook for managing toast notifications with Zustand state management.
+ * Provides functions to add and remove toast messages with automatic deduplication
+ * based on content hashing. Optimized for performance with Zustand selectors.
+ *
+ * @returns Object containing:
+ *   - addToast: Function to display a new toast notification (auto-expires in 5s)
+ *   - removeToast: Function to manually dismiss a toast
+ *   - toastViews: Array of all currently displayed toasts
+ *
+ * @example
+ * const { addToast, removeToast } = useToast()
+ *
+ * // Show success toast
+ * addToast({
+ *   message: 'Booking saved successfully',
+ *   type: 'SUCCESS'
+ * })
+ *
+ * // Show error toast
+ * addToast({
+ *   message: 'Failed to save booking',
+ *   type: 'ERROR'
+ * })
+ *
+ * @remarks
+ * Toasts are automatically deduplicated - identical messages won't create duplicate toasts.
+ * Default TTL is 5000ms (5 seconds).
  */
 export const useToast = () => {
   // Use Zustand selectors for optimal performance

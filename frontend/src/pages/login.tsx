@@ -20,25 +20,25 @@
 'use server'
 
 import { SiGithub, SiGitlab, SiKeycloak } from '@icons-pack/react-simple-icons'
-import { LoginLayout } from 'components/features/login/loginLayout'
+import { LoadingInfoPanel, LoginInfoPanel } from 'components/features/login/authInfoPanels'
+import { AuthLayout } from 'components/features/login/authLayout'
 import { Button } from 'components/primitives/buttons/Button'
 import { Card, CardBody } from 'components/ui/cards/Card'
 import { Alert } from 'components/ui/feedback/Alert'
-import { Icon } from 'components/ui/icons/Icon'
+import { LasiusIcon } from 'components/ui/icons/LasiusIcon'
 import { Logo } from 'components/ui/icons/Logo'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { HelpButton } from 'components/ui/navigation/HelpButton'
-import { TegonalFooter } from 'components/ui/navigation/TegonalFooter'
-import { t } from 'i18next'
 import { getConfiguration } from 'lib/api/lasius/general/general'
+import { getServerSidePropsWithoutAuth } from 'lib/auth/getServerSidePropsWithoutAuth'
 import { logger } from 'lib/logger'
 import { LasiusPlausibleEvents } from 'lib/telemetry/plausibleEvents'
 import { usePlausible } from 'lib/telemetry/usePlausible'
-import { getLocaleFromCookie } from 'lib/utils/auth/getLocaleFromCookie'
 import { formatISOLocale } from 'lib/utils/date/dates'
+import { AlertTriangle } from 'lucide-react'
 import { GetServerSidePropsContext, NextPage } from 'next'
 import { ClientSafeProvider, getCsrfToken, getProviders, signIn } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import {
@@ -52,13 +52,6 @@ type CustomizedClientSafeProvider = ClientSafeProvider & {
   custom_logo: string | null
 }
 
-// list of known error response codes, used to provide translations only
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const loginErrorTranslations = [
-  t('auth.errors.fetchProfileFailed', { defaultValue: 'fetchProfileFailed' }),
-  t('auth.errors.oauthCallback', { defaultValue: 'OAuthCallbackError' }),
-]
-
 const Login: NextPage<{
   csrfToken: string
   providers: CustomizedClientSafeProvider[]
@@ -71,6 +64,39 @@ const Login: NextPage<{
   const router = useRouter()
   const { setSelectedDate } = useCalendarActions()
   const { invitation_id = null, email = null, error = null, callbackUrl = null } = router.query
+
+  // Build dynamic translation key for error messages
+  const getErrorMessage = (errorCode: string | string[] | null): string => {
+    if (!errorCode) return ''
+    const code = Array.isArray(errorCode) ? errorCode[0] : errorCode
+
+    // Always use switch statement to ensure we're explicitly calling t() with the right key
+    // This avoids issues with how i18next handles missing keys
+    switch (code) {
+      case 'OAuthCallback':
+      case 'OAuthCallbackError':
+        return t('auth.errors.oauthCallback', {
+          defaultValue: 'Authentication failed. Please try again.',
+        })
+      case 'SessionRequired':
+        return t('auth.errors.sessionRequired', {
+          defaultValue: 'Please sign in to continue.',
+        })
+      case 'Callback':
+        return t('auth.errors.callback', {
+          defaultValue: 'Authentication callback failed. Please try again.',
+        })
+      case 'fetchProfileFailed':
+        return t('auth.errors.fetchProfileFailed', {
+          defaultValue: "Couldn't load user profile. Please try logging in again.",
+        })
+      default:
+        return t('auth.errors.general', {
+          defaultValue: 'Authentication error. Please try again.',
+          error: code,
+        })
+    }
+  }
 
   const signInToProvider = useCallback(
     async (provider: string) => {
@@ -138,171 +164,160 @@ const Login: NextPage<{
 
   if (providers.length === 1 && !error) {
     return (
-      <LoginLayout>
-        <Card className="w-full max-w-md animate-pulse">
-          <CardBody className="items-center gap-4">
-            <div className="flex justify-center">
+      <AuthLayout infoPanel={<LoadingInfoPanel />}>
+        <Card className="bg-base-100/80 border-0 shadow-2xl backdrop-blur-sm">
+          <CardBody className="items-center gap-4 p-8">
+            <div className="mb-4 flex justify-center lg:hidden">
               <Logo />
             </div>
-            <div className="h-4" />
             <div className="loading loading-spinner loading-lg text-primary"></div>
             <p className="text-base-content/70 text-center">
               {t('auth.preparingSecureLogin', { defaultValue: 'Preparing secure login...' })}
             </p>
           </CardBody>
         </Card>
-      </LoginLayout>
-    )
-  } else {
-    return (
-      <LoginLayout>
-        {error && (
-          <Alert variant="warning" className="max-w-md">
-            {error}
-          </Alert>
-        )}
-        {providers.length === 0 && (
-          <Card variant="bordered" className="border-warning w-full max-w-md">
-            <CardBody className="items-center gap-4">
-              <div className="flex justify-center">
-                <Logo />
-              </div>
-              <div className="h-4" />
-              <div className="text-warning">
-                <Icon name="alert-triangle" size={48} />
-              </div>
-              <p className="text-center font-medium">
-                {t('auth.noAuthMethodsAvailable', {
-                  defaultValue: 'No authentication methods available',
-                })}
-              </p>
-              <p className="text-base-content/70 text-center text-sm">
-                {t('help.contactAdmin', { defaultValue: 'Please contact your administrator' })}
-              </p>
-            </CardBody>
-          </Card>
-        )}
-        {providers.length > 0 && (
-          <Card shadow="xl" className="border-base-300 bg-base-100 w-full max-w-md border">
-            <CardBody className="gap-6 p-8">
-              <div className="flex justify-center">
-                <Logo />
-              </div>
-              <div className="h-4" />
-              <div className="w-full space-y-3 text-center">
-                <p className="text-xl font-semibold">
-                  {providers.length > 1
-                    ? t('auth.welcomeToLasius', { defaultValue: 'Welcome to Lasius' })
-                    : t('auth.signInToContinue', { defaultValue: 'Sign in to continue' })}
-                </p>
-                {providers.length > 1 && (
-                  <p className="text-base-content/70 text-center text-sm">
-                    {t('auth.choosePreferredLoginMethod', {
-                      defaultValue: 'Choose your preferred login method',
-                    })}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-3">
-                {providers.map((provider) => {
-                  let icon = undefined
-                  if (provider.custom_logo) {
-                    icon = (
-                      <Image
-                        alt={provider.name}
-                        src={provider.custom_logo}
-                        width={24}
-                        height={24}
-                      />
-                    )
-                  } else {
-                    switch (provider.id) {
-                      case AUTH_PROVIDER_INTERNAL_LASIUS:
-                        icon = <Icon name="lasius" size={24} />
-                        break
-                      case 'gitlab':
-                        icon = <SiGitlab />
-                        break
-                      case 'github':
-                        icon = <SiGithub />
-                        break
-                      case AUTH_PROVIDER_CUSTOMER_KEYCLOAK:
-                        icon = <SiKeycloak />
-                        break
-                    }
-                  }
-
-                  return (
-                    <Button
-                      key={provider.id}
-                      disabled={isSubmitting}
-                      onClick={() => signInToProvider(provider.id)}
-                      variant="outline"
-                      size="lg"
-                      className="border-base-300 hover:border-primary hover:bg-base-200 w-full justify-center gap-3 transition-all duration-200">
-                      <span className="flex h-6 w-6 items-center justify-center">{icon}</span>
-                      <span className="text-center">
-                        {t('auth.continueWith', { defaultValue: 'Continue with' })}{' '}
-                        <span className="font-semibold">{provider.name}</span>
-                      </span>
-                    </Button>
-                  )
-                })}
-              </div>
-              <div className="flex flex-col items-center gap-2 pt-4">
-                <HelpButton />
-                <p className="text-base-content/50 text-center text-sm">
-                  {t('auth.needHelp', { defaultValue: 'Need help? Click the help button' })}
-                </p>
-              </div>
-            </CardBody>
-          </Card>
-        )}
-        <TegonalFooter />
-      </LoginLayout>
+      </AuthLayout>
     )
   }
+
+  return (
+    <AuthLayout infoPanel={<LoginInfoPanel />}>
+      {/* Error Alert */}
+      {error && (
+        <Alert variant="warning" className="animate-[fadeIn_0.4s_ease-out]">
+          {getErrorMessage(error)}
+        </Alert>
+      )}
+
+      {/* No providers warning */}
+      {providers.length === 0 && (
+        <Card className="border-warning bg-warning/5 backdrop-blur-sm">
+          <CardBody className="items-center gap-4">
+            <div className="flex justify-center lg:hidden">
+              <Logo />
+            </div>
+            <div className="text-warning">
+              <LucideIcon icon={AlertTriangle} size={48} />
+            </div>
+            <p className="text-center font-medium">
+              {t('auth.noAuthMethodsAvailable', {
+                defaultValue: 'No authentication methods available',
+              })}
+            </p>
+            <p className="text-base-content/70 text-center text-sm">
+              {t('help.contactAdmin', { defaultValue: 'Please contact your administrator' })}
+            </p>
+          </CardBody>
+        </Card>
+      )}
+
+      {/* Main login card */}
+      {providers.length > 0 && (
+        <Card className="bg-base-100/80 border-0 shadow-2xl backdrop-blur-sm">
+          <CardBody className="p-8 lg:p-10">
+            <div className="mb-8 text-center">
+              <h2 className="mb-2 text-3xl font-bold">
+                {t('auth.signInTitle', { defaultValue: 'Sign in to your account' })}
+              </h2>
+              <p className="text-base-content/60">
+                {providers.length > 1
+                  ? t('auth.chooseMethod', { defaultValue: 'Choose your preferred method below' })
+                  : t('auth.continueWithProvider', {
+                      defaultValue: 'Continue with your account',
+                    })}
+              </p>
+            </div>
+
+            {/* Provider buttons */}
+            <div className="space-y-3">
+              {providers.map((provider) => {
+                let icon = undefined
+                if (provider.custom_logo) {
+                  icon = (
+                    <Image alt={provider.name} src={provider.custom_logo} width={24} height={24} />
+                  )
+                } else {
+                  switch (provider.id) {
+                    case AUTH_PROVIDER_INTERNAL_LASIUS:
+                      icon = <LasiusIcon size={24} />
+                      break
+                    case 'gitlab':
+                      icon = <SiGitlab />
+                      break
+                    case 'github':
+                      icon = <SiGithub />
+                      break
+                    case AUTH_PROVIDER_CUSTOMER_KEYCLOAK:
+                      icon = <SiKeycloak />
+                      break
+                  }
+                }
+
+                return (
+                  <Button
+                    key={provider.id}
+                    disabled={isSubmitting}
+                    onClick={() => signInToProvider(provider.id)}
+                    variant="outline"
+                    size="lg"
+                    className={`hover:border-primary hover:bg-base-200 w-full justify-start gap-3 transition-colors duration-200 ${isSubmitting ? 'opacity-50' : ''}`}>
+                    <span className="flex h-6 w-6 items-center justify-center">{icon}</span>
+                    <span className="flex-1 text-left">
+                      {t('auth.continueWith', { defaultValue: 'Continue with' })}{' '}
+                      <span className="font-semibold">{provider.name}</span>
+                    </span>
+                  </Button>
+                )
+              })}
+            </div>
+
+            {/* Help button */}
+            <div className="mt-6 flex flex-col items-center gap-2">
+              <HelpButton />
+              <p className="text-base-content/50 text-center text-sm">
+                {t('auth.needHelp', { defaultValue: 'Need help? Click the help button' })}
+              </p>
+            </div>
+          </CardBody>
+        </Card>
+      )}
+    </AuthLayout>
+  )
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const { query } = context
-  // Without i18n config, context.locale doesn't exist - we must use our helper
-  const locale = getLocaleFromCookie(context)
-  const resolvedLocale = query.locale?.toString() || locale
-  const providers = Object.values((await getProviders()) || [])
+  return getServerSidePropsWithoutAuth(context, async (_context, _locale) => {
+    const providers = Object.values((await getProviders()) || [])
 
-  let config
-  try {
-    config = await getConfiguration()
-  } catch (error) {
-    logger.error('[Login] Failed to fetch configuration from backend:', error)
-    // Provide a default config when backend is unavailable
-    config = {
-      lasiusOAuthProviderEnabled: false,
-      lasiusOAuthProviderAllowUserRegistration: false,
-    }
-  }
-
-  const availableProviders = providers
-    .filter((p) => p.id !== AUTH_PROVIDER_INTERNAL_LASIUS || config.lasiusOAuthProviderEnabled)
-    .map((p) => {
-      if (p.id === AUTH_PROVIDER_CUSTOMER_KEYCLOAK) {
-        ;(p as CustomizedClientSafeProvider).custom_logo =
-          process.env.KEYCLOAK_OAUTH_PROVIDER_ICON || null
-      } else {
-        ;(p as CustomizedClientSafeProvider).custom_logo = null
+    let config
+    try {
+      config = await getConfiguration()
+    } catch (error) {
+      logger.error('[Login] Failed to fetch configuration from backend:', error)
+      // Provide a default config when backend is unavailable
+      config = {
+        lasiusOAuthProviderEnabled: false,
+        lasiusOAuthProviderAllowUserRegistration: false,
       }
-      return p
-    })
+    }
 
-  return {
-    props: {
+    const availableProviders = providers
+      .filter((p) => p.id !== AUTH_PROVIDER_INTERNAL_LASIUS || config.lasiusOAuthProviderEnabled)
+      .map((p) => {
+        if (p.id === AUTH_PROVIDER_CUSTOMER_KEYCLOAK) {
+          ;(p as CustomizedClientSafeProvider).custom_logo =
+            process.env.KEYCLOAK_OAUTH_PROVIDER_ICON || null
+        } else {
+          ;(p as CustomizedClientSafeProvider).custom_logo = null
+        }
+        return p
+      })
+
+    return {
       csrfToken: await getCsrfToken(context),
       providers: availableProviders,
-      ...(await serverSideTranslations(resolvedLocale || 'en', ['common'])),
-      locale: resolvedLocale,
-    },
-  }
+    }
+  })
 }
 
 export default Login

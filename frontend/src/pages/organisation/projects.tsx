@@ -23,8 +23,8 @@ import { LayoutResponsive } from 'components/ui/layouts/layoutResponsive'
 import { isAdminOfCurrentOrg } from 'lib/api/functions/isAdminOfCurrentOrg'
 import { useProfile } from 'lib/api/hooks/useProfile'
 import { ModelsUser } from 'lib/api/lasius'
+import { getServerSidePropsWithAuthRequired } from 'lib/auth/getServerSidePropsWithAuth'
 import { GetServerSideProps } from 'next'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { NextPageWithLayout } from 'pages/_app'
 
 const AllProjectsPage: NextPageWithLayout = () => {
@@ -36,12 +36,7 @@ const AllProjectsPage: NextPageWithLayout = () => {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { locale = '' } = context
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, ['common'])),
-    },
-  }
+  return getServerSidePropsWithAuthRequired(context)
 }
 
 AllProjectsPage.getLayout = function getLayout(page) {

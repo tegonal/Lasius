@@ -25,7 +25,6 @@ import { FieldSet } from 'components/ui/forms/FieldSet'
 import { FormBody } from 'components/ui/forms/FormBody'
 import { FormElement } from 'components/ui/forms/FormElement'
 import { FormErrorBadge } from 'components/ui/forms/formErrorBadge'
-import { Icon } from 'components/ui/icons/Icon'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { ModalConfirm } from 'components/ui/overlays/modal/modalConfirm'
 import { UserRoles } from 'dynamicTranslationStrings'
@@ -34,7 +33,7 @@ import { ModelsInvitationResult } from 'lib/api/lasius'
 import { inviteOrganisationUser } from 'lib/api/lasius/organisations/organisations'
 import { inviteProjectUser } from 'lib/api/lasius/projects/projects'
 import { emailValidationPattern } from 'lib/utils/data/validators'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, Copy } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -155,7 +154,7 @@ export const ManageUserInviteByEmailForm: React.FC<Props> = ({
           {mode === 'organisation' && (
             <FormElement>
               <Label htmlFor="organisationRole">
-                {t('organizations.organizationRole', { defaultValue: 'Organisation role' })}
+                {t('organisations.organisationRole', { defaultValue: 'Organisation role' })}
               </Label>
               <div className="relative">
                 <select
@@ -209,7 +208,7 @@ export const ManageUserInviteByEmailForm: React.FC<Props> = ({
               variant="icon"
               aria-label={t('invitations.copyToClipboard', { defaultValue: 'Copy to clipboard' })}
               onClick={() => copy(registrationLink(invitationResult.invitationLinkId || ''))}>
-              <Icon name="copy-paste-interface-essential" size={16} />
+              <LucideIcon icon={Copy} size={16} />
             </Button>
           </div>
         </ModalConfirm>

@@ -19,11 +19,12 @@
 
 import { CardSmall } from 'components/ui/cards/CardSmall'
 import { AvatarUser } from 'components/ui/data-display/avatar/avatarUser'
-import { Icon } from 'components/ui/icons/Icon'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { ModalConfirm } from 'components/ui/overlays/modal/modalConfirm'
 import { m } from 'framer-motion'
 import { useProfile } from 'lib/api/hooks/useProfile'
 import { ModelsUserStub } from 'lib/api/lasius'
+import { Trash2 } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React, { useRef, useState } from 'react'
 import { useOnClickOutside } from 'usehooks-ts'
@@ -106,7 +107,7 @@ export const UserCard: React.FC<Props> = ({ canRemove = false, onRemove, user })
                 <button
                   className="btn btn-ghost btn-square btn-sm"
                   onClick={() => setShowConfirmationDialog(true)}>
-                  <Icon name="bin-2-alternate-interface-essential" size={24} />
+                  <LucideIcon icon={Trash2} size={24} />
                 </button>
               )}
             </div>

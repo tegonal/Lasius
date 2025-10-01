@@ -23,18 +23,26 @@ import { Button } from 'components/primitives/buttons/Button'
 import { FieldSet } from 'components/ui/forms/FieldSet'
 import { FormElement } from 'components/ui/forms/FormElement'
 import { FormElementSpacer } from 'components/ui/forms/formElementSpacer'
-import { Icon } from 'components/ui/icons/Icon'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import useModal from 'components/ui/overlays/modal/hooks/useModal'
 import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
+import { SUPPORTED_LOCALES } from 'lib/config/locales'
+import { EllipsisVertical } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import React from 'react'
 
+// Language display configuration
+const languageConfig: Record<string, { flag: string; name: string }> = {
+  en: { flag: '🇬🇧', name: 'English' },
+  de: { flag: '🇩🇪', name: 'Deutsch' },
+}
+
 export const MobileNavigationButton: React.FC = () => {
   const { modalId, openModal, closeModal } = useModal('MobileNavigationButtonModal')
-  const { t } = useTranslation('common')
+  const { t, i18n } = useTranslation('common')
   const router = useRouter()
-  const { locale, pathname, query, asPath } = router
+  const { pathname, query, asPath } = router
   const organisationSelectModal = useModal(MODAL_SELECT_ORGANISATION)
   const { signOut } = useSignOut()
 
@@ -46,36 +54,36 @@ export const MobileNavigationButton: React.FC = () => {
   return (
     <>
       <Button variant="secondary" shape="circle" onClick={openModal} fullWidth={false}>
-        <Icon name="navigation-menu-vertical-interface-essential" size={24} />
+        <LucideIcon icon={EllipsisVertical} />
       </Button>
       <ModalResponsive modalId={modalId}>
         <FieldSet>
           <FormElement>
             <Button
               onClick={organisationSelectModal.openModal}
-              aria-label={t('organizations.actions.switch', {
+              aria-label={t('organisations.actions.switch', {
                 defaultValue: 'Switch organisation',
               })}>
-              {t('organizations.actions.switch', { defaultValue: 'Switch organisation' })}
+              {t('organisations.actions.switch', { defaultValue: 'Switch organisation' })}
             </Button>
           </FormElement>
           <FormElementSpacer />
           <FormElement>
             <div className="flex gap-2">
-              <Button
-                onClick={() => switchLanguage('en')}
-                variant={locale === 'en' ? 'primary' : 'secondary'}
-                aria-label="English"
-                fullWidth>
-                🇬🇧 English
-              </Button>
-              <Button
-                onClick={() => switchLanguage('de')}
-                variant={locale === 'de' ? 'primary' : 'secondary'}
-                aria-label="Deutsch"
-                fullWidth>
-                🇩🇪 Deutsch
-              </Button>
+              {SUPPORTED_LOCALES.map((lang) => {
+                const config = languageConfig[lang]
+                if (!config) return null // Skip if no config for this locale
+                return (
+                  <Button
+                    key={lang}
+                    onClick={() => switchLanguage(lang)}
+                    variant={i18n.language === lang ? 'primary' : 'secondary'}
+                    aria-label={config.name}
+                    fullWidth>
+                    {config.flag} {config.name}
+                  </Button>
+                )
+              })}
             </div>
           </FormElement>
           <FormElementSpacer />

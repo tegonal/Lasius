@@ -24,24 +24,17 @@ import { IndexColumnTabs } from 'components/features/user/index/indexColumnTabs'
 import { BookingListSelectedDay } from 'components/features/user/index/list/bookingListSelectedDay'
 import { ScrollContainer } from 'components/primitives/layout/ScrollContainer'
 import { LayoutResponsive } from 'components/ui/layouts/layoutResponsive'
-import { getLocaleFromCookie } from 'lib/utils/auth/getLocaleFromCookie'
+import { getServerSidePropsWithAuthRequired } from 'lib/auth/getServerSidePropsWithAuth'
 import { GetServerSideProps } from 'next'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { NextPageWithLayout } from 'pages/_app'
 
 const Home: NextPageWithLayout = () => {
   return null // Content is handled in getLayout
 }
 
+// This page requires authentication
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  // Without i18n config, context.locale doesn't exist - we must use our helper
-  const locale = getLocaleFromCookie(context)
-
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, ['common'])),
-    },
-  }
+  return getServerSidePropsWithAuthRequired(context)
 }
 
 Home.getLayout = function getLayout() {

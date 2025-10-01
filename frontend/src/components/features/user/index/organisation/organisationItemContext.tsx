@@ -21,6 +21,7 @@ import { ContextButtonClose } from 'components/features/contextMenu/buttons/cont
 import { ContextButtonOpen } from 'components/features/contextMenu/buttons/contextButtonOpen'
 import { ContextButtonStartBooking } from 'components/features/contextMenu/buttons/contextButtonStartBooking'
 import { ContextBar } from 'components/features/contextMenu/contextBar'
+import { ContextBarDivider } from 'components/features/contextMenu/contextBarDivider'
 import { ContextCompactAnimatePresence } from 'components/features/contextMenu/contextCompactAnimatePresence'
 import { ContextCompactBody } from 'components/features/contextMenu/contextCompactBody'
 import { useContextMenu } from 'components/features/contextMenu/hooks/useContextMenu'
@@ -46,6 +47,7 @@ export const OrganisationItemContext: React.FC<Props> = ({ item }) => {
             <ContextCompactAnimatePresence>
               <ContextBar>
                 <ContextButtonStartBooking variant="compact" item={item} />
+                <ContextBarDivider />
                 <ContextButtonClose variant="compact" />
               </ContextBar>
             </ContextCompactAnimatePresence>

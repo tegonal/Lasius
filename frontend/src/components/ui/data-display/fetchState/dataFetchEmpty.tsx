@@ -17,7 +17,8 @@
  *
  */
 
-import { Icon } from 'components/ui/icons/Icon'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
+import { Frown } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
 
@@ -26,7 +27,7 @@ export const DataFetchEmpty: React.FC = () => {
   return (
     <div className="flex h-full w-full flex-col items-center justify-center py-4">
       <div className="text-base-content/50 flex flex-col items-center justify-center gap-2 text-sm">
-        <Icon name="on-error-sad-arrows-diagrams" size={24} />
+        <LucideIcon icon={Frown} size={24} />
         <div>{t('common.noData', { defaultValue: 'No data available' })}</div>
       </div>
     </div>

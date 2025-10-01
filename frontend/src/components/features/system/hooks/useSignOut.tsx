@@ -24,6 +24,29 @@ import { signOut } from 'next-auth/react'
 import { resetAllStores } from 'stores/globalActions'
 import { useIsClient } from 'usehooks-ts'
 
+/**
+ * Custom hook for handling user sign-out with proper cleanup.
+ * Removes cookies, resets all Zustand stores, tracks analytics, and signs out via NextAuth.
+ * Only executes on the client side.
+ *
+ * @returns Object containing:
+ *   - signOut: Async function to perform complete sign-out process
+ *
+ * @example
+ * const { signOut } = useSignOut()
+ *
+ * // Sign out user
+ * await signOut()
+ *
+ * @remarks
+ * The sign-out process:
+ * 1. Removes all accessible browser cookies (except locale cookie)
+ * 2. Resets all Zustand stores to initial state
+ * 3. Tracks logout event in analytics
+ * 4. Calls NextAuth signOut to invalidate session
+ *
+ * This ensures complete cleanup of user data from the client.
+ */
 export const useSignOut = () => {
   const isClient = useIsClient()
   const plausible = usePlausible<LasiusPlausibleEvents>()

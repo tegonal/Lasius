@@ -34,7 +34,6 @@ export const SegmentedDateInput = () => {
   const [selectedSegment, setSelectedSegment] = useState<DateSegment | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // Get segment boundaries in the string
   const getSegmentBounds = (value: string): SegmentBounds | null => {
     const parts = value.split('.')
     if (parts.length !== 3) return null
@@ -50,7 +49,6 @@ export const SegmentedDateInput = () => {
     }
   }
 
-  // Determine which segment the cursor is in
   const getSegmentFromPosition = (position: number, value: string): DateSegment | null => {
     const bounds = getSegmentBounds(value)
     if (!bounds) return null
@@ -60,7 +58,6 @@ export const SegmentedDateInput = () => {
     return 'year'
   }
 
-  // Parse lenient date input
   const parseDate = (value: string): Date | null => {
     const cleaned = value.replace(/[^\d.]/g, '')
     const parts = cleaned.split('.')
@@ -86,7 +83,6 @@ export const SegmentedDateInput = () => {
     return dateObj
   }
 
-  // Format date to DD.MM.YYYY
   const formatDate = (dateObj: Date | null): string => {
     if (!dateObj) return ''
     const d = dateObj.getDate().toString().padStart(2, '0')
@@ -95,7 +91,6 @@ export const SegmentedDateInput = () => {
     return `${d}.${m}.${y}`
   }
 
-  // Select a segment
   const selectSegment = (segment: DateSegment): void => {
     const bounds = getSegmentBounds(inputValue)
     if (!bounds || !inputRef.current) return
@@ -108,7 +103,6 @@ export const SegmentedDateInput = () => {
     setSelectedSegment(segment)
   }
 
-  // Handle click to select segment
   const handleClick = (_e: React.MouseEvent<HTMLInputElement>): void => {
     setTimeout(() => {
       const position = inputRef.current?.selectionStart
@@ -121,7 +115,6 @@ export const SegmentedDateInput = () => {
     }, 0)
   }
 
-  // Handle input change with segment awareness
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const value = e.target.value
     const prevValue = inputValue
@@ -134,14 +127,11 @@ export const SegmentedDateInput = () => {
         const selStart = inputRef.current.selectionStart
         const selEnd = inputRef.current.selectionEnd
 
-        // If selection matches a segment, we're replacing it
         if (selStart === segmentBounds.start && selEnd === segmentBounds.end) {
-          // User is typing to replace the segment
           const parts = prevValue.split('.')
           const typedChar = value.slice(selStart, selStart + 1)
 
           if (/\d/.test(typedChar)) {
-            // Replace the segment with the typed digit
             if (selectedSegment === 'day') {
               parts[0] = typedChar.padStart(2, '0')
             } else if (selectedSegment === 'month') {
@@ -154,7 +144,6 @@ export const SegmentedDateInput = () => {
             const newValue = parts.join('.')
             setInputValue(newValue)
 
-            // Try to parse
             const parsed = parseDate(newValue)
             if (parsed) {
               setDate(parsed)
@@ -163,7 +152,6 @@ export const SegmentedDateInput = () => {
               setIsValid(false)
             }
 
-            // Move to next segment or stay in year
             setTimeout(() => {
               if (selectedSegment === 'day') selectSegment('month')
               else if (selectedSegment === 'month') selectSegment('year')
@@ -174,7 +162,6 @@ export const SegmentedDateInput = () => {
           }
         }
 
-        // If we're typing a digit and the segment already has a single digit
         if (/^\d$/.test(value.slice(-1)) && value.length > prevValue.length) {
           const parts = prevValue.split('.')
           const newDigit = value.slice(-1)
@@ -184,7 +171,6 @@ export const SegmentedDateInput = () => {
             const newValue = parts.join('.')
             setInputValue(newValue)
 
-            // Auto-advance to month after typing 2 digits for day
             setTimeout(() => selectSegment('month'), 0)
 
             const parsed = parseDate(newValue)
@@ -200,7 +186,6 @@ export const SegmentedDateInput = () => {
             const newValue = parts.join('.')
             setInputValue(newValue)
 
-            // Auto-advance to year after typing 2 digits for month
             setTimeout(() => selectSegment('year'), 0)
 
             const parsed = parseDate(newValue)
@@ -230,7 +215,6 @@ export const SegmentedDateInput = () => {
       }
     }
 
-    // Default behavior for normal typing
     setInputValue(value)
     setSelectedSegment(null)
 
@@ -249,12 +233,10 @@ export const SegmentedDateInput = () => {
     }
   }
 
-  // Handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>): void => {
     const bounds = getSegmentBounds(inputValue)
     if (!bounds) return
 
-    // Period/Dot key to move to next segment
     if (e.key === '.' || e.key === ',') {
       e.preventDefault()
       const position = inputRef.current?.selectionStart
@@ -266,11 +248,9 @@ export const SegmentedDateInput = () => {
         } else if (segment === 'month') {
           selectSegment('year')
         }
-        // If in year, stay there (no next segment)
       }
     }
 
-    // Arrow keys for increment/decrement
     if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
       e.preventDefault()
 
@@ -295,12 +275,10 @@ export const SegmentedDateInput = () => {
         const formatted = formatDate(newDate)
         setInputValue(formatted)
 
-        // Maintain selection on the same segment
         setTimeout(() => selectSegment(segment), 0)
       }
     }
 
-    // Tab to move between segments
     if (e.key === 'Tab' && !e.shiftKey) {
       const position = inputRef.current?.selectionStart
       if (typeof position === 'number') {
@@ -316,7 +294,6 @@ export const SegmentedDateInput = () => {
       }
     }
 
-    // Shift+Tab to move backwards
     if (e.key === 'Tab' && e.shiftKey) {
       const position = inputRef.current?.selectionStart
       if (typeof position === 'number') {
@@ -332,7 +309,6 @@ export const SegmentedDateInput = () => {
       }
     }
 
-    // Left/Right arrow keys to navigate segments
     if (e.key === 'ArrowLeft') {
       const position = inputRef.current?.selectionStart
       if (typeof position === 'number') {
@@ -364,7 +340,6 @@ export const SegmentedDateInput = () => {
     }
   }
 
-  // Format on blur
   const handleBlur = (): void => {
     setSelectedSegment(null)
 
@@ -383,14 +358,12 @@ export const SegmentedDateInput = () => {
     }
   }
 
-  // Initialize with a placeholder or empty formatted string
   useEffect(() => {
     if (!inputValue && !date) {
       setInputValue('__.__.____')
     }
   }, [inputValue, date])
 
-  // Handle focus to select first segment
   const handleFocus = (): void => {
     if (inputValue === '__.__.____') {
       setInputValue('')

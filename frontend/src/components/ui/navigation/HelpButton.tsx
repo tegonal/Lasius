@@ -25,26 +25,26 @@ import { usePlausible } from 'lib/telemetry/usePlausible'
 import { HelpCircleIcon } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
+import { useHelpStore } from 'stores/helpStore'
 
 export const HelpButton: React.FC = () => {
   const plausible = usePlausible<LasiusPlausibleEvents>()
-  const { i18n, t } = useTranslation('common')
+  const { t } = useTranslation('common')
+  const { toggleHelp } = useHelpStore()
 
-  const openDocumentation = () => {
+  const handleClick = () => {
     plausible('uiAction', {
       props: {
         name: 'helpButton',
       },
     })
 
-    const prefix = i18n.language === 'de' ? 'DE%3A' : ''
-
-    window.open('https://github.com/tegonal/Lasius/wiki/' + prefix + 'Home', '_blank')
+    toggleHelp()
   }
 
   return (
     <ToolTip toolTipContent={t('common.actions.help', { defaultValue: 'Help' })} placement="bottom">
-      <Button onClick={openDocumentation} fullWidth={false} variant="ghost" shape="circle">
+      <Button onClick={handleClick} fullWidth={false} variant="ghost" shape="circle">
         <LucideIcon icon={HelpCircleIcon} size={20} />
       </Button>
     </ToolTip>

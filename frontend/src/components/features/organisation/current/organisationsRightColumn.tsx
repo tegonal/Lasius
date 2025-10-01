@@ -62,20 +62,20 @@ export const OrganisationsRightColumn: React.FC = () => {
   return (
     <div className="w-full px-6 pt-3">
       <Heading as="h2" variant="section">
-        {t('organizations.currentOrganization', { defaultValue: 'Current organisation' })}
+        {t('organisations.currentOrganisation', { defaultValue: 'Current organisation' })}
       </Heading>
       {!selectedOrganisation?.private && (
         <>
           {amIAdmin ? (
             <Text variant="infoText">
-              {t('organizations.adminDescription', {
+              {t('organisations.adminDescription', {
                 defaultValue:
                   'You are an administrator of this organisation. You can add and remove members and change the organisation name, or create a new one.',
               })}
             </Text>
           ) : (
             <Text variant="infoText">
-              {t('organizations.memberDescription', {
+              {t('organisations.memberDescription', {
                 defaultValue:
                   "You are a member of this organisation and don't have the rights to add or remove members. Get in touch with an organisation administrator if you would like to invite someone.",
               })}
@@ -84,7 +84,7 @@ export const OrganisationsRightColumn: React.FC = () => {
         </>
       )}
       <Text variant="infoText">
-        {t('organizations.createDescription', {
+        {t('organisations.createDescription', {
           defaultValue: 'Add a new organisation by clicking on the button below.',
         })}
       </Text>
@@ -93,20 +93,20 @@ export const OrganisationsRightColumn: React.FC = () => {
       {selectedOrganisation?.role === ROLES.ORGANISATION_ADMIN && !selectedOrganisation?.private ? (
         <ButtonGroup>
           <Button variant="primary" onClick={() => inviteMember()}>
-            {t('members.actions.invite', { defaultValue: 'Invite member' })}
+            {t('members.actions.invite', { defaultValue: 'Invite someone' })}
           </Button>
           <Button variant="secondary" onClick={() => editOrganisation()}>
-            {t('organizations.actions.edit', { defaultValue: 'Edit organisation' })}
+            {t('organisations.actions.edit', { defaultValue: 'Edit organisation' })}
           </Button>
           <Button variant="neutral" onClick={() => addOrganisation()}>
-            {t('organizations.actions.create', { defaultValue: 'Create organisation' })}
+            {t('organisations.actions.create', { defaultValue: 'Create organisation' })}
           </Button>
         </ButtonGroup>
       ) : (
         // Show only create button for non-admins or private orgs
         <ButtonGroup>
           <Button variant="neutral" onClick={() => addOrganisation()}>
-            {t('organizations.actions.create', { defaultValue: 'Create organisation' })}
+            {t('organisations.actions.create', { defaultValue: 'Create organisation' })}
           </Button>
         </ButtonGroup>
       )}

@@ -18,14 +18,13 @@
  */
 
 import { Button } from 'components/primitives/buttons/Button'
-import { Icon } from 'components/ui/icons/Icon'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { augmentBookingsList } from 'lib/api/functions/augmentBookingsList'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { ModelsBooking } from 'lib/api/lasius'
 import { useUpdateUserBooking } from 'lib/api/lasius/user-bookings/user-bookings'
 import { formatISOLocale } from 'lib/utils/date/dates'
-import { ArrowDownToLine, ArrowUpToLine, Edit2 } from 'lucide-react'
+import { AlertTriangle, ArrowDownToLine, ArrowUpToLine, Edit2 } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React, { useState } from 'react'
 
@@ -141,7 +140,7 @@ export const BookingOverlapActions: React.FC<Props> = ({
             })}
             onClick={onEdit}
             fullWidth={false}>
-            <Icon name="alert-triangle" size={18} />
+            <LucideIcon icon={AlertTriangle} size={18} />
           </Button>
         )}
       </div>

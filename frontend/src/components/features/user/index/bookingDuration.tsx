@@ -18,10 +18,11 @@
  */
 
 import { ToolTip } from 'components/ui/feedback/Tooltip'
-import { Icon } from 'components/ui/icons/Icon'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { ModelsBooking } from 'lib/api/lasius'
 import { cn } from 'lib/utils/cn'
 import { durationAsString } from 'lib/utils/date/dates'
+import { AlertTriangle, Clock3 } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
 
@@ -37,14 +38,14 @@ export const BookingDuration: React.FC<Props> = ({ item }) => {
         'flex flex-row items-center justify-start gap-1 leading-normal',
         durationIsZero && 'text-warning',
       )}>
-      <Icon name="time-clock-three-interface-essential" size={14} />
+      <LucideIcon icon={Clock3} size={14} />
       <div>{duration}</div>
       {durationIsZero && (
         <ToolTip
           toolTipContent={t('bookings.warnings.durationIsZero', {
             defaultValue: "This booking's duration is zero",
           })}>
-          <Icon name="alert-triangle" size={14} />
+          <LucideIcon icon={AlertTriangle} size={14} />
         </ToolTip>
       )}
     </div>

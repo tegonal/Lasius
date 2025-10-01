@@ -17,8 +17,9 @@
  *
  */
 
-import { Icon } from 'components/ui/icons/Icon'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { durationAsString, formatISOLocale } from 'lib/utils/date/dates'
+import { Timer } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { useInterval } from 'usehooks-ts'
 
@@ -37,7 +38,7 @@ export const BookingDurationCounter: React.FC<Props> = ({ startDate }) => {
 
   return (
     <div className="flex flex-row items-center justify-start gap-1 leading-normal">
-      <Icon name="stopwatch-interface-essential" size={14} />
+      <LucideIcon icon={Timer} size={14} />
       <div>{duration}</div>
     </div>
   )

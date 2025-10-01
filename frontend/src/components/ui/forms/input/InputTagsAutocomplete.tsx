@@ -20,10 +20,11 @@
 import { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react'
 import { Tag, TagList } from 'components/ui/data-display/TagList'
 import { DropdownList } from 'components/ui/forms/input/shared/dropdownList'
-import { Icon } from 'components/ui/icons/Icon'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { differenceBy, filter, noop, sortBy, uniqBy } from 'es-toolkit/compat'
 import { ModelsSimpleTag } from 'lib/api/lasius'
 import { cleanStrForCmp } from 'lib/utils/string/strings'
+import { XCircle } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React, { useEffect, useState } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
@@ -138,7 +139,7 @@ export const InputTagsAutocomplete: React.FC<Props> = ({ suggestions = [], name,
                     <div
                       className="hover:text-accent absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer"
                       onClick={() => setInputText('')}>
-                      <Icon name="remove-circle-interface-essential" size={20} />
+                      <LucideIcon icon={XCircle} size={20} />
                     </div>
                   )}
                   <ComboboxOptions as="div" static={isFocused && projectId && !open}>

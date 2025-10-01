@@ -63,6 +63,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
+  runtime: 'nodejs', // Use Node.js runtime instead of Edge runtime
   matcher: [
     // Match all pages
     '/',

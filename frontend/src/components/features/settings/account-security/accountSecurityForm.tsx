@@ -29,9 +29,10 @@ import { FormElementSpacer } from 'components/ui/forms/formElementSpacer'
 import { FormErrorBadge } from 'components/ui/forms/formErrorBadge'
 import { FormErrorsMultiple } from 'components/ui/forms/formErrorsMultiple'
 import { preventEnterOnForm } from 'components/ui/forms/input/shared/preventEnterOnForm'
-import { Icon } from 'components/ui/icons/Icon'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { useProfile } from 'lib/api/hooks/useProfile'
 import { updateUserPassword } from 'lib/api/lasius/oauth2-provider/oauth2-provider'
+import { Eye, EyeOff } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import { DEV, LASIUS_DEMO_MODE } from 'projectConfig/constants'
 import React, { useState } from 'react'
@@ -167,14 +168,7 @@ export const AccountSecurityForm: React.FC = () => {
                 </FormElement>
                 <FormElement>
                   <Button onClick={handleTogglePasswordsVisible} variant="ghost">
-                    <Icon
-                      name={
-                        showPasswords
-                          ? 'view-1-interface-essential'
-                          : 'view-off-interface-essential'
-                      }
-                      size={24}
-                    />
+                    <LucideIcon icon={showPasswords ? Eye : EyeOff} size={24} />
                     {showPasswords ? (
                       <span>{t('ui.hidePasswords', { defaultValue: 'Hide passwords' })}</span>
                     ) : (

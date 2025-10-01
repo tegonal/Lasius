@@ -18,16 +18,31 @@
  */
 
 import { NavigationTabContent } from 'components/features/navigation/navigationTabContent'
+import {
+  Calendar,
+  Clock,
+  FileText,
+  Folder,
+  FolderCog,
+  Lock,
+  LucideIcon,
+  PieChart,
+  Settings,
+  SlidersHorizontal,
+  Timer,
+  User,
+  UserCircle,
+  Users,
+} from 'lucide-react'
 import { AUTH_PROVIDER_INTERNAL_LASIUS, ROLES } from 'projectConfig/constants'
 import React from 'react'
-import { IconNames } from 'types/iconNames'
 
-const t = (key: string, options?: { defaultValue?: string }) => options?.defaultValue || key
+const t = (key: string, _options?: { defaultValue?: string }) => key
 
 export const ROUTES = {
   USER: {
     INDEX: '/user/home',
-    THIS_MONTH: '/user/this-month',
+    SUMMARY: '/user/summary',
     STATS: '/user/stats',
     LISTS: '/user/lists',
     PROJECTS: '/user/projects',
@@ -39,6 +54,7 @@ export const ROUTES = {
     PROJECTS: '/organisation/projects',
   },
   SETTINGS: {
+    APP: '/settings/app',
     ACCOUNT: '/settings/account',
     ACCOUNT_SECURITY: '/settings/account-security',
     WORKING_HOURS: '/settings/working-hours',
@@ -48,14 +64,14 @@ export const ROUTES = {
 export type NavigationRouteType = {
   route: string
   name: string
-  icon: IconNames
+  icon: LucideIcon
   restrictTo?: string[]
 }
 
 export type NavigationType = {
   level: string
   component: React.ReactNode
-  icon: IconNames
+  icon: LucideIcon
   routes: NavigationRouteType[]
   name: string
 }[]
@@ -64,63 +80,63 @@ export const NAVIGATION: NavigationType = [
   {
     level: 'user',
     component: <NavigationTabContent branch="user" />,
-    icon: 'single-neutral-circle-users',
+    icon: UserCircle,
     name: t('navigation.yourTimeBookingView', { defaultValue: 'Your time booking view' }),
     routes: [
       {
         route: ROUTES.USER.INDEX,
         name: t('bookings.title', { defaultValue: 'Bookings' }),
-        icon: 'stopwatch-interface-essential',
+        icon: Timer,
       },
       {
         route: ROUTES.USER.PROJECTS,
         name: t('projects.myProjects', { defaultValue: 'My projects' }),
-        icon: 'folder-files-folders',
+        icon: Folder,
       },
       {
-        route: ROUTES.USER.THIS_MONTH,
-        name: t('common.time.thisMonth', { defaultValue: 'This month' }),
-        icon: 'calendar-1-interface-essential',
+        route: ROUTES.USER.SUMMARY,
+        name: t('common.summary', { defaultValue: 'Summary' }),
+        icon: Calendar,
       },
       {
         route: ROUTES.USER.STATS,
         name: t('statistics.title', { defaultValue: 'Statistics' }),
-        icon: 'pie-line-graph-interface-essential',
+        icon: PieChart,
       },
       {
         route: ROUTES.USER.LISTS,
         name: t('lists.title', { defaultValue: 'Lists' }),
-        icon: 'filter-text-interface-essential',
+        icon: FileText,
       },
     ],
   },
   {
     level: 'organisation',
     component: <NavigationTabContent branch="organisation" />,
-    icon: 'human-resources-search-team-work-office-companies',
-    name: t('navigation.viewOrganizations', { defaultValue: 'View organisations and manage them' }),
+    icon: Users,
+    name: t('navigation.viewOrganisations', { defaultValue: 'View organisations and manage them' }),
     routes: [
       {
         route: ROUTES.ORGANISATION.CURRENT,
-        name: t('organizations.currentOrganization', { defaultValue: 'Current organisation' }),
-        icon: 'human-resources-search-team-work-office-companies',
+        name: t('organisations.currentOrganisation', { defaultValue: 'Current organisation' }),
+        icon: Users,
       },
       {
         route: ROUTES.ORGANISATION.PROJECTS,
         name: t('projects.allProjects', { defaultValue: 'All projects' }),
-        icon: 'folder-settings-files-folders',
+        icon: FolderCog,
         restrictTo: [ROLES.ORGANISATION_ADMIN],
       },
       {
         route: ROUTES.ORGANISATION.LISTS,
         name: t('lists.title', { defaultValue: 'Lists' }),
-        icon: 'filter-text-interface-essential',
+        icon: FileText,
         restrictTo: [ROLES.ORGANISATION_ADMIN],
       },
       {
         route: ROUTES.ORGANISATION.STATS,
         name: t('statistics.title', { defaultValue: 'Statistics' }),
-        icon: 'pie-line-graph-interface-essential',
+        icon: PieChart,
         restrictTo: [ROLES.ORGANISATION_ADMIN],
       },
     ],
@@ -128,24 +144,29 @@ export const NAVIGATION: NavigationType = [
   {
     level: 'settings',
     component: <NavigationTabContent branch="settings" />,
-    icon: 'cog-interface-essential',
+    icon: Settings,
     name: t('account.changeUserProfileSettings', { defaultValue: 'Change user profile settings' }),
     routes: [
       {
+        route: ROUTES.SETTINGS.APP,
+        name: t('settings.app.menuTitle', { defaultValue: 'App Settings' }),
+        icon: SlidersHorizontal,
+      },
+      {
         route: ROUTES.SETTINGS.ACCOUNT,
         name: t('account.title', { defaultValue: 'Account' }),
-        icon: 'single-neutral-profile-picture-users',
+        icon: User,
       },
       {
         route: ROUTES.SETTINGS.ACCOUNT_SECURITY,
         name: t('account.accountSecurity', { defaultValue: 'Account Security' }),
-        icon: 'lock-1-interface-essential',
+        icon: Lock,
         restrictTo: [AUTH_PROVIDER_INTERNAL_LASIUS],
       },
       {
         route: ROUTES.SETTINGS.WORKING_HOURS,
         name: t('workingHours.title', { defaultValue: 'Working hours' }),
-        icon: 'single-neutral-actions-time-users',
+        icon: Clock,
       },
     ],
   },

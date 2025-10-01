@@ -19,8 +19,8 @@
 
 import { WorkingHoursLayout } from 'components/features/user/workingHours/workingHoursLayout'
 import { LayoutResponsive } from 'components/ui/layouts/layoutResponsive'
+import { getServerSidePropsWithAuthRequired } from 'lib/auth/getServerSidePropsWithAuth'
 import { GetServerSideProps } from 'next'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { NextPageWithLayout } from 'pages/_app'
 
 const WorkingHoursPage: NextPageWithLayout = () => {
@@ -28,12 +28,7 @@ const WorkingHoursPage: NextPageWithLayout = () => {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { locale = '' } = context
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, ['common'])),
-    },
-  }
+  return getServerSidePropsWithAuthRequired(context)
 }
 
 WorkingHoursPage.getLayout = function getLayout(page) {

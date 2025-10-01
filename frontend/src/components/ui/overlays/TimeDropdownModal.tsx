@@ -106,7 +106,6 @@ export const TimeDropdownWithModal: React.FC<Props> = ({
 
         <MenuItems className="bg-base-100 border-base-300 absolute left-0 z-[9999] mt-2 w-36 rounded-lg border shadow-lg">
           <div className="p-1">
-            {/* Preset options */}
             <div className="border-base-300 mb-1 border-b pb-1">
               {PRESET_HOURS.map((preset) => (
                 <MenuItem key={preset.value}>
@@ -125,7 +124,6 @@ export const TimeDropdownWithModal: React.FC<Props> = ({
               ))}
             </div>
 
-            {/* Custom button that opens modal */}
             <MenuItem>
               {({ active }) => (
                 <button
@@ -143,7 +141,6 @@ export const TimeDropdownWithModal: React.FC<Props> = ({
         </MenuItems>
       </Menu>
 
-      {/* Modal for custom time selection */}
       <FormProvider {...hookForm}>
         <ModalResponsive autoSize modalId={modalId}>
           <FieldSet>

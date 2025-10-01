@@ -17,7 +17,8 @@
  *
  */
 
-import { Icon } from 'components/ui/icons/Icon'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
+import { ServerCrash } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
 
@@ -26,7 +27,7 @@ export const DataFetchUnknownError: React.FC = () => {
   return (
     <div className="flex h-full w-full flex-col items-center justify-center">
       <div className="text-base-content/50 flex flex-col items-center justify-center gap-2 text-sm">
-        <Icon name="server-error-desktop-programing-apps-websites" size={24} />
+        <LucideIcon icon={ServerCrash} size={24} />
         <div>
           {t('errors.dataFetchFailed', {
             defaultValue: 'So sorry, but the data could not be retrieved due to an error.',

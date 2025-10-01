@@ -26,7 +26,7 @@ type Props = {
 
 export const BookingCurrent: React.FC<Props> = ({ inContainer = true }) => {
   return (
-    <div className="flex h-full min-h-[96px] w-full flex-row items-center justify-start gap-3 overflow-hidden px-2 py-3 sm:px-3 lg:px-4">
+    <div className="bg-base-200 flex h-full min-h-[96px] w-full flex-row items-center justify-start gap-3 overflow-hidden px-2 py-3 sm:px-3 md:bg-transparent lg:px-4">
       <div className="relative h-full w-full">
         <BookingCurrentEntry inContainer={inContainer} />
       </div>

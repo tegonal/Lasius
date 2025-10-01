@@ -46,7 +46,6 @@ interface SelectProps {
   optionsClassName?: string
   name?: string
   id?: string
-  variant?: 'default' | 'joined'
 }
 
 export const Select: React.FC<SelectProps> = ({
@@ -60,41 +59,27 @@ export const Select: React.FC<SelectProps> = ({
   optionsClassName,
   name,
   id,
-  variant = 'default',
 }) => {
   const selectedOption = options.find((option) => option.value === value)
 
   return (
     <Listbox value={value} onChange={onChange} disabled={disabled} name={name}>
-      <div className={cn('relative w-full', variant === 'joined' && 'join', className)}>
+      <div className={cn('join relative w-full', className)}>
         <ListboxButton
           id={id}
           className={cn(
-            'input input-bordered w-full text-left',
+            'input input-bordered join-item w-full text-left',
             'focus-visible:border-primary focus:outline-none',
             'disabled:bg-base-200 disabled:text-base-content/50',
-            variant === 'joined' && 'join-item',
             buttonClassName,
           )}>
           <span className={cn('block truncate', !selectedOption && 'text-base-content/50')}>
             {selectedOption?.label || placeholder}
           </span>
         </ListboxButton>
-        {variant === 'joined' && (
-          <ListboxButton className="btn btn-neutral join-item px-2">
-            <LucideIcon icon={ChevronDown} size={20} aria-hidden="true" />
-          </ListboxButton>
-        )}
-        {variant === 'default' && (
-          <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-            <LucideIcon
-              icon={ChevronDown}
-              size={20}
-              className="text-base-content/50"
-              aria-hidden="true"
-            />
-          </span>
-        )}
+        <ListboxButton className="btn btn-neutral join-item px-2">
+          <LucideIcon icon={ChevronDown} size={20} aria-hidden="true" />
+        </ListboxButton>
         <Transition
           as={Fragment}
           leave="transition ease-in duration-100"

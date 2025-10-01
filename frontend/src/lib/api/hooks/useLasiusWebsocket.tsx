@@ -24,6 +24,45 @@ import { CONNECTION_STATUS, IS_SERVER, LASIUS_API_WEBSOCKET_URL } from 'projectC
 import { useEffect, useState } from 'react'
 import useWebSocket, { ReadyState } from 'react-use-websocket'
 
+/**
+ * Custom hook for managing WebSocket connection to the Lasius backend.
+ * Provides real-time bidirectional communication for live updates of bookings,
+ * user events, and system notifications with automatic reconnection handling.
+ *
+ * @returns Object containing:
+ *   - sendJsonMessage: Function to send JSON messages to the WebSocket server
+ *   - lastMessage: Most recent parsed message received from the server (null if none)
+ *   - connectionStatus: Current connection status (CONNECTING, CONNECTED, DISCONNECTED, ERROR)
+ *   - messageHistory: Array of all MessageEvent objects received during the session
+ *
+ * @example
+ * const { sendJsonMessage, lastMessage, connectionStatus } = useLasiusWebsocket()
+ *
+ * // Send a message
+ * sendJsonMessage({ type: 'BOOKING_UPDATE', data: bookingData })
+ *
+ * // React to received messages
+ * useEffect(() => {
+ *   if (lastMessage?.type === 'BOOKING_STARTED') {
+ *     console.log('New booking started:', lastMessage.data)
+ *   }
+ * }, [lastMessage])
+ *
+ * // Display connection status
+ * if (connectionStatus === CONNECTION_STATUS.DISCONNECTED) {
+ *   return <ConnectionError />
+ * }
+ *
+ * @remarks
+ * - Automatically reconnects with exponential backoff (max 10s between attempts)
+ * - Makes up to 30 reconnection attempts before giving up
+ * - Clears message history when window loses focus and disconnects
+ * - Shares WebSocket connection across components for efficiency
+ * - Only initializes on client-side (not during SSR)
+ * - Automatically parses incoming messages as JSON
+ * - Logs connection events for debugging purposes
+ * - Connection status maps ReadyState to human-readable CONNECTION_STATUS values
+ */
 export const useLasiusWebsocket = () => {
   const isWindowFocused = useIsWindowFocused()
 

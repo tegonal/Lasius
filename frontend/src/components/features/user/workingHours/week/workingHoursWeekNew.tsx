@@ -70,14 +70,13 @@ export const WorkingHoursWeekNew: React.FC<Props> = ({ organisation }) => {
   return (
     <Card className="overflow-hidden">
       <CardBody className="p-0">
-        {/* Header */}
         <div className="border-base-300 bg-base-200/50 flex items-center justify-between border-b px-4 py-3">
           <div className="flex items-center gap-3">
             <AvatarOrganisation name={organisation.organisationReference.key} size={32} />
             <div>
               <h3 className="font-medium">
                 {organisation.private
-                  ? t('organizations.myPersonalOrganisation', {
+                  ? t('organisations.myPersonalOrganisation', {
                       defaultValue: 'My personal organisation',
                     })
                   : organisation.organisationReference.key}
@@ -97,7 +96,6 @@ export const WorkingHoursWeekNew: React.FC<Props> = ({ organisation }) => {
           </div>
         </div>
 
-        {/* Days Grid */}
         <div className="grid grid-cols-7">
           {week.map((item, index) => {
             const isWeekend = item.day === 'saturday' || item.day === 'sunday'

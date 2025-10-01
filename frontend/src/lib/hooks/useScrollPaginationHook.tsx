@@ -24,6 +24,27 @@ interface UseScrollPagination<E> {
   visibleElements: E[]
 }
 
+/**
+ * Custom hook for implementing infinite scroll pagination with virtual scrolling.
+ * Progressively loads more items as the user scrolls near the bottom of a container.
+ *
+ * @template E - The type of elements in the array
+ * @param elements - The complete array of elements to paginate
+ * @param showItemsPerStep - Number of items to load per pagination step (default: 30)
+ * @param scrollBeforeEnd - Pixel threshold from bottom to trigger next load (default: 50)
+ * @returns Object containing:
+ *   - onScroll: Event handler to attach to the scrollable container
+ *   - visibleElements: Subset of elements currently visible/loaded
+ *
+ * @example
+ * const { onScroll, visibleElements } = useScrollPagination(items, 50, 100)
+ *
+ * return (
+ *   <div onScroll={onScroll} style={{ height: '500px', overflow: 'auto' }}>
+ *     {visibleElements.map(item => <Item key={item.id} {...item} />)}
+ *   </div>
+ * )
+ */
 function useScrollPagination<E>(
   elements: E[],
   showItemsPerStep = 30,

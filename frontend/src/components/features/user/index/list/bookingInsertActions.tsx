@@ -18,14 +18,13 @@
  */
 
 import { Button } from 'components/primitives/buttons/Button'
-import { Icon } from 'components/ui/icons/Icon'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { augmentBookingsList } from 'lib/api/functions/augmentBookingsList'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { ModelsBooking } from 'lib/api/lasius'
 import { useUpdateUserBooking } from 'lib/api/lasius/user-bookings/user-bookings'
 import { formatISOLocale } from 'lib/utils/date/dates'
-import { ArrowDownToLine, ArrowUpToLine, Plus } from 'lucide-react'
+import { ArrowDownToLine, ArrowUpDown, ArrowUpToLine, Plus } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React, { useState } from 'react'
 
@@ -42,11 +41,9 @@ export const BookingInsertActions: React.FC<Props> = ({ currentItem, nextItem, o
   const [isHovered, setIsHovered] = useState(false)
   const { selectedOrganisationId } = useOrganisation()
 
-  // Create hook instances for updating each booking
   const updateCurrentBooking = useUpdateUserBooking(selectedOrganisationId, currentItem.id)
   const updateNextBooking = useUpdateUserBooking(selectedOrganisationId, nextItem?.id || '')
 
-  // Adjust the later booking (currentItem) to start at the end of the earlier booking (nextItem)
   const handleAdjustCurrentStart = async () => {
     if (!nextItem?.end?.dateTime || !selectedOrganisationId) return
 
@@ -58,7 +55,6 @@ export const BookingInsertActions: React.FC<Props> = ({ currentItem, nextItem, o
     })
   }
 
-  // Adjust the earlier booking (nextItem) to end at the start of the later booking (currentItem)
   const handleAdjustNextEnd = async () => {
     if (!nextItem || !currentItem.start?.dateTime || !selectedOrganisationId) return
 
@@ -103,10 +99,10 @@ export const BookingInsertActions: React.FC<Props> = ({ currentItem, nextItem, o
               fullWidth={false}
               size="sm"
               title={t('bookings.actions.insert', {
-                defaultValue: 'Add a booking in between',
+                defaultValue: 'Insert booking',
               })}
               aria-label={t('bookings.actions.insert', {
-                defaultValue: 'Add a booking in between',
+                defaultValue: 'Insert booking',
               })}>
               <LucideIcon icon={Plus} size={16} />
             </Button>
@@ -135,7 +131,7 @@ export const BookingInsertActions: React.FC<Props> = ({ currentItem, nextItem, o
             title={t('bookings.actions.insert', { defaultValue: 'Insert booking' })}
             onClick={onAddBetween}
             fullWidth={false}>
-            <Icon name="expand-vertical-4" size={18} />
+            <LucideIcon icon={ArrowUpDown} size={18} />
           </Button>
         )}
       </div>

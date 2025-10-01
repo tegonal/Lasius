@@ -31,7 +31,6 @@ import React, { useEffect, useState } from 'react'
 
 type ThemeMode = 'light' | 'dark' | 'system'
 
-// Map Theme-UI modes to DaisyUI theme names
 const themeModeToDataTheme: Record<string, string> = {
   light: 'light',
   dark: 'dark',
@@ -44,40 +43,30 @@ export const ColorModeDropdown: React.FC = () => {
   const [activeTheme, setActiveTheme] = useState<ThemeMode>('system')
   const plausible = usePlausible<LasiusPlausibleEvents>()
 
-  // Sync DaisyUI theme with Theme-UI mode on mount and mode change
   useEffect(() => {
     const dataTheme = themeModeToDataTheme[mode] || 'light'
-
-    // Set data-theme attribute on HTML element for DaisyUI/Tailwind
     document.documentElement.setAttribute('data-theme', dataTheme)
 
-    // Save to localStorage only if manually set
     if (typeof window !== 'undefined' && themeSource === 'manual') {
       localStorage.setItem('theme', dataTheme)
     }
   }, [mode, themeSource])
 
-  // Initialize component state based on current theme
   useEffect(() => {
-    // Check if there's a saved theme in localStorage
     const savedTheme = localStorage.getItem('theme')
 
     if (savedTheme) {
-      // User has explicitly set a theme preference
       setThemeSource('manual')
       setActiveTheme(savedTheme as ThemeMode)
 
-      // Sync Theme-UI mode with saved DaisyUI theme
       const themeUIMode = savedTheme === 'dark' ? 'dark' : 'light'
       if (themeUIMode !== mode) {
         setMode(themeUIMode)
       }
     } else {
-      // Following system preference
       setThemeSource('system')
       setActiveTheme('system')
 
-      // Sync with current system preference
       if (typeof window !== 'undefined' && window.matchMedia) {
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
         const systemTheme = prefersDark ? 'dark' : 'light'
@@ -87,13 +76,11 @@ export const ColorModeDropdown: React.FC = () => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []) // Run only on mount
+  }, [])
 
-  // Listen to system preference changes
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return
 
-    // Only listen to system changes if user hasn't set a manual preference
     const savedTheme = localStorage.getItem('theme')
     if (savedTheme) return
 
@@ -105,13 +92,10 @@ export const ColorModeDropdown: React.FC = () => {
       setMode(systemTheme)
     }
 
-    // Modern browsers
     if (mediaQuery.addEventListener) {
       mediaQuery.addEventListener('change', handleChange)
       return () => mediaQuery.removeEventListener('change', handleChange)
-    }
-    // Legacy browsers
-    else if (mediaQuery.addListener) {
+    } else if (mediaQuery.addListener) {
       mediaQuery.addListener(handleChange)
       return () => mediaQuery.removeListener(handleChange)
     }
@@ -121,24 +105,20 @@ export const ColorModeDropdown: React.FC = () => {
     setActiveTheme(theme)
 
     if (theme === 'system') {
-      // Switch to system preference
       setThemeSource('system')
       localStorage.removeItem('theme')
 
-      // Apply system preference
       if (typeof window !== 'undefined' && window.matchMedia) {
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
         const systemTheme = prefersDark ? 'dark' : 'light'
         setMode(systemTheme)
       }
     } else {
-      // Manual theme selection
       setThemeSource('manual')
       setMode(theme)
       localStorage.setItem('theme', theme)
     }
 
-    // Track the action
     plausible('uiAction', {
       props: {
         name: 'colorModeDropdown',
@@ -146,7 +126,6 @@ export const ColorModeDropdown: React.FC = () => {
     })
   }
 
-  // Get current icon based on active theme
   const getCurrentIcon = () => {
     if (activeTheme === 'system') {
       return Monitor

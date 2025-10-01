@@ -42,8 +42,32 @@ import { useContextMenuOpen, useUIActions } from 'stores/uiStore'
 import { mutate } from 'swr'
 
 /**
- * Context menu hook now using Zustand for state management
- * This provides better performance by preventing unnecessary re-renders
+ * Custom hook for managing context menu state and actions for bookings.
+ * Uses Zustand for state management to prevent unnecessary re-renders.
+ * Provides actions for starting bookings, deleting bookings, and managing favorites.
+ *
+ * @returns Object containing:
+ *   - actionAddBookingToFavorites: Function to add a booking to user favorites
+ *   - handleOpenContextMenu: Function to open context menu by hash ID
+ *   - handleCloseContextMenu: Function to close specific context menu by hash ID
+ *   - actionStartBooking: Function to start a new booking (stops current if exists)
+ *   - actionDeleteBooking: Function to delete a booking
+ *   - currentOpenContextMenuId: ID of the currently open context menu
+ *   - handleCloseAll: Function to close all context menus
+ *
+ * @example
+ * const {
+ *   handleOpenContextMenu,
+ *   actionStartBooking,
+ *   actionDeleteBooking,
+ *   currentOpenContextMenuId
+ * } = useContextMenu()
+ *
+ * // Open context menu for a booking
+ * handleOpenContextMenu(bookingHash)
+ *
+ * // Start a booking (automatically stops current one)
+ * await actionStartBooking(orgId, booking)
  */
 export const useContextMenu = () => {
   const { closeModal } = useModal('BookingAddMobileModal')

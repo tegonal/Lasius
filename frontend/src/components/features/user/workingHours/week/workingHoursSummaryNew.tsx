@@ -66,12 +66,12 @@ export const WorkingHoursSummaryNew: React.FC<Props> = ({
             </h2>
             <p className="text-base-content/60 text-sm">
               {t('workingHours.totalHoursDescription', {
-                defaultValue: 'Total hours across all organizations',
+                defaultValue: 'Total hours across all organisations',
               })}
             </p>
           </div>
           <div className="text-right">
-            <div className="text-primary text-3xl font-bold">{totalFormatted}</div>
+            <div className="text-3xl font-bold">{totalFormatted}</div>
             <div className="text-base-content/60 text-xs">
               {t('workingHours.totalPerWeek', { defaultValue: 'total per week' })}
             </div>
@@ -91,7 +91,6 @@ export const WorkingHoursSummaryNew: React.FC<Props> = ({
                   'group hover:bg-base-200/50 flex items-center gap-3 rounded-lg p-2 transition-colors',
                   isWeekend && 'opacity-70',
                 )}>
-                {/* Day label with date */}
                 <div className="w-20 text-sm">
                   <div className="font-medium">{day.label}</div>
                   <div className="text-base-content/50 text-xs">
@@ -99,7 +98,6 @@ export const WorkingHoursSummaryNew: React.FC<Props> = ({
                   </div>
                 </div>
 
-                {/* Visual bar */}
                 <div className="relative flex-1">
                   <div className="bg-base-300/50 h-8 overflow-hidden rounded">
                     <div
@@ -120,7 +118,6 @@ export const WorkingHoursSummaryNew: React.FC<Props> = ({
                     </div>
                   </div>
 
-                  {/* Stacked organization breakdown (on hover) */}
                   {organizationHours && (
                     <div className="absolute inset-0 flex opacity-0 transition-opacity group-hover:opacity-100">
                       {Object.entries(organizationHours).map(([orgId, hours]) => {
@@ -141,7 +138,6 @@ export const WorkingHoursSummaryNew: React.FC<Props> = ({
                   )}
                 </div>
 
-                {/* Hours display */}
                 <div className="w-16 text-right text-sm font-medium">
                   {dayHours > 0 ? decimalHoursToDurationStringRounded(dayHours) : '—'}
                 </div>

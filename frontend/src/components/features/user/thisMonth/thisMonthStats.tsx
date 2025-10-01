@@ -105,7 +105,6 @@ export const ThisMonthStats: React.FC = () => {
 
   return (
     <div className="w-full">
-      {/* Month Stats with month name and year */}
       <Heading variant="section">
         <FormatDate date={selectedDateObj} format="monthNameLong" />{' '}
         <FormatDate date={selectedDateObj} format="year" />
@@ -139,7 +138,6 @@ export const ThisMonthStats: React.FC = () => {
           </StatsGroup>
         </div>
 
-        {/* Top 5 Projects for the month */}
         {topProjects.length > 0 && (
           <div className="flex-1">
             <div className="stats h-fit w-full shadow">
@@ -170,7 +168,6 @@ export const ThisMonthStats: React.FC = () => {
         )}
       </div>
 
-      {/* Weekly Hours Stream Chart */}
       <Heading variant="section">
         {t('statistics.weeklyHoursDistribution', { defaultValue: 'Weekly Hours Distribution' })}
       </Heading>
@@ -182,7 +179,6 @@ export const ThisMonthStats: React.FC = () => {
         />
       </div>
 
-      {/* Week Stats with week number */}
       <Heading variant="section">
         {t('common.time.week', { defaultValue: 'Week' })} {weekNumber}
       </Heading>
@@ -210,7 +206,6 @@ export const ThisMonthStats: React.FC = () => {
         />
       </StatsGroup>
 
-      {/* Day Stats with full date */}
       <Heading variant="section">
         <FormatDate date={selectedDateObj} format="fullDateShort" />
       </Heading>

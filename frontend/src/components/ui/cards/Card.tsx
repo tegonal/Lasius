@@ -77,8 +77,6 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
 
 Card.displayName = 'Card'
 
-// Card sub-components
-
 export interface CardBodyProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
 }
@@ -154,7 +152,6 @@ export const CardFigure = React.forwardRef<HTMLElement, CardFigureProps>(
 
 CardFigure.displayName = 'CardFigure'
 
-// Export variant types for use in other components
 export type CardVariant = VariantProps<typeof cardVariants>['variant']
 export type CardSize = VariantProps<typeof cardVariants>['size']
 export type CardLayout = VariantProps<typeof cardVariants>['layout']

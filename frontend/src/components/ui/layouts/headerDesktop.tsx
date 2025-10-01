@@ -25,7 +25,6 @@ import { CalendarWeekResponsive } from 'components/ui/calendar/CalendarWeekRespo
 import { Logo } from 'components/ui/icons/Logo'
 import { ContainerColumnsHeader } from 'components/ui/layouts/containerColumnsHeader'
 import { HelpButton } from 'components/ui/navigation/HelpButton'
-import { ColorModeDropdown } from 'components/ui/overlays/ColorModeDropdown'
 import { useRouter } from 'next/router'
 import { ROUTES } from 'projectConfig/routes'
 import React from 'react'
@@ -48,7 +47,6 @@ export const HeaderDesktop: React.FC = () => {
         </AnimateChange>
         <div className="flex items-center justify-end gap-2 pr-8">
           <SelectUserOrganisation />
-          <ColorModeDropdown />
           <HelpButton />
           <LogoutButton />
         </div>

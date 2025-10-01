@@ -37,10 +37,10 @@ export const TagGroupList: React.FC<Props> = ({ tags }) => {
       <DataList>
         <DataListRow>
           <DataListHeaderItem>
-            {t('organizations.title', { defaultValue: 'Organisations' })}
+            {t('organisations.title', { defaultValue: 'Organisations' })}
           </DataListHeaderItem>
           <DataListHeaderItem>
-            {t('organizations.title', { defaultValue: 'Organisations' })}
+            {t('organisations.title', { defaultValue: 'Organisations' })}
           </DataListHeaderItem>
           <DataListHeaderItem />
         </DataListRow>

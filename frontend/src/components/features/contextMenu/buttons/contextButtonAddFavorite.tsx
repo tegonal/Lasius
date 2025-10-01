@@ -21,11 +21,12 @@ import { ContextButtonWrapper } from 'components/features/contextMenu/contextBut
 import { ContextCompactButtonWrapper } from 'components/features/contextMenu/contextCompactButtonWrapper'
 import { useContextMenu } from 'components/features/contextMenu/hooks/useContextMenu'
 import { Button } from 'components/primitives/buttons/Button'
-import { Icon } from 'components/ui/icons/Icon'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
+import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { ModelsBooking } from 'lib/api/lasius'
+import { Star } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
-import { useSelectedOrganisationId } from 'stores/organisationStore'
 
 type Props = {
   item: ModelsBooking
@@ -34,7 +35,7 @@ type Props = {
 export const ContextButtonAddFavorite: React.FC<Props> = ({ item, variant }) => {
   const { actionAddBookingToFavorites } = useContextMenu()
   const { t } = useTranslation('common')
-  const selectedOrganisationId = useSelectedOrganisationId()
+  const { selectedOrganisationId } = useOrganisation()
   const Wrapper = variant === 'compact' ? ContextCompactButtonWrapper : ContextButtonWrapper
   return (
     <Wrapper>
@@ -45,7 +46,7 @@ export const ContextButtonAddFavorite: React.FC<Props> = ({ item, variant }) => 
         onClick={() => actionAddBookingToFavorites(selectedOrganisationId, item)}
         fullWidth={false}
         shape="circle">
-        <Icon name="rating-star-add-social-medias-rewards-rating" size={24} />
+        <LucideIcon icon={Star} size={24} />
       </Button>
     </Wrapper>
   )

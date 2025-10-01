@@ -87,6 +87,14 @@ export const AccountForm: React.FC = () => {
     <div className="mx-auto w-full max-w-2xl">
       <Card>
         <CardBody className="p-6">
+          <h2 className="mb-4 text-xl font-semibold">
+            {t('account.profileSettings.title', { defaultValue: 'Profile Information' })}
+          </h2>
+          <p className="text-base-content/70 mb-6 text-sm">
+            {t('account.profileSettings.description', {
+              defaultValue: 'Manage your personal information and account details.',
+            })}
+          </p>
           {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
           <form onSubmit={hookForm.handleSubmit(onSubmit)} onKeyDown={(e) => preventEnterOnForm(e)}>
             <FormBody>
@@ -97,7 +105,7 @@ export const AccountForm: React.FC = () => {
                   <Input id="role" readOnly value={role} tabIndex={-1} disabled />
                 </FormElement>
                 <FormElement
-                  label={t('common.forms.firstName', { defaultValue: 'Firstname' })}
+                  label={t('common.forms.firstName', { defaultValue: 'First name' })}
                   htmlFor="firstName"
                   required>
                   <Input
@@ -112,7 +120,7 @@ export const AccountForm: React.FC = () => {
                   />
                 </FormElement>
                 <FormElement
-                  label={t('common.forms.lastName', { defaultValue: 'Lastname' })}
+                  label={t('common.forms.lastName', { defaultValue: 'Last name' })}
                   htmlFor="lastName"
                   required>
                   <Input

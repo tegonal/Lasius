@@ -37,11 +37,20 @@ import { IsoDateString } from 'lib/api/apiDateHandling'
 import { dateFormat } from 'lib/utils/date/dateFormat'
 import { ModelsWorkingHoursWeekdays } from 'types/common'
 
+/**
+ * Short date format string for displaying dates (e.g., "1.5.2024").
+ */
 export const DATE_FORMAT_SHORT = 'd.M.y'
 
 /**
- * Temporary fix until date-fns returns milliseconds too
- * @param d
+ * Formats a Date object to ISO 8601 string with timezone offset.
+ * Temporary fix until date-fns includes milliseconds in ISO format.
+ *
+ * @param d - The Date object to format
+ * @returns ISO 8601 formatted string with timezone (e.g., "2024-01-15T10:30:00.000+02:00")
+ *
+ * @example
+ * formatISOLocale(new Date('2024-01-15T10:30:00')) // "2024-01-15T10:30:00.000+02:00"
  */
 export const formatISOLocale = (d: Date) => {
   // copied from date-fns
@@ -94,18 +103,52 @@ export const getMonthOfDate = (date: IsoDateString | Date): IsoDateString[] => {
   }).map((date) => formatISOLocale(date))
 }
 
+/**
+ * Calculates the duration between two dates in hours as a decimal number.
+ *
+ * @param start - ISO date string for the start time
+ * @param end - ISO date string for the end time
+ * @returns Duration in hours, rounded to 3 decimal places
+ *
+ * @example
+ * durationInHoursAsNumber('2024-01-15T10:00:00Z', '2024-01-15T13:30:00Z') // 3.5
+ */
 export const durationInHoursAsNumber = (start: IsoDateString, end: IsoDateString) => {
   const durationMillis = differenceInMilliseconds(new Date(end), new Date(start))
   return round(durationMillis / 1000 / 60 / 60, 3)
 }
 
+/**
+ * Calculates the duration between two dates in seconds.
+ *
+ * @param start - ISO date string for the start time
+ * @param end - ISO date string for the end time
+ * @returns Duration in seconds, rounded to 3 decimal places
+ */
 export const durationInSeconds = (start: IsoDateString, end: IsoDateString) => {
   const durationMillis = differenceInMilliseconds(new Date(end), new Date(start))
   return round(durationMillis / 1000, 3)
 }
 
+/**
+ * Pads a time segment number with a leading zero if needed.
+ *
+ * @param n - The number to pad
+ * @returns Zero-padded string (e.g., 5 → "05")
+ */
 const padTimeSegment = (n: number) => padStart(n.toString(), 2, '0')
 
+/**
+ * Converts a duration between two dates to a formatted string (HH:mm).
+ * Includes days converted to hours for durations longer than 24 hours.
+ *
+ * @param start - ISO date string for the start time
+ * @param end - ISO date string for the end time
+ * @returns Duration formatted as "HH:mm"
+ *
+ * @example
+ * durationAsString('2024-01-15T10:00:00Z', '2024-01-15T13:30:00Z') // "03:30"
+ */
 export const durationAsString = (start: IsoDateString, end: IsoDateString) => {
   const {
     days = 0,
@@ -151,15 +194,19 @@ export const decimalHoursToDate = (decimalHours: number) => {
 }
 
 /**
- * Converts a decimal representation of minutes to a zero-padded string representing time as HH:mm
- * @param mins
+ * Converts a decimal representation of minutes to a zero-padded string representing time as HH:mm.
+ *
+ * @param mins - Total minutes as a decimal number
+ * @returns Formatted time string as "HH:mm"
  */
 const decimalMinutesToTimeString = (mins: number) =>
   `${padTimeSegment(Math.floor(mins / 60))}:${padTimeSegment(mins % 60)}`
 
 /**
- * Converts a decimal representation of minutes to an object of hours and minutes as integers
- * @param mins
+ * Converts a decimal representation of minutes to an object of hours and minutes as integers.
+ *
+ * @param mins - Total minutes as a decimal number
+ * @returns Object with separate hours and minutes properties
  */
 const decimalMinutesToDurationObject = (mins: number) => ({
   hours: Math.floor(mins / 60),

@@ -21,10 +21,38 @@ import { ModelsAcceptTOSRequest, ModelsUserSettings } from 'lib/api/lasius'
 import { acceptUserTOS, updateUserSettings, useGetUserProfile } from 'lib/api/lasius/user/user'
 import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
+import { useOrganisationStore } from 'stores/organisationStore'
 
+/**
+ * Custom hook for managing the current user's profile data and authentication state.
+ * Fetches and syncs user profile information with the organisation store,
+ * and provides methods for updating settings and accepting Terms of Service.
+ *
+ * @returns Object containing:
+ *   - firstName: User's first name
+ *   - lastName: User's last name
+ *   - email: User's email address
+ *   - role: User's role in the system
+ *   - profile: Complete user profile data
+ *   - userId: User's unique identifier
+ *   - lasiusIsLoggedIn: Boolean indicating if user is authenticated
+ *   - updateSettings: Function to update user settings
+ *   - acceptedTOSVersion: Version of TOS the user has accepted
+ *   - acceptTOS: Function to accept a new TOS version
+ *
+ * @example
+ * const { profile, lasiusIsLoggedIn, updateSettings } = useProfile()
+ *
+ * if (!lasiusIsLoggedIn) {
+ *   return <LoginPrompt />
+ * }
+ *
+ * await updateSettings({ theme: 'dark' })
+ */
 export const useProfile = () => {
   const session = useSession()
   const [enabled, setEnabled] = useState(false)
+  const syncFromProfile = useOrganisationStore((state) => state.syncFromProfile)
 
   useEffect(() => {
     setEnabled(session.data?.access_token !== undefined)
@@ -39,6 +67,13 @@ export const useProfile = () => {
       shouldRetryOnError: true,
     },
   })
+
+  // Sync organisation store whenever profile data changes
+  useEffect(() => {
+    if (data) {
+      syncFromProfile(data)
+    }
+  }, [data, syncFromProfile])
 
   const updateSettings = async (updateData: Partial<ModelsUserSettings>) => {
     if (data) {

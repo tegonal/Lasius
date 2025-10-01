@@ -17,6 +17,18 @@
  *
  */
 
+/**
+ * Checks if a string contains a substring, case-insensitively.
+ *
+ * @param string - The string to search in
+ * @param cmpString - The substring to search for
+ * @returns True if the substring is found (case-insensitive), false otherwise
+ *
+ * @example
+ * includesInsensitive('Hello World', 'world') // true
+ * includesInsensitive('Hello World', 'HELLO') // true
+ * includesInsensitive('Hello World', 'xyz') // false
+ */
 export const includesInsensitive = (string: string, cmpString: string): boolean => {
   return string.toLowerCase().indexOf(cmpString.toLowerCase()) !== -1
 }

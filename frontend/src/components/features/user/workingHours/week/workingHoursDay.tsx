@@ -23,7 +23,7 @@ import { useToast } from 'components/ui/feedback/hooks/useToast'
 import { FieldSet } from 'components/ui/forms/FieldSet'
 import { FormElement } from 'components/ui/forms/FormElement'
 import { InputDatePicker2 } from 'components/ui/forms/input/datePicker2/InputDatePicker2'
-import { Icon } from 'components/ui/icons/Icon'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import useModal from 'components/ui/overlays/modal/hooks/useModal'
 import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
 import { getHours, getMinutes } from 'date-fns'
@@ -33,6 +33,7 @@ import { ModelsUserOrganisation } from 'lib/api/lasius'
 import { updateWorkingHoursByOrganisation } from 'lib/api/lasius/user-organisations/user-organisations'
 import { getGetUserProfileKey } from 'lib/api/lasius/user/user'
 import { plannedWorkingHoursStub } from 'lib/utils/date/stubPlannedWorkingHours'
+import { Pencil } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React, { useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -93,7 +94,7 @@ export const WorkingHoursDay: React.FC<Props> = ({ item, organisation }) => {
                 <FormatDate date={item.date} format="dayNameShort" />
               </div>
               <div>{item.displayValue}</div>
-              <Icon name="pencil-2-interface-essential" size={18} />
+              <LucideIcon icon={Pencil} size={18} />
             </Button>
           </div>
         </div>

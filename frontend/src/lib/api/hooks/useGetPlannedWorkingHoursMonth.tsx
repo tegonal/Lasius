@@ -25,6 +25,29 @@ import { plannedWorkingHoursStub } from 'lib/utils/date/stubPlannedWorkingHours'
 import { UI_SLOW_DATA_DEDUPE_INTERVAL } from 'projectConfig/intervals'
 import { useMemo } from 'react'
 
+/**
+ * Custom hook for calculating total planned working hours for an entire month.
+ * Retrieves the user's configured working hours and sums them up for all days
+ * in the month containing the given date.
+ *
+ * @param date - ISO date string for any day within the target month (format: 'YYYY-MM-DD')
+ *
+ * @returns Object containing:
+ *   - plannedHoursMonth: Total planned working hours for the entire month
+ *
+ * @example
+ * const { plannedHoursMonth } = useGetPlannedWorkingHoursMonth('2025-01-15')
+ *
+ * console.log(`Expected hours for January: ${plannedHoursMonth}`)
+ *
+ * @remarks
+ * - Calculates based on the user's weekly working hour pattern
+ * - Accounts for different hours on different weekdays (e.g., 8h Mon-Fri, 0h weekends)
+ * - Falls back to plannedWorkingHoursStub if no working hours are configured
+ * - Uses the last selected organisation from user settings
+ * - Uses slow revalidation (UI_SLOW_DATA_DEDUPE_INTERVAL) as working hours rarely change
+ * - Efficiently memoized to prevent unnecessary recalculations
+ */
 export const useGetPlannedWorkingHoursMonth = (date: IsoDateString) => {
   const { data } = useGetUserProfile({
     swr: {

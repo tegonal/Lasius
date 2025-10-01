@@ -22,15 +22,17 @@ import { ContextButtonClose } from 'components/features/contextMenu/buttons/cont
 import { ContextButtonOpen } from 'components/features/contextMenu/buttons/contextButtonOpen'
 import { ContextAnimatePresence } from 'components/features/contextMenu/contextAnimatePresence'
 import { ContextBar } from 'components/features/contextMenu/contextBar'
+import { ContextBarDivider } from 'components/features/contextMenu/contextBarDivider'
 import { ContextBody } from 'components/features/contextMenu/contextBody'
 import { ContextButtonWrapper } from 'components/features/contextMenu/contextButtonWrapper'
 import { useContextMenu } from 'components/features/contextMenu/hooks/useContextMenu'
 import { Button } from 'components/primitives/buttons/Button'
-import { Icon } from 'components/ui/icons/Icon'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import useModal from 'components/ui/overlays/modal/hooks/useModal'
 import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
 import { AnimatePresence } from 'framer-motion'
 import { ModelsBooking } from 'lib/api/lasius'
+import { Pencil } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
 
@@ -66,10 +68,11 @@ export const BookingCurrentEntryContext: React.FC<Props> = ({ item }) => {
                     onClick={editCurrentBooking}
                     fullWidth={false}
                     shape="circle">
-                    <Icon name="time-clock-file-edit-interface-essential" size={24} />
+                    <LucideIcon icon={Pencil} size={24} />
                   </Button>
                 </ContextButtonWrapper>
                 <ContextButtonAddFavorite item={item} />
+                <ContextBarDivider />
                 <ContextButtonClose />
               </ContextBar>
             </ContextAnimatePresence>

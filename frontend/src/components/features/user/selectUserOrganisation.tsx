@@ -43,7 +43,7 @@ export const SelectUserOrganisation: React.FC = () => {
         <AvatarOrganisation name={selectedOrganisationKey || ''} size={24} />
         <span>
           {selectedOrganisation?.private
-            ? t('organizations.myPersonalOrganisation', {
+            ? t('organisations.myPersonalOrganisation', {
                 defaultValue: 'My personal organisation',
               })
             : selectedOrganisationKey}

@@ -23,24 +23,25 @@ import { ContextButtonOpen } from 'components/features/contextMenu/buttons/conte
 import { ContextButtonStartBooking } from 'components/features/contextMenu/buttons/contextButtonStartBooking'
 import { ContextAnimatePresence } from 'components/features/contextMenu/contextAnimatePresence'
 import { ContextBar } from 'components/features/contextMenu/contextBar'
+import { ContextBarDivider } from 'components/features/contextMenu/contextBarDivider'
 import { ContextBody } from 'components/features/contextMenu/contextBody'
 import { ContextButtonWrapper } from 'components/features/contextMenu/contextButtonWrapper'
 import { useContextMenu } from 'components/features/contextMenu/hooks/useContextMenu'
 import { BookingAddUpdateForm } from 'components/features/user/index/bookingAddUpdateForm'
 import { Button } from 'components/primitives/buttons/Button'
-import { Icon } from 'components/ui/icons/Icon'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import useModal from 'components/ui/overlays/modal/hooks/useModal'
 import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
+import { differenceInSeconds } from 'date-fns'
 import { AnimatePresence } from 'framer-motion'
 import { useGetAdjacentBookings } from 'lib/api/hooks/useGetAdjacentBookings'
+import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { ModelsBooking } from 'lib/api/lasius'
 import { updateUserBooking } from 'lib/api/lasius/user-bookings/user-bookings'
 import { formatISOLocale } from 'lib/utils/date/dates'
-import { ArrowDownToLine, ArrowUpToLine } from 'lucide-react'
+import { ArrowDownToLine, ArrowUpToLine, Pencil, Trash2 } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
-import { useSelectedOrganisationId } from 'stores/organisationStore'
 
 type Props = {
   item: ModelsBooking
@@ -50,8 +51,24 @@ export const BookingItemContext: React.FC<Props> = ({ item }) => {
   const { modalId, openModal, closeModal } = useModal(`EditModal-${item.id}`)
   const { t } = useTranslation('common')
   const { currentOpenContextMenuId, handleCloseAll } = useContextMenu()
-  const selectedOrganisationId = useSelectedOrganisationId()
+  const { selectedOrganisationId } = useOrganisation()
   const { previous: previousBooking, next: nextBooking } = useGetAdjacentBookings(item)
+
+  // Helper function to check if two times are within 1 minute of each other
+  const areTimesWithinOneMinute = (time1: string | Date, time2: string | Date): boolean => {
+    return Math.abs(differenceInSeconds(time1, time2)) <= 60
+  }
+
+  // Check if start time needs adjustment (not already aligned with previous end)
+  const shouldShowStartAdjustment =
+    previousBooking?.end?.dateTime &&
+    !areTimesWithinOneMinute(item.start.dateTime, previousBooking.end.dateTime)
+
+  // Check if end time needs adjustment (not already aligned with next start)
+  const shouldShowEndAdjustment =
+    nextBooking?.start?.dateTime &&
+    item.end &&
+    !areTimesWithinOneMinute(item.end.dateTime, nextBooking.start.dateTime)
 
   const deleteItem = async () => {
     const { deleteUserBooking } = await import('lib/api/lasius/user-bookings/user-bookings')
@@ -111,10 +128,10 @@ export const BookingItemContext: React.FC<Props> = ({ item }) => {
                     onClick={() => updateItem()}
                     fullWidth={false}
                     shape="circle">
-                    <Icon name="time-clock-file-edit-interface-essential" size={24} />
+                    <LucideIcon icon={Pencil} size={24} />
                   </Button>
                 </ContextButtonWrapper>
-                {previousBooking?.end?.dateTime && (
+                {shouldShowStartAdjustment && (
                   <ContextButtonWrapper>
                     <Button
                       variant="contextIcon"
@@ -131,7 +148,7 @@ export const BookingItemContext: React.FC<Props> = ({ item }) => {
                     </Button>
                   </ContextButtonWrapper>
                 )}
-                {nextBooking?.start?.dateTime && item.end && (
+                {shouldShowEndAdjustment && (
                   <ContextButtonWrapper>
                     <Button
                       variant="contextIcon"
@@ -157,9 +174,10 @@ export const BookingItemContext: React.FC<Props> = ({ item }) => {
                     onClick={() => deleteItem()}
                     fullWidth={false}
                     shape="circle">
-                    <Icon name="bin-2-alternate-interface-essential" size={24} />
+                    <LucideIcon icon={Trash2} size={24} />
                   </Button>
                 </ContextButtonWrapper>
+                <ContextBarDivider />
                 <ContextButtonClose />
               </ContextBar>
             </ContextAnimatePresence>

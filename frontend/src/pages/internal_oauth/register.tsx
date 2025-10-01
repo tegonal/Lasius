@@ -18,7 +18,8 @@
  */
 
 import { AxiosError } from 'axios'
-import { LoginLayout } from 'components/features/login/loginLayout'
+import { RegisterInfoPanel } from 'components/features/login/authInfoPanels'
+import { AuthLayout } from 'components/features/login/authLayout'
 import { Button } from 'components/primitives/buttons/Button'
 import { Input } from 'components/primitives/inputs/Input'
 import { Card, CardBody } from 'components/ui/cards/Card'
@@ -29,15 +30,15 @@ import { FormBody } from 'components/ui/forms/FormBody'
 import { FormElement } from 'components/ui/forms/FormElement'
 import { FormErrorBadge } from 'components/ui/forms/formErrorBadge'
 import { FormErrorsMultiple } from 'components/ui/forms/formErrorsMultiple'
-import { Icon } from 'components/ui/icons/Icon'
 import { Logo } from 'components/ui/icons/Logo'
-import { TegonalFooter } from 'components/ui/navigation/TegonalFooter'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { registerOAuthUser } from 'lib/api/lasius/oauth2-provider/oauth2-provider'
+import { getServerSidePropsWithoutAuth } from 'lib/auth/getServerSidePropsWithoutAuth'
 import { LasiusPlausibleEvents } from 'lib/telemetry/plausibleEvents'
 import { usePlausible } from 'lib/telemetry/usePlausible'
+import { Eye, EyeOff } from 'lucide-react'
 import { GetServerSideProps, NextPage } from 'next'
 import { useTranslation } from 'next-i18next'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -127,33 +128,32 @@ export const OAuthUserRegister: NextPage<{ locale?: string }> = ({ locale }) => 
   }
 
   return (
-    <LoginLayout>
+    <AuthLayout infoPanel={<RegisterInfoPanel />}>
       {error && (
-        <Alert variant="warning" className="max-w-md">
+        <Alert variant="warning" className="animate-[fadeIn_0.4s_ease-out]">
           {error === 'user_already_registered'
             ? t('auth.errors.userAlreadyRegistered', { defaultValue: 'User already registered' })
             : t('auth.errors.registerUnknown', { defaultValue: 'Unknown registration error' })}
         </Alert>
       )}
       {invitation_id && (
-        <Alert variant="info" className="max-w-md">
+        <Alert variant="info" className="animate-[fadeIn_0.4s_ease-out]">
           {t('invitations.createAccountMessage', {
             defaultValue:
               'You have been invited to create an account so that you can use Lasius to track your working hours.',
           })}
         </Alert>
       )}
-      <Card shadow="lg" className="w-full max-w-md">
-        <CardBody className="gap-6 p-8">
-          <div className="flex justify-center">
+      <Card className="bg-base-100/80 border-0 shadow-2xl backdrop-blur-sm">
+        <CardBody className="p-8 lg:p-10">
+          <div className="mb-4 flex justify-center lg:hidden">
             <Logo />
           </div>
-          <div className="h-4" />
-          <div className="space-y-3 text-center">
-            <p className="text-xl font-semibold">
+          <div className="mb-8 text-center">
+            <h2 className="mb-2 text-3xl font-bold">
               {t('auth.createYourAccount', { defaultValue: 'Create your account' })}
-            </p>
-            <p className="text-base-content/70 text-sm">
+            </h2>
+            <p className="text-base-content/60 text-sm">
               {t('auth.fillDetailsToStart', {
                 defaultValue: 'Please fill in your details to get started',
               })}
@@ -176,7 +176,7 @@ export const OAuthUserRegister: NextPage<{ locale?: string }> = ({ locale }) => 
                   <FormErrorBadge id="email-error" error={errors.email} />
                 </FormElement>
                 <FormElement
-                  label={t('common.forms.firstName', { defaultValue: 'Firstname' })}
+                  label={t('common.forms.firstName', { defaultValue: 'First name' })}
                   htmlFor="firstName"
                   required>
                   <Input
@@ -188,7 +188,7 @@ export const OAuthUserRegister: NextPage<{ locale?: string }> = ({ locale }) => 
                   <FormErrorBadge id="firstName-error" error={errors.firstName} />
                 </FormElement>
                 <FormElement
-                  label={t('common.forms.lastName', { defaultValue: 'Lastname' })}
+                  label={t('common.forms.lastName', { defaultValue: 'Last name' })}
                   htmlFor="lastName"
                   required>
                   <Input
@@ -245,12 +245,7 @@ export const OAuthUserRegister: NextPage<{ locale?: string }> = ({ locale }) => 
                   variant="ghost"
                   fullWidth
                   className="justify-start gap-2">
-                  <Icon
-                    name={
-                      showPasswords ? 'view-1-interface-essential' : 'view-off-interface-essential'
-                    }
-                    size={24}
-                  />
+                  <LucideIcon icon={showPasswords ? Eye : EyeOff} size={24} />
                   <span>
                     {showPasswords
                       ? t('ui.hidePasswords', { defaultValue: 'Hide passwords' })
@@ -265,20 +260,12 @@ export const OAuthUserRegister: NextPage<{ locale?: string }> = ({ locale }) => 
           </form>
         </CardBody>
       </Card>
-      <TegonalFooter />
-    </LoginLayout>
+    </AuthLayout>
   )
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { locale, query } = context
-  const resolvedLocale = query.locale?.toString() || locale
-  return {
-    props: {
-      ...(await serverSideTranslations(resolvedLocale || '', ['common'])),
-      locale: resolvedLocale,
-    },
-  }
+  return getServerSidePropsWithoutAuth(context)
 }
 
 export default OAuthUserRegister

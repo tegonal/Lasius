@@ -24,7 +24,7 @@ import { BookingCurrentNoBooking } from 'components/features/user/index/current/
 import { Button } from 'components/primitives/buttons/Button'
 import { AnimateChange } from 'components/ui/animations/motion/animateChange'
 import { TagList } from 'components/ui/data-display/TagList'
-import { Icon } from 'components/ui/icons/Icon'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { roundToNearestMinutes } from 'date-fns'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import {
@@ -34,6 +34,7 @@ import {
 } from 'lib/api/lasius/user-bookings/user-bookings'
 import { cn } from 'lib/utils/cn'
 import { formatISOLocale } from 'lib/utils/date/dates'
+import { Square } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import { ROUTES } from 'projectConfig/routes'
@@ -85,7 +86,7 @@ export const BookingCurrentEntry: React.FC<Props> = ({ inContainer = false }) =>
                 defaultValue: 'Stop recording current time booking',
               })}
               fullWidth={false}>
-              <Icon name="controls-stop-video-movies-tv" size={24} />
+              <LucideIcon icon={Square} size={24} />
             </Button>
             <div
               className={cn(

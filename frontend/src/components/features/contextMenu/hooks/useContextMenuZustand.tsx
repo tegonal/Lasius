@@ -42,8 +42,32 @@ import { mutate } from 'swr'
 import { useIsClient } from 'usehooks-ts'
 
 /**
- * Updated version of useContextMenu that uses Zustand for state management
- * This provides better performance by preventing unnecessary re-renders
+ * Enhanced context menu hook with Zustand state management and live current booking tracking.
+ * Similar to useContextMenu but fetches and uses current booking data directly.
+ * Provides optimized performance by preventing unnecessary re-renders.
+ *
+ * @returns Object containing:
+ *   - actionAddBookingToFavorites: Function to add a booking to user favorites
+ *   - handleOpenContextMenu: Function to open context menu by hash ID
+ *   - handleCloseContextMenu: Function to close specific context menu by hash ID
+ *   - actionStartBooking: Function to start a new booking (stops current if exists)
+ *   - actionDeleteBooking: Function to delete a booking
+ *   - currentOpenContextMenuId: ID of the currently open context menu
+ *   - handleCloseAll: Function to close all context menus
+ *
+ * @remarks
+ * This version uses `useGetUserBookingCurrent` to access live current booking data,
+ * whereas useContextMenu fetches it only when needed.
+ *
+ * @example
+ * const {
+ *   actionStartBooking,
+ *   currentOpenContextMenuId,
+ *   handleCloseAll
+ * } = useContextMenuZustand()
+ *
+ * // Start booking (handles stopping current booking automatically)
+ * await actionStartBooking(orgId, selectedBooking)
  */
 export const useContextMenuZustand = () => {
   const { closeModal } = useModal('BookingAddMobileModal')

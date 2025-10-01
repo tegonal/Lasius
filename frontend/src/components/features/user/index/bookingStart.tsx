@@ -24,7 +24,7 @@ import { FormBody } from 'components/ui/forms/FormBody'
 import { FormElement } from 'components/ui/forms/FormElement'
 import { InputSelectAutocomplete } from 'components/ui/forms/input/InputSelectAutocomplete'
 import { InputTagsAutocomplete } from 'components/ui/forms/input/InputTagsAutocomplete'
-import { Icon } from 'components/ui/icons/Icon'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import useModal from 'components/ui/overlays/modal/hooks/useModal'
 import { roundToNearestMinutes } from 'date-fns'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
@@ -32,6 +32,7 @@ import { useProjects } from 'lib/api/hooks/useProjects'
 import { startUserBookingCurrent } from 'lib/api/lasius/user-bookings/user-bookings'
 import { useGetTagsByProject } from 'lib/api/lasius/user-organisations/user-organisations'
 import { formatISOLocale } from 'lib/utils/date/dates'
+import { Timer } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React, { useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -116,7 +117,7 @@ export const BookingStart: React.FC = () => {
             </FieldSet>
             <ButtonGroup>
               <Button type="submit" disabled={isSubmitting}>
-                <Icon name="stopwatch-interface-essential" size={24} />
+                <LucideIcon icon={Timer} size={24} />
                 {t('bookings.actions.start', { defaultValue: 'Start booking' })}
               </Button>
             </ButtonGroup>

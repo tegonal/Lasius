@@ -25,6 +25,34 @@ import { useGetUserBookingListByOrganisation } from 'lib/api/lasius/user-booking
 import { formatISOLocale } from 'lib/utils/date/dates'
 import { useMemo } from 'react'
 
+/**
+ * Custom hook for finding the adjacent bookings (previous and next) relative to a given booking.
+ * Fetches all bookings for the same day as the provided booking and identifies its neighbors
+ * in chronological order.
+ *
+ * @param item - The booking to find adjacent bookings for (or undefined)
+ *
+ * @returns Object containing:
+ *   - previous: The chronologically previous booking (later in time, or null if none)
+ *   - next: The chronologically next booking (earlier in time, or null if none)
+ *
+ * @example
+ * const currentBooking = { id: '123', start: { dateTime: '2025-01-15T10:00:00Z' }, ... }
+ * const { previous, next } = useGetAdjacentBookings(currentBooking)
+ *
+ * if (previous) {
+ *   console.log('Previous booking:', previous.id)
+ * }
+ * if (next) {
+ *   console.log('Next booking:', next.id)
+ * }
+ *
+ * @remarks
+ * - Bookings are sorted in reverse chronological order (newest first)
+ * - Returns null for previous/next if no adjacent bookings exist
+ * - Uses the selected organisation from the organisation store
+ * - Only fetches bookings for the same day as the provided booking
+ */
 export const useGetAdjacentBookings = (item: ModelsBooking | undefined) => {
   const { selectedOrganisationId } = useOrganisation()
   const { data: bookings } = useGetUserBookingListByOrganisation(

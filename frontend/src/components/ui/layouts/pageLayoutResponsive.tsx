@@ -25,7 +25,7 @@ type Props = {
 
 export const PageLayoutResponsive: React.FC<Props> = ({ children }) => {
   return (
-    <div className="mx-auto grid h-full w-full grid-rows-[116px_auto] gap-0 px-2 pt-2 min-[1680px]:w-[1500px] md:grid-rows-[148px_auto] md:px-4 md:pt-0 lg:px-8 2xl:w-[1400px] 2xl:px-0">
+    <div className="mx-auto grid h-full w-full grid-rows-[116px_auto] gap-0 pt-2 min-[1680px]:w-[1500px] md:grid-rows-[148px_auto] md:px-4 md:pt-0 lg:px-8 2xl:w-[1400px] 2xl:px-0">
       {children}
     </div>
   )

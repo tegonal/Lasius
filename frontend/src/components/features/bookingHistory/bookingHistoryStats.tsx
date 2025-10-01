@@ -17,7 +17,6 @@
  *
  */
 
-import { Heading } from 'components/primitives/typography/Heading'
 import { StatsGroup } from 'components/ui/data-display/StatsGroup'
 import { StatsTileHours } from 'components/ui/data-display/StatsTileHours'
 import { StatsTileNumber } from 'components/ui/data-display/StatsTileNumber'
@@ -27,27 +26,38 @@ import React from 'react'
 type Props = {
   hours: number
   bookings: number
+  users?: number
+  projects?: number
 }
 
-export const BookingHistoryStats: React.FC<Props> = ({ hours, bookings }) => {
+export const BookingHistoryStats: React.FC<Props> = ({ hours, bookings, users, projects }) => {
   const { t } = useTranslation('common')
   return (
-    <div className="w-full">
-      <Heading variant="section">
-        {t('bookingHistory.stats.currentSelection', { defaultValue: 'Current selection' })}
-      </Heading>
-      <StatsGroup className="w-full pb-4">
-        <StatsTileHours
-          value={hours}
-          label={t('common.units.hours', { defaultValue: 'Hours' })}
-          standalone={false}
-        />
+    <StatsGroup className="flex gap-4">
+      <StatsTileHours
+        value={hours}
+        label={t('common.units.hours', { defaultValue: 'Hours' })}
+        standalone={false}
+      />
+      <StatsTileNumber
+        value={bookings}
+        label={t('bookings.title', { defaultValue: 'Bookings' })}
+        standalone={false}
+      />
+      {users !== undefined && users > 1 && (
         <StatsTileNumber
-          value={bookings}
-          label={t('bookings.title', { defaultValue: 'Bookings' })}
+          value={users}
+          label={t('users.title', { defaultValue: 'Users' })}
           standalone={false}
         />
-      </StatsGroup>
-    </div>
+      )}
+      {projects !== undefined && projects > 1 && (
+        <StatsTileNumber
+          value={projects}
+          label={t('projects.title', { defaultValue: 'Projects' })}
+          standalone={false}
+        />
+      )}
+    </StatsGroup>
   )
 }

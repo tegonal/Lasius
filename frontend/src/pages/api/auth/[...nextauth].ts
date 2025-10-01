@@ -48,8 +48,8 @@ const internalProvider: OAuthConfig<any> = {
   id: AUTH_PROVIDER_INTERNAL_LASIUS,
   // wrap into `t` to ensure we have a translation to it
   name:
-    t('auth.providers.internalLasius', { defaultValue: 'Internal Lasius Sign in' }) ||
-    'Internal Lasius Sign in',
+    t('auth.providers.internalLasius', { defaultValue: 'Internal Lasius Sign-in' }) ||
+    'Internal Lasius Sign-in',
   version: '2.0',
   type: 'oauth',
   // redirect to local login page

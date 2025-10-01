@@ -21,12 +21,13 @@ import { ContextButtonWrapper } from 'components/features/contextMenu/contextBut
 import { ContextCompactButtonWrapper } from 'components/features/contextMenu/contextCompactButtonWrapper'
 import { useContextMenu } from 'components/features/contextMenu/hooks/useContextMenu'
 import { Button } from 'components/primitives/buttons/Button'
-import { Icon } from 'components/ui/icons/Icon'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { ModalConfirm } from 'components/ui/overlays/modal/modalConfirm'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { useProfile } from 'lib/api/hooks/useProfile'
 import { ModelsUserProject } from 'lib/api/lasius'
 import { removeProjectUser } from 'lib/api/lasius/projects/projects'
+import { Trash2 } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
 
@@ -61,7 +62,7 @@ export const ContextButtonDeactivateProject: React.FC<Props> = ({ variant = 'def
         onClick={() => setShowDialog(true)}
         fullWidth={false}
         shape="circle">
-        <Icon name="bin-2-alternate-interface-essential" size={24} />
+        <LucideIcon icon={Trash2} size={24} />
       </Button>
       {showDialog && (
         <ModalConfirm

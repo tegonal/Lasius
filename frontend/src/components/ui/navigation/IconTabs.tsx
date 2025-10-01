@@ -20,12 +20,12 @@
 import { Button } from 'components/primitives/buttons/Button'
 import { ScrollContainer } from 'components/primitives/layout/ScrollContainer'
 import { SelectedTabIcon } from 'components/ui/animations/motion/selectedTabIcon'
-import { Icon } from 'components/ui/icons/Icon'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { AnimatePresence, m } from 'framer-motion'
 import { cn } from 'lib/utils/cn'
+import { LucideIcon as LucideIconType } from 'lucide-react'
 import React, { useEffect, useId, useState } from 'react'
 import { useTabViews, useUIActions } from 'stores/uiStore'
-import { IconNames } from 'types/iconNames'
 
 const PresenceItem = m.div
 
@@ -33,7 +33,7 @@ export type IconTabsItem = {
   id: string
   name: string
   component: React.ReactNode
-  icon: IconNames
+  icon: LucideIconType
   routes?: string[]
 }
 
@@ -90,7 +90,7 @@ export const IconTabs: React.FC<Props> = ({ tabs, position = 'top', initialTab =
               title={item.name}
               aria-label={item.name}
               fullWidth={false}>
-              <Icon name={item.icon} size={24} />
+              <LucideIcon icon={item.icon} size={24} />
             </Button>
           </div>
         ))}

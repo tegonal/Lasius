@@ -21,6 +21,7 @@ import { ContextButtonClose } from 'components/features/contextMenu/buttons/cont
 import { ContextButtonLeaveProject } from 'components/features/contextMenu/buttons/contextButtonLeaveProject'
 import { ContextButtonOpen } from 'components/features/contextMenu/buttons/contextButtonOpen'
 import { ContextBar } from 'components/features/contextMenu/contextBar'
+import { ContextBarDivider } from 'components/features/contextMenu/contextBarDivider'
 import { ContextCompactAnimatePresence } from 'components/features/contextMenu/contextCompactAnimatePresence'
 import { ContextCompactBody } from 'components/features/contextMenu/contextCompactBody'
 import { useContextMenu } from 'components/features/contextMenu/hooks/useContextMenu'
@@ -44,6 +45,7 @@ export const MyProjectsListItemMemberContext: React.FC<Props> = ({ item }) => {
             <ContextCompactAnimatePresence>
               <ContextBar>
                 <ContextButtonLeaveProject item={item} variant="compact" />
+                <ContextBarDivider />
                 <ContextButtonClose variant="compact" />
               </ContextBar>
             </ContextCompactAnimatePresence>

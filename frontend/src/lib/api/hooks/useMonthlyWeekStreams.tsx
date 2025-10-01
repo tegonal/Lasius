@@ -31,6 +31,37 @@ import {
 } from 'lib/schemas/chartSchemas'
 import { useMemo } from 'react'
 
+/**
+ * Custom hook for generating monthly week stream chart data for Nivo stream chart visualization.
+ * Fetches all bookings for a month and transforms them into a week-by-week, day-by-day format
+ * suitable for rendering multi-dimensional time distribution charts.
+ *
+ * @param date - ISO date string for any day within the target month (format: 'YYYY-MM-DD')
+ *
+ * @returns MonthlyWeekStreamChartData object containing:
+ *   - data: Array of 7 objects (one per weekday), each with properties for each week's hours
+ *   - keys: Array of week labels that have booking data (e.g., ['Week 1', 'Week 2'])
+ *   - isLoading: Boolean indicating if data is currently being fetched
+ *   - hasData: Boolean indicating if there is any booking data to display
+ *
+ * @example
+ * const chartData = useMonthlyWeekStreams('2025-01-15')
+ *
+ * if (chartData.isLoading) return <Loading />
+ * if (!chartData.hasData) return <EmptyState />
+ *
+ * return <StreamChart data={chartData.data} keys={chartData.keys} />
+ *
+ * @remarks
+ * - Data structure: 7 weekday objects, each containing hours for each week
+ * - Week numbers are calculated using date-fns getWeek with weekStartsOn: 1 (Monday)
+ * - Only includes weeks that have non-zero booking hours
+ * - Validates data structure in development mode and logs errors
+ * - Returns empty array structure (7 empty objects) if no bookings exist
+ * - Uses 30s deduplication interval to optimize performance
+ * - Hours are rounded to 2 decimal places for chart display
+ * - Format example: [{ "Week 1": 8.5, "Week 2": 7.25 }, ...] for each weekday
+ */
 export const useMonthlyWeekStreams = (date: string): MonthlyWeekStreamChartData => {
   const { selectedOrganisationId } = useOrganisation()
 

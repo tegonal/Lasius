@@ -18,14 +18,14 @@
  */
 
 import { Button } from 'components/primitives/buttons/Button'
-import { Icon } from 'components/ui/icons/Icon'
-import { useOrganisation } from 'lib/api/hooks/useOrganisation'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { useSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import { AUTH_PROVIDER_INTERNAL_LASIUS } from 'projectConfig/constants'
 import { getNavigation, NavigationRouteType } from 'projectConfig/routes'
 import React from 'react'
+import { useIsAdministrator } from 'stores/organisationStore'
 import { useIsClient } from 'usehooks-ts'
 
 const NavigationButton: React.FC<{ item: NavigationRouteType }> = ({ item }) => {
@@ -41,7 +41,7 @@ const NavigationButton: React.FC<{ item: NavigationRouteType }> = ({ item }) => 
       variant={router.route === item.route ? 'navigationActive' : 'navigation'}
       onClick={() => router.push(item.route)}
       fullWidth>
-      <Icon name={item.icon} size={24} />
+      <LucideIcon icon={item.icon} size={24} />
       <div>{t(item.name as any)}</div>
     </Button>
   )
@@ -52,7 +52,7 @@ type Props = {
 }
 
 export const NavigationTabContent: React.FC<Props> = ({ branch }) => {
-  const { isAdministrator } = useOrganisation()
+  const isAdministrator = useIsAdministrator()
   const session = useSession()
 
   return (

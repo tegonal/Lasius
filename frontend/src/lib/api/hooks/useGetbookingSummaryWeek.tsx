@@ -27,6 +27,34 @@ import { useGetUserBookingListByOrganisation } from 'lib/api/lasius/user-booking
 import { UI_SLOW_DATA_DEDUPE_INTERVAL } from 'projectConfig/intervals'
 import { useMemo } from 'react'
 
+/**
+ * Custom hook for retrieving a comprehensive summary of bookings for a specific week.
+ * Fetches all bookings for the week containing the given date, calculates totals, and compares
+ * them against planned working hours to provide progress metrics.
+ *
+ * @param date - ISO date string for any day within the target week (format: 'YYYY-MM-DD')
+ *
+ * @returns Object containing:
+ *   - hours: Total hours booked for the week
+ *   - minutes: Total minutes booked for the week
+ *   - bookings: Array of bookings for the week
+ *   - plannedWorkingHours: Expected working hours for the week
+ *   - fulfilledPercentage: Percentage of planned hours completed (capped at 100%)
+ *   - progressBarPercentage: Actual percentage for progress bar display (can exceed 100%)
+ *
+ * @example
+ * const weeklySummary = useGetBookingSummaryWeek('2025-01-15')
+ *
+ * console.log(`Worked ${weeklySummary.hours} hours out of ${weeklySummary.plannedWorkingHours}`)
+ * console.log(`Weekly progress: ${weeklySummary.fulfilledPercentage}%`)
+ *
+ * @remarks
+ * - Uses aggressive revalidation for current week (2s dedupe) for real-time updates
+ * - Uses slower revalidation for past weeks (UI_SLOW_DATA_DEDUPE_INTERVAL)
+ * - The date parameter can be any day within the week - it will fetch the entire week
+ * - Includes comparison against planned working hours aggregated for the week
+ * - Week boundaries respect the configured week start day
+ */
 export const useGetBookingSummaryWeek = (date: IsoDateString) => {
   const { selectedOrganisationId } = useOrganisation()
   const { plannedHoursWeek: plannedWorkingHours } = useGetPlannedWorkingHoursByDate(date)

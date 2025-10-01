@@ -111,6 +111,19 @@ export const BookingHistoryLayout: React.FC<Props> = ({ dataSource }) => {
     return getModelsBookingSummary(processedItems)
   }, [processedItems])
 
+  // Calculate distinct users and projects
+  const distinctUsers = useMemo(() => {
+    const users = new Set(processedItems.map((item) => item.userReference?.key).filter(Boolean))
+    return users.size
+  }, [processedItems])
+
+  const distinctProjects = useMemo(() => {
+    const projects = new Set(
+      processedItems.map((item) => item.projectReference?.key).filter(Boolean),
+    )
+    return projects.size
+  }, [processedItems])
+
   const { onScroll, visibleElements } = useScrollPagination(processedItems)
 
   const allowEdit = dataSource === 'userBookings'
@@ -121,7 +134,19 @@ export const BookingHistoryLayout: React.FC<Props> = ({ dataSource }) => {
 
   return (
     <FormProvider {...hookForm}>
-      <ScrollContainer className="bg-base-100 flex-1 overflow-y-auto pt-4" onScroll={onScroll}>
+      <ScrollContainer className="bg-base-100 flex-1 overflow-y-auto" onScroll={onScroll}>
+        {/* Top section with summary and export */}
+        <div className="bg-base-200 px-6 py-4">
+          <div className="flex items-start justify-between">
+            <BookingHistoryStats
+              hours={summary.hours}
+              bookings={summary.elements}
+              users={distinctUsers}
+              projects={distinctProjects}
+            />
+            <BookingHistoryExport bookings={processedItems} />
+          </div>
+        </div>
         {!response.data && response.isValidating && <Loading />}
         {response.data && (
           <BookingHistoryTable
@@ -134,9 +159,7 @@ export const BookingHistoryLayout: React.FC<Props> = ({ dataSource }) => {
       </ScrollContainer>
       <ScrollContainer className="bg-base-200 flex-1 overflow-y-auto rounded-tr-lg">
         <ColumnList>
-          <BookingHistoryStats hours={summary.hours} bookings={summary.elements} />
           <BookingHistoryFilter />
-          <BookingHistoryExport bookings={processedItems} />
         </ColumnList>
       </ScrollContainer>
     </FormProvider>

@@ -26,6 +26,46 @@ import { useMemo } from 'react'
 import { OrganisationBookingSource } from 'types/booking'
 import { Granularity } from 'types/common'
 
+/**
+ * Custom hook for fetching and transforming organisation-wide booking statistics by source and day.
+ * Retrieves aggregated booking data for all members of an organisation within a specific date range,
+ * then transforms it into Nivo chart-compatible format for visualization in organisation statistics views.
+ *
+ * @param orgId - Organisation ID to fetch organisation-wide statistics for
+ * @param options - Configuration object containing:
+ *   - source: Source type to filter bookings (e.g., 'OrganisationBooking', 'AllBookings')
+ *   - from: Start date of the date range (ISO date string)
+ *   - to: End date of the date range (ISO date string)
+ *   - granularity: Optional time granularity for aggregation (auto-calculated from date range if not provided)
+ *
+ * @returns Object containing:
+ *   - data: Transformed statistics data in Nivo chart format (undefined if loading/no data)
+ *   - isValidating: Boolean indicating if data is currently being revalidated
+ *   - error: Error object if the request failed
+ *
+ * @example
+ * const { data, isValidating } = useGetOrganisationStatsBySourceAndDay(
+ *   'org-123',
+ *   {
+ *     source: 'OrganisationBooking',
+ *     from: '2025-01-01',
+ *     to: '2025-01-31',
+ *     granularity: 'Week'
+ *   }
+ * )
+ *
+ * if (isValidating) return <Loading />
+ * if (data) return <OrgStatsChart data={data} />
+ *
+ * @remarks
+ * - Aggregates statistics across all organisation members (not just current user)
+ * - Uses custom statsSwrConfig for optimized caching strategy
+ * - Automatically determines granularity from date range if not specified
+ * - Includes planned working hours context for comparison in charts
+ * - Data is memoized to prevent unnecessary transformations
+ * - Typically used by organisation administrators for team oversight
+ * - Transformed data structure is optimized for Nivo chart rendering
+ */
 export const useGetOrganisationStatsBySourceAndDay = (
   orgId: string,
   {

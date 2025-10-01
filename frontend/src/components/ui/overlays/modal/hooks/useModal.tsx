@@ -22,9 +22,32 @@ import { useCallback, useMemo } from 'react'
 import { useModalViews, useUIStore } from 'stores/uiStore'
 
 /**
- * Prepares a modal or uses an existing one by Id
- * Now uses Zustand store for better performance
- * @param modalId
+ * Custom hook for managing modal dialogs with Zustand state management.
+ * Creates or accesses a modal by ID and provides functions to control its visibility.
+ * Optimized for performance by using Zustand selectors.
+ *
+ * @param modalId - Unique identifier for the modal (e.g., 'BookingAddModal')
+ * @returns Object containing:
+ *   - modalId: The modal's unique identifier
+ *   - openModal: Function to show the modal
+ *   - closeModal: Function to hide and remove the modal
+ *   - modalViews: Array of all modal states
+ *   - isModalOpen: Boolean indicating if this specific modal is open
+ *   - addModal: Function to register a new modal in the store
+ *
+ * @example
+ * const { openModal, closeModal, isModalOpen } = useModal('BookingEditModal')
+ *
+ * // Open the modal
+ * openModal()
+ *
+ * // Check if modal is open
+ * if (isModalOpen) {
+ *   console.log('Modal is currently visible')
+ * }
+ *
+ * // Close the modal
+ * closeModal()
  */
 export const useModal = (modalId: string) => {
   // Use Zustand selectors for optimal performance

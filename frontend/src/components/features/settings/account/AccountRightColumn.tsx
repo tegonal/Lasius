@@ -35,31 +35,6 @@ export const AccountRightColumn: React.FC = () => {
             'Manage your personal information and account details. Your email address can only be changed if you are using the internal authentication provider.',
         })}
       </Text>
-      <div className="mt-6">
-        <Text variant="infoText" className="text-sm">
-          <strong>{t('account.settings.information', { defaultValue: 'Information:' })}</strong>
-        </Text>
-        <ul className="text-base-content/70 mt-2 space-y-1 text-sm">
-          <li>
-            •{' '}
-            {t('account.settings.info.roleAdmin', {
-              defaultValue: 'Your role is determined by your organization administrator',
-            })}
-          </li>
-          <li>
-            •{' '}
-            {t('account.settings.info.emailVerification', {
-              defaultValue: 'Email changes may require verification',
-            })}
-          </li>
-          <li>
-            •{' '}
-            {t('account.settings.info.autoSave', {
-              defaultValue: 'All changes are saved immediately',
-            })}
-          </li>
-        </ul>
-      </div>
     </div>
   )
 }

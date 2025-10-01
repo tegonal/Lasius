@@ -27,12 +27,13 @@ import { BookingItemContext } from 'components/features/user/index/list/bookingI
 import { BookingOverlapActions } from 'components/features/user/index/list/bookingOverlapActions'
 import { Button } from 'components/primitives/buttons/Button'
 import { TagList } from 'components/ui/data-display/TagList'
-import { Icon } from 'components/ui/icons/Icon'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import useModal from 'components/ui/overlays/modal/hooks/useModal'
 import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
 import { augmentBookingsList } from 'lib/api/functions/augmentBookingsList'
 import { ModelsBooking } from 'lib/api/lasius'
 import { cn } from 'lib/utils/cn'
+import { PlusCircleIcon } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
 
@@ -90,7 +91,7 @@ export const BookingItem: React.FC<Props> = ({ item, nextItem }) => {
               title={t('bookings.actions.add', { defaultValue: 'Add booking' })}
               onClick={addModal.openModal}
               fullWidth={false}>
-              <Icon name="add-circle" size={18} />
+              <LucideIcon icon={PlusCircleIcon} size={21} />
             </Button>
           </div>
         </div>

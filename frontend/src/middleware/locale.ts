@@ -18,15 +18,15 @@
  */
 
 import { match as matchLocale } from '@formatjs/intl-localematcher'
+import {
+  DEFAULT_LOCALE,
+  LOCALE_COOKIE_MAX_AGE,
+  LOCALE_COOKIE_NAME,
+  SUPPORTED_LOCALES,
+} from 'lib/config/locales'
 import { logger } from 'lib/loggerMiddleware'
 import Negotiator from 'negotiator'
 import { NextRequest, NextResponse } from 'next/server'
-
-// Supported locales as two-letter ISO 639-1 codes
-const SUPPORTED_LOCALES = ['en', 'de']
-const DEFAULT_LOCALE = 'en'
-const COOKIE_NAME = 'NEXT_LOCALE'
-const COOKIE_MAX_AGE = 31536000 // 1 year
 
 /**
  * Get preferred locale from Accept-Language header using negotiator
@@ -69,7 +69,7 @@ export async function localeMiddleware(request: NextRequest): Promise<NextRespon
   logger.info('[LocaleMiddleware] Checking for cookie')
 
   // Check if locale cookie already exists
-  let locale = request.cookies.get(COOKIE_NAME)?.value
+  let locale = request.cookies.get(LOCALE_COOKIE_NAME)?.value
   let shouldSetCookie = false
 
   logger.info('[LocaleMiddleware] Existing cookie:', locale)
@@ -111,9 +111,9 @@ export async function localeMiddleware(request: NextRequest): Promise<NextRespon
   // Set cookie if needed
   if (shouldSetCookie) {
     logger.info('[LocaleMiddleware] Setting cookie:', locale)
-    response.cookies.set(COOKIE_NAME, locale, {
+    response.cookies.set(LOCALE_COOKIE_NAME, locale, {
       path: '/',
-      maxAge: COOKIE_MAX_AGE,
+      maxAge: LOCALE_COOKIE_MAX_AGE,
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
     })
@@ -121,7 +121,7 @@ export async function localeMiddleware(request: NextRequest): Promise<NextRespon
     if (process.env.LASIUS_DEBUG) {
       logger.debug('[LocaleMiddleware][SetCookie]', {
         locale,
-        cookieName: COOKIE_NAME,
+        cookieName: LOCALE_COOKIE_NAME,
       })
     }
   }

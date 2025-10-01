@@ -17,9 +17,9 @@
  *
  */
 
-import { Heading } from 'components/primitives/typography/Heading'
 import { statsSwrConfig } from 'components/ui/data-display/stats/statsSwrConfig'
 import { StatsGroup } from 'components/ui/data-display/StatsGroup'
+import { StatsTileHours } from 'components/ui/data-display/StatsTileHours'
 import { StatsTileNumber } from 'components/ui/data-display/StatsTileNumber'
 import { apiTimespanFromTo } from 'lib/api/apiDateHandling'
 import { getModelsBookingSummary } from 'lib/api/functions/getModelsBookingSummary'
@@ -46,21 +46,45 @@ export const StatsOverview: React.FC = () => {
     [data, isValidating],
   )
 
+  // Calculate distinct users and projects
+  const distinctUsers = useMemo(() => {
+    if (!data || isValidating) return 0
+    const users = new Set(data.map((item) => item.userReference?.key).filter(Boolean))
+    return users.size
+  }, [data, isValidating])
+
+  const distinctProjects = useMemo(() => {
+    if (!data || isValidating) return 0
+    const projects = new Set(data.map((item) => item.projectReference?.key).filter(Boolean))
+    return projects.size
+  }, [data, isValidating])
+
   return (
-    <div className="w-full">
-      <Heading variant="section">{t('statistics.summary', { defaultValue: 'Summary' })}</Heading>
-      <StatsGroup className="w-full pb-4">
+    <StatsGroup className="flex gap-4">
+      <StatsTileHours
+        value={summary?.hours || 0}
+        label={t('common.units.hours', { defaultValue: 'Hours' })}
+        standalone={false}
+      />
+      <StatsTileNumber
+        value={summary?.elements || 0}
+        label={t('bookings.title', { defaultValue: 'Bookings' })}
+        standalone={false}
+      />
+      {distinctUsers > 1 && (
         <StatsTileNumber
-          value={summary?.hours || 0}
-          label={t('common.units.hours', { defaultValue: 'Hours' })}
+          value={distinctUsers}
+          label={t('users.title', { defaultValue: 'Users' })}
           standalone={false}
         />
+      )}
+      {distinctProjects > 1 && (
         <StatsTileNumber
-          value={summary?.elements || 0}
-          label={t('bookings.title', { defaultValue: 'Bookings' })}
+          value={distinctProjects}
+          label={t('projects.title', { defaultValue: 'Projects' })}
           standalone={false}
         />
-      </StatsGroup>
-    </div>
+      )}
+    </StatsGroup>
   )
 }

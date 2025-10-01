@@ -108,6 +108,8 @@ const InputDatePicker2Internal: React.FC<InputDatePicker2Props> = ({
     return () => {
       parentFormContext.unregister(name)
     }
+    // parentFormContext methods are stable (from react-hook-form)
+    // Only name and rules?.required affect registration
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name, rules?.required])
 
@@ -122,6 +124,9 @@ const InputDatePicker2Internal: React.FC<InputDatePicker2Props> = ({
         isInitializedRef.current = true
       }
     }
+    // Zustand store functions (setFromISOString, setInitialValue) are stable references
+    // and don't need to be in the dependency array
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Sync form value to store when it changes externally (e.g., from preset)
@@ -143,6 +148,9 @@ const InputDatePicker2Internal: React.FC<InputDatePicker2Props> = ({
     if (formValue !== currentISOString && formValue) {
       setFromISOString(formValue)
     }
+    // Zustand store functions (getISOString, setFromISOString, setInitialValue) are stable references
+    // and don't need to be in the dependency array - only formValue changes trigger resync
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formValue])
 
   // Update form value and trigger validation
@@ -171,6 +179,8 @@ const InputDatePicker2Internal: React.FC<InputDatePicker2Props> = ({
     else {
       parentFormContext.trigger(name)
     }
+    // Using getISOString() result as dependency instead of the function itself
+    // since Zustand functions are stable but we need to react to value changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getISOString()])
 

@@ -23,6 +23,30 @@ import { plannedWorkingHoursStub } from 'lib/utils/date/stubPlannedWorkingHours'
 import { UI_SLOW_DATA_DEDUPE_INTERVAL } from 'projectConfig/intervals'
 import { useMemo } from 'react'
 
+/**
+ * Custom hook for aggregating planned working hours across organisations.
+ * Provides working hour summaries for both the selected organisation and all organisations
+ * the user belongs to, useful for users working across multiple organisations.
+ *
+ * @returns Object containing:
+ *   - allOrganisationsWorkingHours: Working hours by weekday aggregated across all user organisations
+ *   - selectedOrganisationWorkingHours: Working hours by weekday for the currently selected organisation
+ *   - selectedOrganisationWorkingHoursTotal: Total weekly hours for the selected organisation
+ *
+ * @example
+ * const { selectedOrganisationWorkingHoursTotal, allOrganisationsWorkingHours } = useGetWeeklyPlannedWorkingHoursAggregate()
+ *
+ * console.log(`Total weekly hours: ${selectedOrganisationWorkingHoursTotal}`)
+ * console.log(`Monday hours across all orgs: ${allOrganisationsWorkingHours.monday}`)
+ *
+ * @remarks
+ * - Falls back to plannedWorkingHoursStub if no working hours are configured
+ * - Aggregates hours additively (e.g., 8h in Org A + 4h in Org B = 12h total)
+ * - Uses the last selected organisation from user settings for single-org data
+ * - Uses slow revalidation (UI_SLOW_DATA_DEDUPE_INTERVAL) as working hours rarely change
+ * - Efficiently memoized to prevent unnecessary recalculations
+ * - Useful for comparing workload across organisations or displaying total expected hours
+ */
 export const useGetWeeklyPlannedWorkingHoursAggregate = () => {
   const { data } = useGetUserProfile({
     swr: {

@@ -116,6 +116,72 @@ Regenerates the TypeScript API client from OpenAPI spec. Requires backend to be 
 
 **Note**: Never manually edit files in `src/lib/api/lasius/` - they are auto-generated.
 
+## Internationalization (i18n)
+
+This project uses a **cookie-based locale system** with next-i18next, not Next.js's built-in i18n routing.
+
+### Key Implementation Details
+
+- **Locale Storage**: User locale preference is stored in the `NEXT_LOCALE` cookie
+- **Supported Languages**: English (`en`), German (`de`)
+- **Translation Files**: Located in `public/locales/{locale}/common.json`
+
+### Usage in Components
+
+**Always use `i18n.language` from `useTranslation()`, never `router.locale`:**
+
+```tsx
+// ✅ Correct
+import { useTranslation } from 'next-i18next'
+
+const MyComponent = () => {
+  const { t, i18n } = useTranslation('common')
+  const currentLocale = i18n.language  // Gets locale from cookie
+
+  return <div>{t('my.translation.key')}</div>
+}
+
+// ❌ Wrong - don't use router.locale
+import { useRouter } from 'next/router'
+const { locale } = useRouter()  // This won't work correctly!
+```
+
+### Date Localization
+
+For date formatting with proper localization:
+
+```tsx
+import { FormatDate } from 'components/ui/data-display/FormatDate'
+
+<FormatDate date={myDate} format="monthNameLong" />
+```
+
+The `FormatDate` component automatically uses the correct date-fns locale based on `i18n.language`.
+
+### Language Switching
+
+Language switching requires manually setting the cookie and reloading the page:
+
+```tsx
+import Cookies from 'js-cookie'
+import { LOCALE_COOKIE_NAME, LOCALE_COOKIE_MAX_AGE_DAYS } from 'lib/config/locales'
+import { useRouter } from 'next/router'
+
+const switchLanguage = (newLocale: string) => {
+  // Set the cookie
+  Cookies.set(LOCALE_COOKIE_NAME, newLocale, {
+    expires: LOCALE_COOKIE_MAX_AGE_DAYS,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+  })
+
+  // Reload to apply changes
+  router.reload()
+}
+```
+
+The locale middleware automatically detects and sets the initial locale from browser preferences, but switching languages requires explicit cookie management.
+
 
 ## Maintenance
 

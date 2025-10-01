@@ -21,12 +21,13 @@ import { ContextButtonClose } from 'components/features/contextMenu/buttons/cont
 import { ContextButtonOpen } from 'components/features/contextMenu/buttons/contextButtonOpen'
 import { ContextButtonStartBooking } from 'components/features/contextMenu/buttons/contextButtonStartBooking'
 import { ContextBar } from 'components/features/contextMenu/contextBar'
+import { ContextBarDivider } from 'components/features/contextMenu/contextBarDivider'
 import { ContextCompactAnimatePresence } from 'components/features/contextMenu/contextCompactAnimatePresence'
 import { ContextCompactBody } from 'components/features/contextMenu/contextCompactBody'
 import { ContextCompactButtonWrapper } from 'components/features/contextMenu/contextCompactButtonWrapper'
 import { useContextMenu } from 'components/features/contextMenu/hooks/useContextMenu'
 import { Button } from 'components/primitives/buttons/Button'
-import { Icon } from 'components/ui/icons/Icon'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { AnimatePresence } from 'framer-motion'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { ModelsBookingStub } from 'lib/api/lasius'
@@ -35,6 +36,7 @@ import {
   getGetFavoriteBookingListKey,
 } from 'lib/api/lasius/user-favorites/user-favorites'
 import { stringHash } from 'lib/utils/string/stringHash'
+import { Trash2 } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
 import { useSWRConfig } from 'swr'
@@ -78,9 +80,10 @@ export const FavoriteItemContext: React.FC<Props> = ({ item }) => {
                     onClick={() => deleteFavorite()}
                     fullWidth={false}
                     shape="circle">
-                    <Icon name="bin-2-alternate-interface-essential" size={24} />
+                    <LucideIcon icon={Trash2} size={24} />
                   </Button>
                 </ContextCompactButtonWrapper>
+                <ContextBarDivider />
                 <ContextButtonClose variant="compact" />
               </ContextBar>
             </ContextCompactAnimatePresence>

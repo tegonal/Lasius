@@ -20,6 +20,26 @@
 import { debounce, noop } from 'es-toolkit/compat'
 import { useCallback, useEffect, useState } from 'react'
 
+/**
+ * Custom hook that tracks whether the browser window/tab is currently focused and visible.
+ * Listens to focus, blur, and visibility change events to determine the window's active state.
+ * Uses debouncing (100ms) to prevent rapid state changes.
+ *
+ * @returns Boolean indicating if the window is currently focused and visible
+ *
+ * @example
+ * const isFocused = useIsWindowFocused()
+ *
+ * useEffect(() => {
+ *   if (isFocused) {
+ *     // Resume real-time updates
+ *     startPolling()
+ *   } else {
+ *     // Pause updates when tab is not visible
+ *     stopPolling()
+ *   }
+ * }, [isFocused])
+ */
 export default function useIsWindowFocused(): boolean {
   const [windowIsActive, setWindowIsActive] = useState(true)
 

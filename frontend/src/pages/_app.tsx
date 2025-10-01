@@ -31,20 +31,17 @@ import { RouteProgressBar } from 'components/features/system/routeProgressBar'
 import { TokenWatcher } from 'components/features/system/tokenWatcher'
 import { Error } from 'components/ui/feedback/Error'
 import { Toasts } from 'components/ui/feedback/Toasts'
+import { HelpDrawer } from 'components/ui/overlays/HelpDrawer'
 import { LazyMotion } from 'framer-motion'
-import { getRequestHeaders } from 'lib/api/hooks/useTokensWithAxiosRequests'
-import { ModelsUser } from 'lib/api/lasius'
-import { getGetUserProfileKey, getUserProfile } from 'lib/api/lasius/user/user'
 import { swrLogger } from 'lib/api/swrRequestLogger'
 import { logger } from 'lib/logger'
 import { removeAccessibleCookies } from 'lib/utils/auth/removeAccessibleCookies'
 import { NextPage } from 'next'
-import { Session } from 'next-auth'
-import { getSession, SessionProvider } from 'next-auth/react'
+import { SessionProvider } from 'next-auth/react'
 import { appWithTranslation } from 'next-i18next'
 // import PlausibleProvider from 'next-plausible' // Using custom implementation
 import { DefaultSeo } from 'next-seo'
-import { AppContext, AppProps } from 'next/app'
+import { AppProps } from 'next/app'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import { SOCIAL_MEDIA_CARD_IMAGE_URL } from 'projectConfig/constants'
@@ -58,13 +55,7 @@ export type NextPageWithLayout<P = Record<string, unknown>, IP = P> = NextPage<P
 }
 
 type AppPropsWithLayout = AppProps & {
-  session: Session
   Component: NextPageWithLayout
-  initialState: any
-  statusCode: number
-  demandSignout: boolean
-  fallback: Record<string, any>
-  profile: ModelsUser
 }
 
 const loadFeatures = () => import('../lib/framerMotionFeatures.js').then((res) => res.default)
@@ -77,14 +68,10 @@ const LasiusPwaUpdater =
       })
     : () => <></>
 
-const App = ({
-  Component,
-  pageProps,
-  statusCode = 0,
-  fallback,
-  session,
-  profile,
-}: AppPropsWithLayout): JSX.Element => {
+const App = ({ Component, pageProps }: AppPropsWithLayout): JSX.Element => {
+  // Extract auth props from pageProps (they come from getServerSideProps now)
+  const { session, profile, fallback, statusCode = 0, ...restPageProps } = pageProps
+
   // Use the layout defined at the page level, if available
   const getLayout = Component.getLayout ?? ((page) => page)
   const lasiusIsLoggedIn = !!(session?.access_token && profile?.id)
@@ -148,7 +135,7 @@ const App = ({
     <>
       <SWRConfig
         value={{
-          ...fallback,
+          ...(fallback || {}),
           use: [swrLogger as any],
         }}>
         <SessionProvider
@@ -175,13 +162,14 @@ const App = ({
             {statusCode > 302 ? (
               <Error statusCode={statusCode} />
             ) : (
-              getLayout(<Component {...pageProps} />)
+              getLayout(<Component {...restPageProps} />)
             )}
             <BrowserOnlineStatusCheck />
             <LasiusBackendOnlineCheck />
             <LasiusPwaUpdater />
             <BundleVersionCheck />
             <Toasts />
+            <HelpDrawer />
             {lasiusIsLoggedIn && (
               <>
                 <BootstrapTasks />
@@ -198,50 +186,9 @@ const App = ({
   )
 }
 
-type ExtendedAppContext = AppContext & {
-  ctx: {
-    req: Request & {
-      useragent: any
-      originalUrl: string
-    }
-  }
-}
+// Removed getInitialProps - auth is now handled in each page's getServerSideProps
+// using getServerSidePropsWithAuth helper for better performance and type safety
 
-App.getInitialProps = async ({
-  Component,
-  ctx,
-  ctx: { res, req, pathname },
-}: ExtendedAppContext) => {
-  const session = await getSession({ req })
-  let profile = null
-  if (session?.access_token) {
-    try {
-      profile = await getUserProfile(
-        getRequestHeaders(session.access_token, session.access_token_issuer),
-      )
-    } catch (error) {
-      if (res && !pathname.includes('/login')) {
-        logger.warn('[App][UserProfile][Failed]', error)
-        res.writeHead(307, { Location: '/login?error=fetchProfileFailed' })
-        res.end()
-      }
-    }
-  }
+import nextI18NextConfig from '../../next-i18next.config'
 
-  let pageProps = {}
-  if (Component.getInitialProps) {
-    pageProps = await Component.getInitialProps(ctx)
-  }
-
-  return {
-    pageProps,
-    session,
-    profile,
-    statusCode: res?.statusCode,
-    fallback: {
-      ...(profile && { [getGetUserProfileKey().toString()]: profile }),
-    },
-  }
-}
-
-export default appWithTranslation(App as any)
+export default appWithTranslation(App as any, nextI18NextConfig)

@@ -18,27 +18,70 @@
  */
 
 import { format, formatRelative, Locale } from 'date-fns'
-import { de } from 'date-fns/locale'
+import { de, enUS } from 'date-fns/locale'
+import { DEFAULT_LOCALE } from 'lib/config/locales'
 
-// This needs to be manually matched to ./api/dotenv.ts
-const locales: { [key: string]: Locale } = { de }
+/**
+ * Map of locale codes to date-fns locale objects.
+ * Supports 'de' (German) and 'en' (English US).
+ */
+export const dateLocales: { [key: string]: Locale } = {
+  de,
+  en: enUS,
+}
 
+/**
+ * Gets the date-fns locale object for a given locale code.
+ * Falls back to the default locale if the requested locale is not found.
+ *
+ * @param locale - The locale code (e.g., 'de', 'en')
+ * @returns The corresponding date-fns Locale object
+ */
+export const getDateLocale = (locale: string): Locale => {
+  return dateLocales[locale] || dateLocales[DEFAULT_LOCALE.substring(0, 2)]
+}
+
+/**
+ * Formats a date string using date-fns with locale support.
+ *
+ * @param dateString - ISO date string to format
+ * @param formatStr - Format string (default: 'PP' for localized date)
+ * @param locale - Locale code for formatting (default: DEFAULT_LOCALE)
+ * @returns Formatted date string
+ *
+ * @example
+ * dateFormat('2024-01-15T10:30:00Z', 'PP', 'en') // "Jan 15, 2024"
+ * dateFormat('2024-01-15T10:30:00Z', 'dd.MM.yyyy', 'de') // "15.01.2024"
+ */
 export const dateFormat = (
   dateString: string,
   formatStr: any = 'PP',
-  locale: string | number = 'de',
+  locale: string | number = DEFAULT_LOCALE,
 ): string => {
   const date = new Date(dateString)
   return format(date, formatStr, {
-    locale: locales[locale],
+    locale: dateLocales[locale],
   })
 }
 
-export const dateFormatRelative = (dateString: string, locale = 'de'): string => {
+/**
+ * Formats a date string relative to the current time (e.g., "2 hours ago", "yesterday").
+ *
+ * @param dateString - ISO date string to format
+ * @param locale - Locale code for formatting (default: DEFAULT_LOCALE)
+ * @returns Relative date string localized to the specified locale
+ *
+ * @example
+ * dateFormatRelative('2024-01-15T10:30:00Z', 'en') // "yesterday at 10:30 AM"
+ */
+export const dateFormatRelative = (dateString: string, locale = DEFAULT_LOCALE): string => {
   const date = new Date(dateString)
   return formatRelative(date, new Date(), {
-    locale: locales[locale],
+    locale: dateLocales[locale],
   })
 }
 
+/**
+ * Standard time format string for displaying hours and minutes in 24-hour format.
+ */
 export const TIME_FORMAT = 'HH:mm'

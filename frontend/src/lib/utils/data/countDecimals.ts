@@ -17,6 +17,18 @@
  *
  */
 
+/**
+ * Counts the number of decimal places in a number.
+ * Handles both standard decimal notation (0.123) and scientific notation (5e-6).
+ *
+ * @param value - The number to count decimal places for
+ * @returns The number of decimal places (0 for integers)
+ *
+ * @example
+ * countDecimals(1.23) // 2
+ * countDecimals(5e-6) // 6
+ * countDecimals(10) // 0
+ */
 export const countDecimals = (value: number) => {
   const text = value.toString()
   // verify if number 0.000005 is represented as "5e-6"

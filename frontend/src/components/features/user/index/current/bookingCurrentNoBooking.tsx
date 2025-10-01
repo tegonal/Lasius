@@ -17,7 +17,8 @@
  *
  */
 
-import { Icon } from 'components/ui/icons/Icon'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
+import { Clock } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import { ROUTES } from 'projectConfig/routes'
@@ -33,7 +34,7 @@ export const BookingCurrentNoBooking: React.FC = () => {
         onClick={() => push('/')}
         className="flex h-full w-full cursor-pointer flex-row items-center justify-center gap-3 hover:opacity-80">
         <div>
-          <Icon name="time-clock-circle-interface-essential" size={24} />
+          <LucideIcon icon={Clock} size={24} />
         </div>
         <div>
           {t('bookings.status.currentlyNotBooking', { defaultValue: 'Currently not booking' })}
@@ -45,7 +46,7 @@ export const BookingCurrentNoBooking: React.FC = () => {
   return (
     <div className="flex h-full w-full flex-row items-center justify-center gap-3">
       <div>
-        <Icon name="time-clock-circle-interface-essential" size={24} />
+        <LucideIcon icon={Clock} size={24} />
       </div>
       <div>
         {t('bookings.status.currentlyNotBooking', { defaultValue: 'Currently not booking' })}

@@ -19,7 +19,10 @@
 
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from 'lib/utils/cn'
+import { AlertCircle, AlertTriangle, CheckCircle, Info, XCircle } from 'lucide-react'
 import React from 'react'
+
+import { LucideIcon } from '../icons/LucideIcon'
 
 const alertVariants = cva('alert', {
   variants: {
@@ -36,6 +39,14 @@ const alertVariants = cva('alert', {
   },
 })
 
+const iconMap = {
+  info: Info,
+  success: CheckCircle,
+  warning: AlertTriangle,
+  error: XCircle,
+  neutral: AlertCircle,
+} as const
+
 export interface AlertProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof alertVariants> {
@@ -43,10 +54,20 @@ export interface AlertProps
 }
 
 export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
-  ({ className, variant, children, ...props }, ref) => {
+  ({ className, variant = 'neutral', children, ...props }, ref) => {
+    const IconComponent = iconMap[variant || 'neutral']
+
     return (
-      <div ref={ref} className={cn(alertVariants({ variant }), className)} role="alert" {...props}>
-        {children}
+      <div
+        ref={ref}
+        className={cn(alertVariants({ variant }), 'flex items-center gap-3', className)}
+        role="alert"
+        {...props}>
+        <div className="flex-shrink-0">
+          <LucideIcon icon={IconComponent} size={20} />
+        </div>
+        <div className="divider divider-horizontal m-0 before:w-px after:w-px"></div>
+        <div className="min-w-0 flex-1">{children}</div>
       </div>
     )
   },

@@ -19,8 +19,9 @@
 
 import { OrganisationMembers } from 'components/features/organisation/current/organisationMembers'
 import { Heading } from 'components/primitives/typography/Heading'
-import { Icon } from 'components/ui/icons/Icon'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
+import { Lock } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
 import { useIsClient } from 'usehooks-ts'
@@ -36,16 +37,16 @@ export const OrganisationDetail: React.FC = () => {
     <div className="flex flex-col gap-8">
       <Heading as="h2" variant="h2">
         {selectedOrganisation?.private
-          ? t('organizations.myPersonalOrganisation', {
+          ? t('organisations.myPersonalOrganisation', {
               defaultValue: 'My personal organisation',
             })
           : selectedOrganisation?.organisationReference.key}
       </Heading>
       {selectedOrganisation?.private && (
         <div className="mx-auto mb-4 flex max-w-[500px] flex-col items-center justify-center gap-3 text-center">
-          <Icon name="lock-1-interface-essential" size={24} />
+          <LucideIcon icon={Lock} size={24} />
           <div className="w-full max-w-[500px]">
-            {t('organizations.privateDescription', {
+            {t('organisations.privateDescription', {
               defaultValue:
                 'This organisation is only visible to you. You can use it to track private projects that you do not want others to have access to. If you want to invite people, invite them to an existing organisation or create a new one.',
             })}

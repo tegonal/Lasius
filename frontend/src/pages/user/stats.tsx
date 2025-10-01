@@ -19,8 +19,8 @@
 
 import { StatsLayout } from 'components/features/user/stats/statsLayout'
 import { LayoutResponsive } from 'components/ui/layouts/layoutResponsive'
+import { getServerSidePropsWithAuthRequired } from 'lib/auth/getServerSidePropsWithAuth'
 import { GetServerSideProps } from 'next'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { NextPageWithLayout } from 'pages/_app'
 
 const StatsPage: NextPageWithLayout = () => {
@@ -28,12 +28,7 @@ const StatsPage: NextPageWithLayout = () => {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { locale = '' } = context
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, ['common'])),
-    },
-  }
+  return getServerSidePropsWithAuthRequired(context)
 }
 
 StatsPage.getLayout = function getLayout(page) {

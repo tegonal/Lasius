@@ -21,13 +21,10 @@ import { Card, CardBody } from 'components/ui/cards/Card'
 import React from 'react'
 
 type Props = {
-  // Keeping sx prop for backward compatibility, but it's ignored
   className?: string
   children: React.ReactNode
 }
 
-// Legacy component wrapper for backward compatibility
-// Consider migrating to Card component directly
 export const CardContainer: React.FC<Props> = ({ className, children }) => {
   return (
     <Card className={className} shadow="lg">

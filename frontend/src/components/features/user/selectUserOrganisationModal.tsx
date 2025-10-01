@@ -21,13 +21,14 @@ import { MODAL_SELECT_ORGANISATION } from 'components/features/user/selectUserOr
 import { Heading } from 'components/primitives/typography/Heading'
 import { CardSmall } from 'components/ui/cards/CardSmall'
 import { AvatarOrganisation } from 'components/ui/data-display/avatar/avatarOrganisation'
-import { Icon } from 'components/ui/icons/Icon'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import useModal from 'components/ui/overlays/modal/hooks/useModal'
 import { noop } from 'es-toolkit'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { ModelsEntityReference, ModelsUserOrganisation } from 'lib/api/lasius'
 import { LasiusPlausibleEvents } from 'lib/telemetry/plausibleEvents'
 import { usePlausible } from 'lib/telemetry/usePlausible'
+import { CheckCircleIcon } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
 
@@ -59,7 +60,7 @@ export const SelectUserOrganisationModal: React.FC<Props> = ({ selected, onSelec
   return (
     <div>
       <Heading as="h1" className="mb-4">
-        {t('organizations.selectOrganisation', { defaultValue: 'Select organisation' })}
+        {t('organisations.selectOrganisation', { defaultValue: 'Select organisation' })}
       </Heading>
       <div className="grid grid-cols-3 gap-3">
         {organisations.map((item) => (
@@ -71,7 +72,7 @@ export const SelectUserOrganisationModal: React.FC<Props> = ({ selected, onSelec
             </div>
             <div className="leading-normal">
               {item.private
-                ? t('organizations.myPersonalOrganisation', {
+                ? t('organisations.myPersonalOrganisation', {
                     defaultValue: 'My personal organisation',
                   })
                 : item.organisationReference.key}
@@ -80,7 +81,7 @@ export const SelectUserOrganisationModal: React.FC<Props> = ({ selected, onSelec
               <div
                 title={t('common.selected', { defaultValue: 'Selected' })}
                 className="absolute top-2 right-2">
-                <Icon name="check-circle-1-interface-essential" size={18} />
+                <LucideIcon icon={CheckCircleIcon} size={18} />
               </div>
             )}
           </CardSmall>

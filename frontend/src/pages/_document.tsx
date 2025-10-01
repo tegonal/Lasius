@@ -17,6 +17,7 @@
  *
  */
 
+import { DEFAULT_LOCALE, LOCALE_COOKIE_NAME } from 'lib/config/locales'
 import NextDocument, { DocumentContext, Head, Html, Main, NextScript } from 'next/document'
 import { BUILD_ID, ENVIRONMENT } from 'projectConfig/constants'
 import React from 'react'
@@ -29,10 +30,10 @@ class MyDocument extends NextDocument {
       (ctx.req?.headers['x-middleware-request-locale'] as string) ||
       ctx.req?.headers.cookie
         ?.split(';')
-        .find((c) => c.trim().startsWith('NEXT_LOCALE='))
+        .find((c) => c.trim().startsWith(`${LOCALE_COOKIE_NAME}=`))
         ?.split('=')[1]
         ?.trim() ||
-      'en'
+      DEFAULT_LOCALE
 
     return { ...initialProps, locale }
   }
@@ -101,9 +102,6 @@ class MyDocument extends NextDocument {
           />
         </Head>
         <body id="body">
-          <svg style={{ display: 'none' }}>
-            <use xlinkHref="/symbols.svg#default" />
-          </svg>
           <noscript>
             <p>Please enable JavaScript in your browser settings and reload this page.</p>
           </noscript>

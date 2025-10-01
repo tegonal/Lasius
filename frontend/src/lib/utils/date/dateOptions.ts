@@ -37,8 +37,17 @@ import {
 } from 'date-fns'
 import { formatISOLocale } from 'lib/utils/date/dates'
 
-const t = (key: string, options?: { defaultValue?: string }) => options?.defaultValue || key
+const t = (key: string, _options?: { defaultValue?: string }) => key
 
+/**
+ * Predefined date range options for date pickers and filters.
+ * Includes common time periods like "Yesterday", "This Week", "This Month", etc.
+ * Each option provides a function that returns ISO date strings for the range.
+ *
+ * @example
+ * const thisWeek = dateOptions[1].dateRangeFn(new Date())
+ * // { from: "2024-01-15T00:00:00.000+02:00", to: "2024-01-21T23:59:59.999+02:00" }
+ */
 export const dateOptions = [
   {
     name: t('common.time.yesterday', { defaultValue: 'Yesterday' }),

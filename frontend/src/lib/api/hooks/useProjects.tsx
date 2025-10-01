@@ -22,6 +22,23 @@ import { orderBy } from 'es-toolkit'
 import { useProfile } from 'lib/api/hooks/useProfile'
 import { ModelsUserProject } from 'lib/api/lasius'
 
+/**
+ * Custom hook for accessing projects from the currently selected organisation.
+ * Provides formatted project data for autocomplete inputs and full project lists.
+ *
+ * @returns Object containing:
+ *   - projectSuggestions: Function returning sorted project references for autocomplete
+ *   - userProjects: Function returning full sorted array of user projects
+ *
+ * @example
+ * const { projectSuggestions, userProjects } = useProjects()
+ *
+ * // Get projects for autocomplete
+ * const suggestions = projectSuggestions()
+ *
+ * // Get full project list
+ * const allProjects = userProjects()
+ */
 export const useProjects = () => {
   const { profile } = useProfile()
   const projectSuggestions = (): SelectAutocompleteSuggestionType[] => {

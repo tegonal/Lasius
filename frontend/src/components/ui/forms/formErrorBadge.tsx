@@ -36,12 +36,9 @@ export const FormErrorBadge: React.FC<Props> = ({ error, id }) => {
     <div className="-mt-2" id={id}>
       <div className="badge badge-warning">
         <ErrorSign />
-        {
-          // Use the error message if available, otherwise use the type from FormError
-          error.message ||
-            // @ts-expect-error - error.type is a string
-            FormError[error.type]
-        }
+        {error.message ||
+          // @ts-expect-error - error.type is a string
+          FormError[error.type]}
       </div>
     </div>
   )

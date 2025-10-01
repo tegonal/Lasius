@@ -21,11 +21,13 @@ const js = require('@eslint/js');
 const nextPlugin = require('@next/eslint-plugin-next');
 const typescript = require('@typescript-eslint/eslint-plugin');
 const typescriptParser = require('@typescript-eslint/parser');
+const jsonc = require('eslint-plugin-jsonc');
 const jsxA11y = require('eslint-plugin-jsx-a11y');
 const licenseHeader = require('eslint-plugin-license-header');
 const perfectionist = require('eslint-plugin-perfectionist');
 const react = require('eslint-plugin-react');
 const reactHooks = require('eslint-plugin-react-hooks');
+const jsoncParser = require('jsonc-eslint-parser');
 
 module.exports = [
   js.configs.recommended,
@@ -33,13 +35,19 @@ module.exports = [
     ignores: [
       '.next/**',
       'node_modules/**',
-      'public/**',
+      'public/icons/**',
+      'public/symbols.svg',
       'build/**',
       'dist/**',
       'coverage/**',
       '.yarn/**',
       '.pnp.*',
       'next-env.d.ts',
+      'package.json',
+      'package-lock.json',
+      'yarn.lock',
+      'tsconfig.json',
+      '.bsp/**',
     ],
   },
   {
@@ -170,6 +178,29 @@ module.exports = [
     rules: {
       '@typescript-eslint/no-require-imports': 'off',
       'license-header/header': 'off', // Don't require license header in config files
+    },
+  },
+  // JSON files configuration
+  ...jsonc.configs['flat/recommended-with-json'],
+  {
+    files: ['**/*.json', '**/*.jsonc', '**/*.json5'],
+    languageOptions: {
+      parser: jsoncParser,
+    },
+    plugins: {
+      jsonc,
+    },
+    rules: {
+      // JSON-specific rules
+      'jsonc/indent': ['error', 2],
+      'jsonc/sort-keys': 'off', // Don't force key sorting
+      'jsonc/no-comments': 'off', // Allow comments in JSON files (JSONC)
+      'jsonc/comma-dangle': ['error', 'never'],
+      'jsonc/quotes': ['error', 'double'],
+      'jsonc/quote-props': ['error', 'always'],
+      'jsonc/array-bracket-spacing': ['error', 'never'],
+      'jsonc/object-curly-spacing': ['error', 'never'],
+      'jsonc/key-spacing': ['error', { beforeColon: false, afterColon: true }],
     },
   },
 ];

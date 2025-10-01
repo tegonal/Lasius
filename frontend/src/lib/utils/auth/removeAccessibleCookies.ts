@@ -18,16 +18,29 @@
  */
 
 import Cookies from 'js-cookie'
+import { LOCALE_COOKIE_NAME } from 'lib/config/locales'
 import { IS_SERVER } from 'projectConfig/constants'
 
+/**
+ * Removes all accessible browser cookies except the locale cookie.
+ * This is typically used during logout to clear session data while preserving
+ * the user's language preference.
+ *
+ * @remarks
+ * - Only runs on the client side (skipped on server)
+ * - Preserves the locale cookie for language detection
+ * - Attempts to remove cookies both with and without path specification
+ *
+ * @returns A promise that resolves when all cookies have been removed
+ */
 export const removeAccessibleCookies = async () => {
   if (IS_SERVER) return
   const cookies = Cookies.get()
   if (cookies) {
     // Unset known cookies here. Path names matter...
-    // IMPORTANT: Preserve NEXT_LOCALE cookie as it's used for language detection
+    // IMPORTANT: Preserve locale cookie as it's used for language detection
     Object.keys(cookies).forEach((cookieKey) => {
-      if (cookieKey !== 'NEXT_LOCALE') {
+      if (cookieKey !== LOCALE_COOKIE_NAME) {
         Cookies.remove(cookieKey)
         Cookies.remove(cookieKey, { path: '/' })
       }

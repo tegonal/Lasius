@@ -71,7 +71,7 @@ export const WorkingHoursWeek: React.FC<Props> = ({ organisation }) => {
           <AvatarOrganisation name={organisation.organisationReference.key} size={24} />
           <span>
             {organisation.private
-              ? t('organizations.myPersonalOrganization', {
+              ? t('organisations.myPersonalOrganisation', {
                   defaultValue: 'My personal organisation',
                 })
               : organisation.organisationReference.key}

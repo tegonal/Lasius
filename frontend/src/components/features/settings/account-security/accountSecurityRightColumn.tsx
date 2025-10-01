@@ -35,33 +35,6 @@ export const AccountSecurityRightColumn: React.FC = () => {
             'Update your password to keep your account secure. Make sure to use a strong password with at least 8 characters, including uppercase letters and numbers.',
         })}
       </Text>
-      <div className="mt-6">
-        <Text variant="infoText" className="text-sm">
-          <strong>
-            {t('account.security.passwordRequirements', { defaultValue: 'Password requirements:' })}
-          </strong>
-        </Text>
-        <ul className="text-base-content/70 mt-2 space-y-1 text-sm">
-          <li>
-            •{' '}
-            {t('account.security.requirements.minLength', {
-              defaultValue: 'At least 8 characters long',
-            })}
-          </li>
-          <li>
-            •{' '}
-            {t('account.security.requirements.uppercase', {
-              defaultValue: 'Contains at least one uppercase letter',
-            })}
-          </li>
-          <li>
-            •{' '}
-            {t('account.security.requirements.number', {
-              defaultValue: 'Contains at least one number',
-            })}
-          </li>
-        </ul>
-      </div>
     </div>
   )
 }

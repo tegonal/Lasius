@@ -27,6 +27,33 @@ import { useGetUserBookingListByOrganisation } from 'lib/api/lasius/user-booking
 import { UI_SLOW_DATA_DEDUPE_INTERVAL } from 'projectConfig/intervals'
 import { useMemo } from 'react'
 
+/**
+ * Custom hook for retrieving a comprehensive summary of bookings for a specific day.
+ * Fetches all bookings for the given date, calculates totals, and compares them against
+ * planned working hours to provide progress metrics.
+ *
+ * @param date - ISO date string for the day to summarize (format: 'YYYY-MM-DD')
+ *
+ * @returns Object containing:
+ *   - hours: Total hours booked for the day
+ *   - minutes: Total minutes booked for the day
+ *   - bookings: Array of bookings for the day
+ *   - plannedWorkingHours: Expected working hours for the day
+ *   - fulfilledPercentage: Percentage of planned hours completed (capped at 100%)
+ *   - progressBarPercentage: Actual percentage for progress bar display (can exceed 100%)
+ *
+ * @example
+ * const summary = useGetBookingSummaryDay('2025-01-15')
+ *
+ * console.log(`Worked ${summary.hours} hours out of ${summary.plannedWorkingHours}`)
+ * console.log(`Progress: ${summary.fulfilledPercentage}%`)
+ *
+ * @remarks
+ * - Uses aggressive revalidation for today's date (2s dedupe) for real-time updates
+ * - Uses slower revalidation for past dates (UI_SLOW_DATA_DEDUPE_INTERVAL)
+ * - Includes comparison against planned working hours from user settings
+ * - Summary includes both raw totals and calculated progress metrics
+ */
 export const useGetBookingSummaryDay = (date: IsoDateString) => {
   const { selectedOrganisationId } = useOrganisation()
   const { plannedHoursDay: plannedWorkingHours } = useGetPlannedWorkingHoursByDate(date)

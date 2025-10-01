@@ -18,7 +18,7 @@
  */
 
 import { LasiusBackendStatus } from 'components/features/system/lasiusBackendStatus'
-import { Icon } from 'components/ui/icons/Icon'
+import { TegonalIcon } from 'components/ui/icons/TegonalIcon'
 import { Trans, useTranslation } from 'next-i18next'
 import Link from 'next/link'
 import React from 'react'
@@ -29,7 +29,7 @@ export const TegonalFooter: React.FC = () => {
     <div className="flex flex-col items-center justify-center gap-2 text-gray-400 [&_a:hover]:text-white">
       <div>
         <Link href="https://tegonal.com" target="_blank">
-          <Icon name="tegonal-icon" size={24} />
+          <TegonalIcon size={24} />
         </Link>
       </div>
       <div className="text-sm">

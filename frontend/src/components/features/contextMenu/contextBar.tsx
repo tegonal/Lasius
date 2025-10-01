@@ -25,6 +25,8 @@ type Props = {
 
 export const ContextBar: React.FC<Props> = ({ children }) => {
   return (
-    <div className="bg-secondary flex gap-2 rounded-l-lg p-1 pr-2 pl-2 shadow-md">{children}</div>
+    <div className="bg-secondary -mr-1 flex items-stretch justify-center gap-2 rounded-l-lg p-1 pr-2 pl-2 shadow-md">
+      {children}
+    </div>
   )
 }

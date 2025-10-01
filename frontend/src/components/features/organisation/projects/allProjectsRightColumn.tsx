@@ -47,7 +47,7 @@ export const AllProjectsRightColumn: React.FC = () => {
       <Text variant="infoText">
         {t('projects.allProjectsDescription', {
           defaultValue:
-            'All projects of the current organization which you can administer. Create billing reports that contain time booked by project members not part of your organisation.',
+            'All projects in the current organization that you can administer. Create billing reports including time booked by external project members.',
         })}
       </Text>
       <Divider className="my-4" />

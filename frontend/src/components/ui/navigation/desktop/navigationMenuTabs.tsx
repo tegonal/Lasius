@@ -18,16 +18,18 @@
  */
 
 import { IconTabs, IconTabsItem } from 'components/ui/navigation/IconTabs'
+import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import { NAVIGATION } from 'projectConfig/routes'
 import React from 'react'
 
 export const NavigationMenuTabs: React.FC = () => {
   const router = useRouter()
+  const { t } = useTranslation('common')
 
   const tabs: IconTabsItem[] = NAVIGATION.map((item) => ({
     id: item.level,
-    name: item.name,
+    name: t(item.name as any),
     component: item.component,
     icon: item.icon,
     routes: item.routes.map((r) => r.route),

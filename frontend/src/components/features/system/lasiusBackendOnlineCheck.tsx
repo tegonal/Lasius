@@ -46,7 +46,7 @@ export const LasiusBackendOnlineCheck: React.FC = () => {
       <div>
         {t('system.offlineMessage', {
           defaultValue:
-            'Lasius is currently offline or undergoing maintenance. We will be back momentarily.',
+            'Lasius is currently offline or undergoing maintenance. We will be back shortly.',
         })}
       </div>
     </ModalResponsive>

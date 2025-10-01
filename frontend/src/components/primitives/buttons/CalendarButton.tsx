@@ -18,8 +18,9 @@
  */
 
 import { Button } from 'components/primitives/buttons/Button'
-import { Icon } from 'components/ui/icons/Icon'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { cn } from 'lib/utils/cn'
+import { Calendar } from 'lucide-react'
 import React from 'react'
 
 type Props = {
@@ -36,7 +37,7 @@ export const CalendarButton: React.FC<Props> = ({ onClick, className }) => {
       onClick={onClick}
       fullWidth={false}
       className={cn('text-base-content w-auto p-0 outline-none', className)}>
-      <Icon name="calendar-1-interface-essential" size={24} />
+      <LucideIcon icon={Calendar} size={24} />
     </Button>
   )
 }

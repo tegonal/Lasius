@@ -17,6 +17,8 @@
  *
  */
 
+import { ModelsUser, ModelsUserOrganisation, ModelsUserSettings } from 'lib/api/lasius'
+import { ROLES } from 'projectConfig/constants'
 import { create } from 'zustand'
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
@@ -32,6 +34,17 @@ interface OrganisationStore {
   // Organisation switching state
   isSwitchingOrganisation: boolean
   setIsSwitchingOrganisation: (switching: boolean) => void
+
+  // Cached organisations list
+  organisations: ModelsUserOrganisation[]
+  setOrganisations: (organisations: ModelsUserOrganisation[]) => void
+
+  // Cached user settings (needed for mutations)
+  userSettings: ModelsUserSettings | null
+  setUserSettings: (settings: ModelsUserSettings) => void
+
+  // Sync from profile data (called when profile fetches)
+  syncFromProfile: (profile: ModelsUser) => void
 
   // Helper to switch organisation with loading state
   switchOrganisation: (newId: string) => Promise<void>
@@ -49,6 +62,8 @@ export const useOrganisationStore = create<OrganisationStore>()(
           selectedOrganisationId: '',
           previousOrganisationId: '',
           isSwitchingOrganisation: false,
+          organisations: [],
+          userSettings: null,
 
           setSelectedOrganisationId: (id) =>
             set((state) => {
@@ -59,6 +74,46 @@ export const useOrganisationStore = create<OrganisationStore>()(
           setIsSwitchingOrganisation: (switching) =>
             set((state) => {
               state.isSwitchingOrganisation = switching
+            }),
+
+          setOrganisations: (organisations) =>
+            set((state) => {
+              state.organisations = organisations
+            }),
+
+          setUserSettings: (settings) =>
+            set((state) => {
+              state.userSettings = settings
+            }),
+
+          syncFromProfile: (profile) =>
+            set((state) => {
+              // Update organisations
+              if (profile.organisations) {
+                state.organisations = profile.organisations
+              }
+
+              // Update user settings
+              if (profile.settings) {
+                state.userSettings = profile.settings
+              }
+
+              // Initialize selectedOrganisationId if not set
+              if (!state.selectedOrganisationId) {
+                if (profile.settings?.lastSelectedOrganisation?.id) {
+                  state.previousOrganisationId = state.selectedOrganisationId
+                  state.selectedOrganisationId = profile.settings.lastSelectedOrganisation.id
+                } else if (profile.organisations) {
+                  // Fallback to private organisation
+                  const myPrivateOrg = profile.organisations.find(
+                    (item) => item.private,
+                  )?.organisationReference
+                  if (myPrivateOrg) {
+                    state.previousOrganisationId = state.selectedOrganisationId
+                    state.selectedOrganisationId = myPrivateOrg.id
+                  }
+                }
+              }
             }),
 
           switchOrganisation: async (newId) => {
@@ -87,6 +142,8 @@ export const useOrganisationStore = create<OrganisationStore>()(
               state.selectedOrganisationId = ''
               state.previousOrganisationId = ''
               state.isSwitchingOrganisation = false
+              state.organisations = []
+              state.userSettings = null
             }),
         })),
       ),
@@ -111,6 +168,20 @@ export const useIsSwitchingOrganisation = () =>
 
 export const usePreviousOrganisationId = () =>
   useOrganisationStore((state) => state.previousOrganisationId)
+
+export const useOrganisations = () => useOrganisationStore((state) => state.organisations)
+
+// Computed selector for isAdministrator based on cached data
+export const useIsAdministrator = () => {
+  const selectedOrganisationId = useSelectedOrganisationId()
+  const organisations = useOrganisations()
+
+  const selectedOrganisation = organisations.find(
+    (org) => org.organisationReference.id === selectedOrganisationId,
+  )
+
+  return selectedOrganisation?.role === ROLES.ORGANISATION_ADMIN
+}
 
 // Action hooks
 export const useOrganisationActions = () => {

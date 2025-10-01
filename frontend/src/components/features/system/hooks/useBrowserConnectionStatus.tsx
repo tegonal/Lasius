@@ -21,6 +21,25 @@ import { CONNECTION_STATUS } from 'projectConfig/constants'
 import React from 'react'
 import { useEventListener } from 'usehooks-ts'
 
+/**
+ * Custom hook for monitoring browser's online/offline connection status.
+ * Listens to browser online/offline events to track network connectivity.
+ *
+ * @returns Object containing:
+ *   - status: Current browser connection status (CONNECTED or DISCONNECTED)
+ *
+ * @example
+ * const { status } = useBrowserConnectionStatus()
+ *
+ * if (status === CONNECTION_STATUS.DISCONNECTED) {
+ *   return <OfflineWarning />
+ * }
+ *
+ * @remarks
+ * This tracks browser-level connectivity only. For API-specific connection status,
+ * use useLasiusApiStatus. This hook helps distinguish between network issues
+ * and backend-specific problems.
+ */
 export const useBrowserConnectionStatus = () => {
   const [status, setStatus] = React.useState(CONNECTION_STATUS.CONNECTED)
 

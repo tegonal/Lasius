@@ -17,7 +17,8 @@
  *
  */
 
-import { LoginLayout } from 'components/features/login/loginLayout'
+import { InternalLoginInfoPanel } from 'components/features/login/authInfoPanels'
+import { AuthLayout } from 'components/features/login/authLayout'
 import { Button } from 'components/primitives/buttons/Button'
 import { Input } from 'components/primitives/inputs/Input'
 import { P } from 'components/primitives/typography/Paragraph'
@@ -29,11 +30,11 @@ import { FormBody } from 'components/ui/forms/FormBody'
 import { FormElement } from 'components/ui/forms/FormElement'
 import { FormErrorBadge } from 'components/ui/forms/formErrorBadge'
 import { Logo } from 'components/ui/icons/Logo'
-import { TegonalFooter } from 'components/ui/navigation/TegonalFooter'
 import { LoginError } from 'dynamicTranslationStrings'
 import { ModelsApplicationConfig } from 'lib/api/lasius'
 import { getConfiguration } from 'lib/api/lasius/general/general'
 import { getLoginMutationKey } from 'lib/api/lasius/oauth2-provider/oauth2-provider'
+import { getServerSidePropsWithoutAuth } from 'lib/auth/getServerSidePropsWithoutAuth'
 import { logger } from 'lib/logger'
 import { LasiusPlausibleEvents } from 'lib/telemetry/plausibleEvents'
 import { usePlausible } from 'lib/telemetry/usePlausible'
@@ -41,17 +42,13 @@ import { isEmailAddress } from 'lib/utils/data/validators'
 import { formatISOLocale } from 'lib/utils/date/dates'
 import { GetServerSideProps, NextPage } from 'next'
 import { Trans, useTranslation } from 'next-i18next'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useRouter } from 'next/router'
 import { LASIUS_API_URL, LASIUS_DEMO_MODE } from 'projectConfig/constants'
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useCalendarActions } from 'stores/calendarStore'
 
-const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig; locale?: string }> = ({
-  config,
-  locale,
-}) => {
+const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig }> = ({ config }) => {
   const plausible = usePlausible<LasiusPlausibleEvents>()
   const { setSelectedDate } = useCalendarActions()
   const [error, setError] = useState<keyof typeof LoginError>()
@@ -147,20 +144,19 @@ const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig; locale?: s
       new URLSearchParams({
         invitation_id: invitation_id?.toString() || '',
         email: email?.toString() || '',
-        locale: locale || '',
       })
     void router.replace(url)
   }
 
   return (
-    <LoginLayout>
+    <AuthLayout infoPanel={<InternalLoginInfoPanel />}>
       {error && (
-        <Alert variant="warning" className="max-w-md">
+        <Alert variant="warning" className="animate-[fadeIn_0.4s_ease-out]">
           {LoginError[error]}
         </Alert>
       )}
       {registered && (
-        <Alert variant="info" className="max-w-md">
+        <Alert variant="info" className="animate-[fadeIn_0.4s_ease-out]">
           {t('auth.thankYouForRegistering', {
             defaultValue:
               'Thank you for registering. You can now log in using your email address and password. Welcome to Lasius!',
@@ -168,8 +164,8 @@ const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig; locale?: s
         </Alert>
       )}
       {LASIUS_DEMO_MODE === 'true' && (
-        <Alert variant="info" className="max-w-md">
-          <div className="max-w-lg">
+        <Alert variant="info" className="animate-[fadeIn_0.4s_ease-out]">
+          <div>
             <P>
               {t('demo.welcome', {
                 defaultValue:
@@ -195,17 +191,16 @@ const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig; locale?: s
           </div>
         </Alert>
       )}
-      <Card shadow="xl" className="border-base-300 bg-base-100 w-full max-w-md border">
-        <CardBody className="gap-6 p-8">
-          <div className="flex justify-center">
+      <Card className="bg-base-100/80 border-0 shadow-2xl backdrop-blur-sm">
+        <CardBody className="p-8 lg:p-10">
+          <div className="mb-4 flex justify-center lg:hidden">
             <Logo />
           </div>
-          <div className="h-4" />
-          <div className="space-y-3 text-center">
-            <p className="text-xl font-semibold">
+          <div className="mb-8 text-center">
+            <h2 className="mb-2 text-3xl font-bold">
               {t('auth.signInToLasius', { defaultValue: 'Sign in to Lasius' })}
-            </p>
-            <p className="text-base-content/70 text-sm">
+            </h2>
+            <p className="text-base-content/60 text-sm">
               {t('auth.enterEmailAndPassword', {
                 defaultValue: 'Enter your email and password to access your account',
               })}
@@ -257,37 +252,31 @@ const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig; locale?: s
           </form>
         </CardBody>
       </Card>
-      <TegonalFooter />
-    </LoginLayout>
+    </AuthLayout>
   )
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { locale, query } = context
-  const resolvedLocale = query.locale?.toString() || locale
-
-  let config
-  try {
-    config = await getConfiguration()
-  } catch (error) {
-    logger.error('[InternalOAuth][Login] Failed to fetch configuration from backend:', error)
-    // Provide a default config when backend is unavailable
-    config = {
-      title: 'Lasius',
-      instance: 'local',
-      lasiusOAuthProviderEnabled: false,
-      lasiusOAuthProviderAllowUserRegistration: false,
-      allowedIssuers: [],
+  return getServerSidePropsWithoutAuth(context, async (_context, _locale) => {
+    let config
+    try {
+      config = await getConfiguration()
+    } catch (error) {
+      logger.error('[InternalOAuth][Login] Failed to fetch configuration from backend:', error)
+      // Provide a default config when backend is unavailable
+      config = {
+        title: 'Lasius',
+        instance: 'local',
+        lasiusOAuthProviderEnabled: false,
+        lasiusOAuthProviderAllowUserRegistration: false,
+        allowedIssuers: [],
+      }
     }
-  }
 
-  return {
-    props: {
+    return {
       config: config,
-      ...(await serverSideTranslations(resolvedLocale || '', ['common'])),
-      locale: resolvedLocale,
-    },
-  }
+    }
+  })
 }
 
 export default InternalOAuthLogin

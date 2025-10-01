@@ -38,7 +38,6 @@ export const SegmentedTimeInput = () => {
   const [selectedSegment, setSelectedSegment] = useState<TimeSegment | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // Get segment boundaries in the string
   const getSegmentBounds = (value: string): SegmentBounds | null => {
     const parts = value.split(':')
     if (parts.length !== 2) return null
@@ -52,7 +51,6 @@ export const SegmentedTimeInput = () => {
     }
   }
 
-  // Determine which segment the cursor is in
   const getSegmentFromPosition = (position: number, value: string): TimeSegment | null => {
     const bounds = getSegmentBounds(value)
     if (!bounds) return null
@@ -61,7 +59,6 @@ export const SegmentedTimeInput = () => {
     return 'minute'
   }
 
-  // Parse lenient time input
   const parseTime = (value: string): Time | null => {
     const cleaned = value.replace(/[^\d:]/g, '')
     const parts = cleaned.split(':')
@@ -79,7 +76,6 @@ export const SegmentedTimeInput = () => {
     return { hours: h, minutes: m }
   }
 
-  // Format time to HH:MM
   const formatTime = (timeObj: Time | null): string => {
     if (!timeObj) return ''
     const h = timeObj.hours.toString().padStart(2, '0')
@@ -87,7 +83,6 @@ export const SegmentedTimeInput = () => {
     return `${h}:${m}`
   }
 
-  // Select a segment
   const selectSegment = (segment: TimeSegment): void => {
     const bounds = getSegmentBounds(inputValue)
     if (!bounds || !inputRef.current) return
@@ -100,7 +95,6 @@ export const SegmentedTimeInput = () => {
     setSelectedSegment(segment)
   }
 
-  // Handle click to select segment
   const handleClick = (_e: React.MouseEvent<HTMLInputElement>): void => {
     setTimeout(() => {
       const position = inputRef.current?.selectionStart
@@ -113,7 +107,6 @@ export const SegmentedTimeInput = () => {
     }, 0)
   }
 
-  // Handle input change with segment awareness
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const value = e.target.value
     const prevValue = inputValue
@@ -126,14 +119,11 @@ export const SegmentedTimeInput = () => {
         const selStart = inputRef.current.selectionStart
         const selEnd = inputRef.current.selectionEnd
 
-        // If selection matches a segment, we're replacing it
         if (selStart === segmentBounds.start && selEnd === segmentBounds.end) {
-          // User is typing to replace the segment
           const parts = prevValue.split(':')
           const typedChar = value.slice(selStart, selStart + 1)
 
           if (/\d/.test(typedChar)) {
-            // Replace the segment with the typed digit
             if (selectedSegment === 'hour') {
               parts[0] = typedChar.padStart(2, '0')
             } else if (selectedSegment === 'minute') {
@@ -143,7 +133,6 @@ export const SegmentedTimeInput = () => {
             const newValue = parts.join(':')
             setInputValue(newValue)
 
-            // Try to parse
             const parsed = parseTime(newValue)
             if (parsed) {
               setTime(parsed)
@@ -152,17 +141,14 @@ export const SegmentedTimeInput = () => {
               setIsValid(false)
             }
 
-            // Move to next segment
             setTimeout(() => {
               if (selectedSegment === 'hour') selectSegment('minute')
-              // Stay in minute segment after typing
             }, 0)
 
             return
           }
         }
 
-        // If we're typing a digit and the segment already has a single digit
         if (/^\d$/.test(value.slice(-1)) && value.length > prevValue.length) {
           const parts = prevValue.split(':')
           const newDigit = value.slice(-1)
@@ -172,7 +158,6 @@ export const SegmentedTimeInput = () => {
             const newValue = parts.join(':')
             setInputValue(newValue)
 
-            // Auto-advance to minute after typing 2 digits for hour
             setTimeout(() => selectSegment('minute'), 0)
 
             const parsed = parseTime(newValue)
@@ -201,7 +186,6 @@ export const SegmentedTimeInput = () => {
       }
     }
 
-    // Default behavior for normal typing
     setInputValue(value)
     setSelectedSegment(null)
 
@@ -220,12 +204,10 @@ export const SegmentedTimeInput = () => {
     }
   }
 
-  // Handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>): void => {
     const bounds = getSegmentBounds(inputValue)
     if (!bounds) return
 
-    // Colon key to move to minute segment
     if (e.key === ':') {
       e.preventDefault()
       const position = inputRef.current?.selectionStart
@@ -235,11 +217,9 @@ export const SegmentedTimeInput = () => {
         if (segment === 'hour') {
           selectSegment('minute')
         }
-        // If in minute, stay there (no next segment)
       }
     }
 
-    // Arrow keys for increment/decrement
     if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
       e.preventDefault()
 
@@ -262,12 +242,10 @@ export const SegmentedTimeInput = () => {
         const formatted = formatTime(newTime)
         setInputValue(formatted)
 
-        // Maintain selection on the same segment
         setTimeout(() => selectSegment(segment), 0)
       }
     }
 
-    // Tab to move between segments
     if (e.key === 'Tab' && !e.shiftKey) {
       const position = inputRef.current?.selectionStart
       if (typeof position === 'number') {
@@ -280,7 +258,6 @@ export const SegmentedTimeInput = () => {
       }
     }
 
-    // Shift+Tab to move backwards
     if (e.key === 'Tab' && e.shiftKey) {
       const position = inputRef.current?.selectionStart
       if (typeof position === 'number') {
@@ -293,7 +270,6 @@ export const SegmentedTimeInput = () => {
       }
     }
 
-    // Left/Right arrow keys to navigate segments
     if (e.key === 'ArrowLeft') {
       const position = inputRef.current?.selectionStart
       if (typeof position === 'number') {
@@ -319,7 +295,6 @@ export const SegmentedTimeInput = () => {
     }
   }
 
-  // Format on blur
   const handleBlur = (): void => {
     setSelectedSegment(null)
 
@@ -338,14 +313,12 @@ export const SegmentedTimeInput = () => {
     }
   }
 
-  // Initialize with a placeholder or empty formatted string
   useEffect(() => {
     if (!inputValue && !time) {
       setInputValue('__:__')
     }
   }, [inputValue, time])
 
-  // Handle focus to select first segment
   const handleFocus = (): void => {
     if (inputValue === '__:__') {
       setInputValue('')

@@ -65,7 +65,7 @@ export const OrganisationAddUpdateForm: React.FC<Props> = ({ item, onSave, onCan
     if (mode === 'add' && organisationName) {
       const newOrg = await createOrganisation({ key: organisationName })
       addToast({
-        message: t('organizations.status.created', { defaultValue: 'Organisation created' }),
+        message: t('organisations.status.created', { defaultValue: 'Organisation created' }),
         type: 'SUCCESS',
       })
       if (newOrg) {
@@ -80,7 +80,7 @@ export const OrganisationAddUpdateForm: React.FC<Props> = ({ item, onSave, onCan
         key: organisationName,
       })
       addToast({
-        message: t('organizations.status.updated', { defaultValue: 'Organisation updated' }),
+        message: t('organisations.status.updated', { defaultValue: 'Organisation updated' }),
         type: 'SUCCESS',
       })
     }
@@ -97,7 +97,7 @@ export const OrganisationAddUpdateForm: React.FC<Props> = ({ item, onSave, onCan
             <FieldSet>
               <FormElement>
                 <Label htmlFor="organisationName">
-                  {t('organizations.organizationName', { defaultValue: 'Organisation name' })}
+                  {t('organisations.organizationName', { defaultValue: 'Organisation name' })}
                 </Label>
                 <Input
                   {...hookForm.register('organisationName', { required: true })}

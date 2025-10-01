@@ -114,19 +114,16 @@ export const WorkingHoursGrid: React.FC = () => {
   return (
     <Card>
       <CardBody className="p-0">
-        {/* Grid */}
         <div>
           <table className="w-full">
             <thead>
               <tr>
-                {/* Empty cell for organization column */}
                 <th className="bg-base-100 border-base-300 sticky left-0 z-10 border-r border-b p-3 text-left">
                   <span className="text-base-content/70 text-sm font-medium">
-                    {t('organizations.organization', { defaultValue: 'Organization' })}
+                    {t('organisations.organization', { defaultValue: 'Organisation' })}
                   </span>
                 </th>
 
-                {/* Week day headers */}
                 {weekDays.map((day) => {
                   const isWeekend = day.key === 'saturday' || day.key === 'sunday'
                   return (
@@ -143,7 +140,6 @@ export const WorkingHoursGrid: React.FC = () => {
                   )
                 })}
 
-                {/* Total column header */}
                 <th className="border-base-300 bg-primary/5 border-b p-2 text-center">
                   <div className="text-primary text-sm font-semibold">
                     {t('common.total', { defaultValue: 'Total' })}
@@ -155,7 +151,6 @@ export const WorkingHoursGrid: React.FC = () => {
             <tbody>
               {organisations?.map((org) => (
                 <tr key={org.organisationReference.id} className="group hover:bg-base-200/20">
-                  {/* Organization cell */}
                   <td className="bg-base-100 border-base-300 sticky left-0 z-10 border-r p-3">
                     <div className="flex items-center gap-2">
                       <AvatarOrganisation name={org.organisationReference.key} size={24} />
@@ -163,7 +158,7 @@ export const WorkingHoursGrid: React.FC = () => {
                         className="max-w-[15ch] truncate text-sm font-medium"
                         title={org.organisationReference.key}>
                         {org.private
-                          ? t('organizations.myPersonalOrganisation', {
+                          ? t('organisations.myPersonalOrganisation', {
                               defaultValue: 'My personal organisation',
                             })
                           : org.organisationReference.key}
@@ -171,7 +166,6 @@ export const WorkingHoursGrid: React.FC = () => {
                     </div>
                   </td>
 
-                  {/* Hour cells */}
                   {weekDays.map((day) => {
                     const hours = (org.plannedWorkingHours || plannedWorkingHoursStub)[day.key]
                     const isWeekend = day.key === 'saturday' || day.key === 'sunday'
@@ -203,7 +197,6 @@ export const WorkingHoursGrid: React.FC = () => {
                     )
                   })}
 
-                  {/* Row total */}
                   <td className="bg-primary/5 p-2 text-center">
                     <span className="text-primary font-semibold">
                       {decimalHoursToDurationStringRounded(calculateOrgTotal(org))}
@@ -212,7 +205,6 @@ export const WorkingHoursGrid: React.FC = () => {
                 </tr>
               ))}
 
-              {/* Summary row */}
               <tr className="bg-base-200/50 font-medium">
                 <td className="bg-base-200/50 border-base-300 sticky left-0 z-10 border-t border-r p-3">
                   <span className="text-sm font-semibold">

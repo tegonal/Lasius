@@ -17,10 +17,10 @@
  *
  */
 
-import { Icon } from 'components/ui/icons/Icon'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { cn } from 'lib/utils/cn'
+import { ArrowDown, ArrowUp, LucideIcon as LucideIconType } from 'lucide-react'
 import React from 'react'
-import { IconNames } from 'types/iconNames'
 
 type Props = {
   onClick: React.MouseEventHandler<HTMLDivElement>
@@ -30,16 +30,16 @@ type Props = {
 }
 
 export const UpDownButton: React.FC<Props> = ({ onClick, direction, className }) => {
-  const iconNames: Record<typeof direction, IconNames> = {
-    up: 'arrow-up-1-arrows-diagrams',
-    down: 'arrow-down-1-arrows-diagrams',
+  const icons: Record<typeof direction, LucideIconType> = {
+    up: ArrowUp,
+    down: ArrowDown,
   }
   return (
     <div className={cn('w-full', className)}>
       <div
         onClick={onClick}
         className="btn btn-ghost btn-square cursor-pointer px-0 py-[5px] opacity-60 hover:opacity-100">
-        <Icon name={iconNames[direction]} size={16} />
+        <LucideIcon icon={icons[direction]} size={16} />
       </div>
     </div>
   )

@@ -21,7 +21,7 @@ import { isString } from 'es-toolkit'
 import { IsoDateString } from 'lib/api/apiDateHandling'
 import { dateFormat } from 'lib/utils/date/dateFormat'
 import { formatISOLocale } from 'lib/utils/date/dates'
-import { useRouter } from 'next/router'
+import { useTranslation } from 'next-i18next'
 import React, { memo } from 'react'
 
 const dateFormats = {
@@ -41,9 +41,9 @@ export const FormatDate: React.FC<{
   date: IsoDateString | Date
   format: keyof typeof dateFormats
 }> = memo(({ date, format }) => {
-  const { locale } = useRouter()
+  const { i18n } = useTranslation()
   if (isString(date)) {
-    return <>{dateFormat(date, dateFormats[format], locale)}</>
+    return <>{dateFormat(date, dateFormats[format], i18n.language)}</>
   }
-  return <>{dateFormat(formatISOLocale(date), dateFormats[format], locale)}</>
+  return <>{dateFormat(formatISOLocale(date), dateFormats[format], i18n.language)}</>
 })

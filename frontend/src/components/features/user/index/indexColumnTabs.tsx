@@ -23,6 +23,7 @@ import { FavoriteListCompact } from 'components/features/user/index/favorites/fa
 import { OrganisationListCompact } from 'components/features/user/index/organisation/organisationListCompact'
 import { Divider } from 'components/primitives/divider'
 import { IconTabs, IconTabsItem } from 'components/ui/navigation/IconTabs'
+import { Clock, Star, Users } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
 
@@ -40,7 +41,7 @@ export const IndexColumnTabs: React.FC = () => {
           <BookingAddButton />
         </div>
       ),
-      icon: 'stopwatch-interface-essential',
+      icon: Clock,
     },
     {
       id: 'bookingStartFav',
@@ -48,7 +49,7 @@ export const IndexColumnTabs: React.FC = () => {
         defaultValue: 'Start booking from favorite',
       }),
       component: <FavoriteListCompact />,
-      icon: 'rating-star-social-medias-rewards-rating',
+      icon: Star,
     },
     {
       id: 'bookingStartTeam',
@@ -56,7 +57,7 @@ export const IndexColumnTabs: React.FC = () => {
         defaultValue: 'Start booking from team member',
       }),
       component: <OrganisationListCompact />,
-      icon: 'human-resources-search-team-work-office-companies',
+      icon: Users,
     },
   ]
 

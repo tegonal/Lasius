@@ -129,7 +129,6 @@ export const InputSelectAutocomplete: React.FC<Props> = ({
               {({ open }) => (
                 <>
                   <div className="join w-full">
-                    {/* Input field as first join item - wrapped in ComboboxButton to open on click/focus */}
                     <ComboboxButton as="div" className="join-item flex-1">
                       <ComboboxInput
                         as={Input}
@@ -141,7 +140,6 @@ export const InputSelectAutocomplete: React.FC<Props> = ({
                           setFilterText(newValue)
                         }}
                         onFocus={() => {
-                          // When focusing, if there's a selected value, clear the filter to show all options
                           if (
                             selected &&
                             inputText === (selected as SelectAutocompleteSuggestionType)?.key
@@ -158,7 +156,6 @@ export const InputSelectAutocomplete: React.FC<Props> = ({
                       />
                     </ComboboxButton>
 
-                    {/* Clear button if there's a selection */}
                     {(selected || inputText) && (
                       <button
                         type="button"
@@ -168,7 +165,6 @@ export const InputSelectAutocomplete: React.FC<Props> = ({
                       </button>
                     )}
 
-                    {/* Dropdown button as last join item */}
                     <ComboboxButton className="btn btn-neutral join-item px-2">
                       <LucideIcon icon={open ? ChevronUp : ChevronDown} size={20} />
                     </ComboboxButton>

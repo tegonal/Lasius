@@ -31,6 +31,35 @@ import { UI_SLOW_DATA_DEDUPE_INTERVAL } from 'projectConfig/intervals'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useInterval } from 'usehooks-ts'
 
+/**
+ * Custom hook for real-time tracking of booking progress for a specific day.
+ * Similar to useGetBookingSummaryDay but includes live updates for the currently running booking.
+ * Updates every second to reflect the ongoing booking duration in real-time.
+ *
+ * @param date - ISO date string for the day to track (format: 'YYYY-MM-DD')
+ *
+ * @returns Object containing:
+ *   - hours: Total hours booked including current running booking (live-updated)
+ *   - minutes: Total minutes booked including current running booking
+ *   - bookings: Array of completed bookings for the day
+ *   - plannedWorkingHours: Expected working hours for the day
+ *   - fulfilledPercentage: Percentage of planned hours completed (capped at 100%, live-updated)
+ *   - progressBarPercentage: Actual percentage for progress bar display (can exceed 100%, live-updated)
+ *
+ * @example
+ * const progress = useGetBookingProgressDay('2025-01-15')
+ *
+ * // Real-time display updating every second
+ * console.log(`Current progress: ${progress.hours.toFixed(2)} hours`)
+ * console.log(`Completion: ${progress.fulfilledPercentage}%`)
+ *
+ * @remarks
+ * - Updates every 1000ms (1 second) to show live progress of current booking
+ * - Only includes current booking duration for today's date
+ * - For past dates, behaves like useGetBookingSummaryDay (no live updates)
+ * - Performance optimized with adaptive revalidation based on date
+ * - Uses useInterval for smooth real-time updates without excessive re-renders
+ */
 export const useGetBookingProgressDay = (date: IsoDateString) => {
   const { selectedOrganisationId } = useOrganisation()
   const { plannedHoursDay: plannedWorkingHours } = useGetPlannedWorkingHoursByDate(date)

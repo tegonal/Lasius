@@ -35,28 +35,22 @@ type Props = {
 export const LayoutResponsive: React.FC<Props> = ({ children, rightColumn, mobileContent }) => {
   return (
     <PageLayoutResponsive>
-      {/* Desktop Header - hidden on mobile */}
       <div className="hidden md:block">
         <HeaderDesktop />
       </div>
 
-      {/* Mobile Header - hidden on desktop */}
       <div className="overflow-hidden md:hidden">
         <HeaderMobile />
       </div>
 
-      {/* Desktop Layout - Three columns */}
       <section className="bg-base-200 border-base-content/20 hidden h-full w-full overflow-auto rounded-t-xl border border-b-0 shadow-2xl md:block">
         <ContainerColumnsDesktop>
-          {/* Left Column - Navigation */}
           <div className="h-full w-full rounded-tl-xl">
             <NavigationMenuTabs />
           </div>
 
-          {/* Center Column - Main content */}
           <Suspense fallback={<Loading />}>{children}</Suspense>
 
-          {/* Right Column - Optional */}
           {rightColumn && (
             <div className="border-base-100 bg-base-200 text-base-content flex h-full w-full overflow-auto rounded-tr-xl border-l">
               {rightColumn}
@@ -65,12 +59,10 @@ export const LayoutResponsive: React.FC<Props> = ({ children, rightColumn, mobil
         </ContainerColumnsDesktop>
       </section>
 
-      {/* Mobile Layout - Single column */}
-      <section className="h-full w-full overflow-hidden md:hidden">
+      <section className="bg-base-200 h-full w-full overflow-hidden md:hidden">
         <Suspense fallback={<Loading />}>{mobileContent || children}</Suspense>
       </section>
 
-      {/* Mobile Navigation FAB - only visible on mobile */}
       <div className="fixed bottom-4 left-4 z-10 md:hidden">
         <MobileNavigationButton />
       </div>

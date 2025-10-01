@@ -17,6 +17,7 @@
  *
  */
 
+import { StatsExport } from 'components/features/user/stats/statsExport'
 import { StatsOverview } from 'components/features/user/stats/statsOverview'
 import { ColumnList } from 'components/primitives/layout/ColumnList'
 import { ScrollContainer } from 'components/primitives/layout/ScrollContainer'
@@ -46,12 +47,19 @@ export const StatsLayout: React.FC = () => {
 
   return (
     <FormProvider {...hookForm}>
-      <ScrollContainer className="bg-base-100 flex-1 overflow-y-auto pt-4">
-        <StatsContent />
+      <ScrollContainer className="bg-base-100 flex-1 overflow-y-auto">
+        <div className="bg-base-200 px-6 py-4">
+          <div className="flex items-start justify-between">
+            <StatsOverview />
+            <StatsExport />
+          </div>
+        </div>
+        <div className="pt-4">
+          <StatsContent />
+        </div>
       </ScrollContainer>
       <ScrollContainer className="bg-base-200 flex-1 overflow-y-auto rounded-tr-lg">
         <ColumnList>
-          <StatsOverview />
           <StatsFilter />
         </ColumnList>
       </ScrollContainer>

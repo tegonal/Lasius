@@ -29,7 +29,7 @@ import { FormElement } from 'components/ui/forms/FormElement'
 import { FormErrorBadge } from 'components/ui/forms/formErrorBadge'
 import { InputTagsAdmin } from 'components/ui/forms/input/InputTagsAdmin'
 import { preventEnterOnForm } from 'components/ui/forms/input/shared/preventEnterOnForm'
-import { Icon } from 'components/ui/icons/Icon'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { isEqual, noop, unionWith } from 'es-toolkit/compat'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { ModelsProject, ModelsSimpleTag, ModelsTagGroup, ModelsUserProject } from 'lib/api/lasius'
@@ -41,10 +41,12 @@ import {
 import { getGetUserProfileKey } from 'lib/api/lasius/user/user'
 import { logger } from 'lib/logger'
 import { stringHash } from 'lib/utils/string/stringHash'
+import { HelpCircle, Trash2 } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import { tagGroupTemplate } from 'projectConfig/tagGroupTemplate'
 import React, { useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
+import { useHelpStore } from 'stores/helpStore'
 import { useSWRConfig } from 'swr'
 
 type Props = {
@@ -62,6 +64,7 @@ type FormValues = {
 
 export const ProjectAddUpdateTagsForm: React.FC<Props> = ({ item, onSave, onCancel, mode }) => {
   const { t } = useTranslation('common')
+  const { openHelp } = useHelpStore()
 
   const hookForm = useForm<FormValues>({
     defaultValues: {
@@ -88,7 +91,6 @@ export const ProjectAddUpdateTagsForm: React.FC<Props> = ({ item, onSave, onCanc
 
   useEffect(() => {
     if (item && bookingCategories.data) {
-      // filter taggroups and simpletags into separate arrays for editing, we are merging them back together on submit
       const tagGroups = bookingCategories.data.filter((tag) => tag.type === 'TagGroup') as
         | ModelsTagGroup[]
         | []
@@ -254,7 +256,7 @@ export const ProjectAddUpdateTagsForm: React.FC<Props> = ({ item, onSave, onCanc
                             variant="ghost"
                             size="sm"
                             onClick={() => removeTagGroup(index)}>
-                            <Icon name="bin-2-alternate-interface-essential" size={18} />
+                            <LucideIcon icon={Trash2} size={18} />
                           </Button>
                         </div>
                       </div>
@@ -292,7 +294,7 @@ export const ProjectAddUpdateTagsForm: React.FC<Props> = ({ item, onSave, onCanc
                 </FormElement>
               </FormBody>
             </div>
-            <div>
+            <div className="flex flex-col">
               <FormElement>
                 <Button type="button" variant="secondary" onClick={() => addTemplate()}>
                   {t('tags.actions.addDefaultTagGroups', {
@@ -308,6 +310,20 @@ export const ProjectAddUpdateTagsForm: React.FC<Props> = ({ item, onSave, onCanc
                 <Button type="button" variant="secondary" onClick={onCancel}>
                   {t('common.actions.cancel', { defaultValue: 'Cancel' })}
                 </Button>
+              </FormElement>
+              <div className="flex-grow" />
+              <FormElement>
+                <div className="flex justify-end">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    shape="circle"
+                    size="sm"
+                    onClick={() => openHelp('modal-edit-tags')}
+                    fullWidth={false}>
+                    <LucideIcon icon={HelpCircle} size={20} />
+                  </Button>
+                </div>
               </FormElement>
             </div>
           </div>

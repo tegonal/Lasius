@@ -17,6 +17,10 @@
  *
  */
 
+/**
+ * Default stub object for planned working hours with all weekdays set to 0.
+ * Used as a fallback or initial state when no working hours are configured.
+ */
 export const plannedWorkingHoursStub = {
   monday: 0,
   tuesday: 0,

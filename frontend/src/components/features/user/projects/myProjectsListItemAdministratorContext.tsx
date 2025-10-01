@@ -22,6 +22,7 @@ import { ContextButtonDeactivateProject } from 'components/features/contextMenu/
 import { ContextButtonLeaveProject } from 'components/features/contextMenu/buttons/contextButtonLeaveProject'
 import { ContextButtonOpen } from 'components/features/contextMenu/buttons/contextButtonOpen'
 import { ContextBar } from 'components/features/contextMenu/contextBar'
+import { ContextBarDivider } from 'components/features/contextMenu/contextBarDivider'
 import { ContextCompactAnimatePresence } from 'components/features/contextMenu/contextCompactAnimatePresence'
 import { ContextCompactBody } from 'components/features/contextMenu/contextCompactBody'
 import { ContextCompactButtonWrapper } from 'components/features/contextMenu/contextCompactButtonWrapper'
@@ -29,14 +30,15 @@ import { useContextMenu } from 'components/features/contextMenu/hooks/useContext
 import { ManageProjectMembers } from 'components/features/projects/manageMembers'
 import { ProjectAddUpdateForm } from 'components/features/projects/projectAddUpdateForm'
 import { ProjectAddUpdateTagsForm } from 'components/features/projects/projectAddUpdateTagsForm'
-import { ProjectBookingsCsvExport } from 'components/features/projects/projectBookingsCsvExport'
+import { ProjectBookingsExport } from 'components/features/projects/projectBookingsExport'
 import { Button } from 'components/primitives/buttons/Button'
 import { FormElement } from 'components/ui/forms/FormElement'
-import { Icon } from 'components/ui/icons/Icon'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import useModal from 'components/ui/overlays/modal/hooks/useModal'
 import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
 import { AnimatePresence } from 'framer-motion'
 import { ModelsUserProject } from 'lib/api/lasius'
+import { FileText, Pencil, PieChart, Tags, Users } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
 
@@ -95,7 +97,7 @@ export const MyProjectsListItemAdministratorContext: React.FC<Props> = ({ item }
                     onClick={() => manageMembers()}
                     fullWidth={false}
                     shape="circle">
-                    <Icon name="human-resources-search-team-work-office-companies" size={24} />
+                    <LucideIcon icon={Users} size={24} />
                   </Button>
                 </ContextCompactButtonWrapper>
                 <ContextCompactButtonWrapper>
@@ -106,22 +108,22 @@ export const MyProjectsListItemAdministratorContext: React.FC<Props> = ({ item }
                     onClick={() => showStats()}
                     fullWidth={false}
                     shape="circle">
-                    <Icon name="pie-line-graph-interface-essential" size={24} />
+                    <LucideIcon icon={PieChart} size={24} />
                   </Button>
                 </ContextCompactButtonWrapper>
                 <ContextCompactButtonWrapper>
                   <Button
                     variant="contextIcon"
                     title={t('export.getBillingReports', {
-                      defaultValue: 'Get billing reports as CSV',
+                      defaultValue: 'Get billing reports',
                     })}
                     aria-label={t('export.getBillingReports', {
-                      defaultValue: 'Get billing reports as CSV',
+                      defaultValue: 'Get billing reports',
                     })}
                     onClick={() => showExport()}
                     fullWidth={false}
                     shape="circle">
-                    <Icon name="filter-text-interface-essential" size={24} />
+                    <LucideIcon icon={FileText} size={24} />
                   </Button>
                 </ContextCompactButtonWrapper>
                 <ContextCompactButtonWrapper>
@@ -132,7 +134,7 @@ export const MyProjectsListItemAdministratorContext: React.FC<Props> = ({ item }
                     onClick={() => updateProject()}
                     fullWidth={false}
                     shape="circle">
-                    <Icon name="pencil-2-interface-essential" size={24} />
+                    <LucideIcon icon={Pencil} size={24} />
                   </Button>
                 </ContextCompactButtonWrapper>
                 <ContextCompactButtonWrapper>
@@ -143,11 +145,12 @@ export const MyProjectsListItemAdministratorContext: React.FC<Props> = ({ item }
                     onClick={() => manageTags()}
                     fullWidth={false}
                     shape="circle">
-                    <Icon name="tags-double-interface-essential" size={24} />
+                    <LucideIcon icon={Tags} size={24} />
                   </Button>
                 </ContextCompactButtonWrapper>
                 <ContextButtonDeactivateProject item={item} variant="compact" />
                 <ContextButtonLeaveProject item={item} variant="compact" />
+                <ContextBarDivider />
                 <ContextButtonClose variant="compact" />
               </ContextBar>
             </ContextCompactAnimatePresence>
@@ -191,7 +194,7 @@ export const MyProjectsListItemAdministratorContext: React.FC<Props> = ({ item }
         </FormElement>
       </ModalResponsive>
       <ModalResponsive modalId={exportModal.modalId} autoSize>
-        <ProjectBookingsCsvExport item={item.projectReference} />
+        <ProjectBookingsExport item={item.projectReference} />
         <FormElement>
           <Button type="button" variant="secondary" onClick={exportModal.closeModal}>
             {t('common.actions.cancel', { defaultValue: 'Cancel' })}

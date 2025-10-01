@@ -26,6 +26,45 @@ import { useMemo } from 'react'
 import { UserBookingSource } from 'types/booking'
 import { Granularity } from 'types/common'
 
+/**
+ * Custom hook for fetching and transforming user booking statistics by source and day.
+ * Retrieves aggregated booking data for the current user within a specific organisation and date range,
+ * then transforms it into Nivo chart-compatible format for visualization in statistics views.
+ *
+ * @param orgId - Organisation ID to fetch user statistics for
+ * @param options - Configuration object containing:
+ *   - source: Source type to filter bookings (e.g., 'UserBooking', 'ProjectBooking')
+ *   - from: Start date of the date range (ISO date string)
+ *   - to: End date of the date range (ISO date string)
+ *   - granularity: Optional time granularity for aggregation (auto-calculated from date range if not provided)
+ *
+ * @returns Object containing:
+ *   - data: Transformed statistics data in Nivo chart format (undefined if loading/no data)
+ *   - isValidating: Boolean indicating if data is currently being revalidated
+ *   - error: Error object if the request failed
+ *
+ * @example
+ * const { data, isValidating } = useGetUserStatsBySourceAndDay(
+ *   'org-123',
+ *   {
+ *     source: 'UserBooking',
+ *     from: '2025-01-01',
+ *     to: '2025-01-31',
+ *     granularity: 'Week'
+ *   }
+ * )
+ *
+ * if (isValidating) return <Spinner />
+ * if (data) return <BarChart data={data} />
+ *
+ * @remarks
+ * - Uses custom statsSwrConfig for optimized caching strategy
+ * - Automatically determines granularity from date range if not specified
+ * - Includes planned working hours context for comparison in charts
+ * - Data is memoized to prevent unnecessary transformations
+ * - Handles invalid date ranges gracefully (empty from/to strings)
+ * - Transformed data structure is optimized for Nivo chart rendering
+ */
 export const useGetUserStatsBySourceAndDay = (
   orgId: string,
   {
