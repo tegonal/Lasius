@@ -66,13 +66,17 @@ export const createDatePickerStore = () =>
       setDateFromString: (dateString) => {
         const { timeString } = get().value
         const parsed = parseDateTimeStrings(dateString, timeString)
-        // Always update the display strings, but only update date if valid and not partial
+        // If valid and complete, format the date string; otherwise keep the input as-is
+        const formattedDateString =
+          parsed.isValid && !parsed.isPartial && parsed.date
+            ? formatDateString(parsed.date)
+            : dateString
         set({
           value: {
             date: parsed.isValid && !parsed.isPartial ? parsed.date : get().value.date,
             isValid: parsed.isValid,
             isPartial: parsed.isPartial,
-            dateString,
+            dateString: formattedDateString,
             timeString,
           },
         })
@@ -81,14 +85,18 @@ export const createDatePickerStore = () =>
       setTimeFromString: (timeString) => {
         const { dateString } = get().value
         const parsed = parseDateTimeStrings(dateString, timeString)
-        // Always update the display strings, but only update date if valid and not partial
+        // If valid and complete, format the time string; otherwise keep the input as-is
+        const formattedTimeString =
+          parsed.isValid && !parsed.isPartial && parsed.date
+            ? formatTimeString(parsed.date)
+            : timeString
         set({
           value: {
             date: parsed.isValid && !parsed.isPartial ? parsed.date : get().value.date,
             isValid: parsed.isValid,
             isPartial: parsed.isPartial,
             dateString,
-            timeString,
+            timeString: formattedTimeString,
           },
         })
       },

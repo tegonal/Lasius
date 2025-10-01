@@ -17,6 +17,7 @@
  *
  */
 
+import { logger } from 'lib/logger'
 import { ModalViewType, TabViewType, ToastViewType } from 'types/dynamicViews'
 import { create } from 'zustand'
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware'
@@ -46,6 +47,13 @@ interface UIStore {
   setTabActive: (id: string, activeIndex: number) => void
   removeTab: (id: string) => void
   clearTabs: () => void
+
+  // Global loading state
+  globalLoading: boolean
+  globalLoadingCounter: number
+  setGlobalLoading: (isLoading: boolean) => void
+  showGlobalLoading: () => void
+  hideGlobalLoading: () => void
 }
 
 export const useUIStore = create<UIStore>()(
@@ -140,6 +148,38 @@ export const useUIStore = create<UIStore>()(
             set((state) => {
               state.tabViews = []
             }),
+
+          // Global loading state
+          globalLoading: false,
+          globalLoadingCounter: 0,
+          setGlobalLoading: (isLoading) =>
+            set((state) => {
+              state.globalLoading = isLoading
+              // Reset counter when explicitly setting to false
+              if (!isLoading) {
+                state.globalLoadingCounter = 0
+              }
+            }),
+          showGlobalLoading: () =>
+            set((state) => {
+              state.globalLoadingCounter += 1
+              state.globalLoading = true
+            }),
+          hideGlobalLoading: () =>
+            set((state) => {
+              state.globalLoadingCounter -= 1
+
+              // Escape hatch: detect negative counter and reset
+              if (state.globalLoadingCounter < 0) {
+                logger.warn(
+                  '[UIStore] globalLoadingCounter went negative. This indicates mismatched show/hide calls. Resetting to 0.',
+                  { counter: state.globalLoadingCounter },
+                )
+                state.globalLoadingCounter = 0
+              }
+
+              state.globalLoading = state.globalLoadingCounter > 0
+            }),
         })),
       ),
       {
@@ -161,6 +201,7 @@ export const useContextMenuOpen = () => useUIStore((state) => state.contextMenuO
 export const useModalViews = () => useUIStore((state) => state.modalViews)
 export const useToastViews = () => useUIStore((state) => state.toastViews)
 export const useTabViews = () => useUIStore((state) => state.tabViews)
+export const useGlobalLoading = () => useUIStore((state) => state.globalLoading)
 
 // Action hooks
 export const useUIActions = () => {
@@ -172,6 +213,9 @@ export const useUIActions = () => {
   const addToast = useUIStore((state) => state.addToast)
   const removeToast = useUIStore((state) => state.removeToast)
   const setTabActive = useUIStore((state) => state.setTabActive)
+  const setGlobalLoading = useUIStore((state) => state.setGlobalLoading)
+  const showGlobalLoading = useUIStore((state) => state.showGlobalLoading)
+  const hideGlobalLoading = useUIStore((state) => state.hideGlobalLoading)
 
   return {
     setContextMenuOpen,
@@ -182,5 +226,8 @@ export const useUIActions = () => {
     addToast,
     removeToast,
     setTabActive,
+    setGlobalLoading,
+    showGlobalLoading,
+    hideGlobalLoading,
   }
 }

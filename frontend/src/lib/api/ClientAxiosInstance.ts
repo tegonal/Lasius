@@ -19,9 +19,43 @@
 
 import Axios from 'axios'
 import { IS_SERVER, LASIUS_API_URL, LASIUS_API_URL_INTERNAL } from 'projectConfig/constants'
+import { useUIStore } from 'stores/uiStore'
 
 const clientAxiosInstance = Axios.create({
   baseURL: IS_SERVER ? LASIUS_API_URL_INTERNAL : LASIUS_API_URL,
 }) // use your own URL here or environment variable
+
+// Add request interceptor to show global loading
+clientAxiosInstance.interceptors.request.use(
+  (config) => {
+    // Only track requests on the client side
+    if (!IS_SERVER) {
+      useUIStore.getState().showGlobalLoading()
+    }
+    return config
+  },
+  (error) => {
+    if (!IS_SERVER) {
+      useUIStore.getState().hideGlobalLoading()
+    }
+    return Promise.reject(error)
+  },
+)
+
+// Add response interceptor to hide global loading
+clientAxiosInstance.interceptors.response.use(
+  (response) => {
+    if (!IS_SERVER) {
+      useUIStore.getState().hideGlobalLoading()
+    }
+    return response
+  },
+  (error) => {
+    if (!IS_SERVER) {
+      useUIStore.getState().hideGlobalLoading()
+    }
+    return Promise.reject(error)
+  },
+)
 
 export default clientAxiosInstance

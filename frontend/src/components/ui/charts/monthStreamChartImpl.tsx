@@ -182,15 +182,13 @@ export const MonthStreamChartImpl: React.FC<Props> = ({ data, keys }) => {
           <ResponsiveStream
             data={safeData}
             keys={safeKeys}
-            margin={{ top: 20, right: 20, bottom: 50, left: 60 }}
+            margin={{ top: 0, right: 10, bottom: 30, left: 10 }}
             axisTop={null}
             axisRight={null}
             axisBottom={{
               tickSize: 5,
               tickPadding: 5,
               tickRotation: 0,
-              legend: t('common.time.weekday', { defaultValue: 'Weekday' }),
-              legendOffset: 36,
               format: (value) => weekDays[value] || value,
             }}
             axisLeft={null}

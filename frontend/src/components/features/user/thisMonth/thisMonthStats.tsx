@@ -140,7 +140,7 @@ export const ThisMonthStats: React.FC = () => {
 
         {topProjects.length > 0 && (
           <div className="flex-1">
-            <div className="stats h-fit w-full shadow">
+            <div className="stats h-fit w-full">
               <div className="stat">
                 <div className="stat-title">
                   Top {t('projects.title', { defaultValue: 'Projects' })}

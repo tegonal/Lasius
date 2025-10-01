@@ -24,6 +24,9 @@ import { CONNECTION_STATUS, IS_SERVER, LASIUS_API_WEBSOCKET_URL } from 'projectC
 import { useEffect, useState } from 'react'
 import useWebSocket, { ReadyState } from 'react-use-websocket'
 
+// Maximum number of messages to keep in history to prevent memory exhaustion
+const MAX_MESSAGE_HISTORY = 100
+
 /**
  * Custom hook for managing WebSocket connection to the Lasius backend.
  * Provides real-time bidirectional communication for live updates of bookings,
@@ -93,7 +96,14 @@ export const useLasiusWebsocket = () => {
 
   useEffect(() => {
     if (lastMessage !== null) {
-      setMessageHistory((prev) => [...prev, lastMessage])
+      setMessageHistory((prev) => {
+        const newHistory = [...prev, lastMessage]
+        // Keep only the last MAX_MESSAGE_HISTORY messages to prevent unbounded growth
+        if (newHistory.length > MAX_MESSAGE_HISTORY) {
+          return newHistory.slice(-MAX_MESSAGE_HISTORY)
+        }
+        return newHistory
+      })
     }
   }, [lastMessage, setMessageHistory])
 

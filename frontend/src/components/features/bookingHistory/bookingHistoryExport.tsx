@@ -17,7 +17,8 @@
  *
  */
 
-import { exportBookingList, type ExportFormat } from 'lib/utils/data/export'
+import { useToast } from 'components/ui/feedback/hooks/useToast'
+import { exportBookingList, type ExportContext, type ExportFormat } from 'lib/utils/data/export'
 import { ChevronDown, Download } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
@@ -25,12 +26,24 @@ import { ExtendedHistoryBooking } from 'types/booking'
 
 type Props = {
   bookings: ExtendedHistoryBooking[]
+  context: ExportContext
+  from?: string
+  to?: string
 }
-export const BookingHistoryExport: React.FC<Props> = ({ bookings }) => {
+export const BookingHistoryExport: React.FC<Props> = ({ bookings, context, from, to }) => {
   const { t } = useTranslation('common')
+  const { addToast } = useToast()
 
   const handleExport = (format: ExportFormat) => {
-    exportBookingList(bookings, format)
+    const filename = exportBookingList(bookings, format, undefined, { context, from, to })
+    addToast({
+      message: t('export.status.success', {
+        defaultValue: 'Export successful: {{filename}}',
+        filename,
+      }),
+      type: 'SUCCESS',
+      ttl: 60000,
+    })
   }
 
   return (

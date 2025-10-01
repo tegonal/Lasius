@@ -129,6 +129,7 @@ export const BookingHistoryLayout: React.FC<Props> = ({ dataSource }) => {
   const allowEdit = dataSource === 'userBookings'
   const allowDelete = dataSource === 'userBookings'
   const showUserColumn = dataSource === 'organisationBookings'
+  const exportContext = dataSource === 'userBookings' ? 'user' : 'organisation'
 
   if (!isClient) return null
 
@@ -144,7 +145,12 @@ export const BookingHistoryLayout: React.FC<Props> = ({ dataSource }) => {
               users={distinctUsers}
               projects={distinctProjects}
             />
-            <BookingHistoryExport bookings={processedItems} />
+            <BookingHistoryExport
+              bookings={processedItems}
+              context={exportContext}
+              from={hookForm.getValues('from')}
+              to={hookForm.getValues('to')}
+            />
           </div>
         </div>
         {!response.data && response.isValidating && <Loading />}

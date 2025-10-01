@@ -21,27 +21,39 @@ import { useContextMenu } from 'components/features/contextMenu/hooks/useContext
 import { logger } from 'lib/logger'
 import { useRouter } from 'next/router'
 import React, { useEffect } from 'react'
+import { useUIStore } from 'stores/uiStore'
 
 export const BootstrapTasks: React.FC = () => {
   const { events } = useRouter()
   const { handleCloseAll } = useContextMenu()
+  const showGlobalLoading = useUIStore((state) => state.showGlobalLoading)
+  const hideGlobalLoading = useUIStore((state) => state.hideGlobalLoading)
+
+  const handleRouteChangeStart = () => {
+    logger.info('[BootstrapTasks][onRouteChangeStart]')
+    showGlobalLoading()
+  }
 
   const handleRouteChangeComplete = (newRoute: any) => {
     logger.info('[BootstrapTasks][onRouteChangeComplete]', { newRoute })
+    hideGlobalLoading()
     handleCloseAll()
   }
 
   const handleRouteChangeError = (errorRoute: string) => {
     logger.error('[BootstrapTasks][onRouteChangeError]', errorRoute)
+    hideGlobalLoading()
   }
 
   useEffect(() => {
     logger.info('[initializer][loadOnRefresh]')
+    events.on('routeChangeStart', handleRouteChangeStart)
     events.on('routeChangeComplete', handleRouteChangeComplete)
     events.on('routeChangeError', handleRouteChangeError)
 
     return () => {
-      events.off('routeChangeStart', handleRouteChangeComplete)
+      events.off('routeChangeStart', handleRouteChangeStart)
+      events.off('routeChangeComplete', handleRouteChangeComplete)
       events.off('routeChangeError', handleRouteChangeError)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -17,37 +17,49 @@
  *
  */
 
-import { Button } from 'components/primitives/buttons/Button'
+import { ResetButton } from 'components/primitives/buttons/ResetButton'
 import { Heading } from 'components/primitives/typography/Heading'
 import { DateRangeFilter } from 'components/ui/forms/DateRangeFilter'
 import { FormBody } from 'components/ui/forms/FormBody'
-import { FormElement } from 'components/ui/forms/FormElement'
 import { dateOptions } from 'lib/utils/date/dateOptions'
 import { useTranslation } from 'next-i18next'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 
 export const StatsFilter: React.FC = () => {
   const { t } = useTranslation('common')
   const parentFormContext = useFormContext()
+  const [hasChanges, setHasChanges] = useState(false)
+
+  const defaultDateRange = dateOptions[0].name
 
   const resetForm = () => {
     const { from, to } = dateOptions[0].dateRangeFn(new Date())
     parentFormContext.setValue('from', from)
     parentFormContext.setValue('to', to)
-    parentFormContext.setValue('dateRange', dateOptions[0].name)
+    parentFormContext.setValue('dateRange', defaultDateRange)
   }
+
+  useEffect(() => {
+    const subscription = parentFormContext.watch((values) => {
+      const changed = values.dateRange !== defaultDateRange
+      setHasChanges(changed)
+    })
+    return () => subscription.unsubscribe()
+  }, [parentFormContext, defaultDateRange])
 
   return (
     <div className="w-full">
-      <Heading variant="section">{t('common.filter.title', { defaultValue: 'Filter' })}</Heading>
+      <div className="relative">
+        <Heading variant="section">{t('common.filter.title', { defaultValue: 'Filter' })}</Heading>
+        {hasChanges && (
+          <div className="absolute top-3 right-0">
+            <ResetButton onClick={resetForm} />
+          </div>
+        )}
+      </div>
       <FormBody>
         <DateRangeFilter name="dateRange" />
-        <FormElement>
-          <Button type="button" onClick={resetForm} variant="secondary">
-            {t('common.actions.reset', { defaultValue: 'Reset' })}
-          </Button>
-        </FormElement>
       </FormBody>
     </div>
   )

@@ -17,6 +17,8 @@
  *
  */
 
+import { isValid, parse } from 'date-fns'
+
 /**
  * Parse date and time strings into a Date object with validation
  */
@@ -28,119 +30,85 @@ export function parseDateTimeStrings(
     return { date: null, isValid: true, isPartial: false }
   }
 
-  // Parse date
-  let day = 1,
-    month = 0,
-    year = new Date().getFullYear()
-  let hasValidDate = false
-  let isDatePartial = false
+  // Check for placeholders
+  const hasDate = dateString && dateString !== '__.__.____'
+  const hasTime = timeString && timeString !== '__:__'
 
-  if (dateString && dateString !== '__.__.____') {
-    const dateParts = dateString.split('.')
-    if (dateParts.length === 3) {
-      const [d, m, y] = dateParts
-      const parsedDay = parseInt(d, 10)
-      const parsedMonth = parseInt(m, 10)
-      const parsedYear = parseInt(y, 10)
+  if (!hasDate && !hasTime) {
+    return { date: null, isValid: true, isPartial: false }
+  }
 
-      // Check if all parts are complete (not partial)
-      const isDayComplete = d.length === 2 && !isNaN(parsedDay)
-      const isMonthComplete = m.length === 2 && !isNaN(parsedMonth)
-      const isYearComplete = y.length === 4 && !isNaN(parsedYear)
+  // Check if input is partial (contains underscores)
+  const hasDatePlaceholder = dateString?.includes('_') || false
+  const hasTimePlaceholder = timeString?.includes('_') || false
 
-      // Track if input is partial
-      isDatePartial = !isDayComplete || !isMonthComplete || !isYearComplete
+  if (hasDatePlaceholder || hasTimePlaceholder) {
+    return { date: null, isValid: true, isPartial: true }
+  }
 
-      // Only validate if all segments are complete
-      if (isDayComplete && isMonthComplete && isYearComplete) {
-        if (
-          parsedDay >= 1 &&
-          parsedDay <= 31 &&
-          parsedMonth >= 1 &&
-          parsedMonth <= 12 &&
-          parsedYear >= 1900 &&
-          parsedYear <= 2100
-        ) {
-          day = parsedDay
-          month = parsedMonth - 1
-          year = parsedYear
-          hasValidDate = true
-        } else {
-          return { date: null, isValid: false, isPartial: false }
-        }
-      } else {
-        // Partial input - not invalid, just incomplete
-        return { date: null, isValid: true, isPartial: true }
+  let parsedDate: Date | null = null
+
+  // Parse date if provided
+  if (hasDate) {
+    const dateFormats = [
+      'd.M.yyyy', // Full format: 1.1.2025
+      'd.M.yy', // Short year: 1.1.25
+    ]
+
+    for (const format of dateFormats) {
+      const parsed = parse(dateString, format, new Date())
+      if (isValid(parsed)) {
+        parsedDate = parsed
+        break
       }
-    } else {
-      // Wrong format but could be typing
-      return { date: null, isValid: true, isPartial: true }
+    }
+
+    if (!parsedDate) {
+      return { date: null, isValid: false, isPartial: false }
     }
   }
 
-  // Parse time
-  let hours = 0,
-    minutes = 0
-  let hasValidTime = false
-  let isTimePartial = false
+  // Parse time and combine with date if both provided
+  if (hasTime && parsedDate) {
+    const timeFormats = [
+      'HH:mm', // Two digit format: 09:30
+      'H:mm', // Single digit hour: 9:30
+    ]
 
-  if (timeString && timeString !== '__:__') {
-    const timeParts = timeString.split(':')
-    if (timeParts.length === 2) {
-      const [h, m] = timeParts
-      const parsedHours = parseInt(h, 10)
-      const parsedMinutes = parseInt(m, 10)
-
-      // Check if all parts are complete
-      const isHoursComplete = h.length === 2 && !isNaN(parsedHours)
-      const isMinutesComplete = m.length === 2 && !isNaN(parsedMinutes)
-
-      // Track if input is partial
-      isTimePartial = !isHoursComplete || !isMinutesComplete
-
-      if (isHoursComplete && isMinutesComplete) {
-        if (parsedHours >= 0 && parsedHours <= 23 && parsedMinutes >= 0 && parsedMinutes <= 59) {
-          hours = parsedHours
-          minutes = parsedMinutes
-          hasValidTime = true
-        } else {
-          return { date: null, isValid: false, isPartial: false }
-        }
-      } else {
-        // Partial input - not invalid, just incomplete
-        if (!dateString || dateString === '__.__.____') {
-          // If no date, partial time is ok
-          return { date: null, isValid: true, isPartial: true }
-        }
-        // If there's a date, we need to handle partial time differently
-        isTimePartial = true
+    let parsedTime: Date | null = null
+    for (const format of timeFormats) {
+      const parsed = parse(timeString, format, new Date())
+      if (isValid(parsed)) {
+        parsedTime = parsed
+        break
       }
-    } else {
-      // Wrong format but could be typing
-      return { date: null, isValid: true, isPartial: true }
     }
-  } else if (!timeString || timeString === '__:__') {
-    // Time is optional, so no time is still valid
-    hasValidTime = true
+
+    if (!parsedTime) {
+      return { date: null, isValid: false, isPartial: false }
+    }
+
+    // Combine date and time
+    parsedDate.setHours(parsedTime.getHours(), parsedTime.getMinutes(), 0, 0)
+  } else if (hasTime && !hasDate) {
+    // Time only (use today's date)
+    const timeFormats = ['HH:mm', 'H:mm']
+    const today = new Date()
+
+    for (const format of timeFormats) {
+      const parsed = parse(timeString, format, today)
+      if (isValid(parsed)) {
+        parsedDate = parsed
+        break
+      }
+    }
+
+    if (!parsedDate) {
+      return { date: null, isValid: false, isPartial: false }
+    }
   }
 
-  // Only create date if we have valid date or time
-  if (!hasValidDate && !hasValidTime) {
-    // If both are partial or empty, it's ok
-    return { date: null, isValid: true, isPartial: isDatePartial || isTimePartial }
-  }
-
-  const date = new Date(year, month, day, hours, minutes, 0, 0)
-
-  // Validate the date is real (checks for things like Feb 31)
-  if (
-    hasValidDate &&
-    (date.getDate() !== day || date.getMonth() !== month || date.getFullYear() !== year)
-  ) {
-    return { date: null, isValid: false, isPartial: false }
-  }
-
-  return { date, isValid: true, isPartial: false }
+  return { date: parsedDate, isValid: true, isPartial: false }
 }
 
 /**

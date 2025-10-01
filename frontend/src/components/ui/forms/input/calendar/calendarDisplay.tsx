@@ -79,10 +79,11 @@ export const CalendarDisplay: React.FC<Props> = ({ value, onChange }) => {
   }, [currentMonth, currentMonth.length])
 
   useEffect(() => {
-    const filler = intervalToDuration({
-      start: startOfWeek(firstDayOfMonth, { weekStartsOn: 1 }),
-      end: firstDayOfMonth,
-    }).days
+    const filler =
+      intervalToDuration({
+        start: startOfWeek(firstDayOfMonth, { weekStartsOn: 1 }),
+        end: firstDayOfMonth,
+      }).days || 0
     setTopFiller(new Array(filler).fill(() => uniqueId(), 0, filler))
   }, [firstDayOfMonth])
 

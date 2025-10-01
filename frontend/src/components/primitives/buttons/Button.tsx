@@ -28,7 +28,7 @@ import React from 'react'
 
 const buttonVariants = cva(
   // Base DaisyUI button class
-  'btn flex items-center justify-center gap-2 rounded',
+  'btn flex items-center justify-center gap-2',
   {
     variants: {
       variant: {
@@ -88,11 +88,23 @@ export interface ButtonProps
   children: React.ReactNode
   asChild?: boolean
   fullWidth?: boolean
+  join?: boolean
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
-    { className, variant, size, shape, loading, disabled, children, fullWidth = true, ...props },
+    {
+      className,
+      variant,
+      size,
+      shape,
+      loading,
+      disabled,
+      children,
+      fullWidth = true,
+      join = false,
+      ...props
+    },
     ref,
   ) => {
     const isDisabled = !!disabled || !!loading
@@ -109,6 +121,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           }),
           fullWidth && 'w-full',
           isDisabled && 'btn-disabled',
+          join && 'join-item',
           className,
         )}
         disabled={isDisabled}

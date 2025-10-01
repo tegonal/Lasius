@@ -28,7 +28,7 @@ type Props = PropsWithChildren & {
 export const StatsTile: React.FC<Props> = ({ children, className, style }) => {
   return (
     <div
-      className={cn('bg-base-content/10 relative h-[100px] w-full rounded-md', className)}
+      className={cn('bg-base-200 relative h-[100px] w-full rounded-md', className)}
       style={style}>
       {children}
     </div>

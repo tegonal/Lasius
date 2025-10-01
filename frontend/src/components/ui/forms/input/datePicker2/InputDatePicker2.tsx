@@ -207,65 +207,59 @@ const InputDatePicker2Internal: React.FC<InputDatePicker2Props> = ({
   return (
     <>
       <div className="flex w-full flex-col gap-2">
-        {/* Input fields with format hints */}
+        {/* Input fields */}
         <div className="flex items-start gap-2">
           {withDate && (
             <div className="flex items-start gap-2">
-              <div className="flex flex-col gap-1">
-                <div className="join">
-                  <SegmentedDateInputConnected />
-                  <Button
-                    type="button"
-                    variant="neutral"
-                    className="px-2"
-                    onClick={openModal}
-                    fullWidth={false}>
-                    <LucideIcon icon={CalendarIcon} size={20} />
-                  </Button>
-                  {/* Show preset button next to date if no time input */}
-                  {!withTime && hasPreset && PresetIcon && (
+              <SegmentedDateInputConnected
+                afterSlot={
+                  <>
                     <Button
-                      variant="ghost"
-                      size="sm"
                       type="button"
-                      onClick={onPresetClick}
+                      variant="neutral"
+                      className="px-2"
+                      onClick={openModal}
                       fullWidth={false}
-                      className="join-item p-0"
-                      title={presetLabel}
-                      aria-label={presetLabel}>
-                      <LucideIcon icon={PresetIcon} size={20} />
+                      join>
+                      <LucideIcon icon={CalendarIcon} size={20} />
                     </Button>
-                  )}
-                </div>
-                <span className="text-base-content/60 text-xs">
-                  {t('common.formats.dateFormat', { defaultValue: 'DD.MM.YYYY' })}
-                </span>
-              </div>
+                    {/* Show preset button next to date if no time input */}
+                    {!withTime && hasPreset && PresetIcon && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        type="button"
+                        onClick={onPresetClick}
+                        fullWidth={false}
+                        className="p-0"
+                        title={presetLabel}
+                        aria-label={presetLabel}
+                        join>
+                        <LucideIcon icon={PresetIcon} size={20} />
+                      </Button>
+                    )}
+                  </>
+                }
+              />
             </div>
           )}
           {withDate && withTime && <div className="w-2" />}
           {withTime && (
             <div className="flex items-start gap-2">
-              <div className="flex flex-col gap-1">
-                <div className={hasPreset ? 'join' : ''}>
-                  <SegmentedTimeInputConnected />
-                  {hasPreset && PresetIcon && (
-                    <Button
-                      variant="neutral"
-                      type="button"
-                      onClick={onPresetClick}
-                      fullWidth={false}
-                      className="join-item px-2"
-                      title={presetLabel}
-                      aria-label={presetLabel}>
-                      <LucideIcon icon={PresetIcon} size={20} />
-                    </Button>
-                  )}
-                </div>
-                <span className="text-base-content/60 text-xs">
-                  {t('common.formats.timeFormat', { defaultValue: 'HH:MM' })}
-                </span>
-              </div>
+              <SegmentedTimeInputConnected />
+              {hasPreset && PresetIcon && (
+                <Button
+                  variant="neutral"
+                  type="button"
+                  onClick={onPresetClick}
+                  fullWidth={false}
+                  className="px-2"
+                  title={presetLabel}
+                  aria-label={presetLabel}
+                  join>
+                  <LucideIcon icon={PresetIcon} size={20} />
+                </Button>
+              )}
             </div>
           )}
           {showResetButton && (

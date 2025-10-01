@@ -166,7 +166,7 @@
       "title": "Filter"
     },
     "formats": {
-      "dateFormat": "DD.MM.YYYY",
+      "dateFormat": "TT.MM.JJJJ",
       "durationFormat": "HH:MM",
       "timeFormat": "HH:MM"
     },

@@ -22,7 +22,7 @@ import { Button } from 'components/primitives/buttons/Button'
 import { ButtonLeft } from 'components/primitives/buttons/ButtonLeft'
 import { ButtonRight } from 'components/primitives/buttons/ButtonRight'
 import { AnimateChange } from 'components/ui/animations/motion/animateChange'
-import { SelectedTabIcon } from 'components/ui/animations/motion/selectedTabIcon'
+import { SlidingIndicator } from 'components/ui/animations/SlidingIndicator'
 import { FormatDate } from 'components/ui/data-display/FormatDate'
 import { addWeeks, isToday, toDate } from 'date-fns'
 import { IsoDateString } from 'lib/api/apiDateHandling'
@@ -41,6 +41,11 @@ export const CalendarWeekResponsive: React.FC = () => {
   const [week, setWeek] = React.useState(getWeekOfDate(formatISOLocale(new Date())))
   const [selectedDay, setSelectedDay] = React.useState(selectedDate || formatISOLocale(new Date()))
   const isClient = useIsClient()
+  const dayRefs = React.useRef<(HTMLElement | null)[]>([])
+
+  const getDay = (str: IsoDateString) => {
+    return toDate(new Date(str)).getDate()
+  }
 
   useEffect(() => {
     setSelectedDay(selectedDate)
@@ -51,10 +56,6 @@ export const CalendarWeekResponsive: React.FC = () => {
   }, [selectedDay])
 
   if (!isClient) return null
-
-  const getDay = (str: IsoDateString) => {
-    return toDate(new Date(str)).getDate()
-  }
 
   const nextWeek = () => {
     setWeek(getWeekOfDate(addWeeks(new Date(week[0]), 1)))
@@ -102,25 +103,37 @@ export const CalendarWeekResponsive: React.FC = () => {
           </div>
         </div>
         <div className="min-h-[82px] w-full overflow-x-auto">
-          <AnimateChange hash={week[0]}>
-            <div className="grid w-max grid-cols-[repeat(7,62px)] gap-1 sm:gap-2 md:w-full md:grid-cols-[repeat(7,1fr)] lg:gap-3">
-              {week.map((day) => (
-                <div
-                  key={day}
-                  className={cn(
-                    'relative',
-                    getDay(selectedDay) === getDay(day)
-                      ? 'text-neutral-content'
-                      : 'text-base-content',
-                  )}>
-                  {getDay(selectedDay) === getDay(day) && (
-                    <SelectedTabIcon layoutId="calendarDay" radiusOn="bottom" />
-                  )}
-                  <CalendarDay date={day} onClick={() => handleDayClick(day)} />
-                </div>
-              ))}
-            </div>
-          </AnimateChange>
+          <div className="relative">
+            <AnimateChange hash={week[0]}>
+              <div className="grid w-max grid-cols-[repeat(7,62px)] gap-1 sm:gap-2 md:w-full md:grid-cols-[repeat(7,1fr)] lg:gap-3">
+                {week.map((day, index) => (
+                  <div
+                    key={day}
+                    ref={(el) => {
+                      dayRefs.current[index] = el
+                    }}
+                    className={cn(
+                      'relative',
+                      getDay(selectedDay) === getDay(day)
+                        ? 'text-neutral-content'
+                        : 'text-base-content',
+                    )}>
+                    <CalendarDay
+                      date={day}
+                      onClick={() => handleDayClick(day)}
+                      isSelected={getDay(selectedDay) === getDay(day)}
+                    />
+                  </div>
+                ))}
+              </div>
+            </AnimateChange>
+            {/* Sliding indicator - outside AnimateChange */}
+            <SlidingIndicator
+              selectedIndex={week.findIndex((day) => getDay(selectedDay) === getDay(day))}
+              itemRefs={dayRefs}
+              radiusOn="bottom"
+            />
+          </div>
         </div>
       </div>
       <div className="flex h-full flex-shrink-0 items-center justify-center pt-3">

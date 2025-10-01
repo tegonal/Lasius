@@ -17,7 +17,6 @@
  *
  */
 
-import { useToast } from 'components/ui/feedback/hooks/useToast'
 import useModal from 'components/ui/overlays/modal/hooks/useModal'
 import { roundToNearestMinutes } from 'date-fns'
 import {
@@ -35,7 +34,6 @@ import {
 } from 'lib/api/lasius/user-bookings/user-bookings'
 import { addFavoriteBooking } from 'lib/api/lasius/user-favorites/user-favorites'
 import { formatISOLocale } from 'lib/utils/date/dates'
-import { useTranslation } from 'next-i18next'
 import { useCallback } from 'react'
 import { useCalendarActions } from 'stores/calendarStore'
 import { useContextMenuOpen, useUIActions } from 'stores/uiStore'
@@ -71,8 +69,6 @@ import { mutate } from 'swr'
  */
 export const useContextMenu = () => {
   const { closeModal } = useModal('BookingAddMobileModal')
-  const { addToast } = useToast()
-  const { t } = useTranslation('common')
 
   // Zustand state and actions
   const contextMenuOpen = useContextMenuOpen()
@@ -154,15 +150,9 @@ export const useContextMenu = () => {
         tags,
       } = item
       await addFavoriteBooking(selectedOrganisationId, { projectId, tags })
-      addToast({
-        message: t('bookings.actions.addedToFavorites', {
-          defaultValue: 'Booking added to favorites',
-        }),
-        type: 'SUCCESS',
-      })
       handleCloseAll()
     },
-    [addToast, t, handleCloseAll],
+    [handleCloseAll],
   )
 
   return {

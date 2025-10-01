@@ -21,13 +21,13 @@ import { BootstrapTasks } from 'components/features/system/bootstrapTasks'
 import { BrowserOnlineStatusCheck } from 'components/features/system/browserOnlineStatusCheck'
 import { BundleVersionCheck } from 'components/features/system/bundleVersionCheck'
 import { DevInfoBadge } from 'components/features/system/devInfoBadge'
+import { GlobalLoading } from 'components/features/system/globalLoading'
 import { HttpHeaderProvider } from 'components/features/system/httpHeaderProvider'
 import { LasiusBackendOnlineCheck } from 'components/features/system/lasiusBackendOnlineCheck'
-import { LasiusBackendWebsocketEventHandler } from 'components/features/system/lasiusBackendWebsocketEventHandler'
 import 'styles/globals.css'
+import { LasiusBackendWebsocketEventHandler } from 'components/features/system/lasiusBackendWebsocketEventHandler'
 import { LasiusBackendWebsocketStatus } from 'components/features/system/lasiusBackendWebsocketStatus'
 import { LasiusTOSCheck } from 'components/features/system/lasiusTOSCheck'
-import { RouteProgressBar } from 'components/features/system/routeProgressBar'
 import { TokenWatcher } from 'components/features/system/tokenWatcher'
 import { Error } from 'components/ui/feedback/Error'
 import { Toasts } from 'components/ui/feedback/Toasts'
@@ -152,8 +152,8 @@ const App = ({ Component, pageProps }: AppPropsWithLayout): JSX.Element => {
             />
             <title>Lasius</title>
           </Head>
-          <RouteProgressBar />
           <LazyMotion features={loadFeatures}>
+            <GlobalLoading />
             <DefaultSeo
               openGraph={{
                 images: [{ url: SOCIAL_MEDIA_CARD_IMAGE_URL }],

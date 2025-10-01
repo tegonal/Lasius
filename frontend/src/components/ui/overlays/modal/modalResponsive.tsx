@@ -88,6 +88,8 @@ export const ModalResponsive: React.FC<Props> = ({
 
   const handleEscape = (e: KeyboardEvent) => {
     if (blockViewport) return
+    // Only listen to Escape when there are modals in the stack
+    if (modalViews.length === 0) return
     if (e.key === 'Escape') {
       const latestModal = modalViews.pop()
       if (latestModal?.id === modalId) {

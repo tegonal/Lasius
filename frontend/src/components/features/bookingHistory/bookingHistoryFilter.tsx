@@ -17,7 +17,7 @@
  *
  */
 
-import { Button } from 'components/primitives/buttons/Button'
+import { ResetButton } from 'components/primitives/buttons/ResetButton'
 import { Heading } from 'components/primitives/typography/Heading'
 import { DateRangeFilter } from 'components/ui/forms/DateRangeFilter'
 import { FormBody } from 'components/ui/forms/FormBody'
@@ -29,7 +29,7 @@ import { useProjects } from 'lib/api/hooks/useProjects'
 import { useGetTagsByProject } from 'lib/api/lasius/user-organisations/user-organisations'
 import { dateOptions } from 'lib/utils/date/dateOptions'
 import { useTranslation } from 'next-i18next'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 
 export const BookingHistoryFilter: React.FC = () => {
@@ -41,15 +41,34 @@ export const BookingHistoryFilter: React.FC = () => {
     selectedOrganisationId,
     formContext.watch('projectId'),
   )
+  const [hasChanges, setHasChanges] = useState(false)
+
+  const defaultValues = {
+    projectId: '',
+    tags: [],
+    dateRange: dateOptions[0].name,
+  }
 
   const resetForm = () => {
     const { from, to } = dateOptions[0].dateRangeFn(new Date())
     formContext.setValue('from', from)
     formContext.setValue('to', to)
-    formContext.setValue('dateRange', dateOptions[0].name)
-    formContext.setValue('projectId', '')
-    formContext.setValue('tags', [])
+    formContext.setValue('dateRange', defaultValues.dateRange)
+    formContext.setValue('projectId', defaultValues.projectId)
+    formContext.setValue('tags', defaultValues.tags)
   }
+
+  useEffect(() => {
+    const subscription = formContext.watch((values) => {
+      const changed =
+        values.projectId !== defaultValues.projectId ||
+        (values.tags?.length ?? 0) > 0 ||
+        values.dateRange !== defaultValues.dateRange
+
+      setHasChanges(changed)
+    })
+    return () => subscription.unsubscribe()
+  }, [formContext, defaultValues.projectId, defaultValues.dateRange])
 
   useEffect(() => {
     const subscription = formContext.watch((value, { name }) => {
@@ -66,7 +85,14 @@ export const BookingHistoryFilter: React.FC = () => {
 
   return (
     <div className="w-full">
-      <Heading variant="section">{t('common.filter.title', { defaultValue: 'Filter' })}</Heading>
+      <div className="relative">
+        <Heading variant="section">{t('common.filter.title', { defaultValue: 'Filter' })}</Heading>
+        {hasChanges && (
+          <div className="absolute top-3 right-0">
+            <ResetButton onClick={resetForm} />
+          </div>
+        )}
+      </div>
       <FormBody>
         <FormElement label={t('projects.label', { defaultValue: 'Project' })} htmlFor="projectId">
           <InputSelectAutocomplete
@@ -79,11 +105,6 @@ export const BookingHistoryFilter: React.FC = () => {
           <InputTagsAutocomplete id="tags" name="tags" suggestions={projectTags} />
         </FormElement>
         <DateRangeFilter name="dateRange" />
-        <FormElement>
-          <Button type="button" onClick={resetForm} variant="secondary">
-            {t('common.actions.reset', { defaultValue: 'Reset' })}
-          </Button>
-        </FormElement>
       </FormBody>
     </div>
   )

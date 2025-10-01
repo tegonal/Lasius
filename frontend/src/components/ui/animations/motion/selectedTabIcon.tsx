@@ -21,8 +21,6 @@ import { m } from 'framer-motion'
 import { cn } from 'lib/utils/cn'
 import React, { memo } from 'react'
 
-const MotionDiv = m.div
-
 type Props = {
   layoutId: string
   radiusOn: 'top' | 'right' | 'bottom' | 'left' | 'all'
@@ -38,13 +36,14 @@ export const SelectedTabIcon: React.FC<Props> = memo(({ layoutId, radiusOn }) =>
   }
 
   return (
-    <MotionDiv
-      initial={false}
+    <m.div
       className={cn(
-        'bg-red-gradient absolute top-0 right-0 left-0 z-[1] h-full',
+        'bg-red-gradient absolute top-0 right-0 bottom-0 left-0 h-full',
         radiusClasses[radiusOn],
       )}
       layoutId={layoutId}
+      initial={false}
+      transition={{ duration: 0.2 }}
     />
   )
 })

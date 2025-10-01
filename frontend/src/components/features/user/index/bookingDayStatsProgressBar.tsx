@@ -46,7 +46,7 @@ export const BookingDayStatsProgressBar: React.FC = () => {
 
   return (
     <div className="w-full">
-      <ProgressBar percentage={day.progressBarPercentage} label={label} />
+      <ProgressBar percentage={day.fulfilledPercentage} label={label} />
     </div>
   )
 }

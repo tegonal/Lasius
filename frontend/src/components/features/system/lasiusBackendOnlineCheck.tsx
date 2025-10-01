@@ -23,21 +23,39 @@ import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
 import { logger } from 'lib/logger'
 import { useTranslation } from 'next-i18next'
 import { CONNECTION_STATUS } from 'projectConfig/constants'
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
+
+// Debounce delay to prevent rapid modal toggling during connection flickers
+const STATUS_CHANGE_DEBOUNCE_MS = 2000
 
 export const LasiusBackendOnlineCheck: React.FC = () => {
   const { t } = useTranslation('common')
   const { modalId, openModal, closeModal, isModalOpen } = useModal('BackendOfflineNoticeModal')
   const { status } = useLasiusApiStatus()
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
-    if (status !== CONNECTION_STATUS.CONNECTED && !isModalOpen) {
-      logger.info('LasiusBackendOnlineCheck', status)
-      openModal()
+    // Clear any pending debounce timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current)
     }
-    if (status === CONNECTION_STATUS.CONNECTED && isModalOpen) {
-      logger.info('LasiusBackendOnlineCheck', status)
-      closeModal()
+
+    // Debounce status changes to prevent rapid modal toggling
+    debounceTimerRef.current = setTimeout(() => {
+      if (status !== CONNECTION_STATUS.CONNECTED && !isModalOpen) {
+        logger.info('LasiusBackendOnlineCheck', status)
+        openModal()
+      }
+      if (status === CONNECTION_STATUS.CONNECTED && isModalOpen) {
+        logger.info('LasiusBackendOnlineCheck', status)
+        closeModal()
+      }
+    }, STATUS_CHANGE_DEBOUNCE_MS)
+
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current)
+      }
     }
   }, [closeModal, isModalOpen, openModal, status])
 

@@ -305,4 +305,11 @@
       opacity: 1;
     }
   }
+  
+  .input {
+    &:focus, &:focus-within {
+      @apply outline-2 outline-secondary outline-offset-0 border-secondary;
+    }
+  }
+
 }

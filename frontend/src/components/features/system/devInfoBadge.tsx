@@ -23,11 +23,13 @@ import { useTranslation } from 'next-i18next'
 import { BUILD_ID, DEV } from 'projectConfig/constants'
 import React, { useEffect, useState } from 'react'
 import { useTokenStore } from 'stores/tokenStore'
+import { useUIStore } from 'stores/uiStore'
 import { useIsClient, useMediaQuery } from 'usehooks-ts'
 
 export const DevInfoBadge: React.FC = () => {
   const { t, i18n } = useTranslation('common')
   const { tokenTimeRemaining } = useTokenStore()
+  const globalLoadingCounter = useUIStore((state) => state.globalLoadingCounter)
   const [mode] = useColorMode()
   const [colorMode, setColorMode] = useState<string>('light')
   const isClient = useIsClient()
@@ -45,7 +47,7 @@ export const DevInfoBadge: React.FC = () => {
 
   if (!isClient || !DEV) return null
 
-  const info = `(${breakpointIndex}) | ${i18n.language} | ${BUILD_ID} | ${colorMode} | Token: ${tokenTimeRemaining} | ${t('app.name', { defaultValue: 'Lasius' })}`
+  const info = `(${breakpointIndex}) | ${i18n.language} | ${BUILD_ID} | ${colorMode} | Token: ${tokenTimeRemaining} | Loading: ${globalLoadingCounter} | ${t('app.name', { defaultValue: 'Lasius' })}`
 
   return (
     <div className="fixed bottom-2 left-2">

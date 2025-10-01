@@ -18,12 +18,27 @@
  */
 
 import { ErrorSign } from 'components/ui/feedback/ErrorSign'
-import { FormError } from 'dynamicTranslationStrings'
 import { logger } from 'lib/logger'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
 
 type Props = { errors: { [x: string]: { types: { [x: string]: boolean } } } }
+
+const errorTypeToTranslationKey: Record<string, string> = {
+  required: 'common.validation.required',
+  pattern: 'common.validation.wrongFormat',
+  isEmailAddress: 'common.validation.emailInvalid',
+  notEnoughCharactersPassword: 'common.validation.passwordTooShort',
+  noUppercase: 'common.validation.missingUppercase',
+  noSpecialCharacters: 'common.validation.missingSpecialChar',
+  notEqualPassword: 'common.validation.passwordMismatch',
+  startInPast: 'common.validation.mustBeInPast',
+  endAfterStart: 'common.validation.mustBeAfterStart',
+  startBeforeEnd: 'common.validation.mustBeBeforeEnd',
+  noNumber: 'common.validation.missingNumber',
+  toAfterFrom: 'common.validation.toMustBeAfterFrom',
+  fromBeforeTo: 'common.validation.fromMustBeBeforeTo',
+}
 
 export const FormErrorsSummary: React.FC<Props> = ({ errors }) => {
   const { t } = useTranslation('common')
@@ -34,15 +49,15 @@ export const FormErrorsSummary: React.FC<Props> = ({ errors }) => {
         <div
           key={field}
           className="flex max-w-full flex-row flex-wrap items-center justify-start gap-2 py-2">
-          {Object.keys(errors[field].types).map((key) => (
-            <div key={key} className="badge badge-warning">
-              <ErrorSign />
-              {
-                // @ts-expect-error - error.type is a string
-                t(FormError[key])
-              }
-            </div>
-          ))}
+          {Object.keys(errors[field].types).map((key) => {
+            const translationKey = errorTypeToTranslationKey[key]
+            return (
+              <div key={key} className="badge badge-warning">
+                <ErrorSign />
+                {translationKey ? t(translationKey as any) : key}
+              </div>
+            )
+          })}
         </div>
       ))}
     </>

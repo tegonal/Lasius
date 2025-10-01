@@ -31,11 +31,26 @@ const LasiusPwaUpdater: React.FC = () => {
   }
 
   useEffect(() => {
-    window.workbox.addEventListener('controlling', () => {
+    const handleControlling = () => {
       window.location.reload()
-    })
-    window.workbox.addEventListener('waiting', () => setIsOpen(true))
+    }
+
+    const handleWaiting = () => {
+      setIsOpen(true)
+    }
+
+    const controllingListener = window.workbox.addEventListener('controlling', handleControlling)
+    const waitingListener = window.workbox.addEventListener('waiting', handleWaiting)
     window.workbox.register()
+
+    return () => {
+      if (controllingListener && typeof controllingListener === 'function') {
+        controllingListener()
+      }
+      if (waitingListener && typeof waitingListener === 'function') {
+        waitingListener()
+      }
+    }
   }, [])
 
   if (!isOpen) return null

@@ -26,12 +26,14 @@ interface SegmentedInputWrapperProps {
   children: React.ReactElement
   onArrowClick: (direction: 'up' | 'down') => void
   hasSelection: boolean
+  label?: string
 }
 
 export const SegmentedInputWrapper: React.FC<SegmentedInputWrapperProps> = ({
   children,
   onArrowClick,
   hasSelection,
+  label,
 }) => {
   const [isHovered, setIsHovered] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -63,21 +65,19 @@ export const SegmentedInputWrapper: React.FC<SegmentedInputWrapperProps> = ({
           <LucideIcon icon={ChevronUp} size={24} />
         </Button>
       </div>
-
-      {children}
-
+      <div className="join">{children}</div>
       {/* Down Arrow - positioned below input */}
       <div
-        className={`absolute right-0 -bottom-6 left-0 flex justify-center transition-opacity ${
-          hasSelection || isHovered
-            ? 'opacity-60 hover:opacity-100'
-            : 'pointer-events-none opacity-0'
+        className={`absolute right-0 -bottom-10 left-0 flex flex-col items-center ${
+          hasSelection || isHovered ? '' : 'pointer-events-none'
         }`}>
         <Button
           type="button"
           variant="neutral"
           size="xs"
-          className="cursor-pointer rounded-t-none rounded-b-full"
+          className={`cursor-pointer rounded-t-none rounded-b-full transition-opacity ${
+            hasSelection || isHovered ? 'opacity-60 hover:opacity-100' : 'opacity-0'
+          }`}
           onMouseDown={(e) => {
             e.preventDefault() // Prevent focus loss
             onArrowClick('down')
@@ -86,6 +86,14 @@ export const SegmentedInputWrapper: React.FC<SegmentedInputWrapperProps> = ({
           aria-label="Decrement">
           <LucideIcon icon={ChevronDown} size={24} />
         </Button>
+        {label && (
+          <span
+            className={`text-base-content/60 mt-1 text-xs whitespace-nowrap transition-opacity ${
+              hasSelection || isHovered ? 'opacity-100' : 'opacity-0'
+            }`}>
+            {label}
+          </span>
+        )}
       </div>
     </div>
   )

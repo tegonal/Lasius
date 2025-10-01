@@ -30,9 +30,5 @@ type Props = {
  * Use this when you want multiple stats to appear as a unified component
  */
 export const StatsGroup: React.FC<Props> = ({ children, className }) => {
-  return (
-    <div className={cn('stats stats-vertical lg:stats-horizontal shadow', className)}>
-      {children}
-    </div>
-  )
+  return <div className={cn('stats stats-vertical lg:stats-horizontal', className)}>{children}</div>
 }

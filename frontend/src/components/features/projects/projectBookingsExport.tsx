@@ -18,6 +18,7 @@
  */
 
 import { Text } from 'components/primitives/typography/Text'
+import { useToast } from 'components/ui/feedback/hooks/useToast'
 import { DateRangeFilter } from 'components/ui/forms/DateRangeFilter'
 import { FormBody } from 'components/ui/forms/FormBody'
 import { FormElement } from 'components/ui/forms/FormElement'
@@ -49,6 +50,7 @@ export const ProjectBookingsExport: React.FC<Props> = ({ item }) => {
   const { t } = useTranslation('common')
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const { selectedOrganisationId } = useOrganisation()
+  const { addToast } = useToast()
 
   const hookForm = useForm<FormValues>()
 
@@ -62,7 +64,20 @@ export const ProjectBookingsExport: React.FC<Props> = ({ item }) => {
       timespan || { from: '', to: '' },
     )
     const extendedHistory = getExtendedModelsBookingList(data)
-    exportBookingList(extendedHistory, format)
+    const filename = exportBookingList(extendedHistory, format, undefined, {
+      context: 'project',
+      contextName: item.key,
+      from,
+      to,
+    })
+    addToast({
+      message: t('export.status.success', {
+        defaultValue: 'Export successful: {{filename}}',
+        filename,
+      }),
+      type: 'SUCCESS',
+      ttl: 60000,
+    })
     setIsLoading(false)
   }
 

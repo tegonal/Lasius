@@ -18,8 +18,8 @@
  */
 
 import { ErrorSign } from 'components/ui/feedback/ErrorSign'
-import { FormError } from 'dynamicTranslationStrings'
 import { logger } from 'lib/logger'
+import { useTranslation } from 'next-i18next'
 import React from 'react'
 import { FieldError, FieldErrors, Merge } from 'react-hook-form'
 
@@ -28,17 +28,46 @@ type Props = {
   id?: string
 }
 
+const errorTypeToTranslationKey: Record<string, string> = {
+  required: 'common.validation.required',
+  pattern: 'common.validation.wrongFormat',
+  isEmailAddress: 'common.validation.emailInvalid',
+  notEnoughCharactersPassword: 'common.validation.passwordTooShort',
+  noUppercase: 'common.validation.missingUppercase',
+  noSpecialCharacters: 'common.validation.missingSpecialChar',
+  notEqualPassword: 'common.validation.passwordMismatch',
+  startInPast: 'common.validation.mustBeInPast',
+  endAfterStart: 'common.validation.mustBeAfterStart',
+  startBeforeEnd: 'common.validation.mustBeBeforeEnd',
+  noNumber: 'common.validation.missingNumber',
+  toAfterFrom: 'common.validation.toMustBeAfterFrom',
+  fromBeforeTo: 'common.validation.fromMustBeBeforeTo',
+}
+
 export const FormErrorBadge: React.FC<Props> = ({ error, id }) => {
+  const { t } = useTranslation('common')
+
   if (!error) return null
   logger.info('[form][FormErrorBadge]', error.type)
+
+  const getErrorMessage = () => {
+    if (error.message) return error.message
+
+    const errorType = String(error.type || '')
+    const translationKey = errorTypeToTranslationKey[errorType]
+    if (translationKey) {
+      return t(translationKey as any)
+    }
+
+    // Fallback to error type if no translation found
+    return errorType
+  }
 
   return (
     <div className="-mt-2" id={id}>
       <div className="badge badge-warning">
         <ErrorSign />
-        {error.message ||
-          // @ts-expect-error - error.type is a string
-          FormError[error.type]}
+        {getErrorMessage()}
       </div>
     </div>
   )

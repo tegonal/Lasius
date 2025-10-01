@@ -17,20 +17,33 @@
  *
  */
 
-import React, { memo } from 'react'
+import { Button } from 'components/primitives/buttons/Button'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
+import { RotateCcw } from 'lucide-react'
+import { useTranslation } from 'next-i18next'
+import React from 'react'
 
 type Props = {
-  percentage: number
+  onClick: () => void
+  className?: string
 }
 
-export const ProgressBarSmall: React.FC<Props> = memo(({ percentage }) => {
+export const ResetButton: React.FC<Props> = ({ onClick, className }) => {
+  const { t } = useTranslation('common')
+  const resetLabel = t('common.actions.reset', { defaultValue: 'Reset' })
+
   return (
-    <div className="relative w-full rounded-sm">
-      <div className="bg-base-content/30 absolute top-0 left-0 h-1 w-full rounded-sm" />
-      <div
-        className="bg-secondary dark:bg-base-content h-1 rounded-sm"
-        style={{ width: `${percentage <= 100 ? percentage : 100}%` }}
-      />
-    </div>
+    <Button
+      type="button"
+      variant="ghost"
+      shape="circle"
+      size="xs"
+      onClick={onClick}
+      fullWidth={false}
+      title={resetLabel}
+      aria-label={resetLabel}
+      className={className}>
+      <LucideIcon icon={RotateCcw} size={16} />
+    </Button>
   )
-})
+}

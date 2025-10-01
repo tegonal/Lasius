@@ -29,9 +29,9 @@ import { roundToNearestMinutes } from 'date-fns'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import {
   getGetUserBookingCurrentKey,
-  stopUserBookingCurrent,
   useGetUserBookingCurrent,
 } from 'lib/api/lasius/user-bookings/user-bookings'
+import { stopBookingWithMidnightSplit } from 'lib/utils/booking/splitMidnightBooking'
 import { cn } from 'lib/utils/cn'
 import { formatISOLocale } from 'lib/utils/date/dates'
 import { Square } from 'lucide-react'
@@ -59,10 +59,9 @@ export const BookingCurrentEntry: React.FC<Props> = ({ inContainer = false }) =>
   const { data } = useGetUserBookingCurrent({ swr: { enabled: isClient } })
 
   const stop = async () => {
-    if (data?.booking?.id) {
-      await stopUserBookingCurrent(selectedOrganisationId, data.booking.id, {
-        end: formatISOLocale(roundToNearestMinutes(new Date(), { roundingMethod: 'floor' })),
-      })
+    if (data?.booking) {
+      const endTime = roundToNearestMinutes(new Date(), { roundingMethod: 'floor' })
+      await stopBookingWithMidnightSplit(selectedOrganisationId, data.booking, endTime)
       await mutate(getGetUserBookingCurrentKey())
       setSelectedDate(formatISOLocale(new Date()))
     }

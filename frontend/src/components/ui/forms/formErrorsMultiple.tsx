@@ -18,7 +18,6 @@
  */
 
 import { ErrorSign } from 'components/ui/feedback/ErrorSign'
-import { FormError } from 'dynamicTranslationStrings'
 import { logger } from 'lib/logger'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
@@ -29,6 +28,22 @@ type Props = {
   id?: string
 }
 
+const errorTypeToTranslationKey: Record<string, string> = {
+  required: 'common.validation.required',
+  pattern: 'common.validation.wrongFormat',
+  isEmailAddress: 'common.validation.emailInvalid',
+  notEnoughCharactersPassword: 'common.validation.passwordTooShort',
+  noUppercase: 'common.validation.missingUppercase',
+  noSpecialCharacters: 'common.validation.missingSpecialChar',
+  notEqualPassword: 'common.validation.passwordMismatch',
+  startInPast: 'common.validation.mustBeInPast',
+  endAfterStart: 'common.validation.mustBeAfterStart',
+  startBeforeEnd: 'common.validation.mustBeBeforeEnd',
+  noNumber: 'common.validation.missingNumber',
+  toAfterFrom: 'common.validation.toMustBeAfterFrom',
+  fromBeforeTo: 'common.validation.fromMustBeBeforeTo',
+}
+
 export const FormErrorsMultiple: React.FC<Props> = ({ errors = null, id }) => {
   const { t } = useTranslation('common')
   if (!errors) return null
@@ -37,15 +52,15 @@ export const FormErrorsMultiple: React.FC<Props> = ({ errors = null, id }) => {
   return (
     <div className="relative top-0 right-0 pb-2" id={id}>
       <div className="flex max-w-full flex-row flex-wrap items-center justify-end gap-2">
-        {Object.keys(types).map((key) => (
-          <div key={key} className="badge badge-warning translate-x-[6px] -translate-y-1/2">
-            <ErrorSign />
-            {
-              // @ts-expect-error - error.type is a string
-              t(FormError[key])
-            }
-          </div>
-        ))}
+        {Object.keys(types).map((key) => {
+          const translationKey = errorTypeToTranslationKey[key]
+          return (
+            <div key={key} className="badge badge-warning translate-x-[6px] -translate-y-1/2">
+              <ErrorSign />
+              {translationKey ? t(translationKey as any) : key}
+            </div>
+          )
+        })}
       </div>
     </div>
   )
