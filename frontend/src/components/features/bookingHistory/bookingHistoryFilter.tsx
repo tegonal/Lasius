@@ -17,6 +17,7 @@
  *
  */
 
+import { Button } from 'components/primitives/buttons/Button'
 import { ResetButton } from 'components/primitives/buttons/ResetButton'
 import { Heading } from 'components/primitives/typography/Heading'
 import { DateRangeFilter } from 'components/ui/forms/DateRangeFilter'
@@ -24,17 +25,27 @@ import { FormBody } from 'components/ui/forms/FormBody'
 import { FormElement } from 'components/ui/forms/FormElement'
 import { InputSelectAutocomplete } from 'components/ui/forms/input/InputSelectAutocomplete'
 import { InputTagsAutocomplete } from 'components/ui/forms/input/InputTagsAutocomplete'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { useProjects } from 'lib/api/hooks/useProjects'
 import { useGetTagsByProject } from 'lib/api/lasius/user-organisations/user-organisations'
 import { dateOptions } from 'lib/utils/date/dateOptions'
+import { ArrowLeft } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
+import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 
-export const BookingHistoryFilter: React.FC = () => {
+type BookingHistoryFilterProps = {
+  inactiveProject?: { id: string; key: string } | null
+}
+
+export const BookingHistoryFilter: React.FC<BookingHistoryFilterProps> = ({
+  inactiveProject = null,
+}) => {
   const { t } = useTranslation('common')
-  const { projectSuggestions } = useProjects()
+  const router = useRouter()
+  const { projectSuggestions, findProjectById } = useProjects()
   const formContext = useFormContext()
   const { selectedOrganisationId } = useOrganisation()
   const { data: projectTags } = useGetTagsByProject(
@@ -42,6 +53,15 @@ export const BookingHistoryFilter: React.FC = () => {
     formContext.watch('projectId'),
   )
   const [hasChanges, setHasChanges] = useState(false)
+
+  const handleBackToProjects = () => {
+    // Determine if user or organisation context based on current path
+    const isUserContext = router.pathname.startsWith('/user/')
+    const projectsPath = isUserContext ? '/user/projects' : '/organisation/projects'
+    router.push(projectsPath)
+  }
+
+  // No longer needed - InputSelectAutocomplete now handles missing projects via findMissingProject
 
   const defaultValues = {
     projectId: '',
@@ -85,6 +105,21 @@ export const BookingHistoryFilter: React.FC = () => {
 
   return (
     <div className="w-full">
+      {inactiveProject && (
+        <div className="alert alert-warning mb-4">
+          <div className="flex w-full items-center justify-between">
+            <span>
+              {t('projects.warnings.inactiveProjectFilter', {
+                defaultValue: 'Showing data for inactive project',
+              })}
+            </span>
+            <Button variant="ghost" size="sm" onClick={handleBackToProjects}>
+              <LucideIcon icon={ArrowLeft} size={16} />
+              {t('projects.actions.backToProjects', { defaultValue: 'Back to projects' })}
+            </Button>
+          </div>
+        </div>
+      )}
       <div className="relative">
         <Heading variant="section">{t('common.filter.title', { defaultValue: 'Filter' })}</Heading>
         {hasChanges && (
@@ -98,6 +133,7 @@ export const BookingHistoryFilter: React.FC = () => {
           <InputSelectAutocomplete
             id="projectId"
             suggestions={projectSuggestions()}
+            findMissingProject={findProjectById}
             name="projectId"
           />
         </FormElement>

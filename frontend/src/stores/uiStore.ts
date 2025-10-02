@@ -18,23 +18,23 @@
  */
 
 import { logger } from 'lib/logger'
-import { ModalViewType, TabViewType, ToastViewType } from 'types/dynamicViews'
+import { TabViewType, ToastViewType } from 'types/dynamicViews'
 import { create } from 'zustand'
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
+
+interface ExplosionEvent {
+  id: string
+  x: number
+  y: number
+  timestamp: number
+}
 
 interface UIStore {
   // Context Menu state
   contextMenuOpen: string
   setContextMenuOpen: (id: string) => void
   closeContextMenu: () => void
-
-  // Modal state
-  modalViews: ModalViewType[]
-  addModal: (modal: ModalViewType) => void
-  removeModal: (id: string) => void
-  setModalOpen: (id: string, isOpen: boolean) => void
-  clearModals: () => void
 
   // Toast state
   toastViews: ToastViewType[]
@@ -54,6 +54,11 @@ interface UIStore {
   setGlobalLoading: (isLoading: boolean) => void
   showGlobalLoading: () => void
   hideGlobalLoading: () => void
+
+  // Explosion state
+  explosionEvent: ExplosionEvent | null
+  triggerExplosion: (x: number, y: number) => void
+  clearExplosion: () => void
 }
 
 export const useUIStore = create<UIStore>()(
@@ -70,36 +75,6 @@ export const useUIStore = create<UIStore>()(
           closeContextMenu: () =>
             set((state) => {
               state.contextMenuOpen = ''
-            }),
-
-          // Modal state
-          modalViews: [],
-          addModal: (modal) =>
-            set((state) => {
-              // Check if modal already exists
-              const exists = state.modalViews.find((m) => m.id === modal.id)
-              if (!exists) {
-                state.modalViews.push(modal)
-              } else {
-                // Update existing modal
-                const index = state.modalViews.findIndex((m) => m.id === modal.id)
-                state.modalViews[index] = modal
-              }
-            }),
-          removeModal: (id) =>
-            set((state) => {
-              state.modalViews = state.modalViews.filter((m) => m.id !== id)
-            }),
-          setModalOpen: (id, isOpen) =>
-            set((state) => {
-              const modal = state.modalViews.find((m) => m.id === id)
-              if (modal) {
-                modal.isOpen = isOpen
-              }
-            }),
-          clearModals: () =>
-            set((state) => {
-              state.modalViews = []
             }),
 
           // Toast state
@@ -180,6 +155,22 @@ export const useUIStore = create<UIStore>()(
 
               state.globalLoading = state.globalLoadingCounter > 0
             }),
+
+          // Explosion state
+          explosionEvent: null,
+          triggerExplosion: (x, y) =>
+            set((state) => {
+              state.explosionEvent = {
+                id: `explosion-${Date.now()}-${Math.random()}`,
+                x,
+                y,
+                timestamp: Date.now(),
+              }
+            }),
+          clearExplosion: () =>
+            set((state) => {
+              state.explosionEvent = null
+            }),
         })),
       ),
       {
@@ -198,36 +189,34 @@ export const useUIStore = create<UIStore>()(
 
 // Selector hooks for performance optimization
 export const useContextMenuOpen = () => useUIStore((state) => state.contextMenuOpen)
-export const useModalViews = () => useUIStore((state) => state.modalViews)
 export const useToastViews = () => useUIStore((state) => state.toastViews)
 export const useTabViews = () => useUIStore((state) => state.tabViews)
 export const useGlobalLoading = () => useUIStore((state) => state.globalLoading)
+export const useExplosionEvent = () => useUIStore((state) => state.explosionEvent)
 
 // Action hooks
 export const useUIActions = () => {
   const setContextMenuOpen = useUIStore((state) => state.setContextMenuOpen)
   const closeContextMenu = useUIStore((state) => state.closeContextMenu)
-  const addModal = useUIStore((state) => state.addModal)
-  const removeModal = useUIStore((state) => state.removeModal)
-  const setModalOpen = useUIStore((state) => state.setModalOpen)
   const addToast = useUIStore((state) => state.addToast)
   const removeToast = useUIStore((state) => state.removeToast)
   const setTabActive = useUIStore((state) => state.setTabActive)
   const setGlobalLoading = useUIStore((state) => state.setGlobalLoading)
   const showGlobalLoading = useUIStore((state) => state.showGlobalLoading)
   const hideGlobalLoading = useUIStore((state) => state.hideGlobalLoading)
+  const triggerExplosion = useUIStore((state) => state.triggerExplosion)
+  const clearExplosion = useUIStore((state) => state.clearExplosion)
 
   return {
     setContextMenuOpen,
     closeContextMenu,
-    addModal,
-    removeModal,
-    setModalOpen,
     addToast,
     removeToast,
     setTabActive,
     setGlobalLoading,
     showGlobalLoading,
     hideGlobalLoading,
+    triggerExplosion,
+    clearExplosion,
   }
 }

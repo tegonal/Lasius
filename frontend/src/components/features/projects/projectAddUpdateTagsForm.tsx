@@ -18,19 +18,18 @@
  */
 
 import { Button } from 'components/primitives/buttons/Button'
-import { Input } from 'components/primitives/inputs/Input'
-import { Label } from 'components/primitives/typography/Label'
+import { ScrollContainer } from 'components/primitives/layout/ScrollContainer'
+import { Heading } from 'components/primitives/typography/Heading'
 import { P } from 'components/primitives/typography/Paragraph'
-import { Tag } from 'components/ui/data-display/TagList'
 import { Alert } from 'components/ui/feedback/Alert'
 import { useToast } from 'components/ui/feedback/hooks/useToast'
-import { FormBody } from 'components/ui/forms/FormBody'
-import { FormElement } from 'components/ui/forms/FormElement'
-import { FormErrorBadge } from 'components/ui/forms/formErrorBadge'
-import { InputTagsAdmin } from 'components/ui/forms/input/InputTagsAdmin'
+import { ButtonGroup } from 'components/ui/forms/ButtonGroup'
+import { InputTagsAdmin2 } from 'components/ui/forms/input/InputTagsAdmin2'
 import { preventEnterOnForm } from 'components/ui/forms/input/shared/preventEnterOnForm'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
-import { isEqual, noop, unionWith } from 'es-toolkit/compat'
+import { Tabs } from 'components/ui/navigation/Tabs'
+import { GenericConfirmModal } from 'components/ui/overlays/modal/GenericConfirmModal'
+import { GenericInputModal } from 'components/ui/overlays/modal/GenericInputModal'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { ModelsProject, ModelsSimpleTag, ModelsTagGroup, ModelsUserProject } from 'lib/api/lasius'
 import { getGetProjectListKey, updateProject } from 'lib/api/lasius/projects/projects'
@@ -40,14 +39,18 @@ import {
 } from 'lib/api/lasius/user-organisations/user-organisations'
 import { getGetUserProfileKey } from 'lib/api/lasius/user/user'
 import { logger } from 'lib/logger'
-import { stringHash } from 'lib/utils/string/stringHash'
-import { HelpCircle, Trash2 } from 'lucide-react'
+import { HelpCircle } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
-import { tagGroupTemplate } from 'projectConfig/tagGroupTemplate'
 import React, { useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useHelpStore } from 'stores/helpStore'
 import { useSWRConfig } from 'swr'
+
+import { TagGroupEmptyState } from './tagManager/TagGroupEmptyState'
+import { TagGroupItem } from './tagManager/TagGroupItem'
+import { TagGroupToolbar } from './tagManager/TagGroupToolbar'
+import { useTagGroupOperations } from './tagManager/useTagGroupOperations'
+import { useUnsavedChanges } from './tagManager/useUnsavedChanges'
 
 type Props = {
   item?: ModelsProject | ModelsUserProject
@@ -58,6 +61,7 @@ type Props = {
 
 type FormValues = {
   newTagGroupName: string
+  newTagName: string
   tagGroups: ModelsTagGroup[] | []
   simpleTags: ModelsSimpleTag[] | []
 }
@@ -69,16 +73,41 @@ export const ProjectAddUpdateTagsForm: React.FC<Props> = ({ item, onSave, onCanc
   const hookForm = useForm<FormValues>({
     defaultValues: {
       newTagGroupName: '',
+      newTagName: '',
       tagGroups: [],
       simpleTags: [],
     },
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showAddGroupModal, setShowAddGroupModal] = useState(false)
+  const [showAddTagModal, setShowAddTagModal] = useState<{ groupIndex: number } | null>(null)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<{
+    groupIndex: number
+    groupName: string
+  } | null>(null)
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false)
+
   const { selectedOrganisationId } = useOrganisation()
   const { addToast } = useToast()
-
   const { mutate } = useSWRConfig()
+
+  // Custom hooks
+  const { hasUnsavedChanges, setHasUnsavedChanges } = useUnsavedChanges()
+  const {
+    expandedGroups,
+    setExpandedGroups,
+    copiedTags,
+    addTemplate,
+    removeTagGroup,
+    createTagGroup,
+    expandAll,
+    collapseAll,
+    toggleGroup,
+    copyTags,
+    pasteTags,
+    addTagToGroup,
+  } = useTagGroupOperations(hookForm, setHasUnsavedChanges)
 
   const projectId = (item && 'id' in item ? item.id : item?.projectReference.id) || ''
   const projectKey = (item && 'key' in item ? item.key : item?.projectReference.key) || ''
@@ -89,6 +118,7 @@ export const ProjectAddUpdateTagsForm: React.FC<Props> = ({ item, onSave, onCanc
 
   const bookingCategories = useGetTagsByProject(selectedOrganisationId, projectId)
 
+  // Initialize form data
   useEffect(() => {
     if (item && bookingCategories.data) {
       const tagGroups = bookingCategories.data.filter((tag) => tag.type === 'TagGroup') as
@@ -99,236 +129,266 @@ export const ProjectAddUpdateTagsForm: React.FC<Props> = ({ item, onSave, onCanc
         | ModelsSimpleTag[]
         | []
 
-      hookForm.setValue('tagGroups', tagGroups)
-      hookForm.setValue('simpleTags', simpleTags)
-    }
-  }, [bookingCategories.data, hookForm, item, projectKey])
+      hookForm.reset({
+        newTagGroupName: '',
+        newTagName: '',
+        tagGroups,
+        simpleTags,
+      })
 
+      setExpandedGroups(new Set(tagGroups.map((g) => g.id)))
+    }
+  }, [bookingCategories.data, hookForm, item, projectKey, setExpandedGroups])
+
+  // Form submit
   const onSubmit = async () => {
     setIsSubmitting(true)
-    const { simpleTags, tagGroups } = hookForm.getValues()
-    const bookingCategories = [...simpleTags, ...tagGroups]
-    logger.info('submit', bookingCategories)
-    if (mode === 'update' && item) {
+
+    try {
+      const bookingCategories = [
+        ...hookForm.getValues('tagGroups'),
+        ...hookForm.getValues('simpleTags'),
+      ]
+
+      logger.info('Updating tags', { projectId, bookingCategories })
+
       await updateProject(projectOrganisationId, projectId, {
         ...item,
         bookingCategories,
       })
-    }
-    addToast({
-      message: t('projects.status.updated', { defaultValue: 'Project updated' }),
-      type: 'SUCCESS',
-    })
-    await mutate(getGetProjectListKey(projectOrganisationId))
-    await mutate(getGetUserProfileKey())
-    await mutate(getTagsByProject(selectedOrganisationId, projectId))
-    setIsSubmitting(false)
-    onSave()
-  }
 
-  // useEffect(() => {
-  //   const subscription = hookForm.watch((value, { name }) => {
-  //     switch (name) {
-  //       case 'simpleTags':
-  //         if (value.simpleTags) {
-  //           logger.info('bookingCategories', value.simpleTags);
-  //         }
-  //         break;
-  //       case 'tagGroups':
-  //         if (value.tagGroups) {
-  //           logger.info('bookingCategories', value.tagGroups);
-  //         }
-  //         break;
-  //       default:
-  //         break;
-  //     }
-  //   });
-  //   return () => subscription.unsubscribe();
-  // }, [hookForm]);
-
-  const addTemplate = () => {
-    const tagGroups = hookForm.getValues('tagGroups')
-    const simpleTags = hookForm.getValues('simpleTags')
-
-    const newTagGroups = tagGroupTemplate.filter((tag) => tag.type === 'TagGroup') as
-      | ModelsTagGroup[]
-      | []
-
-    const newSimpleTags = tagGroupTemplate.filter((tag) => tag.type === 'SimpleTag') as
-      | ModelsSimpleTag[]
-      | []
-
-    hookForm.setValue('tagGroups', unionWith(tagGroups, newTagGroups, isEqual))
-    hookForm.setValue('simpleTags', unionWith(simpleTags, newSimpleTags, isEqual))
-
-    hookForm.trigger('tagGroups')
-    hookForm.trigger('simpleTags')
-  }
-
-  const removeTagGroup = (index: number) => {
-    const tagGroups = hookForm.getValues('tagGroups')
-    tagGroups.splice(index, 1)
-    logger.info('tagGroups', tagGroups)
-    hookForm.setValue('tagGroups', tagGroups)
-    hookForm.trigger('tagGroups')
-  }
-
-  const createTagGroup = () => {
-    const newTagGroupName = hookForm.getValues('newTagGroupName')
-    const tagGroups: ModelsTagGroup[] = hookForm.getValues('tagGroups')
-    if (!newTagGroupName) {
       addToast({
-        message: t('tags.validation.nameRequired', { defaultValue: 'Tag group name is required' }),
+        message: t('projects.status.updated', { defaultValue: 'Project updated' }),
+        type: 'SUCCESS',
+      })
+
+      await mutate(getGetProjectListKey(projectOrganisationId))
+      await mutate(getGetUserProfileKey())
+      await mutate(getTagsByProject(selectedOrganisationId, projectId))
+
+      setIsSubmitting(false)
+      onSave()
+    } catch (error) {
+      logger.error('Error updating project tags', error)
+      setIsSubmitting(false)
+      addToast({
+        message: t('common.errors.generic', { defaultValue: 'Something went wrong' }),
         type: 'ERROR',
       })
-      return
     }
-
-    if (tagGroups.find((tagGroup) => tagGroup.id === newTagGroupName)) {
-      addToast({
-        message: t('tags.validation.tagGroupExists', { defaultValue: 'Tag group already exists' }),
-        type: 'ERROR',
-      })
-      return
-    }
-
-    const newTagGroup: ModelsTagGroup = {
-      id: newTagGroupName,
-      type: 'TagGroup',
-      relatedTags: [
-        {
-          id: 'Billable',
-          type: 'SimpleTag',
-        },
-      ],
-    }
-    tagGroups.push(newTagGroup)
-    hookForm.setValue('tagGroups', tagGroups)
-    hookForm.setValue('newTagGroupName', '')
-    hookForm.trigger('tagGroups')
   }
+
+  const handleCancel = () => {
+    if (hasUnsavedChanges || hookForm.formState.isDirty) {
+      setShowCancelConfirm(true)
+    } else {
+      onCancel()
+    }
+  }
+
+  const confirmCancel = () => {
+    setShowCancelConfirm(false)
+    onCancel()
+  }
+
+  const handleAddGroupConfirm = () => {
+    const success = createTagGroup()
+    if (success) {
+      setShowAddGroupModal(false)
+    }
+  }
+
+  const handleAddTagConfirm = () => {
+    if (!showAddTagModal) return
+    const success = addTagToGroup(showAddTagModal.groupIndex)
+    if (success) {
+      setShowAddTagModal(null)
+    }
+  }
+
+  const handleDeleteConfirm = () => {
+    if (!showDeleteConfirm) return
+    removeTagGroup(showDeleteConfirm.groupIndex)
+    setShowDeleteConfirm(null)
+  }
+
+  const confirmDeleteTagGroup = (index: number, groupName: string) => {
+    setShowDeleteConfirm({ groupIndex: index, groupName })
+  }
+
+  // Sort tag groups alphabetically
+  const sortedTagGroups = [...hookForm.watch('tagGroups')].sort((a, b) => a.id.localeCompare(b.id))
+
+  // Tab content
+  const tagGroupsContent = (
+    <div className="flex h-[calc(90vh-12rem)] flex-col">
+      <TagGroupToolbar
+        onAddGroup={() => setShowAddGroupModal(true)}
+        onAddPresets={addTemplate}
+        onToggleAll={expandedGroups.size === sortedTagGroups.length ? collapseAll : expandAll}
+        showToggleAll={sortedTagGroups.length > 0}
+        allExpanded={expandedGroups.size === sortedTagGroups.length}
+      />
+
+      <ScrollContainer className="flex-1 pr-2">
+        <div className="space-y-2">
+          {sortedTagGroups.length === 0 && <TagGroupEmptyState />}
+
+          {sortedTagGroups.map((tagGroup: ModelsTagGroup) => {
+            const index = hookForm.getValues('tagGroups').findIndex((g) => g.id === tagGroup.id)
+            const isExpanded = expandedGroups.has(tagGroup.id)
+
+            return (
+              <TagGroupItem
+                key={tagGroup.id}
+                tagGroup={tagGroup}
+                index={index}
+                isExpanded={isExpanded}
+                onToggle={() => toggleGroup(tagGroup.id)}
+                onDelete={() => confirmDeleteTagGroup(index, tagGroup.id)}
+                onAddTag={() => setShowAddTagModal({ groupIndex: index })}
+                onCopyTags={() => copyTags(tagGroup.id, tagGroup.relatedTags || [])}
+                onPasteTags={() => pasteTags(index)}
+                showPasteButton={!!copiedTags && copiedTags.fromGroupId !== tagGroup.id}
+              />
+            )
+          })}
+        </div>
+      </ScrollContainer>
+    </div>
+  )
+
+  const simpleTagsContent = (
+    <ScrollContainer className="h-[calc(90vh-12rem)] pr-2">
+      <div className="space-y-6">
+        <Alert variant="info">
+          <P>
+            {t('tags.simpleTagsDescription', {
+              defaultValue: 'Tags that are not part of any group',
+            })}
+          </P>
+        </Alert>
+        <InputTagsAdmin2 tags={hookForm.getValues('simpleTags')} name="simpleTags" />
+      </div>
+    </ScrollContainer>
+  )
+
+  const tabs = [
+    {
+      label: t('tags.tagGroups', { defaultValue: 'Tag groups' }),
+      component: tagGroupsContent,
+    },
+    {
+      label: t('tags.simpleTags', { defaultValue: 'Simple tags' }),
+      component: simpleTagsContent,
+    },
+  ]
 
   return (
     <FormProvider {...hookForm}>
-      <div className="relative w-auto">
-        {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
-        <form onSubmit={hookForm.handleSubmit(onSubmit)} onKeyDown={(e) => preventEnterOnForm(e)}>
-          <div className="grid w-full grid-cols-[auto_240px] gap-4">
-            <div>
-              <FormBody>
-                <FormElement>
-                  <Label htmlFor="simpleTags">
-                    {t('tags.tagGroups', { defaultValue: 'Tag groups' })}
-                  </Label>
-                  {hookForm.getValues('tagGroups').length === 0 && (
-                    <div className="flex">
-                      <Alert variant="info" className="my-3 max-w-[500px]">
-                        {t('tags.description.tagGroups', {
-                          defaultValue:
-                            'Tag groups allow easy filtering of a large number of bookings without users having to think too much about tagging rules. While adding a booking, a user can choose the tag group and essentially add multiple tags at the same time.',
-                        })}
-                      </Alert>
-                    </div>
-                  )}
-                  <div className="mt-1 grid w-full grid-cols-3 gap-3">
-                    {hookForm.getValues('tagGroups').map((tagGroup: ModelsTagGroup, index) => (
-                      <div
-                        className="bg-base-200 flex gap-3 rounded-md p-3"
-                        key={stringHash({ tagGroup, index })}>
-                        <div className="flex-grow">
-                          <div className="mb-2 inline-block">
-                            <Tag
-                              key={tagGroup.id}
-                              item={tagGroup}
-                              clickHandler={noop}
-                              hideRemoveIcon
-                            />
-                          </div>
-                          <InputTagsAdmin
-                            tags={tagGroup.relatedTags}
-                            name="tagGroups"
-                            tagGroupIndex={index}
-                          />
-                        </div>
-                        <div>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeTagGroup(index)}>
-                            <LucideIcon icon={Trash2} size={18} />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                    <div className="bg-base-200 rounded-md p-3">
-                      <FormElement>
-                        <P>
-                          {t('tags.actions.addTagGroup', { defaultValue: 'Add a new tag group' })}
-                        </P>
-                      </FormElement>
-                      <FormElement>
-                        <Label htmlFor="simpleTags">
-                          {t('common.forms.name', { defaultValue: 'Name' })}
-                        </Label>
-                        <Input {...hookForm.register('newTagGroupName')} autoComplete="off" />
-                        <FormErrorBadge error={hookForm.formState.errors.newTagGroupName} />
-                      </FormElement>
-                      <FormElement>
-                        <Button
-                          type="button"
-                          variant="secondary"
-                          size="sm"
-                          onClick={() => createTagGroup()}>
-                          {t('tags.actions.createTagGroup', { defaultValue: 'Create tag group' })}
-                        </Button>
-                      </FormElement>
-                    </div>
-                  </div>
-                </FormElement>
-                <FormElement>
-                  <Label htmlFor="simpleTags">
-                    {t('tags.simpleTags', { defaultValue: 'Simple tags' })}
-                  </Label>
-                  <InputTagsAdmin tags={hookForm.getValues('simpleTags')} name="simpleTags" />
-                </FormElement>
-              </FormBody>
-            </div>
-            <div className="flex flex-col">
-              <FormElement>
-                <Button type="button" variant="secondary" onClick={() => addTemplate()}>
-                  {t('tags.actions.addDefaultTagGroups', {
-                    defaultValue: 'Add default tag groups',
+      <form
+        onSubmit={hookForm.handleSubmit(onSubmit)}
+        onKeyDown={preventEnterOnForm}
+        className="flex h-full flex-col">
+        <div className="flex min-h-0 flex-1 flex-col">
+          {/* Header */}
+          <div className="mb-4 flex items-center justify-between">
+            <Heading variant="h2" as="h2">
+              {mode === 'add'
+                ? t('tags.actions.add', { defaultValue: 'Add tags' })
+                : t('tags.actions.editForProject', {
+                    defaultValue: 'Edit tags for {{projectKey}}',
+                    projectKey,
                   })}
-                </Button>
-              </FormElement>
-              <div className="h-5" />
-              <FormElement>
-                <Button type="submit" disabled={isSubmitting} className="relative z-0">
-                  {t('common.actions.save', { defaultValue: 'Save' })}
-                </Button>
-                <Button type="button" variant="secondary" onClick={onCancel}>
-                  {t('common.actions.cancel', { defaultValue: 'Cancel' })}
-                </Button>
-              </FormElement>
-              <div className="flex-grow" />
-              <FormElement>
-                <div className="flex justify-end">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    shape="circle"
-                    size="sm"
-                    onClick={() => openHelp('modal-edit-tags')}
-                    fullWidth={false}>
-                    <LucideIcon icon={HelpCircle} size={20} />
-                  </Button>
-                </div>
-              </FormElement>
-            </div>
+            </Heading>
+            <Button
+              type="button"
+              variant="ghost"
+              shape="circle"
+              size="sm"
+              onClick={() => openHelp('modal-edit-tags')}
+              fullWidth={false}>
+              <LucideIcon icon={HelpCircle} size={20} />
+            </Button>
           </div>
-        </form>
-      </div>
+
+          <div className="flex min-h-0 flex-1 flex-col">
+            <Tabs tabs={tabs} />
+          </div>
+        </div>
+
+        {/* Footer Actions */}
+        <div className="border-base-300 mt-auto flex-shrink-0 border-t pt-4">
+          <ButtonGroup>
+            <Button type="submit" disabled={isSubmitting} className="relative z-0">
+              {t('common.actions.save', { defaultValue: 'Save' })}
+            </Button>
+            <Button type="button" variant="secondary" onClick={handleCancel}>
+              {t('common.actions.cancel', { defaultValue: 'Cancel' })}
+            </Button>
+          </ButtonGroup>
+        </div>
+      </form>
+
+      {/* Modals */}
+      <GenericInputModal
+        open={showAddGroupModal}
+        onClose={() => {
+          setShowAddGroupModal(false)
+          hookForm.setValue('newTagGroupName', '')
+        }}
+        onConfirm={handleAddGroupConfirm}
+        register={hookForm.register}
+        fieldName="newTagGroupName"
+        label={t('tags.actions.addTagGroup', { defaultValue: 'Add tag group' })}
+        placeholder={t('common.forms.name', { defaultValue: 'Name' })}
+        confirmLabel={t('tags.actions.createTagGroup', { defaultValue: 'Create tag group' })}
+        cancelLabel={t('common.actions.cancel', { defaultValue: 'Cancel' })}
+        error={hookForm.formState.errors.newTagGroupName}
+      />
+
+      <GenericInputModal
+        open={!!showAddTagModal}
+        onClose={() => {
+          setShowAddTagModal(null)
+          hookForm.setValue('newTagName', '')
+        }}
+        onConfirm={handleAddTagConfirm}
+        register={hookForm.register}
+        fieldName="newTagName"
+        label={t('tags.actions.addTag', { defaultValue: 'Add a tag' })}
+        placeholder={t('tags.enterTagName', { defaultValue: 'Enter tag name' })}
+        confirmLabel={t('common.actions.add', { defaultValue: 'Add' })}
+        cancelLabel={t('common.actions.cancel', { defaultValue: 'Cancel' })}
+        enableEnterKey
+      />
+
+      {showDeleteConfirm && (
+        <GenericConfirmModal
+          open
+          onClose={() => setShowDeleteConfirm(null)}
+          onConfirm={handleDeleteConfirm}
+          message={t('tags.confirmDeleteGroup', {
+            defaultValue: 'Are you sure you want to delete the tag group "{{groupName}}"?',
+            groupName: showDeleteConfirm.groupName,
+          })}
+          confirmLabel={t('common.actions.delete', { defaultValue: 'Delete' })}
+          cancelLabel={t('common.actions.cancel', { defaultValue: 'Cancel' })}
+        />
+      )}
+
+      {showCancelConfirm && (
+        <GenericConfirmModal
+          open
+          onClose={() => setShowCancelConfirm(false)}
+          onConfirm={confirmCancel}
+          message={t('common.confirmUnsavedChanges', {
+            defaultValue: 'You have unsaved changes. Are you sure you want to cancel?',
+          })}
+          confirmLabel={t('common.actions.discardChanges', { defaultValue: 'Discard changes' })}
+          cancelLabel={t('common.actions.keepEditing', { defaultValue: 'Keep editing' })}
+        />
+      )}
     </FormProvider>
   )
 }

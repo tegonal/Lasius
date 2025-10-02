@@ -25,7 +25,7 @@ type Props = {
 }
 export const DataListHeaderItem: React.FC<Props> = ({ children }) => {
   return (
-    <td className="border-base-content/20 border-b p-1">
+    <td className="border-base-content/20 text-base-content/50 border-b p-1 py-3">
       <Heading variant="headingTableHeader">{children}</Heading>
     </td>
   )

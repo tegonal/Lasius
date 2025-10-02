@@ -20,24 +20,23 @@
 import { ContextButtonClose } from 'components/features/contextMenu/buttons/contextButtonClose'
 import { ContextButtonOpen } from 'components/features/contextMenu/buttons/contextButtonOpen'
 import { ContextButtonStartBooking } from 'components/features/contextMenu/buttons/contextButtonStartBooking'
+import { ContextAnimatePresence } from 'components/features/contextMenu/contextAnimatePresence'
 import { ContextBar } from 'components/features/contextMenu/contextBar'
 import { ContextBarDivider } from 'components/features/contextMenu/contextBarDivider'
-import { ContextCompactAnimatePresence } from 'components/features/contextMenu/contextCompactAnimatePresence'
-import { ContextCompactBody } from 'components/features/contextMenu/contextCompactBody'
-import { ContextCompactButtonWrapper } from 'components/features/contextMenu/contextCompactButtonWrapper'
+import { ContextBody } from 'components/features/contextMenu/contextBody'
+import { ContextButtonWrapper } from 'components/features/contextMenu/contextButtonWrapper'
 import { useContextMenu } from 'components/features/contextMenu/hooks/useContextMenu'
 import { BookingAddUpdateForm } from 'components/features/user/index/bookingAddUpdateForm'
 import { Button } from 'components/primitives/buttons/Button'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
-import useModal from 'components/ui/overlays/modal/hooks/useModal'
-import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
+import { Modal } from 'components/ui/overlays/modal/Modal'
 import { AnimatePresence } from 'framer-motion'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { ModelsBooking } from 'lib/api/lasius'
 import { deleteUserBooking } from 'lib/api/lasius/user-bookings/user-bookings'
 import { Pencil, Star, Trash2 } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
-import React from 'react'
+import React, { useState } from 'react'
 
 type Props = {
   item: ModelsBooking
@@ -50,10 +49,12 @@ export const BookingHistoryItemContext: React.FC<Props> = ({
   allowDelete = false,
   allowEdit = false,
 }) => {
-  const { modalId, openModal, closeModal } = useModal(`EditModal-${item.id}`)
+  const [isOpen, setIsOpen] = useState(false)
   const { t } = useTranslation('common')
   const { actionAddBookingToFavorites, handleCloseAll, currentOpenContextMenuId } = useContextMenu()
   const { selectedOrganisationId } = useOrganisation()
+
+  const handleClose = () => setIsOpen(false)
 
   const deleteItem = async () => {
     await deleteUserBooking(selectedOrganisationId, item.id)
@@ -61,21 +62,21 @@ export const BookingHistoryItemContext: React.FC<Props> = ({
   }
 
   const updateItem = () => {
-    openModal()
+    setIsOpen(true)
     handleCloseAll()
   }
 
   return (
     <>
-      <ContextCompactBody>
+      <ContextBody variant="compact">
         <ContextButtonOpen hash={item.id} />
         <AnimatePresence>
           {currentOpenContextMenuId === item.id && (
-            <ContextCompactAnimatePresence>
+            <ContextAnimatePresence variant="compact">
               <ContextBar>
                 <ContextButtonStartBooking variant="compact" item={item} />
                 {allowEdit && (
-                  <ContextCompactButtonWrapper>
+                  <ContextButtonWrapper variant="compact">
                     <Button
                       title={t('bookings.actions.edit', { defaultValue: 'Edit booking' })}
                       aria-label={t('bookings.actions.edit', { defaultValue: 'Edit booking' })}
@@ -85,9 +86,9 @@ export const BookingHistoryItemContext: React.FC<Props> = ({
                       shape="circle">
                       <LucideIcon icon={Pencil} size={24} />
                     </Button>
-                  </ContextCompactButtonWrapper>
+                  </ContextButtonWrapper>
                 )}
-                <ContextCompactButtonWrapper>
+                <ContextButtonWrapper variant="compact">
                   <Button
                     title={t('favorites.actions.add', { defaultValue: 'Add as favorite' })}
                     aria-label={t('favorites.actions.add', { defaultValue: 'Add as favorite' })}
@@ -97,9 +98,9 @@ export const BookingHistoryItemContext: React.FC<Props> = ({
                     shape="circle">
                     <LucideIcon icon={Star} size={24} />
                   </Button>
-                </ContextCompactButtonWrapper>
+                </ContextButtonWrapper>
                 {allowDelete && (
-                  <ContextCompactButtonWrapper>
+                  <ContextButtonWrapper variant="compact">
                     <Button
                       title={t('bookings.actions.delete', { defaultValue: 'Delete booking' })}
                       aria-label={t('bookings.actions.delete', { defaultValue: 'Delete booking' })}
@@ -109,23 +110,23 @@ export const BookingHistoryItemContext: React.FC<Props> = ({
                       shape="circle">
                       <LucideIcon icon={Trash2} size={24} />
                     </Button>
-                  </ContextCompactButtonWrapper>
+                  </ContextButtonWrapper>
                 )}
                 <ContextBarDivider />
                 <ContextButtonClose variant="compact" />
               </ContextBar>
-            </ContextCompactAnimatePresence>
+            </ContextAnimatePresence>
           )}
         </AnimatePresence>
-      </ContextCompactBody>
-      <ModalResponsive modalId={modalId}>
+      </ContextBody>
+      <Modal open={isOpen} onClose={handleClose}>
         <BookingAddUpdateForm
           mode="update"
           itemUpdate={item}
-          onSave={closeModal}
-          onCancel={closeModal}
+          onSave={handleClose}
+          onCancel={handleClose}
         />
-      </ModalResponsive>
+      </Modal>
     </>
   )
 }

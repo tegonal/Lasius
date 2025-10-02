@@ -19,7 +19,7 @@
 
 import { FormBody } from 'components/ui/forms/FormBody'
 import { FormElement } from 'components/ui/forms/FormElement'
-import { InputDatePicker2 } from 'components/ui/forms/input/datePicker2/InputDatePicker2'
+import { InputDatePicker } from 'components/ui/forms/input/datePicker/InputDatePicker'
 import { Select, SelectOption } from 'components/ui/forms/input/Select'
 import { isAfter, isBefore } from 'date-fns'
 import { dateOptions } from 'lib/utils/date/dateOptions'
@@ -147,10 +147,10 @@ export const DateRangeFilter: React.FC<Props> = ({ name: rangeFieldName }) => {
         />
       </FormElement>
       <FormElement label={t('common.time.from', { defaultValue: 'From' })} htmlFor="from">
-        <InputDatePicker2 name="from" withDate />
+        <InputDatePicker name="from" withDate />
       </FormElement>
       <FormElement label={t('common.time.to', { defaultValue: 'To' })} htmlFor="to">
-        <InputDatePicker2 name="to" withDate />
+        <InputDatePicker name="to" withDate />
       </FormElement>
     </FormBody>
   )

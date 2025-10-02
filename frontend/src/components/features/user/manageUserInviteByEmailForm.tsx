@@ -25,6 +25,7 @@ import { FieldSet } from 'components/ui/forms/FieldSet'
 import { FormBody } from 'components/ui/forms/FormBody'
 import { FormElement } from 'components/ui/forms/FormElement'
 import { FormErrorBadge } from 'components/ui/forms/formErrorBadge'
+import { Select } from 'components/ui/forms/input/Select'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { ModalConfirm } from 'components/ui/overlays/modal/modalConfirm'
 import { UserRoles } from 'dynamicTranslationStrings'
@@ -33,7 +34,7 @@ import { ModelsInvitationResult } from 'lib/api/lasius'
 import { inviteOrganisationUser } from 'lib/api/lasius/organisations/organisations'
 import { inviteProjectUser } from 'lib/api/lasius/projects/projects'
 import { emailValidationPattern } from 'lib/utils/data/validators'
-import { ChevronDown, Copy } from 'lucide-react'
+import { Copy } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -128,27 +129,23 @@ export const ManageUserInviteByEmailForm: React.FC<Props> = ({
               <Label htmlFor="projectRole">
                 {t('projects.projectRole', { defaultValue: 'Project role' })}
               </Label>
-              <div className="relative">
-                <select
-                  className="input input-bordered w-full cursor-pointer appearance-none pr-8"
-                  {...hookForm.register('projectRole', {
-                    required: true,
-                  })}>
-                  <option
-                    key={ModelsUserProjectRoleEnum.ProjectMember}
-                    value={ModelsUserProjectRoleEnum.ProjectMember}>
-                    {UserRoles[ModelsUserProjectRoleEnum.ProjectMember]}
-                  </option>
-                  <option
-                    key={ModelsUserProjectRoleEnum.ProjectAdministrator}
-                    value={ModelsUserProjectRoleEnum.ProjectAdministrator}>
-                    {UserRoles[ModelsUserProjectRoleEnum.ProjectAdministrator]}
-                  </option>
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                  <LucideIcon icon={ChevronDown} size={16} strokeWidth={2} className="opacity-50" />
-                </div>
-              </div>
+              <Select
+                id="projectRole"
+                value={hookForm.watch('projectRole')}
+                onChange={(value) =>
+                  hookForm.setValue('projectRole', value as ModelsUserProjectRoleEnum)
+                }
+                options={[
+                  {
+                    value: ModelsUserProjectRoleEnum.ProjectMember,
+                    label: UserRoles[ModelsUserProjectRoleEnum.ProjectMember],
+                  },
+                  {
+                    value: ModelsUserProjectRoleEnum.ProjectAdministrator,
+                    label: UserRoles[ModelsUserProjectRoleEnum.ProjectAdministrator],
+                  },
+                ]}
+              />
             </FormElement>
           )}
           {mode === 'organisation' && (
@@ -156,27 +153,23 @@ export const ManageUserInviteByEmailForm: React.FC<Props> = ({
               <Label htmlFor="organisationRole">
                 {t('organisations.organisationRole', { defaultValue: 'Organisation role' })}
               </Label>
-              <div className="relative">
-                <select
-                  className="input input-bordered w-full cursor-pointer appearance-none pr-8"
-                  {...hookForm.register('organisationRole', {
-                    required: true,
-                  })}>
-                  <option
-                    key={ModelsUserOrganisationRoleEnum.OrganisationMember}
-                    value={ModelsUserOrganisationRoleEnum.OrganisationMember}>
-                    {UserRoles[ModelsUserOrganisationRoleEnum.OrganisationMember]}
-                  </option>
-                  <option
-                    key={ModelsUserOrganisationRoleEnum.OrganisationAdministrator}
-                    value={ModelsUserOrganisationRoleEnum.OrganisationAdministrator}>
-                    {UserRoles[ModelsUserOrganisationRoleEnum.OrganisationAdministrator]}
-                  </option>
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                  <LucideIcon icon={ChevronDown} size={16} strokeWidth={2} className="opacity-50" />
-                </div>
-              </div>
+              <Select
+                id="organisationRole"
+                value={hookForm.watch('organisationRole')}
+                onChange={(value) =>
+                  hookForm.setValue('organisationRole', value as ModelsUserOrganisationRoleEnum)
+                }
+                options={[
+                  {
+                    value: ModelsUserOrganisationRoleEnum.OrganisationMember,
+                    label: UserRoles[ModelsUserOrganisationRoleEnum.OrganisationMember],
+                  },
+                  {
+                    value: ModelsUserOrganisationRoleEnum.OrganisationAdministrator,
+                    label: UserRoles[ModelsUserOrganisationRoleEnum.OrganisationAdministrator],
+                  },
+                ]}
+              />
             </FormElement>
           )}
         </FieldSet>
@@ -196,7 +189,7 @@ export const ManageUserInviteByEmailForm: React.FC<Props> = ({
           <div>
             {t('invitations.description.copyLink', {
               defaultValue:
-                'Copy the link and send it to your colleague. If he or she does not have an account yet, one will be created when the invitation is accepted.',
+                'Copy the link and send it to your colleague. If they do not have an account yet, one will be created when the invitation is accepted.',
             })}
           </div>
           <div className="flex gap-3 py-3">

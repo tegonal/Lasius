@@ -20,11 +20,11 @@
 import { ContextButtonClose } from 'components/features/contextMenu/buttons/contextButtonClose'
 import { ContextButtonOpen } from 'components/features/contextMenu/buttons/contextButtonOpen'
 import { ContextButtonStartBooking } from 'components/features/contextMenu/buttons/contextButtonStartBooking'
+import { ContextAnimatePresence } from 'components/features/contextMenu/contextAnimatePresence'
 import { ContextBar } from 'components/features/contextMenu/contextBar'
 import { ContextBarDivider } from 'components/features/contextMenu/contextBarDivider'
-import { ContextCompactAnimatePresence } from 'components/features/contextMenu/contextCompactAnimatePresence'
-import { ContextCompactBody } from 'components/features/contextMenu/contextCompactBody'
-import { ContextCompactButtonWrapper } from 'components/features/contextMenu/contextCompactButtonWrapper'
+import { ContextBody } from 'components/features/contextMenu/contextBody'
+import { ContextButtonWrapper } from 'components/features/contextMenu/contextButtonWrapper'
 import { useContextMenu } from 'components/features/contextMenu/hooks/useContextMenu'
 import { Button } from 'components/primitives/buttons/Button'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
@@ -65,14 +65,14 @@ export const FavoriteItemContext: React.FC<Props> = ({ item }) => {
 
   return (
     <>
-      <ContextCompactBody>
+      <ContextBody variant="compact">
         <ContextButtonOpen hash={itemHash} />
         <AnimatePresence>
           {currentOpenContextMenuId === itemHash && (
-            <ContextCompactAnimatePresence>
+            <ContextAnimatePresence variant="compact">
               <ContextBar>
                 <ContextButtonStartBooking variant="compact" item={item} />
-                <ContextCompactButtonWrapper>
+                <ContextButtonWrapper variant="compact">
                   <Button
                     variant="contextIcon"
                     title={t('favorites.actions.delete', { defaultValue: 'Delete favorite' })}
@@ -82,14 +82,14 @@ export const FavoriteItemContext: React.FC<Props> = ({ item }) => {
                     shape="circle">
                     <LucideIcon icon={Trash2} size={24} />
                   </Button>
-                </ContextCompactButtonWrapper>
+                </ContextButtonWrapper>
                 <ContextBarDivider />
                 <ContextButtonClose variant="compact" />
               </ContextBar>
-            </ContextCompactAnimatePresence>
+            </ContextAnimatePresence>
           )}
         </AnimatePresence>
-      </ContextCompactBody>
+      </ContextBody>
     </>
   )
 }

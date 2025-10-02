@@ -27,17 +27,21 @@ import { ModelsUserProject } from 'lib/api/lasius'
  * Provides formatted project data for autocomplete inputs and full project lists.
  *
  * @returns Object containing:
- *   - projectSuggestions: Function returning sorted project references for autocomplete
+ *   - projectSuggestions: Function returning sorted project references for autocomplete (active projects only)
  *   - userProjects: Function returning full sorted array of user projects
+ *   - findProjectById: Function to find any project by ID (including inactive projects from any organization)
  *
  * @example
- * const { projectSuggestions, userProjects } = useProjects()
+ * const { projectSuggestions, userProjects, findProjectById } = useProjects()
  *
  * // Get projects for autocomplete
  * const suggestions = projectSuggestions()
  *
  * // Get full project list
  * const allProjects = userProjects()
+ *
+ * // Find a specific project (even if inactive)
+ * const project = findProjectById('project-id-123')
  */
 export const useProjects = () => {
   const { profile } = useProfile()
@@ -65,8 +69,30 @@ export const useProjects = () => {
     return []
   }
 
+  /**
+   * Finds a project by ID across all organizations in the user's profile.
+   * This includes inactive/deactivated projects.
+   *
+   * @param projectId - The ID of the project to find
+   * @returns The project reference or undefined if not found
+   */
+  const findProjectById = (projectId: string): SelectAutocompleteSuggestionType | undefined => {
+    if (!profile?.organisations || !projectId) return undefined
+
+    // Search through all organizations (not just the selected one)
+    for (const org of profile.organisations) {
+      const project = org.projects.find((p) => p.projectReference.id === projectId)
+      if (project) {
+        return project.projectReference
+      }
+    }
+
+    return undefined
+  }
+
   return {
     projectSuggestions,
     userProjects,
+    findProjectById,
   }
 }

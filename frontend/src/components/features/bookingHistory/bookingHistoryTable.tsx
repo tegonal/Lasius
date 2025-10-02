@@ -23,7 +23,7 @@ import { DataList } from 'components/ui/data-display/dataList/dataList'
 import { DataListField } from 'components/ui/data-display/dataList/dataListField'
 import { DataListHeaderItem } from 'components/ui/data-display/dataList/dataListHeaderItem'
 import { DataListRow } from 'components/ui/data-display/dataList/dataListRow'
-import { DataFetchEmpty } from 'components/ui/data-display/fetchState/dataFetchEmpty'
+import { EmptyStateBookingHistory } from 'components/ui/data-display/fetchState/emptyStateBookingHistory'
 import { TagList } from 'components/ui/data-display/TagList'
 import { sortExtendedBookingsByDate } from 'lib/api/functions/sortBookingsByDate'
 import { ModelsBooking } from 'lib/api/lasius'
@@ -67,7 +67,7 @@ export const BookingHistoryTable: React.FC<Props> = ({
 
   const sortedList = useMemo(() => sortExtendedBookingsByDate(items), [items])
 
-  if (sortedList.length < 1) return <DataFetchEmpty />
+  if (sortedList.length < 1) return <EmptyStateBookingHistory />
 
   return (
     <DataList>

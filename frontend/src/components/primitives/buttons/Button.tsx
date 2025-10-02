@@ -40,7 +40,7 @@ const buttonVariants = cva(
         error: 'bg-red-gradient hover:bg-red-gradient-hover border-none text-white',
         info: 'btn-info',
         ghost: 'btn-ghost',
-        tabs: 'btn-ghost border-none shadow-none [.selected_&]:bg-transparent [.selected_&]:text-white',
+        tabs: 'btn-ghost h-auto border-none p-3 shadow-none [.selected_&]:bg-transparent [.selected_&]:text-white',
         link: 'btn-link',
         outline: 'btn-outline',
         neutral: 'btn-neutral',
@@ -50,8 +50,8 @@ const buttonVariants = cva(
           'bg-red-gradient hover:bg-red-gradient-hover mt-1 h-auto w-auto min-w-0 flex-col rounded-full border-none p-2 text-white shadow-sm',
         contextIcon:
           'text-neutral-content hover:bg-neutral-content/20 h-auto min-h-0 border-none bg-transparent p-2 shadow-none',
-        navigation: 'btn-ghost justify-start gap-3 px-3 py-2 text-left',
-        navigationActive: 'btn-ghost bg-base-content/10 justify-start gap-3 px-3 py-2 text-left',
+        navigation: 'btn-ghost h-auto justify-start gap-3 p-3 text-left',
+        navigationActive: 'btn-ghost bg-base-content/10 h-auto justify-start gap-3 p-3 text-left',
         unstyled:
           'btn-ghost hover:text-primary h-auto min-h-0 border-none p-0 font-normal text-inherit shadow-none hover:bg-transparent',
       },

@@ -19,10 +19,10 @@
 
 import { Button } from 'components/primitives/buttons/Button'
 import { FormElement } from 'components/ui/forms/FormElement'
-import useModal from 'components/ui/overlays/modal/hooks/useModal'
-import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
+import { Modal } from 'components/ui/overlays/modal/Modal'
+import { useModalState } from 'components/ui/overlays/modal/useModalState'
 import { useTranslation } from 'next-i18next'
-import React, { useEffect } from 'react'
+import React from 'react'
 
 type Props = {
   text?: {
@@ -47,26 +47,11 @@ export const ModalConfirm: React.FC<Props> = ({
   hideButtons = false,
   autoSize = false,
 }) => {
-  const { modalId, closeModal, openModal } = useModal('ConfirmationDialog')
   const { t } = useTranslation('common')
-
-  const handleConfirm = () => {
-    onConfirm()
-    closeModal()
-  }
-
-  const handleCancel = () => {
-    if (onCancel) onCancel()
-    closeModal()
-  }
-
-  useEffect(() => {
-    openModal()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  const { isOpen, handleClose, handleConfirm } = useModalState({ onCancel, onConfirm })
 
   return (
-    <ModalResponsive modalId={modalId} blockViewport autoSize={autoSize}>
+    <Modal open={isOpen} onClose={handleClose} blockViewport autoSize={autoSize}>
       {text && <div className="mb-4">{text.action}</div>}
       {children && <div className="mb-4">{children}</div>}
       {!hideButtons && (
@@ -77,12 +62,12 @@ export const ModalConfirm: React.FC<Props> = ({
             {text?.confirm || t('common.ok', { defaultValue: 'Ok' })}
           </Button>
           {onCancel && (
-            <Button variant="secondary" onClick={handleCancel}>
+            <Button variant="secondary" onClick={handleClose}>
               {text?.cancel || t('common.actions.cancel', { defaultValue: 'Cancel' })}
             </Button>
           )}
         </FormElement>
       )}
-    </ModalResponsive>
+    </Modal>
   )
 }

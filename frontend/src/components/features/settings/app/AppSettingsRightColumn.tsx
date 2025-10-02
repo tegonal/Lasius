@@ -17,24 +17,19 @@
  *
  */
 
-import { Heading } from 'components/primitives/typography/Heading'
-import { Text } from 'components/primitives/typography/Text'
+import { SettingsRightColumn } from 'components/features/settings/shared/SettingsRightColumn'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
 
 export const AppSettingsRightColumn: React.FC = () => {
   const { t } = useTranslation('common')
   return (
-    <div className="w-full px-6 pt-3">
-      <Heading as="h2" variant="section">
-        {t('settings.app.title', { defaultValue: 'Application Settings' })}
-      </Heading>
-      <Text variant="infoText">
-        {t('settings.app.description', {
-          defaultValue:
-            'Customize your experience with language and theme preferences. These settings are stored locally in your browser.',
-        })}
-      </Text>
-    </div>
+    <SettingsRightColumn
+      title={t('settings.app.title', { defaultValue: 'Application Settings' })}
+      description={t('settings.app.description', {
+        defaultValue:
+          'Customize your experience with language and theme preferences. These settings are stored locally in your browser.',
+      })}
+    />
   )
 }

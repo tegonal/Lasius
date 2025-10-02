@@ -19,9 +19,9 @@
 
 import { Button } from 'components/primitives/buttons/Button'
 import { SelectedTab } from 'components/ui/animations/motion/selectedTab'
+import { useTabSync } from 'components/ui/navigation/hooks/useTabSync'
 import { AnimatePresence, m } from 'framer-motion'
-import React, { useEffect, useId, useState } from 'react'
-import { useTabViews, useUIActions } from 'stores/uiStore'
+import React from 'react'
 
 type TabItem = { label: string; component: React.ReactNode; icon?: string }
 
@@ -30,26 +30,7 @@ type Props = {
 }
 
 export const Tabs: React.FC<Props> = ({ tabs }) => {
-  const tabViews = useTabViews()
-  const { setTabActive } = useUIActions()
-
-  const [selected, setSelected] = useState<number>(0)
-
-  const tabId = useId()
-
-  useEffect(() => {
-    if (!tabViews.find((tab) => tab.id === tabId)) {
-      setTabActive(tabId, 0)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  useEffect(() => {
-    const tabView = tabViews.find((tab) => tab.id === tabId)
-    if (tabView) {
-      setSelected(tabView.activeIndex)
-    }
-  }, [tabViews, tabId])
+  const { selected, tabId, setSelected } = useTabSync(0)
 
   return (
     <div className="border-base-content/20 flex w-full flex-col border-b">
@@ -58,6 +39,7 @@ export const Tabs: React.FC<Props> = ({ tabs }) => {
           <div key={item.label} className="relative z-[1]">
             {index === selected ? <SelectedTab layoutId={tabId} /> : null}
             <Button
+              type="button"
               variant="ghost"
               onClick={() => setSelected(index)}
               className="relative z-[2]"

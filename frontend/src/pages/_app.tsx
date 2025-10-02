@@ -29,6 +29,7 @@ import { LasiusBackendWebsocketEventHandler } from 'components/features/system/l
 import { LasiusBackendWebsocketStatus } from 'components/features/system/lasiusBackendWebsocketStatus'
 import { LasiusTOSCheck } from 'components/features/system/lasiusTOSCheck'
 import { TokenWatcher } from 'components/features/system/tokenWatcher'
+import { BookingProgressBarExplosion } from 'components/ui/feedback/BookingProgressBarExplosion'
 import { Error } from 'components/ui/feedback/Error'
 import { Toasts } from 'components/ui/feedback/Toasts'
 import { HelpDrawer } from 'components/ui/overlays/HelpDrawer'
@@ -170,6 +171,7 @@ const App = ({ Component, pageProps }: AppPropsWithLayout): JSX.Element => {
             <BundleVersionCheck />
             <Toasts />
             <HelpDrawer />
+            <BookingProgressBarExplosion />
             {lasiusIsLoggedIn && (
               <>
                 <BootstrapTasks />

@@ -40,7 +40,7 @@ export const DropdownListItem: React.FC<Props> = ({
       className={cn(
         'text-base-content px-3 py-2 text-sm hover:cursor-pointer',
         'transition-colors duration-150',
-        active && 'bg-primary text-primary-content',
+        active && 'bg-secondary text-secondary-content',
         selected && !active && 'bg-base-200',
         !active && !selected && 'hover:bg-base-200',
       )}>

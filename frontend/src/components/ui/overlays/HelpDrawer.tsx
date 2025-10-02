@@ -17,12 +17,11 @@
  *
  */
 
-import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
+import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
 import { Button } from 'components/primitives/buttons/Button'
 import { InlineIcon } from 'components/ui/help/InlineIcon'
 import { Tip } from 'components/ui/help/Tip'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
-import { AnimatePresence, m } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
@@ -103,6 +102,7 @@ export const HelpDrawer: React.FC = () => {
   const [mdxSource, setMdxSource] = useState<MDXRemoteSerializeResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
+  const [isFallbackLanguage, setIsFallbackLanguage] = useState(false)
 
   useEffect(() => {
     if (!isOpen) return
@@ -110,11 +110,22 @@ export const HelpDrawer: React.FC = () => {
     const loadHelpContent = async () => {
       setLoading(true)
       setError(false)
+      setIsFallbackLanguage(false)
 
       try {
         const helpFileName = customHelpFile || routeToHelpFile(router.pathname)
         const locale = i18n.language
-        const response = await fetch(`/help/${locale}/${helpFileName}.mdx`)
+
+        // Try to fetch the localized help file
+        let response = await fetch(`/help/${locale}/${helpFileName}.mdx`)
+
+        // If not found and locale is not 'en', try English fallback
+        if (!response.ok && locale !== 'en') {
+          response = await fetch(`/help/en/${helpFileName}.mdx`)
+          if (response.ok) {
+            setIsFallbackLanguage(true)
+          }
+        }
 
         if (!response.ok) {
           throw new Error('Help file not found')
@@ -134,83 +145,78 @@ export const HelpDrawer: React.FC = () => {
   }, [isOpen, router.pathname, i18n.language, customHelpFile])
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <Dialog open={isOpen} onClose={closeHelp} className="relative z-50">
-          {/* Backdrop */}
-          <m.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2, ease: 'easeInOut' }}
-            className="fixed inset-0 bg-black/20"
-          />
+    <Dialog open={isOpen} onClose={closeHelp} className="relative z-50">
+      {/* Backdrop */}
+      <DialogBackdrop
+        transition
+        className="fixed inset-0 bg-black/20 duration-300 ease-out data-[closed]:opacity-0"
+      />
 
-          {/* Drawer */}
-          <div className="fixed inset-0 overflow-hidden">
-            <div className="absolute inset-0 overflow-hidden">
-              <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full">
-                <DialogPanel
-                  as={m.div}
-                  initial={{ x: '100%' }}
-                  animate={{ x: 0 }}
-                  exit={{ x: '100%' }}
-                  transition={
-                    {
-                      duration: 0.3,
-                      ease: 'easeInOut',
-                    } as any
-                  }
-                  className="pointer-events-auto w-screen max-w-[90vw] sm:max-w-[500px] md:max-w-[600px] lg:max-w-[700px]">
-                  <div className="bg-base-100 flex h-full flex-col shadow-2xl">
-                    {/* Header */}
-                    <div className="border-base-300 border-b px-6 py-4">
-                      <div className="flex items-center justify-between">
-                        <DialogTitle className="text-lg font-semibold">
-                          {t('common.actions.help', { defaultValue: 'Help' })}
-                        </DialogTitle>
-                        <Button
-                          onClick={closeHelp}
-                          variant="ghost"
-                          shape="circle"
-                          size="sm"
-                          fullWidth={false}>
-                          <LucideIcon icon={X} size={20} />
-                        </Button>
-                      </div>
-                    </div>
-
-                    {/* Content */}
-                    <div className="flex-1 overflow-y-auto px-8 py-6">
-                      {loading && (
-                        <div className="flex items-center justify-center py-12">
-                          <span className="loading loading-spinner loading-lg"></span>
-                        </div>
-                      )}
-
-                      {error && !loading && (
-                        <div className="alert alert-warning">
-                          <p>
-                            {t('common.errors.helpNotAvailable', {
-                              defaultValue: 'Help content not available for this page.',
-                            })}
-                          </p>
-                        </div>
-                      )}
-
-                      {mdxSource && !loading && !error && (
-                        <div className="prose prose-sm max-w-none">
-                          <MDXRemote {...mdxSource} components={mdxComponents} />
-                        </div>
-                      )}
-                    </div>
+      {/* Drawer */}
+      <div className="fixed inset-0 overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full">
+            <DialogPanel
+              transition
+              className="pointer-events-auto w-screen max-w-[90vw] transform transition duration-300 ease-out data-[closed]:translate-x-full sm:max-w-[500px] md:max-w-[600px] lg:max-w-[700px]">
+              <div className="bg-base-100 flex h-full flex-col shadow-2xl">
+                {/* Header */}
+                <div className="border-base-300 border-b px-6 py-4">
+                  <div className="flex items-center justify-between">
+                    <DialogTitle className="text-lg font-semibold">
+                      {t('common.actions.help', { defaultValue: 'Help' })}
+                    </DialogTitle>
+                    <Button
+                      onClick={closeHelp}
+                      variant="ghost"
+                      shape="circle"
+                      size="sm"
+                      fullWidth={false}>
+                      <LucideIcon icon={X} size={20} />
+                    </Button>
                   </div>
-                </DialogPanel>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 overflow-y-auto px-8 py-6">
+                  {loading && (
+                    <div className="flex items-center justify-center py-12">
+                      <span className="loading loading-spinner loading-lg"></span>
+                    </div>
+                  )}
+
+                  {error && !loading && (
+                    <div className="alert alert-warning">
+                      <p>
+                        {t('common.errors.helpNotAvailable', {
+                          defaultValue: 'Help content not available for this page.',
+                        })}
+                      </p>
+                    </div>
+                  )}
+
+                  {isFallbackLanguage && !loading && !error && (
+                    <div className="alert alert-info mb-4">
+                      <p>
+                        {t('common.info.helpFallbackLanguage', {
+                          defaultValue:
+                            'This help content is not available in your selected language yet. Showing English version.',
+                        })}
+                      </p>
+                    </div>
+                  )}
+
+                  {mdxSource && !loading && !error && (
+                    <div className="prose prose-sm max-w-none">
+                      <MDXRemote {...mdxSource} components={mdxComponents} />
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            </DialogPanel>
           </div>
-        </Dialog>
-      )}
-    </AnimatePresence>
+        </div>
+      </div>
+    </Dialog>
   )
 }

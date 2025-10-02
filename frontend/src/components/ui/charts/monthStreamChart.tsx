@@ -52,3 +52,5 @@ export const MonthStreamChart: React.FC<Props> = ({ data, keys, isLoading }) => 
 
   return <MonthStreamChartImpl data={data} keys={keys} />
 }
+
+export default MonthStreamChart

@@ -17,142 +17,122 @@
  *
  */
 
-import { Button } from 'components/primitives/buttons/Button'
-import { ButtonLeft } from 'components/primitives/buttons/ButtonLeft'
-import { ButtonRight } from 'components/primitives/buttons/ButtonRight'
+import { useCalendarGridOffset } from 'components/features/calendar/hooks/useCalendarGridOffset'
+import { useCalendarNavigation } from 'components/features/calendar/hooks/useCalendarNavigation'
+import { useCalendarSelection } from 'components/features/calendar/hooks/useCalendarSelection'
 import { AnimateChange } from 'components/ui/animations/motion/animateChange'
 import { SelectedTabStatic } from 'components/ui/animations/motion/selectedTabStatic'
 import { FormatDate } from 'components/ui/data-display/FormatDate'
 import { CalendarDayCompact } from 'components/ui/forms/input/calendar/calendarDayCompact'
-import { addMonths, intervalToDuration, setHours, setMinutes, startOfWeek, toDate } from 'date-fns'
-import { uniqueId } from 'es-toolkit/compat'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
+import { format, isToday, setHours, setMinutes } from 'date-fns'
 import { IsoDateString } from 'lib/api/apiDateHandling'
 import { cn } from 'lib/utils/cn'
-import { formatISOLocale, getMonthOfDate, getWeekOfDate } from 'lib/utils/date/dates'
+import { getDateLocale } from 'lib/utils/date/dateFormat'
+import { formatISOLocale } from 'lib/utils/date/dates'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 
 type Props = {
   onChange: (date: IsoDateString) => void
   value: IsoDateString
 }
 export const CalendarDisplay: React.FC<Props> = ({ value, onChange }) => {
-  const { t } = useTranslation('common')
-  const [referenceDay, setReferenceDay] = useState<IsoDateString>(formatISOLocale(new Date()))
-  const [selectedDay, setSelectedDay] = useState<IsoDateString>(referenceDay)
-  const [currentMonth, setCurrentMonth] = useState<IsoDateString[]>(getMonthOfDate(referenceDay))
-  const [firstDayOfMonth, setFirstDayOfMonth] = useState<Date>(new Date(currentMonth[0]))
-  const [topFiller, setTopFiller] = useState<any[]>([])
-  const [originalTime, setOrignalTime] = useState<number[]>([0])
+  const { t, i18n } = useTranslation('common')
+  const [originalTime, setOrignalTime] = useState<number[]>([0, 0])
+
+  const { period: currentMonth, next, previous, goToDate } = useCalendarNavigation(value, 'month')
+  const { selectedDay, selectDay, selectToday, isDaySelected } = useCalendarSelection(value, false)
+  const topFiller = useCalendarGridOffset(currentMonth[0])
+
+  const weekDays = useMemo(() => {
+    const dateLocale = getDateLocale(i18n.language)
+    return Array.from({ length: 7 }, (_, i) => {
+      const date = new Date(2025, 0, 6 + i) // Jan 6, 2025 is a Monday
+      return format(date, 'EEEEE', { locale: dateLocale })
+    })
+  }, [i18n.language])
 
   useEffect(() => {
     if (value) {
-      setReferenceDay(value)
-      setSelectedDay(value)
-      setOrignalTime([new Date(value).getHours(), new Date(value).getMinutes()])
+      const date = new Date(value)
+      setOrignalTime([date.getHours(), date.getMinutes()])
+      goToDate(value)
     }
-  }, [value])
-
-  const getDay = (str: IsoDateString) => {
-    return toDate(new Date(str)).getDate()
-  }
-
-  const nextMonth = () => {
-    setReferenceDay(formatISOLocale(addMonths(new Date(referenceDay), 1)))
-  }
-
-  const previousMonth = () => {
-    setReferenceDay(formatISOLocale(addMonths(new Date(referenceDay), -1)))
-  }
-
-  const showToday = () => {
-    setReferenceDay(formatISOLocale(new Date()))
-    setSelectedDay(referenceDay)
-  }
-
-  useEffect(() => {
-    setCurrentMonth(getMonthOfDate(referenceDay))
-  }, [referenceDay])
-
-  useEffect(() => {
-    setFirstDayOfMonth(new Date(currentMonth[0]))
-  }, [currentMonth, currentMonth.length])
-
-  useEffect(() => {
-    const filler =
-      intervalToDuration({
-        start: startOfWeek(firstDayOfMonth, { weekStartsOn: 1 }),
-        end: firstDayOfMonth,
-      }).days || 0
-    setTopFiller(new Array(filler).fill(() => uniqueId(), 0, filler))
-  }, [firstDayOfMonth])
+  }, [value, goToDate])
 
   const handleChange = (date: IsoDateString) => {
     const dateObj = new Date(date)
-    onChange(formatISOLocale(setMinutes(setHours(dateObj, originalTime[0]), originalTime[1])))
+    const updatedDate = formatISOLocale(
+      setMinutes(setHours(dateObj, originalTime[0]), originalTime[1]),
+    )
+    selectDay(date)
+    onChange(updatedDate)
   }
 
   return (
-    <div className="text-base-content grid grid-cols-[48px_auto_48px] gap-1 select-none">
-      <div className="pt-3">
-        <ButtonLeft
+    <div className="w-full select-none">
+      <div className="mb-3 flex items-center justify-between">
+        <button
+          className="btn btn-ghost btn-sm btn-circle"
           aria-label={t('calendar.navigation.previousMonth', { defaultValue: 'Previous month' })}
-          onClick={() => previousMonth()}
-        />
-      </div>
-      <div className="w-full">
-        <div className="border-base-content/20 flex items-center justify-between border-b text-sm">
-          <div className="flex items-center justify-center">
-            <FormatDate date={firstDayOfMonth} format="monthNameLong" />
+          onClick={previous}>
+          <LucideIcon icon={ChevronLeft} size={16} />
+        </button>
+        <div className="flex flex-col items-center">
+          <div className="text-sm font-medium">
+            <FormatDate date={currentMonth[0]} format="monthNameLong" />
           </div>
-          <div>
-            <Button
-              variant="unstyled"
-              size="xs"
-              aria-label={t('common.time.today', { defaultValue: 'Today' })}
-              onClick={() => showToday()}
-              fullWidth={false}>
-              {t('common.time.today', { defaultValue: 'Today' })}
-            </Button>
-          </div>
-          <div className="flex items-center justify-center">
-            <FormatDate date={firstDayOfMonth} format="year" />
+          <div className="text-base-content/60 text-xs">
+            <FormatDate date={currentMonth[0]} format="year" />
           </div>
         </div>
-        <AnimateChange hash={referenceDay}>
-          <div className="grid w-full grid-cols-7 justify-stretch gap-1 px-1">
-            {getWeekOfDate(selectedDay).map((week) => (
-              <div
-                key={`weekday-${week}`}
-                className="py-1 text-center text-[8px] leading-normal font-medium uppercase">
-                <FormatDate date={week} format="dayNameShort" />
-              </div>
-            ))}
-          </div>
-          <div className="grid w-full grid-cols-7 justify-stretch gap-1 px-1">
-            {topFiller.map((item) => (
-              <div key={item()} />
-            ))}
-            {currentMonth.map((day) => (
-              <div
-                key={`day${day}`}
-                className={cn(
-                  'relative h-full w-full flex-grow',
-                  getDay(selectedDay) === getDay(day) ? 'text-white' : 'text-current',
-                )}>
-                {getDay(selectedDay) === getDay(day) && <SelectedTabStatic radiusOn="all" />}
-                <CalendarDayCompact date={day} onClick={() => handleChange(day)} />
-              </div>
-            ))}
-          </div>
-        </AnimateChange>
-      </div>
-      <div className="pt-3">
-        <ButtonRight
+        <button
+          className="btn btn-ghost btn-sm btn-circle"
           aria-label={t('calendar.navigation.nextMonth', { defaultValue: 'Next month' })}
-          onClick={() => nextMonth()}
-        />
+          onClick={next}>
+          <LucideIcon icon={ChevronRight} size={16} />
+        </button>
       </div>
+
+      {!isToday(new Date(selectedDay)) && (
+        <div className="mb-2 flex justify-center">
+          <button
+            className="btn btn-ghost btn-xs"
+            aria-label={t('common.time.today', { defaultValue: 'Today' })}
+            onClick={selectToday}>
+            {t('common.time.today', { defaultValue: 'Today' })}
+          </button>
+        </div>
+      )}
+
+      <div className="mb-1 grid grid-cols-7 gap-1 text-center">
+        {weekDays.map((day, index) => (
+          <div key={index} className="text-base-content/60 text-xs font-medium">
+            {day}
+          </div>
+        ))}
+      </div>
+
+      <AnimateChange hash={currentMonth[0]}>
+        <div className="grid w-full grid-cols-7 gap-1">
+          {topFiller.map((item) => (
+            <div key={item()} />
+          ))}
+          {currentMonth.map((day) => (
+            <div
+              key={`day${day}`}
+              className={cn(
+                'relative h-full w-full flex-grow',
+                isDaySelected(day) ? 'text-white' : 'text-current',
+              )}>
+              {isDaySelected(day) && <SelectedTabStatic radiusOn="all" />}
+              <CalendarDayCompact date={day} onClick={() => handleChange(day)} />
+            </div>
+          ))}
+        </div>
+      </AnimateChange>
     </div>
   )
 }

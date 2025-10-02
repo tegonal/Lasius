@@ -36,7 +36,8 @@ import { useGetUserBookingListByOrganisation } from 'lib/api/lasius/user-booking
 import { ErrorType } from 'lib/api/lasiusAxiosInstance'
 import useScrollPagination from 'lib/hooks/useScrollPaginationHook'
 import { formatISOLocale } from 'lib/utils/date/dates'
-import React, { useMemo } from 'react'
+import { useRouter } from 'next/router'
+import React, { useEffect, useMemo } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { KeyedMutator } from 'swr'
 import { ModelsTags } from 'types/common'
@@ -55,6 +56,7 @@ type Props = {
 }
 export const BookingHistoryLayout: React.FC<Props> = ({ dataSource }) => {
   const isClient = useIsClient()
+  const router = useRouter()
 
   const hookForm = useForm<FormValues>({
     defaultValues: {
@@ -67,9 +69,28 @@ export const BookingHistoryLayout: React.FC<Props> = ({ dataSource }) => {
   })
   const { selectedOrganisationId } = useOrganisation()
 
+  // Read projectId and projectName from URL search params on mount
+  const inactiveProject = useMemo(() => {
+    const projectIdFromUrl = router.query.projectId as string | undefined
+    const projectNameFromUrl = router.query.projectName as string | undefined
+
+    if (projectIdFromUrl && projectNameFromUrl) {
+      return { id: projectIdFromUrl, key: projectNameFromUrl }
+    }
+    return null
+  }, [router.query.projectId, router.query.projectName])
+
+  useEffect(() => {
+    const projectIdFromUrl = router.query.projectId as string | undefined
+    if (projectIdFromUrl && hookForm.getValues('projectId') === '') {
+      hookForm.setValue('projectId', projectIdFromUrl)
+    }
+  }, [router.query.projectId, hookForm])
+
   let response: {
     data?: ModelsBooking[]
     isValidating: any
+    isLoading?: boolean
     error?: ErrorType<unknown> | undefined
     mutate?: KeyedMutator<ModelsBooking[]>
     swrKey?: string | false | Record<any, any>
@@ -136,36 +157,35 @@ export const BookingHistoryLayout: React.FC<Props> = ({ dataSource }) => {
   return (
     <FormProvider {...hookForm}>
       <ScrollContainer className="bg-base-100 flex-1 overflow-y-auto" onScroll={onScroll}>
-        {/* Top section with summary and export */}
-        <div className="bg-base-200 px-6 py-4">
-          <div className="flex items-start justify-between">
-            <BookingHistoryStats
-              hours={summary.hours}
-              bookings={summary.elements}
-              users={distinctUsers}
-              projects={distinctProjects}
-            />
-            <BookingHistoryExport
-              bookings={processedItems}
-              context={exportContext}
-              from={hookForm.getValues('from')}
-              to={hookForm.getValues('to')}
-            />
-          </div>
+        <div className="bg-base-200 flex items-start justify-between p-4">
+          <BookingHistoryStats
+            hours={summary.hours}
+            bookings={summary.elements}
+            users={distinctUsers}
+            projects={distinctProjects}
+          />
+          <BookingHistoryExport
+            bookings={processedItems}
+            context={exportContext}
+            from={hookForm.getValues('from')}
+            to={hookForm.getValues('to')}
+          />
         </div>
         {!response.data && response.isValidating && <Loading />}
-        {response.data && (
-          <BookingHistoryTable
-            items={visibleElements}
-            allowEdit={allowEdit}
-            allowDelete={allowDelete}
-            showUserColumn={showUserColumn}
-          />
-        )}
+        <div className="px-4 pt-3">
+          {response.data && (
+            <BookingHistoryTable
+              items={visibleElements}
+              allowEdit={allowEdit}
+              allowDelete={allowDelete}
+              showUserColumn={showUserColumn}
+            />
+          )}
+        </div>
       </ScrollContainer>
       <ScrollContainer className="bg-base-200 flex-1 overflow-y-auto rounded-tr-lg">
         <ColumnList>
-          <BookingHistoryFilter />
+          <BookingHistoryFilter inactiveProject={inactiveProject} />
         </ColumnList>
       </ScrollContainer>
     </FormProvider>

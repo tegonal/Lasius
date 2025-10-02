@@ -85,9 +85,6 @@ export const InternalLoginInfoPanel: React.FC = () => {
       <h1 className="mb-4 text-4xl font-bold">
         {t('auth.welcomeBack', { defaultValue: 'Welcome back' })}
       </h1>
-      <p className="mb-8 text-xl opacity-90">
-        {t('auth.signInToContinue', { defaultValue: 'Sign in to continue tracking your time' })}
-      </p>
     </>
   )
 }

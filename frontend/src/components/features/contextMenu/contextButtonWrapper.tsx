@@ -17,11 +17,26 @@
  *
  */
 
+import { cva, type VariantProps } from 'class-variance-authority'
+import { cn } from 'lib/utils/cn'
 import React from 'react'
+
+const contextButtonWrapperVariants = cva('', {
+  variants: {
+    variant: {
+      default: 'p-1',
+      compact: '',
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+  },
+})
 
 type Props = {
   children: React.ReactNode
-}
-export const ContextButtonWrapper: React.FC<Props> = ({ children }) => {
-  return <div className="p-1">{children}</div>
+} & VariantProps<typeof contextButtonWrapperVariants>
+
+export const ContextButtonWrapper: React.FC<Props> = ({ children, variant = 'default' }) => {
+  return <div className={cn(contextButtonWrapperVariants({ variant }))}>{children}</div>
 }

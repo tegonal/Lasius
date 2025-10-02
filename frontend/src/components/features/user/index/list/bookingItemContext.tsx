@@ -30,8 +30,7 @@ import { useContextMenu } from 'components/features/contextMenu/hooks/useContext
 import { BookingAddUpdateForm } from 'components/features/user/index/bookingAddUpdateForm'
 import { Button } from 'components/primitives/buttons/Button'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
-import useModal from 'components/ui/overlays/modal/hooks/useModal'
-import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
+import { Modal } from 'components/ui/overlays/modal/Modal'
 import { differenceInSeconds } from 'date-fns'
 import { AnimatePresence } from 'framer-motion'
 import { useGetAdjacentBookings } from 'lib/api/hooks/useGetAdjacentBookings'
@@ -41,18 +40,20 @@ import { updateUserBooking } from 'lib/api/lasius/user-bookings/user-bookings'
 import { formatISOLocale } from 'lib/utils/date/dates'
 import { ArrowDownToLine, ArrowUpToLine, Pencil, Trash2 } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
-import React from 'react'
+import React, { useState } from 'react'
 
 type Props = {
   item: ModelsBooking
 }
 
 export const BookingItemContext: React.FC<Props> = ({ item }) => {
-  const { modalId, openModal, closeModal } = useModal(`EditModal-${item.id}`)
+  const [isOpen, setIsOpen] = useState(false)
   const { t } = useTranslation('common')
   const { currentOpenContextMenuId, handleCloseAll } = useContextMenu()
   const { selectedOrganisationId } = useOrganisation()
   const { previous: previousBooking, next: nextBooking } = useGetAdjacentBookings(item)
+
+  const handleClose = () => setIsOpen(false)
 
   // Helper function to check if two times are within 1 minute of each other
   const areTimesWithinOneMinute = (time1: string | Date, time2: string | Date): boolean => {
@@ -77,7 +78,7 @@ export const BookingItemContext: React.FC<Props> = ({ item }) => {
   }
 
   const updateItem = () => {
-    openModal()
+    setIsOpen(true)
     handleCloseAll()
   }
 
@@ -184,14 +185,14 @@ export const BookingItemContext: React.FC<Props> = ({ item }) => {
           )}
         </AnimatePresence>
       </ContextBody>
-      <ModalResponsive modalId={modalId}>
+      <Modal open={isOpen} onClose={handleClose}>
         <BookingAddUpdateForm
           mode="update"
           itemUpdate={item}
-          onSave={closeModal}
-          onCancel={closeModal}
+          onSave={handleClose}
+          onCancel={handleClose}
         />
-      </ModalResponsive>
+      </Modal>
     </>
   )
 }

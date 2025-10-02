@@ -19,92 +19,122 @@
 
 import { ContextButtonClose } from 'components/features/contextMenu/buttons/contextButtonClose'
 import { ContextButtonOpen } from 'components/features/contextMenu/buttons/contextButtonOpen'
+import { ContextAnimatePresence } from 'components/features/contextMenu/contextAnimatePresence'
 import { ContextBar } from 'components/features/contextMenu/contextBar'
 import { ContextBarDivider } from 'components/features/contextMenu/contextBarDivider'
-import { ContextCompactAnimatePresence } from 'components/features/contextMenu/contextCompactAnimatePresence'
-import { ContextCompactBody } from 'components/features/contextMenu/contextCompactBody'
-import { ContextCompactButtonWrapper } from 'components/features/contextMenu/contextCompactButtonWrapper'
+import { ContextBody } from 'components/features/contextMenu/contextBody'
+import { ContextButtonWrapper } from 'components/features/contextMenu/contextButtonWrapper'
 import { useContextMenu } from 'components/features/contextMenu/hooks/useContextMenu'
 import { ManageProjectMembers } from 'components/features/projects/manageMembers'
 import { ProjectAddUpdateForm } from 'components/features/projects/projectAddUpdateForm'
 import { ProjectAddUpdateTagsForm } from 'components/features/projects/projectAddUpdateTagsForm'
-import { ProjectBookingsExport } from 'components/features/projects/projectBookingsExport'
 import { Button } from 'components/primitives/buttons/Button'
-import { FormElement } from 'components/ui/forms/FormElement'
+import { ToolTip } from 'components/ui/feedback/Tooltip'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
-import useModal from 'components/ui/overlays/modal/hooks/useModal'
-import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
+import { Modal } from 'components/ui/overlays/modal/Modal'
+import { ModalConfirmDeactivateProject } from 'components/ui/overlays/modal/ModalConfirmDeactivateProject'
 import { AnimatePresence } from 'framer-motion'
 import { ModelsProject } from 'lib/api/lasius'
-import { deactivateProject } from 'lib/api/lasius/projects/projects'
-import { FileText, Pencil, PieChart, Tags, Trash2, Users } from 'lucide-react'
+import { deactivateProject, getGetProjectListKey } from 'lib/api/lasius/projects/projects'
+import { Archive, List, Pencil, PieChart, Tags, Users } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
-import React from 'react'
+import { useRouter } from 'next/router'
+import React, { useState } from 'react'
+import { useSWRConfig } from 'swr'
 
 type Props = {
   item: ModelsProject
 }
 
 export const AllProjectsListItemContext: React.FC<Props> = ({ item }) => {
-  const updateModal = useModal(`EditProjectModal-${item.id}`)
-  const manageModal = useModal(`ManageProjectMembersModal-${item.id}`)
-  const statsModal = useModal(`StatsModal-${item.id}`)
-  const exportModal = useModal(`ExportModal-${item.id}`)
-  const tagModal = useModal(`TagModal-${item.id}`)
+  const [isUpdateOpen, setIsUpdateOpen] = useState(false)
+  const [isManageOpen, setIsManageOpen] = useState(false)
+  const [isTagOpen, setIsTagOpen] = useState(false)
+  const [isDeactivateConfirmOpen, setIsDeactivateConfirmOpen] = useState(false)
   const { handleCloseAll, currentOpenContextMenuId } = useContextMenu()
+  const { mutate } = useSWRConfig()
+  const router = useRouter()
 
   const { t } = useTranslation('common')
 
+  const handleUpdateClose = () => setIsUpdateOpen(false)
+  const handleManageClose = () => setIsManageOpen(false)
+  const handleTagClose = () => setIsTagOpen(false)
+  const handleDeactivateConfirmClose = () => setIsDeactivateConfirmOpen(false)
+
   const showStats = () => {
-    statsModal.openModal()
+    router.push(
+      `/organisation/stats?projectId=${item.id}&projectName=${encodeURIComponent(item.key)}`,
+    )
     handleCloseAll()
   }
 
-  const showExport = () => {
-    exportModal.openModal()
+  const showLists = () => {
+    router.push(
+      `/organisation/lists?projectId=${item.id}&projectName=${encodeURIComponent(item.key)}`,
+    )
+    handleCloseAll()
+  }
+
+  const showDeactivateConfirm = () => {
+    setIsDeactivateConfirmOpen(true)
     handleCloseAll()
   }
 
   const handleDeactivateProject = async () => {
     await deactivateProject(item.organisationReference.id, item.id)
-    handleCloseAll()
+    await mutate(getGetProjectListKey(item.organisationReference.id))
+    setIsDeactivateConfirmOpen(false)
   }
 
   const manageMembers = () => {
-    manageModal.openModal()
+    setIsManageOpen(true)
     handleCloseAll()
   }
 
   const manageTags = () => {
-    tagModal.openModal()
+    setIsTagOpen(true)
     handleCloseAll()
   }
 
   const updateProject = () => {
-    updateModal.openModal()
+    setIsUpdateOpen(true)
     handleCloseAll()
   }
 
   return (
     <>
-      <ContextCompactBody>
+      <ContextBody variant="compact">
         <ContextButtonOpen hash={item.id} />
         <AnimatePresence>
           {currentOpenContextMenuId === item.id && (
-            <ContextCompactAnimatePresence>
+            <ContextAnimatePresence variant="compact">
               <ContextBar>
-                <ContextCompactButtonWrapper>
+                {item.active && (
+                  <ContextButtonWrapper variant="compact">
+                    <Button
+                      variant="contextIcon"
+                      title={t('members.actions.manage', { defaultValue: 'Manage members' })}
+                      aria-label={t('members.actions.manage', { defaultValue: 'Manage members' })}
+                      onClick={() => manageMembers()}
+                      fullWidth={false}
+                      shape="circle">
+                      <LucideIcon icon={Users} size={24} />
+                    </Button>
+                  </ContextButtonWrapper>
+                )}
+                <ContextButtonWrapper variant="compact">
                   <Button
                     variant="contextIcon"
-                    title={t('members.actions.manage', { defaultValue: 'Manage members' })}
-                    aria-label={t('members.actions.manage', { defaultValue: 'Manage members' })}
-                    onClick={() => manageMembers()}
+                    title={t('bookings.showLists', { defaultValue: 'Show bookings' })}
+                    aria-label={t('bookings.showLists', { defaultValue: 'Show bookings' })}
+                    onClick={() => showLists()}
                     fullWidth={false}
                     shape="circle">
-                    <LucideIcon icon={Users} size={24} />
+                    <LucideIcon icon={List} size={24} />
                   </Button>
-                </ContextCompactButtonWrapper>
-                <ContextCompactButtonWrapper>
+                </ContextButtonWrapper>
+                <ContextButtonWrapper variant="compact">
                   <Button
                     variant="contextIcon"
                     title={t('statistics.showStatistics', { defaultValue: 'Show statistics' })}
@@ -114,108 +144,101 @@ export const AllProjectsListItemContext: React.FC<Props> = ({ item }) => {
                     shape="circle">
                     <LucideIcon icon={PieChart} size={24} />
                   </Button>
-                </ContextCompactButtonWrapper>
-                <ContextCompactButtonWrapper>
-                  <Button
-                    variant="contextIcon"
-                    title={t('export.getBillingReports', {
-                      defaultValue: 'Get billing reports',
-                    })}
-                    aria-label={t('export.getBillingReports', {
-                      defaultValue: 'Get billing reports',
-                    })}
-                    onClick={() => showExport()}
-                    fullWidth={false}
-                    shape="circle">
-                    <LucideIcon icon={FileText} size={24} />
-                  </Button>
-                </ContextCompactButtonWrapper>
-                <ContextCompactButtonWrapper>
-                  <Button
-                    variant="contextIcon"
-                    title={t('projects.actions.edit', { defaultValue: 'Edit project' })}
-                    aria-label={t('projects.actions.edit', { defaultValue: 'Edit project' })}
-                    onClick={() => updateProject()}
-                    fullWidth={false}
-                    shape="circle">
-                    <LucideIcon icon={Pencil} size={24} />
-                  </Button>
-                </ContextCompactButtonWrapper>
-                <ContextCompactButtonWrapper>
-                  <Button
-                    variant="contextIcon"
-                    title={t('tags.actions.edit', { defaultValue: 'Edit tags' })}
-                    aria-label={t('tags.actions.edit', { defaultValue: 'Edit tags' })}
-                    onClick={() => manageTags()}
-                    fullWidth={false}
-                    shape="circle">
-                    <LucideIcon icon={Tags} size={24} />
-                  </Button>
-                </ContextCompactButtonWrapper>
-                <ContextCompactButtonWrapper>
-                  <Button
-                    variant="contextIcon"
-                    title={t('projects.actions.deactivate', { defaultValue: 'Deactivate project' })}
-                    aria-label={t('projects.actions.deactivate', {
-                      defaultValue: 'Deactivate project',
-                    })}
-                    onClick={() => handleDeactivateProject()}
-                    fullWidth={false}
-                    shape="circle">
-                    <LucideIcon icon={Trash2} size={24} />
-                  </Button>
-                </ContextCompactButtonWrapper>
+                </ContextButtonWrapper>
+                <ContextButtonWrapper variant="compact">
+                  {!item.active && item.deactivatedBy ? (
+                    <ToolTip
+                      toolTipContent={t('projects.deactivatedBy', {
+                        defaultValue: 'Archived by {{user}}',
+                        user: item.deactivatedBy.key,
+                      })}
+                      placement="top"
+                      width="auto">
+                      <Button
+                        variant="contextIcon"
+                        title={t('projects.actions.edit', { defaultValue: 'Edit project' })}
+                        aria-label={t('projects.actions.edit', { defaultValue: 'Edit project' })}
+                        onClick={() => updateProject()}
+                        fullWidth={false}
+                        shape="circle">
+                        <LucideIcon icon={Pencil} size={24} />
+                      </Button>
+                    </ToolTip>
+                  ) : (
+                    <Button
+                      variant="contextIcon"
+                      title={t('projects.actions.edit', { defaultValue: 'Edit project' })}
+                      aria-label={t('projects.actions.edit', { defaultValue: 'Edit project' })}
+                      onClick={() => updateProject()}
+                      fullWidth={false}
+                      shape="circle">
+                      <LucideIcon icon={Pencil} size={24} />
+                    </Button>
+                  )}
+                </ContextButtonWrapper>
+                {item.active && (
+                  <>
+                    <ContextButtonWrapper variant="compact">
+                      <Button
+                        variant="contextIcon"
+                        title={t('tags.actions.edit', { defaultValue: 'Edit tags' })}
+                        aria-label={t('tags.actions.edit', { defaultValue: 'Edit tags' })}
+                        onClick={() => manageTags()}
+                        fullWidth={false}
+                        shape="circle">
+                        <LucideIcon icon={Tags} size={24} />
+                      </Button>
+                    </ContextButtonWrapper>
+                    <ContextButtonWrapper variant="compact">
+                      <Button
+                        variant="contextIcon"
+                        title={t('projects.actions.deactivate', {
+                          defaultValue: 'Deactivate project',
+                        })}
+                        aria-label={t('projects.actions.deactivate', {
+                          defaultValue: 'Deactivate project',
+                        })}
+                        onClick={() => showDeactivateConfirm()}
+                        fullWidth={false}
+                        shape="circle">
+                        <LucideIcon icon={Archive} size={24} />
+                      </Button>
+                    </ContextButtonWrapper>
+                  </>
+                )}
                 <ContextBarDivider />
                 <ContextButtonClose variant="compact" />
               </ContextBar>
-            </ContextCompactAnimatePresence>
+            </ContextAnimatePresence>
           )}
         </AnimatePresence>
-      </ContextCompactBody>
-      <ModalResponsive modalId={tagModal.modalId} autoSize>
+      </ContextBody>
+      <Modal open={isTagOpen} onClose={handleTagClose} size="wide">
         <ProjectAddUpdateTagsForm
           mode="update"
           item={item}
-          onSave={tagModal.closeModal}
-          onCancel={tagModal.closeModal}
+          onSave={handleTagClose}
+          onCancel={handleTagClose}
         />
-      </ModalResponsive>
-      <ModalResponsive modalId={updateModal.modalId}>
+      </Modal>
+      <Modal open={isUpdateOpen} onClose={handleUpdateClose}>
         <ProjectAddUpdateForm
           mode="update"
           item={item}
-          onSave={updateModal.closeModal}
-          onCancel={updateModal.closeModal}
+          onSave={handleUpdateClose}
+          onCancel={handleUpdateClose}
         />
-      </ModalResponsive>
-      <ModalResponsive modalId={manageModal.modalId} autoSize>
-        <ManageProjectMembers
-          item={item}
-          onSave={manageModal.closeModal}
-          onCancel={manageModal.closeModal}
+      </Modal>
+      <Modal open={isManageOpen} onClose={handleManageClose} autoSize={false}>
+        <ManageProjectMembers item={item} onSave={handleManageClose} onCancel={handleManageClose} />
+      </Modal>
+      {isDeactivateConfirmOpen && (
+        <ModalConfirmDeactivateProject
+          projectName={item.key}
+          onConfirm={handleDeactivateProject}
+          onCancel={handleDeactivateConfirmClose}
         />
-        <FormElement>
-          <Button type="button" variant="secondary" onClick={manageModal.closeModal}>
-            {t('common.actions.cancel', { defaultValue: 'Cancel' })}
-          </Button>
-        </FormElement>
-      </ModalResponsive>
-      <ModalResponsive modalId={statsModal.modalId} autoSize>
-        <div>Placeholder</div>
-        <FormElement>
-          <Button type="button" variant="secondary" onClick={statsModal.closeModal}>
-            {t('common.actions.cancel', { defaultValue: 'Cancel' })}
-          </Button>
-        </FormElement>
-      </ModalResponsive>
-      <ModalResponsive modalId={exportModal.modalId} autoSize>
-        <ProjectBookingsExport item={item} />
-        <FormElement>
-          <Button type="button" variant="secondary" onClick={exportModal.closeModal}>
-            {t('common.actions.cancel', { defaultValue: 'Cancel' })}
-          </Button>
-        </FormElement>
-      </ModalResponsive>
+      )}
     </>
   )
 }

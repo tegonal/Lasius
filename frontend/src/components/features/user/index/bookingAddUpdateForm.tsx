@@ -23,12 +23,11 @@ import { ButtonGroup } from 'components/ui/forms/ButtonGroup'
 import { FieldSet } from 'components/ui/forms/FieldSet'
 import { FormBody } from 'components/ui/forms/FormBody'
 import { FormElement } from 'components/ui/forms/FormElement'
-import { InputDatePicker2 } from 'components/ui/forms/input/datePicker2/InputDatePicker2'
-import { InputDatePickerDuration } from 'components/ui/forms/input/datePicker2/InputDatePickerDuration'
+import { InputDatePicker } from 'components/ui/forms/input/datePicker/InputDatePicker'
+import { InputDatePickerDuration } from 'components/ui/forms/input/datePicker/InputDatePickerDuration'
 import { InputSelectAutocomplete } from 'components/ui/forms/input/InputSelectAutocomplete'
 import { InputTagsAutocomplete } from 'components/ui/forms/input/InputTagsAutocomplete'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
-import useModal from 'components/ui/overlays/modal/hooks/useModal'
 import {
   addHours,
   getHours,
@@ -52,12 +51,13 @@ import {
 import { useGetTagsByProject } from 'lib/api/lasius/user-organisations/user-organisations'
 import { logger } from 'lib/logger'
 import { formatISOLocale } from 'lib/utils/date/dates'
-import { ArrowDownToLine, ArrowUpDown, ArrowUpToLine, Sparkles } from 'lucide-react'
+import { ArrowDownToLine, ArrowUpToLine, ChevronRight, HelpCircle } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import { DEFAULT_STRING_VALUE } from 'projectConfig/constants'
 import React, { useEffect, useRef, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useSelectedDate } from 'stores/calendarStore'
+import { useHelpStore } from 'stores/helpStore'
 import { ModelsTags } from 'types/common'
 
 type Props = {
@@ -84,6 +84,7 @@ export const BookingAddUpdateForm: React.FC<Props> = ({
 }) => {
   const { t } = useTranslation('common')
   const selectedDate = useSelectedDate()
+  const { openHelp } = useHelpStore()
   const hookForm = useForm<FormValues>({
     defaultValues: {
       projectId: '',
@@ -100,12 +101,11 @@ export const BookingAddUpdateForm: React.FC<Props> = ({
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showPresetPanel, setShowPresetPanel] = useState(false)
-  const { projectSuggestions } = useProjects()
+  const { projectSuggestions, findProjectById } = useProjects()
   const { data: projectTags } = useGetTagsByProject(
     selectedOrganisationId,
     hookForm.watch('projectId'),
   )
-  const { closeModal } = useModal('BookingAddMobileModal')
   const previousEndDate = useRef('')
 
   useEffect(() => {
@@ -203,7 +203,6 @@ export const BookingAddUpdateForm: React.FC<Props> = ({
       await updateUserBooking(selectedOrganisationId, itemUpdate.id, payload)
     }
 
-    closeModal()
     onSave()
 
     setIsSubmitting(false)
@@ -311,62 +310,63 @@ export const BookingAddUpdateForm: React.FC<Props> = ({
           <form onSubmit={hookForm.handleSubmit(onSubmit)}>
             <FormBody>
               <FieldSet>
-                <div className="flex items-start">
-                  <div className="flex-1 space-y-4 pr-4">
-                    <FormElement
-                      label={t('projects.label', { defaultValue: 'Project' })}
-                      htmlFor="projectId"
-                      required>
-                      <InputSelectAutocomplete
-                        id="projectId"
-                        name="projectId"
-                        suggestions={projectSuggestions()}
-                        required
-                      />
-                    </FormElement>
-                    <FormElement label={t('tags.label', { defaultValue: 'Tags' })} htmlFor="tags">
-                      <InputTagsAutocomplete id="tags" name="tags" suggestions={projectTags} />
-                    </FormElement>
-                  </div>
-
-                  <div className="bg-base-300 mx-2 w-px self-stretch" />
-
-                  <div className="pt-7 pl-2">
-                    <button
-                      type="button"
-                      onClick={() => setShowPresetPanel(true)}
-                      className="bg-base-content/5 hover:bg-base-content/11 flex min-h-[80px] w-[100px] cursor-pointer flex-col items-center justify-center gap-2 rounded-lg p-3 transition-colors">
-                      <LucideIcon icon={Sparkles} size={20} className="text-base-content/60" />
-                      <span className="text-center text-xs">
-                        {t('bookings.presets.browse', { defaultValue: 'Browse presets' })}
-                      </span>
-                    </button>
-                  </div>
+                <div className="mb-4 flex gap-2">
+                  <Button
+                    variant="neutral"
+                    size="sm"
+                    type="button"
+                    onClick={() => setShowPresetPanel(true)}
+                    className="flex-1 gap-2">
+                    {t('bookings.presets.browse', { defaultValue: 'Browse presets' })}
+                    <LucideIcon icon={ChevronRight} size={16} />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    shape="circle"
+                    size="sm"
+                    onClick={() => openHelp('modal-add-edit-booking')}
+                    fullWidth={false}>
+                    <LucideIcon icon={HelpCircle} size={20} />
+                  </Button>
                 </div>
+                <FormElement
+                  label={t('projects.label', { defaultValue: 'Project' })}
+                  htmlFor="projectId"
+                  required>
+                  <InputSelectAutocomplete
+                    id="projectId"
+                    name="projectId"
+                    suggestions={projectSuggestions()}
+                    findMissingProject={findProjectById}
+                    fallbackProject={itemUpdate?.projectReference}
+                    required
+                  />
+                </FormElement>
+                <FormElement label={t('tags.label', { defaultValue: 'Tags' })} htmlFor="tags">
+                  <InputTagsAutocomplete id="tags" name="tags" suggestions={projectTags} />
+                </FormElement>
               </FieldSet>
 
               <FieldSet className="flex items-start gap-4">
-                <div className="flex-1 space-y-4 pb-6">
+                <div className="flex-shrink space-y-4 pb-6">
                   <FormElement
                     label={t('common.time.starts', { defaultValue: 'Starts' })}
                     htmlFor="start">
-                    <InputDatePicker2 name="start" withDate {...presetStart} />
+                    <InputDatePicker name="start" withDate {...presetStart} />
                   </FormElement>
                   <FormElement
                     label={t('common.time.ends', { defaultValue: 'Ends' })}
                     htmlFor="end">
-                    <InputDatePicker2 name="end" withDate {...presetEnd} />
+                    <InputDatePicker name="end" withDate {...presetEnd} />
                   </FormElement>
                 </div>
 
-                <div className="relative flex flex-col items-center justify-center self-stretch">
+                <div className="relative flex flex-col items-center justify-center self-stretch pt-7">
                   <div className="bg-base-300 absolute inset-y-0 left-1/2 w-px -translate-x-1/2" />
-                  <div className="bg-base-100 border-base-300 relative z-10 rounded-full border p-2">
-                    <ArrowUpDown size={20} className="text-base-content/60" />
-                  </div>
                 </div>
 
-                <div className="flex items-center">
+                <div className="flex flex-col justify-end pb-6">
                   <FormElement
                     label={t('common.time.duration', { defaultValue: 'Duration' })}
                     htmlFor="duration">

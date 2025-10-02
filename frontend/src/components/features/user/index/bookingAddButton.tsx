@@ -19,22 +19,24 @@
 
 import { BookingAddUpdateForm } from 'components/features/user/index/bookingAddUpdateForm'
 import { Button } from 'components/primitives/buttons/Button'
-import useModal from 'components/ui/overlays/modal/hooks/useModal'
-import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
+import { Modal } from 'components/ui/overlays/modal/Modal'
 import { useTranslation } from 'next-i18next'
-import React from 'react'
+import React, { useState } from 'react'
 
 export const BookingAddButton: React.FC = () => {
-  const { modalId, openModal, closeModal } = useModal('BookingCreateExtendedModal')
+  const [isOpen, setIsOpen] = useState(false)
   const { t } = useTranslation('common')
+
+  const handleClose = () => setIsOpen(false)
+
   return (
     <>
-      <Button onClick={openModal} variant="secondary">
+      <Button onClick={() => setIsOpen(true)} variant="secondary">
         {t('bookings.actions.create', { defaultValue: 'Create a booking' })}
       </Button>
-      <ModalResponsive modalId={modalId}>
-        <BookingAddUpdateForm mode="add" onSave={closeModal} onCancel={closeModal} />
-      </ModalResponsive>
+      <Modal open={isOpen} onClose={handleClose}>
+        <BookingAddUpdateForm mode="add" onSave={handleClose} onCancel={handleClose} />
+      </Modal>
     </>
   )
 }

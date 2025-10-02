@@ -22,17 +22,18 @@
 import { ResponsivePie } from '@nivo/pie'
 import { nivoTheme } from 'components/ui/charts/nivoTheme'
 import React from 'react'
-import { nivoPalette } from 'styles/colors'
 import { NivoChartDataType } from 'types/common'
 
 import { TooltipContainer, TooltipItem } from './shared/chartTooltips'
 import { getContrastLabelTextColor } from './shared/chartUtils'
+import { useNivoColors } from './shared/getConsistentColor'
 
 type Props = {
   stats: { data: NivoChartDataType | undefined }
 }
 
 const PieDiagram: React.FC<Props> = ({ stats /* see data tab */ }) => {
+  const nivoColors = useNivoColors()
   const { data } = stats
   if (!data) return null
 
@@ -40,7 +41,7 @@ const PieDiagram: React.FC<Props> = ({ stats /* see data tab */ }) => {
     <ResponsivePie
       data={data}
       theme={nivoTheme}
-      colors={nivoPalette}
+      colors={nivoColors}
       margin={{ top: 40, right: 80, bottom: 40, left: 80 }}
       innerRadius={0.5}
       padAngle={0.75}

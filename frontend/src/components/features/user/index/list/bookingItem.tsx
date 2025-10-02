@@ -28,14 +28,13 @@ import { BookingOverlapActions } from 'components/features/user/index/list/booki
 import { Button } from 'components/primitives/buttons/Button'
 import { TagList } from 'components/ui/data-display/TagList'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
-import useModal from 'components/ui/overlays/modal/hooks/useModal'
-import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
+import { Modal } from 'components/ui/overlays/modal/Modal'
 import { augmentBookingsList } from 'lib/api/functions/augmentBookingsList'
 import { ModelsBooking } from 'lib/api/lasius'
 import { cn } from 'lib/utils/cn'
 import { PlusCircleIcon } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
-import React from 'react'
+import React, { useState } from 'react'
 
 type ItemType = ReturnType<typeof augmentBookingsList>[number]
 
@@ -46,9 +45,13 @@ type Props = {
 
 export const BookingItem: React.FC<Props> = ({ item, nextItem }) => {
   const { t } = useTranslation()
-  const editModal = useModal(`EditModal-${item.id}`)
-  const addModal = useModal(`AddModal-${item.id}`)
-  const addBetweenModal = useModal(`AddBetweenModal-${item.id}`)
+  const [isEditOpen, setIsEditOpen] = useState(false)
+  const [isAddOpen, setIsAddOpen] = useState(false)
+  const [isAddBetweenOpen, setIsAddBetweenOpen] = useState(false)
+
+  const handleEditClose = () => setIsEditOpen(false)
+  const handleAddClose = () => setIsAddOpen(false)
+  const handleAddBetweenClose = () => setIsAddBetweenOpen(false)
 
   return (
     <div
@@ -78,7 +81,7 @@ export const BookingItem: React.FC<Props> = ({ item, nextItem }) => {
         <BookingOverlapActions
           currentItem={item}
           overlappingItem={item.overlapsWithNext}
-          onEdit={editModal.openModal}
+          onEdit={() => setIsEditOpen(true)}
         />
       )}
       {item.isMostRecent && (
@@ -89,7 +92,7 @@ export const BookingItem: React.FC<Props> = ({ item, nextItem }) => {
               shape="circle"
               type="button"
               title={t('bookings.actions.add', { defaultValue: 'Add booking' })}
-              onClick={addModal.openModal}
+              onClick={() => setIsAddOpen(true)}
               fullWidth={false}>
               <LucideIcon icon={PlusCircleIcon} size={21} />
             </Button>
@@ -100,33 +103,33 @@ export const BookingItem: React.FC<Props> = ({ item, nextItem }) => {
         <BookingInsertActions
           currentItem={item}
           nextItem={nextItem}
-          onAddBetween={addBetweenModal.openModal}
+          onAddBetween={() => setIsAddBetweenOpen(true)}
         />
       )}
-      <ModalResponsive modalId={editModal.modalId}>
+      <Modal open={isEditOpen} onClose={handleEditClose}>
         <BookingAddUpdateForm
           mode="update"
           itemUpdate={item}
-          onSave={editModal.closeModal}
-          onCancel={editModal.closeModal}
+          onSave={handleEditClose}
+          onCancel={handleEditClose}
         />
-      </ModalResponsive>
-      <ModalResponsive modalId={addModal.modalId}>
+      </Modal>
+      <Modal open={isAddOpen} onClose={handleAddClose}>
         <BookingAddUpdateForm
           mode="add"
           itemReference={item}
-          onSave={addModal.closeModal}
-          onCancel={addModal.closeModal}
+          onSave={handleAddClose}
+          onCancel={handleAddClose}
         />
-      </ModalResponsive>
-      <ModalResponsive modalId={addBetweenModal.modalId}>
+      </Modal>
+      <Modal open={isAddBetweenOpen} onClose={handleAddBetweenClose}>
         <BookingAddUpdateForm
           mode="addBetween"
           itemReference={item}
-          onSave={addBetweenModal.closeModal}
-          onCancel={addBetweenModal.closeModal}
+          onSave={handleAddBetweenClose}
+          onCancel={handleAddBetweenClose}
         />
-      </ModalResponsive>
+      </Modal>
     </div>
   )
 }

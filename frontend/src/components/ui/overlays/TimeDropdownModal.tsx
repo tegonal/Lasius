@@ -22,16 +22,14 @@ import { Button } from 'components/primitives/buttons/Button'
 import { Heading } from 'components/primitives/typography/Heading'
 import { FieldSet } from 'components/ui/forms/FieldSet'
 import { FormElement } from 'components/ui/forms/FormElement'
-import { InputDurationStandalone } from 'components/ui/forms/input/datePicker2/InputDurationStandalone'
+import { InputDurationStandalone } from 'components/ui/forms/input/datePicker/InputDurationStandalone'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
-import useModal from 'components/ui/overlays/modal/hooks/useModal'
-import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
+import { Modal } from 'components/ui/overlays/modal/Modal'
 import { round } from 'es-toolkit'
 import { cn } from 'lib/utils/cn'
 import { ChevronDown, Clock } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
-import React, { useEffect } from 'react'
-import { FormProvider, useForm } from 'react-hook-form'
+import React, { useEffect, useState } from 'react'
 
 type Props = {
   value: number // decimal hours
@@ -55,18 +53,18 @@ export const TimeDropdownWithModal: React.FC<Props> = ({
   onChange,
   disabled,
   isWeekend,
-  dayName = 'time',
-  orgId = 'default',
+  dayName: _dayName = 'time',
+  orgId: _orgId = 'default',
 }) => {
   const { t } = useTranslation('common')
-  const { modalId, openModal, closeModal } = useModal(
-    `EditWorkingHoursModal-${orgId}-${dayName?.replace(/\s/g, '-')}`,
-  )
-  const hookForm = useForm()
+  const [isOpen, setIsOpen] = useState(false)
+  const [currentValue, setCurrentValue] = useState(value)
+
+  const handleClose = () => setIsOpen(false)
 
   useEffect(() => {
-    hookForm.setValue('timeValue', value)
-  }, [hookForm, value])
+    setCurrentValue(value)
+  }, [value])
 
   const formatHours = (decimal: number) => {
     if (decimal === 0) return '—'
@@ -82,9 +80,12 @@ export const TimeDropdownWithModal: React.FC<Props> = ({
   }
 
   const handleCustomSubmit = () => {
-    const hours = hookForm.getValues().timeValue || 0
-    onChange(round(hours, 2))
-    closeModal()
+    onChange(round(currentValue, 2))
+    handleClose()
+  }
+
+  const handleDurationChange = (hours: number) => {
+    setCurrentValue(hours)
   }
 
   return (
@@ -127,7 +128,7 @@ export const TimeDropdownWithModal: React.FC<Props> = ({
             <MenuItem>
               {({ active }) => (
                 <button
-                  onClick={() => openModal()}
+                  onClick={() => setIsOpen(true)}
                   className={cn(
                     'flex w-full items-center justify-between rounded px-2 py-1.5 text-left text-sm',
                     active && 'bg-base-200',
@@ -141,32 +142,33 @@ export const TimeDropdownWithModal: React.FC<Props> = ({
         </MenuItems>
       </Menu>
 
-      <FormProvider {...hookForm}>
-        <ModalResponsive autoSize modalId={modalId}>
-          <FieldSet>
-            <FormElement>
-              <Heading as="h3" variant="section" className="mb-4">
-                {t('common.time.setCustom', { defaultValue: 'Set custom time' })}
-              </Heading>
-            </FormElement>
-            <FormElement>
-              <div className="time-picker-modal w-full [&_.bg-base-300]:w-full [&_.bg-base-300]:justify-center">
-                <InputDurationStandalone name="timeValue" />
-              </div>
-            </FormElement>
-            <FormElement>
-              <div className="mt-4 flex flex-col gap-2">
-                <Button onClick={handleCustomSubmit} className="w-full">
-                  {t('common.actions.save', { defaultValue: 'Save' })}
-                </Button>
-                <Button variant="secondary" onClick={closeModal} className="w-full">
-                  {t('common.actions.cancel', { defaultValue: 'Cancel' })}
-                </Button>
-              </div>
-            </FormElement>
-          </FieldSet>
-        </ModalResponsive>
-      </FormProvider>
+      <Modal open={isOpen} onClose={handleClose} autoSize>
+        <FieldSet>
+          <FormElement>
+            <Heading as="h3" variant="section" className="mb-4">
+              {t('common.time.setCustom', { defaultValue: 'Set custom time' })}
+            </Heading>
+          </FormElement>
+          <FormElement>
+            <div className="time-picker-modal w-full [&_.bg-base-300]:w-full [&_.bg-base-300]:justify-center">
+              <InputDurationStandalone
+                name="timeValue"
+                onDecimalHoursChange={handleDurationChange}
+              />
+            </div>
+          </FormElement>
+          <FormElement>
+            <div className="mt-4 flex flex-col gap-2">
+              <Button onClick={handleCustomSubmit} className="w-full">
+                {t('common.actions.save', { defaultValue: 'Save' })}
+              </Button>
+              <Button variant="secondary" onClick={handleClose} className="w-full">
+                {t('common.actions.cancel', { defaultValue: 'Cancel' })}
+              </Button>
+            </div>
+          </FormElement>
+        </FieldSet>
+      </Modal>
     </>
   )
 }

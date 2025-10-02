@@ -18,19 +18,18 @@
  */
 
 import { useBrowserConnectionStatus } from 'components/features/system/hooks/useBrowserConnectionStatus'
-import useModal from 'components/ui/overlays/modal/hooks/useModal'
-import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
+import { Modal } from 'components/ui/overlays/modal/Modal'
 import { logger } from 'lib/logger'
 import { useTranslation } from 'next-i18next'
 import { CONNECTION_STATUS } from 'projectConfig/constants'
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 // Debounce delay to prevent rapid modal toggling during connection flickers
 const STATUS_CHANGE_DEBOUNCE_MS = 2000
 
 export const BrowserOnlineStatusCheck: React.FC = () => {
   const { t } = useTranslation('common')
-  const { modalId, openModal, closeModal, isModalOpen } = useModal('ClientOfflineNoticeModal')
+  const [isOpen, setIsOpen] = useState(false)
   const { status } = useBrowserConnectionStatus()
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -42,13 +41,13 @@ export const BrowserOnlineStatusCheck: React.FC = () => {
 
     // Debounce status changes to prevent rapid modal toggling
     debounceTimerRef.current = setTimeout(() => {
-      if (status !== CONNECTION_STATUS.CONNECTED && !isModalOpen) {
+      if (status !== CONNECTION_STATUS.CONNECTED && !isOpen) {
         logger.info('BrowserOnlineStatusCheck', status)
-        openModal()
+        setIsOpen(true)
       }
-      if (status === CONNECTION_STATUS.CONNECTED && isModalOpen) {
+      if (status === CONNECTION_STATUS.CONNECTED && isOpen) {
         logger.info('BrowserOnlineStatusCheck', status)
-        closeModal()
+        setIsOpen(false)
       }
     }, STATUS_CHANGE_DEBOUNCE_MS)
 
@@ -57,16 +56,16 @@ export const BrowserOnlineStatusCheck: React.FC = () => {
         clearTimeout(debounceTimerRef.current)
       }
     }
-  }, [closeModal, isModalOpen, openModal, status])
+  }, [isOpen, status])
 
   return (
-    <ModalResponsive modalId={modalId} blockViewport>
+    <Modal open={isOpen} onClose={() => setIsOpen(false)} blockViewport>
       <div>
         {t('system.noInternetConnection', {
           defaultValue:
             'No Internet connection. Please make sure that your device is connected to the Internet.',
         })}
       </div>
-    </ModalResponsive>
+    </Modal>
   )
 }

@@ -18,19 +18,17 @@
  */
 
 import { useSignOut } from 'components/features/system/hooks/useSignOut'
-import { MODAL_SELECT_ORGANISATION } from 'components/features/user/selectUserOrganisation'
 import { Button } from 'components/primitives/buttons/Button'
 import { FieldSet } from 'components/ui/forms/FieldSet'
 import { FormElement } from 'components/ui/forms/FormElement'
 import { FormElementSpacer } from 'components/ui/forms/formElementSpacer'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
-import useModal from 'components/ui/overlays/modal/hooks/useModal'
-import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
+import { Modal } from 'components/ui/overlays/modal/Modal'
 import { SUPPORTED_LOCALES } from 'lib/config/locales'
 import { EllipsisVertical } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
-import React from 'react'
+import React, { useState } from 'react'
 
 // Language display configuration
 const languageConfig: Record<string, { flag: string; name: string }> = {
@@ -39,28 +37,33 @@ const languageConfig: Record<string, { flag: string; name: string }> = {
 }
 
 export const MobileNavigationButton: React.FC = () => {
-  const { modalId, openModal, closeModal } = useModal('MobileNavigationButtonModal')
+  const [isOpen, setIsOpen] = useState(false)
   const { t, i18n } = useTranslation('common')
   const router = useRouter()
   const { pathname, query, asPath } = router
-  const organisationSelectModal = useModal(MODAL_SELECT_ORGANISATION)
   const { signOut } = useSignOut()
+
+  const handleClose = () => setIsOpen(false)
 
   const switchLanguage = (newLocale: string) => {
     router.push({ pathname, query }, asPath, { locale: newLocale })
-    closeModal()
+    handleClose()
+  }
+
+  const openOrgSelect = () => {
+    // TODO: Implement organization selection modal
   }
 
   return (
     <>
-      <Button variant="secondary" shape="circle" onClick={openModal} fullWidth={false}>
+      <Button variant="secondary" shape="circle" onClick={() => setIsOpen(true)} fullWidth={false}>
         <LucideIcon icon={EllipsisVertical} />
       </Button>
-      <ModalResponsive modalId={modalId}>
+      <Modal open={isOpen} onClose={handleClose}>
         <FieldSet>
           <FormElement>
             <Button
-              onClick={organisationSelectModal.openModal}
+              onClick={openOrgSelect}
               aria-label={t('organisations.actions.switch', {
                 defaultValue: 'Switch organisation',
               })}>
@@ -99,13 +102,13 @@ export const MobileNavigationButton: React.FC = () => {
             <Button
               type="button"
               variant="secondary"
-              onClick={closeModal}
+              onClick={handleClose}
               aria-label={t('common.actions.cancel', { defaultValue: 'Cancel' })}>
               {t('common.actions.cancel', { defaultValue: 'Cancel' })}
             </Button>
           </FormElement>
         </FieldSet>
-      </ModalResponsive>
+      </Modal>
     </>
   )
 }

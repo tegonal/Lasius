@@ -18,7 +18,6 @@
  */
 
 import { ContextButtonWrapper } from 'components/features/contextMenu/contextButtonWrapper'
-import { ContextCompactButtonWrapper } from 'components/features/contextMenu/contextCompactButtonWrapper'
 import { useContextMenu } from 'components/features/contextMenu/hooks/useContextMenu'
 import { Button } from 'components/primitives/buttons/Button'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
@@ -32,9 +31,9 @@ type Props = {
 export const ContextButtonClose: React.FC<Props> = ({ variant = 'default' }) => {
   const { handleCloseAll } = useContextMenu()
   const { t } = useTranslation('common')
-  const Wrapper = variant === 'compact' ? ContextCompactButtonWrapper : ContextButtonWrapper
+  const wrapperVariant = variant === 'compact' ? 'compact' : 'default'
   return (
-    <Wrapper>
+    <ContextButtonWrapper variant={wrapperVariant}>
       <Button
         variant="contextIcon"
         title={t('contextMenu.actions.close', { defaultValue: 'Close context menu' })}
@@ -44,6 +43,6 @@ export const ContextButtonClose: React.FC<Props> = ({ variant = 'default' }) => 
         fullWidth={false}>
         <LucideIcon icon={XIcon} strokeWidth={2} />
       </Button>
-    </Wrapper>
+    </ContextButtonWrapper>
   )
 }

@@ -19,14 +19,18 @@
 
 import { WorkingHoursGrid } from 'components/features/user/workingHours/workingHoursGrid'
 import { WorkingHoursRightColumn } from 'components/features/user/workingHours/workingHoursRightColumn'
+import { WorkingHoursStats } from 'components/features/user/workingHours/workingHoursStats'
 import { ScrollContainer } from 'components/primitives/layout/ScrollContainer'
 import React from 'react'
 
 export const WorkingHoursLayout: React.FC = () => {
   return (
     <>
-      <ScrollContainer className="bg-base-100 flex-1 overflow-y-auto p-4">
-        <WorkingHoursGrid />
+      <ScrollContainer className="bg-base-100 flex-1 overflow-y-auto">
+        <WorkingHoursStats />
+        <div className="p-4">
+          <WorkingHoursGrid />
+        </div>
       </ScrollContainer>
       <ScrollContainer className="bg-base-200 flex-1 overflow-y-auto rounded-tr-lg">
         <WorkingHoursRightColumn />

@@ -25,7 +25,8 @@ import { StatsFilter } from 'components/ui/data-display/stats/statsFilter'
 import { dateOptions } from 'lib/utils/date/dateOptions'
 import { formatISOLocale } from 'lib/utils/date/dates'
 import dynamic from 'next/dynamic'
-import React from 'react'
+import { useRouter } from 'next/router'
+import React, { useMemo } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 
 type FormValues = {
@@ -35,6 +36,7 @@ type FormValues = {
 }
 
 export const StatsLayout: React.FC = () => {
+  const router = useRouter()
   const hookForm = useForm<FormValues>({
     defaultValues: {
       from: formatISOLocale(new Date()),
@@ -42,6 +44,17 @@ export const StatsLayout: React.FC = () => {
       dateRange: dateOptions[0].name,
     },
   })
+
+  // Read projectId and projectName from URL search params
+  const inactiveProject = useMemo(() => {
+    const projectIdFromUrl = router.query.projectId as string | undefined
+    const projectNameFromUrl = router.query.projectName as string | undefined
+
+    if (projectIdFromUrl && projectNameFromUrl) {
+      return { id: projectIdFromUrl, key: projectNameFromUrl }
+    }
+    return null
+  }, [router.query.projectId, router.query.projectName])
 
   const StatsContent = dynamic<any>(() => import('./statsContent').then((mod) => mod.StatsContent))
 
@@ -60,7 +73,7 @@ export const StatsLayout: React.FC = () => {
       </ScrollContainer>
       <ScrollContainer className="bg-base-200 flex-1 overflow-y-auto rounded-tr-lg">
         <ColumnList>
-          <StatsFilter />
+          <StatsFilter inactiveProject={inactiveProject} />
         </ColumnList>
       </ScrollContainer>
     </FormProvider>

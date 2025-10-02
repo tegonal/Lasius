@@ -25,24 +25,37 @@ import { DataList } from 'components/ui/data-display/dataList/dataList'
 import { DataListField } from 'components/ui/data-display/dataList/dataListField'
 import { DataListHeaderItem } from 'components/ui/data-display/dataList/dataListHeaderItem'
 import { DataListRow } from 'components/ui/data-display/dataList/dataListRow'
-import { DataFetchEmpty } from 'components/ui/data-display/fetchState/dataFetchEmpty'
+import { EmptyStateProjects } from 'components/ui/data-display/fetchState/emptyStateProjects'
+import { ProjectLastActivity } from 'components/ui/data-display/ProjectLastActivity'
 import { UserRoles } from 'dynamicTranslationStrings'
+import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { useProjects } from 'lib/api/hooks/useProjects'
 import { stringHash } from 'lib/utils/string/stringHash'
 import { useTranslation } from 'next-i18next'
 import { ROLES } from 'projectConfig/constants'
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useIsClient } from 'usehooks-ts'
 
-export const MyProjectsList: React.FC = () => {
+export type ProjectStatusFilter = 'both' | 'active' | 'inactive'
+
+type Props = {
+  statusFilter: ProjectStatusFilter
+}
+
+export const MyProjectsList: React.FC<Props> = () => {
   const { t } = useTranslation('common')
   const { userProjects } = useProjects()
+  const { selectedOrganisationId } = useOrganisation()
   const isClient = useIsClient()
+
+  const filteredProjects = useMemo(() => {
+    return userProjects()
+  }, [userProjects])
 
   if (!isClient) return null
 
   if (userProjects().length === 0) {
-    return <DataFetchEmpty />
+    return <EmptyStateProjects />
   }
 
   return (
@@ -56,9 +69,12 @@ export const MyProjectsList: React.FC = () => {
           <DataListHeaderItem>
             {t('projects.projectRole', { defaultValue: 'Project role' })}
           </DataListHeaderItem>
+          <DataListHeaderItem>
+            {t('projects.lastActivity', { defaultValue: 'Last activity' })}
+          </DataListHeaderItem>
           <DataListHeaderItem />
         </DataListRow>
-        {userProjects().map((item) => (
+        {filteredProjects.map((item) => (
           <DataListRow key={stringHash(item)}>
             <DataListField width={90}>
               <AvatarProject name={item.projectReference.key} />
@@ -68,6 +84,12 @@ export const MyProjectsList: React.FC = () => {
             </DataListField>
             <DataListField>
               <Text>{UserRoles[item.role]}</Text>
+            </DataListField>
+            <DataListField>
+              <ProjectLastActivity
+                orgId={selectedOrganisationId}
+                projectId={item.projectReference.id}
+              />
             </DataListField>
             <DataListField>
               {item.role === ROLES.PROJECT_ADMIN ? (

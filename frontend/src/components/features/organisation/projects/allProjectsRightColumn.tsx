@@ -17,27 +17,20 @@
  *
  */
 
-import { useContextMenu } from 'components/features/contextMenu/hooks/useContextMenu'
-import { ProjectAddUpdateForm } from 'components/features/projects/projectAddUpdateForm'
+import { ProjectStatusFilter } from 'components/features/organisation/projects/allProjectsList'
 import { Button } from 'components/primitives/buttons/Button'
-import { Divider } from 'components/primitives/divider/Divider'
 import { Heading } from 'components/primitives/typography/Heading'
 import { Text } from 'components/primitives/typography/Text'
-import { FormElement } from 'components/ui/forms/FormElement'
-import useModal from 'components/ui/overlays/modal/hooks/useModal'
-import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
 
-export const AllProjectsRightColumn: React.FC = () => {
-  const { t } = useTranslation('common')
-  const { modalId, openModal, closeModal } = useModal('AddProjectModal')
-  const { handleCloseAll } = useContextMenu()
+type Props = {
+  statusFilter: ProjectStatusFilter
+  onStatusFilterChange: (filter: ProjectStatusFilter) => void
+}
 
-  const addProject = () => {
-    openModal()
-    handleCloseAll()
-  }
+export const AllProjectsRightColumn: React.FC<Props> = ({ statusFilter, onStatusFilterChange }) => {
+  const { t } = useTranslation('common')
 
   return (
     <div className="w-full px-6 pt-3">
@@ -50,15 +43,34 @@ export const AllProjectsRightColumn: React.FC = () => {
             'All projects in the current organization that you can administer. Create billing reports including time booked by external project members.',
         })}
       </Text>
-      <Divider className="my-4" />
-      <FormElement>
-        <Button onClick={() => addProject()}>
-          {t('projects.actions.create', { defaultValue: 'Create a project' })}
-        </Button>
-      </FormElement>
-      <ModalResponsive modalId={modalId}>
-        <ProjectAddUpdateForm mode="add" onSave={closeModal} onCancel={closeModal} />
-      </ModalResponsive>
+      <div className="mt-4 flex flex-col gap-2">
+        <h3 className="text-sm font-medium">
+          {t('projects.filter.status', { defaultValue: 'Status' })}
+        </h3>
+        <div className="join">
+          <Button
+            variant={statusFilter === 'both' ? 'primary' : 'neutral'}
+            size="sm"
+            className="join-item w-auto"
+            onClick={() => onStatusFilterChange('both')}>
+            {t('projects.filter.both', { defaultValue: 'Both' })}
+          </Button>
+          <Button
+            variant={statusFilter === 'active' ? 'primary' : 'neutral'}
+            size="sm"
+            className="join-item w-auto"
+            onClick={() => onStatusFilterChange('active')}>
+            {t('common.status.active', { defaultValue: 'Active' })}
+          </Button>
+          <Button
+            variant={statusFilter === 'inactive' ? 'primary' : 'neutral'}
+            size="sm"
+            className="join-item w-auto"
+            onClick={() => onStatusFilterChange('inactive')}>
+            {t('common.status.inactive', { defaultValue: 'Inactive' })}
+          </Button>
+        </div>
+      </div>
     </div>
   )
 }

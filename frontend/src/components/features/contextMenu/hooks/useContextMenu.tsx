@@ -17,7 +17,6 @@
  *
  */
 
-import useModal from 'components/ui/overlays/modal/hooks/useModal'
 import { roundToNearestMinutes } from 'date-fns'
 import {
   ModelsBooking,
@@ -68,8 +67,6 @@ import { mutate } from 'swr'
  * await actionStartBooking(orgId, booking)
  */
 export const useContextMenu = () => {
-  const { closeModal } = useModal('BookingAddMobileModal')
-
   // Zustand state and actions
   const contextMenuOpen = useContextMenuOpen()
   const { setContextMenuOpen, closeContextMenu } = useUIActions()
@@ -130,9 +127,8 @@ export const useContextMenu = () => {
         start: formatISOLocale(roundToNearestMinutes(new Date(), { roundingMethod: 'floor' })),
       })
       handleCloseAll()
-      closeModal()
     },
-    [setSelectedDate, handleCloseAll, closeModal],
+    [setSelectedDate, handleCloseAll],
   )
 
   const actionDeleteBooking = useCallback(

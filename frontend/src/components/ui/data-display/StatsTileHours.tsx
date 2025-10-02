@@ -18,6 +18,7 @@
  */
 
 import { AnimateNumber } from 'components/ui/animations/motion/animateNumber'
+import { StatsTileWrapper } from 'components/ui/data-display/StatsTileWrapper'
 import { decimalHoursToObject } from 'lib/utils/date/dates'
 import React, { useEffect, useRef } from 'react'
 import { useBoolean } from 'usehooks-ts'
@@ -42,37 +43,33 @@ export const StatsTileHours: React.FC<Props> = ({ value, label, standalone = tru
     previousMinutes.current = duration.minutes
   }, [value])
 
-  const statContent = (
-    <div
-      className="stat hover:bg-base-200 h-fit cursor-pointer transition-colors select-none"
-      onClick={showDecimalHours.toggle}>
-      <div className="stat-title">{label}</div>
-      <div className="stat-value text-2xl">
-        {showDecimalHours.value ? (
-          <AnimateNumber from={previousValue.current} to={value} />
-        ) : (
-          <>
-            <AnimateNumber
-              from={previousHours.current}
-              to={decimalHoursToObject(value).hours}
-              leftpad={1}
-            />
-            :
-            <AnimateNumber
-              from={previousMinutes.current}
-              to={decimalHoursToObject(value).minutes}
-              leftpad={1}
-            />
-          </>
-        )}
+  return (
+    <StatsTileWrapper standalone={standalone}>
+      <div
+        className="stat hover:bg-base-200 h-fit cursor-pointer transition-colors select-none"
+        onClick={showDecimalHours.toggle}>
+        <div className="stat-title">{label}</div>
+        <div className="stat-value text-2xl">
+          {showDecimalHours.value ? (
+            <AnimateNumber from={previousValue.current} to={value} />
+          ) : (
+            <>
+              <AnimateNumber
+                from={previousHours.current}
+                to={decimalHoursToObject(value).hours}
+                leftpad={1}
+              />
+              :
+              <AnimateNumber
+                from={previousMinutes.current}
+                to={decimalHoursToObject(value).minutes}
+                leftpad={1}
+              />
+            </>
+          )}
+        </div>
+        <div className="stat-desc">{showDecimalHours.value ? 'Decimal hours' : 'HH:MM'}</div>
       </div>
-      <div className="stat-desc">{showDecimalHours.value ? 'Decimal hours' : 'HH:MM'}</div>
-    </div>
+    </StatsTileWrapper>
   )
-
-  if (!standalone) {
-    return statContent
-  }
-
-  return <div className="stats h-fit shadow">{statContent}</div>
 }

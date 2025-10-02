@@ -73,7 +73,7 @@ module.exports = {
   },
 
   lineEnding: 'auto',
-  locales: ['en', 'de'],
+  locales: ['en', 'de', 'fr', 'it', 'es'],
   output: 'public/locales/$LOCALE/$NAMESPACE.json',
 
   // Use different plural separator to avoid conflicts

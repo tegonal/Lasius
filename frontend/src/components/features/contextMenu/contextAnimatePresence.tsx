@@ -17,20 +17,35 @@
  *
  */
 
+import { cva, type VariantProps } from 'class-variance-authority'
 import { m } from 'framer-motion'
+import { cn } from 'lib/utils/cn'
 import React from 'react'
+
+const contextAnimatePresenceVariants = cva('absolute', {
+  variants: {
+    variant: {
+      default: 'right-0 z-50',
+      compact: '-right-2',
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+  },
+})
 
 type Props = {
   children: React.ReactNode
-}
-export const ContextAnimatePresence: React.FC<Props> = ({ children }) => {
+} & VariantProps<typeof contextAnimatePresenceVariants>
+
+export const ContextAnimatePresence: React.FC<Props> = ({ children, variant = 'default' }) => {
   return (
     <m.div
       initial={{ opacity: 0, x: '100%' }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: '100%' }}
       transition={{ ease: 'easeInOut', duration: 0.2 }}
-      className="absolute right-0 z-50">
+      className={cn(contextAnimatePresenceVariants({ variant }))}>
       {children}
     </m.div>
   )

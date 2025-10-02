@@ -22,10 +22,9 @@ import { FormatDate } from 'components/ui/data-display/FormatDate'
 import { useToast } from 'components/ui/feedback/hooks/useToast'
 import { FieldSet } from 'components/ui/forms/FieldSet'
 import { FormElement } from 'components/ui/forms/FormElement'
-import { InputDatePicker2 } from 'components/ui/forms/input/datePicker2/InputDatePicker2'
+import { InputDatePicker } from 'components/ui/forms/input/datePicker/InputDatePicker'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
-import useModal from 'components/ui/overlays/modal/hooks/useModal'
-import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
+import { Modal } from 'components/ui/overlays/modal/Modal'
 import { getHours, getMinutes } from 'date-fns'
 import { round } from 'es-toolkit'
 import { IsoDateString } from 'lib/api/apiDateHandling'
@@ -35,7 +34,7 @@ import { getGetUserProfileKey } from 'lib/api/lasius/user/user'
 import { plannedWorkingHoursStub } from 'lib/utils/date/stubPlannedWorkingHours'
 import { Pencil } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useSWRConfig } from 'swr'
 import { ModelsWorkingHoursWeekdays } from 'types/common'
@@ -51,13 +50,13 @@ type Props = {
 }
 
 export const WorkingHoursDay: React.FC<Props> = ({ item, organisation }) => {
-  const { modalId, openModal, closeModal } = useModal(
-    `EditWorkingHoursModal-${organisation?.organisationReference.id}-${item.day}`,
-  )
+  const [isOpen, setIsOpen] = useState(false)
   const { t } = useTranslation('common')
   const hookForm = useForm()
   const { mutate } = useSWRConfig()
   const { addToast } = useToast()
+
+  const handleClose = () => setIsOpen(false)
 
   useEffect(() => {
     hookForm.setValue(item.day, item.value)
@@ -78,7 +77,7 @@ export const WorkingHoursDay: React.FC<Props> = ({ item, organisation }) => {
       message: t('workingHours.status.updated', { defaultValue: 'Working hours updated' }),
       type: 'SUCCESS',
     })
-    closeModal()
+    handleClose()
   }
 
   return (
@@ -88,7 +87,7 @@ export const WorkingHoursDay: React.FC<Props> = ({ item, organisation }) => {
           <div className="flex flex-col items-center justify-center">
             <Button
               variant="ghost"
-              onClick={openModal}
+              onClick={() => setIsOpen(true)}
               className="flex flex-col items-center justify-center gap-2 text-center">
               <div>
                 <FormatDate date={item.date} format="dayNameShort" />
@@ -99,7 +98,7 @@ export const WorkingHoursDay: React.FC<Props> = ({ item, organisation }) => {
           </div>
         </div>
       </div>
-      <ModalResponsive autoSize modalId={modalId}>
+      <Modal open={isOpen} onClose={handleClose} autoSize>
         <FieldSet>
           <FormElement>
             <div className="text-center">
@@ -107,7 +106,7 @@ export const WorkingHoursDay: React.FC<Props> = ({ item, organisation }) => {
             </div>
           </FormElement>
           <FormElement>
-            <InputDatePicker2 name={item.day} withDate={false} />
+            <InputDatePicker name={item.day} withDate={false} />
           </FormElement>
           <FormElement>
             <Button onClick={() => onSubmit()}>
@@ -115,7 +114,7 @@ export const WorkingHoursDay: React.FC<Props> = ({ item, organisation }) => {
             </Button>
           </FormElement>
         </FieldSet>
-      </ModalResponsive>
+      </Modal>
     </FormProvider>
   )
 }

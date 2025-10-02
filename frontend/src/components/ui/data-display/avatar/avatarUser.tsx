@@ -18,8 +18,6 @@
  */
 
 import Avatar from 'boring-avatars'
-import { Strong } from 'components/primitives/typography/Strong'
-import { ToolTip } from 'components/ui/feedback/Tooltip'
 import React from 'react'
 import { userAvatarPalette } from 'styles/colors'
 
@@ -31,27 +29,19 @@ type Props = {
 
 export const AvatarUser: React.FC<Props> = ({ firstName, lastName, size = 39 }) => {
   return (
-    <ToolTip offset={16} placement="right" toolTipContent={`${firstName} ${lastName}`}>
-      <div
-        className="relative shrink-0"
-        style={{
-          width: `${size}px`,
-          height: `${size}px`,
-        }}>
-        <Avatar
-          square={false}
-          size={size}
-          name={`${firstName} ${lastName}`}
-          variant="bauhaus"
-          colors={userAvatarPalette}
-        />
-        <div className="absolute top-0 left-0 flex h-full w-full shrink-0 items-end justify-center p-1 text-sm leading-normal text-white select-none">
-          <Strong>
-            {firstName[0]?.toUpperCase()}
-            {lastName[0]?.toUpperCase()}
-          </Strong>
-        </div>
-      </div>
-    </ToolTip>
+    <div
+      className="relative shrink-0"
+      style={{
+        width: `${size}px`,
+        height: `${size}px`,
+      }}>
+      <Avatar
+        square={false}
+        size={size}
+        name={`${firstName} ${lastName}`}
+        variant="bauhaus"
+        colors={userAvatarPalette}
+      />
+    </div>
   )
 }

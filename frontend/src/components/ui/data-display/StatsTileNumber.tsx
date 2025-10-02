@@ -18,6 +18,7 @@
  */
 
 import { AnimateNumber } from 'components/ui/animations/motion/animateNumber'
+import { StatsTileWrapper } from 'components/ui/data-display/StatsTileWrapper'
 import React, { useEffect, useRef } from 'react'
 
 type Props = {
@@ -31,18 +32,15 @@ export const StatsTileNumber: React.FC<Props> = ({ value, label, standalone = tr
   useEffect(() => {
     previousValue.current = value
   }, [value])
-  const statContent = (
-    <div className="stat h-fit">
-      <div className="stat-title">{label}</div>
-      <div className="stat-value text-2xl">
-        <AnimateNumber from={previousValue.current} to={value} />
+
+  return (
+    <StatsTileWrapper standalone={standalone}>
+      <div className="stat h-fit">
+        <div className="stat-title">{label}</div>
+        <div className="stat-value text-2xl">
+          <AnimateNumber from={previousValue.current} to={value} />
+        </div>
       </div>
-    </div>
+    </StatsTileWrapper>
   )
-
-  if (!standalone) {
-    return statContent
-  }
-
-  return <div className="stats h-fit shadow">{statContent}</div>
 }

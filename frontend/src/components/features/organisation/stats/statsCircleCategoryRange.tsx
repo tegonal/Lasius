@@ -18,7 +18,7 @@
  */
 
 import { StatsTile } from 'components/ui/charts/statsTile'
-import { DataFetchEmpty } from 'components/ui/data-display/fetchState/dataFetchEmpty'
+import { EmptyStateStats } from 'components/ui/data-display/fetchState/emptyStateStats'
 import { Loading } from 'components/ui/data-display/fetchState/loading'
 import { statsSwrConfig } from 'components/ui/data-display/stats/statsSwrConfig'
 import { apiDatespanFromTo } from 'lib/api/apiDateHandling'
@@ -67,7 +67,7 @@ export const StatsCircleCategoryRange: React.FC<Props> = ({ source }) => {
   if (!chartData) {
     return (
       <StatsTile style={{ height: 340 }}>
-        <DataFetchEmpty />
+        <EmptyStateStats />
       </StatsTile>
     )
   }

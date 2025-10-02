@@ -21,25 +21,30 @@ import { SelectUserOrganisationModal } from 'components/features/user/selectUser
 import { Button } from 'components/primitives/buttons/Button'
 import { AvatarOrganisation } from 'components/ui/data-display/avatar/avatarOrganisation'
 import { ButtonGroup } from 'components/ui/forms/ButtonGroup'
-import useModal from 'components/ui/overlays/modal/hooks/useModal'
-import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
+import { Modal } from 'components/ui/overlays/modal/Modal'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { useTranslation } from 'next-i18next'
-import React from 'react'
+import React, { useState } from 'react'
 import { useIsClient } from 'usehooks-ts'
 
 export const MODAL_SELECT_ORGANISATION = 'SelectOrganisationModal'
 
 export const SelectUserOrganisation: React.FC = () => {
   const { t } = useTranslation('common')
-  const { modalId, openModal, closeModal } = useModal(MODAL_SELECT_ORGANISATION)
+  const [isOpen, setIsOpen] = useState(false)
   const { selectedOrganisationKey, selectedOrganisation } = useOrganisation()
   const isClient = useIsClient()
+
+  const handleClose = () => setIsOpen(false)
 
   if (!isClient) return null
   return (
     <>
-      <Button variant="ghost" onClick={openModal} className="hidden md:flex" fullWidth={false}>
+      <Button
+        variant="ghost"
+        onClick={() => setIsOpen(true)}
+        className="hidden md:flex"
+        fullWidth={false}>
         <AvatarOrganisation name={selectedOrganisationKey || ''} size={24} />
         <span>
           {selectedOrganisation?.private
@@ -49,14 +54,14 @@ export const SelectUserOrganisation: React.FC = () => {
             : selectedOrganisationKey}
         </span>
       </Button>
-      <ModalResponsive modalId={modalId}>
-        <SelectUserOrganisationModal />
+      <Modal open={isOpen} onClose={handleClose}>
+        <SelectUserOrganisationModal onClose={handleClose} />
         <ButtonGroup>
-          <Button variant="secondary" onClick={closeModal}>
+          <Button variant="secondary" onClick={handleClose}>
             {t('common.actions.cancel', { defaultValue: 'Cancel' })}
           </Button>
         </ButtonGroup>
-      </ModalResponsive>
+      </Modal>
     </>
   )
 }

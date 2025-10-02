@@ -20,10 +20,10 @@
 import { ContextButtonClose } from 'components/features/contextMenu/buttons/contextButtonClose'
 import { ContextButtonLeaveProject } from 'components/features/contextMenu/buttons/contextButtonLeaveProject'
 import { ContextButtonOpen } from 'components/features/contextMenu/buttons/contextButtonOpen'
+import { ContextAnimatePresence } from 'components/features/contextMenu/contextAnimatePresence'
 import { ContextBar } from 'components/features/contextMenu/contextBar'
 import { ContextBarDivider } from 'components/features/contextMenu/contextBarDivider'
-import { ContextCompactAnimatePresence } from 'components/features/contextMenu/contextCompactAnimatePresence'
-import { ContextCompactBody } from 'components/features/contextMenu/contextCompactBody'
+import { ContextBody } from 'components/features/contextMenu/contextBody'
 import { useContextMenu } from 'components/features/contextMenu/hooks/useContextMenu'
 import { AnimatePresence } from 'framer-motion'
 import { ModelsUserProject } from 'lib/api/lasius'
@@ -38,20 +38,20 @@ export const MyProjectsListItemMemberContext: React.FC<Props> = ({ item }) => {
 
   return (
     <>
-      <ContextCompactBody>
+      <ContextBody variant="compact">
         <ContextButtonOpen hash={item.projectReference.id} />
         <AnimatePresence>
           {currentOpenContextMenuId === item.projectReference.id && (
-            <ContextCompactAnimatePresence>
+            <ContextAnimatePresence variant="compact">
               <ContextBar>
                 <ContextButtonLeaveProject item={item} variant="compact" />
                 <ContextBarDivider />
                 <ContextButtonClose variant="compact" />
               </ContextBar>
-            </ContextCompactAnimatePresence>
+            </ContextAnimatePresence>
           )}
         </AnimatePresence>
-      </ContextCompactBody>
+      </ContextBody>
     </>
   )
 }

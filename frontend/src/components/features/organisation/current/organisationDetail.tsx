@@ -18,7 +18,6 @@
  */
 
 import { OrganisationMembers } from 'components/features/organisation/current/organisationMembers'
-import { Heading } from 'components/primitives/typography/Heading'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { Lock } from 'lucide-react'
@@ -35,13 +34,6 @@ export const OrganisationDetail: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-8">
-      <Heading as="h2" variant="h2">
-        {selectedOrganisation?.private
-          ? t('organisations.myPersonalOrganisation', {
-              defaultValue: 'My personal organisation',
-            })
-          : selectedOrganisation?.organisationReference.key}
-      </Heading>
       {selectedOrganisation?.private && (
         <div className="mx-auto mb-4 flex max-w-[500px] flex-col items-center justify-center gap-3 text-center">
           <LucideIcon icon={Lock} size={24} />

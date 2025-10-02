@@ -17,6 +17,7 @@
  *
  */
 
+import { StatsTileWrapper } from 'components/ui/data-display/StatsTileWrapper'
 import { cn } from 'lib/utils/cn'
 import React from 'react'
 
@@ -57,25 +58,21 @@ export const StatsTilePercentage: React.FC<Props> = ({
     }
   }
 
-  const statContent = (
-    <div className="stat h-fit">
-      <div className="stat-value flex flex-col items-center py-2">
-        <div
-          className={cn('radial-progress', getProgressColor())}
-          style={
-            { '--value': Math.min(roundedValue, 100), '--size': '4rem' } as React.CSSProperties
-          }
-          role="progressbar">
-          <span className="text-sm font-bold">{displayValue}%</span>
+  return (
+    <StatsTileWrapper standalone={standalone}>
+      <div className="stat h-fit">
+        <div className="stat-value flex flex-col items-center py-2">
+          <div
+            className={cn('radial-progress', getProgressColor())}
+            style={
+              { '--value': Math.min(roundedValue, 100), '--size': '4rem' } as React.CSSProperties
+            }
+            role="progressbar">
+            <span className="text-sm font-bold">{displayValue}%</span>
+          </div>
+          {period && <div className="text-base-content/60 mt-2 text-xs">{getPeriodText()}</div>}
         </div>
-        {period && <div className="text-base-content/60 mt-2 text-xs">{getPeriodText()}</div>}
       </div>
-    </div>
+    </StatsTileWrapper>
   )
-
-  if (!standalone) {
-    return statContent
-  }
-
-  return <div className="stats h-fit shadow">{statContent}</div>
 }

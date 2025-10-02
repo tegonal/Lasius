@@ -31,9 +31,9 @@ import {
 import { getDateLocale } from 'lib/utils/date/dateFormat'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
-import { nivoPalette } from 'styles/colors'
 
 import { ChartSingleTooltip, ChartStackTooltip } from './shared/chartTooltips'
+import { useNivoColors } from './shared/getConsistentColor'
 
 type Props = {
   data: MonthlyWeekStreamData
@@ -42,6 +42,7 @@ type Props = {
 
 export const MonthStreamChartImpl: React.FC<Props> = ({ data, keys }) => {
   const { t, i18n } = useTranslation('common')
+  const nivoColors = useNivoColors()
 
   // Get the correct locale for date-fns from centralized config
   const dateLocale = getDateLocale(i18n.language)
@@ -195,7 +196,7 @@ export const MonthStreamChartImpl: React.FC<Props> = ({ data, keys }) => {
             enableGridX={false}
             enableGridY={true}
             offsetType="silhouette"
-            colors={nivoPalette}
+            colors={nivoColors}
             fillOpacity={0.85}
             borderWidth={0}
             animate={false}

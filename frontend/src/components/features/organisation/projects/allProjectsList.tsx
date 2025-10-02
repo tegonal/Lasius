@@ -23,25 +23,46 @@ import { DataList } from 'components/ui/data-display/dataList/dataList'
 import { DataListField } from 'components/ui/data-display/dataList/dataListField'
 import { DataListHeaderItem } from 'components/ui/data-display/dataList/dataListHeaderItem'
 import { DataListRow } from 'components/ui/data-display/dataList/dataListRow'
-import { DataFetchEmpty } from 'components/ui/data-display/fetchState/dataFetchEmpty'
+import { EmptyStateProjects } from 'components/ui/data-display/fetchState/emptyStateProjects'
+import { ProjectLastActivity } from 'components/ui/data-display/ProjectLastActivity'
 import { orderBy } from 'es-toolkit'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { useGetProjectList } from 'lib/api/lasius/projects/projects'
 import { stringHash } from 'lib/utils/string/stringHash'
 import { useTranslation } from 'next-i18next'
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useIsClient } from 'usehooks-ts'
 
-export const AllProjectsList: React.FC = () => {
+export type ProjectStatusFilter = 'both' | 'active' | 'inactive'
+
+type Props = {
+  statusFilter: ProjectStatusFilter
+}
+
+export const AllProjectsList: React.FC<Props> = ({ statusFilter }) => {
   const { t } = useTranslation('common')
   const { selectedOrganisationId } = useOrganisation()
   const { data } = useGetProjectList(selectedOrganisationId)
   const isClient = useIsClient()
 
+  const filteredProjects = useMemo(() => {
+    if (!data) return []
+
+    switch (statusFilter) {
+      case 'active':
+        return data.filter((project) => project.active)
+      case 'inactive':
+        return data.filter((project) => !project.active)
+      case 'both':
+      default:
+        return data
+    }
+  }, [data, statusFilter])
+
   if (!isClient) return null
 
   if (!data || data?.length === 0) {
-    return <DataFetchEmpty />
+    return <EmptyStateProjects />
   }
 
   return (
@@ -53,9 +74,12 @@ export const AllProjectsList: React.FC = () => {
           <DataListHeaderItem>
             {t('common.status.label', { defaultValue: 'Status' })}
           </DataListHeaderItem>
+          <DataListHeaderItem>
+            {t('projects.lastActivity', { defaultValue: 'Last activity' })}
+          </DataListHeaderItem>
           <DataListHeaderItem />
         </DataListRow>
-        {orderBy(data, [(data) => data.key], ['asc']).map((item) => (
+        {orderBy(filteredProjects, [(data) => data.key], ['asc']).map((item) => (
           <DataListRow key={stringHash(item)}>
             <DataListField width={90}>
               <AvatarProject name={item.key} />
@@ -69,6 +93,9 @@ export const AllProjectsList: React.FC = () => {
                   ? t('common.status.active', { defaultValue: 'Active' })
                   : t('common.status.inactive', { defaultValue: 'Inactive' })}
               </span>
+            </DataListField>
+            <DataListField>
+              <ProjectLastActivity orgId={selectedOrganisationId} projectId={item.id} />
             </DataListField>
             <DataListField>
               <AllProjectsListItemContext item={item} />

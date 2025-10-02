@@ -17,8 +17,15 @@
  *
  */
 
-import { UserCard } from 'components/features/user/manageUserCard'
-import { Heading } from 'components/primitives/typography/Heading'
+import { OrganisationMemberListItemContext } from 'components/features/organisation/current/organisationMemberListItemContext'
+import { AvatarUser } from 'components/ui/data-display/avatar/avatarUser'
+import { Badge } from 'components/ui/data-display/Badge'
+import { DataList } from 'components/ui/data-display/dataList/dataList'
+import { DataListField } from 'components/ui/data-display/dataList/dataListField'
+import { DataListHeaderItem } from 'components/ui/data-display/dataList/dataListHeaderItem'
+import { DataListRow } from 'components/ui/data-display/dataList/dataListRow'
+import { EmptyStateMembers } from 'components/ui/data-display/fetchState/emptyStateMembers'
+import { orderBy } from 'es-toolkit'
 import { isAdminOfCurrentOrg } from 'lib/api/functions/isAdminOfCurrentOrg'
 import { useProfile } from 'lib/api/hooks/useProfile'
 import { ModelsUserOrganisation } from 'lib/api/lasius'
@@ -28,43 +35,79 @@ import {
 } from 'lib/api/lasius/organisations/organisations'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
+import { useIsClient } from 'usehooks-ts'
 
 type Props = {
   item: ModelsUserOrganisation | undefined
 }
 
 export const OrganisationMembers: React.FC<Props> = ({ item }) => {
-  const { t } = useTranslation('common')
   const { data: userList } = useGetOrganisationUserList(item?.organisationReference.id || '')
-  const { profile } = useProfile()
+  const { profile, userId } = useProfile()
   const amIAdmin = isAdminOfCurrentOrg(profile)
+  const { t } = useTranslation('common')
+  const isClient = useIsClient()
 
-  const handleUserRemove = (userId: string) => {
+  const handleUserRemove = (userIdToRemove: string) => {
     ;(async () => {
       if (item) {
-        await removeOrganisationUser(item.organisationReference.id, userId)
+        await removeOrganisationUser(item.organisationReference.id, userIdToRemove)
       }
     })()
   }
 
+  if (!isClient) return null
+
+  if (!userList || userList.length === 0) {
+    return <EmptyStateMembers />
+  }
+
   return (
-    <div className="w-full">
-      <Heading as="h2" variant="headingUnderlinedMuted">
-        <div className="flex items-center gap-2">
-          <span>{t('members.title', { defaultValue: 'Members' })}</span>
-          <span className="text-sm font-normal">({userList?.length})</span>
-        </div>
-      </Heading>
-      <div className="mt-4 grid grid-cols-3 gap-3">
-        {userList?.map((user) => (
-          <UserCard
-            canRemove={amIAdmin}
-            user={user}
-            key={user.id}
-            onRemove={() => handleUserRemove(user.id)}
-          />
-        ))}
-      </div>
-    </div>
+    <DataList>
+      <DataListRow>
+        <DataListHeaderItem />
+        <DataListHeaderItem>
+          {t('common.firstName', { defaultValue: 'First name' })}
+        </DataListHeaderItem>
+        <DataListHeaderItem>
+          {t('common.lastName', { defaultValue: 'Last name' })}
+        </DataListHeaderItem>
+        <DataListHeaderItem>{t('common.email', { defaultValue: 'Email' })}</DataListHeaderItem>
+        <DataListHeaderItem>
+          {t('common.status.label', { defaultValue: 'Status' })}
+        </DataListHeaderItem>
+        <DataListHeaderItem />
+      </DataListRow>
+      {orderBy(userList, [(user) => user.lastName, (user) => user.firstName], ['asc', 'asc']).map(
+        (user) => (
+          <DataListRow key={user.id}>
+            <DataListField width={90}>
+              <AvatarUser firstName={user.firstName} lastName={user.lastName} />
+            </DataListField>
+            <DataListField>
+              <span>{user.firstName}</span>
+            </DataListField>
+            <DataListField>
+              <span>{user.lastName}</span>
+            </DataListField>
+            <DataListField>
+              <span>{user.email}</span>
+            </DataListField>
+            <DataListField>
+              {user.id === userId && (
+                <Badge variant="tag">{t('common.you', { defaultValue: 'You' })}</Badge>
+              )}
+            </DataListField>
+            <DataListField>
+              <OrganisationMemberListItemContext
+                user={user}
+                onRemove={() => handleUserRemove(user.id)}
+                canRemove={amIAdmin}
+              />
+            </DataListField>
+          </DataListRow>
+        ),
+      )}
+    </DataList>
   )
 }

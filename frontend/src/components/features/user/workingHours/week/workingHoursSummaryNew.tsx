@@ -73,7 +73,7 @@ export const WorkingHoursSummaryNew: React.FC<Props> = ({
           <div className="text-right">
             <div className="text-3xl font-bold">{totalFormatted}</div>
             <div className="text-base-content/60 text-xs">
-              {t('workingHours.totalPerWeek', { defaultValue: 'total per week' })}
+              {t('workingHours.totalPerWeek', { defaultValue: 'Total per week' })}
             </div>
           </div>
         </div>

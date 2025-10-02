@@ -17,15 +17,15 @@
  *
  */
 
-import { UserCard } from 'components/features/user/manageUserCard'
+import { ManageProjectMembersStats } from 'components/features/projects/manageProjectMembersStats'
+import { ProjectMembersList } from 'components/features/projects/projectMembersList'
 import { ManageUserInviteByEmailForm } from 'components/features/user/manageUserInviteByEmailForm'
-import { Heading } from 'components/primitives/typography/Heading'
-import { FieldSet } from 'components/ui/forms/FieldSet'
-import { isAdminOfProject } from 'lib/api/functions/isAdminOfProject'
+import { Button } from 'components/primitives/buttons/Button'
+import { FormElement } from 'components/ui/forms/FormElement'
+import { Modal } from 'components/ui/overlays/modal/Modal'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
-import { useProfile } from 'lib/api/hooks/useProfile'
 import { ModelsProject, ModelsUserProject, ModelsUserStub } from 'lib/api/lasius'
-import { getProjectUserList, removeProjectUser } from 'lib/api/lasius/projects/projects'
+import { getProjectUserList } from 'lib/api/lasius/projects/projects'
 import { useTranslation } from 'next-i18next'
 import React, { useEffect, useState } from 'react'
 
@@ -35,65 +35,61 @@ type Props = {
   onCancel: () => void
 }
 
-export const ManageProjectMembers: React.FC<Props> = ({ item }) => {
+export const ManageProjectMembers: React.FC<Props> = ({ item, onCancel }) => {
   const { t } = useTranslation('common')
   const { selectedOrganisationId } = useOrganisation()
   const projectId = 'id' in item ? item.id : item.projectReference.id
   const projectOrganisationId =
     'organisationReference' in item ? item.organisationReference.id : selectedOrganisationId
-  const { profile } = useProfile()
-  const amIAdmin = isAdminOfProject(profile, projectOrganisationId, projectId)
   const [users, setUsers] = useState<ModelsUserStub[]>([])
   const [refreshFlag, setRefreshFlag] = useState<boolean>(false)
+  const [isInviteOpen, setIsInviteOpen] = useState(false)
+
   useEffect(() => {
     getProjectUserList(selectedOrganisationId, projectId).then((data) => setUsers(data))
   }, [item, refreshFlag, selectedOrganisationId, projectId])
 
   const handleUserInvite = () => {
-    //
+    setRefreshFlag(!refreshFlag)
+    setIsInviteOpen(false)
+  }
+
+  const handleRefresh = () => {
     setRefreshFlag(!refreshFlag)
   }
 
-  const handleUserRemove = async (userId: string) => {
-    await removeProjectUser(selectedOrganisationId, projectId, userId).then((_) =>
-      setRefreshFlag(!refreshFlag),
-    )
+  const handleInviteOpen = () => {
+    setIsInviteOpen(true)
+  }
+
+  const handleInviteClose = () => {
+    setIsInviteOpen(false)
   }
 
   return (
-    <FieldSet>
-      <div className="relative w-full">
-        <div className="grid grid-cols-[2fr_1fr] gap-3">
-          <div>
-            <div className="border-base-content/20 mb-2 flex items-baseline justify-between border-b pb-2">
-              <div className="flex gap-2">
-                {t('projects.members.title', { defaultValue: 'Project members' })}
-              </div>
-              <span className="text-sm font-normal">{users?.length}</span>
-            </div>
-            <div className="grid grid-cols-3 gap-3 pb-3">
-              {users?.map((user) => (
-                <UserCard
-                  canRemove={amIAdmin}
-                  user={user}
-                  key={user.id}
-                  onRemove={() => handleUserRemove(user.id)}
-                />
-              ))}
-            </div>
-          </div>
-          <div>
-            <Heading as="h2" variant="section">
-              {t('members.actions.invite', { defaultValue: 'Invite someone' })}
-            </Heading>
-            <ManageUserInviteByEmailForm
-              organisation={projectOrganisationId}
-              project={projectId}
-              onSave={handleUserInvite}
-            />
-          </div>
-        </div>
+    <>
+      <ManageProjectMembersStats memberCount={users.length} onInvite={handleInviteOpen} />
+      <div className="px-4 pt-3">
+        <ProjectMembersList
+          users={users}
+          projectId={projectId}
+          projectOrganisationId={projectOrganisationId}
+          onRefresh={handleRefresh}
+        />
       </div>
-    </FieldSet>
+      <FormElement>
+        <Button type="button" variant="secondary" onClick={onCancel}>
+          {t('common.actions.close', { defaultValue: 'Close' })}
+        </Button>
+      </FormElement>
+      <Modal open={isInviteOpen} onClose={handleInviteClose}>
+        <ManageUserInviteByEmailForm
+          organisation={projectOrganisationId}
+          project={projectId}
+          onSave={handleUserInvite}
+          onCancel={handleInviteClose}
+        />
+      </Modal>
+    </>
   )
 }

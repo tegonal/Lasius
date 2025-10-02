@@ -51,10 +51,11 @@ export interface AlertProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof alertVariants> {
   children: React.ReactNode
+  hideIcon?: boolean
 }
 
 export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
-  ({ className, variant = 'neutral', children, ...props }, ref) => {
+  ({ className, variant = 'neutral', children, hideIcon = false, ...props }, ref) => {
     const IconComponent = iconMap[variant || 'neutral']
 
     return (
@@ -63,10 +64,14 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
         className={cn(alertVariants({ variant }), 'flex items-center gap-3', className)}
         role="alert"
         {...props}>
-        <div className="flex-shrink-0">
-          <LucideIcon icon={IconComponent} size={20} />
-        </div>
-        <div className="divider divider-horizontal m-0 before:w-px after:w-px"></div>
+        {!hideIcon && (
+          <>
+            <div className="flex-shrink-0">
+              <LucideIcon icon={IconComponent} size={20} />
+            </div>
+            <div className="divider divider-horizontal m-0 before:w-px after:w-px"></div>
+          </>
+        )}
         <div className="min-w-0 flex-1">{children}</div>
       </div>
     )

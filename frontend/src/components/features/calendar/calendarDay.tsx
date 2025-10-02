@@ -46,9 +46,9 @@ export const CalendarDay: React.FC<Props> = ({ date, onClick, isSelected = false
   return (
     <button
       className={cn(
-        'btn btn-ghost relative z-[2] flex min-h-[78px] w-full min-w-[56px] grow flex-col items-center justify-start text-center',
+        'btn btn-ghost relative z-[2] flex min-h-[78px] w-full min-w-[56px] grow flex-col items-center justify-start border-none text-center shadow-none',
         isWeekend(day) && 'opacity-50',
-        isSelected && 'hover:bg-transparent hover:text-current',
+        isSelected && 'shadow-none hover:bg-transparent hover:text-current',
       )}
       onClick={handleDayClick}>
       <div className="pt-1 text-center text-xs leading-none font-normal uppercase">

@@ -18,7 +18,6 @@
  */
 
 import { ContextButtonWrapper } from 'components/features/contextMenu/contextButtonWrapper'
-import { ContextCompactButtonWrapper } from 'components/features/contextMenu/contextCompactButtonWrapper'
 import { useContextMenu } from 'components/features/contextMenu/hooks/useContextMenu'
 import { Button } from 'components/primitives/buttons/Button'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
@@ -51,10 +50,10 @@ export const ContextButtonDeactivateProject: React.FC<Props> = ({ variant = 'def
     setShowDialog(false)
   }
 
-  const Wrapper = variant === 'compact' ? ContextCompactButtonWrapper : ContextButtonWrapper
+  const wrapperVariant = variant === 'compact' ? 'compact' : 'default'
 
   return (
-    <Wrapper>
+    <ContextButtonWrapper variant={wrapperVariant}>
       <Button
         variant="contextIcon"
         title={t('projects.actions.deactivate', { defaultValue: 'Deactivate project' })}
@@ -75,6 +74,6 @@ export const ContextButtonDeactivateProject: React.FC<Props> = ({ variant = 'def
           onCancel={handleCancel}
         />
       )}
-    </Wrapper>
+    </ContextButtonWrapper>
   )
 }

@@ -18,7 +18,6 @@
  */
 
 import { ContextButtonWrapper } from 'components/features/contextMenu/contextButtonWrapper'
-import { ContextCompactButtonWrapper } from 'components/features/contextMenu/contextCompactButtonWrapper'
 import { useContextMenu } from 'components/features/contextMenu/hooks/useContextMenu'
 import { Button } from 'components/primitives/buttons/Button'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
@@ -36,9 +35,9 @@ export const ContextButtonStartBooking: React.FC<Props> = ({ item, variant = 'de
   const { actionStartBooking } = useContextMenu()
   const { t } = useTranslation('common')
   const { selectedOrganisationId } = useOrganisation()
-  const Wrapper = variant === 'compact' ? ContextCompactButtonWrapper : ContextButtonWrapper
+  const wrapperVariant = variant === 'compact' ? 'compact' : 'default'
   return (
-    <Wrapper>
+    <ContextButtonWrapper variant={wrapperVariant}>
       <Button
         variant="contextIcon"
         title={t('bookings.actions.start', { defaultValue: 'Start booking' })}
@@ -48,6 +47,6 @@ export const ContextButtonStartBooking: React.FC<Props> = ({ item, variant = 'de
         shape="circle">
         <LucideIcon icon={Timer} size={24} />
       </Button>
-    </Wrapper>
+    </ContextButtonWrapper>
   )
 }

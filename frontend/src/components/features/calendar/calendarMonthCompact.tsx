@@ -19,19 +19,21 @@
 
 import { FormatDate } from 'components/ui/data-display/FormatDate'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
-import { addMonths, format, intervalToDuration, isToday, startOfWeek, toDate } from 'date-fns'
-import { uniqueId } from 'es-toolkit/compat'
+import { format, isToday, toDate } from 'date-fns'
 import { AnimatePresence, m } from 'framer-motion'
 import { IsoDateString } from 'lib/api/apiDateHandling'
 import { useGetBookingSummaryDay } from 'lib/api/hooks/useGetBookingSummaryDay'
 import { cn } from 'lib/utils/cn'
 import { getDateLocale } from 'lib/utils/date/dateFormat'
-import { formatISOLocale, getMonthOfDate } from 'lib/utils/date/dates'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
-import React, { useEffect, useMemo } from 'react'
-import { useCalendarActions, useSelectedDate } from 'stores/calendarStore'
+import React, { useMemo } from 'react'
+import { useSelectedDate } from 'stores/calendarStore'
 import { useIsClient } from 'usehooks-ts'
+
+import { useCalendarGridOffset } from './hooks/useCalendarGridOffset'
+import { useCalendarNavigation } from './hooks/useCalendarNavigation'
+import { useCalendarSelection } from './hooks/useCalendarSelection'
 
 type CalendarDayCompactProps = {
   day: IsoDateString
@@ -83,57 +85,14 @@ const CalendarDayCompact: React.FC<CalendarDayCompactProps> = ({
 export const CalendarMonthCompact: React.FC = () => {
   const { t, i18n } = useTranslation('common')
   const selectedDate = useSelectedDate()
-  const { setSelectedDate } = useCalendarActions()
   const isClient = useIsClient()
 
-  const [month, setMonth] = React.useState(getMonthOfDate(selectedDate))
-  const [selectedDay, setSelectedDay] = React.useState(selectedDate)
-
-  useEffect(() => {
-    setMonth(getMonthOfDate(selectedDay))
-  }, [selectedDay])
-
-  const getDay = (str: IsoDateString) => {
-    return toDate(new Date(str)).getDate()
-  }
-
-  const nextMonth = () => {
-    const currentDay = toDate(new Date(selectedDay))
-    const nextMonthDate = addMonths(currentDay, 1)
-    const newSelectedDate = formatISOLocale(nextMonthDate)
-    setMonth(getMonthOfDate(addMonths(new Date(month[0]), 1)))
-    setSelectedDay(newSelectedDate)
-    setSelectedDate(newSelectedDate)
-  }
-
-  const previousMonth = () => {
-    const currentDay = toDate(new Date(selectedDay))
-    const prevMonthDate = addMonths(currentDay, -1)
-    const newSelectedDate = formatISOLocale(prevMonthDate)
-    setMonth(getMonthOfDate(addMonths(new Date(month[0]), -1)))
-    setSelectedDay(newSelectedDate)
-    setSelectedDate(newSelectedDate)
-  }
-
-  const showToday = () => {
-    setSelectedDay(formatISOLocale(new Date()))
-    setSelectedDate(formatISOLocale(new Date()))
-  }
-
-  const handleDayClick = (day: IsoDateString) => {
-    setSelectedDay(day)
-    setSelectedDate(day)
-  }
-
-  const topFiller = () => {
-    const firstDayOfMonth = new Date(month[0])
-    const filler =
-      intervalToDuration({
-        start: startOfWeek(firstDayOfMonth, { weekStartsOn: 1 }),
-        end: firstDayOfMonth,
-      }).days || 0
-    return new Array(filler).fill(() => uniqueId(), 0, filler)
-  }
+  const { period: month, next, previous } = useCalendarNavigation(selectedDate, 'month')
+  const { selectedDay, selectDay, selectToday, isDaySelected } = useCalendarSelection(
+    selectedDate,
+    true,
+  )
+  const topFiller = useCalendarGridOffset(month[0])
 
   const weekDays = useMemo(() => {
     const dateLocale = getDateLocale(i18n.language)
@@ -151,7 +110,7 @@ export const CalendarMonthCompact: React.FC = () => {
         <button
           className="btn btn-ghost btn-sm btn-circle"
           aria-label={t('calendar.navigation.previousMonth', { defaultValue: 'Previous month' })}
-          onClick={() => previousMonth()}>
+          onClick={previous}>
           <LucideIcon icon={ChevronLeft} size={16} />
         </button>
         <div className="flex flex-col items-center">
@@ -165,7 +124,7 @@ export const CalendarMonthCompact: React.FC = () => {
         <button
           className="btn btn-ghost btn-sm btn-circle"
           aria-label={t('calendar.navigation.nextMonth', { defaultValue: 'Next month' })}
-          onClick={() => nextMonth()}>
+          onClick={next}>
           <LucideIcon icon={ChevronRight} size={16} />
         </button>
       </div>
@@ -175,7 +134,7 @@ export const CalendarMonthCompact: React.FC = () => {
           <button
             className="btn btn-ghost btn-xs"
             aria-label={t('common.time.today', { defaultValue: 'Today' })}
-            onClick={() => showToday()}>
+            onClick={selectToday}>
             {t('common.time.today', { defaultValue: 'Today' })}
           </button>
         </div>
@@ -191,12 +150,12 @@ export const CalendarMonthCompact: React.FC = () => {
 
       <AnimatePresence>
         <div className="grid w-full grid-cols-7 gap-1">
-          {topFiller().map((item) => (
+          {topFiller.map((item) => (
             <div key={item()} />
           ))}
           {month.map((day) => {
             const dayDate = new Date(day)
-            const isSelected = getDay(selectedDay) === getDay(day)
+            const isSelected = isDaySelected(day)
             const isTodayDate = isToday(dayDate)
 
             return (
@@ -205,7 +164,7 @@ export const CalendarMonthCompact: React.FC = () => {
                 day={day}
                 isSelected={isSelected}
                 isTodayDate={isTodayDate}
-                onDayClick={handleDayClick}
+                onDayClick={selectDay}
               />
             )
           })}

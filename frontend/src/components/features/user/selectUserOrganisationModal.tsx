@@ -17,12 +17,10 @@
  *
  */
 
-import { MODAL_SELECT_ORGANISATION } from 'components/features/user/selectUserOrganisation'
 import { Heading } from 'components/primitives/typography/Heading'
 import { CardSmall } from 'components/ui/cards/CardSmall'
 import { AvatarOrganisation } from 'components/ui/data-display/avatar/avatarOrganisation'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
-import useModal from 'components/ui/overlays/modal/hooks/useModal'
 import { noop } from 'es-toolkit'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { ModelsEntityReference, ModelsUserOrganisation } from 'lib/api/lasius'
@@ -34,20 +32,24 @@ import React from 'react'
 
 type Props = {
   onSelect?: (organisation: ModelsEntityReference) => void
+  onClose?: () => void
   selected?: ModelsEntityReference
 }
 
-export const SelectUserOrganisationModal: React.FC<Props> = ({ selected, onSelect = noop }) => {
+export const SelectUserOrganisationModal: React.FC<Props> = ({
+  selected,
+  onSelect = noop,
+  onClose = noop,
+}) => {
   const { t } = useTranslation('common')
   const { selectedOrganisationId, organisations, setSelectedOrganisation } = useOrganisation()
-  const { closeModal } = useModal(MODAL_SELECT_ORGANISATION)
   const plausible = usePlausible<LasiusPlausibleEvents>()
 
   const selectOrganisation = async (orgReference: ModelsEntityReference) => {
     plausible('organisation', { props: { status: 'selected' } })
     await setSelectedOrganisation(orgReference)
     onSelect(orgReference)
-    closeModal()
+    onClose()
   }
 
   const isCurrent = (item: ModelsUserOrganisation) => {

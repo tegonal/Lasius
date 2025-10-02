@@ -25,11 +25,11 @@ import { nivoTheme } from 'components/ui/charts/nivoTheme'
 import { line } from 'd3-shape'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
-import { nivoPalette } from 'styles/colors'
 import { NivoChartDataType } from 'types/common'
 
 import { TooltipContainer, TooltipItem } from './shared/chartTooltips'
 import { getContrastLabelTextColor } from './shared/chartUtils'
+import { useNivoColors } from './shared/getConsistentColor'
 
 const Line =
   (props: { category: string; value: number }[]) =>
@@ -61,6 +61,7 @@ type Props = {
 
 const BarsHours: React.FC<Props> = ({ stats, indexBy, groupMode }) => {
   const { t } = useTranslation('common')
+  const nivoColors = useNivoColors()
   const { data, keys, ceilingData } = stats
   if (!data) return null
   return (
@@ -69,7 +70,7 @@ const BarsHours: React.FC<Props> = ({ stats, indexBy, groupMode }) => {
       keys={keys}
       indexBy={indexBy}
       theme={nivoTheme}
-      colors={nivoPalette}
+      colors={nivoColors}
       groupMode={groupMode}
       margin={{ top: 25, right: 30, bottom: 60, left: 60 }}
       padding={0.3}

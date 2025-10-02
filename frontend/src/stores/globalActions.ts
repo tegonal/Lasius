@@ -28,7 +28,6 @@ import { useUIStore } from './uiStore'
  */
 export const resetAllStores = () => {
   // Reset UI store
-  useUIStore.getState().clearModals()
   useUIStore.getState().clearToasts()
   useUIStore.getState().clearTabs()
   useUIStore.getState().closeContextMenu()

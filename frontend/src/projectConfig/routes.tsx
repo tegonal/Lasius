@@ -23,7 +23,6 @@ import {
   Clock,
   FileText,
   Folder,
-  FolderCog,
   Lock,
   LucideIcon,
   PieChart,
@@ -42,7 +41,7 @@ const t = (key: string, _options?: { defaultValue?: string }) => key
 export const ROUTES = {
   USER: {
     INDEX: '/user/home',
-    SUMMARY: '/user/summary',
+    DASHBOARD: '/user/dashboard',
     STATS: '/user/stats',
     LISTS: '/user/lists',
     PROJECTS: '/user/projects',
@@ -89,14 +88,14 @@ export const NAVIGATION: NavigationType = [
         icon: Timer,
       },
       {
+        route: ROUTES.USER.DASHBOARD,
+        name: t('common.dashboard', { defaultValue: 'Dashboard' }),
+        icon: Calendar,
+      },
+      {
         route: ROUTES.USER.PROJECTS,
         name: t('projects.myProjects', { defaultValue: 'My projects' }),
         icon: Folder,
-      },
-      {
-        route: ROUTES.USER.SUMMARY,
-        name: t('common.summary', { defaultValue: 'Summary' }),
-        icon: Calendar,
       },
       {
         route: ROUTES.USER.STATS,
@@ -114,29 +113,29 @@ export const NAVIGATION: NavigationType = [
     level: 'organisation',
     component: <NavigationTabContent branch="organisation" />,
     icon: Users,
-    name: t('navigation.viewOrganisations', { defaultValue: 'View organisations and manage them' }),
+    name: t('navigation.currentOrganisation', { defaultValue: 'Current organisation' }),
     routes: [
       {
         route: ROUTES.ORGANISATION.CURRENT,
-        name: t('organisations.currentOrganisation', { defaultValue: 'Current organisation' }),
+        name: t('organisation.title', { defaultValue: 'Organisation' }),
         icon: Users,
       },
       {
         route: ROUTES.ORGANISATION.PROJECTS,
-        name: t('projects.allProjects', { defaultValue: 'All projects' }),
-        icon: FolderCog,
-        restrictTo: [ROLES.ORGANISATION_ADMIN],
-      },
-      {
-        route: ROUTES.ORGANISATION.LISTS,
-        name: t('lists.title', { defaultValue: 'Lists' }),
-        icon: FileText,
+        name: t('projects.title', { defaultValue: 'Projects' }),
+        icon: Folder,
         restrictTo: [ROLES.ORGANISATION_ADMIN],
       },
       {
         route: ROUTES.ORGANISATION.STATS,
         name: t('statistics.title', { defaultValue: 'Statistics' }),
         icon: PieChart,
+        restrictTo: [ROLES.ORGANISATION_ADMIN],
+      },
+      {
+        route: ROUTES.ORGANISATION.LISTS,
+        name: t('lists.title', { defaultValue: 'Lists' }),
+        icon: FileText,
         restrictTo: [ROLES.ORGANISATION_ADMIN],
       },
     ],

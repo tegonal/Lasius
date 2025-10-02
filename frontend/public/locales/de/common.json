@@ -67,7 +67,6 @@
     "secureAndPrivate": "Sicher & Privat",
     "signIn": "Anmelden",
     "signInTitle": "Bei deinem Konto anmelden",
-    "signInToContinue": "Anmelden, um fortzufahren",
     "signInToLasius": "Bei Lasius anmelden",
     "tagline": "Open-Source Zeiterfassung für moderne Teams",
     "thankYouForRegistering": "Danke für deine Registrierung! Du kannst dich jetzt mit deiner E-Mail-Adresse und deinem Passwort anmelden. Willkommen bei Lasius!",
@@ -103,14 +102,19 @@
       "useEndTimeOfPrevious": "Endzeit der vorherigen Buchung als Startzeit für diese verwenden",
       "useStartTimeOfNext": "Startzeit der nächsten Buchung als Endzeit für diese verwenden"
     },
+    "history": {
+      "empty": "Keine Buchungen für die ausgewählten Filter gefunden"
+    },
     "overlapsWarning": "Diese beiden Buchungen überlappen sich. Klicke, um die obere zu bearbeiten und die Zeit anzupassen.",
     "presets": {
       "browse": "Vorlagen durchsuchen",
+      "empty": "Keine Vorlagen verfügbar",
       "favorites": "Favoriten",
       "recent": "Letzte Buchungen",
       "team": "Team-Buchungen",
       "title": "Eine Vorlage wählen"
     },
+    "showLists": "Show bookings",
     "status": {
       "added": "Buchung hinzugefügt",
       "currentlyNotBooking": "Derzeit keine Buchung aktiv",
@@ -134,7 +138,8 @@
   },
   "charts": {
     "errors": {
-      "invalidData": "Ungültige Daten"
+      "invalidData": "Ungültige Daten",
+      "noData": "No data available"
     },
     "noData": {
       "month": "Keine Buchungsdaten für diesen Monat"
@@ -142,10 +147,15 @@
   },
   "common": {
     "actions": {
+      "actions": "Actions",
+      "add": "Add",
       "cancel": "Abbrechen",
       "close": "Schließen",
+      "delete": "Delete",
+      "discardChanges": "Discard changes",
       "help": "Hilfe",
       "invite": "Einladen",
+      "keepEditing": "Keep editing",
       "reset": "Zurücksetzen",
       "resetToInitial": "Auf ursprünglichen Wert zurücksetzen",
       "save": "Speichern",
@@ -153,9 +163,13 @@
       "signUp": "Registrieren"
     },
     "back": "Zurück",
+    "confirmUnsavedChanges": "You have unsaved changes. Are you sure you want to cancel?",
     "custom": "Benutzerdefiniert",
+    "dashboard": "Dashboard",
     "date": "Datum",
+    "email": "Email",
     "errors": {
+      "generic": "Something went wrong",
       "helpNotAvailable": "Hilfeinhalt für diese Seite nicht verfügbar.",
       "internalServerError": "Interner Serverfehler",
       "pageNotFound": "Seite nicht gefunden",
@@ -165,6 +179,7 @@
     "filter": {
       "title": "Filter"
     },
+    "firstName": "Vorname",
     "formats": {
       "dateFormat": "TT.MM.JJJJ",
       "durationFormat": "HH:MM",
@@ -181,8 +196,11 @@
       "password": "Passwort",
       "role": "Rolle"
     },
+    "info": {
+      "helpFallbackLanguage": "This help content is not available in your selected language yet. Showing English version."
+    },
+    "lastName": "Nachname",
     "name": "Name",
-    "noData": "Keine Daten verfügbar",
     "ok": "Ok",
     "or": "oder",
     "roles": {
@@ -195,7 +213,6 @@
       "inactive": "Inaktiv",
       "label": "Status"
     },
-    "summary": "Zusammenfassung",
     "themes": {
       "dark": "Dunkel",
       "light": "Hell",
@@ -204,6 +221,7 @@
     },
     "time": {
       "date": "Datum",
+      "day": "Tag",
       "duration": "Dauer",
       "ends": "Endet",
       "from": "Von",
@@ -212,6 +230,7 @@
       "lastQuarter": "Letztes Quartal",
       "lastWeek": "Letzte Woche",
       "lastYear": "Letztes Jahr",
+      "month": "Monat",
       "selectRange": "Zeitbereich auswählen",
       "setCustom": "Benutzerdefinierte Zeit festlegen",
       "starts": "Beginnt",
@@ -223,10 +242,8 @@
       "to": "Bis",
       "today": "Heute",
       "week": "Woche",
-      "weekday": "Wochentag",
       "yesterday": "Gestern"
     },
-    "total": "Gesamt",
     "units": {
       "hours": "Stunden"
     },
@@ -235,7 +252,6 @@
       "emailInvalid": "Muss eine gültige E-Mail-Adresse sein",
       "endBeforeStart": "Endzeit liegt vor der Startzeit",
       "fromMustBeBeforeTo": "Muss vor dem \"Bis\"-Datum liegen",
-      "invalidDuration": "Ungültige Dauer",
       "missingNumber": "Fehlende Zahl",
       "missingSpecialChar": "Fehlendes Sonderzeichen",
       "missingUppercase": "Fehlender Großbuchstabe",
@@ -271,14 +287,16 @@
       "excel": "Excel (.xlsx)",
       "ods": "OpenDocument (.ods)"
     },
-    "getBillingReports": "Abrechnungsberichte erhalten",
-    "projectDescription": "Exportiere alle Buchungen für {{project}}. Dies umfasst Zeit, die von allen Benutzern gebucht wurde, auch denen, die nicht Teil deiner Organisation sind."
+    "status": {
+      "success": "Export successful: {{filename}}"
+    }
   },
   "favorites": {
     "actions": {
       "add": "Als Favorit hinzufügen",
       "delete": "Favorit löschen"
     },
+    "empty": "Noch keine Favoriten",
     "status": {
       "removed": "Favorit entfernt"
     }
@@ -326,20 +344,26 @@
   "members": {
     "actions": {
       "invite": "Jemanden einladen",
-      "manage": "Mitglieder verwalten"
+      "manage": "Mitglieder verwalten",
+      "remove": "Mitglied entfernen"
     },
     "confirmations": {
-      "remove": "Bist du sicher, dass du dieses Mitglied entfernen möchtest?"
+      "removeConfirm": "Bist du sicher, dass du {{name}} entfernen möchtest?",
+      "removeTitle": "Mitglied entfernen",
+      "removeWarning": "Dieses Mitglied wird aus der Organisation entfernt und verliert den Zugriff auf alle Projekte."
     },
-    "title": "Mitglieder"
+    "empty": "Keine Mitglieder gefunden"
   },
   "navigation": {
-    "viewOrganisations": "Organisationen anzeigen und verwalten",
+    "currentOrganisation": "Aktuelle Organisation",
     "yourTimeBookingView": "Deine Zeitbuchungsansicht"
   },
   "of": "von",
   "offline": {
     "message": "Du bist offline. Diese Anwendung erfordert eine Internetverbindung. Sie wird automatisch aktualisiert, sobald eine Netzwerkverbindung erkannt wird."
+  },
+  "organisation": {
+    "title": "Organisation"
   },
   "organisations": {
     "actions": {
@@ -351,7 +375,9 @@
     "createDescription": "Füge eine neue Organisation hinzu, indem du auf die Schaltfläche unten klickst.",
     "currentOrganisation": "Aktuelle Organisation",
     "memberDescription": "Du bist Mitglied dieser Organisation und hast keine Berechtigung, Mitglieder hinzuzufügen oder zu entfernen. Wende dich an einen Organisationsadministrator, wenn du jemanden einladen möchtest.",
+    "members": "Mitglieder",
     "myPersonalOrganisation": "Meine persönliche Organisation",
+    "organisationName": "Organisation",
     "organisationRole": "Organisationsrolle",
     "organization": "Organisation",
     "organizationName": "Organisationsname",
@@ -365,6 +391,7 @@
   },
   "projects": {
     "actions": {
+      "backToProjects": "Zurück zu Projekten",
       "create": "Ein Projekt erstellen",
       "deactivate": "Projekt deaktivieren",
       "edit": "Projekt bearbeiten",
@@ -374,14 +401,29 @@
     "allProjectsDescription": "Alle Projekte in der aktuellen Organisation, die du verwalten kannst. Erstelle Abrechnungsberichte einschließlich der Zeit, die von externen Projektmitgliedern gebucht wurde.",
     "confirmations": {
       "deactivate": "Bist du sicher, dass du dieses Projekt deaktivieren möchtest?",
+      "deactivateInstructions": "Gib zur Bestätigung den Projektnamen unten ein:",
+      "deactivateTitle": "Projekt deaktivieren",
+      "deactivateWarning": "Diese Aktion kann nicht rückgängig gemacht werden. Das Projekt wird dauerhaft archiviert und alle Benutzerzuweisungen werden entfernt. Du kannst dieses Projekt nicht wieder aktivieren.",
       "leave": "Bist du sicher, dass du dieses Projekt verlassen möchtest?"
     },
+    "deactivatedBy": "Archiviert von {{user}}",
+    "empty": "Keine Projekte gefunden",
+    "errors": {
+      "projectNotFound": "Dieses Projekt konnte nicht gefunden werden. Die Projekt-ID wird oben angezeigt."
+    },
+    "filter": {
+      "both": "Beide",
+      "status": "Status"
+    },
     "label": "Projekt",
+    "lastActivity": "Last activity",
     "members": {
       "title": "Projektmitglieder"
     },
     "myProjects": "Meine Projekte",
     "myProjectsDescription": "Projekte, in denen du Mitglied bist und Zeit buchen kannst. Eingeschränkt durch die aktuell ausgewählte Organisation.",
+    "name": "Projektname",
+    "noActivity": "No activity",
     "project": "Projekt",
     "projectName": "Projektname",
     "projectRole": "Rolle",
@@ -390,11 +432,21 @@
       "assignedToUser": "Projekt erfolgreich an Benutzer zugewiesen.",
       "updated": "Projekt aktualisiert"
     },
-    "title": "Projekte"
+    "title": "Projekte",
+    "total": "Total",
+    "warnings": {
+      "inactiveProjectContext": "Statistiken von inaktivem Projekt werden angezeigt",
+      "inactiveProjectFilter": "Daten für inaktives Projekt werden angezeigt",
+      "projectNotInActiveList": "Dieses Projekt ist nicht in deiner Liste aktiver Projekte. Es könnte inaktiv sein oder aus einer anderen Organisation stammen.",
+      "projectUnavailable": "Dieses Projekt ist nicht mehr in deinem Profil vorhanden. Du wurdest möglicherweise daraus entfernt."
+    }
   },
   "pwa": {
     "reloadApplication": "Anwendung neu laden",
     "updateMessage": "Lasius wurde aktualisiert. Die Seite wird nach deiner Bestätigung neu geladen."
+  },
+  "search": {
+    "empty": "Keine Ergebnisse gefunden"
   },
   "settings": {
     "app": {
@@ -408,10 +460,15 @@
   },
   "statistics": {
     "expectedHours": "Erwartete Stunden",
+    "noProjectsForDay": "No projects for this day",
+    "noProjectsForWeek": "No projects for this week",
     "percentOfPlannedHours": "% der geplanten Stunden",
     "showStatistics": "Statistiken anzeigen",
     "title": "Statistiken",
     "weeklyHoursDistribution": "Wöchentliche Stundenverteilung"
+  },
+  "stats": {
+    "empty": "Keine Daten für den ausgewählten Zeitraum verfügbar"
   },
   "system": {
     "backendUnreachable": "Backend scheint nicht erreichbar zu sein",
@@ -422,24 +479,38 @@
   },
   "tags": {
     "actions": {
+      "add": "Add tags",
       "addDefaultTagGroups": "Standard-Tag-Gruppen hinzufügen",
+      "addTag": "Add a tag",
       "addTagGroup": "Eine neue Tag-Gruppe hinzufügen",
+      "collapseAll": "Collapse all",
+      "copyTags": "Copy tags",
       "createTagGroup": "Tag-Gruppe erstellen",
-      "edit": "Tags bearbeiten"
+      "edit": "Tags bearbeiten",
+      "editForProject": "Edit tags for {{projectKey}}",
+      "expandAll": "Expand all",
+      "pasteTags": "Paste tags"
     },
     "chooseOrEnter": "Tags auswählen oder eingeben",
+    "confirmDeleteGroup": "Are you sure you want to delete the tag group \"{{groupName}}\"?",
     "customTag": "Benutzerdefinierter Tag",
-    "description": {
-      "tagGroups": "Tag-Gruppen ermöglichen die einfache Filterung einer großen Anzahl von Buchungen, ohne dass Benutzer viel über Tagging-Regeln nachdenken müssen. Beim Hinzufügen einer Buchung kann ein Benutzer die Tag-Gruppe wählen und im Wesentlichen mehrere Tags gleichzeitig hinzufügen."
-    },
+    "enterTagName": "Enter tag name",
     "enterToAdd": "Gib einen Tag ein, um ihn hinzuzufügen",
     "label": "Tags",
+    "noTagGroups": "No tag groups defined yet",
     "simpleTags": "Einfache Tags",
+    "simpleTagsDescription": "Tags that are not part of any group",
+    "status": {
+      "tagsCopied": "Tags copied",
+      "tagsPasted": "Tags pasted"
+    },
     "tagGroups": "Tag-Gruppen",
     "title": "Tags",
     "validation": {
-      "nameRequired": "Tag-Gruppenname ist erforderlich",
-      "tagGroupExists": "Tag-Gruppe existiert bereits"
+      "tagExists": "Tag already exists",
+      "tagGroupExists": "Tag-Gruppe existiert bereits",
+      "tagGroupNameRequired": "Tag group name is required",
+      "tagNameRequired": "Tag name is required"
     }
   },
   "tos": {
@@ -466,6 +537,20 @@
       "error": "Kann nicht mit Websocket verbinden"
     }
   },
+  "workHealth": {
+    "actualHours": "Actual Hours",
+    "avgPerDay": "avg/day",
+    "consecutiveDays": "consecutive days",
+    "elevatedLoad": "Load is elevated",
+    "healthyLoad": "Looking good!",
+    "highLoad": "Heavy load detected",
+    "plannedHours": "Planned Hours",
+    "relaxReminder": "Time to relax a little bit",
+    "sixMonths": "6 Months",
+    "sixMonthTrend": "6-Month Work Trend",
+    "takeItEasy": "Consider taking it easy",
+    "thisWeek": "this week"
+  },
   "workingHours": {
     "clickToAdjustHours": "Klicke auf einen beliebigen Tag in den Organisationskarten unten, um die Stunden anzupassen",
     "dailyTotal": "Täglich gesamt",
@@ -478,7 +563,7 @@
     "status": {
       "updated": "Arbeitszeiten aktualisiert"
     },
-    "summary": "Zusammenfassung",
+    "summary": "Überblick",
     "title": "Arbeitszeiten",
     "totalHoursDescription": "Gesamtstunden über alle Organisationen",
     "totalPerWeek": "gesamt pro Woche",

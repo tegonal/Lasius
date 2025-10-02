@@ -23,7 +23,6 @@ import { FormatDate } from 'components/ui/data-display/FormatDate'
 import { useToast } from 'components/ui/feedback/hooks/useToast'
 import { TimeDropdownWithModal } from 'components/ui/overlays/TimeDropdownModal'
 import { round } from 'es-toolkit'
-import { useGetWeeklyPlannedWorkingHoursAggregate } from 'lib/api/hooks/useGetWeeklyPlannedWorkingHoursAggregate'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { ModelsUserOrganisation } from 'lib/api/lasius'
 import { updateWorkingHoursByOrganisation } from 'lib/api/lasius/user-organisations/user-organisations'
@@ -44,7 +43,6 @@ import { useIsClient } from 'usehooks-ts'
 export const WorkingHoursGrid: React.FC = () => {
   const { t } = useTranslation('common')
   const { organisations } = useOrganisation()
-  const { allOrganisationsWorkingHours } = useGetWeeklyPlannedWorkingHoursAggregate()
   const isClient = useIsClient()
   const { mutate } = useSWRConfig()
   const { addToast } = useToast()
@@ -94,12 +92,7 @@ export const WorkingHoursGrid: React.FC = () => {
     }
   }
 
-  // Calculate totals
-  const calculateOrgTotal = (org: ModelsUserOrganisation): number => {
-    const hours = org.plannedWorkingHours || plannedWorkingHoursStub
-    return Object.values(hours).reduce((sum, h) => sum + h, 0)
-  }
-
+  // Calculate daily totals
   const calculateDayTotal = (day: ModelsWorkingHoursWeekdays): number => {
     return (
       organisations?.reduce((sum, org) => {
@@ -108,8 +101,6 @@ export const WorkingHoursGrid: React.FC = () => {
       }, 0) || 0
     )
   }
-
-  const grandTotal = Object.values(allOrganisationsWorkingHours).reduce((sum, h) => sum + h, 0)
 
   return (
     <Card>
@@ -130,8 +121,9 @@ export const WorkingHoursGrid: React.FC = () => {
                     <th
                       key={day.key}
                       className={cn(
-                        'border-base-300 border-r border-b p-2 text-center',
+                        'border-base-300 border-b p-2 text-left',
                         isWeekend && 'bg-base-200/30',
+                        day.key !== 'sunday' && 'border-r',
                       )}>
                       <div className="text-sm font-medium">
                         <FormatDate date={day.date} format="dayNameShort" />
@@ -139,12 +131,6 @@ export const WorkingHoursGrid: React.FC = () => {
                     </th>
                   )
                 })}
-
-                <th className="border-base-300 bg-primary/5 border-b p-2 text-center">
-                  <div className="text-primary text-sm font-semibold">
-                    {t('common.total', { defaultValue: 'Total' })}
-                  </div>
-                </th>
               </tr>
             </thead>
 
@@ -176,9 +162,10 @@ export const WorkingHoursGrid: React.FC = () => {
                       <td
                         key={day.key}
                         className={cn(
-                          'border-base-300 relative border-r p-1 text-center transition-colors',
+                          'border-base-300 relative p-1 text-left transition-colors',
                           isWeekend && 'bg-base-200/20',
                           'hover:bg-base-200/40',
+                          day.key !== 'sunday' && 'border-r',
                         )}>
                         <TimeDropdownWithModal
                           value={hours}
@@ -196,12 +183,6 @@ export const WorkingHoursGrid: React.FC = () => {
                       </td>
                     )
                   })}
-
-                  <td className="bg-primary/5 p-2 text-center">
-                    <span className="text-primary font-semibold">
-                      {decimalHoursToDurationStringRounded(calculateOrgTotal(org))}
-                    </span>
-                  </td>
                 </tr>
               ))}
 
@@ -218,20 +199,16 @@ export const WorkingHoursGrid: React.FC = () => {
                     <td
                       key={day.key}
                       className={cn(
-                        'border-base-300 border-t border-r p-2 text-center',
+                        'border-base-300 border-t text-left',
                         isWeekend && 'bg-base-200/30',
+                        day.key !== 'sunday' && 'border-r',
                       )}>
-                      <span className="text-sm font-semibold">
+                      <span className="inline-block px-3 py-1 text-sm font-semibold">
                         {dayTotal > 0 ? decimalHoursToDurationStringRounded(dayTotal) : '—'}
                       </span>
                     </td>
                   )
                 })}
-                <td className="border-base-300 bg-primary/10 border-t p-2 text-center">
-                  <span className="text-primary text-lg font-bold">
-                    {decimalHoursToDurationStringRounded(grandTotal)}
-                  </span>
-                </td>
               </tr>
             </tbody>
           </table>

@@ -21,75 +21,81 @@ import { ContextButtonClose } from 'components/features/contextMenu/buttons/cont
 import { ContextButtonDeactivateProject } from 'components/features/contextMenu/buttons/contextButtonDeactivateProject'
 import { ContextButtonLeaveProject } from 'components/features/contextMenu/buttons/contextButtonLeaveProject'
 import { ContextButtonOpen } from 'components/features/contextMenu/buttons/contextButtonOpen'
+import { ContextAnimatePresence } from 'components/features/contextMenu/contextAnimatePresence'
 import { ContextBar } from 'components/features/contextMenu/contextBar'
 import { ContextBarDivider } from 'components/features/contextMenu/contextBarDivider'
-import { ContextCompactAnimatePresence } from 'components/features/contextMenu/contextCompactAnimatePresence'
-import { ContextCompactBody } from 'components/features/contextMenu/contextCompactBody'
-import { ContextCompactButtonWrapper } from 'components/features/contextMenu/contextCompactButtonWrapper'
+import { ContextBody } from 'components/features/contextMenu/contextBody'
+import { ContextButtonWrapper } from 'components/features/contextMenu/contextButtonWrapper'
 import { useContextMenu } from 'components/features/contextMenu/hooks/useContextMenu'
 import { ManageProjectMembers } from 'components/features/projects/manageMembers'
 import { ProjectAddUpdateForm } from 'components/features/projects/projectAddUpdateForm'
 import { ProjectAddUpdateTagsForm } from 'components/features/projects/projectAddUpdateTagsForm'
-import { ProjectBookingsExport } from 'components/features/projects/projectBookingsExport'
 import { Button } from 'components/primitives/buttons/Button'
 import { FormElement } from 'components/ui/forms/FormElement'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
-import useModal from 'components/ui/overlays/modal/hooks/useModal'
-import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
+import { Modal } from 'components/ui/overlays/modal/Modal'
 import { AnimatePresence } from 'framer-motion'
 import { ModelsUserProject } from 'lib/api/lasius'
-import { FileText, Pencil, PieChart, Tags, Users } from 'lucide-react'
+import { List, Pencil, PieChart, Tags, Users } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
-import React from 'react'
+import { useRouter } from 'next/router'
+import React, { useState } from 'react'
 
 type Props = {
   item: ModelsUserProject
 }
 
 export const MyProjectsListItemAdministratorContext: React.FC<Props> = ({ item }) => {
-  const updateModal = useModal(`EditProjectModal-${item.projectReference.id}`)
-  const manageModal = useModal(`ManageProjectMembersModal-${item.projectReference.id}`)
-  const statsModal = useModal(`StatsModal-${item.projectReference.id}`)
-  const exportModal = useModal(`ExportModal-${item.projectReference.id}`)
-  const tagModal = useModal(`TagModal-${item.projectReference.id}`)
+  const [isUpdateOpen, setIsUpdateOpen] = useState(false)
+  const [isManageOpen, setIsManageOpen] = useState(false)
+  const [isTagOpen, setIsTagOpen] = useState(false)
   const { handleCloseAll, currentOpenContextMenuId } = useContextMenu()
+  const router = useRouter()
 
   const { t } = useTranslation('common')
 
+  const handleUpdateClose = () => setIsUpdateOpen(false)
+  const handleManageClose = () => setIsManageOpen(false)
+  const handleTagClose = () => setIsTagOpen(false)
+
   const showStats = () => {
-    statsModal.openModal()
+    router.push(
+      `/user/stats?projectId=${item.projectReference.id}&projectName=${encodeURIComponent(item.projectReference.key)}`,
+    )
     handleCloseAll()
   }
 
-  const showExport = () => {
-    exportModal.openModal()
+  const showLists = () => {
+    router.push(
+      `/user/lists?projectId=${item.projectReference.id}&projectName=${encodeURIComponent(item.projectReference.key)}`,
+    )
     handleCloseAll()
   }
 
   const manageMembers = () => {
-    manageModal.openModal()
+    setIsManageOpen(true)
     handleCloseAll()
   }
 
   const manageTags = () => {
-    tagModal.openModal()
+    setIsTagOpen(true)
     handleCloseAll()
   }
 
   const updateProject = () => {
-    updateModal.openModal()
+    setIsUpdateOpen(true)
     handleCloseAll()
   }
 
   return (
     <>
-      <ContextCompactBody>
+      <ContextBody variant="compact">
         <ContextButtonOpen hash={item.projectReference.id} />
         <AnimatePresence>
           {currentOpenContextMenuId === item.projectReference.id && (
-            <ContextCompactAnimatePresence>
+            <ContextAnimatePresence variant="compact">
               <ContextBar>
-                <ContextCompactButtonWrapper>
+                <ContextButtonWrapper variant="compact">
                   <Button
                     variant="contextIcon"
                     title={t('members.actions.manage', { defaultValue: 'Manage members' })}
@@ -99,8 +105,19 @@ export const MyProjectsListItemAdministratorContext: React.FC<Props> = ({ item }
                     shape="circle">
                     <LucideIcon icon={Users} size={24} />
                   </Button>
-                </ContextCompactButtonWrapper>
-                <ContextCompactButtonWrapper>
+                </ContextButtonWrapper>
+                <ContextButtonWrapper variant="compact">
+                  <Button
+                    variant="contextIcon"
+                    title={t('bookings.showLists', { defaultValue: 'Show bookings' })}
+                    aria-label={t('bookings.showLists', { defaultValue: 'Show bookings' })}
+                    onClick={() => showLists()}
+                    fullWidth={false}
+                    shape="circle">
+                    <LucideIcon icon={List} size={24} />
+                  </Button>
+                </ContextButtonWrapper>
+                <ContextButtonWrapper variant="compact">
                   <Button
                     variant="contextIcon"
                     title={t('statistics.showStatistics', { defaultValue: 'Show statistics' })}
@@ -110,23 +127,8 @@ export const MyProjectsListItemAdministratorContext: React.FC<Props> = ({ item }
                     shape="circle">
                     <LucideIcon icon={PieChart} size={24} />
                   </Button>
-                </ContextCompactButtonWrapper>
-                <ContextCompactButtonWrapper>
-                  <Button
-                    variant="contextIcon"
-                    title={t('export.getBillingReports', {
-                      defaultValue: 'Get billing reports',
-                    })}
-                    aria-label={t('export.getBillingReports', {
-                      defaultValue: 'Get billing reports',
-                    })}
-                    onClick={() => showExport()}
-                    fullWidth={false}
-                    shape="circle">
-                    <LucideIcon icon={FileText} size={24} />
-                  </Button>
-                </ContextCompactButtonWrapper>
-                <ContextCompactButtonWrapper>
+                </ContextButtonWrapper>
+                <ContextButtonWrapper variant="compact">
                   <Button
                     variant="contextIcon"
                     title={t('projects.actions.edit', { defaultValue: 'Edit project' })}
@@ -136,8 +138,8 @@ export const MyProjectsListItemAdministratorContext: React.FC<Props> = ({ item }
                     shape="circle">
                     <LucideIcon icon={Pencil} size={24} />
                   </Button>
-                </ContextCompactButtonWrapper>
-                <ContextCompactButtonWrapper>
+                </ContextButtonWrapper>
+                <ContextButtonWrapper variant="compact">
                   <Button
                     variant="contextIcon"
                     title={t('tags.actions.edit', { defaultValue: 'Edit tags' })}
@@ -147,60 +149,40 @@ export const MyProjectsListItemAdministratorContext: React.FC<Props> = ({ item }
                     shape="circle">
                     <LucideIcon icon={Tags} size={24} />
                   </Button>
-                </ContextCompactButtonWrapper>
+                </ContextButtonWrapper>
                 <ContextButtonDeactivateProject item={item} variant="compact" />
                 <ContextButtonLeaveProject item={item} variant="compact" />
                 <ContextBarDivider />
                 <ContextButtonClose variant="compact" />
               </ContextBar>
-            </ContextCompactAnimatePresence>
+            </ContextAnimatePresence>
           )}
         </AnimatePresence>
-      </ContextCompactBody>
-      <ModalResponsive modalId={updateModal.modalId}>
+      </ContextBody>
+      <Modal open={isUpdateOpen} onClose={handleUpdateClose}>
         <ProjectAddUpdateForm
           mode="update"
           item={item}
-          onSave={updateModal.closeModal}
-          onCancel={updateModal.closeModal}
+          onSave={handleUpdateClose}
+          onCancel={handleUpdateClose}
         />
-      </ModalResponsive>
-      <ModalResponsive modalId={tagModal.modalId} autoSize>
+      </Modal>
+      <Modal open={isTagOpen} onClose={handleTagClose} size="wide">
         <ProjectAddUpdateTagsForm
           mode="update"
           item={item}
-          onSave={tagModal.closeModal}
-          onCancel={tagModal.closeModal}
+          onSave={handleTagClose}
+          onCancel={handleTagClose}
         />
-      </ModalResponsive>
-      <ModalResponsive modalId={manageModal.modalId} autoSize>
-        <ManageProjectMembers
-          item={item}
-          onSave={manageModal.closeModal}
-          onCancel={manageModal.closeModal}
-        />
+      </Modal>
+      <Modal open={isManageOpen} onClose={handleManageClose} autoSize>
+        <ManageProjectMembers item={item} onSave={handleManageClose} onCancel={handleManageClose} />
         <FormElement>
-          <Button type="button" variant="secondary" onClick={manageModal.closeModal}>
+          <Button type="button" variant="secondary" onClick={handleManageClose}>
             {t('common.actions.cancel', { defaultValue: 'Cancel' })}
           </Button>
         </FormElement>
-      </ModalResponsive>
-      <ModalResponsive modalId={statsModal.modalId} autoSize>
-        <div>Placeholder</div>
-        <FormElement>
-          <Button type="button" variant="secondary" onClick={statsModal.closeModal}>
-            {t('common.actions.cancel', { defaultValue: 'Cancel' })}
-          </Button>
-        </FormElement>
-      </ModalResponsive>
-      <ModalResponsive modalId={exportModal.modalId} autoSize>
-        <ProjectBookingsExport item={item.projectReference} />
-        <FormElement>
-          <Button type="button" variant="secondary" onClick={exportModal.closeModal}>
-            {t('common.actions.cancel', { defaultValue: 'Cancel' })}
-          </Button>
-        </FormElement>
-      </ModalResponsive>
+      </Modal>
     </>
   )
 }

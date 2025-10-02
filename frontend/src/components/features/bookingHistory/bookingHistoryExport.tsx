@@ -48,7 +48,11 @@ export const BookingHistoryExport: React.FC<Props> = ({ bookings, context, from,
 
   return (
     <div className="dropdown dropdown-end">
-      <button type="button" className="btn btn-neutral" disabled={bookings.length < 1} tabIndex={0}>
+      <button
+        type="button"
+        className="btn btn-sm btn-neutral w-auto"
+        disabled={bookings.length < 1}
+        tabIndex={0}>
         <Download className="size-4" />
         {t('export.actions.export', { defaultValue: 'Export' })}
         <ChevronDown className="size-4" />

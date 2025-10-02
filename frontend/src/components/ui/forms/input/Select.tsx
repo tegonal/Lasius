@@ -100,18 +100,23 @@ export const Select: React.FC<SelectProps> = ({
                 className={({ active }) =>
                   cn(
                     'relative cursor-pointer py-2 pr-4 pl-10 select-none',
-                    active ? 'bg-primary/10 text-primary' : 'text-base-content',
+                    active
+                      ? 'bg-primary text-primary-content dark:bg-primary/10 dark:text-primary'
+                      : 'text-base-content',
                     option.disabled && 'cursor-not-allowed opacity-50',
                   )
                 }>
                 {({ selected }) => (
                   <>
                     <span
-                      className={cn('block truncate', selected ? 'font-medium' : 'font-normal')}>
+                      className={cn(
+                        'block truncate text-base',
+                        selected ? 'font-medium' : 'font-normal',
+                      )}>
                       {option.label}
                     </span>
                     {selected && (
-                      <span className="text-primary absolute inset-y-0 left-0 flex items-center pl-3">
+                      <span className="text-base-content absolute inset-y-0 left-0 flex items-center pl-3">
                         <LucideIcon icon={Check} size={20} aria-hidden="true" />
                       </span>
                     )}

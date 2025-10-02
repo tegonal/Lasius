@@ -17,28 +17,13 @@
  *
  */
 
-import { useContextMenu } from 'components/features/contextMenu/hooks/useContextMenu'
-import { ProjectAddUpdateForm } from 'components/features/projects/projectAddUpdateForm'
-import { Button } from 'components/primitives/buttons/Button'
-import { Divider } from 'components/primitives/divider/Divider'
 import { Heading } from 'components/primitives/typography/Heading'
 import { Text } from 'components/primitives/typography/Text'
-import { FormElement } from 'components/ui/forms/FormElement'
-import useModal from 'components/ui/overlays/modal/hooks/useModal'
-import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
 
 export const MyProjectsRightColumn: React.FC = () => {
   const { t } = useTranslation('common')
-
-  const { modalId, openModal, closeModal } = useModal('AddMyProjectModal')
-  const { handleCloseAll } = useContextMenu()
-
-  const addProject = () => {
-    openModal()
-    handleCloseAll()
-  }
 
   return (
     <div className="w-full px-6 pt-3">
@@ -51,15 +36,6 @@ export const MyProjectsRightColumn: React.FC = () => {
             'Projects where you are a member and can book time. Restricted by the currently selected organisation.',
         })}
       </Text>
-      <Divider className="my-4" />
-      <FormElement>
-        <Button onClick={() => addProject()}>
-          {t('projects.actions.create', { defaultValue: 'Create a project' })}
-        </Button>
-      </FormElement>
-      <ModalResponsive modalId={modalId}>
-        <ProjectAddUpdateForm mode="add" onSave={closeModal} onCancel={closeModal} />
-      </ModalResponsive>
     </div>
   )
 }

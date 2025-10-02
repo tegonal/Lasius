@@ -23,17 +23,18 @@
 import { ResponsiveBar } from '@nivo/bar'
 import { nivoTheme } from 'components/ui/charts/nivoTheme'
 import React from 'react'
-import { nivoPalette } from 'styles/colors'
 import { NivoChartDataType } from 'types/common'
 
 import { TooltipContainer, TooltipItem } from './shared/chartTooltips'
 import { getContrastLabelTextColor } from './shared/chartUtils'
+import { useNivoColors } from './shared/getConsistentColor'
 
 type Props = {
   stats: { data: NivoChartDataType | undefined }
 }
 
 const BarsTags: React.FC<Props> = ({ stats }) => {
+  const nivoColors = useNivoColors()
   const { data } = stats
   if (!data) return null
   return (
@@ -44,7 +45,7 @@ const BarsTags: React.FC<Props> = ({ stats }) => {
       layout="horizontal"
       enableGridX
       enableGridY={false}
-      colors={nivoPalette}
+      colors={nivoColors}
       margin={{ top: 60, right: 50, bottom: 60, left: 110 }}
       padding={0.3}
       valueScale={{ type: 'linear' }}

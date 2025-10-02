@@ -18,16 +18,19 @@
  */
 
 import { format, formatRelative, Locale } from 'date-fns'
-import { de, enUS } from 'date-fns/locale'
+import { de, enUS, es, fr, it } from 'date-fns/locale'
 import { DEFAULT_LOCALE } from 'lib/config/locales'
 
 /**
  * Map of locale codes to date-fns locale objects.
- * Supports 'de' (German) and 'en' (English US).
+ * Supports 'de' (German), 'en' (English US), 'fr' (French), 'it' (Italian), and 'es' (Spanish).
  */
 export const dateLocales: { [key: string]: Locale } = {
   de,
   en: enUS,
+  fr,
+  it,
+  es,
 }
 
 /**

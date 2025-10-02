@@ -17,24 +17,19 @@
  *
  */
 
-import { Heading } from 'components/primitives/typography/Heading'
-import { Text } from 'components/primitives/typography/Text'
+import { SettingsRightColumn } from 'components/features/settings/shared/SettingsRightColumn'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
 
 export const AccountRightColumn: React.FC = () => {
   const { t } = useTranslation('common')
   return (
-    <div className="w-full px-6 pt-3">
-      <Heading as="h2" variant="section">
-        {t('account.settings.title', { defaultValue: 'Account Settings' })}
-      </Heading>
-      <Text variant="infoText">
-        {t('account.settings.description', {
-          defaultValue:
-            'Manage your personal information and account details. Your email address can only be changed if you are using the internal authentication provider.',
-        })}
-      </Text>
-    </div>
+    <SettingsRightColumn
+      title={t('account.settings.title', { defaultValue: 'Account Settings' })}
+      description={t('account.settings.description', {
+        defaultValue:
+          'Manage your personal information and account details. Your email address can only be changed if you are using the internal authentication provider.',
+      })}
+    />
   )
 }

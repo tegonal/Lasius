@@ -19,7 +19,7 @@
 
 import { BarChartGroupMode } from 'components/ui/charts/barsHours'
 import { StatsTile } from 'components/ui/charts/statsTile'
-import { DataFetchEmpty } from 'components/ui/data-display/fetchState/dataFetchEmpty'
+import { EmptyStateStats } from 'components/ui/data-display/fetchState/emptyStateStats'
 import { Loading } from 'components/ui/data-display/fetchState/loading'
 import { apiDatespanFromTo } from 'lib/api/apiDateHandling'
 import { useGetUserStatsBySourceAndDay } from 'lib/api/hooks/useGetUserStatsBySourceAndDay'
@@ -60,7 +60,7 @@ export const StatsBarsBySource: React.FC<Props> = ({ source, groupMode }) => {
   if (!data) {
     return (
       <StatsTile className="h-[240px]">
-        <DataFetchEmpty />
+        <EmptyStateStats />
       </StatsTile>
     )
   }

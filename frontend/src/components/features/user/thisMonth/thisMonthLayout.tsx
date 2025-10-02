@@ -18,16 +18,23 @@
  */
 
 import { CalendarMonthCompact } from 'components/features/calendar/calendarMonthCompact'
-import { BookingAddButton } from 'components/features/user/index/bookingAddButton'
+import { WorkLoadIndicator } from 'components/features/user/index/workLoadIndicator'
 import { ThisMonthStats } from 'components/features/user/thisMonth/thisMonthStats'
+import { Divider } from 'components/primitives/divider/Divider'
 import { ColumnList } from 'components/primitives/layout/ColumnList'
 import { ScrollContainer } from 'components/primitives/layout/ScrollContainer'
 import { Heading } from 'components/primitives/typography/Heading'
+import { useGetBookingSummaryWeek } from 'lib/api/hooks/useGetbookingSummaryWeek'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
+import { useSelectedDate } from 'stores/calendarStore'
 
 export const ThisMonthLayout: React.FC = () => {
   const { t } = useTranslation('common')
+  const selectedDate = useSelectedDate()
+  const week = useGetBookingSummaryWeek(selectedDate)
+
+  // Pass selectedDate to ensure burnout indicator updates with calendar selection
 
   return (
     <>
@@ -40,7 +47,11 @@ export const ThisMonthLayout: React.FC = () => {
         <ColumnList>
           <Heading variant="section">{t('calendar.title', { defaultValue: 'Calendar' })}</Heading>
           <CalendarMonthCompact />
-          <BookingAddButton />
+          <Divider />
+          <WorkLoadIndicator
+            plannedWeeklyHours={week.plannedWorkingHours}
+            referenceDate={selectedDate}
+          />
         </ColumnList>
       </ScrollContainer>
     </>

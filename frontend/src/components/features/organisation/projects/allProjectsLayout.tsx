@@ -17,20 +17,41 @@
  *
  */
 
-import { AllProjectsList } from 'components/features/organisation/projects/allProjectsList'
+import {
+  AllProjectsList,
+  ProjectStatusFilter,
+} from 'components/features/organisation/projects/allProjectsList'
 import { AllProjectsRightColumn } from 'components/features/organisation/projects/allProjectsRightColumn'
+import { AllProjectsStats } from 'components/features/organisation/projects/allProjectsStats'
+import { ProjectAddUpdateForm } from 'components/features/projects/projectAddUpdateForm'
 import { ScrollContainer } from 'components/primitives/layout/ScrollContainer'
-import React from 'react'
+import { Modal } from 'components/ui/overlays/modal/Modal'
+import React, { useState } from 'react'
 
 export const AllProjectsLayout: React.FC = () => {
+  const [statusFilter, setStatusFilter] = useState<ProjectStatusFilter>('both')
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
+
+  const handleCreateClose = () => setIsCreateOpen(false)
+  const handleCreateOpen = () => setIsCreateOpen(true)
+
   return (
     <>
-      <ScrollContainer className="bg-base-100 flex-1 overflow-y-auto pt-4">
-        <AllProjectsList />
+      <ScrollContainer className="bg-base-100 flex-1 overflow-y-auto">
+        <AllProjectsStats onCreateProject={handleCreateOpen} />
+        <div className="px-4 pt-3">
+          <AllProjectsList statusFilter={statusFilter} />
+        </div>
       </ScrollContainer>
       <ScrollContainer className="bg-base-200 flex-1 overflow-y-auto rounded-tr-lg">
-        <AllProjectsRightColumn />
+        <AllProjectsRightColumn
+          statusFilter={statusFilter}
+          onStatusFilterChange={setStatusFilter}
+        />
       </ScrollContainer>
+      <Modal open={isCreateOpen} onClose={handleCreateClose}>
+        <ProjectAddUpdateForm mode="add" onSave={handleCreateClose} onCancel={handleCreateClose} />
+      </Modal>
     </>
   )
 }

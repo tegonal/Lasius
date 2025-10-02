@@ -21,11 +21,11 @@ import { Button } from 'components/primitives/buttons/Button'
 import { ScrollContainer } from 'components/primitives/layout/ScrollContainer'
 import { SelectedTabIcon } from 'components/ui/animations/motion/selectedTabIcon'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
+import { useTabSync } from 'components/ui/navigation/hooks/useTabSync'
 import { AnimatePresence, m } from 'framer-motion'
 import { cn } from 'lib/utils/cn'
 import { LucideIcon as LucideIconType } from 'lucide-react'
-import React, { useEffect, useId, useState } from 'react'
-import { useTabViews, useUIActions } from 'stores/uiStore'
+import React from 'react'
 
 const PresenceItem = m.div
 
@@ -44,30 +44,7 @@ type Props = {
 }
 
 export const IconTabs: React.FC<Props> = ({ tabs, position = 'top', initialTab = 0 }) => {
-  const tabViews = useTabViews()
-  const { setTabActive } = useUIActions()
-
-  const tabId = useId()
-
-  const [selected, setSelected] = useState(initialTab)
-
-  useEffect(() => {
-    if (!tabViews.find((tab) => tab.id === tabId)) {
-      setTabActive(tabId, initialTab)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  useEffect(() => {
-    const tabView = tabViews.find((tab) => tab.id === tabId)
-    if (tabView) {
-      setSelected(tabView.activeIndex)
-    }
-  }, [tabViews, tabId])
-
-  const handleTabClick = (index: number) => {
-    setTabActive(tabId, index)
-  }
+  const { selected, tabId, handleTabClick } = useTabSync(initialTab)
 
   return (
     <div
@@ -75,7 +52,7 @@ export const IconTabs: React.FC<Props> = ({ tabs, position = 'top', initialTab =
         position === 'top' ? 'grid-rows-[min-content_auto]' : 'grid-cols-[min-content_auto]'
       }`}>
       <div
-        className={`mx-2 flex pt-0 sm:mx-3 sm:pt-2 ${
+        className={`mr-2 flex pt-2 ${
           position === 'top'
             ? 'border-base-content/10 flex-row justify-center border-b'
             : 'border-base-content/10 flex-col justify-start gap-2 border-r'

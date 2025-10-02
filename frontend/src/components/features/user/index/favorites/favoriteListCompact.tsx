@@ -20,8 +20,8 @@
 import { FavoriteItem } from 'components/features/user/index/favorites/favoriteItem'
 import { FavoriteListWrapper } from 'components/features/user/index/favorites/favoriteListWrapper'
 import { AnimateList } from 'components/ui/animations/motion/animateList'
-import { DataFetchEmpty } from 'components/ui/data-display/fetchState/dataFetchEmpty'
 import { DataFetchValidates } from 'components/ui/data-display/fetchState/dataFetchValidates'
+import { EmptyStateFavorites } from 'components/ui/data-display/fetchState/emptyStateFavorites'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { useGetFavoriteBookingList } from 'lib/api/lasius/user-favorites/user-favorites'
 import { stringHash } from 'lib/utils/string/stringHash'
@@ -38,7 +38,7 @@ export const FavoriteListCompact: React.FC = () => {
     <FavoriteListWrapper>
       <DataFetchValidates isValidating={isValidating} />
       {hasNoData ? (
-        <DataFetchEmpty />
+        <EmptyStateFavorites />
       ) : (
         <AnimateList>
           {data?.favorites.map((item) => (

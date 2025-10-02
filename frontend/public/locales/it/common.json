@@ -1,0 +1,572 @@
+{
+  "account": {
+    "accountSecurity": "Sicurezza dell'account",
+    "changeUserProfileSettings": "Modifica le impostazioni del profilo utente",
+    "errors": {
+      "passwordUpdateFailed": "Aggiornamento della password non riuscito. Assicurati di aver inserito la password corrente e che sia corretta."
+    },
+    "languageSettings": {
+      "description": "Scegli la lingua preferita per l'interfaccia. Questa impostazione viene memorizzata localmente nel tuo browser.",
+      "save": "Salva preferenza lingua",
+      "selectLanguage": "Lingua dell'interfaccia",
+      "title": "Preferenze lingua"
+    },
+    "profileChangesNotAllowedInDemo": "Le modifiche al profilo non sono consentite in modalità demo",
+    "profileSettings": {
+      "description": "Gestisci le tue informazioni personali e i dettagli dell'account.",
+      "title": "Informazioni profilo"
+    },
+    "security": {
+      "description": "Aggiorna la password per mantenere sicuro il tuo account. Usa una password robusta con almeno 8 caratteri, che includa lettere maiuscole e numeri."
+    },
+    "settings": {
+      "description": "Gestisci le tue informazioni personali e i dettagli dell'account. Il tuo indirizzo email può essere modificato solo se stai utilizzando il provider di autenticazione interno.",
+      "title": "Impostazioni account"
+    },
+    "status": {
+      "passwordUpdated": "Password aggiornata",
+      "settingsUpdated": "Impostazioni account aggiornate"
+    },
+    "title": "Account"
+  },
+  "app": {
+    "name": "Lasius"
+  },
+  "auth": {
+    "actions": {
+      "logout": "Esci",
+      "signOut": "Disconnetti",
+      "signOutAndRefresh": "Disconnetti e aggiorna"
+    },
+    "chooseMethod": "Scegli il metodo di accesso preferito qui sotto",
+    "connectingSecurely": "Connessione sicura in corso",
+    "continueWith": "Continua con",
+    "continueWithProvider": "Continua con il tuo account",
+    "createYourAccount": "Crea il tuo account",
+    "enterEmailAndPassword": "Inserisci la tua email e password per accedere al tuo account",
+    "errors": {
+      "callback": "Callback di autenticazione non riuscito. Riprova.",
+      "credentialsMissing": "Nome utente o password mancante",
+      "fetchProfileFailed": "Impossibile caricare il profilo utente. Riprova ad accedere.",
+      "general": "Errore di autenticazione: {error}",
+      "oauthCallback": "Autenticazione non riuscita. Riprova.",
+      "registerUnknown": "Errore di registrazione sconosciuto",
+      "sessionRequired": "Effettua l'accesso per continuare.",
+      "userAlreadyRegistered": "Utente già registrato",
+      "wrongPasswordOrEmail": "Password o email errata. Riprova."
+    },
+    "fillDetailsToStart": "Compila i tuoi dettagli per iniziare",
+    "getStartedFree": "Inizia con il monitoraggio tempo open source",
+    "joinLasius": "Unisciti a Lasius",
+    "needHelp": "Serve aiuto? Clicca sul pulsante di aiuto",
+    "noAuthMethodsAvailable": "Nessun metodo di autenticazione disponibile",
+    "preparingSecureLogin": "Preparazione accesso sicuro in corso...",
+    "providers": {
+      "internalLasius": "Accesso interno Lasius"
+    },
+    "secureAndPrivate": "Sicuro e privato",
+    "signIn": "Accedi",
+    "signInTitle": "Accedi al tuo account",
+    "signInToLasius": "Accedi a Lasius",
+    "tagline": "Monitoraggio tempo open source per team moderni",
+    "thankYouForRegistering": "Grazie per esserti registrato! Ora puoi accedere utilizzando il tuo indirizzo email e password. Benvenuto in Lasius!",
+    "welcomeBack": "Bentornato",
+    "welcomeToLasius": "Benvenuto in Lasius"
+  },
+  "bookings": {
+    "actions": {
+      "add": "Aggiungi registrazione",
+      "addedToFavorites": "Registrazione aggiunta ai preferiti",
+      "adjustCurrentStart": "Adatta l'inizio della registrazione corrente alla fine della registrazione sovrapposta",
+      "adjustEndToNext": "Adatta la fine alla registrazione successiva",
+      "adjustLowerEnd": "Estendi la fine della registrazione inferiore all'inizio della registrazione superiore",
+      "adjustOverlappingEnd": "Adatta la fine della registrazione sovrapposta all'inizio della registrazione corrente",
+      "adjustStartToPrevious": "Adatta l'inizio alla registrazione precedente",
+      "adjustUpperStart": "Sposta l'inizio della registrazione superiore alla fine della registrazione inferiore",
+      "create": "Crea una registrazione",
+      "delete": "Elimina registrazione",
+      "edit": "Modifica registrazione",
+      "editOverlapping": "Modifica registrazione per risolvere la sovrapposizione",
+      "insert": "Inserisci registrazione",
+      "start": "Avvia registrazione",
+      "startFromFavorite": "Avvia registrazione da preferito",
+      "startFromTeamMember": "Avvia registrazione da membro del team",
+      "stopRecording": "Interrompi registrazione tempo corrente"
+    },
+    "duration": "Durata",
+    "emptyNever": "Nessuna registrazione ancora",
+    "emptyNeverHelp": "Inizia creando la tua prima registrazione. Serve aiuto?",
+    "emptyToday": "Nessuna registrazione per questo giorno",
+    "hints": {
+      "useEndTimeOfLatest": "Usa l'ora di fine dell'ultima registrazione come ora di inizio per questa",
+      "useEndTimeOfPrevious": "Usa l'ora di fine della registrazione precedente come ora di inizio per questa",
+      "useStartTimeOfNext": "Usa l'ora di inizio della registrazione successiva come ora di fine per questa"
+    },
+    "history": {
+      "empty": "Nessuna registrazione trovata per i filtri selezionati"
+    },
+    "overlapsWarning": "Queste registrazioni si sovrappongono. Clicca per modificare e adattare l'orario.",
+    "presets": {
+      "browse": "Sfoglia preset",
+      "empty": "Nessun preset disponibile",
+      "favorites": "Preferiti",
+      "recent": "Registrazioni recenti",
+      "team": "Registrazioni del team",
+      "title": "Scegli un preset"
+    },
+    "showLists": "Mostra registrazioni",
+    "status": {
+      "added": "Registrazione aggiunta",
+      "currentlyNotBooking": "Nessuna registrazione in corso",
+      "removed": "Registrazione rimossa",
+      "started": "Registrazione avviata",
+      "updated": "Registrazione aggiornata"
+    },
+    "title": "Registrazioni",
+    "warnings": {
+      "durationIsZero": "La durata di questa registrazione è zero"
+    }
+  },
+  "calendar": {
+    "navigation": {
+      "nextMonth": "Mese successivo",
+      "nextWeek": "Settimana successiva",
+      "previousMonth": "Mese precedente",
+      "previousWeek": "Settimana scorsa"
+    },
+    "title": "Calendario"
+  },
+  "charts": {
+    "errors": {
+      "invalidData": "Dati non validi",
+      "noData": "No data available"
+    },
+    "noData": {
+      "month": "Nessun dato di registrazione per questo mese"
+    }
+  },
+  "common": {
+    "actions": {
+      "actions": "Azioni",
+      "add": "Add",
+      "cancel": "Annulla",
+      "close": "Chiudi",
+      "delete": "Delete",
+      "discardChanges": "Discard changes",
+      "help": "Aiuto",
+      "invite": "Invita",
+      "keepEditing": "Keep editing",
+      "reset": "Ripristina",
+      "resetToInitial": "Ripristina al valore iniziale",
+      "save": "Salva",
+      "saveChanges": "Salva modifiche",
+      "signUp": "Registrati"
+    },
+    "back": "Indietro",
+    "confirmUnsavedChanges": "You have unsaved changes. Are you sure you want to cancel?",
+    "custom": "Personalizzato",
+    "dashboard": "Dashboard",
+    "date": "Data",
+    "email": "Email",
+    "errors": {
+      "generic": "Something went wrong",
+      "helpNotAvailable": "Contenuto di aiuto non disponibile per questa pagina.",
+      "internalServerError": "Errore interno del server",
+      "pageNotFound": "Pagina non trovata",
+      "somethingWentWrong": "Qualcosa è andato storto",
+      "unauthorized": "Non autorizzato"
+    },
+    "filter": {
+      "title": "Filtro"
+    },
+    "firstName": "Nome",
+    "formats": {
+      "dateFormat": "DD.MM.YYYY",
+      "durationFormat": "HH:MM",
+      "timeFormat": "HH:MM"
+    },
+    "forms": {
+      "confirmNewPassword": "Conferma nuova password",
+      "confirmPassword": "Conferma password",
+      "email": "Email",
+      "firstName": "Nome",
+      "lastName": "Cognome",
+      "name": "Nome",
+      "newPassword": "Nuova password",
+      "password": "Password",
+      "role": "Ruolo"
+    },
+    "info": {
+      "helpFallbackLanguage": "Questo contenuto di aiuto non è ancora disponibile nella lingua selezionata. Viene mostrata la versione inglese."
+    },
+    "lastName": "Cognome",
+    "name": "Nome",
+    "ok": "Ok",
+    "or": "oppure",
+    "roles": {
+      "administrator": "Amministratore",
+      "member": "Membro"
+    },
+    "selected": "Selezionato",
+    "status": {
+      "active": "Attivo",
+      "inactive": "Inattivo",
+      "label": "Stato"
+    },
+    "themes": {
+      "dark": "Scuro",
+      "light": "Chiaro",
+      "system": "Sistema",
+      "title": "Tema"
+    },
+    "time": {
+      "date": "Data",
+      "day": "Giorno",
+      "duration": "Durata",
+      "ends": "Fine",
+      "from": "Da",
+      "hours": "Ore",
+      "lastMonth": "Mese scorso",
+      "lastQuarter": "Trimestre scorso",
+      "lastWeek": "Settimana scorsa",
+      "lastYear": "Anno scorso",
+      "month": "Mese",
+      "selectRange": "Seleziona intervallo di tempo",
+      "setCustom": "Imposta orario personalizzato",
+      "starts": "Inizio",
+      "thisMonth": "Questo mese",
+      "thisQuarter": "Questo trimestre",
+      "thisWeek": "Questa settimana",
+      "thisYear": "Quest'anno",
+      "timeRange": "Intervallo di tempo",
+      "to": "A",
+      "today": "Oggi",
+      "week": "Settimana",
+      "yesterday": "Ieri"
+    },
+    "units": {
+      "hours": "Ore"
+    },
+    "user": "Utente",
+    "validation": {
+      "emailInvalid": "Deve essere un indirizzo email valido",
+      "endBeforeStart": "L'ora di fine è precedente all'ora di inizio",
+      "fromMustBeBeforeTo": "Deve essere precedente alla data \"a\"",
+      "missingNumber": "Manca una cifra numerica",
+      "missingSpecialChar": "Manca un carattere speciale",
+      "missingUppercase": "Manca un carattere maiuscolo",
+      "mustBeAfterStart": "Deve essere dopo l'inizio",
+      "mustBeBeforeEnd": "Deve essere prima della fine",
+      "mustBeInPast": "Deve essere nel passato",
+      "passwordMismatch": "Le password non corrispondono",
+      "passwordTooShort": "Deve contenere almeno 8 caratteri",
+      "required": "Obbligatorio",
+      "toMustBeAfterFrom": "Deve essere dopo la data \"da\"",
+      "wrongFormat": "Formato errato"
+    },
+    "you": "Tu"
+  },
+  "contextMenu": {
+    "actions": {
+      "close": "Chiudi menu contestuale",
+      "open": "Apri menu contestuale"
+    }
+  },
+  "demo": {
+    "welcome": "Benvenuto nell'istanza demo di Lasius. Usa \"demo1@lasius.ch\" e password \"demo\" per accedere e dare un'occhiata. L'istanza demo viene ripristinata una volta al giorno."
+  },
+  "errors": {
+    "dataFetchFailed": "Ci dispiace molto, ma non è stato possibile recuperare i dati a causa di un errore."
+  },
+  "export": {
+    "actions": {
+      "export": "Esporta"
+    },
+    "formats": {
+      "csv": "CSV (.csv)",
+      "excel": "Excel (.xlsx)",
+      "ods": "OpenDocument (.ods)"
+    },
+    "status": {
+      "success": "Esportazione riuscita: {{filename}}"
+    }
+  },
+  "favorites": {
+    "actions": {
+      "add": "Aggiungi ai preferiti",
+      "delete": "Elimina preferito"
+    },
+    "empty": "Nessun preferito ancora",
+    "status": {
+      "removed": "Preferito rimosso"
+    }
+  },
+  "features": {
+    "freeAndOpenSource": "Gratuito e open source",
+    "insightfulReports": "Report e analisi dettagliati",
+    "inviteTeamMembers": "Invita i membri del tuo team",
+    "openSource": "Open source e self-hosted",
+    "organizeTeams": "Organizza per team e progetti",
+    "startTrackingMinutes": "Inizia a monitorare il tempo in pochi minuti",
+    "trackTime": "Monitora il tempo senza sforzo"
+  },
+  "footer": {
+    "developedBy": "Sviluppato da <0>Tegonal</0>, disponibile su <1>GitHub</1>, rilasciato sotto licenza <2>AGPL 3.0</2>",
+    "feedbackOnGithub": "Apprezziamo il tuo feedback. Lascia un commento su <0>GitHub</0>"
+  },
+  "help": {
+    "contactAdmin": "Contatta il tuo amministratore"
+  },
+  "invitations": {
+    "actions": {
+      "accept": "Accetta invito",
+      "reject": "Rifiuta invito"
+    },
+    "copyToClipboard": "Copia negli appunti",
+    "createAccountMessage": "Sei stato invitato a creare un account Lasius per monitorare le tue ore di lavoro.",
+    "description": {
+      "copyLink": "Copia il link e invialo al tuo collega. Se non ha ancora un account, ne verrà creato uno quando l'invito sarà accettato."
+    },
+    "errors": {
+      "createdForSomeoneElse": "Questo invito è stato creato per qualcun altro. Disconnettiti e aggiorna, oppure inoltra il link dell'invito all'utente {{email}}",
+      "noLongerValid": "Questo invito non è più valido. È meglio contattare la persona che ti ha inviato il link dell'invito per ottenerne uno nuovo."
+    },
+    "inviteByEmail": "Invita tramite email",
+    "messages": {
+      "invitedToOrganisation": "Sei stato invitato da {{inviter}} a unirti all'organizzazione {{organisation}}.",
+      "invitedToProject": "Sei stato invitato da {{inviter}} a unirti al progetto {{project}}.",
+      "selectOrganisation": "Seleziona l'organizzazione a cui vorresti aggiungere questo progetto:"
+    }
+  },
+  "lists": {
+    "title": "Elenchi"
+  },
+  "members": {
+    "actions": {
+      "invite": "Invita qualcuno",
+      "manage": "Gestisci membri",
+      "remove": "Rimuovi membro"
+    },
+    "confirmations": {
+      "removeConfirm": "Sei sicuro di voler rimuovere {{name}}?",
+      "removeTitle": "Rimuovi membro",
+      "removeWarning": "Questo membro verrà rimosso dall'organizzazione e perderà l'accesso a tutti i progetti."
+    },
+    "empty": "Nessun membro trovato"
+  },
+  "navigation": {
+    "currentOrganisation": "Organizzazione corrente",
+    "yourTimeBookingView": "La tua vista registrazioni tempo"
+  },
+  "of": "di",
+  "offline": {
+    "message": "Sei offline. Questa applicazione richiede una connessione online. Si aggiornerà automaticamente quando verrà rilevata una connessione di rete."
+  },
+  "organisation": {
+    "title": "Organizzazione"
+  },
+  "organisations": {
+    "actions": {
+      "create": "Crea organizzazione",
+      "edit": "Modifica organizzazione",
+      "switch": "Cambia organizzazione"
+    },
+    "adminDescription": "Sei un amministratore di questa organizzazione. Puoi aggiungere e rimuovere membri e modificare il nome dell'organizzazione, o crearne una nuova.",
+    "createDescription": "Aggiungi una nuova organizzazione cliccando sul pulsante qui sotto.",
+    "currentOrganisation": "Organizzazione corrente",
+    "memberDescription": "Sei un membro di questa organizzazione e non hai i diritti per aggiungere o rimuovere membri. Contatta un amministratore dell'organizzazione se desideri invitare qualcuno.",
+    "members": "Membri",
+    "myPersonalOrganisation": "La mia organizzazione personale",
+    "organisationName": "Organizzazione",
+    "organisationRole": "Ruolo nell'organizzazione",
+    "organization": "Organizzazione",
+    "organizationName": "Nome organizzazione",
+    "privateDescription": "Questa organizzazione è visibile solo a te. Usala per monitorare progetti privati. Per collaborare con altri, crea o usa un'organizzazione diversa.",
+    "selectOrganisation": "Seleziona organizzazione",
+    "status": {
+      "created": "Organizzazione creata",
+      "updated": "Organizzazione aggiornata"
+    },
+    "title": "Organizzazioni"
+  },
+  "projects": {
+    "actions": {
+      "backToProjects": "Torna ai progetti",
+      "create": "Crea un progetto",
+      "deactivate": "Disattiva progetto",
+      "edit": "Modifica progetto",
+      "leave": "Abbandona questo progetto"
+    },
+    "allProjects": "Tutti i progetti",
+    "allProjectsDescription": "Tutti i progetti nell'organizzazione corrente che puoi amministrare. Crea report di fatturazione includendo il tempo registrato dai membri del progetto esterni.",
+    "confirmations": {
+      "deactivate": "Sei sicuro di voler disattivare questo progetto?",
+      "deactivateInstructions": "Per confermare, digita il nome del progetto qui sotto:",
+      "deactivateTitle": "Disattiva progetto",
+      "deactivateWarning": "Questa azione non può essere annullata. Il progetto verrà archiviato permanentemente e tutte le assegnazioni utente verranno rimosse. Non sarà possibile riattivare questo progetto.",
+      "leave": "Sei sicuro di voler abbandonare questo progetto?"
+    },
+    "deactivatedBy": "Archiviato da {{user}}",
+    "empty": "Nessun progetto trovato",
+    "errors": {
+      "projectNotFound": "Questo progetto non è stato trovato. L'ID del progetto è mostrato sopra."
+    },
+    "filter": {
+      "both": "Entrambi",
+      "status": "Stato"
+    },
+    "label": "Progetto",
+    "lastActivity": "Ultima attività",
+    "members": {
+      "title": "Membri del progetto"
+    },
+    "myProjects": "I miei progetti",
+    "myProjectsDescription": "Progetti di cui sei membro e in cui puoi registrare tempo, filtrati per l'organizzazione corrente.",
+    "name": "Nome progetto",
+    "noActivity": "Nessuna attività",
+    "project": "Progetto",
+    "projectName": "Nome progetto",
+    "projectRole": "Ruolo",
+    "selectProject": "Seleziona progetto",
+    "status": {
+      "assignedToUser": "Progetto assegnato con successo all'utente.",
+      "updated": "Progetto aggiornato"
+    },
+    "title": "Progetti",
+    "total": "Totale",
+    "warnings": {
+      "inactiveProjectContext": "Visualizzazione statistiche da progetto inattivo",
+      "inactiveProjectFilter": "Visualizzazione dati per progetto inattivo",
+      "projectNotInActiveList": "Questo progetto non è nella tua lista di progetti attivi. Potrebbe essere inattivo o di un'altra organizzazione.",
+      "projectUnavailable": "Questo progetto non è più nel tuo profilo. Potresti essere stato rimosso da esso."
+    }
+  },
+  "pwa": {
+    "reloadApplication": "Ricarica applicazione",
+    "updateMessage": "Lasius è stato aggiornato. La pagina verrà ricaricata dopo la tua conferma."
+  },
+  "search": {
+    "empty": "Nessun risultato trovato"
+  },
+  "settings": {
+    "app": {
+      "description": "Personalizza la tua esperienza con le preferenze di lingua e tema. Queste impostazioni vengono memorizzate localmente nel tuo browser.",
+      "language": "Lingua dell'interfaccia",
+      "menuTitle": "Impostazioni app",
+      "save": "Salva impostazioni",
+      "theme": "Tema",
+      "title": "Impostazioni applicazione"
+    }
+  },
+  "statistics": {
+    "expectedHours": "Ore previste",
+    "noProjectsForDay": "No projects for this day",
+    "noProjectsForWeek": "No projects for this week",
+    "percentOfPlannedHours": "% delle ore pianificate",
+    "showStatistics": "Mostra statistiche",
+    "title": "Statistiche",
+    "weeklyHoursDistribution": "Distribuzione ore settimanali"
+  },
+  "stats": {
+    "empty": "Nessun dato disponibile per il periodo selezionato"
+  },
+  "system": {
+    "backendUnreachable": "Il backend sembra essere irraggiungibile",
+    "connectedToBackend": "Connesso al backend",
+    "connectingToBackend": "Connessione al backend in corso",
+    "noInternetConnection": "Nessuna connessione Internet. Assicurati che il tuo dispositivo sia connesso a Internet.",
+    "offlineMessage": "Lasius è attualmente offline o in manutenzione. Torneremo presto."
+  },
+  "tags": {
+    "actions": {
+      "add": "Add tags",
+      "addDefaultTagGroups": "Aggiungi gruppi di tag predefiniti",
+      "addTag": "Add a tag",
+      "addTagGroup": "Aggiungi un nuovo gruppo di tag",
+      "collapseAll": "Collapse all",
+      "copyTags": "Copy tags",
+      "createTagGroup": "Crea gruppo di tag",
+      "edit": "Modifica tag",
+      "editForProject": "Edit tags for {{projectKey}}",
+      "expandAll": "Expand all",
+      "pasteTags": "Paste tags"
+    },
+    "chooseOrEnter": "Scegli o inserisci tag",
+    "confirmDeleteGroup": "Are you sure you want to delete the tag group \"{{groupName}}\"?",
+    "customTag": "Tag personalizzato",
+    "enterTagName": "Enter tag name",
+    "enterToAdd": "Inserisci un tag per aggiungerlo",
+    "label": "Tag",
+    "noTagGroups": "No tag groups defined yet",
+    "simpleTags": "Tag semplici",
+    "simpleTagsDescription": "Tags that are not part of any group",
+    "status": {
+      "tagsCopied": "Tags copied",
+      "tagsPasted": "Tags pasted"
+    },
+    "tagGroups": "Gruppi di tag",
+    "title": "Tag",
+    "validation": {
+      "tagExists": "Tag already exists",
+      "tagGroupExists": "Il gruppo di tag esiste già",
+      "tagGroupNameRequired": "Tag group name is required",
+      "tagNameRequired": "Tag name is required"
+    }
+  },
+  "tos": {
+    "acceptMessage": "Accetta i seguenti Termini di servizio (versione {{version}}), se desideri continuare a utilizzare Lasius:",
+    "actions": {
+      "accept": "Accetta Termini di servizio",
+      "reject": "Rifiuta e disconnetti"
+    }
+  },
+  "ui": {
+    "hidePasswords": "Nascondi password",
+    "showPasswords": "Mostra password"
+  },
+  "users": {
+    "title": "Utenti"
+  },
+  "validation": {
+    "startMustBeInPast": "L'ora di inizio deve essere nel passato"
+  },
+  "websocket": {
+    "status": {
+      "connected": "Websocket connesso",
+      "connecting": "Connessione websocket in corso",
+      "error": "Impossibile connettersi al websocket"
+    }
+  },
+  "workHealth": {
+    "actualHours": "Actual Hours",
+    "avgPerDay": "avg/day",
+    "consecutiveDays": "consecutive days",
+    "elevatedLoad": "Load is elevated",
+    "healthyLoad": "Looking good!",
+    "highLoad": "Heavy load detected",
+    "plannedHours": "Planned Hours",
+    "relaxReminder": "Time to relax a little bit",
+    "sixMonths": "6 Months",
+    "sixMonthTrend": "6-Month Work Trend",
+    "takeItEasy": "Consider taking it easy",
+    "thisWeek": "this week"
+  },
+  "workingHours": {
+    "clickToAdjustHours": "Clicca su un giorno qui sotto per adattare le ore di lavoro",
+    "dailyTotal": "Totale giornaliero",
+    "description": "La quantità di tempo che prevedi di registrare al giorno, per organizzazione, durante una tipica settimana lavorativa. Questi dati vengono utilizzati per calcolare il tuo progresso giornaliero e settimanale.",
+    "errors": {
+      "updateFailed": "Aggiornamento delle ore di lavoro non riuscito"
+    },
+    "perWeek": "a settimana",
+    "setHoursDescription": "Imposta le tue ore di lavoro per ogni giorno",
+    "status": {
+      "updated": "Ore di lavoro aggiornate"
+    },
+    "summary": "Riepilogo",
+    "title": "Ore di lavoro",
+    "totalHoursDescription": "Ore totali in tutte le organizzazioni",
+    "totalPerWeek": "totale a settimana",
+    "weeklyHoursSummary": "Riepilogo ore settimanali"
+  }
+}

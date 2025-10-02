@@ -17,24 +17,19 @@
  *
  */
 
-import { Heading } from 'components/primitives/typography/Heading'
-import { Text } from 'components/primitives/typography/Text'
+import { SettingsRightColumn } from 'components/features/settings/shared/SettingsRightColumn'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
 
 export const AccountSecurityRightColumn: React.FC = () => {
   const { t } = useTranslation('common')
   return (
-    <div className="w-full px-6 pt-3">
-      <Heading as="h2" variant="section">
-        {t('account.accountSecurity', { defaultValue: 'Account Security' })}
-      </Heading>
-      <Text variant="infoText">
-        {t('account.security.description', {
-          defaultValue:
-            'Update your password to keep your account secure. Make sure to use a strong password with at least 8 characters, including uppercase letters and numbers.',
-        })}
-      </Text>
-    </div>
+    <SettingsRightColumn
+      title={t('account.accountSecurity', { defaultValue: 'Account Security' })}
+      description={t('account.security.description', {
+        defaultValue:
+          'Update your password to keep your account secure. Make sure to use a strong password with at least 8 characters, including uppercase letters and numbers.',
+      })}
+    />
   )
 }

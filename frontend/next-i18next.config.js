@@ -3,7 +3,7 @@ module.exports = {
   debug: process.env.LASIUS_DEBUG === 'true',
   i18n: {
     defaultLocale: 'en',
-    locales: ['en', 'de'],
+    locales: ['en', 'de', 'fr', 'it', 'es'],
     // Disable automatic locale detection - we handle it via cookies for prefix-less URLs
     localeDetection: false,
   },

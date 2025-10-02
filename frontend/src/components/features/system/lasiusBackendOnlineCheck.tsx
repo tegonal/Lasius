@@ -18,19 +18,18 @@
  */
 
 import { useLasiusApiStatus } from 'components/features/system/hooks/useLasiusApiStatus'
-import useModal from 'components/ui/overlays/modal/hooks/useModal'
-import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
+import { Modal } from 'components/ui/overlays/modal/Modal'
 import { logger } from 'lib/logger'
 import { useTranslation } from 'next-i18next'
 import { CONNECTION_STATUS } from 'projectConfig/constants'
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 // Debounce delay to prevent rapid modal toggling during connection flickers
 const STATUS_CHANGE_DEBOUNCE_MS = 2000
 
 export const LasiusBackendOnlineCheck: React.FC = () => {
   const { t } = useTranslation('common')
-  const { modalId, openModal, closeModal, isModalOpen } = useModal('BackendOfflineNoticeModal')
+  const [isOpen, setIsOpen] = useState(false)
   const { status } = useLasiusApiStatus()
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -42,13 +41,13 @@ export const LasiusBackendOnlineCheck: React.FC = () => {
 
     // Debounce status changes to prevent rapid modal toggling
     debounceTimerRef.current = setTimeout(() => {
-      if (status !== CONNECTION_STATUS.CONNECTED && !isModalOpen) {
+      if (status !== CONNECTION_STATUS.CONNECTED && !isOpen) {
         logger.info('LasiusBackendOnlineCheck', status)
-        openModal()
+        setIsOpen(true)
       }
-      if (status === CONNECTION_STATUS.CONNECTED && isModalOpen) {
+      if (status === CONNECTION_STATUS.CONNECTED && isOpen) {
         logger.info('LasiusBackendOnlineCheck', status)
-        closeModal()
+        setIsOpen(false)
       }
     }, STATUS_CHANGE_DEBOUNCE_MS)
 
@@ -57,16 +56,16 @@ export const LasiusBackendOnlineCheck: React.FC = () => {
         clearTimeout(debounceTimerRef.current)
       }
     }
-  }, [closeModal, isModalOpen, openModal, status])
+  }, [isOpen, status])
 
   return (
-    <ModalResponsive modalId={modalId} blockViewport>
+    <Modal open={isOpen} onClose={() => setIsOpen(false)} blockViewport>
       <div>
         {t('system.offlineMessage', {
           defaultValue:
             'Lasius is currently offline or undergoing maintenance. We will be back shortly.',
         })}
       </div>
-    </ModalResponsive>
+    </Modal>
   )
 }

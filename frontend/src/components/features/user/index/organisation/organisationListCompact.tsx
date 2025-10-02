@@ -20,7 +20,7 @@
 import { OrganisationItem } from 'components/features/user/index/organisation/organisationItem'
 import { OrganisationListWrapper } from 'components/features/user/index/organisation/organisationListWrapper'
 import { AnimateList } from 'components/ui/animations/motion/animateList'
-import { DataFetchEmpty } from 'components/ui/data-display/fetchState/dataFetchEmpty'
+import { BookingListEmptyToday } from 'components/ui/data-display/fetchState/bookingListEmptyToday'
 import { DataFetchValidates } from 'components/ui/data-display/fetchState/dataFetchValidates'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { useGetUserBookingCurrentListByOrganisation } from 'lib/api/lasius/user-bookings/user-bookings'
@@ -39,7 +39,7 @@ export const OrganisationListCompact: React.FC = () => {
       <DataFetchValidates isValidating={isValidating} />
 
       {hasNoData ? (
-        <DataFetchEmpty />
+        <BookingListEmptyToday />
       ) : (
         <AnimateList popLayout>
           {data?.timeBookings.map((item) => (

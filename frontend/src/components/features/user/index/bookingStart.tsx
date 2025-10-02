@@ -25,7 +25,6 @@ import { FormElement } from 'components/ui/forms/FormElement'
 import { InputSelectAutocomplete } from 'components/ui/forms/input/InputSelectAutocomplete'
 import { InputTagsAutocomplete } from 'components/ui/forms/input/InputTagsAutocomplete'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
-import useModal from 'components/ui/overlays/modal/hooks/useModal'
 import { roundToNearestMinutes } from 'date-fns'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { useProjects } from 'lib/api/hooks/useProjects'
@@ -50,13 +49,12 @@ export const BookingStart: React.FC = () => {
     defaultValues: { projectId: '', tags: [] },
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const { projectSuggestions } = useProjects()
+  const { projectSuggestions, findProjectById } = useProjects()
   const { selectedOrganisationId } = useOrganisation()
   const { data: projectTags } = useGetTagsByProject(
     selectedOrganisationId,
     hookForm.watch('projectId'),
   )
-  const { closeModal } = useModal('BookingAddMobileModal')
 
   const resetComponent = () => {
     hookForm.setValue('projectId', '')
@@ -73,7 +71,6 @@ export const BookingStart: React.FC = () => {
         tags,
         start: formatISOLocale(roundToNearestMinutes(new Date(), { roundingMethod: 'floor' })),
       })
-      closeModal()
       resetComponent()
     }
     setIsSubmitting(false)
@@ -108,6 +105,7 @@ export const BookingStart: React.FC = () => {
                   id="projectId"
                   name="projectId"
                   suggestions={projectSuggestions()}
+                  findMissingProject={findProjectById}
                   required
                 />
               </FormElement>

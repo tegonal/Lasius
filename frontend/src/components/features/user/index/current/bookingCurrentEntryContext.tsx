@@ -28,13 +28,12 @@ import { ContextButtonWrapper } from 'components/features/contextMenu/contextBut
 import { useContextMenu } from 'components/features/contextMenu/hooks/useContextMenu'
 import { Button } from 'components/primitives/buttons/Button'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
-import useModal from 'components/ui/overlays/modal/hooks/useModal'
-import { ModalResponsive } from 'components/ui/overlays/modal/modalResponsive'
+import { Modal } from 'components/ui/overlays/modal/Modal'
 import { AnimatePresence } from 'framer-motion'
 import { ModelsBooking } from 'lib/api/lasius'
 import { Pencil } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
-import React from 'react'
+import React, { useState } from 'react'
 
 import { BookingEditRunning } from '../bookingEditRunning'
 
@@ -44,11 +43,13 @@ type Props = {
 
 export const BookingCurrentEntryContext: React.FC<Props> = ({ item }) => {
   const { t } = useTranslation('common')
-  const { modalId, openModal, closeModal } = useModal('BookingEditCurrentModal')
+  const [isOpen, setIsOpen] = useState(false)
   const { handleCloseAll, currentOpenContextMenuId } = useContextMenu()
 
+  const handleClose = () => setIsOpen(false)
+
   const editCurrentBooking = () => {
-    openModal()
+    setIsOpen(true)
     handleCloseAll()
   }
 
@@ -79,9 +80,9 @@ export const BookingCurrentEntryContext: React.FC<Props> = ({ item }) => {
           )}
         </AnimatePresence>
       </ContextBody>
-      <ModalResponsive modalId={modalId}>
-        <BookingEditRunning item={item} onSave={closeModal} onCancel={closeModal} />
-      </ModalResponsive>
+      <Modal open={isOpen} onClose={handleClose}>
+        <BookingEditRunning item={item} onSave={handleClose} onCancel={handleClose} />
+      </Modal>
     </>
   )
 }

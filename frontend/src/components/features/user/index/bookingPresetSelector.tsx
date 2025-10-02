@@ -20,8 +20,8 @@
 import { Button } from 'components/primitives/buttons/Button'
 import { Heading } from 'components/primitives/typography/Heading'
 import { AnimateList } from 'components/ui/animations/motion/animateList'
-import { DataFetchEmpty } from 'components/ui/data-display/fetchState/dataFetchEmpty'
 import { DataFetchValidates } from 'components/ui/data-display/fetchState/dataFetchValidates'
+import { EmptyStatePresets } from 'components/ui/data-display/fetchState/emptyStatePresets'
 import { TagList } from 'components/ui/data-display/TagList'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { IconTabs, IconTabsItem } from 'components/ui/navigation/IconTabs'
@@ -91,7 +91,7 @@ const RecentBookingsList: React.FC<{ onSelect: (preset: PresetType) => void }> =
   }, [data])
 
   if (isValidating) return <DataFetchValidates isValidating={isValidating} />
-  if (!uniqueBookings.length) return <DataFetchEmpty />
+  if (!uniqueBookings.length) return <EmptyStatePresets />
 
   return (
     <AnimateList>
@@ -125,7 +125,7 @@ const FavoritesList: React.FC<{ onSelect: (preset: PresetType) => void }> = ({ o
   const { data, isValidating } = useGetFavoriteBookingList(selectedOrganisationId)
 
   if (isValidating) return <DataFetchValidates isValidating={isValidating} />
-  if (!data?.favorites.length) return <DataFetchEmpty />
+  if (!data?.favorites.length) return <EmptyStatePresets />
 
   return (
     <AnimateList>
@@ -192,7 +192,7 @@ const TeamBookingsList: React.FC<{ onSelect: (preset: PresetType) => void }> = (
   }, [data])
 
   if (isValidating) return <DataFetchValidates isValidating={isValidating} />
-  if (!uniqueBookings.length) return <DataFetchEmpty />
+  if (!uniqueBookings.length) return <EmptyStatePresets />
 
   return (
     <AnimateList>

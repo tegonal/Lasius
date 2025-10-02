@@ -36,7 +36,7 @@ export const CalendarDayCompact: React.FC<Props> = ({ date, onClick }) => {
     <Button
       variant="ghost"
       className={cn(
-        'relative z-[2] flex h-full w-full flex-grow flex-col items-center justify-center p-2 text-center text-lg leading-none',
+        'relative z-[2] flex h-full w-full flex-grow flex-col items-center justify-center p-2 text-center text-base leading-none',
         isWeekend(day) && 'opacity-50',
       )}
       onClick={() => setDate()}

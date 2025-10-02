@@ -18,7 +18,6 @@
  */
 
 import { ContextButtonWrapper } from 'components/features/contextMenu/contextButtonWrapper'
-import { ContextCompactButtonWrapper } from 'components/features/contextMenu/contextCompactButtonWrapper'
 import { useContextMenu } from 'components/features/contextMenu/hooks/useContextMenu'
 import { Button } from 'components/primitives/buttons/Button'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
@@ -36,9 +35,9 @@ export const ContextButtonAddFavorite: React.FC<Props> = ({ item, variant }) => 
   const { actionAddBookingToFavorites } = useContextMenu()
   const { t } = useTranslation('common')
   const { selectedOrganisationId } = useOrganisation()
-  const Wrapper = variant === 'compact' ? ContextCompactButtonWrapper : ContextButtonWrapper
+  const wrapperVariant = variant === 'compact' ? 'compact' : 'default'
   return (
-    <Wrapper>
+    <ContextButtonWrapper variant={wrapperVariant}>
       <Button
         variant="contextIcon"
         title={t('favorites.actions.add', { defaultValue: 'Add as favorite' })}
@@ -48,6 +47,6 @@ export const ContextButtonAddFavorite: React.FC<Props> = ({ item, variant }) => 
         shape="circle">
         <LucideIcon icon={Star} size={24} />
       </Button>
-    </Wrapper>
+    </ContextButtonWrapper>
   )
 }
