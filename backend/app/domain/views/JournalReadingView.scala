@@ -28,6 +28,10 @@ import pekko.contrib.persistence.mongodb.{
   MongoReadJournal,
   ScalaDslMongoReadJournal
 }
+import org.apache.pekko.persistence.query.scaladsl.{
+  CurrentEventsByPersistenceIdQuery,
+  ReadJournal
+}
 import org.apache.pekko.persistence.query.{EventEnvelope, PersistenceQuery}
 import org.apache.pekko.stream.Materializer
 import org.apache.pekko.stream.scaladsl.Source
@@ -45,9 +49,21 @@ case object JournalReadingViewIsLive
 trait JournalReadingView extends Actor with ActorLogging {
   val persistenceId: String
 
-  private lazy val readJournal: ScalaDslMongoReadJournal =
+  private lazy val readJournal
+      : ReadJournal with CurrentEventsByPersistenceIdQuery = {
+    // Auto-detect journal based on configured persistence plugin
+    val journalPlugin = context.system.settings.config
+      .getString("pekko.persistence.journal.plugin")
+
+    val journalPluginId = journalPlugin match {
+      case "inmemory-journal" => "inmemory-read-journal"
+      case _                  => MongoReadJournal.Identifier
+    }
+
     PersistenceQuery(context.system)
-      .readJournalFor[ScalaDslMongoReadJournal](MongoReadJournal.Identifier)
+      .readJournalFor[ReadJournal with CurrentEventsByPersistenceIdQuery](
+        journalPluginId)
+  }
 
   override val supervisorStrategy: OneForOneStrategy =
     OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1.minute) {
