@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:8.0.9
+    container_name: lasius-dev-db
+    ports:
+      - "27017:27017"
+    networks:
+      - lasius-dev
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Keycloak for authentication
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.1.4
+    container_name: lasius-dev-keycloak
+    ports:
+      - "8080:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+    volumes:
+      - ./keycloak-local-realm.json:/opt/keycloak/data/import/lasius-local-realm.json:ro
+    command: start-dev --import-realm
+    networks:
+      - lasius-dev
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8080;echo -e 'GET /health/ready HTTP/1.1\r\nhost: 127.0.0.1:8080\r\nConnection: close\r\n\r\n' >&3;if [ $? -eq 0 ]; then exit 0;else exit 1;fi;"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  # MailHog for email testing
+  mailhog:
+    image: mailhog/mailhog
+    container_name: lasius-dev-mailhog
+    ports:
+      - "8025:8025"  # Web UI
+      - "1025:1025"  # SMTP server
+    networks:
+      - lasius-dev
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8025"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Nginx proxy (routes frontend and backend)
+  proxy:
+    image: nginx:latest
+    container_name: lasius-dev-proxy
+    ports:
+      - "3000:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./nginx-dev-proxy.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - lasius-dev
+    depends_on:
+      - keycloak
+      - mongodb
+      - mailhog
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+networks:
+  lasius-dev:
+    driver: bridge

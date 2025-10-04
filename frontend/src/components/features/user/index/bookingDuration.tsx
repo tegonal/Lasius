@@ -31,7 +31,7 @@ type Props = { item: ModelsBooking }
 export const BookingDuration: React.FC<Props> = ({ item }) => {
   const duration = durationAsString(item.start.dateTime, item.end?.dateTime || '')
   const durationIsZero = duration === '00:00'
-  const { t } = useTranslation()
+  const { t } = useTranslation('common')
   return (
     <div
       className={cn(

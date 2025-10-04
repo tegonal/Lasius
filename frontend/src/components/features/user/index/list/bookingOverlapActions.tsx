@@ -41,7 +41,7 @@ export const BookingOverlapActions: React.FC<Props> = ({
   overlappingItem,
   onEdit,
 }) => {
-  const { t } = useTranslation()
+  const { t } = useTranslation('common')
   const [isHovered, setIsHovered] = useState(false)
   const { selectedOrganisationId } = useOrganisation()
 

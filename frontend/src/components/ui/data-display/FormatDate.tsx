@@ -41,7 +41,7 @@ export const FormatDate: React.FC<{
   date: IsoDateString | Date
   format: keyof typeof dateFormats
 }> = memo(({ date, format }) => {
-  const { i18n } = useTranslation()
+  const { i18n } = useTranslation('common')
   if (isString(date)) {
     return <>{dateFormat(date, dateFormats[format], i18n.language)}</>
   }

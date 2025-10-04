@@ -45,13 +45,35 @@ export const LasiusTOSCheck: React.FC = () => {
   }
 
   const setLocalizedTosText = () => {
-    fetch('/termsofservice/' + i18n.language + '.html').then((response) => {
-      if (response.status == 200) {
-        response.text().then((resultsHTML) => {
-          setTosHtml(resultsHTML)
+    const language = i18n.language
+    fetch('/termsofservice/' + language + '.html')
+      .then((response) => {
+        if (response.status == 200) {
+          return response.text()
+        }
+        // Fallback to English if language-specific TOS not found
+        return fetch('/termsofservice/en.html').then((fallbackResponse) => {
+          if (fallbackResponse.status == 200) {
+            return fallbackResponse.text().then((englishHtml) => {
+              // Prepend fallback notice
+              const fallbackNotice = `
+                <div style="background-color: rgba(255, 193, 7, 0.1); border: 1px solid rgba(255, 193, 7, 0.5); border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem;">
+                  <strong>Note:</strong> The Terms of Service are not available in your language (${language}).
+                  The English version is displayed below.
+                </div>
+              `
+              return fallbackNotice + englishHtml
+            })
+          }
+          return defaultTosHtml
         })
-      }
-    })
+      })
+      .then((resultsHTML) => {
+        setTosHtml(resultsHTML)
+      })
+      .catch(() => {
+        setTosHtml(defaultTosHtml)
+      })
   }
 
   useEffect(() => {

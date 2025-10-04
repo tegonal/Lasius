@@ -37,7 +37,7 @@ type Props = {
 }
 
 export const BookingInsertActions: React.FC<Props> = ({ currentItem, nextItem, onAddBetween }) => {
-  const { t } = useTranslation()
+  const { t } = useTranslation('common')
   const [isHovered, setIsHovered] = useState(false)
   const { selectedOrganisationId } = useOrganisation()
 

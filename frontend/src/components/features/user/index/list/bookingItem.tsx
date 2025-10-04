@@ -44,7 +44,7 @@ type Props = {
 }
 
 export const BookingItem: React.FC<Props> = ({ item, nextItem }) => {
-  const { t } = useTranslation()
+  const { t } = useTranslation('common')
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [isAddBetweenOpen, setIsAddBetweenOpen] = useState(false)
