@@ -95,7 +95,7 @@ export const AccountForm: React.FC = () => {
               defaultValue: 'Manage your personal information and account details.',
             })}
           </p>
-          {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
+          {}
           <form onSubmit={hookForm.handleSubmit(onSubmit)} onKeyDown={(e) => preventEnterOnForm(e)}>
             <FormBody>
               <FieldSet>
@@ -133,7 +133,7 @@ export const AccountForm: React.FC = () => {
                 </FormElement>
                 <FormElementSpacer />
                 <FormElement
-                  label={t('common.forms.email', { defaultValue: 'E-Mail' })}
+                  label={t('common.forms.email', { defaultValue: 'Email' })}
                   htmlFor="email"
                   required>
                   <Input

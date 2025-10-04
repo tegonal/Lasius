@@ -18,11 +18,13 @@
  */
 
 import { logger } from 'lib/loggerMiddleware'
+import { getValidRouteOrFallback } from 'lib/utils/routing/validateRoute'
 import { JWT } from 'next-auth/jwt'
 import { getToken } from 'next-auth/jwt'
 import { NextAuthMiddlewareOptions, NextRequestWithAuth } from 'next-auth/middleware'
 import { NextMiddlewareResult } from 'next/dist/server/web/types'
 import { NextRequest, NextResponse } from 'next/server'
+import { ROUTES } from 'projectConfig/routes.constants'
 
 /**
  * Parse the auth URL from environment variable or use default
@@ -48,7 +50,7 @@ async function handleAuthMiddleware(
   options: NextAuthMiddlewareOptions | undefined,
   onSuccess?: (token: JWT | null) => Promise<NextMiddlewareResult>,
 ) {
-  const { pathname, search, origin, basePath, locale, defaultLocale } = req.nextUrl
+  const { pathname, search, origin, basePath } = req.nextUrl
 
   const signInPage = options?.pages?.signIn ?? '/api/auth/signin'
   const errorPage = options?.pages?.error ?? '/api/auth/error'
@@ -86,13 +88,20 @@ async function handleAuthMiddleware(
   // the user is authorized, let the middleware handle the rest
   if (isAuthorized) return await onSuccess?.(token)
 
-  // append locale to urls if not default locale
-  const localePath = locale !== defaultLocale ? `/${locale}` : ''
-  const localQueryParam = locale !== defaultLocale ? `?locale=${locale}` : ''
+  // Validate the callback URL - if it's not a known route, use home instead
+  const requestedUrl = `${basePath}${pathname}${search}`
+  const validCallbackUrl = getValidRouteOrFallback(requestedUrl, ROUTES.USER.INDEX, origin)
+
+  if (validCallbackUrl !== requestedUrl) {
+    logger.warn('[AuthMiddleware] Invalid route requested, using fallback:', {
+      requested: requestedUrl,
+      fallback: validCallbackUrl,
+    })
+  }
 
   // the user is not logged in, redirect to the sign-in page
-  const signInUrl = new URL(`${basePath}${signInPage}${localQueryParam}`, origin)
-  signInUrl.searchParams.append('callbackUrl', `${basePath}${localePath}${pathname}${search}`)
+  const signInUrl = new URL(`${basePath}${signInPage}`, origin)
+  signInUrl.searchParams.append('callbackUrl', validCallbackUrl)
   return NextResponse.redirect(signInUrl)
 }
 

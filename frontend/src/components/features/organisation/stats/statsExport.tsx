@@ -141,21 +141,43 @@ export const StatsExport: React.FC = () => {
 
   return (
     <div className="dropdown dropdown-end">
-      <button type="button" className="btn btn-neutral" disabled={!bookingList} tabIndex={0}>
+      <button
+        type="button"
+        className="btn btn-neutral"
+        disabled={!bookingList}
+        tabIndex={0}
+        aria-haspopup="menu"
+        aria-label={t('export.stats.openMenu', {
+          defaultValue: 'Open statistics export format menu',
+        })}>
         <Download className="size-4" />
         {t('export.actions.export', { defaultValue: 'Export' })}
         <ChevronDown className="size-4" />
       </button>
       <ul
         tabIndex={0}
+        role="menu"
+        aria-label={t('export.stats.menuLabel', {
+          defaultValue: 'Statistics export format selection',
+        })}
         className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
-        <li>
-          <button onClick={() => handleExport('xlsx')}>
+        <li role="none">
+          <button
+            role="menuitem"
+            onClick={() => handleExport('xlsx')}
+            aria-label={t('export.formats.excelAria', {
+              defaultValue: 'Export as Excel file',
+            })}>
             {t('export.formats.excel', { defaultValue: 'Excel (.xlsx)' })}
           </button>
         </li>
-        <li>
-          <button onClick={() => handleExport('ods')}>
+        <li role="none">
+          <button
+            role="menuitem"
+            onClick={() => handleExport('ods')}
+            aria-label={t('export.formats.odsAria', {
+              defaultValue: 'Export as OpenDocument file',
+            })}>
             {t('export.formats.ods', { defaultValue: 'OpenDocument (.ods)' })}
           </button>
         </li>

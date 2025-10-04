@@ -171,7 +171,8 @@ export const HelpDrawer: React.FC = () => {
                       variant="ghost"
                       shape="circle"
                       size="sm"
-                      fullWidth={false}>
+                      fullWidth={false}
+                      aria-label={t('common.actions.close', { defaultValue: 'Close' })}>
                       <LucideIcon icon={X} size={20} />
                     </Button>
                   </div>

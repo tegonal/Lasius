@@ -163,7 +163,7 @@ export const OAuthUserRegister: NextPage<{ locale?: string }> = ({ locale }) => 
             <FormBody>
               <FieldSet>
                 <FormElement
-                  label={t('common.forms.email', { defaultValue: 'E-Mail' })}
+                  label={t('common.forms.email', { defaultValue: 'Email' })}
                   htmlFor="email"
                   required>
                   <Input

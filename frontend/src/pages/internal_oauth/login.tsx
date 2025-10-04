@@ -210,7 +210,7 @@ const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig }> = ({ con
             <FormBody>
               <FieldSet>
                 <FormElement
-                  label={t('common.forms.email', { defaultValue: 'E-Mail' })}
+                  label={t('common.forms.email', { defaultValue: 'Email' })}
                   htmlFor="email">
                   <Input
                     id="email"

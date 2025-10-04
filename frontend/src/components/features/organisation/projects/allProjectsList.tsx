@@ -70,7 +70,9 @@ export const AllProjectsList: React.FC<Props> = ({ statusFilter }) => {
       <DataList>
         <DataListRow>
           <DataListHeaderItem />
-          <DataListHeaderItem>{t('common.name', { defaultValue: 'Name' })}</DataListHeaderItem>
+          <DataListHeaderItem>
+            {t('common.forms.name', { defaultValue: 'Name' })}
+          </DataListHeaderItem>
           <DataListHeaderItem>
             {t('common.status.label', { defaultValue: 'Status' })}
           </DataListHeaderItem>

@@ -17,26 +17,28 @@
  *
  */
 
-import { Button } from 'components/primitives/buttons/Button'
-import { LucideIcon } from 'components/ui/icons/LucideIcon'
-import { ChevronRightIcon } from 'lucide-react'
-import React from 'react'
-
-type Props = {
-  onClick: () => void
-  ariaLabel?: string
-}
-
-export const ButtonRight: React.FC<Props> = ({ onClick, ariaLabel = 'Next' }) => {
-  return (
-    <Button
-      type="button"
-      variant="icon"
-      shape="circle"
-      onClick={onClick}
-      fullWidth={false}
-      aria-label={ariaLabel}>
-      <LucideIcon icon={ChevronRightIcon} />
-    </Button>
-  )
+/**
+ * Application routes constants
+ * Separated from routes.tsx to allow usage in middleware without React dependencies
+ */
+export const ROUTES = {
+  USER: {
+    INDEX: '/user/home',
+    DASHBOARD: '/user/dashboard',
+    STATS: '/user/stats',
+    LISTS: '/user/lists',
+    PROJECTS: '/user/projects',
+  },
+  ORGANISATION: {
+    CURRENT: '/organisation/current',
+    LISTS: '/organisation/lists',
+    STATS: '/organisation/stats',
+    PROJECTS: '/organisation/projects',
+  },
+  SETTINGS: {
+    APP: '/settings/app',
+    ACCOUNT: '/settings/account',
+    ACCOUNT_SECURITY: '/settings/account-security',
+    WORKING_HOURS: '/settings/working-hours',
+  },
 }

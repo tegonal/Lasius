@@ -25,6 +25,7 @@ import { getServerSidePropsWithoutAuth } from 'lib/auth/getServerSidePropsWithou
 import { logger } from 'lib/logger'
 import { GetServerSideProps, NextPage } from 'next'
 import { getServerSession, Session } from 'next-auth'
+import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import { nextAuthOptions } from 'pages/api/auth/[...nextauth]'
 import { useAsync } from 'react-async-hook'
@@ -34,6 +35,9 @@ const Join: NextPage<{ session: Session; locale?: string }> = ({ session, locale
   const { invitationId = '' } = router.query as { invitationId: string }
 
   const invitationStatus = useAsync((id: string) => getInvitationStatus(id), [invitationId])
+
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://lasius.io'
+  const ogImageUrl = `${baseUrl}/api/og?title=${encodeURIComponent('You have been invited!')}&subtitle=${encodeURIComponent('Join your team or project on Lasius')}`
 
   if (invitationStatus.loading) return null
 
@@ -59,19 +63,81 @@ const Join: NextPage<{ session: Session; locale?: string }> = ({ session, locale
   if (invitation && session !== null) {
     // check if invitation matches current users session
     if (session.user && session.user.email !== invitation.invitation.invitedEmail) {
-      return <InvitationOtherSession invitation={invitation} />
+      return (
+        <>
+          <NextSeo
+            title="Invitation - Lasius"
+            description="You've been invited to join a team or project on Lasius - open source time tracking for teams."
+            canonical={`${baseUrl}/join/${invitationId}`}
+            openGraph={{
+              url: `${baseUrl}/join/${invitationId}`,
+              title: 'You have been invited!',
+              description:
+                'Join your team or project on Lasius - open source time tracking for teams.',
+              images: [
+                {
+                  url: ogImageUrl,
+                  width: 1200,
+                  height: 630,
+                  alt: 'You have been invited to join Lasius',
+                },
+              ],
+              siteName: 'Lasius',
+              type: 'website',
+              locale: locale || 'en',
+            }}
+            twitter={{
+              handle: '@tegonal',
+              site: '@tegonal',
+              cardType: 'summary_large_image',
+            }}
+          />
+          <InvitationOtherSession invitation={invitation} />
+        </>
+      )
     }
 
     // handle invite for logged in user, confirm
-    return <InvitationUserConfirm invitation={invitation} />
+    return (
+      <>
+        <NextSeo
+          title="Invitation - Lasius"
+          description="You've been invited to join a team or project on Lasius - open source time tracking for teams."
+          canonical={`${baseUrl}/join/${invitationId}`}
+          openGraph={{
+            url: `${baseUrl}/join/${invitationId}`,
+            title: 'You have been invited!',
+            description:
+              'Join your team or project on Lasius - open source time tracking for teams.',
+            images: [
+              {
+                url: ogImageUrl,
+                width: 1200,
+                height: 630,
+                alt: 'You have been invited to join Lasius',
+              },
+            ],
+            siteName: 'Lasius',
+            type: 'website',
+            locale: locale || 'en',
+          }}
+          twitter={{
+            handle: '@tegonal',
+            site: '@tegonal',
+            cardType: 'summary_large_image',
+          }}
+        />
+        <InvitationUserConfirm invitation={invitation} />
+      </>
+    )
   }
 
   return null
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  return getServerSidePropsWithoutAuth(context, async (context, locale) => {
-    const session = await getServerSession(context.req, context.res, nextAuthOptions(locale))
+  return getServerSidePropsWithoutAuth(context, async (context) => {
+    const session = await getServerSession(context.req, context.res, nextAuthOptions())
     return {
       session,
     }

@@ -49,8 +49,10 @@ export const AuthLayout: React.FC<Props> = ({ children, infoPanel }) => {
 
           {children}
 
-          <div className="pt-4 text-center">
-            <TegonalFooter />
+          <div className="flex justify-center pt-4">
+            <div className="max-w-sm text-center">
+              <TegonalFooter />
+            </div>
           </div>
         </div>
       </div>

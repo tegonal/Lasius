@@ -213,8 +213,8 @@
   body {
     margin: 0;
     padding: 0;
-    background-color: oklch(var(--root-bg));
-    color: oklch(var(--color-base-content));
+    background-color: var(--root-bg);
+    color: var(--color-base-content);
     font-family: Roboto, "Open Sans", sans-serif;
     font-weight: 400;
     line-height: 1.666;
@@ -305,11 +305,18 @@
       opacity: 1;
     }
   }
-  
+
   .input {
     &:focus, &:focus-within {
       @apply outline-2 outline-secondary outline-offset-0 border-secondary;
     }
+  }
+
+  /* Override 1Password autofill styling - use theme colors */
+  input[data-com-onepassword-filled],
+  textarea[data-com-onepassword-filled],
+  select[data-com-onepassword-filled] {
+  color: rgb(0, 0, 0) !important;
   }
 
 }

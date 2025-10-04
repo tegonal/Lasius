@@ -302,7 +302,7 @@ if (process.env.GITHUB_OAUTH_CLIENT_ID && process.env.GITHUB_OAUTH_CLIENT_SECRET
   )
 }
 
-export const nextAuthOptions: (locale?: string) => NextAuthOptions = (locale) => {
+export const nextAuthOptions: () => NextAuthOptions = () => {
   return {
     debug: process.env.LASIUS_DEBUG === 'true',
     providers: providers,
@@ -314,7 +314,7 @@ export const nextAuthOptions: (locale?: string) => NextAuthOptions = (locale) =>
     },
     secret: process.env.NEXTAUTH_SECRET,
     pages: {
-      signIn: `/login?${locale ? 'locale=' + locale : ''}`,
+      signIn: `/login`,
       signOut: `/`,
     },
     callbacks: {
@@ -423,6 +423,5 @@ export const nextAuthOptions: (locale?: string) => NextAuthOptions = (locale) =>
 }
 
 export default (req: NextApiRequest, res: NextApiResponse) => {
-  const locale = req.query.locale?.toString()
-  return NextAuth(req, res, nextAuthOptions(locale))
+  return NextAuth(req, res, nextAuthOptions())
 }

@@ -24,9 +24,11 @@ import { OrganisationStats } from 'components/features/organisation/current/orga
 import { ManageUserInviteByEmailForm } from 'components/features/user/manageUserInviteByEmailForm'
 import { ScrollContainer } from 'components/primitives/layout/ScrollContainer'
 import { Modal } from 'components/ui/overlays/modal/Modal'
+import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import React, { useState } from 'react'
 
 export const OrganisationLayout: React.FC = () => {
+  const { selectedOrganisationId } = useOrganisation()
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [isUpdateOpen, setIsUpdateOpen] = useState(false)
   const [isInviteOpen, setIsInviteOpen] = useState(false)
@@ -62,7 +64,7 @@ export const OrganisationLayout: React.FC = () => {
       </Modal>
       <Modal open={isInviteOpen} onClose={handleInviteClose}>
         <ManageUserInviteByEmailForm
-          organisation={undefined}
+          organisation={selectedOrganisationId}
           onSave={handleInviteClose}
           onCancel={handleInviteClose}
         />

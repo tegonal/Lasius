@@ -87,6 +87,7 @@
       "delete": "Buchung löschen",
       "edit": "Buchung bearbeiten",
       "editOverlapping": "Buchung bearbeiten, um Überlappung zu beheben",
+      "filterByProject": "Nach Projekt {{projectKey}} filtern",
       "insert": "Buchung einfügen",
       "start": "Buchung starten",
       "startFromFavorite": "Buchung aus Favorit starten",
@@ -111,10 +112,13 @@
       "empty": "Keine Vorlagen verfügbar",
       "favorites": "Favoriten",
       "recent": "Letzte Buchungen",
+      "selectFavorite": "Favorit auswählen: {{projectName}}{{tags}}",
+      "selectRecent": "Letzte Buchung auswählen: {{projectName}}{{tags}}",
+      "selectTeam": "Team-Buchung von {{userName}} auswählen: {{projectName}}{{tags}}",
       "team": "Team-Buchungen",
       "title": "Eine Vorlage wählen"
     },
-    "showLists": "Show bookings",
+    "showLists": "Buchungen anzeigen",
     "status": {
       "added": "Buchung hinzugefügt",
       "currentlyNotBooking": "Derzeit keine Buchung aktiv",
@@ -139,7 +143,7 @@
   "charts": {
     "errors": {
       "invalidData": "Ungültige Daten",
-      "noData": "No data available"
+      "noData": "Keine Daten verfügbar"
     },
     "noData": {
       "month": "Keine Buchungsdaten für diesen Monat"
@@ -147,15 +151,15 @@
   },
   "common": {
     "actions": {
-      "actions": "Actions",
-      "add": "Add",
+      "actions": "Aktionen",
+      "add": "Hinzufügen",
       "cancel": "Abbrechen",
       "close": "Schließen",
-      "delete": "Delete",
-      "discardChanges": "Discard changes",
+      "delete": "Löschen",
+      "discardChanges": "Änderungen verwerfen",
       "help": "Hilfe",
       "invite": "Einladen",
-      "keepEditing": "Keep editing",
+      "keepEditing": "Weiter bearbeiten",
       "reset": "Zurücksetzen",
       "resetToInitial": "Auf ursprünglichen Wert zurücksetzen",
       "save": "Speichern",
@@ -163,13 +167,12 @@
       "signUp": "Registrieren"
     },
     "back": "Zurück",
-    "confirmUnsavedChanges": "You have unsaved changes. Are you sure you want to cancel?",
+    "confirmUnsavedChanges": "Sie haben ungespeicherte Änderungen. Möchten Sie wirklich abbrechen?",
     "custom": "Benutzerdefiniert",
     "dashboard": "Dashboard",
     "date": "Datum",
-    "email": "Email",
     "errors": {
-      "generic": "Something went wrong",
+      "generic": "Etwas ist schiefgelaufen",
       "helpNotAvailable": "Hilfeinhalt für diese Seite nicht verfügbar.",
       "internalServerError": "Interner Serverfehler",
       "pageNotFound": "Seite nicht gefunden",
@@ -179,7 +182,6 @@
     "filter": {
       "title": "Filter"
     },
-    "firstName": "Vorname",
     "formats": {
       "dateFormat": "TT.MM.JJJJ",
       "durationFormat": "HH:MM",
@@ -196,11 +198,10 @@
       "password": "Passwort",
       "role": "Rolle"
     },
+    "help": "Hilfe",
     "info": {
-      "helpFallbackLanguage": "This help content is not available in your selected language yet. Showing English version."
+      "helpFallbackLanguage": "Dieser Hilfeinhalt ist in Ihrer gewählten Sprache noch nicht verfügbar. Es wird die englische Version angezeigt."
     },
-    "lastName": "Nachname",
-    "name": "Name",
     "ok": "Ok",
     "or": "oder",
     "roles": {
@@ -280,12 +281,23 @@
   },
   "export": {
     "actions": {
-      "export": "Exportieren"
+      "export": "Exportieren",
+      "openMenu": "Exportformat-Menü öffnen"
     },
     "formats": {
       "csv": "CSV (.csv)",
+      "csvAria": "Als CSV-Datei exportieren",
       "excel": "Excel (.xlsx)",
-      "ods": "OpenDocument (.ods)"
+      "excelAria": "Als Excel-Datei exportieren",
+      "ods": "OpenDocument (.ods)",
+      "odsAria": "Als OpenDocument-Datei exportieren"
+    },
+    "menu": {
+      "label": "Exportformat-Auswahl"
+    },
+    "stats": {
+      "menuLabel": "Statistik-Exportformat-Auswahl",
+      "openMenu": "Statistik-Exportformat-Menü öffnen"
     },
     "status": {
       "success": "Export successful: {{filename}}"
@@ -416,14 +428,14 @@
       "status": "Status"
     },
     "label": "Projekt",
-    "lastActivity": "Last activity",
+    "lastActivity": "Letzte Aktivität",
     "members": {
       "title": "Projektmitglieder"
     },
     "myProjects": "Meine Projekte",
     "myProjectsDescription": "Projekte, in denen du Mitglied bist und Zeit buchen kannst. Eingeschränkt durch die aktuell ausgewählte Organisation.",
     "name": "Projektname",
-    "noActivity": "No activity",
+    "noActivity": "Keine Aktivität",
     "project": "Projekt",
     "projectName": "Projektname",
     "projectRole": "Rolle",
@@ -460,8 +472,9 @@
   },
   "statistics": {
     "expectedHours": "Erwartete Stunden",
-    "noProjectsForDay": "No projects for this day",
-    "noProjectsForWeek": "No projects for this week",
+    "noProjectsForDay": "Keine Projekte für diesen Tag",
+    "noProjectsForPeriod": "Keine Projekte für diesen Zeitraum",
+    "noProjectsForWeek": "Keine Projekte für diese Woche",
     "percentOfPlannedHours": "% der geplanten Stunden",
     "showStatistics": "Statistiken anzeigen",
     "title": "Statistiken",
@@ -479,38 +492,38 @@
   },
   "tags": {
     "actions": {
-      "add": "Add tags",
+      "add": "Tags hinzufügen",
       "addDefaultTagGroups": "Standard-Tag-Gruppen hinzufügen",
-      "addTag": "Add a tag",
+      "addTag": "Einen Tag hinzufügen",
       "addTagGroup": "Eine neue Tag-Gruppe hinzufügen",
-      "collapseAll": "Collapse all",
-      "copyTags": "Copy tags",
+      "collapseAll": "Alle einklappen",
+      "copyTags": "Tags kopieren",
       "createTagGroup": "Tag-Gruppe erstellen",
       "edit": "Tags bearbeiten",
-      "editForProject": "Edit tags for {{projectKey}}",
-      "expandAll": "Expand all",
-      "pasteTags": "Paste tags"
+      "editForProject": "Tags für {{projectKey}} bearbeiten",
+      "expandAll": "Alle ausklappen",
+      "pasteTags": "Tags einfügen"
     },
     "chooseOrEnter": "Tags auswählen oder eingeben",
-    "confirmDeleteGroup": "Are you sure you want to delete the tag group \"{{groupName}}\"?",
+    "confirmDeleteGroup": "Möchten Sie die Tag-Gruppe \"{{groupName}}\" wirklich löschen?",
     "customTag": "Benutzerdefinierter Tag",
-    "enterTagName": "Enter tag name",
+    "enterTagName": "Tag-Name eingeben",
     "enterToAdd": "Gib einen Tag ein, um ihn hinzuzufügen",
     "label": "Tags",
-    "noTagGroups": "No tag groups defined yet",
+    "noTagGroups": "Noch keine Tag-Gruppen definiert",
     "simpleTags": "Einfache Tags",
-    "simpleTagsDescription": "Tags that are not part of any group",
+    "simpleTagsDescription": "Tags, die zu keiner Gruppe gehören",
     "status": {
-      "tagsCopied": "Tags copied",
-      "tagsPasted": "Tags pasted"
+      "tagsCopied": "Tags kopiert",
+      "tagsPasted": "Tags eingefügt"
     },
     "tagGroups": "Tag-Gruppen",
     "title": "Tags",
     "validation": {
-      "tagExists": "Tag already exists",
+      "tagExists": "Tag existiert bereits",
       "tagGroupExists": "Tag-Gruppe existiert bereits",
-      "tagGroupNameRequired": "Tag group name is required",
-      "tagNameRequired": "Tag name is required"
+      "tagGroupNameRequired": "Tag-Gruppenname erforderlich",
+      "tagNameRequired": "Tag-Name erforderlich"
     }
   },
   "tos": {
@@ -538,18 +551,18 @@
     }
   },
   "workHealth": {
-    "actualHours": "Actual Hours",
-    "avgPerDay": "avg/day",
-    "consecutiveDays": "consecutive days",
-    "elevatedLoad": "Load is elevated",
-    "healthyLoad": "Looking good!",
-    "highLoad": "Heavy load detected",
-    "plannedHours": "Planned Hours",
-    "relaxReminder": "Time to relax a little bit",
-    "sixMonths": "6 Months",
-    "sixMonthTrend": "6-Month Work Trend",
-    "takeItEasy": "Consider taking it easy",
-    "thisWeek": "this week"
+    "actualHours": "Tatsächliche Stunden",
+    "avgPerDay": "Ø/Tag",
+    "consecutiveDays": "aufeinanderfolgende Tage",
+    "elevatedLoad": "Erhöhte Belastung",
+    "healthyLoad": "Sieht gut aus!",
+    "highLoad": "Hohe Belastung erkannt",
+    "plannedHours": "Geplante Stunden",
+    "relaxReminder": "Zeit, sich etwas zu entspannen",
+    "sixMonths": "6 Monate",
+    "sixMonthTrend": "6-Monats-Arbeitstrend",
+    "takeItEasy": "Überlegen Sie, es ruhiger angehen zu lassen",
+    "thisWeek": "diese Woche"
   },
   "workingHours": {
     "clickToAdjustHours": "Klicke auf einen beliebigen Tag in den Organisationskarten unten, um die Stunden anzupassen",

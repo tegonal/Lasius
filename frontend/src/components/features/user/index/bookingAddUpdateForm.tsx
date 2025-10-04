@@ -326,7 +326,8 @@ export const BookingAddUpdateForm: React.FC<Props> = ({
                     shape="circle"
                     size="sm"
                     onClick={() => openHelp('modal-add-edit-booking')}
-                    fullWidth={false}>
+                    fullWidth={false}
+                    aria-label={t('common.help', { defaultValue: 'Help' })}>
                     <LucideIcon icon={HelpCircle} size={20} />
                   </Button>
                 </div>

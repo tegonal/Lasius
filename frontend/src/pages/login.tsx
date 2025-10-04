@@ -35,16 +35,19 @@ import { logger } from 'lib/logger'
 import { LasiusPlausibleEvents } from 'lib/telemetry/plausibleEvents'
 import { usePlausible } from 'lib/telemetry/usePlausible'
 import { formatISOLocale } from 'lib/utils/date/dates'
+import { getValidRouteOrFallback } from 'lib/utils/routing/validateRoute'
 import { AlertTriangle } from 'lucide-react'
 import { GetServerSidePropsContext, NextPage } from 'next'
 import { ClientSafeProvider, getCsrfToken, getProviders, signIn } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
+import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import {
   AUTH_PROVIDER_CUSTOMER_KEYCLOAK,
   AUTH_PROVIDER_INTERNAL_LASIUS,
 } from 'projectConfig/constants'
+import { ROUTES } from 'projectConfig/routes'
 import { useCallback, useEffect, useState } from 'react'
 import { useCalendarActions } from 'stores/calendarStore'
 
@@ -109,10 +112,19 @@ const Login: NextPage<{
 
       setIsSubmitting(true)
 
-      const localePath = `${locale ? '/' + locale : ''}`
-      const resolvedCallbackUrl = invitation_id
-        ? `${localePath}/join/${invitation_id}`
-        : callbackUrl?.toString() || `${localePath}/user/home`
+      // Validate the callback URL before passing to NextAuth
+      let rawCallbackUrl = callbackUrl?.toString() || ROUTES.USER.INDEX
+      if (callbackUrl) {
+        rawCallbackUrl = getValidRouteOrFallback(callbackUrl.toString(), ROUTES.USER.INDEX)
+        if (rawCallbackUrl !== callbackUrl.toString()) {
+          logger.warn('[Login] Invalid callback URL from query, using fallback:', {
+            original: callbackUrl.toString(),
+            fallback: rawCallbackUrl,
+          })
+        }
+      }
+
+      const resolvedCallbackUrl = invitation_id ? `/join/${invitation_id}` : rawCallbackUrl
       const res = await signIn(
         provider,
         {
@@ -140,7 +152,25 @@ const Login: NextPage<{
         })
 
         setSelectedDate(formatISOLocale(new Date()))
-        await router.push(res.url)
+
+        // Validate the redirect URL - if it's not a known route, redirect to home instead
+        const redirectUrl = getValidRouteOrFallback(res.url, ROUTES.USER.INDEX)
+
+        logger.info('[Login] Attempting redirect to:', res.url)
+        if (redirectUrl !== res.url) {
+          logger.warn('[Login] Invalid route detected, redirecting to home instead:', {
+            attempted: res.url,
+            redirecting: redirectUrl,
+          })
+        }
+
+        await router.push(redirectUrl)
+        logger.info('[Login] Router.push completed, current pathname:', router.pathname)
+      } else {
+        logger.warn('[Login] Sign in failed or no URL returned:', {
+          error: res?.error,
+          url: res?.url,
+        })
       }
     },
     [
@@ -180,112 +210,172 @@ const Login: NextPage<{
     )
   }
 
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://lasius.io'
+  const ogImageUrl = `${baseUrl}/api/og?title=${encodeURIComponent('Lasius')}&subtitle=${encodeURIComponent('Open source time tracking for teams')}`
+
   return (
-    <AuthLayout infoPanel={<LoginInfoPanel />}>
-      {/* Error Alert */}
-      {error && (
-        <Alert variant="warning" className="animate-[fadeIn_0.4s_ease-out]">
-          {getErrorMessage(error)}
-        </Alert>
-      )}
+    <>
+      <NextSeo
+        title="Sign in to Lasius"
+        description="Lasius - Open source time tracking for teams. Sign in to track your time and manage projects."
+        canonical={`${baseUrl}/login`}
+        openGraph={{
+          url: `${baseUrl}/login`,
+          title: 'Sign in to Lasius',
+          description:
+            'Lasius - Open source time tracking for teams. Sign in to track your time and manage projects.',
+          images: [
+            {
+              url: ogImageUrl,
+              width: 1200,
+              height: 630,
+              alt: 'Lasius - Open source time tracker for teams',
+            },
+          ],
+          siteName: 'Lasius',
+          type: 'website',
+          locale: locale || defaultLocale || 'en',
+        }}
+        twitter={{
+          handle: '@tegonal',
+          site: '@tegonal',
+          cardType: 'summary_large_image',
+        }}
+      />
+      <AuthLayout infoPanel={<LoginInfoPanel />}>
+        {/* Error Alert */}
+        {error && (
+          <Alert variant="warning" className="animate-[fadeIn_0.4s_ease-out]">
+            {getErrorMessage(error)}
+          </Alert>
+        )}
 
-      {/* No providers warning */}
-      {providers.length === 0 && (
-        <Card className="border-warning bg-warning/5 backdrop-blur-sm">
-          <CardBody className="items-center gap-4">
-            <div className="flex justify-center lg:hidden">
-              <Logo />
-            </div>
-            <div className="text-warning">
-              <LucideIcon icon={AlertTriangle} size={48} />
-            </div>
-            <p className="text-center font-medium">
-              {t('auth.noAuthMethodsAvailable', {
-                defaultValue: 'No authentication methods available',
-              })}
-            </p>
-            <p className="text-base-content/70 text-center text-sm">
-              {t('help.contactAdmin', { defaultValue: 'Please contact your administrator' })}
-            </p>
-          </CardBody>
-        </Card>
-      )}
-
-      {/* Main login card */}
-      {providers.length > 0 && (
-        <Card className="bg-base-100/80 border-0 shadow-2xl backdrop-blur-sm">
-          <CardBody className="p-8 lg:p-10">
-            <div className="mb-8 text-center">
-              <h2 className="mb-2 text-3xl font-bold">
-                {t('auth.signInTitle', { defaultValue: 'Sign in to your account' })}
-              </h2>
-              <p className="text-base-content/60">
-                {providers.length > 1
-                  ? t('auth.chooseMethod', { defaultValue: 'Choose your preferred method below' })
-                  : t('auth.continueWithProvider', {
-                      defaultValue: 'Continue with your account',
-                    })}
+        {/* No providers warning */}
+        {providers.length === 0 && (
+          <Card className="border-warning bg-warning/5 backdrop-blur-sm">
+            <CardBody className="items-center gap-4">
+              <div className="flex justify-center lg:hidden">
+                <Logo />
+              </div>
+              <div className="text-warning">
+                <LucideIcon icon={AlertTriangle} size={48} />
+              </div>
+              <p className="text-center font-medium">
+                {t('auth.noAuthMethodsAvailable', {
+                  defaultValue: 'No authentication methods available',
+                })}
               </p>
-            </div>
+              <p className="text-base-content/70 text-center text-sm">
+                {t('help.contactAdmin', { defaultValue: 'Please contact your administrator' })}
+              </p>
+            </CardBody>
+          </Card>
+        )}
 
-            {/* Provider buttons */}
-            <div className="space-y-3">
-              {providers.map((provider) => {
-                let icon = undefined
-                if (provider.custom_logo) {
-                  icon = (
-                    <Image alt={provider.name} src={provider.custom_logo} width={24} height={24} />
-                  )
-                } else {
-                  switch (provider.id) {
-                    case AUTH_PROVIDER_INTERNAL_LASIUS:
-                      icon = <LasiusIcon size={24} />
-                      break
-                    case 'gitlab':
-                      icon = <SiGitlab />
-                      break
-                    case 'github':
-                      icon = <SiGithub />
-                      break
-                    case AUTH_PROVIDER_CUSTOMER_KEYCLOAK:
-                      icon = <SiKeycloak />
-                      break
+        {/* Main login card */}
+        {providers.length > 0 && (
+          <Card className="bg-base-100/80 border-0 shadow-2xl backdrop-blur-sm">
+            <CardBody className="p-8 lg:p-10">
+              <div className="mb-8 text-center">
+                <h2 className="mb-2 text-3xl font-bold">
+                  {t('auth.signInTitle', { defaultValue: 'Sign in to your account' })}
+                </h2>
+                <p className="text-base-content/60">
+                  {providers.length > 1
+                    ? t('auth.chooseMethod', { defaultValue: 'Choose your preferred method below' })
+                    : t('auth.continueWithProvider', {
+                        defaultValue: 'Continue with your account',
+                      })}
+                </p>
+              </div>
+
+              {/* Provider buttons */}
+              <div className="space-y-3">
+                {providers.map((provider) => {
+                  let icon = undefined
+                  if (provider.custom_logo) {
+                    icon = (
+                      <Image
+                        alt={provider.name}
+                        src={provider.custom_logo}
+                        width={24}
+                        height={24}
+                      />
+                    )
+                  } else {
+                    switch (provider.id) {
+                      case AUTH_PROVIDER_INTERNAL_LASIUS:
+                        icon = <LasiusIcon size={24} />
+                        break
+                      case 'gitlab':
+                        icon = <SiGitlab />
+                        break
+                      case 'github':
+                        icon = <SiGithub />
+                        break
+                      case AUTH_PROVIDER_CUSTOMER_KEYCLOAK:
+                        icon = <SiKeycloak />
+                        break
+                    }
                   }
-                }
 
-                return (
-                  <Button
-                    key={provider.id}
-                    disabled={isSubmitting}
-                    onClick={() => signInToProvider(provider.id)}
-                    variant="outline"
-                    size="lg"
-                    className={`hover:border-primary hover:bg-base-200 w-full justify-start gap-3 transition-colors duration-200 ${isSubmitting ? 'opacity-50' : ''}`}>
-                    <span className="flex h-6 w-6 items-center justify-center">{icon}</span>
-                    <span className="flex-1 text-left">
-                      {t('auth.continueWith', { defaultValue: 'Continue with' })}{' '}
-                      <span className="font-semibold">{provider.name}</span>
-                    </span>
-                  </Button>
-                )
-              })}
-            </div>
+                  return (
+                    <Button
+                      key={provider.id}
+                      disabled={isSubmitting}
+                      onClick={() => signInToProvider(provider.id)}
+                      variant="outline"
+                      size="lg"
+                      className={`hover:border-primary hover:bg-base-200 w-full justify-start gap-3 transition-colors duration-200 ${isSubmitting ? 'opacity-50' : ''}`}>
+                      <span className="flex h-6 w-6 items-center justify-center">{icon}</span>
+                      <span className="flex-1 text-left">
+                        {t('auth.continueWith', { defaultValue: 'Continue with' })}{' '}
+                        <span className="font-semibold">{provider.name}</span>
+                      </span>
+                    </Button>
+                  )
+                })}
+              </div>
 
-            {/* Help button */}
-            <div className="mt-6 flex flex-col items-center gap-2">
-              <HelpButton />
-              <p className="text-base-content/50 text-center text-sm">
-                {t('auth.needHelp', { defaultValue: 'Need help? Click the help button' })}
-              </p>
-            </div>
-          </CardBody>
-        </Card>
-      )}
-    </AuthLayout>
+              {/* Help button */}
+              <div className="mt-6 flex flex-col items-center gap-2">
+                <HelpButton />
+                <p className="text-base-content/50 text-center text-sm">
+                  {t('auth.needHelp', { defaultValue: 'Need help? Click the help button' })}
+                </p>
+              </div>
+            </CardBody>
+          </Card>
+        )}
+      </AuthLayout>
+    </>
   )
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
+  // Validate and clean the callbackUrl query parameter before NextAuth sees it
+  const callbackUrl = context.query.callbackUrl?.toString()
+  if (callbackUrl) {
+    const validatedUrl = getValidRouteOrFallback(
+      callbackUrl,
+      ROUTES.USER.INDEX,
+      `http://${context.req.headers.host}`,
+    )
+    if (validatedUrl !== callbackUrl) {
+      logger.warn('[Login SSR] Invalid callbackUrl in query, redirecting with valid URL:', {
+        original: callbackUrl,
+        validated: validatedUrl,
+      })
+      // Redirect back to login with the validated callbackUrl
+      return {
+        redirect: {
+          destination: `/login?callbackUrl=${encodeURIComponent(validatedUrl)}${context.query.error ? `&error=${context.query.error}` : ''}`,
+          permanent: false,
+        },
+      }
+    }
+  }
+
   return getServerSidePropsWithoutAuth(context, async (_context, _locale) => {
     const providers = Object.values((await getProviders()) || [])
 

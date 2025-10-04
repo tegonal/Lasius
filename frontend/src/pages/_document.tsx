@@ -46,9 +46,10 @@ class MyDocument extends NextDocument {
       <Html lang={locale}>
         <Head>
           <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
+          <meta name="color-scheme" content="dark light" />
           <link rel="manifest" href="/manifest.json" />
           <meta name="application-name" content="Lasius Timetracking" />
-          <meta name="apple-mobile-web-app-capable" content="yes" />
+          <meta name="mobile-web-app-capable" content="yes" />
           <meta name="apple-mobile-web-app-status-bar-style" content="default" />
           <meta name="apple-mobile-web-app-title" content="Lasius Timetracking" />
           <meta name="description" content="Lasius Timetracking by https://tegonal.com" />

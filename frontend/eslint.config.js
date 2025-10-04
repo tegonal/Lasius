@@ -121,7 +121,13 @@ module.exports = [
       ...reactHooks.configs.recommended.rules,
 
       // JSX A11y rules
-      'jsx-a11y/no-noninteractive-element-interactions': 'warn',
+      'jsx-a11y/no-noninteractive-element-interactions': [
+        'warn',
+        {
+          handlers: ['onClick', 'onMouseDown', 'onMouseUp', 'onKeyPress'],
+          // Exclude onKeyDown to allow form keyboard handling
+        },
+      ],
 
       // License header
       'license-header/header': ['error', './scripts/licenseHeader.js'],

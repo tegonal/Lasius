@@ -87,6 +87,7 @@
       "delete": "Delete booking",
       "edit": "Edit booking",
       "editOverlapping": "Edit booking to resolve overlap",
+      "filterByProject": "Filter by project {{projectKey}}",
       "insert": "Insert booking",
       "start": "Start booking",
       "startFromFavorite": "Start booking from favorite",
@@ -111,6 +112,9 @@
       "empty": "No presets available",
       "favorites": "Favorites",
       "recent": "Recent bookings",
+      "selectFavorite": "Select favorite: {{projectName}}{{tags}}",
+      "selectRecent": "Select recent booking: {{projectName}}{{tags}}",
+      "selectTeam": "Select team booking by {{userName}}: {{projectName}}{{tags}}",
       "team": "Team bookings",
       "title": "Choose a preset"
     },
@@ -167,7 +171,6 @@
     "custom": "Custom",
     "dashboard": "Dashboard",
     "date": "Date",
-    "email": "Email",
     "errors": {
       "generic": "Something went wrong",
       "helpNotAvailable": "Help content not available for this page.",
@@ -179,7 +182,6 @@
     "filter": {
       "title": "Filter"
     },
-    "firstName": "First name",
     "formats": {
       "dateFormat": "DD.MM.YYYY",
       "durationFormat": "HH:MM",
@@ -196,11 +198,10 @@
       "password": "Password",
       "role": "Role"
     },
+    "help": "Help",
     "info": {
       "helpFallbackLanguage": "This help content is not available in your selected language yet. Showing English version."
     },
-    "lastName": "Last name",
-    "name": "Name",
     "ok": "Ok",
     "or": "or",
     "roles": {
@@ -280,12 +281,23 @@
   },
   "export": {
     "actions": {
-      "export": "Export"
+      "export": "Export",
+      "openMenu": "Open export format menu"
     },
     "formats": {
       "csv": "CSV (.csv)",
+      "csvAria": "Export as CSV file",
       "excel": "Excel (.xlsx)",
-      "ods": "OpenDocument (.ods)"
+      "excelAria": "Export as Excel file",
+      "ods": "OpenDocument (.ods)",
+      "odsAria": "Export as OpenDocument file"
+    },
+    "menu": {
+      "label": "Export format selection"
+    },
+    "stats": {
+      "menuLabel": "Statistics export format selection",
+      "openMenu": "Open statistics export format menu"
     },
     "status": {
       "success": "Export successful: {{filename}}"
@@ -461,6 +473,7 @@
   "statistics": {
     "expectedHours": "Expected hours",
     "noProjectsForDay": "No projects for this day",
+    "noProjectsForPeriod": "No projects for this period",
     "noProjectsForWeek": "No projects for this week",
     "percentOfPlannedHours": "% of planned hours",
     "showStatistics": "Show statistics",

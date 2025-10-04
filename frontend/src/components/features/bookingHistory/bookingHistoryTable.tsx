@@ -91,12 +91,17 @@ export const BookingHistoryTable: React.FC<Props> = ({
             <DataListField className="whitespace-nowrap">{booking.userReference.key}</DataListField>
           )}
           <DataListField>
-            <Text
-              className="hover:text-accent cursor-pointer"
+            <button
+              type="button"
+              className="hover:text-accent font-inherit cursor-pointer border-none bg-transparent p-0 text-inherit"
               data-value={booking.projectReference.key}
-              onClick={() => projectIdClickHandler(booking)}>
+              onClick={() => projectIdClickHandler(booking)}
+              aria-label={t('bookings.actions.filterByProject', {
+                defaultValue: 'Filter by project {{projectKey}}',
+                projectKey: booking.projectReference.key,
+              })}>
               {booking.projectReference.key}
-            </Text>
+            </button>
           </DataListField>
           <DataListField>
             <TagList items={booking.tags} clickHandler={tagClickHandler} hideRemoveIcon />

@@ -87,6 +87,7 @@
       "delete": "Eliminar registro",
       "edit": "Editar registro",
       "editOverlapping": "Editar registro para resolver la superposición",
+      "filterByProject": "Filtrar por proyecto {{projectKey}}",
       "insert": "Insertar registro",
       "start": "Iniciar registro",
       "startFromFavorite": "Iniciar registro desde favorito",
@@ -111,6 +112,9 @@
       "empty": "No hay plantillas disponibles",
       "favorites": "Favoritos",
       "recent": "Registros recientes",
+      "selectFavorite": "Seleccionar favorito: {{projectName}}{{tags}}",
+      "selectRecent": "Seleccionar registro reciente: {{projectName}}{{tags}}",
+      "selectTeam": "Seleccionar registro del equipo de {{userName}}: {{projectName}}{{tags}}",
       "team": "Registros del equipo",
       "title": "Elegir una plantilla"
     },
@@ -139,7 +143,7 @@
   "charts": {
     "errors": {
       "invalidData": "Datos no válidos",
-      "noData": "No data available"
+      "noData": "No hay datos disponibles"
     },
     "noData": {
       "month": "No hay datos de registros para este mes"
@@ -148,14 +152,14 @@
   "common": {
     "actions": {
       "actions": "Acciones",
-      "add": "Add",
+      "add": "Añadir",
       "cancel": "Cancelar",
       "close": "Cerrar",
-      "delete": "Delete",
-      "discardChanges": "Discard changes",
+      "delete": "Eliminar",
+      "discardChanges": "Descartar cambios",
       "help": "Ayuda",
       "invite": "Invitar",
-      "keepEditing": "Keep editing",
+      "keepEditing": "Seguir editando",
       "reset": "Restablecer",
       "resetToInitial": "Restablecer al valor inicial",
       "save": "Guardar",
@@ -163,13 +167,12 @@
       "signUp": "Registrarse"
     },
     "back": "Atrás",
-    "confirmUnsavedChanges": "You have unsaved changes. Are you sure you want to cancel?",
+    "confirmUnsavedChanges": "Tiene cambios sin guardar. ¿Está seguro de que desea cancelar?",
     "custom": "Personalizado",
     "dashboard": "Panel de control",
     "date": "Fecha",
-    "email": "Correo electrónico",
     "errors": {
-      "generic": "Something went wrong",
+      "generic": "Algo salió mal",
       "helpNotAvailable": "Contenido de ayuda no disponible para esta página.",
       "internalServerError": "Error interno del servidor",
       "pageNotFound": "Página no encontrada",
@@ -179,7 +182,6 @@
     "filter": {
       "title": "Filtrar"
     },
-    "firstName": "Nombre",
     "formats": {
       "dateFormat": "DD.MM.YYYY",
       "durationFormat": "HH:MM",
@@ -196,11 +198,10 @@
       "password": "Contraseña",
       "role": "Rol"
     },
+    "help": "Ayuda",
     "info": {
       "helpFallbackLanguage": "Este contenido de ayuda aún no está disponible en su idioma seleccionado. Se muestra la versión en inglés."
     },
-    "lastName": "Apellidos",
-    "name": "Nombre",
     "ok": "Aceptar",
     "or": "o",
     "roles": {
@@ -280,12 +281,23 @@
   },
   "export": {
     "actions": {
-      "export": "Exportar"
+      "export": "Exportar",
+      "openMenu": "Abrir menú de formato de exportación"
     },
     "formats": {
       "csv": "CSV (.csv)",
+      "csvAria": "Exportar como archivo CSV",
       "excel": "Excel (.xlsx)",
-      "ods": "OpenDocument (.ods)"
+      "excelAria": "Exportar como archivo Excel",
+      "ods": "OpenDocument (.ods)",
+      "odsAria": "Exportar como archivo OpenDocument"
+    },
+    "menu": {
+      "label": "Selección de formato de exportación"
+    },
+    "stats": {
+      "menuLabel": "Selección de formato de exportación de estadísticas",
+      "openMenu": "Abrir menú de formato de exportación de estadísticas"
     },
     "status": {
       "success": "Exportación exitosa: {{filename}}"
@@ -460,8 +472,9 @@
   },
   "statistics": {
     "expectedHours": "Horas previstas",
-    "noProjectsForDay": "No projects for this day",
-    "noProjectsForWeek": "No projects for this week",
+    "noProjectsForDay": "No hay proyectos para este día",
+    "noProjectsForPeriod": "No hay proyectos para este período",
+    "noProjectsForWeek": "No hay proyectos para esta semana",
     "percentOfPlannedHours": "% de horas planificadas",
     "showStatistics": "Mostrar estadísticas",
     "title": "Estadísticas",
@@ -479,38 +492,38 @@
   },
   "tags": {
     "actions": {
-      "add": "Add tags",
+      "add": "Añadir etiquetas",
       "addDefaultTagGroups": "Añadir grupos de etiquetas predeterminados",
-      "addTag": "Add a tag",
+      "addTag": "Añadir una etiqueta",
       "addTagGroup": "Añadir un nuevo grupo de etiquetas",
-      "collapseAll": "Collapse all",
-      "copyTags": "Copy tags",
+      "collapseAll": "Contraer todo",
+      "copyTags": "Copiar etiquetas",
       "createTagGroup": "Crear grupo de etiquetas",
       "edit": "Editar etiquetas",
-      "editForProject": "Edit tags for {{projectKey}}",
-      "expandAll": "Expand all",
-      "pasteTags": "Paste tags"
+      "editForProject": "Editar etiquetas para {{projectKey}}",
+      "expandAll": "Expandir todo",
+      "pasteTags": "Pegar etiquetas"
     },
     "chooseOrEnter": "Elegir o introducir etiquetas",
-    "confirmDeleteGroup": "Are you sure you want to delete the tag group \"{{groupName}}\"?",
+    "confirmDeleteGroup": "¿Está seguro de que desea eliminar el grupo de etiquetas \"{{groupName}}\"?",
     "customTag": "Etiqueta personalizada",
-    "enterTagName": "Enter tag name",
+    "enterTagName": "Introducir nombre de etiqueta",
     "enterToAdd": "Introduzca una etiqueta para añadirla",
     "label": "Etiquetas",
-    "noTagGroups": "No tag groups defined yet",
+    "noTagGroups": "Aún no se han definido grupos de etiquetas",
     "simpleTags": "Etiquetas simples",
-    "simpleTagsDescription": "Tags that are not part of any group",
+    "simpleTagsDescription": "Etiquetas que no forman parte de ningún grupo",
     "status": {
-      "tagsCopied": "Tags copied",
-      "tagsPasted": "Tags pasted"
+      "tagsCopied": "Etiquetas copiadas",
+      "tagsPasted": "Etiquetas pegadas"
     },
     "tagGroups": "Grupos de etiquetas",
     "title": "Etiquetas",
     "validation": {
-      "tagExists": "Tag already exists",
+      "tagExists": "La etiqueta ya existe",
       "tagGroupExists": "El grupo de etiquetas ya existe",
-      "tagGroupNameRequired": "Tag group name is required",
-      "tagNameRequired": "Tag name is required"
+      "tagGroupNameRequired": "Se requiere el nombre del grupo de etiquetas",
+      "tagNameRequired": "Se requiere el nombre de la etiqueta"
     }
   },
   "tos": {
@@ -538,18 +551,18 @@
     }
   },
   "workHealth": {
-    "actualHours": "Actual Hours",
-    "avgPerDay": "avg/day",
-    "consecutiveDays": "consecutive days",
-    "elevatedLoad": "Load is elevated",
-    "healthyLoad": "Looking good!",
-    "highLoad": "Heavy load detected",
-    "plannedHours": "Planned Hours",
-    "relaxReminder": "Time to relax a little bit",
-    "sixMonths": "6 Months",
-    "sixMonthTrend": "6-Month Work Trend",
-    "takeItEasy": "Consider taking it easy",
-    "thisWeek": "this week"
+    "actualHours": "Horas reales",
+    "avgPerDay": "prom/día",
+    "consecutiveDays": "días consecutivos",
+    "elevatedLoad": "Carga elevada",
+    "healthyLoad": "¡Se ve bien!",
+    "highLoad": "Carga alta detectada",
+    "plannedHours": "Horas planificadas",
+    "relaxReminder": "Es hora de relajarse un poco",
+    "sixMonths": "6 meses",
+    "sixMonthTrend": "Tendencia de trabajo de 6 meses",
+    "takeItEasy": "Considere tomarlo con calma",
+    "thisWeek": "esta semana"
   },
   "workingHours": {
     "clickToAdjustHours": "Haga clic en cualquier día a continuación para ajustar las horas de trabajo",

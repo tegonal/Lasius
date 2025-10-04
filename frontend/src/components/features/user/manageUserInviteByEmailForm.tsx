@@ -79,27 +79,35 @@ export const ManageUserInviteByEmailForm: React.FC<Props> = ({
   const handleCloseResult = () => {
     hookForm.reset()
     setShowResult(false)
+    onSave()
   }
 
   const onSubmit = async () => {
+    console.log('onSubmit called')
+    console.log('Form values:', hookForm.getValues())
+    console.log('Form errors:', hookForm.formState.errors)
     setIsSubmitting(true)
     const { inviteMemberByEmailAddress, projectRole, organisationRole } = hookForm.getValues()
-    if (project && organisation) {
-      const data = await inviteProjectUser(organisation, project, {
-        email: inviteMemberByEmailAddress,
-        role: projectRole,
-      })
-      setInvitationResult(data)
-    } else if (organisation) {
-      const data = await inviteOrganisationUser(organisation, {
-        email: inviteMemberByEmailAddress,
-        role: organisationRole,
-      })
-      setInvitationResult(data)
+    try {
+      if (project && organisation) {
+        const data = await inviteProjectUser(organisation, project, {
+          email: inviteMemberByEmailAddress,
+          role: projectRole,
+        })
+        setInvitationResult(data)
+      } else if (organisation) {
+        const data = await inviteOrganisationUser(organisation, {
+          email: inviteMemberByEmailAddress,
+          role: organisationRole,
+        })
+        setInvitationResult(data)
+      }
+      setIsSubmitting(false)
+      setShowResult(true)
+    } catch (error) {
+      console.error('Invitation error:', error)
+      setIsSubmitting(false)
     }
-    setIsSubmitting(false)
-    setShowResult(true)
-    onSave()
   }
 
   const registrationLink = (invitationId: string) => {
@@ -198,7 +206,9 @@ export const ManageUserInviteByEmailForm: React.FC<Props> = ({
             </code>
 
             <Button
-              variant="icon"
+              variant="primary"
+              shape="circle"
+              fullWidth={false}
               aria-label={t('invitations.copyToClipboard', { defaultValue: 'Copy to clipboard' })}
               onClick={() => copy(registrationLink(invitationResult.invitationLinkId || ''))}>
               <LucideIcon icon={Copy} size={16} />

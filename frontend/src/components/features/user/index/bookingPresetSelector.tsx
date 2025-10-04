@@ -51,6 +51,7 @@ type Props = {
 
 // Component for recent bookings list
 const RecentBookingsList: React.FC<{ onSelect: (preset: PresetType) => void }> = ({ onSelect }) => {
+  const { t } = useTranslation('common')
   const { selectedOrganisationId } = useOrganisation()
 
   // Get bookings from the last 7 days - memoize dates to prevent infinite requests
@@ -105,7 +106,12 @@ const RecentBookingsList: React.FC<{ onSelect: (preset: PresetType) => void }> =
               projectName: item.projectReference.key || item.projectReference.id,
               tags: item.tags,
             })
-          }>
+          }
+          aria-label={t('bookings.presets.selectRecent', {
+            defaultValue: 'Select recent booking: {{projectName}}{{tags}}',
+            projectName: item.projectReference.key || item.projectReference.id,
+            tags: item.tags.length > 0 ? ` with ${item.tags.length} tags` : '',
+          })}>
           <LucideIcon icon={Clock} size={16} className="text-base-content/60 mt-1" />
           <div className="flex-1 space-y-1">
             <div className="text-sm font-medium">
@@ -121,6 +127,7 @@ const RecentBookingsList: React.FC<{ onSelect: (preset: PresetType) => void }> =
 
 // Component for favorites list
 const FavoritesList: React.FC<{ onSelect: (preset: PresetType) => void }> = ({ onSelect }) => {
+  const { t } = useTranslation('common')
   const { selectedOrganisationId } = useOrganisation()
   const { data, isValidating } = useGetFavoriteBookingList(selectedOrganisationId)
 
@@ -139,7 +146,12 @@ const FavoritesList: React.FC<{ onSelect: (preset: PresetType) => void }> = ({ o
               projectName: item.projectReference.key || item.projectReference.id,
               tags: item.tags,
             })
-          }>
+          }
+          aria-label={t('bookings.presets.selectFavorite', {
+            defaultValue: 'Select favorite: {{projectName}}{{tags}}',
+            projectName: item.projectReference.key || item.projectReference.id,
+            tags: item.tags.length > 0 ? ` with ${item.tags.length} tags` : '',
+          })}>
           <LucideIcon icon={Star} size={16} className="text-warning mt-1" />
           <div className="flex-1 space-y-1">
             <div className="text-sm font-medium">
@@ -155,6 +167,7 @@ const FavoritesList: React.FC<{ onSelect: (preset: PresetType) => void }> = ({ o
 
 // Component for team bookings list
 const TeamBookingsList: React.FC<{ onSelect: (preset: PresetType) => void }> = ({ onSelect }) => {
+  const { t } = useTranslation('common')
   const { selectedOrganisationId } = useOrganisation()
 
   // Get team bookings from the last 7 days - memoize dates to prevent infinite requests
@@ -206,7 +219,13 @@ const TeamBookingsList: React.FC<{ onSelect: (preset: PresetType) => void }> = (
               projectName: item.projectReference.key || item.projectReference.id,
               tags: item.tags,
             })
-          }>
+          }
+          aria-label={t('bookings.presets.selectTeam', {
+            defaultValue: 'Select team booking by {{userName}}: {{projectName}}{{tags}}',
+            userName: item.userReference.key || item.userReference.id,
+            projectName: item.projectReference.key || item.projectReference.id,
+            tags: item.tags.length > 0 ? ` with ${item.tags.length} tags` : '',
+          })}>
           <LucideIcon icon={Users} size={16} className="text-base-content/60 mt-1" />
           <div className="flex-1 space-y-1">
             <div className="text-sm font-medium">

@@ -113,7 +113,13 @@ export const BookingHistoryFilter: React.FC<BookingHistoryFilterProps> = ({
                 defaultValue: 'Showing data for inactive project',
               })}
             </span>
-            <Button variant="ghost" size="sm" onClick={handleBackToProjects}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleBackToProjects}
+              aria-label={t('projects.actions.backToProjects', {
+                defaultValue: 'Back to projects',
+              })}>
               <LucideIcon icon={ArrowLeft} size={16} />
               {t('projects.actions.backToProjects', { defaultValue: 'Back to projects' })}
             </Button>

@@ -24,11 +24,18 @@ import React from 'react'
 
 type Props = {
   onClick: () => void
+  ariaLabel?: string
 }
 
-export const ButtonLeft: React.FC<Props> = ({ onClick }) => {
+export const ButtonLeft: React.FC<Props> = ({ onClick, ariaLabel = 'Previous' }) => {
   return (
-    <Button type="button" variant="icon" shape="circle" onClick={onClick} fullWidth={false}>
+    <Button
+      type="button"
+      variant="icon"
+      shape="circle"
+      onClick={onClick}
+      fullWidth={false}
+      aria-label={ariaLabel}>
       <LucideIcon icon={ChevronLeftIcon} />
     </Button>
   )

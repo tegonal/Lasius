@@ -112,7 +112,7 @@ export const AccountSecurityForm: React.FC = () => {
     <div className="mx-auto w-full max-w-2xl">
       <Card>
         <CardBody className="p-6">
-          {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
+          {}
           <form onSubmit={hookForm.handleSubmit(onSubmit)} onKeyDown={(e) => preventEnterOnForm(e)}>
             <FormBody>
               <FieldSet>

@@ -97,7 +97,9 @@ export const useTagGroupOperations = (
     const tagGroups: ModelsTagGroup[] = hookForm.getValues('tagGroups')
     if (!newTagGroupName) {
       addToast({
-        message: t('tags.validation.tagGroupNameRequired', { defaultValue: 'Tag group name is required' }),
+        message: t('tags.validation.tagGroupNameRequired', {
+          defaultValue: 'Tag group name is required',
+        }),
         type: 'ERROR',
       })
       return false

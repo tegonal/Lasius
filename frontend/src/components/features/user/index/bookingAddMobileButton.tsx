@@ -35,7 +35,12 @@ export const BookingAddMobileButton: React.FC = () => {
 
   return (
     <div>
-      <Button variant="primary" shape="circle" onClick={() => setIsOpen(true)} fullWidth={false}>
+      <Button
+        variant="primary"
+        shape="circle"
+        onClick={() => setIsOpen(true)}
+        fullWidth={false}
+        aria-label={t('bookings.actions.add', { defaultValue: 'Add booking' })}>
         <LucideIcon icon={PlusCircleIcon} size={24} />
       </Button>
       <Modal open={isOpen} onClose={handleClose} minHeight="575px">

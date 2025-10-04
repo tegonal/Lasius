@@ -51,9 +51,9 @@ export const AppSettingsForm: React.FC = () => {
   const [selectedTheme, setSelectedTheme] = useState<ThemeMode>('system')
 
   const THEMES: SelectOption[] = [
-    { value: 'light', label: t('common.themes.light') },
-    { value: 'dark', label: t('common.themes.dark') },
-    { value: 'system', label: t('common.themes.system') },
+    { value: 'light', label: t('common.themes.light', { defaultValue: 'Light' }) },
+    { value: 'dark', label: t('common.themes.dark', { defaultValue: 'Dark' }) },
+    { value: 'system', label: t('common.themes.system', { defaultValue: 'System' }) },
   ]
 
   useEffect(() => {

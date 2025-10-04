@@ -67,12 +67,14 @@ export const OrganisationMembers: React.FC<Props> = ({ item }) => {
       <DataListRow>
         <DataListHeaderItem />
         <DataListHeaderItem>
-          {t('common.firstName', { defaultValue: 'First name' })}
+          {t('common.forms.firstName', { defaultValue: 'First name' })}
         </DataListHeaderItem>
         <DataListHeaderItem>
-          {t('common.lastName', { defaultValue: 'Last name' })}
+          {t('common.forms.lastName', { defaultValue: 'Last name' })}
         </DataListHeaderItem>
-        <DataListHeaderItem>{t('common.email', { defaultValue: 'Email' })}</DataListHeaderItem>
+        <DataListHeaderItem>
+          {t('common.forms.email', { defaultValue: 'Email' })}
+        </DataListHeaderItem>
         <DataListHeaderItem>
           {t('common.status.label', { defaultValue: 'Status' })}
         </DataListHeaderItem>

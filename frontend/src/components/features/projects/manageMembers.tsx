@@ -20,23 +20,20 @@
 import { ManageProjectMembersStats } from 'components/features/projects/manageProjectMembersStats'
 import { ProjectMembersList } from 'components/features/projects/projectMembersList'
 import { ManageUserInviteByEmailForm } from 'components/features/user/manageUserInviteByEmailForm'
-import { Button } from 'components/primitives/buttons/Button'
-import { FormElement } from 'components/ui/forms/FormElement'
+import { ScrollContainer } from 'components/primitives/layout/ScrollContainer'
 import { Modal } from 'components/ui/overlays/modal/Modal'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { ModelsProject, ModelsUserProject, ModelsUserStub } from 'lib/api/lasius'
 import { getProjectUserList } from 'lib/api/lasius/projects/projects'
-import { useTranslation } from 'next-i18next'
 import React, { useEffect, useState } from 'react'
 
 type Props = {
   item: ModelsProject | ModelsUserProject
   onSave: () => void
-  onCancel: () => void
+  onCancel?: () => void
 }
 
-export const ManageProjectMembers: React.FC<Props> = ({ item, onCancel }) => {
-  const { t } = useTranslation('common')
+export const ManageProjectMembers: React.FC<Props> = ({ item }) => {
   const { selectedOrganisationId } = useOrganisation()
   const projectId = 'id' in item ? item.id : item.projectReference.id
   const projectOrganisationId =
@@ -68,20 +65,17 @@ export const ManageProjectMembers: React.FC<Props> = ({ item, onCancel }) => {
 
   return (
     <>
-      <ManageProjectMembersStats memberCount={users.length} onInvite={handleInviteOpen} />
-      <div className="px-4 pt-3">
-        <ProjectMembersList
-          users={users}
-          projectId={projectId}
-          projectOrganisationId={projectOrganisationId}
-          onRefresh={handleRefresh}
-        />
+      <div className="flex h-[calc(90vh-12rem)] flex-col">
+        <ManageProjectMembersStats memberCount={users.length} onInvite={handleInviteOpen} />
+        <ScrollContainer className="flex-1 px-4 pt-3">
+          <ProjectMembersList
+            users={users}
+            projectId={projectId}
+            projectOrganisationId={projectOrganisationId}
+            onRefresh={handleRefresh}
+          />
+        </ScrollContainer>
       </div>
-      <FormElement>
-        <Button type="button" variant="secondary" onClick={onCancel}>
-          {t('common.actions.close', { defaultValue: 'Close' })}
-        </Button>
-      </FormElement>
       <Modal open={isInviteOpen} onClose={handleInviteClose}>
         <ManageUserInviteByEmailForm
           organisation={projectOrganisationId}

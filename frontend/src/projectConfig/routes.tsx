@@ -38,27 +38,9 @@ import React from 'react'
 
 const t = (key: string, _options?: { defaultValue?: string }) => key
 
-export const ROUTES = {
-  USER: {
-    INDEX: '/user/home',
-    DASHBOARD: '/user/dashboard',
-    STATS: '/user/stats',
-    LISTS: '/user/lists',
-    PROJECTS: '/user/projects',
-  },
-  ORGANISATION: {
-    CURRENT: '/organisation/current',
-    LISTS: '/organisation/lists',
-    STATS: '/organisation/stats',
-    PROJECTS: '/organisation/projects',
-  },
-  SETTINGS: {
-    APP: '/settings/app',
-    ACCOUNT: '/settings/account',
-    ACCOUNT_SECURITY: '/settings/account-security',
-    WORKING_HOURS: '/settings/working-hours',
-  },
-}
+// Re-export ROUTES from constants file to maintain backward compatibility
+export { ROUTES } from './routes.constants'
+import { ROUTES } from './routes.constants'
 
 export type NavigationRouteType = {
   route: string
