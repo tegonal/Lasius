@@ -19,7 +19,7 @@
 
 import { Input } from 'components/primitives/inputs/Input'
 import { useTranslation } from 'next-i18next'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 
 import {
   createHandleClick,
@@ -29,7 +29,7 @@ import {
   TIME_SEGMENT_CONFIG,
   type TimeSegment,
 } from './shared/core'
-import { formatTime, formatTimeString } from './shared/dateTimeHelpers'
+import { formatTimeString } from './shared/dateTimeHelpers'
 import {
   createInputChangeHandler,
   handleBackspaceDelete,
@@ -38,8 +38,7 @@ import {
   validateInputChar,
 } from './shared/input'
 import { SegmentedInputWrapper } from './shared/SegmentedInputWrapper'
-import { handleArrowIncrement } from './shared/segmentUtils'
-import { useDatePickerStore } from './store/useDatePickerStore'
+import { DatePickerStoreContext, useDatePickerStore } from './store/useDatePickerStore'
 
 interface SegmentedTimeInputConnectedProps {
   afterSlot?: React.ReactNode
@@ -49,7 +48,9 @@ export const SegmentedTimeInputConnected: React.FC<SegmentedTimeInputConnectedPr
   afterSlot,
 }) => {
   const { t } = useTranslation('common')
-  const { value, setTimeFromString, resetToInitial } = useDatePickerStore()
+  const store = useContext(DatePickerStoreContext)
+  const { value, setTimeFromString, incrementHours, incrementMinutes, resetToInitial } =
+    useDatePickerStore()
   const [inputValue, setInputValue] = useState<string>(value.timeString)
   const [selectedSegment, setSelectedSegment] = useState<TimeSegment | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -170,24 +171,22 @@ export const SegmentedTimeInputConnected: React.FC<SegmentedTimeInputConnectedPr
         )
         if (!segment) return
 
-        const newDate = new Date(value.date)
         const baseIncrement = e.key === 'ArrowUp' ? 1 : -1
 
         if (segment === 'hour') {
-          // Hours: increment by 1
-          newDate.setHours(newDate.getHours() + baseIncrement)
+          // Hours: increment by 1, date-fns handles midnight crossing automatically!
+          incrementHours(baseIncrement)
         } else if (segment === 'minute') {
-          // Minutes: increment by 5, automatically handles hour overflow/underflow
-          newDate.setMinutes(newDate.getMinutes() + baseIncrement * 5)
+          // Minutes: increment by 5, date-fns handles hour/day overflow automatically!
+          incrementMinutes(baseIncrement * 5)
         }
 
-        // Get the updated hours and minutes after the date operations
-        const updatedHours = newDate.getHours()
-        const updatedMinutes = newDate.getMinutes()
-        const formatted = formatTime(updatedHours, updatedMinutes)
+        // Update local input value immediately by reading fresh value from store
+        if (store) {
+          const updatedValue = store.getState().value
+          setInputValue(updatedValue.timeString)
+        }
 
-        setInputValue(formatted)
-        setTimeFromString(formatted)
         setTimeout(() => selectSegment(segment), 0)
       }
     }
@@ -303,56 +302,22 @@ export const SegmentedTimeInputConnected: React.FC<SegmentedTimeInputConnectedPr
 
   // Handle arrow button clicks
   const handleArrowClick = (direction: 'up' | 'down') => {
-    // Determine the target segment and increment amount
-    let targetSegment: TimeSegment
-    let incrementAmount: number
-
-    if (selectedSegment === 'hour') {
-      // Hour is explicitly selected - increment by 1
-      targetSegment = 'hour'
-      incrementAmount = 1
-    } else {
-      // Minute is selected or no selection - increment by 5
-      targetSegment = 'minute'
-      incrementAmount = 5
-    }
-
-    // If no date, create one from the current input or use current time
-    let workingDate: Date
-    if (value.date) {
-      workingDate = new Date(value.date)
-    } else if (inputValue && inputValue !== config.placeholder) {
-      // Try to parse the current input
-      const parts = inputValue.split(config.delimiter)
-      if (parts.length === 2) {
-        const [h, m] = parts
-        const hours = parseInt(h, 10) || 0
-        const minutes = parseInt(m, 10) || 0
-        workingDate = new Date()
-        workingDate.setHours(hours, minutes, 0, 0)
-      } else {
-        workingDate = new Date()
-      }
-    } else {
-      workingDate = new Date()
-    }
-
+    // Determine the target segment
+    const targetSegment: TimeSegment = selectedSegment === 'hour' ? 'hour' : 'minute'
     const baseIncrement = direction === 'up' ? 1 : -1
-    const increment = baseIncrement * incrementAmount
 
-    if (targetSegment === 'minute' && incrementAmount === 5) {
-      // For 5-minute increments, round to nearest 5 first
-      const currentMinutes = workingDate.getMinutes()
-      const roundedMinutes = Math.round(currentMinutes / 5) * 5
-      workingDate.setMinutes(roundedMinutes)
-      workingDate.setMinutes(workingDate.getMinutes() + increment)
+    // Use the date-fns powered increment functions
+    if (targetSegment === 'hour') {
+      incrementHours(baseIncrement)
     } else {
-      workingDate = handleArrowIncrement(workingDate, targetSegment, baseIncrement)
+      incrementMinutes(baseIncrement * 5)
     }
 
-    const formatted = formatTime(workingDate.getHours(), workingDate.getMinutes())
-    setInputValue(formatted)
-    setTimeFromString(formatted)
+    // Update local input value immediately by reading fresh value from store
+    if (store) {
+      const updatedValue = store.getState().value
+      setInputValue(updatedValue.timeString)
+    }
 
     // Set flag to indicate focus is from arrow
     focusFromArrowRef.current = true

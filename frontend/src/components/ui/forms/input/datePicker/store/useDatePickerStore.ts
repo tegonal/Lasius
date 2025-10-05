@@ -17,6 +17,7 @@
  *
  */
 
+import { addHours, addMinutes } from 'date-fns'
 import { createContext, useContext } from 'react'
 import { createStore, StoreApi, useStore } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
@@ -25,10 +26,14 @@ import { formatDateString, formatTimeString, parseDateTimeStrings } from '../sha
 
 export type DateTimeValue = {
   date: Date | null
-  dateString: string
-  timeString: string
+  // Internal storage for partial/invalid input during editing
+  _inputDateString: string
+  _inputTimeString: string
   isValid: boolean
   isPartial: boolean
+  // Derived getters for complete values
+  get dateString(): string
+  get timeString(): string
 }
 
 type DatePickerState = {
@@ -42,15 +47,42 @@ type DatePickerState = {
   getISOString: () => string | null
   reset: () => void
   resetToInitial: () => void
+  // Date-fns powered increment functions
+  incrementHours: (amount: number) => void
+  incrementMinutes: (amount: number) => void
+  incrementDays: (amount: number) => void
+  incrementMonths: (amount: number) => void
+  incrementYears: (amount: number) => void
 }
 
-const initialValue: DateTimeValue = {
-  date: null,
-  dateString: '',
-  timeString: '',
-  isValid: true,
-  isPartial: false,
-}
+// Helper to create DateTimeValue with getters
+const createDateTimeValue = (
+  date: Date | null,
+  _inputDateString: string,
+  _inputTimeString: string,
+  isValid: boolean,
+  isPartial: boolean,
+): DateTimeValue => ({
+  date,
+  _inputDateString,
+  _inputTimeString,
+  isValid,
+  isPartial,
+  get dateString() {
+    // If partial or invalid, return the raw input
+    if (this.isPartial || !this.isValid) return this._inputDateString
+    // If valid and complete, return formatted date
+    return this.date ? formatDateString(this.date) : ''
+  },
+  get timeString() {
+    // If partial or invalid, return the raw input
+    if (this.isPartial || !this.isValid) return this._inputTimeString
+    // If valid and complete, return formatted time
+    return this.date ? formatTimeString(this.date) : ''
+  },
+})
+
+const initialValue: DateTimeValue = createDateTimeValue(null, '', '', true, false)
 
 export const createDatePickerStore = () =>
   createStore<DatePickerState>()(
@@ -64,40 +96,40 @@ export const createDatePickerStore = () =>
         })),
 
       setDateFromString: (dateString) => {
-        const { timeString } = get().value
+        const currentDate = get().value.date
+        const timeString = currentDate
+          ? formatTimeString(currentDate)
+          : get().value._inputTimeString
+
         const parsed = parseDateTimeStrings(dateString, timeString)
-        // If valid and complete, format the date string; otherwise keep the input as-is
-        const formattedDateString =
-          parsed.isValid && !parsed.isPartial && parsed.date
-            ? formatDateString(parsed.date)
-            : dateString
+
         set({
-          value: {
-            date: parsed.isValid && !parsed.isPartial ? parsed.date : get().value.date,
-            isValid: parsed.isValid,
-            isPartial: parsed.isPartial,
-            dateString: formattedDateString,
+          value: createDateTimeValue(
+            parsed.isValid && !parsed.isPartial ? parsed.date : get().value.date,
+            dateString,
             timeString,
-          },
+            parsed.isValid,
+            parsed.isPartial,
+          ),
         })
       },
 
       setTimeFromString: (timeString) => {
-        const { dateString } = get().value
+        const currentDate = get().value.date
+        const dateString = currentDate
+          ? formatDateString(currentDate)
+          : get().value._inputDateString
+
         const parsed = parseDateTimeStrings(dateString, timeString)
-        // If valid and complete, format the time string; otherwise keep the input as-is
-        const formattedTimeString =
-          parsed.isValid && !parsed.isPartial && parsed.date
-            ? formatTimeString(parsed.date)
-            : timeString
+
         set({
-          value: {
-            date: parsed.isValid && !parsed.isPartial ? parsed.date : get().value.date,
-            isValid: parsed.isValid,
-            isPartial: parsed.isPartial,
+          value: createDateTimeValue(
+            parsed.isValid && !parsed.isPartial ? parsed.date : get().value.date,
             dateString,
-            timeString: formattedTimeString,
-          },
+            timeString,
+            parsed.isValid,
+            parsed.isPartial,
+          ),
         })
       },
 
@@ -110,7 +142,7 @@ export const createDatePickerStore = () =>
         try {
           const date = new Date(isoString)
           if (isNaN(date.getTime())) {
-            set({ value: { ...initialValue, isValid: false, isPartial: false } })
+            set({ value: createDateTimeValue(null, '', '', false, false) })
             return
           }
 
@@ -118,16 +150,10 @@ export const createDatePickerStore = () =>
           const timeString = formatTimeString(date)
 
           set({
-            value: {
-              date,
-              dateString,
-              timeString,
-              isValid: true,
-              isPartial: false,
-            },
+            value: createDateTimeValue(date, dateString, timeString, true, false),
           })
         } catch {
-          set({ value: { ...initialValue, isValid: false, isPartial: false } })
+          set({ value: createDateTimeValue(null, '', '', false, false) })
         }
       },
 
@@ -154,13 +180,7 @@ export const createDatePickerStore = () =>
           const timeString = formatTimeString(date)
 
           set({
-            initialValue: {
-              date,
-              dateString,
-              timeString,
-              isValid: true,
-              isPartial: false,
-            },
+            initialValue: createDateTimeValue(date, dateString, timeString, true, false),
           })
         } catch {
           set({ initialValue: initialValue })
@@ -172,6 +192,75 @@ export const createDatePickerStore = () =>
       resetToInitial: () => {
         const { initialValue } = get()
         set({ value: initialValue })
+      },
+
+      // Date-fns powered increment functions - these handle midnight crossing automatically!
+      incrementHours: (amount) => {
+        const { date } = get().value
+        if (!date) return
+
+        const newDate = addHours(date, amount)
+        const dateString = formatDateString(newDate)
+        const timeString = formatTimeString(newDate)
+
+        set({
+          value: createDateTimeValue(newDate, dateString, timeString, true, false),
+        })
+      },
+
+      incrementMinutes: (amount) => {
+        const { date } = get().value
+        if (!date) return
+
+        const newDate = addMinutes(date, amount)
+        const dateString = formatDateString(newDate)
+        const timeString = formatTimeString(newDate)
+
+        set({
+          value: createDateTimeValue(newDate, dateString, timeString, true, false),
+        })
+      },
+
+      incrementDays: (amount) => {
+        const { date } = get().value
+        if (!date) return
+
+        const newDate = new Date(date)
+        newDate.setDate(newDate.getDate() + amount)
+        const dateString = formatDateString(newDate)
+        const timeString = formatTimeString(newDate)
+
+        set({
+          value: createDateTimeValue(newDate, dateString, timeString, true, false),
+        })
+      },
+
+      incrementMonths: (amount) => {
+        const { date } = get().value
+        if (!date) return
+
+        const newDate = new Date(date)
+        newDate.setMonth(newDate.getMonth() + amount)
+        const dateString = formatDateString(newDate)
+        const timeString = formatTimeString(newDate)
+
+        set({
+          value: createDateTimeValue(newDate, dateString, timeString, true, false),
+        })
+      },
+
+      incrementYears: (amount) => {
+        const { date } = get().value
+        if (!date) return
+
+        const newDate = new Date(date)
+        newDate.setFullYear(newDate.getFullYear() + amount)
+        const dateString = formatDateString(newDate)
+        const timeString = formatTimeString(newDate)
+
+        set({
+          value: createDateTimeValue(newDate, dateString, timeString, true, false),
+        })
       },
     })),
   )

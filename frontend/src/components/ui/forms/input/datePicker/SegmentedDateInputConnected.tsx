@@ -19,7 +19,7 @@
 
 import { Input } from 'components/primitives/inputs/Input'
 import { useTranslation } from 'next-i18next'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 
 import {
   createHandleClick,
@@ -38,8 +38,7 @@ import {
   validateInputChar,
 } from './shared/input'
 import { SegmentedInputWrapper } from './shared/SegmentedInputWrapper'
-import { handleArrowIncrement } from './shared/segmentUtils'
-import { useDatePickerStore } from './store/useDatePickerStore'
+import { DatePickerStoreContext, useDatePickerStore } from './store/useDatePickerStore'
 
 interface SegmentedDateInputConnectedProps {
   afterSlot?: React.ReactNode
@@ -49,7 +48,15 @@ export const SegmentedDateInputConnected: React.FC<SegmentedDateInputConnectedPr
   afterSlot,
 }) => {
   const { t } = useTranslation('common')
-  const { value, setDateFromString, resetToInitial } = useDatePickerStore()
+  const store = useContext(DatePickerStoreContext)
+  const {
+    value,
+    setDateFromString,
+    incrementDays,
+    incrementMonths,
+    incrementYears,
+    resetToInitial,
+  } = useDatePickerStore()
   const [inputValue, setInputValue] = useState<string>(value.dateString)
   const [selectedSegment, setSelectedSegment] = useState<DateSegment | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -164,20 +171,22 @@ export const SegmentedDateInputConnected: React.FC<SegmentedDateInputConnectedPr
         )
         if (!segment) return
 
-        const newDate = new Date(value.date)
         const increment = e.key === 'ArrowUp' ? 1 : -1
 
         if (segment === 'day') {
-          newDate.setDate(newDate.getDate() + increment)
+          incrementDays(increment)
         } else if (segment === 'month') {
-          newDate.setMonth(newDate.getMonth() + increment)
+          incrementMonths(increment)
         } else if (segment === 'year') {
-          newDate.setFullYear(newDate.getFullYear() + increment)
+          incrementYears(increment)
         }
 
-        const formatted = formatDate(newDate)
-        setInputValue(formatted)
-        setDateFromString(formatted)
+        // Update local input value immediately by reading fresh value from store
+        if (store) {
+          const updatedValue = store.getState().value
+          setInputValue(updatedValue.dateString)
+        }
+
         setTimeout(() => selectSegment(segment), 0)
       }
     }
@@ -302,33 +311,22 @@ export const SegmentedDateInputConnected: React.FC<SegmentedDateInputConnectedPr
   const handleArrowClick = (direction: 'up' | 'down') => {
     // If no segment selected, default to incrementing the day (smallest common unit)
     const targetSegment = selectedSegment || 'day'
+    const increment = direction === 'up' ? 1 : -1
 
-    // If no date, create one from the current input or use today
-    let workingDate: Date
-    if (value.date) {
-      workingDate = new Date(value.date)
-    } else if (inputValue && inputValue !== config.placeholder) {
-      // Try to parse the current input
-      const parts = inputValue.split(config.delimiter)
-      if (parts.length === 3) {
-        const [d, m, y] = parts
-        const day = parseInt(d, 10) || 1
-        const month = parseInt(m, 10) || 1
-        const year = parseInt(y, 10) || new Date().getFullYear()
-        workingDate = new Date(year, month - 1, day)
-      } else {
-        workingDate = new Date()
-      }
-    } else {
-      workingDate = new Date()
+    // Use the date-fns powered increment functions
+    if (targetSegment === 'day') {
+      incrementDays(increment)
+    } else if (targetSegment === 'month') {
+      incrementMonths(increment)
+    } else if (targetSegment === 'year') {
+      incrementYears(increment)
     }
 
-    const increment = direction === 'up' ? 1 : -1
-    workingDate = handleArrowIncrement(workingDate, targetSegment, increment)
-
-    const formatted = formatDate(workingDate)
-    setInputValue(formatted)
-    setDateFromString(formatted)
+    // Update local input value immediately by reading fresh value from store
+    if (store) {
+      const updatedValue = store.getState().value
+      setInputValue(updatedValue.dateString)
+    }
 
     // Always select the segment that was incremented
     setTimeout(() => selectSegment(targetSegment as DateSegment), 0)
