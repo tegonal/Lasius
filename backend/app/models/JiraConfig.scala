@@ -38,13 +38,15 @@ case class JiraProjectMapping(projectId: ProjectId,
 case class JiraAuth(consumerKey: String,
                     privateKey: String,
                     accessToken: String)
-case class JiraConfig(_id: JiraConfigId,
-                      name: String,
-                      baseUrl: URL,
-                      auth: JiraAuth,
-                      settings: JiraSettings,
-                      projects: Seq[JiraProjectMapping])
-    extends BaseEntity[JiraConfigId] {
+case class JiraConfig(
+    _id: JiraConfigId,
+    organisationReference: OrganisationId.OrganisationReference,
+    name: String,
+    baseUrl: URL,
+    auth: JiraAuth,
+    settings: JiraSettings,
+    projects: Seq[JiraProjectMapping]
+) extends BaseEntity[JiraConfigId] {
   val id: JiraConfigId = _id
 }
 

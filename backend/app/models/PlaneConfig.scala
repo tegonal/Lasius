@@ -51,13 +51,15 @@ case class PlaneProjectMapping(projectId: ProjectId,
 
 case class PlaneAuth(apiKey: String)
 
-case class PlaneConfig(_id: PlaneConfigId,
-                       name: String,
-                       baseUrl: URL,
-                       auth: PlaneAuth,
-                       settings: PlaneSettings,
-                       projects: Seq[PlaneProjectMapping])
-    extends BaseEntity[PlaneConfigId] {
+case class PlaneConfig(
+    _id: PlaneConfigId,
+    organisationReference: OrganisationId.OrganisationReference,
+    name: String,
+    baseUrl: URL,
+    auth: PlaneAuth,
+    settings: PlaneSettings,
+    projects: Seq[PlaneProjectMapping]
+) extends BaseEntity[PlaneConfigId] {
   val id: PlaneConfigId = _id
 }
 

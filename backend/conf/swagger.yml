@@ -34,3 +34,238 @@ components:
           TagGroup: '#/components/schemas/models.TagGroup'
           GitlabIssueTag: '#/components/schemas/models.GitlabIssueTag'
           JiraIssueTag: '#/components/schemas/models.JiraIssueTag'
+    models.GitlabConfigId:
+      type: object
+      properties:
+        value:
+          type: string
+      required:
+        - value
+    models.JiraConfigId:
+      type: object
+      properties:
+        value:
+          type: string
+      required:
+        - value
+    models.PlaneConfigId:
+      type: object
+      properties:
+        value:
+          type: string
+      required:
+        - value
+    models.GitlabConfigResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        baseUrl:
+          type: string
+          format: uri
+        checkFrequency:
+          type: integer
+          format: int64
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/models.GitlabProjectMapping'
+        importerType:
+          type: string
+        projectCount:
+          type: integer
+      required:
+        - id
+        - name
+        - baseUrl
+        - checkFrequency
+        - projects
+        - importerType
+        - projectCount
+    models.JiraConfigResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        baseUrl:
+          type: string
+          format: uri
+        checkFrequency:
+          type: integer
+          format: int64
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/models.JiraProjectMapping'
+        importerType:
+          type: string
+        projectCount:
+          type: integer
+      required:
+        - id
+        - name
+        - baseUrl
+        - checkFrequency
+        - projects
+        - importerType
+        - projectCount
+    models.PlaneConfigResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        baseUrl:
+          type: string
+          format: uri
+        checkFrequency:
+          type: integer
+          format: int64
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/models.PlaneProjectMapping'
+        importerType:
+          type: string
+        projectCount:
+          type: integer
+      required:
+        - id
+        - name
+        - baseUrl
+        - checkFrequency
+        - projects
+        - importerType
+        - projectCount
+    models.CreateGitlabConfig:
+      type: object
+      properties:
+        name:
+          type: string
+        baseUrl:
+          type: string
+          format: uri
+        accessToken:
+          type: string
+        checkFrequency:
+          type: integer
+          format: int64
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/models.GitlabProjectMapping'
+      required:
+        - name
+        - baseUrl
+        - accessToken
+        - checkFrequency
+    models.CreateJiraConfig:
+      type: object
+      properties:
+        name:
+          type: string
+        baseUrl:
+          type: string
+          format: uri
+        consumerKey:
+          type: string
+        privateKey:
+          type: string
+        accessToken:
+          type: string
+        checkFrequency:
+          type: integer
+          format: int64
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/models.JiraProjectMapping'
+      required:
+        - name
+        - baseUrl
+        - consumerKey
+        - privateKey
+        - accessToken
+        - checkFrequency
+    models.CreatePlaneConfig:
+      type: object
+      properties:
+        name:
+          type: string
+        baseUrl:
+          type: string
+          format: uri
+        apiKey:
+          type: string
+        checkFrequency:
+          type: integer
+          format: int64
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/models.PlaneProjectMapping'
+      required:
+        - name
+        - baseUrl
+        - apiKey
+        - checkFrequency
+    models.UpdateGitlabConfig:
+      type: object
+      properties:
+        name:
+          type: string
+        baseUrl:
+          type: string
+          format: uri
+        accessToken:
+          type: string
+        checkFrequency:
+          type: integer
+          format: int64
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/models.GitlabProjectMapping'
+    models.UpdateJiraConfig:
+      type: object
+      properties:
+        name:
+          type: string
+        baseUrl:
+          type: string
+          format: uri
+        consumerKey:
+          type: string
+        privateKey:
+          type: string
+        accessToken:
+          type: string
+        checkFrequency:
+          type: integer
+          format: int64
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/models.JiraProjectMapping'
+    models.UpdatePlaneConfig:
+      type: object
+      properties:
+        name:
+          type: string
+        baseUrl:
+          type: string
+          format: uri
+        apiKey:
+          type: string
+        checkFrequency:
+          type: integer
+          format: int64
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/models.PlaneProjectMapping'

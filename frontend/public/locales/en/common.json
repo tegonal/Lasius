@@ -349,6 +349,106 @@
       "selectOrganisation": "Select the organisation you would like to add this project to:"
     }
   },
+  "issueImporters": {
+    "actions": {
+      "addConfiguration": "Add Configuration",
+      "cancel": "Cancel",
+      "create": "Create",
+      "saving": "Saving...",
+      "update": "Update"
+    },
+    "checkInterval": "Check Interval",
+    "checkIntervalHelp": "How often to check for new issues",
+    "configListItem": {
+      "project": "project",
+      "projects": "projects",
+      "usedBy_plural_one": "Used by {{count}} {{noun}}",
+      "usedBy_plural_other": "Used by {{count}} {{noun}}"
+    },
+    "confirmDelete": {
+      "gitlab": "Are you sure you want to delete this GitLab configuration?",
+      "jira": "Are you sure you want to delete this Jira configuration?",
+      "plane": "Are you sure you want to delete this Plane configuration?"
+    },
+    "emptyState": {
+      "message": "No issue importer configurations yet"
+    },
+    "errors": {
+      "deleteFailed": {
+        "gitlab": "Failed to delete GitLab config",
+        "jira": "Failed to delete Jira config",
+        "plane": "Failed to delete Plane config"
+      },
+      "saveFailed": {
+        "gitlab": "Failed to save GitLab config",
+        "jira": "Failed to save Jira config",
+        "plane": "Failed to save Plane config"
+      }
+    },
+    "fields": {
+      "accessToken": "Access Token",
+      "accessTokenEdit": "Access Token (leave empty to keep current)",
+      "apiKey": "API Key",
+      "apiKeyEdit": "API Key (leave empty to keep current)",
+      "baseUrl": "Base URL",
+      "baseUrlPlaceholder": {
+        "gitlab": "https://gitlab.company.com",
+        "jira": "https://company.atlassian.net",
+        "plane": "https://plane.company.com"
+      },
+      "consumerKey": "OAuth Consumer Key",
+      "name": "Configuration Name",
+      "namePlaceholder": {
+        "gitlab": "e.g., Company GitLab",
+        "jira": "e.g., Company Jira",
+        "plane": "e.g., Company Plane"
+      },
+      "oauthAccessToken": "OAuth Access Token",
+      "oauthAccessTokenEdit": "OAuth Access Token (leave empty to keep current)",
+      "privateKey": "OAuth Private Key",
+      "privateKeyEdit": "OAuth Private Key (leave empty to keep current)"
+    },
+    "gitlab": {
+      "howToCreateToken": "How to create a GitLab Personal Access Token:",
+      "step1": "Go to your GitLab profile → Edit Profile → Access Tokens",
+      "step2": "Enter a name and expiration date",
+      "step3": "Select the api scope for full API access",
+      "step4": "Click \"Create personal access token\" and copy it immediately",
+      "tokenWarning": "Note: The token will only be shown once. Store it securely."
+    },
+    "jira": {
+      "howToSetupOAuth": "How to set up Jira OAuth 1.0a authentication:",
+      "oauthWarning": "Note: OAuth 1.0a is deprecated. Consider using OAuth 2.0 for new integrations.",
+      "step1": "Generate RSA key pair using OpenSSL:",
+      "step2": "In Jira: Settings → Applications → Application Links",
+      "step3": "Create incoming link with your consumer key and public key",
+      "step4": "Complete the OAuth flow to get your access token"
+    },
+    "plane": {
+      "howToCreateToken": "How to create a Plane Personal Access Token:",
+      "step1": "Log into your Plane account or instance",
+      "step2": "Go to Profile Settings → Personal Access Tokens",
+      "step3": "Click \"Add personal access token\"",
+      "step4": "Enter a name and copy the generated token immediately",
+      "tokenWarning": "Note: The token will only be shown once. Store it securely."
+    },
+    "typeLabels": {
+      "gitlab": "GitLab",
+      "jira": "Jira",
+      "plane": "Plane"
+    },
+    "typeSelector": {
+      "chooseTracker": "Choose which issue tracker you want to configure:"
+    },
+    "validation": {
+      "accessTokenRequired": "Access token is required",
+      "apiKeyRequired": "API key is required",
+      "baseUrlRequired": "Base URL is required",
+      "consumerKeyRequired": "Consumer key is required",
+      "nameRequired": "Name is required",
+      "privateKeyRequired": "Private key is required"
+    }
+  },
   "lists": {
     "title": "Lists"
   },
@@ -468,6 +568,7 @@
   },
   "organisations": {
     "actions": {
+      "configureImporters": "Configure issue importers",
       "create": "Create organisation",
       "edit": "Edit organisation",
       "switch": "Switch organisation"

@@ -1033,6 +1033,535 @@ POST /invitations/:invitationId/decline                 controllers.InvitationsC
 GET /invitations/:invitationId/status               controllers.InvitationsController.getStatus(invitationId: models.InvitationId)
 
 #######
+####### Issue Importer Configurations #######
+#######
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Get all GitLab importer configurations for organisation
+#  operationId: getGitlabConfigs
+#  responses:
+#    200:
+#      description: success
+#      content:
+#        application/json:
+#          schema:
+#            type: array
+#            items:
+#              $ref: '#/components/schemas/models.GitlabConfigResponse'
+###
+GET /organisations/:orgId/issue-importers/gitlab                                                controllers.IssueImporterConfigController.getGitlabConfigs(orgId: models.OrganisationId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Get GitLab importer configuration by ID
+#  operationId: getGitlabConfig
+#  responses:
+#    200:
+#      description: success
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.GitlabConfigResponse'
+#    404:
+#      description: configuration not found
+###
+GET /organisations/:orgId/issue-importers/gitlab/:id                                            controllers.IssueImporterConfigController.getGitlabConfig(orgId: models.OrganisationId, id: models.GitlabConfigId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Get GitLab importer configuration for a specific project
+#  operationId: getGitlabConfigForProject
+#  responses:
+#    200:
+#      description: success
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.GitlabConfigResponse'
+#    404:
+#      description: no configuration found for this project
+###
+GET /organisations/:orgId/issue-importers/gitlab/for-project/:projectId                         controllers.IssueImporterConfigController.getGitlabConfigForProject(orgId: models.OrganisationId, projectId: models.ProjectId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Create new GitLab importer configuration (Organisation Admin only)
+#  operationId: createGitlabConfig
+#  requestBody:
+#    content:
+#      application/json:
+#        schema:
+#          $ref: '#/components/schemas/models.CreateGitlabConfig'
+#  responses:
+#    201:
+#      description: configuration created
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.GitlabConfigResponse'
+###
+POST /organisations/:orgId/issue-importers/gitlab                                               controllers.IssueImporterConfigController.createGitlabConfig(orgId: models.OrganisationId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Update GitLab importer configuration (Organisation Admin only)
+#  operationId: updateGitlabConfig
+#  requestBody:
+#    content:
+#      application/json:
+#        schema:
+#          $ref: '#/components/schemas/models.UpdateGitlabConfig'
+#  responses:
+#    200:
+#      description: configuration updated
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.GitlabConfigResponse'
+###
+POST /organisations/:orgId/issue-importers/gitlab/:id                                           controllers.IssueImporterConfigController.updateGitlabConfig(orgId: models.OrganisationId, id: models.GitlabConfigId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Delete GitLab importer configuration (Organisation Admin only)
+#  operationId: deleteGitlabConfig
+#  responses:
+#    200:
+#      description: configuration deleted
+###
+DELETE /organisations/:orgId/issue-importers/gitlab/:id                                         controllers.IssueImporterConfigController.deleteGitlabConfig(orgId: models.OrganisationId, id: models.GitlabConfigId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Add project mapping to GitLab configuration (Organisation Admin only)
+#  operationId: addGitlabProjectMapping
+#  requestBody:
+#    content:
+#      application/json:
+#        schema:
+#          $ref: '#/components/schemas/models.GitlabProjectMapping'
+#  responses:
+#    200:
+#      description: project mapping added
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.GitlabConfigResponse'
+###
+POST /organisations/:orgId/issue-importers/gitlab/:id/projects                                  controllers.IssueImporterConfigController.addGitlabProjectMapping(orgId: models.OrganisationId, id: models.GitlabConfigId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Remove project mapping from GitLab configuration (Organisation Admin only)
+#  operationId: removeGitlabProjectMapping
+#  responses:
+#    200:
+#      description: project mapping removed
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.GitlabConfigResponse'
+###
+DELETE /organisations/:orgId/issue-importers/gitlab/:id/projects/:projectId                     controllers.IssueImporterConfigController.removeGitlabProjectMapping(orgId: models.OrganisationId, id: models.GitlabConfigId, projectId: models.ProjectId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Update project mapping settings in GitLab configuration (Organisation Admin only)
+#  operationId: updateGitlabProjectMapping
+#  requestBody:
+#    content:
+#      application/json:
+#        schema:
+#          $ref: '#/components/schemas/models.GitlabProjectSettings'
+#  responses:
+#    200:
+#      description: project mapping updated
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.GitlabConfigResponse'
+###
+POST /organisations/:orgId/issue-importers/gitlab/:id/projects/:projectId                       controllers.IssueImporterConfigController.updateGitlabProjectMapping(orgId: models.OrganisationId, id: models.GitlabConfigId, projectId: models.ProjectId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Get all Jira importer configurations for organisation
+#  operationId: getJiraConfigs
+#  responses:
+#    200:
+#      description: success
+#      content:
+#        application/json:
+#          schema:
+#            type: array
+#            items:
+#              $ref: '#/components/schemas/models.JiraConfigResponse'
+###
+GET /organisations/:orgId/issue-importers/jira                                                  controllers.IssueImporterConfigController.getJiraConfigs(orgId: models.OrganisationId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Get Jira importer configuration by ID
+#  operationId: getJiraConfig
+#  responses:
+#    200:
+#      description: success
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.JiraConfigResponse'
+#    404:
+#      description: configuration not found
+###
+GET /organisations/:orgId/issue-importers/jira/:id                                              controllers.IssueImporterConfigController.getJiraConfig(orgId: models.OrganisationId, id: models.JiraConfigId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Get Jira importer configuration for a specific project
+#  operationId: getJiraConfigForProject
+#  responses:
+#    200:
+#      description: success
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.JiraConfigResponse'
+#    404:
+#      description: no configuration found for this project
+###
+GET /organisations/:orgId/issue-importers/jira/for-project/:projectId                           controllers.IssueImporterConfigController.getJiraConfigForProject(orgId: models.OrganisationId, projectId: models.ProjectId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Create new Jira importer configuration (Organisation Admin only)
+#  operationId: createJiraConfig
+#  requestBody:
+#    content:
+#      application/json:
+#        schema:
+#          $ref: '#/components/schemas/models.CreateJiraConfig'
+#  responses:
+#    201:
+#      description: configuration created
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.JiraConfigResponse'
+###
+POST /organisations/:orgId/issue-importers/jira                                               controllers.IssueImporterConfigController.createJiraConfig(orgId: models.OrganisationId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Update Jira importer configuration (Organisation Admin only)
+#  operationId: updateJiraConfig
+#  requestBody:
+#    content:
+#      application/json:
+#        schema:
+#          $ref: '#/components/schemas/models.UpdateJiraConfig'
+#  responses:
+#    200:
+#      description: configuration updated
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.JiraConfigResponse'
+###
+POST /organisations/:orgId/issue-importers/jira/:id                                           controllers.IssueImporterConfigController.updateJiraConfig(orgId: models.OrganisationId, id: models.JiraConfigId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Delete Jira importer configuration (Organisation Admin only)
+#  operationId: deleteJiraConfig
+#  responses:
+#    200:
+#      description: configuration deleted
+###
+DELETE /organisations/:orgId/issue-importers/jira/:id                                         controllers.IssueImporterConfigController.deleteJiraConfig(orgId: models.OrganisationId, id: models.JiraConfigId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Add project mapping to Jira configuration (Organisation Admin only)
+#  operationId: addJiraProjectMapping
+#  requestBody:
+#    content:
+#      application/json:
+#        schema:
+#          $ref: '#/components/schemas/models.JiraProjectMapping'
+#  responses:
+#    200:
+#      description: project mapping added
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.JiraConfigResponse'
+###
+POST /organisations/:orgId/issue-importers/jira/:id/projects                                  controllers.IssueImporterConfigController.addJiraProjectMapping(orgId: models.OrganisationId, id: models.JiraConfigId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Remove project mapping from Jira configuration (Organisation Admin only)
+#  operationId: removeJiraProjectMapping
+#  responses:
+#    200:
+#      description: project mapping removed
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.JiraConfigResponse'
+###
+DELETE /organisations/:orgId/issue-importers/jira/:id/projects/:projectId                     controllers.IssueImporterConfigController.removeJiraProjectMapping(orgId: models.OrganisationId, id: models.JiraConfigId, projectId: models.ProjectId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Update project mapping settings in Jira configuration (Organisation Admin only)
+#  operationId: updateJiraProjectMapping
+#  requestBody:
+#    content:
+#      application/json:
+#        schema:
+#          $ref: '#/components/schemas/models.JiraProjectSettings'
+#  responses:
+#    200:
+#      description: project mapping updated
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.JiraConfigResponse'
+###
+POST /organisations/:orgId/issue-importers/jira/:id/projects/:projectId                       controllers.IssueImporterConfigController.updateJiraProjectMapping(orgId: models.OrganisationId, id: models.JiraConfigId, projectId: models.ProjectId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Get all Plane importer configurations for organisation
+#  operationId: getPlaneConfigs
+#  responses:
+#    200:
+#      description: success
+#      content:
+#        application/json:
+#          schema:
+#            type: array
+#            items:
+#              $ref: '#/components/schemas/models.PlaneConfigResponse'
+###
+GET /organisations/:orgId/issue-importers/plane                                                 controllers.IssueImporterConfigController.getPlaneConfigs(orgId: models.OrganisationId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Get Plane importer configuration by ID
+#  operationId: getPlaneConfig
+#  responses:
+#    200:
+#      description: success
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.PlaneConfigResponse'
+#    404:
+#      description: configuration not found
+###
+GET /organisations/:orgId/issue-importers/plane/:id                                             controllers.IssueImporterConfigController.getPlaneConfig(orgId: models.OrganisationId, id: models.PlaneConfigId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Get Plane importer configuration for a specific project
+#  operationId: getPlaneConfigForProject
+#  responses:
+#    200:
+#      description: success
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.PlaneConfigResponse'
+#    404:
+#      description: no configuration found for this project
+###
+GET /organisations/:orgId/issue-importers/plane/for-project/:projectId                          controllers.IssueImporterConfigController.getPlaneConfigForProject(orgId: models.OrganisationId, projectId: models.ProjectId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Create new Plane importer configuration (Organisation Admin only)
+#  operationId: createPlaneConfig
+#  requestBody:
+#    content:
+#      application/json:
+#        schema:
+#          $ref: '#/components/schemas/models.CreatePlaneConfig'
+#  responses:
+#    201:
+#      description: configuration created
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.PlaneConfigResponse'
+###
+POST /organisations/:orgId/issue-importers/plane                                               controllers.IssueImporterConfigController.createPlaneConfig(orgId: models.OrganisationId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Update Plane importer configuration (Organisation Admin only)
+#  operationId: updatePlaneConfig
+#  requestBody:
+#    content:
+#      application/json:
+#        schema:
+#          $ref: '#/components/schemas/models.UpdatePlaneConfig'
+#  responses:
+#    200:
+#      description: configuration updated
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.PlaneConfigResponse'
+###
+POST /organisations/:orgId/issue-importers/plane/:id                                           controllers.IssueImporterConfigController.updatePlaneConfig(orgId: models.OrganisationId, id: models.PlaneConfigId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Delete Plane importer configuration (Organisation Admin only)
+#  operationId: deletePlaneConfig
+#  responses:
+#    200:
+#      description: configuration deleted
+###
+DELETE /organisations/:orgId/issue-importers/plane/:id                                         controllers.IssueImporterConfigController.deletePlaneConfig(orgId: models.OrganisationId, id: models.PlaneConfigId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Add project mapping to Plane configuration (Organisation Admin only)
+#  operationId: addPlaneProjectMapping
+#  requestBody:
+#    content:
+#      application/json:
+#        schema:
+#          $ref: '#/components/schemas/models.PlaneProjectMapping'
+#  responses:
+#    200:
+#      description: project mapping added
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.PlaneConfigResponse'
+###
+POST /organisations/:orgId/issue-importers/plane/:id/projects                                  controllers.IssueImporterConfigController.addPlaneProjectMapping(orgId: models.OrganisationId, id: models.PlaneConfigId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Remove project mapping from Plane configuration (Organisation Admin only)
+#  operationId: removePlaneProjectMapping
+#  responses:
+#    200:
+#      description: project mapping removed
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.PlaneConfigResponse'
+###
+DELETE /organisations/:orgId/issue-importers/plane/:id/projects/:projectId                     controllers.IssueImporterConfigController.removePlaneProjectMapping(orgId: models.OrganisationId, id: models.PlaneConfigId, projectId: models.ProjectId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Update project mapping settings in Plane configuration (Organisation Admin only)
+#  operationId: updatePlaneProjectMapping
+#  requestBody:
+#    content:
+#      application/json:
+#        schema:
+#          $ref: '#/components/schemas/models.PlaneProjectSettings'
+#  responses:
+#    200:
+#      description: project mapping updated
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.PlaneConfigResponse'
+###
+POST /organisations/:orgId/issue-importers/plane/:id/projects/:projectId                       controllers.IssueImporterConfigController.updatePlaneProjectMapping(orgId: models.OrganisationId, id: models.PlaneConfigId, projectId: models.ProjectId)
+
+#######
 ####### Static Files #######
 #######
 

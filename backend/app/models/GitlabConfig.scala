@@ -48,13 +48,15 @@ case class GitlabProjectMapping(projectId: ProjectId,
 
 case class GitlabAuth(accessToken: String)
 
-case class GitlabConfig(_id: GitlabConfigId,
-                        name: String,
-                        baseUrl: URL,
-                        auth: GitlabAuth,
-                        settings: GitlabSettings,
-                        projects: Seq[GitlabProjectMapping])
-    extends BaseEntity[GitlabConfigId] {
+case class GitlabConfig(
+    _id: GitlabConfigId,
+    organisationReference: OrganisationId.OrganisationReference,
+    name: String,
+    baseUrl: URL,
+    auth: GitlabAuth,
+    settings: GitlabSettings,
+    projects: Seq[GitlabProjectMapping]
+) extends BaseEntity[GitlabConfigId] {
   val id: GitlabConfigId = _id
 }
 
