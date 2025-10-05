@@ -40,13 +40,14 @@ interface TooltipItemProps {
 }
 
 export const TooltipItem: React.FC<TooltipItemProps> = ({ color, label, value }) => (
-  <div className="flex min-w-0 items-center gap-2 whitespace-nowrap">
-    {color && (
-      <div className="h-3 w-3 flex-shrink-0 rounded-full" style={{ backgroundColor: color }} />
-    )}
-    <span className="text-base-content/90 truncate text-xs">
-      {label}: {value}
-    </span>
+  <div className="flex min-w-0 items-center justify-between gap-3 whitespace-nowrap">
+    <div className="flex min-w-0 items-center gap-2">
+      {color && (
+        <div className="h-3 w-3 flex-shrink-0 rounded-full" style={{ backgroundColor: color }} />
+      )}
+      <span className="text-base-content truncate text-sm font-medium">{label}</span>
+    </div>
+    <span className="text-base-content/70 flex-shrink-0 text-sm">{value}</span>
   </div>
 )
 
@@ -54,7 +55,9 @@ interface StackTooltipData {
   slice: {
     index?: number
     stack: Array<{
-      id: string
+      id?: string
+      layerId?: string
+      layerLabel?: string
       color: string
       value: number
     }>
@@ -99,14 +102,17 @@ export const ChartStackTooltip: React.FC<ChartStackTooltipProps> = ({
         {slice.stack &&
           slice.stack
             .filter((point) => point && point.value > 0)
-            .map((point) => (
-              <TooltipItem
-                key={point.id}
-                color={point.color}
-                label={formatLabel(point.id)}
-                value={formatValue(point.value)}
-              />
-            ))}
+            .map((point) => {
+              const pointId = point.layerLabel || point.layerId || point.id || ''
+              return (
+                <TooltipItem
+                  key={pointId}
+                  color={point.color}
+                  label={formatLabel(pointId)}
+                  value={formatValue(point.value)}
+                />
+              )
+            })}
       </div>
     </TooltipContainer>
   )

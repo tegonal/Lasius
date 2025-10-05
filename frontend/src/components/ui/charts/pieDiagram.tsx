@@ -37,10 +37,21 @@ const PieDiagram: React.FC<Props> = ({ stats /* see data tab */ }) => {
   const { data } = stats
   if (!data) return null
 
+  const customTheme = {
+    ...nivoTheme,
+    labels: {
+      text: {
+        fontSize: 14, // 0.875rem for arc labels (values on slices)
+        fill: 'var(--color-base-content)',
+        fontWeight: 400,
+      },
+    },
+  }
+
   return (
     <ResponsivePie
       data={data}
-      theme={nivoTheme}
+      theme={customTheme}
       colors={nivoColors}
       margin={{ top: 40, right: 80, bottom: 40, left: 80 }}
       innerRadius={0.5}
@@ -52,6 +63,7 @@ const PieDiagram: React.FC<Props> = ({ stats /* see data tab */ }) => {
       arcLinkLabelsThickness={2}
       arcLinkLabelsColor={{ from: 'color' }}
       arcLinkLabel={(item) => `${item.id}`}
+      arcLinkLabelsFontSize={16}
       arcLabel={(item) => `${item.value}h`}
       arcLabelsRadiusOffset={0.55}
       arcLabelsSkipAngle={20}

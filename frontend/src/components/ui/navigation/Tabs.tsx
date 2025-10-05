@@ -33,7 +33,7 @@ export const Tabs: React.FC<Props> = ({ tabs }) => {
   const { selected, tabId, setSelected } = useTabSync(0)
 
   return (
-    <div className="border-base-content/20 flex w-full flex-col border-b">
+    <div className="border-base-content/20 flex min-h-0 w-full flex-1 flex-col border-b">
       <div className="border-base-content/20 flex flex-shrink-0 flex-row justify-start gap-3 border-b">
         {tabs.map((item, index) => (
           <div key={item.label} className="relative z-[1]">
@@ -49,14 +49,15 @@ export const Tabs: React.FC<Props> = ({ tabs }) => {
           </div>
         ))}
       </div>
-      <div className="w-full py-3">
+      <div className="flex min-h-0 w-full flex-1 flex-col py-3">
         <AnimatePresence initial={false} mode="wait">
           <m.div
             key={`menuNavColumn-${selected}`}
             animate={{ opacity: 1, y: 0 }}
             initial={{ opacity: 0, y: 20 }}
             exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.15 }}>
+            transition={{ duration: 0.15 }}
+            className="flex min-h-0 flex-1 flex-col">
             {tabs[selected].component}
           </m.div>
         </AnimatePresence>

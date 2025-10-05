@@ -22,6 +22,7 @@ import { StatsOverview } from 'components/features/user/stats/statsOverview'
 import { ColumnList } from 'components/primitives/layout/ColumnList'
 import { ScrollContainer } from 'components/primitives/layout/ScrollContainer'
 import { StatsFilter } from 'components/ui/data-display/stats/statsFilter'
+import { ErrorBoundary } from 'components/ui/feedback/ErrorBoundary'
 import { dateOptions } from 'lib/utils/date/dateOptions'
 import { formatISOLocale } from 'lib/utils/date/dates'
 import dynamic from 'next/dynamic'
@@ -68,7 +69,9 @@ export const StatsLayout: React.FC = () => {
           </div>
         </div>
         <div className="pt-4">
-          <StatsContent />
+          <ErrorBoundary>
+            <StatsContent />
+          </ErrorBoundary>
         </div>
       </ScrollContainer>
       <ScrollContainer className="bg-base-200 flex-1 overflow-y-auto rounded-tr-lg">

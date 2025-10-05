@@ -17,12 +17,12 @@
  *
  */
 
+import { statsSwrConfig } from 'components/ui/data-display/stats/statsSwrConfig'
 import { eachDayOfInterval, endOfMonth, startOfMonth } from 'date-fns'
 import { IsoDateString } from 'lib/api/apiDateHandling'
 import { getPlannedWorkingHoursForDateRange } from 'lib/api/functions/getPlannedWorkingHoursForDateRange'
 import { useGetUserProfile } from 'lib/api/lasius/user/user'
 import { plannedWorkingHoursStub } from 'lib/utils/date/stubPlannedWorkingHours'
-import { UI_SLOW_DATA_DEDUPE_INTERVAL } from 'projectConfig/intervals'
 import { useMemo } from 'react'
 
 /**
@@ -50,10 +50,10 @@ import { useMemo } from 'react'
  */
 export const useGetPlannedWorkingHoursMonth = (date: IsoDateString) => {
   const { data } = useGetUserProfile({
+    ...statsSwrConfig,
     swr: {
+      ...statsSwrConfig.swr,
       enabled: !!date,
-      revalidateOnFocus: false,
-      dedupingInterval: UI_SLOW_DATA_DEDUPE_INTERVAL,
     },
   })
 

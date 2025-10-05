@@ -51,7 +51,7 @@ export const StatsBarsByAggregatedTags: React.FC = () => {
 
   if (isValidating) {
     return (
-      <StatsTile style={{ height: 300 }}>
+      <StatsTile className="h-[300px]">
         <Loading />
       </StatsTile>
     )
@@ -59,7 +59,7 @@ export const StatsBarsByAggregatedTags: React.FC = () => {
 
   if (!chartData) {
     return (
-      <StatsTile style={{ height: 300 }}>
+      <StatsTile className="h-[300px]">
         <EmptyStateStats />
       </StatsTile>
     )

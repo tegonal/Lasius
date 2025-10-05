@@ -140,15 +140,6 @@
     },
     "title": "Calendario"
   },
-  "charts": {
-    "errors": {
-      "invalidData": "Dati non validi",
-      "noData": "Nessun dato disponibile"
-    },
-    "noData": {
-      "month": "Nessun dato di registrazione per questo mese"
-    }
-  },
   "common": {
     "actions": {
       "actions": "Azioni",
@@ -223,7 +214,6 @@
       "title": "Tema"
     },
     "time": {
-      "date": "Data",
       "day": "Giorno",
       "duration": "Durata",
       "ends": "Fine",
@@ -643,13 +633,13 @@
     }
   },
   "workHealth": {
-    "actualHours": "Ore effettive",
+    "actualHours": "effettive",
     "avgPerDay": "media/giorno",
     "consecutiveDays": "giorni consecutivi",
     "elevatedLoad": "Carico elevato",
     "healthyLoad": "Sembra buono!",
     "highLoad": "Rilevato carico pesante",
-    "plannedHours": "Ore pianificate",
+    "plannedHours": "pianificate",
     "relaxReminder": "È ora di rilassarsi un po'",
     "sixMonths": "6 mesi",
     "sixMonthTrend": "Andamento lavorativo di 6 mesi",

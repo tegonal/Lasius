@@ -17,10 +17,10 @@
  *
  */
 
+import { statsSwrConfig } from 'components/ui/data-display/stats/statsSwrConfig'
 import { ModelsWorkingHours } from 'lib/api/lasius'
 import { useGetUserProfile } from 'lib/api/lasius/user/user'
 import { plannedWorkingHoursStub } from 'lib/utils/date/stubPlannedWorkingHours'
-import { UI_SLOW_DATA_DEDUPE_INTERVAL } from 'projectConfig/intervals'
 import { useMemo } from 'react'
 
 /**
@@ -48,12 +48,7 @@ import { useMemo } from 'react'
  * - Useful for comparing workload across organisations or displaying total expected hours
  */
 export const useGetWeeklyPlannedWorkingHoursAggregate = () => {
-  const { data } = useGetUserProfile({
-    swr: {
-      revalidateOnFocus: false,
-      dedupingInterval: UI_SLOW_DATA_DEDUPE_INTERVAL,
-    },
-  })
+  const { data } = useGetUserProfile(statsSwrConfig)
 
   const allOrganisationsWorkingHours = useMemo(() => {
     const allOrganisations: ModelsWorkingHours = { ...plannedWorkingHoursStub }

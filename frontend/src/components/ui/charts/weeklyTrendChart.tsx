@@ -17,10 +17,7 @@
  *
  */
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
-
-import { ResponsiveLine } from '@nivo/line'
+import { Point, ResponsiveLine } from '@nivo/line'
 import { nivoTheme } from 'components/ui/charts/nivoTheme'
 import { useNivoColors } from 'components/ui/charts/shared/getConsistentColor'
 import { EmptyStateStats } from 'components/ui/data-display/fetchState/emptyStateStats'
@@ -52,14 +49,14 @@ export const WeeklyTrendChart: React.FC<Props> = ({ weeklyData }) => {
   // Transform data for Nivo
   const chartData = [
     {
-      id: t('workHealth.actualHours', { defaultValue: 'Actual Hours' }),
+      id: t('workHealth.actualHours', { defaultValue: 'actual' }),
       data: weeklyData.map((week) => ({
         x: week.weekLabel,
         y: week.hours,
       })),
     },
     {
-      id: t('workHealth.plannedHours', { defaultValue: 'Planned Hours' }),
+      id: t('workHealth.plannedHours', { defaultValue: 'planned' }),
       data: weeklyData.map((week) => ({
         x: week.weekLabel,
         y: week.plannedHours,
@@ -141,11 +138,12 @@ export const WeeklyTrendChart: React.FC<Props> = ({ weeklyData }) => {
             ],
           },
         ]}
-        tooltip={({ point }) => (
+        tooltip={({ point }: { point: Point<any> }) => (
           <div className="bg-base-100 border-base-300 rounded-lg border px-3 py-2 shadow-lg">
-            <div className="text-sm font-medium">{point.serieId}</div>
-            <div className="text-base-content/60 text-xs">
-              {point.data.x}: <strong>{decimalHoursToDurationString(point.data.y)}</strong>
+            <div className="text-sm font-medium">{String(point.seriesId)}</div>
+            <div className="text-base-content/60 text-sm">
+              {point.data.x}:{' '}
+              <strong>{decimalHoursToDurationString(point.data.y as number)}</strong>
             </div>
           </div>
         )}

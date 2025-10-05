@@ -42,7 +42,7 @@ type Props = {
 }
 
 export const MonthStreamChartImpl: React.FC<Props> = ({ data, keys }) => {
-  const { t, i18n } = useTranslation('common')
+  const { i18n } = useTranslation('common')
   const nivoColors = useNivoColors()
 
   // Get the correct locale for date-fns from centralized config

@@ -51,7 +51,7 @@ export const StatsBarsBySource: React.FC<Props> = ({ source, groupMode }) => {
 
   if (isValidating) {
     return (
-      <StatsTile style={{ height: 240 }}>
+      <StatsTile className="h-[240px]">
         <Loading />
       </StatsTile>
     )
@@ -59,14 +59,14 @@ export const StatsBarsBySource: React.FC<Props> = ({ source, groupMode }) => {
 
   if (!data) {
     return (
-      <StatsTile style={{ height: 240 }}>
+      <StatsTile className="h-[240px]">
         <EmptyStateStats />
       </StatsTile>
     )
   }
 
   return (
-    <StatsTile style={{ height: 240 }}>
+    <StatsTile className="h-[240px]">
       <BarsHours stats={data} indexBy="category" groupMode={groupMode} />
     </StatsTile>
   )

@@ -20,7 +20,10 @@
 import { StatsBarsByAggregatedTags } from 'components/features/organisation/stats/statsBarsByAggregatedTags'
 import { StatsBarsBySource } from 'components/features/organisation/stats/statsBarsBySource'
 import { StatsCircleCategoryRange } from 'components/features/organisation/stats/statsCircleCategoryRange'
+import { StatsProjectStream } from 'components/features/organisation/stats/statsProjectStream'
+import { StatsUserStream } from 'components/features/organisation/stats/statsUserStream'
 import { ColumnList } from 'components/primitives/layout/ColumnList'
+import { ErrorBoundary } from 'components/ui/feedback/ErrorBoundary'
 import { Tabs } from 'components/ui/navigation/Tabs'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { useTranslation } from 'next-i18next'
@@ -36,31 +39,52 @@ export const StatsContent: React.FC = () => {
 
   const chartTabs = [
     {
-      label: t('tags.title', { defaultValue: 'Tags' }),
-      component: <StatsBarsBySource source="tag" groupMode="stacked" />,
-    },
-    {
-      label: t('users.title', { defaultValue: 'Users' }),
-      component: <StatsBarsBySource source="user" groupMode="stacked" />,
-    },
-  ]
-
-  const barChartTabs = [
-    {
       label: t('projects.title', { defaultValue: 'Projects' }),
-      component: <StatsCircleCategoryRange source="project" />,
+      component: (
+        <>
+          <ErrorBoundary>
+            <StatsCircleCategoryRange source="project" />
+          </ErrorBoundary>
+          <div className="divider my-4" />
+          <ErrorBoundary>
+            <StatsProjectStream />
+          </ErrorBoundary>
+        </>
+      ),
     },
     {
       label: t('users.title', { defaultValue: 'Users' }),
-      component: <StatsCircleCategoryRange source="user" />,
+      component: (
+        <>
+          <ErrorBoundary>
+            <StatsCircleCategoryRange source="user" />
+          </ErrorBoundary>
+          <div className="divider my-4" />
+          <ErrorBoundary>
+            <StatsUserStream />
+          </ErrorBoundary>
+        </>
+      ),
+    },
+    {
+      label: t('tags.title', { defaultValue: 'Tags' }),
+      component: (
+        <>
+          <ErrorBoundary>
+            <StatsBarsBySource source="tag" groupMode="stacked" />
+          </ErrorBoundary>
+          <div className="divider my-4" />
+          <ErrorBoundary>
+            <StatsBarsByAggregatedTags />
+          </ErrorBoundary>
+        </>
+      ),
     },
   ]
 
   return (
     <ColumnList key={selectedOrganisationId}>
       <Tabs tabs={chartTabs} />
-      <Tabs tabs={barChartTabs} />
-      <StatsBarsByAggregatedTags />
     </ColumnList>
   )
 }

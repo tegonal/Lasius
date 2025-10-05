@@ -17,10 +17,10 @@
  *
  */
 
+import { statsSwrConfig } from 'components/ui/data-display/stats/statsSwrConfig'
 import { useGetUserProfile } from 'lib/api/lasius/user/user'
 import { getWorkingHoursWeekdayString } from 'lib/utils/date/dates'
 import { plannedWorkingHoursStub } from 'lib/utils/date/stubPlannedWorkingHours'
-import { UI_SLOW_DATA_DEDUPE_INTERVAL } from 'projectConfig/intervals'
 
 /**
  * Custom hook for retrieving planned working hours based on a given date.
@@ -49,10 +49,10 @@ import { UI_SLOW_DATA_DEDUPE_INTERVAL } from 'projectConfig/intervals'
  */
 export const useGetPlannedWorkingHoursByDate = (date: string) => {
   const { data } = useGetUserProfile({
+    ...statsSwrConfig,
     swr: {
+      ...statsSwrConfig.swr,
       enabled: !!date,
-      revalidateOnFocus: false,
-      dedupingInterval: UI_SLOW_DATA_DEDUPE_INTERVAL,
     },
   })
 

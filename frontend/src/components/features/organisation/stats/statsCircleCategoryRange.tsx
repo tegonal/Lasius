@@ -58,7 +58,7 @@ export const StatsCircleCategoryRange: React.FC<Props> = ({ source }) => {
 
   if (isValidating) {
     return (
-      <StatsTile style={{ height: 340 }}>
+      <StatsTile className="h-[340px]">
         <Loading />
       </StatsTile>
     )
@@ -66,14 +66,14 @@ export const StatsCircleCategoryRange: React.FC<Props> = ({ source }) => {
 
   if (!chartData) {
     return (
-      <StatsTile style={{ height: 340 }}>
+      <StatsTile className="h-[340px]">
         <EmptyStateStats />
       </StatsTile>
     )
   }
 
   return (
-    <StatsTile style={{ height: 340 }}>
+    <StatsTile className="h-[340px]">
       <PieDiagram stats={chartData} />
     </StatsTile>
   )

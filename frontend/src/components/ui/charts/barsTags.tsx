@@ -17,10 +17,7 @@
  *
  */
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
-
-import { ResponsiveBar } from '@nivo/bar'
+import { BarTooltipProps, ResponsiveBar } from '@nivo/bar'
 import { nivoTheme } from 'components/ui/charts/nivoTheme'
 import React from 'react'
 import { NivoChartDataType } from 'types/common'
@@ -39,19 +36,20 @@ const BarsTags: React.FC<Props> = ({ stats }) => {
   if (!data) return null
   return (
     <ResponsiveBar
-      data={data}
+      data={data as Array<{ id: string; value: number }>}
       theme={nivoTheme}
+      keys={['value']}
       indexBy="id"
       layout="horizontal"
       enableGridX
       enableGridY={false}
       colors={nivoColors}
-      margin={{ top: 60, right: 50, bottom: 60, left: 110 }}
+      margin={{ top: 60, right: 50, bottom: 60, left: 140 }}
       padding={0.3}
       valueScale={{ type: 'linear' }}
       indexScale={{ type: 'band', round: true }}
       borderWidth={0}
-      cornerRadius={3}
+      borderRadius={3}
       axisTop={{
         tickSize: 5,
         tickPadding: 5,
@@ -67,13 +65,22 @@ const BarsTags: React.FC<Props> = ({ stats }) => {
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
+        format: (value: string | number) => {
+          const strValue = String(value)
+          return strValue.length > 16 ? `${strValue.substring(0, 16)}...` : strValue
+        },
       }}
       labelSkipWidth={30}
       labelSkipHeight={12}
       labelTextColor={getContrastLabelTextColor}
-      tooltip={({ value, color, indexValue }) => (
+      label={(d) => `${d.value}h`}
+      tooltip={(props: BarTooltipProps<{ id: string; value: number }>) => (
         <TooltipContainer>
-          <TooltipItem color={color} label={String(indexValue)} value={`${value}h`} />
+          <TooltipItem
+            color={props.color}
+            label={String(props.indexValue)}
+            value={`${props.value}h`}
+          />
         </TooltipContainer>
       )}
     />

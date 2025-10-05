@@ -20,7 +20,9 @@
 import { StatsBarsByAggregatedTags } from 'components/features/user/stats/statsBarsByAggregatedTags'
 import { StatsBarsBySource } from 'components/features/user/stats/statsBarsBySource'
 import { StatsCircleCategoryRange } from 'components/features/user/stats/statsCircleCategoryRange'
+import { StatsProjectStream } from 'components/features/user/stats/statsProjectStream'
 import { ColumnList } from 'components/primitives/layout/ColumnList'
+import { ErrorBoundary } from 'components/ui/feedback/ErrorBoundary'
 import { Tabs } from 'components/ui/navigation/Tabs'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { useTranslation } from 'next-i18next'
@@ -38,19 +40,37 @@ export const StatsContent: React.FC = () => {
   const chartTabs = [
     {
       label: t('projects.title', { defaultValue: 'Projects' }),
-      component: <StatsBarsBySource source="project" groupMode="stacked" />,
+      component: (
+        <>
+          <ErrorBoundary>
+            <StatsCircleCategoryRange />
+          </ErrorBoundary>
+          <div className="divider my-4" />
+          <ErrorBoundary>
+            <StatsProjectStream />
+          </ErrorBoundary>
+        </>
+      ),
     },
     {
       label: t('tags.title', { defaultValue: 'Tags' }),
-      component: <StatsBarsBySource source="tag" groupMode="stacked" />,
+      component: (
+        <>
+          <ErrorBoundary>
+            <StatsBarsBySource source="tag" groupMode="stacked" />
+          </ErrorBoundary>
+          <div className="divider my-4" />
+          <ErrorBoundary>
+            <StatsBarsByAggregatedTags />
+          </ErrorBoundary>
+        </>
+      ),
     },
   ]
 
   return (
     <ColumnList key={selectedOrganisationId}>
       <Tabs tabs={chartTabs} />
-      <StatsCircleCategoryRange />
-      <StatsBarsByAggregatedTags />
     </ColumnList>
   )
 }

@@ -17,32 +17,32 @@
  *
  */
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
-
-import { ResponsiveBar } from '@nivo/bar'
-import { nivoTheme } from 'components/ui/charts/nivoTheme'
+import { BarCustomLayerProps, BarDatum, ResponsiveBar } from '@nivo/bar'
 import { line } from 'd3-shape'
-import { useTranslation } from 'next-i18next'
 import React from 'react'
 import { NivoChartDataType } from 'types/common'
 
+import { nivoTheme } from './nivoTheme'
 import { TooltipContainer, TooltipItem } from './shared/chartTooltips'
 import { getContrastLabelTextColor } from './shared/chartUtils'
 import { useNivoColors } from './shared/getConsistentColor'
 
 const Line =
-  (props: { category: string; value: number }[]) =>
-  (layerProps: { bars: any; xScale: any; yScale: any }) => {
-    const { xScale, yScale } = layerProps
+  (props: { category: string; value: number }[] | undefined) =>
+  (layerProps: BarCustomLayerProps<BarDatum>) => {
+    if (!props) return null
+    const { xScale, yScale, bars } = layerProps
 
-    const lineBegins = line()
-      .x((item) => xScale(item.category) + layerProps.bars[0].width / 2)
-      .y((item) => yScale(item.value))
+    const lineBegins = line<{ category: string; value: number }>()
+      .x((item) => {
+        const scaleValue = xScale(item.category as any)
+        return (scaleValue as number) + (bars[0]?.width || 0) / 2
+      })
+      .y((item) => yScale(item.value) as number)
 
     return (
       <path
-        d={lineBegins(props)}
+        d={lineBegins(props) || undefined}
         fill="none"
         stroke="oklch(var(--color-secondary))"
         strokeWidth={1}
@@ -60,9 +60,8 @@ type Props = {
 }
 
 const BarsHours: React.FC<Props> = ({ stats, indexBy, groupMode }) => {
-  const { t } = useTranslation('common')
   const nivoColors = useNivoColors()
-  const { data, keys, ceilingData } = stats
+  const { data, keys, ceilingData } = stats || {}
   if (!data) return null
   return (
     <ResponsiveBar
@@ -77,25 +76,20 @@ const BarsHours: React.FC<Props> = ({ stats, indexBy, groupMode }) => {
       valueScale={{ type: 'linear' }}
       indexScale={{ type: 'band', round: true }}
       borderWidth={0}
-      cornerRadius={3}
+      borderRadius={3}
       axisTop={null}
       axisRight={null}
       axisBottom={{
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
-        legend: t('common.time.date', { defaultValue: 'Date' }),
-        legendPosition: 'middle',
-        legendOffset: 40,
       }}
       axisLeft={{
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
-        legend: t('common.units.hours', { defaultValue: 'Hours' }),
-        legendPosition: 'middle',
-        legendOffset: -40,
       }}
+      label={(d) => `${d.value}h`}
       labelSkipWidth={20}
       labelSkipHeight={12}
       labelTextColor={getContrastLabelTextColor}
@@ -104,7 +98,13 @@ const BarsHours: React.FC<Props> = ({ stats, indexBy, groupMode }) => {
           <TooltipItem color={color} label={String(id)} value={`${value}h`} />
         </TooltipContainer>
       )}
-      layers={['axes', 'grid', 'bars', 'legends', Line(ceilingData)]}
+      layers={[
+        'axes',
+        'grid',
+        'bars',
+        'legends',
+        Line(ceilingData as { category: string; value: number }[] | undefined),
+      ]}
     />
   )
 }

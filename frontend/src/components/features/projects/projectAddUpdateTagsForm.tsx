@@ -221,7 +221,7 @@ export const ProjectAddUpdateTagsForm: React.FC<Props> = ({ item, onSave, onCanc
 
   // Tab content
   const tagGroupsContent = (
-    <div className="flex h-[calc(90vh-12rem)] flex-col">
+    <div className="flex min-h-0 flex-1 flex-col">
       <TagGroupToolbar
         onAddGroup={() => setShowAddGroupModal(true)}
         onAddPresets={addTemplate}
@@ -230,8 +230,8 @@ export const ProjectAddUpdateTagsForm: React.FC<Props> = ({ item, onSave, onCanc
         allExpanded={expandedGroups.size === sortedTagGroups.length}
       />
 
-      <ScrollContainer className="flex-1 pr-2">
-        <div className="space-y-2">
+      <ScrollContainer className="min-h-0 flex-1 pr-2">
+        <div className="space-y-2 pb-4">
           {sortedTagGroups.length === 0 && <TagGroupEmptyState />}
 
           {sortedTagGroups.map((tagGroup: ModelsTagGroup) => {
@@ -259,8 +259,8 @@ export const ProjectAddUpdateTagsForm: React.FC<Props> = ({ item, onSave, onCanc
   )
 
   const simpleTagsContent = (
-    <ScrollContainer className="h-[calc(90vh-12rem)] pr-2">
-      <div className="space-y-6">
+    <ScrollContainer className="min-h-0 flex-1 pr-2">
+      <div className="space-y-6 pb-4">
         <Alert variant="info">
           <P>
             {t('tags.simpleTagsDescription', {

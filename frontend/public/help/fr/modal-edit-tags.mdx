@@ -2,32 +2,74 @@
 
 Gérez les étiquettes et les groupes d'étiquettes pour votre projet afin de catégoriser et filtrer les réservations pour de meilleurs rapports.
 
-## Ce que vous pouvez faire
+## Aperçu de l'interface
 
-### Créer des groupes d'étiquettes
-Les groupes d'étiquettes regroupent plusieurs étiquettes pour une application rapide lors de la réservation :
-1. Entrez un nom dans le champ **Nom**
-2. Cliquez sur **Créer un groupe d'étiquettes**
-3. Le nouveau groupe apparaît ci-dessous avec un champ de saisie
-4. Tapez les noms d'étiquettes et appuyez sur Entrée pour ajouter des étiquettes au groupe
-5. Cliquez sur l'icône de suppression (<Icon name="Trash2" />) pour supprimer l'ensemble du groupe
+Le gestionnaire d'étiquettes comporte deux onglets :
+- **Groupes d'étiquettes** : Collections organisées d'étiquettes connexes
+- **Étiquettes simples** : Étiquettes individuelles ne faisant partie d'aucun groupe
 
-### Ajouter des étiquettes simples
-Ajoutez des étiquettes individuelles qui peuvent être utilisées indépendamment :
-1. Cliquez dans le champ **Entrez une étiquette pour l'ajouter**
-2. Tapez le nom de l'étiquette et appuyez sur Entrée
-3. L'étiquette apparaît au-dessus du champ de saisie
-4. Cliquez sur l'icône de suppression (<Icon name="X" />) sur n'importe quelle étiquette pour la retirer
+## Onglet Groupes d'étiquettes
+
+### Créer un groupe d'étiquettes
+1. Cliquez sur **Ajouter un groupe d'étiquettes** dans la barre d'outils
+2. Entrez un nom dans la boîte de dialogue modale
+3. Cliquez sur **Créer un groupe d'étiquettes**
+4. Le nouveau groupe apparaît par ordre alphabétique et se développe automatiquement
+
+### Ajouter des étiquettes à un groupe
+1. Cliquez sur le bouton **+** sur le côté droit d'un groupe d'étiquettes développé
+2. Entrez le nom de l'étiquette dans la boîte de dialogue modale
+3. Cliquez sur **Ajouter** ou appuyez sur Entrée
+4. L'étiquette apparaît dans le groupe
+
+### Gérer les groupes d'étiquettes
+
+**Développer/Réduire les groupes**
+- Cliquez sur le nom du groupe ou sur l'icône chevron (<Icon name="ChevronUp" /> / <Icon name="ChevronDown" />) pour basculer les groupes individuels
+- Utilisez le bouton **Tout développer** / **Tout réduire** en haut à droite pour basculer tous les groupes à la fois
+
+**Copier et coller des étiquettes**
+1. Développez un groupe d'étiquettes
+2. Cliquez sur l'icône de copie (<Icon name="Copy" />) pour copier toutes les étiquettes de ce groupe
+3. L'icône de collage (<Icon name="Clipboard" />) apparaît sur les autres groupes
+4. Cliquez sur coller pour ajouter ces étiquettes à un autre groupe (les doublons sont automatiquement filtrés)
+
+**Supprimer un groupe d'étiquettes**
+1. Survolez un groupe d'étiquettes pour révéler l'icône de suppression (<Icon name="Trash2" />)
+2. Cliquez sur l'icône de suppression
+3. Confirmez la suppression dans la boîte de dialogue qui apparaît
+
+**Retirer des étiquettes individuelles**
+- Cliquez sur le **X** sur n'importe quel badge d'étiquette pour le retirer du groupe
+
+**Nombre d'étiquettes**
+- Chaque groupe affiche un badge avec le nombre d'étiquettes qu'il contient
 
 ### Ajouter des groupes d'étiquettes par défaut
-Cliquez sur **Ajouter des groupes d'étiquettes par défaut** pour créer automatiquement un ensemble standard de groupes d'étiquettes, y compris le statut de facturation et les types de travail.
+Cliquez sur **Ajouter des groupes d'étiquettes par défaut** dans la barre d'outils pour créer automatiquement un ensemble standard de groupes d'étiquettes et d'étiquettes simples, y compris le statut de facturation et les types de travail.
 
-### Enregistrer les modifications
-Cliquez sur **Enregistrer** pour appliquer vos modifications d'étiquettes au projet, ou **Annuler** pour les abandonner.
+## Onglet Étiquettes simples
+
+Ajoutez des étiquettes individuelles qui peuvent être utilisées indépendamment :
+1. Passez à l'onglet **Étiquettes simples**
+2. Cliquez sur le bouton **+**
+3. Entrez le nom de l'étiquette dans la boîte de dialogue modale
+4. Cliquez sur **Ajouter** ou appuyez sur Entrée
+5. Cliquez sur le **X** sur n'importe quel badge d'étiquette pour le retirer
+
+## Enregistrer les modifications
+
+- Cliquez sur **Enregistrer** pour appliquer vos modifications d'étiquettes au projet
+- Cliquez sur **Annuler** pour abandonner les modifications
+- Si vous avez des modifications non enregistrées, vous serez invité à confirmer avant d'annuler
 
 ## Conseils
 
 <Tip>Les groupes d'étiquettes garantissent un étiquetage cohérent entre les membres de l'équipe</Tip>
+
+<Tip>Les groupes d'étiquettes sont automatiquement triés par ordre alphabétique</Tip>
+
+<Tip>Utilisez copier/coller pour dupliquer rapidement les structures d'étiquettes entre les groupes</Tip>
 
 <Tip>Utilisez des étiquettes simples pour des catégories ponctuelles qui ne nécessitent pas de regroupement</Tip>
 

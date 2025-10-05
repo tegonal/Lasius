@@ -140,15 +140,6 @@
     },
     "title": "Kalender"
   },
-  "charts": {
-    "errors": {
-      "invalidData": "Ungültige Daten",
-      "noData": "Keine Daten verfügbar"
-    },
-    "noData": {
-      "month": "Keine Buchungsdaten für diesen Monat"
-    }
-  },
   "common": {
     "actions": {
       "actions": "Aktionen",
@@ -223,7 +214,6 @@
       "title": "Design"
     },
     "time": {
-      "date": "Datum",
       "day": "Tag",
       "duration": "Dauer",
       "ends": "Endet",
@@ -643,13 +633,13 @@
     }
   },
   "workHealth": {
-    "actualHours": "Tatsächliche Stunden",
+    "actualHours": "tatsächlich",
     "avgPerDay": "Ø/Tag",
     "consecutiveDays": "aufeinanderfolgende Tage",
     "elevatedLoad": "Erhöhte Belastung",
     "healthyLoad": "Sieht gut aus!",
     "highLoad": "Hohe Belastung erkannt",
-    "plannedHours": "Geplante Stunden",
+    "plannedHours": "geplant",
     "relaxReminder": "Zeit, sich etwas zu entspannen",
     "sixMonths": "6 Monate",
     "sixMonthTrend": "6-Monats-Arbeitstrend",
