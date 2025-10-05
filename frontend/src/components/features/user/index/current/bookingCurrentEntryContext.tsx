@@ -29,9 +29,14 @@ import { useContextMenu } from 'components/features/contextMenu/hooks/useContext
 import { Button } from 'components/primitives/buttons/Button'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { Modal } from 'components/ui/overlays/modal/Modal'
+import { differenceInSeconds } from 'date-fns'
 import { AnimatePresence } from 'framer-motion'
+import { useGetAdjacentBookings } from 'lib/api/hooks/useGetAdjacentBookings'
+import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { ModelsBooking } from 'lib/api/lasius'
-import { Pencil } from 'lucide-react'
+import { updateUserBookingCurrent } from 'lib/api/lasius/user-bookings/user-bookings'
+import { formatISOLocale } from 'lib/utils/date/dates'
+import { ArrowDownToLine, Pencil } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React, { useState } from 'react'
 
@@ -45,12 +50,33 @@ export const BookingCurrentEntryContext: React.FC<Props> = ({ item }) => {
   const { t } = useTranslation('common')
   const [isOpen, setIsOpen] = useState(false)
   const { handleCloseAll, currentOpenContextMenuId } = useContextMenu()
+  const { selectedOrganisationId } = useOrganisation()
+  const { previous: previousBooking } = useGetAdjacentBookings(item)
 
   const handleClose = () => setIsOpen(false)
+
+  // Helper function to check if two times are within 1 minute of each other
+  const areTimesWithinOneMinute = (time1: string | Date, time2: string | Date): boolean => {
+    return Math.abs(differenceInSeconds(time1, time2)) <= 60
+  }
+
+  // Check if start time needs adjustment (not already aligned with previous end)
+  const shouldShowStartAdjustment =
+    previousBooking?.end?.dateTime &&
+    !areTimesWithinOneMinute(item.start.dateTime, previousBooking.end.dateTime)
 
   const editCurrentBooking = () => {
     setIsOpen(true)
     handleCloseAll()
+  }
+
+  const adjustStartToPrevious = async () => {
+    if (previousBooking?.end?.dateTime) {
+      await updateUserBookingCurrent(selectedOrganisationId, item.id, {
+        newStart: formatISOLocale(new Date(previousBooking.end.dateTime)),
+      })
+      handleCloseAll()
+    }
   }
 
   return (
@@ -72,6 +98,23 @@ export const BookingCurrentEntryContext: React.FC<Props> = ({ item }) => {
                     <LucideIcon icon={Pencil} size={24} />
                   </Button>
                 </ContextButtonWrapper>
+                {shouldShowStartAdjustment && (
+                  <ContextButtonWrapper>
+                    <Button
+                      variant="contextIcon"
+                      title={t('bookings.actions.adjustStartToPrevious', {
+                        defaultValue: 'Adjust start to previous booking',
+                      })}
+                      aria-label={t('bookings.actions.adjustStartToPrevious', {
+                        defaultValue: 'Adjust start to previous booking',
+                      })}
+                      onClick={() => adjustStartToPrevious()}
+                      fullWidth={false}
+                      shape="circle">
+                      <LucideIcon icon={ArrowDownToLine} size={24} />
+                    </Button>
+                  </ContextButtonWrapper>
+                )}
                 <ContextButtonAddFavorite item={item} />
                 <ContextBarDivider />
                 <ContextButtonClose />
