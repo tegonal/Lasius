@@ -21,7 +21,7 @@ import { ModalConfirm } from 'components/ui/overlays/modal/modalConfirm'
 import { useProfile } from 'lib/api/hooks/useProfile'
 import { signOut } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
-import { DEV, LASIUS_TERMSOFSERVICE_VERSION } from 'projectConfig/constants'
+import { LASIUS_TERMSOFSERVICE_VERSION } from 'projectConfig/constants'
 import React, { useEffect, useState } from 'react'
 
 export const LasiusTOSCheck: React.FC = () => {
@@ -77,11 +77,9 @@ export const LasiusTOSCheck: React.FC = () => {
   }
 
   useEffect(() => {
-    // In development mode, always show ToS dialog when logged in
-    // In production, only show if version doesn't match
-    const shouldShowToS = DEV
-      ? lasiusIsLoggedIn && currentTOSVersion
-      : lasiusIsLoggedIn && currentTOSVersion && acceptedTOSVersion != currentTOSVersion
+    // Only show if version doesn't match
+    const shouldShowToS =
+      lasiusIsLoggedIn && currentTOSVersion && acceptedTOSVersion != currentTOSVersion
 
     if (shouldShowToS) {
       setLocalizedTosText()
@@ -105,12 +103,6 @@ export const LasiusTOSCheck: React.FC = () => {
           cancel: t('tos.actions.reject', { defaultValue: 'Reject and logout' }),
         }}
         autoSize={true}>
-        {DEV && (
-          <div className="bg-warning/10 border-warning text-warning-content mb-4 rounded-lg border p-3 text-sm">
-            <strong>Development Mode:</strong> This Terms of Service dialog is shown on every login
-            in development mode for testing purposes.
-          </div>
-        )}
         <div
           className="bg-base-200 max-h-[400px] overflow-y-auto p-4"
           dangerouslySetInnerHTML={{ __html: tosHtml }}

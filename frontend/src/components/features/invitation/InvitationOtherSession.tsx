@@ -41,14 +41,20 @@ export const InvitationOtherSession: React.FC<Props> = ({ invitation }) => {
   const { t } = useTranslation('common')
   const router = useRouter()
   const { signOut } = useSignOut()
-
   const plausible = usePlausible<LasiusPlausibleEvents>()
+  const hasTracked = React.useRef(false)
 
-  plausible('invitation', {
-    props: {
-      status: 'wrongUser',
-    },
-  })
+  React.useEffect(() => {
+    if (!hasTracked.current) {
+      plausible('error.auth', {
+        props: {
+          type: 'unauthorized',
+          message: 'invitation_wrong_user',
+        },
+      })
+      hasTracked.current = true
+    }
+  }, [plausible])
 
   const handleSignOut = async () => {
     await signOut()

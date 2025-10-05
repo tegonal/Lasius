@@ -19,6 +19,7 @@
 
 import { BookingItem } from 'components/features/user/index/list/bookingItem'
 import { BookingListWrapper } from 'components/features/user/index/list/bookingListWrapper'
+import { OnboardingTutorial } from 'components/features/user/index/onboarding/onboardingTutorial'
 import { AnimateList } from 'components/ui/animations/motion/animateList'
 import { BookingListEmptyNever } from 'components/ui/data-display/fetchState/bookingListEmptyNever'
 import { BookingListEmptyToday } from 'components/ui/data-display/fetchState/bookingListEmptyToday'
@@ -59,39 +60,45 @@ export const BookingListSelectedDay: React.FC = () => {
     [lastMonthDate, selectedDate],
   )
 
-  const { data: lastMonthData } = useGetUserBookingListByOrganisation(
-    selectedOrganisationId,
-    lastMonthTimespan || { from: '', to: '' },
-    {
-      swr: {
-        enabled: !!selectedOrganisationId && !!lastMonthTimespan,
+  const { data: lastMonthData, isValidating: isValidatingLastMonth } =
+    useGetUserBookingListByOrganisation(
+      selectedOrganisationId,
+      lastMonthTimespan || { from: '', to: '' },
+      {
+        swr: {
+          enabled: !!selectedOrganisationId && !!lastMonthTimespan,
+        },
       },
-    },
-  )
+    )
 
   const sortedList = useMemo(() => augmentBookingsList(data || []), [data])
 
   if (!isClient) return null
 
+  // Wait for initial data to load before determining empty state
+  const isInitialLoad = data === undefined || (lastMonthData === undefined && !!lastMonthTimespan)
   const hasNoData = !data || data?.length === 0
   const hasNeverBooked = !lastMonthData || lastMonthData?.length === 0
 
   return (
     <BookingListWrapper>
-      <DataFetchValidates isValidating={isValidating} />
-      {hasNoData ? (
+      <DataFetchValidates isValidating={isValidating || isValidatingLastMonth} />
+      {isInitialLoad ? null : hasNoData ? (
         DEV ? (
-          // In dev mode, show both placeholders for testing
+          // In dev mode, show all empty states for testing
           <>
             <div className="text-warning bg-warning/10 mx-4 mb-2 rounded-lg p-3 text-center text-xs">
-              DEV MODE: Both empty state components are always shown for testing purposes
+              DEV MODE: All empty state components are shown for testing purposes
             </div>
+            <OnboardingTutorial />
+            <div className="my-4" />
             <BookingListEmptyNever />
+            <div className="my-4" />
             <BookingListEmptyToday />
           </>
         ) : // In production, show appropriate placeholder
         hasNeverBooked ? (
-          <BookingListEmptyNever />
+          <OnboardingTutorial />
         ) : (
           <BookingListEmptyToday />
         )

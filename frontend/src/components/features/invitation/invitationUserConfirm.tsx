@@ -73,9 +73,9 @@ export const InvitationUserConfirm: React.FC<Props> = ({ invitation }) => {
   }, [organisations])
 
   const handleAcceptInvite = async () => {
-    plausible('invitation', {
+    plausible('organisation.invite.accept', {
       props: {
-        status: 'accept',
+        source: 'link',
       },
     })
     await acceptInvitation(invitation.invitation.id, {
@@ -86,11 +86,7 @@ export const InvitationUserConfirm: React.FC<Props> = ({ invitation }) => {
   }
 
   const handleRejectInvite = async () => {
-    plausible('invitation', {
-      props: {
-        status: 'reject',
-      },
-    })
+    plausible('organisation.invite.reject', {})
     await declineInvitation(invitation.invitation.id)
     await router.push('/')
     await router.reload()

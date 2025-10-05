@@ -30,12 +30,20 @@ import React from 'react'
 export const InvitationInvalid: React.FC = () => {
   const { t } = useTranslation('common')
   const plausible = usePlausible<LasiusPlausibleEvents>()
+  const hasTracked = React.useRef(false)
 
-  plausible('invitation', {
-    props: {
-      status: 'invalid',
-    },
-  })
+  React.useEffect(() => {
+    if (!hasTracked.current) {
+      plausible('error.validation', {
+        props: {
+          form: 'invitation',
+          field: 'invitation_id',
+          error: 'invalid_invitation',
+        },
+      })
+      hasTracked.current = true
+    }
+  }, [plausible])
 
   return (
     <LoginLayout>

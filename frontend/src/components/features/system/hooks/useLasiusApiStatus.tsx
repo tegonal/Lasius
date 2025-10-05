@@ -75,7 +75,11 @@ export const useLasiusApiStatus = () => {
     setStatus(CONNECTION_STATUS.DISCONNECTED)
     if (browserStatus === CONNECTION_STATUS.CONNECTED) {
       if (IS_BROWSER) {
-        plausible('error', { props: { status: 'apiConnection', message: 'connectionLost' } })
+        plausible('error.network', {
+          props: {
+            message: 'api_connection_lost',
+          },
+        })
       }
     }
   }

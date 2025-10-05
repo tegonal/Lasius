@@ -153,6 +153,7 @@
     "actions": {
       "actions": "Aktionen",
       "add": "Hinzufügen",
+      "back": "Back",
       "cancel": "Abbrechen",
       "close": "Schließen",
       "delete": "Löschen",
@@ -160,6 +161,7 @@
       "help": "Hilfe",
       "invite": "Einladen",
       "keepEditing": "Weiter bearbeiten",
+      "next": "Next",
       "reset": "Zurücksetzen",
       "resetToInitial": "Auf ursprünglichen Wert zurücksetzen",
       "save": "Speichern",
@@ -374,6 +376,95 @@
   "offline": {
     "message": "Du bist offline. Diese Anwendung erfordert eine Internetverbindung. Sie wird automatisch aktualisiert, sobald eine Netzwerkverbindung erkannt wird."
   },
+  "onboarding": {
+    "actions": {
+      "gotIt": "Ok, verstanden!"
+    },
+    "booking": {
+      "step1": "Buchungsformular verwenden",
+      "step1Desc": "Finden Sie das Buchungsformular in der rechten Spalte und wählen Sie ein Projekt aus.",
+      "step2": "Oder Kontextmenü nutzen",
+      "step2Desc": "Rechtsklick auf eine Buchung, einen Favoriten oder eine Teambuchung und wählen Sie das Stoppuhr-Symbol.",
+      "step3": "Timer stoppen, wenn fertig",
+      "step3Desc": "Wenn Sie mit der Arbeit fertig sind, stoppen Sie den Timer.",
+      "subtitle": "Sie sind startklar! So erstellen Sie Ihre erste Buchung.",
+      "title": "Zeiterfassung starten"
+    },
+    "checklist": {
+      "booking": "Zeiterfassung starten",
+      "help": "Klicken Sie auf 'Weiter', um mehr über jeden Schritt zu erfahren",
+      "organisation": "Organisation erstellen oder beitreten",
+      "progress": "Ihr Fortschritt",
+      "project": "Projekt erstellen oder beitreten",
+      "subtitle": "Folgen Sie diesen einfachen Schritten, um mit der Zeiterfassung zu beginnen",
+      "title": "Los geht's",
+      "workingHours": "Arbeitszeiten für diese Organisation festlegen"
+    },
+    "confirmClose": "Möchten Sie das Tutorial wirklich schließen? Sie können es in den App-Einstellungen wieder aktivieren.",
+    "navigation": {
+      "importantUI": "Wichtige UI-Elemente",
+      "mainNavigation": "Hauptnavigation",
+      "organisationDesc": "Verwalten Sie Ihre aktuelle Organisation, erstellen Sie neue Organisationen und sehen Sie organisationsweite Daten ein",
+      "orgSwitcher": "Organisationswechsler",
+      "orgSwitcherDesc": "In der oberen rechten Ecke können Sie zwischen Ihren Organisationen wechseln",
+      "settingsDesc": "Konfigurieren Sie App-Einstellungen, Konto, Sicherheit und Arbeitszeiten",
+      "subtitle": "Hier sind die wichtigsten Bereiche von Lasius, die Sie täglich nutzen werden.",
+      "title": "Navigation in Lasius",
+      "userDesc": "Erfassen Sie Ihre Zeit, sehen Sie Ihre Buchungen, Dashboard, Projekte, Statistiken und Listen ein",
+      "weeklyCalendar": "Wochenkalender",
+      "weeklyCalendarDesc": "Oben auf der Seite können Sie zwischen den Tagen wechseln, um Ihre Buchungen anzuzeigen"
+    },
+    "organisation": {
+      "action": "Organisationen verwalten",
+      "step1": "Eigene Organisation erstellen",
+      "step1Desc": "Gehen Sie zu den Organisationseinstellungen und erstellen Sie eine neue Organisation, um andere einzuladen.",
+      "step2": "Oder bestehender Organisation beitreten",
+      "step2Desc": "Bitten Sie jemanden, Sie einzuladen und warten Sie auf den Einladungslink.",
+      "subtitle": "Organisationen ermöglichen die Zusammenarbeit mit Teammitgliedern und gemeinsame Zeiterfassung.",
+      "title": "Organisation erstellen oder beitreten"
+    },
+    "overview": {
+      "exports": "Exporte & Listen",
+      "exportsDesc": "Finden Sie Ihre Berichte im Listen-Bereich",
+      "help": "Klicken Sie auf 'Weiter', um zu sehen, was Sie einrichten müssen",
+      "organisations": "Organisationen",
+      "organisationsDesc": "Arbeiten Sie mit Ihren Teammitgliedern zusammen",
+      "projects": "Projekte",
+      "projectsDesc": "Organisieren Sie Ihre Arbeit in erfassbare Projekte",
+      "subtitle": "Hier sind die grundlegenden Bausteine, die Sie kennen sollten",
+      "tags": "Tags & Tag-Gruppen",
+      "tagsDesc": "Kategorisieren Sie Ihre Buchungen für detaillierte Berichte",
+      "title": "Willkommen bei Lasius",
+      "workingHours": "Arbeitszeiten",
+      "workingHoursDesc": "Erfassen Sie Ihre geplanten Arbeitsstunden pro Woche"
+    },
+    "privateOrganisation": {
+      "explanation": "Ihre private Organisation eignet sich perfekt für persönliche Projekte und alles, was Sie nicht mit anderen teilen müssen. Nur Sie können die Projekte und die hier erfasste Zeit sehen.",
+      "help": "Klicken Sie auf 'Weiter', um fortzufahren",
+      "subtitle": "Sie haben bereits eine private Organisation für den persönlichen Gebrauch.",
+      "tip": "💡 Gut zu wissen",
+      "tipDesc": "Wenn Sie mit Teammitgliedern arbeiten möchten, können Sie zusätzliche Organisationen erstellen oder beitreten.",
+      "title": "Ihre private Organisation"
+    },
+    "projects": {
+      "action": "Zu Meine Projekte gehen",
+      "step1": "Eigenes Projekt erstellen",
+      "step1Desc": "Gehen Sie zu Meine Projekte und erstellen Sie ein neues Projekt.",
+      "step2": "Oder bestehendem Projekt beitreten",
+      "step2Desc": "Bitten Sie einen Administrator, Sie zu seinem Projekt hinzuzufügen.",
+      "subtitle": "Projekte helfen Ihnen, Ihre Zeit zu organisieren. Sie benötigen mindestens eines, um loszulegen.",
+      "title": "Projekt erstellen oder beitreten"
+    },
+    "workingHours": {
+      "action": "Arbeitszeiten festlegen",
+      "step1": "Zu Arbeitszeiten gehen",
+      "step1Desc": "Klicken Sie auf die Schaltfläche unten, um Ihre Arbeitszeiten festzulegen.",
+      "step2": "Wöchentliche Stunden eingeben",
+      "step2Desc": "Legen Sie fest, wie viele Stunden Sie pro Tag arbeiten. Lasius zeigt Ihnen Ihren Fortschritt an.",
+      "subtitle": "Teilen Sie Lasius mit, wie viele Stunden pro Woche Sie arbeiten möchten.",
+      "title": "Arbeitszeiten festlegen"
+    }
+  },
   "organisation": {
     "title": "Organisation"
   },
@@ -466,6 +557,7 @@
       "language": "Sprache der Benutzeroberfläche",
       "menuTitle": "App-Einstellungen",
       "save": "Einstellungen speichern",
+      "showOnboarding": "Show Onboarding Tutorial",
       "theme": "Design",
       "title": "Anwendungseinstellungen"
     }

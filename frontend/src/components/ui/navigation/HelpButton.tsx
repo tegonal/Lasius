@@ -33,9 +33,9 @@ export const HelpButton: React.FC = () => {
   const { toggleHelp } = useHelpStore()
 
   const handleClick = () => {
-    plausible('uiAction', {
+    plausible('navigation.help.open', {
       props: {
-        name: 'helpButton',
+        source: 'button',
       },
     })
 

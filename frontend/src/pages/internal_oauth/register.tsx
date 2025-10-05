@@ -87,12 +87,6 @@ export const OAuthUserRegister: NextPage<{ locale?: string }> = ({ locale }) => 
   const onSubmit = async () => {
     const data = getValues()
 
-    plausible('invitation', {
-      props: {
-        status: 'registered',
-      },
-    })
-
     try {
       const response = await registerOAuthUser({
         firstName: data.firstName,
@@ -102,6 +96,12 @@ export const OAuthUserRegister: NextPage<{ locale?: string }> = ({ locale }) => 
       })
 
       if (response) {
+        plausible('auth.register.success', {
+          props: {
+            provider: 'internal',
+          },
+        })
+
         const url =
           '/login?' +
           new URLSearchParams({
@@ -111,6 +111,11 @@ export const OAuthUserRegister: NextPage<{ locale?: string }> = ({ locale }) => 
           })
         await router.replace(url)
       } else {
+        plausible('auth.register.error', {
+          props: {
+            error: 'registration_failed',
+          },
+        })
         setError('registerUserFailedUnknown')
       }
     } catch (error) {

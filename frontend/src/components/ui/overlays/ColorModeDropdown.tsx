@@ -119,9 +119,9 @@ export const ColorModeDropdown: React.FC = () => {
       localStorage.setItem('theme', theme)
     }
 
-    plausible('uiAction', {
+    plausible('settings.app.theme_change', {
       props: {
-        name: 'colorModeDropdown',
+        theme,
       },
     })
   }

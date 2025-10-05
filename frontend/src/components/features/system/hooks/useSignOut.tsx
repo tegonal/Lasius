@@ -55,11 +55,7 @@ export const useSignOut = () => {
     if (isClient) {
       await removeAccessibleCookies()
       resetAllStores()
-      plausible('logout', {
-        props: {
-          status: 'success',
-        },
-      })
+      plausible('auth.logout.success', {})
       await signOut()
     }
   }

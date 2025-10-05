@@ -83,12 +83,6 @@ const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig }> = ({ con
   }, [setFocus])
 
   const onSubmit = async () => {
-    plausible('internalOAuthLogin', {
-      props: {
-        status: 'start',
-      },
-    })
-
     const data = getValues()
     setError(undefined)
 
@@ -117,16 +111,17 @@ const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig }> = ({ con
       setError('usernameOrPasswordWrong')
       setValue('password', '')
       setFocus('email')
-      plausible('internalOAuthLogin', {
+      plausible('auth.login.error', {
         props: {
-          status: 'failed',
+          provider: 'internal',
+          error: 'invalid_credentials',
         },
       })
       logger.info(res)
     } else if (res?.ok && res?.url) {
-      plausible('internalOAuthLogin', {
+      plausible('auth.login.success', {
         props: {
-          status: 'success',
+          provider: 'internal',
         },
       })
 

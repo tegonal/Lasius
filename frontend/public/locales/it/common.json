@@ -153,6 +153,7 @@
     "actions": {
       "actions": "Azioni",
       "add": "Aggiungi",
+      "back": "Back",
       "cancel": "Annulla",
       "close": "Chiudi",
       "delete": "Elimina",
@@ -160,6 +161,7 @@
       "help": "Aiuto",
       "invite": "Invita",
       "keepEditing": "Continua a modificare",
+      "next": "Next",
       "reset": "Ripristina",
       "resetToInitial": "Ripristina al valore iniziale",
       "save": "Salva",
@@ -374,6 +376,95 @@
   "offline": {
     "message": "Sei offline. Questa applicazione richiede una connessione online. Si aggiornerà automaticamente quando verrà rilevata una connessione di rete."
   },
+  "onboarding": {
+    "actions": {
+      "gotIt": "Ok, capito!"
+    },
+    "booking": {
+      "step1": "Usa il modulo di registrazione",
+      "step1Desc": "Trova il modulo di registrazione nella colonna di destra e seleziona un progetto.",
+      "step2": "Oppure usa il menu contestuale",
+      "step2Desc": "Fai clic destro su qualsiasi registrazione, preferito o registrazione di team e scegli l'icona del cronometro.",
+      "step3": "Ferma quando finisci",
+      "step3Desc": "Quando hai finito di lavorare, ferma il timer.",
+      "subtitle": "Sei pronto! Ecco come creare la tua prima registrazione.",
+      "title": "Inizia a registrare il tempo"
+    },
+    "checklist": {
+      "booking": "Inizia a registrare il tempo",
+      "help": "Fai clic su 'Avanti' per saperne di più su ogni passaggio",
+      "organisation": "Crea o unisciti a un'organizzazione",
+      "progress": "Il tuo progresso",
+      "project": "Crea o unisciti a un progetto",
+      "subtitle": "Segui questi semplici passaggi per iniziare a registrare il tempo",
+      "title": "Iniziamo",
+      "workingHours": "Imposta le ore di lavoro per questa organizzazione"
+    },
+    "confirmClose": "Sei sicuro di voler chiudere il tutorial? Puoi riattivarlo nelle impostazioni dell'app.",
+    "navigation": {
+      "importantUI": "Elementi dell'interfaccia importanti",
+      "mainNavigation": "Navigazione principale",
+      "organisationDesc": "Gestisci la tua organizzazione attuale, crea nuove organizzazioni e visualizza i dati dell'intera organizzazione",
+      "orgSwitcher": "Selettore organizzazione",
+      "orgSwitcherDesc": "Nell'angolo in alto a destra, passa tra le tue organizzazioni",
+      "settingsDesc": "Configura le impostazioni dell'app, account, sicurezza e ore di lavoro",
+      "subtitle": "Queste sono le parti principali di Lasius che userai ogni giorno.",
+      "title": "Navigare in Lasius",
+      "userDesc": "Registra il tuo tempo, visualizza le tue registrazioni, dashboard, progetti, statistiche ed elenchi",
+      "weeklyCalendar": "Calendario settimanale",
+      "weeklyCalendarDesc": "Nella parte superiore della pagina, passa tra i giorni per visualizzare le tue registrazioni"
+    },
+    "organisation": {
+      "action": "Gestisci organizzazioni",
+      "step1": "Crea la tua",
+      "step1Desc": "Vai alle impostazioni dell'organizzazione e crea una nuova organizzazione per invitare altri.",
+      "step2": "Oppure unisciti a una esistente",
+      "step2Desc": "Chiedi a qualcuno di invitarti e attendi che ti invii un link di invito.",
+      "subtitle": "Le organizzazioni ti consentono di lavorare con i membri del team e registrare il tempo insieme.",
+      "title": "Crea o unisciti a un'organizzazione"
+    },
+    "overview": {
+      "exports": "Esportazioni ed elenchi",
+      "exportsDesc": "Trova i tuoi report nella sezione Elenchi",
+      "help": "Fai clic su 'Avanti' per vedere cosa devi configurare",
+      "organisations": "Organizzazioni",
+      "organisationsDesc": "Collabora con i membri del tuo team",
+      "projects": "Progetti",
+      "projectsDesc": "Organizza il lavoro in progetti tracciabili",
+      "subtitle": "Questi sono gli elementi di base che devi conoscere",
+      "tags": "Tag e gruppi di tag",
+      "tagsDesc": "Categorizza le tue registrazioni per report dettagliati",
+      "title": "Benvenuto in Lasius",
+      "workingHours": "Ore di lavoro",
+      "workingHoursDesc": "Traccia le ore di lavoro pianificate per settimana"
+    },
+    "privateOrganisation": {
+      "explanation": "La tua organizzazione privata è perfetta per tracciare progetti personali e qualsiasi cosa non hai bisogno di condividere con altri. Solo tu puoi vedere i progetti e il tempo registrato qui.",
+      "help": "Fai clic su 'Avanti' per continuare",
+      "subtitle": "Hai già un'organizzazione privata per uso personale.",
+      "tip": "💡 Buono a sapersi",
+      "tipDesc": "Se vuoi lavorare con i membri del team, puoi creare o unirti a organizzazioni aggiuntive.",
+      "title": "La tua organizzazione privata"
+    },
+    "projects": {
+      "action": "Vai a I miei progetti",
+      "step1": "Crea il tuo",
+      "step1Desc": "Vai a I miei progetti e crea un nuovo progetto.",
+      "step2": "Oppure unisciti a uno esistente",
+      "step2Desc": "Chiedi a un amministratore di aggiungerti al suo progetto.",
+      "subtitle": "I progetti ti aiutano a organizzare il tuo tempo. Ne hai bisogno di almeno uno per iniziare.",
+      "title": "Crea o unisciti a un progetto"
+    },
+    "workingHours": {
+      "action": "Imposta le ore di lavoro",
+      "step1": "Vai alle ore di lavoro",
+      "step1Desc": "Fai clic sul pulsante qui sotto per impostare le tue ore.",
+      "step2": "Inserisci le tue ore settimanali",
+      "step2Desc": "Imposta quante ore lavori ogni giorno. Lasius mostrerà il tuo progresso.",
+      "subtitle": "Indica a Lasius quante ore alla settimana prevedi di lavorare.",
+      "title": "Imposta le ore di lavoro"
+    }
+  },
   "organisation": {
     "title": "Organizzazione"
   },
@@ -466,6 +557,7 @@
       "language": "Lingua dell'interfaccia",
       "menuTitle": "Impostazioni app",
       "save": "Salva impostazioni",
+      "showOnboarding": "Show Onboarding Tutorial",
       "theme": "Tema",
       "title": "Impostazioni applicazione"
     }

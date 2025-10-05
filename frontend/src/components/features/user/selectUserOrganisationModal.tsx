@@ -46,7 +46,11 @@ export const SelectUserOrganisationModal: React.FC<Props> = ({
   const plausible = usePlausible<LasiusPlausibleEvents>()
 
   const selectOrganisation = async (orgReference: ModelsEntityReference) => {
-    plausible('organisation', { props: { status: 'selected' } })
+    plausible('organisation.switch.success', {
+      props: {
+        organisation_count: organisations.length,
+      },
+    })
     await setSelectedOrganisation(orgReference)
     onSelect(orgReference)
     onClose()

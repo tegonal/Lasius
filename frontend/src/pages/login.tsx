@@ -103,13 +103,6 @@ const Login: NextPage<{
 
   const signInToProvider = useCallback(
     async (provider: string) => {
-      plausible('login', {
-        props: {
-          status: 'start',
-          provider: provider,
-        },
-      })
-
       setIsSubmitting(true)
 
       // Validate the callback URL before passing to NextAuth
@@ -144,10 +137,9 @@ const Login: NextPage<{
       setIsSubmitting(false)
 
       if (!res?.error && res?.url) {
-        plausible('login', {
+        plausible('auth.login.success', {
           props: {
-            status: 'success',
-            provider: provider,
+            provider: provider === 'credentials' ? 'internal' : 'oauth',
           },
         })
 
@@ -167,6 +159,13 @@ const Login: NextPage<{
         await router.push(redirectUrl)
         logger.info('[Login] Router.push completed, current pathname:', router.pathname)
       } else {
+        plausible('auth.login.error', {
+          props: {
+            provider: provider === 'credentials' ? 'internal' : 'oauth',
+            error: res?.error || 'unknown_error',
+          },
+        })
+
         logger.warn('[Login] Sign in failed or no URL returned:', {
           error: res?.error,
           url: res?.url,
@@ -294,14 +293,19 @@ const Login: NextPage<{
                 {providers.map((provider) => {
                   let icon = undefined
                   if (provider.custom_logo) {
-                    icon = (
-                      <Image
-                        alt={provider.name}
-                        src={provider.custom_logo}
-                        width={24}
-                        height={24}
-                      />
-                    )
+                    // Use LasiusIcon component for lasius.svg to respect currentColor
+                    if (provider.custom_logo.includes('lasius.svg')) {
+                      icon = <LasiusIcon size={24} />
+                    } else {
+                      icon = (
+                        <Image
+                          alt={provider.name}
+                          src={provider.custom_logo}
+                          width={24}
+                          height={24}
+                        />
+                      )
+                    }
                   } else {
                     switch (provider.id) {
                       case AUTH_PROVIDER_INTERNAL_LASIUS:

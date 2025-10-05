@@ -18,25 +18,37 @@
  */
 
 import { Button } from 'components/primitives/buttons/Button'
+import { Label } from 'components/primitives/typography/Label'
 import { Card, CardBody } from 'components/ui/cards/Card'
 import { ButtonGroup } from 'components/ui/forms/ButtonGroup'
 import { FieldSet } from 'components/ui/forms/FieldSet'
 import { FormBody } from 'components/ui/forms/FormBody'
 import { FormElement } from 'components/ui/forms/FormElement'
 import { Select, SelectOption } from 'components/ui/forms/input/Select'
+import { ToggleSwitch } from 'components/ui/forms/input/ToggleSwitch'
 import Cookies from 'js-cookie'
 import { LOCALE_COOKIE_MAX_AGE_DAYS, LOCALE_COOKIE_NAME } from 'lib/config/locales'
 import { useColorMode } from 'lib/hooks/useColorMode'
+import { usePlausible } from 'lib/telemetry/usePlausible'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
+import {
+  ThemeMode,
+  useAppSettingsActions,
+  useOnboardingDismissed,
+  useTheme,
+} from 'stores/appSettingsStore'
+
+import type { LasiusPlausibleEvents } from 'lib/telemetry/plausibleEvents'
 
 const LANGUAGES: SelectOption[] = [
   { value: 'en', label: 'English' },
   { value: 'de', label: 'Deutsch' },
+  { value: 'fr', label: 'Français' },
+  { value: 'es', label: 'Español' },
+  { value: 'it', label: 'Italiano' },
 ]
-
-type ThemeMode = 'light' | 'dark' | 'system'
 
 const themeModeToDataTheme: Record<string, string> = {
   light: 'light',
@@ -47,8 +59,13 @@ export const AppSettingsForm: React.FC = () => {
   const { t, i18n } = useTranslation('common')
   const router = useRouter()
   const [, setMode] = useColorMode()
+  const theme = useTheme()
+  const onboardingDismissed = useOnboardingDismissed()
+  const { setTheme, dismissOnboarding, resetOnboarding } = useAppSettingsActions()
+  const plausible = usePlausible<LasiusPlausibleEvents>()
   const [selectedLanguage, setSelectedLanguage] = useState<string>('en')
-  const [selectedTheme, setSelectedTheme] = useState<ThemeMode>('system')
+  const [selectedTheme, setSelectedTheme] = useState<ThemeMode>(theme)
+  const [showOnboarding, setShowOnboarding] = useState<boolean>(!onboardingDismissed)
 
   const THEMES: SelectOption[] = [
     { value: 'light', label: t('common.themes.light', { defaultValue: 'Light' }) },
@@ -59,14 +76,9 @@ export const AppSettingsForm: React.FC = () => {
   useEffect(() => {
     const currentLocale = Cookies.get(LOCALE_COOKIE_NAME) || i18n.language || 'en'
     setSelectedLanguage(currentLocale)
-
-    const savedTheme = localStorage.getItem('theme')
-    if (savedTheme) {
-      setSelectedTheme(savedTheme as ThemeMode)
-    } else {
-      setSelectedTheme('system')
-    }
-  }, [i18n.language])
+    setSelectedTheme(theme)
+    setShowOnboarding(!onboardingDismissed)
+  }, [i18n.language, theme, onboardingDismissed])
 
   const handleLanguageChange = (value: string) => {
     setSelectedLanguage(value)
@@ -76,16 +88,48 @@ export const AppSettingsForm: React.FC = () => {
     setSelectedTheme(value as ThemeMode)
   }
 
+  const handleOnboardingToggle = (enabled: boolean) => {
+    setShowOnboarding(enabled)
+    if (enabled) {
+      resetOnboarding()
+      plausible('onboarding.tutorial.reset', {
+        props: { source: 'settings' },
+      })
+    } else {
+      dismissOnboarding()
+    }
+    plausible('settings.app.onboarding_toggle', {
+      props: { enabled },
+    })
+  }
+
   const handleSave = () => {
+    const currentLocale = Cookies.get(LOCALE_COOKIE_NAME) || i18n.language || 'en'
+
+    // Track language change
+    if (selectedLanguage !== currentLocale) {
+      plausible('settings.app.language_change', {
+        props: { from: currentLocale, to: selectedLanguage },
+      })
+    }
+
+    // Track theme change
+    if (selectedTheme !== theme) {
+      plausible('settings.app.theme_change', {
+        props: { theme: selectedTheme },
+      })
+    }
+
     Cookies.set(LOCALE_COOKIE_NAME, selectedLanguage, {
       expires: LOCALE_COOKIE_MAX_AGE_DAYS,
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
     })
 
-    if (selectedTheme === 'system') {
-      localStorage.removeItem('theme')
+    // Save theme to store
+    setTheme(selectedTheme)
 
+    if (selectedTheme === 'system') {
       if (typeof window !== 'undefined' && window.matchMedia) {
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
         const systemTheme = prefersDark ? 'dark' : 'light'
@@ -93,7 +137,6 @@ export const AppSettingsForm: React.FC = () => {
         document.documentElement.setAttribute('data-theme', systemTheme)
       }
     } else {
-      localStorage.setItem('theme', selectedTheme)
       setMode(selectedTheme)
       const dataTheme = themeModeToDataTheme[selectedTheme] || 'light'
       document.documentElement.setAttribute('data-theme', dataTheme)
@@ -131,6 +174,20 @@ export const AppSettingsForm: React.FC = () => {
                   onChange={handleThemeChange}
                   options={THEMES}
                 />
+              </FormElement>
+              <FormElement>
+                <div className="flex items-center gap-3">
+                  <ToggleSwitch
+                    id="onboarding-toggle"
+                    checked={showOnboarding}
+                    onChange={handleOnboardingToggle}
+                  />
+                  <Label htmlFor="onboarding-toggle" className="cursor-pointer">
+                    {t('settings.app.showOnboarding', {
+                      defaultValue: 'Show Onboarding Tutorial',
+                    })}
+                  </Label>
+                </div>
               </FormElement>
             </FieldSet>
             <ButtonGroup>

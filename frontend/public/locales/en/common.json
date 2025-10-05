@@ -153,6 +153,7 @@
     "actions": {
       "actions": "Actions",
       "add": "Add",
+      "back": "Back",
       "cancel": "Cancel",
       "close": "Close",
       "delete": "Delete",
@@ -160,6 +161,7 @@
       "help": "Help",
       "invite": "Invite",
       "keepEditing": "Keep editing",
+      "next": "Next",
       "reset": "Reset",
       "resetToInitial": "Reset to initial value",
       "save": "Save",
@@ -374,6 +376,95 @@
   "offline": {
     "message": "You are offline. This application requires an online connection. It will update automatically when a network connection is detected."
   },
+  "onboarding": {
+    "actions": {
+      "gotIt": "Ok, got it!"
+    },
+    "booking": {
+      "step1": "Use the Booking Form",
+      "step1Desc": "Find the booking form in the right column and select a project.",
+      "step2": "Or Use Context Menu",
+      "step2Desc": "Right-click any booking, favorite, or team booking and choose the stopwatch icon.",
+      "step3": "Stop When Done",
+      "step3Desc": "When you finish working, stop the timer.",
+      "subtitle": "You're all set! Here's how to create your first booking.",
+      "title": "Start Tracking Time"
+    },
+    "checklist": {
+      "booking": "Start tracking time",
+      "help": "Click 'Next' to learn about each step",
+      "organisation": "Create or join an organization",
+      "progress": "Your Progress",
+      "project": "Create or join a project",
+      "subtitle": "Follow these simple steps to start tracking time",
+      "title": "Let's Get You Started",
+      "workingHours": "Set working hours for this organization"
+    },
+    "confirmClose": "Are you sure you want to close the tutorial? You can re-enable it in App Settings.",
+    "navigation": {
+      "importantUI": "Important UI Elements",
+      "mainNavigation": "Main Navigation",
+      "organisationDesc": "Manage your current organization, create new organizations and view organization-wide data",
+      "orgSwitcher": "Organization Switcher",
+      "orgSwitcherDesc": "In the top-right corner, switch between your organizations",
+      "settingsDesc": "Configure app settings, account, security and working hours",
+      "subtitle": "Here are the main parts of Lasius you will use every day.",
+      "title": "Getting Around Lasius",
+      "userDesc": "Track your time, view your bookings, dashboard, projects, statistics and lists",
+      "weeklyCalendar": "Weekly Calendar",
+      "weeklyCalendarDesc": "At the top of the page, switch between days to view your bookings"
+    },
+    "organisation": {
+      "action": "Manage Organizations",
+      "step1": "Create Your Own",
+      "step1Desc": "Go to Organization settings and create a new organization to invite others.",
+      "step2": "Or Join an Existing One",
+      "step2Desc": "Ask someone to invite you and wait for them to send you an invite link.",
+      "subtitle": "Organizations let you work with team members and track time together.",
+      "title": "Create or Join an Organization"
+    },
+    "overview": {
+      "exports": "Exports & Lists",
+      "exportsDesc": "Find your reports in the Lists section",
+      "help": "Click 'Next' to see what you need to set up",
+      "organisations": "Organizations",
+      "organisationsDesc": "Collaborate with your team members",
+      "projects": "Projects",
+      "projectsDesc": "Organize work into trackable projects",
+      "subtitle": "Here are the basic building blocks you should know about",
+      "tags": "Tags & Tag Groups",
+      "tagsDesc": "Categorize your bookings for detailed reports",
+      "title": "Welcome to Lasius",
+      "workingHours": "Working Hours",
+      "workingHoursDesc": "Track your planned work hours per week"
+    },
+    "privateOrganisation": {
+      "explanation": "Your private organization is perfect for tracking personal projects and anything you don't need to share with others. Only you can see the projects and time tracked here.",
+      "help": "Click 'Next' to continue",
+      "subtitle": "You already have a private organization for personal use.",
+      "tip": "💡 Good to Know",
+      "tipDesc": "If you want to work with team members, you can create or join additional organizations.",
+      "title": "Your Private Organization"
+    },
+    "projects": {
+      "action": "Go to My Projects",
+      "step1": "Create Your Own",
+      "step1Desc": "Go to My Projects and create a new project.",
+      "step2": "Or Join an Existing One",
+      "step2Desc": "Ask an administrator to add you to their project.",
+      "subtitle": "Projects help you organize your time. You need at least one to get started.",
+      "title": "Create or Join a Project"
+    },
+    "workingHours": {
+      "action": "Set Working Hours",
+      "step1": "Go to Working Hours",
+      "step1Desc": "Click the button below to set your hours.",
+      "step2": "Enter Your Weekly Hours",
+      "step2Desc": "Set how many hours you work each day. Lasius will show your progress.",
+      "subtitle": "Tell Lasius how many hours per week you plan to work.",
+      "title": "Set Working Hours"
+    }
+  },
   "organisation": {
     "title": "Organisation"
   },
@@ -466,6 +557,7 @@
       "language": "Interface Language",
       "menuTitle": "App Settings",
       "save": "Save Settings",
+      "showOnboarding": "Show Onboarding Tutorial",
       "theme": "Theme",
       "title": "Application Settings"
     }

@@ -32,9 +32,9 @@ export const BookingListEmptyNever: React.FC = () => {
   const { toggleHelp } = useHelpStore()
 
   const handleHelpClick = () => {
-    plausible('uiAction', {
+    plausible('navigation.help.open', {
       props: {
-        name: 'helpButton',
+        source: 'button',
       },
     })
     toggleHelp()

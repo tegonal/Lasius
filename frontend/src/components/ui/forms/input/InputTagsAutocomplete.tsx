@@ -45,6 +45,7 @@ export const InputTagsAutocomplete: React.FC<Props> = ({ suggestions = [], name,
   const [inputText, setInputText] = useState<string>('')
   const [selectedTags, setSelectedTags] = useState<ModelsTags[]>([])
   const [isFocused, setIsFocused] = useState<boolean>(false)
+  const inputRef = React.useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (!parentFormContext) return () => null
@@ -91,6 +92,8 @@ export const InputTagsAutocomplete: React.FC<Props> = ({ suggestions = [], name,
       setInputText('')
       setSelectedTags(tags)
       parentFormContext.setValue(name, tags)
+      // Close the dropdown by blurring the input
+      inputRef.current?.blur()
     }
   }
 
@@ -125,6 +128,7 @@ export const InputTagsAutocomplete: React.FC<Props> = ({ suggestions = [], name,
               {({ open }) => (
                 <>
                   <ComboboxInput
+                    ref={inputRef}
                     id={id || name}
                     className="input input-bordered w-full pr-10 text-sm"
                     onChange={inputValueChanged}

@@ -153,6 +153,7 @@
     "actions": {
       "actions": "Actions",
       "add": "Ajouter",
+      "back": "Back",
       "cancel": "Annuler",
       "close": "Fermer",
       "delete": "Supprimer",
@@ -160,6 +161,7 @@
       "help": "Aide",
       "invite": "Inviter",
       "keepEditing": "Continuer à modifier",
+      "next": "Next",
       "reset": "Réinitialiser",
       "resetToInitial": "Réinitialiser à la valeur initiale",
       "save": "Enregistrer",
@@ -374,6 +376,95 @@
   "offline": {
     "message": "Vous êtes hors ligne. Cette application nécessite une connexion en ligne. Elle se mettra à jour automatiquement lorsqu'une connexion réseau sera détectée."
   },
+  "onboarding": {
+    "actions": {
+      "gotIt": "Ok, compris !"
+    },
+    "booking": {
+      "step1": "Utiliser le formulaire de saisie",
+      "step1Desc": "Trouvez le formulaire de saisie dans la colonne de droite et sélectionnez un projet.",
+      "step2": "Ou utiliser le menu contextuel",
+      "step2Desc": "Faites un clic droit sur une saisie, un favori ou une saisie d'équipe et choisissez l'icône chronomètre.",
+      "step3": "Arrêter le chronomètre",
+      "step3Desc": "Lorsque vous avez terminé de travailler, arrêtez le chronomètre.",
+      "subtitle": "Vous êtes prêt ! Voici comment créer votre première saisie.",
+      "title": "Commencer le suivi du temps"
+    },
+    "checklist": {
+      "booking": "Commencer le suivi du temps",
+      "help": "Cliquez sur 'Suivant' pour en savoir plus sur chaque étape",
+      "organisation": "Créer ou rejoindre une organisation",
+      "progress": "Votre progression",
+      "project": "Créer ou rejoindre un projet",
+      "subtitle": "Suivez ces étapes simples pour commencer le suivi du temps",
+      "title": "Commençons",
+      "workingHours": "Définir les heures de travail pour cette organisation"
+    },
+    "confirmClose": "Êtes-vous sûr de vouloir fermer le tutoriel ? Vous pouvez le réactiver dans les paramètres de l'application.",
+    "navigation": {
+      "importantUI": "Éléments d'interface importants",
+      "mainNavigation": "Navigation principale",
+      "organisationDesc": "Gérez votre organisation actuelle, créez de nouvelles organisations et consultez les données à l'échelle de l'organisation",
+      "orgSwitcher": "Sélecteur d'organisation",
+      "orgSwitcherDesc": "Dans le coin supérieur droit, basculez entre vos organisations",
+      "settingsDesc": "Configurez les paramètres de l'application, le compte, la sécurité et les heures de travail",
+      "subtitle": "Voici les principales parties de Lasius que vous utiliserez chaque jour.",
+      "title": "Naviguer dans Lasius",
+      "userDesc": "Suivez votre temps, consultez vos saisies, tableau de bord, projets, statistiques et listes",
+      "weeklyCalendar": "Calendrier hebdomadaire",
+      "weeklyCalendarDesc": "En haut de la page, basculez entre les jours pour voir vos saisies"
+    },
+    "organisation": {
+      "action": "Gérer les organisations",
+      "step1": "Créer la vôtre",
+      "step1Desc": "Accédez aux paramètres de l'organisation et créez une nouvelle organisation pour inviter d'autres personnes.",
+      "step2": "Ou rejoindre une organisation existante",
+      "step2Desc": "Demandez à quelqu'un de vous inviter et attendez qu'il vous envoie un lien d'invitation.",
+      "subtitle": "Les organisations vous permettent de travailler avec des membres de l'équipe et de suivre le temps ensemble.",
+      "title": "Créer ou rejoindre une organisation"
+    },
+    "overview": {
+      "exports": "Exports & Listes",
+      "exportsDesc": "Retrouvez vos rapports dans la section Listes",
+      "help": "Cliquez sur 'Suivant' pour voir ce que vous devez configurer",
+      "organisations": "Organisations",
+      "organisationsDesc": "Collaborez avec les membres de votre équipe",
+      "projects": "Projets",
+      "projectsDesc": "Organisez votre travail en projets traçables",
+      "subtitle": "Voici les éléments de base que vous devez connaître",
+      "tags": "Tags & Groupes de tags",
+      "tagsDesc": "Catégorisez vos saisies pour des rapports détaillés",
+      "title": "Bienvenue dans Lasius",
+      "workingHours": "Heures de travail",
+      "workingHoursDesc": "Suivez vos heures de travail prévues par semaine"
+    },
+    "privateOrganisation": {
+      "explanation": "Votre organisation privée est parfaite pour suivre les projets personnels et tout ce que vous n'avez pas besoin de partager avec d'autres. Vous seul pouvez voir les projets et le temps enregistré ici.",
+      "help": "Cliquez sur 'Suivant' pour continuer",
+      "subtitle": "Vous avez déjà une organisation privée pour un usage personnel.",
+      "tip": "💡 Bon à savoir",
+      "tipDesc": "Si vous souhaitez travailler avec des membres de l'équipe, vous pouvez créer ou rejoindre des organisations supplémentaires.",
+      "title": "Votre organisation privée"
+    },
+    "projects": {
+      "action": "Aller à Mes projets",
+      "step1": "Créer le vôtre",
+      "step1Desc": "Accédez à Mes projets et créez un nouveau projet.",
+      "step2": "Ou rejoindre un projet existant",
+      "step2Desc": "Demandez à un administrateur de vous ajouter à son projet.",
+      "subtitle": "Les projets vous aident à organiser votre temps. Vous en avez besoin d'au moins un pour commencer.",
+      "title": "Créer ou rejoindre un projet"
+    },
+    "workingHours": {
+      "action": "Définir les heures de travail",
+      "step1": "Aller aux heures de travail",
+      "step1Desc": "Cliquez sur le bouton ci-dessous pour définir vos heures.",
+      "step2": "Saisir vos heures hebdomadaires",
+      "step2Desc": "Définissez combien d'heures vous travaillez chaque jour. Lasius affichera votre progression.",
+      "subtitle": "Indiquez à Lasius combien d'heures par semaine vous prévoyez de travailler.",
+      "title": "Définir les heures de travail"
+    }
+  },
   "organisation": {
     "title": "Organisation"
   },
@@ -466,6 +557,7 @@
       "language": "Langue de l'interface",
       "menuTitle": "Paramètres de l'application",
       "save": "Enregistrer les paramètres",
+      "showOnboarding": "Show Onboarding Tutorial",
       "theme": "Thème",
       "title": "Paramètres de l'application"
     }

@@ -24,14 +24,43 @@ import React, { useEffect } from 'react'
 
 export const Error: React.FC<{ statusCode: number }> = ({ statusCode }) => {
   const plausible = usePlausible<LasiusPlausibleEvents>()
+  const hasTrackedError = React.useRef(false)
 
   useEffect(() => {
-    plausible('error', {
-      props: {
-        status: statusCode.toString(),
-        message: PageError[statusCode.toString()],
-      },
-    })
+    // Only track once, even in React Strict Mode
+    if (hasTrackedError.current) return
+    hasTrackedError.current = true
+
+    // Map status code to appropriate error type
+    const errorType =
+      statusCode === 401 || statusCode === 403
+        ? 'error.auth'
+        : statusCode >= 500
+          ? 'error.api'
+          : 'error.runtime'
+
+    if (errorType === 'error.auth') {
+      plausible('error.auth', {
+        props: {
+          type: statusCode === 401 ? 'unauthorized' : 'forbidden',
+          message: PageError[statusCode.toString()] || 'unknown_error',
+        },
+      })
+    } else if (errorType === 'error.api') {
+      plausible('error.api', {
+        props: {
+          endpoint: 'page_render',
+          status: statusCode,
+          message: PageError[statusCode.toString()] || 'unknown_error',
+        },
+      })
+    } else {
+      plausible('error.runtime', {
+        props: {
+          message: `${statusCode}: ${PageError[statusCode.toString()] || 'unknown_error'}`,
+        },
+      })
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
