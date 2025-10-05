@@ -40,6 +40,11 @@ export const WorkLoadIndicator: React.FC<Props> = ({ plannedWeeklyHours, referen
     return null
   }
 
+  // Only show healthy message if at least 80% of planned hours are reached
+  if (burnoutMetrics.level === 'healthy' && burnoutMetrics.weeklyHours < plannedWeeklyHours * 0.8) {
+    return null
+  }
+
   const hoursText = `${decimalHoursToDurationString(burnoutMetrics.weeklyHours)}/${decimalHoursToDurationString(burnoutMetrics.plannedHours)}`
 
   // Playful icons and colors based on load level
