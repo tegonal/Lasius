@@ -20,7 +20,9 @@
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
 import { Button } from 'components/primitives/buttons/Button'
 import { InlineIcon } from 'components/ui/help/InlineIcon'
+import { Note } from 'components/ui/help/Note'
 import { Tip } from 'components/ui/help/Tip'
+import { Warning } from 'components/ui/help/Warning'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { X } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
@@ -72,6 +74,8 @@ const mdxComponents = {
     </a>
   ),
   Tip: ({ children }: { children: React.ReactNode }) => <Tip>{children}</Tip>,
+  Note: ({ children }: { children: React.ReactNode }) => <Note>{children}</Note>,
+  Warning: ({ children }: { children: React.ReactNode }) => <Warning>{children}</Warning>,
   Icon: ({ name, size }: { name: string; size?: number }) => (
     <InlineIcon name={name as keyof typeof import('lucide-react')} size={size} />
   ),

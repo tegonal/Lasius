@@ -23,6 +23,7 @@
 import { ResponsiveLine } from '@nivo/line'
 import { nivoTheme } from 'components/ui/charts/nivoTheme'
 import { useNivoColors } from 'components/ui/charts/shared/getConsistentColor'
+import { EmptyStateStats } from 'components/ui/data-display/fetchState/emptyStateStats'
 import { WeekData } from 'lib/api/hooks/useWorkHealthMetrics'
 import { decimalHoursToDurationString } from 'lib/utils/date/dates'
 import { useTranslation } from 'next-i18next'
@@ -42,10 +43,8 @@ export const WeeklyTrendChart: React.FC<Props> = ({ weeklyData }) => {
 
   if (!weeklyData || weeklyData.length === 0) {
     return (
-      <div className="bg-base-200 flex h-64 w-full items-center justify-center rounded-lg p-4">
-        <div className="text-base-content/60 text-sm">
-          {t('charts.errors.noData', { defaultValue: 'No data available' })}
-        </div>
+      <div className="h-64 w-full">
+        <EmptyStateStats />
       </div>
     )
   }

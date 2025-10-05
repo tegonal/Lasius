@@ -47,7 +47,7 @@
     "errors": {
       "callback": "Error en la devolución de llamada de autenticación. Por favor, inténtelo de nuevo.",
       "credentialsMissing": "Falta el nombre de usuario o la contraseña",
-      "fetchProfileFailed": "No se pudo cargar el perfil de usuario. Por favor, intente iniciar sesión de nuevo.",
+      "fetchProfileFailed": "Su sesión ha expirado. Por favor, inicie sesión de nuevo.",
       "general": "Error de autenticación: {error}",
       "oauthCallback": "Error de autenticación. Por favor, inténtelo de nuevo.",
       "registerUnknown": "Error desconocido en el registro",

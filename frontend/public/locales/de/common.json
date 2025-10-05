@@ -47,7 +47,7 @@
     "errors": {
       "callback": "Authentifizierungs-Rückruf fehlgeschlagen. Bitte versuche es erneut.",
       "credentialsMissing": "Benutzername oder Passwort fehlt",
-      "fetchProfileFailed": "Benutzerinformationen konnten nicht geladen werden, bitte erneut einloggen.",
+      "fetchProfileFailed": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
       "general": "Ein Fehler ist bei der Authentifizierung aufgetreten: {error}",
       "oauthCallback": "Authentifizierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
       "registerUnknown": "Unbekannter Registrierungsfehler",

@@ -21,6 +21,7 @@
 // @ts-nocheck
 
 import { ResponsiveStream } from '@nivo/stream'
+import { EmptyStateStats } from 'components/ui/data-display/fetchState/emptyStateStats'
 import { format } from 'date-fns'
 import { logger } from 'lib/logger'
 import {
@@ -69,10 +70,8 @@ export const MonthStreamChartImpl: React.FC<Props> = ({ data, keys }) => {
       keys,
     })
     return (
-      <div className="bg-base-200 flex h-64 w-full items-center justify-center rounded-lg p-4">
-        <div className="text-base-content/60 text-sm">
-          {t('charts.errors.invalidData', { defaultValue: 'Invalid data' })}
-        </div>
+      <div className="h-64 w-full">
+        <EmptyStateStats />
       </div>
     )
   }
@@ -81,10 +80,8 @@ export const MonthStreamChartImpl: React.FC<Props> = ({ data, keys }) => {
   if (!data || !keys || !Array.isArray(data) || !Array.isArray(keys) || data.length !== 7) {
     logger.error('[MonthStreamChartImpl] Invalid data or keys:', { data, keys })
     return (
-      <div className="bg-base-200 flex h-64 w-full items-center justify-center rounded-lg p-4">
-        <div className="text-base-content/60 text-sm">
-          {t('charts.errors.invalidData', { defaultValue: 'Invalid data' })}
-        </div>
+      <div className="h-64 w-full">
+        <EmptyStateStats />
       </div>
     )
   }
@@ -97,10 +94,8 @@ export const MonthStreamChartImpl: React.FC<Props> = ({ data, keys }) => {
 
   if (!hasData) {
     return (
-      <div className="bg-base-200 flex h-64 w-full items-center justify-center rounded-lg p-4">
-        <div className="text-base-content/60 text-sm">
-          {t('charts.noData.month', { defaultValue: 'No booking data for this month' })}
-        </div>
+      <div className="h-64 w-full">
+        <EmptyStateStats />
       </div>
     )
   }

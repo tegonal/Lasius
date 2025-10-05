@@ -47,7 +47,7 @@
     "errors": {
       "callback": "Authentication callback failed. Please try again.",
       "credentialsMissing": "Username or password missing",
-      "fetchProfileFailed": "Couldn't load user profile. Please try logging in again.",
+      "fetchProfileFailed": "Your session has expired. Please log in again.",
       "general": "Authentication error: {error}",
       "oauthCallback": "Authentication failed. Please try again.",
       "registerUnknown": "Unknown registration error",

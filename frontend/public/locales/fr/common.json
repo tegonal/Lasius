@@ -47,7 +47,7 @@
     "errors": {
       "callback": "Le rappel d'authentification a échoué. Veuillez réessayer.",
       "credentialsMissing": "Nom d'utilisateur ou mot de passe manquant",
-      "fetchProfileFailed": "Impossible de charger le profil utilisateur. Veuillez vous reconnecter.",
+      "fetchProfileFailed": "Votre session a expiré. Veuillez vous reconnecter.",
       "general": "Erreur d'authentification : {error}",
       "oauthCallback": "L'authentification a échoué. Veuillez réessayer.",
       "registerUnknown": "Erreur d'inscription inconnue",

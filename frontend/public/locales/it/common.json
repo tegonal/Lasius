@@ -47,7 +47,7 @@
     "errors": {
       "callback": "Callback di autenticazione non riuscito. Riprova.",
       "credentialsMissing": "Nome utente o password mancante",
-      "fetchProfileFailed": "Impossibile caricare il profilo utente. Riprova ad accedere.",
+      "fetchProfileFailed": "La tua sessione è scaduta. Effettua nuovamente l'accesso.",
       "general": "Errore di autenticazione: {error}",
       "oauthCallback": "Autenticazione non riuscita. Riprova.",
       "registerUnknown": "Errore di registrazione sconosciuto",
