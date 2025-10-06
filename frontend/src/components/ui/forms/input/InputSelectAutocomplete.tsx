@@ -167,6 +167,9 @@ export const InputSelectAutocomplete: React.FC<Props> = ({
                           defaultValue: 'Select project',
                         })}
                         autoComplete="off"
+                        autoCorrect="off"
+                        autoCapitalize="off"
+                        spellCheck={false}
                         value={inputText}
                         displayValue={(item: SelectAutocompleteSuggestionType) => item?.key || ''}
                       />

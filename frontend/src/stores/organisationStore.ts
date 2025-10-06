@@ -126,6 +126,11 @@ export const useOrganisationStore = create<OrganisationStore>()(
                       .then((updatedProfile) => {
                         // Update SWR cache with the new profile
                         mutate('/user/profile', updatedProfile, false)
+                        // Reload page to ensure all data is loaded with correct organisation
+                        // This only happens when auto-selecting default organisation on first load
+                        if (typeof window !== 'undefined') {
+                          window.location.reload()
+                        }
                       })
                       .catch((error) => {
                         console.error('Failed to persist auto-selected organisation:', error)
