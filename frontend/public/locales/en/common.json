@@ -65,6 +65,12 @@
       "internalLasius": "Internal Lasius Sign-in"
     },
     "secureAndPrivate": "Secure & Private",
+    "sessionExpired": {
+      "alert": "Your session has timed out for security reasons.",
+      "loginButton": "Log In Again",
+      "message": "Please log in again to continue using the application.",
+      "title": "Session Expired"
+    },
     "signIn": "Sign in",
     "signInTitle": "Sign in to your account",
     "signInToLasius": "Sign in to Lasius",
@@ -88,6 +94,7 @@
       "edit": "Edit booking",
       "editOverlapping": "Edit booking to resolve overlap",
       "filterByProject": "Filter by project {{projectKey}}",
+      "filterByUser": "Filter by user {{userKey}}",
       "insert": "Insert booking",
       "start": "Start booking",
       "startFromFavorite": "Start booking from favorite",
@@ -368,6 +375,7 @@
   },
   "onboarding": {
     "actions": {
+      "backToChecklist": "Back to Checklist",
       "gotIt": "Ok, got it!"
     },
     "booking": {
@@ -382,7 +390,7 @@
     },
     "checklist": {
       "booking": "Start tracking time",
-      "help": "Click 'Next' to learn about each step",
+      "help": "Click on any item to learn more about it",
       "organisation": "Create or join an organization",
       "progress": "Your Progress",
       "project": "Create or join a project",
@@ -465,8 +473,15 @@
       "switch": "Switch organisation"
     },
     "adminDescription": "You are an administrator of this organisation. You can add and remove members and change the organisation name, or create a new one.",
-    "createDescription": "Add a new organisation using the Actions button at the top of the list.",
+    "createDescription": "Use the Actions menu to create a new organisation.",
     "currentOrganisation": "Current organisation",
+    "errors": {
+      "duplicateKey": "An organisation with this name already exists",
+      "saveFailed": "Failed to save organisation"
+    },
+    "info": {
+      "uniqueNameRequired": "Organisation names must be unique."
+    },
     "memberDescription": "You are a member of this organisation and don't have the rights to add or remove members. Get in touch with an organisation administrator if you would like to invite someone.",
     "members": "Members",
     "myPersonalOrganisation": "My personal organisation",
@@ -484,7 +499,6 @@
   },
   "projects": {
     "actions": {
-      "backToProjects": "Back to projects",
       "create": "Create a project",
       "deactivate": "Deactivate project",
       "edit": "Edit project",
@@ -502,11 +516,16 @@
     "deactivatedBy": "Archived by {{user}}",
     "empty": "No projects found",
     "errors": {
-      "projectNotFound": "This project could not be found. The project ID is shown above."
+      "duplicateKey": "A project with this name already exists",
+      "projectNotFound": "This project could not be found. The project ID is shown above.",
+      "saveFailed": "Failed to save project"
     },
     "filter": {
       "both": "Both",
       "status": "Status"
+    },
+    "info": {
+      "uniqueNameRequired": "Project names must be unique within your organisation."
     },
     "label": "Project",
     "lastActivity": "Last activity",
@@ -516,7 +535,6 @@
     "myProjects": "My projects",
     "myProjectsDescription": "Projects where you are a member and can book time, filtered by the current organisation.",
     "name": "Project name",
-    "noActivity": "No activity",
     "project": "Project",
     "projectName": "Project name",
     "projectRole": "Role",
@@ -620,7 +638,14 @@
     "showPasswords": "Show passwords"
   },
   "users": {
-    "title": "Users"
+    "errors": {
+      "userNotFound": "This user could not be found. The user ID is shown above."
+    },
+    "title": "Users",
+    "warnings": {
+      "userNotInActiveList": "This user is not in your active users list. They may have been removed from the organisation.",
+      "userUnavailable": "This user is no longer available in your organisation."
+    }
   },
   "validation": {
     "startMustBeInPast": "Start time must be in the past"

@@ -37,7 +37,7 @@ export const {
   LASIUS_TERMSOFSERVICE_VERSION,
 } = publicRuntimeConfig as { [key: string]: string }
 
-export const DEV = ENVIRONMENT !== 'production'
+export const IS_DEV = ENVIRONMENT !== 'production'
 
 export const DEFAULT_STRING_VALUE = 'default'
 export const DEFAULT_STRING_VALUE_ALL = 'all'

@@ -153,6 +153,20 @@ export const useUIStore = create<UIStore>()(
                 state.globalLoadingCounter = 0
               }
 
+              // Safety: If counter is stuck at a low number for too long, auto-reset
+              if (state.globalLoadingCounter > 0 && state.globalLoadingCounter <= 3) {
+                setTimeout(() => {
+                  const currentCounter = useUIStore.getState().globalLoadingCounter
+                  if (currentCounter > 0 && currentCounter <= 3) {
+                    logger.warn(
+                      '[UIStore] globalLoadingCounter appears stuck. Auto-resetting after timeout.',
+                      { counter: currentCounter },
+                    )
+                    useUIStore.getState().setGlobalLoading(false)
+                  }
+                }, 30000) // 30 second timeout
+              }
+
               state.globalLoading = state.globalLoadingCounter > 0
             }),
 

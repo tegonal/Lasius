@@ -65,6 +65,12 @@
       "internalLasius": "Accesso interno Lasius"
     },
     "secureAndPrivate": "Sicuro e privato",
+    "sessionExpired": {
+      "alert": "La tua sessione è scaduta per motivi di sicurezza.",
+      "loginButton": "Accedi di nuovo",
+      "message": "Per favore, accedi di nuovo per continuare a utilizzare l'applicazione.",
+      "title": "Sessione scaduta"
+    },
     "signIn": "Accedi",
     "signInTitle": "Accedi al tuo account",
     "signInToLasius": "Accedi a Lasius",
@@ -88,6 +94,7 @@
       "edit": "Modifica registrazione",
       "editOverlapping": "Modifica registrazione per risolvere la sovrapposizione",
       "filterByProject": "Filtra per progetto {{projectKey}}",
+      "filterByUser": "Filtra per utente {{userKey}}",
       "insert": "Inserisci registrazione",
       "start": "Avvia registrazione",
       "startFromFavorite": "Avvia registrazione da preferito",
@@ -368,6 +375,7 @@
   },
   "onboarding": {
     "actions": {
+      "backToChecklist": "Torna alla lista di controllo",
       "gotIt": "Ok, capito!"
     },
     "booking": {
@@ -382,7 +390,7 @@
     },
     "checklist": {
       "booking": "Inizia a registrare il tempo",
-      "help": "Fai clic su 'Avanti' per saperne di più su ogni passaggio",
+      "help": "Fai clic su un elemento per saperne di più",
       "organisation": "Crea o unisciti a un'organizzazione",
       "progress": "Il tuo progresso",
       "project": "Crea o unisciti a un progetto",
@@ -465,8 +473,15 @@
       "switch": "Cambia organizzazione"
     },
     "adminDescription": "Sei un amministratore di questa organizzazione. Puoi aggiungere e rimuovere membri e modificare il nome dell'organizzazione, o crearne una nuova.",
-    "createDescription": "Aggiungi una nuova organizzazione cliccando sul pulsante qui sotto.",
+    "createDescription": "Usa il menu Azioni per creare una nuova organizzazione.",
     "currentOrganisation": "Organizzazione corrente",
+    "errors": {
+      "duplicateKey": "Un'organizzazione con questo nome esiste già",
+      "saveFailed": "Impossibile salvare l'organizzazione"
+    },
+    "info": {
+      "uniqueNameRequired": "I nomi delle organizzazioni devono essere univoci."
+    },
     "memberDescription": "Sei un membro di questa organizzazione e non hai i diritti per aggiungere o rimuovere membri. Contatta un amministratore dell'organizzazione se desideri invitare qualcuno.",
     "members": "Membri",
     "myPersonalOrganisation": "La mia organizzazione personale",
@@ -484,7 +499,6 @@
   },
   "projects": {
     "actions": {
-      "backToProjects": "Torna ai progetti",
       "create": "Crea un progetto",
       "deactivate": "Disattiva progetto",
       "edit": "Modifica progetto",
@@ -502,11 +516,16 @@
     "deactivatedBy": "Archiviato da {{user}}",
     "empty": "Nessun progetto trovato",
     "errors": {
-      "projectNotFound": "Questo progetto non è stato trovato. L'ID del progetto è mostrato sopra."
+      "duplicateKey": "Un progetto con questo nome esiste già",
+      "projectNotFound": "Questo progetto non è stato trovato. L'ID del progetto è mostrato sopra.",
+      "saveFailed": "Impossibile salvare il progetto"
     },
     "filter": {
       "both": "Entrambi",
       "status": "Stato"
+    },
+    "info": {
+      "uniqueNameRequired": "I nomi dei progetti devono essere univoci all'interno della tua organizzazione."
     },
     "label": "Progetto",
     "lastActivity": "Ultima attività",
@@ -516,7 +535,6 @@
     "myProjects": "I miei progetti",
     "myProjectsDescription": "Progetti di cui sei membro e in cui puoi registrare tempo, filtrati per l'organizzazione corrente.",
     "name": "Nome progetto",
-    "noActivity": "Nessuna attività",
     "project": "Progetto",
     "projectName": "Nome progetto",
     "projectRole": "Ruolo",
@@ -620,7 +638,14 @@
     "showPasswords": "Mostra password"
   },
   "users": {
-    "title": "Utenti"
+    "errors": {
+      "userNotFound": "Questo utente non è stato trovato. L'ID utente è mostrato sopra."
+    },
+    "title": "Utenti",
+    "warnings": {
+      "userNotInActiveList": "Questo utente non è nella tua lista di utenti attivi. Potrebbe essere stato rimosso dall'organizzazione.",
+      "userUnavailable": "Questo utente non è più disponibile nella tua organizzazione."
+    }
   },
   "validation": {
     "startMustBeInPast": "L'ora di inizio deve essere nel passato"

@@ -62,7 +62,7 @@ export interface TextProps
 }
 
 export const Text = React.forwardRef<HTMLElement, TextProps>(
-  ({ className, variant, children, as: Component = 'span', ...props }, ref) => {
+  ({ className, variant, children, as: Component = 'p', ...props }, ref) => {
     // Special handling for footer variant links
     const footerLinkStyles =
       variant === 'footer' ? '[&_a]:text-base-content/75 [&_a:hover]:no-underline' : ''

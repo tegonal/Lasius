@@ -22,12 +22,11 @@ import { ButtonGroup } from 'components/ui/forms/ButtonGroup'
 import { FieldSet } from 'components/ui/forms/FieldSet'
 import { FormBody } from 'components/ui/forms/FormBody'
 import { FormElement } from 'components/ui/forms/FormElement'
-import { InputSelectAutocomplete } from 'components/ui/forms/input/InputSelectAutocomplete'
 import { InputTagsAutocomplete } from 'components/ui/forms/input/InputTagsAutocomplete'
+import { ProjectSelect } from 'components/ui/forms/input/ProjectSelect'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { roundToNearestMinutes } from 'date-fns'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
-import { useProjects } from 'lib/api/hooks/useProjects'
 import { startUserBookingCurrent } from 'lib/api/lasius/user-bookings/user-bookings'
 import { useGetTagsByProject } from 'lib/api/lasius/user-organisations/user-organisations'
 import { formatISOLocale } from 'lib/utils/date/dates'
@@ -49,7 +48,6 @@ export const BookingStart: React.FC = () => {
     defaultValues: { projectId: '', tags: [] },
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const { projectSuggestions, findProjectById } = useProjects()
   const { selectedOrganisationId } = useOrganisation()
   const { data: projectTags } = useGetTagsByProject(
     selectedOrganisationId,
@@ -101,13 +99,7 @@ export const BookingStart: React.FC = () => {
                 label={t('projects.label', { defaultValue: 'Project' })}
                 htmlFor="projectId"
                 required>
-                <InputSelectAutocomplete
-                  id="projectId"
-                  name="projectId"
-                  suggestions={projectSuggestions()}
-                  findMissingProject={findProjectById}
-                  required
-                />
+                <ProjectSelect id="projectId" name="projectId" required />
               </FormElement>
               <FormElement label={t('tags.label', { defaultValue: 'Tags' })} htmlFor="tags">
                 <InputTagsAutocomplete id="tags" suggestions={projectTags} name="tags" />

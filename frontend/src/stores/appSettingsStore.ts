@@ -30,8 +30,10 @@ interface AppSettingsStore {
 
   // Onboarding settings
   onboardingDismissed: boolean
+  onboardingChecklistReached: boolean
   dismissOnboarding: () => void
   resetOnboarding: () => void
+  markChecklistReached: () => void
 }
 
 export const useAppSettingsStore = create<AppSettingsStore>()(
@@ -47,6 +49,7 @@ export const useAppSettingsStore = create<AppSettingsStore>()(
 
         // Onboarding settings
         onboardingDismissed: false,
+        onboardingChecklistReached: false,
         dismissOnboarding: () =>
           set((state) => {
             state.onboardingDismissed = true
@@ -54,6 +57,11 @@ export const useAppSettingsStore = create<AppSettingsStore>()(
         resetOnboarding: () =>
           set((state) => {
             state.onboardingDismissed = false
+            state.onboardingChecklistReached = false
+          }),
+        markChecklistReached: () =>
+          set((state) => {
+            state.onboardingChecklistReached = true
           }),
       })),
       {
@@ -70,16 +78,20 @@ export const useAppSettingsStore = create<AppSettingsStore>()(
 export const useTheme = () => useAppSettingsStore((state) => state.theme)
 export const useOnboardingDismissed = () =>
   useAppSettingsStore((state) => state.onboardingDismissed)
+export const useOnboardingChecklistReached = () =>
+  useAppSettingsStore((state) => state.onboardingChecklistReached)
 
 // Action hooks
 export const useAppSettingsActions = () => {
   const setTheme = useAppSettingsStore((state) => state.setTheme)
   const dismissOnboarding = useAppSettingsStore((state) => state.dismissOnboarding)
   const resetOnboarding = useAppSettingsStore((state) => state.resetOnboarding)
+  const markChecklistReached = useAppSettingsStore((state) => state.markChecklistReached)
 
   return {
     setTheme,
     dismissOnboarding,
     resetOnboarding,
+    markChecklistReached,
   }
 }

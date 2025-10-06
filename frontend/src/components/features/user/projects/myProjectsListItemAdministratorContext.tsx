@@ -18,7 +18,6 @@
  */
 
 import { ContextButtonClose } from 'components/features/contextMenu/buttons/contextButtonClose'
-import { ContextButtonDeactivateProject } from 'components/features/contextMenu/buttons/contextButtonDeactivateProject'
 import { ContextButtonLeaveProject } from 'components/features/contextMenu/buttons/contextButtonLeaveProject'
 import { ContextButtonOpen } from 'components/features/contextMenu/buttons/contextButtonOpen'
 import { ContextAnimatePresence } from 'components/features/contextMenu/contextAnimatePresence'
@@ -150,7 +149,6 @@ export const MyProjectsListItemAdministratorContext: React.FC<Props> = ({ item }
                     <LucideIcon icon={Tags} size={24} />
                   </Button>
                 </ContextButtonWrapper>
-                <ContextButtonDeactivateProject item={item} variant="compact" />
                 <ContextButtonLeaveProject item={item} variant="compact" />
                 <ContextBarDivider />
                 <ContextButtonClose variant="compact" />

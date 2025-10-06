@@ -23,11 +23,7 @@ import { logger } from 'lib/logger'
 import { useSession } from 'next-auth/react'
 import React, { useEffect } from 'react'
 
-type HttpHeaderProviderProps = {
-  session?: any // Keep for backwards compatibility but won't use it
-}
-
-export const HttpHeaderProvider: React.FC<HttpHeaderProviderProps> = () => {
+export const HttpHeaderProvider: React.FC = () => {
   // Use the session from the context, not the prop!
   const { data: session } = useSession()
   const getCSRFToken = async () => {

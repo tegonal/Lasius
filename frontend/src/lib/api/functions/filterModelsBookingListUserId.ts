@@ -17,14 +17,7 @@
  *
  */
 
-import { IS_DEV } from 'projectConfig/constants'
-import { Logger } from 'tslog'
+import { ModelsBooking } from 'lib/api/lasius'
 
-import type { ILogObj } from 'tslog'
-
-const dev: ILogObj = { type: 'pretty', minLevel: 0 }
-const prod: ILogObj = { type: 'json', minLevel: 4, hideLogPositionForProduction: true }
-
-const logger: Logger<ILogObj> = new Logger(IS_DEV ? dev : prod)
-
-export { logger }
+export const filterModelsBookingListUserId = (list: ModelsBooking[], userId: string) =>
+  list.filter((booking) => (userId ? booking.userReference.id === userId : true))

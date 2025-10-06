@@ -45,16 +45,31 @@ export const BootstrapTasks: React.FC = () => {
     hideGlobalLoading()
   }
 
+  const handleBeforeHistoryChange = (url: string) => {
+    // This fires when user cancels navigation (e.g., back button then forward)
+    logger.info('[BootstrapTasks][beforeHistoryChange]', { url })
+    // Reset loading state in case route change was cancelled
+    const currentCounter = useUIStore.getState().globalLoadingCounter
+    if (currentCounter > 0) {
+      logger.warn('[BootstrapTasks] Route may have been cancelled, resetting loading state', {
+        counter: currentCounter,
+      })
+      useUIStore.getState().setGlobalLoading(false)
+    }
+  }
+
   useEffect(() => {
     logger.info('[initializer][loadOnRefresh]')
     events.on('routeChangeStart', handleRouteChangeStart)
     events.on('routeChangeComplete', handleRouteChangeComplete)
     events.on('routeChangeError', handleRouteChangeError)
+    events.on('beforeHistoryChange', handleBeforeHistoryChange)
 
     return () => {
       events.off('routeChangeStart', handleRouteChangeStart)
       events.off('routeChangeComplete', handleRouteChangeComplete)
       events.off('routeChangeError', handleRouteChangeError)
+      events.off('beforeHistoryChange', handleBeforeHistoryChange)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])

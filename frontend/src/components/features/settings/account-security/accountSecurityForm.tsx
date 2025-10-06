@@ -34,7 +34,7 @@ import { useProfile } from 'lib/api/hooks/useProfile'
 import { updateUserPassword } from 'lib/api/lasius/oauth2-provider/oauth2-provider'
 import { Eye, EyeOff } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
-import { DEV, LASIUS_DEMO_MODE } from 'projectConfig/constants'
+import { IS_DEV, LASIUS_DEMO_MODE } from 'projectConfig/constants'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useIsClient } from 'usehooks-ts'
@@ -65,7 +65,7 @@ export const AccountSecurityForm: React.FC = () => {
   }
 
   const onSubmit = async (data: any) => {
-    if (LASIUS_DEMO_MODE === 'true' && !DEV) {
+    if (LASIUS_DEMO_MODE === 'true' && !IS_DEV) {
       addToast({
         message: t('account.profileChangesNotAllowedInDemo', {
           defaultValue: 'Profile changes are not allowed in demo mode',

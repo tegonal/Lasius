@@ -101,6 +101,15 @@ export const StatsExport: React.FC = () => {
     statsSwrConfig,
   )
 
+  const hasData =
+    bookingList &&
+    bookingList.length > 0 &&
+    ((tagsByDay?.length ?? 0) > 0 ||
+      (usersByDay?.length ?? 0) > 0 ||
+      (projectsAggregated?.length ?? 0) > 0 ||
+      (usersAggregated?.length ?? 0) > 0 ||
+      (tagsAggregated?.length ?? 0) > 0)
+
   const handleExport = (format: ExportFormat) => {
     if (!bookingList) return
 
@@ -143,8 +152,8 @@ export const StatsExport: React.FC = () => {
     <div className="dropdown dropdown-end">
       <button
         type="button"
-        className="btn btn-neutral"
-        disabled={!bookingList}
+        className="btn btn-sm btn-neutral w-auto"
+        disabled={!hasData}
         tabIndex={0}
         aria-haspopup="menu"
         aria-label={t('export.stats.openMenu', {

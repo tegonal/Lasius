@@ -23,7 +23,13 @@ import { CheckCircle2, Circle, Clock, Folder, Timer, Users } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
 
-export const OnboardingSlideChecklist: React.FC = () => {
+interface OnboardingSlideChecklistProps {
+  onNavigateToSlide?: (slideId: string) => void
+}
+
+export const OnboardingSlideChecklist: React.FC<OnboardingSlideChecklistProps> = ({
+  onNavigateToSlide,
+}) => {
   const { t } = useTranslation('common')
   const { hasMultipleOrganisations, hasProjects, hasWorkingHours, hasEverBooked } =
     useOnboardingStatus()
@@ -87,11 +93,13 @@ export const OnboardingSlideChecklist: React.FC = () => {
 
         <div className="space-y-3">
           {checklistItems.map((item) => (
-            <div
+            <button
               key={item.id}
-              className={`flex items-start gap-3 rounded-lg p-3 transition-colors ${
+              onClick={() => onNavigateToSlide?.(item.id)}
+              disabled={!onNavigateToSlide}
+              className={`flex w-full items-start gap-3 rounded-lg p-3 text-left transition-all ${
                 item.completed ? 'bg-success/10' : 'bg-base-200'
-              }`}>
+              } ${onNavigateToSlide ? 'cursor-pointer hover:scale-[1.02] hover:shadow-md' : ''}`}>
               <div className="flex-shrink-0">
                 <LucideIcon
                   icon={item.completed ? CheckCircle2 : Circle}
@@ -110,14 +118,14 @@ export const OnboardingSlideChecklist: React.FC = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </div>
 
       <p className="text-base-content/60 text-center text-sm">
         {t('onboarding.checklist.help', {
-          defaultValue: "Click 'Next' to learn about each step",
+          defaultValue: 'Click on any item to learn more about it',
         })}
       </p>
     </div>

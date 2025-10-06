@@ -27,9 +27,11 @@ import { Loading } from 'components/ui/data-display/fetchState/loading'
 import { apiTimespanFromTo } from 'lib/api/apiDateHandling'
 import { filterModelsBookingListByTags } from 'lib/api/functions/filterModelsBookingListByTags'
 import { filterModelsBookingListProjectId } from 'lib/api/functions/filterModelsBookingListProjectId'
+import { filterModelsBookingListUserId } from 'lib/api/functions/filterModelsBookingListUserId'
 import { getExtendedModelsBookingList } from 'lib/api/functions/getExtendedModelsBookingList'
 import { getModelsBookingSummary } from 'lib/api/functions/getModelsBookingSummary'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
+import { useProjects } from 'lib/api/hooks/useProjects'
 import { ModelsBooking } from 'lib/api/lasius'
 import { useGetOrganisationBookingList } from 'lib/api/lasius/organisation-bookings/organisation-bookings'
 import { useGetUserBookingListByOrganisation } from 'lib/api/lasius/user-bookings/user-bookings'
@@ -45,6 +47,7 @@ import { useIsClient } from 'usehooks-ts'
 
 type FormValues = {
   projectId: string
+  userId: string
   tags: ModelsTags[]
   from: string
   to: string
@@ -61,6 +64,7 @@ export const BookingHistoryLayout: React.FC<Props> = ({ dataSource }) => {
   const hookForm = useForm<FormValues>({
     defaultValues: {
       projectId: '',
+      userId: '',
       tags: [],
       from: formatISOLocale(new Date()),
       to: formatISOLocale(new Date()),
@@ -68,17 +72,24 @@ export const BookingHistoryLayout: React.FC<Props> = ({ dataSource }) => {
     },
   })
   const { selectedOrganisationId } = useOrganisation()
+  const { projectSuggestions } = useProjects()
 
   // Read projectId and projectName from URL search params on mount
+  // Only show as inactive if project is not in active suggestions
   const inactiveProject = useMemo(() => {
     const projectIdFromUrl = router.query.projectId as string | undefined
     const projectNameFromUrl = router.query.projectName as string | undefined
 
     if (projectIdFromUrl && projectNameFromUrl) {
-      return { id: projectIdFromUrl, key: projectNameFromUrl }
+      const suggestions = projectSuggestions()
+      const isProjectActive = suggestions.some((p) => p.id === projectIdFromUrl)
+
+      if (!isProjectActive) {
+        return { id: projectIdFromUrl, key: projectNameFromUrl }
+      }
     }
     return null
-  }, [router.query.projectId, router.query.projectName])
+  }, [router.query.projectId, router.query.projectName, projectSuggestions])
 
   useEffect(() => {
     const projectIdFromUrl = router.query.projectId as string | undefined
@@ -118,15 +129,19 @@ export const BookingHistoryLayout: React.FC<Props> = ({ dataSource }) => {
 
   const tags = hookForm.watch('tags')
   const projectId = hookForm.watch('projectId')
+  const userId = hookForm.watch('userId')
 
   const processedItems = useMemo(() => {
     return getExtendedModelsBookingList(
-      filterModelsBookingListProjectId(
-        filterModelsBookingListByTags(response.data || [], tags),
-        projectId,
+      filterModelsBookingListUserId(
+        filterModelsBookingListProjectId(
+          filterModelsBookingListByTags(response.data || [], tags),
+          projectId,
+        ),
+        userId,
       ),
     )
-  }, [response.data, tags, projectId])
+  }, [response.data, tags, projectId, userId])
 
   const summary = useMemo(() => {
     return getModelsBookingSummary(processedItems)
@@ -185,7 +200,7 @@ export const BookingHistoryLayout: React.FC<Props> = ({ dataSource }) => {
       </ScrollContainer>
       <ScrollContainer className="bg-base-200 flex-1 overflow-y-auto rounded-tr-lg">
         <ColumnList>
-          <BookingHistoryFilter inactiveProject={inactiveProject} />
+          <BookingHistoryFilter inactiveProject={inactiveProject} dataSource={dataSource} />
         </ColumnList>
       </ScrollContainer>
     </FormProvider>

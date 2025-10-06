@@ -65,6 +65,15 @@ export const BookingHistoryTable: React.FC<Props> = ({
     }
   }
 
+  const userIdClickHandler = (booking: ModelsBooking) => {
+    const {
+      userReference: { id },
+    } = booking
+    if (id) {
+      formContext.setValue('userId', id)
+    }
+  }
+
   const sortedList = useMemo(() => sortExtendedBookingsByDate(items), [items])
 
   if (sortedList.length < 1) return <EmptyStateBookingHistory />
@@ -88,7 +97,19 @@ export const BookingHistoryTable: React.FC<Props> = ({
       {sortedList.map((booking) => (
         <DataListRow key={booking.id}>
           {showUserColumn && (
-            <DataListField className="whitespace-nowrap">{booking.userReference.key}</DataListField>
+            <DataListField className="whitespace-nowrap">
+              <button
+                type="button"
+                className="hover:text-accent font-inherit cursor-pointer border-none bg-transparent p-0 text-inherit"
+                data-value={booking.userReference.key}
+                onClick={() => userIdClickHandler(booking)}
+                aria-label={t('bookings.actions.filterByUser', {
+                  defaultValue: 'Filter by user {{userKey}}',
+                  userKey: booking.userReference.key,
+                })}>
+                {booking.userReference.key}
+              </button>
+            </DataListField>
           )}
           <DataListField>
             <button

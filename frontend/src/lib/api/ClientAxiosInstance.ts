@@ -35,6 +35,7 @@ clientAxiosInstance.interceptors.request.use(
     return config
   },
   (error) => {
+    // Always decrement on request error
     if (!IS_SERVER) {
       useUIStore.getState().hideGlobalLoading()
     }
@@ -51,6 +52,7 @@ clientAxiosInstance.interceptors.response.use(
     return response
   },
   (error) => {
+    // Always decrement on response error, including cancelled requests
     if (!IS_SERVER) {
       useUIStore.getState().hideGlobalLoading()
     }

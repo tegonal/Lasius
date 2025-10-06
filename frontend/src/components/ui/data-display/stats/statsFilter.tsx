@@ -74,9 +74,16 @@ export const StatsFilter: React.FC<StatsFilterProps> = ({ inactiveProject = null
                 defaultValue: 'Viewing stats from inactive project',
               })}
             </span>
-            <Button variant="ghost" size="sm" onClick={handleBackToProjects}>
+            <Button
+              variant="ghost"
+              size="sm"
+              fullWidth={false}
+              onClick={handleBackToProjects}
+              aria-label={t('common.actions.back', {
+                defaultValue: 'Back',
+              })}>
               <LucideIcon icon={ArrowLeft} size={16} />
-              {t('projects.actions.backToProjects', { defaultValue: 'Back to projects' })}
+              {t('common.actions.back', { defaultValue: 'Back' })}
             </Button>
           </div>
         </div>

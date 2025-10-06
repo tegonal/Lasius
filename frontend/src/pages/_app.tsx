@@ -24,11 +24,12 @@ import { DevInfoBadge } from 'components/features/system/devInfoBadge'
 import { GlobalLoading } from 'components/features/system/globalLoading'
 import { HttpHeaderProvider } from 'components/features/system/httpHeaderProvider'
 import { LasiusBackendOnlineCheck } from 'components/features/system/lasiusBackendOnlineCheck'
-import 'styles/globals.css'
 import { LasiusBackendWebsocketEventHandler } from 'components/features/system/lasiusBackendWebsocketEventHandler'
+import 'styles/globals.css'
 import { LasiusBackendWebsocketStatus } from 'components/features/system/lasiusBackendWebsocketStatus'
 import { LasiusTOSCheck } from 'components/features/system/lasiusTOSCheck'
 import { TokenWatcher } from 'components/features/system/tokenWatcher'
+import { TopLoadingBar } from 'components/features/system/topLoadingBar'
 import { BookingProgressBarExplosion } from 'components/ui/feedback/BookingProgressBarExplosion'
 import { Error } from 'components/ui/feedback/Error'
 import { Toasts } from 'components/ui/feedback/Toasts'
@@ -45,9 +46,8 @@ import { DefaultSeo } from 'next-seo'
 import { AppProps } from 'next/app'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
-import { SOCIAL_MEDIA_CARD_IMAGE_URL } from 'projectConfig/constants'
-import React, { JSX } from 'react'
-import { useAsync } from 'react-async-hook'
+import { IS_DEV, SOCIAL_MEDIA_CARD_IMAGE_URL } from 'projectConfig/constants'
+import React, { JSX, useEffect } from 'react'
 import { resetAllStores } from 'stores/globalActions'
 import { SWRConfig } from 'swr'
 
@@ -67,20 +67,20 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
   // Extract auth props from pageProps (they come from getServerSideProps now)
   const { session, profile, fallback, statusCode = 0, ...restPageProps } = pageProps
 
-  const lasiusIsLoggedIn = !!(session?.access_token && profile?.id)
+  const hasValidSession = !!(session?.access_token && profile?.id)
 
   // Initialize theme on app mount, respecting system preference
   useThemeInitialization()
 
-  useAsync(async () => {
-    if (!lasiusIsLoggedIn) {
+  useEffect(() => {
+    if (!hasValidSession) {
       logger.info('[App][UserNotLoggedIn]')
       resetAllStores()
-      await removeAccessibleCookies()
+      void removeAccessibleCookies()
     } else {
       logger.info('[App][UserLoggedIn]')
     }
-  }, [lasiusIsLoggedIn])
+  }, [hasValidSession])
 
   return (
     <>
@@ -102,7 +102,6 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
             <title>Lasius</title>
           </Head>
           <LazyMotion features={loadFeatures}>
-            <GlobalLoading />
             <DefaultSeo
               openGraph={{
                 images: [{ url: SOCIAL_MEDIA_CARD_IMAGE_URL }],
@@ -119,18 +118,20 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
             <BundleVersionCheck />
             <Toasts />
             <HelpDrawer />
-            <BookingProgressBarExplosion />
-            {lasiusIsLoggedIn && (
+            {hasValidSession && (
               <>
-                <HttpHeaderProvider session={session} />
+                <BookingProgressBarExplosion />
+                <TopLoadingBar />
+                <GlobalLoading />
+                <HttpHeaderProvider />
                 <TokenWatcher />
                 <BootstrapTasks />
                 <LasiusBackendWebsocketStatus />
                 <LasiusBackendWebsocketEventHandler />
-                <DevInfoBadge />
                 <LasiusTOSCheck />
               </>
             )}
+            {IS_DEV && <DevInfoBadge />}
           </LazyMotion>
         </SessionProvider>
       </SWRConfig>

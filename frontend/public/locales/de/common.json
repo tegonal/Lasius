@@ -65,6 +65,12 @@
       "internalLasius": "Interne Lasius-Anmeldung"
     },
     "secureAndPrivate": "Sicher & Privat",
+    "sessionExpired": {
+      "alert": "Deine Sitzung ist aus Sicherheitsgründen abgelaufen.",
+      "loginButton": "Erneut anmelden",
+      "message": "Bitte melde dich erneut an, um die Anwendung weiter zu nutzen.",
+      "title": "Sitzung abgelaufen"
+    },
     "signIn": "Anmelden",
     "signInTitle": "Bei deinem Konto anmelden",
     "signInToLasius": "Bei Lasius anmelden",
@@ -88,6 +94,7 @@
       "edit": "Buchung bearbeiten",
       "editOverlapping": "Buchung bearbeiten, um Überlappung zu beheben",
       "filterByProject": "Nach Projekt {{projectKey}} filtern",
+      "filterByUser": "Nach Benutzer {{userKey}} filtern",
       "insert": "Buchung einfügen",
       "start": "Buchung starten",
       "startFromFavorite": "Buchung aus Favorit starten",
@@ -368,6 +375,7 @@
   },
   "onboarding": {
     "actions": {
+      "backToChecklist": "Zurück zur Checkliste",
       "gotIt": "Ok, verstanden!"
     },
     "booking": {
@@ -382,7 +390,7 @@
     },
     "checklist": {
       "booking": "Zeiterfassung starten",
-      "help": "Klicke auf 'Weiter', um mehr über jeden Schritt zu erfahren",
+      "help": "Klicke auf einen Punkt, um mehr darüber zu erfahren",
       "organisation": "Organisation erstellen oder beitreten",
       "progress": "Dein Fortschritt",
       "project": "Projekt erstellen oder beitreten",
@@ -465,8 +473,15 @@
       "switch": "Organisation wechseln"
     },
     "adminDescription": "Du bist Administrator dieser Organisation. Du kannst Mitglieder hinzufügen und entfernen, den Organisationsnamen ändern oder eine neue erstellen.",
-    "createDescription": "Füge eine neue Organisation hinzu, indem du auf die Schaltfläche unten klickst.",
+    "createDescription": "Verwende das Aktionsmenü, um eine neue Organisation zu erstellen.",
     "currentOrganisation": "Aktuelle Organisation",
+    "errors": {
+      "duplicateKey": "Eine Organisation mit diesem Namen existiert bereits",
+      "saveFailed": "Organisation konnte nicht gespeichert werden"
+    },
+    "info": {
+      "uniqueNameRequired": "Organisationsnamen müssen eindeutig sein."
+    },
     "memberDescription": "Du bist Mitglied dieser Organisation und hast keine Berechtigung, Mitglieder hinzuzufügen oder zu entfernen. Wende dich an einen Organisationsadministrator, wenn du jemanden einladen möchtest.",
     "members": "Mitglieder",
     "myPersonalOrganisation": "Meine persönliche Organisation",
@@ -484,7 +499,6 @@
   },
   "projects": {
     "actions": {
-      "backToProjects": "Zurück zu Projekten",
       "create": "Ein Projekt erstellen",
       "deactivate": "Projekt deaktivieren",
       "edit": "Projekt bearbeiten",
@@ -502,11 +516,16 @@
     "deactivatedBy": "Archiviert von {{user}}",
     "empty": "Keine Projekte gefunden",
     "errors": {
-      "projectNotFound": "Dieses Projekt konnte nicht gefunden werden. Die Projekt-ID wird oben angezeigt."
+      "duplicateKey": "Ein Projekt mit diesem Namen existiert bereits",
+      "projectNotFound": "Dieses Projekt konnte nicht gefunden werden. Die Projekt-ID wird oben angezeigt.",
+      "saveFailed": "Projekt konnte nicht gespeichert werden"
     },
     "filter": {
       "both": "Beide",
       "status": "Status"
+    },
+    "info": {
+      "uniqueNameRequired": "Projektnamen müssen innerhalb deiner Organisation eindeutig sein."
     },
     "label": "Projekt",
     "lastActivity": "Letzte Aktivität",
@@ -516,7 +535,6 @@
     "myProjects": "Meine Projekte",
     "myProjectsDescription": "Projekte, in denen du Mitglied bist und Zeit buchen kannst. Eingeschränkt durch die aktuell ausgewählte Organisation.",
     "name": "Projektname",
-    "noActivity": "Keine Aktivität",
     "project": "Projekt",
     "projectName": "Projektname",
     "projectRole": "Rolle",
@@ -620,7 +638,14 @@
     "showPasswords": "Passwörter anzeigen"
   },
   "users": {
-    "title": "Benutzer"
+    "errors": {
+      "userNotFound": "Dieser Benutzer konnte nicht gefunden werden. Die Benutzer-ID wird oben angezeigt."
+    },
+    "title": "Benutzer",
+    "warnings": {
+      "userNotInActiveList": "Dieser Benutzer befindet sich nicht in deiner aktiven Benutzerliste. Möglicherweise wurde er aus der Organisation entfernt.",
+      "userUnavailable": "Dieser Benutzer ist in deiner Organisation nicht mehr verfügbar."
+    }
   },
   "validation": {
     "startMustBeInPast": "Startzeit muss in der Vergangenheit liegen"

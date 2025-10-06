@@ -23,11 +23,11 @@ import { Heading } from 'components/primitives/typography/Heading'
 import { DateRangeFilter } from 'components/ui/forms/DateRangeFilter'
 import { FormBody } from 'components/ui/forms/FormBody'
 import { FormElement } from 'components/ui/forms/FormElement'
-import { InputSelectAutocomplete } from 'components/ui/forms/input/InputSelectAutocomplete'
 import { InputTagsAutocomplete } from 'components/ui/forms/input/InputTagsAutocomplete'
+import { ProjectSelect } from 'components/ui/forms/input/ProjectSelect'
+import { UserSelect } from 'components/ui/forms/input/UserSelect'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
-import { useProjects } from 'lib/api/hooks/useProjects'
 import { useGetTagsByProject } from 'lib/api/lasius/user-organisations/user-organisations'
 import { dateOptions } from 'lib/utils/date/dateOptions'
 import { ArrowLeft } from 'lucide-react'
@@ -38,21 +38,24 @@ import { useFormContext } from 'react-hook-form'
 
 type BookingHistoryFilterProps = {
   inactiveProject?: { id: string; key: string } | null
+  dataSource: 'userBookings' | 'organisationBookings'
 }
 
 export const BookingHistoryFilter: React.FC<BookingHistoryFilterProps> = ({
   inactiveProject = null,
+  dataSource,
 }) => {
   const { t } = useTranslation('common')
   const router = useRouter()
-  const { projectSuggestions, findProjectById } = useProjects()
-  const formContext = useFormContext()
   const { selectedOrganisationId } = useOrganisation()
+  const formContext = useFormContext()
   const { data: projectTags } = useGetTagsByProject(
     selectedOrganisationId,
     formContext.watch('projectId'),
   )
   const [hasChanges, setHasChanges] = useState(false)
+
+  const showUserFilter = dataSource === 'organisationBookings'
 
   const handleBackToProjects = () => {
     // Determine if user or organisation context based on current path
@@ -65,6 +68,7 @@ export const BookingHistoryFilter: React.FC<BookingHistoryFilterProps> = ({
 
   const defaultValues = {
     projectId: '',
+    userId: '',
     tags: [],
     dateRange: dateOptions[0].name,
   }
@@ -75,6 +79,7 @@ export const BookingHistoryFilter: React.FC<BookingHistoryFilterProps> = ({
     formContext.setValue('to', to)
     formContext.setValue('dateRange', defaultValues.dateRange)
     formContext.setValue('projectId', defaultValues.projectId)
+    formContext.setValue('userId', defaultValues.userId)
     formContext.setValue('tags', defaultValues.tags)
   }
 
@@ -82,13 +87,14 @@ export const BookingHistoryFilter: React.FC<BookingHistoryFilterProps> = ({
     const subscription = formContext.watch((values) => {
       const changed =
         values.projectId !== defaultValues.projectId ||
+        values.userId !== defaultValues.userId ||
         (values.tags?.length ?? 0) > 0 ||
         values.dateRange !== defaultValues.dateRange
 
       setHasChanges(changed)
     })
     return () => subscription.unsubscribe()
-  }, [formContext, defaultValues.projectId, defaultValues.dateRange])
+  }, [formContext, defaultValues.projectId, defaultValues.userId, defaultValues.dateRange])
 
   useEffect(() => {
     const subscription = formContext.watch((value, { name }) => {
@@ -116,12 +122,13 @@ export const BookingHistoryFilter: React.FC<BookingHistoryFilterProps> = ({
             <Button
               variant="ghost"
               size="sm"
+              fullWidth={false}
               onClick={handleBackToProjects}
-              aria-label={t('projects.actions.backToProjects', {
-                defaultValue: 'Back to projects',
+              aria-label={t('common.actions.back', {
+                defaultValue: 'Back',
               })}>
               <LucideIcon icon={ArrowLeft} size={16} />
-              {t('projects.actions.backToProjects', { defaultValue: 'Back to projects' })}
+              {t('common.actions.back', { defaultValue: 'Back' })}
             </Button>
           </div>
         </div>
@@ -135,13 +142,13 @@ export const BookingHistoryFilter: React.FC<BookingHistoryFilterProps> = ({
         )}
       </div>
       <FormBody>
+        {showUserFilter && (
+          <FormElement label={t('common.user', { defaultValue: 'User' })} htmlFor="userId">
+            <UserSelect id="userId" name="userId" organisationId={selectedOrganisationId} />
+          </FormElement>
+        )}
         <FormElement label={t('projects.label', { defaultValue: 'Project' })} htmlFor="projectId">
-          <InputSelectAutocomplete
-            id="projectId"
-            suggestions={projectSuggestions()}
-            findMissingProject={findProjectById}
-            name="projectId"
-          />
+          <ProjectSelect id="projectId" name="projectId" />
         </FormElement>
         <FormElement label={t('tags.label', { defaultValue: 'Tags' })} htmlFor="tags">
           <InputTagsAutocomplete id="tags" name="tags" suggestions={projectTags} />

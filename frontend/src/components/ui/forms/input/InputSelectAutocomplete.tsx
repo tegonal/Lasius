@@ -30,7 +30,7 @@ import { FormErrorBadge } from 'components/ui/forms/formErrorBadge'
 import { DropdownList } from 'components/ui/forms/input/shared/dropdownList'
 import { DropdownListItem } from 'components/ui/forms/input/shared/dropdownListItem'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
-import { find, sortBy } from 'es-toolkit/compat'
+import { sortBy } from 'es-toolkit/compat'
 import { ModelsEntityReference } from 'lib/api/lasius'
 import { cleanStrForCmp } from 'lib/utils/string/strings'
 import { ChevronDown, ChevronUp, X } from 'lucide-react'
@@ -45,8 +45,11 @@ type Props = {
   name: string
   required?: boolean
   id?: string
-  findMissingProject?: (projectId: string) => SelectAutocompleteSuggestionType | undefined // Optional: Function to find a project not in suggestions (e.g., inactive projects)
-  fallbackProject?: SelectAutocompleteSuggestionType // Optional: Project reference to use if not found anywhere else (e.g., from booking data)
+  selectedItem?: SelectAutocompleteSuggestionType | null // Pre-resolved selected item (wrapper handles finding logic)
+  statusMessage?: {
+    text: string
+    variant: 'info' | 'warning' | 'error'
+  } | null
 }
 
 export const InputSelectAutocomplete: React.FC<Props> = ({
@@ -54,8 +57,8 @@ export const InputSelectAutocomplete: React.FC<Props> = ({
   name,
   required = false,
   id,
-  findMissingProject,
-  fallbackProject,
+  selectedItem,
+  statusMessage,
 }) => {
   const { t } = useTranslation('common')
   const parentFormContext = useFormContext()
@@ -66,15 +69,11 @@ export const InputSelectAutocomplete: React.FC<Props> = ({
   const [inputText, setInputText] = useState<string>('')
   const [selected, setSelected] = useState<SelectAutocompleteSuggestionType | ''>('')
   const [filterText, setFilterText] = useState<string>('')
-  const [projectStatus, setProjectStatus] = useState<
-    'active' | 'inactive' | 'unavailable' | 'not-found' | null
-  >(null)
 
   const resetSelection = () => {
     setSelected('')
     setInputText('')
     setFilterText('')
-    setProjectStatus(null)
     parentFormContext?.setValue(name, null)
     // Focus the input after resetting
     setTimeout(() => {
@@ -87,49 +86,22 @@ export const InputSelectAutocomplete: React.FC<Props> = ({
 
     const formValue = parentFormContext.getValues()[name]
 
-    if (formValue) {
-      let preSelected: SelectAutocompleteSuggestionType | undefined
-      let status: 'active' | 'inactive' | 'unavailable' | 'not-found' = 'not-found'
-
-      // First try to find in suggestions (active projects)
-      preSelected = find(suggestions, { id: formValue })
-      if (preSelected) {
-        status = 'active'
-      }
-
-      // If not found in suggestions and findMissingProject is provided, try to find it (inactive projects in profile)
-      if (!preSelected && findMissingProject) {
-        preSelected = findMissingProject(formValue)
-        if (preSelected) {
-          status = 'inactive'
-        }
-      }
-
-      // If still not found, use fallbackProject if it matches the formValue (project from booking, not in profile)
-      if (!preSelected && fallbackProject && fallbackProject.id === formValue) {
-        preSelected = fallbackProject
-        status = 'unavailable'
-      }
-
-      if (preSelected) {
-        setSelected(preSelected)
-        setInputText(preSelected.key)
-        setFilterText(preSelected.key)
-        setProjectStatus(status)
-      } else {
-        // Project not found anywhere - show the project ID as placeholder
-        setSelected('')
-        setInputText(`[${formValue}]`) // Show ID in brackets to indicate it's unavailable
-        setFilterText('')
-        setProjectStatus('not-found')
-      }
+    if (formValue && selectedItem) {
+      // Wrapper component has already resolved the item
+      setSelected(selectedItem)
+      setInputText(selectedItem.key)
+      setFilterText(selectedItem.key)
+    } else if (formValue) {
+      // No selected item provided, show ID as placeholder
+      setSelected('')
+      setInputText(`[${formValue}]`)
+      setFilterText('')
     } else {
       setSelected('')
       setInputText('')
       setFilterText('')
-      setProjectStatus(null)
     }
-  }, [name, parentFormContext, suggestions, findMissingProject, fallbackProject])
+  }, [name, parentFormContext, selectedItem])
 
   // Filter suggestions based on filterText (not inputText)
   const availableSuggestions = sortBy(
@@ -239,27 +211,9 @@ export const InputSelectAutocomplete: React.FC<Props> = ({
         />
       </div>
       <FormErrorBadge error={errors} />
-      {projectStatus === 'inactive' && (
-        <Alert variant="info" className="mt-2">
-          {t('projects.warnings.projectNotInActiveList', {
-            defaultValue:
-              'This project is not in your active projects list. It may be inactive or from another organization.',
-          })}
-        </Alert>
-      )}
-      {projectStatus === 'unavailable' && (
-        <Alert variant="warning" className="mt-2">
-          {t('projects.warnings.projectUnavailable', {
-            defaultValue:
-              'This project is no longer in your profile. You may have been removed from it.',
-          })}
-        </Alert>
-      )}
-      {projectStatus === 'not-found' && (
-        <Alert variant="error" className="mt-2">
-          {t('projects.errors.projectNotFound', {
-            defaultValue: 'This project could not be found. The project ID is shown above.',
-          })}
+      {statusMessage && (
+        <Alert variant={statusMessage.variant} className="mt-2">
+          {statusMessage.text}
         </Alert>
       )}
     </>

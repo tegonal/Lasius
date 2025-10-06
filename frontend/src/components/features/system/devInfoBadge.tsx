@@ -20,7 +20,7 @@
 import { Badge } from 'components/ui/data-display/Badge'
 import { useColorMode } from 'lib/hooks/useColorMode'
 import { useTranslation } from 'next-i18next'
-import { BUILD_ID, DEV } from 'projectConfig/constants'
+import { BUILD_ID, IS_DEV } from 'projectConfig/constants'
 import React, { useEffect, useState } from 'react'
 import { useTokenStore } from 'stores/tokenStore'
 import { useUIStore } from 'stores/uiStore'
@@ -45,7 +45,7 @@ export const DevInfoBadge: React.FC = () => {
     setColorMode(mode || 'light')
   }, [mode])
 
-  if (!isClient || !DEV) return null
+  if (!isClient || !IS_DEV) return null
 
   const info = `(${breakpointIndex}) | ${i18n.language} | ${BUILD_ID} | ${colorMode} | Token: ${tokenTimeRemaining} | Loading: ${globalLoadingCounter} | ${t('app.name', { defaultValue: 'Lasius' })}`
 

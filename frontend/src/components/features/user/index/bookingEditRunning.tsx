@@ -23,12 +23,11 @@ import { FieldSet } from 'components/ui/forms/FieldSet'
 import { FormBody } from 'components/ui/forms/FormBody'
 import { FormElement } from 'components/ui/forms/FormElement'
 import { InputDatePicker } from 'components/ui/forms/input/datePicker/InputDatePicker'
-import { InputSelectAutocomplete } from 'components/ui/forms/input/InputSelectAutocomplete'
 import { InputTagsAutocomplete } from 'components/ui/forms/input/InputTagsAutocomplete'
+import { ProjectSelect } from 'components/ui/forms/input/ProjectSelect'
 import { addSeconds, isFuture } from 'date-fns'
 import { useGetBookingLatest } from 'lib/api/hooks/useGetBookingLatest'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
-import { useProjects } from 'lib/api/hooks/useProjects'
 import { ModelsBooking } from 'lib/api/lasius'
 import {
   getUserBookingCurrent,
@@ -72,7 +71,6 @@ export const BookingEditRunning: React.FC<Props> = ({ item, onSave, onCancel }) 
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { selectedOrganisationId } = useOrganisation()
-  const { projectSuggestions, findProjectById } = useProjects()
   const { data: projectTags } = useGetTagsByProject(
     selectedOrganisationId,
     hookForm.watch('projectId'),
@@ -148,11 +146,9 @@ export const BookingEditRunning: React.FC<Props> = ({ item, onSave, onCancel }) 
                 label={t('projects.label', { defaultValue: 'Project' })}
                 htmlFor="projectId"
                 required>
-                <InputSelectAutocomplete
+                <ProjectSelect
                   id="projectId"
                   name="projectId"
-                  suggestions={projectSuggestions()}
-                  findMissingProject={findProjectById}
                   fallbackProject={item?.projectReference}
                   required
                 />

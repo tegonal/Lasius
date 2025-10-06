@@ -25,8 +25,9 @@ import { useOnboardingStatus } from 'lib/hooks/useOnboardingStatus'
 import { usePlausible } from 'lib/telemetry/usePlausible'
 import { ArrowLeft, ArrowRight, CheckCircle2, Circle, X } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
-import { DEV } from 'projectConfig/constants'
+import { IS_DEV } from 'projectConfig/constants'
 import React, { useEffect, useState } from 'react'
+import { useAppSettingsActions, useOnboardingChecklistReached } from 'stores/appSettingsStore'
 
 import { OnboardingSlideBooking } from './slides/onboardingSlideBooking'
 import { OnboardingSlideChecklist } from './slides/onboardingSlideChecklist'
@@ -41,9 +42,11 @@ import type { LasiusPlausibleEvents } from 'lib/telemetry/plausibleEvents'
 
 export const OnboardingTutorial: React.FC = () => {
   const { t } = useTranslation('common')
-  const [currentSlide, setCurrentSlide] = useState(0)
+  const checklistReached = useOnboardingChecklistReached()
+  const [currentSlide, setCurrentSlide] = useState(checklistReached ? 2 : 0)
   const [dismissed, setDismissed] = useState(false)
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
+  const [returnToChecklistIndex, setReturnToChecklistIndex] = useState<number | null>(null)
   const tutorialRef = React.useRef<HTMLDivElement>(null)
   const plausible = usePlausible<LasiusPlausibleEvents>()
 
@@ -60,6 +63,8 @@ export const OnboardingTutorial: React.FC = () => {
     isLoading,
     dismissOnboarding,
   } = useOnboardingStatus()
+
+  const { markChecklistReached } = useAppSettingsActions()
 
   // Define all slides with completion status
   const allSlides = [
@@ -137,15 +142,15 @@ export const OnboardingTutorial: React.FC = () => {
 
   // Track tutorial start on mount (only once)
   useEffect(() => {
-    if ((!isLoading || DEV) && !hasTrackedStart.current) {
+    if ((!isLoading || IS_DEV) && !hasTrackedStart.current) {
       plausible('onboarding.tutorial.start', {})
       hasTrackedStart.current = true
     }
   }, [plausible, isLoading])
 
-  // Track slide views (only once per slide)
+  // Track slide views (only once per slide) and mark checklist as reached
   useEffect(() => {
-    if ((!isLoading || DEV) && slides[currentSlide]) {
+    if ((!isLoading || IS_DEV) && slides[currentSlide]) {
       const slideKey = `${slides[currentSlide].id}-${currentSlide}`
 
       if (!trackedSlides.current.has(slideKey)) {
@@ -157,24 +162,48 @@ export const OnboardingTutorial: React.FC = () => {
         })
         trackedSlides.current.add(slideKey)
       }
+
+      // Mark checklist as reached when user reaches slide 2 (checklist)
+      if (slides[currentSlide].id === 'checklist' && !checklistReached) {
+        markChecklistReached()
+      }
     }
-  }, [currentSlide, slides, plausible, isLoading])
+  }, [currentSlide, slides, plausible, isLoading, checklistReached, markChecklistReached])
 
   // Don't show while data is loading (except in dev mode where we always show it)
-  if (isLoading && !DEV) {
+  if (isLoading && !IS_DEV) {
     return null
   }
 
   const handleNext = () => {
     if (currentSlide < slides.length - 1) {
       setCurrentSlide(currentSlide + 1)
+      setReturnToChecklistIndex(null) // Clear return index when using Next
       tutorialRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
   }
 
   const handlePrevious = () => {
+    // If we came from checklist, return to checklist
+    if (returnToChecklistIndex !== null) {
+      setCurrentSlide(returnToChecklistIndex)
+      setReturnToChecklistIndex(null)
+      tutorialRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      return
+    }
+
     if (currentSlide > 0) {
       setCurrentSlide(currentSlide - 1)
+      tutorialRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+
+  // Handler for navigating from checklist item to corresponding slide
+  const handleNavigateFromChecklist = (slideId: string) => {
+    const targetSlideIndex = slides.findIndex((slide) => slide.id === slideId)
+    if (targetSlideIndex !== -1 && targetSlideIndex !== currentSlide) {
+      setReturnToChecklistIndex(currentSlide) // Remember checklist position
+      setCurrentSlide(targetSlideIndex)
       tutorialRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
   }
@@ -213,13 +242,14 @@ export const OnboardingTutorial: React.FC = () => {
   }
 
   // Don't show if already completed onboarding or dismissed (except in dev mode)
-  if (!DEV && (hasCompletedOnboarding || dismissed)) {
+  if (!IS_DEV && (hasCompletedOnboarding || dismissed)) {
     return null
   }
 
   const CurrentSlideComponent = slides[currentSlide]?.component
   const isFirstSlide = currentSlide === 0
   const isLastSlide = currentSlide === slides.length - 1
+  const isChecklistSlide = slides[currentSlide]?.id === 'checklist'
 
   return (
     <>
@@ -276,7 +306,12 @@ export const OnboardingTutorial: React.FC = () => {
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3 }}
               className="h-full">
-              {CurrentSlideComponent && <CurrentSlideComponent />}
+              {CurrentSlideComponent &&
+                (isChecklistSlide ? (
+                  <CurrentSlideComponent onNavigateToSlide={handleNavigateFromChecklist} />
+                ) : (
+                  <CurrentSlideComponent />
+                ))}
             </motion.div>
           </AnimatePresence>
         </div>
@@ -291,7 +326,11 @@ export const OnboardingTutorial: React.FC = () => {
             fullWidth={false}
             className="gap-2">
             <LucideIcon icon={ArrowLeft} size={16} />
-            {t('common.actions.back', { defaultValue: 'Back' })}
+            {returnToChecklistIndex !== null
+              ? t('onboarding.actions.backToChecklist', {
+                  defaultValue: 'Back to Checklist',
+                })
+              : t('common.actions.back', { defaultValue: 'Back' })}
           </Button>
 
           <div className="text-base-content/50 text-sm">

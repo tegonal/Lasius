@@ -23,6 +23,7 @@ import { ColumnList } from 'components/primitives/layout/ColumnList'
 import { ScrollContainer } from 'components/primitives/layout/ScrollContainer'
 import { StatsFilter } from 'components/ui/data-display/stats/statsFilter'
 import { ErrorBoundary } from 'components/ui/feedback/ErrorBoundary'
+import { useProjects } from 'lib/api/hooks/useProjects'
 import { dateOptions } from 'lib/utils/date/dateOptions'
 import { formatISOLocale } from 'lib/utils/date/dates'
 import dynamic from 'next/dynamic'
@@ -38,6 +39,7 @@ type FormValues = {
 
 export const StatsLayout: React.FC = () => {
   const router = useRouter()
+  const { projectSuggestions } = useProjects()
   const hookForm = useForm<FormValues>({
     defaultValues: {
       from: formatISOLocale(new Date()),
@@ -47,15 +49,21 @@ export const StatsLayout: React.FC = () => {
   })
 
   // Read projectId and projectName from URL search params
+  // Only show as inactive if project is not in active suggestions
   const inactiveProject = useMemo(() => {
     const projectIdFromUrl = router.query.projectId as string | undefined
     const projectNameFromUrl = router.query.projectName as string | undefined
 
     if (projectIdFromUrl && projectNameFromUrl) {
-      return { id: projectIdFromUrl, key: projectNameFromUrl }
+      const suggestions = projectSuggestions()
+      const isProjectActive = suggestions.some((p) => p.id === projectIdFromUrl)
+
+      if (!isProjectActive) {
+        return { id: projectIdFromUrl, key: projectNameFromUrl }
+      }
     }
     return null
-  }, [router.query.projectId, router.query.projectName])
+  }, [router.query.projectId, router.query.projectName, projectSuggestions])
 
   const StatsContent = dynamic<any>(() => import('./statsContent').then((mod) => mod.StatsContent))
 
@@ -63,9 +71,13 @@ export const StatsLayout: React.FC = () => {
     <FormProvider {...hookForm}>
       <ScrollContainer className="bg-base-100 flex-1 overflow-y-auto">
         <div className="bg-base-200 px-6 py-4">
-          <div className="flex items-start justify-between">
-            <StatsOverview />
-            <StatsExport />
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1">
+              <StatsOverview />
+            </div>
+            <div className="flex-shrink-0">
+              <StatsExport />
+            </div>
           </div>
         </div>
         <div className="pt-4">

@@ -31,7 +31,7 @@ import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { useGetUserBookingListByOrganisation } from 'lib/api/lasius/user-bookings/user-bookings'
 import { useOnboardingStatus } from 'lib/hooks/useOnboardingStatus'
 import { stringHash } from 'lib/utils/string/stringHash'
-import { DEV } from 'projectConfig/constants'
+import { IS_DEV } from 'projectConfig/constants'
 import React, { useMemo } from 'react'
 import { useSelectedDate } from 'stores/calendarStore'
 import { useIsClient } from 'usehooks-ts'
@@ -86,7 +86,7 @@ export const BookingListSelectedDay: React.FC = () => {
     <BookingListWrapper>
       <DataFetchValidates isValidating={isValidating || isValidatingLastMonth} />
       {isInitialLoad ? null : hasNoData ? (
-        DEV ? (
+        IS_DEV ? (
           // In dev mode, show all empty states for testing
           <>
             <div className="text-warning bg-warning/10 mx-4 mb-2 rounded-lg p-3 text-center text-xs">
