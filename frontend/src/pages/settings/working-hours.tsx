@@ -21,18 +21,17 @@ import { WorkingHoursLayout } from 'components/features/user/workingHours/workin
 import { LayoutResponsive } from 'components/ui/layouts/layoutResponsive'
 import { getServerSidePropsWithAuthRequired } from 'lib/auth/getServerSidePropsWithAuth'
 import { GetServerSideProps } from 'next'
-import { NextPageWithLayout } from 'pages/_app'
 
-const WorkingHoursPage: NextPageWithLayout = () => {
-  return <WorkingHoursLayout />
+const WorkingHoursPage = () => {
+  return (
+    <LayoutResponsive>
+      <WorkingHoursLayout />
+    </LayoutResponsive>
+  )
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   return getServerSidePropsWithAuthRequired(context)
-}
-
-WorkingHoursPage.getLayout = function getLayout(page) {
-  return <LayoutResponsive>{page}</LayoutResponsive>
 }
 
 export default WorkingHoursPage

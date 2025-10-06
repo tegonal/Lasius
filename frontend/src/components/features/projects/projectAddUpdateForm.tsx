@@ -17,8 +17,10 @@
  *
  */
 
+import axios from 'axios'
 import { Button } from 'components/primitives/buttons/Button'
 import { Input } from 'components/primitives/inputs/Input'
+import { Alert } from 'components/ui/feedback/Alert'
 import { useToast } from 'components/ui/feedback/hooks/useToast'
 import { ButtonGroup } from 'components/ui/forms/ButtonGroup'
 import { FieldSet } from 'components/ui/forms/FieldSet'
@@ -83,31 +85,55 @@ export const ProjectAddUpdateForm: React.FC<Props> = ({ item, onSave, onCancel, 
     setIsSubmitting(true)
     const { projectKey } = hookForm.getValues()
 
-    if (mode === 'add' && projectKey) {
-      await createProject(projectOrganisationId, {
-        key: projectKey,
-        bookingCategories: [],
+    try {
+      if (mode === 'add' && projectKey) {
+        await createProject(projectOrganisationId, {
+          key: projectKey,
+          bookingCategories: [],
+        })
+      } else if (mode === 'update' && item) {
+        await updateProject(projectOrganisationId, projectId, {
+          ...item,
+          ...(projectKey !== originalProjectName && { key: projectKey }),
+        })
+      }
+      addToast({
+        message: t('projects.status.updated', { defaultValue: 'Project updated' }),
+        type: 'SUCCESS',
       })
-    } else if (mode === 'update' && item) {
-      await updateProject(projectOrganisationId, projectId, {
-        ...item,
-        ...(projectKey !== originalProjectName && { key: projectKey }),
-      })
+      await mutate(getGetProjectListKey(projectOrganisationId))
+      await mutate(getGetUserProfileKey())
+      onSave()
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 400) {
+        hookForm.setError('projectKey', {
+          type: 'manual',
+          message: t('projects.errors.duplicateKey', {
+            defaultValue: 'A project with this name already exists',
+          }),
+        })
+      } else {
+        addToast({
+          message: t('projects.errors.saveFailed', {
+            defaultValue: 'Failed to save project',
+          }),
+          type: 'ERROR',
+        })
+      }
+    } finally {
+      setIsSubmitting(false)
     }
-    addToast({
-      message: t('projects.status.updated', { defaultValue: 'Project updated' }),
-      type: 'SUCCESS',
-    })
-    await mutate(getGetProjectListKey(projectOrganisationId))
-    await mutate(getGetUserProfileKey())
-    setIsSubmitting(false)
-    onSave()
   }
 
   return (
     <FormProvider {...hookForm}>
       <form onSubmit={hookForm.handleSubmit(onSubmit)}>
         <FormBody>
+          <Alert variant="info" className="mb-4">
+            {t('projects.info.uniqueNameRequired', {
+              defaultValue: 'Project names must be unique within your organisation.',
+            })}
+          </Alert>
           <FieldSet>
             <FormElement
               label={t('projects.projectName', { defaultValue: 'Project name' })}
@@ -115,7 +141,15 @@ export const ProjectAddUpdateForm: React.FC<Props> = ({ item, onSave, onCancel, 
               required>
               <Input
                 id="projectKey"
-                {...hookForm.register('projectKey', { required: true })}
+                {...hookForm.register('projectKey', {
+                  required: true,
+                  onChange: () => {
+                    // Clear error when user changes the field
+                    if (hookForm.formState.errors.projectKey) {
+                      hookForm.clearErrors('projectKey')
+                    }
+                  },
+                })}
                 aria-describedby="projectKey-error"
                 autoComplete="off"
               />

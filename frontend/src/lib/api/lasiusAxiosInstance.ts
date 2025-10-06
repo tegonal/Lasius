@@ -59,12 +59,16 @@ export const lasiusAxiosInstance = <T>(
             logger.debug('[lasiusAxiosInstance][RequestCanceled]', error.message)
           }
         } else if (error.response?.status === 401) {
-          if (process.env.LASIUS_DEBUG) {
-            logger.debug('[lasiusAxiosInstance][Unauthorized]', {
-              path: error.request?.pathname,
-              message: error.response?.data,
-            })
-          }
+          // Always log 401 errors to help with debugging
+          logger.warn('[lasiusAxiosInstance][Unauthorized]', {
+            url: config.url,
+            method: config.method,
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+            data: error.response?.data,
+            hasAuthHeader: !!config.headers?.Authorization,
+          })
+
           if (
             IS_BROWSER &&
             window.location.pathname !== '/auth/signin' &&
@@ -83,6 +87,7 @@ export const lasiusAxiosInstance = <T>(
               }
 
               const headers = getRequestHeaders(session.access_token, session.access_token_issuer)
+              logger.info('[lasiusAxiosInstance][Unauthorized] Retrying with refreshed token')
               return lasiusAxiosInstance(
                 {
                   ...config,
@@ -92,11 +97,14 @@ export const lasiusAxiosInstance = <T>(
               )
             }
 
+            logger.error(
+              '[lasiusAxiosInstance][Unauthorized] Session refresh failed, throwing error',
+            )
             throw error
           } else {
-            if (process.env.LASIUS_DEBUG) {
-              logger.info('[lasiusAxiosInstance][Unauthorized]', error.response?.status)
-            }
+            logger.warn(
+              '[lasiusAxiosInstance][Unauthorized] Not retrying (on login page or no auth header)',
+            )
             throw error
           }
         } else {

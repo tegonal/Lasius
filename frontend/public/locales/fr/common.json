@@ -3,24 +3,24 @@
     "accountSecurity": "Sécurité du compte",
     "changeUserProfileSettings": "Modifier les paramètres du profil utilisateur",
     "errors": {
-      "passwordUpdateFailed": "La mise à jour du mot de passe a échoué. Assurez-vous d'avoir saisi votre mot de passe actuel correctement."
+      "passwordUpdateFailed": "La mise à jour du mot de passe a échoué. Assure-toi d'avoir saisi ton mot de passe actuel correctement."
     },
     "languageSettings": {
-      "description": "Choisissez votre langue préférée pour l'interface. Ce paramètre est enregistré localement dans votre navigateur.",
+      "description": "Choisis ta langue préférée pour l'interface. Ce paramètre est enregistré localement dans ton navigateur.",
       "save": "Enregistrer la préférence de langue",
       "selectLanguage": "Langue de l'interface",
       "title": "Préférences de langue"
     },
     "profileChangesNotAllowedInDemo": "Les modifications du profil ne sont pas autorisées en mode démonstration",
     "profileSettings": {
-      "description": "Gérez vos informations personnelles et les détails de votre compte.",
+      "description": "Gère tes informations personnelles et les détails de ton compte.",
       "title": "Informations du profil"
     },
     "security": {
-      "description": "Mettez à jour votre mot de passe pour sécuriser votre compte. Utilisez un mot de passe fort d'au moins 8 caractères, incluant des lettres majuscules et des chiffres."
+      "description": "Mets à jour ton mot de passe pour sécuriser ton compte. Utilise un mot de passe fort d'au moins 8 caractères, incluant des lettres majuscules et des chiffres."
     },
     "settings": {
-      "description": "Gérez vos informations personnelles et les détails de votre compte. Votre adresse e-mail ne peut être modifiée que si vous utilisez le fournisseur d'authentification interne.",
+      "description": "Gère tes informations personnelles et les détails de ton compte. Ton adresse e-mail ne peut être modifiée que si tu utilises le fournisseur d'authentification interne.",
       "title": "Paramètres du compte"
     },
     "status": {
@@ -38,27 +38,27 @@
       "signOut": "Se déconnecter",
       "signOutAndRefresh": "Se déconnecter et actualiser"
     },
-    "chooseMethod": "Choisissez votre méthode de connexion préférée ci-dessous",
+    "chooseMethod": "Choisis ta méthode de connexion préférée ci-dessous",
     "connectingSecurely": "Connexion sécurisée en cours",
     "continueWith": "Continuer avec",
-    "continueWithProvider": "Continuer avec votre compte",
-    "createYourAccount": "Créez votre compte",
-    "enterEmailAndPassword": "Saisissez votre adresse e-mail et votre mot de passe pour accéder à votre compte",
+    "continueWithProvider": "Continuer avec ton compte",
+    "createYourAccount": "Crée ton compte",
+    "enterEmailAndPassword": "Saisis ton adresse e-mail et ton mot de passe pour accéder à ton compte",
     "errors": {
-      "callback": "Le rappel d'authentification a échoué. Veuillez réessayer.",
+      "callback": "Le rappel d'authentification a échoué. Réessaie.",
       "credentialsMissing": "Nom d'utilisateur ou mot de passe manquant",
-      "fetchProfileFailed": "Votre session a expiré. Veuillez vous reconnecter.",
+      "fetchProfileFailed": "Ta session a expiré. Reconnecte-toi.",
       "general": "Erreur d'authentification : {error}",
-      "oauthCallback": "L'authentification a échoué. Veuillez réessayer.",
+      "oauthCallback": "L'authentification a échoué. Réessaie.",
       "registerUnknown": "Erreur d'inscription inconnue",
-      "sessionRequired": "Veuillez vous connecter pour continuer.",
+      "sessionRequired": "Connecte-toi pour continuer.",
       "userAlreadyRegistered": "Utilisateur déjà enregistré",
-      "wrongPasswordOrEmail": "Mot de passe ou adresse e-mail incorrect. Veuillez réessayer."
+      "wrongPasswordOrEmail": "Mot de passe ou adresse e-mail incorrect. Réessaie."
     },
-    "fillDetailsToStart": "Veuillez remplir vos informations pour commencer",
-    "getStartedFree": "Commencez avec le suivi du temps open source",
+    "fillDetailsToStart": "Remplis tes informations pour commencer",
+    "getStartedFree": "Commence avec le suivi du temps open source",
     "joinLasius": "Rejoindre Lasius",
-    "needHelp": "Besoin d'aide ? Cliquez sur le bouton d'aide",
+    "needHelp": "Besoin d'aide ? Clique sur le bouton d'aide",
     "noAuthMethodsAvailable": "Aucune méthode d'authentification disponible",
     "preparingSecureLogin": "Préparation de la connexion sécurisée...",
     "providers": {
@@ -66,10 +66,10 @@
     },
     "secureAndPrivate": "Sécurisé et privé",
     "signIn": "Se connecter",
-    "signInTitle": "Connectez-vous à votre compte",
+    "signInTitle": "Connecte-toi à ton compte",
     "signInToLasius": "Se connecter à Lasius",
     "tagline": "Suivi du temps open source pour les équipes modernes",
-    "thankYouForRegistering": "Merci de vous être inscrit ! Vous pouvez maintenant vous connecter avec votre adresse e-mail et votre mot de passe. Bienvenue sur Lasius !",
+    "thankYouForRegistering": "Merci de t'être inscrit ! Tu peux maintenant te connecter avec ton adresse e-mail et ton mot de passe. Bienvenue sur Lasius !",
     "welcomeBack": "Bienvenue",
     "welcomeToLasius": "Bienvenue sur Lasius"
   },
@@ -96,7 +96,7 @@
     },
     "duration": "Durée",
     "emptyNever": "Aucune réservation pour le moment",
-    "emptyNeverHelp": "Commencez par créer votre première réservation. Besoin d'aide ?",
+    "emptyNeverHelp": "Commence par créer ta première réservation. Besoin d'aide ?",
     "emptyToday": "Aucune réservation pour ce jour",
     "hints": {
       "useEndTimeOfLatest": "Utiliser l'heure de fin de la dernière réservation comme heure de début pour celle-ci",
@@ -144,7 +144,7 @@
     "actions": {
       "actions": "Actions",
       "add": "Ajouter",
-      "back": "Back",
+      "back": "Retour",
       "cancel": "Annuler",
       "close": "Fermer",
       "delete": "Supprimer",
@@ -152,7 +152,7 @@
       "help": "Aide",
       "invite": "Inviter",
       "keepEditing": "Continuer à modifier",
-      "next": "Next",
+      "next": "Suivant",
       "reset": "Réinitialiser",
       "resetToInitial": "Réinitialiser à la valeur initiale",
       "save": "Enregistrer",
@@ -160,7 +160,7 @@
       "signUp": "S'inscrire"
     },
     "back": "Retour",
-    "confirmUnsavedChanges": "Vous avez des modifications non enregistrées. Êtes-vous sûr de vouloir annuler ?",
+    "confirmUnsavedChanges": "Tu as des modifications non enregistrées. Es-tu sûr de vouloir annuler ?",
     "custom": "Personnalisé",
     "dashboard": "Tableau de bord",
     "date": "Date",
@@ -193,7 +193,7 @@
     },
     "help": "Aide",
     "info": {
-      "helpFallbackLanguage": "Ce contenu d'aide n'est pas encore disponible dans votre langue sélectionnée. Version anglaise affichée."
+      "helpFallbackLanguage": "Ce contenu d'aide n'est pas encore disponible dans ta langue sélectionnée. Version anglaise affichée."
     },
     "ok": "Ok",
     "or": "ou",
@@ -257,7 +257,7 @@
       "toMustBeAfterFrom": "Doit être postérieur à la date \"De\"",
       "wrongFormat": "Format incorrect"
     },
-    "you": "Vous"
+    "you": "Tu"
   },
   "contextMenu": {
     "actions": {
@@ -266,7 +266,7 @@
     }
   },
   "demo": {
-    "welcome": "Bienvenue sur l'instance de démonstration de Lasius. Utilisez \"demo1@lasius.ch\" avec le mot de passe \"demo\" pour vous connecter et explorer l'application. L'instance de démonstration est réinitialisée une fois par jour."
+    "welcome": "Bienvenue sur l'instance de démonstration de Lasius. Utilise \"demo1@lasius.ch\" avec le mot de passe \"demo\" pour te connecter et explorer l'application. L'instance de démonstration est réinitialisée une fois par jour."
   },
   "errors": {
     "dataFetchFailed": "Désolé, les données n'ont pas pu être récupérées en raison d'une erreur."
@@ -308,18 +308,18 @@
   "features": {
     "freeAndOpenSource": "Gratuit et open source",
     "insightfulReports": "Rapports et analyses détaillés",
-    "inviteTeamMembers": "Invitez les membres de votre équipe",
+    "inviteTeamMembers": "Invite les membres de ton équipe",
     "openSource": "Open source et auto-hébergé",
-    "organizeTeams": "Organisez par équipes et projets",
-    "startTrackingMinutes": "Commencez à suivre le temps en quelques minutes",
-    "trackTime": "Suivez le temps sans effort"
+    "organizeTeams": "Organise par équipes et projets",
+    "startTrackingMinutes": "Commence à suivre le temps en quelques minutes",
+    "trackTime": "Suis le temps sans effort"
   },
   "footer": {
     "developedBy": "Développé par <0>Tegonal</0>, disponible sur <1>GitHub</1>, publié sous licence <2>AGPL 3.0</2>",
-    "feedbackOnGithub": "Nous apprécions vos commentaires. Veuillez laisser un commentaire sur <0>GitHub</0>"
+    "feedbackOnGithub": "Nous apprécions tes commentaires. Laisse un commentaire sur <0>GitHub</0>"
   },
   "help": {
-    "contactAdmin": "Veuillez contacter votre administrateur"
+    "contactAdmin": "Contacte ton administrateur"
   },
   "invitations": {
     "actions": {
@@ -327,19 +327,19 @@
       "reject": "Rejeter l'invitation"
     },
     "copyToClipboard": "Copier dans le presse-papiers",
-    "createAccountMessage": "Vous avez été invité à créer un compte Lasius pour suivre vos heures de travail.",
+    "createAccountMessage": "Tu as été invité à créer un compte Lasius pour suivre tes heures de travail.",
     "description": {
-      "copyLink": "Copiez le lien et envoyez-le à votre collègue. Si cette personne n'a pas encore de compte, un compte sera créé lors de l'acceptation de l'invitation."
+      "copyLink": "Copie le lien et envoie-le à ton collègue. Si cette personne n'a pas encore de compte, un compte sera créé lors de l'acceptation de l'invitation."
     },
     "errors": {
-      "createdForSomeoneElse": "Cette invitation a été créée pour quelqu'un d'autre. Déconnectez-vous et actualisez la page, ou transférez le lien d'invitation à l'utilisateur {{email}}",
-      "noLongerValid": "Cette invitation n'est plus valide. Il est préférable de contacter la personne qui vous a envoyé le lien d'invitation pour en obtenir un nouveau."
+      "createdForSomeoneElse": "Cette invitation a été créée pour quelqu'un d'autre. Déconnecte-toi et actualise la page, ou transfère le lien d'invitation à l'utilisateur {{email}}",
+      "noLongerValid": "Cette invitation n'est plus valide. Il est préférable de contacter la personne qui t'a envoyé le lien d'invitation pour en obtenir un nouveau."
     },
     "inviteByEmail": "Inviter par e-mail",
     "messages": {
-      "invitedToOrganisation": "Vous avez été invité par {{inviter}} à rejoindre l'organisation {{organisation}}.",
-      "invitedToProject": "Vous avez été invité par {{inviter}} à rejoindre le projet {{project}}.",
-      "selectOrganisation": "Sélectionnez l'organisation à laquelle vous souhaitez ajouter ce projet :"
+      "invitedToOrganisation": "Tu as été invité par {{inviter}} à rejoindre l'organisation {{organisation}}.",
+      "invitedToProject": "Tu as été invité par {{inviter}} à rejoindre le projet {{project}}.",
+      "selectOrganisation": "Sélectionne l'organisation à laquelle tu souhaites ajouter ce projet :"
     }
   },
   "lists": {
@@ -352,7 +352,7 @@
       "remove": "Retirer le membre"
     },
     "confirmations": {
-      "removeConfirm": "Êtes-vous sûr de vouloir retirer {{name}} ?",
+      "removeConfirm": "Es-tu sûr de vouloir retirer {{name}} ?",
       "removeTitle": "Retirer un membre",
       "removeWarning": "Ce membre sera retiré de l'organisation et perdra l'accès à tous les projets."
     },
@@ -360,11 +360,11 @@
   },
   "navigation": {
     "currentOrganisation": "Organisation actuelle",
-    "yourTimeBookingView": "Votre vue de réservation de temps"
+    "yourTimeBookingView": "Ta vue de réservation de temps"
   },
   "of": "de",
   "offline": {
-    "message": "Vous êtes hors ligne. Cette application nécessite une connexion en ligne. Elle se mettra à jour automatiquement lorsqu'une connexion réseau sera détectée."
+    "message": "Tu es hors ligne. Cette application nécessite une connexion en ligne. Elle se mettra à jour automatiquement lorsqu'une connexion réseau sera détectée."
   },
   "onboarding": {
     "actions": {
@@ -372,86 +372,86 @@
     },
     "booking": {
       "step1": "Utiliser le formulaire de saisie",
-      "step1Desc": "Trouvez le formulaire de saisie dans la colonne de droite et sélectionnez un projet.",
+      "step1Desc": "Trouve le formulaire de saisie dans la colonne de droite et sélectionne un projet.",
       "step2": "Ou utiliser le menu contextuel",
-      "step2Desc": "Faites un clic droit sur une saisie, un favori ou une saisie d'équipe et choisissez l'icône chronomètre.",
+      "step2Desc": "Fais un clic droit sur une saisie, un favori ou une saisie d'équipe et choisis l'icône chronomètre.",
       "step3": "Arrêter le chronomètre",
-      "step3Desc": "Lorsque vous avez terminé de travailler, arrêtez le chronomètre.",
-      "subtitle": "Vous êtes prêt ! Voici comment créer votre première saisie.",
+      "step3Desc": "Lorsque tu as terminé de travailler, arrête le chronomètre.",
+      "subtitle": "Tu es prêt ! Voici comment créer ta première saisie.",
       "title": "Commencer le suivi du temps"
     },
     "checklist": {
       "booking": "Commencer le suivi du temps",
-      "help": "Cliquez sur 'Suivant' pour en savoir plus sur chaque étape",
+      "help": "Clique sur 'Suivant' pour en savoir plus sur chaque étape",
       "organisation": "Créer ou rejoindre une organisation",
-      "progress": "Votre progression",
+      "progress": "Ta progression",
       "project": "Créer ou rejoindre un projet",
-      "subtitle": "Suivez ces étapes simples pour commencer le suivi du temps",
+      "subtitle": "Suis ces étapes simples pour commencer le suivi du temps",
       "title": "Commençons",
       "workingHours": "Définir les heures de travail pour cette organisation"
     },
-    "confirmClose": "Êtes-vous sûr de vouloir fermer le tutoriel ? Vous pouvez le réactiver dans les paramètres de l'application.",
+    "confirmClose": "Es-tu sûr de vouloir fermer le tutoriel ? Tu peux le réactiver dans les paramètres de l'application.",
     "navigation": {
       "importantUI": "Éléments d'interface importants",
       "mainNavigation": "Navigation principale",
-      "organisationDesc": "Gérez votre organisation actuelle, créez de nouvelles organisations et consultez les données à l'échelle de l'organisation",
+      "organisationDesc": "Gère ton organisation actuelle, crée de nouvelles organisations et consulte les données à l'échelle de l'organisation",
       "orgSwitcher": "Sélecteur d'organisation",
-      "orgSwitcherDesc": "Dans le coin supérieur droit, basculez entre vos organisations",
-      "settingsDesc": "Configurez les paramètres de l'application, le compte, la sécurité et les heures de travail",
-      "subtitle": "Voici les principales parties de Lasius que vous utiliserez chaque jour.",
+      "orgSwitcherDesc": "Dans le coin supérieur droit, bascule entre tes organisations",
+      "settingsDesc": "Configure les paramètres de l'application, le compte, la sécurité et les heures de travail",
+      "subtitle": "Voici les principales parties de Lasius que tu utiliseras chaque jour.",
       "title": "Naviguer dans Lasius",
-      "userDesc": "Suivez votre temps, consultez vos saisies, tableau de bord, projets, statistiques et listes",
+      "userDesc": "Suis ton temps, consulte tes saisies, tableau de bord, projets, statistiques et listes",
       "weeklyCalendar": "Calendrier hebdomadaire",
-      "weeklyCalendarDesc": "En haut de la page, basculez entre les jours pour voir vos saisies"
+      "weeklyCalendarDesc": "En haut de la page, bascule entre les jours pour voir tes saisies"
     },
     "organisation": {
       "action": "Gérer les organisations",
-      "step1": "Créer la vôtre",
-      "step1Desc": "Accédez aux paramètres de l'organisation et créez une nouvelle organisation pour inviter d'autres personnes.",
+      "step1": "Créer la tienne",
+      "step1Desc": "Accède aux paramètres de l'organisation et crée une nouvelle organisation pour inviter d'autres personnes.",
       "step2": "Ou rejoindre une organisation existante",
-      "step2Desc": "Demandez à quelqu'un de vous inviter et attendez qu'il vous envoie un lien d'invitation.",
-      "subtitle": "Les organisations vous permettent de travailler avec des membres de l'équipe et de suivre le temps ensemble.",
+      "step2Desc": "Demande à quelqu'un de t'inviter et attends qu'il t'envoie un lien d'invitation.",
+      "subtitle": "Les organisations te permettent de travailler avec des membres de l'équipe et de suivre le temps ensemble.",
       "title": "Créer ou rejoindre une organisation"
     },
     "overview": {
       "exports": "Exports & Listes",
-      "exportsDesc": "Retrouvez vos rapports dans la section Listes",
-      "help": "Cliquez sur 'Suivant' pour voir ce que vous devez configurer",
+      "exportsDesc": "Retrouve tes rapports dans la section Listes",
+      "help": "Clique sur 'Suivant' pour voir ce que tu dois configurer",
       "organisations": "Organisations",
-      "organisationsDesc": "Collaborez avec les membres de votre équipe",
+      "organisationsDesc": "Collabore avec les membres de ton équipe",
       "projects": "Projets",
-      "projectsDesc": "Organisez votre travail en projets traçables",
-      "subtitle": "Voici les éléments de base que vous devez connaître",
+      "projectsDesc": "Organise ton travail en projets traçables",
+      "subtitle": "Voici les éléments de base que tu dois connaître",
       "tags": "Tags & Groupes de tags",
-      "tagsDesc": "Catégorisez vos saisies pour des rapports détaillés",
+      "tagsDesc": "Catégorise tes saisies pour des rapports détaillés",
       "title": "Bienvenue dans Lasius",
       "workingHours": "Heures de travail",
-      "workingHoursDesc": "Suivez vos heures de travail prévues par semaine"
+      "workingHoursDesc": "Suis tes heures de travail prévues par semaine"
     },
     "privateOrganisation": {
-      "explanation": "Votre organisation privée est parfaite pour suivre les projets personnels et tout ce que vous n'avez pas besoin de partager avec d'autres. Vous seul pouvez voir les projets et le temps enregistré ici.",
-      "help": "Cliquez sur 'Suivant' pour continuer",
-      "subtitle": "Vous avez déjà une organisation privée pour un usage personnel.",
+      "explanation": "Ton organisation privée est parfaite pour suivre les projets personnels et tout ce que tu n'as pas besoin de partager avec d'autres. Toi seul peux voir les projets et le temps enregistré ici.",
+      "help": "Clique sur 'Suivant' pour continuer",
+      "subtitle": "Tu as déjà une organisation privée pour un usage personnel.",
       "tip": "💡 Bon à savoir",
-      "tipDesc": "Si vous souhaitez travailler avec des membres de l'équipe, vous pouvez créer ou rejoindre des organisations supplémentaires.",
-      "title": "Votre organisation privée"
+      "tipDesc": "Si tu souhaites travailler avec des membres de l'équipe, tu peux créer ou rejoindre des organisations supplémentaires.",
+      "title": "Ton organisation privée"
     },
     "projects": {
       "action": "Aller à Mes projets",
-      "step1": "Créer le vôtre",
-      "step1Desc": "Accédez à Mes projets et créez un nouveau projet.",
+      "step1": "Créer le tien",
+      "step1Desc": "Accède à Mes projets et crée un nouveau projet.",
       "step2": "Ou rejoindre un projet existant",
-      "step2Desc": "Demandez à un administrateur de vous ajouter à son projet.",
-      "subtitle": "Les projets vous aident à organiser votre temps. Vous en avez besoin d'au moins un pour commencer.",
+      "step2Desc": "Demande à un administrateur de t'ajouter à son projet.",
+      "subtitle": "Les projets t'aident à organiser ton temps. Tu en as besoin d'au moins un pour commencer.",
       "title": "Créer ou rejoindre un projet"
     },
     "workingHours": {
       "action": "Définir les heures de travail",
       "step1": "Aller aux heures de travail",
-      "step1Desc": "Cliquez sur le bouton ci-dessous pour définir vos heures.",
-      "step2": "Saisir vos heures hebdomadaires",
-      "step2Desc": "Définissez combien d'heures vous travaillez chaque jour. Lasius affichera votre progression.",
-      "subtitle": "Indiquez à Lasius combien d'heures par semaine vous prévoyez de travailler.",
+      "step1Desc": "Clique sur le bouton ci-dessous pour définir tes heures.",
+      "step2": "Saisir tes heures hebdomadaires",
+      "step2Desc": "Définis combien d'heures tu travailles chaque jour. Lasius affichera ta progression.",
+      "subtitle": "Indique à Lasius combien d'heures par semaine tu prévois de travailler.",
       "title": "Définir les heures de travail"
     }
   },
@@ -464,17 +464,17 @@
       "edit": "Modifier l'organisation",
       "switch": "Changer d'organisation"
     },
-    "adminDescription": "Vous êtes administrateur de cette organisation. Vous pouvez ajouter et retirer des membres, modifier le nom de l'organisation ou en créer une nouvelle.",
-    "createDescription": "Ajoutez une nouvelle organisation en cliquant sur le bouton ci-dessous.",
+    "adminDescription": "Tu es administrateur de cette organisation. Tu peux ajouter et retirer des membres, modifier le nom de l'organisation ou en créer une nouvelle.",
+    "createDescription": "Ajoute une nouvelle organisation en cliquant sur le bouton ci-dessous.",
     "currentOrganisation": "Organisation actuelle",
-    "memberDescription": "Vous êtes membre de cette organisation et n'avez pas les droits pour ajouter ou retirer des membres. Contactez un administrateur de l'organisation si vous souhaitez inviter quelqu'un.",
+    "memberDescription": "Tu es membre de cette organisation et n'as pas les droits pour ajouter ou retirer des membres. Contacte un administrateur de l'organisation si tu souhaites inviter quelqu'un.",
     "members": "Membres",
     "myPersonalOrganisation": "Mon organisation personnelle",
     "organisationName": "Organisation",
     "organisationRole": "Rôle dans l'organisation",
     "organization": "Organisation",
     "organizationName": "Nom de l'organisation",
-    "privateDescription": "Cette organisation n'est visible que par vous. Utilisez-la pour suivre des projets privés. Pour collaborer avec d'autres personnes, créez ou utilisez une organisation différente.",
+    "privateDescription": "Cette organisation n'est visible que par toi. Utilise-la pour suivre des projets privés. Pour collaborer avec d'autres personnes, crée ou utilise une organisation différente.",
     "selectOrganisation": "Sélectionner une organisation",
     "status": {
       "created": "Organisation créée",
@@ -491,13 +491,13 @@
       "leave": "Quitter ce projet"
     },
     "allProjects": "Tous les projets",
-    "allProjectsDescription": "Tous les projets de l'organisation actuelle que vous pouvez administrer. Créez des rapports de facturation incluant le temps réservé par les membres externes du projet.",
+    "allProjectsDescription": "Tous les projets de l'organisation actuelle que tu peux administrer. Crée des rapports de facturation incluant le temps réservé par les membres externes du projet.",
     "confirmations": {
-      "deactivate": "Êtes-vous sûr de vouloir désactiver ce projet ?",
+      "deactivate": "Es-tu sûr de vouloir désactiver ce projet ?",
       "deactivateInstructions": "Pour confirmer, veuillez saisir le nom du projet ci-dessous :",
       "deactivateTitle": "Désactiver le projet",
       "deactivateWarning": "Cette action ne peut pas être annulée. Le projet sera définitivement archivé et toutes les affectations d'utilisateurs seront supprimées. Vous ne pourrez pas réactiver ce projet.",
-      "leave": "Êtes-vous sûr de vouloir quitter ce projet ?"
+      "leave": "Es-tu sûr de vouloir quitter ce projet ?"
     },
     "deactivatedBy": "Archivé par {{user}}",
     "empty": "Aucun projet trouvé",
@@ -514,7 +514,7 @@
       "title": "Membres du projet"
     },
     "myProjects": "Mes projets",
-    "myProjectsDescription": "Projets dont vous êtes membre et pour lesquels vous pouvez réserver du temps, filtrés par l'organisation actuelle.",
+    "myProjectsDescription": "Projets dont tu es membre et pour lesquels tu peux réserver du temps, filtrés par l'organisation actuelle.",
     "name": "Nom du projet",
     "noActivity": "Aucune activité",
     "project": "Projet",
@@ -530,24 +530,24 @@
     "warnings": {
       "inactiveProjectContext": "Affichage des statistiques d'un projet inactif",
       "inactiveProjectFilter": "Affichage des données pour un projet inactif",
-      "projectNotInActiveList": "Ce projet ne figure pas dans votre liste de projets actifs. Il peut être inactif ou provenir d'une autre organisation.",
-      "projectUnavailable": "Ce projet n'est plus dans votre profil. Vous avez peut-être été retiré de celui-ci."
+      "projectNotInActiveList": "Ce projet ne figure pas dans ta liste de projets actifs. Il peut être inactif ou provenir d'une autre organisation.",
+      "projectUnavailable": "Ce projet n'est plus dans ton profil. Tu as peut-être été retiré de celui-ci."
     }
   },
   "pwa": {
     "reloadApplication": "Recharger l'application",
-    "updateMessage": "Lasius a été mis à jour. La page se rechargera après votre confirmation."
+    "updateMessage": "Lasius a été mis à jour. La page se rechargera après ta confirmation."
   },
   "search": {
     "empty": "Aucun résultat trouvé"
   },
   "settings": {
     "app": {
-      "description": "Personnalisez votre expérience avec les préférences de langue et de thème. Ces paramètres sont enregistrés localement dans votre navigateur.",
+      "description": "Personnalise ton expérience avec les préférences de langue et de thème. Ces paramètres sont enregistrés localement dans ton navigateur.",
       "language": "Langue de l'interface",
       "menuTitle": "Paramètres de l'application",
       "save": "Enregistrer les paramètres",
-      "showOnboarding": "Show Onboarding Tutorial",
+      "showOnboarding": "Afficher le tutoriel d'introduction",
       "theme": "Thème",
       "title": "Paramètres de l'application"
     }
@@ -569,7 +569,7 @@
     "backendUnreachable": "Le serveur semble inaccessible",
     "connectedToBackend": "Connecté au serveur",
     "connectingToBackend": "Connexion au serveur",
-    "noInternetConnection": "Pas de connexion Internet. Veuillez vous assurer que votre appareil est connecté à Internet.",
+    "noInternetConnection": "Pas de connexion Internet. Assure-toi que ton appareil est connecté à Internet.",
     "offlineMessage": "Lasius est actuellement hors ligne ou en maintenance. Nous serons de retour sous peu."
   },
   "tags": {
@@ -587,7 +587,7 @@
       "pasteTags": "Coller les étiquettes"
     },
     "chooseOrEnter": "Choisir ou saisir des étiquettes",
-    "confirmDeleteGroup": "Êtes-vous sûr de vouloir supprimer le groupe d'étiquettes \"{{groupName}}\" ?",
+    "confirmDeleteGroup": "Es-tu sûr de vouloir supprimer le groupe d'étiquettes \"{{groupName}}\" ?",
     "customTag": "Étiquette personnalisée",
     "enterTagName": "Saisir le nom de l'étiquette",
     "enterToAdd": "Saisir une étiquette pour l'ajouter",
@@ -609,7 +609,7 @@
     }
   },
   "tos": {
-    "acceptMessage": "Veuillez accepter les conditions d'utilisation suivantes (version {{version}}) si vous souhaitez continuer à utiliser Lasius :",
+    "acceptMessage": "Accepte les conditions d'utilisation suivantes (version {{version}}) si tu souhaites continuer à utiliser Lasius :",
     "actions": {
       "accept": "Accepter les conditions d'utilisation",
       "reject": "Refuser et se déconnecter"
@@ -643,18 +643,18 @@
     "relaxReminder": "Il est temps de se détendre un peu",
     "sixMonths": "6 mois",
     "sixMonthTrend": "Tendance de travail sur 6 mois",
-    "takeItEasy": "Envisagez de lever le pied",
+    "takeItEasy": "Envisage de lever le pied",
     "thisWeek": "cette semaine"
   },
   "workingHours": {
-    "clickToAdjustHours": "Cliquez sur un jour ci-dessous pour ajuster les heures de travail",
+    "clickToAdjustHours": "Clique sur un jour ci-dessous pour ajuster les heures de travail",
     "dailyTotal": "Total quotidien",
-    "description": "Le temps que vous prévoyez de réserver par jour, par organisation, pendant une semaine de travail typique. Ces données sont utilisées pour calculer votre progression quotidienne et hebdomadaire.",
+    "description": "Le temps que tu prévois de réserver par jour, par organisation, pendant une semaine de travail typique. Ces données sont utilisées pour calculer ta progression quotidienne et hebdomadaire.",
     "errors": {
       "updateFailed": "Échec de la mise à jour des heures de travail"
     },
     "perWeek": "par semaine",
-    "setHoursDescription": "Définissez vos heures de travail pour chaque jour",
+    "setHoursDescription": "Définis tes heures de travail pour chaque jour",
     "status": {
       "updated": "Heures de travail mises à jour"
     },

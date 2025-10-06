@@ -3,24 +3,24 @@
     "accountSecurity": "Seguridad de la cuenta",
     "changeUserProfileSettings": "Cambiar la configuración del perfil de usuario",
     "errors": {
-      "passwordUpdateFailed": "Error al actualizar la contraseña. Asegúrese de que ha introducido su contraseña actual correctamente."
+      "passwordUpdateFailed": "Error al actualizar la contraseña. Asegúrate de haber introducido tu contraseña actual correctamente."
     },
     "languageSettings": {
-      "description": "Elija su idioma preferido para la interfaz. Esta configuración se almacena localmente en su navegador.",
+      "description": "Elige tu idioma preferido para la interfaz. Esta configuración se almacena localmente en tu navegador.",
       "save": "Guardar preferencia de idioma",
       "selectLanguage": "Idioma de la interfaz",
       "title": "Preferencias de idioma"
     },
     "profileChangesNotAllowedInDemo": "No se permiten cambios en el perfil en modo demostración",
     "profileSettings": {
-      "description": "Gestione su información personal y los detalles de su cuenta.",
+      "description": "Gestiona tu información personal y los detalles de tu cuenta.",
       "title": "Información del perfil"
     },
     "security": {
-      "description": "Actualice su contraseña para mantener su cuenta segura. Use una contraseña fuerte con al menos 8 caracteres, incluyendo letras mayúsculas y números."
+      "description": "Actualiza tu contraseña para mantener tu cuenta segura. Usa una contraseña fuerte con al menos 8 caracteres, incluyendo letras mayúsculas y números."
     },
     "settings": {
-      "description": "Gestione su información personal y los detalles de su cuenta. Su dirección de correo electrónico solo puede cambiarse si utiliza el proveedor de autenticación interno.",
+      "description": "Gestiona tu información personal y los detalles de tu cuenta. Tu dirección de correo electrónico solo puede cambiarse si utilizas el proveedor de autenticación interno.",
       "title": "Configuración de la cuenta"
     },
     "status": {
@@ -38,27 +38,27 @@
       "signOut": "Cerrar sesión",
       "signOutAndRefresh": "Cerrar sesión y actualizar"
     },
-    "chooseMethod": "Elija su método de inicio de sesión preferido",
+    "chooseMethod": "Elige tu método de inicio de sesión preferido",
     "connectingSecurely": "Conectando de forma segura",
     "continueWith": "Continuar con",
-    "continueWithProvider": "Continuar con su cuenta",
-    "createYourAccount": "Crear su cuenta",
-    "enterEmailAndPassword": "Introduzca su correo electrónico y contraseña para acceder a su cuenta",
+    "continueWithProvider": "Continuar con tu cuenta",
+    "createYourAccount": "Crea tu cuenta",
+    "enterEmailAndPassword": "Introduce tu correo electrónico y contraseña para acceder a tu cuenta",
     "errors": {
-      "callback": "Error en la devolución de llamada de autenticación. Por favor, inténtelo de nuevo.",
+      "callback": "Error en la devolución de llamada de autenticación. Por favor, inténtalo de nuevo.",
       "credentialsMissing": "Falta el nombre de usuario o la contraseña",
-      "fetchProfileFailed": "Su sesión ha expirado. Por favor, inicie sesión de nuevo.",
+      "fetchProfileFailed": "Tu sesión ha expirado. Por favor, inicia sesión de nuevo.",
       "general": "Error de autenticación: {error}",
-      "oauthCallback": "Error de autenticación. Por favor, inténtelo de nuevo.",
+      "oauthCallback": "Error de autenticación. Por favor, inténtalo de nuevo.",
       "registerUnknown": "Error desconocido en el registro",
-      "sessionRequired": "Por favor, inicie sesión para continuar.",
+      "sessionRequired": "Por favor, inicia sesión para continuar.",
       "userAlreadyRegistered": "Usuario ya registrado",
-      "wrongPasswordOrEmail": "Contraseña o correo electrónico incorrectos. Por favor, inténtelo de nuevo."
+      "wrongPasswordOrEmail": "Contraseña o correo electrónico incorrectos. Por favor, inténtalo de nuevo."
     },
-    "fillDetailsToStart": "Por favor, complete sus datos para comenzar",
-    "getStartedFree": "Comience con el seguimiento del tiempo de código abierto",
-    "joinLasius": "Únase a Lasius",
-    "needHelp": "¿Necesita ayuda? Haga clic en el botón de ayuda",
+    "fillDetailsToStart": "Por favor, completa tus datos para comenzar",
+    "getStartedFree": "Comienza con el seguimiento del tiempo de código abierto",
+    "joinLasius": "Únete a Lasius",
+    "needHelp": "¿Necesitas ayuda? Haz clic en el botón de ayuda",
     "noAuthMethodsAvailable": "No hay métodos de autenticación disponibles",
     "preparingSecureLogin": "Preparando inicio de sesión seguro...",
     "providers": {
@@ -66,10 +66,10 @@
     },
     "secureAndPrivate": "Seguro y privado",
     "signIn": "Iniciar sesión",
-    "signInTitle": "Inicie sesión en su cuenta",
+    "signInTitle": "Inicia sesión en tu cuenta",
     "signInToLasius": "Iniciar sesión en Lasius",
     "tagline": "Seguimiento del tiempo de código abierto para equipos modernos",
-    "thankYouForRegistering": "¡Gracias por registrarse! Ahora puede iniciar sesión con su dirección de correo electrónico y contraseña. ¡Bienvenido a Lasius!",
+    "thankYouForRegistering": "¡Gracias por registrarte! Ahora puedes iniciar sesión con tu dirección de correo electrónico y contraseña. ¡Bienvenido a Lasius!",
     "welcomeBack": "Bienvenido de nuevo",
     "welcomeToLasius": "Bienvenido a Lasius"
   },
@@ -96,7 +96,7 @@
     },
     "duration": "Duración",
     "emptyNever": "Aún no hay registros",
-    "emptyNeverHelp": "Comience creando su primer registro. ¿Necesita orientación?",
+    "emptyNeverHelp": "Crea tu primer registro para empezar. ¿Necesitas ayuda?",
     "emptyToday": "No hay registros para este día",
     "hints": {
       "useEndTimeOfLatest": "Usar la hora de finalización del último registro como hora de inicio para este",
@@ -106,7 +106,7 @@
     "history": {
       "empty": "No se encontraron registros para los filtros seleccionados"
     },
-    "overlapsWarning": "Estos registros se superponen. Haga clic para editar y ajustar la hora.",
+    "overlapsWarning": "Estos registros se superponen. Haz clic para editar y ajustar la hora.",
     "presets": {
       "browse": "Explorar plantillas",
       "empty": "No hay plantillas disponibles",
@@ -144,7 +144,7 @@
     "actions": {
       "actions": "Acciones",
       "add": "Añadir",
-      "back": "Back",
+      "back": "Atrás",
       "cancel": "Cancelar",
       "close": "Cerrar",
       "delete": "Eliminar",
@@ -152,7 +152,7 @@
       "help": "Ayuda",
       "invite": "Invitar",
       "keepEditing": "Seguir editando",
-      "next": "Next",
+      "next": "Siguiente",
       "reset": "Restablecer",
       "resetToInitial": "Restablecer al valor inicial",
       "save": "Guardar",
@@ -160,7 +160,7 @@
       "signUp": "Registrarse"
     },
     "back": "Atrás",
-    "confirmUnsavedChanges": "Tiene cambios sin guardar. ¿Está seguro de que desea cancelar?",
+    "confirmUnsavedChanges": "Tienes cambios sin guardar. ¿Estás seguro de que quieres cancelar?",
     "custom": "Personalizado",
     "dashboard": "Panel de control",
     "date": "Fecha",
@@ -193,7 +193,7 @@
     },
     "help": "Ayuda",
     "info": {
-      "helpFallbackLanguage": "Este contenido de ayuda aún no está disponible en su idioma seleccionado. Se muestra la versión en inglés."
+      "helpFallbackLanguage": "Este contenido de ayuda aún no está disponible en tu idioma seleccionado. Se muestra la versión en inglés."
     },
     "ok": "Aceptar",
     "or": "o",
@@ -257,7 +257,7 @@
       "toMustBeAfterFrom": "Debe ser posterior a la fecha \"desde\"",
       "wrongFormat": "Formato incorrecto"
     },
-    "you": "Usted"
+    "you": "Tú"
   },
   "contextMenu": {
     "actions": {
@@ -266,7 +266,7 @@
     }
   },
   "demo": {
-    "welcome": "Bienvenido a la instancia de demostración de Lasius. Use \"demo1@lasius.ch\" y contraseña \"demo\" para iniciar sesión y echar un vistazo. La instancia de demostración se restablece una vez al día."
+    "welcome": "Bienvenido a la instancia de demostración de Lasius. Usa \"demo1@lasius.ch\" y contraseña \"demo\" para iniciar sesión y echar un vistazo. La instancia de demostración se restablece una vez al día."
   },
   "errors": {
     "dataFetchFailed": "Lo sentimos, pero los datos no se pudieron recuperar debido a un error."
@@ -308,18 +308,18 @@
   "features": {
     "freeAndOpenSource": "Gratuito y de código abierto",
     "insightfulReports": "Informes y análisis detallados",
-    "inviteTeamMembers": "Invite a los miembros de su equipo",
+    "inviteTeamMembers": "Invita a los miembros de tu equipo",
     "openSource": "Código abierto y autoalojado",
-    "organizeTeams": "Organice por equipos y proyectos",
-    "startTrackingMinutes": "Comience a registrar el tiempo en minutos",
-    "trackTime": "Registre el tiempo sin esfuerzo"
+    "organizeTeams": "Organiza por equipos y proyectos",
+    "startTrackingMinutes": "Comienza a registrar el tiempo en minutos",
+    "trackTime": "Registra el tiempo sin esfuerzo"
   },
   "footer": {
     "developedBy": "Desarrollado por <0>Tegonal</0>, disponible en <1>GitHub</1>, publicado bajo <2>AGPL 3.0</2>",
-    "feedbackOnGithub": "Agradecemos sus comentarios. Por favor, deje un comentario en <0>GitHub</0>"
+    "feedbackOnGithub": "Agradecemos tus comentarios. Por favor, deja un comentario en <0>GitHub</0>"
   },
   "help": {
-    "contactAdmin": "Por favor, contacte con su administrador"
+    "contactAdmin": "Por favor, contacta con tu administrador"
   },
   "invitations": {
     "actions": {
@@ -327,19 +327,19 @@
       "reject": "Rechazar invitación"
     },
     "copyToClipboard": "Copiar al portapapeles",
-    "createAccountMessage": "Ha sido invitado a crear una cuenta de Lasius para registrar sus horas de trabajo.",
+    "createAccountMessage": "Has sido invitado a crear una cuenta de Lasius para registrar tus horas de trabajo.",
     "description": {
-      "copyLink": "Copie el enlace y envíelo a su colega. Si aún no tiene una cuenta, se creará una cuando se acepte la invitación."
+      "copyLink": "Copia el enlace y envíalo a tu colega. Si aún no tiene una cuenta, se creará una cuando se acepte la invitación."
     },
     "errors": {
-      "createdForSomeoneElse": "Esta invitación ha sido creada para otra persona. Cierre sesión y actualice, o reenvíe el enlace de invitación al usuario {{email}}",
-      "noLongerValid": "Esta invitación ya no es válida. Es mejor que contacte con la persona que le envió el enlace de invitación para obtener uno nuevo."
+      "createdForSomeoneElse": "Esta invitación ha sido creada para otra persona. Cierra sesión y actualiza, o reenvía el enlace de invitación al usuario {{email}}",
+      "noLongerValid": "Esta invitación ya no es válida. Es mejor que contactes con la persona que te envió el enlace de invitación para obtener uno nuevo."
     },
     "inviteByEmail": "Invitar por correo electrónico",
     "messages": {
-      "invitedToOrganisation": "Ha sido invitado por {{inviter}} a unirse a la organización {{organisation}}.",
-      "invitedToProject": "Ha sido invitado por {{inviter}} a unirse al proyecto {{project}}.",
-      "selectOrganisation": "Seleccione la organización a la que desea añadir este proyecto:"
+      "invitedToOrganisation": "Has sido invitado por {{inviter}} a unirte a la organización {{organisation}}.",
+      "invitedToProject": "Has sido invitado por {{inviter}} a unirte al proyecto {{project}}.",
+      "selectOrganisation": "Selecciona la organización a la que quieres añadir este proyecto:"
     }
   },
   "lists": {
@@ -352,7 +352,7 @@
       "remove": "Eliminar miembro"
     },
     "confirmations": {
-      "removeConfirm": "¿Está seguro de que desea eliminar a {{name}}?",
+      "removeConfirm": "¿Estás seguro de que quieres eliminar a {{name}}?",
       "removeTitle": "Eliminar miembro",
       "removeWarning": "Este miembro será eliminado de la organización y perderá el acceso a todos los proyectos."
     },
@@ -360,11 +360,11 @@
   },
   "navigation": {
     "currentOrganisation": "Organización actual",
-    "yourTimeBookingView": "Su vista de registro de tiempo"
+    "yourTimeBookingView": "Tu vista de registro de tiempo"
   },
   "of": "de",
   "offline": {
-    "message": "Está desconectado. Esta aplicación requiere una conexión en línea. Se actualizará automáticamente cuando se detecte una conexión de red."
+    "message": "Estás desconectado. Esta aplicación requiere una conexión en línea. Se actualizará automáticamente cuando se detecte una conexión de red."
   },
   "onboarding": {
     "actions": {
@@ -390,7 +390,7 @@
       "title": "Comencemos",
       "workingHours": "Establecer horas de trabajo para esta organización"
     },
-    "confirmClose": "¿Estás seguro de que quieres cerrar el tutorial? Puedes volver a activarlo en la configuración de la aplicación.",
+    "confirmClose": "¿Estás seguro de que quieres cerrar el tutorial? Puedes volver a activarlo en la configuración de la app.",
     "navigation": {
       "importantUI": "Elementos de interfaz importantes",
       "mainNavigation": "Navegación principal",
@@ -464,17 +464,17 @@
       "edit": "Editar organización",
       "switch": "Cambiar organización"
     },
-    "adminDescription": "Usted es un administrador de esta organización. Puede añadir y eliminar miembros y cambiar el nombre de la organización, o crear una nueva.",
-    "createDescription": "Añada una nueva organización haciendo clic en el botón de abajo.",
+    "adminDescription": "Eres un administrador de esta organización. Puedes añadir y eliminar miembros y cambiar el nombre de la organización, o crear una nueva.",
+    "createDescription": "Añade una nueva organización haciendo clic en el botón de abajo.",
     "currentOrganisation": "Organización actual",
-    "memberDescription": "Usted es miembro de esta organización y no tiene los permisos para añadir o eliminar miembros. Póngase en contacto con un administrador de la organización si desea invitar a alguien.",
+    "memberDescription": "Eres miembro de esta organización y no tienes los permisos para añadir o eliminar miembros. Ponte en contacto con un administrador de la organización si quieres invitar a alguien.",
     "members": "Miembros",
     "myPersonalOrganisation": "Mi organización personal",
     "organisationName": "Organización",
     "organisationRole": "Rol en la organización",
     "organization": "Organización",
     "organizationName": "Nombre de la organización",
-    "privateDescription": "Esta organización solo es visible para usted. Úsela para realizar un seguimiento de proyectos privados. Para colaborar con otros, cree o use una organización diferente.",
+    "privateDescription": "Esta organización solo es visible para ti. Úsala para realizar un seguimiento de proyectos privados. Para colaborar con otros, crea o usa una organización diferente.",
     "selectOrganisation": "Seleccionar organización",
     "status": {
       "created": "Organización creada",
@@ -491,13 +491,13 @@
       "leave": "Abandonar este proyecto"
     },
     "allProjects": "Todos los proyectos",
-    "allProjectsDescription": "Todos los proyectos de la organización actual que puede administrar. Cree informes de facturación incluyendo el tiempo registrado por miembros externos del proyecto.",
+    "allProjectsDescription": "Todos los proyectos de la organización actual que puedes administrar. Crea informes de facturación incluyendo el tiempo registrado por miembros externos del proyecto.",
     "confirmations": {
-      "deactivate": "¿Está seguro de que desea desactivar este proyecto?",
-      "deactivateInstructions": "Para confirmar, escriba el nombre del proyecto a continuación:",
+      "deactivate": "¿Estás seguro de que quieres desactivar este proyecto?",
+      "deactivateInstructions": "Para confirmar, escribe el nombre del proyecto a continuación:",
       "deactivateTitle": "Desactivar proyecto",
-      "deactivateWarning": "Esta acción no se puede deshacer. El proyecto será archivado permanentemente y todas las asignaciones de usuarios se eliminarán. No podrá reactivar este proyecto.",
-      "leave": "¿Está seguro de que desea abandonar este proyecto?"
+      "deactivateWarning": "Esta acción no se puede deshacer. El proyecto será archivado permanentemente y todas las asignaciones de usuarios se eliminarán. No podrás reactivar este proyecto.",
+      "leave": "¿Estás seguro de que quieres abandonar este proyecto?"
     },
     "deactivatedBy": "Archivado por {{user}}",
     "empty": "No se encontraron proyectos",
@@ -514,7 +514,7 @@
       "title": "Miembros del proyecto"
     },
     "myProjects": "Mis proyectos",
-    "myProjectsDescription": "Proyectos en los que es miembro y puede registrar tiempo, filtrados por la organización actual.",
+    "myProjectsDescription": "Proyectos en los que eres miembro y puedes registrar tiempo, filtrados por la organización actual.",
     "name": "Nombre del proyecto",
     "noActivity": "Sin actividad",
     "project": "Proyecto",
@@ -530,24 +530,24 @@
     "warnings": {
       "inactiveProjectContext": "Viendo estadísticas de proyecto inactivo",
       "inactiveProjectFilter": "Mostrando datos de proyecto inactivo",
-      "projectNotInActiveList": "Este proyecto no está en su lista de proyectos activos. Puede estar inactivo o ser de otra organización.",
-      "projectUnavailable": "Este proyecto ya no está en su perfil. Es posible que haya sido eliminado del mismo."
+      "projectNotInActiveList": "Este proyecto no está en tu lista de proyectos activos. Puede estar inactivo o ser de otra organización.",
+      "projectUnavailable": "Este proyecto ya no está en tu perfil. Es posible que hayas sido eliminado del mismo."
     }
   },
   "pwa": {
     "reloadApplication": "Recargar aplicación",
-    "updateMessage": "Lasius se ha actualizado. La página se recargará después de su confirmación."
+    "updateMessage": "Lasius se ha actualizado. La página se recargará después de tu confirmación."
   },
   "search": {
     "empty": "No se encontraron resultados"
   },
   "settings": {
     "app": {
-      "description": "Personalice su experiencia con las preferencias de idioma y tema. Estas configuraciones se almacenan localmente en su navegador.",
+      "description": "Personaliza tu experiencia con las preferencias de idioma y tema. Estas configuraciones se almacenan localmente en tu navegador.",
       "language": "Idioma de la interfaz",
       "menuTitle": "Configuración de la aplicación",
       "save": "Guardar configuración",
-      "showOnboarding": "Show Onboarding Tutorial",
+      "showOnboarding": "Mostrar tutorial de introducción",
       "theme": "Tema",
       "title": "Configuración de la aplicación"
     }
@@ -569,7 +569,7 @@
     "backendUnreachable": "El servidor parece estar inaccesible",
     "connectedToBackend": "Conectado al servidor",
     "connectingToBackend": "Conectando al servidor",
-    "noInternetConnection": "Sin conexión a Internet. Por favor, asegúrese de que su dispositivo esté conectado a Internet.",
+    "noInternetConnection": "Sin conexión a Internet. Por favor, asegúrate de que tu dispositivo esté conectado a Internet.",
     "offlineMessage": "Lasius está actualmente sin conexión o en mantenimiento. Volveremos en breve."
   },
   "tags": {
@@ -586,11 +586,11 @@
       "expandAll": "Expandir todo",
       "pasteTags": "Pegar etiquetas"
     },
-    "chooseOrEnter": "Elegir o introducir etiquetas",
-    "confirmDeleteGroup": "¿Está seguro de que desea eliminar el grupo de etiquetas \"{{groupName}}\"?",
+    "chooseOrEnter": "Elige o introduce etiquetas",
+    "confirmDeleteGroup": "¿Estás seguro de que quieres eliminar el grupo de etiquetas \"{{groupName}}\"?",
     "customTag": "Etiqueta personalizada",
-    "enterTagName": "Introducir nombre de etiqueta",
-    "enterToAdd": "Introduzca una etiqueta para añadirla",
+    "enterTagName": "Introduce nombre de etiqueta",
+    "enterToAdd": "Introduce una etiqueta para añadirla",
     "label": "Etiquetas",
     "noTagGroups": "Aún no se han definido grupos de etiquetas",
     "simpleTags": "Etiquetas simples",
@@ -609,7 +609,7 @@
     }
   },
   "tos": {
-    "acceptMessage": "Por favor, acepte los siguientes Términos de Servicio (versión {{version}}), si desea continuar usando Lasius:",
+    "acceptMessage": "Por favor, acepta los siguientes Términos de Servicio (versión {{version}}), si quieres continuar usando Lasius:",
     "actions": {
       "accept": "Aceptar Términos de Servicio",
       "reject": "Rechazar y cerrar sesión"
@@ -643,18 +643,18 @@
     "relaxReminder": "Es hora de relajarse un poco",
     "sixMonths": "6 meses",
     "sixMonthTrend": "Tendencia de trabajo de 6 meses",
-    "takeItEasy": "Considere tomarlo con calma",
+    "takeItEasy": "Considera tomártelo con calma",
     "thisWeek": "esta semana"
   },
   "workingHours": {
-    "clickToAdjustHours": "Haga clic en cualquier día a continuación para ajustar las horas de trabajo",
+    "clickToAdjustHours": "Haz clic en cualquier día a continuación para ajustar las horas de trabajo",
     "dailyTotal": "Total diario",
-    "description": "La cantidad de tiempo que espera registrar por día, por organización, durante una semana laboral típica. Estos datos se utilizan para calcular su progreso diario y semanal.",
+    "description": "La cantidad de tiempo que esperas registrar por día, por organización, durante una semana laboral típica. Estos datos se utilizan para calcular tu progreso diario y semanal.",
     "errors": {
       "updateFailed": "Error al actualizar las horas de trabajo"
     },
     "perWeek": "por semana",
-    "setHoursDescription": "Establezca sus horas de trabajo para cada día",
+    "setHoursDescription": "Establece tus horas de trabajo para cada día",
     "status": {
       "updated": "Horas de trabajo actualizadas"
     },

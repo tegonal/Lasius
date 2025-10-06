@@ -21,18 +21,17 @@ import { OrganisationLayout } from 'components/features/organisation/current/org
 import { LayoutResponsive } from 'components/ui/layouts/layoutResponsive'
 import { getServerSidePropsWithAuthRequired } from 'lib/auth/getServerSidePropsWithAuth'
 import { GetServerSideProps } from 'next'
-import { NextPageWithLayout } from 'pages/_app'
 
-const CurrentOrganisationPage: NextPageWithLayout = () => {
-  return <OrganisationLayout />
+const CurrentOrganisationPage = () => {
+  return (
+    <LayoutResponsive>
+      <OrganisationLayout />
+    </LayoutResponsive>
+  )
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   return getServerSidePropsWithAuthRequired(context)
-}
-
-CurrentOrganisationPage.getLayout = function getLayout(page) {
-  return <LayoutResponsive>{page}</LayoutResponsive>
 }
 
 export default CurrentOrganisationPage

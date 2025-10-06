@@ -23,22 +23,19 @@ import { ScrollContainer } from 'components/primitives/layout/ScrollContainer'
 import { LayoutResponsive } from 'components/ui/layouts/layoutResponsive'
 import { getServerSidePropsWithAuthRequired } from 'lib/auth/getServerSidePropsWithAuth'
 import { GetServerSideProps } from 'next'
-import { NextPageWithLayout } from 'pages/_app'
 
-const AppSettingsPage: NextPageWithLayout = () => {
+const AppSettingsPage = () => {
   return (
-    <ScrollContainer className="bg-base-100 flex-1 overflow-y-auto p-4">
-      <AppSettingsForm />
-    </ScrollContainer>
+    <LayoutResponsive rightColumn={<AppSettingsRightColumn />}>
+      <ScrollContainer className="bg-base-100 flex-1 overflow-y-auto p-4">
+        <AppSettingsForm />
+      </ScrollContainer>
+    </LayoutResponsive>
   )
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   return getServerSidePropsWithAuthRequired(context)
-}
-
-AppSettingsPage.getLayout = function getLayout(page) {
-  return <LayoutResponsive rightColumn={<AppSettingsRightColumn />}>{page}</LayoutResponsive>
 }
 
 export default AppSettingsPage

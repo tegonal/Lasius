@@ -3,7 +3,7 @@
     "accountSecurity": "Sicurezza dell'account",
     "changeUserProfileSettings": "Modifica le impostazioni del profilo utente",
     "errors": {
-      "passwordUpdateFailed": "Aggiornamento della password non riuscito. Assicurati di aver inserito la password corrente e che sia corretta."
+      "passwordUpdateFailed": "Aggiornamento della password non riuscito. Assicurati di aver inserito correttamente la password corrente."
     },
     "languageSettings": {
       "description": "Scegli la lingua preferita per l'interfaccia. Questa impostazione viene memorizzata localmente nel tuo browser.",
@@ -96,7 +96,7 @@
     },
     "duration": "Durata",
     "emptyNever": "Nessuna registrazione ancora",
-    "emptyNeverHelp": "Inizia creando la tua prima registrazione. Serve aiuto?",
+    "emptyNeverHelp": "Crea la tua prima registrazione per iniziare. Serve aiuto?",
     "emptyToday": "Nessuna registrazione per questo giorno",
     "hints": {
       "useEndTimeOfLatest": "Usa l'ora di fine dell'ultima registrazione come ora di inizio per questa",
@@ -106,7 +106,7 @@
     "history": {
       "empty": "Nessuna registrazione trovata per i filtri selezionati"
     },
-    "overlapsWarning": "Queste registrazioni si sovrappongono. Clicca per modificare e adattare l'orario.",
+    "overlapsWarning": "Queste registrazioni si sovrappongono. Fai clic per modificare e adattare l'orario.",
     "presets": {
       "browse": "Sfoglia preset",
       "empty": "Nessun preset disponibile",
@@ -144,7 +144,7 @@
     "actions": {
       "actions": "Azioni",
       "add": "Aggiungi",
-      "back": "Back",
+      "back": "Indietro",
       "cancel": "Annulla",
       "close": "Chiudi",
       "delete": "Elimina",
@@ -152,7 +152,7 @@
       "help": "Aiuto",
       "invite": "Invita",
       "keepEditing": "Continua a modificare",
-      "next": "Next",
+      "next": "Avanti",
       "reset": "Ripristina",
       "resetToInitial": "Ripristina al valore iniziale",
       "save": "Salva",
@@ -160,7 +160,7 @@
       "signUp": "Registrati"
     },
     "back": "Indietro",
-    "confirmUnsavedChanges": "Hai modifiche non salvate. Sei sicuro di voler annullare?",
+    "confirmUnsavedChanges": "Hai modifiche non salvate. Sei sicuro di volerle annullare?",
     "custom": "Personalizzato",
     "dashboard": "Dashboard",
     "date": "Data",
@@ -339,7 +339,7 @@
     "messages": {
       "invitedToOrganisation": "Sei stato invitato da {{inviter}} a unirti all'organizzazione {{organisation}}.",
       "invitedToProject": "Sei stato invitato da {{inviter}} a unirti al progetto {{project}}.",
-      "selectOrganisation": "Seleziona l'organizzazione a cui vorresti aggiungere questo progetto:"
+      "selectOrganisation": "Seleziona l'organizzazione a cui vuoi aggiungere questo progetto:"
     }
   },
   "lists": {
@@ -354,7 +354,7 @@
     "confirmations": {
       "removeConfirm": "Sei sicuro di voler rimuovere {{name}}?",
       "removeTitle": "Rimuovi membro",
-      "removeWarning": "Questo membro verrà rimosso dall'organizzazione e perderà l'accesso a tutti i progetti."
+      "removeWarning": "Questo membro sarà rimosso dall'organizzazione e perderà l'accesso a tutti i progetti."
     },
     "empty": "Nessun membro trovato"
   },
@@ -496,7 +496,7 @@
       "deactivate": "Sei sicuro di voler disattivare questo progetto?",
       "deactivateInstructions": "Per confermare, digita il nome del progetto qui sotto:",
       "deactivateTitle": "Disattiva progetto",
-      "deactivateWarning": "Questa azione non può essere annullata. Il progetto verrà archiviato permanentemente e tutte le assegnazioni utente verranno rimosse. Non sarà possibile riattivare questo progetto.",
+      "deactivateWarning": "Questa azione non può essere annullata. Il progetto sarà archiviato permanentemente e tutte le assegnazioni utente saranno rimosse. Non sarà possibile riattivare questo progetto.",
       "leave": "Sei sicuro di voler abbandonare questo progetto?"
     },
     "deactivatedBy": "Archiviato da {{user}}",
@@ -536,7 +536,7 @@
   },
   "pwa": {
     "reloadApplication": "Ricarica applicazione",
-    "updateMessage": "Lasius è stato aggiornato. La pagina verrà ricaricata dopo la tua conferma."
+    "updateMessage": "Lasius è stato aggiornato. La pagina sarà ricaricata dopo la tua conferma."
   },
   "search": {
     "empty": "Nessun risultato trovato"
@@ -547,7 +547,7 @@
       "language": "Lingua dell'interfaccia",
       "menuTitle": "Impostazioni app",
       "save": "Salva impostazioni",
-      "showOnboarding": "Show Onboarding Tutorial",
+      "showOnboarding": "Mostra tutorial introduttivo",
       "theme": "Tema",
       "title": "Impostazioni applicazione"
     }
@@ -569,7 +569,7 @@
     "backendUnreachable": "Il backend sembra essere irraggiungibile",
     "connectedToBackend": "Connesso al backend",
     "connectingToBackend": "Connessione al backend in corso",
-    "noInternetConnection": "Nessuna connessione Internet. Assicurati che il tuo dispositivo sia connesso a Internet.",
+    "noInternetConnection": "Nessuna connessione Internet. Assicurati che il tuo dispositivo sia connesso.",
     "offlineMessage": "Lasius è attualmente offline o in manutenzione. Torneremo presto."
   },
   "tags": {
@@ -609,7 +609,7 @@
     }
   },
   "tos": {
-    "acceptMessage": "Accetta i seguenti Termini di servizio (versione {{version}}), se desideri continuare a utilizzare Lasius:",
+    "acceptMessage": "Accetta i seguenti Termini di servizio (versione {{version}}), se vuoi continuare a utilizzare Lasius:",
     "actions": {
       "accept": "Accetta Termini di servizio",
       "reject": "Rifiuta e disconnetti"
@@ -647,7 +647,7 @@
     "thisWeek": "questa settimana"
   },
   "workingHours": {
-    "clickToAdjustHours": "Clicca su un giorno qui sotto per adattare le ore di lavoro",
+    "clickToAdjustHours": "Fai clic su un giorno qui sotto per adattare le ore di lavoro",
     "dailyTotal": "Totale giornaliero",
     "description": "La quantità di tempo che prevedi di registrare al giorno, per organizzazione, durante una tipica settimana lavorativa. Questi dati vengono utilizzati per calcolare il tuo progresso giornaliero e settimanale.",
     "errors": {

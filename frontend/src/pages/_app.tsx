@@ -35,9 +35,9 @@ import { Toasts } from 'components/ui/feedback/Toasts'
 import { HelpDrawer } from 'components/ui/overlays/HelpDrawer'
 import { LazyMotion } from 'framer-motion'
 import { swrLogger } from 'lib/api/swrRequestLogger'
+import { useThemeInitialization } from 'lib/hooks/useThemeInitialization'
 import { logger } from 'lib/logger'
 import { removeAccessibleCookies } from 'lib/utils/auth/removeAccessibleCookies'
-import { NextPage } from 'next'
 import { SessionProvider } from 'next-auth/react'
 import { appWithTranslation } from 'next-i18next'
 // import PlausibleProvider from 'next-plausible' // Using custom implementation
@@ -46,18 +46,12 @@ import { AppProps } from 'next/app'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import { SOCIAL_MEDIA_CARD_IMAGE_URL } from 'projectConfig/constants'
-import React, { JSX, ReactElement, ReactNode, useEffect } from 'react'
+import React, { JSX } from 'react'
 import { useAsync } from 'react-async-hook'
 import { resetAllStores } from 'stores/globalActions'
 import { SWRConfig } from 'swr'
 
-export type NextPageWithLayout<P = Record<string, unknown>, IP = P> = NextPage<P, IP> & {
-  getLayout?: (page: ReactElement<P>) => ReactNode
-}
-
-type AppPropsWithLayout = AppProps & {
-  Component: NextPageWithLayout
-}
+import nextI18NextConfig from '../../next-i18next.config'
 
 const loadFeatures = () => import('../lib/framerMotionFeatures.js').then((res) => res.default)
 
@@ -69,58 +63,14 @@ const LasiusPwaUpdater =
       })
     : () => <></>
 
-const App = ({ Component, pageProps }: AppPropsWithLayout): JSX.Element => {
+const App = ({ Component, pageProps }: AppProps): JSX.Element => {
   // Extract auth props from pageProps (they come from getServerSideProps now)
   const { session, profile, fallback, statusCode = 0, ...restPageProps } = pageProps
 
-  // Use the layout defined at the page level, if available
-  const getLayout = Component.getLayout ?? ((page) => page)
   const lasiusIsLoggedIn = !!(session?.access_token && profile?.id)
 
   // Initialize theme on app mount, respecting system preference
-  useEffect(() => {
-    // Check if there's a saved theme in localStorage
-    const savedTheme = localStorage.getItem('theme')
-
-    if (savedTheme) {
-      // User has explicitly set a theme preference
-      document.documentElement.setAttribute('data-theme', savedTheme)
-    } else {
-      // No saved preference, check system preference
-      if (typeof window !== 'undefined' && window.matchMedia) {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-        const systemTheme = prefersDark ? 'dark' : 'light'
-        document.documentElement.setAttribute('data-theme', systemTheme)
-      } else {
-        // Fallback to light theme if matchMedia is not supported
-        document.documentElement.setAttribute('data-theme', 'light')
-      }
-    }
-
-    // Listen to system preference changes (only if no saved preference)
-    if (!savedTheme && typeof window !== 'undefined' && window.matchMedia) {
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-
-      const handleChange = (e: MediaQueryListEvent) => {
-        // Only apply system changes if user hasn't set a manual preference
-        if (!localStorage.getItem('theme')) {
-          const systemTheme = e.matches ? 'dark' : 'light'
-          document.documentElement.setAttribute('data-theme', systemTheme)
-        }
-      }
-
-      // Modern browsers
-      if (mediaQuery.addEventListener) {
-        mediaQuery.addEventListener('change', handleChange)
-        return () => mediaQuery.removeEventListener('change', handleChange)
-      }
-      // Legacy browsers
-      else if (mediaQuery.addListener) {
-        mediaQuery.addListener(handleChange)
-        return () => mediaQuery.removeListener(handleChange)
-      }
-    }
-  }, [])
+  useThemeInitialization()
 
   useAsync(async () => {
     if (!lasiusIsLoggedIn) {
@@ -144,8 +94,6 @@ const App = ({ Component, pageProps }: AppPropsWithLayout): JSX.Element => {
           refetchOnWindowFocus={true}
           refetchInterval={10} // Refetch every 10 seconds to catch token refreshes
         >
-          <HttpHeaderProvider session={session} />
-          <TokenWatcher />
           <Head>
             <meta
               name="viewport"
@@ -163,7 +111,7 @@ const App = ({ Component, pageProps }: AppPropsWithLayout): JSX.Element => {
             {statusCode > 302 ? (
               <Error statusCode={statusCode} />
             ) : (
-              getLayout(<Component {...restPageProps} />)
+              <Component {...restPageProps} />
             )}
             <BrowserOnlineStatusCheck />
             <LasiusBackendOnlineCheck />
@@ -174,6 +122,8 @@ const App = ({ Component, pageProps }: AppPropsWithLayout): JSX.Element => {
             <BookingProgressBarExplosion />
             {lasiusIsLoggedIn && (
               <>
+                <HttpHeaderProvider session={session} />
+                <TokenWatcher />
                 <BootstrapTasks />
                 <LasiusBackendWebsocketStatus />
                 <LasiusBackendWebsocketEventHandler />
@@ -190,7 +140,5 @@ const App = ({ Component, pageProps }: AppPropsWithLayout): JSX.Element => {
 
 // Removed getInitialProps - auth is now handled in each page's getServerSideProps
 // using getServerSidePropsWithAuth helper for better performance and type safety
-
-import nextI18NextConfig from '../../next-i18next.config'
 
 export default appWithTranslation(App as any, nextI18NextConfig)

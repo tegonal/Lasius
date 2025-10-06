@@ -17,9 +17,11 @@
  *
  */
 
+import axios from 'axios'
 import { Button } from 'components/primitives/buttons/Button'
 import { Input } from 'components/primitives/inputs/Input'
 import { Label } from 'components/primitives/typography/Label'
+import { Alert } from 'components/ui/feedback/Alert'
 import { useToast } from 'components/ui/feedback/hooks/useToast'
 import { ButtonGroup } from 'components/ui/forms/ButtonGroup'
 import { FieldSet } from 'components/ui/forms/FieldSet'
@@ -62,31 +64,51 @@ export const OrganisationAddUpdateForm: React.FC<Props> = ({ item, onSave, onCan
   const onSubmit = async () => {
     setIsSubmitting(true)
     const { organisationName } = hookForm.getValues()
-    if (mode === 'add' && organisationName) {
-      const newOrg = await createOrganisation({ key: organisationName })
-      addToast({
-        message: t('organisations.status.created', { defaultValue: 'Organisation created' }),
-        type: 'SUCCESS',
-      })
-      if (newOrg) {
-        await setSelectedOrganisation({
-          id: newOrg.id,
-          key: newOrg.key,
+
+    try {
+      if (mode === 'add' && organisationName) {
+        const newOrg = await createOrganisation({ key: organisationName })
+        addToast({
+          message: t('organisations.status.created', { defaultValue: 'Organisation created' }),
+          type: 'SUCCESS',
+        })
+        if (newOrg) {
+          await setSelectedOrganisation({
+            id: newOrg.id,
+            key: newOrg.key,
+          })
+        }
+      } else if (item) {
+        await updateOrganisation(item.organisationReference.id, {
+          ...item,
+          key: organisationName,
+        })
+        addToast({
+          message: t('organisations.status.updated', { defaultValue: 'Organisation updated' }),
+          type: 'SUCCESS',
         })
       }
-    } else if (item) {
-      await updateOrganisation(item.organisationReference.id, {
-        ...item,
-        key: organisationName,
-      })
-      addToast({
-        message: t('organisations.status.updated', { defaultValue: 'Organisation updated' }),
-        type: 'SUCCESS',
-      })
+      await mutate(getGetUserProfileKey())
+      onSave()
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 400) {
+        hookForm.setError('organisationName', {
+          type: 'manual',
+          message: t('organisations.errors.duplicateKey', {
+            defaultValue: 'An organisation with this name already exists',
+          }),
+        })
+      } else {
+        addToast({
+          message: t('organisations.errors.saveFailed', {
+            defaultValue: 'Failed to save organisation',
+          }),
+          type: 'ERROR',
+        })
+      }
+    } finally {
+      setIsSubmitting(false)
     }
-    setIsSubmitting(false)
-    await mutate(getGetUserProfileKey())
-    onSave()
   }
 
   return (
@@ -94,13 +116,26 @@ export const OrganisationAddUpdateForm: React.FC<Props> = ({ item, onSave, onCan
       <div className="relative w-full">
         <form onSubmit={hookForm.handleSubmit(onSubmit)}>
           <FormBody>
+            <Alert variant="info" className="mb-4">
+              {t('organisations.info.uniqueNameRequired', {
+                defaultValue: 'Organisation names must be unique.',
+              })}
+            </Alert>
             <FieldSet>
               <FormElement>
                 <Label htmlFor="organisationName">
                   {t('organisations.organizationName', { defaultValue: 'Organisation name' })}
                 </Label>
                 <Input
-                  {...hookForm.register('organisationName', { required: true })}
+                  {...hookForm.register('organisationName', {
+                    required: true,
+                    onChange: () => {
+                      // Clear error when user changes the field
+                      if (hookForm.formState.errors.organisationName) {
+                        hookForm.clearErrors('organisationName')
+                      }
+                    },
+                  })}
                   autoComplete="off"
                 />
                 <FormErrorBadge error={hookForm.formState.errors.organisationName} />

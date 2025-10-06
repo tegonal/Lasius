@@ -21,18 +21,17 @@ import { AccountLayout } from 'components/features/settings/account/AccountLayou
 import { LayoutResponsive } from 'components/ui/layouts/layoutResponsive'
 import { getServerSidePropsWithAuthRequired } from 'lib/auth/getServerSidePropsWithAuth'
 import { GetServerSideProps } from 'next'
-import { NextPageWithLayout } from 'pages/_app'
 
-const AccountPage: NextPageWithLayout = () => {
-  return <AccountLayout />
+const AccountPage = () => {
+  return (
+    <LayoutResponsive>
+      <AccountLayout />
+    </LayoutResponsive>
+  )
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   return getServerSidePropsWithAuthRequired(context)
-}
-
-AccountPage.getLayout = function getLayout(page) {
-  return <LayoutResponsive>{page}</LayoutResponsive>
 }
 
 export default AccountPage

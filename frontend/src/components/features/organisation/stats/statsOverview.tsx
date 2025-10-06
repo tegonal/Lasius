@@ -59,6 +59,13 @@ export const StatsOverview: React.FC = () => {
     return projects.size
   }, [data, isValidating])
 
+  // Hide overview if no data
+  const hasData = !isValidating && data && data.length > 0
+
+  if (!hasData) {
+    return null
+  }
+
   return (
     <StatsGroup className="flex gap-4">
       <StatsTileHours

@@ -21,18 +21,17 @@ import { MyProjectsLayout } from 'components/features/user/projects/myProjectsLa
 import { LayoutResponsive } from 'components/ui/layouts/layoutResponsive'
 import { getServerSidePropsWithAuthRequired } from 'lib/auth/getServerSidePropsWithAuth'
 import { GetServerSideProps } from 'next'
-import { NextPageWithLayout } from 'pages/_app'
 
-const MyProjectsPage: NextPageWithLayout = () => {
-  return <MyProjectsLayout />
+const MyProjectsPage = () => {
+  return (
+    <LayoutResponsive>
+      <MyProjectsLayout />
+    </LayoutResponsive>
+  )
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   return getServerSidePropsWithAuthRequired(context)
-}
-
-MyProjectsPage.getLayout = function getLayout(page) {
-  return <LayoutResponsive>{page}</LayoutResponsive>
 }
 
 export default MyProjectsPage

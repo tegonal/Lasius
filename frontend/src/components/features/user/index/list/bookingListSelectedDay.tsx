@@ -29,6 +29,7 @@ import { apiTimespanDay, apiTimespanFromTo } from 'lib/api/apiDateHandling'
 import { augmentBookingsList } from 'lib/api/functions/augmentBookingsList'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { useGetUserBookingListByOrganisation } from 'lib/api/lasius/user-bookings/user-bookings'
+import { useOnboardingStatus } from 'lib/hooks/useOnboardingStatus'
 import { stringHash } from 'lib/utils/string/stringHash'
 import { DEV } from 'projectConfig/constants'
 import React, { useMemo } from 'react'
@@ -39,6 +40,7 @@ export const BookingListSelectedDay: React.FC = () => {
   const { selectedOrganisationId } = useOrganisation()
   const isClient = useIsClient()
   const selectedDate = useSelectedDate()
+  const { isDismissed } = useOnboardingStatus()
 
   const { data, isValidating } = useGetUserBookingListByOrganisation(
     selectedOrganisationId,
@@ -98,7 +100,12 @@ export const BookingListSelectedDay: React.FC = () => {
           </>
         ) : // In production, show appropriate placeholder
         hasNeverBooked ? (
-          <OnboardingTutorial />
+          // Show tutorial if not dismissed, otherwise show "never booked" empty state
+          isDismissed ? (
+            <BookingListEmptyNever />
+          ) : (
+            <OnboardingTutorial />
+          )
         ) : (
           <BookingListEmptyToday />
         )

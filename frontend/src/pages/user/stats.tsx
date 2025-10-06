@@ -21,20 +21,17 @@ import { StatsLayout } from 'components/features/user/stats/statsLayout'
 import { LayoutResponsive } from 'components/ui/layouts/layoutResponsive'
 import { getServerSidePropsWithAuthRequired } from 'lib/auth/getServerSidePropsWithAuth'
 import { GetServerSideProps } from 'next'
-import { NextPageWithLayout } from 'pages/_app'
 
-const StatsPage: NextPageWithLayout = () => {
-  return <StatsLayout />
+const StatsPage = () => {
+  return (
+    <LayoutResponsive>
+      <StatsLayout />
+    </LayoutResponsive>
+  )
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   return getServerSidePropsWithAuthRequired(context)
-}
-
-StatsPage.getLayout = function getLayout(page) {
-  // Stats page doesn't have a right column or custom mobile content
-  // It will use the same content for both desktop center and mobile
-  return <LayoutResponsive>{page}</LayoutResponsive>
 }
 
 export default StatsPage

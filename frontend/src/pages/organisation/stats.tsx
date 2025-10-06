@@ -25,22 +25,25 @@ import { useProfile } from 'lib/api/hooks/useProfile'
 import { ModelsUser } from 'lib/api/lasius'
 import { getServerSidePropsWithAuthRequired } from 'lib/auth/getServerSidePropsWithAuth'
 import { GetServerSideProps } from 'next'
-import { NextPageWithLayout } from 'pages/_app'
 
-const StatsPage: NextPageWithLayout = () => {
+const StatsPage = () => {
   const { profile } = useProfile()
   if (isAdminOfCurrentOrg(profile as ModelsUser)) {
-    return <StatsLayout />
+    return (
+      <LayoutResponsive>
+        <StatsLayout />
+      </LayoutResponsive>
+    )
   }
-  return <Error statusCode={401} />
+  return (
+    <LayoutResponsive>
+      <Error statusCode={401} />
+    </LayoutResponsive>
+  )
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   return getServerSidePropsWithAuthRequired(context)
-}
-
-StatsPage.getLayout = function getLayout(page) {
-  return <LayoutResponsive>{page}</LayoutResponsive>
 }
 
 export default StatsPage

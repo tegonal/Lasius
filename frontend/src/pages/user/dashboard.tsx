@@ -21,18 +21,17 @@ import { ThisMonthLayout } from 'components/features/user/thisMonth/thisMonthLay
 import { LayoutResponsive } from 'components/ui/layouts/layoutResponsive'
 import { getServerSidePropsWithAuthRequired } from 'lib/auth/getServerSidePropsWithAuth'
 import { GetServerSideProps } from 'next'
-import { NextPageWithLayout } from 'pages/_app'
 
-const ThisMonthPage: NextPageWithLayout = () => {
-  return <ThisMonthLayout />
+const ThisMonthPage = () => {
+  return (
+    <LayoutResponsive>
+      <ThisMonthLayout />
+    </LayoutResponsive>
+  )
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   return getServerSidePropsWithAuthRequired(context)
-}
-
-ThisMonthPage.getLayout = function getLayout(page) {
-  return <LayoutResponsive>{page}</LayoutResponsive>
 }
 
 export default ThisMonthPage

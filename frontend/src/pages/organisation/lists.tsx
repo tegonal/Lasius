@@ -25,22 +25,25 @@ import { useProfile } from 'lib/api/hooks/useProfile'
 import { ModelsUser } from 'lib/api/lasius'
 import { getServerSidePropsWithAuthRequired } from 'lib/auth/getServerSidePropsWithAuth'
 import { GetServerSideProps } from 'next'
-import { NextPageWithLayout } from 'pages/_app'
 
-const ListsPage: NextPageWithLayout = () => {
+const ListsPage = () => {
   const { profile } = useProfile()
   if (isAdminOfCurrentOrg(profile as ModelsUser)) {
-    return <BookingHistoryLayout dataSource="organisationBookings" />
+    return (
+      <LayoutResponsive>
+        <BookingHistoryLayout dataSource="organisationBookings" />
+      </LayoutResponsive>
+    )
   }
-  return <Error statusCode={401} />
+  return (
+    <LayoutResponsive>
+      <Error statusCode={401} />
+    </LayoutResponsive>
+  )
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   return getServerSidePropsWithAuthRequired(context)
-}
-
-ListsPage.getLayout = function getLayout(page) {
-  return <LayoutResponsive>{page}</LayoutResponsive>
 }
 
 export default ListsPage

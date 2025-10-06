@@ -19,6 +19,7 @@
 
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
 import { Button } from 'components/primitives/buttons/Button'
+import { ErrorBoundary } from 'components/ui/feedback/ErrorBoundary'
 import { InlineIcon } from 'components/ui/help/InlineIcon'
 import { Note } from 'components/ui/help/Note'
 import { Tip } from 'components/ui/help/Tip'
@@ -212,9 +213,20 @@ export const HelpDrawer: React.FC = () => {
                   )}
 
                   {mdxSource && !loading && !error && (
-                    <div className="prose prose-sm max-w-none">
-                      <MDXRemote {...mdxSource} components={mdxComponents} />
-                    </div>
+                    <ErrorBoundary
+                      fallback={
+                        <div className="alert alert-error">
+                          <p>
+                            {t('common.errors.helpNotAvailable', {
+                              defaultValue: 'Help content not available for this page.',
+                            })}
+                          </p>
+                        </div>
+                      }>
+                      <div className="prose prose-sm max-w-none">
+                        <MDXRemote {...mdxSource} components={mdxComponents} />
+                      </div>
+                    </ErrorBoundary>
                   )}
                 </div>
               </div>

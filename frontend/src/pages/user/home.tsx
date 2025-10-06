@@ -26,18 +26,8 @@ import { ScrollContainer } from 'components/primitives/layout/ScrollContainer'
 import { LayoutResponsive } from 'components/ui/layouts/layoutResponsive'
 import { getServerSidePropsWithAuthRequired } from 'lib/auth/getServerSidePropsWithAuth'
 import { GetServerSideProps } from 'next'
-import { NextPageWithLayout } from 'pages/_app'
 
-const Home: NextPageWithLayout = () => {
-  return null // Content is handled in getLayout
-}
-
-// This page requires authentication
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  return getServerSidePropsWithAuthRequired(context)
-}
-
-Home.getLayout = function getLayout() {
+const Home = () => {
   // Desktop center column content
   const desktopCenterContent = (
     <div className="border-base-100 bg-base-100 text-base-content grid h-full w-full grid-rows-[min-content_min-content_auto] gap-1 overflow-auto border-l">
@@ -69,6 +59,11 @@ Home.getLayout = function getLayout() {
       {desktopCenterContent}
     </LayoutResponsive>
   )
+}
+
+// This page requires authentication
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  return getServerSidePropsWithAuthRequired(context)
 }
 
 export default Home

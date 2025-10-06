@@ -47,13 +47,13 @@
     "errors": {
       "callback": "Authentifizierungs-Rückruf fehlgeschlagen. Bitte versuche es erneut.",
       "credentialsMissing": "Benutzername oder Passwort fehlt",
-      "fetchProfileFailed": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
+      "fetchProfileFailed": "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.",
       "general": "Ein Fehler ist bei der Authentifizierung aufgetreten: {error}",
-      "oauthCallback": "Authentifizierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "oauthCallback": "Authentifizierung fehlgeschlagen. Bitte versuche es erneut.",
       "registerUnknown": "Unbekannter Registrierungsfehler",
       "sessionRequired": "Bitte melde dich an, um fortzufahren.",
       "userAlreadyRegistered": "Benutzer bereits registriert",
-      "wrongPasswordOrEmail": "Falsches Passwort oder E-Mail. Versuchen Sie es erneut."
+      "wrongPasswordOrEmail": "Falsches Passwort oder E-Mail. Versuche es erneut."
     },
     "fillDetailsToStart": "Bitte fülle deine Angaben aus, um zu beginnen",
     "getStartedFree": "Starte mit Open-Source Zeiterfassung",
@@ -144,7 +144,7 @@
     "actions": {
       "actions": "Aktionen",
       "add": "Hinzufügen",
-      "back": "Back",
+      "back": "Zurück",
       "cancel": "Abbrechen",
       "close": "Schließen",
       "delete": "Löschen",
@@ -152,7 +152,7 @@
       "help": "Hilfe",
       "invite": "Einladen",
       "keepEditing": "Weiter bearbeiten",
-      "next": "Next",
+      "next": "Weiter",
       "reset": "Zurücksetzen",
       "resetToInitial": "Auf ursprünglichen Wert zurücksetzen",
       "save": "Speichern",
@@ -160,7 +160,7 @@
       "signUp": "Registrieren"
     },
     "back": "Zurück",
-    "confirmUnsavedChanges": "Sie haben ungespeicherte Änderungen. Möchten Sie wirklich abbrechen?",
+    "confirmUnsavedChanges": "Du hast ungespeicherte Änderungen. Möchtest du wirklich abbrechen?",
     "custom": "Benutzerdefiniert",
     "dashboard": "Dashboard",
     "date": "Datum",
@@ -193,7 +193,7 @@
     },
     "help": "Hilfe",
     "info": {
-      "helpFallbackLanguage": "Dieser Hilfeinhalt ist in Ihrer gewählten Sprache noch nicht verfügbar. Es wird die englische Version angezeigt."
+      "helpFallbackLanguage": "Dieser Hilfeinhalt ist in deiner gewählten Sprache noch nicht verfügbar. Es wird die englische Version angezeigt."
     },
     "ok": "Ok",
     "or": "oder",
@@ -292,7 +292,7 @@
       "openMenu": "Statistik-Exportformat-Menü öffnen"
     },
     "status": {
-      "success": "Export successful: {{filename}}"
+      "success": "Export erfolgreich: {{filename}}"
     }
   },
   "favorites": {
@@ -372,86 +372,86 @@
     },
     "booking": {
       "step1": "Buchungsformular verwenden",
-      "step1Desc": "Finden Sie das Buchungsformular in der rechten Spalte und wählen Sie ein Projekt aus.",
+      "step1Desc": "Finde das Buchungsformular in der rechten Spalte und wähle ein Projekt aus.",
       "step2": "Oder Kontextmenü nutzen",
-      "step2Desc": "Rechtsklick auf eine Buchung, einen Favoriten oder eine Teambuchung und wählen Sie das Stoppuhr-Symbol.",
+      "step2Desc": "Rechtsklick auf eine Buchung, einen Favoriten oder eine Teambuchung und wähle das Stoppuhr-Symbol.",
       "step3": "Timer stoppen, wenn fertig",
-      "step3Desc": "Wenn Sie mit der Arbeit fertig sind, stoppen Sie den Timer.",
-      "subtitle": "Sie sind startklar! So erstellen Sie Ihre erste Buchung.",
+      "step3Desc": "Wenn du mit der Arbeit fertig bist, stoppe den Timer.",
+      "subtitle": "Du bist startklar! So erstellst du deine erste Buchung.",
       "title": "Zeiterfassung starten"
     },
     "checklist": {
       "booking": "Zeiterfassung starten",
-      "help": "Klicken Sie auf 'Weiter', um mehr über jeden Schritt zu erfahren",
+      "help": "Klicke auf 'Weiter', um mehr über jeden Schritt zu erfahren",
       "organisation": "Organisation erstellen oder beitreten",
-      "progress": "Ihr Fortschritt",
+      "progress": "Dein Fortschritt",
       "project": "Projekt erstellen oder beitreten",
-      "subtitle": "Folgen Sie diesen einfachen Schritten, um mit der Zeiterfassung zu beginnen",
+      "subtitle": "Folge diesen einfachen Schritten, um mit der Zeiterfassung zu beginnen",
       "title": "Los geht's",
       "workingHours": "Arbeitszeiten für diese Organisation festlegen"
     },
-    "confirmClose": "Möchten Sie das Tutorial wirklich schließen? Sie können es in den App-Einstellungen wieder aktivieren.",
+    "confirmClose": "Möchtest du das Tutorial wirklich schließen? Du kannst es in den App-Einstellungen wieder aktivieren.",
     "navigation": {
       "importantUI": "Wichtige UI-Elemente",
       "mainNavigation": "Hauptnavigation",
-      "organisationDesc": "Verwalten Sie Ihre aktuelle Organisation, erstellen Sie neue Organisationen und sehen Sie organisationsweite Daten ein",
+      "organisationDesc": "Verwalte deine aktuelle Organisation, erstelle neue Organisationen und sieh dir organisationsweite Daten an",
       "orgSwitcher": "Organisationswechsler",
-      "orgSwitcherDesc": "In der oberen rechten Ecke können Sie zwischen Ihren Organisationen wechseln",
-      "settingsDesc": "Konfigurieren Sie App-Einstellungen, Konto, Sicherheit und Arbeitszeiten",
-      "subtitle": "Hier sind die wichtigsten Bereiche von Lasius, die Sie täglich nutzen werden.",
+      "orgSwitcherDesc": "In der oberen rechten Ecke kannst du zwischen deinen Organisationen wechseln",
+      "settingsDesc": "Konfiguriere App-Einstellungen, Konto, Sicherheit und Arbeitszeiten",
+      "subtitle": "Hier sind die wichtigsten Bereiche von Lasius, die du täglich nutzen wirst.",
       "title": "Navigation in Lasius",
-      "userDesc": "Erfassen Sie Ihre Zeit, sehen Sie Ihre Buchungen, Dashboard, Projekte, Statistiken und Listen ein",
+      "userDesc": "Erfasse deine Zeit, sieh dir deine Buchungen, Dashboard, Projekte, Statistiken und Listen an",
       "weeklyCalendar": "Wochenkalender",
-      "weeklyCalendarDesc": "Oben auf der Seite können Sie zwischen den Tagen wechseln, um Ihre Buchungen anzuzeigen"
+      "weeklyCalendarDesc": "Oben auf der Seite kannst du zwischen den Tagen wechseln, um deine Buchungen anzuzeigen"
     },
     "organisation": {
       "action": "Organisationen verwalten",
       "step1": "Eigene Organisation erstellen",
-      "step1Desc": "Gehen Sie zu den Organisationseinstellungen und erstellen Sie eine neue Organisation, um andere einzuladen.",
+      "step1Desc": "Gehe zu den Organisationseinstellungen und erstelle eine neue Organisation, um andere einzuladen.",
       "step2": "Oder bestehender Organisation beitreten",
-      "step2Desc": "Bitten Sie jemanden, Sie einzuladen und warten Sie auf den Einladungslink.",
+      "step2Desc": "Bitte jemanden, dich einzuladen und warte auf den Einladungslink.",
       "subtitle": "Organisationen ermöglichen die Zusammenarbeit mit Teammitgliedern und gemeinsame Zeiterfassung.",
       "title": "Organisation erstellen oder beitreten"
     },
     "overview": {
       "exports": "Exporte & Listen",
-      "exportsDesc": "Finden Sie Ihre Berichte im Listen-Bereich",
-      "help": "Klicken Sie auf 'Weiter', um zu sehen, was Sie einrichten müssen",
+      "exportsDesc": "Finde deine Berichte im Listen-Bereich",
+      "help": "Klicke auf 'Weiter', um zu sehen, was du einrichten musst",
       "organisations": "Organisationen",
-      "organisationsDesc": "Arbeiten Sie mit Ihren Teammitgliedern zusammen",
+      "organisationsDesc": "Arbeite mit deinen Teammitgliedern zusammen",
       "projects": "Projekte",
-      "projectsDesc": "Organisieren Sie Ihre Arbeit in erfassbare Projekte",
-      "subtitle": "Hier sind die grundlegenden Bausteine, die Sie kennen sollten",
+      "projectsDesc": "Organisiere deine Arbeit in erfassbare Projekte",
+      "subtitle": "Hier sind die grundlegenden Bausteine, die du kennen solltest",
       "tags": "Tags & Tag-Gruppen",
-      "tagsDesc": "Kategorisieren Sie Ihre Buchungen für detaillierte Berichte",
+      "tagsDesc": "Kategorisiere deine Buchungen für detaillierte Berichte",
       "title": "Willkommen bei Lasius",
       "workingHours": "Arbeitszeiten",
-      "workingHoursDesc": "Erfassen Sie Ihre geplanten Arbeitsstunden pro Woche"
+      "workingHoursDesc": "Erfasse deine geplanten Arbeitsstunden pro Woche"
     },
     "privateOrganisation": {
-      "explanation": "Ihre private Organisation eignet sich perfekt für persönliche Projekte und alles, was Sie nicht mit anderen teilen müssen. Nur Sie können die Projekte und die hier erfasste Zeit sehen.",
-      "help": "Klicken Sie auf 'Weiter', um fortzufahren",
-      "subtitle": "Sie haben bereits eine private Organisation für den persönlichen Gebrauch.",
+      "explanation": "Deine private Organisation eignet sich perfekt für persönliche Projekte und alles, was du nicht mit anderen teilen musst. Nur du kannst die Projekte und die hier erfasste Zeit sehen.",
+      "help": "Klicke auf 'Weiter', um fortzufahren",
+      "subtitle": "Du hast bereits eine private Organisation für den persönlichen Gebrauch.",
       "tip": "💡 Gut zu wissen",
-      "tipDesc": "Wenn Sie mit Teammitgliedern arbeiten möchten, können Sie zusätzliche Organisationen erstellen oder beitreten.",
-      "title": "Ihre private Organisation"
+      "tipDesc": "Wenn du mit Teammitgliedern arbeiten möchtest, kannst du zusätzliche Organisationen erstellen oder beitreten.",
+      "title": "Deine private Organisation"
     },
     "projects": {
       "action": "Zu Meine Projekte gehen",
       "step1": "Eigenes Projekt erstellen",
-      "step1Desc": "Gehen Sie zu Meine Projekte und erstellen Sie ein neues Projekt.",
+      "step1Desc": "Gehe zu Meine Projekte und erstelle ein neues Projekt.",
       "step2": "Oder bestehendem Projekt beitreten",
-      "step2Desc": "Bitten Sie einen Administrator, Sie zu seinem Projekt hinzuzufügen.",
-      "subtitle": "Projekte helfen Ihnen, Ihre Zeit zu organisieren. Sie benötigen mindestens eines, um loszulegen.",
+      "step2Desc": "Bitte einen Administrator, dich zu seinem Projekt hinzuzufügen.",
+      "subtitle": "Projekte helfen dir, deine Zeit zu organisieren. Du benötigst mindestens eines, um loszulegen.",
       "title": "Projekt erstellen oder beitreten"
     },
     "workingHours": {
       "action": "Arbeitszeiten festlegen",
       "step1": "Zu Arbeitszeiten gehen",
-      "step1Desc": "Klicken Sie auf die Schaltfläche unten, um Ihre Arbeitszeiten festzulegen.",
+      "step1Desc": "Klicke auf die Schaltfläche unten, um deine Arbeitszeiten festzulegen.",
       "step2": "Wöchentliche Stunden eingeben",
-      "step2Desc": "Legen Sie fest, wie viele Stunden Sie pro Tag arbeiten. Lasius zeigt Ihnen Ihren Fortschritt an.",
-      "subtitle": "Teilen Sie Lasius mit, wie viele Stunden pro Woche Sie arbeiten möchten.",
+      "step2Desc": "Lege fest, wie viele Stunden du pro Tag arbeitest. Lasius zeigt dir deinen Fortschritt an.",
+      "subtitle": "Teile Lasius mit, wie viele Stunden pro Woche du arbeiten möchtest.",
       "title": "Arbeitszeiten festlegen"
     }
   },
@@ -547,7 +547,7 @@
       "language": "Sprache der Benutzeroberfläche",
       "menuTitle": "App-Einstellungen",
       "save": "Einstellungen speichern",
-      "showOnboarding": "Show Onboarding Tutorial",
+      "showOnboarding": "Einführungstutorial anzeigen",
       "theme": "Design",
       "title": "Anwendungseinstellungen"
     }
@@ -587,7 +587,7 @@
       "pasteTags": "Tags einfügen"
     },
     "chooseOrEnter": "Tags auswählen oder eingeben",
-    "confirmDeleteGroup": "Möchten Sie die Tag-Gruppe \"{{groupName}}\" wirklich löschen?",
+    "confirmDeleteGroup": "Möchtest du die Tag-Gruppe \"{{groupName}}\" wirklich löschen?",
     "customTag": "Benutzerdefinierter Tag",
     "enterTagName": "Tag-Name eingeben",
     "enterToAdd": "Gib einen Tag ein, um ihn hinzuzufügen",
@@ -640,10 +640,10 @@
     "healthyLoad": "Sieht gut aus!",
     "highLoad": "Hohe Belastung erkannt",
     "plannedHours": "geplant",
-    "relaxReminder": "Zeit, sich etwas zu entspannen",
+    "relaxReminder": "Zeit, dich etwas zu entspannen",
     "sixMonths": "6 Monate",
     "sixMonthTrend": "6-Monats-Arbeitstrend",
-    "takeItEasy": "Überlegen Sie, es ruhiger angehen zu lassen",
+    "takeItEasy": "Überlege, es ruhiger angehen zu lassen",
     "thisWeek": "diese Woche"
   },
   "workingHours": {

@@ -18,6 +18,7 @@
  */
 
 import { StatsTile } from 'components/ui/charts/statsTile'
+import { EmptyStateStats } from 'components/ui/data-display/fetchState/emptyStateStats'
 import { Loading } from 'components/ui/data-display/fetchState/loading'
 import { apiDatespanFromTo } from 'lib/api/apiDateHandling'
 import { shouldUseBarChart } from 'lib/api/config/granularityConfig'
@@ -75,7 +76,11 @@ export const StatsProjectStream: React.FC = () => {
   }
 
   if (!data) {
-    return null
+    return (
+      <StatsTile className="h-[320px]">
+        <EmptyStateStats />
+      </StatsTile>
+    )
   }
 
   // Use bar chart for short time periods (<=2 days)
