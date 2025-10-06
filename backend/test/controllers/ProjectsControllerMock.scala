@@ -34,6 +34,7 @@ import play.api.mvc.ControllerComponents
 import play.api.test.Helpers
 import play.modules.reactivemongo.ReactiveMongoApi
 import repositories.{
+  BookingHistoryMongoRepository,
   InvitationMongoRepository,
   ProjectMongoRepository,
   UserMongoRepository,
@@ -50,6 +51,7 @@ class ProjectsControllerMock(
     val projectRepository: ProjectMongoRepository,
     userMongoRepository: UserMongoRepository,
     val invitationRepository: InvitationMongoRepository,
+    bookingHistoryMongoRepository: BookingHistoryMongoRepository,
     authConfig: AuthConfig,
     reactiveMongoApi: ReactiveMongoApi,
     override val organisationRole: OrganisationRole,
@@ -59,11 +61,12 @@ class ProjectsControllerMock(
       conf = conf,
       controllerComponents = controllerComponents,
       systemServices = systemServices,
+      authConfig = authConfig,
+      reactiveMongoApi = reactiveMongoApi,
       projectRepository = projectRepository,
       userRepository = userMongoRepository,
       invitationRepository = invitationRepository,
-      authConfig = authConfig,
-      reactiveMongoApi = reactiveMongoApi
+      bookingHistoryRepository = bookingHistoryMongoRepository
     )
     with SecurityControllerMock
     with TestDBSupport {
@@ -84,9 +87,10 @@ object ProjectsControllerMock
             projectRole: ProjectRole = ProjectAdministrator,
             projectActive: Boolean = true)(implicit
       ec: ExecutionContext): ProjectsControllerMock = {
-    val userMongoRepository       = new UserMongoRepository()
-    val projectMongoRepository    = new ProjectMongoRepository()
-    val invitationMongoRepository = new InvitationMongoRepository()
+    val userMongoRepository           = new UserMongoRepository()
+    val projectMongoRepository        = new ProjectMongoRepository()
+    val invitationMongoRepository     = new InvitationMongoRepository()
+    val bookingHistoryMongoRepository = new BookingHistoryMongoRepository()
 
     val controller = new ProjectsControllerMock(
       conf = conf,
@@ -95,6 +99,7 @@ object ProjectsControllerMock
       projectRepository = projectMongoRepository,
       userMongoRepository = userMongoRepository,
       invitationRepository = invitationMongoRepository,
+      bookingHistoryMongoRepository = bookingHistoryMongoRepository,
       authConfig = authConfig,
       reactiveMongoApi = reactiveMongoApi,
       organisationRole = organisationRole,

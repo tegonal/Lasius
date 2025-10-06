@@ -17,29 +17,17 @@
  *
  */
 
-import { formatDateTimeToURLParam } from 'lib/api/apiDateHandling'
-import { useGetProjectBookingList } from 'lib/api/lasius/project-bookings/project-bookings'
-import { useMemo } from 'react'
+import { useGetProjectLastActivityDate } from 'lib/api/lasius/projects/projects'
 
 /**
- * Hook to fetch the most recent booking for a project
- * Uses a 10-year lookback window with limit=1 for efficiency
+ * Hook to fetch the last activity date for a project
+ * Uses the dedicated /last-activity endpoint
+ * @param enabled - Whether to enable the query (default: true)
  */
-export const useProjectLastActivity = (orgId: string, projectId: string) => {
-  const params = useMemo(() => {
-    const tenYearsAgo = new Date()
-    tenYearsAgo.setFullYear(tenYearsAgo.getFullYear() - 10)
-
-    return {
-      from: formatDateTimeToURLParam(tenYearsAgo),
-      to: formatDateTimeToURLParam(new Date()),
-      limit: 1,
-      skip: 0,
-    }
-  }, [])
-
-  const { data, error, isLoading } = useGetProjectBookingList(orgId, projectId, params, {
+export const useProjectLastActivity = (orgId: string, projectId: string, enabled = true) => {
+  const { data, error, isLoading } = useGetProjectLastActivityDate(orgId, projectId, {
     swr: {
+      enabled,
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
       dedupingInterval: 300000, // Cache for 5 minutes
@@ -47,7 +35,7 @@ export const useProjectLastActivity = (orgId: string, projectId: string) => {
   })
 
   return {
-    lastActivityDate: data?.[0]?.start,
+    lastActivityDate: data,
     isLoading,
     error,
   }

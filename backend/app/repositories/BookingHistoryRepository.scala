@@ -62,6 +62,9 @@ trait BookingHistoryRepository
                             skip: Option[Int])(implicit
       dbSession: DBSession): Future[Iterable[BookingV2]]
 
+  def findLastActivityDateByProjects(projectIds: Seq[ProjectId])(implicit
+      dbSession: DBSession): Future[Map[ProjectId, LocalDateTime]]
+
   def updateBooking(newBooking: BookingV2)(implicit
       format: Format[BookingV2],
       dbSession: DBSession): Future[Boolean]
@@ -101,6 +104,53 @@ class BookingHistoryMongoRepository @Inject() ()(
                                      skip: Option[Int])(implicit
       dbSession: DBSession): Future[Iterable[BookingV2]] =
     findByRange(None, None, Some(projectId), from, to, limit, skip)
+
+  override def findLastActivityDateByProjects(projectIds: Seq[ProjectId])(
+      implicit dbSession: DBSession): Future[Map[ProjectId, LocalDateTime]] = {
+    if (projectIds.isEmpty) {
+      Future.successful(Map.empty)
+    } else {
+      val collection = coll
+      import collection.AggregationFramework._
+      import reactivemongo.api.bson._
+
+      val pipeline = List(
+        Match(
+          BSONDocument(
+            "projectReference.id" -> BSONDocument(
+              "$in" -> projectIds.map(_.value.toString)),
+            "end" -> BSONDocument("$ne" -> BSONNull)
+          )),
+        Sort(Descending("start.dateTime")),
+        Group(BSONString("$projectReference.id"))(
+          "lastActivityDate" -> First(BSONString("$start.dateTime")),
+          "projectId"        -> First(BSONString("$projectReference.id"))
+        )
+      )
+
+      logger.debug(
+        s"findLastActivityDateByProjects for ${projectIds.size} projects")
+
+      collection
+        .aggregateWith[BSONDocument]()(_ => pipeline)
+        .collect[List]()
+        .map { results =>
+          results.flatMap { doc =>
+            for {
+              projectIdValue  <- doc.getAsOpt[String]("projectId")
+              lastActivityStr <- doc.getAsOpt[String]("lastActivityDate")
+              projectId = ProjectId(java.util.UUID.fromString(projectIdValue))
+              lastActivity = LocalDateTime.parse(lastActivityStr)
+            } yield projectId -> lastActivity
+          }.toMap
+        }
+        .recover { case ex =>
+          logger.error(s"Error finding last activity dates: ${ex.getMessage}",
+                       ex)
+          Map.empty[ProjectId, LocalDateTime]
+        }
+    }
+  }
 
   private def findByRange(userReference: Option[UserReference],
                           orgId: Option[OrganisationId],

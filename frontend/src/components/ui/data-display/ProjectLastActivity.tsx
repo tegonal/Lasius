@@ -20,33 +20,42 @@
 import { Text } from 'components/primitives/typography/Text'
 import { format } from 'date-fns'
 import { useProjectLastActivity } from 'lib/api/hooks/useProjectLastActivity'
-import { useTranslation } from 'next-i18next'
 import React from 'react'
 
 type Props = {
   orgId: string
   projectId: string
+  lastActivityDate?: string | null
 }
 
 /**
- * Async component that fetches and displays the last activity date for a project
- * Loads independently to avoid blocking the list rendering
+ * Displays the last activity date for a project
+ * If lastActivityDate is provided (even if null), displays it directly
+ * Otherwise fetches the data asynchronously
  */
-export const ProjectLastActivity: React.FC<Props> = ({ orgId, projectId }) => {
-  const { t } = useTranslation('common')
-  const { lastActivityDate, isLoading, error } = useProjectLastActivity(orgId, projectId)
+export const ProjectLastActivity: React.FC<Props> = ({ orgId, projectId, lastActivityDate }) => {
+  // Only fetch if lastActivityDate was not provided at all (undefined)
+  const shouldFetch = lastActivityDate === undefined
+  const {
+    lastActivityDate: fetchedDate,
+    isLoading,
+    error,
+  } = useProjectLastActivity(orgId, projectId, shouldFetch)
 
-  if (isLoading) {
+  // Use provided date or fetched date
+  const displayDate = lastActivityDate !== undefined ? lastActivityDate : fetchedDate
+
+  if (shouldFetch && isLoading) {
     return <div className="skeleton h-4 w-20" />
   }
 
-  if (error) {
-    return <Text variant="small">-</Text>
+  if (shouldFetch && error) {
+    return <Text variant="small">—</Text>
   }
 
-  if (!lastActivityDate) {
-    return <Text variant="small">{t('projects.noActivity', { defaultValue: 'No activity' })}</Text>
+  if (!displayDate) {
+    return <Text variant="small">—</Text>
   }
 
-  return <Text variant="small">{format(new Date(lastActivityDate.dateTime), 'dd.MM.yyyy')}</Text>
+  return <Text variant="small">{format(new Date(displayDate), 'dd.MM.yyyy')}</Text>
 }

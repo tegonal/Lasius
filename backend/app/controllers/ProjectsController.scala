@@ -24,11 +24,17 @@ package controllers
 import com.typesafe.config.Config
 import core.SystemServices
 import models._
+import models.BaseFormat.localDateTimeFormat
 import org.joda.time.DateTime
 import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
 import play.modules.reactivemongo.ReactiveMongoApi
-import repositories.{InvitationRepository, ProjectRepository, UserRepository}
+import repositories.{
+  BookingHistoryRepository,
+  InvitationRepository,
+  ProjectRepository,
+  UserRepository
+}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -41,7 +47,9 @@ class ProjectsController @Inject() (
     override val reactiveMongoApi: ReactiveMongoApi,
     projectRepository: ProjectRepository,
     userRepository: UserRepository,
-    invitationRepository: InvitationRepository)(implicit ec: ExecutionContext)
+    invitationRepository: InvitationRepository,
+    bookingHistoryRepository: BookingHistoryRepository)(implicit
+    ec: ExecutionContext)
     extends BaseLasiusController() {
   def getProjects(orgId: OrganisationId): Action[Unit] =
     HasUserRole(FreeUser, parse.empty, withinTransaction = false) {
@@ -49,7 +57,7 @@ class ProjectsController @Inject() (
         HasOrganisationRole(user, orgId, OrganisationAdministrator) { userOrg =>
           projectRepository
             .findByOrganisation(userOrg.organisationReference)
-            .map(p => Ok(Json.toJson(p)))
+            .map(projects => Ok(Json.toJson(projects)))
         }
     }
 
@@ -129,6 +137,32 @@ class ProjectsController @Inject() (
               _ <- projectRepository.deactivate(userOrg.organisationReference,
                                                 projectId)
             } yield Ok("")
+        }
+    }
+
+  def getLastActivityDate(orgId: OrganisationId,
+                          projectId: ProjectId): Action[Unit] =
+    HasUserRole(FreeUser, parse.empty, withinTransaction = false) {
+      implicit dbSession => implicit subject => user => implicit request =>
+        isOrgAdminOrHasProjectRoleInOrganisation(user,
+                                                 orgId,
+                                                 projectId,
+                                                 ProjectMember) { _ =>
+          logger.debug(s"Getting last activity for project ${projectId.value}")
+          bookingHistoryRepository
+            .findLastActivityDateByProjects(Seq(projectId))
+            .map { dates =>
+              logger.debug(s"Found dates: $dates")
+              dates.get(projectId) match {
+                case Some(date) =>
+                  logger.debug(s"Returning date: $date")
+                  Ok(Json.toJson(date))
+                case None =>
+                  logger.debug(
+                    s"No activity found for project ${projectId.value}")
+                  NoContent
+              }
+            }
         }
     }
 

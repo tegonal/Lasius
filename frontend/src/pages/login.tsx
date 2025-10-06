@@ -34,6 +34,7 @@ import { getServerSidePropsWithoutAuth } from 'lib/auth/getServerSidePropsWithou
 import { logger } from 'lib/logger'
 import { LasiusPlausibleEvents } from 'lib/telemetry/plausibleEvents'
 import { usePlausible } from 'lib/telemetry/usePlausible'
+import { removeAccessibleCookies } from 'lib/utils/auth/removeAccessibleCookies'
 import { formatISOLocale } from 'lib/utils/date/dates'
 import { getValidRouteOrFallback } from 'lib/utils/routing/validateRoute'
 import { AlertTriangle } from 'lucide-react'
@@ -184,6 +185,11 @@ const Login: NextPage<{
       callbackUrl,
     ],
   )
+
+  // Clear all cookies except locale when landing on login page
+  useEffect(() => {
+    void removeAccessibleCookies()
+  }, [])
 
   useEffect(() => {
     if (providers.length === 1 && !error) {

@@ -346,6 +346,7 @@ export const nextAuthOptions: () => NextAuthOptions = () => {
         // Initial sign in
         if (account) {
           // First-time login, save the `access_token`, its expiry and the `refresh_token`
+          // Clear any previous error state from a failed session
           return {
             ...token,
             access_token: account.access_token,
@@ -357,6 +358,7 @@ export const nextAuthOptions: () => NextAuthOptions = () => {
               access_token: account.access_token,
             },
             provider: account.provider,
+            error: undefined, // Clear any previous error
           }
         } else if (!token.expires_at || Date.now() < token.expires_at * 1000) {
           // Subsequent logins, but the `access_token` is still valid
@@ -418,6 +420,14 @@ export const nextAuthOptions: () => NextAuthOptions = () => {
           logger.info('[nextauth][events][signIn]')
         }
       },
+    },
+    redirect: async ({ url, baseUrl }: { url: string; baseUrl: string }) => {
+      // Ensure session timeouts always redirect to /login, not directly to OAuth provider
+      if (url.startsWith(baseUrl)) {
+        return url
+      }
+      // If redirecting to external OAuth provider after session timeout, redirect to login instead
+      return `${baseUrl}/login`
     },
   }
 }
