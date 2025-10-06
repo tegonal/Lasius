@@ -64,7 +64,7 @@ export const StatsCircleCategoryRange: React.FC<Props> = ({ source }) => {
     )
   }
 
-  if (!chartData) {
+  if (!chartData?.data || chartData.data.length === 0) {
     return (
       <StatsTile className="h-[340px]">
         <EmptyStateStats />

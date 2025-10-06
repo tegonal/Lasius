@@ -19,7 +19,7 @@
 
 import { m } from 'framer-motion'
 import { cn } from 'lib/utils/cn'
-import React, { memo } from 'react'
+import React, { memo, useEffect, useState } from 'react'
 
 type Props = {
   layoutId: string
@@ -27,6 +27,13 @@ type Props = {
 }
 
 export const SelectedTabIcon: React.FC<Props> = memo(({ layoutId, radiusOn }) => {
+  const [isInitialRender, setIsInitialRender] = useState(true)
+
+  useEffect(() => {
+    // Allow animations after first render
+    setIsInitialRender(false)
+  }, [])
+
   const radiusClasses = {
     top: 'rounded-t-md',
     right: 'rounded-r-md',
@@ -43,7 +50,7 @@ export const SelectedTabIcon: React.FC<Props> = memo(({ layoutId, radiusOn }) =>
       )}
       layoutId={layoutId}
       initial={false}
-      transition={{ duration: 0.2 }}
+      transition={isInitialRender ? { duration: 0 } : { duration: 0.2 }}
     />
   )
 })

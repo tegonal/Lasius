@@ -85,9 +85,14 @@ export const useProfile = () => {
 
   const acceptTOS = async (currentTOSVersion: string) => {
     if (data) {
-      const acceptTOSRequest: ModelsAcceptTOSRequest = { version: currentTOSVersion }
-      const profile = await acceptUserTOS(acceptTOSRequest)
-      await mutate(profile)
+      try {
+        const acceptTOSRequest: ModelsAcceptTOSRequest = { version: currentTOSVersion }
+        const profile = await acceptUserTOS(acceptTOSRequest)
+        await mutate(profile)
+      } catch (error) {
+        console.error('Failed to accept TOS:', error)
+        throw error
+      }
     }
   }
 

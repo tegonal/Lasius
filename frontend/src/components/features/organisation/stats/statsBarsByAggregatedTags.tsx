@@ -57,7 +57,7 @@ export const StatsBarsByAggregatedTags: React.FC = () => {
     )
   }
 
-  if (!chartData) {
+  if (!chartData?.data || chartData.data.length === 0) {
     return (
       <StatsTile className="h-[300px]">
         <EmptyStateStats />

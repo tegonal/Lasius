@@ -18,7 +18,9 @@
  */
 
 import { ModelsUser, ModelsUserOrganisation, ModelsUserSettings } from 'lib/api/lasius'
+import { updateUserSettings } from 'lib/api/lasius/user/user'
 import { ROLES } from 'projectConfig/constants'
+import { mutate } from 'swr'
 import { create } from 'zustand'
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
@@ -108,9 +110,26 @@ export const useOrganisationStore = create<OrganisationStore>()(
                   const myPrivateOrg = profile.organisations.find(
                     (item) => item.private,
                   )?.organisationReference
-                  if (myPrivateOrg) {
+                  if (myPrivateOrg && state.userSettings) {
                     state.previousOrganisationId = state.selectedOrganisationId
                     state.selectedOrganisationId = myPrivateOrg.id
+
+                    // Update backend settings to persist the auto-selected organisation
+                    const updatedSettings: ModelsUserSettings = {
+                      ...state.userSettings,
+                      lastSelectedOrganisation: myPrivateOrg,
+                    }
+                    state.userSettings = updatedSettings
+
+                    // Persist to backend asynchronously and update SWR cache
+                    updateUserSettings(updatedSettings)
+                      .then((updatedProfile) => {
+                        // Update SWR cache with the new profile
+                        mutate('/user/profile', updatedProfile, false)
+                      })
+                      .catch((error) => {
+                        console.error('Failed to persist auto-selected organisation:', error)
+                      })
                   }
                 }
               }

@@ -34,6 +34,8 @@ export const SlidingIndicator: React.FC<Props> = ({
   radiusOn = 'all',
 }) => {
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, top: 0, width: 0, height: 0 })
+  const [isMounted, setIsMounted] = useState(false)
+  const [isPositioned, setIsPositioned] = useState(false)
 
   const radiusClasses = {
     top: 'rounded-t-md',
@@ -56,16 +58,27 @@ export const SlidingIndicator: React.FC<Props> = ({
             width: rect.width,
             height: rect.height,
           })
+          // Mark as positioned and mounted after a short delay to ensure rendering is complete
+          if (!isPositioned) {
+            setIsPositioned(true)
+            requestAnimationFrame(() => {
+              setIsMounted(true)
+            })
+          }
         }
       })
     }
-  }, [selectedIndex, itemRefs])
+  }, [selectedIndex, itemRefs, isPositioned])
+
+  // Don't render until positioned
+  if (!isPositioned) return null
 
   return (
     <div className="pointer-events-none absolute inset-0">
       <div
         className={cn(
           'bg-red-gradient absolute transition-all duration-200 ease-out',
+          isMounted ? 'opacity-100' : 'opacity-0',
           radiusClasses[radiusOn],
           className,
         )}
@@ -74,7 +87,7 @@ export const SlidingIndicator: React.FC<Props> = ({
           top: `${indicatorStyle.top}px`,
           width: `${indicatorStyle.width}px`,
           height: `${indicatorStyle.height}px`,
-          willChange: 'left, top, width, height',
+          willChange: 'left, top, width, height, opacity',
         }}
       />
     </div>
