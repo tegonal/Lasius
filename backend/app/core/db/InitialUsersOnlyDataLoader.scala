@@ -21,7 +21,7 @@
 
 package core.db
 
-import core.{DBSession, DBSupport}
+import core.{DBSession, DBSupport, SystemServices}
 import models.UserId.UserReference
 import models._
 import org.mindrot.jbcrypt.BCrypt
@@ -41,8 +41,8 @@ class InitialUsersOnlyDataLoader @Inject() (
     override val reactiveMongoApi: ReactiveMongoApi,
     oauthUserRepository: OAuthUserRepository,
     userRepository: UserRepository,
-    organisationRepository: OrganisationRepository)(implicit
-    executionContext: ExecutionContext)
+    organisationRepository: OrganisationRepository,
+    systemServices: SystemServices)(implicit executionContext: ExecutionContext)
     extends Logging
     with DBSupport
     with InitialDataLoader {
@@ -66,131 +66,73 @@ class InitialUsersOnlyDataLoader @Inject() (
 
   override def initializeData(supportTransaction: Boolean)(implicit
       userReference: UserReference): Future[Unit] = {
-    logger.debug("Initialize users only (no projects/bookings)...")
+    logger.debug(
+      "Initialize users only (with private organizations, no projects/bookings)...")
     withDBSession(withTransaction = supportTransaction) { implicit dbSession =>
       for {
-        (user1org, user2org, publicOrg) <- initializeOrganisations()
-        _                               <- initializeUsers(user1org, user2org, publicOrg)
+        _ <- initializeUser1()(userReference, dbSession)
+        _ <- initializeUser2()(userReference, dbSession)
       } yield ()
     }
   }
 
-  private def initializeOrganisations()(implicit
-      dbSession: DBSession,
-      userReference: UserReference)
-      : Future[(Organisation, Organisation, Organisation)] = {
-
-    val user1org =
-      Organisation(OrganisationId(),
-                   user1Key,
-                   `private` = true,
-                   active = true,
-                   userReference,
-                   None)
-
-    val user2org =
-      Organisation(OrganisationId(),
-                   user2Key,
-                   `private` = true,
-                   active = true,
-                   userReference,
-                   None)
-
-    val publicOrg =
-      Organisation(OrganisationId(),
-                   "DemoOrg",
-                   `private` = false,
-                   active = true,
-                   userReference,
-                   None)
-
-    organisationRepository
-      .bulkInsert(List(user1org, user2org, publicOrg))
-      .map(_ => (user1org, user2org, publicOrg))
+  private def initializeUser1()(implicit
+      userReference: UserReference,
+      dbSession: DBSession): Future[Unit] = {
+    for {
+      // Create OAuth user
+      oauthUser <- oauthUserRepository.upsert(
+        OAuthUser(
+          id = OAuthUserId(),
+          email = user1Email,
+          password = user1PasswordHash,
+          firstName = Some("Demo"),
+          lastName = Some("User 1"),
+          active = true
+        ))
+      // Create private organisation for user
+      org <- organisationRepository.create(user1Key, `private` = true)(
+        systemServices.systemSubject,
+        dbSession)
+      // Create user with UserInfo similar to OAuth flow
+      userInfo = UserInfo(key = user1Key,
+                          firstName = Some("Demo"),
+                          lastName = Some("User 1"),
+                          email = user1Email)
+      user <- userRepository.createInitialUserBasedOnProfile(
+        userInfo,
+        org,
+        OrganisationAdministrator)
+    } yield ()
   }
 
-  private def initializeUsers(user1Org: Organisation,
-                              user2Org: Organisation,
-                              publicOrg: Organisation)(implicit
+  private def initializeUser2()(implicit
+      userReference: UserReference,
       dbSession: DBSession): Future[Unit] = {
-
-    val oauthUser1 = OAuthUser(
-      id = OAuthUserId(),
-      email = user1Email,
-      password = user1PasswordHash,
-      firstName = Some("Demo"),
-      lastName = Some("User 1"),
-      active = true,
-    )
-
-    val user1 = User(
-      id = UserId(),
-      key = user1Key,
-      email = user1Email,
-      firstName = "Demo",
-      lastName = "User 1",
-      active = true,
-      role = FreeUser,
-      organisations = Seq(
-        UserOrganisation(
-          user1Org.getReference,
-          `private` = user1Org.`private`,
-          OrganisationAdministrator,
-          WorkingHours(),
-          Seq()
-        ),
-        UserOrganisation(
-          publicOrg.getReference,
-          publicOrg.`private`,
-          OrganisationAdministrator,
-          WorkingHours(monday = 8, tuesday = 4, wednesday = 2),
-          Seq() // No projects pre-assigned
-        )
-      ),
-      settings = Some(
-        UserSettings(lastSelectedOrganisation = Some(publicOrg.getReference))),
-      acceptedTOS = None
-    )
-
-    val oauthUser2 = OAuthUser(
-      id = OAuthUserId(),
-      email = user2Email,
-      password = user2PasswordHash,
-      firstName = Some("Demo"),
-      lastName = Some("User 2"),
-      active = true,
-    )
-
-    val user2 = User(
-      id = UserId(),
-      key = user2Key,
-      email = user2Email,
-      firstName = "Demo",
-      lastName = "User 2",
-      active = true,
-      role = FreeUser,
-      organisations = Seq(
-        UserOrganisation(
-          user2Org.getReference,
-          `private` = user2Org.`private`,
-          OrganisationAdministrator,
-          WorkingHours(),
-          Seq()
-        ),
-        UserOrganisation(
-          publicOrg.getReference,
-          `private` = publicOrg.`private`,
-          OrganisationAdministrator,
-          WorkingHours(monday = 8, tuesday = 4, wednesday = 2),
-          Seq() // No projects pre-assigned
-        )
-      ),
-      settings = Some(
-        UserSettings(lastSelectedOrganisation = Some(publicOrg.getReference))),
-      acceptedTOS = None
-    )
-
-    oauthUserRepository.bulkInsert(List(oauthUser1, oauthUser2))
-    userRepository.bulkInsert(List(user1, user2)).map(_ => ())
+    for {
+      // Create OAuth user
+      oauthUser <- oauthUserRepository.upsert(
+        OAuthUser(
+          id = OAuthUserId(),
+          email = user2Email,
+          password = user2PasswordHash,
+          firstName = Some("Demo"),
+          lastName = Some("User 2"),
+          active = true
+        ))
+      // Create private organisation for user
+      org <- organisationRepository.create(user2Key, `private` = true)(
+        systemServices.systemSubject,
+        dbSession)
+      // Create user with UserInfo similar to OAuth flow
+      userInfo = UserInfo(key = user2Key,
+                          firstName = Some("Demo"),
+                          lastName = Some("User 2"),
+                          email = user2Email)
+      user <- userRepository.createInitialUserBasedOnProfile(
+        userInfo,
+        org,
+        OrganisationAdministrator)
+    } yield ()
   }
 }
