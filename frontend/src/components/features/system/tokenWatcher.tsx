@@ -18,20 +18,24 @@
  */
 
 import { useSignOut } from 'components/features/system/hooks/useSignOut'
+import { SessionTimeoutModal } from 'components/features/system/SessionTimeoutModal'
 import { logger } from 'lib/logger'
 import { useSession } from 'next-auth/react'
-import { useEffect, useRef } from 'react'
+import { useRouter } from 'next/router'
+import { useEffect, useRef, useState } from 'react'
 import { TokenState, useTokenStore } from 'stores/tokenStore'
 
 export const TokenWatcher: React.FC = () => {
   const { data: session, update, status } = useSession()
   const { signOut } = useSignOut()
+  const router = useRouter()
   const setTokenState = useTokenStore((state) => state.setTokenState)
   const setTokenTimeRemaining = useTokenStore((state) => state.setTokenTimeRemaining)
   const setExpiresAt = useTokenStore((state) => state.setExpiresAt)
   const hasTriggeredLogoutRef = useRef(false)
   const previousTokenStateRef = useRef<TokenState>('no_session')
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
+  const [showSessionTimeoutModal, setShowSessionTimeoutModal] = useState(false)
 
   useEffect(() => {
     // Clear any existing interval
@@ -64,14 +68,19 @@ export const TokenWatcher: React.FC = () => {
           setTokenState('no_session')
           setTokenTimeRemaining('N/A')
           setExpiresAt(null)
-
-          // Only trigger logout if we previously had a valid token (token was revoked/expired)
-          if (!hasTriggeredLogoutRef.current && previousTokenStateRef.current === 'valid') {
-            hasTriggeredLogoutRef.current = true
-            logger.warn('[TokenWatcher] Token became invalid, triggering logout')
-            await signOut()
-          }
           previousTokenStateRef.current = 'no_session'
+        }
+        return
+      }
+
+      // Check if session has a refresh error - this means authentication failed
+      if (session?.error === 'RefreshAccessTokenError') {
+        if (previousTokenStateRef.current !== 'expired') {
+          setTokenState('expired')
+          setTokenTimeRemaining('Authentication failed')
+          previousTokenStateRef.current = 'expired'
+          logger.warn('[TokenWatcher] Refresh token error detected, showing session timeout modal')
+          setShowSessionTimeoutModal(true)
         }
         return
       }
@@ -126,5 +135,11 @@ export const TokenWatcher: React.FC = () => {
     }
   }, [session, status, update, setTokenState, setTokenTimeRemaining, setExpiresAt, signOut])
 
-  return null
+  const handleLoginAgain = async () => {
+    setShowSessionTimeoutModal(false)
+    await signOut()
+    await router.push('/login')
+  }
+
+  return <SessionTimeoutModal open={showSessionTimeoutModal} onLoginAgain={handleLoginAgain} />
 }

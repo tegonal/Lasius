@@ -20,8 +20,7 @@
 import axios from 'axios'
 import { getCsrfToken } from 'lib/api/lasius/general/general'
 import { logger } from 'lib/logger'
-import { removeAccessibleCookies } from 'lib/utils/auth/removeAccessibleCookies'
-import { signOut, useSession } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import React, { useEffect } from 'react'
 
 type HttpHeaderProviderProps = {
@@ -63,11 +62,8 @@ export const HttpHeaderProvider: React.FC<HttpHeaderProviderProps> = () => {
     if (tokenIssuer) {
       axios.defaults.headers.common['X-Token-Issuer'] = tokenIssuer
     }
-    if (session?.error && session?.access_token) {
-      logger.error('[HttpHeaderProvider][UpdateSessionFailed]', session.error)
-      void removeAccessibleCookies()
-      void signOut()
-    }
+    // Note: Session error handling (e.g., RefreshAccessTokenError) is now handled
+    // exclusively by TokenWatcher, which shows a user-friendly modal before logout
   }, [session?.access_token, session?.access_token_issuer, session?.error, session?.expires_at])
 
   return null
