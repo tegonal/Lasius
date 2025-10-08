@@ -21,23 +21,17 @@
 
 package domain.views
 
-import org.apache.pekko.NotUsed
-import org.apache.pekko.actor.SupervisorStrategy.Restart
-import org.apache.pekko.actor.{Actor, ActorLogging, OneForOneStrategy}
-import pekko.contrib.persistence.mongodb.{
-  MongoReadJournal,
-  ScalaDslMongoReadJournal
-}
-import org.apache.pekko.persistence.query.scaladsl.{
-  CurrentEventsByPersistenceIdQuery,
-  ReadJournal
-}
-import org.apache.pekko.persistence.query.{EventEnvelope, PersistenceQuery}
-import org.apache.pekko.stream.Materializer
-import org.apache.pekko.stream.scaladsl.Source
 import domain.AggregateRoot.{InitializeViewLive, RestoreViewFromState}
 import domain.UserTimeBookingAggregate.UserTimeBooking
 import models.PersistedEvent
+import org.apache.pekko.NotUsed
+import org.apache.pekko.actor.SupervisorStrategy.Restart
+import org.apache.pekko.actor.{Actor, ActorLogging, OneForOneStrategy}
+import org.apache.pekko.persistence.query.scaladsl.{CurrentEventsByPersistenceIdQuery, ReadJournal}
+import org.apache.pekko.persistence.query.{EventEnvelope, PersistenceQuery}
+import org.apache.pekko.stream.Materializer
+import org.apache.pekko.stream.scaladsl.Source
+import pekko.contrib.persistence.mongodb.MongoReadJournal
 
 import scala.concurrent.duration.DurationInt
 import scala.language.postfixOps
