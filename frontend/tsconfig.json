@@ -1,7 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "outDir": "/dev/shm",
+    "outDir": ".next",
     "target": "esnext",
     "module": "esnext",
     "allowJs": true,

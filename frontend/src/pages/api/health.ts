@@ -17,16 +17,16 @@
  *
  */
 
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextApiRequest, NextApiResponse } from 'next'
 
 export type NextApiHealthResponse = {
-  status: string;
-};
+  status: string
+}
 
 const handler = (_req: NextApiRequest, res: NextApiResponse): void => {
   res.status(200).json({
     status: 'OK',
-  });
-};
+  })
+}
 
-export default handler;
+export default handler

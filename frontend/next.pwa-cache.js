@@ -141,7 +141,7 @@ module.exports = [
   // },
   {
     urlPattern: ({ url }) => {
-      // eslint-disable-next-line no-restricted-globals
+       
       const isSameOrigin = self.origin === url.origin;
       if (!isSameOrigin) return false;
       const { pathname } = url;

@@ -17,13 +17,13 @@
  *
  */
 
-import getConfig from 'next/config';
+import getConfig from 'next/config'
 
-export const IS_BROWSER: boolean = typeof window !== 'undefined';
-export const IS_SERVER: boolean = typeof window === 'undefined';
-export const SOCIAL_MEDIA_CARD_IMAGE_URL = '/social-card.png';
+export const IS_BROWSER: boolean = typeof window !== 'undefined'
+export const IS_SERVER: boolean = typeof window === 'undefined'
+export const SOCIAL_MEDIA_CARD_IMAGE_URL = '/social-card.png'
 
-const { publicRuntimeConfig } = getConfig();
+const { publicRuntimeConfig } = getConfig()
 
 export const {
   BUILD_ID,
@@ -35,12 +35,12 @@ export const {
   LASIUS_TELEMETRY_PLAUSIBLE_SOURCE_DOMAIN,
   LASIUS_DEMO_MODE,
   LASIUS_TERMSOFSERVICE_VERSION,
-} = publicRuntimeConfig as { [key: string]: string };
+} = publicRuntimeConfig as { [key: string]: string }
 
-export const DEV = ENVIRONMENT !== 'production';
+export const IS_DEV = ENVIRONMENT !== 'production'
 
-export const DEFAULT_STRING_VALUE = 'default';
-export const DEFAULT_STRING_VALUE_ALL = 'all';
+export const DEFAULT_STRING_VALUE = 'default'
+export const DEFAULT_STRING_VALUE_ALL = 'all'
 
 export const TIME = {
   MINUTE: 'minute',
@@ -48,13 +48,13 @@ export const TIME = {
   DAY: 'day',
   MONTH: 'month',
   YEAR: 'year',
-};
+}
 
-export const NO_DATA_AVAILABLE = 'nodata';
-export type NO_DATA_AVAILABLE = typeof NO_DATA_AVAILABLE;
+export const NO_DATA_AVAILABLE = 'nodata'
+export type NO_DATA_AVAILABLE = typeof NO_DATA_AVAILABLE
 
-export const DATA_LOADING = 'dataloading';
-export type DATA_LOADING = typeof DATA_LOADING;
+export const DATA_LOADING = 'dataloading'
+export type DATA_LOADING = typeof DATA_LOADING
 
 export const ROLES = {
   USER: 'FreeUser',
@@ -62,8 +62,8 @@ export const ROLES = {
   ORGANISATION_MEMBER: 'OrganisationMember',
   PROJECT_MEMBER: 'ProjectMember',
   PROJECT_ADMIN: 'ProjectAdministrator',
-};
-export type ROLES = typeof ROLES;
+}
+export type ROLES = typeof ROLES
 
 export const WEBSOCKET_EVENT = {
   UserLoggedOutV2: 'UserLoggedOutV2',
@@ -81,7 +81,7 @@ export const WEBSOCKET_EVENT = {
   UserTimeBookingByTagEntryAdded: 'UserTimeBookingByTagEntryAdded',
   UserTimeBookingByTagEntryRemoved: 'UserTimeBookingByTagEntryRemoved',
   Pong: 'Pong',
-};
+}
 
 export enum CONNECTION_STATUS {
   UNKNOWN = 'UNKNOWN',
@@ -92,5 +92,5 @@ export enum CONNECTION_STATUS {
   ERROR = 'ERROR',
 }
 
-export const AUTH_PROVIDER_INTERNAL_LASIUS = 'internal_lasius';
-export const AUTH_PROVIDER_CUSTOMER_KEYCLOAK = 'custom_keycloak';
+export const AUTH_PROVIDER_INTERNAL_LASIUS = 'internal_lasius'
+export const AUTH_PROVIDER_CUSTOMER_KEYCLOAK = 'custom_keycloak'

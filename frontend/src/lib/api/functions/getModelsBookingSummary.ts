@@ -17,15 +17,15 @@
  *
  */
 
-import { ModelsBooking } from 'lib/api/lasius';
-import { round } from 'lodash';
-import { getExtendedModelsBookingList } from 'lib/api/functions/getExtendedModelsBookingList';
+import { round } from 'es-toolkit'
+import { getExtendedModelsBookingList } from 'lib/api/functions/getExtendedModelsBookingList'
+import { ModelsBooking } from 'lib/api/lasius'
 
 export const getModelsBookingSummary = (list: ModelsBooking[]) => {
   const hours = round(
     getExtendedModelsBookingList(list).reduce((acc, item) => acc + item.duration, 0),
-    2
-  );
-  const elements = list.length;
-  return { hours, elements };
-};
+    2,
+  )
+  const elements = list.length
+  return { hours, elements }
+}

@@ -62,10 +62,14 @@ class CurrentUserTimeBookingsView(val clientReceiver: ClientReceiver,
   @unused
   def autoUpdateInterval: FiniteDuration = 100.millis
 
-  override val receive: Receive = ({ case InitializeCurrentTimeBooking(state) =>
-    this.state = state
-    context.become(live)
-    sender() ! JournalReadingViewIsLive
+  override val receive: Receive = ({
+    case InitializeCurrentTimeBooking(state) =>
+      this.state = state
+      context.become(live)
+      sender() ! JournalReadingViewIsLive
+    case GetCurrentTimeBooking(_) =>
+      // Handle query even before full initialization (e.g., when no bookings exist)
+      sender() ! currentUserTimeBookings
   }: Receive).orElse(defaultReceive)
 
   override def restoreViewFromState(snapshot: UserTimeBooking): Unit = {
@@ -86,6 +90,15 @@ class CurrentUserTimeBookingsView(val clientReceiver: ClientReceiver,
   }
 
   override protected val live: Receive = {
+    case GetCurrentTimeBooking(_) =>
+      // check if still on same day
+      val day = LocalDate.now
+      if (!day.equals(state.currentDay)) {
+        val durations = getMapForDay(day)
+        state = updateBooking(state.booking, day, durations)
+      }
+
+      sender() ! currentUserTimeBookings
     case e: UserTimeBookingStartedV2 =>
       log.debug(
         s"CurrentUserTimeBookingsView -> UserTimeBookingStarted($e.booking)")
@@ -202,15 +215,6 @@ class CurrentUserTimeBookingsView(val clientReceiver: ClientReceiver,
         notifyClient()
       }
       sender() ! Ack
-    case GetCurrentTimeBooking(_) =>
-      // check if still on same day
-      val day = LocalDate.now
-      if (!day.equals(state.currentDay)) {
-        val durations = getMapForDay(day)
-        state = updateBooking(state.booking, day, durations)
-      }
-
-      sender() ! currentUserTimeBookings
   }
 
   private def notifyClient(): Unit = {

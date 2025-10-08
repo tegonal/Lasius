@@ -23,3 +23,9 @@ activator-*.sbt
 .bloop/
 .metals/
 metals.sbt
+
+# MCP/Agents
+CLAUDE.md
+/.serena
+/.claude
+/.playwright*

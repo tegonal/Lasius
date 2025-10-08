@@ -17,30 +17,58 @@
  *
  */
 
-import { apiTimespanDay } from 'lib/api/apiDateHandling';
-import { useGetUserBookingListByOrganisation } from 'lib/api/lasius/user-bookings/user-bookings';
-import { useMemo } from 'react';
-import { useOrganisation } from 'lib/api/hooks/useOrganisation';
-import { ModelsBooking } from 'lib/api/lasius';
-import { sortBookingsByDate } from 'lib/api/functions/sortBookingsByDate';
-import { formatISOLocale } from 'lib/dates';
+import { apiTimespanDay } from 'lib/api/apiDateHandling'
+import { sortBookingsByDate } from 'lib/api/functions/sortBookingsByDate'
+import { useOrganisation } from 'lib/api/hooks/useOrganisation'
+import { ModelsBooking } from 'lib/api/lasius'
+import { useGetUserBookingListByOrganisation } from 'lib/api/lasius/user-bookings/user-bookings'
+import { formatISOLocale } from 'lib/utils/date/dates'
+import { useMemo } from 'react'
 
+/**
+ * Custom hook for finding the adjacent bookings (previous and next) relative to a given booking.
+ * Fetches all bookings for the same day as the provided booking and identifies its neighbors
+ * in chronological order.
+ *
+ * @param item - The booking to find adjacent bookings for (or undefined)
+ *
+ * @returns Object containing:
+ *   - previous: The chronologically previous booking (later in time, or null if none)
+ *   - next: The chronologically next booking (earlier in time, or null if none)
+ *
+ * @example
+ * const currentBooking = { id: '123', start: { dateTime: '2025-01-15T10:00:00Z' }, ... }
+ * const { previous, next } = useGetAdjacentBookings(currentBooking)
+ *
+ * if (previous) {
+ *   console.log('Previous booking:', previous.id)
+ * }
+ * if (next) {
+ *   console.log('Next booking:', next.id)
+ * }
+ *
+ * @remarks
+ * - Bookings are sorted in reverse chronological order (newest first)
+ * - Returns null for previous/next if no adjacent bookings exist
+ * - Uses the selected organisation from the organisation store
+ * - Only fetches bookings for the same day as the provided booking
+ */
 export const useGetAdjacentBookings = (item: ModelsBooking | undefined) => {
-  const { selectedOrganisationId } = useOrganisation();
+  const { selectedOrganisationId } = useOrganisation()
   const { data: bookings } = useGetUserBookingListByOrganisation(
     selectedOrganisationId,
-    apiTimespanDay(item?.start.dateTime || formatISOLocale(new Date()))
-  );
+    apiTimespanDay(item?.start.dateTime || formatISOLocale(new Date())),
+  )
 
-  const sorted = sortBookingsByDate(bookings || []);
-  const indexCurrent = sorted.findIndex((b) => b.id === item?.id);
+  const sorted = sortBookingsByDate(bookings || [])
+  const indexCurrent = sorted.findIndex((b) => b.id === item?.id)
   const data = useMemo(
     () => ({
       previous: sorted[indexCurrent + 1] || null,
       next: sorted[indexCurrent - 1] || null,
     }),
-    [sorted, indexCurrent]
-  );
+    [sorted, indexCurrent],
+  )
 
-  return data;
-};
+  return data
+}

@@ -17,46 +17,95 @@
  *
  */
 
-import { useEffect, useState } from 'react';
-import useWebSocket, { ReadyState } from 'react-use-websocket';
-import { CONNECTION_STATUS, IS_SERVER, LASIUS_API_WEBSOCKET_URL } from 'projectConfig/constants';
-import parseJson from 'parse-json';
-import { logger } from 'lib/logger';
-import useIsWindowFocused from 'lib/hooks/useIsWindowFocused';
+import useIsWindowFocused from 'lib/hooks/useIsWindowFocused'
+import { logger } from 'lib/logger'
+import parseJson from 'parse-json'
+import { CONNECTION_STATUS, IS_SERVER, LASIUS_API_WEBSOCKET_URL } from 'projectConfig/constants'
+import { useEffect, useState } from 'react'
+import useWebSocket, { ReadyState } from 'react-use-websocket'
 
+// Maximum number of messages to keep in history to prevent memory exhaustion
+const MAX_MESSAGE_HISTORY = 100
+
+/**
+ * Custom hook for managing WebSocket connection to the Lasius backend.
+ * Provides real-time bidirectional communication for live updates of bookings,
+ * user events, and system notifications with automatic reconnection handling.
+ *
+ * @returns Object containing:
+ *   - sendJsonMessage: Function to send JSON messages to the WebSocket server
+ *   - lastMessage: Most recent parsed message received from the server (null if none)
+ *   - connectionStatus: Current connection status (CONNECTING, CONNECTED, DISCONNECTED, ERROR)
+ *   - messageHistory: Array of all MessageEvent objects received during the session
+ *
+ * @example
+ * const { sendJsonMessage, lastMessage, connectionStatus } = useLasiusWebsocket()
+ *
+ * // Send a message
+ * sendJsonMessage({ type: 'BOOKING_UPDATE', data: bookingData })
+ *
+ * // React to received messages
+ * useEffect(() => {
+ *   if (lastMessage?.type === 'BOOKING_STARTED') {
+ *     console.log('New booking started:', lastMessage.data)
+ *   }
+ * }, [lastMessage])
+ *
+ * // Display connection status
+ * if (connectionStatus === CONNECTION_STATUS.DISCONNECTED) {
+ *   return <ConnectionError />
+ * }
+ *
+ * @remarks
+ * - Automatically reconnects with exponential backoff (max 10s between attempts)
+ * - Makes up to 30 reconnection attempts before giving up
+ * - Clears message history when window loses focus and disconnects
+ * - Shares WebSocket connection across components for efficiency
+ * - Only initializes on client-side (not during SSR)
+ * - Automatically parses incoming messages as JSON
+ * - Logs connection events for debugging purposes
+ * - Connection status maps ReadyState to human-readable CONNECTION_STATUS values
+ */
 export const useLasiusWebsocket = () => {
-  const isWindowFocused = useIsWindowFocused();
+  const isWindowFocused = useIsWindowFocused()
 
-  const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([]);
+  const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([])
 
-  const websocketUrl = IS_SERVER ? null : `${LASIUS_API_WEBSOCKET_URL}/messaging/websocket`;
+  const websocketUrl = IS_SERVER ? null : `${LASIUS_API_WEBSOCKET_URL}/messaging/websocket`
   const { sendJsonMessage, lastMessage, readyState } = useWebSocket(websocketUrl, {
     share: true,
     shouldReconnect: (closeEvent) => {
-      logger.warn('[useLasiusWebsocket][shouldReconnect]', closeEvent);
-      return true;
+      logger.warn('[useLasiusWebsocket][shouldReconnect]', closeEvent)
+      return true
     },
     retryOnError: true,
     //exponential backoff reconnect interval
     reconnectInterval: (attemptNumber) => Math.min(Math.pow(2, attemptNumber) * 1000, 10000),
     reconnectAttempts: 30,
-  });
+  })
 
   useEffect(() => {
     if (isWindowFocused && readyState === ReadyState.OPEN) {
-      logger.info('[useLasiusWebsocket][onReturn][connected]');
+      logger.info('[useLasiusWebsocket][onReturn][connected]')
     }
     if (isWindowFocused && readyState !== ReadyState.OPEN) {
-      logger.info('[useLasiusWebsocket][onReturn][disconnected]');
-      setMessageHistory([]);
+      logger.info('[useLasiusWebsocket][onReturn][disconnected]')
+      setMessageHistory([])
     }
-  }, [isWindowFocused, readyState]);
+  }, [isWindowFocused, readyState])
 
   useEffect(() => {
     if (lastMessage !== null) {
-      setMessageHistory((prev) => [...prev, lastMessage]);
+      setMessageHistory((prev) => {
+        const newHistory = [...prev, lastMessage]
+        // Keep only the last MAX_MESSAGE_HISTORY messages to prevent unbounded growth
+        if (newHistory.length > MAX_MESSAGE_HISTORY) {
+          return newHistory.slice(-MAX_MESSAGE_HISTORY)
+        }
+        return newHistory
+      })
     }
-  }, [lastMessage, setMessageHistory]);
+  }, [lastMessage, setMessageHistory])
 
   const connectionStatus = {
     [ReadyState.CONNECTING]: CONNECTION_STATUS.CONNECTING,
@@ -64,12 +113,12 @@ export const useLasiusWebsocket = () => {
     [ReadyState.CLOSING]: CONNECTION_STATUS.DISCONNECTED,
     [ReadyState.CLOSED]: CONNECTION_STATUS.ERROR,
     [ReadyState.UNINSTANTIATED]: CONNECTION_STATUS.ERROR,
-  }[readyState];
+  }[readyState]
 
   return {
     sendJsonMessage,
     lastMessage: lastMessage?.data ? parseJson(lastMessage?.data) : null,
     connectionStatus,
     messageHistory,
-  };
-};
+  }
+}

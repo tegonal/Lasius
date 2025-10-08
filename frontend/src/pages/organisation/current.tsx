@@ -17,27 +17,21 @@
  *
  */
 
-import { GetServerSideProps } from 'next';
-import { OrganisationLayout } from 'layout/pages/organisation/current/organisationLayout';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { LayoutDesktop } from 'layout/layoutDesktop';
-import { NextPageWithLayout } from 'pages/_app';
+import { OrganisationLayout } from 'components/features/organisation/current/organisationLayout'
+import { LayoutResponsive } from 'components/ui/layouts/layoutResponsive'
+import { getServerSidePropsWithAuthRequired } from 'lib/auth/getServerSidePropsWithAuth'
+import { GetServerSideProps } from 'next'
 
-const CurrentOrganisationPage: NextPageWithLayout = () => {
-  return <OrganisationLayout />;
-};
+const CurrentOrganisationPage = () => {
+  return (
+    <LayoutResponsive>
+      <OrganisationLayout />
+    </LayoutResponsive>
+  )
+}
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { locale = '' } = context;
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, ['common'])),
-    },
-  };
-};
+  return getServerSidePropsWithAuthRequired(context)
+}
 
-CurrentOrganisationPage.getLayout = function getLayout(page) {
-  return <LayoutDesktop>{page}</LayoutDesktop>;
-};
-
-export default CurrentOrganisationPage;
+export default CurrentOrganisationPage

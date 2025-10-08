@@ -17,35 +17,33 @@
  *
  */
 
-import { GetServerSideProps } from 'next';
-import { AllProjectsLayout } from 'layout/pages/organisation/projects/allProjectsLayout';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { LayoutDesktop } from 'layout/layoutDesktop';
-import { NextPageWithLayout } from 'pages/_app';
-import { Error } from 'components/error';
-import { isAdminOfCurrentOrg } from 'lib/api/functions/isAdminOfCurrentOrg';
-import { ModelsUser } from 'lib/api/lasius';
-import { useProfile } from 'lib/api/hooks/useProfile';
+import { AllProjectsLayout } from 'components/features/organisation/projects/allProjectsLayout'
+import { Error } from 'components/ui/feedback/Error'
+import { LayoutResponsive } from 'components/ui/layouts/layoutResponsive'
+import { isAdminOfCurrentOrg } from 'lib/api/functions/isAdminOfCurrentOrg'
+import { useProfile } from 'lib/api/hooks/useProfile'
+import { ModelsUser } from 'lib/api/lasius'
+import { getServerSidePropsWithAuthRequired } from 'lib/auth/getServerSidePropsWithAuth'
+import { GetServerSideProps } from 'next'
 
-const AllProjectsPage: NextPageWithLayout = () => {
-  const { profile } = useProfile();
+const AllProjectsPage = () => {
+  const { profile } = useProfile()
   if (isAdminOfCurrentOrg(profile as ModelsUser)) {
-    return <AllProjectsLayout />;
+    return (
+      <LayoutResponsive>
+        <AllProjectsLayout />
+      </LayoutResponsive>
+    )
   }
-  return <Error statusCode={401} />;
-};
+  return (
+    <LayoutResponsive>
+      <Error statusCode={401} />
+    </LayoutResponsive>
+  )
+}
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { locale = '' } = context;
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, ['common'])),
-    },
-  };
-};
+  return getServerSidePropsWithAuthRequired(context)
+}
 
-AllProjectsPage.getLayout = function getLayout(page) {
-  return <LayoutDesktop>{page}</LayoutDesktop>;
-};
-
-export default AllProjectsPage;
+export default AllProjectsPage

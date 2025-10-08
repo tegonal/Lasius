@@ -17,17 +17,17 @@
  *
  */
 
-import { NextApiRequest, NextApiResponse } from 'next';
-import { BUILD_ID } from 'projectConfig/constants';
+import { NextApiRequest, NextApiResponse } from 'next'
+import { BUILD_ID } from 'projectConfig/constants'
 
 export type BuildIdResponse = {
-  buildId: string;
-};
+  buildId: string
+}
 
 const handler = (_req: NextApiRequest, res: NextApiResponse): void => {
   res.status(200).json({
     buildId: BUILD_ID,
-  });
-};
+  })
+}
 
-export default handler;
+export default handler

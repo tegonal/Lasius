@@ -17,26 +17,39 @@
  *
  */
 
-import { InitializeColorMode } from 'theme-ui';
-import NextDocument, { DocumentContext, Head, Html, Main, NextScript } from 'next/document';
-import React from 'react';
-
-import { googleFontLoaderString } from 'styles/themeConstants';
-import { BUILD_ID, ENVIRONMENT } from 'projectConfig/constants';
+import { DEFAULT_LOCALE, LOCALE_COOKIE_NAME } from 'lib/config/locales'
+import NextDocument, { DocumentContext, Head, Html, Main, NextScript } from 'next/document'
+import { BUILD_ID, ENVIRONMENT } from 'projectConfig/constants'
+import React from 'react'
 
 class MyDocument extends NextDocument {
   static async getInitialProps(ctx: DocumentContext) {
-    return NextDocument.getInitialProps(ctx);
+    const initialProps = await NextDocument.getInitialProps(ctx)
+    // Without i18n config, we must read locale from cookie or header
+    const locale =
+      (ctx.req?.headers['x-middleware-request-locale'] as string) ||
+      ctx.req?.headers.cookie
+        ?.split(';')
+        .find((c) => c.trim().startsWith(`${LOCALE_COOKIE_NAME}=`))
+        ?.split('=')[1]
+        ?.trim() ||
+      DEFAULT_LOCALE
+
+    return { ...initialProps, locale }
   }
 
   render() {
+    // Type assertion to access locale from props
+    const { locale } = this.props as any
+
     return (
-      <Html>
+      <Html lang={locale}>
         <Head>
           <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
+          <meta name="color-scheme" content="dark light" />
           <link rel="manifest" href="/manifest.json" />
           <meta name="application-name" content="Lasius Timetracking" />
-          <meta name="apple-mobile-web-app-capable" content="yes" />
+          <meta name="mobile-web-app-capable" content="yes" />
           <meta name="apple-mobile-web-app-status-bar-style" content="default" />
           <meta name="apple-mobile-web-app-title" content="Lasius Timetracking" />
           <meta name="description" content="Lasius Timetracking by https://tegonal.com" />
@@ -50,23 +63,56 @@ class MyDocument extends NextDocument {
           <meta httpEquiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
           <meta name="build-id" content={`${BUILD_ID}`} />
           <meta name="environment" content={`${ENVIRONMENT}`} />
-          <link href={googleFontLoaderString} rel="stylesheet" />
+          {/* Script to initialize DaisyUI/Tailwind theme before render to avoid FOUC */}
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function() { 
+                  try {
+                    // Check for saved theme in localStorage
+                    var savedTheme = localStorage.getItem('theme');
+
+                    // If no saved theme, check for Theme-UI mode
+                    if (!savedTheme) {
+                      var themeUIMode = localStorage.getItem('theme-ui-color-mode');
+                      if (themeUIMode === 'dark') {
+                        savedTheme = 'dark';
+                      } else if (themeUIMode === 'light') {
+                        savedTheme = 'light';
+                      }
+                    }
+
+                    // If still no theme, check system preference
+                    if (!savedTheme) {
+                      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                        savedTheme = 'dark';
+                      } else {
+                        savedTheme = 'light';
+                      }
+                    }
+
+                    // Apply the theme
+                    document.documentElement.setAttribute('data-theme', savedTheme);
+                  } catch (e) {
+                    // Fallback to light theme if anything goes wrong
+                    document.documentElement.setAttribute('data-theme', 'light');
+                  }
+                })();
+              `,
+            }}
+          />
         </Head>
         <body id="body">
-          <svg style={{ display: 'none' }}>
-            <use xlinkHref="/symbols.svg#default" />
-          </svg>
           <noscript>
             <p>Please enable JavaScript in your browser settings and reload this page.</p>
           </noscript>
-          <InitializeColorMode />
           <Main />
           <div id="modal" />
           <NextScript />
         </body>
       </Html>
-    );
+    )
   }
 }
 
-export default MyDocument;
+export default MyDocument

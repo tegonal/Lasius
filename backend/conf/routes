@@ -760,6 +760,26 @@ GET /organisations/:orgId/projects/:projectId/users                     controll
 ###
 #  security:
 #    - bearerHttpAuthentication: []
+#  tags:
+#    - projects
+#  operationId: getProjectLastActivityDate
+#  description: Get last activity date for a project.
+#  responses:
+#    200:
+#      description: Last activity date
+#      content:
+#        application/json:
+#          schema:
+#            type: string
+#            format: date-time
+#    204:
+#      description: No activity found for this project
+###
+GET /organisations/:orgId/projects/:projectId/last-activity            controllers.ProjectsController.getLastActivityDate(orgId: models.OrganisationId, projectId: models.ProjectId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
 #  tags: 
 #    - projects
 #  operationId: inviteProjectUser

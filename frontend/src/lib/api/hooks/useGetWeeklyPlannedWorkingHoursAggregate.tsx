@@ -17,54 +17,73 @@
  *
  */
 
-import { useGetUserProfile } from 'lib/api/lasius/user/user';
-import { plannedWorkingHoursStub } from 'lib/stubPlannedWorkingHours';
-import { UI_SLOW_DATA_DEDUPE_INTERVAL } from 'projectConfig/intervals';
-import { useMemo } from 'react';
-import { ModelsWorkingHours } from 'lib/api/lasius';
+import { statsSwrConfig } from 'components/ui/data-display/stats/statsSwrConfig'
+import { ModelsWorkingHours } from 'lib/api/lasius'
+import { useGetUserProfile } from 'lib/api/lasius/user/user'
+import { plannedWorkingHoursStub } from 'lib/utils/date/stubPlannedWorkingHours'
+import { useMemo } from 'react'
 
+/**
+ * Custom hook for aggregating planned working hours across organisations.
+ * Provides working hour summaries for both the selected organisation and all organisations
+ * the user belongs to, useful for users working across multiple organisations.
+ *
+ * @returns Object containing:
+ *   - allOrganisationsWorkingHours: Working hours by weekday aggregated across all user organisations
+ *   - selectedOrganisationWorkingHours: Working hours by weekday for the currently selected organisation
+ *   - selectedOrganisationWorkingHoursTotal: Total weekly hours for the selected organisation
+ *
+ * @example
+ * const { selectedOrganisationWorkingHoursTotal, allOrganisationsWorkingHours } = useGetWeeklyPlannedWorkingHoursAggregate()
+ *
+ * console.log(`Total weekly hours: ${selectedOrganisationWorkingHoursTotal}`)
+ * console.log(`Monday hours across all orgs: ${allOrganisationsWorkingHours.monday}`)
+ *
+ * @remarks
+ * - Falls back to plannedWorkingHoursStub if no working hours are configured
+ * - Aggregates hours additively (e.g., 8h in Org A + 4h in Org B = 12h total)
+ * - Uses the last selected organisation from user settings for single-org data
+ * - Uses slow revalidation (UI_SLOW_DATA_DEDUPE_INTERVAL) as working hours rarely change
+ * - Efficiently memoized to prevent unnecessary recalculations
+ * - Useful for comparing workload across organisations or displaying total expected hours
+ */
 export const useGetWeeklyPlannedWorkingHoursAggregate = () => {
-  const { data } = useGetUserProfile({
-    swr: {
-      revalidateOnFocus: false,
-      dedupingInterval: UI_SLOW_DATA_DEDUPE_INTERVAL,
-    },
-  });
+  const { data } = useGetUserProfile(statsSwrConfig)
 
   const allOrganisationsWorkingHours = useMemo(() => {
-    const allOrganisations: ModelsWorkingHours = { ...plannedWorkingHoursStub };
+    const allOrganisations: ModelsWorkingHours = { ...plannedWorkingHoursStub }
     data?.organisations.forEach((item) => {
-      const { plannedWorkingHours } = item;
+      const { plannedWorkingHours } = item
       if (plannedWorkingHours) {
         Object.keys(plannedWorkingHours).forEach((day: any) => {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
-          allOrganisations[day] += plannedWorkingHours[day];
-        });
+          allOrganisations[day] += plannedWorkingHours[day]
+        })
       }
-    });
-    return allOrganisations;
-  }, [data]);
+    })
+    return allOrganisations
+  }, [data])
 
   const selectedOrganisationWorkingHours = useMemo(() => {
     if (data && data.organisations && data.organisations.length > 0) {
       const workingHours = data.organisations.find(
-        (org) => org.organisationReference.id === data?.settings?.lastSelectedOrganisation?.id
-      );
-      return workingHours ? workingHours.plannedWorkingHours : plannedWorkingHoursStub;
+        (org) => org.organisationReference.id === data?.settings?.lastSelectedOrganisation?.id,
+      )
+      return workingHours ? workingHours.plannedWorkingHours : plannedWorkingHoursStub
     }
-    return plannedWorkingHoursStub;
-  }, [data]);
+    return plannedWorkingHoursStub
+  }, [data])
 
   const selectedOrganisationWorkingHoursTotal = useMemo(
     () =>
       Object.entries(selectedOrganisationWorkingHours).reduce((a, c) => ['total', a[1] + c[1]])[1],
-    [selectedOrganisationWorkingHours]
-  );
+    [selectedOrganisationWorkingHours],
+  )
 
   return {
     allOrganisationsWorkingHours,
     selectedOrganisationWorkingHours,
     selectedOrganisationWorkingHoursTotal,
-  };
-};
+  }
+}

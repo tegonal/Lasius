@@ -69,6 +69,13 @@ class LatestUserTimeBookingsView(clientReceiver: ClientReceiver,
   @unused
   def autoUpdateInterval: FiniteDuration = 100.millis
 
+  override val receive: Receive = ({ case GetLatestTimeBooking(_, maxHistory) =>
+    // Handle query even before full initialization (e.g., when no bookings exist)
+    state = state.copy(maxHistory = maxHistory)
+    notifyClient()
+    sender() ! Ack
+  }: Receive).orElse(defaultReceive)
+
   private def getStartTime(booking: BookingStub): DateTime = {
     state.startTimeMap.getOrElse(booking, oldDateTime)
   }

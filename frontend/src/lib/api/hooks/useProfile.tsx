@@ -17,18 +17,46 @@
  *
  */
 
-import { updateUserSettings, useGetUserProfile, acceptUserTOS } from 'lib/api/lasius/user/user';
-import { ModelsUserSettings, ModelsAcceptTOSRequest } from 'lib/api/lasius';
-import { useSession } from 'next-auth/react';
-import { useEffect, useState } from 'react';
+import { ModelsAcceptTOSRequest, ModelsUserSettings } from 'lib/api/lasius'
+import { acceptUserTOS, updateUserSettings, useGetUserProfile } from 'lib/api/lasius/user/user'
+import { useSession } from 'next-auth/react'
+import { useEffect, useState } from 'react'
+import { useOrganisationStore } from 'stores/organisationStore'
 
+/**
+ * Custom hook for managing the current user's profile data and authentication state.
+ * Fetches and syncs user profile information with the organisation store,
+ * and provides methods for updating settings and accepting Terms of Service.
+ *
+ * @returns Object containing:
+ *   - firstName: User's first name
+ *   - lastName: User's last name
+ *   - email: User's email address
+ *   - role: User's role in the system
+ *   - profile: Complete user profile data
+ *   - userId: User's unique identifier
+ *   - lasiusIsLoggedIn: Boolean indicating if user is authenticated
+ *   - updateSettings: Function to update user settings
+ *   - acceptedTOSVersion: Version of TOS the user has accepted
+ *   - acceptTOS: Function to accept a new TOS version
+ *
+ * @example
+ * const { profile, lasiusIsLoggedIn, updateSettings } = useProfile()
+ *
+ * if (!lasiusIsLoggedIn) {
+ *   return <LoginPrompt />
+ * }
+ *
+ * await updateSettings({ theme: 'dark' })
+ */
 export const useProfile = () => {
-  const session = useSession();
-  const [enabled, setEnabled] = useState(false);
+  const session = useSession()
+  const [enabled, setEnabled] = useState(false)
+  const syncFromProfile = useOrganisationStore((state) => state.syncFromProfile)
 
   useEffect(() => {
-    setEnabled(session.data?.access_token !== undefined);
-  }, [session.data?.access_token]);
+    setEnabled(session.data?.access_token !== undefined)
+  }, [session.data?.access_token])
 
   const { data, mutate } = useGetUserProfile({
     swr: {
@@ -38,23 +66,35 @@ export const useProfile = () => {
       revalidateOnReconnect: true,
       shouldRetryOnError: true,
     },
-  });
+  })
+
+  // Sync organisation store whenever profile data changes
+  useEffect(() => {
+    if (data) {
+      syncFromProfile(data)
+    }
+  }, [data, syncFromProfile])
 
   const updateSettings = async (updateData: Partial<ModelsUserSettings>) => {
     if (data) {
-      const modifiedSettings: ModelsUserSettings = { ...data.settings, ...updateData };
-      const profile = await updateUserSettings(modifiedSettings);
-      await mutate(profile);
+      const modifiedSettings: ModelsUserSettings = { ...data.settings, ...updateData }
+      const profile = await updateUserSettings(modifiedSettings)
+      await mutate(profile)
     }
-  };
+  }
 
   const acceptTOS = async (currentTOSVersion: string) => {
     if (data) {
-      const acceptTOSRequest: ModelsAcceptTOSRequest = { version: currentTOSVersion };
-      const profile = await acceptUserTOS(acceptTOSRequest);
-      await mutate(profile);
+      try {
+        const acceptTOSRequest: ModelsAcceptTOSRequest = { version: currentTOSVersion }
+        const profile = await acceptUserTOS(acceptTOSRequest)
+        await mutate(profile)
+      } catch (error) {
+        console.error('Failed to accept TOS:', error)
+        throw error
+      }
     }
-  };
+  }
 
   return {
     firstName: data?.firstName || '',
@@ -67,5 +107,5 @@ export const useProfile = () => {
     updateSettings,
     acceptedTOSVersion: data?.acceptedTOS?.version || '',
     acceptTOS,
-  };
-};
+  }
+}

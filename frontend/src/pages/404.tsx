@@ -17,9 +17,9 @@
  *
  */
 
-import { Error } from 'components/error';
-import React from 'react';
+import { Error } from 'components/ui/feedback/Error'
+import React from 'react'
 
-const Error404: React.FC = () => <Error statusCode={404} />;
+const Error404: React.FC = () => <Error statusCode={404} />
 
-export default Error404;
+export default Error404

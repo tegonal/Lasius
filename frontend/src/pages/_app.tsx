@@ -17,104 +17,83 @@
  *
  */
 
-import { AppContext, AppProps } from 'next/app';
-import Head from 'next/head';
-import { ThemeUIProvider } from 'theme-ui';
-import { globalStyles } from 'styles/theme/globalStyles';
-import { theme } from 'styles/theme';
-import { getSession, SessionProvider } from 'next-auth/react';
-import React, { JSX, ReactElement, ReactNode } from 'react';
-import { appWithTranslation } from 'next-i18next';
-import { NextPage } from 'next';
-import { BootstrapTasks } from 'components/system/bootstrapTasks';
-import { DevInfoBadge } from 'components/system/devInfoBadge';
-import { LasiusBackendWebsocketStatus } from 'components/system/lasiusBackendWebsocketStatus';
-import { BrowserOnlineStatusCheck } from 'components/system/browserOnlineStatusCheck';
-import { LasiusBackendOnlineCheck } from 'components/system/lasiusBackendOnlineCheck';
-import { LasiusTOSCheck } from 'components/system/lasiusTOSCheck';
-import { Session } from 'next-auth';
-import { BundleVersionCheck } from 'components/system/bundleVersionCheck';
-import { LasiusBackendWebsocketEventHandler } from 'components/system/lasiusBackendWebsocketEventHandler';
-import { StoreContextProvider, useStore } from 'storeContext/store';
-import { Error } from 'components/error';
-import {
-  DEV,
-  LASIUS_TELEMETRY_PLAUSIBLE_HOST,
-  LASIUS_TELEMETRY_PLAUSIBLE_SOURCE_DOMAIN,
-  SOCIAL_MEDIA_CARD_IMAGE_URL,
-} from 'projectConfig/constants';
-import { SWRConfig } from 'swr';
-import { DefaultSeo } from 'next-seo';
-import { swrLogger } from 'lib/api/swrRequestLogger';
-import { Toasts } from 'components/toasts/toasts';
-import { LazyMotion } from 'framer-motion';
-import { getGetUserProfileKey, getUserProfile } from 'lib/api/lasius/user/user';
-import { ModelsUser } from 'lib/api/lasius';
-import { HttpHeaderProvider } from 'components/system/httpHeaderProvider';
-import { useAsync } from 'react-async-hook';
-import { removeAccessibleCookies } from 'lib/removeAccessibleCookies';
-import { getRequestHeaders } from 'lib/api/hooks/useTokensWithAxiosRequests';
-import { logger } from 'lib/logger';
-import dynamic from 'next/dynamic';
-import PlausibleProvider from 'next-plausible';
+import { BootstrapTasks } from 'components/features/system/bootstrapTasks'
+import { BrowserOnlineStatusCheck } from 'components/features/system/browserOnlineStatusCheck'
+import { BundleVersionCheck } from 'components/features/system/bundleVersionCheck'
+import { DevInfoBadge } from 'components/features/system/devInfoBadge'
+import { GlobalLoading } from 'components/features/system/globalLoading'
+import { HttpHeaderProvider } from 'components/features/system/httpHeaderProvider'
+import { LasiusBackendOnlineCheck } from 'components/features/system/lasiusBackendOnlineCheck'
+import { LasiusBackendWebsocketEventHandler } from 'components/features/system/lasiusBackendWebsocketEventHandler'
+import 'styles/globals.css'
+import { LasiusBackendWebsocketStatus } from 'components/features/system/lasiusBackendWebsocketStatus'
+import { LasiusTOSCheck } from 'components/features/system/lasiusTOSCheck'
+import { TokenWatcher } from 'components/features/system/tokenWatcher'
+import { TopLoadingBar } from 'components/features/system/topLoadingBar'
+import { BookingProgressBarExplosion } from 'components/ui/feedback/BookingProgressBarExplosion'
+import { Error } from 'components/ui/feedback/Error'
+import { Toasts } from 'components/ui/feedback/Toasts'
+import { HelpDrawer } from 'components/ui/overlays/HelpDrawer'
+import { LazyMotion } from 'framer-motion'
+import { swrLogger } from 'lib/api/swrRequestLogger'
+import { useThemeInitialization } from 'lib/hooks/useThemeInitialization'
+import { logger } from 'lib/logger'
+import { removeAccessibleCookies } from 'lib/utils/auth/removeAccessibleCookies'
+import { SessionProvider } from 'next-auth/react'
+import { appWithTranslation } from 'next-i18next'
+// import PlausibleProvider from 'next-plausible' // Using custom implementation
+import { DefaultSeo } from 'next-seo'
+import { AppProps } from 'next/app'
+import dynamic from 'next/dynamic'
+import Head from 'next/head'
+import { IS_DEV, SOCIAL_MEDIA_CARD_IMAGE_URL } from 'projectConfig/constants'
+import React, { JSX, useEffect } from 'react'
+import { resetAllStores } from 'stores/globalActions'
+import { SWRConfig } from 'swr'
 
-export type NextPageWithLayout<P = Record<string, unknown>, IP = P> = NextPage<P, IP> & {
-  getLayout?: (page: ReactElement<P>) => ReactNode;
-};
+import nextI18NextConfig from '../../next-i18next.config'
 
-type AppPropsWithLayout = AppProps & {
-  session: Session;
-  Component: NextPageWithLayout;
-  initialState: any;
-  statusCode: number;
-  demandSignout: boolean;
-  fallback: Record<string, any>;
-  profile: ModelsUser;
-};
-
-const loadFeatures = () => import('../lib/framerMotionFeatures.js').then((res) => res.default);
+const loadFeatures = () => import('../lib/framerMotionFeatures.js').then((res) => res.default)
 
 // Enable PWA Updater only in browsers and if workbox object is available
 const LasiusPwaUpdater =
   typeof window !== 'undefined' && window?.workbox
-    ? dynamic(() => import(`../components/system/lasiusPwaUpdater`), {
+    ? dynamic(() => import(`../components/features/system/lasiusPwaUpdater`), {
         ssr: false,
       })
-    : () => <></>;
+    : () => <></>
 
-const App = ({
-  Component,
-  pageProps,
-  statusCode = 0,
-  fallback,
-  session,
-  profile,
-}: AppPropsWithLayout): JSX.Element => {
-  // Use the layout defined at the page level, if available
-  const getLayout = Component.getLayout ?? ((page) => page);
-  const lasiusIsLoggedIn = !!(session?.access_token && profile?.id);
-  const store = useStore();
+const App = ({ Component, pageProps }: AppProps): JSX.Element => {
+  // Extract auth props from pageProps (they come from getServerSideProps now)
+  const { session, profile, fallback, statusCode = 0, ...restPageProps } = pageProps
 
-  useAsync(async () => {
-    if (!lasiusIsLoggedIn) {
-      logger.info('[App][UserNotLoggedIn]');
-      store.dispatch({ type: 'reset' });
-      await removeAccessibleCookies();
+  const hasValidSession = !!(session?.access_token && profile?.id)
+
+  // Initialize theme on app mount, respecting system preference
+  useThemeInitialization()
+
+  useEffect(() => {
+    if (!hasValidSession) {
+      logger.info('[App][UserNotLoggedIn]')
+      resetAllStores()
+      void removeAccessibleCookies()
     } else {
-      logger.info('[App][UserLoggedIn]');
+      logger.info('[App][UserLoggedIn]')
     }
-  }, [lasiusIsLoggedIn]);
+  }, [hasValidSession])
 
   return (
     <>
       <SWRConfig
         value={{
-          ...fallback,
+          ...(fallback || {}),
           use: [swrLogger as any],
-        }}
-      >
-        <SessionProvider session={session} refetchOnWindowFocus={true}>
-          <HttpHeaderProvider session={session} />
+        }}>
+        <SessionProvider
+          session={session}
+          refetchOnWindowFocus={true}
+          refetchInterval={10} // Refetch every 10 seconds to catch token refreshes
+        >
           <Head>
             <meta
               name="viewport"
@@ -122,96 +101,45 @@ const App = ({
             />
             <title>Lasius</title>
           </Head>
-          <StoreContextProvider>
-            <LazyMotion features={loadFeatures}>
-              <ThemeUIProvider theme={theme}>
-                <PlausibleProvider
-                  domain={LASIUS_TELEMETRY_PLAUSIBLE_SOURCE_DOMAIN}
-                  customDomain={LASIUS_TELEMETRY_PLAUSIBLE_HOST}
-                  selfHosted
-                  enabled={!!LASIUS_TELEMETRY_PLAUSIBLE_SOURCE_DOMAIN}
-                  trackLocalhost={DEV}
-                  trackOutboundLinks
-                >
-                  <DefaultSeo
-                    openGraph={{
-                      images: [{ url: SOCIAL_MEDIA_CARD_IMAGE_URL }],
-                    }}
-                  />
-                  {globalStyles}
-                  {statusCode > 302 ? (
-                    <Error statusCode={statusCode} />
-                  ) : (
-                    getLayout(<Component {...pageProps} />)
-                  )}
-                  <BrowserOnlineStatusCheck />
-                  <LasiusBackendOnlineCheck />
-                  <LasiusPwaUpdater />
-                  <BundleVersionCheck />
-                  <Toasts />
-                  {lasiusIsLoggedIn && (
-                    <>
-                      <BootstrapTasks />
-                      <LasiusBackendWebsocketStatus />
-                      <LasiusBackendWebsocketEventHandler />
-                      <DevInfoBadge />
-                      <LasiusTOSCheck />
-                    </>
-                  )}
-                </PlausibleProvider>
-              </ThemeUIProvider>
-            </LazyMotion>
-          </StoreContextProvider>
+          <LazyMotion features={loadFeatures}>
+            <DefaultSeo
+              openGraph={{
+                images: [{ url: SOCIAL_MEDIA_CARD_IMAGE_URL }],
+              }}
+            />
+            {statusCode > 302 ? (
+              <Error statusCode={statusCode} />
+            ) : (
+              <Component {...restPageProps} />
+            )}
+            <BrowserOnlineStatusCheck />
+            <LasiusBackendOnlineCheck />
+            <LasiusPwaUpdater />
+            <BundleVersionCheck />
+            <Toasts />
+            <HelpDrawer />
+            {hasValidSession && (
+              <>
+                <BookingProgressBarExplosion />
+                <TopLoadingBar />
+                <GlobalLoading />
+                <HttpHeaderProvider />
+                <TokenWatcher />
+                <BootstrapTasks />
+                <LasiusBackendWebsocketStatus />
+                <LasiusBackendWebsocketEventHandler />
+                <LasiusTOSCheck />
+              </>
+            )}
+            {IS_DEV && <DevInfoBadge />}
+          </LazyMotion>
         </SessionProvider>
       </SWRConfig>
     </>
-  );
-};
+  )
+}
 
-type ExtendedAppContext = AppContext & {
-  ctx: {
-    req: Request & {
-      useragent: any;
-      originalUrl: string;
-    };
-  };
-};
+// Removed getInitialProps - auth is now handled in each page's getServerSideProps
+// using getServerSidePropsWithAuth helper for better performance and type safety
 
-App.getInitialProps = async ({
-  Component,
-  ctx,
-  ctx: { res, req, pathname },
-}: ExtendedAppContext) => {
-  const session = await getSession({ req });
-  let profile = null;
-  if (session?.access_token) {
-    try {
-      profile = await getUserProfile(
-        getRequestHeaders(session.access_token, session.access_token_issuer)
-      );
-    } catch (error) {
-      if (res && !pathname.includes('/login')) {
-        logger.warn('[App][UserProfile][Failed]', error);
-        res.writeHead(307, { Location: '/login?error=fetchProfileFailed' });
-        res.end();
-      }
-    }
-  }
-
-  let pageProps = {};
-  if (Component.getInitialProps) {
-    pageProps = await Component.getInitialProps(ctx);
-  }
-
-  return {
-    pageProps,
-    session,
-    profile,
-    statusCode: res?.statusCode,
-    fallback: {
-      ...(profile && { [getGetUserProfileKey().toString()]: profile }),
-    },
-  };
-};
-
-export default appWithTranslation(App as any);
+export default appWithTranslation(App as any, nextI18NextConfig)

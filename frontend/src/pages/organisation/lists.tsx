@@ -17,35 +17,33 @@
  *
  */
 
-import { GetServerSideProps } from 'next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { LayoutDesktop } from 'layout/layoutDesktop';
-import { NextPageWithLayout } from 'pages/_app';
-import { Error } from 'components/error';
-import { BookingHistoryLayout } from 'components/bookingHistory/bookingHistoryLayout';
-import { isAdminOfCurrentOrg } from 'lib/api/functions/isAdminOfCurrentOrg';
-import { ModelsUser } from 'lib/api/lasius';
-import { useProfile } from 'lib/api/hooks/useProfile';
+import { BookingHistoryLayout } from 'components/features/bookingHistory/bookingHistoryLayout'
+import { Error } from 'components/ui/feedback/Error'
+import { LayoutResponsive } from 'components/ui/layouts/layoutResponsive'
+import { isAdminOfCurrentOrg } from 'lib/api/functions/isAdminOfCurrentOrg'
+import { useProfile } from 'lib/api/hooks/useProfile'
+import { ModelsUser } from 'lib/api/lasius'
+import { getServerSidePropsWithAuthRequired } from 'lib/auth/getServerSidePropsWithAuth'
+import { GetServerSideProps } from 'next'
 
-const ListsPage: NextPageWithLayout = () => {
-  const { profile } = useProfile();
+const ListsPage = () => {
+  const { profile } = useProfile()
   if (isAdminOfCurrentOrg(profile as ModelsUser)) {
-    return <BookingHistoryLayout dataSource="organisationBookings" />;
+    return (
+      <LayoutResponsive>
+        <BookingHistoryLayout dataSource="organisationBookings" />
+      </LayoutResponsive>
+    )
   }
-  return <Error statusCode={401} />;
-};
+  return (
+    <LayoutResponsive>
+      <Error statusCode={401} />
+    </LayoutResponsive>
+  )
+}
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { locale = '' } = context;
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, ['common'])),
-    },
-  };
-};
+  return getServerSidePropsWithAuthRequired(context)
+}
 
-ListsPage.getLayout = function getLayout(page) {
-  return <LayoutDesktop>{page}</LayoutDesktop>;
-};
-
-export default ListsPage;
+export default ListsPage

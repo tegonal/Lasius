@@ -17,39 +17,92 @@
  *
  */
 
-import { ModelsEntityReference } from 'lib/api/lasius';
-import { ROLES } from 'projectConfig/constants';
-import { useProfile } from 'lib/api/hooks/useProfile';
+import { ModelsEntityReference, ModelsUserSettings } from 'lib/api/lasius'
+import { updateUserSettings } from 'lib/api/lasius/user/user'
+import { ROLES } from 'projectConfig/constants'
+import { useCallback } from 'react'
+import {
+  useOrganisations,
+  useOrganisationStore,
+  useSelectedOrganisationId,
+} from 'stores/organisationStore'
 
+/**
+ * Custom hook for managing organisation selection and organisation-related data.
+ * Provides access to the currently selected organisation, all user organisations,
+ * and methods to change the active organisation with optimistic updates.
+ *
+ * @returns Object containing:
+ *   - selectedOrganisationId: ID of the currently selected organisation
+ *   - selectedOrganisationKey: Key/slug of the selected organisation
+ *   - selectedOrganisation: Complete selected organisation object
+ *   - organisations: Array of all organisations the user belongs to
+ *   - setSelectedOrganisation: Function to change the active organisation
+ *   - isAdministrator: Boolean indicating if user is admin of selected org
+ *
+ * @example
+ * const { selectedOrganisation, organisations, setSelectedOrganisation, isAdministrator } = useOrganisation()
+ *
+ * // Switch organisation
+ * await setSelectedOrganisation(organisations[1].organisationReference)
+ *
+ * // Check admin status
+ * if (isAdministrator) {
+ *   return <AdminPanel />
+ * }
+ */
 export const useOrganisation = () => {
-  const { profile: data, updateSettings } = useProfile();
+  // Use Zustand store for all organisation data (no profile fetch!)
+  const selectedOrganisationId = useSelectedOrganisationId()
+  const organisations = useOrganisations()
+  const userSettings = useOrganisationStore((state) => state.userSettings)
+  const setSelectedOrganisationIdStore = useOrganisationStore(
+    (state) => state.setSelectedOrganisationId,
+  )
+  const setUserSettings = useOrganisationStore((state) => state.setUserSettings)
 
-  const setSelectedOrganisation = async (organisationReference: ModelsEntityReference) => {
-    if (organisationReference) {
-      await updateSettings({ lastSelectedOrganisation: organisationReference });
-    }
-  };
+  const setSelectedOrganisation = useCallback(
+    async (organisationReference: ModelsEntityReference) => {
+      if (organisationReference) {
+        // Update local store immediately for optimistic update
+        setSelectedOrganisationIdStore(organisationReference.id)
 
-  let lastSelectedOrganisationId = data?.settings.lastSelectedOrganisation?.id;
-  if (!lastSelectedOrganisationId) {
-    const myPrivateOrg = data?.organisations.filter((item) => item.private)[0]
-      .organisationReference;
-    if (myPrivateOrg) {
-      setSelectedOrganisation(myPrivateOrg);
-      lastSelectedOrganisationId = myPrivateOrg.id;
-    }
-  }
+        // Build updated settings object
+        const updatedSettings: ModelsUserSettings = {
+          ...userSettings,
+          lastSelectedOrganisation: organisationReference,
+        }
 
-  const selectedOrganisation = data?.organisations.find(
-    (org) => org.organisationReference.id === lastSelectedOrganisationId
-  );
+        // Update local settings cache optimistically
+        setUserSettings(updatedSettings)
+
+        // Update backend
+        try {
+          await updateUserSettings(updatedSettings)
+        } catch (error) {
+          // Rollback on error
+          console.error('Failed to update organisation:', error)
+          // Restore previous settings
+          if (userSettings) {
+            setUserSettings(userSettings)
+          }
+        }
+      }
+    },
+    [setSelectedOrganisationIdStore, userSettings, setUserSettings],
+  )
+
+  // Compute selectedOrganisation from cached store data
+  const selectedOrganisation = organisations.find(
+    (org) => org.organisationReference.id === selectedOrganisationId,
+  )
 
   return {
-    selectedOrganisationId: selectedOrganisation?.organisationReference?.id || '',
+    selectedOrganisationId: selectedOrganisationId || '',
     selectedOrganisationKey: selectedOrganisation?.organisationReference?.key || '',
     selectedOrganisation,
-    organisations: data?.organisations || [],
+    organisations,
     setSelectedOrganisation,
     isAdministrator: selectedOrganisation?.role === ROLES.ORGANISATION_ADMIN,
-  };
-};
+  }
+}

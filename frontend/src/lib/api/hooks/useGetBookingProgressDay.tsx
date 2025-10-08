@@ -17,25 +17,54 @@
  *
  */
 
-import { differenceInSeconds, isToday } from 'date-fns';
-import { apiTimespanDay, IsoDateString } from 'lib/api/apiDateHandling';
+import { differenceInSeconds, isToday } from 'date-fns'
+import { apiTimespanDay, IsoDateString } from 'lib/api/apiDateHandling'
+import { getExpectedVsBookedPercentage } from 'lib/api/functions/getExpectedVsBookedPercentage'
+import { getModelsBookingSummary } from 'lib/api/functions/getModelsBookingSummary'
+import { useGetPlannedWorkingHoursByDate } from 'lib/api/hooks/useGetPlannedWorkingHoursByDate'
+import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import {
   useGetUserBookingCurrent,
   useGetUserBookingListByOrganisation,
-} from 'lib/api/lasius/user-bookings/user-bookings';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useGetPlannedWorkingHoursByDate } from 'lib/api/hooks/useGetPlannedWorkingHoursByDate';
-import { useInterval } from 'usehooks-ts';
-import { UI_SLOW_DATA_DEDUPE_INTERVAL } from 'projectConfig/intervals';
-import { useOrganisation } from 'lib/api/hooks/useOrganisation';
-import { getExpectedVsBookedPercentage } from 'lib/api/functions/getExpectedVsBookedPercentage';
-import { getModelsBookingSummary } from 'lib/api/functions/getModelsBookingSummary';
+} from 'lib/api/lasius/user-bookings/user-bookings'
+import { UI_SLOW_DATA_DEDUPE_INTERVAL } from 'projectConfig/intervals'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useInterval } from 'usehooks-ts'
 
+/**
+ * Custom hook for real-time tracking of booking progress for a specific day.
+ * Similar to useGetBookingSummaryDay but includes live updates for the currently running booking.
+ * Updates every second to reflect the ongoing booking duration in real-time.
+ *
+ * @param date - ISO date string for the day to track (format: 'YYYY-MM-DD')
+ *
+ * @returns Object containing:
+ *   - hours: Total hours booked including current running booking (live-updated)
+ *   - minutes: Total minutes booked including current running booking
+ *   - bookings: Array of completed bookings for the day
+ *   - plannedWorkingHours: Expected working hours for the day
+ *   - fulfilledPercentage: Percentage of planned hours completed (capped at 100%, live-updated)
+ *   - progressBarPercentage: Actual percentage for progress bar display (can exceed 100%, live-updated)
+ *
+ * @example
+ * const progress = useGetBookingProgressDay('2025-01-15')
+ *
+ * // Real-time display updating every second
+ * console.log(`Current progress: ${progress.hours.toFixed(2)} hours`)
+ * console.log(`Completion: ${progress.fulfilledPercentage}%`)
+ *
+ * @remarks
+ * - Updates every 1000ms (1 second) to show live progress of current booking
+ * - Only includes current booking duration for today's date
+ * - For past dates, behaves like useGetBookingSummaryDay (no live updates)
+ * - Performance optimized with adaptive revalidation based on date
+ * - Uses useInterval for smooth real-time updates without excessive re-renders
+ */
 export const useGetBookingProgressDay = (date: IsoDateString) => {
-  const { selectedOrganisationId } = useOrganisation();
-  const { plannedHoursDay: plannedWorkingHours } = useGetPlannedWorkingHoursByDate(date);
-  const day = useMemo(() => new Date(date), [date]);
-  const [currentDuration, setCurrentDuration] = useState(0);
+  const { selectedOrganisationId } = useOrganisation()
+  const { plannedHoursDay: plannedWorkingHours } = useGetPlannedWorkingHoursByDate(date)
+  const day = useMemo(() => new Date(date), [date])
+  const [currentDuration, setCurrentDuration] = useState(0)
 
   const { data: bookings } = useGetUserBookingListByOrganisation(
     selectedOrganisationId,
@@ -47,40 +76,42 @@ export const useGetBookingProgressDay = (date: IsoDateString) => {
         revalidateIfStale: isToday(day),
         dedupingInterval: isToday(day) ? 2000 : UI_SLOW_DATA_DEDUPE_INTERVAL,
       },
-    }
-  );
+    },
+  )
 
-  const { data: currentBooking } = useGetUserBookingCurrent();
+  const { data: currentBooking } = useGetUserBookingCurrent()
 
   const currentBookingDuration = useCallback(() => {
     if (isToday(day) && currentBooking?.booking?.start.dateTime) {
       setCurrentDuration(
-        differenceInSeconds(new Date(), new Date(currentBooking?.booking?.start.dateTime)) / 60 / 60
-      );
+        differenceInSeconds(new Date(), new Date(currentBooking?.booking?.start.dateTime)) /
+          60 /
+          60,
+      )
     } else {
-      setCurrentDuration(0);
+      setCurrentDuration(0)
     }
-  }, [currentBooking?.booking?.start.dateTime, day]);
+  }, [currentBooking?.booking?.start.dateTime, day])
 
   useEffect(() => {
-    currentBookingDuration();
-  }, [currentBookingDuration]);
+    currentBookingDuration()
+  }, [currentBookingDuration])
 
-  useInterval(currentBookingDuration, 1000);
+  useInterval(currentBookingDuration, 1000)
 
-  const summaryInit = useMemo(() => getModelsBookingSummary(bookings || []), [bookings]);
+  const summaryInit = useMemo(() => getModelsBookingSummary(bookings || []), [bookings])
 
-  const summary = { ...summaryInit, hours: summaryInit.hours + currentDuration };
+  const summary = { ...summaryInit, hours: summaryInit.hours + currentDuration }
 
   const { fulfilledPercentage, progressBarPercentage } = getExpectedVsBookedPercentage(
     plannedWorkingHours,
-    summary.hours
-  );
+    summary.hours,
+  )
 
   return {
     ...summary,
     plannedWorkingHours,
     fulfilledPercentage,
     progressBarPercentage,
-  };
-};
+  }
+}

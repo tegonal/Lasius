@@ -17,12 +17,12 @@
  *
  */
 
-import { ModelsUser } from 'lib/api/lasius';
-import { ROLES } from 'projectConfig/constants';
+import { ModelsUser } from 'lib/api/lasius'
+import { ROLES } from 'projectConfig/constants'
 
 export const isAdminOfCurrentOrg = (profile: ModelsUser | undefined) => {
   const selectedOrganisation = profile?.organisations.find(
-    (org) => org.organisationReference.id === profile?.settings.lastSelectedOrganisation?.id
-  );
-  return selectedOrganisation?.role === ROLES.ORGANISATION_ADMIN;
-};
+    (org) => org.organisationReference.id === profile?.settings.lastSelectedOrganisation?.id,
+  )
+  return selectedOrganisation?.role === ROLES.ORGANISATION_ADMIN
+}

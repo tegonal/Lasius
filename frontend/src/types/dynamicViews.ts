@@ -18,18 +18,19 @@
  */
 
 export type ModalViewType = {
-  id: string;
-  isOpen: boolean;
-};
+  id: string
+  isOpen: boolean
+}
 
 export type TabViewType = {
-  id: string;
-  activeIndex: number;
-};
+  id: string
+  activeIndex: number
+}
 
 export type ToastViewType = {
-  id: string;
-  message: string;
-  ttl?: number;
-  type: 'WARNING' | 'ERROR' | 'NOTIFICATION' | 'SUCCESS';
-};
+  id: string
+  message: string
+  description?: string
+  ttl?: number
+  type: 'WARNING' | 'ERROR' | 'NOTIFICATION' | 'SUCCESS'
+}

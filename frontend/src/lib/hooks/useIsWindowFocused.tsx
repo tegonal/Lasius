@@ -17,52 +17,72 @@
  *
  */
 
-import { useCallback, useEffect, useState } from 'react';
-import { debounce, noop } from 'lodash';
+import { debounce, noop } from 'es-toolkit/compat'
+import { useCallback, useEffect, useState } from 'react'
 
+/**
+ * Custom hook that tracks whether the browser window/tab is currently focused and visible.
+ * Listens to focus, blur, and visibility change events to determine the window's active state.
+ * Uses debouncing (100ms) to prevent rapid state changes.
+ *
+ * @returns Boolean indicating if the window is currently focused and visible
+ *
+ * @example
+ * const isFocused = useIsWindowFocused()
+ *
+ * useEffect(() => {
+ *   if (isFocused) {
+ *     // Resume real-time updates
+ *     startPolling()
+ *   } else {
+ *     // Pause updates when tab is not visible
+ *     stopPolling()
+ *   }
+ * }, [isFocused])
+ */
 export default function useIsWindowFocused(): boolean {
-  const [windowIsActive, setWindowIsActive] = useState(true);
+  const [windowIsActive, setWindowIsActive] = useState(true)
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleActivity = useCallback(
     debounce(
       (e: { type: string }) => {
         if (e?.type === 'focus') {
-          return setWindowIsActive(true);
+          return setWindowIsActive(true)
         }
         if (e?.type === 'blur') {
-          return setWindowIsActive(false);
+          return setWindowIsActive(false)
         }
         if (e?.type === 'visibilitychange') {
           if (document.hidden) {
-            return setWindowIsActive(false);
+            return setWindowIsActive(false)
           }
-          return setWindowIsActive(true);
+          return setWindowIsActive(true)
         }
-        return noop();
+        return noop()
       },
       100,
-      { leading: false }
+      { leading: false },
     ),
-    []
-  );
+    [],
+  )
 
   useEffect(() => {
-    document.addEventListener('visibilitychange', handleActivity);
-    document.addEventListener('blur', handleActivity);
-    window.addEventListener('blur', handleActivity);
-    window.addEventListener('focus', handleActivity);
-    document.addEventListener('focus', handleActivity);
+    document.addEventListener('visibilitychange', handleActivity)
+    document.addEventListener('blur', handleActivity)
+    window.addEventListener('blur', handleActivity)
+    window.addEventListener('focus', handleActivity)
+    document.addEventListener('focus', handleActivity)
 
     return () => {
-      window.removeEventListener('blur', handleActivity);
-      document.removeEventListener('blur', handleActivity);
-      window.removeEventListener('focus', handleActivity);
-      document.removeEventListener('focus', handleActivity);
-      document.removeEventListener('visibilitychange', handleActivity);
-    };
+      window.removeEventListener('blur', handleActivity)
+      document.removeEventListener('blur', handleActivity)
+      window.removeEventListener('focus', handleActivity)
+      document.removeEventListener('focus', handleActivity)
+      document.removeEventListener('visibilitychange', handleActivity)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [])
 
-  return windowIsActive;
+  return windowIsActive
 }

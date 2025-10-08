@@ -57,7 +57,10 @@ class CurrentUserTimeBookingsViewSpec extends Specification with Mockito {
         CurrentUserTimeBookingsViewMock.props(userReference, clientReceiver))
 
       val day   = LocalDate.now()
-      val start = DateTime.now().minusHours(2)
+      val start = day
+        .toDateTimeAtCurrentTime()
+        .withTimeAtStartOfDay()
+        .plusHours(12) // 12pm today
 
       val tag1 = SimpleTag(TagId("tag1"))
       val tag2 = SimpleTag(TagId("tag2"))
@@ -110,8 +113,11 @@ class CurrentUserTimeBookingsViewSpec extends Specification with Mockito {
       probe.send(actorRef, InitializeViewLive(userReference, 0))
       probe.expectMsg(JournalReadingViewIsLive)
 
-      val day      = LocalDate.now()
-      val start    = DateTime.now().minusHours(2)
+      val day   = LocalDate.now()
+      val start = day
+        .toDateTimeAtCurrentTime()
+        .withTimeAtStartOfDay()
+        .plusHours(12) // 12pm today
       val tag1     = SimpleTag(TagId("tag1"))
       val tag2     = SimpleTag(TagId("tag2"))
       val newStart = start.minusHours(2)
@@ -169,9 +175,12 @@ class CurrentUserTimeBookingsViewSpec extends Specification with Mockito {
       probe.send(actorRef, InitializeViewLive(userReference, 0))
       probe.expectMsg(JournalReadingViewIsLive)
 
-      val day   = LocalDate.now()
-      val end   = DateTime.now()
-      val start = end.minusHours(2)
+      val day = LocalDate.now()
+      val end = day
+        .toDateTimeAtCurrentTime()
+        .withTimeAtStartOfDay()
+        .plusHours(14) // 2pm today
+      val start = end.minusHours(2) // 12pm today
       val tag1  = SimpleTag(TagId("tag1"))
       val tag2  = SimpleTag(TagId("tag2"))
 
@@ -223,9 +232,12 @@ class CurrentUserTimeBookingsViewSpec extends Specification with Mockito {
       probe.send(actorRef, InitializeViewLive(userReference, 0))
       probe.expectMsg(JournalReadingViewIsLive)
 
-      val day      = LocalDate.now()
-      val end      = DateTime.now()
-      val start    = end.minusHours(2)
+      val day = LocalDate.now()
+      val end = day
+        .toDateTimeAtCurrentTime()
+        .withTimeAtStartOfDay()
+        .plusHours(14) // 2pm today
+      val start    = end.minusHours(2) // 12pm today
       val tag1     = SimpleTag(TagId("tag1"))
       val tag2     = SimpleTag(TagId("tag2"))
       val duration = Duration.standardHours(2)
@@ -290,9 +302,12 @@ class CurrentUserTimeBookingsViewSpec extends Specification with Mockito {
       val actorRef       = system.actorOf(
         CurrentUserTimeBookingsViewMock.props(userReference, clientReceiver))
 
-      val day      = LocalDate.now()
-      val end      = DateTime.now()
-      val start    = end.minusHours(2)
+      val day = LocalDate.now()
+      val end = day
+        .toDateTimeAtCurrentTime()
+        .withTimeAtStartOfDay()
+        .plusHours(14) // 2pm today
+      val start    = end.minusHours(2) // 12pm today
       val tag1     = SimpleTag(TagId("tag1"))
       val tag2     = SimpleTag(TagId("tag2"))
       val duration = Duration.standardHours(2)
@@ -359,9 +374,12 @@ class CurrentUserTimeBookingsViewSpec extends Specification with Mockito {
       val actorRef       = system.actorOf(
         CurrentUserTimeBookingsViewMock.props(userReference, clientReceiver))
 
-      val day      = LocalDate.now()
-      val end      = DateTime.now()
-      val start    = end.minusHours(2)
+      val day = LocalDate.now()
+      val end = day
+        .toDateTimeAtCurrentTime()
+        .withTimeAtStartOfDay()
+        .plusHours(14) // 2pm today
+      val start    = end.minusHours(2) // 12pm today
       val tag1     = SimpleTag(TagId("tag1"))
       val tag2     = SimpleTag(TagId("tag2"))
       val duration = Duration.standardHours(2)

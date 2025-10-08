@@ -17,29 +17,29 @@
  *
  */
 
-import { BareFetcher, Key, SWRConfiguration, SWRHook } from 'swr';
-import { logger } from 'lib/logger';
+import { logger } from 'lib/logger'
+import { BareFetcher, Key, SWRConfiguration, SWRHook } from 'swr'
 
 export const swrLogger = (useSWRNext: SWRHook) => {
   return (key: Key, fetcher: BareFetcher | null, config: SWRConfiguration) => {
-    let nextFetcher = fetcher;
+    let nextFetcher = fetcher
 
     if (fetcher) {
       nextFetcher = (...args: unknown[]) => {
-        const started = Date.now();
-        const label = typeof key === 'function' ? key() : Array.isArray(key) ? key.join(', ') : key;
-        logger.info('SWR Request', label);
-        const response = fetcher(...args);
+        const started = Date.now()
+        const label = typeof key === 'function' ? key() : Array.isArray(key) ? key.join(', ') : key
+        logger.info('SWR Request', label)
+        const response = fetcher(...args)
         if (response instanceof Promise) {
           return response.then((result) => {
-            logger.info('SWR Request complete', label, 'elapsed', Date.now() - started, 'ms');
-            return result;
-          });
+            logger.info('SWR Request complete', label, 'elapsed', Date.now() - started, 'ms')
+            return result
+          })
         }
-        logger.info('SWR Request complete', label, 'elapsed', Date.now() - started, 'ms');
-        return response;
-      };
+        logger.info('SWR Request complete', label, 'elapsed', Date.now() - started, 'ms')
+        return response
+      }
     }
-    return useSWRNext(key, nextFetcher, config);
-  };
-};
+    return useSWRNext(key, nextFetcher, config)
+  }
+}

@@ -17,7 +17,7 @@
  *
  */
 
-import { ModelsTag } from 'lib/api/lasius';
+import { ModelsTag } from 'lib/api/lasius'
 
 export const tagGroupTemplate: ModelsTag[] = [
   {
@@ -70,4 +70,4 @@ export const tagGroupTemplate: ModelsTag[] = [
       },
     ],
   },
-];
+]

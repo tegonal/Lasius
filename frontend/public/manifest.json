@@ -1,12 +1,12 @@
 {
-  "theme_color" : "#555555",
-  "background_color" : "#333333",
-  "display" : "standalone",
-  "scope" : "/",
-  "start_url" : "/",
-  "name" : "Lasius Timetracking",
-  "short_name" : "Lasius",
-  "description" : "Lasius Timetracking by https://tegonal.com",
+  "theme_color": "#555555",
+  "background_color": "#333333",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/",
+  "name": "Lasius Timetracking",
+  "short_name": "Lasius",
+  "description": "Lasius Timetracking by https://tegonal.com",
   "icons": [
     {
       "src": "/icon-192x192.png",

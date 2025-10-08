@@ -17,55 +17,156 @@
  *
  */
 
-import { NextApiRequest, NextApiResponse } from 'next';
-import { logger } from 'lib/logger';
-import { LASIUS_TELEMETRY_PLAUSIBLE_HOST } from 'projectConfig/constants';
+import { logger } from 'lib/logger'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { LASIUS_TELEMETRY_PLAUSIBLE_HOST } from 'projectConfig/constants'
 
 export type PlausibleEventPayload = {
   /** Event name */
-  readonly n: string;
+  readonly n: string
   /** Page URL */
-  readonly u: Location['href'];
+  readonly u: string
   /** Domain */
-  readonly d: Location['hostname'];
+  readonly d: string
   /** Referrer */
-  readonly r: Document['referrer'] | null;
+  readonly r: string | null
   /** Screen width */
-  readonly w: Window['innerWidth'];
+  readonly w: number
   /** Hash mode */
-  readonly h: 1 | 0;
+  readonly h: 1 | 0
   /** Props, stringified JSON */
-  readonly p?: string;
-};
+  readonly p?: string
+}
 
-const handler = async (request: NextApiRequest, res: NextApiResponse) => {
-  const body = request.body.json() as PlausibleEventPayload;
-  logger.info('Plausible event', {
-    LASIUS_TELEMETRY_PLAUSIBLE_HOST,
-    body,
-    headers: request.headers,
-  });
-  const payload: RequestInit = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'User-Agent': request.headers['user-agent'] || '',
-      'X-Forwarded-For': request.headers['x-forwarded-for']?.toString() || '',
-    },
-    body: JSON.stringify({ ...body, r: body.r ? body.r : request.headers['referer'] || '' }),
-  };
-  logger.info('Plausible event', { LASIUS_TELEMETRY_PLAUSIBLE_HOST, payload });
-  const response = await fetch(
-    `https://${LASIUS_TELEMETRY_PLAUSIBLE_HOST}/api/event`,
-    payload
-  ).catch((e) => {
-    logger.error('error', e);
-  });
-  if (response) {
-    res.status(response.status).json(response.body);
-  } else {
-    res.status(500).json({ error: 'error' });
+/**
+ * Get the client's real IP address from various headers
+ * Handles proxies, load balancers, and CDNs
+ */
+function getClientIp(req: NextApiRequest): string {
+  // Check headers in order of preference
+  const forwardedFor = req.headers['x-forwarded-for']
+  const realIp = req.headers['x-real-ip']
+  const cfConnectingIp = req.headers['cf-connecting-ip']
+
+  if (forwardedFor) {
+    // X-Forwarded-For can contain multiple IPs, take the first one
+    const ips = Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor
+    return ips.split(',')[0].trim()
   }
-};
 
-export default handler;
+  if (realIp) {
+    return Array.isArray(realIp) ? realIp[0] : realIp
+  }
+
+  if (cfConnectingIp) {
+    return Array.isArray(cfConnectingIp) ? cfConnectingIp[0] : cfConnectingIp
+  }
+
+  // Fall back to socket address
+  return req.socket.remoteAddress || '127.0.0.1'
+}
+
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+  // Only accept POST requests
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' })
+  }
+
+  // Validate Plausible host is configured
+  if (!LASIUS_TELEMETRY_PLAUSIBLE_HOST) {
+    logger.error('❌ LASIUS_TELEMETRY_PLAUSIBLE_HOST not configured')
+    return res.status(500).json({ error: 'Plausible host not configured' })
+  }
+
+  try {
+    const body = req.body as PlausibleEventPayload
+    const clientIp = getClientIp(req)
+    const debugMode = req.headers['x-debug-request'] === 'true'
+
+    logger.info('📊 Plausible event received:', {
+      event: body.n,
+      url: body.u,
+      domain: body.d,
+      props: body.p ? JSON.parse(body.p) : undefined,
+      clientIp: debugMode ? clientIp : 'hidden',
+      userAgent: req.headers['user-agent']?.substring(0, 50) + '...',
+    })
+
+    // Build headers for forwarding to Plausible
+    // Note: Plausible accepts both application/json and text/plain
+    const headers: HeadersInit = {
+      'Content-Type': 'text/plain',
+      // User-Agent is critical for device detection
+      'User-Agent': req.headers['user-agent'] || 'Unknown',
+      // X-Forwarded-For is critical for unique visitor counting
+      'X-Forwarded-For': clientIp,
+    }
+
+    // Add debug header if requested
+    if (debugMode) {
+      headers['X-Debug-Request'] = 'true'
+    }
+
+    // Ensure referrer is included (use the one from the event or fallback to header)
+    const eventBody = {
+      ...body,
+      r: body.r || req.headers.referer || null,
+    }
+
+    // Construct Plausible URL (handle both http/https and missing protocol)
+    const plausibleUrl = LASIUS_TELEMETRY_PLAUSIBLE_HOST.startsWith('http')
+      ? `${LASIUS_TELEMETRY_PLAUSIBLE_HOST}/api/event`
+      : `https://${LASIUS_TELEMETRY_PLAUSIBLE_HOST}/api/event`
+
+    logger.info('📤 Forwarding to Plausible:', {
+      url: plausibleUrl,
+      ip: debugMode ? clientIp : 'hidden',
+    })
+
+    // Forward the request to Plausible
+    const response = await fetch(plausibleUrl, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(eventBody),
+    })
+
+    const responseText = await response.text()
+
+    if (response.ok) {
+      logger.info('✅ Plausible response:', response.status, debugMode ? responseText : '')
+
+      // Return the response from Plausible
+      if (responseText) {
+        try {
+          const jsonResponse = JSON.parse(responseText)
+          return res.status(response.status).json(jsonResponse)
+        } catch {
+          // Not JSON, return as text
+          return res.status(response.status).send(responseText)
+        }
+      } else {
+        return res.status(response.status).end()
+      }
+    } else {
+      logger.error('❌ Plausible error response:', response.status, responseText)
+      logger.error('Plausible API error', {
+        status: response.status,
+        response: responseText,
+        url: plausibleUrl,
+      })
+      return res.status(response.status).json({
+        error: 'Plausible API error',
+        details: responseText,
+      })
+    }
+  } catch (error) {
+    logger.error('❌ Error forwarding to Plausible:', error)
+    logger.error('Error forwarding event to Plausible', error)
+    return res.status(500).json({
+      error: 'Internal server error',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    })
+  }
+}
+
+export default handler

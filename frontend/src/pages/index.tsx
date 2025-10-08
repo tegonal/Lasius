@@ -17,21 +17,21 @@
  *
  */
 
-import { GetServerSidePropsContext, NextPage } from 'next';
+import { GetServerSidePropsContext, NextPage } from 'next'
 
 const Index: NextPage = () => {
-  return null;
-};
+  return null
+}
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const { locale, query, defaultLocale } = context;
-  const resolvedLocale = query.locale || locale;
+  const { locale, query, defaultLocale } = context
+  const resolvedLocale = query.locale || locale
   return {
     redirect: {
       permanent: false,
       destination: `${resolvedLocale && resolvedLocale !== defaultLocale ? '/' + resolvedLocale : ''}/user/home`,
     },
-  };
+  }
 }
 
-export default Index;
+export default Index

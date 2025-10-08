@@ -17,27 +17,21 @@
  *
  */
 
-import { GetServerSideProps } from 'next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { MyProjectsLayout } from 'layout/pages/user/projects/myProjectsLayout';
-import { LayoutDesktop } from 'layout/layoutDesktop';
-import { NextPageWithLayout } from 'pages/_app';
+import { MyProjectsLayout } from 'components/features/user/projects/myProjectsLayout'
+import { LayoutResponsive } from 'components/ui/layouts/layoutResponsive'
+import { getServerSidePropsWithAuthRequired } from 'lib/auth/getServerSidePropsWithAuth'
+import { GetServerSideProps } from 'next'
 
-const MyProjectsPage: NextPageWithLayout = () => {
-  return <MyProjectsLayout />;
-};
+const MyProjectsPage = () => {
+  return (
+    <LayoutResponsive>
+      <MyProjectsLayout />
+    </LayoutResponsive>
+  )
+}
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { locale = '' } = context;
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, ['common'])),
-    },
-  };
-};
+  return getServerSidePropsWithAuthRequired(context)
+}
 
-MyProjectsPage.getLayout = function getLayout(page) {
-  return <LayoutDesktop>{page}</LayoutDesktop>;
-};
-
-export default MyProjectsPage;
+export default MyProjectsPage

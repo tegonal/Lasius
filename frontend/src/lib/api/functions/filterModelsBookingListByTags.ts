@@ -17,14 +17,15 @@
  *
  */
 
-import { ModelsBooking } from 'lib/api/lasius';
-import { ModelsTags } from 'types/common';
-import { cleanStrForCmp } from 'lib/strings';
-import { arrayContainsAll } from 'lib/arrayContainsAll';
+import { difference } from 'es-toolkit'
+import { ModelsBooking } from 'lib/api/lasius'
+import { cleanStrForCmp } from 'lib/utils/string/strings'
+import { ModelsTags } from 'types/common'
 
 export const filterModelsBookingListByTags = (list: ModelsBooking[], tags: ModelsTags[]) =>
   list.filter((booking) => {
-    const arrFilter = tags.map((item) => cleanStrForCmp(item.id));
-    const arrBooking = booking.tags.map((item) => cleanStrForCmp(item.id));
-    return arrayContainsAll(arrFilter, arrBooking);
-  });
+    const arrFilter = tags.map((item) => cleanStrForCmp(item.id))
+    const arrBooking = booking.tags.map((item) => cleanStrForCmp(item.id))
+    // Check if all elements in arrFilter exist in arrBooking
+    return difference(arrFilter, arrBooking).length === 0
+  })

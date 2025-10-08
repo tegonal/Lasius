@@ -17,44 +17,46 @@
  *
  */
 
-import React, { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { Box, Button, Input, Label } from 'theme-ui';
-import { FormErrorBadge } from 'components/forms/formErrorBadge';
-import { useTranslation } from 'next-i18next';
-import { CardContainer } from 'components/cardContainer';
-import { LoginLayout } from 'layout/pages/login/loginLayout';
-import { Logo } from 'components/logo';
-import { FormElement } from 'components/forms/formElement';
-import { FormBody } from 'components/forms/formBody';
-import { BoxWarning } from 'components/shared/notifications/boxWarning';
-import { useRouter } from 'next/router';
-import { FormErrorsMultiple } from 'components/forms/formErrorsMultiple';
-import { Icon } from 'components/shared/icon';
-import { BoxInfo } from 'components/shared/notifications/boxInfo';
-import { TegonalFooter } from 'components/shared/tegonalFooter';
-import { usePlausible } from 'next-plausible';
-import { LasiusPlausibleEvents } from 'lib/telemetry/plausibleEvents';
-import { registerOAuthUser } from 'lib/api/lasius/oauth2-provider/oauth2-provider';
-import { GetServerSideProps, NextPage } from 'next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { AxiosError } from 'axios';
+import { AxiosError } from 'axios'
+import { RegisterInfoPanel } from 'components/features/login/authInfoPanels'
+import { AuthLayout } from 'components/features/login/authLayout'
+import { Button } from 'components/primitives/buttons/Button'
+import { Input } from 'components/primitives/inputs/Input'
+import { Card, CardBody } from 'components/ui/cards/Card'
+import { Alert } from 'components/ui/feedback/Alert'
+import { ButtonGroup } from 'components/ui/forms/ButtonGroup'
+import { FieldSet } from 'components/ui/forms/FieldSet'
+import { FormBody } from 'components/ui/forms/FormBody'
+import { FormElement } from 'components/ui/forms/FormElement'
+import { FormErrorBadge } from 'components/ui/forms/formErrorBadge'
+import { FormErrorsMultiple } from 'components/ui/forms/formErrorsMultiple'
+import { Logo } from 'components/ui/icons/Logo'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
+import { registerOAuthUser } from 'lib/api/lasius/oauth2-provider/oauth2-provider'
+import { getServerSidePropsWithoutAuth } from 'lib/auth/getServerSidePropsWithoutAuth'
+import { LasiusPlausibleEvents } from 'lib/telemetry/plausibleEvents'
+import { usePlausible } from 'lib/telemetry/usePlausible'
+import { Eye, EyeOff } from 'lucide-react'
+import { GetServerSideProps, NextPage } from 'next'
+import { useTranslation } from 'next-i18next'
+import { useRouter } from 'next/router'
+import React, { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 
 export const OAuthUserRegister: NextPage<{ locale?: string }> = ({ locale }) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showPasswords, setShowPasswords] = useState(false);
-  const [error, setError] = useState('');
-  const { t } = useTranslation('common');
-  const router = useRouter();
-  const { invitation_id = undefined, email = undefined } = router.query;
-  const plausible = usePlausible<LasiusPlausibleEvents>();
+  const [showPasswords, setShowPasswords] = useState(false)
+  const [error, setError] = useState('')
+  const { t } = useTranslation('common')
+  const router = useRouter()
+  const { invitation_id = undefined, email = undefined } = router.query
+  const plausible = usePlausible<LasiusPlausibleEvents>()
 
   // list of known error response codes, used tp provide translations only
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const translations = [
-    t('register_user_unknown_error'),
-    t('register_user_user_already_registered'),
-  ];
+    t('auth.errors.registerUnknown', { defaultValue: 'Unknown registration error' }),
+    t('auth.errors.userAlreadyRegistered', { defaultValue: 'User already registered' }),
+  ]
 
   const {
     register,
@@ -72,159 +74,203 @@ export const OAuthUserRegister: NextPage<{ locale?: string }> = ({ locale }) => 
       confirmPassword: '',
       email: email?.toString() || '',
     },
-  });
+  })
 
   useEffect(() => {
     if (email) {
-      setFocus('firstName');
+      setFocus('firstName')
     } else {
-      setFocus('email');
+      setFocus('email')
     }
-  }, [setFocus, email]);
+  }, [setFocus, email])
 
   const onSubmit = async () => {
-    const data = getValues();
+    const data = getValues()
 
-    plausible('invitation', {
-      props: {
-        status: 'registered',
-      },
-    });
-
-    setIsSubmitting(true);
     try {
       const response = await registerOAuthUser({
         firstName: data.firstName,
         lastName: data.lastName,
         password: data.confirmPassword,
         email: data.email,
-      });
+      })
 
       if (response) {
+        plausible('auth.register.success', {
+          props: {
+            provider: 'internal',
+          },
+        })
+
         const url =
           '/login?' +
           new URLSearchParams({
             invitation_id: invitation_id?.toString() || '',
             email: data.email?.toString() || '',
             locale: locale || '',
-          });
-        await router.replace(url);
+          })
+        await router.replace(url)
       } else {
-        setError('registerUserFailedUnknown');
+        plausible('auth.register.error', {
+          props: {
+            error: 'registration_failed',
+          },
+        })
+        setError('registerUserFailedUnknown')
       }
     } catch (error) {
       if (error instanceof AxiosError) {
-        setError(error.response?.data || 'unknown_error');
+        setError(error.response?.data || 'unknown_error')
       } else {
-        setError('unknown_error');
+        setError('unknown_error')
       }
     }
-    setIsSubmitting(false);
-  };
+  }
 
   const handleTogglePasswordsVisible = (e: { preventDefault: () => void }) => {
-    e.preventDefault();
-    setShowPasswords(!showPasswords);
-  };
+    e.preventDefault()
+    setShowPasswords(!showPasswords)
+  }
 
   return (
-    <LoginLayout>
-      <Logo />
-      {error && <BoxWarning>{t(('register_user_' + error) as any)}</BoxWarning>}
-      {invitation_id && (
-        <BoxInfo>
-          {t(
-            'You have been invited to create an account so that you can use Lasius to track your working hours.'
-          )}
-        </BoxInfo>
+    <AuthLayout infoPanel={<RegisterInfoPanel />}>
+      {error && (
+        <Alert variant="warning" className="animate-[fadeIn_0.4s_ease-out]">
+          {error === 'user_already_registered'
+            ? t('auth.errors.userAlreadyRegistered', { defaultValue: 'User already registered' })
+            : t('auth.errors.registerUnknown', { defaultValue: 'Unknown registration error' })}
+        </Alert>
       )}
-      <CardContainer>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <FormBody>
-            <FormElement>
-              <Label htmlFor="email">{t('E-Mail')}</Label>
-              <Input {...register('email', { required: true })} autoComplete="off" autoFocus />
-              <FormErrorBadge error={errors.email} />
-            </FormElement>
-            <FormElement>
-              <Label htmlFor="firstName">{t('Firstname')}</Label>
-              <Input {...register('firstName', { required: true })} autoComplete="off" autoFocus />
-              <FormErrorBadge error={errors.firstName} />
-            </FormElement>
-            <FormElement>
-              <Label htmlFor="lastName">{t('Lastname')}</Label>
-              <Input {...register('lastName', { required: true })} autoComplete="off" autoFocus />
-              <FormErrorBadge error={errors.lastName} />
-            </FormElement>
-            <FormElement>
-              <Label htmlFor="password">{t('Password')}</Label>
-              <Input
-                {...register('password', {
-                  required: true,
-                  validate: {
-                    notEnoughCharactersPassword: (value: string) => value.length > 8,
-                    noUppercase: (value: string) => /(?=.*[A-Z])/.test(value),
-                    noNumber: (value: string) => /\d/.test(value),
-                  },
-                })}
-                autoComplete="off"
-                autoFocus
-                type={showPasswords ? 'text' : 'password'}
-              />
-              <FormErrorsMultiple errors={errors.password as any} />
-            </FormElement>
-            <FormElement>
-              <Label htmlFor="email">{t('Confirm password')}</Label>
-              <Input
-                {...register('confirmPassword', {
-                  required: true,
-                  validate: {
-                    noPasswordConfirmNewEqual: (value: string) => value === getValues('password'),
-                  },
-                })}
-                autoComplete="off"
-                autoFocus
-                type={showPasswords ? 'text' : 'password'}
-              />
-              <FormErrorBadge error={errors.confirmPassword} />
-            </FormElement>
-            <FormElement>
-              <Button onClick={handleTogglePasswordsVisible} variant="iconText">
-                <Icon
-                  name={
-                    showPasswords ? 'view-1-interface-essential' : 'view-off-interface-essential'
-                  }
-                  size={24}
-                />
-                {showPasswords ? (
-                  <Box>{t('Hide passwords')}</Box>
-                ) : (
-                  <Box>{t('Show passwords')}</Box>
-                )}
-              </Button>
-            </FormElement>
-            <FormElement>
-              <Button disabled={isSubmitting} type="submit">
-                {t('Sign up')}
-              </Button>
-            </FormElement>
-          </FormBody>
-        </form>
-      </CardContainer>
-      <TegonalFooter />
-    </LoginLayout>
-  );
-};
+      {invitation_id && (
+        <Alert variant="info" className="animate-[fadeIn_0.4s_ease-out]">
+          {t('invitations.createAccountMessage', {
+            defaultValue:
+              'You have been invited to create an account so that you can use Lasius to track your working hours.',
+          })}
+        </Alert>
+      )}
+      <Card className="bg-base-100/80 border-0 shadow-2xl backdrop-blur-sm">
+        <CardBody className="p-8 lg:p-10">
+          <div className="mb-4 flex justify-center lg:hidden">
+            <Logo />
+          </div>
+          <div className="mb-8 text-center">
+            <h2 className="mb-2 text-3xl font-bold">
+              {t('auth.createYourAccount', { defaultValue: 'Create your account' })}
+            </h2>
+            <p className="text-base-content/60 text-sm">
+              {t('auth.fillDetailsToStart', {
+                defaultValue: 'Please fill in your details to get started',
+              })}
+            </p>
+          </div>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <FormBody>
+              <FieldSet>
+                <FormElement
+                  label={t('common.forms.email', { defaultValue: 'Email' })}
+                  htmlFor="email"
+                  required>
+                  <Input
+                    id="email"
+                    {...register('email', { required: true })}
+                    aria-describedby="email-error"
+                    autoComplete="email"
+                    autoFocus
+                  />
+                  <FormErrorBadge id="email-error" error={errors.email} />
+                </FormElement>
+                <FormElement
+                  label={t('common.forms.firstName', { defaultValue: 'First name' })}
+                  htmlFor="firstName"
+                  required>
+                  <Input
+                    id="firstName"
+                    {...register('firstName', { required: true })}
+                    aria-describedby="firstName-error"
+                    autoComplete="given-name"
+                  />
+                  <FormErrorBadge id="firstName-error" error={errors.firstName} />
+                </FormElement>
+                <FormElement
+                  label={t('common.forms.lastName', { defaultValue: 'Last name' })}
+                  htmlFor="lastName"
+                  required>
+                  <Input
+                    id="lastName"
+                    {...register('lastName', { required: true })}
+                    aria-describedby="lastName-error"
+                    autoComplete="family-name"
+                  />
+                  <FormErrorBadge id="lastName-error" error={errors.lastName} />
+                </FormElement>
+                <FormElement
+                  label={t('common.forms.password', { defaultValue: 'Password' })}
+                  htmlFor="password"
+                  required>
+                  <Input
+                    id="password"
+                    {...register('password', {
+                      required: true,
+                      validate: {
+                        notEnoughCharactersPassword: (value: string) => value.length > 8,
+                        noUppercase: (value: string) => /(?=.*[A-Z])/.test(value),
+                        noNumber: (value: string) => /\d/.test(value),
+                      },
+                    })}
+                    aria-describedby="password-errors"
+                    autoComplete="new-password"
+                    type={showPasswords ? 'text' : 'password'}
+                  />
+                  <FormErrorsMultiple id="password-errors" errors={errors.password as any} />
+                </FormElement>
+                <FormElement
+                  label={t('common.forms.confirmPassword', { defaultValue: 'Confirm password' })}
+                  htmlFor="confirmPassword"
+                  required>
+                  <Input
+                    id="confirmPassword"
+                    {...register('confirmPassword', {
+                      required: true,
+                      validate: {
+                        noPasswordConfirmNewEqual: (value: string) =>
+                          value === getValues('password'),
+                      },
+                    })}
+                    aria-describedby="confirmPassword-error"
+                    autoComplete="new-password"
+                    type={showPasswords ? 'text' : 'password'}
+                  />
+                  <FormErrorBadge id="confirmPassword-error" error={errors.confirmPassword} />
+                </FormElement>
+              </FieldSet>
+              <ButtonGroup>
+                <Button
+                  onClick={handleTogglePasswordsVisible}
+                  variant="ghost"
+                  fullWidth
+                  className="justify-start gap-2">
+                  <LucideIcon icon={showPasswords ? Eye : EyeOff} size={24} />
+                  <span>
+                    {showPasswords
+                      ? t('ui.hidePasswords', { defaultValue: 'Hide passwords' })
+                      : t('ui.showPasswords', { defaultValue: 'Show passwords' })}
+                  </span>
+                </Button>
+                <Button type="submit" fullWidth>
+                  {t('common.actions.signUp', { defaultValue: 'Sign up' })}
+                </Button>
+              </ButtonGroup>
+            </FormBody>
+          </form>
+        </CardBody>
+      </Card>
+    </AuthLayout>
+  )
+}
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { locale, query } = context;
-  const resolvedLocale = query.locale?.toString() || locale;
-  return {
-    props: {
-      ...(await serverSideTranslations(resolvedLocale || '', ['common'])),
-      locale: resolvedLocale,
-    },
-  };
-};
+  return getServerSidePropsWithoutAuth(context)
+}
 
-export default OAuthUserRegister;
+export default OAuthUserRegister

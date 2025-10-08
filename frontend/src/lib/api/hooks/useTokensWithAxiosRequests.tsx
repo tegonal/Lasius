@@ -17,14 +17,44 @@
  *
  */
 
+/**
+ * Utility function for generating HTTP request headers with authentication tokens.
+ * Creates a headers object containing the Authorization Bearer token and token issuer
+ * information for authenticated API requests to the Lasius backend.
+ *
+ * @param token - Optional authentication token (typically JWT from NextAuth)
+ * @param tokenIssuer - Optional token issuer identifier for the authentication provider
+ *
+ * @returns Object containing:
+ *   - headers: Object with Authorization and X-Token-Issuer headers if token provided
+ *   - Empty object if no token is provided
+ *
+ * @example
+ * // With authentication token
+ * const headers = getRequestHeaders(session?.access_token, 'keycloak')
+ * // Returns: { headers: { Authorization: 'Bearer <token>', 'X-Token-Issuer': 'keycloak' } }
+ *
+ * // Without token (unauthenticated request)
+ * const headers = getRequestHeaders()
+ * // Returns: {}
+ *
+ * // Use with axios request
+ * const response = await axios.get('/api/bookings', getRequestHeaders(token, issuer))
+ *
+ * @remarks
+ * - Returns empty object if token is not provided, allowing safe use in all contexts
+ * - Used by Axios interceptors to automatically add auth headers to API requests
+ * - Token issuer header helps backend identify the OAuth provider
+ * - Part of the authentication infrastructure for the Lasius API client
+ */
 export const getRequestHeaders = (token?: string, tokenIssuer?: string) => {
   if (!token) {
-    return {};
+    return {}
   }
   return {
     headers: {
       Authorization: `Bearer ${token}`,
       'X-Token-Issuer': tokenIssuer,
     },
-  };
-};
+  }
+}

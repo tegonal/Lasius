@@ -17,6 +17,6 @@
  *
  */
 
-import axios from 'axios';
+import axios from 'axios'
 
-export const nextJsAxiosInstance = (url: string) => axios.get(url).then((res) => res.data);
+export const nextJsAxiosInstance = (url: string) => axios.get(url).then((res) => res.data)

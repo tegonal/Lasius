@@ -17,27 +17,21 @@
  *
  */
 
-import { GetServerSideProps } from 'next';
-import { AccountLayout } from 'layout/pages/settings/account/accountLayout';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { LayoutDesktop } from 'layout/layoutDesktop';
-import { NextPageWithLayout } from 'pages/_app';
+import { AccountLayout } from 'components/features/settings/account/AccountLayout'
+import { LayoutResponsive } from 'components/ui/layouts/layoutResponsive'
+import { getServerSidePropsWithAuthRequired } from 'lib/auth/getServerSidePropsWithAuth'
+import { GetServerSideProps } from 'next'
 
-const AccountPage: NextPageWithLayout = () => {
-  return <AccountLayout />;
-};
+const AccountPage = () => {
+  return (
+    <LayoutResponsive>
+      <AccountLayout />
+    </LayoutResponsive>
+  )
+}
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { locale = '' } = context;
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, ['common'])),
-    },
-  };
-};
+  return getServerSidePropsWithAuthRequired(context)
+}
 
-AccountPage.getLayout = function getLayout(page) {
-  return <LayoutDesktop>{page}</LayoutDesktop>;
-};
-
-export default AccountPage;
+export default AccountPage

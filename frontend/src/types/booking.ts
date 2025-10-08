@@ -17,17 +17,17 @@
  *
  */
 
-import { ModelsBooking } from 'lib/api/lasius';
+import { ModelsBooking } from 'lib/api/lasius'
 
 export type ExtendedHistoryBooking = ModelsBooking & {
-  date: string;
-  fromTo: string;
-  duration: number;
-  durationString: string;
-};
+  date: string
+  fromTo: string
+  duration: number
+  durationString: string
+}
 
-export type UserBookingSource = 'tag' | 'project';
+export type UserBookingSource = 'tag' | 'project'
 
-export type OrganisationBookingSource = 'tag' | 'project' | 'user';
+export type OrganisationBookingSource = 'tag' | 'project' | 'user'
 
-export type OrganisationPieChartSource = 'project' | 'user';
+export type OrganisationPieChartSource = 'project' | 'user'

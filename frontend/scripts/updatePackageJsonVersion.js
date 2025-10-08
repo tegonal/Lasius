@@ -21,7 +21,7 @@
  * This script is used to update the version in package.json. It takes the current git hash from the
  * branch it is built on and appends it to the version number previously defined in package.json.
  */
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const fs = require('fs');
 
 fs.readFile('./package.json', (err, data) => {

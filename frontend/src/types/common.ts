@@ -17,20 +17,20 @@
  *
  */
 
-import { ModelsTag, ModelsWorkingHours } from 'lib/api/lasius';
+import { ModelsTag, ModelsWorkingHours } from 'lib/api/lasius'
 
 export type LinkObjectType = {
-  href: string;
-  locale: string;
-  passHref?: boolean;
-};
+  href: string
+  locale: string
+  passHref?: boolean
+}
 
-export type NivoChartDataType = Array<{ [x: string]: string | number }>;
+export type NivoChartDataType = Array<{ [x: string]: string | number }>
 
-export type ModelsWorkingHoursWeekdays = keyof ModelsWorkingHours;
+export type ModelsWorkingHoursWeekdays = keyof ModelsWorkingHours
 
 // Workaround
-export type ModelsTags = ModelsTag;
-export type ModelsTagWithSummary = ModelsTag & { summary?: string };
+export type ModelsTags = ModelsTag
+export type ModelsTagWithSummary = ModelsTag & { summary?: string }
 
-export type Granularity = 'All' | 'Year' | 'Month' | 'Week' | 'Day';
+export type Granularity = 'All' | 'Year' | 'Month' | 'Week' | 'Day'
