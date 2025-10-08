@@ -70,7 +70,7 @@ libraryDependencies ++= Seq(
   "net.openhft"          % "zero-allocation-hashing"         % "0.27ea0",
   "com.github.pureconfig" %% "pureconfig" % pureConfigVersion,
   // depend on this plugin to be able to provide custom OutputTransformer
-  "io.github.play-swagger" %% "play-swagger" % "2.0.4",
+  "io.github.play-swagger" %% "play-swagger" % "2.0.6",
   "com.github.fdimuccio"   %% "play2-sockjs" % "0.10.0",
 
   // basic jwt token and jwks support
