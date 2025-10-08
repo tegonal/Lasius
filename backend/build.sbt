@@ -67,7 +67,7 @@ libraryDependencies ++= Seq(
   "io.github.alstanchev" % "pekko-persistence-inmemory_2.13" % "1.3.0" % "test",
   "io.kontainers"       %% "purecsv"                         % "1.3.10",
   "com.chuusai"         %% "shapeless"                       % "2.3.13",
-  "net.openhft"          % "zero-allocation-hashing"         % "0.27ea0",
+  "net.openhft"          % "zero-allocation-hashing"         % "0.27ea1",
   "com.github.pureconfig" %% "pureconfig" % pureConfigVersion,
   // depend on this plugin to be able to provide custom OutputTransformer
   "io.github.play-swagger" %% "play-swagger" % "2.0.4",
