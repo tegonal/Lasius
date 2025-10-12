@@ -27,10 +27,11 @@ type TabItem = { label: string; component: React.ReactNode; icon?: string }
 
 type Props = {
   tabs: TabItem[]
+  defaultIndex?: number
 }
 
-export const Tabs: React.FC<Props> = ({ tabs }) => {
-  const { selected, tabId, setSelected } = useTabSync(0)
+export const Tabs: React.FC<Props> = ({ tabs, defaultIndex = 0 }) => {
+  const { selected, tabId, setSelected } = useTabSync(defaultIndex)
 
   return (
     <div className="border-base-content/20 flex min-h-0 w-full flex-1 flex-col border-b">

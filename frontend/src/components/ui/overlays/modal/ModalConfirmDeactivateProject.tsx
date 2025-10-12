@@ -91,7 +91,7 @@ export const ModalConfirmDeactivateProject: React.FC<Props> = ({
             {t('projects.actions.deactivate', { defaultValue: 'Deactivate project' })}
           </Button>
           <Button variant="secondary" onClick={handleClose}>
-            {t('common.actions.cancel', { defaultValue: 'Cancel' })}
+            {t('common.actions.close', { defaultValue: 'Close' })}
           </Button>
         </FormElement>
       </div>

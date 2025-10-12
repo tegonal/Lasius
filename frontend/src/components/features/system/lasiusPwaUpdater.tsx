@@ -17,7 +17,7 @@
  *
  */
 
-import { ModalConfirm } from 'components/ui/overlays/modal/modalConfirm'
+import { GenericConfirmModal } from 'components/ui/overlays/modal/GenericConfirmModal'
 import { useTranslation } from 'next-i18next'
 import React, { useEffect, useState } from 'react'
 
@@ -56,14 +56,18 @@ const LasiusPwaUpdater: React.FC = () => {
   if (!isOpen) return null
 
   return (
-    <ModalConfirm
+    <GenericConfirmModal
+      open={isOpen}
+      onClose={() => setIsOpen(false)}
       onConfirm={handleConfirm}
-      text={{
-        action: t('pwa.updateMessage', {
-          defaultValue: 'Lasius has been updated. The page will reload after your confirmation.',
-        }),
-        confirm: t('pwa.reloadApplication', { defaultValue: 'Reload application' }),
-      }}
+      title={t('pwa.updateAvailable', { defaultValue: 'Update available' })}
+      message={t('pwa.updateMessage', {
+        defaultValue: 'Lasius has been updated. The page will reload after your confirmation.',
+      })}
+      confirmLabel={t('pwa.reloadApplication', { defaultValue: 'Reload application' })}
+      cancelLabel={t('common.actions.cancel', { defaultValue: 'Cancel' })}
+      confirmVariant="primary"
+      blockViewport
     />
   )
 }

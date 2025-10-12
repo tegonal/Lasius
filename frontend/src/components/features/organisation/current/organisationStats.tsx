@@ -30,15 +30,9 @@ type Props = {
   onInvite: () => void
   onEdit: () => void
   onCreate: () => void
-  onConfigureImporters: () => void
 }
 
-export const OrganisationStats: React.FC<Props> = ({
-  onInvite,
-  onEdit,
-  onCreate,
-  onConfigureImporters,
-}) => {
+export const OrganisationStats: React.FC<Props> = ({ onInvite, onEdit, onCreate }) => {
   const { t } = useTranslation('common')
   const { selectedOrganisation } = useOrganisation()
   const { data: userList } = useGetOrganisationUserList(
@@ -89,13 +83,6 @@ export const OrganisationStats: React.FC<Props> = ({
               <li>
                 <button onClick={onEdit}>
                   {t('organisations.actions.edit', { defaultValue: 'Edit organisation' })}
-                </button>
-              </li>
-              <li>
-                <button onClick={onConfigureImporters}>
-                  {t('organisations.actions.configureImporters', {
-                    defaultValue: 'Configure issue importers',
-                  })}
                 </button>
               </li>
             </>

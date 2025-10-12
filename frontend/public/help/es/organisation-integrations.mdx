@@ -1,0 +1,47 @@
+# Integraciones
+
+Conecta Lasius con sistemas externos de seguimiento de problemas como GitHub, GitLab, Jira y Plane. Importa automáticamente problemas como etiquetas para optimizar tu flujo de trabajo de seguimiento de tiempo.
+
+## Lo que puedes hacer
+
+### Ver estadísticas de integración
+En la parte superior de la página, consulta el número total de integraciones configuradas en tu organización.
+
+### Explorar integraciones activas
+Visualiza todas las integraciones configuradas en una tabla que muestra:
+- **Tipo** - La plataforma (GitHub, GitLab, Jira, Plane)
+- **Nombre** - Tu nombre personalizado para esta integración
+- **URL base** - El endpoint de la API utilizado
+- **Proyectos** - Número de proyectos que utilizan esta integración
+
+### Agregar nuevas integraciones
+Haz clic en **Agregar configuración** en la esquina superior derecha para configurar una nueva integración. Sigue el asistente para:
+1. Seleccionar el tipo de plataforma
+2. Introducir detalles de conexión y credenciales
+3. Probar la conexión
+4. Mapear proyectos externos a proyectos de Lasius
+5. Configurar los ajustes de importación de etiquetas
+
+### Gestionar integraciones
+Haz clic en el menú contextual (<Icon name="EllipsisVertical" />) de cualquier integración para:
+- **Ver información de configuración** - Ver configuración de conexión detallada y estado
+- **Editar configuración** - Actualizar credenciales, URL u otros ajustes
+- **Ver asignaciones de proyectos** - Ver y modificar qué proyectos externos se sincronizan con qué proyectos de Lasius
+- **Eliminar configuración** - Eliminar la integración (detiene la sincronización de etiquetas)
+
+### Sincronización automática de etiquetas
+Una vez configurado, Lasius importa automáticamente problemas de tus plataformas externas como etiquetas. Los miembros del equipo pueden seleccionar estas etiquetas al hacer seguimiento del tiempo, creando una conexión directa entre las entradas de tiempo y los elementos de trabajo externos.
+
+## Consejos
+
+<Tip>Comienza con una única asignación de proyecto para probar tu integración antes de expandirla a todos los proyectos</Tip>
+
+<Tip>Usa nombres significativos para tus integraciones si tienes múltiples instancias de la misma plataforma</Tip>
+
+<Tip>Las etiquetas se sincronizan automáticamente - no se necesita importación manual una vez configuradas</Tip>
+
+<Tip>Cada integración puede asignarse a múltiples proyectos de Lasius, permitiendo estructuras organizativas flexibles</Tip>
+
+<Tip>Si una integración muestra problemas de conectividad, consulta la información de configuración para mensajes de error detallados</Tip>
+
+<Tip>Eliminar una integración no eliminará las etiquetas existentes - solo detiene la sincronización futura</Tip>

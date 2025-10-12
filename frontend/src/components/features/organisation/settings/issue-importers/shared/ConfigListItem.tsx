@@ -20,19 +20,23 @@
 import { ImporterTypeBadge } from 'components/features/issue-importers/shared/ImporterTypeBadge'
 import { Button } from 'components/primitives/buttons/Button'
 import { Card, CardBody } from 'components/ui/cards/Card'
-import { Edit, Trash2 } from 'lucide-react'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
+import { FolderTree, Pencil, Trash2 } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
 
 import type { ImporterType } from 'components/features/issue-importers/shared/types'
+import type { ModelsUserStub } from 'lib/api/lasius'
 
 type Props = {
   type: ImporterType
   name: string
   baseUrl: string
   projectCount: number
+  createdBy?: string | ModelsUserStub
   onEdit: () => void
   onDelete: () => void
+  onViewMappings: () => void
 }
 
 export const ConfigListItem: React.FC<Props> = ({
@@ -40,10 +44,12 @@ export const ConfigListItem: React.FC<Props> = ({
   name,
   baseUrl,
   projectCount,
+  createdBy,
   onEdit,
   onDelete,
+  onViewMappings,
 }) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('integrations')
 
   const noun =
     projectCount === 1
@@ -60,25 +66,49 @@ export const ConfigListItem: React.FC<Props> = ({
               <ImporterTypeBadge type={type} />
             </div>
             <p className="text-base-content/70 mb-1 text-sm">{baseUrl}</p>
-            <p className="text-base-content/60 text-xs">
-              {t('issueImporters.configListItem.usedBy', {
-                count: projectCount,
-                noun,
-                defaultValue: 'Used by {{count}} {{noun}}',
-              })}
-            </p>
+            <div className="text-base-content/60 flex flex-wrap items-center gap-x-2 text-xs">
+              <span>
+                {t('issueImporters.configListItem.usedBy', {
+                  count: projectCount,
+                  noun,
+                  defaultValue: '{{count}} {{noun}}',
+                })}
+              </span>
+              {createdBy && (
+                <>
+                  <span>•</span>
+                  <span>{typeof createdBy === 'string' ? createdBy : createdBy.key}</span>
+                </>
+              )}
+            </div>
           </div>
           <div className="flex gap-2">
-            <Button variant="ghost" size="sm" fullWidth={false} onClick={onEdit}>
-              <Edit className="h-4 w-4" />
+            <Button
+              variant="ghost"
+              size="sm"
+              fullWidth={false}
+              onClick={onViewMappings}
+              title={t('issueImporters.actions.viewMappings', {
+                defaultValue: 'View project mappings',
+              })}>
+              <LucideIcon icon={FolderTree} size={16} />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              fullWidth={false}
+              onClick={onEdit}
+              title={t('issueImporters.actions.edit', { defaultValue: 'Edit configuration' })}>
+              <LucideIcon icon={Pencil} size={16} />
             </Button>
             <Button
               variant="ghost"
               size="sm"
               fullWidth={false}
               onClick={onDelete}
-              disabled={projectCount > 0}>
-              <Trash2 className="h-4 w-4" />
+              disabled={projectCount > 0}
+              title={t('issueImporters.actions.delete', { defaultValue: 'Delete configuration' })}>
+              <LucideIcon icon={Trash2} size={16} />
             </Button>
           </div>
         </div>

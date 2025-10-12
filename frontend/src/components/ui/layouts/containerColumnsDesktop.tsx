@@ -25,7 +25,7 @@ type Props = {
 
 export const ContainerColumnsDesktop: React.FC<Props> = ({ children }) => {
   return (
-    <div className="grid h-full w-full grid-cols-[minmax(200px,310px)_minmax(max-content,auto)_minmax(200px,310px)] gap-0 overflow-auto 2xl:grid-cols-[minmax(200px,340px)_minmax(max-content,auto)_minmax(200px,340px)]">
+    <div className="grid h-full w-full grid-cols-[19rem_auto_19rem] gap-0 overflow-auto">
       {children}
     </div>
   )

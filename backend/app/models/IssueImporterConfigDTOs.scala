@@ -25,110 +25,155 @@ import models.BaseFormat._
 import play.api.libs.json._
 import java.net.URL
 
-// ===== GitLab DTOs =====
+// ===== Unified Create/Update DTOs =====
 
-case class CreateGitlabConfig(
+/** Unified DTO for creating issue importer configurations. Type-specific fields
+  * are optional and validated based on importerType.
+  *
+  * Design note: This uses a unified approach with type discrimination,
+  * diverging from the Invitation pattern (which uses separate endpoints per
+  * type). This is intentional because:
+  *   1. All importer types are created in the same context (organization)
+  *   2. Type is configuration data, not a different resource paradigm
+  *   3. Makes adding new types (GitHub, BitBucket) trivial
+  */
+case class CreateIssueImporterConfig(
+    importerType: ImporterType,
     name: String,
     baseUrl: URL,
-    accessToken: String,
     checkFrequency: Long,
-    projects: Seq[GitlabProjectMapping] = Seq.empty
+    // GitLab & Plane auth
+    accessToken: Option[String] = None,
+    // Jira auth
+    consumerKey: Option[String] = None,
+    privateKey: Option[String] = None,
+    // Plane auth
+    apiKey: Option[String] = None,
+    // GitHub-specific: resource owner for org-scoped tokens
+    resourceOwner: Option[String] = None,
+    resourceOwnerType: Option[String] = None // "User" or "Organization"
+    // Note: GitHub uses accessToken (same as GitLab)
 )
 
-object CreateGitlabConfig {
-  implicit val format: Format[CreateGitlabConfig] =
-    Json.format[CreateGitlabConfig]
+object CreateIssueImporterConfig {
+  implicit val format: Format[CreateIssueImporterConfig] =
+    Json.format[CreateIssueImporterConfig]
 }
 
-case class UpdateGitlabConfig(
-    name: Option[String],
-    baseUrl: Option[URL],
-    accessToken: Option[String],
-    checkFrequency: Option[Long],
-    projects: Option[Seq[GitlabProjectMapping]]
+case class UpdateIssueImporterConfig(
+    name: Option[String] = None,
+    baseUrl: Option[URL] = None,
+    checkFrequency: Option[Long] = None,
+    // Type-specific auth (validated based on existing config type)
+    accessToken: Option[String] = None,
+    consumerKey: Option[String] = None,
+    privateKey: Option[String] = None,
+    apiKey: Option[String] = None,
+    resourceOwner: Option[String] = None,    // GitHub resource owner login
+    resourceOwnerType: Option[String] = None // "User" or "Organization"
 )
 
-object UpdateGitlabConfig {
-  implicit val format: Format[UpdateGitlabConfig] =
-    Json.format[UpdateGitlabConfig]
+object UpdateIssueImporterConfig {
+  implicit val format: Format[UpdateIssueImporterConfig] =
+    Json.format[UpdateIssueImporterConfig]
 }
 
-// ===== Jira DTOs =====
+// ===== Project Mapping DTOs =====
 
-case class CreateJiraConfig(
-    name: String,
-    baseUrl: URL,
-    consumerKey: String,
-    privateKey: String,
-    accessToken: String,
-    checkFrequency: Long,
-    projects: Seq[JiraProjectMapping] = Seq.empty
+/** Unified DTO for creating project mappings. Type-specific fields are
+  * validated based on the parent config's importerType.
+  */
+case class CreateProjectMapping(
+    projectId: ProjectId,
+    // GitLab-specific
+    gitlabProjectId: Option[String] = None,
+    projectKeyPrefix: Option[String] = None,
+    gitlabTagConfig: Option[GitlabTagConfiguration] = None,
+    // Jira-specific
+    jiraProjectKey: Option[String] = None,
+    // Plane-specific
+    planeProjectId: Option[String] = None,
+    planeWorkspaceSlug: Option[String] = None,
+    planeTagConfig: Option[PlaneTagConfiguration] = None,
+    // GitHub-specific
+    githubRepoOwner: Option[String] = None,
+    githubRepoName: Option[String] = None,
+    githubTagConfig: Option[GithubTagConfiguration] = None,
+    // Common
+    maxResults: Option[Int] = None,
+    params: Option[String] = None
 )
 
-object CreateJiraConfig {
-  implicit val format: Format[CreateJiraConfig] = Json.format[CreateJiraConfig]
+object CreateProjectMapping {
+  implicit val format: Format[CreateProjectMapping] =
+    Json.format[CreateProjectMapping]
 }
 
-case class UpdateJiraConfig(
-    name: Option[String],
-    baseUrl: Option[URL],
-    consumerKey: Option[String],
-    privateKey: Option[String],
-    accessToken: Option[String],
-    checkFrequency: Option[Long],
-    projects: Option[Seq[JiraProjectMapping]]
+case class UpdateProjectMapping(
+    // GitLab-specific
+    gitlabProjectId: Option[String] = None,
+    projectKeyPrefix: Option[String] = None,
+    gitlabTagConfig: Option[GitlabTagConfiguration] = None,
+    // Jira-specific
+    jiraProjectKey: Option[String] = None,
+    // Plane-specific
+    planeProjectId: Option[String] = None,
+    planeWorkspaceSlug: Option[String] = None,
+    planeTagConfig: Option[PlaneTagConfiguration] = None,
+    // GitHub-specific
+    githubRepoOwner: Option[String] = None,
+    githubRepoName: Option[String] = None,
+    githubTagConfig: Option[GithubTagConfiguration] = None,
+    // Common
+    maxResults: Option[Int] = None,
+    params: Option[String] = None
 )
 
-object UpdateJiraConfig {
-  implicit val format: Format[UpdateJiraConfig] = Json.format[UpdateJiraConfig]
-}
-
-// ===== Plane DTOs =====
-
-case class CreatePlaneConfig(
-    name: String,
-    baseUrl: URL,
-    apiKey: String,
-    checkFrequency: Long,
-    projects: Seq[PlaneProjectMapping] = Seq.empty
-)
-
-object CreatePlaneConfig {
-  implicit val format: Format[CreatePlaneConfig] =
-    Json.format[CreatePlaneConfig]
-}
-
-case class UpdatePlaneConfig(
-    name: Option[String],
-    baseUrl: Option[URL],
-    apiKey: Option[String],
-    checkFrequency: Option[Long],
-    projects: Option[Seq[PlaneProjectMapping]]
-)
-
-object UpdatePlaneConfig {
-  implicit val format: Format[UpdatePlaneConfig] =
-    Json.format[UpdatePlaneConfig]
+object UpdateProjectMapping {
+  implicit val format: Format[UpdateProjectMapping] =
+    Json.format[UpdateProjectMapping]
 }
 
 // ===== Unified Response DTO =====
 
 sealed trait IssueImporterConfigResponse {
+  def id: IssueImporterConfigId
+  def importerType: ImporterType
   def name: String
-  def importerType: String
   def baseUrl: URL
   def checkFrequency: Long
   def projectCount: Int
+  def syncStatus: ConfigSyncStatus
+  def audit: AuditInfoResponse
+}
+
+object IssueImporterConfigResponse {
+  import julienrf.json.derived
+
+  private val writes: OWrites[IssueImporterConfigResponse] =
+    derived.flat.owrites[IssueImporterConfigResponse](
+      BaseFormat.defaultTypeFormat)
+
+  private val reads: Reads[IssueImporterConfigResponse] =
+    derived.flat.reads[IssueImporterConfigResponse](
+      BaseFormat.defaultTypeFormat)
+
+  implicit val format: Format[IssueImporterConfigResponse] =
+    Format(reads, writes)
 }
 
 case class GitlabConfigResponse(
-    id: GitlabConfigId,
+    id: IssueImporterConfigId,
+    importerType: ImporterType = ImporterType.Gitlab,
     name: String,
     baseUrl: URL,
     checkFrequency: Long,
-    projects: Seq[GitlabProjectMapping]
+    projects: Seq[GitlabProjectMapping],
+    syncStatus: ConfigSyncStatus,
+    audit: AuditInfoResponse,
+    // type attribute only needed to generate correct swagger definition
+    `type`: String = classOf[GitlabConfigResponse].getSimpleName
 ) extends IssueImporterConfigResponse {
-  val importerType: String = "gitlab"
   val projectCount: Int = projects.size
 }
 
@@ -136,25 +181,39 @@ object GitlabConfigResponse {
   implicit val format: Format[GitlabConfigResponse] =
     Json.format[GitlabConfigResponse]
 
-  def fromConfig(config: GitlabConfig): GitlabConfigResponse = {
+  def fromConfig(config: GitlabConfig,
+                 createdByUser: UserStub,
+                 updatedByUser: UserStub): GitlabConfigResponse = {
     GitlabConfigResponse(
-      id = config._id,
+      id = IssueImporterConfigId(config.id.value),
+      importerType = ImporterType.Gitlab,
       name = config.name,
       baseUrl = config.baseUrl,
       checkFrequency = config.settings.checkFrequency,
-      projects = config.projects
+      projects = config.projects,
+      syncStatus = config.syncStatus,
+      audit = AuditInfoResponse(
+        createdBy = createdByUser,
+        createdAt = config.audit.createdAt,
+        updatedBy = updatedByUser,
+        updatedAt = config.audit.updatedAt
+      )
     )
   }
 }
 
 case class JiraConfigResponse(
-    id: JiraConfigId,
+    id: IssueImporterConfigId,
+    importerType: ImporterType = ImporterType.Jira,
     name: String,
     baseUrl: URL,
     checkFrequency: Long,
-    projects: Seq[JiraProjectMapping]
+    projects: Seq[JiraProjectMapping],
+    syncStatus: ConfigSyncStatus,
+    audit: AuditInfoResponse,
+    // type attribute only needed to generate correct swagger definition
+    `type`: String = classOf[JiraConfigResponse].getSimpleName
 ) extends IssueImporterConfigResponse {
-  val importerType: String = "jira"
   val projectCount: Int = projects.size
 }
 
@@ -162,25 +221,39 @@ object JiraConfigResponse {
   implicit val format: Format[JiraConfigResponse] =
     Json.format[JiraConfigResponse]
 
-  def fromConfig(config: JiraConfig): JiraConfigResponse = {
+  def fromConfig(config: JiraConfig,
+                 createdByUser: UserStub,
+                 updatedByUser: UserStub): JiraConfigResponse = {
     JiraConfigResponse(
-      id = config._id,
+      id = IssueImporterConfigId(config.id.value),
+      importerType = ImporterType.Jira,
       name = config.name,
       baseUrl = config.baseUrl,
       checkFrequency = config.settings.checkFrequency,
-      projects = config.projects
+      projects = config.projects,
+      syncStatus = config.syncStatus,
+      audit = AuditInfoResponse(
+        createdBy = createdByUser,
+        createdAt = config.audit.createdAt,
+        updatedBy = updatedByUser,
+        updatedAt = config.audit.updatedAt
+      )
     )
   }
 }
 
 case class PlaneConfigResponse(
-    id: PlaneConfigId,
+    id: IssueImporterConfigId,
+    importerType: ImporterType = ImporterType.Plane,
     name: String,
     baseUrl: URL,
     checkFrequency: Long,
-    projects: Seq[PlaneProjectMapping]
+    projects: Seq[PlaneProjectMapping],
+    syncStatus: ConfigSyncStatus,
+    audit: AuditInfoResponse,
+    // type attribute only needed to generate correct swagger definition
+    `type`: String = classOf[PlaneConfigResponse].getSimpleName
 ) extends IssueImporterConfigResponse {
-  val importerType: String = "plane"
   val projectCount: Int = projects.size
 }
 
@@ -188,13 +261,104 @@ object PlaneConfigResponse {
   implicit val format: Format[PlaneConfigResponse] =
     Json.format[PlaneConfigResponse]
 
-  def fromConfig(config: PlaneConfig): PlaneConfigResponse = {
+  def fromConfig(config: PlaneConfig,
+                 createdByUser: UserStub,
+                 updatedByUser: UserStub): PlaneConfigResponse = {
     PlaneConfigResponse(
-      id = config._id,
+      id = IssueImporterConfigId(config.id.value),
+      importerType = ImporterType.Plane,
       name = config.name,
       baseUrl = config.baseUrl,
       checkFrequency = config.settings.checkFrequency,
-      projects = config.projects
+      projects = config.projects,
+      syncStatus = config.syncStatus,
+      audit = AuditInfoResponse(
+        createdBy = createdByUser,
+        createdAt = config.audit.createdAt,
+        updatedBy = updatedByUser,
+        updatedAt = config.audit.updatedAt
+      )
     )
   }
+}
+
+case class GithubConfigResponse(
+    id: IssueImporterConfigId,
+    importerType: ImporterType = ImporterType.Github,
+    name: String,
+    baseUrl: URL,
+    checkFrequency: Long,
+    projects: Seq[GithubProjectMapping],
+    syncStatus: ConfigSyncStatus,
+    audit: AuditInfoResponse,
+    resourceOwner: Option[String] = None,
+    resourceOwnerType: Option[String] = None, // "User" or "Organization"
+    availableResourceOwners: Option[Seq[ExternalProject]] = None,
+    // type attribute only needed to generate correct swagger definition
+    `type`: String = classOf[GithubConfigResponse].getSimpleName
+) extends IssueImporterConfigResponse {
+  val projectCount: Int = projects.size
+}
+
+object GithubConfigResponse {
+  implicit val format: Format[GithubConfigResponse] =
+    Json.format[GithubConfigResponse]
+
+  def fromConfig(config: GithubConfig,
+                 createdByUser: UserStub,
+                 updatedByUser: UserStub,
+                 availableResourceOwners: Option[Seq[ExternalProject]] = None)
+      : GithubConfigResponse = {
+    GithubConfigResponse(
+      id = IssueImporterConfigId(config.id.value),
+      importerType = ImporterType.Github,
+      name = config.name,
+      baseUrl = config.baseUrl,
+      checkFrequency = config.settings.checkFrequency,
+      projects = config.projects,
+      syncStatus = config.syncStatus,
+      audit = AuditInfoResponse(
+        createdBy = createdByUser,
+        createdAt = config.audit.createdAt,
+        updatedBy = updatedByUser,
+        updatedAt = config.audit.updatedAt
+      ),
+      resourceOwner = config.auth.resourceOwner,
+      resourceOwnerType = config.auth.resourceOwnerType,
+      availableResourceOwners = availableResourceOwners
+    )
+  }
+}
+
+// ===== List Projects Response Models =====
+
+case class ExternalProject(
+    id: String,
+    name: String,
+    ownerType: Option[String] = None // "User" or "Organization" for GitHub
+)
+
+case class ExternalWorkspace(
+    id: String,
+    name: String,
+    projects: Seq[ExternalProject]
+)
+
+case class ListProjectsResponse(
+    projects: Option[Seq[ExternalProject]] = None,
+    workspaces: Option[Seq[ExternalWorkspace]] = None
+)
+
+object ExternalProject {
+  implicit val format: Format[ExternalProject] = Json.format[ExternalProject]
+}
+
+object ExternalWorkspace {
+  implicit val format: Format[ExternalWorkspace] =
+    Json.format[ExternalWorkspace]
+}
+
+object ListProjectsResponse {
+  implicit val format: Format[ListProjectsResponse] =
+    Json.format[ListProjectsResponse]
 }

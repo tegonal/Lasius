@@ -21,7 +21,7 @@ import { ContextButtonWrapper } from 'components/features/contextMenu/contextBut
 import { useContextMenu } from 'components/features/contextMenu/hooks/useContextMenu'
 import { Button } from 'components/primitives/buttons/Button'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
-import { ModalConfirm } from 'components/ui/overlays/modal/modalConfirm'
+import { GenericConfirmModal } from 'components/ui/overlays/modal/GenericConfirmModal'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { useProfile } from 'lib/api/hooks/useProfile'
 import { ModelsUserProject } from 'lib/api/lasius'
@@ -43,10 +43,11 @@ export const ContextButtonDeactivateProject: React.FC<Props> = ({ variant = 'def
 
   const handleConfirm = async () => {
     await removeProjectUser(selectedOrganisationId, item.projectReference.id, userId)
+    setShowDialog(false)
     handleCloseAll()
   }
 
-  const handleCancel = async () => {
+  const handleCancel = () => {
     setShowDialog(false)
   }
 
@@ -64,14 +65,18 @@ export const ContextButtonDeactivateProject: React.FC<Props> = ({ variant = 'def
         <LucideIcon icon={Trash2} size={24} />
       </Button>
       {showDialog && (
-        <ModalConfirm
-          text={{
-            action: t('projects.confirmations.deactivate', {
-              defaultValue: 'Are you sure you want to deactivate this project?',
-            }),
-          }}
+        <GenericConfirmModal
+          open={showDialog}
+          onClose={handleCancel}
           onConfirm={handleConfirm}
-          onCancel={handleCancel}
+          title={t('projects.actions.deactivate', { defaultValue: 'Deactivate project' })}
+          message={t('projects.confirmations.deactivate', {
+            defaultValue: 'Are you sure you want to deactivate this project?',
+          })}
+          confirmLabel={t('projects.actions.deactivate', { defaultValue: 'Deactivate project' })}
+          cancelLabel={t('common.actions.cancel', { defaultValue: 'Cancel' })}
+          confirmVariant="primary"
+          blockViewport
         />
       )}
     </ContextButtonWrapper>

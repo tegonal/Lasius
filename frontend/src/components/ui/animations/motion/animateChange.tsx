@@ -31,18 +31,15 @@ type Props = {
   hash?: string
   useAvailableSpace?: boolean
 }
-export const AnimateChange: React.FC<Props> = ({ children, hash, useAvailableSpace }) => {
-  const style = useAvailableSpace ? { width: '100%', height: '100%' } : {}
+export const AnimateChange: React.FC<Props> = ({
+  children,
+  hash,
+  useAvailableSpace: _useAvailableSpace,
+}) => {
   return (
     <AnimatePresence key={hash} mode="popLayout">
       {React.Children.map(children, (child, idx) => (
-        <m.div
-          exit="exit"
-          initial="hidden"
-          animate="show"
-          variants={item}
-          custom={idx}
-          style={style}>
+        <m.div exit="exit" initial="hidden" animate="show" variants={item} custom={idx}>
           {child}
         </m.div>
       ))}

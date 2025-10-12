@@ -17,12 +17,13 @@
  *
  */
 
+import { CalendarDataProvider } from 'components/features/calendar/CalendarDataProvider'
+import { useCalendarDaySummary } from 'components/features/calendar/hooks/useCalendarDaySummary'
 import { FormatDate } from 'components/ui/data-display/FormatDate'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { format, isToday, toDate } from 'date-fns'
 import { AnimatePresence, m } from 'framer-motion'
 import { IsoDateString } from 'lib/api/apiDateHandling'
-import { useGetBookingSummaryDay } from 'lib/api/hooks/useGetBookingSummaryDay'
 import { cn } from 'lib/utils/cn'
 import { getDateLocale } from 'lib/utils/date/dateFormat'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
@@ -48,7 +49,7 @@ const CalendarDayCompact: React.FC<CalendarDayCompactProps> = ({
   isTodayDate,
   onDayClick,
 }) => {
-  const { progressBarPercentage } = useGetBookingSummaryDay(day)
+  const { progressBarPercentage } = useCalendarDaySummary(day)
   const dayDate = new Date(day)
   const dayNumber = toDate(dayDate).getDate()
 
@@ -105,71 +106,73 @@ export const CalendarMonthCompact: React.FC = () => {
   if (!isClient) return null
 
   return (
-    <div className="w-full">
-      <div className="mb-3 flex items-center justify-between">
-        <button
-          className="btn btn-ghost btn-sm btn-circle"
-          aria-label={t('calendar.navigation.previousMonth', { defaultValue: 'Previous month' })}
-          onClick={previous}>
-          <LucideIcon icon={ChevronLeft} size={16} />
-        </button>
-        <div className="flex flex-col items-center">
-          <div className="text-sm font-medium">
-            <FormatDate date={month[0]} format="monthNameLong" />
-          </div>
-          <div className="text-base-content/60 text-xs">
-            <FormatDate date={month[0]} format="year" />
-          </div>
-        </div>
-        <button
-          className="btn btn-ghost btn-sm btn-circle"
-          aria-label={t('calendar.navigation.nextMonth', { defaultValue: 'Next month' })}
-          onClick={next}>
-          <LucideIcon icon={ChevronRight} size={16} />
-        </button>
-      </div>
-
-      {!isToday(new Date(selectedDay)) && (
-        <div className="mb-2 flex justify-center">
+    <CalendarDataProvider date={selectedDate} period="month">
+      <div className="w-full">
+        <div className="mb-3 flex items-center justify-between">
           <button
-            className="btn btn-ghost btn-xs"
-            aria-label={t('common.time.today', { defaultValue: 'Today' })}
-            onClick={selectToday}>
-            {t('common.time.today', { defaultValue: 'Today' })}
+            className="btn btn-ghost btn-sm btn-circle"
+            aria-label={t('calendar.navigation.previousMonth', { defaultValue: 'Previous month' })}
+            onClick={previous}>
+            <LucideIcon icon={ChevronLeft} size={16} />
+          </button>
+          <div className="flex flex-col items-center">
+            <div className="text-sm font-medium">
+              <FormatDate date={month[0]} format="monthNameLong" />
+            </div>
+            <div className="text-base-content/60 text-xs">
+              <FormatDate date={month[0]} format="year" />
+            </div>
+          </div>
+          <button
+            className="btn btn-ghost btn-sm btn-circle"
+            aria-label={t('calendar.navigation.nextMonth', { defaultValue: 'Next month' })}
+            onClick={next}>
+            <LucideIcon icon={ChevronRight} size={16} />
           </button>
         </div>
-      )}
 
-      <div className="mb-1 grid grid-cols-7 gap-1 text-center">
-        {weekDays.map((day, index) => (
-          <div key={index} className="text-base-content/60 text-xs font-medium">
-            {day}
+        {!isToday(new Date(selectedDay)) && (
+          <div className="mb-2 flex justify-center">
+            <button
+              className="btn btn-ghost btn-xs"
+              aria-label={t('common.time.today', { defaultValue: 'Today' })}
+              onClick={selectToday}>
+              {t('common.time.today', { defaultValue: 'Today' })}
+            </button>
           </div>
-        ))}
-      </div>
+        )}
 
-      <AnimatePresence>
-        <div className="grid w-full grid-cols-7 gap-1">
-          {topFiller.map((item) => (
-            <div key={item()} />
+        <div className="mb-1 grid grid-cols-7 gap-1 text-center">
+          {weekDays.map((day, index) => (
+            <div key={index} className="text-base-content/60 text-xs font-medium">
+              {day}
+            </div>
           ))}
-          {month.map((day) => {
-            const dayDate = new Date(day)
-            const isSelected = isDaySelected(day)
-            const isTodayDate = isToday(dayDate)
-
-            return (
-              <CalendarDayCompact
-                key={day}
-                day={day}
-                isSelected={isSelected}
-                isTodayDate={isTodayDate}
-                onDayClick={selectDay}
-              />
-            )
-          })}
         </div>
-      </AnimatePresence>
-    </div>
+
+        <AnimatePresence>
+          <div className="grid w-full grid-cols-7 gap-1">
+            {topFiller.map((item) => (
+              <div key={item()} />
+            ))}
+            {month.map((day) => {
+              const dayDate = new Date(day)
+              const isSelected = isDaySelected(day)
+              const isTodayDate = isToday(dayDate)
+
+              return (
+                <CalendarDayCompact
+                  key={day}
+                  day={day}
+                  isSelected={isSelected}
+                  isTodayDate={isTodayDate}
+                  onDayClick={selectDay}
+                />
+              )
+            })}
+          </div>
+        </AnimatePresence>
+      </div>
+    </CalendarDataProvider>
   )
 }

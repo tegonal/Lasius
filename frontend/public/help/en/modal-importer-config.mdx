@@ -1,0 +1,80 @@
+# Integration Configuration
+
+Configure connections to external project management platforms (GitHub, GitLab, Jira, Plane) to automatically sync issues as time tracking tags.
+
+## Creating an Integration
+
+1. Enter a **Configuration Name** to identify this integration (e.g., "Company GitLab")
+2. Enter the **Base URL** for your platform instance
+3. Enter your **Access Token** or authentication credentials
+4. Set the **Check Interval** (how often to check for new issues)
+5. Click **Create** to save
+
+<Tip>The right column shows step-by-step instructions for generating tokens on your platform</Tip>
+
+## Editing an Integration
+
+When editing, credential fields show placeholder text to indicate they're optional:
+
+- Leave credential fields **empty** to keep existing values
+- Fill in credential fields **only if you want to update them**
+
+### Testing Your Connection
+
+1. Fill in any credentials you want to update
+2. Click **Test Connection** (bottom right)
+3. Check the result message that appears
+4. Click **Update** to save if the test succeeds
+
+<Tip>Always test the connection before saving to catch authentication problems early</Tip>
+
+## Check Interval
+
+This controls how often Lasius fetches new issues from your platform.
+
+**Recommended settings:**
+- **5 minutes**: For active teams with frequent updates
+- **15 minutes**: For most teams (good balance)
+- **30 minutes**: For smaller teams or to reduce API calls
+
+## Platform-Specific Notes
+
+**GitHub:**
+- After entering your access token, select which user/organization owns the repositories
+- The dropdown loads automatically after you enter a valid token
+
+**GitLab:**
+- Works with GitLab.com or self-hosted instances
+- Token needs `read_api` scope
+
+**Jira:**
+- Requires OAuth consumer key, private key, and access token
+- Follow the right-column instructions carefully for OAuth setup
+
+**Plane:**
+- Get your API key from Plane workspace settings
+
+## After Creating
+
+Once created, you need to:
+1. Go back to the integrations list
+2. Open the context menu for your integration
+3. Select **Map Projects** to link projects
+4. Configure which issues to sync as tags
+
+## Troubleshooting
+
+**Test connection fails:**
+- Double-check the base URL is correct
+- Verify your credentials have the right permissions
+- Check the error message for specific details
+
+**GitHub: No organizations appear:**
+- Make sure you entered a valid access token
+- Wait a moment for the dropdown to load
+- Check that your token has access to organizations
+
+**Form won't save:**
+- All fields are required when creating
+- Configuration name must be unique
+- Check for error messages below each field

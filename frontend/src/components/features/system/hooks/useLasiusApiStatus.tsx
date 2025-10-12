@@ -64,8 +64,25 @@ const testApiConnection = async () => {
  */
 export const useLasiusApiStatus = () => {
   const [status, setStatus] = React.useState(CONNECTION_STATUS.CONNECTED)
+  const [isWindowFocused, setIsWindowFocused] = React.useState(true)
   const { status: browserStatus } = useBrowserConnectionStatus()
   const plausible = usePlausible<LasiusPlausibleEvents>()
+
+  // Track window focus to pause polling when tab is not active
+  React.useEffect(() => {
+    if (!IS_BROWSER) return
+
+    const handleFocus = () => setIsWindowFocused(true)
+    const handleBlur = () => setIsWindowFocused(false)
+
+    window.addEventListener('focus', handleFocus)
+    window.addEventListener('blur', handleBlur)
+
+    return () => {
+      window.removeEventListener('focus', handleFocus)
+      window.removeEventListener('blur', handleBlur)
+    }
+  }, [])
 
   const handleOnline = () => {
     setStatus(CONNECTION_STATUS.CONNECTED)
@@ -84,13 +101,17 @@ export const useLasiusApiStatus = () => {
     }
   }
 
-  useInterval(async () => {
-    if (browserStatus === CONNECTION_STATUS.CONNECTED) {
-      const status = await testApiConnection()
-      if (status === CONNECTION_STATUS.CONNECTED) handleOnline()
-      if (status === CONNECTION_STATUS.DISCONNECTED) handleOffline()
-    }
-  }, API_STATUS_INTERVAL)
+  // Only poll when window is focused and browser is online
+  useInterval(
+    async () => {
+      if (browserStatus === CONNECTION_STATUS.CONNECTED && isWindowFocused) {
+        const status = await testApiConnection()
+        if (status === CONNECTION_STATUS.CONNECTED) handleOnline()
+        if (status === CONNECTION_STATUS.DISCONNECTED) handleOffline()
+      }
+    },
+    isWindowFocused ? API_STATUS_INTERVAL : null,
+  )
 
   return { status }
 }

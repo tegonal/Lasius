@@ -54,7 +54,7 @@ export const GenericInputModal: React.FC<Props> = ({
   label,
   placeholder,
   confirmLabel,
-  cancelLabel = 'Cancel',
+  cancelLabel = 'Close',
   error,
   enableEnterKey = false,
 }) => {

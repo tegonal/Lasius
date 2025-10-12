@@ -33,10 +33,10 @@ type Props = {
   onSelect: (type: ImporterType) => void
 }
 
-const IMPORTERS: ImporterType[] = ['gitlab', 'jira', 'plane']
+const IMPORTERS: ImporterType[] = ['github', 'gitlab', 'jira', 'plane']
 
 export const ImporterTypeSelector: React.FC<Props> = ({ open, onClose, onSelect }) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('integrations')
 
   return (
     <Modal open={open} onClose={onClose}>

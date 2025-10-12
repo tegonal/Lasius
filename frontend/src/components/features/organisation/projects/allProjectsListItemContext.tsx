@@ -213,7 +213,7 @@ export const AllProjectsListItemContext: React.FC<Props> = ({ item }) => {
           )}
         </AnimatePresence>
       </ContextBody>
-      <Modal open={isTagOpen} onClose={handleTagClose} size="wide">
+      <Modal open={isTagOpen} onClose={handleTagClose} size="lg">
         <ProjectAddUpdateTagsForm
           mode="update"
           item={item}
@@ -229,7 +229,7 @@ export const AllProjectsListItemContext: React.FC<Props> = ({ item }) => {
           onCancel={handleUpdateClose}
         />
       </Modal>
-      <Modal open={isManageOpen} onClose={handleManageClose} autoSize={false}>
+      <Modal open={isManageOpen} onClose={handleManageClose} size="xl">
         <ManageProjectMembers item={item} onSave={handleManageClose} onCancel={handleManageClose} />
       </Modal>
       {isDeactivateConfirmOpen && (

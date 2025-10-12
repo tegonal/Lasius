@@ -43,17 +43,23 @@ object PlaneTagParseScheduler {
                             settings: PlaneSettings,
                             projectSettings: PlaneProjectSettings,
                             auth: ServiceAuthentication,
+                            configId: IssueImporterConfigId,
+                            organisationId: OrganisationId,
                             projectId: ProjectId)
   case class StopScheduler(uuid: UUID)
+  case class StopProjectScheduler(configId: IssueImporterConfigId,
+                                  projectId: ProjectId)
   case object StopAllSchedulers
   case class SchedulerStarted(uuid: UUID)
+  case class RefreshTags(configId: IssueImporterConfigId, projectId: ProjectId)
 }
 
 class PlaneTagParseScheduler(wsClient: WSClient, systemServices: SystemServices)
     extends Actor
     with ActorLogging {
   import PlaneTagParseScheduler._
-  var workers: Map[UUID, ActorRef] = Map()
+  var workers: Map[UUID, ActorRef]                                      = Map()
+  var projectWorkers: Map[(IssueImporterConfigId, ProjectId), ActorRef] = Map()
 
   override val supervisorStrategy: OneForOneStrategy =
     OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1.minute) {
@@ -66,6 +72,8 @@ class PlaneTagParseScheduler(wsClient: WSClient, systemServices: SystemServices)
                         settings,
                         projectSettings,
                         auth,
+                        configId,
+                        organisationId,
                         projectId) =>
       log.debug(
         s"StartScheduler: $config, $auth, $projectId, ${projectSettings.planeProjectId}")
@@ -78,8 +86,11 @@ class PlaneTagParseScheduler(wsClient: WSClient, systemServices: SystemServices)
                                   settings,
                                   projectSettings,
                                   auth,
+                                  configId,
+                                  organisationId,
                                   projectId))
-      workers += uuid -> ref
+      workers += uuid                         -> ref
+      projectWorkers += (configId, projectId) -> ref
       ref ! StartParsing
       sender() ! SchedulerStarted(uuid)
     case StopScheduler(uuid) =>
@@ -88,6 +99,7 @@ class PlaneTagParseScheduler(wsClient: WSClient, systemServices: SystemServices)
         .get(uuid)
         .map { worker =>
           log.debug(s"Stopping worker with uuid:$uuid")
+          projectWorkers = projectWorkers.filter(_._2 != worker)
           worker ! PoisonPill
           workers - uuid
         }
@@ -96,5 +108,34 @@ class PlaneTagParseScheduler(wsClient: WSClient, systemServices: SystemServices)
     case StopAllSchedulers =>
       log.debug("Stopping all workers")
       workers.map { case (_, worker) => worker ! PoisonPill }
+      projectWorkers = Map()
+
+    case StopProjectScheduler(configId, projectId) =>
+      log.debug(
+        s"StopProjectScheduler: configId=$configId, projectId=$projectId")
+      projectWorkers.get((configId, projectId)) match {
+        case Some(worker) =>
+          log.debug(
+            s"Stopping worker for configId=$configId, projectId=$projectId")
+          worker ! PoisonPill
+          projectWorkers -= ((configId, projectId))
+          // Also remove from workers map
+          workers = workers.filter(_._2 != worker)
+        case None =>
+          log.warning(
+            s"No worker found for configId=$configId, projectId=$projectId")
+      }
+
+    case RefreshTags(configId, projectId) =>
+      log.debug(s"RefreshTags: configId=$configId, projectId=$projectId")
+      projectWorkers.get((configId, projectId)) match {
+        case Some(worker) =>
+          log.debug(
+            s"Found worker for project $projectId, sending Parse message")
+          worker ! PlaneTagParseWorker.Parse
+        case None =>
+          log.warning(
+            s"No worker found for configId=$configId, projectId=$projectId")
+      }
   }
 }

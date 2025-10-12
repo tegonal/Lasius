@@ -25,18 +25,32 @@ const clientAxiosInstance = Axios.create({
   baseURL: IS_SERVER ? LASIUS_API_URL_INTERNAL : LASIUS_API_URL,
 }) // use your own URL here or environment variable
 
+/**
+ * Endpoints that should not trigger the global loading indicator
+ * These are typically background polling or session management requests
+ */
+const EXCLUDED_ENDPOINTS = ['/api/auth/session', '/api/build-id', '/backend/config']
+
+/**
+ * Check if a request URL should be excluded from loading tracking
+ */
+const shouldExcludeFromLoading = (url?: string): boolean => {
+  if (!url) return false
+  return EXCLUDED_ENDPOINTS.some((endpoint) => url.includes(endpoint))
+}
+
 // Add request interceptor to show global loading
 clientAxiosInstance.interceptors.request.use(
   (config) => {
     // Only track requests on the client side
-    if (!IS_SERVER) {
+    if (!IS_SERVER && !shouldExcludeFromLoading(config.url)) {
       useUIStore.getState().showGlobalLoading()
     }
     return config
   },
   (error) => {
     // Always decrement on request error
-    if (!IS_SERVER) {
+    if (!IS_SERVER && !shouldExcludeFromLoading(error.config?.url)) {
       useUIStore.getState().hideGlobalLoading()
     }
     return Promise.reject(error)
@@ -46,14 +60,14 @@ clientAxiosInstance.interceptors.request.use(
 // Add response interceptor to hide global loading
 clientAxiosInstance.interceptors.response.use(
   (response) => {
-    if (!IS_SERVER) {
+    if (!IS_SERVER && !shouldExcludeFromLoading(response.config.url)) {
       useUIStore.getState().hideGlobalLoading()
     }
     return response
   },
   (error) => {
     // Always decrement on response error, including cancelled requests
-    if (!IS_SERVER) {
+    if (!IS_SERVER && !shouldExcludeFromLoading(error.config?.url)) {
       useUIStore.getState().hideGlobalLoading()
     }
     return Promise.reject(error)

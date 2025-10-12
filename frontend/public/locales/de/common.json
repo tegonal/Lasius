@@ -29,6 +29,9 @@
     },
     "title": "Konto"
   },
+  "actions": {
+    "close": "Schließen"
+  },
   "app": {
     "name": "Lasius"
   },
@@ -45,14 +48,52 @@
     "createYourAccount": "Erstelle dein Konto",
     "enterEmailAndPassword": "Gib deine E-Mail-Adresse und dein Passwort ein, um auf dein Konto zuzugreifen",
     "errors": {
+      "accessDenied": {
+        "message": "Du hast keine Berechtigung, dich anzumelden. Bitte kontaktiere deinen Administrator.",
+        "title": "Zugriff verweigert"
+      },
+      "backToLogin": "Zurück zur Anmeldung",
       "callback": "Authentifizierungs-Rückruf fehlgeschlagen. Bitte versuche es erneut.",
+      "configuration": {
+        "message": "Es gibt ein Problem mit der Serverkonfiguration. Bitte kontaktiere deinen Administrator.",
+        "title": "Konfigurationsfehler"
+      },
+      "credentials": {
+        "message": "Die eingegebenen Anmeldedaten sind falsch. Bitte versuche es erneut.",
+        "title": "Anmeldung fehlgeschlagen"
+      },
       "credentialsMissing": "Benutzername oder Passwort fehlt",
+      "default": {
+        "message": "Bei der Authentifizierung ist ein Fehler aufgetreten. Bitte versuche es erneut.",
+        "title": "Authentifizierungsfehler"
+      },
+      "email": {
+        "message": "Die Anmelde-E-Mail konnte nicht gesendet werden. Bitte versuche es später erneut.",
+        "title": "E-Mail-Fehler"
+      },
+      "errorCode": "Fehlercode",
       "fetchProfileFailed": "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.",
       "general": "Ein Fehler ist bei der Authentifizierung aufgetreten: {error}",
+      "oauth": {
+        "message": "Bei der OAuth-Authentifizierung ist ein Fehler aufgetreten. Bitte versuche es erneut oder verwende eine andere Anmeldemethode.",
+        "title": "OAuth-Fehler"
+      },
       "oauthCallback": "Authentifizierung fehlgeschlagen. Bitte versuche es erneut.",
+      "persistentIssue": "Wenn dieses Problem weiterhin besteht, kontaktiere bitte deinen Administrator.",
       "registerUnknown": "Unbekannter Registrierungsfehler",
-      "sessionRequired": "Bitte melde dich an, um fortzufahren.",
+      "sessionRequired": {
+        "message": "Bitte melde dich an, um fortzufahren.",
+        "title": "Sitzung erforderlich"
+      },
+      "unknown": {
+        "message": "Bei der Authentifizierung ist ein unerwarteter Fehler aufgetreten.",
+        "title": "Authentifizierungsfehler"
+      },
       "userAlreadyRegistered": "Benutzer bereits registriert",
+      "verification": {
+        "message": "Der Verifizierungstoken ist abgelaufen oder wurde bereits verwendet. Bitte versuche dich erneut anzumelden.",
+        "title": "Verifizierung fehlgeschlagen"
+      },
       "wrongPasswordOrEmail": "Falsches Passwort oder E-Mail. Versuche es erneut."
     },
     "fillDetailsToStart": "Bitte fülle deine Angaben aus, um zu beginnen",
@@ -74,6 +115,9 @@
     "signIn": "Anmelden",
     "signInTitle": "Bei deinem Konto anmelden",
     "signInToLasius": "Bei Lasius anmelden",
+    "status": {
+      "authenticationFailed": "Authentifizierung fehlgeschlagen. Bitte melde dich erneut an."
+    },
     "tagline": "Open-Source Zeiterfassung für moderne Teams",
     "thankYouForRegistering": "Danke für deine Registrierung! Du kannst dich jetzt mit deiner E-Mail-Adresse und deinem Passwort anmelden. Willkommen bei Lasius!",
     "welcomeBack": "Willkommen zurück",
@@ -129,6 +173,7 @@
     "status": {
       "added": "Buchung hinzugefügt",
       "currentlyNotBooking": "Derzeit keine Buchung aktiv",
+      "historyCleared": "Buchungsverlauf gelöscht",
       "removed": "Buchung entfernt",
       "started": "Buchung gestartet",
       "updated": "Buchung aktualisiert"
@@ -249,17 +294,17 @@
     },
     "user": "Benutzer",
     "validation": {
-      "emailInvalid": "Muss eine gültige E-Mail-Adresse sein",
+      "emailInvalid": "Ungültige E-Mail-Adresse",
       "endBeforeStart": "Endzeit liegt vor der Startzeit",
       "fromMustBeBeforeTo": "Muss vor dem \"Bis\"-Datum liegen",
-      "missingNumber": "Fehlende Zahl",
+      "missingNumber": "Muss eine Zahl enthalten",
       "missingSpecialChar": "Fehlendes Sonderzeichen",
-      "missingUppercase": "Fehlender Großbuchstabe",
+      "missingUppercase": "Muss einen Großbuchstaben enthalten",
       "mustBeAfterStart": "Muss nach dem Start sein",
       "mustBeBeforeEnd": "Muss vor dem Ende sein",
       "mustBeInPast": "Muss in der Vergangenheit liegen",
       "passwordMismatch": "Passwörter stimmen nicht überein",
-      "passwordTooShort": "Nicht genug Zeichen (min. 8)",
+      "passwordTooShort": "Mindestens 9 Zeichen",
       "required": "Erforderlich",
       "toMustBeAfterFrom": "Muss nach dem \"Von\"-Datum liegen",
       "wrongFormat": "Falsches Format"
@@ -328,6 +373,9 @@
   "help": {
     "contactAdmin": "Bitte kontaktiere deinen Administrator"
   },
+  "integrations": {
+    "title": "Integrationen"
+  },
   "invitations": {
     "actions": {
       "accept": "Einladung annehmen",
@@ -338,115 +386,41 @@
     "description": {
       "copyLink": "Kopiere den Link und sende ihn an deine Kollegen. Falls sie noch kein Konto haben, wird eines erstellt, wenn die Einladung angenommen wird."
     },
+    "email": "Email",
     "errors": {
       "createdForSomeoneElse": "Diese Einladung wurde für jemand anderen erstellt. Melde dich entweder ab und lade die Seite neu, oder leite den Einladungslink an den Benutzer {{email}} weiter",
       "noLongerValid": "Diese Einladung ist nicht mehr gültig. Kontaktiere am besten die Person, die dir den Einladungslink gesendet hat, um einen neuen zu erhalten."
     },
-    "inviteByEmail": "Per E-Mail einladen",
+    "inviteOrganisationDescription": "Gib die E-Mail-Adresse der Person ein, die du einladen möchtest. Ein Einladungslink wird generiert, den du ihr senden kannst.",
+    "inviteProjectDescription": "Gib die E-Mail-Adresse der Person ein, die du einladen möchtest. Ein Einladungslink wird generiert, den du ihr senden kannst.",
     "messages": {
       "invitedToOrganisation": "Du wurdest von {{inviter}} eingeladen, der Organisation {{organisation}} beizutreten.",
       "invitedToProject": "Du wurdest von {{inviter}} eingeladen, dem Projekt {{project}} beizutreten.",
       "selectOrganisation": "Wähle die Organisation aus, zu der du dieses Projekt hinzufügen möchtest:"
+    },
+    "title": {
+      "invitationCreated": "Einladung erstellt",
+      "userAssigned": "Benutzer zugewiesen"
     }
   },
   "issueImporters": {
-    "actions": {
-      "addConfiguration": "Add Configuration",
-      "cancel": "Cancel",
-      "create": "Create",
-      "saving": "Saving...",
-      "update": "Update"
-    },
-    "checkInterval": "Check Interval",
-    "checkIntervalHelp": "How often to check for new issues",
-    "configListItem": {
-      "project": "project",
-      "projects": "projects",
-      "usedBy_plural_one": "Used by {{count}} {{noun}}",
-      "usedBy_plural_other": "Used by {{count}} {{noun}}"
-    },
-    "confirmDelete": {
-      "gitlab": "Are you sure you want to delete this GitLab configuration?",
-      "jira": "Are you sure you want to delete this Jira configuration?",
-      "plane": "Are you sure you want to delete this Plane configuration?"
-    },
-    "emptyState": {
-      "message": "No issue tracker configurations yet"
-    },
-    "errors": {
-      "deleteFailed": {
-        "gitlab": "Failed to delete GitLab config",
-        "jira": "Failed to delete Jira config",
-        "plane": "Failed to delete Plane config"
-      },
-      "saveFailed": {
-        "gitlab": "Failed to save GitLab config",
-        "jira": "Failed to save Jira config",
-        "plane": "Failed to save Plane config"
-      }
-    },
-    "fields": {
-      "accessToken": "Access Token",
-      "accessTokenEdit": "Access Token (leave empty to keep current)",
-      "apiKey": "API Key",
-      "apiKeyEdit": "API Key (leave empty to keep current)",
-      "baseUrl": "Base URL",
-      "baseUrlPlaceholder": {
-        "gitlab": "https://gitlab.company.com",
-        "jira": "https://company.atlassian.net",
-        "plane": "https://plane.company.com"
-      },
-      "consumerKey": "OAuth Consumer Key",
-      "name": "Configuration Name",
-      "namePlaceholder": {
-        "gitlab": "e.g., Company GitLab",
-        "jira": "e.g., Company Jira",
-        "plane": "e.g., Company Plane"
-      },
-      "oauthAccessToken": "OAuth Access Token",
-      "oauthAccessTokenEdit": "OAuth Access Token (leave empty to keep current)",
-      "privateKey": "OAuth Private Key",
-      "privateKeyEdit": "OAuth Private Key (leave empty to keep current)"
-    },
-    "gitlab": {
-      "howToCreateToken": "How to create a GitLab Personal Access Token:",
-      "step1": "Go to your GitLab profile → Edit Profile → Access Tokens",
-      "step2": "Enter a name and expiration date",
-      "step3": "Select the api scope for full API access",
-      "step4": "Click \"Create personal access token\" and copy it immediately",
-      "tokenWarning": "Note: The token will only be shown once. Store it securely."
-    },
-    "jira": {
-      "howToSetupOAuth": "How to set up Jira OAuth 1.0a authentication:",
-      "oauthWarning": "Note: OAuth 1.0a is deprecated. Consider using OAuth 2.0 for new integrations.",
-      "step1": "Generate RSA key pair using OpenSSL:",
-      "step2": "In Jira: Settings → Applications → Application Links",
-      "step3": "Create incoming link with your consumer key and public key",
-      "step4": "Complete the OAuth flow to get your access token"
-    },
-    "plane": {
-      "howToCreateToken": "How to create a Plane Personal Access Token:",
-      "step1": "Log into your Plane account or instance",
-      "step2": "Go to Profile Settings → Personal Access Tokens",
-      "step3": "Click \"Add personal access token\"",
-      "step4": "Enter a name and copy the generated token immediately",
-      "tokenWarning": "Note: The token will only be shown once. Store it securely."
-    },
     "typeLabels": {
+      "github": "GitHub",
       "gitlab": "GitLab",
       "jira": "Jira",
       "plane": "Plane"
     },
-    "typeSelector": {
-      "chooseTracker": "Choose which issue tracker you want to configure:"
-    },
     "validation": {
-      "accessTokenRequired": "Access token is required",
-      "apiKeyRequired": "API key is required",
-      "baseUrlRequired": "Base URL is required",
-      "consumerKeyRequired": "Consumer key is required",
-      "nameRequired": "Name is required",
-      "privateKeyRequired": "Private key is required"
+      "accessTokenRequired": "Access Token ist erforderlich",
+      "apiKeyRequired": "API-Schlüssel ist erforderlich",
+      "baseUrlRequired": "Basis-URL ist erforderlich",
+      "consumerKeyRequired": "Consumer Key ist erforderlich",
+      "invalidUrl": "Ungültige URL",
+      "maxInterval": "Maximal 24 Stunden",
+      "minInterval": "Mindestens 1 Minute",
+      "nameRequired": "Name ist erforderlich",
+      "privateKeyRequired": "Private Key ist erforderlich",
+      "resourceOwnerRequired": "Resource Owner ist erforderlich"
     }
   },
   "lists": {
@@ -463,6 +437,8 @@
       "removeTitle": "Mitglied entfernen",
       "removeWarning": "Dieses Mitglied wird aus der Organisation entfernt und verliert den Zugriff auf alle Projekte."
     },
+    "description_one": "Dieses Projekt hat {{count}} Mitglied.",
+    "description_other": "Dieses Projekt hat {{count}} Mitglieder.",
     "empty": "Keine Mitglieder gefunden"
   },
   "navigation": {
@@ -498,6 +474,7 @@
       "title": "Los geht's",
       "workingHours": "Arbeitszeiten für diese Organisation festlegen"
     },
+    "closeTutorial": "Tutorial schließen",
     "confirmClose": "Möchtest du das Tutorial wirklich schließen? Du kannst es in den App-Einstellungen wieder aktivieren.",
     "navigation": {
       "importantUI": "Wichtige UI-Elemente",
@@ -568,7 +545,6 @@
   },
   "organisations": {
     "actions": {
-      "configureImporters": "Configure issue importers",
       "create": "Organisation erstellen",
       "edit": "Organisation bearbeiten",
       "switch": "Organisation wechseln"
@@ -576,6 +552,10 @@
     "adminDescription": "Du bist Administrator dieser Organisation. Du kannst Mitglieder hinzufügen und entfernen, den Organisationsnamen ändern oder eine neue erstellen.",
     "createDescription": "Verwende das Aktionsmenü, um eine neue Organisation zu erstellen.",
     "currentOrganisation": "Aktuelle Organisation",
+    "description": {
+      "create": "Erstelle eine neue Organisation, um mit deinem Team zusammenzuarbeiten.",
+      "edit": "Aktualisiere den Organisationsnamen."
+    },
     "errors": {
       "duplicateKey": "Eine Organisation mit diesem Namen existiert bereits",
       "saveFailed": "Organisation konnte nicht gespeichert werden"
@@ -600,6 +580,7 @@
   },
   "projects": {
     "actions": {
+      "add": "Projekt hinzufügen",
       "create": "Ein Projekt erstellen",
       "deactivate": "Projekt deaktivieren",
       "edit": "Projekt bearbeiten",
@@ -615,6 +596,10 @@
       "leave": "Bist du sicher, dass du dieses Projekt verlassen möchtest?"
     },
     "deactivatedBy": "Archiviert von {{user}}",
+    "description": {
+      "add": "Erstelle ein neues Projekt, um deine Zeiterfassung zu organisieren.",
+      "edit": "Aktualisiere die Projektdetails."
+    },
     "empty": "Keine Projekte gefunden",
     "errors": {
       "duplicateKey": "Ein Projekt mit diesem Namen existiert bereits",
@@ -630,9 +615,6 @@
     },
     "label": "Projekt",
     "lastActivity": "Letzte Aktivität",
-    "members": {
-      "title": "Projektmitglieder"
-    },
     "myProjects": "Meine Projekte",
     "myProjectsDescription": "Projekte, in denen du Mitglied bist und Zeit buchen kannst. Eingeschränkt durch die aktuell ausgewählte Organisation.",
     "name": "Projektname",
@@ -642,6 +624,7 @@
     "selectProject": "Projekt auswählen",
     "status": {
       "assignedToUser": "Projekt erfolgreich an Benutzer zugewiesen.",
+      "created": "Projekt erstellt",
       "updated": "Projekt aktualisiert"
     },
     "title": "Projekte",
@@ -655,6 +638,7 @@
   },
   "pwa": {
     "reloadApplication": "Anwendung neu laden",
+    "updateAvailable": "Update verfügbar",
     "updateMessage": "Lasius wurde aktualisiert. Die Seite wird nach deiner Bestätigung neu geladen."
   },
   "search": {
@@ -732,7 +716,8 @@
     "actions": {
       "accept": "Nutzungsbedingungen akzeptieren",
       "reject": "Ablehnen und abmelden"
-    }
+    },
+    "title": "Terms of Service (version {{version}})"
   },
   "ui": {
     "hidePasswords": "Passwörter ausblenden",
@@ -749,7 +734,21 @@
     }
   },
   "validation": {
-    "startMustBeInPast": "Startzeit muss in der Vergangenheit liegen"
+    "confirmPasswordRequired": "Bitte bestätige dein Passwort",
+    "emailInvalid": "Ungültige E-Mail-Adresse",
+    "emailRequired": "E-Mail ist erforderlich",
+    "firstNameRequired": "Vorname ist erforderlich",
+    "languageRequired": "Sprache ist erforderlich",
+    "lastNameRequired": "Nachname ist erforderlich",
+    "missingNumber": "Muss eine Zahl enthalten",
+    "missingUppercase": "Muss einen Großbuchstaben enthalten",
+    "organisationNameRequired": "Organisationsname ist erforderlich",
+    "passwordMismatch": "Passwörter stimmen nicht überein",
+    "passwordRequired": "Passwort ist erforderlich",
+    "passwordTooShort": "Mindestens 9 Zeichen",
+    "projectKeyRequired": "Projektname ist erforderlich",
+    "startMustBeInPast": "Startzeit muss in der Vergangenheit liegen",
+    "themeRequired": "Design ist erforderlich"
   },
   "websocket": {
     "status": {

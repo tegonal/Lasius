@@ -76,12 +76,14 @@ class TagCache(systemServices: SystemServices, clientReceiver: ClientReceiver)
 
     val diff = calcDiff(current, tags)
 
-    // notify client
+    // Update cache (no WebSocket notification sent)
     log.debug(s"TagCache changed:$diff")
     tagCache = diff
       .map { case (removed, added) =>
-        val msg = TagCacheChanged(projectId, removed, added)
-        clientReceiver.broadcast(systemServices.systemUser, msg)
+        // Note: TagCacheChanged event is NOT broadcasted to clients
+        // Clients retrieve tags via API endpoints when needed
+        log.debug(
+          s"TagCache updated for project $projectId: removed=${removed.size}, added=${added.size}")
 
         // update cache
         val newMap = currentMap.map(_ + (typ -> tags)).getOrElse(Map())

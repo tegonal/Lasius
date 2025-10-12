@@ -21,7 +21,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from 'lib/utils/cn'
 import React from 'react'
 
-const badgeVariants = cva('badge inline-flex items-center gap-2', {
+const badgeVariants = cva('badge inline-flex items-center gap-2 rounded-sm px-2', {
   variants: {
     variant: {
       primary: 'badge-primary',
@@ -37,7 +37,7 @@ const badgeVariants = cva('badge inline-flex items-center gap-2', {
     },
     clickable: {
       true: 'cursor-pointer transition-colors',
-      false: '',
+      false: 'select-none',
     },
   },
   compoundVariants: [
@@ -67,11 +67,22 @@ export interface Props extends VariantProps<typeof badgeVariants> {
   children: React.ReactNode
   className?: string
   onClick?: React.MouseEventHandler<HTMLDivElement>
+  style?: React.CSSProperties
 }
 
-export const Badge: React.FC<Props> = ({ children, variant, clickable, className, onClick }) => {
+export const Badge: React.FC<Props> = ({
+  children,
+  variant,
+  clickable,
+  className,
+  onClick,
+  style,
+}) => {
   return (
-    <div className={cn(badgeVariants({ variant, clickable }), className)} onClick={onClick}>
+    <div
+      className={cn(badgeVariants({ variant, clickable }), className)}
+      onClick={onClick}
+      style={style}>
       {children}
     </div>
   )

@@ -404,18 +404,8 @@ object Binders {
       stringBinder: PathBindable[String]): PathBindable[InvitationId] =
     uuidBaseIdPathBindable[InvitationId](stringBinder, InvitationId.apply)
 
-  implicit def GitlabConfigIdPathBindable(implicit
-      stringBinder: PathBindable[String]): PathBindable[GitlabConfigId] =
-    bsonObjectIdBaseIdPathBindable[GitlabConfigId](stringBinder,
-                                                   GitlabConfigId.apply)
-
-  implicit def JiraConfigIdPathBindable(implicit
-      stringBinder: PathBindable[String]): PathBindable[JiraConfigId] =
-    bsonObjectIdBaseIdPathBindable[JiraConfigId](stringBinder,
-                                                 JiraConfigId.apply)
-
-  implicit def PlaneConfigIdPathBindable(implicit
-      stringBinder: PathBindable[String]): PathBindable[PlaneConfigId] =
-    bsonObjectIdBaseIdPathBindable[PlaneConfigId](stringBinder,
-                                                  PlaneConfigId.apply)
+  implicit def IssueImporterConfigIdPathBindable(implicit
+      stringBinder: PathBindable[String]): PathBindable[IssueImporterConfigId] =
+    uuidBaseIdPathBindable[IssueImporterConfigId](stringBinder,
+                                                  IssueImporterConfigId.apply)
 }

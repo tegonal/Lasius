@@ -17,8 +17,7 @@
  *
  */
 
-import { SiGitlab } from '@icons-pack/react-simple-icons'
-import { SiJirasoftware } from '@icons-pack/react-simple-icons'
+import { SiGithub, SiGitlab, SiJirasoftware } from '@icons-pack/react-simple-icons'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { Layers } from 'lucide-react'
 import React from 'react'
@@ -32,6 +31,8 @@ type Props = {
 
 export const ImporterTypeIcon: React.FC<Props> = ({ type, className = 'h-5 w-5' }) => {
   switch (type) {
+    case 'github':
+      return <SiGithub className={className} />
     case 'gitlab':
       return <SiGitlab className={className} />
     case 'jira':

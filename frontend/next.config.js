@@ -1,5 +1,13 @@
 /** @type {import('next').NextConfig} */
 
+// Conditionally require bundle analyzer only when needed
+const withBundleAnalyzer =
+  process.env.ANALYZE === 'true'
+    ? require('@next/bundle-analyzer')({
+        enabled: true,
+      })
+    : (config) => config
+
 const { i18n } = require('./next-i18next.config')
 const { generateBuildId, generateBuildIdSync } = require('./next.buildId')
 const { redirects } = require('./next.redirects')
@@ -50,4 +58,4 @@ const nextConfiguration = {
   ],
 }
 
-module.exports = nextConfiguration
+module.exports = withBundleAnalyzer(nextConfiguration)

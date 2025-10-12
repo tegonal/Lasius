@@ -1,0 +1,86 @@
+# Mappature progetti
+
+Collega i progetti esterni dalla tua piattaforma di integrazione ai progetti Lasius. I problemi dai progetti mappati vengono sincronizzati automaticamente e sono disponibili come etichette di tracciamento del tempo.
+
+## Comprendere l'elenco
+
+Ogni riga mostra:
+- **Lato sinistro**: Nome e ID del progetto esterno
+- **Freccia**: Indicatore visivo di mappatura
+- **Lato destro**:
+  - Nome del progetto Lasius mappato (o "Non mappato" in grigio)
+  - Pulsante menu a tre punti
+
+## Filtrare i progetti
+
+Usa la casella di filtro in alto per cercare per nome di progetto o ID. Fai clic sulla X per cancellare.
+
+<Tip>I progetti mappati appaiono per primi, poi i progetti non mappati</Tip>
+
+## Mappare un progetto
+
+1. Fai clic sul **menu a tre punti** per il progetto che desideri mappare
+2. Fai clic sull'**icona matita** per aggiungere o modificare la mappatura
+3. Seleziona un progetto Lasius dal menu a tendina
+4. Configura le impostazioni delle etichette (appare dopo aver selezionato un progetto)
+5. Fai clic su **Conferma** per salvare
+
+<Tip>La configurazione delle etichette è disponibile solo per GitHub, GitLab e Plane (non per Jira)</Tip>
+
+## Configurazione etichette
+
+Dopo aver selezionato un progetto Lasius, configura quali campi dei problemi importare come etichette:
+
+**Campi etichette da importare** (Selezione multipla):
+- Usa titolo del problema come etichetta
+- Usa etichette come etichette
+- Usa milestone come etichetta
+- Usa assegnatari come etichette (solo GitHub)
+
+**Stato problema da importare**:
+- Tutti i problemi
+- Solo problemi aperti
+- Solo problemi chiusi
+
+<Tip>Usa "Solo problemi aperti" per evitare di ingombrare la tua lista di etichette con problemi chiusi</Tip>
+
+## Modificare una mappatura
+
+1. Fai clic sul **menu a tre punti** per il progetto mappato
+2. Fai clic sull'**icona matita**
+3. Cambia il progetto Lasius o le impostazioni delle etichette
+4. Fai clic su **Conferma** per salvare
+
+## Rimuovere una mappatura
+
+1. Fai clic sul **menu a tre punti** per il progetto mappato
+2. Fai clic sull'**icona cestino**
+3. Appare una finestra di dialogo di conferma
+4. Fai clic su **Rimuovi** per confermare
+
+<Tip>La rimozione di una mappatura interrompe la sincronizzazione ma non elimina le etichette esistenti</Tip>
+
+## Dopo la mappatura
+
+La sincronizzazione avviene automaticamente:
+- La prima sincronizzazione avviene al prossimo intervallo di verifica programmato
+- Le sincronizzazioni successive recuperano solo problemi nuovi o aggiornati
+- Controlla lo stato di salute dell'integrazione per monitorare i progressi
+
+## Risoluzione dei problemi
+
+**L'elenco dei progetti è vuoto:**
+- Verifica le credenziali di integrazione nelle impostazioni
+- Verifica che il tuo account abbia accesso ai progetti sulla piattaforma
+- Attendi il completamento del caricamento iniziale
+
+**Impossibile selezionare un progetto Lasius:**
+- Assicurati di avere almeno un progetto creato in Lasius
+- Verifica di avere il permesso di accedere al progetto
+- Prova a chiudere e riaprire il modale
+
+**La mappatura si salva ma le etichette non appaiono:**
+- Attendi il prossimo ciclo di sincronizzazione (controlla l'intervallo dell'integrazione)
+- Verifica che almeno un campo etichetta sia selezionato
+- Verifica che i problemi corrispondano al tuo filtro di stato (tutti, aperti o chiusi)
+- Controlla lo stato di salute dell'integrazione per errori

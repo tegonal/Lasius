@@ -1,0 +1,40 @@
+{
+	# Global options
+	admin off
+	auto_https off
+	log {
+		output stdout
+		level ERROR
+	}
+}
+
+:3000 {
+	# Backend API routes
+	handle /backend/messagingSocket* {
+		reverse_proxy host.docker.internal:9000 {
+			header_up Host {host}
+			header_up X-Real-IP {remote_host}
+			header_up X-Forwarded-For {remote_host}
+			header_up X-Forwarded-Proto {scheme}
+		}
+	}
+
+	handle /backend/* {
+		reverse_proxy host.docker.internal:9000 {
+			header_up Host {host}
+			header_up X-Real-IP {remote_host}
+			header_up X-Forwarded-For {remote_host}
+			header_up X-Forwarded-Proto {scheme}
+		}
+	}
+
+	# Next.js frontend (default route)
+	handle {
+		reverse_proxy host.docker.internal:3001 {
+			header_up Host {host}
+			header_up X-Real-IP {remote_host}
+			header_up X-Forwarded-For {remote_host}
+			header_up X-Forwarded-Proto {scheme}
+		}
+	}
+}

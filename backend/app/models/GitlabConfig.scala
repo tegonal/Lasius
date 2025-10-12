@@ -23,46 +23,52 @@ package models
 
 import models.BaseFormat._
 import play.api.libs.json._
-import reactivemongo.api.bson.BSONObjectID
+import org.joda.time.DateTime
 
 import java.net.URL
 
-case class GitlabConfigId(value: BSONObjectID = BSONObjectID.generate())
-    extends BaseBSONObjectId
-
 case class GitlabSettings(checkFrequency: Long)
 
-case class GitlabTagConfiguration(useLabels: Boolean,
-                                  labelFilter: Set[String],
-                                  useMilestone: Boolean = false,
-                                  useTitle: Boolean = false)
+case class GitlabTagConfiguration(
+    useLabels: Boolean,
+    labelFilter: Set[String],
+    useMilestone: Boolean = false,
+    useTitle: Boolean = false,
+    includeOnlyIssuesWithLabels: Set[String] = Set(),
+    includeOnlyIssuesWithState: Set[String] = Set()
+)
 
-case class GitlabProjectSettings(gitlabProjectId: String,
-                                 maxResults: Option[Int] = None,
-                                 params: Option[String] = None,
-                                 projectKeyPrefix: Option[String] = None,
-                                 tagConfiguration: GitlabTagConfiguration)
+case class GitlabProjectSettings(
+    gitlabProjectId: String,
+    maxResults: Option[Int] = None,
+    params: Option[String] = None,
+    projectKeyPrefix: Option[String] = None,
+    tagConfiguration: GitlabTagConfiguration
+)
 
-case class GitlabProjectMapping(projectId: ProjectId,
-                                settings: GitlabProjectSettings)
+case class GitlabProjectMapping(
+    projectId: ProjectId,
+    settings: GitlabProjectSettings
+)
 
 case class GitlabAuth(accessToken: String)
 
 case class GitlabConfig(
-    _id: GitlabConfigId,
+    id: IssueImporterConfigId,
     organisationReference: OrganisationId.OrganisationReference,
+    importerType: ImporterType = ImporterType.Gitlab,
     name: String,
     baseUrl: URL,
     auth: GitlabAuth,
     settings: GitlabSettings,
-    projects: Seq[GitlabProjectMapping]
-) extends BaseEntity[GitlabConfigId] {
-  val id: GitlabConfigId = _id
-}
-
-object GitlabConfigId {
-  implicit val idFormat: Format[GitlabConfigId] =
-    BaseFormat.idformat[GitlabConfigId](GitlabConfigId.apply)
+    projects: Seq[GitlabProjectMapping],
+    syncStatus: ConfigSyncStatus = ConfigSyncStatus.empty,
+    audit: AuditInfo,
+    // type attribute only needed to generate correct swagger definition
+    `type`: String = classOf[GitlabConfig].getSimpleName
+) extends IssueImporterConfig {
+  val checkFrequency: Long     = settings.checkFrequency
+  val canListProjects: Boolean = true
 }
 
 object GitlabProjectMapping {

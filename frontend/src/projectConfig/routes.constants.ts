@@ -34,6 +34,7 @@ export const ROUTES = {
     LISTS: '/organisation/lists',
     STATS: '/organisation/stats',
     PROJECTS: '/organisation/projects',
+    INTEGRATIONS: '/organisation/integrations',
   },
   SETTINGS: {
     APP: '/settings/app',

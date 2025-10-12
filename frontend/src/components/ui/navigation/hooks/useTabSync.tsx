@@ -31,9 +31,9 @@ export const useTabSync = (initialTab: number = 0) => {
   const [selected, setSelected] = useState(initialTab)
 
   useEffect(() => {
-    if (!tabViews.find((tab) => tab.id === tabId)) {
-      setTabActive(tabId, initialTab)
-    }
+    // Always set the initial tab on mount, even if it exists in store
+    // This ensures defaultIndex is respected on each page visit
+    setTabActive(tabId, initialTab)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

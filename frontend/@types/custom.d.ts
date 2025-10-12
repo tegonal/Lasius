@@ -20,6 +20,7 @@
 import 'react-i18next';
 
 import en from '../public/locales/en/common.json';
+import integrations from '../public/locales/en/integrations.json';
 
 declare module '*.svg' {
   const content: any;
@@ -37,6 +38,7 @@ declare module 'i18next' {
     // custom resources type
     resources: {
       common: typeof en;
+      integrations: typeof integrations;
     };
   }
 }

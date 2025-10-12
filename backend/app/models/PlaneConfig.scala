@@ -23,12 +23,9 @@ package models
 
 import models.BaseFormat._
 import play.api.libs.json._
-import reactivemongo.api.bson.BSONObjectID
+import org.joda.time.DateTime
 
 import java.net.URL
-
-case class PlaneConfigId(value: BSONObjectID = BSONObjectID.generate())
-    extends BaseBSONObjectId
 
 case class PlaneSettings(checkFrequency: Long)
 
@@ -38,34 +35,40 @@ case class PlaneTagConfiguration(
     useMilestone: Boolean = false,
     useTitle: Boolean = false,
     includeOnlyIssuesWithLabels: Set[String] = Set(),
-    includeOnlyIssuesWithState: Set[String] = Set())
+    includeOnlyIssuesWithState: Set[String] = Set()
+)
 
-case class PlaneProjectSettings(planeWorkspace: String,
-                                planeProjectId: String,
-                                maxResults: Option[Int] = None,
-                                params: Option[String] = None,
-                                tagConfiguration: PlaneTagConfiguration)
+case class PlaneProjectSettings(
+    planeWorkspace: String,
+    planeProjectId: String,
+    maxResults: Option[Int] = None,
+    params: Option[String] = None,
+    tagConfiguration: PlaneTagConfiguration
+)
 
-case class PlaneProjectMapping(projectId: ProjectId,
-                               settings: PlaneProjectSettings)
+case class PlaneProjectMapping(
+    projectId: ProjectId,
+    settings: PlaneProjectSettings
+)
 
 case class PlaneAuth(apiKey: String)
 
 case class PlaneConfig(
-    _id: PlaneConfigId,
+    id: IssueImporterConfigId,
     organisationReference: OrganisationId.OrganisationReference,
+    importerType: ImporterType = ImporterType.Plane,
     name: String,
     baseUrl: URL,
     auth: PlaneAuth,
     settings: PlaneSettings,
-    projects: Seq[PlaneProjectMapping]
-) extends BaseEntity[PlaneConfigId] {
-  val id: PlaneConfigId = _id
-}
-
-object PlaneConfigId {
-  implicit val idFormat: Format[PlaneConfigId] =
-    BaseFormat.idformat[PlaneConfigId](PlaneConfigId.apply)
+    projects: Seq[PlaneProjectMapping],
+    syncStatus: ConfigSyncStatus = ConfigSyncStatus.empty,
+    audit: AuditInfo,
+    // type attribute only needed to generate correct swagger definition
+    `type`: String = classOf[PlaneConfig].getSimpleName
+) extends IssueImporterConfig {
+  val checkFrequency: Long     = settings.checkFrequency
+  val canListProjects: Boolean = true
 }
 
 object PlaneProjectMapping {

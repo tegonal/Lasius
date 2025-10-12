@@ -1,0 +1,47 @@
+# Integrations
+
+Connect Lasius with external issue tracking systems like GitHub, GitLab, Jira, and Plane. Automatically import issues as tags to streamline your time tracking workflow.
+
+## What You Can Do
+
+### View Integration Statistics
+At the top of the page, see the total number of configured integrations in your organization.
+
+### Browse Active Integrations
+View all configured integrations in a table showing:
+- **Type** - The platform (GitHub, GitLab, Jira, Plane)
+- **Name** - Your custom name for this integration
+- **Base URL** - The API endpoint being used
+- **Projects** - Number of projects using this integration
+
+### Add New Integrations
+Click **Add Configuration** in the top right to set up a new integration. Follow the wizard to:
+1. Select the platform type
+2. Enter connection details and credentials
+3. Test the connection
+4. Map external projects to Lasius projects
+5. Configure tag import settings
+
+### Manage Integrations
+Click the context menu (<Icon name="EllipsisVertical" />) on any integration to:
+- **View configuration info** - See detailed connection settings and status
+- **Edit configuration** - Update credentials, URL, or other settings
+- **View project mappings** - See and modify which external projects sync to which Lasius projects
+- **Delete configuration** - Remove the integration (stops syncing tags)
+
+### Automatic Tag Syncing
+Once configured, Lasius automatically imports issues from your external platforms as tags. Team members can then select these tags when tracking time, creating a direct connection between time entries and external work items.
+
+## Tips
+
+<Tip>Start with a single project mapping to test your integration before expanding to all projects</Tip>
+
+<Tip>Use meaningful names for your integrations if you have multiple instances of the same platform</Tip>
+
+<Tip>Tags are automatically synced - no manual imports needed once configured</Tip>
+
+<Tip>Each integration can map to multiple Lasius projects, allowing flexible organization structures</Tip>
+
+<Tip>If an integration shows connectivity issues, check the configuration info for detailed error messages</Tip>
+
+<Tip>Deleting an integration won't delete existing tags - only stops future syncing</Tip>

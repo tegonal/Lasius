@@ -108,6 +108,7 @@ class MockServices(actorSystem: ActorSystem) extends SystemServices {
   val latestUserTimeBookingsViewService: ActorRef   = TestProbe().ref
   val timeBookingStatisticsViewService: ActorRef    = TestProbe().ref
   val tagCache: ActorRef                            = TestProbe().ref
+  val issueImporterStatusMonitor: ActorRef          = TestProbe().ref
   val pluginHandler: ActorRef                       = TestProbe().ref
   val loginHandler: ActorRef                        = TestProbe().ref
 

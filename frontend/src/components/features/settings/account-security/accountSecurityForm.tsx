@@ -17,6 +17,7 @@
  *
  */
 
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from 'components/primitives/buttons/Button'
 import { Input } from 'components/primitives/inputs/Input'
 import { Label } from 'components/primitives/typography/Label'
@@ -35,18 +36,50 @@ import { updateUserPassword } from 'lib/api/lasius/oauth2-provider/oauth2-provid
 import { Eye, EyeOff } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import { IS_DEV, LASIUS_DEMO_MODE } from 'projectConfig/constants'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useIsClient } from 'usehooks-ts'
+import { z } from 'zod'
 
-type Form = {
-  password: string
-  newPassword: string
-  confirmPassword: string
-}
+import type { TFunction } from 'i18next'
+
+// Schema factory function with i18n support
+const createPasswordChangeSchema = (t: TFunction) =>
+  z
+    .object({
+      password: z
+        .string()
+        .min(1, t('validation.passwordRequired', { defaultValue: 'Password is required' })),
+      newPassword: z
+        .string()
+        .min(9, t('validation.passwordTooShort', { defaultValue: 'Minimum 9 characters' }))
+        .regex(
+          /(?=.*[A-Z])/,
+          t('validation.missingUppercase', { defaultValue: 'Must contain uppercase letter' }),
+        )
+        .regex(/\d/, t('validation.missingNumber', { defaultValue: 'Must contain a number' })),
+      confirmPassword: z
+        .string()
+        .min(
+          1,
+          t('validation.confirmPasswordRequired', { defaultValue: 'Please confirm your password' }),
+        ),
+    })
+    .refine((data) => data.newPassword === data.confirmPassword, {
+      message: t('validation.passwordMismatch', { defaultValue: 'Passwords do not match' }),
+      path: ['confirmPassword'],
+    })
+
+type FormData = z.infer<ReturnType<typeof createPasswordChangeSchema>>
 export const AccountSecurityForm: React.FC = () => {
+  const { t } = useTranslation('common')
   const [showPasswords, setShowPasswords] = useState<boolean>(false)
-  const hookForm = useForm<Form>({
+
+  // Memoize schema to prevent recreation on every render
+  const schema = useMemo(() => createPasswordChangeSchema(t), [t])
+
+  const hookForm = useForm<FormData>({
+    resolver: zodResolver(schema),
     defaultValues: { password: '', newPassword: '', confirmPassword: '' },
     mode: 'onSubmit',
     criteriaMode: 'all',
@@ -55,8 +88,6 @@ export const AccountSecurityForm: React.FC = () => {
   const { profile } = useProfile()
   const isClient = useIsClient()
   const { addToast } = useToast()
-
-  const { t } = useTranslation('common')
 
   const resetForm = () => {
     if (profile) {
@@ -121,7 +152,7 @@ export const AccountSecurityForm: React.FC = () => {
                     {t('common.forms.password', { defaultValue: 'Password' })}
                   </Label>
                   <Input
-                    {...hookForm.register('password', { required: true })}
+                    {...hookForm.register('password')}
                     autoComplete="off"
                     type={showPasswords ? 'text' : 'password'}
                   />
@@ -133,17 +164,7 @@ export const AccountSecurityForm: React.FC = () => {
                     {t('common.forms.newPassword', { defaultValue: 'New password' })}
                   </Label>
                   <Input
-                    {...hookForm.register('newPassword', {
-                      required: true,
-                      validate: {
-                        notEnoughCharactersPassword: (value: string) => value.length > 8,
-                        // notEqualPassword: (value: string) => value !== hookForm.getValues('password'),
-                        noUppercase: (value: string) => /(?=.*[A-Z])/.test(value),
-                        noNumber: (value: string) => /\d/.test(value),
-                        // noSpecialCharacters: (value: string) =>
-                        //   /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+/.test(value),
-                      },
-                    })}
+                    {...hookForm.register('newPassword')}
                     autoComplete="off"
                     type={showPasswords ? 'text' : 'password'}
                   />
@@ -154,13 +175,7 @@ export const AccountSecurityForm: React.FC = () => {
                     {t('common.forms.confirmNewPassword', { defaultValue: 'Confirm new password' })}
                   </Label>
                   <Input
-                    {...hookForm.register('confirmPassword', {
-                      required: true,
-                      validate: {
-                        notEqualPassword: (value: string) =>
-                          value === hookForm.getValues('newPassword'),
-                      },
-                    })}
+                    {...hookForm.register('confirmPassword')}
                     autoComplete="off"
                     type={showPasswords ? 'text' : 'password'}
                   />

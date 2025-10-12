@@ -31,6 +31,12 @@ export type ToastViewType = {
   id: string
   message: string
   description?: string
+  /** Time to live in milliseconds. Defaults to 5000ms (5 seconds) if not specified. */
   ttl?: number
   type: 'WARNING' | 'ERROR' | 'NOTIFICATION' | 'SUCCESS'
+  /** Optional action button with label and link */
+  action?: {
+    label: string
+    href: string
+  }
 }

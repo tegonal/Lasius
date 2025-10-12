@@ -28,7 +28,7 @@ type Props = {
 }
 
 export const ImporterTypeBadge: React.FC<Props> = ({ type }) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('integrations')
 
   return (
     <div className="badge badge-outline gap-2">

@@ -1,0 +1,248 @@
+{
+  "actions": {
+    "back": "Retour",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "confirm": "Confirmer",
+    "finish": "Terminer",
+    "next": "Suivant",
+    "remove": "Supprimer",
+    "saving": "Enregistrement..."
+  },
+  "clear": "Effacer",
+  "integrations": {
+    "actions": {
+      "addIntegration": "Ajouter une intégration"
+    },
+    "configurations": "Configurations",
+    "configureDescription": "Utilise le bouton Ajouter une intégration pour configurer une nouvelle intégration. Après avoir créé une configuration, associe tes projets externes aux projets Lasius pour activer l'importation des tickets.",
+    "description": "Connecte Lasius avec des systèmes externes de suivi des tickets comme GitHub, GitLab, Jira et Plane. Les tickets importés deviennent disponibles en tant qu'étiquettes lors de la réservation de temps dans les projets associés, te permettant de suivre le temps directement sur tes tickets.",
+    "issueTrackers": "Systèmes de suivi des tickets",
+    "title": "Intégrations"
+  },
+  "issueImporters": {
+    "actions": {
+      "addConfiguration": "Ajouter une configuration",
+      "create": "Créer",
+      "delete": "Supprimer la configuration",
+      "deleteDisabled": "Impossible de supprimer : supprimez d'abord toutes les correspondances de projet",
+      "edit": "Modifier la configuration",
+      "update": "Mettre à jour",
+      "viewInfo": "Voir les informations de configuration",
+      "viewMappings": "Voir les correspondances de projet"
+    },
+    "checkInterval": "Intervalle de vérification",
+    "checkIntervalHelp": "Fréquence de vérification des nouveaux tickets",
+    "configListItem": {
+      "project": "project",
+      "projectCount_one": "{{count}} projet",
+      "projectCount_many": "",
+      "projectCount_other": "{{count}} projets",
+      "projects": "projects",
+      "usedBy_one": "Utilisé par {{count}} {{noun}}",
+      "usedBy_many": "{{count}} {{noun}}",
+      "usedBy_other": "Utilisé par {{count}} {{noun}}"
+    },
+    "descriptions": {
+      "create": "Configurez une nouvelle intégration d'importateur de problèmes pour synchroniser les problèmes depuis votre outil de gestion de projet.",
+      "edit": "Mettez à jour la configuration de cette intégration d'importateur de problèmes."
+    },
+    "emptyState": {
+      "message": "Aucune configuration de système de suivi des tickets pour le moment"
+    },
+    "errors": {
+      "invalidMappingData": "Données de correspondance invalides",
+      "mappingRemoveFailed": "Échec de la suppression de la correspondance de projet",
+      "mappingSaveFailed": "Échec de l'enregistrement des correspondances de projet",
+      "saveFailed": "Échec de l'enregistrement de la configuration"
+    },
+    "fields": {
+      "accessToken": "Jeton d'accès",
+      "accessTokenEdit": "Jeton d'accès (laisser vide pour conserver l'actuel)",
+      "apiKey": "Clé API",
+      "apiKeyEdit": "Clé API (laisser vide pour conserver l'actuelle)",
+      "baseUrl": "URL de base",
+      "baseUrlPlaceholder": {
+        "github": "https://api.github.com",
+        "gitlab": "https://gitlab.company.com",
+        "jira": "https://company.atlassian.net",
+        "plane": "https://plane.company.com"
+      },
+      "consumerKey": "Clé de consommateur OAuth",
+      "consumerKeyEdit": "Clé de consommateur (laisser vide pour conserver l'actuelle)",
+      "name": "Nom de la configuration",
+      "namePlaceholder": {
+        "github": "p. ex., Entreprise GitHub",
+        "gitlab": "p. ex., Entreprise GitLab",
+        "jira": "p. ex., Entreprise Jira",
+        "plane": "p. ex., Entreprise Plane"
+      },
+      "oauthAccessToken": "Jeton d'accès OAuth",
+      "privateKey": "Clé privée OAuth",
+      "privateKeyEdit": "Clé privée OAuth (laisser vide pour conserver l'actuelle)",
+      "resourceOwner": "Propriétaire de la ressource",
+      "resourceOwnerHelp": "Sélectionne l'utilisateur ou l'organisation GitHub qui possède les dépôts auxquels tu veux accéder.",
+      "resourceOwnerLoading": "Chargement des organisations...",
+      "resourceOwnerNoResults": "Aucune organisation trouvée",
+      "resourceOwnerPlaceholder": "Saisis le jeton d'accès ci-dessus pour charger les organisations",
+      "resourceOwnerSelect": "Sélectionner une organisation"
+    },
+    "github": {
+      "instructions": {
+        "content": "<0><1>Vérifie ton adresse e-mail sur GitHub</1><1>Va dans Settings → Developer settings → Personal access tokens → Fine-grained tokens</1><1>Clique sur \"Generate new token\"</1><1>Saisis un nom de jeton et sélectionne une date d'expiration</1><1>Choisis un propriétaire de ressource (ton compte utilisateur ou une organisation à laquelle tu as accès)</1><1>Sélectionne l'accès au dépôt (tous les dépôts ou seulement certains dépôts)</1><1>Sous Repository permissions, définis <2>Issues</2> sur \"Read-only\" et <2>Metadata</2> sur \"Read-only\"</1><1>Clique sur \"Generate token\" et copie-le immédiatement</1></0><3>Important : Les jetons fine-grained sont requis (pas les jetons classiques). Le propriétaire de ressource que tu sélectionnes détermine les dépôts auxquels tu peux accéder. Pour les dépôts d'organisation, tu pourrais avoir besoin de l'approbation du propriétaire de l'organisation. Assure-toi de sélectionner le même propriétaire de ressource dans le formulaire de configuration ci-dessus.</3>",
+        "title": "Comment créer des identifiants GitHub :"
+      }
+    },
+    "gitlab": {
+      "instructions": {
+        "content": "<0><1>Dans la barre latérale gauche, sélectionne ton avatar</1><1>Sélectionne \"Edit profile\"</1><1>Sélectionne \"Personal access tokens\"</1><1>Sélectionne \"Add new token\"</1><1>Saisis un nom de jeton et une description optionnelle</1><1>Définis une date d'expiration</1><1>Sélectionne le scope <2>read_api</2> (accorde l'accès en lecture à l'API, y compris tous les groupes et projets)</1><1>Clique sur \"Create personal access token\"</1><1>Copie le jeton immédiatement et stocke-le en toute sécurité</1></0><3>Note : Le jeton ne sera affiché qu'une seule fois. Utilise <2>read_api</2> pour l'accès en lecture seule, ou <2>api</2> pour un accès complet en lecture/écriture si nécessaire.</3>",
+        "title": "Comment créer des identifiants GitLab :"
+      }
+    },
+    "headers": {
+      "baseUrl": "URL de base",
+      "name": "Nom",
+      "projects": "Projets",
+      "type": "Type"
+    },
+    "healthStatus": {
+      "degraded": "Dégradé",
+      "failed": "Échoué",
+      "healthy": "Sain",
+      "unknown": "Inconnu"
+    },
+    "info": {
+      "auditInfo": "Informations d'audit",
+      "baseUrl": "URL de base",
+      "basicInfo": "Informations de base",
+      "checkFrequency": "Fréquence de vérification",
+      "checkFrequencyValue": "{{minutes}} minutes",
+      "createdAt": "Créé le",
+      "createdBy": "Créé par",
+      "healthStatus": "État de santé",
+      "issuesSynced": "Tickets",
+      "lastChecked": "Dernière vérification : {{date}}",
+      "lastSuccessfulSync": "Dernière synchronisation réussie",
+      "lastSync": "Dernière synchronisation",
+      "loadError": "Échec du chargement des détails de configuration. Veuillez réessayer.",
+      "name": "Nom",
+      "nextScheduledSync": "Prochaine synchronisation programmée",
+      "projectName": "Projet",
+      "projectStats": "Statistiques du projet",
+      "title": "Informations de configuration",
+      "totalIssuesSynced": "Total de tickets synchronisés",
+      "totalProjectsMapped": "Projets associés",
+      "type": "Type",
+      "updatedAt": "Dernière mise à jour",
+      "updatedBy": "Mis à jour par"
+    },
+    "jira": {
+      "instructions": {
+        "content": "<0><1>Génère une paire de clés RSA avec OpenSSL : <2>openssl genrsa -out jira_privatekey.pem 1024</2></1><1>Extrait la clé publique : <2>openssl rsa -in jira_privatekey.pem -pubout -out jira_publickey.pem</2></1><1>Dans Jira : Clique sur Paramètres (icône d'engrenage) → Applications → Application links</1><1>Saisis n'importe quelle URL (par ex., <2>http://localhost</2>) et clique sur \"Create new link\"</1><1>Ignore l'avertissement \"No response was received\" et clique sur \"Continue\"</1><1>Saisis ton nom d'application et sélectionne \"Create incoming link\"</1><1>Dans le formulaire d'authentification entrante, saisis ta clé de consommateur et colle le contenu de la clé publique depuis <2>jira_publickey.pem</2></1><1>Complète le flux d'autorisation OAuth 1.0a en utilisant ta clé de consommateur et ta clé privée pour obtenir le jeton d'accès</1></0><3>Note : Cela utilise OAuth 1.0a avec signature RSA-SHA1. Principalement pour Jira Server/Data Center. Pour Jira Cloud, envisage d'utiliser des jetons API ou OAuth 2.0 pour les nouvelles intégrations.</3>",
+        "title": "Comment créer des identifiants Jira :"
+      }
+    },
+    "plane": {
+      "instructions": {
+        "content": "<0><1>Connecte-toi à ton compte Plane ou à ton instance auto-hébergée</1><1>Va dans les paramètres du profil</1><1>Sélectionne \"Personal Access Tokens\" dans la liste des onglets</1><1>Clique sur \"Add personal access token\"</1><1>Saisis un nom de jeton et une description optionnelle</1><1>Clique sur \"Generate\" ou \"Create\"</1><1>Copie le jeton généré immédiatement et stocke-le en toute sécurité</1></0><3>Note : Le jeton ne sera affiché qu'une seule fois. Le jeton est transmis en tant que valeur de l'en-tête <2>X-API-Key</2> dans les requêtes API.</3>",
+        "title": "Comment créer des identifiants Plane :"
+      }
+    },
+    "projectMappings": {
+      "title": "Mappages de projets {{platform}}"
+    },
+    "success": {
+      "configDeleted": "Configuration supprimée avec succès",
+      "configSaved": "Configuration enregistrée avec succès",
+      "mappingRemoved": "Correspondance de projet supprimée avec succès",
+      "mappingSaved": "Correspondance de projet enregistrée avec succès"
+    },
+    "tagConfiguration": {
+      "description": "Configure les champs des tickets externes à utiliser pour créer des étiquettes dans Lasius.",
+      "issueState": {
+        "all": "Tous les tickets",
+        "closed": "Tickets fermés uniquement",
+        "open": "Tickets ouverts uniquement"
+      },
+      "issueStateLabel": "Statut de ticket à importer",
+      "tagFieldsLabel": "Champs de tags à importer",
+      "tagFieldsPlaceholder": "Sélectionne des champs...",
+      "useAssignees": "Utiliser les assignés comme étiquettes",
+      "useLabels": "Utiliser les labels comme étiquettes",
+      "useMilestone": "Utiliser le jalon comme étiquette",
+      "useTitle": "Utiliser le titre du ticket comme étiquette"
+    },
+    "testConnection": {
+      "editModeNote": "Note : Saisis tes identifiants ci-dessus pour tester la connexion. Laisser vide pour conserver les identifiants existants lors de l'enregistrement.",
+      "failed": "Échec du test de connexion. Vérifie tes identifiants et l'URL.",
+      "resourceOwnerRequired": "Sélectionne un propriétaire de ressource avant de tester la connexion.",
+      "success": "Test de connexion réussi",
+      "test": "Tester la connexion",
+      "testing": "Test de connexion en cours..."
+    },
+    "titles": {
+      "create": "Créer une intégration",
+      "edit": "Modifier une intégration"
+    },
+    "typeSelector": {
+      "chooseTracker": "Choisis quel système de suivi des tickets tu veux configurer :"
+    },
+    "wizard": {
+      "config": {
+        "description": "Saisis tes informations de connexion pour te connecter à {{platform}}.",
+        "title": "Configurer {{platform}}"
+      },
+      "projects": {
+        "addMapping": "Ajouter une correspondance",
+        "changeMapping": "Modifier la correspondance",
+        "confirmRemoveMessage": "Êtes-vous sûr de vouloir supprimer ce mappage de projet ? Les problèmes ne seront plus synchronisés, mais les étiquettes existantes resteront.",
+        "confirmRemoveTitle": "Supprimer le mappage de projet",
+        "confirmRemoveWarning": "Cette action ne peut pas être annulée.",
+        "createMapping": "Créer un mappage de projet",
+        "editMapping": "Modifier un mappage de projet",
+        "externalProject": "Projet externe",
+        "filterPlaceholder": "Filtrer les projets...",
+        "lasiusProject": "Projet Lasius",
+        "loadError": "Impossible de charger les projets. Veuillez réessayer.",
+        "loading": "Chargement des projets depuis {{platform}}...",
+        "mappingDescription": "Liez ce projet externe à un projet Lasius pour synchroniser automatiquement les problèmes en tant qu'étiquettes de suivi du temps.",
+        "mappingDescription_one": "{{count}} projet trouvé dans {{platform}}. Associe-le à tes projets Lasius pour importer les tickets. {{mapped}} sur {{total}} associé.",
+        "mappingDescription_many": "Found {{count}} projects from {{platform}}. Map them to your Lasius projects to import issues. {{mapped}} of {{total}} mapped.",
+        "mappingDescription_other": "{{count}} projets trouvés dans {{platform}}. Associe-les à tes projets Lasius pour importer les tickets. {{mapped}} sur {{total}} associés.",
+        "mappingDescription_plural_one": "{{count}} projet trouvé dans {{platform}}. Associe-le à tes projets Lasius pour importer les tickets. {{mapped}} sur {{total}} associé.",
+        "mappingDescription_plural_many": "{{count}} projets trouvés dans {{platform}}. Associe-les à tes projets Lasius pour importer les tickets. {{mapped}} sur {{total}} associés.",
+        "mappingDescription_plural_other": "{{count}} projets trouvés dans {{platform}}. Associe-les à tes projets Lasius pour importer les tickets. {{mapped}} sur {{total}} associés.",
+        "noProjects": "Aucun projet trouvé dans {{platform}}",
+        "notMapped": "Non associé",
+        "orphanedProject": "Projet non disponible",
+        "removeMapping": "Supprimer la correspondance",
+        "selectMappingDescription": "Choisis quel projet Lasius doit être lié à ce projet externe.",
+        "title": "Associer les projets externes"
+      },
+      "selectPlatform": {
+        "description": "Choisis quelle plateforme de suivi des tickets tu veux intégrer avec Lasius.",
+        "githubDescription": "Importer les tickets et les pull requests depuis les dépôts GitHub",
+        "gitlabDescription": "Importer les tickets et les merge requests depuis les projets GitLab",
+        "jiraDescription": "Importer les tickets et les epics depuis les tableaux Jira",
+        "planeDescription": "Importer les tickets et les tâches depuis les espaces de travail Plane",
+        "title": "Sélectionner le système de suivi des tickets"
+      },
+      "steps": {
+        "configure": "Configurer",
+        "platform": "Plateforme",
+        "projects": "Projets",
+        "test": "Tester"
+      },
+      "test": {
+        "error": "Échec de la connexion",
+        "retry": "Réessayer le test de connexion",
+        "success": "Connexion réussie !",
+        "successDescription": "Passage à l'étape suivante...",
+        "testing": "Test de connexion en cours..."
+      }
+    }
+  },
+  "projects": {
+    "label": "Projet"
+  }
+}

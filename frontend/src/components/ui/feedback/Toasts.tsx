@@ -22,6 +22,7 @@ import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { AnimatePresence, m } from 'framer-motion'
 import { cn } from 'lib/utils/cn'
 import { AlertCircle, AlertTriangle, CheckCircle, Info, X } from 'lucide-react'
+import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { ToastViewType } from 'types/dynamicViews'
 import { useIsClient } from 'usehooks-ts'
@@ -95,27 +96,42 @@ const ToastItem: React.FC<{ item: ToastViewType }> = ({ item }) => {
         config.borderColor,
       )}
       role="alert">
-      <div className="flex items-center gap-3 px-4 py-3">
-        <LucideIcon
-          icon={Icon}
-          size={20}
-          className={cn(config.textColor, 'flex-shrink-0', item.description && 'self-start')}
-        />
-        <div className="min-w-0 flex-1">
-          <p className="text-sm leading-5 font-medium">{item.message}</p>
-          {item.description && (
-            <p className="text-base-content/60 mt-0.5 text-xs leading-4">{item.description}</p>
-          )}
+      <div className="flex flex-col gap-2 px-4 py-3">
+        <div className="flex items-center gap-3">
+          <LucideIcon
+            icon={Icon}
+            size={20}
+            className={cn(config.textColor, 'flex-shrink-0', item.description && 'self-start')}
+          />
+          <div className="min-w-0 flex-1">
+            <p className="text-sm leading-5 font-medium">{item.message}</p>
+            {item.description && (
+              <p className="text-base-content/60 mt-0.5 text-xs leading-4">{item.description}</p>
+            )}
+          </div>
+          <button
+            className={cn(
+              'hover:bg-base-content/10 flex-shrink-0 rounded-md p-1 transition-colors',
+              'focus:ring-base-content/20 focus:ring-2 focus:ring-offset-2 focus:outline-none',
+            )}
+            onClick={() => removeToast(item)}
+            aria-label="Close notification">
+            <LucideIcon icon={X} size={16} className="text-base-content/60" />
+          </button>
         </div>
-        <button
-          className={cn(
-            'hover:bg-base-content/10 flex-shrink-0 rounded-md p-1 transition-colors',
-            'focus:ring-base-content/20 focus:ring-2 focus:ring-offset-2 focus:outline-none',
-          )}
-          onClick={() => removeToast(item)}
-          aria-label="Close notification">
-          <LucideIcon icon={X} size={16} className="text-base-content/60" />
-        </button>
+        {item.action && (
+          <div className="flex justify-end pl-8">
+            <Link
+              href={item.action.href}
+              className={cn(
+                'text-xs font-medium underline transition-colors hover:no-underline',
+                config.textColor,
+              )}
+              onClick={() => removeToast(item)}>
+              {item.action.label}
+            </Link>
+          </div>
+        )}
       </div>
       <div className="bg-base-content/10 absolute bottom-0 left-0 h-0.5">
         <div

@@ -89,11 +89,7 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
           ...(fallback || {}),
           use: [swrLogger as any],
         }}>
-        <SessionProvider
-          session={session}
-          refetchOnWindowFocus={true}
-          refetchInterval={10} // Refetch every 10 seconds to catch token refreshes
-        >
+        <SessionProvider session={session} refetchOnWindowFocus={true} refetchInterval={0}>
           <Head>
             <meta
               name="viewport"

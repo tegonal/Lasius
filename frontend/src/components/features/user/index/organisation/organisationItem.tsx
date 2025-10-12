@@ -46,7 +46,7 @@ export const OrganisationItem: React.FC<Props> = ({ item }) => {
         {booking && (
           <div className="flex flex-col gap-1">
             <BookingName variant="compact" item={booking} />
-            <TagList items={booking.tags} />
+            <TagList items={booking.tags} width="xs" />
           </div>
         )}
       </div>

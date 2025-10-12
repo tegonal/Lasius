@@ -24,9 +24,10 @@ import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { differenceBy, filter, noop, sortBy, uniqBy } from 'es-toolkit/compat'
 import { ModelsSimpleTag } from 'lib/api/lasius'
 import { cleanStrForCmp } from 'lib/utils/string/strings'
+import { isImporterTag } from 'lib/utils/tagHelpers'
 import { XCircle } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
 import { ModelsTags, ModelsTagWithSummary } from 'types/common'
 
@@ -65,19 +66,40 @@ export const InputTagsAutocomplete: React.FC<Props> = ({ suggestions = [], name,
 
   // Show all tags when focused with a project selected and no input text
   // Otherwise filter by input text
-  const availableSuggestions = sortById(
-    differenceBy(suggestions as ModelsTagWithSummary[], selectedTags ?? [], 'id').filter((tag) => {
-      // If no input text, show all tags
-      if (!inputText) {
-        return true
+  const filteredSuggestions = differenceBy(
+    suggestions as ModelsTagWithSummary[],
+    selectedTags ?? [],
+    'id',
+  ).filter((tag) => {
+    // If no input text, show all tags
+    if (!inputText) {
+      return true
+    }
+    // Otherwise filter by input text
+    return (
+      cleanStrForCmp(tag.summary || '').includes(cleanStrForCmp(inputText)) ||
+      cleanStrForCmp(tag.id).includes(cleanStrForCmp(inputText))
+    )
+  })
+
+  // Separate platform tags (importers) from non-platform tags
+  const { nonPlatformTags, platformTags } = useMemo(() => {
+    const nonPlatform: ModelsTags[] = []
+    const platform: ModelsTags[] = []
+
+    filteredSuggestions.forEach((tag) => {
+      if (isImporterTag(tag)) {
+        platform.push(tag)
+      } else {
+        nonPlatform.push(tag)
       }
-      // Otherwise filter by input text
-      return (
-        cleanStrForCmp(tag.summary || '').includes(cleanStrForCmp(inputText)) ||
-        cleanStrForCmp(tag.id).includes(cleanStrForCmp(inputText))
-      )
-    }),
-  )
+    })
+
+    return {
+      nonPlatformTags: sortById(nonPlatform),
+      platformTags: sortById(platform),
+    }
+  }, [filteredSuggestions])
 
   const removeTag = (tag: ModelsTags) => {
     const toRemove = filter(selectedTags, { id: tag.id })
@@ -102,6 +124,8 @@ export const InputTagsAutocomplete: React.FC<Props> = ({ suggestions = [], name,
   const displayCreateTag =
     inputText.length > 0 && !selectedTags.find((s) => s && s.id === inputText)
 
+  const hasAnySuggestions = nonPlatformTags.length > 0 || platformTags.length > 0
+
   if (!parentFormContext) return null
 
   // const preventDefault = (e: any) => {
@@ -116,7 +140,7 @@ export const InputTagsAutocomplete: React.FC<Props> = ({ suggestions = [], name,
     <div>
       {selectedTags.length > 0 && (
         <div className="my-2">
-          <TagList items={selectedTags} clickHandler={removeTag} />
+          <TagList items={selectedTags} clickHandler={removeTag} width="sm" />
         </div>
       )}
       <div className="relative">
@@ -148,7 +172,7 @@ export const InputTagsAutocomplete: React.FC<Props> = ({ suggestions = [], name,
                   )}
                   <ComboboxOptions as="div" static={isFocused && projectId && !open}>
                     {(open || (isFocused && projectId)) &&
-                      (displayCreateTag || availableSuggestions.length > 0) && (
+                      (displayCreateTag || hasAnySuggestions) && (
                         <DropdownList className="flex flex-wrap gap-0 px-2">
                           {displayCreateTag && (
                             <ComboboxOption
@@ -169,7 +193,23 @@ export const InputTagsAutocomplete: React.FC<Props> = ({ suggestions = [], name,
                               )}
                             </ComboboxOption>
                           )}
-                          {availableSuggestions.map((item) => (
+                          {nonPlatformTags.map((item) => (
+                            <ComboboxOption
+                              as="div"
+                              key={item.id}
+                              value={item}
+                              className="w-fit p-1">
+                              {({ active }) => (
+                                <Tag
+                                  active={active}
+                                  item={item}
+                                  clickHandler={noop}
+                                  hideRemoveIcon
+                                />
+                              )}
+                            </ComboboxOption>
+                          ))}
+                          {platformTags.map((item) => (
                             <ComboboxOption
                               as="div"
                               key={item.id}

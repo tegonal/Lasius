@@ -21,7 +21,6 @@ import { OrganisationAddUpdateForm } from 'components/features/organisation/curr
 import { OrganisationDetail } from 'components/features/organisation/current/organisationDetail'
 import { OrganisationsRightColumn } from 'components/features/organisation/current/organisationsRightColumn'
 import { OrganisationStats } from 'components/features/organisation/current/organisationStats'
-import { IssueImporterConfigList } from 'components/features/organisation/settings/issue-importers/IssueImporterConfigList'
 import { ManageUserInviteByEmailForm } from 'components/features/user/manageUserInviteByEmailForm'
 import { ScrollContainer } from 'components/primitives/layout/ScrollContainer'
 import { Modal } from 'components/ui/overlays/modal/Modal'
@@ -33,28 +32,20 @@ export const OrganisationLayout: React.FC = () => {
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [isUpdateOpen, setIsUpdateOpen] = useState(false)
   const [isInviteOpen, setIsInviteOpen] = useState(false)
-  const [isImporterConfigOpen, setIsImporterConfigOpen] = useState(false)
 
   const handleAddClose = () => setIsAddOpen(false)
   const handleUpdateClose = () => setIsUpdateOpen(false)
   const handleInviteClose = () => setIsInviteOpen(false)
-  const handleImporterConfigClose = () => setIsImporterConfigOpen(false)
 
   const handleInvite = () => setIsInviteOpen(true)
   const handleEdit = () => setIsUpdateOpen(true)
   const handleCreate = () => setIsAddOpen(true)
-  const handleConfigureImporters = () => setIsImporterConfigOpen(true)
 
   return (
     <>
       <ScrollContainer className="bg-base-100 flex-1 overflow-y-auto">
-        <OrganisationStats
-          onInvite={handleInvite}
-          onEdit={handleEdit}
-          onCreate={handleCreate}
-          onConfigureImporters={handleConfigureImporters}
-        />
-        <div className="px-4 pt-3">
+        <OrganisationStats onInvite={handleInvite} onEdit={handleEdit} onCreate={handleCreate} />
+        <div className="pt-4">
           <OrganisationDetail />
         </div>
       </ScrollContainer>
@@ -77,9 +68,6 @@ export const OrganisationLayout: React.FC = () => {
           onSave={handleInviteClose}
           onCancel={handleInviteClose}
         />
-      </Modal>
-      <Modal open={isImporterConfigOpen} onClose={handleImporterConfigClose}>
-        <IssueImporterConfigList />
       </Modal>
     </>
   )

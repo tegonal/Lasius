@@ -1,0 +1,86 @@
+# Projektzuordnungen
+
+Verknüpfe externe Projekte von deiner Integrationsplattform mit Lasius-Projekten. Issues aus zugeordneten Projekten werden automatisch synchronisiert und als Zeiterfassungs-Tags verfügbar gemacht.
+
+## Die Liste verstehen
+
+Jede Zeile zeigt:
+- **Linke Seite**: Name und ID des externen Projekts
+- **Pfeil**: Visueller Zuordnungsindikator
+- **Rechte Seite**:
+  - Name des zugeordneten Lasius-Projekts (oder "Nicht zugeordnet" in Grau)
+  - Drei-Punkte-Menü-Button
+
+## Projekte filtern
+
+Verwende das Filterfeld oben, um nach Projektname oder ID zu suchen. Klicke auf das X zum Löschen.
+
+<Tip>Zugeordnete Projekte erscheinen zuerst, dann nicht zugeordnete Projekte</Tip>
+
+## Projekt zuordnen
+
+1. Klicke auf das **Drei-Punkte-Menü** für das Projekt, das du zuordnen möchtest
+2. Klicke auf das **Stift-Symbol**, um die Zuordnung hinzuzufügen oder zu bearbeiten
+3. Wähle ein Lasius-Projekt aus dem Dropdown
+4. Konfiguriere die Tag-Einstellungen (erscheint nach Auswahl eines Projekts)
+5. Klicke auf **Bestätigen**, um zu speichern
+
+<Tip>Tag-Konfiguration ist nur für GitHub, GitLab und Plane verfügbar (nicht für Jira)</Tip>
+
+## Tag-Konfiguration
+
+Nach Auswahl eines Lasius-Projekts konfiguriere, welche Issue-Felder als Tags importiert werden:
+
+**Zu importierende Tag-Felder** (Mehrfachauswahl):
+- Issue-Titel als Tag verwenden
+- Labels als Tags verwenden
+- Meilenstein als Tag verwenden
+- Zugewiesene Personen als Tags verwenden (nur GitHub)
+
+**Zu importierender Issue-Status**:
+- Alle Issues
+- Nur offene Issues
+- Nur geschlossene Issues
+
+<Tip>Verwende "Nur offene Issues", um deine Tag-Liste nicht mit geschlossenen Issues zu überladen</Tip>
+
+## Zuordnung bearbeiten
+
+1. Klicke auf das **Drei-Punkte-Menü** für das zugeordnete Projekt
+2. Klicke auf das **Stift-Symbol**
+3. Ändere das Lasius-Projekt oder die Tag-Einstellungen
+4. Klicke auf **Bestätigen**, um zu speichern
+
+## Zuordnung entfernen
+
+1. Klicke auf das **Drei-Punkte-Menü** für das zugeordnete Projekt
+2. Klicke auf das **Papierkorb-Symbol**
+3. Ein Bestätigungsdialog erscheint
+4. Klicke auf **Entfernen**, um zu bestätigen
+
+<Tip>Das Entfernen einer Zuordnung stoppt die Synchronisierung, löscht aber keine bestehenden Tags</Tip>
+
+## Nach der Zuordnung
+
+Die Synchronisierung erfolgt automatisch:
+- Erste Synchronisierung erfolgt beim nächsten geplanten Prüfintervall
+- Nachfolgende Synchronisierungen holen nur neue oder aktualisierte Issues
+- Prüfe den Gesundheitsstatus der Integration, um den Fortschritt zu überwachen
+
+## Fehlerbehebung
+
+**Projektliste ist leer:**
+- Verifiziere die Integrations-Anmeldedaten in den Einstellungen
+- Prüfe, ob dein Konto Zugriff auf Projekte der Plattform hat
+- Warte, bis das initiale Laden abgeschlossen ist
+
+**Kann kein Lasius-Projekt auswählen:**
+- Stelle sicher, dass du mindestens ein Projekt in Lasius erstellt hast
+- Prüfe, ob du Zugriffsberechtigung auf das Projekt hast
+- Versuche, den Dialog zu schließen und erneut zu öffnen
+
+**Zuordnung wird gespeichert, aber Tags erscheinen nicht:**
+- Warte auf den nächsten Synchronisierungszyklus (prüfe das Intervall der Integration)
+- Verifiziere, dass mindestens ein Tag-Feld ausgewählt ist
+- Prüfe, ob Issues deinem Status-Filter entsprechen (alle, offen oder geschlossen)
+- Überprüfe den Gesundheitsstatus der Integration auf Fehler

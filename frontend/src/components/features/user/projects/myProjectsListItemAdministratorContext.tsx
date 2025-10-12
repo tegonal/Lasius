@@ -30,7 +30,6 @@ import { ManageProjectMembers } from 'components/features/projects/manageMembers
 import { ProjectAddUpdateForm } from 'components/features/projects/projectAddUpdateForm'
 import { ProjectAddUpdateTagsForm } from 'components/features/projects/projectAddUpdateTagsForm'
 import { Button } from 'components/primitives/buttons/Button'
-import { FormElement } from 'components/ui/forms/FormElement'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { Modal } from 'components/ui/overlays/modal/Modal'
 import { AnimatePresence } from 'framer-motion'
@@ -165,7 +164,7 @@ export const MyProjectsListItemAdministratorContext: React.FC<Props> = ({ item }
           onCancel={handleUpdateClose}
         />
       </Modal>
-      <Modal open={isTagOpen} onClose={handleTagClose} size="wide">
+      <Modal open={isTagOpen} onClose={handleTagClose} size="lg">
         <ProjectAddUpdateTagsForm
           mode="update"
           item={item}
@@ -173,13 +172,8 @@ export const MyProjectsListItemAdministratorContext: React.FC<Props> = ({ item }
           onCancel={handleTagClose}
         />
       </Modal>
-      <Modal open={isManageOpen} onClose={handleManageClose} autoSize>
+      <Modal open={isManageOpen} onClose={handleManageClose} size="xl">
         <ManageProjectMembers item={item} onSave={handleManageClose} onCancel={handleManageClose} />
-        <FormElement>
-          <Button type="button" variant="secondary" onClick={handleManageClose}>
-            {t('common.actions.cancel', { defaultValue: 'Cancel' })}
-          </Button>
-        </FormElement>
       </Modal>
     </>
   )

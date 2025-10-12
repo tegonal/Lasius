@@ -1,0 +1,86 @@
+# Project Mappings
+
+Link external projects from your integration platform to Lasius projects. Issues from mapped projects are automatically synced and available as time tracking tags.
+
+## Understanding the List
+
+Each row shows:
+- **Left side**: External project name and ID
+- **Arrow**: Visual mapping indicator
+- **Right side**:
+  - Mapped Lasius project name (or "Not mapped" in gray)
+  - Three-dot menu button
+
+## Filtering Projects
+
+Use the filter box at the top to search by project name or ID. Click the X to clear.
+
+<Tip>Mapped projects appear first, then unmapped projects</Tip>
+
+## Mapping a Project
+
+1. Click the **three-dot menu** for the project you want to map
+2. Click the **pencil icon** to add or edit the mapping
+3. Select a Lasius project from the dropdown
+4. Configure tag settings (appears after selecting a project)
+5. Click **Confirm** to save
+
+<Tip>Tag configuration is only available for GitHub, GitLab, and Plane (not Jira)</Tip>
+
+## Tag Configuration
+
+After selecting a Lasius project, configure which issue fields to import as tags:
+
+**Tag Fields to Import** (Multi-select):
+- Use issue title as tag
+- Use labels as tags
+- Use milestone as tag
+- Use assignees as tags (GitHub only)
+
+**Issue State to Import**:
+- All issues
+- Open issues only
+- Closed issues only
+
+<Tip>Use "Open issues only" to avoid cluttering your tag list with closed issues</Tip>
+
+## Editing a Mapping
+
+1. Click the **three-dot menu** for the mapped project
+2. Click the **pencil icon**
+3. Change the Lasius project or tag settings
+4. Click **Confirm** to save
+
+## Removing a Mapping
+
+1. Click the **three-dot menu** for the mapped project
+2. Click the **trash icon**
+3. A confirmation dialog appears
+4. Click **Remove** to confirm
+
+<Tip>Removing a mapping stops syncing but doesn't delete existing tags</Tip>
+
+## After Mapping
+
+Syncing happens automatically:
+- First sync occurs on the next scheduled check interval
+- Subsequent syncs only fetch new or updated issues
+- Check the integration's health status to monitor progress
+
+## Troubleshooting
+
+**Project list is empty:**
+- Verify integration credentials in settings
+- Check your account has access to projects on the platform
+- Wait for the initial load to complete
+
+**Cannot select a Lasius project:**
+- Ensure you have at least one project created in Lasius
+- Check you have permission to access the project
+- Try closing and reopening the modal
+
+**Mapping saves but tags don't appear:**
+- Wait for the next sync cycle (check the integration's interval)
+- Verify at least one tag field is selected
+- Check issues match your state filter (all, open, or closed)
+- Review the integration's health status for errors

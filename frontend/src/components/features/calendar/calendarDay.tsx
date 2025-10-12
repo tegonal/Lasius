@@ -17,12 +17,12 @@
  *
  */
 
+import { useCalendarDaySummary } from 'components/features/calendar/hooks/useCalendarDaySummary'
 import { DotRed } from 'components/ui/data-display/dots/dotRed'
 import { FormatDate } from 'components/ui/data-display/FormatDate'
 import { ProgressBarSmall } from 'components/ui/data-display/ProgressBarSmall'
 import { isToday, isWeekend } from 'date-fns'
 import { IsoDateString } from 'lib/api/apiDateHandling'
-import { useGetBookingSummaryDay } from 'lib/api/hooks/useGetBookingSummaryDay'
 import { cn } from 'lib/utils/cn'
 import React from 'react'
 import { useIsClient } from 'usehooks-ts'
@@ -37,7 +37,7 @@ export const CalendarDay: React.FC<Props> = ({ date, onClick, isSelected = false
   const isClient = useIsClient()
   const day = new Date(date)
 
-  const { progressBarPercentage } = useGetBookingSummaryDay(date)
+  const { progressBarPercentage } = useCalendarDaySummary(date)
 
   if (!isClient) return null
 

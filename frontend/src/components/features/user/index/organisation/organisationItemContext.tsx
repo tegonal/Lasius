@@ -45,7 +45,7 @@ export const OrganisationItemContext: React.FC<Props> = ({ item }) => {
         <AnimatePresence>
           {currentOpenContextMenuId === itemHash && (
             <ContextAnimatePresence variant="compact">
-              <ContextBar>
+              <ContextBar className="-mr-3">
                 <ContextButtonStartBooking variant="compact" item={item} />
                 <ContextBarDivider />
                 <ContextButtonClose variant="compact" />

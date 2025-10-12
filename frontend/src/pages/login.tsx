@@ -83,7 +83,7 @@ const Login: NextPage<{
           defaultValue: 'Authentication failed. Please try again.',
         })
       case 'SessionRequired':
-        return t('auth.errors.sessionRequired', {
+        return t('auth.errors.sessionRequired.message', {
           defaultValue: 'Please sign in to continue.',
         })
       case 'Callback':

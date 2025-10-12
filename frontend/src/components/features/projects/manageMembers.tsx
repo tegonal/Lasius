@@ -20,11 +20,16 @@
 import { ManageProjectMembersStats } from 'components/features/projects/manageProjectMembersStats'
 import { ProjectMembersList } from 'components/features/projects/projectMembersList'
 import { ManageUserInviteByEmailForm } from 'components/features/user/manageUserInviteByEmailForm'
+import { Button } from 'components/primitives/buttons/Button'
 import { ScrollContainer } from 'components/primitives/layout/ScrollContainer'
+import { ButtonGroup } from 'components/ui/forms/ButtonGroup'
 import { Modal } from 'components/ui/overlays/modal/Modal'
+import { ModalCloseButton } from 'components/ui/overlays/modal/ModalCloseButton'
+import { ModalHeader } from 'components/ui/overlays/modal/ModalHeader'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { ModelsProject, ModelsUserProject, ModelsUserStub } from 'lib/api/lasius'
 import { getProjectUserList } from 'lib/api/lasius/projects/projects'
+import { useTranslation } from 'next-i18next'
 import React, { useEffect, useState } from 'react'
 
 type Props = {
@@ -33,7 +38,8 @@ type Props = {
   onCancel?: () => void
 }
 
-export const ManageProjectMembers: React.FC<Props> = ({ item }) => {
+export const ManageProjectMembers: React.FC<Props> = ({ item, onCancel }) => {
+  const { t } = useTranslation('common')
   const { selectedOrganisationId } = useOrganisation()
   const projectId = 'id' in item ? item.id : item.projectReference.id
   const projectOrganisationId =
@@ -63,11 +69,23 @@ export const ManageProjectMembers: React.FC<Props> = ({ item }) => {
     setIsInviteOpen(false)
   }
 
+  const handleClose = () => {
+    if (onCancel) {
+      onCancel()
+    }
+  }
+
   return (
     <>
-      <div className="flex h-[calc(90vh-12rem)] flex-col">
+      <div className="flex h-full min-h-0 flex-1 flex-col">
+        <ModalCloseButton onClose={handleClose} />
+
+        <ModalHeader className="mb-4">
+          {t('members.actions.manage', { defaultValue: 'Manage members' })}
+        </ModalHeader>
+
         <ManageProjectMembersStats memberCount={users.length} onInvite={handleInviteOpen} />
-        <ScrollContainer className="flex-1 px-4 pt-3">
+        <ScrollContainer className="min-h-0 grow">
           <ProjectMembersList
             users={users}
             projectId={projectId}
@@ -75,6 +93,11 @@ export const ManageProjectMembers: React.FC<Props> = ({ item }) => {
             onRefresh={handleRefresh}
           />
         </ScrollContainer>
+        <ButtonGroup>
+          <Button type="button" variant="secondary" onClick={handleClose}>
+            {t('common.actions.close', { defaultValue: 'Close' })}
+          </Button>
+        </ButtonGroup>
       </div>
       <Modal open={isInviteOpen} onClose={handleInviteClose}>
         <ManageUserInviteByEmailForm

@@ -48,7 +48,7 @@ class GitlabApiServiceImpl(override val ws: WSClient,
     extends GitlabApiService
     with ApiServiceBase {
 
-  val findIssuesUrl = s"/projects/%s/issues?"
+  val findIssuesUrl = s"/api/v4/projects/%s/issues?"
 
   def findIssues(projectId: String,
                  paramString: String,

@@ -17,7 +17,11 @@
  *
  */
 
-import { ModalConfirm } from 'components/ui/overlays/modal/modalConfirm'
+import { Button } from 'components/primitives/buttons/Button'
+import { ButtonGroup } from 'components/ui/forms/ButtonGroup'
+import { Modal } from 'components/ui/overlays/modal/Modal'
+import { ModalDescription } from 'components/ui/overlays/modal/ModalDescription'
+import { ModalHeader } from 'components/ui/overlays/modal/ModalHeader'
 import { useProfile } from 'lib/api/hooks/useProfile'
 import { signOut } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
@@ -89,25 +93,37 @@ export const LasiusTOSCheck: React.FC = () => {
   }, [acceptedTOSVersion, lasiusIsLoggedIn, i18n.language])
 
   return (
-    showAcceptTOSDialog && (
-      <ModalConfirm
-        onConfirm={handleConfirm}
-        onCancel={handleCancel}
-        text={{
-          action: t('tos.acceptMessage', {
+    <Modal open={showAcceptTOSDialog} onClose={handleCancel} blockViewport>
+      <div className="flex flex-col gap-4">
+        <ModalHeader>
+          {t('tos.title', {
+            defaultValue: 'Terms of Service (version {{version}})',
+            version: currentTOSVersion,
+          })}
+        </ModalHeader>
+
+        <ModalDescription>
+          {t('tos.acceptMessage', {
             defaultValue:
               'Please accept the following Terms of Service (version {{version}}), if you want to continue using Lasius:',
             version: currentTOSVersion,
-          }),
-          confirm: t('tos.actions.accept', { defaultValue: 'Accept Terms of Service' }),
-          cancel: t('tos.actions.reject', { defaultValue: 'Reject and logout' }),
-        }}
-        autoSize={true}>
+          })}
+        </ModalDescription>
+
         <div
-          className="bg-base-200 max-h-[400px] overflow-y-auto p-4"
+          className="bg-base-200 max-h-[400px] overflow-y-auto rounded-lg p-4"
           dangerouslySetInnerHTML={{ __html: tosHtml }}
         />
-      </ModalConfirm>
-    )
+
+        <ButtonGroup>
+          <Button type="button" variant="primary" onClick={handleConfirm}>
+            {t('tos.actions.accept', { defaultValue: 'Accept Terms of Service' })}
+          </Button>
+          <Button type="button" variant="secondary" onClick={handleCancel}>
+            {t('tos.actions.reject', { defaultValue: 'Reject and logout' })}
+          </Button>
+        </ButtonGroup>
+      </div>
+    </Modal>
   )
 }

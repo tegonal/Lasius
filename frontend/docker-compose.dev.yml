@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # MongoDB Database
   mongodb:
@@ -52,16 +50,16 @@ services:
       timeout: 5s
       retries: 5
 
-  # Nginx proxy (routes frontend and backend)
+  # Caddy proxy (routes frontend and backend)
   proxy:
-    image: nginx:latest
+    image: caddy:2.9-alpine
     container_name: lasius-dev-proxy
     ports:
       - "3000:3000"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - ./nginx-dev-proxy.conf:/etc/nginx/nginx.conf:ro
+      - ./Caddyfile.dev:/etc/caddy/Caddyfile:ro
     networks:
       - lasius-dev
     depends_on:
@@ -69,7 +67,7 @@ services:
       - mongodb
       - mailhog
     healthcheck:
-      test: ["CMD", "nginx", "-t"]
+      test: ["CMD", "caddy", "validate", "--config", "/etc/caddy/Caddyfile"]
       interval: 10s
       timeout: 5s
       retries: 3

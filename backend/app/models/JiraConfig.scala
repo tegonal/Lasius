@@ -23,36 +23,45 @@ package models
 
 import models.BaseFormat._
 import play.api.libs.json._
-import reactivemongo.api.bson.BSONObjectID
+import org.joda.time.DateTime
 
 import java.net.URL
 
-case class JiraConfigId(value: BSONObjectID = BSONObjectID.generate())
-    extends BaseBSONObjectId
 case class JiraSettings(checkFrequency: Long)
-case class JiraProjectSettings(jiraProjectKey: String,
-                               maxResults: Option[Int] = None,
-                               jql: Option[String] = None)
-case class JiraProjectMapping(projectId: ProjectId,
-                              settings: JiraProjectSettings)
-case class JiraAuth(consumerKey: String,
-                    privateKey: String,
-                    accessToken: String)
+
+case class JiraProjectSettings(
+    jiraProjectKey: String,
+    maxResults: Option[Int] = None,
+    jql: Option[String] = None
+)
+
+case class JiraProjectMapping(
+    projectId: ProjectId,
+    settings: JiraProjectSettings
+)
+
+case class JiraAuth(
+    consumerKey: String,
+    privateKey: String,
+    accessToken: String
+)
+
 case class JiraConfig(
-    _id: JiraConfigId,
+    id: IssueImporterConfigId,
     organisationReference: OrganisationId.OrganisationReference,
+    importerType: ImporterType = ImporterType.Jira,
     name: String,
     baseUrl: URL,
     auth: JiraAuth,
     settings: JiraSettings,
-    projects: Seq[JiraProjectMapping]
-) extends BaseEntity[JiraConfigId] {
-  val id: JiraConfigId = _id
-}
-
-object JiraConfigId {
-  implicit val idFormat: Format[JiraConfigId] =
-    BaseFormat.idformat[JiraConfigId](JiraConfigId.apply)
+    projects: Seq[JiraProjectMapping],
+    syncStatus: ConfigSyncStatus = ConfigSyncStatus.empty,
+    audit: AuditInfo,
+    // type attribute only needed to generate correct swagger definition
+    `type`: String = classOf[JiraConfig].getSimpleName
+) extends IssueImporterConfig {
+  val checkFrequency: Long     = settings.checkFrequency
+  val canListProjects: Boolean = true
 }
 
 object JiraProjectMapping {

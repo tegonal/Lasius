@@ -19,9 +19,12 @@
 
 import type { TFunction } from 'i18next'
 
-export type ImporterType = 'gitlab' | 'jira' | 'plane'
+export type ImporterType = 'gitlab' | 'jira' | 'plane' | 'github'
 
-export const getImporterTypeLabel = (type: ImporterType, t: TFunction): string => {
+export const getImporterTypeLabel = (
+  type: ImporterType,
+  t: TFunction<'integrations' | 'common'>,
+): string => {
   switch (type) {
     case 'gitlab':
       return t('issueImporters.typeLabels.gitlab', { defaultValue: 'GitLab' })
@@ -29,5 +32,7 @@ export const getImporterTypeLabel = (type: ImporterType, t: TFunction): string =
       return t('issueImporters.typeLabels.jira', { defaultValue: 'Jira' })
     case 'plane':
       return t('issueImporters.typeLabels.plane', { defaultValue: 'Plane' })
+    case 'github':
+      return t('issueImporters.typeLabels.github', { defaultValue: 'GitHub' })
   }
 }

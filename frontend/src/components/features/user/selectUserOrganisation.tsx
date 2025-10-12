@@ -58,7 +58,7 @@ export const SelectUserOrganisation: React.FC = () => {
         <SelectUserOrganisationModal onClose={handleClose} />
         <ButtonGroup>
           <Button variant="secondary" onClick={handleClose}>
-            {t('common.actions.cancel', { defaultValue: 'Cancel' })}
+            {t('common.actions.close', { defaultValue: 'Close' })}
           </Button>
         </ButtonGroup>
       </Modal>

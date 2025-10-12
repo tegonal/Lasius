@@ -604,7 +604,7 @@ export const ThisMonthStats: React.FC = () => {
 
   return (
     <div className="w-full">
-      <Tabs tabs={tabs} />
+      <Tabs tabs={tabs} defaultIndex={2} />
     </div>
   )
 }

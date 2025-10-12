@@ -21,6 +21,9 @@ import React from 'react'
 
 type Props = {
   children: React.ReactNode
+  className?: string
 }
 
-export const Ul: React.FC<Props> = ({ children }) => <ul>{children}</ul>
+export const Ul: React.FC<Props> = ({ children, className = '' }) => (
+  <ul className={`mt-2 list-inside list-disc space-y-1 ${className}`}>{children}</ul>
+)

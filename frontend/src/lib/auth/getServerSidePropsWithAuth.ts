@@ -47,6 +47,8 @@ export async function getServerSidePropsWithAuth(
     context: GetServerSidePropsContext,
     authData: { session: Session | null; profile: ModelsUser | null },
   ) => Promise<Record<string, any>>,
+  // Additional namespaces beyond 'common'
+  namespaces: string[] = [],
 ): Promise<GetServerSidePropsResult<AuthPageProps & Record<string, any>>> {
   const { req, resolvedUrl } = context
   const locale = getLocaleFromCookie(context)
@@ -78,8 +80,9 @@ export async function getServerSidePropsWithAuth(
   // Get page-specific props if provided
   const pageProps = getPageProps ? await getPageProps(context, { session, profile }) : {}
 
-  // Get translations
-  const translations = await serverSideTranslations(locale, ['common'], nextI18NextConfig)
+  // Get translations - always include 'common' plus any additional namespaces
+  const allNamespaces = ['common', ...namespaces]
+  const translations = await serverSideTranslations(locale, allNamespaces, nextI18NextConfig)
 
   return {
     props: {
@@ -104,17 +107,22 @@ export async function getServerSidePropsWithAuthRequired(
     context: GetServerSidePropsContext,
     authData: { session: Session; profile: ModelsUser },
   ) => Promise<Record<string, any>>,
+  namespaces: string[] = [],
 ): Promise<GetServerSidePropsResult<AuthPageProps & Record<string, any>>> {
-  const result = await getServerSidePropsWithAuth(context, async (ctx, authData) => {
-    // Redirect if not authenticated
-    if (!authData.session || !authData.profile) {
-      return {} // Will be redirected below
-    }
-    // Safe to cast here since we checked above
-    return getPageProps
-      ? await getPageProps(ctx, authData as { session: Session; profile: ModelsUser })
-      : {}
-  })
+  const result = await getServerSidePropsWithAuth(
+    context,
+    async (ctx, authData) => {
+      // Redirect if not authenticated
+      if (!authData.session || !authData.profile) {
+        return {} // Will be redirected below
+      }
+      // Safe to cast here since we checked above
+      return getPageProps
+        ? await getPageProps(ctx, authData as { session: Session; profile: ModelsUser })
+        : {}
+    },
+    namespaces,
+  )
 
   // Check if we need to redirect
   if ('props' in result) {

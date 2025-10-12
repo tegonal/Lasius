@@ -80,6 +80,7 @@ export const WEBSOCKET_EVENT = {
   UserTimeBookingHistoryEntryRemoved: 'UserTimeBookingHistoryEntryRemoved',
   UserTimeBookingByTagEntryAdded: 'UserTimeBookingByTagEntryAdded',
   UserTimeBookingByTagEntryRemoved: 'UserTimeBookingByTagEntryRemoved',
+  IssueImporterSyncStatsChanged: 'IssueImporterSyncStatsChanged',
   Pong: 'Pong',
 }
 

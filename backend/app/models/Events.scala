@@ -234,6 +234,19 @@ case class TagCacheChanged(projectId: ProjectId,
                            added: Set[Tag])
     extends OutEvent
 
+case class IssueImporterSyncStatsChanged(
+    configId: IssueImporterConfigId,
+    organisationId: OrganisationId,
+    importerType: ImporterType,
+    configName: String,
+    syncStatus: ConfigSyncStatus
+) extends OutEvent
+
+object IssueImporterSyncStatsChanged {
+  implicit val format: Format[IssueImporterSyncStatsChanged] =
+    Json.format[IssueImporterSyncStatsChanged]
+}
+
 object InEvent {
   implicit val inEventFormat: OFormat[InEvent] =
     derived.flat.oformat[InEvent](defaultTypeFormat)
