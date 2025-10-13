@@ -93,65 +93,6 @@ export const CardBody = React.forwardRef<HTMLDivElement, CardBodyProps>(
 
 CardBody.displayName = 'CardBody'
 
-export interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
-  children: React.ReactNode
-  as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
-}
-
-export const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(
-  ({ className, children, as: Component = 'h2', ...props }, ref) => {
-    return (
-      <Component ref={ref} className={cn('card-title', className)} {...props}>
-        {children}
-      </Component>
-    )
-  },
-)
-
-CardTitle.displayName = 'CardTitle'
-
-export interface CardActionsProps extends React.HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode
-  justify?: 'start' | 'end' | 'center' | 'between' | 'around' | 'evenly'
-}
-
-export const CardActions = React.forwardRef<HTMLDivElement, CardActionsProps>(
-  ({ className, children, justify = 'end', ...props }, ref) => {
-    const justifyClasses = {
-      start: 'justify-start',
-      end: 'justify-end',
-      center: 'justify-center',
-      between: 'justify-between',
-      around: 'justify-around',
-      evenly: 'justify-evenly',
-    }
-
-    return (
-      <div ref={ref} className={cn('card-actions', justifyClasses[justify], className)} {...props}>
-        {children}
-      </div>
-    )
-  },
-)
-
-CardActions.displayName = 'CardActions'
-
-export interface CardFigureProps extends React.HTMLAttributes<HTMLElement> {
-  children: React.ReactNode
-}
-
-export const CardFigure = React.forwardRef<HTMLElement, CardFigureProps>(
-  ({ className, children, ...props }, ref) => {
-    return (
-      <figure ref={ref} className={cn(className)} {...props}>
-        {children}
-      </figure>
-    )
-  },
-)
-
-CardFigure.displayName = 'CardFigure'
-
 export type CardVariant = VariantProps<typeof cardVariants>['variant']
 export type CardSize = VariantProps<typeof cardVariants>['size']
 export type CardLayout = VariantProps<typeof cardVariants>['layout']

@@ -22,7 +22,6 @@
   },
   "issueImporters": {
     "actions": {
-      "addConfiguration": "Añadir configuración",
       "create": "Crear",
       "delete": "Eliminar configuración",
       "deleteDisabled": "No se puede eliminar: primero elimina todas las correspondencias de proyecto",
@@ -183,9 +182,6 @@
     "titles": {
       "create": "Crear integración",
       "edit": "Editar integración"
-    },
-    "typeSelector": {
-      "chooseTracker": "Elige qué sistema de seguimiento de incidencias quieres configurar:"
     },
     "wizard": {
       "config": {

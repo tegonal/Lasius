@@ -5,12 +5,6 @@
     "errors": {
       "passwordUpdateFailed": "Passwort-Aktualisierung fehlgeschlagen. Stelle sicher, dass du dein aktuelles Passwort korrekt eingegeben hast."
     },
-    "languageSettings": {
-      "description": "Wähle deine bevorzugte Sprache für die Benutzeroberfläche. Diese Einstellung wird lokal in deinem Browser gespeichert.",
-      "save": "Spracheinstellung speichern",
-      "selectLanguage": "Oberflächensprache",
-      "title": "Spracheinstellungen"
-    },
     "profileChangesNotAllowedInDemo": "Profil-Änderungen sind im Demo-Modus nicht erlaubt",
     "profileSettings": {
       "description": "Verwalte deine persönlichen Informationen und Konto-Details.",
@@ -243,7 +237,10 @@
       "password": "Passwort",
       "role": "Rolle"
     },
-    "help": "Hilfe",
+    "help": {
+      "buttonLabel": "Hilfe",
+      "contactAdmin": "Bitte kontaktiere deinen Administrator"
+    },
     "info": {
       "helpFallbackLanguage": "Dieser Hilfeinhalt ist in deiner gewählten Sprache noch nicht verfügbar. Es wird die englische Version angezeigt."
     },
@@ -262,8 +259,7 @@
     "themes": {
       "dark": "Dunkel",
       "light": "Hell",
-      "system": "System",
-      "title": "Design"
+      "system": "System"
     },
     "time": {
       "day": "Tag",
@@ -320,9 +316,6 @@
   "demo": {
     "welcome": "Willkommen zur Lasius-Demo-Instanz. Verwende \"demo1@lasius.ch\" und das Passwort \"demo\", um dich anzumelden und dich umzusehen. Die Demo-Instanz wird einmal am Tag zurückgesetzt."
   },
-  "errors": {
-    "dataFetchFailed": "Entschuldigung, aber die Daten konnten aufgrund eines Fehlers nicht abgerufen werden."
-  },
   "export": {
     "actions": {
       "export": "Exportieren",
@@ -370,9 +363,7 @@
     "developedBy": "Entwickelt von <0>Tegonal</0>, verfügbar auf <1>GitHub</1>, veröffentlicht unter <2>AGPL 3.0</2>",
     "feedbackOnGithub": "Wir schätzen dein Feedback. Bitte hinterlasse einen Kommentar auf <0>GitHub</0>"
   },
-  "help": {
-    "contactAdmin": "Bitte kontaktiere deinen Administrator"
-  },
+  "help": "Help",
   "integrations": {
     "title": "Integrationen"
   },
@@ -575,8 +566,7 @@
     "status": {
       "created": "Organisation erstellt",
       "updated": "Organisation aktualisiert"
-    },
-    "title": "Organisationen"
+    }
   },
   "projects": {
     "actions": {
@@ -589,7 +579,6 @@
     "allProjects": "Alle Projekte",
     "allProjectsDescription": "Alle Projekte in der aktuellen Organisation, die du verwalten kannst. Erstelle Abrechnungsberichte einschließlich der Zeit, die von externen Projektmitgliedern gebucht wurde.",
     "confirmations": {
-      "deactivate": "Bist du sicher, dass du dieses Projekt deaktivieren möchtest?",
       "deactivateInstructions": "Gib zur Bestätigung den Projektnamen unten ein:",
       "deactivateTitle": "Projekt deaktivieren",
       "deactivateWarning": "Diese Aktion kann nicht rückgängig gemacht werden. Das Projekt wird dauerhaft archiviert und alle Benutzerzuweisungen werden entfernt. Du kannst dieses Projekt nicht wieder aktivieren.",
@@ -637,12 +626,9 @@
     }
   },
   "pwa": {
-    "reloadApplication": "Anwendung neu laden",
-    "updateAvailable": "Update verfügbar",
-    "updateMessage": "Lasius wurde aktualisiert. Die Seite wird nach deiner Bestätigung neu geladen."
-  },
-  "search": {
-    "empty": "Keine Ergebnisse gefunden"
+    "reloadApplication": "Reload application",
+    "updateAvailable": "Update available",
+    "updateMessage": "Lasius has been updated. The page will reload after your confirmation."
   },
   "settings": {
     "app": {
@@ -693,7 +679,6 @@
     "confirmDeleteGroup": "Möchtest du die Tag-Gruppe \"{{groupName}}\" wirklich löschen?",
     "customTag": "Benutzerdefinierter Tag",
     "enterTagName": "Tag-Name eingeben",
-    "enterToAdd": "Gib einen Tag ein, um ihn hinzuzufügen",
     "label": "Tags",
     "noTagGroups": "Noch keine Tag-Gruppen definiert",
     "simpleTags": "Einfache Tags",
@@ -772,21 +757,16 @@
     "thisWeek": "diese Woche"
   },
   "workingHours": {
-    "clickToAdjustHours": "Klicke auf einen beliebigen Tag in den Organisationskarten unten, um die Stunden anzupassen",
     "dailyTotal": "Täglich gesamt",
     "description": "Die Zeitspanne, die du pro Tag nach Organisation während einer typischen Arbeitswoche zu buchen erwartest. Diese Daten werden verwendet, um deinen täglichen und wöchentlichen Fortschritt zu berechnen.",
     "errors": {
       "updateFailed": "Fehler beim Aktualisieren der Arbeitszeiten"
     },
-    "perWeek": "pro Woche",
-    "setHoursDescription": "Lege deine Arbeitszeiten für jeden Tag fest",
     "status": {
       "updated": "Arbeitszeiten aktualisiert"
     },
     "summary": "Überblick",
     "title": "Arbeitszeiten",
-    "totalHoursDescription": "Gesamtstunden über alle Organisationen",
-    "totalPerWeek": "gesamt pro Woche",
-    "weeklyHoursSummary": "Wöchentliche Stundenzusammenfassung"
+    "totalPerWeek": "gesamt pro Woche"
   }
 }

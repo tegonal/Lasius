@@ -17,8 +17,15 @@
  *
  */
 
-import { ModelsUser, ModelsUserOrganisation, ModelsUserSettings } from 'lib/api/lasius'
+import {
+  ModelsEntityReference,
+  ModelsUser,
+  ModelsUserOrganisation,
+  ModelsUserSettings,
+} from 'lib/api/lasius'
 import { updateUserSettings } from 'lib/api/lasius/user/user'
+import { logger } from 'lib/logger'
+import { stringHash } from 'lib/utils/string/stringHash'
 import { ROLES } from 'projectConfig/constants'
 import { mutate } from 'swr'
 import { create } from 'zustand'
@@ -100,42 +107,128 @@ export const useOrganisationStore = create<OrganisationStore>()(
                 state.userSettings = profile.settings
               }
 
-              // Initialize selectedOrganisationId if not set
-              if (!state.selectedOrganisationId) {
-                if (profile.settings?.lastSelectedOrganisation?.id) {
-                  state.previousOrganisationId = state.selectedOrganisationId
-                  state.selectedOrganisationId = profile.settings.lastSelectedOrganisation.id
-                } else if (profile.organisations) {
-                  // Fallback to private organisation
-                  const myPrivateOrg = profile.organisations.find(
-                    (item) => item.private,
-                  )?.organisationReference
-                  if (myPrivateOrg && state.userSettings) {
-                    state.previousOrganisationId = state.selectedOrganisationId
-                    state.selectedOrganisationId = myPrivateOrg.id
+              // Validate selectedOrganisationId against available organisations
+              const currentSelectedId = state.selectedOrganisationId
+              const isOrgStillAvailable = profile.organisations?.some(
+                (org) => org.organisationReference.id === currentSelectedId,
+              )
 
-                    // Update backend settings to persist the auto-selected organisation
+              // Initialize or reset selectedOrganisationId if invalid
+              if (!currentSelectedId || !isOrgStillAvailable) {
+                // Log for debugging when org is no longer accessible
+                if (currentSelectedId && !isOrgStillAvailable) {
+                  logger.warn(
+                    '[OrganisationStore] Selected organisation no longer accessible, switching to fallback',
+                    {
+                      selectedId: currentSelectedId,
+                      availableOrgs: profile.organisations?.map((o) => ({
+                        id: o.organisationReference.id,
+                        key: o.organisationReference.key,
+                      })),
+                    },
+                  )
+                }
+
+                // Fallback logic: Try these in order
+                let fallbackOrg: ModelsEntityReference | undefined
+
+                // 1. Try lastSelectedOrganisation from backend settings (if still exists)
+                if (profile.settings?.lastSelectedOrganisation?.id) {
+                  const lastSelectedOrg = profile.settings.lastSelectedOrganisation
+                  const lastSelectedStillExists = profile.organisations?.find(
+                    (org) => org.organisationReference.id === lastSelectedOrg.id,
+                  )
+                  if (lastSelectedStillExists) {
+                    fallbackOrg = lastSelectedOrg
+                    logger.info('[OrganisationStore] Using lastSelectedOrganisation from backend', {
+                      orgId: fallbackOrg.id,
+                      orgKey: fallbackOrg.key,
+                    })
+                  }
+                }
+
+                // 2. Try private organisation
+                if (!fallbackOrg) {
+                  const privateOrg = profile.organisations?.find((org) => org.private)
+                  if (privateOrg) {
+                    fallbackOrg = privateOrg.organisationReference
+                    logger.info('[OrganisationStore] Falling back to private organisation', {
+                      orgId: fallbackOrg.id,
+                      orgKey: fallbackOrg.key,
+                    })
+                  }
+                }
+
+                // 3. Try first available organisation
+                if (!fallbackOrg && profile.organisations && profile.organisations.length > 0) {
+                  fallbackOrg = profile.organisations[0].organisationReference
+                  logger.info('[OrganisationStore] Falling back to first available organisation', {
+                    orgId: fallbackOrg.id,
+                    orgKey: fallbackOrg.key,
+                  })
+                }
+
+                // Set fallback organisation
+                if (fallbackOrg) {
+                  const previousOrgId = state.selectedOrganisationId
+                  state.previousOrganisationId = previousOrgId
+                  state.selectedOrganisationId = fallbackOrg.id
+
+                  // Show toast notification if org was switched (not first load)
+                  if (previousOrgId && previousOrgId !== fallbackOrg.id) {
+                    const toastMessage = `Switched to ${fallbackOrg.key} organisation`
+                    // Import toast dynamically to avoid circular dependencies
+                    // Note: Cannot use useToast() hook here because this runs outside React components
+                    import('stores/uiStore')
+                      .then(({ useUIStore }) => {
+                        useUIStore.getState().addToast({
+                          id: stringHash({ message: toastMessage, type: 'NOTIFICATION' }),
+                          message: toastMessage,
+                          type: 'NOTIFICATION',
+                          ttl: 5000,
+                        })
+                      })
+                      .catch((error) => {
+                        logger.error('[OrganisationStore] Failed to show toast:', error)
+                      })
+                  }
+
+                  // Update backend settings to persist the fallback
+                  if (state.userSettings) {
                     const updatedSettings: ModelsUserSettings = {
                       ...state.userSettings,
-                      lastSelectedOrganisation: myPrivateOrg,
+                      lastSelectedOrganisation: fallbackOrg,
                     }
                     state.userSettings = updatedSettings
 
-                    // Persist to backend asynchronously and update SWR cache
+                    // Persist to backend asynchronously
                     updateUserSettings(updatedSettings)
                       .then((updatedProfile) => {
                         // Update SWR cache with the new profile
                         mutate('/user/profile', updatedProfile, false)
-                        // Reload page to ensure all data is loaded with correct organisation
-                        // This only happens when auto-selecting default organisation on first load
-                        if (typeof window !== 'undefined') {
+                        logger.info(
+                          '[OrganisationStore] Fallback organisation persisted to backend',
+                        )
+
+                        // Only reload page on first load (when previousOrgId was empty)
+                        if (!previousOrgId && typeof window !== 'undefined') {
+                          logger.info(
+                            '[OrganisationStore] Reloading page for initial organisation setup',
+                          )
                           window.location.reload()
                         }
                       })
                       .catch((error) => {
-                        console.error('Failed to persist auto-selected organisation:', error)
+                        logger.error(
+                          '[OrganisationStore] Failed to persist fallback organisation:',
+                          error,
+                        )
                       })
                   }
+                } else {
+                  logger.error('[OrganisationStore] No fallback organisation available', {
+                    profileOrgs: profile.organisations?.length || 0,
+                  })
                 }
               }
             }),

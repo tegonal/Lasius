@@ -156,7 +156,7 @@ export const ManageUserInviteByEmailForm: React.FC<Props> = ({
           <ModalCloseButton onClose={handleClose} />
 
           <ModalHeader className="mb-2">
-            {t('members.actions.invite', { defaultValue: 'Invite member' })}
+            {t('members.actions.invite', { defaultValue: 'Invite someone' })}
           </ModalHeader>
 
           <ModalDescription className="mb-4">

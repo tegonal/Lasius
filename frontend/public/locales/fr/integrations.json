@@ -22,7 +22,6 @@
   },
   "issueImporters": {
     "actions": {
-      "addConfiguration": "Ajouter une configuration",
       "create": "Créer",
       "delete": "Supprimer la configuration",
       "deleteDisabled": "Impossible de supprimer : supprimez d'abord toutes les correspondances de projet",
@@ -183,9 +182,6 @@
     "titles": {
       "create": "Créer une intégration",
       "edit": "Modifier une intégration"
-    },
-    "typeSelector": {
-      "chooseTracker": "Choisis quel système de suivi des tickets tu veux configurer :"
     },
     "wizard": {
       "config": {

@@ -22,7 +22,6 @@
   },
   "issueImporters": {
     "actions": {
-      "addConfiguration": "Aggiungi configurazione",
       "create": "Crea",
       "delete": "Elimina configurazione",
       "deleteDisabled": "Impossibile eliminare: rimuovi prima tutte le mappature di progetto",
@@ -183,9 +182,6 @@
     "titles": {
       "create": "Crea integrazione",
       "edit": "Modifica integrazione"
-    },
-    "typeSelector": {
-      "chooseTracker": "Scegli quale sistema di tracciamento issue vuoi configurare:"
     },
     "wizard": {
       "config": {

@@ -22,7 +22,6 @@
   },
   "issueImporters": {
     "actions": {
-      "addConfiguration": "Add Configuration",
       "create": "Create",
       "delete": "Delete",
       "deleteDisabled": "Cannot delete: remove all project mappings first",
@@ -181,9 +180,6 @@
     "titles": {
       "create": "Create Integration",
       "edit": "Edit Integration"
-    },
-    "typeSelector": {
-      "chooseTracker": "Choose which issue tracker you want to configure:"
     },
     "wizard": {
       "config": {

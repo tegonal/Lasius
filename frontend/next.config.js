@@ -22,16 +22,29 @@ const {
   LASIUS_TELEMETRY_PLAUSIBLE_SOURCE_DOMAIN,
   LASIUS_DEMO_MODE,
   LASIUS_TERMSOFSERVICE_VERSION,
+  NEXTAUTH_URL,
 } = process.env
 
 const nextConfiguration = {
   redirects,
   generateBuildId,
   i18n,
+  output: 'standalone',
   poweredByHeader: false,
   compiler: {},
   productionBrowserSourceMaps: process.env.NODE_ENV !== 'production',
   reactStrictMode: true,
+  experimental: {
+    // Include missing dependencies in standalone build
+    // These are transitive dependencies from get-intrinsic that Next.js tracing misses
+    outputFileTracingIncludes: {
+      '/*': [
+        './node_modules/async-function/**/*',
+        './node_modules/generator-function/**/*',
+        './node_modules/async-generator-function/**/*',
+      ],
+    },
+  },
   publicRuntimeConfig: {
     BUILD_ID: generateBuildIdSync(),
     ENVIRONMENT,
@@ -42,6 +55,7 @@ const nextConfiguration = {
     LASIUS_TELEMETRY_PLAUSIBLE_SOURCE_DOMAIN,
     LASIUS_DEMO_MODE,
     LASIUS_TERMSOFSERVICE_VERSION,
+    LASIUS_PUBLIC_URL: NEXTAUTH_URL || 'http://localhost:3000',
   },
   headers: async () => [
     {

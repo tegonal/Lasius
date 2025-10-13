@@ -5,12 +5,6 @@
     "errors": {
       "passwordUpdateFailed": "Password update failed. Make sure you entered your current password and that it is correct."
     },
-    "languageSettings": {
-      "description": "Choose your preferred language for the interface. This setting is stored locally in your browser.",
-      "save": "Save Language Preference",
-      "selectLanguage": "Interface Language",
-      "title": "Language Preferences"
-    },
     "profileChangesNotAllowedInDemo": "Profile changes are not allowed in demo mode",
     "profileSettings": {
       "description": "Manage your personal information and account details.",
@@ -243,7 +237,10 @@
       "password": "Password",
       "role": "Role"
     },
-    "help": "Help",
+    "help": {
+      "buttonLabel": "Help",
+      "contactAdmin": "Please contact your administrator"
+    },
     "info": {
       "helpFallbackLanguage": "This help content is not available in your selected language yet. Showing English version."
     },
@@ -262,8 +259,7 @@
     "themes": {
       "dark": "Dark",
       "light": "Light",
-      "system": "System",
-      "title": "Theme"
+      "system": "System"
     },
     "time": {
       "day": "Day",
@@ -320,9 +316,6 @@
   "demo": {
     "welcome": "Welcome to the Lasius demo instance. Use \"demo1@lasius.ch\" and password \"demo\" to log in and have a look around. The demo instance is reset once a day."
   },
-  "errors": {
-    "dataFetchFailed": "So sorry, but the data could not be retrieved due to an error."
-  },
   "export": {
     "actions": {
       "export": "Export",
@@ -370,9 +363,7 @@
     "developedBy": "Developed by <0>Tegonal</0>, available on <1>GitHub</1>, released under <2>AGPL 3.0</2>",
     "feedbackOnGithub": "We appreciate your feedback. Please leave a comment on <0>GitHub</0>"
   },
-  "help": {
-    "contactAdmin": "Please contact your administrator"
-  },
+  "help": "Help",
   "integrations": {
     "title": "Integrations"
   },
@@ -575,8 +566,7 @@
     "status": {
       "created": "Organisation created",
       "updated": "Organisation updated"
-    },
-    "title": "Organisations"
+    }
   },
   "projects": {
     "actions": {
@@ -589,7 +579,6 @@
     "allProjects": "All projects",
     "allProjectsDescription": "All projects in the current organisation that you can administer. Create billing reports including time booked by external project members.",
     "confirmations": {
-      "deactivate": "Are you sure you want to deactivate this project?",
       "deactivateInstructions": "To confirm, please type the project name below:",
       "deactivateTitle": "Deactivate project",
       "deactivateWarning": "This action cannot be undone. The project will be permanently archived and all user assignments will be removed. You will not be able to reactivate this project.",
@@ -641,9 +630,6 @@
     "updateAvailable": "Update available",
     "updateMessage": "Lasius has been updated. The page will reload after your confirmation."
   },
-  "search": {
-    "empty": "No results found"
-  },
   "settings": {
     "app": {
       "description": "Customize your experience with language and theme preferences. These settings are stored locally in your browser.",
@@ -693,7 +679,6 @@
     "confirmDeleteGroup": "Are you sure you want to delete the tag group \"{{groupName}}\"?",
     "customTag": "Custom tag",
     "enterTagName": "Enter tag name",
-    "enterToAdd": "Enter a tag to add it",
     "label": "Tags",
     "noTagGroups": "No tag groups defined yet",
     "simpleTags": "Simple tags",
@@ -772,21 +757,16 @@
     "thisWeek": "this week"
   },
   "workingHours": {
-    "clickToAdjustHours": "Click any day below to adjust working hours",
     "dailyTotal": "Daily Total",
     "description": "The amount of time you expect to book per day, by organisation, during a typical working week. This data is used to calculate your daily and weekly progress.",
     "errors": {
       "updateFailed": "Failed to update working hours"
     },
-    "perWeek": "per week",
-    "setHoursDescription": "Set your working hours for each day",
     "status": {
       "updated": "Working hours updated"
     },
     "summary": "Summary",
     "title": "Working hours",
-    "totalHoursDescription": "Total hours across all organisations",
-    "totalPerWeek": "total per week",
-    "weeklyHoursSummary": "Weekly Hours Summary"
+    "totalPerWeek": "total per week"
   }
 }

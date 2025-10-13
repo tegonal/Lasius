@@ -143,7 +143,7 @@ export const ProjectAddUpdateForm: React.FC<Props> = ({ mode, item, onCancel, on
         <ModalHeader>
           {mode === 'add'
             ? t('projects.actions.add', { defaultValue: 'Add Project' })
-            : t('projects.actions.edit', { defaultValue: 'Edit Project' })}
+            : t('projects.actions.edit', { defaultValue: 'Edit project' })}
         </ModalHeader>
 
         <ModalDescription className="mb-4">

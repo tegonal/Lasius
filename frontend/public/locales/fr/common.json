@@ -5,12 +5,6 @@
     "errors": {
       "passwordUpdateFailed": "La mise à jour du mot de passe a échoué. Assure-toi d'avoir saisi ton mot de passe actuel correctement."
     },
-    "languageSettings": {
-      "description": "Choisis ta langue préférée pour l'interface. Ce paramètre est enregistré localement dans ton navigateur.",
-      "save": "Enregistrer la préférence de langue",
-      "selectLanguage": "Langue de l'interface",
-      "title": "Préférences de langue"
-    },
     "profileChangesNotAllowedInDemo": "Les modifications du profil ne sont pas autorisées en mode démonstration",
     "profileSettings": {
       "description": "Gère tes informations personnelles et les détails de ton compte.",
@@ -243,7 +237,10 @@
       "password": "Mot de passe",
       "role": "Rôle"
     },
-    "help": "Aide",
+    "help": {
+      "buttonLabel": "Aide",
+      "contactAdmin": "Contacte ton administrateur"
+    },
     "info": {
       "helpFallbackLanguage": "Ce contenu d'aide n'est pas encore disponible dans ta langue sélectionnée. Version anglaise affichée."
     },
@@ -262,8 +259,7 @@
     "themes": {
       "dark": "Sombre",
       "light": "Clair",
-      "system": "Système",
-      "title": "Thème"
+      "system": "Système"
     },
     "time": {
       "day": "Jour",
@@ -320,9 +316,6 @@
   "demo": {
     "welcome": "Bienvenue sur l'instance de démonstration de Lasius. Utilise \"demo1@lasius.ch\" avec le mot de passe \"demo\" pour te connecter et explorer l'application. L'instance de démonstration est réinitialisée une fois par jour."
   },
-  "errors": {
-    "dataFetchFailed": "Désolé, les données n'ont pas pu être récupérées en raison d'une erreur."
-  },
   "export": {
     "actions": {
       "export": "Exporter",
@@ -370,9 +363,7 @@
     "developedBy": "Développé par <0>Tegonal</0>, disponible sur <1>GitHub</1>, publié sous licence <2>AGPL 3.0</2>",
     "feedbackOnGithub": "Nous apprécions tes commentaires. Laisse un commentaire sur <0>GitHub</0>"
   },
-  "help": {
-    "contactAdmin": "Contacte ton administrateur"
-  },
+  "help": "Help",
   "integrations": {
     "title": "Intégrations"
   },
@@ -576,8 +567,7 @@
     "status": {
       "created": "Organisation créée",
       "updated": "Organisation mise à jour"
-    },
-    "title": "Organisations"
+    }
   },
   "projects": {
     "actions": {
@@ -590,7 +580,6 @@
     "allProjects": "Tous les projets",
     "allProjectsDescription": "Tous les projets de l'organisation actuelle que tu peux administrer. Crée des rapports de facturation incluant le temps réservé par les membres externes du projet.",
     "confirmations": {
-      "deactivate": "Es-tu sûr de vouloir désactiver ce projet ?",
       "deactivateInstructions": "Pour confirmer, veuillez saisir le nom du projet ci-dessous :",
       "deactivateTitle": "Désactiver le projet",
       "deactivateWarning": "Cette action ne peut pas être annulée. Le projet sera définitivement archivé et toutes les affectations d'utilisateurs seront supprimées. Vous ne pourrez pas réactiver ce projet.",
@@ -638,12 +627,9 @@
     }
   },
   "pwa": {
-    "reloadApplication": "Recharger l'application",
-    "updateAvailable": "Mise à jour disponible",
-    "updateMessage": "Lasius a été mis à jour. La page se rechargera après ta confirmation."
-  },
-  "search": {
-    "empty": "Aucun résultat trouvé"
+    "reloadApplication": "Reload application",
+    "updateAvailable": "Update available",
+    "updateMessage": "Lasius has been updated. The page will reload after your confirmation."
   },
   "settings": {
     "app": {
@@ -694,7 +680,6 @@
     "confirmDeleteGroup": "Es-tu sûr de vouloir supprimer le groupe d'étiquettes \"{{groupName}}\" ?",
     "customTag": "Étiquette personnalisée",
     "enterTagName": "Saisir le nom de l'étiquette",
-    "enterToAdd": "Saisir une étiquette pour l'ajouter",
     "label": "Étiquettes",
     "noTagGroups": "Aucun groupe d'étiquettes défini pour le moment",
     "simpleTags": "Étiquettes simples",
@@ -773,21 +758,16 @@
     "thisWeek": "cette semaine"
   },
   "workingHours": {
-    "clickToAdjustHours": "Clique sur un jour ci-dessous pour ajuster les heures de travail",
     "dailyTotal": "Total quotidien",
     "description": "Le temps que tu prévois de réserver par jour, par organisation, pendant une semaine de travail typique. Ces données sont utilisées pour calculer ta progression quotidienne et hebdomadaire.",
     "errors": {
       "updateFailed": "Échec de la mise à jour des heures de travail"
     },
-    "perWeek": "par semaine",
-    "setHoursDescription": "Définis tes heures de travail pour chaque jour",
     "status": {
       "updated": "Heures de travail mises à jour"
     },
     "summary": "Résumé",
     "title": "Heures de travail",
-    "totalHoursDescription": "Total des heures pour toutes les organisations",
-    "totalPerWeek": "total par semaine",
-    "weeklyHoursSummary": "Résumé hebdomadaire des heures"
+    "totalPerWeek": "total par semaine"
   }
 }

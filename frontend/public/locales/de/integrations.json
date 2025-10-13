@@ -22,7 +22,6 @@
   },
   "issueImporters": {
     "actions": {
-      "addConfiguration": "Konfiguration hinzufügen",
       "create": "Erstellen",
       "delete": "Konfiguration löschen",
       "deleteDisabled": "Löschen nicht möglich: Entferne zuerst alle Projekt-Zuordnungen",
@@ -181,9 +180,6 @@
     "titles": {
       "create": "Integration erstellen",
       "edit": "Integration bearbeiten"
-    },
-    "typeSelector": {
-      "chooseTracker": "Wähle aus, welchen Issue-Tracker du konfigurieren möchtest:"
     },
     "wizard": {
       "config": {

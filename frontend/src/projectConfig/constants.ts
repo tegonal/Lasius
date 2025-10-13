@@ -21,7 +21,6 @@ import getConfig from 'next/config'
 
 export const IS_BROWSER: boolean = typeof window !== 'undefined'
 export const IS_SERVER: boolean = typeof window === 'undefined'
-export const SOCIAL_MEDIA_CARD_IMAGE_URL = '/social-card.png'
 
 const { publicRuntimeConfig } = getConfig()
 
@@ -35,6 +34,7 @@ export const {
   LASIUS_TELEMETRY_PLAUSIBLE_SOURCE_DOMAIN,
   LASIUS_DEMO_MODE,
   LASIUS_TERMSOFSERVICE_VERSION,
+  LASIUS_PUBLIC_URL,
 } = publicRuntimeConfig as { [key: string]: string }
 
 export const IS_DEV = ENVIRONMENT !== 'production'

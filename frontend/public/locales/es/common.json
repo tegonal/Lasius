@@ -5,12 +5,6 @@
     "errors": {
       "passwordUpdateFailed": "Error al actualizar la contraseña. Asegúrate de haber introducido tu contraseña actual correctamente."
     },
-    "languageSettings": {
-      "description": "Elige tu idioma preferido para la interfaz. Esta configuración se almacena localmente en tu navegador.",
-      "save": "Guardar preferencia de idioma",
-      "selectLanguage": "Idioma de la interfaz",
-      "title": "Preferencias de idioma"
-    },
     "profileChangesNotAllowedInDemo": "No se permiten cambios en el perfil en modo demostración",
     "profileSettings": {
       "description": "Gestiona tu información personal y los detalles de tu cuenta.",
@@ -243,7 +237,10 @@
       "password": "Contraseña",
       "role": "Rol"
     },
-    "help": "Ayuda",
+    "help": {
+      "buttonLabel": "Ayuda",
+      "contactAdmin": "Por favor, contacta con tu administrador"
+    },
     "info": {
       "helpFallbackLanguage": "Este contenido de ayuda aún no está disponible en tu idioma seleccionado. Se muestra la versión en inglés."
     },
@@ -262,8 +259,7 @@
     "themes": {
       "dark": "Oscuro",
       "light": "Claro",
-      "system": "Sistema",
-      "title": "Tema"
+      "system": "Sistema"
     },
     "time": {
       "day": "Día",
@@ -320,9 +316,6 @@
   "demo": {
     "welcome": "Bienvenido a la instancia de demostración de Lasius. Usa \"demo1@lasius.ch\" y contraseña \"demo\" para iniciar sesión y echar un vistazo. La instancia de demostración se restablece una vez al día."
   },
-  "errors": {
-    "dataFetchFailed": "Lo sentimos, pero los datos no se pudieron recuperar debido a un error."
-  },
   "export": {
     "actions": {
       "export": "Exportar",
@@ -370,9 +363,7 @@
     "developedBy": "Desarrollado por <0>Tegonal</0>, disponible en <1>GitHub</1>, publicado bajo <2>AGPL 3.0</2>",
     "feedbackOnGithub": "Agradecemos tus comentarios. Por favor, deja un comentario en <0>GitHub</0>"
   },
-  "help": {
-    "contactAdmin": "Por favor, contacta con tu administrador"
-  },
+  "help": "Help",
   "integrations": {
     "title": "Integraciones"
   },
@@ -576,8 +567,7 @@
     "status": {
       "created": "Organización creada",
       "updated": "Organización actualizada"
-    },
-    "title": "Organizaciones"
+    }
   },
   "projects": {
     "actions": {
@@ -590,7 +580,6 @@
     "allProjects": "Todos los proyectos",
     "allProjectsDescription": "Todos los proyectos de la organización actual que puedes administrar. Crea informes de facturación incluyendo el tiempo registrado por miembros externos del proyecto.",
     "confirmations": {
-      "deactivate": "¿Estás seguro de que quieres desactivar este proyecto?",
       "deactivateInstructions": "Para confirmar, escribe el nombre del proyecto a continuación:",
       "deactivateTitle": "Desactivar proyecto",
       "deactivateWarning": "Esta acción no se puede deshacer. El proyecto será archivado permanentemente y todas las asignaciones de usuarios se eliminarán. No podrás reactivar este proyecto.",
@@ -638,12 +627,9 @@
     }
   },
   "pwa": {
-    "reloadApplication": "Recargar aplicación",
-    "updateAvailable": "Actualización disponible",
-    "updateMessage": "Lasius se ha actualizado. La página se recargará después de tu confirmación."
-  },
-  "search": {
-    "empty": "No se encontraron resultados"
+    "reloadApplication": "Reload application",
+    "updateAvailable": "Update available",
+    "updateMessage": "Lasius has been updated. The page will reload after your confirmation."
   },
   "settings": {
     "app": {
@@ -694,7 +680,6 @@
     "confirmDeleteGroup": "¿Estás seguro de que quieres eliminar el grupo de etiquetas \"{{groupName}}\"?",
     "customTag": "Etiqueta personalizada",
     "enterTagName": "Introduce nombre de etiqueta",
-    "enterToAdd": "Introduce una etiqueta para añadirla",
     "label": "Etiquetas",
     "noTagGroups": "Aún no se han definido grupos de etiquetas",
     "simpleTags": "Etiquetas simples",
@@ -773,21 +758,16 @@
     "thisWeek": "esta semana"
   },
   "workingHours": {
-    "clickToAdjustHours": "Haz clic en cualquier día a continuación para ajustar las horas de trabajo",
     "dailyTotal": "Total diario",
     "description": "La cantidad de tiempo que esperas registrar por día, por organización, durante una semana laboral típica. Estos datos se utilizan para calcular tu progreso diario y semanal.",
     "errors": {
       "updateFailed": "Error al actualizar las horas de trabajo"
     },
-    "perWeek": "por semana",
-    "setHoursDescription": "Establece tus horas de trabajo para cada día",
     "status": {
       "updated": "Horas de trabajo actualizadas"
     },
     "summary": "Resumen",
     "title": "Horas de trabajo",
-    "totalHoursDescription": "Total de horas en todas las organizaciones",
-    "totalPerWeek": "total por semana",
-    "weeklyHoursSummary": "Resumen de horas semanales"
+    "totalPerWeek": "total por semana"
   }
 }

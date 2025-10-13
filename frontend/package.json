@@ -43,7 +43,6 @@
   "dependencies": {
     "@formatjs/intl-localematcher": "^0.6.2",
     "@headlessui/react": "^2.2.9",
-    "@hookform/error-message": "^2.0.1",
     "@hookform/resolvers": "^5.2.2",
     "@icons-pack/react-simple-icons": "^13.8.0",
     "@nivo/bar": "^0.99.0",
@@ -71,7 +70,6 @@
     "next-auth": "4.24.11",
     "next-i18next": "^15.4.2",
     "next-mdx-remote": "^5.0.0",
-    "next-pwa": "^5.6.0",
     "next-seo": "^6.8.0",
     "parse-json": "^8.3.0",
     "react": "19.2.0",

@@ -271,7 +271,9 @@ const Login: NextPage<{
                 })}
               </p>
               <p className="text-base-content/70 text-center text-sm">
-                {t('help.contactAdmin', { defaultValue: 'Please contact your administrator' })}
+                {t('common.help.contactAdmin', {
+                  defaultValue: 'Please contact your administrator',
+                })}
               </p>
             </CardBody>
           </Card>
