@@ -45,7 +45,7 @@ import { appWithTranslation } from 'next-i18next'
 import { DefaultSeo } from 'next-seo'
 import { AppProps } from 'next/app'
 import Head from 'next/head'
-import { IS_DEV, LASIUS_PUBLIC_URL } from 'projectConfig/constants'
+import { getIsDev, getLasiusPublicUrl, IS_SERVER } from 'projectConfig/constants'
 import React, { JSX, useEffect } from 'react'
 import { resetAllStores } from 'stores/globalActions'
 import { SWRConfig } from 'swr'
@@ -101,7 +101,7 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
                   'Lasius is an open source time tracking application for teams. Track your time, manage projects, and collaborate with your team.',
                 images: [
                   {
-                    url: `${LASIUS_PUBLIC_URL}/api/og?title=${encodeURIComponent('Lasius')}&subtitle=${encodeURIComponent('Open source time tracking for teams')}`,
+                    url: `${IS_SERVER ? process.env.NEXTAUTH_URL || 'http://localhost:3000' : getLasiusPublicUrl()}/api/og?title=${encodeURIComponent('Lasius')}&subtitle=${encodeURIComponent('Open source time tracking for teams')}`,
                     width: 1200,
                     height: 630,
                     alt: 'Lasius - Open source time tracker for teams',
@@ -137,7 +137,7 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
                 <LasiusTOSCheck />
               </>
             )}
-            {IS_DEV && <DevInfoBadge />}
+            {getIsDev() && <DevInfoBadge />}
           </LazyMotion>
         </SessionProvider>
       </SWRConfig>

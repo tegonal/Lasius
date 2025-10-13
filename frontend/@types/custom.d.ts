@@ -43,3 +43,20 @@ declare module 'i18next' {
   }
 }
 
+// Declare runtime environment variables on window object
+declare global {
+  interface Window {
+    ENV?: {
+      LASIUS_API_URL: string;
+      LASIUS_API_WEBSOCKET_URL: string;
+      LASIUS_PUBLIC_URL: string;
+      LASIUS_TELEMETRY_PLAUSIBLE_HOST: string;
+      LASIUS_TELEMETRY_PLAUSIBLE_SOURCE_DOMAIN: string;
+      LASIUS_DEMO_MODE: string;
+      LASIUS_TERMSOFSERVICE_VERSION: string;
+      LASIUS_VERSION: string;
+      ENVIRONMENT: string;
+    };
+  }
+}
+
