@@ -25,7 +25,7 @@ import { ModalHeader } from 'components/ui/overlays/modal/ModalHeader'
 import { useProfile } from 'lib/api/hooks/useProfile'
 import { signOut } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
-import { LASIUS_TERMSOFSERVICE_VERSION } from 'projectConfig/constants'
+import { getLasiusTermsOfServiceVersion } from 'projectConfig/constants'
 import React, { useEffect, useState } from 'react'
 
 export const LasiusTOSCheck: React.FC = () => {
@@ -36,7 +36,7 @@ export const LasiusTOSCheck: React.FC = () => {
   const { i18n, t } = useTranslation('common')
   const { acceptedTOSVersion, acceptTOS, lasiusIsLoggedIn } = useProfile()
 
-  const currentTOSVersion = LASIUS_TERMSOFSERVICE_VERSION
+  const currentTOSVersion = getLasiusTermsOfServiceVersion()
 
   const handleConfirm = () => {
     acceptTOS(currentTOSVersion)

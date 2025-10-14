@@ -18,7 +18,7 @@
  */
 
 import { logger } from 'lib/logger'
-import { LASIUS_TELEMETRY_PLAUSIBLE_SOURCE_DOMAIN } from 'projectConfig/constants'
+import { getLasiusTelemetryPlausibleSourceDomain } from 'projectConfig/constants'
 import { useCallback } from 'react'
 
 type PlausibleOptions = {
@@ -44,7 +44,8 @@ type PlausibleEvent = {
 export function usePlausible<T extends Record<string, PlausibleOptions> = any>() {
   return useCallback((eventName: Extract<keyof T, string>, options?: PlausibleOptions) => {
     // Only track if domain is configured
-    if (!LASIUS_TELEMETRY_PLAUSIBLE_SOURCE_DOMAIN) {
+    const domain = getLasiusTelemetryPlausibleSourceDomain()
+    if (!domain) {
       logger.debug('[Plausible] Tracking disabled: no domain configured')
       return
     }
@@ -54,7 +55,7 @@ export function usePlausible<T extends Record<string, PlausibleOptions> = any>()
       const event: Omit<PlausibleEvent, 'p'> = {
         n: eventName,
         u: window.location.href,
-        d: LASIUS_TELEMETRY_PLAUSIBLE_SOURCE_DOMAIN,
+        d: domain,
         r: document.referrer || null,
         w: window.innerWidth,
         h: window.location.hash ? 1 : 0,

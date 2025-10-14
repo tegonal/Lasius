@@ -25,7 +25,7 @@ import { useOnboardingStatus } from 'lib/hooks/useOnboardingStatus'
 import { usePlausible } from 'lib/telemetry/usePlausible'
 import { ArrowLeft, ArrowRight, CheckCircle2, Circle, X } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
-import { IS_DEV } from 'projectConfig/constants'
+import { getIsDev } from 'projectConfig/constants'
 import React, { useEffect, useState } from 'react'
 import { useAppSettingsActions, useOnboardingChecklistReached } from 'stores/appSettingsStore'
 
@@ -142,7 +142,7 @@ export const OnboardingTutorial: React.FC = () => {
 
   // Track tutorial start on mount (only once)
   useEffect(() => {
-    if ((!isLoading || IS_DEV) && !hasTrackedStart.current) {
+    if ((!isLoading || getIsDev()) && !hasTrackedStart.current) {
       plausible('onboarding.tutorial.start', {})
       hasTrackedStart.current = true
     }
@@ -150,7 +150,7 @@ export const OnboardingTutorial: React.FC = () => {
 
   // Track slide views (only once per slide) and mark checklist as reached
   useEffect(() => {
-    if ((!isLoading || IS_DEV) && slides[currentSlide]) {
+    if ((!isLoading || getIsDev()) && slides[currentSlide]) {
       const slideKey = `${slides[currentSlide].id}-${currentSlide}`
 
       if (!trackedSlides.current.has(slideKey)) {
@@ -171,7 +171,7 @@ export const OnboardingTutorial: React.FC = () => {
   }, [currentSlide, slides, plausible, isLoading, checklistReached, markChecklistReached])
 
   // Don't show while data is loading (except in dev mode where we always show it)
-  if (isLoading && !IS_DEV) {
+  if (isLoading && !getIsDev()) {
     return null
   }
 
@@ -242,7 +242,7 @@ export const OnboardingTutorial: React.FC = () => {
   }
 
   // Don't show if already completed onboarding or dismissed (except in dev mode)
-  if (!IS_DEV && (hasCompletedOnboarding || dismissed)) {
+  if (!getIsDev() && (hasCompletedOnboarding || dismissed)) {
     return null
   }
 

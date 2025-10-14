@@ -20,7 +20,7 @@
 import useIsWindowFocused from 'lib/hooks/useIsWindowFocused'
 import { logger } from 'lib/logger'
 import parseJson from 'parse-json'
-import { CONNECTION_STATUS, IS_SERVER, LASIUS_API_WEBSOCKET_URL } from 'projectConfig/constants'
+import { CONNECTION_STATUS, getLasiusApiWebsocketUrl, IS_SERVER } from 'projectConfig/constants'
 import { useEffect, useState } from 'react'
 import useWebSocket, { ReadyState } from 'react-use-websocket'
 
@@ -71,7 +71,7 @@ export const useLasiusWebsocket = () => {
 
   const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([])
 
-  const websocketUrl = IS_SERVER ? null : `${LASIUS_API_WEBSOCKET_URL}/messaging/websocket`
+  const websocketUrl = IS_SERVER ? null : `${getLasiusApiWebsocketUrl()}/messaging/websocket`
   const { sendJsonMessage, lastMessage, readyState } = useWebSocket(websocketUrl, {
     share: true,
     shouldReconnect: (closeEvent) => {
