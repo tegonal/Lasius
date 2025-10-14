@@ -1,0 +1,86 @@
+# Mappages de projets
+
+Liez les projets externes de votre plateforme d'intégration aux projets Lasius. Les problèmes des projets mappés sont automatiquement synchronisés et disponibles en tant qu'étiquettes de suivi du temps.
+
+## Comprendre la liste
+
+Chaque ligne affiche :
+- **Côté gauche** : Nom et ID du projet externe
+- **Flèche** : Indicateur visuel de mappage
+- **Côté droit** :
+  - Nom du projet Lasius mappé (ou "Non mappé" en gris)
+  - Bouton de menu à trois points
+
+## Filtrer les projets
+
+Utilisez la zone de filtre en haut pour rechercher par nom de projet ou ID. Cliquez sur le X pour effacer.
+
+<Tip>Les projets mappés apparaissent en premier, puis les projets non mappés</Tip>
+
+## Mapper un projet
+
+1. Cliquez sur le **menu à trois points** du projet que vous souhaitez mapper
+2. Cliquez sur l'**icône crayon** pour ajouter ou modifier le mappage
+3. Sélectionnez un projet Lasius dans la liste déroulante
+4. Configurez les paramètres d'étiquettes (apparaît après la sélection d'un projet)
+5. Cliquez sur **Confirmer** pour enregistrer
+
+<Tip>La configuration des étiquettes n'est disponible que pour GitHub, GitLab et Plane (pas pour Jira)</Tip>
+
+## Configuration des étiquettes
+
+Après avoir sélectionné un projet Lasius, configurez les champs de problème à importer en tant qu'étiquettes :
+
+**Champs d'étiquettes à importer** (Sélection multiple) :
+- Utiliser le titre du problème comme étiquette
+- Utiliser les labels comme étiquettes
+- Utiliser le jalon comme étiquette
+- Utiliser les personnes assignées comme étiquettes (GitHub uniquement)
+
+**État des problèmes à importer** :
+- Tous les problèmes
+- Problèmes ouverts uniquement
+- Problèmes fermés uniquement
+
+<Tip>Utilisez "Problèmes ouverts uniquement" pour éviter d'encombrer votre liste d'étiquettes avec des problèmes fermés</Tip>
+
+## Modifier un mappage
+
+1. Cliquez sur le **menu à trois points** du projet mappé
+2. Cliquez sur l'**icône crayon**
+3. Modifiez le projet Lasius ou les paramètres d'étiquettes
+4. Cliquez sur **Confirmer** pour enregistrer
+
+## Supprimer un mappage
+
+1. Cliquez sur le **menu à trois points** du projet mappé
+2. Cliquez sur l'**icône corbeille**
+3. Une boîte de dialogue de confirmation apparaît
+4. Cliquez sur **Supprimer** pour confirmer
+
+<Tip>La suppression d'un mappage arrête la synchronisation mais ne supprime pas les étiquettes existantes</Tip>
+
+## Après le mappage
+
+La synchronisation se produit automatiquement :
+- La première synchronisation a lieu lors du prochain intervalle de vérification planifié
+- Les synchronisations suivantes ne récupèrent que les problèmes nouveaux ou mis à jour
+- Vérifiez l'état de santé de l'intégration pour surveiller la progression
+
+## Dépannage
+
+**La liste de projets est vide :**
+- Vérifiez les identifiants d'intégration dans les paramètres
+- Vérifiez que votre compte a accès aux projets sur la plateforme
+- Attendez que le chargement initial soit terminé
+
+**Impossible de sélectionner un projet Lasius :**
+- Assurez-vous d'avoir créé au moins un projet dans Lasius
+- Vérifiez que vous avez la permission d'accéder au projet
+- Essayez de fermer et rouvrir la fenêtre modale
+
+**Le mappage s'enregistre mais les étiquettes n'apparaissent pas :**
+- Attendez le prochain cycle de synchronisation (vérifiez l'intervalle de l'intégration)
+- Vérifiez qu'au moins un champ d'étiquette est sélectionné
+- Vérifiez que les problèmes correspondent à votre filtre d'état (tous, ouverts ou fermés)
+- Consultez l'état de santé de l'intégration pour détecter les erreurs

@@ -21,7 +21,12 @@
 
 package core
 
-import actors.{ClientReceiver, LasiusSupervisorActor, TagCache}
+import actors.{
+  ClientReceiver,
+  IssueImporterStatusMonitor,
+  LasiusSupervisorActor,
+  TagCache
+}
 import com.google.inject.ImplementedBy
 import com.typesafe.config.Config
 import core.db.InitialDataLoader
@@ -70,6 +75,7 @@ trait SystemServices {
   val latestUserTimeBookingsViewService: ActorRef
   val timeBookingStatisticsViewService: ActorRef
   val tagCache: ActorRef
+  val issueImporterStatusMonitor: ActorRef
   val pluginHandler: ActorRef
   val loginHandler: ActorRef
   val system: ActorSystem
@@ -89,9 +95,7 @@ class DefaultSystemServices @Inject() (
     @Named(LasiusSupervisorActor.name) supervisor: ActorRef,
     override val reactiveMongoApi: ReactiveMongoApi,
     userRepository: UserRepository,
-    jiraConfigRepository: JiraConfigRepository,
-    gitlabConfigRepository: GitlabConfigRepository,
-    planeConfigRepository: PlaneConfigRepository,
+    issueImporterConfigRepository: IssueImporterConfigRepository,
     clientReceiver: ClientReceiver,
     bookingByProjectRepository: BookingByProjectRepository,
     bookingByTagRepository: BookingByTagRepository,
@@ -181,13 +185,23 @@ class DefaultSystemServices @Inject() (
     Await
       .result(supervisor ? TagCache.props(this, clientReceiver), duration)
       .asInstanceOf[ActorRef]
+  val issueImporterStatusMonitor: ActorRef = Await
+    .result(
+      supervisor ? IssueImporterStatusMonitor.props(
+        issueImporterConfigRepository,
+        userRepository,
+        clientReceiver,
+        this,
+        reactiveMongoApi
+      ),
+      duration
+    )
+    .asInstanceOf[ActorRef]
   val pluginHandler: ActorRef = Await
     .result(
       supervisor ? PluginHandler
         .props(userRepository,
-               jiraConfigRepository,
-               gitlabConfigRepository,
-               planeConfigRepository,
+               issueImporterConfigRepository,
                this,
                wsClient,
                lasiusConfig,

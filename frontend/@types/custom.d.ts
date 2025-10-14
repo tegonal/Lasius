@@ -20,6 +20,7 @@
 import 'react-i18next';
 
 import en from '../public/locales/en/common.json';
+import integrations from '../public/locales/en/integrations.json';
 
 declare module '*.svg' {
   const content: any;
@@ -37,16 +38,25 @@ declare module 'i18next' {
     // custom resources type
     resources: {
       common: typeof en;
+      integrations: typeof integrations;
     };
   }
 }
 
+// Declare runtime environment variables on window object
 declare global {
   interface Window {
-    workbox: {
-      messageSkipWaiting(): void;
-      register(): void;
-      addEventListener(name: string, callback: () => unknown);
+    ENV?: {
+      LASIUS_API_URL: string;
+      LASIUS_API_WEBSOCKET_URL: string;
+      LASIUS_PUBLIC_URL: string;
+      LASIUS_TELEMETRY_PLAUSIBLE_HOST: string;
+      LASIUS_TELEMETRY_PLAUSIBLE_SOURCE_DOMAIN: string;
+      LASIUS_DEMO_MODE: string;
+      LASIUS_TERMSOFSERVICE_VERSION: string;
+      LASIUS_VERSION: string;
+      ENVIRONMENT: string;
     };
   }
 }
+

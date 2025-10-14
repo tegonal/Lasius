@@ -88,6 +88,9 @@ trait UserRepository
   def findByOrganisation(organisationReference: OrganisationReference)(implicit
       dbSession: DBSession): Future[Seq[User]]
 
+  def findAdministratorsByOrganisation(organisationId: OrganisationId)(implicit
+      dbSession: DBSession): Future[Seq[User]]
+
   def findAll()(implicit dbSession: DBSession): Future[Seq[User]]
 
   def updateUserData(userReference: UserReference,
@@ -376,6 +379,17 @@ class UserMongoRepository @Inject() (
     val sel =
       Json.obj(
         "organisations.organisationReference.id" -> organisationReference.id)
+    find(sel).map(_.map(_._1).toSeq)
+  }
+
+  override def findAdministratorsByOrganisation(organisationId: OrganisationId)(
+      implicit dbSession: DBSession): Future[Seq[User]] = {
+    val sel = Json.obj(
+      "active"                                 -> true,
+      "organisations.organisationReference.id" -> organisationId,
+      "organisations.role"                     -> Json.toJson(
+        OrganisationAdministrator: OrganisationRole)
+    )
     find(sel).map(_.map(_._1).toSeq)
   }
 

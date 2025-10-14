@@ -23,6 +23,8 @@ import { Alert } from 'components/ui/feedback/Alert'
 import { ButtonGroup } from 'components/ui/forms/ButtonGroup'
 import { FormElement } from 'components/ui/forms/FormElement'
 import { Modal } from 'components/ui/overlays/modal/Modal'
+import { ModalCloseButton } from 'components/ui/overlays/modal/ModalCloseButton'
+import { ModalTitle } from 'components/ui/overlays/modal/ModalTitle'
 import React from 'react'
 
 type Props = {
@@ -39,7 +41,6 @@ type Props = {
     message: string
   }
   blockViewport?: boolean
-  autoSize?: boolean
 }
 
 /**
@@ -53,17 +54,18 @@ export const GenericConfirmModal: React.FC<Props> = ({
   onConfirm,
   message,
   confirmLabel,
-  cancelLabel = 'Cancel',
+  cancelLabel = 'Close',
   confirmVariant = 'primary',
   title,
   alert,
   blockViewport,
-  autoSize,
 }) => {
   return (
-    <Modal open={open} onClose={onClose} blockViewport={blockViewport} autoSize={autoSize}>
+    <Modal open={open} onClose={onClose} blockViewport={blockViewport}>
       <div className="flex flex-col gap-4">
-        {title && <div className="text-lg font-semibold">{title}</div>}
+        <ModalCloseButton onClose={onClose} />
+
+        {title && <ModalTitle>{title}</ModalTitle>}
 
         {alert && <Alert variant={alert.variant}>{alert.message}</Alert>}
 

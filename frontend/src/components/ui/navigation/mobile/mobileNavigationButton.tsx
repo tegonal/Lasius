@@ -103,8 +103,8 @@ export const MobileNavigationButton: React.FC = () => {
               type="button"
               variant="secondary"
               onClick={handleClose}
-              aria-label={t('common.actions.cancel', { defaultValue: 'Cancel' })}>
-              {t('common.actions.cancel', { defaultValue: 'Cancel' })}
+              aria-label={t('common.actions.close', { defaultValue: 'Close' })}>
+              {t('common.actions.close', { defaultValue: 'Close' })}
             </Button>
           </FormElement>
         </FieldSet>

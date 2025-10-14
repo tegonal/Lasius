@@ -17,6 +17,7 @@
  *
  */
 
+import { zodResolver } from '@hookform/resolvers/zod'
 import axios from 'axios'
 import { Button } from 'components/primitives/buttons/Button'
 import { Input } from 'components/primitives/inputs/Input'
@@ -28,14 +29,20 @@ import { FieldSet } from 'components/ui/forms/FieldSet'
 import { FormBody } from 'components/ui/forms/FormBody'
 import { FormElement } from 'components/ui/forms/FormElement'
 import { FormErrorBadge } from 'components/ui/forms/formErrorBadge'
+import { ModalCloseButton } from 'components/ui/overlays/modal/ModalCloseButton'
+import { ModalDescription } from 'components/ui/overlays/modal/ModalDescription'
+import { ModalHeader } from 'components/ui/overlays/modal/ModalHeader'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { ModelsUserOrganisation } from 'lib/api/lasius'
 import { createOrganisation, updateOrganisation } from 'lib/api/lasius/organisations/organisations'
 import { getGetUserProfileKey } from 'lib/api/lasius/user/user'
 import { useTranslation } from 'next-i18next'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useSWRConfig } from 'swr'
+import { z } from 'zod'
+
+import type { TFunction } from 'i18next'
 
 type Props = {
   item?: ModelsUserOrganisation
@@ -44,15 +51,30 @@ type Props = {
   onCancel: () => void
 }
 
-type Form = {
-  organisationName: string
-}
+// Schema factory function with i18n support
+const createOrganisationSchema = (t: TFunction) =>
+  z.object({
+    organisationName: z
+      .string()
+      .min(
+        1,
+        t('validation.organisationNameRequired', { defaultValue: 'Organisation name is required' }),
+      ),
+  })
+
+type FormData = z.infer<ReturnType<typeof createOrganisationSchema>>
 export const OrganisationAddUpdateForm: React.FC<Props> = ({ item, onSave, onCancel, mode }) => {
-  const hookForm = useForm<Form>()
+  const { t } = useTranslation('common')
+
+  // Memoize schema to prevent recreation on every render
+  const schema = useMemo(() => createOrganisationSchema(t), [t])
+
+  const hookForm = useForm<FormData>({
+    resolver: zodResolver(schema),
+  })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { selectedOrganisationKey, setSelectedOrganisation } = useOrganisation()
   const { addToast } = useToast()
-  const { t } = useTranslation('common')
   const { mutate } = useSWRConfig()
 
   useEffect(() => {
@@ -116,11 +138,30 @@ export const OrganisationAddUpdateForm: React.FC<Props> = ({ item, onSave, onCan
       <div className="relative w-full">
         <form onSubmit={hookForm.handleSubmit(onSubmit)}>
           <FormBody>
+            <ModalCloseButton onClose={onCancel} />
+
+            <ModalHeader className="mb-2">
+              {mode === 'add'
+                ? t('organisations.actions.create', { defaultValue: 'Create organisation' })
+                : t('organisations.actions.edit', { defaultValue: 'Edit organisation' })}
+            </ModalHeader>
+
+            <ModalDescription className="mb-4">
+              {mode === 'add'
+                ? t('organisations.description.create', {
+                    defaultValue: 'Create a new organisation to collaborate with your team.',
+                  })
+                : t('organisations.description.edit', {
+                    defaultValue: 'Update the organisation name.',
+                  })}
+            </ModalDescription>
+
             <Alert variant="info" className="mb-4">
               {t('organisations.info.uniqueNameRequired', {
                 defaultValue: 'Organisation names must be unique.',
               })}
             </Alert>
+
             <FieldSet>
               <FormElement>
                 <Label htmlFor="organisationName">
@@ -128,7 +169,6 @@ export const OrganisationAddUpdateForm: React.FC<Props> = ({ item, onSave, onCan
                 </Label>
                 <Input
                   {...hookForm.register('organisationName', {
-                    required: true,
                     onChange: () => {
                       // Clear error when user changes the field
                       if (hookForm.formState.errors.organisationName) {

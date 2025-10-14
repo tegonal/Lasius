@@ -24,7 +24,7 @@ type Props = {
 }
 export const DataList: React.FC<Props> = ({ children }) => {
   return (
-    <table className="w-full border-collapse overflow-hidden">
+    <table className="w-full border-collapse">
       <tbody>{children}</tbody>
     </table>
   )

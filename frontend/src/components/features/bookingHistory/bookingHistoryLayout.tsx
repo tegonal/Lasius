@@ -187,7 +187,7 @@ export const BookingHistoryLayout: React.FC<Props> = ({ dataSource }) => {
           />
         </div>
         {!response.data && response.isValidating && <Loading />}
-        <div className="px-4 pt-3">
+        <div className="pt-4">
           {response.data && (
             <BookingHistoryTable
               items={visibleElements}

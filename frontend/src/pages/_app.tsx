@@ -26,7 +26,6 @@ import { HttpHeaderProvider } from 'components/features/system/httpHeaderProvide
 import { LasiusBackendOnlineCheck } from 'components/features/system/lasiusBackendOnlineCheck'
 import { LasiusBackendWebsocketEventHandler } from 'components/features/system/lasiusBackendWebsocketEventHandler'
 import 'styles/globals.css'
-import { LasiusBackendWebsocketStatus } from 'components/features/system/lasiusBackendWebsocketStatus'
 import { LasiusTOSCheck } from 'components/features/system/lasiusTOSCheck'
 import { TokenWatcher } from 'components/features/system/tokenWatcher'
 import { TopLoadingBar } from 'components/features/system/topLoadingBar'
@@ -44,9 +43,8 @@ import { appWithTranslation } from 'next-i18next'
 // import PlausibleProvider from 'next-plausible' // Using custom implementation
 import { DefaultSeo } from 'next-seo'
 import { AppProps } from 'next/app'
-import dynamic from 'next/dynamic'
 import Head from 'next/head'
-import { IS_DEV, SOCIAL_MEDIA_CARD_IMAGE_URL } from 'projectConfig/constants'
+import { getIsDev, getLasiusPublicUrl, IS_SERVER } from 'projectConfig/constants'
 import React, { JSX, useEffect } from 'react'
 import { resetAllStores } from 'stores/globalActions'
 import { SWRConfig } from 'swr'
@@ -54,14 +52,6 @@ import { SWRConfig } from 'swr'
 import nextI18NextConfig from '../../next-i18next.config'
 
 const loadFeatures = () => import('../lib/framerMotionFeatures.js').then((res) => res.default)
-
-// Enable PWA Updater only in browsers and if workbox object is available
-const LasiusPwaUpdater =
-  typeof window !== 'undefined' && window?.workbox
-    ? dynamic(() => import(`../components/features/system/lasiusPwaUpdater`), {
-        ssr: false,
-      })
-    : () => <></>
 
 const App = ({ Component, pageProps }: AppProps): JSX.Element => {
   // Extract auth props from pageProps (they come from getServerSideProps now)
@@ -89,11 +79,7 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
           ...(fallback || {}),
           use: [swrLogger as any],
         }}>
-        <SessionProvider
-          session={session}
-          refetchOnWindowFocus={true}
-          refetchInterval={10} // Refetch every 10 seconds to catch token refreshes
-        >
+        <SessionProvider session={session} refetchOnWindowFocus={true} refetchInterval={0}>
           <Head>
             <meta
               name="viewport"
@@ -103,8 +89,28 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
           </Head>
           <LazyMotion features={loadFeatures}>
             <DefaultSeo
+              titleTemplate="%s | Lasius"
+              defaultTitle="Lasius - Open source time tracking for teams"
+              description="Lasius is an open source time tracking application for teams. Track your time, manage projects, and collaborate with your team."
               openGraph={{
-                images: [{ url: SOCIAL_MEDIA_CARD_IMAGE_URL }],
+                type: 'website',
+                siteName: 'Lasius',
+                title: 'Lasius - Open source time tracking for teams',
+                description:
+                  'Lasius is an open source time tracking application for teams. Track your time, manage projects, and collaborate with your team.',
+                images: [
+                  {
+                    url: `${IS_SERVER ? process.env.NEXTAUTH_URL || 'http://localhost:3000' : getLasiusPublicUrl()}/api/og?title=${encodeURIComponent('Lasius')}&subtitle=${encodeURIComponent('Open source time tracking for teams')}`,
+                    width: 1200,
+                    height: 630,
+                    alt: 'Lasius - Open source time tracker for teams',
+                  },
+                ],
+              }}
+              twitter={{
+                handle: '@tegonal',
+                site: '@tegonal',
+                cardType: 'summary_large_image',
               }}
             />
             {statusCode > 302 ? (
@@ -114,7 +120,6 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
             )}
             <BrowserOnlineStatusCheck />
             <LasiusBackendOnlineCheck />
-            <LasiusPwaUpdater />
             <BundleVersionCheck />
             <Toasts />
             <HelpDrawer />
@@ -126,12 +131,11 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
                 <HttpHeaderProvider />
                 <TokenWatcher />
                 <BootstrapTasks />
-                <LasiusBackendWebsocketStatus />
                 <LasiusBackendWebsocketEventHandler />
                 <LasiusTOSCheck />
               </>
             )}
-            {IS_DEV && <DevInfoBadge />}
+            {getIsDev() && <DevInfoBadge />}
           </LazyMotion>
         </SessionProvider>
       </SWRConfig>

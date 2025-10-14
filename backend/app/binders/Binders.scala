@@ -403,4 +403,9 @@ object Binders {
   implicit def InvitationIdPathBindable(implicit
       stringBinder: PathBindable[String]): PathBindable[InvitationId] =
     uuidBaseIdPathBindable[InvitationId](stringBinder, InvitationId.apply)
+
+  implicit def IssueImporterConfigIdPathBindable(implicit
+      stringBinder: PathBindable[String]): PathBindable[IssueImporterConfigId] =
+    uuidBaseIdPathBindable[IssueImporterConfigId](stringBinder,
+                                                  IssueImporterConfigId.apply)
 }

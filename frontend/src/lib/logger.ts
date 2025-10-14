@@ -17,7 +17,7 @@
  *
  */
 
-import { IS_DEV } from 'projectConfig/constants'
+import { getIsDev } from 'projectConfig/constants'
 import { Logger } from 'tslog'
 
 import type { ILogObj } from 'tslog'
@@ -25,6 +25,6 @@ import type { ILogObj } from 'tslog'
 const dev: ILogObj = { type: 'pretty', minLevel: 0 }
 const prod: ILogObj = { type: 'json', minLevel: 4, hideLogPositionForProduction: true }
 
-const logger: Logger<ILogObj> = new Logger(IS_DEV ? dev : prod)
+const logger: Logger<ILogObj> = new Logger(getIsDev() ? dev : prod)
 
 export { logger }

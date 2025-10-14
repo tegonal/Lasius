@@ -21,16 +21,22 @@
 
 package actors.scheduler.gitlab
 
+import actors.IssueImporterStatusMonitor.{
+  UpdateConnectivityStatus,
+  UpdateProjectSyncStats
+}
 import actors.TagCache.TagsUpdated
 import actors.scheduler.{ServiceAuthentication, ServiceConfiguration}
 import org.apache.pekko.actor._
 import core.SystemServices
 import models._
+import org.joda.time.DateTime
 import play.api.libs.ws.WSClient
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.concurrent.duration._
 import scala.language.postfixOps
+import scala.util.{Failure, Success}
 
 object GitlabTagParseWorker {
   def props(wsClient: WSClient,
@@ -39,6 +45,8 @@ object GitlabTagParseWorker {
             settings: GitlabSettings,
             projectSettings: GitlabProjectSettings,
             auth: ServiceAuthentication,
+            configId: IssueImporterConfigId,
+            organisationId: OrganisationId,
             projectId: ProjectId): Props =
     Props(classOf[GitlabTagParseWorker],
           wsClient,
@@ -47,6 +55,8 @@ object GitlabTagParseWorker {
           settings,
           projectSettings,
           auth,
+          configId,
+          organisationId,
           projectId)
 
   case object StartParsing
@@ -59,6 +69,8 @@ class GitlabTagParseWorker(wsClient: WSClient,
                            settings: GitlabSettings,
                            projectSettings: GitlabProjectSettings,
                            implicit val auth: ServiceAuthentication,
+                           configId: IssueImporterConfigId,
+                           organisationId: OrganisationId,
                            projectId: ProjectId)
     extends Actor
     with ActorLogging {
@@ -93,14 +105,64 @@ class GitlabTagParseWorker(wsClient: WSClient,
           projectId,
           tags)
 
-        // handle new parsed issue keys
+        // Report successful sync
+        systemServices.issueImporterStatusMonitor ! UpdateProjectSyncStats(
+          configId = configId,
+          organisationId = organisationId,
+          projectId = projectId,
+          projectName = s"GitLab Project ${projectSettings.gitlabProjectId}",
+          issueCount = result.size,
+          success = true
+        )
+
+        systemServices.issueImporterStatusMonitor ! UpdateConnectivityStatus(
+          configId = configId,
+          organisationId = organisationId,
+          status = ConnectivityStatus.Healthy,
+          issue = None
+        )
       }
-      .andThen { case s =>
-        // restart timer
-        log.debug(s"andThen:restart time $s")
-        cancellable = Some(
-          context.system.scheduler
-            .scheduleOnce(settings.checkFrequency.milliseconds, self, Parse))
+      .andThen {
+        case Success(_) =>
+          // restart timer
+          log.debug(s"Parse successful, restarting timer")
+          cancellable = Some(
+            context.system.scheduler
+              .scheduleOnce(settings.checkFrequency.milliseconds, self, Parse))
+
+        case Failure(ex) =>
+          log.error(ex, s"Failed to parse GitLab issues for project $projectId")
+
+          // Classify error and report
+          val (errorCode, httpStatus) = classifyError(ex)
+          val issue                   = ConnectivityIssue(
+            errorCode = errorCode,
+            message = ex.getMessage,
+            timestamp = DateTime.now,
+            httpStatus = httpStatus
+          )
+
+          systemServices.issueImporterStatusMonitor ! UpdateProjectSyncStats(
+            configId = configId,
+            organisationId = organisationId,
+            projectId = projectId,
+            projectName = s"GitLab Project ${projectSettings.gitlabProjectId}",
+            issueCount = 0,
+            success = false,
+            error = Some(issue)
+          )
+
+          systemServices.issueImporterStatusMonitor ! UpdateConnectivityStatus(
+            configId = configId,
+            organisationId = organisationId,
+            status = ConnectivityStatus.Failed,
+            issue = Some(issue)
+          )
+
+          // restart timer anyway
+          cancellable = Some(
+            context.system.scheduler
+              .scheduleOnce(settings.checkFrequency.milliseconds, self, Parse))
       }
   }
 
@@ -185,6 +247,24 @@ class GitlabTagParseWorker(wsClient: WSClient,
                   query,
                   Some(offset),
                   Some(max))
+  }
+
+  private def classifyError(ex: Throwable): (String, Option[Int]) = {
+    ex.getMessage match {
+      case msg if msg.contains("401") || msg.contains("Unauthorized") =>
+        ("authentication_failed", Some(401))
+      case msg if msg.contains("403") || msg.contains("Forbidden") =>
+        ("permission_denied", Some(403))
+      case msg if msg.contains("404") || msg.contains("Not Found") =>
+        ("resource_not_found", Some(404))
+      case msg if msg.contains("timeout") || msg.contains("timed out") =>
+        ("timeout", None)
+      case msg
+          if msg.contains("Connection refused") || msg.contains(
+            "ConnectException") =>
+        ("connection_refused", None)
+      case _ => ("unknown_error", None)
+    }
   }
 
   override def postStop(): Unit = {

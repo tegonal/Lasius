@@ -316,6 +316,7 @@ export const nextAuthOptions: () => NextAuthOptions = () => {
     pages: {
       signIn: `/login`,
       signOut: `/`,
+      error: '/auth/error',
     },
     callbacks: {
       async session({ session, token, user }) {

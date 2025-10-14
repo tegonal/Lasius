@@ -1,0 +1,47 @@
+# Integrationen
+
+Verbinde Lasius mit externen Issue-Tracking-Systemen wie GitHub, GitLab, Jira und Plane. Importiere automatisch Issues als Tags, um deinen Zeiterfassungs-Workflow zu optimieren.
+
+## Was du tun kannst
+
+### Integrationsstatistiken anzeigen
+Oben auf der Seite siehst du die Gesamtzahl der konfigurierten Integrationen in deiner Organisation.
+
+### Aktive Integrationen durchsuchen
+Zeige alle konfigurierten Integrationen in einer Tabelle an:
+- **Typ** - Die Plattform (GitHub, GitLab, Jira, Plane)
+- **Name** - Dein benutzerdefinierter Name für diese Integration
+- **Basis-URL** - Der verwendete API-Endpunkt
+- **Projekte** - Anzahl der Projekte, die diese Integration verwenden
+
+### Neue Integrationen hinzufügen
+Klicke oben rechts auf **Konfiguration hinzufügen**, um eine neue Integration einzurichten. Folge dem Assistenten:
+1. Wähle den Plattformtyp
+2. Gib Verbindungsdetails und Zugangsdaten ein
+3. Teste die Verbindung
+4. Ordne externe Projekte Lasius-Projekten zu
+5. Konfiguriere die Tag-Import-Einstellungen
+
+### Integrationen verwalten
+Klicke auf das Kontextmenü (<Icon name="EllipsisVertical" />) einer Integration, um:
+- **Konfigurationsinfo anzeigen** - Detaillierte Verbindungseinstellungen und Status anzeigen
+- **Konfiguration bearbeiten** - Zugangsdaten, URL oder andere Einstellungen aktualisieren
+- **Projektzuordnungen anzeigen** - Anzeigen und ändern, welche externen Projekte mit welchen Lasius-Projekten synchronisiert werden
+- **Konfiguration löschen** - Integration entfernen (stoppt Tag-Synchronisierung)
+
+### Automatische Tag-Synchronisierung
+Nach der Konfiguration importiert Lasius automatisch Issues von deinen externen Plattformen als Tags. Teammitglieder können dann diese Tags bei der Zeiterfassung auswählen und so eine direkte Verbindung zwischen Zeiteinträgen und externen Arbeitselementen herstellen.
+
+## Tipps
+
+<Tip>Beginne mit einer einzelnen Projektzuordnung, um deine Integration zu testen, bevor du sie auf alle Projekte ausweitest</Tip>
+
+<Tip>Verwende aussagekräftige Namen für deine Integrationen, wenn du mehrere Instanzen derselben Plattform hast</Tip>
+
+<Tip>Tags werden automatisch synchronisiert - kein manueller Import erforderlich, sobald sie konfiguriert sind</Tip>
+
+<Tip>Jede Integration kann mehreren Lasius-Projekten zugeordnet werden, was flexible Organisationsstrukturen ermöglicht</Tip>
+
+<Tip>Wenn eine Integration Verbindungsprobleme zeigt, prüfe die Konfigurationsinfo für detaillierte Fehlermeldungen</Tip>
+
+<Tip>Das Löschen einer Integration löscht keine bestehenden Tags - es stoppt nur die zukünftige Synchronisierung</Tip>

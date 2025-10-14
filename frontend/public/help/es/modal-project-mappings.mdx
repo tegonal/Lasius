@@ -1,0 +1,86 @@
+# Asignaciones de proyectos
+
+Vincula proyectos externos de tu plataforma de integración a proyectos de Lasius. Los problemas de proyectos asignados se sincronizan automáticamente y están disponibles como etiquetas de seguimiento de tiempo.
+
+## Entender la lista
+
+Cada fila muestra:
+- **Lado izquierdo**: Nombre e ID del proyecto externo
+- **Flecha**: Indicador visual de asignación
+- **Lado derecho**:
+  - Nombre del proyecto Lasius asignado (o "No asignado" en gris)
+  - Botón de menú de tres puntos
+
+## Filtrar proyectos
+
+Usa el cuadro de filtro en la parte superior para buscar por nombre de proyecto o ID. Haz clic en la X para borrar.
+
+<Tip>Los proyectos asignados aparecen primero, luego los proyectos no asignados</Tip>
+
+## Asignar un proyecto
+
+1. Haz clic en el **menú de tres puntos** del proyecto que deseas asignar
+2. Haz clic en el **icono de lápiz** para agregar o editar la asignación
+3. Selecciona un proyecto de Lasius del menú desplegable
+4. Configura los ajustes de etiquetas (aparece después de seleccionar un proyecto)
+5. Haz clic en **Confirmar** para guardar
+
+<Tip>La configuración de etiquetas solo está disponible para GitHub, GitLab y Plane (no para Jira)</Tip>
+
+## Configuración de etiquetas
+
+Después de seleccionar un proyecto de Lasius, configura qué campos de problemas importar como etiquetas:
+
+**Campos de etiquetas a importar** (Selección múltiple):
+- Usar título del problema como etiqueta
+- Usar etiquetas como etiquetas
+- Usar hito como etiqueta
+- Usar asignados como etiquetas (solo GitHub)
+
+**Estado de problema a importar**:
+- Todos los problemas
+- Solo problemas abiertos
+- Solo problemas cerrados
+
+<Tip>Usa "Solo problemas abiertos" para evitar saturar tu lista de etiquetas con problemas cerrados</Tip>
+
+## Editar una asignación
+
+1. Haz clic en el **menú de tres puntos** del proyecto asignado
+2. Haz clic en el **icono de lápiz**
+3. Cambia el proyecto de Lasius o los ajustes de etiquetas
+4. Haz clic en **Confirmar** para guardar
+
+## Eliminar una asignación
+
+1. Haz clic en el **menú de tres puntos** del proyecto asignado
+2. Haz clic en el **icono de papelera**
+3. Aparece un diálogo de confirmación
+4. Haz clic en **Eliminar** para confirmar
+
+<Tip>Eliminar una asignación detiene la sincronización pero no elimina las etiquetas existentes</Tip>
+
+## Después de asignar
+
+La sincronización ocurre automáticamente:
+- La primera sincronización ocurre en el próximo intervalo de verificación programado
+- Las sincronizaciones posteriores solo obtienen problemas nuevos o actualizados
+- Verifica el estado de salud de la integración para monitorear el progreso
+
+## Resolución de problemas
+
+**La lista de proyectos está vacía:**
+- Verifica las credenciales de integración en la configuración
+- Verifica que tu cuenta tenga acceso a proyectos en la plataforma
+- Espera a que se complete la carga inicial
+
+**No se puede seleccionar un proyecto de Lasius:**
+- Asegúrate de tener al menos un proyecto creado en Lasius
+- Verifica que tengas permiso para acceder al proyecto
+- Intenta cerrar y volver a abrir el modal
+
+**La asignación se guarda pero las etiquetas no aparecen:**
+- Espera al siguiente ciclo de sincronización (verifica el intervalo de la integración)
+- Verifica que al menos un campo de etiqueta esté seleccionado
+- Verifica que los problemas coincidan con tu filtro de estado (todos, abiertos o cerrados)
+- Revisa el estado de salud de la integración en busca de errores

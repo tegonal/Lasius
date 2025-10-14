@@ -29,7 +29,8 @@ case class LasiusConfig(
     initializeViewsOnStartup: Boolean,
     title: String,
     instance: String,
-    security: LasiusSecurityConfig
+    security: LasiusSecurityConfig,
+    issueImporters: IssueImportersConfig = IssueImportersConfig()
 ) {
 
   def toApplicationConfig: ApplicationConfig =
@@ -41,6 +42,39 @@ case class LasiusConfig(
         security.oauth2Provider.allowRegisterUsers,
       allowedIssuers = security.allowedIssuers.map(_.issuer)
     )
+}
+
+case class IssueImportersConfig(
+    circuitBreaker: CircuitBreakerConfig = CircuitBreakerConfig()
+)
+
+case class CircuitBreakerConfig(
+    failureThreshold: Int = 5,
+    resetTimeoutMinutes: Int = 30,
+    backoffMultiplier: Double = 2.0,
+    maxBackoffMinutes: Int = 1440 // 24 hours
+) {
+  // Calculate backoff delay based on consecutive failures
+  def calculateBackoffMillis(consecutiveFailures: Int): Long = {
+    if (consecutiveFailures < failureThreshold) {
+      0L // No backoff before circuit opens
+    } else {
+      val failuresSinceOpen = consecutiveFailures - failureThreshold
+      val baseDelay = resetTimeoutMinutes * 60 * 1000 // Convert to milliseconds
+      val backoffDelay = Math
+        .min(
+          baseDelay * Math.pow(backoffMultiplier, failuresSinceOpen.toDouble),
+          maxBackoffMinutes * 60 * 1000
+        )
+        .toLong
+      backoffDelay
+    }
+  }
+
+  // Check if circuit should be open based on consecutive failures
+  def isCircuitOpen(consecutiveFailures: Int): Boolean = {
+    consecutiveFailures >= failureThreshold
+  }
 }
 
 case class LasiusSecurityConfig(

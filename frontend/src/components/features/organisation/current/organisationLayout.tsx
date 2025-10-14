@@ -45,7 +45,7 @@ export const OrganisationLayout: React.FC = () => {
     <>
       <ScrollContainer className="bg-base-100 flex-1 overflow-y-auto">
         <OrganisationStats onInvite={handleInvite} onEdit={handleEdit} onCreate={handleCreate} />
-        <div className="px-4 pt-3">
+        <div className="pt-4">
           <OrganisationDetail />
         </div>
       </ScrollContainer>

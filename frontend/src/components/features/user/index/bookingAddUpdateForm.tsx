@@ -50,7 +50,7 @@ import {
 import { useGetTagsByProject } from 'lib/api/lasius/user-organisations/user-organisations'
 import { logger } from 'lib/logger'
 import { formatISOLocale } from 'lib/utils/date/dates'
-import { ArrowDownToLine, ArrowUpToLine, ChevronRight, HelpCircle } from 'lucide-react'
+import { ArrowDownToLine, ArrowRight, ArrowUpToLine, HelpCircle } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import { DEFAULT_STRING_VALUE } from 'projectConfig/constants'
 import React, { useEffect, useRef, useState } from 'react'
@@ -316,7 +316,7 @@ export const BookingAddUpdateForm: React.FC<Props> = ({
                     onClick={() => setShowPresetPanel(true)}
                     className="flex-1 gap-2">
                     {t('bookings.presets.browse', { defaultValue: 'Browse presets' })}
-                    <LucideIcon icon={ChevronRight} size={16} />
+                    <LucideIcon icon={ArrowRight} size={16} />
                   </Button>
                   <Button
                     type="button"
@@ -325,7 +325,7 @@ export const BookingAddUpdateForm: React.FC<Props> = ({
                     size="sm"
                     onClick={() => openHelp('modal-add-edit-booking')}
                     fullWidth={false}
-                    aria-label={t('common.help', { defaultValue: 'Help' })}>
+                    aria-label={t('common.help.buttonLabel', { defaultValue: 'Help' })}>
                     <LucideIcon icon={HelpCircle} size={20} />
                   </Button>
                 </div>

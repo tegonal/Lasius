@@ -163,7 +163,7 @@ export const TimeDropdownWithModal: React.FC<Props> = ({
                 {t('common.actions.save', { defaultValue: 'Save' })}
               </Button>
               <Button variant="secondary" onClick={handleClose} className="w-full">
-                {t('common.actions.cancel', { defaultValue: 'Cancel' })}
+                {t('common.actions.close', { defaultValue: 'Close' })}
               </Button>
             </div>
           </FormElement>

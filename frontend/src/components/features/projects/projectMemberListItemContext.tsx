@@ -109,10 +109,9 @@ export const ProjectMemberListItemContext: React.FC<Props> = ({ user, onRemove, 
             name: `${user.firstName} ${user.lastName}`,
           })}
           confirmLabel={t('members.actions.remove', { defaultValue: 'Remove member' })}
-          cancelLabel={t('common.actions.cancel', { defaultValue: 'Cancel' })}
+          cancelLabel={t('common.actions.close', { defaultValue: 'Close' })}
           confirmVariant="primary"
           blockViewport
-          autoSize
         />
       )}
     </>

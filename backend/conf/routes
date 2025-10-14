@@ -1033,6 +1033,688 @@ POST /invitations/:invitationId/decline                 controllers.InvitationsC
 GET /invitations/:invitationId/status               controllers.InvitationsController.getStatus(invitationId: models.InvitationId)
 
 #######
+####### Issue Importer Configurations #######
+#######
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Get all importer configurations for organisation (optionally filtered by type)
+#  operationId: getConfigs
+#  parameters:
+#    - name: orgId
+#      in: path
+#      required: true
+#      schema:
+#        type: string
+#        format: uuid
+#      description: Organisation ID
+#    - name: type
+#      in: query
+#      required: false
+#      schema:
+#        type: string
+#        enum: [gitlab, jira, plane]
+#      description: Filter by importer type (gitlab, jira, or plane)
+#  responses:
+#    200:
+#      description: success
+#      content:
+#        application/json:
+#          schema:
+#            type: array
+#            items:
+#              $ref: '#/components/schemas/models.IssueImporterConfigResponse'
+#    403:
+#      description: user not authorized (requires OrganisationAdministrator role)
+###
+GET /organisations/:orgId/issue-importers                                                       controllers.IssueImporterConfigController.getConfigs(orgId: models.OrganisationId, type: Option[String])
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Get importer configuration by ID
+#  operationId: getConfig
+#  parameters:
+#    - name: orgId
+#      in: path
+#      required: true
+#      schema:
+#        type: string
+#        format: uuid
+#      description: Organisation ID
+#    - name: configId
+#      in: path
+#      required: true
+#      schema:
+#        type: string
+#      description: Importer configuration ID
+#  responses:
+#    200:
+#      description: success
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.IssueImporterConfigResponse'
+#    403:
+#      description: access denied (user not in organisation or not an admin)
+#    404:
+#      description: configuration not found
+###
+GET /organisations/:orgId/issue-importers/:configId                                             controllers.IssueImporterConfigController.getConfig(orgId: models.OrganisationId, configId: models.IssueImporterConfigId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Get importer configuration for a specific project
+#  operationId: getConfigForProject
+#  parameters:
+#    - name: orgId
+#      in: path
+#      required: true
+#      schema:
+#        type: string
+#        format: uuid
+#      description: Organisation ID
+#    - name: projectId
+#      in: path
+#      required: true
+#      schema:
+#        type: string
+#        format: uuid
+#      description: Project ID
+#  responses:
+#    200:
+#      description: success
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.IssueImporterConfigResponse'
+#    403:
+#      description: access denied (user not in organisation or not an admin)
+#    404:
+#      description: no configuration found for this project
+###
+GET /organisations/:orgId/projects/:projectId/issue-importer                                    controllers.IssueImporterConfigController.getConfigForProject(orgId: models.OrganisationId, projectId: models.ProjectId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Create new importer configuration (Organisation Admin only)
+#  operationId: createConfig
+#  parameters:
+#    - name: orgId
+#      in: path
+#      required: true
+#      schema:
+#        type: string
+#        format: uuid
+#      description: Organisation ID
+#  requestBody:
+#    required: true
+#    content:
+#      application/json:
+#        schema:
+#          $ref: '#/components/schemas/models.CreateIssueImporterConfig'
+#  responses:
+#    201:
+#      description: configuration created
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.IssueImporterConfigResponse'
+#    400:
+#      description: invalid request (missing required fields or validation failed)
+#    403:
+#      description: user not authorized (requires OrganisationAdministrator role)
+###
+POST /organisations/:orgId/issue-importers                                                      controllers.IssueImporterConfigController.createConfig(orgId: models.OrganisationId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Test connectivity to external service
+#  description: Tests connectivity to GitLab/Jira/Plane without saving configuration. Useful for validating credentials before creating a config. Requires only OrganisationMember role since nothing is saved.
+#  operationId: testConnectivity
+#  parameters:
+#    - name: orgId
+#      in: path
+#      required: true
+#      schema:
+#        type: string
+#        format: uuid
+#      description: Organisation ID
+#  requestBody:
+#    required: true
+#    content:
+#      application/json:
+#        schema:
+#          $ref: '#/components/schemas/models.CreateIssueImporterConfig'
+#  responses:
+#    200:
+#      description: connectivity test successful
+#      content:
+#        application/json:
+#          schema:
+#            type: object
+#            properties:
+#              status:
+#                type: string
+#                enum: [success]
+#              message:
+#                type: string
+#                example: Successfully connected to GitLab
+#    400:
+#      description: connectivity test failed or validation error
+#      content:
+#        application/json:
+#          schema:
+#            type: object
+#            properties:
+#              status:
+#                type: string
+#                enum: [error]
+#              message:
+#                type: string
+#                example: Authentication failed - Invalid access token
+#              error:
+#                type: string
+#                enum: [connection_failed, authentication_failed, unknown_host, timeout, connection_error, validation_failed]
+###
+POST /organisations/:orgId/issue-importers/test                                                 controllers.IssueImporterConfigController.testConnectivity(orgId: models.OrganisationId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Test connectivity for existing configuration
+#  description: Tests connectivity to external service using credentials from an existing saved configuration. Useful for validating that saved credentials still work or testing after updating configuration. Requires only OrganisationMember role since nothing is modified.
+#  operationId: testExistingConfig
+#  parameters:
+#    - name: orgId
+#      in: path
+#      required: true
+#      schema:
+#        type: string
+#        format: uuid
+#      description: Organisation ID
+#    - name: configId
+#      in: path
+#      required: true
+#      schema:
+#        type: string
+#        format: uuid
+#      description: Issue importer configuration ID
+#  responses:
+#    200:
+#      description: connectivity test successful
+#      content:
+#        application/json:
+#          schema:
+#            type: object
+#            properties:
+#              status:
+#                type: string
+#                enum: [success]
+#              message:
+#                type: string
+#                example: Successfully connected to GitLab
+#    400:
+#      description: connectivity test failed
+#      content:
+#        application/json:
+#          schema:
+#            type: object
+#            properties:
+#              status:
+#                type: string
+#                enum: [error]
+#              message:
+#                type: string
+#                example: Authentication failed - Invalid access token
+#              error:
+#                type: string
+#                enum: [connection_failed, authentication_failed, unknown_host, timeout, connection_error]
+#    403:
+#      description: Configuration does not belong to organization
+#    404:
+#      description: Configuration not found
+###
+POST /organisations/:orgId/issue-importers/:configId/test                                       controllers.IssueImporterConfigController.testExistingConfig(orgId: models.OrganisationId, configId: models.IssueImporterConfigId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: List available projects from external service
+#  description: Fetches list of accessible projects/workspaces from the configured external service (GitLab/Jira/Plane). For GitLab and Jira, returns flat list of projects. For Plane, returns hierarchical list of workspaces with their projects. Requires only OrganisationMember role since it only reads from external API.
+#  operationId: listProjects
+#  parameters:
+#    - name: orgId
+#      in: path
+#      required: true
+#      schema:
+#        type: string
+#        format: uuid
+#      description: Organisation ID
+#    - name: configId
+#      in: path
+#      required: true
+#      schema:
+#        type: string
+#        format: uuid
+#      description: Issue importer configuration ID
+#  responses:
+#    200:
+#      description: Successfully fetched projects/workspaces
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.ListProjectsResponse'
+#    400:
+#      description: Failed to fetch projects from external API
+#      content:
+#        application/json:
+#          schema:
+#            type: object
+#            properties:
+#              status:
+#                type: string
+#                enum: [error]
+#              message:
+#                type: string
+#                example: Failed to fetch GitLab projects - HTTP 401
+#              error:
+#                type: string
+#                enum: [list_projects_failed]
+#    403:
+#      description: Configuration does not belong to organization
+#    404:
+#      description: Configuration not found
+###
+GET /organisations/:orgId/issue-importers/:configId/projects                                    controllers.IssueImporterConfigController.listProjects(orgId: models.OrganisationId, configId: models.IssueImporterConfigId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: List GitHub resource owners (user + organizations)
+#  description: Lists available resource owners for a GitHub token. Returns the authenticated user plus all organizations they have access to. This helps users select the correct resource owner when creating organization-scoped fine-grained tokens. GitHub-specific endpoint.
+#  operationId: listGithubResourceOwners
+#  parameters:
+#    - name: orgId
+#      in: path
+#      required: true
+#      schema:
+#        type: string
+#        format: uuid
+#      description: Organisation ID
+#  requestBody:
+#    required: true
+#    content:
+#      application/json:
+#        schema:
+#          $ref: '#/components/schemas/models.CreateIssueImporterConfig'
+#  responses:
+#    200:
+#      description: Successfully fetched resource owners
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.ListProjectsResponse'
+#    400:
+#      description: Failed to fetch resource owners or invalid importer type
+#      content:
+#        application/json:
+#          schema:
+#            type: object
+#            properties:
+#              status:
+#                type: string
+#                enum: [error]
+#              message:
+#                type: string
+#              error:
+#                type: string
+#                enum: [list_resource_owners_failed, missing_access_token, invalid_importer_type]
+###
+POST /organisations/:orgId/issue-importers/github/resource-owners                               controllers.IssueImporterConfigController.listGithubResourceOwners(orgId: models.OrganisationId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Update importer configuration (Organisation Admin only)
+#  operationId: updateConfig
+#  parameters:
+#    - name: orgId
+#      in: path
+#      required: true
+#      schema:
+#        type: string
+#        format: uuid
+#      description: Organisation ID
+#    - name: configId
+#      in: path
+#      required: true
+#      schema:
+#        type: string
+#      description: Importer configuration ID
+#  requestBody:
+#    required: true
+#    content:
+#      application/json:
+#        schema:
+#          $ref: '#/components/schemas/models.UpdateIssueImporterConfig'
+#  responses:
+#    200:
+#      description: configuration updated
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.IssueImporterConfigResponse'
+#    400:
+#      description: invalid request (missing required fields or validation failed)
+#    403:
+#      description: user not authorized (requires OrganisationAdministrator role)
+#    404:
+#      description: configuration not found
+###
+PUT /organisations/:orgId/issue-importers/:configId                                             controllers.IssueImporterConfigController.updateConfig(orgId: models.OrganisationId, configId: models.IssueImporterConfigId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Delete importer configuration (Organisation Admin only)
+#  operationId: deleteConfig
+#  parameters:
+#    - name: orgId
+#      in: path
+#      required: true
+#      schema:
+#        type: string
+#        format: uuid
+#      description: Organisation ID
+#    - name: configId
+#      in: path
+#      required: true
+#      schema:
+#        type: string
+#      description: Importer configuration ID
+#  responses:
+#    204:
+#      description: configuration deleted successfully (no content)
+#    400:
+#      description: validation failed
+#      content:
+#        application/json:
+#          schema:
+#            type: object
+#            properties:
+#              error:
+#                type: string
+#                example: validation_failed
+#              message:
+#                type: string
+#              field:
+#                type: string
+#    403:
+#      description: user not authorized (requires OrganisationAdministrator role)
+#      content:
+#        application/json:
+#          schema:
+#            type: object
+#            properties:
+#              error:
+#                type: string
+#                example: access_denied
+#              message:
+#                type: string
+#              configId:
+#                type: string
+#    404:
+#      description: configuration not found
+#      content:
+#        application/json:
+#          schema:
+#            type: object
+#            properties:
+#              error:
+#                type: string
+#                example: config_not_found
+#              message:
+#                type: string
+#              configId:
+#                type: string
+###
+DELETE /organisations/:orgId/issue-importers/:configId                                          controllers.IssueImporterConfigController.deleteConfig(orgId: models.OrganisationId, configId: models.IssueImporterConfigId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Force immediate tag refresh for a project
+#  description: Triggers an immediate tag refresh for a specific project mapping. Sends a message to the worker to fetch tags from the external service (GitLab/Jira/Plane/GitHub) right away, bypassing the scheduled check interval. Tags will be updated within seconds. Requires only OrganisationMember role as this is a read-like operation.
+#  operationId: refreshTags
+#  parameters:
+#    - name: orgId
+#      in: path
+#      required: true
+#      schema:
+#        type: string
+#        format: uuid
+#      description: Organisation ID
+#    - name: configId
+#      in: path
+#      required: true
+#      schema:
+#        type: string
+#      description: Issue importer configuration ID
+#    - name: projectId
+#      in: path
+#      required: true
+#      schema:
+#        type: string
+#        format: uuid
+#      description: Project ID
+#  responses:
+#    202:
+#      description: Refresh request accepted - tags will be updated immediately
+#      content:
+#        application/json:
+#          schema:
+#            type: object
+#            properties:
+#              status:
+#                type: string
+#                enum: [accepted]
+#              message:
+#                type: string
+#                example: Tag refresh triggered immediately. Tags will be updated shortly.
+#              configId:
+#                type: string
+#              projectId:
+#                type: string
+#              importerType:
+#                type: string
+#                enum: [gitlab, jira, plane, github]
+#    403:
+#      description: Configuration does not belong to organization
+#    404:
+#      description: Configuration not found or project not mapped to configuration
+#      content:
+#        application/json:
+#          schema:
+#            type: object
+#            properties:
+#              status:
+#                type: string
+#                enum: [error]
+#              message:
+#                type: string
+#              error:
+#                type: string
+#                enum: [config_not_found, project_not_found]
+#              configId:
+#                type: string
+#              projectId:
+#                type: string
+###
+POST /organisations/:orgId/issue-importers/:configId/projects/:projectId/refresh-tags         controllers.IssueImporterConfigController.refreshTags(orgId: models.OrganisationId, configId: models.IssueImporterConfigId, projectId: models.ProjectId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Add project mapping to configuration (Organisation Admin only)
+#  operationId: addProjectMapping
+#  parameters:
+#    - name: orgId
+#      in: path
+#      required: true
+#      schema:
+#        type: string
+#        format: uuid
+#      description: Organisation ID
+#    - name: configId
+#      in: path
+#      required: true
+#      schema:
+#        type: string
+#      description: Importer configuration ID
+#  requestBody:
+#    required: true
+#    content:
+#      application/json:
+#        schema:
+#          $ref: '#/components/schemas/models.CreateProjectMapping'
+#  responses:
+#    200:
+#      description: project mapping added
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.IssueImporterConfigResponse'
+#    400:
+#      description: invalid request (missing required fields or validation failed)
+#    403:
+#      description: user not authorized (requires OrganisationAdministrator role)
+#    404:
+#      description: configuration not found
+###
+POST /organisations/:orgId/issue-importers/:configId/projects                                   controllers.IssueImporterConfigController.addProjectMapping(orgId: models.OrganisationId, configId: models.IssueImporterConfigId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Update project mapping in configuration (Organisation Admin only)
+#  operationId: updateProjectMapping
+#  parameters:
+#    - name: orgId
+#      in: path
+#      required: true
+#      schema:
+#        type: string
+#        format: uuid
+#      description: Organisation ID
+#    - name: configId
+#      in: path
+#      required: true
+#      schema:
+#        type: string
+#      description: Importer configuration ID
+#    - name: projectId
+#      in: path
+#      required: true
+#      schema:
+#        type: string
+#        format: uuid
+#      description: Project ID
+#  requestBody:
+#    required: true
+#    content:
+#      application/json:
+#        schema:
+#          $ref: '#/components/schemas/models.UpdateProjectMapping'
+#  responses:
+#    200:
+#      description: project mapping updated
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.IssueImporterConfigResponse'
+#    400:
+#      description: invalid request (missing required fields or validation failed)
+#    403:
+#      description: user not authorized (requires OrganisationAdministrator role)
+#    404:
+#      description: configuration not found or project not found in mapping
+###
+PUT /organisations/:orgId/issue-importers/:configId/projects/:projectId                         controllers.IssueImporterConfigController.updateProjectMapping(orgId: models.OrganisationId, configId: models.IssueImporterConfigId, projectId: models.ProjectId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Remove project mapping from configuration (Organisation Admin only)
+#  operationId: removeProjectMapping
+#  parameters:
+#    - name: orgId
+#      in: path
+#      required: true
+#      schema:
+#        type: string
+#        format: uuid
+#      description: Organisation ID
+#    - name: configId
+#      in: path
+#      required: true
+#      schema:
+#        type: string
+#      description: Importer configuration ID
+#    - name: projectId
+#      in: path
+#      required: true
+#      schema:
+#        type: string
+#        format: uuid
+#      description: Project ID
+#  responses:
+#    200:
+#      description: project mapping removed
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.IssueImporterConfigResponse'
+#    403:
+#      description: user not authorized (requires OrganisationAdministrator role)
+#    404:
+#      description: configuration not found or project not found in mapping
+###
+DELETE /organisations/:orgId/issue-importers/:configId/projects/:projectId                      controllers.IssueImporterConfigController.removeProjectMapping(orgId: models.OrganisationId, configId: models.IssueImporterConfigId, projectId: models.ProjectId)
+
+#######
 ####### Static Files #######
 #######
 

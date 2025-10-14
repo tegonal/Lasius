@@ -48,7 +48,7 @@ export const NavigationMenuTabs: React.FC = () => {
   }
 
   return (
-    <div className="h-full w-full px-6 pt-4">
+    <div className="h-full w-full px-2 pt-1 lg:px-4 lg:pt-4 xl:px-6 xl:pt-6">
       <IconTabs tabs={tabs} position="left" initialTab={getInitialTab()} />
     </div>
   )

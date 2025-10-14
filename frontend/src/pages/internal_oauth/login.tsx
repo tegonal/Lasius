@@ -43,7 +43,7 @@ import { formatISOLocale } from 'lib/utils/date/dates'
 import { GetServerSideProps, NextPage } from 'next'
 import { Trans, useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
-import { LASIUS_API_URL, LASIUS_DEMO_MODE } from 'projectConfig/constants'
+import { getLasiusApiUrl, getLasiusDemoMode } from 'projectConfig/constants'
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useCalendarActions } from 'stores/calendarStore'
@@ -89,7 +89,7 @@ const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig }> = ({ con
     // We need to use fetch here as on client side the
     // browser will automatically follow the redirect when resolving the
     // XHTMLRequest and return this result instead
-    const res = await fetch(LASIUS_API_URL + getLoginMutationKey()[0], {
+    const res = await fetch(getLasiusApiUrl() + getLoginMutationKey()[0], {
       method: 'POST',
       redirect: 'follow',
       body: JSON.stringify({
@@ -158,7 +158,7 @@ const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig }> = ({ con
           })}
         </Alert>
       )}
-      {LASIUS_DEMO_MODE === 'true' && (
+      {getLasiusDemoMode() === 'true' && (
         <Alert variant="info" className="animate-[fadeIn_0.4s_ease-out]">
           <div>
             <P>

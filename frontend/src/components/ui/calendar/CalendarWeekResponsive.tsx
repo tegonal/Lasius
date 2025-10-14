@@ -17,6 +17,7 @@
  *
  */
 
+import { CalendarDataProvider } from 'components/features/calendar/CalendarDataProvider'
 import { CalendarDay } from 'components/features/calendar/calendarDay'
 import { useCalendarNavigation } from 'components/features/calendar/hooks/useCalendarNavigation'
 import { useCalendarSelection } from 'components/features/calendar/hooks/useCalendarSelection'
@@ -53,71 +54,73 @@ export const CalendarWeekResponsive: React.FC = () => {
   if (!isClient) return null
 
   return (
-    <div className="flex min-w-0 items-center justify-center overflow-hidden">
-      <div className="flex flex-shrink-0 items-center justify-center pt-3">
-        <ButtonLeft
-          aria-label={t('calendar.navigation.previousWeek', { defaultValue: 'Previous week' })}
-          onClick={previous}
-        />
-      </div>
-      <div className="min-w-0 flex-1 overflow-hidden md:max-w-[500px]">
-        <div className="border-base-content/50 grid min-h-[22px] w-full grid-cols-3 border-b text-sm">
-          <div>
-            <FormatDate date={week[0]} format="monthNameLong" />
+    <CalendarDataProvider date={selectedDate || formatISOLocale(new Date())} period="week">
+      <div className="flex min-w-0 items-center justify-center overflow-hidden">
+        <div className="flex flex-shrink-0 items-center justify-center pt-3">
+          <ButtonLeft
+            aria-label={t('calendar.navigation.previousWeek', { defaultValue: 'Previous week' })}
+            onClick={previous}
+          />
+        </div>
+        <div className="min-w-0 flex-1 overflow-hidden md:max-w-[500px]">
+          <div className="border-base-content/50 grid min-h-[22px] w-full grid-cols-3 border-b text-sm">
+            <div>
+              <FormatDate date={week[0]} format="monthNameLong" />
+            </div>
+            {!isToday(new Date(selectedDay)) ? (
+              <Button
+                variant="unstyled"
+                size="xs"
+                aria-label={t('common.time.today', { defaultValue: 'Today' })}
+                onClick={selectToday}>
+                {t('common.time.today', { defaultValue: 'Today' })}
+              </Button>
+            ) : (
+              <div />
+            )}
+            <div className="text-right">
+              <FormatDate date={week[0]} format="year" />
+            </div>
           </div>
-          {!isToday(new Date(selectedDay)) ? (
-            <Button
-              variant="unstyled"
-              size="xs"
-              aria-label={t('common.time.today', { defaultValue: 'Today' })}
-              onClick={selectToday}>
-              {t('common.time.today', { defaultValue: 'Today' })}
-            </Button>
-          ) : (
-            <div />
-          )}
-          <div className="text-right">
-            <FormatDate date={week[0]} format="year" />
+          <div className="min-h-[82px] w-full overflow-x-auto">
+            <div className="relative">
+              <AnimateChange hash={week[0]}>
+                <div className="grid w-max grid-cols-[repeat(7,62px)] gap-1 sm:gap-2 md:w-full md:grid-cols-[repeat(7,1fr)] lg:gap-3">
+                  {week.map((day, index) => (
+                    <div
+                      key={day}
+                      ref={(el) => {
+                        dayRefs.current[index] = el
+                      }}
+                      className={cn(
+                        'relative',
+                        isDaySelected(day) ? 'text-neutral-content' : 'text-base-content',
+                      )}>
+                      <CalendarDay
+                        date={day}
+                        onClick={() => selectDay(day)}
+                        isSelected={isDaySelected(day)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </AnimateChange>
+              {/* Sliding indicator - outside AnimateChange */}
+              <SlidingIndicator
+                selectedIndex={week.findIndex((day) => isDaySelected(day))}
+                itemRefs={dayRefs}
+                radiusOn="bottom"
+              />
+            </div>
           </div>
         </div>
-        <div className="min-h-[82px] w-full overflow-x-auto">
-          <div className="relative">
-            <AnimateChange hash={week[0]}>
-              <div className="grid w-max grid-cols-[repeat(7,62px)] gap-1 sm:gap-2 md:w-full md:grid-cols-[repeat(7,1fr)] lg:gap-3">
-                {week.map((day, index) => (
-                  <div
-                    key={day}
-                    ref={(el) => {
-                      dayRefs.current[index] = el
-                    }}
-                    className={cn(
-                      'relative',
-                      isDaySelected(day) ? 'text-neutral-content' : 'text-base-content',
-                    )}>
-                    <CalendarDay
-                      date={day}
-                      onClick={() => selectDay(day)}
-                      isSelected={isDaySelected(day)}
-                    />
-                  </div>
-                ))}
-              </div>
-            </AnimateChange>
-            {/* Sliding indicator - outside AnimateChange */}
-            <SlidingIndicator
-              selectedIndex={week.findIndex((day) => isDaySelected(day))}
-              itemRefs={dayRefs}
-              radiusOn="bottom"
-            />
-          </div>
+        <div className="flex h-full flex-shrink-0 items-center justify-center pt-3">
+          <ButtonRight
+            aria-label={t('calendar.navigation.nextWeek', { defaultValue: 'Next week' })}
+            onClick={next}
+          />
         </div>
       </div>
-      <div className="flex h-full flex-shrink-0 items-center justify-center pt-3">
-        <ButtonRight
-          aria-label={t('calendar.navigation.nextWeek', { defaultValue: 'Next week' })}
-          onClick={next}
-        />
-      </div>
-    </div>
+    </CalendarDataProvider>
   )
 }

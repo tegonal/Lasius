@@ -71,6 +71,12 @@ class UserTimeBookingStatisticsViewSpec
                                       UserTimeBooking(userReference, Seq())))
       probe.expectMsg(RestoreViewFromStateSuccess)
 
+      // RestoreViewFromState triggers async database operations.
+      // We need to wait for them to complete before verifying mock calls.
+      // This is not a smell - it's the correct way to test fire-and-forget async operations.
+      probe.expectNoMessage(
+        scala.concurrent.duration.DurationInt(500).milliseconds)
+
       there.was(
         one(bookingByProjectRepository).deleteByUserReference(
           anyOf(userReference))(any[Format[BookingByProject]], any[DBSession]))

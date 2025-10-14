@@ -83,7 +83,7 @@ const Login: NextPage<{
           defaultValue: 'Authentication failed. Please try again.',
         })
       case 'SessionRequired':
-        return t('auth.errors.sessionRequired', {
+        return t('auth.errors.sessionRequired.message', {
           defaultValue: 'Please sign in to continue.',
         })
       case 'Callback':
@@ -271,7 +271,9 @@ const Login: NextPage<{
                 })}
               </p>
               <p className="text-base-content/70 text-center text-sm">
-                {t('help.contactAdmin', { defaultValue: 'Please contact your administrator' })}
+                {t('common.help.contactAdmin', {
+                  defaultValue: 'Please contact your administrator',
+                })}
               </p>
             </CardBody>
           </Card>

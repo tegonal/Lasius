@@ -24,17 +24,19 @@ import { cn } from 'lib/utils/cn'
 import React, { Fragment } from 'react'
 
 const modalContainerVariants = cva(
-  'bg-base-100 text-base-content mx-2 rounded-lg p-6 shadow-lg md:mx-0 md:p-8',
+  'bg-base-100 text-base-content relative mx-2 rounded-lg p-6 shadow-lg md:mx-0 md:p-8',
   {
     variants: {
       size: {
-        default: 'w-full max-w-full md:w-4/5 md:max-w-[500px]',
-        wide: 'h-[90vh] w-full max-w-full md:w-4/5 md:max-w-[700px]',
+        md: 'w-full max-w-full md:w-4/5 md:max-w-[500px]',
+        lg: 'h-[90vh] w-full max-w-full md:w-4/5 md:max-w-[700px]',
+        xl: 'h-[90vh] w-full max-w-full md:w-4/5 md:max-w-[900px]',
+        '2xl': 'h-[90vh] w-full max-w-full md:w-4/5 md:max-w-[1200px]',
         auto: 'h-auto w-full max-w-full md:w-auto md:max-w-[80%]',
       },
     },
     defaultVariants: {
-      size: 'default',
+      size: 'md',
     },
   },
 )
@@ -70,7 +72,7 @@ export const Modal: React.FC<Props> = ({
     }
   }
 
-  const modalSize = autoSize ? 'auto' : size || 'default'
+  const modalSize = autoSize ? 'auto' : size || 'md'
 
   return (
     <Transition show={open} as={Fragment}>

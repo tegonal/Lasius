@@ -9,6 +9,7 @@ package-lock.json
 dump
 .history
 .env.local
+**/*_old.json
 
 # PWA files
 **/public/sw.js
@@ -25,6 +26,8 @@ CLAUDE.md
 /.serena
 /.claude
 /.playwright*
+.clauderc
+.mcp.json
 
 # Migration files
 **/*.backup

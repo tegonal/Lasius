@@ -20,7 +20,10 @@
 import React from 'react'
 
 type Props = {
-  children: React.ReactNode
+  children?: React.ReactNode
+  className?: string
 }
 
-export const Ol: React.FC<Props> = ({ children }) => <ol>{children}</ol>
+export const Ol: React.FC<Props> = ({ children, className = '' }) => (
+  <ol className={`mt-2 list-inside list-decimal space-y-1 ${className}`}>{children}</ol>
+)

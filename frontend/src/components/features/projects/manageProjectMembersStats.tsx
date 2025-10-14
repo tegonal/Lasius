@@ -18,8 +18,7 @@
  */
 
 import { Button } from 'components/primitives/buttons/Button'
-import { StatsGroup } from 'components/ui/data-display/StatsGroup'
-import { StatsTileNumber } from 'components/ui/data-display/StatsTileNumber'
+import { ModalDescription } from 'components/ui/overlays/modal/ModalDescription'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
 
@@ -32,14 +31,13 @@ export const ManageProjectMembersStats: React.FC<Props> = ({ memberCount, onInvi
   const { t } = useTranslation('common')
 
   return (
-    <div className="bg-base-200 flex items-start justify-between gap-4 p-4">
-      <StatsGroup>
-        <StatsTileNumber
-          value={memberCount}
-          label={t('projects.members.title', { defaultValue: 'Project members' })}
-          standalone={false}
-        />
-      </StatsGroup>
+    <div className="mb-4 flex items-center justify-between gap-4">
+      <ModalDescription>
+        {t('members.description', {
+          defaultValue: 'This project has {{count}} member(s).',
+          count: memberCount,
+        })}
+      </ModalDescription>
       <Button onClick={onInvite} size="sm" fullWidth={false} className="w-auto" variant="neutral">
         {t('members.actions.invite', { defaultValue: 'Invite someone' })}
       </Button>

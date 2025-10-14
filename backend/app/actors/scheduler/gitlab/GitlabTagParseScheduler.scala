@@ -42,10 +42,15 @@ object GitlabTagParseScheduler {
                             settings: GitlabSettings,
                             projectSettings: GitlabProjectSettings,
                             auth: ServiceAuthentication,
+                            configId: IssueImporterConfigId,
+                            organisationId: OrganisationId,
                             projectId: ProjectId)
   case class StopScheduler(uuid: UUID)
+  case class StopProjectScheduler(configId: IssueImporterConfigId,
+                                  projectId: ProjectId)
   case object StopAllSchedulers
   case class SchedulerStarted(uuid: UUID)
+  case class RefreshTags(configId: IssueImporterConfigId, projectId: ProjectId)
 }
 
 class GitlabTagParseScheduler(wsClient: WSClient,
@@ -53,7 +58,8 @@ class GitlabTagParseScheduler(wsClient: WSClient,
     extends Actor
     with ActorLogging {
   import GitlabTagParseScheduler._
-  var workers: Map[UUID, ActorRef] = Map()
+  var workers: Map[UUID, ActorRef]                                      = Map()
+  var projectWorkers: Map[(IssueImporterConfigId, ProjectId), ActorRef] = Map()
 
   override val supervisorStrategy: OneForOneStrategy =
     OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1.minute) {
@@ -61,7 +67,13 @@ class GitlabTagParseScheduler(wsClient: WSClient,
     }
 
   val receive: Receive = {
-    case StartScheduler(config, settings, projectSettings, auth, projectId) =>
+    case StartScheduler(config,
+                        settings,
+                        projectSettings,
+                        auth,
+                        configId,
+                        organisationId,
+                        projectId) =>
       log.debug(
         s"StartScheduler: $config, $auth, $projectId, ${projectSettings.gitlabProjectId}")
       val uuid = UUID.randomUUID
@@ -72,8 +84,11 @@ class GitlabTagParseScheduler(wsClient: WSClient,
                                    settings,
                                    projectSettings,
                                    auth,
+                                   configId,
+                                   organisationId,
                                    projectId))
-      workers += uuid -> ref
+      workers += uuid                         -> ref
+      projectWorkers += (configId, projectId) -> ref
       ref ! StartParsing
       sender() ! SchedulerStarted(uuid)
     case StopScheduler(uuid) =>
@@ -82,6 +97,8 @@ class GitlabTagParseScheduler(wsClient: WSClient,
         .get(uuid)
         .map { worker =>
           log.debug(s"Stopping worker with uuid:$uuid")
+          // Remove from projectWorkers map
+          projectWorkers = projectWorkers.filter(_._2 != worker)
           worker ! PoisonPill
           workers - uuid
         }
@@ -90,5 +107,34 @@ class GitlabTagParseScheduler(wsClient: WSClient,
     case StopAllSchedulers =>
       log.debug("Stopping all workers")
       workers.map { case (_, worker) => worker ! PoisonPill }
+      projectWorkers = Map()
+
+    case StopProjectScheduler(configId, projectId) =>
+      log.debug(
+        s"StopProjectScheduler: configId=$configId, projectId=$projectId")
+      projectWorkers.get((configId, projectId)) match {
+        case Some(worker) =>
+          log.debug(
+            s"Stopping worker for configId=$configId, projectId=$projectId")
+          worker ! PoisonPill
+          projectWorkers -= ((configId, projectId))
+          // Also remove from workers map
+          workers = workers.filter(_._2 != worker)
+        case None =>
+          log.warning(
+            s"No worker found for configId=$configId, projectId=$projectId")
+      }
+
+    case RefreshTags(configId, projectId) =>
+      log.debug(s"RefreshTags: configId=$configId, projectId=$projectId")
+      projectWorkers.get((configId, projectId)) match {
+        case Some(worker) =>
+          log.debug(
+            s"Found worker for project $projectId, sending Parse message")
+          worker ! GitlabTagParseWorker.Parse
+        case None =>
+          log.warning(
+            s"No worker found for configId=$configId, projectId=$projectId")
+      }
   }
 }

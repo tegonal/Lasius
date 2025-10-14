@@ -5,12 +5,6 @@
     "errors": {
       "passwordUpdateFailed": "Password update failed. Make sure you entered your current password and that it is correct."
     },
-    "languageSettings": {
-      "description": "Choose your preferred language for the interface. This setting is stored locally in your browser.",
-      "save": "Save Language Preference",
-      "selectLanguage": "Interface Language",
-      "title": "Language Preferences"
-    },
     "profileChangesNotAllowedInDemo": "Profile changes are not allowed in demo mode",
     "profileSettings": {
       "description": "Manage your personal information and account details.",
@@ -29,6 +23,9 @@
     },
     "title": "Account"
   },
+  "actions": {
+    "close": "Close"
+  },
   "app": {
     "name": "Lasius"
   },
@@ -45,14 +42,52 @@
     "createYourAccount": "Create your account",
     "enterEmailAndPassword": "Enter your email and password to access your account",
     "errors": {
+      "accessDenied": {
+        "message": "You do not have permission to sign in. Please contact your administrator.",
+        "title": "Access Denied"
+      },
+      "backToLogin": "Back to Login",
       "callback": "Authentication callback failed. Please try again.",
+      "configuration": {
+        "message": "There is a problem with the server configuration. Please contact your administrator.",
+        "title": "Configuration Error"
+      },
+      "credentials": {
+        "message": "The credentials you provided are incorrect. Please try again.",
+        "title": "Sign In Failed"
+      },
       "credentialsMissing": "Username or password missing",
+      "default": {
+        "message": "An error occurred during authentication. Please try again.",
+        "title": "Authentication Error"
+      },
+      "email": {
+        "message": "Could not send sign-in email. Please try again later.",
+        "title": "Email Error"
+      },
+      "errorCode": "Error code",
       "fetchProfileFailed": "Your session has expired. Please log in again.",
       "general": "Authentication error: {error}",
+      "oauth": {
+        "message": "An error occurred during OAuth authentication. Please try again or use a different sign-in method.",
+        "title": "OAuth Error"
+      },
       "oauthCallback": "Authentication failed. Please try again.",
+      "persistentIssue": "If this issue persists, please contact your administrator.",
       "registerUnknown": "Unknown registration error",
-      "sessionRequired": "Please sign in to continue.",
+      "sessionRequired": {
+        "message": "Please sign in to continue.",
+        "title": "Session Required"
+      },
+      "unknown": {
+        "message": "An unexpected error occurred during authentication.",
+        "title": "Authentication Error"
+      },
       "userAlreadyRegistered": "User already registered",
+      "verification": {
+        "message": "The verification token has expired or has already been used. Please try signing in again.",
+        "title": "Verification Failed"
+      },
       "wrongPasswordOrEmail": "Wrong password or email. Please try again."
     },
     "fillDetailsToStart": "Please fill in your details to get started",
@@ -74,6 +109,9 @@
     "signIn": "Sign in",
     "signInTitle": "Sign in to your account",
     "signInToLasius": "Sign in to Lasius",
+    "status": {
+      "authenticationFailed": "Authentication failed. Please log in again."
+    },
     "tagline": "Open source time tracking for modern teams",
     "thankYouForRegistering": "Thank you for registering! You can now log in using your email address and password. Welcome to Lasius!",
     "welcomeBack": "Welcome back",
@@ -129,6 +167,7 @@
     "status": {
       "added": "Booking added",
       "currentlyNotBooking": "Currently not booking",
+      "historyCleared": "Booking history cleared",
       "removed": "Booking removed",
       "started": "Booking started",
       "updated": "Booking updated"
@@ -198,7 +237,10 @@
       "password": "Password",
       "role": "Role"
     },
-    "help": "Help",
+    "help": {
+      "buttonLabel": "Help",
+      "contactAdmin": "Please contact your administrator"
+    },
     "info": {
       "helpFallbackLanguage": "This help content is not available in your selected language yet. Showing English version."
     },
@@ -217,8 +259,7 @@
     "themes": {
       "dark": "Dark",
       "light": "Light",
-      "system": "System",
-      "title": "Theme"
+      "system": "System"
     },
     "time": {
       "day": "Day",
@@ -249,17 +290,17 @@
     },
     "user": "User",
     "validation": {
-      "emailInvalid": "Must be a valid email address",
+      "emailInvalid": "Invalid email address",
       "endBeforeStart": "End time is before start time",
       "fromMustBeBeforeTo": "Must be before the \"to\" date",
-      "missingNumber": "Missing number digit",
+      "missingNumber": "Must contain a number",
       "missingSpecialChar": "Missing special character",
-      "missingUppercase": "Missing uppercase character",
+      "missingUppercase": "Must contain uppercase letter",
       "mustBeAfterStart": "Must be after start",
       "mustBeBeforeEnd": "Must be before end",
       "mustBeInPast": "Must be in the past",
-      "passwordMismatch": "Passwords don't match",
-      "passwordTooShort": "Must be at least 8 characters",
+      "passwordMismatch": "Passwords do not match",
+      "passwordTooShort": "Minimum 9 characters",
       "required": "Required",
       "toMustBeAfterFrom": "Must be after the \"from\" date",
       "wrongFormat": "Wrong format"
@@ -274,9 +315,6 @@
   },
   "demo": {
     "welcome": "Welcome to the Lasius demo instance. Use \"demo1@lasius.ch\" and password \"demo\" to log in and have a look around. The demo instance is reset once a day."
-  },
-  "errors": {
-    "dataFetchFailed": "So sorry, but the data could not be retrieved due to an error."
   },
   "export": {
     "actions": {
@@ -323,10 +361,17 @@
   },
   "footer": {
     "developedBy": "Developed by <0>Tegonal</0>, available on <1>GitHub</1>, released under <2>AGPL 3.0</2>",
-    "feedbackOnGithub": "We appreciate your feedback. Please leave a comment on <0>GitHub</0>"
+    "feedbackOnGithub": "We appreciate your feedback. Please leave a comment on <0>GitHub</0>",
+    "github": {
+      "title": "Find issues, post feedback and get the source code on GitHub"
+    },
+    "tegonal": {
+      "title": "Lasius is developed and maintained by Tegonal Cooperative and released under AGPL 3.0"
+    }
   },
-  "help": {
-    "contactAdmin": "Please contact your administrator"
+  "help": "Help",
+  "integrations": {
+    "title": "Integrations"
   },
   "invitations": {
     "actions": {
@@ -338,15 +383,41 @@
     "description": {
       "copyLink": "Copy the link and send it to your colleague. If they do not have an account yet, one will be created when the invitation is accepted."
     },
+    "email": "Email",
     "errors": {
       "createdForSomeoneElse": "This invitation has been created for someone else. Either log out and refresh, or forward the invitation link to the user {{email}}",
       "noLongerValid": "This invitation is no longer valid. It is best to contact the person who sent you the invitation link to get a new one."
     },
-    "inviteByEmail": "Invite by E-Mail",
+    "inviteOrganisationDescription": "Enter the email address of the person you want to invite. An invitation link will be generated that you can send to them.",
+    "inviteProjectDescription": "Enter the email address of the person you want to invite. An invitation link will be generated that you can send to them.",
     "messages": {
       "invitedToOrganisation": "You have been invited by {{inviter}} to join organisation {{organisation}}.",
       "invitedToProject": "You have been invited by {{inviter}} to join project {{project}}.",
       "selectOrganisation": "Select the organisation you would like to add this project to:"
+    },
+    "title": {
+      "invitationCreated": "Invitation created",
+      "userAssigned": "User assigned"
+    }
+  },
+  "issueImporters": {
+    "typeLabels": {
+      "github": "GitHub",
+      "gitlab": "GitLab",
+      "jira": "Jira",
+      "plane": "Plane"
+    },
+    "validation": {
+      "accessTokenRequired": "Access token is required",
+      "apiKeyRequired": "API key is required",
+      "baseUrlRequired": "Base URL is required",
+      "consumerKeyRequired": "Consumer key is required",
+      "invalidUrl": "Invalid URL",
+      "maxInterval": "Maximum 24 hours",
+      "minInterval": "Minimum 1 minute",
+      "nameRequired": "Name is required",
+      "privateKeyRequired": "Private key is required",
+      "resourceOwnerRequired": "Resource owner is required"
     }
   },
   "lists": {
@@ -363,6 +434,8 @@
       "removeTitle": "Remove member",
       "removeWarning": "This member will be removed from the organisation and lose access to all projects."
     },
+    "description_one": "This project has {{count}} member(s).",
+    "description_other": "This project has {{count}} member(s).",
     "empty": "No members found"
   },
   "navigation": {
@@ -398,6 +471,7 @@
       "title": "Let's Get You Started",
       "workingHours": "Set working hours for this organization"
     },
+    "closeTutorial": "Close tutorial",
     "confirmClose": "Are you sure you want to close the tutorial? You can re-enable it in App Settings.",
     "navigation": {
       "importantUI": "Important UI Elements",
@@ -475,6 +549,10 @@
     "adminDescription": "You are an administrator of this organisation. You can add and remove members and change the organisation name, or create a new one.",
     "createDescription": "Use the Actions menu to create a new organisation.",
     "currentOrganisation": "Current organisation",
+    "description": {
+      "create": "Create a new organisation to collaborate with your team.",
+      "edit": "Update the organisation name."
+    },
     "errors": {
       "duplicateKey": "An organisation with this name already exists",
       "saveFailed": "Failed to save organisation"
@@ -494,11 +572,11 @@
     "status": {
       "created": "Organisation created",
       "updated": "Organisation updated"
-    },
-    "title": "Organisations"
+    }
   },
   "projects": {
     "actions": {
+      "add": "Add Project",
       "create": "Create a project",
       "deactivate": "Deactivate project",
       "edit": "Edit project",
@@ -507,13 +585,16 @@
     "allProjects": "All projects",
     "allProjectsDescription": "All projects in the current organisation that you can administer. Create billing reports including time booked by external project members.",
     "confirmations": {
-      "deactivate": "Are you sure you want to deactivate this project?",
       "deactivateInstructions": "To confirm, please type the project name below:",
       "deactivateTitle": "Deactivate project",
       "deactivateWarning": "This action cannot be undone. The project will be permanently archived and all user assignments will be removed. You will not be able to reactivate this project.",
       "leave": "Are you sure you want to leave this project?"
     },
     "deactivatedBy": "Archived by {{user}}",
+    "description": {
+      "add": "Create a new project to organize your time tracking.",
+      "edit": "Update the project details."
+    },
     "empty": "No projects found",
     "errors": {
       "duplicateKey": "A project with this name already exists",
@@ -529,9 +610,6 @@
     },
     "label": "Project",
     "lastActivity": "Last activity",
-    "members": {
-      "title": "Project members"
-    },
     "myProjects": "My projects",
     "myProjectsDescription": "Projects where you are a member and can book time, filtered by the current organisation.",
     "name": "Project name",
@@ -541,6 +619,7 @@
     "selectProject": "Select project",
     "status": {
       "assignedToUser": "Project successfully assigned to user.",
+      "created": "Project created",
       "updated": "Project updated"
     },
     "title": "Projects",
@@ -554,10 +633,8 @@
   },
   "pwa": {
     "reloadApplication": "Reload application",
+    "updateAvailable": "Update available",
     "updateMessage": "Lasius has been updated. The page will reload after your confirmation."
-  },
-  "search": {
-    "empty": "No results found"
   },
   "settings": {
     "app": {
@@ -584,11 +661,14 @@
     "empty": "No data available for the selected period"
   },
   "system": {
+    "backend": "Backend",
     "backendUnreachable": "Backend seems to be unreachable",
     "connectedToBackend": "Connected to backend",
     "connectingToBackend": "Connecting to backend",
+    "connectionStatus": "Connection status",
     "noInternetConnection": "No Internet connection. Please make sure that your device is connected to the Internet.",
-    "offlineMessage": "Lasius is currently offline or undergoing maintenance. We will be back shortly."
+    "offlineMessage": "Lasius is currently offline or undergoing maintenance. We will be back shortly.",
+    "websocket": "WebSocket"
   },
   "tags": {
     "actions": {
@@ -608,7 +688,6 @@
     "confirmDeleteGroup": "Are you sure you want to delete the tag group \"{{groupName}}\"?",
     "customTag": "Custom tag",
     "enterTagName": "Enter tag name",
-    "enterToAdd": "Enter a tag to add it",
     "label": "Tags",
     "noTagGroups": "No tag groups defined yet",
     "simpleTags": "Simple tags",
@@ -631,7 +710,8 @@
     "actions": {
       "accept": "Accept Terms of Service",
       "reject": "Reject and logout"
-    }
+    },
+    "title": "Terms of Service (version {{version}})"
   },
   "ui": {
     "hidePasswords": "Hide passwords",
@@ -648,7 +728,21 @@
     }
   },
   "validation": {
-    "startMustBeInPast": "Start time must be in the past"
+    "confirmPasswordRequired": "Please confirm your password",
+    "emailInvalid": "Invalid email address",
+    "emailRequired": "Email is required",
+    "firstNameRequired": "First name is required",
+    "languageRequired": "Language is required",
+    "lastNameRequired": "Last name is required",
+    "missingNumber": "Must contain a number",
+    "missingUppercase": "Must contain uppercase letter",
+    "organisationNameRequired": "Organisation name is required",
+    "passwordMismatch": "Passwords do not match",
+    "passwordRequired": "Password is required",
+    "passwordTooShort": "Minimum 9 characters",
+    "projectKeyRequired": "Project name is required",
+    "startMustBeInPast": "Start time must be in the past",
+    "themeRequired": "Theme is required"
   },
   "websocket": {
     "status": {
@@ -672,21 +766,16 @@
     "thisWeek": "this week"
   },
   "workingHours": {
-    "clickToAdjustHours": "Click any day below to adjust working hours",
     "dailyTotal": "Daily Total",
     "description": "The amount of time you expect to book per day, by organisation, during a typical working week. This data is used to calculate your daily and weekly progress.",
     "errors": {
       "updateFailed": "Failed to update working hours"
     },
-    "perWeek": "per week",
-    "setHoursDescription": "Set your working hours for each day",
     "status": {
       "updated": "Working hours updated"
     },
     "summary": "Summary",
     "title": "Working hours",
-    "totalHoursDescription": "Total hours across all organisations",
-    "totalPerWeek": "total per week",
-    "weeklyHoursSummary": "Weekly Hours Summary"
+    "totalPerWeek": "total per week"
   }
 }

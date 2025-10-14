@@ -19,12 +19,14 @@
 
 import { DEFAULT_LOCALE, LOCALE_COOKIE_NAME } from 'lib/config/locales'
 import NextDocument, { DocumentContext, Head, Html, Main, NextScript } from 'next/document'
-import { BUILD_ID, ENVIRONMENT } from 'projectConfig/constants'
 import React from 'react'
+
+import type { RuntimeConfig } from 'projectConfig/constants'
 
 class MyDocument extends NextDocument {
   static async getInitialProps(ctx: DocumentContext) {
     const initialProps = await NextDocument.getInitialProps(ctx)
+
     // Without i18n config, we must read locale from cookie or header
     const locale =
       (ctx.req?.headers['x-middleware-request-locale'] as string) ||
@@ -35,12 +37,26 @@ class MyDocument extends NextDocument {
         ?.trim() ||
       DEFAULT_LOCALE
 
-    return { ...initialProps, locale }
+    // Build runtime config from process.env (server-side only)
+    const runtimeConfig: RuntimeConfig = {
+      LASIUS_API_URL: process.env.LASIUS_API_URL || '',
+      LASIUS_API_WEBSOCKET_URL: process.env.LASIUS_API_WEBSOCKET_URL || '',
+      LASIUS_PUBLIC_URL: process.env.NEXTAUTH_URL || 'http://localhost:3000',
+      LASIUS_TELEMETRY_PLAUSIBLE_HOST: process.env.LASIUS_TELEMETRY_PLAUSIBLE_HOST || '',
+      LASIUS_TELEMETRY_PLAUSIBLE_SOURCE_DOMAIN:
+        process.env.LASIUS_TELEMETRY_PLAUSIBLE_SOURCE_DOMAIN || '',
+      LASIUS_DEMO_MODE: process.env.LASIUS_DEMO_MODE || 'false',
+      LASIUS_TERMSOFSERVICE_VERSION: process.env.LASIUS_TERMSOFSERVICE_VERSION || '',
+      LASIUS_VERSION: process.env.LASIUS_VERSION || 'dev',
+      ENVIRONMENT: process.env.ENVIRONMENT || 'development',
+    }
+
+    return { ...initialProps, locale, runtimeConfig }
   }
 
   render() {
-    // Type assertion to access locale from props
-    const { locale } = this.props as any
+    // Type assertion to access custom props
+    const { locale, runtimeConfig } = this.props as any
 
     return (
       <Html lang={locale}>
@@ -61,13 +77,19 @@ class MyDocument extends NextDocument {
           <link rel="apple-touch-icon" sizes="152x152" href="/icon-310x310.png" />
           <link rel="apple-touch-icon" sizes="167x167" href="/icon-310x310.png" />
           <meta httpEquiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
-          <meta name="build-id" content={`${BUILD_ID}`} />
-          <meta name="environment" content={`${ENVIRONMENT}`} />
+          <meta name="lasius-version" content={runtimeConfig?.LASIUS_VERSION || 'dev'} />
+          <meta name="environment" content={runtimeConfig?.ENVIRONMENT || 'development'} />
+          {/* Inject runtime config into window object */}
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `window.ENV = ${JSON.stringify(runtimeConfig || {})};`,
+            }}
+          />
           {/* Script to initialize DaisyUI/Tailwind theme before render to avoid FOUC */}
           <script
             dangerouslySetInnerHTML={{
               __html: `
-                (function() { 
+                (function() {
                   try {
                     // Check for saved theme in localStorage
                     var savedTheme = localStorage.getItem('theme');

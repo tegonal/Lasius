@@ -30,9 +30,9 @@ type Props = {
 export const FavoriteItem: React.FC<Props> = ({ item }) => {
   return (
     <div className="border-base-content/20 flex flex-row items-center justify-between gap-2 border-b px-2 py-2">
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col">
         <BookingName item={item} />
-        <TagList items={item.tags} />
+        <TagList items={item.tags} width="sm" />
       </div>
       <div className="flex-shrink-0">
         <FavoriteItemContext item={item} />

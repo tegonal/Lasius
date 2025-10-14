@@ -146,7 +146,7 @@ export const useUIStore = create<UIStore>()(
 
               // Escape hatch: detect negative counter and reset
               if (state.globalLoadingCounter < 0) {
-                logger.warn(
+                logger.info(
                   '[UIStore] globalLoadingCounter went negative. This indicates mismatched show/hide calls. Resetting to 0.',
                   { counter: state.globalLoadingCounter },
                 )
@@ -158,7 +158,7 @@ export const useUIStore = create<UIStore>()(
                 setTimeout(() => {
                   const currentCounter = useUIStore.getState().globalLoadingCounter
                   if (currentCounter > 0 && currentCounter <= 3) {
-                    logger.warn(
+                    logger.info(
                       '[UIStore] globalLoadingCounter appears stuck. Auto-resetting after timeout.',
                       { counter: currentCounter },
                     )

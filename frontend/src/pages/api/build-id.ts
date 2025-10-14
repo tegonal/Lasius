@@ -18,15 +18,21 @@
  */
 
 import { NextApiRequest, NextApiResponse } from 'next'
-import { BUILD_ID } from 'projectConfig/constants'
 
 export type BuildIdResponse = {
   buildId: string
 }
 
+/**
+ * Returns the current Lasius version from the LASIUS_VERSION environment variable.
+ * Used by clients to detect version skew (when a new version is deployed
+ * but the client still has the old bundle loaded).
+ */
 const handler = (_req: NextApiRequest, res: NextApiResponse): void => {
+  const buildId = process.env.LASIUS_VERSION || 'dev'
+
   res.status(200).json({
-    buildId: BUILD_ID,
+    buildId,
   })
 }
 

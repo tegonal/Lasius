@@ -72,32 +72,30 @@ export const BookingCurrentEntry: React.FC<Props> = ({ inContainer = false }) =>
   }
 
   return (
-    <AnimateChange hash={`${!data?.booking}`} useAvailableSpace>
+    <AnimateChange hash={`${!data?.booking}`}>
       {!data?.booking ? (
         <BookingCurrentNoBooking />
       ) : (
-        <div className="flex h-full w-full flex-row items-center justify-between gap-2 lg:gap-4">
-          <div className="flex flex-row items-center justify-start gap-2 lg:gap-3">
-            <Button
-              onClick={stop}
-              variant="stopRecording"
-              title={t('bookings.actions.stopRecording', {
-                defaultValue: 'Stop recording current time booking',
-              })}
-              fullWidth={false}>
-              <LucideIcon icon={Square} size={24} />
-            </Button>
-            <div
-              className={cn(
-                'flex flex-col gap-1 leading-normal',
-                !inContainer && 'cursor-pointer hover:opacity-80',
-              )}
-              onClick={handleClick}>
-              <BookingName item={data.booking} />
-              <TagList items={data.booking.tags} />
-            </div>
+        <div className="grid h-full w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 lg:gap-4">
+          <Button
+            onClick={stop}
+            variant="stopRecording"
+            title={t('bookings.actions.stopRecording', {
+              defaultValue: 'Stop recording current time booking',
+            })}
+            fullWidth={false}>
+            <LucideIcon icon={Square} size={24} />
+          </Button>
+          <div
+            className={cn(
+              'flex w-full min-w-0 flex-col gap-1 overflow-hidden leading-normal',
+              !inContainer && 'cursor-pointer hover:opacity-80',
+            )}
+            onClick={handleClick}>
+            <BookingName item={data.booking} />
+            <TagList items={data.booking.tags} />
           </div>
-          <div className="flex flex-shrink-0 flex-row items-center justify-center gap-2 lg:gap-4">
+          <div className="flex flex-row items-center justify-center gap-2 lg:gap-4">
             <div className="hidden h-full flex-row items-center justify-start gap-2 md:flex lg:gap-4">
               <BookingFrom startDate={data.booking.start?.dateTime} />
               <BookingDurationCounter

@@ -28,7 +28,6 @@ import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { X } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
-import { serialize } from 'next-mdx-remote/serialize'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import { useHelpStore } from 'stores/helpStore'
@@ -121,12 +120,12 @@ export const HelpDrawer: React.FC = () => {
         const helpFileName = customHelpFile || routeToHelpFile(router.pathname)
         const locale = i18n.language
 
-        // Try to fetch the localized help file
-        let response = await fetch(`/help/${locale}/${helpFileName}.mdx`)
+        // Try to fetch the compiled MDX from API route
+        let response = await fetch(`/api/help/${locale}/${helpFileName}`)
 
         // If not found and locale is not 'en', try English fallback
         if (!response.ok && locale !== 'en') {
-          response = await fetch(`/help/en/${helpFileName}.mdx`)
+          response = await fetch(`/api/help/en/${helpFileName}`)
           if (response.ok) {
             setIsFallbackLanguage(true)
           }
@@ -136,8 +135,8 @@ export const HelpDrawer: React.FC = () => {
           throw new Error('Help file not found')
         }
 
-        const mdxText = await response.text()
-        const mdxResult = await serialize(mdxText)
+        // API route returns pre-compiled MDX
+        const mdxResult = await response.json()
         setMdxSource(mdxResult)
       } catch {
         setError(true)

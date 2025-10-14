@@ -167,7 +167,7 @@ export const InputTagsAdmin2: React.FC<Props> = ({
               setShowAddModal(false)
               setInputText('')
             }}>
-            {t('common.actions.cancel', { defaultValue: 'Cancel' })}
+            {t('common.actions.close', { defaultValue: 'Close' })}
           </Button>
         </ButtonGroup>
       </Modal>

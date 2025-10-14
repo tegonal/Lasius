@@ -119,7 +119,7 @@ export const BookingItemContext: React.FC<Props> = ({ item }) => {
         <AnimatePresence>
           {currentOpenContextMenuId === item.id && (
             <ContextAnimatePresence>
-              <ContextBar>
+              <ContextBar className="-mr-4">
                 <ContextButtonStartBooking item={item} />
                 <ContextButtonWrapper>
                   <Button

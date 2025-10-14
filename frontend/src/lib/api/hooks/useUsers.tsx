@@ -18,8 +18,8 @@
  */
 
 import { SelectAutocompleteSuggestionType } from 'components/ui/forms/input/InputSelectAutocomplete'
+import { orderBy } from 'es-toolkit'
 import { useGetOrganisationUserList } from 'lib/api/lasius/organisations/organisations'
-import { orderBy } from 'lodash'
 
 /**
  * Hook for managing user data and suggestions

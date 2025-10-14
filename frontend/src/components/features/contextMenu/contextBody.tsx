@@ -25,7 +25,7 @@ const contextBodyVariants = cva('flex items-center', {
   variants: {
     variant: {
       default: '',
-      compact: 'relative h-full justify-center pl-2',
+      compact: 'relative h-full justify-center',
     },
   },
   defaultVariants: {

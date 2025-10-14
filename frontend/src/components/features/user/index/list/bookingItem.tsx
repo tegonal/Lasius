@@ -56,17 +56,17 @@ export const BookingItem: React.FC<Props> = ({ item, nextItem }) => {
   return (
     <div
       className={cn(
-        'relative flex flex-row items-center justify-between gap-2 px-2 py-3 md:px-4',
+        'relative grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-2 py-3 md:gap-4 md:px-4',
         item.overlapsWithNext
           ? 'border-warning border-b-4 border-dotted'
           : 'border-base-content/20 border-b',
         item.isMostRecent && 'border-base-content/20 border-t',
       )}>
-      <div className="flex flex-col gap-1">
+      <div className="flex w-full min-w-0 flex-col gap-3">
         <BookingName item={item} />
         <TagList items={item.tags} />
       </div>
-      <div className="flex h-full flex-shrink-0 flex-row items-center justify-start gap-3 md:gap-4">
+      <div className="flex h-full flex-row items-center justify-start gap-3 md:gap-4">
         <div className="hidden h-full flex-row items-center justify-start gap-2 md:flex md:gap-4">
           <BookingFromTo item={item} />
           <BookingDuration item={item} />

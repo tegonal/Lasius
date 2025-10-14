@@ -21,7 +21,7 @@ import { ContextButtonWrapper } from 'components/features/contextMenu/contextBut
 import { useContextMenu } from 'components/features/contextMenu/hooks/useContextMenu'
 import { Button } from 'components/primitives/buttons/Button'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
-import { ModalConfirm } from 'components/ui/overlays/modal/modalConfirm'
+import { GenericConfirmModal } from 'components/ui/overlays/modal/GenericConfirmModal'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { useProfile } from 'lib/api/hooks/useProfile'
 import { ModelsUserProject } from 'lib/api/lasius'
@@ -43,10 +43,11 @@ export const ContextButtonLeaveProject: React.FC<Props> = ({ variant = 'default'
 
   const handleConfirm = async () => {
     await removeProjectUser(selectedOrganisationId, item.projectReference.id, userId)
+    setShowDialog(false)
     handleCloseAll()
   }
 
-  const handleCancel = async () => {
+  const handleCancel = () => {
     setShowDialog(false)
   }
 
@@ -64,14 +65,18 @@ export const ContextButtonLeaveProject: React.FC<Props> = ({ variant = 'default'
         <LucideIcon icon={LogOut} size={24} />
       </Button>
       {showDialog && (
-        <ModalConfirm
-          text={{
-            action: t('projects.confirmations.leave', {
-              defaultValue: 'Are you sure you want to leave this project?',
-            }),
-          }}
+        <GenericConfirmModal
+          open={showDialog}
+          onClose={handleCancel}
           onConfirm={handleConfirm}
-          onCancel={handleCancel}
+          title={t('projects.actions.leave', { defaultValue: 'Leave this project' })}
+          message={t('projects.confirmations.leave', {
+            defaultValue: 'Are you sure you want to leave this project?',
+          })}
+          confirmLabel={t('projects.actions.leave', { defaultValue: 'Leave this project' })}
+          cancelLabel={t('common.actions.cancel', { defaultValue: 'Cancel' })}
+          confirmVariant="primary"
+          blockViewport
         />
       )}
     </ContextButtonWrapper>

@@ -17,30 +17,30 @@
  *
  */
 
-import { ModalConfirm } from 'components/ui/overlays/modal/modalConfirm'
+import { GenericConfirmModal } from 'components/ui/overlays/modal/GenericConfirmModal'
 import { nextJsAxiosInstance } from 'lib/api/nextJsAxiosInstance'
 import { logger } from 'lib/logger'
 import { useTranslation } from 'next-i18next'
 import { BuildIdResponse } from 'pages/api/build-id'
-import { BUILD_ID } from 'projectConfig/constants'
-import { LOCAL_VERSION_CHECK_INTERVAL } from 'projectConfig/intervals'
+import { getLasiusVersion } from 'projectConfig/constants'
 import React, { useEffect, useState } from 'react'
 import useSWR from 'swr'
 
 export const BundleVersionCheck: React.FC = () => {
   const { t } = useTranslation('common')
   const { data, isLoading } = useSWR<BuildIdResponse>('/api/build-id', nextJsAxiosInstance, {
-    refreshInterval: LOCAL_VERSION_CHECK_INTERVAL,
     revalidateOnMount: true,
-    refreshWhenHidden: true,
+    revalidateOnFocus: true,
+    revalidateOnReconnect: false,
   })
   const [shouldRefresh, setShouldRefresh] = useState<boolean>(false)
 
   useEffect(() => {
-    if (!data || isLoading || !data.buildId || !BUILD_ID) {
+    const localVersion = getLasiusVersion()
+    if (!data || isLoading || !data.buildId || !localVersion) {
       return
     }
-    setShouldRefresh(data.buildId !== BUILD_ID)
+    setShouldRefresh(data.buildId !== localVersion)
   }, [data, isLoading])
 
   const handleConfirm = () => {
@@ -49,8 +49,8 @@ export const BundleVersionCheck: React.FC = () => {
 
   if (data) {
     logger.info('[BundleVersionCheck]', {
-      apiBuildId: data?.buildId,
-      localBuildId: BUILD_ID,
+      serverVersion: data?.buildId,
+      clientVersion: getLasiusVersion(),
       shouldRefresh,
     })
   }
@@ -58,15 +58,18 @@ export const BundleVersionCheck: React.FC = () => {
   return (
     <>
       {shouldRefresh && (
-        <ModalConfirm
+        <GenericConfirmModal
+          open={shouldRefresh}
+          onClose={() => setShouldRefresh(false)}
           onConfirm={handleConfirm}
-          text={{
-            action: t('pwa.updateMessage', {
-              defaultValue:
-                'Lasius has been updated. The page will reload after your confirmation.',
-            }),
-            confirm: t('pwa.reloadApplication', { defaultValue: 'Reload application' }),
-          }}
+          title={t('pwa.updateAvailable', { defaultValue: 'Update available' })}
+          message={t('pwa.updateMessage', {
+            defaultValue: 'Lasius has been updated. The page will reload after your confirmation.',
+          })}
+          confirmLabel={t('pwa.reloadApplication', { defaultValue: 'Reload application' })}
+          cancelLabel={t('common.actions.cancel', { defaultValue: 'Cancel' })}
+          confirmVariant="primary"
+          blockViewport
         />
       )}
     </>

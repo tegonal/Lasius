@@ -17,6 +17,7 @@
  *
  */
 
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from 'components/primitives/buttons/Button'
 import { Input } from 'components/primitives/inputs/Input'
 import { Card, CardBody } from 'components/ui/cards/Card'
@@ -30,29 +31,48 @@ import { FormErrorBadge } from 'components/ui/forms/formErrorBadge'
 import { preventEnterOnForm } from 'components/ui/forms/input/shared/preventEnterOnForm'
 import { useProfile } from 'lib/api/hooks/useProfile'
 import { updateUserProfile } from 'lib/api/lasius/user/user'
-import { emailValidationPattern } from 'lib/utils/data/validators'
 import { useSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
-import { AUTH_PROVIDER_INTERNAL_LASIUS, LASIUS_DEMO_MODE } from 'projectConfig/constants'
-import React, { useEffect, useState } from 'react'
+import { AUTH_PROVIDER_INTERNAL_LASIUS, getLasiusDemoMode } from 'projectConfig/constants'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useIsClient } from 'usehooks-ts'
+import { z } from 'zod'
 
-type Form = {
-  email: string
-  firstName: string
-  lastName: string
-}
+import type { TFunction } from 'i18next'
+
+// Schema factory function with i18n support
+const createAccountSchema = (t: TFunction) =>
+  z.object({
+    firstName: z
+      .string()
+      .min(1, t('validation.firstNameRequired', { defaultValue: 'First name is required' })),
+    lastName: z
+      .string()
+      .min(1, t('validation.lastNameRequired', { defaultValue: 'Last name is required' })),
+    email: z
+      .string()
+      .min(1, t('validation.emailRequired', { defaultValue: 'Email is required' }))
+      .email(t('validation.emailInvalid', { defaultValue: 'Invalid email address' })),
+  })
+
+type FormData = z.infer<ReturnType<typeof createAccountSchema>>
 
 export const AccountForm: React.FC = () => {
-  const hookForm = useForm<Form>({ defaultValues: { email: '', firstName: '', lastName: '' } })
+  const { t } = useTranslation('common')
+
+  // Memoize schema to prevent recreation on every render
+  const schema = useMemo(() => createAccountSchema(t), [t])
+
+  const hookForm = useForm<FormData>({
+    resolver: zodResolver(schema),
+    defaultValues: { email: '', firstName: '', lastName: '' },
+  })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { firstName, lastName, email, role } = useProfile()
   const isClient = useIsClient()
   const session = useSession()
   const { addToast } = useToast()
-
-  const { t } = useTranslation('common')
 
   useEffect(() => {
     hookForm.setValue('firstName', firstName)
@@ -61,7 +81,7 @@ export const AccountForm: React.FC = () => {
   }, [email, firstName, hookForm, lastName])
 
   const onSubmit = async () => {
-    if (LASIUS_DEMO_MODE === 'true') {
+    if (getLasiusDemoMode() === 'true') {
       addToast({
         message: t('account.profileChangesNotAllowedInDemo', {
           defaultValue: 'Profile changes are not allowed in demo mode',
@@ -110,7 +130,7 @@ export const AccountForm: React.FC = () => {
                   required>
                   <Input
                     id="firstName"
-                    {...hookForm.register('firstName', { required: true })}
+                    {...hookForm.register('firstName')}
                     aria-describedby="firstName-error"
                     autoComplete="given-name"
                   />
@@ -125,7 +145,7 @@ export const AccountForm: React.FC = () => {
                   required>
                   <Input
                     id="lastName"
-                    {...hookForm.register('lastName', { required: true })}
+                    {...hookForm.register('lastName')}
                     aria-describedby="lastName-error"
                     autoComplete="family-name"
                   />
@@ -139,10 +159,7 @@ export const AccountForm: React.FC = () => {
                   <Input
                     id="email"
                     readOnly={session?.data?.provider !== AUTH_PROVIDER_INTERNAL_LASIUS}
-                    {...hookForm.register('email', {
-                      required: true,
-                      pattern: emailValidationPattern,
-                    })}
+                    {...hookForm.register('email')}
                     aria-describedby="email-error"
                     autoComplete="email"
                   />

@@ -17,6 +17,7 @@
  *
  */
 
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from 'components/primitives/buttons/Button'
 import { Label } from 'components/primitives/typography/Label'
 import { Card, CardBody } from 'components/ui/cards/Card'
@@ -32,14 +33,17 @@ import { useColorMode } from 'lib/hooks/useColorMode'
 import { usePlausible } from 'lib/telemetry/usePlausible'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo } from 'react'
+import { useForm } from 'react-hook-form'
 import {
   ThemeMode,
   useAppSettingsActions,
   useOnboardingDismissed,
   useTheme,
 } from 'stores/appSettingsStore'
+import { z } from 'zod'
 
+import type { TFunction } from 'i18next'
 import type { LasiusPlausibleEvents } from 'lib/telemetry/plausibleEvents'
 
 const LANGUAGES: SelectOption[] = [
@@ -55,6 +59,20 @@ const themeModeToDataTheme: Record<string, string> = {
   dark: 'dark',
 }
 
+// Schema factory function with i18n support
+const createAppSettingsSchema = (t: TFunction) =>
+  z.object({
+    language: z
+      .string()
+      .min(1, t('validation.languageRequired', { defaultValue: 'Language is required' })),
+    theme: z.enum(['light', 'dark', 'system'], {
+      message: t('validation.themeRequired', { defaultValue: 'Theme is required' }),
+    }),
+    showOnboarding: z.boolean(),
+  })
+
+type FormData = z.infer<ReturnType<typeof createAppSettingsSchema>>
+
 export const AppSettingsForm: React.FC = () => {
   const { t, i18n } = useTranslation('common')
   const router = useRouter()
@@ -63,9 +81,18 @@ export const AppSettingsForm: React.FC = () => {
   const onboardingDismissed = useOnboardingDismissed()
   const { setTheme, dismissOnboarding, resetOnboarding } = useAppSettingsActions()
   const plausible = usePlausible<LasiusPlausibleEvents>()
-  const [selectedLanguage, setSelectedLanguage] = useState<string>('en')
-  const [selectedTheme, setSelectedTheme] = useState<ThemeMode>(theme)
-  const [showOnboarding, setShowOnboarding] = useState<boolean>(!onboardingDismissed)
+
+  // Memoize schema to prevent recreation on every render
+  const schema = useMemo(() => createAppSettingsSchema(t), [t])
+
+  const hookForm = useForm<FormData>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      language: 'en',
+      theme: 'system' as ThemeMode,
+      showOnboarding: !onboardingDismissed,
+    },
+  })
 
   const THEMES: SelectOption[] = [
     { value: 'light', label: t('common.themes.light', { defaultValue: 'Light' }) },
@@ -75,21 +102,21 @@ export const AppSettingsForm: React.FC = () => {
 
   useEffect(() => {
     const currentLocale = Cookies.get(LOCALE_COOKIE_NAME) || i18n.language || 'en'
-    setSelectedLanguage(currentLocale)
-    setSelectedTheme(theme)
-    setShowOnboarding(!onboardingDismissed)
-  }, [i18n.language, theme, onboardingDismissed])
+    hookForm.setValue('language', currentLocale)
+    hookForm.setValue('theme', theme)
+    hookForm.setValue('showOnboarding', !onboardingDismissed)
+  }, [i18n.language, theme, onboardingDismissed, hookForm])
 
   const handleLanguageChange = (value: string) => {
-    setSelectedLanguage(value)
+    hookForm.setValue('language', value)
   }
 
   const handleThemeChange = (value: string) => {
-    setSelectedTheme(value as ThemeMode)
+    hookForm.setValue('theme', value as ThemeMode)
   }
 
   const handleOnboardingToggle = (enabled: boolean) => {
-    setShowOnboarding(enabled)
+    hookForm.setValue('showOnboarding', enabled)
     if (enabled) {
       resetOnboarding()
       plausible('onboarding.tutorial.reset', {
@@ -103,33 +130,33 @@ export const AppSettingsForm: React.FC = () => {
     })
   }
 
-  const handleSave = () => {
+  const onSubmit = (data: FormData) => {
     const currentLocale = Cookies.get(LOCALE_COOKIE_NAME) || i18n.language || 'en'
 
     // Track language change
-    if (selectedLanguage !== currentLocale) {
+    if (data.language !== currentLocale) {
       plausible('settings.app.language_change', {
-        props: { from: currentLocale, to: selectedLanguage },
+        props: { from: currentLocale, to: data.language },
       })
     }
 
     // Track theme change
-    if (selectedTheme !== theme) {
+    if (data.theme !== theme) {
       plausible('settings.app.theme_change', {
-        props: { theme: selectedTheme },
+        props: { theme: data.theme },
       })
     }
 
-    Cookies.set(LOCALE_COOKIE_NAME, selectedLanguage, {
+    Cookies.set(LOCALE_COOKIE_NAME, data.language, {
       expires: LOCALE_COOKIE_MAX_AGE_DAYS,
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
     })
 
     // Save theme to store
-    setTheme(selectedTheme)
+    setTheme(data.theme)
 
-    if (selectedTheme === 'system') {
+    if (data.theme === 'system') {
       if (typeof window !== 'undefined' && window.matchMedia) {
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
         const systemTheme = prefersDark ? 'dark' : 'light'
@@ -137,8 +164,8 @@ export const AppSettingsForm: React.FC = () => {
         document.documentElement.setAttribute('data-theme', systemTheme)
       }
     } else {
-      setMode(selectedTheme)
-      const dataTheme = themeModeToDataTheme[selectedTheme] || 'light'
+      setMode(data.theme)
+      const dataTheme = themeModeToDataTheme[data.theme] || 'light'
       document.documentElement.setAttribute('data-theme', dataTheme)
     }
 
@@ -149,53 +176,55 @@ export const AppSettingsForm: React.FC = () => {
     <div className="mx-auto mt-6 w-full max-w-2xl">
       <Card>
         <CardBody className="p-6">
-          <FormBody>
-            <FieldSet>
-              <FormElement
-                label={t('settings.app.language', {
-                  defaultValue: 'Interface Language',
-                })}
-                htmlFor="language-select">
-                <Select
-                  id="language-select"
-                  value={selectedLanguage}
-                  onChange={handleLanguageChange}
-                  options={LANGUAGES}
-                />
-              </FormElement>
-              <FormElement
-                label={t('settings.app.theme', {
-                  defaultValue: 'Theme',
-                })}
-                htmlFor="theme-select">
-                <Select
-                  id="theme-select"
-                  value={selectedTheme}
-                  onChange={handleThemeChange}
-                  options={THEMES}
-                />
-              </FormElement>
-              <FormElement>
-                <div className="flex items-center gap-3">
-                  <ToggleSwitch
-                    id="onboarding-toggle"
-                    checked={showOnboarding}
-                    onChange={handleOnboardingToggle}
+          <form onSubmit={hookForm.handleSubmit(onSubmit)}>
+            <FormBody>
+              <FieldSet>
+                <FormElement
+                  label={t('settings.app.language', {
+                    defaultValue: 'Interface Language',
+                  })}
+                  htmlFor="language-select">
+                  <Select
+                    id="language-select"
+                    value={hookForm.watch('language')}
+                    onChange={handleLanguageChange}
+                    options={LANGUAGES}
                   />
-                  <Label htmlFor="onboarding-toggle" className="cursor-pointer">
-                    {t('settings.app.showOnboarding', {
-                      defaultValue: 'Show Onboarding Tutorial',
-                    })}
-                  </Label>
-                </div>
-              </FormElement>
-            </FieldSet>
-            <ButtonGroup>
-              <Button variant="primary" onClick={handleSave}>
-                {t('settings.app.save', { defaultValue: 'Save Settings' })}
-              </Button>
-            </ButtonGroup>
-          </FormBody>
+                </FormElement>
+                <FormElement
+                  label={t('settings.app.theme', {
+                    defaultValue: 'Theme',
+                  })}
+                  htmlFor="theme-select">
+                  <Select
+                    id="theme-select"
+                    value={hookForm.watch('theme')}
+                    onChange={handleThemeChange}
+                    options={THEMES}
+                  />
+                </FormElement>
+                <FormElement>
+                  <div className="flex items-center gap-3">
+                    <ToggleSwitch
+                      id="onboarding-toggle"
+                      checked={hookForm.watch('showOnboarding')}
+                      onChange={handleOnboardingToggle}
+                    />
+                    <Label htmlFor="onboarding-toggle" className="cursor-pointer">
+                      {t('settings.app.showOnboarding', {
+                        defaultValue: 'Show Onboarding Tutorial',
+                      })}
+                    </Label>
+                  </div>
+                </FormElement>
+              </FieldSet>
+              <ButtonGroup>
+                <Button type="submit" variant="primary">
+                  {t('settings.app.save', { defaultValue: 'Save Settings' })}
+                </Button>
+              </ButtonGroup>
+            </FormBody>
+          </form>
         </CardBody>
       </Card>
     </div>

@@ -19,17 +19,17 @@
 
 import { Button } from 'components/primitives/buttons/Button'
 import { ScrollContainer } from 'components/primitives/layout/ScrollContainer'
-import { Heading } from 'components/primitives/typography/Heading'
 import { P } from 'components/primitives/typography/Paragraph'
 import { Alert } from 'components/ui/feedback/Alert'
 import { useToast } from 'components/ui/feedback/hooks/useToast'
 import { ButtonGroup } from 'components/ui/forms/ButtonGroup'
 import { InputTagsAdmin2 } from 'components/ui/forms/input/InputTagsAdmin2'
 import { preventEnterOnForm } from 'components/ui/forms/input/shared/preventEnterOnForm'
-import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { Tabs } from 'components/ui/navigation/Tabs'
 import { GenericConfirmModal } from 'components/ui/overlays/modal/GenericConfirmModal'
 import { GenericInputModal } from 'components/ui/overlays/modal/GenericInputModal'
+import { ModalCloseButton } from 'components/ui/overlays/modal/ModalCloseButton'
+import { ModalHeader } from 'components/ui/overlays/modal/ModalHeader'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { ModelsProject, ModelsSimpleTag, ModelsTagGroup, ModelsUserProject } from 'lib/api/lasius'
 import { getGetProjectListKey, updateProject } from 'lib/api/lasius/projects/projects'
@@ -39,11 +39,9 @@ import {
 } from 'lib/api/lasius/user-organisations/user-organisations'
 import { getGetUserProfileKey } from 'lib/api/lasius/user/user'
 import { logger } from 'lib/logger'
-import { HelpCircle } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React, { useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
-import { useHelpStore } from 'stores/helpStore'
 import { useSWRConfig } from 'swr'
 
 import { TagGroupEmptyState } from './tagManager/TagGroupEmptyState'
@@ -68,7 +66,6 @@ type FormValues = {
 
 export const ProjectAddUpdateTagsForm: React.FC<Props> = ({ item, onSave, onCancel, mode }) => {
   const { t } = useTranslation('common')
-  const { openHelp } = useHelpStore()
 
   const hookForm = useForm<FormValues>({
     defaultValues: {
@@ -291,26 +288,16 @@ export const ProjectAddUpdateTagsForm: React.FC<Props> = ({ item, onSave, onCanc
         onKeyDown={preventEnterOnForm}
         className="flex h-full flex-col">
         <div className="flex min-h-0 flex-1 flex-col">
-          {/* Header */}
-          <div className="mb-4 flex items-center justify-between">
-            <Heading variant="h2" as="h2">
-              {mode === 'add'
-                ? t('tags.actions.add', { defaultValue: 'Add tags' })
-                : t('tags.actions.editForProject', {
-                    defaultValue: 'Edit tags for {{projectKey}}',
-                    projectKey,
-                  })}
-            </Heading>
-            <Button
-              type="button"
-              variant="ghost"
-              shape="circle"
-              size="sm"
-              onClick={() => openHelp('modal-edit-tags')}
-              fullWidth={false}>
-              <LucideIcon icon={HelpCircle} size={20} />
-            </Button>
-          </div>
+          <ModalCloseButton onClose={handleCancel} />
+
+          <ModalHeader helpKey="modal-edit-tags" className="mb-4">
+            {mode === 'add'
+              ? t('tags.actions.add', { defaultValue: 'Add tags' })
+              : t('tags.actions.editForProject', {
+                  defaultValue: 'Edit tags for {{projectKey}}',
+                  projectKey,
+                })}
+          </ModalHeader>
 
           <div className="flex min-h-0 flex-1 flex-col">
             <Tabs tabs={tabs} />
@@ -343,7 +330,7 @@ export const ProjectAddUpdateTagsForm: React.FC<Props> = ({ item, onSave, onCanc
         label={t('tags.actions.addTagGroup', { defaultValue: 'Add tag group' })}
         placeholder={t('common.forms.name', { defaultValue: 'Name' })}
         confirmLabel={t('tags.actions.createTagGroup', { defaultValue: 'Create tag group' })}
-        cancelLabel={t('common.actions.cancel', { defaultValue: 'Cancel' })}
+        cancelLabel={t('common.actions.close', { defaultValue: 'Close' })}
         error={hookForm.formState.errors.newTagGroupName}
       />
 
@@ -359,7 +346,7 @@ export const ProjectAddUpdateTagsForm: React.FC<Props> = ({ item, onSave, onCanc
         label={t('tags.actions.addTag', { defaultValue: 'Add a tag' })}
         placeholder={t('tags.enterTagName', { defaultValue: 'Enter tag name' })}
         confirmLabel={t('common.actions.add', { defaultValue: 'Add' })}
-        cancelLabel={t('common.actions.cancel', { defaultValue: 'Cancel' })}
+        cancelLabel={t('common.actions.close', { defaultValue: 'Close' })}
         enableEnterKey
       />
 
@@ -373,7 +360,7 @@ export const ProjectAddUpdateTagsForm: React.FC<Props> = ({ item, onSave, onCanc
             groupName: showDeleteConfirm.groupName,
           })}
           confirmLabel={t('common.actions.delete', { defaultValue: 'Delete' })}
-          cancelLabel={t('common.actions.cancel', { defaultValue: 'Cancel' })}
+          cancelLabel={t('common.actions.close', { defaultValue: 'Close' })}
         />
       )}
 

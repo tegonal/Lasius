@@ -35,7 +35,7 @@ export const MyProjectsLayout: React.FC = () => {
     <>
       <ScrollContainer className="bg-base-100 flex-1 overflow-y-auto">
         <MyProjectsStats onCreateProject={handleCreateOpen} />
-        <div className="px-4 pt-3">
+        <div className="pt-4">
           <MyProjectsList statusFilter="both" />
         </div>
       </ScrollContainer>

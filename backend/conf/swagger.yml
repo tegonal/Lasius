@@ -27,6 +27,7 @@ components:
         - $ref: '#/components/schemas/models.GitlabIssueTag'
         - $ref: '#/components/schemas/models.JiraIssueTag'
         - $ref: '#/components/schemas/models.PlaneIssueTag'
+        - $ref: '#/components/schemas/models.GithubIssueTag'
       discriminator:
         propertyName: type
         mapping:
@@ -34,3 +35,761 @@ components:
           TagGroup: '#/components/schemas/models.TagGroup'
           GitlabIssueTag: '#/components/schemas/models.GitlabIssueTag'
           JiraIssueTag: '#/components/schemas/models.JiraIssueTag'
+          GithubIssueTag: '#/components/schemas/models.GithubIssueTag'
+    models.ImporterType:
+      type: string
+      enum:
+        - gitlab
+        - jira
+        - plane
+        - github
+    models.IssueImporterConfigId:
+      type: string
+      format: uuid
+      description: UUID identifier for issue importer configurations
+    models.GitlabConfigResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        baseUrl:
+          type: string
+          format: uri
+        checkFrequency:
+          type: integer
+          format: int64
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/models.GitlabProjectMapping'
+        importerType:
+          type: string
+        projectCount:
+          type: integer
+        syncStatus:
+          $ref: '#/components/schemas/models.ConfigSyncStatus'
+        audit:
+          $ref: '#/components/schemas/models.AuditInfoResponse'
+      required:
+        - id
+        - name
+        - baseUrl
+        - checkFrequency
+        - projects
+        - importerType
+        - projectCount
+        - syncStatus
+        - audit
+    models.JiraConfigResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        baseUrl:
+          type: string
+          format: uri
+        checkFrequency:
+          type: integer
+          format: int64
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/models.JiraProjectMapping'
+        importerType:
+          type: string
+        projectCount:
+          type: integer
+        syncStatus:
+          $ref: '#/components/schemas/models.ConfigSyncStatus'
+        audit:
+          $ref: '#/components/schemas/models.AuditInfoResponse'
+      required:
+        - id
+        - name
+        - baseUrl
+        - checkFrequency
+        - projects
+        - importerType
+        - projectCount
+        - syncStatus
+        - audit
+    models.PlaneConfigResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        baseUrl:
+          type: string
+          format: uri
+        checkFrequency:
+          type: integer
+          format: int64
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/models.PlaneProjectMapping'
+        importerType:
+          type: string
+        projectCount:
+          type: integer
+        syncStatus:
+          $ref: '#/components/schemas/models.ConfigSyncStatus'
+        audit:
+          $ref: '#/components/schemas/models.AuditInfoResponse'
+      required:
+        - id
+        - name
+        - baseUrl
+        - checkFrequency
+        - projects
+        - importerType
+        - projectCount
+        - syncStatus
+        - audit
+    models.GithubConfigResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        baseUrl:
+          type: string
+          format: uri
+        checkFrequency:
+          type: integer
+          format: int64
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/models.GithubProjectMapping'
+        importerType:
+          type: string
+        projectCount:
+          type: integer
+        syncStatus:
+          $ref: '#/components/schemas/models.ConfigSyncStatus'
+        audit:
+          $ref: '#/components/schemas/models.AuditInfoResponse'
+        resourceOwner:
+          type: string
+          description: GitHub resource owner (organization or user login) for the token
+        resourceOwnerType:
+          type: string
+          enum: [User, Organization]
+          description: Type of the resource owner (User or Organization)
+        availableResourceOwners:
+          type: array
+          items:
+            $ref: '#/components/schemas/models.ExternalProject'
+          description: List of available resource owners (user + organizations) for the token
+      required:
+        - id
+        - name
+        - baseUrl
+        - checkFrequency
+        - projects
+        - importerType
+        - projectCount
+        - syncStatus
+        - audit
+    models.CreateGitlabConfig:
+      type: object
+      properties:
+        name:
+          type: string
+        baseUrl:
+          type: string
+          format: uri
+        accessToken:
+          type: string
+        checkFrequency:
+          type: integer
+          format: int64
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/models.GitlabProjectMapping'
+      required:
+        - name
+        - baseUrl
+        - accessToken
+        - checkFrequency
+    models.CreateJiraConfig:
+      type: object
+      properties:
+        name:
+          type: string
+        baseUrl:
+          type: string
+          format: uri
+        consumerKey:
+          type: string
+        privateKey:
+          type: string
+        accessToken:
+          type: string
+        checkFrequency:
+          type: integer
+          format: int64
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/models.JiraProjectMapping'
+      required:
+        - name
+        - baseUrl
+        - consumerKey
+        - privateKey
+        - accessToken
+        - checkFrequency
+    models.CreatePlaneConfig:
+      type: object
+      properties:
+        name:
+          type: string
+        baseUrl:
+          type: string
+          format: uri
+        apiKey:
+          type: string
+        checkFrequency:
+          type: integer
+          format: int64
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/models.PlaneProjectMapping'
+      required:
+        - name
+        - baseUrl
+        - apiKey
+        - checkFrequency
+    models.UpdateGitlabConfig:
+      type: object
+      properties:
+        name:
+          type: string
+        baseUrl:
+          type: string
+          format: uri
+        accessToken:
+          type: string
+        checkFrequency:
+          type: integer
+          format: int64
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/models.GitlabProjectMapping'
+    models.UpdateJiraConfig:
+      type: object
+      properties:
+        name:
+          type: string
+        baseUrl:
+          type: string
+          format: uri
+        consumerKey:
+          type: string
+        privateKey:
+          type: string
+        accessToken:
+          type: string
+        checkFrequency:
+          type: integer
+          format: int64
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/models.JiraProjectMapping'
+    models.UpdatePlaneConfig:
+      type: object
+      properties:
+        name:
+          type: string
+        baseUrl:
+          type: string
+          format: uri
+        apiKey:
+          type: string
+        checkFrequency:
+          type: integer
+          format: int64
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/models.PlaneProjectMapping'
+    models.IssueImporterConfigResponse:
+      oneOf:
+        - $ref: '#/components/schemas/models.GitlabConfigResponse'
+        - $ref: '#/components/schemas/models.JiraConfigResponse'
+        - $ref: '#/components/schemas/models.PlaneConfigResponse'
+        - $ref: '#/components/schemas/models.GithubConfigResponse'
+      discriminator:
+        propertyName: importerType
+        mapping:
+          gitlab: '#/components/schemas/models.GitlabConfigResponse'
+          jira: '#/components/schemas/models.JiraConfigResponse'
+          plane: '#/components/schemas/models.PlaneConfigResponse'
+          github: '#/components/schemas/models.GithubConfigResponse'
+    models.CreateIssueImporterConfig:
+      type: object
+      properties:
+        importerType:
+          type: string
+          enum: [gitlab, jira, plane, github]
+        name:
+          type: string
+        baseUrl:
+          type: string
+          format: uri
+        checkFrequency:
+          type: integer
+          format: int64
+        accessToken:
+          type: string
+        consumerKey:
+          type: string
+        privateKey:
+          type: string
+        apiKey:
+          type: string
+        resourceOwner:
+          type: string
+          description: GitHub resource owner (organization or user login) for the token
+        resourceOwnerType:
+          type: string
+          enum: [User, Organization]
+          description: Type of the resource owner (User or Organization)
+      required:
+        - importerType
+        - name
+        - baseUrl
+        - checkFrequency
+    models.UpdateIssueImporterConfig:
+      type: object
+      properties:
+        name:
+          type: string
+        baseUrl:
+          type: string
+          format: uri
+        checkFrequency:
+          type: integer
+          format: int64
+        accessToken:
+          type: string
+        consumerKey:
+          type: string
+        privateKey:
+          type: string
+        apiKey:
+          type: string
+        resourceOwner:
+          type: string
+          description: GitHub resource owner (organization or user login) for the token
+        resourceOwnerType:
+          type: string
+          enum: [User, Organization]
+          description: Type of the resource owner (User or Organization)
+    models.AuditInfo:
+      type: object
+      description: Tracks who created and last modified an entity
+      properties:
+        createdBy:
+          type: string
+          format: uuid
+          description: User ID of entity creator
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when entity was created
+        updatedBy:
+          type: string
+          format: uuid
+          description: User ID of last updater
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when entity was last updated
+      required:
+        - createdBy
+        - createdAt
+        - updatedBy
+        - updatedAt
+    models.AuditInfoResponse:
+      type: object
+      description: Audit information with full user details for API responses
+      properties:
+        createdBy:
+          $ref: '#/components/schemas/models.UserStub'
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when entity was created
+        updatedBy:
+          $ref: '#/components/schemas/models.UserStub'
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when entity was last updated
+      required:
+        - createdBy
+        - createdAt
+        - updatedBy
+        - updatedAt
+    models.ConnectivityStatus:
+      type: string
+      enum: [healthy, degraded, failed, unknown]
+      description: Health status of connection to external service
+    models.ConnectivityIssue:
+      type: object
+      description: Details about a connectivity or sync error
+      properties:
+        errorCode:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable error message
+        timestamp:
+          type: string
+          format: date-time
+          description: When the error occurred
+        httpStatus:
+          type: integer
+          description: HTTP status code if applicable
+        retryCount:
+          type: integer
+          description: Number of consecutive retry attempts
+      required:
+        - errorCode
+        - message
+        - timestamp
+        - retryCount
+    models.ProjectSyncStats:
+      type: object
+      description: Sync statistics for a specific project mapping
+      properties:
+        projectId:
+          type: string
+          format: uuid
+          description: Project ID
+        projectName:
+          type: string
+          description: Project name
+        lastSyncAt:
+          type: string
+          format: date-time
+          description: Last successful sync timestamp
+        lastSyncIssueCount:
+          type: integer
+          description: Number of issues synced in last run
+        totalIssuesSynced:
+          type: integer
+          description: Total issues synced since mapping creation
+        consecutiveFailures:
+          type: integer
+          description: Number of consecutive sync failures (circuit breaker)
+        lastError:
+          $ref: '#/components/schemas/models.ConnectivityIssue'
+      required:
+        - projectId
+        - projectName
+        - lastSyncIssueCount
+        - totalIssuesSynced
+        - consecutiveFailures
+    models.ConfigSyncStatus:
+      type: object
+      description: Overall health and sync statistics for an issue importer configuration
+      properties:
+        connectivityStatus:
+          $ref: '#/components/schemas/models.ConnectivityStatus'
+        lastConnectivityCheck:
+          type: string
+          format: date-time
+          description: Last time connectivity was verified
+        currentIssue:
+          $ref: '#/components/schemas/models.ConnectivityIssue'
+        projectStats:
+          type: array
+          items:
+            $ref: '#/components/schemas/models.ProjectSyncStats'
+          description: Per-project sync statistics
+        totalProjectsMapped:
+          type: integer
+          description: Number of projects mapped to this config
+        totalIssuesSynced:
+          type: integer
+          format: int64
+          description: Total issues synced across all projects
+        lastSuccessfulSync:
+          type: string
+          format: date-time
+          description: Last successful sync across any project
+        nextScheduledSync:
+          type: string
+          format: date-time
+          description: When next sync is scheduled
+      required:
+        - connectivityStatus
+        - projectStats
+        - totalProjectsMapped
+        - totalIssuesSynced
+    models.ExternalProject:
+      type: object
+      description: External project or resource owner from an issue tracking system
+      properties:
+        id:
+          type: string
+          description: External project ID or resource owner login
+        name:
+          type: string
+          description: Display name of the project or resource owner
+        ownerType:
+          type: string
+          enum: [User, Organization]
+          description: Type of the resource owner (GitHub only, User or Organization)
+      required:
+        - id
+        - name
+    # WebSocket Event Schemas
+    WebSocket.OutEvent:
+      oneOf:
+        - $ref: '#/components/schemas/WebSocket.Pong'
+        - $ref: '#/components/schemas/WebSocket.HelloClient'
+        - $ref: '#/components/schemas/WebSocket.AuthenticationFailed'
+        - $ref: '#/components/schemas/WebSocket.CurrentUserTimeBookingEvent'
+        - $ref: '#/components/schemas/WebSocket.CurrentOrganisationTimeBookings'
+        - $ref: '#/components/schemas/WebSocket.FavoriteAdded'
+        - $ref: '#/components/schemas/WebSocket.FavoriteRemoved'
+        - $ref: '#/components/schemas/WebSocket.LatestTimeBooking'
+        - $ref: '#/components/schemas/WebSocket.IssueImporterSyncStatsChanged'
+        - $ref: '#/components/schemas/WebSocket.UserTimeBookingHistoryEntryCleaned'
+        - $ref: '#/components/schemas/WebSocket.UserTimeBookingHistoryEntryAdded'
+        - $ref: '#/components/schemas/WebSocket.UserTimeBookingHistoryEntryRemoved'
+        - $ref: '#/components/schemas/WebSocket.UserTimeBookingHistoryEntryChanged'
+      discriminator:
+        propertyName: type
+    WebSocket.Pong:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [Pong]
+      required:
+        - type
+    WebSocket.HelloClient:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [HelloClient]
+      required:
+        - type
+    WebSocket.AuthenticationFailed:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [AuthenticationFailed]
+      required:
+        - type
+    WebSocket.CurrentUserTimeBookingEvent:
+      type: object
+      description: Current user's active booking update
+      properties:
+        type:
+          type: string
+          enum: [CurrentUserTimeBookingEvent]
+        booking:
+          $ref: '#/components/schemas/models.CurrentUserTimeBooking'
+      required:
+        - type
+        - booking
+    WebSocket.CurrentOrganisationTimeBookings:
+      type: object
+      description: Current time bookings for all users in an organization
+      properties:
+        type:
+          type: string
+          enum: [CurrentOrganisationTimeBookings]
+        orgId:
+          type: string
+          format: uuid
+        timeBookings:
+          type: array
+          items:
+            $ref: '#/components/schemas/models.CurrentUserTimeBooking'
+      required:
+        - type
+        - orgId
+        - timeBookings
+    WebSocket.FavoriteAdded:
+      type: object
+      description: User added a booking to favorites
+      properties:
+        type:
+          type: string
+          enum: [FavoriteAdded]
+        userId:
+          type: string
+          format: uuid
+        orgId:
+          type: string
+          format: uuid
+        bookingStub:
+          $ref: '#/components/schemas/models.BookingStub'
+      required:
+        - type
+        - userId
+        - orgId
+        - bookingStub
+    WebSocket.FavoriteRemoved:
+      type: object
+      description: User removed a booking from favorites
+      properties:
+        type:
+          type: string
+          enum: [FavoriteRemoved]
+        userId:
+          type: string
+          format: uuid
+        orgId:
+          type: string
+          format: uuid
+        bookingStub:
+          $ref: '#/components/schemas/models.BookingStub'
+      required:
+        - type
+        - userId
+        - orgId
+        - bookingStub
+    WebSocket.LatestTimeBooking:
+      type: object
+      description: User's recent booking history update
+      properties:
+        type:
+          type: string
+          enum: [LatestTimeBooking]
+        userId:
+          type: string
+          format: uuid
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/models.BookingStub'
+      required:
+        - type
+        - userId
+        - history
+    WebSocket.IssueImporterSyncStatsChanged:
+      type: object
+      description: Issue importer sync status changed (admin-only, negative outcomes only)
+      properties:
+        type:
+          type: string
+          enum: [IssueImporterSyncStatsChanged]
+        configId:
+          type: string
+          format: uuid
+        organisationId:
+          type: string
+          format: uuid
+        importerType:
+          $ref: '#/components/schemas/models.ImporterType'
+        configName:
+          type: string
+        syncStatus:
+          $ref: '#/components/schemas/models.ConfigSyncStatus'
+      required:
+        - type
+        - configId
+        - organisationId
+        - importerType
+        - configName
+        - syncStatus
+    WebSocket.UserTimeBookingHistoryEntryCleaned:
+      type: object
+      description: User's booking history was cleared
+      properties:
+        type:
+          type: string
+          enum: [UserTimeBookingHistoryEntryCleaned]
+        userId:
+          type: string
+          format: uuid
+      required:
+        - type
+        - userId
+    WebSocket.UserTimeBookingHistoryEntryAdded:
+      type: object
+      description: New booking added to user's history
+      properties:
+        type:
+          type: string
+          enum: [UserTimeBookingHistoryEntryAdded]
+        booking:
+          $ref: '#/components/schemas/models.Booking'
+      required:
+        - type
+        - booking
+    WebSocket.UserTimeBookingHistoryEntryRemoved:
+      type: object
+      description: Booking removed from user's history
+      properties:
+        type:
+          type: string
+          enum: [UserTimeBookingHistoryEntryRemoved]
+        bookingId:
+          type: string
+          format: uuid
+      required:
+        - type
+        - bookingId
+    WebSocket.UserTimeBookingHistoryEntryChanged:
+      type: object
+      description: Existing booking in user's history was modified
+      properties:
+        type:
+          type: string
+          enum: [UserTimeBookingHistoryEntryChanged]
+        booking:
+          $ref: '#/components/schemas/models.Booking'
+      required:
+        - type
+        - booking
+    models.CurrentUserTimeBooking:
+      type: object
+      description: User's current time booking with daily totals
+      properties:
+        userReference:
+          $ref: '#/components/schemas/models.EntityReference'
+        day:
+          type: string
+          format: date
+        booking:
+          $ref: '#/components/schemas/models.Booking'
+        totalBySameBookingInMillis:
+          type: integer
+          format: int64
+          description: Total time for same booking in milliseconds
+        totalByDayInMillis:
+          type: integer
+          format: int64
+          description: Total time for the day in milliseconds
+      required:
+        - userReference
+        - day
+        - totalByDayInMillis

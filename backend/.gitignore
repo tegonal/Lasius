@@ -29,3 +29,5 @@ CLAUDE.md
 /.serena
 /.claude
 /.playwright*
+.clauderc
+.mcp.json

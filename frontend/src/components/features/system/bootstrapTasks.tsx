@@ -51,7 +51,7 @@ export const BootstrapTasks: React.FC = () => {
     // Reset loading state in case route change was cancelled
     const currentCounter = useUIStore.getState().globalLoadingCounter
     if (currentCounter > 0) {
-      logger.warn('[BootstrapTasks] Route may have been cancelled, resetting loading state', {
+      logger.info('[BootstrapTasks] Route may have been cancelled, resetting loading state', {
         counter: currentCounter,
       })
       useUIStore.getState().setGlobalLoading(false)

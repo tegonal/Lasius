@@ -4,6 +4,8 @@
   "display": "standalone",
   "scope": "/",
   "start_url": "/",
+  "orientation": "portrait",
+  "categories": ["productivity", "business"],
   "name": "Lasius Timetracking",
   "short_name": "Lasius",
   "description": "Lasius Timetracking by https://tegonal.com",

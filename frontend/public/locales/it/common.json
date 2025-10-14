@@ -5,12 +5,6 @@
     "errors": {
       "passwordUpdateFailed": "Aggiornamento della password non riuscito. Assicurati di aver inserito correttamente la password corrente."
     },
-    "languageSettings": {
-      "description": "Scegli la lingua preferita per l'interfaccia. Questa impostazione viene memorizzata localmente nel tuo browser.",
-      "save": "Salva preferenza lingua",
-      "selectLanguage": "Lingua dell'interfaccia",
-      "title": "Preferenze lingua"
-    },
     "profileChangesNotAllowedInDemo": "Le modifiche al profilo non sono consentite in modalità demo",
     "profileSettings": {
       "description": "Gestisci le tue informazioni personali e i dettagli dell'account.",
@@ -29,6 +23,9 @@
     },
     "title": "Account"
   },
+  "actions": {
+    "close": "Chiudi"
+  },
   "app": {
     "name": "Lasius"
   },
@@ -45,14 +42,52 @@
     "createYourAccount": "Crea il tuo account",
     "enterEmailAndPassword": "Inserisci la tua email e password per accedere al tuo account",
     "errors": {
+      "accessDenied": {
+        "message": "Non hai i permessi per accedere. Contatta il tuo amministratore.",
+        "title": "Accesso negato"
+      },
+      "backToLogin": "Torna all'accesso",
       "callback": "Callback di autenticazione non riuscito. Riprova.",
+      "configuration": {
+        "message": "C'è un problema con la configurazione del server. Contatta il tuo amministratore.",
+        "title": "Errore di configurazione"
+      },
+      "credentials": {
+        "message": "Le credenziali fornite sono errate. Riprova.",
+        "title": "Accesso non riuscito"
+      },
       "credentialsMissing": "Nome utente o password mancante",
+      "default": {
+        "message": "Si è verificato un errore durante l'autenticazione. Riprova.",
+        "title": "Errore di autenticazione"
+      },
+      "email": {
+        "message": "Impossibile inviare l'email di accesso. Riprova più tardi.",
+        "title": "Errore email"
+      },
+      "errorCode": "Codice errore",
       "fetchProfileFailed": "La tua sessione è scaduta. Effettua nuovamente l'accesso.",
       "general": "Errore di autenticazione: {error}",
+      "oauth": {
+        "message": "Si è verificato un errore durante l'autenticazione OAuth. Riprova o usa un metodo di accesso diverso.",
+        "title": "Errore OAuth"
+      },
       "oauthCallback": "Autenticazione non riuscita. Riprova.",
+      "persistentIssue": "Se il problema persiste, contatta il tuo amministratore.",
       "registerUnknown": "Errore di registrazione sconosciuto",
-      "sessionRequired": "Effettua l'accesso per continuare.",
+      "sessionRequired": {
+        "message": "Effettua l'accesso per continuare.",
+        "title": "Sessione richiesta"
+      },
+      "unknown": {
+        "message": "Si è verificato un errore imprevisto durante l'autenticazione.",
+        "title": "Errore di autenticazione"
+      },
       "userAlreadyRegistered": "Utente già registrato",
+      "verification": {
+        "message": "Il token di verifica è scaduto o è già stato utilizzato. Prova ad accedere di nuovo.",
+        "title": "Verifica non riuscita"
+      },
       "wrongPasswordOrEmail": "Password o email errata. Riprova."
     },
     "fillDetailsToStart": "Compila i tuoi dettagli per iniziare",
@@ -74,6 +109,9 @@
     "signIn": "Accedi",
     "signInTitle": "Accedi al tuo account",
     "signInToLasius": "Accedi a Lasius",
+    "status": {
+      "authenticationFailed": "Autenticazione fallita. Effettua nuovamente l'accesso."
+    },
     "tagline": "Monitoraggio tempo open source per team moderni",
     "thankYouForRegistering": "Grazie per esserti registrato! Ora puoi accedere utilizzando il tuo indirizzo email e password. Benvenuto in Lasius!",
     "welcomeBack": "Bentornato",
@@ -129,6 +167,7 @@
     "status": {
       "added": "Registrazione aggiunta",
       "currentlyNotBooking": "Nessuna registrazione in corso",
+      "historyCleared": "Cronologia prenotazioni cancellata",
       "removed": "Registrazione rimossa",
       "started": "Registrazione avviata",
       "updated": "Registrazione aggiornata"
@@ -198,7 +237,10 @@
       "password": "Password",
       "role": "Ruolo"
     },
-    "help": "Aiuto",
+    "help": {
+      "buttonLabel": "Aiuto",
+      "contactAdmin": "Contatta il tuo amministratore"
+    },
     "info": {
       "helpFallbackLanguage": "Questo contenuto di aiuto non è ancora disponibile nella lingua selezionata. Viene mostrata la versione inglese."
     },
@@ -217,8 +259,7 @@
     "themes": {
       "dark": "Scuro",
       "light": "Chiaro",
-      "system": "Sistema",
-      "title": "Tema"
+      "system": "Sistema"
     },
     "time": {
       "day": "Giorno",
@@ -249,17 +290,17 @@
     },
     "user": "Utente",
     "validation": {
-      "emailInvalid": "Deve essere un indirizzo email valido",
+      "emailInvalid": "Indirizzo email non valido",
       "endBeforeStart": "L'ora di fine è precedente all'ora di inizio",
       "fromMustBeBeforeTo": "Deve essere precedente alla data \"a\"",
-      "missingNumber": "Manca una cifra numerica",
+      "missingNumber": "Deve contenere un numero",
       "missingSpecialChar": "Manca un carattere speciale",
-      "missingUppercase": "Manca un carattere maiuscolo",
+      "missingUppercase": "Deve contenere una lettera maiuscola",
       "mustBeAfterStart": "Deve essere dopo l'inizio",
       "mustBeBeforeEnd": "Deve essere prima della fine",
       "mustBeInPast": "Deve essere nel passato",
       "passwordMismatch": "Le password non corrispondono",
-      "passwordTooShort": "Deve contenere almeno 8 caratteri",
+      "passwordTooShort": "Minimo 9 caratteri",
       "required": "Obbligatorio",
       "toMustBeAfterFrom": "Deve essere dopo la data \"da\"",
       "wrongFormat": "Formato errato"
@@ -274,9 +315,6 @@
   },
   "demo": {
     "welcome": "Benvenuto nell'istanza demo di Lasius. Usa \"demo1@lasius.ch\" e password \"demo\" per accedere e dare un'occhiata. L'istanza demo viene ripristinata una volta al giorno."
-  },
-  "errors": {
-    "dataFetchFailed": "Ci dispiace molto, ma non è stato possibile recuperare i dati a causa di un errore."
   },
   "export": {
     "actions": {
@@ -323,10 +361,17 @@
   },
   "footer": {
     "developedBy": "Sviluppato da <0>Tegonal</0>, disponibile su <1>GitHub</1>, rilasciato sotto licenza <2>AGPL 3.0</2>",
-    "feedbackOnGithub": "Apprezziamo il tuo feedback. Lascia un commento su <0>GitHub</0>"
+    "feedbackOnGithub": "Apprezziamo il tuo feedback. Lascia un commento su <0>GitHub</0>",
+    "github": {
+      "title": "Find issues, post feedback and get the source code on GitHub"
+    },
+    "tegonal": {
+      "title": "Lasius is developed and maintained by Tegonal Cooperative and released under AGPL 3.0"
+    }
   },
-  "help": {
-    "contactAdmin": "Contatta il tuo amministratore"
+  "help": "Help",
+  "integrations": {
+    "title": "Integrazioni"
   },
   "invitations": {
     "actions": {
@@ -338,15 +383,41 @@
     "description": {
       "copyLink": "Copia il link e invialo al tuo collega. Se non ha ancora un account, ne verrà creato uno quando l'invito sarà accettato."
     },
+    "email": "Email",
     "errors": {
       "createdForSomeoneElse": "Questo invito è stato creato per qualcun altro. Disconnettiti e aggiorna, oppure inoltra il link dell'invito all'utente {{email}}",
       "noLongerValid": "Questo invito non è più valido. È meglio contattare la persona che ti ha inviato il link dell'invito per ottenerne uno nuovo."
     },
-    "inviteByEmail": "Invita tramite email",
+    "inviteOrganisationDescription": "Inserisci l'indirizzo email della persona che desideri invitare. Verrà generato un link di invito che potrai inviarle.",
+    "inviteProjectDescription": "Inserisci l'indirizzo email della persona che desideri invitare. Verrà generato un link di invito che potrai inviarle.",
     "messages": {
       "invitedToOrganisation": "Sei stato invitato da {{inviter}} a unirti all'organizzazione {{organisation}}.",
       "invitedToProject": "Sei stato invitato da {{inviter}} a unirti al progetto {{project}}.",
       "selectOrganisation": "Seleziona l'organizzazione a cui vuoi aggiungere questo progetto:"
+    },
+    "title": {
+      "invitationCreated": "Invito creato",
+      "userAssigned": "Utente assegnato"
+    }
+  },
+  "issueImporters": {
+    "typeLabels": {
+      "github": "GitHub",
+      "gitlab": "GitLab",
+      "jira": "Jira",
+      "plane": "Plane"
+    },
+    "validation": {
+      "accessTokenRequired": "Token di accesso richiesto",
+      "apiKeyRequired": "Chiave API richiesta",
+      "baseUrlRequired": "URL di base richiesto",
+      "consumerKeyRequired": "Chiave consumer richiesta",
+      "invalidUrl": "URL non valido",
+      "maxInterval": "Massimo 24 ore",
+      "minInterval": "Minimo 1 minuto",
+      "nameRequired": "Nome richiesto",
+      "privateKeyRequired": "Chiave privata richiesta",
+      "resourceOwnerRequired": "Proprietario risorsa richiesto"
     }
   },
   "lists": {
@@ -363,6 +434,9 @@
       "removeTitle": "Rimuovi membro",
       "removeWarning": "Questo membro sarà rimosso dall'organizzazione e perderà l'accesso a tutti i progetti."
     },
+    "description_one": "Questo progetto ha {{count}} membro.",
+    "description_many": "Questo progetto ha {{count}} membri.",
+    "description_other": "Questo progetto ha {{count}} membri.",
     "empty": "Nessun membro trovato"
   },
   "navigation": {
@@ -398,6 +472,7 @@
       "title": "Iniziamo",
       "workingHours": "Imposta le ore di lavoro per questa organizzazione"
     },
+    "closeTutorial": "Chiudi tutorial",
     "confirmClose": "Sei sicuro di voler chiudere il tutorial? Puoi riattivarlo nelle impostazioni dell'app.",
     "navigation": {
       "importantUI": "Elementi dell'interfaccia importanti",
@@ -475,6 +550,10 @@
     "adminDescription": "Sei un amministratore di questa organizzazione. Puoi aggiungere e rimuovere membri e modificare il nome dell'organizzazione, o crearne una nuova.",
     "createDescription": "Usa il menu Azioni per creare una nuova organizzazione.",
     "currentOrganisation": "Organizzazione corrente",
+    "description": {
+      "create": "Crea una nuova organizzazione per collaborare con il tuo team.",
+      "edit": "Aggiorna il nome dell'organizzazione."
+    },
     "errors": {
       "duplicateKey": "Un'organizzazione con questo nome esiste già",
       "saveFailed": "Impossibile salvare l'organizzazione"
@@ -494,11 +573,11 @@
     "status": {
       "created": "Organizzazione creata",
       "updated": "Organizzazione aggiornata"
-    },
-    "title": "Organizzazioni"
+    }
   },
   "projects": {
     "actions": {
+      "add": "Aggiungi progetto",
       "create": "Crea un progetto",
       "deactivate": "Disattiva progetto",
       "edit": "Modifica progetto",
@@ -507,13 +586,16 @@
     "allProjects": "Tutti i progetti",
     "allProjectsDescription": "Tutti i progetti nell'organizzazione corrente che puoi amministrare. Crea report di fatturazione includendo il tempo registrato dai membri del progetto esterni.",
     "confirmations": {
-      "deactivate": "Sei sicuro di voler disattivare questo progetto?",
       "deactivateInstructions": "Per confermare, digita il nome del progetto qui sotto:",
       "deactivateTitle": "Disattiva progetto",
       "deactivateWarning": "Questa azione non può essere annullata. Il progetto sarà archiviato permanentemente e tutte le assegnazioni utente saranno rimosse. Non sarà possibile riattivare questo progetto.",
       "leave": "Sei sicuro di voler abbandonare questo progetto?"
     },
     "deactivatedBy": "Archiviato da {{user}}",
+    "description": {
+      "add": "Crea un nuovo progetto per organizzare il tuo tracciamento del tempo.",
+      "edit": "Aggiorna i dettagli del progetto."
+    },
     "empty": "Nessun progetto trovato",
     "errors": {
       "duplicateKey": "Un progetto con questo nome esiste già",
@@ -529,9 +611,6 @@
     },
     "label": "Progetto",
     "lastActivity": "Ultima attività",
-    "members": {
-      "title": "Membri del progetto"
-    },
     "myProjects": "I miei progetti",
     "myProjectsDescription": "Progetti di cui sei membro e in cui puoi registrare tempo, filtrati per l'organizzazione corrente.",
     "name": "Nome progetto",
@@ -541,6 +620,7 @@
     "selectProject": "Seleziona progetto",
     "status": {
       "assignedToUser": "Progetto assegnato con successo all'utente.",
+      "created": "Progetto creato",
       "updated": "Progetto aggiornato"
     },
     "title": "Progetti",
@@ -549,15 +629,13 @@
       "inactiveProjectContext": "Visualizzazione statistiche da progetto inattivo",
       "inactiveProjectFilter": "Visualizzazione dati per progetto inattivo",
       "projectNotInActiveList": "Questo progetto non è nella tua lista di progetti attivi. Potrebbe essere inattivo o di un'altra organizzazione.",
-      "projectUnavailable": "Questo progetto non è più nel tuo profilo. Potresti essere stato rimosso da esso."
+      "projectUnavailable": "Questo progetto non è più nel tuo profil. Potresti essere stato rimosso da esso."
     }
   },
   "pwa": {
-    "reloadApplication": "Ricarica applicazione",
-    "updateMessage": "Lasius è stato aggiornato. La pagina sarà ricaricata dopo la tua conferma."
-  },
-  "search": {
-    "empty": "Nessun risultato trovato"
+    "reloadApplication": "Reload application",
+    "updateAvailable": "Update available",
+    "updateMessage": "Lasius has been updated. The page will reload after your confirmation."
   },
   "settings": {
     "app": {
@@ -584,11 +662,14 @@
     "empty": "Nessun dato disponibile per il periodo selezionato"
   },
   "system": {
+    "backend": "Backend",
     "backendUnreachable": "Il backend sembra essere irraggiungibile",
     "connectedToBackend": "Connesso al backend",
     "connectingToBackend": "Connessione al backend in corso",
+    "connectionStatus": "Connection status",
     "noInternetConnection": "Nessuna connessione Internet. Assicurati che il tuo dispositivo sia connesso.",
-    "offlineMessage": "Lasius è attualmente offline o in manutenzione. Torneremo presto."
+    "offlineMessage": "Lasius è attualmente offline o in manutenzione. Torneremo presto.",
+    "websocket": "WebSocket"
   },
   "tags": {
     "actions": {
@@ -608,7 +689,6 @@
     "confirmDeleteGroup": "Sei sicuro di voler eliminare il gruppo di tag \"{{groupName}}\"?",
     "customTag": "Tag personalizzato",
     "enterTagName": "Inserisci nome tag",
-    "enterToAdd": "Inserisci un tag per aggiungerlo",
     "label": "Tag",
     "noTagGroups": "Nessun gruppo di tag ancora definito",
     "simpleTags": "Tag semplici",
@@ -631,7 +711,8 @@
     "actions": {
       "accept": "Accetta Termini di servizio",
       "reject": "Rifiuta e disconnetti"
-    }
+    },
+    "title": "Terms of Service (version {{version}})"
   },
   "ui": {
     "hidePasswords": "Nascondi password",
@@ -648,7 +729,21 @@
     }
   },
   "validation": {
-    "startMustBeInPast": "L'ora di inizio deve essere nel passato"
+    "confirmPasswordRequired": "Conferma la tua password",
+    "emailInvalid": "Indirizzo email non valido",
+    "emailRequired": "Email richiesta",
+    "firstNameRequired": "Nome richiesto",
+    "languageRequired": "Lingua richiesta",
+    "lastNameRequired": "Cognome richiesto",
+    "missingNumber": "Deve contenere un numero",
+    "missingUppercase": "Deve contenere una lettera maiuscola",
+    "organisationNameRequired": "Nome organizzazione richiesto",
+    "passwordMismatch": "Le password non corrispondono",
+    "passwordRequired": "Password richiesta",
+    "passwordTooShort": "Minimo 9 caratteri",
+    "projectKeyRequired": "Nome progetto richiesto",
+    "startMustBeInPast": "L'ora di inizio deve essere nel passato",
+    "themeRequired": "Tema richiesto"
   },
   "websocket": {
     "status": {
@@ -672,21 +767,16 @@
     "thisWeek": "questa settimana"
   },
   "workingHours": {
-    "clickToAdjustHours": "Fai clic su un giorno qui sotto per adattare le ore di lavoro",
     "dailyTotal": "Totale giornaliero",
     "description": "La quantità di tempo che prevedi di registrare al giorno, per organizzazione, durante una tipica settimana lavorativa. Questi dati vengono utilizzati per calcolare il tuo progresso giornaliero e settimanale.",
     "errors": {
       "updateFailed": "Aggiornamento delle ore di lavoro non riuscito"
     },
-    "perWeek": "a settimana",
-    "setHoursDescription": "Imposta le tue ore di lavoro per ogni giorno",
     "status": {
       "updated": "Ore di lavoro aggiornate"
     },
     "summary": "Riepilogo",
     "title": "Ore di lavoro",
-    "totalHoursDescription": "Ore totali in tutte le organizzazioni",
-    "totalPerWeek": "totale a settimana",
-    "weeklyHoursSummary": "Riepilogo ore settimanali"
+    "totalPerWeek": "totale a settimana"
   }
 }

@@ -139,7 +139,7 @@ export const OrganisationMemberListItemContext: React.FC<Props> = ({
                 {t('members.actions.remove', { defaultValue: 'Remove member' })}
               </Button>
               <Button variant="secondary" onClick={handleCancel}>
-                {t('common.actions.cancel', { defaultValue: 'Cancel' })}
+                {t('common.actions.close', { defaultValue: 'Close' })}
               </Button>
             </FormElement>
           </div>

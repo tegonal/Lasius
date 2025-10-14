@@ -24,6 +24,7 @@ import { HeaderMobile } from 'components/ui/layouts/headerMobile'
 import { PageLayoutResponsive } from 'components/ui/layouts/pageLayoutResponsive'
 import { NavigationMenuTabs } from 'components/ui/navigation/desktop/navigationMenuTabs'
 import { MobileNavigationButton } from 'components/ui/navigation/mobile/mobileNavigationButton'
+import { TegonalFooter } from 'components/ui/navigation/TegonalFooter'
 import React, { Suspense } from 'react'
 
 type Props = {
@@ -43,21 +44,28 @@ export const LayoutResponsive: React.FC<Props> = ({ children, rightColumn, mobil
         <HeaderMobile />
       </div>
 
-      <section className="bg-base-200 border-base-content/20 hidden h-full w-full overflow-auto rounded-t-xl border border-b-0 shadow-2xl md:block">
-        <ContainerColumnsDesktop>
-          <div className="h-full w-full rounded-tl-xl">
-            <NavigationMenuTabs />
-          </div>
-
-          <Suspense fallback={<Loading />}>{children}</Suspense>
-
-          {rightColumn && (
-            <div className="border-base-100 bg-base-200 text-base-content flex h-full w-full overflow-auto rounded-tr-xl border-l">
-              {rightColumn}
+      <div className="bg-base-200 border-base-content/20 hidden h-full w-full overflow-hidden rounded-xl border shadow-2xl md:flex md:flex-col">
+        <section className="h-full w-full overflow-auto">
+          <ContainerColumnsDesktop>
+            <div className="h-full w-full rounded-tl-xl">
+              <NavigationMenuTabs />
             </div>
-          )}
-        </ContainerColumnsDesktop>
-      </section>
+
+            <Suspense fallback={<Loading />}>{children}</Suspense>
+
+            {rightColumn && (
+              <div className="border-base-100 bg-base-200 text-base-content flex h-full w-full overflow-auto rounded-tr-xl border-l">
+                {rightColumn}
+              </div>
+            )}
+          </ContainerColumnsDesktop>
+        </section>
+
+        {/* Desktop footer - closes the 3-column layout */}
+        <footer className="border-base-content/20 bg-base-100 flex items-center justify-between border-t px-3 py-2">
+          <TegonalFooter variant="compact" />
+        </footer>
+      </div>
 
       <section className="bg-base-200 h-full w-full overflow-hidden md:hidden">
         <Suspense fallback={<Loading />}>{mobileContent || children}</Suspense>

@@ -20,11 +20,11 @@
 import { Badge } from 'components/ui/data-display/Badge'
 import { useColorMode } from 'lib/hooks/useColorMode'
 import { useTranslation } from 'next-i18next'
-import { BUILD_ID, IS_DEV } from 'projectConfig/constants'
+import { getIsDev, getLasiusVersion } from 'projectConfig/constants'
 import React, { useEffect, useState } from 'react'
 import { useTokenStore } from 'stores/tokenStore'
 import { useUIStore } from 'stores/uiStore'
-import { useIsClient, useMediaQuery } from 'usehooks-ts'
+import { useIsClient } from 'usehooks-ts'
 
 export const DevInfoBadge: React.FC = () => {
   const { t, i18n } = useTranslation('common')
@@ -34,34 +34,33 @@ export const DevInfoBadge: React.FC = () => {
   const [colorMode, setColorMode] = useState<string>('light')
   const isClient = useIsClient()
 
-  // Media queries matching Tailwind breakpoints
-  const isSm = useMediaQuery('(min-width: 640px)')
-  const isMd = useMediaQuery('(min-width: 768px)')
-  const isLg = useMediaQuery('(min-width: 1024px)')
-
-  const breakpointIndex = isLg ? 3 : isMd ? 2 : isSm ? 1 : 0
-
   useEffect(() => {
     setColorMode(mode || 'light')
   }, [mode])
 
-  if (!isClient || !IS_DEV) return null
+  if (!isClient || !getIsDev()) return null
 
-  const info = `(${breakpointIndex}) | ${i18n.language} | ${BUILD_ID} | ${colorMode} | Token: ${tokenTimeRemaining} | Loading: ${globalLoadingCounter} | ${t('app.name', { defaultValue: 'Lasius' })}`
+  const info = `${i18n.language} | ${getLasiusVersion()} | ${colorMode} | Token: ${tokenTimeRemaining} | Loading: ${globalLoadingCounter} | ${t('app.name', { defaultValue: 'Lasius' })}`
 
   return (
-    <div className="fixed bottom-2 left-2">
+    <div className="fixed bottom-2 left-2 z-50">
       <div className="block sm:hidden">
-        <Badge>&lt; sm | {info}</Badge>
+        <Badge>&lt; sm (640px) | {info}</Badge>
       </div>
       <div className="hidden sm:block md:hidden">
-        <Badge>sm &gt; &lt; md | {info}</Badge>
+        <Badge>sm (640px) &gt; &lt; md (768px) | {info}</Badge>
       </div>
       <div className="hidden md:block lg:hidden">
-        <Badge>md &gt; &lt; lg | {info}</Badge>
+        <Badge>md (768px) &gt; &lt; lg (1024px) | {info}</Badge>
       </div>
-      <div className="hidden lg:block">
-        <Badge>lg &gt; | {info}</Badge>
+      <div className="hidden lg:block xl:hidden">
+        <Badge>lg (1024px) &gt; &lt; xl (1280px) | {info}</Badge>
+      </div>
+      <div className="hidden xl:block 2xl:hidden">
+        <Badge>xl (1280px) &gt; &lt; 2xl (1536px) | {info}</Badge>
+      </div>
+      <div className="hidden 2xl:block">
+        <Badge>2xl (1536px) &gt; | {info}</Badge>
       </div>
     </div>
   )

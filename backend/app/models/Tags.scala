@@ -125,3 +125,22 @@ object PlaneIssueTag {
   implicit val issueTagFormat: Format[PlaneIssueTag] =
     Json.format[PlaneIssueTag]
 }
+
+// GitHub tags
+case class GithubIssueTag(id: TagId,
+                          repoOwner: String,
+                          repoName: String,
+                          issueNumber: Int,
+                          summary: Option[String],
+                          relatedTags: Seq[SimpleTag],
+                          issueLink: String,
+                          // type attribute only needed to generate correct swagger definition
+                          `type`: String =
+                            classOf[GithubIssueTag].getSimpleName)
+    extends GroupedTags
+    with NamedTag
+
+object GithubIssueTag {
+  implicit val issueTagFormat: Format[GithubIssueTag] =
+    Json.format[GithubIssueTag]
+}

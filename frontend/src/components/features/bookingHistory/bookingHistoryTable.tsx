@@ -124,11 +124,16 @@ export const BookingHistoryTable: React.FC<Props> = ({
               {booking.projectReference.key}
             </button>
           </DataListField>
-          <DataListField>
-            <TagList items={booking.tags} clickHandler={tagClickHandler} hideRemoveIcon />
+          <DataListField className="max-w-md">
+            <TagList
+              items={booking.tags}
+              clickHandler={tagClickHandler}
+              hideRemoveIcon
+              width="sm"
+            />
           </DataListField>
           <DataListField className="whitespace-nowrap">
-            <Text variant="small">{booking.fromTo}</Text> <br />
+            <Text variant="small">{booking.fromTo}</Text>{' '}
             <Text variant="small">{booking.date}</Text>
           </DataListField>
           <DataListField className="whitespace-nowrap">{booking.durationString}</DataListField>

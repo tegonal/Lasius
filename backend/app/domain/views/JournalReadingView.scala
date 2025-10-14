@@ -27,7 +27,10 @@ import models.PersistedEvent
 import org.apache.pekko.NotUsed
 import org.apache.pekko.actor.SupervisorStrategy.Restart
 import org.apache.pekko.actor.{Actor, ActorLogging, OneForOneStrategy}
-import org.apache.pekko.persistence.query.scaladsl.{CurrentEventsByPersistenceIdQuery, ReadJournal}
+import org.apache.pekko.persistence.query.scaladsl.{
+  CurrentEventsByPersistenceIdQuery,
+  ReadJournal
+}
 import org.apache.pekko.persistence.query.{EventEnvelope, PersistenceQuery}
 import org.apache.pekko.stream.Materializer
 import org.apache.pekko.stream.scaladsl.Source

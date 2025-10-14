@@ -21,6 +21,8 @@ import { useToast } from 'components/ui/feedback/hooks/useToast'
 import { useLasiusWebsocket } from 'lib/api/hooks/useLasiusWebsocket'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { useSwrMutateMany } from 'lib/api/hooks/useSwrMutateMany'
+import { getGetConfigsKey } from 'lib/api/lasius/issue-importers/issue-importers'
+import { ModelsConnectivityStatus } from 'lib/api/lasius/modelsConnectivityStatus'
 import {
   getGetUserBookingCurrentKey,
   getGetUserBookingCurrentListByOrganisationKey,
@@ -28,9 +30,23 @@ import {
 import { getGetFavoriteBookingListKey } from 'lib/api/lasius/user-favorites/user-favorites'
 import { logger } from 'lib/logger'
 import { stringHash } from 'lib/utils/string/stringHash'
+import {
+  isAuthenticationFailed,
+  isCurrentUserTimeBookingEvent,
+  isFavoriteAdded,
+  isFavoriteRemoved,
+  isIssueImporterSyncStatsChanged,
+  isLatestTimeBooking,
+  isUserTimeBookingHistoryEntryAdded,
+  isUserTimeBookingHistoryEntryChanged,
+  isUserTimeBookingHistoryEntryCleaned,
+  isUserTimeBookingHistoryEntryRemoved,
+  processWebSocketEvent,
+  WebSocketEventHandler,
+} from 'lib/utils/websocket/typeGuards'
 import { useTranslation } from 'next-i18next'
-import { WEBSOCKET_EVENT } from 'projectConfig/constants'
-import React, { useEffect } from 'react'
+import { ROUTES } from 'projectConfig/routes.constants'
+import React, { useEffect, useMemo } from 'react'
 import { useSWRConfig } from 'swr'
 
 export const LasiusBackendWebsocketEventHandler: React.FC = () => {
@@ -41,148 +57,196 @@ export const LasiusBackendWebsocketEventHandler: React.FC = () => {
   const { selectedOrganisationId } = useOrganisation()
   const { addToast } = useToast()
   const { t } = useTranslation('common')
+  const { t: tIntegrations } = useTranslation('integrations')
 
-  const newMessage = stringHash(lastMessage) !== lastMessageHash
-
-  useEffect(() => {
-    if (lastMessage && stringHash(lastMessage) !== lastMessageHash) {
-      logger.info('[AppWebsocketEventHandler]', lastMessage)
-      const { type, data } = lastMessage
-
-      //  Mutate data, grouped, to save requests
-
-      switch (true) {
-        case type === WEBSOCKET_EVENT.CurrentUserTimeBookingEvent:
+  // Define event handlers with full type safety
+  const eventHandlers: WebSocketEventHandler<any>[] = useMemo(
+    () => [
+      // CurrentUserTimeBookingEvent
+      {
+        typeGuard: isCurrentUserTimeBookingEvent,
+        handler: () => {
           mutate(getGetUserBookingCurrentKey())
           mutate(getGetUserBookingCurrentListByOrganisationKey(selectedOrganisationId))
-          break
-
-        case type === WEBSOCKET_EVENT.UserTimeBookingHistoryEntryRemoved:
-        case type === WEBSOCKET_EVENT.UserTimeBookingHistoryEntryAdded:
-        case type === WEBSOCKET_EVENT.UserTimeBookingHistoryEntryChanged:
+        },
+      },
+      // UserTimeBookingHistoryEntryAdded
+      {
+        typeGuard: isUserTimeBookingHistoryEntryAdded,
+        handler: () => {
           mutateMany(/.*\/user-bookings\/.*/)
-          // this.booking.loadBookingsCache();
-          // this.userBookingHistory.load();
-          break
-
-        case type === WEBSOCKET_EVENT.HelloClient:
-          logger.info('[AppWebsocketEventHandler][HelloClient!]')
-          break
-
-        case type === WEBSOCKET_EVENT.FavoriteAdded:
-        case type === WEBSOCKET_EVENT.FavoriteRemoved:
-          mutate(getGetFavoriteBookingListKey(selectedOrganisationId))
-          break
-
-        case type === WEBSOCKET_EVENT.LatestTimeBooking:
-        case type === WEBSOCKET_EVENT.CurrentOrganisationTimeBookings:
-          //
-          break
-
-        case type === WEBSOCKET_EVENT.UserTimeBookingByProjectEntryAdded:
-        case type === WEBSOCKET_EVENT.UserTimeBookingByProjectEntryRemoved:
-        case type === WEBSOCKET_EVENT.UserTimeBookingByTagEntryRemoved:
-        case type === WEBSOCKET_EVENT.UserTimeBookingByTagEntryAdded:
-          //  Unhandled events - these clog up the ws connection on simple updates
-          break
-
-        case type === WEBSOCKET_EVENT.Pong:
-          // ignore
-          break
-
-        default:
-          logger.warn('[AppWebsocketEventHandler][UnhandledEvent]', type, { data })
-      }
-
-      //  Fire toasts on specific events
-
-      switch (true) {
-        case type === WEBSOCKET_EVENT.CurrentUserTimeBookingEvent:
-          break
-
-        case type === WEBSOCKET_EVENT.UserTimeBookingHistoryEntryRemoved:
-          addToast({
-            message: t('bookings.status.removed', { defaultValue: 'Booking removed' }),
-            type: 'SUCCESS',
-          })
-          break
-
-        case type === WEBSOCKET_EVENT.UserLoggedOutV2:
-          logger.info('[AppWebsocketEventHandler][UserLoggedOutV2]')
-          break
-
-        case type === WEBSOCKET_EVENT.UserTimeBookingHistoryEntryAdded:
           addToast({
             message: t('bookings.status.added', { defaultValue: 'Booking added' }),
             type: 'SUCCESS',
           })
-          break
-
-        case type === WEBSOCKET_EVENT.UserTimeBookingHistoryEntryChanged:
+        },
+      },
+      // UserTimeBookingHistoryEntryChanged
+      {
+        typeGuard: isUserTimeBookingHistoryEntryChanged,
+        handler: () => {
+          mutateMany(/.*\/user-bookings\/.*/)
           addToast({
             message: t('bookings.status.updated', { defaultValue: 'Booking updated' }),
             type: 'SUCCESS',
           })
-
-          break
-
-        case type === WEBSOCKET_EVENT.HelloClient:
-          break
-
-        case type === WEBSOCKET_EVENT.FavoriteAdded:
+        },
+      },
+      // UserTimeBookingHistoryEntryRemoved
+      {
+        typeGuard: isUserTimeBookingHistoryEntryRemoved,
+        handler: () => {
+          mutateMany(/.*\/user-bookings\/.*/)
+          addToast({
+            message: t('bookings.status.removed', { defaultValue: 'Booking removed' }),
+            type: 'SUCCESS',
+          })
+        },
+      },
+      // FavoriteAdded
+      {
+        typeGuard: isFavoriteAdded,
+        handler: () => {
+          mutate(getGetFavoriteBookingListKey(selectedOrganisationId))
           addToast({
             message: t('bookings.actions.addedToFavorites', {
               defaultValue: 'Booking added to favorites',
             }),
             type: 'SUCCESS',
           })
-          break
-
-        case type === WEBSOCKET_EVENT.FavoriteRemoved:
+        },
+      },
+      // FavoriteRemoved
+      {
+        typeGuard: isFavoriteRemoved,
+        handler: () => {
+          mutate(getGetFavoriteBookingListKey(selectedOrganisationId))
           addToast({
             message: t('favorites.status.removed', { defaultValue: 'Favorite removed' }),
             type: 'SUCCESS',
           })
-          break
-
-        case type === WEBSOCKET_EVENT.LatestTimeBooking:
+        },
+      },
+      // LatestTimeBooking
+      {
+        typeGuard: isLatestTimeBooking,
+        handler: () => {
           addToast({
             message: t('bookings.status.started', { defaultValue: 'Booking started' }),
             type: 'SUCCESS',
           })
-          break
+        },
+      },
+      // IssueImporterSyncStatsChanged
+      {
+        typeGuard: isIssueImporterSyncStatsChanged,
+        handler: (event) => {
+          // Handle cache invalidation
+          mutate(getGetConfigsKey(selectedOrganisationId))
 
-        case type === WEBSOCKET_EVENT.CurrentOrganisationTimeBookings:
-          break
+          // Handle toast notifications based on connectivity status
+          if (event.syncStatus.connectivityStatus === ModelsConnectivityStatus.degraded) {
+            addToast({
+              message: tIntegrations('issueImporters.status.connectivityDegraded', {
+                defaultValue: 'Issue importer connectivity degraded: {{configName}}',
+                configName: event.configName,
+              }),
+              type: 'WARNING',
+              ttl: 120000,
+              action: {
+                label: tIntegrations('issueImporters.actions.viewIntegrations', {
+                  defaultValue: 'View Integrations',
+                }),
+                href: ROUTES.ORGANISATION.INTEGRATIONS,
+              },
+            })
+          } else if (event.syncStatus.connectivityStatus === ModelsConnectivityStatus.failed) {
+            const errorMessage = event.syncStatus.currentIssue?.message || ''
+            addToast({
+              message: tIntegrations('issueImporters.status.connectivityFailed', {
+                defaultValue: 'Issue importer connectivity failed: {{configName}}',
+                configName: event.configName,
+              }),
+              type: 'ERROR',
+              ttl: 120000,
+              action: {
+                label: tIntegrations('issueImporters.actions.viewIntegrations', {
+                  defaultValue: 'View Integrations',
+                }),
+                href: ROUTES.ORGANISATION.INTEGRATIONS,
+              },
+            })
+            if (errorMessage) {
+              logger.error('[IssueImporterSyncStatsChanged]', errorMessage)
+            }
+          }
+        },
+      },
+      // UserTimeBookingHistoryEntryCleaned
+      {
+        typeGuard: isUserTimeBookingHistoryEntryCleaned,
+        handler: () => {
+          mutateMany(/.*\/user-bookings\/.*/)
+          addToast({
+            message: t('bookings.status.historyCleared', {
+              defaultValue: 'Booking history cleared',
+            }),
+            type: 'NOTIFICATION',
+          })
+        },
+      },
+      // AuthenticationFailed
+      {
+        typeGuard: isAuthenticationFailed,
+        handler: () => {
+          logger.error('[AuthenticationFailed]', 'WebSocket authentication failed')
+          addToast({
+            message: t('auth.status.authenticationFailed', {
+              defaultValue: 'Authentication failed. Please log in again.',
+            }),
+            type: 'ERROR',
+            ttl: 10000,
+          })
+        },
+      },
+    ],
+    [mutate, mutateMany, selectedOrganisationId, addToast, t, tIntegrations],
+  )
 
-        case type === WEBSOCKET_EVENT.UserTimeBookingByProjectEntryAdded:
-          break
+  const newMessage = stringHash(lastMessage) !== lastMessageHash
 
-        case type === WEBSOCKET_EVENT.UserTimeBookingByProjectEntryRemoved:
-          break
+  useEffect(() => {
+    if (lastMessage && stringHash(lastMessage) !== lastMessageHash) {
+      logger.info('[AppWebsocketEventHandler]', lastMessage)
 
-        case type === WEBSOCKET_EVENT.UserTimeBookingByTagEntryRemoved:
-          break
+      // Process event through type-safe handler registry
+      const wasHandled = processWebSocketEvent(lastMessage, eventHandlers)
 
-        case type === WEBSOCKET_EVENT.UserTimeBookingByTagEntryAdded:
-          //  Unhandled events
-          break
-        default:
-          break
+      // Log unhandled events
+      if (!wasHandled && lastMessage && typeof lastMessage === 'object' && 'type' in lastMessage) {
+        const messageType = lastMessage.type as string
+        // Explicitly handled but intentionally ignored events
+        const ignoredEvents = [
+          'HelloClient',
+          'Pong',
+          'CurrentOrganisationTimeBookings',
+          'UserTimeBookingByProjectEntryAdded',
+          'UserTimeBookingByProjectEntryRemoved',
+          'UserTimeBookingByTagEntryRemoved',
+          'UserTimeBookingByTagEntryAdded',
+          'UserLoggedOutV2',
+        ]
+
+        if (ignoredEvents.includes(messageType)) {
+          logger.info('[AppWebsocketEventHandler][IgnoredEvent]', messageType)
+        } else {
+          logger.warn('[AppWebsocketEventHandler][UnhandledEvent]', messageType, lastMessage)
+        }
       }
 
       setLastMessageHash(stringHash(lastMessage))
     }
-  }, [
-    newMessage,
-    lastMessageHash,
-    lastMessage,
-    mutate,
-    selectedOrganisationId,
-    mutateMany,
-    addToast,
-    t,
-  ])
+  }, [newMessage, lastMessageHash, lastMessage, eventHandlers])
 
   return <></>
 }
