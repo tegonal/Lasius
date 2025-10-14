@@ -48,15 +48,17 @@ export const IconTabs: React.FC<Props> = ({ tabs, position = 'top', initialTab =
 
   return (
     <div
-      className={`relative grid h-full w-full justify-stretch gap-0 overflow-auto ${
-        position === 'top' ? 'grid-rows-[min-content_auto]' : 'grid-cols-[min-content_auto]'
-      }`}>
+      className={cn(
+        'relative grid h-full w-full justify-stretch gap-0 overflow-auto',
+        position === 'top' ? 'grid-rows-[min-content_auto]' : 'grid-cols-[min-content_auto]',
+      )}>
       <div
-        className={`mr-2 flex pt-2 ${
+        className={cn(
+          'flex',
           position === 'top'
-            ? 'border-base-content/10 flex-row justify-center border-b'
-            : 'border-base-content/10 flex-col justify-start gap-2 border-r'
-        }`}>
+            ? 'border-base-content/10 flex-row justify-center border-b pt-2 lg:pt-4 xl:pt-6'
+            : 'border-base-content/10 mr-2 flex-col justify-start gap-2 border-r',
+        )}>
         {tabs.map((item, index) => (
           <div key={item.id} className={cn('relative z-10', index === selected && 'selected')}>
             {index === selected ? <SelectedTabIcon layoutId={tabId} radiusOn={position} /> : null}
@@ -72,7 +74,7 @@ export const IconTabs: React.FC<Props> = ({ tabs, position = 'top', initialTab =
           </div>
         ))}
       </div>
-      <ScrollContainer className="pt-2">
+      <ScrollContainer className={cn(position === 'top' ? 'pt-2' : '')}>
         <AnimatePresence initial={false} mode="popLayout">
           <PresenceItem
             key={`menuBooking-${selected}`}

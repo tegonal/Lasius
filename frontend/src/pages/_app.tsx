@@ -26,7 +26,6 @@ import { HttpHeaderProvider } from 'components/features/system/httpHeaderProvide
 import { LasiusBackendOnlineCheck } from 'components/features/system/lasiusBackendOnlineCheck'
 import { LasiusBackendWebsocketEventHandler } from 'components/features/system/lasiusBackendWebsocketEventHandler'
 import 'styles/globals.css'
-import { LasiusBackendWebsocketStatus } from 'components/features/system/lasiusBackendWebsocketStatus'
 import { LasiusTOSCheck } from 'components/features/system/lasiusTOSCheck'
 import { TokenWatcher } from 'components/features/system/tokenWatcher'
 import { TopLoadingBar } from 'components/features/system/topLoadingBar'
@@ -132,7 +131,6 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
                 <HttpHeaderProvider />
                 <TokenWatcher />
                 <BootstrapTasks />
-                <LasiusBackendWebsocketStatus />
                 <LasiusBackendWebsocketEventHandler />
                 <LasiusTOSCheck />
               </>

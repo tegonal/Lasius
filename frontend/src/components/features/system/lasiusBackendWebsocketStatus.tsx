@@ -74,7 +74,7 @@ export const LasiusBackendWebsocketStatus: React.FC = () => {
   if (!isClient) return null
 
   return (
-    <div className="fixed top-2 right-2">
+    <div>
       {status === CONNECTION_STATUS.CONNECTED && (
         <ToolTip
           toolTipContent={t('websocket.status.connected', { defaultValue: 'Websocket connected' })}>

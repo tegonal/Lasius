@@ -361,7 +361,13 @@
   },
   "footer": {
     "developedBy": "Développé par <0>Tegonal</0>, disponible sur <1>GitHub</1>, publié sous licence <2>AGPL 3.0</2>",
-    "feedbackOnGithub": "Nous apprécions tes commentaires. Laisse un commentaire sur <0>GitHub</0>"
+    "feedbackOnGithub": "Nous apprécions tes commentaires. Laisse un commentaire sur <0>GitHub</0>",
+    "github": {
+      "title": "Find issues, post feedback and get the source code on GitHub"
+    },
+    "tegonal": {
+      "title": "Lasius is developed and maintained by Tegonal Cooperative and released under AGPL 3.0"
+    }
   },
   "help": "Help",
   "integrations": {
@@ -656,11 +662,14 @@
     "empty": "Aucune donnée disponible pour la période sélectionnée"
   },
   "system": {
+    "backend": "Backend",
     "backendUnreachable": "Le serveur semble inaccessible",
     "connectedToBackend": "Connecté au serveur",
     "connectingToBackend": "Connexion au serveur",
+    "connectionStatus": "Connection status",
     "noInternetConnection": "Pas de connexion Internet. Assure-toi que ton appareil est connecté à Internet.",
-    "offlineMessage": "Lasius est actuellement hors ligne ou en maintenance. Nous serons de retour sous peu."
+    "offlineMessage": "Lasius est actuellement hors ligne ou en maintenance. Nous serons de retour sous peu.",
+    "websocket": "WebSocket"
   },
   "tags": {
     "actions": {
