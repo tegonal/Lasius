@@ -38,7 +38,7 @@ resolvers += "Sonatype OSS Releases".at(
   "https://oss.sonatype.org/content/repositories/releases")
 
 val pekkoVersion             = "1.1.3"
-val reactiveMongoPlayVersion = "1.1.0-play30.RC15"
+val reactiveMongoPlayVersion = "1.1.0-play30.RC17"
 // Play framework 3.x is still bound to older guice version
 val guiceVersion      = "6.0.0"
 val pureConfigVersion = "0.17.9"
