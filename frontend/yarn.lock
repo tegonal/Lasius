@@ -4258,10 +4258,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"daisyui@npm:^5.3.0":
-  version: 5.3.0
-  resolution: "daisyui@npm:5.3.0"
-  checksum: 10/9568326110231ce68427b50d13b0831721a1387a710b0ab116a932f9b2bc77004f2dde039b781893efcd8c538b94be6d084cfa0f19634eefed9de87b8feb8f3e
+"daisyui@npm:^5.3.2":
+  version: 5.3.2
+  resolution: "daisyui@npm:5.3.2"
+  checksum: 10/f8d37fc598a7a1c2151f20da2273246414c93b248cb7789e6d7fa9710d97b54906fcc6345cb7ae497b4bc9b0d1269cbd619cfb88ed958fa281a0e09cfe4797af
   languageName: node
   linkType: hard
 
@@ -7217,7 +7217,7 @@ __metadata:
     class-variance-authority: "npm:^0.7.1"
     clsx: "npm:^2.1.1"
     concurrently: "npm:^9.2.1"
-    daisyui: "npm:^5.3.0"
+    daisyui: "npm:^5.3.2"
     date-fns: "npm:^4.1.0"
     date-fns-tz: "npm:^3.2.0"
     dotenv-cli: "npm:^10.0.0"
@@ -7251,7 +7251,7 @@ __metadata:
     orval: "npm:7.13.2"
     parse-json: "npm:^8.3.0"
     prettier: "npm:^3.6.2"
-    prettier-plugin-tailwindcss: "npm:^0.6.14"
+    prettier-plugin-tailwindcss: "npm:^0.7.0"
     react: "npm:19.2.0"
     react-async-hook: "npm:^4.0.0"
     react-dom: "npm:19.2.0"
@@ -9137,9 +9137,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier-plugin-tailwindcss@npm:^0.6.14":
-  version: 0.6.14
-  resolution: "prettier-plugin-tailwindcss@npm:0.6.14"
+"prettier-plugin-tailwindcss@npm:^0.7.0":
+  version: 0.7.0
+  resolution: "prettier-plugin-tailwindcss@npm:0.7.0"
   peerDependencies:
     "@ianvs/prettier-plugin-sort-imports": "*"
     "@prettier/plugin-hermes": "*"
@@ -9151,14 +9151,12 @@ __metadata:
     prettier: ^3.0
     prettier-plugin-astro: "*"
     prettier-plugin-css-order: "*"
-    prettier-plugin-import-sort: "*"
     prettier-plugin-jsdoc: "*"
     prettier-plugin-marko: "*"
     prettier-plugin-multiline-arrays: "*"
     prettier-plugin-organize-attributes: "*"
     prettier-plugin-organize-imports: "*"
     prettier-plugin-sort-imports: "*"
-    prettier-plugin-style-order: "*"
     prettier-plugin-svelte: "*"
   peerDependenciesMeta:
     "@ianvs/prettier-plugin-sort-imports":
@@ -9179,8 +9177,6 @@ __metadata:
       optional: true
     prettier-plugin-css-order:
       optional: true
-    prettier-plugin-import-sort:
-      optional: true
     prettier-plugin-jsdoc:
       optional: true
     prettier-plugin-marko:
@@ -9193,11 +9189,9 @@ __metadata:
       optional: true
     prettier-plugin-sort-imports:
       optional: true
-    prettier-plugin-style-order:
-      optional: true
     prettier-plugin-svelte:
       optional: true
-  checksum: 10/84235df312878176f7019272d921923943895f08120393e40f518c4c5f572e6adf11fdd9fbe9c92b9d7210ed1f9c6605e89de1b627b6ac2cf8480e199ee80e26
+  checksum: 10/8e48f97fdd9af13a8e6ad70d08088d504efe9b4e32227ae9d184387890aa9fd871ff340c26a3f7b3be73408f3f4369fae59073444e9df00f4ac8eb5017b6cd69
   languageName: node
   linkType: hard
 
