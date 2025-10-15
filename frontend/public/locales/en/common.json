@@ -94,6 +94,9 @@
     "getStartedFree": "Get started with open source time tracking",
     "joinLasius": "Join Lasius",
     "needHelp": "Need help? Click the help button",
+    "needsAccount": {
+      "message": "To accept the invitation, please sign in with {{email}} or create a new account using one of the login providers below."
+    },
     "noAuthMethodsAvailable": "No authentication methods available",
     "preparingSecureLogin": "Preparing secure login...",
     "providers": {
@@ -392,8 +395,16 @@
     "inviteProjectDescription": "Enter the email address of the person you want to invite. An invitation link will be generated that you can send to them.",
     "messages": {
       "invitedToOrganisation": "You have been invited by {{inviter}} to join organisation {{organisation}}.",
+      "invitedToOrganisationNeedsAccount": "You have been invited by {{inviter}} to join organisation {{organisation}}.",
       "invitedToProject": "You have been invited by {{inviter}} to join project {{project}}.",
+      "invitedToProjectNeedsAccount": "You have been invited by {{inviter}} to join project {{project}}.",
       "selectOrganisation": "Select the organisation you would like to add this project to:"
+    },
+    "needsAccount": {
+      "continue": "Continue to Sign In",
+      "description": "You'll need to sign in or create an account for {{email}} to accept this invitation.",
+      "emailMatch": "Make sure to sign in with the email address this invitation was sent to: {{email}}",
+      "title": "Account Required"
     },
     "title": {
       "invitationCreated": "Invitation created",

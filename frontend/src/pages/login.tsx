@@ -67,7 +67,13 @@ const Login: NextPage<{
   const { t } = useTranslation('common')
   const router = useRouter()
   const { setSelectedDate } = useCalendarActions()
-  const { invitation_id = null, email = null, error = null, callbackUrl = null } = router.query
+  const {
+    invitation_id = null,
+    email = null,
+    error = null,
+    callbackUrl = null,
+    needs_account = null,
+  } = router.query
 
   // Build dynamic translation key for error messages
   const getErrorMessage = (errorCode: string | string[] | null): string => {
@@ -249,9 +255,16 @@ const Login: NextPage<{
       />
       <AuthLayout infoPanel={<LoginInfoPanel />}>
         {/* Error Alert */}
-        {error && (
-          <Alert variant="warning" className="animate-[fadeIn_0.4s_ease-out]">
-            {getErrorMessage(error)}
+        {error && <Alert variant="warning">{getErrorMessage(error)}</Alert>}
+
+        {/* New account required for invitation */}
+        {needs_account && email && (
+          <Alert variant="info">
+            {t('auth.needsAccount.message', {
+              defaultValue:
+                'To accept the invitation, please sign in with {{email}} or create a new account using one of the login providers below.',
+              email: email,
+            })}
           </Alert>
         )}
 

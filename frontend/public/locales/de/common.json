@@ -94,6 +94,9 @@
     "getStartedFree": "Starte mit Open-Source Zeiterfassung",
     "joinLasius": "Bei Lasius mitmachen",
     "needHelp": "Brauchst du Hilfe? Klicke auf die Hilfe-Schaltfläche",
+    "needsAccount": {
+      "message": "Um die Einladung anzunehmen, melde dich bitte mit {{email}} an oder erstelle ein neues Konto mit einem der unten aufgeführten Anbieter."
+    },
     "noAuthMethodsAvailable": "Keine Authentifizierungsmethoden verfügbar",
     "preparingSecureLogin": "Sichere Anmeldung wird vorbereitet...",
     "providers": {
@@ -392,8 +395,16 @@
     "inviteProjectDescription": "Gib die E-Mail-Adresse der Person ein, die du einladen möchtest. Ein Einladungslink wird generiert, den du ihr senden kannst.",
     "messages": {
       "invitedToOrganisation": "Du wurdest von {{inviter}} eingeladen, der Organisation {{organisation}} beizutreten.",
+      "invitedToOrganisationNeedsAccount": "You have been invited by {{inviter}} to join organisation {{organisation}}.",
       "invitedToProject": "Du wurdest von {{inviter}} eingeladen, dem Projekt {{project}} beizutreten.",
+      "invitedToProjectNeedsAccount": "You have been invited by {{inviter}} to join project {{project}}.",
       "selectOrganisation": "Wähle die Organisation aus, zu der du dieses Projekt hinzufügen möchtest:"
+    },
+    "needsAccount": {
+      "continue": "Weiter zur Anmeldung",
+      "description": "Du musst dich mit {{email}} anmelden oder ein Konto erstellen, um diese Einladung anzunehmen.",
+      "emailMatch": "Stelle sicher, dass du dich mit der E-Mail-Adresse anmeldest, an die diese Einladung gesendet wurde: {{email}}",
+      "title": "Konto erforderlich"
     },
     "title": {
       "invitationCreated": "Einladung erstellt",

@@ -18,6 +18,7 @@
  */
 
 import { InvitationInvalid } from 'components/features/invitation/invitationInvalid'
+import { InvitationNeedsAccount } from 'components/features/invitation/InvitationNeedsAccount'
 import { InvitationOtherSession } from 'components/features/invitation/InvitationOtherSession'
 import { InvitationUserConfirm } from 'components/features/invitation/invitationUserConfirm'
 import { getInvitationStatus } from 'lib/api/lasius/invitations-public/invitations-public'
@@ -47,22 +48,15 @@ const Join: NextPage<{ session: Session; locale?: string }> = ({ session, locale
 
   const invitation = invitationStatus.result
 
-  if (invitation?.invitation?.id && invitation?.invitation?.invitedEmail && session === null) {
-    logger.info('[Join][NotAuthenticated]', session)
-    // login user and handle invitation logic again
-    const url =
-      '/login?' +
-      new URLSearchParams({
-        invitation_id: invitation.invitation?.id,
-        email: invitation.invitation?.invitedEmail,
-        locale: locale || '',
-      })
-    router.replace(url)
+  if (invitation?.invitation?.id && invitation?.invitation?.invitedEmail && !session) {
+    logger.info('[Join][NotAuthenticated]', { session, status: invitation.status })
+    // Show appropriate component based on whether user exists
+    return <InvitationNeedsAccount invitation={invitation} locale={locale} />
   }
 
-  if (invitation && session !== null) {
+  if (invitation && session) {
     // check if invitation matches current users session
-    if (session.user && session.user.email !== invitation.invitation.invitedEmail) {
+    if (session?.user?.email && session.user.email !== invitation.invitation.invitedEmail) {
       return (
         <>
           <NextSeo

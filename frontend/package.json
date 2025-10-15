@@ -102,7 +102,7 @@
     "@typescript-eslint/eslint-plugin": "^8.46.1",
     "@typescript-eslint/parser": "^8.46.1",
     "concurrently": "^9.2.1",
-    "daisyui": "^5.3.0",
+    "daisyui": "^5.3.2",
     "dotenv-cli": "^10.0.0",
     "eslint": "9.37.0",
     "eslint-config-airbnb": "^19.0.4",
@@ -120,7 +120,7 @@
     "jsonc-eslint-parser": "^2.4.1",
     "orval": "7.13.2",
     "prettier": "^3.6.2",
-    "prettier-plugin-tailwindcss": "^0.6.14",
+    "prettier-plugin-tailwindcss": "^0.7.0",
     "svgo": "^4.0.0",
     "tailwindcss": "4.1.14",
     "typescript": "5.9.3"

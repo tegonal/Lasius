@@ -94,6 +94,9 @@
     "getStartedFree": "Commence avec le suivi du temps open source",
     "joinLasius": "Rejoindre Lasius",
     "needHelp": "Besoin d'aide ? Clique sur le bouton d'aide",
+    "needsAccount": {
+      "message": "Pour accepter l'invitation, connecte-toi avec {{email}} ou crée un nouveau compte en utilisant l'un des fournisseurs de connexion ci-dessous."
+    },
     "noAuthMethodsAvailable": "Aucune méthode d'authentification disponible",
     "preparingSecureLogin": "Préparation de la connexion sécurisée...",
     "providers": {
@@ -392,8 +395,16 @@
     "inviteProjectDescription": "Saisissez l'adresse e-mail de la personne que vous souhaitez inviter. Un lien d'invitation sera généré que vous pourrez lui envoyer.",
     "messages": {
       "invitedToOrganisation": "Tu as été invité par {{inviter}} à rejoindre l'organisation {{organisation}}.",
+      "invitedToOrganisationNeedsAccount": "You have been invited by {{inviter}} to join organisation {{organisation}}.",
       "invitedToProject": "Tu as été invité par {{inviter}} à rejoindre le projet {{project}}.",
+      "invitedToProjectNeedsAccount": "You have been invited by {{inviter}} to join project {{project}}.",
       "selectOrganisation": "Sélectionne l'organisation à laquelle tu souhaites ajouter ce projet :"
+    },
+    "needsAccount": {
+      "continue": "Continuer vers la connexion",
+      "description": "Tu devras te connecter ou créer un compte pour {{email}} afin d'accepter cette invitation.",
+      "emailMatch": "Assure-toi de te connecter avec l'adresse e-mail à laquelle cette invitation a été envoyée : {{email}}",
+      "title": "Compte requis"
     },
     "title": {
       "invitationCreated": "Invitation créée",
