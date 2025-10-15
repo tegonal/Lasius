@@ -42,22 +42,70 @@ const errorTypeToTranslationKey: Record<string, string> = {
   noNumber: 'common.validation.missingNumber',
   toAfterFrom: 'common.validation.toMustBeAfterFrom',
   fromBeforeTo: 'common.validation.fromMustBeBeforeTo',
+  // Map Zod error codes to translation keys (fallbacks, prefer message over type)
+  too_small: 'common.validation.passwordTooShort',
+  invalid_string: 'common.validation.wrongFormat',
+  invalid_format: 'common.validation.wrongFormat',
+  // custom: don't map, will use the message directly
 }
 
 export const FormErrorsMultiple: React.FC<Props> = ({ errors = null, id }) => {
   const { t } = useTranslation('common')
   if (!errors) return null
-  const { types = {} } = errors
+  const { types, message } = errors
   logger.warn('[form][FormErrorsMultiple]', errors)
+
+  // If no types but has a message, create a single error display
+  if (!types && message) {
+    return (
+      <div className="relative top-0 right-0 pb-2" id={id}>
+        <div className="flex max-w-full flex-row flex-wrap items-center justify-end gap-2">
+          <div className="badge badge-warning translate-x-[6px] -translate-y-1/2">
+            <ErrorSign />
+            {typeof message === 'string' ? message : ''}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!types) return null
+
   return (
     <div className="relative top-0 right-0 pb-2" id={id}>
       <div className="flex max-w-full flex-row flex-wrap items-center justify-end gap-2">
         {Object.keys(types).map((key) => {
+          const errorValue = types[key as keyof typeof types]
           const translationKey = errorTypeToTranslationKey[key]
+
+          // Handle arrays of error messages (e.g., from Zod custom validation)
+          if (Array.isArray(errorValue)) {
+            return errorValue.map((msg, index) => (
+              <div
+                key={`${key}-${index}`}
+                className="badge badge-warning translate-x-[6px] -translate-y-1/2">
+                <ErrorSign />
+                {typeof msg === 'string' ? msg : String(msg)}
+              </div>
+            ))
+          }
+
+          // Priority: 1) error message string, 2) message property, 3) translation, 4) error type key
+          let displayMessage: string
+          if (typeof errorValue === 'string') {
+            displayMessage = errorValue
+          } else if (typeof errorValue === 'object' && errorValue && 'message' in errorValue) {
+            displayMessage = String(errorValue.message)
+          } else if (translationKey) {
+            displayMessage = t(translationKey as any)
+          } else {
+            displayMessage = key
+          }
+
           return (
             <div key={key} className="badge badge-warning translate-x-[6px] -translate-y-1/2">
               <ErrorSign />
-              {translationKey ? t(translationKey as any) : key}
+              {displayMessage}
             </div>
           )
         })}
