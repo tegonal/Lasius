@@ -44,20 +44,23 @@ import {
   processWebSocketEvent,
   WebSocketEventHandler,
 } from 'lib/utils/websocket/typeGuards'
+import { useSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
+import { CONNECTION_STATUS } from 'projectConfig/constants'
 import { ROUTES } from 'projectConfig/routes.constants'
 import React, { useEffect, useMemo } from 'react'
 import { useSWRConfig } from 'swr'
 
 export const LasiusBackendWebsocketEventHandler: React.FC = () => {
   const { mutate } = useSWRConfig()
-  const { lastMessage } = useLasiusWebsocket()
+  const { lastMessage, connectionStatus, sendJsonMessage } = useLasiusWebsocket()
   const mutateMany = useSwrMutateMany()
   const [lastMessageHash, setLastMessageHash] = React.useState<string | null>(null)
   const { selectedOrganisationId } = useOrganisation()
   const { addToast } = useToast()
   const { t } = useTranslation('common')
   const { t: tIntegrations } = useTranslation('integrations')
+  const session = useSession()
 
   // Define event handlers with full type safety
   const eventHandlers: WebSocketEventHandler<any>[] = useMemo(
@@ -212,6 +215,37 @@ export const LasiusBackendWebsocketEventHandler: React.FC = () => {
     ],
     [mutate, mutateMany, selectedOrganisationId, addToast, t, tIntegrations],
   )
+
+  // Send HelloServer authentication when WebSocket connects
+  useEffect(() => {
+    const sendClientAuthentication = () => {
+      logger.info('[WebsocketEventHandler] Sending HelloServer authentication', {
+        client: 'lasius-nextjs-frontend',
+        hasToken: !!session.data?.access_token,
+        hasIssuer: !!session.data?.access_token_issuer,
+      })
+      sendJsonMessage(
+        {
+          type: 'HelloServer',
+          client: 'lasius-nextjs-frontend',
+          token: session.data?.access_token,
+          tokenIssuer: session.data?.access_token_issuer,
+        },
+        false,
+      )
+    }
+
+    if (connectionStatus === CONNECTION_STATUS.CONNECTED && session.data?.access_token) {
+      sendClientAuthentication()
+    } else if (connectionStatus === CONNECTION_STATUS.CONNECTED && !session.data?.access_token) {
+      logger.warn('[WebsocketEventHandler] WebSocket connected but no access token available yet')
+    }
+  }, [
+    connectionStatus,
+    session.data?.access_token,
+    session.data?.access_token_issuer,
+    sendJsonMessage,
+  ])
 
   const newMessage = stringHash(lastMessage) !== lastMessageHash
 

@@ -18,6 +18,7 @@
  */
 
 import { AnimatePresence, m } from 'framer-motion'
+import { logger } from 'lib/logger'
 import React, { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useExplosionEvent, useUIStore } from 'stores/uiStore'
@@ -33,7 +34,7 @@ export const BookingProgressBarExplosion: React.FC = () => {
 
   useEffect(() => {
     if (explosionEvent) {
-      console.log('Explosion event received:', explosionEvent)
+      logger.info('Explosion event received:', explosionEvent)
       // Set active explosion
       setActiveExplosion({
         id: explosionEvent.id,

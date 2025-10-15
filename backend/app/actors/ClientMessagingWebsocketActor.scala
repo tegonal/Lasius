@@ -58,7 +58,10 @@ class ClientReceiverWebsocket extends ClientReceiver {
   def broadcast(senderUserId: UserId, event: OutEvent): Unit = {
     ClientMessagingWebsocketActor.actors
       .iterator()
-      .forEachRemaining(_ ! SendToClient(senderUserId, event))
+      .forEachRemaining { actor =>
+        // Send message - let dead letter handling deal with terminated actors
+        actor ! SendToClient(senderUserId, event)
+      }
   }
 
   /** Send OutEvent to a list of receiving clients exclusing sender itself
@@ -68,7 +71,10 @@ class ClientReceiverWebsocket extends ClientReceiver {
            receivers: List[UserId]): Unit = {
     ClientMessagingWebsocketActor.actors
       .iterator()
-      .forEachRemaining(_ ! SendToClient(senderUserId, event, receivers))
+      .forEachRemaining { actor =>
+        // Send message - let dead letter handling deal with terminated actors
+        actor ! SendToClient(senderUserId, event, receivers)
+      }
   }
 
   def !(senderUserId: UserId,
@@ -113,9 +119,19 @@ class ClientMessagingWebsocketActor(
   // append to map of active actors
   ClientMessagingWebsocketActor.actors.add(self)
 
-  private def default: Receive = { case Ping =>
-    log.debug("Answer with pong")
-    out ! Pong
+  // Watch the output actor to detect early disconnection
+  context.watch(out)
+
+  private def default: Receive = {
+    case Ping =>
+      log.debug("Answer with pong")
+      out ! Pong
+    case Terminated(`out`) =>
+      // Output actor terminated - clean up immediately
+      log.debug(
+        s"Output actor terminated for user ${userId.map(_.value).getOrElse("'Unauthenticated'")}")
+      ClientMessagingWebsocketActor.actors.remove(self)
+      context.stop(self)
   }
 
   private def unauthenticated: Receive = default.orElse {
@@ -143,12 +159,21 @@ class ClientMessagingWebsocketActor(
     case SendToClient(senderUserId, event, Nil) =>
       // broadcast to all others
       if (userId.isDefined && !userId.contains(senderUserId)) {
+        log.info(
+          s"[WebSocket] Broadcasting ${event.getClass.getSimpleName} to user ${userId.get}")
         out ! event
+      } else {
+        log.debug(s"[WebSocket] Skipping broadcast to sender ${senderUserId}")
       }
     case SendToClient(_, event, receivers) =>
       // send to specific clients only
       if (userId.isDefined && receivers.contains(userId.get)) {
+        log.info(
+          s"[WebSocket] Sending ${event.getClass.getSimpleName} to user ${userId.get}")
         out ! event
+      } else {
+        log.debug(
+          s"[WebSocket] User ${userId.getOrElse("unauthenticated")} not in receivers list")
       }
   }
 
