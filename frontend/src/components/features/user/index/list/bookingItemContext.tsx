@@ -17,30 +17,30 @@
  *
  */
 
-import { ContextButtonAddFavorite } from 'components/features/contextMenu/buttons/contextButtonAddFavorite'
-import { ContextButtonClose } from 'components/features/contextMenu/buttons/contextButtonClose'
-import { ContextButtonOpen } from 'components/features/contextMenu/buttons/contextButtonOpen'
-import { ContextButtonStartBooking } from 'components/features/contextMenu/buttons/contextButtonStartBooking'
-import { ContextAnimatePresence } from 'components/features/contextMenu/contextAnimatePresence'
-import { ContextBar } from 'components/features/contextMenu/contextBar'
-import { ContextBarDivider } from 'components/features/contextMenu/contextBarDivider'
-import { ContextBody } from 'components/features/contextMenu/contextBody'
-import { ContextButtonWrapper } from 'components/features/contextMenu/contextButtonWrapper'
-import { useContextMenu } from 'components/features/contextMenu/hooks/useContextMenu'
-import { BookingAddUpdateForm } from 'components/features/user/index/bookingAddUpdateForm'
-import { Button } from 'components/primitives/buttons/Button'
-import { LucideIcon } from 'components/ui/icons/LucideIcon'
-import { Modal } from 'components/ui/overlays/modal/Modal'
-import { differenceInSeconds } from 'date-fns'
-import { AnimatePresence } from 'framer-motion'
-import { useGetAdjacentBookings } from 'lib/api/hooks/useGetAdjacentBookings'
-import { useOrganisation } from 'lib/api/hooks/useOrganisation'
-import { ModelsBooking } from 'lib/api/lasius'
-import { updateUserBooking } from 'lib/api/lasius/user-bookings/user-bookings'
-import { formatISOLocale } from 'lib/utils/date/dates'
-import { ArrowDownToLine, ArrowUpToLine, Pencil, Trash2 } from 'lucide-react'
-import { useTranslation } from 'next-i18next'
-import React, { useState } from 'react'
+import { ContextButtonAddFavorite } from "components/features/contextMenu/buttons/contextButtonAddFavorite";
+import { ContextButtonClose } from "components/features/contextMenu/buttons/contextButtonClose";
+import { ContextButtonOpen } from "components/features/contextMenu/buttons/contextButtonOpen";
+import { ContextButtonStartBooking } from "components/features/contextMenu/buttons/contextButtonStartBooking";
+import { ContextAnimatePresence } from "components/features/contextMenu/contextAnimatePresence";
+import { ContextBar } from "components/features/contextMenu/contextBar";
+import { ContextBarDivider } from "components/features/contextMenu/contextBarDivider";
+import { ContextBody } from "components/features/contextMenu/contextBody";
+import { ContextButtonWrapper } from "components/features/contextMenu/contextButtonWrapper";
+import { useContextMenu } from "components/features/contextMenu/hooks/useContextMenu";
+import { BookingAddUpdateForm } from "components/features/user/index/bookingAddUpdateForm";
+import { Button } from "components/primitives/buttons/Button";
+import { LucideIcon } from "components/ui/icons/LucideIcon";
+import { Modal } from "components/ui/overlays/modal/Modal";
+import { differenceInSeconds } from "date-fns";
+import { AnimatePresence } from "framer-motion";
+import { useGetAdjacentBookings } from "lib/api/hooks/useGetAdjacentBookings";
+import { useOrganisation } from "lib/api/hooks/useOrganisation";
+import { ModelsBooking } from "lib/api/lasius";
+import { updateUserBooking } from "lib/api/lasius/user-bookings/user-bookings";
+import { formatISOLocale } from "lib/utils/date/dates";
+import { ArrowDownToLine, ArrowUpToLine, Pencil, Trash2 } from "lucide-react";
+import { useTranslation } from "next-i18next";
+import React, { useState } from "react";
 
 type Props = {
   item: ModelsBooking
@@ -119,7 +119,7 @@ export const BookingItemContext: React.FC<Props> = ({ item }) => {
         <AnimatePresence>
           {currentOpenContextMenuId === item.id && (
             <ContextAnimatePresence>
-              <ContextBar className="-mr-4">
+              <ContextBar>
                 <ContextButtonStartBooking item={item} />
                 <ContextButtonWrapper>
                   <Button

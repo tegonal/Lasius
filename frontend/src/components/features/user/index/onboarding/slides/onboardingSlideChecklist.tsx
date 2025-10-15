@@ -44,7 +44,7 @@ export const OnboardingSlideChecklist: React.FC<OnboardingSlideChecklistProps> =
       completed: hasMultipleOrganisations,
     },
     {
-      id: 'project',
+      id: 'projects',
       icon: Folder,
       label: t('onboarding.checklist.project', { defaultValue: 'Create or join a project' }),
       completed: hasProjects,
