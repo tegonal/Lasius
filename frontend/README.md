@@ -123,8 +123,8 @@ This project uses a **cookie-based locale system** with next-i18next, not Next.j
 ### Key Implementation Details
 
 - **Locale Storage**: User locale preference is stored in the `NEXT_LOCALE` cookie
-- **Supported Languages**: English (`en`), German (`de`)
-- **Translation Files**: Located in `public/locales/{locale}/common.json`
+- **Supported Languages**: English (`en`), German (`de`), Spanish (`es`), French (`fr`), Italian (`it`)
+- **Translation Files**: Located in `public/locales/{locale}/common.json` and `public/locales/{locale}/integrations.json`
 
 ### Usage in Components
 
