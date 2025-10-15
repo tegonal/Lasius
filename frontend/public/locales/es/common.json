@@ -94,6 +94,9 @@
     "getStartedFree": "Comienza con el seguimiento del tiempo de código abierto",
     "joinLasius": "Únete a Lasius",
     "needHelp": "¿Necesitas ayuda? Haz clic en el botón de ayuda",
+    "needsAccount": {
+      "message": "Para aceptar la invitación, inicia sesión con {{email}} o crea una nueva cuenta usando uno de los proveedores de inicio de sesión que aparecen a continuación."
+    },
     "noAuthMethodsAvailable": "No hay métodos de autenticación disponibles",
     "preparingSecureLogin": "Preparando inicio de sesión seguro...",
     "providers": {
@@ -392,8 +395,16 @@
     "inviteProjectDescription": "Introduce la dirección de correo electrónico de la persona que deseas invitar. Se generará un enlace de invitación que puedes enviarle.",
     "messages": {
       "invitedToOrganisation": "Has sido invitado por {{inviter}} a unirte a la organización {{organisation}}.",
+      "invitedToOrganisationNeedsAccount": "You have been invited by {{inviter}} to join organisation {{organisation}}.",
       "invitedToProject": "Has sido invitado por {{inviter}} a unirte al proyecto {{project}}.",
+      "invitedToProjectNeedsAccount": "You have been invited by {{inviter}} to join project {{project}}.",
       "selectOrganisation": "Selecciona la organización a la que quieres añadir este proyecto:"
+    },
+    "needsAccount": {
+      "continue": "Continuar al inicio de sesión",
+      "description": "Necesitarás iniciar sesión o crear una cuenta para {{email}} para aceptar esta invitación.",
+      "emailMatch": "Asegúrate de iniciar sesión con la dirección de correo electrónico a la que se envió esta invitación: {{email}}",
+      "title": "Cuenta requerida"
     },
     "title": {
       "invitationCreated": "Invitación creada",
