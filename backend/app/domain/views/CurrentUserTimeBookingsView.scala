@@ -223,7 +223,12 @@ class CurrentUserTimeBookingsView(val clientReceiver: ClientReceiver,
     val event = currentUserTimeBookings
 
     if (!today.isAfter(state.currentDay)) {
+      log.info(
+        s"[CurrentUserTimeBookingsView] Sending WebSocket event to user ${userReference.id}: ${event.getClass.getSimpleName}")
       clientReceiver ! (userReference.id, event, List(userReference.id))
+    } else {
+      log.debug(
+        s"[CurrentUserTimeBookingsView] Skipping WebSocket event (old date): today=$today, stateDay=${state.currentDay}")
     }
 
     // publish to the event stream as well

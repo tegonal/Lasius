@@ -19,6 +19,7 @@
 
 import { ToolTip } from 'components/ui/feedback/Tooltip'
 import { m } from 'framer-motion'
+import { logger } from 'lib/logger'
 import React, { memo, useEffect, useRef, useState } from 'react'
 import { useGlobalLoading, useUIStore } from 'stores/uiStore'
 
@@ -50,11 +51,11 @@ export const ProgressBar: React.FC<{ percentage: number; label: string }> = memo
 
         // Only trigger if we have valid coordinates
         if (x > 0 && y > 0) {
-          console.log('ProgressBar explosion coords:', { x, y, fillRect })
+          logger.info('ProgressBar explosion coords:', { x, y, fillRect })
           triggerExplosion(x, y)
           hasTriggeredExplosionRef.current = true
         } else {
-          console.log('ProgressBar skipping invalid coords:', { x, y, fillRect })
+          logger.info('ProgressBar skipping invalid coords:', { x, y, fillRect })
         }
       }
     }
