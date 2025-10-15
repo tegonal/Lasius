@@ -47,23 +47,39 @@ import type { TFunction } from 'i18next'
 const createPasswordChangeSchema = (t: TFunction) =>
   z
     .object({
-      password: z
-        .string()
-        .min(1, t('validation.passwordRequired', { defaultValue: 'Password is required' })),
-      newPassword: z
-        .string()
-        .min(9, t('validation.passwordTooShort', { defaultValue: 'Minimum 9 characters' }))
-        .regex(
-          /(?=.*[A-Z])/,
-          t('validation.missingUppercase', { defaultValue: 'Must contain uppercase letter' }),
-        )
-        .regex(/\d/, t('validation.missingNumber', { defaultValue: 'Must contain a number' })),
-      confirmPassword: z
-        .string()
-        .min(
-          1,
-          t('validation.confirmPasswordRequired', { defaultValue: 'Please confirm your password' }),
-        ),
+      password: z.string().min(1, {
+        message: t('validation.passwordRequired', { defaultValue: 'Password is required' }),
+      }),
+      newPassword: z.string().superRefine((val, ctx) => {
+        if (val.length < 9) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: t('validation.passwordTooShort', { defaultValue: 'Minimum 9 characters' }),
+            params: { type: 'notEnoughCharactersPassword' },
+          })
+        }
+        if (!/(?=.*[A-Z])/.test(val)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: t('validation.missingUppercase', {
+              defaultValue: 'Must contain uppercase letter',
+            }),
+            params: { type: 'noUppercase' },
+          })
+        }
+        if (!/\d/.test(val)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: t('validation.missingNumber', { defaultValue: 'Must contain a number' }),
+            params: { type: 'noNumber' },
+          })
+        }
+      }),
+      confirmPassword: z.string().min(1, {
+        message: t('validation.confirmPasswordRequired', {
+          defaultValue: 'Please confirm your password',
+        }),
+      }),
     })
     .refine((data) => data.newPassword === data.confirmPassword, {
       message: t('validation.passwordMismatch', { defaultValue: 'Passwords do not match' }),
