@@ -33,7 +33,11 @@ import { ModalDescription } from 'components/ui/overlays/modal/ModalDescription'
 import { ModalHeader } from 'components/ui/overlays/modal/ModalHeader'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { ModelsProject, ModelsUserProject } from 'lib/api/lasius'
-import { createProject, updateProject } from 'lib/api/lasius/projects/projects'
+import {
+  createProject,
+  getGetProjectListKey,
+  updateProject,
+} from 'lib/api/lasius/projects/projects'
 import { getGetUserProfileKey } from 'lib/api/lasius/user/user'
 import { useTranslation } from 'next-i18next'
 import React, { useMemo, useState } from 'react'
@@ -112,6 +116,7 @@ export const ProjectAddUpdateForm: React.FC<Props> = ({ mode, item, onCancel, on
         })
       }
 
+      await mutate(getGetProjectListKey(selectedOrganisationId))
       await mutate(getGetUserProfileKey())
       onSave()
     } catch (error) {
