@@ -10,8 +10,8 @@ body:
     id: version
     attributes:
       label: Affected Version
-      description: What version of PROJECT_NAME are you using?
-      placeholder: "v0.1.0"
+      description: What version of Lasius are you using?
+      placeholder: "v2.1.0"
     validations:
       required: true
   - type: textarea
