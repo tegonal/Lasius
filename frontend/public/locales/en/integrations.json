@@ -82,7 +82,10 @@
       "resourceOwnerLoading": "Loading organizations...",
       "resourceOwnerNoResults": "No organizations found",
       "resourceOwnerPlaceholder": "Enter access token above to load organizations",
-      "resourceOwnerSelect": "Select an organization"
+      "resourceOwnerSelect": "Select an organization",
+      "workspace": "Workspace",
+      "workspaceHelp": "The workspace slug from your Plane URL (e.g., \"my-company\" from https://app.plane.so/my-company)",
+      "workspacePlaceholder": "e.g., my-company"
     },
     "github": {
       "instructions": {
@@ -141,7 +144,7 @@
     },
     "plane": {
       "instructions": {
-        "content": "<0><1>Log into your Plane account or self-hosted instance</1><1>Go to Profile Settings</1><1>Select \"Personal Access Tokens\" from the list of tabs</1><1>Click \"Add personal access token\"</1><1>Enter a token name and optional description</1><1>Click \"Generate\" or \"Create\"</1><1>Copy the generated token immediately and store it securely</1></0><3>Note: The token will only be shown once. The token is passed as the value of the <2>X-API-Key</2> header in API requests.</3>",
+        "content": "<0><1>Log into your Plane account or self-hosted instance</1><1>Go to Profile Settings</1><1>Select \"Personal Access Tokens\" from the list of tabs</1><1>Click \"Add personal access token\"</1><1>Enter a token name and optional description</1><1>Click \"Generate\" or \"Create\"</1><1>Copy the generated token immediately and store it securely</1></0><3>Note: The token will only be shown once. The token is passed as the value of the <2>X-API-Key</2> header in API requests.</3><3>Workspace: You need to specify your workspace slug, which can be found in your Plane URL. For example, if your Plane URL is <2>https://app.plane.so/my-company</2>, then your workspace slug is <2>my-company</2>. This is required to access projects and issues in your workspace.</3>",
         "title": "How to create Plane credentials:"
       }
     },
@@ -156,12 +159,15 @@
     },
     "tagConfiguration": {
       "description": "Configure which fields from external issues should be used to create tags in Lasius.",
-      "issueState": {
-        "all": "All issues",
-        "closed": "Closed issues only",
-        "open": "Open issues only"
-      },
-      "issueStateLabel": "Issue state to import",
+      "issueLabelFilterHelp": "Leave empty to import all issues, or select labels to import only issues that have at least one of these labels.",
+      "issueLabelFilterLabel": "Import only issues with specific labels",
+      "issueLabelFilterPlaceholder": "All issues (or select labels to filter...)",
+      "issueStateFilterHelp": "Leave empty to import all issues, or select states to import only issues in those states.",
+      "issueStateFilterLabel": "Import only issues with specific states",
+      "issueStateFilterPlaceholder": "All states (or select specific states...)",
+      "labelFilterHelp": "Leave empty to import all labels, or select specific labels to import only those.",
+      "labelFilterLabel": "Import only specific labels",
+      "labelFilterPlaceholder": "All labels (or select specific labels...)",
       "tagFieldsLabel": "Tag fields to import",
       "tagFieldsPlaceholder": "Select fields...",
       "useAssignees": "Use assignees as tags",

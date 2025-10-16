@@ -169,7 +169,10 @@ class IssueImporterConfigMongoRepository @Inject() (
           name = data.name,
           baseUrl = data.baseUrl,
           auth = PlaneAuth(data.apiKey.getOrElse("")),
-          settings = PlaneSettings(data.checkFrequency),
+          settings = PlaneSettings(
+            checkFrequency = data.checkFrequency,
+            workspace = data.workspace.getOrElse("")
+          ),
           projects = Seq.empty,
           audit = audit
         )
@@ -238,9 +241,16 @@ class IssueImporterConfigMongoRepository @Inject() (
             auth = data.apiKey
               .map(key => PlaneAuth(key))
               .getOrElse(c.auth),
-            settings = data.checkFrequency
-              .map(freq => PlaneSettings(freq))
-              .getOrElse(c.settings),
+            settings =
+              if (data.checkFrequency.isDefined || data.workspace.isDefined) {
+                PlaneSettings(
+                  checkFrequency =
+                    data.checkFrequency.getOrElse(c.settings.checkFrequency),
+                  workspace = data.workspace.getOrElse(c.settings.workspace)
+                )
+              } else {
+                c.settings
+              },
             audit = AuditInfo.updated(c.audit, userId)
           )
 
@@ -283,6 +293,7 @@ class IssueImporterConfigMongoRepository @Inject() (
             projectId = mapping.projectId,
             settings = GitlabProjectSettings(
               gitlabProjectId = mapping.gitlabProjectId.getOrElse(""),
+              externalProjectName = mapping.externalProjectName,
               maxResults = mapping.maxResults,
               params = mapping.params,
               projectKeyPrefix = mapping.projectKeyPrefix,
@@ -303,6 +314,7 @@ class IssueImporterConfigMongoRepository @Inject() (
             projectId = mapping.projectId,
             settings = JiraProjectSettings(
               jiraProjectKey = mapping.jiraProjectKey.getOrElse(""),
+              externalProjectName = mapping.externalProjectName,
               maxResults = mapping.maxResults,
               jql = mapping.params
             )
@@ -315,8 +327,8 @@ class IssueImporterConfigMongoRepository @Inject() (
           val planeMapping = PlaneProjectMapping(
             projectId = mapping.projectId,
             settings = PlaneProjectSettings(
-              planeWorkspace = mapping.planeWorkspaceSlug.getOrElse(""),
               planeProjectId = mapping.planeProjectId.getOrElse(""),
+              externalProjectName = mapping.externalProjectName,
               maxResults = mapping.maxResults,
               params = mapping.params,
               tagConfiguration = mapping.planeTagConfig.getOrElse(
@@ -336,6 +348,7 @@ class IssueImporterConfigMongoRepository @Inject() (
             settings = GithubProjectSettings(
               githubRepoOwner = mapping.githubRepoOwner.getOrElse(""),
               githubRepoName = mapping.githubRepoName.getOrElse(""),
+              externalProjectName = mapping.externalProjectName,
               maxResults = mapping.maxResults,
               params = mapping.params,
               projectKeyPrefix = mapping.projectKeyPrefix,
@@ -371,6 +384,8 @@ class IssueImporterConfigMongoRepository @Inject() (
                   settings = m.settings.copy(
                     gitlabProjectId = mapping.gitlabProjectId.getOrElse(
                       m.settings.gitlabProjectId),
+                    externalProjectName = mapping.externalProjectName.orElse(
+                      m.settings.externalProjectName),
                     maxResults =
                       mapping.maxResults.orElse(m.settings.maxResults),
                     params = mapping.params.orElse(m.settings.params),
@@ -392,6 +407,8 @@ class IssueImporterConfigMongoRepository @Inject() (
                   settings = m.settings.copy(
                     jiraProjectKey = mapping.jiraProjectKey.getOrElse(
                       m.settings.jiraProjectKey),
+                    externalProjectName = mapping.externalProjectName.orElse(
+                      m.settings.externalProjectName),
                     maxResults =
                       mapping.maxResults.orElse(m.settings.maxResults),
                     jql = mapping.params.orElse(m.settings.jql)
@@ -407,10 +424,10 @@ class IssueImporterConfigMongoRepository @Inject() (
               case m if m.projectId == projectId =>
                 m.copy(
                   settings = m.settings.copy(
-                    planeWorkspace = mapping.planeWorkspaceSlug.getOrElse(
-                      m.settings.planeWorkspace),
                     planeProjectId = mapping.planeProjectId.getOrElse(
                       m.settings.planeProjectId),
+                    externalProjectName = mapping.externalProjectName.orElse(
+                      m.settings.externalProjectName),
                     maxResults =
                       mapping.maxResults.orElse(m.settings.maxResults),
                     params = mapping.params.orElse(m.settings.params),
@@ -432,6 +449,8 @@ class IssueImporterConfigMongoRepository @Inject() (
                       m.settings.githubRepoOwner),
                     githubRepoName = mapping.githubRepoName.getOrElse(
                       m.settings.githubRepoName),
+                    externalProjectName = mapping.externalProjectName.orElse(
+                      m.settings.externalProjectName),
                     maxResults =
                       mapping.maxResults.orElse(m.settings.maxResults),
                     params = mapping.params.orElse(m.settings.params),

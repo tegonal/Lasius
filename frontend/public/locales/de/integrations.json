@@ -82,7 +82,10 @@
       "resourceOwnerLoading": "Lade Organisationen...",
       "resourceOwnerNoResults": "Keine Organisationen gefunden",
       "resourceOwnerPlaceholder": "Zugangstoken oben eingeben, um Organisationen zu laden",
-      "resourceOwnerSelect": "Organisation auswählen"
+      "resourceOwnerSelect": "Organisation auswählen",
+      "workspace": "Arbeitsbereich",
+      "workspaceHelp": "Der Arbeitsbereich-Slug aus Ihrer Plane-URL (z.B. \"meine-firma\" aus https://app.plane.so/meine-firma)",
+      "workspacePlaceholder": "z.B. meine-firma"
     },
     "github": {
       "instructions": {
@@ -141,7 +144,7 @@
     },
     "plane": {
       "instructions": {
-        "content": "<0><1>Melde dich bei deinem Plane-Konto oder deiner selbst gehosteten Instanz an</1><1>Gehe zu Profileinstellungen</1><1>Wähle \"Personal Access Tokens\" aus der Liste der Tabs</1><1>Klicke auf \"Add personal access token\"</1><1>Gib einen Token-Namen und eine optionale Beschreibung ein</1><1>Klicke auf \"Generate\" oder \"Create\"</1><1>Kopiere den generierten Token sofort und speichere ihn sicher</1></0><3>Hinweis: Der Token wird nur einmal angezeigt. Der Token wird als Wert des <2>X-API-Key</2>-Headers in API-Anfragen übergeben.</3>",
+        "content": "<0><1>Melde dich bei deinem Plane-Konto oder deiner selbst gehosteten Instanz an</1><1>Gehe zu Profileinstellungen</1><1>Wähle \"Personal Access Tokens\" aus der Liste der Tabs</1><1>Klicke auf \"Add personal access token\"</1><1>Gib einen Token-Namen und eine optionale Beschreibung ein</1><1>Klicke auf \"Generate\" oder \"Create\"</1><1>Kopiere den generierten Token sofort und speichere ihn sicher</1></0><3>Hinweis: Der Token wird nur einmal angezeigt. Der Token wird als Wert des <2>X-API-Key</2>-Headers in API-Anfragen übergeben.</3><3>Arbeitsbereich: Du musst deinen Arbeitsbereich-Slug angeben, der in deiner Plane-URL zu finden ist. Wenn deine Plane-URL beispielsweise <2>https://app.plane.so/meine-firma</2> ist, dann ist dein Arbeitsbereich-Slug <2>meine-firma</2>. Dies ist erforderlich, um auf Projekte und Issues in deinem Arbeitsbereich zuzugreifen.</3>",
         "title": "So erstellst du Plane-Anmeldedaten:"
       }
     },
@@ -156,12 +159,15 @@
     },
     "tagConfiguration": {
       "description": "Konfiguriere, welche Felder aus externen Issues verwendet werden sollen, um Tags in Lasius zu erstellen.",
-      "issueState": {
-        "all": "Alle Issues",
-        "closed": "Nur geschlossene Issues",
-        "open": "Nur offene Issues"
-      },
-      "issueStateLabel": "Zu importierender Issue-Status",
+      "issueLabelFilterHelp": "Leer lassen, um alle Issues zu importieren, oder Labels auswählen, um nur Issues zu importieren, die mindestens eines dieser Labels haben.",
+      "issueLabelFilterLabel": "Nur Issues mit bestimmten Labels importieren",
+      "issueLabelFilterPlaceholder": "Alle Issues (oder Labels zum Filtern auswählen...)",
+      "issueStateFilterHelp": "Leer lassen, um alle Issues zu importieren, oder Status auswählen, um nur Issues in diesen Status zu importieren.",
+      "issueStateFilterLabel": "Nur Issues mit bestimmten Status importieren",
+      "issueStateFilterPlaceholder": "Alle Status (oder bestimmte Status auswählen...)",
+      "labelFilterHelp": "Leer lassen, um alle Labels zu importieren, oder bestimmte Labels auswählen, um nur diese zu importieren.",
+      "labelFilterLabel": "Nur bestimmte Labels importieren",
+      "labelFilterPlaceholder": "Alle Labels (oder bestimmte Labels auswählen...)",
       "tagFieldsLabel": "Tag-Felder zum Importieren",
       "tagFieldsPlaceholder": "Felder auswählen...",
       "useAssignees": "Bearbeiter als Tags verwenden",

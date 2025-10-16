@@ -281,9 +281,7 @@ export const ConfigInfoModal: React.FC<Props> = ({
                       {syncStatus.projectStats.map((stat, index) => (
                         <DataListRow key={index}>
                           <DataListField>
-                            <span className="text-sm font-medium">
-                              {stat.projectName || stat.projectId || 'Unknown'}
-                            </span>
+                            <span className="text-sm font-medium">{stat.projectName}</span>
                           </DataListField>
                           <DataListField>
                             <span className="text-sm">{stat.totalIssuesSynced || 0}</span>

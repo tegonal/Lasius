@@ -49,6 +49,7 @@ case class CreateIssueImporterConfig(
     privateKey: Option[String] = None,
     // Plane auth
     apiKey: Option[String] = None,
+    workspace: Option[String] = None, // Plane workspace slug
     // GitHub-specific: resource owner for org-scoped tokens
     resourceOwner: Option[String] = None,
     resourceOwnerType: Option[String] = None // "User" or "Organization"
@@ -69,6 +70,7 @@ case class UpdateIssueImporterConfig(
     consumerKey: Option[String] = None,
     privateKey: Option[String] = None,
     apiKey: Option[String] = None,
+    workspace: Option[String] = None,        // Plane workspace slug
     resourceOwner: Option[String] = None,    // GitHub resource owner login
     resourceOwnerType: Option[String] = None // "User" or "Organization"
 )
@@ -85,6 +87,8 @@ object UpdateIssueImporterConfig {
   */
 case class CreateProjectMapping(
     projectId: ProjectId,
+    // Common
+    externalProjectName: Option[String] = None,
     // GitLab-specific
     gitlabProjectId: Option[String] = None,
     projectKeyPrefix: Option[String] = None,
@@ -93,7 +97,6 @@ case class CreateProjectMapping(
     jiraProjectKey: Option[String] = None,
     // Plane-specific
     planeProjectId: Option[String] = None,
-    planeWorkspaceSlug: Option[String] = None,
     planeTagConfig: Option[PlaneTagConfiguration] = None,
     // GitHub-specific
     githubRepoOwner: Option[String] = None,
@@ -110,6 +113,8 @@ object CreateProjectMapping {
 }
 
 case class UpdateProjectMapping(
+    // Common
+    externalProjectName: Option[String] = None,
     // GitLab-specific
     gitlabProjectId: Option[String] = None,
     projectKeyPrefix: Option[String] = None,
@@ -118,7 +123,6 @@ case class UpdateProjectMapping(
     jiraProjectKey: Option[String] = None,
     // Plane-specific
     planeProjectId: Option[String] = None,
-    planeWorkspaceSlug: Option[String] = None,
     planeTagConfig: Option[PlaneTagConfiguration] = None,
     // GitHub-specific
     githubRepoOwner: Option[String] = None,
@@ -251,6 +255,7 @@ case class PlaneConfigResponse(
     projects: Seq[PlaneProjectMapping],
     syncStatus: ConfigSyncStatus,
     audit: AuditInfoResponse,
+    workspace: String, // Plane workspace slug
     // type attribute only needed to generate correct swagger definition
     `type`: String = classOf[PlaneConfigResponse].getSimpleName
 ) extends IssueImporterConfigResponse {
@@ -277,7 +282,8 @@ object PlaneConfigResponse {
         createdAt = config.audit.createdAt,
         updatedBy = updatedByUser,
         updatedAt = config.audit.updatedAt
-      )
+      ),
+      workspace = config.settings.workspace
     )
   }
 }
@@ -335,7 +341,10 @@ object GithubConfigResponse {
 case class ExternalProject(
     id: String,
     name: String,
-    ownerType: Option[String] = None // "User" or "Organization" for GitHub
+    ownerType: Option[String] = None, // "User" or "Organization" for GitHub
+    availableLabels: Option[Seq[String]] =
+      None,                                     // Plane/GitLab available labels
+    availableStates: Option[Seq[String]] = None // Plane available states
 )
 
 case class ExternalWorkspace(

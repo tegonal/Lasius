@@ -439,7 +439,6 @@ class IssueImporterConfigControllerSpec
         ),
         jiraProjectKey = None,
         planeProjectId = None,
-        planeWorkspaceSlug = None,
         planeTagConfig = None,
         maxResults = Some(50),
         params = None
@@ -509,7 +508,6 @@ class IssueImporterConfigControllerSpec
         ),
         jiraProjectKey = None,
         planeProjectId = None,
-        planeWorkspaceSlug = None,
         planeTagConfig = None,
         maxResults = Some(200),
         params = Some("custom=param")
@@ -568,7 +566,6 @@ class IssueImporterConfigControllerSpec
         gitlabTagConfig = None,
         jiraProjectKey = None,
         planeProjectId = None,
-        planeWorkspaceSlug = None,
         planeTagConfig = None,
         maxResults = Some(50),
         params = None
@@ -796,7 +793,8 @@ class IssueImporterConfigControllerSpec
         accessToken = None,
         consumerKey = None,
         privateKey = None,
-        apiKey = Some("test-api-key")
+        apiKey = Some("test-api-key"),
+        workspace = Some("test-workspace")
       )
 
       val request: FakeRequest[CreateIssueImporterConfig] =
@@ -966,7 +964,7 @@ class IssueImporterConfigControllerSpec
       response.projects.get.head.name must equalTo("Project A")
     }
 
-    "return 200 with Plane workspaces and projects" in new WithTestApplication {
+    "return 200 with Plane projects" in new WithTestApplication {
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
@@ -976,15 +974,8 @@ class IssueImporterConfigControllerSpec
       val mockWsRequest  = mock[WSRequest]
       val mockWsResponse = mock[WSResponse]
 
-      // Plane API returns paginated responses with "results" array and optional "next" field
-      val workspacesJson = Json.obj(
-        "results" -> Json.arr(
-          Json.obj("slug" -> "workspace-a", "name" -> "Workspace A"),
-          Json.obj("slug" -> "workspace-b", "name" -> "Workspace B")
-        )
-        // No "next" field = no pagination
-      )
-
+      // Plane API fetches projects for the configured workspace
+      // The planeConfig in the mock has workspace: "test-workspace"
       val projectsJson = Json.obj(
         "results" -> Json.arr(
           Json.obj("id" -> "proj-1", "name" -> "Project 1"),
@@ -1000,13 +991,9 @@ class IssueImporterConfigControllerSpec
         .thenReturn(mockWsRequest)
       when(mockWsRequest.get())
         .thenReturn(Future.successful(mockWsResponse))
-        .thenReturn(Future.successful(mockWsResponse))
-        .thenReturn(Future.successful(mockWsResponse))
       when(mockWsResponse.status).thenReturn(200)
       when(mockWsResponse.json)
-        .thenReturn(workspacesJson) // First call: list workspaces
-        .thenReturn(projectsJson)   // Second call: projects for workspace-a
-        .thenReturn(projectsJson)   // Third call: projects for workspace-b
+        .thenReturn(projectsJson) // Fetch projects for test-workspace
 
       val controller: IssueImporterConfigControllerMock =
         IssueImporterConfigControllerMock(
@@ -1025,10 +1012,10 @@ class IssueImporterConfigControllerSpec
 
       status(result) must equalTo(OK)
       val response = contentAsJson(result).as[ListProjectsResponse]
-      response.workspaces must beSome
-      response.workspaces.get.size must equalTo(2)
-      response.workspaces.get.head.name must equalTo("Workspace A")
-      response.workspaces.get.head.projects.size must equalTo(2)
+      // Plane now returns flat projects list like GitLab/Jira (one workspace per config)
+      response.projects must beSome
+      response.projects.get.size must equalTo(2)
+      response.projects.get.head.name must equalTo("Project 1")
     }
 
     "return 200 with GitHub repositories" in new WithTestApplication {

@@ -40,6 +40,7 @@ case class GitlabTagConfiguration(
 
 case class GitlabProjectSettings(
     gitlabProjectId: String,
+    externalProjectName: Option[String] = None,
     maxResults: Option[Int] = None,
     params: Option[String] = None,
     projectKeyPrefix: Option[String] = None,

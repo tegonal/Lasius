@@ -68,6 +68,7 @@ type Props = {
     externalProjectId: string,
     lasiusProjectId: string | null,
     tagConfig: TagConfiguration | undefined,
+    externalProjectName?: string,
   ) => void
   onProjectsLoaded?: (projects: ModelsExternalProject[]) => void
 }
@@ -135,6 +136,9 @@ export const ProjectMappingList: React.FC<Props> = ({
     lasiusProjectId: string | null,
     tagConfig: TagConfiguration | undefined,
   ) => {
+    // Find the external project to get its name
+    const externalProject = projects.find((p) => p.id === externalProjectId)
+
     setMappings((prev) => {
       const updated = { ...prev }
       if (lasiusProjectId) {
@@ -147,7 +151,7 @@ export const ProjectMappingList: React.FC<Props> = ({
       }
       return updated
     })
-    onMappingChange(externalProjectId, lasiusProjectId, tagConfig)
+    onMappingChange(externalProjectId, lasiusProjectId, tagConfig, externalProject?.name)
   }
 
   // Filter projects by name or ID

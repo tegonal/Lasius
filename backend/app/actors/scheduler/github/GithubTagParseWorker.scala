@@ -116,8 +116,8 @@ class GithubTagParseWorker(wsClient: WSClient,
           configId = configId,
           organisationId = organisationId,
           projectId = projectId,
-          projectName =
-            s"GitHub ${projectSettings.githubRepoOwner}/${projectSettings.githubRepoName}",
+          projectName = projectSettings.externalProjectName.getOrElse(
+            s"GitHub ${projectSettings.githubRepoOwner}/${projectSettings.githubRepoName}"),
           issueCount = result.size,
           success = true
         )
@@ -152,8 +152,8 @@ class GithubTagParseWorker(wsClient: WSClient,
             configId = configId,
             organisationId = organisationId,
             projectId = projectId,
-            projectName =
-              s"GitHub ${projectSettings.githubRepoOwner}/${projectSettings.githubRepoName}",
+            projectName = projectSettings.externalProjectName.getOrElse(
+              s"GitHub ${projectSettings.githubRepoOwner}/${projectSettings.githubRepoName}"),
             issueCount = 0,
             success = false,
             error = Some(issue)

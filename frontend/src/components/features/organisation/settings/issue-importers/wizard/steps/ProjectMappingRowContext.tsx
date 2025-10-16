@@ -155,7 +155,7 @@ export const ProjectMappingRowContext: React.FC<Props> = ({
           )}
         </AnimatePresence>
       </ContextBody>
-      <Modal open={isSelectorOpen} onClose={handleSelectorClose}>
+      <Modal open={isSelectorOpen} onClose={handleSelectorClose} size="lg">
         <ProjectMappingSelector
           importerType={importerType}
           externalProject={externalProject}

@@ -101,6 +101,11 @@ export const useConnectionTest = (
           payload.resourceOwnerType = formData.resourceOwnerType
         }
 
+        // Add workspace for Plane (required field, not nullable)
+        if (importerType === 'plane') {
+          payload.workspace = formData.workspace || ''
+        }
+
         logger.info(
           `[useConnectionTest] Testing with new credentials for ${importerType}${configId ? ` (editing config ${configId})` : ' (new config)'}`,
         )

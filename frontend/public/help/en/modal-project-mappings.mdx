@@ -31,18 +31,26 @@ Use the filter box at the top to search by project name or ID. Click the X to cl
 
 After selecting a Lasius project, configure which issue fields to import as tags:
 
-**Tag Fields to Import** (Multi-select):
+**Tag Fields to Import** (Multi-select, at least one required):
 - Use issue title as tag
 - Use labels as tags
 - Use milestone as tag
 - Use assignees as tags (GitHub only)
 
-**Issue State to Import**:
-- All issues
-- Open issues only
-- Closed issues only
+**Label Filter** (appears if "Use labels" is selected):
+- Leave empty to import all labels as tags
+- Select specific labels to import only those
 
-<Tip>Use "Open issues only" to avoid cluttering your tag list with closed issues</Tip>
+**Issue Label Filter**:
+- Leave empty to import all issues
+- Select labels to import only issues with those labels
+
+**Issue State Filter**:
+- **GitHub/GitLab**: Single selection (open or closed)
+- **Plane**: Multi-select (custom workflow states)
+- Leave empty to import issues in all states
+
+<Tip>For GitHub/GitLab, select "open" to avoid cluttering your tag list with closed issues</Tip>
 
 ## Editing a Mapping
 

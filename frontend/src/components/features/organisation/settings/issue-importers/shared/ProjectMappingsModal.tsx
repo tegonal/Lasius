@@ -93,6 +93,7 @@ export const ProjectMappingsModal: React.FC<Props> = ({ open, onClose, config, o
       externalProjectId: string,
       lasiusProjectId: string | null,
       tagConfig?: TagConfiguration,
+      externalProjectName?: string,
     ) => {
       const previousMapping = mappings[externalProjectId]
 
@@ -151,6 +152,7 @@ export const ProjectMappingsModal: React.FC<Props> = ({ open, onClose, config, o
           externalProjectId,
           lasiusProjectId,
           tagConfig,
+          externalProjectName,
         )
 
         if (!result.success) {

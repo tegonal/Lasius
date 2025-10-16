@@ -110,7 +110,8 @@ class GitlabTagParseWorker(wsClient: WSClient,
           configId = configId,
           organisationId = organisationId,
           projectId = projectId,
-          projectName = s"GitLab Project ${projectSettings.gitlabProjectId}",
+          projectName = projectSettings.externalProjectName.getOrElse(
+            s"GitLab Project ${projectSettings.gitlabProjectId}"),
           issueCount = result.size,
           success = true
         )
@@ -146,7 +147,8 @@ class GitlabTagParseWorker(wsClient: WSClient,
             configId = configId,
             organisationId = organisationId,
             projectId = projectId,
-            projectName = s"GitLab Project ${projectSettings.gitlabProjectId}",
+            projectName = projectSettings.externalProjectName.getOrElse(
+              s"GitLab Project ${projectSettings.gitlabProjectId}"),
             issueCount = 0,
             success = false,
             error = Some(issue)

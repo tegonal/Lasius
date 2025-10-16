@@ -31,6 +31,7 @@ case class JiraSettings(checkFrequency: Long)
 
 case class JiraProjectSettings(
     jiraProjectKey: String,
+    externalProjectName: Option[String] = None,
     maxResults: Option[Int] = None,
     jql: Option[String] = None
 )

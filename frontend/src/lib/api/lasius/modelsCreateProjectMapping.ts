@@ -23,13 +23,15 @@ import type { ModelsGithubTagConfiguration } from './modelsGithubTagConfiguratio
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.0.1+10-a10445d4+20251012-1746
+ * OpenAPI spec version: 2.1.3+0-5a9b540e+20251016-0430
  */
 import type { ModelsGitlabTagConfiguration } from './modelsGitlabTagConfiguration'
 import type { ModelsPlaneTagConfiguration } from './modelsPlaneTagConfiguration'
 
 export interface ModelsCreateProjectMapping {
   projectId: string
+  /** @nullable */
+  externalProjectName?: string | null
   /** @nullable */
   gitlabProjectId?: string | null
   /** @nullable */
@@ -40,8 +42,6 @@ export interface ModelsCreateProjectMapping {
   jiraProjectKey?: string | null
   /** @nullable */
   planeProjectId?: string | null
-  /** @nullable */
-  planeWorkspaceSlug?: string | null
   /** @nullable */
   planeTagConfig?: ModelsPlaneTagConfiguration
   /** @nullable */

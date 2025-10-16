@@ -84,7 +84,10 @@
       "resourceOwnerLoading": "Caricamento organizzazioni...",
       "resourceOwnerNoResults": "Nessuna organizzazione trovata",
       "resourceOwnerPlaceholder": "Inserisci il token di accesso sopra per caricare le organizzazioni",
-      "resourceOwnerSelect": "Seleziona un'organizzazione"
+      "resourceOwnerSelect": "Seleziona un'organizzazione",
+      "workspace": "Spazio di lavoro",
+      "workspaceHelp": "Lo slug dello spazio di lavoro dal tuo URL Plane (es., \"mia-azienda\" da https://app.plane.so/mia-azienda)",
+      "workspacePlaceholder": "es. mia-azienda"
     },
     "github": {
       "instructions": {
@@ -143,7 +146,7 @@
     },
     "plane": {
       "instructions": {
-        "content": "<0><1>Accedi al tuo account Plane o istanza self-hosted</1><1>Vai nelle impostazioni del profilo</1><1>Seleziona \"Personal Access Tokens\" dall'elenco delle schede</1><1>Clicca su \"Add personal access token\"</1><1>Inserisci un nome per il token e una descrizione opzionale</1><1>Clicca su \"Generate\" o \"Create\"</1><1>Copia il token generato immediatamente e conservalo in modo sicuro</1></0><3>Nota: Il token verrà mostrato solo una volta. Il token viene passato come valore dell'header <2>X-API-Key</2> nelle richieste API.</3>",
+        "content": "<0><1>Accedi al tuo account Plane o istanza self-hosted</1><1>Vai nelle impostazioni del profilo</1><1>Seleziona \"Personal Access Tokens\" dall'elenco delle schede</1><1>Clicca su \"Add personal access token\"</1><1>Inserisci un nome per il token e una descrizione opzionale</1><1>Clicca su \"Generate\" o \"Create\"</1><1>Copia il token generato immediatamente e conservalo in modo sicuro</1></0><3>Nota: Il token verrà mostrato solo una volta. Il token viene passato come valore dell'header <2>X-API-Key</2> nelle richieste API.</3><3>Spazio di lavoro: Devi specificare lo slug del tuo spazio di lavoro, che si trova nel tuo URL Plane. Ad esempio, se il tuo URL Plane è <2>https://app.plane.so/mia-azienda</2>, allora lo slug del tuo spazio di lavoro è <2>mia-azienda</2>. Questo è necessario per accedere a progetti e issue nel tuo spazio di lavoro.</3>",
         "title": "Come creare le credenziali Plane:"
       }
     },
@@ -158,12 +161,15 @@
     },
     "tagConfiguration": {
       "description": "Configura quali campi delle issue esterne devono essere usati per creare tag in Lasius.",
-      "issueState": {
-        "all": "Tutte le issue",
-        "closed": "Solo issue chiuse",
-        "open": "Solo issue aperte"
-      },
-      "issueStateLabel": "Stato issue da importare",
+      "issueLabelFilterHelp": "Lasciare vuoto per importare tutte le issue, oppure selezionare etichette per importare solo le issue che hanno almeno una di queste etichette.",
+      "issueLabelFilterLabel": "Importa solo issue con etichette specifiche",
+      "issueLabelFilterPlaceholder": "Tutte le issue (o seleziona etichette per filtrare...)",
+      "issueStateFilterHelp": "Lasciare vuoto per importare tutte le issue, oppure selezionare stati per importare solo le issue in quegli stati.",
+      "issueStateFilterLabel": "Importa solo issue con stati specifici",
+      "issueStateFilterPlaceholder": "Tutti gli stati (o seleziona stati specifici...)",
+      "labelFilterHelp": "Lasciare vuoto per importare tutte le etichette, oppure selezionare etichette specifiche per importare solo quelle.",
+      "labelFilterLabel": "Importa solo etichette specifiche",
+      "labelFilterPlaceholder": "Tutte le etichette (o seleziona etichette specifiche...)",
       "tagFieldsLabel": "Campi tag da importare",
       "tagFieldsPlaceholder": "Seleziona campi...",
       "useAssignees": "Usa assegnatari come tag",

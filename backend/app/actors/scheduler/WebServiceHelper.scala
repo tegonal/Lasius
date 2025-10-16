@@ -71,7 +71,7 @@ object WebServiceHelper {
       : Future[Try[(JsValue, Map[String, scala.collection.Seq[String]])]] = {
     wsClient
       .url(url)
-      .addHttpHeaders(s"x-api-key" -> s"${auth.apiKey}")
+      .addHttpHeaders(s"X-API-Key" -> s"${auth.apiKey}")
       .get()
       .map { result =>
         result.status match {

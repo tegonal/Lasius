@@ -48,6 +48,7 @@ export const ListProjectsStep: React.FC<Props> = ({
     externalProjectId: string,
     lasiusProjectId: string | null,
     tagConfig: any,
+    _externalProjectName?: string, // Ignored in wizard context, only used when saving
   ) => {
     setMappings((prev) => {
       const updated = { ...prev }

@@ -84,7 +84,10 @@
       "resourceOwnerLoading": "Chargement des organisations...",
       "resourceOwnerNoResults": "Aucune organisation trouvée",
       "resourceOwnerPlaceholder": "Saisis le jeton d'accès ci-dessus pour charger les organisations",
-      "resourceOwnerSelect": "Sélectionner une organisation"
+      "resourceOwnerSelect": "Sélectionner une organisation",
+      "workspace": "Espace de travail",
+      "workspaceHelp": "Le slug de l'espace de travail depuis ton URL Plane (par ex., \"ma-societe\" depuis https://app.plane.so/ma-societe)",
+      "workspacePlaceholder": "p. ex., ma-societe"
     },
     "github": {
       "instructions": {
@@ -143,7 +146,7 @@
     },
     "plane": {
       "instructions": {
-        "content": "<0><1>Connecte-toi à ton compte Plane ou à ton instance auto-hébergée</1><1>Va dans les paramètres du profil</1><1>Sélectionne \"Personal Access Tokens\" dans la liste des onglets</1><1>Clique sur \"Add personal access token\"</1><1>Saisis un nom de jeton et une description optionnelle</1><1>Clique sur \"Generate\" ou \"Create\"</1><1>Copie le jeton généré immédiatement et stocke-le en toute sécurité</1></0><3>Note : Le jeton ne sera affiché qu'une seule fois. Le jeton est transmis en tant que valeur de l'en-tête <2>X-API-Key</2> dans les requêtes API.</3>",
+        "content": "<0><1>Connecte-toi à ton compte Plane ou à ton instance auto-hébergée</1><1>Va dans les paramètres du profil</1><1>Sélectionne \"Personal Access Tokens\" dans la liste des onglets</1><1>Clique sur \"Add personal access token\"</1><1>Saisis un nom de jeton et une description optionnelle</1><1>Clique sur \"Generate\" ou \"Create\"</1><1>Copie le jeton généré immédiatement et stocke-le en toute sécurité</1></0><3>Note : Le jeton ne sera affiché qu'une seule fois. Le jeton est transmis en tant que valeur de l'en-tête <2>X-API-Key</2> dans les requêtes API.</3><3>Espace de travail : Tu dois spécifier le slug de ton espace de travail, qui se trouve dans ton URL Plane. Par exemple, si ton URL Plane est <2>https://app.plane.so/ma-societe</2>, alors ton slug d'espace de travail est <2>ma-societe</2>. Ceci est nécessaire pour accéder aux projets et tickets de ton espace de travail.</3>",
         "title": "Comment créer des identifiants Plane :"
       }
     },
@@ -158,12 +161,15 @@
     },
     "tagConfiguration": {
       "description": "Configure les champs des tickets externes à utiliser pour créer des étiquettes dans Lasius.",
-      "issueState": {
-        "all": "Tous les tickets",
-        "closed": "Tickets fermés uniquement",
-        "open": "Tickets ouverts uniquement"
-      },
-      "issueStateLabel": "Statut de ticket à importer",
+      "issueLabelFilterHelp": "Laisser vide pour importer tous les tickets, ou sélectionner des étiquettes pour importer uniquement les tickets ayant au moins une de ces étiquettes.",
+      "issueLabelFilterLabel": "Importer uniquement les tickets avec des étiquettes spécifiques",
+      "issueLabelFilterPlaceholder": "Tous les tickets (ou sélectionner des étiquettes pour filtrer...)",
+      "issueStateFilterHelp": "Laisser vide pour importer tous les tickets, ou sélectionner des états pour importer uniquement les tickets dans ces états.",
+      "issueStateFilterLabel": "Importer uniquement les tickets avec des états spécifiques",
+      "issueStateFilterPlaceholder": "Tous les états (ou sélectionner des états spécifiques...)",
+      "labelFilterHelp": "Laisser vide pour importer toutes les étiquettes, ou sélectionner des étiquettes spécifiques pour importer uniquement celles-ci.",
+      "labelFilterLabel": "Importer uniquement des étiquettes spécifiques",
+      "labelFilterPlaceholder": "Toutes les étiquettes (ou sélectionner des étiquettes spécifiques...)",
       "tagFieldsLabel": "Champs de tags à importer",
       "tagFieldsPlaceholder": "Sélectionne des champs...",
       "useAssignees": "Utiliser les assignés comme étiquettes",

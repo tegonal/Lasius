@@ -47,6 +47,7 @@ export type MappingPayloadResult =
  * @param externalProjectId - External project identifier (format varies by platform)
  * @param lasiusProjectId - Lasius project ID to map to
  * @param tagConfig - Optional tag configuration for the mapping
+ * @param externalProjectName - Optional external project name (e.g., "facebook/react" for GitHub)
  * @returns Result object with payload or error
  */
 export const buildMappingPayload = (
@@ -54,16 +55,17 @@ export const buildMappingPayload = (
   externalProjectId: string,
   lasiusProjectId: string,
   tagConfig?: TagConfiguration,
+  externalProjectName?: string,
 ): MappingPayloadResult => {
   // Initialize with all fields as null
   const payload: ModelsCreateProjectMapping = {
     projectId: lasiusProjectId,
+    externalProjectName: externalProjectName || null,
     gitlabProjectId: null,
     projectKeyPrefix: null,
     gitlabTagConfig: undefined,
     jiraProjectKey: null,
     planeProjectId: null,
-    planeWorkspaceSlug: null,
     planeTagConfig: undefined,
     githubRepoOwner: null,
     githubRepoName: null,

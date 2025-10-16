@@ -120,12 +120,14 @@ class IssueImporterConfigControllerMock(
     name = "Test Plane",
     baseUrl = new URL("https://plane.test.com"),
     auth = PlaneAuth("test-api-key"),
-    settings = PlaneSettings(checkFrequency = 300000L),
+    settings = PlaneSettings(
+      checkFrequency = 300000L,
+      workspace = "test-workspace"
+    ),
     projects = Seq(
       PlaneProjectMapping(
         projectId = project.id,
         settings = PlaneProjectSettings(
-          planeWorkspace = "test-workspace",
           planeProjectId = "test-project-123",
           maxResults = Some(100),
           params = None,

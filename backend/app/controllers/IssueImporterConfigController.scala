@@ -708,13 +708,22 @@ class IssueImporterConfigController @Inject() (
           } yield Ok
 
         case ImporterType.Plane =>
-          validate(
-            config.apiKey.isDefined,
-            ConfigErrorResponses.validationFailed(
-              "apiKey",
-              "apiKey is required for Plane configurations",
-              ImporterType.Plane)
-          )
+          for {
+            _ <- validate(
+              config.apiKey.isDefined,
+              ConfigErrorResponses.validationFailed(
+                "apiKey",
+                "apiKey is required for Plane configurations",
+                ImporterType.Plane)
+            )
+            _ <- validate(
+              config.workspace.isDefined,
+              ConfigErrorResponses.validationFailed(
+                "workspace",
+                "workspace is required for Plane configurations",
+                ImporterType.Plane)
+            )
+          } yield Ok
 
         case ImporterType.Github =>
           for {
@@ -813,13 +822,6 @@ class IssueImporterConfigController @Inject() (
               ImporterType.Plane)
           )
           _ <- validate(
-            mapping.planeWorkspaceSlug.isDefined,
-            ConfigErrorResponses.validationFailed(
-              "planeWorkspaceSlug",
-              "planeWorkspaceSlug is required for Plane project mappings",
-              ImporterType.Plane)
-          )
-          _ <- validate(
             mapping.planeTagConfig.isDefined,
             ConfigErrorResponses.validationFailed(
               "planeTagConfig",
@@ -900,7 +902,8 @@ class IssueImporterConfigController @Inject() (
           name = c.name,
           baseUrl = c.baseUrl,
           checkFrequency = c.settings.checkFrequency,
-          apiKey = Some(c.auth.apiKey)
+          apiKey = Some(c.auth.apiKey),
+          workspace = Some(c.settings.workspace)
         )
 
       case c: GithubConfig =>

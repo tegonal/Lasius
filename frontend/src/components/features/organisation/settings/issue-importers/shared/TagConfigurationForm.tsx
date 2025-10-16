@@ -17,13 +17,16 @@
  *
  */
 
+import { FormBody } from 'components/ui/forms/FormBody'
+import { FormElement } from 'components/ui/forms/FormElement'
 import { MultiSelect, type MultiSelectOption } from 'components/ui/forms/input/MultiSelect'
-import { Select, type SelectOption } from 'components/ui/forms/input/Select'
+import { Select } from 'components/ui/forms/input/Select'
 import { useTranslation } from 'next-i18next'
 import React, { useMemo } from 'react'
 
 import type { ImporterType } from 'components/features/issue-importers/shared/types'
 import type {
+  ModelsExternalProject,
   ModelsGithubTagConfiguration,
   ModelsGitlabTagConfiguration,
   ModelsPlaneTagConfiguration,
@@ -38,9 +41,15 @@ type Props = {
   importerType: ImporterType
   value: TagConfiguration
   onChange: (value: TagConfiguration) => void
+  externalProject?: ModelsExternalProject
 }
 
-export const TagConfigurationForm: React.FC<Props> = ({ importerType, value, onChange }) => {
+export const TagConfigurationForm: React.FC<Props> = ({
+  importerType,
+  value,
+  onChange,
+  externalProject,
+}) => {
   const { t } = useTranslation('integrations')
 
   // Tag field options for multiselect
@@ -91,6 +100,11 @@ export const TagConfigurationForm: React.FC<Props> = ({ importerType, value, onC
   }, [value, importerType])
 
   const handleTagFieldsChange = (selectedValues: string[]) => {
+    // Require at least one selection
+    if (selectedValues.length === 0) {
+      return
+    }
+
     onChange({
       ...value,
       useTitle: selectedValues.includes('useTitle'),
@@ -102,83 +116,170 @@ export const TagConfigurationForm: React.FC<Props> = ({ importerType, value, onC
     } as TagConfiguration)
   }
 
-  // Issue state options
-  const issueStateOptions: SelectOption[] = useMemo(
-    () => [
-      {
-        value: 'all',
-        label: t('issueImporters.tagConfiguration.issueState.all', { defaultValue: 'All issues' }),
-      },
-      {
-        value: 'open',
-        label: t('issueImporters.tagConfiguration.issueState.open', {
-          defaultValue: 'Open issues only',
-        }),
-      },
-      {
-        value: 'closed',
-        label: t('issueImporters.tagConfiguration.issueState.closed', {
-          defaultValue: 'Closed issues only',
-        }),
-      },
-    ],
-    [t],
-  )
-
-  // Get current issue state value (array -> single value for select)
-  const currentIssueState = useMemo(() => {
-    if (value.includeOnlyIssuesWithState.length === 0) {
-      return 'all'
-    }
-    return value.includeOnlyIssuesWithState[0] || 'open'
-  }, [value.includeOnlyIssuesWithState])
-
-  const handleIssueStateChange = (state: string) => {
-    onChange({
-      ...value,
-      includeOnlyIssuesWithState: state === 'all' ? [] : [state],
-    })
-  }
-
   return (
-    <div className="space-y-3">
-      <div className="space-y-1">
-        <label htmlFor="tag-fields-select" className="text-sm font-medium">
-          {t('issueImporters.tagConfiguration.tagFieldsLabel', {
+    <>
+      <FormBody>
+        <FormElement
+          label={t('issueImporters.tagConfiguration.tagFieldsLabel', {
             defaultValue: 'Tag fields to import',
           })}
-        </label>
-        <MultiSelect
-          id="tag-fields-select"
-          value={selectedTagFields}
-          onChange={handleTagFieldsChange}
-          options={tagFieldOptions}
-          placeholder={t('issueImporters.tagConfiguration.tagFieldsPlaceholder', {
-            defaultValue: 'Select fields...',
-          })}
-        />
-      </div>
+          htmlFor="tag-fields-select">
+          <MultiSelect
+            id="tag-fields-select"
+            value={selectedTagFields}
+            onChange={handleTagFieldsChange}
+            options={tagFieldOptions}
+            placeholder={t('issueImporters.tagConfiguration.tagFieldsPlaceholder', {
+              defaultValue: 'Select fields...',
+            })}
+          />
+          <p className="text-base-content/60 text-xs">
+            {t('issueImporters.tagConfiguration.description', {
+              defaultValue:
+                'Configure which fields from external issues should be used to create tags in Lasius.',
+            })}
+          </p>
+        </FormElement>
 
-      <div className="space-y-1">
-        <label htmlFor="issue-state-select" className="text-sm font-medium">
-          {t('issueImporters.tagConfiguration.issueStateLabel', {
-            defaultValue: 'Issue state to import',
-          })}
-        </label>
-        <Select
-          id="issue-state-select"
-          value={currentIssueState}
-          onChange={handleIssueStateChange}
-          options={issueStateOptions}
-        />
-      </div>
+        {/* Label filter - filter which labels to import as tags */}
+        {selectedTagFields.includes('useLabels') && 'labelFilter' in value && (
+          <FormElement
+            label={t('issueImporters.tagConfiguration.labelFilterLabel', {
+              defaultValue: 'Import only specific labels',
+            })}
+            htmlFor="label-filter-select">
+            <MultiSelect
+              id="label-filter-select"
+              value={value.labelFilter || []}
+              onChange={(selectedLabels) =>
+                onChange({
+                  ...value,
+                  labelFilter: selectedLabels,
+                })
+              }
+              options={
+                externalProject?.availableLabels?.map((label) => ({
+                  value: label,
+                  label,
+                })) || []
+              }
+              placeholder={t('issueImporters.tagConfiguration.labelFilterPlaceholder', {
+                defaultValue: 'All labels (or select specific labels...)',
+              })}
+              disabled={
+                !externalProject?.availableLabels || externalProject.availableLabels.length === 0
+              }
+            />
+            <p className="text-base-content/60 text-xs">
+              {t('issueImporters.tagConfiguration.labelFilterHelp', {
+                defaultValue:
+                  'Leave empty to import all labels, or select specific labels to import only those.',
+              })}
+            </p>
+          </FormElement>
+        )}
 
-      <p className="text-base-content/60 text-xs">
-        {t('issueImporters.tagConfiguration.description', {
-          defaultValue:
-            'Configure which fields from external issues should be used to create tags in Lasius.',
-        })}
-      </p>
-    </div>
+        {/* Issue label filter - filter which issues to import based on labels */}
+        {'includeOnlyIssuesWithLabels' in value && (
+          <FormElement
+            label={t('issueImporters.tagConfiguration.issueLabelFilterLabel', {
+              defaultValue: 'Import only issues with specific labels',
+            })}
+            htmlFor="issue-label-filter-select">
+            <MultiSelect
+              id="issue-label-filter-select"
+              value={value.includeOnlyIssuesWithLabels || []}
+              onChange={(selectedLabels) =>
+                onChange({
+                  ...value,
+                  includeOnlyIssuesWithLabels: selectedLabels,
+                })
+              }
+              options={
+                externalProject?.availableLabels?.map((label) => ({
+                  value: label,
+                  label,
+                })) || []
+              }
+              placeholder={t('issueImporters.tagConfiguration.issueLabelFilterPlaceholder', {
+                defaultValue: 'All issues (or select labels to filter...)',
+              })}
+              disabled={
+                !externalProject?.availableLabels || externalProject.availableLabels.length === 0
+              }
+            />
+            <p className="text-base-content/60 text-xs">
+              {t('issueImporters.tagConfiguration.issueLabelFilterHelp', {
+                defaultValue:
+                  'Leave empty to import all issues, or select labels to import only issues that have at least one of these labels.',
+              })}
+            </p>
+          </FormElement>
+        )}
+
+        {/* Issue state filter - filter which issues to import based on state */}
+        {'includeOnlyIssuesWithState' in value && (
+          <FormElement
+            label={t('issueImporters.tagConfiguration.issueStateFilterLabel', {
+              defaultValue: 'Import only issues with specific states',
+            })}
+            htmlFor="issue-state-filter-select">
+            {importerType === 'plane' ? (
+              <MultiSelect
+                id="issue-state-filter-select"
+                value={value.includeOnlyIssuesWithState || []}
+                onChange={(selectedStates) =>
+                  onChange({
+                    ...value,
+                    includeOnlyIssuesWithState: selectedStates,
+                  })
+                }
+                options={
+                  externalProject?.availableStates?.map((state) => ({
+                    value: state,
+                    label: state,
+                  })) || []
+                }
+                placeholder={t('issueImporters.tagConfiguration.issueStateFilterPlaceholder', {
+                  defaultValue: 'All states (or select specific states...)',
+                })}
+                disabled={
+                  !externalProject?.availableStates || externalProject.availableStates.length === 0
+                }
+              />
+            ) : (
+              <Select
+                id="issue-state-filter-select"
+                value={value.includeOnlyIssuesWithState?.[0] || ''}
+                onChange={(selectedState) =>
+                  onChange({
+                    ...value,
+                    includeOnlyIssuesWithState: selectedState ? [selectedState] : [],
+                  })
+                }
+                options={
+                  externalProject?.availableStates?.map((state) => ({
+                    value: state,
+                    label: state,
+                  })) || []
+                }
+                placeholder={t('issueImporters.tagConfiguration.issueStateFilterPlaceholder', {
+                  defaultValue: 'All states (or select specific states...)',
+                })}
+                disabled={
+                  !externalProject?.availableStates || externalProject.availableStates.length === 0
+                }
+              />
+            )}
+            <p className="text-base-content/60 text-xs">
+              {t('issueImporters.tagConfiguration.issueStateFilterHelp', {
+                defaultValue:
+                  'Leave empty to import all issues, or select states to import only issues in those states.',
+              })}
+            </p>
+          </FormElement>
+        )}
+      </FormBody>
+    </>
   )
 }
