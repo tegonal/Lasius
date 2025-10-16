@@ -149,7 +149,7 @@ export const Toasts: React.FC = () => {
   if (!isClient) return null
 
   return (
-    <div className="toast toast-end toast-bottom z-[9999]">
+    <div className="toast toast-center toast-bottom md:toast-end z-[9999]">
       <AnimatePresence mode="sync">
         {toastViews.map((toast) => (
           <m.div

@@ -26,7 +26,7 @@ import { useUpdateUserBooking } from 'lib/api/lasius/user-bookings/user-bookings
 import { formatISOLocale } from 'lib/utils/date/dates'
 import { AlertTriangle, ArrowDownToLine, ArrowUpToLine, Edit2 } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 type ItemType = ReturnType<typeof augmentBookingsList>[number]
 
@@ -43,11 +43,60 @@ export const BookingOverlapActions: React.FC<Props> = ({
 }) => {
   const { t } = useTranslation('common')
   const [isHovered, setIsHovered] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(false)
+  const dialogRef = useRef<HTMLDialogElement>(null)
   const { selectedOrganisationId } = useOrganisation()
 
   // Create hook instances for updating each booking
   const updateCurrentBooking = useUpdateUserBooking(selectedOrganisationId, currentItem.id)
   const updateOverlappingBooking = useUpdateUserBooking(selectedOrganisationId, overlappingItem.id)
+
+  // Open/close dialog when isExpanded changes
+  useEffect(() => {
+    if (isExpanded && dialogRef.current && !dialogRef.current.open) {
+      dialogRef.current.show()
+    } else if (!isExpanded && dialogRef.current?.open) {
+      dialogRef.current.close()
+    }
+  }, [isExpanded])
+
+  // Handle dialog close event (triggered by ESC key)
+  useEffect(() => {
+    const dialog = dialogRef.current
+    if (!dialog) return
+
+    const handleClose = () => {
+      setIsExpanded(false)
+      setIsHovered(false)
+    }
+
+    dialog.addEventListener('close', handleClose)
+    return () => {
+      dialog.removeEventListener('close', handleClose)
+    }
+  }, [])
+
+  // Handle click outside to close
+  useEffect(() => {
+    if (!isExpanded) return
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dialogRef.current && !dialogRef.current.contains(event.target as Node)) {
+        setIsExpanded(false)
+        setIsHovered(false)
+      }
+    }
+
+    // Use a slight delay to avoid closing immediately after opening
+    const timeoutId = setTimeout(() => {
+      document.addEventListener('mousedown', handleClickOutside)
+    }, 100)
+
+    return () => {
+      clearTimeout(timeoutId)
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isExpanded])
 
   // Adjust the current booking to start where the overlapping booking ends
   const handleAdjustCurrentToOverlappingEnd = async () => {
@@ -59,6 +108,7 @@ export const BookingOverlapActions: React.FC<Props> = ({
       start: formatISOLocale(new Date(overlappingItem.end.dateTime)),
       end: currentItem.end?.dateTime ? formatISOLocale(new Date(currentItem.end.dateTime)) : '',
     })
+    setIsExpanded(false)
   }
 
   // Adjust the overlapping booking to end where the current booking starts
@@ -71,17 +121,27 @@ export const BookingOverlapActions: React.FC<Props> = ({
       start: formatISOLocale(new Date(overlappingItem.start.dateTime)),
       end: formatISOLocale(new Date(currentItem.start.dateTime)),
     })
+    setIsExpanded(false)
   }
 
+  const handleEdit = () => {
+    onEdit()
+    setIsExpanded(false)
+  }
+
+  const handleToggle = () => {
+    setIsExpanded(!isExpanded)
+  }
+
+  const showExpanded = isHovered || isExpanded
+
   return (
-    <div
-      className="absolute inset-x-0 bottom-0 z-10 flex items-center justify-center text-center"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}>
-      <div
-        className={`bg-base-100 absolute flex gap-1 rounded-full p-1 transition-all duration-200 ${isHovered ? 'z-20' : 'z-10'}`}>
-        {isHovered ? (
-          <>
+    <>
+      {isExpanded && (
+        <dialog
+          ref={dialogRef}
+          className="absolute top-full left-1/2 m-0 -translate-x-1/2 -translate-y-1/2 transform bg-transparent p-0">
+          <div className="bg-base-100 flex gap-1 rounded-full p-1">
             <Button
               variant="icon"
               shape="circle"
@@ -102,7 +162,7 @@ export const BookingOverlapActions: React.FC<Props> = ({
               variant="icon"
               shape="circle"
               type="button"
-              onClick={onEdit}
+              onClick={handleEdit}
               fullWidth={false}
               size="sm"
               title={t('bookings.actions.editOverlapping', {
@@ -129,21 +189,86 @@ export const BookingOverlapActions: React.FC<Props> = ({
               })}>
               <LucideIcon icon={ArrowDownToLine} size={16} className="text-warning" />
             </Button>
-          </>
-        ) : (
-          <Button
-            variant="icon"
-            shape="circle"
-            type="button"
-            title={t('bookings.overlapsWarning', {
-              defaultValue: 'These two bookings overlap. Hover to see adjustment options.',
-            })}
-            onClick={onEdit}
-            fullWidth={false}>
-            <LucideIcon icon={AlertTriangle} size={18} />
-          </Button>
-        )}
-      </div>
-    </div>
+          </div>
+        </dialog>
+      )}
+
+      {!isExpanded && (
+        <div
+          className="absolute inset-x-0 bottom-0 z-10 flex items-center justify-center text-center"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => {
+            setIsHovered(false)
+            setIsExpanded(false)
+          }}>
+          <div
+            className={`bg-base-100 absolute flex gap-1 rounded-full p-1 transition-all duration-200 ${showExpanded ? 'z-20' : 'z-10'}`}>
+            {showExpanded ? (
+              <>
+                <Button
+                  variant="icon"
+                  shape="circle"
+                  type="button"
+                  onClick={handleAdjustOverlappingToCurrentStart}
+                  fullWidth={false}
+                  size="sm"
+                  title={t('bookings.actions.adjustOverlappingEnd', {
+                    defaultValue: 'Adjust overlapping booking to end at current booking start',
+                  })}
+                  aria-label={t('bookings.actions.adjustOverlappingEnd', {
+                    defaultValue: 'Adjust overlapping booking to end at current booking start',
+                  })}>
+                  <LucideIcon icon={ArrowUpToLine} size={16} className="text-warning" />
+                </Button>
+
+                <Button
+                  variant="icon"
+                  shape="circle"
+                  type="button"
+                  onClick={handleEdit}
+                  fullWidth={false}
+                  size="sm"
+                  title={t('bookings.actions.editOverlapping', {
+                    defaultValue: 'Edit booking to resolve overlap',
+                  })}
+                  aria-label={t('bookings.actions.editOverlapping', {
+                    defaultValue: 'Edit booking to resolve overlap',
+                  })}>
+                  <LucideIcon icon={Edit2} size={16} className="text-warning" />
+                </Button>
+
+                <Button
+                  variant="icon"
+                  shape="circle"
+                  type="button"
+                  onClick={handleAdjustCurrentToOverlappingEnd}
+                  fullWidth={false}
+                  size="sm"
+                  title={t('bookings.actions.adjustCurrentStart', {
+                    defaultValue: 'Adjust current booking to start at overlapping booking end',
+                  })}
+                  aria-label={t('bookings.actions.adjustCurrentStart', {
+                    defaultValue: 'Adjust current booking to start at overlapping booking end',
+                  })}>
+                  <LucideIcon icon={ArrowDownToLine} size={16} className="text-warning" />
+                </Button>
+              </>
+            ) : (
+              <Button
+                variant="icon"
+                shape="circle"
+                type="button"
+                title={t('bookings.overlapsWarning', {
+                  defaultValue: 'These two bookings overlap. Tap to see adjustment options.',
+                })}
+                onClick={handleToggle}
+                fullWidth={false}>
+                <LucideIcon icon={AlertTriangle} size={18} />
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
+    </>
   )
 }

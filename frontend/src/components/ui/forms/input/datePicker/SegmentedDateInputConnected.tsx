@@ -61,6 +61,7 @@ export const SegmentedDateInputConnected: React.FC<SegmentedDateInputConnectedPr
   const [selectedSegment, setSelectedSegment] = useState<DateSegment | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const focusFromMouseRef = useRef<boolean>(false)
+  const pendingCursorPosRef = useRef<number | null>(null)
 
   const config = DATE_SEGMENT_CONFIG
 
@@ -70,6 +71,26 @@ export const SegmentedDateInputConnected: React.FC<SegmentedDateInputConnectedPr
       setInputValue(value.dateString || config.placeholder)
     }
   }, [value.dateString, inputValue, config.placeholder])
+
+  // Restore cursor position after inputValue changes (runs synchronously before paint)
+  React.useLayoutEffect(() => {
+    console.log('[useLayoutEffect] Fired:', {
+      inputValue,
+      pendingCursorPos: pendingCursorPosRef.current,
+      hasFocus: inputRef.current?.matches(':focus'),
+      currentSelection: [inputRef.current?.selectionStart, inputRef.current?.selectionEnd],
+    })
+    if (pendingCursorPosRef.current !== null && inputRef.current?.matches(':focus')) {
+      const pos = pendingCursorPosRef.current
+      pendingCursorPosRef.current = null
+      console.log('[useLayoutEffect] Setting cursor position to:', pos)
+      inputRef.current.setSelectionRange(pos, pos)
+      console.log('[useLayoutEffect] After setting:', [
+        inputRef.current?.selectionStart,
+        inputRef.current?.selectionEnd,
+      ])
+    }
+  }, [inputValue])
 
   // Select a segment using helper
   const selectSegment = (segment: DateSegment): void => {
@@ -107,6 +128,9 @@ export const SegmentedDateInputConnected: React.FC<SegmentedDateInputConnectedPr
     setInputValue,
     updateStore: setDateFromString,
     selectSegmentFn: selectSegment,
+    setCursorPosition: (pos) => {
+      pendingCursorPosRef.current = pos
+    },
   })
 
   // Handle keyboard navigation

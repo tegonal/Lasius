@@ -31,6 +31,7 @@ type InputChangeHandlerParams<T extends string> = {
   setInputValue: (value: string) => void
   updateStore: (value: string) => void
   selectSegmentFn: (segment: T) => void
+  setCursorPosition?: (pos: number) => void
 }
 
 /**
@@ -46,10 +47,18 @@ export function createInputChangeHandler<T extends string>(params: InputChangeHa
     setInputValue,
     updateStore,
     selectSegmentFn,
+    setCursorPosition,
   } = params
 
   return (e: React.ChangeEvent<HTMLInputElement>): void => {
     let newValue = e.target.value
+    console.log('[inputChangeHandler] onChange fired:', {
+      prevValue: inputValue,
+      newValue,
+      selectedSegment,
+      selectionStart: inputRef.current?.selectionStart,
+      selectionEnd: inputRef.current?.selectionEnd,
+    })
 
     // Replace alternative delimiters (e.g., '.' for ':' in time input)
     if (config.delimiter === ':' && newValue.includes('.')) {
@@ -59,100 +68,76 @@ export function createInputChangeHandler<T extends string>(params: InputChangeHa
     const prevValue = inputValue
 
     // Smart input validation: only allow configured characters
-    const pattern = new RegExp(`^[${config.allowedCharsPattern.source}]*$`)
+    const pattern = new RegExp(`^${config.allowedCharsPattern.source}*$`)
     if (newValue && !pattern.test(newValue)) {
+      console.log(
+        '[inputChangeHandler] Invalid pattern, rejected. Pattern:',
+        pattern,
+        'Value:',
+        newValue,
+      )
       return
     }
 
-    // Check if we're replacing a segment
+    // Check if we're editing a segment
     if (selectedSegment && inputRef.current) {
       const bounds = getSegmentBounds(prevValue, config.delimiter, config.segments)
       if (bounds) {
-        const segmentBounds = bounds[selectedSegment]
-        const selStart = inputRef.current.selectionStart
-        const selEnd = inputRef.current.selectionEnd
+        const segmentIndex = config.segments.indexOf(selectedSegment)
+        const prevParts = prevValue.split(config.delimiter)
+        const newParts = newValue.split(config.delimiter)
+        const prevSegmentValue = prevParts[segmentIndex]
+        const newSegmentValue = newParts[segmentIndex]
 
-        // If selection matches a segment, we're replacing it
-        if (selStart === segmentBounds.start && selEnd === segmentBounds.end) {
-          const parts = prevValue.split(config.delimiter)
-          const typedChar = newValue.slice(selStart, selStart + 1)
+        console.log('[inputChangeHandler] Segment check:', {
+          segmentIndex,
+          prevSegmentValue,
+          newSegmentValue,
+          prevParts,
+          newParts,
+        })
 
-          if (/\d/.test(typedChar)) {
-            const digit = parseInt(typedChar, 10)
-            const maxFirstDigit = config.segmentMaxFirstDigit[selectedSegment]
+        // If the segment value changed and we got a digit
+        if (newSegmentValue !== prevSegmentValue && /^\d+$/.test(newSegmentValue)) {
+          console.log('[inputChangeHandler] Segment value changed, processing...')
+          const requiredLength = config.segmentPlaceholders[selectedSegment].length
 
-            // Smart overflow handling: auto-advance if first digit exceeds max possible
-            if (digit > maxFirstDigit) {
-              const segmentIndex = config.segments.indexOf(selectedSegment)
-              parts[segmentIndex] = typedChar.padStart(
-                config.segmentPlaceholders[selectedSegment].length,
-                '0',
-              )
-              const updatedValue = parts.join(config.delimiter)
-              setInputValue(updatedValue)
-              updateStore(updatedValue)
+          // Build the corrected value with the segment change
+          const parts = prevParts.slice()
+          parts[segmentIndex] = newSegmentValue
+          const updatedValue = parts.join(config.delimiter)
 
-              // Move to next segment if not the last
-              const nextIndex = segmentIndex + 1
-              if (nextIndex < config.segments.length) {
-                setTimeout(() => selectSegmentFn(config.segments[nextIndex]), 0)
-              }
-              return
-            }
+          console.log('[inputChangeHandler] Setting value:', updatedValue)
+          setInputValue(updatedValue)
+          updateStore(updatedValue)
 
-            // Replace the segment with the typed digit
-            const segmentIndex = config.segments.indexOf(selectedSegment)
-            const isLastSegmentAndLonger =
-              segmentIndex === config.segments.length - 1 &&
-              config.segmentPlaceholders[selectedSegment].length > 2
-
-            if (isLastSegmentAndLonger) {
-              // For year segment, don't pad
-              parts[segmentIndex] = typedChar
-            } else {
-              // For day/month/hour/minute, pad to 2 digits
-              parts[segmentIndex] = typedChar.padStart(2, '0')
-            }
-
-            const updatedValue = parts.join(config.delimiter)
-            setInputValue(updatedValue)
-            updateStore(updatedValue)
-
-            // Move to next segment if not the last
+          // Auto-advance only if we've reached the required length for this segment
+          if (newSegmentValue.length >= requiredLength) {
+            console.log('[inputChangeHandler] Segment complete, auto-advancing')
+            // Segment is complete, advance to next
             const nextIndex = segmentIndex + 1
             if (nextIndex < config.segments.length) {
               setTimeout(() => selectSegmentFn(config.segments[nextIndex]), 0)
             }
-
-            return
-          }
-        }
-
-        // If we're typing a digit and the segment already has a single digit
-        if (/^\d$/.test(newValue.slice(-1)) && newValue.length > prevValue.length) {
-          const parts = prevValue.split(config.delimiter)
-          const newDigit = newValue.slice(-1)
-          const segmentIndex = config.segments.indexOf(selectedSegment)
-          const currentPart = parts[segmentIndex]
-
-          if (/^\d$/.test(currentPart)) {
-            parts[segmentIndex] = currentPart + newDigit
-            const updatedValue = parts.join(config.delimiter)
-            setInputValue(updatedValue)
-            updateStore(updatedValue)
-
-            // Move to next segment if not the last
-            const nextIndex = segmentIndex + 1
-            if (nextIndex < config.segments.length) {
-              setTimeout(() => selectSegmentFn(config.segments[nextIndex]), 0)
+          } else {
+            // Still typing in this segment, position cursor after the last digit
+            let cursorPos = 0
+            for (let i = 0; i < segmentIndex; i++) {
+              cursorPos += parts[i].length + config.delimiter.length
             }
-            return
+            cursorPos += parts[segmentIndex].length
+            console.log('[inputChangeHandler] Calling setCursorPosition:', cursorPos)
+            if (setCursorPosition) {
+              setCursorPosition(cursorPos)
+            }
           }
+          return
         }
       }
     }
 
     // Default behavior
+    console.log('[inputChangeHandler] Using default behavior, setting value:', newValue)
     setInputValue(newValue)
     updateStore(newValue)
   }

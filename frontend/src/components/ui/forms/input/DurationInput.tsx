@@ -58,6 +58,7 @@ export const DurationInput: React.FC<DurationInputProps> = ({ value, onChange, i
   const focusFromArrowRef = useRef<boolean>(false)
   const focusFromMouseRef = useRef<boolean>(false)
   const initialDurationRef = useRef<number>(0)
+  const pendingCursorPosRef = useRef<number | null>(null)
 
   const config = DURATION_SEGMENT_CONFIG
 
@@ -80,6 +81,15 @@ export const DurationInput: React.FC<DurationInputProps> = ({ value, onChange, i
       setInputValue(durationString)
     }
   }, [durationString])
+
+  // Restore cursor position after inputValue changes (runs synchronously before paint)
+  React.useLayoutEffect(() => {
+    if (pendingCursorPosRef.current !== null && inputRef.current?.matches(':focus')) {
+      const pos = pendingCursorPosRef.current
+      pendingCursorPosRef.current = null
+      inputRef.current.setSelectionRange(pos, pos)
+    }
+  }, [inputValue])
 
   // Select a segment
   const selectSegment = (segment: DurationSegment): void => {
@@ -137,6 +147,9 @@ export const DurationInput: React.FC<DurationInputProps> = ({ value, onChange, i
       }
     },
     selectSegmentFn: selectSegment,
+    setCursorPosition: (pos) => {
+      pendingCursorPosRef.current = pos
+    },
   })
 
   // Handle keyboard navigation

@@ -55,6 +55,10 @@ interface UIStore {
   showGlobalLoading: () => void
   hideGlobalLoading: () => void
 
+  // Stats tile display preferences
+  statsTileTimeAsDecimals: boolean
+  toggleStatsTileTimeAsDecimals: () => void
+
   // Explosion state
   explosionEvent: ExplosionEvent | null
   triggerExplosion: (x: number, y: number) => void
@@ -170,6 +174,13 @@ export const useUIStore = create<UIStore>()(
               state.globalLoading = state.globalLoadingCounter > 0
             }),
 
+          // Stats tile display preferences
+          statsTileTimeAsDecimals: false,
+          toggleStatsTileTimeAsDecimals: () =>
+            set((state) => {
+              state.statsTileTimeAsDecimals = !state.statsTileTimeAsDecimals
+            }),
+
           // Explosion state
           explosionEvent: null,
           triggerExplosion: (x, y) =>
@@ -190,8 +201,9 @@ export const useUIStore = create<UIStore>()(
       {
         name: 'lasius-ui-store', // localStorage key
         partialize: (state) => ({
-          // Only persist tab views, not modals or toasts
+          // Persist tab views and stats tile preferences
           tabViews: state.tabViews,
+          statsTileTimeAsDecimals: state.statsTileTimeAsDecimals,
         }),
       },
     ),
@@ -206,6 +218,7 @@ export const useContextMenuOpen = () => useUIStore((state) => state.contextMenuO
 export const useToastViews = () => useUIStore((state) => state.toastViews)
 export const useTabViews = () => useUIStore((state) => state.tabViews)
 export const useGlobalLoading = () => useUIStore((state) => state.globalLoading)
+export const useStatsTileTimeAsDecimals = () => useUIStore((state) => state.statsTileTimeAsDecimals)
 export const useExplosionEvent = () => useUIStore((state) => state.explosionEvent)
 
 // Action hooks
@@ -218,6 +231,7 @@ export const useUIActions = () => {
   const setGlobalLoading = useUIStore((state) => state.setGlobalLoading)
   const showGlobalLoading = useUIStore((state) => state.showGlobalLoading)
   const hideGlobalLoading = useUIStore((state) => state.hideGlobalLoading)
+  const toggleStatsTileTimeAsDecimals = useUIStore((state) => state.toggleStatsTileTimeAsDecimals)
   const triggerExplosion = useUIStore((state) => state.triggerExplosion)
   const clearExplosion = useUIStore((state) => state.clearExplosion)
 
@@ -230,6 +244,7 @@ export const useUIActions = () => {
     setGlobalLoading,
     showGlobalLoading,
     hideGlobalLoading,
+    toggleStatsTileTimeAsDecimals,
     triggerExplosion,
     clearExplosion,
   }

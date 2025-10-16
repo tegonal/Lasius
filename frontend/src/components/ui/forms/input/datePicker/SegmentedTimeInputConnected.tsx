@@ -57,6 +57,7 @@ export const SegmentedTimeInputConnected: React.FC<SegmentedTimeInputConnectedPr
   const focusFromArrowRef = useRef<boolean>(false)
   const focusFromMouseRef = useRef<boolean>(false)
   const arrowIncrementModeRef = useRef<'large' | 'small' | null>(null)
+  const pendingCursorPosRef = useRef<number | null>(null)
 
   const config = TIME_SEGMENT_CONFIG
 
@@ -66,6 +67,15 @@ export const SegmentedTimeInputConnected: React.FC<SegmentedTimeInputConnectedPr
       setInputValue(value.timeString || config.placeholder)
     }
   }, [value.timeString, inputValue, config.placeholder])
+
+  // Restore cursor position after inputValue changes (runs synchronously before paint)
+  React.useLayoutEffect(() => {
+    if (pendingCursorPosRef.current !== null && inputRef.current?.matches(':focus')) {
+      const pos = pendingCursorPosRef.current
+      pendingCursorPosRef.current = null
+      inputRef.current.setSelectionRange(pos, pos)
+    }
+  }, [inputValue])
 
   // Select a segment using helper
   const selectSegment = (segment: TimeSegment): void => {
@@ -107,6 +117,9 @@ export const SegmentedTimeInputConnected: React.FC<SegmentedTimeInputConnectedPr
     setInputValue,
     updateStore: setTimeFromString,
     selectSegmentFn: selectSegment,
+    setCursorPosition: (pos) => {
+      pendingCursorPosRef.current = pos
+    },
   })
 
   // Handle keyboard navigation

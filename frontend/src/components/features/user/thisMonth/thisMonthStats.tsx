@@ -27,6 +27,7 @@ import { Tabs } from 'components/ui/navigation/Tabs'
 import { endOfMonth, endOfWeek, getWeek, startOfMonth, startOfWeek, subMonths } from 'date-fns'
 import { apiDatespanFromTo } from 'lib/api/apiDateHandling'
 import { getExpectedVsBookedPercentage } from 'lib/api/functions/getExpectedVsBookedPercentage'
+import { getModelsBookingSummary } from 'lib/api/functions/getModelsBookingSummary'
 import { useGetBookingSummaryDay } from 'lib/api/hooks/useGetBookingSummaryDay'
 import { useGetBookingSummaryMonth } from 'lib/api/hooks/useGetBookingSummaryMonth'
 import { useGetBookingSummaryWeek } from 'lib/api/hooks/useGetbookingSummaryWeek'
@@ -60,7 +61,7 @@ export const ThisMonthStats: React.FC = () => {
   const { plannedHoursMonth } = useGetPlannedWorkingHoursMonth(selectedDate)
 
   // Get work health metrics for burnout indicator and trend charts
-  const { weeklyData: sixMonthData } = useWorkHealthMetrics(
+  const { weeklyData: sixMonthData, bookings: sixMonthsBookings } = useWorkHealthMetrics(
     week.plannedWorkingHours,
     26,
     selectedDate,
@@ -243,16 +244,16 @@ export const ThisMonthStats: React.FC = () => {
     const totalExpected = sixMonthData.reduce((sum, week) => sum + week.plannedHours, 0)
     const { fulfilledPercentage } = getExpectedVsBookedPercentage(totalExpected, totalHours)
 
-    // Calculate total bookings from project stats
-    const totalBookings = projectStatsSixMonths?.data?.length || 0
+    // Get booking count from actual booking list (same as day/week/month)
+    const bookingSummary = getModelsBookingSummary(sixMonthsBookings || [])
 
     return {
       hours: totalHours,
-      bookings: totalBookings,
+      bookings: bookingSummary.elements,
       expectedHours: totalExpected,
       fulfilledPercentage,
     }
-  }, [sixMonthData, projectStatsSixMonths])
+  }, [sixMonthData, sixMonthsBookings])
 
   const tabs = [
     {

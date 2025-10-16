@@ -25,15 +25,27 @@ type Props = {
   label?: string
   htmlFor?: string
   required?: boolean
+  labelActionSlot?: React.ReactNode
 }
 
-export const FormElement: React.FC<Props> = ({ children, label, htmlFor, required }) => {
+export const FormElement: React.FC<Props> = ({
+  children,
+  label,
+  htmlFor,
+  required,
+  labelActionSlot,
+}) => {
   return (
     <div className="space-y-2">
       {label && (
-        <Label htmlFor={htmlFor} required={required}>
-          {label}
-        </Label>
+        <div className="relative flex items-center">
+          <Label htmlFor={htmlFor} required={required}>
+            {label}
+          </Label>
+          {labelActionSlot && (
+            <div className="absolute top-0 right-0 flex items-center">{labelActionSlot}</div>
+          )}
+        </div>
       )}
       {children}
     </div>

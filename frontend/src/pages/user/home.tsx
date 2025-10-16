@@ -17,7 +17,6 @@
  *
  */
 
-import { BookingAddMobileButton } from 'components/features/user/index/bookingAddMobileButton'
 import { BookingDayStatsProgressBar } from 'components/features/user/index/bookingDayStatsProgressBar'
 import { BookingCurrent } from 'components/features/user/index/current/bookingCurrent'
 import { IndexColumnTabs } from 'components/features/user/index/indexColumnTabs'
@@ -41,17 +40,11 @@ const Home = () => {
 
   // Mobile content with different order and structure
   const mobileContent = (
-    <>
-      <section className="bg-base-300 text-base-content relative grid h-full w-full grid-rows-[min-content_min-content_auto] gap-1 overflow-auto rounded-t-xl">
-        <BookingCurrent />
-        <BookingDayStatsProgressBar />
-        <BookingListSelectedDay />
-      </section>
-      {/* Mobile Add Booking FAB */}
-      <div className="fixed bottom-4 left-1/2 z-10 -translate-x-1/2">
-        <BookingAddMobileButton />
-      </div>
-    </>
+    <section className="bg-base-300 text-base-content relative grid h-full w-full grid-rows-[min-content_min-content_auto] gap-1 overflow-auto rounded-t-xl">
+      <BookingCurrent />
+      <BookingDayStatsProgressBar />
+      <BookingListSelectedDay />
+    </section>
   )
 
   return (

@@ -23,7 +23,7 @@ import { HeaderDesktop } from 'components/ui/layouts/headerDesktop'
 import { HeaderMobile } from 'components/ui/layouts/headerMobile'
 import { PageLayoutResponsive } from 'components/ui/layouts/pageLayoutResponsive'
 import { NavigationMenuTabs } from 'components/ui/navigation/desktop/navigationMenuTabs'
-import { MobileNavigationButton } from 'components/ui/navigation/mobile/mobileNavigationButton'
+import { MobileFloatingActionButton } from 'components/ui/navigation/mobile/mobileFloatingActionButton'
 import { TegonalFooter } from 'components/ui/navigation/TegonalFooter'
 import React, { Suspense } from 'react'
 
@@ -71,9 +71,8 @@ export const LayoutResponsive: React.FC<Props> = ({ children, rightColumn, mobil
         <Suspense fallback={<Loading />}>{mobileContent || children}</Suspense>
       </section>
 
-      <div className="fixed bottom-4 left-4 z-10 md:hidden">
-        <MobileNavigationButton />
-      </div>
+      {/* Mobile FAB - bottom right with add booking and settings actions */}
+      <MobileFloatingActionButton />
     </PageLayoutResponsive>
   )
 }

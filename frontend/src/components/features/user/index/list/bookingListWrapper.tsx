@@ -25,7 +25,7 @@ type Props = {
 
 export const BookingListWrapper: React.FC<Props> = ({ children }) => {
   return (
-    <div className="bg-base-200 relative pt-2 pb-24 select-none md:bg-transparent md:pb-0">
+    <div className="bg-base-100 relative pt-2 pb-24 select-none md:bg-transparent md:pb-0">
       {children}
     </div>
   )

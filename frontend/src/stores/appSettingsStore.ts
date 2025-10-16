@@ -21,6 +21,9 @@ import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
 
+// Storage key for persisting app settings to localStorage
+export const APP_SETTINGS_STORAGE_KEY = 'lasius-app-settings'
+
 export type ThemeMode = 'light' | 'dark' | 'system'
 
 interface AppSettingsStore {
@@ -65,7 +68,7 @@ export const useAppSettingsStore = create<AppSettingsStore>()(
           }),
       })),
       {
-        name: 'lasius-app-settings',
+        name: APP_SETTINGS_STORAGE_KEY,
       },
     ),
     {

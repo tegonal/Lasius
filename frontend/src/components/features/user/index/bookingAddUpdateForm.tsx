@@ -100,11 +100,24 @@ export const BookingAddUpdateForm: React.FC<Props> = ({
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showPresetPanel, setShowPresetPanel] = useState(false)
+  const [startResetButton, setStartResetButton] = useState<React.ReactNode>(null)
+  const [endResetButton, setEndResetButton] = useState<React.ReactNode>(null)
   const { data: projectTags } = useGetTagsByProject(
     selectedOrganisationId,
     hookForm.watch('projectId'),
   )
   const previousEndDate = useRef('')
+
+  // Calculate duration in hours and check if it exceeds typical work day (8 hours)
+  const startValue = hookForm.watch('start')
+  const endValue = hookForm.watch('end')
+  const durationHours = React.useMemo(() => {
+    if (!startValue || !endValue) return 0
+    const start = new Date(startValue)
+    const end = new Date(endValue)
+    return (end.getTime() - start.getTime()) / (1000 * 60 * 60)
+  }, [startValue, endValue])
+  const showDurationWarning = durationHours > 8
 
   useEffect(() => {
     if (itemUpdate) {
@@ -236,37 +249,62 @@ export const BookingAddUpdateForm: React.FC<Props> = ({
     return () => subscription.unsubscribe()
   }, [hookForm])
 
+  // Helper to check if two times are within the same minute (tolerance)
+  const isWithinSameMinute = (time1: string, time2: string): boolean => {
+    if (!time1 || !time2) return false
+    const date1 = new Date(time1)
+    const date2 = new Date(time2)
+    const diffMs = Math.abs(date1.getTime() - date2.getTime())
+    return diffMs < 60000 // Less than 1 minute
+  }
+
   const presetStart =
     mode === 'addBetween'
       ? {}
-      : {
-          presetLabel:
-            mode === 'add'
-              ? t('bookings.hints.useEndTimeOfLatest', {
-                  defaultValue: 'Use end time of latest booking as start time for this one',
-                })
-              : t('bookings.hints.useEndTimeOfPrevious', {
-                  defaultValue: 'Use end time of previous booking as start time for this one',
-                }),
-          presetDate:
-            mode === 'add'
-              ? formatISOLocale(new Date(latestBooking?.end?.dateTime || ''))
-              : formatISOLocale(new Date(bookingBeforeCurrent?.end?.dateTime || '')),
-          presetIcon: ArrowDownToLine,
-        }
+      : (() => {
+          const referenceTime =
+            mode === 'add' ? latestBooking?.end?.dateTime : bookingBeforeCurrent?.end?.dateTime
+
+          // Hide preset if current start time is already within same minute as reference
+          if (referenceTime && isWithinSameMinute(startValue, referenceTime)) {
+            return {}
+          }
+
+          return {
+            presetLabel:
+              mode === 'add'
+                ? t('bookings.hints.useEndTimeOfLatest', {
+                    defaultValue: 'Use end time of latest booking as start time for this one',
+                  })
+                : t('bookings.hints.useEndTimeOfPrevious', {
+                    defaultValue: 'Use end time of previous booking as start time for this one',
+                  }),
+            presetDate: formatISOLocale(new Date(referenceTime || '')),
+            presetIcon: ArrowDownToLine,
+          }
+        })()
 
   const presetEnd =
     mode === 'add'
       ? {}
       : mode === 'addBetween'
         ? {}
-        : {
-            presetLabel: t('bookings.hints.useStartTimeOfNext', {
-              defaultValue: 'Use start time of next booking as end time for this one',
-            }),
-            presetDate: formatISOLocale(new Date(bookingAfterCurrent?.start?.dateTime || '')),
-            presetIcon: ArrowUpToLine,
-          }
+        : (() => {
+            const referenceTime = bookingAfterCurrent?.start?.dateTime
+
+            // Hide preset if current end time is already within same minute as reference
+            if (referenceTime && isWithinSameMinute(endValue, referenceTime)) {
+              return {}
+            }
+
+            return {
+              presetLabel: t('bookings.hints.useStartTimeOfNext', {
+                defaultValue: 'Use start time of next booking as end time for this one',
+              }),
+              presetDate: formatISOLocale(new Date(referenceTime || '')),
+              presetIcon: ArrowUpToLine,
+            }
+          })()
 
   const handlePresetSelect = (preset: {
     projectId: string
@@ -346,16 +384,28 @@ export const BookingAddUpdateForm: React.FC<Props> = ({
               </FieldSet>
 
               <FieldSet className="flex items-start gap-4">
-                <div className="flex-shrink space-y-4 pb-6">
+                <div className="flex-grow space-y-4 pb-6">
                   <FormElement
                     label={t('common.time.starts', { defaultValue: 'Starts' })}
-                    htmlFor="start">
-                    <InputDatePicker name="start" withDate {...presetStart} />
+                    htmlFor="start"
+                    labelActionSlot={startResetButton}>
+                    <InputDatePicker
+                      name="start"
+                      withDate
+                      onRenderLabelAction={setStartResetButton}
+                      {...presetStart}
+                    />
                   </FormElement>
                   <FormElement
                     label={t('common.time.ends', { defaultValue: 'Ends' })}
-                    htmlFor="end">
-                    <InputDatePicker name="end" withDate {...presetEnd} />
+                    htmlFor="end"
+                    labelActionSlot={endResetButton}>
+                    <InputDatePicker
+                      name="end"
+                      withDate
+                      onRenderLabelAction={setEndResetButton}
+                      {...presetEnd}
+                    />
                   </FormElement>
                 </div>
 
@@ -371,6 +421,27 @@ export const BookingAddUpdateForm: React.FC<Props> = ({
                   </FormElement>
                 </div>
               </FieldSet>
+
+              {showDurationWarning && (
+                <div className="alert alert-warning mb-4" role="alert">
+                  <LucideIcon icon={HelpCircle} size={20} />
+                  <div className="flex flex-col gap-1">
+                    <div className="font-semibold">
+                      {t('bookings.warnings.longDuration', {
+                        defaultValue: 'Long duration detected',
+                      })}
+                    </div>
+                    <div className="text-sm">
+                      {t('bookings.warnings.longDurationDescription', {
+                        defaultValue:
+                          'This booking is longer than a typical 8-hour work day. Please verify that the start and end times are correct.',
+                        hours: durationHours.toFixed(1),
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <ButtonGroup>
                 <Button type="submit" disabled={isSubmitting}>
                   {t('common.actions.save', { defaultValue: 'Save' })}

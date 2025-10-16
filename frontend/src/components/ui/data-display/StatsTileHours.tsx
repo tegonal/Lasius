@@ -19,9 +19,10 @@
 
 import { AnimateNumber } from 'components/ui/animations/motion/animateNumber'
 import { StatsTileWrapper } from 'components/ui/data-display/StatsTileWrapper'
+import { round } from 'es-toolkit'
 import { decimalHoursToObject } from 'lib/utils/date/dates'
 import React, { useEffect, useRef } from 'react'
-import { useBoolean } from 'usehooks-ts'
+import { useStatsTileTimeAsDecimals, useUIStore } from 'stores/uiStore'
 
 type Props = {
   value: number
@@ -34,7 +35,8 @@ export const StatsTileHours: React.FC<Props> = ({ value, label, standalone = tru
   const previousHours = useRef<number>(0)
   const previousMinutes = useRef<number>(0)
 
-  const showDecimalHours = useBoolean(false)
+  const showDecimalHours = useStatsTileTimeAsDecimals()
+  const toggleStatsTileTimeAsDecimals = useUIStore((state) => state.toggleStatsTileTimeAsDecimals)
 
   useEffect(() => {
     const duration = decimalHoursToObject(value)
@@ -47,11 +49,11 @@ export const StatsTileHours: React.FC<Props> = ({ value, label, standalone = tru
     <StatsTileWrapper standalone={standalone}>
       <div
         className="stat hover:bg-base-200 h-fit cursor-pointer transition-colors select-none"
-        onClick={showDecimalHours.toggle}>
+        onClick={toggleStatsTileTimeAsDecimals}>
         <div className="stat-title">{label}</div>
         <div className="stat-value text-2xl">
-          {showDecimalHours.value ? (
-            <AnimateNumber from={previousValue.current} to={value} />
+          {showDecimalHours ? (
+            <AnimateNumber from={round(previousValue.current, 2)} to={round(value, 2)} />
           ) : (
             <>
               <AnimateNumber
@@ -68,7 +70,7 @@ export const StatsTileHours: React.FC<Props> = ({ value, label, standalone = tru
             </>
           )}
         </div>
-        <div className="stat-desc">{showDecimalHours.value ? 'Decimal hours' : 'HH:MM'}</div>
+        <div className="stat-desc">{showDecimalHours ? 'Decimal hours' : 'HH:MM'}</div>
       </div>
     </StatsTileWrapper>
   )
