@@ -308,7 +308,6 @@ DELETE /user-organisations/organisations/:orgId/leave           controllers.Orga
 ###
 #  security:
 #    - bearerHttpAuthentication: []
-#  summary: TagController
 #  tags:
 #     - user-organisations
 #  summary: Get tags by organisation and project

@@ -37,8 +37,8 @@ resolvers += "Tegonal releases".at(
 resolvers += "Sonatype OSS Releases".at(
   "https://oss.sonatype.org/content/repositories/releases")
 
-val pekkoVersion             = "1.1.3"
-val reactiveMongoPlayVersion = "1.1.0-play30.RC15"
+val pekkoVersion             = "1.2.1"
+val reactiveMongoPlayVersion = "1.1.0-play30.RC17"
 // Play framework 3.x is still bound to older guice version
 val guiceVersion      = "6.0.0"
 val pureConfigVersion = "0.17.9"
@@ -49,7 +49,7 @@ libraryDependencies ++= Seq(
   "com.github.scullxbones"      %% "pekko-persistence-mongodb" % "1.2.2",
   "com.tegonal"                 %% "play-json-typedid"         % "2.0.0",
   "org.julienrf"                %% "play-json-derived-codecs"  % "11.0.0",
-  "org.playframework"           %% "play-json-joda"            % "3.0.4",
+  "org.playframework"           %% "play-json-joda"            % "3.0.5",
   "com.google.inject"            % "guice"                     % guiceVersion,
   "com.google.inject.extensions" % "guice-assistedinject"      % guiceVersion,
   // support more than 22 fields in case classes
@@ -67,10 +67,10 @@ libraryDependencies ++= Seq(
   "io.github.alstanchev" % "pekko-persistence-inmemory_2.13" % "1.3.0" % "test",
   "io.kontainers"       %% "purecsv"                         % "1.3.10",
   "com.chuusai"         %% "shapeless"                       % "2.3.13",
-  "net.openhft"          % "zero-allocation-hashing"         % "0.27ea0",
+  "net.openhft"          % "zero-allocation-hashing"         % "0.27ea1",
   "com.github.pureconfig" %% "pureconfig" % pureConfigVersion,
   // depend on this plugin to be able to provide custom OutputTransformer
-  "io.github.play-swagger" %% "play-swagger" % "2.0.4",
+  "io.github.play-swagger" %% "play-swagger" % "2.0.6",
   "com.github.fdimuccio"   %% "play2-sockjs" % "0.10.0",
 
   // basic jwt token and jwks support
@@ -86,7 +86,7 @@ libraryDependencies ++= Seq(
   ws,
   specs2 % Test,
   guice,
-  "org.webjars" % "swagger-ui" % "5.24.0"
+  "org.webjars" % "swagger-ui" % "5.29.2"
 )
 
 dependencyOverrides ++= Seq(

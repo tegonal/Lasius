@@ -102,7 +102,7 @@
     "@typescript-eslint/eslint-plugin": "^8.46.1",
     "@typescript-eslint/parser": "^8.46.1",
     "concurrently": "^9.2.1",
-    "daisyui": "^5.3.6",
+    "daisyui": "^5.3.7",
     "dotenv-cli": "^10.0.0",
     "eslint": "9.37.0",
     "eslint-config-airbnb": "^19.0.4",
