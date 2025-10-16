@@ -24,7 +24,7 @@ import type { ModelsUserOrganisation } from './modelsUserOrganisation'
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.1.3+0-5a9b540e+20251016-0430
+ * OpenAPI spec version: 2.1.4+2-aeb2b3a9+20251017-0052
  */
 import type { ModelsUserRole } from './modelsUserRole'
 import type { ModelsUserSettings } from './modelsUserSettings'

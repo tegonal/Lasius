@@ -4267,10 +4267,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"daisyui@npm:^5.3.6":
-  version: 5.3.6
-  resolution: "daisyui@npm:5.3.6"
-  checksum: 10/96dfcb0b2dbc421e5b9304afa0bc86d07cd45aa245a2b9ae9aecddaf8fefc9cd1c54d28338480f227f46d62f6920b01a1a5d380a5ac47b7ef93e4449769fc684
+"daisyui@npm:^5.3.7":
+  version: 5.3.7
+  resolution: "daisyui@npm:5.3.7"
+  checksum: 10/6bc140e271d5079f2d335373ab9fb4c2707d01b9ae969984468791ec97f00f3ee55fa53bea1164927643900d20f24ae01abe3f8622e38f946f55f1a669affa5b
   languageName: node
   linkType: hard
 
@@ -7226,7 +7226,7 @@ __metadata:
     class-variance-authority: "npm:^0.7.1"
     clsx: "npm:^2.1.1"
     concurrently: "npm:^9.2.1"
-    daisyui: "npm:^5.3.6"
+    daisyui: "npm:^5.3.7"
     date-fns: "npm:^4.1.0"
     date-fns-tz: "npm:^3.2.0"
     dotenv-cli: "npm:^10.0.0"
