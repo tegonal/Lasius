@@ -14,4 +14,7 @@ addSbtPlugin("io.github.play-swagger" % "sbt-play-swagger" % "2.0.6")
 
 addSbtPlugin("de.heikoseeberger" % "sbt-header" % "5.10.0")
 
+// Docker support
+addSbtPlugin("com.github.sbt" % "sbt-native-packager" % "1.11.4")
+
 addDependencyTreePlugin
