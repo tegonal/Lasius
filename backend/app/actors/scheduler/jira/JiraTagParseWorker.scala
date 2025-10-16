@@ -113,7 +113,8 @@ class JiraTagParseWorker(wsClient: WSClient,
           configId = configId,
           organisationId = organisationId,
           projectId = projectId,
-          projectName = s"Jira Project ${projectSettings.jiraProjectKey}",
+          projectName = projectSettings.externalProjectName.getOrElse(
+            s"Jira Project ${projectSettings.jiraProjectKey}"),
           issueCount = result.size,
           success = true
         )
@@ -147,7 +148,8 @@ class JiraTagParseWorker(wsClient: WSClient,
             configId = configId,
             organisationId = organisationId,
             projectId = projectId,
-            projectName = s"Jira Project ${projectSettings.jiraProjectKey}",
+            projectName = projectSettings.externalProjectName.getOrElse(
+              s"Jira Project ${projectSettings.jiraProjectKey}"),
             issueCount = 0,
             success = false,
             error = Some(issue)

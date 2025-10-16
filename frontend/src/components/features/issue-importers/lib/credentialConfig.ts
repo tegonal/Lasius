@@ -135,7 +135,15 @@ export const getCredentialPayload = (
 
     case 'plane':
       if (!isEdit || formData.apiKey) {
+        // Include API key and workspace when creating or updating credentials
         payload.apiKey = formData.apiKey
+        payload.workspace = formData.workspace
+      } else {
+        // In edit mode without new credentials, still send workspace if it exists
+        // This allows updating the workspace without changing the API key
+        if (formData.workspace) {
+          payload.workspace = formData.workspace
+        }
       }
       break
   }
@@ -212,6 +220,7 @@ export const getDefaultFormValues = (type: ImporterType) => {
 
     case 'plane':
       defaults.apiKey = ''
+      defaults.workspace = ''
       break
   }
 

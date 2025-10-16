@@ -43,7 +43,7 @@ import { ModalCloseButton } from 'components/ui/overlays/modal/ModalCloseButton'
 import { ModalDescription } from 'components/ui/overlays/modal/ModalDescription'
 import { ModalHeader } from 'components/ui/overlays/modal/ModalHeader'
 import { useGetConfig } from 'lib/api/lasius/issue-importers/issue-importers'
-import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React, { useEffect, useMemo } from 'react'
 import { Controller, useForm } from 'react-hook-form'
@@ -143,9 +143,14 @@ export const GenericConfigModal: React.FC<Props> = ({
         ...Object.keys(defaults).reduce(
           (acc, key) => {
             if (
-              !['name', 'baseUrl', 'checkFrequency', 'resourceOwner', 'resourceOwnerType'].includes(
-                key,
-              )
+              ![
+                'name',
+                'baseUrl',
+                'checkFrequency',
+                'resourceOwner',
+                'resourceOwnerType',
+                'workspace',
+              ].includes(key)
             ) {
               acc[key] = '' // Empty in edit mode - backend doesn't return credentials
             }
@@ -156,6 +161,7 @@ export const GenericConfigModal: React.FC<Props> = ({
         checkFrequency: activeConfig.checkFrequency,
         resourceOwner: (activeConfig as any).resourceOwner || '',
         resourceOwnerType: (activeConfig as any).resourceOwnerType || null,
+        workspace: (activeConfig as any).workspace || '',
       }
       reset(resetData)
     } else {
@@ -449,6 +455,33 @@ export const GenericConfigModal: React.FC<Props> = ({
                 )
               })()}
 
+            {/* Plane workspace field */}
+            {importerType === 'plane' && (
+              <FormElement>
+                <Label htmlFor="workspace">
+                  {t('issueImporters.fields.workspace', { defaultValue: 'Workspace' })}
+                </Label>
+                <Input
+                  {...register('workspace')}
+                  id="workspace"
+                  placeholder={t('issueImporters.fields.workspacePlaceholder', {
+                    defaultValue: 'e.g., my-company',
+                  })}
+                  onChange={(e) => {
+                    register('workspace').onChange(e)
+                    resetTestState()
+                  }}
+                />
+                {errors.workspace && <FormErrorBadge error={errors.workspace} />}
+                <p className="text-base-content/60 mt-1 text-xs">
+                  {t('issueImporters.fields.workspaceHelp', {
+                    defaultValue:
+                      'The workspace slug from your Plane URL (e.g., "my-company" from https://app.plane.so/my-company)',
+                  })}
+                </p>
+              </FormElement>
+            )}
+
             {/* Check frequency field */}
             <FormElement>
               <div className="flex flex-col gap-2">
@@ -491,14 +524,7 @@ export const GenericConfigModal: React.FC<Props> = ({
               <div className="space-y-4">
                 {connectionTestResult && (
                   <Alert variant={connectionTestResult === 'success' ? 'success' : 'error'}>
-                    <div className="flex items-center gap-2">
-                      {connectionTestResult === 'success' ? (
-                        <CheckCircle className="h-4 w-4" />
-                      ) : (
-                        <AlertCircle className="h-4 w-4" />
-                      )}
-                      <span className="text-sm">{connectionTestMessage}</span>
-                    </div>
+                    {connectionTestMessage}
                   </Alert>
                 )}
                 <Button

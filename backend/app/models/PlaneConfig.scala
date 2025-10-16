@@ -27,7 +27,7 @@ import org.joda.time.DateTime
 
 import java.net.URL
 
-case class PlaneSettings(checkFrequency: Long)
+case class PlaneSettings(checkFrequency: Long, workspace: String)
 
 case class PlaneTagConfiguration(
     useLabels: Boolean,
@@ -39,8 +39,8 @@ case class PlaneTagConfiguration(
 )
 
 case class PlaneProjectSettings(
-    planeWorkspace: String,
     planeProjectId: String,
+    externalProjectName: Option[String] = None,
     maxResults: Option[Int] = None,
     params: Option[String] = None,
     tagConfiguration: PlaneTagConfiguration
@@ -67,7 +67,9 @@ case class PlaneConfig(
     // type attribute only needed to generate correct swagger definition
     `type`: String = classOf[PlaneConfig].getSimpleName
 ) extends IssueImporterConfig {
-  val checkFrequency: Long     = settings.checkFrequency
+  val checkFrequency: Long = settings.checkFrequency
+  // Plane API requires workspace slug to list projects
+  // Projects are fetched from configured workspace slugs
   val canListProjects: Boolean = true
 }
 

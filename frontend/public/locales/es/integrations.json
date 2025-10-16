@@ -84,7 +84,10 @@
       "resourceOwnerLoading": "Cargando organizaciones...",
       "resourceOwnerNoResults": "No se encontraron organizaciones",
       "resourceOwnerPlaceholder": "Introduce el token de acceso arriba para cargar organizaciones",
-      "resourceOwnerSelect": "Seleccionar una organización"
+      "resourceOwnerSelect": "Seleccionar una organización",
+      "workspace": "Espacio de trabajo",
+      "workspaceHelp": "El slug del espacio de trabajo desde tu URL de Plane (p. ej., \"mi-empresa\" desde https://app.plane.so/mi-empresa)",
+      "workspacePlaceholder": "p. ej., mi-empresa"
     },
     "github": {
       "instructions": {
@@ -143,7 +146,7 @@
     },
     "plane": {
       "instructions": {
-        "content": "<0><1>Inicia sesión en tu cuenta de Plane o instancia auto-alojada</1><1>Ve a Configuración del perfil</1><1>Selecciona \"Personal Access Tokens\" de la lista de pestañas</1><1>Haz clic en \"Add personal access token\"</1><1>Introduce un nombre de token y una descripción opcional</1><1>Haz clic en \"Generate\" o \"Create\"</1><1>Copia el token generado inmediatamente y guárdalo de forma segura</1></0><3>Nota: El token solo se mostrará una vez. El token se pasa como valor del encabezado <2>X-API-Key</2> en las solicitudes API.</3>",
+        "content": "<0><1>Inicia sesión en tu cuenta de Plane o instancia auto-alojada</1><1>Ve a Configuración del perfil</1><1>Selecciona \"Personal Access Tokens\" de la lista de pestañas</1><1>Haz clic en \"Add personal access token\"</1><1>Introduce un nombre de token y una descripción opcional</1><1>Haz clic en \"Generate\" o \"Create\"</1><1>Copia el token generado inmediatamente y guárdalo de forma segura</1></0><3>Nota: El token solo se mostrará una vez. El token se pasa como valor del encabezado <2>X-API-Key</2> en las solicitudes API.</3><3>Espacio de trabajo: Debes especificar el slug de tu espacio de trabajo, que se encuentra en tu URL de Plane. Por ejemplo, si tu URL de Plane es <2>https://app.plane.so/mi-empresa</2>, entonces tu slug de espacio de trabajo es <2>mi-empresa</2>. Esto es necesario para acceder a proyectos e incidencias en tu espacio de trabajo.</3>",
         "title": "Cómo crear credenciales de Plane:"
       }
     },
@@ -158,12 +161,15 @@
     },
     "tagConfiguration": {
       "description": "Configura qué campos de las incidencias externas deben usarse para crear etiquetas en Lasius.",
-      "issueState": {
-        "all": "Todas las incidencias",
-        "closed": "Solo incidencias cerradas",
-        "open": "Solo incidencias abiertas"
-      },
-      "issueStateLabel": "Estado de incidencia a importar",
+      "issueLabelFilterHelp": "Dejar vacío para importar todas las incidencias, o seleccionar etiquetas para importar solo incidencias que tengan al menos una de estas etiquetas.",
+      "issueLabelFilterLabel": "Importar solo incidencias con etiquetas específicas",
+      "issueLabelFilterPlaceholder": "Todas las incidencias (o seleccionar etiquetas para filtrar...)",
+      "issueStateFilterHelp": "Dejar vacío para importar todas las incidencias, o seleccionar estados para importar solo incidencias en esos estados.",
+      "issueStateFilterLabel": "Importar solo incidencias con estados específicos",
+      "issueStateFilterPlaceholder": "Todos los estados (o seleccionar estados específicos...)",
+      "labelFilterHelp": "Dejar vacío para importar todas las etiquetas, o seleccionar etiquetas específicas para importar solo esas.",
+      "labelFilterLabel": "Importar solo etiquetas específicas",
+      "labelFilterPlaceholder": "Todas las etiquetas (o seleccionar etiquetas específicas...)",
       "tagFieldsLabel": "Campos de etiquetas a importar",
       "tagFieldsPlaceholder": "Selecciona campos...",
       "useAssignees": "Usar asignados como etiquetas",

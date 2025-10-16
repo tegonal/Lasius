@@ -93,7 +93,7 @@ class PlaneApiServiceImpl(override val ws: WSClient,
     val params = Seq(
       Some(paramString),
       if (includeOnlyIssuesWithLabelsIds.isEmpty) None
-      else getParam("labels", includeOnlyIssuesWithStateIds.mkString(",")),
+      else getParam("labels", includeOnlyIssuesWithLabelsIds.mkString(",")),
       if (includeOnlyIssuesWithStateIds.isEmpty) None
       else getParam("state", includeOnlyIssuesWithStateIds.mkString(","))
     )

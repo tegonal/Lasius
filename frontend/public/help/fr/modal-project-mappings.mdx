@@ -31,18 +31,26 @@ Utilisez la zone de filtre en haut pour rechercher par nom de projet ou ID. Cliq
 
 Après avoir sélectionné un projet Lasius, configurez les champs de problème à importer en tant qu'étiquettes :
 
-**Champs d'étiquettes à importer** (Sélection multiple) :
+**Champs d'étiquettes à importer** (Sélection multiple, au moins un requis) :
 - Utiliser le titre du problème comme étiquette
 - Utiliser les labels comme étiquettes
 - Utiliser le jalon comme étiquette
 - Utiliser les personnes assignées comme étiquettes (GitHub uniquement)
 
-**État des problèmes à importer** :
-- Tous les problèmes
-- Problèmes ouverts uniquement
-- Problèmes fermés uniquement
+**Filtre de labels** (apparaît si "Utiliser les labels" est sélectionné) :
+- Laisser vide pour importer tous les labels comme étiquettes
+- Sélectionner des labels spécifiques pour n'importer que ceux-là
 
-<Tip>Utilisez "Problèmes ouverts uniquement" pour éviter d'encombrer votre liste d'étiquettes avec des problèmes fermés</Tip>
+**Filtre de labels des problèmes** :
+- Laisser vide pour importer tous les problèmes
+- Sélectionner des labels pour n'importer que les problèmes avec ces labels
+
+**Filtre d'état des problèmes** :
+- **GitHub/GitLab** : Sélection unique (ouvert ou fermé)
+- **Plane** : Sélection multiple (états de workflow personnalisés)
+- Laisser vide pour importer les problèmes dans tous les états
+
+<Tip>Pour GitHub/GitLab, sélectionnez "ouvert" pour éviter d'encombrer votre liste d'étiquettes avec des problèmes fermés</Tip>
 
 ## Modifier un mappage
 

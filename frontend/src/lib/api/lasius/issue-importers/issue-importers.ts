@@ -22,7 +22,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.0.1+10-a10445d4+20251012-1746
+ * OpenAPI spec version: 2.1.3+0-5a9b540e+20251016-0430
  */
 import useSwr from 'swr'
 import useSWRMutation from 'swr/mutation'
@@ -515,7 +515,7 @@ export const useTestExistingConfig = <TError = ErrorType<TestExistingConfig400 |
   }
 }
 /**
- * Fetches list of accessible projects/workspaces from the configured external service (GitLab/Jira/Plane). For GitLab and Jira, returns flat list of projects. For Plane, returns hierarchical list of workspaces with their projects. Requires only OrganisationMember role since it only reads from external API.
+ * Fetches list of accessible projects from the configured external service (GitLab/Jira/Plane/GitHub). Returns flat list of projects for all importer types. GitLab/GitHub/Plane projects include available labels and states to help configure filters. GitLab states are "opened", "closed", "all". GitHub states are "open", "closed", "all". Plane states are custom per project. Jira returns basic project information only. Requires only OrganisationMember role since it only reads from external API.
  * @summary List available projects from external service
  */
 export const listProjects = (

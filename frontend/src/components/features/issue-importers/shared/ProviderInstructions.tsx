@@ -157,6 +157,12 @@ export const ProviderInstructions: React.FC<Props> = ({ importerType }) => {
             Note: The token will only be shown once. The token is passed as the value of the{' '}
             <Code>X-API-Key</Code> header in API requests.
           </P>
+          <P>
+            Workspace: You need to specify your workspace slug, which can be found in your Plane
+            URL. For example, if your Plane URL is <Code>https://app.plane.so/my-company</Code>,
+            then your workspace slug is <Code>my-company</Code>. This is required to access projects
+            and issues in your workspace.
+          </P>
         </Trans>
       )
       break

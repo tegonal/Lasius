@@ -42,6 +42,7 @@ case class GithubTagConfiguration(
 case class GithubProjectSettings(
     githubRepoOwner: String,
     githubRepoName: String,
+    externalProjectName: Option[String] = None,
     maxResults: Option[Int] = None,
     params: Option[String] = None,
     projectKeyPrefix: Option[String] = None,

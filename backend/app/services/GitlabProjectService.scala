@@ -118,6 +118,49 @@ class GitlabProjectService(wsClient: WSClient)(implicit ec: ExecutionContext)
 
     val initialUrl =
       config.baseUrl.toString + "/api/v4/projects?membership=true&archived=false&per_page=100"
-    fetchPage(initialUrl)
+
+    for {
+      projects <- fetchPage(initialUrl)
+      // Enrich each project with available labels
+      enrichedProjects <- Future.sequence(projects.map { project =>
+        enrichProjectWithLabels(config, project)
+      })
+    } yield enrichedProjects.sortBy(_.name)
+  }
+
+  private def enrichProjectWithLabels(
+      config: GitlabConfig,
+      project: ExternalProject): Future[ExternalProject] = {
+    fetchProjectLabels(config, project.id).map { labels =>
+      project.copy(
+        availableLabels = if (labels.nonEmpty) Some(labels) else None,
+        availableStates =
+          Some(Seq("opened", "closed", "all")) // GitLab fixed states
+      )
+    }
+  }
+
+  private def fetchProjectLabels(config: GitlabConfig,
+                                 projectId: String): Future[Seq[String]] = {
+    val labelsUrl =
+      s"${config.baseUrl}/api/v4/projects/$projectId/labels?per_page=100"
+
+    wsClient
+      .url(labelsUrl)
+      .addHttpHeaders("PRIVATE-TOKEN" -> config.auth.accessToken)
+      .withRequestTimeout(ProjectListTimeout)
+      .get()
+      .map { response =>
+        response.status match {
+          case 200 =>
+            response.json
+              .as[JsArray]
+              .value
+              .map(label => (label \ "name").as[String])
+              .toSeq
+          case _ => Seq.empty // Gracefully handle failures
+        }
+      }
+      .recover { case _ => Seq.empty } // Gracefully handle errors
   }
 }

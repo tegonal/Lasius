@@ -18,8 +18,10 @@
  */
 
 import { Button } from 'components/primitives/buttons/Button'
+import { ScrollContainer } from 'components/primitives/layout/ScrollContainer'
 import { Text } from 'components/primitives/typography/Text'
 import { ButtonGroup } from 'components/ui/forms/ButtonGroup'
+import { FormBody } from 'components/ui/forms/FormBody'
 import { FormElement } from 'components/ui/forms/FormElement'
 import { InputSelectAutocomplete } from 'components/ui/forms/input/InputSelectAutocomplete'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
@@ -108,67 +110,76 @@ export const ProjectMappingSelector: React.FC<Props> = ({
 
   return (
     <FormProvider {...hookForm}>
-      <div className="space-y-4">
+      <form onSubmit={hookForm.handleSubmit(handleSubmit)} className="flex h-full flex-col">
         <ModalCloseButton onClose={onCancel} />
 
-        <ModalHeader className="mb-2">
-          {selectedProjectId
-            ? t('issueImporters.wizard.projects.editMapping', {
-                defaultValue: 'Edit Project Mapping',
-              })
-            : t('issueImporters.wizard.projects.createMapping', {
-                defaultValue: 'Create Project Mapping',
+        <ScrollContainer>
+          <div className="flex h-full flex-col">
+            <ModalHeader className="mb-2">
+              {selectedProjectId
+                ? t('issueImporters.wizard.projects.editMapping', {
+                    defaultValue: 'Edit Project Mapping',
+                  })
+                : t('issueImporters.wizard.projects.createMapping', {
+                    defaultValue: 'Create Project Mapping',
+                  })}
+            </ModalHeader>
+
+            <ModalDescription className="mb-4">
+              {t('issueImporters.wizard.projects.mappingDescription', {
+                defaultValue:
+                  'Link this external project to a Lasius project to automatically sync issues as time tracking tags.',
               })}
-        </ModalHeader>
+            </ModalDescription>
 
-        <ModalDescription className="mb-4">
-          {t('issueImporters.wizard.projects.mappingDescription', {
-            defaultValue:
-              'Link this external project to a Lasius project to automatically sync issues as time tracking tags.',
-          })}
-        </ModalDescription>
+            <div className="space-y-4">
+              <div className="bg-base-200 flex items-center gap-3 rounded-lg p-4">
+                <LucideIcon
+                  icon={FolderOpen}
+                  size={20}
+                  className="text-base-content/60 flex-shrink-0"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium">{externalProject.name}</p>
+                  <p className="text-base-content/50 truncate text-xs">{externalProject.id}</p>
+                </div>
+              </div>
 
-        <form onSubmit={hookForm.handleSubmit(handleSubmit)} className="space-y-4">
-          <div className="bg-base-200 flex items-center gap-3 rounded-lg p-4">
-            <LucideIcon
-              icon={FolderOpen}
-              size={20}
-              className="text-base-content/60 flex-shrink-0"
-            />
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium">{externalProject.name}</p>
-              <p className="text-base-content/50 truncate text-xs">{externalProject.id}</p>
+              <Text variant="infoText">
+                {t('issueImporters.wizard.projects.selectMappingDescription', {
+                  defaultValue:
+                    'Choose which Lasius project should be linked to this external project.',
+                })}
+              </Text>
+
+              <FormBody>
+                <FormElement
+                  label={t('projects.label', { defaultValue: 'Project' })}
+                  htmlFor="projectId"
+                  required>
+                  <InputSelectAutocomplete
+                    id="projectId"
+                    name="projectId"
+                    required
+                    suggestions={lasiusProjects}
+                    selectedItem={selectedItem}
+                  />
+                </FormElement>
+
+                {watchedProjectId && watchedTagConfig && importerType !== 'jira' && (
+                  <TagConfigurationForm
+                    importerType={importerType}
+                    value={watchedTagConfig}
+                    onChange={(newConfig) => hookForm.setValue('tagConfig', newConfig)}
+                    externalProject={externalProject}
+                  />
+                )}
+              </FormBody>
             </div>
           </div>
+        </ScrollContainer>
 
-          <Text variant="infoText">
-            {t('issueImporters.wizard.projects.selectMappingDescription', {
-              defaultValue:
-                'Choose which Lasius project should be linked to this external project.',
-            })}
-          </Text>
-
-          <FormElement
-            label={t('projects.label', { defaultValue: 'Project' })}
-            htmlFor="projectId"
-            required>
-            <InputSelectAutocomplete
-              id="projectId"
-              name="projectId"
-              required
-              suggestions={lasiusProjects}
-              selectedItem={selectedItem}
-            />
-          </FormElement>
-
-          {watchedProjectId && watchedTagConfig && importerType !== 'jira' && (
-            <TagConfigurationForm
-              importerType={importerType}
-              value={watchedTagConfig}
-              onChange={(newConfig) => hookForm.setValue('tagConfig', newConfig)}
-            />
-          )}
-
+        <div className="mt-6">
           <ButtonGroup>
             <Button type="submit" variant="primary" disabled={!watchedProjectId}>
               {t('actions.confirm', { defaultValue: 'Confirm' })}
@@ -177,8 +188,8 @@ export const ProjectMappingSelector: React.FC<Props> = ({
               {t('actions.cancel', { defaultValue: 'Cancel' })}
             </Button>
           </ButtonGroup>
-        </form>
-      </div>
+        </div>
+      </form>
     </FormProvider>
   )
 }

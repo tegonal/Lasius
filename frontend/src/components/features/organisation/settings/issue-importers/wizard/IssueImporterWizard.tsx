@@ -153,6 +153,7 @@ export const IssueImporterWizard: React.FC<Props> = ({ open, onClose, orgId, add
         apiKey: state.formData.apiKey || null,
         resourceOwner: state.formData.resourceOwner || null,
         resourceOwnerType: state.formData.resourceOwnerType,
+        workspace: state.formData.workspace || null,
       })
 
       if (config) {
@@ -239,12 +240,16 @@ export const IssueImporterWizard: React.FC<Props> = ({ open, onClose, orgId, add
       if (mappingEntries.length > 0) {
         // Map external project IDs to Lasius project IDs with tag configurations
         for (const [externalProjectId, mappingWithConfig] of mappingEntries) {
+          // Find the external project to get its name
+          const externalProject = state.availableProjects?.find((p) => p.id === externalProjectId)
+
           // Build platform-specific mapping payload using helper
           const result = buildMappingPayload(
             state.formData.importerType,
             externalProjectId,
             mappingWithConfig.projectId,
             mappingWithConfig.tagConfig,
+            externalProject?.name,
           )
 
           if (!result.success) {
@@ -384,6 +389,7 @@ export const IssueImporterWizard: React.FC<Props> = ({ open, onClose, orgId, add
                 apiKey: state.formData.apiKey || null,
                 resourceOwner: state.formData.resourceOwner || null,
                 resourceOwnerType: state.formData.resourceOwnerType || null,
+                workspace: state.formData.workspace || null,
               }
               return (
                 <TestConnectionStep

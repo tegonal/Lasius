@@ -23,7 +23,7 @@ import type { ModelsBookingStatsByCategory } from './modelsBookingStatsByCategor
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.0.1+10-a10445d4+20251012-1746
+ * OpenAPI spec version: 2.1.3+0-5a9b540e+20251016-0430
  */
 import type { ModelsBookingStatsCategory } from './modelsBookingStatsCategory'
 

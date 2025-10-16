@@ -124,6 +124,6 @@ class JiraProjectService(wsClient: WSClient)(implicit ec: ExecutionContext)
         }
     }
 
-    fetchPage(0)
+    fetchPage(0).map(_.sortBy(_.name))
   }
 }

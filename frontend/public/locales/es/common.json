@@ -428,7 +428,8 @@
       "minInterval": "Mínimo 1 minuto",
       "nameRequired": "Nombre requerido",
       "privateKeyRequired": "Clave privada requerida",
-      "resourceOwnerRequired": "Propietario de recurso requerido"
+      "resourceOwnerRequired": "Propietario de recurso requerido",
+      "workspaceRequired": "Espacio de trabajo requerido"
     }
   },
   "lists": {

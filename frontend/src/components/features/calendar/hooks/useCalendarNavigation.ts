@@ -20,7 +20,7 @@
 import { addMonths, addWeeks } from 'date-fns'
 import { IsoDateString } from 'lib/api/apiDateHandling'
 import { formatISOLocale, getMonthOfDate, getWeekOfDate } from 'lib/utils/date/dates'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useCalendarActions } from 'stores/calendarStore'
 
 type ViewType = 'month' | 'week'
@@ -30,6 +30,13 @@ export const useCalendarNavigation = (initialDate: IsoDateString, viewType: View
   const [period, setPeriod] = useState<IsoDateString[]>(
     viewType === 'month' ? getMonthOfDate(initialDate) : getWeekOfDate(initialDate),
   )
+
+  // Update period when initialDate changes (e.g., when "Today" is clicked)
+  useEffect(() => {
+    const newPeriod =
+      viewType === 'month' ? getMonthOfDate(initialDate) : getWeekOfDate(initialDate)
+    setPeriod(newPeriod)
+  }, [initialDate, viewType])
 
   const next = useCallback(() => {
     setPeriod((currentPeriod) => {

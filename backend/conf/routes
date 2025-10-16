@@ -1299,7 +1299,7 @@ POST /organisations/:orgId/issue-importers/:configId/test                       
 #  tags:
 #    - issue-importers
 #  summary: List available projects from external service
-#  description: Fetches list of accessible projects/workspaces from the configured external service (GitLab/Jira/Plane). For GitLab and Jira, returns flat list of projects. For Plane, returns hierarchical list of workspaces with their projects. Requires only OrganisationMember role since it only reads from external API.
+#  description: Fetches list of accessible projects from the configured external service (GitLab/Jira/Plane/GitHub). Returns flat list of projects for all importer types. GitLab/GitHub/Plane projects include available labels and states to help configure filters. GitLab states are "opened", "closed", "all". GitHub states are "open", "closed", "all". Plane states are custom per project. Jira returns basic project information only. Requires only OrganisationMember role since it only reads from external API.
 #  operationId: listProjects
 #  parameters:
 #    - name: orgId

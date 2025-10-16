@@ -50,6 +50,7 @@ export interface WizardFormData {
 
   // Plane
   apiKey?: string
+  workspace?: string
 }
 
 export interface WizardState {

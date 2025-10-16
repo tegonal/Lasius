@@ -261,8 +261,8 @@ class GithubProjectService(wsClient: WSClient)(implicit ec: ExecutionContext)
             }
         }
 
-        // Fetch all pages
-        fetchPage(initialReposUrl).map { repos =>
+        // Fetch all pages and enrich with labels
+        fetchPage(initialReposUrl).flatMap { repos =>
           // Debug: Log all repo names
           val repoNames = repos.map(_.id).mkString(", ")
           play.api
@@ -283,8 +283,49 @@ class GithubProjectService(wsClient: WSClient)(implicit ec: ExecutionContext)
             .Logger(getClass)
             .debug(s"Config ${config.id.value} token type: ${tokenType}")
 
-          repos
+          // Enrich each repository with available labels
+          Future
+            .sequence(repos.map { repo =>
+              enrichProjectWithLabels(config, repo)
+            })
+            .map(_.sortBy(_.name))
         }
       }
+  }
+
+  private def enrichProjectWithLabels(
+      config: GithubConfig,
+      project: ExternalProject): Future[ExternalProject] = {
+    fetchProjectLabels(config, project.id).map { labels =>
+      project.copy(
+        availableLabels = if (labels.nonEmpty) Some(labels) else None,
+        availableStates =
+          Some(Seq("open", "closed", "all")) // GitHub fixed states
+      )
+    }
+  }
+
+  private def fetchProjectLabels(config: GithubConfig,
+                                 repoFullName: String): Future[Seq[String]] = {
+    val labelsUrl =
+      s"${config.baseUrl}/repos/$repoFullName/labels?per_page=100"
+
+    wsClient
+      .url(labelsUrl)
+      .addHttpHeaders("Authorization" -> s"Bearer ${config.auth.accessToken}")
+      .withRequestTimeout(ProjectListTimeout)
+      .get()
+      .map { response =>
+        response.status match {
+          case 200 =>
+            response.json
+              .as[JsArray]
+              .value
+              .map(label => (label \ "name").as[String])
+              .toSeq
+          case _ => Seq.empty // Gracefully handle failures
+        }
+      }
+      .recover { case _ => Seq.empty } // Gracefully handle errors
   }
 }

@@ -24,5 +24,5 @@ type Props = {
 }
 
 export const FormBody: React.FC<Props> = ({ children }) => {
-  return <div className="flex w-full flex-col gap-2 sm:gap-4">{children}</div>
+  return <div className="flex w-full flex-col gap-2 md:gap-6">{children}</div>
 }

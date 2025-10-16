@@ -151,6 +151,12 @@ export const createConfigSchema = (
       return z.object({
         ...baseSchema,
         apiKey: credentialSchemas.apiKey(t, isEdit),
+        workspace: z.string().min(
+          1,
+          t('issueImporters.validation.workspaceRequired', {
+            defaultValue: 'Workspace is required',
+          }),
+        ),
       })
   }
 }

@@ -31,18 +31,26 @@ Usa el cuadro de filtro en la parte superior para buscar por nombre de proyecto 
 
 Después de seleccionar un proyecto de Lasius, configura qué campos de problemas importar como etiquetas:
 
-**Campos de etiquetas a importar** (Selección múltiple):
+**Campos de etiquetas a importar** (Selección múltiple, al menos uno requerido):
 - Usar título del problema como etiqueta
 - Usar etiquetas como etiquetas
 - Usar hito como etiqueta
 - Usar asignados como etiquetas (solo GitHub)
 
-**Estado de problema a importar**:
-- Todos los problemas
-- Solo problemas abiertos
-- Solo problemas cerrados
+**Filtro de etiquetas** (aparece si "Usar etiquetas" está seleccionado):
+- Dejar vacío para importar todas las etiquetas como etiquetas
+- Seleccionar etiquetas específicas para importar solo esas
 
-<Tip>Usa "Solo problemas abiertos" para evitar saturar tu lista de etiquetas con problemas cerrados</Tip>
+**Filtro de etiquetas de problema**:
+- Dejar vacío para importar todos los problemas
+- Seleccionar etiquetas para importar solo problemas con esas etiquetas
+
+**Filtro de estado de problema**:
+- **GitHub/GitLab**: Selección única (abierto o cerrado)
+- **Plane**: Selección múltiple (estados de flujo de trabajo personalizados)
+- Dejar vacío para importar problemas en todos los estados
+
+<Tip>Para GitHub/GitLab, selecciona "abierto" para evitar saturar tu lista de etiquetas con problemas cerrados</Tip>
 
 ## Editar una asignación
 

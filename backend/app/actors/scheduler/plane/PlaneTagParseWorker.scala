@@ -135,7 +135,8 @@ class PlaneTagParseWorker(wsClient: WSClient,
         configId = configId,
         organisationId = organisationId,
         projectId = projectId,
-        projectName = s"Plane Project ${projectSettings.planeProjectId}",
+        projectName = projectSettings.externalProjectName.getOrElse(
+          s"Plane Project ${projectSettings.planeProjectId}"),
         issueCount = issues.size,
         success = true
       )
@@ -169,7 +170,8 @@ class PlaneTagParseWorker(wsClient: WSClient,
           configId = configId,
           organisationId = organisationId,
           projectId = projectId,
-          projectName = s"Plane Project ${projectSettings.planeProjectId}",
+          projectName = projectSettings.externalProjectName.getOrElse(
+            s"Plane Project ${projectSettings.planeProjectId}"),
           issueCount = 0,
           success = false,
           error = Some(issue)
@@ -214,7 +216,7 @@ class PlaneTagParseWorker(wsClient: WSClient,
       nameTag.map(t => labelTags :+ t).getOrElse(labelTags)
 
     val issueLink =
-      s"$baseURL/${projectSettings.planeWorkspace}/projects/${issue.project.id}/issues/${issue.id}"
+      s"$baseURL/${settings.workspace}/projects/${issue.project.id}/issues/${issue.id}"
 
     PlaneIssueTag(
       TagId(
@@ -232,7 +234,7 @@ class PlaneTagParseWorker(wsClient: WSClient,
       s"Fetch labels for projectId=${projectId.value}, planeProjectId=${projectSettings.planeProjectId}")
     apiService
       .getLabels(maxResults = maxResults,
-                 workspace = projectSettings.planeWorkspace,
+                 workspace = settings.workspace,
                  projectId = projectSettings.planeProjectId)
   }
 
@@ -241,7 +243,7 @@ class PlaneTagParseWorker(wsClient: WSClient,
       s"Fetch states for projectId=${projectId.value}, planeProjectId=${projectSettings.planeProjectId}")
     apiService
       .getStates(maxResults = maxResults,
-                 workspace = projectSettings.planeWorkspace,
+                 workspace = settings.workspace,
                  projectId = projectSettings.planeProjectId)
   }
 
@@ -255,7 +257,7 @@ class PlaneTagParseWorker(wsClient: WSClient,
     val query = projectSettings.params.getOrElse(defaultParams)
     apiService
       .findIssues(
-        workspace = projectSettings.planeWorkspace,
+        workspace = settings.workspace,
         projectId = projectSettings.planeProjectId,
         paramString = query,
         maxResults = newMax,
