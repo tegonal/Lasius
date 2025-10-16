@@ -147,9 +147,6 @@ dockerExposedPorts := Seq(9000)
 // Docker repository
 dockerRepository := Some("tegonal")
 
-// Update latest tag when publishing
-dockerUpdateLatest := true
-
 // Override package name for Docker (CI/CD expects "lasius-backend")
 Docker / packageName := "lasius-backend"
 
@@ -165,10 +162,19 @@ dockerAlias := {
   )
 }
 
+// Only tag as 'latest' for stable semver releases (e.g., v1.2.3 or 1.2.3)
+// Any other tag pattern is considered beta/experimental
 dockerAliases ++= {
-  if (dockerUpdateLatest.value) {
+  val ver = version.value
+  // Match semantic versioning: optional 'v' prefix + X.Y.Z (where X, Y, Z are numbers)
+  val semverPattern = """^v?\d+\.\d+\.\d+$""".r
+  val isStableRelease = semverPattern.matches(ver)
+
+  if (isStableRelease) {
     Seq(dockerAlias.value.withTag(Some("latest")))
-  } else Seq.empty
+  } else {
+    Seq.empty
+  }
 }
 
 // Use multi-stage build for better security and smaller images
