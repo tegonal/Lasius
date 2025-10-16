@@ -18,6 +18,7 @@
  */
 
 import { useEffect } from 'react'
+import { APP_SETTINGS_STORAGE_KEY } from 'stores/appSettingsStore'
 
 /**
  * Hook to initialize and manage theme on app mount.
@@ -29,14 +30,27 @@ import { useEffect } from 'react'
  */
 export const useThemeInitialization = () => {
   useEffect(() => {
-    // Check if there's a saved theme in localStorage
-    const savedTheme = localStorage.getItem('theme')
+    // Read theme from Zustand persist store
+    const getThemeFromStore = (): string | null => {
+      try {
+        const persistedState = localStorage.getItem(APP_SETTINGS_STORAGE_KEY)
+        if (persistedState) {
+          const parsed = JSON.parse(persistedState)
+          return parsed.state?.theme || null
+        }
+      } catch {
+        // Ignore parsing errors
+      }
+      return null
+    }
 
-    if (savedTheme) {
-      // User has explicitly set a theme preference
+    const savedTheme = getThemeFromStore()
+
+    if (savedTheme && savedTheme !== 'system') {
+      // User has explicitly set a theme preference (light or dark)
       document.documentElement.setAttribute('data-theme', savedTheme)
     } else {
-      // No saved preference, check system preference
+      // No saved preference or user chose 'system', check system preference
       if (typeof window !== 'undefined' && window.matchMedia) {
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
         const systemTheme = prefersDark ? 'dark' : 'light'
@@ -47,13 +61,18 @@ export const useThemeInitialization = () => {
       }
     }
 
-    // Listen to system preference changes (only if no saved preference)
-    if (!savedTheme && typeof window !== 'undefined' && window.matchMedia) {
+    // Listen to system preference changes (only if user chose 'system' or no preference)
+    if (
+      (!savedTheme || savedTheme === 'system') &&
+      typeof window !== 'undefined' &&
+      window.matchMedia
+    ) {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
 
       const handleChange = (e: MediaQueryListEvent) => {
         // Only apply system changes if user hasn't set a manual preference
-        if (!localStorage.getItem('theme')) {
+        const currentTheme = getThemeFromStore()
+        if (!currentTheme || currentTheme === 'system') {
           const systemTheme = e.matches ? 'dark' : 'light'
           document.documentElement.setAttribute('data-theme', systemTheme)
         }

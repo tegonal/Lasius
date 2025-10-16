@@ -24,11 +24,12 @@ import { FormErrorBadge } from 'components/ui/forms/formErrorBadge'
 import { CalendarDisplay } from 'components/ui/forms/input/calendar/calendarDisplay'
 import { useRequiredFormContext } from 'components/ui/forms/WithFormContext'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
+import { isEqual } from 'date-fns'
 import { IsoDateString } from 'lib/api/apiDateHandling'
 import { formatISOLocale } from 'lib/utils/date/dates'
 import { CalendarIcon, LucideIcon as LucideIconType, RotateCcw, X } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
-import React, { useEffect, useMemo, useRef } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useFormContext } from 'react-hook-form'
 
 import { SegmentedDateInputConnected } from './SegmentedDateInputConnected'
@@ -47,6 +48,7 @@ export type InputDatePickerProps = {
   presetDate?: IsoDateString
   presetLabel?: string
   presetIcon?: LucideIconType
+  onRenderLabelAction?: (resetButton: React.ReactNode) => void
 }
 
 /**
@@ -60,12 +62,14 @@ const InputDatePickerInternal: React.FC<InputDatePickerProps> = ({
   presetDate,
   presetLabel,
   presetIcon: PresetIcon,
+  onRenderLabelAction,
 }) => {
   const { t } = useTranslation('common')
   const parentFormContext = useRequiredFormContext() // Guaranteed non-null
   const { getISOString, setFromISOString, setInitialValue, resetToInitial, value } =
     useDatePickerStore()
   const isInitializedRef = useRef(false)
+  const initialDateRef = useRef<Date | null>(null)
 
   // Watch the form value
   const formValue = parentFormContext.watch(name)
@@ -115,6 +119,11 @@ const InputDatePickerInternal: React.FC<InputDatePickerProps> = ({
         // Use the form's initial value
         setFromISOString(initialValue)
         setInitialValue(initialValue)
+        // Save initial date for comparison
+        const initialDate = new Date(initialValue)
+        if (!isNaN(initialDate.getTime())) {
+          initialDateRef.current = initialDate
+        }
         isInitializedRef.current = true
       }
     }
@@ -129,6 +138,11 @@ const InputDatePickerInternal: React.FC<InputDatePickerProps> = ({
     if (!isInitializedRef.current && formValue) {
       setFromISOString(formValue)
       setInitialValue(formValue)
+      // Save initial date for comparison
+      const initialDate = new Date(formValue)
+      if (!isNaN(initialDate.getTime())) {
+        initialDateRef.current = initialDate
+      }
       isInitializedRef.current = true
       return
     }
@@ -190,13 +204,54 @@ const InputDatePickerInternal: React.FC<InputDatePickerProps> = ({
     close()
   }
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     resetToInitial()
-  }
+  }, [resetToInitial])
 
-  // Show reset button when current value is invalid and complete
+  // Show reset button when:
+  // 1. Current datetime differs from initial datetime (comparing entire date+time), OR
+  // 2. Current value is invalid and complete
+  const dateTimeHasChanged =
+    initialDateRef.current &&
+    value.date &&
+    value.isValid &&
+    !isEqual(initialDateRef.current, value.date)
+
   const showResetButton =
-    !value.isValid && !value.isPartial && (value.dateString || value.timeString)
+    dateTimeHasChanged ||
+    (!value.isValid && !value.isPartial && (value.dateString || value.timeString))
+
+  // Render reset button (memoized to avoid recreating on every render)
+  const resetButtonElement = useMemo(
+    () =>
+      showResetButton ? (
+        <ToolTip
+          toolTipContent={t('common.actions.resetToInitial', {
+            defaultValue: 'Reset to initial value',
+          })}>
+          <Button
+            variant="ghost"
+            size="sm"
+            type="button"
+            onClick={handleReset}
+            fullWidth={false}
+            shape="circle"
+            aria-label={t('common.actions.resetToInitial', {
+              defaultValue: 'Reset to initial value',
+            })}>
+            <LucideIcon icon={RotateCcw} size={16} />
+          </Button>
+        </ToolTip>
+      ) : null,
+    [showResetButton, handleReset, t],
+  )
+
+  // Call onRenderLabelAction callback to pass reset button to parent
+  useEffect(() => {
+    if (onRenderLabelAction) {
+      onRenderLabelAction(resetButtonElement)
+    }
+  }, [resetButtonElement, onRenderLabelAction])
 
   return (
     <>
@@ -277,27 +332,6 @@ const InputDatePickerInternal: React.FC<InputDatePickerProps> = ({
                 )
               }
             />
-          )}
-          {showResetButton && (
-            <div className="-my-6">
-              <ToolTip
-                toolTipContent={t('common.actions.resetToInitial', {
-                  defaultValue: 'Reset to initial value',
-                })}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  type="button"
-                  onClick={handleReset}
-                  fullWidth={false}
-                  shape="circle"
-                  aria-label={t('common.actions.resetToInitial', {
-                    defaultValue: 'Reset to initial value',
-                  })}>
-                  <LucideIcon icon={RotateCcw} size={16} />
-                </Button>
-              </ToolTip>
-            </div>
           )}
         </div>
 

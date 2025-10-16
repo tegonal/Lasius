@@ -182,5 +182,6 @@ export const useWorkHealthMetrics = (
     weeklyData,
     burnoutMetrics,
     isLoading,
+    bookings, // Expose bookings for calculating booking count
   }
 }

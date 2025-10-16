@@ -50,13 +50,27 @@ export function parseDateTimeStrings(
 
   // Parse date if provided
   if (hasDate) {
+    // Normalize short years (1-3 digits) to current century
+    let normalizedDateString = dateString
+    const dateParts = dateString.split('.')
+    if (dateParts.length === 3) {
+      const yearPart = dateParts[2]
+      // If year has 1-3 digits, assume current century (20XX)
+      if (yearPart && /^\d{1,3}$/.test(yearPart)) {
+        const currentCentury = Math.floor(new Date().getFullYear() / 100) * 100
+        const normalizedYear = currentCentury + parseInt(yearPart, 10)
+        dateParts[2] = normalizedYear.toString()
+        normalizedDateString = dateParts.join('.')
+      }
+    }
+
     const dateFormats = [
       'd.M.yyyy', // Full format: 1.1.2025
       'd.M.yy', // Short year: 1.1.25
     ]
 
     for (const format of dateFormats) {
-      const parsed = parse(dateString, format, new Date())
+      const parsed = parse(normalizedDateString, format, new Date())
       if (isValid(parsed)) {
         parsedDate = parsed
         break

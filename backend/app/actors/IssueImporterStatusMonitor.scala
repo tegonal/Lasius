@@ -190,7 +190,7 @@ class IssueImporterStatusMonitor(
             projectName = projectName,
             lastSyncAt = Some(DateTime.now),
             lastSyncIssueCount = issueCount,
-            totalIssuesSynced = existing.totalIssuesSynced + issueCount,
+            totalIssuesSynced = issueCount,
             consecutiveFailures = 0,
             lastError = None
           )

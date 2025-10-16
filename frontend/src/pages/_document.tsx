@@ -20,6 +20,7 @@
 import { DEFAULT_LOCALE, LOCALE_COOKIE_NAME } from 'lib/config/locales'
 import NextDocument, { DocumentContext, Head, Html, Main, NextScript } from 'next/document'
 import React from 'react'
+import { APP_SETTINGS_STORAGE_KEY } from 'stores/appSettingsStore'
 
 import type { RuntimeConfig } from 'projectConfig/constants'
 
@@ -91,30 +92,31 @@ class MyDocument extends NextDocument {
               __html: `
                 (function() {
                   try {
-                    // Check for saved theme in localStorage
-                    var savedTheme = localStorage.getItem('theme');
+                    var savedTheme = null;
 
-                    // If no saved theme, check for Theme-UI mode
-                    if (!savedTheme) {
-                      var themeUIMode = localStorage.getItem('theme-ui-color-mode');
-                      if (themeUIMode === 'dark') {
-                        savedTheme = 'dark';
-                      } else if (themeUIMode === 'light') {
-                        savedTheme = 'light';
+                    // Read theme from Zustand persist store
+                    try {
+                      var persistedState = localStorage.getItem('${APP_SETTINGS_STORAGE_KEY}');
+                      if (persistedState) {
+                        var parsed = JSON.parse(persistedState);
+                        savedTheme = parsed.state && parsed.state.theme;
                       }
+                    } catch (e) {
+                      // Ignore parsing errors
                     }
 
-                    // If still no theme, check system preference
-                    if (!savedTheme) {
+                    // Apply theme based on user preference
+                    if (savedTheme && savedTheme !== 'system') {
+                      // User explicitly chose light or dark
+                      document.documentElement.setAttribute('data-theme', savedTheme);
+                    } else {
+                      // User chose 'system' or no preference - use system preference
                       if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                        savedTheme = 'dark';
+                        document.documentElement.setAttribute('data-theme', 'dark');
                       } else {
-                        savedTheme = 'light';
+                        document.documentElement.setAttribute('data-theme', 'light');
                       }
                     }
-
-                    // Apply the theme
-                    document.documentElement.setAttribute('data-theme', savedTheme);
                   } catch (e) {
                     // Fallback to light theme if anything goes wrong
                     document.documentElement.setAttribute('data-theme', 'light');

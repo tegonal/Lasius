@@ -132,9 +132,10 @@ export const AppSettingsForm: React.FC = () => {
 
   const onSubmit = (data: FormData) => {
     const currentLocale = Cookies.get(LOCALE_COOKIE_NAME) || i18n.language || 'en'
+    const languageChanged = data.language !== currentLocale
 
     // Track language change
-    if (data.language !== currentLocale) {
+    if (languageChanged) {
       plausible('settings.app.language_change', {
         props: { from: currentLocale, to: data.language },
       })
@@ -169,7 +170,10 @@ export const AppSettingsForm: React.FC = () => {
       document.documentElement.setAttribute('data-theme', dataTheme)
     }
 
-    router.reload()
+    // Only reload if language changed (to load new translation files)
+    if (languageChanged) {
+      router.reload()
+    }
   }
 
   return (
