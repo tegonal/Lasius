@@ -2,7 +2,7 @@
 
 Lasius is an open source time tracking solution that includes a comprehensive set of features, with a particular focus on team collaboration.
 
-**Public Beta**: We welcome your feedback! Please use the issue tracker of this repository.
+We welcome your feedback! Please use the issue tracker of this repository.
 
 Lasius is a modern web application with a backend written in Scala and a NextJS React frontend.
 
@@ -13,10 +13,12 @@ Lasius is a modern web application with a backend written in Scala and a NextJS 
 - Start-Stop tracking: Record time spent on a task in real-time
 - Labels & Tags: Assign labels to each booking and edit labels on project level
 - Favorites: Save your most used bookings as favorites and start booking with one click
+- Booking Templates: Create bookings from existing entries or team member bookings
+- Flexible Time Adjustments: Adjust start/end times between adjacent bookings
 - Progressive Web App: Use Lasius on your mobile device as a PWA and add it to your homescreen
-- Dark-mode: Switch between light and dark mode
+- Dark-mode: Switch between light, dark or the system default
 - Statistics & Reports: See your organisation, project or personal statistics for a given time period
-- Export: Export organisation, project or personal bookings using various filters as CSV for a given time period
+- Export: Export organisation, project or personal bookings and statistics in multiple formats (CSV, ODS, XLSX)
 - ACL: Assign roles to users in a project or organisation to allow or restrict access to certain features
 
 ## Team Features
@@ -28,7 +30,8 @@ Lasius is a modern web application with a backend written in Scala and a NextJS 
 
 ## Integrations
 
-- Issue trackers: Connect your issue tracker to Lasius and use issue numbers as labels. Currently supported:
+- Issue trackers: Connect your issue tracker to Lasius and automatically sync issues as tags. Fully configurable in the UI. Currently supported:
+  - GitHub
   - GitLab
   - Jira
   - Plane.io
@@ -36,17 +39,25 @@ Lasius is a modern web application with a backend written in Scala and a NextJS 
 ## Personal Time Management
 
 - Set your personal hourly target per weekday and organisation
-- See your progress in real-time
+- See your progress in real-time with monthly calculations
+- Personal dashboard with time tracking insights
+
+## User Experience
+
+- Built-in contextual help system throughout the application
+- Interactive onboarding checklist for new users
+- Multi-language support: English, German, Spanish, French, and Italian
+- Responsive design optimized for all device sizes
 
 # Roadmap
 
 We plan to implement the following features in the near future (no specific order, no ETA):
 
-- [ ] Make GitLab, Jira and Plane integration configurable in the frontend (currently hardcoded)
-- [ ] Add support for GitHub issue tracker
 - [ ] Special project to book sick days, holidays, etc. per organization
+- [ ] Additional issue tracker integrations
+- [ ] An API that lets you import bookings into other system using access tokens
 
-If you plan to use Lasius for your company or organisation, and you depend on one of the above features, we are happy to discuss sponsoring the development.
+If you plan to use Lasius for your company or organisation, and you need specific features or support, we are happy to discuss sponsoring the development.
 
 Watch this repository to get notified about new releases.
 
@@ -125,7 +136,7 @@ To bring up a local dev Environment please install:
 - docker
 - node
 
-Copy the frontent `frontend/.env.template` file to `frontend/.env.local`.
+Copy the frontend `frontend/.env.template` file to `frontend/.env.local` and edit it.
 
 To enable external OAuth support, register application in provider and configure the external provider settings (`GITLAB_OAUTH_*` or `GITHUB_OAUTH_*`) before starting backend and frontend. Those environment variables are re-used in the backend configuration and enable the provider there as well.
 
@@ -186,5 +197,5 @@ We bumped to the latest available mongo database version 8.x. If you consider mi
 
 ## Wiki / Documentation
 
-The wiki documentation of this project is part of the main repository and will be published on every build of the main branch. Therefore don't edit the wiki online as those changes will be overwritten on the next build.
+The wiki documentation of this project is part of the main repository and will be published on every build of the main branch. Therefore, don't edit the wiki online as those changes will be overwritten on the next build.
 If you want to change the wiki documentation please create a PR to the main branch.
