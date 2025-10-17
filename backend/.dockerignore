@@ -1,0 +1,38 @@
+# Build artifacts
+target/
+project/target/
+project/project/
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+.bsp/
+
+# Version control
+.git/
+.gitignore
+
+# Logs
+logs/
+*.log
+
+# Temp files
+*.tmp
+*.bak
+*.swp
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test data
+test-data/
+
+# Node modules (if any)
+node_modules/
+
+# Documentation
+*.md
+docs/
