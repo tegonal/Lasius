@@ -172,9 +172,12 @@ dockerRepository := Some("tegonal")
 Docker / packageName := "lasius-backend"
 
 // Sanitize version for Docker tags (Docker doesn't allow '+' characters)
+// Preserve 'v' prefix to match frontend tagging convention
 import com.typesafe.sbt.packager.docker.DockerAlias
 dockerAlias := {
-  val sanitizedVersion = version.value.replace('+', '-')
+  val rawVersion = version.value.replace('+', '-')
+  // sbt-dynver strips 'v' prefix, so add it back if not present
+  val sanitizedVersion = if (rawVersion.startsWith("v")) rawVersion else s"v$rawVersion"
   DockerAlias(
     registryHost = dockerRepository.value,
     username = None,
