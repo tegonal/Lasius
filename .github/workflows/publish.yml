@@ -14,7 +14,7 @@ jobs:
     name: Build & push frontend
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       - name: Add COMMIT_SHORT_SHA env property
         run: echo "COMMIT_SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
       - name: Set up Docker Buildx
@@ -37,7 +37,7 @@ jobs:
     name: Build & push backend
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       - name: Setup JDK
         uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
         with:
