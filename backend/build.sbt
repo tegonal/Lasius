@@ -46,7 +46,7 @@ val jacksonVersion    = "2.19.0"
 
 libraryDependencies ++= Seq(
   "org.reactivemongo" %% "play2-reactivemongo" % reactiveMongoPlayVersion,
-  "com.github.scullxbones"      %% "pekko-persistence-mongodb" % "1.2.2",
+  "com.github.scullxbones"      %% "pekko-persistence-mongodb" % "1.3.1",
   "com.tegonal"                 %% "play-json-typedid"         % "2.0.0",
   "org.julienrf"                %% "play-json-derived-codecs"  % "11.0.0",
   "org.playframework"           %% "play-json-joda"            % "3.0.5",
