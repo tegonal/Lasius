@@ -111,6 +111,27 @@ Production / javaOptions.withRank(
 
 scalafmtOnCompile := true
 
+// ============================================================================
+// Compiler Warning Suppressions
+// ============================================================================
+
+// Suppress jsObjectWrites deprecation warnings from ReactiveMongo
+// Context:
+//   - Using play2-reactivemongo 1.1.0-play30.RC17 (no stable release available)
+//   - ReactiveMongo's jsObjectWrites is deprecated since 0.20.6 with message:
+//     "Will be removed when provided by Play-JSON itself"
+//   - This is an internal compatibility layer in the library, not our code
+//   - Upgrading won't help - waiting for Play-JSON to provide native support
+// Adverse effects: NONE
+//   - Only suppresses warnings in library code (reactivemongo package)
+//   - Does NOT suppress deprecation warnings in our own code
+//   - Does NOT hide actual problems in our codebase
+//   - Can be removed when Play-JSON provides native support
+// Alternative: Wait for stable play2-reactivemongo release (not yet available)
+scalacOptions ++= Seq(
+  "-Wconf:cat=deprecation&origin=reactivemongo\\..*&msg=jsObjectWrites:s"
+)
+
 headerLicense := Some(
   HeaderLicense.Custom(
     """|
@@ -138,8 +159,8 @@ headerLicense := Some(
 // Docker Configuration (sbt-native-packager)
 // ============================================================================
 
-// Base image - Eclipse Temurin 21 JRE on Alpine for small size
-dockerBaseImage := "eclipse-temurin:21-jre-alpine"
+// Base image - Eclipse Temurin 25 JRE on Alpine for small size
+dockerBaseImage := "eclipse-temurin:25-jre-alpine"
 
 // Exposed ports
 dockerExposedPorts := Seq(9000)
@@ -168,7 +189,7 @@ dockerAliases ++= {
   val ver = version.value
   // Match semantic versioning: optional 'v' prefix + X.Y.Z (where X, Y, Z are numbers)
   val semverPattern = """^v?\d+\.\d+\.\d+$""".r
-  val isStableRelease = semverPattern.matches(ver)
+  val isStableRelease = semverPattern.pattern.matcher(ver).matches()
 
   if (isStableRelease) {
     Seq(dockerAlias.value.withTag(Some("latest")))

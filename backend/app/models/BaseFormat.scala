@@ -94,7 +94,7 @@ object BaseFormat {
 
       case JsString(url) =>
         try {
-          JsSuccess(new URL(url))
+          JsSuccess(URI.create(url).toURL)
         } catch {
           case e: Throwable =>
             JsError(s"couldn't parse url:$url, $e")
