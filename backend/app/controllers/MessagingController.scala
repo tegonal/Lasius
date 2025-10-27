@@ -68,7 +68,7 @@ class MessagingController @Inject() (
           authConfig = authConfig
         ),
         1000,
-        OverflowStrategy.dropNew
+        OverflowStrategy.dropHead
       )
     }))
   }

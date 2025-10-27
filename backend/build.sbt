@@ -1,15 +1,21 @@
 import play.sbt.routes.RoutesKeys
 import org.scalafmt.sbt.ScalafmtPlugin.autoImport.*
+import com.typesafe.sbt.packager.docker.{DockerPermissionStrategy, Cmd, ExecCmd}
 
 name := """lasius"""
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
 lazy val root = (project in file("."))
-  .enablePlugins(PlayScala,
-                 BuildInfoPlugin,
-                 SwaggerPlugin,
-                 AutomateHeaderPlugin)
+  .enablePlugins(
+    PlayScala,
+    BuildInfoPlugin,
+    SwaggerPlugin,
+    AutomateHeaderPlugin,
+    JavaAppPackaging,  // Enables basic packaging
+    DockerPlugin,      // Enables Docker image generation
+    AshScriptPlugin    // Generates ash-compatible scripts for Alpine
+  )
   .settings(
     RoutesKeys.routesImport += "binders.Binders._",
     swaggerV3  := true,
@@ -105,6 +111,27 @@ Production / javaOptions.withRank(
 
 scalafmtOnCompile := true
 
+// ============================================================================
+// Compiler Warning Suppressions
+// ============================================================================
+
+// Suppress jsObjectWrites deprecation warnings from ReactiveMongo
+// Context:
+//   - Using play2-reactivemongo 1.1.0-play30.RC17 (no stable release available)
+//   - ReactiveMongo's jsObjectWrites is deprecated since 0.20.6 with message:
+//     "Will be removed when provided by Play-JSON itself"
+//   - This is an internal compatibility layer in the library, not our code
+//   - Upgrading won't help - waiting for Play-JSON to provide native support
+// Adverse effects: NONE
+//   - Only suppresses warnings in library code (reactivemongo package)
+//   - Does NOT suppress deprecation warnings in our own code
+//   - Does NOT hide actual problems in our codebase
+//   - Can be removed when Play-JSON provides native support
+// Alternative: Wait for stable play2-reactivemongo release (not yet available)
+scalacOptions ++= Seq(
+  "-Wconf:cat=deprecation&origin=reactivemongo\\..*&msg=jsObjectWrites:s"
+)
+
 headerLicense := Some(
   HeaderLicense.Custom(
     """|
@@ -127,3 +154,74 @@ headerLicense := Some(
        |along with Lasius. If not, see <https://www.gnu.org/licenses/>.
        |""".stripMargin
   ))
+
+// ============================================================================
+// Docker Configuration (sbt-native-packager)
+// ============================================================================
+
+// Base image - Eclipse Temurin 25 JRE on Alpine for small size
+dockerBaseImage := "eclipse-temurin:25-jre-alpine"
+
+// Exposed ports
+dockerExposedPorts := Seq(9000)
+
+// Docker repository
+dockerRepository := Some("tegonal")
+
+// Override package name for Docker (CI/CD expects "lasius-backend")
+Docker / packageName := "lasius-backend"
+
+// Sanitize version for Docker tags (Docker doesn't allow '+' characters)
+// Preserve 'v' prefix to match frontend tagging convention
+import com.typesafe.sbt.packager.docker.DockerAlias
+dockerAlias := {
+  val rawVersion = version.value.replace('+', '-')
+  // sbt-dynver strips 'v' prefix, so add it back if not present
+  val sanitizedVersion = if (rawVersion.startsWith("v")) rawVersion else s"v$rawVersion"
+  DockerAlias(
+    registryHost = dockerRepository.value,
+    username = None,
+    name = (Docker / packageName).value,
+    tag = Some(sanitizedVersion)
+  )
+}
+
+// Only tag as 'latest' for stable semver releases (e.g., v1.2.3 or 1.2.3)
+// Any other tag pattern is considered beta/experimental
+dockerAliases ++= {
+  val ver = version.value
+  // Match semantic versioning: optional 'v' prefix + X.Y.Z (where X, Y, Z are numbers)
+  val semverPattern = """^v?\d+\.\d+\.\d+$""".r
+  val isStableRelease = semverPattern.pattern.matcher(ver).matches()
+
+  if (isStableRelease) {
+    Seq(dockerAlias.value.withTag(Some("latest")))
+  } else {
+    Seq.empty
+  }
+}
+
+// Use multi-stage build for better security and smaller images
+dockerPermissionStrategy := DockerPermissionStrategy.MultiStage
+
+// Run as non-root user (security best practice)
+// Default user is "demiourgos728" with UID 1001 (provided by sbt-native-packager)
+
+// Note: No logs directory needed - using STDOUT logging (Docker best practice)
+
+// Docker labels (including git commit info for traceability)
+dockerLabels := {
+  val gitCommit = sys.env.getOrElse("COMMIT_SHORT_SHA",
+    scala.sys.process.Process("git rev-parse --short=8 HEAD").!!.trim)
+
+  Map(
+    "maintainer" -> "Tegonal Genossenschaft <https://tegonal.com>",
+    "org.opencontainers.image.title" -> "Lasius Backend",
+    "org.opencontainers.image.description" -> "Open source time tracker for teams",
+    "org.opencontainers.image.vendor" -> "Tegonal Genossenschaft",
+    "org.opencontainers.image.licenses" -> "AGPL-3.0",
+    "org.opencontainers.image.source" -> "https://github.com/tegonal/lasius",
+    "org.opencontainers.image.revision" -> gitCommit,
+    "git-commit" -> gitCommit  // Legacy label for backwards compatibility
+  )
+}
