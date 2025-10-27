@@ -207,20 +207,7 @@ dockerPermissionStrategy := DockerPermissionStrategy.MultiStage
 // Run as non-root user (security best practice)
 // Default user is "demiourgos728" with UID 1001 (provided by sbt-native-packager)
 
-// Create logs directory in Docker image
-dockerCommands := dockerCommands.value.flatMap {
-  case cmd @ Cmd("FROM", _) => Seq(cmd)
-  case cmd @ Cmd("WORKDIR", _) => Seq(
-    cmd,
-    ExecCmd("RUN", "mkdir", "-p", "/opt/docker/logs")
-  )
-  case cmd @ ExecCmd("ENTRYPOINT", _) => Seq(
-    // Ensure logs directory has correct ownership before starting app
-    ExecCmd("RUN", "chown", "-R", "demiourgos728:root", "/opt/docker/logs"),
-    cmd
-  )
-  case other => Seq(other)
-}
+// Note: No logs directory needed - using STDOUT logging (Docker best practice)
 
 // Docker labels (including git commit info for traceability)
 dockerLabels := {
