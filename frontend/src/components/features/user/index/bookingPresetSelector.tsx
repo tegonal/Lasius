@@ -20,6 +20,7 @@
 import { Button } from 'components/primitives/buttons/Button'
 import { Heading } from 'components/primitives/typography/Heading'
 import { AnimateList } from 'components/ui/animations/motion/animateList'
+import { AvatarUser } from 'components/ui/data-display/avatar/avatarUser'
 import { DataFetchValidates } from 'components/ui/data-display/fetchState/dataFetchValidates'
 import { EmptyStatePresets } from 'components/ui/data-display/fetchState/emptyStatePresets'
 import { TagList } from 'components/ui/data-display/TagList'
@@ -30,6 +31,7 @@ import { formatDateTimeToURLParam } from 'lib/api/apiDateHandling'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { ModelsBooking } from 'lib/api/lasius'
 import { useGetOrganisationBookingList } from 'lib/api/lasius/organisation-bookings/organisation-bookings'
+import { useGetOrganisationUserList } from 'lib/api/lasius/organisations/organisations'
 import { useGetUserBookingListByOrganisation } from 'lib/api/lasius/user-bookings/user-bookings'
 import { useGetFavoriteBookingList } from 'lib/api/lasius/user-favorites/user-favorites'
 import { stringHash } from 'lib/utils/string/stringHash'
@@ -99,7 +101,7 @@ const RecentBookingsList: React.FC<{ onSelect: (preset: PresetType) => void }> =
       {uniqueBookings.map((item) => (
         <button
           key={stringHash(item)}
-          className="hover:bg-base-200 flex w-full cursor-pointer items-start gap-3 rounded-lg p-3 text-left transition-colors"
+          className="hover:bg-base-200 flex w-full cursor-pointer items-start rounded-lg p-3 text-left transition-colors"
           onClick={() =>
             onSelect({
               projectId: item.projectReference.id,
@@ -112,7 +114,6 @@ const RecentBookingsList: React.FC<{ onSelect: (preset: PresetType) => void }> =
             projectName: item.projectReference.key || item.projectReference.id,
             tags: item.tags.length > 0 ? ` with ${item.tags.length} tags` : '',
           })}>
-          <LucideIcon icon={Clock} size={16} className="text-base-content/60 mt-1" />
           <div className="flex-1 space-y-1">
             <div className="text-sm font-medium">
               {item.projectReference.key || item.projectReference.id}
@@ -139,7 +140,7 @@ const FavoritesList: React.FC<{ onSelect: (preset: PresetType) => void }> = ({ o
       {data.favorites.map((item: any) => (
         <button
           key={stringHash(item)}
-          className="hover:bg-base-200 flex w-full cursor-pointer items-start gap-3 rounded-lg p-3 text-left transition-colors"
+          className="hover:bg-base-200 flex w-full cursor-pointer items-start rounded-lg p-3 text-left transition-colors"
           onClick={() =>
             onSelect({
               projectId: item.projectReference.id,
@@ -152,7 +153,6 @@ const FavoritesList: React.FC<{ onSelect: (preset: PresetType) => void }> = ({ o
             projectName: item.projectReference.key || item.projectReference.id,
             tags: item.tags.length > 0 ? ` with ${item.tags.length} tags` : '',
           })}>
-          <LucideIcon icon={Star} size={16} className="text-warning mt-1" />
           <div className="flex-1 space-y-1">
             <div className="text-sm font-medium">
               {item.projectReference.key || item.projectReference.id}
@@ -162,6 +162,50 @@ const FavoritesList: React.FC<{ onSelect: (preset: PresetType) => void }> = ({ o
         </button>
       ))}
     </AnimateList>
+  )
+}
+
+// Individual team booking item with avatar
+const TeamBookingItem: React.FC<{
+  item: ModelsBooking
+  onSelect: (preset: PresetType) => void
+  t: any
+}> = ({ item, onSelect, t }) => {
+  const { selectedOrganisationId } = useOrganisation()
+  const { data: users } = useGetOrganisationUserList(selectedOrganisationId)
+
+  // Look up the full user data by ID to get actual firstName and lastName
+  const userData = users?.find((u) => u.id === item.userReference.id)
+
+  // Fallback to parsing username if user data not found
+  const userKey = item.userReference.key || ''
+  const firstName = userData?.firstName || userKey.split('.')[0] || userKey[0] || ''
+  const lastName = userData?.lastName || userKey.split('.')[1] || userKey[1] || ''
+
+  return (
+    <button
+      className="hover:bg-base-200 flex w-full cursor-pointer items-start gap-2 rounded-lg p-3 text-left transition-colors"
+      onClick={() =>
+        onSelect({
+          projectId: item.projectReference.id,
+          projectName: item.projectReference.key || item.projectReference.id,
+          tags: item.tags,
+        })
+      }
+      aria-label={t('bookings.presets.selectTeam', {
+        defaultValue: 'Select team booking by {{userName}}: {{projectName}}{{tags}}',
+        userName: `${firstName} ${lastName}`,
+        projectName: item.projectReference.key || item.projectReference.id,
+        tags: item.tags.length > 0 ? ` with ${item.tags.length} tags` : '',
+      })}>
+      <AvatarUser firstName={firstName} lastName={lastName} size={32} />
+      <div className="flex-1 space-y-1">
+        <div className="text-sm font-medium">
+          {item.projectReference.key || item.projectReference.id}
+        </div>
+        {item.tags.length > 0 && <TagList items={item.tags} />}
+      </div>
+    </button>
   )
 }
 
@@ -210,33 +254,7 @@ const TeamBookingsList: React.FC<{ onSelect: (preset: PresetType) => void }> = (
   return (
     <AnimateList>
       {uniqueBookings.map((item) => (
-        <button
-          key={stringHash(item)}
-          className="hover:bg-base-200 flex w-full cursor-pointer items-start gap-3 rounded-lg p-3 text-left transition-colors"
-          onClick={() =>
-            onSelect({
-              projectId: item.projectReference.id,
-              projectName: item.projectReference.key || item.projectReference.id,
-              tags: item.tags,
-            })
-          }
-          aria-label={t('bookings.presets.selectTeam', {
-            defaultValue: 'Select team booking by {{userName}}: {{projectName}}{{tags}}',
-            userName: item.userReference.key || item.userReference.id,
-            projectName: item.projectReference.key || item.projectReference.id,
-            tags: item.tags.length > 0 ? ` with ${item.tags.length} tags` : '',
-          })}>
-          <LucideIcon icon={Users} size={16} className="text-base-content/60 mt-1" />
-          <div className="flex-1 space-y-1">
-            <div className="text-sm font-medium">
-              {item.projectReference.key || item.projectReference.id}
-            </div>
-            <div className="text-base-content/60 text-xs">
-              {item.userReference.key || item.userReference.id}
-            </div>
-            {item.tags.length > 0 && <TagList items={item.tags} />}
-          </div>
-        </button>
+        <TeamBookingItem key={stringHash(item)} item={item} onSelect={onSelect} t={t} />
       ))}
     </AnimateList>
   )
