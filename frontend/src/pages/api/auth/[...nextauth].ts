@@ -411,6 +411,63 @@ export const nextAuthOptions: () => NextAuthOptions = () => {
             }),
           })
         }
+        // auto logout from gitlab instance
+        else if (token.provider === 'gitlab') {
+          if (process.env.LASIUS_DEBUG) {
+            logger.info('auto-logout from gitlab at', gitlabUrl + '/oauth/revoke')
+          }
+
+          try {
+            await fetch(gitlabUrl + '/oauth/revoke', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: new URLSearchParams({
+                client_id: process.env.GITLAB_OAUTH_CLIENT_ID || '',
+                client_secret: process.env.GITLAB_OAUTH_CLIENT_SECRET || '',
+                token: token.access_token || '',
+              }),
+            })
+          } catch (error) {
+            if (process.env.LASIUS_DEBUG) {
+              logger.warn('[nextauth][events][signOut][gitlab] Token revocation failed', error)
+            }
+          }
+        }
+        // auto logout from github instance
+        else if (token.provider === 'github') {
+          if (process.env.LASIUS_DEBUG) {
+            logger.info('auto-logout from github')
+          }
+
+          try {
+            // GitHub uses DELETE with basic auth
+            const credentials = Buffer.from(
+              `${process.env.GITHUB_OAUTH_CLIENT_ID}:${process.env.GITHUB_OAUTH_CLIENT_SECRET}`,
+            ).toString('base64')
+
+            await fetch(
+              `https://api.github.com/applications/${process.env.GITHUB_OAUTH_CLIENT_ID}/token`,
+              {
+                method: 'DELETE',
+                headers: {
+                  Authorization: `Basic ${credentials}`,
+                  Accept: 'application/vnd.github+json',
+                  'X-GitHub-Api-Version': '2022-11-28',
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  access_token: token.access_token || '',
+                }),
+              },
+            )
+          } catch (error) {
+            if (process.env.LASIUS_DEBUG) {
+              logger.warn('[nextauth][events][signOut][github] Token revocation failed', error)
+            }
+          }
+        }
         // or internal lasius provider
         else if (token.provider === AUTH_PROVIDER_INTERNAL_LASIUS) {
           await logout(getRequestHeaders(token.access_token, token.access_token_issuer))
