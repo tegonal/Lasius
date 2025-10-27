@@ -29,10 +29,7 @@ import { orderBy } from 'es-toolkit'
 import { isAdminOfCurrentOrg } from 'lib/api/functions/isAdminOfCurrentOrg'
 import { useProfile } from 'lib/api/hooks/useProfile'
 import { ModelsUserOrganisation } from 'lib/api/lasius'
-import {
-  removeOrganisationUser,
-  useGetOrganisationUserList,
-} from 'lib/api/lasius/organisations/organisations'
+import { useGetOrganisationUserList } from 'lib/api/lasius/organisations/organisations'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
 import { useIsClient } from 'usehooks-ts'
@@ -42,18 +39,25 @@ type Props = {
 }
 
 export const OrganisationMembers: React.FC<Props> = ({ item }) => {
-  const { data: userList } = useGetOrganisationUserList(item?.organisationReference.id || '')
+  const { data: userList, mutate } = useGetOrganisationUserList(
+    item?.organisationReference.id || '',
+  )
   const { profile, userId } = useProfile()
   const amIAdmin = isAdminOfCurrentOrg(profile)
   const { t } = useTranslation('common')
   const isClient = useIsClient()
 
-  const handleUserRemove = (userIdToRemove: string) => {
-    ;(async () => {
-      if (item) {
-        await removeOrganisationUser(item.organisationReference.id, userIdToRemove)
-      }
-    })()
+  const handleUserRemove = async (userIdToRemove: string) => {
+    if (!item) return
+
+    // Import the API function dynamically to avoid circular dependency
+    const { removeOrganisationUser } = await import('lib/api/lasius/organisations/organisations')
+
+    // Call API to remove user
+    await removeOrganisationUser(item.organisationReference.id, userIdToRemove)
+
+    // Invalidate cache to trigger SWR revalidation
+    await mutate()
   }
 
   if (!isClient) return null
