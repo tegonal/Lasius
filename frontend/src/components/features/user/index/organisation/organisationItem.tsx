@@ -21,7 +21,9 @@ import { BookingName } from 'components/features/user/index/bookingName'
 import { OrganisationItemContext } from 'components/features/user/index/organisation/organisationItemContext'
 import { AvatarUser } from 'components/ui/data-display/avatar/avatarUser'
 import { TagList } from 'components/ui/data-display/TagList'
+import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { ModelsCurrentUserTimeBooking } from 'lib/api/lasius'
+import { useGetOrganisationUserList } from 'lib/api/lasius/organisations/organisations'
 import { cn } from 'lib/utils/cn'
 import React from 'react'
 
@@ -30,10 +32,19 @@ type Props = {
 }
 
 export const OrganisationItem: React.FC<Props> = ({ item }) => {
-  if (!item?.userReference?.key) return null
-  const user = item.userReference.key
-  const firstName = user.split('.')[0] || user[0]
-  const lastName = user.split('.')[1] || user[1]
+  const { selectedOrganisationId } = useOrganisation()
+  const { data: users } = useGetOrganisationUserList(selectedOrganisationId)
+
+  if (!item?.userReference?.id) return null
+
+  // Look up the full user data by ID to get actual firstName and lastName
+  const userData = users?.find((u) => u.id === item.userReference.id)
+
+  // Fallback to parsing username if user data not found
+  const userKey = item.userReference.key || ''
+  const firstName = userData?.firstName || userKey.split('.')[0] || userKey[0] || ''
+  const lastName = userData?.lastName || userKey.split('.')[1] || userKey[1] || ''
+
   const { booking } = item
   return (
     <div className="border-base-content/20 flex flex-row items-center justify-between gap-2 overflow-hidden border-b py-2 pr-2">

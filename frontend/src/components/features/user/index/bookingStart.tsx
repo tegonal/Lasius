@@ -41,7 +41,11 @@ type FormValues = {
   tags: ModelsTags[]
 }
 
-export const BookingStart: React.FC = () => {
+type Props = {
+  onSuccess?: () => void
+}
+
+export const BookingStart: React.FC<Props> = ({ onSuccess }) => {
   const { t } = useTranslation('common')
   const hookForm = useForm<FormValues>({
     mode: 'onSubmit',
@@ -70,6 +74,7 @@ export const BookingStart: React.FC = () => {
         start: formatISOLocale(roundToNearestMinutes(new Date(), { roundingMethod: 'floor' })),
       })
       resetComponent()
+      onSuccess?.()
     }
     setIsSubmitting(false)
   }

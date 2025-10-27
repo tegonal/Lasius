@@ -23,10 +23,13 @@ import { MyProjectsRightColumn } from 'components/features/user/projects/myProje
 import { MyProjectsStats } from 'components/features/user/projects/myProjectsStats'
 import { ScrollContainer } from 'components/primitives/layout/ScrollContainer'
 import { Modal } from 'components/ui/overlays/modal/Modal'
+import { useProjects } from 'lib/api/hooks/useProjects'
 import React, { useState } from 'react'
 
 export const MyProjectsLayout: React.FC = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const { userProjects } = useProjects()
 
   const handleCreateClose = () => setIsCreateOpen(false)
   const handleCreateOpen = () => setIsCreateOpen(true)
@@ -36,11 +39,15 @@ export const MyProjectsLayout: React.FC = () => {
       <ScrollContainer className="bg-base-100 flex-1 overflow-y-auto">
         <MyProjectsStats onCreateProject={handleCreateOpen} />
         <div className="pt-4">
-          <MyProjectsList statusFilter="both" />
+          <MyProjectsList statusFilter="both" searchTerm={searchTerm} />
         </div>
       </ScrollContainer>
       <ScrollContainer className="bg-base-200 flex-1 overflow-y-auto rounded-tr-lg">
-        <MyProjectsRightColumn />
+        <MyProjectsRightColumn
+          projectCount={userProjects().length}
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+        />
       </ScrollContainer>
       <Modal open={isCreateOpen} onClose={handleCreateClose}>
         <ProjectAddUpdateForm mode="add" onSave={handleCreateClose} onCancel={handleCreateClose} />

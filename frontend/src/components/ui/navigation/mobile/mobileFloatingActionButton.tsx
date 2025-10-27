@@ -20,6 +20,7 @@
 import { AppSettingsForm } from 'components/features/settings/app/AppSettingsForm'
 import { useSignOut } from 'components/features/system/hooks/useSignOut'
 import { BookingAddUpdateForm } from 'components/features/user/index/bookingAddUpdateForm'
+import { BookingStart } from 'components/features/user/index/bookingStart'
 import { SelectUserOrganisationModal } from 'components/features/user/selectUserOrganisationModal'
 import { Button } from 'components/primitives/buttons/Button'
 import { FloatingActionButton } from 'components/primitives/buttons/FloatingActionButton'
@@ -27,40 +28,51 @@ import { ButtonGroup } from 'components/ui/forms/ButtonGroup'
 import { FormElementSpacer } from 'components/ui/forms/formElementSpacer'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { Modal } from 'components/ui/overlays/modal/Modal'
-import { Building2, LogOut, Menu, PlusCircle, Settings, X } from 'lucide-react'
+import { Building2, LogOut, Menu, Play, PlusCircle, Settings, X } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React, { useState } from 'react'
 
 /**
  * Mobile Floating Action Button
  *
- * Fixed bottom-right FAB with four actions:
- * 1. Add new booking
- * 2. Switch organisation
- * 3. Open settings (app settings form)
- * 4. Sign out
+ * Fixed bottom-right FAB with five actions:
+ * 1. Start booking (quick start with project + tags)
+ * 2. Add new booking (full form)
+ * 3. Switch organisation
+ * 4. Open settings (app settings form)
+ * 5. Sign out
  *
  * Only visible on mobile (md:hidden)
  */
 export const MobileFloatingActionButton: React.FC = () => {
+  const [isStartBookingOpen, setIsStartBookingOpen] = useState(false)
   const [isAddBookingOpen, setIsAddBookingOpen] = useState(false)
   const [isOrgSelectOpen, setIsOrgSelectOpen] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const { t } = useTranslation('common')
   const { signOut } = useSignOut()
 
+  const handleStartBookingClose = () => setIsStartBookingOpen(false)
   const handleAddBookingClose = () => setIsAddBookingOpen(false)
   const handleOrgSelectClose = () => setIsOrgSelectOpen(false)
   const handleSettingsClose = () => setIsSettingsOpen(false)
 
   const actions = [
     {
+      id: 'start-booking',
+      label: t('bookings.actions.start', { defaultValue: 'Start booking' }),
+      icon: <LucideIcon icon={Play} size={24} />,
+      onClick: () => setIsStartBookingOpen(true),
+      ariaLabel: t('bookings.actions.start', { defaultValue: 'Start booking' }),
+      variant: 'primary' as const,
+    },
+    {
       id: 'add-booking',
       label: t('bookings.actions.add', { defaultValue: 'Add booking' }),
       icon: <LucideIcon icon={PlusCircle} size={24} />,
       onClick: () => setIsAddBookingOpen(true),
       ariaLabel: t('bookings.actions.add', { defaultValue: 'Add booking' }),
-      variant: 'primary' as const,
+      variant: 'secondary' as const,
     },
     {
       id: 'switch-organisation',
@@ -103,7 +115,12 @@ export const MobileFloatingActionButton: React.FC = () => {
         />
       </div>
 
-      {/* Add Booking Modal */}
+      {/* Start Booking Modal - Quick start with project + tags */}
+      <Modal open={isStartBookingOpen} onClose={handleStartBookingClose}>
+        <BookingStart onSuccess={handleStartBookingClose} />
+      </Modal>
+
+      {/* Add Booking Modal - Full form */}
       <Modal open={isAddBookingOpen} onClose={handleAddBookingClose}>
         <BookingAddUpdateForm
           mode="add"

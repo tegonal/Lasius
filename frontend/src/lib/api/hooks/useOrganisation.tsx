@@ -18,7 +18,7 @@
  */
 
 import { ModelsEntityReference, ModelsUserSettings } from 'lib/api/lasius'
-import { updateUserSettings } from 'lib/api/lasius/user/user'
+import { getGetUserProfileKey, updateUserSettings } from 'lib/api/lasius/user/user'
 import { ROLES } from 'projectConfig/constants'
 import { useCallback } from 'react'
 import {
@@ -26,6 +26,7 @@ import {
   useOrganisationStore,
   useSelectedOrganisationId,
 } from 'stores/organisationStore'
+import { mutate } from 'swr'
 
 /**
  * Custom hook for managing organisation selection and organisation-related data.
@@ -79,6 +80,9 @@ export const useOrganisation = () => {
         // Update backend
         try {
           await updateUserSettings(updatedSettings)
+
+          // Invalidate profile cache to trigger refetch with new organization data
+          await mutate(getGetUserProfileKey())
         } catch (error) {
           // Rollback on error
           console.error('Failed to update organisation:', error)
