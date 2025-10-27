@@ -114,8 +114,11 @@ export const InputTagsAutocomplete: React.FC<Props> = ({ suggestions = [], name,
       setInputText('')
       setSelectedTags(tags)
       parentFormContext.setValue(name, tags)
-      // Close the dropdown by blurring the input
-      inputRef.current?.blur()
+      // Refocus the input to allow continuous tag entry
+      // Use setTimeout to ensure the focus happens after any blur events
+      setTimeout(() => {
+        inputRef.current?.focus()
+      }, 0)
     }
   }
 
