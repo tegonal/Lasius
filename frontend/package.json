@@ -92,7 +92,7 @@
     "@eslint/eslintrc": "^3.3.1",
     "@next/bundle-analyzer": "^15.5.5",
     "@openapitools/openapi-generator-cli": "^2.25.0",
-    "@tailwindcss/postcss": "4.1.14",
+    "@tailwindcss/postcss": "4.1.16",
     "@types/d3-shape": "^3.1.7",
     "@types/js-cookie": "^3.0.6",
     "@types/negotiator": "^0.6.4",
@@ -122,7 +122,7 @@
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.7.0",
     "svgo": "^4.0.0",
-    "tailwindcss": "4.1.14",
+    "tailwindcss": "4.1.16",
     "typescript": "5.9.3"
   },
   "packageManager": "yarn@4.10.3"
