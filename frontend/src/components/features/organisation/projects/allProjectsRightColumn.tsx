@@ -19,18 +19,31 @@
 
 import { ProjectStatusFilter } from 'components/features/organisation/projects/allProjectsList'
 import { Button } from 'components/primitives/buttons/Button'
+import { Input } from 'components/primitives/inputs/Input'
 import { Heading } from 'components/primitives/typography/Heading'
 import { Text } from 'components/primitives/typography/Text'
+import { LucideIcon } from 'components/ui/icons/LucideIcon'
+import { X } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
 
 type Props = {
   statusFilter: ProjectStatusFilter
   onStatusFilterChange: (filter: ProjectStatusFilter) => void
+  projectCount: number
+  searchTerm: string
+  onSearchChange: (value: string) => void
 }
 
-export const AllProjectsRightColumn: React.FC<Props> = ({ statusFilter, onStatusFilterChange }) => {
+export const AllProjectsRightColumn: React.FC<Props> = ({
+  statusFilter,
+  onStatusFilterChange,
+  projectCount,
+  searchTerm,
+  onSearchChange,
+}) => {
   const { t } = useTranslation('common')
+  const showSearch = projectCount > 10
 
   return (
     <div className="w-full px-6 pt-3">
@@ -43,6 +56,33 @@ export const AllProjectsRightColumn: React.FC<Props> = ({ statusFilter, onStatus
             'All projects in the current organization that you can administer. Create billing reports including time booked by external project members.',
         })}
       </Text>
+      {showSearch && (
+        <div className="mt-4">
+          <h3 className="mb-2 text-sm font-medium">
+            {t('projects.filter.search', { defaultValue: 'Search' })}
+          </h3>
+          <div className="join w-full">
+            <Input
+              type="text"
+              placeholder={t('projects.filter.searchPlaceholder', {
+                defaultValue: 'Filter projects...',
+              })}
+              value={searchTerm}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="join-item"
+            />
+            {searchTerm && (
+              <button
+                type="button"
+                className="btn btn-square join-item"
+                onClick={() => onSearchChange('')}
+                aria-label={t('common.actions.clear', { defaultValue: 'Clear' })}>
+                <LucideIcon icon={X} size={20} />
+              </button>
+            )}
+          </div>
+        </div>
+      )}
       <div className="mt-4 flex flex-col gap-2">
         <h3 className="text-sm font-medium">
           {t('projects.filter.status', { defaultValue: 'Status' })}

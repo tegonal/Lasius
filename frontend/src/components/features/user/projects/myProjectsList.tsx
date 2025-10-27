@@ -40,17 +40,25 @@ export type ProjectStatusFilter = 'both' | 'active' | 'inactive'
 
 type Props = {
   statusFilter: ProjectStatusFilter
+  searchTerm: string
 }
 
-export const MyProjectsList: React.FC<Props> = () => {
+export const MyProjectsList: React.FC<Props> = ({ searchTerm }) => {
   const { t } = useTranslation('common')
   const { userProjects } = useProjects()
   const { selectedOrganisationId } = useOrganisation()
   const isClient = useIsClient()
 
   const filteredProjects = useMemo(() => {
-    return userProjects()
-  }, [userProjects])
+    const projects = userProjects()
+
+    if (!searchTerm.trim()) return projects
+
+    const searchLower = searchTerm.toLowerCase()
+    return projects.filter((project) =>
+      project.projectReference.key.toLowerCase().includes(searchLower),
+    )
+  }, [userProjects, searchTerm])
 
   if (!isClient) return null
 

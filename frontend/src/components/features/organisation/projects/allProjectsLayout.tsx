@@ -26,11 +26,16 @@ import { AllProjectsStats } from 'components/features/organisation/projects/allP
 import { ProjectAddUpdateForm } from 'components/features/projects/projectAddUpdateForm'
 import { ScrollContainer } from 'components/primitives/layout/ScrollContainer'
 import { Modal } from 'components/ui/overlays/modal/Modal'
+import { useOrganisation } from 'lib/api/hooks/useOrganisation'
+import { useGetProjectList } from 'lib/api/lasius/projects/projects'
 import React, { useState } from 'react'
 
 export const AllProjectsLayout: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<ProjectStatusFilter>('both')
   const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const { selectedOrganisationId } = useOrganisation()
+  const { data } = useGetProjectList(selectedOrganisationId)
 
   const handleCreateClose = () => setIsCreateOpen(false)
   const handleCreateOpen = () => setIsCreateOpen(true)
@@ -40,13 +45,16 @@ export const AllProjectsLayout: React.FC = () => {
       <ScrollContainer className="bg-base-100 flex-1 overflow-y-auto">
         <AllProjectsStats onCreateProject={handleCreateOpen} />
         <div className="pt-4">
-          <AllProjectsList statusFilter={statusFilter} />
+          <AllProjectsList statusFilter={statusFilter} searchTerm={searchTerm} />
         </div>
       </ScrollContainer>
       <ScrollContainer className="bg-base-200 flex-1 overflow-y-auto rounded-tr-lg">
         <AllProjectsRightColumn
           statusFilter={statusFilter}
           onStatusFilterChange={setStatusFilter}
+          projectCount={data?.length || 0}
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
         />
       </ScrollContainer>
       <Modal open={isCreateOpen} onClose={handleCreateClose}>
