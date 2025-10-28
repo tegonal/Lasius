@@ -3,24 +3,13 @@
 <!--
   ~ Copyright (C) 2009-2015 Typesafe Inc. <http://www.typesafe.com>
   -->
-<!-- The default logback configuration that Play uses if no other configuration is provided -->
+<!-- Development logback configuration - STDOUT-only (Docker best practice) -->
 <configuration>
-
-  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-     <file>${application.home}/logs/application.log</file>
-     <encoder>
-       <pattern>%date [%level] from %logger in %thread - %message%n%xException</pattern>
-     </encoder>
-  </appender>
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
       <pattern>%highlight(%-5level) %logger{15} - %message%n%xException{10}</pattern>
     </encoder>
-  </appender>
-
-  <appender name="ASYNCFILE" class="ch.qos.logback.classic.AsyncAppender">
-    <appender-ref ref="FILE" />
   </appender>
 
   <appender name="ASYNCSTDOUT" class="ch.qos.logback.classic.AsyncAppender">
