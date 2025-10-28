@@ -4716,26 +4716,26 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv-cli@npm:^10.0.0":
-  version: 10.0.0
-  resolution: "dotenv-cli@npm:10.0.0"
+"dotenv-cli@npm:^11.0.0":
+  version: 11.0.0
+  resolution: "dotenv-cli@npm:11.0.0"
   dependencies:
     cross-spawn: "npm:^7.0.6"
     dotenv: "npm:^17.1.0"
-    dotenv-expand: "npm:^11.0.0"
+    dotenv-expand: "npm:^12.0.0"
     minimist: "npm:^1.2.6"
   bin:
     dotenv: cli.js
-  checksum: 10/8a49b24dff88731531ec13074e721073dbb38ad0953ff8b644136b2faa212261751b655b2d98c077501674585a30c81ac06a120a862149fa7658cde57f2ca4c7
+  checksum: 10/0dab973aa8d94163f9b17f7452f9c9b567baf67e6551c3d883f3ea1df9edbd69a9ea55cbc8e020026c9e8d8f01056087526d011c1829924483c8c72f9c17c79a
   languageName: node
   linkType: hard
 
-"dotenv-expand@npm:^11.0.0":
-  version: 11.0.7
-  resolution: "dotenv-expand@npm:11.0.7"
+"dotenv-expand@npm:^12.0.0":
+  version: 12.0.3
+  resolution: "dotenv-expand@npm:12.0.3"
   dependencies:
     dotenv: "npm:^16.4.5"
-  checksum: 10/1cd981e2b925e746919e9fca16fa5e953955d021b5d5fea0a4ae96dc61fcc76bc95874e7730f8ceca22f5e3df5a47eb1fc626c3f45e98019ceba54fd58521971
+  checksum: 10/d9aaf051805c8fa64e7e3620936ecb38229a93f5603883e53856d6f57cd4ae93fb74baefdf0b03b1c0608bc3eefbbcb23912972d7303b6191a5c0e1688a8652f
   languageName: node
   linkType: hard
 
@@ -7492,7 +7492,7 @@ __metadata:
     daisyui: "npm:^5.3.10"
     date-fns: "npm:^4.1.0"
     date-fns-tz: "npm:^3.2.0"
-    dotenv-cli: "npm:^10.0.0"
+    dotenv-cli: "npm:^11.0.0"
     es-toolkit: "npm:^1.41.0"
     eslint: "npm:9.38.0"
     eslint-config-airbnb: "npm:^19.0.4"
