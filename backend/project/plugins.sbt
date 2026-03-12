@@ -2,9 +2,9 @@
 //  "https://repo.typesafe.com/typesafe/releases/")
 
 // The Play plugin
-addSbtPlugin("org.playframework" % "sbt-plugin" % "3.0.9")
+addSbtPlugin("org.playframework" % "sbt-plugin" % "3.0.10")
 
-addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.5")
+addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.6")
 
 addSbtPlugin("com.dwijnand" % "sbt-dynver" % "4.1.1")
 
@@ -15,6 +15,6 @@ addSbtPlugin("io.github.play-swagger" % "sbt-play-swagger" % "2.0.6")
 addSbtPlugin("de.heikoseeberger" % "sbt-header" % "5.10.0")
 
 // Docker support
-addSbtPlugin("com.github.sbt" % "sbt-native-packager" % "1.11.4")
+addSbtPlugin("com.github.sbt" % "sbt-native-packager" % "1.11.7")
 
 addDependencyTreePlugin
