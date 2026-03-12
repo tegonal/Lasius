@@ -1,0 +1,13 @@
+{
+  "name": "@lasius/services",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Development services (MongoDB, Keycloak, Caddy proxy, MailHog)",
+  "scripts": {
+    "services:start": "docker compose -f docker-compose.dev.yml up -d",
+    "services:stop": "docker compose -f docker-compose.dev.yml down",
+    "services:clean": "docker compose -f docker-compose.dev.yml down -v --remove-orphans",
+    "services:logs": "docker compose -f docker-compose.dev.yml logs -f",
+    "services:status": "docker compose -f docker-compose.dev.yml ps"
+  }
+}

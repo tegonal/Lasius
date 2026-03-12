@@ -6,3 +6,13 @@ target
 .history
 **/common_old.json
 .DS_Store
+
+# Claude Code / AI agents (local only)
+.claude/
+.mcp.json
+.memory/
+.serena/
+.clauderc
+.playwright*
+CLAUDE.md
+**/.logs/
