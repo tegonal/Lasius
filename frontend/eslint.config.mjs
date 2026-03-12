@@ -17,19 +17,19 @@
  *
  */
 
-const js = require('@eslint/js');
-const nextPlugin = require('@next/eslint-plugin-next');
-const typescript = require('@typescript-eslint/eslint-plugin');
-const typescriptParser = require('@typescript-eslint/parser');
-const jsonc = require('eslint-plugin-jsonc');
-const jsxA11y = require('eslint-plugin-jsx-a11y');
-const licenseHeader = require('eslint-plugin-license-header');
-const perfectionist = require('eslint-plugin-perfectionist');
-const react = require('eslint-plugin-react');
-const reactHooks = require('eslint-plugin-react-hooks');
-const jsoncParser = require('jsonc-eslint-parser');
+import js from '@eslint/js';
+import nextPlugin from '@next/eslint-plugin-next';
+import typescript from '@typescript-eslint/eslint-plugin';
+import typescriptParser from '@typescript-eslint/parser';
+import jsonc from 'eslint-plugin-jsonc';
+import jsxA11y from 'eslint-plugin-jsx-a11y';
+import licenseHeader from 'eslint-plugin-license-header';
+import perfectionist from 'eslint-plugin-perfectionist';
+import react from 'eslint-plugin-react';
+import reactHooks from 'eslint-plugin-react-hooks';
+import * as jsoncParser from 'jsonc-eslint-parser';
 
-module.exports = [
+export default [
   js.configs.recommended,
   {
     ignores: [
@@ -180,7 +180,7 @@ module.exports = [
   },
   {
     // Special config for JavaScript config files
-    files: ['*.config.js', '*.config.mjs', 'scripts/**/*.js', 'eslint.config.js'],
+    files: ['*.config.js', '*.config.mjs', 'scripts/**/*.js', 'eslint.config.mjs'],
     rules: {
       '@typescript-eslint/no-require-imports': 'off',
       'license-header/header': 'off', // Don't require license header in config files

@@ -17,7 +17,7 @@
  *
  */
 
-module.exports = {
+export default {
   'lasius-file': {
     input: { target: 'http://localhost:9000/backend/assets/swagger.json' },
     output: {
@@ -25,6 +25,7 @@ module.exports = {
       target: './src/lib/api/lasius/',
       schemas: './src/lib/api/lasius/',
       client: 'swr',
+      httpClient: 'axios',
       mock: false,
       override: {
         mutator: { path: './src/lib/api/lasiusAxiosInstance.ts', name: 'lasiusAxiosInstance' },
