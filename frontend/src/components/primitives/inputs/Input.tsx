@@ -65,7 +65,8 @@ const inputVariants = cva(
 )
 
 export interface InputProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'>,
+  extends
+    Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'>,
     VariantProps<typeof inputVariants> {
   fullWidth?: boolean
   error?: boolean
@@ -151,7 +152,8 @@ const textareaVariants = cva(
 )
 
 export interface TextareaProps
-  extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'size'>,
+  extends
+    Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'size'>,
     VariantProps<typeof textareaVariants> {
   fullWidth?: boolean
   error?: boolean

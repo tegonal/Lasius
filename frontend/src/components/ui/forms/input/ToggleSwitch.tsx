@@ -60,7 +60,8 @@ const toggleSwitchVariants = cva(
 )
 
 export interface ToggleSwitchProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'type' | 'onChange'>,
+  extends
+    Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'type' | 'onChange'>,
     VariantProps<typeof toggleSwitchVariants> {
   checked: boolean
   onChange: (checked: boolean) => void

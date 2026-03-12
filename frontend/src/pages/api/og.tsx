@@ -40,51 +40,49 @@ export default async function handler(req: NextRequest) {
     ).then((res) => res.arrayBuffer())
 
     return new ImageResponse(
-      (
+      <div
+        style={{
+          height: '100%',
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#0F1916',
+          backgroundImage: 'linear-gradient(135deg, #0F1916 0%, #1a2a25 50%, #0F1916 100%)',
+        }}>
         <div
           style={{
-            height: '100%',
-            width: '100%',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: '#0F1916',
-            backgroundImage: 'linear-gradient(135deg, #0F1916 0%, #1a2a25 50%, #0F1916 100%)',
+            padding: '80px',
           }}>
-          <div
+          <h1
             style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '80px',
+              fontSize: 72,
+              fontWeight: 700,
+              color: '#D4FF66',
+              marginBottom: 20,
+              textAlign: 'center',
+              fontFamily: 'Roboto',
             }}>
-            <h1
-              style={{
-                fontSize: 72,
-                fontWeight: 700,
-                color: '#D4FF66',
-                marginBottom: 20,
-                textAlign: 'center',
-                fontFamily: 'Roboto',
-              }}>
-              {title}
-            </h1>
-            <p
-              style={{
-                fontSize: 36,
-                color: '#FAFAFA',
-                textAlign: 'center',
-                fontFamily: 'Roboto',
-                fontWeight: 400,
-                maxWidth: 800,
-              }}>
-              {subtitle}
-            </p>
-          </div>
+            {title}
+          </h1>
+          <p
+            style={{
+              fontSize: 36,
+              color: '#FAFAFA',
+              textAlign: 'center',
+              fontFamily: 'Roboto',
+              fontWeight: 400,
+              maxWidth: 800,
+            }}>
+            {subtitle}
+          </p>
         </div>
-      ),
+      </div>,
       {
         width: 1200,
         height: 630,
