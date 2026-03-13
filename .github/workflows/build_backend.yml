@@ -26,6 +26,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 25
+          cache: sbt
       - name: Build backend
         working-directory: ./backend
         run: sbt clean update compile test dist

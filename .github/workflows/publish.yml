@@ -32,6 +32,8 @@ jobs:
             LASIUS_VERSION=${{github.ref_name}}
           push: true
           tags: tegonal/lasius-frontend:${{github.ref_name}}
+          cache-from: type=gha,scope=frontend
+          cache-to: type=gha,mode=max,scope=frontend
 
   backend:
     name: Build & push backend
@@ -43,6 +45,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 25
+          cache: sbt
       - name: Add COMMIT_SHORT_SHA env property
         run: echo "COMMIT_SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
       - name: Login to DockerHub
