@@ -17,24 +17,28 @@
  *
  */
 
+import { isSameDay } from 'date-fns'
 import { apiTimespanDay } from 'lib/api/apiDateHandling'
 import { sortBookingsByDate } from 'lib/api/functions/sortBookingsByDate'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { ModelsBooking } from 'lib/api/lasius'
-import { useGetUserBookingListByOrganisation } from 'lib/api/lasius/user-bookings/user-bookings'
+import {
+  useGetUserBookingCurrent,
+  useGetUserBookingListByOrganisation,
+} from 'lib/api/lasius/user-bookings/user-bookings'
 import { formatISOLocale } from 'lib/utils/date/dates'
 import { useMemo } from 'react'
 
 /**
  * Custom hook for finding the adjacent bookings (previous and next) relative to a given booking.
- * Fetches all bookings for the same day as the provided booking and identifies its neighbors
- * in chronological order.
+ * Fetches all bookings for the same day as the provided booking, including the currently running
+ * booking, and identifies its neighbors in chronological order.
  *
  * @param item - The booking to find adjacent bookings for (or undefined)
  *
  * @returns Object containing:
- *   - previous: The chronologically previous booking (later in time, or null if none)
- *   - next: The chronologically next booking (earlier in time, or null if none)
+ *   - previous: The chronologically previous booking (earlier in time, or null if none)
+ *   - next: The chronologically next booking (later in time, or null if none)
  *
  * @example
  * const currentBooking = { id: '123', start: { dateTime: '2025-01-15T10:00:00Z' }, ... }
@@ -52,6 +56,7 @@ import { useMemo } from 'react'
  * - Returns null for previous/next if no adjacent bookings exist
  * - Uses the selected organisation from the organisation store
  * - Only fetches bookings for the same day as the provided booking
+ * - Includes the currently running booking in adjacency calculation
  */
 export const useGetAdjacentBookings = (item: ModelsBooking | undefined) => {
   const { selectedOrganisationId } = useOrganisation()
@@ -59,16 +64,33 @@ export const useGetAdjacentBookings = (item: ModelsBooking | undefined) => {
     selectedOrganisationId,
     apiTimespanDay(item?.start.dateTime || formatISOLocale(new Date())),
   )
+  const { data: currentBookingData } = useGetUserBookingCurrent()
 
-  const sorted = sortBookingsByDate(bookings || [])
-  const indexCurrent = sorted.findIndex((b) => b.id === item?.id)
-  const data = useMemo(
-    () => ({
+  const mergedBookings = useMemo(() => {
+    const list = bookings || []
+    const runningBooking = currentBookingData?.booking
+
+    if (
+      !runningBooking ||
+      !item?.start.dateTime ||
+      !isSameDay(new Date(runningBooking.start.dateTime), new Date(item.start.dateTime))
+    ) {
+      return list
+    }
+
+    if (list.some((b) => b.id === runningBooking.id)) {
+      return list
+    }
+
+    return [...list, runningBooking]
+  }, [bookings, currentBookingData?.booking, item?.start.dateTime])
+
+  return useMemo(() => {
+    const sorted = sortBookingsByDate(mergedBookings)
+    const indexCurrent = sorted.findIndex((b) => b.id === item?.id)
+    return {
       previous: sorted[indexCurrent + 1] || null,
       next: sorted[indexCurrent - 1] || null,
-    }),
-    [sorted, indexCurrent],
-  )
-
-  return data
+    }
+  }, [mergedBookings, item?.id])
 }
