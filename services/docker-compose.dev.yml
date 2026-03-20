@@ -37,7 +37,7 @@ services:
 
   # Mailpit for email testing
   mailpit:
-    image: axllent/mailpit:v1.22
+    image: axllent/mailpit:v1.29
     container_name: lasius-dev-mailpit
     ports:
       - "8025:8025"  # Web UI
