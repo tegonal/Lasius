@@ -7,9 +7,7 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-COPY .yarnrc.yml ./
-COPY .yarn/releases ./.yarn/releases
-COPY package.json yarn.lock ./
+COPY .yarnrc.yml package.json yarn.lock ./
 RUN corepack enable
 RUN yarn install --immutable
 

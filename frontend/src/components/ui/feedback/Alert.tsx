@@ -48,8 +48,7 @@ const iconMap = {
 } as const
 
 export interface AlertProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof alertVariants> {
+  extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof alertVariants> {
   children: React.ReactNode
   hideIcon?: boolean
 }

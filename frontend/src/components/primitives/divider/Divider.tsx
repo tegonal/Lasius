@@ -60,7 +60,8 @@ const dividerVariants = cva(
 )
 
 export interface DividerProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'color'>,
+  extends
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'color'>,
     VariantProps<typeof dividerVariants> {
   /**
    * Text content to display in the divider

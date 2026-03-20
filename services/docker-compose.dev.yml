@@ -35,10 +35,10 @@ services:
       timeout: 5s
       retries: 30
 
-  # MailHog for email testing
-  mailhog:
-    image: mailhog/mailhog
-    container_name: lasius-dev-mailhog
+  # Mailpit for email testing
+  mailpit:
+    image: axllent/mailpit:v1.22
+    container_name: lasius-dev-mailpit
     ports:
       - "8025:8025"  # Web UI
       - "1025:1025"  # SMTP server
@@ -65,7 +65,7 @@ services:
     depends_on:
       - keycloak
       - mongodb
-      - mailhog
+      - mailpit
     healthcheck:
       test: ["CMD", "caddy", "validate", "--config", "/etc/caddy/Caddyfile"]
       interval: 10s

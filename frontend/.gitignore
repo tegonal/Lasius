@@ -1,8 +1,5 @@
 .next
-.yarn/cache
-.yarn/unplugged
-.yarn/build-state.yml
-.yarn/install-state.gz
+.yarn
 .swc
 node_modules
 package-lock.json
@@ -20,14 +17,6 @@ dump
 **/public/workbox-*.js.map
 **/public/worker-*.js.map
 **/public/fallback-*.js.map
-
-# MCP/Agents
-CLAUDE.md
-/.serena
-/.claude
-/.playwright*
-.clauderc
-.mcp.json
 
 # Migration files
 **/*.backup

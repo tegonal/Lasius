@@ -57,8 +57,7 @@ const cardVariants = cva('card', {
 })
 
 export interface CardProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof cardVariants> {
+  extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof cardVariants> {
   children: React.ReactNode
 }
 

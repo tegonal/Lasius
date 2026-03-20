@@ -69,8 +69,7 @@ const labelVariants = cva(
 )
 
 export interface LabelProps
-  extends React.LabelHTMLAttributes<HTMLLabelElement>,
-    VariantProps<typeof labelVariants> {
+  extends React.LabelHTMLAttributes<HTMLLabelElement>, VariantProps<typeof labelVariants> {
   children: React.ReactNode
   as?: 'label' | 'span'
 }

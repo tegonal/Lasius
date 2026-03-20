@@ -26,7 +26,7 @@ swaggerDomainNameSpaces := Seq("models", "controllers")
 swaggerPrettyJson       := true
 swaggerOutputTransformers += "core.swagger.SwaggerRenameModelClassesTransformer"
 
-scalaVersion := "2.13.17"
+scalaVersion := "2.13.18"
 
 buildInfoKeys := Seq[BuildInfoKey](organization,
                                    name,
@@ -43,16 +43,16 @@ resolvers += "Tegonal releases".at(
 resolvers += "Sonatype OSS Releases".at(
   "https://oss.sonatype.org/content/repositories/releases")
 
-val pekkoVersion             = "1.2.1"
-val reactiveMongoPlayVersion = "1.1.0-play30.RC19"
+val pekkoVersion             = "1.4.0"
+val reactiveMongoPlayVersion = "1.1.0-play30.RC20"
 // Play framework 3.x is still bound to older guice version
 val guiceVersion      = "6.0.0"
-val pureConfigVersion = "0.17.9"
-val jacksonVersion    = "2.19.0"
+val pureConfigVersion = "0.17.10"
+val jacksonVersion    = "2.21.1"
 
 libraryDependencies ++= Seq(
   "org.reactivemongo" %% "play2-reactivemongo" % reactiveMongoPlayVersion,
-  "com.github.scullxbones"      %% "pekko-persistence-mongodb" % "1.3.1",
+  "com.github.scullxbones"      %% "pekko-persistence-mongodb" % "1.4.0",
   "com.tegonal"                 %% "play-json-typedid"         % "2.0.0",
   "org.julienrf"                %% "play-json-derived-codecs"  % "11.0.0",
   "org.playframework"           %% "play-json-joda"            % "3.0.6",
@@ -69,7 +69,7 @@ libraryDependencies ++= Seq(
   "org.apache.pekko" %% "pekko-persistence-testkit"   % pekkoVersion % "test",
   // reactivemongo based connector for persistent akka
   "org.mindrot"         % "jbcrypt"                   % "0.4",
-  "de.flapdoodle.embed" % "de.flapdoodle.embed.mongo" % "4.21.0" % "test",
+  "de.flapdoodle.embed" % "de.flapdoodle.embed.mongo" % "4.24.0" % "test",
   "io.github.alstanchev" % "pekko-persistence-inmemory_2.13" % "1.3.0" % "test",
   "io.kontainers"       %% "purecsv"                         % "1.3.10",
   "com.chuusai"         %% "shapeless"                       % "2.3.13",
@@ -81,8 +81,8 @@ libraryDependencies ++= Seq(
 
   // basic jwt token and jwks support
   // "com.github.jwt-scala" %% "jwt-play" % "10.0.1",
-  "com.auth0" % "java-jwt" % "4.5.0",
-  "com.auth0" % "jwks-rsa" % "0.22.1",
+  "com.auth0" % "java-jwt" % "4.5.1",
+  "com.auth0" % "jwks-rsa" % "0.23.0",
 
   // oauth2 provider dependencies
   // oauth2 provider dependencies to be able to provide a simple oauth server packed with lasius
@@ -92,14 +92,15 @@ libraryDependencies ++= Seq(
   ws,
   specs2 % Test,
   guice,
-  "org.webjars" % "swagger-ui" % "5.29.2"
+  "org.webjars" % "swagger-ui" % "5.32.1"
 )
 
 dependencyOverrides ++= Seq(
   "com.fasterxml.jackson.module" % "jackson-module-scala_2.13" % jacksonVersion,
   "com.fasterxml.jackson.core"   % "jackson-databind"          % jacksonVersion,
   "com.fasterxml.jackson.core"   % "jackson-core"              % jacksonVersion,
-  "com.fasterxml.jackson.core"   % "jackson-annotations"       % jacksonVersion,
+  // jackson-annotations dropped patch versions from 2.20+; only publishes minor (e.g. "2.21")
+  "com.fasterxml.jackson.core"   % "jackson-annotations"       % "2.21",
 )
 
 Test / javaOptions += "-Dconfig.file=conf/test.conf"
