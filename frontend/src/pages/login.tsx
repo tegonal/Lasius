@@ -152,7 +152,20 @@ const Login: NextPage<{
 
         setSelectedDate(formatISOLocale(new Date()))
 
-        // Validate the redirect URL - if it's not a known route, redirect to home instead
+        // OAuth providers (e.g. Keycloak) return an external authorization URL.
+        // Redirect directly — router.push only handles internal app routes.
+        try {
+          const responseUrl = new URL(res.url, window.location.origin)
+          if (responseUrl.origin !== window.location.origin) {
+            logger.info('[Login] OAuth redirect to:', res.url)
+            window.location.href = res.url
+            return
+          }
+        } catch {
+          // Invalid URL — fall through to standard route validation
+        }
+
+        // Internal URL — validate and redirect as before
         const redirectUrl = getValidRouteOrFallback(res.url, ROUTES.USER.INDEX)
 
         logger.info('[Login] Attempting redirect to:', res.url)
