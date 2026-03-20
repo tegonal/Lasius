@@ -21,6 +21,9 @@ test-results/
 # TypeScript build info
 *.tsbuildinfo
 
+# i18next-cli tracking
+i18next-cli-last-funnel-message-shown.json
+
 # Caches
 node-compile-cache/
 playwright-transform-cache-*/
