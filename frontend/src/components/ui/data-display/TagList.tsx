@@ -66,7 +66,7 @@ type PropsTagContainer = {
 }
 
 export const Tag: React.FC<PropsTagContainer> = ({
-  active: _active,
+  active,
   clickHandler,
   hideRemoveIcon,
   item,
@@ -124,8 +124,15 @@ export const Tag: React.FC<PropsTagContainer> = ({
             variant="tagWithSummary"
             clickable={clickable}
             onClick={() => clickTag(item)}
-            className="join-item !rounded-l-badge group-hover:bg-neutral group-hover:text-neutral-content rounded-r-none px-1"
-            style={{ background: 'oklch(from var(--color-secondary) calc(l - 0.3) c h)' }}>
+            className={cn(
+              'join-item !rounded-l-badge group-hover:bg-neutral group-hover:text-neutral-content rounded-r-none px-1',
+              active && 'bg-neutral text-neutral-content',
+            )}
+            style={
+              active
+                ? undefined
+                : { background: 'oklch(from var(--color-secondary) calc(l - 0.3) c h)' }
+            }>
             <ImporterTypeIcon type={importerType} className="h-4 w-4" />
           </Badge>
         )}
@@ -133,15 +140,25 @@ export const Tag: React.FC<PropsTagContainer> = ({
           variant="tagWithSummary"
           clickable={clickable}
           onClick={() => clickTag(item)}
-          className="join-item group-hover:bg-neutral group-hover:text-neutral-content rounded-none px-1"
-          style={{ background: 'oklch(from var(--color-secondary) calc(l - 0.15) c h)' }}>
+          className={cn(
+            'join-item group-hover:bg-neutral group-hover:text-neutral-content rounded-none px-1',
+            active && 'bg-neutral text-neutral-content',
+          )}
+          style={
+            active
+              ? undefined
+              : { background: 'oklch(from var(--color-secondary) calc(l - 0.15) c h)' }
+          }>
           {item.id}
         </Badge>
         <Badge
           variant="tagWithSummary"
           clickable={clickable}
           onClick={() => clickTag(item)}
-          className="join-item !rounded-r-badge group-hover:bg-neutral group-hover:text-neutral-content min-w-0 rounded-l-none">
+          className={cn(
+            'join-item !rounded-r-badge group-hover:bg-neutral group-hover:text-neutral-content min-w-0 rounded-l-none',
+            active && 'bg-neutral text-neutral-content',
+          )}>
           <span
             className="block w-full overflow-hidden text-ellipsis whitespace-nowrap"
             title={summary}>
@@ -155,7 +172,11 @@ export const Tag: React.FC<PropsTagContainer> = ({
 
   // Simple tags: Single Badge
   return (
-    <Badge variant={tagVariant} onClick={() => clickTag(item)} clickable={clickable}>
+    <Badge
+      variant={tagVariant}
+      onClick={() => clickTag(item)}
+      clickable={clickable}
+      className={active ? 'bg-neutral text-neutral-content' : undefined}>
       <ItemLabel label={item.id} summary={summary} width={width} />
       {clickableAndRemovable && <LucideIcon icon={XIcon} size={16} strokeWidth={2} />}
     </Badge>

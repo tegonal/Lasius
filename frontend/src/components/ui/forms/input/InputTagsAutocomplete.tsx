@@ -205,9 +205,9 @@ export const InputTagsAutocomplete: React.FC<Props> = ({ suggestions = [], name,
                               key={item.id}
                               value={item}
                               className="w-fit p-1">
-                              {({ active }) => (
+                              {({ focus }) => (
                                 <Tag
-                                  active={active}
+                                  active={focus}
                                   item={item}
                                   clickHandler={noop}
                                   hideRemoveIcon
@@ -221,9 +221,9 @@ export const InputTagsAutocomplete: React.FC<Props> = ({ suggestions = [], name,
                               key={item.id}
                               value={item}
                               className="w-fit p-1">
-                              {({ active }) => (
+                              {({ focus }) => (
                                 <Tag
-                                  active={active}
+                                  active={focus}
                                   item={item}
                                   clickHandler={noop}
                                   hideRemoveIcon
