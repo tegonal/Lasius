@@ -30,6 +30,8 @@ test('auth error page shows error details @auth', async ({ page }) => {
 test('back to login button navigates to login @auth', async ({ page }) => {
   await page.goto('/auth/error?error=AccessDenied')
 
+  // Wait for the back button to render before clicking
+  await page.getByTestId('auth-error-back-btn').waitFor({ state: 'visible', timeout: 15000 })
   await page.getByTestId('auth-error-back-btn').click()
 
   await page.waitForURL(/.*\/login.*/, { timeout: 15000 })

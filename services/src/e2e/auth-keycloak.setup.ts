@@ -32,13 +32,16 @@ setup('authenticate via Keycloak', async ({ page }) => {
   // Wait for redirect to Keycloak login form
   await page.waitForURL(/.*localhost:8080.*/, { timeout: 15000 })
 
+  // Wait for the Keycloak login form to render
+  await page.getByLabel('Email').waitFor({ state: 'visible', timeout: 15000 })
+
   // Fill in Keycloak login form
   await page.getByLabel('Email').fill('e2e@lasius.ch')
   await page.locator('input#password').fill('e2e-test')
   await page.getByRole('button', { name: /sign in/i }).click()
 
-  // Wait for redirect back to the app after login
-  await page.waitForURL(/.*localhost:3000\/user\/.*/, { timeout: 15000 })
+  // Wait for redirect back to the app after login (OAuth callback + SSR can be slow on cold start)
+  await page.waitForURL(/.*localhost:3000\/user\/.*/, { timeout: 30000 })
 
   // Verify we're logged in
   await expect(page.locator('body')).toBeVisible()

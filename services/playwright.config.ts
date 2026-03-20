@@ -29,11 +29,14 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   outputDir: './test-results',
+  // Dev server needs extra time for cold SSR compilation + auth middleware
+  timeout: process.env.CI ? 30000 : 60000,
 
   use: {
     baseURL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
+    navigationTimeout: 30000,
   },
 
   projects: [
@@ -48,7 +51,7 @@ export default defineConfig({
     {
       name: 'chromium',
       testMatch: /.*\.spec\.ts/,
-      testIgnore: /.*\.unauth\.spec\.ts/,
+      testIgnore: [/.*\.unauth\.spec\.ts/, /.*keycloak\.spec\.ts/],
       use: {
         ...devices['Desktop Chrome'],
         storageState: '.auth/user.json',
@@ -57,8 +60,7 @@ export default defineConfig({
     },
     {
       name: 'keycloak',
-      testMatch: /.*\.spec\.ts/,
-      testIgnore: /.*\.unauth\.spec\.ts/,
+      testMatch: /.*keycloak\.spec\.ts/,
       use: {
         ...devices['Desktop Chrome'],
         storageState: '.auth/keycloak-user.json',
