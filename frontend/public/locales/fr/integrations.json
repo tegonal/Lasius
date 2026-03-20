@@ -28,6 +28,7 @@
       "edit": "Modifier la configuration",
       "update": "Mettre à jour",
       "viewInfo": "Voir les informations de configuration",
+      "viewIntegrations": "View Integrations",
       "viewMappings": "Voir les correspondances de projet"
     },
     "checkInterval": "Intervalle de vérification",
@@ -50,6 +51,12 @@
       "message": "Aucune configuration de système de suivi des tickets pour le moment"
     },
     "errors": {
+      "deleteFailed": {
+        "github": "issueImporters.errors.deleteFailed.github",
+        "gitlab": "issueImporters.errors.deleteFailed.gitlab",
+        "jira": "issueImporters.errors.deleteFailed.jira",
+        "plane": "issueImporters.errors.deleteFailed.plane"
+      },
       "invalidMappingData": "Données de correspondance invalides",
       "mappingRemoveFailed": "Échec de la suppression de la correspondance de projet",
       "mappingSaveFailed": "Échec de l'enregistrement des correspondances de projet",
@@ -153,6 +160,10 @@
     "projectMappings": {
       "title": "Mappages de projets {{platform}}"
     },
+    "status": {
+      "connectivityDegraded": "Issue importer connectivity degraded: {{configName}}",
+      "connectivityFailed": "Issue importer connectivity failed: {{configName}}"
+    },
     "success": {
       "configDeleted": "Configuration supprimée avec succès",
       "configSaved": "Configuration enregistrée avec succès",
@@ -194,6 +205,7 @@
         "description": "Saisis tes informations de connexion pour te connecter à {{platform}}.",
         "title": "Configurer {{platform}}"
       },
+      "mappingNotImplemented": "Mapping step not yet implemented",
       "projects": {
         "addMapping": "Ajouter une correspondance",
         "changeMapping": "Modifier la correspondance",
@@ -211,9 +223,6 @@
         "mappingDescription_one": "{{count}} projet trouvé dans {{platform}}. Associe-le à tes projets Lasius pour importer les tickets. {{mapped}} sur {{total}} associé.",
         "mappingDescription_many": "Found {{count}} projects from {{platform}}. Map them to your Lasius projects to import issues. {{mapped}} of {{total}} mapped.",
         "mappingDescription_other": "{{count}} projets trouvés dans {{platform}}. Associe-les à tes projets Lasius pour importer les tickets. {{mapped}} sur {{total}} associés.",
-        "mappingDescription_plural_one": "{{count}} projet trouvé dans {{platform}}. Associe-le à tes projets Lasius pour importer les tickets. {{mapped}} sur {{total}} associé.",
-        "mappingDescription_plural_many": "{{count}} projets trouvés dans {{platform}}. Associe-les à tes projets Lasius pour importer les tickets. {{mapped}} sur {{total}} associés.",
-        "mappingDescription_plural_other": "{{count}} projets trouvés dans {{platform}}. Associe-les à tes projets Lasius pour importer les tickets. {{mapped}} sur {{total}} associés.",
         "noProjects": "Aucun projet trouvé dans {{platform}}",
         "notMapped": "Non associé",
         "orphanedProject": "Projet non disponible",

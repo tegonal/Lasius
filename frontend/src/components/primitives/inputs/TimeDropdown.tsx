@@ -22,6 +22,7 @@ import { Button } from 'components/primitives/buttons/Button'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { cn } from 'lib/utils/cn'
 import { ChevronDown, ChevronLeft, Clock } from 'lucide-react'
+import { useTranslation } from 'next-i18next'
 import React, { useState } from 'react'
 
 type Props = {
@@ -52,6 +53,7 @@ const generateTimeOptions = () => {
 }
 
 export const TimeDropdown: React.FC<Props> = ({ value, onChange, disabled, isWeekend }) => {
+  const { t } = useTranslation('common')
   const [showCustom, setShowCustom] = useState(false)
   const timeOptions = generateTimeOptions()
 
@@ -115,7 +117,7 @@ export const TimeDropdown: React.FC<Props> = ({ value, onChange, disabled, isWee
                       active && 'bg-base-200',
                       showCustom && 'bg-primary/10',
                     )}>
-                    <span>Custom time...</span>
+                    <span>{t('common.time.customTime', { defaultValue: 'Custom time...' })}</span>
                     <LucideIcon icon={Clock} size={12} />
                   </button>
                 )}
@@ -129,7 +131,7 @@ export const TimeDropdown: React.FC<Props> = ({ value, onChange, disabled, isWee
                   onClick={() => setShowCustom(false)}
                   className="hover:bg-base-200 flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm">
                   <LucideIcon icon={ChevronLeft} size={12} />
-                  <span>Back to presets</span>
+                  <span>{t('common.time.backToPresets', { defaultValue: 'Back to presets' })}</span>
                 </button>
               </div>
 

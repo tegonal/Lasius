@@ -7,6 +7,27 @@ target
 **/common_old.json
 .DS_Store
 
+# Node / Yarn (shared across frontend, services, e2e)
+node_modules/
+.yarn/
+.pnp.*
+
+# Playwright (shared across services, e2e)
+playwright-report/
+playwright/.cache/
+test-results/
+.auth/
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Caches
+node-compile-cache/
+playwright-transform-cache-*/
+
+# Environment
+.env.local
+
 # Claude Code / AI agents (local only)
 .claude/
 .mcp.json

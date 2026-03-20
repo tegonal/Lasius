@@ -199,17 +199,24 @@
       "cancel": "Annuler",
       "clear": "Effacer",
       "close": "Fermer",
+      "closeActionsMenu": "Close actions menu",
+      "closeNotification": "Close notification",
       "delete": "Supprimer",
       "discardChanges": "Abandonner les modifications",
       "help": "Aide",
       "invite": "Inviter",
       "keepEditing": "Continuer à modifier",
       "next": "Suivant",
+      "openActionsMenu": "Open actions menu",
       "reset": "Réinitialiser",
       "resetToInitial": "Réinitialiser à la valeur initiale",
       "save": "Enregistrer",
       "saveChanges": "Enregistrer les modifications",
       "signUp": "S'inscrire"
+    },
+    "aria": {
+      "decrement": "Decrement",
+      "increment": "Increment"
     },
     "back": "Retour",
     "confirmUnsavedChanges": "Tu as des modifications non enregistrées. Es-tu sûr de vouloir annuler ?",
@@ -222,7 +229,8 @@
       "internalServerError": "Erreur interne du serveur",
       "pageNotFound": "Page non trouvée",
       "somethingWentWrong": "Une erreur s'est produite",
-      "unauthorized": "Non autorisé"
+      "unauthorized": "Non autorisé",
+      "unexpectedError": "An unexpected error occurred"
     },
     "filter": {
       "title": "Filtre"
@@ -268,6 +276,8 @@
       "system": "Système"
     },
     "time": {
+      "backToPresets": "Back to presets",
+      "customTime": "Custom time...",
       "day": "Jour",
       "duration": "Durée",
       "ends": "Se termine",

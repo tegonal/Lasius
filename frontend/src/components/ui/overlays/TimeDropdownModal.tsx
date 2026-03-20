@@ -133,7 +133,7 @@ export const TimeDropdownWithModal: React.FC<Props> = ({
                     'flex w-full items-center justify-between rounded px-2 py-1.5 text-left text-sm',
                     active && 'bg-base-200',
                   )}>
-                  <span>Custom time...</span>
+                  <span>{t('common.time.customTime', { defaultValue: 'Custom time...' })}</span>
                   <LucideIcon icon={Clock} size={12} />
                 </button>
               )}

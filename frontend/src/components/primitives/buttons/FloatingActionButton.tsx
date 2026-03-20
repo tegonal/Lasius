@@ -19,6 +19,7 @@
 
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from 'lib/utils/cn'
+import { useTranslation } from 'next-i18next'
 import React from 'react'
 
 /**
@@ -91,7 +92,7 @@ export interface FloatingActionButtonProps extends VariantProps<typeof fabVarian
 export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
   icon,
   actions,
-  ariaLabel = 'Open actions menu',
+  ariaLabel,
   closeIcon,
   layout = 'vertical',
   position = 'bottomRight',
@@ -99,6 +100,9 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
   size = 'lg',
   zIndex = 10,
 }) => {
+  const { t } = useTranslation('common')
+  const resolvedAriaLabel =
+    ariaLabel ?? t('common.actions.openActionsMenu', { defaultValue: 'Open actions menu' })
   const sizeClass = size === 'sm' ? 'btn-sm' : size === 'lg' ? 'btn-lg' : 'btn-md'
 
   return (
@@ -107,7 +111,7 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
       <div
         tabIndex={0}
         role="button"
-        aria-label={ariaLabel}
+        aria-label={resolvedAriaLabel}
         className={cn(
           'btn btn-circle',
           sizeClass,
@@ -121,7 +125,9 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
         <div className="fab-close">
           <button
             className={cn('btn btn-circle', sizeClass, 'btn-ghost')}
-            aria-label="Close actions menu">
+            aria-label={t('common.actions.closeActionsMenu', {
+              defaultValue: 'Close actions menu',
+            })}>
             {closeIcon}
           </button>
         </div>

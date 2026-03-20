@@ -28,6 +28,7 @@
       "edit": "Konfiguration bearbeiten",
       "update": "Aktualisieren",
       "viewInfo": "Konfigurationsinfo anzeigen",
+      "viewIntegrations": "View Integrations",
       "viewMappings": "Projekt-Zuordnungen anzeigen"
     },
     "checkInterval": "Prüfintervall",
@@ -48,6 +49,12 @@
       "message": "Noch keine Issue-Tracker-Konfigurationen vorhanden"
     },
     "errors": {
+      "deleteFailed": {
+        "github": "issueImporters.errors.deleteFailed.github",
+        "gitlab": "issueImporters.errors.deleteFailed.gitlab",
+        "jira": "issueImporters.errors.deleteFailed.jira",
+        "plane": "issueImporters.errors.deleteFailed.plane"
+      },
       "invalidMappingData": "Ungültige Zuordnungsdaten",
       "mappingRemoveFailed": "Projekt-Zuordnung konnte nicht entfernt werden",
       "mappingSaveFailed": "Projekt-Zuordnungen konnten nicht gespeichert werden",
@@ -151,6 +158,10 @@
     "projectMappings": {
       "title": "{{platform}} Projekt-Zuordnungen"
     },
+    "status": {
+      "connectivityDegraded": "Issue importer connectivity degraded: {{configName}}",
+      "connectivityFailed": "Issue importer connectivity failed: {{configName}}"
+    },
     "success": {
       "configDeleted": "Konfiguration erfolgreich gelöscht",
       "configSaved": "Konfiguration erfolgreich gespeichert",
@@ -192,6 +203,7 @@
         "description": "Gib deine Verbindungsdaten ein, um dich mit {{platform}} zu verbinden.",
         "title": "{{platform}} konfigurieren"
       },
+      "mappingNotImplemented": "Mapping step not yet implemented",
       "projects": {
         "addMapping": "Zuordnung hinzufügen",
         "changeMapping": "Zuordnung ändern",
@@ -208,8 +220,6 @@
         "mappingDescription": "Verknüpfe dieses externe Projekt mit einem Lasius-Projekt, um Issues automatisch als Zeiterfassungs-Tags zu synchronisieren.",
         "mappingDescription_one": "{{count}} Projekt von {{platform}} gefunden. Ordne es deinen Lasius-Projekten zu, um Issues zu importieren. {{mapped}} von {{total}} zugeordnet.",
         "mappingDescription_other": "{{count}} Projekte von {{platform}} gefunden. Ordne sie deinen Lasius-Projekten zu, um Issues zu importieren. {{mapped}} von {{total}} zugeordnet.",
-        "mappingDescription_plural_one": "{{count}} Projekt von {{platform}} gefunden. Ordne es deinen Lasius-Projekten zu, um Issues zu importieren. {{mapped}} von {{total}} zugeordnet.",
-        "mappingDescription_plural_other": "{{count}} Projekte von {{platform}} gefunden. Ordne sie deinen Lasius-Projekten zu, um Issues zu importieren. {{mapped}} von {{total}} zugeordnet.",
         "noProjects": "Keine Projekte in {{platform}} gefunden",
         "notMapped": "Nicht zugeordnet",
         "orphanedProject": "Projekt nicht mehr verfügbar",
