@@ -7352,7 +7352,7 @@ __metadata:
     react-i18next: "npm:^16.5.8"
     react-popper: "npm:^2.3.0"
     react-use-websocket: "npm:^4.13.0"
-    satori: "npm:^0.25.0"
+    satori: "npm:^0.26.0"
     svgo: "npm:^4.0.1"
     swr: "npm:^2.4.1"
     tailwind-merge: "npm:^3.5.0"
@@ -9750,7 +9750,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"satori@npm:0.25.0, satori@npm:^0.25.0":
+"satori@npm:0.25.0":
   version: 0.25.0
   resolution: "satori@npm:0.25.0"
   dependencies:
@@ -9766,6 +9766,25 @@ __metadata:
     postcss-value-parser: "npm:^4.2.0"
     yoga-layout: "npm:^3.2.1"
   checksum: 10/d9e23ce11ee27be2caab751a9b6a71e6fc448f6c4ef679b476327f5c628856a866095111d3d30fa14ea250fe50936f32b2254bc66e24166cbe375e7c11a3f6bf
+  languageName: node
+  linkType: hard
+
+"satori@npm:^0.26.0":
+  version: 0.26.0
+  resolution: "satori@npm:0.26.0"
+  dependencies:
+    "@shuding/opentype.js": "npm:1.4.0-beta.0"
+    css-background-parser: "npm:^0.1.0"
+    css-box-shadow: "npm:1.0.0-3"
+    css-gradient-parser: "npm:^0.0.17"
+    css-to-react-native: "npm:^3.0.0"
+    emoji-regex-xs: "npm:^2.0.1"
+    escape-html: "npm:^1.0.3"
+    linebreak: "npm:^1.1.0"
+    parse-css-color: "npm:^0.2.1"
+    postcss-value-parser: "npm:^4.2.0"
+    yoga-layout: "npm:^3.2.1"
+  checksum: 10/4b0b6597cad7d4cbf82f3cf62aa9a5bf84ea2769baa881ca957a87a5da562ad2e219775201e0291e65ffcf7f31ebb9a81700aae61280cf0bec9fe4a4f02fbb07
   languageName: node
   linkType: hard
 
