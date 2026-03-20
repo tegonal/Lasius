@@ -24,6 +24,7 @@ import { Card, CardBody } from 'components/ui/cards/Card'
 import { Logo } from 'components/ui/icons/Logo'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { getServerSidePropsWithoutAuth } from 'lib/auth/getServerSidePropsWithoutAuth'
+import { DEFAULT_LOCALE } from 'lib/config/locales'
 import { AlertTriangle, ArrowLeft } from 'lucide-react'
 import { GetServerSidePropsContext, NextPage } from 'next'
 import { useTranslation } from 'next-i18next'
@@ -151,7 +152,7 @@ const AuthError: NextPage<{ locale?: string; defaultLocale?: string }> = ({
           ],
           siteName: 'Lasius',
           type: 'website',
-          locale: locale || defaultLocale || 'en',
+          locale: locale || defaultLocale || DEFAULT_LOCALE,
         }}
         twitter={{
           handle: '@tegonal',
@@ -174,13 +175,17 @@ const AuthError: NextPage<{ locale?: string; defaultLocale?: string }> = ({
 
             {/* Error title */}
             <div className="text-center">
-              <h2 className="mb-2 text-2xl font-bold">{errorDetails.title}</h2>
-              <p className="text-base-content/70 max-w-md">{errorDetails.message}</p>
+              <h2 className="mb-2 text-2xl font-bold" data-testid="auth-error-title">
+                {errorDetails.title}
+              </h2>
+              <p className="text-base-content/70 max-w-md" data-testid="auth-error-message">
+                {errorDetails.message}
+              </p>
             </div>
 
             {/* Technical details (optional, shown in smaller text) */}
             {error && (
-              <div className="bg-base-200 rounded-lg p-3">
+              <div className="bg-base-200 rounded-lg p-3" data-testid="auth-error-code">
                 <p className="text-base-content/50 text-center text-xs">
                   {t('auth.errors.errorCode', { defaultValue: 'Error code' })}:{' '}
                   <code className="text-base-content/70 font-mono">{error}</code>
@@ -191,6 +196,7 @@ const AuthError: NextPage<{ locale?: string; defaultLocale?: string }> = ({
             {/* Back to login button */}
             <div className="mt-4 w-full">
               <Button
+                data-testid="auth-error-back-btn"
                 onClick={handleBackToLogin}
                 variant="primary"
                 size="lg"

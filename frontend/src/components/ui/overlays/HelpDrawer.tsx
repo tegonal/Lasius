@@ -25,6 +25,7 @@ import { Note } from 'components/ui/help/Note'
 import { Tip } from 'components/ui/help/Tip'
 import { Warning } from 'components/ui/help/Warning'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
+import { DEFAULT_LOCALE } from 'lib/config/locales'
 import { X } from 'lucide-react'
 import { useTranslation } from 'next-i18next'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
@@ -123,9 +124,9 @@ export const HelpDrawer: React.FC = () => {
         // Try to fetch the compiled MDX from API route
         let response = await fetch(`/api/help/${locale}/${helpFileName}`)
 
-        // If not found and locale is not 'en', try English fallback
-        if (!response.ok && locale !== 'en') {
-          response = await fetch(`/api/help/en/${helpFileName}`)
+        // If not found and locale is not the default, try default locale fallback
+        if (!response.ok && locale !== DEFAULT_LOCALE) {
+          response = await fetch(`/api/help/${DEFAULT_LOCALE}/${helpFileName}`)
           if (response.ok) {
             setIsFallbackLanguage(true)
           }

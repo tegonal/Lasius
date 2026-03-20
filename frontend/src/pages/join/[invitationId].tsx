@@ -23,6 +23,7 @@ import { InvitationOtherSession } from 'components/features/invitation/Invitatio
 import { InvitationUserConfirm } from 'components/features/invitation/invitationUserConfirm'
 import { getInvitationStatus } from 'lib/api/lasius/invitations-public/invitations-public'
 import { getServerSidePropsWithoutAuth } from 'lib/auth/getServerSidePropsWithoutAuth'
+import { DEFAULT_LOCALE } from 'lib/config/locales'
 import { logger } from 'lib/logger'
 import { GetServerSideProps, NextPage } from 'next'
 import { getServerSession, Session } from 'next-auth'
@@ -78,7 +79,7 @@ const Join: NextPage<{ session: Session; locale?: string }> = ({ session, locale
               ],
               siteName: 'Lasius',
               type: 'website',
-              locale: locale || 'en',
+              locale: locale || DEFAULT_LOCALE,
             }}
             twitter={{
               handle: '@tegonal',
@@ -113,7 +114,7 @@ const Join: NextPage<{ session: Session; locale?: string }> = ({ session, locale
             ],
             siteName: 'Lasius',
             type: 'website',
-            locale: locale || 'en',
+            locale: locale || DEFAULT_LOCALE,
           }}
           twitter={{
             handle: '@tegonal',

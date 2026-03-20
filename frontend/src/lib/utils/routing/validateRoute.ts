@@ -17,10 +17,8 @@
  *
  */
 
+import { SUPPORTED_LOCALES } from 'lib/config/locales'
 import { ROUTES } from 'projectConfig/routes.constants'
-
-// Supported locales from next-i18next config
-const SUPPORTED_LOCALES = ['en', 'de', 'fr', 'it', 'es']
 
 /**
  * Removes locale prefix from a pathname if present
