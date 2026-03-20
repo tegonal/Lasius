@@ -17,12 +17,15 @@ node --version  # Should show v24.x.x
 ```
 
 ### Package Manager Setup
+
+Yarn is managed via Corepack using the `packageManager` field in `package.json`. No manual Yarn installation needed.
+
 ```bash
-# Enable Corepack for Yarn management
+# Enable Corepack (ships with Node.js >= 16)
 corepack enable
 
-# Verify Yarn is available
-yarn --version  # Should show 3.x or 4.x
+# Verify Yarn is available (version managed automatically)
+yarn --version  # Should show 4.x
 ```
 
 ### Docker
@@ -35,11 +38,11 @@ docker --version  # Docker version 20.10 or higher
 - **Framework**: Next.js 15 with Pages Router
 - **UI Library**: React 19
 - **Language**: TypeScript 5
-- **Styling**: Tailwind CSS v4 + DaisyUI
+- **Styling**: Tailwind CSS v4 + DaisyUI 5
 - **State Management**: Zustand
 - **Data Fetching**: SWR
 - **Form Handling**: React Hook Form + Zod
-- **Code Quality**: ESLint, Prettier, TypeScript strict mode
+- **Code Quality**: ESLint 9 (flat config, cached), Prettier 3 (cached), TypeScript strict mode
 
 
 ## Installation
@@ -58,20 +61,23 @@ yarn install
 
 ## Development
 
-### Start Backend Services
+### Start Dev Services
+
+Dev services (MongoDB, Keycloak, Caddy proxy) are managed from the `services/` directory:
+
 ```bash
-yarn run backend
+cd ../services && yarn services:start
 ```
-Starts the backend server (sbt run) and Docker containers for MongoDB and Nginx proxy.
 
 ### Start Development Server
 ```bash
-yarn run dev
+yarn dev
 ```
 Runs Next.js in development mode with hot reload on port 3001.
 
 ### Access Points
-- Frontend: `http://localhost:3001`
+- Application: `http://localhost:3000` (via Caddy proxy — use this)
+- Frontend direct: `http://localhost:3001`
 - API Documentation: `http://localhost:9000/backend/docs/swagger-ui/index.html?url=/backend/assets/swagger.json`
 - Backend Routes: `http://localhost:9000/backend/`
 
@@ -90,27 +96,27 @@ Password: demo
 ```bash
 yarn check
 ```
-Runs linting, formatting, and type checking in sequence.
+Runs linting (with auto-fix), formatting, and type checking in sequence. Both ESLint and Prettier use caching to speed up repeated runs.
 
 ### Individual Commands
 ```bash
-yarn run lint        # ESLint checking
-yarn run lint:fix    # Auto-fix ESLint issues
-yarn run prettier    # Format code with Prettier
-yarn run typecheck   # TypeScript type checking
+yarn lint            # ESLint checking (cached)
+yarn lint-fix        # Auto-fix ESLint issues (cached)
+yarn prettier        # Format code with Prettier (cached)
+yarn typecheck       # TypeScript type checking
 ```
 
 ## Build
 
 ```bash
-yarn run build       # Production build
-yarn run start       # Start production server
+yarn build           # Production build
+yarn start           # Start production server
 ```
 
 ## API Client Generation
 
 ```bash
-yarn run orval
+yarn orval
 ```
 Regenerates the TypeScript API client from OpenAPI spec. Requires backend to be running.
 
@@ -131,7 +137,7 @@ This project uses a **cookie-based locale system** with next-i18next, not Next.j
 **Always use `i18n.language` from `useTranslation()`, never `router.locale`:**
 
 ```tsx
-// ✅ Correct
+// Correct
 import { useTranslation } from 'next-i18next'
 
 const MyComponent = () => {
@@ -141,7 +147,7 @@ const MyComponent = () => {
   return <div>{t('my.translation.key')}</div>
 }
 
-// ❌ Wrong - don't use router.locale
+// Wrong - don't use router.locale
 import { useRouter } from 'next/router'
 const { locale } = useRouter()  // This won't work correctly!
 ```
@@ -187,12 +193,12 @@ The locale middleware automatically detects and sets the initial locale from bro
 
 ### Update Dependencies
 ```bash
-yarn run up          # Interactive dependency updates
+yarn up              # Interactive dependency updates
 ```
 
 ### Clean Install
 ```bash
-yarn run cleaner     # Remove all packages and reinstall
+yarn cleaner         # Remove all packages and reinstall
 yarn rebuild         # Rebuild platform-specific binaries
 ```
 
@@ -234,7 +240,6 @@ See the [Component Architecture Guide](src/components/README.md) for detailed in
 - [Primitives Guide](src/components/primitives/README.md) - Foundation component guidelines
 - [UI Components Guide](src/components/ui/README.md) - Composed component patterns
 - [Features Guide](src/components/features/README.md) - Business logic components
-- [CLAUDE.md](CLAUDE.md) - AI assistant instructions and project conventions
 
 ## Contributing
 

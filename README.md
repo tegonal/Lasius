@@ -130,17 +130,76 @@ Authentication providers need to be configured in the frontend environment confi
 
 ## Dev Environment
 
-To bring up a local dev Environment please install:
+### Prerequisites
 
-- sbt
-- docker
-- node
+- [sbt](https://www.scala-sbt.org/) (Scala build tool)
+- [Docker](https://www.docker.com/) and Docker Compose
+- [Node.js](https://nodejs.org/) >= 20 (includes Corepack)
+- [tmux](https://github.com/tmux/tmux) (for `dev.sh` launcher)
 
-Copy the frontend `frontend/.env.template` file to `frontend/.env.local` and edit it.
+Enable Corepack to use the correct Yarn version (managed via `package.json#packageManager`):
 
-To enable external OAuth support, register application in provider and configure the external provider settings (`GITLAB_OAUTH_*` or `GITHUB_OAUTH_*`) before starting backend and frontend. Those environment variables are re-used in the backend configuration and enable the provider there as well.
+```bash
+corepack enable
+```
 
-Start the backend with `yarn run backend` and the frontend with `yarn run dev` from the `frontend` directory.
+### Setup
+
+```bash
+# 1. Install dependencies (compile backend + install frontend deps)
+./install.sh
+
+# 2. Copy and edit the frontend environment file
+cp frontend/.env.template frontend/.env.local
+
+# 3. Start dev services (MongoDB, Keycloak, Mailpit, Caddy proxy)
+cd services && yarn services:start
+
+# 4. Start backend + frontend in tmux
+./dev.sh
+```
+
+### Services
+
+Dev services are managed from the `services/` directory:
+
+```bash
+yarn services:start    # Start all dev services (MongoDB, Keycloak, Mailpit, Caddy)
+yarn services:stop     # Stop all dev services
+yarn services:clean    # Stop and remove all data volumes
+yarn services:logs     # Stream service logs
+yarn services:status   # Show service status
+```
+
+### Ports
+
+| Service    | Port |
+|------------|------|
+| App (proxy)| 3000 |
+| Frontend   | 3001 |
+| Backend    | 9000 |
+| MongoDB    | 27017|
+| Keycloak   | 8080 |
+| Mailpit UI | 8025 |
+| Mailpit SMTP| 1025|
+
+Access the application at `http://localhost:3000` (the Caddy proxy routes frontend and backend).
+
+### Running Manually
+
+If you prefer not to use `dev.sh`, start each service individually:
+
+```bash
+# Backend (from backend/)
+sbt run -Dconfig.resource=dev.conf
+
+# Frontend (from frontend/, after backend is ready)
+yarn dev
+```
+
+### OAuth Providers
+
+To enable external OAuth support, register an application with your provider and configure the provider settings (`GITLAB_OAUTH_*`, `GITHUB_OAUTH_*`, or `KEYCLOAK_OAUTH_*`) in `frontend/.env.local` before starting. These environment variables are re-used in the backend configuration.
 
 ## Test Environment
 
