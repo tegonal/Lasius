@@ -2164,6 +2164,21 @@
           "temporary": false
         }
       ]
+    },
+    {
+      "username": "e2e2@lasius.ch",
+      "email": "e2e2@lasius.ch",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "E2E2",
+      "lastName": "Test",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "e2e-test",
+          "temporary": false
+        }
+      ]
     }
   ]
 }

@@ -36,6 +36,7 @@ import { registerOAuthUser } from 'lib/api/lasius/oauth2-provider/oauth2-provide
 import { getServerSidePropsWithoutAuth } from 'lib/auth/getServerSidePropsWithoutAuth'
 import { LasiusPlausibleEvents } from 'lib/telemetry/plausibleEvents'
 import { usePlausible } from 'lib/telemetry/usePlausible'
+import { isEmailAddress } from 'lib/utils/data/validators'
 import { Eye, EyeOff } from 'lucide-react'
 import { GetServerSideProps, NextPage } from 'next'
 import { useTranslation } from 'next-i18next'
@@ -174,7 +175,10 @@ export const OAuthUserRegister: NextPage<{ locale?: string }> = ({ locale }) => 
                   <Input
                     id="email"
                     data-testid="auth-register-email-input"
-                    {...register('email', { required: true })}
+                    {...register('email', {
+                      required: true,
+                      validate: { isEmailAddress: (v) => isEmailAddress(v.toString()) },
+                    })}
                     aria-describedby="email-error"
                     autoComplete="email"
                     autoFocus

@@ -55,7 +55,7 @@ export const lasiusAxiosInstance = <T>(
       .then(({ data }) => data)
       .catch(async (error) => {
         if (Axios.isCancel(error)) {
-          if (process.env.LASIUS_DEBUG) {
+          if (process.env.LASIUS_DEBUG === 'true') {
             logger.debug('[lasiusAxiosInstance][RequestCanceled]', error.message)
           }
         } else if (error.response?.status === 401) {
