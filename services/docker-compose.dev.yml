@@ -25,7 +25,7 @@ services:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
     volumes:
-      - ./keycloak-local-realm.json:/opt/keycloak/data/import/lasius-local-realm.json:ro
+      - ./keycloak-local-realm.json:/opt/keycloak/data/import/lasius-realm.json:ro
     command: start-dev --import-realm
     networks:
       - lasius-dev

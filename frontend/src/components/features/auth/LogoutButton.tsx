@@ -34,6 +34,7 @@ export const LogoutButton: React.FC = () => {
       toolTipContent={t('auth.actions.logout', { defaultValue: 'Logout' })}
       placement="bottom">
       <Button
+        data-testid="auth-logout-btn"
         onClick={signOut}
         fullWidth={false}
         variant="ghost"

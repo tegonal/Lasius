@@ -2,12 +2,36 @@
   "name": "@lasius/services",
   "version": "1.0.0",
   "private": true,
-  "description": "Development services (MongoDB, Keycloak, Caddy proxy, Mailpit)",
+  "description": "Development services (MongoDB, Keycloak, Caddy proxy, Mailpit) and E2E tests",
+  "packageManager": "yarn@4.13.0",
   "scripts": {
     "services:start": "docker compose -f docker-compose.dev.yml up -d",
     "services:stop": "docker compose -f docker-compose.dev.yml down",
     "services:clean": "docker compose -f docker-compose.dev.yml down -v --remove-orphans",
     "services:logs": "docker compose -f docker-compose.dev.yml logs -f",
-    "services:status": "docker compose -f docker-compose.dev.yml ps"
+    "services:status": "docker compose -f docker-compose.dev.yml ps",
+    "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
+    "lint-fix": "eslint --cache --cache-location ./node_modules/.cache/eslint . --fix",
+    "prettier": "prettier --cache --write --log-level warn 'src/**/*.ts' '*.config.*' '*.ts'",
+    "typecheck": "tsc --noEmit",
+    "check": "yarn run lint-fix && yarn run prettier && yarn run typecheck && echo '✓ All checks passed'",
+    "e2e": "playwright test",
+    "e2e:headed": "playwright test --headed",
+    "e2e:ui": "playwright test --ui",
+    "e2e:report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "@playwright/test": "^1.52.0",
+    "@types/node": "24.12.0",
+    "@typescript-eslint/eslint-plugin": "^8.57.1",
+    "@typescript-eslint/parser": "^8.57.1",
+    "eslint": "9.39.4",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-license-header": "^0.9.0",
+    "eslint-plugin-perfectionist": "^5.7.0",
+    "eslint-plugin-prettier": "^5.5.5",
+    "prettier": "^3.8.1",
+    "typescript": "5.9.3"
   }
 }

@@ -123,12 +123,12 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
             <BundleVersionCheck />
             <Toasts />
             <HelpDrawer />
+            {session?.access_token && <HttpHeaderProvider />}
             {hasValidSession && (
               <>
                 <BookingProgressBarExplosion />
                 <TopLoadingBar />
                 <GlobalLoading />
-                <HttpHeaderProvider />
                 <TokenWatcher />
                 <BootstrapTasks />
                 <LasiusBackendWebsocketEventHandler />

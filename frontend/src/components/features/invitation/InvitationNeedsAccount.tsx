@@ -101,7 +101,12 @@ export const InvitationNeedsAccount: React.FC<Props> = ({ invitation, locale }) 
               })}
             </Alert>
 
-            <Button onClick={handleContinue} fullWidth size="lg" className="gap-2">
+            <Button
+              onClick={handleContinue}
+              fullWidth
+              size="lg"
+              className="gap-2"
+              data-testid="invite-signin-btn">
               <LucideIcon icon={LogIn} size={18} />
               {t('invitations.needsAccount.continue', {
                 defaultValue: 'Continue to Sign In',

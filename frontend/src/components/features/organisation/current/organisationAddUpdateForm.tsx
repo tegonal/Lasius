@@ -168,6 +168,7 @@ export const OrganisationAddUpdateForm: React.FC<Props> = ({ item, onSave, onCan
                   {t('organisations.organizationName', { defaultValue: 'Organisation name' })}
                 </Label>
                 <Input
+                  data-testid="org-form-name-input"
                   {...hookForm.register('organisationName', {
                     onChange: () => {
                       // Clear error when user changes the field
@@ -182,10 +183,18 @@ export const OrganisationAddUpdateForm: React.FC<Props> = ({ item, onSave, onCan
               </FormElement>
             </FieldSet>
             <ButtonGroup>
-              <Button type="submit" disabled={isSubmitting} className="relative z-0">
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="relative z-0"
+                data-testid="org-form-submit-btn">
                 {t('common.actions.save', { defaultValue: 'Save' })}
               </Button>
-              <Button type="button" variant="secondary" onClick={onCancel}>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={onCancel}
+                data-testid="org-form-cancel-btn">
                 {t('common.actions.cancel', { defaultValue: 'Cancel' })}
               </Button>
             </ButtonGroup>

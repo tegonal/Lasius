@@ -19,4 +19,6 @@ module.exports = {
   returnEmptyString: false,
   // Use default value if provided
   fallbackLng: false,
+  // Suppress i18next sponsorship/Locize banner
+  showSupportNotice: false,
 }

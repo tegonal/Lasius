@@ -66,7 +66,11 @@ export const OrganisationStats: React.FC<Props> = ({ onInvite, onEdit, onCreate 
         />
       </StatsGroup>
       <div className="dropdown dropdown-end">
-        <button type="button" className="btn btn-sm btn-neutral w-auto" tabIndex={0}>
+        <button
+          type="button"
+          className="btn btn-sm btn-neutral w-auto"
+          tabIndex={0}
+          data-testid="org-actions-dropdown">
           {t('common.actions.actions', { defaultValue: 'Actions' })}
           <ChevronDown className="size-4" />
         </button>
@@ -76,19 +80,19 @@ export const OrganisationStats: React.FC<Props> = ({ onInvite, onEdit, onCreate 
           {isAdmin && !isPrivate && (
             <>
               <li>
-                <button onClick={onInvite}>
+                <button onClick={onInvite} data-testid="org-actions-invite-btn">
                   {t('members.actions.invite', { defaultValue: 'Invite someone' })}
                 </button>
               </li>
               <li>
-                <button onClick={onEdit}>
+                <button onClick={onEdit} data-testid="org-actions-edit-btn">
                   {t('organisations.actions.edit', { defaultValue: 'Edit organisation' })}
                 </button>
               </li>
             </>
           )}
           <li>
-            <button onClick={onCreate}>
+            <button onClick={onCreate} data-testid="org-actions-create-btn">
               {t('organisations.actions.create', { defaultValue: 'Create organisation' })}
             </button>
           </li>

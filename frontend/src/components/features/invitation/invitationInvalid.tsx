@@ -47,7 +47,10 @@ export const InvitationInvalid: React.FC = () => {
 
   return (
     <LoginLayout>
-      <Card shadow="xl" className="border-base-300 bg-base-100 w-full max-w-md border">
+      <Card
+        shadow="xl"
+        className="border-base-300 bg-base-100 w-full max-w-md border"
+        data-testid="invite-invalid">
         <CardBody className="gap-6 p-8">
           <div className="flex justify-center">
             <Logo />

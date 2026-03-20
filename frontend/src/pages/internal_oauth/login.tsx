@@ -146,7 +146,10 @@ const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig }> = ({ con
   return (
     <AuthLayout infoPanel={<InternalLoginInfoPanel />}>
       {error && (
-        <Alert variant="warning" className="animate-[fadeIn_0.4s_ease-out]">
+        <Alert
+          variant="warning"
+          className="animate-[fadeIn_0.4s_ease-out]"
+          data-testid="auth-internal-login-error">
           {LoginError[error]}
         </Alert>
       )}
@@ -209,6 +212,7 @@ const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig }> = ({ con
                   htmlFor="email">
                   <Input
                     id="email"
+                    data-testid="auth-internal-email-input"
                     {...register('email', {
                       required: true,
                       validate: { isEmailAddress: (v) => isEmailAddress(v.toString()) },
@@ -225,6 +229,7 @@ const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig }> = ({ con
                   htmlFor="password">
                   <Input
                     id="password"
+                    data-testid="auth-internal-password-input"
                     {...register('password', { required: true })}
                     aria-describedby="password-error"
                     type="password"
@@ -234,11 +239,15 @@ const InternalOAuthLogin: NextPage<{ config: ModelsApplicationConfig }> = ({ con
                 </FormElement>
               </FieldSet>
               <ButtonGroup>
-                <Button type="submit" fullWidth>
+                <Button type="submit" fullWidth data-testid="auth-internal-submit-btn">
                   {t('auth.signIn', { defaultValue: 'Sign in' })}
                 </Button>
                 {config.lasiusOAuthProviderAllowUserRegistration && (
-                  <Button variant="ghost" onClick={() => onRegister()} fullWidth>
+                  <Button
+                    variant="ghost"
+                    onClick={() => onRegister()}
+                    fullWidth
+                    data-testid="auth-internal-signup-btn">
                     {t('common.actions.signUp', { defaultValue: 'Sign up' })}
                   </Button>
                 )}

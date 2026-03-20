@@ -173,6 +173,7 @@ export const OAuthUserRegister: NextPage<{ locale?: string }> = ({ locale }) => 
                   required>
                   <Input
                     id="email"
+                    data-testid="auth-register-email-input"
                     {...register('email', { required: true })}
                     aria-describedby="email-error"
                     autoComplete="email"
@@ -186,6 +187,7 @@ export const OAuthUserRegister: NextPage<{ locale?: string }> = ({ locale }) => 
                   required>
                   <Input
                     id="firstName"
+                    data-testid="auth-register-firstname-input"
                     {...register('firstName', { required: true })}
                     aria-describedby="firstName-error"
                     autoComplete="given-name"
@@ -198,6 +200,7 @@ export const OAuthUserRegister: NextPage<{ locale?: string }> = ({ locale }) => 
                   required>
                   <Input
                     id="lastName"
+                    data-testid="auth-register-lastname-input"
                     {...register('lastName', { required: true })}
                     aria-describedby="lastName-error"
                     autoComplete="family-name"
@@ -210,6 +213,7 @@ export const OAuthUserRegister: NextPage<{ locale?: string }> = ({ locale }) => 
                   required>
                   <Input
                     id="password"
+                    data-testid="auth-register-password-input"
                     {...register('password', {
                       required: true,
                       validate: {
@@ -230,6 +234,7 @@ export const OAuthUserRegister: NextPage<{ locale?: string }> = ({ locale }) => 
                   required>
                   <Input
                     id="confirmPassword"
+                    data-testid="auth-register-confirmpassword-input"
                     {...register('confirmPassword', {
                       required: true,
                       validate: {
@@ -257,7 +262,7 @@ export const OAuthUserRegister: NextPage<{ locale?: string }> = ({ locale }) => 
                       : t('ui.showPasswords', { defaultValue: 'Show passwords' })}
                   </span>
                 </Button>
-                <Button type="submit" fullWidth>
+                <Button type="submit" fullWidth data-testid="auth-register-submit-btn">
                   {t('common.actions.signUp', { defaultValue: 'Sign up' })}
                 </Button>
               </ButtonGroup>
