@@ -26,7 +26,7 @@
   "oauth2DeviceCodeLifespan": 600,
   "oauth2DevicePollingInterval": 5,
   "enabled": true,
-  "sslRequired": "external",
+  "sslRequired": "none",
   "registrationAllowed": true,
   "registrationEmailAsUsername": true,
   "rememberMe": true,
@@ -2148,5 +2148,37 @@
   },
   "clientPolicies": {
     "policies": []
-  }
+  },
+  "users": [
+    {
+      "username": "e2e@lasius.ch",
+      "email": "e2e@lasius.ch",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "E2E",
+      "lastName": "Test",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "e2e-test",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "e2e2@lasius.ch",
+      "email": "e2e2@lasius.ch",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "E2E2",
+      "lastName": "Test",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "e2e-test",
+          "temporary": false
+        }
+      ]
+    }
+  ]
 }

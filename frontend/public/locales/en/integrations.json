@@ -28,6 +28,7 @@
       "edit": "Edit",
       "update": "Update",
       "viewInfo": "View configuration info",
+      "viewIntegrations": "View Integrations",
       "viewMappings": "View project mappings"
     },
     "checkInterval": "Check Interval",
@@ -48,6 +49,12 @@
       "message": "No issue importer configurations yet"
     },
     "errors": {
+      "deleteFailed": {
+        "github": "issueImporters.errors.deleteFailed.github",
+        "gitlab": "issueImporters.errors.deleteFailed.gitlab",
+        "jira": "issueImporters.errors.deleteFailed.jira",
+        "plane": "issueImporters.errors.deleteFailed.plane"
+      },
       "invalidMappingData": "",
       "mappingRemoveFailed": "Failed to remove project mapping",
       "mappingSaveFailed": "Failed to save project mappings",
@@ -151,6 +158,10 @@
     "projectMappings": {
       "title": "{{platform}} Project Mappings"
     },
+    "status": {
+      "connectivityDegraded": "Issue importer connectivity degraded: {{configName}}",
+      "connectivityFailed": "Issue importer connectivity failed: {{configName}}"
+    },
     "success": {
       "configDeleted": "Configuration deleted successfully",
       "configSaved": "Configuration saved successfully",
@@ -192,6 +203,7 @@
         "description": "Enter your connection details to connect to {{platform}}.",
         "title": "Configure {{platform}}"
       },
+      "mappingNotImplemented": "Mapping step not yet implemented",
       "projects": {
         "addMapping": "Add mapping",
         "changeMapping": "Change mapping",
@@ -208,8 +220,6 @@
         "mappingDescription": "Link this external project to a Lasius project to automatically sync issues as time tracking tags.",
         "mappingDescription_one": "Found {{count}} projects from {{platform}}. Map them to your Lasius projects to import issues. {{mapped}} of {{total}} mapped.",
         "mappingDescription_other": "Found {{count}} projects from {{platform}}. Map them to your Lasius projects to import issues. {{mapped}} of {{total}} mapped.",
-        "mappingDescription_plural_one": "Found {{count}} projects from {{platform}}. Map them to your Lasius projects to import issues. {{mapped}} of {{total}} mapped.",
-        "mappingDescription_plural_other": "Found {{count}} projects from {{platform}}. Map them to your Lasius projects to import issues. {{mapped}} of {{total}} mapped.",
         "noProjects": "No projects found in {{platform}}",
         "notMapped": "Not mapped",
         "orphanedProject": "Project no longer available",

@@ -140,10 +140,14 @@ export const InvitationUserConfirm: React.FC<Props> = ({ invitation }) => {
               </>
             )}
             <FormElement>
-              <Button onClick={handleAcceptInvite} fullWidth>
+              <Button onClick={handleAcceptInvite} fullWidth data-testid="invite-accept-btn">
                 {t('invitations.actions.accept', { defaultValue: 'Accept invitation' })}
               </Button>
-              <Button variant="ghost" onClick={handleRejectInvite} fullWidth>
+              <Button
+                variant="ghost"
+                onClick={handleRejectInvite}
+                fullWidth
+                data-testid="invite-reject-btn">
                 {t('invitations.actions.reject', { defaultValue: 'Reject invitation' })}
               </Button>
             </FormElement>

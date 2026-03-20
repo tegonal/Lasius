@@ -17,8 +17,8 @@
  *
  */
 
-import { AnimatePresence, m } from 'framer-motion'
 import { stringHash } from 'lib/utils/string/stringHash'
+import { AnimatePresence, m } from 'motion/react'
 import React from 'react'
 
 const item = {

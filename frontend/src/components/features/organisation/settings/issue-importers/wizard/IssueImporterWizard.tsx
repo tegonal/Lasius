@@ -418,7 +418,11 @@ export const IssueImporterWizard: React.FC<Props> = ({ open, onClose, orgId, add
             state.formData.importerType &&
             state.availableProjects && (
               <div className="flex h-full items-center justify-center">
-                <p className="text-base-content/60">Mapping step not yet implemented</p>
+                <p className="text-base-content/60">
+                  {t('issueImporters.wizard.mappingNotImplemented', {
+                    defaultValue: 'Mapping step not yet implemented',
+                  })}
+                </p>
               </div>
             )}
         </ScrollContainer>

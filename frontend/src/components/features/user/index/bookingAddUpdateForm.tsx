@@ -38,7 +38,6 @@ import {
   setHours,
   setMinutes,
 } from 'date-fns'
-import { AnimatePresence, m } from 'framer-motion'
 import { useGetAdjacentBookings } from 'lib/api/hooks/useGetAdjacentBookings'
 import { useGetBookingLatest } from 'lib/api/hooks/useGetBookingLatest'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
@@ -51,6 +50,7 @@ import { useGetTagsByProject } from 'lib/api/lasius/user-organisations/user-orga
 import { logger } from 'lib/logger'
 import { formatISOLocale } from 'lib/utils/date/dates'
 import { ArrowDownToLine, ArrowRight, ArrowUpToLine, HelpCircle } from 'lucide-react'
+import { AnimatePresence, m } from 'motion/react'
 import { useTranslation } from 'next-i18next'
 import { DEFAULT_STRING_VALUE } from 'projectConfig/constants'
 import React, { useEffect, useRef, useState } from 'react'

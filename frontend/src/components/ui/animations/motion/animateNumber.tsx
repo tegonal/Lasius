@@ -18,8 +18,8 @@
  */
 
 import { isInteger, padStart, round } from 'es-toolkit/compat'
-import { animate } from 'framer-motion'
 import { countDecimals } from 'lib/utils/data/countDecimals'
+import { animate } from 'motion/react'
 import React, { useEffect, useRef } from 'react'
 
 type Props = {

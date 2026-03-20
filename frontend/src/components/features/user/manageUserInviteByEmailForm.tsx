@@ -176,7 +176,11 @@ export const ManageUserInviteByEmailForm: React.FC<Props> = ({
               <Label htmlFor="inviteMemberByEmailAddress">
                 {t('invitations.email', { defaultValue: 'Email' })}
               </Label>
-              <Input {...hookForm.register('inviteMemberByEmailAddress')} autoComplete="off" />
+              <Input
+                data-testid="org-invite-email-input"
+                {...hookForm.register('inviteMemberByEmailAddress')}
+                autoComplete="off"
+              />
               <FormErrorBadge error={hookForm.formState.errors.inviteMemberByEmailAddress} />
             </FormElement>
             {mode === 'project' && (
@@ -212,6 +216,7 @@ export const ManageUserInviteByEmailForm: React.FC<Props> = ({
                   {t('organisations.organisationRole', { defaultValue: 'Organisation role' })}
                 </Label>
                 <Select
+                  data-testid="org-invite-role-select"
                   id="organisationRole"
                   value={
                     hookForm.watch('organisationRole') ||
@@ -238,7 +243,7 @@ export const ManageUserInviteByEmailForm: React.FC<Props> = ({
             )}
           </FieldSet>
           <ButtonGroup>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isSubmitting} data-testid="org-invite-submit-btn">
               {t('common.actions.invite', { defaultValue: 'Invite' })}
             </Button>
             {onCancel && (
@@ -269,7 +274,7 @@ export const ManageUserInviteByEmailForm: React.FC<Props> = ({
             </ModalDescription>
 
             <div className="flex gap-3">
-              <code className="bg-base-200 flex-1 rounded px-2 py-1">
+              <code className="bg-base-200 flex-1 rounded px-2 py-1" data-testid="org-invite-link">
                 {registrationLink(invitationResult.invitationLinkId)}
               </code>
 
@@ -278,13 +283,18 @@ export const ManageUserInviteByEmailForm: React.FC<Props> = ({
                 shape="circle"
                 fullWidth={false}
                 aria-label={t('invitations.copyToClipboard', { defaultValue: 'Copy to clipboard' })}
+                data-testid="org-invite-copy-btn"
                 onClick={() => copy(registrationLink(invitationResult.invitationLinkId || ''))}>
                 <LucideIcon icon={Copy} size={16} />
               </Button>
             </div>
 
             <ButtonGroup>
-              <Button type="button" variant="primary" onClick={handleCloseResult}>
+              <Button
+                type="button"
+                variant="primary"
+                onClick={handleCloseResult}
+                data-testid="org-invite-close-btn">
                 {t('common.actions.close', { defaultValue: 'Close' })}
               </Button>
             </ButtonGroup>
@@ -314,7 +324,11 @@ export const ManageUserInviteByEmailForm: React.FC<Props> = ({
             </div>
 
             <ButtonGroup>
-              <Button type="button" variant="primary" onClick={handleCloseResult}>
+              <Button
+                type="button"
+                variant="primary"
+                onClick={handleCloseResult}
+                data-testid="org-invite-assigned-close-btn">
                 {t('common.actions.close', { defaultValue: 'Close' })}
               </Button>
             </ButtonGroup>

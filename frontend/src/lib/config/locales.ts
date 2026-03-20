@@ -37,6 +37,21 @@ export const LOCALE_COOKIE_NAME = 'NEXT_LOCALE'
 export const LOCALE_COOKIE_MAX_AGE = 31536000 // 1 year in seconds
 export const LOCALE_COOKIE_MAX_AGE_DAYS = 365 // 1 year in days (for js-cookie)
 
+// Native language labels for locale picker UI
+const LOCALE_LABELS: Record<string, string> = {
+  en: 'English',
+  de: 'Deutsch',
+  fr: 'Français',
+  es: 'Español',
+  it: 'Italiano',
+}
+
+// Language options for select dropdowns (derived from SUPPORTED_LOCALES)
+export const LANGUAGE_OPTIONS = SUPPORTED_LOCALES.map((locale) => ({
+  value: locale,
+  label: LOCALE_LABELS[locale] || locale,
+}))
+
 // Type for supported locales
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number]
 

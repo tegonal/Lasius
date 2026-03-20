@@ -199,17 +199,24 @@
       "cancel": "Cancel",
       "clear": "Clear",
       "close": "Close",
+      "closeActionsMenu": "Close actions menu",
+      "closeNotification": "Close notification",
       "delete": "Delete",
       "discardChanges": "Discard changes",
       "help": "Help",
       "invite": "Invite",
       "keepEditing": "Keep editing",
       "next": "Next",
+      "openActionsMenu": "Open actions menu",
       "reset": "Reset",
       "resetToInitial": "Reset to initial value",
       "save": "Save",
       "saveChanges": "Save changes",
       "signUp": "Sign up"
+    },
+    "aria": {
+      "decrement": "Decrement",
+      "increment": "Increment"
     },
     "back": "Back",
     "confirmUnsavedChanges": "You have unsaved changes. Are you sure you want to cancel?",
@@ -222,7 +229,8 @@
       "internalServerError": "Internal server error",
       "pageNotFound": "Page not found",
       "somethingWentWrong": "Something went wrong",
-      "unauthorized": "Unauthorized"
+      "unauthorized": "Unauthorized",
+      "unexpectedError": "An unexpected error occurred"
     },
     "filter": {
       "title": "Filter"
@@ -268,6 +276,8 @@
       "system": "System"
     },
     "time": {
+      "backToPresets": "Back to presets",
+      "customTime": "Custom time...",
       "day": "Day",
       "duration": "Duration",
       "ends": "Ends",

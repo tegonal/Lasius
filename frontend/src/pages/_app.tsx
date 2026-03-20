@@ -33,11 +33,11 @@ import { BookingProgressBarExplosion } from 'components/ui/feedback/BookingProgr
 import { Error } from 'components/ui/feedback/Error'
 import { Toasts } from 'components/ui/feedback/Toasts'
 import { HelpDrawer } from 'components/ui/overlays/HelpDrawer'
-import { LazyMotion } from 'framer-motion'
 import { swrLogger } from 'lib/api/swrRequestLogger'
 import { useThemeInitialization } from 'lib/hooks/useThemeInitialization'
 import { logger } from 'lib/logger'
 import { removeAccessibleCookies } from 'lib/utils/auth/removeAccessibleCookies'
+import { LazyMotion } from 'motion/react'
 import { SessionProvider } from 'next-auth/react'
 import { appWithTranslation } from 'next-i18next'
 // import PlausibleProvider from 'next-plausible' // Using custom implementation
@@ -123,12 +123,12 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
             <BundleVersionCheck />
             <Toasts />
             <HelpDrawer />
+            {session?.access_token && <HttpHeaderProvider />}
             {hasValidSession && (
               <>
                 <BookingProgressBarExplosion />
                 <TopLoadingBar />
                 <GlobalLoading />
-                <HttpHeaderProvider />
                 <TokenWatcher />
                 <BootstrapTasks />
                 <LasiusBackendWebsocketEventHandler />

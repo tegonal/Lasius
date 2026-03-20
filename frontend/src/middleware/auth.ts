@@ -111,7 +111,7 @@ async function handleAuthMiddleware(
  * updated token in the session-cookie after refreshing it.
  */
 async function handleTokenRefresh(request: NextRequestWithAuth): Promise<NextResponse> {
-  if (process.env.LASIUS_DEBUG) {
+  if (process.env.LASIUS_DEBUG === 'true') {
     logger.debug('[AuthMiddleware][Request]', request.url, request.nextauth.token)
   }
 
@@ -123,7 +123,7 @@ async function handleTokenRefresh(request: NextRequestWithAuth): Promise<NextRes
     request.nextauth.token?.expires_at &&
     Date.now() >= request.nextauth.token.expires_at * 1000
   ) {
-    if (process.env.LASIUS_DEBUG) {
+    if (process.env.LASIUS_DEBUG === 'true') {
       logger.debug('[AuthMiddleware][AccessTokenExpired]')
     }
 
@@ -146,7 +146,7 @@ async function handleTokenRefresh(request: NextRequestWithAuth): Promise<NextRes
       } else {
         // Log error response for debugging
         const errorText = await session.text()
-        if (process.env.LASIUS_DEBUG) {
+        if (process.env.LASIUS_DEBUG === 'true') {
           logger.error('[AuthMiddleware][SessionRefreshError]', {
             status: session.status,
             statusText: session.statusText,
@@ -159,7 +159,7 @@ async function handleTokenRefresh(request: NextRequestWithAuth): Promise<NextRes
         return NextResponse.redirect(signInUrl)
       }
     } catch (error) {
-      if (process.env.LASIUS_DEBUG) {
+      if (process.env.LASIUS_DEBUG === 'true') {
         logger.error('[AuthMiddleware][SessionRefreshJSONError]', error)
       }
       // If JSON parsing fails, redirect to login
@@ -168,7 +168,7 @@ async function handleTokenRefresh(request: NextRequestWithAuth): Promise<NextRes
       return NextResponse.redirect(signInUrl)
     }
 
-    if (process.env.LASIUS_DEBUG) {
+    if (process.env.LASIUS_DEBUG === 'true') {
       logger.debug('[AuthMiddleware][AccessTokenChanged]', data)
     }
 
@@ -177,12 +177,14 @@ async function handleTokenRefresh(request: NextRequestWithAuth): Promise<NextRes
     // Use cookie already for queued request
     if (setCookies.length > 0) {
       setCookies.forEach((cookie) => {
-        const [cookieName, cookieValue] = cookie.split('=')
-        const setCookieValues = cookieValue.split(';')
-        request.cookies.set(cookieName, setCookieValues[0])
+        const eqIndex = cookie.indexOf('=')
+        if (eqIndex === -1) return
+        const cookieName = cookie.substring(0, eqIndex)
+        const cookieValue = cookie.substring(eqIndex + 1).split(';')[0]
+        request.cookies.set(cookieName, cookieValue)
       })
       requestHeaders.set('Cookie', request.cookies.toString())
-      if (process.env.LASIUS_DEBUG) {
+      if (process.env.LASIUS_DEBUG === 'true') {
         logger.debug('[AuthMiddleware][UpgradedCookies]', request.cookies)
       }
     }
@@ -197,7 +199,7 @@ async function handleTokenRefresh(request: NextRequestWithAuth): Promise<NextRes
     setCookies.forEach((cookie) => {
       res.headers.append('Set-Cookie', cookie)
     })
-    if (process.env.LASIUS_DEBUG) {
+    if (process.env.LASIUS_DEBUG === 'true') {
       logger.debug('[AuthMiddleware][Response][SetCookies]', setCookies)
     }
   }

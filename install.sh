@@ -22,6 +22,14 @@ cd "$REPO_ROOT/frontend"
 corepack enable
 yarn install
 
+# Services (Docker configs + E2E tests)
+echo ""
+echo "--- Services (yarn + Playwright) ---"
+cd "$REPO_ROOT/services"
+corepack enable
+yarn install
+npx playwright install chromium
+
 echo ""
 echo "=== Installation complete ==="
 echo ""

@@ -28,6 +28,7 @@
       "edit": "Editar configuración",
       "update": "Actualizar",
       "viewInfo": "Ver información de configuración",
+      "viewIntegrations": "View Integrations",
       "viewMappings": "Ver correspondencias de proyecto"
     },
     "checkInterval": "Intervalo de verificación",
@@ -50,6 +51,12 @@
       "message": "Aún no hay configuraciones de seguimiento de incidencias"
     },
     "errors": {
+      "deleteFailed": {
+        "github": "issueImporters.errors.deleteFailed.github",
+        "gitlab": "issueImporters.errors.deleteFailed.gitlab",
+        "jira": "issueImporters.errors.deleteFailed.jira",
+        "plane": "issueImporters.errors.deleteFailed.plane"
+      },
       "invalidMappingData": "Datos de correspondencia inválidos",
       "mappingRemoveFailed": "Error al eliminar la correspondencia de proyecto",
       "mappingSaveFailed": "Error al guardar las correspondencias de proyecto",
@@ -153,6 +160,10 @@
     "projectMappings": {
       "title": "Asignaciones de proyectos {{platform}}"
     },
+    "status": {
+      "connectivityDegraded": "Issue importer connectivity degraded: {{configName}}",
+      "connectivityFailed": "Issue importer connectivity failed: {{configName}}"
+    },
     "success": {
       "configDeleted": "Configuración eliminada con éxito",
       "configSaved": "Configuración guardada con éxito",
@@ -194,6 +205,7 @@
         "description": "Introduce tus datos de conexión para conectarte a {{platform}}.",
         "title": "Configurar {{platform}}"
       },
+      "mappingNotImplemented": "Mapping step not yet implemented",
       "projects": {
         "addMapping": "Añadir correspondencia",
         "changeMapping": "Cambiar correspondencia",
@@ -211,9 +223,6 @@
         "mappingDescription_one": "Se encontró {{count}} proyecto en {{platform}}. Asócialo a tus proyectos Lasius para importar incidencias. {{mapped}} de {{total}} asociado.",
         "mappingDescription_many": "Found {{count}} projects from {{platform}}. Map them to your Lasius projects to import issues. {{mapped}} of {{total}} mapped.",
         "mappingDescription_other": "Se encontraron {{count}} proyectos en {{platform}}. Asócialos a tus proyectos Lasius para importar incidencias. {{mapped}} de {{total}} asociados.",
-        "mappingDescription_plural_one": "Se encontró {{count}} proyecto en {{platform}}. Asócialo a tus proyectos Lasius para importar incidencias. {{mapped}} de {{total}} asociado.",
-        "mappingDescription_plural_many": "Se encontraron {{count}} proyectos en {{platform}}. Asócialos a tus proyectos Lasius para importar incidencias. {{mapped}} de {{total}} asociados.",
-        "mappingDescription_plural_other": "Se encontraron {{count}} proyectos en {{platform}}. Asócialos a tus proyectos Lasius para importar incidencias. {{mapped}} de {{total}} asociados.",
         "noProjects": "No se encontraron proyectos en {{platform}}",
         "notMapped": "No asociado",
         "orphanedProject": "Proyecto no disponible",

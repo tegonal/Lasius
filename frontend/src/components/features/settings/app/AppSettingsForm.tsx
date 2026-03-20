@@ -28,7 +28,12 @@ import { FormElement } from 'components/ui/forms/FormElement'
 import { Select, SelectOption } from 'components/ui/forms/input/Select'
 import { ToggleSwitch } from 'components/ui/forms/input/ToggleSwitch'
 import Cookies from 'js-cookie'
-import { LOCALE_COOKIE_MAX_AGE_DAYS, LOCALE_COOKIE_NAME } from 'lib/config/locales'
+import {
+  DEFAULT_LOCALE,
+  LANGUAGE_OPTIONS,
+  LOCALE_COOKIE_MAX_AGE_DAYS,
+  LOCALE_COOKIE_NAME,
+} from 'lib/config/locales'
 import { useColorMode } from 'lib/hooks/useColorMode'
 import { usePlausible } from 'lib/telemetry/usePlausible'
 import { useTranslation } from 'next-i18next'
@@ -46,13 +51,7 @@ import { z } from 'zod'
 import type { TFunction } from 'i18next'
 import type { LasiusPlausibleEvents } from 'lib/telemetry/plausibleEvents'
 
-const LANGUAGES: SelectOption[] = [
-  { value: 'en', label: 'English' },
-  { value: 'de', label: 'Deutsch' },
-  { value: 'fr', label: 'Français' },
-  { value: 'es', label: 'Español' },
-  { value: 'it', label: 'Italiano' },
-]
+const LANGUAGES = LANGUAGE_OPTIONS
 
 const themeModeToDataTheme: Record<string, string> = {
   light: 'light',
@@ -88,7 +87,7 @@ export const AppSettingsForm: React.FC = () => {
   const hookForm = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      language: 'en',
+      language: DEFAULT_LOCALE,
       theme: 'system' as ThemeMode,
       showOnboarding: !onboardingDismissed,
     },
@@ -101,7 +100,7 @@ export const AppSettingsForm: React.FC = () => {
   ]
 
   useEffect(() => {
-    const currentLocale = Cookies.get(LOCALE_COOKIE_NAME) || i18n.language || 'en'
+    const currentLocale = Cookies.get(LOCALE_COOKIE_NAME) || i18n.language || DEFAULT_LOCALE
     hookForm.setValue('language', currentLocale)
     hookForm.setValue('theme', theme)
     hookForm.setValue('showOnboarding', !onboardingDismissed)
@@ -131,7 +130,7 @@ export const AppSettingsForm: React.FC = () => {
   }
 
   const onSubmit = (data: FormData) => {
-    const currentLocale = Cookies.get(LOCALE_COOKIE_NAME) || i18n.language || 'en'
+    const currentLocale = Cookies.get(LOCALE_COOKIE_NAME) || i18n.language || DEFAULT_LOCALE
     const languageChanged = data.language !== currentLocale
 
     // Track language change

@@ -44,7 +44,7 @@ function getPreferredLocale(request: NextRequest): string {
     const negotiator = new Negotiator({ headers: negotiatorHeaders })
     const browserLocales = negotiator.languages()
 
-    if (process.env.LASIUS_DEBUG) {
+    if (process.env.LASIUS_DEBUG === 'true') {
       logger.debug('[LocaleMiddleware][BrowserLocales]', browserLocales)
     }
 
@@ -54,7 +54,7 @@ function getPreferredLocale(request: NextRequest): string {
     // Extract two-letter code if needed (e.g., 'en-US' -> 'en')
     return matchedLocale.substring(0, 2).toLowerCase()
   } catch (error) {
-    if (process.env.LASIUS_DEBUG) {
+    if (process.env.LASIUS_DEBUG === 'true') {
       logger.debug('[LocaleMiddleware][DetectionError]', error)
     }
     return DEFAULT_LOCALE
@@ -81,7 +81,7 @@ export async function localeMiddleware(request: NextRequest): Promise<NextRespon
     shouldSetCookie = true
     logger.info('[LocaleMiddleware] Detected locale from browser:', locale)
 
-    if (process.env.LASIUS_DEBUG) {
+    if (process.env.LASIUS_DEBUG === 'true') {
       logger.debug('[LocaleMiddleware][DetectedLocale]', {
         detectedLocale: locale,
         pathname: request.nextUrl.pathname,
@@ -89,7 +89,7 @@ export async function localeMiddleware(request: NextRequest): Promise<NextRespon
       })
     }
   } else {
-    if (process.env.LASIUS_DEBUG) {
+    if (process.env.LASIUS_DEBUG === 'true') {
       logger.debug('[LocaleMiddleware][ExistingCookie]', {
         locale,
         pathname: request.nextUrl.pathname,
@@ -118,7 +118,7 @@ export async function localeMiddleware(request: NextRequest): Promise<NextRespon
       secure: process.env.NODE_ENV === 'production',
     })
 
-    if (process.env.LASIUS_DEBUG) {
+    if (process.env.LASIUS_DEBUG === 'true') {
       logger.debug('[LocaleMiddleware][SetCookie]', {
         locale,
         cookieName: LOCALE_COOKIE_NAME,

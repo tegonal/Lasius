@@ -36,6 +36,7 @@ import { registerOAuthUser } from 'lib/api/lasius/oauth2-provider/oauth2-provide
 import { getServerSidePropsWithoutAuth } from 'lib/auth/getServerSidePropsWithoutAuth'
 import { LasiusPlausibleEvents } from 'lib/telemetry/plausibleEvents'
 import { usePlausible } from 'lib/telemetry/usePlausible'
+import { isEmailAddress } from 'lib/utils/data/validators'
 import { Eye, EyeOff } from 'lucide-react'
 import { GetServerSideProps, NextPage } from 'next'
 import { useTranslation } from 'next-i18next'
@@ -173,7 +174,11 @@ export const OAuthUserRegister: NextPage<{ locale?: string }> = ({ locale }) => 
                   required>
                   <Input
                     id="email"
-                    {...register('email', { required: true })}
+                    data-testid="auth-register-email-input"
+                    {...register('email', {
+                      required: true,
+                      validate: { isEmailAddress: (v) => isEmailAddress(v.toString()) },
+                    })}
                     aria-describedby="email-error"
                     autoComplete="email"
                     autoFocus
@@ -186,6 +191,7 @@ export const OAuthUserRegister: NextPage<{ locale?: string }> = ({ locale }) => 
                   required>
                   <Input
                     id="firstName"
+                    data-testid="auth-register-firstname-input"
                     {...register('firstName', { required: true })}
                     aria-describedby="firstName-error"
                     autoComplete="given-name"
@@ -198,6 +204,7 @@ export const OAuthUserRegister: NextPage<{ locale?: string }> = ({ locale }) => 
                   required>
                   <Input
                     id="lastName"
+                    data-testid="auth-register-lastname-input"
                     {...register('lastName', { required: true })}
                     aria-describedby="lastName-error"
                     autoComplete="family-name"
@@ -210,6 +217,7 @@ export const OAuthUserRegister: NextPage<{ locale?: string }> = ({ locale }) => 
                   required>
                   <Input
                     id="password"
+                    data-testid="auth-register-password-input"
                     {...register('password', {
                       required: true,
                       validate: {
@@ -230,6 +238,7 @@ export const OAuthUserRegister: NextPage<{ locale?: string }> = ({ locale }) => 
                   required>
                   <Input
                     id="confirmPassword"
+                    data-testid="auth-register-confirmpassword-input"
                     {...register('confirmPassword', {
                       required: true,
                       validate: {
@@ -257,7 +266,7 @@ export const OAuthUserRegister: NextPage<{ locale?: string }> = ({ locale }) => 
                       : t('ui.showPasswords', { defaultValue: 'Show passwords' })}
                   </span>
                 </Button>
-                <Button type="submit" fullWidth>
+                <Button type="submit" fullWidth data-testid="auth-register-submit-btn">
                   {t('common.actions.signUp', { defaultValue: 'Sign up' })}
                 </Button>
               </ButtonGroup>

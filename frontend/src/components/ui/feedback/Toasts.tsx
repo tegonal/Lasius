@@ -19,9 +19,10 @@
 
 import { useToast } from 'components/ui/feedback/hooks/useToast'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
-import { AnimatePresence, m } from 'framer-motion'
 import { cn } from 'lib/utils/cn'
 import { AlertCircle, AlertTriangle, CheckCircle, Info, X } from 'lucide-react'
+import { AnimatePresence, m } from 'motion/react'
+import { useTranslation } from 'next-i18next'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { ToastViewType } from 'types/dynamicViews'
@@ -29,6 +30,7 @@ import { useIsClient } from 'usehooks-ts'
 
 const ToastItem: React.FC<{ item: ToastViewType }> = ({ item }) => {
   const { removeToast } = useToast()
+  const { t } = useTranslation('common')
   const [progress, setProgress] = useState(100)
 
   useEffect(() => {
@@ -115,7 +117,9 @@ const ToastItem: React.FC<{ item: ToastViewType }> = ({ item }) => {
               'focus:ring-base-content/20 focus:ring-2 focus:ring-offset-2 focus:outline-none',
             )}
             onClick={() => removeToast(item)}
-            aria-label="Close notification">
+            aria-label={t('common.actions.closeNotification', {
+              defaultValue: 'Close notification',
+            })}>
             <LucideIcon icon={X} size={16} className="text-base-content/60" />
           </button>
         </div>

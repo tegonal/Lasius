@@ -63,7 +63,10 @@ export const InvitationOtherSession: React.FC<Props> = ({ invitation }) => {
 
   return (
     <LoginLayout>
-      <Card shadow="xl" className="border-base-300 bg-base-100 w-full max-w-md border">
+      <Card
+        shadow="xl"
+        className="border-base-300 bg-base-100 w-full max-w-md border"
+        data-testid="invite-other-session">
         <CardBody className="gap-6 p-8">
           <div className="flex justify-center">
             <Logo />

@@ -23,15 +23,16 @@ import { InvitationOtherSession } from 'components/features/invitation/Invitatio
 import { InvitationUserConfirm } from 'components/features/invitation/invitationUserConfirm'
 import { getInvitationStatus } from 'lib/api/lasius/invitations-public/invitations-public'
 import { getServerSidePropsWithoutAuth } from 'lib/auth/getServerSidePropsWithoutAuth'
+import { DEFAULT_LOCALE } from 'lib/config/locales'
 import { logger } from 'lib/logger'
 import { GetServerSideProps, NextPage } from 'next'
-import { getServerSession, Session } from 'next-auth'
+import { getSession, useSession } from 'next-auth/react'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
-import { nextAuthOptions } from 'pages/api/auth/[...nextauth]'
 import { useAsync } from 'react-async-hook'
 
-const Join: NextPage<{ session: Session; locale?: string }> = ({ session, locale }) => {
+const Join: NextPage<{ locale?: string }> = ({ locale }) => {
+  const { data: session, status: sessionStatus } = useSession()
   const router = useRouter()
   const { invitationId = '' } = router.query as { invitationId: string }
 
@@ -40,7 +41,7 @@ const Join: NextPage<{ session: Session; locale?: string }> = ({ session, locale
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://lasius.io'
   const ogImageUrl = `${baseUrl}/api/og?title=${encodeURIComponent('You have been invited!')}&subtitle=${encodeURIComponent('Join your team or project on Lasius')}`
 
-  if (invitationStatus.loading) return null
+  if (invitationStatus.loading || sessionStatus === 'loading') return null
 
   if (invitationStatus.status === 'error') {
     return <InvitationInvalid />
@@ -78,7 +79,7 @@ const Join: NextPage<{ session: Session; locale?: string }> = ({ session, locale
               ],
               siteName: 'Lasius',
               type: 'website',
-              locale: locale || 'en',
+              locale: locale || DEFAULT_LOCALE,
             }}
             twitter={{
               handle: '@tegonal',
@@ -113,7 +114,7 @@ const Join: NextPage<{ session: Session; locale?: string }> = ({ session, locale
             ],
             siteName: 'Lasius',
             type: 'website',
-            locale: locale || 'en',
+            locale: locale || DEFAULT_LOCALE,
           }}
           twitter={{
             handle: '@tegonal',
@@ -131,9 +132,11 @@ const Join: NextPage<{ session: Session; locale?: string }> = ({ session, locale
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   return getServerSidePropsWithoutAuth(context, async (context) => {
-    const session = await getServerSession(context.req, context.res, nextAuthOptions())
+    const session = await getSession({ req: context.req })
     return {
-      session,
+      // session is passed to _app.tsx's SessionProvider via pageProps destructuring,
+      // making it available to useSession() in the component
+      session: session ? JSON.parse(JSON.stringify(session)) : null,
     }
   })
 }

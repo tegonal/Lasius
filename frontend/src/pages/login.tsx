@@ -31,6 +31,7 @@ import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { HelpButton } from 'components/ui/navigation/HelpButton'
 import { getConfiguration } from 'lib/api/lasius/general/general'
 import { getServerSidePropsWithoutAuth } from 'lib/auth/getServerSidePropsWithoutAuth'
+import { DEFAULT_LOCALE } from 'lib/config/locales'
 import { logger } from 'lib/logger'
 import { LasiusPlausibleEvents } from 'lib/telemetry/plausibleEvents'
 import { usePlausible } from 'lib/telemetry/usePlausible'
@@ -152,7 +153,20 @@ const Login: NextPage<{
 
         setSelectedDate(formatISOLocale(new Date()))
 
-        // Validate the redirect URL - if it's not a known route, redirect to home instead
+        // OAuth providers (e.g. Keycloak) return an external authorization URL.
+        // Redirect directly — router.push only handles internal app routes.
+        try {
+          const responseUrl = new URL(res.url, window.location.origin)
+          if (responseUrl.origin !== window.location.origin) {
+            logger.info('[Login] OAuth redirect to:', res.url)
+            window.location.href = res.url
+            return
+          }
+        } catch {
+          // Invalid URL — fall through to standard route validation
+        }
+
+        // Internal URL — validate and redirect as before
         const redirectUrl = getValidRouteOrFallback(res.url, ROUTES.USER.INDEX)
 
         logger.info('[Login] Attempting redirect to:', res.url)
@@ -245,7 +259,7 @@ const Login: NextPage<{
           ],
           siteName: 'Lasius',
           type: 'website',
-          locale: locale || defaultLocale || 'en',
+          locale: locale || defaultLocale || DEFAULT_LOCALE,
         }}
         twitter={{
           handle: '@tegonal',
@@ -255,7 +269,11 @@ const Login: NextPage<{
       />
       <AuthLayout infoPanel={<LoginInfoPanel />}>
         {/* Error Alert */}
-        {error && <Alert variant="warning">{getErrorMessage(error)}</Alert>}
+        {error && (
+          <Alert variant="warning" data-testid="auth-login-error">
+            {getErrorMessage(error)}
+          </Alert>
+        )}
 
         {/* New account required for invitation */}
         {needs_account && email && (
@@ -347,6 +365,7 @@ const Login: NextPage<{
                   return (
                     <Button
                       key={provider.id}
+                      data-testid={`auth-provider-${provider.id}`}
                       disabled={isSubmitting}
                       onClick={() => signInToProvider(provider.id)}
                       variant="outline"

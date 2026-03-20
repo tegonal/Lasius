@@ -41,6 +41,7 @@ export const SelectUserOrganisation: React.FC = () => {
   return (
     <>
       <Button
+        data-testid="org-selector-btn"
         variant="ghost"
         onClick={() => setIsOpen(true)}
         className="hidden md:flex"

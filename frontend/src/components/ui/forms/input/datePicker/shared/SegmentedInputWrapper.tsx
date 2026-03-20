@@ -20,6 +20,7 @@
 import { Button } from 'components/primitives/buttons/Button'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { ChevronDown, ChevronUp } from 'lucide-react'
+import { useTranslation } from 'next-i18next'
 import React, { useRef, useState } from 'react'
 
 interface SegmentedInputWrapperProps {
@@ -35,6 +36,7 @@ export const SegmentedInputWrapper: React.FC<SegmentedInputWrapperProps> = ({
   hasSelection,
   label,
 }) => {
+  const { t } = useTranslation('common')
   const [isHovered, setIsHovered] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -61,7 +63,7 @@ export const SegmentedInputWrapper: React.FC<SegmentedInputWrapperProps> = ({
             onArrowClick('up')
           }}
           tabIndex={-1}
-          aria-label="Increment">
+          aria-label={t('common.aria.increment', { defaultValue: 'Increment' })}>
           <LucideIcon icon={ChevronUp} size={24} />
         </Button>
       </div>
@@ -83,7 +85,7 @@ export const SegmentedInputWrapper: React.FC<SegmentedInputWrapperProps> = ({
             onArrowClick('down')
           }}
           tabIndex={-1}
-          aria-label="Decrement">
+          aria-label={t('common.aria.decrement', { defaultValue: 'Decrement' })}>
           <LucideIcon icon={ChevronDown} size={24} />
         </Button>
         {label && (

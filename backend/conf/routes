@@ -73,6 +73,7 @@ GET /csrf-token             controllers.ApplicationController.getCsrfToken
 #          schema:
 #            $ref: '#/components/schemas/models.OAuthUserId'
 ###
++nocsrf
 POST /oauth2/user/register      controllers.OAuth2Controller.registerUser()
 
 ###

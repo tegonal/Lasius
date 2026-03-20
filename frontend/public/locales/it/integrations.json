@@ -28,6 +28,7 @@
       "edit": "Modifica configurazione",
       "update": "Aggiorna",
       "viewInfo": "Visualizza informazioni configurazione",
+      "viewIntegrations": "View Integrations",
       "viewMappings": "Visualizza mappature progetto"
     },
     "checkInterval": "Intervallo di verifica",
@@ -50,6 +51,12 @@
       "message": "Nessuna configurazione di tracciamento issue ancora presente"
     },
     "errors": {
+      "deleteFailed": {
+        "github": "issueImporters.errors.deleteFailed.github",
+        "gitlab": "issueImporters.errors.deleteFailed.gitlab",
+        "jira": "issueImporters.errors.deleteFailed.jira",
+        "plane": "issueImporters.errors.deleteFailed.plane"
+      },
       "invalidMappingData": "Dati di mappatura non validi",
       "mappingRemoveFailed": "Impossibile rimuovere la mappatura del progetto",
       "mappingSaveFailed": "Impossibile salvare le mappature del progetto",
@@ -153,6 +160,10 @@
     "projectMappings": {
       "title": "Mappature progetti {{platform}}"
     },
+    "status": {
+      "connectivityDegraded": "Issue importer connectivity degraded: {{configName}}",
+      "connectivityFailed": "Issue importer connectivity failed: {{configName}}"
+    },
     "success": {
       "configDeleted": "Configurazione eliminata con successo",
       "configSaved": "Configurazione salvata con successo",
@@ -194,6 +205,7 @@
         "description": "Inserisci i tuoi dati di connessione per connetterti a {{platform}}.",
         "title": "Configura {{platform}}"
       },
+      "mappingNotImplemented": "Mapping step not yet implemented",
       "projects": {
         "addMapping": "Aggiungi mappatura",
         "changeMapping": "Modifica mappatura",
@@ -211,9 +223,6 @@
         "mappingDescription_one": "Trovato {{count}} progetto da {{platform}}. Associalo ai tuoi progetti Lasius per importare le issue. {{mapped}} di {{total}} associato.",
         "mappingDescription_many": "Found {{count}} projects from {{platform}}. Map them to your Lasius projects to import issues. {{mapped}} of {{total}} mapped.",
         "mappingDescription_other": "Trovati {{count}} progetti da {{platform}}. Associali ai tuoi progetti Lasius per importare le issue. {{mapped}} di {{total}} associati.",
-        "mappingDescription_plural_one": "Trovato {{count}} progetto da {{platform}}. Associalo ai tuoi progetti Lasius per importare le issue. {{mapped}} di {{total}} associato.",
-        "mappingDescription_plural_many": "Trovati {{count}} progetti da {{platform}}. Associali ai tuoi progetti Lasius per importare le issue. {{mapped}} di {{total}} associati.",
-        "mappingDescription_plural_other": "Trovati {{count}} progetti da {{platform}}. Associali ai tuoi progetti Lasius per importare le issue. {{mapped}} di {{total}} associati.",
         "noProjects": "Nessun progetto trovato in {{platform}}",
         "notMapped": "Non associato",
         "orphanedProject": "Progetto non disponibile",

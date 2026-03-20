@@ -16,6 +16,7 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "incremental": true,
+    "tsBuildInfoFile": ".tsbuildinfo",
     "typeRoots": [
       "./node_modules/@types",
       "./@types"

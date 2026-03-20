@@ -30,11 +30,11 @@ import { BookingAddUpdateForm } from 'components/features/user/index/bookingAddU
 import { Button } from 'components/primitives/buttons/Button'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { Modal } from 'components/ui/overlays/modal/Modal'
-import { AnimatePresence } from 'framer-motion'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { ModelsBooking } from 'lib/api/lasius'
 import { deleteUserBooking } from 'lib/api/lasius/user-bookings/user-bookings'
 import { Pencil, Star, Trash2 } from 'lucide-react'
+import { AnimatePresence } from 'motion/react'
 import { useTranslation } from 'next-i18next'
 import React, { useState } from 'react'
 

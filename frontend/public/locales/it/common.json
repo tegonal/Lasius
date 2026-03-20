@@ -199,17 +199,24 @@
       "cancel": "Annulla",
       "clear": "Cancella",
       "close": "Chiudi",
+      "closeActionsMenu": "Close actions menu",
+      "closeNotification": "Close notification",
       "delete": "Elimina",
       "discardChanges": "Scarta modifiche",
       "help": "Aiuto",
       "invite": "Invita",
       "keepEditing": "Continua a modificare",
       "next": "Avanti",
+      "openActionsMenu": "Open actions menu",
       "reset": "Ripristina",
       "resetToInitial": "Ripristina al valore iniziale",
       "save": "Salva",
       "saveChanges": "Salva modifiche",
       "signUp": "Registrati"
+    },
+    "aria": {
+      "decrement": "Decrement",
+      "increment": "Increment"
     },
     "back": "Indietro",
     "confirmUnsavedChanges": "Hai modifiche non salvate. Sei sicuro di volerle annullare?",
@@ -222,7 +229,8 @@
       "internalServerError": "Errore interno del server",
       "pageNotFound": "Pagina non trovata",
       "somethingWentWrong": "Qualcosa è andato storto",
-      "unauthorized": "Non autorizzato"
+      "unauthorized": "Non autorizzato",
+      "unexpectedError": "An unexpected error occurred"
     },
     "filter": {
       "title": "Filtro"
@@ -268,6 +276,8 @@
       "system": "Sistema"
     },
     "time": {
+      "backToPresets": "Back to presets",
+      "customTime": "Custom time...",
       "day": "Giorno",
       "duration": "Durata",
       "ends": "Fine",

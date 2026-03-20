@@ -18,8 +18,8 @@
  */
 
 import { cva, type VariantProps } from 'class-variance-authority'
-import { m } from 'framer-motion'
 import { cn } from 'lib/utils/cn'
+import { m } from 'motion/react'
 import React from 'react'
 
 const contextAnimatePresenceVariants = cva('absolute', {

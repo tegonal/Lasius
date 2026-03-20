@@ -18,8 +18,8 @@
  */
 
 import { ToolTip } from 'components/ui/feedback/Tooltip'
-import { m } from 'framer-motion'
 import { logger } from 'lib/logger'
+import { m } from 'motion/react'
 import React, { memo, useEffect, useRef, useState } from 'react'
 import { useGlobalLoading, useUIStore } from 'stores/uiStore'
 

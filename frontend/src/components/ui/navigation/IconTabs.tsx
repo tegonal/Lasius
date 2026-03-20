@@ -22,9 +22,9 @@ import { ScrollContainer } from 'components/primitives/layout/ScrollContainer'
 import { SelectedTabIcon } from 'components/ui/animations/motion/selectedTabIcon'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { useTabSync } from 'components/ui/navigation/hooks/useTabSync'
-import { AnimatePresence, m } from 'framer-motion'
 import { cn } from 'lib/utils/cn'
 import { LucideIcon as LucideIconType } from 'lucide-react'
+import { AnimatePresence, m } from 'motion/react'
 import React from 'react'
 
 const PresenceItem = m.div

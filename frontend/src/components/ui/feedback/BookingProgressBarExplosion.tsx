@@ -17,8 +17,8 @@
  *
  */
 
-import { AnimatePresence, m } from 'framer-motion'
 import { logger } from 'lib/logger'
+import { AnimatePresence, m } from 'motion/react'
 import React, { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useExplosionEvent, useUIStore } from 'stores/uiStore'

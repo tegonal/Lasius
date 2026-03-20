@@ -116,7 +116,11 @@ export const LasiusTOSCheck: React.FC = () => {
         />
 
         <ButtonGroup>
-          <Button type="button" variant="primary" onClick={handleConfirm}>
+          <Button
+            type="button"
+            variant="primary"
+            onClick={handleConfirm}
+            data-testid="tos-accept-btn">
             {t('tos.actions.accept', { defaultValue: 'Accept Terms of Service' })}
           </Button>
           <Button type="button" variant="secondary" onClick={handleCancel}>

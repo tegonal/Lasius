@@ -1,12 +1,10 @@
 .next
-.yarn
 .swc
-node_modules
 package-lock.json
 dump
-.history
-.env.local
-**/*_old.json
+# i18next-cli generated types
+src/types/i18next.d.ts
+src/types/resources.d.ts
 
 # PWA files
 **/public/sw.js

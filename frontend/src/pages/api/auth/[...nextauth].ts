@@ -130,7 +130,7 @@ async function fetchRefreshAccessToken(refresh_token: string, token: JWT): Promi
       throw tokensOrError
     }
 
-    if (process.env.LASIUS_DEBUG) {
+    if (process.env.LASIUS_DEBUG === 'true') {
       logger.info(
         '[NextAuth][refreshAccessToken][RenewedToken] refresh_token=%s, access_token=%s',
         tokensOrError?.refresh_token,
@@ -158,7 +158,7 @@ async function fetchRefreshAccessToken(refresh_token: string, token: JWT): Promi
 
     return newTokenResult
   } catch (error) {
-    if (process.env.LASIUS_DEBUG) {
+    if (process.env.LASIUS_DEBUG === 'true') {
       logger.warn('[NextAuth][RefreshAccessTokenError]', error)
     }
 
@@ -180,7 +180,7 @@ function refreshAccessToken(token: JWT): undefined | Promise<JWT> {
   // Check if refresh is already in progress and return the same promise
   const inProgressRefresh = REFRESH_TOKEN_PROGRESS.get(token.refresh_token)
   if (inProgressRefresh) {
-    if (process.env.LASIUS_DEBUG) {
+    if (process.env.LASIUS_DEBUG === 'true') {
       logger.debug(
         '[NextAuth][refreshAccessToken][WaitingForRefresh] refresh_token=%s',
         token.refresh_token,
@@ -192,7 +192,7 @@ function refreshAccessToken(token: JWT): undefined | Promise<JWT> {
   const cachedResult = REFRESH_TOKEN_CACHE.get(token.refresh_token)
   const now = Date.now()
   if (cachedResult) {
-    if (process.env.LASIUS_DEBUG) {
+    if (process.env.LASIUS_DEBUG === 'true') {
       logger.debug(
         '[NextAuth][refreshAccessToken][CachedRefresh] refresh_token=%s, access_token=%s, time_remaining=%s',
         token.refresh_token,
@@ -201,7 +201,7 @@ function refreshAccessToken(token: JWT): undefined | Promise<JWT> {
       )
     }
     if (cachedResult.expiry < now) {
-      if (process.env.LASIUS_DEBUG) {
+      if (process.env.LASIUS_DEBUG === 'true') {
         logger.debug(
           '[NextAuth][refreshAccessToken][RemoveExpiredRefreshToken] refresh_token=%s, time_remaining=%s',
           token.refresh_token,
@@ -217,7 +217,7 @@ function refreshAccessToken(token: JWT): undefined | Promise<JWT> {
   const expiredCachedRefreshTokens = Array.from(REFRESH_TOKEN_CACHE.entries())
     .filter(([_, item]) => item.expiry < now)
     .map(([key, _]) => key)
-  if (process.env.LASIUS_DEBUG) {
+  if (process.env.LASIUS_DEBUG === 'true') {
     logger.debug(
       '[NextAuth][CleanCachedRefreshTokens] number_of_expired_tokens=%s',
       expiredCachedRefreshTokens.length,
@@ -225,7 +225,7 @@ function refreshAccessToken(token: JWT): undefined | Promise<JWT> {
   }
   expiredCachedRefreshTokens.forEach((token) => REFRESH_TOKEN_CACHE.delete(token))
 
-  if (process.env.LASIUS_DEBUG) {
+  if (process.env.LASIUS_DEBUG === 'true') {
     logger.debug('[NextAuth][refreshAccessToken] refresh_token=%s', token?.refresh_token)
   }
 
@@ -329,14 +329,14 @@ export const nextAuthOptions: () => NextAuthOptions = () => {
           session.expires_at = token.expires_at
         }
         session.user = session.user || user
-        if (process.env.LASIUS_DEBUG) {
+        if (process.env.LASIUS_DEBUG === 'true') {
           logger.debug('[NextAuth][Session]', session)
         }
 
         return session
       },
       async jwt({ token, account, user, profile, trigger }) {
-        if (process.env.LASIUS_DEBUG) {
+        if (process.env.LASIUS_DEBUG === 'true') {
           logger.debug(
             '[NextAuth][JWT] refresh_token=%s, token_expires_at=%s, trigger=%s',
             token.refresh_token,
@@ -368,7 +368,7 @@ export const nextAuthOptions: () => NextAuthOptions = () => {
           // Subsequent logins, but the `access_token` has expired, try to refresh it
           if (!token.refresh_token) throw new TypeError('Missing refresh_token')
           if (token.error === 'RefreshAccessTokenError') {
-            if (process.env.LASIUS_DEBUG) {
+            if (process.env.LASIUS_DEBUG === 'true') {
               logger.info('Token refresh already failed, not trying again.')
             }
             return token
@@ -386,12 +386,12 @@ export const nextAuthOptions: () => NextAuthOptions = () => {
     },
     events: {
       async signOut({ token }: { token: JWT }) {
-        if (process.env.LASIUS_DEBUG) {
+        if (process.env.LASIUS_DEBUG === 'true') {
           logger.info('[nextauth][events][signOut]', token.provider)
         }
         // auto logout from keycloak instance
         if (token.provider === AUTH_PROVIDER_CUSTOMER_KEYCLOAK) {
-          if (process.env.LASIUS_DEBUG) {
+          if (process.env.LASIUS_DEBUG === 'true') {
             logger.info(
               'auto-logout from keycloak at',
               process.env.KEYCLOAK_OAUTH_URL + '/protocol/openid-connect/logout',
@@ -413,7 +413,7 @@ export const nextAuthOptions: () => NextAuthOptions = () => {
         }
         // auto logout from gitlab instance
         else if (token.provider === 'gitlab') {
-          if (process.env.LASIUS_DEBUG) {
+          if (process.env.LASIUS_DEBUG === 'true') {
             logger.info('auto-logout from gitlab at', gitlabUrl + '/oauth/revoke')
           }
 
@@ -430,14 +430,14 @@ export const nextAuthOptions: () => NextAuthOptions = () => {
               }),
             })
           } catch (error) {
-            if (process.env.LASIUS_DEBUG) {
+            if (process.env.LASIUS_DEBUG === 'true') {
               logger.warn('[nextauth][events][signOut][gitlab] Token revocation failed', error)
             }
           }
         }
         // auto logout from github instance
         else if (token.provider === 'github') {
-          if (process.env.LASIUS_DEBUG) {
+          if (process.env.LASIUS_DEBUG === 'true') {
             logger.info('auto-logout from github')
           }
 
@@ -463,7 +463,7 @@ export const nextAuthOptions: () => NextAuthOptions = () => {
               },
             )
           } catch (error) {
-            if (process.env.LASIUS_DEBUG) {
+            if (process.env.LASIUS_DEBUG === 'true') {
               logger.warn('[nextauth][events][signOut][github] Token revocation failed', error)
             }
           }
@@ -473,10 +473,11 @@ export const nextAuthOptions: () => NextAuthOptions = () => {
           await logout(getRequestHeaders(token.access_token, token.access_token_issuer))
         }
       },
-      async signIn() {
-        if (process.env.LASIUS_DEBUG) {
-          logger.info('[nextauth][events][signIn]')
-        }
+      async signIn({ user, account }) {
+        logger.info('[nextauth][events][signIn]', {
+          provider: account?.provider,
+          userId: user?.id,
+        })
       },
     },
     redirect: async ({ url, baseUrl }: { url: string; baseUrl: string }) => {
