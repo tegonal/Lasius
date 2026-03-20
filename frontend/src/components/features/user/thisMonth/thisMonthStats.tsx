@@ -17,15 +17,25 @@
  *
  */
 
+import { StatsOverviewGrid } from 'components/features/user/thisMonth/StatsOverviewGrid'
+import { TopProjectsCard } from 'components/features/user/thisMonth/TopProjectsCard'
 import { Heading } from 'components/primitives/typography/Heading'
 import { FormatDate } from 'components/ui/data-display/FormatDate'
-import { StatsGroup } from 'components/ui/data-display/StatsGroup'
-import { StatsTileHours } from 'components/ui/data-display/StatsTileHours'
-import { StatsTileNumber } from 'components/ui/data-display/StatsTileNumber'
-import { StatsTilePercentage } from 'components/ui/data-display/StatsTilePercentage'
+import { ToggleSwitch } from 'components/ui/forms/input/ToggleSwitch'
 import { Tabs } from 'components/ui/navigation/Tabs'
-import { endOfMonth, endOfWeek, getWeek, startOfMonth, startOfWeek, subMonths } from 'date-fns'
+import {
+  differenceInWeeks,
+  endOfMonth,
+  endOfWeek,
+  endOfYear,
+  getWeek,
+  startOfMonth,
+  startOfWeek,
+  startOfYear,
+  subMonths,
+} from 'date-fns'
 import { apiDatespanFromTo } from 'lib/api/apiDateHandling'
+import { aggregateProjectHours } from 'lib/api/functions/aggregateProjectHours'
 import { getExpectedVsBookedPercentage } from 'lib/api/functions/getExpectedVsBookedPercentage'
 import { getModelsBookingSummary } from 'lib/api/functions/getModelsBookingSummary'
 import { useGetBookingSummaryDay } from 'lib/api/hooks/useGetBookingSummaryDay'
@@ -39,7 +49,7 @@ import { useWorkHealthMetrics } from 'lib/api/hooks/useWorkHealthMetrics'
 import { formatISOLocale } from 'lib/utils/date/dates'
 import { useTranslation } from 'next-i18next'
 import dynamic from 'next/dynamic'
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useSelectedDate } from 'stores/calendarStore'
 
 const MonthStreamChart = dynamic(() => import('components/ui/charts/monthStreamChart'), {
@@ -110,6 +120,44 @@ export const ThisMonthStats: React.FC = () => {
     to: weekDatespan?.to || '',
   })
 
+  // Year tab state and computed params
+  const [isCalendarYear, setIsCalendarYear] = useState(false)
+
+  const yearParams = useMemo(() => {
+    const dateObj = new Date(selectedDate)
+    const today = new Date()
+    if (isCalendarYear) {
+      const start = startOfYear(dateObj)
+      const end = endOfYear(dateObj) > today ? today : endOfYear(dateObj)
+      const weeks = differenceInWeeks(end, start) + 1
+      return {
+        weeksToAnalyze: weeks,
+        referenceDate: formatISOLocale(end),
+        start: formatISOLocale(start),
+        end: formatISOLocale(end),
+      }
+    }
+    return {
+      weeksToAnalyze: 52,
+      referenceDate: selectedDate,
+      start: formatISOLocale(subMonths(dateObj, 12)),
+      end: formatISOLocale(dateObj),
+    }
+  }, [isCalendarYear, selectedDate])
+
+  const { weeklyData: yearData, bookings: yearBookings } = useWorkHealthMetrics(
+    week.plannedWorkingHours,
+    yearParams.weeksToAnalyze,
+    yearParams.referenceDate,
+  )
+
+  const yearDatespan = apiDatespanFromTo(yearParams.start, yearParams.end)
+  const { data: projectStatsYear } = useGetUserStatsBySourceAndDay(selectedOrganisationId, {
+    source: 'project',
+    from: yearDatespan?.from || '',
+    to: yearDatespan?.to || '',
+  })
+
   // Get project stats for the last 6 months
   const sixMonthsStart = formatISOLocale(subMonths(new Date(selectedDate), 6))
   const sixMonthsEnd = formatISOLocale(new Date(selectedDate))
@@ -120,123 +168,19 @@ export const ThisMonthStats: React.FC = () => {
     to: sixMonthsDatespan?.to || '',
   })
 
-  // Calculate all projects for the day
-  const dayProjects = useMemo(() => {
-    if (!projectStatsDay?.data) return []
-
-    const projectHours: Record<string, number> = {}
-    projectStatsDay.data.forEach((day) => {
-      Object.entries(day).forEach(([key, value]) => {
-        if (key !== 'category' && Array.isArray(value)) {
-          const hours = value[0] as number
-          if (hours > 0) {
-            projectHours[key] = (projectHours[key] || 0) + hours
-          }
-        }
-      })
-    })
-
-    const sorted = Object.entries(projectHours).sort(([, a], [, b]) => b - a)
-    const total = sorted.reduce((sum, [, hours]) => sum + hours, 0)
-
-    return sorted.map(([name, hours]) => ({
-      name,
-      hours,
-      percentage: total > 0 ? (hours / total) * 100 : 0,
-    }))
-  }, [projectStatsDay])
-
-  // Calculate top 5 projects for the week
-  const weekTopProjects = useMemo(() => {
-    if (!projectStatsWeek?.data) return []
-
-    const projectHours: Record<string, number> = {}
-    projectStatsWeek.data.forEach((day) => {
-      Object.entries(day).forEach(([key, value]) => {
-        if (key !== 'category' && Array.isArray(value)) {
-          const hours = value[0] as number
-          if (hours > 0) {
-            projectHours[key] = (projectHours[key] || 0) + hours
-          }
-        }
-      })
-    })
-
-    const sorted = Object.entries(projectHours)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 5)
-    const total = sorted.reduce((sum, [, hours]) => sum + hours, 0)
-
-    return sorted.map(([name, hours]) => ({
-      name,
-      hours,
-      percentage: total > 0 ? (hours / total) * 100 : 0,
-    }))
-  }, [projectStatsWeek])
-
-  // Calculate top 5 projects for the month
-  const monthTopProjects = useMemo(() => {
-    if (!projectStatsMonth?.data) return []
-
-    // Aggregate all project hours across the month
-    const projectHours: Record<string, number> = {}
-    projectStatsMonth.data.forEach((day) => {
-      Object.entries(day).forEach(([key, value]) => {
-        if (key !== 'category' && Array.isArray(value)) {
-          const hours = value[0] as number
-          if (hours > 0) {
-            projectHours[key] = (projectHours[key] || 0) + hours
-          }
-        }
-      })
-    })
-
-    // Sort and take top 5
-    const sorted = Object.entries(projectHours)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 5)
-
-    // Calculate total for percentages
-    const total = sorted.reduce((sum, [, hours]) => sum + hours, 0)
-
-    return sorted.map(([name, hours]) => ({
-      name,
-      hours,
-      percentage: total > 0 ? (hours / total) * 100 : 0,
-    }))
-  }, [projectStatsMonth])
-
-  // Calculate top 5 projects for 6 months
-  const sixMonthsTopProjects = useMemo(() => {
-    if (!projectStatsSixMonths?.data) return []
-
-    // Aggregate all project hours across 6 months
-    const projectHours: Record<string, number> = {}
-    projectStatsSixMonths.data.forEach((day) => {
-      Object.entries(day).forEach(([key, value]) => {
-        if (key !== 'category' && Array.isArray(value)) {
-          const hours = value[0] as number
-          if (hours > 0) {
-            projectHours[key] = (projectHours[key] || 0) + hours
-          }
-        }
-      })
-    })
-
-    // Sort and take top 5
-    const sorted = Object.entries(projectHours)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 5)
-
-    // Calculate total for percentages
-    const total = sorted.reduce((sum, [, hours]) => sum + hours, 0)
-
-    return sorted.map(([name, hours]) => ({
-      name,
-      hours,
-      percentage: total > 0 ? (hours / total) * 100 : 0,
-    }))
-  }, [projectStatsSixMonths])
+  const dayProjects = useMemo(() => aggregateProjectHours(projectStatsDay?.data), [projectStatsDay])
+  const weekTopProjects = useMemo(
+    () => aggregateProjectHours(projectStatsWeek?.data, 5),
+    [projectStatsWeek],
+  )
+  const monthTopProjects = useMemo(
+    () => aggregateProjectHours(projectStatsMonth?.data, 5),
+    [projectStatsMonth],
+  )
+  const sixMonthsTopProjects = useMemo(
+    () => aggregateProjectHours(projectStatsSixMonths?.data, 5),
+    [projectStatsSixMonths],
+  )
 
   // Calculate 6-month summary stats
   const sixMonthsStats = useMemo(() => {
@@ -255,6 +199,26 @@ export const ThisMonthStats: React.FC = () => {
     }
   }, [sixMonthData, sixMonthsBookings])
 
+  // Calculate year summary stats
+  const yearStats = useMemo(() => {
+    const totalHours = yearData.reduce((sum, week) => sum + week.hours, 0)
+    const totalExpected = yearData.reduce((sum, week) => sum + week.plannedHours, 0)
+    const { fulfilledPercentage } = getExpectedVsBookedPercentage(totalExpected, totalHours)
+    const bookingSummary = getModelsBookingSummary(yearBookings || [])
+
+    return {
+      hours: totalHours,
+      bookings: bookingSummary.elements,
+      expectedHours: totalExpected,
+      fulfilledPercentage,
+    }
+  }, [yearData, yearBookings])
+
+  const yearTopProjects = useMemo(
+    () => aggregateProjectHours(projectStatsYear?.data, 5),
+    [projectStatsYear],
+  )
+
   const tabs = [
     {
       label: t('common.time.day', { defaultValue: 'Day' }),
@@ -264,79 +228,20 @@ export const ThisMonthStats: React.FC = () => {
             <FormatDate date={selectedDateObj} format="fullDateShort" />
           </Heading>
           <div className="flex gap-4 pb-4">
-            <div className="flex-1 space-y-3">
-              <StatsGroup className="grid w-full grid-cols-2">
-                <StatsTileNumber
-                  value={day.elements}
-                  label={t('bookings.title', { defaultValue: 'Bookings' })}
-                  standalone={false}
-                />
-                <StatsTileHours
-                  value={day.hours}
-                  label={t('common.time.hours', { defaultValue: 'Hours' })}
-                  standalone={false}
-                />
-              </StatsGroup>
-              <StatsGroup className="grid w-full grid-cols-2">
-                <StatsTileHours
-                  value={day.plannedWorkingHours}
-                  label={t('statistics.expectedHours', { defaultValue: 'Expected hours' })}
-                  standalone={false}
-                />
-                <StatsTilePercentage
-                  value={day.fulfilledPercentage}
-                  label={t('statistics.percentOfPlannedHours', {
-                    defaultValue: '% of planned hours',
-                  })}
-                  standalone={false}
-                  period="day"
-                />
-              </StatsGroup>
-            </div>
-
-            {dayProjects.length > 0 ? (
-              <div className="flex-1">
-                <div className="stats h-fit w-full">
-                  <div className="stat">
-                    <div className="stat-title">
-                      {t('projects.title', { defaultValue: 'Projects' })}
-                    </div>
-                    <div className="mt-2 space-y-2">
-                      {dayProjects.map((project) => (
-                        <div key={project.name} className="flex flex-col gap-1">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="flex-1 truncate font-medium">{project.name}</span>
-                            <span className="text-base-content/60 ml-2 text-xs">
-                              {project.hours.toFixed(1)}h
-                            </span>
-                          </div>
-                          <progress
-                            className="progress progress-primary h-2"
-                            value={project.percentage}
-                            max="100"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="flex-1">
-                <div className="stats h-fit w-full">
-                  <div className="stat">
-                    <div className="stat-title">
-                      {t('projects.title', { defaultValue: 'Projects' })}
-                    </div>
-                    <div className="text-base-content/60 py-8 text-center text-sm">
-                      {t('statistics.noProjectsForDay', {
-                        defaultValue: 'No projects for this day',
-                      })}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+            <StatsOverviewGrid
+              bookings={day.elements}
+              hours={day.hours}
+              expectedHours={day.plannedWorkingHours}
+              fulfilledPercentage={day.fulfilledPercentage}
+              period="day"
+            />
+            <TopProjectsCard
+              projects={dayProjects}
+              showTopPrefix={false}
+              emptyMessage={t('statistics.noProjectsForDay', {
+                defaultValue: 'No projects for this day',
+              })}
+            />
           </div>
         </>
       ),
@@ -349,79 +254,19 @@ export const ThisMonthStats: React.FC = () => {
             {t('common.time.week', { defaultValue: 'Week' })} {weekNumber}
           </Heading>
           <div className="flex gap-4 pb-4">
-            <div className="flex-1 space-y-3">
-              <StatsGroup className="grid w-full grid-cols-2">
-                <StatsTileNumber
-                  value={week.elements}
-                  label={t('bookings.title', { defaultValue: 'Bookings' })}
-                  standalone={false}
-                />
-                <StatsTileHours
-                  value={week.hours}
-                  label={t('common.time.hours', { defaultValue: 'Hours' })}
-                  standalone={false}
-                />
-              </StatsGroup>
-              <StatsGroup className="grid w-full grid-cols-2">
-                <StatsTileHours
-                  value={week.plannedWorkingHours}
-                  label={t('statistics.expectedHours', { defaultValue: 'Expected hours' })}
-                  standalone={false}
-                />
-                <StatsTilePercentage
-                  value={week.fulfilledPercentage}
-                  label={t('statistics.percentOfPlannedHours', {
-                    defaultValue: '% of planned hours',
-                  })}
-                  standalone={false}
-                  period="week"
-                />
-              </StatsGroup>
-            </div>
-
-            {weekTopProjects.length > 0 ? (
-              <div className="flex-1">
-                <div className="stats h-fit w-full">
-                  <div className="stat">
-                    <div className="stat-title">
-                      Top {t('projects.title', { defaultValue: 'Projects' })}
-                    </div>
-                    <div className="mt-2 space-y-2">
-                      {weekTopProjects.map((project) => (
-                        <div key={project.name} className="flex flex-col gap-1">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="flex-1 truncate font-medium">{project.name}</span>
-                            <span className="text-base-content/60 ml-2 text-xs">
-                              {project.hours.toFixed(1)}h
-                            </span>
-                          </div>
-                          <progress
-                            className="progress progress-primary h-2"
-                            value={project.percentage}
-                            max="100"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="flex-1">
-                <div className="stats h-fit w-full">
-                  <div className="stat">
-                    <div className="stat-title">
-                      Top {t('projects.title', { defaultValue: 'Projects' })}
-                    </div>
-                    <div className="text-base-content/60 py-8 text-center text-sm">
-                      {t('statistics.noProjectsForWeek', {
-                        defaultValue: 'No projects for this week',
-                      })}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+            <StatsOverviewGrid
+              bookings={week.elements}
+              hours={week.hours}
+              expectedHours={week.plannedWorkingHours}
+              fulfilledPercentage={week.fulfilledPercentage}
+              period="week"
+            />
+            <TopProjectsCard
+              projects={weekTopProjects}
+              emptyMessage={t('statistics.noProjectsForWeek', {
+                defaultValue: 'No projects for this week',
+              })}
+            />
           </div>
         </>
       ),
@@ -435,64 +280,19 @@ export const ThisMonthStats: React.FC = () => {
             <FormatDate date={selectedDateObj} format="year" />
           </Heading>
           <div className="flex gap-4 pb-4">
-            <div className="flex-1 space-y-3">
-              <StatsGroup className="grid w-full grid-cols-2">
-                <StatsTileNumber
-                  value={month.elements}
-                  label={t('bookings.title', { defaultValue: 'Bookings' })}
-                  standalone={false}
-                />
-                <StatsTileHours
-                  value={month.hours}
-                  label={t('common.time.hours', { defaultValue: 'Hours' })}
-                  standalone={false}
-                />
-              </StatsGroup>
-              <StatsGroup className="grid w-full grid-cols-2">
-                <StatsTileHours
-                  value={plannedHoursMonth}
-                  label={t('statistics.expectedHours', { defaultValue: 'Expected hours' })}
-                  standalone={false}
-                />
-                <StatsTilePercentage
-                  value={monthPercentage}
-                  label={t('statistics.percentOfPlannedHours', {
-                    defaultValue: '% of planned hours',
-                  })}
-                  standalone={false}
-                  period="month"
-                />
-              </StatsGroup>
-            </div>
-
-            {monthTopProjects.length > 0 && (
-              <div className="flex-1">
-                <div className="stats h-fit w-full">
-                  <div className="stat">
-                    <div className="stat-title">
-                      Top {t('projects.title', { defaultValue: 'Projects' })}
-                    </div>
-                    <div className="mt-2 space-y-2">
-                      {monthTopProjects.map((project) => (
-                        <div key={project.name} className="flex flex-col gap-1">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="flex-1 truncate font-medium">{project.name}</span>
-                            <span className="text-base-content/60 ml-2 text-xs">
-                              {project.hours.toFixed(1)}h
-                            </span>
-                          </div>
-                          <progress
-                            className="progress progress-primary h-2"
-                            value={project.percentage}
-                            max="100"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+            <StatsOverviewGrid
+              bookings={month.elements}
+              hours={month.hours}
+              expectedHours={plannedHoursMonth}
+              fulfilledPercentage={monthPercentage}
+              period="month"
+            />
+            <TopProjectsCard
+              projects={monthTopProjects}
+              emptyMessage={t('statistics.noProjectsForMonth', {
+                defaultValue: 'No projects for this month',
+              })}
+            />
           </div>
 
           <Heading variant="section">
@@ -518,78 +318,18 @@ export const ThisMonthStats: React.FC = () => {
             {t('workHealth.sixMonths', { defaultValue: '6 Months' })}
           </Heading>
           <div className="flex gap-4 pb-4">
-            <div className="flex-1 space-y-3">
-              <StatsGroup className="grid w-full grid-cols-2">
-                <StatsTileNumber
-                  value={sixMonthsStats.bookings}
-                  label={t('bookings.title', { defaultValue: 'Bookings' })}
-                  standalone={false}
-                />
-                <StatsTileHours
-                  value={sixMonthsStats.hours}
-                  label={t('common.time.hours', { defaultValue: 'Hours' })}
-                  standalone={false}
-                />
-              </StatsGroup>
-              <StatsGroup className="grid w-full grid-cols-2">
-                <StatsTileHours
-                  value={sixMonthsStats.expectedHours}
-                  label={t('statistics.expectedHours', { defaultValue: 'Expected hours' })}
-                  standalone={false}
-                />
-                <StatsTilePercentage
-                  value={sixMonthsStats.fulfilledPercentage}
-                  label={t('statistics.percentOfPlannedHours', {
-                    defaultValue: '% of planned hours',
-                  })}
-                  standalone={false}
-                />
-              </StatsGroup>
-            </div>
-
-            {sixMonthsTopProjects.length > 0 ? (
-              <div className="flex-1">
-                <div className="stats h-fit w-full">
-                  <div className="stat">
-                    <div className="stat-title">
-                      Top {t('projects.title', { defaultValue: 'Projects' })}
-                    </div>
-                    <div className="mt-2 space-y-2">
-                      {sixMonthsTopProjects.map((project) => (
-                        <div key={project.name} className="flex flex-col gap-1">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="flex-1 truncate font-medium">{project.name}</span>
-                            <span className="text-base-content/60 ml-2 text-xs">
-                              {project.hours.toFixed(1)}h
-                            </span>
-                          </div>
-                          <progress
-                            className="progress progress-primary h-2"
-                            value={project.percentage}
-                            max="100"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="flex-1">
-                <div className="stats h-fit w-full">
-                  <div className="stat">
-                    <div className="stat-title">
-                      Top {t('projects.title', { defaultValue: 'Projects' })}
-                    </div>
-                    <div className="text-base-content/60 py-8 text-center text-sm">
-                      {t('statistics.noProjectsForPeriod', {
-                        defaultValue: 'No projects for this period',
-                      })}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+            <StatsOverviewGrid
+              bookings={sixMonthsStats.bookings}
+              hours={sixMonthsStats.hours}
+              expectedHours={sixMonthsStats.expectedHours}
+              fulfilledPercentage={sixMonthsStats.fulfilledPercentage}
+            />
+            <TopProjectsCard
+              projects={sixMonthsTopProjects}
+              emptyMessage={t('statistics.noProjectsForPeriod', {
+                defaultValue: 'No projects for this period',
+              })}
+            />
           </div>
 
           <Heading variant="section">
@@ -597,6 +337,47 @@ export const ThisMonthStats: React.FC = () => {
           </Heading>
           <div className="pb-4">
             <WeeklyTrendChart weeklyData={sixMonthData} />
+          </div>
+        </>
+      ),
+    },
+    {
+      label: t('common.time.year', { defaultValue: 'Year' }),
+      component: (
+        <>
+          <Heading variant="section">
+            {isCalendarYear ? (
+              <FormatDate date={selectedDateObj} format="year" />
+            ) : (
+              t('statistics.rolling12Months', { defaultValue: 'Rolling 12 Months' })
+            )}
+          </Heading>
+          <label className="mb-4 flex items-center gap-2 text-sm">
+            <span className="text-base-content/60">
+              {t('statistics.calendarYear', { defaultValue: 'Calendar year' })}
+            </span>
+            <ToggleSwitch checked={isCalendarYear} onChange={setIsCalendarYear} size="sm" />
+          </label>
+          <div className="flex gap-4 pb-4">
+            <StatsOverviewGrid
+              bookings={yearStats.bookings}
+              hours={yearStats.hours}
+              expectedHours={yearStats.expectedHours}
+              fulfilledPercentage={yearStats.fulfilledPercentage}
+            />
+            <TopProjectsCard
+              projects={yearTopProjects}
+              emptyMessage={t('statistics.noProjectsForPeriod', {
+                defaultValue: 'No projects for this period',
+              })}
+            />
+          </div>
+
+          <Heading variant="section">
+            {t('statistics.yearlyWorkTrend', { defaultValue: 'Yearly Work Trend' })}
+          </Heading>
+          <div className="pb-4">
+            <WeeklyTrendChart weeklyData={yearData} tickEvery={4} />
           </div>
         </>
       ),

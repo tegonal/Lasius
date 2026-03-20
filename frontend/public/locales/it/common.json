@@ -177,7 +177,9 @@
     },
     "title": "Registrazioni",
     "warnings": {
-      "durationIsZero": "La durata di questa registrazione è zero"
+      "durationIsZero": "La durata di questa registrazione è zero",
+      "longDuration": "Durata prolungata rilevata",
+      "longDurationDescription": "Questa prenotazione supera una tipica giornata lavorativa di 8 ore. Verifichi gli orari di inizio e fine."
     }
   },
   "calendar": {
@@ -195,6 +197,7 @@
       "add": "Aggiungi",
       "back": "Indietro",
       "cancel": "Annulla",
+      "clear": "Cancella",
       "close": "Chiudi",
       "delete": "Elimina",
       "discardChanges": "Scarta modifiche",
@@ -286,6 +289,7 @@
       "to": "A",
       "today": "Oggi",
       "week": "Settimana",
+      "year": "Anno",
       "yesterday": "Ieri"
     },
     "units": {
@@ -366,13 +370,13 @@
     "developedBy": "Sviluppato da <0>Tegonal</0>, disponibile su <1>GitHub</1>, rilasciato sotto licenza <2>AGPL 3.0</2>",
     "feedbackOnGithub": "Apprezziamo il tuo feedback. Lascia un commento su <0>GitHub</0>",
     "github": {
-      "title": "Find issues, post feedback and get the source code on GitHub"
+      "title": "Segnala problemi, invia feedback e ottieni il codice sorgente su GitHub"
     },
     "tegonal": {
-      "title": "Lasius is developed and maintained by Tegonal Cooperative and released under AGPL 3.0"
+      "title": "Lasius è sviluppato e gestito dalla cooperativa Tegonal e rilasciato sotto AGPL 3.0"
     }
   },
-  "help": "Help",
+  "help": "Aiuto",
   "integrations": {
     "title": "Integrazioni"
   },
@@ -395,9 +399,9 @@
     "inviteProjectDescription": "Inserisci l'indirizzo email della persona che desideri invitare. Verrà generato un link di invito che potrai inviarle.",
     "messages": {
       "invitedToOrganisation": "Sei stato invitato da {{inviter}} a unirti all'organizzazione {{organisation}}.",
-      "invitedToOrganisationNeedsAccount": "You have been invited by {{inviter}} to join organisation {{organisation}}.",
+      "invitedToOrganisationNeedsAccount": "È stato/a invitato/a da {{inviter}} a unirsi all'organizzazione {{organisation}}.",
       "invitedToProject": "Sei stato invitato da {{inviter}} a unirti al progetto {{project}}.",
-      "invitedToProjectNeedsAccount": "You have been invited by {{inviter}} to join project {{project}}.",
+      "invitedToProjectNeedsAccount": "È stato/a invitato/a da {{inviter}} a unirsi al progetto {{project}}.",
       "selectOrganisation": "Seleziona l'organizzazione a cui vuoi aggiungere questo progetto:"
     },
     "needsAccount": {
@@ -453,6 +457,8 @@
   },
   "navigation": {
     "currentOrganisation": "Organizzazione corrente",
+    "openMenu": "Apri menu",
+    "settings": "Impostazioni",
     "yourTimeBookingView": "La tua vista registrazioni tempo"
   },
   "of": "di",
@@ -616,6 +622,8 @@
     },
     "filter": {
       "both": "Entrambi",
+      "search": "Cerca",
+      "searchPlaceholder": "Filtra progetti...",
       "status": "Stato"
     },
     "info": {
@@ -645,9 +653,9 @@
     }
   },
   "pwa": {
-    "reloadApplication": "Reload application",
-    "updateAvailable": "Update available",
-    "updateMessage": "Lasius has been updated. The page will reload after your confirmation."
+    "reloadApplication": "Ricarica applicazione",
+    "updateAvailable": "Aggiornamento disponibile",
+    "updateMessage": "Lasius è stato aggiornato. La pagina verrà ricaricata dopo la conferma."
   },
   "settings": {
     "app": {
@@ -661,14 +669,18 @@
     }
   },
   "statistics": {
+    "calendarYear": "Anno solare",
     "expectedHours": "Ore previste",
     "noProjectsForDay": "Nessun progetto per questo giorno",
+    "noProjectsForMonth": "Nessun progetto per questo mese",
     "noProjectsForPeriod": "Nessun progetto per questo periodo",
     "noProjectsForWeek": "Nessun progetto per questa settimana",
     "percentOfPlannedHours": "% delle ore pianificate",
+    "rolling12Months": "Ultimi 12 mesi",
     "showStatistics": "Mostra statistiche",
     "title": "Statistiche",
-    "weeklyHoursDistribution": "Distribuzione ore settimanali"
+    "weeklyHoursDistribution": "Distribuzione ore settimanali",
+    "yearlyWorkTrend": "Tendenza lavorativa annuale"
   },
   "stats": {
     "empty": "Nessun dato disponibile per il periodo selezionato"
@@ -724,7 +736,7 @@
       "accept": "Accetta Termini di servizio",
       "reject": "Rifiuta e disconnetti"
     },
-    "title": "Terms of Service (version {{version}})"
+    "title": "Condizioni di servizio (versione {{version}})"
   },
   "ui": {
     "hidePasswords": "Nascondi password",
