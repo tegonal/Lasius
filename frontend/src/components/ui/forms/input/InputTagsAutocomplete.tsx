@@ -150,12 +150,15 @@ export const InputTagsAutocomplete: React.FC<Props> = ({ suggestions = [], name,
         <Controller
           name={name}
           control={parentFormContext.control}
-          render={() => (
+          render={({ field }) => (
             <Combobox value={selectedTags} onChange={addTag}>
               {({ open }) => (
                 <>
                   <ComboboxInput
-                    ref={inputRef}
+                    ref={(el: HTMLInputElement | null) => {
+                      inputRef.current = el
+                      field.ref(el)
+                    }}
                     id={id || name}
                     className="input input-bordered w-full pr-10 text-sm"
                     onChange={inputValueChanged}
