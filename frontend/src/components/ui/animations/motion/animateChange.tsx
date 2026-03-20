@@ -17,7 +17,7 @@
  *
  */
 
-import { AnimatePresence, m } from 'framer-motion'
+import { AnimatePresence, m } from 'motion/react'
 import React from 'react'
 
 const item = {

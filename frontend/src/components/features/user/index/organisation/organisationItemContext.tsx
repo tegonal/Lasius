@@ -25,9 +25,9 @@ import { ContextBar } from 'components/features/contextMenu/contextBar'
 import { ContextBarDivider } from 'components/features/contextMenu/contextBarDivider'
 import { ContextBody } from 'components/features/contextMenu/contextBody'
 import { useContextMenu } from 'components/features/contextMenu/hooks/useContextMenu'
-import { AnimatePresence } from 'framer-motion'
 import { ModelsCurrentUserTimeBooking } from 'lib/api/lasius'
 import { stringHash } from 'lib/utils/string/stringHash'
+import { AnimatePresence } from 'motion/react'
 import React from 'react'
 
 type Props = {

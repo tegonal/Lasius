@@ -18,7 +18,7 @@
  */
 
 import { LasiusIcon } from 'components/ui/icons/LasiusIcon'
-import { AnimatePresence, m } from 'framer-motion'
+import { AnimatePresence, m } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { useGlobalLoading } from 'stores/uiStore'
 

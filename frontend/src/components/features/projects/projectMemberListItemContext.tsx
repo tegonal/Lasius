@@ -28,9 +28,9 @@ import { useContextMenu } from 'components/features/contextMenu/hooks/useContext
 import { Button } from 'components/primitives/buttons/Button'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
 import { GenericConfirmModal } from 'components/ui/overlays/modal/GenericConfirmModal'
-import { AnimatePresence } from 'framer-motion'
 import { ModelsUserStub } from 'lib/api/lasius'
 import { UserX } from 'lucide-react'
+import { AnimatePresence } from 'motion/react'
 import { useTranslation } from 'next-i18next'
 import React, { useState } from 'react'
 

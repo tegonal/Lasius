@@ -19,8 +19,8 @@
 
 import { Dialog, DialogBackdrop, DialogPanel, Transition, TransitionChild } from '@headlessui/react'
 import { cva, type VariantProps } from 'class-variance-authority'
-import { m } from 'framer-motion'
 import { cn } from 'lib/utils/cn'
+import { m } from 'motion/react'
 import React, { Fragment } from 'react'
 
 const modalContainerVariants = cva(

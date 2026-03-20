@@ -20,7 +20,7 @@
 import { Button } from 'components/primitives/buttons/Button'
 import { SelectedTab } from 'components/ui/animations/motion/selectedTab'
 import { useTabSync } from 'components/ui/navigation/hooks/useTabSync'
-import { AnimatePresence, m } from 'framer-motion'
+import { AnimatePresence, m } from 'motion/react'
 import React from 'react'
 
 type TabItem = { label: string; component: React.ReactNode; icon?: string }

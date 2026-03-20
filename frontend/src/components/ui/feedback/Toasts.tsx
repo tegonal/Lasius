@@ -19,9 +19,9 @@
 
 import { useToast } from 'components/ui/feedback/hooks/useToast'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
-import { AnimatePresence, m } from 'framer-motion'
 import { cn } from 'lib/utils/cn'
 import { AlertCircle, AlertTriangle, CheckCircle, Info, X } from 'lucide-react'
+import { AnimatePresence, m } from 'motion/react'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { ToastViewType } from 'types/dynamicViews'

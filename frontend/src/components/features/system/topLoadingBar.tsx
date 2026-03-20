@@ -17,7 +17,7 @@
  *
  */
 
-import { AnimatePresence, m } from 'framer-motion'
+import { AnimatePresence, m } from 'motion/react'
 import { useEffect, useMemo, useState } from 'react'
 import { useGlobalLoading } from 'stores/uiStore'
 import { nivoPalette } from 'styles/colors'

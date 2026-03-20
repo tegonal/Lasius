@@ -17,8 +17,8 @@
  *
  */
 
-import { m } from 'framer-motion'
 import { cn } from 'lib/utils/cn'
+import { m } from 'motion/react'
 import React, { memo, useEffect, useState } from 'react'
 
 type Props = {

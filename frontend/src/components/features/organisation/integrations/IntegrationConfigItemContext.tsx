@@ -28,8 +28,8 @@ import { useContextMenu } from 'components/features/contextMenu/hooks/useContext
 import { Button } from 'components/primitives/buttons/Button'
 import { ToolTip } from 'components/ui/feedback/Tooltip'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
-import { AnimatePresence } from 'framer-motion'
 import { FolderTree, Info, Pencil, Trash2 } from 'lucide-react'
+import { AnimatePresence } from 'motion/react'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
 

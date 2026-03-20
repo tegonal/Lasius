@@ -28,7 +28,6 @@ import { ContextButtonWrapper } from 'components/features/contextMenu/contextBut
 import { useContextMenu } from 'components/features/contextMenu/hooks/useContextMenu'
 import { Button } from 'components/primitives/buttons/Button'
 import { LucideIcon } from 'components/ui/icons/LucideIcon'
-import { AnimatePresence } from 'framer-motion'
 import { useOrganisation } from 'lib/api/hooks/useOrganisation'
 import { ModelsBookingStub } from 'lib/api/lasius'
 import {
@@ -37,6 +36,7 @@ import {
 } from 'lib/api/lasius/user-favorites/user-favorites'
 import { stringHash } from 'lib/utils/string/stringHash'
 import { Trash2 } from 'lucide-react'
+import { AnimatePresence } from 'motion/react'
 import { useTranslation } from 'next-i18next'
 import React from 'react'
 import { useSWRConfig } from 'swr'
