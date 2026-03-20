@@ -19,6 +19,7 @@ sbt compile
 echo ""
 echo "--- Frontend (yarn) ---"
 cd "$REPO_ROOT/frontend"
+corepack enable
 yarn install
 
 echo ""
