@@ -28,13 +28,14 @@ import React from 'react'
 
 type Props = {
   weeklyData: WeekData[]
+  tickEvery?: number
 }
 
 /**
  * Displays a line chart showing weekly work hours trend over time
  * Shows actual hours vs planned hours with visual indicators for overtime
  */
-export const WeeklyTrendChart: React.FC<Props> = ({ weeklyData }) => {
+export const WeeklyTrendChart: React.FC<Props> = ({ weeklyData, tickEvery }) => {
   const { t } = useTranslation('common')
   const nivoColors = useNivoColors()
 
@@ -94,6 +95,9 @@ export const WeeklyTrendChart: React.FC<Props> = ({ weeklyData }) => {
           tickSize: 5,
           tickPadding: 5,
           tickRotation: -45,
+          tickValues: tickEvery
+            ? weeklyData.filter((_, i) => i % tickEvery === 0).map((w) => w.weekLabel)
+            : undefined,
         }}
         axisLeft={{
           tickSize: 5,

@@ -177,7 +177,9 @@
     },
     "title": "Buchungen",
     "warnings": {
-      "durationIsZero": "Die Dauer dieser Buchung ist null"
+      "durationIsZero": "Die Dauer dieser Buchung ist null",
+      "longDuration": "Lange Dauer erkannt",
+      "longDurationDescription": "Diese Buchung ist länger als ein typischer 8-Stunden-Arbeitstag. Bitte überprüfen Sie die Start- und Endzeiten."
     }
   },
   "calendar": {
@@ -195,6 +197,7 @@
       "add": "Hinzufügen",
       "back": "Zurück",
       "cancel": "Abbrechen",
+      "clear": "Löschen",
       "close": "Schließen",
       "delete": "Löschen",
       "discardChanges": "Änderungen verwerfen",
@@ -286,6 +289,7 @@
       "to": "Bis",
       "today": "Heute",
       "week": "Woche",
+      "year": "Jahr",
       "yesterday": "Gestern"
     },
     "units": {
@@ -366,13 +370,13 @@
     "developedBy": "Entwickelt von <0>Tegonal</0>, verfügbar auf <1>GitHub</1>, veröffentlicht unter <2>AGPL 3.0</2>",
     "feedbackOnGithub": "Wir schätzen dein Feedback. Bitte hinterlasse einen Kommentar auf <0>GitHub</0>",
     "github": {
-      "title": "Find issues, post feedback and get the source code on GitHub"
+      "title": "Fehler melden, Feedback geben und den Quellcode auf GitHub finden"
     },
     "tegonal": {
-      "title": "Lasius is developed and maintained by Tegonal Cooperative and released under AGPL 3.0"
+      "title": "Lasius wird von der Tegonal Genossenschaft entwickelt und gepflegt und unter AGPL 3.0 veröffentlicht"
     }
   },
-  "help": "Help",
+  "help": "Hilfe",
   "integrations": {
     "title": "Integrationen"
   },
@@ -386,7 +390,7 @@
     "description": {
       "copyLink": "Kopiere den Link und sende ihn an deine Kollegen. Falls sie noch kein Konto haben, wird eines erstellt, wenn die Einladung angenommen wird."
     },
-    "email": "Email",
+    "email": "E-Mail",
     "errors": {
       "createdForSomeoneElse": "Diese Einladung wurde für jemand anderen erstellt. Melde dich entweder ab und lade die Seite neu, oder leite den Einladungslink an den Benutzer {{email}} weiter",
       "noLongerValid": "Diese Einladung ist nicht mehr gültig. Kontaktiere am besten die Person, die dir den Einladungslink gesendet hat, um einen neuen zu erhalten."
@@ -395,9 +399,9 @@
     "inviteProjectDescription": "Gib die E-Mail-Adresse der Person ein, die du einladen möchtest. Ein Einladungslink wird generiert, den du ihr senden kannst.",
     "messages": {
       "invitedToOrganisation": "Du wurdest von {{inviter}} eingeladen, der Organisation {{organisation}} beizutreten.",
-      "invitedToOrganisationNeedsAccount": "You have been invited by {{inviter}} to join organisation {{organisation}}.",
+      "invitedToOrganisationNeedsAccount": "Sie wurden von {{inviter}} eingeladen, der Organisation {{organisation}} beizutreten.",
       "invitedToProject": "Du wurdest von {{inviter}} eingeladen, dem Projekt {{project}} beizutreten.",
-      "invitedToProjectNeedsAccount": "You have been invited by {{inviter}} to join project {{project}}.",
+      "invitedToProjectNeedsAccount": "Sie wurden von {{inviter}} eingeladen, dem Projekt {{project}} beizutreten.",
       "selectOrganisation": "Wähle die Organisation aus, zu der du dieses Projekt hinzufügen möchtest:"
     },
     "needsAccount": {
@@ -452,6 +456,8 @@
   },
   "navigation": {
     "currentOrganisation": "Aktuelle Organisation",
+    "openMenu": "Menü öffnen",
+    "settings": "Einstellungen",
     "yourTimeBookingView": "Deine Zeitbuchungsansicht"
   },
   "of": "von",
@@ -615,6 +621,8 @@
     },
     "filter": {
       "both": "Beide",
+      "search": "Suchen",
+      "searchPlaceholder": "Projekte filtern...",
       "status": "Status"
     },
     "info": {
@@ -635,7 +643,7 @@
       "updated": "Projekt aktualisiert"
     },
     "title": "Projekte",
-    "total": "Total",
+    "total": "Gesamt",
     "warnings": {
       "inactiveProjectContext": "Statistiken von inaktivem Projekt werden angezeigt",
       "inactiveProjectFilter": "Daten für inaktives Projekt werden angezeigt",
@@ -644,9 +652,9 @@
     }
   },
   "pwa": {
-    "reloadApplication": "Reload application",
-    "updateAvailable": "Update available",
-    "updateMessage": "Lasius has been updated. The page will reload after your confirmation."
+    "reloadApplication": "Anwendung neu laden",
+    "updateAvailable": "Aktualisierung verfügbar",
+    "updateMessage": "Lasius wurde aktualisiert. Die Seite wird nach Ihrer Bestätigung neu geladen."
   },
   "settings": {
     "app": {
@@ -660,14 +668,18 @@
     }
   },
   "statistics": {
+    "calendarYear": "Kalenderjahr",
     "expectedHours": "Erwartete Stunden",
     "noProjectsForDay": "Keine Projekte für diesen Tag",
+    "noProjectsForMonth": "Keine Projekte für diesen Monat",
     "noProjectsForPeriod": "Keine Projekte für diesen Zeitraum",
     "noProjectsForWeek": "Keine Projekte für diese Woche",
     "percentOfPlannedHours": "% der geplanten Stunden",
+    "rolling12Months": "Letzte 12 Monate",
     "showStatistics": "Statistiken anzeigen",
     "title": "Statistiken",
-    "weeklyHoursDistribution": "Wöchentliche Stundenverteilung"
+    "weeklyHoursDistribution": "Wöchentliche Stundenverteilung",
+    "yearlyWorkTrend": "Jährlicher Arbeitstrend"
   },
   "stats": {
     "empty": "Keine Daten für den ausgewählten Zeitraum verfügbar"
@@ -723,7 +735,7 @@
       "accept": "Nutzungsbedingungen akzeptieren",
       "reject": "Ablehnen und abmelden"
     },
-    "title": "Terms of Service (version {{version}})"
+    "title": "Nutzungsbedingungen (Version {{version}})"
   },
   "ui": {
     "hidePasswords": "Passwörter ausblenden",

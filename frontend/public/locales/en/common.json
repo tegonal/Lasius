@@ -177,7 +177,9 @@
     },
     "title": "Bookings",
     "warnings": {
-      "durationIsZero": "This booking's duration is zero"
+      "durationIsZero": "This booking's duration is zero",
+      "longDuration": "Long duration detected",
+      "longDurationDescription": "This booking is longer than a typical 8-hour work day. Please verify that the start and end times are correct."
     }
   },
   "calendar": {
@@ -195,6 +197,7 @@
       "add": "Add",
       "back": "Back",
       "cancel": "Cancel",
+      "clear": "Clear",
       "close": "Close",
       "delete": "Delete",
       "discardChanges": "Discard changes",
@@ -286,6 +289,7 @@
       "to": "To",
       "today": "Today",
       "week": "Week",
+      "year": "Year",
       "yesterday": "Yesterday"
     },
     "units": {
@@ -452,6 +456,8 @@
   },
   "navigation": {
     "currentOrganisation": "Current organisation",
+    "openMenu": "Open menu",
+    "settings": "Settings",
     "yourTimeBookingView": "Your time booking view"
   },
   "of": "of",
@@ -615,6 +621,8 @@
     },
     "filter": {
       "both": "Both",
+      "search": "Search",
+      "searchPlaceholder": "Filter projects...",
       "status": "Status"
     },
     "info": {
@@ -660,14 +668,18 @@
     }
   },
   "statistics": {
+    "calendarYear": "Calendar year",
     "expectedHours": "Expected hours",
     "noProjectsForDay": "No projects for this day",
+    "noProjectsForMonth": "No projects for this month",
     "noProjectsForPeriod": "No projects for this period",
     "noProjectsForWeek": "No projects for this week",
     "percentOfPlannedHours": "% of planned hours",
+    "rolling12Months": "Rolling 12 Months",
     "showStatistics": "Show statistics",
     "title": "Statistics",
-    "weeklyHoursDistribution": "Weekly Hours Distribution"
+    "weeklyHoursDistribution": "Weekly Hours Distribution",
+    "yearlyWorkTrend": "Yearly Work Trend"
   },
   "stats": {
     "empty": "No data available for the selected period"

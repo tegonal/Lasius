@@ -177,7 +177,9 @@
     },
     "title": "Réservations",
     "warnings": {
-      "durationIsZero": "La durée de cette réservation est nulle"
+      "durationIsZero": "La durée de cette réservation est nulle",
+      "longDuration": "Durée prolongée détectée",
+      "longDurationDescription": "Cette réservation dépasse une journée de travail typique de 8 heures. Veuillez vérifier les heures de début et de fin."
     }
   },
   "calendar": {
@@ -195,6 +197,7 @@
       "add": "Ajouter",
       "back": "Retour",
       "cancel": "Annuler",
+      "clear": "Effacer",
       "close": "Fermer",
       "delete": "Supprimer",
       "discardChanges": "Abandonner les modifications",
@@ -286,6 +289,7 @@
       "to": "À",
       "today": "Aujourd'hui",
       "week": "Semaine",
+      "year": "Année",
       "yesterday": "Hier"
     },
     "units": {
@@ -366,13 +370,13 @@
     "developedBy": "Développé par <0>Tegonal</0>, disponible sur <1>GitHub</1>, publié sous licence <2>AGPL 3.0</2>",
     "feedbackOnGithub": "Nous apprécions tes commentaires. Laisse un commentaire sur <0>GitHub</0>",
     "github": {
-      "title": "Find issues, post feedback and get the source code on GitHub"
+      "title": "Signaler des problèmes, donner votre avis et obtenir le code source sur GitHub"
     },
     "tegonal": {
-      "title": "Lasius is developed and maintained by Tegonal Cooperative and released under AGPL 3.0"
+      "title": "Lasius est développé et maintenu par la coopérative Tegonal et publié sous AGPL 3.0"
     }
   },
-  "help": "Help",
+  "help": "Aide",
   "integrations": {
     "title": "Intégrations"
   },
@@ -386,7 +390,7 @@
     "description": {
       "copyLink": "Copie le lien et envoie-le à ton collègue. Si cette personne n'a pas encore de compte, un compte sera créé lors de l'acceptation de l'invitation."
     },
-    "email": "Email",
+    "email": "E-mail",
     "errors": {
       "createdForSomeoneElse": "Cette invitation a été créée pour quelqu'un d'autre. Déconnecte-toi et actualise la page, ou transfère le lien d'invitation à l'utilisateur {{email}}",
       "noLongerValid": "Cette invitation n'est plus valide. Il est préférable de contacter la personne qui t'a envoyé le lien d'invitation pour en obtenir un nouveau."
@@ -395,9 +399,9 @@
     "inviteProjectDescription": "Saisissez l'adresse e-mail de la personne que vous souhaitez inviter. Un lien d'invitation sera généré que vous pourrez lui envoyer.",
     "messages": {
       "invitedToOrganisation": "Tu as été invité par {{inviter}} à rejoindre l'organisation {{organisation}}.",
-      "invitedToOrganisationNeedsAccount": "You have been invited by {{inviter}} to join organisation {{organisation}}.",
+      "invitedToOrganisationNeedsAccount": "Vous avez été invité(e) par {{inviter}} à rejoindre l'organisation {{organisation}}.",
       "invitedToProject": "Tu as été invité par {{inviter}} à rejoindre le projet {{project}}.",
-      "invitedToProjectNeedsAccount": "You have been invited by {{inviter}} to join project {{project}}.",
+      "invitedToProjectNeedsAccount": "Vous avez été invité(e) par {{inviter}} à rejoindre le projet {{project}}.",
       "selectOrganisation": "Sélectionne l'organisation à laquelle tu souhaites ajouter ce projet :"
     },
     "needsAccount": {
@@ -453,6 +457,8 @@
   },
   "navigation": {
     "currentOrganisation": "Organisation actuelle",
+    "openMenu": "Ouvrir le menu",
+    "settings": "Paramètres",
     "yourTimeBookingView": "Ta vue de réservation de temps"
   },
   "of": "de",
@@ -616,6 +622,8 @@
     },
     "filter": {
       "both": "Les deux",
+      "search": "Rechercher",
+      "searchPlaceholder": "Filtrer les projets...",
       "status": "Statut"
     },
     "info": {
@@ -645,9 +653,9 @@
     }
   },
   "pwa": {
-    "reloadApplication": "Reload application",
-    "updateAvailable": "Update available",
-    "updateMessage": "Lasius has been updated. The page will reload after your confirmation."
+    "reloadApplication": "Recharger l'application",
+    "updateAvailable": "Mise à jour disponible",
+    "updateMessage": "Lasius a été mis à jour. La page sera rechargée après votre confirmation."
   },
   "settings": {
     "app": {
@@ -661,14 +669,18 @@
     }
   },
   "statistics": {
+    "calendarYear": "Année civile",
     "expectedHours": "Heures prévues",
     "noProjectsForDay": "Aucun projet pour ce jour",
+    "noProjectsForMonth": "Aucun projet pour ce mois",
     "noProjectsForPeriod": "Aucun projet pour cette période",
     "noProjectsForWeek": "Aucun projet pour cette semaine",
     "percentOfPlannedHours": "% des heures planifiées",
+    "rolling12Months": "12 derniers mois",
     "showStatistics": "Afficher les statistiques",
     "title": "Statistiques",
-    "weeklyHoursDistribution": "Répartition hebdomadaire des heures"
+    "weeklyHoursDistribution": "Répartition hebdomadaire des heures",
+    "yearlyWorkTrend": "Tendance annuelle de travail"
   },
   "stats": {
     "empty": "Aucune donnée disponible pour la période sélectionnée"
@@ -724,7 +736,7 @@
       "accept": "Accepter les conditions d'utilisation",
       "reject": "Refuser et se déconnecter"
     },
-    "title": "Terms of Service (version {{version}})"
+    "title": "Conditions d'utilisation (version {{version}})"
   },
   "ui": {
     "hidePasswords": "Masquer les mots de passe",
