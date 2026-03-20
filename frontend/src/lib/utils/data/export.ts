@@ -115,12 +115,25 @@ export const exportBookingList = (
     tags: item.tags.map((tag) => tag.id).join(','),
     start: modelsLocalDateTimeWithTimeZoneToString(item.start),
     end: item.end ? modelsLocalDateTimeWithTimeZoneToString(item.end) : '',
-    duration: item.duration.toString(),
+    duration: Math.round(item.duration * 60) / 60 / 24,
     durationString: item.durationString,
   }))
 
   // Create worksheet from JSON data
   const ws = XLSX.utils.json_to_sheet(data)
+
+  // Apply time format to the duration column so it renders as [h]:mm in spreadsheets
+  const keys = Object.keys(data[0] || {})
+  const durationCol = keys.indexOf('duration')
+  if (durationCol >= 0 && ws['!ref']) {
+    const range = XLSX.utils.decode_range(ws['!ref'])
+    for (let row = range.s.r + 1; row <= range.e.r; row++) {
+      const addr = XLSX.utils.encode_cell({ r: row, c: durationCol })
+      if (ws[addr]) {
+        ws[addr].z = '[h]:mm'
+      }
+    }
+  }
 
   // Create workbook and add the worksheet
   const wb = XLSX.utils.book_new()
