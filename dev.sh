@@ -53,12 +53,12 @@ export TERM=xterm-256color
 
 # Create tmux session with backend in first pane
 tmux new-session -d -s "$SESSION" -c "$ROOT/backend" \
-  "dotenv -e $ROOT/frontend/.env.local -- sbt run -Dconfig.resource=dev.conf; read -p 'Press Enter to close...'"
+  "set -a; [ -f $ROOT/frontend/.env.local ] && . $ROOT/frontend/.env.local; set +a; sbt run -Dconfig.resource=dev.conf; read -p 'Press Enter to close...'"
 
 # Split: frontend (waits for backend via port check)
 tmux split-window -t "$SESSION" -v -c "$ROOT/frontend" \
   "echo 'Waiting for backend on port 9000...' && \
-   while ! (echo > /dev/tcp/localhost/9000) 2>/dev/null; do sleep 2; done && \
+   while ! nc -z localhost 9000 2>/dev/null; do sleep 2; done && \
    echo 'Backend ready. Starting frontend...' && \
    yarn dev; read -p 'Press Enter to close...'"
 
