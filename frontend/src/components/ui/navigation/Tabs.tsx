@@ -43,7 +43,7 @@ export const Tabs: React.FC<Props> = ({ tabs, defaultIndex = 0 }) => {
               type="button"
               variant="ghost"
               onClick={() => setSelected(index)}
-              className="relative z-[2]"
+              className="hover:after:bg-base-content/40 relative z-[2] hover:bg-transparent hover:after:absolute hover:after:right-0 hover:after:bottom-0 hover:after:left-0 hover:after:h-[2px]"
               aria-label={item.label}>
               {item.label}
             </Button>
