@@ -79,6 +79,7 @@ export function createInternalProvider(): InternalOAuthProvider {
 	return {
 		async exchangeCode(
 			code: string,
+			_redirectUri: string,
 			codeVerifier?: string,
 		): Promise<TokenResponse> {
 			const body: Record<string, string> = {
@@ -110,7 +111,7 @@ export function createInternalProvider(): InternalOAuthProvider {
 			return (await response.json()) as TokenResponse
 		},
 
-		getAuthorizationUrl(_state: string): string {
+		getAuthorizationUrl(_state: string, _redirectUri: string): string {
 			// Internal provider does not use browser-redirect authorization.
 			// Use loginWithCredentials() instead.
 			throw new Error(
@@ -189,7 +190,7 @@ export function createInternalProvider(): InternalOAuthProvider {
 			}
 
 			// Step 3: Exchange code for tokens using PKCE verifier
-			const tokens = await this.exchangeCode(code, codeVerifier)
+			const tokens = await this.exchangeCode(code, '/', codeVerifier)
 
 			// Step 4: Fetch user profile
 			const profile = await this.getUserProfile(tokens.access_token)

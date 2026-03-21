@@ -17,6 +17,47 @@
  *
  */
 
+import { logger } from '~/lib/logger'
+import { getProvider } from '~/services/auth/providers'
+import {
+	destroyUserSession,
+	getSessionTokens,
+} from '~/services/auth/session.server'
+
+import { type Route } from './+types/logout'
+
+/** Handle POST logout (preferred — form submission) */
+export async function action({ request }: Route.ActionArgs) {
+	return performLogout(request)
+}
+
+/** Handle GET logout — matches current Next.js behavior where /logout immediately logs out */
+export async function loader({ request }: Route.LoaderArgs) {
+	return performLogout(request)
+}
+
+/**
+ * This route processes logout and redirects.
+ * No component is normally rendered, but we include one as a fallback.
+ */
 export default function Logout() {
-	return <div>Logout — placeholder</div>
+	return null
+}
+
+async function performLogout(request: Request): Promise<Response> {
+	const result = await getSessionTokens(request)
+
+	if (result?.tokens) {
+		try {
+			const provider = getProvider(result.tokens.tokenIssuer)
+			await provider.revokeToken(result.tokens.accessToken)
+			logger.debug('Token revoked successfully', {
+				provider: result.tokens.tokenIssuer,
+			})
+		} catch (err) {
+			logger.warn('Token revocation failed during logout', { error: err })
+		}
+	}
+
+	return destroyUserSession(request)
 }

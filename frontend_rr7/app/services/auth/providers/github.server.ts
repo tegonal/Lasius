@@ -33,7 +33,10 @@ export function createGitHubProvider(): OAuthProvider {
 	const clientSecret = getServerEnvRequired('GITHUB_OAUTH_CLIENT_SECRET')
 
 	return {
-		async exchangeCode(code: string): Promise<TokenResponse> {
+		async exchangeCode(
+			code: string,
+			redirectUri: string,
+		): Promise<TokenResponse> {
 			const response = await fetch(
 				'https://github.com/login/oauth/access_token',
 				{
@@ -41,6 +44,7 @@ export function createGitHubProvider(): OAuthProvider {
 						client_id: clientId,
 						client_secret: clientSecret,
 						code,
+						redirect_uri: redirectUri,
 					}),
 					headers: {
 						Accept: 'application/json',
@@ -74,11 +78,12 @@ export function createGitHubProvider(): OAuthProvider {
 			}
 		},
 
-		getAuthorizationUrl(state: string): string {
+		getAuthorizationUrl(state: string, redirectUri: string): string {
 			const url = new URL('https://github.com/login/oauth/authorize')
 			url.searchParams.set('client_id', clientId)
 			url.searchParams.set('scope', 'read:user user:email')
 			url.searchParams.set('state', state)
+			url.searchParams.set('redirect_uri', redirectUri)
 			return url.toString()
 		},
 

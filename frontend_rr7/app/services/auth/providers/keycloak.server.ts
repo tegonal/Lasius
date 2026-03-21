@@ -33,13 +33,17 @@ export function createKeycloakProvider(): OAuthProvider {
 	const revokeUrl = `${baseUrl}/protocol/openid-connect/revoke`
 
 	return {
-		async exchangeCode(code: string): Promise<TokenResponse> {
+		async exchangeCode(
+			code: string,
+			redirectUri: string,
+		): Promise<TokenResponse> {
 			const response = await fetch(tokenUrl, {
 				body: new URLSearchParams({
 					client_id: clientId,
 					client_secret: clientSecret,
 					code,
 					grant_type: 'authorization_code',
+					redirect_uri: redirectUri,
 				}),
 				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
 				method: 'POST',
@@ -57,12 +61,13 @@ export function createKeycloakProvider(): OAuthProvider {
 			return (await response.json()) as TokenResponse
 		},
 
-		getAuthorizationUrl(state: string): string {
+		getAuthorizationUrl(state: string, redirectUri: string): string {
 			const url = new URL(authorizationUrl)
 			url.searchParams.set('client_id', clientId)
 			url.searchParams.set('response_type', 'code')
 			url.searchParams.set('scope', 'openid profile email')
 			url.searchParams.set('state', state)
+			url.searchParams.set('redirect_uri', redirectUri)
 			return url.toString()
 		},
 
