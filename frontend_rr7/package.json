@@ -34,6 +34,7 @@
     "i18next": "25.9.0",
     "i18next-browser-languagedetector": "^8.2.1",
     "i18next-fetch-backend": "^7.0.0",
+    "immer": "^11.1.4",
     "isbot": "^5.1.36",
     "lucide-react": "^0.577.0",
     "react": "^19.2.4",

@@ -5555,6 +5555,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"immer@npm:^11.1.4":
+  version: 11.1.4
+  resolution: "immer@npm:11.1.4"
+  checksum: 10c0/77beca6b0a4e361b30414189d63c64beb7df40ac1d8cbf524308fcbabe755e9aa49db3c6e95a6e412911416fec621f2c8470be5ec79feedc6abd6e4f7f18a9ce
+  languageName: node
+  linkType: hard
+
 "immer@npm:^9.0.6":
   version: 9.0.21
   resolution: "immer@npm:9.0.21"
@@ -6146,6 +6153,7 @@ __metadata:
     i18next: "npm:25.9.0"
     i18next-browser-languagedetector: "npm:^8.2.1"
     i18next-fetch-backend: "npm:^7.0.0"
+    immer: "npm:^11.1.4"
     isbot: "npm:^5.1.36"
     lucide-react: "npm:^0.577.0"
     orval: "npm:^7.9.0"
