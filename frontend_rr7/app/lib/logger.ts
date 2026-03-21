@@ -19,4 +19,7 @@
 
 import { Logger } from 'tslog'
 
-export const logger = new Logger({ name: 'lasius' })
+export const logger = new Logger({
+	name: 'lasius',
+	type: process.env.NODE_ENV === 'production' ? 'json' : 'pretty',
+})

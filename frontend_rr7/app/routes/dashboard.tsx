@@ -19,9 +19,9 @@
 
 import { data } from 'react-router'
 
+import { logger } from '~/lib/logger'
 import { getUserProfile } from '~/services/api/lasius/user/user'
 import { authHeaders, requireUser } from '~/services/auth/auth-helpers.server'
-import { logger } from '~/services/logger'
 
 import { type Route } from './+types/dashboard'
 

@@ -28,10 +28,12 @@ import {
 	Outlet,
 	Scripts,
 	ScrollRestoration,
+	useRouteError,
 } from 'react-router'
 import { useChangeLanguage } from 'remix-i18next/react'
 
 import { localeCookie } from '~/lib/cookies/i18next-cookie.server'
+import { logger } from '~/lib/logger'
 import { getLocale, i18nextMiddleware } from '~/middleware/i18next'
 
 import { type Route } from './+types/root.ts'
@@ -61,23 +63,97 @@ export default function App({ loaderData }: Route.ComponentProps) {
 	return <Outlet />
 }
 
-export function ErrorBoundary({ error }: { error: unknown }) {
-	let title = 'Unexpected Error'
-	let message = 'An unexpected error occurred.'
+export function ErrorBoundary() {
+	const error = useRouteError()
+
+	// Log errors client-side only
+	if (typeof window !== 'undefined') {
+		logger.error('ErrorBoundary caught error', error)
+	}
 
 	if (isRouteErrorResponse(error)) {
-		title = `${error.status} ${error.statusText}`
-		message = error.data?.toString() ?? message
-	} else if (error instanceof Error) {
-		message = error.message
+		if (error.status === 401) {
+			return (
+				<div className="flex min-h-screen items-center justify-center p-4">
+					<div className="card bg-base-200 w-full max-w-md shadow-lg">
+						<div className="card-body items-center text-center">
+							<h1 className="card-title text-2xl">Unauthorized</h1>
+							<p>You need to sign in to access this page.</p>
+							<div className="card-actions mt-4">
+								<a className="btn btn-primary" href="/login">
+									Sign in
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			)
+		}
+
+		if (error.status === 404) {
+			return (
+				<div className="flex min-h-screen items-center justify-center p-4">
+					<div className="card bg-base-200 w-full max-w-md shadow-lg">
+						<div className="card-body items-center text-center">
+							<h1 className="card-title text-2xl">Page not found</h1>
+							<p>The page you are looking for does not exist.</p>
+							<div className="card-actions mt-4">
+								<a className="btn btn-primary" href="/">
+									Go home
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			)
+		}
+
+		return (
+			<div className="flex min-h-screen items-center justify-center p-4">
+				<div className="card bg-base-200 w-full max-w-md shadow-lg">
+					<div className="card-body">
+						<h1 className="card-title text-2xl">
+							{error.status} {error.statusText}
+						</h1>
+						<p>{error.data?.toString() ?? 'An error occurred.'}</p>
+						<div className="card-actions mt-4">
+							<a className="btn btn-primary" href="/">
+								Go home
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		)
 	}
 
 	return (
-		<div className="flex min-h-screen items-center justify-center">
-			<div className="card bg-base-200 shadow-lg">
+		<div className="flex min-h-screen items-center justify-center p-4">
+			<div className="card bg-base-200 w-full max-w-md shadow-lg">
 				<div className="card-body">
-					<h1 className="card-title text-2xl">{title}</h1>
-					<p>{message}</p>
+					<div className="alert alert-error mb-4">
+						<span>An unexpected error occurred.</span>
+					</div>
+					{process.env.NODE_ENV === 'development' && error instanceof Error && (
+						<details className="collapse-arrow bg-base-300 collapse">
+							<summary className="collapse-title font-medium">
+								Error details
+							</summary>
+							<div className="collapse-content">
+								<p className="font-mono text-sm">{error.message}</p>
+								{error.stack && (
+									<pre className="mt-2 overflow-auto text-xs">
+										{error.stack}
+									</pre>
+								)}
+							</div>
+						</details>
+					)}
+					<div className="card-actions mt-4">
+						<a className="btn btn-primary" href="/">
+							Go home
+						</a>
+					</div>
 				</div>
 			</div>
 		</div>

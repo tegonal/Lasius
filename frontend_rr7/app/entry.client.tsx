@@ -68,7 +68,7 @@ async function main() {
 }
 
 main().catch((error) => {
-	// Logger may not be available during hydration startup
+	// Logger may not be available during hydration startup — use console as fallback
 
 	console.error('Hydration error:', error)
 })
