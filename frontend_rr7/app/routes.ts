@@ -20,6 +20,7 @@
 import {
 	index,
 	layout,
+	prefix,
 	route,
 	type RouteConfig,
 } from '@react-router/dev/routes'
@@ -28,20 +29,27 @@ export default [
 	// Auth routes (public)
 	route('login', 'routes/login.tsx'),
 	route('logout', 'routes/logout.tsx'),
-	route('internal-oauth/login', 'routes/internal-oauth.login.tsx'),
-	route('internal-oauth/register', 'routes/internal-oauth.register.tsx'),
-	route('oauth/:provider/login', 'routes/oauth.$provider.login.tsx'),
-	route('oauth/callback', 'routes/oauth.callback.tsx'),
+	...prefix('internal-oauth', [
+		route('login', 'routes/internal-oauth.login.tsx'),
+		route('register', 'routes/internal-oauth.register.tsx'),
+	]),
+	...prefix('oauth', [
+		route(':provider/login', 'routes/oauth.$provider.login.tsx'),
+		route('callback', 'routes/oauth.callback.tsx'),
+	]),
 
-	// API routes (public)
-	route('api/session-status', 'routes/api.session-status.tsx'),
-	route('api/locales/:lang/:ns', 'routes/api.locales.$lang.$ns.ts'),
-	route('api/help/:locale/:slug', 'routes/api.help.$locale.$slug.ts'),
-
-	// API routes (authenticated)
-	route('api/calendar-bookings', 'routes/api.calendar-bookings.ts'),
-	route('api/org-switch', 'routes/api.org-switch.ts'),
+	// API resource routes
+	...prefix('api', [
+		route('session-status', 'routes/api.session-status.tsx'),
+		route('locales/:lang/:ns', 'routes/api.locales.$lang.$ns.ts'),
+		route('help/:locale/:slug', 'routes/api.help.$locale.$slug.ts'),
+		route('theme', 'routes/api.theme.ts'),
+		route('calendar-bookings', 'routes/api.calendar-bookings.ts'),
+		route('org-switch', 'routes/api.org-switch.ts'),
+	]),
 
 	// Authenticated app routes — requireUser redirects to /login if unauthenticated
-	layout('routes/app-layout.tsx', [index('routes/dashboard.tsx')]),
+	layout('routes/app-layout.tsx', [
+		layout('routes/home.tsx', [index('routes/home._index.tsx')]),
+	]),
 ] satisfies RouteConfig

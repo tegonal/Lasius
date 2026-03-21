@@ -18,9 +18,15 @@
  */
 
 import { LogOutIcon } from 'lucide-react'
-import { Suspense } from 'react'
 import { useTranslation } from 'react-i18next'
-import { data, Form, href, Link, Outlet } from 'react-router'
+import {
+	data,
+	Form,
+	href,
+	Link,
+	Outlet,
+	type ShouldRevalidateFunctionArgs,
+} from 'react-router'
 
 import { DevInfoBadge } from '~/components/features/system/dev-info-badge'
 import { Button } from '~/components/primitives/buttons/button'
@@ -28,6 +34,7 @@ import { Logo } from '~/components/ui/icons/logo'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { TegonalFooter } from '~/components/ui/navigation/tegonal-footer'
 import { CalendarWeek } from '~/features/calendar/components/calendar-week'
+import { HelpButton } from '~/features/help/components/help-button'
 import { OrgSwitcher } from '~/features/organisation/components/org-switcher'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { getUserProfile } from '~/services/api/lasius/user/user'
@@ -39,11 +46,30 @@ import {
 
 import { type Route } from './+types/app-layout'
 
+/** Skip revalidation for same-page navigations, but allow action-triggered revalidation */
+export function shouldRevalidate({
+	currentUrl,
+	defaultShouldRevalidate,
+	formMethod,
+	nextUrl,
+}: ShouldRevalidateFunctionArgs) {
+	if (formMethod) {
+		return defaultShouldRevalidate
+	}
+	if (currentUrl.pathname === nextUrl.pathname) {
+		return false
+	}
+	return defaultShouldRevalidate
+}
+
 export const loader = async ({ request }: Route.LoaderArgs) => {
 	const auth = await requireUser(request)
 	const profile = await getUserProfile({
 		headers: authHeaders(auth.session),
 	})
+	// accessToken and tokenIssuer are intentionally exposed to the client —
+	// the WebSocket connection authenticates via these credentials, matching
+	// the original frontend's NextAuth session behavior.
 	return data(
 		{
 			accessToken: auth.session.accessToken,
@@ -77,6 +103,7 @@ export default function AppLayout(_props: Route.ComponentProps) {
 
 						<div className="flex items-center justify-end gap-2 pr-8">
 							<OrgSwitcher />
+							<HelpButton />
 							<Form action="/logout" method="post">
 								<Button
 									aria-label={t('auth.actions.signOut', {
@@ -121,28 +148,9 @@ export default function AppLayout(_props: Route.ComponentProps) {
 
 			{/* Desktop content area */}
 			<div className="bg-base-200 border-base-content/20 hidden h-full w-full overflow-hidden rounded-xl border shadow-2xl md:flex md:flex-col">
-				<section className="h-full w-full overflow-auto">
-					<div className="grid size-full grid-cols-[17rem_auto_18rem] overflow-auto lg:grid-cols-[18rem_auto_19rem] xl:grid-cols-[19rem_auto_20rem] 2xl:grid-cols-[19rem_auto_24rem]">
-						{/* Left column: navigation sidebar */}
-						<div className="h-full w-full rounded-tl-xl">
-							{/* NavigationMenuTabs placeholder */}
-						</div>
-
-						{/* Center: main content */}
-						<Suspense
-							fallback={
-								<div className="flex h-full items-center justify-center">
-									<span className="loading loading-spinner loading-lg text-primary" />
-								</div>
-							}
-						>
-							<Outlet />
-						</Suspense>
-
-						{/* Right column placeholder */}
-						<div className="border-base-100 bg-base-200 text-base-content flex h-full w-full overflow-auto rounded-tr-xl border-l" />
-					</div>
-				</section>
+				<div className="h-full w-full overflow-auto">
+					<Outlet />
+				</div>
 
 				{/* Desktop footer */}
 				<footer className="border-base-content/20 bg-base-100 flex items-center justify-between border-t px-3 py-2">
@@ -152,15 +160,7 @@ export default function AppLayout(_props: Route.ComponentProps) {
 
 			{/* Mobile content area */}
 			<section className="bg-base-200 h-full w-full overflow-hidden md:hidden">
-				<Suspense
-					fallback={
-						<div className="flex h-full items-center justify-center">
-							<span className="loading loading-spinner loading-lg text-primary" />
-						</div>
-					}
-				>
-					<Outlet />
-				</Suspense>
+				<Outlet />
 			</section>
 
 			<DevInfoBadge />

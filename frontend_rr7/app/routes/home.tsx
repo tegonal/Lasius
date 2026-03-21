@@ -17,19 +17,42 @@
  *
  */
 
-import { useTranslation } from 'react-i18next'
+import { Suspense } from 'react'
+import { Outlet } from 'react-router'
 
-export default function Home() {
-	const { t } = useTranslation()
-
+export default function HomeLayout() {
 	return (
-		<div className="flex min-h-screen items-center justify-center">
-			<div className="card bg-base-200 shadow-lg">
-				<div className="card-body">
-					<h1 className="card-title text-2xl">Lasius</h1>
-					<p>{t('common:Organisations.title')}</p>
+		<>
+			{/* Desktop: 3-column grid */}
+			<section className="hidden size-full overflow-auto md:block">
+				<div className="grid size-full grid-cols-[17rem_auto_18rem] overflow-auto lg:grid-cols-[18rem_auto_19rem] xl:grid-cols-[19rem_auto_20rem] 2xl:grid-cols-[19rem_auto_24rem]">
+					{/* Left column: navigation sidebar */}
+					<div className="h-full w-full rounded-tl-xl">
+						{/* TODO: NavigationMenuTabs */}
+					</div>
+
+					{/* Center: main content */}
+					<Suspense
+						fallback={
+							<div className="flex h-full items-center justify-center">
+								<span className="loading loading-spinner loading-lg text-primary" />
+							</div>
+						}
+					>
+						<Outlet />
+					</Suspense>
+
+					{/* Right column */}
+					<div className="border-base-100 bg-base-200 text-base-content flex h-full w-full overflow-auto rounded-tr-xl border-l">
+						{/* TODO: IndexColumnTabs */}
+					</div>
 				</div>
-			</div>
-		</div>
+			</section>
+
+			{/* Mobile: single column */}
+			<section className="h-full w-full overflow-hidden md:hidden">
+				<Outlet />
+			</section>
+		</>
 	)
 }
