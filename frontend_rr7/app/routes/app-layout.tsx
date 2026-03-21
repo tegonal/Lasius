@@ -20,25 +20,34 @@
 import { LogOutIcon } from 'lucide-react'
 import { Suspense } from 'react'
 import { useTranslation } from 'react-i18next'
-import { data, Form, Link, Outlet } from 'react-router'
+import { data, Form, href, Link, Outlet } from 'react-router'
 
 import { DevInfoBadge } from '~/components/features/system/dev-info-badge'
 import { Button } from '~/components/primitives/buttons/button'
 import { Logo } from '~/components/ui/icons/logo'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { TegonalFooter } from '~/components/ui/navigation/tegonal-footer'
-import { requireUser } from '~/services/auth/auth-helpers.server'
+import { getUserProfile } from '~/services/api/lasius/user/user'
+import {
+	authHeaders,
+	mergeAuthHeaders,
+	requireUser,
+} from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/app-layout'
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-	const session = await requireUser(request)
-	return data({
-		user: {
-			email: session.email,
-			userId: session.userId,
-		},
+	const auth = await requireUser(request)
+	const profile = await getUserProfile({
+		headers: authHeaders(auth.session),
 	})
+	return data(
+		{
+			user: profile.data,
+			websocketUrl: process.env.LASIUS_API_WEBSOCKET_URL || '',
+		},
+		{ headers: mergeAuthHeaders(auth) },
+	)
 }
 
 export default function AppLayout(_props: Route.ComponentProps) {
@@ -51,7 +60,7 @@ export default function AppLayout(_props: Route.ComponentProps) {
 				<section className="h-full w-full overflow-visible">
 					<div className="grid h-full w-full grid-cols-[minmax(200px,310px)_minmax(max-content,auto)_minmax(200px,310px)] gap-0 overflow-visible 2xl:grid-cols-[minmax(200px,340px)_minmax(max-content,auto)_minmax(200px,340px)]">
 						<div className="hover:text-info flex cursor-pointer items-center justify-start gap-8 pl-8">
-							<Link to="/">
+							<Link to={href('/')}>
 								<Logo />
 							</Link>
 						</div>
@@ -83,7 +92,7 @@ export default function AppLayout(_props: Route.ComponentProps) {
 			{/* Mobile header */}
 			<div className="overflow-hidden md:hidden">
 				<section className="flex h-full w-full items-center justify-between px-4">
-					<Link to="/">
+					<Link to={href('/')}>
 						<Logo size="sm" />
 					</Link>
 					<Form action="/logout" method="post">
