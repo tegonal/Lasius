@@ -18,7 +18,8 @@
  */
 
 import { toDate } from 'date-fns'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router'
 
 import {
 	useCalendarActions,
@@ -27,7 +28,9 @@ import {
 import { formatISOLocale, type IsoDateString } from '~/lib/utils/dates'
 
 /**
- * Manages day selection with optional calendar store integration
+ * Manages day selection with calendar store + URL search param integration.
+ * When useStore is true, selecting a day also sets ?date= in the URL,
+ * which triggers loader revalidation in child routes.
  */
 export const useCalendarSelection = (
 	initialDate: IsoDateString,
@@ -35,6 +38,7 @@ export const useCalendarSelection = (
 ) => {
 	const storeSelectedDate = useSelectedDate()
 	const { setSelectedDate: setStoreSelectedDate } = useCalendarActions()
+	const [, setSearchParams] = useSearchParams()
 
 	const [selectedDay, setSelectedDay] = useState<IsoDateString>(
 		useStore ? storeSelectedDate : initialDate,
@@ -46,16 +50,26 @@ export const useCalendarSelection = (
 		}
 	}, [storeSelectedDate, useStore])
 
-	const selectDay = (day: IsoDateString) => {
-		setSelectedDay(day)
-		if (useStore) {
-			setStoreSelectedDate(day)
-		}
-	}
+	const selectDay = useCallback(
+		(day: IsoDateString) => {
+			setSelectedDay(day)
+			if (useStore) {
+				setStoreSelectedDate(day)
+				setSearchParams(
+					(prev) => {
+						prev.set('date', day)
+						return prev
+					},
+					{ preventScrollReset: true },
+				)
+			}
+		},
+		[useStore, setStoreSelectedDate, setSearchParams],
+	)
 
-	const selectToday = () => {
+	const selectToday = useCallback(() => {
 		selectDay(formatISOLocale(new Date()))
-	}
+	}, [selectDay])
 
 	const getDay = (str: IsoDateString) => {
 		return toDate(new Date(str)).getDate()

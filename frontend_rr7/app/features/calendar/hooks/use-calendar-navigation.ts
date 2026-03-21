@@ -19,6 +19,7 @@
 
 import { addMonths, addWeeks } from 'date-fns'
 import { useCallback, useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router'
 
 import { useCalendarActions } from '~/features/calendar/calendar-store'
 import {
@@ -35,6 +36,7 @@ export const useCalendarNavigation = (
 	viewType: ViewType,
 ) => {
 	const { setSelectedDate } = useCalendarActions()
+	const [, setSearchParams] = useSearchParams()
 	const [period, setPeriod] = useState<IsoDateString[]>(
 		viewType === 'month'
 			? getMonthOfDate(initialDate)
@@ -50,6 +52,20 @@ export const useCalendarNavigation = (
 		setPeriod(newPeriod)
 	}, [initialDate, viewType])
 
+	const navigateToDate = useCallback(
+		(date: IsoDateString) => {
+			setSelectedDate(date)
+			setSearchParams(
+				(prev) => {
+					prev.set('date', date)
+					return prev
+				},
+				{ preventScrollReset: true },
+			)
+		},
+		[setSelectedDate, setSearchParams],
+	)
+
 	const next = useCallback(() => {
 		setPeriod((currentPeriod) => {
 			const firstDay = currentPeriod[0]
@@ -60,13 +76,12 @@ export const useCalendarNavigation = (
 					? addMonths(currentFirst, 1)
 					: addWeeks(currentFirst, 1)
 			const nextPeriodFormatted = formatISOLocale(nextPeriod)
-			// Update selected date in store so stats update
-			setSelectedDate(nextPeriodFormatted)
+			navigateToDate(nextPeriodFormatted)
 			return viewType === 'month'
 				? getMonthOfDate(nextPeriod)
 				: getWeekOfDate(nextPeriodFormatted)
 		})
-	}, [viewType, setSelectedDate])
+	}, [viewType, navigateToDate])
 
 	const previous = useCallback(() => {
 		setPeriod((currentPeriod) => {
@@ -78,13 +93,12 @@ export const useCalendarNavigation = (
 					? addMonths(currentFirst, -1)
 					: addWeeks(currentFirst, -1)
 			const prevPeriodFormatted = formatISOLocale(prevPeriod)
-			// Update selected date in store so stats update
-			setSelectedDate(prevPeriodFormatted)
+			navigateToDate(prevPeriodFormatted)
 			return viewType === 'month'
 				? getMonthOfDate(prevPeriod)
 				: getWeekOfDate(prevPeriodFormatted)
 		})
-	}, [viewType, setSelectedDate])
+	}, [viewType, navigateToDate])
 
 	const goToDate = useCallback(
 		(date: IsoDateString) => {

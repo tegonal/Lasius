@@ -53,9 +53,11 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 		organisations[0]?.organisationReference.id ??
 		''
 
-	// Today's date as default (future: read from URL search param)
-	const today = formatISOLocale(new Date())
-	const dayTimespan = apiTimespanDay(today)
+	// Read selected date from URL search param, fall back to today
+	const url = new URL(request.url)
+	const dateParam = url.searchParams.get('date')
+	const selectedDate = dateParam || formatISOLocale(new Date())
+	const dayTimespan = apiTimespanDay(selectedDate)
 
 	// Fetch day bookings and current booking in parallel
 	const [dayBookingsRes, currentBookingRes] = await Promise.all([
@@ -102,7 +104,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 				plannedWorkingHours: plannedHoursDay,
 				progressBarPercentage,
 			},
-			selectedDate: today,
+			selectedDate,
 		},
 		{ headers: mergeAuthHeaders(auth) },
 	)
