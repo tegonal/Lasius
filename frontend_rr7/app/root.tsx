@@ -18,7 +18,9 @@
  */
 
 import { type PropsWithChildren } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
+	data,
 	isRouteErrorResponse,
 	Links,
 	type LinksFunction,
@@ -27,14 +29,35 @@ import {
 	Scripts,
 	ScrollRestoration,
 } from 'react-router'
+import { useChangeLanguage } from 'remix-i18next/react'
 
+import { localeCookie } from '~/lib/cookies/i18next-cookie.server'
+import { getLocale, i18nextMiddleware } from '~/middleware/i18next'
+
+import { type Route } from './+types/root.ts'
 import './tailwind.css'
+
+export const middleware = [i18nextMiddleware]
 
 export const links: LinksFunction = () => [
 	{ href: '/favicon.svg', rel: 'icon', type: 'image/svg+xml' },
 ]
 
-export default function App() {
+export const handle = {
+	i18n: ['common'],
+}
+
+export const loader = async ({ context }: Route.LoaderArgs) => {
+	const locale = getLocale(context)
+
+	const headers = new Headers()
+	headers.append('Set-Cookie', await localeCookie.serialize(locale))
+
+	return data({ locale }, { headers })
+}
+
+export default function App({ loaderData }: Route.ComponentProps) {
+	useChangeLanguage(loaderData.locale)
 	return <Outlet />
 }
 
@@ -62,8 +85,10 @@ export function ErrorBoundary({ error }: { error: unknown }) {
 }
 
 export function Layout({ children }: PropsWithChildren) {
+	const { i18n } = useTranslation()
+
 	return (
-		<html lang="en">
+		<html dir={i18n.dir(i18n.language)} lang={i18n.language}>
 			<head>
 				<meta charSet="utf-8" />
 				<meta content="width=device-width, initial-scale=1" name="viewport" />

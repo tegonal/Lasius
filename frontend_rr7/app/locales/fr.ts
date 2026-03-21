@@ -17,19 +17,12 @@
  *
  */
 
-import { useTranslation } from 'react-i18next'
+import common from './fr/common.json'
+import integrations from './fr/integrations.json'
 
-export default function Home() {
-	const { t } = useTranslation()
+const resources = {
+	common,
+	integrations,
+} as const
 
-	return (
-		<div className="flex min-h-screen items-center justify-center">
-			<div className="card bg-base-200 shadow-lg">
-				<div className="card-body">
-					<h1 className="card-title text-2xl">Lasius</h1>
-					<p>{t('common:Organisations.title')}</p>
-				</div>
-			</div>
-		</div>
-	)
-}
+export default resources

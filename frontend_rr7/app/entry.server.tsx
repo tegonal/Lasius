@@ -24,13 +24,17 @@ import {
 	renderToPipeableStream,
 	type RenderToPipeableStreamOptions,
 } from 'react-dom/server'
+import { I18nextProvider } from 'react-i18next'
 import {
 	type EntryContext,
 	isRouteErrorResponse,
+	type RouterContextProvider,
 	ServerRouter,
 } from 'react-router'
 
 import { logger } from '~/lib/logger'
+
+import { getInstance } from './middleware/i18next'
 
 export const streamTimeout = 5_000
 
@@ -58,6 +62,7 @@ export default function handleRequest(
 	responseStatusCode: number,
 	responseHeaders: Headers,
 	entryContext: EntryContext,
+	routerContext: RouterContextProvider,
 ) {
 	return new Promise((resolve, reject) => {
 		let shellRendered = false
@@ -69,7 +74,9 @@ export default function handleRequest(
 				: 'onShellReady'
 
 		const { abort, pipe } = renderToPipeableStream(
-			<ServerRouter context={entryContext} url={request.url} />,
+			<I18nextProvider i18n={getInstance(routerContext)}>
+				<ServerRouter context={entryContext} url={request.url} />
+			</I18nextProvider>,
 			{
 				onError(error: unknown) {
 					responseStatusCode = 500

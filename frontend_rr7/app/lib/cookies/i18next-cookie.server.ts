@@ -17,19 +17,11 @@
  *
  */
 
-import { useTranslation } from 'react-i18next'
+import { createCookie } from 'react-router'
 
-export default function Home() {
-	const { t } = useTranslation()
-
-	return (
-		<div className="flex min-h-screen items-center justify-center">
-			<div className="card bg-base-200 shadow-lg">
-				<div className="card-body">
-					<h1 className="card-title text-2xl">Lasius</h1>
-					<p>{t('common:Organisations.title')}</p>
-				</div>
-			</div>
-		</div>
-	)
-}
+export const localeCookie = createCookie('lng', {
+	httpOnly: true,
+	path: '/',
+	sameSite: 'lax',
+	secure: process.env.NODE_ENV === 'production',
+})

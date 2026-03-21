@@ -2185,6 +2185,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/accept-language-parser@npm:^1.5.8":
+  version: 1.5.8
+  resolution: "@types/accept-language-parser@npm:1.5.8"
+  checksum: 10c0/acd6909999f8761d812e2eb8878bcb22c270937560766f6ba404f98e9b2c76144b4c556c76f78c0b0387ff1c2bef8665dae69c617d6ef87cd32c957f53e8b446
+  languageName: node
+  linkType: hard
+
 "@types/babel__core@npm:^7":
   version: 7.20.5
   resolution: "@types/babel__core@npm:7.20.5"
@@ -5531,6 +5538,7 @@ __metadata:
     "@react-router/dev": "npm:^7.13.1"
     "@react-router/serve": "npm:^7.13.1"
     "@tailwindcss/vite": "npm:^4.2.2"
+    "@types/accept-language-parser": "npm:^1.5.8"
     "@types/babel__core": "npm:^7"
     "@types/node": "npm:^24.12.0"
     "@types/react": "npm:^19.2.14"
