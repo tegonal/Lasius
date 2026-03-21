@@ -40,6 +40,7 @@ export default [
 
 	// API routes (authenticated)
 	route('api/calendar-bookings', 'routes/api.calendar-bookings.ts'),
+	route('api/org-switch', 'routes/api.org-switch.ts'),
 
 	// Authenticated app routes — requireUser redirects to /login if unauthenticated
 	layout('routes/app-layout.tsx', [index('routes/dashboard.tsx')]),
