@@ -18,14 +18,14 @@
  */
 
 export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="card bg-base-200 shadow-lg">
-        <div className="card-body">
-          <h1 className="card-title text-2xl">Lasius</h1>
-          <p>React Router 7 scaffold — working!</p>
-        </div>
-      </div>
-    </div>
-  )
+	return (
+		<div className="flex min-h-screen items-center justify-center">
+			<div className="card bg-base-200 shadow-lg">
+				<div className="card-body">
+					<h1 className="card-title text-2xl">Lasius</h1>
+					<p>React Router 7 scaffold — working!</p>
+				</div>
+			</div>
+		</div>
+	)
 }

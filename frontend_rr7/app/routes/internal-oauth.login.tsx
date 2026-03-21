@@ -18,5 +18,5 @@
  */
 
 export default function InternalOAuthLogin() {
-  return <div>Internal OAuth login — placeholder</div>
+	return <div>Internal OAuth login — placeholder</div>
 }

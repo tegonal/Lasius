@@ -1,0 +1,10 @@
+**/*.log
+**/.DS_Store
+.vscode/settings.json
+.history
+node_modules
+public
+.yarn
+dist
+build
+.react-router

@@ -18,5 +18,5 @@
  */
 
 export default function Logout() {
-  return <div>Logout — placeholder</div>
+	return <div>Logout — placeholder</div>
 }

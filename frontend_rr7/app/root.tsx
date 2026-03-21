@@ -19,62 +19,62 @@
 
 import { type PropsWithChildren } from 'react'
 import {
-  isRouteErrorResponse,
-  Links,
-  type LinksFunction,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
+	isRouteErrorResponse,
+	Links,
+	type LinksFunction,
+	Meta,
+	Outlet,
+	Scripts,
+	ScrollRestoration,
 } from 'react-router'
 
 import './tailwind.css'
 
 export const links: LinksFunction = () => [
-  { href: '/favicon.svg', rel: 'icon', type: 'image/svg+xml' },
+	{ href: '/favicon.svg', rel: 'icon', type: 'image/svg+xml' },
 ]
 
-export function Layout({ children }: PropsWithChildren) {
-  return (
-    <html lang="en">
-      <head>
-        <meta charSet="utf-8" />
-        <meta content="width=device-width, initial-scale=1" name="viewport" />
-        <Links />
-        <Meta />
-      </head>
-      <body>
-        {children}
-        <ScrollRestoration />
-        <Scripts />
-      </body>
-    </html>
-  )
-}
-
 export default function App() {
-  return <Outlet />
+	return <Outlet />
 }
 
 export function ErrorBoundary({ error }: { error: unknown }) {
-  let title = 'Unexpected Error'
-  let message = 'An unexpected error occurred.'
+	let title = 'Unexpected Error'
+	let message = 'An unexpected error occurred.'
 
-  if (isRouteErrorResponse(error)) {
-    title = `${error.status} ${error.statusText}`
-    message = error.data?.toString() ?? message
-  } else if (error instanceof Error) {
-    message = error.message
-  }
+	if (isRouteErrorResponse(error)) {
+		title = `${error.status} ${error.statusText}`
+		message = error.data?.toString() ?? message
+	} else if (error instanceof Error) {
+		message = error.message
+	}
 
-  return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="card bg-base-200 shadow-lg">
-        <div className="card-body">
-          <h1 className="card-title text-2xl">{title}</h1>
-          <p>{message}</p>
-        </div>
-      </div>
-    </div>
-  )
+	return (
+		<div className="flex min-h-screen items-center justify-center">
+			<div className="card bg-base-200 shadow-lg">
+				<div className="card-body">
+					<h1 className="card-title text-2xl">{title}</h1>
+					<p>{message}</p>
+				</div>
+			</div>
+		</div>
+	)
+}
+
+export function Layout({ children }: PropsWithChildren) {
+	return (
+		<html lang="en">
+			<head>
+				<meta charSet="utf-8" />
+				<meta content="width=device-width, initial-scale=1" name="viewport" />
+				<Links />
+				<Meta />
+			</head>
+			<body>
+				{children}
+				<ScrollRestoration />
+				<Scripts />
+			</body>
+		</html>
+	)
 }

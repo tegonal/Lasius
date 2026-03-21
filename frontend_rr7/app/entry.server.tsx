@@ -20,8 +20,15 @@
 import { createReadableStreamFromReadable } from '@react-router/node'
 import { isbot } from 'isbot'
 import { PassThrough } from 'node:stream'
-import { renderToPipeableStream, type RenderToPipeableStreamOptions } from 'react-dom/server'
-import { type EntryContext, isRouteErrorResponse, ServerRouter } from 'react-router'
+import {
+	renderToPipeableStream,
+	type RenderToPipeableStreamOptions,
+} from 'react-dom/server'
+import {
+	type EntryContext,
+	isRouteErrorResponse,
+	ServerRouter,
+} from 'react-router'
 
 import { logger } from '~/lib/logger'
 
@@ -32,62 +39,64 @@ export const streamTimeout = 5_000
  * Filters out aborted requests and expected client errors.
  */
 export function handleError(error: unknown, { request }: { request: Request }) {
-  // Don't log aborted requests (user navigated away)
-  if (request.signal.aborted) {
-    return
-  }
+	// Don't log aborted requests (user navigated away)
+	if (request.signal.aborted) {
+		return
+	}
 
-  // Don't log expected client errors (4xx responses)
-  if (isRouteErrorResponse(error) && error.status < 500) {
-    return
-  }
+	// Don't log expected client errors (4xx responses)
+	if (isRouteErrorResponse(error) && error.status < 500) {
+		return
+	}
 
-  // Log server errors
-  logger.error({ error, url: request.url }, 'Unhandled server error')
+	// Log server errors
+	logger.error({ error, url: request.url }, 'Unhandled server error')
 }
 
 export default function handleRequest(
-  request: Request,
-  responseStatusCode: number,
-  responseHeaders: Headers,
-  entryContext: EntryContext,
+	request: Request,
+	responseStatusCode: number,
+	responseHeaders: Headers,
+	entryContext: EntryContext,
 ) {
-  return new Promise((resolve, reject) => {
-    let shellRendered = false
-    const userAgent = request.headers.get('user-agent')
+	return new Promise((resolve, reject) => {
+		let shellRendered = false
+		const userAgent = request.headers.get('user-agent')
 
-    const readyOption: keyof RenderToPipeableStreamOptions =
-      (userAgent && isbot(userAgent)) || entryContext.isSpaMode ? 'onAllReady' : 'onShellReady'
+		const readyOption: keyof RenderToPipeableStreamOptions =
+			(userAgent && isbot(userAgent)) || entryContext.isSpaMode
+				? 'onAllReady'
+				: 'onShellReady'
 
-    const { abort, pipe } = renderToPipeableStream(
-      <ServerRouter context={entryContext} url={request.url} />,
-      {
-        onError(error: unknown) {
-          responseStatusCode = 500
-          if (shellRendered) logger.error(error)
-        },
-        onShellError(error: unknown) {
-          reject(error)
-        },
-        [readyOption]() {
-          shellRendered = true
-          const body = new PassThrough()
-          const stream = createReadableStreamFromReadable(body)
+		const { abort, pipe } = renderToPipeableStream(
+			<ServerRouter context={entryContext} url={request.url} />,
+			{
+				onError(error: unknown) {
+					responseStatusCode = 500
+					if (shellRendered) logger.error(error)
+				},
+				onShellError(error: unknown) {
+					reject(error)
+				},
+				[readyOption]() {
+					shellRendered = true
+					const body = new PassThrough()
+					const stream = createReadableStreamFromReadable(body)
 
-          responseHeaders.set('Content-Type', 'text/html')
+					responseHeaders.set('Content-Type', 'text/html')
 
-          resolve(
-            new Response(stream, {
-              headers: responseHeaders,
-              status: responseStatusCode,
-            }),
-          )
+					resolve(
+						new Response(stream, {
+							headers: responseHeaders,
+							status: responseStatusCode,
+						}),
+					)
 
-          pipe(body)
-        },
-      },
-    )
+					pipe(body)
+				},
+			},
+		)
 
-    setTimeout(abort, streamTimeout + 1000)
-  })
+		setTimeout(abort, streamTimeout + 1000)
+	})
 }

@@ -18,5 +18,5 @@
  */
 
 export default function OAuthProviderLogin() {
-  return <div>OAuth provider login — placeholder</div>
+	return <div>OAuth provider login — placeholder</div>
 }

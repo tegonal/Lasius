@@ -18,5 +18,5 @@
  */
 
 export default function OAuthCallback() {
-  return <div>OAuth callback — placeholder</div>
+	return <div>OAuth callback — placeholder</div>
 }

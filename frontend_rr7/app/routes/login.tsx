@@ -18,5 +18,5 @@
  */
 
 export default function Login() {
-  return <div>Login — placeholder</div>
+	return <div>Login — placeholder</div>
 }

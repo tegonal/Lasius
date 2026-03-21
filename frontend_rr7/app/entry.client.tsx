@@ -24,18 +24,21 @@ import { HydratedRouter } from 'react-router/dom'
 import { logger } from '~/lib/logger'
 
 window.addEventListener('error', (event) => {
-  logger.error({ error: event.error, type: 'window-error' }, 'Uncaught error')
+	logger.error({ error: event.error, type: 'window-error' }, 'Uncaught error')
 })
 
 window.addEventListener('unhandledrejection', (event) => {
-  logger.error({ error: event.reason, type: 'unhandled-rejection' }, 'Unhandled rejection')
+	logger.error(
+		{ error: event.reason, type: 'unhandled-rejection' },
+		'Unhandled rejection',
+	)
 })
 
 startTransition(() => {
-  hydrateRoot(
-    document,
-    <StrictMode>
-      <HydratedRouter />
-    </StrictMode>,
-  )
+	hydrateRoot(
+		document,
+		<StrictMode>
+			<HydratedRouter />
+		</StrictMode>,
+	)
 })

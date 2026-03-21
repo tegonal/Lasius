@@ -17,23 +17,23 @@
  *
  */
 
-import { type RouteConfig, index, route } from '@react-router/dev/routes'
+import { index, route, type RouteConfig } from '@react-router/dev/routes'
 
 export default [
-  // Home / health check
-  index('routes/home.tsx'),
+	// Home / health check
+	index('routes/home.tsx'),
 
-  // Auth routes (no lang prefix — OAuth redirects are language-independent)
-  route('login', 'routes/login.tsx'),
-  route('logout', 'routes/logout.tsx'),
-  route('internal-oauth/login', 'routes/internal-oauth.login.tsx'),
-  route('oauth/:provider/login', 'routes/oauth.$provider.login.tsx'),
-  route('oauth/callback', 'routes/oauth.callback.tsx'),
+	// Auth routes (no lang prefix — OAuth redirects are language-independent)
+	route('login', 'routes/login.tsx'),
+	route('logout', 'routes/logout.tsx'),
+	route('internal-oauth/login', 'routes/internal-oauth.login.tsx'),
+	route('oauth/:provider/login', 'routes/oauth.$provider.login.tsx'),
+	route('oauth/callback', 'routes/oauth.callback.tsx'),
 
-  // Language-prefixed app routes (added in later tasks)
-  // ...prefix(':lang', [
-  //   layout('routes/app-layout.tsx', [
-  //     index('routes/dashboard.tsx'),
-  //   ]),
-  // ]),
+	// Language-prefixed app routes (added in later tasks)
+	// ...prefix(':lang', [
+	//   layout('routes/app-layout.tsx', [
+	//     index('routes/dashboard.tsx'),
+	//   ]),
+	// ]),
 ] satisfies RouteConfig
