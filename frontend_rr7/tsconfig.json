@@ -1,0 +1,24 @@
+{
+  "extends": ["@epic-web/config/typescript"],
+  "include": [
+    ".react-router/types/**/*",
+    "@epic-web/config/reset.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.js",
+    "**/*.jsx"
+  ],
+  "exclude": ["node_modules", "dist", "build", "public", "temp"],
+  "compilerOptions": {
+    "incremental": true,
+    "allowImportingTsExtensions": true,
+    "noUncheckedIndexedAccess": true,
+    "baseUrl": ".",
+    "types": ["@react-router/node", "vite/client"],
+    "paths": {
+      "~/*": ["./app/*"],
+      "~/react-router/*": ["./.react-router/types/*"]
+    },
+    "rootDirs": [".", "./.react-router/types"]
+  }
+}
