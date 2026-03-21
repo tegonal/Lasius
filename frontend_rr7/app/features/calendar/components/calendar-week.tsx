@@ -30,7 +30,6 @@ import { CalendarDay } from '~/features/calendar/components/calendar-day'
 import { useCalendarNavigation } from '~/features/calendar/hooks/use-calendar-navigation'
 import { useCalendarSelection } from '~/features/calendar/hooks/use-calendar-selection'
 import { usePersistedSearchParam } from '~/hooks/use-persisted-search-param'
-import { useIsClient } from '~/lib/hooks/use-is-client'
 import { cn } from '~/lib/utils/cn'
 import { formatISOLocale } from '~/lib/utils/dates'
 
@@ -42,7 +41,6 @@ export function CalendarWeek({ organisationId }: { organisationId: string }) {
 		'date',
 		formatISOLocale(new Date()),
 	)
-	const isClient = useIsClient()
 	const dayRefs = useRef<(HTMLElement | null)[]>([])
 
 	const {
@@ -52,8 +50,6 @@ export function CalendarWeek({ organisationId }: { organisationId: string }) {
 	} = useCalendarNavigation(selectedDate, 'week')
 	const { isDaySelected, selectDay, selectedDay, selectToday } =
 		useCalendarSelection(selectedDate)
-
-	if (!isClient) return null
 
 	return (
 		<CalendarDataProvider
