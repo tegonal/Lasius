@@ -18,12 +18,12 @@
  */
 
 import { isToday, isWeekend } from 'date-fns'
+import { Suspense } from 'react'
 
 import { DotRed } from '~/components/ui/data-display/dots/dot-red'
 import { FormatDate } from '~/components/ui/data-display/format-date'
 import { ProgressBarSmall } from '~/components/ui/data-display/progress-bar-small'
 import { useCalendarDaySummary } from '~/features/calendar/hooks/use-calendar-day-summary'
-import { useIsClient } from '~/lib/hooks/use-is-client'
 import { cn } from '~/lib/utils/cn'
 import { type IsoDateString } from '~/lib/utils/dates'
 
@@ -36,14 +36,28 @@ export function CalendarDay({
 	isSelected?: boolean
 	onClick: (args: IsoDateString) => void
 }) {
-	const isClient = useIsClient()
+	return (
+		<Suspense fallback={<CalendarDaySkeleton />}>
+			<CalendarDayContent
+				date={date}
+				isSelected={isSelected}
+				onClick={onClick}
+			/>
+		</Suspense>
+	)
+}
+
+function CalendarDayContent({
+	date,
+	isSelected,
+	onClick,
+}: {
+	date: IsoDateString
+	isSelected: boolean
+	onClick: (args: IsoDateString) => void
+}) {
 	const day = new Date(date)
-
 	const { progressBarPercentage } = useCalendarDaySummary(date)
-
-	if (!isClient) return null
-
-	const handleDayClick = () => onClick(date)
 
 	return (
 		<button
@@ -52,7 +66,7 @@ export function CalendarDay({
 				isWeekend(day) && 'opacity-50',
 				isSelected && 'shadow-none hover:bg-transparent hover:text-current',
 			)}
-			onClick={handleDayClick}
+			onClick={() => onClick(date)}
 		>
 			<div className="pt-1 text-center text-xs leading-none font-normal uppercase">
 				<FormatDate date={day} format="dayNameShort" />
@@ -71,5 +85,14 @@ export function CalendarDay({
 				</div>
 			)}
 		</button>
+	)
+}
+
+function CalendarDaySkeleton() {
+	return (
+		<div className="flex min-h-[78px] w-full min-w-[56px] flex-col items-center justify-start pt-1">
+			<div className="skeleton h-3 w-6 rounded" />
+			<div className="skeleton mt-2 h-7 w-8 rounded" />
+		</div>
 	)
 }
