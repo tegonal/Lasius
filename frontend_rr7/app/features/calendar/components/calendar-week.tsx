@@ -23,21 +23,25 @@ import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
+import { SlidingIndicator } from '~/components/ui/animations/sliding-indicator'
 import { FormatDate } from '~/components/ui/data-display/format-date'
 import { CalendarDataProvider } from '~/features/calendar/calendar-data-provider'
-import { useSelectedDate } from '~/features/calendar/calendar-store'
 import { CalendarDay } from '~/features/calendar/components/calendar-day'
 import { useCalendarNavigation } from '~/features/calendar/hooks/use-calendar-navigation'
 import { useCalendarSelection } from '~/features/calendar/hooks/use-calendar-selection'
+import { usePersistedSearchParam } from '~/hooks/use-persisted-search-param'
 import { useIsClient } from '~/lib/hooks/use-is-client'
 import { cn } from '~/lib/utils/cn'
 import { formatISOLocale } from '~/lib/utils/dates'
 
-// ─── Arrow buttons ──────────────────────────────────────────────────────────
+// ─── CalendarWeek ───────────────────────────────────────────────────────────
 
 export function CalendarWeek({ organisationId }: { organisationId: string }) {
 	const { t } = useTranslation('common')
-	const selectedDate = useSelectedDate()
+	const selectedDate = usePersistedSearchParam(
+		'date',
+		formatISOLocale(new Date()),
+	)
 	const isClient = useIsClient()
 	const dayRefs = useRef<(HTMLElement | null)[]>([])
 
@@ -45,15 +49,15 @@ export function CalendarWeek({ organisationId }: { organisationId: string }) {
 		next,
 		period: week,
 		previous,
-	} = useCalendarNavigation(selectedDate || formatISOLocale(new Date()), 'week')
+	} = useCalendarNavigation(selectedDate, 'week')
 	const { isDaySelected, selectDay, selectedDay, selectToday } =
-		useCalendarSelection(selectedDate || formatISOLocale(new Date()), true)
+		useCalendarSelection(selectedDate)
 
 	if (!isClient) return null
 
 	return (
 		<CalendarDataProvider
-			date={selectedDate || formatISOLocale(new Date())}
+			date={selectedDate}
 			organisationId={organisationId}
 			period="week"
 		>
@@ -116,7 +120,11 @@ export function CalendarWeek({ organisationId }: { organisationId: string }) {
 									</div>
 								))}
 							</div>
-							{/* TODO: Add SlidingIndicator component for selected day highlight */}
+							<SlidingIndicator
+								itemRefs={dayRefs}
+								radiusOn="bottom"
+								selectedIndex={week.findIndex((day) => isDaySelected(day))}
+							/>
 						</div>
 					</div>
 				</div>
@@ -141,7 +149,7 @@ function ButtonLeft(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
 	)
 }
 
-// ─── CalendarWeek ───────────────────────────────────────────────────────────
+// ─── Arrow buttons ──────────────────────────────────────────────────────────
 
 function ButtonRight(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
 	return (

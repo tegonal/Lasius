@@ -21,7 +21,6 @@ import { addMonths, addWeeks } from 'date-fns'
 import { useCallback, useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router'
 
-import { useCalendarActions } from '~/features/calendar/calendar-store'
 import {
 	formatISOLocale,
 	getMonthOfDate,
@@ -32,29 +31,27 @@ import {
 type ViewType = 'month' | 'week'
 
 export const useCalendarNavigation = (
-	initialDate: IsoDateString,
+	selectedDate: IsoDateString,
 	viewType: ViewType,
 ) => {
-	const { setSelectedDate } = useCalendarActions()
 	const [, setSearchParams] = useSearchParams()
 	const [period, setPeriod] = useState<IsoDateString[]>(
 		viewType === 'month'
-			? getMonthOfDate(initialDate)
-			: getWeekOfDate(initialDate),
+			? getMonthOfDate(selectedDate)
+			: getWeekOfDate(selectedDate),
 	)
 
-	// Update period when initialDate changes (e.g., when "Today" is clicked)
+	// Update period when selectedDate changes (e.g., from URL search param)
 	useEffect(() => {
 		const newPeriod =
 			viewType === 'month'
-				? getMonthOfDate(initialDate)
-				: getWeekOfDate(initialDate)
+				? getMonthOfDate(selectedDate)
+				: getWeekOfDate(selectedDate)
 		setPeriod(newPeriod)
-	}, [initialDate, viewType])
+	}, [selectedDate, viewType])
 
 	const navigateToDate = useCallback(
 		(date: IsoDateString) => {
-			setSelectedDate(date)
 			setSearchParams(
 				(prev) => {
 					prev.set('date', date)
@@ -63,7 +60,7 @@ export const useCalendarNavigation = (
 				{ preventScrollReset: true },
 			)
 		},
-		[setSelectedDate, setSearchParams],
+		[setSearchParams],
 	)
 
 	const next = useCallback(() => {

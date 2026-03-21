@@ -18,53 +18,30 @@
  */
 
 import { toDate } from 'date-fns'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback } from 'react'
 import { useSearchParams } from 'react-router'
 
-import {
-	useCalendarActions,
-	useSelectedDate,
-} from '~/features/calendar/calendar-store'
 import { formatISOLocale, type IsoDateString } from '~/lib/utils/dates'
 
 /**
- * Manages day selection with calendar store + URL search param integration.
- * When useStore is true, selecting a day also sets ?date= in the URL,
- * which triggers loader revalidation in child routes.
+ * Manages day selection via URL search params.
+ * The ?date= param is the source of truth; localStorage persistence
+ * is handled by usePersistedSearchParam in the parent component.
  */
-export const useCalendarSelection = (
-	initialDate: IsoDateString,
-	useStore = true,
-) => {
-	const storeSelectedDate = useSelectedDate()
-	const { setSelectedDate: setStoreSelectedDate } = useCalendarActions()
+export const useCalendarSelection = (selectedDate: IsoDateString) => {
 	const [, setSearchParams] = useSearchParams()
-
-	const [selectedDay, setSelectedDay] = useState<IsoDateString>(
-		useStore ? storeSelectedDate : initialDate,
-	)
-
-	useEffect(() => {
-		if (useStore) {
-			setSelectedDay(storeSelectedDate)
-		}
-	}, [storeSelectedDate, useStore])
 
 	const selectDay = useCallback(
 		(day: IsoDateString) => {
-			setSelectedDay(day)
-			if (useStore) {
-				setStoreSelectedDate(day)
-				setSearchParams(
-					(prev) => {
-						prev.set('date', day)
-						return prev
-					},
-					{ preventScrollReset: true },
-				)
-			}
+			setSearchParams(
+				(prev) => {
+					prev.set('date', day)
+					return prev
+				},
+				{ preventScrollReset: true },
+			)
 		},
-		[useStore, setStoreSelectedDate, setSearchParams],
+		[setSearchParams],
 	)
 
 	const selectToday = useCallback(() => {
@@ -76,14 +53,14 @@ export const useCalendarSelection = (
 	}
 
 	const isDaySelected = (day: IsoDateString) => {
-		return getDay(selectedDay) === getDay(day)
+		return getDay(selectedDate) === getDay(day)
 	}
 
 	return {
 		getDay,
 		isDaySelected,
 		selectDay,
-		selectedDay,
+		selectedDay: selectedDate,
 		selectToday,
 	}
 }
