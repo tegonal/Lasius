@@ -34,12 +34,17 @@ type Pages = {
   "/api/session-status": {
     params: {};
   };
+  "/:lang": {
+    params: {
+      "lang": string;
+    };
+  };
 };
 
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/login" | "/logout" | "/internal-oauth/login" | "/oauth/:provider/login" | "/oauth/callback" | "/api/session-status";
+    page: "/" | "/login" | "/logout" | "/internal-oauth/login" | "/oauth/:provider/login" | "/oauth/callback" | "/api/session-status" | "/:lang";
   };
   "routes/home.tsx": {
     id: "routes/home";
@@ -69,6 +74,14 @@ type RouteFiles = {
     id: "routes/api.session-status";
     page: "/api/session-status";
   };
+  "routes/app-layout.tsx": {
+    id: "routes/app-layout";
+    page: "/:lang";
+  };
+  "routes/dashboard.tsx": {
+    id: "routes/dashboard";
+    page: "/:lang";
+  };
 };
 
 type RouteModules = {
@@ -80,4 +93,6 @@ type RouteModules = {
   "routes/oauth.$provider.login": typeof import("./app/routes/oauth.$provider.login.tsx");
   "routes/oauth.callback": typeof import("./app/routes/oauth.callback.tsx");
   "routes/api.session-status": typeof import("./app/routes/api.session-status.tsx");
+  "routes/app-layout": typeof import("./app/routes/app-layout.tsx");
+  "routes/dashboard": typeof import("./app/routes/dashboard.tsx");
 };

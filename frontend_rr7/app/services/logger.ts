@@ -17,30 +17,21 @@
  *
  */
 
-import {
-	index,
-	layout,
-	prefix,
-	route,
-	type RouteConfig,
-} from '@react-router/dev/routes'
-
-export default [
-	// Home / health check
-	index('routes/home.tsx'),
-
-	// Auth routes (no lang prefix — OAuth redirects are language-independent)
-	route('login', 'routes/login.tsx'),
-	route('logout', 'routes/logout.tsx'),
-	route('internal-oauth/login', 'routes/internal-oauth.login.tsx'),
-	route('oauth/:provider/login', 'routes/oauth.$provider.login.tsx'),
-	route('oauth/callback', 'routes/oauth.callback.tsx'),
-
-	// API routes
-	route('api/session-status', 'routes/api.session-status.tsx'),
-
-	// Language-prefixed app routes
-	...prefix(':lang', [
-		layout('routes/app-layout.tsx', [index('routes/dashboard.tsx')]),
-	]),
-] satisfies RouteConfig
+/**
+ * Minimal logger stub — will be replaced by tslog in Task 11.
+ * Provides the same interface so consumers don't need to change.
+ */
+export const logger = {
+	debug: (...args: unknown[]) => {
+		console.debug('[DEBUG]', ...args)
+	},
+	error: (...args: unknown[]) => {
+		console.error('[ERROR]', ...args)
+	},
+	info: (...args: unknown[]) => {
+		console.info('[INFO]', ...args)
+	},
+	warn: (...args: unknown[]) => {
+		console.warn('[WARN]', ...args)
+	},
+}
