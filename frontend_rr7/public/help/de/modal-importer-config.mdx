@@ -1,0 +1,80 @@
+# Integrationskonfiguration
+
+Konfiguriere Verbindungen zu externen Projektmanagement-Plattformen (GitHub, GitLab, Jira, Plane), um automatisch Issues als Zeiterfassungs-Tags zu synchronisieren.
+
+## Integration erstellen
+
+1. Gib einen **Konfigurationsnamen** ein, um diese Integration zu identifizieren (z.B. "Firmen-GitLab")
+2. Gib die **Basis-URL** für deine Plattforminstanz ein
+3. Gib dein **Access Token** oder deine Authentifizierungsdaten ein
+4. Lege das **Prüfintervall** fest (wie oft nach neuen Issues gesucht wird)
+5. Klicke auf **Erstellen**, um zu speichern
+
+<Tip>Die rechte Spalte zeigt Schritt-für-Schritt-Anleitungen zum Generieren von Token auf deiner Plattform</Tip>
+
+## Integration bearbeiten
+
+Beim Bearbeiten zeigen Anmeldedaten-Felder Platzhaltertext an, um anzuzeigen, dass sie optional sind:
+
+- Lass Anmeldedaten-Felder **leer**, um bestehende Werte zu behalten
+- Füll Anmeldedaten-Felder **nur aus, wenn du sie aktualisieren möchtest**
+
+### Verbindung testen
+
+1. Gib alle Anmeldedaten ein, die du aktualisieren möchtest
+2. Klicke auf **Verbindung testen** (unten rechts)
+3. Prüfe die angezeigte Ergebnisnachricht
+4. Klicke auf **Aktualisieren**, um zu speichern, wenn der Test erfolgreich war
+
+<Tip>Teste die Verbindung immer vor dem Speichern, um Authentifizierungsprobleme frühzeitig zu erkennen</Tip>
+
+## Prüfintervall
+
+Dies steuert, wie oft Lasius neue Issues von deiner Plattform abruft.
+
+**Empfohlene Einstellungen:**
+- **5 Minuten**: Für aktive Teams mit häufigen Updates
+- **15 Minuten**: Für die meisten Teams (gute Balance)
+- **30 Minuten**: Für kleinere Teams oder um API-Aufrufe zu reduzieren
+
+## Plattformspezifische Hinweise
+
+**GitHub:**
+- Nach Eingabe deines Access Tokens wähle aus, welchem Benutzer/welcher Organisation die Repositories gehören
+- Das Dropdown lädt automatisch, nachdem du ein gültiges Token eingegeben hast
+
+**GitLab:**
+- Funktioniert mit GitLab.com oder selbst gehosteten Instanzen
+- Token benötigt `read_api`-Berechtigung
+
+**Jira:**
+- Erfordert OAuth Consumer Key, Private Key und Access Token
+- Folge den Anweisungen in der rechten Spalte sorgfältig für das OAuth-Setup
+
+**Plane:**
+- Hole deinen API-Key aus den Plane-Workspace-Einstellungen
+
+## Nach dem Erstellen
+
+Nach der Erstellung musst du:
+1. Zurück zur Integrationsliste gehen
+2. Das Kontextmenü für deine Integration öffnen
+3. **Projekte zuordnen** auswählen, um Projekte zu verknüpfen
+4. Konfigurieren, welche Issues als Tags synchronisiert werden
+
+## Fehlerbehebung
+
+**Verbindungstest schlägt fehl:**
+- Überprüfe, ob die Basis-URL korrekt ist
+- Verifiziere, dass deine Anmeldedaten die richtigen Berechtigungen haben
+- Prüfe die Fehlermeldung für spezifische Details
+
+**GitHub: Keine Organisationen werden angezeigt:**
+- Stelle sicher, dass du ein gültiges Access Token eingegeben hast
+- Warte einen Moment, bis das Dropdown geladen ist
+- Prüfe, ob dein Token Zugriff auf Organisationen hat
+
+**Formular wird nicht gespeichert:**
+- Alle Felder sind beim Erstellen erforderlich
+- Konfigurationsname muss eindeutig sein
+- Prüfe auf Fehlermeldungen unter jedem Feld

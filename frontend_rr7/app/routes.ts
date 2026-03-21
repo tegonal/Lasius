@@ -20,27 +20,24 @@
 import {
 	index,
 	layout,
-	prefix,
 	route,
 	type RouteConfig,
 } from '@react-router/dev/routes'
 
 export default [
-	// Home / health check
-	index('routes/home.tsx'),
-
-	// Auth routes (no lang prefix — OAuth redirects are language-independent)
+	// Auth routes (public)
 	route('login', 'routes/login.tsx'),
 	route('logout', 'routes/logout.tsx'),
 	route('internal-oauth/login', 'routes/internal-oauth.login.tsx'),
+	route('internal-oauth/register', 'routes/internal-oauth.register.tsx'),
 	route('oauth/:provider/login', 'routes/oauth.$provider.login.tsx'),
 	route('oauth/callback', 'routes/oauth.callback.tsx'),
 
-	// API routes
+	// API routes (public)
 	route('api/session-status', 'routes/api.session-status.tsx'),
+	route('api/locales/:lang/:ns', 'routes/api.locales.$lang.$ns.ts'),
+	route('api/help/:locale/:slug', 'routes/api.help.$locale.$slug.ts'),
 
-	// Language-prefixed app routes
-	...prefix(':lang', [
-		layout('routes/app-layout.tsx', [index('routes/dashboard.tsx')]),
-	]),
+	// Authenticated app routes — requireUser redirects to /login if unauthenticated
+	layout('routes/app-layout.tsx', [index('routes/dashboard.tsx')]),
 ] satisfies RouteConfig

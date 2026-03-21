@@ -1,0 +1,80 @@
+# Configuration d'intégration
+
+Configurez les connexions vers des plateformes externes de gestion de projet (GitHub, GitLab, Jira, Plane) pour synchroniser automatiquement les problèmes en tant qu'étiquettes de suivi du temps.
+
+## Créer une intégration
+
+1. Saisissez un **nom de configuration** pour identifier cette intégration (par ex. "GitLab Entreprise")
+2. Saisissez l'**URL de base** de votre instance de plateforme
+3. Saisissez votre **jeton d'accès** ou vos identifiants d'authentification
+4. Définissez l'**intervalle de vérification** (fréquence de vérification des nouveaux problèmes)
+5. Cliquez sur **Créer** pour enregistrer
+
+<Tip>La colonne de droite affiche les instructions étape par étape pour générer des jetons sur votre plateforme</Tip>
+
+## Modifier une intégration
+
+Lors de la modification, les champs d'identifiants affichent un texte d'espace réservé pour indiquer qu'ils sont facultatifs :
+
+- Laissez les champs d'identifiants **vides** pour conserver les valeurs existantes
+- Remplissez les champs d'identifiants **uniquement si vous souhaitez les mettre à jour**
+
+### Tester votre connexion
+
+1. Remplissez les identifiants que vous souhaitez mettre à jour
+2. Cliquez sur **Tester la connexion** (en bas à droite)
+3. Vérifiez le message de résultat qui apparaît
+4. Cliquez sur **Mettre à jour** pour enregistrer si le test réussit
+
+<Tip>Testez toujours la connexion avant d'enregistrer pour détecter les problèmes d'authentification dès le début</Tip>
+
+## Intervalle de vérification
+
+Cela contrôle la fréquence à laquelle Lasius récupère les nouveaux problèmes depuis votre plateforme.
+
+**Paramètres recommandés :**
+- **5 minutes** : Pour les équipes actives avec des mises à jour fréquentes
+- **15 minutes** : Pour la plupart des équipes (bon équilibre)
+- **30 minutes** : Pour les petites équipes ou pour réduire les appels API
+
+## Notes spécifiques à la plateforme
+
+**GitHub :**
+- Après avoir saisi votre jeton d'accès, sélectionnez l'utilisateur/organisation propriétaire des dépôts
+- La liste déroulante se charge automatiquement après avoir saisi un jeton valide
+
+**GitLab :**
+- Fonctionne avec GitLab.com ou des instances auto-hébergées
+- Le jeton nécessite la portée `read_api`
+
+**Jira :**
+- Nécessite une clé de consommateur OAuth, une clé privée et un jeton d'accès
+- Suivez attentivement les instructions de la colonne de droite pour la configuration OAuth
+
+**Plane :**
+- Obtenez votre clé API depuis les paramètres de l'espace de travail Plane
+
+## Après la création
+
+Une fois créée, vous devez :
+1. Revenir à la liste des intégrations
+2. Ouvrir le menu contextuel de votre intégration
+3. Sélectionner **Mapper les projets** pour lier les projets
+4. Configurer quels problèmes synchroniser en tant qu'étiquettes
+
+## Dépannage
+
+**Le test de connexion échoue :**
+- Vérifiez que l'URL de base est correcte
+- Vérifiez que vos identifiants ont les bonnes permissions
+- Consultez le message d'erreur pour des détails spécifiques
+
+**GitHub : Aucune organisation n'apparaît :**
+- Assurez-vous d'avoir saisi un jeton d'accès valide
+- Attendez un instant que la liste déroulante se charge
+- Vérifiez que votre jeton a accès aux organisations
+
+**Le formulaire ne s'enregistre pas :**
+- Tous les champs sont obligatoires lors de la création
+- Le nom de configuration doit être unique
+- Vérifiez les messages d'erreur sous chaque champ

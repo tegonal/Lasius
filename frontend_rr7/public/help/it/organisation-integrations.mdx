@@ -1,0 +1,47 @@
+# Integrazioni
+
+Collega Lasius con sistemi esterni di tracciamento problemi come GitHub, GitLab, Jira e Plane. Importa automaticamente i problemi come etichette per ottimizzare il tuo flusso di lavoro di tracciamento del tempo.
+
+## Cosa puoi fare
+
+### Visualizza statistiche di integrazione
+Nella parte superiore della pagina, visualizza il numero totale di integrazioni configurate nella tua organizzazione.
+
+### Esplora integrazioni attive
+Visualizza tutte le integrazioni configurate in una tabella che mostra:
+- **Tipo** - La piattaforma (GitHub, GitLab, Jira, Plane)
+- **Nome** - Il tuo nome personalizzato per questa integrazione
+- **URL di base** - L'endpoint API utilizzato
+- **Progetti** - Numero di progetti che utilizzano questa integrazione
+
+### Aggiungi nuove integrazioni
+Fai clic su **Aggiungi configurazione** in alto a destra per configurare una nuova integrazione. Segui la procedura guidata per:
+1. Selezionare il tipo di piattaforma
+2. Inserire i dettagli di connessione e le credenziali
+3. Testare la connessione
+4. Mappare i progetti esterni ai progetti Lasius
+5. Configurare le impostazioni di importazione delle etichette
+
+### Gestisci integrazioni
+Fai clic sul menu contestuale (<Icon name="EllipsisVertical" />) di qualsiasi integrazione per:
+- **Visualizza informazioni di configurazione** - Visualizza impostazioni di connessione dettagliate e stato
+- **Modifica configurazione** - Aggiorna credenziali, URL o altre impostazioni
+- **Visualizza mappature progetti** - Visualizza e modifica quali progetti esterni si sincronizzano con quali progetti Lasius
+- **Elimina configurazione** - Rimuovi l'integrazione (interrompe la sincronizzazione delle etichette)
+
+### Sincronizzazione automatica delle etichette
+Una volta configurato, Lasius importa automaticamente i problemi dalle tue piattaforme esterne come etichette. I membri del team possono quindi selezionare queste etichette durante il tracciamento del tempo, creando una connessione diretta tra le voci di tempo e gli elementi di lavoro esterni.
+
+## Suggerimenti
+
+<Tip>Inizia con una singola mappatura di progetto per testare la tua integrazione prima di espanderla a tutti i progetti</Tip>
+
+<Tip>Usa nomi significativi per le tue integrazioni se hai più istanze della stessa piattaforma</Tip>
+
+<Tip>Le etichette vengono sincronizzate automaticamente - nessuna importazione manuale necessaria una volta configurate</Tip>
+
+<Tip>Ogni integrazione può essere mappata a più progetti Lasius, consentendo strutture organizzative flessibili</Tip>
+
+<Tip>Se un'integrazione mostra problemi di connettività, consulta le informazioni di configurazione per messaggi di errore dettagliati</Tip>
+
+<Tip>L'eliminazione di un'integrazione non eliminerà le etichette esistenti - interrompe solo la sincronizzazione futura</Tip>

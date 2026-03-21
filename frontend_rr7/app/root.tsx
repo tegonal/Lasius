@@ -32,6 +32,7 @@ import {
 } from 'react-router'
 import { useChangeLanguage } from 'remix-i18next/react'
 
+import { HelpDrawer } from '~/features/help/components/help-drawer'
 import { localeCookie } from '~/lib/cookies/i18next-cookie.server'
 import { logger } from '~/lib/logger'
 import { getLocale, i18nextMiddleware } from '~/middleware/i18next'
@@ -42,7 +43,15 @@ import './tailwind.css'
 export const middleware = [i18nextMiddleware]
 
 export const links: LinksFunction = () => [
-	{ href: '/favicon.svg', rel: 'icon', type: 'image/svg+xml' },
+	{ href: '/icons/lasius.svg', rel: 'icon', type: 'image/svg+xml' },
+	{ href: '/icon-96x96.png', rel: 'icon', sizes: '96x96', type: 'image/png' },
+	{ href: '/icon-32x32.png', rel: 'icon', sizes: '32x32', type: 'image/png' },
+	{ href: '/icon-16x16.png', rel: 'icon', sizes: '16x16', type: 'image/png' },
+	{
+		href: '/icon-192x192.png',
+		rel: 'apple-touch-icon',
+		sizes: '192x192',
+	},
 ]
 
 export const handle = {
@@ -160,14 +169,51 @@ export function ErrorBoundary() {
 	)
 }
 
+/**
+ * Inline script to initialize DaisyUI theme before first paint (prevents FOUC).
+ * Reads saved theme from Zustand persist store in localStorage,
+ * falls back to system preference, then to 'light'.
+ */
+const themeInitScript = `
+(function() {
+  try {
+    var savedTheme = null;
+    try {
+      var persistedState = localStorage.getItem('app-settings');
+      if (persistedState) {
+        var parsed = JSON.parse(persistedState);
+        savedTheme = parsed.state && parsed.state.theme;
+      }
+    } catch (e) {}
+    if (savedTheme && savedTheme !== 'system') {
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    } else {
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    }
+  } catch (e) {
+    document.documentElement.setAttribute('data-theme', 'light');
+  }
+})();
+`
+
 export function Layout({ children }: PropsWithChildren) {
 	const { i18n } = useTranslation()
 
 	return (
-		<html dir={i18n.dir(i18n.language)} lang={i18n.language}>
+		<html
+			dir={i18n.dir(i18n.language)}
+			lang={i18n.language}
+			suppressHydrationWarning
+		>
 			<head>
 				<meta charSet="utf-8" />
+				<meta content="dark light" name="color-scheme" />
 				<meta content="width=device-width, initial-scale=1" name="viewport" />
+				<script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
 				<Links />
 				<Meta />
 			</head>
@@ -175,6 +221,7 @@ export function Layout({ children }: PropsWithChildren) {
 				{children}
 				<ScrollRestoration />
 				<Scripts />
+				<HelpDrawer />
 			</body>
 		</html>
 	)

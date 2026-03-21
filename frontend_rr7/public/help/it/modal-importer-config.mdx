@@ -1,0 +1,80 @@
+# Configurazione integrazione
+
+Configura le connessioni verso piattaforme esterne di gestione progetti (GitHub, GitLab, Jira, Plane) per sincronizzare automaticamente i problemi come etichette di tracciamento del tempo.
+
+## Creare un'integrazione
+
+1. Inserisci un **nome di configurazione** per identificare questa integrazione (es. "GitLab Aziendale")
+2. Inserisci l'**URL di base** della tua istanza di piattaforma
+3. Inserisci il tuo **token di accesso** o le credenziali di autenticazione
+4. Imposta l'**intervallo di verifica** (frequenza di verifica dei nuovi problemi)
+5. Fai clic su **Crea** per salvare
+
+<Tip>La colonna destra mostra le istruzioni passo passo per generare token sulla tua piattaforma</Tip>
+
+## Modificare un'integrazione
+
+Durante la modifica, i campi delle credenziali mostrano testo segnaposto per indicare che sono facoltativi:
+
+- Lascia i campi delle credenziali **vuoti** per mantenere i valori esistenti
+- Compila i campi delle credenziali **solo se desideri aggiornarli**
+
+### Testare la connessione
+
+1. Compila le credenziali che desideri aggiornare
+2. Fai clic su **Testa connessione** (in basso a destra)
+3. Verifica il messaggio di risultato che appare
+4. Fai clic su **Aggiorna** per salvare se il test ha successo
+
+<Tip>Testa sempre la connessione prima di salvare per rilevare problemi di autenticazione in anticipo</Tip>
+
+## Intervallo di verifica
+
+Questo controlla con quale frequenza Lasius recupera i nuovi problemi dalla tua piattaforma.
+
+**Impostazioni consigliate:**
+- **5 minuti**: Per team attivi con aggiornamenti frequenti
+- **15 minuti**: Per la maggior parte dei team (buon equilibrio)
+- **30 minuti**: Per team più piccoli o per ridurre le chiamate API
+
+## Note specifiche della piattaforma
+
+**GitHub:**
+- Dopo aver inserito il tuo token di accesso, seleziona quale utente/organizzazione possiede i repository
+- Il menu a tendina si carica automaticamente dopo aver inserito un token valido
+
+**GitLab:**
+- Funziona con GitLab.com o istanze auto-ospitate
+- Il token richiede l'ambito `read_api`
+
+**Jira:**
+- Richiede chiave consumer OAuth, chiave privata e token di accesso
+- Segui attentamente le istruzioni della colonna destra per la configurazione OAuth
+
+**Plane:**
+- Ottieni la tua chiave API dalle impostazioni dello spazio di lavoro Plane
+
+## Dopo la creazione
+
+Una volta creata, devi:
+1. Tornare all'elenco delle integrazioni
+2. Aprire il menu contestuale per la tua integrazione
+3. Selezionare **Mappa progetti** per collegare i progetti
+4. Configurare quali problemi sincronizzare come etichette
+
+## Risoluzione dei problemi
+
+**Il test di connessione fallisce:**
+- Verifica che l'URL di base sia corretto
+- Verifica che le tue credenziali abbiano i permessi corretti
+- Controlla il messaggio di errore per dettagli specifici
+
+**GitHub: Non appaiono organizzazioni:**
+- Assicurati di aver inserito un token di accesso valido
+- Attendi un momento per il caricamento del menu a tendina
+- Verifica che il tuo token abbia accesso alle organizzazioni
+
+**Il modulo non si salva:**
+- Tutti i campi sono obbligatori durante la creazione
+- Il nome di configurazione deve essere univoco
+- Cerca messaggi di errore sotto ogni campo
