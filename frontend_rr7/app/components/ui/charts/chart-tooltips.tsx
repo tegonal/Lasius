@@ -1,0 +1,159 @@
+/**
+ * Lasius - Open source time tracker for teams
+ * Copyright (c) Tegonal Genossenschaft (https://tegonal.com)
+ *
+ * This file is part of Lasius.
+ *
+ * Lasius is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * Lasius is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with Lasius.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
+import { type ReactNode } from 'react'
+
+// ─── Tooltip Container ──────────────────────────────────────────────────────
+
+interface SingleTooltipPoint {
+	color: string
+	data: {
+		x: number | string
+		y: number
+	}
+	id: string
+	value: number
+}
+
+// ─── Tooltip Item ────────────────────────────────────────────────────────────
+
+interface StackTooltipSlice {
+	index?: number
+	stack: Array<{
+		color: string
+		id?: string
+		layerId?: string
+		layerLabel?: string
+		value: number
+	}>
+}
+
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+export function ChartSingleTooltip({
+	formatValue = (val) => `${val}h`,
+	point,
+}: {
+	formatValue?: (value: number) => string
+	point: SingleTooltipPoint
+}) {
+	if (!point) return null
+
+	return (
+		<TooltipContainer>
+			<TooltipItem
+				color={point.color}
+				label={point.data.x.toString()}
+				value={formatValue(point.value)}
+			/>
+		</TooltipContainer>
+	)
+}
+
+export function ChartStackTooltip({
+	formatLabel = (id) => id,
+	formatValue = (val) => `${val}h`,
+	getTitle,
+	slice,
+}: {
+	formatLabel?: (id: string) => string
+	formatValue?: (value: number) => string
+	getTitle?: (index?: number) => string
+	slice: StackTooltipSlice
+}) {
+	if (!slice) return null
+
+	const title = getTitle
+		? getTitle(slice.index)
+		: `Item ${(slice.index || 0) + 1}`
+
+	return (
+		<TooltipContainer title={title}>
+			<div className="space-y-1">
+				{slice.stack &&
+					slice.stack
+						.filter((point) => point && point.value > 0)
+						.map((point) => {
+							const pointId =
+								point.layerLabel || point.layerId || point.id || ''
+							return (
+								<TooltipItem
+									color={point.color}
+									key={pointId}
+									label={formatLabel(pointId)}
+									value={formatValue(point.value)}
+								/>
+							)
+						})}
+			</div>
+		</TooltipContainer>
+	)
+}
+
+// ─── Stack Tooltip ───────────────────────────────────────────────────────────
+
+export function TooltipContainer({
+	children,
+	title,
+}: {
+	children: ReactNode
+	title?: string
+}) {
+	return (
+		<div className="bg-base-100 border-base-200 w-auto rounded border p-2 shadow-lg">
+			{title && (
+				<div className="text-base-content mb-2 text-sm font-medium whitespace-nowrap">
+					{title}
+				</div>
+			)}
+			{children}
+		</div>
+	)
+}
+
+// ─── Single Tooltip ──────────────────────────────────────────────────────────
+
+export function TooltipItem({
+	color,
+	label,
+	value,
+}: {
+	color?: string
+	label: string
+	value: number | string
+}) {
+	return (
+		<div className="flex min-w-0 items-center justify-between gap-3 whitespace-nowrap">
+			<div className="flex min-w-0 items-center gap-2">
+				{color && (
+					<div
+						className="h-3 w-3 flex-shrink-0 rounded-full"
+						style={{ backgroundColor: color }}
+					/>
+				)}
+				<span className="text-base-content truncate text-sm font-medium">
+					{label}
+				</span>
+			</div>
+			<span className="text-base-content/70 flex-shrink-0 text-sm">
+				{value}
+			</span>
+		</div>
+	)
+}
