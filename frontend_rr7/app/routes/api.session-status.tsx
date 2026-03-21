@@ -17,26 +17,30 @@
  *
  */
 
-import { index, route, type RouteConfig } from '@react-router/dev/routes'
+import { data } from 'react-router'
 
-export default [
-	// Home / health check
-	index('routes/home.tsx'),
+import { getUserSession } from '~/services/auth/session.server'
 
-	// Auth routes (no lang prefix — OAuth redirects are language-independent)
-	route('login', 'routes/login.tsx'),
-	route('logout', 'routes/logout.tsx'),
-	route('internal-oauth/login', 'routes/internal-oauth.login.tsx'),
-	route('oauth/:provider/login', 'routes/oauth.$provider.login.tsx'),
-	route('oauth/callback', 'routes/oauth.callback.tsx'),
+/**
+ * GET /api/session-status
+ *
+ * Lightweight endpoint polled by the client-side TokenWatcher.
+ * Returns session status without triggering auto-refresh — that happens
+ * transparently in loaders via getSessionTokens().
+ */
+export async function loader({ request }: { request: Request }) {
+	const session = await getUserSession(request)
+	const user = session.get('user')
 
-	// API routes
-	route('api/session-status', 'routes/api.session-status.tsx'),
+	const authenticated = !!user
+	const expiresAt = user?.expiresAt ?? null
 
-	// Language-prefixed app routes (added in later tasks)
-	// ...prefix(':lang', [
-	//   layout('routes/app-layout.tsx', [
-	//     index('routes/dashboard.tsx'),
-	//   ]),
-	// ]),
-] satisfies RouteConfig
+	return data(
+		{ authenticated, expiresAt },
+		{
+			headers: {
+				'Cache-Control': 'no-store',
+			},
+		},
+	)
+}
