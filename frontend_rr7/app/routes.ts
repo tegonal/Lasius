@@ -54,7 +54,9 @@ export default [
 		index('routes/index-redirect.ts'),
 
 		...prefix('user', [
-			layout('routes/home.tsx', [route('home', 'routes/home._index.tsx')]),
+			layout('routes/user.home.tsx', [
+				route('home', 'routes/user.home._index.tsx'),
+			]),
 		]),
 	]),
 ] satisfies RouteConfig

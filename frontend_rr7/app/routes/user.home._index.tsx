@@ -1,0 +1,121 @@
+/**
+ * Lasius - Open source time tracker for teams
+ * Copyright (c) Tegonal Genossenschaft (https://tegonal.com)
+ *
+ * This file is part of Lasius.
+ *
+ * Lasius is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * Lasius is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with Lasius.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
+import { data } from 'react-router'
+
+import { BookingCurrent } from '~/features/bookings/components/booking-current'
+import { BookingListSelectedDay } from '~/features/bookings/components/booking-list-selected-day'
+import { BookingDayStatsProgressBar } from '~/features/home/components/booking-day-stats-progress-bar'
+import { augmentBookingsList } from '~/lib/api/functions/augment-bookings-list'
+import { getExpectedVsBookedPercentage } from '~/lib/api/functions/get-expected-vs-booked-percentage'
+import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
+import { apiTimespanDay, formatISOLocale } from '~/lib/utils/dates'
+import {
+	getUserBookingCurrent,
+	getUserBookingListByOrganisation,
+} from '~/services/api/lasius/user-bookings/user-bookings'
+import { getUserProfile } from '~/services/api/lasius/user/user'
+import {
+	authHeaders,
+	mergeAuthHeaders,
+	requireUser,
+} from '~/services/auth/auth-helpers.server'
+
+import { type Route } from './+types/user.home._index'
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
+	const auth = await requireUser(request)
+	const headers = authHeaders(auth.session)
+
+	// Get user profile for planned working hours + org selection
+	const profile = await getUserProfile({ headers })
+	const user = profile.data
+	const organisations = user.organisations ?? []
+	const selectedOrgId =
+		user.settings?.lastSelectedOrganisation?.id ??
+		organisations.find((o) => o.private)?.organisationReference.id ??
+		organisations[0]?.organisationReference.id ??
+		''
+
+	// Today's date as default (future: read from URL search param)
+	const today = formatISOLocale(new Date())
+	const dayTimespan = apiTimespanDay(today)
+
+	// Fetch day bookings and current booking in parallel
+	const [dayBookingsRes, currentBookingRes] = await Promise.all([
+		getUserBookingListByOrganisation(selectedOrgId, dayTimespan, { headers }),
+		getUserBookingCurrent({ headers }),
+	])
+
+	const dayBookings = dayBookingsRes.data ?? []
+	const currentBooking = currentBookingRes.data
+
+	// Compute planned working hours for today's weekday
+	const selectedOrg = organisations.find(
+		(o) => o.organisationReference.id === selectedOrgId,
+	)
+	const plannedHours = selectedOrg?.plannedWorkingHours
+	const weekdayNames: Record<number, string> = {
+		0: 'sunday',
+		1: 'monday',
+		2: 'tuesday',
+		3: 'wednesday',
+		4: 'thursday',
+		5: 'friday',
+		6: 'saturday',
+	}
+	const todayWeekday = weekdayNames[new Date().getDay()] ?? 'monday'
+	const plannedHoursDay =
+		(plannedHours as Record<string, number> | undefined)?.[todayWeekday] ?? 0
+
+	// Compute day summary
+	const daySummary = getModelsBookingSummary(dayBookings)
+	const { fulfilledPercentage, progressBarPercentage } =
+		getExpectedVsBookedPercentage(plannedHoursDay, daySummary.hours)
+
+	// Augment bookings list for display
+	const augmentedBookings = augmentBookingsList(dayBookings)
+
+	return data(
+		{
+			augmentedBookings,
+			currentBooking,
+			daySummary: {
+				...daySummary,
+				fulfilledPercentage,
+				plannedWorkingHours: plannedHoursDay,
+				progressBarPercentage,
+			},
+			selectedDate: today,
+		},
+		{ headers: mergeAuthHeaders(auth) },
+	)
+}
+
+export default function HomeIndex() {
+	return (
+		<div className="border-base-100 bg-base-100 text-base-content grid h-full w-full grid-rows-[min-content_min-content_auto] gap-1 overflow-auto border-l">
+			<BookingDayStatsProgressBar />
+			<BookingCurrent />
+			<div className="overflow-auto">
+				<BookingListSelectedDay />
+			</div>
+		</div>
+	)
+}

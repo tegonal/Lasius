@@ -20,6 +20,8 @@
 import { Suspense } from 'react'
 import { Outlet } from 'react-router'
 
+import { NavigationMenuTabs } from '~/features/navigation/components/navigation-menu-tabs'
+
 export default function HomeLayout() {
 	return (
 		<>
@@ -28,7 +30,7 @@ export default function HomeLayout() {
 				<div className="grid size-full grid-cols-[17rem_auto_18rem] overflow-auto lg:grid-cols-[18rem_auto_19rem] xl:grid-cols-[19rem_auto_20rem] 2xl:grid-cols-[19rem_auto_24rem]">
 					{/* Left column: navigation sidebar */}
 					<div className="h-full w-full rounded-tl-xl">
-						{/* TODO: NavigationMenuTabs */}
+						<NavigationMenuTabs />
 					</div>
 
 					{/* Center: main content */}
