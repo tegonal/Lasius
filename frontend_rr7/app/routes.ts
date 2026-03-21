@@ -38,6 +38,9 @@ export default [
 	route('api/locales/:lang/:ns', 'routes/api.locales.$lang.$ns.ts'),
 	route('api/help/:locale/:slug', 'routes/api.help.$locale.$slug.ts'),
 
+	// API routes (authenticated)
+	route('api/calendar-bookings', 'routes/api.calendar-bookings.ts'),
+
 	// Authenticated app routes — requireUser redirects to /login if unauthenticated
 	layout('routes/app-layout.tsx', [index('routes/dashboard.tsx')]),
 ] satisfies RouteConfig
