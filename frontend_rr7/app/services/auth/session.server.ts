@@ -21,7 +21,8 @@ import { createCookieSessionStorage, redirect } from 'react-router'
 
 import { logger } from '~/lib/logger'
 
-import { type LasiusSessionData, type OAuthProvider } from './types'
+import { getProvider } from './providers'
+import { type LasiusSessionData } from './types'
 
 export type { LasiusSessionData }
 
@@ -131,12 +132,4 @@ export async function setSessionTokens(
 	const session = await getUserSession(request)
 	session.set('user', tokens)
 	return await commitSession(session)
-}
-
-/**
- * Placeholder for provider registry — will be implemented in Task 6.
- * Each provider handles its own token refresh logic.
- */
-function getProvider(_issuer: string): OAuthProvider {
-	throw new Error(`Provider registry not implemented yet — issuer: ${_issuer}`)
 }
