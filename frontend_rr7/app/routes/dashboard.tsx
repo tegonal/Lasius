@@ -18,9 +18,11 @@
  */
 
 import { endOfWeek, startOfWeek, subWeeks } from 'date-fns'
-import { data, Outlet } from 'react-router'
+import { data, Outlet, useSearchParams } from 'react-router'
 
+import { CalendarMonthCompact } from '~/features/dashboard/components/calendar-month-compact'
 import { DashboardTabs } from '~/features/dashboard/components/dashboard-tabs'
+import { WorkloadIndicator } from '~/features/dashboard/components/workload-indicator'
 import { computeWorkHealthMetrics } from '~/lib/api/functions/compute-work-health-metrics.server'
 import { getWeeklyPlannedHours } from '~/lib/api/functions/get-planned-working-hours'
 import { formatDateTimeToURLParam, formatISOLocale } from '~/lib/utils/dates'
@@ -81,7 +83,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 	)
 
 	// Compute burnout metrics server-side
-	const burnoutMetrics = computeWorkHealthMetrics(
+	const { burnoutMetrics, weeklyData } = computeWorkHealthMetrics(
 		bookingsResponse.data,
 		weeklyPlannedHours,
 		WEEKS_TO_ANALYZE,
@@ -94,20 +96,45 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 			plannedHours,
 			selectedDate,
 			selectedOrgId,
+			weeklyData,
 			weeklyPlannedHours,
 		},
 		{ headers: mergeAuthHeaders(auth) },
 	)
 }
 
-export default function DashboardLayout(_props: Route.ComponentProps) {
+export default function DashboardLayout({ loaderData }: Route.ComponentProps) {
+	const [searchParams, setSearchParams] = useSearchParams()
+	const date = searchParams.get('date') || loaderData.selectedDate
+
+	const handleDateChange = (newDate: string) => {
+		setSearchParams((prev) => {
+			const next = new URLSearchParams(prev)
+			next.set('date', newDate)
+			return next
+		})
+	}
+
 	return (
-		<div className="border-base-100 bg-base-100 text-base-content grid h-full w-full grid-rows-[min-content_auto] overflow-auto border-l">
-			<div className="border-base-200 border-b px-4 pt-2">
-				<DashboardTabs />
+		<div className="flex h-full">
+			{/* Main content */}
+			<div className="flex min-w-0 flex-1 flex-col overflow-auto">
+				<div className="border-base-200 border-b px-4 pt-2">
+					<DashboardTabs />
+				</div>
+				<div className="flex-1 overflow-auto">
+					<Outlet />
+				</div>
 			</div>
-			<div className="overflow-auto">
-				<Outlet />
+
+			{/* Right sidebar - desktop only */}
+			<div className="bg-base-200 border-base-200 hidden w-72 shrink-0 overflow-auto border-l p-4 md:block">
+				<CalendarMonthCompact date={date} onDateChange={handleDateChange} />
+				<div className="border-base-content/10 my-4 border-t" />
+				<WorkloadIndicator
+					burnoutMetrics={loaderData.burnoutMetrics}
+					plannedWeeklyHours={loaderData.weeklyPlannedHours}
+				/>
 			</div>
 		</div>
 	)
