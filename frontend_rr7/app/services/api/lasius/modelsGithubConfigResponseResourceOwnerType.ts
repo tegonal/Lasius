@@ -11,10 +11,11 @@
  * @nullable
  */
 export type ModelsGithubConfigResponseResourceOwnerType =
-	| null
 	| (typeof ModelsGithubConfigResponseResourceOwnerType)[keyof typeof ModelsGithubConfigResponseResourceOwnerType]
+	| null
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ModelsGithubConfigResponseResourceOwnerType = {
-	Organization: 'Organization',
 	User: 'User',
+	Organization: 'Organization',
 } as const

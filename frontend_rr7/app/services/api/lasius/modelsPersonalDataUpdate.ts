@@ -8,9 +8,9 @@
 
 export interface ModelsPersonalDataUpdate {
 	/** @nullable */
-	email?: null | string
+	email?: string | null
 	/** @nullable */
-	firstName?: null | string
+	firstName?: string | null
 	/** @nullable */
-	lastName?: null | string
+	lastName?: string | null
 }

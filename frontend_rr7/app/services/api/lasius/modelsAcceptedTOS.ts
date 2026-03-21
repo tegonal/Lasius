@@ -7,7 +7,7 @@
  */
 
 export interface ModelsAcceptedTOS {
+	version: string
 	/** @pattern yyyy-MM-dd */
 	date: string
-	version: string
 }

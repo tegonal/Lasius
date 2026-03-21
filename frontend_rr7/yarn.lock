@@ -396,6 +396,35 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@conform-to/dom@npm:1.17.1":
+  version: 1.17.1
+  resolution: "@conform-to/dom@npm:1.17.1"
+  checksum: 10c0/9cb76388ee529856e1e8266c7808ac409507b8c55ca1ba456520fa460f15f0d6892f83d180e5ee6c4030cfd4e99df571752507faa1136dc1bf9d411547aa81f5
+  languageName: node
+  linkType: hard
+
+"@conform-to/react@npm:^1.17.1":
+  version: 1.17.1
+  resolution: "@conform-to/react@npm:1.17.1"
+  dependencies:
+    "@conform-to/dom": "npm:1.17.1"
+  peerDependencies:
+    react: ">=18"
+  checksum: 10c0/dcd5c5ac0ecf1e87c91cd2cb81abe18905eb54f0e282ce745b1751e23c39aa642284dca21f1f26a4937a9d359ebbbf6f6c9cc2fed8c3522c700aa663000ad8b9
+  languageName: node
+  linkType: hard
+
+"@conform-to/zod@npm:^1.17.1":
+  version: 1.17.1
+  resolution: "@conform-to/zod@npm:1.17.1"
+  dependencies:
+    "@conform-to/dom": "npm:1.17.1"
+  peerDependencies:
+    zod: ^3.21.0 || ^4.0.0
+  checksum: 10c0/49ad4d3deb8357a42ad01f24fe7d999bc18efdf8cfb0dfdf06cd96af989012a5833591a7c8b9a4fb0da06d0a491979da672c86f29677ff722592f85c8bcc6b9c
+  languageName: node
+  linkType: hard
+
 "@emnapi/core@npm:^1.4.3, @emnapi/core@npm:^1.7.1, @emnapi/core@npm:^1.8.1":
   version: 1.9.1
   resolution: "@emnapi/core@npm:1.9.1"
@@ -6087,6 +6116,8 @@ __metadata:
   dependencies:
     "@babel/core": "npm:^7.29.0"
     "@babel/preset-typescript": "npm:^7.28.5"
+    "@conform-to/react": "npm:^1.17.1"
+    "@conform-to/zod": "npm:^1.17.1"
     "@epic-web/config": "npm:^1.24.1"
     "@headlessui/react": "npm:^2.2.9"
     "@hookform/resolvers": "npm:^5.0.1"

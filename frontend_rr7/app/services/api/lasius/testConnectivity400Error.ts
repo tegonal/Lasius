@@ -9,11 +9,12 @@
 export type TestConnectivity400Error =
 	(typeof TestConnectivity400Error)[keyof typeof TestConnectivity400Error]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TestConnectivity400Error = {
-	authentication_failed: 'authentication_failed',
-	connection_error: 'connection_error',
 	connection_failed: 'connection_failed',
-	timeout: 'timeout',
+	authentication_failed: 'authentication_failed',
 	unknown_host: 'unknown_host',
+	timeout: 'timeout',
+	connection_error: 'connection_error',
 	validation_failed: 'validation_failed',
 } as const

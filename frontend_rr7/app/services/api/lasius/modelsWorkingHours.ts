@@ -7,11 +7,11 @@
  */
 
 export interface ModelsWorkingHours {
-	friday: number
 	monday: number
-	saturday: number
-	sunday: number
-	thursday: number
 	tuesday: number
 	wednesday: number
+	thursday: number
+	friday: number
+	saturday: number
+	sunday: number
 }

@@ -9,6 +9,7 @@
 export type ModelsInvitationOutcomeStatus =
 	(typeof ModelsInvitationOutcomeStatus)[keyof typeof ModelsInvitationOutcomeStatus]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ModelsInvitationOutcomeStatus = {
 	InvitationAccepted: 'InvitationAccepted',
 	InvitationDeclined: 'InvitationDeclined',

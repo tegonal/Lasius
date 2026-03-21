@@ -9,7 +9,8 @@
 export type ModelsUserOrganisationRole =
 	(typeof ModelsUserOrganisationRole)[keyof typeof ModelsUserOrganisationRole]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ModelsUserOrganisationRole = {
-	OrganisationAdministrator: 'OrganisationAdministrator',
 	OrganisationMember: 'OrganisationMember',
+	OrganisationAdministrator: 'OrganisationAdministrator',
 } as const

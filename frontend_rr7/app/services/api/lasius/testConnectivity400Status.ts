@@ -9,6 +9,7 @@
 export type TestConnectivity400Status =
 	(typeof TestConnectivity400Status)[keyof typeof TestConnectivity400Status]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TestConnectivity400Status = {
 	error: 'error',
 } as const

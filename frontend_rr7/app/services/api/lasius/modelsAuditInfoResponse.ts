@@ -5,22 +5,22 @@
  * Track your time
  * OpenAPI spec version: 2.2.2+28-3680f9fd+20260321-0840
  */
-import { type ModelsUserStub } from './modelsUserStub'
+import type { ModelsUserStub } from './modelsUserStub'
 
 /**
  * Audit information with full user details for API responses
  */
 export interface ModelsAuditInfoResponse {
+	createdBy: ModelsUserStub
 	/**
 	 * Timestamp when entity was created
 	 * @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ
 	 */
 	createdAt: string
-	createdBy: ModelsUserStub
+	updatedBy: ModelsUserStub
 	/**
 	 * Timestamp when entity was last updated
 	 * @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ
 	 */
 	updatedAt: string
-	updatedBy: ModelsUserStub
 }

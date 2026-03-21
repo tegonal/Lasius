@@ -7,9 +7,9 @@
  */
 
 export interface ModelsApplicationConfig {
-	allowedIssuers: string[]
-	instance: string
-	lasiusOAuthProviderAllowUserRegistration: boolean
-	lasiusOAuthProviderEnabled: boolean
 	title: string
+	instance: string
+	lasiusOAuthProviderEnabled: boolean
+	lasiusOAuthProviderAllowUserRegistration: boolean
+	allowedIssuers: string[]
 }

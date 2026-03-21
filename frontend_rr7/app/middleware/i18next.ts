@@ -23,7 +23,7 @@ import { createI18nextMiddleware } from 'remix-i18next/middleware'
 import { i18nConfig } from '~/i18n-config.ts'
 import { localeCookie } from '~/lib/cookies/i18next-cookie.server'
 
-const ignorePaths = ['/api/*']
+const ignorePrefixes = ['/api/']
 
 export const [i18nextMiddleware, getLocale, getInstance] =
 	createI18nextMiddleware({
@@ -32,17 +32,11 @@ export const [i18nextMiddleware, getLocale, getInstance] =
 			fallbackLanguage: i18nConfig.fallbackLng,
 			async findLocale(request) {
 				const pathname = new URL(request.url).pathname
-				if (ignorePaths.some((path) => pathname.match(path))) {
+				if (ignorePrefixes.some((prefix) => pathname.startsWith(prefix))) {
 					return null
 				}
 
-				// First try path-based detection (/:lang prefix)
-				const firstPathSegment = pathname.split('/').at(1) || ''
-				if (i18nConfig.supportedLngs.includes(firstPathSegment)) {
-					return firstPathSegment
-				}
-
-				// Then try Accept-Language header
+				// Try Accept-Language header as fallback (cookie is checked automatically by remix-i18next)
 				const acceptLanguageHeader = request.headers.get('Accept-Language')
 				if (acceptLanguageHeader) {
 					const preferredLanguages = parser.parse(acceptLanguageHeader)

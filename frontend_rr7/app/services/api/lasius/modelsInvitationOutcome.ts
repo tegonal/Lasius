@@ -5,12 +5,12 @@
  * Track your time
  * OpenAPI spec version: 2.2.2+28-3680f9fd+20260321-0840
  */
-import { type ModelsEntityReference } from './modelsEntityReference'
-import { type ModelsInvitationOutcomeStatus } from './modelsInvitationOutcomeStatus'
+import type { ModelsEntityReference } from './modelsEntityReference'
+import type { ModelsInvitationOutcomeStatus } from './modelsInvitationOutcomeStatus'
 
 export interface ModelsInvitationOutcome {
+	userReference: ModelsEntityReference
 	/** @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ */
 	dateTime: string
 	status: ModelsInvitationOutcomeStatus
-	userReference: ModelsEntityReference
 }

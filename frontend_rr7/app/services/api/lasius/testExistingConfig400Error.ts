@@ -9,10 +9,11 @@
 export type TestExistingConfig400Error =
 	(typeof TestExistingConfig400Error)[keyof typeof TestExistingConfig400Error]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TestExistingConfig400Error = {
-	authentication_failed: 'authentication_failed',
-	connection_error: 'connection_error',
 	connection_failed: 'connection_failed',
-	timeout: 'timeout',
+	authentication_failed: 'authentication_failed',
 	unknown_host: 'unknown_host',
+	timeout: 'timeout',
+	connection_error: 'connection_error',
 } as const

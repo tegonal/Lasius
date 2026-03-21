@@ -8,9 +8,9 @@
 
 export interface ModelsOAuthUserRegistration {
 	email: string
-	/** @nullable */
-	firstName?: null | string
-	/** @nullable */
-	lastName?: null | string
 	password: string
+	/** @nullable */
+	firstName?: string | null
+	/** @nullable */
+	lastName?: string | null
 }

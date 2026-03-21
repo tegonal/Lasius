@@ -17,41 +17,86 @@
  *
  */
 
+import { getFormProps, getInputProps, useForm } from '@conform-to/react'
+import { parseWithZod } from '@conform-to/zod/v4'
+import { Trans, useTranslation } from 'react-i18next'
 import {
 	data,
-	Form,
 	redirect,
 	useActionData,
+	useFetcher,
 	useLoaderData,
+	useNavigate,
 } from 'react-router'
+import { z } from 'zod'
 
+import { InternalLoginInfoPanel } from '~/components/features/login/auth-info-panels'
+import { AuthLayout } from '~/components/features/login/auth-layout'
+import { Button } from '~/components/primitives/buttons/button'
+import { Input } from '~/components/primitives/inputs/input'
+import { Card, CardBody } from '~/components/ui/cards/card'
+import { Alert } from '~/components/ui/feedback/alert'
+import { ButtonGroup } from '~/components/ui/forms/button-group'
+import { FieldSet } from '~/components/ui/forms/field-set'
+import { FormBody } from '~/components/ui/forms/form-body'
+import { FormElement } from '~/components/ui/forms/form-element'
+import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
+import { Logo } from '~/components/ui/icons/logo'
 import { getServerEnv } from '~/lib/env.server'
 import { logger } from '~/lib/logger'
+import { getConfiguration } from '~/services/api/lasius/general/general'
 import { getOptionalUser } from '~/services/auth/auth-helpers.server'
 import { getInternalProvider } from '~/services/auth/providers'
 import { createUserSession } from '~/services/auth/session.server'
 
 import { type Route } from './+types/internal-oauth.login'
 
+type TFunction = (key: string, opts?: { defaultValue: string }) => string
+
+const createLoginSchema = (t: TFunction) =>
+	z.object({
+		email: z
+			.string({
+				error: t('common.validation.required', { defaultValue: 'Required' }),
+			})
+			.email(
+				t('common.validation.emailInvalid', {
+					defaultValue: 'Invalid email address',
+				}),
+			),
+		password: z
+			.string({
+				error: t('common.validation.required', { defaultValue: 'Required' }),
+			})
+			.min(1, t('common.validation.required', { defaultValue: 'Required' })),
+		returnTo: z.string().default('/'),
+	})
+
+// Server-side schema with English defaults
+const serverLoginSchema = createLoginSchema(
+	(_, opts) => opts?.defaultValue ?? '',
+)
+
 export async function action({ request }: Route.ActionArgs) {
 	const formData = await request.formData()
-	const email = formData.get('email')
-	const password = formData.get('password')
-	const returnTo = (formData.get('returnTo') as string) || '/en/'
+	const submission = parseWithZod(formData, { schema: serverLoginSchema })
 
-	if (!email || typeof email !== 'string' || !email.trim()) {
-		return data({ error: 'Email is required.' }, { status: 400 })
+	if (submission.status !== 'success') {
+		return data(
+			{ lastResult: submission.reply(), serverError: null },
+			{ status: 400 },
+		)
 	}
 
-	if (!password || typeof password !== 'string') {
-		return data({ error: 'Password is required.' }, { status: 400 })
-	}
+	const { email, password, returnTo } = submission.value
 
 	try {
 		const provider = getInternalProvider()
 		const result = await provider.loginWithCredentials(email.trim(), password)
 
-		logger.debug('Internal login successful', { email: result.profile.email })
+		logger.debug('Internal login successful', {
+			email: result.profile.email,
+		})
 
 		return createUserSession(
 			{
@@ -68,100 +113,231 @@ export async function action({ request }: Route.ActionArgs) {
 		const message = err instanceof Error ? err.message : 'Login failed'
 		logger.warn('Internal login failed', { email, error: message })
 
-		if (message === 'Invalid credentials') {
-			return data({ error: 'Invalid email or password.' }, { status: 401 })
-		}
+		const errorCode =
+			message === 'Invalid credentials'
+				? 'usernameOrPasswordWrong'
+				: 'Login failed. Please try again.'
 
-		return data({ error: 'Login failed. Please try again.' }, { status: 500 })
+		return data(
+			{ lastResult: submission.reply(), serverError: errorCode },
+			{ status: message === 'Invalid credentials' ? 401 : 500 },
+		)
 	}
 }
 
 export default function InternalOAuthLogin() {
-	const { demoMode, returnTo } = useLoaderData<typeof loader>()
+	const {
+		allowRegistration,
+		demoMode,
+		email: prefilledEmail,
+		invitationId,
+		registered,
+		returnTo,
+	} = useLoaderData<typeof loader>()
 	const actionData = useActionData<typeof action>()
+	const fetcher = useFetcher()
+	const navigate = useNavigate()
+	const { t } = useTranslation('common')
+
+	const loginSchema = createLoginSchema(t)
+
+	const [form, fields] = useForm({
+		defaultValue: { email: prefilledEmail, password: '', returnTo },
+		lastResult: actionData?.lastResult,
+		onValidate({ formData }) {
+			return parseWithZod(formData, { schema: loginSchema })
+		},
+		shouldRevalidate: 'onInput',
+		shouldValidate: 'onBlur',
+	})
+
+	const isSubmitting = fetcher.state !== 'idle'
+
+	const getErrorMessage = (errorCode: string): string => {
+		switch (errorCode) {
+			case 'usernameOrPasswordWrong':
+				return t('auth.errors.invalidCredentials', {
+					defaultValue: 'Invalid email or password. Please try again.',
+				})
+			default:
+				return errorCode
+		}
+	}
 
 	return (
-		<div className="bg-base-200 flex min-h-screen items-center justify-center">
-			<div className="card bg-base-100 w-full max-w-sm shadow-xl">
-				<div className="card-body">
-					<h2 className="card-title justify-center text-2xl">
-						Sign in with Email
-					</h2>
-
-					{actionData?.error && (
-						<div className="alert alert-error">
-							<span>{actionData.error}</span>
-						</div>
-					)}
-
-					<Form className="mt-4 flex flex-col gap-4" method="post">
-						<input name="returnTo" type="hidden" value={returnTo} />
-
-						<label className="floating-label">
-							<span>Email</span>
-							<input
-								autoComplete="email"
-								autoFocus
-								className="input input-bordered w-full"
-								name="email"
-								placeholder="Email"
-								required
-								type="email"
+		<AuthLayout infoPanel={<InternalLoginInfoPanel />}>
+			{registered && (
+				<Alert
+					className="animate-[fadeIn_0.4s_ease-out]"
+					data-testid="auth-internal-registered-success"
+					variant="success"
+				>
+					{t('auth.registrationSuccess', {
+						defaultValue:
+							'Thank you for registering. You can now sign in with your credentials.',
+					})}
+				</Alert>
+			)}
+			{actionData?.serverError && (
+				<Alert
+					className="animate-[fadeIn_0.4s_ease-out]"
+					data-testid="auth-internal-login-error"
+					variant="warning"
+				>
+					{getErrorMessage(actionData.serverError)}
+				</Alert>
+			)}
+			{demoMode && (
+				<Alert className="animate-[fadeIn_0.4s_ease-out]" variant="info">
+					<div>
+						<p>
+							{t('demo.welcome', {
+								defaultValue:
+									'Welcome to the Lasius demo instance. Use "demo1@lasius.ch" and password "demo" to log in and have a look around. The demo instance is reset once a day.',
+							})}
+						</p>
+						<p>
+							<Trans
+								components={[
+									<a
+										className="text-primary hover:underline"
+										href="https://github.com/tegonal/lasius"
+										key="gitHubLink"
+										rel="noopener noreferrer"
+										target="_blank"
+									/>,
+								]}
+								defaults="We appreciate your feedback. Please leave a comment on <0>GitHub</0>"
+								i18nKey="footer.feedbackOnGithub"
+								t={t}
 							/>
-						</label>
-
-						<label className="floating-label">
-							<span>Password</span>
-							<input
-								autoComplete="current-password"
-								className="input input-bordered w-full"
-								name="password"
-								placeholder="Password"
-								required
-								type="password"
-							/>
-						</label>
-
-						<button className="btn btn-primary w-full" type="submit">
-							Sign in
-						</button>
-					</Form>
-
-					{demoMode && (
-						<div className="alert alert-info mt-4">
-							<div>
-								<p className="font-semibold">Demo Mode</p>
-								<p className="text-sm">
-									Use <code className="font-mono">demo1@lasius.ch</code> /{' '}
-									<code className="font-mono">demo</code> or{' '}
-									<code className="font-mono">demo2@lasius.ch</code> /{' '}
-									<code className="font-mono">demo</code>
-								</p>
-							</div>
-						</div>
-					)}
-
-					<div className="mt-4 text-center">
-						<a className="link link-primary text-sm" href="/login">
-							Back to login options
-						</a>
+						</p>
 					</div>
-				</div>
-			</div>
-		</div>
+				</Alert>
+			)}
+			<Card className="bg-base-100/80 border-0 shadow-2xl backdrop-blur-sm">
+				<CardBody className="p-8 lg:p-10">
+					<div className="mb-4 flex justify-center lg:hidden">
+						<Logo />
+					</div>
+					<div className="mb-8 text-center">
+						<h2 className="mb-2 text-3xl font-bold">
+							{t('auth.signInToLasius', {
+								defaultValue: 'Sign in to Lasius',
+							})}
+						</h2>
+						<p className="text-base-content/60 text-sm">
+							{t('auth.enterEmailAndPassword', {
+								defaultValue:
+									'Enter your email and password to access your account',
+							})}
+						</p>
+					</div>
+					<fetcher.Form method="post" {...getFormProps(form)}>
+						<input
+							{...getInputProps(fields.returnTo, { type: 'hidden' })}
+							key={fields.returnTo.key}
+						/>
+						<FormBody>
+							<FieldSet>
+								<FormElement
+									htmlFor={fields.email.id}
+									label={t('common.forms.email', {
+										defaultValue: 'Email',
+									})}
+								>
+									<Input
+										autoComplete="email"
+										autoFocus
+										data-testid="auth-internal-email-input"
+										error={!!fields.email.errors?.length}
+										{...getInputProps(fields.email, { type: 'email' })}
+										key={fields.email.key}
+									/>
+									<FormFieldErrors errors={fields.email.errors} />
+								</FormElement>
+								<FormElement
+									htmlFor={fields.password.id}
+									label={t('common.forms.password', {
+										defaultValue: 'Password',
+									})}
+								>
+									<Input
+										autoComplete="current-password"
+										data-testid="auth-internal-password-input"
+										error={!!fields.password.errors?.length}
+										{...getInputProps(fields.password, { type: 'password' })}
+										key={fields.password.key}
+									/>
+									<FormFieldErrors errors={fields.password.errors} />
+								</FormElement>
+							</FieldSet>
+							<ButtonGroup>
+								<Button
+									data-testid="auth-internal-submit-btn"
+									fullWidth
+									loading={isSubmitting}
+									type="submit"
+								>
+									{t('auth.signIn', {
+										defaultValue: 'Sign in',
+									})}
+								</Button>
+								{allowRegistration && (
+									<Button
+										data-testid="auth-internal-signup-btn"
+										fullWidth
+										onClick={() =>
+											navigate(
+												`/internal-oauth/register${invitationId ? `?invitation_id=${invitationId}` : ''}`,
+											)
+										}
+										type="button"
+										variant="secondary"
+									>
+										{t('common.actions.signUp', {
+											defaultValue: 'Sign up',
+										})}
+									</Button>
+								)}
+							</ButtonGroup>
+						</FormBody>
+					</fetcher.Form>
+				</CardBody>
+			</Card>
+		</AuthLayout>
 	)
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
 	const user = await getOptionalUser(request)
 	const url = new URL(request.url)
-	const returnTo = url.searchParams.get('returnTo') ?? '/en/'
+	const returnTo = url.searchParams.get('returnTo') ?? '/'
 
 	if (user) {
 		throw redirect(returnTo)
 	}
 
 	const demoMode = getServerEnv('LASIUS_DEMO_MODE') === 'true'
+	const email = url.searchParams.get('email') ?? ''
+	const invitationId = url.searchParams.get('invitation_id') ?? ''
+	const registered = url.searchParams.get('registered') === 'true'
 
-	return { demoMode, returnTo }
+	let allowRegistration = false
+	try {
+		const config = await getConfiguration()
+		allowRegistration =
+			config.data.lasiusOAuthProviderAllowUserRegistration ?? false
+	} catch (error) {
+		logger.warn('Failed to fetch configuration', error)
+	}
+
+	return {
+		allowRegistration,
+		demoMode,
+		email,
+		invitationId,
+		registered,
+		returnTo,
+	}
 }

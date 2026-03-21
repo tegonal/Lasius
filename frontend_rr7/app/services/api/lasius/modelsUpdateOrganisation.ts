@@ -8,5 +8,5 @@
 
 export interface ModelsUpdateOrganisation {
 	/** @nullable */
-	key?: null | string
+	key?: string | null
 }

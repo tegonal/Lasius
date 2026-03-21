@@ -9,6 +9,7 @@
 export type ModelsSimpleTagType =
 	(typeof ModelsSimpleTagType)[keyof typeof ModelsSimpleTagType]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ModelsSimpleTagType = {
 	SimpleTag: 'SimpleTag',
 } as const

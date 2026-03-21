@@ -19,28 +19,38 @@
 
 import { data } from 'react-router'
 
-import { getUserSession } from '~/services/auth/session.server'
+import { getSessionTokens } from '~/services/auth/session.server'
 
 /**
  * GET /api/session-status
  *
- * Lightweight endpoint polled by the client-side TokenWatcher.
- * Returns session status without triggering auto-refresh — that happens
- * transparently in loaders via getSessionTokens().
+ * Polled by the client-side TokenWatcher. Calls getSessionTokens() which
+ * auto-refreshes the access token if it's near expiry. The refreshed session
+ * cookie is propagated back via Set-Cookie header.
  */
 export async function loader({ request }: { request: Request }) {
-	const session = await getUserSession(request)
-	const user = session.get('user')
+	const result = await getSessionTokens(request)
 
-	const authenticated = !!user
-	const expiresAt = user?.expiresAt ?? null
+	if (!result) {
+		return data(
+			{ authenticated: false, expiresAt: null },
+			{ headers: { 'Cache-Control': 'no-store' } },
+		)
+	}
+
+	const headers = new Headers({ 'Cache-Control': 'no-store' })
+	if (result.headers) {
+		const setCookie =
+			result.headers instanceof Headers
+				? result.headers.get('Set-Cookie')
+				: (result.headers as Record<string, string>)['Set-Cookie']
+		if (setCookie) {
+			headers.set('Set-Cookie', setCookie)
+		}
+	}
 
 	return data(
-		{ authenticated, expiresAt },
-		{
-			headers: {
-				'Cache-Control': 'no-store',
-			},
-		},
+		{ authenticated: true, expiresAt: result.tokens.expiresAt },
+		{ headers },
 	)
 }

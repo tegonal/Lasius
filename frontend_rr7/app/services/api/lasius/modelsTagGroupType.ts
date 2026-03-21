@@ -9,6 +9,7 @@
 export type ModelsTagGroupType =
 	(typeof ModelsTagGroupType)[keyof typeof ModelsTagGroupType]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ModelsTagGroupType = {
 	TagGroup: 'TagGroup',
 } as const

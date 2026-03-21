@@ -7,11 +7,11 @@
  */
 
 export interface ModelsJiraProjectSettings {
-	/** @nullable */
-	externalProjectName?: null | string
 	jiraProjectKey: string
 	/** @nullable */
-	jql?: null | string
+	externalProjectName?: string | null
 	/** @nullable */
-	maxResults?: null | number
+	maxResults?: number | null
+	/** @nullable */
+	jql?: string | null
 }

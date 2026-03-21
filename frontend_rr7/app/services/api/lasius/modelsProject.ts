@@ -5,17 +5,17 @@
  * Track your time
  * OpenAPI spec version: 2.2.2+28-3680f9fd+20260321-0840
  */
-import { type ModelsEntityReference } from './modelsEntityReference'
-import { type ModelsEntityReferenceModelsUserId } from './modelsEntityReferenceModelsUserId'
-import { type ModelsTag } from './modelsTag'
+import type { ModelsEntityReference } from './modelsEntityReference'
+import type { ModelsTag } from './modelsTag'
+import type { ModelsEntityReferenceModelsUserId } from './modelsEntityReferenceModelsUserId'
 
 export interface ModelsProject {
-	active: boolean
-	bookingCategories: ModelsTag[]
-	createdBy: ModelsEntityReference
-	/** @nullable */
-	deactivatedBy?: ModelsEntityReferenceModelsUserId
 	id: string
 	key: string
 	organisationReference: ModelsEntityReference
+	bookingCategories: ModelsTag[]
+	active: boolean
+	createdBy: ModelsEntityReference
+	/** @nullable */
+	deactivatedBy?: ModelsEntityReferenceModelsUserId
 }

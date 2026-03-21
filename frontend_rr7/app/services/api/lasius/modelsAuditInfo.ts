@@ -10,12 +10,12 @@
  * Tracks who created and last modified an entity
  */
 export interface ModelsAuditInfo {
-	/** Timestamp when entity was created */
-	createdAt: string
 	/** User ID of entity creator */
 	createdBy: string
-	/** Timestamp when entity was last updated */
-	updatedAt: string
+	/** Timestamp when entity was created */
+	createdAt: string
 	/** User ID of last updater */
 	updatedBy: string
+	/** Timestamp when entity was last updated */
+	updatedAt: string
 }

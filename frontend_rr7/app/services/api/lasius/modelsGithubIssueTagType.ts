@@ -9,6 +9,7 @@
 export type ModelsGithubIssueTagType =
 	(typeof ModelsGithubIssueTagType)[keyof typeof ModelsGithubIssueTagType]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ModelsGithubIssueTagType = {
 	GithubIssueTag: 'GithubIssueTag',
 } as const

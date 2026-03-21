@@ -9,6 +9,7 @@
 export type ModelsPlaneConfigResponseImporterType =
 	(typeof ModelsPlaneConfigResponseImporterType)[keyof typeof ModelsPlaneConfigResponseImporterType]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ModelsPlaneConfigResponseImporterType = {
 	plane: 'plane',
 } as const

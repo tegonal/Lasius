@@ -9,6 +9,7 @@
 export type RefreshTags404Status =
 	(typeof RefreshTags404Status)[keyof typeof RefreshTags404Status]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const RefreshTags404Status = {
 	error: 'error',
 } as const

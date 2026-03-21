@@ -5,8 +5,8 @@
  * Track your time
  * OpenAPI spec version: 2.2.2+28-3680f9fd+20260321-0840
  */
-import { type ModelsExternalProject } from './modelsExternalProject'
-import { type ModelsExternalWorkspace } from './modelsExternalWorkspace'
+import type { ModelsExternalProject } from './modelsExternalProject'
+import type { ModelsExternalWorkspace } from './modelsExternalWorkspace'
 
 export interface ModelsListProjectsResponse {
 	/** @nullable */

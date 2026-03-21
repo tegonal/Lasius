@@ -9,6 +9,7 @@
 export type WebSocketIssueImporterSyncStatsChangedType =
 	(typeof WebSocketIssueImporterSyncStatsChangedType)[keyof typeof WebSocketIssueImporterSyncStatsChangedType]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const WebSocketIssueImporterSyncStatsChangedType = {
 	IssueImporterSyncStatsChanged: 'IssueImporterSyncStatsChanged',
 } as const

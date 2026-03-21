@@ -5,7 +5,7 @@
  * Track your time
  * OpenAPI spec version: 2.2.2+28-3680f9fd+20260321-0840
  */
-import { type WebSocketPongType } from './webSocketPongType'
+import type { WebSocketPongType } from './webSocketPongType'
 
 export interface WebSocketPong {
 	type: WebSocketPongType

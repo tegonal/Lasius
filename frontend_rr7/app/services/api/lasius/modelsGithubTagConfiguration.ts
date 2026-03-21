@@ -7,11 +7,11 @@
  */
 
 export interface ModelsGithubTagConfiguration {
-	includeOnlyIssuesWithLabels: string[]
-	includeOnlyIssuesWithState: string[]
-	labelFilter: string[]
-	useAssignees: boolean
 	useLabels: boolean
+	labelFilter: string[]
 	useMilestone: boolean
 	useTitle: boolean
+	useAssignees: boolean
+	includeOnlyIssuesWithLabels: string[]
+	includeOnlyIssuesWithState: string[]
 }

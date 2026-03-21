@@ -5,33 +5,33 @@
  * Track your time
  * OpenAPI spec version: 2.2.2+28-3680f9fd+20260321-0840
  */
-import { type ModelsUpdateIssueImporterConfigResourceOwnerType } from './modelsUpdateIssueImporterConfigResourceOwnerType'
+import type { ModelsUpdateIssueImporterConfigResourceOwnerType } from './modelsUpdateIssueImporterConfigResourceOwnerType'
 
 export interface ModelsUpdateIssueImporterConfig {
 	/** @nullable */
-	accessToken?: null | string
+	name?: string | null
 	/** @nullable */
-	apiKey?: null | string
+	baseUrl?: string | null
 	/** @nullable */
-	baseUrl?: null | string
+	checkFrequency?: number | null
 	/** @nullable */
-	checkFrequency?: null | number
+	accessToken?: string | null
 	/** @nullable */
-	consumerKey?: null | string
+	consumerKey?: string | null
 	/** @nullable */
-	name?: null | string
+	privateKey?: string | null
 	/** @nullable */
-	privateKey?: null | string
+	apiKey?: string | null
+	/** @nullable */
+	workspace?: string | null
 	/**
 	 * GitHub resource owner (organization or user login) for the token
 	 * @nullable
 	 */
-	resourceOwner?: null | string
+	resourceOwner?: string | null
 	/**
 	 * Type of the resource owner (User or Organization)
 	 * @nullable
 	 */
 	resourceOwnerType?: ModelsUpdateIssueImporterConfigResourceOwnerType
-	/** @nullable */
-	workspace?: null | string
 }

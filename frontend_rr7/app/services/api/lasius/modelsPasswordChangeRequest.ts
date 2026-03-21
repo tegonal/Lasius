@@ -7,6 +7,6 @@
  */
 
 export interface ModelsPasswordChangeRequest {
-	newPassword: string
 	password: string
+	newPassword: string
 }

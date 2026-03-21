@@ -9,9 +9,10 @@
 export type RefreshTags202ImporterType =
 	(typeof RefreshTags202ImporterType)[keyof typeof RefreshTags202ImporterType]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const RefreshTags202ImporterType = {
-	github: 'github',
 	gitlab: 'gitlab',
 	jira: 'jira',
 	plane: 'plane',
+	github: 'github',
 } as const

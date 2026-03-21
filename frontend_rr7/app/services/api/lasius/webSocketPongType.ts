@@ -9,6 +9,7 @@
 export type WebSocketPongType =
 	(typeof WebSocketPongType)[keyof typeof WebSocketPongType]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const WebSocketPongType = {
 	Pong: 'Pong',
 } as const

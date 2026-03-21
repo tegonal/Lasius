@@ -11,10 +11,11 @@
  * @nullable
  */
 export type ModelsCreateIssueImporterConfigResourceOwnerType =
-	| null
 	| (typeof ModelsCreateIssueImporterConfigResourceOwnerType)[keyof typeof ModelsCreateIssueImporterConfigResourceOwnerType]
+	| null
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ModelsCreateIssueImporterConfigResourceOwnerType = {
-	Organization: 'Organization',
 	User: 'User',
+	Organization: 'Organization',
 } as const

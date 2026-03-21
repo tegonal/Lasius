@@ -9,6 +9,7 @@
 export type ModelsGithubConfigResponseImporterType =
 	(typeof ModelsGithubConfigResponseImporterType)[keyof typeof ModelsGithubConfigResponseImporterType]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ModelsGithubConfigResponseImporterType = {
 	github: 'github',
 } as const

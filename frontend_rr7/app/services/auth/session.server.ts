@@ -26,26 +26,33 @@ import { type LasiusSessionData } from './types'
 
 export type { LasiusSessionData }
 
-const sessionStorage = createCookieSessionStorage<{ user: LasiusSessionData }>({
-	cookie: {
-		httpOnly: true,
-		maxAge: 60 * 60 * 24 * 7, // 7 days
-		name: '_lasius_session',
-		path: '/',
-		sameSite: 'lax',
-		secrets: [process.env.NEXTAUTH_SECRET!],
-		secure: process.env.NODE_ENV === 'production',
-	},
-})
+function getSessionStorage() {
+	const secret = process.env.AUTH_SECRET
+	if (!secret) {
+		throw new Error('Missing required env var: AUTH_SECRET')
+	}
 
-const { commitSession, destroySession, getSession } = sessionStorage
+	return createCookieSessionStorage<{ user: LasiusSessionData }>({
+		cookie: {
+			httpOnly: true,
+			maxAge: 60 * 60 * 24 * 7, // 7 days
+			name: '_lasius_session',
+			path: '/',
+			sameSite: 'lax',
+			secrets: [secret],
+			secure: process.env.NODE_ENV === 'production',
+		},
+	})
+}
+
+let _sessionStorage: ReturnType<typeof getSessionStorage> | undefined
 
 /** Create a new user session and redirect */
 export async function createUserSession(
 	data: LasiusSessionData,
 	redirectTo: string,
 ): Promise<Response> {
-	const session = await sessionStorage.getSession()
+	const session = await getSession(null)
 	session.set('user', data)
 
 	return redirect(redirectTo, {
@@ -132,4 +139,27 @@ export async function setSessionTokens(
 	const session = await getUserSession(request)
 	session.set('user', tokens)
 	return await commitSession(session)
+}
+
+function commitSession(
+	...args: Parameters<ReturnType<typeof getSessionStorage>['commitSession']>
+) {
+	return sessionStorage().commitSession(...args)
+}
+
+function destroySession(
+	...args: Parameters<ReturnType<typeof getSessionStorage>['destroySession']>
+) {
+	return sessionStorage().destroySession(...args)
+}
+
+function getSession(cookieHeader: null | string) {
+	return sessionStorage().getSession(cookieHeader)
+}
+
+function sessionStorage() {
+	if (!_sessionStorage) {
+		_sessionStorage = getSessionStorage()
+	}
+	return _sessionStorage
 }

@@ -9,6 +9,7 @@
 export type ModelsJoinOrganisationInvitationType =
 	(typeof ModelsJoinOrganisationInvitationType)[keyof typeof ModelsJoinOrganisationInvitationType]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ModelsJoinOrganisationInvitationType = {
 	JoinOrganisationInvitation: 'JoinOrganisationInvitation',
 } as const

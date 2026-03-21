@@ -5,17 +5,17 @@
  * Track your time
  * OpenAPI spec version: 2.2.2+28-3680f9fd+20260321-0840
  */
-import { type GetOrganisationBookingAggregatedStatsGranularity } from './getOrganisationBookingAggregatedStatsGranularity'
+import type { GetOrganisationBookingAggregatedStatsGranularity } from './getOrganisationBookingAggregatedStatsGranularity'
 
 export type GetOrganisationBookingAggregatedStatsParams = {
-	/**
-	 * @pattern yyyy-MM-dd
-	 */
-	from: string
-	granularity: GetOrganisationBookingAggregatedStatsGranularity
 	source: string
 	/**
 	 * @pattern yyyy-MM-dd
 	 */
+	from: string
+	/**
+	 * @pattern yyyy-MM-dd
+	 */
 	to: string
+	granularity: GetOrganisationBookingAggregatedStatsGranularity
 }

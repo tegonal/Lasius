@@ -17,8 +17,16 @@
  *
  */
 
-import { data, Outlet } from 'react-router'
+import { LogOutIcon } from 'lucide-react'
+import { Suspense } from 'react'
+import { useTranslation } from 'react-i18next'
+import { data, Form, Link, Outlet } from 'react-router'
 
+import { DevInfoBadge } from '~/components/features/system/dev-info-badge'
+import { Button } from '~/components/primitives/buttons/button'
+import { Logo } from '~/components/ui/icons/logo'
+import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+import { TegonalFooter } from '~/components/ui/navigation/tegonal-footer'
 import { requireUser } from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/app-layout'
@@ -33,25 +41,113 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 	})
 }
 
-export default function AppLayout({ loaderData }: Route.ComponentProps) {
+export default function AppLayout(_props: Route.ComponentProps) {
+	const { t } = useTranslation('common')
+
 	return (
-		<div className="bg-base-100 min-h-screen">
-			<header className="navbar bg-base-200 shadow-sm">
-				<div className="flex-1">
-					<span className="text-xl font-bold">Lasius</span>
-				</div>
-				<div className="flex-none gap-2">
-					<span className="text-sm">{loaderData.user.email}</span>
-					<form action="/logout" method="post">
-						<button className="btn btn-ghost btn-sm" type="submit">
-							Logout
-						</button>
-					</form>
-				</div>
-			</header>
-			<main className="container mx-auto p-4">
-				<Outlet />
-			</main>
+		<div className="container mx-auto grid size-full grid-rows-[116px_auto] gap-0 md:grid-rows-[148px_auto] md:pb-4">
+			{/* Desktop header */}
+			<div className="hidden md:block">
+				<section className="h-full w-full overflow-visible">
+					<div className="grid h-full w-full grid-cols-[minmax(200px,310px)_minmax(max-content,auto)_minmax(200px,310px)] gap-0 overflow-visible 2xl:grid-cols-[minmax(200px,340px)_minmax(max-content,auto)_minmax(200px,340px)]">
+						<div className="hover:text-info flex cursor-pointer items-center justify-start gap-8 pl-8">
+							<Link to="/">
+								<Logo />
+							</Link>
+						</div>
+
+						<div className="flex h-full w-full items-center justify-center gap-8">
+							{/* Center content placeholder: BookingCurrent / CalendarWeek */}
+						</div>
+
+						<div className="flex items-center justify-end gap-2 pr-8">
+							{/* SelectUserOrganisation placeholder */}
+							<Form action="/logout" method="post">
+								<Button
+									aria-label={t('auth.actions.signOut', {
+										defaultValue: 'Sign out',
+									})}
+									data-testid="auth-logout-btn"
+									fullWidth={false}
+									shape="circle"
+									variant="ghost"
+								>
+									<LucideIcon icon={LogOutIcon} size={20} />
+								</Button>
+							</Form>
+						</div>
+					</div>
+				</section>
+			</div>
+
+			{/* Mobile header */}
+			<div className="overflow-hidden md:hidden">
+				<section className="flex h-full w-full items-center justify-between px-4">
+					<Link to="/">
+						<Logo size="sm" />
+					</Link>
+					<Form action="/logout" method="post">
+						<Button
+							aria-label={t('auth.actions.signOut', {
+								defaultValue: 'Sign out',
+							})}
+							data-testid="auth-logout-btn-mobile"
+							fullWidth={false}
+							shape="circle"
+							size="sm"
+							variant="ghost"
+						>
+							<LucideIcon icon={LogOutIcon} size={18} />
+						</Button>
+					</Form>
+				</section>
+			</div>
+
+			{/* Desktop content area */}
+			<div className="bg-base-200 border-base-content/20 hidden h-full w-full overflow-hidden rounded-xl border shadow-2xl md:flex md:flex-col">
+				<section className="h-full w-full overflow-auto">
+					<div className="grid size-full grid-cols-[17rem_auto_18rem] overflow-auto lg:grid-cols-[18rem_auto_19rem] xl:grid-cols-[19rem_auto_20rem] 2xl:grid-cols-[19rem_auto_24rem]">
+						{/* Left column: navigation sidebar */}
+						<div className="h-full w-full rounded-tl-xl">
+							{/* NavigationMenuTabs placeholder */}
+						</div>
+
+						{/* Center: main content */}
+						<Suspense
+							fallback={
+								<div className="flex h-full items-center justify-center">
+									<span className="loading loading-spinner loading-lg text-primary" />
+								</div>
+							}
+						>
+							<Outlet />
+						</Suspense>
+
+						{/* Right column placeholder */}
+						<div className="border-base-100 bg-base-200 text-base-content flex h-full w-full overflow-auto rounded-tr-xl border-l" />
+					</div>
+				</section>
+
+				{/* Desktop footer */}
+				<footer className="border-base-content/20 bg-base-100 flex items-center justify-between border-t px-3 py-2">
+					<TegonalFooter variant="compact" />
+				</footer>
+			</div>
+
+			{/* Mobile content area */}
+			<section className="bg-base-200 h-full w-full overflow-hidden md:hidden">
+				<Suspense
+					fallback={
+						<div className="flex h-full items-center justify-center">
+							<span className="loading loading-spinner loading-lg text-primary" />
+						</div>
+					}
+				>
+					<Outlet />
+				</Suspense>
+			</section>
+
+			<DevInfoBadge />
 		</div>
 	)
 }

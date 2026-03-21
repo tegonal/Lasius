@@ -9,7 +9,8 @@
 export type ModelsUserStubRole =
 	(typeof ModelsUserStubRole)[keyof typeof ModelsUserStubRole]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ModelsUserStubRole = {
-	Administrator: 'Administrator',
 	FreeUser: 'FreeUser',
+	Administrator: 'Administrator',
 } as const

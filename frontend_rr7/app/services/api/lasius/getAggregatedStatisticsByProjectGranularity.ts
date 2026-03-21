@@ -9,10 +9,11 @@
 export type GetAggregatedStatisticsByProjectGranularity =
 	(typeof GetAggregatedStatisticsByProjectGranularity)[keyof typeof GetAggregatedStatisticsByProjectGranularity]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const GetAggregatedStatisticsByProjectGranularity = {
 	All: 'All',
-	Day: 'Day',
+	Year: 'Year',
 	Month: 'Month',
 	Week: 'Week',
-	Year: 'Year',
+	Day: 'Day',
 } as const

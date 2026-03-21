@@ -9,6 +9,7 @@
 export type WebSocketHelloClientType =
 	(typeof WebSocketHelloClientType)[keyof typeof WebSocketHelloClientType]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const WebSocketHelloClientType = {
 	HelloClient: 'HelloClient',
 } as const

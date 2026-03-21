@@ -5,17 +5,17 @@
  * Track your time
  * OpenAPI spec version: 2.2.2+28-3680f9fd+20260321-0840
  */
-import { type ModelsGitlabTagConfiguration } from './modelsGitlabTagConfiguration'
+import type { ModelsGitlabTagConfiguration } from './modelsGitlabTagConfiguration'
 
 export interface ModelsGitlabProjectSettings {
-	/** @nullable */
-	externalProjectName?: null | string
 	gitlabProjectId: string
 	/** @nullable */
-	maxResults?: null | number
+	externalProjectName?: string | null
 	/** @nullable */
-	params?: null | string
+	maxResults?: number | null
 	/** @nullable */
-	projectKeyPrefix?: null | string
+	params?: string | null
+	/** @nullable */
+	projectKeyPrefix?: string | null
 	tagConfiguration: ModelsGitlabTagConfiguration
 }

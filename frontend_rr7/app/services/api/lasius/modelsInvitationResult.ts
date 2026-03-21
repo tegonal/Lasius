@@ -7,7 +7,7 @@
  */
 
 export interface ModelsInvitationResult {
-	email: string
 	/** @nullable */
-	invitationLinkId?: null | string
+	invitationLinkId?: string | null
+	email: string
 }

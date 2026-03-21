@@ -9,10 +9,11 @@
 export type GetOrganisationBookingAggregatedStatsGranularity =
 	(typeof GetOrganisationBookingAggregatedStatsGranularity)[keyof typeof GetOrganisationBookingAggregatedStatsGranularity]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const GetOrganisationBookingAggregatedStatsGranularity = {
 	All: 'All',
-	Day: 'Day',
+	Year: 'Year',
 	Month: 'Month',
 	Week: 'Week',
-	Year: 'Year',
+	Day: 'Day',
 } as const

@@ -18,6 +18,7 @@
  */
 
 import { createReadableStreamFromReadable } from '@react-router/node'
+import { createInstance } from 'i18next'
 import { isbot } from 'isbot'
 import { PassThrough } from 'node:stream'
 import {
@@ -32,6 +33,7 @@ import {
 	ServerRouter,
 } from 'react-router'
 
+import { i18nConfig } from '~/i18n-config'
 import { logger } from '~/lib/logger'
 
 import { getInstance } from './middleware/i18next'
@@ -73,8 +75,22 @@ export default function handleRequest(
 				? 'onAllReady'
 				: 'onShellReady'
 
+		let i18nInstance: ReturnType<typeof createInstance>
+		try {
+			i18nInstance = getInstance(routerContext)
+		} catch {
+			// Middleware context unavailable for non-route requests (favicon, .well-known, etc.)
+			// Fall back to a minimal synchronous i18n instance
+			i18nInstance = createInstance({
+				...i18nConfig,
+				initImmediate: false,
+				lng: i18nConfig.fallbackLng,
+			})
+			void i18nInstance.init()
+		}
+
 		const { abort, pipe } = renderToPipeableStream(
-			<I18nextProvider i18n={getInstance(routerContext)}>
+			<I18nextProvider i18n={i18nInstance}>
 				<ServerRouter context={entryContext} url={request.url} />
 			</I18nextProvider>,
 			{

@@ -9,6 +9,7 @@
 export type RefreshTags404Error =
 	(typeof RefreshTags404Error)[keyof typeof RefreshTags404Error]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const RefreshTags404Error = {
 	config_not_found: 'config_not_found',
 	project_not_found: 'project_not_found',

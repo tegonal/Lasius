@@ -9,8 +9,9 @@
 export type ListGithubResourceOwners400Error =
 	(typeof ListGithubResourceOwners400Error)[keyof typeof ListGithubResourceOwners400Error]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListGithubResourceOwners400Error = {
-	invalid_importer_type: 'invalid_importer_type',
 	list_resource_owners_failed: 'list_resource_owners_failed',
 	missing_access_token: 'missing_access_token',
+	invalid_importer_type: 'invalid_importer_type',
 } as const

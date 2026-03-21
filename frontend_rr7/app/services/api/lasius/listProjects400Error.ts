@@ -9,6 +9,7 @@
 export type ListProjects400Error =
 	(typeof ListProjects400Error)[keyof typeof ListProjects400Error]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListProjects400Error = {
 	list_projects_failed: 'list_projects_failed',
 } as const

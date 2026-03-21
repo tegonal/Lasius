@@ -9,6 +9,7 @@
 export type TestConnectivity200Status =
 	(typeof TestConnectivity200Status)[keyof typeof TestConnectivity200Status]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TestConnectivity200Status = {
 	success: 'success',
 } as const

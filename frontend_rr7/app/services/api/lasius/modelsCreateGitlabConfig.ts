@@ -5,12 +5,12 @@
  * Track your time
  * OpenAPI spec version: 2.2.2+28-3680f9fd+20260321-0840
  */
-import { type ModelsGitlabProjectMapping } from './modelsGitlabProjectMapping'
+import type { ModelsGitlabProjectMapping } from './modelsGitlabProjectMapping'
 
 export interface ModelsCreateGitlabConfig {
-	accessToken: string
-	baseUrl: string
-	checkFrequency: number
 	name: string
+	baseUrl: string
+	accessToken: string
+	checkFrequency: number
 	projects?: ModelsGitlabProjectMapping[]
 }

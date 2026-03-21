@@ -12,15 +12,15 @@ export type GetOrganisationBookingListParams = {
 	 */
 	from: string
 	/**
-	 * @nullable
-	 */
-	limit?: null | number
-	/**
-	 * @nullable
-	 */
-	skip?: null | number
-	/**
 	 * @pattern yyyy-MM-dd'T'HH:mm:ss.SSS
 	 */
 	to: string
+	/**
+	 * @nullable
+	 */
+	limit?: number | null
+	/**
+	 * @nullable
+	 */
+	skip?: number | null
 }

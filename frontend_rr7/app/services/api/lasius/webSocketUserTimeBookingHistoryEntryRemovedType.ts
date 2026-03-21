@@ -9,6 +9,7 @@
 export type WebSocketUserTimeBookingHistoryEntryRemovedType =
 	(typeof WebSocketUserTimeBookingHistoryEntryRemovedType)[keyof typeof WebSocketUserTimeBookingHistoryEntryRemovedType]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const WebSocketUserTimeBookingHistoryEntryRemovedType = {
 	UserTimeBookingHistoryEntryRemoved: 'UserTimeBookingHistoryEntryRemoved',
 } as const

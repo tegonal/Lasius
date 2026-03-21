@@ -9,6 +9,7 @@
 export type TestExistingConfig200Status =
 	(typeof TestExistingConfig200Status)[keyof typeof TestExistingConfig200Status]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TestExistingConfig200Status = {
 	success: 'success',
 } as const

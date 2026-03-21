@@ -43,6 +43,7 @@ if ! command -v tmux > /dev/null 2>&1; then
   exit 1
 fi
 
+
 # Kill existing session if running
 tmux kill-session -t "$SESSION" 2>/dev/null || true
 
@@ -55,20 +56,20 @@ export TERM=xterm-256color
 tmux new-session -d -s "$SESSION" -c "$ROOT/backend" \
   "set -a; [ -f $ROOT/frontend/.env.local ] && . $ROOT/frontend/.env.local; set +a; sbt run -Dconfig.resource=dev-large.conf; read -p 'Press Enter to close...'"
 
-# Split: frontend (waits for backend via port check)
-tmux split-window -t "$SESSION" -v -c "$ROOT/frontend" \
+# Split: frontend RR7 (waits for backend via port check)
+tmux split-window -t "$SESSION" -v -c "$ROOT/frontend_rr7" \
   "echo 'Waiting for backend on port 9000...' && \
    while ! nc -z localhost 9000 2>/dev/null; do sleep 2; done && \
-   echo 'Backend ready. Starting frontend...' && \
+   echo 'Backend ready. Starting frontend (RR7)...' && \
    yarn dev; read -p 'Press Enter to close...'"
 
 # --- Logging ---
 
-mkdir -p "$ROOT/backend/.logs" "$ROOT/frontend/.logs"
+mkdir -p "$ROOT/backend/.logs" "$ROOT/frontend_rr7/.logs"
 : > "$ROOT/backend/.logs/dev-server.log"
-: > "$ROOT/frontend/.logs/dev-server.log"
+: > "$ROOT/frontend_rr7/.logs/dev-server.log"
 tmux pipe-pane -t "$SESSION:0.0" -o "cat >> $ROOT/backend/.logs/dev-server.log"
-tmux pipe-pane -t "$SESSION:0.1" -o "cat >> $ROOT/frontend/.logs/dev-server.log"
+tmux pipe-pane -t "$SESSION:0.1" -o "cat >> $ROOT/frontend_rr7/.logs/dev-server.log"
 
 # --- Layout ---
 
@@ -76,7 +77,7 @@ tmux select-layout -t "$SESSION" even-vertical
 
 # Pane titles in borders
 tmux select-pane -t "$SESSION:0.0" -T "backend :9000"
-tmux select-pane -t "$SESSION:0.1" -T "frontend :3001"
+tmux select-pane -t "$SESSION:0.1" -T "frontend-rr7 :5173"
 
 # Enable pane border status
 tmux set-option -t "$SESSION" pane-border-status top
@@ -96,7 +97,7 @@ tmux select-pane -t "$SESSION:0.0"
 echo ""
 echo "=== Lasius Dev ==="
 echo "Backend:  http://localhost:9000 (pane 0)"
-echo "Frontend: http://localhost:3001 (pane 1)"
+echo "Frontend: http://localhost:5173 (pane 1)"
 echo "App:      http://localhost:3000 (proxy)"
 echo ""
 echo "Attaching to tmux session '$SESSION'..."

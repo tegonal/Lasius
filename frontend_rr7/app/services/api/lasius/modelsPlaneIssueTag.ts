@@ -5,14 +5,14 @@
  * Track your time
  * OpenAPI spec version: 2.2.2+28-3680f9fd+20260321-0840
  */
-import { type ModelsSimpleTag } from './modelsSimpleTag'
+import type { ModelsSimpleTag } from './modelsSimpleTag'
 
 export interface ModelsPlaneIssueTag {
 	id: string
-	issueLink: string
 	projectId: string
-	relatedTags: ModelsSimpleTag[]
 	/** @nullable */
-	summary?: null | string
+	summary?: string | null
+	relatedTags: ModelsSimpleTag[]
+	issueLink: string
 	type: string
 }

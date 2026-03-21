@@ -9,6 +9,7 @@
 export type TestExistingConfig400Status =
 	(typeof TestExistingConfig400Status)[keyof typeof TestExistingConfig400Status]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TestExistingConfig400Status = {
 	error: 'error',
 } as const

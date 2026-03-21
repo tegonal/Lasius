@@ -7,7 +7,7 @@
  */
 
 export type DeleteConfig403 = {
-	configId?: string
 	error?: string
 	message?: string
+	configId?: string
 }

@@ -12,18 +12,18 @@
 export interface ModelsConnectivityIssue {
 	/** Machine-readable error code */
 	errorCode: string
-	/**
-	 * HTTP status code if applicable
-	 * @nullable
-	 */
-	httpStatus?: null | number
 	/** Human-readable error message */
 	message: string
-	/** Number of consecutive retry attempts */
-	retryCount: number
 	/**
 	 * When the error occurred
 	 * @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ
 	 */
 	timestamp: string
+	/**
+	 * HTTP status code if applicable
+	 * @nullable
+	 */
+	httpStatus?: number | null
+	/** Number of consecutive retry attempts */
+	retryCount: number
 }

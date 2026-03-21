@@ -5,7 +5,7 @@
  * Track your time
  * OpenAPI spec version: 2.2.2+28-3680f9fd+20260321-0840
  */
-import { type ModelsPlaneProjectSettings } from './modelsPlaneProjectSettings'
+import type { ModelsPlaneProjectSettings } from './modelsPlaneProjectSettings'
 
 export interface ModelsPlaneProjectMapping {
 	projectId: string

@@ -5,16 +5,12 @@
  * Track your time
  * OpenAPI spec version: 2.2.2+28-3680f9fd+20260321-0840
  */
-import { type ModelsExternalProjectOwnerType } from './modelsExternalProjectOwnerType'
+import type { ModelsExternalProjectOwnerType } from './modelsExternalProjectOwnerType'
 
 /**
  * External project or resource owner from an issue tracking system
  */
 export interface ModelsExternalProject {
-	/** @nullable */
-	availableLabels?: null | string[]
-	/** @nullable */
-	availableStates?: null | string[]
 	/** External project ID or resource owner login */
 	id: string
 	/** Display name of the project or resource owner */
@@ -24,4 +20,8 @@ export interface ModelsExternalProject {
 	 * @nullable
 	 */
 	ownerType?: ModelsExternalProjectOwnerType
+	/** @nullable */
+	availableLabels?: string[] | null
+	/** @nullable */
+	availableStates?: string[] | null
 }

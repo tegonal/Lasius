@@ -9,6 +9,7 @@
 export type ListGithubResourceOwners400Status =
 	(typeof ListGithubResourceOwners400Status)[keyof typeof ListGithubResourceOwners400Status]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListGithubResourceOwners400Status = {
 	error: 'error',
 } as const

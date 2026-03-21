@@ -178,7 +178,7 @@ export default function Login() {
 						</div>
 
 						{/* Provider buttons */}
-						<div className="space-y-3">
+						<div className="flex flex-col gap-3">
 							{providers.map((provider) => (
 								<a
 									data-testid={`auth-provider-${provider}`}
@@ -186,10 +186,10 @@ export default function Login() {
 									key={provider}
 								>
 									<Button
-										className="hover:border-primary hover:bg-base-200 w-full justify-start gap-3 transition-colors duration-200"
+										className="w-full justify-start gap-3 transition-colors duration-200"
 										size="lg"
 										type="button"
-										variant="outline"
+										variant="secondary"
 									>
 										<span className="flex h-6 w-6 items-center justify-center">
 											{getProviderIcon(provider)}

@@ -7,10 +7,10 @@
  */
 
 export interface ModelsPlaneTagConfiguration {
-	includeOnlyIssuesWithLabels: string[]
-	includeOnlyIssuesWithState: string[]
-	labelFilter: string[]
 	useLabels: boolean
+	labelFilter: string[]
 	useMilestone: boolean
 	useTitle: boolean
+	includeOnlyIssuesWithLabels: string[]
+	includeOnlyIssuesWithState: string[]
 }

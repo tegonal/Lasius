@@ -7,9 +7,10 @@
  */
 
 export type GetConfigsType =
-	| null
 	| (typeof GetConfigsType)[keyof typeof GetConfigsType]
+	| null
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const GetConfigsType = {
 	gitlab: 'gitlab',
 	jira: 'jira',

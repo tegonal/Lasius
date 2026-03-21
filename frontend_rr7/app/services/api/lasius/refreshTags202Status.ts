@@ -9,6 +9,7 @@
 export type RefreshTags202Status =
 	(typeof RefreshTags202Status)[keyof typeof RefreshTags202Status]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const RefreshTags202Status = {
 	accepted: 'accepted',
 } as const

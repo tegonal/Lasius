@@ -9,7 +9,8 @@
 export type ModelsUserProjectRole =
 	(typeof ModelsUserProjectRole)[keyof typeof ModelsUserProjectRole]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ModelsUserProjectRole = {
-	ProjectAdministrator: 'ProjectAdministrator',
 	ProjectMember: 'ProjectMember',
+	ProjectAdministrator: 'ProjectAdministrator',
 } as const

@@ -9,6 +9,7 @@
 export type ModelsJiraConfigResponseImporterType =
 	(typeof ModelsJiraConfigResponseImporterType)[keyof typeof ModelsJiraConfigResponseImporterType]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ModelsJiraConfigResponseImporterType = {
 	jira: 'jira',
 } as const

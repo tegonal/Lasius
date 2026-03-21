@@ -5,15 +5,15 @@
  * Track your time
  * OpenAPI spec version: 2.2.2+28-3680f9fd+20260321-0840
  */
-import { type ModelsPlaneTagConfiguration } from './modelsPlaneTagConfiguration'
+import type { ModelsPlaneTagConfiguration } from './modelsPlaneTagConfiguration'
 
 export interface ModelsPlaneProjectSettings {
-	/** @nullable */
-	externalProjectName?: null | string
-	/** @nullable */
-	maxResults?: null | number
-	/** @nullable */
-	params?: null | string
 	planeProjectId: string
+	/** @nullable */
+	externalProjectName?: string | null
+	/** @nullable */
+	maxResults?: number | null
+	/** @nullable */
+	params?: string | null
 	tagConfiguration: ModelsPlaneTagConfiguration
 }

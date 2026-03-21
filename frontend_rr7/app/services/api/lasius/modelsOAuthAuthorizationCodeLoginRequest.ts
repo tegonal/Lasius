@@ -8,15 +8,15 @@
 
 export interface ModelsOAuthAuthorizationCodeLoginRequest {
 	clientId: string
-	/** @nullable */
-	codeChallenge?: null | string
-	/** @nullable */
-	codeChallengeMethod?: null | string
 	email: string
 	password: string
+	/** @nullable */
+	scope?: string | null
 	redirectUri: string
 	/** @nullable */
-	scope?: null | string
+	codeChallenge?: string | null
 	/** @nullable */
-	state?: null | string
+	codeChallengeMethod?: string | null
+	/** @nullable */
+	state?: string | null
 }

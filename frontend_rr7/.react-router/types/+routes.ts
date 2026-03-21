@@ -23,6 +23,9 @@ type Pages = {
   "/internal-oauth/login": {
     params: {};
   };
+  "/internal-oauth/register": {
+    params: {};
+  };
   "/oauth/:provider/login": {
     params: {
       "provider": string;
@@ -34,9 +37,16 @@ type Pages = {
   "/api/session-status": {
     params: {};
   };
-  "/:lang": {
+  "/api/locales/:lang/:ns": {
     params: {
       "lang": string;
+      "ns": string;
+    };
+  };
+  "/api/help/:locale/:slug": {
+    params: {
+      "locale": string;
+      "slug": string;
     };
   };
 };
@@ -44,11 +54,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/login" | "/logout" | "/internal-oauth/login" | "/oauth/:provider/login" | "/oauth/callback" | "/api/session-status" | "/:lang";
-  };
-  "routes/home.tsx": {
-    id: "routes/home";
-    page: "/";
+    page: "/" | "/login" | "/logout" | "/internal-oauth/login" | "/internal-oauth/register" | "/oauth/:provider/login" | "/oauth/callback" | "/api/session-status" | "/api/locales/:lang/:ns" | "/api/help/:locale/:slug";
   };
   "routes/login.tsx": {
     id: "routes/login";
@@ -62,6 +68,10 @@ type RouteFiles = {
     id: "routes/internal-oauth.login";
     page: "/internal-oauth/login";
   };
+  "routes/internal-oauth.register.tsx": {
+    id: "routes/internal-oauth.register";
+    page: "/internal-oauth/register";
+  };
   "routes/oauth.$provider.login.tsx": {
     id: "routes/oauth.$provider.login";
     page: "/oauth/:provider/login";
@@ -74,25 +84,35 @@ type RouteFiles = {
     id: "routes/api.session-status";
     page: "/api/session-status";
   };
+  "routes/api.locales.$lang.$ns.ts": {
+    id: "routes/api.locales.$lang.$ns";
+    page: "/api/locales/:lang/:ns";
+  };
+  "routes/api.help.$locale.$slug.ts": {
+    id: "routes/api.help.$locale.$slug";
+    page: "/api/help/:locale/:slug";
+  };
   "routes/app-layout.tsx": {
     id: "routes/app-layout";
-    page: "/:lang";
+    page: "/";
   };
   "routes/dashboard.tsx": {
     id: "routes/dashboard";
-    page: "/:lang";
+    page: "/";
   };
 };
 
 type RouteModules = {
   "root": typeof import("./app/root.tsx");
-  "routes/home": typeof import("./app/routes/home.tsx");
   "routes/login": typeof import("./app/routes/login.tsx");
   "routes/logout": typeof import("./app/routes/logout.tsx");
   "routes/internal-oauth.login": typeof import("./app/routes/internal-oauth.login.tsx");
+  "routes/internal-oauth.register": typeof import("./app/routes/internal-oauth.register.tsx");
   "routes/oauth.$provider.login": typeof import("./app/routes/oauth.$provider.login.tsx");
   "routes/oauth.callback": typeof import("./app/routes/oauth.callback.tsx");
   "routes/api.session-status": typeof import("./app/routes/api.session-status.tsx");
+  "routes/api.locales.$lang.$ns": typeof import("./app/routes/api.locales.$lang.$ns.ts");
+  "routes/api.help.$locale.$slug": typeof import("./app/routes/api.help.$locale.$slug.ts");
   "routes/app-layout": typeof import("./app/routes/app-layout.tsx");
   "routes/dashboard": typeof import("./app/routes/dashboard.tsx");
 };

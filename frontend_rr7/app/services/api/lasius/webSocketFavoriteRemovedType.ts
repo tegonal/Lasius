@@ -9,6 +9,7 @@
 export type WebSocketFavoriteRemovedType =
 	(typeof WebSocketFavoriteRemovedType)[keyof typeof WebSocketFavoriteRemovedType]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const WebSocketFavoriteRemovedType = {
 	FavoriteRemoved: 'FavoriteRemoved',
 } as const

@@ -8,7 +8,7 @@
 
 export interface ModelsBookingStatsByCategory {
 	/** @nullable */
-	duration?: null | number
+	label?: string | null
 	/** @nullable */
-	label?: null | string
+	duration?: number | null
 }

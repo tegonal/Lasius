@@ -11,5 +11,5 @@ export interface ModelsStopBookingRequest {
 	 * @nullable
 	 * @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ
 	 */
-	end?: null | string
+	end?: string | null
 }

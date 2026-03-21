@@ -46,13 +46,10 @@ async function main() {
 		.use(Fetch)
 		.use(I18nextBrowserLanguageDetector)
 		.init({
+			...i18nConfig,
 			backend: { loadPath: '/api/locales/{{lng}}/{{ns}}' },
-			defaultNS: i18nConfig.defaultNS,
 			detection: { caches: [], order: ['htmlTag'] },
-			fallbackLng: i18nConfig.fallbackLng,
-			fallbackNS: i18nConfig.fallbackNS,
 			ns: getInitialNamespaces(),
-			returnEmptyString: i18nConfig.returnEmptyString,
 		})
 
 	startTransition(() => {

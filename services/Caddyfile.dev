@@ -28,9 +28,9 @@
 		}
 	}
 
-	# Next.js frontend (default route)
+	# React Router 7 frontend (default route)
 	handle {
-		reverse_proxy host.docker.internal:3001 {
+		reverse_proxy host.docker.internal:5173 {
 			header_up Host {host}
 			header_up X-Real-IP {remote_host}
 			header_up X-Forwarded-For {remote_host}

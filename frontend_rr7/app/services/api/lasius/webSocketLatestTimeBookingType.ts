@@ -9,6 +9,7 @@
 export type WebSocketLatestTimeBookingType =
 	(typeof WebSocketLatestTimeBookingType)[keyof typeof WebSocketLatestTimeBookingType]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const WebSocketLatestTimeBookingType = {
 	LatestTimeBooking: 'LatestTimeBooking',
 } as const

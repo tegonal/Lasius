@@ -9,9 +9,10 @@
 export type ModelsImporterType =
 	(typeof ModelsImporterType)[keyof typeof ModelsImporterType]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ModelsImporterType = {
-	github: 'github',
 	gitlab: 'gitlab',
 	jira: 'jira',
 	plane: 'plane',
+	github: 'github',
 } as const

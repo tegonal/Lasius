@@ -79,7 +79,7 @@ export function createInternalProvider(): InternalOAuthProvider {
 	return {
 		async exchangeCode(
 			code: string,
-			_redirectUri: string,
+			redirectUri: string,
 			codeVerifier?: string,
 		): Promise<TokenResponse> {
 			const body: Record<string, string> = {
@@ -87,6 +87,7 @@ export function createInternalProvider(): InternalOAuthProvider {
 				client_secret: clientSecret,
 				code,
 				grant_type: 'authorization_code',
+				redirect_uri: redirectUri,
 			}
 
 			if (codeVerifier) {

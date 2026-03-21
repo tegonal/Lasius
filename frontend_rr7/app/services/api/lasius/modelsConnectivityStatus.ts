@@ -12,9 +12,10 @@
 export type ModelsConnectivityStatus =
 	(typeof ModelsConnectivityStatus)[keyof typeof ModelsConnectivityStatus]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ModelsConnectivityStatus = {
+	healthy: 'healthy',
 	degraded: 'degraded',
 	failed: 'failed',
-	healthy: 'healthy',
 	unknown: 'unknown',
 } as const

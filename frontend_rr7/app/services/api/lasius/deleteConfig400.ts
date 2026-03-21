@@ -8,6 +8,6 @@
 
 export type DeleteConfig400 = {
 	error?: string
-	field?: string
 	message?: string
+	field?: string
 }

@@ -8,11 +8,11 @@
 
 export interface ModelsBookingStatsCategory {
 	/** @nullable */
-	day?: null | number
+	year?: number | null
 	/** @nullable */
-	month?: null | number
+	month?: number | null
 	/** @nullable */
-	week?: null | number
+	week?: number | null
 	/** @nullable */
-	year?: null | number
+	day?: number | null
 }

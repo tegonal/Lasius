@@ -5,12 +5,12 @@
  * Track your time
  * OpenAPI spec version: 2.2.2+28-3680f9fd+20260321-0840
  */
-import { type WebSocketUserTimeBookingHistoryEntryRemovedType } from './webSocketUserTimeBookingHistoryEntryRemovedType'
+import type { WebSocketUserTimeBookingHistoryEntryRemovedType } from './webSocketUserTimeBookingHistoryEntryRemovedType'
 
 /**
  * Booking removed from user's history
  */
 export interface WebSocketUserTimeBookingHistoryEntryRemoved {
-	bookingId: string
 	type: WebSocketUserTimeBookingHistoryEntryRemovedType
+	bookingId: string
 }

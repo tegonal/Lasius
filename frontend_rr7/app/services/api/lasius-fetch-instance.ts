@@ -23,8 +23,9 @@
  * Orval's fetch client generates calls as:
  *   lasiusFetch<T>(url: string, init: RequestInit): Promise<T>
  *
- * The URL from Orval is a relative path (e.g. `/organisations/:orgId/projects`).
- * This mutator prepends the backend base URL and handles response parsing.
+ * The URL from Orval is a relative path matching the backend route (e.g. `/organisations/:orgId/projects`).
+ * This mutator prepends the backend base URL (which includes the Play context path `/backend`)
+ * and handles response parsing.
  *
  * Usage in loaders/actions:
  *   const result = await getProjects(orgId, {
@@ -52,10 +53,11 @@ export class ApiError extends Error {
  */
 function getBaseUrl(): string {
 	if (typeof process !== 'undefined') {
+		// Env vars already include the Play context path (/backend)
 		return (
 			process.env.LASIUS_API_URL_INTERNAL ||
 			process.env.LASIUS_API_URL ||
-			'http://localhost:9000'
+			'http://localhost:9000/backend'
 		)
 	}
 	return ''
@@ -66,7 +68,7 @@ export const lasiusFetch = async <T>(
 	init: RequestInit,
 ): Promise<T> => {
 	const baseUrl = getBaseUrl()
-	const fullUrl = `${baseUrl}/backend/api/v1${url}`
+	const fullUrl = `${baseUrl}${url}`
 
 	const response = await fetch(fullUrl, init)
 

@@ -9,6 +9,7 @@
 export type ModelsGitlabConfigResponseImporterType =
 	(typeof ModelsGitlabConfigResponseImporterType)[keyof typeof ModelsGitlabConfigResponseImporterType]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ModelsGitlabConfigResponseImporterType = {
 	gitlab: 'gitlab',
 } as const

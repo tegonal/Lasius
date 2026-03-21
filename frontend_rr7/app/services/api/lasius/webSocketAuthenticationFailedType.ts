@@ -9,6 +9,7 @@
 export type WebSocketAuthenticationFailedType =
 	(typeof WebSocketAuthenticationFailedType)[keyof typeof WebSocketAuthenticationFailedType]
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const WebSocketAuthenticationFailedType = {
 	AuthenticationFailed: 'AuthenticationFailed',
 } as const

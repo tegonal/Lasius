@@ -11,10 +11,11 @@
  * @nullable
  */
 export type ModelsExternalProjectOwnerType =
-	| null
 	| (typeof ModelsExternalProjectOwnerType)[keyof typeof ModelsExternalProjectOwnerType]
+	| null
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ModelsExternalProjectOwnerType = {
-	Organization: 'Organization',
 	User: 'User',
+	Organization: 'Organization',
 } as const
