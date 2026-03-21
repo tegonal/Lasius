@@ -57,6 +57,16 @@ export default [
 			layout('routes/user.home.tsx', [
 				route('home', 'routes/user.home._index.tsx'),
 			]),
+			...prefix('dashboard', [
+				layout('routes/dashboard.tsx', [
+					index('routes/dashboard._index.tsx'),
+					route('day', 'routes/dashboard.day.tsx'),
+					route('week', 'routes/dashboard.week.tsx'),
+					route('month', 'routes/dashboard.month.tsx'),
+					route('6months', 'routes/dashboard.6months.tsx'),
+					route('year', 'routes/dashboard.year.tsx'),
+				]),
+			]),
 		]),
 	]),
 ] satisfies RouteConfig
