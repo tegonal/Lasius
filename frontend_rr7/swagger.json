@@ -1,0 +1,5790 @@
+{
+	"paths": {
+		"/config": {
+			"get": {
+				"operationId": "getConfiguration",
+				"tags": ["general"],
+				"summary": "Get application config",
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.ApplicationConfig"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/csrf-token": {
+			"get": {
+				"operationId": "getCsrfToken",
+				"tags": ["general"],
+				"summary": "Get csrf token",
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.CsrfToken"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/oauth2/user/register": {
+			"post": {
+				"operationId": "registerOAuthUser",
+				"tags": ["oauth2-provider"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "--------please annotate------",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/models.OAuthUserRegistration"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.OAuthUserId"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/oauth2/user/update-password": {
+			"post": {
+				"operationId": "updateUserPassword",
+				"tags": ["oauth2-provider"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Change current user's password",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/models.PasswordChangeRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "success"
+					}
+				}
+			}
+		},
+		"/oauth2/access_token": {
+			"post": {
+				"operationId": "oauthAccessToken",
+				"tags": ["oauth2-provider"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "access to internally provided oauth2 provider. Use for demo purposes only!",
+				"responses": {
+					"200": {
+						"description": "success"
+					}
+				}
+			}
+		},
+		"/oauth2/login": {
+			"post": {
+				"operationId": "login",
+				"tags": ["oauth2-provider"],
+				"summary": "login to the oauth provider with the authorization code flow",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/models.OAuthAuthorizationCodeLoginRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"302": {
+						"description": "redirect on success"
+					}
+				}
+			}
+		},
+		"/oauth2/logout": {
+			"post": {
+				"operationId": "logout",
+				"tags": ["oauth2-provider"],
+				"summary": "logout from the internal oauth provider, token will not be valid anymore afterwards",
+				"responses": {
+					"200": {
+						"description": "ok, if access token was removed"
+					}
+				}
+			}
+		},
+		"/oauth2/profile": {
+			"get": {
+				"operationId": "getUOAuthUserProfile",
+				"tags": ["oauth2-provider"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "access to internally provided oauth2 provider. Use for demo purposes only!",
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.OAuthUser"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/user/profile": {
+			"get": {
+				"operationId": "getUserProfile",
+				"tags": ["user"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Get current user's profile",
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.User"
+								}
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"operationId": "updateUserProfile",
+				"tags": ["user"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Change current user's profile",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/models.PersonalDataUpdate"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.User"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/user/profile/settings": {
+			"post": {
+				"operationId": "updateUserSettings",
+				"tags": ["user"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Change current user's settings",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/models.UserSettings"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.User"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/user/accept-tos": {
+			"post": {
+				"operationId": "acceptUserTOS",
+				"tags": ["user"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Accept terms of service (TOS)",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/models.AcceptTOSRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.User"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/users/organisations/{orgId}/users/{userId}": {
+			"post": {
+				"operationId": "updateUserProfileByOrganisation",
+				"tags": ["users"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Change selected user's profile in selected organisation",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/models.PersonalDataUpdate"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.User"
+								}
+							}
+						}
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "userId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/user-organisations/organisations/{orgId}/working-hours": {
+			"post": {
+				"operationId": "updateWorkingHoursByOrganisation",
+				"tags": ["user-organisations"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Change current user's working hours for the selected organisation",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/models.UpdateUserOrganisation"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.User"
+								}
+							}
+						}
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/user-organisations/organisations/{orgId}/leave": {
+			"delete": {
+				"operationId": "deleteUserMembershipByOrganisation",
+				"tags": ["user-organisations"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Remove current user's membership from selected organisation",
+				"responses": {
+					"200": {
+						"description": "successfully removed user from organisation"
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/user-organisations/organisations/{orgId}/projects/{projectId}/tags": {
+			"get": {
+				"operationId": "getTagsByProject",
+				"tags": ["user-organisations"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Get tags by organisation and project",
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/models.Tag"
+									}
+								}
+							}
+						}
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "projectId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/user-bookings/organisations/{orgId}/bookings/start": {
+			"post": {
+				"operationId": "startUserBookingCurrent",
+				"tags": ["user-bookings"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Start booking time on selected organisation for the current user",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/models.StartBookingRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "success"
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/user-bookings/organisations/{orgId}/bookings/{bookingId}/stop": {
+			"post": {
+				"operationId": "stopUserBookingCurrent",
+				"tags": ["user-bookings"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Stop the currently running booking by organisation and booking id for the current user",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/models.StopBookingRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "success"
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "bookingId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/user-bookings/organisations/{orgId}/bookings/{bookingId}/start-time": {
+			"post": {
+				"operationId": "updateUserBookingCurrent",
+				"tags": ["user-bookings"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Change the currently running booking by organisation and booking id for the current user",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/models.BookingChangeStartRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "success"
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "bookingId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/user-bookings/organisations/{orgId}/bookings/{bookingId}": {
+			"delete": {
+				"operationId": "deleteUserBooking",
+				"tags": ["user-bookings"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Remove a booking by organisation and booking id for the current user",
+				"responses": {
+					"200": {
+						"description": "success"
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "bookingId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"post": {
+				"operationId": "updateUserBooking",
+				"tags": ["user-bookings"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Change a booking by organisation for the current user",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/models.EditBookingRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "success"
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "bookingId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/user-bookings/organisations/{orgId}/bookings": {
+			"post": {
+				"operationId": "addUserBookingByOrganisation",
+				"tags": ["user-bookings"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Create a booking by organisation for the current user",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/models.AddBookingRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "success"
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/user-bookings/organisations/{orgId}/bookings/history": {
+			"get": {
+				"operationId": "getUserBookingListByOrganisation",
+				"tags": ["user-bookings"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Get current user's booking history for selected organisation",
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/models.Booking"
+									}
+								}
+							}
+						}
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "from",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"pattern": "yyyy-MM-dd'T'HH:mm:ss.SSS"
+						}
+					},
+					{
+						"in": "query",
+						"name": "to",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"pattern": "yyyy-MM-dd'T'HH:mm:ss.SSS"
+						}
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"type": "integer",
+							"format": "int32",
+							"nullable": true
+						}
+					},
+					{
+						"in": "query",
+						"name": "skip",
+						"required": false,
+						"schema": {
+							"type": "integer",
+							"format": "int32",
+							"nullable": true
+						}
+					}
+				]
+			}
+		},
+		"/user-bookings/organisations/{orgId}/bookings/stats/aggregated": {
+			"get": {
+				"operationId": "getUserBookingAggregatedStatsByOrganisation",
+				"tags": ["user-bookings"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Get aggregated stats for current user in selected organisation",
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/models.BookingStats"
+									}
+								}
+							}
+						}
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "source",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "from",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"pattern": "yyyy-MM-dd"
+						}
+					},
+					{
+						"in": "query",
+						"name": "to",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"pattern": "yyyy-MM-dd"
+						}
+					},
+					{
+						"in": "query",
+						"name": "granularity",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"enum": ["All", "Year", "Month", "Week", "Day"]
+						}
+					}
+				]
+			}
+		},
+		"/user-bookings/current": {
+			"get": {
+				"operationId": "getUserBookingCurrent",
+				"tags": ["user-bookings"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Get current user's currently running booking",
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.CurrentUserTimeBooking"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/user-bookings/organisations/{orgId}/current": {
+			"get": {
+				"operationId": "getUserBookingCurrentListByOrganisation",
+				"tags": ["user-bookings"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Get currently running bookings of members in selected organisation",
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.CurrentOrganisationTimeBookings"
+								}
+							}
+						}
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/user-bookings/organisations/{orgId}/latest": {
+			"get": {
+				"operationId": "getUserBookingLatestListByOrganisation",
+				"tags": ["user-bookings"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Get latest bookings of members in selected organisation",
+				"responses": {
+					"200": {
+						"description": "success"
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "maxHistory",
+						"required": false,
+						"schema": {
+							"type": "integer",
+							"format": "int32",
+							"default": 5
+						}
+					}
+				]
+			}
+		},
+		"/user-favorites/organisations/{orgId}": {
+			"get": {
+				"operationId": "getFavoriteBookingList",
+				"tags": ["user-favorites"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Get current user's favorite bookings list for the selected organisation",
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.UserFavorites"
+								}
+							}
+						}
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"post": {
+				"operationId": "addFavoriteBooking",
+				"tags": ["user-favorites"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Save a new favorite booking for the current user in the selected organisation",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/models.FavoritesRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/models.UserFavorites"
+									}
+								}
+							}
+						}
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"delete": {
+				"operationId": "deleteFavoriteBooking",
+				"tags": ["user-favorites"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Remove a favorite booking for the current user from the selected organisation",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/models.FavoritesRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "success"
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/organisation-bookings/organisations/{orgId}/bookings/history": {
+			"get": {
+				"operationId": "getOrganisationBookingList",
+				"tags": ["organisation-bookings"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Get bookings for the selected organisation within the selected timeframe",
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/models.Booking"
+									}
+								}
+							}
+						}
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "from",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"pattern": "yyyy-MM-dd'T'HH:mm:ss.SSS"
+						}
+					},
+					{
+						"in": "query",
+						"name": "to",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"pattern": "yyyy-MM-dd'T'HH:mm:ss.SSS"
+						}
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"type": "integer",
+							"format": "int32",
+							"nullable": true
+						}
+					},
+					{
+						"in": "query",
+						"name": "skip",
+						"required": false,
+						"schema": {
+							"type": "integer",
+							"format": "int32",
+							"nullable": true
+						}
+					}
+				]
+			}
+		},
+		"/organisation-bookings/organisations/{orgId}/bookings/stats/aggregated": {
+			"get": {
+				"operationId": "getOrganisationBookingAggregatedStats",
+				"tags": ["organisation-bookings"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Get aggregated statistics about bookings for the selected organisation within the selected timeframe",
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/models.BookingStats"
+									}
+								}
+							}
+						}
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "source",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "from",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"pattern": "yyyy-MM-dd"
+						}
+					},
+					{
+						"in": "query",
+						"name": "to",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"pattern": "yyyy-MM-dd"
+						}
+					},
+					{
+						"in": "query",
+						"name": "granularity",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"enum": ["All", "Year", "Month", "Week", "Day"]
+						}
+					}
+				]
+			}
+		},
+		"/organisations/{orgId}/projects/{projectId}/bookings/history": {
+			"get": {
+				"operationId": "getProjectBookingList",
+				"tags": ["project-bookings"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Get statistics about bookings for the selected project within the selected timeframe",
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/models.Booking"
+									}
+								}
+							}
+						}
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "projectId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "from",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"pattern": "yyyy-MM-dd'T'HH:mm:ss.SSS"
+						}
+					},
+					{
+						"in": "query",
+						"name": "to",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"pattern": "yyyy-MM-dd'T'HH:mm:ss.SSS"
+						}
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"type": "integer",
+							"format": "int32",
+							"nullable": true
+						}
+					},
+					{
+						"in": "query",
+						"name": "skip",
+						"required": false,
+						"schema": {
+							"type": "integer",
+							"format": "int32",
+							"nullable": true
+						}
+					}
+				]
+			}
+		},
+		"/organisations/{orgId}/projects/{projectId}/bookings/stats/aggregated": {
+			"get": {
+				"operationId": "getAggregatedStatisticsByProject",
+				"tags": ["project-bookings"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/models.BookingStats"
+									}
+								}
+							}
+						}
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "projectId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "source",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "from",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"pattern": "yyyy-MM-dd"
+						}
+					},
+					{
+						"in": "query",
+						"name": "to",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"pattern": "yyyy-MM-dd"
+						}
+					},
+					{
+						"in": "query",
+						"name": "granularity",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"enum": ["All", "Year", "Month", "Week", "Day"]
+						}
+					}
+				]
+			}
+		},
+		"/organisations/{orgId}/projects": {
+			"get": {
+				"operationId": "getProjectList",
+				"tags": ["projects"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/models.Project"
+									}
+								}
+							}
+						}
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"post": {
+				"operationId": "createProject",
+				"tags": ["projects"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/models.CreateProject"
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.Project"
+								}
+							}
+						}
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/organisations/{orgId}/projects/{projectId}": {
+			"post": {
+				"operationId": "updateProject",
+				"tags": ["projects"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "update a project",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/models.UpdateProject"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.Project"
+								}
+							}
+						}
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "projectId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"delete": {
+				"operationId": "deactivateProject",
+				"tags": ["projects"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Deactivate a project",
+				"responses": {
+					"200": {
+						"description": "success"
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "projectId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/organisations/{orgId}/projects/{projectId}/users": {
+			"get": {
+				"operationId": "getProjectUserList",
+				"tags": ["projects"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/models.UserStub"
+									}
+								}
+							}
+						}
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "projectId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"post": {
+				"operationId": "inviteProjectUser",
+				"tags": ["projects"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/models.UserToProjectAssignment"
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.InvitationResult"
+								}
+							}
+						}
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "projectId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/organisations/{orgId}/projects/{projectId}/last-activity": {
+			"get": {
+				"operationId": "getProjectLastActivityDate",
+				"tags": ["projects"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"description": "Get last activity date for a project.",
+				"responses": {
+					"200": {
+						"description": "Last activity date",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string",
+									"format": "date-time"
+								}
+							}
+						}
+					},
+					"204": {
+						"description": "No activity found for this project"
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "projectId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/organisations/{orgId}/projects/{projectId}/users/{userId}": {
+			"delete": {
+				"operationId": "removeProjectUser",
+				"tags": ["projects"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "success"
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "projectId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "userId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/organisations/{orgId}/projects/{projectId}/leave": {
+			"delete": {
+				"operationId": "removeProjectOwnUser",
+				"tags": ["projects"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Remove current user's membership from selected project and selected organisation",
+				"responses": {
+					"200": {
+						"description": "success"
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "projectId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/organisations": {
+			"post": {
+				"operationId": "createOrganisation",
+				"tags": ["organisations"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "create an organisation",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/models.CreateOrganisation"
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.Organisation"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/organisations/{orgId}": {
+			"get": {
+				"operationId": "getOrganisation",
+				"tags": ["organisations"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.Organisation"
+								}
+							}
+						}
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"post": {
+				"operationId": "updateOrganisation",
+				"tags": ["organisations"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "update an organisation",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/models.UpdateOrganisation"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.Organisation"
+								}
+							}
+						}
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"delete": {
+				"operationId": "deactivateOrganisation",
+				"tags": ["organisations"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "delete/deactivate an organisation",
+				"responses": {
+					"200": {
+						"description": "success"
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/organisations/{orgId}/users": {
+			"get": {
+				"operationId": "getOrganisationUserList",
+				"tags": ["organisations"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/models.UserStub"
+									}
+								}
+							}
+						}
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/organisations/{orgId}/invite": {
+			"post": {
+				"operationId": "inviteOrganisationUser",
+				"tags": ["organisations"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "assign a user to an organisation",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/models.UserToOrganisationAssignment"
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "successfully created invitation",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.InvitationResult"
+								}
+							}
+						}
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/organisations/{orgId}/users/{userId}": {
+			"delete": {
+				"operationId": "removeOrganisationUser",
+				"tags": ["organisations"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Remove selected user's membership from selected organisation",
+				"responses": {
+					"200": {
+						"description": "successfully removed user from organisation"
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "userId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/invitations/{invitationId}": {
+			"get": {
+				"operationId": "getInvitation",
+				"tags": ["invitations-private"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "get detail of an invitation",
+				"responses": {
+					"400": {
+						"description": "invalid invitation or invalid referenced user"
+					},
+					"200": {
+						"description": "success if valid invitation",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.Invitation"
+								}
+							}
+						}
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "invitationId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/invitations/{invitationId}/accept": {
+			"post": {
+				"operationId": "acceptInvitation",
+				"tags": ["invitations-private"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/models.AcceptInvitationRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.Invitation"
+								}
+							}
+						}
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "invitationId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/invitations/{invitationId}/decline": {
+			"post": {
+				"operationId": "declineInvitation",
+				"tags": ["invitations-private"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.Invitation"
+								}
+							}
+						}
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "invitationId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/invitations/{invitationId}/status": {
+			"get": {
+				"operationId": "getInvitationStatus",
+				"tags": ["invitations-public"],
+				"summary": "get status of an invitation",
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.InvitationStatusResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "invalid or non existing invitation"
+					}
+				},
+				"parameters": [
+					{
+						"in": "path",
+						"name": "invitationId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/organisations/{orgId}/issue-importers": {
+			"get": {
+				"operationId": "getConfigs",
+				"tags": ["issue-importers"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Get all importer configurations for organisation (optionally filtered by type)",
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "uuid"
+						},
+						"description": "Organisation ID"
+					},
+					{
+						"in": "query",
+						"name": "type",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"nullable": true,
+							"enum": ["gitlab", "jira", "plane"]
+						},
+						"description": "Filter by importer type (gitlab, jira, or plane)"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/models.IssueImporterConfigResponse"
+									}
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "user not authorized (requires OrganisationAdministrator role)"
+					}
+				}
+			},
+			"post": {
+				"operationId": "createConfig",
+				"tags": ["issue-importers"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Create new importer configuration (Organisation Admin only)",
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "uuid"
+						},
+						"description": "Organisation ID"
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/models.CreateIssueImporterConfig"
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "configuration created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.IssueImporterConfigResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "invalid request (missing required fields or validation failed)"
+					},
+					"403": {
+						"description": "user not authorized (requires OrganisationAdministrator role)"
+					}
+				}
+			}
+		},
+		"/organisations/{orgId}/issue-importers/{configId}": {
+			"get": {
+				"operationId": "getConfig",
+				"tags": ["issue-importers"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Get importer configuration by ID",
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "uuid"
+						},
+						"description": "Organisation ID"
+					},
+					{
+						"in": "path",
+						"name": "configId",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/models.IssueImporterConfigId",
+							"type": "string"
+						},
+						"description": "Importer configuration ID"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.IssueImporterConfigResponse"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "access denied (user not in organisation or not an admin)"
+					},
+					"404": {
+						"description": "configuration not found"
+					}
+				}
+			},
+			"put": {
+				"operationId": "updateConfig",
+				"tags": ["issue-importers"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Update importer configuration (Organisation Admin only)",
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "uuid"
+						},
+						"description": "Organisation ID"
+					},
+					{
+						"in": "path",
+						"name": "configId",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/models.IssueImporterConfigId",
+							"type": "string"
+						},
+						"description": "Importer configuration ID"
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/models.UpdateIssueImporterConfig"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "configuration updated",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.IssueImporterConfigResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "invalid request (missing required fields or validation failed)"
+					},
+					"403": {
+						"description": "user not authorized (requires OrganisationAdministrator role)"
+					},
+					"404": {
+						"description": "configuration not found"
+					}
+				}
+			},
+			"delete": {
+				"operationId": "deleteConfig",
+				"tags": ["issue-importers"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Delete importer configuration (Organisation Admin only)",
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "uuid"
+						},
+						"description": "Organisation ID"
+					},
+					{
+						"in": "path",
+						"name": "configId",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/models.IssueImporterConfigId",
+							"type": "string"
+						},
+						"description": "Importer configuration ID"
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "configuration deleted successfully (no content)"
+					},
+					"400": {
+						"description": "validation failed",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"error": {
+											"type": "string",
+											"example": "validation_failed"
+										},
+										"message": {
+											"type": "string"
+										},
+										"field": {
+											"type": "string"
+										}
+									}
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "user not authorized (requires OrganisationAdministrator role)",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"error": {
+											"type": "string",
+											"example": "access_denied"
+										},
+										"message": {
+											"type": "string"
+										},
+										"configId": {
+											"type": "string"
+										}
+									}
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "configuration not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"error": {
+											"type": "string",
+											"example": "config_not_found"
+										},
+										"message": {
+											"type": "string"
+										},
+										"configId": {
+											"type": "string"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/organisations/{orgId}/projects/{projectId}/issue-importer": {
+			"get": {
+				"operationId": "getConfigForProject",
+				"tags": ["issue-importers"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Get importer configuration for a specific project",
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "uuid"
+						},
+						"description": "Organisation ID"
+					},
+					{
+						"in": "path",
+						"name": "projectId",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "uuid"
+						},
+						"description": "Project ID"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.IssueImporterConfigResponse"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "access denied (user not in organisation or not an admin)"
+					},
+					"404": {
+						"description": "no configuration found for this project"
+					}
+				}
+			}
+		},
+		"/organisations/{orgId}/issue-importers/test": {
+			"post": {
+				"operationId": "testConnectivity",
+				"tags": ["issue-importers"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Test connectivity to external service",
+				"description": "Tests connectivity to GitLab/Jira/Plane without saving configuration. Useful for validating credentials before creating a config. Requires only OrganisationMember role since nothing is saved.",
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "uuid"
+						},
+						"description": "Organisation ID"
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/models.CreateIssueImporterConfig"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "connectivity test successful",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"status": {
+											"type": "string",
+											"enum": ["success"]
+										},
+										"message": {
+											"type": "string",
+											"example": "Successfully connected to GitLab"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "connectivity test failed or validation error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"status": {
+											"type": "string",
+											"enum": ["error"]
+										},
+										"message": {
+											"type": "string",
+											"example": "Authentication failed - Invalid access token"
+										},
+										"error": {
+											"type": "string",
+											"enum": [
+												"connection_failed",
+												"authentication_failed",
+												"unknown_host",
+												"timeout",
+												"connection_error",
+												"validation_failed"
+											]
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/organisations/{orgId}/issue-importers/{configId}/test": {
+			"post": {
+				"operationId": "testExistingConfig",
+				"tags": ["issue-importers"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Test connectivity for existing configuration",
+				"description": "Tests connectivity to external service using credentials from an existing saved configuration. Useful for validating that saved credentials still work or testing after updating configuration. Requires only OrganisationMember role since nothing is modified.",
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "uuid"
+						},
+						"description": "Organisation ID"
+					},
+					{
+						"in": "path",
+						"name": "configId",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/models.IssueImporterConfigId",
+							"type": "string",
+							"format": "uuid"
+						},
+						"description": "Issue importer configuration ID"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "connectivity test successful",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"status": {
+											"type": "string",
+											"enum": ["success"]
+										},
+										"message": {
+											"type": "string",
+											"example": "Successfully connected to GitLab"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "connectivity test failed",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"status": {
+											"type": "string",
+											"enum": ["error"]
+										},
+										"message": {
+											"type": "string",
+											"example": "Authentication failed - Invalid access token"
+										},
+										"error": {
+											"type": "string",
+											"enum": [
+												"connection_failed",
+												"authentication_failed",
+												"unknown_host",
+												"timeout",
+												"connection_error"
+											]
+										}
+									}
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Configuration does not belong to organization"
+					},
+					"404": {
+						"description": "Configuration not found"
+					}
+				}
+			}
+		},
+		"/organisations/{orgId}/issue-importers/{configId}/projects": {
+			"get": {
+				"operationId": "listProjects",
+				"tags": ["issue-importers"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "List available projects from external service",
+				"description": "Fetches list of accessible projects from the configured external service (GitLab/Jira/Plane/GitHub). Returns flat list of projects for all importer types. GitLab/GitHub/Plane projects include available labels and states to help configure filters. GitLab states are \"opened\", \"closed\", \"all\". GitHub states are \"open\", \"closed\", \"all\". Plane states are custom per project. Jira returns basic project information only. Requires only OrganisationMember role since it only reads from external API.",
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "uuid"
+						},
+						"description": "Organisation ID"
+					},
+					{
+						"in": "path",
+						"name": "configId",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/models.IssueImporterConfigId",
+							"type": "string",
+							"format": "uuid"
+						},
+						"description": "Issue importer configuration ID"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Successfully fetched projects/workspaces",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.ListProjectsResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Failed to fetch projects from external API",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"status": {
+											"type": "string",
+											"enum": ["error"]
+										},
+										"message": {
+											"type": "string",
+											"example": "Failed to fetch GitLab projects - HTTP 401"
+										},
+										"error": {
+											"type": "string",
+											"enum": ["list_projects_failed"]
+										}
+									}
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Configuration does not belong to organization"
+					},
+					"404": {
+						"description": "Configuration not found"
+					}
+				}
+			},
+			"post": {
+				"operationId": "addProjectMapping",
+				"tags": ["issue-importers"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Add project mapping to configuration (Organisation Admin only)",
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "uuid"
+						},
+						"description": "Organisation ID"
+					},
+					{
+						"in": "path",
+						"name": "configId",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/models.IssueImporterConfigId",
+							"type": "string"
+						},
+						"description": "Importer configuration ID"
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/models.CreateProjectMapping"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "project mapping added",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.IssueImporterConfigResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "invalid request (missing required fields or validation failed)"
+					},
+					"403": {
+						"description": "user not authorized (requires OrganisationAdministrator role)"
+					},
+					"404": {
+						"description": "configuration not found"
+					}
+				}
+			}
+		},
+		"/organisations/{orgId}/issue-importers/github/resource-owners": {
+			"post": {
+				"operationId": "listGithubResourceOwners",
+				"tags": ["issue-importers"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "List GitHub resource owners (user + organizations)",
+				"description": "Lists available resource owners for a GitHub token. Returns the authenticated user plus all organizations they have access to. This helps users select the correct resource owner when creating organization-scoped fine-grained tokens. GitHub-specific endpoint.",
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "uuid"
+						},
+						"description": "Organisation ID"
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/models.CreateIssueImporterConfig"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Successfully fetched resource owners",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.ListProjectsResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Failed to fetch resource owners or invalid importer type",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"status": {
+											"type": "string",
+											"enum": ["error"]
+										},
+										"message": {
+											"type": "string"
+										},
+										"error": {
+											"type": "string",
+											"enum": [
+												"list_resource_owners_failed",
+												"missing_access_token",
+												"invalid_importer_type"
+											]
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/organisations/{orgId}/issue-importers/{configId}/projects/{projectId}/refresh-tags": {
+			"post": {
+				"operationId": "refreshTags",
+				"tags": ["issue-importers"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Force immediate tag refresh for a project",
+				"description": "Triggers an immediate tag refresh for a specific project mapping. Sends a message to the worker to fetch tags from the external service (GitLab/Jira/Plane/GitHub) right away, bypassing the scheduled check interval. Tags will be updated within seconds. Requires only OrganisationMember role as this is a read-like operation.",
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "uuid"
+						},
+						"description": "Organisation ID"
+					},
+					{
+						"in": "path",
+						"name": "configId",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/models.IssueImporterConfigId",
+							"type": "string"
+						},
+						"description": "Issue importer configuration ID"
+					},
+					{
+						"in": "path",
+						"name": "projectId",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "uuid"
+						},
+						"description": "Project ID"
+					}
+				],
+				"responses": {
+					"202": {
+						"description": "Refresh request accepted - tags will be updated immediately",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"status": {
+											"type": "string",
+											"enum": ["accepted"]
+										},
+										"message": {
+											"type": "string",
+											"example": "Tag refresh triggered immediately. Tags will be updated shortly."
+										},
+										"configId": {
+											"type": "string"
+										},
+										"projectId": {
+											"type": "string"
+										},
+										"importerType": {
+											"type": "string",
+											"enum": ["gitlab", "jira", "plane", "github"]
+										}
+									}
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Configuration does not belong to organization"
+					},
+					"404": {
+						"description": "Configuration not found or project not mapped to configuration",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"status": {
+											"type": "string",
+											"enum": ["error"]
+										},
+										"message": {
+											"type": "string"
+										},
+										"error": {
+											"type": "string",
+											"enum": ["config_not_found", "project_not_found"]
+										},
+										"configId": {
+											"type": "string"
+										},
+										"projectId": {
+											"type": "string"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/organisations/{orgId}/issue-importers/{configId}/projects/{projectId}": {
+			"put": {
+				"operationId": "updateProjectMapping",
+				"tags": ["issue-importers"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Update project mapping in configuration (Organisation Admin only)",
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "uuid"
+						},
+						"description": "Organisation ID"
+					},
+					{
+						"in": "path",
+						"name": "configId",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/models.IssueImporterConfigId",
+							"type": "string"
+						},
+						"description": "Importer configuration ID"
+					},
+					{
+						"in": "path",
+						"name": "projectId",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "uuid"
+						},
+						"description": "Project ID"
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/models.UpdateProjectMapping"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "project mapping updated",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.IssueImporterConfigResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "invalid request (missing required fields or validation failed)"
+					},
+					"403": {
+						"description": "user not authorized (requires OrganisationAdministrator role)"
+					},
+					"404": {
+						"description": "configuration not found or project not found in mapping"
+					}
+				}
+			},
+			"delete": {
+				"operationId": "removeProjectMapping",
+				"tags": ["issue-importers"],
+				"security": [
+					{
+						"bearerHttpAuthentication": []
+					}
+				],
+				"summary": "Remove project mapping from configuration (Organisation Admin only)",
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgId",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "uuid"
+						},
+						"description": "Organisation ID"
+					},
+					{
+						"in": "path",
+						"name": "configId",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/models.IssueImporterConfigId",
+							"type": "string"
+						},
+						"description": "Importer configuration ID"
+					},
+					{
+						"in": "path",
+						"name": "projectId",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "uuid"
+						},
+						"description": "Project ID"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "project mapping removed",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/models.IssueImporterConfigResponse"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "user not authorized (requires OrganisationAdministrator role)"
+					},
+					"404": {
+						"description": "configuration not found or project not found in mapping"
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"models.Booking": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"start": {
+						"$ref": "#/components/schemas/models.LocalDateTimeWithTimeZone"
+					},
+					"end": {
+						"nullable": true,
+						"$ref": "#/components/schemas/models.LocalDateTimeWithTimeZone"
+					},
+					"userReference": {
+						"$ref": "#/components/schemas/models.EntityReference"
+					},
+					"organisationReference": {
+						"$ref": "#/components/schemas/models.EntityReference"
+					},
+					"projectReference": {
+						"$ref": "#/components/schemas/models.EntityReference"
+					},
+					"tags": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/models.Tag"
+						}
+					},
+					"bookingHash": {
+						"type": "integer",
+						"format": "int64"
+					}
+				},
+				"required": [
+					"id",
+					"start",
+					"userReference",
+					"organisationReference",
+					"projectReference",
+					"tags",
+					"bookingHash"
+				]
+			},
+			"models.GithubConfigResponse": {
+				"properties": {
+					"id": {
+						"$ref": "#/components/schemas/models.IssueImporterConfigId",
+						"type": "string",
+						"format": "uuid"
+					},
+					"importerType": {
+						"$ref": "#/components/schemas/models.ImporterType",
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"baseUrl": {
+						"type": "string",
+						"format": "uri"
+					},
+					"checkFrequency": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"projects": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/models.GithubProjectMapping"
+						}
+					},
+					"syncStatus": {
+						"$ref": "#/components/schemas/models.ConfigSyncStatus"
+					},
+					"audit": {
+						"$ref": "#/components/schemas/models.AuditInfoResponse"
+					},
+					"resourceOwner": {
+						"type": "string",
+						"nullable": true,
+						"description": "GitHub resource owner (organization or user login) for the token"
+					},
+					"resourceOwnerType": {
+						"type": "string",
+						"nullable": true,
+						"enum": ["User", "Organization"],
+						"description": "Type of the resource owner (User or Organization)"
+					},
+					"availableResourceOwners": {
+						"type": "array",
+						"nullable": true,
+						"items": {
+							"$ref": "#/components/schemas/models.ExternalProject"
+						},
+						"description": "List of available resource owners (user + organizations) for the token"
+					},
+					"type": {
+						"type": "string"
+					},
+					"projectCount": {
+						"type": "integer"
+					}
+				},
+				"required": [
+					"id",
+					"name",
+					"baseUrl",
+					"checkFrequency",
+					"projects",
+					"importerType",
+					"projectCount",
+					"syncStatus",
+					"audit"
+				],
+				"type": "object"
+			},
+			"models.PlaneConfigResponse": {
+				"properties": {
+					"id": {
+						"$ref": "#/components/schemas/models.IssueImporterConfigId",
+						"type": "string",
+						"format": "uuid"
+					},
+					"importerType": {
+						"$ref": "#/components/schemas/models.ImporterType",
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"baseUrl": {
+						"type": "string",
+						"format": "uri"
+					},
+					"checkFrequency": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"projects": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/models.PlaneProjectMapping"
+						}
+					},
+					"syncStatus": {
+						"$ref": "#/components/schemas/models.ConfigSyncStatus"
+					},
+					"audit": {
+						"$ref": "#/components/schemas/models.AuditInfoResponse"
+					},
+					"workspace": {
+						"type": "string"
+					},
+					"type": {
+						"type": "string"
+					},
+					"projectCount": {
+						"type": "integer"
+					}
+				},
+				"required": [
+					"id",
+					"name",
+					"baseUrl",
+					"checkFrequency",
+					"projects",
+					"importerType",
+					"projectCount",
+					"syncStatus",
+					"audit"
+				],
+				"type": "object"
+			},
+			"models.JiraConfigResponse": {
+				"properties": {
+					"id": {
+						"$ref": "#/components/schemas/models.IssueImporterConfigId",
+						"type": "string",
+						"format": "uuid"
+					},
+					"importerType": {
+						"$ref": "#/components/schemas/models.ImporterType",
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"baseUrl": {
+						"type": "string",
+						"format": "uri"
+					},
+					"checkFrequency": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"projects": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/models.JiraProjectMapping"
+						}
+					},
+					"syncStatus": {
+						"$ref": "#/components/schemas/models.ConfigSyncStatus"
+					},
+					"audit": {
+						"$ref": "#/components/schemas/models.AuditInfoResponse"
+					},
+					"type": {
+						"type": "string"
+					},
+					"projectCount": {
+						"type": "integer"
+					}
+				},
+				"required": [
+					"id",
+					"name",
+					"baseUrl",
+					"checkFrequency",
+					"projects",
+					"importerType",
+					"projectCount",
+					"syncStatus",
+					"audit"
+				],
+				"type": "object"
+			},
+			"models.GitlabConfigResponse": {
+				"properties": {
+					"id": {
+						"$ref": "#/components/schemas/models.IssueImporterConfigId",
+						"type": "string",
+						"format": "uuid"
+					},
+					"importerType": {
+						"$ref": "#/components/schemas/models.ImporterType",
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"baseUrl": {
+						"type": "string",
+						"format": "uri"
+					},
+					"checkFrequency": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"projects": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/models.GitlabProjectMapping"
+						}
+					},
+					"syncStatus": {
+						"$ref": "#/components/schemas/models.ConfigSyncStatus"
+					},
+					"audit": {
+						"$ref": "#/components/schemas/models.AuditInfoResponse"
+					},
+					"type": {
+						"type": "string"
+					},
+					"projectCount": {
+						"type": "integer"
+					}
+				},
+				"required": [
+					"id",
+					"name",
+					"baseUrl",
+					"checkFrequency",
+					"projects",
+					"importerType",
+					"projectCount",
+					"syncStatus",
+					"audit"
+				],
+				"type": "object"
+			},
+			"models.GithubProjectSettings": {
+				"properties": {
+					"githubRepoOwner": {
+						"type": "string"
+					},
+					"githubRepoName": {
+						"type": "string"
+					},
+					"externalProjectName": {
+						"type": "string",
+						"nullable": true
+					},
+					"maxResults": {
+						"type": "integer",
+						"format": "int32",
+						"nullable": true
+					},
+					"params": {
+						"type": "string",
+						"nullable": true
+					},
+					"projectKeyPrefix": {
+						"type": "string",
+						"nullable": true
+					},
+					"tagConfiguration": {
+						"$ref": "#/components/schemas/models.GithubTagConfiguration"
+					}
+				},
+				"required": ["githubRepoOwner", "githubRepoName", "tagConfiguration"]
+			},
+			"models.GithubProjectMapping": {
+				"properties": {
+					"projectId": {
+						"type": "string"
+					},
+					"settings": {
+						"$ref": "#/components/schemas/models.GithubProjectSettings"
+					}
+				},
+				"required": ["projectId", "settings"]
+			},
+			"models.PlaneProjectSettings": {
+				"properties": {
+					"planeProjectId": {
+						"type": "string"
+					},
+					"externalProjectName": {
+						"type": "string",
+						"nullable": true
+					},
+					"maxResults": {
+						"type": "integer",
+						"format": "int32",
+						"nullable": true
+					},
+					"params": {
+						"type": "string",
+						"nullable": true
+					},
+					"tagConfiguration": {
+						"$ref": "#/components/schemas/models.PlaneTagConfiguration"
+					}
+				},
+				"required": ["planeProjectId", "tagConfiguration"]
+			},
+			"models.PlaneProjectMapping": {
+				"properties": {
+					"projectId": {
+						"type": "string"
+					},
+					"settings": {
+						"$ref": "#/components/schemas/models.PlaneProjectSettings"
+					}
+				},
+				"required": ["projectId", "settings"]
+			},
+			"models.JiraProjectSettings": {
+				"properties": {
+					"jiraProjectKey": {
+						"type": "string"
+					},
+					"externalProjectName": {
+						"type": "string",
+						"nullable": true
+					},
+					"maxResults": {
+						"type": "integer",
+						"format": "int32",
+						"nullable": true
+					},
+					"jql": {
+						"type": "string",
+						"nullable": true
+					}
+				},
+				"required": ["jiraProjectKey"]
+			},
+			"models.JiraProjectMapping": {
+				"properties": {
+					"projectId": {
+						"type": "string"
+					},
+					"settings": {
+						"$ref": "#/components/schemas/models.JiraProjectSettings"
+					}
+				},
+				"required": ["projectId", "settings"]
+			},
+			"models.AuditInfoResponse": {
+				"properties": {
+					"createdBy": {
+						"$ref": "#/components/schemas/models.UserStub"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time",
+						"pattern": "yyyy-MM-dd'T'HH:mm:ss.SSSZZ",
+						"description": "Timestamp when entity was created"
+					},
+					"updatedBy": {
+						"$ref": "#/components/schemas/models.UserStub"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time",
+						"pattern": "yyyy-MM-dd'T'HH:mm:ss.SSSZZ",
+						"description": "Timestamp when entity was last updated"
+					}
+				},
+				"required": ["createdBy", "createdAt", "updatedBy", "updatedAt"],
+				"type": "object",
+				"description": "Audit information with full user details for API responses"
+			},
+			"models.ProjectSyncStats": {
+				"properties": {
+					"projectId": {
+						"type": "string",
+						"format": "uuid",
+						"description": "Project ID"
+					},
+					"projectName": {
+						"type": "string",
+						"description": "Project name"
+					},
+					"lastSyncAt": {
+						"nullable": true,
+						"type": "string",
+						"format": "date-time",
+						"pattern": "yyyy-MM-dd'T'HH:mm:ss.SSSZZ",
+						"description": "Last successful sync timestamp"
+					},
+					"lastSyncIssueCount": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Number of issues synced in last run"
+					},
+					"totalIssuesSynced": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Total issues synced since mapping creation"
+					},
+					"consecutiveFailures": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Number of consecutive sync failures (circuit breaker)"
+					},
+					"lastError": {
+						"nullable": true,
+						"$ref": "#/components/schemas/models.ConnectivityIssue"
+					}
+				},
+				"required": [
+					"projectId",
+					"projectName",
+					"lastSyncIssueCount",
+					"totalIssuesSynced",
+					"consecutiveFailures"
+				],
+				"type": "object",
+				"description": "Sync statistics for a specific project mapping"
+			},
+			"models.ConnectivityIssue": {
+				"properties": {
+					"errorCode": {
+						"type": "string",
+						"description": "Machine-readable error code"
+					},
+					"message": {
+						"type": "string",
+						"description": "Human-readable error message"
+					},
+					"timestamp": {
+						"type": "string",
+						"format": "date-time",
+						"pattern": "yyyy-MM-dd'T'HH:mm:ss.SSSZZ",
+						"description": "When the error occurred"
+					},
+					"httpStatus": {
+						"type": "integer",
+						"format": "int32",
+						"nullable": true,
+						"description": "HTTP status code if applicable"
+					},
+					"retryCount": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Number of consecutive retry attempts"
+					}
+				},
+				"required": ["errorCode", "message", "timestamp", "retryCount"],
+				"type": "object",
+				"description": "Details about a connectivity or sync error"
+			},
+			"models.ConnectivityStatus": {
+				"properties": {},
+				"type": "string",
+				"enum": ["healthy", "degraded", "failed", "unknown"],
+				"description": "Health status of connection to external service"
+			},
+			"models.ConfigSyncStatus": {
+				"properties": {
+					"connectivityStatus": {
+						"$ref": "#/components/schemas/models.ConnectivityStatus"
+					},
+					"lastConnectivityCheck": {
+						"nullable": true,
+						"type": "string",
+						"format": "date-time",
+						"pattern": "yyyy-MM-dd'T'HH:mm:ss.SSSZZ",
+						"description": "Last time connectivity was verified"
+					},
+					"currentIssue": {
+						"nullable": true,
+						"$ref": "#/components/schemas/models.ConnectivityIssue"
+					},
+					"projectStats": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/models.ProjectSyncStats"
+						},
+						"description": "Per-project sync statistics"
+					},
+					"totalProjectsMapped": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Number of projects mapped to this config"
+					},
+					"totalIssuesSynced": {
+						"type": "integer",
+						"format": "int64",
+						"description": "Total issues synced across all projects"
+					},
+					"lastSuccessfulSync": {
+						"nullable": true,
+						"type": "string",
+						"format": "date-time",
+						"pattern": "yyyy-MM-dd'T'HH:mm:ss.SSSZZ",
+						"description": "Last successful sync across any project"
+					},
+					"nextScheduledSync": {
+						"nullable": true,
+						"type": "string",
+						"format": "date-time",
+						"pattern": "yyyy-MM-dd'T'HH:mm:ss.SSSZZ",
+						"description": "When next sync is scheduled"
+					}
+				},
+				"required": [
+					"connectivityStatus",
+					"projectStats",
+					"totalProjectsMapped",
+					"totalIssuesSynced"
+				],
+				"type": "object",
+				"description": "Overall health and sync statistics for an issue importer configuration"
+			},
+			"models.GitlabProjectSettings": {
+				"properties": {
+					"gitlabProjectId": {
+						"type": "string"
+					},
+					"externalProjectName": {
+						"type": "string",
+						"nullable": true
+					},
+					"maxResults": {
+						"type": "integer",
+						"format": "int32",
+						"nullable": true
+					},
+					"params": {
+						"type": "string",
+						"nullable": true
+					},
+					"projectKeyPrefix": {
+						"type": "string",
+						"nullable": true
+					},
+					"tagConfiguration": {
+						"$ref": "#/components/schemas/models.GitlabTagConfiguration"
+					}
+				},
+				"required": ["gitlabProjectId", "tagConfiguration"]
+			},
+			"models.GitlabProjectMapping": {
+				"properties": {
+					"projectId": {
+						"type": "string"
+					},
+					"settings": {
+						"$ref": "#/components/schemas/models.GitlabProjectSettings"
+					}
+				},
+				"required": ["projectId", "settings"]
+			},
+			"models.GithubIssueTag": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"repoOwner": {
+						"type": "string"
+					},
+					"repoName": {
+						"type": "string"
+					},
+					"issueNumber": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"summary": {
+						"type": "string",
+						"nullable": true
+					},
+					"relatedTags": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/models.SimpleTag"
+						}
+					},
+					"issueLink": {
+						"type": "string"
+					},
+					"type": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"id",
+					"repoOwner",
+					"repoName",
+					"issueNumber",
+					"relatedTags",
+					"issueLink",
+					"type"
+				]
+			},
+			"models.PlaneIssueTag": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"projectId": {
+						"type": "string"
+					},
+					"summary": {
+						"type": "string",
+						"nullable": true
+					},
+					"relatedTags": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/models.SimpleTag"
+						}
+					},
+					"issueLink": {
+						"type": "string"
+					},
+					"type": {
+						"type": "string"
+					}
+				},
+				"required": ["id", "projectId", "relatedTags", "issueLink", "type"]
+			},
+			"models.JiraIssueTag": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"baseUrl": {
+						"type": "string"
+					},
+					"summary": {
+						"type": "string",
+						"nullable": true
+					},
+					"url": {
+						"type": "string"
+					},
+					"projectKey": {
+						"type": "string"
+					},
+					"type": {
+						"type": "string"
+					}
+				},
+				"required": ["id", "baseUrl", "url", "projectKey", "type"]
+			},
+			"models.GitlabIssueTag": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"projectId": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"summary": {
+						"type": "string",
+						"nullable": true
+					},
+					"relatedTags": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/models.SimpleTag"
+						}
+					},
+					"issueLink": {
+						"type": "string"
+					},
+					"type": {
+						"type": "string"
+					}
+				},
+				"required": ["id", "projectId", "relatedTags", "issueLink", "type"]
+			},
+			"models.TagGroup": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"relatedTags": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/models.SimpleTag"
+						}
+					},
+					"type": {
+						"type": "string"
+					}
+				},
+				"required": ["id", "relatedTags", "type"]
+			},
+			"models.SimpleTag": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"type": {
+						"type": "string"
+					}
+				},
+				"required": ["id", "type"]
+			},
+			"models.JoinProjectInvitation": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"invitedEmail": {
+						"type": "string"
+					},
+					"createDate": {
+						"type": "string",
+						"format": "date-time",
+						"pattern": "yyyy-MM-dd'T'HH:mm:ss.SSSZZ"
+					},
+					"createdBy": {
+						"$ref": "#/components/schemas/models.EntityReference"
+					},
+					"expiration": {
+						"type": "string",
+						"format": "date-time",
+						"pattern": "yyyy-MM-dd'T'HH:mm:ss.SSSZZ"
+					},
+					"sharedByOrganisationReference": {
+						"$ref": "#/components/schemas/models.EntityReference"
+					},
+					"projectReference": {
+						"$ref": "#/components/schemas/models.EntityReference"
+					},
+					"role": {
+						"type": "string",
+						"enum": ["ProjectMember", "ProjectAdministrator"]
+					},
+					"outcome": {
+						"nullable": true,
+						"$ref": "#/components/schemas/models.InvitationOutcome"
+					},
+					"type": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"id",
+					"invitedEmail",
+					"createDate",
+					"createdBy",
+					"expiration",
+					"sharedByOrganisationReference",
+					"projectReference",
+					"role",
+					"type"
+				]
+			},
+			"models.InvitationOutcome": {
+				"properties": {
+					"userReference": {
+						"$ref": "#/components/schemas/models.EntityReference"
+					},
+					"dateTime": {
+						"type": "string",
+						"format": "date-time",
+						"pattern": "yyyy-MM-dd'T'HH:mm:ss.SSSZZ"
+					},
+					"status": {
+						"type": "string",
+						"enum": ["InvitationAccepted", "InvitationDeclined"]
+					}
+				},
+				"required": ["userReference", "dateTime", "status"]
+			},
+			"models.JoinOrganisationInvitation": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"invitedEmail": {
+						"type": "string"
+					},
+					"createDate": {
+						"type": "string",
+						"format": "date-time",
+						"pattern": "yyyy-MM-dd'T'HH:mm:ss.SSSZZ"
+					},
+					"createdBy": {
+						"$ref": "#/components/schemas/models.EntityReference"
+					},
+					"expiration": {
+						"type": "string",
+						"format": "date-time",
+						"pattern": "yyyy-MM-dd'T'HH:mm:ss.SSSZZ"
+					},
+					"organisationReference": {
+						"$ref": "#/components/schemas/models.EntityReference"
+					},
+					"role": {
+						"type": "string",
+						"enum": ["OrganisationMember", "OrganisationAdministrator"]
+					},
+					"outcome": {
+						"nullable": true,
+						"$ref": "#/components/schemas/models.InvitationOutcome"
+					},
+					"type": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"id",
+					"invitedEmail",
+					"createDate",
+					"createdBy",
+					"expiration",
+					"organisationReference",
+					"role",
+					"type"
+				]
+			},
+			"models.UpdateProjectMapping": {
+				"properties": {
+					"externalProjectName": {
+						"type": "string",
+						"nullable": true
+					},
+					"gitlabProjectId": {
+						"type": "string",
+						"nullable": true
+					},
+					"projectKeyPrefix": {
+						"type": "string",
+						"nullable": true
+					},
+					"gitlabTagConfig": {
+						"nullable": true,
+						"$ref": "#/components/schemas/models.GitlabTagConfiguration"
+					},
+					"jiraProjectKey": {
+						"type": "string",
+						"nullable": true
+					},
+					"planeProjectId": {
+						"type": "string",
+						"nullable": true
+					},
+					"planeTagConfig": {
+						"nullable": true,
+						"$ref": "#/components/schemas/models.PlaneTagConfiguration"
+					},
+					"githubRepoOwner": {
+						"type": "string",
+						"nullable": true
+					},
+					"githubRepoName": {
+						"type": "string",
+						"nullable": true
+					},
+					"githubTagConfig": {
+						"nullable": true,
+						"$ref": "#/components/schemas/models.GithubTagConfiguration"
+					},
+					"maxResults": {
+						"type": "integer",
+						"format": "int32",
+						"nullable": true
+					},
+					"params": {
+						"type": "string",
+						"nullable": true
+					}
+				}
+			},
+			"models.GithubTagConfiguration": {
+				"properties": {
+					"useLabels": {
+						"type": "boolean"
+					},
+					"labelFilter": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"useMilestone": {
+						"type": "boolean"
+					},
+					"useTitle": {
+						"type": "boolean"
+					},
+					"useAssignees": {
+						"type": "boolean"
+					},
+					"includeOnlyIssuesWithLabels": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"includeOnlyIssuesWithState": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					}
+				},
+				"required": [
+					"useLabels",
+					"labelFilter",
+					"useMilestone",
+					"useTitle",
+					"useAssignees",
+					"includeOnlyIssuesWithLabels",
+					"includeOnlyIssuesWithState"
+				]
+			},
+			"models.PlaneTagConfiguration": {
+				"properties": {
+					"useLabels": {
+						"type": "boolean"
+					},
+					"labelFilter": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"useMilestone": {
+						"type": "boolean"
+					},
+					"useTitle": {
+						"type": "boolean"
+					},
+					"includeOnlyIssuesWithLabels": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"includeOnlyIssuesWithState": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					}
+				},
+				"required": [
+					"useLabels",
+					"labelFilter",
+					"useMilestone",
+					"useTitle",
+					"includeOnlyIssuesWithLabels",
+					"includeOnlyIssuesWithState"
+				]
+			},
+			"models.GitlabTagConfiguration": {
+				"properties": {
+					"useLabels": {
+						"type": "boolean"
+					},
+					"labelFilter": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"useMilestone": {
+						"type": "boolean"
+					},
+					"useTitle": {
+						"type": "boolean"
+					},
+					"includeOnlyIssuesWithLabels": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"includeOnlyIssuesWithState": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					}
+				},
+				"required": [
+					"useLabels",
+					"labelFilter",
+					"useMilestone",
+					"useTitle",
+					"includeOnlyIssuesWithLabels",
+					"includeOnlyIssuesWithState"
+				]
+			},
+			"models.CreateProjectMapping": {
+				"properties": {
+					"projectId": {
+						"type": "string"
+					},
+					"externalProjectName": {
+						"type": "string",
+						"nullable": true
+					},
+					"gitlabProjectId": {
+						"type": "string",
+						"nullable": true
+					},
+					"projectKeyPrefix": {
+						"type": "string",
+						"nullable": true
+					},
+					"gitlabTagConfig": {
+						"nullable": true,
+						"$ref": "#/components/schemas/models.GitlabTagConfiguration"
+					},
+					"jiraProjectKey": {
+						"type": "string",
+						"nullable": true
+					},
+					"planeProjectId": {
+						"type": "string",
+						"nullable": true
+					},
+					"planeTagConfig": {
+						"nullable": true,
+						"$ref": "#/components/schemas/models.PlaneTagConfiguration"
+					},
+					"githubRepoOwner": {
+						"type": "string",
+						"nullable": true
+					},
+					"githubRepoName": {
+						"type": "string",
+						"nullable": true
+					},
+					"githubTagConfig": {
+						"nullable": true,
+						"$ref": "#/components/schemas/models.GithubTagConfiguration"
+					},
+					"maxResults": {
+						"type": "integer",
+						"format": "int32",
+						"nullable": true
+					},
+					"params": {
+						"type": "string",
+						"nullable": true
+					}
+				},
+				"required": ["projectId"]
+			},
+			"models.ExternalWorkspace": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"projects": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/models.ExternalProject"
+						}
+					}
+				},
+				"required": ["id", "name", "projects"]
+			},
+			"models.ExternalProject": {
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "External project ID or resource owner login"
+					},
+					"name": {
+						"type": "string",
+						"description": "Display name of the project or resource owner"
+					},
+					"ownerType": {
+						"type": "string",
+						"nullable": true,
+						"enum": ["User", "Organization"],
+						"description": "Type of the resource owner (GitHub only, User or Organization)"
+					},
+					"availableLabels": {
+						"type": "array",
+						"nullable": true,
+						"items": {
+							"type": "string"
+						}
+					},
+					"availableStates": {
+						"type": "array",
+						"nullable": true,
+						"items": {
+							"type": "string"
+						}
+					}
+				},
+				"required": ["id", "name"],
+				"type": "object",
+				"description": "External project or resource owner from an issue tracking system"
+			},
+			"models.ListProjectsResponse": {
+				"properties": {
+					"projects": {
+						"type": "array",
+						"nullable": true,
+						"items": {
+							"$ref": "#/components/schemas/models.ExternalProject"
+						}
+					},
+					"workspaces": {
+						"type": "array",
+						"nullable": true,
+						"items": {
+							"$ref": "#/components/schemas/models.ExternalWorkspace"
+						}
+					}
+				}
+			},
+			"models.UpdateIssueImporterConfig": {
+				"properties": {
+					"name": {
+						"type": "string",
+						"nullable": true
+					},
+					"baseUrl": {
+						"type": "string",
+						"nullable": true,
+						"format": "uri"
+					},
+					"checkFrequency": {
+						"type": "integer",
+						"format": "int64",
+						"nullable": true
+					},
+					"accessToken": {
+						"type": "string",
+						"nullable": true
+					},
+					"consumerKey": {
+						"type": "string",
+						"nullable": true
+					},
+					"privateKey": {
+						"type": "string",
+						"nullable": true
+					},
+					"apiKey": {
+						"type": "string",
+						"nullable": true
+					},
+					"workspace": {
+						"type": "string",
+						"nullable": true
+					},
+					"resourceOwner": {
+						"type": "string",
+						"nullable": true,
+						"description": "GitHub resource owner (organization or user login) for the token"
+					},
+					"resourceOwnerType": {
+						"type": "string",
+						"nullable": true,
+						"enum": ["User", "Organization"],
+						"description": "Type of the resource owner (User or Organization)"
+					}
+				},
+				"type": "object"
+			},
+			"models.IssueImporterConfigId": {
+				"properties": {
+					"value": {
+						"type": "string",
+						"format": "uuid"
+					}
+				},
+				"required": ["value"],
+				"type": "string",
+				"format": "uuid",
+				"description": "UUID identifier for issue importer configurations"
+			},
+			"models.ImporterType": {
+				"properties": {},
+				"type": "string",
+				"enum": ["gitlab", "jira", "plane", "github"]
+			},
+			"models.CreateIssueImporterConfig": {
+				"properties": {
+					"importerType": {
+						"$ref": "#/components/schemas/models.ImporterType",
+						"type": "string",
+						"enum": ["gitlab", "jira", "plane", "github"]
+					},
+					"name": {
+						"type": "string"
+					},
+					"baseUrl": {
+						"type": "string",
+						"format": "uri"
+					},
+					"checkFrequency": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"accessToken": {
+						"type": "string",
+						"nullable": true
+					},
+					"consumerKey": {
+						"type": "string",
+						"nullable": true
+					},
+					"privateKey": {
+						"type": "string",
+						"nullable": true
+					},
+					"apiKey": {
+						"type": "string",
+						"nullable": true
+					},
+					"workspace": {
+						"type": "string",
+						"nullable": true
+					},
+					"resourceOwner": {
+						"type": "string",
+						"nullable": true,
+						"description": "GitHub resource owner (organization or user login) for the token"
+					},
+					"resourceOwnerType": {
+						"type": "string",
+						"nullable": true,
+						"enum": ["User", "Organization"],
+						"description": "Type of the resource owner (User or Organization)"
+					}
+				},
+				"required": ["importerType", "name", "baseUrl", "checkFrequency"],
+				"type": "object"
+			},
+			"models.IssueImporterConfigResponse": {
+				"properties": {},
+				"oneOf": [
+					{
+						"$ref": "#/components/schemas/models.GitlabConfigResponse"
+					},
+					{
+						"$ref": "#/components/schemas/models.JiraConfigResponse"
+					},
+					{
+						"$ref": "#/components/schemas/models.PlaneConfigResponse"
+					},
+					{
+						"$ref": "#/components/schemas/models.GithubConfigResponse"
+					}
+				],
+				"discriminator": {
+					"propertyName": "importerType",
+					"mapping": {
+						"gitlab": "#/components/schemas/models.GitlabConfigResponse",
+						"jira": "#/components/schemas/models.JiraConfigResponse",
+						"plane": "#/components/schemas/models.PlaneConfigResponse",
+						"github": "#/components/schemas/models.GithubConfigResponse"
+					}
+				}
+			},
+			"models.InvitationStatusResponse": {
+				"properties": {
+					"status": {
+						"type": "string",
+						"enum": ["UnregisteredUser", "InvitationOk"]
+					},
+					"invitation": {
+						"$ref": "#/components/schemas/models.Invitation"
+					}
+				},
+				"required": ["status", "invitation"]
+			},
+			"models.AcceptInvitationRequest": {
+				"properties": {
+					"organisationReference": {
+						"nullable": true,
+						"$ref": "#/components/schemas/models.EntityReference-models.OrganisationId"
+					}
+				}
+			},
+			"models.Invitation": {
+				"properties": {},
+				"oneOf": [
+					{
+						"$ref": "#/components/schemas/models.JoinOrganisationInvitation"
+					},
+					{
+						"$ref": "#/components/schemas/models.JoinProjectInvitation"
+					}
+				],
+				"discriminator": {
+					"propertyName": "type",
+					"mapping": {
+						"JoinOrganisationInvitation": "#/components/schemas/models.JoinOrganisationInvitation",
+						"JoinProjectInvitation": "#/components/schemas/models.JoinProjectInvitation"
+					}
+				}
+			},
+			"models.UserToOrganisationAssignment": {
+				"properties": {
+					"email": {
+						"type": "string"
+					},
+					"role": {
+						"type": "string",
+						"enum": ["OrganisationMember", "OrganisationAdministrator"]
+					}
+				},
+				"required": ["email", "role"]
+			},
+			"models.UpdateOrganisation": {
+				"properties": {
+					"key": {
+						"type": "string",
+						"nullable": true
+					}
+				}
+			},
+			"models.Organisation": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"key": {
+						"type": "string"
+					},
+					"private": {
+						"type": "boolean"
+					},
+					"active": {
+						"type": "boolean"
+					},
+					"createdBy": {
+						"$ref": "#/components/schemas/models.EntityReference"
+					},
+					"deactivatedBy": {
+						"nullable": true,
+						"$ref": "#/components/schemas/models.EntityReference-models.UserId"
+					}
+				},
+				"required": ["id", "key", "private", "active", "createdBy"]
+			},
+			"models.CreateOrganisation": {
+				"properties": {
+					"key": {
+						"type": "string"
+					},
+					"plannedWorkingHours": {
+						"nullable": true,
+						"$ref": "#/components/schemas/models.WorkingHours"
+					}
+				},
+				"required": ["key"]
+			},
+			"models.InvitationResult": {
+				"properties": {
+					"invitationLinkId": {
+						"nullable": true,
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					}
+				},
+				"required": ["email"]
+			},
+			"models.UserToProjectAssignment": {
+				"properties": {
+					"email": {
+						"type": "string"
+					},
+					"role": {
+						"type": "string",
+						"enum": ["ProjectMember", "ProjectAdministrator"]
+					}
+				},
+				"required": ["email", "role"]
+			},
+			"models.UserStub": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"key": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"firstName": {
+						"type": "string"
+					},
+					"lastName": {
+						"type": "string"
+					},
+					"active": {
+						"type": "boolean"
+					},
+					"role": {
+						"type": "string",
+						"enum": ["FreeUser", "Administrator"]
+					}
+				},
+				"required": [
+					"id",
+					"key",
+					"email",
+					"firstName",
+					"lastName",
+					"active",
+					"role"
+				]
+			},
+			"models.UpdateProject": {
+				"properties": {
+					"key": {
+						"type": "string",
+						"nullable": true
+					},
+					"bookingCategories": {
+						"type": "array",
+						"nullable": true,
+						"items": {
+							"$ref": "#/components/schemas/models.Tag"
+						}
+					}
+				}
+			},
+			"models.CreateProject": {
+				"properties": {
+					"key": {
+						"type": "string"
+					},
+					"bookingCategories": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/models.Tag"
+						}
+					}
+				},
+				"required": ["key", "bookingCategories"]
+			},
+			"models.EntityReference-models.UserId": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"key": {
+						"type": "string"
+					}
+				},
+				"required": ["id", "key"]
+			},
+			"models.Project": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"key": {
+						"type": "string"
+					},
+					"organisationReference": {
+						"$ref": "#/components/schemas/models.EntityReference"
+					},
+					"bookingCategories": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/models.Tag"
+						}
+					},
+					"active": {
+						"type": "boolean"
+					},
+					"createdBy": {
+						"$ref": "#/components/schemas/models.EntityReference"
+					},
+					"deactivatedBy": {
+						"nullable": true,
+						"$ref": "#/components/schemas/models.EntityReference-models.UserId"
+					}
+				},
+				"required": [
+					"id",
+					"key",
+					"organisationReference",
+					"bookingCategories",
+					"active",
+					"createdBy"
+				]
+			},
+			"models.FavoritesRequest": {
+				"properties": {
+					"projectId": {
+						"type": "string"
+					},
+					"tags": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/models.Tag"
+						}
+					}
+				},
+				"required": ["projectId", "tags"]
+			},
+			"models.BookingStub": {
+				"properties": {
+					"projectReference": {
+						"$ref": "#/components/schemas/models.EntityReference"
+					},
+					"tags": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/models.Tag"
+						}
+					},
+					"bookingHash": {
+						"type": "integer",
+						"format": "int64"
+					}
+				},
+				"required": ["projectReference", "tags", "bookingHash"]
+			},
+			"models.UserFavorites": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"orgId": {
+						"type": "string"
+					},
+					"favorites": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/models.BookingStub"
+						}
+					}
+				},
+				"required": ["id", "orgId", "favorites"]
+			},
+			"models.CurrentOrganisationTimeBookings": {
+				"properties": {
+					"orgId": {
+						"type": "string"
+					},
+					"timeBookings": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/models.CurrentUserTimeBooking"
+						}
+					}
+				},
+				"required": ["orgId", "timeBookings"]
+			},
+			"models.CurrentUserTimeBooking": {
+				"properties": {
+					"userReference": {
+						"$ref": "#/components/schemas/models.EntityReference"
+					},
+					"day": {
+						"type": "string",
+						"pattern": "yyyy-MM-dd",
+						"format": "date"
+					},
+					"booking": {
+						"nullable": true,
+						"$ref": "#/components/schemas/models.Booking"
+					},
+					"totalBySameBookingInMillis": {
+						"nullable": true,
+						"type": "integer",
+						"format": "int64",
+						"description": "Total time for same booking in milliseconds"
+					},
+					"totalByDayInMillis": {
+						"type": "integer",
+						"format": "int64",
+						"description": "Total time for the day in milliseconds"
+					}
+				},
+				"required": ["userReference", "day", "totalByDayInMillis"],
+				"type": "object",
+				"description": "User's current time booking with daily totals"
+			},
+			"models.BookingStatsByCategory": {
+				"properties": {
+					"label": {
+						"type": "string",
+						"nullable": true
+					},
+					"duration": {
+						"type": "integer",
+						"format": "int64",
+						"nullable": true
+					}
+				}
+			},
+			"models.BookingStatsCategory": {
+				"properties": {
+					"year": {
+						"type": "integer",
+						"format": "int32",
+						"nullable": true
+					},
+					"month": {
+						"type": "integer",
+						"format": "int32",
+						"nullable": true
+					},
+					"week": {
+						"type": "integer",
+						"format": "int32",
+						"nullable": true
+					},
+					"day": {
+						"type": "integer",
+						"format": "int32",
+						"nullable": true
+					}
+				}
+			},
+			"models.BookingStats": {
+				"properties": {
+					"category": {
+						"$ref": "#/components/schemas/models.BookingStatsCategory"
+					},
+					"values": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/models.BookingStatsByCategory"
+						}
+					}
+				},
+				"required": ["category", "values"]
+			},
+			"models.LocalDateTimeWithTimeZone": {
+				"properties": {
+					"dateTime": {
+						"type": "string",
+						"pattern": "yyyy-MM-dd'T'HH:mm:ss.SSS"
+					},
+					"zone": {
+						"type": "string"
+					}
+				},
+				"required": ["dateTime", "zone"]
+			},
+			"models.AddBookingRequest": {
+				"properties": {
+					"projectId": {
+						"type": "string"
+					},
+					"tags": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/models.Tag"
+						}
+					},
+					"start": {
+						"type": "string",
+						"format": "date-time",
+						"pattern": "yyyy-MM-dd'T'HH:mm:ss.SSSZZ"
+					},
+					"end": {
+						"type": "string",
+						"format": "date-time",
+						"pattern": "yyyy-MM-dd'T'HH:mm:ss.SSSZZ"
+					}
+				},
+				"required": ["projectId", "tags", "start", "end"]
+			},
+			"models.EditBookingRequest": {
+				"properties": {
+					"projectId": {
+						"nullable": true,
+						"type": "string"
+					},
+					"tags": {
+						"type": "array",
+						"nullable": true,
+						"items": {
+							"$ref": "#/components/schemas/models.Tag"
+						}
+					},
+					"start": {
+						"nullable": true,
+						"type": "string",
+						"format": "date-time",
+						"pattern": "yyyy-MM-dd'T'HH:mm:ss.SSSZZ"
+					},
+					"end": {
+						"nullable": true,
+						"type": "string",
+						"format": "date-time",
+						"pattern": "yyyy-MM-dd'T'HH:mm:ss.SSSZZ"
+					}
+				}
+			},
+			"models.BookingChangeStartRequest": {
+				"properties": {
+					"newStart": {
+						"type": "string",
+						"format": "date-time",
+						"pattern": "yyyy-MM-dd'T'HH:mm:ss.SSSZZ"
+					}
+				},
+				"required": ["newStart"]
+			},
+			"models.StopBookingRequest": {
+				"properties": {
+					"end": {
+						"nullable": true,
+						"type": "string",
+						"format": "date-time",
+						"pattern": "yyyy-MM-dd'T'HH:mm:ss.SSSZZ"
+					}
+				}
+			},
+			"models.StartBookingRequest": {
+				"properties": {
+					"projectId": {
+						"type": "string"
+					},
+					"tags": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/models.Tag"
+						}
+					},
+					"start": {
+						"nullable": true,
+						"type": "string",
+						"format": "date-time",
+						"pattern": "yyyy-MM-dd'T'HH:mm:ss.SSSZZ"
+					}
+				},
+				"required": ["projectId", "tags"]
+			},
+			"models.Tag": {
+				"properties": {},
+				"oneOf": [
+					{
+						"$ref": "#/components/schemas/models.SimpleTag"
+					},
+					{
+						"$ref": "#/components/schemas/models.TagGroup"
+					},
+					{
+						"$ref": "#/components/schemas/models.GitlabIssueTag"
+					},
+					{
+						"$ref": "#/components/schemas/models.JiraIssueTag"
+					},
+					{
+						"$ref": "#/components/schemas/models.PlaneIssueTag"
+					},
+					{
+						"$ref": "#/components/schemas/models.GithubIssueTag"
+					}
+				],
+				"discriminator": {
+					"propertyName": "type",
+					"mapping": {
+						"SimpleTag": "#/components/schemas/models.SimpleTag",
+						"TagGroup": "#/components/schemas/models.TagGroup",
+						"GitlabIssueTag": "#/components/schemas/models.GitlabIssueTag",
+						"JiraIssueTag": "#/components/schemas/models.JiraIssueTag",
+						"GithubIssueTag": "#/components/schemas/models.GithubIssueTag"
+					}
+				}
+			},
+			"models.UpdateUserOrganisation": {
+				"properties": {
+					"plannedWorkingHours": {
+						"$ref": "#/components/schemas/models.WorkingHours"
+					}
+				},
+				"required": ["plannedWorkingHours"]
+			},
+			"models.AcceptTOSRequest": {
+				"properties": {
+					"version": {
+						"type": "string"
+					}
+				},
+				"required": ["version"]
+			},
+			"models.PersonalDataUpdate": {
+				"properties": {
+					"email": {
+						"type": "string",
+						"nullable": true
+					},
+					"firstName": {
+						"type": "string",
+						"nullable": true
+					},
+					"lastName": {
+						"type": "string",
+						"nullable": true
+					}
+				}
+			},
+			"models.AcceptedTOS": {
+				"properties": {
+					"version": {
+						"type": "string"
+					},
+					"date": {
+						"type": "string",
+						"pattern": "yyyy-MM-dd"
+					}
+				},
+				"required": ["version", "date"]
+			},
+			"models.UserSettings": {
+				"properties": {
+					"lastSelectedOrganisation": {
+						"nullable": true,
+						"$ref": "#/components/schemas/models.EntityReference-models.OrganisationId"
+					}
+				}
+			},
+			"models.EntityReference-models.OrganisationId": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"key": {
+						"type": "string"
+					}
+				},
+				"required": ["id", "key"]
+			},
+			"models.UserProject": {
+				"properties": {
+					"sharedByOrganisationReference": {
+						"nullable": true,
+						"$ref": "#/components/schemas/models.EntityReference-models.OrganisationId"
+					},
+					"projectReference": {
+						"$ref": "#/components/schemas/models.EntityReference"
+					},
+					"role": {
+						"type": "string",
+						"enum": ["ProjectMember", "ProjectAdministrator"]
+					}
+				},
+				"required": ["projectReference", "role"]
+			},
+			"models.WorkingHours": {
+				"properties": {
+					"monday": {
+						"type": "number",
+						"format": "float"
+					},
+					"tuesday": {
+						"type": "number",
+						"format": "float"
+					},
+					"wednesday": {
+						"type": "number",
+						"format": "float"
+					},
+					"thursday": {
+						"type": "number",
+						"format": "float"
+					},
+					"friday": {
+						"type": "number",
+						"format": "float"
+					},
+					"saturday": {
+						"type": "number",
+						"format": "float"
+					},
+					"sunday": {
+						"type": "number",
+						"format": "float"
+					}
+				},
+				"required": [
+					"monday",
+					"tuesday",
+					"wednesday",
+					"thursday",
+					"friday",
+					"saturday",
+					"sunday"
+				]
+			},
+			"models.EntityReference": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"key": {
+						"type": "string"
+					}
+				},
+				"required": ["id", "key"]
+			},
+			"models.UserOrganisation": {
+				"properties": {
+					"organisationReference": {
+						"$ref": "#/components/schemas/models.EntityReference"
+					},
+					"private": {
+						"type": "boolean"
+					},
+					"role": {
+						"type": "string",
+						"enum": ["OrganisationMember", "OrganisationAdministrator"]
+					},
+					"plannedWorkingHours": {
+						"$ref": "#/components/schemas/models.WorkingHours"
+					},
+					"projects": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/models.UserProject"
+						}
+					}
+				},
+				"required": [
+					"organisationReference",
+					"private",
+					"role",
+					"plannedWorkingHours",
+					"projects"
+				]
+			},
+			"models.User": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"key": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"firstName": {
+						"type": "string"
+					},
+					"lastName": {
+						"type": "string"
+					},
+					"active": {
+						"type": "boolean"
+					},
+					"role": {
+						"type": "string",
+						"enum": ["FreeUser", "Administrator"]
+					},
+					"organisations": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/models.UserOrganisation"
+						}
+					},
+					"settings": {
+						"$ref": "#/components/schemas/models.UserSettings"
+					},
+					"acceptedTOS": {
+						"nullable": true,
+						"$ref": "#/components/schemas/models.AcceptedTOS"
+					}
+				},
+				"required": [
+					"id",
+					"key",
+					"email",
+					"firstName",
+					"lastName",
+					"active",
+					"role",
+					"organisations",
+					"settings"
+				]
+			},
+			"models.OAuthUser": {
+				"properties": {
+					"id": {
+						"$ref": "#/components/schemas/models.OAuthUserId"
+					},
+					"email": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					},
+					"firstName": {
+						"type": "string",
+						"nullable": true
+					},
+					"lastName": {
+						"type": "string",
+						"nullable": true
+					},
+					"active": {
+						"type": "boolean"
+					}
+				},
+				"required": ["id", "email", "password", "active"]
+			},
+			"models.OAuthAuthorizationCodeLoginRequest": {
+				"properties": {
+					"clientId": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					},
+					"scope": {
+						"type": "string",
+						"nullable": true
+					},
+					"redirectUri": {
+						"type": "string"
+					},
+					"codeChallenge": {
+						"type": "string",
+						"nullable": true
+					},
+					"codeChallengeMethod": {
+						"type": "string",
+						"nullable": true
+					},
+					"state": {
+						"type": "string",
+						"nullable": true
+					}
+				},
+				"required": ["clientId", "email", "password", "redirectUri"]
+			},
+			"models.PasswordChangeRequest": {
+				"properties": {
+					"password": {
+						"type": "string"
+					},
+					"newPassword": {
+						"type": "string"
+					}
+				},
+				"required": ["password", "newPassword"]
+			},
+			"models.OAuthUserId": {
+				"properties": {
+					"value": {
+						"type": "string",
+						"format": "uuid"
+					}
+				},
+				"required": ["value"]
+			},
+			"models.OAuthUserRegistration": {
+				"properties": {
+					"email": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					},
+					"firstName": {
+						"type": "string",
+						"nullable": true
+					},
+					"lastName": {
+						"type": "string",
+						"nullable": true
+					}
+				},
+				"required": ["email", "password"]
+			},
+			"models.CsrfToken": {
+				"properties": {
+					"value": {
+						"type": "string"
+					}
+				},
+				"required": ["value"]
+			},
+			"models.ApplicationConfig": {
+				"properties": {
+					"title": {
+						"type": "string"
+					},
+					"instance": {
+						"type": "string"
+					},
+					"lasiusOAuthProviderEnabled": {
+						"type": "boolean"
+					},
+					"lasiusOAuthProviderAllowUserRegistration": {
+						"type": "boolean"
+					},
+					"allowedIssuers": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					}
+				},
+				"required": [
+					"title",
+					"instance",
+					"lasiusOAuthProviderEnabled",
+					"lasiusOAuthProviderAllowUserRegistration",
+					"allowedIssuers"
+				]
+			},
+			"models.CreateGitlabConfig": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"baseUrl": {
+						"type": "string",
+						"format": "uri"
+					},
+					"accessToken": {
+						"type": "string"
+					},
+					"checkFrequency": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"projects": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/models.GitlabProjectMapping"
+						}
+					}
+				},
+				"required": ["name", "baseUrl", "accessToken", "checkFrequency"]
+			},
+			"models.CreateJiraConfig": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"baseUrl": {
+						"type": "string",
+						"format": "uri"
+					},
+					"consumerKey": {
+						"type": "string"
+					},
+					"privateKey": {
+						"type": "string"
+					},
+					"accessToken": {
+						"type": "string"
+					},
+					"checkFrequency": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"projects": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/models.JiraProjectMapping"
+						}
+					}
+				},
+				"required": [
+					"name",
+					"baseUrl",
+					"consumerKey",
+					"privateKey",
+					"accessToken",
+					"checkFrequency"
+				]
+			},
+			"models.CreatePlaneConfig": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"baseUrl": {
+						"type": "string",
+						"format": "uri"
+					},
+					"apiKey": {
+						"type": "string"
+					},
+					"checkFrequency": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"projects": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/models.PlaneProjectMapping"
+						}
+					}
+				},
+				"required": ["name", "baseUrl", "apiKey", "checkFrequency"]
+			},
+			"models.UpdateGitlabConfig": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"baseUrl": {
+						"type": "string",
+						"format": "uri"
+					},
+					"accessToken": {
+						"type": "string"
+					},
+					"checkFrequency": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"projects": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/models.GitlabProjectMapping"
+						}
+					}
+				}
+			},
+			"models.UpdateJiraConfig": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"baseUrl": {
+						"type": "string",
+						"format": "uri"
+					},
+					"consumerKey": {
+						"type": "string"
+					},
+					"privateKey": {
+						"type": "string"
+					},
+					"accessToken": {
+						"type": "string"
+					},
+					"checkFrequency": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"projects": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/models.JiraProjectMapping"
+						}
+					}
+				}
+			},
+			"models.UpdatePlaneConfig": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"baseUrl": {
+						"type": "string",
+						"format": "uri"
+					},
+					"apiKey": {
+						"type": "string"
+					},
+					"checkFrequency": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"projects": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/models.PlaneProjectMapping"
+						}
+					}
+				}
+			},
+			"models.AuditInfo": {
+				"type": "object",
+				"description": "Tracks who created and last modified an entity",
+				"properties": {
+					"createdBy": {
+						"type": "string",
+						"format": "uuid",
+						"description": "User ID of entity creator"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time",
+						"description": "Timestamp when entity was created"
+					},
+					"updatedBy": {
+						"type": "string",
+						"format": "uuid",
+						"description": "User ID of last updater"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time",
+						"description": "Timestamp when entity was last updated"
+					}
+				},
+				"required": ["createdBy", "createdAt", "updatedBy", "updatedAt"]
+			},
+			"WebSocket.OutEvent": {
+				"oneOf": [
+					{
+						"$ref": "#/components/schemas/WebSocket.Pong"
+					},
+					{
+						"$ref": "#/components/schemas/WebSocket.HelloClient"
+					},
+					{
+						"$ref": "#/components/schemas/WebSocket.AuthenticationFailed"
+					},
+					{
+						"$ref": "#/components/schemas/WebSocket.CurrentUserTimeBookingEvent"
+					},
+					{
+						"$ref": "#/components/schemas/WebSocket.CurrentOrganisationTimeBookings"
+					},
+					{
+						"$ref": "#/components/schemas/WebSocket.FavoriteAdded"
+					},
+					{
+						"$ref": "#/components/schemas/WebSocket.FavoriteRemoved"
+					},
+					{
+						"$ref": "#/components/schemas/WebSocket.LatestTimeBooking"
+					},
+					{
+						"$ref": "#/components/schemas/WebSocket.IssueImporterSyncStatsChanged"
+					},
+					{
+						"$ref": "#/components/schemas/WebSocket.UserTimeBookingHistoryEntryCleaned"
+					},
+					{
+						"$ref": "#/components/schemas/WebSocket.UserTimeBookingHistoryEntryAdded"
+					},
+					{
+						"$ref": "#/components/schemas/WebSocket.UserTimeBookingHistoryEntryRemoved"
+					},
+					{
+						"$ref": "#/components/schemas/WebSocket.UserTimeBookingHistoryEntryChanged"
+					}
+				],
+				"discriminator": {
+					"propertyName": "type"
+				}
+			},
+			"WebSocket.Pong": {
+				"type": "object",
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": ["Pong"]
+					}
+				},
+				"required": ["type"]
+			},
+			"WebSocket.HelloClient": {
+				"type": "object",
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": ["HelloClient"]
+					}
+				},
+				"required": ["type"]
+			},
+			"WebSocket.AuthenticationFailed": {
+				"type": "object",
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": ["AuthenticationFailed"]
+					}
+				},
+				"required": ["type"]
+			},
+			"WebSocket.CurrentUserTimeBookingEvent": {
+				"type": "object",
+				"description": "Current user's active booking update",
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": ["CurrentUserTimeBookingEvent"]
+					},
+					"booking": {
+						"$ref": "#/components/schemas/models.CurrentUserTimeBooking"
+					}
+				},
+				"required": ["type", "booking"]
+			},
+			"WebSocket.CurrentOrganisationTimeBookings": {
+				"type": "object",
+				"description": "Current time bookings for all users in an organization",
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": ["CurrentOrganisationTimeBookings"]
+					},
+					"orgId": {
+						"type": "string",
+						"format": "uuid"
+					},
+					"timeBookings": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/models.CurrentUserTimeBooking"
+						}
+					}
+				},
+				"required": ["type", "orgId", "timeBookings"]
+			},
+			"WebSocket.FavoriteAdded": {
+				"type": "object",
+				"description": "User added a booking to favorites",
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": ["FavoriteAdded"]
+					},
+					"userId": {
+						"type": "string",
+						"format": "uuid"
+					},
+					"orgId": {
+						"type": "string",
+						"format": "uuid"
+					},
+					"bookingStub": {
+						"$ref": "#/components/schemas/models.BookingStub"
+					}
+				},
+				"required": ["type", "userId", "orgId", "bookingStub"]
+			},
+			"WebSocket.FavoriteRemoved": {
+				"type": "object",
+				"description": "User removed a booking from favorites",
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": ["FavoriteRemoved"]
+					},
+					"userId": {
+						"type": "string",
+						"format": "uuid"
+					},
+					"orgId": {
+						"type": "string",
+						"format": "uuid"
+					},
+					"bookingStub": {
+						"$ref": "#/components/schemas/models.BookingStub"
+					}
+				},
+				"required": ["type", "userId", "orgId", "bookingStub"]
+			},
+			"WebSocket.LatestTimeBooking": {
+				"type": "object",
+				"description": "User's recent booking history update",
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": ["LatestTimeBooking"]
+					},
+					"userId": {
+						"type": "string",
+						"format": "uuid"
+					},
+					"history": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/models.BookingStub"
+						}
+					}
+				},
+				"required": ["type", "userId", "history"]
+			},
+			"WebSocket.IssueImporterSyncStatsChanged": {
+				"type": "object",
+				"description": "Issue importer sync status changed (admin-only, negative outcomes only)",
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": ["IssueImporterSyncStatsChanged"]
+					},
+					"configId": {
+						"type": "string",
+						"format": "uuid"
+					},
+					"organisationId": {
+						"type": "string",
+						"format": "uuid"
+					},
+					"importerType": {
+						"$ref": "#/components/schemas/models.ImporterType"
+					},
+					"configName": {
+						"type": "string"
+					},
+					"syncStatus": {
+						"$ref": "#/components/schemas/models.ConfigSyncStatus"
+					}
+				},
+				"required": [
+					"type",
+					"configId",
+					"organisationId",
+					"importerType",
+					"configName",
+					"syncStatus"
+				]
+			},
+			"WebSocket.UserTimeBookingHistoryEntryCleaned": {
+				"type": "object",
+				"description": "User's booking history was cleared",
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": ["UserTimeBookingHistoryEntryCleaned"]
+					},
+					"userId": {
+						"type": "string",
+						"format": "uuid"
+					}
+				},
+				"required": ["type", "userId"]
+			},
+			"WebSocket.UserTimeBookingHistoryEntryAdded": {
+				"type": "object",
+				"description": "New booking added to user's history",
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": ["UserTimeBookingHistoryEntryAdded"]
+					},
+					"booking": {
+						"$ref": "#/components/schemas/models.Booking"
+					}
+				},
+				"required": ["type", "booking"]
+			},
+			"WebSocket.UserTimeBookingHistoryEntryRemoved": {
+				"type": "object",
+				"description": "Booking removed from user's history",
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": ["UserTimeBookingHistoryEntryRemoved"]
+					},
+					"bookingId": {
+						"type": "string",
+						"format": "uuid"
+					}
+				},
+				"required": ["type", "bookingId"]
+			},
+			"WebSocket.UserTimeBookingHistoryEntryChanged": {
+				"type": "object",
+				"description": "Existing booking in user's history was modified",
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": ["UserTimeBookingHistoryEntryChanged"]
+					},
+					"booking": {
+						"$ref": "#/components/schemas/models.Booking"
+					}
+				},
+				"required": ["type", "booking"]
+			}
+		},
+		"securitySchemes": {
+			"bearerHttpAuthentication": {
+				"description": "Bearer token using a JWT",
+				"type": "http",
+				"scheme": "bearer",
+				"bearerFormat": "JWT"
+			}
+		}
+	},
+	"tags": [],
+	"info": {
+		"version": "2.2.2+28-3680f9fd+20260321-0840",
+		"title": "Lasius API",
+		"description": "Track your time"
+	},
+	"openapi": "3.0.0"
+}

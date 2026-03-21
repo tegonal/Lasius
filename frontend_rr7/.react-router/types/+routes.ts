@@ -31,12 +31,15 @@ type Pages = {
   "/oauth/callback": {
     params: {};
   };
+  "/api/session-status": {
+    params: {};
+  };
 };
 
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/login" | "/logout" | "/internal-oauth/login" | "/oauth/:provider/login" | "/oauth/callback";
+    page: "/" | "/login" | "/logout" | "/internal-oauth/login" | "/oauth/:provider/login" | "/oauth/callback" | "/api/session-status";
   };
   "routes/home.tsx": {
     id: "routes/home";
@@ -62,6 +65,10 @@ type RouteFiles = {
     id: "routes/oauth.callback";
     page: "/oauth/callback";
   };
+  "routes/api.session-status.tsx": {
+    id: "routes/api.session-status";
+    page: "/api/session-status";
+  };
 };
 
 type RouteModules = {
@@ -72,4 +79,5 @@ type RouteModules = {
   "routes/internal-oauth.login": typeof import("./app/routes/internal-oauth.login.tsx");
   "routes/oauth.$provider.login": typeof import("./app/routes/oauth.$provider.login.tsx");
   "routes/oauth.callback": typeof import("./app/routes/oauth.callback.tsx");
+  "routes/api.session-status": typeof import("./app/routes/api.session-status.tsx");
 };

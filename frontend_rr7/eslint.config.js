@@ -6,7 +6,12 @@ import { globalIgnores } from 'eslint/config'
 
 /** @type {import("eslint").Linter.Config[]} */
 export default [
-	globalIgnores(['.react-router/', 'build/', 'node_modules/']),
+	globalIgnores([
+		'.react-router/',
+		'app/services/api/lasius/',
+		'build/',
+		'node_modules/',
+	]),
 	...defaultConfig,
 	{
 		rules: {
