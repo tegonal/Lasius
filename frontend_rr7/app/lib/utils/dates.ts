@@ -105,7 +105,7 @@ export const getMonthOfDate = (date: Date | IsoDateString): IsoDateString[] => {
 
 // ─── API timespan helpers ────────────────────────────────────────────────────
 
-const formatDateTimeToURLParam = (date: Date): ApiDateParam => {
+export const formatDateTimeToURLParam = (date: Date): ApiDateParam => {
 	if (!date || !isValid(date)) {
 		throw new Error(
 			`Invalid date provided to formatDateTimeToURLParam: ${date}`,
@@ -143,5 +143,36 @@ export const apiTimespanMonth = (
 	return {
 		from: formatDateTimeToURLParam(startOfDay(startOfMonth(dateObj))),
 		to: formatDateTimeToURLParam(endOfDay(endOfMonth(dateObj))),
+	}
+}
+
+/**
+ * Get from and to date spanning the entire day
+ */
+export const apiTimespanDay = (
+	date: IsoDateString,
+): { from: ApiDateParam; to: ApiDateParam } => {
+	const dateObj = new Date(date)
+	return {
+		from: formatDateTimeToURLParam(startOfDay(dateObj)),
+		to: formatDateTimeToURLParam(endOfDay(dateObj)),
+	}
+}
+
+/**
+ * Get from and to spanning start-of-from-day to end-of-to-day.
+ * Returns null for empty/invalid dates (skip API call).
+ */
+export const apiTimespanFromTo = (
+	from: IsoDateString,
+	to: IsoDateString,
+): null | { from: ApiDateParam; to: ApiDateParam } => {
+	if (!from || !to) return null
+	const fromDate = new Date(from)
+	const toDate = new Date(to)
+	if (!isValid(fromDate) || !isValid(toDate)) return null
+	return {
+		from: formatDateTimeToURLParam(startOfDay(fromDate)),
+		to: formatDateTimeToURLParam(endOfDay(toDate)),
 	}
 }

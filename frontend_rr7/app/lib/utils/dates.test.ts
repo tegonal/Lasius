@@ -18,7 +18,10 @@
  */
 
 import { describe, expect, it } from 'vitest'
+
 import {
+	apiTimespanDay,
+	apiTimespanFromTo,
 	apiTimespanMonth,
 	apiTimespanWeek,
 	formatISOLocale,
@@ -31,7 +34,9 @@ describe('formatISOLocale', () => {
 		const date = new Date(2024, 0, 15, 10, 30, 0, 0)
 		const result = formatISOLocale(date)
 		// Should match pattern: yyyy-MM-ddTHH:mm:ss.SSS+HH:MM
-		expect(result).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}[+-]\d{2}:\d{2}$/)
+		expect(result).toMatch(
+			/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}[+-]\d{2}:\d{2}$/,
+		)
 		expect(result).toContain('2024-01-15T10:30:00.000')
 	})
 
@@ -98,5 +103,29 @@ describe('apiTimespanMonth', () => {
 		const result = apiTimespanMonth('2024-01-17T10:00:00.000+01:00')
 		expect(result.from).toContain('2024-01-01T00:00:00.000')
 		expect(result.to).toContain('2024-01-31T23:59:59.999')
+	})
+})
+
+describe('apiTimespanDay', () => {
+	it('returns from/to spanning the full day', () => {
+		const result = apiTimespanDay('2026-03-15T10:00:00.000+01:00')
+		expect(result.from).toContain('2026-03-15T00:00:00.000')
+		expect(result.to).toContain('2026-03-15T23:59:59.999')
+	})
+})
+
+describe('apiTimespanFromTo', () => {
+	it('returns from/to spanning start of from-day to end of to-day', () => {
+		const result = apiTimespanFromTo(
+			'2026-03-01T10:00:00.000+01:00',
+			'2026-03-15T10:00:00.000+01:00',
+		)
+		expect(result).not.toBeNull()
+		expect(result!.from).toContain('2026-03-01T00:00:00.000')
+		expect(result!.to).toContain('2026-03-15T23:59:59.999')
+	})
+
+	it('returns null for empty strings', () => {
+		expect(apiTimespanFromTo('', '')).toBeNull()
 	})
 })
