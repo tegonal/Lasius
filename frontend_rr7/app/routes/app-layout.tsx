@@ -27,6 +27,9 @@ import { Button } from '~/components/primitives/buttons/button'
 import { Logo } from '~/components/ui/icons/logo'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { TegonalFooter } from '~/components/ui/navigation/tegonal-footer'
+import { CalendarWeek } from '~/features/calendar/components/calendar-week'
+import { OrgSwitcher } from '~/features/organisation/components/org-switcher'
+import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { getUserProfile } from '~/services/api/lasius/user/user'
 import {
 	authHeaders,
@@ -43,6 +46,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 	})
 	return data(
 		{
+			accessToken: auth.session.accessToken,
+			tokenIssuer: auth.session.tokenIssuer,
 			user: profile.data,
 			websocketUrl: process.env.LASIUS_API_WEBSOCKET_URL || '',
 		},
@@ -52,6 +57,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
 export default function AppLayout(_props: Route.ComponentProps) {
 	const { t } = useTranslation('common')
+	const { selectedOrganisationId } = useOrganisation()
 
 	return (
 		<div className="container mx-auto grid size-full grid-rows-[116px_auto] gap-0 md:grid-rows-[148px_auto] md:pb-4">
@@ -66,11 +72,11 @@ export default function AppLayout(_props: Route.ComponentProps) {
 						</div>
 
 						<div className="flex h-full w-full items-center justify-center gap-8">
-							{/* Center content placeholder: BookingCurrent / CalendarWeek */}
+							<CalendarWeek organisationId={selectedOrganisationId} />
 						</div>
 
 						<div className="flex items-center justify-end gap-2 pr-8">
-							{/* SelectUserOrganisation placeholder */}
+							<OrgSwitcher />
 							<Form action="/logout" method="post">
 								<Button
 									aria-label={t('auth.actions.signOut', {
@@ -95,6 +101,7 @@ export default function AppLayout(_props: Route.ComponentProps) {
 					<Link to={href('/')}>
 						<Logo size="sm" />
 					</Link>
+					<CalendarWeek organisationId={selectedOrganisationId} />
 					<Form action="/logout" method="post">
 						<Button
 							aria-label={t('auth.actions.signOut', {
