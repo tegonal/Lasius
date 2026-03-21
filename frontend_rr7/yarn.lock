@@ -344,7 +344,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.16.3, @babel/runtime@npm:^7.23.2, @babel/runtime@npm:^7.28.4, @babel/runtime@npm:^7.28.6":
+"@babel/runtime@npm:^7.16.3, @babel/runtime@npm:^7.23.2, @babel/runtime@npm:^7.29.2":
   version: 7.29.2
   resolution: "@babel/runtime@npm:7.29.2"
   checksum: 10c0/30b80a0140d16467792e1bbeb06f655b0dab70407da38dfac7fedae9c859f9ae9d846ef14ad77bd3814c064295fe9b1bc551f1541ea14646ae9f22b71a8bc17a
@@ -1021,7 +1021,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hookform/resolvers@npm:^5.0.1":
+"@hookform/resolvers@npm:^5.2.2":
   version: 5.2.2
   resolution: "@hookform/resolvers@npm:5.2.2"
   dependencies:
@@ -2448,7 +2448,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/babel__core@npm:^7":
+"@types/babel__core@npm:^7.20.5":
   version: 7.20.5
   resolution: "@types/babel__core@npm:7.20.5"
   dependencies:
@@ -3393,6 +3393,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"boring-avatars@npm:^2.0.4":
+  version: 2.0.4
+  resolution: "boring-avatars@npm:2.0.4"
+  peerDependencies:
+    react: ">=18.0.0"
+    react-dom: ">=18.0.0"
+  checksum: 10c0/9a55cce3d59aff2dda20b6f972e91280892ed3579b2ff5fca8ae5b00425066b867d7ad7ea65e1932463b6025b5f7b7ce5c85b7024c7602c8aa4a6e69dd5f1c6c
+  languageName: node
+  linkType: hard
+
 "brace-expansion@npm:^1.1.7":
   version: 1.1.12
   resolution: "brace-expansion@npm:1.1.12"
@@ -3751,7 +3761,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cookie@npm:^1.0.1, cookie@npm:^1.0.2":
+"cookie@npm:^1.0.1, cookie@npm:^1.1.1":
   version: 1.1.1
   resolution: "cookie@npm:1.1.1"
   checksum: 10c0/79c4ddc0fcad9c4f045f826f42edf54bcc921a29586a4558b0898277fa89fb47be95bc384c2253f493af7b29500c830da28341274527328f18eba9f58afa112c
@@ -5509,17 +5519,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next@npm:25.9.0":
-  version: 25.9.0
-  resolution: "i18next@npm:25.9.0"
+"i18next@npm:25.10.1":
+  version: 25.10.1
+  resolution: "i18next@npm:25.10.1"
   dependencies:
-    "@babel/runtime": "npm:^7.28.6"
+    "@babel/runtime": "npm:^7.29.2"
   peerDependencies:
     typescript: ^5
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10c0/63ab0be4d07aea0064062a3ab6e683c858e11d6dff3d3ee7921b8868fbc2386933afc9d4e217e232d5ac6d2bd644500629d0f01c7d9bc83509cc38179d8b14e2
+  checksum: 10c0/91d44b960521f4d09895f5e6d0fbabb95dfc6e995dbce0ebd1a0352d1ba0a992bbd356046ac817f92f81736128b0632a8a58a5119dba740946fef4f2c797e924
   languageName: node
   linkType: hard
 
@@ -6127,22 +6137,23 @@ __metadata:
     "@conform-to/zod": "npm:^1.17.1"
     "@epic-web/config": "npm:^1.24.1"
     "@headlessui/react": "npm:^2.2.9"
-    "@hookform/resolvers": "npm:^5.0.1"
+    "@hookform/resolvers": "npm:^5.2.2"
     "@icons-pack/react-simple-icons": "npm:^13.13.0"
     "@mdx-js/mdx": "npm:^3.1.1"
     "@react-router/dev": "npm:^7.13.1"
     "@react-router/serve": "npm:^7.13.1"
     "@tailwindcss/vite": "npm:^4.2.2"
     "@types/accept-language-parser": "npm:^1.5.8"
-    "@types/babel__core": "npm:^7"
+    "@types/babel__core": "npm:^7.20.5"
     "@types/node": "npm:^24.12.0"
     "@types/react": "npm:^19.2.14"
     "@types/react-dom": "npm:^19.2.3"
     accept-language-parser: "npm:^1.5.0"
     babel-plugin-react-compiler: "npm:^1.0.0"
+    boring-avatars: "npm:^2.0.4"
     class-variance-authority: "npm:^0.7.1"
     clsx: "npm:^2.1.1"
-    cookie: "npm:^1.0.2"
+    cookie: "npm:^1.1.1"
     daisyui: "npm:^5.5.19"
     date-fns: "npm:^4.1.0"
     date-fns-tz: "npm:^3.2.0"
@@ -6150,19 +6161,19 @@ __metadata:
     eslint-plugin-check-file: "npm:^3.3.1"
     eslint-plugin-perfectionist: "npm:^5.7.0"
     eslint-plugin-react-compiler: "npm:^19.1.0-rc.2"
-    i18next: "npm:25.9.0"
+    i18next: "npm:25.10.1"
     i18next-browser-languagedetector: "npm:^8.2.1"
     i18next-fetch-backend: "npm:^7.0.0"
     immer: "npm:^11.1.4"
     isbot: "npm:^5.1.36"
     lucide-react: "npm:^0.577.0"
-    orval: "npm:^7.9.0"
+    orval: "npm:^7.21.0"
     prettier: "npm:^3.8.1"
     prettier-plugin-tailwindcss: "npm:^0.7.2"
     react: "npm:^19.2.4"
     react-dom: "npm:^19.2.4"
-    react-hook-form: "npm:^7.56.4"
-    react-i18next: "npm:^16.5.8"
+    react-hook-form: "npm:^7.71.2"
+    react-i18next: "npm:^16.6.0"
     react-router: "npm:^7.13.1"
     remix-i18next: "npm:^7.4.2"
     tailwind-merge: "npm:^3.5.0"
@@ -7576,7 +7587,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"orval@npm:^7.9.0":
+"orval@npm:^7.21.0":
   version: 7.21.0
   resolution: "orval@npm:7.21.0"
   dependencies:
@@ -8030,7 +8041,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-hook-form@npm:^7.56.4":
+"react-hook-form@npm:^7.71.2":
   version: 7.71.2
   resolution: "react-hook-form@npm:7.71.2"
   peerDependencies:
@@ -8039,11 +8050,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-i18next@npm:^16.5.8":
-  version: 16.5.8
-  resolution: "react-i18next@npm:16.5.8"
+"react-i18next@npm:^16.6.0":
+  version: 16.6.0
+  resolution: "react-i18next@npm:16.6.0"
   dependencies:
-    "@babel/runtime": "npm:^7.28.4"
+    "@babel/runtime": "npm:^7.29.2"
     html-parse-stringify: "npm:^3.0.1"
     use-sync-external-store: "npm:^1.6.0"
   peerDependencies:
@@ -8057,7 +8068,7 @@ __metadata:
       optional: true
     typescript:
       optional: true
-  checksum: 10c0/a234ed701e53c47ce4c67f2bc74b5718a4fea2865d6eaae06f850cca35a1ead038e6fd25b2a4b629c96947f3e6bb997f6d81d07cc4584997a0373c62c6aba3eb
+  checksum: 10c0/b603d7f584d31842c0094a225fa31b5f9fa9a096223ac1ce44cab2895bc2ecbd764d812c8b4232171a02bf7182fcf38f300e4602d28775e931d9e12d4cb88f00
   languageName: node
   linkType: hard
 
