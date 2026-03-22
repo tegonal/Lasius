@@ -24,7 +24,7 @@ import { useTranslation } from 'react-i18next'
  * Dev-only overlay badge showing current breakpoint, language, theme, and token time remaining.
  * Only renders in development mode. Polls /api/session-status every 5s for token expiry.
  */
-export function DevInfoBadge() {
+export const DevInfoBadge = () => {
 	const { i18n } = useTranslation()
 	const [tokenTime, setTokenTime] = useState('N/A')
 	const [colorMode, setColorMode] = useState('light')
@@ -107,7 +107,7 @@ export function DevInfoBadge() {
 	)
 }
 
-function Badge({ children }: { children: React.ReactNode }) {
+const Badge = ({ children }: { children: React.ReactNode }) => {
 	return (
 		<span className="badge badge-neutral badge-sm opacity-70">{children}</span>
 	)

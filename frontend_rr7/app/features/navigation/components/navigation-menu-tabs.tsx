@@ -28,7 +28,7 @@ import {
 import { NAVIGATION } from '~/config/navigation'
 import { NavigationTabContent } from '~/features/navigation/components/navigation-tab-content'
 
-export function NavigationMenuTabs() {
+export const NavigationMenuTabs = () => {
 	const { t } = useTranslation('common')
 	const location = useLocation()
 
@@ -61,7 +61,7 @@ export function NavigationMenuTabs() {
 }
 
 /** Find the NAVIGATION section index whose routes match the given pathname. */
-function tabIndexForPath(pathname: string): number {
+export const tabIndexForPath = (pathname: string): number => {
 	for (let i = 0; i < NAVIGATION.length; i++) {
 		const hasMatch = NAVIGATION[i]?.routes.some((route) =>
 			pathname.startsWith(route.route),

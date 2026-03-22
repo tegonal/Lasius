@@ -34,7 +34,7 @@ const statusDotClass: Record<BackendConnectionStatus, string> = {
 	disconnected: 'bg-error',
 }
 
-export function BackendStatus() {
+export const BackendStatus = () => {
 	const { t } = useTranslation('common')
 	const isClient = useIsClient()
 	const [status, setStatus] = useState<BackendConnectionStatus>('connecting')

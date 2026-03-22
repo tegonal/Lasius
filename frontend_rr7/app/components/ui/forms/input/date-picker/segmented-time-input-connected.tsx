@@ -17,7 +17,7 @@
  *
  */
 
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Input } from '~/components/primitives/inputs/input'
@@ -39,16 +39,17 @@ import {
 	validateInputChar,
 } from './shared/input'
 import { SegmentedInputWrapper } from './shared/segmented-input-wrapper'
+import { useRestoreCursorPosition } from './shared/use-restore-cursor-position'
 import {
 	DatePickerStoreContext,
 	useDatePickerStore,
 } from './store/use-date-picker-store'
 
-export function SegmentedTimeInputConnected({
+export const SegmentedTimeInputConnected = ({
 	afterSlot,
 }: {
 	afterSlot?: React.ReactNode
-}) {
+}) => {
 	const { t } = useTranslation('common')
 	const store = useContext(DatePickerStoreContext)
 	const {
@@ -65,7 +66,7 @@ export function SegmentedTimeInputConnected({
 	const inputRef = useRef<HTMLInputElement>(null)
 	const focusFromArrowRef = useRef<boolean>(false)
 	const focusFromMouseRef = useRef<boolean>(false)
-	const pendingCursorPosRef = useRef<null | number>(null)
+	const setCursorPosition = useRestoreCursorPosition(inputRef, inputValue)
 
 	const config = TIME_SEGMENT_CONFIG
 
@@ -78,18 +79,6 @@ export function SegmentedTimeInputConnected({
 			setInputValue(value.timeString || config.placeholder)
 		}
 	}, [value.timeString, inputValue, config.placeholder])
-
-	// Restore cursor position after inputValue changes
-	React.useLayoutEffect(() => {
-		if (
-			pendingCursorPosRef.current !== null &&
-			inputRef.current?.matches(':focus')
-		) {
-			const pos = pendingCursorPosRef.current
-			pendingCursorPosRef.current = null
-			inputRef.current.setSelectionRange(pos, pos)
-		}
-	}, [inputValue])
 
 	// Select a segment using helper
 	const selectSegment = (segment: TimeSegment): void => {
@@ -127,9 +116,7 @@ export function SegmentedTimeInputConnected({
 		inputValue,
 		selectedSegment,
 		selectSegmentFn: selectSegment,
-		setCursorPosition: (pos) => {
-			pendingCursorPosRef.current = pos
-		},
+		setCursorPosition,
 		setInputValue,
 		updateStore: setTimeFromString,
 	})

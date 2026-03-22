@@ -17,7 +17,7 @@
  *
  */
 
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Input } from '~/components/primitives/inputs/input'
@@ -45,14 +45,15 @@ import {
 	validateInputChar,
 } from './shared/input'
 import { SegmentedInputWrapper } from './shared/segmented-input-wrapper'
+import { useRestoreCursorPosition } from './shared/use-restore-cursor-position'
 
-export function SegmentedDurationInputConnected({
+export const SegmentedDurationInputConnected = ({
 	endFieldName,
 	startFieldName,
 }: {
 	endFieldName: string
 	startFieldName: string
-}) {
+}) => {
 	const { t } = useTranslation('common')
 	const parentFormContext = useRequiredFormContext()
 	const inputRef = useRef<HTMLInputElement>(null)
@@ -61,7 +62,6 @@ export function SegmentedDurationInputConnected({
 	const focusFromArrowRef = useRef<boolean>(false)
 	const focusFromMouseRef = useRef<boolean>(false)
 	const initialDurationRef = useRef<number>(0)
-	const pendingCursorPosRef = useRef<null | number>(null)
 
 	const config = DURATION_SEGMENT_CONFIG
 
@@ -76,6 +76,7 @@ export function SegmentedDurationInputConnected({
 	const durationString = formatDuration(durationMinutes)
 
 	const [inputValue, setInputValue] = useState<string>(durationString)
+	const setCursorPosition = useRestoreCursorPosition(inputRef, inputValue)
 
 	// Store initial duration when component mounts or start/end change externally
 	useEffect(() => {
@@ -90,18 +91,6 @@ export function SegmentedDurationInputConnected({
 			setInputValue(durationString)
 		}
 	}, [durationString])
-
-	// Restore cursor position after inputValue changes
-	React.useLayoutEffect(() => {
-		if (
-			pendingCursorPosRef.current !== null &&
-			inputRef.current?.matches(':focus')
-		) {
-			const pos = pendingCursorPosRef.current
-			pendingCursorPosRef.current = null
-			inputRef.current.setSelectionRange(pos, pos)
-		}
-	}, [inputValue])
 
 	// Select a segment using helper
 	const selectSegment = (segment: DurationSegment): void => {
@@ -157,9 +146,7 @@ export function SegmentedDurationInputConnected({
 		inputValue,
 		selectedSegment,
 		selectSegmentFn: selectSegment,
-		setCursorPosition: (pos) => {
-			pendingCursorPosRef.current = pos
-		},
+		setCursorPosition,
 		setInputValue,
 		updateStore: (val: string) => {
 			const minutes = parseDuration(val)

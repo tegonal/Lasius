@@ -99,7 +99,7 @@ const isWithinSameMinute = (time1: string, time2: string): boolean => {
 	return diffMs < 60000 // Less than 1 minute
 }
 
-export function BookingAddUpdateForm({
+export const BookingAddUpdateForm = ({
 	bookingAfter,
 	bookingBefore,
 	favorites = [],
@@ -112,7 +112,7 @@ export function BookingAddUpdateForm({
 	recentBookings = [],
 	selectedDate,
 	selectedOrgId,
-}: BookingAddUpdateFormProps) {
+}: BookingAddUpdateFormProps) => {
 	const { t } = useTranslation('common')
 	const addBookingApi = useAddUserBookingByOrganisation()
 	const updateBookingApi = useUpdateUserBooking()
@@ -531,12 +531,17 @@ export function BookingAddUpdateForm({
 								)}
 
 								<ButtonGroup>
-									<Button disabled={isSubmitting} type="submit">
+									<Button loading={isSubmitting} type="submit">
 										{t('common.actions.save', {
 											defaultValue: 'Save',
 										})}
 									</Button>
-									<Button onClick={onClose} type="button" variant="secondary">
+									<Button
+										disabled={isSubmitting}
+										onClick={onClose}
+										type="button"
+										variant="secondary"
+									>
 										{t('common.actions.close', {
 											defaultValue: 'Close',
 										})}

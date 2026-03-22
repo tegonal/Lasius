@@ -26,7 +26,7 @@ import { getNavigation, type NavigationRouteType } from '~/config/navigation'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { useLayoutLoaderData } from '~/hooks/use-layout-loader-data'
 
-export function NavigationTabContent({ branch }: { branch: string }) {
+export const NavigationTabContent = ({ branch }: { branch: string }) => {
 	const { isAdministrator } = useOrganisation()
 	const loaderData = useLayoutLoaderData()
 
@@ -43,7 +43,7 @@ export function NavigationTabContent({ branch }: { branch: string }) {
 	)
 }
 
-function NavigationButton({ item }: { item: NavigationRouteType }) {
+const NavigationButton = ({ item }: { item: NavigationRouteType }) => {
 	const navigate = useNavigate()
 	const location = useLocation()
 	const { t } = useTranslation('common')

@@ -34,7 +34,7 @@ export type IconTabsItem = {
 	routes?: string[]
 }
 
-export function IconTabs({
+export const IconTabs = ({
 	onSelect,
 	position = 'top',
 	selected,
@@ -44,7 +44,7 @@ export function IconTabs({
 	position?: 'left' | 'top'
 	selected: number
 	tabs: IconTabsItem[]
-}) {
+}) => {
 	const itemRefs = useRef<(HTMLElement | null)[]>([])
 
 	return (

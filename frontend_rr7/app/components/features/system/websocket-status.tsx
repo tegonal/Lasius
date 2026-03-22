@@ -34,7 +34,7 @@ const statusDotClass: Record<ConnectionStatus, string> = {
 	[ConnectionStatus.ERROR]: 'bg-error',
 }
 
-export function WebsocketStatus() {
+export const WebsocketStatus = () => {
 	const { t } = useTranslation('common')
 	const isClient = useIsClient()
 	const { connectionStatus } = useLasiusWebsocket()

@@ -60,23 +60,23 @@ type Props = {
 	item: AugmentedBooking
 }
 
-function areTimesWithinOneMinute(
+const areTimesWithinOneMinute = (
 	time1: Date | string,
 	time2: Date | string,
-): boolean {
+): boolean => {
 	const d1 = typeof time1 === 'string' ? new Date(time1) : time1
 	const d2 = typeof time2 === 'string' ? new Date(time2) : time2
 	return Math.abs(d1.getTime() - d2.getTime()) <= 60_000
 }
 
-function useCurrentBookingId(): string | undefined {
+const useCurrentBookingId = (): string | undefined => {
 	const loaderData = useRouteLoaderData('routes/user.home._index') as
 		| HomeLoaderData
 		| undefined
 	return loaderData?.currentBooking?.booking?.id
 }
 
-function useGetAdjacentBookings(item: ModelsBooking) {
+const useGetAdjacentBookings = (item: ModelsBooking) => {
 	const loaderData = useRouteLoaderData('routes/user.home._index') as
 		| HomeLoaderData
 		| undefined
@@ -90,7 +90,7 @@ function useGetAdjacentBookings(item: ModelsBooking) {
 	}
 }
 
-function useSelectedOrgId(): string {
+const useSelectedOrgId = (): string => {
 	const loaderData = useRouteLoaderData('routes/user.home._index') as
 		| HomeLoaderData
 		| undefined

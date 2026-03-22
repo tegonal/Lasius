@@ -35,7 +35,11 @@ import { formatISOLocale } from '~/lib/utils/dates'
 
 // ─── CalendarWeek ───────────────────────────────────────────────────────────
 
-export function CalendarWeek({ organisationId }: { organisationId: string }) {
+export const CalendarWeek = ({
+	organisationId,
+}: {
+	organisationId: string
+}) => {
 	const { t } = useTranslation('common')
 	const selectedDate = usePersistedSearchParam(
 		'date',

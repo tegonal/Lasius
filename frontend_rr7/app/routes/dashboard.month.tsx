@@ -67,10 +67,10 @@ clientLoader.hydrate = false
 
 // ─── Stream chart computation ────────────────────────────────────────────────
 
-function computeStreamChartData(
+const computeStreamChartData = (
 	bookings: ModelsBooking[],
 	selectedDate: string,
-) {
+) => {
 	const dateObj = new Date(selectedDate)
 	const monthStart = startOfMonth(dateObj)
 	const monthEnd = endOfMonth(dateObj)

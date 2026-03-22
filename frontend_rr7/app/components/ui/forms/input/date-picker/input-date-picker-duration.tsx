@@ -31,7 +31,9 @@ export type InputDatePickerDurationProps = {
 }
 
 // Export the wrapped version that handles missing context gracefully
-export function InputDatePickerDuration(props: InputDatePickerDurationProps) {
+export const InputDatePickerDuration = (
+	props: InputDatePickerDurationProps,
+) => {
 	const formContext = useFormContext()
 
 	if (!formContext) {
@@ -42,10 +44,10 @@ export function InputDatePickerDuration(props: InputDatePickerDurationProps) {
 }
 
 // Internal component that assumes form context is available
-function InputDatePickerDurationInternal({
+const InputDatePickerDurationInternal = ({
 	endFieldName,
 	startFieldName,
-}: InputDatePickerDurationProps) {
+}: InputDatePickerDurationProps) => {
 	const { t } = useTranslation('common')
 	const parentFormContext = useRequiredFormContext()
 

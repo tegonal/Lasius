@@ -36,7 +36,7 @@ interface SessionStatus {
  * the user before their session expires. Loader-based auto-refresh
  * handles most cases transparently; this is a safety net for idle tabs.
  */
-export function TokenWatcher() {
+export const TokenWatcher = () => {
 	const { t } = useTranslation()
 	const navigate = useNavigate()
 	const revalidator = useRevalidator()

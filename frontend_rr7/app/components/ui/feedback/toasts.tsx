@@ -63,7 +63,7 @@ const toastConfig: Record<
 	},
 }
 
-export function ToastProvider({ children }: { children: React.ReactNode }) {
+export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
 	return (
 		<Toast.Provider timeout={5000} toastManager={toastManager}>
 			{children}
@@ -76,7 +76,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 	)
 }
 
-function ToastList() {
+const ToastList = () => {
 	const { toasts } = Toast.useToastManager<ToastData>()
 
 	return toasts.map((toast) => {

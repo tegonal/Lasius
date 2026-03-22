@@ -22,13 +22,13 @@ import { type ReactNode } from 'react'
 
 import { cn } from '~/lib/utils/cn'
 
-export function ScrollArea({
+export const ScrollArea = ({
 	children,
 	className,
 }: {
 	children: ReactNode
 	className?: string
-}) {
+}) => {
 	return (
 		<BaseScrollArea.Root className={cn('min-h-0', className)}>
 			<BaseScrollArea.Viewport className="h-full overscroll-contain">

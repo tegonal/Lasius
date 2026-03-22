@@ -247,10 +247,10 @@ export default function Login() {
 	)
 }
 
-function getProviderDisplayName(
+const getProviderDisplayName = (
 	provider: AuthProvider,
 	keycloakName: string | undefined,
-): string {
+): string => {
 	if (provider === 'keycloak' && keycloakName) {
 		return keycloakName
 	}
@@ -263,7 +263,7 @@ function getProviderDisplayName(
 	return names[provider]
 }
 
-function getProviderIcon(provider: AuthProvider): React.ReactNode {
+const getProviderIcon = (provider: AuthProvider): React.ReactNode => {
 	switch (provider) {
 		case 'github':
 			return <SiGithub size={24} />
@@ -278,7 +278,10 @@ function getProviderIcon(provider: AuthProvider): React.ReactNode {
 	}
 }
 
-function getProviderLoginUrl(provider: AuthProvider, returnTo: string): string {
+const getProviderLoginUrl = (
+	provider: AuthProvider,
+	returnTo: string,
+): string => {
 	if (provider === 'internal') {
 		return `${href('/internal-oauth/login')}?returnTo=${encodeURIComponent(returnTo)}`
 	}

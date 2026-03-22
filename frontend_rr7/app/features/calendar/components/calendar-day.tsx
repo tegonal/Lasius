@@ -27,7 +27,7 @@ import { useCalendarDaySummary } from '~/features/calendar/hooks/use-calendar-da
 import { cn } from '~/lib/utils/cn'
 import { type IsoDateString } from '~/lib/utils/dates'
 
-export function CalendarDay({
+export const CalendarDay = ({
 	date,
 	isSelected = false,
 	onClick,
@@ -35,7 +35,7 @@ export function CalendarDay({
 	date: IsoDateString
 	isSelected?: boolean
 	onClick: (args: IsoDateString) => void
-}) {
+}) => {
 	return (
 		<Suspense fallback={<CalendarDaySkeleton />}>
 			<CalendarDayContent
@@ -47,7 +47,7 @@ export function CalendarDay({
 	)
 }
 
-function CalendarDayContent({
+const CalendarDayContent = ({
 	date,
 	isSelected,
 	onClick,
@@ -55,7 +55,7 @@ function CalendarDayContent({
 	date: IsoDateString
 	isSelected: boolean
 	onClick: (args: IsoDateString) => void
-}) {
+}) => {
 	const day = new Date(date)
 	const { progressBarPercentage } = useCalendarDaySummary(date)
 

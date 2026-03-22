@@ -33,7 +33,7 @@ type Props = {
 	size?: number
 }
 
-export function AvatarUser({ firstName, lastName, size = 39 }: Props) {
+export const AvatarUser = ({ firstName, lastName, size = 39 }: Props) => {
 	const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
 	const fullName = `${firstName} ${lastName}`
 

@@ -45,13 +45,13 @@ const dateLocales: Record<string, Locale> = {
 	it,
 }
 
-export function MonthStreamChart({
+export const MonthStreamChart = ({
 	data,
 	keys,
 }: {
 	data: MonthlyWeekStreamData
 	keys: MonthlyWeekStreamKeys
-}) {
+}) => {
 	const { i18n } = useTranslation('common')
 	const nivoColors = useNivoColors()
 
@@ -239,7 +239,7 @@ export function MonthStreamChart({
 
 // ─── Validation ──────────────────────────────────────────────────────────────
 
-function EmptyStateStats() {
+const EmptyStateStats = () => {
 	const { t } = useTranslation('common')
 	return (
 		<div className="flex h-full w-full flex-col items-center justify-center py-8">
@@ -257,15 +257,15 @@ function EmptyStateStats() {
 
 // ─── Empty State ─────────────────────────────────────────────────────────────
 
-function getDateLocale(language: string): Locale {
+const getDateLocale = (language: string): Locale => {
 	return dateLocales[language] ?? dateLocales['en']
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-function isValidMonthlyWeekStreamData(
+const isValidMonthlyWeekStreamData = (
 	data: unknown,
-): data is MonthlyWeekStreamData {
+): data is MonthlyWeekStreamData => {
 	if (!Array.isArray(data) || data.length !== 7) return false
 	return data.every(
 		(item) =>

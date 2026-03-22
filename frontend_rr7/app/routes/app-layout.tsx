@@ -49,12 +49,12 @@ import {
 import { type Route } from './+types/app-layout'
 
 /** Skip revalidation for same-page navigations, but allow action-triggered revalidation */
-export function shouldRevalidate({
+export const shouldRevalidate = ({
 	currentUrl,
 	defaultShouldRevalidate,
 	formMethod,
 	nextUrl,
-}: ShouldRevalidateFunctionArgs) {
+}: ShouldRevalidateFunctionArgs) => {
 	if (formMethod) {
 		return defaultShouldRevalidate
 	}

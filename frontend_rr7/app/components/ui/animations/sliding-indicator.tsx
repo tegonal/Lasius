@@ -29,7 +29,7 @@ const radiusClasses = {
 	top: 'rounded-t-md',
 } as const
 
-export function SlidingIndicator({
+export const SlidingIndicator = ({
 	className,
 	itemRefs,
 	radiusOn = 'all',
@@ -39,7 +39,7 @@ export function SlidingIndicator({
 	itemRefs: RefObject<(HTMLElement | null)[]>
 	radiusOn?: keyof typeof radiusClasses
 	selectedIndex: number
-}) {
+}) => {
 	const [indicatorStyle, setIndicatorStyle] = useState({
 		height: 0,
 		left: 0,

@@ -31,12 +31,12 @@ type SegmentedInputWrapperProps = {
 	onArrowClick: (direction: 'down' | 'up') => void
 }
 
-export function SegmentedInputWrapper({
+export const SegmentedInputWrapper = ({
 	children,
 	hasSelection,
 	label,
 	onArrowClick,
-}: SegmentedInputWrapperProps) {
+}: SegmentedInputWrapperProps) => {
 	const { t } = useTranslation('common')
 	const [isHovered, setIsHovered] = useState(false)
 	const containerRef = useRef<HTMLDivElement>(null)

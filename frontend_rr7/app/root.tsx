@@ -48,11 +48,11 @@ import './tailwind.css'
 export const middleware = [i18nextMiddleware]
 
 /** Locale and theme rarely change — skip revalidation unless navigation target changes */
-export function shouldRevalidate({
+export const shouldRevalidate = ({
 	currentUrl,
 	defaultShouldRevalidate,
 	nextUrl,
-}: ShouldRevalidateFunctionArgs) {
+}: ShouldRevalidateFunctionArgs) => {
 	if (currentUrl.pathname === nextUrl.pathname) {
 		return false
 	}
@@ -92,7 +92,7 @@ export default function App({ loaderData }: Route.ComponentProps) {
 	return <Outlet />
 }
 
-export function ErrorBoundary() {
+export const ErrorBoundary = () => {
 	const error = useRouteError()
 
 	// Log errors client-side only
@@ -225,7 +225,7 @@ const themeInitScript = `
 })();
 `
 
-export function Layout({ children }: PropsWithChildren) {
+export const Layout = ({ children }: PropsWithChildren) => {
 	const { i18n } = useTranslation()
 	const rootData = useRouteLoaderData<typeof loader>('root')
 	const theme = rootData?.theme ?? 'light'

@@ -23,7 +23,7 @@ import { useFormContext } from 'react-hook-form'
  * Hook that safely returns form context or throws if not available.
  * This ensures components fail fast if used outside a form context.
  */
-export function useRequiredFormContext() {
+export const useRequiredFormContext = () => {
 	const formContext = useFormContext()
 
 	if (!formContext) {

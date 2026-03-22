@@ -46,13 +46,13 @@ interface StackTooltipSlice {
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export function ChartSingleTooltip({
+export const ChartSingleTooltip = ({
 	formatValue = (val) => `${val}h`,
 	point,
 }: {
 	formatValue?: (value: number) => string
 	point: SingleTooltipPoint
-}) {
+}) => {
 	if (!point) return null
 
 	return (
@@ -66,7 +66,7 @@ export function ChartSingleTooltip({
 	)
 }
 
-export function ChartStackTooltip({
+export const ChartStackTooltip = ({
 	formatLabel = (id) => id,
 	formatValue = (val) => `${val}h`,
 	getTitle,
@@ -76,7 +76,7 @@ export function ChartStackTooltip({
 	formatValue?: (value: number) => string
 	getTitle?: (index?: number) => string
 	slice: StackTooltipSlice
-}) {
+}) => {
 	if (!slice) return null
 
 	const title = getTitle
@@ -108,13 +108,13 @@ export function ChartStackTooltip({
 
 // ─── Stack Tooltip ───────────────────────────────────────────────────────────
 
-export function TooltipContainer({
+export const TooltipContainer = ({
 	children,
 	title,
 }: {
 	children: ReactNode
 	title?: string
-}) {
+}) => {
 	return (
 		<div className="bg-base-100 border-base-200 w-auto rounded border p-2 shadow-lg">
 			{title && (
@@ -129,7 +129,7 @@ export function TooltipContainer({
 
 // ─── Single Tooltip ──────────────────────────────────────────────────────────
 
-export function TooltipItem({
+export const TooltipItem = ({
 	color,
 	label,
 	value,
@@ -137,7 +137,7 @@ export function TooltipItem({
 	color?: string
 	label: string
 	value: number | string
-}) {
+}) => {
 	return (
 		<div className="flex min-w-0 items-center justify-between gap-3 whitespace-nowrap">
 			<div className="flex min-w-0 items-center gap-2">

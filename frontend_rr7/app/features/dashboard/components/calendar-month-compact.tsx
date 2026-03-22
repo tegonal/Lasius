@@ -19,19 +19,17 @@
 
 import {
 	addMonths,
-	eachDayOfInterval,
-	endOfMonth,
 	format,
-	getDay,
 	isSameDay,
 	isToday,
 	startOfMonth,
 	subMonths,
 } from 'date-fns'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { useCalendarMonth } from '~/hooks/use-calendar-month'
 import { cn } from '~/lib/utils/cn'
 import { formatISOLocale } from '~/lib/utils/dates'
 
@@ -45,26 +43,7 @@ export const CalendarMonthCompact = ({ date, onDateChange }: Props) => {
 	const selectedDate = new Date(date)
 
 	const [viewDate, setViewDate] = useState(() => startOfMonth(selectedDate))
-
-	const monthDays = useMemo(() => {
-		const start = startOfMonth(viewDate)
-		const end = endOfMonth(viewDate)
-		return eachDayOfInterval({ end, start })
-	}, [viewDate])
-
-	// Monday-based offset: getDay returns 0=Sun, we want Mon=0
-	const startOffset = useMemo(() => {
-		const day = getDay(startOfMonth(viewDate))
-		// Convert: Sun(0)->6, Mon(1)->0, Tue(2)->1, ...
-		return day === 0 ? 6 : day - 1
-	}, [viewDate])
-
-	const weekDays = useMemo(() => {
-		return Array.from({ length: 7 }, (_, i) => {
-			const d = new Date(2025, 0, 6 + i) // Jan 6, 2025 is a Monday
-			return format(d, 'EEEEE', { locale: undefined })
-		})
-	}, [])
+	const { monthDays, startOffset, weekDays } = useCalendarMonth(viewDate)
 
 	const handlePrevMonth = () => setViewDate((prev) => subMonths(prev, 1))
 	const handleNextMonth = () => setViewDate((prev) => addMonths(prev, 1))

@@ -21,6 +21,7 @@ import { differenceInMilliseconds, isSameDay, parseISO } from 'date-fns'
 import { useMemo } from 'react'
 
 import { useCalendarData } from '~/features/calendar/calendar-data-provider'
+import { getExpectedVsBookedPercentage } from '~/lib/api/functions/get-expected-vs-booked-percentage'
 import { type IsoDateString } from '~/lib/utils/dates'
 
 const DEFAULT_PLANNED_HOURS = 8
@@ -31,26 +32,6 @@ const DEFAULT_PLANNED_HOURS = 8
 const durationInHours = (start: string, end: string): number => {
 	const ms = differenceInMilliseconds(new Date(end), new Date(start))
 	return Math.round((ms / 1000 / 60 / 60) * 1000) / 1000
-}
-
-/**
- * Compute progress percentages given expected and worked hours.
- */
-const getExpectedVsBookedPercentage = (expected: number, worked: number) => {
-	let fulfilledPercentage = 0
-	if (worked === 0) fulfilledPercentage = 0
-	if (expected === 0 && worked > 0) fulfilledPercentage = 100
-	if (expected > 0 && worked > 0)
-		fulfilledPercentage = Math.round((worked / expected) * 100 * 100) / 100
-
-	const progressBarPercentage =
-		fulfilledPercentage > 90 && fulfilledPercentage < 100
-			? 90
-			: fulfilledPercentage > 100
-				? 100
-				: fulfilledPercentage
-
-	return { fulfilledPercentage, progressBarPercentage }
 }
 
 /**

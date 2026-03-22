@@ -55,23 +55,23 @@ type Props = {
 	item: ModelsBooking
 }
 
-function areTimesWithinOneMinute(
+const areTimesWithinOneMinute = (
 	time1: Date | string,
 	time2: Date | string,
-): boolean {
+): boolean => {
 	const d1 = typeof time1 === 'string' ? new Date(time1) : time1
 	const d2 = typeof time2 === 'string' ? new Date(time2) : time2
 	return Math.abs(differenceInSeconds(d1, d2)) <= 60
 }
 
-function useCurrentBooking(): ModelsCurrentUserTimeBooking | undefined {
+const useCurrentBooking = (): ModelsCurrentUserTimeBooking | undefined => {
 	const loaderData = useRouteLoaderData('routes/user.home._index') as
 		| HomeLoaderData
 		| undefined
 	return loaderData?.currentBooking
 }
 
-function useGetPreviousBooking(item: ModelsBooking) {
+const useGetPreviousBooking = (item: ModelsBooking) => {
 	const loaderData = useRouteLoaderData('routes/user.home._index') as
 		| HomeLoaderData
 		| undefined
@@ -81,7 +81,7 @@ function useGetPreviousBooking(item: ModelsBooking) {
 	return index < bookings.length - 1 ? bookings[index + 1] : null
 }
 
-function useSelectedOrgId(): string {
+const useSelectedOrgId = (): string => {
 	const loaderData = useRouteLoaderData('routes/user.home._index') as
 		| HomeLoaderData
 		| undefined

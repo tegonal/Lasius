@@ -49,12 +49,12 @@ import { type Route } from './+types/dashboard'
 // ─── Revalidation ────────────────────────────────────────────────────────────
 
 /** Only revalidate when the date search param changes, not on child tab switches */
-export function shouldRevalidate({
+export const shouldRevalidate = ({
 	currentUrl,
 	defaultShouldRevalidate,
 	formMethod,
 	nextUrl,
-}: ShouldRevalidateFunctionArgs) {
+}: ShouldRevalidateFunctionArgs) => {
 	if (formMethod) return defaultShouldRevalidate
 	const currentDate = currentUrl.searchParams.get('date')
 	const nextDate = nextUrl.searchParams.get('date')

@@ -20,8 +20,6 @@
 import { Toast } from '@base-ui/react/toast'
 import { useCallback } from 'react'
 
-import { stringHash } from '~/lib/utils/string-hash'
-
 import { type ToastData, type ToastType } from './toast-manager'
 
 type AddToastOptions = {
@@ -40,18 +38,13 @@ export function useToast() {
 
 	const addToast = useCallback(
 		(options: AddToastOptions) => {
-			const hash = stringHash(options)
-			const isDuplicate = manager.toasts.some((t) => t.id === hash)
-
-			if (!isDuplicate) {
-				manager.add({
-					data: options.action ? { action: options.action } : undefined,
-					description: options.description,
-					timeout: options.ttl,
-					title: options.message,
-					type: options.type,
-				})
-			}
+			manager.add({
+				data: options.action ? { action: options.action } : undefined,
+				description: options.description,
+				timeout: options.ttl,
+				title: options.message,
+				type: options.type,
+			})
 		},
 		[manager],
 	)

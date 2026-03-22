@@ -44,11 +44,11 @@ import {
 	useDatePickerStore,
 } from './store/use-date-picker-store'
 
-export function SegmentedDateInputConnected({
+export const SegmentedDateInputConnected = ({
 	afterSlot,
 }: {
 	afterSlot?: React.ReactNode
-}) {
+}) => {
 	const { t } = useTranslation('common')
 	const store = useContext(DatePickerStoreContext)
 	const {

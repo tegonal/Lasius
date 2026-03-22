@@ -59,7 +59,7 @@ export type InputDatePickerProps = {
 /**
  * Main component that checks for form context before rendering
  */
-export function InputDatePicker(props: InputDatePickerProps) {
+export const InputDatePicker = (props: InputDatePickerProps) => {
 	const formContext = useFormContext()
 
 	if (!formContext) {
@@ -72,7 +72,7 @@ export function InputDatePicker(props: InputDatePickerProps) {
 /**
  * Wrapper component that provides store isolation
  */
-function InputDatePickerInner(props: InputDatePickerProps) {
+const InputDatePickerInner = (props: InputDatePickerProps) => {
 	const store = useMemo(() => createDatePickerStore(), [])
 
 	return (
@@ -85,7 +85,7 @@ function InputDatePickerInner(props: InputDatePickerProps) {
 /**
  * Internal component that assumes form context is available
  */
-function InputDatePickerInternal({
+const InputDatePickerInternal = ({
 	name,
 	onRenderLabelAction,
 	presetDate,
@@ -94,7 +94,7 @@ function InputDatePickerInternal({
 	rules,
 	withDate = true,
 	withTime = true,
-}: InputDatePickerProps) {
+}: InputDatePickerProps) => {
 	const { t } = useTranslation('common')
 	const parentFormContext = useRequiredFormContext()
 	const {

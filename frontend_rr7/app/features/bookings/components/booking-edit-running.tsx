@@ -19,10 +19,9 @@
 
 import { addSeconds, isFuture } from 'date-fns'
 import { ArrowDownToLine } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { useFetcher } from 'react-router'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { ButtonGroup } from '~/components/ui/forms/button-group'
@@ -32,11 +31,10 @@ import { FormElement } from '~/components/ui/forms/form-element'
 import { InputDatePicker } from '~/components/ui/forms/input/date-picker/input-date-picker'
 import { InputTagsAutocomplete } from '~/components/ui/forms/input/input-tags-autocomplete'
 import { ProjectSelect } from '~/components/ui/forms/input/project-select'
+import { useBookingFormData } from '~/hooks/use-booking-form-data'
 import { formatISOLocale } from '~/lib/utils/dates'
 import {
-	type ModelsBooking,
 	type ModelsCurrentUserTimeBooking,
-	type ModelsEntityReference,
 	type ModelsTag,
 } from '~/services/api/lasius'
 import { useUpdateUserBooking } from '~/services/api/lasius-hooks/user-bookings/user-bookings'
@@ -53,18 +51,13 @@ type FormValues = {
 	tags: ModelsTag[]
 }
 
-export function BookingEditRunning({
+export const BookingEditRunning = ({
 	item,
 	onClose,
 	selectedOrgId,
-}: BookingEditRunningProps) {
+}: BookingEditRunningProps) => {
 	const { t } = useTranslation('common')
 	const updateBookingApi = useUpdateUserBooking()
-	const formDataFetcher = useFetcher<{
-		projects: ModelsEntityReference[]
-		recentBookings: ModelsBooking[]
-		tags: ModelsTag[]
-	}>()
 
 	const isSubmitting = updateBookingApi.state !== 'idle'
 
@@ -79,45 +72,20 @@ export function BookingEditRunning({
 
 	const booking = item.booking
 
-	// Track previous values to avoid re-fetching when fetcher identity changes
-	const prevOrgIdRef = useRef<string>('')
-	const prevProjectIdRef = useRef<string>('')
-
-	// Load form data (projects, tags) for the selected org
-	useEffect(() => {
-		if (selectedOrgId && selectedOrgId !== prevOrgIdRef.current) {
-			prevOrgIdRef.current = selectedOrgId
-			void formDataFetcher.load(`/api/booking-form-data?orgId=${selectedOrgId}`)
-		}
-	}, [selectedOrgId, formDataFetcher])
-
-	const projects = formDataFetcher.data?.projects ?? []
-
-	// Watch projectId to load project-specific tags
 	const watchedProjectId = hookForm.watch('projectId')
-	const projectTagsFetcher = useFetcher<{ tags: ModelsTag[] }>()
-
-	useEffect(() => {
-		const key = `${selectedOrgId}:${watchedProjectId}`
-		if (selectedOrgId && watchedProjectId && key !== prevProjectIdRef.current) {
-			prevProjectIdRef.current = key
-			void projectTagsFetcher.load(
-				`/api/booking-form-data?orgId=${selectedOrgId}&projectId=${watchedProjectId}`,
-			)
-		}
-	}, [selectedOrgId, watchedProjectId, projectTagsFetcher])
-
-	const projectTags = projectTagsFetcher.data?.tags ?? []
+	const { projects, projectTags, recentBookings } = useBookingFormData(
+		selectedOrgId,
+		watchedProjectId,
+	)
 
 	// Derive latest completed booking from recent bookings for start-time preset
 	const latestBooking = useMemo(() => {
-		const bookings = formDataFetcher.data?.recentBookings ?? []
-		const completed = bookings.filter((b) => b.end?.dateTime)
+		const completed = recentBookings.filter((b) => b.end?.dateTime)
 		if (completed.length === 0) return null
 		return completed.reduce((latest, b) =>
 			new Date(b.end!.dateTime) > new Date(latest.end!.dateTime) ? b : latest,
 		)
-	}, [formDataFetcher.data?.recentBookings])
+	}, [recentBookings])
 
 	// Initialize form values from the running booking
 	useEffect(() => {
@@ -256,12 +224,17 @@ export function BookingEditRunning({
 							</FormElement>
 						</FieldSet>
 						<ButtonGroup>
-							<Button disabled={isSubmitting} type="submit">
+							<Button loading={isSubmitting} type="submit">
 								{t('common.actions.save', {
 									defaultValue: 'Save',
 								})}
 							</Button>
-							<Button onClick={onClose} type="button" variant="secondary">
+							<Button
+								disabled={isSubmitting}
+								onClick={onClose}
+								type="button"
+								variant="secondary"
+							>
 								{t('common.actions.close', {
 									defaultValue: 'Close',
 								})}

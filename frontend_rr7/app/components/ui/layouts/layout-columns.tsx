@@ -43,7 +43,7 @@ export const outerGridClasses =
 export const innerGridClasses =
 	'grid size-full overflow-auto grid-cols-[auto_18rem] lg:grid-cols-[auto_19rem] xl:grid-cols-[auto_20rem] 2xl:grid-cols-[auto_24rem]'
 
-export function ColumnCenter({ children }: { children: ReactNode }) {
+export const ColumnCenter = ({ children }: { children: ReactNode }) => {
 	return (
 		<div className="border-base-100 bg-base-100 text-base-content h-full min-w-0 overflow-auto border-l">
 			{children}
@@ -51,11 +51,11 @@ export function ColumnCenter({ children }: { children: ReactNode }) {
 	)
 }
 
-export function ColumnLeft({ children }: { children: ReactNode }) {
+export const ColumnLeft = ({ children }: { children: ReactNode }) => {
 	return <div className="h-full w-full rounded-tl-xl">{children}</div>
 }
 
-export function ColumnRight({ children }: { children?: ReactNode }) {
+export const ColumnRight = ({ children }: { children?: ReactNode }) => {
 	return (
 		<div className="border-base-100 bg-base-200 text-base-content h-full overflow-hidden rounded-tr-xl border-l">
 			{children}

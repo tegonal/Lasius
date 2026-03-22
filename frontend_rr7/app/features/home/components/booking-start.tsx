@@ -19,10 +19,9 @@
 
 import { roundToNearestMinutes } from 'date-fns'
 import { Timer } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { useFetcher } from 'react-router'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { ButtonGroup } from '~/components/ui/forms/button-group'
@@ -32,12 +31,10 @@ import { FormElement } from '~/components/ui/forms/form-element'
 import { InputTagsAutocomplete } from '~/components/ui/forms/input/input-tags-autocomplete'
 import { ProjectSelect } from '~/components/ui/forms/input/project-select'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+import { useBookingFormData } from '~/hooks/use-booking-form-data'
 import { useStopAndStart } from '~/hooks/use-stop-and-start'
 import { formatISOLocale } from '~/lib/utils/dates'
-import {
-	type ModelsEntityReference,
-	type ModelsTag,
-} from '~/services/api/lasius'
+import { type ModelsTag } from '~/services/api/lasius'
 
 type FormValues = {
 	projectId: string
@@ -57,41 +54,11 @@ export const BookingStart = ({ onSuccess, selectedOrgId }: Props) => {
 		mode: 'onSubmit',
 	})
 
-	// Fetch projects for the org
-	const formDataFetcher = useFetcher<{
-		projects: ModelsEntityReference[]
-	}>()
-	const prevOrgIdRef = useRef('')
-
-	useEffect(() => {
-		if (selectedOrgId && selectedOrgId !== prevOrgIdRef.current) {
-			prevOrgIdRef.current = selectedOrgId
-			void formDataFetcher.load(`/api/booking-form-data?orgId=${selectedOrgId}`)
-		}
-	}, [selectedOrgId, formDataFetcher])
-
-	const projects = formDataFetcher.data?.projects ?? []
-
-	// Fetch tags for the selected project
-	const projectTagsFetcher = useFetcher<{ projectTags: ModelsTag[] }>()
 	const watchedProjectId = hookForm.watch('projectId')
-	const prevProjectKeyRef = useRef('')
-
-	useEffect(() => {
-		const key = `${selectedOrgId}:${watchedProjectId}`
-		if (
-			selectedOrgId &&
-			watchedProjectId &&
-			key !== prevProjectKeyRef.current
-		) {
-			prevProjectKeyRef.current = key
-			void projectTagsFetcher.load(
-				`/api/booking-form-data?orgId=${selectedOrgId}&projectId=${watchedProjectId}`,
-			)
-		}
-	}, [selectedOrgId, watchedProjectId, projectTagsFetcher])
-
-	const projectTags = projectTagsFetcher.data?.projectTags ?? []
+	const { projects, projectTags } = useBookingFormData(
+		selectedOrgId,
+		watchedProjectId,
+	)
 
 	const resetComponent = () => {
 		hookForm.setValue('projectId', '')

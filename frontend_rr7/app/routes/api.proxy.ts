@@ -74,7 +74,7 @@ export async function action({ request }: { request: Request }) {
 		...(body !== undefined && { body: JSON.stringify(body) }),
 	})
 
-	return data(result, {
+	return data(result ?? { ok: true }, {
 		headers: authResult ? mergeAuthHeaders(authResult) : {},
 	})
 }

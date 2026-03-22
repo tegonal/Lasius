@@ -17,8 +17,6 @@
  *
  */
 
-import { redirect } from 'react-router'
-
 import { logger } from '~/lib/logger'
 import { getProvider } from '~/services/auth/providers'
 import {

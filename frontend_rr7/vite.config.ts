@@ -57,6 +57,10 @@ export default defineConfig(() => ({
 		tsconfigPaths: true,
 	},
 	server: {
+		forwardConsole: {
+			logLevels: ['error', 'warn', 'info', 'log', 'debug'],
+			unhandledErrors: true,
+		},
 		host: true,
 	},
 }))

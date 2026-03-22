@@ -19,10 +19,7 @@
 
 import {
 	addMonths,
-	eachDayOfInterval,
-	endOfMonth,
 	format,
-	getDay,
 	isSameDay,
 	isToday,
 	setHours,
@@ -31,9 +28,10 @@ import {
 	subMonths,
 } from 'date-fns'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { useCalendarMonth } from '~/hooks/use-calendar-month'
 import { cn } from '~/lib/utils/cn'
 import { formatISOLocale, type IsoDateString } from '~/lib/utils/dates'
 
@@ -42,12 +40,13 @@ type CalendarDisplayProps = {
 	value: IsoDateString
 }
 
-export function CalendarDisplay({ onChange, value }: CalendarDisplayProps) {
+export const CalendarDisplay = ({ onChange, value }: CalendarDisplayProps) => {
 	const { t } = useTranslation('common')
 	const selectedDate = new Date(value)
 	const [originalTime, setOriginalTime] = useState<number[]>([0, 0])
 
 	const [viewDate, setViewDate] = useState(() => startOfMonth(selectedDate))
+	const { monthDays, startOffset, weekDays } = useCalendarMonth(viewDate)
 
 	// Store the original time when the value changes
 	useEffect(() => {
@@ -57,25 +56,6 @@ export function CalendarDisplay({ onChange, value }: CalendarDisplayProps) {
 			setViewDate(startOfMonth(date))
 		}
 	}, [value])
-
-	const monthDays = useMemo(() => {
-		const start = startOfMonth(viewDate)
-		const end = endOfMonth(viewDate)
-		return eachDayOfInterval({ end, start })
-	}, [viewDate])
-
-	// Monday-based offset: getDay returns 0=Sun, we want Mon=0
-	const startOffset = useMemo(() => {
-		const day = getDay(startOfMonth(viewDate))
-		return day === 0 ? 6 : day - 1
-	}, [viewDate])
-
-	const weekDays = useMemo(() => {
-		return Array.from({ length: 7 }, (_, i) => {
-			const d = new Date(2025, 0, 6 + i) // Jan 6, 2025 is a Monday
-			return format(d, 'EEEEE', { locale: undefined })
-		})
-	}, [])
 
 	const handlePrevMonth = () => setViewDate((prev) => subMonths(prev, 1))
 	const handleNextMonth = () => setViewDate((prev) => addMonths(prev, 1))

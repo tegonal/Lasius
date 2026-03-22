@@ -43,13 +43,13 @@ export type WeekData = {
  * Displays a line chart showing weekly work hours trend over time.
  * Shows actual hours vs planned hours with visual indicators for overtime.
  */
-export function WeeklyTrendChart({
+export const WeeklyTrendChart = ({
 	tickEvery,
 	weeklyData,
 }: {
 	tickEvery?: number
 	weeklyData: WeekData[]
-}) {
+}) => {
 	const { t } = useTranslation('common')
 	const nivoColors = useNivoColors()
 
@@ -177,7 +177,7 @@ export function WeeklyTrendChart({
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-function EmptyStateStats() {
+const EmptyStateStats = () => {
 	const { t } = useTranslation('common')
 	return (
 		<div className="flex h-full w-full flex-col items-center justify-center py-8">
