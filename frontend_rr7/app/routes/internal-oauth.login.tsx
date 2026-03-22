@@ -32,8 +32,6 @@ import {
 } from 'react-router'
 import { z } from 'zod'
 
-import { InternalLoginInfoPanel } from '~/components/features/login/auth-info-panels'
-import { AuthLayout } from '~/components/features/login/auth-layout'
 import { Button } from '~/components/primitives/buttons/button'
 import { Input } from '~/components/primitives/inputs/input'
 import { Card, CardBody } from '~/components/ui/cards/card'
@@ -44,6 +42,8 @@ import { FormBody } from '~/components/ui/forms/form-body'
 import { FormElement } from '~/components/ui/forms/form-element'
 import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { Logo } from '~/components/ui/icons/logo'
+import { InternalLoginInfoPanel } from '~/features/auth/auth-info-panels'
+import { AuthLayout } from '~/features/auth/auth-layout'
 import { getServerEnv } from '~/lib/env.server'
 import { type SchemaTranslationFn } from '~/lib/i18n-types'
 import { logger } from '~/lib/logger'
@@ -295,11 +295,16 @@ export default function InternalOAuthLogin() {
 									<Button
 										data-testid="auth-internal-signup-btn"
 										fullWidth
-										onClick={() =>
-											navigate(
-												`${href('/internal-oauth/register')}${invitationId ? `?invitation_id=${invitationId}` : ''}`,
+										onClick={() => {
+											const params = new URLSearchParams()
+											if (invitationId)
+												params.set('invitation_id', invitationId)
+											if (returnTo) params.set('returnTo', returnTo)
+											const qs = params.toString()
+											void navigate(
+												`${href('/internal-oauth/register')}${qs ? `?${qs}` : ''}`,
 											)
-										}
+										}}
 										type="button"
 										variant="secondary"
 									>

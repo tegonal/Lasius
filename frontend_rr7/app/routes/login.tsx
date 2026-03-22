@@ -22,17 +22,17 @@ import { AlertTriangle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { href, redirect, useLoaderData } from 'react-router'
 
-import {
-	LoadingInfoPanel,
-	LoginInfoPanel,
-} from '~/components/features/login/auth-info-panels'
-import { AuthLayout } from '~/components/features/login/auth-layout'
 import { Button } from '~/components/primitives/buttons/button'
 import { Card, CardBody } from '~/components/ui/cards/card'
 import { Alert } from '~/components/ui/feedback/alert'
 import { LasiusIcon } from '~/components/ui/icons/lasius-icon'
 import { Logo } from '~/components/ui/icons/logo'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+import {
+	LoadingInfoPanel,
+	LoginInfoPanel,
+} from '~/features/auth/auth-info-panels'
+import { AuthLayout } from '~/features/auth/auth-layout'
 import { HelpButton } from '~/features/help/components/help-button'
 import { getServerEnv } from '~/lib/env.server'
 import {

@@ -33,8 +33,6 @@ import {
 } from 'react-router'
 import { z } from 'zod'
 
-import { RegisterInfoPanel } from '~/components/features/login/auth-info-panels'
-import { AuthLayout } from '~/components/features/login/auth-layout'
 import { Button } from '~/components/primitives/buttons/button'
 import { Input } from '~/components/primitives/inputs/input'
 import { Card, CardBody } from '~/components/ui/cards/card'
@@ -46,6 +44,8 @@ import { FormElement } from '~/components/ui/forms/form-element'
 import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { Logo } from '~/components/ui/icons/logo'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+import { RegisterInfoPanel } from '~/features/auth/auth-info-panels'
+import { AuthLayout } from '~/features/auth/auth-layout'
 import { type SchemaTranslationFn } from '~/lib/i18n-types'
 import { logger } from '~/lib/logger'
 import { registerOAuthUser } from '~/services/api/lasius/oauth2-provider/oauth2-provider'
@@ -101,6 +101,7 @@ const createRegisterSchema = (t: SchemaTranslationFn) =>
 						defaultValue: 'Must contain a number',
 					}),
 				}),
+			returnTo: z.string().optional(),
 		})
 		.refine((val) => val.password === val.confirmPassword, {
 			message: t('common.validation.passwordMismatch', {
@@ -125,7 +126,7 @@ export async function action({ request }: Route.ActionArgs) {
 		)
 	}
 
-	const { email, firstName, invitationId, lastName, password } =
+	const { email, firstName, invitationId, lastName, password, returnTo } =
 		submission.value
 
 	try {
@@ -142,6 +143,9 @@ export async function action({ request }: Route.ActionArgs) {
 		})
 		if (invitationId) {
 			params.set('invitation_id', invitationId)
+		}
+		if (returnTo) {
+			params.set('returnTo', returnTo)
 		}
 
 		return redirect(`${href('/internal-oauth/login')}?${params.toString()}`)
@@ -167,7 +171,11 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export default function InternalOAuthRegister() {
-	const { email: prefilledEmail, invitationId } = useLoaderData<typeof loader>()
+	const {
+		email: prefilledEmail,
+		invitationId,
+		returnTo,
+	} = useLoaderData<typeof loader>()
 	const actionData = useActionData<typeof action>()
 	const navigation = useNavigation()
 	const { t } = useTranslation('common')
@@ -182,6 +190,7 @@ export default function InternalOAuthRegister() {
 		invitationId?: string
 		lastName: string
 		password: string
+		returnTo?: string
 	}>({
 		defaultValue: {
 			confirmPassword: '',
@@ -190,6 +199,7 @@ export default function InternalOAuthRegister() {
 			invitationId: invitationId || undefined,
 			lastName: '',
 			password: '',
+			returnTo: returnTo || undefined,
 		},
 		lastResult: actionData?.lastResult,
 		onValidate({ formData }) {
@@ -251,6 +261,12 @@ export default function InternalOAuthRegister() {
 						</p>
 					</div>
 					<Form method="post" {...getFormProps(form)}>
+						{returnTo && (
+							<input
+								{...getInputProps(fields.returnTo, { type: 'hidden' })}
+								key={fields.returnTo.key}
+							/>
+						)}
 						{invitationId && (
 							<input
 								{...getInputProps(fields.invitationId, { type: 'hidden' })}
@@ -395,6 +411,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 	const url = new URL(request.url)
 	const email = url.searchParams.get('email') ?? ''
 	const invitationId = url.searchParams.get('invitation_id') ?? ''
+	const returnTo = url.searchParams.get('returnTo') ?? ''
 
-	return { email, invitationId }
+	return { email, invitationId, returnTo }
 }
