@@ -119,7 +119,10 @@ export const BookingCurrentEntryContext = ({ item }: Props) => {
 	return (
 		<>
 			<ContextBody>
-				<ContextButtonOpen hash={item.id} />
+				<ContextButtonOpen
+					data-testid="booking-current-ctx-open-btn"
+					hash={item.id}
+				/>
 				{currentOpenContextMenuId === item.id && (
 					<ContextAnimatePresence>
 						<ContextBar>
@@ -128,6 +131,7 @@ export const BookingCurrentEntryContext = ({ item }: Props) => {
 									aria-label={t('bookings.actions.edit', {
 										defaultValue: 'Edit booking',
 									})}
+									data-testid="booking-current-edit-btn"
 									fullWidth={false}
 									onClick={editCurrentBooking}
 									shape="circle"

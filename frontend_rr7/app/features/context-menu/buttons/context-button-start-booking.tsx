@@ -30,12 +30,14 @@ import {
 import { ContextButtonWrapper } from '../context-button-wrapper'
 
 type Props = {
+	'data-testid'?: string
 	item: ModelsBooking | ModelsBookingStub
 	onStart?: () => void
 	variant?: 'compact' | 'default'
 }
 
 export const ContextButtonStartBooking = ({
+	'data-testid': testId,
 	item: _item,
 	onStart,
 	variant = 'default',
@@ -48,6 +50,7 @@ export const ContextButtonStartBooking = ({
 				aria-label={t('bookings.actions.start', {
 					defaultValue: 'Start booking',
 				})}
+				data-testid={testId}
 				fullWidth={false}
 				onClick={onStart}
 				shape="circle"

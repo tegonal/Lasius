@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+import { useStopAndStart } from '~/features/bookings/hooks/use-stop-and-start'
 import { ContextButtonClose } from '~/features/context-menu/buttons/context-button-close'
 import { ContextButtonOpen } from '~/features/context-menu/buttons/context-button-open'
 import { ContextButtonStartBooking } from '~/features/context-menu/buttons/context-button-start-booking'
@@ -32,7 +33,6 @@ import { ContextBarDivider } from '~/features/context-menu/context-bar-divider'
 import { ContextBody } from '~/features/context-menu/context-body'
 import { ContextButtonWrapper } from '~/features/context-menu/context-button-wrapper'
 import { useContextMenu } from '~/features/context-menu/hooks/use-context-menu'
-import { useStopAndStart } from '~/hooks/use-stop-and-start'
 import { formatISOLocale } from '~/lib/utils/dates'
 import { stringHash } from '~/lib/utils/string-hash'
 import { type ModelsBookingStub } from '~/services/api/lasius'
@@ -77,11 +77,12 @@ export const FavoriteItemContext = ({ item, selectedOrgId }: Props) => {
 
 	return (
 		<ContextBody variant="compact">
-			<ContextButtonOpen hash={itemHash} />
+			<ContextButtonOpen data-testid="favorite-ctx-open-btn" hash={itemHash} />
 			{currentOpenContextMenuId === itemHash && (
 				<ContextAnimatePresence variant="compact">
 					<ContextBar className="-mr-3">
 						<ContextButtonStartBooking
+							data-testid="favorite-ctx-start-btn"
 							item={item}
 							onStart={handleStart}
 							variant="compact"
@@ -91,6 +92,7 @@ export const FavoriteItemContext = ({ item, selectedOrgId }: Props) => {
 								aria-label={t('favorites.actions.delete', {
 									defaultValue: 'Delete favorite',
 								})}
+								data-testid="favorite-ctx-delete-btn"
 								fullWidth={false}
 								onClick={deleteFavorite}
 								shape="circle"

@@ -27,12 +27,14 @@ import { type ModelsBooking } from '~/services/api/lasius'
 import { ContextButtonWrapper } from '../context-button-wrapper'
 
 type Props = {
+	'data-testid'?: string
 	item: ModelsBooking
 	onAddFavorite?: () => void
 	variant?: 'compact' | 'default'
 }
 
 export const ContextButtonAddFavorite = ({
+	'data-testid': testId,
 	item: _item,
 	onAddFavorite,
 	variant = 'default',
@@ -45,6 +47,7 @@ export const ContextButtonAddFavorite = ({
 				aria-label={t('favorites.actions.add', {
 					defaultValue: 'Add as favorite',
 				})}
+				data-testid={testId}
 				fullWidth={false}
 				onClick={onAddFavorite}
 				shape="circle"

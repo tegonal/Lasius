@@ -26,7 +26,13 @@ import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 
 import { useContextMenu } from '../hooks/use-context-menu'
 
-export const ContextButtonOpen = ({ hash }: { hash: string }) => {
+export const ContextButtonOpen = ({
+	'data-testid': testId,
+	hash,
+}: {
+	'data-testid'?: string
+	hash: string
+}) => {
 	const { handleCloseAll, handleOpenContextMenu } = useContextMenu()
 	const { t } = useTranslation('common')
 
@@ -43,6 +49,7 @@ export const ContextButtonOpen = ({ hash }: { hash: string }) => {
 			aria-label={t('contextMenu.actions.open', {
 				defaultValue: 'Open context menu',
 			})}
+			data-testid={testId}
 			fullWidth={false}
 			onClick={() => handleOpenContextMenu(hash)}
 			shape="circle"

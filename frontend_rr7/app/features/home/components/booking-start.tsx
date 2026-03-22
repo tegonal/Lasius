@@ -31,8 +31,8 @@ import { FormElement } from '~/components/ui/forms/form-element'
 import { InputTagsAutocomplete } from '~/components/ui/forms/input/input-tags-autocomplete'
 import { ProjectSelect } from '~/components/ui/forms/input/project-select'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
-import { useBookingFormData } from '~/hooks/use-booking-form-data'
-import { useStopAndStart } from '~/hooks/use-stop-and-start'
+import { useBookingFormData } from '~/features/bookings/hooks/use-booking-form-data'
+import { useStopAndStart } from '~/features/bookings/hooks/use-stop-and-start'
 import { formatISOLocale } from '~/lib/utils/dates'
 import { type ModelsTag } from '~/services/api/lasius'
 
@@ -133,7 +133,11 @@ export const BookingStart = ({ onSuccess, selectedOrgId }: Props) => {
 							</FormElement>
 						</FieldSet>
 						<ButtonGroup>
-							<Button disabled={stopAndStart.state !== 'idle'} type="submit">
+							<Button
+								data-testid="booking-start-submit-btn"
+								disabled={stopAndStart.state !== 'idle'}
+								type="submit"
+							>
 								<LucideIcon icon={Timer} size={24} />
 								{t('bookings.actions.start', {
 									defaultValue: 'Start booking',

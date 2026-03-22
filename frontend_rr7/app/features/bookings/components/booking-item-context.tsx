@@ -30,6 +30,7 @@ import {
 	useHomeLoaderData,
 	useSelectedOrgId,
 } from '~/features/bookings/hooks/use-home-loader-data'
+import { useStopAndStart } from '~/features/bookings/hooks/use-stop-and-start'
 import { ContextButtonAddFavorite } from '~/features/context-menu/buttons/context-button-add-favorite'
 import { ContextButtonClose } from '~/features/context-menu/buttons/context-button-close'
 import { ContextButtonOpen } from '~/features/context-menu/buttons/context-button-open'
@@ -40,7 +41,6 @@ import { ContextBarDivider } from '~/features/context-menu/context-bar-divider'
 import { ContextBody } from '~/features/context-menu/context-body'
 import { ContextButtonWrapper } from '~/features/context-menu/context-button-wrapper'
 import { useContextMenu } from '~/features/context-menu/hooks/use-context-menu'
-import { useStopAndStart } from '~/hooks/use-stop-and-start'
 import { type AugmentedBooking } from '~/lib/api/functions/augment-bookings-list'
 import { formatISOLocale } from '~/lib/utils/dates'
 import { type ModelsBooking } from '~/services/api/lasius'
@@ -167,16 +167,21 @@ export const BookingItemContext = ({ item }: Props) => {
 	return (
 		<>
 			<ContextBody>
-				<ContextButtonOpen hash={item.id} />
+				<ContextButtonOpen data-testid="booking-ctx-open-btn" hash={item.id} />
 				{currentOpenContextMenuId === item.id && (
 					<ContextAnimatePresence>
 						<ContextBar>
-							<ContextButtonStartBooking item={item} onStart={startBooking} />
+							<ContextButtonStartBooking
+								data-testid="booking-ctx-start-btn"
+								item={item}
+								onStart={startBooking}
+							/>
 							<ContextButtonWrapper>
 								<Button
 									aria-label={t('bookings.actions.edit', {
 										defaultValue: 'Edit booking',
 									})}
+									data-testid="booking-ctx-edit-btn"
 									fullWidth={false}
 									onClick={() => {
 										setIsEditModalOpen(true)
@@ -197,6 +202,7 @@ export const BookingItemContext = ({ item }: Props) => {
 										aria-label={t('bookings.actions.adjustStartToPrevious', {
 											defaultValue: 'Adjust start to previous booking',
 										})}
+										data-testid="booking-ctx-adjust-start-btn"
 										fullWidth={false}
 										onClick={adjustStartToPrevious}
 										shape="circle"
@@ -215,6 +221,7 @@ export const BookingItemContext = ({ item }: Props) => {
 										aria-label={t('bookings.actions.adjustEndToNext', {
 											defaultValue: 'Adjust end to next booking',
 										})}
+										data-testid="booking-ctx-adjust-end-btn"
 										fullWidth={false}
 										onClick={adjustEndToNext}
 										shape="circle"
@@ -228,6 +235,7 @@ export const BookingItemContext = ({ item }: Props) => {
 								</ContextButtonWrapper>
 							)}
 							<ContextButtonAddFavorite
+								data-testid="booking-ctx-favorite-btn"
 								item={item}
 								onAddFavorite={addFavorite}
 							/>
@@ -236,6 +244,7 @@ export const BookingItemContext = ({ item }: Props) => {
 									aria-label={t('bookings.actions.delete', {
 										defaultValue: 'Delete booking',
 									})}
+									data-testid="booking-ctx-delete-btn"
 									fullWidth={false}
 									onClick={deleteItem}
 									shape="circle"

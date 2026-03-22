@@ -531,12 +531,17 @@ export const BookingAddUpdateForm = ({
 								)}
 
 								<ButtonGroup>
-									<Button loading={isSubmitting} type="submit">
+									<Button
+										data-testid="booking-form-save-btn"
+										loading={isSubmitting}
+										type="submit"
+									>
 										{t('common.actions.save', {
 											defaultValue: 'Save',
 										})}
 									</Button>
 									<Button
+										data-testid="booking-form-close-btn"
 										disabled={isSubmitting}
 										onClick={onClose}
 										type="button"
