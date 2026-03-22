@@ -21,10 +21,11 @@
 
 import { ResponsiveStream } from '@nivo/stream'
 import { format } from 'date-fns'
-import { de, enUS, es, fr, it, type Locale } from 'date-fns/locale'
-import { BarChart3 } from 'lucide-react'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+
+import { EmptyStateStats } from '~/features/stats/components/empty-state-stats'
+import { getDateLocale } from '~/lib/utils/date-locale'
 
 import { ChartSingleTooltip, ChartStackTooltip } from './chart-tooltips'
 import { useNivoColors } from './nivo-theme'
@@ -34,16 +35,6 @@ import { useNivoColors } from './nivo-theme'
 export type MonthlyWeekStreamData = MonthlyWeekStreamDataItem[]
 export type MonthlyWeekStreamDataItem = Record<string, number>
 export type MonthlyWeekStreamKeys = string[]
-
-// ─── Locale map ──────────────────────────────────────────────────────────────
-
-const dateLocales: Record<string, Locale> = {
-	de,
-	en: enUS,
-	es,
-	fr,
-	it,
-}
 
 export const MonthStreamChart = ({
 	data,
@@ -238,30 +229,6 @@ export const MonthStreamChart = ({
 }
 
 // ─── Validation ──────────────────────────────────────────────────────────────
-
-const EmptyStateStats = () => {
-	const { t } = useTranslation('common')
-	return (
-		<div className="flex h-full w-full flex-col items-center justify-center py-8">
-			<div className="text-base-content/50 flex flex-col items-center justify-center gap-2 text-sm">
-				<BarChart3 size={32} />
-				<div className="text-center">
-					{t('stats.empty', {
-						defaultValue: 'No data available for the selected period',
-					})}
-				</div>
-			</div>
-		</div>
-	)
-}
-
-// ─── Empty State ─────────────────────────────────────────────────────────────
-
-const getDateLocale = (language: string): Locale => {
-	return dateLocales[language] ?? dateLocales['en']
-}
-
-// ─── Component ───────────────────────────────────────────────────────────────
 
 const isValidMonthlyWeekStreamData = (
 	data: unknown,

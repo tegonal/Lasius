@@ -20,9 +20,9 @@
 // @ts-nocheck
 
 import { type Point, ResponsiveLine } from '@nivo/line'
-import { BarChart3 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
+import { EmptyStateStats } from '~/features/stats/components/empty-state-stats'
 import { decimalHoursToDurationString } from '~/lib/utils/duration'
 
 import { nivoTheme, useNivoColors } from './nivo-theme'
@@ -171,24 +171,6 @@ export const WeeklyTrendChart = ({
 					type: 'linear',
 				}}
 			/>
-		</div>
-	)
-}
-
-// ─── Component ───────────────────────────────────────────────────────────────
-
-const EmptyStateStats = () => {
-	const { t } = useTranslation('common')
-	return (
-		<div className="flex h-full w-full flex-col items-center justify-center py-8">
-			<div className="text-base-content/50 flex flex-col items-center justify-center gap-2 text-sm">
-				<BarChart3 size={32} />
-				<div className="text-center">
-					{t('stats.empty', {
-						defaultValue: 'No data available for the selected period',
-					})}
-				</div>
-			</div>
 		</div>
 	)
 }

@@ -19,44 +19,51 @@
 
 import { useTranslation } from 'react-i18next'
 
-import { Button } from '~/components/primitives/buttons/button'
-import { useProjects } from '~/features/projects/hooks/use-projects'
 import { StatsGroup } from '~/features/stats/components/stats-group'
+import { StatsTileHours } from '~/features/stats/components/stats-tile-hours'
 import { StatsTileNumber } from '~/features/stats/components/stats-tile-number'
 
 type Props = {
-	onCreateProject: () => void
+	bookings: number
+	hours: number
+	projects?: number
+	users?: number
 }
 
-export const MyProjectsStats = ({ onCreateProject }: Props) => {
+export const BookingHistoryStats = ({
+	bookings,
+	hours,
+	projects,
+	users,
+}: Props) => {
 	const { t } = useTranslation('common')
-	const { userProjects } = useProjects()
-	const projects = userProjects()
-
-	const totalCount = projects.length
 
 	return (
-		<div className="bg-base-200 flex items-start justify-between gap-4 p-4">
-			<StatsGroup>
+		<StatsGroup className="flex gap-4">
+			<StatsTileHours
+				label={t('common.units.hours', { defaultValue: 'Hours' })}
+				standalone={false}
+				value={hours}
+			/>
+			<StatsTileNumber
+				label={t('bookings.title', { defaultValue: 'Bookings' })}
+				standalone={false}
+				value={bookings}
+			/>
+			{users !== undefined && users > 1 && (
 				<StatsTileNumber
-					label={t('projects.myProjects', {
-						defaultValue: 'My projects',
-					})}
+					label={t('users.title', { defaultValue: 'Users' })}
 					standalone={false}
-					value={totalCount}
+					value={users}
 				/>
-			</StatsGroup>
-			<Button
-				className="w-auto"
-				fullWidth={false}
-				onClick={onCreateProject}
-				size="sm"
-				variant="neutral"
-			>
-				{t('projects.actions.create', {
-					defaultValue: 'Create project',
-				})}
-			</Button>
-		</div>
+			)}
+			{projects !== undefined && projects > 1 && (
+				<StatsTileNumber
+					label={t('projects.title', { defaultValue: 'Projects' })}
+					standalone={false}
+					value={projects}
+				/>
+			)}
+		</StatsGroup>
 	)
 }
