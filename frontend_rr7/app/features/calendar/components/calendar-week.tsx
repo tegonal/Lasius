@@ -67,6 +67,7 @@ export const CalendarWeek = ({
 						aria-label={t('calendar.navigation.previousWeek', {
 							defaultValue: 'Previous week',
 						})}
+						data-testid="calendar-week-prev-btn"
 						onClick={previous}
 					/>
 				</div>
@@ -80,6 +81,7 @@ export const CalendarWeek = ({
 								aria-label={t('common.time.today', {
 									defaultValue: 'Today',
 								})}
+								data-testid="calendar-week-today-btn"
 								onClick={selectToday}
 								size="xs"
 								variant="unstyled"
@@ -133,6 +135,7 @@ export const CalendarWeek = ({
 						aria-label={t('calendar.navigation.nextWeek', {
 							defaultValue: 'Next week',
 						})}
+						data-testid="calendar-week-next-btn"
 						onClick={next}
 					/>
 				</div>

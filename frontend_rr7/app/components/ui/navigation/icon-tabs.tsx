@@ -80,6 +80,7 @@ export const IconTabs = ({
 						<Button
 							aria-label={item.name}
 							className="relative z-20"
+							data-testid={`nav-tab-${item.id}`}
 							fullWidth={false}
 							onClick={() => onSelect(index)}
 							title={item.name}

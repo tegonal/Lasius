@@ -28,22 +28,27 @@ export const DashboardTabs = () => {
 
 	const tabs = [
 		{
+			id: 'day',
 			label: t('common.time.day', { defaultValue: 'Day' }),
 			to: href('/user/dashboard/day'),
 		},
 		{
+			id: 'week',
 			label: t('common.time.week', { defaultValue: 'Week' }),
 			to: href('/user/dashboard/week'),
 		},
 		{
+			id: 'month',
 			label: t('common.time.month', { defaultValue: 'Month' }),
 			to: href('/user/dashboard/month'),
 		},
 		{
+			id: '6months',
 			label: t('workHealth.sixMonths', { defaultValue: '6 Months' }),
 			to: href('/user/dashboard/6months'),
 		},
 		{
+			id: 'year',
 			label: t('common.time.year', { defaultValue: 'Year' }),
 			to: href('/user/dashboard/year'),
 		},
@@ -54,6 +59,7 @@ export const DashboardTabs = () => {
 			{tabs.map((tab) => (
 				<NavLink
 					className={({ isActive }) => `tab ${isActive ? 'tab-active' : ''}`}
+					data-testid={`dashboard-tab-${tab.id}`}
 					key={tab.to}
 					to={`${tab.to}${search}`}
 				>
