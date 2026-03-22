@@ -29,6 +29,7 @@ import { Modal } from '~/components/ui/overlays/modal'
 import { MyProjectsList } from '~/features/projects/components/my-projects-list'
 import { MyProjectsRightColumn } from '~/features/projects/components/my-projects-right-column'
 import { MyProjectsStats } from '~/features/projects/components/my-projects-stats'
+import { ProjectAddUpdateForm } from '~/features/projects/components/project-add-update-form'
 import { useProjects } from '~/features/projects/hooks/use-projects'
 
 export const MyProjectsLayout = () => {
@@ -59,10 +60,11 @@ export const MyProjectsLayout = () => {
 				</ScrollArea>
 			</ColumnRight>
 			<Modal onClose={handleCreateClose} open={isCreateOpen}>
-				{/* TODO: ProjectAddUpdateForm — will be created in Task 12-14 */}
-				<div className="p-4">
-					<p>Create project form placeholder</p>
-				</div>
+				<ProjectAddUpdateForm
+					mode="add"
+					onCancel={handleCreateClose}
+					onSave={handleCreateClose}
+				/>
 			</Modal>
 		</div>
 	)

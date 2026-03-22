@@ -31,6 +31,8 @@ import { EmptyStateProjects } from '~/components/ui/data-display/fetch-state/emp
 import { ProjectLastActivity } from '~/components/ui/data-display/project-last-activity'
 import { ROLES } from '~/config/constants'
 import { UserRoles } from '~/config/dynamic-translation-strings'
+import { MyProjectsListItemAdminContext } from '~/features/projects/components/my-projects-list-item-admin-context'
+import { MyProjectsListItemMemberContext } from '~/features/projects/components/my-projects-list-item-member-context'
 import { useProjects } from '~/features/projects/hooks/use-projects'
 
 export type ProjectStatusFilter = 'active' | 'both' | 'inactive'
@@ -93,8 +95,11 @@ export const MyProjectsList = ({ searchTerm }: Props) => {
 						<ProjectLastActivity />
 					</DataListField>
 					<DataListField>
-						{/* TODO: context menu — will be created in Task 12-14 */}
-						{item.role === ROLES.PROJECT_ADMIN ? <div /> : <div />}
+						{item.role === ROLES.PROJECT_ADMIN ? (
+							<MyProjectsListItemAdminContext item={item} />
+						) : (
+							<MyProjectsListItemMemberContext item={item} />
+						)}
 					</DataListField>
 				</DataListRow>
 			))}
