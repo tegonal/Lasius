@@ -20,18 +20,14 @@
 import { FolderOpen } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+import { EmptyState } from '~/components/ui/data-display/empty-state'
 
 export const EmptyStateProjects = () => {
 	const { t } = useTranslation('common')
 	return (
-		<div className="flex h-full w-full flex-col items-center justify-center py-8">
-			<div className="text-base-content/50 flex flex-col items-center justify-center gap-2 text-sm">
-				<LucideIcon icon={FolderOpen} size={32} />
-				<div className="text-center">
-					{t('projects.empty', { defaultValue: 'No projects found' })}
-				</div>
-			</div>
-		</div>
+		<EmptyState
+			icon={FolderOpen}
+			label={t('projects.empty', { defaultValue: 'No projects found' })}
+		/>
 	)
 }

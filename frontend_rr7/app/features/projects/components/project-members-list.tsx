@@ -18,6 +18,7 @@
  */
 
 import { orderBy } from 'es-toolkit'
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useRouteLoaderData } from 'react-router'
 
@@ -29,11 +30,11 @@ import {
 	DataListHeaderItem,
 	DataListRow,
 } from '~/components/ui/data-display/data-list'
-import { EmptyStateMembers } from '~/components/ui/data-display/fetch-state/empty-state-members'
+import { EmptyStateMembers } from '~/features/projects/components/empty-state-members'
 import { isAdminOfProject } from '~/lib/api/functions/is-admin-of-project'
 import { type loader } from '~/routes/app-layout'
 import { type ModelsUserStub } from '~/services/api/lasius'
-import { removeProjectUser } from '~/services/api/lasius/projects/projects'
+import { useRemoveProjectUser } from '~/services/api/lasius-hooks/projects/projects'
 
 import { ProjectMemberListItemContext } from './project-member-list-item-context'
 
@@ -60,13 +61,19 @@ export const ProjectMembersList = ({
 		projectId,
 	)
 
+	const removeUserApi = useRemoveProjectUser()
+
+	// Refresh list after successful removal
+	useEffect(() => {
+		if (removeUserApi.state !== 'idle' || !removeUserApi.data) return
+		onRefresh()
+	}, [removeUserApi.state, removeUserApi.data, onRefresh])
+
 	const handleUserRemove = (userIdToRemove: string) => {
-		void removeProjectUser(
-			projectOrganisationId,
+		removeUserApi.submit({
+			orgId: projectOrganisationId,
 			projectId,
-			userIdToRemove,
-		).then(() => {
-			onRefresh()
+			userId: userIdToRemove,
 		})
 	}
 
@@ -119,7 +126,7 @@ export const ProjectMembersList = ({
 					</DataListField>
 					<DataListField>
 						<ProjectMemberListItemContext
-							canRemove={amIAdmin}
+							canRemove={amIAdmin && users.length > 1}
 							onRemove={() => handleUserRemove(user.id)}
 							user={user}
 						/>
