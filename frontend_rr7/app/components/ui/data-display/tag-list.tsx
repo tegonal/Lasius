@@ -20,8 +20,8 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 import { XIcon } from 'lucide-react'
 
-import { ImporterTypeIcon } from '~/components/features/issue-importers/importer-type-icon'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+import { ImporterTypeIcon } from '~/features/issue-importers/importer-type-icon'
 import { cn } from '~/lib/utils/cn'
 import { getImporterTypeFromTag } from '~/lib/utils/tag-helpers'
 import { type ModelsTag } from '~/services/api/lasius'
