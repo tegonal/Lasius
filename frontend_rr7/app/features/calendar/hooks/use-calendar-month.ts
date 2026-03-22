@@ -25,14 +25,19 @@ import {
 	startOfMonth,
 } from 'date-fns'
 import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
+
+import { getDateLocale } from '~/lib/utils/date-locale'
 
 /**
  * Shared hook for computing calendar month layout data from a viewDate.
  *
  * Returns the days in the month, Monday-based start offset, and
- * single-letter weekday headers.
+ * single-letter weekday headers (locale-aware).
  */
-export function useCalendarMonth(viewDate: Date) {
+export const useCalendarMonth = (viewDate: Date) => {
+	const { i18n } = useTranslation('common')
+	const locale = getDateLocale(i18n.language)
 	const monthDays = useMemo(() => {
 		const start = startOfMonth(viewDate)
 		const end = endOfMonth(viewDate)
@@ -48,9 +53,9 @@ export function useCalendarMonth(viewDate: Date) {
 	const weekDays = useMemo(() => {
 		return Array.from({ length: 7 }, (_, i) => {
 			const d = new Date(2025, 0, 6 + i) // Jan 6, 2025 is a Monday
-			return format(d, 'EEEEE', { locale: undefined })
+			return format(d, 'EEEEE', { locale })
 		})
-	}, [])
+	}, [locale])
 
 	return { monthDays, startOffset, weekDays }
 }

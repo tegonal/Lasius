@@ -25,8 +25,8 @@ import { Button } from '~/components/primitives/buttons/button'
 import { TagList } from '~/components/ui/data-display/tag-list'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { useHomeLoaderData } from '~/features/bookings/hooks/use-home-loader-data'
+import { useStopBooking } from '~/features/bookings/hooks/use-stop-booking'
 import { ContextMenuProvider } from '~/features/context-menu/hooks/use-context-menu'
-import { useStopBooking } from '~/hooks/use-stop-booking'
 import { formatISOLocale } from '~/lib/utils/dates'
 import { type ModelsBooking } from '~/services/api/lasius'
 
@@ -41,7 +41,10 @@ export const BookingCurrent = () => {
 	const currentBooking = loaderData?.currentBooking
 
 	return (
-		<div className="bg-base-200 relative flex h-full min-h-[96px] w-full flex-row items-center gap-3 overflow-hidden px-2 py-3 sm:px-3 md:bg-transparent lg:px-4 [&>*]:w-full">
+		<div
+			className="bg-base-200 relative flex h-full min-h-[96px] w-full flex-row items-center gap-3 overflow-hidden px-2 py-3 sm:px-3 md:bg-transparent lg:px-4 [&>*]:w-full"
+			data-testid="booking-current-section"
+		>
 			{!currentBooking?.booking ? (
 				<NoBooking />
 			) : (
@@ -99,6 +102,7 @@ const CurrentBookingEntry = ({
 	return (
 		<div className="grid h-full w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 lg:gap-4">
 			<Button
+				data-testid="booking-current-stop-btn"
 				fullWidth={false}
 				onClick={stop}
 				title={t('bookings.actions.stopRecording', {

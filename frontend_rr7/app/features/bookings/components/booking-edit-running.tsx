@@ -31,7 +31,7 @@ import { FormElement } from '~/components/ui/forms/form-element'
 import { InputDatePicker } from '~/components/ui/forms/input/date-picker/input-date-picker'
 import { InputTagsAutocomplete } from '~/components/ui/forms/input/input-tags-autocomplete'
 import { ProjectSelect } from '~/components/ui/forms/input/project-select'
-import { useBookingFormData } from '~/hooks/use-booking-form-data'
+import { useBookingFormData } from '~/features/bookings/hooks/use-booking-form-data'
 import { formatISOLocale } from '~/lib/utils/dates'
 import {
 	type ModelsCurrentUserTimeBooking,

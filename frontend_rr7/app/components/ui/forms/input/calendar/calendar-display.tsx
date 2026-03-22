@@ -31,8 +31,9 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { useCalendarMonth } from '~/hooks/use-calendar-month'
+import { useCalendarMonth } from '~/features/calendar/hooks/use-calendar-month'
 import { cn } from '~/lib/utils/cn'
+import { getDateLocale } from '~/lib/utils/date-locale'
 import { formatISOLocale, type IsoDateString } from '~/lib/utils/dates'
 
 type CalendarDisplayProps = {
@@ -41,7 +42,8 @@ type CalendarDisplayProps = {
 }
 
 export const CalendarDisplay = ({ onChange, value }: CalendarDisplayProps) => {
-	const { t } = useTranslation('common')
+	const { i18n, t } = useTranslation('common')
+	const locale = getDateLocale(i18n.language)
 	const selectedDate = new Date(value)
 	const [originalTime, setOriginalTime] = useState<number[]>([0, 0])
 
@@ -94,7 +96,9 @@ export const CalendarDisplay = ({ onChange, value }: CalendarDisplayProps) => {
 					<ChevronLeft size={16} />
 				</button>
 				<div className="flex flex-col items-center">
-					<div className="text-sm font-medium">{format(viewDate, 'MMMM')}</div>
+					<div className="text-sm font-medium">
+						{format(viewDate, 'MMMM', { locale })}
+					</div>
 					<div className="text-base-content/60 text-xs">
 						{format(viewDate, 'yyyy')}
 					</div>
@@ -142,7 +146,7 @@ export const CalendarDisplay = ({ onChange, value }: CalendarDisplayProps) => {
 
 					return (
 						<button
-							aria-label={`Select ${day.toLocaleDateString()}`}
+							aria-label={format(day, 'PPP', { locale })}
 							className={cn(
 								'flex h-8 w-full cursor-pointer items-center justify-center rounded text-sm transition-colors',
 								isSelected && 'bg-secondary text-secondary-content',

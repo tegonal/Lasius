@@ -19,6 +19,7 @@
 
 import { roundToNearestMinutes } from 'date-fns'
 
+import { useStopAndStart } from '~/features/bookings/hooks/use-stop-and-start'
 import { ContextButtonClose } from '~/features/context-menu/buttons/context-button-close'
 import { ContextButtonOpen } from '~/features/context-menu/buttons/context-button-open'
 import { ContextButtonStartBooking } from '~/features/context-menu/buttons/context-button-start-booking'
@@ -27,7 +28,6 @@ import { ContextBar } from '~/features/context-menu/context-bar'
 import { ContextBarDivider } from '~/features/context-menu/context-bar-divider'
 import { ContextBody } from '~/features/context-menu/context-body'
 import { useContextMenu } from '~/features/context-menu/hooks/use-context-menu'
-import { useStopAndStart } from '~/hooks/use-stop-and-start'
 import { formatISOLocale } from '~/lib/utils/dates'
 import { stringHash } from '~/lib/utils/string-hash'
 import { type ModelsCurrentUserTimeBooking } from '~/services/api/lasius'
