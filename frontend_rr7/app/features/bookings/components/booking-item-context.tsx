@@ -41,7 +41,10 @@ import { useStopAndStart } from '~/hooks/use-stop-and-start'
 import { type AugmentedBooking } from '~/lib/api/functions/augment-bookings-list'
 import { formatISOLocale } from '~/lib/utils/dates'
 import { type ModelsBooking } from '~/services/api/lasius'
-import { useDeleteUserBooking, useUpdateUserBooking } from '~/services/api/lasius-hooks/user-bookings/user-bookings'
+import {
+	useDeleteUserBooking,
+	useUpdateUserBooking,
+} from '~/services/api/lasius-hooks/user-bookings/user-bookings'
 import { useAddFavoriteBooking } from '~/services/api/lasius-hooks/user-favorites/user-favorites'
 
 type HomeLoaderData = {
@@ -113,7 +116,9 @@ export const BookingItemContext = ({ item }: Props) => {
 		if (previousBooking?.end?.dateTime) {
 			updateBookingApi.submit({
 				body: {
-					end: item.end ? formatISOLocale(new Date(item.end.dateTime)) : undefined,
+					end: item.end
+						? formatISOLocale(new Date(item.end.dateTime))
+						: undefined,
 					projectId: item.projectReference?.id || '',
 					start: formatISOLocale(new Date(previousBooking.end.dateTime)),
 					tags: item.tags || [],
@@ -165,98 +170,103 @@ export const BookingItemContext = ({ item }: Props) => {
 
 	return (
 		<>
-		<ContextBody>
-			<ContextButtonOpen hash={item.id} />
-			{currentOpenContextMenuId === item.id && (
-				<ContextAnimatePresence>
-					<ContextBar>
-						<ContextButtonStartBooking item={item} onStart={startBooking} />
-						<ContextButtonWrapper>
-							<Button
-								aria-label={t('bookings.actions.edit', {
-									defaultValue: 'Edit booking',
-								})}
-								fullWidth={false}
-								onClick={() => {
-									setIsEditModalOpen(true)
-									handleCloseAll()
-								}}
-								shape="circle"
-								title={t('bookings.actions.edit', {
-									defaultValue: 'Edit booking',
-								})}
-								variant="contextIcon"
-							>
-								<LucideIcon icon={Pencil} size={24} />
-							</Button>
-						</ContextButtonWrapper>
-						{shouldShowStartAdjustment && (
+			<ContextBody>
+				<ContextButtonOpen hash={item.id} />
+				{currentOpenContextMenuId === item.id && (
+					<ContextAnimatePresence>
+						<ContextBar>
+							<ContextButtonStartBooking item={item} onStart={startBooking} />
 							<ContextButtonWrapper>
 								<Button
-									aria-label={t('bookings.actions.adjustStartToPrevious', {
-										defaultValue: 'Adjust start to previous booking',
+									aria-label={t('bookings.actions.edit', {
+										defaultValue: 'Edit booking',
 									})}
 									fullWidth={false}
-									onClick={adjustStartToPrevious}
+									onClick={() => {
+										setIsEditModalOpen(true)
+										handleCloseAll()
+									}}
 									shape="circle"
-									title={t('bookings.actions.adjustStartToPrevious', {
-										defaultValue: 'Adjust start to previous booking',
+									title={t('bookings.actions.edit', {
+										defaultValue: 'Edit booking',
 									})}
 									variant="contextIcon"
 								>
-									<LucideIcon icon={ArrowDownToLine} size={24} />
+									<LucideIcon icon={Pencil} size={24} />
 								</Button>
 							</ContextButtonWrapper>
-						)}
-						{shouldShowEndAdjustment && (
+							{shouldShowStartAdjustment && (
+								<ContextButtonWrapper>
+									<Button
+										aria-label={t('bookings.actions.adjustStartToPrevious', {
+											defaultValue: 'Adjust start to previous booking',
+										})}
+										fullWidth={false}
+										onClick={adjustStartToPrevious}
+										shape="circle"
+										title={t('bookings.actions.adjustStartToPrevious', {
+											defaultValue: 'Adjust start to previous booking',
+										})}
+										variant="contextIcon"
+									>
+										<LucideIcon icon={ArrowDownToLine} size={24} />
+									</Button>
+								</ContextButtonWrapper>
+							)}
+							{shouldShowEndAdjustment && (
+								<ContextButtonWrapper>
+									<Button
+										aria-label={t('bookings.actions.adjustEndToNext', {
+											defaultValue: 'Adjust end to next booking',
+										})}
+										fullWidth={false}
+										onClick={adjustEndToNext}
+										shape="circle"
+										title={t('bookings.actions.adjustEndToNext', {
+											defaultValue: 'Adjust end to next booking',
+										})}
+										variant="contextIcon"
+									>
+										<LucideIcon icon={ArrowUpToLine} size={24} />
+									</Button>
+								</ContextButtonWrapper>
+							)}
+							<ContextButtonAddFavorite
+								item={item}
+								onAddFavorite={addFavorite}
+							/>
 							<ContextButtonWrapper>
 								<Button
-									aria-label={t('bookings.actions.adjustEndToNext', {
-										defaultValue: 'Adjust end to next booking',
+									aria-label={t('bookings.actions.delete', {
+										defaultValue: 'Delete booking',
 									})}
 									fullWidth={false}
-									onClick={adjustEndToNext}
+									onClick={deleteItem}
 									shape="circle"
-									title={t('bookings.actions.adjustEndToNext', {
-										defaultValue: 'Adjust end to next booking',
+									title={t('bookings.actions.delete', {
+										defaultValue: 'Delete booking',
 									})}
 									variant="contextIcon"
 								>
-									<LucideIcon icon={ArrowUpToLine} size={24} />
+									<LucideIcon icon={Trash2} size={24} />
 								</Button>
 							</ContextButtonWrapper>
-						)}
-						<ContextButtonAddFavorite item={item} onAddFavorite={addFavorite} />
-						<ContextButtonWrapper>
-							<Button
-								aria-label={t('bookings.actions.delete', {
-									defaultValue: 'Delete booking',
-								})}
-								fullWidth={false}
-								onClick={deleteItem}
-								shape="circle"
-								title={t('bookings.actions.delete', {
-									defaultValue: 'Delete booking',
-								})}
-								variant="contextIcon"
-							>
-								<LucideIcon icon={Trash2} size={24} />
-							</Button>
-						</ContextButtonWrapper>
-						<ContextBarDivider />
-						<ContextButtonClose />
-					</ContextBar>
-				</ContextAnimatePresence>
-			)}
-		</ContextBody>
-		<Modal onClose={() => setIsEditModalOpen(false)} open={isEditModalOpen}>
-			<BookingAddUpdateForm
-				itemUpdate={item}
-				mode="update"
-				onClose={() => setIsEditModalOpen(false)}
-				selectedOrgId={selectedOrgId}
-			/>
-		</Modal>
+							<ContextBarDivider />
+							<ContextButtonClose />
+						</ContextBar>
+					</ContextAnimatePresence>
+				)}
+			</ContextBody>
+			<Modal onClose={() => setIsEditModalOpen(false)} open={isEditModalOpen}>
+				<BookingAddUpdateForm
+					bookingAfter={nextBooking ?? undefined}
+					bookingBefore={previousBooking ?? undefined}
+					itemUpdate={item}
+					mode="update"
+					onClose={() => setIsEditModalOpen(false)}
+					selectedOrgId={selectedOrgId}
+				/>
+			</Modal>
 		</>
 	)
 }

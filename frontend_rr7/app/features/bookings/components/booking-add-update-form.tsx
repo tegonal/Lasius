@@ -21,11 +21,18 @@ import {
 	addHours,
 	getHours,
 	getMinutes,
+	isAfter,
+	isBefore,
 	isToday,
 	setHours,
 	setMinutes,
 } from 'date-fns'
-import { HelpCircle } from 'lucide-react'
+import {
+	ArrowDownToLine,
+	ArrowRight,
+	ArrowUpToLine,
+	HelpCircle,
+} from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
@@ -41,17 +48,32 @@ import { InputDatePickerDuration } from '~/components/ui/forms/input/date-picker
 import { InputTagsAutocomplete } from '~/components/ui/forms/input/input-tags-autocomplete'
 import { ProjectSelect } from '~/components/ui/forms/input/project-select'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+import { ModalHelpButton } from '~/features/help/components/help-button'
 import { formatISOLocale } from '~/lib/utils/dates'
 import {
 	type ModelsBooking,
+	type ModelsBookingStub,
 	type ModelsEntityReference,
 	type ModelsTag,
 } from '~/services/api/lasius'
+import {
+	useAddUserBookingByOrganisation,
+	useUpdateUserBooking,
+} from '~/services/api/lasius-hooks/user-bookings/user-bookings'
+
+import { BookingPresetSelector } from './booking-preset-selector'
 
 type BookingAddUpdateFormProps = {
+	bookingAfter?: ModelsBooking
+	bookingBefore?: ModelsBooking
+	favorites?: ModelsBookingStub[]
+	itemReference?: ModelsBooking
 	itemUpdate?: ModelsBooking
-	mode: 'add' | 'update'
+	latestBooking?: ModelsBooking
+	mode: 'add' | 'addBetween' | 'update'
 	onClose: () => void
+	orgBookings?: ModelsBooking[]
+	recentBookings?: ModelsBooking[]
 	selectedDate?: Date
 	selectedOrgId: string
 }
@@ -63,26 +85,49 @@ type FormValues = {
 	tags: ModelsTag[]
 }
 
+type PresetSelection = {
+	projectId: string
+	projectName: string
+	tags: ModelsTag[]
+}
+
+const isWithinSameMinute = (time1: string, time2: string): boolean => {
+	if (!time1 || !time2) return false
+	const date1 = new Date(time1)
+	const date2 = new Date(time2)
+	const diffMs = Math.abs(date1.getTime() - date2.getTime())
+	return diffMs < 60000 // Less than 1 minute
+}
+
 export function BookingAddUpdateForm({
+	bookingAfter,
+	bookingBefore,
+	favorites = [],
+	itemReference,
 	itemUpdate,
+	latestBooking,
 	mode,
 	onClose,
+	orgBookings = [],
+	recentBookings = [],
 	selectedDate,
 	selectedOrgId,
 }: BookingAddUpdateFormProps) {
 	const { t } = useTranslation('common')
-	const fetcher = useFetcher<{ ok?: boolean }>()
+	const addBookingApi = useAddUserBookingByOrganisation()
+	const updateBookingApi = useUpdateUserBooking()
 	const formDataFetcher = useFetcher<{
 		projects: ModelsEntityReference[]
 		tags: ModelsTag[]
 	}>()
 
-	const isSubmitting = fetcher.state !== 'idle'
+	const isSubmitting =
+		addBookingApi.state !== 'idle' || updateBookingApi.state !== 'idle'
 
 	const [startResetButton, setStartResetButton] =
 		useState<React.ReactNode>(null)
-	const [endResetButton, setEndResetButton] =
-		useState<React.ReactNode>(null)
+	const [endResetButton, setEndResetButton] = useState<React.ReactNode>(null)
+	const [showPresetPanel, setShowPresetPanel] = useState(false)
 
 	const dateForForm = useMemo(() => selectedDate ?? new Date(), [selectedDate])
 
@@ -154,7 +199,8 @@ export function BookingAddUpdateForm({
 			)
 			void hookForm.trigger()
 		}
-		if (mode === 'add') {
+
+		if (mode === 'add' && !itemReference) {
 			if (!isToday(new Date(dateForForm))) {
 				const end = formatISOLocale(setHours(new Date(dateForForm), 12))
 				hookForm.setValue(
@@ -166,13 +212,61 @@ export function BookingAddUpdateForm({
 			}
 
 			if (isToday(new Date(dateForForm))) {
-				const end = formatISOLocale(addHours(new Date(), 1))
-				hookForm.setValue('start', formatISOLocale(new Date()))
+				const end = formatISOLocale(new Date())
+				hookForm.setValue('start', formatISOLocale(addHours(new Date(), -1)))
 				hookForm.setValue('end', end)
 				previousEndDate.current = end
 			}
+
+			hookForm.setValue('projectId', '')
+			hookForm.setValue('tags', [])
 		}
-	}, [itemUpdate, mode, hookForm, dateForForm])
+
+		if (mode === 'add' && itemReference) {
+			const reference = new Date(itemReference.end?.dateTime ?? '')
+			hookForm.setValue('start', formatISOLocale(reference))
+			hookForm.setValue('end', formatISOLocale(addHours(reference, 1)))
+
+			hookForm.setValue('projectId', '')
+			hookForm.setValue('tags', [])
+		}
+
+		if (mode === 'addBetween' && itemReference) {
+			hookForm.setValue(
+				'start',
+				formatISOLocale(new Date(bookingBefore?.end?.dateTime ?? '')),
+			)
+			hookForm.setValue(
+				'end',
+				formatISOLocale(new Date(itemReference?.start?.dateTime ?? '')),
+			)
+
+			hookForm.setValue('projectId', '')
+			hookForm.setValue('tags', [])
+		}
+
+		// Register validators with element names
+		hookForm.register('start', {
+			validate: {
+				startBeforeEnd: (v) =>
+					isBefore(new Date(v), new Date(hookForm.getValues('end'))),
+			},
+		})
+
+		hookForm.register('end', {
+			validate: {
+				endAfterStart: (v) =>
+					isAfter(new Date(v), new Date(hookForm.getValues('start'))),
+			},
+		})
+	}, [
+		itemUpdate,
+		mode,
+		hookForm,
+		dateForForm,
+		itemReference,
+		bookingBefore?.end?.dateTime,
+	])
 
 	// Watch for field changes to auto-adjust end date when start changes
 	useEffect(() => {
@@ -211,10 +305,84 @@ export function BookingAddUpdateForm({
 
 	// Close on successful submission
 	useEffect(() => {
-		if (fetcher.state === 'idle' && fetcher.data?.ok) {
+		const addDone =
+			addBookingApi.state === 'idle' && addBookingApi.data !== undefined
+		const updateDone =
+			updateBookingApi.state === 'idle' && updateBookingApi.data !== undefined
+		if (addDone || updateDone) {
 			onClose()
 		}
-	}, [fetcher.state, fetcher.data, onClose])
+	}, [
+		addBookingApi.state,
+		addBookingApi.data,
+		updateBookingApi.state,
+		updateBookingApi.data,
+		onClose,
+	])
+
+	// Compute preset start props for the start InputDatePicker
+	const presetStart = useMemo(() => {
+		if (mode === 'addBetween') return {}
+
+		const referenceTime =
+			mode === 'add'
+				? latestBooking?.end?.dateTime
+				: bookingBefore?.end?.dateTime
+
+		if (!referenceTime) return {}
+
+		// Hide preset if current start time is already within same minute as reference
+		if (isWithinSameMinute(startValue, referenceTime)) {
+			return {}
+		}
+
+		return {
+			presetDate: formatISOLocale(new Date(referenceTime)),
+			presetIcon: ArrowDownToLine,
+			presetLabel:
+				mode === 'add'
+					? t('bookings.hints.useEndTimeOfLatest', {
+							defaultValue:
+								'Use end time of latest booking as start time for this one',
+						})
+					: t('bookings.hints.useEndTimeOfPrevious', {
+							defaultValue:
+								'Use end time of previous booking as start time for this one',
+						}),
+		}
+	}, [mode, latestBooking, bookingBefore, startValue, t])
+
+	// Compute preset end props for the end InputDatePicker
+	const presetEnd = useMemo(() => {
+		if (mode === 'add' || mode === 'addBetween') return {}
+
+		const referenceTime = bookingAfter?.start?.dateTime
+		if (!referenceTime) return {}
+
+		// Hide preset if current end time is already within same minute as reference
+		if (isWithinSameMinute(endValue, referenceTime)) {
+			return {}
+		}
+
+		return {
+			presetDate: formatISOLocale(new Date(referenceTime)),
+			presetIcon: ArrowUpToLine,
+			presetLabel: t('bookings.hints.useStartTimeOfNext', {
+				defaultValue: 'Use start time of next booking as end time for this one',
+			}),
+		}
+	}, [mode, bookingAfter, endValue, t])
+
+	const handlePresetSelect = useCallback(
+		(preset: PresetSelection) => {
+			hookForm.setValue('projectId', preset.projectId)
+			hookForm.setValue('tags', preset.tags)
+			setShowPresetPanel(false)
+			// Trigger validation after setting values
+			void hookForm.trigger(['projectId', 'tags'])
+		},
+		[hookForm],
+	)
 
 	const onSubmit = useCallback(
 		(formValues: FormValues) => {
@@ -224,140 +392,175 @@ export function BookingAddUpdateForm({
 				return
 			}
 
-			const formData = new FormData()
-			formData.set('orgId', selectedOrgId)
-			formData.set('projectId', projectId)
-			formData.set('tags', JSON.stringify(tags))
-			formData.set('start', start)
-			formData.set('end', end)
-
-			if (mode === 'add') {
-				formData.set('intent', 'add')
+			if (mode === 'add' || mode === 'addBetween') {
+				addBookingApi.submit({
+					body: { end, projectId, start, tags },
+					orgId: selectedOrgId,
+				})
 			} else if (mode === 'update' && itemUpdate) {
-				formData.set('intent', 'update')
-				formData.set('bookingId', itemUpdate.id)
+				updateBookingApi.submit({
+					body: {
+						end: end || undefined,
+						projectId,
+						start: start || undefined,
+						tags,
+					},
+					bookingId: itemUpdate.id,
+					orgId: selectedOrgId,
+				})
 			}
-
-			void fetcher.submit(formData, {
-				action: '/api/bookings',
-				method: 'post',
-			})
 		},
-		[selectedOrgId, mode, itemUpdate, fetcher],
+		[selectedOrgId, mode, itemUpdate, addBookingApi, updateBookingApi],
 	)
 
 	return (
 		<FormProvider {...hookForm}>
-			<form onSubmit={hookForm.handleSubmit(onSubmit)}>
-				<FormBody>
-					<FieldSet>
-						<FormElement
-							htmlFor="projectId"
-							label={t('projects.label', {
-								defaultValue: 'Project',
-							})}
-							required
-						>
-							<ProjectSelect
-								fallbackProject={itemUpdate?.projectReference}
-								id="projectId"
-								name="projectId"
-								projects={projects}
-								required
-							/>
-						</FormElement>
-						<FormElement
-							htmlFor="tags"
-							label={t('tags.label', {
-								defaultValue: 'Tags',
-							})}
-						>
-							<InputTagsAutocomplete
-								id="tags"
-								name="tags"
-								suggestions={projectTags}
-							/>
-						</FormElement>
-					</FieldSet>
+			<div className="relative w-full overflow-hidden">
+				{/* Preset panel — slides in from right */}
+				<div
+					className="bg-base-100 absolute inset-0 z-20 transition-transform duration-300 ease-out"
+					style={{
+						transform: showPresetPanel ? 'translateX(0)' : 'translateX(100%)',
+					}}
+				>
+					<BookingPresetSelector
+						favorites={favorites}
+						onBack={() => setShowPresetPanel(false)}
+						onSelect={handlePresetSelect}
+						orgBookings={orgBookings}
+						recentBookings={recentBookings}
+					/>
+				</div>
 
-					<FieldSet className="flex items-start gap-4">
-						<div className="flex-grow space-y-4 pb-6">
-							<FormElement
-								htmlFor="start"
-								label={t('common.time.starts', {
-									defaultValue: 'Starts',
-								})}
-								labelActionSlot={startResetButton}
-							>
-								<InputDatePicker
-									name="start"
-									onRenderLabelAction={setStartResetButton}
-									rules={{ required: true }}
-								/>
-							</FormElement>
-							<FormElement
-								htmlFor="end"
-								label={t('common.time.ends', {
-									defaultValue: 'Ends',
-								})}
-								labelActionSlot={endResetButton}
-							>
-								<InputDatePicker
-									name="end"
-									onRenderLabelAction={setEndResetButton}
-									rules={{ required: true }}
-								/>
-							</FormElement>
-						</div>
-						<div className="flex w-28 flex-col items-center pt-8">
-							<InputDatePickerDuration
-								endFieldName="end"
-								startFieldName="start"
-							/>
-						</div>
-					</FieldSet>
-
-					{showDurationWarning && (
-						<div className="alert alert-warning mb-4" role="alert">
-							<LucideIcon icon={HelpCircle} size={20} />
-							<div className="flex flex-col gap-1">
-								<div className="font-semibold">
-									{t('bookings.warnings.longDuration', {
-										defaultValue: 'Long duration detected',
+				{/* Form content — slides left when presets are shown */}
+				<div
+					className="relative w-full transition-transform duration-300 ease-out"
+					style={{
+						transform: showPresetPanel ? 'translateX(-100%)' : 'translateX(0)',
+					}}
+				>
+					<form onSubmit={hookForm.handleSubmit(onSubmit)}>
+						<FormBody>
+							<FieldSet>
+								<div className="mb-4 flex gap-2">
+									<Button
+										className="flex-1 gap-2"
+										onClick={() => setShowPresetPanel(true)}
+										size="sm"
+										type="button"
+										variant="neutral"
+									>
+										{t('bookings.presets.browse', {
+											defaultValue: 'Browse presets',
+										})}
+										<LucideIcon icon={ArrowRight} size={16} />
+									</Button>
+									<ModalHelpButton helpKey="modal-add-edit-booking" />
+								</div>
+								<FormElement
+									htmlFor="projectId"
+									label={t('projects.label', {
+										defaultValue: 'Project',
 									})}
-								</div>
-								<div className="text-sm">
-									{t(
-										'bookings.warnings.longDurationDescription',
-										{
-											defaultValue:
-												'This booking is longer than a typical 8-hour work day. Please verify that the start and end times are correct.',
-											hours: durationHours.toFixed(1),
-										},
-									)}
-								</div>
-							</div>
-						</div>
-					)}
+									required
+								>
+									<ProjectSelect
+										fallbackProject={itemUpdate?.projectReference}
+										id="projectId"
+										name="projectId"
+										projects={projects}
+										required
+									/>
+								</FormElement>
+								<FormElement
+									htmlFor="tags"
+									label={t('tags.label', {
+										defaultValue: 'Tags',
+									})}
+								>
+									<InputTagsAutocomplete
+										id="tags"
+										name="tags"
+										suggestions={projectTags}
+									/>
+								</FormElement>
+							</FieldSet>
 
-					<ButtonGroup>
-						<Button disabled={isSubmitting} type="submit">
-							{t('common.actions.save', {
-								defaultValue: 'Save',
-							})}
-						</Button>
-						<Button
-							onClick={onClose}
-							type="button"
-							variant="secondary"
-						>
-							{t('common.actions.close', {
-								defaultValue: 'Close',
-							})}
-						</Button>
-					</ButtonGroup>
-				</FormBody>
-			</form>
+							<FieldSet className="flex items-start gap-4">
+								<div className="flex-grow space-y-4 pb-6">
+									<FormElement
+										htmlFor="start"
+										label={t('common.time.starts', {
+											defaultValue: 'Starts',
+										})}
+										labelActionSlot={startResetButton}
+									>
+										<InputDatePicker
+											name="start"
+											onRenderLabelAction={setStartResetButton}
+											rules={{ required: true }}
+											{...presetStart}
+										/>
+									</FormElement>
+									<FormElement
+										htmlFor="end"
+										label={t('common.time.ends', {
+											defaultValue: 'Ends',
+										})}
+										labelActionSlot={endResetButton}
+									>
+										<InputDatePicker
+											name="end"
+											onRenderLabelAction={setEndResetButton}
+											rules={{ required: true }}
+											{...presetEnd}
+										/>
+									</FormElement>
+								</div>
+								<div className="flex w-28 flex-col items-center pt-8">
+									<InputDatePickerDuration
+										endFieldName="end"
+										startFieldName="start"
+									/>
+								</div>
+							</FieldSet>
+
+							{showDurationWarning && (
+								<div className="alert alert-warning mb-4" role="alert">
+									<LucideIcon icon={HelpCircle} size={20} />
+									<div className="flex flex-col gap-1">
+										<div className="font-semibold">
+											{t('bookings.warnings.longDuration', {
+												defaultValue: 'Long duration detected',
+											})}
+										</div>
+										<div className="text-sm">
+											{t('bookings.warnings.longDurationDescription', {
+												defaultValue:
+													'This booking is longer than a typical 8-hour work day. Please verify that the start and end times are correct.',
+												hours: durationHours.toFixed(1),
+											})}
+										</div>
+									</div>
+								</div>
+							)}
+
+							<ButtonGroup>
+								<Button disabled={isSubmitting} type="submit">
+									{t('common.actions.save', {
+										defaultValue: 'Save',
+									})}
+								</Button>
+								<Button onClick={onClose} type="button" variant="secondary">
+									{t('common.actions.close', {
+										defaultValue: 'Close',
+									})}
+								</Button>
+							</ButtonGroup>
+						</FormBody>
+					</form>
+				</div>
+			</div>
 		</FormProvider>
 	)
 }
