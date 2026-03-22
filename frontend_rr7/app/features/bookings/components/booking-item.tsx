@@ -17,46 +17,45 @@
  *
  */
 
-import { format } from 'date-fns'
-
+import { TagList } from '~/components/ui/data-display/tag-list'
 import { type AugmentedBooking } from '~/lib/api/functions/augment-bookings-list'
-import { durationAsString } from '~/lib/utils/duration'
+import { cn } from '~/lib/utils/cn'
 
-const TIME_FORMAT = 'HH:mm'
+import { BookingDuration } from './booking-duration'
+import { BookingFromTo } from './booking-from-to'
+import { BookingFromToMobile } from './booking-from-to-mobile'
+import { BookingItemContext } from './booking-item-context'
+import { BookingName } from './booking-name'
 
-export const BookingItem = ({ item }: { item: AugmentedBooking }) => {
-	const startTime = format(new Date(item.start.dateTime), TIME_FORMAT)
-	const endTime = item.end
-		? format(new Date(item.end.dateTime), TIME_FORMAT)
-		: '...'
-	const duration = item.end
-		? durationAsString(item.start.dateTime, item.end.dateTime)
-		: ''
+type Props = {
+	item: AugmentedBooking
+}
 
-	const projectName = item.projectReference?.key ?? 'Unknown'
-
+export const BookingItem = ({ item }: Props) => {
 	return (
-		<div className="border-base-content/10 flex items-center gap-3 border-b px-4 py-3 last:border-b-0">
-			<div className="flex min-w-0 flex-1 flex-col gap-0.5">
-				<span className="truncate font-medium">{projectName}</span>
-				{item.tags && item.tags.length > 0 && (
-					<div className="flex flex-wrap gap-1">
-						{item.tags.map((tag) => (
-							<span
-								className="badge badge-xs badge-outline"
-								key={`${tag.id}-${tag.type}`}
-							>
-								{tag.id}
-							</span>
-						))}
-					</div>
-				)}
+		<div
+			className={cn(
+				'relative grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-2 py-3 md:gap-4 md:px-4',
+				item.overlapsWithNext
+					? 'border-warning border-b-4 border-dotted'
+					: 'border-base-content/20 border-b',
+				item.isMostRecent && 'border-base-content/20 border-t',
+			)}
+		>
+			<div className="flex w-full min-w-0 flex-col gap-3">
+				<BookingName item={item} />
+				<TagList items={item.tags} />
 			</div>
-			<div className="text-base-content/60 flex flex-col items-end text-sm">
-				<span>
-					{startTime} – {endTime}
-				</span>
-				{duration && <span className="text-xs">{duration}</span>}
+			<div className="flex h-full flex-row items-center justify-start gap-3 md:gap-4">
+				<div className="hidden h-full flex-row items-center justify-start gap-2 md:flex md:gap-4">
+					<BookingFromTo item={item} />
+					<BookingDuration item={item} />
+				</div>
+				<div className="flex h-full flex-col items-end justify-center gap-2 md:hidden">
+					<BookingFromToMobile item={item} />
+					<BookingDuration item={item} />
+				</div>
+				<BookingItemContext item={item} />
 			</div>
 		</div>
 	)

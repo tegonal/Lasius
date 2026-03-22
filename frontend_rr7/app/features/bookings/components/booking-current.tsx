@@ -17,18 +17,34 @@
  *
  */
 
-import { SquareIcon } from 'lucide-react'
+import { roundToNearestMinutes } from 'date-fns'
+import { ClockIcon, SquareIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useRouteLoaderData } from 'react-router'
 
+import { ContextMenuProvider } from '~/components/features/context-menu/hooks/use-context-menu'
 import { Button } from '~/components/primitives/buttons/button'
+import { TagList } from '~/components/ui/data-display/tag-list'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+import { useStopBooking } from '~/hooks/use-stop-booking'
+import { formatISOLocale } from '~/lib/utils/dates'
+import { type ModelsBooking } from '~/services/api/lasius'
 import { type ModelsCurrentUserTimeBooking } from '~/services/api/lasius/modelsCurrentUserTimeBooking'
+
+import { BookingCurrentEntryContext } from './booking-current-entry-context'
+import { BookingDurationCounter } from './booking-duration-counter'
+import { BookingFrom } from './booking-from'
+import { BookingName } from './booking-name'
+
+type HomeLoaderData = {
+	currentBooking: ModelsCurrentUserTimeBooking | undefined
+	selectedOrgId: string
+}
 
 export const BookingCurrent = () => {
 	const loaderData = useRouteLoaderData('routes/user.home._index') as
+		| HomeLoaderData
 		| undefined
-		| { currentBooking: ModelsCurrentUserTimeBooking | undefined }
 
 	const currentBooking = loaderData?.currentBooking
 
@@ -37,7 +53,12 @@ export const BookingCurrent = () => {
 			{!currentBooking?.booking ? (
 				<NoBooking />
 			) : (
-				<CurrentBookingEntry booking={currentBooking.booking} />
+				<ContextMenuProvider>
+					<CurrentBookingEntry
+						booking={currentBooking.booking}
+						selectedOrgId={loaderData?.selectedOrgId ?? ''}
+					/>
+				</ContextMenuProvider>
 			)}
 		</div>
 	)
@@ -46,60 +67,73 @@ export const BookingCurrent = () => {
 const NoBooking = () => {
 	const { t } = useTranslation('common')
 	return (
-		<div className="text-base-content/60 flex items-center justify-center gap-2">
-			<span className="text-sm">
-				{t('bookings.noCurrentBooking', {
-					defaultValue: 'No booking running',
+		<div className="flex h-full w-full flex-row items-center justify-center gap-3">
+			<div>
+				<LucideIcon icon={ClockIcon} size={24} />
+			</div>
+			<div>
+				{t('bookings.status.currentlyNotBooking', {
+					defaultValue: 'Currently not booking',
 				})}
-			</span>
+			</div>
 		</div>
 	)
 }
 
 const CurrentBookingEntry = ({
 	booking,
+	selectedOrgId,
 }: {
-	booking: NonNullable<ModelsCurrentUserTimeBooking['booking']>
+	booking: ModelsBooking
+	selectedOrgId: string
 }) => {
 	const { t } = useTranslation('common')
+	const stopBookingApi = useStopBooking()
 
-	const projectName =
-		booking.projectReference?.key ??
-		t('bookings.unknownProject', { defaultValue: 'Unknown' })
+	const stop = () => {
+		const endTime = roundToNearestMinutes(new Date(), {
+			roundingMethod: 'floor',
+		})
+		stopBookingApi.submit({
+			bookingId: booking.id,
+			end: formatISOLocale(endTime),
+			orgId: selectedOrgId,
+			projectId: booking.projectReference?.id || '',
+			start: booking.start?.dateTime || '',
+			tags: booking.tags || [],
+		})
+	}
 
 	return (
 		<div className="grid h-full w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 lg:gap-4">
 			<Button
-				className="text-error"
 				fullWidth={false}
+				onClick={stop}
 				title={t('bookings.actions.stopRecording', {
 					defaultValue: 'Stop recording current time booking',
 				})}
-				variant="ghost"
+				variant="stopRecording"
 			>
 				<LucideIcon icon={SquareIcon} size={24} />
 			</Button>
 			<div className="flex w-full min-w-0 flex-col gap-1 overflow-hidden leading-normal">
-				<span className="truncate font-semibold">{projectName}</span>
-				{booking.tags && booking.tags.length > 0 && (
-					<div className="flex flex-wrap gap-1">
-						{booking.tags.map((tag) => (
-							<span
-								className="badge badge-sm badge-outline"
-								key={`${tag.id}-${tag.type}`}
-							>
-								{tag.id}
-							</span>
-						))}
-					</div>
-				)}
+				<BookingName item={booking} />
+				<TagList items={booking.tags} />
 			</div>
-			<div className="text-base-content/60 text-sm">
-				{booking.start?.dateTime &&
-					new Date(booking.start.dateTime).toLocaleTimeString([], {
-						hour: '2-digit',
-						minute: '2-digit',
-					})}
+			<div className="flex flex-row items-center justify-center gap-2 lg:gap-4">
+				<div className="hidden h-full flex-row items-center justify-start gap-2 md:flex lg:gap-4">
+					<BookingFrom startDate={booking.start?.dateTime} />
+					<BookingDurationCounter
+						startDate={booking.start?.dateTime || formatISOLocale(new Date())}
+					/>
+				</div>
+				<div className="flex h-full flex-col items-end justify-center gap-1 md:hidden">
+					<BookingFrom startDate={booking.start?.dateTime} />
+					<BookingDurationCounter
+						startDate={booking.start?.dateTime || formatISOLocale(new Date())}
+					/>
+				</div>
+				<BookingCurrentEntryContext item={booking} />
 			</div>
 		</div>
 	)

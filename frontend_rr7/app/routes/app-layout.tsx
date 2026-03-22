@@ -30,6 +30,7 @@ import {
 
 import { DevInfoBadge } from '~/components/features/system/dev-info-badge'
 import { Button } from '~/components/primitives/buttons/button'
+import { TokenWatcher } from '~/components/token-watcher'
 import { Logo } from '~/components/ui/icons/logo'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { TegonalFooter } from '~/components/ui/navigation/tegonal-footer'
@@ -37,6 +38,7 @@ import { CalendarWeek } from '~/features/calendar/components/calendar-week'
 import { HelpButton } from '~/features/help/components/help-button'
 import { OrgSwitcher } from '~/features/organisation/components/org-switcher'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
+import { WebSocketEventHandler } from '~/features/system/websocket/websocket-event-handler'
 import { getUserProfile } from '~/services/api/lasius/user/user'
 import {
 	authHeaders,
@@ -164,6 +166,8 @@ export default function AppLayout(_props: Route.ComponentProps) {
 			</section>
 
 			<DevInfoBadge />
+			<TokenWatcher />
+			<WebSocketEventHandler />
 		</div>
 	)
 }

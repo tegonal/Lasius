@@ -23,6 +23,7 @@ export interface LasiusSessionData {
 	accessToken: string
 	email: string
 	expiresAt: number // ms timestamp (Date.now())
+	issuedAt: number // ms timestamp — when the token was issued or last refreshed
 	refreshToken: string
 	tokenIssuer: AuthProvider
 	userId: string

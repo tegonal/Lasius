@@ -17,7 +17,7 @@
  *
  */
 
-import { createCookieSessionStorage, redirect } from 'react-router'
+import { createCookieSessionStorage, href, redirect } from 'react-router'
 
 import { logger } from '~/lib/logger'
 
@@ -25,6 +25,20 @@ import { getProvider } from './providers'
 import { type LasiusSessionData } from './types'
 
 export type { LasiusSessionData }
+
+/**
+ * In-flight refresh dedup: when multiple parallel loaders call getSessionTokens()
+ * with the same refresh token, only the first one actually refreshes. Others await
+ * the same promise. Keyed by refresh token to handle concurrent requests correctly.
+ */
+const inflightRefreshes = new Map<
+	string,
+	Promise<null | {
+		access_token: string
+		expires_in: number
+		refresh_token?: string
+	}>
+>()
 
 function getSessionStorage() {
 	const secret = process.env.AUTH_SECRET
@@ -65,7 +79,7 @@ export async function createUserSession(
 /** Destroy the user session and redirect to login */
 export async function destroyUserSession(
 	request: Request,
-	redirectTo = '/login',
+	redirectTo = href('/login'),
 ): Promise<Response> {
 	const session = await getUserSession(request)
 
@@ -90,37 +104,48 @@ export async function getSessionTokens(
 		return null
 	}
 
-	// Check if token is expired (with 60s buffer for clock skew)
-	if (user.expiresAt < Date.now() + 60_000) {
-		logger.debug('Access token expired, attempting refresh')
+	// Sliding-window refresh: refresh once past the midpoint of the token's lifetime.
+	// This ensures any page load or navigation extends the session proactively,
+	// rather than waiting until the last 60s before expiry.
+	// For pre-migration sessions without issuedAt, assume token was issued
+	// 5 minutes ago to avoid triggering an immediate refresh storm.
+	const fallbackIssuedAt = user.expiresAt - 300_000
+	const issuedAt = user.issuedAt ?? fallbackIssuedAt
+	const tokenLifetime = user.expiresAt - issuedAt
+	const halfLife = tokenLifetime > 0 ? tokenLifetime / 2 : 60_000
+	const needsRefresh = Date.now() > issuedAt + halfLife
 
-		try {
-			const provider = getProvider(user.tokenIssuer)
-			const refreshed = await provider.refreshToken(user.refreshToken)
+	if (needsRefresh) {
+		logger.debug('Access token past half-life, refreshing')
 
-			if (refreshed) {
-				logger.debug('Token refresh successful')
+		const refreshKey = user.refreshToken
+		const refreshed = await deduplicatedRefresh(refreshKey, user)
 
-				const updatedUser: LasiusSessionData = {
-					...user,
-					accessToken: refreshed.access_token,
-					expiresAt: Date.now() + refreshed.expires_in * 1000,
-					refreshToken: refreshed.refresh_token ?? user.refreshToken,
-				}
+		if (refreshed) {
+			logger.debug('Token refresh successful')
 
-				session.set('user', updatedUser)
-				const setCookie = await commitSession(session)
-
-				return {
-					headers: { 'Set-Cookie': setCookie },
-					tokens: updatedUser,
-				}
+			const now = Date.now()
+			const updatedUser: LasiusSessionData = {
+				...user,
+				accessToken: refreshed.access_token,
+				expiresAt: now + refreshed.expires_in * 1000,
+				issuedAt: now,
+				refreshToken: refreshed.refresh_token ?? user.refreshToken,
 			}
-		} catch (error) {
-			logger.warn('Token refresh failed, user needs to re-login', error)
+
+			session.set('user', updatedUser)
+			const setCookie = await commitSession(session)
+
+			return {
+				headers: { 'Set-Cookie': setCookie },
+				tokens: updatedUser,
+			}
 		}
 
-		return null
+		// Refresh failed — the refresh token is invalid (e.g. backend restarted).
+		// Force logout so the user gets a fresh session with valid tokens.
+		logger.warn('Refresh token invalid, forcing logout')
+		throw await destroyUserSession(request)
 	}
 
 	return { tokens: user }
@@ -145,6 +170,64 @@ function commitSession(
 	...args: Parameters<ReturnType<typeof getSessionStorage>['commitSession']>
 ) {
 	return sessionStorage().commitSession(...args)
+}
+
+/** Backoff delays for token refresh retries: 500ms → 1s → 2s */
+const REFRESH_BACKOFF_MS = [500, 1000, 2000]
+
+/**
+ * Deduplicate concurrent refresh calls: if multiple parallel loaders trigger a refresh
+ * with the same refresh token, only one network request is made. Retries up to 3 times
+ * with exponential backoff (500ms → 1s → 2s) before giving up.
+ */
+async function deduplicatedRefresh(
+	refreshKey: string,
+	user: LasiusSessionData,
+): Promise<null | {
+	access_token: string
+	expires_in: number
+	refresh_token?: string
+}> {
+	const inflight = inflightRefreshes.get(refreshKey)
+	if (inflight) {
+		logger.debug('Joining in-flight refresh for dedup')
+		return inflight
+	}
+
+	const promise = (async () => {
+		const provider = getProvider(user.tokenIssuer)
+
+		for (let i = 0; i <= REFRESH_BACKOFF_MS.length; i++) {
+			try {
+				return await provider.refreshToken(user.refreshToken)
+			} catch (error) {
+				if (i < REFRESH_BACKOFF_MS.length) {
+					const delay = REFRESH_BACKOFF_MS[i]
+					logger.warn(
+						`Token refresh attempt ${i + 1} failed, retrying in ${delay}ms`,
+						error,
+					)
+					await new Promise((r) => setTimeout(r, delay))
+				} else {
+					logger.warn(
+						`Token refresh failed after ${REFRESH_BACKOFF_MS.length + 1} attempts`,
+						error,
+					)
+					return null
+				}
+			}
+		}
+
+		return null
+	})()
+
+	inflightRefreshes.set(refreshKey, promise)
+
+	try {
+		return await promise
+	} finally {
+		inflightRefreshes.delete(refreshKey)
+	}
 }
 
 function destroySession(

@@ -97,7 +97,7 @@ export const computeWorkHealthMetrics = (
 		weeks.push({
 			hours: weekData?.hours || 0,
 			plannedHours: plannedWeeklyHours,
-			weekLabel: `W${weekNum}`,
+			weekLabel: `W${weekNum}/${year}`,
 			weekNumber: weekNum,
 			year,
 		})

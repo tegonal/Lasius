@@ -36,6 +36,7 @@ import { getExpectedVsBookedPercentage } from '~/lib/api/functions/get-expected-
 import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
 import { getPlannedHoursForRange } from '~/lib/api/functions/get-planned-working-hours'
 import { apiTimespanMonth, formatISOLocale } from '~/lib/utils/dates'
+import { cachedServerLoader } from '~/lib/utils/loader-cache'
 import { type ModelsBooking } from '~/services/api/lasius'
 import {
 	getUserBookingAggregatedStatsByOrganisation,
@@ -55,6 +56,14 @@ const MonthStreamChart = lazy(() =>
 		default: mod.MonthStreamChart,
 	})),
 )
+
+// ─── Client Loader (cache unless full-page refresh) ──────────────────────────
+
+export const clientLoader = async ({
+	request,
+	serverLoader,
+}: Route.ClientLoaderArgs) => cachedServerLoader(request, serverLoader)
+clientLoader.hydrate = false
 
 // ─── Stream chart computation ────────────────────────────────────────────────
 
@@ -172,7 +181,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 			{
 				from: format(monthStartDate, 'yyyy-MM-dd'),
 				granularity: 'Day',
-				source: 'Project',
+				source: 'project',
 				to: format(monthEndDate, 'yyyy-MM-dd'),
 			},
 			{ headers },
@@ -195,10 +204,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 	)
 
 	// Aggregate top projects
-	const topProjects = aggregateProjectHours(
-		projectStats as unknown as Record<string, unknown>[],
-		5,
-	)
+	const topProjects = aggregateProjectHours(projectStats, 5)
 
 	// Compute stream chart data
 	const streamChart = computeStreamChartData(monthBookings, selectedDate)

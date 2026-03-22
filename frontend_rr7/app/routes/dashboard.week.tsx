@@ -28,6 +28,7 @@ import { getExpectedVsBookedPercentage } from '~/lib/api/functions/get-expected-
 import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
 import { getPlannedHoursForRange } from '~/lib/api/functions/get-planned-working-hours'
 import { apiTimespanWeek, formatISOLocale } from '~/lib/utils/dates'
+import { cachedServerLoader } from '~/lib/utils/loader-cache'
 import {
 	getUserBookingAggregatedStatsByOrganisation,
 	getUserBookingListByOrganisation,
@@ -40,6 +41,14 @@ import {
 } from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/dashboard.week'
+
+// ─── Client Loader (cache unless full-page refresh) ──────────────────────────
+
+export const clientLoader = async ({
+	request,
+	serverLoader,
+}: Route.ClientLoaderArgs) => cachedServerLoader(request, serverLoader)
+clientLoader.hydrate = false
 
 // ─── Loader ──────────────────────────────────────────────────────────────────
 
@@ -86,7 +95,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 			{
 				from: format(weekStartDate, 'yyyy-MM-dd'),
 				granularity: 'Day',
-				source: 'Project',
+				source: 'project',
 				to: format(weekEndDate, 'yyyy-MM-dd'),
 			},
 			{ headers },
@@ -109,10 +118,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 	)
 
 	// Aggregate top 5 projects
-	const topProjects = aggregateProjectHours(
-		projectStats as unknown as Record<string, unknown>[],
-		5,
-	)
+	const topProjects = aggregateProjectHours(projectStats, 5)
 
 	// Get week number
 	const weekNumber = getWeek(dateObj, { weekStartsOn: 1 })

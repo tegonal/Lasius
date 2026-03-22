@@ -46,6 +46,8 @@ export default [
 		route('theme', 'routes/api.theme.ts'),
 		route('calendar-bookings', 'routes/api.calendar-bookings.ts'),
 		route('org-switch', 'routes/api.org-switch.ts'),
+		route('booking-form-data', 'routes/api.booking-form-data.ts'),
+		route('proxy', 'routes/api.proxy.ts'),
 	]),
 
 	// Authenticated app routes — requireUser redirects to /login if unauthenticated
@@ -56,15 +58,15 @@ export default [
 		...prefix('user', [
 			layout('routes/user.home.tsx', [
 				route('home', 'routes/user.home._index.tsx'),
-			]),
-			...prefix('dashboard', [
-				layout('routes/dashboard.tsx', [
-					index('routes/dashboard._index.tsx'),
-					route('day', 'routes/dashboard.day.tsx'),
-					route('week', 'routes/dashboard.week.tsx'),
-					route('month', 'routes/dashboard.month.tsx'),
-					route('6months', 'routes/dashboard.6months.tsx'),
-					route('year', 'routes/dashboard.year.tsx'),
+				...prefix('dashboard', [
+					layout('routes/dashboard.tsx', [
+						index('routes/dashboard._index.tsx'),
+						route('day', 'routes/dashboard.day.tsx'),
+						route('week', 'routes/dashboard.week.tsx'),
+						route('month', 'routes/dashboard.month.tsx'),
+						route('6months', 'routes/dashboard.6months.tsx'),
+						route('year', 'routes/dashboard.year.tsx'),
+					]),
 				]),
 			]),
 		]),

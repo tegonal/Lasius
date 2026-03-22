@@ -19,13 +19,19 @@
 
 import { describe, expect, it } from 'vitest'
 
-import { authHeaders } from './auth-helpers.server'
+import {
+	authHeaders,
+	type AuthResult,
+	mergeAuthHeaders,
+	sanitizeReturnTo,
+} from './auth-helpers.server'
 import { type LasiusSessionData } from './types'
 
 const mockSession: LasiusSessionData = {
 	accessToken: 'test-access-token',
 	email: 'test@example.com',
 	expiresAt: Date.now() + 3600_000,
+	issuedAt: Date.now(),
 	refreshToken: 'test-refresh-token',
 	tokenIssuer: 'keycloak',
 	userId: 'user-123',
@@ -47,5 +53,84 @@ describe('authHeaders', () => {
 		}
 		const headers = authHeaders(internalSession)
 		expect(headers['X-Token-Issuer']).toBe('internal')
+	})
+})
+
+describe('sanitizeReturnTo', () => {
+	it('allows a valid relative path', () => {
+		expect(sanitizeReturnTo('/dashboard')).toBe('/dashboard')
+	})
+
+	it('allows nested relative paths', () => {
+		expect(sanitizeReturnTo('/org/123/projects')).toBe('/org/123/projects')
+	})
+
+	it('rejects empty string', () => {
+		expect(sanitizeReturnTo('')).toBe('/')
+	})
+
+	it('rejects protocol-relative URLs', () => {
+		expect(sanitizeReturnTo('//evil.com')).toBe('/')
+	})
+
+	it('rejects absolute URLs', () => {
+		expect(sanitizeReturnTo('https://evil.com')).toBe('/')
+	})
+
+	it('rejects paths not starting with /', () => {
+		expect(sanitizeReturnTo('evil.com/path')).toBe('/')
+	})
+
+	it('rejects backslash paths', () => {
+		expect(sanitizeReturnTo('/\\evil.com')).toBe('/')
+	})
+
+	it('rejects paths with embedded backslashes', () => {
+		expect(sanitizeReturnTo('/foo\\bar')).toBe('/')
+	})
+
+	it('uses custom fallback', () => {
+		expect(sanitizeReturnTo('', '/home')).toBe('/home')
+	})
+})
+
+describe('mergeAuthHeaders', () => {
+	it('returns empty headers when authResult has no headers', () => {
+		const authResult: AuthResult = { session: mockSession }
+		const merged = mergeAuthHeaders(authResult)
+		expect(merged.get('Set-Cookie')).toBeNull()
+	})
+
+	it('propagates Set-Cookie from Headers instance', () => {
+		const setCookieHeaders = new Headers({
+			'Set-Cookie': 'session=abc123',
+		})
+		const authResult: AuthResult = {
+			headers: setCookieHeaders,
+			session: mockSession,
+		}
+		const merged = mergeAuthHeaders(authResult)
+		expect(merged.get('Set-Cookie')).toBe('session=abc123')
+	})
+
+	it('propagates Set-Cookie from plain object', () => {
+		const authResult: AuthResult = {
+			headers: { 'Set-Cookie': 'session=abc123' },
+			session: mockSession,
+		}
+		const merged = mergeAuthHeaders(authResult)
+		expect(merged.get('Set-Cookie')).toBe('session=abc123')
+	})
+
+	it('preserves existing response headers', () => {
+		const authResult: AuthResult = {
+			headers: { 'Set-Cookie': 'session=abc123' },
+			session: mockSession,
+		}
+		const merged = mergeAuthHeaders(authResult, {
+			'Content-Type': 'application/json',
+		})
+		expect(merged.get('Content-Type')).toBe('application/json')
+		expect(merged.get('Set-Cookie')).toBe('session=abc123')
 	})
 })

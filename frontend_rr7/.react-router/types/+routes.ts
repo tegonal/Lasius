@@ -49,12 +49,48 @@ type Pages = {
       "slug": string;
     };
   };
+  "/api/theme": {
+    params: {};
+  };
+  "/api/calendar-bookings": {
+    params: {};
+  };
+  "/api/org-switch": {
+    params: {};
+  };
+  "/api/booking-form-data": {
+    params: {};
+  };
+  "/api/proxy": {
+    params: {};
+  };
+  "/user/home": {
+    params: {};
+  };
+  "/user/dashboard": {
+    params: {};
+  };
+  "/user/dashboard/day": {
+    params: {};
+  };
+  "/user/dashboard/week": {
+    params: {};
+  };
+  "/user/dashboard/month": {
+    params: {};
+  };
+  "/user/dashboard/6months": {
+    params: {};
+  };
+  "/user/dashboard/year": {
+    params: {};
+  };
 };
 
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/login" | "/logout" | "/internal-oauth/login" | "/internal-oauth/register" | "/oauth/:provider/login" | "/oauth/callback" | "/api/session-status" | "/api/locales/:lang/:ns" | "/api/help/:locale/:slug";
+    page: "/" | "/login" | "/logout" | "/internal-oauth/login" | "/internal-oauth/register" | "/oauth/:provider/login" | "/oauth/callback" | "/api/session-status" | "/api/locales/:lang/:ns" | "/api/help/:locale/:slug" | "/api/theme" | "/api/calendar-bookings" | "/api/org-switch" | "/api/booking-form-data" | "/api/proxy" | "/user/home" | "/user/dashboard" | "/user/dashboard/day" | "/user/dashboard/week" | "/user/dashboard/month" | "/user/dashboard/6months" | "/user/dashboard/year";
   };
   "routes/login.tsx": {
     id: "routes/login";
@@ -92,13 +128,69 @@ type RouteFiles = {
     id: "routes/api.help.$locale.$slug";
     page: "/api/help/:locale/:slug";
   };
+  "routes/api.theme.ts": {
+    id: "routes/api.theme";
+    page: "/api/theme";
+  };
+  "routes/api.calendar-bookings.ts": {
+    id: "routes/api.calendar-bookings";
+    page: "/api/calendar-bookings";
+  };
+  "routes/api.org-switch.ts": {
+    id: "routes/api.org-switch";
+    page: "/api/org-switch";
+  };
+  "routes/api.booking-form-data.ts": {
+    id: "routes/api.booking-form-data";
+    page: "/api/booking-form-data";
+  };
+  "routes/api.proxy.ts": {
+    id: "routes/api.proxy";
+    page: "/api/proxy";
+  };
   "routes/app-layout.tsx": {
     id: "routes/app-layout";
+    page: "/" | "/user/home" | "/user/dashboard" | "/user/dashboard/day" | "/user/dashboard/week" | "/user/dashboard/month" | "/user/dashboard/6months" | "/user/dashboard/year";
+  };
+  "routes/index-redirect.ts": {
+    id: "routes/index-redirect";
     page: "/";
+  };
+  "routes/user.home.tsx": {
+    id: "routes/user.home";
+    page: "/user/home" | "/user/dashboard" | "/user/dashboard/day" | "/user/dashboard/week" | "/user/dashboard/month" | "/user/dashboard/6months" | "/user/dashboard/year";
+  };
+  "routes/user.home._index.tsx": {
+    id: "routes/user.home._index";
+    page: "/user/home";
   };
   "routes/dashboard.tsx": {
     id: "routes/dashboard";
-    page: "/";
+    page: "/user/dashboard" | "/user/dashboard/day" | "/user/dashboard/week" | "/user/dashboard/month" | "/user/dashboard/6months" | "/user/dashboard/year";
+  };
+  "routes/dashboard._index.tsx": {
+    id: "routes/dashboard._index";
+    page: "/user/dashboard";
+  };
+  "routes/dashboard.day.tsx": {
+    id: "routes/dashboard.day";
+    page: "/user/dashboard/day";
+  };
+  "routes/dashboard.week.tsx": {
+    id: "routes/dashboard.week";
+    page: "/user/dashboard/week";
+  };
+  "routes/dashboard.month.tsx": {
+    id: "routes/dashboard.month";
+    page: "/user/dashboard/month";
+  };
+  "routes/dashboard.6months.tsx": {
+    id: "routes/dashboard.6months";
+    page: "/user/dashboard/6months";
+  };
+  "routes/dashboard.year.tsx": {
+    id: "routes/dashboard.year";
+    page: "/user/dashboard/year";
   };
 };
 
@@ -113,6 +205,20 @@ type RouteModules = {
   "routes/api.session-status": typeof import("./app/routes/api.session-status.tsx");
   "routes/api.locales.$lang.$ns": typeof import("./app/routes/api.locales.$lang.$ns.ts");
   "routes/api.help.$locale.$slug": typeof import("./app/routes/api.help.$locale.$slug.ts");
+  "routes/api.theme": typeof import("./app/routes/api.theme.ts");
+  "routes/api.calendar-bookings": typeof import("./app/routes/api.calendar-bookings.ts");
+  "routes/api.org-switch": typeof import("./app/routes/api.org-switch.ts");
+  "routes/api.booking-form-data": typeof import("./app/routes/api.booking-form-data.ts");
+  "routes/api.proxy": typeof import("./app/routes/api.proxy.ts");
   "routes/app-layout": typeof import("./app/routes/app-layout.tsx");
+  "routes/index-redirect": typeof import("./app/routes/index-redirect.ts");
+  "routes/user.home": typeof import("./app/routes/user.home.tsx");
+  "routes/user.home._index": typeof import("./app/routes/user.home._index.tsx");
   "routes/dashboard": typeof import("./app/routes/dashboard.tsx");
+  "routes/dashboard._index": typeof import("./app/routes/dashboard._index.tsx");
+  "routes/dashboard.day": typeof import("./app/routes/dashboard.day.tsx");
+  "routes/dashboard.week": typeof import("./app/routes/dashboard.week.tsx");
+  "routes/dashboard.month": typeof import("./app/routes/dashboard.month.tsx");
+  "routes/dashboard.6months": typeof import("./app/routes/dashboard.6months.tsx");
+  "routes/dashboard.year": typeof import("./app/routes/dashboard.year.tsx");
 };

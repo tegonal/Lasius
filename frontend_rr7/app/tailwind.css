@@ -334,6 +334,46 @@
 		}
 	}
 
+	.animate-fade-in {
+		animation-name: fadeIn;
+	}
+
+	@keyframes star-explode {
+		0% {
+			opacity: 1;
+			transform: translate(0, 0) scale(0) rotate(0deg);
+		}
+		25% {
+			opacity: 1;
+			transform: translate(
+					calc(var(--star-tx) * 0.35),
+					calc(var(--star-ty) * 0.35 - 6px)
+				)
+				scale(1.2) rotate(calc(var(--star-rot) * 0.3));
+		}
+		50% {
+			opacity: 0.9;
+			transform: translate(
+					calc(var(--star-tx) * 0.65),
+					calc(var(--star-ty) * 0.65 - 4px)
+				)
+				scale(0.9) rotate(calc(var(--star-rot) * 0.6));
+		}
+		75% {
+			opacity: 0.5;
+			transform: translate(
+					calc(var(--star-tx) * 0.88),
+					calc(var(--star-ty) * 0.88)
+				)
+				scale(0.5) rotate(calc(var(--star-rot) * 0.85));
+		}
+		100% {
+			opacity: 0;
+			transform: translate(var(--star-tx), var(--star-ty)) scale(0)
+				rotate(var(--star-rot));
+		}
+	}
+
 	.input {
 		&:focus,
 		&:focus-within {

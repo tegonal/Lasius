@@ -41,6 +41,7 @@ import {
 	getWeeklyPlannedHours,
 } from '~/lib/api/functions/get-planned-working-hours'
 import { formatDateTimeToURLParam, formatISOLocale } from '~/lib/utils/dates'
+import { cachedServerLoader } from '~/lib/utils/loader-cache'
 import {
 	getUserBookingAggregatedStatsByOrganisation,
 	getUserBookingListByOrganisation,
@@ -59,6 +60,14 @@ const WeeklyTrendChart = lazy(() =>
 		default: mod.WeeklyTrendChart,
 	})),
 )
+
+// ─── Client Loader (cache unless full-page refresh) ──────────────────────────
+
+export const clientLoader = async ({
+	request,
+	serverLoader,
+}: Route.ClientLoaderArgs) => cachedServerLoader(request, serverLoader)
+clientLoader.hydrate = false
 
 // ─── Loader ──────────────────────────────────────────────────────────────────
 
@@ -125,7 +134,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 			{
 				from: format(rangeStart, 'yyyy-MM-dd'),
 				granularity: 'Week',
-				source: 'Project',
+				source: 'project',
 				to: format(rangeEnd, 'yyyy-MM-dd'),
 			},
 			{ headers },
@@ -157,10 +166,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 	)
 
 	// Aggregate top 5 projects
-	const topProjects = aggregateProjectHours(
-		projectStats as unknown as Record<string, unknown>[],
-		5,
-	)
+	const topProjects = aggregateProjectHours(projectStats, 5)
 
 	return data(
 		{

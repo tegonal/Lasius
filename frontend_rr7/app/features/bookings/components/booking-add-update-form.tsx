@@ -416,149 +416,145 @@ export function BookingAddUpdateForm({
 	return (
 		<FormProvider {...hookForm}>
 			<div className="relative w-full overflow-hidden">
-				{/* Preset panel — slides in from right */}
 				<div
-					className="bg-base-100 absolute inset-0 z-20 transition-transform duration-300 ease-out"
+					className="flex w-[200%] transition-transform duration-300 ease-out"
 					style={{
-						transform: showPresetPanel ? 'translateX(0)' : 'translateX(100%)',
+						transform: showPresetPanel ? 'translateX(-50%)' : 'translateX(0)',
 					}}
 				>
-					<BookingPresetSelector
-						favorites={favorites}
-						onBack={() => setShowPresetPanel(false)}
-						onSelect={handlePresetSelect}
-						orgBookings={orgBookings}
-						recentBookings={recentBookings}
-					/>
-				</div>
-
-				{/* Form content — slides left when presets are shown */}
-				<div
-					className="relative w-full transition-transform duration-300 ease-out"
-					style={{
-						transform: showPresetPanel ? 'translateX(-100%)' : 'translateX(0)',
-					}}
-				>
-					<form onSubmit={hookForm.handleSubmit(onSubmit)}>
-						<FormBody>
-							<FieldSet>
-								<div className="mb-4 flex gap-2">
-									<Button
-										className="flex-1 gap-2"
-										onClick={() => setShowPresetPanel(true)}
-										size="sm"
-										type="button"
-										variant="neutral"
-									>
-										{t('bookings.presets.browse', {
-											defaultValue: 'Browse presets',
+					{/* Form content */}
+					<div className="w-1/2">
+						<form onSubmit={hookForm.handleSubmit(onSubmit)}>
+							<FormBody>
+								<FieldSet>
+									<div className="mb-4 flex gap-2">
+										<Button
+											className="flex-1 gap-2"
+											onClick={() => setShowPresetPanel(true)}
+											size="sm"
+											type="button"
+											variant="neutral"
+										>
+											{t('bookings.presets.browse', {
+												defaultValue: 'Browse presets',
+											})}
+											<LucideIcon icon={ArrowRight} size={16} />
+										</Button>
+										<ModalHelpButton helpKey="modal-add-edit-booking" />
+									</div>
+									<FormElement
+										htmlFor="projectId"
+										label={t('projects.label', {
+											defaultValue: 'Project',
 										})}
-										<LucideIcon icon={ArrowRight} size={16} />
-									</Button>
-									<ModalHelpButton helpKey="modal-add-edit-booking" />
-								</div>
-								<FormElement
-									htmlFor="projectId"
-									label={t('projects.label', {
-										defaultValue: 'Project',
-									})}
-									required
-								>
-									<ProjectSelect
-										fallbackProject={itemUpdate?.projectReference}
-										id="projectId"
-										name="projectId"
-										projects={projects}
 										required
-									/>
-								</FormElement>
-								<FormElement
-									htmlFor="tags"
-									label={t('tags.label', {
-										defaultValue: 'Tags',
-									})}
-								>
-									<InputTagsAutocomplete
-										id="tags"
-										name="tags"
-										suggestions={projectTags}
-									/>
-								</FormElement>
-							</FieldSet>
-
-							<FieldSet className="flex items-start gap-4">
-								<div className="flex-grow space-y-4 pb-6">
-									<FormElement
-										htmlFor="start"
-										label={t('common.time.starts', {
-											defaultValue: 'Starts',
-										})}
-										labelActionSlot={startResetButton}
 									>
-										<InputDatePicker
-											name="start"
-											onRenderLabelAction={setStartResetButton}
-											rules={{ required: true }}
-											{...presetStart}
+										<ProjectSelect
+											fallbackProject={itemUpdate?.projectReference}
+											id="projectId"
+											name="projectId"
+											projects={projects}
+											required
 										/>
 									</FormElement>
 									<FormElement
-										htmlFor="end"
-										label={t('common.time.ends', {
-											defaultValue: 'Ends',
+										htmlFor="tags"
+										label={t('tags.label', {
+											defaultValue: 'Tags',
 										})}
-										labelActionSlot={endResetButton}
 									>
-										<InputDatePicker
-											name="end"
-											onRenderLabelAction={setEndResetButton}
-											rules={{ required: true }}
-											{...presetEnd}
+										<InputTagsAutocomplete
+											id="tags"
+											name="tags"
+											suggestions={projectTags}
 										/>
 									</FormElement>
-								</div>
-								<div className="flex w-28 flex-col items-center pt-8">
-									<InputDatePickerDuration
-										endFieldName="end"
-										startFieldName="start"
-									/>
-								</div>
-							</FieldSet>
+								</FieldSet>
 
-							{showDurationWarning && (
-								<div className="alert alert-warning mb-4" role="alert">
-									<LucideIcon icon={HelpCircle} size={20} />
-									<div className="flex flex-col gap-1">
-										<div className="font-semibold">
-											{t('bookings.warnings.longDuration', {
-												defaultValue: 'Long duration detected',
+								<FieldSet className="flex items-start gap-4">
+									<div className="flex-grow space-y-4 pb-6">
+										<FormElement
+											htmlFor="start"
+											label={t('common.time.starts', {
+												defaultValue: 'Starts',
 											})}
-										</div>
-										<div className="text-sm">
-											{t('bookings.warnings.longDurationDescription', {
-												defaultValue:
-													'This booking is longer than a typical 8-hour work day. Please verify that the start and end times are correct.',
-												hours: durationHours.toFixed(1),
+											labelActionSlot={startResetButton}
+										>
+											<InputDatePicker
+												name="start"
+												onRenderLabelAction={setStartResetButton}
+												rules={{ required: true }}
+												{...presetStart}
+											/>
+										</FormElement>
+										<FormElement
+											htmlFor="end"
+											label={t('common.time.ends', {
+												defaultValue: 'Ends',
 											})}
+											labelActionSlot={endResetButton}
+										>
+											<InputDatePicker
+												name="end"
+												onRenderLabelAction={setEndResetButton}
+												rules={{ required: true }}
+												{...presetEnd}
+											/>
+										</FormElement>
+									</div>
+									<div className="flex w-28 flex-col items-center pt-8">
+										<InputDatePickerDuration
+											endFieldName="end"
+											startFieldName="start"
+										/>
+									</div>
+								</FieldSet>
+
+								{showDurationWarning && (
+									<div className="alert alert-warning mb-4" role="alert">
+										<LucideIcon icon={HelpCircle} size={20} />
+										<div className="flex flex-col gap-1">
+											<div className="font-semibold">
+												{t('bookings.warnings.longDuration', {
+													defaultValue: 'Long duration detected',
+												})}
+											</div>
+											<div className="text-sm">
+												{t('bookings.warnings.longDurationDescription', {
+													defaultValue:
+														'This booking is longer than a typical 8-hour work day. Please verify that the start and end times are correct.',
+													hours: durationHours.toFixed(1),
+												})}
+											</div>
 										</div>
 									</div>
-								</div>
-							)}
+								)}
 
-							<ButtonGroup>
-								<Button disabled={isSubmitting} type="submit">
-									{t('common.actions.save', {
-										defaultValue: 'Save',
-									})}
-								</Button>
-								<Button onClick={onClose} type="button" variant="secondary">
-									{t('common.actions.close', {
-										defaultValue: 'Close',
-									})}
-								</Button>
-							</ButtonGroup>
-						</FormBody>
-					</form>
+								<ButtonGroup>
+									<Button disabled={isSubmitting} type="submit">
+										{t('common.actions.save', {
+											defaultValue: 'Save',
+										})}
+									</Button>
+									<Button onClick={onClose} type="button" variant="secondary">
+										{t('common.actions.close', {
+											defaultValue: 'Close',
+										})}
+									</Button>
+								</ButtonGroup>
+							</FormBody>
+						</form>
+					</div>
+					{/* Preset panel */}
+					<div className="w-1/2">
+						<BookingPresetSelector
+							favorites={favorites}
+							onBack={() => setShowPresetPanel(false)}
+							onSelect={handlePresetSelect}
+							orgBookings={orgBookings}
+							recentBookings={recentBookings}
+						/>
+					</div>
 				</div>
 			</div>
 		</FormProvider>

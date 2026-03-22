@@ -24,10 +24,12 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
 	data,
+	Form,
+	href,
 	redirect,
 	useActionData,
-	useFetcher,
 	useLoaderData,
+	useNavigation,
 } from 'react-router'
 import { z } from 'zod'
 
@@ -44,15 +46,14 @@ import { FormElement } from '~/components/ui/forms/form-element'
 import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { Logo } from '~/components/ui/icons/logo'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+import { type SchemaTranslationFn } from '~/lib/i18n-types'
 import { logger } from '~/lib/logger'
 import { registerOAuthUser } from '~/services/api/lasius/oauth2-provider/oauth2-provider'
 import { getOptionalUser } from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/internal-oauth.register'
 
-type TFunction = (key: string, opts?: { defaultValue: string }) => string
-
-const createRegisterSchema = (t: TFunction) =>
+const createRegisterSchema = (t: SchemaTranslationFn) =>
 	z
 		.object({
 			confirmPassword: z
@@ -143,7 +144,7 @@ export async function action({ request }: Route.ActionArgs) {
 			params.set('invitation_id', invitationId)
 		}
 
-		return redirect(`/internal-oauth/login?${params.toString()}`)
+		return redirect(`${href('/internal-oauth/login')}?${params.toString()}`)
 	} catch (error) {
 		const message = error instanceof Error ? error.message : 'unknown_error'
 		logger.warn('Registration failed', { email, error: message })
@@ -168,13 +169,20 @@ export async function action({ request }: Route.ActionArgs) {
 export default function InternalOAuthRegister() {
 	const { email: prefilledEmail, invitationId } = useLoaderData<typeof loader>()
 	const actionData = useActionData<typeof action>()
-	const fetcher = useFetcher()
+	const navigation = useNavigation()
 	const { t } = useTranslation('common')
 	const [showPasswords, setShowPasswords] = useState(false)
 
 	const registerSchema = createRegisterSchema(t)
 
-	const [form, fields] = useForm({
+	const [form, fields] = useForm<{
+		confirmPassword: string
+		email: string
+		firstName: string
+		invitationId?: string
+		lastName: string
+		password: string
+	}>({
 		defaultValue: {
 			confirmPassword: '',
 			email: prefilledEmail,
@@ -191,7 +199,7 @@ export default function InternalOAuthRegister() {
 		shouldValidate: 'onBlur',
 	})
 
-	const isSubmitting = fetcher.state !== 'idle'
+	const isSubmitting = navigation.state !== 'idle'
 
 	const getErrorMessage = (errorCode: string): string => {
 		switch (errorCode) {
@@ -242,7 +250,7 @@ export default function InternalOAuthRegister() {
 							})}
 						</p>
 					</div>
-					<fetcher.Form method="post" {...getFormProps(form)}>
+					<Form method="post" {...getFormProps(form)}>
 						{invitationId && (
 							<input
 								{...getInputProps(fields.invitationId, { type: 'hidden' })}
@@ -370,7 +378,7 @@ export default function InternalOAuthRegister() {
 								</Button>
 							</ButtonGroup>
 						</FormBody>
-					</fetcher.Form>
+					</Form>
 				</CardBody>
 			</Card>
 		</AuthLayout>
@@ -381,7 +389,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 	const user = await getOptionalUser(request)
 
 	if (user) {
-		throw redirect('/')
+		throw redirect(href('/'))
 	}
 
 	const url = new URL(request.url)

@@ -91,6 +91,7 @@ export function WeeklyTrendChart({
 			<ResponsiveLine
 				areaOpacity={0.1}
 				axisBottom={{
+					format: (value: string) => value.replace(/\/\d{4}$/, ''),
 					tickPadding: 5,
 					tickRotation: -45,
 					tickSize: 5,

@@ -17,33 +17,17 @@
  *
  */
 
-import { createCookie, redirect } from 'react-router'
+import { href, redirect } from 'react-router'
 
 import { logger } from '~/lib/logger'
+import {
+	oauthStateCookie,
+	type OAuthStateCookieData,
+} from '~/services/auth/oauth-state-cookie.server'
 import { getProvider } from '~/services/auth/providers'
 import { createUserSession } from '~/services/auth/session.server'
-import { type AuthProvider } from '~/services/auth/types'
 
 import { type Route } from './+types/oauth.callback'
-
-interface OAuthStateCookieData {
-	codeVerifier: string
-	provider: AuthProvider
-	returnTo: string
-	state: string
-}
-
-/**
- * Must match the cookie created in oauth.$provider.login.tsx.
- * We recreate it here to parse, then clear it.
- */
-const oauthStateCookie = createCookie('_lasius_oauth_state', {
-	httpOnly: true,
-	maxAge: 300,
-	path: '/',
-	sameSite: 'lax',
-	secure: process.env.NODE_ENV === 'production',
-})
 
 export async function loader({ request }: Route.LoaderArgs) {
 	const url = new URL(request.url)
@@ -53,12 +37,12 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 	if (error) {
 		logger.error('OAuth callback received error from provider', { error })
-		throw redirect(`/login?error=${encodeURIComponent(error)}`)
+		throw redirect(`${href('/login')}?error=${encodeURIComponent(error)}`)
 	}
 
 	if (!code || !state) {
 		logger.warn('OAuth callback missing code or state')
-		throw redirect('/login?error=no_code')
+		throw redirect(`${href('/login')}?error=no_code`)
 	}
 
 	// Read and validate state cookie
@@ -69,7 +53,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 	if (!cookieData) {
 		logger.warn('OAuth callback: state cookie missing or expired')
-		throw redirect('/login?error=state_mismatch')
+		throw redirect(`${href('/login')}?error=state_mismatch`)
 	}
 
 	if (cookieData.state !== state) {
@@ -77,14 +61,14 @@ export async function loader({ request }: Route.LoaderArgs) {
 			expected: cookieData.state,
 			received: state,
 		})
-		throw redirect('/login?error=state_mismatch')
+		throw redirect(`${href('/login')}?error=state_mismatch`)
 	}
 
 	const { codeVerifier, provider: providerName, returnTo } = cookieData
 
 	try {
 		const provider = getProvider(providerName)
-		const redirectUri = `${url.origin}/oauth/callback`
+		const redirectUri = `${url.origin}${href('/oauth/callback')}`
 
 		// Exchange authorization code for tokens
 		const tokens = await provider.exchangeCode(code, redirectUri, codeVerifier)
@@ -107,11 +91,12 @@ export async function loader({ request }: Route.LoaderArgs) {
 				accessToken: tokens.access_token,
 				email: profile.email,
 				expiresAt: Date.now() + tokens.expires_in * 1000,
+				issuedAt: Date.now(),
 				refreshToken: tokens.refresh_token ?? '',
 				tokenIssuer: providerName,
 				userId: profile.userId,
 			},
-			returnTo || '/en/',
+			returnTo || '/',
 		)
 
 		// Append the clear-state-cookie header to the session redirect response
@@ -122,7 +107,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 			error: err,
 			provider: providerName,
 		})
-		throw redirect('/login?error=token_exchange_failed')
+		throw redirect(`${href('/login')}?error=token_exchange_failed`)
 	}
 }
 

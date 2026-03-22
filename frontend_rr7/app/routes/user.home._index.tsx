@@ -19,17 +19,27 @@
 
 import { data } from 'react-router'
 
+import {
+	ColumnCenter,
+	ColumnRight,
+	innerGridClasses,
+} from '~/components/ui/layouts/layout-columns'
+import { ScrollArea } from '~/components/ui/layouts/scroll-area'
 import { BookingCurrent } from '~/features/bookings/components/booking-current'
 import { BookingListSelectedDay } from '~/features/bookings/components/booking-list-selected-day'
 import { BookingDayStatsProgressBar } from '~/features/home/components/booking-day-stats-progress-bar'
+import { IndexColumnTabs } from '~/features/home/components/index-column-tabs'
 import { augmentBookingsList } from '~/lib/api/functions/augment-bookings-list'
 import { getExpectedVsBookedPercentage } from '~/lib/api/functions/get-expected-vs-booked-percentage'
 import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
 import { apiTimespanDay, formatISOLocale } from '~/lib/utils/dates'
+import { getOrganisationUserList } from '~/services/api/lasius/organisations/organisations'
 import {
 	getUserBookingCurrent,
+	getUserBookingCurrentListByOrganisation,
 	getUserBookingListByOrganisation,
 } from '~/services/api/lasius/user-bookings/user-bookings'
+import { getFavoriteBookingList } from '~/services/api/lasius/user-favorites/user-favorites'
 import { getUserProfile } from '~/services/api/lasius/user/user'
 import {
 	authHeaders,
@@ -59,14 +69,26 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 	const selectedDate = dateParam || formatISOLocale(new Date())
 	const dayTimespan = apiTimespanDay(selectedDate)
 
-	// Fetch day bookings and current booking in parallel
-	const [dayBookingsRes, currentBookingRes] = await Promise.all([
+	// Fetch day bookings, current booking, favorites, org current bookings, and users in parallel
+	const [
+		dayBookingsRes,
+		currentBookingRes,
+		favoritesRes,
+		orgCurrentBookingsRes,
+		orgUsersRes,
+	] = await Promise.all([
 		getUserBookingListByOrganisation(selectedOrgId, dayTimespan, { headers }),
 		getUserBookingCurrent({ headers }),
+		getFavoriteBookingList(selectedOrgId, { headers }),
+		getUserBookingCurrentListByOrganisation(selectedOrgId, { headers }),
+		getOrganisationUserList(selectedOrgId, { headers }),
 	])
 
 	const dayBookings = dayBookingsRes.data ?? []
 	const currentBooking = currentBookingRes.data
+	const favorites = favoritesRes.data?.favorites ?? []
+	const orgCurrentBookings = orgCurrentBookingsRes.data?.timeBookings ?? []
+	const orgUsers = orgUsersRes.data ?? []
 
 	// Compute planned working hours for today's weekday
 	const selectedOrg = organisations.find(
@@ -104,20 +126,38 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 				plannedWorkingHours: plannedHoursDay,
 				progressBarPercentage,
 			},
+			favorites,
+			orgCurrentBookings,
+			orgUsers,
 			selectedDate,
+			selectedOrgId,
 		},
 		{ headers: mergeAuthHeaders(auth) },
 	)
 }
 
-export default function HomeIndex() {
+export default function HomeIndex({ loaderData }: Route.ComponentProps) {
+	const { favorites, orgCurrentBookings, orgUsers, selectedOrgId } = loaderData
+
 	return (
-		<div className="border-base-100 bg-base-100 text-base-content grid h-full w-full grid-rows-[min-content_min-content_auto] gap-1 overflow-auto border-l">
-			<BookingDayStatsProgressBar />
-			<BookingCurrent />
-			<div className="overflow-auto">
-				<BookingListSelectedDay />
-			</div>
+		<div className={innerGridClasses}>
+			<ColumnCenter>
+				<div className="grid h-full w-full grid-rows-[min-content_min-content_auto] gap-1">
+					<BookingDayStatsProgressBar />
+					<BookingCurrent />
+					<ScrollArea>
+						<BookingListSelectedDay />
+					</ScrollArea>
+				</div>
+			</ColumnCenter>
+			<ColumnRight>
+				<IndexColumnTabs
+					favorites={favorites}
+					orgBookings={orgCurrentBookings}
+					selectedOrgId={selectedOrgId}
+					users={orgUsers}
+				/>
+			</ColumnRight>
 		</div>
 	)
 }

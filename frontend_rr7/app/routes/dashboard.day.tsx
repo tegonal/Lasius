@@ -29,6 +29,7 @@ import { getExpectedVsBookedPercentage } from '~/lib/api/functions/get-expected-
 import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
 import { getPlannedHoursForDay } from '~/lib/api/functions/get-planned-working-hours'
 import { apiTimespanDay, formatISOLocale } from '~/lib/utils/dates'
+import { cachedServerLoader } from '~/lib/utils/loader-cache'
 import {
 	getUserBookingAggregatedStatsByOrganisation,
 	getUserBookingListByOrganisation,
@@ -41,6 +42,14 @@ import {
 } from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/dashboard.day'
+
+// ─── Client Loader (cache unless full-page refresh) ──────────────────────────
+
+export const clientLoader = async ({
+	request,
+	serverLoader,
+}: Route.ClientLoaderArgs) => cachedServerLoader(request, serverLoader)
+clientLoader.hydrate = false
 
 // ─── Loader ──────────────────────────────────────────────────────────────────
 
@@ -86,7 +95,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 			{
 				from: dayDate,
 				granularity: 'Day',
-				source: 'Project',
+				source: 'project',
 				to: dayDate,
 			},
 			{ headers },
@@ -105,9 +114,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 	)
 
 	// Aggregate ALL projects (day shows all, no topN limit)
-	const projects = aggregateProjectHours(
-		projectStats as unknown as Record<string, unknown>[],
-	)
+	const projects = aggregateProjectHours(projectStats)
 
 	return data(
 		{

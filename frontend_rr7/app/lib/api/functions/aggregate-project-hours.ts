@@ -17,29 +17,33 @@
  *
  */
 
+import { type ModelsBookingStats } from '~/services/api/lasius/modelsBookingStats'
+
 export type ProjectSummary = {
 	hours: number
 	name: string
 	percentage: number
 }
 
+const MS_PER_HOUR = 3_600_000
+
 export const aggregateProjectHours = (
-	data: Record<string, unknown>[] | undefined,
+	data: ModelsBookingStats[] | undefined,
 	topN?: number,
 ): ProjectSummary[] => {
 	if (!data) return []
 
 	const projectHours: Record<string, number> = {}
-	data.forEach((entry) => {
-		Object.entries(entry).forEach(([key, value]) => {
-			if (key !== 'category' && Array.isArray(value)) {
-				const hours = value[0] as number
-				if (hours > 0) {
-					projectHours[key] = (projectHours[key] || 0) + hours
-				}
+	for (const entry of data) {
+		for (const item of entry.values) {
+			const name = item.label
+			if (!name) continue
+			const hours = (item.duration ?? 0) / MS_PER_HOUR
+			if (hours > 0) {
+				projectHours[name] = (projectHours[name] || 0) + hours
 			}
-		})
-	})
+		}
+	}
 
 	let sorted = Object.entries(projectHours).sort(([, a], [, b]) => b - a)
 	if (topN !== undefined) {

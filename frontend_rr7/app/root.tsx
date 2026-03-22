@@ -21,6 +21,7 @@ import { type PropsWithChildren } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
 	data,
+	href,
 	isRouteErrorResponse,
 	Links,
 	type LinksFunction,
@@ -28,12 +29,16 @@ import {
 	Outlet,
 	Scripts,
 	ScrollRestoration,
+	type ShouldRevalidateFunctionArgs,
 	useRouteError,
+	useRouteLoaderData,
 } from 'react-router'
 import { useChangeLanguage } from 'remix-i18next/react'
 
+import { ToastProvider } from '~/components/ui/feedback/toasts'
 import { HelpDrawer } from '~/features/help/components/help-drawer'
 import { localeCookie } from '~/lib/cookies/i18next-cookie.server'
+import { parseThemeCookie } from '~/lib/cookies/theme-cookie.server'
 import { logger } from '~/lib/logger'
 import { getLocale, i18nextMiddleware } from '~/middleware/i18next'
 
@@ -41,6 +46,18 @@ import { type Route } from './+types/root.ts'
 import './tailwind.css'
 
 export const middleware = [i18nextMiddleware]
+
+/** Locale and theme rarely change — skip revalidation unless navigation target changes */
+export function shouldRevalidate({
+	currentUrl,
+	defaultShouldRevalidate,
+	nextUrl,
+}: ShouldRevalidateFunctionArgs) {
+	if (currentUrl.pathname === nextUrl.pathname) {
+		return false
+	}
+	return defaultShouldRevalidate
+}
 
 export const links: LinksFunction = () => [
 	{ href: '/icons/lasius.svg', rel: 'icon', type: 'image/svg+xml' },
@@ -55,16 +72,19 @@ export const links: LinksFunction = () => [
 ]
 
 export const handle = {
-	i18n: ['common'],
+	i18n: 'common',
 }
 
-export const loader = async ({ context }: Route.LoaderArgs) => {
+export const loader = async ({ context, request }: Route.LoaderArgs) => {
 	const locale = getLocale(context)
+
+	const cookieHeader = request.headers.get('Cookie')
+	const theme = parseThemeCookie(cookieHeader) ?? 'light'
 
 	const headers = new Headers()
 	headers.append('Set-Cookie', await localeCookie.serialize(locale))
 
-	return data({ locale }, { headers })
+	return data({ locale, theme }, { headers })
 }
 
 export default function App({ loaderData }: Route.ComponentProps) {
@@ -89,7 +109,7 @@ export function ErrorBoundary() {
 							<h1 className="card-title text-2xl">Unauthorized</h1>
 							<p>You need to sign in to access this page.</p>
 							<div className="card-actions mt-4">
-								<a className="btn btn-primary" href="/login">
+								<a className="btn btn-primary" href={href('/login')}>
 									Sign in
 								</a>
 							</div>
@@ -107,7 +127,7 @@ export function ErrorBoundary() {
 							<h1 className="card-title text-2xl">Page not found</h1>
 							<p>The page you are looking for does not exist.</p>
 							<div className="card-actions mt-4">
-								<a className="btn btn-primary" href="/">
+								<a className="btn btn-primary" href={href('/')}>
 									Go home
 								</a>
 							</div>
@@ -126,7 +146,7 @@ export function ErrorBoundary() {
 						</h1>
 						<p>{error.data?.toString() ?? 'An error occurred.'}</p>
 						<div className="card-actions mt-4">
-							<a className="btn btn-primary" href="/">
+							<a className="btn btn-primary" href={href('/')}>
 								Go home
 							</a>
 						</div>
@@ -159,7 +179,7 @@ export function ErrorBoundary() {
 						</details>
 					)}
 					<div className="card-actions mt-4">
-						<a className="btn btn-primary" href="/">
+						<a className="btn btn-primary" href={href('/')}>
 							Go home
 						</a>
 					</div>
@@ -170,30 +190,35 @@ export function ErrorBoundary() {
 }
 
 /**
- * Inline script to initialize DaisyUI theme before first paint (prevents FOUC).
- * Reads saved theme from Zustand persist store in localStorage,
- * falls back to system preference, then to 'light'.
+ * Inline script that runs before first paint to prevent FOUC.
+ * 1. Reads the `theme` cookie (not httpOnly, so JS can access it)
+ * 2. If no cookie, detects system preference and writes the cookie
+ * 3. Sets data-theme on <html> — overrides the server default ('light')
+ *    with the actual system preference on first visit
+ *
+ * The server always renders data-theme="light"|"dark" (from cookie, defaulting
+ * to "light"). This script corrects to system preference before paint if needed,
+ * and sets the cookie so the server gets it right on the next request.
  */
 const themeInitScript = `
 (function() {
   try {
-    var savedTheme = null;
-    try {
-      var persistedState = localStorage.getItem('app-settings');
-      if (persistedState) {
-        var parsed = JSON.parse(persistedState);
-        savedTheme = parsed.state && parsed.state.theme;
-      }
-    } catch (e) {}
-    if (savedTheme && savedTheme !== 'system') {
-      document.documentElement.setAttribute('data-theme', savedTheme);
-    } else {
-      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-      } else {
-        document.documentElement.setAttribute('data-theme', 'light');
+    var theme = null;
+    var cookies = document.cookie.split(';');
+    for (var i = 0; i < cookies.length; i++) {
+      var c = cookies[i].trim();
+      if (c.indexOf('theme=') === 0) {
+        theme = decodeURIComponent(c.substring(6));
+        break;
       }
     }
+    if (theme !== 'light' && theme !== 'dark') {
+      theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+        ? 'dark'
+        : 'light';
+      document.cookie = 'theme=' + theme + ';path=/;max-age=31536000;samesite=lax' + (location.protocol === 'https:' ? ';secure' : '');
+    }
+    document.documentElement.setAttribute('data-theme', theme);
   } catch (e) {
     document.documentElement.setAttribute('data-theme', 'light');
   }
@@ -202,9 +227,12 @@ const themeInitScript = `
 
 export function Layout({ children }: PropsWithChildren) {
 	const { i18n } = useTranslation()
+	const rootData = useRouteLoaderData<typeof loader>('root')
+	const theme = rootData?.theme ?? 'light'
 
 	return (
 		<html
+			data-theme={theme}
 			dir={i18n.dir(i18n.language)}
 			lang={i18n.language}
 			suppressHydrationWarning
@@ -218,7 +246,7 @@ export function Layout({ children }: PropsWithChildren) {
 				<Meta />
 			</head>
 			<body>
-				{children}
+				<ToastProvider>{children}</ToastProvider>
 				<ScrollRestoration />
 				<Scripts />
 				<HelpDrawer />

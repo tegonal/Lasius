@@ -20,6 +20,7 @@
 import { useTranslation } from 'react-i18next'
 import { useRouteLoaderData } from 'react-router'
 
+import { ContextMenuProvider } from '~/components/features/context-menu/hooks/use-context-menu'
 import { type AugmentedBooking } from '~/lib/api/functions/augment-bookings-list'
 
 import { BookingItem } from './booking-item'
@@ -45,10 +46,22 @@ export const BookingListSelectedDay = () => {
 	}
 
 	return (
-		<div className="flex flex-col">
-			{bookings.map((item) => (
-				<BookingItem item={item} key={item.id} />
-			))}
-		</div>
+		<ContextMenuProvider>
+			<div className="flex flex-col">
+				{bookings.map((item, index) => (
+					<div
+						className="animate-fade-in"
+						key={item.id}
+						style={{
+							animationDelay: `${index * 0.12}s`,
+							animationDuration: '0.5s',
+							animationFillMode: 'both',
+						}}
+					>
+						<BookingItem item={item} />
+					</div>
+				))}
+			</div>
+		</ContextMenuProvider>
 	)
 }

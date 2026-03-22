@@ -44,5 +44,7 @@ function hashCode(str: string | undefined) {
  * @returns A string representation of the 32-bit hash.
  */
 export const stringHash = (anything: unknown): string => {
-	return hashCode(JSON.stringify(anything, Object.keys(anything as object).sort())).toString()
+	return hashCode(
+		JSON.stringify(anything, Object.keys(anything as object).sort()),
+	).toString()
 }

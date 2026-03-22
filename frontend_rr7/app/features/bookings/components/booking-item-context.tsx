@@ -40,7 +40,10 @@ import { BookingAddUpdateForm } from '~/features/bookings/components/booking-add
 import { useStopAndStart } from '~/hooks/use-stop-and-start'
 import { type AugmentedBooking } from '~/lib/api/functions/augment-bookings-list'
 import { formatISOLocale } from '~/lib/utils/dates'
-import { type ModelsBooking } from '~/services/api/lasius'
+import {
+	type ModelsBooking,
+	type ModelsCurrentUserTimeBooking,
+} from '~/services/api/lasius'
 import {
 	useDeleteUserBooking,
 	useUpdateUserBooking,
@@ -49,6 +52,7 @@ import { useAddFavoriteBooking } from '~/services/api/lasius-hooks/user-favorite
 
 type HomeLoaderData = {
 	augmentedBookings: AugmentedBooking[]
+	currentBooking?: ModelsCurrentUserTimeBooking
 	selectedOrgId: string
 }
 
@@ -63,6 +67,13 @@ function areTimesWithinOneMinute(
 	const d1 = typeof time1 === 'string' ? new Date(time1) : time1
 	const d2 = typeof time2 === 'string' ? new Date(time2) : time2
 	return Math.abs(d1.getTime() - d2.getTime()) <= 60_000
+}
+
+function useCurrentBookingId(): string | undefined {
+	const loaderData = useRouteLoaderData('routes/user.home._index') as
+		| HomeLoaderData
+		| undefined
+	return loaderData?.currentBooking?.booking?.id
 }
 
 function useGetAdjacentBookings(item: ModelsBooking) {
@@ -93,6 +104,7 @@ export const BookingItemContext = ({ item }: Props) => {
 	const { next: nextBooking, previous: previousBooking } =
 		useGetAdjacentBookings(item)
 	const selectedOrgId = useSelectedOrgId()
+	const currentBookingId = useCurrentBookingId()
 	const deleteBookingApi = useDeleteUserBooking()
 	const updateBookingApi = useUpdateUserBooking()
 	const addFavoriteApi = useAddFavoriteBooking()
@@ -149,6 +161,7 @@ export const BookingItemContext = ({ item }: Props) => {
 	const startBooking = () => {
 		const now = roundToNearestMinutes(new Date(), { roundingMethod: 'floor' })
 		stopAndStartApi.submit({
+			currentBookingId,
 			orgId: selectedOrgId,
 			projectId: item.projectReference?.id || '',
 			start: formatISOLocale(now),

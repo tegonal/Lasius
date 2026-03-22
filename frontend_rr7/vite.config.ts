@@ -3,7 +3,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { defineConfig, type Plugin } from 'vite'
 import babel from 'vite-plugin-babel'
 
-function patchReactRouterForVite8(plugins: Plugin[]): Plugin[] {
+function patchPluginsForVite8(plugins: Plugin[]): Plugin[] {
 	return plugins.map((plugin) => {
 		const originalConfig = plugin.config
 		if (typeof originalConfig === 'function') {
@@ -42,14 +42,16 @@ export default defineConfig(() => ({
 	},
 	plugins: [
 		tailwindcss(),
-		...patchReactRouterForVite8(reactRouter() as Plugin[]),
-		babel({
-			babelConfig: {
-				plugins: ['babel-plugin-react-compiler'],
-				presets: ['@babel/preset-typescript'],
-			},
-			filter: /\.[jt]sx?$/,
-		}),
+		...patchPluginsForVite8(reactRouter() as Plugin[]),
+		...patchPluginsForVite8([
+			babel({
+				babelConfig: {
+					plugins: ['babel-plugin-react-compiler'],
+					presets: ['@babel/preset-typescript'],
+				},
+				filter: /\.[jt]sx?$/,
+			}) as Plugin,
+		]),
 	],
 	resolve: {
 		tsconfigPaths: true,

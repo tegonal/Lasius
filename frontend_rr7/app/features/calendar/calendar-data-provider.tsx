@@ -67,14 +67,15 @@ export const CalendarDataProvider = ({
 		[date, period],
 	)
 
+	const { load } = fetcher
+
 	useEffect(() => {
 		if (organisationId && date) {
-			void fetcher.load(
+			void load(
 				`/api/calendar-bookings?orgId=${organisationId}&from=${timespan.from}&to=${timespan.to}`,
 			)
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [organisationId, timespan.from, timespan.to, date])
+	}, [organisationId, timespan.from, timespan.to, date, load])
 
 	const value = useMemo<CalendarDataContextValue>(
 		() => ({

@@ -22,11 +22,13 @@ import { parseWithZod } from '@conform-to/zod/v4'
 import { Trans, useTranslation } from 'react-i18next'
 import {
 	data,
+	Form,
+	href,
 	redirect,
 	useActionData,
-	useFetcher,
 	useLoaderData,
 	useNavigate,
+	useNavigation,
 } from 'react-router'
 import { z } from 'zod'
 
@@ -43,17 +45,19 @@ import { FormElement } from '~/components/ui/forms/form-element'
 import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { Logo } from '~/components/ui/icons/logo'
 import { getServerEnv } from '~/lib/env.server'
+import { type SchemaTranslationFn } from '~/lib/i18n-types'
 import { logger } from '~/lib/logger'
 import { getConfiguration } from '~/services/api/lasius/general/general'
-import { getOptionalUser } from '~/services/auth/auth-helpers.server'
+import {
+	getOptionalUser,
+	sanitizeReturnTo,
+} from '~/services/auth/auth-helpers.server'
 import { getInternalProvider } from '~/services/auth/providers'
 import { createUserSession } from '~/services/auth/session.server'
 
 import { type Route } from './+types/internal-oauth.login'
 
-type TFunction = (key: string, opts?: { defaultValue: string }) => string
-
-const createLoginSchema = (t: TFunction) =>
+const createLoginSchema = (t: SchemaTranslationFn) =>
 	z.object({
 		email: z
 			.string({
@@ -103,6 +107,7 @@ export async function action({ request }: Route.ActionArgs) {
 				accessToken: result.tokens.access_token,
 				email: result.profile.email,
 				expiresAt: Date.now() + result.tokens.expires_in * 1000,
+				issuedAt: Date.now(),
 				refreshToken: result.tokens.refresh_token ?? '',
 				tokenIssuer: 'internal',
 				userId: result.profile.userId,
@@ -116,7 +121,7 @@ export async function action({ request }: Route.ActionArgs) {
 		const errorCode =
 			message === 'Invalid credentials'
 				? 'usernameOrPasswordWrong'
-				: 'Login failed. Please try again.'
+				: 'loginFailed'
 
 		return data(
 			{ lastResult: submission.reply(), serverError: errorCode },
@@ -135,8 +140,8 @@ export default function InternalOAuthLogin() {
 		returnTo,
 	} = useLoaderData<typeof loader>()
 	const actionData = useActionData<typeof action>()
-	const fetcher = useFetcher()
 	const navigate = useNavigate()
+	const navigation = useNavigation()
 	const { t } = useTranslation('common')
 
 	const loginSchema = createLoginSchema(t)
@@ -151,7 +156,7 @@ export default function InternalOAuthLogin() {
 		shouldValidate: 'onBlur',
 	})
 
-	const isSubmitting = fetcher.state !== 'idle'
+	const isSubmitting = navigation.state !== 'idle'
 
 	const getErrorMessage = (errorCode: string): string => {
 		switch (errorCode) {
@@ -159,8 +164,11 @@ export default function InternalOAuthLogin() {
 				return t('auth.errors.invalidCredentials', {
 					defaultValue: 'Invalid email or password. Please try again.',
 				})
+			case 'loginFailed':
 			default:
-				return errorCode
+				return t('auth.errors.loginFailed', {
+					defaultValue: 'Login failed. Please try again.',
+				})
 		}
 	}
 
@@ -233,7 +241,7 @@ export default function InternalOAuthLogin() {
 							})}
 						</p>
 					</div>
-					<fetcher.Form method="post" {...getFormProps(form)}>
+					<Form method="post" {...getFormProps(form)}>
 						<input
 							{...getInputProps(fields.returnTo, { type: 'hidden' })}
 							key={fields.returnTo.key}
@@ -289,7 +297,7 @@ export default function InternalOAuthLogin() {
 										fullWidth
 										onClick={() =>
 											navigate(
-												`/internal-oauth/register${invitationId ? `?invitation_id=${invitationId}` : ''}`,
+												`${href('/internal-oauth/register')}${invitationId ? `?invitation_id=${invitationId}` : ''}`,
 											)
 										}
 										type="button"
@@ -302,7 +310,7 @@ export default function InternalOAuthLogin() {
 								)}
 							</ButtonGroup>
 						</FormBody>
-					</fetcher.Form>
+					</Form>
 				</CardBody>
 			</Card>
 		</AuthLayout>
@@ -312,7 +320,7 @@ export default function InternalOAuthLogin() {
 export async function loader({ request }: Route.LoaderArgs) {
 	const user = await getOptionalUser(request)
 	const url = new URL(request.url)
-	const returnTo = url.searchParams.get('returnTo') ?? '/'
+	const returnTo = sanitizeReturnTo(url.searchParams.get('returnTo') ?? '/')
 
 	if (user) {
 		throw redirect(returnTo)

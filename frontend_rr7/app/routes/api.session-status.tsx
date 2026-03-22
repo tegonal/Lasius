@@ -19,16 +19,19 @@
 
 import { data } from 'react-router'
 
+import { mergeAuthHeaders } from '~/services/auth/auth-helpers.server'
 import { getSessionTokens } from '~/services/auth/session.server'
+
+import { type Route } from './+types/api.session-status'
 
 /**
  * GET /api/session-status
  *
  * Polled by the client-side TokenWatcher. Calls getSessionTokens() which
- * auto-refreshes the access token if it's near expiry. The refreshed session
+ * auto-refreshes the access token if it's past half-life. The refreshed session
  * cookie is propagated back via Set-Cookie header.
  */
-export async function loader({ request }: { request: Request }) {
+export async function loader({ request }: Route.LoaderArgs) {
 	const result = await getSessionTokens(request)
 
 	if (!result) {
@@ -38,16 +41,10 @@ export async function loader({ request }: { request: Request }) {
 		)
 	}
 
-	const headers = new Headers({ 'Cache-Control': 'no-store' })
-	if (result.headers) {
-		const setCookie =
-			result.headers instanceof Headers
-				? result.headers.get('Set-Cookie')
-				: (result.headers as Record<string, string>)['Set-Cookie']
-		if (setCookie) {
-			headers.set('Set-Cookie', setCookie)
-		}
-	}
+	const headers = mergeAuthHeaders(
+		{ headers: result.headers, session: result.tokens },
+		{ 'Cache-Control': 'no-store' },
+	)
 
 	return data(
 		{ authenticated: true, expiresAt: result.tokens.expiresAt },

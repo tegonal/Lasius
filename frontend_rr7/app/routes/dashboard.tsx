@@ -18,8 +18,18 @@
  */
 
 import { endOfWeek, startOfWeek, subWeeks } from 'date-fns'
-import { data, Outlet, useSearchParams } from 'react-router'
+import {
+	data,
+	Outlet,
+	type ShouldRevalidateFunctionArgs,
+	useSearchParams,
+} from 'react-router'
 
+import {
+	ColumnCenter,
+	ColumnRight,
+	innerGridClasses,
+} from '~/components/ui/layouts/layout-columns'
 import { CalendarMonthCompact } from '~/features/dashboard/components/calendar-month-compact'
 import { DashboardTabs } from '~/features/dashboard/components/dashboard-tabs'
 import { WorkloadIndicator } from '~/features/dashboard/components/workload-indicator'
@@ -35,6 +45,22 @@ import {
 } from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/dashboard'
+
+// ─── Revalidation ────────────────────────────────────────────────────────────
+
+/** Only revalidate when the date search param changes, not on child tab switches */
+export function shouldRevalidate({
+	currentUrl,
+	defaultShouldRevalidate,
+	formMethod,
+	nextUrl,
+}: ShouldRevalidateFunctionArgs) {
+	if (formMethod) return defaultShouldRevalidate
+	const currentDate = currentUrl.searchParams.get('date')
+	const nextDate = nextUrl.searchParams.get('date')
+	if (currentDate === nextDate) return false
+	return defaultShouldRevalidate
+}
 
 const WEEKS_TO_ANALYZE = 12
 
@@ -116,26 +142,25 @@ export default function DashboardLayout({ loaderData }: Route.ComponentProps) {
 	}
 
 	return (
-		<div className="flex h-full">
-			{/* Main content */}
-			<div className="flex min-w-0 flex-1 flex-col overflow-auto">
+		<div className={innerGridClasses}>
+			<ColumnCenter>
 				<div className="border-base-200 border-b px-4 pt-2">
 					<DashboardTabs />
 				</div>
 				<div className="flex-1 overflow-auto">
 					<Outlet />
 				</div>
-			</div>
-
-			{/* Right sidebar - desktop only */}
-			<div className="bg-base-200 border-base-200 hidden w-72 shrink-0 overflow-auto border-l p-4 md:block">
-				<CalendarMonthCompact date={date} onDateChange={handleDateChange} />
-				<div className="border-base-content/10 my-4 border-t" />
-				<WorkloadIndicator
-					burnoutMetrics={loaderData.burnoutMetrics}
-					plannedWeeklyHours={loaderData.weeklyPlannedHours}
-				/>
-			</div>
+			</ColumnCenter>
+			<ColumnRight>
+				<div className="p-4">
+					<CalendarMonthCompact date={date} onDateChange={handleDateChange} />
+					<div className="border-base-content/10 my-4 border-t" />
+					<WorkloadIndicator
+						burnoutMetrics={loaderData.burnoutMetrics}
+						plannedWeeklyHours={loaderData.weeklyPlannedHours}
+					/>
+				</div>
+			</ColumnRight>
 		</div>
 	)
 }

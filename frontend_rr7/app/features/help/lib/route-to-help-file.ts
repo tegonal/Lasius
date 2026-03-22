@@ -18,21 +18,29 @@
  */
 
 /**
- * Converts a route pathname to an MDX help file name.
+ * Maps RR7 route pathnames to help file names.
  *
- * Examples:
- *   /user/home       → user-home
- *   /organisation/projects → organisation-projects
- *   /                → login
- *   /settings/:id    → settings-dynamic
+ * Help files were authored for the Next.js route structure (e.g. /user/home → user-home).
+ * RR7 uses a flatter route structure, so we need an explicit mapping.
  */
+const routeMap: Record<string, string> = {
+	'/': 'user-home',
+	'/dashboard': 'user-dashboard',
+	'/login': 'login',
+}
+
 export const routeToHelpFile = (path: string): string => {
-	// Remove leading slash and replace remaining slashes with hyphens
+	// Check explicit mapping first
+	const mapped = routeMap[path]
+	if (mapped) {
+		return mapped
+	}
+
+	// Fallback: convert path to hyphenated name
 	let normalized = path.replace(/^\//, '').replace(/\//g, '-')
 
-	// Handle root/index
 	if (normalized === '') {
-		normalized = 'login'
+		return 'user-home'
 	}
 
 	// Handle dynamic route segments (React Router uses :param syntax)

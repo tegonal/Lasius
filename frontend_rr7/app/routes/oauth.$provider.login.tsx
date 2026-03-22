@@ -17,7 +17,7 @@
  *
  */
 
-import { createCookie, redirect } from 'react-router'
+import { href, redirect } from 'react-router'
 
 import {
 	generateCodeChallenge,
@@ -25,20 +25,14 @@ import {
 	generateState,
 } from '~/lib/crypto.server'
 import { logger } from '~/lib/logger'
+import { sanitizeReturnTo } from '~/services/auth/auth-helpers.server'
+import { oauthStateCookie } from '~/services/auth/oauth-state-cookie.server'
 import { getProvider, isProviderEnabled } from '~/services/auth/providers'
 import { type AuthProvider } from '~/services/auth/types'
 
 import { type Route } from './+types/oauth.$provider.login'
 
 const VALID_PROVIDERS: AuthProvider[] = ['keycloak', 'github', 'gitlab']
-
-const oauthStateCookie = createCookie('_lasius_oauth_state', {
-	httpOnly: true,
-	maxAge: 300, // 5 minutes
-	path: '/',
-	sameSite: 'lax',
-	secure: process.env.NODE_ENV === 'production',
-})
 
 export async function loader({ params, request }: Route.LoaderArgs) {
 	const providerName = params.provider as AuthProvider
@@ -50,19 +44,19 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 		logger.warn('Invalid or disabled OAuth provider requested', {
 			provider: providerName,
 		})
-		throw redirect('/login?error=invalid_provider')
+		throw redirect(`${href('/login')}?error=invalid_provider`)
 	}
 
 	const url = new URL(request.url)
-	const returnTo = url.searchParams.get('returnTo') ?? '/en/'
+	const returnTo = sanitizeReturnTo(url.searchParams.get('returnTo') ?? '/')
 
 	const state = generateState()
 	const codeVerifier = generateCodeVerifier()
 	const codeChallenge = await generateCodeChallenge(codeVerifier)
 
-	// Build the callback URL
+	// Build the callback URL using type-safe href
 	const origin = url.origin
-	const redirectUri = `${origin}/oauth/callback`
+	const redirectUri = `${origin}${href('/oauth/callback')}`
 
 	// Store state, provider, code verifier, and returnTo in a cookie
 	const cookieData = {

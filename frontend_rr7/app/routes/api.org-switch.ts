@@ -21,7 +21,7 @@ import { data } from 'react-router'
 
 import { updateUserSettings } from '~/services/api/lasius/user/user'
 import {
-	authHeaders,
+	authHeadersWithCsrf,
 	mergeAuthHeaders,
 	requireUser,
 } from '~/services/auth/auth-helpers.server'
@@ -35,14 +35,25 @@ import {
 export async function action({ request }: { request: Request }) {
 	const auth = await requireUser(request)
 	const formData = await request.formData()
-	const orgId = formData.get('organisationId') as string
-	const orgKey = formData.get('organisationKey') as string
+	const orgId = formData.get('organisationId')
+	const orgKey = formData.get('organisationKey')
 
+	if (!orgId || !orgKey) {
+		return data(
+			{ error: 'Missing organisationId or organisationKey' },
+			{ headers: mergeAuthHeaders(auth), status: 400 },
+		)
+	}
+
+	const headers = await authHeadersWithCsrf(auth.session)
 	const result = await updateUserSettings(
 		{
-			lastSelectedOrganisation: { id: orgId, key: orgKey },
+			lastSelectedOrganisation: {
+				id: orgId as string,
+				key: orgKey as string,
+			},
 		},
-		{ headers: authHeaders(auth.session) },
+		{ headers },
 	)
 
 	return data({ user: result.data }, { headers: mergeAuthHeaders(auth) })

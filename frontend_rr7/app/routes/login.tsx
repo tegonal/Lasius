@@ -20,7 +20,7 @@
 import { SiGithub, SiGitlab, SiKeycloak } from '@icons-pack/react-simple-icons'
 import { AlertTriangle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { redirect, useLoaderData } from 'react-router'
+import { href, redirect, useLoaderData } from 'react-router'
 
 import {
 	LoadingInfoPanel,
@@ -35,7 +35,10 @@ import { Logo } from '~/components/ui/icons/logo'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { HelpButton } from '~/features/help/components/help-button'
 import { getServerEnv } from '~/lib/env.server'
-import { getOptionalUser } from '~/services/auth/auth-helpers.server'
+import {
+	getOptionalUser,
+	sanitizeReturnTo,
+} from '~/services/auth/auth-helpers.server'
 import { getEnabledProviders } from '~/services/auth/providers'
 import { type AuthProvider } from '~/services/auth/types'
 
@@ -44,7 +47,7 @@ import { type Route } from './+types/login'
 export async function loader({ request }: Route.LoaderArgs) {
 	const user = await getOptionalUser(request)
 	const url = new URL(request.url)
-	const returnTo = url.searchParams.get('returnTo') ?? '/'
+	const returnTo = sanitizeReturnTo(url.searchParams.get('returnTo') ?? '/')
 	const error = url.searchParams.get('error') ?? null
 
 	if (user) {
@@ -232,8 +235,13 @@ export default function Login() {
 			)}
 
 			{/* Help */}
-			<div className="mt-6 flex justify-center">
+			<div className="mt-6 flex flex-col items-center gap-2">
 				<HelpButton />
+				<p className="text-base-content/50 text-center text-sm">
+					{t('auth.needHelp', {
+						defaultValue: 'Need help? Click the help button',
+					})}
+				</p>
 			</div>
 		</AuthLayout>
 	)
@@ -272,7 +280,7 @@ function getProviderIcon(provider: AuthProvider): React.ReactNode {
 
 function getProviderLoginUrl(provider: AuthProvider, returnTo: string): string {
 	if (provider === 'internal') {
-		return `/internal-oauth/login?returnTo=${encodeURIComponent(returnTo)}`
+		return `${href('/internal-oauth/login')}?returnTo=${encodeURIComponent(returnTo)}`
 	}
-	return `/oauth/${provider}/login?returnTo=${encodeURIComponent(returnTo)}`
+	return `${href('/oauth/:provider/login', { provider })}?returnTo=${encodeURIComponent(returnTo)}`
 }

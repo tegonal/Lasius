@@ -18,26 +18,35 @@
  */
 
 import { useTranslation } from 'react-i18next'
-import { NavLink, useSearchParams } from 'react-router'
+import { href, NavLink, useSearchParams } from 'react-router'
 
 export const DashboardTabs = () => {
 	const { t } = useTranslation('common')
 	const [searchParams] = useSearchParams()
 	const dateParam = searchParams.get('date')
-	const search = dateParam ? `?date=${dateParam}` : ''
+	const search = dateParam ? `?${new URLSearchParams({ date: dateParam })}` : ''
 
 	const tabs = [
-		{ label: t('common.time.day', { defaultValue: 'Day' }), to: 'day' },
-		{ label: t('common.time.week', { defaultValue: 'Week' }), to: 'week' },
+		{
+			label: t('common.time.day', { defaultValue: 'Day' }),
+			to: href('/user/dashboard/day'),
+		},
+		{
+			label: t('common.time.week', { defaultValue: 'Week' }),
+			to: href('/user/dashboard/week'),
+		},
 		{
 			label: t('common.time.month', { defaultValue: 'Month' }),
-			to: 'month',
+			to: href('/user/dashboard/month'),
 		},
 		{
 			label: t('workHealth.sixMonths', { defaultValue: '6 Months' }),
-			to: '6months',
+			to: href('/user/dashboard/6months'),
 		},
-		{ label: t('common.time.year', { defaultValue: 'Year' }), to: 'year' },
+		{
+			label: t('common.time.year', { defaultValue: 'Year' }),
+			to: href('/user/dashboard/year'),
+		},
 	]
 
 	return (

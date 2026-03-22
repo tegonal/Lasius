@@ -39,6 +39,7 @@ import {
 	type ModelsEntityReference,
 	type ModelsTag,
 } from '~/services/api/lasius'
+import { useUpdateUserBooking } from '~/services/api/lasius-hooks/user-bookings/user-bookings'
 
 type BookingEditRunningProps = {
 	item: ModelsCurrentUserTimeBooking
@@ -58,14 +59,14 @@ export function BookingEditRunning({
 	selectedOrgId,
 }: BookingEditRunningProps) {
 	const { t } = useTranslation('common')
-	const fetcher = useFetcher<{ ok?: boolean }>()
+	const updateBookingApi = useUpdateUserBooking()
 	const formDataFetcher = useFetcher<{
 		projects: ModelsEntityReference[]
 		recentBookings: ModelsBooking[]
 		tags: ModelsTag[]
 	}>()
 
-	const isSubmitting = fetcher.state !== 'idle'
+	const isSubmitting = updateBookingApi.state !== 'idle'
 
 	const hookForm = useForm<FormValues>({
 		defaultValues: {
@@ -86,9 +87,7 @@ export function BookingEditRunning({
 	useEffect(() => {
 		if (selectedOrgId && selectedOrgId !== prevOrgIdRef.current) {
 			prevOrgIdRef.current = selectedOrgId
-			void formDataFetcher.load(
-				`/api/booking-form-data?orgId=${selectedOrgId}`,
-			)
+			void formDataFetcher.load(`/api/booking-form-data?orgId=${selectedOrgId}`)
 		}
 	}, [selectedOrgId, formDataFetcher])
 
@@ -100,11 +99,7 @@ export function BookingEditRunning({
 
 	useEffect(() => {
 		const key = `${selectedOrgId}:${watchedProjectId}`
-		if (
-			selectedOrgId &&
-			watchedProjectId &&
-			key !== prevProjectIdRef.current
-		) {
+		if (selectedOrgId && watchedProjectId && key !== prevProjectIdRef.current) {
 			prevProjectIdRef.current = key
 			void projectTagsFetcher.load(
 				`/api/booking-form-data?orgId=${selectedOrgId}&projectId=${watchedProjectId}`,
@@ -115,16 +110,14 @@ export function BookingEditRunning({
 	const projectTags = projectTagsFetcher.data?.tags ?? []
 
 	// Derive latest completed booking from recent bookings for start-time preset
-	const recentBookings = formDataFetcher.data?.recentBookings ?? []
 	const latestBooking = useMemo(() => {
-		const completed = recentBookings.filter((b) => b.end?.dateTime)
+		const bookings = formDataFetcher.data?.recentBookings ?? []
+		const completed = bookings.filter((b) => b.end?.dateTime)
 		if (completed.length === 0) return null
 		return completed.reduce((latest, b) =>
-			new Date(b.end!.dateTime) > new Date(latest.end!.dateTime)
-				? b
-				: latest,
+			new Date(b.end!.dateTime) > new Date(latest.end!.dateTime) ? b : latest,
 		)
-	}, [recentBookings])
+	}, [formDataFetcher.data?.recentBookings])
 
 	// Initialize form values from the running booking
 	useEffect(() => {
@@ -164,10 +157,13 @@ export function BookingEditRunning({
 
 	// Close on successful submission
 	useEffect(() => {
-		if (fetcher.state === 'idle' && fetcher.data?.ok) {
+		if (
+			updateBookingApi.state === 'idle' &&
+			updateBookingApi.data !== undefined
+		) {
 			onClose()
 		}
-	}, [fetcher.state, fetcher.data, onClose])
+	}, [updateBookingApi.state, updateBookingApi.data, onClose])
 
 	const presetStart = latestBooking?.end
 		? {
@@ -190,20 +186,17 @@ export function BookingEditRunning({
 				return
 			}
 
-			const formData = new FormData()
-			formData.set('intent', 'update')
-			formData.set('orgId', selectedOrgId)
-			formData.set('bookingId', booking.id)
-			formData.set('projectId', projectId)
-			formData.set('tags', JSON.stringify(tags))
-			formData.set('start', start)
-
-			void fetcher.submit(formData, {
-				action: '/api/bookings',
-				method: 'post',
+			updateBookingApi.submit({
+				body: {
+					projectId,
+					start: start || undefined,
+					tags,
+				},
+				bookingId: booking.id,
+				orgId: selectedOrgId,
 			})
 		},
-		[selectedOrgId, booking, fetcher],
+		[selectedOrgId, booking, updateBookingApi],
 	)
 
 	return (
@@ -251,13 +244,9 @@ export function BookingEditRunning({
 										validate: {
 											startInPast: (v: string) =>
 												!isFuture(new Date(v)) ||
-												(t(
-													'validation.startMustBeInPast',
-													{
-														defaultValue:
-															'Start time must be in the past',
-													},
-												) as string),
+												(t('validation.startMustBeInPast', {
+													defaultValue: 'Start time must be in the past',
+												}) as string),
 										},
 									}}
 									withDate={false}
@@ -272,11 +261,7 @@ export function BookingEditRunning({
 									defaultValue: 'Save',
 								})}
 							</Button>
-							<Button
-								onClick={onClose}
-								type="button"
-								variant="secondary"
-							>
+							<Button onClick={onClose} type="button" variant="secondary">
 								{t('common.actions.close', {
 									defaultValue: 'Close',
 								})}

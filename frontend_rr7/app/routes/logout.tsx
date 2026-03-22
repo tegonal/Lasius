@@ -17,6 +17,8 @@
  *
  */
 
+import { redirect } from 'react-router'
+
 import { logger } from '~/lib/logger'
 import { getProvider } from '~/services/auth/providers'
 import {
@@ -31,7 +33,7 @@ export async function action({ request }: Route.ActionArgs) {
 	return performLogout(request)
 }
 
-/** Handle GET logout — matches current Next.js behavior where /logout immediately logs out */
+/** GET /logout also destroys the session — users visiting /logout directly expect to be logged out */
 export async function loader({ request }: Route.LoaderArgs) {
 	return performLogout(request)
 }
@@ -50,7 +52,7 @@ async function performLogout(request: Request): Promise<Response> {
 	if (result?.tokens) {
 		try {
 			const provider = getProvider(result.tokens.tokenIssuer)
-			await provider.revokeToken(result.tokens.accessToken)
+			await provider.revokeToken(result.tokens.refreshToken)
 			logger.debug('Token revoked successfully', {
 				provider: result.tokens.tokenIssuer,
 			})

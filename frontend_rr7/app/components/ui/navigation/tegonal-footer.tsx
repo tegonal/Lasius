@@ -21,6 +21,8 @@ import { SiGithub } from '@icons-pack/react-simple-icons'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { Trans, useTranslation } from 'react-i18next'
 
+import { BackendStatus } from '~/components/features/system/backend-status'
+import { WebsocketStatus } from '~/components/features/system/websocket-status'
 import { TegonalIcon } from '~/components/ui/icons/tegonal-icon'
 
 const footerVariants = cva(
@@ -75,6 +77,8 @@ export const TegonalFooter = ({ variant }: TegonalFooterProps) => {
 								})}
 							/>
 						</a>
+						<BackendStatus />
+						<WebsocketStatus />
 					</div>
 				) : (
 					<Trans

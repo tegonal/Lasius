@@ -29,4 +29,4 @@
  * cleanStrForCmp('test') === cleanStrForCmp('TEST') // true
  */
 export const cleanStrForCmp = (str: string) =>
-	str.toString().trim().toUpperCase()
+	(str ?? '').toString().trim().toUpperCase()

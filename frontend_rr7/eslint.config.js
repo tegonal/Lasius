@@ -24,7 +24,7 @@ export default [
 			'react-compiler': reactCompiler,
 		},
 		rules: {
-			'react-compiler/react-compiler': 'warn',
+			'react-compiler/react-compiler': 'error',
 		},
 	},
 	{

@@ -17,12 +17,7 @@
  *
  */
 
-import {
-	Dialog,
-	DialogBackdrop,
-	DialogPanel,
-	DialogTitle,
-} from '@headlessui/react'
+import { Dialog } from '@base-ui/react/dialog'
 import { run } from '@mdx-js/mdx'
 import { X } from 'lucide-react'
 import { Fragment, useEffect, useState } from 'react'
@@ -115,6 +110,12 @@ export const HelpDrawer = () => {
 	const [error, setError] = useState(false)
 	const [isFallbackLanguage, setIsFallbackLanguage] = useState(false)
 
+	const handleOpenChange = (nextOpen: boolean) => {
+		if (!nextOpen) {
+			closeHelp()
+		}
+	}
+
 	useEffect(() => {
 		if (!isOpen) return
 
@@ -165,86 +166,82 @@ export const HelpDrawer = () => {
 	}, [isOpen, location.pathname, i18n.language, customHelpFile])
 
 	return (
-		<Dialog className="relative z-50" onClose={closeHelp} open={isOpen}>
-			{/* Backdrop */}
-			<DialogBackdrop
-				className="fixed inset-0 bg-black/20 duration-300 ease-out data-[closed]:opacity-0"
-				transition
-			/>
+		<Dialog.Root modal onOpenChange={handleOpenChange} open={isOpen}>
+			<Dialog.Portal>
+				<Dialog.Backdrop className="fixed inset-0 z-50 bg-black/20 transition-opacity duration-300 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0" />
+				<div className="fixed inset-0 z-50 overflow-hidden">
+					<div className="absolute inset-0 overflow-hidden">
+						<div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full">
+							<Dialog.Popup className="pointer-events-auto w-screen max-w-[90vw] transform transition-transform duration-300 data-[ending-style]:translate-x-full data-[starting-style]:translate-x-full sm:max-w-[500px] md:max-w-[600px] lg:max-w-[700px]">
+								<div className="bg-base-100 flex h-full flex-col shadow-2xl">
+									{/* Header */}
+									<div className="border-base-300 border-b px-6 py-4">
+										<div className="flex items-center justify-between">
+											<Dialog.Title className="text-lg font-semibold">
+												{t('common.actions.help', {
+													defaultValue: 'Help',
+												})}
+											</Dialog.Title>
+											<Dialog.Close
+												render={
+													<Button
+														aria-label={t('common.actions.close', {
+															defaultValue: 'Close',
+														})}
+														fullWidth={false}
+														shape="circle"
+														size="sm"
+														variant="ghost"
+													>
+														<LucideIcon icon={X} size={20} />
+													</Button>
+												}
+											/>
+										</div>
+									</div>
 
-			{/* Drawer */}
-			<div className="fixed inset-0 overflow-hidden">
-				<div className="absolute inset-0 overflow-hidden">
-					<div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full">
-						<DialogPanel
-							className="pointer-events-auto w-screen max-w-[90vw] transform transition duration-300 ease-out data-[closed]:translate-x-full sm:max-w-[500px] md:max-w-[600px] lg:max-w-[700px]"
-							transition
-						>
-							<div className="bg-base-100 flex h-full flex-col shadow-2xl">
-								{/* Header */}
-								<div className="border-base-300 border-b px-6 py-4">
-									<div className="flex items-center justify-between">
-										<DialogTitle className="text-lg font-semibold">
-											{t('common.actions.help', {
-												defaultValue: 'Help',
-											})}
-										</DialogTitle>
-										<Button
-											aria-label={t('common.actions.close', {
-												defaultValue: 'Close',
-											})}
-											fullWidth={false}
-											onClick={closeHelp}
-											shape="circle"
-											size="sm"
-											variant="ghost"
-										>
-											<LucideIcon icon={X} size={20} />
-										</Button>
+									{/* Content */}
+									<div className="flex-1 overflow-y-auto px-8 py-6">
+										{loading && (
+											<div className="flex items-center justify-center py-12">
+												<span className="loading loading-spinner loading-lg" />
+											</div>
+										)}
+
+										{error && !loading && (
+											<div className="alert alert-warning">
+												<p>
+													{t('common.errors.helpNotAvailable', {
+														defaultValue:
+															'Help content not available for this page.',
+													})}
+												</p>
+											</div>
+										)}
+
+										{isFallbackLanguage && !loading && !error && (
+											<div className="alert alert-info mb-4">
+												<p>
+													{t('common.info.helpFallbackLanguage', {
+														defaultValue:
+															'This help content is not available in your selected language yet. Showing English version.',
+													})}
+												</p>
+											</div>
+										)}
+
+										{mdxContent && !loading && !error && (
+											<div className="prose prose-sm max-w-none">
+												{mdxContent}
+											</div>
+										)}
 									</div>
 								</div>
-
-								{/* Content */}
-								<div className="flex-1 overflow-y-auto px-8 py-6">
-									{loading && (
-										<div className="flex items-center justify-center py-12">
-											<span className="loading loading-spinner loading-lg" />
-										</div>
-									)}
-
-									{error && !loading && (
-										<div className="alert alert-warning">
-											<p>
-												{t('common.errors.helpNotAvailable', {
-													defaultValue:
-														'Help content not available for this page.',
-												})}
-											</p>
-										</div>
-									)}
-
-									{isFallbackLanguage && !loading && !error && (
-										<div className="alert alert-info mb-4">
-											<p>
-												{t('common.info.helpFallbackLanguage', {
-													defaultValue:
-														'This help content is not available in your selected language yet. Showing English version.',
-												})}
-											</p>
-										</div>
-									)}
-
-									{mdxContent && !loading && !error && (
-										<div className="prose prose-sm max-w-none">
-											{mdxContent}
-										</div>
-									)}
-								</div>
-							</div>
-						</DialogPanel>
+							</Dialog.Popup>
+						</div>
 					</div>
 				</div>
-			</div>
-		</Dialog>
+			</Dialog.Portal>
+		</Dialog.Root>
 	)
 }

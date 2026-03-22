@@ -17,15 +17,8 @@
  *
  */
 
-import {
-	Dialog,
-	DialogBackdrop,
-	DialogPanel,
-	Transition,
-	TransitionChild,
-} from '@headlessui/react'
+import { Dialog } from '@base-ui/react/dialog'
 import { cva, type VariantProps } from 'class-variance-authority'
-import { Fragment } from 'react'
 
 import { cn } from '~/lib/utils/cn'
 
@@ -58,7 +51,7 @@ interface Props extends ModalContainerProps {
 }
 
 /**
- * Modal component using HeadlessUI Dialog.
+ * Modal component using Base UI Dialog.
  * Provides focus trapping, backdrop click to close, and accessibility.
  */
 export const Modal = ({
@@ -70,53 +63,33 @@ export const Modal = ({
 	open,
 	size,
 }: Props) => {
-	const handleClose = () => {
-		if (!blockViewport) {
+	const modalSize = autoSize ? 'auto' : size || 'md'
+
+	const handleOpenChange = (nextOpen: boolean) => {
+		if (!nextOpen && !blockViewport) {
 			onClose()
 		}
 	}
 
-	const modalSize = autoSize ? 'auto' : size || 'md'
-
 	return (
-		<Transition as={Fragment} show={open}>
-			<Dialog className="relative z-50" onClose={handleClose}>
-				{/* Backdrop */}
-				<TransitionChild
-					as={Fragment}
-					enter="ease-out duration-300"
-					enterFrom="opacity-0"
-					enterTo="opacity-100"
-					leave="ease-in duration-300"
-					leaveFrom="opacity-100"
-					leaveTo="opacity-0"
+		<Dialog.Root modal onOpenChange={handleOpenChange} open={open}>
+			<Dialog.Portal>
+				<Dialog.Backdrop className="fixed inset-0 z-50 bg-black/40 backdrop-blur-[5px] transition-opacity duration-300 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0" />
+				<Dialog.Popup
+					className={cn('fixed inset-0 z-50 flex items-center justify-center')}
 				>
-					<DialogBackdrop className="fixed inset-0 bg-black/40 backdrop-blur-[5px]" />
-				</TransitionChild>
-
-				{/* Modal container */}
-				<div className="fixed inset-0 flex items-center justify-center">
-					<TransitionChild
-						as={Fragment}
-						enter="ease-out duration-300"
-						enterFrom="opacity-0 translate-y-full"
-						enterTo="opacity-100 translate-y-0"
-						leave="ease-in duration-300"
-						leaveFrom="opacity-100 translate-y-0"
-						leaveTo="opacity-0 translate-y-full"
+					<div
+						className={cn(
+							modalContainerVariants({ size: modalSize }),
+							minHeight && 'h-auto',
+							'transition-all duration-300 data-[ending-style]:translate-y-full data-[ending-style]:opacity-0 data-[starting-style]:translate-y-full data-[starting-style]:opacity-0',
+						)}
+						style={{ minHeight: minHeight || undefined }}
 					>
-						<DialogPanel
-							className={cn(
-								modalContainerVariants({ size: modalSize }),
-								minHeight && 'h-auto',
-							)}
-							style={{ minHeight: minHeight || undefined }}
-						>
-							{children}
-						</DialogPanel>
-					</TransitionChild>
-				</div>
-			</Dialog>
-		</Transition>
+						{children}
+					</div>
+				</Dialog.Popup>
+			</Dialog.Portal>
+		</Dialog.Root>
 	)
 }

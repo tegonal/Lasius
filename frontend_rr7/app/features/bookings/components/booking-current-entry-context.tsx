@@ -172,7 +172,10 @@ export const BookingCurrentEntryContext = ({ item }: Props) => {
 									</Button>
 								</ContextButtonWrapper>
 							)}
-							<ContextButtonAddFavorite item={item} onAddFavorite={addFavorite} />
+							<ContextButtonAddFavorite
+								item={item}
+								onAddFavorite={addFavorite}
+							/>
 							<ContextBarDivider />
 							<ContextButtonClose />
 						</ContextBar>

@@ -20,34 +20,30 @@
 import { Suspense } from 'react'
 import { Outlet } from 'react-router'
 
+import {
+	ColumnLeft,
+	outerGridClasses,
+} from '~/components/ui/layouts/layout-columns'
 import { NavigationMenuTabs } from '~/features/navigation/components/navigation-menu-tabs'
 
 export default function HomeLayout() {
 	return (
 		<>
-			{/* Desktop: 3-column grid */}
+			{/* Desktop: left nav + content area (children use ColumnCenter/ColumnRight) */}
 			<section className="hidden size-full overflow-auto md:block">
-				<div className="grid size-full grid-cols-[17rem_auto_18rem] overflow-auto lg:grid-cols-[18rem_auto_19rem] xl:grid-cols-[19rem_auto_20rem] 2xl:grid-cols-[19rem_auto_24rem]">
-					{/* Left column: navigation sidebar */}
-					<div className="h-full w-full rounded-tl-xl">
+				<div className={outerGridClasses}>
+					<ColumnLeft>
 						<NavigationMenuTabs />
-					</div>
-
-					{/* Center: main content */}
+					</ColumnLeft>
 					<Suspense
 						fallback={
-							<div className="flex h-full items-center justify-center">
+							<div className="flex h-full flex-1 items-center justify-center">
 								<span className="loading loading-spinner loading-lg text-primary" />
 							</div>
 						}
 					>
 						<Outlet />
 					</Suspense>
-
-					{/* Right column */}
-					<div className="border-base-100 bg-base-200 text-base-content flex h-full w-full overflow-auto rounded-tr-xl border-l">
-						{/* TODO: IndexColumnTabs */}
-					</div>
 				</div>
 			</section>
 

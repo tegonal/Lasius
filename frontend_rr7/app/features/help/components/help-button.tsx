@@ -17,27 +17,58 @@
  *
  */
 
-import { HelpCircle } from 'lucide-react'
+import { HelpCircleIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { useHelpStore } from '~/features/help/store/help-store'
 
+/**
+ * Header help button — toggles the help drawer (route-based content).
+ */
 export const HelpButton = () => {
 	const { t } = useTranslation('common')
 	const { toggleHelp } = useHelpStore()
 
 	return (
+		<div
+			className="tooltip tooltip-bottom"
+			data-tip={t('common.actions.help', { defaultValue: 'Help' })}
+		>
+			<Button
+				aria-label={t('common.actions.help', { defaultValue: 'Help' })}
+				data-testid="help-btn"
+				fullWidth={false}
+				onClick={toggleHelp}
+				shape="circle"
+				variant="ghost"
+			>
+				<LucideIcon icon={HelpCircleIcon} size={20} />
+			</Button>
+		</div>
+	)
+}
+
+/**
+ * Contextual help button — opens the help drawer with a specific help file.
+ * Used in modals and feature-specific areas.
+ */
+export const ModalHelpButton = ({ helpKey }: { helpKey: string }) => {
+	const { t } = useTranslation('common')
+	const { openHelp } = useHelpStore()
+
+	return (
 		<Button
 			aria-label={t('common.actions.help', { defaultValue: 'Help' })}
-			data-testid="help-btn"
 			fullWidth={false}
-			onClick={toggleHelp}
+			onClick={() => openHelp(helpKey)}
 			shape="circle"
+			size="sm"
+			type="button"
 			variant="ghost"
 		>
-			<LucideIcon icon={HelpCircle} size={20} />
+			<LucideIcon icon={HelpCircleIcon} size={20} />
 		</Button>
 	)
 }

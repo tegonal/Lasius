@@ -19,7 +19,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate, useRevalidator } from 'react-router'
+import { href, useNavigate, useRevalidator } from 'react-router'
 
 import { logger } from '~/lib/logger'
 
@@ -56,7 +56,7 @@ export function TokenWatcher() {
 
 			if (!status.authenticated) {
 				logger.info('[TokenWatcher] Session gone, redirecting to login')
-				void navigate('/login', { replace: true })
+				void navigate(href('/login'), { replace: true })
 				return
 			}
 
@@ -100,7 +100,7 @@ export function TokenWatcher() {
 
 	const handleLogout = useCallback(() => {
 		setShowWarning(false)
-		void navigate('/logout')
+		void navigate(href('/logout'))
 	}, [navigate])
 
 	return (

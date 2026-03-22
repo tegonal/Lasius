@@ -22,6 +22,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
+import { AvatarUser } from '~/components/ui/data-display/avatar-user'
 import { TagList } from '~/components/ui/data-display/tag-list'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import {
@@ -88,21 +89,6 @@ const BookingPresetItem = ({
 	</div>
 )
 
-const AvatarInitials = ({
-	firstName,
-	lastName,
-}: {
-	firstName: string
-	lastName: string
-}) => {
-	const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
-	return (
-		<div className="bg-primary text-primary-content flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-medium">
-			{initials}
-		</div>
-	)
-}
-
 const AnimatedList = ({ children }: { children: React.ReactNode }) => (
 	<div className="flex flex-col">{children}</div>
 )
@@ -154,22 +140,17 @@ const RecentBookingsList = ({
 				<AnimatedItem index={index} key={stringHash(item)}>
 					<PresetButton
 						ariaLabel={t('bookings.presets.selectRecent', {
-							defaultValue:
-								'Select recent booking: {{projectName}}{{tags}}',
+							defaultValue: 'Select recent booking: {{projectName}}{{tags}}',
 							projectName:
-								item.projectReference.key ||
-								item.projectReference.id,
+								item.projectReference.key || item.projectReference.id,
 							tags:
-								item.tags.length > 0
-									? ` with ${item.tags.length} tags`
-									: '',
+								item.tags.length > 0 ? ` with ${item.tags.length} tags` : '',
 						})}
 						onClick={() =>
 							onSelect({
 								projectId: item.projectReference.id,
 								projectName:
-									item.projectReference.key ||
-									item.projectReference.id,
+									item.projectReference.key || item.projectReference.id,
 								tags: item.tags,
 							})
 						}
@@ -199,22 +180,17 @@ const FavoritesList = ({
 				<AnimatedItem index={index} key={stringHash(item)}>
 					<PresetButton
 						ariaLabel={t('bookings.presets.selectFavorite', {
-							defaultValue:
-								'Select favorite: {{projectName}}{{tags}}',
+							defaultValue: 'Select favorite: {{projectName}}{{tags}}',
 							projectName:
-								item.projectReference.key ||
-								item.projectReference.id,
+								item.projectReference.key || item.projectReference.id,
 							tags:
-								item.tags.length > 0
-									? ` with ${item.tags.length} tags`
-									: '',
+								item.tags.length > 0 ? ` with ${item.tags.length} tags` : '',
 						})}
 						onClick={() =>
 							onSelect({
 								projectId: item.projectReference.id,
 								projectName:
-									item.projectReference.key ||
-									item.projectReference.id,
+									item.projectReference.key || item.projectReference.id,
 								tags: item.tags,
 							})
 						}
@@ -259,33 +235,25 @@ const TeamBookingsList = ({
 				<AnimatedItem index={index} key={stringHash(item)}>
 					<PresetButton
 						ariaLabel={t('bookings.presets.selectTeam', {
-							defaultValue:
-								'Select team booking: {{projectName}}{{tags}}',
+							defaultValue: 'Select team booking: {{projectName}}{{tags}}',
 							projectName:
-								item.projectReference.key ||
-								item.projectReference.id,
+								item.projectReference.key || item.projectReference.id,
 							tags:
-								item.tags.length > 0
-									? ` with ${item.tags.length} tags`
-									: '',
+								item.tags.length > 0 ? ` with ${item.tags.length} tags` : '',
 						})}
 						onClick={() =>
 							onSelect({
 								projectId: item.projectReference.id,
 								projectName:
-									item.projectReference.key ||
-									item.projectReference.id,
+									item.projectReference.key || item.projectReference.id,
 								tags: item.tags,
 							})
 						}
 					>
-						<AvatarInitials
-							firstName={
-								item.userReference?.key?.split(' ')[0] ?? '?'
-							}
-							lastName={
-								item.userReference?.key?.split(' ')[1] ?? ''
-							}
+						<AvatarUser
+							firstName={item.userReference?.key?.split(' ')[0] ?? '?'}
+							lastName={item.userReference?.key?.split(' ')[1] ?? ''}
+							size={32}
 						/>
 						<BookingPresetItem item={item} />
 					</PresetButton>
@@ -317,9 +285,7 @@ export const BookingPresetSelector = ({
 			}),
 		},
 		{
-			component: (
-				<FavoritesList items={favorites} onSelect={onSelect} />
-			),
+			component: <FavoritesList items={favorites} onSelect={onSelect} />,
 			icon: Star,
 			id: 'favorites',
 			name: t('bookings.presets.favorites', {
@@ -327,9 +293,7 @@ export const BookingPresetSelector = ({
 			}),
 		},
 		{
-			component: (
-				<TeamBookingsList items={orgBookings} onSelect={onSelect} />
-			),
+			component: <TeamBookingsList items={orgBookings} onSelect={onSelect} />,
 			icon: Users,
 			id: 'team',
 			name: t('bookings.presets.team', {
