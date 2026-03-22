@@ -88,7 +88,10 @@ export const MyProjectsListItemAdminContext = ({ item }: Props) => {
 	return (
 		<>
 			<ContextBody variant="compact">
-				<ContextButtonOpen hash={item.projectReference.id} />
+				<ContextButtonOpen
+					data-testid="project-ctx-open-btn"
+					hash={item.projectReference.id}
+				/>
 				{currentOpenContextMenuId === item.projectReference.id && (
 					<ContextAnimatePresence variant="compact">
 						<ContextBar>
@@ -145,6 +148,7 @@ export const MyProjectsListItemAdminContext = ({ item }: Props) => {
 									aria-label={t('projects.actions.edit', {
 										defaultValue: 'Edit project',
 									})}
+									data-testid="project-ctx-edit-btn"
 									fullWidth={false}
 									onClick={() => editProject()}
 									shape="circle"

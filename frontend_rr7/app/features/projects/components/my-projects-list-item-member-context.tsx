@@ -36,7 +36,10 @@ export const MyProjectsListItemMemberContext = ({ item }: Props) => {
 
 	return (
 		<ContextBody variant="compact">
-			<ContextButtonOpen hash={item.projectReference.id} />
+			<ContextButtonOpen
+				data-testid="project-ctx-open-btn"
+				hash={item.projectReference.id}
+			/>
 			{currentOpenContextMenuId === item.projectReference.id && (
 				<ContextAnimatePresence variant="compact">
 					<ContextBar>

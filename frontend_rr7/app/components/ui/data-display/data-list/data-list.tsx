@@ -19,13 +19,11 @@
 
 import React from 'react'
 
-interface Props {
-	children: React.ReactNode
-}
+type Props = React.ComponentPropsWithoutRef<'table'>
 
-export const DataList = ({ children }: Props) => {
+export const DataList = ({ children, ...rest }: Props) => {
 	return (
-		<table className="w-full border-collapse">
+		<table className="w-full border-collapse" {...rest}>
 			<tbody>{children}</tbody>
 		</table>
 	)

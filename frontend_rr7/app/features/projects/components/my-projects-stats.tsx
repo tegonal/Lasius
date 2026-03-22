@@ -48,6 +48,7 @@ export const MyProjectsStats = ({ onCreateProject }: Props) => {
 			</StatsGroup>
 			<Button
 				className="w-auto"
+				data-testid="project-create-btn"
 				fullWidth={false}
 				onClick={onCreateProject}
 				size="sm"

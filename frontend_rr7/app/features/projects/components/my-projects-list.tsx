@@ -64,7 +64,7 @@ export const MyProjectsList = ({ searchTerm }: Props) => {
 
 	return (
 		<ContextMenuProvider>
-			<DataList>
+			<DataList data-testid="project-list">
 				<DataListRow>
 					<DataListHeaderItem />
 					<DataListHeaderItem>
@@ -83,7 +83,10 @@ export const MyProjectsList = ({ searchTerm }: Props) => {
 					<DataListHeaderItem />
 				</DataListRow>
 				{filteredProjects.map((item) => (
-					<DataListRow key={item.projectReference.id}>
+					<DataListRow
+						data-testid="project-card"
+						key={item.projectReference.id}
+					>
 						<DataListField width={90}>
 							<AvatarProject name={item.projectReference.key} />
 						</DataListField>

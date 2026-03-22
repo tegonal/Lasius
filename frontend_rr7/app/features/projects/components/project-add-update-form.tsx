@@ -19,10 +19,9 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { type TFunction } from 'i18next'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { useFetcher } from 'react-router'
 import { z } from 'zod'
 
 import { Button } from '~/components/primitives/buttons/button'
@@ -38,6 +37,10 @@ import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-but
 import { ModalDescription } from '~/components/ui/overlays/modal/modal-description'
 import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
+import {
+	useCreateProject,
+	useUpdateProject,
+} from '~/services/api/lasius-hooks/projects/projects'
 import { type ModelsProject } from '~/services/api/lasius/modelsProject'
 import { type ModelsUserProject } from '~/services/api/lasius/modelsUserProject'
 
@@ -69,7 +72,10 @@ export const ProjectAddUpdateForm = ({
 	const { t } = useTranslation('common')
 	const { addToast } = useToast()
 	const { selectedOrganisationId } = useOrganisation()
-	const fetcher = useFetcher()
+
+	const createProjectApi = useCreateProject()
+	const updateProjectApi = useUpdateProject()
+	const activeFetcher = mode === 'add' ? createProjectApi : updateProjectApi
 
 	const schema = useMemo(() => createProjectSchema(t), [t])
 
@@ -100,47 +106,44 @@ export const ProjectAddUpdateForm = ({
 		resolver: zodResolver(schema),
 	})
 
-	const isSubmitting = fetcher.state !== 'idle'
+	const isSubmitting = activeFetcher.state !== 'idle'
 
-	// Handle fetcher response
+	// Handle response
+	const handledRef = useRef(false)
 	useEffect(() => {
-		if (fetcher.state === 'idle' && fetcher.data) {
-			const data = fetcher.data as { error?: string; success?: boolean }
-			if (data.success) {
-				addToast({
-					message:
-						mode === 'add'
-							? t('projects.status.created', {
-									defaultValue: 'Project created',
-								})
-							: t('projects.status.updated', {
-									defaultValue: 'Project updated',
-								}),
-					type: 'SUCCESS',
-				})
-				onSave()
-			} else if (data.error) {
-				hookForm.setError('projectKey', {
-					message: t('projects.errors.duplicateKey', {
-						defaultValue: 'A project with this name already exists',
-					}),
-					type: 'manual',
-				})
-			}
-		}
-	}, [fetcher.state, fetcher.data]) // eslint-disable-line react-hooks/exhaustive-deps
+		if (activeFetcher.state !== 'idle' || !activeFetcher.data) return
+		if (handledRef.current) return
+		handledRef.current = true
+
+		addToast({
+			message:
+				mode === 'add'
+					? t('projects.status.created', {
+							defaultValue: 'Project created',
+						})
+					: t('projects.status.updated', {
+							defaultValue: 'Project updated',
+						}),
+			type: 'SUCCESS',
+		})
+		onSave()
+	}, [activeFetcher.state, activeFetcher.data, addToast, t, mode, onSave])
 
 	const onSubmit = () => {
 		const { projectKey } = hookForm.getValues()
-		void fetcher.submit(
-			{
-				intent: mode === 'add' ? 'createProject' : 'updateProject',
-				organisationId: selectedOrganisationId,
+
+		if (mode === 'add') {
+			createProjectApi.submit({
+				body: { bookingCategories: [], key: projectKey },
+				orgId: selectedOrganisationId,
+			})
+		} else {
+			updateProjectApi.submit({
+				body: { key: projectKey },
+				orgId: selectedOrganisationId,
 				projectId: getProjectId(item),
-				projectKey,
-			},
-			{ method: 'post' },
-		)
+			})
+		}
 	}
 
 	return (
@@ -188,6 +191,7 @@ export const ProjectAddUpdateForm = ({
 								<Input
 									aria-describedby="projectKey-error"
 									autoComplete="off"
+									data-testid="project-form-key-input"
 									id="projectKey"
 									{...hookForm.register('projectKey', {
 										onChange: () => {
@@ -206,6 +210,7 @@ export const ProjectAddUpdateForm = ({
 						<ButtonGroup>
 							<Button
 								className="relative z-0"
+								data-testid="project-form-save-btn"
 								disabled={isSubmitting}
 								type="submit"
 							>
@@ -213,7 +218,12 @@ export const ProjectAddUpdateForm = ({
 									defaultValue: 'Save',
 								})}
 							</Button>
-							<Button onClick={onCancel} type="button" variant="secondary">
+							<Button
+								data-testid="project-form-close-btn"
+								onClick={onCancel}
+								type="button"
+								variant="secondary"
+							>
 								{t('common.actions.cancel', {
 									defaultValue: 'Cancel',
 								})}
