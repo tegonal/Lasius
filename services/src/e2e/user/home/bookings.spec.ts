@@ -99,10 +99,11 @@ test.describe('Booking lifecycle @crud', () => {
     await page.getByTestId('booking-ctx-delete-btn').waitFor({ state: 'visible', timeout: 5000 })
     await page.getByTestId('booking-ctx-delete-btn').click()
 
-    // Wait for deletion to process and verify count decreased
-    await page.waitForTimeout(2000)
-    const countAfter = await bookingItems.count()
-    expect(countAfter).toBeLessThan(countBefore)
+    // Wait for the UI to reflect the deletion
+    await expect(async () => {
+      const countAfter = await bookingItems.count()
+      expect(countAfter).toBeLessThan(countBefore)
+    }).toPass({ timeout: 10000 })
   })
 
   test('start booking from context menu', async ({ page }) => {
