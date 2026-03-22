@@ -69,6 +69,9 @@ export default [
 					]),
 				]),
 			]),
+			layout('routes/user.projects.tsx', [
+				route('projects', 'routes/user.projects._index.tsx'),
+			]),
 		]),
 	]),
 ] satisfies RouteConfig

@@ -19,8 +19,8 @@
 
 import { LogOut } from 'lucide-react'
 import { useState } from 'react'
-import { useFetcher } from 'react-router'
 import { useTranslation } from 'react-i18next'
+import { useFetcher } from 'react-router'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
@@ -47,7 +47,7 @@ export const ContextButtonLeaveProject = ({
 	const fetcher = useFetcher()
 
 	const handleConfirm = () => {
-		fetcher.submit(
+		void fetcher.submit(
 			{
 				intent: 'leave-project',
 				orgId: selectedOrganisationId,
@@ -90,8 +90,7 @@ export const ContextButtonLeaveProject = ({
 					})}
 					confirmVariant="primary"
 					message={t('projects.confirmations.leave', {
-						defaultValue:
-							'Are you sure you want to leave this project?',
+						defaultValue: 'Are you sure you want to leave this project?',
 					})}
 					onClose={handleCancel}
 					onConfirm={handleConfirm}
