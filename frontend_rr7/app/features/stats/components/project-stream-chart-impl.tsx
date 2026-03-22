@@ -21,11 +21,13 @@
 
 import { ResponsiveStream } from '@nivo/stream'
 
+import {
+	ChartSingleTooltip,
+	ChartStackTooltip,
+} from '~/components/ui/charts/chart-tooltips'
+import { nivoTheme, useNivoColors } from '~/components/ui/charts/nivo-theme'
 import { EmptyStateStats } from '~/features/stats/components/empty-state-stats'
 import { type NivoChartDataType } from '~/lib/api/functions/get-nivo-chart-data-from-api-stats-data'
-
-import { ChartSingleTooltip, ChartStackTooltip } from './chart-tooltips'
-import { nivoTheme, useNivoColors } from './nivo-theme'
 
 type Props = {
 	data: NivoChartDataType

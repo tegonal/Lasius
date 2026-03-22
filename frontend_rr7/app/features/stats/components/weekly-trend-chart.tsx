@@ -22,10 +22,9 @@
 import { type Point, ResponsiveLine } from '@nivo/line'
 import { useTranslation } from 'react-i18next'
 
+import { nivoTheme, useNivoColors } from '~/components/ui/charts/nivo-theme'
 import { EmptyStateStats } from '~/features/stats/components/empty-state-stats'
 import { decimalHoursToDurationString } from '~/lib/utils/duration'
-
-import { nivoTheme, useNivoColors } from './nivo-theme'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 

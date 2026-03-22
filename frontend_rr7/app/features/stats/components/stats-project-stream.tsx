@@ -25,9 +25,11 @@ import { EmptyStateStats } from './empty-state-stats'
 import { StatsTile } from './stats-tile'
 
 const ProjectStreamChartImpl = lazy(() =>
-	import('~/components/ui/charts/project-stream-chart-impl').then((mod) => ({
-		default: mod.ProjectStreamChartImpl,
-	})),
+	import('~/features/stats/components/project-stream-chart-impl').then(
+		(mod) => ({
+			default: mod.ProjectStreamChartImpl,
+		}),
+	),
 )
 
 const BarsHours = lazy(() =>

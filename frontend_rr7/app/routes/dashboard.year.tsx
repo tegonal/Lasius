@@ -56,7 +56,7 @@ import {
 import { type Route } from './+types/dashboard.year'
 
 const WeeklyTrendChart = lazy(() =>
-	import('~/components/ui/charts/weekly-trend-chart').then((mod) => ({
+	import('~/features/stats/components/weekly-trend-chart').then((mod) => ({
 		default: mod.WeeklyTrendChart,
 	})),
 )

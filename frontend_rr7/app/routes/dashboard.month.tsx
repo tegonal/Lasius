@@ -52,7 +52,7 @@ import {
 import { type Route } from './+types/dashboard.month'
 
 const MonthStreamChart = lazy(() =>
-	import('~/components/ui/charts/month-stream-chart').then((mod) => ({
+	import('~/features/stats/components/month-stream-chart').then((mod) => ({
 		default: mod.MonthStreamChart,
 	})),
 )

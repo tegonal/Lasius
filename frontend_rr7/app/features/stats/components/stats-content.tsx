@@ -20,8 +20,8 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { ChartErrorBoundary } from '~/components/ui/error-boundary-chart'
 import { type TabItem, Tabs } from '~/components/ui/navigation/tabs'
+import { ChartErrorBoundary } from '~/features/stats/components/error-boundary-chart'
 import { type NivoChartDataType } from '~/lib/api/functions/get-nivo-chart-data-from-api-stats-data'
 
 import { type BarChartGroupMode } from './bars-hours'

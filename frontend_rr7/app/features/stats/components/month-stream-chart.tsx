@@ -24,11 +24,13 @@ import { format } from 'date-fns'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import {
+	ChartSingleTooltip,
+	ChartStackTooltip,
+} from '~/components/ui/charts/chart-tooltips'
+import { useNivoColors } from '~/components/ui/charts/nivo-theme'
 import { EmptyStateStats } from '~/features/stats/components/empty-state-stats'
 import { getDateLocale } from '~/lib/utils/date-locale'
-
-import { ChartSingleTooltip, ChartStackTooltip } from './chart-tooltips'
-import { useNivoColors } from './nivo-theme'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
