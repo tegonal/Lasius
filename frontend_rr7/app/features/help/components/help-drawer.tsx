@@ -172,7 +172,10 @@ export const HelpDrawer = () => {
 				<div className="fixed inset-0 z-50 overflow-hidden">
 					<div className="absolute inset-0 overflow-hidden">
 						<div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full">
-							<Dialog.Popup className="pointer-events-auto w-screen max-w-[90vw] transform transition-transform duration-300 data-[ending-style]:translate-x-full data-[starting-style]:translate-x-full sm:max-w-[500px] md:max-w-[600px] lg:max-w-[700px]">
+							<Dialog.Popup
+								className="pointer-events-auto w-screen max-w-[90vw] transform transition-transform duration-300 data-[ending-style]:translate-x-full data-[starting-style]:translate-x-full sm:max-w-[500px] md:max-w-[600px] lg:max-w-[700px]"
+								data-testid="help-drawer"
+							>
 								<div className="bg-base-100 flex h-full flex-col shadow-2xl">
 									{/* Header */}
 									<div className="border-base-300 border-b px-6 py-4">
