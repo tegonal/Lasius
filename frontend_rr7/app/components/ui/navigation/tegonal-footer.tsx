@@ -21,9 +21,9 @@ import { SiGithub } from '@icons-pack/react-simple-icons'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { Trans, useTranslation } from 'react-i18next'
 
-import { BackendStatus } from '~/components/features/system/backend-status'
-import { WebsocketStatus } from '~/components/features/system/websocket-status'
 import { TegonalIcon } from '~/components/ui/icons/tegonal-icon'
+import { BackendStatus } from '~/features/system/components/backend-status'
+import { WebsocketStatus } from '~/features/system/components/websocket-status'
 
 const footerVariants = cva(
 	'text-base-content/50 [&_a:hover]:text-base-content flex',
