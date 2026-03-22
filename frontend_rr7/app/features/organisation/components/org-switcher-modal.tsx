@@ -58,7 +58,7 @@ export const OrgSwitcherModal = ({
 	}
 
 	return (
-		<div>
+		<div data-testid="org-switcher-modal">
 			<h1 className="mb-4 text-2xl font-bold">
 				{t('organisations.selectOrganisation', {
 					defaultValue: 'Select organisation',
@@ -67,10 +67,9 @@ export const OrgSwitcherModal = ({
 			<div className="grid grid-cols-3 gap-3">
 				{organisations.map((item) => (
 					<CardSmall
+						data-testid="org-card"
 						key={item.organisationReference.id}
-						onClick={() =>
-							selectOrganisation(item.organisationReference)
-						}
+						onClick={() => selectOrganisation(item.organisationReference)}
 					>
 						<div className="flex flex-col items-center justify-center pt-2">
 							<AvatarOrganisation
@@ -80,13 +79,9 @@ export const OrgSwitcherModal = ({
 						</div>
 						<div className="leading-normal">
 							{item.private
-								? t(
-										'organisations.myPersonalOrganisation',
-										{
-											defaultValue:
-												'My personal organisation',
-										},
-									)
+								? t('organisations.myPersonalOrganisation', {
+										defaultValue: 'My personal organisation',
+									})
 								: item.organisationReference.key}
 						</div>
 						{isCurrent(item) && (
