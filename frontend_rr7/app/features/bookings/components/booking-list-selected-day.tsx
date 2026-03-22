@@ -18,18 +18,15 @@
  */
 
 import { useTranslation } from 'react-i18next'
-import { useRouteLoaderData } from 'react-router'
 
-import { ContextMenuProvider } from '~/components/features/context-menu/hooks/use-context-menu'
-import { type AugmentedBooking } from '~/lib/api/functions/augment-bookings-list'
+import { useHomeLoaderData } from '~/features/bookings/hooks/use-home-loader-data'
+import { ContextMenuProvider } from '~/features/context-menu/hooks/use-context-menu'
 
 import { BookingItem } from './booking-item'
 
 export const BookingListSelectedDay = () => {
 	const { t } = useTranslation('common')
-	const loaderData = useRouteLoaderData('routes/user.home._index') as
-		| undefined
-		| { augmentedBookings: AugmentedBooking[] }
+	const loaderData = useHomeLoaderData()
 
 	const bookings = loaderData?.augmentedBookings ?? []
 
@@ -58,7 +55,7 @@ export const BookingListSelectedDay = () => {
 							animationFillMode: 'both',
 						}}
 					>
-						<BookingItem item={item} />
+						<BookingItem item={item} nextItem={bookings[index + 1]} />
 					</div>
 				))}
 			</div>

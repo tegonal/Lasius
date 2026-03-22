@@ -20,31 +20,23 @@
 import { roundToNearestMinutes } from 'date-fns'
 import { ClockIcon, SquareIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { useRouteLoaderData } from 'react-router'
 
-import { ContextMenuProvider } from '~/components/features/context-menu/hooks/use-context-menu'
 import { Button } from '~/components/primitives/buttons/button'
 import { TagList } from '~/components/ui/data-display/tag-list'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+import { useHomeLoaderData } from '~/features/bookings/hooks/use-home-loader-data'
+import { ContextMenuProvider } from '~/features/context-menu/hooks/use-context-menu'
 import { useStopBooking } from '~/hooks/use-stop-booking'
 import { formatISOLocale } from '~/lib/utils/dates'
 import { type ModelsBooking } from '~/services/api/lasius'
-import { type ModelsCurrentUserTimeBooking } from '~/services/api/lasius/modelsCurrentUserTimeBooking'
 
 import { BookingCurrentEntryContext } from './booking-current-entry-context'
 import { BookingDurationCounter } from './booking-duration-counter'
 import { BookingFrom } from './booking-from'
 import { BookingName } from './booking-name'
 
-type HomeLoaderData = {
-	currentBooking: ModelsCurrentUserTimeBooking | undefined
-	selectedOrgId: string
-}
-
 export const BookingCurrent = () => {
-	const loaderData = useRouteLoaderData('routes/user.home._index') as
-		| HomeLoaderData
-		| undefined
+	const loaderData = useHomeLoaderData()
 
 	const currentBooking = loaderData?.currentBooking
 

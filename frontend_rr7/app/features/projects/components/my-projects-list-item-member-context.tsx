@@ -17,14 +17,14 @@
  *
  */
 
-import { ContextButtonClose } from '~/components/features/context-menu/buttons/context-button-close'
-import { ContextButtonLeaveProject } from '~/components/features/context-menu/buttons/context-button-leave-project'
-import { ContextButtonOpen } from '~/components/features/context-menu/buttons/context-button-open'
-import { ContextAnimatePresence } from '~/components/features/context-menu/context-animate-presence'
-import { ContextBar } from '~/components/features/context-menu/context-bar'
-import { ContextBarDivider } from '~/components/features/context-menu/context-bar-divider'
-import { ContextBody } from '~/components/features/context-menu/context-body'
-import { useContextMenu } from '~/components/features/context-menu/hooks/use-context-menu'
+import { ContextButtonClose } from '~/features/context-menu/buttons/context-button-close'
+import { ContextButtonLeaveProject } from '~/features/context-menu/buttons/context-button-leave-project'
+import { ContextButtonOpen } from '~/features/context-menu/buttons/context-button-open'
+import { ContextAnimatePresence } from '~/features/context-menu/context-animate-presence'
+import { ContextBar } from '~/features/context-menu/context-bar'
+import { ContextBarDivider } from '~/features/context-menu/context-bar-divider'
+import { ContextBody } from '~/features/context-menu/context-body'
+import { useContextMenu } from '~/features/context-menu/hooks/use-context-menu'
 import { type ModelsUserProject } from '~/services/api/lasius/modelsUserProject'
 
 type Props = {

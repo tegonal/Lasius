@@ -17,8 +17,8 @@
  *
  */
 
-import { ContextMenuProvider } from '~/components/features/context-menu/hooks/use-context-menu'
 import { AnimateList } from '~/components/ui/animations/animate-list'
+import { ContextMenuProvider } from '~/features/context-menu/hooks/use-context-menu'
 import { stringHash } from '~/lib/utils/string-hash'
 import { type ModelsBookingStub } from '~/services/api/lasius'
 

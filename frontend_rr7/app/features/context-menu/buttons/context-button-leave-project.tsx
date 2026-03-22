@@ -20,12 +20,12 @@
 import { LogOut } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useFetcher } from 'react-router'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { GenericConfirmModal } from '~/components/ui/overlays/modal/generic-confirm-modal'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
+import { useRemoveProjectOwnUser } from '~/services/api/lasius-hooks/projects/projects'
 import { type ModelsUserProject } from '~/services/api/lasius/modelsUserProject'
 
 import { ContextButtonWrapper } from '../context-button-wrapper'
@@ -44,17 +44,13 @@ export const ContextButtonLeaveProject = ({
 	const { t } = useTranslation('common')
 	const [showDialog, setShowDialog] = useState(false)
 	const { selectedOrganisationId } = useOrganisation()
-	const fetcher = useFetcher()
+	const leaveProjectApi = useRemoveProjectOwnUser()
 
 	const handleConfirm = () => {
-		void fetcher.submit(
-			{
-				intent: 'leave-project',
-				orgId: selectedOrganisationId,
-				projectId: item.projectReference.id,
-			},
-			{ action: '/api/project-leave', method: 'post' },
-		)
+		leaveProjectApi.submit({
+			orgId: selectedOrganisationId,
+			projectId: item.projectReference.id,
+		})
 		setShowDialog(false)
 		handleCloseAll()
 	}

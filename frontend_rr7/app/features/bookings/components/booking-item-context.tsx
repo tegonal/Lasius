@@ -21,40 +21,34 @@ import { roundToNearestMinutes } from 'date-fns'
 import { ArrowDownToLine, ArrowUpToLine, Pencil, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useRouteLoaderData } from 'react-router'
 
-import { ContextButtonAddFavorite } from '~/components/features/context-menu/buttons/context-button-add-favorite'
-import { ContextButtonClose } from '~/components/features/context-menu/buttons/context-button-close'
-import { ContextButtonOpen } from '~/components/features/context-menu/buttons/context-button-open'
-import { ContextButtonStartBooking } from '~/components/features/context-menu/buttons/context-button-start-booking'
-import { ContextAnimatePresence } from '~/components/features/context-menu/context-animate-presence'
-import { ContextBar } from '~/components/features/context-menu/context-bar'
-import { ContextBarDivider } from '~/components/features/context-menu/context-bar-divider'
-import { ContextBody } from '~/components/features/context-menu/context-body'
-import { ContextButtonWrapper } from '~/components/features/context-menu/context-button-wrapper'
-import { useContextMenu } from '~/components/features/context-menu/hooks/use-context-menu'
 import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { Modal } from '~/components/ui/overlays/modal'
 import { BookingAddUpdateForm } from '~/features/bookings/components/booking-add-update-form'
+import {
+	useHomeLoaderData,
+	useSelectedOrgId,
+} from '~/features/bookings/hooks/use-home-loader-data'
+import { ContextButtonAddFavorite } from '~/features/context-menu/buttons/context-button-add-favorite'
+import { ContextButtonClose } from '~/features/context-menu/buttons/context-button-close'
+import { ContextButtonOpen } from '~/features/context-menu/buttons/context-button-open'
+import { ContextButtonStartBooking } from '~/features/context-menu/buttons/context-button-start-booking'
+import { ContextAnimatePresence } from '~/features/context-menu/context-animate-presence'
+import { ContextBar } from '~/features/context-menu/context-bar'
+import { ContextBarDivider } from '~/features/context-menu/context-bar-divider'
+import { ContextBody } from '~/features/context-menu/context-body'
+import { ContextButtonWrapper } from '~/features/context-menu/context-button-wrapper'
+import { useContextMenu } from '~/features/context-menu/hooks/use-context-menu'
 import { useStopAndStart } from '~/hooks/use-stop-and-start'
 import { type AugmentedBooking } from '~/lib/api/functions/augment-bookings-list'
 import { formatISOLocale } from '~/lib/utils/dates'
-import {
-	type ModelsBooking,
-	type ModelsCurrentUserTimeBooking,
-} from '~/services/api/lasius'
+import { type ModelsBooking } from '~/services/api/lasius'
 import {
 	useDeleteUserBooking,
 	useUpdateUserBooking,
 } from '~/services/api/lasius-hooks/user-bookings/user-bookings'
 import { useAddFavoriteBooking } from '~/services/api/lasius-hooks/user-favorites/user-favorites'
-
-type HomeLoaderData = {
-	augmentedBookings: AugmentedBooking[]
-	currentBooking?: ModelsCurrentUserTimeBooking
-	selectedOrgId: string
-}
 
 type Props = {
 	item: AugmentedBooking
@@ -70,16 +64,12 @@ const areTimesWithinOneMinute = (
 }
 
 const useCurrentBookingId = (): string | undefined => {
-	const loaderData = useRouteLoaderData('routes/user.home._index') as
-		| HomeLoaderData
-		| undefined
+	const loaderData = useHomeLoaderData()
 	return loaderData?.currentBooking?.booking?.id
 }
 
 const useGetAdjacentBookings = (item: ModelsBooking) => {
-	const loaderData = useRouteLoaderData('routes/user.home._index') as
-		| HomeLoaderData
-		| undefined
+	const loaderData = useHomeLoaderData()
 
 	const bookings = loaderData?.augmentedBookings ?? []
 	const index = bookings.findIndex((b) => b.id === item.id)
@@ -88,13 +78,6 @@ const useGetAdjacentBookings = (item: ModelsBooking) => {
 		next: index > 0 ? bookings[index - 1] : null,
 		previous: index < bookings.length - 1 ? bookings[index + 1] : null,
 	}
-}
-
-const useSelectedOrgId = (): string => {
-	const loaderData = useRouteLoaderData('routes/user.home._index') as
-		| HomeLoaderData
-		| undefined
-	return loaderData?.selectedOrgId ?? ''
 }
 
 export const BookingItemContext = ({ item }: Props) => {

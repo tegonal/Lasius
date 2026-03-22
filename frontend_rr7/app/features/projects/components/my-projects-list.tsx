@@ -20,7 +20,6 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { ContextMenuProvider } from '~/components/features/context-menu/hooks/use-context-menu'
 import { AvatarProject } from '~/components/ui/data-display/avatar/avatar-project'
 import {
 	DataList,
@@ -30,6 +29,7 @@ import {
 } from '~/components/ui/data-display/data-list'
 import { ROLES } from '~/config/constants'
 import { UserRoles } from '~/config/dynamic-translation-strings'
+import { ContextMenuProvider } from '~/features/context-menu/hooks/use-context-menu'
 import { EmptyStateProjects } from '~/features/projects/components/empty-state-projects'
 import { MyProjectsListItemAdminContext } from '~/features/projects/components/my-projects-list-item-admin-context'
 import { MyProjectsListItemMemberContext } from '~/features/projects/components/my-projects-list-item-member-context'
