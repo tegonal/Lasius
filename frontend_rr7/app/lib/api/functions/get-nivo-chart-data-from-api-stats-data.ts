@@ -120,8 +120,8 @@ export const getNivoChartDataFromApiStatsData = (
     const categoryLabel = getCategoryLabel(cat.category, granularity)
     const categoryValues = Object.fromEntries(
       cat.values.map((item) => [
-        [item.label || ''],
-        [millisToHours(item.duration || 0)],
+        item.label || '',
+        millisToHours(item.duration || 0),
       ]),
     )
     return {

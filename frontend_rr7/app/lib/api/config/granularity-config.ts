@@ -57,7 +57,7 @@ export const getAdaptiveGranularity = (
 
 /**
  * Determines if bar chart should be used instead of stream chart.
- * Bar charts are used for <=14 days (Day granularity range) since stream charts need many points.
+ * Bar charts are better for very short time periods (<=2 past days).
  */
 export const shouldUseBarChart = (from: string, to: string): boolean => {
   const today = new Date()
@@ -70,7 +70,7 @@ export const shouldUseBarChart = (from: string, to: string): boolean => {
   }
 
   const days = differenceInCalendarDays(effectiveToDate, fromDate)
-  return days <= 14
+  return days <= 2
 }
 
 /**
