@@ -17,20 +17,33 @@
  *
  */
 
+import { useLoaderData } from 'react-router'
+
 import {
   ColumnCenter,
   ColumnRight,
   innerGridClasses,
 } from '~/components/ui/layouts/layout-columns'
+import { IntegrationsRightColumn } from '~/features/integrations/components/integrations-right-column'
+import { IntegrationsStats } from '~/features/integrations/components/integrations-stats'
+import { type ModelsIssueImporterConfigResponse } from '~/services/api/lasius/modelsIssueImporterConfigResponse'
 
 export const IntegrationsLayout = () => {
+  const { configs } = useLoaderData<{
+    configs: ModelsIssueImporterConfigResponse[]
+  }>()
+
   return (
     <div className={innerGridClasses}>
       <ColumnCenter>
-        <p>Integrations center (TODO)</p>
+        <div className="flex h-full flex-col overflow-hidden">
+          <div className="flex-shrink-0">
+            <IntegrationsStats configs={configs} onAddClick={() => {}} />
+          </div>
+        </div>
       </ColumnCenter>
       <ColumnRight>
-        <p>Integrations info (TODO)</p>
+        <IntegrationsRightColumn />
       </ColumnRight>
     </div>
   )
