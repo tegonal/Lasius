@@ -17,127 +17,265 @@
  *
  */
 
-import { ChevronDown, Download } from 'lucide-react'
+import { endOfDay, format, isValid, startOfDay } from 'date-fns'
+import { ChevronDown, Download, Loader2 } from 'lucide-react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { useToast } from '~/components/ui/feedback/use-toast'
+import { getAdaptiveGranularity } from '~/lib/api/config/granularity-config'
+import { logger } from '~/lib/logger'
 import {
-	type ExportFormat,
-	exportStatistics,
+  type ExportFormat,
+  exportStatistics,
 } from '~/lib/utils/statistics-export'
 import { type ModelsBookingStats } from '~/services/api/lasius'
 
 type StatsExportProps = {
-	bookingList: {
-		elements: number
-		hours: number
-	}
-	distinctProjects: number
-	distinctUsers: number
-	from: string
-	projectsAggregated: ModelsBookingStats[] | undefined
-	projectsByDay: ModelsBookingStats[] | undefined
-	tagsAggregated: ModelsBookingStats[] | undefined
-	tagsByDay: ModelsBookingStats[] | undefined
-	to: string
+  bookingList: {
+    elements: number
+    hours: number
+  }
+  distinctProjects: number
+  distinctUsers: number
+  from: string
+  scope?: 'organisation' | 'user'
+  selectedOrgId: string
+  to: string
+}
+
+const apiDateFormat = 'yyyy-MM-dd'
+
+const formatDateParam = (dateStr: string): string => {
+  const date = new Date(dateStr)
+  if (!isValid(date)) return dateStr
+  return format(startOfDay(date), apiDateFormat)
+}
+
+const formatDateParamEnd = (dateStr: string): string => {
+  const date = new Date(dateStr)
+  if (!isValid(date)) return dateStr
+  return format(endOfDay(date), apiDateFormat)
+}
+
+type FetchStatsParams = {
+  from: string
+  granularity: string
+  scope: 'organisation' | 'user'
+  selectedOrgId: string
+  source: string
+  to: string
+}
+
+const fetchAggregatedStats = async ({
+  from,
+  granularity,
+  scope,
+  selectedOrgId,
+  source,
+  to,
+}: FetchStatsParams): Promise<ModelsBookingStats[]> => {
+  const apiFrom = formatDateParam(from)
+  const apiTo = formatDateParamEnd(to)
+
+  const basePath =
+    scope === 'organisation'
+      ? `/organisation-bookings/organisations/${selectedOrgId}/bookings/stats/aggregated`
+      : `/user-bookings/organisations/${selectedOrgId}/bookings/stats/aggregated`
+
+  const params = new URLSearchParams({
+    from: apiFrom,
+    granularity,
+    source,
+    to: apiTo,
+  })
+
+  const response = await fetch('/api/proxy', {
+    body: JSON.stringify({
+      method: 'GET',
+      url: `${basePath}?${params.toString()}`,
+    }),
+    headers: { 'Content-Type': 'application/json' },
+    method: 'POST',
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ${source} stats: ${response.status}`)
+  }
+
+  const data = (await response.json()) as { data?: ModelsBookingStats[] }
+  return data.data ?? []
 }
 
 export const StatsExport = ({
-	bookingList,
-	distinctProjects,
-	distinctUsers,
-	from,
-	projectsAggregated,
-	projectsByDay,
-	tagsAggregated,
-	tagsByDay,
-	to,
+  bookingList,
+  distinctProjects,
+  distinctUsers,
+  from,
+  scope = 'user',
+  selectedOrgId,
+  to,
 }: StatsExportProps) => {
-	const { t } = useTranslation('common')
+  const { t } = useTranslation('common')
+  const { addToast } = useToast()
+  const [isExporting, setIsExporting] = useState(false)
 
-	const hasData =
-		bookingList.elements > 0 &&
-		((projectsByDay?.length ?? 0) > 0 ||
-			(tagsByDay?.length ?? 0) > 0 ||
-			(projectsAggregated?.length ?? 0) > 0 ||
-			(tagsAggregated?.length ?? 0) > 0)
+  const hasData = bookingList.elements > 0
 
-	const handleExport = (format: ExportFormat) => {
-		exportStatistics(
-			{
-				aggregated: [
-					{ data: projectsAggregated, source: 'project' },
-					{ data: tagsAggregated, source: 'tag' },
-				],
-				byDayAndSource: [
-					{ data: projectsByDay, source: 'project' },
-					{ data: tagsByDay, source: 'tag' },
-				],
-				scope: 'user',
-				summary: {
-					from,
-					to,
-					totalBookings: bookingList.elements,
-					totalHours: bookingList.hours,
-					totalProjects: distinctProjects,
-					totalUsers: distinctUsers,
-				},
-			},
-			format,
-		)
-	}
+  const handleExport = async (exportFormat: ExportFormat) => {
+    setIsExporting(true)
 
-	return (
-		<div className="dropdown dropdown-end" data-testid="stats-export">
-			<button
-				aria-haspopup="menu"
-				aria-label={t('export.stats.openMenu', {
-					defaultValue: 'Open statistics export format menu',
-				})}
-				className="btn btn-sm btn-neutral w-auto"
-				data-testid="stats-export-btn"
-				disabled={!hasData}
-				tabIndex={0}
-				type="button"
-			>
-				<Download className="size-4" />
-				{t('export.actions.export', { defaultValue: 'Export' })}
-				<ChevronDown className="size-4" />
-			</button>
-			<ul
-				aria-label={t('export.stats.menuLabel', {
-					defaultValue: 'Statistics export format selection',
-				})}
-				className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
-				role="menu"
-				tabIndex={0}
-			>
-				<li role="none">
-					<button
-						aria-label={t('export.formats.excelAria', {
-							defaultValue: 'Export as Excel file',
-						})}
-						onClick={() => handleExport('xlsx')}
-						role="menuitem"
-					>
-						{t('export.formats.excel', {
-							defaultValue: 'Excel (.xlsx)',
-						})}
-					</button>
-				</li>
-				<li role="none">
-					<button
-						aria-label={t('export.formats.odsAria', {
-							defaultValue: 'Export as OpenDocument file',
-						})}
-						onClick={() => handleExport('ods')}
-						role="menuitem"
-					>
-						{t('export.formats.ods', {
-							defaultValue: 'OpenDocument (.ods)',
-						})}
-					</button>
-				</li>
-			</ul>
-		</div>
-	)
+    try {
+      const granularity = getAdaptiveGranularity(from, to)
+
+      const fetchParams = (source: string, gran: string): FetchStatsParams => ({
+        from,
+        granularity: gran,
+        scope,
+        selectedOrgId,
+        source,
+        to,
+      })
+
+      let projectsByDay: ModelsBookingStats[] = []
+      let tagsByDay: ModelsBookingStats[] = []
+      let usersByDay: ModelsBookingStats[] = []
+      let projectsAggregated: ModelsBookingStats[] = []
+      let tagsAggregated: ModelsBookingStats[] = []
+      let usersAggregated: ModelsBookingStats[] = []
+
+      if (scope === 'organisation') {
+        ;[
+          tagsByDay,
+          usersByDay,
+          projectsAggregated,
+          usersAggregated,
+          tagsAggregated,
+        ] = await Promise.all([
+          fetchAggregatedStats(fetchParams('tag', granularity)),
+          fetchAggregatedStats(fetchParams('user', granularity)),
+          fetchAggregatedStats(fetchParams('project', 'All')),
+          fetchAggregatedStats(fetchParams('user', 'All')),
+          fetchAggregatedStats(fetchParams('tag', 'All')),
+        ])
+      } else {
+        ;[projectsByDay, tagsByDay, projectsAggregated, tagsAggregated] =
+          await Promise.all([
+            fetchAggregatedStats(fetchParams('project', granularity)),
+            fetchAggregatedStats(fetchParams('tag', granularity)),
+            fetchAggregatedStats(fetchParams('project', 'All')),
+            fetchAggregatedStats(fetchParams('tag', 'All')),
+          ])
+      }
+
+      const byDayAndSource =
+        scope === 'organisation'
+          ? [
+              { data: tagsByDay, source: 'tag' as const },
+              { data: usersByDay, source: 'user' as const },
+            ]
+          : [
+              { data: projectsByDay, source: 'project' as const },
+              { data: tagsByDay, source: 'tag' as const },
+            ]
+
+      const aggregated =
+        scope === 'organisation'
+          ? [
+              { data: projectsAggregated, source: 'project' as const },
+              { data: usersAggregated, source: 'user' as const },
+              { data: tagsAggregated, source: 'tag' as const },
+            ]
+          : [
+              { data: projectsAggregated, source: 'project' as const },
+              { data: tagsAggregated, source: 'tag' as const },
+            ]
+
+      exportStatistics(
+        {
+          aggregated,
+          byDayAndSource,
+          scope,
+          summary: {
+            from,
+            to,
+            totalBookings: bookingList.elements,
+            totalHours: bookingList.hours,
+            totalProjects: distinctProjects,
+            totalUsers: distinctUsers,
+          },
+        },
+        exportFormat,
+      )
+    } catch (error) {
+      logger.error('Failed to export statistics', error)
+      addToast({
+        message: t('export.stats.error', {
+          defaultValue: 'Failed to export statistics. Please try again.',
+        }),
+        type: 'ERROR',
+      })
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  return (
+    <div className="dropdown dropdown-end" data-testid="stats-export">
+      <button
+        aria-haspopup="menu"
+        aria-label={t('export.stats.openMenu', {
+          defaultValue: 'Open statistics export format menu',
+        })}
+        className="btn btn-sm btn-neutral w-auto"
+        data-testid="stats-export-btn"
+        disabled={!hasData || isExporting}
+        tabIndex={0}
+        type="button"
+      >
+        {isExporting ? (
+          <Loader2 className="size-4 animate-spin" />
+        ) : (
+          <Download className="size-4" />
+        )}
+        {t('export.actions.export', { defaultValue: 'Export' })}
+        <ChevronDown className="size-4" />
+      </button>
+      <ul
+        aria-label={t('export.stats.menuLabel', {
+          defaultValue: 'Statistics export format selection',
+        })}
+        className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+        role="menu"
+        tabIndex={0}
+      >
+        <li role="none">
+          <button
+            aria-label={t('export.formats.excelAria', {
+              defaultValue: 'Export as Excel file',
+            })}
+            onClick={() => handleExport('xlsx')}
+            role="menuitem"
+          >
+            {t('export.formats.excel', {
+              defaultValue: 'Excel (.xlsx)',
+            })}
+          </button>
+        </li>
+        <li role="none">
+          <button
+            aria-label={t('export.formats.odsAria', {
+              defaultValue: 'Export as OpenDocument file',
+            })}
+            onClick={() => handleExport('ods')}
+            role="menuitem"
+          >
+            {t('export.formats.ods', {
+              defaultValue: 'OpenDocument (.ods)',
+            })}
+          </button>
+        </li>
+      </ul>
+    </div>
+  )
 }
