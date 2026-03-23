@@ -1,0 +1,35 @@
+{
+  "actions": {
+    "add": "Tags hinzufügen",
+    "addDefaultTagGroups": "Standard-Tag-Gruppen hinzufügen",
+    "addTag": "Einen Tag hinzufügen",
+    "addTagGroup": "Eine neue Tag-Gruppe hinzufügen",
+    "collapseAll": "Alle einklappen",
+    "copyTags": "Tags kopieren",
+    "createTagGroup": "Tag-Gruppe erstellen",
+    "edit": "Tags bearbeiten",
+    "editForProject": "Tags für {{projectKey}} bearbeiten",
+    "expandAll": "Alle ausklappen",
+    "pasteTags": "Tags einfügen"
+  },
+  "chooseOrEnter": "Tags auswählen oder eingeben",
+  "confirmDeleteGroup": "Möchtest du die Tag-Gruppe \"{{groupName}}\" wirklich löschen?",
+  "customTag": "Benutzerdefinierter Tag",
+  "enterTagName": "Tag-Name eingeben",
+  "label": "Tags",
+  "noTagGroups": "Noch keine Tag-Gruppen definiert",
+  "simpleTags": "Einfache Tags",
+  "simpleTagsDescription": "Tags, die zu keiner Gruppe gehören",
+  "status": {
+    "tagsCopied": "Tags kopiert",
+    "tagsPasted": "Tags eingefügt"
+  },
+  "tagGroups": "Tag-Gruppen",
+  "title": "Tags",
+  "validation": {
+    "tagExists": "Tag existiert bereits",
+    "tagGroupExists": "Tag-Gruppe existiert bereits",
+    "tagGroupNameRequired": "Tag-Gruppenname erforderlich",
+    "tagNameRequired": "Tag-Name erforderlich"
+  }
+}

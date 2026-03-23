@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "create": "Créer une organisation",
+    "edit": "Modifier l'organisation"
+  },
+  "adminDescription": "Tu es administrateur de cette organisation. Tu peux ajouter et retirer des membres, modifier le nom de l'organisation ou en créer une nouvelle.",
+  "createDescription": "Utilisez le menu Actions pour créer une nouvelle organisation.",
+  "currentOrganisation": "Organisation actuelle",
+  "description": {
+    "create": "Créez une nouvelle organisation pour collaborer avec votre équipe.",
+    "edit": "Mettez à jour le nom de l'organisation."
+  },
+  "errors": {
+    "duplicateKey": "Une organisation avec ce nom existe déjà"
+  },
+  "info": {
+    "uniqueNameRequired": "Les noms d'organisation doivent être uniques."
+  },
+  "memberDescription": "Tu es membre de cette organisation et n'as pas les droits pour ajouter ou retirer des membres. Contacte un administrateur de l'organisation si tu souhaites inviter quelqu'un.",
+  "members": {
+    "actions": {
+      "invite": "Inviter quelqu'un",
+      "manage": "Gérer les membres",
+      "remove": "Retirer le membre"
+    },
+    "confirmations": {
+      "removeConfirm": "Es-tu sûr de vouloir retirer {{name}} ?",
+      "removeTitle": "Retirer un membre",
+      "removeWarning": "Ce membre sera retiré de l'organisation et perdra l'accès à tous les projets."
+    },
+    "confirmRemove": "Are you sure you want to remove this member from the project?",
+    "description_one": "Ce projet a {{count}} membre.",
+    "description_many": "Ce projet a {{count}} membres.",
+    "description_other": "Ce projet a {{count}} membres.",
+    "empty": "Aucun membre trouvé",
+    "emptyState": "No members found",
+    "title": "Members"
+  },
+  "myPersonalOrganisation": "Mon organisation personnelle",
+  "organisationName": "Organisation",
+  "organisationRole": "Rôle dans l'organisation",
+  "organization": "Organisation",
+  "organizationName": "Nom de l'organisation",
+  "privateDescription": "Cette organisation n'est visible que par toi. Utilise-la pour suivre des projets privés. Pour collaborer avec d'autres personnes, crée ou utilise une organisation différente.",
+  "selectOrganisation": "Sélectionner une organisation"
+}

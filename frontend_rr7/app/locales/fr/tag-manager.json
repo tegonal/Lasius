@@ -1,0 +1,35 @@
+{
+  "actions": {
+    "add": "Ajouter des étiquettes",
+    "addDefaultTagGroups": "Ajouter les groupes d'étiquettes par défaut",
+    "addTag": "Ajouter une étiquette",
+    "addTagGroup": "Ajouter un nouveau groupe d'étiquettes",
+    "collapseAll": "Tout réduire",
+    "copyTags": "Copier les étiquettes",
+    "createTagGroup": "Créer un groupe d'étiquettes",
+    "edit": "Modifier les étiquettes",
+    "editForProject": "Modifier les étiquettes pour {{projectKey}}",
+    "expandAll": "Tout développer",
+    "pasteTags": "Coller les étiquettes"
+  },
+  "chooseOrEnter": "Choisir ou saisir des étiquettes",
+  "confirmDeleteGroup": "Es-tu sûr de vouloir supprimer le groupe d'étiquettes \"{{groupName}}\" ?",
+  "customTag": "Étiquette personnalisée",
+  "enterTagName": "Saisir le nom de l'étiquette",
+  "label": "Étiquettes",
+  "noTagGroups": "Aucun groupe d'étiquettes défini pour le moment",
+  "simpleTags": "Étiquettes simples",
+  "simpleTagsDescription": "Étiquettes qui ne font partie d'aucun groupe",
+  "status": {
+    "tagsCopied": "Étiquettes copiées",
+    "tagsPasted": "Étiquettes collées"
+  },
+  "tagGroups": "Groupes d'étiquettes",
+  "title": "Étiquettes",
+  "validation": {
+    "tagExists": "L'étiquette existe déjà",
+    "tagGroupExists": "Le groupe d'étiquettes existe déjà",
+    "tagGroupNameRequired": "Le nom du groupe d'étiquettes est requis",
+    "tagNameRequired": "Le nom de l'étiquette est requis"
+  }
+}

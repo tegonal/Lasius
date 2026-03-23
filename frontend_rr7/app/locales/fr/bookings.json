@@ -1,0 +1,55 @@
+{
+  "actions": {
+    "add": "Ajouter une réservation",
+    "adjustCurrentStart": "Ajuster la réservation actuelle pour qu'elle commence à la fin de la réservation chevauchante",
+    "adjustEndToNext": "Ajuster la fin à la réservation suivante",
+    "adjustLowerEnd": "Étendre la fin de la réservation inférieure jusqu'au début de la réservation supérieure",
+    "adjustOverlappingEnd": "Ajuster la réservation chevauchante pour qu'elle se termine au début de la réservation actuelle",
+    "adjustStartToPrevious": "Ajuster le début à la réservation précédente",
+    "adjustUpperStart": "Déplacer le début de la réservation supérieure à la fin de la réservation inférieure",
+    "create": "Créer une réservation",
+    "delete": "Supprimer la réservation",
+    "edit": "Modifier la réservation",
+    "editOverlapping": "Modifier la réservation pour résoudre le chevauchement",
+    "filterByProject": "Filtrer par projet {{projectKey}}",
+    "filterByUser": "Filtrer par utilisateur {{userKey}}",
+    "insert": "Insérer une réservation",
+    "start": "Démarrer la réservation",
+    "startFromFavorite": "Démarrer la réservation à partir d'un favori",
+    "startFromTeamMember": "Démarrer la réservation à partir d'un membre de l'équipe",
+    "stopRecording": "Arrêter l'enregistrement de la réservation en cours"
+  },
+  "duration": "Durée",
+  "emptyToday": "Aucune réservation pour ce jour",
+  "hints": {
+    "useEndTimeOfLatest": "Utiliser l'heure de fin de la dernière réservation comme heure de début pour celle-ci",
+    "useEndTimeOfPrevious": "Utiliser l'heure de fin de la réservation précédente comme heure de début pour celle-ci",
+    "useStartTimeOfNext": "Utiliser l'heure de début de la réservation suivante comme heure de fin pour celle-ci"
+  },
+  "history": {
+    "empty": "Aucune réservation trouvée pour les filtres sélectionnés"
+  },
+  "noBookingsToday": "No bookings for this day",
+  "overlapsWarning": "Ces réservations se chevauchent. Cliquez pour modifier et ajuster l'heure.",
+  "presets": {
+    "browse": "Parcourir les modèles",
+    "empty": "Aucun modèle disponible",
+    "favorites": "Favoris",
+    "recent": "Réservations récentes",
+    "selectFavorite": "Sélectionner un favori : {{projectName}}{{tags}}",
+    "selectRecent": "Sélectionner une réservation récente : {{projectName}}{{tags}}",
+    "selectTeam": "Sélectionner une réservation d'équipe par {{userName}} : {{projectName}}{{tags}}",
+    "team": "Réservations de l'équipe",
+    "title": "Choisir un modèle"
+  },
+  "showLists": "Afficher les réservations",
+  "status": {
+    "currentlyNotBooking": "Aucune réservation en cours"
+  },
+  "title": "Réservations",
+  "warnings": {
+    "durationIsZero": "La durée de cette réservation est nulle",
+    "longDuration": "Durée prolongée détectée",
+    "longDurationDescription": "Cette réservation dépasse une journée de travail typique de 8 heures. Veuillez vérifier les heures de début et de fin."
+  }
+}

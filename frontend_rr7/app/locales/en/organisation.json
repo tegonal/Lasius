@@ -1,0 +1,45 @@
+{
+  "actions": {
+    "create": "Create organisation",
+    "edit": "Edit organisation"
+  },
+  "adminDescription": "You are an administrator of this organisation. You can add and remove members and change the organisation name, or create a new one.",
+  "createDescription": "Use the Actions menu to create a new organisation.",
+  "currentOrganisation": "Current organisation",
+  "description": {
+    "create": "Create a new organisation to collaborate with your team.",
+    "edit": "Update the organisation name."
+  },
+  "errors": {
+    "duplicateKey": "An organisation with this name already exists"
+  },
+  "info": {
+    "uniqueNameRequired": "Organisation names must be unique."
+  },
+  "memberDescription": "You are a member of this organisation and don't have the rights to add or remove members. Get in touch with an organisation administrator if you would like to invite someone.",
+  "members": {
+    "actions": {
+      "invite": "Invite someone",
+      "manage": "Manage members",
+      "remove": "Remove member"
+    },
+    "confirmations": {
+      "removeConfirm": "Are you sure you want to remove {{name}}?",
+      "removeTitle": "Remove member",
+      "removeWarning": "This member will be removed from the organisation and lose access to all projects."
+    },
+    "confirmRemove": "Are you sure you want to remove this member from the project?",
+    "description_one": "This project has {{count}} member(s).",
+    "description_other": "This project has {{count}} member(s).",
+    "empty": "No members found",
+    "emptyState": "No members found",
+    "title": "Members"
+  },
+  "myPersonalOrganisation": "My personal organisation",
+  "organisationName": "Organisation",
+  "organisationRole": "Organisation role",
+  "organization": "Organisation",
+  "organizationName": "Organisation name",
+  "privateDescription": "This organisation is only visible to you. Use it to track private projects. To collaborate with others, create or use a different organisation.",
+  "selectOrganisation": "Select organisation"
+}

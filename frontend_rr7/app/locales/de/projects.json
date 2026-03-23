@@ -1,0 +1,54 @@
+{
+  "actions": {
+    "add": "Projekt hinzufügen",
+    "create": "Ein Projekt erstellen",
+    "deactivate": "Projekt deaktivieren",
+    "deactivateConfirm": "Are you sure you want to deactivate the project \"{{project}}\"?",
+    "edit": "Projekt bearbeiten",
+    "leave": "Dieses Projekt verlassen"
+  },
+  "allProjects": "Alle Projekte",
+  "allProjectsDescription": "Alle Projekte in der aktuellen Organisation, die du verwalten kannst. Erstelle Abrechnungsberichte einschließlich der Zeit, die von externen Projektmitgliedern gebucht wurde.",
+  "confirmations": {
+    "leave": "Bist du sicher, dass du dieses Projekt verlassen möchtest?"
+  },
+  "deactivatedBy": "Archiviert von {{user}}",
+  "description": {
+    "add": "Erstelle ein neues Projekt, um deine Zeiterfassung zu organisieren.",
+    "edit": "Aktualisiere die Projektdetails."
+  },
+  "empty": "Keine Projekte gefunden",
+  "errors": {
+    "projectNotFound": "Dieses Projekt konnte nicht gefunden werden. Die Projekt-ID wird oben angezeigt."
+  },
+  "filter": {
+    "both": "Beide",
+    "search": "Suchen",
+    "searchPlaceholder": "Projekte filtern...",
+    "status": "Status"
+  },
+  "info": {
+    "uniqueNameRequired": "Projektnamen müssen innerhalb deiner Organisation eindeutig sein."
+  },
+  "label": "Projekt",
+  "lastActivity": "Letzte Aktivität",
+  "myProjects": "Meine Projekte",
+  "myProjectsDescription": "Projekte, in denen du Mitglied bist und Zeit buchen kannst. Eingeschränkt durch die aktuell ausgewählte Organisation.",
+  "project": "Projekt",
+  "projectName": "Projektname",
+  "projectRole": "Rolle",
+  "selectProject": "Projekt auswählen",
+  "status": {
+    "assignedToUser": "Projekt erfolgreich an Benutzer zugewiesen.",
+    "created": "Projekt erstellt",
+    "updated": "Projekt aktualisiert"
+  },
+  "title": "Projekte",
+  "total": "Gesamt",
+  "warnings": {
+    "inactiveProjectContext": "Statistiken von inaktivem Projekt werden angezeigt",
+    "inactiveProjectFilter": "Daten für inaktives Projekt werden angezeigt",
+    "projectNotInActiveList": "Dieses Projekt ist nicht in deiner Liste aktiver Projekte. Es könnte inaktiv sein oder aus einer anderen Organisation stammen.",
+    "projectUnavailable": "Dieses Projekt ist nicht mehr in deinem Profil vorhanden. Du wurdest möglicherweise daraus entfernt."
+  }
+}

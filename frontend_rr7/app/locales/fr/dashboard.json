@@ -1,0 +1,15 @@
+{
+  "workHealth": {
+    "actualHours": "réelles",
+    "avgPerDay": "moy/jour",
+    "consecutiveDays": "jours consécutifs",
+    "elevatedLoad": "Charge élevée",
+    "healthyLoad": "Ça a l'air bien !",
+    "highLoad": "Charge importante détectée",
+    "plannedHours": "planifiées",
+    "relaxReminder": "Il est temps de se détendre un peu",
+    "sixMonths": "6 mois",
+    "takeItEasy": "Envisage de lever le pied",
+    "thisWeek": "cette semaine"
+  }
+}

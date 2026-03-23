@@ -1,0 +1,12 @@
+{
+  "dailyTotal": "Daily Total",
+  "description": "The amount of time you expect to book per day, by organisation, during a typical working week. This data is used to calculate your daily and weekly progress.",
+  "errors": {
+    "updateFailed": "Failed to update working hours"
+  },
+  "status": {
+    "updated": "Working hours updated"
+  },
+  "title": "Working hours",
+  "totalPerWeek": "total per week"
+}

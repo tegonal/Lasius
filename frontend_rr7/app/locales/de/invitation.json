@@ -1,0 +1,35 @@
+{
+  "actions": {
+    "accept": "Einladung annehmen",
+    "reject": "Einladung ablehnen"
+  },
+  "copyToClipboard": "In Zwischenablage kopieren",
+  "createAccountMessage": "Du wurdest eingeladen, ein Konto zu erstellen, damit du Lasius zur Erfassung deiner Arbeitszeit nutzen kannst.",
+  "description": {
+    "copyLink": "Kopiere den Link und sende ihn an deine Kollegen. Falls sie noch kein Konto haben, wird eines erstellt, wenn die Einladung angenommen wird."
+  },
+  "email": "E-Mail",
+  "errors": {
+    "createdForSomeoneElse": "Diese Einladung wurde für jemand anderen erstellt. Melde dich entweder ab und lade die Seite neu, oder leite den Einladungslink an den Benutzer {{email}} weiter",
+    "noLongerValid": "Diese Einladung ist nicht mehr gültig. Kontaktiere am besten die Person, die dir den Einladungslink gesendet hat, um einen neuen zu erhalten."
+  },
+  "inviteOrganisationDescription": "Gib die E-Mail-Adresse der Person ein, die du einladen möchtest. Ein Einladungslink wird generiert, den du ihr senden kannst.",
+  "inviteProjectDescription": "Gib die E-Mail-Adresse der Person ein, die du einladen möchtest. Ein Einladungslink wird generiert, den du ihr senden kannst.",
+  "messages": {
+    "invitedToOrganisation": "Du wurdest von {{inviter}} eingeladen, der Organisation {{organisation}} beizutreten.",
+    "invitedToOrganisationNeedsAccount": "Sie wurden von {{inviter}} eingeladen, der Organisation {{organisation}} beizutreten.",
+    "invitedToProject": "Du wurdest von {{inviter}} eingeladen, dem Projekt {{project}} beizutreten.",
+    "invitedToProjectNeedsAccount": "Sie wurden von {{inviter}} eingeladen, dem Projekt {{project}} beizutreten.",
+    "selectOrganisation": "Wähle die Organisation aus, zu der du dieses Projekt hinzufügen möchtest:"
+  },
+  "needsAccount": {
+    "description": "Du musst dich mit {{email}} anmelden oder ein Konto erstellen, um diese Einladung anzunehmen.",
+    "emailMatch": "Stelle sicher, dass du dich mit der E-Mail-Adresse anmeldest, an die diese Einladung gesendet wurde: {{email}}",
+    "signInOrSignUpWith": "Sign in or sign up with",
+    "title": "Konto erforderlich"
+  },
+  "title": {
+    "invitationCreated": "Einladung erstellt",
+    "userAssigned": "Benutzer zugewiesen"
+  }
+}

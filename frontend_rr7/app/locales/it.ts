@@ -17,12 +17,44 @@
  *
  */
 
+import auth from './it/auth.json'
+import bookingHistory from './it/booking-history.json'
+import bookings from './it/bookings.json'
+import calendar from './it/calendar.json'
 import common from './it/common.json'
+import contextMenu from './it/context-menu.json'
+import dashboard from './it/dashboard.json'
+import help from './it/help.json'
+import home from './it/home.json'
 import integrations from './it/integrations.json'
+import invitation from './it/invitation.json'
+import navigation from './it/navigation.json'
+import organisation from './it/organisation.json'
+import projects from './it/projects.json'
+import settings from './it/settings.json'
+import stats from './it/stats.json'
+import system from './it/system.json'
+import tagManager from './it/tag-manager.json'
+import workingHours from './it/working-hours.json'
 
-const resources = {
+export default {
+  auth,
+  'booking-history': bookingHistory,
+  bookings,
+  calendar,
   common,
+  'context-menu': contextMenu,
+  dashboard,
+  help,
+  home,
   integrations,
+  invitation,
+  navigation,
+  organisation,
+  projects,
+  settings,
+  stats,
+  system,
+  'tag-manager': tagManager,
+  'working-hours': workingHours,
 } as const
-
-export default resources

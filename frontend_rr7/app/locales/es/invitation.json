@@ -1,0 +1,35 @@
+{
+  "actions": {
+    "accept": "Aceptar invitación",
+    "reject": "Rechazar invitación"
+  },
+  "copyToClipboard": "Copiar al portapapeles",
+  "createAccountMessage": "Has sido invitado a crear una cuenta de Lasius para registrar tus horas de trabajo.",
+  "description": {
+    "copyLink": "Copia el enlace y envíalo a tu colega. Si aún no tiene una cuenta, se creará una cuando se acepte la invitación."
+  },
+  "email": "Correo electrónico",
+  "errors": {
+    "createdForSomeoneElse": "Esta invitación ha sido creada para otra persona. Cierra sesión y actualiza, o reenvía el enlace de invitación al usuario {{email}}",
+    "noLongerValid": "Esta invitación ya no es válida. Es mejor que contactes con la persona que te envió el enlace de invitación para obtener uno nuevo."
+  },
+  "inviteOrganisationDescription": "Introduce la dirección de correo electrónico de la persona que deseas invitar. Se generará un enlace de invitación que puedes enviarle.",
+  "inviteProjectDescription": "Introduce la dirección de correo electrónico de la persona que deseas invitar. Se generará un enlace de invitación que puedes enviarle.",
+  "messages": {
+    "invitedToOrganisation": "Has sido invitado por {{inviter}} a unirte a la organización {{organisation}}.",
+    "invitedToOrganisationNeedsAccount": "Ha sido invitado/a por {{inviter}} a unirse a la organización {{organisation}}.",
+    "invitedToProject": "Has sido invitado por {{inviter}} a unirte al proyecto {{project}}.",
+    "invitedToProjectNeedsAccount": "Ha sido invitado/a por {{inviter}} a unirse al proyecto {{project}}.",
+    "selectOrganisation": "Selecciona la organización a la que quieres añadir este proyecto:"
+  },
+  "needsAccount": {
+    "description": "Necesitarás iniciar sesión o crear una cuenta para {{email}} para aceptar esta invitación.",
+    "emailMatch": "Asegúrate de iniciar sesión con la dirección de correo electrónico a la que se envió esta invitación: {{email}}",
+    "signInOrSignUpWith": "Sign in or sign up with",
+    "title": "Cuenta requerida"
+  },
+  "title": {
+    "invitationCreated": "Invitación creada",
+    "userAssigned": "Usuario asignado"
+  }
+}

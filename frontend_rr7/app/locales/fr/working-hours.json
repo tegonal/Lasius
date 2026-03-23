@@ -1,0 +1,12 @@
+{
+  "dailyTotal": "Total quotidien",
+  "description": "Le temps que tu prévois de réserver par jour, par organisation, pendant une semaine de travail typique. Ces données sont utilisées pour calculer ta progression quotidienne et hebdomadaire.",
+  "errors": {
+    "updateFailed": "Échec de la mise à jour des heures de travail"
+  },
+  "status": {
+    "updated": "Heures de travail mises à jour"
+  },
+  "title": "Heures de travail",
+  "totalPerWeek": "total par semaine"
+}

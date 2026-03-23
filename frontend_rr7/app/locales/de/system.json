@@ -1,0 +1,24 @@
+{
+  "pwa": {
+    "reloadApplication": "Anwendung neu laden",
+    "updateAvailable": "Aktualisierung verfügbar",
+    "updateMessage": "Lasius wurde aktualisiert. Die Seite wird nach Ihrer Bestätigung neu geladen."
+  },
+  "sessionTimeout": {
+    "extend": "Extend Session",
+    "logout": "Logout",
+    "message": "Your session will expire soon. Would you like to extend it?",
+    "title": "Session Expiring"
+  },
+  "websocket": {
+    "status": {
+      "connected": "Websocket verbunden",
+      "connecting": "Websocket verbindet",
+      "error": "Kann nicht mit Websocket verbinden"
+    }
+  },
+  "backendUnreachable": "Backend scheint nicht erreichbar zu sein",
+  "connectedToBackend": "Mit Backend verbunden",
+  "connectingToBackend": "Verbinde mit Backend",
+  "offlineMessage": "Lasius ist derzeit offline oder wird gewartet. Wir sind bald wieder da."
+}

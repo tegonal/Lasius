@@ -1,0 +1,55 @@
+{
+  "actions": {
+    "add": "Buchung hinzufügen",
+    "adjustCurrentStart": "Aktuelle Buchung anpassen, um am Ende der überlappenden Buchung zu starten",
+    "adjustEndToNext": "Ende an nächste Buchung anpassen",
+    "adjustLowerEnd": "Untere Buchung bis zum Start der oberen Buchung verlängern",
+    "adjustOverlappingEnd": "Überlappende Buchung anpassen, um am Start der aktuellen Buchung zu enden",
+    "adjustStartToPrevious": "Start an vorherige Buchung anpassen",
+    "adjustUpperStart": "Start der oberen Buchung an Ende der unteren Buchung verschieben",
+    "create": "Eine Buchung erstellen",
+    "delete": "Buchung löschen",
+    "edit": "Buchung bearbeiten",
+    "editOverlapping": "Buchung bearbeiten, um Überlappung zu beheben",
+    "filterByProject": "Nach Projekt {{projectKey}} filtern",
+    "filterByUser": "Nach Benutzer {{userKey}} filtern",
+    "insert": "Buchung einfügen",
+    "start": "Buchung starten",
+    "startFromFavorite": "Buchung aus Favorit starten",
+    "startFromTeamMember": "Buchung von Teammitglied starten",
+    "stopRecording": "Aufzeichnung der aktuellen Buchung stoppen"
+  },
+  "duration": "Dauer",
+  "emptyToday": "Keine Buchungen für diesen Tag",
+  "hints": {
+    "useEndTimeOfLatest": "Endzeit der letzten Buchung als Startzeit für diese verwenden",
+    "useEndTimeOfPrevious": "Endzeit der vorherigen Buchung als Startzeit für diese verwenden",
+    "useStartTimeOfNext": "Startzeit der nächsten Buchung als Endzeit für diese verwenden"
+  },
+  "history": {
+    "empty": "Keine Buchungen für die ausgewählten Filter gefunden"
+  },
+  "noBookingsToday": "No bookings for this day",
+  "overlapsWarning": "Diese beiden Buchungen überlappen sich. Klicke, um die obere zu bearbeiten und die Zeit anzupassen.",
+  "presets": {
+    "browse": "Vorlagen durchsuchen",
+    "empty": "Keine Vorlagen verfügbar",
+    "favorites": "Favoriten",
+    "recent": "Letzte Buchungen",
+    "selectFavorite": "Favorit auswählen: {{projectName}}{{tags}}",
+    "selectRecent": "Letzte Buchung auswählen: {{projectName}}{{tags}}",
+    "selectTeam": "Team-Buchung von {{userName}} auswählen: {{projectName}}{{tags}}",
+    "team": "Team-Buchungen",
+    "title": "Eine Vorlage wählen"
+  },
+  "showLists": "Buchungen anzeigen",
+  "status": {
+    "currentlyNotBooking": "Derzeit keine Buchung aktiv"
+  },
+  "title": "Buchungen",
+  "warnings": {
+    "durationIsZero": "Die Dauer dieser Buchung ist null",
+    "longDuration": "Lange Dauer erkannt",
+    "longDurationDescription": "Diese Buchung ist länger als ein typischer 8-Stunden-Arbeitstag. Bitte überprüfen Sie die Start- und Endzeiten."
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "actions": {
+    "add": "Añadir registro",
+    "adjustCurrentStart": "Ajustar el inicio del registro actual al final del registro superpuesto",
+    "adjustEndToNext": "Ajustar el final al siguiente registro",
+    "adjustLowerEnd": "Extender el final del registro inferior al inicio del registro superior",
+    "adjustOverlappingEnd": "Ajustar el final del registro superpuesto al inicio del registro actual",
+    "adjustStartToPrevious": "Ajustar el inicio al registro anterior",
+    "adjustUpperStart": "Mover el inicio del registro superior al final del registro inferior",
+    "create": "Crear un registro",
+    "delete": "Eliminar registro",
+    "edit": "Editar registro",
+    "editOverlapping": "Editar registro para resolver la superposición",
+    "filterByProject": "Filtrar por proyecto {{projectKey}}",
+    "filterByUser": "Filtrar por usuario {{userKey}}",
+    "insert": "Insertar registro",
+    "start": "Iniciar registro",
+    "startFromFavorite": "Iniciar registro desde favorito",
+    "startFromTeamMember": "Iniciar registro desde miembro del equipo",
+    "stopRecording": "Detener el registro de tiempo actual"
+  },
+  "duration": "Duración",
+  "emptyToday": "No hay registros para este día",
+  "hints": {
+    "useEndTimeOfLatest": "Usar la hora de finalización del último registro como hora de inicio para este",
+    "useEndTimeOfPrevious": "Usar la hora de finalización del registro anterior como hora de inicio para este",
+    "useStartTimeOfNext": "Usar la hora de inicio del siguiente registro como hora de finalización para este"
+  },
+  "history": {
+    "empty": "No se encontraron registros para los filtros seleccionados"
+  },
+  "noBookingsToday": "No bookings for this day",
+  "overlapsWarning": "Estos registros se superponen. Haz clic para editar y ajustar la hora.",
+  "presets": {
+    "browse": "Explorar plantillas",
+    "empty": "No hay plantillas disponibles",
+    "favorites": "Favoritos",
+    "recent": "Registros recientes",
+    "selectFavorite": "Seleccionar favorito: {{projectName}}{{tags}}",
+    "selectRecent": "Seleccionar registro reciente: {{projectName}}{{tags}}",
+    "selectTeam": "Seleccionar registro del equipo de {{userName}}: {{projectName}}{{tags}}",
+    "team": "Registros del equipo",
+    "title": "Elegir una plantilla"
+  },
+  "showLists": "Mostrar registros",
+  "status": {
+    "currentlyNotBooking": "Actualmente sin registrar"
+  },
+  "title": "Registros",
+  "warnings": {
+    "durationIsZero": "La duración de este registro es cero",
+    "longDuration": "Duración prolongada detectada",
+    "longDurationDescription": "Esta reserva supera una jornada laboral típica de 8 horas. Verifique las horas de inicio y fin."
+  }
+}

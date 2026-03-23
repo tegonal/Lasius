@@ -38,7 +38,27 @@ export function isLocale(value: null | string | undefined): value is Locale {
 }
 
 /** Translation namespaces — matches locale JSON file names */
-export const NAMESPACES = ['common', 'integrations'] as const
+export const NAMESPACES = [
+  'common',
+  'auth',
+  'booking-history',
+  'bookings',
+  'calendar',
+  'context-menu',
+  'dashboard',
+  'help',
+  'home',
+  'integrations',
+  'invitation',
+  'navigation',
+  'organisation',
+  'projects',
+  'settings',
+  'stats',
+  'system',
+  'tag-manager',
+  'working-hours',
+] as const
 
 /** Namespace type derived from the NAMESPACES array */
 export type Namespace = (typeof NAMESPACES)[number]

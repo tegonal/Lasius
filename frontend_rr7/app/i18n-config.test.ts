@@ -30,7 +30,27 @@ describe('i18n-config', () => {
 
   describe('NAMESPACES', () => {
     it('contains all expected namespaces', () => {
-      expect(NAMESPACES).toEqual(['common', 'integrations'])
+      expect(NAMESPACES).toEqual([
+        'common',
+        'auth',
+        'booking-history',
+        'bookings',
+        'calendar',
+        'context-menu',
+        'dashboard',
+        'help',
+        'home',
+        'integrations',
+        'invitation',
+        'navigation',
+        'organisation',
+        'projects',
+        'settings',
+        'stats',
+        'system',
+        'tag-manager',
+        'working-hours',
+      ])
     })
   })
 

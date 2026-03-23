@@ -1,197 +1,178 @@
 {
-  "account": {
-    "accountSecurity": "Sécurité du compte",
-    "profileChangesNotAllowedInDemo": "Les modifications du profil ne sont pas autorisées en mode démonstration",
-    "profileSettings": {
-      "description": "Gère tes informations personnelles et les détails de ton compte.",
-      "title": "Informations du profil"
-    },
-    "security": {
-      "description": "Mets à jour ton mot de passe pour sécuriser ton compte. Utilise un mot de passe fort d'au moins 8 caractères, incluant des lettres majuscules et des chiffres."
-    },
-    "settings": {
-      "description": "Gère tes informations personnelles et les détails de ton compte. Ton adresse e-mail ne peut être modifiée que si tu utilises le fournisseur d'authentification interne.",
-      "title": "Paramètres du compte"
-    },
-    "status": {
-      "passwordUpdated": "Mot de passe mis à jour",
-      "settingsUpdated": "Paramètres du compte mis à jour"
-    }
-  },
   "actions": {
     "close": "Fermer"
   },
   "auth": {
     "actions": {
-      "signOut": "Se déconnecter",
-      "signOutAndRefresh": "Se déconnecter et actualiser"
+      "signOut": "Sign out",
+      "signOutAndRefresh": "Sign out and refresh"
     },
-    "chooseMethod": "Choisis ta méthode de connexion préférée ci-dessous",
-    "connectingSecurely": "Connexion sécurisée en cours",
-    "continueWith": "Continuer avec",
-    "continueWithProvider": "Continuer avec ton compte",
-    "createYourAccount": "Crée ton compte",
-    "enterEmailAndPassword": "Saisis ton adresse e-mail et ton mot de passe pour accéder à ton compte",
+    "chooseMethod": "Choose your preferred method below",
+    "connectingSecurely": "Connecting you securely",
+    "continueWith": "Continue with",
+    "continueWithProvider": "Continue with your account",
+    "createYourAccount": "Create your account",
+    "enterEmailAndPassword": "Enter your email and password to access your account",
     "errors": {
       "accessDenied": {
-        "message": "Tu n'as pas la permission de te connecter. Contacte ton administrateur.",
-        "title": "Accès refusé"
+        "message": "You do not have permission to sign in. Please contact your administrator.",
+        "title": "Access Denied"
       },
-      "backToLogin": "Retour à la connexion",
-      "callback": "Le rappel d'authentification a échoué. Réessaie.",
+      "backToLogin": "Back to Login",
+      "callback": "Authentication callback failed. Please try again.",
       "configuration": {
-        "message": "Il y a un problème avec la configuration du serveur. Contacte ton administrateur.",
-        "title": "Erreur de configuration"
+        "message": "There is a problem with the server configuration. Please contact your administrator.",
+        "title": "Configuration Error"
       },
       "credentials": {
-        "message": "Les identifiants fournis sont incorrects. Réessaie.",
-        "title": "Échec de connexion"
+        "message": "The credentials you provided are incorrect. Please try again.",
+        "title": "Sign In Failed"
       },
       "default": {
-        "message": "Une erreur s'est produite lors de l'authentification. Réessaie.",
-        "title": "Erreur d'authentification"
+        "message": "An error occurred during authentication. Please try again.",
+        "title": "Authentication Error"
       },
       "email": {
-        "message": "Impossible d'envoyer l'e-mail de connexion. Réessaie plus tard.",
-        "title": "Erreur d'e-mail"
+        "message": "Could not send sign-in email. Please try again later.",
+        "title": "Email Error"
       },
-      "errorCode": "Code d'erreur",
-      "fetchProfileFailed": "Ta session a expiré. Reconnecte-toi.",
-      "general": "Erreur d'authentification : {error}",
+      "errorCode": "Error code",
+      "fetchProfileFailed": "Couldn't load user profile. Please try logging in again.",
+      "general": "Authentication error. Please try again.",
       "invalidCredentials": "Invalid email or password. Please try again.",
       "loginFailed": "Login failed. Please try again.",
       "oauth": {
-        "message": "Une erreur s'est produite lors de l'authentification OAuth. Réessaie ou utilise une autre méthode de connexion.",
-        "title": "Erreur OAuth"
+        "message": "An error occurred during OAuth authentication. Please try again or use a different sign-in method.",
+        "title": "OAuth Error"
       },
-      "oauthCallback": "L'authentification a échoué. Réessaie.",
-      "persistentIssue": "Si ce problème persiste, contacte ton administrateur.",
-      "registerUnknown": "Erreur d'inscription inconnue",
+      "oauthCallback": "Authentication failed. Please try again.",
+      "persistentIssue": "If this issue persists, please contact your administrator.",
+      "registerUnknown": "Unknown registration error",
       "sessionRequired": {
-        "message": "Connecte-toi pour continuer.",
-        "title": "Session requise"
+        "message": "Please sign in to continue.",
+        "title": "Session Required"
       },
       "stateMismatch": "Authentication failed: invalid state. Please try again.",
       "unknown": {
-        "message": "Une erreur inattendue s'est produite lors de l'authentification.",
-        "title": "Erreur d'authentification"
+        "message": "An unexpected error occurred during authentication.",
+        "title": "Authentication Error"
       },
-      "userAlreadyRegistered": "Utilisateur déjà enregistré",
+      "userAlreadyRegistered": "User already registered",
       "verification": {
-        "message": "Le jeton de vérification a expiré ou a déjà été utilisé. Réessaie de te connecter.",
-        "title": "Échec de vérification"
+        "message": "The verification token has expired or has already been used. Please try signing in again.",
+        "title": "Verification Failed"
       }
     },
-    "fillDetailsToStart": "Remplis tes informations pour commencer",
-    "getStartedFree": "Commence avec le suivi du temps open source",
-    "joinLasius": "Rejoindre Lasius",
-    "needHelp": "Besoin d'aide ? Clique sur le bouton d'aide",
-    "noAuthMethodsAvailable": "Aucune méthode d'authentification disponible",
-    "preparingSecureLogin": "Préparation de la connexion sécurisée...",
+    "fillDetailsToStart": "Please fill in your details to get started",
+    "getStartedFree": "Get started with open source time tracking",
+    "joinLasius": "Join Lasius",
+    "needHelp": "Need help? Click the help button",
+    "noAuthMethodsAvailable": "No authentication methods available",
+    "preparingSecureLogin": "Preparing secure login...",
     "registrationSuccess": "Thank you for registering. You can now sign in with your credentials.",
-    "secureAndPrivate": "Sécurisé et privé",
-    "signIn": "Se connecter",
-    "signInTitle": "Connecte-toi à ton compte",
-    "signInToLasius": "Se connecter à Lasius",
-    "tagline": "Suivi du temps open source pour les équipes modernes",
-    "welcomeBack": "Bienvenue",
-    "welcomeToLasius": "Bienvenue sur Lasius"
+    "secureAndPrivate": "Secure & private",
+    "signIn": "Sign in",
+    "signInTitle": "Sign in to your account",
+    "signInToLasius": "Sign in to Lasius",
+    "tagline": "Open source time tracking for teams",
+    "welcomeBack": "Welcome back",
+    "welcomeToLasius": "Welcome to Lasius"
   },
   "bookings": {
     "actions": {
-      "add": "Ajouter une réservation",
-      "adjustCurrentStart": "Ajuster la réservation actuelle pour qu'elle commence à la fin de la réservation chevauchante",
-      "adjustEndToNext": "Ajuster la fin à la réservation suivante",
-      "adjustLowerEnd": "Étendre la fin de la réservation inférieure jusqu'au début de la réservation supérieure",
-      "adjustOverlappingEnd": "Ajuster la réservation chevauchante pour qu'elle se termine au début de la réservation actuelle",
-      "adjustStartToPrevious": "Ajuster le début à la réservation précédente",
-      "adjustUpperStart": "Déplacer le début de la réservation supérieure à la fin de la réservation inférieure",
-      "create": "Créer une réservation",
-      "delete": "Supprimer la réservation",
-      "edit": "Modifier la réservation",
-      "editOverlapping": "Modifier la réservation pour résoudre le chevauchement",
-      "filterByProject": "Filtrer par projet {{projectKey}}",
-      "filterByUser": "Filtrer par utilisateur {{userKey}}",
-      "insert": "Insérer une réservation",
-      "start": "Démarrer la réservation",
-      "startFromFavorite": "Démarrer la réservation à partir d'un favori",
-      "startFromTeamMember": "Démarrer la réservation à partir d'un membre de l'équipe",
-      "stopRecording": "Arrêter l'enregistrement de la réservation en cours"
+      "add": "Add booking",
+      "adjustCurrentStart": "Adjust current booking to start at overlapping booking end",
+      "adjustEndToNext": "Adjust end to next booking",
+      "adjustLowerEnd": "Extend lower booking end to upper booking start",
+      "adjustOverlappingEnd": "Adjust overlapping booking to end at current booking start",
+      "adjustStartToPrevious": "Adjust start to previous booking",
+      "adjustUpperStart": "Move upper booking start to lower booking end",
+      "create": "Create a booking",
+      "delete": "Delete booking",
+      "edit": "Edit booking",
+      "editOverlapping": "Edit booking to resolve overlap",
+      "filterByProject": "Filter by project {{projectKey}}",
+      "filterByUser": "Filter by user {{userKey}}",
+      "insert": "Insert booking",
+      "start": "Start booking",
+      "startFromFavorite": "Start booking from favorite",
+      "startFromTeamMember": "Start booking from team member",
+      "stopRecording": "Stop recording current time booking"
     },
-    "duration": "Durée",
-    "emptyToday": "Aucune réservation pour ce jour",
+    "duration": "Duration",
+    "emptyToday": "No bookings for this day",
     "hints": {
-      "useEndTimeOfLatest": "Utiliser l'heure de fin de la dernière réservation comme heure de début pour celle-ci",
-      "useEndTimeOfPrevious": "Utiliser l'heure de fin de la réservation précédente comme heure de début pour celle-ci",
-      "useStartTimeOfNext": "Utiliser l'heure de début de la réservation suivante comme heure de fin pour celle-ci"
+      "useEndTimeOfLatest": "Use end time of latest booking as start time for this one",
+      "useEndTimeOfPrevious": "Use end time of previous booking as start time for this one",
+      "useStartTimeOfNext": "Use start time of next booking as end time for this one"
     },
     "history": {
-      "empty": "Aucune réservation trouvée pour les filtres sélectionnés"
+      "empty": "No bookings found for the selected filters"
     },
     "noBookingsToday": "No bookings for this day",
-    "overlapsWarning": "Ces réservations se chevauchent. Cliquez pour modifier et ajuster l'heure.",
+    "overlapsWarning": "These two bookings overlap. Tap to see adjustment options.",
     "presets": {
-      "browse": "Parcourir les modèles",
-      "empty": "Aucun modèle disponible",
-      "favorites": "Favoris",
-      "recent": "Réservations récentes",
-      "selectFavorite": "Sélectionner un favori : {{projectName}}{{tags}}",
-      "selectRecent": "Sélectionner une réservation récente : {{projectName}}{{tags}}",
-      "selectTeam": "Sélectionner une réservation d'équipe par {{userName}} : {{projectName}}{{tags}}",
-      "team": "Réservations de l'équipe",
-      "title": "Choisir un modèle"
+      "browse": "Browse presets",
+      "empty": "No bookings found",
+      "favorites": "Favorites",
+      "recent": "Recent bookings",
+      "selectFavorite": "Select favorite: {{projectName}}{{tags}}",
+      "selectRecent": "Select recent booking: {{projectName}}{{tags}}",
+      "selectTeam": "Select team booking: {{projectName}}{{tags}}",
+      "team": "Team bookings",
+      "title": "Choose a preset"
     },
-    "showLists": "Afficher les réservations",
+    "showLists": "Show bookings",
     "status": {
-      "currentlyNotBooking": "Aucune réservation en cours"
+      "currentlyNotBooking": "Currently not booking"
     },
-    "title": "Réservations",
+    "title": "Bookings",
     "warnings": {
-      "durationIsZero": "La durée de cette réservation est nulle",
-      "longDuration": "Durée prolongée détectée",
-      "longDurationDescription": "Cette réservation dépasse une journée de travail typique de 8 heures. Veuillez vérifier les heures de début et de fin."
+      "durationIsZero": "This booking's duration is zero",
+      "longDuration": "Long duration detected",
+      "longDurationDescription": "This booking is longer than a typical 8-hour work day. Please verify that the start and end times are correct."
     }
   },
   "calendar": {
     "navigation": {
-      "nextMonth": "Mois suivant",
-      "nextWeek": "Semaine suivante",
-      "previousMonth": "Mois précédent",
-      "previousWeek": "Semaine dernière"
+      "nextMonth": "Next month",
+      "nextWeek": "Next week",
+      "previousMonth": "Previous month",
+      "previousWeek": "Previous week"
     }
   },
   "common": {
     "actions": {
       "actions": "Actions",
-      "add": "Ajouter",
-      "back": "Retour",
-      "cancel": "Annuler",
-      "clear": "Effacer",
-      "close": "Fermer",
-      "delete": "Supprimer",
-      "discardChanges": "Abandonner les modifications",
-      "help": "Aide",
-      "keepEditing": "Continuer à modifier",
-      "reset": "Réinitialiser",
-      "resetToInitial": "Réinitialiser à la valeur initiale",
-      "save": "Enregistrer",
-      "saveChanges": "Enregistrer les modifications",
-      "signUp": "S'inscrire"
+      "add": "Add",
+      "back": "Back",
+      "cancel": "Cancel",
+      "clear": "Clear",
+      "close": "Close",
+      "delete": "Delete",
+      "discardChanges": "Discard changes",
+      "help": "Help",
+      "keepEditing": "Keep editing",
+      "reset": "Reset",
+      "resetToInitial": "Reset to initial value",
+      "save": "Save",
+      "saveChanges": "Save changes",
+      "signUp": "Sign up"
     },
     "aria": {
       "decrement": "Decrement",
       "increment": "Increment"
     },
-    "back": "Retour",
+    "back": "Back",
     "cancel": "Cancel",
-    "confirmUnsavedChanges": "Tu as des modifications non enregistrées. Es-tu sûr de vouloir annuler ?",
-    "custom": "Personnalisé",
+    "confirmUnsavedChanges": "You have unsaved changes. Are you sure you want to cancel?",
+    "custom": "Custom",
     "date": "Date",
     "errors": {
-      "helpNotAvailable": "Le contenu d'aide n'est pas disponible pour cette page."
+      "helpNotAvailable": "Help content not available for this page."
     },
     "filter": {
-      "title": "Filtre"
+      "title": "Filter"
     },
     "formats": {
       "dateFormat": "DD.MM.YYYY",
@@ -199,84 +180,84 @@
       "timeFormat": "HH:MM"
     },
     "forms": {
-      "confirmNewPassword": "Confirmer le nouveau mot de passe",
-      "confirmPassword": "Confirmer le mot de passe",
-      "email": "E-mail",
-      "firstName": "Prénom",
-      "lastName": "Nom",
-      "name": "Nom",
-      "newPassword": "Nouveau mot de passe",
-      "password": "Mot de passe",
-      "role": "Rôle"
+      "confirmNewPassword": "Confirm new password",
+      "confirmPassword": "Confirm password",
+      "email": "Email",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "name": "Name",
+      "newPassword": "New password",
+      "password": "Password",
+      "role": "Role"
     },
     "help": {
-      "contactAdmin": "Contacte ton administrateur"
+      "contactAdmin": "Please contact your administrator"
     },
     "info": {
-      "helpFallbackLanguage": "Ce contenu d'aide n'est pas encore disponible dans ta langue sélectionnée. Version anglaise affichée."
+      "helpFallbackLanguage": "This help content is not available in your selected language yet. Showing English version."
     },
-    "or": "ou",
+    "or": "or",
     "roles": {
-      "administrator": "Administrateur",
-      "member": "Membre"
+      "administrator": "Administrator",
+      "member": "Member"
     },
-    "selected": "Sélectionné",
+    "selected": "Selected",
     "status": {
-      "active": "Actif",
-      "inactive": "Inactif",
-      "label": "Statut"
+      "active": "Active",
+      "inactive": "Inactive",
+      "label": "Status"
     },
     "themes": {
-      "dark": "Sombre",
-      "light": "Clair",
-      "system": "Système"
+      "dark": "Dark",
+      "light": "Light",
+      "system": "System"
     },
     "time": {
       "customTime": "Custom time...",
-      "day": "Jour",
-      "ends": "Se termine",
-      "from": "De",
-      "hours": "Heures",
-      "lastMonth": "Mois dernier",
-      "lastQuarter": "Trimestre dernier",
-      "lastWeek": "Semaine dernière",
-      "lastYear": "Année dernière",
+      "day": "Day",
+      "ends": "Ends",
+      "from": "From",
+      "hours": "Hours",
+      "lastMonth": "Last month",
+      "lastQuarter": "Last quarter",
+      "lastWeek": "Last week",
+      "lastYear": "Last year",
       "minutes": "Minutes",
-      "month": "Mois",
-      "selectRange": "Sélectionner une période",
-      "setCustom": "Définir une heure personnalisée",
-      "starts": "Commence",
-      "thisMonth": "Ce mois",
-      "thisQuarter": "Ce trimestre",
-      "thisWeek": "Cette semaine",
-      "thisYear": "Cette année",
-      "timeRange": "Période",
-      "to": "À",
-      "today": "Aujourd'hui",
-      "week": "Semaine",
-      "year": "Année",
-      "yesterday": "Hier"
+      "month": "Month",
+      "selectRange": "Select time range",
+      "setCustom": "Set custom time",
+      "starts": "Starts",
+      "thisMonth": "This month",
+      "thisQuarter": "This quarter",
+      "thisWeek": "This week",
+      "thisYear": "This year",
+      "timeRange": "Time range",
+      "to": "To",
+      "today": "Today",
+      "week": "Week",
+      "year": "Year",
+      "yesterday": "Yesterday"
     },
     "units": {
-      "hours": "Heures"
+      "hours": "Hours"
     },
-    "user": "Utilisateur",
+    "user": "User",
     "validation": {
       "email": "Please enter a valid email address",
-      "emailInvalid": "Adresse e-mail invalide",
-      "endBeforeStart": "L'heure de fin est antérieure à l'heure de début",
-      "missingNumber": "Doit contenir un chiffre",
-      "missingUppercase": "Doit contenir une lettre majuscule",
-      "passwordMismatch": "Les mots de passe ne correspondent pas",
-      "passwordTooShort": "Minimum 9 caractères",
-      "required": "Requis"
+      "emailInvalid": "Invalid email address",
+      "endBeforeStart": "End time is before start time",
+      "missingNumber": "Must contain a number",
+      "missingUppercase": "Must contain an uppercase letter",
+      "passwordMismatch": "Passwords do not match",
+      "passwordTooShort": "Password must be at least 9 characters",
+      "required": "Required"
     },
-    "you": "Tu"
+    "you": "You"
   },
   "contextMenu": {
     "actions": {
-      "close": "Fermer le menu contextuel",
-      "open": "Ouvrir le menu contextuel"
+      "close": "Close context menu",
+      "open": "Open context menu"
     }
   },
   "demo": {
@@ -311,10 +292,10 @@
   },
   "favorites": {
     "actions": {
-      "add": "Ajouter aux favoris",
-      "delete": "Supprimer le favori"
+      "add": "Add as favorite",
+      "delete": "Delete favorite"
     },
-    "empty": "Aucun favori pour le moment"
+    "empty": "No favorites yet"
   },
   "features": {
     "freeAndOpenSource": "Gratuit et open source",
@@ -337,223 +318,149 @@
   },
   "invitations": {
     "actions": {
-      "accept": "Accepter l'invitation",
-      "reject": "Rejeter l'invitation"
+      "accept": "Accept invitation",
+      "reject": "Reject invitation"
     },
-    "copyToClipboard": "Copier dans le presse-papiers",
-    "createAccountMessage": "Tu as été invité à créer un compte Lasius pour suivre tes heures de travail.",
+    "copyToClipboard": "Copy to clipboard",
+    "createAccountMessage": "You have been invited to create an account so that you can use Lasius to track your working hours.",
     "description": {
-      "copyLink": "Copie le lien et envoie-le à ton collègue. Si cette personne n'a pas encore de compte, un compte sera créé lors de l'acceptation de l'invitation."
+      "copyLink": "Copy the link and send it to your colleague. If they do not have an account yet, one will be created when the invitation is accepted."
     },
-    "email": "E-mail",
+    "email": "Email",
     "errors": {
-      "createdForSomeoneElse": "Cette invitation a été créée pour quelqu'un d'autre. Déconnecte-toi et actualise la page, ou transfère le lien d'invitation à l'utilisateur {{email}}",
-      "noLongerValid": "Cette invitation n'est plus valide. Il est préférable de contacter la personne qui t'a envoyé le lien d'invitation pour en obtenir un nouveau."
+      "createdForSomeoneElse": "This invitation has been created for someone else. Either log out and refresh, or forward the invitation link to the user {{email}}",
+      "noLongerValid": "This invitation is no longer valid. It is best to contact the person who sent you the invitation link to get a new one."
     },
-    "inviteOrganisationDescription": "Saisissez l'adresse e-mail de la personne que vous souhaitez inviter. Un lien d'invitation sera généré que vous pourrez lui envoyer.",
-    "inviteProjectDescription": "Saisissez l'adresse e-mail de la personne que vous souhaitez inviter. Un lien d'invitation sera généré que vous pourrez lui envoyer.",
+    "inviteOrganisationDescription": "Enter the email address of the person you want to invite. An invitation link will be generated that you can send to them.",
+    "inviteProjectDescription": "Enter the email address of the person you want to invite. An invitation link will be generated that you can send to them.",
     "messages": {
-      "invitedToOrganisation": "Tu as été invité par {{inviter}} à rejoindre l'organisation {{organisation}}.",
-      "invitedToOrganisationNeedsAccount": "Vous avez été invité(e) par {{inviter}} à rejoindre l'organisation {{organisation}}.",
-      "invitedToProject": "Tu as été invité par {{inviter}} à rejoindre le projet {{project}}.",
-      "invitedToProjectNeedsAccount": "Vous avez été invité(e) par {{inviter}} à rejoindre le projet {{project}}.",
-      "selectOrganisation": "Sélectionne l'organisation à laquelle tu souhaites ajouter ce projet :"
+      "invitedToOrganisation": "You have been invited by {{inviter}} to join organisation {{organisation}}.",
+      "invitedToOrganisationNeedsAccount": "You have been invited by {{inviter}} to join organisation {{organisation}}.",
+      "invitedToProject": "You have been invited by {{inviter}} to join project {{project}}.",
+      "invitedToProjectNeedsAccount": "You have been invited by {{inviter}} to join project {{project}}.",
+      "selectOrganisation": "Select the organisation you would like to add this project to:"
     },
     "needsAccount": {
-      "description": "Tu devras te connecter ou créer un compte pour {{email}} afin d'accepter cette invitation.",
-      "emailMatch": "Assure-toi de te connecter avec l'adresse e-mail à laquelle cette invitation a été envoyée : {{email}}",
+      "description": "You'll need to sign in or create an account for {{email}} to accept this invitation.",
+      "emailMatch": "Make sure to sign in with the email address this invitation was sent to: {{email}}",
       "signInOrSignUpWith": "Sign in or sign up with",
-      "title": "Compte requis"
+      "title": "Account Required"
     },
     "title": {
-      "invitationCreated": "Invitation créée",
-      "userAssigned": "Utilisateur assigné"
+      "invitationCreated": "Invitation created",
+      "userAssigned": "User assigned"
     }
-  },
-  "members": {
-    "actions": {
-      "invite": "Inviter quelqu'un",
-      "manage": "Gérer les membres",
-      "remove": "Retirer le membre"
-    },
-    "confirmations": {
-      "removeConfirm": "Es-tu sûr de vouloir retirer {{name}} ?",
-      "removeTitle": "Retirer un membre",
-      "removeWarning": "Ce membre sera retiré de l'organisation et perdra l'accès à tous les projets."
-    },
-    "confirmRemove": "Are you sure you want to remove this member from the project?",
-    "description_one": "Ce projet a {{count}} membre.",
-    "description_many": "Ce projet a {{count}} membres.",
-    "description_other": "Ce projet a {{count}} membres.",
-    "empty": "Aucun membre trouvé",
-    "emptyState": "No members found",
-    "title": "Members"
   },
   "of": "de",
-  "organisations": {
-    "actions": {
-      "create": "Créer une organisation",
-      "edit": "Modifier l'organisation"
-    },
-    "adminDescription": "Tu es administrateur de cette organisation. Tu peux ajouter et retirer des membres, modifier le nom de l'organisation ou en créer une nouvelle.",
-    "createDescription": "Utilisez le menu Actions pour créer une nouvelle organisation.",
-    "currentOrganisation": "Organisation actuelle",
-    "description": {
-      "create": "Créez une nouvelle organisation pour collaborer avec votre équipe.",
-      "edit": "Mettez à jour le nom de l'organisation."
-    },
-    "errors": {
-      "duplicateKey": "Une organisation avec ce nom existe déjà"
-    },
-    "info": {
-      "uniqueNameRequired": "Les noms d'organisation doivent être uniques."
-    },
-    "memberDescription": "Tu es membre de cette organisation et n'as pas les droits pour ajouter ou retirer des membres. Contacte un administrateur de l'organisation si tu souhaites inviter quelqu'un.",
-    "members": "Membres",
-    "myPersonalOrganisation": "Mon organisation personnelle",
-    "organisationName": "Organisation",
-    "organisationRole": "Rôle dans l'organisation",
-    "organization": "Organisation",
-    "organizationName": "Nom de l'organisation",
-    "privateDescription": "Cette organisation n'est visible que par toi. Utilise-la pour suivre des projets privés. Pour collaborer avec d'autres personnes, crée ou utilise une organisation différente.",
-    "selectOrganisation": "Sélectionner une organisation"
-  },
   "projects": {
     "actions": {
-      "add": "Ajouter un projet",
-      "create": "Créer un projet",
-      "deactivate": "Désactiver le projet",
+      "add": "Add Project",
+      "create": "Create project",
+      "deactivate": "Deactivate project",
       "deactivateConfirm": "Are you sure you want to deactivate the project \"{{project}}\"?",
-      "edit": "Modifier le projet",
-      "leave": "Quitter ce projet"
+      "edit": "Edit project",
+      "leave": "Leave this project"
     },
-    "allProjects": "Tous les projets",
-    "allProjectsDescription": "Tous les projets de l'organisation actuelle que tu peux administrer. Crée des rapports de facturation incluant le temps réservé par les membres externes du projet.",
+    "allProjects": "All projects",
+    "allProjectsDescription": "All projects in the current organization that you can administer. Create billing reports including time booked by external project members.",
     "confirmations": {
-      "leave": "Es-tu sûr de vouloir quitter ce projet ?"
+      "leave": "Are you sure you want to leave this project?"
     },
-    "deactivatedBy": "Archivé par {{user}}",
+    "deactivatedBy": "Archived by {{user}}",
     "description": {
-      "add": "Créez un nouveau projet pour organiser votre suivi du temps.",
-      "edit": "Mettez à jour les détails du projet."
+      "add": "Create a new project to organize your time tracking.",
+      "edit": "Update the project details."
     },
-    "empty": "Aucun projet trouvé",
+    "empty": "No projects found",
     "errors": {
-      "projectNotFound": "Ce projet n'a pas pu être trouvé. L'ID du projet est affiché ci-dessus."
+      "projectNotFound": "This project could not be found. The project ID is shown above."
     },
     "filter": {
-      "both": "Les deux",
-      "search": "Rechercher",
-      "searchPlaceholder": "Filtrer les projets...",
-      "status": "Statut"
+      "both": "Both",
+      "search": "Search",
+      "searchPlaceholder": "Filter projects...",
+      "status": "Status"
     },
     "info": {
-      "uniqueNameRequired": "Les noms de projet doivent être uniques au sein de votre organisation."
+      "uniqueNameRequired": "Project names must be unique within your organisation."
     },
-    "label": "Projet",
-    "lastActivity": "Dernière activité",
-    "myProjects": "Mes projets",
-    "myProjectsDescription": "Projets dont tu es membre et pour lesquels tu peux réserver du temps, filtrés par l'organisation actuelle.",
-    "project": "Projet",
-    "projectName": "Nom du projet",
-    "projectRole": "Rôle",
-    "selectProject": "Sélectionner un projet",
+    "label": "Project",
+    "lastActivity": "Last activity",
+    "myProjects": "My projects",
+    "myProjectsDescription": "Projects where you are a member and can book time. Restricted by the currently selected organisation.",
+    "project": "Project",
+    "projectName": "Project name",
+    "projectRole": "Project role",
+    "selectProject": "Select project",
     "status": {
-      "assignedToUser": "Projet assigné à l'utilisateur avec succès.",
-      "created": "Projet créé",
-      "updated": "Projet mis à jour"
+      "assignedToUser": "Project successfully assigned to user.",
+      "created": "Project created",
+      "updated": "Project updated"
     },
-    "title": "Projets",
+    "title": "Projects",
     "total": "Total",
     "warnings": {
-      "inactiveProjectContext": "Affichage des statistiques d'un projet inactif",
-      "inactiveProjectFilter": "Affichage des données pour un projet inactif",
-      "projectNotInActiveList": "Ce projet ne figure pas dans ta liste de projets actifs. Il peut être inactif ou provenir d'une autre organisation.",
-      "projectUnavailable": "Ce projet n'est plus dans ton profil. Tu as peut-être été retiré de celui-ci."
-    }
-  },
-  "pwa": {
-    "reloadApplication": "Recharger l'application",
-    "updateAvailable": "Mise à jour disponible",
-    "updateMessage": "Lasius a été mis à jour. La page sera rechargée après votre confirmation."
-  },
-  "SessionTimeout": {
-    "extend": "Extend Session",
-    "logout": "Logout",
-    "message": "Your session will expire soon. Would you like to extend it?",
-    "title": "Session Expiring"
-  },
-  "settings": {
-    "app": {
-      "description": "Personnalise ton expérience avec les préférences de langue et de thème. Ces paramètres sont enregistrés localement dans ton navigateur.",
-      "language": "Langue de l'interface",
-      "save": "Enregistrer les paramètres",
-      "showOnboarding": "Afficher le tutoriel d'introduction",
-      "theme": "Thème",
-      "title": "Paramètres de l'application"
+      "inactiveProjectContext": "Viewing stats from inactive project",
+      "inactiveProjectFilter": "Showing data for inactive project",
+      "projectNotInActiveList": "This project is not in your active projects list. It may be inactive or from another organization.",
+      "projectUnavailable": "This project is no longer in your profile. You may have been removed from it."
     }
   },
   "statistics": {
     "6months": "6 Months",
     "6monthWorkTrend": "6-Month Work Trend",
-    "calendarYear": "Année civile",
-    "expectedHours": "Heures prévues",
+    "calendarYear": "Calendar year",
+    "expectedHours": "Expected hours",
     "noProjectsFor6Months": "No projects for this period",
-    "noProjectsForDay": "Aucun projet pour ce jour",
-    "noProjectsForMonth": "Aucun projet pour ce mois",
-    "noProjectsForWeek": "Aucun projet pour cette semaine",
+    "noProjectsForDay": "No projects for this day",
+    "noProjectsForMonth": "No projects for this month",
+    "noProjectsForWeek": "No projects for this week",
     "noProjectsForYear": "No projects for this period",
-    "percentOfPlannedHours": "% des heures planifiées",
-    "rolling12Months": "12 derniers mois",
+    "percentOfPlannedHours": "% of planned hours",
+    "rolling12Months": "Rolling 12 Months",
     "rolling12MonthsTrend": "12-Month Work Trend",
-    "showStatistics": "Afficher les statistiques",
-    "weeklyHoursDistribution": "Répartition hebdomadaire des heures",
+    "showStatistics": "Show statistics",
+    "weeklyHoursDistribution": "Weekly Hours Distribution",
     "yearWorkTrend": "Yearly Work Trend"
   },
   "stats": {
     "decimalHours": "Decimal hours",
-    "empty": "Aucune donnée disponible pour la période sélectionnée",
+    "empty": "No data available for the selected period",
     "hoursMinutes": "HH:MM"
-  },
-  "system": {
-    "backendUnreachable": "Le serveur semble inaccessible",
-    "connectedToBackend": "Connecté au serveur",
-    "connectingToBackend": "Connexion au serveur",
-    "offlineMessage": "Lasius est actuellement hors ligne ou en maintenance. Nous serons de retour sous peu."
   },
   "tags": {
     "actions": {
-      "add": "Ajouter des étiquettes",
-      "addDefaultTagGroups": "Ajouter les groupes d'étiquettes par défaut",
-      "addTag": "Ajouter une étiquette",
-      "addTagGroup": "Ajouter un nouveau groupe d'étiquettes",
-      "collapseAll": "Tout réduire",
-      "copyTags": "Copier les étiquettes",
-      "createTagGroup": "Créer un groupe d'étiquettes",
-      "edit": "Modifier les étiquettes",
-      "editForProject": "Modifier les étiquettes pour {{projectKey}}",
-      "expandAll": "Tout développer",
-      "pasteTags": "Coller les étiquettes"
+      "add": "Add tags",
+      "addDefaultTagGroups": "Add default tag groups",
+      "addTag": "Add a tag",
+      "addTagGroup": "Add tag group",
+      "collapseAll": "Collapse all",
+      "copyTags": "Copy tags",
+      "createTagGroup": "Create tag group",
+      "edit": "Edit tags",
+      "editForProject": "Edit tags for {{projectKey}}",
+      "expandAll": "Expand all",
+      "pasteTags": "Paste tags"
     },
-    "chooseOrEnter": "Choisir ou saisir des étiquettes",
-    "confirmDeleteGroup": "Es-tu sûr de vouloir supprimer le groupe d'étiquettes \"{{groupName}}\" ?",
-    "customTag": "Étiquette personnalisée",
-    "enterTagName": "Saisir le nom de l'étiquette",
-    "label": "Étiquettes",
-    "noTagGroups": "Aucun groupe d'étiquettes défini pour le moment",
-    "simpleTags": "Étiquettes simples",
-    "simpleTagsDescription": "Étiquettes qui ne font partie d'aucun groupe",
+    "chooseOrEnter": "Choose or enter tags",
+    "confirmDeleteGroup": "Are you sure you want to delete the tag group \"{{groupName}}\"?",
+    "customTag": "Custom tag",
+    "enterTagName": "Enter tag name",
+    "label": "Tags",
+    "noTagGroups": "No tag groups defined yet",
+    "simpleTags": "Simple tags",
+    "simpleTagsDescription": "Tags that are not part of any group",
     "status": {
-      "tagsCopied": "Étiquettes copiées",
-      "tagsPasted": "Étiquettes collées"
+      "tagsCopied": "Tags copied",
+      "tagsPasted": "Tags pasted"
     },
-    "tagGroups": "Groupes d'étiquettes",
-    "title": "Étiquettes",
+    "tagGroups": "Tag groups",
+    "title": "Tags",
     "validation": {
-      "tagExists": "L'étiquette existe déjà",
-      "tagGroupExists": "Le groupe d'étiquettes existe déjà",
-      "tagGroupNameRequired": "Le nom du groupe d'étiquettes est requis",
-      "tagNameRequired": "Le nom de l'étiquette est requis"
+      "tagExists": "Tag already exists",
+      "tagGroupExists": "Tag group already exists",
+      "tagGroupNameRequired": "Tag group name is required",
+      "tagNameRequired": "Tag name is required"
     }
   },
   "ui": {
@@ -586,36 +493,29 @@
     "startMustBeInPast": "L'heure de début doit être dans le passé",
     "themeRequired": "Thème requis"
   },
-  "websocket": {
-    "status": {
-      "connected": "Websocket connecté",
-      "connecting": "Connexion au websocket",
-      "error": "Impossible de se connecter au websocket"
-    }
-  },
   "workHealth": {
-    "actualHours": "réelles",
-    "avgPerDay": "moy/jour",
-    "consecutiveDays": "jours consécutifs",
-    "elevatedLoad": "Charge élevée",
-    "healthyLoad": "Ça a l'air bien !",
-    "highLoad": "Charge importante détectée",
-    "plannedHours": "planifiées",
-    "relaxReminder": "Il est temps de se détendre un peu",
-    "sixMonths": "6 mois",
-    "takeItEasy": "Envisage de lever le pied",
-    "thisWeek": "cette semaine"
+    "actualHours": "actual",
+    "avgPerDay": "avg/day",
+    "consecutiveDays": "consecutive days",
+    "elevatedLoad": "Load is elevated",
+    "healthyLoad": "Looking good!",
+    "highLoad": "Heavy load detected",
+    "plannedHours": "planned",
+    "relaxReminder": "Time to relax a little bit",
+    "sixMonths": "6 Months",
+    "takeItEasy": "Consider taking it easy",
+    "thisWeek": "this week"
   },
   "workingHours": {
-    "dailyTotal": "Total quotidien",
-    "description": "Le temps que tu prévois de réserver par jour, par organisation, pendant une semaine de travail typique. Ces données sont utilisées pour calculer ta progression quotidienne et hebdomadaire.",
+    "dailyTotal": "Daily Total",
+    "description": "The amount of time you expect to book per day, by organisation, during a typical working week. This data is used to calculate your daily and weekly progress.",
     "errors": {
-      "updateFailed": "Échec de la mise à jour des heures de travail"
+      "updateFailed": "Failed to update working hours"
     },
     "status": {
-      "updated": "Heures de travail mises à jour"
+      "updated": "Working hours updated"
     },
-    "title": "Heures de travail",
-    "totalPerWeek": "total par semaine"
+    "title": "Working hours",
+    "totalPerWeek": "Total per week"
   }
 }

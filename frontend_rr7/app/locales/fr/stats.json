@@ -1,0 +1,22 @@
+{
+  "statistics": {
+    "6months": "6 Months",
+    "6monthWorkTrend": "6-Month Work Trend",
+    "calendarYear": "Année civile",
+    "expectedHours": "Heures prévues",
+    "noProjectsFor6Months": "No projects for this period",
+    "noProjectsForDay": "Aucun projet pour ce jour",
+    "noProjectsForMonth": "Aucun projet pour ce mois",
+    "noProjectsForWeek": "Aucun projet pour cette semaine",
+    "noProjectsForYear": "No projects for this period",
+    "percentOfPlannedHours": "% des heures planifiées",
+    "rolling12Months": "12 derniers mois",
+    "rolling12MonthsTrend": "12-Month Work Trend",
+    "showStatistics": "Afficher les statistiques",
+    "weeklyHoursDistribution": "Répartition hebdomadaire des heures",
+    "yearWorkTrend": "Yearly Work Trend"
+  },
+  "decimalHours": "Decimal hours",
+  "empty": "Aucune donnée disponible pour la période sélectionnée",
+  "hoursMinutes": "HH:MM"
+}

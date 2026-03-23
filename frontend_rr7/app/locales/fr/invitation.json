@@ -1,0 +1,35 @@
+{
+  "actions": {
+    "accept": "Accepter l'invitation",
+    "reject": "Rejeter l'invitation"
+  },
+  "copyToClipboard": "Copier dans le presse-papiers",
+  "createAccountMessage": "Tu as été invité à créer un compte Lasius pour suivre tes heures de travail.",
+  "description": {
+    "copyLink": "Copie le lien et envoie-le à ton collègue. Si cette personne n'a pas encore de compte, un compte sera créé lors de l'acceptation de l'invitation."
+  },
+  "email": "E-mail",
+  "errors": {
+    "createdForSomeoneElse": "Cette invitation a été créée pour quelqu'un d'autre. Déconnecte-toi et actualise la page, ou transfère le lien d'invitation à l'utilisateur {{email}}",
+    "noLongerValid": "Cette invitation n'est plus valide. Il est préférable de contacter la personne qui t'a envoyé le lien d'invitation pour en obtenir un nouveau."
+  },
+  "inviteOrganisationDescription": "Saisissez l'adresse e-mail de la personne que vous souhaitez inviter. Un lien d'invitation sera généré que vous pourrez lui envoyer.",
+  "inviteProjectDescription": "Saisissez l'adresse e-mail de la personne que vous souhaitez inviter. Un lien d'invitation sera généré que vous pourrez lui envoyer.",
+  "messages": {
+    "invitedToOrganisation": "Tu as été invité par {{inviter}} à rejoindre l'organisation {{organisation}}.",
+    "invitedToOrganisationNeedsAccount": "Vous avez été invité(e) par {{inviter}} à rejoindre l'organisation {{organisation}}.",
+    "invitedToProject": "Tu as été invité par {{inviter}} à rejoindre le projet {{project}}.",
+    "invitedToProjectNeedsAccount": "Vous avez été invité(e) par {{inviter}} à rejoindre le projet {{project}}.",
+    "selectOrganisation": "Sélectionne l'organisation à laquelle tu souhaites ajouter ce projet :"
+  },
+  "needsAccount": {
+    "description": "Tu devras te connecter ou créer un compte pour {{email}} afin d'accepter cette invitation.",
+    "emailMatch": "Assure-toi de te connecter avec l'adresse e-mail à laquelle cette invitation a été envoyée : {{email}}",
+    "signInOrSignUpWith": "Sign in or sign up with",
+    "title": "Compte requis"
+  },
+  "title": {
+    "invitationCreated": "Invitation créée",
+    "userAssigned": "Utilisateur assigné"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "create": "Crear organización",
+    "edit": "Editar organización"
+  },
+  "adminDescription": "Eres un administrador de esta organización. Puedes añadir y eliminar miembros y cambiar el nombre de la organización, o crear una nueva.",
+  "createDescription": "Usa el menú de Acciones para crear una nueva organización.",
+  "currentOrganisation": "Organización actual",
+  "description": {
+    "create": "Crea una nueva organización para colaborar con tu equipo.",
+    "edit": "Actualiza el nombre de la organización."
+  },
+  "errors": {
+    "duplicateKey": "Ya existe una organización con este nombre"
+  },
+  "info": {
+    "uniqueNameRequired": "Los nombres de las organizaciones deben ser únicos."
+  },
+  "memberDescription": "Eres miembro de esta organización y no tienes los permisos para añadir o eliminar miembros. Ponte en contacto con un administrador de la organización si quieres invitar a alguien.",
+  "members": {
+    "actions": {
+      "invite": "Invitar a alguien",
+      "manage": "Gestionar miembros",
+      "remove": "Eliminar miembro"
+    },
+    "confirmations": {
+      "removeConfirm": "¿Estás seguro de que quieres eliminar a {{name}}?",
+      "removeTitle": "Eliminar miembro",
+      "removeWarning": "Este miembro será eliminado de la organización y perderá el acceso a todos los proyectos."
+    },
+    "confirmRemove": "Are you sure you want to remove this member from the project?",
+    "description_one": "Este proyecto tiene {{count}} miembro.",
+    "description_many": "Este proyecto tiene {{count}} miembros.",
+    "description_other": "Este proyecto tiene {{count}} miembros.",
+    "empty": "No se encontraron miembros",
+    "emptyState": "No members found",
+    "title": "Members"
+  },
+  "myPersonalOrganisation": "Mi organización personal",
+  "organisationName": "Organización",
+  "organisationRole": "Rol en la organización",
+  "organization": "Organización",
+  "organizationName": "Nombre de la organización",
+  "privateDescription": "Esta organización solo es visible para ti. Úsala para realizar un seguimiento de proyectos privados. Para colaborar con otros, crea o usa una organización diferente.",
+  "selectOrganisation": "Seleccionar organización"
+}

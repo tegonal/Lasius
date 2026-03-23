@@ -1,0 +1,55 @@
+{
+  "actions": {
+    "add": "Aggiungi registrazione",
+    "adjustCurrentStart": "Adatta l'inizio della registrazione corrente alla fine della registrazione sovrapposta",
+    "adjustEndToNext": "Adatta la fine alla registrazione successiva",
+    "adjustLowerEnd": "Estendi la fine della registrazione inferiore all'inizio della registrazione superiore",
+    "adjustOverlappingEnd": "Adatta la fine della registrazione sovrapposta all'inizio della registrazione corrente",
+    "adjustStartToPrevious": "Adatta l'inizio alla registrazione precedente",
+    "adjustUpperStart": "Sposta l'inizio della registrazione superiore alla fine della registrazione inferiore",
+    "create": "Crea una registrazione",
+    "delete": "Elimina registrazione",
+    "edit": "Modifica registrazione",
+    "editOverlapping": "Modifica registrazione per risolvere la sovrapposizione",
+    "filterByProject": "Filtra per progetto {{projectKey}}",
+    "filterByUser": "Filtra per utente {{userKey}}",
+    "insert": "Inserisci registrazione",
+    "start": "Avvia registrazione",
+    "startFromFavorite": "Avvia registrazione da preferito",
+    "startFromTeamMember": "Avvia registrazione da membro del team",
+    "stopRecording": "Interrompi registrazione tempo corrente"
+  },
+  "duration": "Durata",
+  "emptyToday": "Nessuna registrazione per questo giorno",
+  "hints": {
+    "useEndTimeOfLatest": "Usa l'ora di fine dell'ultima registrazione come ora di inizio per questa",
+    "useEndTimeOfPrevious": "Usa l'ora di fine della registrazione precedente come ora di inizio per questa",
+    "useStartTimeOfNext": "Usa l'ora di inizio della registrazione successiva come ora di fine per questa"
+  },
+  "history": {
+    "empty": "Nessuna registrazione trovata per i filtri selezionati"
+  },
+  "noBookingsToday": "No bookings for this day",
+  "overlapsWarning": "Queste registrazioni si sovrappongono. Fai clic per modificare e adattare l'orario.",
+  "presets": {
+    "browse": "Sfoglia preset",
+    "empty": "Nessun preset disponibile",
+    "favorites": "Preferiti",
+    "recent": "Registrazioni recenti",
+    "selectFavorite": "Seleziona preferito: {{projectName}}{{tags}}",
+    "selectRecent": "Seleziona registrazione recente: {{projectName}}{{tags}}",
+    "selectTeam": "Seleziona registrazione del team di {{userName}}: {{projectName}}{{tags}}",
+    "team": "Registrazioni del team",
+    "title": "Scegli un preset"
+  },
+  "showLists": "Mostra registrazioni",
+  "status": {
+    "currentlyNotBooking": "Nessuna registrazione in corso"
+  },
+  "title": "Registrazioni",
+  "warnings": {
+    "durationIsZero": "La durata di questa registrazione è zero",
+    "longDuration": "Durata prolungata rilevata",
+    "longDurationDescription": "Questa prenotazione supera una tipica giornata lavorativa di 8 ore. Verifichi gli orari di inizio e fine."
+  }
+}

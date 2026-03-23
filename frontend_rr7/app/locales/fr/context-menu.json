@@ -1,0 +1,6 @@
+{
+  "actions": {
+    "close": "Fermer le menu contextuel",
+    "open": "Ouvrir le menu contextuel"
+  }
+}

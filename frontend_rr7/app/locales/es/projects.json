@@ -1,0 +1,54 @@
+{
+  "actions": {
+    "add": "Añadir proyecto",
+    "create": "Crear un proyecto",
+    "deactivate": "Desactivar proyecto",
+    "deactivateConfirm": "Are you sure you want to deactivate the project \"{{project}}\"?",
+    "edit": "Editar proyecto",
+    "leave": "Abandonar este proyecto"
+  },
+  "allProjects": "Todos los proyectos",
+  "allProjectsDescription": "Todos los proyectos de la organización actual que puedes administrar. Crea informes de facturación incluyendo el tiempo registrado por miembros externos del proyecto.",
+  "confirmations": {
+    "leave": "¿Estás seguro de que quieres abandonar este proyecto?"
+  },
+  "deactivatedBy": "Archivado por {{user}}",
+  "description": {
+    "add": "Crea un nuevo proyecto para organizar tu seguimiento de tiempo.",
+    "edit": "Actualiza los detalles del proyecto."
+  },
+  "empty": "No se encontraron proyectos",
+  "errors": {
+    "projectNotFound": "No se pudo encontrar este proyecto. El ID del proyecto se muestra arriba."
+  },
+  "filter": {
+    "both": "Ambos",
+    "search": "Buscar",
+    "searchPlaceholder": "Filtrar proyectos...",
+    "status": "Estado"
+  },
+  "info": {
+    "uniqueNameRequired": "Los nombres de los proyectos deben ser únicos dentro de tu organización."
+  },
+  "label": "Proyecto",
+  "lastActivity": "Última actividad",
+  "myProjects": "Mis proyectos",
+  "myProjectsDescription": "Proyectos en los que eres miembro y puedes registrar tiempo, filtrados por la organización actual.",
+  "project": "Proyecto",
+  "projectName": "Nombre del proyecto",
+  "projectRole": "Rol",
+  "selectProject": "Seleccionar proyecto",
+  "status": {
+    "assignedToUser": "Proyecto asignado correctamente al usuario.",
+    "created": "Proyecto creado",
+    "updated": "Proyecto actualizado"
+  },
+  "title": "Proyectos",
+  "total": "Total",
+  "warnings": {
+    "inactiveProjectContext": "Viendo estadísticas de proyecto inactivo",
+    "inactiveProjectFilter": "Mostrando datos de proyecto inactivo",
+    "projectNotInActiveList": "Este proyecto no está en tu lista de proyectos activos. Puede estar inactivo o ser de otra organización.",
+    "projectUnavailable": "Este proyecto ya no está en tu perfil. Es posible que hayas sido eliminado del mismo."
+  }
+}

@@ -1,23 +1,4 @@
 {
-  "account": {
-    "accountSecurity": "Account Security",
-    "profileChangesNotAllowedInDemo": "Profile changes are not allowed in demo mode",
-    "profileSettings": {
-      "description": "Manage your personal information and account details.",
-      "title": "Profile Information"
-    },
-    "security": {
-      "description": "Update your password to keep your account secure. Use a strong password with at least 8 characters, including uppercase letters and numbers."
-    },
-    "settings": {
-      "description": "Manage your personal information and account details. Your email address can only be changed if you are using the internal authentication provider.",
-      "title": "Account Settings"
-    },
-    "status": {
-      "passwordUpdated": "Password updated",
-      "settingsUpdated": "Account settings updated"
-    }
-  },
   "actions": {
     "close": "Close"
   },
@@ -26,7 +7,7 @@
       "signOut": "Sign out",
       "signOutAndRefresh": "Sign out and refresh"
     },
-    "chooseMethod": "Choose your preferred login method below",
+    "chooseMethod": "Choose your preferred method below",
     "connectingSecurely": "Connecting you securely",
     "continueWith": "Continue with",
     "continueWithProvider": "Continue with your account",
@@ -56,8 +37,8 @@
         "title": "Email Error"
       },
       "errorCode": "Error code",
-      "fetchProfileFailed": "Your session has expired. Please log in again.",
-      "general": "Authentication error: {error}",
+      "fetchProfileFailed": "Couldn't load user profile. Please try logging in again.",
+      "general": "Authentication error. Please try again.",
       "invalidCredentials": "Invalid email or password. Please try again.",
       "loginFailed": "Login failed. Please try again.",
       "oauth": {
@@ -89,11 +70,11 @@
     "noAuthMethodsAvailable": "No authentication methods available",
     "preparingSecureLogin": "Preparing secure login...",
     "registrationSuccess": "Thank you for registering. You can now sign in with your credentials.",
-    "secureAndPrivate": "Secure & Private",
+    "secureAndPrivate": "Secure & private",
     "signIn": "Sign in",
     "signInTitle": "Sign in to your account",
     "signInToLasius": "Sign in to Lasius",
-    "tagline": "Open source time tracking for modern teams",
+    "tagline": "Open source time tracking for teams",
     "welcomeBack": "Welcome back",
     "welcomeToLasius": "Welcome to Lasius"
   },
@@ -129,15 +110,15 @@
       "empty": "No bookings found for the selected filters"
     },
     "noBookingsToday": "No bookings for this day",
-    "overlapsWarning": "These bookings overlap. Click to edit and adjust the time.",
+    "overlapsWarning": "These two bookings overlap. Tap to see adjustment options.",
     "presets": {
       "browse": "Browse presets",
-      "empty": "No presets available",
+      "empty": "No bookings found",
       "favorites": "Favorites",
       "recent": "Recent bookings",
       "selectFavorite": "Select favorite: {{projectName}}{{tags}}",
       "selectRecent": "Select recent booking: {{projectName}}{{tags}}",
-      "selectTeam": "Select team booking by {{userName}}: {{projectName}}{{tags}}",
+      "selectTeam": "Select team booking: {{projectName}}{{tags}}",
       "team": "Team bookings",
       "title": "Choose a preset"
     },
@@ -266,9 +247,9 @@
       "emailInvalid": "Invalid email address",
       "endBeforeStart": "End time is before start time",
       "missingNumber": "Must contain a number",
-      "missingUppercase": "Must contain uppercase letter",
+      "missingUppercase": "Must contain an uppercase letter",
       "passwordMismatch": "Passwords do not match",
-      "passwordTooShort": "Minimum 9 characters",
+      "passwordTooShort": "Password must be at least 9 characters",
       "required": "Required"
     },
     "you": "You"
@@ -341,7 +322,7 @@
       "reject": "Reject invitation"
     },
     "copyToClipboard": "Copy to clipboard",
-    "createAccountMessage": "You've been invited to create a Lasius account to track your working hours.",
+    "createAccountMessage": "You have been invited to create an account so that you can use Lasius to track your working hours.",
     "description": {
       "copyLink": "Copy the link and send it to your colleague. If they do not have an account yet, one will be created when the invitation is accepted."
     },
@@ -370,64 +351,18 @@
       "userAssigned": "User assigned"
     }
   },
-  "members": {
-    "actions": {
-      "invite": "Invite someone",
-      "manage": "Manage members",
-      "remove": "Remove member"
-    },
-    "confirmations": {
-      "removeConfirm": "Are you sure you want to remove {{name}}?",
-      "removeTitle": "Remove member",
-      "removeWarning": "This member will be removed from the organisation and lose access to all projects."
-    },
-    "confirmRemove": "Are you sure you want to remove this member from the project?",
-    "description_one": "This project has {{count}} member(s).",
-    "description_other": "This project has {{count}} member(s).",
-    "empty": "No members found",
-    "emptyState": "No members found",
-    "title": "Members"
-  },
   "of": "of",
-  "organisations": {
-    "actions": {
-      "create": "Create organisation",
-      "edit": "Edit organisation"
-    },
-    "adminDescription": "You are an administrator of this organisation. You can add and remove members and change the organisation name, or create a new one.",
-    "createDescription": "Use the Actions menu to create a new organisation.",
-    "currentOrganisation": "Current organisation",
-    "description": {
-      "create": "Create a new organisation to collaborate with your team.",
-      "edit": "Update the organisation name."
-    },
-    "errors": {
-      "duplicateKey": "An organisation with this name already exists"
-    },
-    "info": {
-      "uniqueNameRequired": "Organisation names must be unique."
-    },
-    "memberDescription": "You are a member of this organisation and don't have the rights to add or remove members. Get in touch with an organisation administrator if you would like to invite someone.",
-    "members": "Members",
-    "myPersonalOrganisation": "My personal organisation",
-    "organisationName": "Organisation",
-    "organisationRole": "Organisation role",
-    "organization": "Organisation",
-    "organizationName": "Organisation name",
-    "privateDescription": "This organisation is only visible to you. Use it to track private projects. To collaborate with others, create or use a different organisation.",
-    "selectOrganisation": "Select organisation"
-  },
   "projects": {
     "actions": {
       "add": "Add Project",
-      "create": "Create a project",
+      "create": "Create project",
       "deactivate": "Deactivate project",
       "deactivateConfirm": "Are you sure you want to deactivate the project \"{{project}}\"?",
       "edit": "Edit project",
       "leave": "Leave this project"
     },
     "allProjects": "All projects",
-    "allProjectsDescription": "All projects in the current organisation that you can administer. Create billing reports including time booked by external project members.",
+    "allProjectsDescription": "All projects in the current organization that you can administer. Create billing reports including time booked by external project members.",
     "confirmations": {
       "leave": "Are you sure you want to leave this project?"
     },
@@ -452,10 +387,10 @@
     "label": "Project",
     "lastActivity": "Last activity",
     "myProjects": "My projects",
-    "myProjectsDescription": "Projects where you are a member and can book time, filtered by the current organisation.",
+    "myProjectsDescription": "Projects where you are a member and can book time. Restricted by the currently selected organisation.",
     "project": "Project",
     "projectName": "Project name",
-    "projectRole": "Role",
+    "projectRole": "Project role",
     "selectProject": "Select project",
     "status": {
       "assignedToUser": "Project successfully assigned to user.",
@@ -469,27 +404,6 @@
       "inactiveProjectFilter": "Showing data for inactive project",
       "projectNotInActiveList": "This project is not in your active projects list. It may be inactive or from another organization.",
       "projectUnavailable": "This project is no longer in your profile. You may have been removed from it."
-    }
-  },
-  "pwa": {
-    "reloadApplication": "Reload application",
-    "updateAvailable": "Update available",
-    "updateMessage": "Lasius has been updated. The page will reload after your confirmation."
-  },
-  "SessionTimeout": {
-    "extend": "Extend Session",
-    "logout": "Logout",
-    "message": "Your session will expire soon. Would you like to extend it?",
-    "title": "Session Expiring"
-  },
-  "settings": {
-    "app": {
-      "description": "Customize your experience with language and theme preferences. These settings are stored locally in your browser.",
-      "language": "Interface Language",
-      "save": "Save Settings",
-      "showOnboarding": "Show Onboarding Tutorial",
-      "theme": "Theme",
-      "title": "Application Settings"
     }
   },
   "statistics": {
@@ -513,12 +427,6 @@
     "decimalHours": "Decimal hours",
     "empty": "No data available for the selected period",
     "hoursMinutes": "HH:MM"
-  },
-  "system": {
-    "backendUnreachable": "Backend seems to be unreachable",
-    "connectedToBackend": "Connected to backend",
-    "connectingToBackend": "Connecting to backend",
-    "offlineMessage": "Lasius is currently offline or undergoing maintenance. We will be back shortly."
   },
   "tags": {
     "actions": {
@@ -585,13 +493,6 @@
     "startMustBeInPast": "Start time must be in the past",
     "themeRequired": "Theme is required"
   },
-  "websocket": {
-    "status": {
-      "connected": "Websocket connected",
-      "connecting": "Websocket connecting",
-      "error": "Unable to connect to websocket"
-    }
-  },
   "workHealth": {
     "actualHours": "actual",
     "avgPerDay": "avg/day",
@@ -615,6 +516,6 @@
       "updated": "Working hours updated"
     },
     "title": "Working hours",
-    "totalPerWeek": "total per week"
+    "totalPerWeek": "Total per week"
   }
 }

@@ -1,0 +1,45 @@
+{
+  "actions": {
+    "create": "Organisation erstellen",
+    "edit": "Organisation bearbeiten"
+  },
+  "adminDescription": "Du bist Administrator dieser Organisation. Du kannst Mitglieder hinzufügen und entfernen, den Organisationsnamen ändern oder eine neue erstellen.",
+  "createDescription": "Verwende das Aktionsmenü, um eine neue Organisation zu erstellen.",
+  "currentOrganisation": "Aktuelle Organisation",
+  "description": {
+    "create": "Erstelle eine neue Organisation, um mit deinem Team zusammenzuarbeiten.",
+    "edit": "Aktualisiere den Organisationsnamen."
+  },
+  "errors": {
+    "duplicateKey": "Eine Organisation mit diesem Namen existiert bereits"
+  },
+  "info": {
+    "uniqueNameRequired": "Organisationsnamen müssen eindeutig sein."
+  },
+  "memberDescription": "Du bist Mitglied dieser Organisation und hast keine Berechtigung, Mitglieder hinzuzufügen oder zu entfernen. Wende dich an einen Organisationsadministrator, wenn du jemanden einladen möchtest.",
+  "members": {
+    "actions": {
+      "invite": "Jemanden einladen",
+      "manage": "Mitglieder verwalten",
+      "remove": "Mitglied entfernen"
+    },
+    "confirmations": {
+      "removeConfirm": "Bist du sicher, dass du {{name}} entfernen möchtest?",
+      "removeTitle": "Mitglied entfernen",
+      "removeWarning": "Dieses Mitglied wird aus der Organisation entfernt und verliert den Zugriff auf alle Projekte."
+    },
+    "confirmRemove": "Are you sure you want to remove this member from the project?",
+    "description_one": "Dieses Projekt hat {{count}} Mitglied.",
+    "description_other": "Dieses Projekt hat {{count}} Mitglieder.",
+    "empty": "Keine Mitglieder gefunden",
+    "emptyState": "No members found",
+    "title": "Members"
+  },
+  "myPersonalOrganisation": "Meine persönliche Organisation",
+  "organisationName": "Organisation",
+  "organisationRole": "Organisationsrolle",
+  "organization": "Organisation",
+  "organizationName": "Organisationsname",
+  "privateDescription": "Diese Organisation ist nur für dich sichtbar. Du kannst sie nutzen, um private Projekte zu erfassen, auf die andere keinen Zugriff haben sollen. Wenn du Leute einladen möchtest, lade sie zu einer bestehenden Organisation ein oder erstelle eine neue.",
+  "selectOrganisation": "Organisation auswählen"
+}

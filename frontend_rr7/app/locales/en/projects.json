@@ -1,0 +1,54 @@
+{
+  "actions": {
+    "add": "Add Project",
+    "create": "Create a project",
+    "deactivate": "Deactivate project",
+    "deactivateConfirm": "Are you sure you want to deactivate the project \"{{project}}\"?",
+    "edit": "Edit project",
+    "leave": "Leave this project"
+  },
+  "allProjects": "All projects",
+  "allProjectsDescription": "All projects in the current organisation that you can administer. Create billing reports including time booked by external project members.",
+  "confirmations": {
+    "leave": "Are you sure you want to leave this project?"
+  },
+  "deactivatedBy": "Archived by {{user}}",
+  "description": {
+    "add": "Create a new project to organize your time tracking.",
+    "edit": "Update the project details."
+  },
+  "empty": "No projects found",
+  "errors": {
+    "projectNotFound": "This project could not be found. The project ID is shown above."
+  },
+  "filter": {
+    "both": "Both",
+    "search": "Search",
+    "searchPlaceholder": "Filter projects...",
+    "status": "Status"
+  },
+  "info": {
+    "uniqueNameRequired": "Project names must be unique within your organisation."
+  },
+  "label": "Project",
+  "lastActivity": "Last activity",
+  "myProjects": "My projects",
+  "myProjectsDescription": "Projects where you are a member and can book time, filtered by the current organisation.",
+  "project": "Project",
+  "projectName": "Project name",
+  "projectRole": "Role",
+  "selectProject": "Select project",
+  "status": {
+    "assignedToUser": "Project successfully assigned to user.",
+    "created": "Project created",
+    "updated": "Project updated"
+  },
+  "title": "Projects",
+  "total": "Total",
+  "warnings": {
+    "inactiveProjectContext": "Viewing stats from inactive project",
+    "inactiveProjectFilter": "Showing data for inactive project",
+    "projectNotInActiveList": "This project is not in your active projects list. It may be inactive or from another organization.",
+    "projectUnavailable": "This project is no longer in your profile. You may have been removed from it."
+  }
+}

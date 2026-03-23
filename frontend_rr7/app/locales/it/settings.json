@@ -1,0 +1,29 @@
+{
+  "account": {
+    "accountSecurity": "Sicurezza dell'account",
+    "profileChangesNotAllowedInDemo": "Le modifiche al profilo non sono consentite in modalità demo",
+    "profileSettings": {
+      "description": "Gestisci le tue informazioni personali e i dettagli dell'account.",
+      "title": "Informazioni profilo"
+    },
+    "security": {
+      "description": "Aggiorna la password per mantenere sicuro il tuo account. Usa una password robusta con almeno 8 caratteri, che includa lettere maiuscole e numeri."
+    },
+    "settings": {
+      "description": "Gestisci le tue informazioni personali e i dettagli dell'account. Il tuo indirizzo email può essere modificato solo se stai utilizzando il provider di autenticazione interno.",
+      "title": "Impostazioni account"
+    },
+    "status": {
+      "passwordUpdated": "Password aggiornata",
+      "settingsUpdated": "Impostazioni account aggiornate"
+    }
+  },
+  "app": {
+    "description": "Personalizza la tua esperienza con le preferenze di lingua e tema. Queste impostazioni vengono memorizzate localmente nel tuo browser.",
+    "language": "Lingua dell'interfaccia",
+    "save": "Salva impostazioni",
+    "showOnboarding": "Mostra tutorial introduttivo",
+    "theme": "Tema",
+    "title": "Impostazioni applicazione"
+  }
+}

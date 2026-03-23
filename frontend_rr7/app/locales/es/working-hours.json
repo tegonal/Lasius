@@ -1,0 +1,12 @@
+{
+  "dailyTotal": "Total diario",
+  "description": "La cantidad de tiempo que esperas registrar por día, por organización, durante una semana laboral típica. Estos datos se utilizan para calcular tu progreso diario y semanal.",
+  "errors": {
+    "updateFailed": "Error al actualizar las horas de trabajo"
+  },
+  "status": {
+    "updated": "Horas de trabajo actualizadas"
+  },
+  "title": "Horas de trabajo",
+  "totalPerWeek": "total por semana"
+}

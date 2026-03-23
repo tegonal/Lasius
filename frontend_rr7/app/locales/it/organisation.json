@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "create": "Crea organizzazione",
+    "edit": "Modifica organizzazione"
+  },
+  "adminDescription": "Sei un amministratore di questa organizzazione. Puoi aggiungere e rimuovere membri e modificare il nome dell'organizzazione, o crearne una nuova.",
+  "createDescription": "Usa il menu Azioni per creare una nuova organizzazione.",
+  "currentOrganisation": "Organizzazione corrente",
+  "description": {
+    "create": "Crea una nuova organizzazione per collaborare con il tuo team.",
+    "edit": "Aggiorna il nome dell'organizzazione."
+  },
+  "errors": {
+    "duplicateKey": "Un'organizzazione con questo nome esiste già"
+  },
+  "info": {
+    "uniqueNameRequired": "I nomi delle organizzazioni devono essere univoci."
+  },
+  "memberDescription": "Sei un membro di questa organizzazione e non hai i diritti per aggiungere o rimuovere membri. Contatta un amministratore dell'organizzazione se desideri invitare qualcuno.",
+  "members": {
+    "actions": {
+      "invite": "Invita qualcuno",
+      "manage": "Gestisci membri",
+      "remove": "Rimuovi membro"
+    },
+    "confirmations": {
+      "removeConfirm": "Sei sicuro di voler rimuovere {{name}}?",
+      "removeTitle": "Rimuovi membro",
+      "removeWarning": "Questo membro sarà rimosso dall'organizzazione e perderà l'accesso a tutti i progetti."
+    },
+    "confirmRemove": "Are you sure you want to remove this member from the project?",
+    "description_one": "Questo progetto ha {{count}} membro.",
+    "description_many": "Questo progetto ha {{count}} membri.",
+    "description_other": "Questo progetto ha {{count}} membri.",
+    "empty": "Nessun membro trovato",
+    "emptyState": "No members found",
+    "title": "Members"
+  },
+  "myPersonalOrganisation": "La mia organizzazione personale",
+  "organisationName": "Organizzazione",
+  "organisationRole": "Ruolo nell'organizzazione",
+  "organization": "Organizzazione",
+  "organizationName": "Nome organizzazione",
+  "privateDescription": "Questa organizzazione è visibile solo a te. Usala per monitorare progetti privati. Per collaborare con altri, crea o usa un'organizzazione diversa.",
+  "selectOrganisation": "Seleziona organizzazione"
+}

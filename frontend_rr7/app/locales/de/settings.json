@@ -1,0 +1,29 @@
+{
+  "account": {
+    "accountSecurity": "Konto-Sicherheit",
+    "profileChangesNotAllowedInDemo": "Profil-Änderungen sind im Demo-Modus nicht erlaubt",
+    "profileSettings": {
+      "description": "Verwalte deine persönlichen Informationen und Konto-Details.",
+      "title": "Profilinformationen"
+    },
+    "security": {
+      "description": "Aktualisiere dein Passwort, um dein Konto sicher zu halten. Verwende ein starkes Passwort mit mindestens 8 Zeichen, einschließlich Großbuchstaben und Zahlen."
+    },
+    "settings": {
+      "description": "Verwalte deine persönlichen Informationen und Konto-Details. Deine E-Mail-Adresse kann nur geändert werden, wenn du den internen Authentifizierungsanbieter verwendest.",
+      "title": "Konto-Einstellungen"
+    },
+    "status": {
+      "passwordUpdated": "Passwort aktualisiert",
+      "settingsUpdated": "Konto-Einstellungen aktualisiert"
+    }
+  },
+  "app": {
+    "description": "Passe deine Erfahrung mit Sprach- und Design-Einstellungen an. Diese Einstellungen werden lokal in deinem Browser gespeichert.",
+    "language": "Sprache der Benutzeroberfläche",
+    "save": "Einstellungen speichern",
+    "showOnboarding": "Einführungstutorial anzeigen",
+    "theme": "Design",
+    "title": "Anwendungseinstellungen"
+  }
+}

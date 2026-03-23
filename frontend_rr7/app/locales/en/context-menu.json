@@ -1,0 +1,6 @@
+{
+  "actions": {
+    "close": "Close context menu",
+    "open": "Open context menu"
+  }
+}
