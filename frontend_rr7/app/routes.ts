@@ -90,7 +90,14 @@ export default [
         route('current', 'routes/organisation.current.tsx'),
         route('lists', 'routes/organisation.lists.tsx'),
         route('projects', 'routes/organisation.projects._index.tsx'),
-        route('stats', 'routes/organisation.stats.tsx'),
+        ...prefix('stats', [
+          layout('routes/organisation.stats.tsx', [
+            index('routes/organisation.stats._index.tsx'),
+            route('projects', 'routes/organisation.stats.projects.tsx'),
+            route('users', 'routes/organisation.stats.users.tsx'),
+            route('tags', 'routes/organisation.stats.tags.tsx'),
+          ]),
+        ]),
       ]),
     ]),
 
