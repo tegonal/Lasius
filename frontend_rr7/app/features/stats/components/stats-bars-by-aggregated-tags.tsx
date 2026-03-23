@@ -17,16 +17,9 @@
  *
  */
 
-import { lazy, Suspense } from 'react'
-
+import { BarsTags } from './bars-tags'
 import { EmptyStateStats } from './empty-state-stats'
 import { StatsTile } from './stats-tile'
-
-const BarsTags = lazy(() =>
-  import('./bars-tags').then((mod) => ({
-    default: mod.BarsTags,
-  })),
-)
 
 type StatsBarsByAggregatedTagsProps = {
   chartData:
@@ -53,15 +46,7 @@ export const StatsBarsByAggregatedTags = ({
       className="min-h-[200px]"
       style={{ height: `${chartData.data.length * 36}px` }}
     >
-      <Suspense
-        fallback={
-          <div className="bg-base-200 flex h-full w-full items-center justify-center rounded-lg">
-            <span className="loading loading-spinner loading-md" />
-          </div>
-        }
-      >
-        <BarsTags stats={chartData} />
-      </Suspense>
+      <BarsTags stats={chartData} />
     </StatsTile>
   )
 }

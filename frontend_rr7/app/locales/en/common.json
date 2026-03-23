@@ -1,10 +1,6 @@
 {
   "account": {
     "accountSecurity": "Account Security",
-    "changeUserProfileSettings": "Change user profile settings",
-    "errors": {
-      "passwordUpdateFailed": "Password update failed. Make sure you entered your current password and that it is correct."
-    },
     "profileChangesNotAllowedInDemo": "Profile changes are not allowed in demo mode",
     "profileSettings": {
       "description": "Manage your personal information and account details.",
@@ -20,18 +16,13 @@
     "status": {
       "passwordUpdated": "Password updated",
       "settingsUpdated": "Account settings updated"
-    },
-    "title": "Account"
+    }
   },
   "actions": {
     "close": "Close"
   },
-  "app": {
-    "name": "Lasius"
-  },
   "auth": {
     "actions": {
-      "logout": "Logout",
       "signOut": "Sign out",
       "signOutAndRefresh": "Sign out and refresh"
     },
@@ -56,7 +47,6 @@
         "message": "The credentials you provided are incorrect. Please try again.",
         "title": "Sign In Failed"
       },
-      "credentialsMissing": "Username or password missing",
       "default": {
         "message": "An error occurred during authentication. Please try again.",
         "title": "Authentication Error"
@@ -68,6 +58,8 @@
       "errorCode": "Error code",
       "fetchProfileFailed": "Your session has expired. Please log in again.",
       "general": "Authentication error: {error}",
+      "invalidCredentials": "Invalid email or password. Please try again.",
+      "loginFailed": "Login failed. Please try again.",
       "oauth": {
         "message": "An error occurred during OAuth authentication. Please try again or use a different sign-in method.",
         "title": "OAuth Error"
@@ -79,6 +71,7 @@
         "message": "Please sign in to continue.",
         "title": "Session Required"
       },
+      "stateMismatch": "Authentication failed: invalid state. Please try again.",
       "unknown": {
         "message": "An unexpected error occurred during authentication.",
         "title": "Authentication Error"
@@ -87,43 +80,26 @@
       "verification": {
         "message": "The verification token has expired or has already been used. Please try signing in again.",
         "title": "Verification Failed"
-      },
-      "wrongPasswordOrEmail": "Wrong password or email. Please try again."
+      }
     },
     "fillDetailsToStart": "Please fill in your details to get started",
     "getStartedFree": "Get started with open source time tracking",
     "joinLasius": "Join Lasius",
     "needHelp": "Need help? Click the help button",
-    "needsAccount": {
-      "message": "To accept the invitation, please sign in with {{email}} or create a new account using one of the login providers below."
-    },
     "noAuthMethodsAvailable": "No authentication methods available",
     "preparingSecureLogin": "Preparing secure login...",
-    "providers": {
-      "internalLasius": "Internal Lasius Sign-in"
-    },
+    "registrationSuccess": "Thank you for registering. You can now sign in with your credentials.",
     "secureAndPrivate": "Secure & Private",
-    "sessionExpired": {
-      "alert": "Your session has timed out for security reasons.",
-      "loginButton": "Log In Again",
-      "message": "Please log in again to continue using the application.",
-      "title": "Session Expired"
-    },
     "signIn": "Sign in",
     "signInTitle": "Sign in to your account",
     "signInToLasius": "Sign in to Lasius",
-    "status": {
-      "authenticationFailed": "Authentication failed. Please log in again."
-    },
     "tagline": "Open source time tracking for modern teams",
-    "thankYouForRegistering": "Thank you for registering! You can now log in using your email address and password. Welcome to Lasius!",
     "welcomeBack": "Welcome back",
     "welcomeToLasius": "Welcome to Lasius"
   },
   "bookings": {
     "actions": {
       "add": "Add booking",
-      "addedToFavorites": "Booking added to favorites",
       "adjustCurrentStart": "Adjust current booking to start at overlapping booking end",
       "adjustEndToNext": "Adjust end to next booking",
       "adjustLowerEnd": "Extend lower booking end to upper booking start",
@@ -143,8 +119,6 @@
       "stopRecording": "Stop recording current time booking"
     },
     "duration": "Duration",
-    "emptyNever": "No bookings yet",
-    "emptyNeverHelp": "Get started by creating your first booking. Need guidance?",
     "emptyToday": "No bookings for this day",
     "hints": {
       "useEndTimeOfLatest": "Use end time of latest booking as start time for this one",
@@ -154,6 +128,7 @@
     "history": {
       "empty": "No bookings found for the selected filters"
     },
+    "noBookingsToday": "No bookings for this day",
     "overlapsWarning": "These bookings overlap. Click to edit and adjust the time.",
     "presets": {
       "browse": "Browse presets",
@@ -168,12 +143,7 @@
     },
     "showLists": "Show bookings",
     "status": {
-      "added": "Booking added",
-      "currentlyNotBooking": "Currently not booking",
-      "historyCleared": "Booking history cleared",
-      "removed": "Booking removed",
-      "started": "Booking started",
-      "updated": "Booking updated"
+      "currentlyNotBooking": "Currently not booking"
     },
     "title": "Bookings",
     "warnings": {
@@ -188,8 +158,7 @@
       "nextWeek": "Next week",
       "previousMonth": "Previous month",
       "previousWeek": "Previous week"
-    },
-    "title": "Calendar"
+    }
   },
   "common": {
     "actions": {
@@ -199,15 +168,10 @@
       "cancel": "Cancel",
       "clear": "Clear",
       "close": "Close",
-      "closeActionsMenu": "Close actions menu",
-      "closeNotification": "Close notification",
       "delete": "Delete",
       "discardChanges": "Discard changes",
       "help": "Help",
-      "invite": "Invite",
       "keepEditing": "Keep editing",
-      "next": "Next",
-      "openActionsMenu": "Open actions menu",
       "reset": "Reset",
       "resetToInitial": "Reset to initial value",
       "save": "Save",
@@ -219,18 +183,12 @@
       "increment": "Increment"
     },
     "back": "Back",
+    "cancel": "Cancel",
     "confirmUnsavedChanges": "You have unsaved changes. Are you sure you want to cancel?",
     "custom": "Custom",
-    "dashboard": "Dashboard",
     "date": "Date",
     "errors": {
-      "generic": "Something went wrong",
-      "helpNotAvailable": "Help content not available for this page.",
-      "internalServerError": "Internal server error",
-      "pageNotFound": "Page not found",
-      "somethingWentWrong": "Something went wrong",
-      "unauthorized": "Unauthorized",
-      "unexpectedError": "An unexpected error occurred"
+      "helpNotAvailable": "Help content not available for this page."
     },
     "filter": {
       "title": "Filter"
@@ -252,13 +210,11 @@
       "role": "Role"
     },
     "help": {
-      "buttonLabel": "Help",
       "contactAdmin": "Please contact your administrator"
     },
     "info": {
       "helpFallbackLanguage": "This help content is not available in your selected language yet. Showing English version."
     },
-    "ok": "Ok",
     "or": "or",
     "roles": {
       "administrator": "Administrator",
@@ -276,10 +232,8 @@
       "system": "System"
     },
     "time": {
-      "backToPresets": "Back to presets",
       "customTime": "Custom time...",
       "day": "Day",
-      "duration": "Duration",
       "ends": "Ends",
       "from": "From",
       "hours": "Hours",
@@ -287,6 +241,7 @@
       "lastQuarter": "Last quarter",
       "lastWeek": "Last week",
       "lastYear": "Last year",
+      "minutes": "Minutes",
       "month": "Month",
       "selectRange": "Select time range",
       "setCustom": "Set custom time",
@@ -307,20 +262,14 @@
     },
     "user": "User",
     "validation": {
+      "email": "Please enter a valid email address",
       "emailInvalid": "Invalid email address",
       "endBeforeStart": "End time is before start time",
-      "fromMustBeBeforeTo": "Must be before the \"to\" date",
       "missingNumber": "Must contain a number",
-      "missingSpecialChar": "Missing special character",
       "missingUppercase": "Must contain uppercase letter",
-      "mustBeAfterStart": "Must be after start",
-      "mustBeBeforeEnd": "Must be before end",
-      "mustBeInPast": "Must be in the past",
       "passwordMismatch": "Passwords do not match",
       "passwordTooShort": "Minimum 9 characters",
-      "required": "Required",
-      "toMustBeAfterFrom": "Must be after the \"from\" date",
-      "wrongFormat": "Wrong format"
+      "required": "Required"
     },
     "you": "You"
   },
@@ -331,6 +280,8 @@
     }
   },
   "demo": {
+    "credentials": "Use \"demo1@lasius.ch\" and password \"demo\" to log in and have a look around.",
+    "title": "Demo Mode",
     "welcome": "Welcome to the Lasius demo instance. Use \"demo1@lasius.ch\" and password \"demo\" to log in and have a look around. The demo instance is reset once a day."
   },
   "export": {
@@ -350,6 +301,7 @@
       "label": "Export format selection"
     },
     "stats": {
+      "error": "Failed to export statistics. Please try again.",
       "menuLabel": "Statistics export format selection",
       "openMenu": "Open statistics export format menu"
     },
@@ -362,10 +314,7 @@
       "add": "Add as favorite",
       "delete": "Delete favorite"
     },
-    "empty": "No favorites yet",
-    "status": {
-      "removed": "Favorite removed"
-    }
+    "empty": "No favorites yet"
   },
   "features": {
     "freeAndOpenSource": "Free and open source",
@@ -385,10 +334,6 @@
     "tegonal": {
       "title": "Lasius is developed and maintained by Tegonal Cooperative and released under AGPL 3.0"
     }
-  },
-  "help": "Help",
-  "integrations": {
-    "title": "Integrations"
   },
   "invitations": {
     "actions": {
@@ -415,39 +360,15 @@
       "selectOrganisation": "Select the organisation you would like to add this project to:"
     },
     "needsAccount": {
-      "continue": "Continue to Sign In",
       "description": "You'll need to sign in or create an account for {{email}} to accept this invitation.",
       "emailMatch": "Make sure to sign in with the email address this invitation was sent to: {{email}}",
+      "signInOrSignUpWith": "Sign in or sign up with",
       "title": "Account Required"
     },
     "title": {
       "invitationCreated": "Invitation created",
       "userAssigned": "User assigned"
     }
-  },
-  "issueImporters": {
-    "typeLabels": {
-      "github": "GitHub",
-      "gitlab": "GitLab",
-      "jira": "Jira",
-      "plane": "Plane"
-    },
-    "validation": {
-      "accessTokenRequired": "Access token is required",
-      "apiKeyRequired": "API key is required",
-      "baseUrlRequired": "Base URL is required",
-      "consumerKeyRequired": "Consumer key is required",
-      "invalidUrl": "Invalid URL",
-      "maxInterval": "Maximum 24 hours",
-      "minInterval": "Minimum 1 minute",
-      "nameRequired": "Name is required",
-      "privateKeyRequired": "Private key is required",
-      "resourceOwnerRequired": "Resource owner is required",
-      "workspaceRequired": "Workspace is required"
-    }
-  },
-  "lists": {
-    "title": "Lists"
   },
   "members": {
     "actions": {
@@ -460,119 +381,18 @@
       "removeTitle": "Remove member",
       "removeWarning": "This member will be removed from the organisation and lose access to all projects."
     },
+    "confirmRemove": "Are you sure you want to remove this member from the project?",
     "description_one": "This project has {{count}} member(s).",
     "description_other": "This project has {{count}} member(s).",
-    "empty": "No members found"
-  },
-  "navigation": {
-    "currentOrganisation": "Current organisation",
-    "openMenu": "Open menu",
-    "settings": "Settings",
-    "yourTimeBookingView": "Your time booking view"
+    "empty": "No members found",
+    "emptyState": "No members found",
+    "title": "Members"
   },
   "of": "of",
-  "offline": {
-    "message": "You are offline. This application requires an online connection. It will update automatically when a network connection is detected."
-  },
-  "onboarding": {
-    "actions": {
-      "backToChecklist": "Back to Checklist",
-      "gotIt": "Ok, got it!"
-    },
-    "booking": {
-      "step1": "Use the Booking Form",
-      "step1Desc": "Find the booking form in the right column and select a project.",
-      "step2": "Or Use Context Menu",
-      "step2Desc": "Right-click any booking, favorite, or team booking and choose the stopwatch icon.",
-      "step3": "Stop When Done",
-      "step3Desc": "When you finish working, stop the timer.",
-      "subtitle": "You're all set! Here's how to create your first booking.",
-      "title": "Start Tracking Time"
-    },
-    "checklist": {
-      "booking": "Start tracking time",
-      "help": "Click on any item to learn more about it",
-      "organisation": "Create or join an organization",
-      "progress": "Your Progress",
-      "project": "Create or join a project",
-      "subtitle": "Follow these simple steps to start tracking time",
-      "title": "Let's Get You Started",
-      "workingHours": "Set working hours for this organization"
-    },
-    "closeTutorial": "Close tutorial",
-    "confirmClose": "Are you sure you want to close the tutorial? You can re-enable it in App Settings.",
-    "navigation": {
-      "importantUI": "Important UI Elements",
-      "mainNavigation": "Main Navigation",
-      "organisationDesc": "Manage your current organization, create new organizations and view organization-wide data",
-      "orgSwitcher": "Organization Switcher",
-      "orgSwitcherDesc": "In the top-right corner, switch between your organizations",
-      "settingsDesc": "Configure app settings, account, security and working hours",
-      "subtitle": "Here are the main parts of Lasius you will use every day.",
-      "title": "Getting Around Lasius",
-      "userDesc": "Track your time, view your bookings, dashboard, projects, statistics and lists",
-      "weeklyCalendar": "Weekly Calendar",
-      "weeklyCalendarDesc": "At the top of the page, switch between days to view your bookings"
-    },
-    "organisation": {
-      "action": "Manage Organizations",
-      "step1": "Create Your Own",
-      "step1Desc": "Go to Organization settings and create a new organization to invite others.",
-      "step2": "Or Join an Existing One",
-      "step2Desc": "Ask someone to invite you and wait for them to send you an invite link.",
-      "subtitle": "Organizations let you work with team members and track time together.",
-      "title": "Create or Join an Organization"
-    },
-    "overview": {
-      "exports": "Exports & Lists",
-      "exportsDesc": "Find your reports in the Lists section",
-      "help": "Click 'Next' to see what you need to set up",
-      "organisations": "Organizations",
-      "organisationsDesc": "Collaborate with your team members",
-      "projects": "Projects",
-      "projectsDesc": "Organize work into trackable projects",
-      "subtitle": "Here are the basic building blocks you should know about",
-      "tags": "Tags & Tag Groups",
-      "tagsDesc": "Categorize your bookings for detailed reports",
-      "title": "Welcome to Lasius",
-      "workingHours": "Working Hours",
-      "workingHoursDesc": "Track your planned work hours per week"
-    },
-    "privateOrganisation": {
-      "explanation": "Your private organization is perfect for tracking personal projects and anything you don't need to share with others. Only you can see the projects and time tracked here.",
-      "help": "Click 'Next' to continue",
-      "subtitle": "You already have a private organization for personal use.",
-      "tip": "💡 Good to Know",
-      "tipDesc": "If you want to work with team members, you can create or join additional organizations.",
-      "title": "Your Private Organization"
-    },
-    "projects": {
-      "action": "Go to My Projects",
-      "step1": "Create Your Own",
-      "step1Desc": "Go to My Projects and create a new project.",
-      "step2": "Or Join an Existing One",
-      "step2Desc": "Ask an administrator to add you to their project.",
-      "subtitle": "Projects help you organize your time. You need at least one to get started.",
-      "title": "Create or Join a Project"
-    },
-    "workingHours": {
-      "action": "Set Working Hours",
-      "step1": "Go to Working Hours",
-      "step1Desc": "Click the button below to set your hours.",
-      "step2": "Enter Your Weekly Hours",
-      "step2Desc": "Set how many hours you work each day. Lasius will show your progress.",
-      "subtitle": "Tell Lasius how many hours per week you plan to work.",
-      "title": "Set Working Hours"
-    }
-  },
-  "organisation": {
-    "title": "Organisation"
-  },
   "organisations": {
     "actions": {
       "create": "Create organisation",
-      "edit": "Edit organisation",
-      "switch": "Switch organisation"
+      "edit": "Edit organisation"
     },
     "adminDescription": "You are an administrator of this organisation. You can add and remove members and change the organisation name, or create a new one.",
     "createDescription": "Use the Actions menu to create a new organisation.",
@@ -582,8 +402,7 @@
       "edit": "Update the organisation name."
     },
     "errors": {
-      "duplicateKey": "An organisation with this name already exists",
-      "saveFailed": "Failed to save organisation"
+      "duplicateKey": "An organisation with this name already exists"
     },
     "info": {
       "uniqueNameRequired": "Organisation names must be unique."
@@ -596,26 +415,20 @@
     "organization": "Organisation",
     "organizationName": "Organisation name",
     "privateDescription": "This organisation is only visible to you. Use it to track private projects. To collaborate with others, create or use a different organisation.",
-    "selectOrganisation": "Select organisation",
-    "status": {
-      "created": "Organisation created",
-      "updated": "Organisation updated"
-    }
+    "selectOrganisation": "Select organisation"
   },
   "projects": {
     "actions": {
       "add": "Add Project",
       "create": "Create a project",
       "deactivate": "Deactivate project",
+      "deactivateConfirm": "Are you sure you want to deactivate the project \"{{project}}\"?",
       "edit": "Edit project",
       "leave": "Leave this project"
     },
     "allProjects": "All projects",
     "allProjectsDescription": "All projects in the current organisation that you can administer. Create billing reports including time booked by external project members.",
     "confirmations": {
-      "deactivateInstructions": "To confirm, please type the project name below:",
-      "deactivateTitle": "Deactivate project",
-      "deactivateWarning": "This action cannot be undone. The project will be permanently archived and all user assignments will be removed. You will not be able to reactivate this project.",
       "leave": "Are you sure you want to leave this project?"
     },
     "deactivatedBy": "Archived by {{user}}",
@@ -625,9 +438,7 @@
     },
     "empty": "No projects found",
     "errors": {
-      "duplicateKey": "A project with this name already exists",
-      "projectNotFound": "This project could not be found. The project ID is shown above.",
-      "saveFailed": "Failed to save project"
+      "projectNotFound": "This project could not be found. The project ID is shown above."
     },
     "filter": {
       "both": "Both",
@@ -642,7 +453,6 @@
     "lastActivity": "Last activity",
     "myProjects": "My projects",
     "myProjectsDescription": "Projects where you are a member and can book time, filtered by the current organisation.",
-    "name": "Project name",
     "project": "Project",
     "projectName": "Project name",
     "projectRole": "Role",
@@ -666,11 +476,16 @@
     "updateAvailable": "Update available",
     "updateMessage": "Lasius has been updated. The page will reload after your confirmation."
   },
+  "SessionTimeout": {
+    "extend": "Extend Session",
+    "logout": "Logout",
+    "message": "Your session will expire soon. Would you like to extend it?",
+    "title": "Session Expiring"
+  },
   "settings": {
     "app": {
       "description": "Customize your experience with language and theme preferences. These settings are stored locally in your browser.",
       "language": "Interface Language",
-      "menuTitle": "App Settings",
       "save": "Save Settings",
       "showOnboarding": "Show Onboarding Tutorial",
       "theme": "Theme",
@@ -678,31 +493,32 @@
     }
   },
   "statistics": {
+    "6months": "6 Months",
+    "6monthWorkTrend": "6-Month Work Trend",
     "calendarYear": "Calendar year",
     "expectedHours": "Expected hours",
+    "noProjectsFor6Months": "No projects for this period",
     "noProjectsForDay": "No projects for this day",
     "noProjectsForMonth": "No projects for this month",
-    "noProjectsForPeriod": "No projects for this period",
     "noProjectsForWeek": "No projects for this week",
+    "noProjectsForYear": "No projects for this period",
     "percentOfPlannedHours": "% of planned hours",
     "rolling12Months": "Rolling 12 Months",
+    "rolling12MonthsTrend": "12-Month Work Trend",
     "showStatistics": "Show statistics",
-    "title": "Statistics",
     "weeklyHoursDistribution": "Weekly Hours Distribution",
-    "yearlyWorkTrend": "Yearly Work Trend"
+    "yearWorkTrend": "Yearly Work Trend"
   },
   "stats": {
-    "empty": "No data available for the selected period"
+    "decimalHours": "Decimal hours",
+    "empty": "No data available for the selected period",
+    "hoursMinutes": "HH:MM"
   },
   "system": {
-    "backend": "Backend",
     "backendUnreachable": "Backend seems to be unreachable",
     "connectedToBackend": "Connected to backend",
     "connectingToBackend": "Connecting to backend",
-    "connectionStatus": "Connection status",
-    "noInternetConnection": "No Internet connection. Please make sure that your device is connected to the Internet.",
-    "offlineMessage": "Lasius is currently offline or undergoing maintenance. We will be back shortly.",
-    "websocket": "WebSocket"
+    "offlineMessage": "Lasius is currently offline or undergoing maintenance. We will be back shortly."
   },
   "tags": {
     "actions": {
@@ -739,14 +555,6 @@
       "tagNameRequired": "Tag name is required"
     }
   },
-  "tos": {
-    "acceptMessage": "Please accept the following Terms of Service (version {{version}}), if you want to continue using Lasius:",
-    "actions": {
-      "accept": "Accept Terms of Service",
-      "reject": "Reject and logout"
-    },
-    "title": "Terms of Service (version {{version}})"
-  },
   "ui": {
     "hidePasswords": "Hide passwords",
     "showPasswords": "Show passwords"
@@ -757,7 +565,6 @@
     },
     "title": "Users",
     "warnings": {
-      "userNotInActiveList": "This user is not in your active users list. They may have been removed from the organisation.",
       "userUnavailable": "This user is no longer available in your organisation."
     }
   },
@@ -795,7 +602,6 @@
     "plannedHours": "planned",
     "relaxReminder": "Time to relax a little bit",
     "sixMonths": "6 Months",
-    "sixMonthTrend": "6-Month Work Trend",
     "takeItEasy": "Consider taking it easy",
     "thisWeek": "this week"
   },
@@ -808,7 +614,6 @@
     "status": {
       "updated": "Working hours updated"
     },
-    "summary": "Summary",
     "title": "Working hours",
     "totalPerWeek": "total per week"
   }

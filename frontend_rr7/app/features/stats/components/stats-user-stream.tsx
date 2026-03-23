@@ -17,26 +17,12 @@
  *
  */
 
-import { lazy, Suspense } from 'react'
-
 import { type NivoChartDataType } from '~/lib/api/functions/get-nivo-chart-data-from-api-stats-data'
 
+import { BarsHours } from './bars-hours'
 import { EmptyStateStats } from './empty-state-stats'
+import { ProjectStreamChartImpl } from './project-stream-chart-impl'
 import { StatsTile } from './stats-tile'
-
-const ProjectStreamChartImpl = lazy(() =>
-  import('~/features/stats/components/project-stream-chart-impl').then(
-    (mod) => ({
-      default: mod.ProjectStreamChartImpl,
-    }),
-  ),
-)
-
-const BarsHours = lazy(() =>
-  import('./bars-hours').then((mod) => ({
-    default: mod.BarsHours,
-  })),
-)
 
 type StatsUserStreamProps = {
   chartData:
@@ -64,28 +50,10 @@ export const StatsUserStream = ({
   if (useBarChart) {
     return (
       <StatsTile className="h-[320px]">
-        <Suspense
-          fallback={
-            <div className="bg-base-200 flex h-full w-full items-center justify-center rounded-lg">
-              <span className="loading loading-spinner loading-md" />
-            </div>
-          }
-        >
-          <BarsHours groupMode="stacked" indexBy="category" stats={chartData} />
-        </Suspense>
+        <BarsHours groupMode="stacked" indexBy="category" stats={chartData} />
       </StatsTile>
     )
   }
 
-  return (
-    <Suspense
-      fallback={
-        <div className="bg-base-200 h-80 w-full animate-pulse rounded-lg p-4">
-          <span className="loading loading-spinner loading-md" />
-        </div>
-      }
-    >
-      <ProjectStreamChartImpl data={chartData.data} keys={chartData.keys} />
-    </Suspense>
-  )
+  return <ProjectStreamChartImpl data={chartData.data} keys={chartData.keys} />
 }

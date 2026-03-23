@@ -24,13 +24,13 @@ import {
   getWeek,
   startOfMonth,
 } from 'date-fns'
-import { lazy, Suspense } from 'react'
 import { useTranslation } from 'react-i18next'
 import { data } from 'react-router'
 
 import { FormatDate } from '~/components/ui/data-display/format-date'
 import { StatsOverviewGrid } from '~/features/dashboard/components/stats-overview-grid'
 import { TopProjectsCard } from '~/features/dashboard/components/top-projects-card'
+import { MonthStreamChart } from '~/features/stats/components/month-stream-chart'
 import { aggregateProjectHours } from '~/lib/api/functions/aggregate-project-hours'
 import { getExpectedVsBookedPercentage } from '~/lib/api/functions/get-expected-vs-booked-percentage'
 import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
@@ -50,12 +50,6 @@ import {
 } from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/dashboard.month'
-
-const MonthStreamChart = lazy(() =>
-  import('~/features/stats/components/month-stream-chart').then((mod) => ({
-    default: mod.MonthStreamChart,
-  })),
-)
 
 // ─── Client Loader (cache unless full-page refresh) ──────────────────────────
 
@@ -257,13 +251,7 @@ export default function DashboardMonth({ loaderData }: Route.ComponentProps) {
               defaultValue: 'Weekly Hours Distribution',
             })}
           </h3>
-          <Suspense
-            fallback={
-              <div className="bg-base-200 h-64 w-full animate-pulse rounded" />
-            }
-          >
-            <MonthStreamChart data={streamChart.data} keys={streamChart.keys} />
-          </Suspense>
+          <MonthStreamChart data={streamChart.data} keys={streamChart.keys} />
         </>
       )}
     </div>

@@ -33,7 +33,6 @@ import {
   useRouteError,
   useRouteLoaderData,
 } from 'react-router'
-import { useChangeLanguage } from 'remix-i18next/react'
 
 import { DataLoadingProgress } from '~/components/features/system/data-loading-progress'
 import { ToastProvider } from '~/components/ui/feedback/toasts'
@@ -89,7 +88,6 @@ export const loader = async ({ context, request }: Route.LoaderArgs) => {
 }
 
 export default function App({ loaderData }: Route.ComponentProps) {
-  useChangeLanguage(loaderData.locale)
   return <Outlet />
 }
 

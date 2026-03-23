@@ -17,34 +17,34 @@
  *
  */
 
-import { PieDiagram } from '~/components/ui/charts/pie-diagram'
+import { data } from 'react-router'
 
-import { EmptyStateStats } from './empty-state-stats'
-import { StatsTile } from './stats-tile'
+import { getConfiguration } from '~/services/api/lasius/general/general'
 
-type StatsCircleCategoryRangeProps = {
-  chartData:
-    | undefined
-    | {
-        data: undefined | { id: string; value: number }[]
-        keys?: (null | string | undefined)[]
-      }
+export type HealthResponse = {
+  backend: 'connected' | 'disconnected'
+  status: 'ok'
+  version: string
 }
 
-export const StatsCircleCategoryRange = ({
-  chartData,
-}: StatsCircleCategoryRangeProps) => {
-  if (!chartData?.data || chartData.data.length === 0) {
-    return (
-      <StatsTile className="h-[340px]">
-        <EmptyStateStats />
-      </StatsTile>
-    )
+/**
+ * GET /api/health
+ *
+ * Returns app self-status, backend connectivity, and build version.
+ * No auth required — must work even when session is expired.
+ */
+export async function loader() {
+  const version = process.env.LASIUS_VERSION || 'dev'
+
+  let backend: HealthResponse['backend'] = 'disconnected'
+  try {
+    await getConfiguration()
+    backend = 'connected'
+  } catch {
+    backend = 'disconnected'
   }
 
-  return (
-    <StatsTile className="h-[340px]">
-      <PieDiagram stats={chartData} />
-    </StatsTile>
-  )
+  return data({ backend, status: 'ok', version } satisfies HealthResponse, {
+    headers: { 'Cache-Control': 'no-store' },
+  })
 }

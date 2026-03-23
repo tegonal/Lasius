@@ -18,15 +18,14 @@
  */
 
 import { ServerIcon } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { useIsClient } from '~/lib/hooks/use-is-client'
-
-type BackendConnectionStatus = 'connected' | 'connecting' | 'disconnected'
-
-const POLL_INTERVAL_MS = 30000
+import {
+  type BackendConnectionStatus,
+  useBackendStatus,
+} from '~/stores/ui-store'
 
 const statusDotClass: Record<BackendConnectionStatus, string> = {
   connected: 'bg-success',
@@ -37,28 +36,7 @@ const statusDotClass: Record<BackendConnectionStatus, string> = {
 export const BackendStatus = () => {
   const { t } = useTranslation('common')
   const isClient = useIsClient()
-  const [status, setStatus] = useState<BackendConnectionStatus>('connecting')
-  const intervalRef = useRef<null | ReturnType<typeof setInterval>>(null)
-
-  const checkStatus = useCallback(async () => {
-    try {
-      const res = await fetch('/api/session-status')
-      setStatus(res.ok ? 'connected' : 'disconnected')
-    } catch {
-      setStatus('disconnected')
-    }
-  }, [])
-
-  useEffect(() => {
-    void checkStatus()
-    intervalRef.current = setInterval(
-      () => void checkStatus(),
-      POLL_INTERVAL_MS,
-    )
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current)
-    }
-  }, [checkStatus])
+  const status = useBackendStatus()
 
   if (!isClient) return null
 

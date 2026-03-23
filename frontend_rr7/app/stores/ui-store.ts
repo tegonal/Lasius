@@ -24,6 +24,11 @@ import { immer } from 'zustand/middleware/immer'
 
 import { logger } from '~/lib/logger'
 
+export type BackendConnectionStatus =
+  | 'connected'
+  | 'connecting'
+  | 'disconnected'
+
 interface ExplosionEvent {
   id: string
   timestamp: number
@@ -44,6 +49,8 @@ interface ToastViewType {
 
 interface UIStore {
   addToast: (toast: ToastViewType) => void
+  // Backend health state (written by useHealthMonitor, read by BackendStatus indicator)
+  backendStatus: BackendConnectionStatus
   clearExplosion: () => void
   clearTabs: () => void
 
@@ -61,9 +68,11 @@ interface UIStore {
   removeTab: (id: string) => void
 
   removeToast: (id: string) => void
+  setBackendStatus: (status: BackendConnectionStatus) => void
   setContextMenuOpen: (id: string) => void
   setGlobalLoading: (isLoading: boolean) => void
   setTabActive: (id: string, activeIndex: number) => void
+  setVersionDrift: (drift: boolean) => void
   showGlobalLoading: () => void
 
   // Stats tile display preferences
@@ -75,6 +84,8 @@ interface UIStore {
   toastViews: ToastViewType[]
   toggleStatsTileTimeAsDecimals: () => void
   triggerExplosion: (x: number, y: number) => void
+  // Version drift state (written by useHealthMonitor, read by HealthMonitor component)
+  versionDrift: boolean
 }
 
 export const useUIStore = create<UIStore>()(
@@ -96,6 +107,8 @@ export const useUIStore = create<UIStore>()(
                 }, toast.ttl)
               }
             }),
+          // Backend health state
+          backendStatus: 'connecting' as BackendConnectionStatus,
           clearExplosion: () =>
             set((state) => {
               state.explosionEvent = null
@@ -163,6 +176,10 @@ export const useUIStore = create<UIStore>()(
             set((state) => {
               state.toastViews = state.toastViews.filter((t) => t.id !== id)
             }),
+          setBackendStatus: (status) =>
+            set((state) => {
+              state.backendStatus = status
+            }),
           setContextMenuOpen: (id) =>
             set((state) => {
               state.contextMenuOpen = id
@@ -182,6 +199,11 @@ export const useUIStore = create<UIStore>()(
               } else {
                 state.tabViews.push({ activeIndex, id })
               }
+            }),
+
+          setVersionDrift: (drift) =>
+            set((state) => {
+              state.versionDrift = drift
             }),
           showGlobalLoading: () =>
             set((state) => {
@@ -209,6 +231,8 @@ export const useUIStore = create<UIStore>()(
                 y,
               }
             }),
+          // Version drift state
+          versionDrift: false,
         })),
       ),
       {
@@ -235,6 +259,8 @@ export const useStatsTileTimeAsDecimals = () =>
   useUIStore((state) => state.statsTileTimeAsDecimals)
 export const useExplosionEvent = () =>
   useUIStore((state) => state.explosionEvent)
+export const useBackendStatus = () => useUIStore((state) => state.backendStatus)
+export const useVersionDrift = () => useUIStore((state) => state.versionDrift)
 
 // Action hooks — actions are stable Zustand references, so useMemo with
 // them as deps produces a stable object that never triggers re-renders.

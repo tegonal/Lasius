@@ -25,13 +25,13 @@ import {
   startOfYear,
   subWeeks,
 } from 'date-fns'
-import { lazy, Suspense } from 'react'
 import { useTranslation } from 'react-i18next'
 import { data, useSearchParams } from 'react-router'
 
 import { FormatDate } from '~/components/ui/data-display/format-date'
 import { StatsOverviewGrid } from '~/features/dashboard/components/stats-overview-grid'
 import { TopProjectsCard } from '~/features/dashboard/components/top-projects-card'
+import { WeeklyTrendChart } from '~/features/stats/components/weekly-trend-chart'
 import { aggregateProjectHours } from '~/lib/api/functions/aggregate-project-hours'
 import { computeWorkHealthMetrics } from '~/lib/api/functions/compute-work-health-metrics.server'
 import { getExpectedVsBookedPercentage } from '~/lib/api/functions/get-expected-vs-booked-percentage'
@@ -54,12 +54,6 @@ import {
 } from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/dashboard.year'
-
-const WeeklyTrendChart = lazy(() =>
-  import('~/features/stats/components/weekly-trend-chart').then((mod) => ({
-    default: mod.WeeklyTrendChart,
-  })),
-)
 
 // ─── Client Loader (cache unless full-page refresh) ──────────────────────────
 
@@ -255,13 +249,7 @@ export default function DashboardYear({ loaderData }: Route.ComponentProps) {
                   defaultValue: '12-Month Work Trend',
                 })}
           </h3>
-          <Suspense
-            fallback={
-              <div className="bg-base-200 h-64 w-full animate-pulse rounded" />
-            }
-          >
-            <WeeklyTrendChart tickEvery={4} weeklyData={weeklyData} />
-          </Suspense>
+          <WeeklyTrendChart tickEvery={4} weeklyData={weeklyData} />
         </>
       )}
     </div>

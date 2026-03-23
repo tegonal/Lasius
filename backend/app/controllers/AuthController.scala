@@ -43,7 +43,7 @@ class AuthController @Inject() (
   def createWsTicket(): Action[Unit] =
     HasUserRole(FreeUser, parse.empty, withinTransaction = false) {
       _ => _ => user => _ =>
-        val ref = user.getReference
+        val ref    = user.getReference
         val ticket = systemServices.createWsTicket(ref.id, ref)
         Future.successful(Ok(Json.obj("ticket" -> ticket)))
     }

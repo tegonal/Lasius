@@ -52,6 +52,7 @@ export default [
     route('proxy', 'routes/api.proxy.ts'),
     route('ws-ticket', 'routes/api.ws-ticket.ts'),
     route('locale', 'routes/api.locale.ts'),
+    route('health', 'routes/api.health.ts'),
   ]),
 
   // Authenticated app routes — requireUser redirects to /login if unauthenticated

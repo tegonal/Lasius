@@ -45,17 +45,17 @@
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
     "es-toolkit": "^1.45.1",
-    "i18next": "25.10.3",
+    "i18next": "25.10.5",
     "i18next-browser-languagedetector": "^8.2.1",
     "i18next-fetch-backend": "^7.0.0",
     "immer": "^11.1.4",
     "isbot": "^5.1.36",
-    "lucide-react": "^0.577.0",
+    "lucide-react": "^1.0.1",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-hook-form": "^7.72.0",
-    "react-i18next": "^16.6.0",
-    "react-router": "^7.13.1",
+    "react-i18next": "^16.6.2",
+    "react-router": "^7.13.2",
     "remix-i18next": "^7.4.2",
     "tailwind-merge": "^3.5.0",
     "tslog": "^4.10.2",
@@ -89,9 +89,9 @@
     "tailwindcss": "^4.2.2",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.57.1",
-    "vite": "^8.0.1",
+    "vite": "^8.0.2",
     "vite-plugin-babel": "^1.6.0",
-    "vitest": "^4.1.0"
+    "vitest": "^4.1.1"
   },
   "engines": {
     "node": ">=24.0.0"

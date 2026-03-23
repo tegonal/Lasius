@@ -78,6 +78,9 @@ type Pages = {
   "/api/locale": {
     params: {};
   };
+  "/api/health": {
+    params: {};
+  };
   "/user/home": {
     params: {};
   };
@@ -152,7 +155,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/login" | "/logout" | "/join/:invitationId" | "/auth/error" | "/internal-oauth/login" | "/internal-oauth/register" | "/oauth/:provider/login" | "/oauth/callback" | "/api/session-status" | "/api/locales/:lang/:ns" | "/api/help/:locale/:slug" | "/api/theme" | "/api/calendar-bookings" | "/api/org-switch" | "/api/booking-form-data" | "/api/proxy" | "/api/ws-ticket" | "/api/locale" | "/user/home" | "/user/dashboard" | "/user/dashboard/day" | "/user/dashboard/week" | "/user/dashboard/month" | "/user/dashboard/6months" | "/user/dashboard/year" | "/user/lists" | "/user/stats" | "/user/stats/projects" | "/user/stats/tags" | "/user/projects" | "/organisation/current" | "/organisation/lists" | "/organisation/projects" | "/organisation/stats" | "/organisation/stats/projects" | "/organisation/stats/users" | "/organisation/stats/tags" | "/settings/account" | "/settings/account-security" | "/settings/app" | "/settings/working-hours";
+    page: "/" | "/login" | "/logout" | "/join/:invitationId" | "/auth/error" | "/internal-oauth/login" | "/internal-oauth/register" | "/oauth/:provider/login" | "/oauth/callback" | "/api/session-status" | "/api/locales/:lang/:ns" | "/api/help/:locale/:slug" | "/api/theme" | "/api/calendar-bookings" | "/api/org-switch" | "/api/booking-form-data" | "/api/proxy" | "/api/ws-ticket" | "/api/locale" | "/api/health" | "/user/home" | "/user/dashboard" | "/user/dashboard/day" | "/user/dashboard/week" | "/user/dashboard/month" | "/user/dashboard/6months" | "/user/dashboard/year" | "/user/lists" | "/user/stats" | "/user/stats/projects" | "/user/stats/tags" | "/user/projects" | "/organisation/current" | "/organisation/lists" | "/organisation/projects" | "/organisation/stats" | "/organisation/stats/projects" | "/organisation/stats/users" | "/organisation/stats/tags" | "/settings/account" | "/settings/account-security" | "/settings/app" | "/settings/working-hours";
   };
   "routes/login.tsx": {
     id: "routes/login";
@@ -225,6 +228,10 @@ type RouteFiles = {
   "routes/api.locale.ts": {
     id: "routes/api.locale";
     page: "/api/locale";
+  };
+  "routes/api.health.ts": {
+    id: "routes/api.health";
+    page: "/api/health";
   };
   "routes/app-layout.tsx": {
     id: "routes/app-layout";
@@ -376,6 +383,7 @@ type RouteModules = {
   "routes/api.proxy": typeof import("./app/routes/api.proxy.ts");
   "routes/api.ws-ticket": typeof import("./app/routes/api.ws-ticket.ts");
   "routes/api.locale": typeof import("./app/routes/api.locale.ts");
+  "routes/api.health": typeof import("./app/routes/api.health.ts");
   "routes/app-layout": typeof import("./app/routes/app-layout.tsx");
   "routes/index-redirect": typeof import("./app/routes/index-redirect.ts");
   "routes/user.layout": typeof import("./app/routes/user.layout.tsx");

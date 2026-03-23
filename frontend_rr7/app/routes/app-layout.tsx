@@ -38,6 +38,7 @@ import { HelpButton } from '~/features/help/components/help-button'
 import { OrgSwitcher } from '~/features/organisation/components/org-switcher'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { DevInfoBadge } from '~/features/system/components/dev-info-badge'
+import { HealthMonitor } from '~/features/system/components/health-monitor'
 import { WebSocketEventHandler } from '~/features/system/websocket/websocket-event-handler'
 import { getUserProfile } from '~/services/api/lasius/user/user'
 import {
@@ -159,6 +160,7 @@ export default function AppLayout(_props: Route.ComponentProps) {
       <DevInfoBadge />
       <TokenWatcher />
       <WebSocketEventHandler />
+      <HealthMonitor />
     </div>
   )
 }

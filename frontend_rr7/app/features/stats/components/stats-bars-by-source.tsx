@@ -17,19 +17,11 @@
  *
  */
 
-import { lazy, Suspense } from 'react'
-
 import { type NivoChartDataType } from '~/lib/api/functions/get-nivo-chart-data-from-api-stats-data'
 
-import { type BarChartGroupMode } from './bars-hours'
+import { type BarChartGroupMode, BarsHours } from './bars-hours'
 import { EmptyStateStats } from './empty-state-stats'
 import { StatsTile } from './stats-tile'
-
-const BarsHours = lazy(() =>
-  import('./bars-hours').then((mod) => ({
-    default: mod.BarsHours,
-  })),
-)
 
 type StatsBarsBySourceProps = {
   chartData:
@@ -56,15 +48,7 @@ export const StatsBarsBySource = ({
 
   return (
     <StatsTile className="h-[240px]">
-      <Suspense
-        fallback={
-          <div className="bg-base-200 flex h-full w-full items-center justify-center rounded-lg">
-            <span className="loading loading-spinner loading-md" />
-          </div>
-        }
-      >
-        <BarsHours groupMode={groupMode} indexBy="category" stats={chartData} />
-      </Suspense>
+      <BarsHours groupMode={groupMode} indexBy="category" stats={chartData} />
     </StatsTile>
   )
 }
