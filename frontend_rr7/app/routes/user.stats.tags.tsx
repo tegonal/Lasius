@@ -17,29 +17,19 @@
  *
  */
 
-import { useTranslation } from 'react-i18next'
-import {
-  data,
-  href,
-  Outlet,
-  type ShouldRevalidateFunctionArgs,
-} from 'react-router'
+import { data, type ShouldRevalidateFunctionArgs } from 'react-router'
 
-import {
-  ColumnCenter,
-  ColumnRight,
-  innerGridClasses,
-} from '~/components/ui/layouts/layout-columns'
-import { ScrollArea } from '~/components/ui/layouts/scroll-area'
-import { StatsExport } from '~/features/stats/components/stats-export'
-import { StatsFilter } from '~/features/stats/components/stats-filter'
-import { StatsOverview } from '~/features/stats/components/stats-overview'
-import { StatsTabs } from '~/features/stats/components/stats-tabs'
-import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
+import { type BarChartGroupMode } from '~/features/stats/components/bars-hours'
+import { ChartErrorBoundary } from '~/features/stats/components/error-boundary-chart'
+import { StatsBarsByAggregatedTags } from '~/features/stats/components/stats-bars-by-aggregated-tags'
+import { StatsBarsBySource } from '~/features/stats/components/stats-bars-by-source'
+import { getAdaptiveGranularity } from '~/lib/api/config/granularity-config'
+import { getNivoChartDataFromApiStatsData } from '~/lib/api/functions/get-nivo-chart-data-from-api-stats-data'
+import { getTransformedChartDataAggregate } from '~/lib/api/functions/get-transformed-chart-data-aggregate'
 import { dateOptions } from '~/lib/utils/date/date-options'
-import { apiTimespanFromTo } from '~/lib/utils/dates'
+import { apiDatespanFromTo } from '~/lib/utils/dates'
 import { cachedServerLoader } from '~/lib/utils/loader-cache'
-import { getUserBookingListByOrganisation } from '~/services/api/lasius/user-bookings/user-bookings'
+import { getUserBookingAggregatedStatsByOrganisation } from '~/services/api/lasius/user-bookings/user-bookings'
 import { getUserProfile } from '~/services/api/lasius/user/user'
 import {
   authHeaders,
@@ -47,7 +37,7 @@ import {
   requireUser,
 } from '~/services/auth/auth-helpers.server'
 
-import { type Route } from './+types/user.stats'
+import { type Route } from './+types/user.stats.tags'
 
 // ─── Revalidation ────────────────────────────────────────────────────────────
 
@@ -111,35 +101,53 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     to = defaultRange?.to ?? ''
   }
 
+  const granularity = getAdaptiveGranularity(from, to)
+
   // Compute API params
-  const timespan = apiTimespanFromTo(from, to)
+  const datespan = apiDatespanFromTo(from, to)
 
-  // Fetch bookings for overview summary
-  const bookingsRes = timespan
-    ? await getUserBookingListByOrganisation(selectedOrgId, timespan, {
-        headers,
-      })
-    : { data: [] }
+  // Fetch tag stats in parallel
+  const [tagsByDayRes, tagsAggregatedRes] = await Promise.all([
+    datespan
+      ? getUserBookingAggregatedStatsByOrganisation(
+          selectedOrgId,
+          {
+            from: datespan.from,
+            granularity,
+            source: 'tag',
+            to: datespan.to,
+          },
+          { headers },
+        )
+      : Promise.resolve({ data: [] }),
+    datespan
+      ? getUserBookingAggregatedStatsByOrganisation(
+          selectedOrgId,
+          {
+            from: datespan.from,
+            granularity: 'All',
+            source: 'tag',
+            to: datespan.to,
+          },
+          { headers },
+        )
+      : Promise.resolve({ data: [] }),
+  ])
 
-  const bookings = bookingsRes.data ?? []
+  const tagsByDay = tagsByDayRes.data ?? []
+  const tagsAggregated = tagsAggregatedRes.data ?? []
 
   // Transform data server-side
-  const bookingSummary = getModelsBookingSummary(bookings)
-
-  const distinctUsers = new Set(
-    bookings.map((b) => b.userReference?.id).filter(Boolean),
-  ).size
-  const distinctProjects = new Set(
-    bookings.map((b) => b.projectReference?.id).filter(Boolean),
-  ).size
+  const tagsByDayChart = getNivoChartDataFromApiStatsData(
+    tagsByDay,
+    granularity,
+  )
+  const tagsAggregatedChart = getTransformedChartDataAggregate(tagsAggregated)
 
   return data(
     {
-      bookingSummary,
-      distinctProjects,
-      distinctUsers,
-      from,
-      to,
+      tagsAggregatedChart,
+      tagsByDayChart,
     },
     { headers: mergeAuthHeaders(auth) },
   )
@@ -147,73 +155,21 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-const UserStatsLayout = ({ loaderData }: Route.ComponentProps) => {
-  const { t } = useTranslation('common')
-
-  const { bookingSummary, distinctProjects, distinctUsers, from, to } =
-    loaderData
-
-  const tabs = [
-    {
-      id: 'projects',
-      label: t('projects.title', { defaultValue: 'Projects' }),
-      to: href('/user/stats/projects'),
-    },
-    {
-      id: 'tags',
-      label: t('tags.title', { defaultValue: 'Tags' }),
-      to: href('/user/stats/tags'),
-    },
-  ]
+const UserStatsTags = ({ loaderData }: Route.ComponentProps) => {
+  const { tagsAggregatedChart, tagsByDayChart } = loaderData
 
   return (
-    <div className={innerGridClasses} data-testid="stats-page">
-      <ColumnCenter>
-        <div className="flex h-full flex-col overflow-hidden">
-          <div className="bg-base-200 flex-shrink-0 px-6 py-4">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1">
-                <StatsOverview
-                  distinctProjects={distinctProjects}
-                  distinctUsers={distinctUsers}
-                  elements={bookingSummary.elements}
-                  hours={bookingSummary.hours}
-                />
-              </div>
-              <div className="flex-shrink-0">
-                <StatsExport
-                  bookingList={bookingSummary}
-                  distinctProjects={distinctProjects}
-                  distinctUsers={distinctUsers}
-                  from={from}
-                  projectsAggregated={[]}
-                  projectsByDay={[]}
-                  tagsAggregated={[]}
-                  tagsByDay={[]}
-                  to={to}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="border-base-200 border-b px-6 pt-2">
-            <StatsTabs tabs={tabs} />
-          </div>
-          <ScrollArea className="min-h-0 flex-1">
-            <div className="pt-4">
-              <Outlet />
-            </div>
-          </ScrollArea>
-        </div>
-      </ColumnCenter>
-      <ColumnRight>
-        <ScrollArea className="h-full">
-          <div className="p-4">
-            <StatsFilter />
-          </div>
-        </ScrollArea>
-      </ColumnRight>
+    <div className="px-6">
+      <ChartErrorBoundary>
+        <StatsBarsBySource
+          chartData={tagsByDayChart}
+          groupMode={'stacked' as BarChartGroupMode}
+        />
+        <div className="divider my-4" />
+        <StatsBarsByAggregatedTags chartData={tagsAggregatedChart} />
+      </ChartErrorBoundary>
     </div>
   )
 }
 
-export default UserStatsLayout
+export default UserStatsTags

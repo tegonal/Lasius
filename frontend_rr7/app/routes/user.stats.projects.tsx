@@ -17,29 +17,21 @@
  *
  */
 
-import { useTranslation } from 'react-i18next'
-import {
-  data,
-  href,
-  Outlet,
-  type ShouldRevalidateFunctionArgs,
-} from 'react-router'
+import { data, type ShouldRevalidateFunctionArgs } from 'react-router'
 
+import { ChartErrorBoundary } from '~/features/stats/components/error-boundary-chart'
+import { StatsCircleCategoryRange } from '~/features/stats/components/stats-circle-category-range'
+import { StatsProjectStream } from '~/features/stats/components/stats-project-stream'
 import {
-  ColumnCenter,
-  ColumnRight,
-  innerGridClasses,
-} from '~/components/ui/layouts/layout-columns'
-import { ScrollArea } from '~/components/ui/layouts/scroll-area'
-import { StatsExport } from '~/features/stats/components/stats-export'
-import { StatsFilter } from '~/features/stats/components/stats-filter'
-import { StatsOverview } from '~/features/stats/components/stats-overview'
-import { StatsTabs } from '~/features/stats/components/stats-tabs'
-import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
+  getAdaptiveGranularity,
+  shouldUseBarChart,
+} from '~/lib/api/config/granularity-config'
+import { getNivoChartDataFromApiStatsData } from '~/lib/api/functions/get-nivo-chart-data-from-api-stats-data'
+import { getTransformedChartDataAggregate } from '~/lib/api/functions/get-transformed-chart-data-aggregate'
 import { dateOptions } from '~/lib/utils/date/date-options'
-import { apiTimespanFromTo } from '~/lib/utils/dates'
+import { apiDatespanFromTo } from '~/lib/utils/dates'
 import { cachedServerLoader } from '~/lib/utils/loader-cache'
-import { getUserBookingListByOrganisation } from '~/services/api/lasius/user-bookings/user-bookings'
+import { getUserBookingAggregatedStatsByOrganisation } from '~/services/api/lasius/user-bookings/user-bookings'
 import { getUserProfile } from '~/services/api/lasius/user/user'
 import {
   authHeaders,
@@ -47,7 +39,7 @@ import {
   requireUser,
 } from '~/services/auth/auth-helpers.server'
 
-import { type Route } from './+types/user.stats'
+import { type Route } from './+types/user.stats.projects'
 
 // ─── Revalidation ────────────────────────────────────────────────────────────
 
@@ -111,35 +103,56 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     to = defaultRange?.to ?? ''
   }
 
+  const granularity = getAdaptiveGranularity(from, to)
+  const useBarChart = shouldUseBarChart(from, to)
+
   // Compute API params
-  const timespan = apiTimespanFromTo(from, to)
+  const datespan = apiDatespanFromTo(from, to)
 
-  // Fetch bookings for overview summary
-  const bookingsRes = timespan
-    ? await getUserBookingListByOrganisation(selectedOrgId, timespan, {
-        headers,
-      })
-    : { data: [] }
+  // Fetch project stats in parallel
+  const [projectsByDayRes, projectsAggregatedRes] = await Promise.all([
+    datespan
+      ? getUserBookingAggregatedStatsByOrganisation(
+          selectedOrgId,
+          {
+            from: datespan.from,
+            granularity,
+            source: 'project',
+            to: datespan.to,
+          },
+          { headers },
+        )
+      : Promise.resolve({ data: [] }),
+    datespan
+      ? getUserBookingAggregatedStatsByOrganisation(
+          selectedOrgId,
+          {
+            from: datespan.from,
+            granularity: 'All',
+            source: 'project',
+            to: datespan.to,
+          },
+          { headers },
+        )
+      : Promise.resolve({ data: [] }),
+  ])
 
-  const bookings = bookingsRes.data ?? []
+  const projectsByDay = projectsByDayRes.data ?? []
+  const projectsAggregated = projectsAggregatedRes.data ?? []
 
   // Transform data server-side
-  const bookingSummary = getModelsBookingSummary(bookings)
-
-  const distinctUsers = new Set(
-    bookings.map((b) => b.userReference?.id).filter(Boolean),
-  ).size
-  const distinctProjects = new Set(
-    bookings.map((b) => b.projectReference?.id).filter(Boolean),
-  ).size
+  const projectStreamChart = getNivoChartDataFromApiStatsData(
+    projectsByDay,
+    granularity,
+  )
+  const projectsAggregatedChart =
+    getTransformedChartDataAggregate(projectsAggregated)
 
   return data(
     {
-      bookingSummary,
-      distinctProjects,
-      distinctUsers,
-      from,
-      to,
+      projectsAggregatedChart,
+      projectStreamChart,
+      useBarChart,
     },
     { headers: mergeAuthHeaders(auth) },
   )
@@ -147,73 +160,22 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-const UserStatsLayout = ({ loaderData }: Route.ComponentProps) => {
-  const { t } = useTranslation('common')
-
-  const { bookingSummary, distinctProjects, distinctUsers, from, to } =
+const UserStatsProjects = ({ loaderData }: Route.ComponentProps) => {
+  const { projectsAggregatedChart, projectStreamChart, useBarChart } =
     loaderData
 
-  const tabs = [
-    {
-      id: 'projects',
-      label: t('projects.title', { defaultValue: 'Projects' }),
-      to: href('/user/stats/projects'),
-    },
-    {
-      id: 'tags',
-      label: t('tags.title', { defaultValue: 'Tags' }),
-      to: href('/user/stats/tags'),
-    },
-  ]
-
   return (
-    <div className={innerGridClasses} data-testid="stats-page">
-      <ColumnCenter>
-        <div className="flex h-full flex-col overflow-hidden">
-          <div className="bg-base-200 flex-shrink-0 px-6 py-4">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1">
-                <StatsOverview
-                  distinctProjects={distinctProjects}
-                  distinctUsers={distinctUsers}
-                  elements={bookingSummary.elements}
-                  hours={bookingSummary.hours}
-                />
-              </div>
-              <div className="flex-shrink-0">
-                <StatsExport
-                  bookingList={bookingSummary}
-                  distinctProjects={distinctProjects}
-                  distinctUsers={distinctUsers}
-                  from={from}
-                  projectsAggregated={[]}
-                  projectsByDay={[]}
-                  tagsAggregated={[]}
-                  tagsByDay={[]}
-                  to={to}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="border-base-200 border-b px-6 pt-2">
-            <StatsTabs tabs={tabs} />
-          </div>
-          <ScrollArea className="min-h-0 flex-1">
-            <div className="pt-4">
-              <Outlet />
-            </div>
-          </ScrollArea>
-        </div>
-      </ColumnCenter>
-      <ColumnRight>
-        <ScrollArea className="h-full">
-          <div className="p-4">
-            <StatsFilter />
-          </div>
-        </ScrollArea>
-      </ColumnRight>
+    <div className="px-6">
+      <ChartErrorBoundary>
+        <StatsCircleCategoryRange chartData={projectsAggregatedChart} />
+        <div className="divider my-4" />
+        <StatsProjectStream
+          chartData={projectStreamChart}
+          useBarChart={useBarChart}
+        />
+      </ChartErrorBoundary>
     </div>
   )
 }
 
-export default UserStatsLayout
+export default UserStatsProjects
