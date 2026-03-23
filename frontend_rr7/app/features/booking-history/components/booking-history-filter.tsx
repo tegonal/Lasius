@@ -125,29 +125,26 @@ export const BookingHistoryFilter = ({
         <div className="alert alert-warning mb-4">
           <div className="flex w-full items-center justify-between">
             <span>
-              {t('projects.warnings.inactiveProjectFilter', {
-                defaultValue: 'Showing data for inactive project',
-              })}
+              {t(
+                'projects:warnings.inactiveProjectFilter',
+                'Showing data for inactive project',
+              )}
             </span>
             <Button
-              aria-label={t('common.actions.back', {
-                defaultValue: 'Back',
-              })}
+              aria-label={t('actions.back', 'Back')}
               fullWidth={false}
               onClick={handleBackToProjects}
               size="sm"
               variant="ghost"
             >
               <LucideIcon icon={ArrowLeft} size={16} />
-              {t('common.actions.back', { defaultValue: 'Back' })}
+              {t('actions.back', 'Back')}
             </Button>
           </div>
         </div>
       )}
       <div className="relative">
-        <Heading variant="section">
-          {t('common.filter.title', { defaultValue: 'Filter' })}
-        </Heading>
+        <Heading variant="section">{t('filter.title', 'Filter')}</Heading>
         {hasChanges && (
           <div className="absolute top-3 right-0">
             <Button
@@ -156,32 +153,21 @@ export const BookingHistoryFilter = ({
               size="xs"
               variant="ghost"
             >
-              {t('common.actions.reset', {
-                defaultValue: 'Reset',
-              })}
+              {t('actions.reset', 'Reset')}
             </Button>
           </div>
         )}
       </div>
       <FormBody>
         {showUserFilter && (
-          <FormElement
-            htmlFor="userId"
-            label={t('common.user', { defaultValue: 'User' })}
-          >
+          <FormElement htmlFor="userId" label={t('user', 'User')}>
             <UserSelect id="userId" name="userId" users={users} />
           </FormElement>
         )}
-        <FormElement
-          htmlFor="projectId"
-          label={t('projects.label', { defaultValue: 'Project' })}
-        >
+        <FormElement htmlFor="projectId" label={t('projects:label', 'Project')}>
           <ProjectSelect id="projectId" name="projectId" projects={projects} />
         </FormElement>
-        <FormElement
-          htmlFor="tags"
-          label={t('tags.label', { defaultValue: 'Tags' })}
-        >
+        <FormElement htmlFor="tags" label={t('tag-manager:label', 'Tags')}>
           <InputTagsAutocomplete
             id="tags"
             name="tags"

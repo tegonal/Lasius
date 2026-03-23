@@ -119,16 +119,12 @@ export const BookingCurrentEntryContext = ({ item }: Props) => {
             <ContextBar>
               <ContextButtonWrapper>
                 <Button
-                  aria-label={t('bookings.actions.edit', {
-                    defaultValue: 'Edit booking',
-                  })}
+                  aria-label={t('bookings:actions.edit', 'Edit booking')}
                   data-testid="booking-current-edit-btn"
                   fullWidth={false}
                   onClick={editCurrentBooking}
                   shape="circle"
-                  title={t('bookings.actions.edit', {
-                    defaultValue: 'Edit booking',
-                  })}
+                  title={t('bookings:actions.edit', 'Edit booking')}
                   variant="contextIcon"
                 >
                   <LucideIcon icon={PencilIcon} size={24} />
@@ -137,15 +133,17 @@ export const BookingCurrentEntryContext = ({ item }: Props) => {
               {shouldShowStartAdjustment && (
                 <ContextButtonWrapper>
                   <Button
-                    aria-label={t('bookings.actions.adjustStartToPrevious', {
-                      defaultValue: 'Adjust start to previous booking',
-                    })}
+                    aria-label={t(
+                      'bookings:actions.adjustStartToPrevious',
+                      'Adjust start to previous booking',
+                    )}
                     fullWidth={false}
                     onClick={adjustStartToPrevious}
                     shape="circle"
-                    title={t('bookings.actions.adjustStartToPrevious', {
-                      defaultValue: 'Adjust start to previous booking',
-                    })}
+                    title={t(
+                      'bookings:actions.adjustStartToPrevious',
+                      'Adjust start to previous booking',
+                    )}
                     variant="contextIcon"
                   >
                     <LucideIcon icon={ArrowDownToLineIcon} size={24} />

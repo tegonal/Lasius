@@ -326,14 +326,14 @@ export const BookingAddUpdateForm = ({
       presetIcon: ArrowDownToLine,
       presetLabel:
         mode === 'add'
-          ? t('bookings.hints.useEndTimeOfLatest', {
-              defaultValue:
-                'Use end time of latest booking as start time for this one',
-            })
-          : t('bookings.hints.useEndTimeOfPrevious', {
-              defaultValue:
-                'Use end time of previous booking as start time for this one',
-            }),
+          ? t(
+              'bookings:hints.useEndTimeOfLatest',
+              'Use end time of latest booking as start time for this one',
+            )
+          : t(
+              'bookings:hints.useEndTimeOfPrevious',
+              'Use end time of previous booking as start time for this one',
+            ),
     }
   }, [mode, latestBooking, bookingBefore, startValue, t])
 
@@ -352,9 +352,10 @@ export const BookingAddUpdateForm = ({
     return {
       presetDate: formatISOLocale(new Date(referenceTime)),
       presetIcon: ArrowUpToLine,
-      presetLabel: t('bookings.hints.useStartTimeOfNext', {
-        defaultValue: 'Use start time of next booking as end time for this one',
-      }),
+      presetLabel: t(
+        'bookings:hints.useStartTimeOfNext',
+        'Use start time of next booking as end time for this one',
+      ),
     }
   }, [mode, bookingAfter, endValue, t])
 
@@ -420,18 +421,14 @@ export const BookingAddUpdateForm = ({
                       type="button"
                       variant="neutral"
                     >
-                      {t('bookings.presets.browse', {
-                        defaultValue: 'Browse presets',
-                      })}
+                      {t('bookings:presets.browse', 'Browse presets')}
                       <LucideIcon icon={ArrowRight} size={16} />
                     </Button>
                     <ModalHelpButton helpKey="modal-add-edit-booking" />
                   </div>
                   <FormElement
                     htmlFor="projectId"
-                    label={t('projects.label', {
-                      defaultValue: 'Project',
-                    })}
+                    label={t('projects:label', 'Project')}
                     required
                   >
                     <ProjectSelect
@@ -444,9 +441,7 @@ export const BookingAddUpdateForm = ({
                   </FormElement>
                   <FormElement
                     htmlFor="tags"
-                    label={t('tags.label', {
-                      defaultValue: 'Tags',
-                    })}
+                    label={t('tag-manager:label', 'Tags')}
                   >
                     <InputTagsAutocomplete
                       id="tags"
@@ -460,9 +455,7 @@ export const BookingAddUpdateForm = ({
                   <div className="flex-grow space-y-4 pb-6">
                     <FormElement
                       htmlFor="start"
-                      label={t('common.time.starts', {
-                        defaultValue: 'Starts',
-                      })}
+                      label={t('time.starts', 'Starts')}
                       labelActionSlot={startResetButton}
                     >
                       <InputDatePicker
@@ -474,9 +467,7 @@ export const BookingAddUpdateForm = ({
                     </FormElement>
                     <FormElement
                       htmlFor="end"
-                      label={t('common.time.ends', {
-                        defaultValue: 'Ends',
-                      })}
+                      label={t('time.ends', 'Ends')}
                       labelActionSlot={endResetButton}
                     >
                       <InputDatePicker
@@ -500,16 +491,16 @@ export const BookingAddUpdateForm = ({
                     <LucideIcon icon={HelpCircle} size={20} />
                     <div className="flex flex-col gap-1">
                       <div className="font-semibold">
-                        {t('bookings.warnings.longDuration', {
-                          defaultValue: 'Long duration detected',
-                        })}
+                        {t(
+                          'bookings:warnings.longDuration',
+                          'Long duration detected',
+                        )}
                       </div>
                       <div className="text-sm">
-                        {t('bookings.warnings.longDurationDescription', {
-                          defaultValue:
-                            'This booking is longer than a typical 8-hour work day. Please verify that the start and end times are correct.',
-                          hours: durationHours.toFixed(1),
-                        })}
+                        {t(
+                          'bookings:warnings.longDurationDescription',
+                          'This booking is longer than a typical 8-hour work day. Please verify that the start and end times are correct.',
+                        )}
                       </div>
                     </div>
                   </div>
@@ -521,9 +512,7 @@ export const BookingAddUpdateForm = ({
                     loading={isSubmitting}
                     type="submit"
                   >
-                    {t('common.actions.save', {
-                      defaultValue: 'Save',
-                    })}
+                    {t('actions.save', 'Save')}
                   </Button>
                   <Button
                     data-testid="booking-form-close-btn"
@@ -532,9 +521,7 @@ export const BookingAddUpdateForm = ({
                     type="button"
                     variant="secondary"
                   >
-                    {t('common.actions.close', {
-                      defaultValue: 'Close',
-                    })}
+                    {t('actions.close', 'Close')}
                   </Button>
                 </ButtonGroup>
               </FormBody>

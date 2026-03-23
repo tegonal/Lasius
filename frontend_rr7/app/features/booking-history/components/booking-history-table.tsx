@@ -82,21 +82,17 @@ export const BookingHistoryTable = ({
     <DataList>
       <DataListRow>
         {showUserColumn && (
-          <DataListHeaderItem>
-            {t('common.user', { defaultValue: 'User' })}
-          </DataListHeaderItem>
+          <DataListHeaderItem>{t('user', 'User')}</DataListHeaderItem>
         )}
         <DataListHeaderItem>
-          {t('projects.project', { defaultValue: 'Project' })}
+          {t('projects:project', 'Project')}
         </DataListHeaderItem>
         <DataListHeaderItem>
-          {t('tags.title', { defaultValue: 'Tags' })}
+          {t('tag-manager:title', 'Tags')}
         </DataListHeaderItem>
+        <DataListHeaderItem>{t('date', 'Date')}</DataListHeaderItem>
         <DataListHeaderItem>
-          {t('common.date', { defaultValue: 'Date' })}
-        </DataListHeaderItem>
-        <DataListHeaderItem>
-          {t('bookings.duration', { defaultValue: 'Duration' })}
+          {t('bookings:duration', 'Duration')}
         </DataListHeaderItem>
         <DataListHeaderItem />
       </DataListRow>
@@ -105,10 +101,13 @@ export const BookingHistoryTable = ({
           {showUserColumn && (
             <DataListField className="whitespace-nowrap">
               <button
-                aria-label={t('bookings.actions.filterByUser', {
-                  defaultValue: 'Filter by user {{userKey}}',
-                  userKey: booking.userReference.key,
-                })}
+                aria-label={t(
+                  'bookings:actions.filterByUser',
+                  'Filter by user {{userKey}}',
+                  {
+                    userKey: booking.userReference.key,
+                  },
+                )}
                 className="hover:text-accent font-inherit cursor-pointer border-none bg-transparent p-0 text-inherit"
                 data-value={booking.userReference.key}
                 onClick={() => userIdClickHandler(booking)}
@@ -120,10 +119,13 @@ export const BookingHistoryTable = ({
           )}
           <DataListField>
             <button
-              aria-label={t('bookings.actions.filterByProject', {
-                defaultValue: 'Filter by project {{projectKey}}',
-                projectKey: booking.projectReference.key,
-              })}
+              aria-label={t(
+                'bookings:actions.filterByProject',
+                'Filter by project {{projectKey}}',
+                {
+                  projectKey: booking.projectReference.key,
+                },
+              )}
               className="hover:text-accent font-inherit cursor-pointer border-none bg-transparent p-0 text-inherit"
               data-value={booking.projectReference.key}
               onClick={() => projectClickHandler(booking)}

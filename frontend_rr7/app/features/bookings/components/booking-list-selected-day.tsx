@@ -34,9 +34,7 @@ export const BookingListSelectedDay = () => {
     return (
       <div className="text-base-content/60 flex flex-col items-center justify-center gap-2 p-8">
         <span className="text-sm">
-          {t('bookings.noBookingsToday', {
-            defaultValue: 'No bookings for this day',
-          })}
+          {t('bookings:noBookingsToday', 'No bookings for this day')}
         </span>
       </div>
     )

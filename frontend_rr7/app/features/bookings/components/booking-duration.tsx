@@ -45,9 +45,10 @@ export const BookingDuration = ({ item }: Props) => {
       <div>{duration}</div>
       {durationIsZero && (
         <span
-          title={t('bookings.warnings.durationIsZero', {
-            defaultValue: "This booking's duration is zero",
-          })}
+          title={t(
+            'bookings:warnings.durationIsZero',
+            "This booking's duration is zero",
+          )}
         >
           <LucideIcon icon={AlertTriangle} size={14} />
         </span>

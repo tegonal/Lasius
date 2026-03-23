@@ -29,27 +29,19 @@ export const LoginInfoPanel = () => {
   const features = [
     {
       icon: Clock,
-      text: t('features.trackTime', {
-        defaultValue: 'Track time effortlessly',
-      }),
+      text: t('features:trackTime', 'Track time effortlessly'),
     },
     {
       icon: Users,
-      text: t('features.organizeTeams', {
-        defaultValue: 'Organize by teams & projects',
-      }),
+      text: t('features:organizeTeams', 'Organize by teams & projects'),
     },
     {
       icon: BarChart3,
-      text: t('features.insightfulReports', {
-        defaultValue: 'Insightful reports & analytics',
-      }),
+      text: t('features:insightfulReports', 'Insightful reports & analytics'),
     },
     {
       icon: Globe,
-      text: t('features.openSource', {
-        defaultValue: 'Open source & self-hosted',
-      }),
+      text: t('features:openSource', 'Open source & self-hosted'),
     },
   ]
 
@@ -57,12 +49,10 @@ export const LoginInfoPanel = () => {
     <>
       <Logo className="text-secondary-content mb-16 h-16 w-auto" />
       <h1 className="mb-4 text-4xl font-bold">
-        {t('auth.welcomeToLasius', { defaultValue: 'Welcome to Lasius' })}
+        {t('auth:welcomeToLasius', 'Welcome to Lasius')}
       </h1>
       <p className="mb-8 text-xl opacity-90">
-        {t('auth.tagline', {
-          defaultValue: 'Open source time tracking for teams',
-        })}
+        {t('auth:tagline', 'Open source time tracking for teams')}
       </p>
 
       <div className="space-y-4">
@@ -83,9 +73,7 @@ export const LoginInfoPanel = () => {
       <div className="border-secondary-content/20 mt-12 border-t pt-8">
         <div className="flex items-center gap-2 text-sm opacity-80">
           <LucideIcon icon={Shield} size={16} />
-          <span>
-            {t('auth.secureAndPrivate', { defaultValue: 'Secure & private' })}
-          </span>
+          <span>{t('auth:secureAndPrivate', 'Secure & private')}</span>
         </div>
       </div>
     </>
@@ -99,7 +87,7 @@ export const InternalLoginInfoPanel = () => {
     <>
       <Logo className="text-secondary-content mb-16 h-16 w-auto" />
       <h1 className="mb-4 text-4xl font-bold">
-        {t('auth.welcomeBack', { defaultValue: 'Welcome back' })}
+        {t('auth:welcomeBack', 'Welcome back')}
       </h1>
     </>
   )
@@ -111,21 +99,18 @@ export const RegisterInfoPanel = () => {
   const benefits = [
     {
       icon: Globe,
-      text: t('features.freeAndOpenSource', {
-        defaultValue: 'Free and open source',
-      }),
+      text: t('features:freeAndOpenSource', 'Free and open source'),
     },
     {
       icon: Clock,
-      text: t('features.startTrackingMinutes', {
-        defaultValue: 'Start tracking time in minutes',
-      }),
+      text: t(
+        'features:startTrackingMinutes',
+        'Start tracking time in minutes',
+      ),
     },
     {
       icon: Users,
-      text: t('features.inviteTeamMembers', {
-        defaultValue: 'Invite your team members',
-      }),
+      text: t('features:inviteTeamMembers', 'Invite your team members'),
     },
   ]
 
@@ -133,12 +118,10 @@ export const RegisterInfoPanel = () => {
     <>
       <Logo className="text-secondary-content mb-16 h-16 w-auto" />
       <h1 className="mb-4 text-4xl font-bold">
-        {t('auth.joinLasius', { defaultValue: 'Join Lasius' })}
+        {t('auth:joinLasius', 'Join Lasius')}
       </h1>
       <p className="mb-8 text-xl opacity-90">
-        {t('auth.getStartedFree', {
-          defaultValue: 'Get started with open source time tracking',
-        })}
+        {t('auth:getStartedFree', 'Get started with open source time tracking')}
       </p>
 
       <div className="space-y-4">
@@ -166,9 +149,7 @@ export const LoadingInfoPanel = () => {
     <>
       <Logo className="text-secondary-content mb-16 h-16 w-auto" />
       <h1 className="mb-4 text-4xl font-bold">
-        {t('auth.connectingSecurely', {
-          defaultValue: 'Connecting you securely',
-        })}
+        {t('auth:connectingSecurely', 'Connecting you securely')}
       </h1>
       <div className="loading loading-dots loading-lg"></div>
     </>

@@ -69,14 +69,15 @@ export default function Login({
   const getErrorMessage = (errorCode: string): string => {
     switch (errorCode) {
       case 'Callback':
-        return t('auth.errors.callback', {
-          defaultValue: 'Authentication callback failed. Please try again.',
-        })
+        return t(
+          'auth:errors.callback',
+          'Authentication callback failed. Please try again.',
+        )
       case 'fetchProfileFailed':
-        return t('auth.errors.fetchProfileFailed', {
-          defaultValue:
-            "Couldn't load user profile. Please try logging in again.",
-        })
+        return t(
+          'auth:errors.fetchProfileFailed',
+          "Couldn't load user profile. Please try logging in again.",
+        )
       case 'no_code':
       case 'OAuthCallback':
       case 'OAuthCallbackError':

@@ -78,15 +78,11 @@ export const BookingHistoryItemContext = ({
               {allowEdit && (
                 <ContextButtonWrapper variant="compact">
                   <Button
-                    aria-label={t('bookings.actions.edit', {
-                      defaultValue: 'Edit booking',
-                    })}
+                    aria-label={t('bookings:actions.edit', 'Edit booking')}
                     fullWidth={false}
                     onClick={() => updateItem()}
                     shape="circle"
-                    title={t('bookings.actions.edit', {
-                      defaultValue: 'Edit booking',
-                    })}
+                    title={t('bookings:actions.edit', 'Edit booking')}
                     variant="contextIcon"
                   >
                     <LucideIcon icon={Pencil} size={24} />
@@ -97,15 +93,11 @@ export const BookingHistoryItemContext = ({
               {allowDelete && (
                 <ContextButtonWrapper variant="compact">
                   <Button
-                    aria-label={t('bookings.actions.delete', {
-                      defaultValue: 'Delete booking',
-                    })}
+                    aria-label={t('bookings:actions.delete', 'Delete booking')}
                     fullWidth={false}
                     onClick={() => void deleteItem()}
                     shape="circle"
-                    title={t('bookings.actions.delete', {
-                      defaultValue: 'Delete booking',
-                    })}
+                    title={t('bookings:actions.delete', 'Delete booking')}
                     variant="contextIcon"
                   >
                     <LucideIcon icon={Trash2} size={24} />

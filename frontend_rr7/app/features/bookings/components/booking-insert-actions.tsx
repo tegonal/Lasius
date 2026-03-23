@@ -183,16 +183,18 @@ export const BookingInsertActions = ({
         >
           <div className="bg-base-100 flex gap-1 rounded-full p-1">
             <Button
-              aria-label={t('bookings.actions.adjustLowerEnd', {
-                defaultValue: 'Extend lower booking end to upper booking start',
-              })}
+              aria-label={t(
+                'bookings:actions.adjustLowerEnd',
+                'Extend lower booking end to upper booking start',
+              )}
               fullWidth={false}
               onClick={handleAdjustNextEnd}
               shape="circle"
               size="sm"
-              title={t('bookings.actions.adjustLowerEnd', {
-                defaultValue: 'Extend lower booking end to upper booking start',
-              })}
+              title={t(
+                'bookings:actions.adjustLowerEnd',
+                'Extend lower booking end to upper booking start',
+              )}
               type="button"
               variant="iconPrimaryHover"
             >
@@ -200,16 +202,12 @@ export const BookingInsertActions = ({
             </Button>
 
             <Button
-              aria-label={t('bookings.actions.insert', {
-                defaultValue: 'Insert booking',
-              })}
+              aria-label={t('bookings:actions.insert', 'Insert booking')}
               fullWidth={false}
               onClick={handleAddBetween}
               shape="circle"
               size="sm"
-              title={t('bookings.actions.insert', {
-                defaultValue: 'Insert booking',
-              })}
+              title={t('bookings:actions.insert', 'Insert booking')}
               type="button"
               variant="iconPrimaryHover"
             >
@@ -217,16 +215,18 @@ export const BookingInsertActions = ({
             </Button>
 
             <Button
-              aria-label={t('bookings.actions.adjustUpperStart', {
-                defaultValue: 'Move upper booking start to lower booking end',
-              })}
+              aria-label={t(
+                'bookings:actions.adjustUpperStart',
+                'Move upper booking start to lower booking end',
+              )}
               fullWidth={false}
               onClick={handleAdjustCurrentStartWithClose}
               shape="circle"
               size="sm"
-              title={t('bookings.actions.adjustUpperStart', {
-                defaultValue: 'Move upper booking start to lower booking end',
-              })}
+              title={t(
+                'bookings:actions.adjustUpperStart',
+                'Move upper booking start to lower booking end',
+              )}
               type="button"
               variant="iconPrimaryHover"
             >
@@ -249,18 +249,18 @@ export const BookingInsertActions = ({
             {showExpanded ? (
               <>
                 <Button
-                  aria-label={t('bookings.actions.adjustLowerEnd', {
-                    defaultValue:
-                      'Extend lower booking end to upper booking start',
-                  })}
+                  aria-label={t(
+                    'bookings:actions.adjustLowerEnd',
+                    'Extend lower booking end to upper booking start',
+                  )}
                   fullWidth={false}
                   onClick={handleAdjustNextEnd}
                   shape="circle"
                   size="sm"
-                  title={t('bookings.actions.adjustLowerEnd', {
-                    defaultValue:
-                      'Extend lower booking end to upper booking start',
-                  })}
+                  title={t(
+                    'bookings:actions.adjustLowerEnd',
+                    'Extend lower booking end to upper booking start',
+                  )}
                   type="button"
                   variant="iconPrimaryHover"
                 >
@@ -268,16 +268,12 @@ export const BookingInsertActions = ({
                 </Button>
 
                 <Button
-                  aria-label={t('bookings.actions.insert', {
-                    defaultValue: 'Insert booking',
-                  })}
+                  aria-label={t('bookings:actions.insert', 'Insert booking')}
                   fullWidth={false}
                   onClick={handleAddBetween}
                   shape="circle"
                   size="sm"
-                  title={t('bookings.actions.insert', {
-                    defaultValue: 'Insert booking',
-                  })}
+                  title={t('bookings:actions.insert', 'Insert booking')}
                   type="button"
                   variant="iconPrimaryHover"
                 >
@@ -285,18 +281,18 @@ export const BookingInsertActions = ({
                 </Button>
 
                 <Button
-                  aria-label={t('bookings.actions.adjustUpperStart', {
-                    defaultValue:
-                      'Move upper booking start to lower booking end',
-                  })}
+                  aria-label={t(
+                    'bookings:actions.adjustUpperStart',
+                    'Move upper booking start to lower booking end',
+                  )}
                   fullWidth={false}
                   onClick={handleAdjustCurrentStartWithClose}
                   shape="circle"
                   size="sm"
-                  title={t('bookings.actions.adjustUpperStart', {
-                    defaultValue:
-                      'Move upper booking start to lower booking end',
-                  })}
+                  title={t(
+                    'bookings:actions.adjustUpperStart',
+                    'Move upper booking start to lower booking end',
+                  )}
                   type="button"
                   variant="iconPrimaryHover"
                 >
@@ -308,9 +304,7 @@ export const BookingInsertActions = ({
                 fullWidth={false}
                 onClick={handleToggle}
                 shape="circle"
-                title={t('bookings.actions.insert', {
-                  defaultValue: 'Insert booking',
-                })}
+                title={t('bookings:actions.insert', 'Insert booking')}
                 type="button"
                 variant="iconPrimaryHover"
               >

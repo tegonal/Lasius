@@ -170,9 +170,7 @@ export const BookingItemContext = ({ item }: Props) => {
               />
               <ContextButtonWrapper>
                 <Button
-                  aria-label={t('bookings.actions.edit', {
-                    defaultValue: 'Edit booking',
-                  })}
+                  aria-label={t('bookings:actions.edit', 'Edit booking')}
                   data-testid="booking-ctx-edit-btn"
                   fullWidth={false}
                   onClick={() => {
@@ -180,9 +178,7 @@ export const BookingItemContext = ({ item }: Props) => {
                     handleCloseAll()
                   }}
                   shape="circle"
-                  title={t('bookings.actions.edit', {
-                    defaultValue: 'Edit booking',
-                  })}
+                  title={t('bookings:actions.edit', 'Edit booking')}
                   variant="contextIcon"
                 >
                   <LucideIcon icon={Pencil} size={24} />
@@ -191,16 +187,18 @@ export const BookingItemContext = ({ item }: Props) => {
               {shouldShowStartAdjustment && (
                 <ContextButtonWrapper>
                   <Button
-                    aria-label={t('bookings.actions.adjustStartToPrevious', {
-                      defaultValue: 'Adjust start to previous booking',
-                    })}
+                    aria-label={t(
+                      'bookings:actions.adjustStartToPrevious',
+                      'Adjust start to previous booking',
+                    )}
                     data-testid="booking-ctx-adjust-start-btn"
                     fullWidth={false}
                     onClick={adjustStartToPrevious}
                     shape="circle"
-                    title={t('bookings.actions.adjustStartToPrevious', {
-                      defaultValue: 'Adjust start to previous booking',
-                    })}
+                    title={t(
+                      'bookings:actions.adjustStartToPrevious',
+                      'Adjust start to previous booking',
+                    )}
                     variant="contextIcon"
                   >
                     <LucideIcon icon={ArrowDownToLine} size={24} />
@@ -210,16 +208,18 @@ export const BookingItemContext = ({ item }: Props) => {
               {shouldShowEndAdjustment && (
                 <ContextButtonWrapper>
                   <Button
-                    aria-label={t('bookings.actions.adjustEndToNext', {
-                      defaultValue: 'Adjust end to next booking',
-                    })}
+                    aria-label={t(
+                      'bookings:actions.adjustEndToNext',
+                      'Adjust end to next booking',
+                    )}
                     data-testid="booking-ctx-adjust-end-btn"
                     fullWidth={false}
                     onClick={adjustEndToNext}
                     shape="circle"
-                    title={t('bookings.actions.adjustEndToNext', {
-                      defaultValue: 'Adjust end to next booking',
-                    })}
+                    title={t(
+                      'bookings:actions.adjustEndToNext',
+                      'Adjust end to next booking',
+                    )}
                     variant="contextIcon"
                   >
                     <LucideIcon icon={ArrowUpToLine} size={24} />
@@ -233,16 +233,12 @@ export const BookingItemContext = ({ item }: Props) => {
               />
               <ContextButtonWrapper>
                 <Button
-                  aria-label={t('bookings.actions.delete', {
-                    defaultValue: 'Delete booking',
-                  })}
+                  aria-label={t('bookings:actions.delete', 'Delete booking')}
                   data-testid="booking-ctx-delete-btn"
                   fullWidth={false}
                   onClick={deleteItem}
                   shape="circle"
-                  title={t('bookings.actions.delete', {
-                    defaultValue: 'Delete booking',
-                  })}
+                  title={t('bookings:actions.delete', 'Delete booking')}
                   variant="contextIcon"
                 >
                   <LucideIcon icon={Trash2} size={24} />

@@ -129,10 +129,10 @@ export const BookingEditRunning = ({
           addSeconds(new Date(latestBooking.end.dateTime), 1),
         ),
         presetIcon: ArrowDownToLine,
-        presetLabel: t('bookings.hints.useEndTimeOfLatest', {
-          defaultValue:
-            'Use end time of latest booking as start time for this one',
-        }),
+        presetLabel: t(
+          'bookings:hints.useEndTimeOfLatest',
+          'Use end time of latest booking as start time for this one',
+        ),
       }
     : {}
 
@@ -165,9 +165,7 @@ export const BookingEditRunning = ({
             <FieldSet>
               <FormElement
                 htmlFor="projectId"
-                label={t('projects.label', {
-                  defaultValue: 'Project',
-                })}
+                label={t('projects:label', 'Project')}
                 required
               >
                 <ProjectSelect
@@ -180,9 +178,7 @@ export const BookingEditRunning = ({
               </FormElement>
               <FormElement
                 htmlFor="tags"
-                label={t('tags.label', {
-                  defaultValue: 'Tags',
-                })}
+                label={t('tag-manager:label', 'Tags')}
               >
                 <InputTagsAutocomplete
                   id="tags"
@@ -190,21 +186,17 @@ export const BookingEditRunning = ({
                   suggestions={projectTags}
                 />
               </FormElement>
-              <FormElement
-                htmlFor="start"
-                label={t('common.time.starts', {
-                  defaultValue: 'Starts',
-                })}
-              >
+              <FormElement htmlFor="start" label={t('time.starts', 'Starts')}>
                 <InputDatePicker
                   name="start"
                   rules={{
                     validate: {
                       startInPast: (v: string) =>
                         !isFuture(new Date(v)) ||
-                        t('validation.startMustBeInPast', {
-                          defaultValue: 'Start time must be in the past',
-                        }),
+                        t(
+                          'validation.startMustBeInPast',
+                          'Start time must be in the past',
+                        ),
                     },
                   }}
                   withDate={false}
@@ -215,9 +207,7 @@ export const BookingEditRunning = ({
             </FieldSet>
             <ButtonGroup>
               <Button loading={updateBookingApi.isSubmitting} type="submit">
-                {t('common.actions.save', {
-                  defaultValue: 'Save',
-                })}
+                {t('actions.save', 'Save')}
               </Button>
               <Button
                 disabled={updateBookingApi.isSubmitting}
@@ -225,9 +215,7 @@ export const BookingEditRunning = ({
                 type="button"
                 variant="secondary"
               >
-                {t('common.actions.close', {
-                  defaultValue: 'Close',
-                })}
+                {t('actions.close', 'Close')}
               </Button>
             </ButtonGroup>
           </FormBody>

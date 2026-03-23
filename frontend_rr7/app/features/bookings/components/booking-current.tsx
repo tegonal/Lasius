@@ -67,9 +67,7 @@ const NoBooking = () => {
         <LucideIcon icon={ClockIcon} size={24} />
       </div>
       <div>
-        {t('bookings.status.currentlyNotBooking', {
-          defaultValue: 'Currently not booking',
-        })}
+        {t('bookings:status.currentlyNotBooking', 'Currently not booking')}
       </div>
     </div>
   )
@@ -105,9 +103,10 @@ const CurrentBookingEntry = ({
         data-testid="booking-current-stop-btn"
         fullWidth={false}
         onClick={stop}
-        title={t('bookings.actions.stopRecording', {
-          defaultValue: 'Stop recording current time booking',
-        })}
+        title={t(
+          'bookings:actions.stopRecording',
+          'Stop recording current time booking',
+        )}
         variant="stopRecording"
       >
         <LucideIcon icon={SquareIcon} size={24} />

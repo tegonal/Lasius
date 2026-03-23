@@ -52,8 +52,7 @@ export const BookingHistoryExport = ({
       to,
     })
     addToast({
-      message: t('export.status.success', {
-        defaultValue: 'Export successful: {{filename}}',
+      message: t('export.status.success', 'Export successful: {{filename}}', {
         filename,
       }),
       ttl: 60000,
@@ -65,64 +64,53 @@ export const BookingHistoryExport = ({
     <div className="dropdown dropdown-end">
       <button
         aria-haspopup="menu"
-        aria-label={t('export.actions.openMenu', {
-          defaultValue: 'Open export format menu',
-        })}
+        aria-label={t('export.actions.openMenu', 'Open export format menu')}
         className="btn btn-sm btn-neutral w-auto"
         disabled={bookings.length < 1}
         tabIndex={0}
         type="button"
       >
         <LucideIcon icon={Download} size={16} />
-        {t('export.actions.export', { defaultValue: 'Export' })}
+        {t('export.actions.export', 'Export')}
         <LucideIcon icon={ChevronDown} size={16} />
       </button>
       <ul
-        aria-label={t('export.menu.label', {
-          defaultValue: 'Export format selection',
-        })}
+        aria-label={t('export.menu.label', 'Export format selection')}
         className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
         role="menu"
         tabIndex={0}
       >
         <li role="none">
           <button
-            aria-label={t('export.formats.csvAria', {
-              defaultValue: 'Export as CSV file',
-            })}
+            aria-label={t('export.formats.csvAria', 'Export as CSV file')}
             onClick={() => handleExport('csv')}
             role="menuitem"
             type="button"
           >
-            {t('export.formats.csv', { defaultValue: 'CSV (.csv)' })}
+            {t('export.formats.csv', 'CSV (.csv)')}
           </button>
         </li>
         <li role="none">
           <button
-            aria-label={t('export.formats.excelAria', {
-              defaultValue: 'Export as Excel file',
-            })}
+            aria-label={t('export.formats.excelAria', 'Export as Excel file')}
             onClick={() => handleExport('xlsx')}
             role="menuitem"
             type="button"
           >
-            {t('export.formats.excel', {
-              defaultValue: 'Excel (.xlsx)',
-            })}
+            {t('export.formats.excel', 'Excel (.xlsx)')}
           </button>
         </li>
         <li role="none">
           <button
-            aria-label={t('export.formats.odsAria', {
-              defaultValue: 'Export as OpenDocument file',
-            })}
+            aria-label={t(
+              'export.formats.odsAria',
+              'Export as OpenDocument file',
+            )}
             onClick={() => handleExport('ods')}
             role="menuitem"
             type="button"
           >
-            {t('export.formats.ods', {
-              defaultValue: 'OpenDocument (.ods)',
-            })}
+            {t('export.formats.ods', 'OpenDocument (.ods)')}
           </button>
         </li>
       </ul>

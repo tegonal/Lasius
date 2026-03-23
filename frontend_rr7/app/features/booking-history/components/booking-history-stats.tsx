@@ -41,25 +41,25 @@ export const BookingHistoryStats = ({
   return (
     <StatsGroup className="flex gap-4">
       <StatsTileHours
-        label={t('common.units.hours', { defaultValue: 'Hours' })}
+        label={t('units.hours', 'Hours')}
         standalone={false}
         value={hours}
       />
       <StatsTileNumber
-        label={t('bookings.title', { defaultValue: 'Bookings' })}
+        label={t('bookings:title', 'Bookings')}
         standalone={false}
         value={bookings}
       />
       {users !== undefined && users > 1 && (
         <StatsTileNumber
-          label={t('users.title', { defaultValue: 'Users' })}
+          label={t('users.title', 'Users')}
           standalone={false}
           value={users}
         />
       )}
       {projects !== undefined && projects > 1 && (
         <StatsTileNumber
-          label={t('projects.title', { defaultValue: 'Projects' })}
+          label={t('projects:title', 'Projects')}
           standalone={false}
           value={projects}
         />

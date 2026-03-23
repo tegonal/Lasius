@@ -157,18 +157,18 @@ export const BookingOverlapActions = ({
         >
           <div className="bg-base-100 flex gap-1 rounded-full p-1">
             <Button
-              aria-label={t('bookings.actions.adjustOverlappingEnd', {
-                defaultValue:
-                  'Adjust overlapping booking to end at current booking start',
-              })}
+              aria-label={t(
+                'bookings:actions.adjustOverlappingEnd',
+                'Adjust overlapping booking to end at current booking start',
+              )}
               fullWidth={false}
               onClick={handleAdjustOverlappingToCurrentStart}
               shape="circle"
               size="sm"
-              title={t('bookings.actions.adjustOverlappingEnd', {
-                defaultValue:
-                  'Adjust overlapping booking to end at current booking start',
-              })}
+              title={t(
+                'bookings:actions.adjustOverlappingEnd',
+                'Adjust overlapping booking to end at current booking start',
+              )}
               type="button"
               variant="icon"
             >
@@ -180,16 +180,18 @@ export const BookingOverlapActions = ({
             </Button>
 
             <Button
-              aria-label={t('bookings.actions.editOverlapping', {
-                defaultValue: 'Edit booking to resolve overlap',
-              })}
+              aria-label={t(
+                'bookings:actions.editOverlapping',
+                'Edit booking to resolve overlap',
+              )}
               fullWidth={false}
               onClick={handleEdit}
               shape="circle"
               size="sm"
-              title={t('bookings.actions.editOverlapping', {
-                defaultValue: 'Edit booking to resolve overlap',
-              })}
+              title={t(
+                'bookings:actions.editOverlapping',
+                'Edit booking to resolve overlap',
+              )}
               type="button"
               variant="icon"
             >
@@ -197,18 +199,18 @@ export const BookingOverlapActions = ({
             </Button>
 
             <Button
-              aria-label={t('bookings.actions.adjustCurrentStart', {
-                defaultValue:
-                  'Adjust current booking to start at overlapping booking end',
-              })}
+              aria-label={t(
+                'bookings:actions.adjustCurrentStart',
+                'Adjust current booking to start at overlapping booking end',
+              )}
               fullWidth={false}
               onClick={handleAdjustCurrentToOverlappingEnd}
               shape="circle"
               size="sm"
-              title={t('bookings.actions.adjustCurrentStart', {
-                defaultValue:
-                  'Adjust current booking to start at overlapping booking end',
-              })}
+              title={t(
+                'bookings:actions.adjustCurrentStart',
+                'Adjust current booking to start at overlapping booking end',
+              )}
               type="button"
               variant="icon"
             >
@@ -237,18 +239,18 @@ export const BookingOverlapActions = ({
             {showExpanded ? (
               <>
                 <Button
-                  aria-label={t('bookings.actions.adjustOverlappingEnd', {
-                    defaultValue:
-                      'Adjust overlapping booking to end at current booking start',
-                  })}
+                  aria-label={t(
+                    'bookings:actions.adjustOverlappingEnd',
+                    'Adjust overlapping booking to end at current booking start',
+                  )}
                   fullWidth={false}
                   onClick={handleAdjustOverlappingToCurrentStart}
                   shape="circle"
                   size="sm"
-                  title={t('bookings.actions.adjustOverlappingEnd', {
-                    defaultValue:
-                      'Adjust overlapping booking to end at current booking start',
-                  })}
+                  title={t(
+                    'bookings:actions.adjustOverlappingEnd',
+                    'Adjust overlapping booking to end at current booking start',
+                  )}
                   type="button"
                   variant="icon"
                 >
@@ -260,16 +262,18 @@ export const BookingOverlapActions = ({
                 </Button>
 
                 <Button
-                  aria-label={t('bookings.actions.editOverlapping', {
-                    defaultValue: 'Edit booking to resolve overlap',
-                  })}
+                  aria-label={t(
+                    'bookings:actions.editOverlapping',
+                    'Edit booking to resolve overlap',
+                  )}
                   fullWidth={false}
                   onClick={handleEdit}
                   shape="circle"
                   size="sm"
-                  title={t('bookings.actions.editOverlapping', {
-                    defaultValue: 'Edit booking to resolve overlap',
-                  })}
+                  title={t(
+                    'bookings:actions.editOverlapping',
+                    'Edit booking to resolve overlap',
+                  )}
                   type="button"
                   variant="icon"
                 >
@@ -277,18 +281,18 @@ export const BookingOverlapActions = ({
                 </Button>
 
                 <Button
-                  aria-label={t('bookings.actions.adjustCurrentStart', {
-                    defaultValue:
-                      'Adjust current booking to start at overlapping booking end',
-                  })}
+                  aria-label={t(
+                    'bookings:actions.adjustCurrentStart',
+                    'Adjust current booking to start at overlapping booking end',
+                  )}
                   fullWidth={false}
                   onClick={handleAdjustCurrentToOverlappingEnd}
                   shape="circle"
                   size="sm"
-                  title={t('bookings.actions.adjustCurrentStart', {
-                    defaultValue:
-                      'Adjust current booking to start at overlapping booking end',
-                  })}
+                  title={t(
+                    'bookings:actions.adjustCurrentStart',
+                    'Adjust current booking to start at overlapping booking end',
+                  )}
                   type="button"
                   variant="icon"
                 >
@@ -304,10 +308,10 @@ export const BookingOverlapActions = ({
                 fullWidth={false}
                 onClick={handleToggle}
                 shape="circle"
-                title={t('bookings.overlapsWarning', {
-                  defaultValue:
-                    'These two bookings overlap. Tap to see adjustment options.',
-                })}
+                title={t(
+                  'bookings:overlapsWarning',
+                  'These two bookings overlap. Tap to see adjustment options.',
+                )}
                 type="button"
                 variant="icon"
               >

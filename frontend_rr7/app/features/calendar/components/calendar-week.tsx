@@ -40,7 +40,7 @@ export const CalendarWeek = ({
 }: {
   organisationId: string
 }) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation(['calendar', 'common'])
   const selectedDate = usePersistedSearchParam(
     'date',
     formatISOLocale(new Date()),
@@ -64,9 +64,7 @@ export const CalendarWeek = ({
       <div className="flex min-w-0 items-center justify-center overflow-hidden">
         <div className="flex flex-shrink-0 items-center justify-center pt-3">
           <ButtonLeft
-            aria-label={t('calendar.navigation.previousWeek', {
-              defaultValue: 'Previous week',
-            })}
+            aria-label={t('calendar:navigation.previousWeek', 'Previous week')}
             data-testid="calendar-week-prev-btn"
             onClick={previous}
           />
@@ -78,17 +76,13 @@ export const CalendarWeek = ({
             </div>
             {!isToday(new Date(selectedDay)) ? (
               <Button
-                aria-label={t('common.time.today', {
-                  defaultValue: 'Today',
-                })}
+                aria-label={t('time.today', 'Today')}
                 data-testid="calendar-week-today-btn"
                 onClick={selectToday}
                 size="xs"
                 variant="unstyled"
               >
-                {t('common.time.today', {
-                  defaultValue: 'Today',
-                })}
+                {t('time.today', 'Today')}
               </Button>
             ) : (
               <div />
@@ -132,9 +126,7 @@ export const CalendarWeek = ({
         </div>
         <div className="flex h-full flex-shrink-0 items-center justify-center pt-3">
           <ButtonRight
-            aria-label={t('calendar.navigation.nextWeek', {
-              defaultValue: 'Next week',
-            })}
+            aria-label={t('calendar:navigation.nextWeek', 'Next week')}
             data-testid="calendar-week-next-btn"
             onClick={next}
           />

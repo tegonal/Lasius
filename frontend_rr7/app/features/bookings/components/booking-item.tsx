@@ -96,9 +96,7 @@ export const BookingItem = ({ item, nextItem }: Props) => {
               fullWidth={false}
               onClick={() => setIsAddOpen(true)}
               shape="circle"
-              title={t('bookings.actions.add', {
-                defaultValue: 'Add booking',
-              })}
+              title={t('bookings:actions.add', 'Add booking')}
               type="button"
               variant="iconPrimaryHover"
             >

@@ -52,7 +52,7 @@ const EmptyState = () => {
   const { t } = useTranslation()
   return (
     <div className="text-base-content/50 flex items-center justify-center p-8 text-sm">
-      {t('bookings.presets.empty', { defaultValue: 'No bookings found' })}
+      {t('bookings:presets.empty', 'No bookings found')}
     </div>
   )
 }
@@ -139,13 +139,16 @@ const RecentBookingsList = ({
       {unique.map((item, index) => (
         <AnimatedItem index={index} key={stringHash(item)}>
           <PresetButton
-            ariaLabel={t('bookings.presets.selectRecent', {
-              defaultValue: 'Select recent booking: {{projectName}}{{tags}}',
-              projectName:
-                item.projectReference.key || item.projectReference.id,
-              tags:
-                item.tags.length > 0 ? ` with ${item.tags.length} tags` : '',
-            })}
+            ariaLabel={t(
+              'bookings:presets.selectRecent',
+              'Select recent booking: {{projectName}}{{tags}}',
+              {
+                projectName:
+                  item.projectReference.key || item.projectReference.id,
+                tags:
+                  item.tags.length > 0 ? ` with ${item.tags.length} tags` : '',
+              },
+            )}
             onClick={() =>
               onSelect({
                 projectId: item.projectReference.id,
@@ -179,13 +182,16 @@ const FavoritesList = ({
       {items.map((item, index) => (
         <AnimatedItem index={index} key={stringHash(item)}>
           <PresetButton
-            ariaLabel={t('bookings.presets.selectFavorite', {
-              defaultValue: 'Select favorite: {{projectName}}{{tags}}',
-              projectName:
-                item.projectReference.key || item.projectReference.id,
-              tags:
-                item.tags.length > 0 ? ` with ${item.tags.length} tags` : '',
-            })}
+            ariaLabel={t(
+              'bookings:presets.selectFavorite',
+              'Select favorite: {{projectName}}{{tags}}',
+              {
+                projectName:
+                  item.projectReference.key || item.projectReference.id,
+                tags:
+                  item.tags.length > 0 ? ` with ${item.tags.length} tags` : '',
+              },
+            )}
             onClick={() =>
               onSelect({
                 projectId: item.projectReference.id,
@@ -234,13 +240,16 @@ const TeamBookingsList = ({
       {unique.map((item, index) => (
         <AnimatedItem index={index} key={stringHash(item)}>
           <PresetButton
-            ariaLabel={t('bookings.presets.selectTeam', {
-              defaultValue: 'Select team booking: {{projectName}}{{tags}}',
-              projectName:
-                item.projectReference.key || item.projectReference.id,
-              tags:
-                item.tags.length > 0 ? ` with ${item.tags.length} tags` : '',
-            })}
+            ariaLabel={t(
+              'bookings:presets.selectTeam',
+              'Select team booking: {{projectName}}{{tags}}',
+              {
+                projectName:
+                  item.projectReference.key || item.projectReference.id,
+                tags:
+                  item.tags.length > 0 ? ` with ${item.tags.length} tags` : '',
+              },
+            )}
             onClick={() =>
               onSelect({
                 projectId: item.projectReference.id,
@@ -280,25 +289,19 @@ export const BookingPresetSelector = ({
       ),
       icon: Clock,
       id: 'recent',
-      name: t('bookings.presets.recent', {
-        defaultValue: 'Recent bookings',
-      }),
+      name: t('bookings:presets.recent', 'Recent bookings'),
     },
     {
       component: <FavoritesList items={favorites} onSelect={onSelect} />,
       icon: Star,
       id: 'favorites',
-      name: t('bookings.presets.favorites', {
-        defaultValue: 'Favorites',
-      }),
+      name: t('bookings:presets.favorites', 'Favorites'),
     },
     {
       component: <TeamBookingsList items={orgBookings} onSelect={onSelect} />,
       icon: Users,
       id: 'team',
-      name: t('bookings.presets.team', {
-        defaultValue: 'Team bookings',
-      }),
+      name: t('bookings:presets.team', 'Team bookings'),
     },
   ]
 
@@ -312,12 +315,10 @@ export const BookingPresetSelector = ({
           variant="neutral"
         >
           <LucideIcon icon={ArrowLeft} size={16} />
-          {t('common.back', { defaultValue: 'Back' })}
+          {t('back', 'Back')}
         </Button>
         <h6 className="mt-3 text-center text-base font-semibold">
-          {t('bookings.presets.title', {
-            defaultValue: 'Choose a preset',
-          })}
+          {t('bookings:presets.title', 'Choose a preset')}
         </h6>
       </div>
       <div className="flex-1 overflow-hidden">

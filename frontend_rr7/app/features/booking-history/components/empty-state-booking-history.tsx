@@ -27,9 +27,10 @@ export const EmptyStateBookingHistory = () => {
   return (
     <EmptyState
       icon={History}
-      label={t('bookings.history.empty', {
-        defaultValue: 'No bookings found for the selected filters',
-      })}
+      label={t(
+        'bookings:history.empty',
+        'No bookings found for the selected filters',
+      )}
     />
   )
 }
