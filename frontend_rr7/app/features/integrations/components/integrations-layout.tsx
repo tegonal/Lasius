@@ -17,8 +17,10 @@
  *
  */
 
+import { useTranslation } from 'react-i18next'
 import { useLoaderData } from 'react-router'
 
+import { GenericConfirmModal } from '~/components/ui/overlays/modal/generic-confirm-modal'
 import {
   ColumnCenter,
   ColumnRight,
@@ -31,6 +33,8 @@ import { useIssueImporterConfigManagement } from '~/features/integrations/hooks/
 import { type ModelsIssueImporterConfigResponse } from '~/services/api/lasius/modelsIssueImporterConfigResponse'
 
 export const IntegrationsLayout = () => {
+  const { t } = useTranslation('integrations')
+
   const { configs, selectedOrgId } = useLoaderData<{
     configs: ModelsIssueImporterConfigResponse[]
     selectedOrgId: string
@@ -38,30 +42,68 @@ export const IntegrationsLayout = () => {
 
   const management = useIssueImporterConfigManagement(selectedOrgId)
 
+  const hasProjects =
+    (management.selectedConfig &&
+      'projects' in management.selectedConfig &&
+      Array.isArray(management.selectedConfig.projects) &&
+      management.selectedConfig.projects.length > 0) ??
+    false
+
   return (
-    <div className={innerGridClasses}>
-      <ColumnCenter>
-        <div className="flex h-full flex-col overflow-hidden">
-          <div className="flex-shrink-0">
-            <IntegrationsStats
-              configs={configs}
-              onAddClick={management.openWizard}
-            />
+    <>
+      <div className={innerGridClasses}>
+        <ColumnCenter>
+          <div className="flex h-full flex-col overflow-hidden">
+            <div className="flex-shrink-0">
+              <IntegrationsStats
+                configs={configs}
+                onAddClick={management.openWizard}
+              />
+            </div>
+            <div className="flex-1 overflow-y-auto">
+              <IntegrationsContent
+                configs={configs}
+                onDelete={management.openDeleteConfirm}
+                onEdit={management.openConfigEdit}
+                onViewInfo={management.openConfigInfo}
+                onViewMappings={management.openProjectMappings}
+              />
+            </div>
           </div>
-          <div className="flex-1 overflow-y-auto">
-            <IntegrationsContent
-              configs={configs}
-              onDelete={management.openDeleteConfirm}
-              onEdit={management.openConfigEdit}
-              onViewInfo={management.openConfigInfo}
-              onViewMappings={management.openProjectMappings}
-            />
-          </div>
-        </div>
-      </ColumnCenter>
-      <ColumnRight>
-        <IntegrationsRightColumn />
-      </ColumnRight>
-    </div>
+        </ColumnCenter>
+        <ColumnRight>
+          <IntegrationsRightColumn />
+        </ColumnRight>
+      </div>
+
+      <GenericConfirmModal
+        open={management.activeModal === 'deleteConfirm'}
+        onClose={management.closeModal}
+        onConfirm={management.handleDelete}
+        title={t('integrations.delete.title', {
+          defaultValue: 'Delete Integration',
+        })}
+        message={t('integrations.delete.message', {
+          defaultValue:
+            'Are you sure you want to delete this integration configuration?',
+          name: management.selectedConfig?.name ?? '',
+        })}
+        confirmLabel={t('integrations.delete.confirm', {
+          defaultValue: 'Delete',
+        })}
+        confirmVariant="error"
+        alert={
+          hasProjects
+            ? {
+                variant: 'warning' as const,
+                message: t('integrations.delete.hasProjects', {
+                  defaultValue:
+                    'This configuration has project mappings. Remove all mappings before deleting.',
+                }),
+              }
+            : undefined
+        }
+      />
+    </>
   )
 }
