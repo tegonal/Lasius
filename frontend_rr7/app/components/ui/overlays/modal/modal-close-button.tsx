@@ -24,7 +24,7 @@ import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 
 type Props = {
-	onClose: () => void
+  onClose: () => void
 }
 
 /**
@@ -32,20 +32,20 @@ type Props = {
  * Positioned absolutely for consistent placement
  */
 export const ModalCloseButton = ({ onClose }: Props) => {
-	const { t } = useTranslation('common')
+  const { t } = useTranslation('common')
 
-	return (
-		<div className="absolute top-4 right-4">
-			<Button
-				aria-label={t('actions.close', { defaultValue: 'Close' })}
-				fullWidth={false}
-				onClick={onClose}
-				shape="circle"
-				type="button"
-				variant="ghost"
-			>
-				<LucideIcon icon={X} size={20} />
-			</Button>
-		</div>
-	)
+  return (
+    <div className="absolute top-4 right-4">
+      <Button
+        aria-label={t('actions.close', { defaultValue: 'Close' })}
+        fullWidth={false}
+        onClick={onClose}
+        shape="circle"
+        type="button"
+        variant="ghost"
+      >
+        <LucideIcon icon={X} size={20} />
+      </Button>
+    </div>
+  )
 }

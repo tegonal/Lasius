@@ -30,14 +30,14 @@ import { getPlannedHoursForRange } from '~/lib/api/functions/get-planned-working
 import { apiTimespanWeek, formatISOLocale } from '~/lib/utils/dates'
 import { cachedServerLoader } from '~/lib/utils/loader-cache'
 import {
-	getUserBookingAggregatedStatsByOrganisation,
-	getUserBookingListByOrganisation,
+  getUserBookingAggregatedStatsByOrganisation,
+  getUserBookingListByOrganisation,
 } from '~/services/api/lasius/user-bookings/user-bookings'
 import { getUserProfile } from '~/services/api/lasius/user/user'
 import {
-	authHeaders,
-	mergeAuthHeaders,
-	requireUser,
+  authHeaders,
+  mergeAuthHeaders,
+  requireUser,
 } from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/dashboard.week'
@@ -45,120 +45,123 @@ import { type Route } from './+types/dashboard.week'
 // ─── Client Loader (cache unless full-page refresh) ──────────────────────────
 
 export const clientLoader = async ({
-	request,
-	serverLoader,
+  request,
+  serverLoader,
 }: Route.ClientLoaderArgs) => cachedServerLoader(request, serverLoader)
 clientLoader.hydrate = false
 
 // ─── Loader ──────────────────────────────────────────────────────────────────
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-	const auth = await requireUser(request)
-	const headers = authHeaders(auth.session)
+  const auth = await requireUser(request)
+  const headers = authHeaders(auth.session)
 
-	const profile = await getUserProfile({ headers })
-	const user = profile.data
+  const profile = await getUserProfile({ headers })
+  const user = profile.data
 
-	// Determine selected org
-	const organisations = user.organisations ?? []
-	const selectedOrgId =
-		user.settings?.lastSelectedOrganisation?.id ??
-		organisations.find((o) => o.private)?.organisationReference.id ??
-		organisations[0]?.organisationReference.id ??
-		''
+  // Determine selected org
+  const organisations = user.organisations ?? []
+  const selectedOrgId =
+    user.settings?.lastSelectedOrganisation?.id ??
+    organisations.find((o) => o.private)?.organisationReference.id ??
+    organisations[0]?.organisationReference.id ??
+    ''
 
-	// Extract planned working hours for the selected org
-	const selectedOrg = organisations.find(
-		(o) => o.organisationReference.id === selectedOrgId,
-	)
-	const plannedHours = selectedOrg?.plannedWorkingHours
-		? { ...selectedOrg.plannedWorkingHours }
-		: null
+  // Extract planned working hours for the selected org
+  const selectedOrg = organisations.find(
+    (o) => o.organisationReference.id === selectedOrgId,
+  )
+  const plannedHours = selectedOrg?.plannedWorkingHours
+    ? { ...selectedOrg.plannedWorkingHours }
+    : null
 
-	// Read selected date from URL search param, fall back to today
-	const url = new URL(request.url)
-	const selectedDate =
-		url.searchParams.get('date') || formatISOLocale(new Date())
+  // Read selected date from URL search param, fall back to today
+  const url = new URL(request.url)
+  const dateParam = url.searchParams.get('date')
+  const selectedDate =
+    dateParam && !isNaN(new Date(dateParam).getTime())
+      ? dateParam
+      : formatISOLocale(new Date())
 
-	const weekTimespan = apiTimespanWeek(selectedDate)
-	const dateObj = new Date(selectedDate)
-	const weekStartDate = startOfWeek(dateObj, { weekStartsOn: 1 })
-	const weekEndDate = endOfWeek(dateObj, { weekStartsOn: 1 })
+  const weekTimespan = apiTimespanWeek(selectedDate)
+  const dateObj = new Date(selectedDate)
+  const weekStartDate = startOfWeek(dateObj, { weekStartsOn: 1 })
+  const weekEndDate = endOfWeek(dateObj, { weekStartsOn: 1 })
 
-	// Fetch week bookings and aggregated project stats in parallel
-	const [weekBookingsRes, projectStatsRes] = await Promise.all([
-		getUserBookingListByOrganisation(selectedOrgId, weekTimespan, {
-			headers,
-		}),
-		getUserBookingAggregatedStatsByOrganisation(
-			selectedOrgId,
-			{
-				from: format(weekStartDate, 'yyyy-MM-dd'),
-				granularity: 'Day',
-				source: 'project',
-				to: format(weekEndDate, 'yyyy-MM-dd'),
-			},
-			{ headers },
-		),
-	])
+  // Fetch week bookings and aggregated project stats in parallel
+  const [weekBookingsRes, projectStatsRes] = await Promise.all([
+    getUserBookingListByOrganisation(selectedOrgId, weekTimespan, {
+      headers,
+    }),
+    getUserBookingAggregatedStatsByOrganisation(
+      selectedOrgId,
+      {
+        from: format(weekStartDate, 'yyyy-MM-dd'),
+        granularity: 'Day',
+        source: 'project',
+        to: format(weekEndDate, 'yyyy-MM-dd'),
+      },
+      { headers },
+    ),
+  ])
 
-	const weekBookings = weekBookingsRes.data ?? []
-	const projectStats = projectStatsRes.data ?? []
+  const weekBookings = weekBookingsRes.data ?? []
+  const projectStats = projectStatsRes.data ?? []
 
-	// Compute week summary
-	const summary = getModelsBookingSummary(weekBookings)
-	const expectedHours = getPlannedHoursForRange(
-		weekStartDate,
-		weekEndDate,
-		plannedHours,
-	)
-	const { fulfilledPercentage } = getExpectedVsBookedPercentage(
-		expectedHours,
-		summary.hours,
-	)
+  // Compute week summary
+  const summary = getModelsBookingSummary(weekBookings)
+  const expectedHours = getPlannedHoursForRange(
+    weekStartDate,
+    weekEndDate,
+    plannedHours,
+  )
+  const { fulfilledPercentage } = getExpectedVsBookedPercentage(
+    expectedHours,
+    summary.hours,
+  )
 
-	// Aggregate top 5 projects
-	const topProjects = aggregateProjectHours(projectStats, 5)
+  // Aggregate top 5 projects
+  const topProjects = aggregateProjectHours(projectStats, 5)
 
-	// Get week number
-	const weekNumber = getWeek(dateObj, { weekStartsOn: 1 })
+  // Get week number
+  const weekNumber = getWeek(dateObj, { weekStartsOn: 1 })
 
-	return data(
-		{
-			selectedDate,
-			stats: {
-				bookings: summary.elements,
-				expectedHours,
-				fulfilledPercentage,
-				hours: summary.hours,
-			},
-			topProjects,
-			weekNumber,
-		},
-		{ headers: mergeAuthHeaders(auth) },
-	)
+  return data(
+    {
+      selectedDate,
+      stats: {
+        bookings: summary.elements,
+        expectedHours,
+        fulfilledPercentage,
+        hours: summary.hours,
+      },
+      topProjects,
+      weekNumber,
+    },
+    { headers: mergeAuthHeaders(auth) },
+  )
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function DashboardWeek({ loaderData }: Route.ComponentProps) {
-	const { t } = useTranslation('common')
-	const { stats, topProjects, weekNumber } = loaderData
+  const { t } = useTranslation('common')
+  const { stats, topProjects, weekNumber } = loaderData
 
-	return (
-		<div className="space-y-6 px-8 py-6">
-			<h2 className="text-lg font-semibold">
-				{t('common.time.week', { defaultValue: 'Week' })} {weekNumber}
-			</h2>
-			<div className="flex gap-4">
-				<StatsOverviewGrid {...stats} period="week" />
-				<TopProjectsCard
-					emptyMessage={t('statistics.noProjectsForWeek', {
-						defaultValue: 'No projects for this week',
-					})}
-					projects={topProjects}
-				/>
-			</div>
-		</div>
-	)
+  return (
+    <div className="space-y-6 px-8 py-6">
+      <h2 className="text-lg font-semibold">
+        {t('common.time.week', { defaultValue: 'Week' })} {weekNumber}
+      </h2>
+      <div className="flex gap-4">
+        <StatsOverviewGrid {...stats} period="week" />
+        <TopProjectsCard
+          emptyMessage={t('statistics.noProjectsForWeek', {
+            defaultValue: 'No projects for this week',
+          })}
+          projects={topProjects}
+        />
+      </div>
+    </div>
+  )
 }

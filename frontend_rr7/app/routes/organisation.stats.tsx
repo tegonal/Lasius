@@ -149,6 +149,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
       distinctProjects,
       distinctUsers,
       from,
+      selectedOrgId,
       to,
     },
     { headers: mergeAuthHeaders(auth) },
@@ -160,8 +161,14 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 const OrgStatsLayout = ({ loaderData }: Route.ComponentProps) => {
   const { t } = useTranslation('common')
 
-  const { bookingSummary, distinctProjects, distinctUsers, from, to } =
-    loaderData
+  const {
+    bookingSummary,
+    distinctProjects,
+    distinctUsers,
+    from,
+    selectedOrgId,
+    to,
+  } = loaderData
 
   const tabs = [
     {
@@ -201,14 +208,9 @@ const OrgStatsLayout = ({ loaderData }: Route.ComponentProps) => {
                   distinctProjects={distinctProjects}
                   distinctUsers={distinctUsers}
                   from={from}
-                  projectsAggregated={[]}
-                  projectsByDay={[]}
                   scope="organisation"
-                  tagsAggregated={[]}
-                  tagsByDay={[]}
+                  selectedOrgId={selectedOrgId}
                   to={to}
-                  usersAggregated={[]}
-                  usersByDay={[]}
                 />
               </div>
             </div>

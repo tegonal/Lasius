@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { ModelsAuditInfoResponse } from './modelsAuditInfoResponse'
 import type { ModelsConfigSyncStatus } from './modelsConfigSyncStatus'
@@ -12,14 +12,14 @@ import type { ModelsGitlabProjectMapping } from './modelsGitlabProjectMapping'
 import type { ModelsIssueImporterConfigId } from './modelsIssueImporterConfigId'
 
 export interface ModelsGitlabConfigResponse {
-	id: ModelsIssueImporterConfigId
-	importerType: ModelsGitlabConfigResponseImporterType
-	name: string
-	baseUrl: string
-	checkFrequency: number
-	projects: ModelsGitlabProjectMapping[]
-	syncStatus: ModelsConfigSyncStatus
-	audit: ModelsAuditInfoResponse
-	type?: string
-	projectCount: number
+  id: ModelsIssueImporterConfigId
+  importerType: ModelsGitlabConfigResponseImporterType
+  name: string
+  baseUrl: string
+  checkFrequency: number
+  projects: ModelsGitlabProjectMapping[]
+  syncStatus: ModelsConfigSyncStatus
+  audit: ModelsAuditInfoResponse
+  type?: string
+  projectCount: number
 }

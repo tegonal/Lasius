@@ -25,8 +25,8 @@ test('unauthenticated user is redirected to login @auth', async ({ page }) => {
   await page.waitForURL(/.*\/login.*/, { timeout: 15000 })
 })
 
-test('unauthenticated settings access is redirected @auth', async ({ page }) => {
-  await page.goto('/settings/account')
+test('unauthenticated dashboard access is redirected @auth', async ({ page }) => {
+  await page.goto('/user/dashboard')
 
   await page.waitForURL(/.*\/login.*/, { timeout: 15000 })
 })

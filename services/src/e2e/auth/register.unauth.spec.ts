@@ -32,7 +32,7 @@ test.describe('Registration flow @auth', () => {
   })
 
   test('navigate from login to register via signup button', async ({ page }) => {
-    await page.goto('/internal-oauth/login')
+    await page.goto('/internal-oauth/login', { waitUntil: 'domcontentloaded' })
 
     const signupBtn = page.getByTestId('auth-internal-signup-btn')
     if (!(await signupBtn.isVisible({ timeout: 5000 }).catch(() => false))) {
@@ -41,8 +41,9 @@ test.describe('Registration flow @auth', () => {
     }
     await signupBtn.click()
 
-    await page.waitForURL(/.*\/internal-oauth\/register.*/, { timeout: 15000 })
+    // Client-side navigation — wait for the register form to appear
     await expect(page.getByTestId('auth-register-email-input')).toBeVisible({ timeout: 15000 })
+    await expect(page).toHaveURL(/.*\/internal-oauth\/register.*/)
   })
 
   test('register with valid data redirects to login with success message', async ({ page }) => {

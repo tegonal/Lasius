@@ -17,11 +17,14 @@
  *
  */
 
-import { toDate } from 'date-fns'
+import { format, toDate } from 'date-fns'
 import { useCallback } from 'react'
 import { useSearchParams } from 'react-router'
 
 import { formatISOLocale, type IsoDateString } from '~/lib/utils/dates'
+
+/** Simple yyyy-MM-dd format safe for URL search params (no +/: characters) */
+const toDateParam = (d: Date): string => format(d, 'yyyy-MM-dd')
 
 /**
  * Manages day selection via URL search params.
@@ -29,38 +32,38 @@ import { formatISOLocale, type IsoDateString } from '~/lib/utils/dates'
  * is handled by usePersistedSearchParam in the parent component.
  */
 export const useCalendarSelection = (selectedDate: IsoDateString) => {
-	const [, setSearchParams] = useSearchParams()
+  const [, setSearchParams] = useSearchParams()
 
-	const selectDay = useCallback(
-		(day: IsoDateString) => {
-			setSearchParams(
-				(prev) => {
-					prev.set('date', day)
-					return prev
-				},
-				{ preventScrollReset: true },
-			)
-		},
-		[setSearchParams],
-	)
+  const selectDay = useCallback(
+    (day: IsoDateString) => {
+      setSearchParams(
+        (prev) => {
+          prev.set('date', toDateParam(new Date(day)))
+          return prev
+        },
+        { preventScrollReset: true },
+      )
+    },
+    [setSearchParams],
+  )
 
-	const selectToday = useCallback(() => {
-		selectDay(formatISOLocale(new Date()))
-	}, [selectDay])
+  const selectToday = useCallback(() => {
+    selectDay(formatISOLocale(new Date()))
+  }, [selectDay])
 
-	const getDay = (str: IsoDateString) => {
-		return toDate(new Date(str)).getDate()
-	}
+  const getDay = (str: IsoDateString) => {
+    return toDate(new Date(str)).getDate()
+  }
 
-	const isDaySelected = (day: IsoDateString) => {
-		return getDay(selectedDate) === getDay(day)
-	}
+  const isDaySelected = (day: IsoDateString) => {
+    return getDay(selectedDate) === getDay(day)
+  }
 
-	return {
-		getDay,
-		isDaySelected,
-		selectDay,
-		selectedDay: selectedDate,
-		selectToday,
-	}
+  return {
+    getDay,
+    isDaySelected,
+    selectDay,
+    selectedDay: selectedDate,
+    selectToday,
+  }
 }

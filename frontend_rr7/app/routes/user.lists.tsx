@@ -26,74 +26,68 @@ import { apiTimespanFromTo, formatISOLocale } from '~/lib/utils/dates'
 import { getUserBookingListByOrganisation } from '~/services/api/lasius/user-bookings/user-bookings'
 import { getUserProfile } from '~/services/api/lasius/user/user'
 import {
-	authHeaders,
-	mergeAuthHeaders,
-	requireUser,
+  authHeaders,
+  mergeAuthHeaders,
+  requireUser,
 } from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/user.lists'
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-	const auth = await requireUser(request)
-	const headers = authHeaders(auth.session)
+  const auth = await requireUser(request)
+  const headers = authHeaders(auth.session)
 
-	const profile = await getUserProfile({ headers })
-	const user = profile.data
+  const profile = await getUserProfile({ headers })
+  const user = profile.data
 
-	const organisations = user.organisations ?? []
-	const selectedOrgId =
-		user.settings?.lastSelectedOrganisation?.id ??
-		organisations.find((o) => o.private)?.organisationReference.id ??
-		organisations[0]?.organisationReference.id ??
-		''
+  const organisations = user.organisations ?? []
+  const selectedOrgId =
+    user.settings?.lastSelectedOrganisation?.id ??
+    organisations.find((o) => o.private)?.organisationReference.id ??
+    organisations[0]?.organisationReference.id ??
+    ''
 
-	// Read date range from search params: from/to (set by filter), or date (single day), or default
-	const url = new URL(request.url)
-	const fromParam = url.searchParams.get('from')
-	const toParam = url.searchParams.get('to')
-	const dateParam = url.searchParams.get('date')
+  // Read date range from search params: from/to (set by filter), or default
+  const url = new URL(request.url)
+  const fromParam = url.searchParams.get('from')
+  const toParam = url.searchParams.get('to')
 
-	let dateRange: { from: string; to: string }
-	if (fromParam && toParam) {
-		dateRange = { from: fromParam, to: toParam }
-	} else if (dateParam && !isNaN(new Date(dateParam).getTime())) {
-		dateRange = {
-			from: formatISOLocale(new Date(dateParam)),
-			to: formatISOLocale(new Date(dateParam)),
-		}
-	} else {
-		const firstOption = dateOptions[0]
-		const now = new Date()
-		dateRange = firstOption
-			? firstOption.dateRangeFn(now)
-			: { from: formatISOLocale(now), to: formatISOLocale(now) }
-	}
+  let dateRange: { from: string; to: string }
+  if (fromParam && toParam) {
+    dateRange = { from: fromParam, to: toParam }
+  } else {
+    const firstOption = dateOptions[0]
+    const now = new Date()
+    dateRange = firstOption
+      ? firstOption.dateRangeFn(now)
+      : { from: formatISOLocale(now), to: formatISOLocale(now) }
+  }
 
-	const timespan = apiTimespanFromTo(dateRange.from, dateRange.to)
+  const timespan = apiTimespanFromTo(dateRange.from, dateRange.to)
 
-	const bookingsResponse = await getUserBookingListByOrganisation(
-		selectedOrgId,
-		timespan ?? { from: '', to: '' },
-		{ headers },
-	)
+  const bookingsResponse = await getUserBookingListByOrganisation(
+    selectedOrgId,
+    timespan ?? { from: '', to: '' },
+    { headers },
+  )
 
-	return data(
-		{
-			bookings: bookingsResponse.data,
-		},
-		{ headers: mergeAuthHeaders(auth) },
-	)
+  return data(
+    {
+      bookings: bookingsResponse.data,
+    },
+    { headers: mergeAuthHeaders(auth) },
+  )
 }
 
 const UserListsPage = ({ loaderData }: Route.ComponentProps) => {
-	return (
-		<div className={innerGridClasses} data-testid="lists-page">
-			<BookingHistoryLayout
-				bookings={loaderData.bookings}
-				dataSource="userBookings"
-			/>
-		</div>
-	)
+  return (
+    <div className={innerGridClasses} data-testid="lists-page">
+      <BookingHistoryLayout
+        bookings={loaderData.bookings}
+        dataSource="userBookings"
+      />
+    </div>
+  )
 }
 
 export default UserListsPage

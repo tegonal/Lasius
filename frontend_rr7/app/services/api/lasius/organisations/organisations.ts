@@ -3,15 +3,15 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type {
-	ModelsCreateOrganisation,
-	ModelsInvitationResult,
-	ModelsOrganisation,
-	ModelsUpdateOrganisation,
-	ModelsUserStub,
-	ModelsUserToOrganisationAssignment,
+  ModelsCreateOrganisation,
+  ModelsInvitationResult,
+  ModelsOrganisation,
+  ModelsUpdateOrganisation,
+  ModelsUserStub,
+  ModelsUserToOrganisationAssignment,
 } from './..'
 
 import { lasiusFetch } from '../../lasius-fetch-instance'
@@ -20,215 +20,215 @@ import { lasiusFetch } from '../../lasius-fetch-instance'
  * @summary create an organisation
  */
 export type createOrganisationResponse201 = {
-	data: ModelsOrganisation
-	status: 201
+  data: ModelsOrganisation
+  status: 201
 }
 
 export type createOrganisationResponseSuccess =
-	createOrganisationResponse201 & {
-		headers: Headers
-	}
+  createOrganisationResponse201 & {
+    headers: Headers
+  }
 export type createOrganisationResponse = createOrganisationResponseSuccess
 
 export const getCreateOrganisationUrl = () => {
-	return `/organisations`
+  return `/organisations`
 }
 
 export const createOrganisation = async (
-	modelsCreateOrganisation: ModelsCreateOrganisation,
-	options?: RequestInit,
+  modelsCreateOrganisation: ModelsCreateOrganisation,
+  options?: RequestInit,
 ): Promise<createOrganisationResponse> => {
-	return lasiusFetch<createOrganisationResponse>(getCreateOrganisationUrl(), {
-		...options,
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json', ...options?.headers },
-		body: JSON.stringify(modelsCreateOrganisation),
-	})
+  return lasiusFetch<createOrganisationResponse>(getCreateOrganisationUrl(), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(modelsCreateOrganisation),
+  })
 }
 
 export type getOrganisationResponse200 = {
-	data: ModelsOrganisation
-	status: 200
+  data: ModelsOrganisation
+  status: 200
 }
 
 export type getOrganisationResponseSuccess = getOrganisationResponse200 & {
-	headers: Headers
+  headers: Headers
 }
 export type getOrganisationResponse = getOrganisationResponseSuccess
 
 export const getGetOrganisationUrl = (orgId: string) => {
-	return `/organisations/${orgId}`
+  return `/organisations/${orgId}`
 }
 
 export const getOrganisation = async (
-	orgId: string,
-	options?: RequestInit,
+  orgId: string,
+  options?: RequestInit,
 ): Promise<getOrganisationResponse> => {
-	return lasiusFetch<getOrganisationResponse>(getGetOrganisationUrl(orgId), {
-		...options,
-		method: 'GET',
-	})
+  return lasiusFetch<getOrganisationResponse>(getGetOrganisationUrl(orgId), {
+    ...options,
+    method: 'GET',
+  })
 }
 
 /**
  * @summary update an organisation
  */
 export type updateOrganisationResponse200 = {
-	data: ModelsOrganisation
-	status: 200
+  data: ModelsOrganisation
+  status: 200
 }
 
 export type updateOrganisationResponseSuccess =
-	updateOrganisationResponse200 & {
-		headers: Headers
-	}
+  updateOrganisationResponse200 & {
+    headers: Headers
+  }
 export type updateOrganisationResponse = updateOrganisationResponseSuccess
 
 export const getUpdateOrganisationUrl = (orgId: string) => {
-	return `/organisations/${orgId}`
+  return `/organisations/${orgId}`
 }
 
 export const updateOrganisation = async (
-	orgId: string,
-	modelsUpdateOrganisation: ModelsUpdateOrganisation,
-	options?: RequestInit,
+  orgId: string,
+  modelsUpdateOrganisation: ModelsUpdateOrganisation,
+  options?: RequestInit,
 ): Promise<updateOrganisationResponse> => {
-	return lasiusFetch<updateOrganisationResponse>(
-		getUpdateOrganisationUrl(orgId),
-		{
-			...options,
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json', ...options?.headers },
-			body: JSON.stringify(modelsUpdateOrganisation),
-		},
-	)
+  return lasiusFetch<updateOrganisationResponse>(
+    getUpdateOrganisationUrl(orgId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(modelsUpdateOrganisation),
+    },
+  )
 }
 
 /**
  * @summary delete/deactivate an organisation
  */
 export type deactivateOrganisationResponse200 = {
-	data: void
-	status: 200
+  data: void
+  status: 200
 }
 
 export type deactivateOrganisationResponseSuccess =
-	deactivateOrganisationResponse200 & {
-		headers: Headers
-	}
+  deactivateOrganisationResponse200 & {
+    headers: Headers
+  }
 export type deactivateOrganisationResponse =
-	deactivateOrganisationResponseSuccess
+  deactivateOrganisationResponseSuccess
 
 export const getDeactivateOrganisationUrl = (orgId: string) => {
-	return `/organisations/${orgId}`
+  return `/organisations/${orgId}`
 }
 
 export const deactivateOrganisation = async (
-	orgId: string,
-	options?: RequestInit,
+  orgId: string,
+  options?: RequestInit,
 ): Promise<deactivateOrganisationResponse> => {
-	return lasiusFetch<deactivateOrganisationResponse>(
-		getDeactivateOrganisationUrl(orgId),
-		{
-			...options,
-			method: 'DELETE',
-		},
-	)
+  return lasiusFetch<deactivateOrganisationResponse>(
+    getDeactivateOrganisationUrl(orgId),
+    {
+      ...options,
+      method: 'DELETE',
+    },
+  )
 }
 
 export type getOrganisationUserListResponse200 = {
-	data: ModelsUserStub[]
-	status: 200
+  data: ModelsUserStub[]
+  status: 200
 }
 
 export type getOrganisationUserListResponseSuccess =
-	getOrganisationUserListResponse200 & {
-		headers: Headers
-	}
+  getOrganisationUserListResponse200 & {
+    headers: Headers
+  }
 export type getOrganisationUserListResponse =
-	getOrganisationUserListResponseSuccess
+  getOrganisationUserListResponseSuccess
 
 export const getGetOrganisationUserListUrl = (orgId: string) => {
-	return `/organisations/${orgId}/users`
+  return `/organisations/${orgId}/users`
 }
 
 export const getOrganisationUserList = async (
-	orgId: string,
-	options?: RequestInit,
+  orgId: string,
+  options?: RequestInit,
 ): Promise<getOrganisationUserListResponse> => {
-	return lasiusFetch<getOrganisationUserListResponse>(
-		getGetOrganisationUserListUrl(orgId),
-		{
-			...options,
-			method: 'GET',
-		},
-	)
+  return lasiusFetch<getOrganisationUserListResponse>(
+    getGetOrganisationUserListUrl(orgId),
+    {
+      ...options,
+      method: 'GET',
+    },
+  )
 }
 
 /**
  * @summary assign a user to an organisation
  */
 export type inviteOrganisationUserResponse201 = {
-	data: ModelsInvitationResult
-	status: 201
+  data: ModelsInvitationResult
+  status: 201
 }
 
 export type inviteOrganisationUserResponseSuccess =
-	inviteOrganisationUserResponse201 & {
-		headers: Headers
-	}
+  inviteOrganisationUserResponse201 & {
+    headers: Headers
+  }
 export type inviteOrganisationUserResponse =
-	inviteOrganisationUserResponseSuccess
+  inviteOrganisationUserResponseSuccess
 
 export const getInviteOrganisationUserUrl = (orgId: string) => {
-	return `/organisations/${orgId}/invite`
+  return `/organisations/${orgId}/invite`
 }
 
 export const inviteOrganisationUser = async (
-	orgId: string,
-	modelsUserToOrganisationAssignment: ModelsUserToOrganisationAssignment,
-	options?: RequestInit,
+  orgId: string,
+  modelsUserToOrganisationAssignment: ModelsUserToOrganisationAssignment,
+  options?: RequestInit,
 ): Promise<inviteOrganisationUserResponse> => {
-	return lasiusFetch<inviteOrganisationUserResponse>(
-		getInviteOrganisationUserUrl(orgId),
-		{
-			...options,
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json', ...options?.headers },
-			body: JSON.stringify(modelsUserToOrganisationAssignment),
-		},
-	)
+  return lasiusFetch<inviteOrganisationUserResponse>(
+    getInviteOrganisationUserUrl(orgId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(modelsUserToOrganisationAssignment),
+    },
+  )
 }
 
 /**
  * @summary Remove selected user's membership from selected organisation
  */
 export type removeOrganisationUserResponse200 = {
-	data: void
-	status: 200
+  data: void
+  status: 200
 }
 
 export type removeOrganisationUserResponseSuccess =
-	removeOrganisationUserResponse200 & {
-		headers: Headers
-	}
+  removeOrganisationUserResponse200 & {
+    headers: Headers
+  }
 export type removeOrganisationUserResponse =
-	removeOrganisationUserResponseSuccess
+  removeOrganisationUserResponseSuccess
 
 export const getRemoveOrganisationUserUrl = (orgId: string, userId: string) => {
-	return `/organisations/${orgId}/users/${userId}`
+  return `/organisations/${orgId}/users/${userId}`
 }
 
 export const removeOrganisationUser = async (
-	orgId: string,
-	userId: string,
-	options?: RequestInit,
+  orgId: string,
+  userId: string,
+  options?: RequestInit,
 ): Promise<removeOrganisationUserResponse> => {
-	return lasiusFetch<removeOrganisationUserResponse>(
-		getRemoveOrganisationUserUrl(orgId, userId),
-		{
-			...options,
-			method: 'DELETE',
-		},
-	)
+  return lasiusFetch<removeOrganisationUserResponse>(
+    getRemoveOrganisationUserUrl(orgId, userId),
+    {
+      ...options,
+      method: 'DELETE',
+    },
+  )
 }

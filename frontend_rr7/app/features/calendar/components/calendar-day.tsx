@@ -28,71 +28,71 @@ import { cn } from '~/lib/utils/cn'
 import { type IsoDateString } from '~/lib/utils/dates'
 
 export const CalendarDay = ({
-	date,
-	isSelected = false,
-	onClick,
+  date,
+  isSelected = false,
+  onClick,
 }: {
-	date: IsoDateString
-	isSelected?: boolean
-	onClick: (args: IsoDateString) => void
+  date: IsoDateString
+  isSelected?: boolean
+  onClick: (args: IsoDateString) => void
 }) => {
-	return (
-		<Suspense fallback={<CalendarDaySkeleton />}>
-			<CalendarDayContent
-				date={date}
-				isSelected={isSelected}
-				onClick={onClick}
-			/>
-		</Suspense>
-	)
+  return (
+    <Suspense fallback={<CalendarDaySkeleton />}>
+      <CalendarDayContent
+        date={date}
+        isSelected={isSelected}
+        onClick={onClick}
+      />
+    </Suspense>
+  )
 }
 
 const CalendarDayContent = ({
-	date,
-	isSelected,
-	onClick,
+  date,
+  isSelected,
+  onClick,
 }: {
-	date: IsoDateString
-	isSelected: boolean
-	onClick: (args: IsoDateString) => void
+  date: IsoDateString
+  isSelected: boolean
+  onClick: (args: IsoDateString) => void
 }) => {
-	const day = new Date(date)
-	const { progressBarPercentage } = useCalendarDaySummary(date)
+  const day = new Date(date)
+  const { progressBarPercentage } = useCalendarDaySummary(date)
 
-	return (
-		<button
-			className={cn(
-				'btn btn-ghost relative z-[2] flex min-h-[78px] w-full min-w-[56px] grow flex-col items-center justify-start border-none text-center shadow-none',
-				isWeekend(day) && 'opacity-50',
-				isSelected && 'shadow-none hover:bg-transparent hover:text-current',
-			)}
-			onClick={() => onClick(date)}
-		>
-			<div className="pt-1 text-center text-xs leading-none font-normal uppercase">
-				<FormatDate date={day} format="dayNameShort" />
-			</div>
-			<div className="text-2xl leading-none font-normal">
-				<FormatDate date={day} format="dayPadded" />{' '}
-			</div>
-			{progressBarPercentage > 0 && (
-				<div className="flex w-full justify-center pb-2">
-					<ProgressBarSmall percentage={progressBarPercentage} />
-				</div>
-			)}
-			{isToday(day) && (
-				<div className="flex w-full justify-center pb-1">
-					<DotRed />
-				</div>
-			)}
-		</button>
-	)
+  return (
+    <button
+      className={cn(
+        'btn btn-ghost relative z-[2] flex min-h-[78px] w-full min-w-[56px] grow flex-col items-center justify-start border-none text-center shadow-none',
+        isWeekend(day) && 'opacity-50',
+        isSelected && 'shadow-none hover:bg-transparent hover:text-current',
+      )}
+      onClick={() => onClick(date)}
+    >
+      <div className="pt-1 text-center text-xs leading-none font-normal uppercase">
+        <FormatDate date={day} format="dayNameShort" />
+      </div>
+      <div className="text-2xl leading-none font-normal">
+        <FormatDate date={day} format="dayPadded" />{' '}
+      </div>
+      {progressBarPercentage > 0 && (
+        <div className="flex w-full justify-center pb-2">
+          <ProgressBarSmall percentage={progressBarPercentage} />
+        </div>
+      )}
+      {isToday(day) && (
+        <div className="flex w-full justify-center pb-1">
+          <DotRed />
+        </div>
+      )}
+    </button>
+  )
 }
 
 function CalendarDaySkeleton() {
-	return (
-		<div className="flex min-h-[78px] w-full min-w-[56px] flex-col items-center justify-start pt-1">
-			<div className="skeleton h-3 w-6 rounded" />
-			<div className="skeleton mt-2 h-7 w-8 rounded" />
-		</div>
-	)
+  return (
+    <div className="flex min-h-[78px] w-full min-w-[56px] flex-col items-center justify-start pt-1">
+      <div className="skeleton h-3 w-6 rounded" />
+      <div className="skeleton mt-2 h-7 w-8 rounded" />
+    </div>
+  )
 }

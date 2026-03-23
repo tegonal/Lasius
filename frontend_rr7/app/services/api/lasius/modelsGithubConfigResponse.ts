@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { ModelsAuditInfoResponse } from './modelsAuditInfoResponse'
 import type { ModelsConfigSyncStatus } from './modelsConfigSyncStatus'
@@ -14,29 +14,29 @@ import type { ModelsGithubProjectMapping } from './modelsGithubProjectMapping'
 import type { ModelsIssueImporterConfigId } from './modelsIssueImporterConfigId'
 
 export interface ModelsGithubConfigResponse {
-	id: ModelsIssueImporterConfigId
-	importerType: ModelsGithubConfigResponseImporterType
-	name: string
-	baseUrl: string
-	checkFrequency: number
-	projects: ModelsGithubProjectMapping[]
-	syncStatus: ModelsConfigSyncStatus
-	audit: ModelsAuditInfoResponse
-	/**
-	 * GitHub resource owner (organization or user login) for the token
-	 * @nullable
-	 */
-	resourceOwner?: string | null
-	/**
-	 * Type of the resource owner (User or Organization)
-	 * @nullable
-	 */
-	resourceOwnerType?: ModelsGithubConfigResponseResourceOwnerType
-	/**
-	 * List of available resource owners (user + organizations) for the token
-	 * @nullable
-	 */
-	availableResourceOwners?: ModelsExternalProject[] | null
-	type?: string
-	projectCount: number
+  id: ModelsIssueImporterConfigId
+  importerType: ModelsGithubConfigResponseImporterType
+  name: string
+  baseUrl: string
+  checkFrequency: number
+  projects: ModelsGithubProjectMapping[]
+  syncStatus: ModelsConfigSyncStatus
+  audit: ModelsAuditInfoResponse
+  /**
+   * GitHub resource owner (organization or user login) for the token
+   * @nullable
+   */
+  resourceOwner?: string | null
+  /**
+   * Type of the resource owner (User or Organization)
+   * @nullable
+   */
+  resourceOwnerType?: ModelsGithubConfigResponseResourceOwnerType
+  /**
+   * List of available resource owners (user + organizations) for the token
+   * @nullable
+   */
+  availableResourceOwners?: ModelsExternalProject[] | null
+  type?: string
+  projectCount: number
 }

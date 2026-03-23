@@ -29,98 +29,92 @@ import { getOrganisationUserList } from '~/services/api/lasius/organisations/org
 import { getProjectList } from '~/services/api/lasius/projects/projects'
 import { getUserProfile } from '~/services/api/lasius/user/user'
 import {
-	authHeaders,
-	mergeAuthHeaders,
-	requireUser,
+  authHeaders,
+  mergeAuthHeaders,
+  requireUser,
 } from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/organisation.lists'
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-	const auth = await requireUser(request)
-	const headers = authHeaders(auth.session)
+  const auth = await requireUser(request)
+  const headers = authHeaders(auth.session)
 
-	const profile = await getUserProfile({ headers })
-	const user = profile.data
+  const profile = await getUserProfile({ headers })
+  const user = profile.data
 
-	const organisations = user.organisations ?? []
-	const selectedOrgId =
-		user.settings?.lastSelectedOrganisation?.id ??
-		organisations.find((o) => o.private)?.organisationReference.id ??
-		organisations[0]?.organisationReference.id ??
-		''
+  const organisations = user.organisations ?? []
+  const selectedOrgId =
+    user.settings?.lastSelectedOrganisation?.id ??
+    organisations.find((o) => o.private)?.organisationReference.id ??
+    organisations[0]?.organisationReference.id ??
+    ''
 
-	// Check admin role
-	const selectedOrg = organisations.find(
-		(o) => o.organisationReference.id === selectedOrgId,
-	)
-	const isAdmin =
-		selectedOrg?.role === ModelsUserOrganisationRole.OrganisationAdministrator
+  // Check admin role
+  const selectedOrg = organisations.find(
+    (o) => o.organisationReference.id === selectedOrgId,
+  )
+  const isAdmin =
+    selectedOrg?.role === ModelsUserOrganisationRole.OrganisationAdministrator
 
-	if (!isAdmin) {
-		throw new Response('Unauthorized', { status: 401 })
-	}
+  if (!isAdmin) {
+    throw new Response('Unauthorized', { status: 401 })
+  }
 
-	// Read date range from search params: from/to (set by filter), or date (single day), or default
-	const url = new URL(request.url)
-	const fromParam = url.searchParams.get('from')
-	const toParam = url.searchParams.get('to')
-	const dateParam = url.searchParams.get('date')
+  // Read date range from search params: from/to (set by filter), or default
+  const url = new URL(request.url)
+  const fromParam = url.searchParams.get('from')
+  const toParam = url.searchParams.get('to')
 
-	let dateRange: { from: string; to: string }
-	if (fromParam && toParam) {
-		dateRange = { from: fromParam, to: toParam }
-	} else if (dateParam && !isNaN(new Date(dateParam).getTime())) {
-		dateRange = {
-			from: formatISOLocale(new Date(dateParam)),
-			to: formatISOLocale(new Date(dateParam)),
-		}
-	} else {
-		const firstOption = dateOptions[0]
-		const now = new Date()
-		dateRange = firstOption
-			? firstOption.dateRangeFn(now)
-			: { from: formatISOLocale(now), to: formatISOLocale(now) }
-	}
+  let dateRange: { from: string; to: string }
+  if (fromParam && toParam) {
+    dateRange = { from: fromParam, to: toParam }
+  } else {
+    const firstOption = dateOptions[0]
+    const now = new Date()
+    dateRange = firstOption
+      ? firstOption.dateRangeFn(now)
+      : { from: formatISOLocale(now), to: formatISOLocale(now) }
+  }
 
-	const timespan = apiTimespanFromTo(dateRange.from, dateRange.to)
+  const timespan = apiTimespanFromTo(dateRange.from, dateRange.to)
 
-	const [bookingsResponse, usersResponse, projectsResponse] = await Promise.all(
-		[
-			getOrganisationBookingList(
-				selectedOrgId,
-				timespan ?? { from: '', to: '' },
-				{ headers },
-			),
-			getOrganisationUserList(selectedOrgId, { headers }),
-			getProjectList(selectedOrgId, { headers }),
-		],
-	)
+  const [bookingsResponse, usersResponse, projectsResponse] = await Promise.all(
+    [
+      getOrganisationBookingList(
+        selectedOrgId,
+        timespan ?? { from: '', to: '' },
+        { headers },
+      ),
+      getOrganisationUserList(selectedOrgId, { headers }),
+      getProjectList(selectedOrgId, { headers }),
+    ],
+  )
 
-	return data(
-		{
-			bookings: bookingsResponse.data,
-			projects: projectsResponse.data.map((p) => ({
-				id: p.id,
-				key: p.key,
-			})),
-			users: usersResponse.data,
-		},
-		{ headers: mergeAuthHeaders(auth) },
-	)
+  return data(
+    {
+      bookings: bookingsResponse.data,
+      projects: projectsResponse.data.map((p) => ({
+        id: p.id,
+        key: p.key,
+      })),
+      users: usersResponse.data,
+    },
+    { headers: mergeAuthHeaders(auth) },
+  )
 }
 
 const OrganisationListsPage = ({ loaderData }: Route.ComponentProps) => {
-	return (
-		<div className={innerGridClasses} data-testid="org-lists-page">
-			<BookingHistoryLayout
-				bookings={loaderData.bookings}
-				dataSource="organisationBookings"
-				projects={loaderData.projects}
-				users={loaderData.users}
-			/>
-		</div>
-	)
+  return (
+    <div className={innerGridClasses} data-testid="org-lists-page">
+      <BookingHistoryLayout
+        bookings={loaderData.bookings}
+        dataSource="organisationBookings"
+        projects={loaderData.projects}
+        users={loaderData.users}
+      />
+    </div>
+  )
 }
 
 export default OrganisationListsPage

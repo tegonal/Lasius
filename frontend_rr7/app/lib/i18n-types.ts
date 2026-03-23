@@ -23,6 +23,6 @@
  * fallback that extracts `defaultValue`.
  */
 export type SchemaTranslationFn = (
-	key: string,
-	opts?: { defaultValue: string },
+  key: string,
+  opts?: { defaultValue: string },
 ) => string

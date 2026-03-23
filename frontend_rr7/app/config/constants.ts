@@ -18,11 +18,11 @@
  */
 
 export const ROLES = {
-	ORGANISATION_ADMIN: 'OrganisationAdministrator',
-	ORGANISATION_MEMBER: 'OrganisationMember',
-	PROJECT_ADMIN: 'ProjectAdministrator',
-	PROJECT_MEMBER: 'ProjectMember',
-	USER: 'FreeUser',
+  ORGANISATION_ADMIN: 'OrganisationAdministrator',
+  ORGANISATION_MEMBER: 'OrganisationMember',
+  PROJECT_ADMIN: 'ProjectAdministrator',
+  PROJECT_MEMBER: 'ProjectMember',
+  USER: 'FreeUser',
 }
 
 export const AUTH_PROVIDER_INTERNAL_LASIUS = 'internal_lasius'

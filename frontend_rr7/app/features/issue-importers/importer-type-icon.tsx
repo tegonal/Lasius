@@ -18,9 +18,9 @@
  */
 
 import {
-	SiGithub,
-	SiGitlab,
-	SiJirasoftware,
+  SiGithub,
+  SiGitlab,
+  SiJirasoftware,
 } from '@icons-pack/react-simple-icons'
 import { Layers } from 'lucide-react'
 
@@ -28,19 +28,19 @@ import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 
 type Props = {
-	className?: string
-	type: ImporterType
+  className?: string
+  type: ImporterType
 }
 
 export const ImporterTypeIcon = ({ className = 'h-5 w-5', type }: Props) => {
-	switch (type) {
-		case 'github':
-			return <SiGithub className={className} />
-		case 'gitlab':
-			return <SiGitlab className={className} />
-		case 'jira':
-			return <SiJirasoftware className={className} />
-		case 'plane':
-			return <LucideIcon className={className} icon={Layers} />
-	}
+  switch (type) {
+    case 'github':
+      return <SiGithub className={className} />
+    case 'gitlab':
+      return <SiGitlab className={className} />
+    case 'jira':
+      return <SiJirasoftware className={className} />
+    case 'plane':
+      return <LucideIcon className={className} icon={Layers} />
+  }
 }

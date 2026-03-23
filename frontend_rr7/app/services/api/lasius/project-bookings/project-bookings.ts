@@ -3,13 +3,13 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type {
-	GetAggregatedStatisticsByProjectParams,
-	GetProjectBookingListParams,
-	ModelsBooking,
-	ModelsBookingStats,
+  GetAggregatedStatisticsByProjectParams,
+  GetProjectBookingListParams,
+  ModelsBooking,
+  ModelsBookingStats,
 } from './..'
 
 import { lasiusFetch } from '../../lasius-fetch-instance'
@@ -18,94 +18,94 @@ import { lasiusFetch } from '../../lasius-fetch-instance'
  * @summary Get statistics about bookings for the selected project within the selected timeframe
  */
 export type getProjectBookingListResponse200 = {
-	data: ModelsBooking[]
-	status: 200
+  data: ModelsBooking[]
+  status: 200
 }
 
 export type getProjectBookingListResponseSuccess =
-	getProjectBookingListResponse200 & {
-		headers: Headers
-	}
+  getProjectBookingListResponse200 & {
+    headers: Headers
+  }
 export type getProjectBookingListResponse = getProjectBookingListResponseSuccess
 
 export const getGetProjectBookingListUrl = (
-	orgId: string,
-	projectId: string,
-	params: GetProjectBookingListParams,
+  orgId: string,
+  projectId: string,
+  params: GetProjectBookingListParams,
 ) => {
-	const normalizedParams = new URLSearchParams()
+  const normalizedParams = new URLSearchParams()
 
-	Object.entries(params || {}).forEach(([key, value]) => {
-		if (value !== undefined) {
-			normalizedParams.append(key, value === null ? 'null' : value.toString())
-		}
-	})
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  })
 
-	const stringifiedParams = normalizedParams.toString()
+  const stringifiedParams = normalizedParams.toString()
 
-	return stringifiedParams.length > 0
-		? `/organisations/${orgId}/projects/${projectId}/bookings/history?${stringifiedParams}`
-		: `/organisations/${orgId}/projects/${projectId}/bookings/history`
+  return stringifiedParams.length > 0
+    ? `/organisations/${orgId}/projects/${projectId}/bookings/history?${stringifiedParams}`
+    : `/organisations/${orgId}/projects/${projectId}/bookings/history`
 }
 
 export const getProjectBookingList = async (
-	orgId: string,
-	projectId: string,
-	params: GetProjectBookingListParams,
-	options?: RequestInit,
+  orgId: string,
+  projectId: string,
+  params: GetProjectBookingListParams,
+  options?: RequestInit,
 ): Promise<getProjectBookingListResponse> => {
-	return lasiusFetch<getProjectBookingListResponse>(
-		getGetProjectBookingListUrl(orgId, projectId, params),
-		{
-			...options,
-			method: 'GET',
-		},
-	)
+  return lasiusFetch<getProjectBookingListResponse>(
+    getGetProjectBookingListUrl(orgId, projectId, params),
+    {
+      ...options,
+      method: 'GET',
+    },
+  )
 }
 
 export type getAggregatedStatisticsByProjectResponse200 = {
-	data: ModelsBookingStats[]
-	status: 200
+  data: ModelsBookingStats[]
+  status: 200
 }
 
 export type getAggregatedStatisticsByProjectResponseSuccess =
-	getAggregatedStatisticsByProjectResponse200 & {
-		headers: Headers
-	}
+  getAggregatedStatisticsByProjectResponse200 & {
+    headers: Headers
+  }
 export type getAggregatedStatisticsByProjectResponse =
-	getAggregatedStatisticsByProjectResponseSuccess
+  getAggregatedStatisticsByProjectResponseSuccess
 
 export const getGetAggregatedStatisticsByProjectUrl = (
-	orgId: string,
-	projectId: string,
-	params: GetAggregatedStatisticsByProjectParams,
+  orgId: string,
+  projectId: string,
+  params: GetAggregatedStatisticsByProjectParams,
 ) => {
-	const normalizedParams = new URLSearchParams()
+  const normalizedParams = new URLSearchParams()
 
-	Object.entries(params || {}).forEach(([key, value]) => {
-		if (value !== undefined) {
-			normalizedParams.append(key, value === null ? 'null' : value.toString())
-		}
-	})
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  })
 
-	const stringifiedParams = normalizedParams.toString()
+  const stringifiedParams = normalizedParams.toString()
 
-	return stringifiedParams.length > 0
-		? `/organisations/${orgId}/projects/${projectId}/bookings/stats/aggregated?${stringifiedParams}`
-		: `/organisations/${orgId}/projects/${projectId}/bookings/stats/aggregated`
+  return stringifiedParams.length > 0
+    ? `/organisations/${orgId}/projects/${projectId}/bookings/stats/aggregated?${stringifiedParams}`
+    : `/organisations/${orgId}/projects/${projectId}/bookings/stats/aggregated`
 }
 
 export const getAggregatedStatisticsByProject = async (
-	orgId: string,
-	projectId: string,
-	params: GetAggregatedStatisticsByProjectParams,
-	options?: RequestInit,
+  orgId: string,
+  projectId: string,
+  params: GetAggregatedStatisticsByProjectParams,
+  options?: RequestInit,
 ): Promise<getAggregatedStatisticsByProjectResponse> => {
-	return lasiusFetch<getAggregatedStatisticsByProjectResponse>(
-		getGetAggregatedStatisticsByProjectUrl(orgId, projectId, params),
-		{
-			...options,
-			method: 'GET',
-		},
-	)
+  return lasiusFetch<getAggregatedStatisticsByProjectResponse>(
+    getGetAggregatedStatisticsByProjectUrl(orgId, projectId, params),
+    {
+      ...options,
+      method: 'GET',
+    },
+  )
 }

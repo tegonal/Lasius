@@ -20,10 +20,10 @@
 import { Toast } from '@base-ui/react/toast'
 
 export type ToastData = {
-	action?: {
-		href: string
-		label: string
-	}
+  action?: {
+    href: string
+    label: string
+  }
 }
 
 export type ToastType = 'ERROR' | 'NOTIFICATION' | 'SUCCESS' | 'WARNING'

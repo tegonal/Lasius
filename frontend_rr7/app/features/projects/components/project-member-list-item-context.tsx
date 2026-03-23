@@ -35,83 +35,83 @@ import { useContextMenu } from '~/features/context-menu/hooks/use-context-menu'
 import { type ModelsUserStub } from '~/services/api/lasius'
 
 type Props = {
-	canRemove: boolean
-	onRemove: () => void
-	user: ModelsUserStub
+  canRemove: boolean
+  onRemove: () => void
+  user: ModelsUserStub
 }
 
 export const ProjectMemberListItemContext = ({
-	canRemove,
-	onRemove,
-	user,
+  canRemove,
+  onRemove,
+  user,
 }: Props) => {
-	const { t } = useTranslation('common')
-	const { currentOpenContextMenuId, handleCloseAll } = useContextMenu()
-	const [isRemoveConfirmOpen, setIsRemoveConfirmOpen] = useState(false)
+  const { t } = useTranslation('common')
+  const { currentOpenContextMenuId, handleCloseAll } = useContextMenu()
+  const [isRemoveConfirmOpen, setIsRemoveConfirmOpen] = useState(false)
 
-	const showRemoveConfirm = () => {
-		setIsRemoveConfirmOpen(true)
-		handleCloseAll()
-	}
+  const showRemoveConfirm = () => {
+    setIsRemoveConfirmOpen(true)
+    handleCloseAll()
+  }
 
-	const handleRemoveConfirmClose = () => {
-		setIsRemoveConfirmOpen(false)
-	}
+  const handleRemoveConfirmClose = () => {
+    setIsRemoveConfirmOpen(false)
+  }
 
-	const handleRemove = () => {
-		onRemove()
-		setIsRemoveConfirmOpen(false)
-	}
+  const handleRemove = () => {
+    onRemove()
+    setIsRemoveConfirmOpen(false)
+  }
 
-	if (!canRemove) {
-		return null
-	}
+  if (!canRemove) {
+    return null
+  }
 
-	return (
-		<>
-			<ContextBody variant="compact">
-				<ContextButtonOpen hash={user.id} />
-				{currentOpenContextMenuId === user.id && (
-					<ContextAnimatePresence variant="compact">
-						<ContextBar>
-							<ContextButtonWrapper variant="compact">
-								<Button
-									aria-label={t('members.actions.remove', {
-										defaultValue: 'Remove member',
-									})}
-									fullWidth={false}
-									onClick={showRemoveConfirm}
-									shape="circle"
-									title={t('members.actions.remove', {
-										defaultValue: 'Remove member',
-									})}
-									variant="contextIcon"
-								>
-									<LucideIcon icon={UserX} size={24} />
-								</Button>
-							</ContextButtonWrapper>
-							<ContextBarDivider />
-							<ContextButtonClose variant="compact" />
-						</ContextBar>
-					</ContextAnimatePresence>
-				)}
-			</ContextBody>
-			<GenericConfirmModal
-				confirmLabel={t('members.actions.remove', {
-					defaultValue: 'Remove member',
-				})}
-				confirmVariant="error"
-				message={t('members.confirmRemove', {
-					defaultValue:
-						'Are you sure you want to remove this member from the project?',
-				})}
-				onClose={handleRemoveConfirmClose}
-				onConfirm={handleRemove}
-				open={isRemoveConfirmOpen}
-				title={t('members.actions.remove', {
-					defaultValue: 'Remove member',
-				})}
-			/>
-		</>
-	)
+  return (
+    <>
+      <ContextBody variant="compact">
+        <ContextButtonOpen hash={user.id} />
+        {currentOpenContextMenuId === user.id && (
+          <ContextAnimatePresence variant="compact">
+            <ContextBar>
+              <ContextButtonWrapper variant="compact">
+                <Button
+                  aria-label={t('members.actions.remove', {
+                    defaultValue: 'Remove member',
+                  })}
+                  fullWidth={false}
+                  onClick={showRemoveConfirm}
+                  shape="circle"
+                  title={t('members.actions.remove', {
+                    defaultValue: 'Remove member',
+                  })}
+                  variant="contextIcon"
+                >
+                  <LucideIcon icon={UserX} size={24} />
+                </Button>
+              </ContextButtonWrapper>
+              <ContextBarDivider />
+              <ContextButtonClose variant="compact" />
+            </ContextBar>
+          </ContextAnimatePresence>
+        )}
+      </ContextBody>
+      <GenericConfirmModal
+        confirmLabel={t('members.actions.remove', {
+          defaultValue: 'Remove member',
+        })}
+        confirmVariant="error"
+        message={t('members.confirmRemove', {
+          defaultValue:
+            'Are you sure you want to remove this member from the project?',
+        })}
+        onClose={handleRemoveConfirmClose}
+        onConfirm={handleRemove}
+        open={isRemoveConfirmOpen}
+        title={t('members.actions.remove', {
+          defaultValue: 'Remove member',
+        })}
+      />
+    </>
+  )
 }

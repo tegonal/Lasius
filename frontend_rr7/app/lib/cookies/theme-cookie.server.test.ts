@@ -20,75 +20,75 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-	isValidTheme,
-	parseThemeCookie,
-	serializeThemeCookie,
+  isValidTheme,
+  parseThemeCookie,
+  serializeThemeCookie,
 } from './theme-cookie.server'
 
 describe('isValidTheme', () => {
-	it('accepts "light"', () => {
-		expect(isValidTheme('light')).toBe(true)
-	})
+  it('accepts "light"', () => {
+    expect(isValidTheme('light')).toBe(true)
+  })
 
-	it('accepts "dark"', () => {
-		expect(isValidTheme('dark')).toBe(true)
-	})
+  it('accepts "dark"', () => {
+    expect(isValidTheme('dark')).toBe(true)
+  })
 
-	it('rejects "system"', () => {
-		expect(isValidTheme('system')).toBe(false)
-	})
+  it('rejects "system"', () => {
+    expect(isValidTheme('system')).toBe(false)
+  })
 
-	it('rejects null', () => {
-		expect(isValidTheme(null)).toBe(false)
-	})
+  it('rejects null', () => {
+    expect(isValidTheme(null)).toBe(false)
+  })
 
-	it('rejects undefined', () => {
-		expect(isValidTheme(undefined)).toBe(false)
-	})
+  it('rejects undefined', () => {
+    expect(isValidTheme(undefined)).toBe(false)
+  })
 
-	it('rejects arbitrary strings', () => {
-		expect(isValidTheme('blue')).toBe(false)
-	})
+  it('rejects arbitrary strings', () => {
+    expect(isValidTheme('blue')).toBe(false)
+  })
 })
 
 describe('parseThemeCookie', () => {
-	it('returns null for null header', () => {
-		expect(parseThemeCookie(null)).toBeNull()
-	})
+  it('returns null for null header', () => {
+    expect(parseThemeCookie(null)).toBeNull()
+  })
 
-	it('parses "light" from cookie header', () => {
-		expect(parseThemeCookie('theme=light')).toBe('light')
-	})
+  it('parses "light" from cookie header', () => {
+    expect(parseThemeCookie('theme=light')).toBe('light')
+  })
 
-	it('parses "dark" from cookie header', () => {
-		expect(parseThemeCookie('theme=dark')).toBe('dark')
-	})
+  it('parses "dark" from cookie header', () => {
+    expect(parseThemeCookie('theme=dark')).toBe('dark')
+  })
 
-	it('returns null for invalid theme value', () => {
-		expect(parseThemeCookie('theme=blue')).toBeNull()
-	})
+  it('returns null for invalid theme value', () => {
+    expect(parseThemeCookie('theme=blue')).toBeNull()
+  })
 
-	it('returns null when theme cookie is absent', () => {
-		expect(parseThemeCookie('lng=en')).toBeNull()
-	})
+  it('returns null when theme cookie is absent', () => {
+    expect(parseThemeCookie('lng=en')).toBeNull()
+  })
 
-	it('finds theme among multiple cookies', () => {
-		expect(parseThemeCookie('lng=en; theme=dark; other=value')).toBe('dark')
-	})
+  it('finds theme among multiple cookies', () => {
+    expect(parseThemeCookie('lng=en; theme=dark; other=value')).toBe('dark')
+  })
 })
 
 describe('serializeThemeCookie', () => {
-	it('produces a Set-Cookie string with the theme value', () => {
-		const result = serializeThemeCookie('dark')
-		expect(result).toContain('theme=dark')
-		expect(result).toContain('Path=/')
-		expect(result).toContain('SameSite=Lax')
-	})
+  it('produces a Set-Cookie string with the theme value', () => {
+    const result = serializeThemeCookie('dark')
+    expect(result).toContain('theme=dark')
+    expect(result).toContain('Path=/')
+    expect(result).toContain('SameSite=Lax')
+  })
 
-	it('round-trips with parseThemeCookie', () => {
-		const setCookie = serializeThemeCookie('light')
-		// Extract just the key=value part (before first ;)
-		const cookieValue = setCookie.split(';')[0] ?? ''
-		expect(parseThemeCookie(cookieValue)).toBe('light')
-	})
+  it('round-trips with parseThemeCookie', () => {
+    const setCookie = serializeThemeCookie('light')
+    // Extract just the key=value part (before first ;)
+    const cookieValue = setCookie.split(';')[0] ?? ''
+    expect(parseThemeCookie(cookieValue)).toBe('light')
+  })
 })

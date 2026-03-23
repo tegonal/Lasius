@@ -30,42 +30,42 @@ import { i18nConfig } from '~/i18n-config.ts'
 import { logger } from '~/lib/logger'
 
 window.addEventListener('error', (event) => {
-	logger.error({ error: event.error, type: 'window-error' }, 'Uncaught error')
+  logger.error({ error: event.error, type: 'window-error' }, 'Uncaught error')
 })
 
 window.addEventListener('unhandledrejection', (event) => {
-	logger.error(
-		{ error: event.reason, type: 'unhandled-rejection' },
-		'Unhandled rejection',
-	)
+  logger.error(
+    { error: event.reason, type: 'unhandled-rejection' },
+    'Unhandled rejection',
+  )
 })
 
 async function main() {
-	await i18next
-		.use(initReactI18next)
-		.use(Fetch)
-		.use(I18nextBrowserLanguageDetector)
-		.init({
-			...i18nConfig,
-			backend: { loadPath: '/api/locales/{{lng}}/{{ns}}' },
-			detection: { caches: [], order: ['htmlTag'] },
-			ns: getInitialNamespaces(),
-		})
+  await i18next
+    .use(initReactI18next)
+    .use(Fetch)
+    .use(I18nextBrowserLanguageDetector)
+    .init({
+      ...i18nConfig,
+      backend: { loadPath: '/api/locales/{{lng}}/{{ns}}' },
+      detection: { caches: [], order: ['htmlTag'] },
+      ns: getInitialNamespaces(),
+    })
 
-	startTransition(() => {
-		hydrateRoot(
-			document,
-			<I18nextProvider i18n={i18next}>
-				<StrictMode>
-					<HydratedRouter />
-				</StrictMode>
-			</I18nextProvider>,
-		)
-	})
+  startTransition(() => {
+    hydrateRoot(
+      document,
+      <I18nextProvider i18n={i18next}>
+        <StrictMode>
+          <HydratedRouter />
+        </StrictMode>
+      </I18nextProvider>,
+    )
+  })
 }
 
 main().catch((error) => {
-	// Logger may not be available during hydration startup — use console as fallback
+  // Logger may not be available during hydration startup — use console as fallback
 
-	console.error('Hydration error:', error)
+  console.error('Hydration error:', error)
 })

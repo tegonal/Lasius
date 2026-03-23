@@ -22,104 +22,104 @@
 import { ResponsiveStream } from '@nivo/stream'
 
 import {
-	ChartSingleTooltip,
-	ChartStackTooltip,
+  ChartSingleTooltip,
+  ChartStackTooltip,
 } from '~/components/ui/charts/chart-tooltips'
 import { nivoTheme, useNivoColors } from '~/components/ui/charts/nivo-theme'
 import { EmptyStateStats } from '~/features/stats/components/empty-state-stats'
 import { type NivoChartDataType } from '~/lib/api/functions/get-nivo-chart-data-from-api-stats-data'
 
 type Props = {
-	data: NivoChartDataType
-	keys: string[]
+  data: NivoChartDataType
+  keys: string[]
 }
 
 export const ProjectStreamChartImpl = ({ data, keys }: Props) => {
-	const nivoColors = useNivoColors()
+  const nivoColors = useNivoColors()
 
-	if (!data || !keys || !Array.isArray(data) || !Array.isArray(keys)) {
-		return (
-			<div className="h-80 w-full">
-				<EmptyStateStats />
-			</div>
-		)
-	}
+  if (!data || !keys || !Array.isArray(data) || !Array.isArray(keys)) {
+    return (
+      <div className="h-80 w-full">
+        <EmptyStateStats />
+      </div>
+    )
+  }
 
-	const hasData =
-		keys.length > 0 && data.some((d) => keys.some((key) => (d[key] || 0) > 0))
+  const hasData =
+    keys.length > 0 && data.some((d) => keys.some((key) => (d[key] || 0) > 0))
 
-	if (!hasData) {
-		return (
-			<div className="h-80 w-full">
-				<EmptyStateStats />
-			</div>
-		)
-	}
+  if (!hasData) {
+    return (
+      <div className="h-80 w-full">
+        <EmptyStateStats />
+      </div>
+    )
+  }
 
-	const streamData = data.map((item) => {
-		const transformed: Record<string, number> = {}
-		keys.forEach((key) => {
-			const value = item[key]
-			transformed[key] = typeof value === 'number' ? value : 0
-		})
-		return transformed
-	})
+  const streamData = data.map((item) => {
+    const transformed: Record<string, number> = {}
+    keys.forEach((key) => {
+      const value = item[key]
+      transformed[key] = typeof value === 'number' ? value : 0
+    })
+    return transformed
+  })
 
-	return (
-		<div className="bg-base-200 rounded-lg p-4">
-			<div className="h-80 w-full">
-				<ResponsiveStream
-					animate={false}
-					axisBottom={{
-						format: (value) => {
-							const item = data[value]
-							const category = item?.category || value
-							return String(category)
-						},
-						tickPadding: 5,
-						tickRotation: -45,
-						tickSize: 5,
-					}}
-					axisLeft={null}
-					axisRight={null}
-					axisTop={null}
-					borderWidth={0}
-					colors={nivoColors}
-					data={streamData}
-					dotBorderColor={{ from: 'color', modifiers: [['darker', 0.7]] }}
-					dotBorderWidth={2}
-					dotColor={{ from: 'color' }}
-					dotSize={8}
-					enableDots={true}
-					enableGridX={false}
-					enableGridY={false}
-					enableStackTooltip={true}
-					fillOpacity={0.85}
-					isInteractive={true}
-					keys={keys}
-					margin={{ bottom: 50, left: 20, right: 20, top: 20 }}
-					motionConfig="stiff"
-					offsetType="silhouette"
-					stackTooltip={({ slice }) => (
-						<ChartStackTooltip
-							formatLabel={(id) => id || ''}
-							formatValue={(value) => `${value.toFixed(1)}h`}
-							getTitle={(index) => {
-								const item = data[index]
-								return item?.category || `${index}`
-							}}
-							slice={slice}
-						/>
-					)}
-					theme={nivoTheme}
-					tooltip={({ point }) => (
-						<ChartSingleTooltip
-							formatValue={(value) => `${value.toFixed(1)}h`}
-							point={point}
-						/>
-					)}
-				/>
-			</div>
-		</div>
-	)
+  return (
+    <div className="bg-base-200 rounded-lg p-4">
+      <div className="h-80 w-full">
+        <ResponsiveStream
+          animate={false}
+          axisBottom={{
+            format: (value) => {
+              const item = data[value]
+              const category = item?.category || value
+              return String(category)
+            },
+            tickPadding: 5,
+            tickRotation: -45,
+            tickSize: 5,
+          }}
+          axisLeft={null}
+          axisRight={null}
+          axisTop={null}
+          borderWidth={0}
+          colors={nivoColors}
+          data={streamData}
+          dotBorderColor={{ from: 'color', modifiers: [['darker', 0.7]] }}
+          dotBorderWidth={2}
+          dotColor={{ from: 'color' }}
+          dotSize={8}
+          enableDots={true}
+          enableGridX={false}
+          enableGridY={false}
+          enableStackTooltip={true}
+          fillOpacity={0.85}
+          isInteractive={true}
+          keys={keys}
+          margin={{ bottom: 50, left: 20, right: 20, top: 20 }}
+          motionConfig="stiff"
+          offsetType="silhouette"
+          stackTooltip={({ slice }) => (
+            <ChartStackTooltip
+              formatLabel={(id) => id || ''}
+              formatValue={(value) => `${value.toFixed(1)}h`}
+              getTitle={(index) => {
+                const item = data[index]
+                return item?.category || `${index}`
+              }}
+              slice={slice}
+            />
+          )}
+          theme={nivoTheme}
+          tooltip={({ point }) => (
+            <ChartSingleTooltip
+              formatValue={(value) => `${value.toFixed(1)}h`}
+              point={point}
+            />
+          )}
+        />
+      </div>
+    </div>
+  )
 }

@@ -20,39 +20,39 @@
 export type AuthProvider = 'github' | 'gitlab' | 'internal' | 'keycloak'
 
 export interface LasiusSessionData {
-	accessToken: string
-	email: string
-	expiresAt: number // ms timestamp (Date.now())
-	issuedAt: number // ms timestamp — when the token was issued or last refreshed
-	refreshToken: string
-	tokenIssuer: AuthProvider
-	userId: string
+  accessToken: string
+  email: string
+  expiresAt: number // ms timestamp (Date.now())
+  issuedAt: number // ms timestamp — when the token was issued or last refreshed
+  refreshToken: string
+  tokenIssuer: AuthProvider
+  userId: string
 }
 
 /** Provider interface — each provider implements these */
 export interface OAuthProvider {
-	exchangeCode(
-		code: string,
-		redirectUri: string,
-		codeVerifier?: string,
-	): Promise<TokenResponse>
-	getAuthorizationUrl(
-		state: string,
-		redirectUri: string,
-		codeChallenge?: string,
-	): string
-	getUserProfile(
-		accessToken: string,
-	): Promise<{ email: string; userId: string }>
-	provider: AuthProvider
-	refreshToken(refreshToken: string): Promise<null | TokenResponse>
-	revokeToken(token: string): Promise<void>
+  exchangeCode(
+    code: string,
+    redirectUri: string,
+    codeVerifier?: string,
+  ): Promise<TokenResponse>
+  getAuthorizationUrl(
+    state: string,
+    redirectUri: string,
+    codeChallenge?: string,
+  ): string
+  getUserProfile(
+    accessToken: string,
+  ): Promise<{ email: string; userId: string }>
+  provider: AuthProvider
+  refreshToken(refreshToken: string): Promise<null | TokenResponse>
+  revokeToken(token: string): Promise<void>
 }
 
 export interface TokenResponse {
-	access_token: string
-	expires_in: number
-	refresh_token?: string
-	scope?: string
-	token_type: string
+  access_token: string
+  expires_in: number
+  refresh_token?: string
+  scope?: string
+  token_type: string
 }

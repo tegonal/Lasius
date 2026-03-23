@@ -22,24 +22,24 @@
  * Separated from navigation config to allow usage without React dependencies
  */
 export const ROUTES = {
-	ORGANISATION: {
-		CURRENT: '/organisation/current',
-		INTEGRATIONS: '/organisation/integrations',
-		LISTS: '/organisation/lists',
-		PROJECTS: '/organisation/projects',
-		STATS: '/organisation/stats',
-	},
-	SETTINGS: {
-		ACCOUNT: '/settings/account',
-		ACCOUNT_SECURITY: '/settings/account-security',
-		APP: '/settings/app',
-		WORKING_HOURS: '/settings/working-hours',
-	},
-	USER: {
-		DASHBOARD: '/user/dashboard',
-		INDEX: '/user/home',
-		LISTS: '/user/lists',
-		PROJECTS: '/user/projects',
-		STATS: '/user/stats',
-	},
+  ORGANISATION: {
+    CURRENT: '/organisation/current',
+    INTEGRATIONS: '/organisation/integrations',
+    LISTS: '/organisation/lists',
+    PROJECTS: '/organisation/projects',
+    STATS: '/organisation/stats',
+  },
+  SETTINGS: {
+    ACCOUNT: '/settings/account',
+    ACCOUNT_SECURITY: '/settings/account-security',
+    APP: '/settings/app',
+    WORKING_HOURS: '/settings/working-hours',
+  },
+  USER: {
+    DASHBOARD: '/user/dashboard',
+    INDEX: '/user/home',
+    LISTS: '/user/lists',
+    PROJECTS: '/user/projects',
+    STATS: '/user/stats',
+  },
 }

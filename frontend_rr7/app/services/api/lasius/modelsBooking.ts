@@ -3,19 +3,19 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { ModelsEntityReference } from './modelsEntityReference'
 import type { ModelsLocalDateTimeWithTimeZone } from './modelsLocalDateTimeWithTimeZone'
 import type { ModelsTag } from './modelsTag'
 
 export interface ModelsBooking {
-	id: string
-	start: ModelsLocalDateTimeWithTimeZone
-	end?: ModelsLocalDateTimeWithTimeZone | null
-	userReference: ModelsEntityReference
-	organisationReference: ModelsEntityReference
-	projectReference: ModelsEntityReference
-	tags: ModelsTag[]
-	bookingHash: number
+  id: string
+  start: ModelsLocalDateTimeWithTimeZone
+  end?: ModelsLocalDateTimeWithTimeZone | null
+  userReference: ModelsEntityReference
+  organisationReference: ModelsEntityReference
+  projectReference: ModelsEntityReference
+  tags: ModelsTag[]
+  bookingHash: number
 }

@@ -27,89 +27,89 @@ import { cn } from '~/lib/utils/cn'
  */
 
 const labelVariants = cva(
-	// Base DaisyUI label class
-	'label cursor-pointer',
-	{
-		defaultVariants: {
-			required: false,
-			size: 'md',
-			variant: 'default',
-			weight: 'medium',
-		},
-		variants: {
-			required: {
-				false: '',
-				true: "after:text-error after:ml-0.5 after:content-['*']",
-			},
-			size: {
-				lg: 'text-lg',
-				md: 'text-base',
-				sm: 'text-sm',
-				xs: 'text-xs',
-			},
-			variant: {
-				accent: 'label-text text-accent',
-				default: 'label-text',
-				error: 'label-text text-error',
-				info: 'label-text text-info',
-				muted: 'label-text text-neutral/70',
-				primary: 'label-text text-primary',
-				secondary: 'label-text text-secondary',
-				success: 'label-text text-success',
-				warning: 'label-text text-warning',
-			},
-			weight: {
-				bold: 'font-bold',
-				medium: 'font-medium',
-				normal: 'font-normal',
-				semibold: 'font-semibold',
-			},
-		},
-	},
+  // Base DaisyUI label class
+  'label cursor-pointer',
+  {
+    defaultVariants: {
+      required: false,
+      size: 'md',
+      variant: 'default',
+      weight: 'medium',
+    },
+    variants: {
+      required: {
+        false: '',
+        true: "after:text-error after:ml-0.5 after:content-['*']",
+      },
+      size: {
+        lg: 'text-lg',
+        md: 'text-base',
+        sm: 'text-sm',
+        xs: 'text-xs',
+      },
+      variant: {
+        accent: 'label-text text-accent',
+        default: 'label-text',
+        error: 'label-text text-error',
+        info: 'label-text text-info',
+        muted: 'label-text text-neutral/70',
+        primary: 'label-text text-primary',
+        secondary: 'label-text text-secondary',
+        success: 'label-text text-success',
+        warning: 'label-text text-warning',
+      },
+      weight: {
+        bold: 'font-bold',
+        medium: 'font-medium',
+        normal: 'font-normal',
+        semibold: 'font-semibold',
+      },
+    },
+  },
 )
 
 export interface LabelProps
-	extends
-		React.LabelHTMLAttributes<HTMLLabelElement>,
-		VariantProps<typeof labelVariants> {
-	as?: 'label' | 'span'
-	children: React.ReactNode
+  extends
+    React.LabelHTMLAttributes<HTMLLabelElement>,
+    VariantProps<typeof labelVariants> {
+  as?: 'label' | 'span'
+  children: React.ReactNode
 }
 
 export const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
-	(
-		{
-			as: Component = 'label',
-			children,
-			className,
-			required,
-			size,
-			variant,
-			weight,
-			...props
-		},
-		ref,
-	) => {
-		const Element = Component as React.ElementType
+  (
+    {
+      as: Component = 'label',
+      children,
+      className,
+      required,
+      size,
+      variant,
+      weight,
+      ...props
+    },
+    ref,
+  ) => {
+    const Element = Component as React.ElementType
 
-		return (
-			<Element
-				className={cn(
-					labelVariants({
-						required,
-						size,
-						variant,
-						weight,
-					}),
-					className,
-				)}
-				ref={ref}
-				{...props}
-			>
-				{children}
-			</Element>
-		)
-	},
+    return (
+      <Element
+        className={cn(
+          labelVariants({
+            required,
+            size,
+            variant,
+            weight,
+          }),
+          className,
+        )}
+        ref={ref}
+        {...props}
+      >
+        {children}
+      </Element>
+    )
+  },
 )
 
 Label.displayName = 'Label'

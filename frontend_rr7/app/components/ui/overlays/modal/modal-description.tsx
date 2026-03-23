@@ -22,8 +22,8 @@ import { Dialog } from '@base-ui/react/dialog'
 import { cn } from '~/lib/utils/cn'
 
 type Props = {
-	children: React.ReactNode
-	className?: string
+  children: React.ReactNode
+  className?: string
 }
 
 /**
@@ -31,9 +31,11 @@ type Props = {
  * Uses Base UI's Dialog.Description for ARIA compliance
  */
 export const ModalDescription = ({ children, className }: Props) => {
-	return (
-		<Dialog.Description className={cn('text-base-content/70 text-sm', className)}>
-			{children}
-		</Dialog.Description>
-	)
+  return (
+    <Dialog.Description
+      className={cn('text-base-content/70 text-sm', className)}
+    >
+      {children}
+    </Dialog.Description>
+  )
 }

@@ -40,92 +40,92 @@ import { type ModelsBooking } from '~/services/api/lasius'
 import { deleteUserBooking } from '~/services/api/lasius/user-bookings/user-bookings'
 
 type Props = {
-	allowDelete?: boolean
-	allowEdit?: boolean
-	item: ModelsBooking
+  allowDelete?: boolean
+  allowEdit?: boolean
+  item: ModelsBooking
 }
 
 export const BookingHistoryItemContext = ({
-	allowDelete = false,
-	allowEdit = false,
-	item,
+  allowDelete = false,
+  allowEdit = false,
+  item,
 }: Props) => {
-	const [isOpen, setIsOpen] = useState(false)
-	const { t } = useTranslation('common')
-	const { currentOpenContextMenuId, handleCloseAll } = useContextMenu()
-	const { selectedOrganisationId } = useOrganisation()
+  const [isOpen, setIsOpen] = useState(false)
+  const { t } = useTranslation('common')
+  const { currentOpenContextMenuId, handleCloseAll } = useContextMenu()
+  const { selectedOrganisationId } = useOrganisation()
 
-	const handleClose = () => setIsOpen(false)
+  const handleClose = () => setIsOpen(false)
 
-	const deleteItem = async () => {
-		await deleteUserBooking(selectedOrganisationId, item.id)
-		handleCloseAll()
-	}
+  const deleteItem = async () => {
+    await deleteUserBooking(selectedOrganisationId, item.id)
+    handleCloseAll()
+  }
 
-	const updateItem = () => {
-		setIsOpen(true)
-		handleCloseAll()
-	}
+  const updateItem = () => {
+    setIsOpen(true)
+    handleCloseAll()
+  }
 
-	return (
-		<>
-			<ContextBody variant="compact">
-				<ContextButtonOpen hash={item.id} />
-				{currentOpenContextMenuId === item.id && (
-					<ContextAnimatePresence variant="compact">
-						<ContextBar>
-							<ContextButtonStartBooking item={item} variant="compact" />
-							{allowEdit && (
-								<ContextButtonWrapper variant="compact">
-									<Button
-										aria-label={t('bookings.actions.edit', {
-											defaultValue: 'Edit booking',
-										})}
-										fullWidth={false}
-										onClick={() => updateItem()}
-										shape="circle"
-										title={t('bookings.actions.edit', {
-											defaultValue: 'Edit booking',
-										})}
-										variant="contextIcon"
-									>
-										<LucideIcon icon={Pencil} size={24} />
-									</Button>
-								</ContextButtonWrapper>
-							)}
-							<ContextButtonAddFavorite item={item} variant="compact" />
-							{allowDelete && (
-								<ContextButtonWrapper variant="compact">
-									<Button
-										aria-label={t('bookings.actions.delete', {
-											defaultValue: 'Delete booking',
-										})}
-										fullWidth={false}
-										onClick={() => void deleteItem()}
-										shape="circle"
-										title={t('bookings.actions.delete', {
-											defaultValue: 'Delete booking',
-										})}
-										variant="contextIcon"
-									>
-										<LucideIcon icon={Trash2} size={24} />
-									</Button>
-								</ContextButtonWrapper>
-							)}
-							<ContextBarDivider />
-							<ContextButtonClose variant="compact" />
-						</ContextBar>
-					</ContextAnimatePresence>
-				)}
-			</ContextBody>
-			<Modal onClose={handleClose} open={isOpen}>
-				<BookingAddUpdateForm
-					itemUpdate={item}
-					mode="update"
-					onClose={handleClose}
-					selectedOrgId={selectedOrganisationId}
-				/>
-			</Modal>
-		</>
-	)
+  return (
+    <>
+      <ContextBody variant="compact">
+        <ContextButtonOpen hash={item.id} />
+        {currentOpenContextMenuId === item.id && (
+          <ContextAnimatePresence variant="compact">
+            <ContextBar>
+              <ContextButtonStartBooking item={item} variant="compact" />
+              {allowEdit && (
+                <ContextButtonWrapper variant="compact">
+                  <Button
+                    aria-label={t('bookings.actions.edit', {
+                      defaultValue: 'Edit booking',
+                    })}
+                    fullWidth={false}
+                    onClick={() => updateItem()}
+                    shape="circle"
+                    title={t('bookings.actions.edit', {
+                      defaultValue: 'Edit booking',
+                    })}
+                    variant="contextIcon"
+                  >
+                    <LucideIcon icon={Pencil} size={24} />
+                  </Button>
+                </ContextButtonWrapper>
+              )}
+              <ContextButtonAddFavorite item={item} variant="compact" />
+              {allowDelete && (
+                <ContextButtonWrapper variant="compact">
+                  <Button
+                    aria-label={t('bookings.actions.delete', {
+                      defaultValue: 'Delete booking',
+                    })}
+                    fullWidth={false}
+                    onClick={() => void deleteItem()}
+                    shape="circle"
+                    title={t('bookings.actions.delete', {
+                      defaultValue: 'Delete booking',
+                    })}
+                    variant="contextIcon"
+                  >
+                    <LucideIcon icon={Trash2} size={24} />
+                  </Button>
+                </ContextButtonWrapper>
+              )}
+              <ContextBarDivider />
+              <ContextButtonClose variant="compact" />
+            </ContextBar>
+          </ContextAnimatePresence>
+        )}
+      </ContextBody>
+      <Modal onClose={handleClose} open={isOpen}>
+        <BookingAddUpdateForm
+          itemUpdate={item}
+          mode="update"
+          onClose={handleClose}
+          selectedOrgId={selectedOrganisationId}
+        />
+      </Modal>
+    </>
+  )
 }

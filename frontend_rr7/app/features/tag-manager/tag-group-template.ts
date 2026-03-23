@@ -20,54 +20,54 @@
 import { type ModelsTag } from '~/services/api/lasius'
 
 export const tagGroupTemplate: ModelsTag[] = [
-	{
-		id: 'Administration',
-		relatedTags: [
-			{
-				id: 'Non-Billable',
-				type: 'SimpleTag',
-			},
-		],
-		type: 'TagGroup',
-	},
-	{
-		id: 'Development',
-		relatedTags: [
-			{
-				id: 'Billable',
-				type: 'SimpleTag',
-			},
-		],
-		type: 'TagGroup',
-	},
-	{
-		id: 'Design',
-		relatedTags: [
-			{
-				id: 'Billable',
-				type: 'SimpleTag',
-			},
-		],
-		type: 'TagGroup',
-	},
-	{
-		id: 'Project Management',
-		relatedTags: [
-			{
-				id: 'Billable',
-				type: 'SimpleTag',
-			},
-		],
-		type: 'TagGroup',
-	},
-	{
-		id: 'Maintenance & Support',
-		relatedTags: [
-			{
-				id: 'Billable',
-				type: 'SimpleTag',
-			},
-		],
-		type: 'TagGroup',
-	},
+  {
+    id: 'Administration',
+    relatedTags: [
+      {
+        id: 'Non-Billable',
+        type: 'SimpleTag',
+      },
+    ],
+    type: 'TagGroup',
+  },
+  {
+    id: 'Development',
+    relatedTags: [
+      {
+        id: 'Billable',
+        type: 'SimpleTag',
+      },
+    ],
+    type: 'TagGroup',
+  },
+  {
+    id: 'Design',
+    relatedTags: [
+      {
+        id: 'Billable',
+        type: 'SimpleTag',
+      },
+    ],
+    type: 'TagGroup',
+  },
+  {
+    id: 'Project Management',
+    relatedTags: [
+      {
+        id: 'Billable',
+        type: 'SimpleTag',
+      },
+    ],
+    type: 'TagGroup',
+  },
+  {
+    id: 'Maintenance & Support',
+    relatedTags: [
+      {
+        id: 'Billable',
+        type: 'SimpleTag',
+      },
+    ],
+    type: 'TagGroup',
+  },
 ]

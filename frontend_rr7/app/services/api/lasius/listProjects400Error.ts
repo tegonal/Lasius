@@ -3,12 +3,12 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 
-export type ListProjects400Error =
-	(typeof ListProjects400Error)[keyof typeof ListProjects400Error]
+export type ListProjects400Error = typeof ListProjects400Error[keyof typeof ListProjects400Error];
+
 
 export const ListProjects400Error = {
-	list_projects_failed: 'list_projects_failed',
-} as const
+  list_projects_failed: 'list_projects_failed',
+} as const;

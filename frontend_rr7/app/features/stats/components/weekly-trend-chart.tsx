@@ -29,11 +29,11 @@ import { decimalHoursToDurationString } from '~/lib/utils/duration'
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 export type WeekData = {
-	hours: number
-	plannedHours: number
-	weekLabel: string
-	weekNumber: number
-	year: number
+  hours: number
+  plannedHours: number
+  weekLabel: string
+  weekNumber: number
+  year: number
 }
 
 // ─── Empty State ─────────────────────────────────────────────────────────────
@@ -43,133 +43,133 @@ export type WeekData = {
  * Shows actual hours vs planned hours with visual indicators for overtime.
  */
 export const WeeklyTrendChart = ({
-	tickEvery,
-	weeklyData,
+  tickEvery,
+  weeklyData,
 }: {
-	tickEvery?: number
-	weeklyData: WeekData[]
+  tickEvery?: number
+  weeklyData: WeekData[]
 }) => {
-	const { t } = useTranslation('common')
-	const nivoColors = useNivoColors()
+  const { t } = useTranslation('common')
+  const nivoColors = useNivoColors()
 
-	if (!weeklyData || weeklyData.length === 0) {
-		return (
-			<div className="h-64 w-full">
-				<EmptyStateStats />
-			</div>
-		)
-	}
+  if (!weeklyData || weeklyData.length === 0) {
+    return (
+      <div className="h-64 w-full">
+        <EmptyStateStats />
+      </div>
+    )
+  }
 
-	// Transform data for Nivo
-	const chartData = [
-		{
-			data: weeklyData.map((week) => ({
-				x: week.weekLabel,
-				y: week.hours,
-			})),
-			id: t('workHealth.actualHours', { defaultValue: 'actual' }),
-		},
-		{
-			data: weeklyData.map((week) => ({
-				x: week.weekLabel,
-				y: week.plannedHours,
-			})),
-			id: t('workHealth.plannedHours', { defaultValue: 'planned' }),
-		},
-	]
+  // Transform data for Nivo
+  const chartData = [
+    {
+      data: weeklyData.map((week) => ({
+        x: week.weekLabel,
+        y: week.hours,
+      })),
+      id: t('workHealth.actualHours', { defaultValue: 'actual' }),
+    },
+    {
+      data: weeklyData.map((week) => ({
+        x: week.weekLabel,
+        y: week.plannedHours,
+      })),
+      id: t('workHealth.plannedHours', { defaultValue: 'planned' }),
+    },
+  ]
 
-	// Calculate max value for Y axis to determine tick values
-	const maxHours = Math.max(
-		...weeklyData.map((w) => w.hours),
-		...weeklyData.map((w) => w.plannedHours),
-	)
-	const tickStep = maxHours > 100 ? 20 : maxHours > 50 ? 10 : 5
+  // Calculate max value for Y axis to determine tick values
+  const maxHours = Math.max(
+    ...weeklyData.map((w) => w.hours),
+    ...weeklyData.map((w) => w.plannedHours),
+  )
+  const tickStep = maxHours > 100 ? 20 : maxHours > 50 ? 10 : 5
 
-	return (
-		<div className="h-64 w-full">
-			<ResponsiveLine
-				areaOpacity={0.1}
-				axisBottom={{
-					format: (value: string) => value.replace(/\/\d{4}$/, ''),
-					tickPadding: 5,
-					tickRotation: -45,
-					tickSize: 5,
-					tickValues: tickEvery
-						? weeklyData
-								.filter((_, i) => i % tickEvery === 0)
-								.map((w) => w.weekLabel)
-						: undefined,
-				}}
-				axisLeft={{
-					format: (value) => decimalHoursToDurationString(value),
-					tickPadding: 5,
-					tickRotation: 0,
-					tickSize: 5,
-					tickValues: tickStep,
-				}}
-				axisRight={null}
-				axisTop={null}
-				colors={nivoColors}
-				curve="monotoneX"
-				data={chartData}
-				enableArea={true}
-				enableGridX={false}
-				enablePoints={true}
-				legends={[
-					{
-						anchor: 'top-left',
-						direction: 'row',
-						effects: [
-							{
-								on: 'hover',
-								style: {
-									itemBackground: 'rgba(0, 0, 0, .03)',
-									itemOpacity: 1,
-								},
-							},
-						],
-						itemDirection: 'left-to-right',
-						itemHeight: 20,
-						itemOpacity: 0.75,
-						itemsSpacing: 20,
-						itemWidth: 100,
-						justify: false,
-						symbolBorderColor: 'rgba(0, 0, 0, .5)',
-						symbolShape: 'circle',
-						symbolSize: 12,
-						translateX: 0,
-						translateY: -20,
-					},
-				]}
-				margin={{ bottom: 40, left: 50, right: 20, top: 20 }}
-				pointBorderColor={{ from: 'serieColor' }}
-				pointBorderWidth={2}
-				pointColor={{ theme: 'background' }}
-				pointLabelYOffset={-12}
-				pointSize={8}
-				theme={nivoTheme}
-				tooltip={({ point }: { point: Point }) => (
-					<div className="bg-base-100 border-base-300 rounded-lg border px-3 py-2 shadow-lg">
-						<div className="text-sm font-medium">{String(point.seriesId)}</div>
-						<div className="text-base-content/60 text-sm">
-							{point.data.x}:{' '}
-							<strong>
-								{decimalHoursToDurationString(point.data.y as number)}
-							</strong>
-						</div>
-					</div>
-				)}
-				useMesh={true}
-				xScale={{ type: 'point' }}
-				yFormat={(value) => decimalHoursToDurationString(value)}
-				yScale={{
-					max: 'auto',
-					min: 0,
-					reverse: false,
-					stacked: false,
-					type: 'linear',
-				}}
-			/>
-		</div>
-	)
+  return (
+    <div className="h-64 w-full">
+      <ResponsiveLine
+        areaOpacity={0.1}
+        axisBottom={{
+          format: (value: string) => value.replace(/\/\d{4}$/, ''),
+          tickPadding: 5,
+          tickRotation: -45,
+          tickSize: 5,
+          tickValues: tickEvery
+            ? weeklyData
+                .filter((_, i) => i % tickEvery === 0)
+                .map((w) => w.weekLabel)
+            : undefined,
+        }}
+        axisLeft={{
+          format: (value) => decimalHoursToDurationString(value),
+          tickPadding: 5,
+          tickRotation: 0,
+          tickSize: 5,
+          tickValues: tickStep,
+        }}
+        axisRight={null}
+        axisTop={null}
+        colors={nivoColors}
+        curve="monotoneX"
+        data={chartData}
+        enableArea={true}
+        enableGridX={false}
+        enablePoints={true}
+        legends={[
+          {
+            anchor: 'top-left',
+            direction: 'row',
+            effects: [
+              {
+                on: 'hover',
+                style: {
+                  itemBackground: 'rgba(0, 0, 0, .03)',
+                  itemOpacity: 1,
+                },
+              },
+            ],
+            itemDirection: 'left-to-right',
+            itemHeight: 20,
+            itemOpacity: 0.75,
+            itemsSpacing: 20,
+            itemWidth: 100,
+            justify: false,
+            symbolBorderColor: 'rgba(0, 0, 0, .5)',
+            symbolShape: 'circle',
+            symbolSize: 12,
+            translateX: 0,
+            translateY: -20,
+          },
+        ]}
+        margin={{ bottom: 40, left: 50, right: 20, top: 20 }}
+        pointBorderColor={{ from: 'serieColor' }}
+        pointBorderWidth={2}
+        pointColor={{ theme: 'background' }}
+        pointLabelYOffset={-12}
+        pointSize={8}
+        theme={nivoTheme}
+        tooltip={({ point }: { point: Point }) => (
+          <div className="bg-base-100 border-base-300 rounded-lg border px-3 py-2 shadow-lg">
+            <div className="text-sm font-medium">{String(point.seriesId)}</div>
+            <div className="text-base-content/60 text-sm">
+              {point.data.x}:{' '}
+              <strong>
+                {decimalHoursToDurationString(point.data.y as number)}
+              </strong>
+            </div>
+          </div>
+        )}
+        useMesh={true}
+        xScale={{ type: 'point' }}
+        yFormat={(value) => decimalHoursToDurationString(value)}
+        yScale={{
+          max: 'auto',
+          min: 0,
+          reverse: false,
+          stacked: false,
+          type: 'linear',
+        }}
+      />
+    </div>
+  )
 }

@@ -3,34 +3,34 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { ModelsCreateIssueImporterConfigResourceOwnerType } from './modelsCreateIssueImporterConfigResourceOwnerType'
 import type { ModelsImporterType } from './modelsImporterType'
 
 export interface ModelsCreateIssueImporterConfig {
-	importerType: ModelsImporterType
-	name: string
-	baseUrl: string
-	checkFrequency: number
-	/** @nullable */
-	accessToken?: string | null
-	/** @nullable */
-	consumerKey?: string | null
-	/** @nullable */
-	privateKey?: string | null
-	/** @nullable */
-	apiKey?: string | null
-	/** @nullable */
-	workspace?: string | null
-	/**
-	 * GitHub resource owner (organization or user login) for the token
-	 * @nullable
-	 */
-	resourceOwner?: string | null
-	/**
-	 * Type of the resource owner (User or Organization)
-	 * @nullable
-	 */
-	resourceOwnerType?: ModelsCreateIssueImporterConfigResourceOwnerType
+  importerType: ModelsImporterType
+  name: string
+  baseUrl: string
+  checkFrequency: number
+  /** @nullable */
+  accessToken?: string | null
+  /** @nullable */
+  consumerKey?: string | null
+  /** @nullable */
+  privateKey?: string | null
+  /** @nullable */
+  apiKey?: string | null
+  /** @nullable */
+  workspace?: string | null
+  /**
+   * GitHub resource owner (organization or user login) for the token
+   * @nullable
+   */
+  resourceOwner?: string | null
+  /**
+   * Type of the resource owner (User or Organization)
+   * @nullable
+   */
+  resourceOwnerType?: ModelsCreateIssueImporterConfigResourceOwnerType
 }

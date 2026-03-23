@@ -27,73 +27,73 @@ import { ScrollArea } from '~/components/ui/layouts/scroll-area'
 import { cn } from '~/lib/utils/cn'
 
 export type IconTabsItem = {
-	component: ReactNode
-	icon: LucideIconType
-	id: string
-	name: string
-	routes?: string[]
+  component: ReactNode
+  icon: LucideIconType
+  id: string
+  name: string
+  routes?: string[]
 }
 
 export const IconTabs = ({
-	onSelect,
-	position = 'top',
-	selected,
-	tabs,
+  onSelect,
+  position = 'top',
+  selected,
+  tabs,
 }: {
-	onSelect: (index: number) => void
-	position?: 'left' | 'top'
-	selected: number
-	tabs: IconTabsItem[]
+  onSelect: (index: number) => void
+  position?: 'left' | 'top'
+  selected: number
+  tabs: IconTabsItem[]
 }) => {
-	const itemRefs = useRef<(HTMLElement | null)[]>([])
+  const itemRefs = useRef<(HTMLElement | null)[]>([])
 
-	return (
-		<div
-			className={cn(
-				'relative grid h-full w-full justify-stretch gap-0 overflow-hidden',
-				position === 'top'
-					? 'grid-rows-[min-content_auto]'
-					: 'grid-cols-[min-content_auto]',
-			)}
-		>
-			<div
-				className={cn(
-					'relative flex',
-					position === 'top'
-						? 'border-base-content/10 flex-row justify-center border-b pt-2 lg:pt-4 xl:pt-6'
-						: 'border-base-content/10 mr-2 flex-col justify-start gap-2 border-r',
-				)}
-			>
-				<SlidingIndicator
-					itemRefs={itemRefs}
-					radiusOn={position}
-					selectedIndex={selected}
-				/>
-				{tabs.map((item, index) => (
-					<div
-						className={cn('relative z-10', index === selected && 'selected')}
-						key={item.id}
-						ref={(el) => {
-							itemRefs.current[index] = el
-						}}
-					>
-						<Button
-							aria-label={item.name}
-							className="relative z-20"
-							data-testid={`nav-tab-${item.id}`}
-							fullWidth={false}
-							onClick={() => onSelect(index)}
-							title={item.name}
-							variant="tabs"
-						>
-							<LucideIcon icon={item.icon} size={24} />
-						</Button>
-					</div>
-				))}
-			</div>
-			<ScrollArea className={position === 'top' ? 'pt-2' : ''}>
-				{tabs[selected]?.component}
-			</ScrollArea>
-		</div>
-	)
+  return (
+    <div
+      className={cn(
+        'relative grid h-full w-full justify-stretch gap-0 overflow-hidden',
+        position === 'top'
+          ? 'grid-rows-[min-content_auto]'
+          : 'grid-cols-[min-content_auto]',
+      )}
+    >
+      <div
+        className={cn(
+          'relative flex',
+          position === 'top'
+            ? 'border-base-content/10 flex-row justify-center border-b pt-2 lg:pt-4 xl:pt-6'
+            : 'border-base-content/10 mr-2 flex-col justify-start gap-2 border-r',
+        )}
+      >
+        <SlidingIndicator
+          itemRefs={itemRefs}
+          radiusOn={position}
+          selectedIndex={selected}
+        />
+        {tabs.map((item, index) => (
+          <div
+            className={cn('relative z-10', index === selected && 'selected')}
+            key={item.id}
+            ref={(el) => {
+              itemRefs.current[index] = el
+            }}
+          >
+            <Button
+              aria-label={item.name}
+              className="relative z-20"
+              data-testid={`nav-tab-${item.id}`}
+              fullWidth={false}
+              onClick={() => onSelect(index)}
+              title={item.name}
+              variant="tabs"
+            >
+              <LucideIcon icon={item.icon} size={24} />
+            </Button>
+          </div>
+        ))}
+      </div>
+      <ScrollArea className={position === 'top' ? 'pt-2' : ''}>
+        {tabs[selected]?.component}
+      </ScrollArea>
+    </div>
+  )
 }

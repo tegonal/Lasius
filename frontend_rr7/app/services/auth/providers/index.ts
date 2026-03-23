@@ -23,8 +23,8 @@ import { type AuthProvider, type OAuthProvider } from '../types'
 import { createGitHubProvider } from './github.server'
 import { createGitLabProvider } from './gitlab.server'
 import {
-	createInternalProvider,
-	type InternalOAuthProvider,
+  createInternalProvider,
+  type InternalOAuthProvider,
 } from './internal.server'
 import { createKeycloakProvider } from './keycloak.server'
 
@@ -45,55 +45,55 @@ const providerCache = new Map<AuthProvider, OAuthProvider>()
  * - gitlab: enabled if GITLAB_OAUTH_CLIENT_ID is set
  */
 export function getEnabledProviders(): AuthProvider[] {
-	const providers: AuthProvider[] = []
+  const providers: AuthProvider[] = []
 
-	if (getServerEnv('LASIUS_OAUTH_CLIENT_ID')) {
-		providers.push('internal')
-	}
-	if (getServerEnv('KEYCLOAK_OAUTH_CLIENT_ID')) {
-		providers.push('keycloak')
-	}
-	if (getServerEnv('GITHUB_OAUTH_CLIENT_ID')) {
-		providers.push('github')
-	}
-	if (getServerEnv('GITLAB_OAUTH_CLIENT_ID')) {
-		providers.push('gitlab')
-	}
+  if (getServerEnv('LASIUS_OAUTH_CLIENT_ID')) {
+    providers.push('internal')
+  }
+  if (getServerEnv('KEYCLOAK_OAUTH_CLIENT_ID')) {
+    providers.push('keycloak')
+  }
+  if (getServerEnv('GITHUB_OAUTH_CLIENT_ID')) {
+    providers.push('github')
+  }
+  if (getServerEnv('GITLAB_OAUTH_CLIENT_ID')) {
+    providers.push('gitlab')
+  }
 
-	return providers
+  return providers
 }
 
 /** Get the internal provider (typed with loginWithCredentials) */
 export function getInternalProvider(): InternalOAuthProvider {
-	return getProvider('internal') as InternalOAuthProvider
+  return getProvider('internal') as InternalOAuthProvider
 }
 
 /** Get a provider instance by issuer name. Throws if not enabled. */
 export function getProvider(issuer: AuthProvider): OAuthProvider {
-	const cached = providerCache.get(issuer)
-	if (cached) return cached
+  const cached = providerCache.get(issuer)
+  if (cached) return cached
 
-	const provider = createProvider(issuer)
-	providerCache.set(issuer, provider)
-	return provider
+  const provider = createProvider(issuer)
+  providerCache.set(issuer, provider)
+  return provider
 }
 
 /** Check if a specific provider is enabled */
 export function isProviderEnabled(provider: AuthProvider): boolean {
-	return getEnabledProviders().includes(provider)
+  return getEnabledProviders().includes(provider)
 }
 
 function createProvider(issuer: AuthProvider): OAuthProvider {
-	switch (issuer) {
-		case 'github':
-			return createGitHubProvider()
-		case 'gitlab':
-			return createGitLabProvider()
-		case 'internal':
-			return createInternalProvider()
-		case 'keycloak':
-			return createKeycloakProvider()
-		default:
-			throw new Error(`Unknown auth provider: ${issuer as string}`)
-	}
+  switch (issuer) {
+    case 'github':
+      return createGitHubProvider()
+    case 'gitlab':
+      return createGitLabProvider()
+    case 'internal':
+      return createInternalProvider()
+    case 'keycloak':
+      return createKeycloakProvider()
+    default:
+      throw new Error(`Unknown auth provider: ${issuer as string}`)
+  }
 }

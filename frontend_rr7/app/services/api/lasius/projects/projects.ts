@@ -3,302 +3,302 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type {
-	ModelsCreateProject,
-	ModelsInvitationResult,
-	ModelsProject,
-	ModelsUpdateProject,
-	ModelsUserStub,
-	ModelsUserToProjectAssignment,
+  ModelsCreateProject,
+  ModelsInvitationResult,
+  ModelsProject,
+  ModelsUpdateProject,
+  ModelsUserStub,
+  ModelsUserToProjectAssignment,
 } from './..'
 
 import { lasiusFetch } from '../../lasius-fetch-instance'
 
 export type getProjectListResponse200 = {
-	data: ModelsProject[]
-	status: 200
+  data: ModelsProject[]
+  status: 200
 }
 
 export type getProjectListResponseSuccess = getProjectListResponse200 & {
-	headers: Headers
+  headers: Headers
 }
 export type getProjectListResponse = getProjectListResponseSuccess
 
 export const getGetProjectListUrl = (orgId: string) => {
-	return `/organisations/${orgId}/projects`
+  return `/organisations/${orgId}/projects`
 }
 
 export const getProjectList = async (
-	orgId: string,
-	options?: RequestInit,
+  orgId: string,
+  options?: RequestInit,
 ): Promise<getProjectListResponse> => {
-	return lasiusFetch<getProjectListResponse>(getGetProjectListUrl(orgId), {
-		...options,
-		method: 'GET',
-	})
+  return lasiusFetch<getProjectListResponse>(getGetProjectListUrl(orgId), {
+    ...options,
+    method: 'GET',
+  })
 }
 
 export type createProjectResponse201 = {
-	data: ModelsProject
-	status: 201
+  data: ModelsProject
+  status: 201
 }
 
 export type createProjectResponseSuccess = createProjectResponse201 & {
-	headers: Headers
+  headers: Headers
 }
 export type createProjectResponse = createProjectResponseSuccess
 
 export const getCreateProjectUrl = (orgId: string) => {
-	return `/organisations/${orgId}/projects`
+  return `/organisations/${orgId}/projects`
 }
 
 export const createProject = async (
-	orgId: string,
-	modelsCreateProject: ModelsCreateProject,
-	options?: RequestInit,
+  orgId: string,
+  modelsCreateProject: ModelsCreateProject,
+  options?: RequestInit,
 ): Promise<createProjectResponse> => {
-	return lasiusFetch<createProjectResponse>(getCreateProjectUrl(orgId), {
-		...options,
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json', ...options?.headers },
-		body: JSON.stringify(modelsCreateProject),
-	})
+  return lasiusFetch<createProjectResponse>(getCreateProjectUrl(orgId), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(modelsCreateProject),
+  })
 }
 
 /**
  * @summary update a project
  */
 export type updateProjectResponse200 = {
-	data: ModelsProject
-	status: 200
+  data: ModelsProject
+  status: 200
 }
 
 export type updateProjectResponseSuccess = updateProjectResponse200 & {
-	headers: Headers
+  headers: Headers
 }
 export type updateProjectResponse = updateProjectResponseSuccess
 
 export const getUpdateProjectUrl = (orgId: string, projectId: string) => {
-	return `/organisations/${orgId}/projects/${projectId}`
+  return `/organisations/${orgId}/projects/${projectId}`
 }
 
 export const updateProject = async (
-	orgId: string,
-	projectId: string,
-	modelsUpdateProject: ModelsUpdateProject,
-	options?: RequestInit,
+  orgId: string,
+  projectId: string,
+  modelsUpdateProject: ModelsUpdateProject,
+  options?: RequestInit,
 ): Promise<updateProjectResponse> => {
-	return lasiusFetch<updateProjectResponse>(
-		getUpdateProjectUrl(orgId, projectId),
-		{
-			...options,
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json', ...options?.headers },
-			body: JSON.stringify(modelsUpdateProject),
-		},
-	)
+  return lasiusFetch<updateProjectResponse>(
+    getUpdateProjectUrl(orgId, projectId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(modelsUpdateProject),
+    },
+  )
 }
 
 /**
  * @summary Deactivate a project
  */
 export type deactivateProjectResponse200 = {
-	data: void
-	status: 200
+  data: void
+  status: 200
 }
 
 export type deactivateProjectResponseSuccess = deactivateProjectResponse200 & {
-	headers: Headers
+  headers: Headers
 }
 export type deactivateProjectResponse = deactivateProjectResponseSuccess
 
 export const getDeactivateProjectUrl = (orgId: string, projectId: string) => {
-	return `/organisations/${orgId}/projects/${projectId}`
+  return `/organisations/${orgId}/projects/${projectId}`
 }
 
 export const deactivateProject = async (
-	orgId: string,
-	projectId: string,
-	options?: RequestInit,
+  orgId: string,
+  projectId: string,
+  options?: RequestInit,
 ): Promise<deactivateProjectResponse> => {
-	return lasiusFetch<deactivateProjectResponse>(
-		getDeactivateProjectUrl(orgId, projectId),
-		{
-			...options,
-			method: 'DELETE',
-		},
-	)
+  return lasiusFetch<deactivateProjectResponse>(
+    getDeactivateProjectUrl(orgId, projectId),
+    {
+      ...options,
+      method: 'DELETE',
+    },
+  )
 }
 
 export type getProjectUserListResponse200 = {
-	data: ModelsUserStub[]
-	status: 200
+  data: ModelsUserStub[]
+  status: 200
 }
 
 export type getProjectUserListResponseSuccess =
-	getProjectUserListResponse200 & {
-		headers: Headers
-	}
+  getProjectUserListResponse200 & {
+    headers: Headers
+  }
 export type getProjectUserListResponse = getProjectUserListResponseSuccess
 
 export const getGetProjectUserListUrl = (orgId: string, projectId: string) => {
-	return `/organisations/${orgId}/projects/${projectId}/users`
+  return `/organisations/${orgId}/projects/${projectId}/users`
 }
 
 export const getProjectUserList = async (
-	orgId: string,
-	projectId: string,
-	options?: RequestInit,
+  orgId: string,
+  projectId: string,
+  options?: RequestInit,
 ): Promise<getProjectUserListResponse> => {
-	return lasiusFetch<getProjectUserListResponse>(
-		getGetProjectUserListUrl(orgId, projectId),
-		{
-			...options,
-			method: 'GET',
-		},
-	)
+  return lasiusFetch<getProjectUserListResponse>(
+    getGetProjectUserListUrl(orgId, projectId),
+    {
+      ...options,
+      method: 'GET',
+    },
+  )
 }
 
 export type inviteProjectUserResponse201 = {
-	data: ModelsInvitationResult
-	status: 201
+  data: ModelsInvitationResult
+  status: 201
 }
 
 export type inviteProjectUserResponseSuccess = inviteProjectUserResponse201 & {
-	headers: Headers
+  headers: Headers
 }
 export type inviteProjectUserResponse = inviteProjectUserResponseSuccess
 
 export const getInviteProjectUserUrl = (orgId: string, projectId: string) => {
-	return `/organisations/${orgId}/projects/${projectId}/users`
+  return `/organisations/${orgId}/projects/${projectId}/users`
 }
 
 export const inviteProjectUser = async (
-	orgId: string,
-	projectId: string,
-	modelsUserToProjectAssignment: ModelsUserToProjectAssignment,
-	options?: RequestInit,
+  orgId: string,
+  projectId: string,
+  modelsUserToProjectAssignment: ModelsUserToProjectAssignment,
+  options?: RequestInit,
 ): Promise<inviteProjectUserResponse> => {
-	return lasiusFetch<inviteProjectUserResponse>(
-		getInviteProjectUserUrl(orgId, projectId),
-		{
-			...options,
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json', ...options?.headers },
-			body: JSON.stringify(modelsUserToProjectAssignment),
-		},
-	)
+  return lasiusFetch<inviteProjectUserResponse>(
+    getInviteProjectUserUrl(orgId, projectId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(modelsUserToProjectAssignment),
+    },
+  )
 }
 
 /**
  * Get last activity date for a project.
  */
 export type getProjectLastActivityDateResponse200 = {
-	data: string
-	status: 200
+  data: string
+  status: 200
 }
 
 export type getProjectLastActivityDateResponse204 = {
-	data: void
-	status: 204
+  data: void
+  status: 204
 }
 
 export type getProjectLastActivityDateResponseSuccess = (
-	| getProjectLastActivityDateResponse200
-	| getProjectLastActivityDateResponse204
+  | getProjectLastActivityDateResponse200
+  | getProjectLastActivityDateResponse204
 ) & {
-	headers: Headers
+  headers: Headers
 }
 export type getProjectLastActivityDateResponse =
-	getProjectLastActivityDateResponseSuccess
+  getProjectLastActivityDateResponseSuccess
 
 export const getGetProjectLastActivityDateUrl = (
-	orgId: string,
-	projectId: string,
+  orgId: string,
+  projectId: string,
 ) => {
-	return `/organisations/${orgId}/projects/${projectId}/last-activity`
+  return `/organisations/${orgId}/projects/${projectId}/last-activity`
 }
 
 export const getProjectLastActivityDate = async (
-	orgId: string,
-	projectId: string,
-	options?: RequestInit,
+  orgId: string,
+  projectId: string,
+  options?: RequestInit,
 ): Promise<getProjectLastActivityDateResponse> => {
-	return lasiusFetch<getProjectLastActivityDateResponse>(
-		getGetProjectLastActivityDateUrl(orgId, projectId),
-		{
-			...options,
-			method: 'GET',
-		},
-	)
+  return lasiusFetch<getProjectLastActivityDateResponse>(
+    getGetProjectLastActivityDateUrl(orgId, projectId),
+    {
+      ...options,
+      method: 'GET',
+    },
+  )
 }
 
 export type removeProjectUserResponse200 = {
-	data: void
-	status: 200
+  data: void
+  status: 200
 }
 
 export type removeProjectUserResponseSuccess = removeProjectUserResponse200 & {
-	headers: Headers
+  headers: Headers
 }
 export type removeProjectUserResponse = removeProjectUserResponseSuccess
 
 export const getRemoveProjectUserUrl = (
-	orgId: string,
-	projectId: string,
-	userId: string,
+  orgId: string,
+  projectId: string,
+  userId: string,
 ) => {
-	return `/organisations/${orgId}/projects/${projectId}/users/${userId}`
+  return `/organisations/${orgId}/projects/${projectId}/users/${userId}`
 }
 
 export const removeProjectUser = async (
-	orgId: string,
-	projectId: string,
-	userId: string,
-	options?: RequestInit,
+  orgId: string,
+  projectId: string,
+  userId: string,
+  options?: RequestInit,
 ): Promise<removeProjectUserResponse> => {
-	return lasiusFetch<removeProjectUserResponse>(
-		getRemoveProjectUserUrl(orgId, projectId, userId),
-		{
-			...options,
-			method: 'DELETE',
-		},
-	)
+  return lasiusFetch<removeProjectUserResponse>(
+    getRemoveProjectUserUrl(orgId, projectId, userId),
+    {
+      ...options,
+      method: 'DELETE',
+    },
+  )
 }
 
 /**
  * @summary Remove current user's membership from selected project and selected organisation
  */
 export type removeProjectOwnUserResponse200 = {
-	data: void
-	status: 200
+  data: void
+  status: 200
 }
 
 export type removeProjectOwnUserResponseSuccess =
-	removeProjectOwnUserResponse200 & {
-		headers: Headers
-	}
+  removeProjectOwnUserResponse200 & {
+    headers: Headers
+  }
 export type removeProjectOwnUserResponse = removeProjectOwnUserResponseSuccess
 
 export const getRemoveProjectOwnUserUrl = (
-	orgId: string,
-	projectId: string,
+  orgId: string,
+  projectId: string,
 ) => {
-	return `/organisations/${orgId}/projects/${projectId}/leave`
+  return `/organisations/${orgId}/projects/${projectId}/leave`
 }
 
 export const removeProjectOwnUser = async (
-	orgId: string,
-	projectId: string,
-	options?: RequestInit,
+  orgId: string,
+  projectId: string,
+  options?: RequestInit,
 ): Promise<removeProjectOwnUserResponse> => {
-	return lasiusFetch<removeProjectOwnUserResponse>(
-		getRemoveProjectOwnUserUrl(orgId, projectId),
-		{
-			...options,
-			method: 'DELETE',
-		},
-	)
+  return lasiusFetch<removeProjectOwnUserResponse>(
+    getRemoveProjectOwnUserUrl(orgId, projectId),
+    {
+      ...options,
+      method: 'DELETE',
+    },
+  )
 }

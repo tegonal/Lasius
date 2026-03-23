@@ -29,17 +29,17 @@ import { FormErrorBadge } from '~/components/ui/forms/form-error-badge'
 import { Modal } from '~/components/ui/overlays/modal'
 
 type Props = {
-	open: boolean
-	onClose: () => void
-	onConfirm: () => void
-	register: UseFormRegister<any>
-	fieldName: string
-	label: string
-	placeholder: string
-	confirmLabel: string
-	cancelLabel?: string
-	error?: FieldError
-	enableEnterKey?: boolean
+  cancelLabel?: string
+  confirmLabel: string
+  enableEnterKey?: boolean
+  error?: FieldError
+  fieldName: string
+  label: string
+  onClose: () => void
+  onConfirm: () => void
+  open: boolean
+  placeholder: string
+  register: UseFormRegister<any>
 }
 
 /**
@@ -47,46 +47,46 @@ type Props = {
  * Consolidates TagGroupAddModal and TagGroupAddTagModal patterns
  */
 export const GenericInputModal = ({
-	open,
-	onClose,
-	onConfirm,
-	register,
-	fieldName,
-	label,
-	placeholder,
-	confirmLabel,
-	cancelLabel = 'Close',
-	error,
-	enableEnterKey = false,
+  cancelLabel = 'Close',
+  confirmLabel,
+  enableEnterKey = false,
+  error,
+  fieldName,
+  label,
+  onClose,
+  onConfirm,
+  open,
+  placeholder,
+  register,
 }: Props) => {
-	const handleKeyDown = (e: React.KeyboardEvent) => {
-		if (enableEnterKey && e.key === 'Enter') {
-			e.preventDefault()
-			onConfirm()
-		}
-	}
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (enableEnterKey && e.key === 'Enter') {
+      e.preventDefault()
+      onConfirm()
+    }
+  }
 
-	return (
-		<Modal open={open} onClose={onClose}>
-			<FormElement>
-				<Label htmlFor={fieldName}>{label}</Label>
-				<Input
-					{...register(fieldName)}
-					autoComplete="off"
-					placeholder={placeholder}
-					autoFocus
-					onKeyDown={enableEnterKey ? handleKeyDown : undefined}
-				/>
-				{error && <FormErrorBadge error={error} />}
-			</FormElement>
-			<ButtonGroup>
-				<Button type="button" variant="primary" onClick={onConfirm}>
-					{confirmLabel}
-				</Button>
-				<Button type="button" variant="secondary" onClick={onClose}>
-					{cancelLabel}
-				</Button>
-			</ButtonGroup>
-		</Modal>
-	)
+  return (
+    <Modal onClose={onClose} open={open}>
+      <FormElement>
+        <Label htmlFor={fieldName}>{label}</Label>
+        <Input
+          {...register(fieldName)}
+          autoComplete="off"
+          autoFocus
+          onKeyDown={enableEnterKey ? handleKeyDown : undefined}
+          placeholder={placeholder}
+        />
+        {error && <FormErrorBadge error={error} />}
+      </FormElement>
+      <ButtonGroup>
+        <Button onClick={onConfirm} type="button" variant="primary">
+          {confirmLabel}
+        </Button>
+        <Button onClick={onClose} type="button" variant="secondary">
+          {cancelLabel}
+        </Button>
+      </ButtonGroup>
+    </Modal>
+  )
 }

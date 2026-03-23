@@ -22,19 +22,19 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '~/lib/utils/cn'
 
 const contextBodyVariants = cva('flex items-center', {
-	defaultVariants: { variant: 'default' },
-	variants: {
-		variant: {
-			compact: 'relative h-full justify-center',
-			default: '',
-		},
-	},
+  defaultVariants: { variant: 'default' },
+  variants: {
+    variant: {
+      compact: 'relative h-full justify-center',
+      default: '',
+    },
+  },
 })
 
 type Props = VariantProps<typeof contextBodyVariants> & {
-	children: React.ReactNode
+  children: React.ReactNode
 }
 
 export const ContextBody = ({ children, variant = 'default' }: Props) => (
-	<div className={cn(contextBodyVariants({ variant }))}>{children}</div>
+  <div className={cn(contextBodyVariants({ variant }))}>{children}</div>
 )

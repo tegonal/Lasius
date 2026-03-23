@@ -36,101 +36,101 @@ import { BookingFrom } from './booking-from'
 import { BookingName } from './booking-name'
 
 export const BookingCurrent = () => {
-	const loaderData = useHomeLoaderData()
+  const loaderData = useHomeLoaderData()
 
-	const currentBooking = loaderData?.currentBooking
+  const currentBooking = loaderData?.currentBooking
 
-	return (
-		<div
-			className="bg-base-200 relative flex h-full min-h-[96px] w-full flex-row items-center gap-3 overflow-hidden px-2 py-3 sm:px-3 md:bg-transparent lg:px-4 [&>*]:w-full"
-			data-testid="booking-current-section"
-		>
-			{!currentBooking?.booking ? (
-				<NoBooking />
-			) : (
-				<ContextMenuProvider>
-					<CurrentBookingEntry
-						booking={currentBooking.booking}
-						selectedOrgId={loaderData?.selectedOrgId ?? ''}
-					/>
-				</ContextMenuProvider>
-			)}
-		</div>
-	)
+  return (
+    <div
+      className="bg-base-200 relative flex h-full min-h-[96px] w-full flex-row items-center gap-3 overflow-hidden px-2 py-3 sm:px-3 md:bg-transparent lg:px-4 [&>*]:w-full"
+      data-testid="booking-current-section"
+    >
+      {!currentBooking?.booking ? (
+        <NoBooking />
+      ) : (
+        <ContextMenuProvider>
+          <CurrentBookingEntry
+            booking={currentBooking.booking}
+            selectedOrgId={loaderData?.selectedOrgId ?? ''}
+          />
+        </ContextMenuProvider>
+      )}
+    </div>
+  )
 }
 
 const NoBooking = () => {
-	const { t } = useTranslation('common')
-	return (
-		<div className="flex h-full w-full flex-row items-center justify-center gap-3">
-			<div>
-				<LucideIcon icon={ClockIcon} size={24} />
-			</div>
-			<div>
-				{t('bookings.status.currentlyNotBooking', {
-					defaultValue: 'Currently not booking',
-				})}
-			</div>
-		</div>
-	)
+  const { t } = useTranslation('common')
+  return (
+    <div className="flex h-full w-full flex-row items-center justify-center gap-3">
+      <div>
+        <LucideIcon icon={ClockIcon} size={24} />
+      </div>
+      <div>
+        {t('bookings.status.currentlyNotBooking', {
+          defaultValue: 'Currently not booking',
+        })}
+      </div>
+    </div>
+  )
 }
 
 const CurrentBookingEntry = ({
-	booking,
-	selectedOrgId,
+  booking,
+  selectedOrgId,
 }: {
-	booking: ModelsBooking
-	selectedOrgId: string
+  booking: ModelsBooking
+  selectedOrgId: string
 }) => {
-	const { t } = useTranslation('common')
-	const stopBookingApi = useStopBooking()
+  const { t } = useTranslation('common')
+  const stopBookingApi = useStopBooking()
 
-	const stop = () => {
-		const endTime = roundToNearestMinutes(new Date(), {
-			roundingMethod: 'floor',
-		})
-		stopBookingApi.submit({
-			bookingId: booking.id,
-			end: formatISOLocale(endTime),
-			orgId: selectedOrgId,
-			projectId: booking.projectReference?.id || '',
-			start: booking.start?.dateTime || '',
-			tags: booking.tags || [],
-		})
-	}
+  const stop = () => {
+    const endTime = roundToNearestMinutes(new Date(), {
+      roundingMethod: 'floor',
+    })
+    stopBookingApi.submit({
+      bookingId: booking.id,
+      end: formatISOLocale(endTime),
+      orgId: selectedOrgId,
+      projectId: booking.projectReference?.id || '',
+      start: booking.start?.dateTime || '',
+      tags: booking.tags || [],
+    })
+  }
 
-	return (
-		<div className="grid h-full w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 lg:gap-4">
-			<Button
-				data-testid="booking-current-stop-btn"
-				fullWidth={false}
-				onClick={stop}
-				title={t('bookings.actions.stopRecording', {
-					defaultValue: 'Stop recording current time booking',
-				})}
-				variant="stopRecording"
-			>
-				<LucideIcon icon={SquareIcon} size={24} />
-			</Button>
-			<div className="flex w-full min-w-0 flex-col gap-1 overflow-hidden leading-normal">
-				<BookingName item={booking} />
-				<TagList items={booking.tags} />
-			</div>
-			<div className="flex flex-row items-center justify-center gap-2 lg:gap-4">
-				<div className="hidden h-full flex-row items-center justify-start gap-2 md:flex lg:gap-4">
-					<BookingFrom startDate={booking.start?.dateTime} />
-					<BookingDurationCounter
-						startDate={booking.start?.dateTime || formatISOLocale(new Date())}
-					/>
-				</div>
-				<div className="flex h-full flex-col items-end justify-center gap-1 md:hidden">
-					<BookingFrom startDate={booking.start?.dateTime} />
-					<BookingDurationCounter
-						startDate={booking.start?.dateTime || formatISOLocale(new Date())}
-					/>
-				</div>
-				<BookingCurrentEntryContext item={booking} />
-			</div>
-		</div>
-	)
+  return (
+    <div className="grid h-full w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 lg:gap-4">
+      <Button
+        data-testid="booking-current-stop-btn"
+        fullWidth={false}
+        onClick={stop}
+        title={t('bookings.actions.stopRecording', {
+          defaultValue: 'Stop recording current time booking',
+        })}
+        variant="stopRecording"
+      >
+        <LucideIcon icon={SquareIcon} size={24} />
+      </Button>
+      <div className="flex w-full min-w-0 flex-col gap-1 overflow-hidden leading-normal">
+        <BookingName item={booking} />
+        <TagList items={booking.tags} />
+      </div>
+      <div className="flex flex-row items-center justify-center gap-2 lg:gap-4">
+        <div className="hidden h-full flex-row items-center justify-start gap-2 md:flex lg:gap-4">
+          <BookingFrom startDate={booking.start?.dateTime} />
+          <BookingDurationCounter
+            startDate={booking.start?.dateTime || formatISOLocale(new Date())}
+          />
+        </div>
+        <div className="flex h-full flex-col items-end justify-center gap-1 md:hidden">
+          <BookingFrom startDate={booking.start?.dateTime} />
+          <BookingDurationCounter
+            startDate={booking.start?.dateTime || formatISOLocale(new Date())}
+          />
+        </div>
+        <BookingCurrentEntryContext item={booking} />
+      </div>
+    </div>
+  )
 }

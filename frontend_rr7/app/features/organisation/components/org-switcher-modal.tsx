@@ -30,73 +30,73 @@ import { type ModelsUserOrganisation } from '~/services/api/lasius/modelsUserOrg
 const noop = () => {}
 
 interface Props {
-	onClose?: () => void
-	onSelect?: (organisation: ModelsEntityReference) => void
-	selected?: ModelsEntityReference
+  onClose?: () => void
+  onSelect?: (organisation: ModelsEntityReference) => void
+  selected?: ModelsEntityReference
 }
 
 export const OrgSwitcherModal = ({
-	onClose = noop,
-	onSelect = noop,
-	selected,
+  onClose = noop,
+  onSelect = noop,
+  selected,
 }: Props) => {
-	const { t } = useTranslation('common')
-	const { organisations, selectedOrganisationId, setSelectedOrganisation } =
-		useOrganisation()
+  const { t } = useTranslation('common')
+  const { organisations, selectedOrganisationId, setSelectedOrganisation } =
+    useOrganisation()
 
-	const selectOrganisation = (orgReference: ModelsEntityReference) => {
-		setSelectedOrganisation(orgReference)
-		onSelect(orgReference)
-		onClose()
-	}
+  const selectOrganisation = (orgReference: ModelsEntityReference) => {
+    setSelectedOrganisation(orgReference)
+    onSelect(orgReference)
+    onClose()
+  }
 
-	const isCurrent = (item: ModelsUserOrganisation) => {
-		if (selected) {
-			return selected.id === item.organisationReference.id
-		}
-		return item.organisationReference.id === selectedOrganisationId
-	}
+  const isCurrent = (item: ModelsUserOrganisation) => {
+    if (selected) {
+      return selected.id === item.organisationReference.id
+    }
+    return item.organisationReference.id === selectedOrganisationId
+  }
 
-	return (
-		<div data-testid="org-switcher-modal">
-			<h1 className="mb-4 text-2xl font-bold">
-				{t('organisations.selectOrganisation', {
-					defaultValue: 'Select organisation',
-				})}
-			</h1>
-			<div className="grid grid-cols-3 gap-3">
-				{organisations.map((item) => (
-					<CardSmall
-						data-testid="org-card"
-						key={item.organisationReference.id}
-						onClick={() => selectOrganisation(item.organisationReference)}
-					>
-						<div className="flex flex-col items-center justify-center pt-2">
-							<AvatarOrganisation
-								name={item.organisationReference.key}
-								size={64}
-							/>
-						</div>
-						<div className="leading-normal">
-							{item.private
-								? t('organisations.myPersonalOrganisation', {
-										defaultValue: 'My personal organisation',
-									})
-								: item.organisationReference.key}
-						</div>
-						{isCurrent(item) && (
-							<div
-								className="absolute top-2 right-2"
-								title={t('common.selected', {
-									defaultValue: 'Selected',
-								})}
-							>
-								<LucideIcon icon={CheckCircleIcon} size={18} />
-							</div>
-						)}
-					</CardSmall>
-				))}
-			</div>
-		</div>
-	)
+  return (
+    <div data-testid="org-switcher-modal">
+      <h1 className="mb-4 text-2xl font-bold">
+        {t('organisations.selectOrganisation', {
+          defaultValue: 'Select organisation',
+        })}
+      </h1>
+      <div className="grid grid-cols-3 gap-3">
+        {organisations.map((item) => (
+          <CardSmall
+            data-testid="org-card"
+            key={item.organisationReference.id}
+            onClick={() => selectOrganisation(item.organisationReference)}
+          >
+            <div className="flex flex-col items-center justify-center pt-2">
+              <AvatarOrganisation
+                name={item.organisationReference.key}
+                size={64}
+              />
+            </div>
+            <div className="leading-normal">
+              {item.private
+                ? t('organisations.myPersonalOrganisation', {
+                    defaultValue: 'My personal organisation',
+                  })
+                : item.organisationReference.key}
+            </div>
+            {isCurrent(item) && (
+              <div
+                className="absolute top-2 right-2"
+                title={t('common.selected', {
+                  defaultValue: 'Selected',
+                })}
+              >
+                <LucideIcon icon={CheckCircleIcon} size={18} />
+              </div>
+            )}
+          </CardSmall>
+        ))}
+      </div>
+    </div>
+  )
 }

@@ -3,12 +3,12 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 
-export type ModelsJoinOrganisationInvitationType =
-	(typeof ModelsJoinOrganisationInvitationType)[keyof typeof ModelsJoinOrganisationInvitationType]
+export type ModelsJoinOrganisationInvitationType = typeof ModelsJoinOrganisationInvitationType[keyof typeof ModelsJoinOrganisationInvitationType];
+
 
 export const ModelsJoinOrganisationInvitationType = {
-	JoinOrganisationInvitation: 'JoinOrganisationInvitation',
-} as const
+  JoinOrganisationInvitation: 'JoinOrganisationInvitation',
+} as const;

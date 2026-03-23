@@ -20,34 +20,34 @@
 import Avatar from 'boring-avatars'
 
 const organisationAvatarPalette = [
-	'#4a4343',
-	'#52fbba',
-	'#fffa45',
-	'#ff1d00',
-	'#723431',
+  '#4a4343',
+  '#52fbba',
+  '#fffa45',
+  '#ff1d00',
+  '#723431',
 ]
 
 interface Props {
-	name: string
-	size?: number
+  name: string
+  size?: number
 }
 
 export const AvatarOrganisation = ({ name, size = 39 }: Props) => {
-	return (
-		<div
-			className="relative"
-			style={{
-				height: `${size}px`,
-				width: `${size}px`,
-			}}
-		>
-			<Avatar
-				colors={organisationAvatarPalette}
-				name={name}
-				size={size}
-				square={false}
-				variant="bauhaus"
-			/>
-		</div>
-	)
+  return (
+    <div
+      className="relative"
+      style={{
+        height: `${size}px`,
+        width: `${size}px`,
+      }}
+    >
+      <Avatar
+        colors={organisationAvatarPalette}
+        name={name}
+        size={size}
+        square={false}
+        variant="bauhaus"
+      />
+    </div>
+  )
 }

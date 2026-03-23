@@ -24,46 +24,46 @@ import { StatsTileHours } from '~/features/stats/components/stats-tile-hours'
 import { StatsTileNumber } from '~/features/stats/components/stats-tile-number'
 
 type Props = {
-	bookings: number
-	hours: number
-	projects?: number
-	users?: number
+  bookings: number
+  hours: number
+  projects?: number
+  users?: number
 }
 
 export const BookingHistoryStats = ({
-	bookings,
-	hours,
-	projects,
-	users,
+  bookings,
+  hours,
+  projects,
+  users,
 }: Props) => {
-	const { t } = useTranslation('common')
+  const { t } = useTranslation('common')
 
-	return (
-		<StatsGroup className="flex gap-4">
-			<StatsTileHours
-				label={t('common.units.hours', { defaultValue: 'Hours' })}
-				standalone={false}
-				value={hours}
-			/>
-			<StatsTileNumber
-				label={t('bookings.title', { defaultValue: 'Bookings' })}
-				standalone={false}
-				value={bookings}
-			/>
-			{users !== undefined && users > 1 && (
-				<StatsTileNumber
-					label={t('users.title', { defaultValue: 'Users' })}
-					standalone={false}
-					value={users}
-				/>
-			)}
-			{projects !== undefined && projects > 1 && (
-				<StatsTileNumber
-					label={t('projects.title', { defaultValue: 'Projects' })}
-					standalone={false}
-					value={projects}
-				/>
-			)}
-		</StatsGroup>
-	)
+  return (
+    <StatsGroup className="flex gap-4">
+      <StatsTileHours
+        label={t('common.units.hours', { defaultValue: 'Hours' })}
+        standalone={false}
+        value={hours}
+      />
+      <StatsTileNumber
+        label={t('bookings.title', { defaultValue: 'Bookings' })}
+        standalone={false}
+        value={bookings}
+      />
+      {users !== undefined && users > 1 && (
+        <StatsTileNumber
+          label={t('users.title', { defaultValue: 'Users' })}
+          standalone={false}
+          value={users}
+        />
+      )}
+      {projects !== undefined && projects > 1 && (
+        <StatsTileNumber
+          label={t('projects.title', { defaultValue: 'Projects' })}
+          standalone={false}
+          value={projects}
+        />
+      )}
+    </StatsGroup>
+  )
 }

@@ -23,20 +23,25 @@ import { type ReactNode } from 'react'
 import { cn } from '~/lib/utils/cn'
 
 export const ScrollArea = ({
-	children,
-	className,
+  children,
+  className,
+  onScroll,
 }: {
-	children: ReactNode
-	className?: string
+  children: ReactNode
+  className?: string
+  onScroll?: React.UIEventHandler<HTMLDivElement>
 }) => {
-	return (
-		<BaseScrollArea.Root className={cn('min-h-0', className)}>
-			<BaseScrollArea.Viewport className="h-full overscroll-contain">
-				<BaseScrollArea.Content>{children}</BaseScrollArea.Content>
-			</BaseScrollArea.Viewport>
-			<BaseScrollArea.Scrollbar className="pointer-events-none m-0.5 flex w-1 justify-center rounded-sm opacity-0 transition-opacity data-[hovering]:pointer-events-auto data-[hovering]:opacity-100 data-[hovering]:delay-0 data-[scrolling]:pointer-events-auto data-[scrolling]:opacity-100 data-[scrolling]:duration-0">
-				<BaseScrollArea.Thumb className="bg-base-content/20 w-full rounded-sm" />
-			</BaseScrollArea.Scrollbar>
-		</BaseScrollArea.Root>
-	)
+  return (
+    <BaseScrollArea.Root className={cn('min-h-0', className)}>
+      <BaseScrollArea.Viewport
+        className="h-full overscroll-contain"
+        onScroll={onScroll}
+      >
+        <BaseScrollArea.Content>{children}</BaseScrollArea.Content>
+      </BaseScrollArea.Viewport>
+      <BaseScrollArea.Scrollbar className="pointer-events-none m-0.5 flex w-1 justify-center rounded-sm opacity-0 transition-opacity data-[hovering]:pointer-events-auto data-[hovering]:opacity-100 data-[hovering]:delay-0 data-[scrolling]:pointer-events-auto data-[scrolling]:opacity-100 data-[scrolling]:duration-0">
+        <BaseScrollArea.Thumb className="bg-base-content/20 w-full rounded-sm" />
+      </BaseScrollArea.Scrollbar>
+    </BaseScrollArea.Root>
+  )
 }

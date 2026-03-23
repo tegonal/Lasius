@@ -18,18 +18,18 @@
  */
 
 import {
-	type LucideIcon as LucideIconType,
-	type LucideProps,
+  type LucideIcon as LucideIconType,
+  type LucideProps,
 } from 'lucide-react'
 
 // Global defaults for all Lucide icons
 const LUCIDE_DEFAULTS: Partial<LucideProps> = {
-	size: 26,
-	strokeWidth: 1.5,
+  size: 26,
+  strokeWidth: 1.5,
 }
 
 interface LucideIconProps extends LucideProps {
-	icon: LucideIconType
+  icon: LucideIconType
 }
 
 /**
@@ -38,5 +38,5 @@ interface LucideIconProps extends LucideProps {
  * Override defaults: <LucideIcon icon={HelpCircleIcon} size={24} strokeWidth={2} />
  */
 export const LucideIcon = ({ icon: Icon, ...props }: LucideIconProps) => {
-	return <Icon {...LUCIDE_DEFAULTS} {...props} />
+  return <Icon {...LUCIDE_DEFAULTS} {...props} />
 }

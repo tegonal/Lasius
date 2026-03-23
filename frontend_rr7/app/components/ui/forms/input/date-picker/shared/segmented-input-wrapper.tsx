@@ -25,91 +25,91 @@ import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 
 type SegmentedInputWrapperProps = {
-	children: React.ReactElement
-	hasSelection: boolean
-	label?: string
-	onArrowClick: (direction: 'down' | 'up') => void
+  children: React.ReactElement
+  hasSelection: boolean
+  label?: string
+  onArrowClick: (direction: 'down' | 'up') => void
 }
 
 export const SegmentedInputWrapper = ({
-	children,
-	hasSelection,
-	label,
-	onArrowClick,
+  children,
+  hasSelection,
+  label,
+  onArrowClick,
 }: SegmentedInputWrapperProps) => {
-	const { t } = useTranslation('common')
-	const [isHovered, setIsHovered] = useState(false)
-	const containerRef = useRef<HTMLDivElement>(null)
+  const { t } = useTranslation('common')
+  const [isHovered, setIsHovered] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
 
-	return (
-		<div
-			className="relative inline-block"
-			onMouseEnter={() => setIsHovered(true)}
-			onMouseLeave={() => setIsHovered(false)}
-			ref={containerRef}
-		>
-			{/* Up Arrow - positioned above input */}
-			<div
-				className={`absolute -top-6 right-0 left-0 flex justify-center transition-opacity ${
-					hasSelection || isHovered
-						? 'opacity-60 hover:opacity-100'
-						: 'pointer-events-none opacity-0'
-				}`}
-			>
-				<Button
-					aria-label={t('common.aria.increment', {
-						defaultValue: 'Increment',
-					})}
-					className="cursor-pointer rounded-t-full rounded-b-none"
-					onMouseDown={(e) => {
-						e.preventDefault()
-						onArrowClick('up')
-					}}
-					size="xs"
-					tabIndex={-1}
-					type="button"
-					variant="neutral"
-				>
-					<LucideIcon icon={ChevronUp} size={24} />
-				</Button>
-			</div>
-			<div className="join">{children}</div>
-			{/* Down Arrow - positioned below input */}
-			<div
-				className={`absolute right-0 -bottom-10 left-0 flex flex-col items-center ${
-					hasSelection || isHovered ? '' : 'pointer-events-none'
-				}`}
-			>
-				<Button
-					aria-label={t('common.aria.decrement', {
-						defaultValue: 'Decrement',
-					})}
-					className={`cursor-pointer rounded-t-none rounded-b-full transition-opacity ${
-						hasSelection || isHovered
-							? 'opacity-60 hover:opacity-100'
-							: 'opacity-0'
-					}`}
-					onMouseDown={(e) => {
-						e.preventDefault()
-						onArrowClick('down')
-					}}
-					size="xs"
-					tabIndex={-1}
-					type="button"
-					variant="neutral"
-				>
-					<LucideIcon icon={ChevronDown} size={24} />
-				</Button>
-				{label && (
-					<span
-						className={`text-base-content/60 mt-1 text-xs whitespace-nowrap transition-opacity ${
-							hasSelection || isHovered ? 'opacity-100' : 'opacity-0'
-						}`}
-					>
-						{label}
-					</span>
-				)}
-			</div>
-		</div>
-	)
+  return (
+    <div
+      className="relative inline-block"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      ref={containerRef}
+    >
+      {/* Up Arrow - positioned above input */}
+      <div
+        className={`absolute -top-6 right-0 left-0 flex justify-center transition-opacity ${
+          hasSelection || isHovered
+            ? 'opacity-60 hover:opacity-100'
+            : 'pointer-events-none opacity-0'
+        }`}
+      >
+        <Button
+          aria-label={t('common.aria.increment', {
+            defaultValue: 'Increment',
+          })}
+          className="cursor-pointer rounded-t-full rounded-b-none"
+          onMouseDown={(e) => {
+            e.preventDefault()
+            onArrowClick('up')
+          }}
+          size="xs"
+          tabIndex={-1}
+          type="button"
+          variant="neutral"
+        >
+          <LucideIcon icon={ChevronUp} size={24} />
+        </Button>
+      </div>
+      <div className="join">{children}</div>
+      {/* Down Arrow - positioned below input */}
+      <div
+        className={`absolute right-0 -bottom-10 left-0 flex flex-col items-center ${
+          hasSelection || isHovered ? '' : 'pointer-events-none'
+        }`}
+      >
+        <Button
+          aria-label={t('common.aria.decrement', {
+            defaultValue: 'Decrement',
+          })}
+          className={`cursor-pointer rounded-t-none rounded-b-full transition-opacity ${
+            hasSelection || isHovered
+              ? 'opacity-60 hover:opacity-100'
+              : 'opacity-0'
+          }`}
+          onMouseDown={(e) => {
+            e.preventDefault()
+            onArrowClick('down')
+          }}
+          size="xs"
+          tabIndex={-1}
+          type="button"
+          variant="neutral"
+        >
+          <LucideIcon icon={ChevronDown} size={24} />
+        </Button>
+        {label && (
+          <span
+            className={`text-base-content/60 mt-1 text-xs whitespace-nowrap transition-opacity ${
+              hasSelection || isHovered ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
+            {label}
+          </span>
+        )}
+      </div>
+    </div>
+  )
 }

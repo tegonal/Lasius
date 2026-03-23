@@ -22,7 +22,7 @@ import { redirect } from 'react-router'
 import { type Route } from './+types/dashboard._index'
 
 export const loader = ({ request }: Route.LoaderArgs) => {
-	const url = new URL(request.url)
-	const search = url.search || ''
-	throw redirect(`/user/dashboard/month${search}`)
+  const url = new URL(request.url)
+  const search = url.search || ''
+  throw redirect(`/user/dashboard/month${search}`)
 }

@@ -22,42 +22,42 @@ import { describe, expect, it } from 'vitest'
 import { stringHash } from './string-hash'
 
 describe('stringHash', () => {
-	it('returns a string', () => {
-		expect(typeof stringHash({ a: 1 })).toBe('string')
-	})
+  it('returns a string', () => {
+    expect(typeof stringHash({ a: 1 })).toBe('string')
+  })
 
-	it('returns the same hash for identical objects', () => {
-		const obj = { name: 'test', value: 42 }
-		expect(stringHash(obj)).toBe(stringHash(obj))
-	})
+  it('returns the same hash for identical objects', () => {
+    const obj = { name: 'test', value: 42 }
+    expect(stringHash(obj)).toBe(stringHash(obj))
+  })
 
-	it('returns different hashes for different objects', () => {
-		expect(stringHash({ a: 1 })).not.toBe(stringHash({ a: 2 }))
-	})
+  it('returns different hashes for different objects', () => {
+    expect(stringHash({ a: 1 })).not.toBe(stringHash({ a: 2 }))
+  })
 
-	it('returns a deterministic hash for empty object', () => {
-		const hash = stringHash({})
-		expect(hash).toBeTruthy()
-		expect(hash).toBe(stringHash({}))
-	})
+  it('returns a deterministic hash for empty object', () => {
+    const hash = stringHash({})
+    expect(hash).toBeTruthy()
+    expect(hash).toBe(stringHash({}))
+  })
 
-	it('handles nested objects', () => {
-		const nested = { a: { b: { c: 1 } } }
-		const hash = stringHash(nested)
-		expect(hash).toBeTruthy()
-		expect(hash).toBe(stringHash(nested))
-	})
+  it('handles nested objects', () => {
+    const nested = { a: { b: { c: 1 } } }
+    const hash = stringHash(nested)
+    expect(hash).toBeTruthy()
+    expect(hash).toBe(stringHash(nested))
+  })
 
-	it('handles arrays', () => {
-		const arr = [1, 2, 3]
-		const hash = stringHash(arr)
-		expect(hash).toBeTruthy()
-	})
+  it('handles arrays', () => {
+    const arr = [1, 2, 3]
+    const hash = stringHash(arr)
+    expect(hash).toBeTruthy()
+  })
 
-	it('produces consistent results across calls', () => {
-		const data = { project: 'abc', tags: ['x', 'y'] }
-		const first = stringHash(data)
-		const second = stringHash(data)
-		expect(first).toBe(second)
-	})
+  it('produces consistent results across calls', () => {
+    const data = { project: 'abc', tags: ['x', 'y'] }
+    const first = stringHash(data)
+    const second = stringHash(data)
+    expect(first).toBe(second)
+  })
 })

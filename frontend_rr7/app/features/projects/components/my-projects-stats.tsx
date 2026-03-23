@@ -25,39 +25,39 @@ import { StatsGroup } from '~/features/stats/components/stats-group'
 import { StatsTileNumber } from '~/features/stats/components/stats-tile-number'
 
 type Props = {
-	onCreateProject: () => void
+  onCreateProject: () => void
 }
 
 export const MyProjectsStats = ({ onCreateProject }: Props) => {
-	const { t } = useTranslation('common')
-	const { userProjects } = useProjects()
-	const projects = userProjects()
+  const { t } = useTranslation('common')
+  const { userProjects } = useProjects()
+  const projects = userProjects()
 
-	const totalCount = projects.length
+  const totalCount = projects.length
 
-	return (
-		<div className="bg-base-200 flex items-start justify-between gap-4 p-4">
-			<StatsGroup>
-				<StatsTileNumber
-					label={t('projects.myProjects', {
-						defaultValue: 'My projects',
-					})}
-					standalone={false}
-					value={totalCount}
-				/>
-			</StatsGroup>
-			<Button
-				className="w-auto"
-				data-testid="project-create-btn"
-				fullWidth={false}
-				onClick={onCreateProject}
-				size="sm"
-				variant="neutral"
-			>
-				{t('projects.actions.create', {
-					defaultValue: 'Create project',
-				})}
-			</Button>
-		</div>
-	)
+  return (
+    <div className="bg-base-200 flex items-start justify-between gap-4 p-4">
+      <StatsGroup>
+        <StatsTileNumber
+          label={t('projects.myProjects', {
+            defaultValue: 'My projects',
+          })}
+          standalone={false}
+          value={totalCount}
+        />
+      </StatsGroup>
+      <Button
+        className="w-auto"
+        data-testid="project-create-btn"
+        fullWidth={false}
+        onClick={onCreateProject}
+        size="sm"
+        variant="neutral"
+      >
+        {t('projects.actions.create', {
+          defaultValue: 'Create project',
+        })}
+      </Button>
+    </div>
+  )
 }

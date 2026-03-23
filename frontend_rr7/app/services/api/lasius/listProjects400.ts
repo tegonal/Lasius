@@ -3,13 +3,13 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { ListProjects400Error } from './listProjects400Error'
 import type { ListProjects400Status } from './listProjects400Status'
 
 export type ListProjects400 = {
-	status?: ListProjects400Status
-	message?: string
-	error?: ListProjects400Error
+  status?: ListProjects400Status
+  message?: string
+  error?: ListProjects400Error
 }

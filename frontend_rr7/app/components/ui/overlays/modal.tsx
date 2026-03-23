@@ -23,31 +23,31 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '~/lib/utils/cn'
 
 const modalContainerVariants = cva(
-	'bg-base-100 text-base-content relative mx-2 rounded-lg p-6 shadow-lg md:mx-0 md:p-8',
-	{
-		defaultVariants: {
-			size: 'md',
-		},
-		variants: {
-			size: {
-				auto: 'h-auto w-full max-w-full md:w-auto md:max-w-[80%]',
-				lg: 'w-full max-w-full md:w-4/5 md:max-w-[800px]',
-				md: 'w-full max-w-full md:w-4/5 md:max-w-[500px]',
-				xl: 'w-full max-w-full md:w-4/5 md:max-w-[1200px]',
-			},
-		},
-	},
+  'bg-base-100 text-base-content relative mx-2 rounded-lg p-6 shadow-lg md:mx-0 md:p-8',
+  {
+    defaultVariants: {
+      size: 'md',
+    },
+    variants: {
+      size: {
+        auto: 'h-auto w-full max-w-full md:w-auto md:max-w-[80%]',
+        lg: 'h-[90vh] w-full max-w-full md:w-4/5 md:max-w-[800px]',
+        md: 'w-full max-w-full md:w-4/5 md:max-w-[500px]',
+        xl: 'h-[90vh] w-full max-w-full md:w-4/5 md:max-w-[1200px]',
+      },
+    },
+  },
 )
 
 type ModalContainerProps = VariantProps<typeof modalContainerVariants>
 
 interface Props extends ModalContainerProps {
-	autoSize?: boolean
-	blockViewport?: boolean
-	children: React.ReactNode
-	minHeight?: number | string
-	onClose: () => void
-	open: boolean
+  autoSize?: boolean
+  blockViewport?: boolean
+  children: React.ReactNode
+  minHeight?: number | string
+  onClose: () => void
+  open: boolean
 }
 
 /**
@@ -55,41 +55,41 @@ interface Props extends ModalContainerProps {
  * Provides focus trapping, backdrop click to close, and accessibility.
  */
 export const Modal = ({
-	autoSize = false,
-	blockViewport = false,
-	children,
-	minHeight,
-	onClose,
-	open,
-	size,
+  autoSize = false,
+  blockViewport = false,
+  children,
+  minHeight,
+  onClose,
+  open,
+  size,
 }: Props) => {
-	const modalSize = autoSize ? 'auto' : size || 'md'
+  const modalSize = autoSize ? 'auto' : size || 'md'
 
-	const handleOpenChange = (nextOpen: boolean) => {
-		if (!nextOpen && !blockViewport) {
-			onClose()
-		}
-	}
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen && !blockViewport) {
+      onClose()
+    }
+  }
 
-	return (
-		<Dialog.Root modal onOpenChange={handleOpenChange} open={open}>
-			<Dialog.Portal>
-				<Dialog.Backdrop className="fixed inset-0 z-50 bg-black/40 backdrop-blur-[5px] transition-opacity duration-300 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0" />
-				<Dialog.Popup
-					className={cn('fixed inset-0 z-50 flex items-center justify-center')}
-				>
-					<div
-						className={cn(
-							modalContainerVariants({ size: modalSize }),
-							minHeight && 'h-auto',
-							'transition-all duration-300 data-[ending-style]:translate-y-full data-[ending-style]:opacity-0 data-[starting-style]:translate-y-full data-[starting-style]:opacity-0',
-						)}
-						style={{ minHeight: minHeight || undefined }}
-					>
-						{children}
-					</div>
-				</Dialog.Popup>
-			</Dialog.Portal>
-		</Dialog.Root>
-	)
+  return (
+    <Dialog.Root modal onOpenChange={handleOpenChange} open={open}>
+      <Dialog.Portal>
+        <Dialog.Backdrop className="fixed inset-0 z-50 bg-black/40 backdrop-blur-[5px] transition-opacity duration-300 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0" />
+        <Dialog.Popup
+          className={cn('fixed inset-0 z-50 flex items-center justify-center')}
+        >
+          <div
+            className={cn(
+              modalContainerVariants({ size: modalSize }),
+              minHeight && 'h-auto',
+              'transition-all duration-300 data-[ending-style]:translate-y-full data-[ending-style]:opacity-0 data-[starting-style]:translate-y-full data-[starting-style]:opacity-0',
+            )}
+            style={{ minHeight: minHeight || undefined }}
+          >
+            {children}
+          </div>
+        </Dialog.Popup>
+      </Dialog.Portal>
+    </Dialog.Root>
+  )
 }

@@ -28,27 +28,27 @@ import { useContextMenu } from '~/features/context-menu/hooks/use-context-menu'
 import { type ModelsUserProject } from '~/services/api/lasius/modelsUserProject'
 
 type Props = {
-	item: ModelsUserProject
+  item: ModelsUserProject
 }
 
 export const MyProjectsListItemMemberContext = ({ item }: Props) => {
-	const { currentOpenContextMenuId } = useContextMenu()
+  const { currentOpenContextMenuId } = useContextMenu()
 
-	return (
-		<ContextBody variant="compact">
-			<ContextButtonOpen
-				data-testid="project-ctx-open-btn"
-				hash={item.projectReference.id}
-			/>
-			{currentOpenContextMenuId === item.projectReference.id && (
-				<ContextAnimatePresence variant="compact">
-					<ContextBar>
-						<ContextButtonLeaveProject item={item} variant="compact" />
-						<ContextBarDivider />
-						<ContextButtonClose variant="compact" />
-					</ContextBar>
-				</ContextAnimatePresence>
-			)}
-		</ContextBody>
-	)
+  return (
+    <ContextBody variant="compact">
+      <ContextButtonOpen
+        data-testid="project-ctx-open-btn"
+        hash={item.projectReference.id}
+      />
+      {currentOpenContextMenuId === item.projectReference.id && (
+        <ContextAnimatePresence variant="compact">
+          <ContextBar>
+            <ContextButtonLeaveProject item={item} variant="compact" />
+            <ContextBarDivider />
+            <ContextButtonClose variant="compact" />
+          </ContextBar>
+        </ContextAnimatePresence>
+      )}
+    </ContextBody>
+  )
 }

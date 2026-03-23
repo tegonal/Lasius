@@ -21,6 +21,7 @@ import { SiGithub, SiGitlab, SiKeycloak } from '@icons-pack/react-simple-icons'
 import { useTranslation } from 'react-i18next'
 import { href } from 'react-router'
 
+import { Button } from '~/components/primitives/buttons/button'
 import { Card, CardBody } from '~/components/ui/cards/card'
 import { Alert } from '~/components/ui/feedback/alert'
 import { LasiusIcon } from '~/components/ui/icons/lasius-icon'
@@ -32,134 +33,140 @@ import { type ModelsJoinProjectInvitation } from '~/services/api/lasius/modelsJo
 import { type AuthProvider } from '~/services/auth/types'
 
 interface Props {
-	invitation: ModelsInvitationStatusResponse
-	keycloakName?: string
-	providers: AuthProvider[]
+  invitation: ModelsInvitationStatusResponse
+  keycloakName?: string
+  providers: AuthProvider[]
 }
 
 export const InvitationNeedsAccount = ({
-	invitation,
-	keycloakName,
-	providers = [],
+  invitation,
+  keycloakName,
+  providers = [],
 }: Props) => {
-	const { t } = useTranslation('common')
+  const { t } = useTranslation('common')
 
-	const returnTo = `/join/${invitation.invitation.id}`
+  const returnTo = `/join/${invitation.invitation.id}`
 
-	const getProviderLoginUrl = (provider: AuthProvider): string => {
-		const params = new URLSearchParams({
-			invitation_id: invitation.invitation.id,
-			returnTo,
-		})
-		if (provider === 'internal') {
-			params.set('email', invitation.invitation.invitedEmail)
-			return `${href('/internal-oauth/login')}?${params.toString()}`
-		}
-		return `${href('/oauth/:provider/login', { provider })}?${params.toString()}`
-	}
+  const getProviderLoginUrl = (provider: AuthProvider): string => {
+    const params = new URLSearchParams({
+      invitation_id: invitation.invitation.id,
+      returnTo,
+    })
+    if (provider === 'internal') {
+      params.set('email', invitation.invitation.invitedEmail)
+      return `${href('/internal-oauth/login')}?${params.toString()}`
+    }
+    return `${href('/oauth/:provider/login', { provider })}?${params.toString()}`
+  }
 
-	const invitationMessage =
-		invitation.invitation.type === 'JoinOrganisationInvitation'
-			? t('invitations.messages.invitedToOrganisationNeedsAccount', {
-					defaultValue:
-						'You have been invited by {{inviter}} to join organisation {{organisation}}.',
-					inviter: invitation.invitation.createdBy.key,
-					organisation: (
-						invitation.invitation as ModelsJoinOrganisationInvitation
-					).organisationReference.key,
-				})
-			: t('invitations.messages.invitedToProjectNeedsAccount', {
-					defaultValue:
-						'You have been invited by {{inviter}} to join project {{project}}.',
-					inviter: invitation.invitation.createdBy.key,
-					project: (invitation.invitation as ModelsJoinProjectInvitation)
-						.projectReference.key,
-				})
+  const invitationMessage =
+    invitation.invitation.type === 'JoinOrganisationInvitation'
+      ? t('invitations.messages.invitedToOrganisationNeedsAccount', {
+          defaultValue:
+            'You have been invited by {{inviter}} to join organisation {{organisation}}.',
+          inviter: invitation.invitation.createdBy.key,
+          organisation: (
+            invitation.invitation as ModelsJoinOrganisationInvitation
+          ).organisationReference.key,
+        })
+      : t('invitations.messages.invitedToProjectNeedsAccount', {
+          defaultValue:
+            'You have been invited by {{inviter}} to join project {{project}}.',
+          inviter: invitation.invitation.createdBy.key,
+          project: (invitation.invitation as ModelsJoinProjectInvitation)
+            .projectReference.key,
+        })
 
-	return (
-		<AuthLayout infoPanel={<LoginInfoPanel />}>
-			<Alert variant="info">{invitationMessage}</Alert>
+  return (
+    <AuthLayout infoPanel={<LoginInfoPanel />}>
+      <Alert variant="info">{invitationMessage}</Alert>
 
-			<Card className="bg-base-100/80 border-0 shadow-2xl backdrop-blur-sm">
-				<CardBody className="p-8 lg:p-10">
-					<div className="mb-8 space-y-4 text-center">
-						<h2 className="text-3xl font-bold">
-							{t('invitations.needsAccount.title', {
-								defaultValue: 'Account Required',
-							})}
-						</h2>
-						<p className="text-base-content/60">
-							{t('invitations.needsAccount.description', {
-								defaultValue:
-									"You'll need to sign in or create an account for {{email}} to accept this invitation.",
-								email: invitation.invitation.invitedEmail,
-							})}
-						</p>
-					</div>
+      <Card className="bg-base-100/80 border-0 shadow-2xl backdrop-blur-sm">
+        <CardBody className="p-8 lg:p-10">
+          <div className="mb-8 space-y-4 text-center">
+            <h2 className="text-3xl font-bold">
+              {t('invitations.needsAccount.title', {
+                defaultValue: 'Account Required',
+              })}
+            </h2>
+            <p className="text-base-content/60">
+              {t('invitations.needsAccount.description', {
+                defaultValue:
+                  "You'll need to sign in or create an account for {{email}} to accept this invitation.",
+                email: invitation.invitation.invitedEmail,
+              })}
+            </p>
+          </div>
 
-					<Alert variant="warning">
-						{t('invitations.needsAccount.emailMatch', {
-							defaultValue:
-								'Make sure to sign in with the email address this invitation was sent to: {{email}}',
-							email: invitation.invitation.invitedEmail,
-						})}
-					</Alert>
+          <Alert variant="warning">
+            {t('invitations.needsAccount.emailMatch', {
+              defaultValue:
+                'Make sure to sign in with the email address this invitation was sent to: {{email}}',
+              email: invitation.invitation.invitedEmail,
+            })}
+          </Alert>
 
-					<div className="mt-6 flex flex-col gap-3">
-						{providers.map((provider) => (
-							<a
-								className="btn btn-secondary btn-lg w-full justify-start gap-3 transition-colors duration-200"
-								data-testid={`invite-provider-${provider}`}
-								href={getProviderLoginUrl(provider)}
-								key={provider}
-							>
-								<span className="flex h-6 w-6 items-center justify-center">
-									{getProviderIcon(provider)}
-								</span>
-								<span className="flex-1 text-left">
-									{t('invitations.needsAccount.signInOrSignUpWith', {
-										defaultValue: 'Sign in or sign up with',
-									})}{' '}
-									<span className="font-semibold">
-										{getProviderDisplayName(provider, keycloakName)}
-									</span>
-								</span>
-							</a>
-						))}
-					</div>
-				</CardBody>
-			</Card>
-		</AuthLayout>
-	)
+          <div className="mt-6 flex flex-col gap-3">
+            {providers.map((provider) => (
+              <a
+                data-testid={`invite-provider-${provider}`}
+                href={getProviderLoginUrl(provider)}
+                key={provider}
+              >
+                <Button
+                  className="w-full justify-start gap-3 transition-colors duration-200"
+                  size="lg"
+                  type="button"
+                  variant="secondary"
+                >
+                  <span className="flex h-6 w-6 items-center justify-center">
+                    {getProviderIcon(provider)}
+                  </span>
+                  <span className="flex-1 text-left">
+                    {t('invitations.needsAccount.signInOrSignUpWith', {
+                      defaultValue: 'Sign in or sign up with',
+                    })}{' '}
+                    <span className="font-semibold">
+                      {getProviderDisplayName(provider, keycloakName)}
+                    </span>
+                  </span>
+                </Button>
+              </a>
+            ))}
+          </div>
+        </CardBody>
+      </Card>
+    </AuthLayout>
+  )
 }
 
 const getProviderDisplayName = (
-	provider: AuthProvider,
-	keycloakName: string | undefined,
+  provider: AuthProvider,
+  keycloakName: string | undefined,
 ): string => {
-	if (provider === 'keycloak' && keycloakName) {
-		return keycloakName
-	}
-	const names: Record<AuthProvider, string> = {
-		github: 'GitHub',
-		gitlab: 'GitLab',
-		internal: 'Email & Password',
-		keycloak: 'Keycloak',
-	}
-	return names[provider]
+  if (provider === 'keycloak' && keycloakName) {
+    return keycloakName
+  }
+  const names: Record<AuthProvider, string> = {
+    github: 'GitHub',
+    gitlab: 'GitLab',
+    internal: 'Email & Password',
+    keycloak: 'Keycloak',
+  }
+  return names[provider]
 }
 
 const getProviderIcon = (provider: AuthProvider): React.ReactNode => {
-	switch (provider) {
-		case 'github':
-			return <SiGithub size={24} />
-		case 'gitlab':
-			return <SiGitlab size={24} />
-		case 'internal':
-			return <LasiusIcon size={24} />
-		case 'keycloak':
-			return <SiKeycloak size={24} />
-		default:
-			return null
-	}
+  switch (provider) {
+    case 'github':
+      return <SiGithub size={24} />
+    case 'gitlab':
+      return <SiGitlab size={24} />
+    case 'internal':
+      return <LasiusIcon size={24} />
+    case 'keycloak':
+      return <SiKeycloak size={24} />
+    default:
+      return null
+  }
 }

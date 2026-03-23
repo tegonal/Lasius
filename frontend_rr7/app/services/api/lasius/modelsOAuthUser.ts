@@ -3,17 +3,17 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { ModelsOAuthUserId } from './modelsOAuthUserId'
 
 export interface ModelsOAuthUser {
-	id: ModelsOAuthUserId
-	email: string
-	password: string
-	/** @nullable */
-	firstName?: string | null
-	/** @nullable */
-	lastName?: string | null
-	active: boolean
+  id: ModelsOAuthUserId
+  email: string
+  password: string
+  /** @nullable */
+  firstName?: string | null
+  /** @nullable */
+  lastName?: string | null
+  active: boolean
 }

@@ -22,23 +22,23 @@ import { describe, expect, it } from 'vitest'
 import { cleanStrForCmp } from './strings'
 
 describe('cleanStrForCmp', () => {
-	it('converts to uppercase', () => {
-		expect(cleanStrForCmp('hello')).toBe('HELLO')
-	})
+  it('converts to uppercase', () => {
+    expect(cleanStrForCmp('hello')).toBe('HELLO')
+  })
 
-	it('trims whitespace', () => {
-		expect(cleanStrForCmp('  hello  ')).toBe('HELLO')
-	})
+  it('trims whitespace', () => {
+    expect(cleanStrForCmp('  hello  ')).toBe('HELLO')
+  })
 
-	it('handles mixed case with whitespace', () => {
-		expect(cleanStrForCmp('  Hello World  ')).toBe('HELLO WORLD')
-	})
+  it('handles mixed case with whitespace', () => {
+    expect(cleanStrForCmp('  Hello World  ')).toBe('HELLO WORLD')
+  })
 
-	it('returns empty string for empty input', () => {
-		expect(cleanStrForCmp('')).toBe('')
-	})
+  it('returns empty string for empty input', () => {
+    expect(cleanStrForCmp('')).toBe('')
+  })
 
-	it('enables case-insensitive comparison', () => {
-		expect(cleanStrForCmp('test')).toBe(cleanStrForCmp('TEST'))
-	})
+  it('enables case-insensitive comparison', () => {
+    expect(cleanStrForCmp('test')).toBe(cleanStrForCmp('TEST'))
+  })
 })

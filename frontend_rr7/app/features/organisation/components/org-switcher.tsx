@@ -27,43 +27,43 @@ import { OrgSwitcherModal } from '~/features/organisation/components/org-switche
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 
 export const OrgSwitcher = () => {
-	const { t } = useTranslation('common')
-	const [isOpen, setIsOpen] = useState(false)
-	const { selectedOrganisation, selectedOrganisationKey } = useOrganisation()
+  const { t } = useTranslation('common')
+  const [isOpen, setIsOpen] = useState(false)
+  const { selectedOrganisation, selectedOrganisationKey } = useOrganisation()
 
-	const handleClose = () => setIsOpen(false)
+  const handleClose = () => setIsOpen(false)
 
-	return (
-		<>
-			<button
-				className="btn btn-ghost hidden md:flex"
-				data-testid="org-selector-btn"
-				onClick={() => setIsOpen(true)}
-				type="button"
-			>
-				<AvatarOrganisation name={selectedOrganisationKey || ''} size={24} />
-				<span>
-					{selectedOrganisation?.private
-						? t('organisations.myPersonalOrganisation', {
-								defaultValue: 'My personal organisation',
-							})
-						: selectedOrganisationKey}
-				</span>
-			</button>
-			<Modal onClose={handleClose} open={isOpen}>
-				<OrgSwitcherModal onClose={handleClose} />
-				<ButtonGroup>
-					<button
-						className="btn btn-secondary"
-						onClick={handleClose}
-						type="button"
-					>
-						{t('common.actions.close', {
-							defaultValue: 'Close',
-						})}
-					</button>
-				</ButtonGroup>
-			</Modal>
-		</>
-	)
+  return (
+    <>
+      <button
+        className="btn btn-ghost hidden md:flex"
+        data-testid="org-selector-btn"
+        onClick={() => setIsOpen(true)}
+        type="button"
+      >
+        <AvatarOrganisation name={selectedOrganisationKey || ''} size={24} />
+        <span>
+          {selectedOrganisation?.private
+            ? t('organisations.myPersonalOrganisation', {
+                defaultValue: 'My personal organisation',
+              })
+            : selectedOrganisationKey}
+        </span>
+      </button>
+      <Modal onClose={handleClose} open={isOpen}>
+        <OrgSwitcherModal onClose={handleClose} />
+        <ButtonGroup>
+          <button
+            className="btn btn-secondary"
+            onClick={handleClose}
+            type="button"
+          >
+            {t('common.actions.close', {
+              defaultValue: 'Close',
+            })}
+          </button>
+        </ButtonGroup>
+      </Modal>
+    </>
+  )
 }

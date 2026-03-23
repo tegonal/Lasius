@@ -21,5 +21,5 @@ import { redirect } from 'react-router'
 
 // Matches Next.js index page: / → /user/home
 export function loader() {
-	throw redirect('/user/home')
+  throw redirect('/user/home')
 }

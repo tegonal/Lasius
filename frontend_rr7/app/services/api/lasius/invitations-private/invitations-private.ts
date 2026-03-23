@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { ModelsAcceptInvitationRequest, ModelsInvitation } from './..'
 
@@ -13,93 +13,93 @@ import { lasiusFetch } from '../../lasius-fetch-instance'
  * @summary get detail of an invitation
  */
 export type getInvitationResponse200 = {
-	data: ModelsInvitation
-	status: 200
+  data: ModelsInvitation
+  status: 200
 }
 
 export type getInvitationResponse400 = {
-	data: void
-	status: 400
+  data: void
+  status: 400
 }
 
 export type getInvitationResponseSuccess = getInvitationResponse200 & {
-	headers: Headers
+  headers: Headers
 }
 export type getInvitationResponseError = getInvitationResponse400 & {
-	headers: Headers
+  headers: Headers
 }
 
 export type getInvitationResponse =
-	| getInvitationResponseSuccess
-	| getInvitationResponseError
+  | getInvitationResponseSuccess
+  | getInvitationResponseError
 
 export const getGetInvitationUrl = (invitationId: string) => {
-	return `/invitations/${invitationId}`
+  return `/invitations/${invitationId}`
 }
 
 export const getInvitation = async (
-	invitationId: string,
-	options?: RequestInit,
+  invitationId: string,
+  options?: RequestInit,
 ): Promise<getInvitationResponse> => {
-	return lasiusFetch<getInvitationResponse>(getGetInvitationUrl(invitationId), {
-		...options,
-		method: 'GET',
-	})
+  return lasiusFetch<getInvitationResponse>(getGetInvitationUrl(invitationId), {
+    ...options,
+    method: 'GET',
+  })
 }
 
 export type acceptInvitationResponse200 = {
-	data: ModelsInvitation
-	status: 200
+  data: ModelsInvitation
+  status: 200
 }
 
 export type acceptInvitationResponseSuccess = acceptInvitationResponse200 & {
-	headers: Headers
+  headers: Headers
 }
 export type acceptInvitationResponse = acceptInvitationResponseSuccess
 
 export const getAcceptInvitationUrl = (invitationId: string) => {
-	return `/invitations/${invitationId}/accept`
+  return `/invitations/${invitationId}/accept`
 }
 
 export const acceptInvitation = async (
-	invitationId: string,
-	modelsAcceptInvitationRequest: ModelsAcceptInvitationRequest,
-	options?: RequestInit,
+  invitationId: string,
+  modelsAcceptInvitationRequest: ModelsAcceptInvitationRequest,
+  options?: RequestInit,
 ): Promise<acceptInvitationResponse> => {
-	return lasiusFetch<acceptInvitationResponse>(
-		getAcceptInvitationUrl(invitationId),
-		{
-			...options,
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json', ...options?.headers },
-			body: JSON.stringify(modelsAcceptInvitationRequest),
-		},
-	)
+  return lasiusFetch<acceptInvitationResponse>(
+    getAcceptInvitationUrl(invitationId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(modelsAcceptInvitationRequest),
+    },
+  )
 }
 
 export type declineInvitationResponse200 = {
-	data: ModelsInvitation
-	status: 200
+  data: ModelsInvitation
+  status: 200
 }
 
 export type declineInvitationResponseSuccess = declineInvitationResponse200 & {
-	headers: Headers
+  headers: Headers
 }
 export type declineInvitationResponse = declineInvitationResponseSuccess
 
 export const getDeclineInvitationUrl = (invitationId: string) => {
-	return `/invitations/${invitationId}/decline`
+  return `/invitations/${invitationId}/decline`
 }
 
 export const declineInvitation = async (
-	invitationId: string,
-	options?: RequestInit,
+  invitationId: string,
+  options?: RequestInit,
 ): Promise<declineInvitationResponse> => {
-	return lasiusFetch<declineInvitationResponse>(
-		getDeclineInvitationUrl(invitationId),
-		{
-			...options,
-			method: 'POST',
-		},
-	)
+  return lasiusFetch<declineInvitationResponse>(
+    getDeclineInvitationUrl(invitationId),
+    {
+      ...options,
+      method: 'POST',
+    },
+  )
 }

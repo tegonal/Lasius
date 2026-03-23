@@ -23,31 +23,31 @@ import { useCallback } from 'react'
 import { type ToastData, type ToastType } from './toast-manager'
 
 type AddToastOptions = {
-	action?: {
-		href: string
-		label: string
-	}
-	description?: string
-	message: string
-	ttl?: number
-	type: ToastType
+  action?: {
+    href: string
+    label: string
+  }
+  description?: string
+  message: string
+  ttl?: number
+  type: ToastType
 }
 
 export function useToast() {
-	const manager = Toast.useToastManager<ToastData>()
+  const manager = Toast.useToastManager<ToastData>()
 
-	const addToast = useCallback(
-		(options: AddToastOptions) => {
-			manager.add({
-				data: options.action ? { action: options.action } : undefined,
-				description: options.description,
-				timeout: options.ttl,
-				title: options.message,
-				type: options.type,
-			})
-		},
-		[manager],
-	)
+  const addToast = useCallback(
+    (options: AddToastOptions) => {
+      manager.add({
+        data: options.action ? { action: options.action } : undefined,
+        description: options.description,
+        timeout: options.ttl,
+        title: options.message,
+        type: options.type,
+      })
+    },
+    [manager],
+  )
 
-	return { addToast }
+  return { addToast }
 }

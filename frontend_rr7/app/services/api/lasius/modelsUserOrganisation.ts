@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { ModelsEntityReference } from './modelsEntityReference'
 import type { ModelsUserOrganisationRole } from './modelsUserOrganisationRole'
@@ -11,9 +11,9 @@ import type { ModelsUserProject } from './modelsUserProject'
 import type { ModelsWorkingHours } from './modelsWorkingHours'
 
 export interface ModelsUserOrganisation {
-	organisationReference: ModelsEntityReference
-	private: boolean
-	role: ModelsUserOrganisationRole
-	plannedWorkingHours: ModelsWorkingHours
-	projects: ModelsUserProject[]
+  organisationReference: ModelsEntityReference
+  private: boolean
+  role: ModelsUserOrganisationRole
+  plannedWorkingHours: ModelsWorkingHours
+  projects: ModelsUserProject[]
 }

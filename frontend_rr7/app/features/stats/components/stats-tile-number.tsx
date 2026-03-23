@@ -24,25 +24,25 @@ import { AnimateNumber } from '~/components/ui/animations/animate-number'
 import { StatsTileWrapper } from './stats-tile-wrapper'
 
 type Props = {
-	label: string
-	standalone?: boolean
-	value: number
+  label: string
+  standalone?: boolean
+  value: number
 }
 
 export const StatsTileNumber = ({ label, standalone = true, value }: Props) => {
-	const previousValue = useRef<number>(0)
-	useEffect(() => {
-		previousValue.current = value
-	}, [value])
+  const previousValue = useRef<number>(0)
+  useEffect(() => {
+    previousValue.current = value
+  }, [value])
 
-	return (
-		<StatsTileWrapper standalone={standalone}>
-			<div className="stat h-fit">
-				<div className="stat-title">{label}</div>
-				<div className="stat-value text-2xl">
-					<AnimateNumber from={previousValue.current} to={value} />
-				</div>
-			</div>
-		</StatsTileWrapper>
-	)
+  return (
+    <StatsTileWrapper standalone={standalone}>
+      <div className="stat h-fit">
+        <div className="stat-title">{label}</div>
+        <div className="stat-value text-2xl">
+          <AnimateNumber from={previousValue.current} to={value} />
+        </div>
+      </div>
+    </StatsTileWrapper>
+  )
 }

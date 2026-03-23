@@ -28,65 +28,65 @@ import { useStatsTileTimeAsDecimals, useUIStore } from '~/stores/ui-store'
 import { StatsTileWrapper } from './stats-tile-wrapper'
 
 type Props = {
-	label: string
-	standalone?: boolean
-	value: number
+  label: string
+  standalone?: boolean
+  value: number
 }
 
 export const StatsTileHours = ({ label, standalone = true, value }: Props) => {
-	const { t } = useTranslation('common')
-	const previousValue = useRef<number>(0)
-	const previousHours = useRef<number>(0)
-	const previousMinutes = useRef<number>(0)
+  const { t } = useTranslation('common')
+  const previousValue = useRef<number>(0)
+  const previousHours = useRef<number>(0)
+  const previousMinutes = useRef<number>(0)
 
-	const showDecimalHours = useStatsTileTimeAsDecimals()
-	const toggleStatsTileTimeAsDecimals = useUIStore(
-		(state) => state.toggleStatsTileTimeAsDecimals,
-	)
+  const showDecimalHours = useStatsTileTimeAsDecimals()
+  const toggleStatsTileTimeAsDecimals = useUIStore(
+    (state) => state.toggleStatsTileTimeAsDecimals,
+  )
 
-	const duration = decimalHoursToObject(value)
+  const duration = decimalHoursToObject(value)
 
-	useEffect(() => {
-		previousValue.current = value
-		previousHours.current = duration.hours
-		previousMinutes.current = duration.minutes
-	}, [value, duration.hours, duration.minutes])
+  useEffect(() => {
+    previousValue.current = value
+    previousHours.current = duration.hours
+    previousMinutes.current = duration.minutes
+  }, [value, duration.hours, duration.minutes])
 
-	return (
-		<StatsTileWrapper standalone={standalone}>
-			<div
-				className="stat hover:bg-base-200 h-fit cursor-pointer transition-colors select-none"
-				onClick={toggleStatsTileTimeAsDecimals}
-			>
-				<div className="stat-title">{label}</div>
-				<div className="stat-value text-2xl">
-					{showDecimalHours ? (
-						<AnimateNumber
-							from={round(previousValue.current, 2)}
-							to={round(value, 2)}
-						/>
-					) : (
-						<>
-							<AnimateNumber
-								from={previousHours.current}
-								leftpad={1}
-								to={duration.hours}
-							/>
-							:
-							<AnimateNumber
-								from={previousMinutes.current}
-								leftpad={1}
-								to={duration.minutes}
-							/>
-						</>
-					)}
-				</div>
-				<div className="stat-desc">
-					{showDecimalHours
-						? t('stats.decimalHours', { defaultValue: 'Decimal hours' })
-						: t('stats.hoursMinutes', { defaultValue: 'HH:MM' })}
-				</div>
-			</div>
-		</StatsTileWrapper>
-	)
+  return (
+    <StatsTileWrapper standalone={standalone}>
+      <div
+        className="stat hover:bg-base-200 h-fit cursor-pointer transition-colors select-none"
+        onClick={toggleStatsTileTimeAsDecimals}
+      >
+        <div className="stat-title">{label}</div>
+        <div className="stat-value text-2xl">
+          {showDecimalHours ? (
+            <AnimateNumber
+              from={round(previousValue.current, 2)}
+              to={round(value, 2)}
+            />
+          ) : (
+            <>
+              <AnimateNumber
+                from={previousHours.current}
+                leftpad={1}
+                to={duration.hours}
+              />
+              :
+              <AnimateNumber
+                from={previousMinutes.current}
+                leftpad={1}
+                to={duration.minutes}
+              />
+            </>
+          )}
+        </div>
+        <div className="stat-desc">
+          {showDecimalHours
+            ? t('stats.decimalHours', { defaultValue: 'Decimal hours' })
+            : t('stats.hoursMinutes', { defaultValue: 'HH:MM' })}
+        </div>
+      </div>
+    </StatsTileWrapper>
+  )
 }

@@ -20,9 +20,9 @@
 import { href, redirect } from 'react-router'
 
 import {
-	generateCodeChallenge,
-	generateCodeVerifier,
-	generateState,
+  generateCodeChallenge,
+  generateCodeVerifier,
+  generateState,
 } from '~/lib/crypto.server'
 import { logger } from '~/lib/logger'
 import { sanitizeReturnTo } from '~/services/auth/auth-helpers.server'
@@ -35,51 +35,51 @@ import { type Route } from './+types/oauth.$provider.login'
 const VALID_PROVIDERS: AuthProvider[] = ['keycloak', 'github', 'gitlab']
 
 export async function loader({ params, request }: Route.LoaderArgs) {
-	const providerName = params.provider as AuthProvider
+  const providerName = params.provider as AuthProvider
 
-	if (
-		!VALID_PROVIDERS.includes(providerName) ||
-		!isProviderEnabled(providerName)
-	) {
-		logger.warn('Invalid or disabled OAuth provider requested', {
-			provider: providerName,
-		})
-		throw redirect(`${href('/login')}?error=invalid_provider`)
-	}
+  if (
+    !VALID_PROVIDERS.includes(providerName) ||
+    !isProviderEnabled(providerName)
+  ) {
+    logger.warn('Invalid or disabled OAuth provider requested', {
+      provider: providerName,
+    })
+    throw redirect(`${href('/login')}?error=invalid_provider`)
+  }
 
-	const url = new URL(request.url)
-	const returnTo = sanitizeReturnTo(url.searchParams.get('returnTo') ?? '/')
+  const url = new URL(request.url)
+  const returnTo = sanitizeReturnTo(url.searchParams.get('returnTo') ?? '/')
 
-	const state = generateState()
-	const codeVerifier = generateCodeVerifier()
-	const codeChallenge = await generateCodeChallenge(codeVerifier)
+  const state = generateState()
+  const codeVerifier = generateCodeVerifier()
+  const codeChallenge = await generateCodeChallenge(codeVerifier)
 
-	// Build the callback URL using type-safe href
-	const origin = url.origin
-	const redirectUri = `${origin}${href('/oauth/callback')}`
+  // Build the callback URL using type-safe href
+  const origin = url.origin
+  const redirectUri = `${origin}${href('/oauth/callback')}`
 
-	// Store state, provider, code verifier, and returnTo in a cookie
-	const cookieData = {
-		codeVerifier,
-		provider: providerName,
-		returnTo,
-		state,
-	}
+  // Store state, provider, code verifier, and returnTo in a cookie
+  const cookieData = {
+    codeVerifier,
+    provider: providerName,
+    returnTo,
+    state,
+  }
 
-	const provider = getProvider(providerName)
-	const authorizationUrl = provider.getAuthorizationUrl(
-		state,
-		redirectUri,
-		codeChallenge,
-	)
+  const provider = getProvider(providerName)
+  const authorizationUrl = provider.getAuthorizationUrl(
+    state,
+    redirectUri,
+    codeChallenge,
+  )
 
-	logger.debug('Redirecting to OAuth provider', { provider: providerName })
+  logger.debug('Redirecting to OAuth provider', { provider: providerName })
 
-	return redirect(authorizationUrl, {
-		headers: {
-			'Set-Cookie': await oauthStateCookie.serialize(cookieData),
-		},
-	})
+  return redirect(authorizationUrl, {
+    headers: {
+      'Set-Cookie': await oauthStateCookie.serialize(cookieData),
+    },
+  })
 }
 
 /**
@@ -87,5 +87,5 @@ export async function loader({ params, request }: Route.LoaderArgs) {
  * No component is rendered.
  */
 export default function OAuthProviderLogin() {
-	return null
+  return null
 }

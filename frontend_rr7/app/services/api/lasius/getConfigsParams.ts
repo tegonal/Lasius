@@ -3,14 +3,14 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { GetConfigsType } from './getConfigsType'
 
 export type GetConfigsParams = {
-	/**
-	 * Filter by importer type (gitlab, jira, or plane)
-	 * @nullable
-	 */
-	type?: GetConfigsType
+  /**
+   * Filter by importer type (gitlab, jira, or plane)
+   * @nullable
+   */
+  type?: GetConfigsType
 }

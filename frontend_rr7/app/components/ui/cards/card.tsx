@@ -23,78 +23,78 @@ import React from 'react'
 import { cn } from '~/lib/utils/cn'
 
 const cardVariants = cva('card', {
-	defaultVariants: {
-		layout: 'default',
-		shadow: 'none',
-		size: 'md',
-		variant: 'default',
-	},
-	variants: {
-		layout: {
-			default: '',
-			imageFull: 'image-full',
-			side: 'card-side',
-		},
-		shadow: {
-			lg: 'shadow-lg',
-			md: 'shadow-md',
-			none: '',
-			sm: 'shadow-sm',
-			xl: 'shadow-xl',
-		},
-		size: {
-			lg: 'card-lg',
-			md: '',
-			sm: 'card-sm',
-			xl: 'card-xl',
-			xs: 'card-xs',
-		},
-		variant: {
-			bordered: 'card-bordered',
-			dashed: 'card-dash',
-			default: 'bg-base-100',
-		},
-	},
+  defaultVariants: {
+    layout: 'default',
+    shadow: 'none',
+    size: 'md',
+    variant: 'default',
+  },
+  variants: {
+    layout: {
+      default: '',
+      imageFull: 'image-full',
+      side: 'card-side',
+    },
+    shadow: {
+      lg: 'shadow-lg',
+      md: 'shadow-md',
+      none: '',
+      sm: 'shadow-sm',
+      xl: 'shadow-xl',
+    },
+    size: {
+      lg: 'card-lg',
+      md: '',
+      sm: 'card-sm',
+      xl: 'card-xl',
+      xs: 'card-xs',
+    },
+    variant: {
+      bordered: 'card-bordered',
+      dashed: 'card-dash',
+      default: 'bg-base-100',
+    },
+  },
 })
 
 export interface CardProps
-	extends
-		React.HTMLAttributes<HTMLDivElement>,
-		VariantProps<typeof cardVariants> {
-	children: React.ReactNode
+  extends
+    React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof cardVariants> {
+  children: React.ReactNode
 }
 
 export const Card = React.forwardRef<HTMLDivElement, CardProps>(
-	({ children, className, layout, shadow, size, variant, ...props }, ref) => {
-		return (
-			<div
-				className={cn(
-					cardVariants({ layout, shadow, size, variant }),
-					className,
-				)}
-				ref={ref}
-				{...props}
-			>
-				{children}
-			</div>
-		)
-	},
+  ({ children, className, layout, shadow, size, variant, ...props }, ref) => {
+    return (
+      <div
+        className={cn(
+          cardVariants({ layout, shadow, size, variant }),
+          className,
+        )}
+        ref={ref}
+        {...props}
+      >
+        {children}
+      </div>
+    )
+  },
 )
 
 Card.displayName = 'Card'
 
 export interface CardBodyProps extends React.HTMLAttributes<HTMLDivElement> {
-	children: React.ReactNode
+  children: React.ReactNode
 }
 
 export const CardBody = React.forwardRef<HTMLDivElement, CardBodyProps>(
-	({ children, className, ...props }, ref) => {
-		return (
-			<div className={cn('card-body', className)} ref={ref} {...props}>
-				{children}
-			</div>
-		)
-	},
+  ({ children, className, ...props }, ref) => {
+    return (
+      <div className={cn('card-body', className)} ref={ref} {...props}>
+        {children}
+      </div>
+    )
+  },
 )
 
 CardBody.displayName = 'CardBody'

@@ -17,99 +17,100 @@
  *
  */
 
-import { addMonths, addWeeks } from 'date-fns'
+import { addMonths, addWeeks, format } from 'date-fns'
 import { useCallback, useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router'
 
 import {
-	formatISOLocale,
-	getMonthOfDate,
-	getWeekOfDate,
-	type IsoDateString,
+  formatISOLocale,
+  getMonthOfDate,
+  getWeekOfDate,
+  type IsoDateString,
 } from '~/lib/utils/dates'
+
+/** Simple yyyy-MM-dd format safe for URL search params (no +/: characters) */
+const toDateParam = (d: Date): string => format(d, 'yyyy-MM-dd')
 
 type ViewType = 'month' | 'week'
 
 export const useCalendarNavigation = (
-	selectedDate: IsoDateString,
-	viewType: ViewType,
+  selectedDate: IsoDateString,
+  viewType: ViewType,
 ) => {
-	const [, setSearchParams] = useSearchParams()
-	const [period, setPeriod] = useState<IsoDateString[]>(
-		viewType === 'month'
-			? getMonthOfDate(selectedDate)
-			: getWeekOfDate(selectedDate),
-	)
+  const [, setSearchParams] = useSearchParams()
+  const [period, setPeriod] = useState<IsoDateString[]>(
+    viewType === 'month'
+      ? getMonthOfDate(selectedDate)
+      : getWeekOfDate(selectedDate),
+  )
 
-	// Update period when selectedDate changes (e.g., from URL search param)
-	useEffect(() => {
-		const newPeriod =
-			viewType === 'month'
-				? getMonthOfDate(selectedDate)
-				: getWeekOfDate(selectedDate)
-		setPeriod(newPeriod)
-	}, [selectedDate, viewType])
+  // Update period when selectedDate changes (e.g., from URL search param)
+  useEffect(() => {
+    const newPeriod =
+      viewType === 'month'
+        ? getMonthOfDate(selectedDate)
+        : getWeekOfDate(selectedDate)
+    setPeriod(newPeriod)
+  }, [selectedDate, viewType])
 
-	const navigateToDate = useCallback(
-		(date: IsoDateString) => {
-			setSearchParams(
-				(prev) => {
-					prev.set('date', date)
-					return prev
-				},
-				{ preventScrollReset: true },
-			)
-		},
-		[setSearchParams],
-	)
+  const navigateToDate = useCallback(
+    (date: IsoDateString) => {
+      setSearchParams(
+        (prev) => {
+          prev.set('date', date)
+          return prev
+        },
+        { preventScrollReset: true },
+      )
+    },
+    [setSearchParams],
+  )
 
-	const next = useCallback(() => {
-		setPeriod((currentPeriod) => {
-			const firstDay = currentPeriod[0]
-			if (!firstDay) return currentPeriod
-			const currentFirst = new Date(firstDay)
-			const nextPeriod =
-				viewType === 'month'
-					? addMonths(currentFirst, 1)
-					: addWeeks(currentFirst, 1)
-			const nextPeriodFormatted = formatISOLocale(nextPeriod)
-			navigateToDate(nextPeriodFormatted)
-			return viewType === 'month'
-				? getMonthOfDate(nextPeriod)
-				: getWeekOfDate(nextPeriodFormatted)
-		})
-	}, [viewType, navigateToDate])
+  const next = useCallback(() => {
+    setPeriod((currentPeriod) => {
+      const firstDay = currentPeriod[0]
+      if (!firstDay) return currentPeriod
+      const currentFirst = new Date(firstDay)
+      const nextPeriod =
+        viewType === 'month'
+          ? addMonths(currentFirst, 1)
+          : addWeeks(currentFirst, 1)
+      navigateToDate(toDateParam(nextPeriod))
+      return viewType === 'month'
+        ? getMonthOfDate(nextPeriod)
+        : getWeekOfDate(nextPeriod)
+    })
+  }, [viewType, navigateToDate])
 
-	const previous = useCallback(() => {
-		setPeriod((currentPeriod) => {
-			const firstDay = currentPeriod[0]
-			if (!firstDay) return currentPeriod
-			const currentFirst = new Date(firstDay)
-			const prevPeriod =
-				viewType === 'month'
-					? addMonths(currentFirst, -1)
-					: addWeeks(currentFirst, -1)
-			const prevPeriodFormatted = formatISOLocale(prevPeriod)
-			navigateToDate(prevPeriodFormatted)
-			return viewType === 'month'
-				? getMonthOfDate(prevPeriod)
-				: getWeekOfDate(prevPeriodFormatted)
-		})
-	}, [viewType, navigateToDate])
+  const previous = useCallback(() => {
+    setPeriod((currentPeriod) => {
+      const firstDay = currentPeriod[0]
+      if (!firstDay) return currentPeriod
+      const currentFirst = new Date(firstDay)
+      const prevPeriod =
+        viewType === 'month'
+          ? addMonths(currentFirst, -1)
+          : addWeeks(currentFirst, -1)
+      navigateToDate(toDateParam(prevPeriod))
+      return viewType === 'month'
+        ? getMonthOfDate(prevPeriod)
+        : getWeekOfDate(prevPeriod)
+    })
+  }, [viewType, navigateToDate])
 
-	const goToDate = useCallback(
-		(date: IsoDateString) => {
-			setPeriod(
-				viewType === 'month' ? getMonthOfDate(date) : getWeekOfDate(date),
-			)
-		},
-		[viewType],
-	)
+  const goToDate = useCallback(
+    (date: IsoDateString) => {
+      setPeriod(
+        viewType === 'month' ? getMonthOfDate(date) : getWeekOfDate(date),
+      )
+    },
+    [viewType],
+  )
 
-	return {
-		goToDate,
-		next,
-		period,
-		previous,
-	}
+  return {
+    goToDate,
+    next,
+    period,
+    previous,
+  }
 }

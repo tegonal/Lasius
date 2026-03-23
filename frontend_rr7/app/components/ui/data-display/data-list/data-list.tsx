@@ -22,9 +22,9 @@ import React from 'react'
 type Props = React.ComponentPropsWithoutRef<'table'>
 
 export const DataList = ({ children, ...rest }: Props) => {
-	return (
-		<table className="w-full border-collapse" {...rest}>
-			<tbody>{children}</tbody>
-		</table>
-	)
+  return (
+    <table className="w-full border-collapse" {...rest}>
+      <tbody>{children}</tbody>
+    </table>
+  )
 }

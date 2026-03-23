@@ -21,102 +21,102 @@
  * Common arrow key increment/decrement for date/time values
  */
 export function handleArrowIncrement(
-	date: Date,
-	segment: string,
-	increment: number,
+  date: Date,
+  segment: string,
+  increment: number,
 ): Date {
-	const newDate = new Date(date)
+  const newDate = new Date(date)
 
-	switch (segment) {
-		case 'day':
-			newDate.setDate(newDate.getDate() + increment)
-			break
-		case 'hour':
-			newDate.setHours((newDate.getHours() + increment + 24) % 24)
-			break
-		case 'minute':
-			newDate.setMinutes((newDate.getMinutes() + increment + 60) % 60)
-			break
-		case 'month':
-			newDate.setMonth(newDate.getMonth() + increment)
-			break
-		case 'year':
-			newDate.setFullYear(newDate.getFullYear() + increment)
-			break
-	}
+  switch (segment) {
+    case 'day':
+      newDate.setDate(newDate.getDate() + increment)
+      break
+    case 'hour':
+      newDate.setHours((newDate.getHours() + increment + 24) % 24)
+      break
+    case 'minute':
+      newDate.setMinutes((newDate.getMinutes() + increment + 60) % 60)
+      break
+    case 'month':
+      newDate.setMonth(newDate.getMonth() + increment)
+      break
+    case 'year':
+      newDate.setFullYear(newDate.getFullYear() + increment)
+      break
+  }
 
-	return newDate
+  return newDate
 }
 
 /**
  * Common utility for handling multi-digit input in segments
  */
 export function handleMultiDigitInput<TSegment extends string>(
-	inputValue: string,
-	newValue: string,
-	selectedSegment: null | TSegment,
-	separator: string,
-	getSegmentIndex: (segment: TSegment) => number,
-	shouldAutoAdvance: (segment: TSegment, parts: string[]) => boolean,
+  inputValue: string,
+  newValue: string,
+  selectedSegment: null | TSegment,
+  separator: string,
+  getSegmentIndex: (segment: TSegment) => number,
+  shouldAutoAdvance: (segment: TSegment, parts: string[]) => boolean,
 ) {
-	// Check if we're typing a digit and the segment already has content
-	if (
-		/^\d$/.test(newValue.slice(-1)) &&
-		newValue.length > inputValue.length &&
-		selectedSegment
-	) {
-		const parts = inputValue.split(separator)
-		const newDigit = newValue.slice(-1)
-		const segmentIndex = getSegmentIndex(selectedSegment)
+  // Check if we're typing a digit and the segment already has content
+  if (
+    /^\d$/.test(newValue.slice(-1)) &&
+    newValue.length > inputValue.length &&
+    selectedSegment
+  ) {
+    const parts = inputValue.split(separator)
+    const newDigit = newValue.slice(-1)
+    const segmentIndex = getSegmentIndex(selectedSegment)
 
-		if (segmentIndex >= 0 && segmentIndex < parts.length) {
-			const currentSegment = parts[segmentIndex] ?? ''
-			if (/^\d+$/.test(currentSegment)) {
-				parts[segmentIndex] = currentSegment + newDigit
-				return {
-					newValue: parts.join(separator),
-					shouldAdvance: shouldAutoAdvance(selectedSegment, parts),
-				}
-			}
-		}
-	}
+    if (segmentIndex >= 0 && segmentIndex < parts.length) {
+      const currentSegment = parts[segmentIndex] ?? ''
+      if (/^\d+$/.test(currentSegment)) {
+        parts[segmentIndex] = currentSegment + newDigit
+        return {
+          newValue: parts.join(separator),
+          shouldAdvance: shouldAutoAdvance(selectedSegment, parts),
+        }
+      }
+    }
+  }
 
-	return null
+  return null
 }
 
 /**
  * Common utility for handling segment replacement when typing
  */
 export function handleSegmentReplacement<TSegment extends string>(
-	inputValue: string,
-	newValue: string,
-	selectedSegment: null | TSegment,
-	selectionStart: null | number,
-	selectionEnd: null | number,
-	segmentBounds: { end: number; start: number },
-	separator: string,
-	getSegmentIndex: (segment: TSegment) => number,
-	formatSegmentValue: (value: string, segment: TSegment) => string,
+  inputValue: string,
+  newValue: string,
+  selectedSegment: null | TSegment,
+  selectionStart: null | number,
+  selectionEnd: null | number,
+  segmentBounds: { end: number; start: number },
+  separator: string,
+  getSegmentIndex: (segment: TSegment) => number,
+  formatSegmentValue: (value: string, segment: TSegment) => string,
 ) {
-	// Check if selection matches the segment bounds (user is replacing the segment)
-	if (
-		selectionStart === segmentBounds.start &&
-		selectionEnd === segmentBounds.end
-	) {
-		const parts = inputValue.split(separator)
-		const typedChar = newValue.slice(selectionStart, selectionStart + 1)
+  // Check if selection matches the segment bounds (user is replacing the segment)
+  if (
+    selectionStart === segmentBounds.start &&
+    selectionEnd === segmentBounds.end
+  ) {
+    const parts = inputValue.split(separator)
+    const typedChar = newValue.slice(selectionStart, selectionStart + 1)
 
-		if (/\d/.test(typedChar) && selectedSegment) {
-			const segmentIndex = getSegmentIndex(selectedSegment)
-			if (segmentIndex >= 0 && segmentIndex < parts.length) {
-				parts[segmentIndex] = formatSegmentValue(typedChar, selectedSegment)
-				return {
-					newValue: parts.join(separator),
-					shouldAdvance: true,
-				}
-			}
-		}
-	}
+    if (/\d/.test(typedChar) && selectedSegment) {
+      const segmentIndex = getSegmentIndex(selectedSegment)
+      if (segmentIndex >= 0 && segmentIndex < parts.length) {
+        parts[segmentIndex] = formatSegmentValue(typedChar, selectedSegment)
+        return {
+          newValue: parts.join(separator),
+          shouldAdvance: true,
+        }
+      }
+    }
+  }
 
-	return null
+  return null
 }

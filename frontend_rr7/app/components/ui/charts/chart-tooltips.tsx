@@ -22,138 +22,138 @@ import { type ReactNode } from 'react'
 // ─── Tooltip Container ──────────────────────────────────────────────────────
 
 interface SingleTooltipPoint {
-	color: string
-	data: {
-		x: number | string
-		y: number
-	}
-	id: string
-	value: number
+  color: string
+  data: {
+    x: number | string
+    y: number
+  }
+  id: string
+  value: number
 }
 
 // ─── Tooltip Item ────────────────────────────────────────────────────────────
 
 interface StackTooltipSlice {
-	index?: number
-	stack: Array<{
-		color: string
-		id?: string
-		layerId?: string
-		layerLabel?: string
-		value: number
-	}>
+  index?: number
+  stack: Array<{
+    color: string
+    id?: string
+    layerId?: string
+    layerLabel?: string
+    value: number
+  }>
 }
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 export const ChartSingleTooltip = ({
-	formatValue = (val) => `${val}h`,
-	point,
+  formatValue = (val) => `${val}h`,
+  point,
 }: {
-	formatValue?: (value: number) => string
-	point: SingleTooltipPoint
+  formatValue?: (value: number) => string
+  point: SingleTooltipPoint
 }) => {
-	if (!point) return null
+  if (!point) return null
 
-	return (
-		<TooltipContainer>
-			<TooltipItem
-				color={point.color}
-				label={point.data.x.toString()}
-				value={formatValue(point.value)}
-			/>
-		</TooltipContainer>
-	)
+  return (
+    <TooltipContainer>
+      <TooltipItem
+        color={point.color}
+        label={point.data.x.toString()}
+        value={formatValue(point.value)}
+      />
+    </TooltipContainer>
+  )
 }
 
 export const ChartStackTooltip = ({
-	formatLabel = (id) => id,
-	formatValue = (val) => `${val}h`,
-	getTitle,
-	slice,
+  formatLabel = (id) => id,
+  formatValue = (val) => `${val}h`,
+  getTitle,
+  slice,
 }: {
-	formatLabel?: (id: string) => string
-	formatValue?: (value: number) => string
-	getTitle?: (index?: number) => string
-	slice: StackTooltipSlice
+  formatLabel?: (id: string) => string
+  formatValue?: (value: number) => string
+  getTitle?: (index?: number) => string
+  slice: StackTooltipSlice
 }) => {
-	if (!slice) return null
+  if (!slice) return null
 
-	const title = getTitle
-		? getTitle(slice.index)
-		: `Item ${(slice.index || 0) + 1}`
+  const title = getTitle
+    ? getTitle(slice.index)
+    : `Item ${(slice.index || 0) + 1}`
 
-	return (
-		<TooltipContainer title={title}>
-			<div className="space-y-1">
-				{slice.stack &&
-					slice.stack
-						.filter((point) => point && point.value > 0)
-						.map((point) => {
-							const pointId =
-								point.layerLabel || point.layerId || point.id || ''
-							return (
-								<TooltipItem
-									color={point.color}
-									key={pointId}
-									label={formatLabel(pointId)}
-									value={formatValue(point.value)}
-								/>
-							)
-						})}
-			</div>
-		</TooltipContainer>
-	)
+  return (
+    <TooltipContainer title={title}>
+      <div className="space-y-1">
+        {slice.stack &&
+          slice.stack
+            .filter((point) => point && point.value > 0)
+            .map((point) => {
+              const pointId =
+                point.layerLabel || point.layerId || point.id || ''
+              return (
+                <TooltipItem
+                  color={point.color}
+                  key={pointId}
+                  label={formatLabel(pointId)}
+                  value={formatValue(point.value)}
+                />
+              )
+            })}
+      </div>
+    </TooltipContainer>
+  )
 }
 
 // ─── Stack Tooltip ───────────────────────────────────────────────────────────
 
 export const TooltipContainer = ({
-	children,
-	title,
+  children,
+  title,
 }: {
-	children: ReactNode
-	title?: string
+  children: ReactNode
+  title?: string
 }) => {
-	return (
-		<div className="bg-base-100 border-base-200 w-auto rounded border p-2 shadow-lg">
-			{title && (
-				<div className="text-base-content mb-2 text-sm font-medium whitespace-nowrap">
-					{title}
-				</div>
-			)}
-			{children}
-		</div>
-	)
+  return (
+    <div className="bg-base-100 border-base-200 w-auto rounded border p-2 shadow-lg">
+      {title && (
+        <div className="text-base-content mb-2 text-sm font-medium whitespace-nowrap">
+          {title}
+        </div>
+      )}
+      {children}
+    </div>
+  )
 }
 
 // ─── Single Tooltip ──────────────────────────────────────────────────────────
 
 export const TooltipItem = ({
-	color,
-	label,
-	value,
+  color,
+  label,
+  value,
 }: {
-	color?: string
-	label: string
-	value: number | string
+  color?: string
+  label: string
+  value: number | string
 }) => {
-	return (
-		<div className="flex min-w-0 items-center justify-between gap-3 whitespace-nowrap">
-			<div className="flex min-w-0 items-center gap-2">
-				{color && (
-					<div
-						className="h-3 w-3 flex-shrink-0 rounded-full"
-						style={{ backgroundColor: color }}
-					/>
-				)}
-				<span className="text-base-content truncate text-sm font-medium">
-					{label}
-				</span>
-			</div>
-			<span className="text-base-content/70 flex-shrink-0 text-sm">
-				{value}
-			</span>
-		</div>
-	)
+  return (
+    <div className="flex min-w-0 items-center justify-between gap-3 whitespace-nowrap">
+      <div className="flex min-w-0 items-center gap-2">
+        {color && (
+          <div
+            className="h-3 w-3 flex-shrink-0 rounded-full"
+            style={{ backgroundColor: color }}
+          />
+        )}
+        <span className="text-base-content truncate text-sm font-medium">
+          {label}
+        </span>
+      </div>
+      <span className="text-base-content/70 flex-shrink-0 text-sm">
+        {value}
+      </span>
+    </div>
+  )
 }

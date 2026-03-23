@@ -21,8 +21,8 @@ import common from './de/common.json'
 import integrations from './de/integrations.json'
 
 const resources = {
-	common,
-	integrations,
+  common,
+  integrations,
 } as const
 
 export default resources

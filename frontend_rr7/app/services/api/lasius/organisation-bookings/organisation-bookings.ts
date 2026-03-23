@@ -3,13 +3,13 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type {
-	GetOrganisationBookingAggregatedStatsParams,
-	GetOrganisationBookingListParams,
-	ModelsBooking,
-	ModelsBookingStats,
+  GetOrganisationBookingAggregatedStatsParams,
+  GetOrganisationBookingListParams,
+  ModelsBooking,
+  ModelsBookingStats,
 } from './..'
 
 import { lasiusFetch } from '../../lasius-fetch-instance'
@@ -18,94 +18,94 @@ import { lasiusFetch } from '../../lasius-fetch-instance'
  * @summary Get bookings for the selected organisation within the selected timeframe
  */
 export type getOrganisationBookingListResponse200 = {
-	data: ModelsBooking[]
-	status: 200
+  data: ModelsBooking[]
+  status: 200
 }
 
 export type getOrganisationBookingListResponseSuccess =
-	getOrganisationBookingListResponse200 & {
-		headers: Headers
-	}
+  getOrganisationBookingListResponse200 & {
+    headers: Headers
+  }
 export type getOrganisationBookingListResponse =
-	getOrganisationBookingListResponseSuccess
+  getOrganisationBookingListResponseSuccess
 
 export const getGetOrganisationBookingListUrl = (
-	orgId: string,
-	params: GetOrganisationBookingListParams,
+  orgId: string,
+  params: GetOrganisationBookingListParams,
 ) => {
-	const normalizedParams = new URLSearchParams()
+  const normalizedParams = new URLSearchParams()
 
-	Object.entries(params || {}).forEach(([key, value]) => {
-		if (value !== undefined) {
-			normalizedParams.append(key, value === null ? 'null' : value.toString())
-		}
-	})
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  })
 
-	const stringifiedParams = normalizedParams.toString()
+  const stringifiedParams = normalizedParams.toString()
 
-	return stringifiedParams.length > 0
-		? `/organisation-bookings/organisations/${orgId}/bookings/history?${stringifiedParams}`
-		: `/organisation-bookings/organisations/${orgId}/bookings/history`
+  return stringifiedParams.length > 0
+    ? `/organisation-bookings/organisations/${orgId}/bookings/history?${stringifiedParams}`
+    : `/organisation-bookings/organisations/${orgId}/bookings/history`
 }
 
 export const getOrganisationBookingList = async (
-	orgId: string,
-	params: GetOrganisationBookingListParams,
-	options?: RequestInit,
+  orgId: string,
+  params: GetOrganisationBookingListParams,
+  options?: RequestInit,
 ): Promise<getOrganisationBookingListResponse> => {
-	return lasiusFetch<getOrganisationBookingListResponse>(
-		getGetOrganisationBookingListUrl(orgId, params),
-		{
-			...options,
-			method: 'GET',
-		},
-	)
+  return lasiusFetch<getOrganisationBookingListResponse>(
+    getGetOrganisationBookingListUrl(orgId, params),
+    {
+      ...options,
+      method: 'GET',
+    },
+  )
 }
 
 /**
  * @summary Get aggregated statistics about bookings for the selected organisation within the selected timeframe
  */
 export type getOrganisationBookingAggregatedStatsResponse200 = {
-	data: ModelsBookingStats[]
-	status: 200
+  data: ModelsBookingStats[]
+  status: 200
 }
 
 export type getOrganisationBookingAggregatedStatsResponseSuccess =
-	getOrganisationBookingAggregatedStatsResponse200 & {
-		headers: Headers
-	}
+  getOrganisationBookingAggregatedStatsResponse200 & {
+    headers: Headers
+  }
 export type getOrganisationBookingAggregatedStatsResponse =
-	getOrganisationBookingAggregatedStatsResponseSuccess
+  getOrganisationBookingAggregatedStatsResponseSuccess
 
 export const getGetOrganisationBookingAggregatedStatsUrl = (
-	orgId: string,
-	params: GetOrganisationBookingAggregatedStatsParams,
+  orgId: string,
+  params: GetOrganisationBookingAggregatedStatsParams,
 ) => {
-	const normalizedParams = new URLSearchParams()
+  const normalizedParams = new URLSearchParams()
 
-	Object.entries(params || {}).forEach(([key, value]) => {
-		if (value !== undefined) {
-			normalizedParams.append(key, value === null ? 'null' : value.toString())
-		}
-	})
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  })
 
-	const stringifiedParams = normalizedParams.toString()
+  const stringifiedParams = normalizedParams.toString()
 
-	return stringifiedParams.length > 0
-		? `/organisation-bookings/organisations/${orgId}/bookings/stats/aggregated?${stringifiedParams}`
-		: `/organisation-bookings/organisations/${orgId}/bookings/stats/aggregated`
+  return stringifiedParams.length > 0
+    ? `/organisation-bookings/organisations/${orgId}/bookings/stats/aggregated?${stringifiedParams}`
+    : `/organisation-bookings/organisations/${orgId}/bookings/stats/aggregated`
 }
 
 export const getOrganisationBookingAggregatedStats = async (
-	orgId: string,
-	params: GetOrganisationBookingAggregatedStatsParams,
-	options?: RequestInit,
+  orgId: string,
+  params: GetOrganisationBookingAggregatedStatsParams,
+  options?: RequestInit,
 ): Promise<getOrganisationBookingAggregatedStatsResponse> => {
-	return lasiusFetch<getOrganisationBookingAggregatedStatsResponse>(
-		getGetOrganisationBookingAggregatedStatsUrl(orgId, params),
-		{
-			...options,
-			method: 'GET',
-		},
-	)
+  return lasiusFetch<getOrganisationBookingAggregatedStatsResponse>(
+    getGetOrganisationBookingAggregatedStatsUrl(orgId, params),
+    {
+      ...options,
+      method: 'GET',
+    },
+  )
 }

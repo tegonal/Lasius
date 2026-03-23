@@ -25,29 +25,29 @@ import { Modal } from '~/components/ui/overlays/modal'
 import { BookingAddUpdateForm } from '~/features/bookings/components/booking-add-update-form'
 
 type Props = {
-	selectedOrgId: string
+  selectedOrgId: string
 }
 
 export const BookingAddButton = ({ selectedOrgId }: Props) => {
-	const [isOpen, setIsOpen] = useState(false)
-	const { t } = useTranslation('common')
+  const [isOpen, setIsOpen] = useState(false)
+  const { t } = useTranslation('common')
 
-	const handleClose = () => setIsOpen(false)
+  const handleClose = () => setIsOpen(false)
 
-	return (
-		<>
-			<Button onClick={() => setIsOpen(true)} variant="secondary">
-				{t('bookings.actions.create', {
-					defaultValue: 'Create a booking',
-				})}
-			</Button>
-			<Modal onClose={handleClose} open={isOpen}>
-				<BookingAddUpdateForm
-					mode="add"
-					onClose={handleClose}
-					selectedOrgId={selectedOrgId}
-				/>
-			</Modal>
-		</>
-	)
+  return (
+    <>
+      <Button onClick={() => setIsOpen(true)} variant="secondary">
+        {t('bookings.actions.create', {
+          defaultValue: 'Create a booking',
+        })}
+      </Button>
+      <Modal onClose={handleClose} open={isOpen}>
+        <BookingAddUpdateForm
+          mode="add"
+          onClose={handleClose}
+          selectedOrgId={selectedOrgId}
+        />
+      </Modal>
+    </>
+  )
 }

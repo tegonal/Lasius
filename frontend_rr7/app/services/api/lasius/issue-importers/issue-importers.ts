@@ -3,28 +3,28 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type {
-	DeleteConfig400,
-	DeleteConfig403,
-	DeleteConfig404,
-	GetConfigsParams,
-	ListGithubResourceOwners400,
-	ListProjects400,
-	ModelsCreateIssueImporterConfig,
-	ModelsCreateProjectMapping,
-	ModelsIssueImporterConfigId,
-	ModelsIssueImporterConfigResponse,
-	ModelsListProjectsResponse,
-	ModelsUpdateIssueImporterConfig,
-	ModelsUpdateProjectMapping,
-	RefreshTags202,
-	RefreshTags404,
-	TestConnectivity200,
-	TestConnectivity400,
-	TestExistingConfig200,
-	TestExistingConfig400,
+  DeleteConfig400,
+  DeleteConfig403,
+  DeleteConfig404,
+  GetConfigsParams,
+  ListGithubResourceOwners400,
+  ListProjects400,
+  ModelsCreateIssueImporterConfig,
+  ModelsCreateProjectMapping,
+  ModelsIssueImporterConfigId,
+  ModelsIssueImporterConfigResponse,
+  ModelsListProjectsResponse,
+  ModelsUpdateIssueImporterConfig,
+  ModelsUpdateProjectMapping,
+  RefreshTags202,
+  RefreshTags404,
+  TestConnectivity200,
+  TestConnectivity400,
+  TestExistingConfig200,
+  TestExistingConfig400,
 } from './..'
 
 import { lasiusFetch } from '../../lasius-fetch-instance'
@@ -33,322 +33,322 @@ import { lasiusFetch } from '../../lasius-fetch-instance'
  * @summary Get all importer configurations for organisation (optionally filtered by type)
  */
 export type getConfigsResponse200 = {
-	data: ModelsIssueImporterConfigResponse[]
-	status: 200
+  data: ModelsIssueImporterConfigResponse[]
+  status: 200
 }
 
 export type getConfigsResponse403 = {
-	data: void
-	status: 403
+  data: void
+  status: 403
 }
 
 export type getConfigsResponseSuccess = getConfigsResponse200 & {
-	headers: Headers
+  headers: Headers
 }
 export type getConfigsResponseError = getConfigsResponse403 & {
-	headers: Headers
+  headers: Headers
 }
 
 export type getConfigsResponse =
-	| getConfigsResponseSuccess
-	| getConfigsResponseError
+  | getConfigsResponseSuccess
+  | getConfigsResponseError
 
 export const getGetConfigsUrl = (orgId: string, params?: GetConfigsParams) => {
-	const normalizedParams = new URLSearchParams()
+  const normalizedParams = new URLSearchParams()
 
-	Object.entries(params || {}).forEach(([key, value]) => {
-		if (value !== undefined) {
-			normalizedParams.append(key, value === null ? 'null' : value.toString())
-		}
-	})
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  })
 
-	const stringifiedParams = normalizedParams.toString()
+  const stringifiedParams = normalizedParams.toString()
 
-	return stringifiedParams.length > 0
-		? `/organisations/${orgId}/issue-importers?${stringifiedParams}`
-		: `/organisations/${orgId}/issue-importers`
+  return stringifiedParams.length > 0
+    ? `/organisations/${orgId}/issue-importers?${stringifiedParams}`
+    : `/organisations/${orgId}/issue-importers`
 }
 
 export const getConfigs = async (
-	orgId: string,
-	params?: GetConfigsParams,
-	options?: RequestInit,
+  orgId: string,
+  params?: GetConfigsParams,
+  options?: RequestInit,
 ): Promise<getConfigsResponse> => {
-	return lasiusFetch<getConfigsResponse>(getGetConfigsUrl(orgId, params), {
-		...options,
-		method: 'GET',
-	})
+  return lasiusFetch<getConfigsResponse>(getGetConfigsUrl(orgId, params), {
+    ...options,
+    method: 'GET',
+  })
 }
 
 /**
  * @summary Create new importer configuration (Organisation Admin only)
  */
 export type createConfigResponse201 = {
-	data: ModelsIssueImporterConfigResponse
-	status: 201
+  data: ModelsIssueImporterConfigResponse
+  status: 201
 }
 
 export type createConfigResponse400 = {
-	data: void
-	status: 400
+  data: void
+  status: 400
 }
 
 export type createConfigResponse403 = {
-	data: void
-	status: 403
+  data: void
+  status: 403
 }
 
 export type createConfigResponseSuccess = createConfigResponse201 & {
-	headers: Headers
+  headers: Headers
 }
 export type createConfigResponseError = (
-	| createConfigResponse400
-	| createConfigResponse403
+  | createConfigResponse400
+  | createConfigResponse403
 ) & {
-	headers: Headers
+  headers: Headers
 }
 
 export type createConfigResponse =
-	| createConfigResponseSuccess
-	| createConfigResponseError
+  | createConfigResponseSuccess
+  | createConfigResponseError
 
 export const getCreateConfigUrl = (orgId: string) => {
-	return `/organisations/${orgId}/issue-importers`
+  return `/organisations/${orgId}/issue-importers`
 }
 
 export const createConfig = async (
-	orgId: string,
-	modelsCreateIssueImporterConfig: ModelsCreateIssueImporterConfig,
-	options?: RequestInit,
+  orgId: string,
+  modelsCreateIssueImporterConfig: ModelsCreateIssueImporterConfig,
+  options?: RequestInit,
 ): Promise<createConfigResponse> => {
-	return lasiusFetch<createConfigResponse>(getCreateConfigUrl(orgId), {
-		...options,
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json', ...options?.headers },
-		body: JSON.stringify(modelsCreateIssueImporterConfig),
-	})
+  return lasiusFetch<createConfigResponse>(getCreateConfigUrl(orgId), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(modelsCreateIssueImporterConfig),
+  })
 }
 
 /**
  * @summary Get importer configuration by ID
  */
 export type getConfigResponse200 = {
-	data: ModelsIssueImporterConfigResponse
-	status: 200
+  data: ModelsIssueImporterConfigResponse
+  status: 200
 }
 
 export type getConfigResponse403 = {
-	data: void
-	status: 403
+  data: void
+  status: 403
 }
 
 export type getConfigResponse404 = {
-	data: void
-	status: 404
+  data: void
+  status: 404
 }
 
 export type getConfigResponseSuccess = getConfigResponse200 & {
-	headers: Headers
+  headers: Headers
 }
 export type getConfigResponseError = (
-	| getConfigResponse403
-	| getConfigResponse404
+  | getConfigResponse403
+  | getConfigResponse404
 ) & {
-	headers: Headers
+  headers: Headers
 }
 
 export type getConfigResponse =
-	| getConfigResponseSuccess
-	| getConfigResponseError
+  | getConfigResponseSuccess
+  | getConfigResponseError
 
 export const getGetConfigUrl = (
-	orgId: string,
-	configId: ModelsIssueImporterConfigId,
+  orgId: string,
+  configId: ModelsIssueImporterConfigId,
 ) => {
-	return `/organisations/${orgId}/issue-importers/${configId}`
+  return `/organisations/${orgId}/issue-importers/${configId}`
 }
 
 export const getConfig = async (
-	orgId: string,
-	configId: ModelsIssueImporterConfigId,
-	options?: RequestInit,
+  orgId: string,
+  configId: ModelsIssueImporterConfigId,
+  options?: RequestInit,
 ): Promise<getConfigResponse> => {
-	return lasiusFetch<getConfigResponse>(getGetConfigUrl(orgId, configId), {
-		...options,
-		method: 'GET',
-	})
+  return lasiusFetch<getConfigResponse>(getGetConfigUrl(orgId, configId), {
+    ...options,
+    method: 'GET',
+  })
 }
 
 /**
  * @summary Update importer configuration (Organisation Admin only)
  */
 export type updateConfigResponse200 = {
-	data: ModelsIssueImporterConfigResponse
-	status: 200
+  data: ModelsIssueImporterConfigResponse
+  status: 200
 }
 
 export type updateConfigResponse400 = {
-	data: void
-	status: 400
+  data: void
+  status: 400
 }
 
 export type updateConfigResponse403 = {
-	data: void
-	status: 403
+  data: void
+  status: 403
 }
 
 export type updateConfigResponse404 = {
-	data: void
-	status: 404
+  data: void
+  status: 404
 }
 
 export type updateConfigResponseSuccess = updateConfigResponse200 & {
-	headers: Headers
+  headers: Headers
 }
 export type updateConfigResponseError = (
-	| updateConfigResponse400
-	| updateConfigResponse403
-	| updateConfigResponse404
+  | updateConfigResponse400
+  | updateConfigResponse403
+  | updateConfigResponse404
 ) & {
-	headers: Headers
+  headers: Headers
 }
 
 export type updateConfigResponse =
-	| updateConfigResponseSuccess
-	| updateConfigResponseError
+  | updateConfigResponseSuccess
+  | updateConfigResponseError
 
 export const getUpdateConfigUrl = (
-	orgId: string,
-	configId: ModelsIssueImporterConfigId,
+  orgId: string,
+  configId: ModelsIssueImporterConfigId,
 ) => {
-	return `/organisations/${orgId}/issue-importers/${configId}`
+  return `/organisations/${orgId}/issue-importers/${configId}`
 }
 
 export const updateConfig = async (
-	orgId: string,
-	configId: ModelsIssueImporterConfigId,
-	modelsUpdateIssueImporterConfig: ModelsUpdateIssueImporterConfig,
-	options?: RequestInit,
+  orgId: string,
+  configId: ModelsIssueImporterConfigId,
+  modelsUpdateIssueImporterConfig: ModelsUpdateIssueImporterConfig,
+  options?: RequestInit,
 ): Promise<updateConfigResponse> => {
-	return lasiusFetch<updateConfigResponse>(
-		getUpdateConfigUrl(orgId, configId),
-		{
-			...options,
-			method: 'PUT',
-			headers: { 'Content-Type': 'application/json', ...options?.headers },
-			body: JSON.stringify(modelsUpdateIssueImporterConfig),
-		},
-	)
+  return lasiusFetch<updateConfigResponse>(
+    getUpdateConfigUrl(orgId, configId),
+    {
+      ...options,
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(modelsUpdateIssueImporterConfig),
+    },
+  )
 }
 
 /**
  * @summary Delete importer configuration (Organisation Admin only)
  */
 export type deleteConfigResponse204 = {
-	data: void
-	status: 204
+  data: void
+  status: 204
 }
 
 export type deleteConfigResponse400 = {
-	data: DeleteConfig400
-	status: 400
+  data: DeleteConfig400
+  status: 400
 }
 
 export type deleteConfigResponse403 = {
-	data: DeleteConfig403
-	status: 403
+  data: DeleteConfig403
+  status: 403
 }
 
 export type deleteConfigResponse404 = {
-	data: DeleteConfig404
-	status: 404
+  data: DeleteConfig404
+  status: 404
 }
 
 export type deleteConfigResponseSuccess = deleteConfigResponse204 & {
-	headers: Headers
+  headers: Headers
 }
 export type deleteConfigResponseError = (
-	| deleteConfigResponse400
-	| deleteConfigResponse403
-	| deleteConfigResponse404
+  | deleteConfigResponse400
+  | deleteConfigResponse403
+  | deleteConfigResponse404
 ) & {
-	headers: Headers
+  headers: Headers
 }
 
 export type deleteConfigResponse =
-	| deleteConfigResponseSuccess
-	| deleteConfigResponseError
+  | deleteConfigResponseSuccess
+  | deleteConfigResponseError
 
 export const getDeleteConfigUrl = (
-	orgId: string,
-	configId: ModelsIssueImporterConfigId,
+  orgId: string,
+  configId: ModelsIssueImporterConfigId,
 ) => {
-	return `/organisations/${orgId}/issue-importers/${configId}`
+  return `/organisations/${orgId}/issue-importers/${configId}`
 }
 
 export const deleteConfig = async (
-	orgId: string,
-	configId: ModelsIssueImporterConfigId,
-	options?: RequestInit,
+  orgId: string,
+  configId: ModelsIssueImporterConfigId,
+  options?: RequestInit,
 ): Promise<deleteConfigResponse> => {
-	return lasiusFetch<deleteConfigResponse>(
-		getDeleteConfigUrl(orgId, configId),
-		{
-			...options,
-			method: 'DELETE',
-		},
-	)
+  return lasiusFetch<deleteConfigResponse>(
+    getDeleteConfigUrl(orgId, configId),
+    {
+      ...options,
+      method: 'DELETE',
+    },
+  )
 }
 
 /**
  * @summary Get importer configuration for a specific project
  */
 export type getConfigForProjectResponse200 = {
-	data: ModelsIssueImporterConfigResponse
-	status: 200
+  data: ModelsIssueImporterConfigResponse
+  status: 200
 }
 
 export type getConfigForProjectResponse403 = {
-	data: void
-	status: 403
+  data: void
+  status: 403
 }
 
 export type getConfigForProjectResponse404 = {
-	data: void
-	status: 404
+  data: void
+  status: 404
 }
 
 export type getConfigForProjectResponseSuccess =
-	getConfigForProjectResponse200 & {
-		headers: Headers
-	}
+  getConfigForProjectResponse200 & {
+    headers: Headers
+  }
 export type getConfigForProjectResponseError = (
-	| getConfigForProjectResponse403
-	| getConfigForProjectResponse404
+  | getConfigForProjectResponse403
+  | getConfigForProjectResponse404
 ) & {
-	headers: Headers
+  headers: Headers
 }
 
 export type getConfigForProjectResponse =
-	| getConfigForProjectResponseSuccess
-	| getConfigForProjectResponseError
+  | getConfigForProjectResponseSuccess
+  | getConfigForProjectResponseError
 
 export const getGetConfigForProjectUrl = (orgId: string, projectId: string) => {
-	return `/organisations/${orgId}/projects/${projectId}/issue-importer`
+  return `/organisations/${orgId}/projects/${projectId}/issue-importer`
 }
 
 export const getConfigForProject = async (
-	orgId: string,
-	projectId: string,
-	options?: RequestInit,
+  orgId: string,
+  projectId: string,
+  options?: RequestInit,
 ): Promise<getConfigForProjectResponse> => {
-	return lasiusFetch<getConfigForProjectResponse>(
-		getGetConfigForProjectUrl(orgId, projectId),
-		{
-			...options,
-			method: 'GET',
-		},
-	)
+  return lasiusFetch<getConfigForProjectResponse>(
+    getGetConfigForProjectUrl(orgId, projectId),
+    {
+      ...options,
+      method: 'GET',
+    },
+  )
 }
 
 /**
@@ -356,41 +356,41 @@ export const getConfigForProject = async (
  * @summary Test connectivity to external service
  */
 export type testConnectivityResponse200 = {
-	data: TestConnectivity200
-	status: 200
+  data: TestConnectivity200
+  status: 200
 }
 
 export type testConnectivityResponse400 = {
-	data: TestConnectivity400
-	status: 400
+  data: TestConnectivity400
+  status: 400
 }
 
 export type testConnectivityResponseSuccess = testConnectivityResponse200 & {
-	headers: Headers
+  headers: Headers
 }
 export type testConnectivityResponseError = testConnectivityResponse400 & {
-	headers: Headers
+  headers: Headers
 }
 
 export type testConnectivityResponse =
-	| testConnectivityResponseSuccess
-	| testConnectivityResponseError
+  | testConnectivityResponseSuccess
+  | testConnectivityResponseError
 
 export const getTestConnectivityUrl = (orgId: string) => {
-	return `/organisations/${orgId}/issue-importers/test`
+  return `/organisations/${orgId}/issue-importers/test`
 }
 
 export const testConnectivity = async (
-	orgId: string,
-	modelsCreateIssueImporterConfig: ModelsCreateIssueImporterConfig,
-	options?: RequestInit,
+  orgId: string,
+  modelsCreateIssueImporterConfig: ModelsCreateIssueImporterConfig,
+  options?: RequestInit,
 ): Promise<testConnectivityResponse> => {
-	return lasiusFetch<testConnectivityResponse>(getTestConnectivityUrl(orgId), {
-		...options,
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json', ...options?.headers },
-		body: JSON.stringify(modelsCreateIssueImporterConfig),
-	})
+  return lasiusFetch<testConnectivityResponse>(getTestConnectivityUrl(orgId), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(modelsCreateIssueImporterConfig),
+  })
 }
 
 /**
@@ -398,60 +398,60 @@ export const testConnectivity = async (
  * @summary Test connectivity for existing configuration
  */
 export type testExistingConfigResponse200 = {
-	data: TestExistingConfig200
-	status: 200
+  data: TestExistingConfig200
+  status: 200
 }
 
 export type testExistingConfigResponse400 = {
-	data: TestExistingConfig400
-	status: 400
+  data: TestExistingConfig400
+  status: 400
 }
 
 export type testExistingConfigResponse403 = {
-	data: void
-	status: 403
+  data: void
+  status: 403
 }
 
 export type testExistingConfigResponse404 = {
-	data: void
-	status: 404
+  data: void
+  status: 404
 }
 
 export type testExistingConfigResponseSuccess =
-	testExistingConfigResponse200 & {
-		headers: Headers
-	}
+  testExistingConfigResponse200 & {
+    headers: Headers
+  }
 export type testExistingConfigResponseError = (
-	| testExistingConfigResponse400
-	| testExistingConfigResponse403
-	| testExistingConfigResponse404
+  | testExistingConfigResponse400
+  | testExistingConfigResponse403
+  | testExistingConfigResponse404
 ) & {
-	headers: Headers
+  headers: Headers
 }
 
 export type testExistingConfigResponse =
-	| testExistingConfigResponseSuccess
-	| testExistingConfigResponseError
+  | testExistingConfigResponseSuccess
+  | testExistingConfigResponseError
 
 export const getTestExistingConfigUrl = (
-	orgId: string,
-	configId: ModelsIssueImporterConfigId,
+  orgId: string,
+  configId: ModelsIssueImporterConfigId,
 ) => {
-	return `/organisations/${orgId}/issue-importers/${configId}/test`
+  return `/organisations/${orgId}/issue-importers/${configId}/test`
 }
 
 export const testExistingConfig = async (
-	orgId: string,
-	configId: ModelsIssueImporterConfigId,
-	options?: RequestInit,
+  orgId: string,
+  configId: ModelsIssueImporterConfigId,
+  options?: RequestInit,
 ): Promise<testExistingConfigResponse> => {
-	return lasiusFetch<testExistingConfigResponse>(
-		getTestExistingConfigUrl(orgId, configId),
-		{
-			...options,
-			method: 'POST',
-		},
-	)
+  return lasiusFetch<testExistingConfigResponse>(
+    getTestExistingConfigUrl(orgId, configId),
+    {
+      ...options,
+      method: 'POST',
+    },
+  )
 }
 
 /**
@@ -459,121 +459,121 @@ export const testExistingConfig = async (
  * @summary List available projects from external service
  */
 export type listProjectsResponse200 = {
-	data: ModelsListProjectsResponse
-	status: 200
+  data: ModelsListProjectsResponse
+  status: 200
 }
 
 export type listProjectsResponse400 = {
-	data: ListProjects400
-	status: 400
+  data: ListProjects400
+  status: 400
 }
 
 export type listProjectsResponse403 = {
-	data: void
-	status: 403
+  data: void
+  status: 403
 }
 
 export type listProjectsResponse404 = {
-	data: void
-	status: 404
+  data: void
+  status: 404
 }
 
 export type listProjectsResponseSuccess = listProjectsResponse200 & {
-	headers: Headers
+  headers: Headers
 }
 export type listProjectsResponseError = (
-	| listProjectsResponse400
-	| listProjectsResponse403
-	| listProjectsResponse404
+  | listProjectsResponse400
+  | listProjectsResponse403
+  | listProjectsResponse404
 ) & {
-	headers: Headers
+  headers: Headers
 }
 
 export type listProjectsResponse =
-	| listProjectsResponseSuccess
-	| listProjectsResponseError
+  | listProjectsResponseSuccess
+  | listProjectsResponseError
 
 export const getListProjectsUrl = (
-	orgId: string,
-	configId: ModelsIssueImporterConfigId,
+  orgId: string,
+  configId: ModelsIssueImporterConfigId,
 ) => {
-	return `/organisations/${orgId}/issue-importers/${configId}/projects`
+  return `/organisations/${orgId}/issue-importers/${configId}/projects`
 }
 
 export const listProjects = async (
-	orgId: string,
-	configId: ModelsIssueImporterConfigId,
-	options?: RequestInit,
+  orgId: string,
+  configId: ModelsIssueImporterConfigId,
+  options?: RequestInit,
 ): Promise<listProjectsResponse> => {
-	return lasiusFetch<listProjectsResponse>(
-		getListProjectsUrl(orgId, configId),
-		{
-			...options,
-			method: 'GET',
-		},
-	)
+  return lasiusFetch<listProjectsResponse>(
+    getListProjectsUrl(orgId, configId),
+    {
+      ...options,
+      method: 'GET',
+    },
+  )
 }
 
 /**
  * @summary Add project mapping to configuration (Organisation Admin only)
  */
 export type addProjectMappingResponse200 = {
-	data: ModelsIssueImporterConfigResponse
-	status: 200
+  data: ModelsIssueImporterConfigResponse
+  status: 200
 }
 
 export type addProjectMappingResponse400 = {
-	data: void
-	status: 400
+  data: void
+  status: 400
 }
 
 export type addProjectMappingResponse403 = {
-	data: void
-	status: 403
+  data: void
+  status: 403
 }
 
 export type addProjectMappingResponse404 = {
-	data: void
-	status: 404
+  data: void
+  status: 404
 }
 
 export type addProjectMappingResponseSuccess = addProjectMappingResponse200 & {
-	headers: Headers
+  headers: Headers
 }
 export type addProjectMappingResponseError = (
-	| addProjectMappingResponse400
-	| addProjectMappingResponse403
-	| addProjectMappingResponse404
+  | addProjectMappingResponse400
+  | addProjectMappingResponse403
+  | addProjectMappingResponse404
 ) & {
-	headers: Headers
+  headers: Headers
 }
 
 export type addProjectMappingResponse =
-	| addProjectMappingResponseSuccess
-	| addProjectMappingResponseError
+  | addProjectMappingResponseSuccess
+  | addProjectMappingResponseError
 
 export const getAddProjectMappingUrl = (
-	orgId: string,
-	configId: ModelsIssueImporterConfigId,
+  orgId: string,
+  configId: ModelsIssueImporterConfigId,
 ) => {
-	return `/organisations/${orgId}/issue-importers/${configId}/projects`
+  return `/organisations/${orgId}/issue-importers/${configId}/projects`
 }
 
 export const addProjectMapping = async (
-	orgId: string,
-	configId: ModelsIssueImporterConfigId,
-	modelsCreateProjectMapping: ModelsCreateProjectMapping,
-	options?: RequestInit,
+  orgId: string,
+  configId: ModelsIssueImporterConfigId,
+  modelsCreateProjectMapping: ModelsCreateProjectMapping,
+  options?: RequestInit,
 ): Promise<addProjectMappingResponse> => {
-	return lasiusFetch<addProjectMappingResponse>(
-		getAddProjectMappingUrl(orgId, configId),
-		{
-			...options,
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json', ...options?.headers },
-			body: JSON.stringify(modelsCreateProjectMapping),
-		},
-	)
+  return lasiusFetch<addProjectMappingResponse>(
+    getAddProjectMappingUrl(orgId, configId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(modelsCreateProjectMapping),
+    },
+  )
 }
 
 /**
@@ -581,46 +581,46 @@ export const addProjectMapping = async (
  * @summary List GitHub resource owners (user + organizations)
  */
 export type listGithubResourceOwnersResponse200 = {
-	data: ModelsListProjectsResponse
-	status: 200
+  data: ModelsListProjectsResponse
+  status: 200
 }
 
 export type listGithubResourceOwnersResponse400 = {
-	data: ListGithubResourceOwners400
-	status: 400
+  data: ListGithubResourceOwners400
+  status: 400
 }
 
 export type listGithubResourceOwnersResponseSuccess =
-	listGithubResourceOwnersResponse200 & {
-		headers: Headers
-	}
+  listGithubResourceOwnersResponse200 & {
+    headers: Headers
+  }
 export type listGithubResourceOwnersResponseError =
-	listGithubResourceOwnersResponse400 & {
-		headers: Headers
-	}
+  listGithubResourceOwnersResponse400 & {
+    headers: Headers
+  }
 
 export type listGithubResourceOwnersResponse =
-	| listGithubResourceOwnersResponseSuccess
-	| listGithubResourceOwnersResponseError
+  | listGithubResourceOwnersResponseSuccess
+  | listGithubResourceOwnersResponseError
 
 export const getListGithubResourceOwnersUrl = (orgId: string) => {
-	return `/organisations/${orgId}/issue-importers/github/resource-owners`
+  return `/organisations/${orgId}/issue-importers/github/resource-owners`
 }
 
 export const listGithubResourceOwners = async (
-	orgId: string,
-	modelsCreateIssueImporterConfig: ModelsCreateIssueImporterConfig,
-	options?: RequestInit,
+  orgId: string,
+  modelsCreateIssueImporterConfig: ModelsCreateIssueImporterConfig,
+  options?: RequestInit,
 ): Promise<listGithubResourceOwnersResponse> => {
-	return lasiusFetch<listGithubResourceOwnersResponse>(
-		getListGithubResourceOwnersUrl(orgId),
-		{
-			...options,
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json', ...options?.headers },
-			body: JSON.stringify(modelsCreateIssueImporterConfig),
-		},
-	)
+  return lasiusFetch<listGithubResourceOwnersResponse>(
+    getListGithubResourceOwnersUrl(orgId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(modelsCreateIssueImporterConfig),
+    },
+  )
 }
 
 /**
@@ -628,174 +628,174 @@ export const listGithubResourceOwners = async (
  * @summary Force immediate tag refresh for a project
  */
 export type refreshTagsResponse202 = {
-	data: RefreshTags202
-	status: 202
+  data: RefreshTags202
+  status: 202
 }
 
 export type refreshTagsResponse403 = {
-	data: void
-	status: 403
+  data: void
+  status: 403
 }
 
 export type refreshTagsResponse404 = {
-	data: RefreshTags404
-	status: 404
+  data: RefreshTags404
+  status: 404
 }
 
 export type refreshTagsResponseSuccess = refreshTagsResponse202 & {
-	headers: Headers
+  headers: Headers
 }
 export type refreshTagsResponseError = (
-	| refreshTagsResponse403
-	| refreshTagsResponse404
+  | refreshTagsResponse403
+  | refreshTagsResponse404
 ) & {
-	headers: Headers
+  headers: Headers
 }
 
 export type refreshTagsResponse =
-	| refreshTagsResponseSuccess
-	| refreshTagsResponseError
+  | refreshTagsResponseSuccess
+  | refreshTagsResponseError
 
 export const getRefreshTagsUrl = (
-	orgId: string,
-	configId: ModelsIssueImporterConfigId,
-	projectId: string,
+  orgId: string,
+  configId: ModelsIssueImporterConfigId,
+  projectId: string,
 ) => {
-	return `/organisations/${orgId}/issue-importers/${configId}/projects/${projectId}/refresh-tags`
+  return `/organisations/${orgId}/issue-importers/${configId}/projects/${projectId}/refresh-tags`
 }
 
 export const refreshTags = async (
-	orgId: string,
-	configId: ModelsIssueImporterConfigId,
-	projectId: string,
-	options?: RequestInit,
+  orgId: string,
+  configId: ModelsIssueImporterConfigId,
+  projectId: string,
+  options?: RequestInit,
 ): Promise<refreshTagsResponse> => {
-	return lasiusFetch<refreshTagsResponse>(
-		getRefreshTagsUrl(orgId, configId, projectId),
-		{
-			...options,
-			method: 'POST',
-		},
-	)
+  return lasiusFetch<refreshTagsResponse>(
+    getRefreshTagsUrl(orgId, configId, projectId),
+    {
+      ...options,
+      method: 'POST',
+    },
+  )
 }
 
 /**
  * @summary Update project mapping in configuration (Organisation Admin only)
  */
 export type updateProjectMappingResponse200 = {
-	data: ModelsIssueImporterConfigResponse
-	status: 200
+  data: ModelsIssueImporterConfigResponse
+  status: 200
 }
 
 export type updateProjectMappingResponse400 = {
-	data: void
-	status: 400
+  data: void
+  status: 400
 }
 
 export type updateProjectMappingResponse403 = {
-	data: void
-	status: 403
+  data: void
+  status: 403
 }
 
 export type updateProjectMappingResponse404 = {
-	data: void
-	status: 404
+  data: void
+  status: 404
 }
 
 export type updateProjectMappingResponseSuccess =
-	updateProjectMappingResponse200 & {
-		headers: Headers
-	}
+  updateProjectMappingResponse200 & {
+    headers: Headers
+  }
 export type updateProjectMappingResponseError = (
-	| updateProjectMappingResponse400
-	| updateProjectMappingResponse403
-	| updateProjectMappingResponse404
+  | updateProjectMappingResponse400
+  | updateProjectMappingResponse403
+  | updateProjectMappingResponse404
 ) & {
-	headers: Headers
+  headers: Headers
 }
 
 export type updateProjectMappingResponse =
-	| updateProjectMappingResponseSuccess
-	| updateProjectMappingResponseError
+  | updateProjectMappingResponseSuccess
+  | updateProjectMappingResponseError
 
 export const getUpdateProjectMappingUrl = (
-	orgId: string,
-	configId: ModelsIssueImporterConfigId,
-	projectId: string,
+  orgId: string,
+  configId: ModelsIssueImporterConfigId,
+  projectId: string,
 ) => {
-	return `/organisations/${orgId}/issue-importers/${configId}/projects/${projectId}`
+  return `/organisations/${orgId}/issue-importers/${configId}/projects/${projectId}`
 }
 
 export const updateProjectMapping = async (
-	orgId: string,
-	configId: ModelsIssueImporterConfigId,
-	projectId: string,
-	modelsUpdateProjectMapping: ModelsUpdateProjectMapping,
-	options?: RequestInit,
+  orgId: string,
+  configId: ModelsIssueImporterConfigId,
+  projectId: string,
+  modelsUpdateProjectMapping: ModelsUpdateProjectMapping,
+  options?: RequestInit,
 ): Promise<updateProjectMappingResponse> => {
-	return lasiusFetch<updateProjectMappingResponse>(
-		getUpdateProjectMappingUrl(orgId, configId, projectId),
-		{
-			...options,
-			method: 'PUT',
-			headers: { 'Content-Type': 'application/json', ...options?.headers },
-			body: JSON.stringify(modelsUpdateProjectMapping),
-		},
-	)
+  return lasiusFetch<updateProjectMappingResponse>(
+    getUpdateProjectMappingUrl(orgId, configId, projectId),
+    {
+      ...options,
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(modelsUpdateProjectMapping),
+    },
+  )
 }
 
 /**
  * @summary Remove project mapping from configuration (Organisation Admin only)
  */
 export type removeProjectMappingResponse200 = {
-	data: ModelsIssueImporterConfigResponse
-	status: 200
+  data: ModelsIssueImporterConfigResponse
+  status: 200
 }
 
 export type removeProjectMappingResponse403 = {
-	data: void
-	status: 403
+  data: void
+  status: 403
 }
 
 export type removeProjectMappingResponse404 = {
-	data: void
-	status: 404
+  data: void
+  status: 404
 }
 
 export type removeProjectMappingResponseSuccess =
-	removeProjectMappingResponse200 & {
-		headers: Headers
-	}
+  removeProjectMappingResponse200 & {
+    headers: Headers
+  }
 export type removeProjectMappingResponseError = (
-	| removeProjectMappingResponse403
-	| removeProjectMappingResponse404
+  | removeProjectMappingResponse403
+  | removeProjectMappingResponse404
 ) & {
-	headers: Headers
+  headers: Headers
 }
 
 export type removeProjectMappingResponse =
-	| removeProjectMappingResponseSuccess
-	| removeProjectMappingResponseError
+  | removeProjectMappingResponseSuccess
+  | removeProjectMappingResponseError
 
 export const getRemoveProjectMappingUrl = (
-	orgId: string,
-	configId: ModelsIssueImporterConfigId,
-	projectId: string,
+  orgId: string,
+  configId: ModelsIssueImporterConfigId,
+  projectId: string,
 ) => {
-	return `/organisations/${orgId}/issue-importers/${configId}/projects/${projectId}`
+  return `/organisations/${orgId}/issue-importers/${configId}/projects/${projectId}`
 }
 
 export const removeProjectMapping = async (
-	orgId: string,
-	configId: ModelsIssueImporterConfigId,
-	projectId: string,
-	options?: RequestInit,
+  orgId: string,
+  configId: ModelsIssueImporterConfigId,
+  projectId: string,
+  options?: RequestInit,
 ): Promise<removeProjectMappingResponse> => {
-	return lasiusFetch<removeProjectMappingResponse>(
-		getRemoveProjectMappingUrl(orgId, configId, projectId),
-		{
-			...options,
-			method: 'DELETE',
-		},
-	)
+  return lasiusFetch<removeProjectMappingResponse>(
+    getRemoveProjectMappingUrl(orgId, configId, projectId),
+    {
+      ...options,
+      method: 'DELETE',
+    },
+  )
 }

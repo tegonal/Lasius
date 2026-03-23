@@ -18,11 +18,11 @@
  */
 
 import {
-	eachDayOfInterval,
-	endOfMonth,
-	format,
-	getDay,
-	startOfMonth,
+  eachDayOfInterval,
+  endOfMonth,
+  format,
+  getDay,
+  startOfMonth,
 } from 'date-fns'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -36,26 +36,26 @@ import { getDateLocale } from '~/lib/utils/date-locale'
  * single-letter weekday headers (locale-aware).
  */
 export const useCalendarMonth = (viewDate: Date) => {
-	const { i18n } = useTranslation('common')
-	const locale = getDateLocale(i18n.language)
-	const monthDays = useMemo(() => {
-		const start = startOfMonth(viewDate)
-		const end = endOfMonth(viewDate)
-		return eachDayOfInterval({ end, start })
-	}, [viewDate])
+  const { i18n } = useTranslation('common')
+  const locale = getDateLocale(i18n.language)
+  const monthDays = useMemo(() => {
+    const start = startOfMonth(viewDate)
+    const end = endOfMonth(viewDate)
+    return eachDayOfInterval({ end, start })
+  }, [viewDate])
 
-	// Monday-based offset: getDay returns 0=Sun, we want Mon=0
-	const startOffset = useMemo(() => {
-		const day = getDay(startOfMonth(viewDate))
-		return day === 0 ? 6 : day - 1
-	}, [viewDate])
+  // Monday-based offset: getDay returns 0=Sun, we want Mon=0
+  const startOffset = useMemo(() => {
+    const day = getDay(startOfMonth(viewDate))
+    return day === 0 ? 6 : day - 1
+  }, [viewDate])
 
-	const weekDays = useMemo(() => {
-		return Array.from({ length: 7 }, (_, i) => {
-			const d = new Date(2025, 0, 6 + i) // Jan 6, 2025 is a Monday
-			return format(d, 'EEEEE', { locale })
-		})
-	}, [locale])
+  const weekDays = useMemo(() => {
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(2025, 0, 6 + i) // Jan 6, 2025 is a Monday
+      return format(d, 'EEEEE', { locale })
+    })
+  }, [locale])
 
-	return { monthDays, startOffset, weekDays }
+  return { monthDays, startOffset, weekDays }
 }

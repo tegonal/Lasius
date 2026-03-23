@@ -23,37 +23,37 @@ import { useEffect, useState } from 'react'
 import { cn } from '~/lib/utils/cn'
 
 const variants = cva('absolute', {
-	defaultVariants: { variant: 'default' },
-	variants: {
-		variant: {
-			compact: '-right-2',
-			default: 'right-0 z-50',
-		},
-	},
+  defaultVariants: { variant: 'default' },
+  variants: {
+    variant: {
+      compact: '-right-2',
+      default: 'right-0 z-50',
+    },
+  },
 })
 
 type Props = VariantProps<typeof variants> & { children: React.ReactNode }
 
 export const ContextAnimatePresence = ({
-	children,
-	variant = 'default',
+  children,
+  variant = 'default',
 }: Props) => {
-	const [mounted, setMounted] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
-	useEffect(() => {
-		requestAnimationFrame(() => setMounted(true))
-	}, [])
+  useEffect(() => {
+    requestAnimationFrame(() => setMounted(true))
+  }, [])
 
-	return (
-		<div
-			className={cn(variants({ variant }))}
-			style={{
-				opacity: mounted ? 1 : 0,
-				transform: mounted ? 'translateX(0)' : 'translateX(100%)',
-				transition: 'opacity 0.2s ease-in-out, transform 0.2s ease-in-out',
-			}}
-		>
-			{children}
-		</div>
-	)
+  return (
+    <div
+      className={cn(variants({ variant }))}
+      style={{
+        opacity: mounted ? 1 : 0,
+        transform: mounted ? 'translateX(0)' : 'translateX(100%)',
+        transition: 'opacity 0.2s ease-in-out, transform 0.2s ease-in-out',
+      }}
+    >
+      {children}
+    </div>
+  )
 }

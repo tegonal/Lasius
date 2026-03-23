@@ -20,34 +20,34 @@
 import { ErrorSign } from '~/components/ui/feedback/error-sign'
 
 interface FormFieldErrorsProps {
-	errors?: string[]
-	id?: string
+  errors?: string[]
+  id?: string
 }
 
 export const FormFieldErrors = ({ errors, id }: FormFieldErrorsProps) => {
-	if (!errors?.length) return null
+  if (!errors?.length) return null
 
-	if (errors.length === 1) {
-		return (
-			<div className="-mt-2" id={id}>
-				<div className="badge badge-warning">
-					<ErrorSign />
-					{errors[0]}
-				</div>
-			</div>
-		)
-	}
+  if (errors.length === 1) {
+    return (
+      <div className="-mt-2" id={id}>
+        <div className="badge badge-warning">
+          <ErrorSign />
+          {errors[0]}
+        </div>
+      </div>
+    )
+  }
 
-	return (
-		<div className="-mt-2" id={id}>
-			<div className="flex max-w-full flex-row flex-wrap items-center justify-end gap-2">
-				{errors.map((error) => (
-					<div className="badge badge-warning" key={error}>
-						<ErrorSign />
-						{error}
-					</div>
-				))}
-			</div>
-		</div>
-	)
+  return (
+    <div className="-mt-2" id={id}>
+      <div className="flex max-w-full flex-row flex-wrap items-center justify-end gap-2">
+        {errors.map((error) => (
+          <div className="badge badge-warning" key={error}>
+            <ErrorSign />
+            {error}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
 }

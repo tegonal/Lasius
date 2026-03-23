@@ -22,52 +22,52 @@ import { useTranslation } from 'react-i18next'
 
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import {
-	ConnectionStatus,
-	useLasiusWebsocket,
+  ConnectionStatus,
+  useLasiusWebsocket,
 } from '~/features/system/websocket/use-lasius-websocket'
 import { useIsClient } from '~/lib/hooks/use-is-client'
 
 const statusDotClass: Record<ConnectionStatus, string> = {
-	[ConnectionStatus.CONNECTED]: 'bg-success',
-	[ConnectionStatus.CONNECTING]: 'bg-warning',
-	[ConnectionStatus.DISCONNECTED]: 'bg-error',
-	[ConnectionStatus.ERROR]: 'bg-error',
+  [ConnectionStatus.CONNECTED]: 'bg-success',
+  [ConnectionStatus.CONNECTING]: 'bg-warning',
+  [ConnectionStatus.DISCONNECTED]: 'bg-error',
+  [ConnectionStatus.ERROR]: 'bg-error',
 }
 
 export const WebsocketStatus = () => {
-	const { t } = useTranslation('common')
-	const isClient = useIsClient()
-	const { connectionStatus } = useLasiusWebsocket()
+  const { t } = useTranslation('common')
+  const isClient = useIsClient()
+  const { connectionStatus } = useLasiusWebsocket()
 
-	if (!isClient) return null
+  if (!isClient) return null
 
-	const labels: Record<ConnectionStatus, string> = {
-		[ConnectionStatus.CONNECTED]: t('websocket.status.connected', {
-			defaultValue: 'WebSocket connected',
-		}),
-		[ConnectionStatus.CONNECTING]: t('websocket.status.connecting', {
-			defaultValue: 'WebSocket connecting',
-		}),
-		[ConnectionStatus.DISCONNECTED]: t('websocket.status.error', {
-			defaultValue: 'Unable to connect to WebSocket',
-		}),
-		[ConnectionStatus.ERROR]: t('websocket.status.error', {
-			defaultValue: 'Unable to connect to WebSocket',
-		}),
-	}
+  const labels: Record<ConnectionStatus, string> = {
+    [ConnectionStatus.CONNECTED]: t('websocket.status.connected', {
+      defaultValue: 'WebSocket connected',
+    }),
+    [ConnectionStatus.CONNECTING]: t('websocket.status.connecting', {
+      defaultValue: 'WebSocket connecting',
+    }),
+    [ConnectionStatus.DISCONNECTED]: t('websocket.status.error', {
+      defaultValue: 'Unable to connect to WebSocket',
+    }),
+    [ConnectionStatus.ERROR]: t('websocket.status.error', {
+      defaultValue: 'Unable to connect to WebSocket',
+    }),
+  }
 
-	return (
-		<div
-			className="tooltip tooltip-top"
-			data-testid="websocket-status"
-			data-tip={labels[connectionStatus]}
-		>
-			<div className="relative inline-flex">
-				<LucideIcon icon={RadioTowerIcon} size={14} />
-				<span
-					className={`absolute -top-1 -right-1 size-2 rounded-full ${statusDotClass[connectionStatus]}`}
-				/>
-			</div>
-		</div>
-	)
+  return (
+    <div
+      className="tooltip tooltip-top"
+      data-testid="websocket-status"
+      data-tip={labels[connectionStatus]}
+    >
+      <div className="relative inline-flex">
+        <LucideIcon icon={RadioTowerIcon} size={14} />
+        <span
+          className={`absolute -top-1 -right-1 size-2 rounded-full ${statusDotClass[connectionStatus]}`}
+        />
+      </div>
+    </div>
+  )
 }

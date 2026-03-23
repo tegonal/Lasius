@@ -22,12 +22,12 @@ import { cn } from '~/lib/utils/cn'
 type Props = { children: React.ReactNode; className?: string }
 
 export const ContextBar = ({ children, className }: Props) => (
-	<div
-		className={cn(
-			'bg-secondary -mr-1 flex items-stretch justify-center gap-2 rounded-l-lg p-1 pr-2 pl-2 shadow-md',
-			className,
-		)}
-	>
-		{children}
-	</div>
+  <div
+    className={cn(
+      'bg-secondary -mr-1 flex items-stretch justify-center gap-2 rounded-l-lg p-1 pr-2 pl-2 shadow-md',
+      className,
+    )}
+  >
+    {children}
+  </div>
 )

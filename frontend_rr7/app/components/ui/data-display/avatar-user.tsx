@@ -20,42 +20,42 @@
 import Avatar from 'boring-avatars'
 
 const USER_AVATAR_PALETTE = [
-	'#212020',
-	'#0f455b',
-	'#224431',
-	'#836c02',
-	'#D9832D',
+  '#212020',
+  '#0f455b',
+  '#224431',
+  '#836c02',
+  '#D9832D',
 ]
 
 type Props = {
-	firstName: string
-	lastName: string
-	size?: number
+  firstName: string
+  lastName: string
+  size?: number
 }
 
 export const AvatarUser = ({ firstName, lastName, size = 39 }: Props) => {
-	const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
-	const fullName = `${firstName} ${lastName}`
+  const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
+  const fullName = `${firstName} ${lastName}`
 
-	return (
-		<div
-			className="relative shrink-0"
-			style={{ height: `${size}px`, width: `${size}px` }}
-			title={fullName}
-		>
-			<Avatar
-				colors={USER_AVATAR_PALETTE}
-				name={fullName}
-				size={size}
-				square={false}
-				variant="bauhaus"
-			/>
-			<div
-				className="pointer-events-none absolute inset-0 flex items-center justify-center font-semibold text-white"
-				style={{ fontSize: `${size * 0.4}px` }}
-			>
-				{initials}
-			</div>
-		</div>
-	)
+  return (
+    <div
+      className="relative shrink-0"
+      style={{ height: `${size}px`, width: `${size}px` }}
+      title={fullName}
+    >
+      <Avatar
+        colors={USER_AVATAR_PALETTE}
+        name={fullName}
+        size={size}
+        square={false}
+        variant="bauhaus"
+      />
+      <div
+        className="pointer-events-none absolute inset-0 flex items-center justify-center font-semibold text-white"
+        style={{ fontSize: `${size * 0.4}px` }}
+      >
+        {initials}
+      </div>
+    </div>
+  )
 }

@@ -28,26 +28,26 @@ import { useHelpStore } from '~/features/help/store/help-store'
  * Header help button — toggles the help drawer (route-based content).
  */
 export const HelpButton = () => {
-	const { t } = useTranslation('common')
-	const { toggleHelp } = useHelpStore()
+  const { t } = useTranslation('common')
+  const { toggleHelp } = useHelpStore()
 
-	return (
-		<div
-			className="tooltip tooltip-bottom"
-			data-tip={t('common.actions.help', { defaultValue: 'Help' })}
-		>
-			<Button
-				aria-label={t('common.actions.help', { defaultValue: 'Help' })}
-				data-testid="help-btn"
-				fullWidth={false}
-				onClick={toggleHelp}
-				shape="circle"
-				variant="ghost"
-			>
-				<LucideIcon icon={HelpCircleIcon} size={20} />
-			</Button>
-		</div>
-	)
+  return (
+    <div
+      className="tooltip tooltip-bottom"
+      data-tip={t('common.actions.help', { defaultValue: 'Help' })}
+    >
+      <Button
+        aria-label={t('common.actions.help', { defaultValue: 'Help' })}
+        data-testid="help-btn"
+        fullWidth={false}
+        onClick={toggleHelp}
+        shape="circle"
+        variant="ghost"
+      >
+        <LucideIcon icon={HelpCircleIcon} size={20} />
+      </Button>
+    </div>
+  )
 }
 
 /**
@@ -55,20 +55,20 @@ export const HelpButton = () => {
  * Used in modals and feature-specific areas.
  */
 export const ModalHelpButton = ({ helpKey }: { helpKey: string }) => {
-	const { t } = useTranslation('common')
-	const { openHelp } = useHelpStore()
+  const { t } = useTranslation('common')
+  const { openHelp } = useHelpStore()
 
-	return (
-		<Button
-			aria-label={t('common.actions.help', { defaultValue: 'Help' })}
-			fullWidth={false}
-			onClick={() => openHelp(helpKey)}
-			shape="circle"
-			size="sm"
-			type="button"
-			variant="ghost"
-		>
-			<LucideIcon icon={HelpCircleIcon} size={20} />
-		</Button>
-	)
+  return (
+    <Button
+      aria-label={t('common.actions.help', { defaultValue: 'Help' })}
+      fullWidth={false}
+      onClick={() => openHelp(helpKey)}
+      shape="circle"
+      size="sm"
+      type="button"
+      variant="ghost"
+    >
+      <LucideIcon icon={HelpCircleIcon} size={20} />
+    </Button>
+  )
 }

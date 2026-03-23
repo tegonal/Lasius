@@ -3,23 +3,23 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { ModelsTag } from './modelsTag'
 
 export interface ModelsEditBookingRequest {
-	/** @nullable */
-	projectId?: string | null
-	/** @nullable */
-	tags?: ModelsTag[] | null
-	/**
-	 * @nullable
-	 * @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ
-	 */
-	start?: string | null
-	/**
-	 * @nullable
-	 * @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ
-	 */
-	end?: string | null
+  /** @nullable */
+  projectId?: string | null
+  /** @nullable */
+  tags?: ModelsTag[] | null
+  /**
+   * @nullable
+   * @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ
+   */
+  start?: string | null
+  /**
+   * @nullable
+   * @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ
+   */
+  end?: string | null
 }

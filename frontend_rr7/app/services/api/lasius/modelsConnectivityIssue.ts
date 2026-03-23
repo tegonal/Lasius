@@ -3,27 +3,27 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 
 /**
  * Details about a connectivity or sync error
  */
 export interface ModelsConnectivityIssue {
-	/** Machine-readable error code */
-	errorCode: string
-	/** Human-readable error message */
-	message: string
-	/**
-	 * When the error occurred
-	 * @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ
-	 */
-	timestamp: string
-	/**
-	 * HTTP status code if applicable
-	 * @nullable
-	 */
-	httpStatus?: number | null
-	/** Number of consecutive retry attempts */
-	retryCount: number
+  /** Machine-readable error code */
+  errorCode: string
+  /** Human-readable error message */
+  message: string
+  /**
+   * When the error occurred
+   * @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ
+   */
+  timestamp: string
+  /**
+   * HTTP status code if applicable
+   * @nullable
+   */
+  httpStatus?: number | null
+  /** Number of consecutive retry attempts */
+  retryCount: number
 }

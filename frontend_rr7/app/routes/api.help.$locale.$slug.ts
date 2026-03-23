@@ -34,45 +34,45 @@ import { type Route } from './+types/api.help.$locale.$slug'
  * This keeps the MDX compiler out of the client bundle.
  */
 export async function loader({ params }: Route.LoaderArgs) {
-	const { locale, slug } = params
+  const { locale, slug } = params
 
-	if (!locale || !slug) {
-		return data({ error: 'Invalid parameters' }, { status: 400 })
-	}
+  if (!locale || !slug) {
+    return data({ error: 'Invalid parameters' }, { status: 400 })
+  }
 
-	// Sanitize inputs to prevent path traversal
-	const safeLocale = locale.replace(/[^a-z-]/g, '')
-	const safeSlug = slug.replace(/[^a-z0-9-]/g, '')
+  // Sanitize inputs to prevent path traversal
+  const safeLocale = locale.replace(/[^a-z-]/g, '')
+  const safeSlug = slug.replace(/[^a-z0-9-]/g, '')
 
-	const filePath = join(
-		process.cwd(),
-		'public',
-		'help',
-		safeLocale,
-		`${safeSlug}.mdx`,
-	)
+  const filePath = join(
+    process.cwd(),
+    'public',
+    'help',
+    safeLocale,
+    `${safeSlug}.mdx`,
+  )
 
-	if (!existsSync(filePath)) {
-		return data({ error: 'Help file not found' }, { status: 404 })
-	}
+  if (!existsSync(filePath)) {
+    return data({ error: 'Help file not found' }, { status: 404 })
+  }
 
-	try {
-		const mdxText = readFileSync(filePath, 'utf8')
+  try {
+    const mdxText = readFileSync(filePath, 'utf8')
 
-		const compiled = await compile(mdxText, {
-			development: false,
-			outputFormat: 'function-body',
-		})
+    const compiled = await compile(mdxText, {
+      development: false,
+      outputFormat: 'function-body',
+    })
 
-		return data(
-			{ code: String(compiled) },
-			{
-				headers: {
-					'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate',
-				},
-			},
-		)
-	} catch {
-		return data({ error: 'Failed to compile MDX' }, { status: 500 })
-	}
+    return data(
+      { code: String(compiled) },
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate',
+        },
+      },
+    )
+  } catch {
+    return data({ error: 'Failed to compile MDX' }, { status: 500 })
+  }
 }

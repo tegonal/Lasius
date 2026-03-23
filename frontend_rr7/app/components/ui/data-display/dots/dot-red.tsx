@@ -18,21 +18,21 @@
  */
 
 export const DotRed = ({
-	size = 6,
-	title,
+  size = 6,
+  title,
 }: {
-	size?: number
-	title?: string
+  size?: number
+  title?: string
 }) => {
-	return (
-		<div
-			className="bg-error"
-			style={{
-				borderRadius: `${size}px`,
-				height: `${size}px`,
-				width: `${size}px`,
-			}}
-			title={title || undefined}
-		/>
-	)
+  return (
+    <div
+      className="bg-error"
+      style={{
+        borderRadius: `${size}px`,
+        height: `${size}px`,
+        width: `${size}px`,
+      }}
+      title={title || undefined}
+    />
+  )
 }

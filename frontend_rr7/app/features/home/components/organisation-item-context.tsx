@@ -33,46 +33,46 @@ import { stringHash } from '~/lib/utils/string-hash'
 import { type ModelsCurrentUserTimeBooking } from '~/services/api/lasius'
 
 type Props = {
-	item: ModelsCurrentUserTimeBooking
-	selectedOrgId: string
+  item: ModelsCurrentUserTimeBooking
+  selectedOrgId: string
 }
 
 export const OrganisationItemContext = ({ item, selectedOrgId }: Props) => {
-	const itemHash = stringHash(item)
-	const { currentOpenContextMenuId, handleCloseAll } = useContextMenu()
-	const stopAndStart = useStopAndStart()
+  const itemHash = stringHash(item)
+  const { currentOpenContextMenuId, handleCloseAll } = useContextMenu()
+  const stopAndStart = useStopAndStart()
 
-	const handleStart = () => {
-		if (!item.booking) return
-		stopAndStart.submit({
-			orgId: selectedOrgId,
-			projectId: item.booking.projectReference.id,
-			start: formatISOLocale(
-				roundToNearestMinutes(new Date(), { roundingMethod: 'floor' }),
-			),
-			tags: item.booking.tags,
-		})
-		handleCloseAll()
-	}
+  const handleStart = () => {
+    if (!item.booking) return
+    stopAndStart.submit({
+      orgId: selectedOrgId,
+      projectId: item.booking.projectReference.id,
+      start: formatISOLocale(
+        roundToNearestMinutes(new Date(), { roundingMethod: 'floor' }),
+      ),
+      tags: item.booking.tags,
+    })
+    handleCloseAll()
+  }
 
-	return (
-		<ContextBody variant="compact">
-			<ContextButtonOpen hash={itemHash} />
-			{currentOpenContextMenuId === itemHash && (
-				<ContextAnimatePresence variant="compact">
-					<ContextBar className="-mr-3">
-						{item.booking && (
-							<ContextButtonStartBooking
-								item={item.booking}
-								onStart={handleStart}
-								variant="compact"
-							/>
-						)}
-						<ContextBarDivider />
-						<ContextButtonClose variant="compact" />
-					</ContextBar>
-				</ContextAnimatePresence>
-			)}
-		</ContextBody>
-	)
+  return (
+    <ContextBody variant="compact">
+      <ContextButtonOpen hash={itemHash} />
+      {currentOpenContextMenuId === itemHash && (
+        <ContextAnimatePresence variant="compact">
+          <ContextBar className="-mr-3">
+            {item.booking && (
+              <ContextButtonStartBooking
+                item={item.booking}
+                onStart={handleStart}
+                variant="compact"
+              />
+            )}
+            <ContextBarDivider />
+            <ContextButtonClose variant="compact" />
+          </ContextBar>
+        </ContextAnimatePresence>
+      )}
+    </ContextBody>
+  )
 }

@@ -3,24 +3,24 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 
 export type GetUserBookingListByOrganisationParams = {
-	/**
-	 * @pattern yyyy-MM-dd'T'HH:mm:ss.SSS
-	 */
-	from: string
-	/**
-	 * @pattern yyyy-MM-dd'T'HH:mm:ss.SSS
-	 */
-	to: string
-	/**
-	 * @nullable
-	 */
-	limit?: number | null
-	/**
-	 * @nullable
-	 */
-	skip?: number | null
+  /**
+   * @pattern yyyy-MM-dd'T'HH:mm:ss.SSS
+   */
+  from: string
+  /**
+   * @pattern yyyy-MM-dd'T'HH:mm:ss.SSS
+   */
+  to: string
+  /**
+   * @nullable
+   */
+  limit?: number | null
+  /**
+   * @nullable
+   */
+  skip?: number | null
 }

@@ -18,9 +18,9 @@
  */
 
 interface FormBodyProps {
-	children: React.ReactNode
+  children: React.ReactNode
 }
 
 export const FormBody = ({ children }: FormBodyProps) => {
-	return <div className="flex w-full flex-col gap-2 md:gap-6">{children}</div>
+  return <div className="flex w-full flex-col gap-2 md:gap-6">{children}</div>
 }

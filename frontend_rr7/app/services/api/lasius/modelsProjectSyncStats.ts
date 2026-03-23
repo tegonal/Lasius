@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { ModelsConnectivityIssue } from './modelsConnectivityIssue'
 
@@ -11,21 +11,21 @@ import type { ModelsConnectivityIssue } from './modelsConnectivityIssue'
  * Sync statistics for a specific project mapping
  */
 export interface ModelsProjectSyncStats {
-	/** Project ID */
-	projectId: string
-	/** Project name */
-	projectName: string
-	/**
-	 * Last successful sync timestamp
-	 * @nullable
-	 * @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ
-	 */
-	lastSyncAt?: string | null
-	/** Number of issues synced in last run */
-	lastSyncIssueCount: number
-	/** Total issues synced since mapping creation */
-	totalIssuesSynced: number
-	/** Number of consecutive sync failures (circuit breaker) */
-	consecutiveFailures: number
-	lastError?: ModelsConnectivityIssue | null
+  /** Project ID */
+  projectId: string
+  /** Project name */
+  projectName: string
+  /**
+   * Last successful sync timestamp
+   * @nullable
+   * @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ
+   */
+  lastSyncAt?: string | null
+  /** Number of issues synced in last run */
+  lastSyncIssueCount: number
+  /** Total issues synced since mapping creation */
+  totalIssuesSynced: number
+  /** Number of consecutive sync failures (circuit breaker) */
+  consecutiveFailures: number
+  lastError?: ModelsConnectivityIssue | null
 }

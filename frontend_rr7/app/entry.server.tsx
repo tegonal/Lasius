@@ -22,15 +22,15 @@ import { createInstance } from 'i18next'
 import { isbot } from 'isbot'
 import { PassThrough } from 'node:stream'
 import {
-	renderToPipeableStream,
-	type RenderToPipeableStreamOptions,
+  renderToPipeableStream,
+  type RenderToPipeableStreamOptions,
 } from 'react-dom/server'
 import { I18nextProvider } from 'react-i18next'
 import {
-	type EntryContext,
-	isRouteErrorResponse,
-	type RouterContextProvider,
-	ServerRouter,
+  type EntryContext,
+  isRouteErrorResponse,
+  type RouterContextProvider,
+  ServerRouter,
 } from 'react-router'
 
 import { i18nConfig } from '~/i18n-config'
@@ -45,81 +45,81 @@ export const streamTimeout = 5_000
  * Filters out aborted requests and expected client errors.
  */
 export function handleError(error: unknown, { request }: { request: Request }) {
-	// Don't log aborted requests (user navigated away)
-	if (request.signal.aborted) {
-		return
-	}
+  // Don't log aborted requests (user navigated away)
+  if (request.signal.aborted) {
+    return
+  }
 
-	// Don't log expected client errors (4xx responses)
-	if (isRouteErrorResponse(error) && error.status < 500) {
-		return
-	}
+  // Don't log expected client errors (4xx responses)
+  if (isRouteErrorResponse(error) && error.status < 500) {
+    return
+  }
 
-	// Log server errors
-	logger.error({ error, url: request.url }, 'Unhandled server error')
+  // Log server errors
+  logger.error({ error, url: request.url }, 'Unhandled server error')
 }
 
 export default function handleRequest(
-	request: Request,
-	responseStatusCode: number,
-	responseHeaders: Headers,
-	entryContext: EntryContext,
-	routerContext: RouterContextProvider,
+  request: Request,
+  responseStatusCode: number,
+  responseHeaders: Headers,
+  entryContext: EntryContext,
+  routerContext: RouterContextProvider,
 ) {
-	return new Promise((resolve, reject) => {
-		let shellRendered = false
-		const userAgent = request.headers.get('user-agent')
+  return new Promise((resolve, reject) => {
+    let shellRendered = false
+    const userAgent = request.headers.get('user-agent')
 
-		const readyOption: keyof RenderToPipeableStreamOptions =
-			(userAgent && isbot(userAgent)) || entryContext.isSpaMode
-				? 'onAllReady'
-				: 'onShellReady'
+    const readyOption: keyof RenderToPipeableStreamOptions =
+      (userAgent && isbot(userAgent)) || entryContext.isSpaMode
+        ? 'onAllReady'
+        : 'onShellReady'
 
-		let i18nInstance: ReturnType<typeof createInstance>
-		try {
-			i18nInstance = getInstance(routerContext)
-		} catch {
-			// Middleware context unavailable for non-route requests (favicon, .well-known, etc.)
-			// Fall back to a minimal synchronous i18n instance
-			i18nInstance = createInstance({
-				...i18nConfig,
-				initImmediate: false,
-				lng: i18nConfig.fallbackLng,
-			})
-			void i18nInstance.init()
-		}
+    let i18nInstance: ReturnType<typeof createInstance>
+    try {
+      i18nInstance = getInstance(routerContext)
+    } catch {
+      // Middleware context unavailable for non-route requests (favicon, .well-known, etc.)
+      // Fall back to a minimal synchronous i18n instance
+      i18nInstance = createInstance({
+        ...i18nConfig,
+        initImmediate: false,
+        lng: i18nConfig.fallbackLng,
+      })
+      void i18nInstance.init()
+    }
 
-		const { abort, pipe } = renderToPipeableStream(
-			<I18nextProvider i18n={i18nInstance}>
-				<ServerRouter context={entryContext} url={request.url} />
-			</I18nextProvider>,
-			{
-				onError(error: unknown) {
-					responseStatusCode = 500
-					if (shellRendered) logger.error(error)
-				},
-				onShellError(error: unknown) {
-					reject(error)
-				},
-				[readyOption]() {
-					shellRendered = true
-					const body = new PassThrough()
-					const stream = createReadableStreamFromReadable(body)
+    const { abort, pipe } = renderToPipeableStream(
+      <I18nextProvider i18n={i18nInstance}>
+        <ServerRouter context={entryContext} url={request.url} />
+      </I18nextProvider>,
+      {
+        onError(error: unknown) {
+          responseStatusCode = 500
+          if (shellRendered) logger.error(error)
+        },
+        onShellError(error: unknown) {
+          reject(error)
+        },
+        [readyOption]() {
+          shellRendered = true
+          const body = new PassThrough()
+          const stream = createReadableStreamFromReadable(body)
 
-					responseHeaders.set('Content-Type', 'text/html')
+          responseHeaders.set('Content-Type', 'text/html')
 
-					resolve(
-						new Response(stream, {
-							headers: responseHeaders,
-							status: responseStatusCode,
-						}),
-					)
+          resolve(
+            new Response(stream, {
+              headers: responseHeaders,
+              status: responseStatusCode,
+            }),
+          )
 
-					pipe(body)
-				},
-			},
-		)
+          pipe(body)
+        },
+      },
+    )
 
-		setTimeout(abort, streamTimeout + 1000)
-	})
+    setTimeout(abort, streamTimeout + 1000)
+  })
 }

@@ -20,14 +20,14 @@
 import { cn } from '~/lib/utils/cn'
 
 interface FieldSetProps {
-	children: React.ReactNode
-	className?: string
+  children: React.ReactNode
+  className?: string
 }
 
 export const FieldSet = ({ children, className }: FieldSetProps) => {
-	return (
-		<div className={cn('fieldset gap-6 rounded-lg p-2', className)}>
-			{children}
-		</div>
-	)
+  return (
+    <div className={cn('fieldset gap-6 rounded-lg p-2', className)}>
+      {children}
+    </div>
+  )
 }

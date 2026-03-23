@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { ModelsBooking } from './modelsBooking'
 import type { WebSocketUserTimeBookingHistoryEntryChangedType } from './webSocketUserTimeBookingHistoryEntryChangedType'
@@ -12,6 +12,6 @@ import type { WebSocketUserTimeBookingHistoryEntryChangedType } from './webSocke
  * Existing booking in user's history was modified
  */
 export interface WebSocketUserTimeBookingHistoryEntryChanged {
-	type: WebSocketUserTimeBookingHistoryEntryChangedType
-	booking: ModelsBooking
+  type: WebSocketUserTimeBookingHistoryEntryChangedType
+  booking: ModelsBooking
 }

@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { ModelsApplicationConfig, ModelsCsrfToken } from './..'
 
@@ -13,50 +13,50 @@ import { lasiusFetch } from '../../lasius-fetch-instance'
  * @summary Get application config
  */
 export type getConfigurationResponse200 = {
-	data: ModelsApplicationConfig
-	status: 200
+  data: ModelsApplicationConfig
+  status: 200
 }
 
 export type getConfigurationResponseSuccess = getConfigurationResponse200 & {
-	headers: Headers
+  headers: Headers
 }
 export type getConfigurationResponse = getConfigurationResponseSuccess
 
 export const getGetConfigurationUrl = () => {
-	return `/config`
+  return `/config`
 }
 
 export const getConfiguration = async (
-	options?: RequestInit,
+  options?: RequestInit,
 ): Promise<getConfigurationResponse> => {
-	return lasiusFetch<getConfigurationResponse>(getGetConfigurationUrl(), {
-		...options,
-		method: 'GET',
-	})
+  return lasiusFetch<getConfigurationResponse>(getGetConfigurationUrl(), {
+    ...options,
+    method: 'GET',
+  })
 }
 
 /**
  * @summary Get csrf token
  */
 export type getCsrfTokenResponse200 = {
-	data: ModelsCsrfToken
-	status: 200
+  data: ModelsCsrfToken
+  status: 200
 }
 
 export type getCsrfTokenResponseSuccess = getCsrfTokenResponse200 & {
-	headers: Headers
+  headers: Headers
 }
 export type getCsrfTokenResponse = getCsrfTokenResponseSuccess
 
 export const getGetCsrfTokenUrl = () => {
-	return `/csrf-token`
+  return `/csrf-token`
 }
 
 export const getCsrfToken = async (
-	options?: RequestInit,
+  options?: RequestInit,
 ): Promise<getCsrfTokenResponse> => {
-	return lasiusFetch<getCsrfTokenResponse>(getGetCsrfTokenUrl(), {
-		...options,
-		method: 'GET',
-	})
+  return lasiusFetch<getCsrfTokenResponse>(getGetCsrfTokenUrl(), {
+    ...options,
+    method: 'GET',
+  })
 }

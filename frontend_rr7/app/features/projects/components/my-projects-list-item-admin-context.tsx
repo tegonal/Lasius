@@ -40,172 +40,172 @@ import { ProjectAddUpdateTagsForm } from '~/features/tag-manager/components/proj
 import { type ModelsUserProject } from '~/services/api/lasius/modelsUserProject'
 
 type Props = {
-	item: ModelsUserProject
+  item: ModelsUserProject
 }
 
 export const MyProjectsListItemAdminContext = ({ item }: Props) => {
-	const [isUpdateOpen, setIsUpdateOpen] = useState(false)
-	const [isManageOpen, setIsManageOpen] = useState(false)
-	const [isTagOpen, setIsTagOpen] = useState(false)
-	const { currentOpenContextMenuId, handleCloseAll } = useContextMenu()
-	const navigate = useNavigate()
+  const [isUpdateOpen, setIsUpdateOpen] = useState(false)
+  const [isManageOpen, setIsManageOpen] = useState(false)
+  const [isTagOpen, setIsTagOpen] = useState(false)
+  const { currentOpenContextMenuId, handleCloseAll } = useContextMenu()
+  const navigate = useNavigate()
 
-	const { t } = useTranslation('common')
+  const { t } = useTranslation('common')
 
-	const handleUpdateClose = () => setIsUpdateOpen(false)
-	const handleManageClose = () => setIsManageOpen(false)
-	const handleTagClose = () => setIsTagOpen(false)
+  const handleUpdateClose = () => setIsUpdateOpen(false)
+  const handleManageClose = () => setIsManageOpen(false)
+  const handleTagClose = () => setIsTagOpen(false)
 
-	const showStats = () => {
-		void navigate(
-			`/user/stats?projectId=${item.projectReference.id}&projectName=${encodeURIComponent(item.projectReference.key)}`,
-		)
-		handleCloseAll()
-	}
+  const showStats = () => {
+    void navigate(
+      `/user/stats?projectId=${item.projectReference.id}&projectName=${encodeURIComponent(item.projectReference.key)}`,
+    )
+    handleCloseAll()
+  }
 
-	const showLists = () => {
-		void navigate(
-			`/user/lists?projectId=${item.projectReference.id}&projectName=${encodeURIComponent(item.projectReference.key)}`,
-		)
-		handleCloseAll()
-	}
+  const showLists = () => {
+    void navigate(
+      `/user/lists?projectId=${item.projectReference.id}&projectName=${encodeURIComponent(item.projectReference.key)}`,
+    )
+    handleCloseAll()
+  }
 
-	const manageMembers = () => {
-		setIsManageOpen(true)
-		handleCloseAll()
-	}
+  const manageMembers = () => {
+    setIsManageOpen(true)
+    handleCloseAll()
+  }
 
-	const manageTags = () => {
-		setIsTagOpen(true)
-		handleCloseAll()
-	}
+  const manageTags = () => {
+    setIsTagOpen(true)
+    handleCloseAll()
+  }
 
-	const editProject = () => {
-		setIsUpdateOpen(true)
-		handleCloseAll()
-	}
+  const editProject = () => {
+    setIsUpdateOpen(true)
+    handleCloseAll()
+  }
 
-	return (
-		<>
-			<ContextBody variant="compact">
-				<ContextButtonOpen
-					data-testid="project-ctx-open-btn"
-					hash={item.projectReference.id}
-				/>
-				{currentOpenContextMenuId === item.projectReference.id && (
-					<ContextAnimatePresence variant="compact">
-						<ContextBar>
-							<ContextButtonWrapper variant="compact">
-								<Button
-									aria-label={t('members.actions.manage', {
-										defaultValue: 'Manage members',
-									})}
-									fullWidth={false}
-									onClick={() => manageMembers()}
-									shape="circle"
-									title={t('members.actions.manage', {
-										defaultValue: 'Manage members',
-									})}
-									variant="contextIcon"
-								>
-									<LucideIcon icon={Users} size={24} />
-								</Button>
-							</ContextButtonWrapper>
-							<ContextButtonWrapper variant="compact">
-								<Button
-									aria-label={t('bookings.showLists', {
-										defaultValue: 'Show bookings',
-									})}
-									fullWidth={false}
-									onClick={() => showLists()}
-									shape="circle"
-									title={t('bookings.showLists', {
-										defaultValue: 'Show bookings',
-									})}
-									variant="contextIcon"
-								>
-									<LucideIcon icon={List} size={24} />
-								</Button>
-							</ContextButtonWrapper>
-							<ContextButtonWrapper variant="compact">
-								<Button
-									aria-label={t('statistics.showStatistics', {
-										defaultValue: 'Show statistics',
-									})}
-									fullWidth={false}
-									onClick={() => showStats()}
-									shape="circle"
-									title={t('statistics.showStatistics', {
-										defaultValue: 'Show statistics',
-									})}
-									variant="contextIcon"
-								>
-									<LucideIcon icon={PieChart} size={24} />
-								</Button>
-							</ContextButtonWrapper>
-							<ContextButtonWrapper variant="compact">
-								<Button
-									aria-label={t('projects.actions.edit', {
-										defaultValue: 'Edit project',
-									})}
-									data-testid="project-ctx-edit-btn"
-									fullWidth={false}
-									onClick={() => editProject()}
-									shape="circle"
-									title={t('projects.actions.edit', {
-										defaultValue: 'Edit project',
-									})}
-									variant="contextIcon"
-								>
-									<LucideIcon icon={Pencil} size={24} />
-								</Button>
-							</ContextButtonWrapper>
-							<ContextButtonWrapper variant="compact">
-								<Button
-									aria-label={t('tags.actions.edit', {
-										defaultValue: 'Edit tags',
-									})}
-									fullWidth={false}
-									onClick={() => manageTags()}
-									shape="circle"
-									title={t('tags.actions.edit', {
-										defaultValue: 'Edit tags',
-									})}
-									variant="contextIcon"
-								>
-									<LucideIcon icon={Tags} size={24} />
-								</Button>
-							</ContextButtonWrapper>
-							<ContextButtonLeaveProject item={item} variant="compact" />
-							<ContextBarDivider />
-							<ContextButtonClose variant="compact" />
-						</ContextBar>
-					</ContextAnimatePresence>
-				)}
-			</ContextBody>
-			<Modal onClose={handleUpdateClose} open={isUpdateOpen}>
-				<ProjectAddUpdateForm
-					item={item}
-					mode="update"
-					onCancel={handleUpdateClose}
-					onSave={handleUpdateClose}
-				/>
-			</Modal>
-			<Modal onClose={handleTagClose} open={isTagOpen} size="lg">
-				<ProjectAddUpdateTagsForm
-					item={item}
-					mode="update"
-					onCancel={handleTagClose}
-					onSave={handleTagClose}
-				/>
-			</Modal>
-			<Modal onClose={handleManageClose} open={isManageOpen} size="xl">
-				<ManageProjectMembers
-					item={item}
-					onCancel={handleManageClose}
-					onSave={handleManageClose}
-				/>
-			</Modal>
-		</>
-	)
+  return (
+    <>
+      <ContextBody variant="compact">
+        <ContextButtonOpen
+          data-testid="project-ctx-open-btn"
+          hash={item.projectReference.id}
+        />
+        {currentOpenContextMenuId === item.projectReference.id && (
+          <ContextAnimatePresence variant="compact">
+            <ContextBar>
+              <ContextButtonWrapper variant="compact">
+                <Button
+                  aria-label={t('members.actions.manage', {
+                    defaultValue: 'Manage members',
+                  })}
+                  fullWidth={false}
+                  onClick={() => manageMembers()}
+                  shape="circle"
+                  title={t('members.actions.manage', {
+                    defaultValue: 'Manage members',
+                  })}
+                  variant="contextIcon"
+                >
+                  <LucideIcon icon={Users} size={24} />
+                </Button>
+              </ContextButtonWrapper>
+              <ContextButtonWrapper variant="compact">
+                <Button
+                  aria-label={t('bookings.showLists', {
+                    defaultValue: 'Show bookings',
+                  })}
+                  fullWidth={false}
+                  onClick={() => showLists()}
+                  shape="circle"
+                  title={t('bookings.showLists', {
+                    defaultValue: 'Show bookings',
+                  })}
+                  variant="contextIcon"
+                >
+                  <LucideIcon icon={List} size={24} />
+                </Button>
+              </ContextButtonWrapper>
+              <ContextButtonWrapper variant="compact">
+                <Button
+                  aria-label={t('statistics.showStatistics', {
+                    defaultValue: 'Show statistics',
+                  })}
+                  fullWidth={false}
+                  onClick={() => showStats()}
+                  shape="circle"
+                  title={t('statistics.showStatistics', {
+                    defaultValue: 'Show statistics',
+                  })}
+                  variant="contextIcon"
+                >
+                  <LucideIcon icon={PieChart} size={24} />
+                </Button>
+              </ContextButtonWrapper>
+              <ContextButtonWrapper variant="compact">
+                <Button
+                  aria-label={t('projects.actions.edit', {
+                    defaultValue: 'Edit project',
+                  })}
+                  data-testid="project-ctx-edit-btn"
+                  fullWidth={false}
+                  onClick={() => editProject()}
+                  shape="circle"
+                  title={t('projects.actions.edit', {
+                    defaultValue: 'Edit project',
+                  })}
+                  variant="contextIcon"
+                >
+                  <LucideIcon icon={Pencil} size={24} />
+                </Button>
+              </ContextButtonWrapper>
+              <ContextButtonWrapper variant="compact">
+                <Button
+                  aria-label={t('tags.actions.edit', {
+                    defaultValue: 'Edit tags',
+                  })}
+                  fullWidth={false}
+                  onClick={() => manageTags()}
+                  shape="circle"
+                  title={t('tags.actions.edit', {
+                    defaultValue: 'Edit tags',
+                  })}
+                  variant="contextIcon"
+                >
+                  <LucideIcon icon={Tags} size={24} />
+                </Button>
+              </ContextButtonWrapper>
+              <ContextButtonLeaveProject item={item} variant="compact" />
+              <ContextBarDivider />
+              <ContextButtonClose variant="compact" />
+            </ContextBar>
+          </ContextAnimatePresence>
+        )}
+      </ContextBody>
+      <Modal onClose={handleUpdateClose} open={isUpdateOpen}>
+        <ProjectAddUpdateForm
+          item={item}
+          mode="update"
+          onCancel={handleUpdateClose}
+          onSave={handleUpdateClose}
+        />
+      </Modal>
+      <Modal onClose={handleTagClose} open={isTagOpen} size="lg">
+        <ProjectAddUpdateTagsForm
+          item={item}
+          mode="update"
+          onCancel={handleTagClose}
+          onSave={handleTagClose}
+        />
+      </Modal>
+      <Modal onClose={handleManageClose} open={isManageOpen} size="xl">
+        <ManageProjectMembers
+          item={item}
+          onCancel={handleManageClose}
+          onSave={handleManageClose}
+        />
+      </Modal>
+    </>
+  )
 }

@@ -17,43 +17,45 @@
  *
  */
 
+import { sumBy } from 'es-toolkit'
+
 import { type ModelsBookingStats } from '~/services/api/lasius/modelsBookingStats'
 
 export type ProjectSummary = {
-	hours: number
-	name: string
-	percentage: number
+  hours: number
+  name: string
+  percentage: number
 }
 
 const MS_PER_HOUR = 3_600_000
 
 export const aggregateProjectHours = (
-	data: ModelsBookingStats[] | undefined,
-	topN?: number,
+  data: ModelsBookingStats[] | undefined,
+  topN?: number,
 ): ProjectSummary[] => {
-	if (!data) return []
+  if (!data) return []
 
-	const projectHours: Record<string, number> = {}
-	for (const entry of data) {
-		for (const item of entry.values) {
-			const name = item.label
-			if (!name) continue
-			const hours = (item.duration ?? 0) / MS_PER_HOUR
-			if (hours > 0) {
-				projectHours[name] = (projectHours[name] || 0) + hours
-			}
-		}
-	}
+  const projectHours: Record<string, number> = {}
+  for (const entry of data) {
+    for (const item of entry.values) {
+      const name = item.label
+      if (!name) continue
+      const hours = (item.duration ?? 0) / MS_PER_HOUR
+      if (hours > 0) {
+        projectHours[name] = (projectHours[name] || 0) + hours
+      }
+    }
+  }
 
-	let sorted = Object.entries(projectHours).sort(([, a], [, b]) => b - a)
-	if (topN !== undefined) {
-		sorted = sorted.slice(0, topN)
-	}
-	const total = sorted.reduce((sum, [, hours]) => sum + hours, 0)
+  let sorted = Object.entries(projectHours).sort(([, a], [, b]) => b - a)
+  if (topN !== undefined) {
+    sorted = sorted.slice(0, topN)
+  }
+  const total = sumBy(sorted, ([, hours]) => hours)
 
-	return sorted.map(([name, hours]) => ({
-		hours,
-		name,
-		percentage: total > 0 ? (hours / total) * 100 : 0,
-	}))
+  return sorted.map(([name, hours]) => ({
+    hours,
+    name,
+    percentage: total > 0 ? (hours / total) * 100 : 0,
+  }))
 }

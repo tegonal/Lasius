@@ -23,42 +23,42 @@ import { EmptyStateStats } from './empty-state-stats'
 import { StatsTile } from './stats-tile'
 
 const PieDiagram = lazy(() =>
-	import('~/components/ui/charts/pie-diagram').then((mod) => ({
-		default: mod.PieDiagram,
-	})),
+  import('~/components/ui/charts/pie-diagram').then((mod) => ({
+    default: mod.PieDiagram,
+  })),
 )
 
 type StatsCircleCategoryRangeProps = {
-	chartData:
-		| undefined
-		| {
-				data: undefined | { id: string; value: number }[]
-				keys?: (null | string | undefined)[]
-		  }
+  chartData:
+    | undefined
+    | {
+        data: undefined | { id: string; value: number }[]
+        keys?: (null | string | undefined)[]
+      }
 }
 
 export const StatsCircleCategoryRange = ({
-	chartData,
+  chartData,
 }: StatsCircleCategoryRangeProps) => {
-	if (!chartData?.data || chartData.data.length === 0) {
-		return (
-			<StatsTile className="h-[340px]">
-				<EmptyStateStats />
-			</StatsTile>
-		)
-	}
+  if (!chartData?.data || chartData.data.length === 0) {
+    return (
+      <StatsTile className="h-[340px]">
+        <EmptyStateStats />
+      </StatsTile>
+    )
+  }
 
-	return (
-		<StatsTile className="h-[340px]">
-			<Suspense
-				fallback={
-					<div className="bg-base-200 flex h-full w-full items-center justify-center rounded-lg">
-						<span className="loading loading-spinner loading-md" />
-					</div>
-				}
-			>
-				<PieDiagram stats={chartData} />
-			</Suspense>
-		</StatsTile>
-	)
+  return (
+    <StatsTile className="h-[340px]">
+      <Suspense
+        fallback={
+          <div className="bg-base-200 flex h-full w-full items-center justify-center rounded-lg">
+            <span className="loading loading-spinner loading-md" />
+          </div>
+        }
+      >
+        <PieDiagram stats={chartData} />
+      </Suspense>
+    </StatsTile>
+  )
 }

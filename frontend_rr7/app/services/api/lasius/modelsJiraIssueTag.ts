@@ -3,16 +3,16 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { ModelsJiraIssueTagType } from './modelsJiraIssueTagType'
 
 export interface ModelsJiraIssueTag {
-	id: string
-	baseUrl: string
-	/** @nullable */
-	summary?: string | null
-	url: string
-	projectKey: string
-	type: ModelsJiraIssueTagType
+  id: string
+  baseUrl: string
+  /** @nullable */
+  summary?: string | null
+  url: string
+  projectKey: string
+  type: ModelsJiraIssueTagType
 }

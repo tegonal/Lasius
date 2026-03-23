@@ -27,19 +27,19 @@ import { ModalCloseButton } from './modal-close-button'
 import { ModalTitle } from './modal-title'
 
 type Props = {
-	alert?: {
-		message: string
-		variant: 'error' | 'info' | 'success' | 'warning'
-	}
-	blockViewport?: boolean
-	cancelLabel?: string
-	confirmLabel: string
-	confirmVariant?: 'error' | 'primary' | 'secondary'
-	message: string
-	onClose: () => void
-	onConfirm: () => void
-	open: boolean
-	title?: string
+  alert?: {
+    message: string
+    variant: 'error' | 'info' | 'success' | 'warning'
+  }
+  blockViewport?: boolean
+  cancelLabel?: string
+  confirmLabel: string
+  confirmVariant?: 'error' | 'primary' | 'secondary'
+  message: string
+  onClose: () => void
+  onConfirm: () => void
+  open: boolean
+  title?: string
 }
 
 /**
@@ -48,39 +48,39 @@ type Props = {
  * Consolidates: TagGroupDeleteConfirmModal, TagGroupUnsavedChangesModal, ModalConfirmDeleteUser
  */
 export const GenericConfirmModal = ({
-	alert,
-	blockViewport,
-	cancelLabel = 'Close',
-	confirmLabel,
-	confirmVariant = 'primary',
-	message,
-	onClose,
-	onConfirm,
-	open,
-	title,
+  alert,
+  blockViewport,
+  cancelLabel = 'Close',
+  confirmLabel,
+  confirmVariant = 'primary',
+  message,
+  onClose,
+  onConfirm,
+  open,
+  title,
 }: Props) => {
-	return (
-		<Modal blockViewport={blockViewport} onClose={onClose} open={open}>
-			<div className="flex flex-col gap-4">
-				<ModalCloseButton onClose={onClose} />
+  return (
+    <Modal blockViewport={blockViewport} onClose={onClose} open={open}>
+      <div className="flex flex-col gap-4">
+        <ModalCloseButton onClose={onClose} />
 
-				{title && <ModalTitle>{title}</ModalTitle>}
+        {title && <ModalTitle>{title}</ModalTitle>}
 
-				{alert && <Alert variant={alert.variant}>{alert.message}</Alert>}
+        {alert && <Alert variant={alert.variant}>{alert.message}</Alert>}
 
-				<FormElement>
-					<p>{message}</p>
-				</FormElement>
+        <FormElement>
+          <p>{message}</p>
+        </FormElement>
 
-				<ButtonGroup>
-					<Button onClick={onConfirm} type="button" variant={confirmVariant}>
-						{confirmLabel}
-					</Button>
-					<Button onClick={onClose} type="button" variant="secondary">
-						{cancelLabel}
-					</Button>
-				</ButtonGroup>
-			</div>
-		</Modal>
-	)
+        <ButtonGroup>
+          <Button onClick={onConfirm} type="button" variant={confirmVariant}>
+            {confirmLabel}
+          </Button>
+          <Button onClick={onClose} type="button" variant="secondary">
+            {cancelLabel}
+          </Button>
+        </ButtonGroup>
+      </div>
+    </Modal>
+  )
 }

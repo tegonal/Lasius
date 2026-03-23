@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { ModelsGithubIssueTag } from './modelsGithubIssueTag'
 import type { ModelsGitlabIssueTag } from './modelsGitlabIssueTag'
@@ -13,9 +13,9 @@ import type { ModelsSimpleTag } from './modelsSimpleTag'
 import type { ModelsTagGroup } from './modelsTagGroup'
 
 export type ModelsTag =
-	| (ModelsSimpleTag & unknown)
-	| (ModelsTagGroup & unknown)
-	| (ModelsGitlabIssueTag & unknown)
-	| (ModelsJiraIssueTag & unknown)
-	| (ModelsPlaneIssueTag & unknown)
-	| (ModelsGithubIssueTag & unknown)
+  | (ModelsSimpleTag & unknown)
+  | (ModelsTagGroup & unknown)
+  | (ModelsGitlabIssueTag & unknown)
+  | (ModelsJiraIssueTag & unknown)
+  | (ModelsPlaneIssueTag & unknown)
+  | (ModelsGithubIssueTag & unknown)

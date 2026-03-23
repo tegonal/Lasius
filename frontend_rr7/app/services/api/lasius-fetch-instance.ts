@@ -34,14 +34,14 @@
  */
 
 export class ApiError extends Error {
-	constructor(
-		public status: number,
-		public statusText: string,
-		public body: unknown,
-	) {
-		super(`API error: ${status} ${statusText}`)
-		this.name = 'ApiError'
-	}
+  constructor(
+    public status: number,
+    public statusText: string,
+    public body: unknown,
+  ) {
+    super(`API error: ${status} ${statusText}`)
+    this.name = 'ApiError'
+  }
 }
 
 /**
@@ -52,46 +52,46 @@ export class ApiError extends Error {
  * Falls back to the public LASIUS_API_URL.
  */
 function getBaseUrl(): string {
-	if (typeof process !== 'undefined') {
-		// Env vars already include the Play context path (/backend)
-		return (
-			process.env.LASIUS_API_URL_INTERNAL ||
-			process.env.LASIUS_API_URL ||
-			'http://localhost:9000/backend'
-		)
-	}
-	return ''
+  if (typeof process !== 'undefined') {
+    // Env vars already include the Play context path (/backend)
+    return (
+      process.env.LASIUS_API_URL_INTERNAL ||
+      process.env.LASIUS_API_URL ||
+      'http://localhost:9000/backend'
+    )
+  }
+  return ''
 }
 
 export const lasiusFetch = async <T>(
-	url: string,
-	init: RequestInit,
+  url: string,
+  init: RequestInit,
 ): Promise<T> => {
-	const baseUrl = getBaseUrl()
-	const fullUrl = `${baseUrl}${url}`
+  const baseUrl = getBaseUrl()
+  const fullUrl = `${baseUrl}${url}`
 
-	const response = await fetch(fullUrl, init)
+  const response = await fetch(fullUrl, init)
 
-	if (!response.ok) {
-		let body: unknown
-		try {
-			body = await response.json()
-		} catch {
-			body = await response.text().catch(() => null)
-		}
-		throw new ApiError(response.status, response.statusText, body)
-	}
+  if (!response.ok) {
+    let body: unknown
+    try {
+      body = await response.json()
+    } catch {
+      body = await response.text().catch(() => null)
+    }
+    throw new ApiError(response.status, response.statusText, body)
+  }
 
-	// Handle empty responses (204 No Content, etc.)
-	if (
-		response.status === 204 ||
-		response.headers.get('content-length') === '0'
-	) {
-		return undefined as T
-	}
+  // Handle empty responses (204 No Content, etc.)
+  if (
+    response.status === 204 ||
+    response.headers.get('content-length') === '0'
+  ) {
+    return undefined as T
+  }
 
-	const data = await response.json()
-	return { data, headers: response.headers, status: response.status } as T
+  const data = await response.json()
+  return { data, headers: response.headers, status: response.status } as T
 }
 
 export type BodyType<BodyData> = BodyData

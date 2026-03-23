@@ -25,57 +25,57 @@ import { Heading } from '~/components/primitives/typography/heading'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 
 type Props = {
-	onSearchChange: (value: string) => void
-	projectCount: number
-	searchTerm: string
+  onSearchChange: (value: string) => void
+  projectCount: number
+  searchTerm: string
 }
 
 export const MyProjectsRightColumn = ({
-	onSearchChange,
-	projectCount,
-	searchTerm,
+  onSearchChange,
+  projectCount,
+  searchTerm,
 }: Props) => {
-	const { t } = useTranslation('common')
-	const showSearch = projectCount > 10
+  const { t } = useTranslation('common')
+  const showSearch = projectCount > 10
 
-	return (
-		<div className="w-full px-6 pt-3">
-			<Heading as="h2" variant="section">
-				{t('projects.myProjects', { defaultValue: 'My projects' })}
-			</Heading>
-			<p className="text-base-content/60 text-sm">
-				{t('projects.myProjectsDescription', {
-					defaultValue:
-						'Projects where you are a member and can book time. Restricted by the currently selected organisation.',
-				})}
-			</p>
-			{showSearch && (
-				<div className="mt-4">
-					<div className="join w-full">
-						<Input
-							className="join-item"
-							onChange={(e) => onSearchChange(e.target.value)}
-							placeholder={t('projects.filter.searchPlaceholder', {
-								defaultValue: 'Filter projects...',
-							})}
-							type="text"
-							value={searchTerm}
-						/>
-						{searchTerm && (
-							<button
-								aria-label={t('common.actions.clear', {
-									defaultValue: 'Clear',
-								})}
-								className="btn btn-square join-item"
-								onClick={() => onSearchChange('')}
-								type="button"
-							>
-								<LucideIcon icon={X} size={20} />
-							</button>
-						)}
-					</div>
-				</div>
-			)}
-		</div>
-	)
+  return (
+    <div className="w-full px-6 pt-3">
+      <Heading as="h2" variant="section">
+        {t('projects.myProjects', { defaultValue: 'My projects' })}
+      </Heading>
+      <p className="text-base-content/60 text-sm">
+        {t('projects.myProjectsDescription', {
+          defaultValue:
+            'Projects where you are a member and can book time. Restricted by the currently selected organisation.',
+        })}
+      </p>
+      {showSearch && (
+        <div className="mt-4">
+          <div className="join w-full">
+            <Input
+              className="join-item"
+              onChange={(e) => onSearchChange(e.target.value)}
+              placeholder={t('projects.filter.searchPlaceholder', {
+                defaultValue: 'Filter projects...',
+              })}
+              type="text"
+              value={searchTerm}
+            />
+            {searchTerm && (
+              <button
+                aria-label={t('common.actions.clear', {
+                  defaultValue: 'Clear',
+                })}
+                className="btn btn-square join-item"
+                onClick={() => onSearchChange('')}
+                type="button"
+              >
+                <LucideIcon icon={X} size={20} />
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  )
 }

@@ -20,20 +20,20 @@
 import { logger } from '~/lib/logger'
 import { getProvider } from '~/services/auth/providers'
 import {
-	destroyUserSession,
-	getSessionTokens,
+  destroyUserSession,
+  getSessionTokens,
 } from '~/services/auth/session.server'
 
 import { type Route } from './+types/logout'
 
 /** Handle POST logout (preferred — form submission) */
 export async function action({ request }: Route.ActionArgs) {
-	return performLogout(request)
+  return performLogout(request)
 }
 
 /** GET /logout also destroys the session — users visiting /logout directly expect to be logged out */
 export async function loader({ request }: Route.LoaderArgs) {
-	return performLogout(request)
+  return performLogout(request)
 }
 
 /**
@@ -41,23 +41,23 @@ export async function loader({ request }: Route.LoaderArgs) {
  * No component is normally rendered, but we include one as a fallback.
  */
 export default function Logout() {
-	return null
+  return null
 }
 
 async function performLogout(request: Request): Promise<Response> {
-	const result = await getSessionTokens(request)
+  const result = await getSessionTokens(request)
 
-	if (result?.tokens) {
-		try {
-			const provider = getProvider(result.tokens.tokenIssuer)
-			await provider.revokeToken(result.tokens.refreshToken)
-			logger.debug('Token revoked successfully', {
-				provider: result.tokens.tokenIssuer,
-			})
-		} catch (err) {
-			logger.warn('Token revocation failed during logout', { error: err })
-		}
-	}
+  if (result?.tokens) {
+    try {
+      const provider = getProvider(result.tokens.tokenIssuer)
+      await provider.revokeToken(result.tokens.refreshToken)
+      logger.debug('Token revoked successfully', {
+        provider: result.tokens.tokenIssuer,
+      })
+    } catch (err) {
+      logger.warn('Token revocation failed during logout', { error: err })
+    }
+  }
 
-	return destroyUserSession(request)
+  return destroyUserSession(request)
 }

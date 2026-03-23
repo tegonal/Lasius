@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { ModelsGithubConfigResponse } from './modelsGithubConfigResponse'
 import type { ModelsGitlabConfigResponse } from './modelsGitlabConfigResponse'
@@ -11,7 +11,7 @@ import type { ModelsJiraConfigResponse } from './modelsJiraConfigResponse'
 import type { ModelsPlaneConfigResponse } from './modelsPlaneConfigResponse'
 
 export type ModelsIssueImporterConfigResponse =
-	| (ModelsGitlabConfigResponse & unknown)
-	| (ModelsJiraConfigResponse & unknown)
-	| (ModelsPlaneConfigResponse & unknown)
-	| (ModelsGithubConfigResponse & unknown)
+  | (ModelsGitlabConfigResponse & unknown)
+  | (ModelsJiraConfigResponse & unknown)
+  | (ModelsPlaneConfigResponse & unknown)
+  | (ModelsGithubConfigResponse & unknown)

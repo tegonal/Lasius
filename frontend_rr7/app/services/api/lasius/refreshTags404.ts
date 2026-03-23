@@ -3,15 +3,15 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { RefreshTags404Error } from './refreshTags404Error'
 import type { RefreshTags404Status } from './refreshTags404Status'
 
 export type RefreshTags404 = {
-	status?: RefreshTags404Status
-	message?: string
-	error?: RefreshTags404Error
-	configId?: string
-	projectId?: string
+  status?: RefreshTags404Status
+  message?: string
+  error?: RefreshTags404Error
+  configId?: string
+  projectId?: string
 }

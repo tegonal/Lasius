@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { ModelsPersonalDataUpdate, ModelsUser } from './..'
 
@@ -13,37 +13,37 @@ import { lasiusFetch } from '../../lasius-fetch-instance'
  * @summary Change selected user's profile in selected organisation
  */
 export type updateUserProfileByOrganisationResponse200 = {
-	data: ModelsUser
-	status: 200
+  data: ModelsUser
+  status: 200
 }
 
 export type updateUserProfileByOrganisationResponseSuccess =
-	updateUserProfileByOrganisationResponse200 & {
-		headers: Headers
-	}
+  updateUserProfileByOrganisationResponse200 & {
+    headers: Headers
+  }
 export type updateUserProfileByOrganisationResponse =
-	updateUserProfileByOrganisationResponseSuccess
+  updateUserProfileByOrganisationResponseSuccess
 
 export const getUpdateUserProfileByOrganisationUrl = (
-	orgId: string,
-	userId: string,
+  orgId: string,
+  userId: string,
 ) => {
-	return `/users/organisations/${orgId}/users/${userId}`
+  return `/users/organisations/${orgId}/users/${userId}`
 }
 
 export const updateUserProfileByOrganisation = async (
-	orgId: string,
-	userId: string,
-	modelsPersonalDataUpdate: ModelsPersonalDataUpdate,
-	options?: RequestInit,
+  orgId: string,
+  userId: string,
+  modelsPersonalDataUpdate: ModelsPersonalDataUpdate,
+  options?: RequestInit,
 ): Promise<updateUserProfileByOrganisationResponse> => {
-	return lasiusFetch<updateUserProfileByOrganisationResponse>(
-		getUpdateUserProfileByOrganisationUrl(orgId, userId),
-		{
-			...options,
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json', ...options?.headers },
-			body: JSON.stringify(modelsPersonalDataUpdate),
-		},
-	)
+  return lasiusFetch<updateUserProfileByOrganisationResponse>(
+    getUpdateUserProfileByOrganisationUrl(orgId, userId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(modelsPersonalDataUpdate),
+    },
+  )
 }

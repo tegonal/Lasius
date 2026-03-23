@@ -23,20 +23,20 @@ import * as LucideIcons from 'lucide-react'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 
 interface InlineIconProps {
-	name: keyof typeof LucideIcons
-	size?: number
+  name: keyof typeof LucideIcons
+  size?: number
 }
 
 export const InlineIcon = ({ name, size = 18 }: InlineIconProps) => {
-	const IconComponent = LucideIcons[name] as LucideIconType
+  const IconComponent = LucideIcons[name] as LucideIconType
 
-	if (!IconComponent) {
-		return <span>{name}</span>
-	}
+  if (!IconComponent) {
+    return <span>{name}</span>
+  }
 
-	return (
-		<span className="inline-flex align-middle">
-			<LucideIcon icon={IconComponent} size={size} />
-		</span>
-	)
+  return (
+    <span className="inline-flex align-middle">
+      <LucideIcon icon={IconComponent} size={size} />
+    </span>
+  )
 }

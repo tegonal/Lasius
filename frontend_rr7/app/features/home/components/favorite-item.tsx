@@ -24,23 +24,23 @@ import { type ModelsBookingStub } from '~/services/api/lasius'
 import { FavoriteItemContext } from './favorite-item-context'
 
 type Props = {
-	item: ModelsBookingStub
-	selectedOrgId: string
+  item: ModelsBookingStub
+  selectedOrgId: string
 }
 
 export const FavoriteItem = ({ item, selectedOrgId }: Props) => {
-	return (
-		<div
-			className="border-base-content/20 flex flex-row items-center justify-between gap-2 border-b px-2 py-2"
-			data-testid="favorite-item"
-		>
-			<div className="flex flex-col">
-				<BookingName item={item} />
-				<TagList items={item.tags} width="sm" />
-			</div>
-			<div className="flex-shrink-0">
-				<FavoriteItemContext item={item} selectedOrgId={selectedOrgId} />
-			</div>
-		</div>
-	)
+  return (
+    <div
+      className="border-base-content/20 flex flex-row items-center justify-between gap-2 border-b px-2 py-2"
+      data-testid="favorite-item"
+    >
+      <div className="flex flex-col">
+        <BookingName item={item} />
+        <TagList items={item.tags} width="sm" />
+      </div>
+      <div className="flex-shrink-0">
+        <FavoriteItemContext item={item} selectedOrgId={selectedOrgId} />
+      </div>
+    </div>
+  )
 }

@@ -27,94 +27,94 @@ import { cn } from '~/lib/utils/cn'
  */
 
 const inputVariants = cva(
-	// Base DaisyUI input class
-	'input w-full',
-	{
-		defaultVariants: {
-			size: 'md',
-			state: 'default',
-			variant: 'default',
-		},
-		variants: {
-			size: {
-				lg: 'input-lg',
-				md: '', // default DaisyUI size
-				sm: 'input-sm',
-				xs: 'input-xs',
-			},
-			state: {
-				default: '',
-				disabled: 'input-disabled cursor-not-allowed opacity-50',
-				loading: 'loading',
-				readonly: 'cursor-default focus:outline-none',
-			},
-			variant: {
-				accent: 'input-bordered input-accent',
-				default: 'input-bordered',
-				error: 'input-bordered input-error',
-				filled: 'bg-base-200',
-				ghost: 'input-ghost',
-				info: 'input-bordered input-info',
-				primary: 'input-bordered input-primary',
-				secondary: 'input-bordered input-secondary',
-				success: 'input-bordered input-success',
-				warning: 'input-bordered input-warning',
-			},
-		},
-	},
+  // Base DaisyUI input class
+  'input w-full',
+  {
+    defaultVariants: {
+      size: 'md',
+      state: 'default',
+      variant: 'default',
+    },
+    variants: {
+      size: {
+        lg: 'input-lg',
+        md: '', // default DaisyUI size
+        sm: 'input-sm',
+        xs: 'input-xs',
+      },
+      state: {
+        default: '',
+        disabled: 'input-disabled cursor-not-allowed opacity-50',
+        loading: 'loading',
+        readonly: 'cursor-default focus:outline-none',
+      },
+      variant: {
+        accent: 'input-bordered input-accent',
+        default: 'input-bordered',
+        error: 'input-bordered input-error',
+        filled: 'bg-base-200',
+        ghost: 'input-ghost',
+        info: 'input-bordered input-info',
+        primary: 'input-bordered input-primary',
+        secondary: 'input-bordered input-secondary',
+        success: 'input-bordered input-success',
+        warning: 'input-bordered input-warning',
+      },
+    },
+  },
 )
 
 export interface InputProps
-	extends
-		Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'>,
-		VariantProps<typeof inputVariants> {
-	error?: boolean
-	fullWidth?: boolean
+  extends
+    Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'>,
+    VariantProps<typeof inputVariants> {
+  error?: boolean
+  fullWidth?: boolean
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-	(
-		{
-			className,
-			disabled,
-			error,
-			fullWidth = true,
-			readOnly,
-			size,
-			state,
-			variant,
-			...props
-		},
-		ref,
-	) => {
-		// Determine the state based on props
-		const inputState = disabled
-			? 'disabled'
-			: readOnly
-				? 'readonly'
-				: state || 'default'
+  (
+    {
+      className,
+      disabled,
+      error,
+      fullWidth = true,
+      readOnly,
+      size,
+      state,
+      variant,
+      ...props
+    },
+    ref,
+  ) => {
+    // Determine the state based on props
+    const inputState = disabled
+      ? 'disabled'
+      : readOnly
+        ? 'readonly'
+        : state || 'default'
 
-		// Override variant if error prop is true
-		const inputVariant = error ? 'error' : variant
+    // Override variant if error prop is true
+    const inputVariant = error ? 'error' : variant
 
-		return (
-			<input
-				className={cn(
-					inputVariants({
-						size,
-						state: inputState,
-						variant: inputVariant,
-					}),
-					!fullWidth && 'w-auto',
-					className,
-				)}
-				disabled={disabled}
-				readOnly={readOnly}
-				ref={ref}
-				{...props}
-			/>
-		)
-	},
+    return (
+      <input
+        className={cn(
+          inputVariants({
+            size,
+            state: inputState,
+            variant: inputVariant,
+          }),
+          !fullWidth && 'w-auto',
+          className,
+        )}
+        disabled={disabled}
+        readOnly={readOnly}
+        ref={ref}
+        {...props}
+      />
+    )
+  },
 )
 
 Input.displayName = 'Input'
@@ -129,93 +129,93 @@ export type InputVariant = VariantProps<typeof inputVariants>['variant']
  * Shares similar styling with Input component
  */
 const textareaVariants = cva(
-	// Base DaisyUI textarea class
-	'textarea w-full',
-	{
-		defaultVariants: {
-			size: 'md',
-			state: 'default',
-			variant: 'default',
-		},
-		variants: {
-			size: {
-				lg: 'textarea-lg',
-				md: '', // default DaisyUI size
-				sm: 'textarea-sm',
-				xs: 'textarea-xs',
-			},
-			state: {
-				default: '',
-				disabled: 'textarea-disabled cursor-not-allowed opacity-50',
-				readonly: 'cursor-default focus:outline-none',
-			},
-			variant: {
-				accent: 'textarea-bordered textarea-accent',
-				default: 'textarea-bordered',
-				error: 'textarea-bordered textarea-error',
-				filled: 'bg-base-200',
-				ghost: 'textarea-ghost',
-				info: 'textarea-bordered textarea-info',
-				primary: 'textarea-bordered textarea-primary',
-				secondary: 'textarea-bordered textarea-secondary',
-				success: 'textarea-bordered textarea-success',
-				warning: 'textarea-bordered textarea-warning',
-			},
-		},
-	},
+  // Base DaisyUI textarea class
+  'textarea w-full',
+  {
+    defaultVariants: {
+      size: 'md',
+      state: 'default',
+      variant: 'default',
+    },
+    variants: {
+      size: {
+        lg: 'textarea-lg',
+        md: '', // default DaisyUI size
+        sm: 'textarea-sm',
+        xs: 'textarea-xs',
+      },
+      state: {
+        default: '',
+        disabled: 'textarea-disabled cursor-not-allowed opacity-50',
+        readonly: 'cursor-default focus:outline-none',
+      },
+      variant: {
+        accent: 'textarea-bordered textarea-accent',
+        default: 'textarea-bordered',
+        error: 'textarea-bordered textarea-error',
+        filled: 'bg-base-200',
+        ghost: 'textarea-ghost',
+        info: 'textarea-bordered textarea-info',
+        primary: 'textarea-bordered textarea-primary',
+        secondary: 'textarea-bordered textarea-secondary',
+        success: 'textarea-bordered textarea-success',
+        warning: 'textarea-bordered textarea-warning',
+      },
+    },
+  },
 )
 
 export interface TextareaProps
-	extends
-		Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'size'>,
-		VariantProps<typeof textareaVariants> {
-	error?: boolean
-	fullWidth?: boolean
+  extends
+    Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'size'>,
+    VariantProps<typeof textareaVariants> {
+  error?: boolean
+  fullWidth?: boolean
 }
 
 export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-	(
-		{
-			className,
-			disabled,
-			error,
-			fullWidth = true,
-			readOnly,
-			size,
-			state,
-			variant,
-			...props
-		},
-		ref,
-	) => {
-		// Determine the state based on props
-		const textareaState = disabled
-			? 'disabled'
-			: readOnly
-				? 'readonly'
-				: state || 'default'
+  (
+    {
+      className,
+      disabled,
+      error,
+      fullWidth = true,
+      readOnly,
+      size,
+      state,
+      variant,
+      ...props
+    },
+    ref,
+  ) => {
+    // Determine the state based on props
+    const textareaState = disabled
+      ? 'disabled'
+      : readOnly
+        ? 'readonly'
+        : state || 'default'
 
-		// Override variant if error prop is true
-		const textareaVariant = error ? 'error' : variant
+    // Override variant if error prop is true
+    const textareaVariant = error ? 'error' : variant
 
-		return (
-			<textarea
-				className={cn(
-					textareaVariants({
-						size,
-						state: textareaState,
-						variant: textareaVariant,
-					}),
-					!fullWidth && 'w-auto',
-					className,
-				)}
-				disabled={disabled}
-				readOnly={readOnly}
-				ref={ref}
-				{...props}
-			/>
-		)
-	},
+    return (
+      <textarea
+        className={cn(
+          textareaVariants({
+            size,
+            state: textareaState,
+            variant: textareaVariant,
+          }),
+          !fullWidth && 'w-auto',
+          className,
+        )}
+        disabled={disabled}
+        readOnly={readOnly}
+        ref={ref}
+        {...props}
+      />
+    )
+  },
 )
 
 Textarea.displayName = 'Textarea'

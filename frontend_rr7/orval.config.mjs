@@ -20,34 +20,34 @@
 import { fetcherClientBuilder } from './app/services/api/orval-fetcher-client.mjs'
 
 const input = {
-	target: 'http://localhost:9000/backend/assets/swagger.json',
+  target: 'http://localhost:9000/backend/assets/swagger.json',
 }
 
 export default {
-	lasius: {
-		input,
-		output: {
-			client: 'fetch',
-			mock: false,
-			mode: 'tags-split',
-			override: {
-				mutator: {
-					name: 'lasiusFetch',
-					path: './app/services/api/lasius-fetch-instance.ts',
-				},
-			},
-			schemas: './app/services/api/lasius/',
-			target: './app/services/api/lasius/',
-		},
-	},
-	lasiusHooks: {
-		input,
-		output: {
-			client: fetcherClientBuilder,
-			mock: false,
-			mode: 'tags-split',
-			schemas: './app/services/api/lasius/',
-			target: './app/services/api/lasius-hooks/',
-		},
-	},
+  lasius: {
+    input,
+    output: {
+      client: 'fetch',
+      mock: false,
+      mode: 'tags-split',
+      override: {
+        mutator: {
+          name: 'lasiusFetch',
+          path: './app/services/api/lasius-fetch-instance.ts',
+        },
+      },
+      schemas: './app/services/api/lasius/',
+      target: './app/services/api/lasius/',
+    },
+  },
+  lasiusHooks: {
+    input,
+    output: {
+      client: fetcherClientBuilder,
+      mock: false,
+      mode: 'tags-split',
+      schemas: './app/services/api/lasius/',
+      target: './app/services/api/lasius-hooks/',
+    },
+  },
 }

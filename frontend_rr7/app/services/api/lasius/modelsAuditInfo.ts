@@ -3,19 +3,19 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 
 /**
  * Tracks who created and last modified an entity
  */
 export interface ModelsAuditInfo {
-	/** User ID of entity creator */
-	createdBy: string
-	/** Timestamp when entity was created */
-	createdAt: string
-	/** User ID of last updater */
-	updatedBy: string
-	/** Timestamp when entity was last updated */
-	updatedAt: string
+  /** User ID of entity creator */
+  createdBy: string
+  /** Timestamp when entity was created */
+  createdAt: string
+  /** User ID of last updater */
+  updatedBy: string
+  /** Timestamp when entity was last updated */
+  updatedAt: string
 }

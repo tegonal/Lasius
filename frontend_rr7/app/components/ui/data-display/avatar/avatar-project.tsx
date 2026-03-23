@@ -20,34 +20,34 @@
 import Avatar from 'boring-avatars'
 
 const projectAvatarPalette = [
-	'#32911b',
-	'#a9bb5a',
-	'#8e8a1e',
-	'#b03727',
-	'#723431',
+  '#32911b',
+  '#a9bb5a',
+  '#8e8a1e',
+  '#b03727',
+  '#723431',
 ]
 
 interface Props {
-	name: string
-	size?: number
+  name: string
+  size?: number
 }
 
 export const AvatarProject = ({ name, size = 39 }: Props) => {
-	return (
-		<div
-			className="relative"
-			style={{
-				height: `${size}px`,
-				width: `${size}px`,
-			}}
-		>
-			<Avatar
-				colors={projectAvatarPalette}
-				name={name}
-				size={size}
-				square={false}
-				variant="bauhaus"
-			/>
-		</div>
-	)
+  return (
+    <div
+      className="relative"
+      style={{
+        height: `${size}px`,
+        width: `${size}px`,
+      }}
+    >
+      <Avatar
+        colors={projectAvatarPalette}
+        name={name}
+        size={size}
+        square={false}
+        variant="bauhaus"
+      />
+    </div>
+  )
 }

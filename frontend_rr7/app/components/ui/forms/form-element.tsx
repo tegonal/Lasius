@@ -20,35 +20,35 @@
 import { Label } from '~/components/primitives/typography/label'
 
 interface FormElementProps {
-	children: React.ReactNode
-	htmlFor?: string
-	label?: string
-	labelActionSlot?: React.ReactNode
-	required?: boolean
+  children: React.ReactNode
+  htmlFor?: string
+  label?: string
+  labelActionSlot?: React.ReactNode
+  required?: boolean
 }
 
 export const FormElement = ({
-	children,
-	htmlFor,
-	label,
-	labelActionSlot,
-	required,
+  children,
+  htmlFor,
+  label,
+  labelActionSlot,
+  required,
 }: FormElementProps) => {
-	return (
-		<div className="space-y-2">
-			{label && (
-				<div className="relative flex items-center">
-					<Label htmlFor={htmlFor} required={required}>
-						{label}
-					</Label>
-					{labelActionSlot && (
-						<div className="absolute top-0 right-0 flex items-center">
-							{labelActionSlot}
-						</div>
-					)}
-				</div>
-			)}
-			{children}
-		</div>
-	)
+  return (
+    <div className="space-y-2">
+      {label && (
+        <div className="relative flex items-center">
+          <Label htmlFor={htmlFor} required={required}>
+            {label}
+          </Label>
+          {labelActionSlot && (
+            <div className="absolute top-0 right-0 flex items-center">
+              {labelActionSlot}
+            </div>
+          )}
+        </div>
+      )}
+      {children}
+    </div>
+  )
 }

@@ -25,28 +25,28 @@ import { Logo } from '~/components/ui/icons/logo'
 import { AuthLayout } from '~/features/auth/auth-layout'
 
 export const InvitationInvalid = () => {
-	const { t } = useTranslation('common')
+  const { t } = useTranslation('common')
 
-	return (
-		<AuthLayout>
-			<Card
-				className="border-base-300 bg-base-100 w-full max-w-md border"
-				data-testid="invite-invalid"
-				shadow="xl"
-			>
-				<CardBody className="gap-6 p-8">
-					<div className="flex justify-center">
-						<Logo />
-					</div>
-					<div className="h-4" />
-					<Alert variant="warning">
-						{t('invitations.errors.noLongerValid', {
-							defaultValue:
-								'This invitation is no longer valid. It is best to contact the person who sent you the invitation link to get a new one.',
-						})}
-					</Alert>
-				</CardBody>
-			</Card>
-		</AuthLayout>
-	)
+  return (
+    <AuthLayout>
+      <Card
+        className="border-base-300 bg-base-100 w-full max-w-md border"
+        data-testid="invite-invalid"
+        shadow="xl"
+      >
+        <CardBody className="gap-6 p-8">
+          <div className="flex justify-center">
+            <Logo />
+          </div>
+          <div className="h-4" />
+          <Alert variant="warning">
+            {t('invitations.errors.noLongerValid', {
+              defaultValue:
+                'This invitation is no longer valid. It is best to contact the person who sent you the invitation link to get a new one.',
+            })}
+          </Alert>
+        </CardBody>
+      </Card>
+    </AuthLayout>
+  )
 }

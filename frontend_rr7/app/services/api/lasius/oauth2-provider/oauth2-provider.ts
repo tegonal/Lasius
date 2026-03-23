@@ -3,14 +3,14 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type {
-	ModelsOAuthAuthorizationCodeLoginRequest,
-	ModelsOAuthUser,
-	ModelsOAuthUserId,
-	ModelsOAuthUserRegistration,
-	ModelsPasswordChangeRequest,
+  ModelsOAuthAuthorizationCodeLoginRequest,
+  ModelsOAuthUser,
+  ModelsOAuthUserId,
+  ModelsOAuthUserRegistration,
+  ModelsPasswordChangeRequest,
 } from './..'
 
 import { lasiusFetch } from '../../lasius-fetch-instance'
@@ -19,168 +19,168 @@ import { lasiusFetch } from '../../lasius-fetch-instance'
  * @summary --------please annotate------
  */
 export type registerOAuthUserResponse200 = {
-	data: ModelsOAuthUserId
-	status: 200
+  data: ModelsOAuthUserId
+  status: 200
 }
 
 export type registerOAuthUserResponseSuccess = registerOAuthUserResponse200 & {
-	headers: Headers
+  headers: Headers
 }
 export type registerOAuthUserResponse = registerOAuthUserResponseSuccess
 
 export const getRegisterOAuthUserUrl = () => {
-	return `/oauth2/user/register`
+  return `/oauth2/user/register`
 }
 
 export const registerOAuthUser = async (
-	modelsOAuthUserRegistration: ModelsOAuthUserRegistration,
-	options?: RequestInit,
+  modelsOAuthUserRegistration: ModelsOAuthUserRegistration,
+  options?: RequestInit,
 ): Promise<registerOAuthUserResponse> => {
-	return lasiusFetch<registerOAuthUserResponse>(getRegisterOAuthUserUrl(), {
-		...options,
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json', ...options?.headers },
-		body: JSON.stringify(modelsOAuthUserRegistration),
-	})
+  return lasiusFetch<registerOAuthUserResponse>(getRegisterOAuthUserUrl(), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(modelsOAuthUserRegistration),
+  })
 }
 
 /**
  * @summary Change current user's password
  */
 export type updateUserPasswordResponse200 = {
-	data: void
-	status: 200
+  data: void
+  status: 200
 }
 
 export type updateUserPasswordResponseSuccess =
-	updateUserPasswordResponse200 & {
-		headers: Headers
-	}
+  updateUserPasswordResponse200 & {
+    headers: Headers
+  }
 export type updateUserPasswordResponse = updateUserPasswordResponseSuccess
 
 export const getUpdateUserPasswordUrl = () => {
-	return `/oauth2/user/update-password`
+  return `/oauth2/user/update-password`
 }
 
 export const updateUserPassword = async (
-	modelsPasswordChangeRequest: ModelsPasswordChangeRequest,
-	options?: RequestInit,
+  modelsPasswordChangeRequest: ModelsPasswordChangeRequest,
+  options?: RequestInit,
 ): Promise<updateUserPasswordResponse> => {
-	return lasiusFetch<updateUserPasswordResponse>(getUpdateUserPasswordUrl(), {
-		...options,
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json', ...options?.headers },
-		body: JSON.stringify(modelsPasswordChangeRequest),
-	})
+  return lasiusFetch<updateUserPasswordResponse>(getUpdateUserPasswordUrl(), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(modelsPasswordChangeRequest),
+  })
 }
 
 /**
  * @summary access to internally provided oauth2 provider. Use for demo purposes only!
  */
 export type oauthAccessTokenResponse200 = {
-	data: void
-	status: 200
+  data: void
+  status: 200
 }
 
 export type oauthAccessTokenResponseSuccess = oauthAccessTokenResponse200 & {
-	headers: Headers
+  headers: Headers
 }
 export type oauthAccessTokenResponse = oauthAccessTokenResponseSuccess
 
 export const getOauthAccessTokenUrl = () => {
-	return `/oauth2/access_token`
+  return `/oauth2/access_token`
 }
 
 export const oauthAccessToken = async (
-	options?: RequestInit,
+  options?: RequestInit,
 ): Promise<oauthAccessTokenResponse> => {
-	return lasiusFetch<oauthAccessTokenResponse>(getOauthAccessTokenUrl(), {
-		...options,
-		method: 'POST',
-	})
+  return lasiusFetch<oauthAccessTokenResponse>(getOauthAccessTokenUrl(), {
+    ...options,
+    method: 'POST',
+  })
 }
 
 /**
  * @summary login to the oauth provider with the authorization code flow
  */
 export type loginResponse302 = {
-	data: void
-	status: 302
+  data: void
+  status: 302
 }
 export type loginResponseError = loginResponse302 & {
-	headers: Headers
+  headers: Headers
 }
 
 export type loginResponse = loginResponseError
 
 export const getLoginUrl = () => {
-	return `/oauth2/login`
+  return `/oauth2/login`
 }
 
 export const login = async (
-	modelsOAuthAuthorizationCodeLoginRequest: ModelsOAuthAuthorizationCodeLoginRequest,
-	options?: RequestInit,
+  modelsOAuthAuthorizationCodeLoginRequest: ModelsOAuthAuthorizationCodeLoginRequest,
+  options?: RequestInit,
 ): Promise<loginResponse> => {
-	return lasiusFetch<loginResponse>(getLoginUrl(), {
-		...options,
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json', ...options?.headers },
-		body: JSON.stringify(modelsOAuthAuthorizationCodeLoginRequest),
-	})
+  return lasiusFetch<loginResponse>(getLoginUrl(), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(modelsOAuthAuthorizationCodeLoginRequest),
+  })
 }
 
 /**
  * @summary logout from the internal oauth provider, token will not be valid anymore afterwards
  */
 export type logoutResponse200 = {
-	data: void
-	status: 200
+  data: void
+  status: 200
 }
 
 export type logoutResponseSuccess = logoutResponse200 & {
-	headers: Headers
+  headers: Headers
 }
 export type logoutResponse = logoutResponseSuccess
 
 export const getLogoutUrl = () => {
-	return `/oauth2/logout`
+  return `/oauth2/logout`
 }
 
 export const logout = async (
-	options?: RequestInit,
+  options?: RequestInit,
 ): Promise<logoutResponse> => {
-	return lasiusFetch<logoutResponse>(getLogoutUrl(), {
-		...options,
-		method: 'POST',
-	})
+  return lasiusFetch<logoutResponse>(getLogoutUrl(), {
+    ...options,
+    method: 'POST',
+  })
 }
 
 /**
  * @summary access to internally provided oauth2 provider. Use for demo purposes only!
  */
 export type getUOAuthUserProfileResponse200 = {
-	data: ModelsOAuthUser
-	status: 200
+  data: ModelsOAuthUser
+  status: 200
 }
 
 export type getUOAuthUserProfileResponseSuccess =
-	getUOAuthUserProfileResponse200 & {
-		headers: Headers
-	}
+  getUOAuthUserProfileResponse200 & {
+    headers: Headers
+  }
 export type getUOAuthUserProfileResponse = getUOAuthUserProfileResponseSuccess
 
 export const getGetUOAuthUserProfileUrl = () => {
-	return `/oauth2/profile`
+  return `/oauth2/profile`
 }
 
 export const getUOAuthUserProfile = async (
-	options?: RequestInit,
+  options?: RequestInit,
 ): Promise<getUOAuthUserProfileResponse> => {
-	return lasiusFetch<getUOAuthUserProfileResponse>(
-		getGetUOAuthUserProfileUrl(),
-		{
-			...options,
-			method: 'GET',
-		},
-	)
+  return lasiusFetch<getUOAuthUserProfileResponse>(
+    getGetUOAuthUserProfileUrl(),
+    {
+      ...options,
+      method: 'GET',
+    },
+  )
 }

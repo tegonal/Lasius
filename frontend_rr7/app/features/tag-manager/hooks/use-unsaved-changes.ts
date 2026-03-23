@@ -20,10 +20,10 @@
 import { useState } from 'react'
 
 export const useUnsavedChanges = () => {
-	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
-	return {
-		hasUnsavedChanges,
-		setHasUnsavedChanges,
-	}
+  return {
+    hasUnsavedChanges,
+    setHasUnsavedChanges,
+  }
 }

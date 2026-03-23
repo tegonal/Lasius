@@ -22,16 +22,16 @@ import { createCookie } from 'react-router'
 import { type AuthProvider } from '~/services/auth/types'
 
 export interface OAuthStateCookieData {
-	codeVerifier: string
-	provider: AuthProvider
-	returnTo: string
-	state: string
+  codeVerifier: string
+  provider: AuthProvider
+  returnTo: string
+  state: string
 }
 
 export const oauthStateCookie = createCookie('_lasius_oauth_state', {
-	httpOnly: true,
-	maxAge: 300, // 5 minutes
-	path: '/',
-	sameSite: 'lax',
-	secure: process.env.NODE_ENV === 'production',
+  httpOnly: true,
+  maxAge: 300, // 5 minutes
+  path: '/',
+  sameSite: 'lax',
+  secure: process.env.NODE_ENV === 'production',
 })

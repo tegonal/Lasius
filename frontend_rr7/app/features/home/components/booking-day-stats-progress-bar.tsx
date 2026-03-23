@@ -24,28 +24,28 @@ import { ProgressBar } from '~/components/ui/data-display/progress-bar'
 import { decimalHoursToDurationString } from '~/lib/utils/duration'
 
 export const BookingDayStatsProgressBar = () => {
-	const { t } = useTranslation('common')
-	const loaderData = useRouteLoaderData('routes/user.home._index') as
-		| undefined
-		| {
-				daySummary: {
-					fulfilledPercentage: number
-					hours: number
-					plannedWorkingHours: number
-				}
-		  }
+  const { t } = useTranslation('common')
+  const loaderData = useRouteLoaderData('routes/user.layout._index') as
+    | undefined
+    | {
+        daySummary: {
+          fulfilledPercentage: number
+          hours: number
+          plannedWorkingHours: number
+        }
+      }
 
-	const daySummary = loaderData?.daySummary
-	if (!daySummary) return null
+  const daySummary = loaderData?.daySummary
+  if (!daySummary) return null
 
-	const label = `${daySummary.fulfilledPercentage}% (${decimalHoursToDurationString(daySummary.hours)} ${t(
-		'of',
-		{ defaultValue: 'of' },
-	)} ${decimalHoursToDurationString(daySummary.plannedWorkingHours)})`
+  const label = `${daySummary.fulfilledPercentage}% (${decimalHoursToDurationString(daySummary.hours)} ${t(
+    'of',
+    { defaultValue: 'of' },
+  )} ${decimalHoursToDurationString(daySummary.plannedWorkingHours)})`
 
-	return (
-		<div className="w-full">
-			<ProgressBar label={label} percentage={daySummary.fulfilledPercentage} />
-		</div>
-	)
+  return (
+    <div className="w-full">
+      <ProgressBar label={label} percentage={daySummary.fulfilledPercentage} />
+    </div>
+  )
 }

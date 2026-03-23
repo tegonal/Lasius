@@ -3,12 +3,12 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 
-export type ModelsTagGroupType =
-	(typeof ModelsTagGroupType)[keyof typeof ModelsTagGroupType]
+export type ModelsTagGroupType = typeof ModelsTagGroupType[keyof typeof ModelsTagGroupType];
+
 
 export const ModelsTagGroupType = {
-	TagGroup: 'TagGroup',
-} as const
+  TagGroup: 'TagGroup',
+} as const;

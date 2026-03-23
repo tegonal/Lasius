@@ -20,131 +20,131 @@
 import { useRef, useState } from 'react'
 
 export type SegmentBounds = {
-	[key: string]: { end: number; start: number }
+  [key: string]: { end: number; start: number }
 }
 
 /**
  * Common hook for segmented input functionality
  */
 export function useSegmentedInput<TSegment extends string>(
-	initialValue: string,
-	placeholder: string,
+  initialValue: string,
+  placeholder: string,
 ) {
-	const [inputValue, setInputValue] = useState<string>(initialValue)
-	const [selectedSegment, setSelectedSegment] = useState<null | TSegment>(null)
-	const inputRef = useRef<HTMLInputElement>(null)
+  const [inputValue, setInputValue] = useState<string>(initialValue)
+  const [selectedSegment, setSelectedSegment] = useState<null | TSegment>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
-	// Handle focus to select first segment
-	const handleFocus = (onFirstSegmentSelect: () => void) => {
-		if (inputValue === placeholder) {
-			setInputValue('')
-		} else if (inputValue) {
-			setTimeout(onFirstSegmentSelect, 0)
-		}
-	}
+  // Handle focus to select first segment
+  const handleFocus = (onFirstSegmentSelect: () => void) => {
+    if (inputValue === placeholder) {
+      setInputValue('')
+    } else if (inputValue) {
+      setTimeout(onFirstSegmentSelect, 0)
+    }
+  }
 
-	// Handle click to select segment
-	const handleClick = (
-		getSegmentFromPosition: (
-			position: number,
-			value: string,
-		) => null | TSegment,
-		selectSegment: (segment: TSegment) => void,
-	) => {
-		setTimeout(() => {
-			const position = inputRef.current?.selectionStart
-			if (
-				typeof position === 'number' &&
-				inputValue &&
-				inputValue !== placeholder
-			) {
-				const segment = getSegmentFromPosition(position, inputValue)
-				if (segment) {
-					selectSegment(segment)
-				}
-			}
-		}, 0)
-	}
+  // Handle click to select segment
+  const handleClick = (
+    getSegmentFromPosition: (
+      position: number,
+      value: string,
+    ) => null | TSegment,
+    selectSegment: (segment: TSegment) => void,
+  ) => {
+    setTimeout(() => {
+      const position = inputRef.current?.selectionStart
+      if (
+        typeof position === 'number' &&
+        inputValue &&
+        inputValue !== placeholder
+      ) {
+        const segment = getSegmentFromPosition(position, inputValue)
+        if (segment) {
+          selectSegment(segment)
+        }
+      }
+    }, 0)
+  }
 
-	// Select a segment
-	const selectSegment = (
-		segment: TSegment,
-		getSegmentBounds: (value: string) => null | SegmentBounds,
-	): void => {
-		const bounds = getSegmentBounds(inputValue)
-		if (!bounds || !inputRef.current) return
+  // Select a segment
+  const selectSegment = (
+    segment: TSegment,
+    getSegmentBounds: (value: string) => null | SegmentBounds,
+  ): void => {
+    const bounds = getSegmentBounds(inputValue)
+    if (!bounds || !inputRef.current) return
 
-		const segmentBounds = bounds[segment]
-		if (!segmentBounds) return
+    const segmentBounds = bounds[segment]
+    if (!segmentBounds) return
 
-		inputRef.current.focus()
-		inputRef.current.setSelectionRange(segmentBounds.start, segmentBounds.end)
-		setSelectedSegment(segment)
-	}
+    inputRef.current.focus()
+    inputRef.current.setSelectionRange(segmentBounds.start, segmentBounds.end)
+    setSelectedSegment(segment)
+  }
 
-	return {
-		handleClick,
-		handleFocus,
-		inputRef,
-		inputValue,
-		selectedSegment,
-		selectSegment,
-		setInputValue,
-		setSelectedSegment,
-	}
+  return {
+    handleClick,
+    handleFocus,
+    inputRef,
+    inputValue,
+    selectedSegment,
+    selectSegment,
+    setInputValue,
+    setSelectedSegment,
+  }
 }
 
 /**
  * Common keyboard navigation for segmented inputs
  */
 export function useSegmentNavigation<TSegment extends string>(
-	segments: TSegment[],
-	getSegmentFromPosition: (position: number, value: string) => null | TSegment,
-	selectSegment: (segment: TSegment) => void,
-	separator: string,
+  segments: TSegment[],
+  getSegmentFromPosition: (position: number, value: string) => null | TSegment,
+  selectSegment: (segment: TSegment) => void,
+  separator: string,
 ) {
-	const handleSegmentNavigation = (
-		e: React.KeyboardEvent<HTMLInputElement>,
-		inputRef: React.RefObject<HTMLInputElement>,
-		inputValue: string,
-	) => {
-		// Separator key to move to next segment
-		if (e.key === separator) {
-			e.preventDefault()
-			const position = inputRef.current?.selectionStart
-			if (typeof position === 'number') {
-				const segment = getSegmentFromPosition(position, inputValue)
-				if (segment) {
-					const currentIndex = segments.indexOf(segment)
-					const nextSegment = segments[currentIndex + 1]
-					if (currentIndex < segments.length - 1 && nextSegment) {
-						selectSegment(nextSegment)
-					}
-				}
-			}
-		}
+  const handleSegmentNavigation = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    inputRef: React.RefObject<HTMLInputElement>,
+    inputValue: string,
+  ) => {
+    // Separator key to move to next segment
+    if (e.key === separator) {
+      e.preventDefault()
+      const position = inputRef.current?.selectionStart
+      if (typeof position === 'number') {
+        const segment = getSegmentFromPosition(position, inputValue)
+        if (segment) {
+          const currentIndex = segments.indexOf(segment)
+          const nextSegment = segments[currentIndex + 1]
+          if (currentIndex < segments.length - 1 && nextSegment) {
+            selectSegment(nextSegment)
+          }
+        }
+      }
+    }
 
-		// Tab navigation
-		if (e.key === 'Tab') {
-			const position = inputRef.current?.selectionStart
-			if (typeof position === 'number') {
-				const segment = getSegmentFromPosition(position, inputValue)
-				if (segment) {
-					const currentIndex = segments.indexOf(segment)
+    // Tab navigation
+    if (e.key === 'Tab') {
+      const position = inputRef.current?.selectionStart
+      if (typeof position === 'number') {
+        const segment = getSegmentFromPosition(position, inputValue)
+        if (segment) {
+          const currentIndex = segments.indexOf(segment)
 
-					const nextSeg = segments[currentIndex + 1]
-					const prevSeg = segments[currentIndex - 1]
-					if (!e.shiftKey && currentIndex < segments.length - 1 && nextSeg) {
-						e.preventDefault()
-						selectSegment(nextSeg)
-					} else if (e.shiftKey && currentIndex > 0 && prevSeg) {
-						e.preventDefault()
-						selectSegment(prevSeg)
-					}
-				}
-			}
-		}
-	}
+          const nextSeg = segments[currentIndex + 1]
+          const prevSeg = segments[currentIndex - 1]
+          if (!e.shiftKey && currentIndex < segments.length - 1 && nextSeg) {
+            e.preventDefault()
+            selectSegment(nextSeg)
+          } else if (e.shiftKey && currentIndex > 0 && prevSeg) {
+            e.preventDefault()
+            selectSegment(prevSeg)
+          }
+        }
+      }
+    }
+  }
 
-	return { handleSegmentNavigation }
+  return { handleSegmentNavigation }
 }

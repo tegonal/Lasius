@@ -25,19 +25,19 @@ import { getSessionTokens } from './session.server'
 import { type LasiusSessionData } from './types'
 
 export interface AuthResult {
-	/** Set-Cookie header to propagate if the token was refreshed */
-	headers?: HeadersInit
-	session: LasiusSessionData
+  /** Set-Cookie header to propagate if the token was refreshed */
+  headers?: HeadersInit
+  session: LasiusSessionData
 }
 
 /** Build authorization headers for backend API calls */
 export function authHeaders(
-	session: LasiusSessionData,
+  session: LasiusSessionData,
 ): Record<string, string> {
-	return {
-		Authorization: `Bearer ${session.accessToken}`,
-		'X-Token-Issuer': session.tokenIssuer,
-	}
+  return {
+    Authorization: `Bearer ${session.accessToken}`,
+    'X-Token-Issuer': session.tokenIssuer,
+  }
 }
 
 /**
@@ -49,20 +49,20 @@ export function authHeaders(
  * the token and forward both the header and cookie explicitly.
  */
 export async function authHeadersWithCsrf(
-	session: LasiusSessionData,
+  session: LasiusSessionData,
 ): Promise<Record<string, string>> {
-	const headers = authHeaders(session)
-	const csrf = await getCsrfToken({ headers })
+  const headers = authHeaders(session)
+  const csrf = await getCsrfToken({ headers })
 
-	const setCookie = csrf.headers.get('set-cookie') ?? ''
-	const match = setCookie.match(/PLAY_SESSION_CSRF=([^;]+)/)
-	const csrfCookie = match ? `PLAY_SESSION_CSRF=${match[1]}` : ''
+  const setCookie = csrf.headers.get('set-cookie') ?? ''
+  const match = setCookie.match(/PLAY_SESSION_CSRF=([^;]+)/)
+  const csrfCookie = match ? `PLAY_SESSION_CSRF=${match[1]}` : ''
 
-	return {
-		...headers,
-		Cookie: csrfCookie,
-		'Csrf-Token': csrf.data.value,
-	}
+  return {
+    ...headers,
+    Cookie: csrfCookie,
+    'Csrf-Token': csrf.data.value,
+  }
 }
 
 /**
@@ -70,11 +70,11 @@ export async function authHeadersWithCsrf(
  * Use in loaders that show different content for authenticated vs anonymous users.
  */
 export async function getOptionalUser(
-	request: Request,
+  request: Request,
 ): Promise<AuthResult | null> {
-	const result = await getSessionTokens(request)
-	if (!result) return null
-	return { headers: result.headers, session: result.tokens }
+  const result = await getSessionTokens(request)
+  if (!result) return null
+  return { headers: result.headers, session: result.tokens }
 }
 
 /**
@@ -82,20 +82,20 @@ export async function getOptionalUser(
  * Call this when building the response headers for any loader/action that uses requireUser.
  */
 export function mergeAuthHeaders(
-	authResult: AuthResult,
-	responseHeaders?: HeadersInit,
+  authResult: AuthResult,
+  responseHeaders?: HeadersInit,
 ): Headers {
-	const headers = new Headers(responseHeaders)
-	if (authResult.headers) {
-		const setCookie =
-			authResult.headers instanceof Headers
-				? authResult.headers.get('Set-Cookie')
-				: (authResult.headers as Record<string, string>)['Set-Cookie']
-		if (setCookie) {
-			headers.append('Set-Cookie', setCookie)
-		}
-	}
-	return headers
+  const headers = new Headers(responseHeaders)
+  if (authResult.headers) {
+    const setCookie =
+      authResult.headers instanceof Headers
+        ? authResult.headers.get('Set-Cookie')
+        : (authResult.headers as Record<string, string>)['Set-Cookie']
+    if (setCookie) {
+      headers.append('Set-Cookie', setCookie)
+    }
+  }
+  return headers
 }
 
 /**
@@ -106,22 +106,22 @@ export function mergeAuthHeaders(
  * Always propagate `result.headers` via `mergeAuthHeaders()` in your loader response.
  */
 export async function requireUser(request: Request): Promise<AuthResult> {
-	const result = await getSessionTokens(request)
+  const result = await getSessionTokens(request)
 
-	if (!result) {
-		const url = new URL(request.url)
-		const pathname = url.pathname
+  if (!result) {
+    const url = new URL(request.url)
+    const pathname = url.pathname
 
-		// Resource routes (fetcher-only endpoints) should not set returnTo —
-		// redirecting to /api/* after login makes no sense for the user.
-		const returnTo = pathname.startsWith('/api/')
-			? '/'
-			: encodeURIComponent(pathname)
+    // Resource routes (fetcher-only endpoints) should not set returnTo —
+    // redirecting to /api/* after login makes no sense for the user.
+    const returnTo = pathname.startsWith('/api/')
+      ? '/'
+      : encodeURIComponent(pathname)
 
-		throw redirect(`${href('/login')}?returnTo=${returnTo}`)
-	}
+    throw redirect(`${href('/login')}?returnTo=${returnTo}`)
+  }
 
-	return { headers: result.headers, session: result.tokens }
+  return { headers: result.headers, session: result.tokens }
 }
 
 /**
@@ -129,13 +129,13 @@ export async function requireUser(request: Request): Promise<AuthResult> {
  * Only allows relative paths — rejects absolute URLs, protocol-relative URLs, and data URIs.
  */
 export function sanitizeReturnTo(value: string, fallback = '/'): string {
-	if (!value || !value.startsWith('/') || value.startsWith('//')) {
-		return fallback
-	}
-	// Reject backslash paths — some browsers normalize `\` to `/`,
-	// turning `/\evil.com` into `//evil.com` (protocol-relative URL).
-	if (value.includes('\\')) {
-		return fallback
-	}
-	return value
+  if (!value || !value.startsWith('/') || value.startsWith('//')) {
+    return fallback
+  }
+  // Reject backslash paths — some browsers normalize `\` to `/`,
+  // turning `/\evil.com` into `//evil.com` (protocol-relative URL).
+  if (value.includes('\\')) {
+    return fallback
+  }
+  return value
 }

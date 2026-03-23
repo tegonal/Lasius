@@ -20,8 +20,8 @@
 import { type ReactNode } from 'react'
 
 type Props = {
-	children: ReactNode
-	standalone: boolean
+  children: ReactNode
+  standalone: boolean
 }
 
 /**
@@ -29,9 +29,9 @@ type Props = {
  * Handles the standalone vs grouped rendering logic
  */
 export const StatsTileWrapper = ({ children, standalone }: Props) => {
-	if (!standalone) {
-		return <>{children}</>
-	}
+  if (!standalone) {
+    return <>{children}</>
+  }
 
-	return <div className="stats h-fit shadow">{children}</div>
+  return <div className="stats h-fit shadow">{children}</div>
 }

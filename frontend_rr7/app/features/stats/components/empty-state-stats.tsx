@@ -23,13 +23,13 @@ import { useTranslation } from 'react-i18next'
 import { EmptyState } from '~/components/ui/data-display/empty-state'
 
 export const EmptyStateStats = () => {
-	const { t } = useTranslation('common')
-	return (
-		<EmptyState
-			icon={BarChart3}
-			label={t('stats.empty', {
-				defaultValue: 'No data available for the selected period',
-			})}
-		/>
-	)
+  const { t } = useTranslation('common')
+  return (
+    <EmptyState
+      icon={BarChart3}
+      label={t('stats.empty', {
+        defaultValue: 'No data available for the selected period',
+      })}
+    />
+  )
 }

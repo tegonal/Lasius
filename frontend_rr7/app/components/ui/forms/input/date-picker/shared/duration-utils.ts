@@ -21,47 +21,47 @@
  * Add minutes to a date
  */
 export function addMinutesToDate(date: Date, minutes: number): Date {
-	const result = new Date(date)
-	result.setMinutes(result.getMinutes() + minutes)
-	return result
+  const result = new Date(date)
+  result.setMinutes(result.getMinutes() + minutes)
+  return result
 }
 
 /**
  * Calculate duration in minutes between two dates
  */
 export function calculateDurationMinutes(
-	start: Date | null,
-	end: Date | null,
+  start: Date | null,
+  end: Date | null,
 ): number {
-	if (!start || !end) return 0
-	const diffMs = end.getTime() - start.getTime()
-	return Math.floor(diffMs / (1000 * 60))
+  if (!start || !end) return 0
+  const diffMs = end.getTime() - start.getTime()
+  return Math.floor(diffMs / (1000 * 60))
 }
 
 /**
  * Format duration in minutes to HH:MM format
  */
 export function formatDuration(totalMinutes: number): string {
-	const absMinutes = Math.abs(totalMinutes)
-	const hours = Math.floor(absMinutes / 60)
-	const minutes = absMinutes % 60
-	const sign = totalMinutes < 0 ? '-' : ''
-	return `${sign}${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
+  const absMinutes = Math.abs(totalMinutes)
+  const hours = Math.floor(absMinutes / 60)
+  const minutes = absMinutes % 60
+  const sign = totalMinutes < 0 ? '-' : ''
+  return `${sign}${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
 }
 
 /**
  * Parse duration string (HH:MM) to minutes
  */
 export function parseDuration(durationString: string): null | number {
-	const match = durationString.match(/^(-)?(\d{1,2}):(\d{2})$/)
-	if (!match) return null
+  const match = durationString.match(/^(-)?(\d{1,2}):(\d{2})$/)
+  if (!match) return null
 
-	const [, sign, hoursStr = '0', minutesStr = '0'] = match
-	const hours = parseInt(hoursStr, 10)
-	const minutes = parseInt(minutesStr, 10)
+  const [, sign, hoursStr = '0', minutesStr = '0'] = match
+  const hours = parseInt(hoursStr, 10)
+  const minutes = parseInt(minutesStr, 10)
 
-	if (minutes >= 60) return null
+  if (minutes >= 60) return null
 
-	const totalMinutes = hours * 60 + minutes
-	return sign === '-' ? -totalMinutes : totalMinutes
+  const totalMinutes = hours * 60 + minutes
+  return sign === '-' ? -totalMinutes : totalMinutes
 }

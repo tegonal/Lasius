@@ -20,5 +20,5 @@
 import { type ReactNode } from 'react'
 
 export const FavouriteListWrapper = ({ children }: { children: ReactNode }) => {
-	return <div className="flex w-full flex-col px-3 select-none">{children}</div>
+  return <div className="flex w-full flex-col px-3 select-none">{children}</div>
 }

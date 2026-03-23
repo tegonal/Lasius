@@ -20,17 +20,17 @@
 import { memo } from 'react'
 
 export const ProgressBarSmall = memo(function ProgressBarSmall({
-	percentage,
+  percentage,
 }: {
-	percentage: number
+  percentage: number
 }) {
-	return (
-		<div className="relative w-full rounded-sm">
-			<div className="bg-base-content/30 absolute top-0 left-0 h-1 w-full rounded-sm" />
-			<div
-				className="bg-secondary dark:bg-base-content h-1 rounded-sm"
-				style={{ width: `${percentage <= 100 ? percentage : 100}%` }}
-			/>
-		</div>
-	)
+  return (
+    <div className="relative w-full rounded-sm">
+      <div className="bg-base-content/30 absolute top-0 left-0 h-1 w-full rounded-sm" />
+      <div
+        className="bg-secondary dark:bg-base-content h-1 rounded-sm"
+        style={{ width: `${percentage <= 100 ? percentage : 100}%` }}
+      />
+    </div>
+  )
 })

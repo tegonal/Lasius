@@ -23,13 +23,13 @@ import { useTranslation } from 'react-i18next'
 
 import { Divider } from '~/components/primitives/divider'
 import {
-	IconTabs,
-	type IconTabsItem,
+  IconTabs,
+  type IconTabsItem,
 } from '~/components/ui/navigation/icon-tabs'
 import {
-	type ModelsBookingStub,
-	type ModelsCurrentUserTimeBooking,
-	type ModelsUserStub,
+  type ModelsBookingStub,
+  type ModelsCurrentUserTimeBooking,
+  type ModelsUserStub,
 } from '~/services/api/lasius'
 
 import { BookingAddButton } from './booking-add-button'
@@ -38,66 +38,66 @@ import { FavoriteListCompact } from './favorite-list-compact'
 import { OrganisationListCompact } from './organisation-list-compact'
 
 type Props = {
-	favorites: ModelsBookingStub[]
-	orgBookings: ModelsCurrentUserTimeBooking[]
-	selectedOrgId: string
-	users: ModelsUserStub[]
+  favorites: ModelsBookingStub[]
+  orgBookings: ModelsCurrentUserTimeBooking[]
+  selectedOrgId: string
+  users: ModelsUserStub[]
 }
 
 export const IndexColumnTabs = ({
-	favorites,
-	orgBookings,
-	selectedOrgId,
-	users,
+  favorites,
+  orgBookings,
+  selectedOrgId,
+  users,
 }: Props) => {
-	const { t } = useTranslation('common')
-	const [selectedTab, setSelectedTab] = useState(0)
+  const { t } = useTranslation('common')
+  const [selectedTab, setSelectedTab] = useState(0)
 
-	const tabs: IconTabsItem[] = [
-		{
-			component: (
-				<div className="flex w-full flex-col items-center justify-center gap-1 px-2 py-4 sm:gap-4 sm:px-3">
-					<BookingStart selectedOrgId={selectedOrgId} />
-					<Divider text={t('common.or', { defaultValue: 'or' })} />
-					<BookingAddButton selectedOrgId={selectedOrgId} />
-				</div>
-			),
-			icon: Clock,
-			id: 'bookingStart',
-			name: t('bookings.actions.start', {
-				defaultValue: 'Start booking',
-			}),
-		},
-		{
-			component: (
-				<FavoriteListCompact
-					favorites={favorites}
-					selectedOrgId={selectedOrgId}
-				/>
-			),
-			icon: Star,
-			id: 'bookingStartFav',
-			name: t('bookings.actions.startFromFavorite', {
-				defaultValue: 'Start booking from favorite',
-			}),
-		},
-		{
-			component: (
-				<OrganisationListCompact
-					orgBookings={orgBookings}
-					selectedOrgId={selectedOrgId}
-					users={users}
-				/>
-			),
-			icon: Users,
-			id: 'bookingStartTeam',
-			name: t('bookings.actions.startFromTeamMember', {
-				defaultValue: 'Start booking from team member',
-			}),
-		},
-	]
+  const tabs: IconTabsItem[] = [
+    {
+      component: (
+        <div className="flex w-full flex-col items-center justify-center gap-1 px-2 py-4 sm:gap-4 sm:px-3">
+          <BookingStart selectedOrgId={selectedOrgId} />
+          <Divider text={t('common.or', { defaultValue: 'or' })} />
+          <BookingAddButton selectedOrgId={selectedOrgId} />
+        </div>
+      ),
+      icon: Clock,
+      id: 'bookingStart',
+      name: t('bookings.actions.start', {
+        defaultValue: 'Start booking',
+      }),
+    },
+    {
+      component: (
+        <FavoriteListCompact
+          favorites={favorites}
+          selectedOrgId={selectedOrgId}
+        />
+      ),
+      icon: Star,
+      id: 'bookingStartFav',
+      name: t('bookings.actions.startFromFavorite', {
+        defaultValue: 'Start booking from favorite',
+      }),
+    },
+    {
+      component: (
+        <OrganisationListCompact
+          orgBookings={orgBookings}
+          selectedOrgId={selectedOrgId}
+          users={users}
+        />
+      ),
+      icon: Users,
+      id: 'bookingStartTeam',
+      name: t('bookings.actions.startFromTeamMember', {
+        defaultValue: 'Start booking from team member',
+      }),
+    },
+  ]
 
-	return (
-		<IconTabs onSelect={setSelectedTab} selected={selectedTab} tabs={tabs} />
-	)
+  return (
+    <IconTabs onSelect={setSelectedTab} selected={selectedTab} tabs={tabs} />
+  )
 }

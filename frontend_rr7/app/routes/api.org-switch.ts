@@ -21,9 +21,9 @@ import { data } from 'react-router'
 
 import { updateUserSettings } from '~/services/api/lasius/user/user'
 import {
-	authHeadersWithCsrf,
-	mergeAuthHeaders,
-	requireUser,
+  authHeadersWithCsrf,
+  mergeAuthHeaders,
+  requireUser,
 } from '~/services/auth/auth-helpers.server'
 
 /**
@@ -33,28 +33,28 @@ import {
  * Called by the org switcher modal via useFetcher POST.
  */
 export async function action({ request }: { request: Request }) {
-	const auth = await requireUser(request)
-	const formData = await request.formData()
-	const orgId = formData.get('organisationId')
-	const orgKey = formData.get('organisationKey')
+  const auth = await requireUser(request)
+  const formData = await request.formData()
+  const orgId = formData.get('organisationId')
+  const orgKey = formData.get('organisationKey')
 
-	if (!orgId || !orgKey) {
-		return data(
-			{ error: 'Missing organisationId or organisationKey' },
-			{ headers: mergeAuthHeaders(auth), status: 400 },
-		)
-	}
+  if (!orgId || !orgKey) {
+    return data(
+      { error: 'Missing organisationId or organisationKey' },
+      { headers: mergeAuthHeaders(auth), status: 400 },
+    )
+  }
 
-	const headers = await authHeadersWithCsrf(auth.session)
-	const result = await updateUserSettings(
-		{
-			lastSelectedOrganisation: {
-				id: orgId as string,
-				key: orgKey as string,
-			},
-		},
-		{ headers },
-	)
+  const headers = await authHeadersWithCsrf(auth.session)
+  const result = await updateUserSettings(
+    {
+      lastSelectedOrganisation: {
+        id: orgId as string,
+        key: orgKey as string,
+      },
+    },
+    { headers },
+  )
 
-	return data({ user: result.data }, { headers: mergeAuthHeaders(auth) })
+  return data({ user: result.data }, { headers: mergeAuthHeaders(auth) })
 }

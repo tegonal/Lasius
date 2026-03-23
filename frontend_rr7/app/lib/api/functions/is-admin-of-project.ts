@@ -21,15 +21,15 @@ import { ROLES } from '~/config/constants'
 import { type ModelsUser } from '~/services/api/lasius/modelsUser'
 
 export const isAdminOfProject = (
-	profile: ModelsUser | undefined,
-	organisationId: string,
-	projectId: string,
+  profile: ModelsUser | undefined,
+  organisationId: string,
+  projectId: string,
 ) => {
-	const selectedOrganisation = profile?.organisations.find(
-		(org) => org.organisationReference.id === organisationId,
-	)
-	const selectProject = selectedOrganisation?.projects.find(
-		(proj) => proj.projectReference.id === projectId,
-	)
-	return selectProject?.role === ROLES.PROJECT_ADMIN
+  const selectedOrganisation = profile?.organisations.find(
+    (org) => org.organisationReference.id === organisationId,
+  )
+  const selectProject = selectedOrganisation?.projects.find(
+    (proj) => proj.projectReference.id === projectId,
+  )
+  return selectProject?.role === ROLES.PROJECT_ADMIN
 }

@@ -22,8 +22,8 @@ import { expect, test } from '@playwright/test'
 test('login page shows provider buttons @auth', async ({ page }) => {
   await page.goto('/login')
 
-  await expect(page.getByTestId('auth-provider-internal_lasius')).toBeVisible()
-  await expect(page.getByTestId('auth-provider-custom_keycloak')).toBeVisible()
+  await expect(page.getByTestId('auth-provider-internal')).toBeVisible()
+  await expect(page.getByTestId('auth-provider-keycloak')).toBeVisible()
 })
 
 test('login page shows error from query param @auth', async ({ page }) => {
@@ -33,11 +33,10 @@ test('login page shows error from query param @auth', async ({ page }) => {
 })
 
 test('invalid credentials show error @auth', async ({ page }) => {
-  await page.goto('/login')
+  await page.goto('/internal-oauth/login', { waitUntil: 'domcontentloaded' })
 
-  // Click internal provider
-  await page.getByTestId('auth-provider-internal_lasius').click()
-  await page.waitForURL(/.*\/internal_oauth\/login.*/)
+  // Wait for the login form to render
+  await page.getByTestId('auth-internal-email-input').waitFor({ state: 'visible', timeout: 15000 })
 
   // Fill wrong credentials
   await page.getByTestId('auth-internal-email-input').fill('demo1@lasius.ch')
@@ -45,5 +44,5 @@ test('invalid credentials show error @auth', async ({ page }) => {
   await page.getByTestId('auth-internal-submit-btn').click()
 
   // Verify error is shown
-  await expect(page.getByTestId('auth-internal-login-error')).toBeVisible()
+  await expect(page.getByTestId('auth-internal-login-error')).toBeVisible({ timeout: 10000 })
 })

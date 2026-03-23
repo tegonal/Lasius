@@ -23,20 +23,20 @@ export type DateSegment = 'day' | 'month' | 'year'
  * Configuration for a segmented input field
  */
 export type SegmentConfig<T extends string> = {
-	/** Regex pattern for allowed characters in input */
-	allowedCharsPattern: RegExp
-	/** Delimiter between segments (e.g., '.' for dates, ':' for times) */
-	delimiter: string
-	/** Full placeholder string (e.g., '__.__.____') */
-	placeholder: string
-	/** Maximum allowed first digit for each segment (for auto-advance) */
-	segmentMaxFirstDigit: Record<T, number>
-	/** Placeholder for each segment */
-	segmentPlaceholders: Record<T, string>
-	/** List of segment names in order */
-	segments: T[]
-	/** Keys that act as separators to move to next segment */
-	separatorKeys: string[]
+  /** Regex pattern for allowed characters in input */
+  allowedCharsPattern: RegExp
+  /** Delimiter between segments (e.g., '.' for dates, ':' for times) */
+  delimiter: string
+  /** Full placeholder string (e.g., '__.__.____') */
+  placeholder: string
+  /** Maximum allowed first digit for each segment (for auto-advance) */
+  segmentMaxFirstDigit: Record<T, number>
+  /** Placeholder for each segment */
+  segmentPlaceholders: Record<T, string>
+  /** List of segment names in order */
+  segments: T[]
+  /** Keys that act as separators to move to next segment */
+  separatorKeys: string[]
 }
 export type TimeSegment = 'hour' | 'minute'
 
@@ -44,40 +44,40 @@ export type TimeSegment = 'hour' | 'minute'
  * Predefined configuration for date input (DD.MM.YYYY)
  */
 export const DATE_SEGMENT_CONFIG: SegmentConfig<DateSegment> = {
-	allowedCharsPattern: /[\d.]/,
-	delimiter: '.',
-	placeholder: '__.__.____',
-	segmentMaxFirstDigit: {
-		day: 3, // 4-9 auto-advances
-		month: 1, // 2-9 auto-advances
-		year: 9, // no auto-advance for year
-	},
-	segmentPlaceholders: {
-		day: '__',
-		month: '__',
-		year: '____',
-	},
-	segments: ['day', 'month', 'year'],
-	separatorKeys: ['.', ','],
+  allowedCharsPattern: /[\d.]/,
+  delimiter: '.',
+  placeholder: '__.__.____',
+  segmentMaxFirstDigit: {
+    day: 3, // 4-9 auto-advances
+    month: 1, // 2-9 auto-advances
+    year: 9, // no auto-advance for year
+  },
+  segmentPlaceholders: {
+    day: '__',
+    month: '__',
+    year: '____',
+  },
+  segments: ['day', 'month', 'year'],
+  separatorKeys: ['.', ','],
 }
 
 /**
  * Predefined configuration for time input (HH:MM)
  */
 export const TIME_SEGMENT_CONFIG: SegmentConfig<TimeSegment> = {
-	allowedCharsPattern: /[\d:.]/,
-	delimiter: ':',
-	placeholder: '__:__',
-	segmentMaxFirstDigit: {
-		hour: 2, // 3-9 auto-advances
-		minute: 5, // 6-9 auto-advances
-	},
-	segmentPlaceholders: {
-		hour: '__',
-		minute: '__',
-	},
-	segments: ['hour', 'minute'],
-	separatorKeys: [':', '.'],
+  allowedCharsPattern: /[\d:.]/,
+  delimiter: ':',
+  placeholder: '__:__',
+  segmentMaxFirstDigit: {
+    hour: 2, // 3-9 auto-advances
+    minute: 5, // 6-9 auto-advances
+  },
+  segmentPlaceholders: {
+    hour: '__',
+    minute: '__',
+  },
+  segments: ['hour', 'minute'],
+  separatorKeys: [':', '.'],
 }
 
 /**
@@ -90,17 +90,17 @@ export type DurationSegment = TimeSegment
  * Allows unlimited hours (no 24-hour restriction like time)
  */
 export const DURATION_SEGMENT_CONFIG: SegmentConfig<DurationSegment> = {
-	allowedCharsPattern: /[\d:.]/,
-	delimiter: ':',
-	placeholder: '__:__',
-	segmentMaxFirstDigit: {
-		hour: 9, // Allow any hour value for duration
-		minute: 5, // 6-9 auto-advances
-	},
-	segmentPlaceholders: {
-		hour: '__',
-		minute: '__',
-	},
-	segments: ['hour', 'minute'],
-	separatorKeys: [':', '.'],
+  allowedCharsPattern: /[\d:.]/,
+  delimiter: ':',
+  placeholder: '__:__',
+  segmentMaxFirstDigit: {
+    hour: 9, // Allow any hour value for duration
+    minute: 5, // 6-9 auto-advances
+  },
+  segmentPlaceholders: {
+    hour: '__',
+    minute: '__',
+  },
+  segments: ['hour', 'minute'],
+  separatorKeys: [':', '.'],
 }

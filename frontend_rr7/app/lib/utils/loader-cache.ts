@@ -27,31 +27,31 @@ const cache = new Map<string, { data: unknown; timestamp: number }>()
 const DEFAULT_TTL = 5 * 60 * 1000 // 5 minutes
 
 export async function cachedServerLoader<T>(
-	request: Request,
-	serverLoader: () => Promise<T>,
-	ttl = DEFAULT_TTL,
+  request: Request,
+  serverLoader: () => Promise<T>,
+  ttl = DEFAULT_TTL,
 ): Promise<T> {
-	const url = new URL(request.url)
-	const cacheKey = `${url.pathname}${url.search}`
-	const cached = cache.get(cacheKey)
+  const url = new URL(request.url)
+  const cacheKey = `${url.pathname}${url.search}`
+  const cached = cache.get(cacheKey)
 
-	if (cached && Date.now() - cached.timestamp < ttl) {
-		return cached.data as T
-	}
+  if (cached && Date.now() - cached.timestamp < ttl) {
+    return cached.data as T
+  }
 
-	const data = await serverLoader()
-	cache.set(cacheKey, { data, timestamp: Date.now() })
-	return data
+  const data = await serverLoader()
+  cache.set(cacheKey, { data, timestamp: Date.now() })
+  return data
 }
 
 export function invalidateLoaderCache(pathPrefix?: string) {
-	if (!pathPrefix) {
-		cache.clear()
-		return
-	}
-	for (const key of cache.keys()) {
-		if (key.startsWith(pathPrefix)) {
-			cache.delete(key)
-		}
-	}
+  if (!pathPrefix) {
+    cache.clear()
+    return
+  }
+  for (const key of cache.keys()) {
+    if (key.startsWith(pathPrefix)) {
+      cache.delete(key)
+    }
+  }
 }

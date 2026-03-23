@@ -32,22 +32,22 @@ import { type Route } from './+types/api.session-status'
  * cookie is propagated back via Set-Cookie header.
  */
 export async function loader({ request }: Route.LoaderArgs) {
-	const result = await getSessionTokens(request)
+  const result = await getSessionTokens(request)
 
-	if (!result) {
-		return data(
-			{ authenticated: false, expiresAt: null },
-			{ headers: { 'Cache-Control': 'no-store' } },
-		)
-	}
+  if (!result) {
+    return data(
+      { authenticated: false, expiresAt: null },
+      { headers: { 'Cache-Control': 'no-store' } },
+    )
+  }
 
-	const headers = mergeAuthHeaders(
-		{ headers: result.headers, session: result.tokens },
-		{ 'Cache-Control': 'no-store' },
-	)
+  const headers = mergeAuthHeaders(
+    { headers: result.headers, session: result.tokens },
+    { 'Cache-Control': 'no-store' },
+  )
 
-	return data(
-		{ authenticated: true, expiresAt: result.tokens.expiresAt },
-		{ headers },
-	)
+  return data(
+    { authenticated: true, expiresAt: result.tokens.expiresAt },
+    { headers },
+  )
 }

@@ -27,38 +27,38 @@ import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { useContextMenu } from '../hooks/use-context-menu'
 
 export const ContextButtonOpen = ({
-	'data-testid': testId,
-	hash,
+  'data-testid': testId,
+  hash,
 }: {
-	'data-testid'?: string
-	hash: string
+  'data-testid'?: string
+  hash: string
 }) => {
-	const { handleCloseAll, handleOpenContextMenu } = useContextMenu()
-	const { t } = useTranslation('common')
+  const { handleCloseAll, handleOpenContextMenu } = useContextMenu()
+  const { t } = useTranslation('common')
 
-	useEffect(() => {
-		const handleKeyDown = (e: KeyboardEvent) => {
-			if (e.key === 'Escape') handleCloseAll()
-		}
-		document.addEventListener('keydown', handleKeyDown)
-		return () => document.removeEventListener('keydown', handleKeyDown)
-	}, [handleCloseAll])
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') handleCloseAll()
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [handleCloseAll])
 
-	return (
-		<Button
-			aria-label={t('contextMenu.actions.open', {
-				defaultValue: 'Open context menu',
-			})}
-			data-testid={testId}
-			fullWidth={false}
-			onClick={() => handleOpenContextMenu(hash)}
-			shape="circle"
-			title={t('contextMenu.actions.open', {
-				defaultValue: 'Open context menu',
-			})}
-			variant="icon"
-		>
-			<LucideIcon icon={EllipsisVertical} />
-		</Button>
-	)
+  return (
+    <Button
+      aria-label={t('contextMenu.actions.open', {
+        defaultValue: 'Open context menu',
+      })}
+      data-testid={testId}
+      fullWidth={false}
+      onClick={() => handleOpenContextMenu(hash)}
+      shape="circle"
+      title={t('contextMenu.actions.open', {
+        defaultValue: 'Open context menu',
+      })}
+      variant="icon"
+    >
+      <LucideIcon icon={EllipsisVertical} />
+    </Button>
+  )
 }

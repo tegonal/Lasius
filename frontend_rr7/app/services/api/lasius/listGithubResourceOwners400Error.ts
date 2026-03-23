@@ -3,14 +3,14 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 
-export type ListGithubResourceOwners400Error =
-	(typeof ListGithubResourceOwners400Error)[keyof typeof ListGithubResourceOwners400Error]
+export type ListGithubResourceOwners400Error = typeof ListGithubResourceOwners400Error[keyof typeof ListGithubResourceOwners400Error];
+
 
 export const ListGithubResourceOwners400Error = {
-	list_resource_owners_failed: 'list_resource_owners_failed',
-	missing_access_token: 'missing_access_token',
-	invalid_importer_type: 'invalid_importer_type',
-} as const
+  list_resource_owners_failed: 'list_resource_owners_failed',
+  missing_access_token: 'missing_access_token',
+  invalid_importer_type: 'invalid_importer_type',
+} as const;

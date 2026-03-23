@@ -22,25 +22,25 @@ import { type ModelsTag } from '~/services/api/lasius'
 export type ImporterType = 'github' | 'gitlab' | 'jira' | 'plane'
 
 export function getImporterTypeFromTag(tag: ModelsTag): ImporterType | null {
-	switch (tag.type) {
-		case 'GithubIssueTag':
-			return 'github'
-		case 'GitlabIssueTag':
-			return 'gitlab'
-		case 'JiraIssueTag':
-			return 'jira'
-		case 'PlaneIssueTag':
-			return 'plane'
-		default:
-			return null
-	}
+  switch (tag.type) {
+    case 'GithubIssueTag':
+      return 'github'
+    case 'GitlabIssueTag':
+      return 'gitlab'
+    case 'JiraIssueTag':
+      return 'jira'
+    case 'PlaneIssueTag':
+      return 'plane'
+    default:
+      return null
+  }
 }
 
 export function isImporterTag(tag: ModelsTag): boolean {
-	return (
-		tag.type === 'GithubIssueTag' ||
-		tag.type === 'GitlabIssueTag' ||
-		tag.type === 'JiraIssueTag' ||
-		tag.type === 'PlaneIssueTag'
-	)
+  return (
+    tag.type === 'GithubIssueTag' ||
+    tag.type === 'GitlabIssueTag' ||
+    tag.type === 'JiraIssueTag' ||
+    tag.type === 'PlaneIssueTag'
+  )
 }

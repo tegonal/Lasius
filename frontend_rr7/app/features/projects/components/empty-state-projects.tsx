@@ -23,11 +23,11 @@ import { useTranslation } from 'react-i18next'
 import { EmptyState } from '~/components/ui/data-display/empty-state'
 
 export const EmptyStateProjects = () => {
-	const { t } = useTranslation('common')
-	return (
-		<EmptyState
-			icon={FolderOpen}
-			label={t('projects.empty', { defaultValue: 'No projects found' })}
-		/>
-	)
+  const { t } = useTranslation('common')
+  return (
+    <EmptyState
+      icon={FolderOpen}
+      label={t('projects.empty', { defaultValue: 'No projects found' })}
+    />
+  )
 }

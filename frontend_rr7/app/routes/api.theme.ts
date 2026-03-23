@@ -20,26 +20,26 @@
 import { data } from 'react-router'
 
 import {
-	isValidTheme,
-	serializeThemeCookie,
+  isValidTheme,
+  serializeThemeCookie,
 } from '~/lib/cookies/theme-cookie.server'
 
 import { type Route } from './+types/api.theme.ts'
 
 export const action = async ({ request }: Route.ActionArgs) => {
-	const formData = await request.formData()
-	const theme = formData.get('theme')
+  const formData = await request.formData()
+  const theme = formData.get('theme')
 
-	if (!isValidTheme(theme)) {
-		return data({ success: false }, { status: 400 })
-	}
+  if (!isValidTheme(theme)) {
+    return data({ success: false }, { status: 400 })
+  }
 
-	return data(
-		{ success: true },
-		{
-			headers: {
-				'Set-Cookie': serializeThemeCookie(theme),
-			},
-		},
-	)
+  return data(
+    { success: true },
+    {
+      headers: {
+        'Set-Cookie': serializeThemeCookie(theme),
+      },
+    },
+  )
 }

@@ -22,48 +22,48 @@ import { describe, expect, it } from 'vitest'
 import { getServerEnv, getServerEnvRequired } from './env.server'
 
 describe('getServerEnvRequired', () => {
-	it('returns the value when env var exists', () => {
-		process.env.TEST_ENV_VAR = 'test-value'
-		expect(getServerEnvRequired('TEST_ENV_VAR')).toBe('test-value')
-		delete process.env.TEST_ENV_VAR
-	})
+  it('returns the value when env var exists', () => {
+    process.env.TEST_ENV_VAR = 'test-value'
+    expect(getServerEnvRequired('TEST_ENV_VAR')).toBe('test-value')
+    delete process.env.TEST_ENV_VAR
+  })
 
-	it('throws when env var is missing', () => {
-		delete process.env.MISSING_VAR
-		expect(() => getServerEnvRequired('MISSING_VAR')).toThrow(
-			'Missing required env var: MISSING_VAR',
-		)
-	})
+  it('throws when env var is missing', () => {
+    delete process.env.MISSING_VAR
+    expect(() => getServerEnvRequired('MISSING_VAR')).toThrow(
+      'Missing required env var: MISSING_VAR',
+    )
+  })
 
-	it('throws when env var is empty string', () => {
-		process.env.EMPTY_VAR = ''
-		expect(() => getServerEnvRequired('EMPTY_VAR')).toThrow(
-			'Missing required env var: EMPTY_VAR',
-		)
-		delete process.env.EMPTY_VAR
-	})
+  it('throws when env var is empty string', () => {
+    process.env.EMPTY_VAR = ''
+    expect(() => getServerEnvRequired('EMPTY_VAR')).toThrow(
+      'Missing required env var: EMPTY_VAR',
+    )
+    delete process.env.EMPTY_VAR
+  })
 })
 
 describe('getServerEnv', () => {
-	it('returns the value when env var exists', () => {
-		process.env.TEST_ENV_VAR = 'test-value'
-		expect(getServerEnv('TEST_ENV_VAR')).toBe('test-value')
-		delete process.env.TEST_ENV_VAR
-	})
+  it('returns the value when env var exists', () => {
+    process.env.TEST_ENV_VAR = 'test-value'
+    expect(getServerEnv('TEST_ENV_VAR')).toBe('test-value')
+    delete process.env.TEST_ENV_VAR
+  })
 
-	it('returns undefined when env var is missing and no default', () => {
-		delete process.env.MISSING_VAR
-		expect(getServerEnv('MISSING_VAR')).toBeUndefined()
-	})
+  it('returns undefined when env var is missing and no default', () => {
+    delete process.env.MISSING_VAR
+    expect(getServerEnv('MISSING_VAR')).toBeUndefined()
+  })
 
-	it('returns default value when env var is missing', () => {
-		delete process.env.MISSING_VAR
-		expect(getServerEnv('MISSING_VAR', 'fallback')).toBe('fallback')
-	})
+  it('returns default value when env var is missing', () => {
+    delete process.env.MISSING_VAR
+    expect(getServerEnv('MISSING_VAR', 'fallback')).toBe('fallback')
+  })
 
-	it('returns env var value over default when both exist', () => {
-		process.env.TEST_ENV_VAR = 'real-value'
-		expect(getServerEnv('TEST_ENV_VAR', 'fallback')).toBe('real-value')
-		delete process.env.TEST_ENV_VAR
-	})
+  it('returns env var value over default when both exist', () => {
+    process.env.TEST_ENV_VAR = 'real-value'
+    expect(getServerEnv('TEST_ENV_VAR', 'fallback')).toBe('real-value')
+    delete process.env.TEST_ENV_VAR
+  })
 })

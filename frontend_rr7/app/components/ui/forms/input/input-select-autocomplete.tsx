@@ -18,11 +18,11 @@
  */
 
 import {
-	Combobox,
-	ComboboxButton,
-	ComboboxInput,
-	ComboboxOption,
-	ComboboxOptions,
+  Combobox,
+  ComboboxButton,
+  ComboboxInput,
+  ComboboxOption,
+  ComboboxOptions,
 } from '@headlessui/react'
 import { ChevronDown, ChevronUp, X } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
@@ -40,204 +40,204 @@ import { type ModelsEntityReference } from '~/services/api/lasius'
 export type SelectAutocompleteSuggestionType = ModelsEntityReference
 
 type InputSelectAutocompleteProps = {
-	id?: string
-	name: string
-	required?: boolean
-	selectedItem?: null | SelectAutocompleteSuggestionType
-	statusMessage?: null | {
-		text: string
-		variant: 'error' | 'info' | 'warning'
-	}
-	suggestions: SelectAutocompleteSuggestionType[]
+  id?: string
+  name: string
+  required?: boolean
+  selectedItem?: null | SelectAutocompleteSuggestionType
+  statusMessage?: null | {
+    text: string
+    variant: 'error' | 'info' | 'warning'
+  }
+  suggestions: SelectAutocompleteSuggestionType[]
 }
 
 const alertVariantClass: Record<string, string> = {
-	error: 'alert alert-error',
-	info: 'alert alert-info',
-	warning: 'alert alert-warning',
+  error: 'alert alert-error',
+  info: 'alert alert-info',
+  warning: 'alert alert-warning',
 }
 
 export const InputSelectAutocomplete = ({
-	id,
-	name,
-	required = false,
-	selectedItem,
-	statusMessage,
-	suggestions = [],
+  id,
+  name,
+  required = false,
+  selectedItem,
+  statusMessage,
+  suggestions = [],
 }: InputSelectAutocompleteProps) => {
-	const { t } = useTranslation('common')
-	const parentFormContext = useFormContext()
-	const inputRef = useRef<HTMLInputElement>(null)
+  const { t } = useTranslation('common')
+  const parentFormContext = useFormContext()
+  const inputRef = useRef<HTMLInputElement>(null)
 
-	const errors = parentFormContext?.formState.errors[name]
+  const errors = parentFormContext?.formState.errors[name]
 
-	const [inputText, setInputText] = useState<string>('')
-	const [selected, setSelected] = useState<
-		'' | SelectAutocompleteSuggestionType
-	>('')
-	const [filterText, setFilterText] = useState<string>('')
+  const [inputText, setInputText] = useState<string>('')
+  const [selected, setSelected] = useState<
+    '' | SelectAutocompleteSuggestionType
+  >('')
+  const [filterText, setFilterText] = useState<string>('')
 
-	const resetSelection = () => {
-		setSelected('')
-		setInputText('')
-		setFilterText('')
-		parentFormContext?.setValue(name, null)
-		setTimeout(() => {
-			inputRef.current?.focus()
-		}, 0)
-	}
+  const resetSelection = () => {
+    setSelected('')
+    setInputText('')
+    setFilterText('')
+    parentFormContext?.setValue(name, null)
+    setTimeout(() => {
+      inputRef.current?.focus()
+    }, 0)
+  }
 
-	useEffect(() => {
-		if (!parentFormContext) return
+  useEffect(() => {
+    if (!parentFormContext) return
 
-		const formValue = parentFormContext.getValues()[name]
+    const formValue = parentFormContext.getValues()[name]
 
-		if (formValue && selectedItem) {
-			setSelected(selectedItem)
-			setInputText(selectedItem.key)
-			setFilterText(selectedItem.key)
-		} else if (formValue) {
-			setSelected('')
-			setInputText(`[${formValue}]`)
-			setFilterText('')
-		} else {
-			setSelected('')
-			setInputText('')
-			setFilterText('')
-		}
-	}, [name, parentFormContext, selectedItem])
+    if (formValue && selectedItem) {
+      setSelected(selectedItem)
+      setInputText(selectedItem.key)
+      setFilterText(selectedItem.key)
+    } else if (formValue) {
+      setSelected('')
+      setInputText(`[${formValue}]`)
+      setFilterText('')
+    } else {
+      setSelected('')
+      setInputText('')
+      setFilterText('')
+    }
+  }, [name, parentFormContext, selectedItem])
 
-	const availableSuggestions = (
-		filterText
-			? suggestions.filter((item) =>
-					cleanStrForCmp(item.key).includes(cleanStrForCmp(filterText)),
-				)
-			: suggestions
-	).sort((a, b) => (a.key ?? '').localeCompare(b.key ?? ''))
+  const availableSuggestions = (
+    filterText
+      ? suggestions.filter((item) =>
+          cleanStrForCmp(item.key).includes(cleanStrForCmp(filterText)),
+        )
+      : suggestions
+  ).sort((a, b) => (a.key ?? '').localeCompare(b.key ?? ''))
 
-	const rules = required
-		? {
-				validate: {
-					required: (v: string | undefined) => !!v,
-				},
-			}
-		: {}
+  const rules = required
+    ? {
+        validate: {
+          required: (v: string | undefined) => !!v,
+        },
+      }
+    : {}
 
-	if (!parentFormContext) return null
+  if (!parentFormContext) return null
 
-	return (
-		<>
-			<div className="relative">
-				<Controller
-					control={parentFormContext.control}
-					name={name}
-					render={({ field: { onChange, value } }) => (
-						<Combobox
-							as="div"
-							onChange={(change: SelectAutocompleteSuggestionType) => {
-								if (change?.id) {
-									onChange(change.id)
-									setTimeout(() => {
-										inputRef.current?.blur()
-									}, 0)
-								}
-							}}
-							value={value}
-						>
-							{({ open }) => (
-								<>
-									<div className="join w-full">
-										<ComboboxButton as="div" className="join-item flex-1">
-											<ComboboxInput
-												as={Input}
-												autoCapitalize="off"
-												autoComplete="off"
-												autoCorrect="off"
-												className="mb-0 w-full text-sm"
-												displayValue={(
-													item: SelectAutocompleteSuggestionType,
-												) => item?.key || ''}
-												id={id || name}
-												onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-													const newValue = e.currentTarget.value
-													setInputText(newValue)
-													setFilterText(newValue)
-												}}
-												onFocus={() => {
-													if (
-														selected &&
-														inputText ===
-															(selected as SelectAutocompleteSuggestionType)
-																?.key
-													) {
-														setFilterText('')
-													}
-												}}
-												placeholder={t(
-													'projects.selectProject',
-													'Select project',
-												)}
-												ref={inputRef}
-												spellCheck={false}
-												value={inputText}
-											/>
-										</ComboboxButton>
+  return (
+    <>
+      <div className="relative">
+        <Controller
+          control={parentFormContext.control}
+          name={name}
+          render={({ field: { onChange, value } }) => (
+            <Combobox
+              as="div"
+              onChange={(change: SelectAutocompleteSuggestionType) => {
+                if (change?.id) {
+                  onChange(change.id)
+                  setTimeout(() => {
+                    inputRef.current?.blur()
+                  }, 0)
+                }
+              }}
+              value={value}
+            >
+              {({ open }) => (
+                <>
+                  <div className="join w-full">
+                    <ComboboxButton as="div" className="join-item flex-1">
+                      <ComboboxInput
+                        as={Input}
+                        autoCapitalize="off"
+                        autoComplete="off"
+                        autoCorrect="off"
+                        className="mb-0 w-full text-sm"
+                        displayValue={(
+                          item: SelectAutocompleteSuggestionType,
+                        ) => item?.key || ''}
+                        id={id || name}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                          const newValue = e.currentTarget.value
+                          setInputText(newValue)
+                          setFilterText(newValue)
+                        }}
+                        onFocus={() => {
+                          if (
+                            selected &&
+                            inputText ===
+                              (selected as SelectAutocompleteSuggestionType)
+                                ?.key
+                          ) {
+                            setFilterText('')
+                          }
+                        }}
+                        placeholder={t(
+                          'projects.selectProject',
+                          'Select project',
+                        )}
+                        ref={inputRef}
+                        spellCheck={false}
+                        value={inputText}
+                      />
+                    </ComboboxButton>
 
-										{(selected || inputText) && (
-											<button
-												className="btn btn-neutral join-item px-2"
-												onClick={resetSelection}
-												type="button"
-											>
-												<LucideIcon icon={X} size={20} />
-											</button>
-										)}
+                    {(selected || inputText) && (
+                      <button
+                        className="btn btn-neutral join-item px-2"
+                        onClick={resetSelection}
+                        type="button"
+                      >
+                        <LucideIcon icon={X} size={20} />
+                      </button>
+                    )}
 
-										<ComboboxButton className="btn btn-neutral join-item px-2">
-											<LucideIcon
-												icon={open ? ChevronUp : ChevronDown}
-												size={20}
-											/>
-										</ComboboxButton>
-									</div>
-									<ComboboxOptions as="div">
-										{open && availableSuggestions.length > 0 && (
-											<DropdownList>
-												{availableSuggestions.map((suggestion) => (
-													<ComboboxOption
-														as="div"
-														key={suggestion.key}
-														value={suggestion}
-													>
-														{({ active, selected }) => (
-															<DropdownListItem
-																active={active}
-																itemSearchString={inputText}
-																itemValue={suggestion.key}
-																key={suggestion.id}
-																selected={selected}
-															/>
-														)}
-													</ComboboxOption>
-												))}
-											</DropdownList>
-										)}
-									</ComboboxOptions>
-								</>
-							)}
-						</Combobox>
-					)}
-					rules={rules}
-				/>
-			</div>
-			<FormErrorBadge error={errors} />
-			{statusMessage && (
-				<div
-					className={`${alertVariantClass[statusMessage.variant] || 'alert'} mt-2`}
-				>
-					{statusMessage.text}
-				</div>
-			)}
-		</>
-	)
+                    <ComboboxButton className="btn btn-neutral join-item px-2">
+                      <LucideIcon
+                        icon={open ? ChevronUp : ChevronDown}
+                        size={20}
+                      />
+                    </ComboboxButton>
+                  </div>
+                  <ComboboxOptions as="div">
+                    {open && availableSuggestions.length > 0 && (
+                      <DropdownList>
+                        {availableSuggestions.map((suggestion) => (
+                          <ComboboxOption
+                            as="div"
+                            key={suggestion.key}
+                            value={suggestion}
+                          >
+                            {({ active, selected }) => (
+                              <DropdownListItem
+                                active={active}
+                                itemSearchString={inputText}
+                                itemValue={suggestion.key}
+                                key={suggestion.id}
+                                selected={selected}
+                              />
+                            )}
+                          </ComboboxOption>
+                        ))}
+                      </DropdownList>
+                    )}
+                  </ComboboxOptions>
+                </>
+              )}
+            </Combobox>
+          )}
+          rules={rules}
+        />
+      </div>
+      <FormErrorBadge error={errors} />
+      {statusMessage && (
+        <div
+          className={`${alertVariantClass[statusMessage.variant] || 'alert'} mt-2`}
+        >
+          {statusMessage.text}
+        </div>
+      )}
+    </>
+  )
 }

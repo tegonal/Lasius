@@ -20,30 +20,30 @@
 import { cn } from '~/lib/utils/cn'
 
 export const DropdownListItem = ({
-	active,
-	itemSearchString: _itemSearchString,
-	itemValue,
-	prependString = '',
-	selected,
+  active,
+  itemSearchString: _itemSearchString,
+  itemValue,
+  prependString = '',
+  selected,
 }: {
-	active: boolean
-	itemSearchString: string
-	itemValue: string
-	prependString?: string
-	selected: boolean
+  active: boolean
+  itemSearchString: string
+  itemValue: string
+  prependString?: string
+  selected: boolean
 }) => {
-	return (
-		<div
-			className={cn(
-				'text-base-content px-3 py-2 text-sm hover:cursor-pointer',
-				'transition-colors duration-150',
-				active && 'bg-secondary text-secondary-content',
-				selected && !active && 'bg-base-200',
-				!active && !selected && 'hover:bg-base-200',
-			)}
-		>
-			{prependString}
-			{itemValue}
-		</div>
-	)
+  return (
+    <div
+      className={cn(
+        'text-base-content px-3 py-2 text-sm hover:cursor-pointer',
+        'transition-colors duration-150',
+        active && 'bg-secondary text-secondary-content',
+        selected && !active && 'bg-base-200',
+        !active && !selected && 'hover:bg-base-200',
+      )}
+    >
+      {prependString}
+      {itemValue}
+    </div>
+  )
 }

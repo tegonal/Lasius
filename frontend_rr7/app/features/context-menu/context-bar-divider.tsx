@@ -18,5 +18,5 @@
  */
 
 export const ContextBarDivider = () => (
-	<div className="border-secondary-content/30 ml-1 self-stretch border-r" />
+  <div className="border-secondary-content/30 ml-1 self-stretch border-r" />
 )

@@ -22,8 +22,8 @@ import { Dialog } from '@base-ui/react/dialog'
 import { cn } from '~/lib/utils/cn'
 
 type Props = {
-	children: React.ReactNode
-	className?: string
+  children: React.ReactNode
+  className?: string
 }
 
 /**
@@ -31,9 +31,9 @@ type Props = {
  * Uses Base UI's Dialog.Title for ARIA compliance
  */
 export const ModalTitle = ({ children, className }: Props) => {
-	return (
-		<Dialog.Title className={cn('text-lg font-semibold', className)}>
-			{children}
-		</Dialog.Title>
-	)
+  return (
+    <Dialog.Title className={cn('text-lg font-semibold', className)}>
+      {children}
+    </Dialog.Title>
+  )
 }

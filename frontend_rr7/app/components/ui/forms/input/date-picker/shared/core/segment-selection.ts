@@ -25,53 +25,53 @@ import { getSegmentBounds, getSegmentFromPosition } from './segment-bounds'
  * Handle click to select segment
  */
 export function createHandleClick<T extends string>(
-	inputRef: React.RefObject<HTMLInputElement | null>,
-	inputValue: string,
-	placeholder: string,
-	delimiter: string,
-	segmentNames: T[],
-	selectSegmentFn: (segment: T) => void,
+  inputRef: React.RefObject<HTMLInputElement | null>,
+  inputValue: string,
+  placeholder: string,
+  delimiter: string,
+  segmentNames: T[],
+  selectSegmentFn: (segment: T) => void,
 ) {
-	return (_e: React.MouseEvent<HTMLInputElement>): void => {
-		setTimeout(() => {
-			const position = inputRef.current?.selectionStart
-			if (
-				typeof position === 'number' &&
-				inputValue &&
-				inputValue !== placeholder
-			) {
-				const segment = getSegmentFromPosition(
-					position,
-					inputValue,
-					delimiter,
-					segmentNames,
-				)
-				if (segment) {
-					selectSegmentFn(segment)
-				}
-			}
-		}, 0)
-	}
+  return (_e: React.MouseEvent<HTMLInputElement>): void => {
+    setTimeout(() => {
+      const position = inputRef.current?.selectionStart
+      if (
+        typeof position === 'number' &&
+        inputValue &&
+        inputValue !== placeholder
+      ) {
+        const segment = getSegmentFromPosition(
+          position,
+          inputValue,
+          delimiter,
+          segmentNames,
+        )
+        if (segment) {
+          selectSegmentFn(segment)
+        }
+      }
+    }, 0)
+  }
 }
 
 /**
  * Select a segment by setting cursor selection range
  */
 export function selectSegment<T extends string>(
-	segment: T,
-	inputValue: string,
-	delimiter: string,
-	segmentNames: T[],
-	inputRef: React.RefObject<HTMLInputElement | null>,
-	setSelectedSegment: (segment: null | T) => void,
+  segment: T,
+  inputValue: string,
+  delimiter: string,
+  segmentNames: T[],
+  inputRef: React.RefObject<HTMLInputElement | null>,
+  setSelectedSegment: (segment: null | T) => void,
 ): void {
-	const bounds = getSegmentBounds(inputValue, delimiter, segmentNames)
-	if (!bounds || !inputRef.current) return
+  const bounds = getSegmentBounds(inputValue, delimiter, segmentNames)
+  if (!bounds || !inputRef.current) return
 
-	const segmentBounds = bounds[segment]
-	if (!segmentBounds) return
+  const segmentBounds = bounds[segment]
+  if (!segmentBounds) return
 
-	inputRef.current.focus()
-	inputRef.current.setSelectionRange(segmentBounds.start, segmentBounds.end)
-	setSelectedSegment(segment)
+  inputRef.current.focus()
+  inputRef.current.setSelectionRange(segmentBounds.start, segmentBounds.end)
+  setSelectedSegment(segment)
 }

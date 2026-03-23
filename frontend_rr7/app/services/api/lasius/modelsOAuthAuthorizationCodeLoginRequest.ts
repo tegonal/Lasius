@@ -3,20 +3,20 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 
 export interface ModelsOAuthAuthorizationCodeLoginRequest {
-	clientId: string
-	email: string
-	password: string
-	/** @nullable */
-	scope?: string | null
-	redirectUri: string
-	/** @nullable */
-	codeChallenge?: string | null
-	/** @nullable */
-	codeChallengeMethod?: string | null
-	/** @nullable */
-	state?: string | null
+  clientId: string
+  email: string
+  password: string
+  /** @nullable */
+  scope?: string | null
+  redirectUri: string
+  /** @nullable */
+  codeChallenge?: string | null
+  /** @nullable */
+  codeChallengeMethod?: string | null
+  /** @nullable */
+  state?: string | null
 }

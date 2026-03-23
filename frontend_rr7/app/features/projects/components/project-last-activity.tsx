@@ -17,25 +17,20 @@
  *
  */
 
-import { format } from 'date-fns'
+import { format, parseISO } from 'date-fns'
 
 interface Props {
-	lastActivityDate?: null | string
+  lastActivityDate?: null | string
 }
 
-/**
- * Displays the last activity date for a project.
- * Accepts lastActivityDate as a prop (provided by the route loader).
- * Shows "—" if no date is available.
- */
 export const ProjectLastActivity = ({ lastActivityDate }: Props) => {
-	if (!lastActivityDate) {
-		return <span className="text-sm">—</span>
-	}
+  if (!lastActivityDate) {
+    return <span className="text-sm">—</span>
+  }
 
-	return (
-		<span className="text-sm">
-			{format(new Date(lastActivityDate), 'dd.MM.yyyy')}
-		</span>
-	)
+  return (
+    <span className="text-sm">
+      {format(parseISO(lastActivityDate), 'dd.MM.yyyy')}
+    </span>
+  )
 }

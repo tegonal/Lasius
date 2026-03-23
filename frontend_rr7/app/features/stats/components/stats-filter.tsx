@@ -33,169 +33,169 @@ import { dateOptions } from '~/lib/utils/date/date-options'
 import { formatISOLocale } from '~/lib/utils/dates'
 
 type StatsFilterProps = {
-	inactiveProject?: null | { id: string; key: string }
+  inactiveProject?: null | { id: string; key: string }
 }
 
 export const StatsFilter = ({ inactiveProject = null }: StatsFilterProps) => {
-	const { t } = useTranslation('common')
-	const navigate = useNavigate()
-	const [searchParams, setSearchParams] = useSearchParams()
-	const [selectedRange, setSelectedRange] = useState(
-		() => searchParams.get('dateRange') || dateOptions[0]?.name || '',
-	)
+  const { t } = useTranslation('common')
+  const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [selectedRange, setSelectedRange] = useState(
+    () => searchParams.get('dateRange') || dateOptions[0]?.name || '',
+  )
 
-	const defaultDateRange = dateOptions[0]?.name || ''
+  const defaultDateRange = dateOptions[0]?.name || ''
 
-	const hasChanges = selectedRange !== defaultDateRange
+  const hasChanges = selectedRange !== defaultDateRange
 
-	const selectOptions: SelectOption[] = dateOptions.map((option) => ({
-		label: t(option.name as never),
-		value: option.name,
-	}))
+  const selectOptions: SelectOption[] = dateOptions.map((option) => ({
+    label: t(option.name as never),
+    value: option.name,
+  }))
 
-	const handleRangeChange = (value: string) => {
-		setSelectedRange(value)
+  const handleRangeChange = (value: string) => {
+    setSelectedRange(value)
 
-		const option = dateOptions.find((opt) => opt.name === value)
-		if (!option?.dateRangeFn) return
+    const option = dateOptions.find((opt) => opt.name === value)
+    if (!option?.dateRangeFn) return
 
-		const { from, to } = option.dateRangeFn(new Date())
-		setSearchParams(
-			(prev) => {
-				prev.set('from', from)
-				prev.set('to', to)
-				prev.set('dateRange', value)
-				return prev
-			},
-			{ replace: true },
-		)
-	}
+    const { from, to } = option.dateRangeFn(new Date())
+    setSearchParams(
+      (prev) => {
+        prev.set('from', from)
+        prev.set('to', to)
+        prev.set('dateRange', value)
+        return prev
+      },
+      { replace: true },
+    )
+  }
 
-	const handleFromChange = (value: string) => {
-		setSearchParams(
-			(prev) => {
-				prev.set('from', value)
-				prev.set('dateRange', t('common.custom', { defaultValue: 'Custom' }))
-				return prev
-			},
-			{ replace: true },
-		)
-		setSelectedRange(t('common.custom', { defaultValue: 'Custom' }))
-	}
+  const handleFromChange = (value: string) => {
+    setSearchParams(
+      (prev) => {
+        prev.set('from', value)
+        prev.set('dateRange', t('common.custom', { defaultValue: 'Custom' }))
+        return prev
+      },
+      { replace: true },
+    )
+    setSelectedRange(t('common.custom', { defaultValue: 'Custom' }))
+  }
 
-	const handleToChange = (value: string) => {
-		setSearchParams(
-			(prev) => {
-				prev.set('to', value)
-				prev.set('dateRange', t('common.custom', { defaultValue: 'Custom' }))
-				return prev
-			},
-			{ replace: true },
-		)
-		setSelectedRange(t('common.custom', { defaultValue: 'Custom' }))
-	}
+  const handleToChange = (value: string) => {
+    setSearchParams(
+      (prev) => {
+        prev.set('to', value)
+        prev.set('dateRange', t('common.custom', { defaultValue: 'Custom' }))
+        return prev
+      },
+      { replace: true },
+    )
+    setSelectedRange(t('common.custom', { defaultValue: 'Custom' }))
+  }
 
-	const resetForm = () => {
-		const firstOption = dateOptions[0]
-		if (!firstOption) return
-		const { from, to } = firstOption.dateRangeFn(new Date())
-		setSelectedRange(defaultDateRange)
-		setSearchParams(
-			(prev) => {
-				prev.set('from', from)
-				prev.set('to', to)
-				prev.set('dateRange', defaultDateRange)
-				return prev
-			},
-			{ replace: true },
-		)
-	}
+  const resetForm = () => {
+    const firstOption = dateOptions[0]
+    if (!firstOption) return
+    const { from, to } = firstOption.dateRangeFn(new Date())
+    setSelectedRange(defaultDateRange)
+    setSearchParams(
+      (prev) => {
+        prev.set('from', from)
+        prev.set('to', to)
+        prev.set('dateRange', defaultDateRange)
+        return prev
+      },
+      { replace: true },
+    )
+  }
 
-	const handleBackToProjects = () => {
-		void navigate('/user/projects')
-	}
+  const handleBackToProjects = () => {
+    void navigate('/user/projects')
+  }
 
-	const currentFrom = searchParams.get('from') || formatISOLocale(new Date())
-	const currentTo = searchParams.get('to') || formatISOLocale(new Date())
+  const currentFrom = searchParams.get('from') || formatISOLocale(new Date())
+  const currentTo = searchParams.get('to') || formatISOLocale(new Date())
 
-	return (
-		<div className="w-full" data-testid="stats-filter">
-			{inactiveProject && (
-				<div className="alert alert-warning mb-4">
-					<div className="flex w-full items-center justify-between">
-						<span>
-							{t('projects.warnings.inactiveProjectContext', {
-								defaultValue: 'Viewing stats from inactive project',
-							})}
-						</span>
-						<Button
-							aria-label={t('common.actions.back', {
-								defaultValue: 'Back',
-							})}
-							fullWidth={false}
-							onClick={handleBackToProjects}
-							size="sm"
-							variant="ghost"
-						>
-							<LucideIcon icon={ArrowLeft} size={16} />
-							{t('common.actions.back', { defaultValue: 'Back' })}
-						</Button>
-					</div>
-				</div>
-			)}
-			<div className="relative">
-				<Heading variant="section">
-					{t('common.filter.title', { defaultValue: 'Filter' })}
-				</Heading>
-				{hasChanges && (
-					<div className="absolute top-3 right-0">
-						<button
-							className="btn btn-ghost btn-xs"
-							onClick={resetForm}
-							type="button"
-						>
-							{t('common.actions.reset', {
-								defaultValue: 'Reset',
-							})}
-						</button>
-					</div>
-				)}
-			</div>
-			<FormBody>
-				<FormElement
-					htmlFor="dateRange"
-					label={t('common.time.timeRange', {
-						defaultValue: 'Time range',
-					})}
-				>
-					<Select
-						id="dateRange"
-						onChange={handleRangeChange}
-						options={selectOptions}
-						value={selectedRange}
-					/>
-				</FormElement>
-				<FormElement
-					htmlFor="from"
-					label={t('common.time.from', { defaultValue: 'From' })}
-				>
-					<InputDateStandalone
-						id="from"
-						onChange={handleFromChange}
-						value={currentFrom.split('T')[0] || ''}
-					/>
-				</FormElement>
-				<FormElement
-					htmlFor="to"
-					label={t('common.time.to', { defaultValue: 'To' })}
-				>
-					<InputDateStandalone
-						id="to"
-						onChange={handleToChange}
-						value={currentTo.split('T')[0] || ''}
-					/>
-				</FormElement>
-			</FormBody>
-		</div>
-	)
+  return (
+    <div className="w-full" data-testid="stats-filter">
+      {inactiveProject && (
+        <div className="alert alert-warning mb-4">
+          <div className="flex w-full items-center justify-between">
+            <span>
+              {t('projects.warnings.inactiveProjectContext', {
+                defaultValue: 'Viewing stats from inactive project',
+              })}
+            </span>
+            <Button
+              aria-label={t('common.actions.back', {
+                defaultValue: 'Back',
+              })}
+              fullWidth={false}
+              onClick={handleBackToProjects}
+              size="sm"
+              variant="ghost"
+            >
+              <LucideIcon icon={ArrowLeft} size={16} />
+              {t('common.actions.back', { defaultValue: 'Back' })}
+            </Button>
+          </div>
+        </div>
+      )}
+      <div className="relative">
+        <Heading variant="section">
+          {t('common.filter.title', { defaultValue: 'Filter' })}
+        </Heading>
+        {hasChanges && (
+          <div className="absolute top-3 right-0">
+            <button
+              className="btn btn-ghost btn-xs"
+              onClick={resetForm}
+              type="button"
+            >
+              {t('common.actions.reset', {
+                defaultValue: 'Reset',
+              })}
+            </button>
+          </div>
+        )}
+      </div>
+      <FormBody>
+        <FormElement
+          htmlFor="dateRange"
+          label={t('common.time.timeRange', {
+            defaultValue: 'Time range',
+          })}
+        >
+          <Select
+            id="dateRange"
+            onChange={handleRangeChange}
+            options={selectOptions}
+            value={selectedRange}
+          />
+        </FormElement>
+        <FormElement
+          htmlFor="from"
+          label={t('common.time.from', { defaultValue: 'From' })}
+        >
+          <InputDateStandalone
+            id="from"
+            onChange={handleFromChange}
+            value={currentFrom.split('T')[0] || ''}
+          />
+        </FormElement>
+        <FormElement
+          htmlFor="to"
+          label={t('common.time.to', { defaultValue: 'To' })}
+        >
+          <InputDateStandalone
+            id="to"
+            onChange={handleToChange}
+            value={currentTo.split('T')[0] || ''}
+          />
+        </FormElement>
+      </FormBody>
+    </div>
+  )
 }

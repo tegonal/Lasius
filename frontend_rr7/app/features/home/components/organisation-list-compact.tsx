@@ -21,8 +21,8 @@ import { AnimateList } from '~/components/ui/animations/animate-list'
 import { ContextMenuProvider } from '~/features/context-menu/hooks/use-context-menu'
 import { stringHash } from '~/lib/utils/string-hash'
 import {
-	type ModelsCurrentUserTimeBooking,
-	type ModelsUserStub,
+  type ModelsCurrentUserTimeBooking,
+  type ModelsUserStub,
 } from '~/services/api/lasius'
 
 import { BookingListEmptyToday } from './booking-list-empty-today'
@@ -30,36 +30,36 @@ import { OrganisationItem } from './organisation-item'
 import { OrganisationListWrapper } from './organisation-list-wrapper'
 
 type Props = {
-	orgBookings: ModelsCurrentUserTimeBooking[]
-	selectedOrgId: string
-	users: ModelsUserStub[]
+  orgBookings: ModelsCurrentUserTimeBooking[]
+  selectedOrgId: string
+  users: ModelsUserStub[]
 }
 
 export const OrganisationListCompact = ({
-	orgBookings,
-	selectedOrgId,
-	users,
+  orgBookings,
+  selectedOrgId,
+  users,
 }: Props) => {
-	const hasNoData = !orgBookings || orgBookings.length === 0
+  const hasNoData = !orgBookings || orgBookings.length === 0
 
-	return (
-		<ContextMenuProvider>
-			<OrganisationListWrapper>
-				{hasNoData ? (
-					<BookingListEmptyToday />
-				) : (
-					<AnimateList popLayout>
-						{orgBookings.map((item) => (
-							<OrganisationItem
-								item={item}
-								key={stringHash(item)}
-								selectedOrgId={selectedOrgId}
-								users={users}
-							/>
-						))}
-					</AnimateList>
-				)}
-			</OrganisationListWrapper>
-		</ContextMenuProvider>
-	)
+  return (
+    <ContextMenuProvider>
+      <OrganisationListWrapper>
+        {hasNoData ? (
+          <BookingListEmptyToday />
+        ) : (
+          <AnimateList popLayout>
+            {orgBookings.map((item) => (
+              <OrganisationItem
+                item={item}
+                key={stringHash(item)}
+                selectedOrgId={selectedOrgId}
+                users={users}
+              />
+            ))}
+          </AnimateList>
+        )}
+      </OrganisationListWrapper>
+    </ContextMenuProvider>
+  )
 }

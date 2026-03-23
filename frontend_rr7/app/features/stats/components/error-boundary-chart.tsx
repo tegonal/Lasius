@@ -20,36 +20,36 @@
 import { Component, type ReactNode } from 'react'
 
 type ChartErrorBoundaryProps = {
-	children: ReactNode
-	fallback?: ReactNode
+  children: ReactNode
+  fallback?: ReactNode
 }
 
 type ChartErrorBoundaryState = {
-	hasError: boolean
+  hasError: boolean
 }
 
 export class ChartErrorBoundary extends Component<
-	ChartErrorBoundaryProps,
-	ChartErrorBoundaryState
+  ChartErrorBoundaryProps,
+  ChartErrorBoundaryState
 > {
-	state: ChartErrorBoundaryState = { hasError: false }
+  state: ChartErrorBoundaryState = { hasError: false }
 
-	static getDerivedStateFromError(): ChartErrorBoundaryState {
-		return { hasError: true }
-	}
+  static getDerivedStateFromError(): ChartErrorBoundaryState {
+    return { hasError: true }
+  }
 
-	render() {
-		if (this.state.hasError) {
-			return (
-				this.props.fallback || (
-					<div className="bg-base-200 flex h-[320px] w-full items-center justify-center rounded-lg">
-						<span className="text-base-content/50 text-sm">
-							Chart failed to load
-						</span>
-					</div>
-				)
-			)
-		}
-		return this.props.children
-	}
+  render() {
+    if (this.state.hasError) {
+      return (
+        this.props.fallback || (
+          <div className="bg-base-200 flex h-[320px] w-full items-center justify-center rounded-lg">
+            <span className="text-base-content/50 text-sm">
+              Chart failed to load
+            </span>
+          </div>
+        )
+      )
+    }
+    return this.props.children
+  }
 }

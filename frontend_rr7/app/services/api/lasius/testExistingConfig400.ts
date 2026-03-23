@@ -3,13 +3,13 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { TestExistingConfig400Error } from './testExistingConfig400Error'
 import type { TestExistingConfig400Status } from './testExistingConfig400Status'
 
 export type TestExistingConfig400 = {
-	status?: TestExistingConfig400Status
-	message?: string
-	error?: TestExistingConfig400Error
+  status?: TestExistingConfig400Status
+  message?: string
+  error?: TestExistingConfig400Error
 }

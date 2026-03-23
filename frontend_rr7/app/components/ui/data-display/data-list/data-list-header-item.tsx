@@ -22,13 +22,13 @@ import React from 'react'
 import { Heading } from '~/components/primitives/typography/heading'
 
 interface Props {
-	children?: React.ReactNode
+  children?: React.ReactNode
 }
 
 export const DataListHeaderItem = ({ children }: Props) => {
-	return (
-		<td className="border-base-content/20 text-base-content/50 border-b p-1 py-3">
-			<Heading variant="headingTableHeader">{children}</Heading>
-		</td>
-	)
+  return (
+    <td className="border-base-content/20 text-base-content/50 border-b p-1 py-3">
+      <Heading variant="headingTableHeader">{children}</Heading>
+    </td>
+  )
 }

@@ -19,11 +19,11 @@
 
 import { cva, type VariantProps } from 'class-variance-authority'
 import {
-	AlertCircle,
-	AlertTriangle,
-	CheckCircle,
-	Info,
-	XCircle,
+  AlertCircle,
+  AlertTriangle,
+  CheckCircle,
+  Info,
+  XCircle,
 } from 'lucide-react'
 import React from 'react'
 
@@ -31,66 +31,66 @@ import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { cn } from '~/lib/utils/cn'
 
 const alertVariants = cva('alert', {
-	defaultVariants: {
-		variant: 'neutral',
-	},
-	variants: {
-		variant: {
-			error: 'alert-error',
-			info: 'alert-info',
-			neutral: '',
-			success: 'alert-success',
-			warning: 'alert-warning',
-		},
-	},
+  defaultVariants: {
+    variant: 'neutral',
+  },
+  variants: {
+    variant: {
+      error: 'alert-error',
+      info: 'alert-info',
+      neutral: '',
+      success: 'alert-success',
+      warning: 'alert-warning',
+    },
+  },
 })
 
 const iconMap = {
-	error: XCircle,
-	info: Info,
-	neutral: AlertCircle,
-	success: CheckCircle,
-	warning: AlertTriangle,
+  error: XCircle,
+  info: Info,
+  neutral: AlertCircle,
+  success: CheckCircle,
+  warning: AlertTriangle,
 } as const
 
 export interface AlertProps
-	extends
-		React.HTMLAttributes<HTMLDivElement>,
-		VariantProps<typeof alertVariants> {
-	children: React.ReactNode
-	hideIcon?: boolean
+  extends
+    React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof alertVariants> {
+  children: React.ReactNode
+  hideIcon?: boolean
 }
 
 export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
-	(
-		{ children, className, hideIcon = false, variant = 'neutral', ...props },
-		ref,
-	) => {
-		const IconComponent = iconMap[variant || 'neutral']
+  (
+    { children, className, hideIcon = false, variant = 'neutral', ...props },
+    ref,
+  ) => {
+    const IconComponent = iconMap[variant || 'neutral']
 
-		return (
-			<div
-				className={cn(
-					alertVariants({ variant }),
-					'flex items-center gap-3',
-					className,
-				)}
-				ref={ref}
-				role="alert"
-				{...props}
-			>
-				{!hideIcon && (
-					<>
-						<div className="flex-shrink-0">
-							<LucideIcon icon={IconComponent} size={20} />
-						</div>
-						<div className="divider divider-horizontal m-0 before:w-px after:w-px"></div>
-					</>
-				)}
-				<div className="min-w-0 flex-1">{children}</div>
-			</div>
-		)
-	},
+    return (
+      <div
+        className={cn(
+          alertVariants({ variant }),
+          'flex items-center gap-3',
+          className,
+        )}
+        ref={ref}
+        role="alert"
+        {...props}
+      >
+        {!hideIcon && (
+          <>
+            <div className="flex-shrink-0">
+              <LucideIcon icon={IconComponent} size={20} />
+            </div>
+            <div className="divider divider-horizontal m-0 before:w-px after:w-px"></div>
+          </>
+        )}
+        <div className="min-w-0 flex-1">{children}</div>
+      </div>
+    )
+  },
 )
 
 Alert.displayName = 'Alert'

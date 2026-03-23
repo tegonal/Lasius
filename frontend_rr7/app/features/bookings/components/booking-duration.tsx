@@ -28,30 +28,30 @@ import { type ModelsBooking } from '~/services/api/lasius'
 type Props = { item: ModelsBooking }
 
 export const BookingDuration = ({ item }: Props) => {
-	const duration = durationAsString(
-		item.start.dateTime,
-		item.end?.dateTime || '',
-	)
-	const durationIsZero = duration === '00:00'
-	const { t } = useTranslation('common')
-	return (
-		<div
-			className={cn(
-				'flex flex-row items-center justify-start gap-1 leading-normal',
-				durationIsZero && 'text-warning',
-			)}
-		>
-			<LucideIcon icon={Clock3} size={14} />
-			<div>{duration}</div>
-			{durationIsZero && (
-				<span
-					title={t('bookings.warnings.durationIsZero', {
-						defaultValue: "This booking's duration is zero",
-					})}
-				>
-					<LucideIcon icon={AlertTriangle} size={14} />
-				</span>
-			)}
-		</div>
-	)
+  const duration = durationAsString(
+    item.start.dateTime,
+    item.end?.dateTime || '',
+  )
+  const durationIsZero = duration === '00:00'
+  const { t } = useTranslation('common')
+  return (
+    <div
+      className={cn(
+        'flex flex-row items-center justify-start gap-1 leading-normal',
+        durationIsZero && 'text-warning',
+      )}
+    >
+      <LucideIcon icon={Clock3} size={14} />
+      <div>{duration}</div>
+      {durationIsZero && (
+        <span
+          title={t('bookings.warnings.durationIsZero', {
+            defaultValue: "This booking's duration is zero",
+          })}
+        >
+          <LucideIcon icon={AlertTriangle} size={14} />
+        </span>
+      )}
+    </div>
+  )
 }

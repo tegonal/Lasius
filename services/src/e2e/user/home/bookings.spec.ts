@@ -17,28 +17,42 @@
  *
  */
 
-import { expect, test } from '@playwright/test'
+import { expect, type Page, test } from '@playwright/test'
 
-test.describe('Booking lifecycle @crud', () => {
+/**
+ * Opens the context menu for a booking item by clicking the ⋮ button.
+ * Retries the click until the menu actually appears (handles SSR hydration timing).
+ */
+const openContextMenu = async (page: Page, bookingItemIndex = 0) => {
+  const bookingItem = page.getByTestId('booking-item').nth(bookingItemIndex)
+  const openBtn = bookingItem.getByTestId('booking-ctx-open-btn')
+
+  await expect(async () => {
+    await openBtn.click()
+    await expect(page.getByTestId('booking-ctx-edit-btn')).toBeVisible({ timeout: 1000 })
+  }).toPass({ timeout: 10000 })
+}
+
+test.describe.serial('Booking lifecycle @crud', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/user/home')
     await page.waitForURL(/.*\/user\/.*/, { timeout: 15000 })
-    // Wait for page to load
-    await page.getByTestId('calendar-week-prev-btn').waitFor({ state: 'visible', timeout: 15000 })
+    // Wait for page content to load
+    await page.getByTestId('booking-start-submit-btn').waitFor({ state: 'visible', timeout: 15000 })
   })
 
   test('start a booking from quick start form', async ({ page }) => {
-    // The booking start form has a project select — click it and pick first option
-    await page.getByTestId('booking-start-submit-btn').waitFor({ state: 'visible', timeout: 10000 })
+    // Click the chevron button to open the project dropdown
+    const projectInput = page.locator('#projectId')
+    await projectInput.waitFor({ state: 'visible', timeout: 10000 })
 
-    // Select a project - the form has a combobox/select for projects
-    // Click the project select area (look for a combobox or select input)
-    const projectSelect = page.locator('[name="projectId"]').first()
-    if (await projectSelect.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await projectSelect.click()
-      // Pick first option
-      await page.locator('[role="option"]').first().click({ timeout: 5000 })
-    }
+    // Use retry pattern in case hydration hasn't completed
+    await expect(async () => {
+      await projectInput.click()
+      await expect(page.locator('[role="option"]').first()).toBeVisible({ timeout: 1000 })
+    }).toPass({ timeout: 10000 })
+
+    await page.locator('[role="option"]').first().click()
 
     await page.getByTestId('booking-start-submit-btn').click()
 
@@ -68,11 +82,9 @@ test.describe('Booking lifecycle @crud', () => {
       return
     }
 
-    // Open context menu
-    await bookingItem.getByTestId('booking-ctx-open-btn').click()
+    await openContextMenu(page)
 
     // Click edit
-    await page.getByTestId('booking-ctx-edit-btn').waitFor({ state: 'visible', timeout: 5000 })
     await page.getByTestId('booking-ctx-edit-btn').click()
 
     // Edit form modal should appear
@@ -92,11 +104,9 @@ test.describe('Booking lifecycle @crud', () => {
       return
     }
 
-    // Open context menu on first booking
-    await bookingItems.first().getByTestId('booking-ctx-open-btn').click()
+    await openContextMenu(page)
 
     // Click delete
-    await page.getByTestId('booking-ctx-delete-btn').waitFor({ state: 'visible', timeout: 5000 })
     await page.getByTestId('booking-ctx-delete-btn').click()
 
     // Wait for the UI to reflect the deletion
@@ -113,9 +123,8 @@ test.describe('Booking lifecycle @crud', () => {
       return
     }
 
-    await bookingItem.getByTestId('booking-ctx-open-btn').click()
+    await openContextMenu(page)
 
-    await page.getByTestId('booking-ctx-start-btn').waitFor({ state: 'visible', timeout: 5000 })
     await page.getByTestId('booking-ctx-start-btn').click()
 
     // Running booking should appear
@@ -129,12 +138,12 @@ test.describe('Booking lifecycle @crud', () => {
       return
     }
 
-    await bookingItem.getByTestId('booking-ctx-open-btn').click()
+    await openContextMenu(page)
 
-    await page.getByTestId('booking-ctx-favorite-btn').waitFor({ state: 'visible', timeout: 5000 })
     await page.getByTestId('booking-ctx-favorite-btn').click()
 
-    // Favorite should appear in favorites list
+    // Switch to favorites tab and check the favorite appeared
+    await page.getByTestId('nav-tab-bookingStartFav').click()
     await expect(page.getByTestId('favorite-item').first()).toBeVisible({ timeout: 10000 })
   })
 })

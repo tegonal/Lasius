@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { ModelsInvitationStatusResponse } from './..'
 
@@ -13,41 +13,41 @@ import { lasiusFetch } from '../../lasius-fetch-instance'
  * @summary get status of an invitation
  */
 export type getInvitationStatusResponse200 = {
-	data: ModelsInvitationStatusResponse
-	status: 200
+  data: ModelsInvitationStatusResponse
+  status: 200
 }
 
 export type getInvitationStatusResponse400 = {
-	data: void
-	status: 400
+  data: void
+  status: 400
 }
 
 export type getInvitationStatusResponseSuccess =
-	getInvitationStatusResponse200 & {
-		headers: Headers
-	}
+  getInvitationStatusResponse200 & {
+    headers: Headers
+  }
 export type getInvitationStatusResponseError =
-	getInvitationStatusResponse400 & {
-		headers: Headers
-	}
+  getInvitationStatusResponse400 & {
+    headers: Headers
+  }
 
 export type getInvitationStatusResponse =
-	| getInvitationStatusResponseSuccess
-	| getInvitationStatusResponseError
+  | getInvitationStatusResponseSuccess
+  | getInvitationStatusResponseError
 
 export const getGetInvitationStatusUrl = (invitationId: string) => {
-	return `/invitations/${invitationId}/status`
+  return `/invitations/${invitationId}/status`
 }
 
 export const getInvitationStatus = async (
-	invitationId: string,
-	options?: RequestInit,
+  invitationId: string,
+  options?: RequestInit,
 ): Promise<getInvitationStatusResponse> => {
-	return lasiusFetch<getInvitationStatusResponse>(
-		getGetInvitationStatusUrl(invitationId),
-		{
-			...options,
-			method: 'GET',
-		},
-	)
+  return lasiusFetch<getInvitationStatusResponse>(
+    getGetInvitationStatusUrl(invitationId),
+    {
+      ...options,
+      method: 'GET',
+    },
+  )
 }

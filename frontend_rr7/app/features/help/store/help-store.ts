@@ -20,19 +20,19 @@
 import { create } from 'zustand'
 
 interface HelpStore {
-	closeHelp: () => void
-	customHelpFile: null | string
-	isOpen: boolean
-	openHelp: (customFile?: string) => void
-	toggleHelp: () => void
+  closeHelp: () => void
+  customHelpFile: null | string
+  isOpen: boolean
+  openHelp: (customFile?: string) => void
+  toggleHelp: () => void
 }
 
 export const useHelpStore = create<HelpStore>((set) => ({
-	closeHelp: () => set({ customHelpFile: null, isOpen: false }),
-	customHelpFile: null,
-	isOpen: false,
-	openHelp: (customFile?: string) =>
-		set({ customHelpFile: customFile ?? null, isOpen: true }),
-	toggleHelp: () =>
-		set((state) => ({ customHelpFile: null, isOpen: !state.isOpen })),
+  closeHelp: () => set({ customHelpFile: null, isOpen: false }),
+  customHelpFile: null,
+  isOpen: false,
+  openHelp: (customFile?: string) =>
+    set({ customHelpFile: customFile ?? null, isOpen: true }),
+  toggleHelp: () =>
+    set((state) => ({ customHelpFile: null, isOpen: !state.isOpen })),
 }))

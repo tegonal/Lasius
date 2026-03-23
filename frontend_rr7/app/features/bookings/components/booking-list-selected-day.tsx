@@ -25,40 +25,40 @@ import { ContextMenuProvider } from '~/features/context-menu/hooks/use-context-m
 import { BookingItem } from './booking-item'
 
 export const BookingListSelectedDay = () => {
-	const { t } = useTranslation('common')
-	const loaderData = useHomeLoaderData()
+  const { t } = useTranslation('common')
+  const loaderData = useHomeLoaderData()
 
-	const bookings = loaderData?.augmentedBookings ?? []
+  const bookings = loaderData?.augmentedBookings ?? []
 
-	if (bookings.length === 0) {
-		return (
-			<div className="text-base-content/60 flex flex-col items-center justify-center gap-2 p-8">
-				<span className="text-sm">
-					{t('bookings.noBookingsToday', {
-						defaultValue: 'No bookings for this day',
-					})}
-				</span>
-			</div>
-		)
-	}
+  if (bookings.length === 0) {
+    return (
+      <div className="text-base-content/60 flex flex-col items-center justify-center gap-2 p-8">
+        <span className="text-sm">
+          {t('bookings.noBookingsToday', {
+            defaultValue: 'No bookings for this day',
+          })}
+        </span>
+      </div>
+    )
+  }
 
-	return (
-		<ContextMenuProvider>
-			<div className="flex flex-col">
-				{bookings.map((item, index) => (
-					<div
-						className="animate-fade-in"
-						key={item.id}
-						style={{
-							animationDelay: `${index * 0.12}s`,
-							animationDuration: '0.5s',
-							animationFillMode: 'both',
-						}}
-					>
-						<BookingItem item={item} nextItem={bookings[index + 1]} />
-					</div>
-				))}
-			</div>
-		</ContextMenuProvider>
-	)
+  return (
+    <ContextMenuProvider>
+      <div className="flex flex-col">
+        {bookings.map((item, index) => (
+          <div
+            className="animate-fade-in"
+            key={item.id}
+            style={{
+              animationDelay: `${index * 0.12}s`,
+              animationDuration: '0.5s',
+              animationFillMode: 'both',
+            }}
+          >
+            <BookingItem item={item} nextItem={bookings[index + 1]} />
+          </div>
+        ))}
+      </div>
+    </ContextMenuProvider>
+  )
 }

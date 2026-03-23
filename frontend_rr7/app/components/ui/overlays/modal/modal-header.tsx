@@ -22,8 +22,8 @@ import { cn } from '~/lib/utils/cn'
 import { ModalTitle } from './modal-title'
 
 type Props = {
-	children: React.ReactNode
-	className?: string
+  children: React.ReactNode
+  className?: string
 }
 
 /**
@@ -36,9 +36,9 @@ type Props = {
  * </ModalHeader>
  */
 export const ModalHeader = ({ children, className }: Props) => {
-	return (
-		<div className={cn('mb-2 flex items-center gap-2', className)}>
-			<ModalTitle>{children}</ModalTitle>
-		</div>
-	)
+  return (
+    <div className={cn('mb-2 flex items-center gap-2', className)}>
+      <ModalTitle>{children}</ModalTitle>
+    </div>
+  )
 }

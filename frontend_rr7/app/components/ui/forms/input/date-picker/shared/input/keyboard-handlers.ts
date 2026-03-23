@@ -20,110 +20,110 @@
 import type React from 'react'
 
 import {
-	getSegmentFromPosition,
-	type SegmentBounds,
+  getSegmentFromPosition,
+  type SegmentBounds,
 } from '../core/segment-bounds'
 
 /**
  * Handle Backspace/Delete - clear selected segment
  */
 export function handleBackspaceDelete<T extends string>(
-	e: React.KeyboardEvent<HTMLInputElement>,
-	inputRef: React.RefObject<HTMLInputElement | null>,
-	inputValue: string,
-	delimiter: string,
-	segmentNames: T[],
-	bounds: SegmentBounds<T>,
-	placeholders: Record<T, string>,
-	setInputValue: (value: string) => void,
-	updateStore: (value: string) => void,
-	selectSegmentFn: (segment: T) => void,
+  e: React.KeyboardEvent<HTMLInputElement>,
+  inputRef: React.RefObject<HTMLInputElement | null>,
+  inputValue: string,
+  delimiter: string,
+  segmentNames: T[],
+  bounds: SegmentBounds<T>,
+  placeholders: Record<T, string>,
+  setInputValue: (value: string) => void,
+  updateStore: (value: string) => void,
+  selectSegmentFn: (segment: T) => void,
 ): boolean {
-	if (e.key === 'Backspace' || e.key === 'Delete') {
-		const position = inputRef.current?.selectionStart
-		const selectionEnd = inputRef.current?.selectionEnd
+  if (e.key === 'Backspace' || e.key === 'Delete') {
+    const position = inputRef.current?.selectionStart
+    const selectionEnd = inputRef.current?.selectionEnd
 
-		if (typeof position === 'number' && typeof selectionEnd === 'number') {
-			const segment = getSegmentFromPosition(
-				position,
-				inputValue,
-				delimiter,
-				segmentNames,
-			)
-			if (!segment) return false
+    if (typeof position === 'number' && typeof selectionEnd === 'number') {
+      const segment = getSegmentFromPosition(
+        position,
+        inputValue,
+        delimiter,
+        segmentNames,
+      )
+      if (!segment) return false
 
-			const segmentBounds = bounds[segment]
+      const segmentBounds = bounds[segment]
 
-			// If entire segment is selected, clear it
-			if (
-				position === segmentBounds.start &&
-				selectionEnd === segmentBounds.end
-			) {
-				e.preventDefault()
-				const parts = inputValue.split(delimiter)
-				const segmentIndex = segmentNames.indexOf(segment)
-				parts[segmentIndex] = placeholders[segment]
+      // If entire segment is selected, clear it
+      if (
+        position === segmentBounds.start &&
+        selectionEnd === segmentBounds.end
+      ) {
+        e.preventDefault()
+        const parts = inputValue.split(delimiter)
+        const segmentIndex = segmentNames.indexOf(segment)
+        parts[segmentIndex] = placeholders[segment]
 
-				const updatedValue = parts.join(delimiter)
-				setInputValue(updatedValue)
-				updateStore(updatedValue)
-				setTimeout(() => selectSegmentFn(segment), 0)
-				return true
-			}
-		}
-	}
-	return false
+        const updatedValue = parts.join(delimiter)
+        setInputValue(updatedValue)
+        updateStore(updatedValue)
+        setTimeout(() => selectSegmentFn(segment), 0)
+        return true
+      }
+    }
+  }
+  return false
 }
 
 /**
  * Handle Escape key - reset to initial value
  */
 export function handleEscapeKey(
-	e: React.KeyboardEvent<HTMLInputElement>,
-	inputRef: React.RefObject<HTMLInputElement | null>,
-	resetToInitial: () => void,
+  e: React.KeyboardEvent<HTMLInputElement>,
+  inputRef: React.RefObject<HTMLInputElement | null>,
+  resetToInitial: () => void,
 ): boolean {
-	if (e.key === 'Escape') {
-		e.preventDefault()
-		e.stopPropagation() // Prevent modal close
-		resetToInitial()
-		inputRef.current?.blur()
-		return true
-	}
-	return false
+  if (e.key === 'Escape') {
+    e.preventDefault()
+    e.stopPropagation() // Prevent modal close
+    resetToInitial()
+    inputRef.current?.blur()
+    return true
+  }
+  return false
 }
 
 /**
  * Handle separator key (. or : or ,) to move to next segment
  */
 export function handleSeparatorKey<T extends string>(
-	e: React.KeyboardEvent<HTMLInputElement>,
-	separatorKeys: string[],
-	inputRef: React.RefObject<HTMLInputElement | null>,
-	inputValue: string,
-	delimiter: string,
-	segmentNames: T[],
-	selectSegmentFn: (segment: T) => void,
+  e: React.KeyboardEvent<HTMLInputElement>,
+  separatorKeys: string[],
+  inputRef: React.RefObject<HTMLInputElement | null>,
+  inputValue: string,
+  delimiter: string,
+  segmentNames: T[],
+  selectSegmentFn: (segment: T) => void,
 ): boolean {
-	if (separatorKeys.includes(e.key)) {
-		e.preventDefault()
-		const position = inputRef.current?.selectionStart
-		if (typeof position === 'number') {
-			const segment = getSegmentFromPosition(
-				position,
-				inputValue,
-				delimiter,
-				segmentNames,
-			)
-			if (segment) {
-				const currentIndex = segmentNames.indexOf(segment)
-				const nextSegment = segmentNames[currentIndex + 1]
-				if (currentIndex < segmentNames.length - 1 && nextSegment) {
-					selectSegmentFn(nextSegment)
-				}
-			}
-		}
-		return true
-	}
-	return false
+  if (separatorKeys.includes(e.key)) {
+    e.preventDefault()
+    const position = inputRef.current?.selectionStart
+    if (typeof position === 'number') {
+      const segment = getSegmentFromPosition(
+        position,
+        inputValue,
+        delimiter,
+        segmentNames,
+      )
+      if (segment) {
+        const currentIndex = segmentNames.indexOf(segment)
+        const nextSegment = segmentNames[currentIndex + 1]
+        if (currentIndex < segmentNames.length - 1 && nextSegment) {
+          selectSegmentFn(nextSegment)
+        }
+      }
+    }
+    return true
+  }
+  return false
 }

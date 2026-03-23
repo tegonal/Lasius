@@ -29,36 +29,36 @@ import { type ReactNode } from 'react'
  *   grid-cols-[19rem_auto_24rem]  (2xl)
  *
  * With React Router nested routes we split this into two grids:
- *   Outer (user.home.tsx):  grid-cols-[left_auto]   — ColumnLeft + Outlet
+ *   Outer (user.layout.tsx):  grid-cols-[left_auto]   — ColumnLeft + Outlet
  *   Inner (child routes):   grid-cols-[auto_right]   — ColumnCenter + ColumnRight
  *
  * Both grids reference the same responsive widths to maintain identical layout.
  */
 
-/** Outer grid: left nav + content area. Rendered by user.home.tsx. */
+/** Outer grid: left nav + content area. Rendered by user.layout.tsx. */
 export const outerGridClasses =
-	'grid size-full overflow-auto grid-cols-[17rem_auto] lg:grid-cols-[18rem_auto] xl:grid-cols-[19rem_auto] 2xl:grid-cols-[19rem_auto]'
+  'grid size-full overflow-auto grid-cols-[17rem_auto] lg:grid-cols-[18rem_auto] xl:grid-cols-[19rem_auto] 2xl:grid-cols-[19rem_auto]'
 
 /** Inner grid: center content + right sidebar. Rendered by child routes. */
 export const innerGridClasses =
-	'grid size-full overflow-auto grid-cols-[auto_18rem] lg:grid-cols-[auto_19rem] xl:grid-cols-[auto_20rem] 2xl:grid-cols-[auto_24rem]'
+  'grid size-full overflow-auto grid-cols-[auto_18rem] lg:grid-cols-[auto_19rem] xl:grid-cols-[auto_20rem] 2xl:grid-cols-[auto_24rem]'
 
 export const ColumnCenter = ({ children }: { children: ReactNode }) => {
-	return (
-		<div className="border-base-100 bg-base-100 text-base-content h-full min-w-0 overflow-auto border-l">
-			{children}
-		</div>
-	)
+  return (
+    <div className="border-base-100 bg-base-100 text-base-content h-full min-w-0 overflow-auto border-l">
+      {children}
+    </div>
+  )
 }
 
 export const ColumnLeft = ({ children }: { children: ReactNode }) => {
-	return <div className="h-full w-full rounded-tl-xl">{children}</div>
+  return <div className="h-full w-full rounded-tl-xl">{children}</div>
 }
 
 export const ColumnRight = ({ children }: { children?: ReactNode }) => {
-	return (
-		<div className="border-base-100 bg-base-200 text-base-content h-full overflow-hidden rounded-tr-xl border-l">
-			{children}
-		</div>
-	)
+  return (
+    <div className="border-base-100 bg-base-200 text-base-content h-full overflow-hidden rounded-tr-xl border-l">
+      {children}
+    </div>
+  )
 }

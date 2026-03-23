@@ -19,12 +19,16 @@
 
 import { data } from 'react-router'
 
-import { lasiusFetch } from '~/services/api/lasius-fetch-instance'
+import { ApiError, lasiusFetch } from '~/services/api/lasius-fetch-instance'
 import {
-	authHeadersWithCsrf,
-	mergeAuthHeaders,
-	requireUser,
+  authHeadersWithCsrf,
+  mergeAuthHeaders,
+  requireUser,
 } from '~/services/auth/auth-helpers.server'
+
+export type ProxyEnvelope<T = unknown> =
+  | { data: T; ok: true }
+  | { error: string; ok: false; status: number }
 
 /**
  * POST /api/proxy
@@ -37,44 +41,84 @@ import {
  *
  * Injects auth headers (JWT + CSRF) unless skipAuth is true.
  * Forwards the request to the backend via lasiusFetch.
+ *
+ * Returns a consistent envelope: { ok: true, data } or { ok: false, error, status }
  */
 export async function action({ request }: { request: Request }) {
-	const json = (await request.json()) as {
-		body?: unknown
-		method: string
-		skipAuth?: boolean
-		url: string
-	}
+  const json = (await request.json()) as {
+    body?: unknown
+    method: string
+    skipAuth?: boolean
+    url: string
+  }
 
-	const { body, method, skipAuth, url } = json
+  const { body, method, skipAuth, url } = json
 
-	if (!url || !method) {
-		return data({ error: 'Missing url or method' }, { status: 400 })
-	}
+  if (!url || !method) {
+    return data(
+      {
+        error: 'Missing url or method',
+        ok: false,
+        status: 400,
+      } satisfies ProxyEnvelope,
+      { status: 400 },
+    )
+  }
 
-	// Prevent SSRF — only allow relative paths
-	if (!url.startsWith('/')) {
-		return data({ error: 'URL must be a relative path' }, { status: 400 })
-	}
+  // Prevent SSRF — only allow relative paths
+  if (!url.startsWith('/')) {
+    return data(
+      {
+        error: 'URL must be a relative path',
+        ok: false,
+        status: 400,
+      } satisfies ProxyEnvelope,
+      { status: 400 },
+    )
+  }
 
-	let headers: Record<string, string> = {}
-	let authResult
+  let headers: Record<string, string> = {}
+  let authResult
 
-	if (!skipAuth) {
-		authResult = await requireUser(request)
-		headers = await authHeadersWithCsrf(authResult.session)
-	}
+  if (!skipAuth) {
+    authResult = await requireUser(request)
+    headers = await authHeadersWithCsrf(authResult.session)
+  }
 
-	const result = await lasiusFetch(url, {
-		headers: {
-			...(body !== undefined && { 'Content-Type': 'application/json' }),
-			...headers,
-		},
-		method,
-		...(body !== undefined && { body: JSON.stringify(body) }),
-	})
+  try {
+    const result = (await lasiusFetch(url, {
+      headers: {
+        ...(body !== undefined && { 'Content-Type': 'application/json' }),
+        ...headers,
+      },
+      method,
+      ...(body !== undefined && { body: JSON.stringify(body) }),
+    })) as undefined | { data: unknown }
 
-	return data(result ?? { ok: true }, {
-		headers: authResult ? mergeAuthHeaders(authResult) : {},
-	})
+    const envelope: ProxyEnvelope = { data: result?.data ?? null, ok: true }
+
+    return data(envelope, {
+      headers: authResult ? mergeAuthHeaders(authResult) : {},
+    })
+  } catch (e) {
+    if (e instanceof ApiError) {
+      const envelope: ProxyEnvelope = {
+        error: e.statusText,
+        ok: false,
+        status: e.status,
+      }
+      return data(envelope, {
+        headers: authResult ? mergeAuthHeaders(authResult) : {},
+        status: e.status,
+      })
+    }
+    return data(
+      {
+        error: 'Internal proxy error',
+        ok: false,
+        status: 500,
+      } satisfies ProxyEnvelope,
+      { status: 500 },
+    )
+  }
 }

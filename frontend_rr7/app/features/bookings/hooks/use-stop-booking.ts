@@ -18,22 +18,22 @@
  */
 
 import { addDays, endOfDay, isSameDay, startOfDay } from 'date-fns'
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useRef } from 'react'
 
 import { formatISOLocale } from '~/lib/utils/dates'
 import { type ModelsTag } from '~/services/api/lasius'
 import {
-	useAddUserBookingByOrganisation,
-	useStopUserBookingCurrent,
+  useAddUserBookingByOrganisation,
+  useStopUserBookingCurrent,
 } from '~/services/api/lasius-hooks/user-bookings/user-bookings'
 
 type StopBookingPayload = {
-	bookingId: string
-	end: string
-	orgId: string
-	projectId: string
-	start: string
-	tags: ModelsTag[]
+  bookingId: string
+  end: string
+  orgId: string
+  projectId: string
+  start: string
+  tags: ModelsTag[]
 }
 
 /**
@@ -42,67 +42,65 @@ type StopBookingPayload = {
  * Chains useStopUserBookingCurrent → useAddUserBookingByOrganisation (conditional).
  */
 export function useStopBooking() {
-	const stopApi = useStopUserBookingCurrent()
-	const addApi = useAddUserBookingByOrganisation()
-	const pendingAddRef = useRef<null | {
-		end: string
-		orgId: string
-		projectId: string
-		start: string
-		tags: ModelsTag[]
-	}>(null)
+  const addApi = useAddUserBookingByOrganisation()
+  const pendingAddRef = useRef<null | {
+    end: string
+    orgId: string
+    projectId: string
+    start: string
+    tags: ModelsTag[]
+  }>(null)
 
-	// When stop completes and there's a pending add (midnight split), fire it
-	useEffect(() => {
-		if (stopApi.state === 'idle' && pendingAddRef.current) {
-			const { end, orgId, projectId, start, tags } = pendingAddRef.current
-			pendingAddRef.current = null
-			addApi.submit({
-				body: { end, projectId, start, tags },
-				orgId,
-			})
-		}
-	}, [stopApi.state, addApi])
+  const stopApi = useStopUserBookingCurrent({
+    onSuccess: () => {
+      if (pendingAddRef.current) {
+        const { end, orgId, projectId, start, tags } = pendingAddRef.current
+        pendingAddRef.current = null
+        addApi.submit({
+          body: { end, projectId, start, tags },
+          orgId,
+        })
+      }
+    },
+  })
 
-	const submit = useCallback(
-		(payload: StopBookingPayload) => {
-			const { bookingId, end, orgId, projectId, start, tags } = payload
-			const startDate = new Date(start)
-			const endDate = new Date(end)
-			const spansMidnight = !isSameDay(startDate, endDate)
+  const submit = useCallback(
+    (payload: StopBookingPayload) => {
+      const { bookingId, end, orgId, projectId, start, tags } = payload
+      const startDate = new Date(start)
+      const endDate = new Date(end)
+      const spansMidnight = !isSameDay(startDate, endDate)
 
-			if (!spansMidnight) {
-				stopApi.submit({
-					body: { end },
-					bookingId,
-					orgId,
-				})
-			} else {
-				const eod = formatISOLocale(endOfDay(startDate))
-				const nextDayStart = formatISOLocale(startOfDay(addDays(startDate, 1)))
+      if (!spansMidnight) {
+        stopApi.submit({
+          body: { end },
+          bookingId,
+          orgId,
+        })
+      } else {
+        const eod = formatISOLocale(endOfDay(startDate))
+        const nextDayStart = formatISOLocale(startOfDay(addDays(startDate, 1)))
 
-				// Queue the next-day booking, then stop at end-of-day
-				pendingAddRef.current = {
-					end: formatISOLocale(endDate),
-					orgId,
-					projectId,
-					start: nextDayStart,
-					tags,
-				}
-				stopApi.submit({
-					body: { end: eod },
-					bookingId,
-					orgId,
-				})
-			}
-		},
-		[stopApi],
-	)
+        // Queue the next-day booking, then stop at end-of-day
+        pendingAddRef.current = {
+          end: formatISOLocale(endDate),
+          orgId,
+          projectId,
+          start: nextDayStart,
+          tags,
+        }
+        stopApi.submit({
+          body: { end: eod },
+          bookingId,
+          orgId,
+        })
+      }
+    },
+    [stopApi],
+  )
 
-	const state =
-		stopApi.state !== 'idle' || addApi.state !== 'idle' || pendingAddRef.current
-			? 'submitting'
-			: 'idle'
+  const state =
+    stopApi.state !== 'idle' || addApi.state !== 'idle' ? 'submitting' : 'idle'
 
-	return { state, submit }
+  return { state, submit }
 }

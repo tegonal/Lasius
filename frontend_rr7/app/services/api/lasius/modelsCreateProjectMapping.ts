@@ -3,33 +3,33 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { ModelsGithubTagConfiguration } from './modelsGithubTagConfiguration'
 import type { ModelsGitlabTagConfiguration } from './modelsGitlabTagConfiguration'
 import type { ModelsPlaneTagConfiguration } from './modelsPlaneTagConfiguration'
 
 export interface ModelsCreateProjectMapping {
-	projectId: string
-	/** @nullable */
-	externalProjectName?: string | null
-	/** @nullable */
-	gitlabProjectId?: string | null
-	/** @nullable */
-	projectKeyPrefix?: string | null
-	gitlabTagConfig?: ModelsGitlabTagConfiguration | null
-	/** @nullable */
-	jiraProjectKey?: string | null
-	/** @nullable */
-	planeProjectId?: string | null
-	planeTagConfig?: ModelsPlaneTagConfiguration | null
-	/** @nullable */
-	githubRepoOwner?: string | null
-	/** @nullable */
-	githubRepoName?: string | null
-	githubTagConfig?: ModelsGithubTagConfiguration | null
-	/** @nullable */
-	maxResults?: number | null
-	/** @nullable */
-	params?: string | null
+  projectId: string
+  /** @nullable */
+  externalProjectName?: string | null
+  /** @nullable */
+  gitlabProjectId?: string | null
+  /** @nullable */
+  projectKeyPrefix?: string | null
+  gitlabTagConfig?: ModelsGitlabTagConfiguration | null
+  /** @nullable */
+  jiraProjectKey?: string | null
+  /** @nullable */
+  planeProjectId?: string | null
+  planeTagConfig?: ModelsPlaneTagConfiguration | null
+  /** @nullable */
+  githubRepoOwner?: string | null
+  /** @nullable */
+  githubRepoName?: string | null
+  githubTagConfig?: ModelsGithubTagConfiguration | null
+  /** @nullable */
+  maxResults?: number | null
+  /** @nullable */
+  params?: string | null
 }

@@ -18,56 +18,54 @@
  */
 
 import { eachDayOfInterval } from 'date-fns'
+import { sum, sumBy } from 'es-toolkit'
 
 const weekdayNames: Record<number, string> = {
-	0: 'sunday',
-	1: 'monday',
-	2: 'tuesday',
-	3: 'wednesday',
-	4: 'thursday',
-	5: 'friday',
-	6: 'saturday',
+  0: 'sunday',
+  1: 'monday',
+  2: 'tuesday',
+  3: 'wednesday',
+  4: 'thursday',
+  5: 'friday',
+  6: 'saturday',
 }
 
 export type PlannedWorkingHours = Record<string, number>
 
 const defaultPlannedWorkingHours: PlannedWorkingHours = {
-	friday: 8,
-	monday: 8,
-	saturday: 0,
-	sunday: 0,
-	thursday: 8,
-	tuesday: 8,
-	wednesday: 8,
+  friday: 8,
+  monday: 8,
+  saturday: 0,
+  sunday: 0,
+  thursday: 8,
+  tuesday: 8,
+  wednesday: 8,
 }
 
 /** Get planned hours for a single date */
 export const getPlannedHoursForDay = (
-	date: Date,
-	plannedHours: null | PlannedWorkingHours | undefined,
+  date: Date,
+  plannedHours: null | PlannedWorkingHours | undefined,
 ): number => {
-	const hours = plannedHours ?? defaultPlannedWorkingHours
-	const weekday = weekdayNames[date.getDay()] ?? 'monday'
-	return hours[weekday] ?? 0
+  const hours = plannedHours ?? defaultPlannedWorkingHours
+  const weekday = weekdayNames[date.getDay()] ?? 'monday'
+  return hours[weekday] ?? 0
 }
 
 /** Sum planned hours across a date interval */
 export const getPlannedHoursForRange = (
-	start: Date,
-	end: Date,
-	plannedHours: null | PlannedWorkingHours | undefined,
+  start: Date,
+  end: Date,
+  plannedHours: null | PlannedWorkingHours | undefined,
 ): number => {
-	const days = eachDayOfInterval({ end, start })
-	return days.reduce(
-		(sum, day) => sum + getPlannedHoursForDay(day, plannedHours),
-		0,
-	)
+  const days = eachDayOfInterval({ end, start })
+  return sumBy(days, (day) => getPlannedHoursForDay(day, plannedHours))
 }
 
 /** Get weekly planned hours total */
 export const getWeeklyPlannedHours = (
-	plannedHours: null | PlannedWorkingHours | undefined,
+  plannedHours: null | PlannedWorkingHours | undefined,
 ): number => {
-	const hours = plannedHours ?? defaultPlannedWorkingHours
-	return Object.values(hours).reduce((sum, h) => sum + h, 0)
+  const hours = plannedHours ?? defaultPlannedWorkingHours
+  return sum(Object.values(hours))
 }

@@ -40,55 +40,55 @@ import { ModelsUserOrganisationRole } from '~/services/api/lasius/modelsUserOrga
  *   - isAdministrator: Boolean indicating if user is admin of selected org
  */
 export const useOrganisation = () => {
-	const loaderData = useRouteLoaderData('routes/app-layout') as
-		| undefined
-		| { user: ModelsUser; websocketUrl: string }
+  const loaderData = useRouteLoaderData('routes/app-layout') as
+    | undefined
+    | { user: ModelsUser; websocketUrl: string }
 
-	const user = loaderData?.user
-	const organisations: ModelsUserOrganisation[] = user?.organisations ?? []
-	const settings = user?.settings
+  const user = loaderData?.user
+  const organisations: ModelsUserOrganisation[] = user?.organisations ?? []
+  const settings = user?.settings
 
-	// Derive selected org: settings > private org > first org
-	const selectedOrganisationId =
-		settings?.lastSelectedOrganisation?.id ??
-		organisations.find((o) => o.private)?.organisationReference.id ??
-		organisations[0]?.organisationReference.id ??
-		''
+  // Derive selected org: settings > private org > first org
+  const selectedOrganisationId =
+    settings?.lastSelectedOrganisation?.id ??
+    organisations.find((o) => o.private)?.organisationReference.id ??
+    organisations[0]?.organisationReference.id ??
+    ''
 
-	const selectedOrganisation = organisations.find(
-		(o) => o.organisationReference.id === selectedOrganisationId,
-	)
+  const selectedOrganisation = organisations.find(
+    (o) => o.organisationReference.id === selectedOrganisationId,
+  )
 
-	const selectedOrganisationKey =
-		selectedOrganisation?.organisationReference?.key ?? ''
+  const selectedOrganisationKey =
+    selectedOrganisation?.organisationReference?.key ?? ''
 
-	const isAdministrator =
-		selectedOrganisation?.role ===
-		ModelsUserOrganisationRole.OrganisationAdministrator
+  const isAdministrator =
+    selectedOrganisation?.role ===
+    ModelsUserOrganisationRole.OrganisationAdministrator
 
-	// Use fetcher to switch org without full navigation
-	const fetcher = useFetcher()
+  // Use fetcher to switch org without full navigation
+  const fetcher = useFetcher()
 
-	const setSelectedOrganisation = (
-		organisationReference: ModelsEntityReference,
-	) => {
-		if (organisationReference) {
-			void fetcher.submit(
-				{
-					organisationId: organisationReference.id,
-					organisationKey: organisationReference.key,
-				},
-				{ action: '/api/org-switch', method: 'post' },
-			)
-		}
-	}
+  const setSelectedOrganisation = (
+    organisationReference: ModelsEntityReference,
+  ) => {
+    if (organisationReference) {
+      void fetcher.submit(
+        {
+          organisationId: organisationReference.id,
+          organisationKey: organisationReference.key,
+        },
+        { action: '/api/org-switch', method: 'post' },
+      )
+    }
+  }
 
-	return {
-		isAdministrator,
-		organisations,
-		selectedOrganisation,
-		selectedOrganisationId,
-		selectedOrganisationKey,
-		setSelectedOrganisation,
-	}
+  return {
+    isAdministrator,
+    organisations,
+    selectedOrganisation,
+    selectedOrganisationId,
+    selectedOrganisationKey,
+    setSelectedOrganisation,
+  }
 }

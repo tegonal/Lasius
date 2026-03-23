@@ -20,33 +20,33 @@
 import { useCallback, useEffect, useState } from 'react'
 
 export function useIsWindowFocused(): boolean {
-	const [windowIsActive, setWindowIsActive] = useState(true)
+  const [windowIsActive, setWindowIsActive] = useState(true)
 
-	const handleActivity = useCallback((e: Event) => {
-		if (e.type === 'focus') {
-			setWindowIsActive(true)
-		} else if (e.type === 'blur') {
-			setWindowIsActive(false)
-		} else if (e.type === 'visibilitychange') {
-			setWindowIsActive(!document.hidden)
-		}
-	}, [])
+  const handleActivity = useCallback((e: Event) => {
+    if (e.type === 'focus') {
+      setWindowIsActive(true)
+    } else if (e.type === 'blur') {
+      setWindowIsActive(false)
+    } else if (e.type === 'visibilitychange') {
+      setWindowIsActive(!document.hidden)
+    }
+  }, [])
 
-	useEffect(() => {
-		document.addEventListener('visibilitychange', handleActivity)
-		document.addEventListener('blur', handleActivity)
-		window.addEventListener('blur', handleActivity)
-		window.addEventListener('focus', handleActivity)
-		document.addEventListener('focus', handleActivity)
+  useEffect(() => {
+    document.addEventListener('visibilitychange', handleActivity)
+    document.addEventListener('blur', handleActivity)
+    window.addEventListener('blur', handleActivity)
+    window.addEventListener('focus', handleActivity)
+    document.addEventListener('focus', handleActivity)
 
-		return () => {
-			window.removeEventListener('blur', handleActivity)
-			document.removeEventListener('blur', handleActivity)
-			window.removeEventListener('focus', handleActivity)
-			document.removeEventListener('focus', handleActivity)
-			document.removeEventListener('visibilitychange', handleActivity)
-		}
-	}, [handleActivity])
+    return () => {
+      window.removeEventListener('blur', handleActivity)
+      document.removeEventListener('blur', handleActivity)
+      window.removeEventListener('focus', handleActivity)
+      document.removeEventListener('focus', handleActivity)
+      document.removeEventListener('visibilitychange', handleActivity)
+    }
+  }, [handleActivity])
 
-	return windowIsActive
+  return windowIsActive
 }

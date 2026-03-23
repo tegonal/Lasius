@@ -29,63 +29,63 @@ type BackendConnectionStatus = 'connected' | 'connecting' | 'disconnected'
 const POLL_INTERVAL_MS = 30000
 
 const statusDotClass: Record<BackendConnectionStatus, string> = {
-	connected: 'bg-success',
-	connecting: 'bg-warning',
-	disconnected: 'bg-error',
+  connected: 'bg-success',
+  connecting: 'bg-warning',
+  disconnected: 'bg-error',
 }
 
 export const BackendStatus = () => {
-	const { t } = useTranslation('common')
-	const isClient = useIsClient()
-	const [status, setStatus] = useState<BackendConnectionStatus>('connecting')
-	const intervalRef = useRef<null | ReturnType<typeof setInterval>>(null)
+  const { t } = useTranslation('common')
+  const isClient = useIsClient()
+  const [status, setStatus] = useState<BackendConnectionStatus>('connecting')
+  const intervalRef = useRef<null | ReturnType<typeof setInterval>>(null)
 
-	const checkStatus = useCallback(async () => {
-		try {
-			const res = await fetch('/api/session-status')
-			setStatus(res.ok ? 'connected' : 'disconnected')
-		} catch {
-			setStatus('disconnected')
-		}
-	}, [])
+  const checkStatus = useCallback(async () => {
+    try {
+      const res = await fetch('/api/session-status')
+      setStatus(res.ok ? 'connected' : 'disconnected')
+    } catch {
+      setStatus('disconnected')
+    }
+  }, [])
 
-	useEffect(() => {
-		void checkStatus()
-		intervalRef.current = setInterval(
-			() => void checkStatus(),
-			POLL_INTERVAL_MS,
-		)
-		return () => {
-			if (intervalRef.current) clearInterval(intervalRef.current)
-		}
-	}, [checkStatus])
+  useEffect(() => {
+    void checkStatus()
+    intervalRef.current = setInterval(
+      () => void checkStatus(),
+      POLL_INTERVAL_MS,
+    )
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current)
+    }
+  }, [checkStatus])
 
-	if (!isClient) return null
+  if (!isClient) return null
 
-	const labels: Record<BackendConnectionStatus, string> = {
-		connected: t('system.connectedToBackend', {
-			defaultValue: 'Connected to backend',
-		}),
-		connecting: t('system.connectingToBackend', {
-			defaultValue: 'Connecting to backend',
-		}),
-		disconnected: t('system.backendUnreachable', {
-			defaultValue: 'Backend seems to be unreachable',
-		}),
-	}
+  const labels: Record<BackendConnectionStatus, string> = {
+    connected: t('system.connectedToBackend', {
+      defaultValue: 'Connected to backend',
+    }),
+    connecting: t('system.connectingToBackend', {
+      defaultValue: 'Connecting to backend',
+    }),
+    disconnected: t('system.backendUnreachable', {
+      defaultValue: 'Backend seems to be unreachable',
+    }),
+  }
 
-	return (
-		<div
-			className="tooltip tooltip-top"
-			data-testid="backend-status"
-			data-tip={labels[status]}
-		>
-			<div className="relative inline-flex">
-				<LucideIcon icon={ServerIcon} size={14} />
-				<span
-					className={`absolute -top-1 -right-1 size-2 rounded-full ${statusDotClass[status]}`}
-				/>
-			</div>
-		</div>
-	)
+  return (
+    <div
+      className="tooltip tooltip-top"
+      data-testid="backend-status"
+      data-tip={labels[status]}
+    >
+      <div className="relative inline-flex">
+        <LucideIcon icon={ServerIcon} size={14} />
+        <span
+          className={`absolute -top-1 -right-1 size-2 rounded-full ${statusDotClass[status]}`}
+        />
+      </div>
+    </div>
+  )
 }

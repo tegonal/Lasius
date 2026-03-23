@@ -26,24 +26,24 @@ import { type ModelsBooking } from '~/services/api/lasius'
 type Props = { item: ModelsBooking }
 
 export const BookingFromToMobile = ({ item }: Props) => {
-	const { end, start } = item
-	return (
-		<div className="flex flex-row gap-1 leading-normal">
-			<div className="flex items-center justify-center">
-				<span className="text-sm opacity-50">
-					<FormatDate date={start.dateTime} format="time" />
-				</span>
-			</div>
-			<div className="flex items-center justify-center">
-				<span className="text-sm opacity-50">
-					<LucideIcon icon={ArrowLeftRight} size={16} />
-				</span>
-			</div>
-			<div className="flex items-center justify-center">
-				<span className="text-sm opacity-50">
-					<FormatDate date={end?.dateTime || ''} format="time" />
-				</span>
-			</div>
-		</div>
-	)
+  const { end, start } = item
+  return (
+    <div className="flex flex-row gap-1 leading-normal">
+      <div className="flex items-center justify-center">
+        <span className="text-sm opacity-50">
+          <FormatDate date={start.dateTime} format="time" />
+        </span>
+      </div>
+      <div className="flex items-center justify-center">
+        <span className="text-sm opacity-50">
+          <LucideIcon icon={ArrowLeftRight} size={16} />
+        </span>
+      </div>
+      <div className="flex items-center justify-center">
+        <span className="text-sm opacity-50">
+          <FormatDate date={end?.dateTime || ''} format="time" />
+        </span>
+      </div>
+    </div>
+  )
 }

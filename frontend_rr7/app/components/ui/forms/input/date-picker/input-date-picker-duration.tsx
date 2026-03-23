@@ -26,54 +26,54 @@ import { SegmentedDurationInputConnected } from './segmented-duration-input-conn
 import { calculateDurationMinutes } from './shared/duration-utils'
 
 export type InputDatePickerDurationProps = {
-	endFieldName: string
-	startFieldName: string
+  endFieldName: string
+  startFieldName: string
 }
 
 // Export the wrapped version that handles missing context gracefully
 export const InputDatePickerDuration = (
-	props: InputDatePickerDurationProps,
+  props: InputDatePickerDurationProps,
 ) => {
-	const formContext = useFormContext()
+  const formContext = useFormContext()
 
-	if (!formContext) {
-		return null
-	}
+  if (!formContext) {
+    return null
+  }
 
-	return <InputDatePickerDurationInternal {...props} />
+  return <InputDatePickerDurationInternal {...props} />
 }
 
 // Internal component that assumes form context is available
 const InputDatePickerDurationInternal = ({
-	endFieldName,
-	startFieldName,
+  endFieldName,
+  startFieldName,
 }: InputDatePickerDurationProps) => {
-	const { t } = useTranslation('common')
-	const parentFormContext = useRequiredFormContext()
+  const { t } = useTranslation('common')
+  const parentFormContext = useRequiredFormContext()
 
-	const startValue = parentFormContext.watch(startFieldName)
-	const endValue = parentFormContext.watch(endFieldName)
+  const startValue = parentFormContext.watch(startFieldName)
+  const endValue = parentFormContext.watch(endFieldName)
 
-	const durationMinutes = calculateDurationMinutes(
-		startValue ? new Date(startValue) : null,
-		endValue ? new Date(endValue) : null,
-	)
+  const durationMinutes = calculateDurationMinutes(
+    startValue ? new Date(startValue) : null,
+    endValue ? new Date(endValue) : null,
+  )
 
-	const isInvalid = durationMinutes < 0
+  const isInvalid = durationMinutes < 0
 
-	return (
-		<div className="flex w-full flex-col gap-2">
-			<SegmentedDurationInputConnected
-				endFieldName={endFieldName}
-				startFieldName={startFieldName}
-			/>
-			{isInvalid && (
-				<span className="text-error mt-1 text-xs">
-					{t('common.validation.endBeforeStart', {
-						defaultValue: 'End time is before start time',
-					})}
-				</span>
-			)}
-		</div>
-	)
+  return (
+    <div className="flex w-full flex-col gap-2">
+      <SegmentedDurationInputConnected
+        endFieldName={endFieldName}
+        startFieldName={startFieldName}
+      />
+      {isInvalid && (
+        <span className="text-error mt-1 text-xs">
+          {t('common.validation.endBeforeStart', {
+            defaultValue: 'End time is before start time',
+          })}
+        </span>
+      )}
+    </div>
+  )
 }

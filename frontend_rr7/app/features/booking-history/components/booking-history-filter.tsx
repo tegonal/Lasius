@@ -35,163 +35,161 @@ import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { dateOptions } from '~/lib/utils/date/date-options'
 import {
-	type ModelsEntityReference,
-	type ModelsTag,
-	type ModelsUserStub,
+  type ModelsEntityReference,
+  type ModelsTag,
+  type ModelsUserStub,
 } from '~/services/api/lasius'
 import { getTagsByProject } from '~/services/api/lasius/user-organisations/user-organisations'
 
 type Props = {
-	dataSource: 'organisationBookings' | 'userBookings'
-	inactiveProject?: null | { id: string; key: string }
-	initialDate?: Date
-	projects: ModelsEntityReference[]
-	users?: ModelsUserStub[]
+  dataSource: 'organisationBookings' | 'userBookings'
+  inactiveProject?: null | { id: string; key: string }
+  projects: ModelsEntityReference[]
+  users?: ModelsUserStub[]
 }
 
 export const BookingHistoryFilter = ({
-	dataSource,
-	inactiveProject = null,
-	initialDate,
-	projects,
-	users = [],
+  dataSource,
+  inactiveProject = null,
+  projects,
+  users = [],
 }: Props) => {
-	const { t } = useTranslation('common')
-	const navigate = useNavigate()
-	const { selectedOrganisationId } = useOrganisation()
-	const formContext = useFormContext()
-	const [projectTags, setProjectTags] = useState<ModelsTag[]>([])
+  const { t } = useTranslation('common')
+  const navigate = useNavigate()
+  const { selectedOrganisationId } = useOrganisation()
+  const formContext = useFormContext()
+  const [projectTags, setProjectTags] = useState<ModelsTag[]>([])
 
-	const projectId = formContext.watch('projectId') as string
+  const projectId = formContext.watch('projectId') as string
 
-	const showUserFilter = dataSource === 'organisationBookings'
+  const showUserFilter = dataSource === 'organisationBookings'
 
-	const firstDateOption = dateOptions[0]
+  const firstDateOption = dateOptions[0]
 
-	useEffect(() => {
-		if (projectId && selectedOrganisationId) {
-			void getTagsByProject(selectedOrganisationId, projectId).then(
-				(response) => {
-					setProjectTags(response.data)
-				},
-			)
-		} else {
-			setProjectTags([])
-		}
-	}, [projectId, selectedOrganisationId])
+  useEffect(() => {
+    if (projectId && selectedOrganisationId) {
+      void getTagsByProject(selectedOrganisationId, projectId).then(
+        (response) => {
+          setProjectTags(response.data)
+        },
+      )
+    } else {
+      setProjectTags([])
+    }
+  }, [projectId, selectedOrganisationId])
 
-	const handleBackToProjects = () => {
-		const isUserContext = dataSource === 'userBookings'
-		const projectsPath = isUserContext
-			? '/user/projects'
-			: '/organisation/projects'
-		void navigate(projectsPath)
-	}
+  const handleBackToProjects = () => {
+    const isUserContext = dataSource === 'userBookings'
+    const projectsPath = isUserContext
+      ? '/user/projects'
+      : '/organisation/projects'
+    void navigate(projectsPath)
+  }
 
-	const defaultProjectId = ''
-	const defaultUserId = ''
-	const defaultTags: ModelsTag[] = []
-	const defaultDateRange = firstDateOption?.name ?? ''
+  const defaultProjectId = ''
+  const defaultUserId = ''
+  const defaultTags: ModelsTag[] = []
+  const defaultDateRange = firstDateOption?.name ?? ''
 
-	const watchedValues = formContext.watch()
-	const hasChanges =
-		watchedValues.projectId !== defaultProjectId ||
-		watchedValues.userId !== defaultUserId ||
-		(Array.isArray(watchedValues.tags) && watchedValues.tags.length > 0) ||
-		watchedValues.dateRange !== defaultDateRange
+  const watchedValues = formContext.watch()
+  const hasChanges =
+    watchedValues.projectId !== defaultProjectId ||
+    watchedValues.userId !== defaultUserId ||
+    (Array.isArray(watchedValues.tags) && watchedValues.tags.length > 0) ||
+    watchedValues.dateRange !== defaultDateRange
 
-	const resetForm = () => {
-		if (firstDateOption) {
-			const { from, to } = firstDateOption.dateRangeFn(new Date())
-			formContext.setValue('from', from)
-			formContext.setValue('to', to)
-		}
-		formContext.setValue('dateRange', defaultDateRange)
-		formContext.setValue('projectId', defaultProjectId)
-		formContext.setValue('userId', defaultUserId)
-		formContext.setValue('tags', defaultTags)
-	}
+  const resetForm = () => {
+    if (firstDateOption) {
+      const { from, to } = firstDateOption.dateRangeFn(new Date())
+      formContext.setValue('from', from)
+      formContext.setValue('to', to)
+    }
+    formContext.setValue('dateRange', defaultDateRange)
+    formContext.setValue('projectId', defaultProjectId)
+    formContext.setValue('userId', defaultUserId)
+    formContext.setValue('tags', defaultTags)
+  }
 
-	useEffect(() => {
-		const subscription = formContext.watch((_value, { name }) => {
-			if (name === 'projectId') {
-				formContext.setFocus('tags')
-			}
-		})
-		return () => subscription.unsubscribe()
-	}, [formContext])
+  useEffect(() => {
+    const subscription = formContext.watch((_value, { name }) => {
+      if (name === 'projectId') {
+        formContext.setFocus('tags')
+      }
+    })
+    return () => subscription.unsubscribe()
+  }, [formContext])
 
-	return (
-		<div className="w-full" data-testid="lists-filter">
-			{inactiveProject && (
-				<div className="alert alert-warning mb-4">
-					<div className="flex w-full items-center justify-between">
-						<span>
-							{t('projects.warnings.inactiveProjectFilter', {
-								defaultValue: 'Showing data for inactive project',
-							})}
-						</span>
-						<Button
-							aria-label={t('common.actions.back', {
-								defaultValue: 'Back',
-							})}
-							fullWidth={false}
-							onClick={handleBackToProjects}
-							size="sm"
-							variant="ghost"
-						>
-							<LucideIcon icon={ArrowLeft} size={16} />
-							{t('common.actions.back', { defaultValue: 'Back' })}
-						</Button>
-					</div>
-				</div>
-			)}
-			<div className="relative">
-				<Heading variant="section">
-					{t('common.filter.title', { defaultValue: 'Filter' })}
-				</Heading>
-				{hasChanges && (
-					<div className="absolute top-3 right-0">
-						<Button
-							fullWidth={false}
-							onClick={resetForm}
-							size="xs"
-							variant="ghost"
-						>
-							{t('common.actions.reset', {
-								defaultValue: 'Reset',
-							})}
-						</Button>
-					</div>
-				)}
-			</div>
-			<FormBody>
-				{showUserFilter && (
-					<FormElement
-						htmlFor="userId"
-						label={t('common.user', { defaultValue: 'User' })}
-					>
-						<UserSelect id="userId" name="userId" users={users} />
-					</FormElement>
-				)}
-				<FormElement
-					htmlFor="projectId"
-					label={t('projects.label', { defaultValue: 'Project' })}
-				>
-					<ProjectSelect id="projectId" name="projectId" projects={projects} />
-				</FormElement>
-				<FormElement
-					htmlFor="tags"
-					label={t('tags.label', { defaultValue: 'Tags' })}
-				>
-					<InputTagsAutocomplete
-						id="tags"
-						name="tags"
-						suggestions={projectTags}
-					/>
-				</FormElement>
-				<DateRangeFilter initialDate={initialDate} name="dateRange" />
-			</FormBody>
-		</div>
-	)
+  return (
+    <div className="w-full" data-testid="lists-filter">
+      {inactiveProject && (
+        <div className="alert alert-warning mb-4">
+          <div className="flex w-full items-center justify-between">
+            <span>
+              {t('projects.warnings.inactiveProjectFilter', {
+                defaultValue: 'Showing data for inactive project',
+              })}
+            </span>
+            <Button
+              aria-label={t('common.actions.back', {
+                defaultValue: 'Back',
+              })}
+              fullWidth={false}
+              onClick={handleBackToProjects}
+              size="sm"
+              variant="ghost"
+            >
+              <LucideIcon icon={ArrowLeft} size={16} />
+              {t('common.actions.back', { defaultValue: 'Back' })}
+            </Button>
+          </div>
+        </div>
+      )}
+      <div className="relative">
+        <Heading variant="section">
+          {t('common.filter.title', { defaultValue: 'Filter' })}
+        </Heading>
+        {hasChanges && (
+          <div className="absolute top-3 right-0">
+            <Button
+              fullWidth={false}
+              onClick={resetForm}
+              size="xs"
+              variant="ghost"
+            >
+              {t('common.actions.reset', {
+                defaultValue: 'Reset',
+              })}
+            </Button>
+          </div>
+        )}
+      </div>
+      <FormBody>
+        {showUserFilter && (
+          <FormElement
+            htmlFor="userId"
+            label={t('common.user', { defaultValue: 'User' })}
+          >
+            <UserSelect id="userId" name="userId" users={users} />
+          </FormElement>
+        )}
+        <FormElement
+          htmlFor="projectId"
+          label={t('projects.label', { defaultValue: 'Project' })}
+        >
+          <ProjectSelect id="projectId" name="projectId" projects={projects} />
+        </FormElement>
+        <FormElement
+          htmlFor="tags"
+          label={t('tags.label', { defaultValue: 'Tags' })}
+        >
+          <InputTagsAutocomplete
+            id="tags"
+            name="tags"
+            suggestions={projectTags}
+          />
+        </FormElement>
+        <DateRangeFilter name="dateRange" />
+      </FormBody>
+    </div>
+  )
 }

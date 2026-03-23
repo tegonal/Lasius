@@ -24,45 +24,45 @@ import { type ModelsBooking } from '~/services/api/lasius'
 import { sortBookingsByDate } from './sort-bookings-by-date'
 
 export type AugmentedBooking = ModelsBooking & {
-	allowInsert?: boolean
-	hasNextItem?: boolean
-	isMostRecent?: boolean
-	overlapsWithNext?: ModelsBooking
+  allowInsert?: boolean
+  hasNextItem?: boolean
+  isMostRecent?: boolean
+  overlapsWithNext?: ModelsBooking
 }
 
 export const augmentBookingsList = (
-	bookings: ModelsBooking[],
+  bookings: ModelsBooking[],
 ): AugmentedBooking[] => {
-	const sorted = sortBookingsByDate(bookings)
+  const sorted = sortBookingsByDate(bookings)
 
-	return sorted.map((booking, index) => {
-		const nextBooking = sorted[index + 1]
-		const isMostRecent = index === 0
-		const hasNextItem = index < sorted.length - 1
+  return sorted.map((booking, index) => {
+    const nextBooking = sorted[index + 1]
+    const isMostRecent = index === 0
+    const hasNextItem = index < sorted.length - 1
 
-		if (nextBooking && booking.end && nextBooking.end) {
-			const isOverlapping =
-				nextBooking.end.dateTime !== booking.start.dateTime &&
-				!isBefore(
-					new Date(nextBooking.end.dateTime),
-					new Date(booking.start.dateTime),
-				)
+    if (nextBooking && booking.end && nextBooking.end) {
+      const isOverlapping =
+        nextBooking.end.dateTime !== booking.start.dateTime &&
+        !isBefore(
+          new Date(nextBooking.end.dateTime),
+          new Date(booking.start.dateTime),
+        )
 
-			const hasGap =
-				differenceInMinutes(
-					new Date(booking.start.dateTime),
-					new Date(nextBooking.end.dateTime),
-				) > 1
+      const hasGap =
+        differenceInMinutes(
+          new Date(booking.start.dateTime),
+          new Date(nextBooking.end.dateTime),
+        ) > 1
 
-			return {
-				...booking,
-				allowInsert: hasGap,
-				hasNextItem,
-				isMostRecent,
-				overlapsWithNext: isOverlapping ? nextBooking : undefined,
-			}
-		}
+      return {
+        ...booking,
+        allowInsert: hasGap,
+        hasNextItem,
+        isMostRecent,
+        overlapsWithNext: isOverlapping ? nextBooking : undefined,
+      }
+    }
 
-		return { ...booking, hasNextItem, isMostRecent }
-	})
+    return { ...booking, hasNextItem, isMostRecent }
+  })
 }

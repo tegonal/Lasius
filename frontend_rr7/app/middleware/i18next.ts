@@ -26,40 +26,40 @@ import { localeCookie } from '~/lib/cookies/i18next-cookie.server'
 const ignorePrefixes = ['/api/']
 
 export const [i18nextMiddleware, getLocale, getInstance] =
-	createI18nextMiddleware({
-		detection: {
-			cookie: localeCookie,
-			fallbackLanguage: i18nConfig.fallbackLng,
-			async findLocale(request) {
-				const pathname = new URL(request.url).pathname
-				if (ignorePrefixes.some((prefix) => pathname.startsWith(prefix))) {
-					return null
-				}
+  createI18nextMiddleware({
+    detection: {
+      cookie: localeCookie,
+      fallbackLanguage: i18nConfig.fallbackLng,
+      async findLocale(request) {
+        const pathname = new URL(request.url).pathname
+        if (ignorePrefixes.some((prefix) => pathname.startsWith(prefix))) {
+          return null
+        }
 
-				// Try Accept-Language header as fallback (cookie is checked automatically by remix-i18next)
-				const acceptLanguageHeader = request.headers.get('Accept-Language')
-				if (acceptLanguageHeader) {
-					const preferredLanguages = parser.parse(acceptLanguageHeader)
-					if (preferredLanguages.length > 0) {
-						const match = preferredLanguages.find((lang) =>
-							i18nConfig.supportedLngs.includes(lang.code),
-						)
-						if (match) {
-							return match.code
-						}
-					}
-				}
+        // Try Accept-Language header as fallback (cookie is checked automatically by remix-i18next)
+        const acceptLanguageHeader = request.headers.get('Accept-Language')
+        if (acceptLanguageHeader) {
+          const preferredLanguages = parser.parse(acceptLanguageHeader)
+          if (preferredLanguages.length > 0) {
+            const match = preferredLanguages.find((lang) =>
+              i18nConfig.supportedLngs.includes(lang.code),
+            )
+            if (match) {
+              return match.code
+            }
+          }
+        }
 
-				return null
-			},
-			supportedLanguages: i18nConfig.supportedLngs,
-		},
-		i18next: {
-			defaultNS: i18nConfig.defaultNS,
-			fallbackNS: i18nConfig.fallbackNS,
-			ns: i18nConfig.ns,
-			resources: i18nConfig.resources,
-			returnEmptyString: i18nConfig.returnEmptyString,
-			showSupportNotice: false,
-		},
-	})
+        return null
+      },
+      supportedLanguages: i18nConfig.supportedLngs,
+    },
+    i18next: {
+      defaultNS: i18nConfig.defaultNS,
+      fallbackNS: i18nConfig.fallbackNS,
+      ns: i18nConfig.ns,
+      resources: i18nConfig.resources,
+      returnEmptyString: i18nConfig.returnEmptyString,
+      showSupportNotice: false,
+    },
+  })

@@ -25,90 +25,90 @@ import { useTranslation } from 'react-i18next'
  * Only renders in development mode. Polls /api/session-status every 5s for token expiry.
  */
 export const DevInfoBadge = () => {
-	const { i18n } = useTranslation()
-	const [tokenTime, setTokenTime] = useState('N/A')
-	const [colorMode, setColorMode] = useState('light')
+  const { i18n } = useTranslation()
+  const [tokenTime, setTokenTime] = useState('N/A')
+  const [colorMode, setColorMode] = useState('light')
 
-	const updateTokenTime = useCallback(async () => {
-		try {
-			const res = await fetch('/api/session-status')
-			if (!res.ok) {
-				setTokenTime('N/A')
-				return
-			}
-			const status: { authenticated: boolean; expiresAt: null | number } =
-				await res.json()
+  const updateTokenTime = useCallback(async () => {
+    try {
+      const res = await fetch('/api/session-status')
+      if (!res.ok) {
+        setTokenTime('N/A')
+        return
+      }
+      const status: { authenticated: boolean; expiresAt: null | number } =
+        await res.json()
 
-			if (!status.authenticated || !status.expiresAt) {
-				setTokenTime('N/A')
-				return
-			}
+      if (!status.authenticated || !status.expiresAt) {
+        setTokenTime('N/A')
+        return
+      }
 
-			const diffMs = status.expiresAt - Date.now()
-			if (diffMs <= 0) {
-				setTokenTime('EXPIRED')
-			} else {
-				const m = Math.floor(diffMs / 60000)
-				const s = Math.floor((diffMs % 60000) / 1000)
-				setTokenTime(`${m}m ${s}s`)
-			}
-		} catch {
-			setTokenTime('ERR')
-		}
-	}, [])
+      const diffMs = status.expiresAt - Date.now()
+      if (diffMs <= 0) {
+        setTokenTime('EXPIRED')
+      } else {
+        const m = Math.floor(diffMs / 60000)
+        const s = Math.floor((diffMs % 60000) / 1000)
+        setTokenTime(`${m}m ${s}s`)
+      }
+    } catch {
+      setTokenTime('ERR')
+    }
+  }, [])
 
-	useEffect(() => {
-		void updateTokenTime()
-		const id = setInterval(() => void updateTokenTime(), 5000)
-		return () => clearInterval(id)
-	}, [updateTokenTime])
+  useEffect(() => {
+    void updateTokenTime()
+    const id = setInterval(() => void updateTokenTime(), 5000)
+    return () => clearInterval(id)
+  }, [updateTokenTime])
 
-	useEffect(() => {
-		const theme = document.documentElement.getAttribute('data-theme') || 'light'
-		setColorMode(theme)
+  useEffect(() => {
+    const theme = document.documentElement.getAttribute('data-theme') || 'light'
+    setColorMode(theme)
 
-		const observer = new MutationObserver(() => {
-			setColorMode(
-				document.documentElement.getAttribute('data-theme') || 'light',
-			)
-		})
-		observer.observe(document.documentElement, {
-			attributeFilter: ['data-theme'],
-			attributes: true,
-		})
-		return () => observer.disconnect()
-	}, [])
+    const observer = new MutationObserver(() => {
+      setColorMode(
+        document.documentElement.getAttribute('data-theme') || 'light',
+      )
+    })
+    observer.observe(document.documentElement, {
+      attributeFilter: ['data-theme'],
+      attributes: true,
+    })
+    return () => observer.disconnect()
+  }, [])
 
-	if (process.env.NODE_ENV !== 'development') return null
+  if (process.env.NODE_ENV !== 'development') return null
 
-	const info = `${i18n.language} | ${colorMode} | Token: ${tokenTime}`
+  const info = `${i18n.language} | ${colorMode} | Token: ${tokenTime}`
 
-	return (
-		<div className="fixed bottom-2 left-2 z-50">
-			<div className="block sm:hidden">
-				<Badge>&lt; sm (640px) | {info}</Badge>
-			</div>
-			<div className="hidden sm:block md:hidden">
-				<Badge>sm (640px) &gt; &lt; md (768px) | {info}</Badge>
-			</div>
-			<div className="hidden md:block lg:hidden">
-				<Badge>md (768px) &gt; &lt; lg (1024px) | {info}</Badge>
-			</div>
-			<div className="hidden lg:block xl:hidden">
-				<Badge>lg (1024px) &gt; &lt; xl (1280px) | {info}</Badge>
-			</div>
-			<div className="hidden xl:block 2xl:hidden">
-				<Badge>xl (1280px) &gt; &lt; 2xl (1536px) | {info}</Badge>
-			</div>
-			<div className="hidden 2xl:block">
-				<Badge>2xl (1536px) &gt; | {info}</Badge>
-			</div>
-		</div>
-	)
+  return (
+    <div className="fixed bottom-2 left-2 z-50">
+      <div className="block sm:hidden">
+        <Badge>&lt; sm (640px) | {info}</Badge>
+      </div>
+      <div className="hidden sm:block md:hidden">
+        <Badge>sm (640px) &gt; &lt; md (768px) | {info}</Badge>
+      </div>
+      <div className="hidden md:block lg:hidden">
+        <Badge>md (768px) &gt; &lt; lg (1024px) | {info}</Badge>
+      </div>
+      <div className="hidden lg:block xl:hidden">
+        <Badge>lg (1024px) &gt; &lt; xl (1280px) | {info}</Badge>
+      </div>
+      <div className="hidden xl:block 2xl:hidden">
+        <Badge>xl (1280px) &gt; &lt; 2xl (1536px) | {info}</Badge>
+      </div>
+      <div className="hidden 2xl:block">
+        <Badge>2xl (1536px) &gt; | {info}</Badge>
+      </div>
+    </div>
+  )
 }
 
 const Badge = ({ children }: { children: React.ReactNode }) => {
-	return (
-		<span className="badge badge-neutral badge-sm opacity-70">{children}</span>
-	)
+  return (
+    <span className="badge badge-neutral badge-sm opacity-70">{children}</span>
+  )
 }

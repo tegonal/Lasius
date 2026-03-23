@@ -17,55 +17,83 @@
  *
  */
 
+import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { href, NavLink, useSearchParams } from 'react-router'
+import { href, NavLink, useLocation, useSearchParams } from 'react-router'
+
+import { SlidingIndicator } from '~/components/ui/animations/sliding-indicator'
+import { cn } from '~/lib/utils/cn'
 
 export const DashboardTabs = () => {
-	const { t } = useTranslation('common')
-	const [searchParams] = useSearchParams()
-	const dateParam = searchParams.get('date')
-	const search = dateParam ? `?${new URLSearchParams({ date: dateParam })}` : ''
+  const { t } = useTranslation('common')
+  const [searchParams] = useSearchParams()
+  const location = useLocation()
+  const dateParam = searchParams.get('date')
+  const search = dateParam ? `?${new URLSearchParams({ date: dateParam })}` : ''
+  const itemRefs = useRef<(HTMLElement | null)[]>([])
 
-	const tabs = [
-		{
-			id: 'day',
-			label: t('common.time.day', { defaultValue: 'Day' }),
-			to: href('/user/dashboard/day'),
-		},
-		{
-			id: 'week',
-			label: t('common.time.week', { defaultValue: 'Week' }),
-			to: href('/user/dashboard/week'),
-		},
-		{
-			id: 'month',
-			label: t('common.time.month', { defaultValue: 'Month' }),
-			to: href('/user/dashboard/month'),
-		},
-		{
-			id: '6months',
-			label: t('workHealth.sixMonths', { defaultValue: '6 Months' }),
-			to: href('/user/dashboard/6months'),
-		},
-		{
-			id: 'year',
-			label: t('common.time.year', { defaultValue: 'Year' }),
-			to: href('/user/dashboard/year'),
-		},
-	]
+  const tabs = [
+    {
+      id: 'day',
+      label: t('common.time.day', { defaultValue: 'Day' }),
+      to: href('/user/dashboard/day'),
+    },
+    {
+      id: 'week',
+      label: t('common.time.week', { defaultValue: 'Week' }),
+      to: href('/user/dashboard/week'),
+    },
+    {
+      id: 'month',
+      label: t('common.time.month', { defaultValue: 'Month' }),
+      to: href('/user/dashboard/month'),
+    },
+    {
+      id: '6months',
+      label: t('workHealth.sixMonths', { defaultValue: '6 Months' }),
+      to: href('/user/dashboard/6months'),
+    },
+    {
+      id: 'year',
+      label: t('common.time.year', { defaultValue: 'Year' }),
+      to: href('/user/dashboard/year'),
+    },
+  ]
 
-	return (
-		<div className="tabs tabs-border" role="tablist">
-			{tabs.map((tab) => (
-				<NavLink
-					className={({ isActive }) => `tab ${isActive ? 'tab-active' : ''}`}
-					data-testid={`dashboard-tab-${tab.id}`}
-					key={tab.to}
-					to={`${tab.to}${search}`}
-				>
-					{tab.label}
-				</NavLink>
-			))}
-		</div>
-	)
+  const selectedIndex = tabs.findIndex((tab) =>
+    location.pathname.endsWith(tab.to),
+  )
+
+  return (
+    <div className="border-base-content/20 relative flex flex-shrink-0 flex-row justify-start gap-3 border-b">
+      <SlidingIndicator
+        className="!top-auto !bottom-0 !h-[2px]"
+        itemRefs={itemRefs}
+        radiusOn="bottom"
+        selectedIndex={selectedIndex}
+      />
+      {tabs.map((tab, index) => (
+        <div
+          className="relative z-10"
+          key={tab.to}
+          ref={(el) => {
+            itemRefs.current[index] = el
+          }}
+        >
+          <NavLink
+            className={({ isActive }) =>
+              cn(
+                'btn btn-ghost relative z-20 rounded-none hover:bg-transparent hover:shadow-[inset_0_-2px_0_0_currentColor]',
+                isActive ? 'text-base-content' : 'text-base-content/60',
+              )
+            }
+            data-testid={`dashboard-tab-${tab.id}`}
+            to={`${tab.to}${search}`}
+          >
+            {tab.label}
+          </NavLink>
+        </div>
+      ))}
+    </div>
+  )
 }

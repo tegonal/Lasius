@@ -20,13 +20,13 @@
 import { type ReactNode } from 'react'
 
 export const OrganisationListWrapper = ({
-	children,
+  children,
 }: {
-	children: ReactNode
+  children: ReactNode
 }) => {
-	return (
-		<div className="relative flex w-full flex-col px-3 select-none">
-			{children}
-		</div>
-	)
+  return (
+    <div className="relative flex w-full flex-col px-3 select-none">
+      {children}
+    </div>
+  )
 }

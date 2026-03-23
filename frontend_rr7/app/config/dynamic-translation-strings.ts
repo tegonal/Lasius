@@ -17,11 +17,16 @@
  *
  */
 
-const t = (key: string, options?: { defaultValue?: string }) => options?.defaultValue || key
+const t = (key: string, options?: { defaultValue?: string }) =>
+  options?.defaultValue || key
 
 export const UserRoles: Record<string, string> = {
-	OrganisationAdministrator: t('common.roles.administrator', { defaultValue: 'Administrator' }),
-	OrganisationMember: t('common.roles.member', { defaultValue: 'Member' }),
-	ProjectAdministrator: t('common.roles.administrator', { defaultValue: 'Administrator' }),
-	ProjectMember: t('common.roles.member', { defaultValue: 'Member' }),
+  OrganisationAdministrator: t('common.roles.administrator', {
+    defaultValue: 'Administrator',
+  }),
+  OrganisationMember: t('common.roles.member', { defaultValue: 'Member' }),
+  ProjectAdministrator: t('common.roles.administrator', {
+    defaultValue: 'Administrator',
+  }),
+  ProjectMember: t('common.roles.member', { defaultValue: 'Member' }),
 }

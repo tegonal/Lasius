@@ -27,7 +27,7 @@ setup('authenticate via Keycloak', async ({ page }) => {
   await page.waitForURL(/.*\/login.*/)
 
   // Click the Keycloak provider button
-  await page.getByTestId('auth-provider-custom_keycloak').click()
+  await page.getByTestId('auth-provider-keycloak').click()
 
   // Wait for redirect to Keycloak login form
   await page.waitForURL(/.*localhost:8080.*/, { timeout: 15000 })

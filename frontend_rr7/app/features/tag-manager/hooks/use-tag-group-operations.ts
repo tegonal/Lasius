@@ -17,7 +17,7 @@
  *
  */
 
-import { isEqual, unionWith } from 'es-toolkit/compat'
+import { unionWith } from 'es-toolkit/compat'
 import { useState } from 'react'
 import { type UseFormReturn } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
@@ -29,232 +29,232 @@ import { type ModelsTagGroup } from '~/services/api/lasius/modelsTagGroup'
 import { tagGroupTemplate } from '../tag-group-template'
 
 type CopiedTags = {
-	fromGroupId: string
-	tags: ModelsSimpleTag[]
+  fromGroupId: string
+  tags: ModelsSimpleTag[]
 }
 
 type FormValues = {
-	newTagGroupName: string
-	newTagName: string
-	simpleTags: ModelsSimpleTag[]
-	tagGroups: ModelsTagGroup[]
+  newTagGroupName: string
+  newTagName: string
+  simpleTags: ModelsSimpleTag[]
+  tagGroups: ModelsTagGroup[]
 }
 
 export const useTagGroupOperations = (
-	hookForm: UseFormReturn<FormValues>,
-	setHasUnsavedChanges: (value: boolean) => void,
+  hookForm: UseFormReturn<FormValues>,
+  setHasUnsavedChanges: (value: boolean) => void,
 ) => {
-	const { t } = useTranslation('common')
-	const { addToast } = useToast()
-	const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
-	const [copiedTags, setCopiedTags] = useState<CopiedTags | null>(null)
+  const { t } = useTranslation('common')
+  const { addToast } = useToast()
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
+  const [copiedTags, setCopiedTags] = useState<CopiedTags | null>(null)
 
-	const addTemplate = () => {
-		const tagGroups = hookForm.getValues('tagGroups')
-		const simpleTags = hookForm.getValues('simpleTags')
+  const addTemplate = () => {
+    const tagGroups = hookForm.getValues('tagGroups')
+    const simpleTags = hookForm.getValues('simpleTags')
 
-		const newTagGroups = tagGroupTemplate.filter(
-			(tag) => tag.type === 'TagGroup',
-		) as ModelsTagGroup[]
+    const newTagGroups = tagGroupTemplate.filter(
+      (tag) => tag.type === 'TagGroup',
+    ) as ModelsTagGroup[]
 
-		const newSimpleTags = tagGroupTemplate.filter(
-			(tag) => tag.type === 'SimpleTag',
-		) as ModelsSimpleTag[]
+    const newSimpleTags = tagGroupTemplate.filter(
+      (tag) => tag.type === 'SimpleTag',
+    ) as ModelsSimpleTag[]
 
-		hookForm.setValue(
-			'tagGroups',
-			unionWith(tagGroups, newTagGroups, isEqual),
-			{ shouldDirty: true },
-		)
-		hookForm.setValue(
-			'simpleTags',
-			unionWith(simpleTags, newSimpleTags, isEqual),
-			{ shouldDirty: true },
-		)
+    hookForm.setValue(
+      'tagGroups',
+      unionWith(tagGroups, newTagGroups, (a, b) => a.id === b.id),
+      { shouldDirty: true },
+    )
+    hookForm.setValue(
+      'simpleTags',
+      unionWith(simpleTags, newSimpleTags, (a, b) => a.id === b.id),
+      { shouldDirty: true },
+    )
 
-		// Expand newly added groups
-		const allGroupIds = [...tagGroups, ...newTagGroups].map((g) => g.id)
-		setExpandedGroups(new Set(allGroupIds))
+    // Expand newly added groups
+    const allGroupIds = [...tagGroups, ...newTagGroups].map((g) => g.id)
+    setExpandedGroups(new Set(allGroupIds))
 
-		void hookForm.trigger('tagGroups')
-		void hookForm.trigger('simpleTags')
-		setHasUnsavedChanges(true)
-	}
+    void hookForm.trigger('tagGroups')
+    void hookForm.trigger('simpleTags')
+    setHasUnsavedChanges(true)
+  }
 
-	const removeTagGroup = (index: number) => {
-		const tagGroups = hookForm.getValues('tagGroups')
-		const group = tagGroups[index]
-		if (!group) return
-		const removedGroupId = group.id
-		tagGroups.splice(index, 1)
-		hookForm.setValue('tagGroups', tagGroups, { shouldDirty: true })
-		void hookForm.trigger('tagGroups')
+  const removeTagGroup = (index: number) => {
+    const tagGroups = hookForm.getValues('tagGroups')
+    const group = tagGroups[index]
+    if (!group) return
+    const removedGroupId = group.id
+    tagGroups.splice(index, 1)
+    hookForm.setValue('tagGroups', tagGroups, { shouldDirty: true })
+    void hookForm.trigger('tagGroups')
 
-		// Remove from expanded groups
-		setExpandedGroups((prev) => {
-			const next = new Set(prev)
-			next.delete(removedGroupId)
-			return next
-		})
+    // Remove from expanded groups
+    setExpandedGroups((prev) => {
+      const next = new Set(prev)
+      next.delete(removedGroupId)
+      return next
+    })
 
-		setHasUnsavedChanges(true)
-	}
+    setHasUnsavedChanges(true)
+  }
 
-	const createTagGroup = () => {
-		const newTagGroupName = hookForm.getValues('newTagGroupName')
-		const tagGroups: ModelsTagGroup[] = hookForm.getValues('tagGroups')
-		if (!newTagGroupName) {
-			addToast({
-				message: t('tags.validation.tagGroupNameRequired', {
-					defaultValue: 'Tag group name is required',
-				}),
-				type: 'ERROR',
-			})
-			return false
-		}
+  const createTagGroup = () => {
+    const newTagGroupName = hookForm.getValues('newTagGroupName')
+    const tagGroups: ModelsTagGroup[] = hookForm.getValues('tagGroups')
+    if (!newTagGroupName) {
+      addToast({
+        message: t('tags.validation.tagGroupNameRequired', {
+          defaultValue: 'Tag group name is required',
+        }),
+        type: 'ERROR',
+      })
+      return false
+    }
 
-		if (tagGroups.find((tagGroup) => tagGroup.id === newTagGroupName)) {
-			addToast({
-				message: t('tags.validation.tagGroupExists', {
-					defaultValue: 'Tag group already exists',
-				}),
-				type: 'ERROR',
-			})
-			return false
-		}
+    if (tagGroups.find((tagGroup) => tagGroup.id === newTagGroupName)) {
+      addToast({
+        message: t('tags.validation.tagGroupExists', {
+          defaultValue: 'Tag group already exists',
+        }),
+        type: 'ERROR',
+      })
+      return false
+    }
 
-		const newTagGroup: ModelsTagGroup = {
-			id: newTagGroupName,
-			relatedTags: [],
-			type: 'TagGroup',
-		}
-		tagGroups.push(newTagGroup)
-		hookForm.setValue('tagGroups', tagGroups, { shouldDirty: true })
-		hookForm.setValue('newTagGroupName', '')
-		void hookForm.trigger('tagGroups')
-		setHasUnsavedChanges(true)
+    const newTagGroup: ModelsTagGroup = {
+      id: newTagGroupName,
+      relatedTags: [],
+      type: 'TagGroup',
+    }
+    tagGroups.push(newTagGroup)
+    hookForm.setValue('tagGroups', tagGroups, { shouldDirty: true })
+    hookForm.setValue('newTagGroupName', '')
+    void hookForm.trigger('tagGroups')
+    setHasUnsavedChanges(true)
 
-		// Expand the newly created group
-		setExpandedGroups((prev) => new Set([...prev, newTagGroupName]))
-		return true
-	}
+    // Expand the newly created group
+    setExpandedGroups((prev) => new Set([...prev, newTagGroupName]))
+    return true
+  }
 
-	const expandAll = () => {
-		const allGroupIds = hookForm.getValues('tagGroups').map((g) => g.id)
-		setExpandedGroups(new Set(allGroupIds))
-	}
+  const expandAll = () => {
+    const allGroupIds = hookForm.getValues('tagGroups').map((g) => g.id)
+    setExpandedGroups(new Set(allGroupIds))
+  }
 
-	const collapseAll = () => {
-		setExpandedGroups(new Set())
-	}
+  const collapseAll = () => {
+    setExpandedGroups(new Set())
+  }
 
-	const toggleGroup = (groupId: string) => {
-		setExpandedGroups((prev) => {
-			const next = new Set(prev)
-			if (next.has(groupId)) {
-				next.delete(groupId)
-			} else {
-				next.add(groupId)
-			}
-			return next
-		})
-	}
+  const toggleGroup = (groupId: string) => {
+    setExpandedGroups((prev) => {
+      const next = new Set(prev)
+      if (next.has(groupId)) {
+        next.delete(groupId)
+      } else {
+        next.add(groupId)
+      }
+      return next
+    })
+  }
 
-	const copyTags = (groupId: string, tags: ModelsSimpleTag[]) => {
-		setCopiedTags({ fromGroupId: groupId, tags })
-		addToast({
-			message: t('tags.status.tagsCopied', {
-				defaultValue: 'Tags copied',
-			}),
-			type: 'SUCCESS',
-		})
-	}
+  const copyTags = (groupId: string, tags: ModelsSimpleTag[]) => {
+    setCopiedTags({ fromGroupId: groupId, tags })
+    addToast({
+      message: t('tags.status.tagsCopied', {
+        defaultValue: 'Tags copied',
+      }),
+      type: 'SUCCESS',
+    })
+  }
 
-	const pasteTags = (targetIndex: number) => {
-		if (!copiedTags) return
+  const pasteTags = (targetIndex: number) => {
+    if (!copiedTags) return
 
-		const tagGroups = hookForm.getValues('tagGroups')
-		const targetGroup = tagGroups[targetIndex]
-		if (!targetGroup) return
+    const tagGroups = hookForm.getValues('tagGroups')
+    const targetGroup = tagGroups[targetIndex]
+    if (!targetGroup) return
 
-		// Merge tags, avoiding duplicates
-		const existingTags = targetGroup.relatedTags || []
-		const newTags = copiedTags.tags.filter(
-			(tag) => !existingTags.some((existing) => existing.id === tag.id),
-		)
+    // Merge tags, avoiding duplicates
+    const existingTags = targetGroup.relatedTags || []
+    const newTags = copiedTags.tags.filter(
+      (tag) => !existingTags.some((existing) => existing.id === tag.id),
+    )
 
-		targetGroup.relatedTags = [...existingTags, ...newTags]
-		hookForm.setValue('tagGroups', tagGroups, { shouldDirty: true })
-		void hookForm.trigger('tagGroups')
-		setHasUnsavedChanges(true)
+    targetGroup.relatedTags = [...existingTags, ...newTags]
+    hookForm.setValue('tagGroups', tagGroups, { shouldDirty: true })
+    void hookForm.trigger('tagGroups')
+    setHasUnsavedChanges(true)
 
-		addToast({
-			message: t('tags.status.tagsPasted', {
-				defaultValue: 'Tags pasted',
-			}),
-			type: 'SUCCESS',
-		})
+    addToast({
+      message: t('tags.status.tagsPasted', {
+        defaultValue: 'Tags pasted',
+      }),
+      type: 'SUCCESS',
+    })
 
-		// Reset copy state after pasting
-		setCopiedTags(null)
-	}
+    // Reset copy state after pasting
+    setCopiedTags(null)
+  }
 
-	const addTagToGroup = (groupIndex: number) => {
-		const newTagName = hookForm.getValues('newTagName')
-		if (!newTagName.trim()) {
-			addToast({
-				message: t('tags.validation.tagNameRequired', {
-					defaultValue: 'Tag name is required',
-				}),
-				type: 'ERROR',
-			})
-			return false
-		}
+  const addTagToGroup = (groupIndex: number) => {
+    const newTagName = hookForm.getValues('newTagName')
+    if (!newTagName.trim()) {
+      addToast({
+        message: t('tags.validation.tagNameRequired', {
+          defaultValue: 'Tag name is required',
+        }),
+        type: 'ERROR',
+      })
+      return false
+    }
 
-		const tagGroups = hookForm.getValues('tagGroups')
-		const targetGroup = tagGroups[groupIndex]
-		if (!targetGroup) return false
+    const tagGroups = hookForm.getValues('tagGroups')
+    const targetGroup = tagGroups[groupIndex]
+    if (!targetGroup) return false
 
-		if (!targetGroup.relatedTags) {
-			targetGroup.relatedTags = []
-		}
+    if (!targetGroup.relatedTags) {
+      targetGroup.relatedTags = []
+    }
 
-		// Check for duplicates
-		if (targetGroup.relatedTags.some((tag) => tag.id === newTagName.trim())) {
-			addToast({
-				message: t('tags.validation.tagExists', {
-					defaultValue: 'Tag already exists',
-				}),
-				type: 'ERROR',
-			})
-			return false
-		}
+    // Check for duplicates
+    if (targetGroup.relatedTags.some((tag) => tag.id === newTagName.trim())) {
+      addToast({
+        message: t('tags.validation.tagExists', {
+          defaultValue: 'Tag already exists',
+        }),
+        type: 'ERROR',
+      })
+      return false
+    }
 
-		const newTag: ModelsSimpleTag = {
-			id: newTagName.trim(),
-			type: 'SimpleTag',
-		}
-		targetGroup.relatedTags.push(newTag)
+    const newTag: ModelsSimpleTag = {
+      id: newTagName.trim(),
+      type: 'SimpleTag',
+    }
+    targetGroup.relatedTags.push(newTag)
 
-		hookForm.setValue('tagGroups', tagGroups, { shouldDirty: true })
-		hookForm.setValue('newTagName', '')
-		void hookForm.trigger('tagGroups')
-		setHasUnsavedChanges(true)
-		return true
-	}
+    hookForm.setValue('tagGroups', tagGroups, { shouldDirty: true })
+    hookForm.setValue('newTagName', '')
+    void hookForm.trigger('tagGroups')
+    setHasUnsavedChanges(true)
+    return true
+  }
 
-	return {
-		addTagToGroup,
-		addTemplate,
-		collapseAll,
-		copiedTags,
-		copyTags,
-		createTagGroup,
-		expandAll,
-		expandedGroups,
-		pasteTags,
-		removeTagGroup,
-		setExpandedGroups,
-		toggleGroup,
-	}
+  return {
+    addTagToGroup,
+    addTemplate,
+    collapseAll,
+    copiedTags,
+    copyTags,
+    createTagGroup,
+    expandAll,
+    expandedGroups,
+    pasteTags,
+    removeTagGroup,
+    setExpandedGroups,
+    toggleGroup,
+  }
 }

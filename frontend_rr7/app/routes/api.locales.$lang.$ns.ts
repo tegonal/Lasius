@@ -29,36 +29,36 @@ const resources = i18nConfig.resources
 type Language = keyof typeof resources
 
 const languageSchema = z.enum(
-	i18nConfig.supportedLngs as [Language, ...Language[]],
+  i18nConfig.supportedLngs as [Language, ...Language[]],
 )
 
 export async function loader({ params }: Route.LoaderArgs) {
-	const lng = languageSchema.safeParse(params.lang)
+  const lng = languageSchema.safeParse(params.lang)
 
-	if (lng.error) {
-		logger.error('Invalid language', lng.error)
-		return data({ error: lng.error }, { status: 400 })
-	}
+  if (lng.error) {
+    logger.error('Invalid language', lng.error)
+    return data({ error: lng.error }, { status: 400 })
+  }
 
-	const language = lng.data
-	const namespaces = resources[language]
+  const language = lng.data
+  const namespaces = resources[language]
 
-	const namespace = params.ns
-	if (!namespace || !(namespace in namespaces)) {
-		logger.error(`Invalid namespace: ${namespace}`)
-		return data({ error: `Invalid namespace: ${namespace}` }, { status: 400 })
-	}
+  const namespace = params.ns
+  if (!namespace || !(namespace in namespaces)) {
+    logger.error(`Invalid namespace: ${namespace}`)
+    return data({ error: `Invalid namespace: ${namespace}` }, { status: 400 })
+  }
 
-	const namespaceData = namespaces[namespace as keyof typeof namespaces]
+  const namespaceData = namespaces[namespace as keyof typeof namespaces]
 
-	const headers = new Headers()
+  const headers = new Headers()
 
-	if (process.env.NODE_ENV === 'production') {
-		headers.set(
-			'Cache-Control',
-			'public, max-age=300, s-maxage=86400, stale-while-revalidate=604800, stale-if-error=604800',
-		)
-	}
+  if (process.env.NODE_ENV === 'production') {
+    headers.set(
+      'Cache-Control',
+      'public, max-age=300, s-maxage=86400, stale-while-revalidate=604800, stale-if-error=604800',
+    )
+  }
 
-	return data(namespaceData, { headers })
+  return data(namespaceData, { headers })
 }

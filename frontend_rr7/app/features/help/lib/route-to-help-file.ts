@@ -24,27 +24,27 @@
  * RR7 uses a flatter route structure, so we need an explicit mapping.
  */
 const routeMap: Record<string, string> = {
-	'/': 'user-home',
-	'/dashboard': 'user-dashboard',
-	'/login': 'login',
+  '/': 'user-home',
+  '/dashboard': 'user-dashboard',
+  '/login': 'login',
 }
 
 export const routeToHelpFile = (path: string): string => {
-	// Check explicit mapping first
-	const mapped = routeMap[path]
-	if (mapped) {
-		return mapped
-	}
+  // Check explicit mapping first
+  const mapped = routeMap[path]
+  if (mapped) {
+    return mapped
+  }
 
-	// Fallback: convert path to hyphenated name
-	let normalized = path.replace(/^\//, '').replace(/\//g, '-')
+  // Fallback: convert path to hyphenated name
+  let normalized = path.replace(/^\//, '').replace(/\//g, '-')
 
-	if (normalized === '') {
-		return 'user-home'
-	}
+  if (normalized === '') {
+    return 'user-home'
+  }
 
-	// Handle dynamic route segments (React Router uses :param syntax)
-	normalized = normalized.replace(/:[^-/]+/g, 'dynamic')
+  // Handle dynamic route segments (React Router uses :param syntax)
+  normalized = normalized.replace(/:[^-/]+/g, 'dynamic')
 
-	return normalized
+  return normalized
 }

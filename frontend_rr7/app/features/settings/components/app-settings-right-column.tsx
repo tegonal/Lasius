@@ -17,21 +17,21 @@
  *
  */
 
-import { type ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 
-type Props = {
-	children: ReactNode
-	standalone: boolean
-}
+import { SettingsRightColumn } from '~/features/settings/components/settings-right-column'
 
-/**
- * Shared wrapper component for stats tiles
- * Handles the standalone vs grouped rendering logic
- */
-export const StatsTileWrapper = ({ children, standalone }: Props) => {
-	if (!standalone) {
-		return <>{children}</>
-	}
-
-	return <div className="stats h-fit shadow">{children}</div>
+export const AppSettingsRightColumn = () => {
+  const { t } = useTranslation('common')
+  return (
+    <SettingsRightColumn
+      description={t('settings.app.description', {
+        defaultValue:
+          'Customize your experience with language and theme preferences. These settings are stored locally in your browser.',
+      })}
+      title={t('settings.app.title', {
+        defaultValue: 'Application Settings',
+      })}
+    />
+  )
 }

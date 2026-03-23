@@ -21,14 +21,14 @@ import { FormatDate } from '~/components/ui/data-display/format-date'
 import { type IsoDateString } from '~/lib/utils/dates'
 
 type Props = {
-	startDate: IsoDateString | undefined
+  startDate: IsoDateString | undefined
 }
 
 export const BookingFrom = ({ startDate }: Props) => {
-	if (!startDate) return null
-	return (
-		<div className="leading-normal">
-			<FormatDate date={startDate} format="time" />
-		</div>
-	)
+  if (!startDate) return null
+  return (
+    <div className="leading-normal">
+      <FormatDate date={startDate} format="time" />
+    </div>
+  )
 }

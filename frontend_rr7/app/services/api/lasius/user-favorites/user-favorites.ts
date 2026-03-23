@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { ModelsFavoritesRequest, ModelsUserFavorites } from './..'
 
@@ -13,98 +13,98 @@ import { lasiusFetch } from '../../lasius-fetch-instance'
  * @summary Get current user's favorite bookings list for the selected organisation
  */
 export type getFavoriteBookingListResponse200 = {
-	data: ModelsUserFavorites
-	status: 200
+  data: ModelsUserFavorites
+  status: 200
 }
 
 export type getFavoriteBookingListResponseSuccess =
-	getFavoriteBookingListResponse200 & {
-		headers: Headers
-	}
+  getFavoriteBookingListResponse200 & {
+    headers: Headers
+  }
 export type getFavoriteBookingListResponse =
-	getFavoriteBookingListResponseSuccess
+  getFavoriteBookingListResponseSuccess
 
 export const getGetFavoriteBookingListUrl = (orgId: string) => {
-	return `/user-favorites/organisations/${orgId}`
+  return `/user-favorites/organisations/${orgId}`
 }
 
 export const getFavoriteBookingList = async (
-	orgId: string,
-	options?: RequestInit,
+  orgId: string,
+  options?: RequestInit,
 ): Promise<getFavoriteBookingListResponse> => {
-	return lasiusFetch<getFavoriteBookingListResponse>(
-		getGetFavoriteBookingListUrl(orgId),
-		{
-			...options,
-			method: 'GET',
-		},
-	)
+  return lasiusFetch<getFavoriteBookingListResponse>(
+    getGetFavoriteBookingListUrl(orgId),
+    {
+      ...options,
+      method: 'GET',
+    },
+  )
 }
 
 /**
  * @summary Save a new favorite booking for the current user in the selected organisation
  */
 export type addFavoriteBookingResponse200 = {
-	data: ModelsUserFavorites[]
-	status: 200
+  data: ModelsUserFavorites[]
+  status: 200
 }
 
 export type addFavoriteBookingResponseSuccess =
-	addFavoriteBookingResponse200 & {
-		headers: Headers
-	}
+  addFavoriteBookingResponse200 & {
+    headers: Headers
+  }
 export type addFavoriteBookingResponse = addFavoriteBookingResponseSuccess
 
 export const getAddFavoriteBookingUrl = (orgId: string) => {
-	return `/user-favorites/organisations/${orgId}`
+  return `/user-favorites/organisations/${orgId}`
 }
 
 export const addFavoriteBooking = async (
-	orgId: string,
-	modelsFavoritesRequest: ModelsFavoritesRequest,
-	options?: RequestInit,
+  orgId: string,
+  modelsFavoritesRequest: ModelsFavoritesRequest,
+  options?: RequestInit,
 ): Promise<addFavoriteBookingResponse> => {
-	return lasiusFetch<addFavoriteBookingResponse>(
-		getAddFavoriteBookingUrl(orgId),
-		{
-			...options,
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json', ...options?.headers },
-			body: JSON.stringify(modelsFavoritesRequest),
-		},
-	)
+  return lasiusFetch<addFavoriteBookingResponse>(
+    getAddFavoriteBookingUrl(orgId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(modelsFavoritesRequest),
+    },
+  )
 }
 
 /**
  * @summary Remove a favorite booking for the current user from the selected organisation
  */
 export type deleteFavoriteBookingResponse200 = {
-	data: void
-	status: 200
+  data: void
+  status: 200
 }
 
 export type deleteFavoriteBookingResponseSuccess =
-	deleteFavoriteBookingResponse200 & {
-		headers: Headers
-	}
+  deleteFavoriteBookingResponse200 & {
+    headers: Headers
+  }
 export type deleteFavoriteBookingResponse = deleteFavoriteBookingResponseSuccess
 
 export const getDeleteFavoriteBookingUrl = (orgId: string) => {
-	return `/user-favorites/organisations/${orgId}`
+  return `/user-favorites/organisations/${orgId}`
 }
 
 export const deleteFavoriteBooking = async (
-	orgId: string,
-	modelsFavoritesRequest: ModelsFavoritesRequest,
-	options?: RequestInit,
+  orgId: string,
+  modelsFavoritesRequest: ModelsFavoritesRequest,
+  options?: RequestInit,
 ): Promise<deleteFavoriteBookingResponse> => {
-	return lasiusFetch<deleteFavoriteBookingResponse>(
-		getDeleteFavoriteBookingUrl(orgId),
-		{
-			...options,
-			method: 'DELETE',
-			headers: { 'Content-Type': 'application/json', ...options?.headers },
-			body: JSON.stringify(modelsFavoritesRequest),
-		},
-	)
+  return lasiusFetch<deleteFavoriteBookingResponse>(
+    getDeleteFavoriteBookingUrl(orgId),
+    {
+      ...options,
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(modelsFavoritesRequest),
+    },
+  )
 }

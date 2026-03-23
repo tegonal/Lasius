@@ -22,8 +22,8 @@ import { type ReactNode } from 'react'
 import { cn } from '~/lib/utils/cn'
 
 type Props = {
-	children: ReactNode
-	className?: string
+  children: ReactNode
+  className?: string
 }
 
 /**
@@ -31,14 +31,14 @@ type Props = {
  * Use this when you want multiple stats to appear as a unified component
  */
 export const StatsGroup = ({ children, className }: Props) => {
-	return (
-		<div
-			className={cn(
-				'stats stats-vertical lg:stats-horizontal overflow-visible',
-				className,
-			)}
-		>
-			{children}
-		</div>
-	)
+  return (
+    <div
+      className={cn(
+        'stats stats-vertical lg:stats-horizontal overflow-visible',
+        className,
+      )}
+    >
+      {children}
+    </div>
+  )
 }

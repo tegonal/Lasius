@@ -3,16 +3,16 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 
-export type TestExistingConfig400Error =
-	(typeof TestExistingConfig400Error)[keyof typeof TestExistingConfig400Error]
+export type TestExistingConfig400Error = typeof TestExistingConfig400Error[keyof typeof TestExistingConfig400Error];
+
 
 export const TestExistingConfig400Error = {
-	connection_failed: 'connection_failed',
-	authentication_failed: 'authentication_failed',
-	unknown_host: 'unknown_host',
-	timeout: 'timeout',
-	connection_error: 'connection_error',
-} as const
+  connection_failed: 'connection_failed',
+  authentication_failed: 'authentication_failed',
+  unknown_host: 'unknown_host',
+  timeout: 'timeout',
+  connection_error: 'connection_error',
+} as const;

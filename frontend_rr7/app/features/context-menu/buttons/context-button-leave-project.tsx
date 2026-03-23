@@ -32,70 +32,70 @@ import { ContextButtonWrapper } from '../context-button-wrapper'
 import { useContextMenu } from '../hooks/use-context-menu'
 
 type Props = {
-	item: ModelsUserProject
-	variant?: 'compact' | 'default'
+  item: ModelsUserProject
+  variant?: 'compact' | 'default'
 }
 
 export const ContextButtonLeaveProject = ({
-	item,
-	variant = 'default',
+  item,
+  variant = 'default',
 }: Props) => {
-	const { handleCloseAll } = useContextMenu()
-	const { t } = useTranslation('common')
-	const [showDialog, setShowDialog] = useState(false)
-	const { selectedOrganisationId } = useOrganisation()
-	const leaveProjectApi = useRemoveProjectOwnUser()
+  const { handleCloseAll } = useContextMenu()
+  const { t } = useTranslation('common')
+  const [showDialog, setShowDialog] = useState(false)
+  const { selectedOrganisationId } = useOrganisation()
+  const leaveProjectApi = useRemoveProjectOwnUser()
 
-	const handleConfirm = () => {
-		leaveProjectApi.submit({
-			orgId: selectedOrganisationId,
-			projectId: item.projectReference.id,
-		})
-		setShowDialog(false)
-		handleCloseAll()
-	}
+  const handleConfirm = () => {
+    leaveProjectApi.submit({
+      orgId: selectedOrganisationId,
+      projectId: item.projectReference.id,
+    })
+    setShowDialog(false)
+    handleCloseAll()
+  }
 
-	const handleCancel = () => {
-		setShowDialog(false)
-	}
+  const handleCancel = () => {
+    setShowDialog(false)
+  }
 
-	return (
-		<ContextButtonWrapper variant={variant}>
-			<Button
-				aria-label={t('projects.actions.leave', {
-					defaultValue: 'Leave this project',
-				})}
-				fullWidth={false}
-				onClick={() => setShowDialog(true)}
-				shape="circle"
-				title={t('projects.actions.leave', {
-					defaultValue: 'Leave this project',
-				})}
-				variant="contextIcon"
-			>
-				<LucideIcon icon={LogOut} size={24} />
-			</Button>
-			{showDialog && (
-				<GenericConfirmModal
-					blockViewport
-					cancelLabel={t('common.actions.cancel', {
-						defaultValue: 'Cancel',
-					})}
-					confirmLabel={t('projects.actions.leave', {
-						defaultValue: 'Leave this project',
-					})}
-					confirmVariant="primary"
-					message={t('projects.confirmations.leave', {
-						defaultValue: 'Are you sure you want to leave this project?',
-					})}
-					onClose={handleCancel}
-					onConfirm={handleConfirm}
-					open={showDialog}
-					title={t('projects.actions.leave', {
-						defaultValue: 'Leave this project',
-					})}
-				/>
-			)}
-		</ContextButtonWrapper>
-	)
+  return (
+    <ContextButtonWrapper variant={variant}>
+      <Button
+        aria-label={t('projects.actions.leave', {
+          defaultValue: 'Leave this project',
+        })}
+        fullWidth={false}
+        onClick={() => setShowDialog(true)}
+        shape="circle"
+        title={t('projects.actions.leave', {
+          defaultValue: 'Leave this project',
+        })}
+        variant="contextIcon"
+      >
+        <LucideIcon icon={LogOut} size={24} />
+      </Button>
+      {showDialog && (
+        <GenericConfirmModal
+          blockViewport
+          cancelLabel={t('common.actions.cancel', {
+            defaultValue: 'Cancel',
+          })}
+          confirmLabel={t('projects.actions.leave', {
+            defaultValue: 'Leave this project',
+          })}
+          confirmVariant="primary"
+          message={t('projects.confirmations.leave', {
+            defaultValue: 'Are you sure you want to leave this project?',
+          })}
+          onClose={handleCancel}
+          onConfirm={handleConfirm}
+          open={showDialog}
+          title={t('projects.actions.leave', {
+            defaultValue: 'Leave this project',
+          })}
+        />
+      )}
+    </ContextButtonWrapper>
+  )
 }

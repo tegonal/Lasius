@@ -27,9 +27,9 @@ import { getFavoriteBookingList } from '~/services/api/lasius/user-favorites/use
 import { getTagsByProject } from '~/services/api/lasius/user-organisations/user-organisations'
 import { getUserProfile } from '~/services/api/lasius/user/user'
 import {
-	authHeaders,
-	mergeAuthHeaders,
-	requireUser,
+  authHeaders,
+  mergeAuthHeaders,
+  requireUser,
 } from '~/services/auth/auth-helpers.server'
 
 /**
@@ -40,66 +40,66 @@ import {
  * Called by booking modal components via useFetcher.load().
  */
 export async function loader({ request }: { request: Request }) {
-	const auth = await requireUser(request)
-	const headers = authHeaders(auth.session)
-	const url = new URL(request.url)
-	const orgId = url.searchParams.get('orgId')
-	const projectId = url.searchParams.get('projectId')
+  const auth = await requireUser(request)
+  const headers = authHeaders(auth.session)
+  const url = new URL(request.url)
+  const orgId = url.searchParams.get('orgId')
+  const projectId = url.searchParams.get('projectId')
 
-	if (!orgId) {
-		return data(
-			{
-				favorites: null,
-				orgBookings: [],
-				projects: [],
-				projectTags: [],
-				recentBookings: [],
-			},
-			{ headers: mergeAuthHeaders(auth), status: 400 },
-		)
-	}
+  if (!orgId) {
+    return data(
+      {
+        favorites: null,
+        orgBookings: [],
+        projects: [],
+        projectTags: [],
+        recentBookings: [],
+      },
+      { headers: mergeAuthHeaders(auth), status: 400 },
+    )
+  }
 
-	const now = new Date()
-	const sevenDaysAgo = subDays(now, 7)
-	const timespan = {
-		from: formatISOLocale(sevenDaysAgo),
-		to: formatISOLocale(now),
-	}
+  const now = new Date()
+  const sevenDaysAgo = subDays(now, 7)
+  const timespan = {
+    from: formatISOLocale(sevenDaysAgo),
+    to: formatISOLocale(now),
+  }
 
-	// Fetch all data in parallel
-	const [profileRes, favoritesRes, recentBookingsRes, orgBookingsRes] =
-		await Promise.all([
-			getUserProfile({ headers }),
-			getFavoriteBookingList(orgId, { headers }),
-			getUserBookingListByOrganisation(orgId, timespan, { headers }),
-			getOrganisationBookingList(orgId, timespan, { headers }),
-		])
+  // Fetch all data in parallel
+  const [profileRes, favoritesRes, recentBookingsRes, orgBookingsRes] =
+    await Promise.all([
+      getUserProfile({ headers }),
+      getFavoriteBookingList(orgId, { headers }),
+      getUserBookingListByOrganisation(orgId, timespan, { headers }),
+      getOrganisationBookingList(orgId, timespan, { headers }),
+    ])
 
-	// Extract projects for the selected org, sorted by key
-	const organisations = profileRes.data.organisations ?? []
-	const selectedOrg = organisations.find(
-		(o) => o.organisationReference.id === orgId,
-	)
-	const projects = (selectedOrg?.projects ?? [])
-		.map((p) => p.projectReference)
-		.slice()
-		.sort((a, b) => a.key.localeCompare(b.key))
+  // Extract projects for the selected org, sorted by key
+  const organisations = profileRes.data.organisations ?? []
+  const selectedOrg = organisations.find(
+    (o) => o.organisationReference.id === orgId,
+  )
+  const projects = (selectedOrg?.projects ?? [])
+    .map((p) => p.projectReference)
+    .slice()
+    .sort((a, b) => a.key.localeCompare(b.key))
 
-	// Conditionally fetch tags for the selected project
-	let projectTags: Awaited<ReturnType<typeof getTagsByProject>>['data'] = []
-	if (projectId) {
-		const tagsRes = await getTagsByProject(orgId, projectId, { headers })
-		projectTags = tagsRes.data
-	}
+  // Conditionally fetch tags for the selected project
+  let projectTags: Awaited<ReturnType<typeof getTagsByProject>>['data'] = []
+  if (projectId) {
+    const tagsRes = await getTagsByProject(orgId, projectId, { headers })
+    projectTags = tagsRes.data
+  }
 
-	return data(
-		{
-			favorites: favoritesRes.data,
-			orgBookings: orgBookingsRes.data,
-			projects,
-			projectTags,
-			recentBookings: recentBookingsRes.data,
-		},
-		{ headers: mergeAuthHeaders(auth) },
-	)
+  return data(
+    {
+      favorites: favoritesRes.data,
+      orgBookings: orgBookingsRes.data,
+      projects,
+      projectTags,
+      recentBookings: recentBookingsRes.data,
+    },
+    { headers: mergeAuthHeaders(auth) },
+  )
 }

@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { ModelsUserStub } from './modelsUserStub'
 
@@ -11,16 +11,16 @@ import type { ModelsUserStub } from './modelsUserStub'
  * Audit information with full user details for API responses
  */
 export interface ModelsAuditInfoResponse {
-	createdBy: ModelsUserStub
-	/**
-	 * Timestamp when entity was created
-	 * @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ
-	 */
-	createdAt: string
-	updatedBy: ModelsUserStub
-	/**
-	 * Timestamp when entity was last updated
-	 * @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ
-	 */
-	updatedAt: string
+  createdBy: ModelsUserStub
+  /**
+   * Timestamp when entity was created
+   * @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ
+   */
+  createdAt: string
+  updatedBy: ModelsUserStub
+  /**
+   * Timestamp when entity was last updated
+   * @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ
+   */
+  updatedAt: string
 }

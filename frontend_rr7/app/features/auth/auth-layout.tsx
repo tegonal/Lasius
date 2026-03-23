@@ -21,43 +21,43 @@ import { Logo } from '~/components/ui/icons/logo'
 import { TegonalFooter } from '~/components/ui/navigation/tegonal-footer'
 
 interface AuthLayoutProps {
-	children: React.ReactNode
-	infoPanel?: React.ReactNode
+  children: React.ReactNode
+  infoPanel?: React.ReactNode
 }
 
 export const AuthLayout = ({ children, infoPanel }: AuthLayoutProps) => {
-	return (
-		<div className="flex min-h-screen w-full">
-			{infoPanel && (
-				<div className="bg-secondary relative hidden items-center justify-center overflow-hidden lg:flex lg:w-1/2">
-					<div className="bg-secondary-content/5 absolute top-20 left-20 h-64 w-64 rounded-full blur-3xl"></div>
-					<div className="bg-secondary-content/5 absolute right-20 bottom-20 h-96 w-96 rounded-full blur-3xl"></div>
+  return (
+    <div className="flex min-h-screen w-full">
+      {infoPanel && (
+        <div className="bg-secondary relative hidden items-center justify-center overflow-hidden lg:flex lg:w-1/2">
+          <div className="bg-secondary-content/5 absolute top-20 left-20 h-64 w-64 rounded-full blur-3xl"></div>
+          <div className="bg-secondary-content/5 absolute right-20 bottom-20 h-96 w-96 rounded-full blur-3xl"></div>
 
-					<div className="text-secondary-content relative z-10 max-w-lg p-12">
-						{infoPanel}
-					</div>
-				</div>
-			)}
+          <div className="text-secondary-content relative z-10 max-w-lg p-12">
+            {infoPanel}
+          </div>
+        </div>
+      )}
 
-			<div
-				className={`from-base-100 to-base-200/30 flex w-full items-center justify-center bg-gradient-to-b p-8 ${infoPanel ? 'lg:w-1/2' : ''}`}
-			>
-				<div className="w-full max-w-md space-y-6">
-					{infoPanel && (
-						<div className="mb-8 flex justify-center lg:hidden">
-							<Logo className="h-12 w-auto" />
-						</div>
-					)}
+      <div
+        className={`from-base-100 to-base-200/30 flex w-full items-center justify-center bg-gradient-to-b p-8 ${infoPanel ? 'lg:w-1/2' : ''}`}
+      >
+        <div className="w-full max-w-md space-y-6">
+          {infoPanel && (
+            <div className="mb-8 flex justify-center lg:hidden">
+              <Logo className="h-12 w-auto" />
+            </div>
+          )}
 
-					{children}
+          {children}
 
-					<div className="flex justify-center pt-4">
-						<div className="max-w-sm text-center">
-							<TegonalFooter />
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	)
+          <div className="flex justify-center pt-4">
+            <div className="max-w-sm text-center">
+              <TegonalFooter />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }

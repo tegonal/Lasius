@@ -21,19 +21,19 @@
  * Validate input character - block invalid characters
  */
 export function validateInputChar(key: string, allowedChars: RegExp): boolean {
-	if (key.length === 1 && !allowedChars.test(key)) {
-		const allowedKeys = [
-			'Backspace',
-			'Delete',
-			'Tab',
-			'Escape',
-			'Enter',
-			'ArrowLeft',
-			'ArrowRight',
-			'ArrowUp',
-			'ArrowDown',
-		]
-		return allowedKeys.includes(key)
-	}
-	return true
+  if (key.length === 1 && !allowedChars.test(key)) {
+    const allowedKeys = [
+      'Backspace',
+      'Delete',
+      'Tab',
+      'Escape',
+      'Enter',
+      'ArrowLeft',
+      'ArrowRight',
+      'ArrowUp',
+      'ArrowDown',
+    ]
+    return allowedKeys.includes(key)
+  }
+  return true
 }

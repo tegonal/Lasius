@@ -21,52 +21,52 @@ import { AvatarUser } from '~/components/ui/data-display/avatar-user'
 import { TagList } from '~/components/ui/data-display/tag-list'
 import { cn } from '~/lib/utils/cn'
 import {
-	type ModelsCurrentUserTimeBooking,
-	type ModelsUserStub,
+  type ModelsCurrentUserTimeBooking,
+  type ModelsUserStub,
 } from '~/services/api/lasius'
 
 import { BookingName } from '../../bookings/components/booking-name'
 import { OrganisationItemContext } from './organisation-item-context'
 
 type Props = {
-	item: ModelsCurrentUserTimeBooking
-	selectedOrgId: string
-	users: ModelsUserStub[]
+  item: ModelsCurrentUserTimeBooking
+  selectedOrgId: string
+  users: ModelsUserStub[]
 }
 
 export const OrganisationItem = ({ item, selectedOrgId, users }: Props) => {
-	if (!item?.userReference?.id) return null
+  if (!item?.userReference?.id) return null
 
-	const userData = users.find((u) => u.id === item.userReference.id)
+  const userData = users.find((u) => u.id === item.userReference.id)
 
-	const userKey = item.userReference.key || ''
-	const firstName =
-		userData?.firstName || userKey.split('.')[0] || userKey[0] || ''
-	const lastName =
-		userData?.lastName || userKey.split('.')[1] || userKey[1] || ''
+  const userKey = item.userReference.key || ''
+  const firstName =
+    userData?.firstName || userKey.split('.')[0] || userKey[0] || ''
+  const lastName =
+    userData?.lastName || userKey.split('.')[1] || userKey[1] || ''
 
-	const { booking } = item
-	return (
-		<div className="border-base-content/20 flex flex-row items-center justify-between gap-2 overflow-hidden border-b py-2 pr-2">
-			<div
-				className={cn(
-					'flex flex-row items-center justify-center gap-2',
-					!booking && 'opacity-[0.333] grayscale',
-				)}
-			>
-				<AvatarUser firstName={firstName} lastName={lastName} />
-				{booking && (
-					<div className="flex flex-col gap-1">
-						<BookingName item={booking} variant="compact" />
-						<TagList items={booking.tags} width="xs" />
-					</div>
-				)}
-			</div>
-			{booking && (
-				<div className="flex-shrink-0">
-					<OrganisationItemContext item={item} selectedOrgId={selectedOrgId} />
-				</div>
-			)}
-		</div>
-	)
+  const { booking } = item
+  return (
+    <div className="border-base-content/20 flex flex-row items-center justify-between gap-2 overflow-hidden border-b py-2 pr-2">
+      <div
+        className={cn(
+          'flex flex-row items-center justify-center gap-2',
+          !booking && 'opacity-[0.333] grayscale',
+        )}
+      >
+        <AvatarUser firstName={firstName} lastName={lastName} />
+        {booking && (
+          <div className="flex flex-col gap-1">
+            <BookingName item={booking} variant="compact" />
+            <TagList items={booking.tags} width="xs" />
+          </div>
+        )}
+      </div>
+      {booking && (
+        <div className="flex-shrink-0">
+          <OrganisationItemContext item={item} selectedOrgId={selectedOrgId} />
+        </div>
+      )}
+    </div>
+  )
 }

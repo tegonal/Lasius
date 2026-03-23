@@ -20,77 +20,77 @@
 import { type BarTooltipProps, ResponsiveBar } from '@nivo/bar'
 
 import {
-	TooltipContainer,
-	TooltipItem,
+  TooltipContainer,
+  TooltipItem,
 } from '~/components/ui/charts/chart-tooltips'
 import {
-	getContrastLabelTextColor,
-	nivoTheme,
-	useNivoColors,
+  getContrastLabelTextColor,
+  nivoTheme,
+  useNivoColors,
 } from '~/components/ui/charts/nivo-theme'
 import { type NivoChartDataType } from '~/lib/api/functions/get-nivo-chart-data-from-api-stats-data'
 
 type Props = {
-	stats: { data: NivoChartDataType | undefined }
+  stats: { data: NivoChartDataType | undefined }
 }
 
 export const BarsTags = ({ stats }: Props) => {
-	const nivoColors = useNivoColors()
-	const { data } = stats
-	if (!data) return null
-	return (
-		<ResponsiveBar
-			axisBottom={{
-				tickPadding: 5,
-				tickRotation: 0,
-				tickSize: 5,
-			}}
-			axisLeft={{
-				format: (value: number | string) => {
-					const strValue = String(value)
-					return strValue.length > 16
-						? `${strValue.substring(0, 16)}...`
-						: strValue
-				},
-				tickPadding: 5,
-				tickRotation: 0,
-				tickSize: 5,
-			}}
-			axisRight={null}
-			axisTop={{
-				tickPadding: 5,
-				tickRotation: 0,
-				tickSize: 5,
-			}}
-			borderRadius={3}
-			borderWidth={0}
-			colors={nivoColors}
-			data={data as Array<{ id: string; value: number }>}
-			enableGridX
-			enableGridY={false}
-			indexBy="id"
-			indexScale={{ round: true, type: 'band' }}
-			keys={['value']}
-			label={(d) => `${d.value}h`}
-			labelSkipHeight={12}
-			labelSkipWidth={30}
-			labelTextColor={getContrastLabelTextColor}
-			layout="horizontal"
-			margin={{ bottom: 60, left: 140, right: 50, top: 60 }}
-			padding={0.3}
-			theme={nivoTheme}
-			tooltip={(props: BarTooltipProps<{ id: string; value: number }>) => (
-				<TooltipContainer>
-					<TooltipItem
-						color={props.color}
-						label={String(props.indexValue)}
-						value={`${props.value}h`}
-					/>
-				</TooltipContainer>
-			)}
-			valueScale={{ type: 'linear' }}
-		/>
-	)
+  const nivoColors = useNivoColors()
+  const { data } = stats
+  if (!data) return null
+  return (
+    <ResponsiveBar
+      axisBottom={{
+        tickPadding: 5,
+        tickRotation: 0,
+        tickSize: 5,
+      }}
+      axisLeft={{
+        format: (value: number | string) => {
+          const strValue = String(value)
+          return strValue.length > 16
+            ? `${strValue.substring(0, 16)}...`
+            : strValue
+        },
+        tickPadding: 5,
+        tickRotation: 0,
+        tickSize: 5,
+      }}
+      axisRight={null}
+      axisTop={{
+        tickPadding: 5,
+        tickRotation: 0,
+        tickSize: 5,
+      }}
+      borderRadius={3}
+      borderWidth={0}
+      colors={nivoColors}
+      data={data as Array<{ id: string; value: number }>}
+      enableGridX
+      enableGridY={false}
+      indexBy="id"
+      indexScale={{ round: true, type: 'band' }}
+      keys={['value']}
+      label={(d) => `${d.value}h`}
+      labelSkipHeight={12}
+      labelSkipWidth={30}
+      labelTextColor={getContrastLabelTextColor}
+      layout="horizontal"
+      margin={{ bottom: 60, left: 140, right: 50, top: 60 }}
+      padding={0.3}
+      theme={nivoTheme}
+      tooltip={(props: BarTooltipProps<{ id: string; value: number }>) => (
+        <TooltipContainer>
+          <TooltipItem
+            color={props.color}
+            label={String(props.indexValue)}
+            value={`${props.value}h`}
+          />
+        </TooltipContainer>
+      )}
+      valueScale={{ type: 'linear' }}
+    />
+  )
 }
 
 export default BarsTags

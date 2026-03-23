@@ -22,23 +22,23 @@ import { type ReactNode } from 'react'
 import { cn } from '~/lib/utils/cn'
 
 export const DropdownList = ({
-	children,
-	className,
+  children,
+  className,
 }: {
-	children: ReactNode
-	className?: string
+  children: ReactNode
+  className?: string
 }) => {
-	return (
-		<div
-			className={cn(
-				'bg-base-100 border-base-content/20 absolute mt-1 rounded-lg border',
-				'h-auto max-h-[240px] w-full overflow-auto py-1',
-				'z-50 shadow-lg',
-				'scrollbar-thin scrollbar-thumb-base-content/20 scrollbar-track-transparent',
-				className,
-			)}
-		>
-			{children}
-		</div>
-	)
+  return (
+    <div
+      className={cn(
+        'bg-base-100 border-base-content/20 absolute mt-1 rounded-lg border',
+        'h-auto max-h-[240px] w-full overflow-auto py-1',
+        'z-50 shadow-lg',
+        'scrollbar-thin scrollbar-thumb-base-content/20 scrollbar-track-transparent',
+        className,
+      )}
+    >
+      {children}
+    </div>
+  )
 }

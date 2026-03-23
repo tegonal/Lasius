@@ -18,56 +18,68 @@
  */
 
 import { isInteger, padStart, round } from 'es-toolkit/compat'
-import { animate } from 'motion/react'
 import { useEffect, useRef } from 'react'
 
 import { countDecimals } from '~/lib/utils/data/count-decimals'
 
 type Props = {
-	from: number
-	leftpad?: number
-	to: number
+  from: number
+  leftpad?: number
+  to: number
 }
 
-const number = (value: number, from: number, to: number) =>
-	round(
-		value,
-		isInteger(to) ? (to === 0 ? countDecimals(from) : 0) : countDecimals(to),
-	)
+const formatNumber = (value: number, from: number, to: number) =>
+  round(
+    value,
+    isInteger(to) ? (to === 0 ? countDecimals(from) : 0) : countDecimals(to),
+  )
 
-const numberLeftpadded = (
-	value: number,
-	from: number,
-	to: number,
-	leftpad: number,
-) => padStart(number(value, from, to).toString(), 1 + leftpad, '0')
+const formatNumberLeftpadded = (
+  value: number,
+  from: number,
+  to: number,
+  leftpad: number,
+) => padStart(formatNumber(value, from, to).toString(), 1 + leftpad, '0')
+
+const DURATION_MS = 330
 
 /**
  * AnimateNumber component: Animates a number from one value to another.
+ * Uses requestAnimationFrame with ease-out cubic easing.
  * @param from
  * @param to
  * @param leftpad
  */
 export const AnimateNumber = ({ from, leftpad = 0, to }: Props) => {
-	const nodeRef = useRef<HTMLSpanElement>(null)
+  const nodeRef = useRef<HTMLSpanElement>(null)
 
-	useEffect(() => {
-		const node = nodeRef.current
+  useEffect(() => {
+    const node = nodeRef.current
+    if (!node) return
 
-		const controls = animate(from, to, {
-			duration: 0.33,
-			onUpdate(value) {
-				if (node) {
-					node.textContent =
-						leftpad > 0
-							? numberLeftpadded(value, from, to, leftpad)
-							: number(value, from, to).toString()
-				}
-			},
-		})
+    const startTime = performance.now()
+    let rafId: number
 
-		return () => controls.stop()
-	}, [from, leftpad, to])
+    const update = (currentTime: number) => {
+      const elapsed = currentTime - startTime
+      const progress = Math.min(elapsed / DURATION_MS, 1)
+      // Ease out cubic
+      const eased = 1 - Math.pow(1 - progress, 3)
+      const value = from + (to - from) * eased
 
-	return <span ref={nodeRef} />
+      node.textContent =
+        leftpad > 0
+          ? formatNumberLeftpadded(value, from, to, leftpad)
+          : formatNumber(value, from, to).toString()
+
+      if (progress < 1) {
+        rafId = requestAnimationFrame(update)
+      }
+    }
+
+    rafId = requestAnimationFrame(update)
+    return () => cancelAnimationFrame(rafId)
+  }, [from, leftpad, to])
+
+  return <span ref={nodeRef} />
 }

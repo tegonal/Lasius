@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { ModelsExternalProjectOwnerType } from './modelsExternalProjectOwnerType'
 
@@ -11,17 +11,17 @@ import type { ModelsExternalProjectOwnerType } from './modelsExternalProjectOwne
  * External project or resource owner from an issue tracking system
  */
 export interface ModelsExternalProject {
-	/** External project ID or resource owner login */
-	id: string
-	/** Display name of the project or resource owner */
-	name: string
-	/**
-	 * Type of the resource owner (GitHub only, User or Organization)
-	 * @nullable
-	 */
-	ownerType?: ModelsExternalProjectOwnerType
-	/** @nullable */
-	availableLabels?: string[] | null
-	/** @nullable */
-	availableStates?: string[] | null
+  /** External project ID or resource owner login */
+  id: string
+  /** Display name of the project or resource owner */
+  name: string
+  /**
+   * Type of the resource owner (GitHub only, User or Organization)
+   * @nullable
+   */
+  ownerType?: ModelsExternalProjectOwnerType
+  /** @nullable */
+  availableLabels?: string[] | null
+  /** @nullable */
+  availableStates?: string[] | null
 }

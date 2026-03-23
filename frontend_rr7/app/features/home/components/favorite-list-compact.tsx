@@ -27,30 +27,30 @@ import { FavoriteItem } from './favorite-item'
 import { FavouriteListWrapper } from './favourite-list-wrapper'
 
 type Props = {
-	favorites: ModelsBookingStub[]
-	selectedOrgId: string
+  favorites: ModelsBookingStub[]
+  selectedOrgId: string
 }
 
 export const FavoriteListCompact = ({ favorites, selectedOrgId }: Props) => {
-	const hasNoData = !favorites || favorites.length === 0
+  const hasNoData = !favorites || favorites.length === 0
 
-	return (
-		<ContextMenuProvider>
-			<FavouriteListWrapper>
-				{hasNoData ? (
-					<EmptyStateFavorites />
-				) : (
-					<AnimateList>
-						{favorites.map((item) => (
-							<FavoriteItem
-								item={item}
-								key={stringHash(item)}
-								selectedOrgId={selectedOrgId}
-							/>
-						))}
-					</AnimateList>
-				)}
-			</FavouriteListWrapper>
-		</ContextMenuProvider>
-	)
+  return (
+    <ContextMenuProvider>
+      <FavouriteListWrapper>
+        {hasNoData ? (
+          <EmptyStateFavorites />
+        ) : (
+          <AnimateList>
+            {favorites.map((item) => (
+              <FavoriteItem
+                item={item}
+                key={stringHash(item)}
+                selectedOrgId={selectedOrgId}
+              />
+            ))}
+          </AnimateList>
+        )}
+      </FavouriteListWrapper>
+    </ContextMenuProvider>
+  )
 }

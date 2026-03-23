@@ -23,89 +23,89 @@ import React from 'react'
 import { cn } from '~/lib/utils/cn'
 
 const headingVariants = cva('', {
-	defaultVariants: {
-		align: 'left',
-		tone: 'default',
-		variant: 'h2',
-	},
-	variants: {
-		align: {
-			center: 'text-center',
-			justify: 'text-justify',
-			left: 'text-left',
-			right: 'text-right',
-		},
-		size: {
-			'2xl': 'text-2xl',
-			'3xl': 'text-3xl',
-			'4xl': 'text-4xl',
-			'5xl': 'text-5xl',
-			base: 'text-base',
-			lg: 'text-lg',
-			sm: 'text-sm',
-			xl: 'text-xl',
-		},
-		tone: {
-			accent: 'text-accent',
-			default: '',
-			error: 'text-error',
-			info: 'text-info',
-			muted: 'text-base-content/70',
-			primary: 'text-primary',
-			secondary: 'text-secondary',
-			success: 'text-success',
-			warning: 'text-warning',
-		},
-		variant: {
-			display: 'text-5xl font-bold tracking-wider',
-			h1: 'text-4xl font-bold tracking-wide',
-			h2: 'text-3xl font-bold tracking-wide',
-			h3: 'text-2xl font-semibold tracking-wide',
-			h4: 'text-xl font-semibold',
-			h5: 'text-lg font-medium',
-			h6: 'text-base font-medium',
-			headingTableHeader: 'mb-1 text-sm font-normal',
-			headingUnderlinedMuted:
-				'border-base-content/30 text-base-content/70 mb-4 w-full border-b text-sm font-normal',
-			page: 'mb-4 text-3xl font-bold',
-			section:
-				'border-base-content/20 mb-2 w-full border-b pt-3 pb-2 text-lg font-normal tracking-wide sm:mb-4',
-			subtitle: 'text-base-content/70 text-lg font-medium',
-			title: 'text-2xl font-bold tracking-wide',
-		},
-	},
+  defaultVariants: {
+    align: 'left',
+    tone: 'default',
+    variant: 'h2',
+  },
+  variants: {
+    align: {
+      center: 'text-center',
+      justify: 'text-justify',
+      left: 'text-left',
+      right: 'text-right',
+    },
+    size: {
+      '2xl': 'text-2xl',
+      '3xl': 'text-3xl',
+      '4xl': 'text-4xl',
+      '5xl': 'text-5xl',
+      base: 'text-base',
+      lg: 'text-lg',
+      sm: 'text-sm',
+      xl: 'text-xl',
+    },
+    tone: {
+      accent: 'text-accent',
+      default: '',
+      error: 'text-error',
+      info: 'text-info',
+      muted: 'text-base-content/70',
+      primary: 'text-primary',
+      secondary: 'text-secondary',
+      success: 'text-success',
+      warning: 'text-warning',
+    },
+    variant: {
+      display: 'text-5xl font-bold tracking-wider',
+      h1: 'text-4xl font-bold tracking-wide',
+      h2: 'text-3xl font-bold tracking-wide',
+      h3: 'text-2xl font-semibold tracking-wide',
+      h4: 'text-xl font-semibold',
+      h5: 'text-lg font-medium',
+      h6: 'text-base font-medium',
+      headingTableHeader: 'mb-1 text-sm font-normal',
+      headingUnderlinedMuted:
+        'border-base-content/30 text-base-content/70 mb-4 w-full border-b text-sm font-normal',
+      page: 'mb-4 text-3xl font-bold',
+      section:
+        'border-base-content/20 mb-2 w-full border-b pt-3 pb-2 text-lg font-normal tracking-wide sm:mb-4',
+      subtitle: 'text-base-content/70 text-lg font-medium',
+      title: 'text-2xl font-bold tracking-wide',
+    },
+  },
 })
 
 export interface HeadingProps
-	extends
-		React.HTMLAttributes<HTMLHeadingElement>,
-		VariantProps<typeof headingVariants> {
-	as?: HeadingElement
-	children: React.ReactNode
+  extends
+    React.HTMLAttributes<HTMLHeadingElement>,
+    VariantProps<typeof headingVariants> {
+  as?: HeadingElement
+  children: React.ReactNode
 }
 
 type HeadingElement = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
 
 export const Heading = React.forwardRef<HTMLHeadingElement, HeadingProps>(
-	(
-		{ align, as = 'h2', children, className, size, tone, variant, ...props },
-		ref,
-	) => {
-		const Component = as
+  (
+    { align, as = 'h2', children, className, size, tone, variant, ...props },
+    ref,
+  ) => {
+    const Component = as
 
-		return (
-			<Component
-				className={cn(
-					headingVariants({ align, size, tone, variant }),
-					className,
-				)}
-				ref={ref}
-				{...props}
-			>
-				{children}
-			</Component>
-		)
-	},
+    return (
+      <Component
+        className={cn(
+          headingVariants({ align, size, tone, variant }),
+          className,
+        )}
+        ref={ref}
+        {...props}
+      >
+        {children}
+      </Component>
+    )
+  },
 )
 
 Heading.displayName = 'Heading'

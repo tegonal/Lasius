@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { ModelsBooking } from './modelsBooking'
 import type { ModelsEntityReference } from './modelsEntityReference'
@@ -12,15 +12,15 @@ import type { ModelsEntityReference } from './modelsEntityReference'
  * User's current time booking with daily totals
  */
 export interface ModelsCurrentUserTimeBooking {
-	userReference: ModelsEntityReference
-	/** @pattern yyyy-MM-dd */
-	day: string
-	booking?: ModelsBooking | null
-	/**
-	 * Total time for same booking in milliseconds
-	 * @nullable
-	 */
-	totalBySameBookingInMillis?: number | null
-	/** Total time for the day in milliseconds */
-	totalByDayInMillis: number
+  userReference: ModelsEntityReference
+  /** @pattern yyyy-MM-dd */
+  day: string
+  booking?: ModelsBooking | null
+  /**
+   * Total time for same booking in milliseconds
+   * @nullable
+   */
+  totalBySameBookingInMillis?: number | null
+  /** Total time for the day in milliseconds */
+  totalByDayInMillis: number
 }

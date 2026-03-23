@@ -27,37 +27,43 @@ import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { useLayoutLoaderData } from '~/hooks/use-layout-loader-data'
 
 export const NavigationTabContent = ({ branch }: { branch: string }) => {
-	const { isAdministrator } = useOrganisation()
-	const loaderData = useLayoutLoaderData()
+  const { isAdministrator } = useOrganisation()
+  const loaderData = useLayoutLoaderData()
 
-	return (
-		<div className="flex flex-col items-start justify-start gap-3">
-			{getNavigation({
-				id: branch,
-				isOrganisationAdministrator: isAdministrator,
-				isUserOfInternalOAuthProvider: loaderData?.tokenIssuer === 'internal',
-			}).map((item) => (
-				<NavigationButton item={item} key={item.name} />
-			))}
-		</div>
-	)
+  return (
+    <div className="flex flex-col items-start justify-start gap-3">
+      {getNavigation({
+        id: branch,
+        isOrganisationAdministrator: isAdministrator,
+        isUserOfInternalOAuthProvider: loaderData?.tokenIssuer === 'internal',
+      }).map((item) => (
+        <NavigationButton item={item} key={item.name} />
+      ))}
+    </div>
+  )
 }
 
 const NavigationButton = ({ item }: { item: NavigationRouteType }) => {
-	const navigate = useNavigate()
-	const location = useLocation()
-	const { t } = useTranslation('common')
+  const navigate = useNavigate()
+  const location = useLocation()
+  const { t } = useTranslation('common')
 
-	const isActive = location.pathname === item.route
+  const isActive = location.pathname === item.route
 
-	return (
-		<Button
-			fullWidth
-			onClick={() => void navigate(item.route)}
-			variant={isActive ? 'navigationActive' : 'navigation'}
-		>
-			<LucideIcon icon={item.icon} size={24} />
-			<div>{t(item.name)}</div>
-		</Button>
-	)
+  const handleClick = () => {
+    const dateParam = new URLSearchParams(location.search).get('date')
+    const search = dateParam ? `?date=${dateParam}` : ''
+    void navigate(`${item.route}${search}`)
+  }
+
+  return (
+    <Button
+      fullWidth
+      onClick={handleClick}
+      variant={isActive ? 'navigationActive' : 'navigation'}
+    >
+      <LucideIcon icon={item.icon} size={24} />
+      <div>{t(item.name)}</div>
+    </Button>
+  )
 }

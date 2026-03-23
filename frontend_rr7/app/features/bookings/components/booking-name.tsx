@@ -23,26 +23,26 @@ import { cn } from '~/lib/utils/cn'
 import { type ModelsEntityReference } from '~/services/api/lasius'
 
 const bookingNameVariants = cva('leading-normal', {
-	defaultVariants: { variant: 'default' },
-	variants: {
-		variant: {
-			compact: 'text-sm',
-			default: '',
-		},
-	},
+  defaultVariants: { variant: 'default' },
+  variants: {
+    variant: {
+      compact: 'text-sm',
+      default: '',
+    },
+  },
 })
 
 type Props = {
-	className?: string
-	item: undefined | { projectReference: ModelsEntityReference }
-	variant?: 'compact'
+  className?: string
+  item: undefined | { projectReference: ModelsEntityReference }
+  variant?: 'compact'
 }
 
 export const BookingName = ({ className, item, variant }: Props) => {
-	if (!item?.projectReference?.key) return null
-	return (
-		<div className={cn(bookingNameVariants({ variant }), className)}>
-			<span className="font-bold">{item.projectReference.key}</span>
-		</div>
-	)
+  if (!item?.projectReference?.key) return null
+  return (
+    <div className={cn(bookingNameVariants({ variant }), className)}>
+      <span className="font-bold">{item.projectReference.key}</span>
+    </div>
+  )
 }

@@ -18,51 +18,51 @@
  */
 
 import {
-	createContext,
-	type ReactNode,
-	useCallback,
-	useContext,
-	useState,
+  createContext,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useState,
 } from 'react'
 
 type ContextMenuState = {
-	currentOpenContextMenuId: null | string
-	handleCloseAll: () => void
-	handleOpenContextMenu: (hash: string) => void
+  currentOpenContextMenuId: null | string
+  handleCloseAll: () => void
+  handleOpenContextMenu: (hash: string) => void
 }
 
 const ContextMenuContext = createContext<ContextMenuState | null>(null)
 
 export const ContextMenuProvider = ({ children }: { children: ReactNode }) => {
-	const [currentOpenContextMenuId, setCurrentOpenContextMenuId] = useState<
-		null | string
-	>(null)
+  const [currentOpenContextMenuId, setCurrentOpenContextMenuId] = useState<
+    null | string
+  >(null)
 
-	const handleOpenContextMenu = useCallback((hash: string) => {
-		setCurrentOpenContextMenuId((prev) => (prev === hash ? null : hash))
-	}, [])
+  const handleOpenContextMenu = useCallback((hash: string) => {
+    setCurrentOpenContextMenuId((prev) => (prev === hash ? null : hash))
+  }, [])
 
-	const handleCloseAll = useCallback(() => {
-		setCurrentOpenContextMenuId(null)
-	}, [])
+  const handleCloseAll = useCallback(() => {
+    setCurrentOpenContextMenuId(null)
+  }, [])
 
-	return (
-		<ContextMenuContext.Provider
-			value={{
-				currentOpenContextMenuId,
-				handleCloseAll,
-				handleOpenContextMenu,
-			}}
-		>
-			{children}
-		</ContextMenuContext.Provider>
-	)
+  return (
+    <ContextMenuContext.Provider
+      value={{
+        currentOpenContextMenuId,
+        handleCloseAll,
+        handleOpenContextMenu,
+      }}
+    >
+      {children}
+    </ContextMenuContext.Provider>
+  )
 }
 
 export const useContextMenu = (): ContextMenuState => {
-	const context = useContext(ContextMenuContext)
-	if (!context) {
-		throw new Error('useContextMenu must be used within a ContextMenuProvider')
-	}
-	return context
+  const context = useContext(ContextMenuContext)
+  if (!context) {
+    throw new Error('useContextMenu must be used within a ContextMenuProvider')
+  }
+  return context
 }

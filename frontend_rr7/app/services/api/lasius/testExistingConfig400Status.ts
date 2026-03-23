@@ -3,12 +3,12 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 
-export type TestExistingConfig400Status =
-	(typeof TestExistingConfig400Status)[keyof typeof TestExistingConfig400Status]
+export type TestExistingConfig400Status = typeof TestExistingConfig400Status[keyof typeof TestExistingConfig400Status];
+
 
 export const TestExistingConfig400Status = {
-	error: 'error',
-} as const
+  error: 'error',
+} as const;

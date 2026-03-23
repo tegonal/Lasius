@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { ModelsEntityReference } from './modelsEntityReference'
 import type { ModelsInvitationOutcome } from './modelsInvitationOutcome'
@@ -11,15 +11,15 @@ import type { ModelsJoinOrganisationInvitationRole } from './modelsJoinOrganisat
 import type { ModelsJoinOrganisationInvitationType } from './modelsJoinOrganisationInvitationType'
 
 export interface ModelsJoinOrganisationInvitation {
-	id: string
-	invitedEmail: string
-	/** @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ */
-	createDate: string
-	createdBy: ModelsEntityReference
-	/** @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ */
-	expiration: string
-	organisationReference: ModelsEntityReference
-	role: ModelsJoinOrganisationInvitationRole
-	outcome?: ModelsInvitationOutcome | null
-	type: ModelsJoinOrganisationInvitationType
+  id: string
+  invitedEmail: string
+  /** @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ */
+  createDate: string
+  createdBy: ModelsEntityReference
+  /** @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ */
+  expiration: string
+  organisationReference: ModelsEntityReference
+  role: ModelsJoinOrganisationInvitationRole
+  outcome?: ModelsInvitationOutcome | null
+  type: ModelsJoinOrganisationInvitationType
 }

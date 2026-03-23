@@ -22,12 +22,12 @@ import React from 'react'
 type Props = React.ComponentPropsWithoutRef<'tr'>
 
 export const DataListRow = ({ children, ...rest }: Props) => {
-	return (
-		<tr
-			className="border-base-content/20 border-b [&>td:first-child]:pl-4 [&>td:last-child]:w-12 [&>td:last-child]:pr-2"
-			{...rest}
-		>
-			{children}
-		</tr>
-	)
+  return (
+    <tr
+      className="border-base-content/20 border-b [&>td:first-child]:pl-4 [&>td:last-child]:w-12 [&>td:last-child]:pr-2"
+      {...rest}
+    >
+      {children}
+    </tr>
+  )
 }

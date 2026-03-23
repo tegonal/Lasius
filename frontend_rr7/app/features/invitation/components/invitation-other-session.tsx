@@ -30,47 +30,47 @@ import { AuthLayout } from '~/features/auth/auth-layout'
 import { type ModelsInvitationStatusResponse } from '~/services/api/lasius/modelsInvitationStatusResponse'
 
 interface Props {
-	invitation: ModelsInvitationStatusResponse
+  invitation: ModelsInvitationStatusResponse
 }
 
 export const InvitationOtherSession = ({ invitation }: Props) => {
-	const { t } = useTranslation('common')
-	const navigate = useNavigate()
+  const { t } = useTranslation('common')
+  const navigate = useNavigate()
 
-	const handleSignOut = () => {
-		void navigate('/logout')
-	}
+  const handleSignOut = () => {
+    void navigate('/logout')
+  }
 
-	return (
-		<AuthLayout>
-			<Card
-				className="border-base-300 bg-base-100 w-full max-w-md border"
-				data-testid="invite-other-session"
-				shadow="xl"
-			>
-				<CardBody className="gap-6 p-8">
-					<div className="flex justify-center">
-						<Logo />
-					</div>
-					<div className="h-4" />
-					<Alert variant="warning">
-						{t('invitations.errors.createdForSomeoneElse', {
-							defaultValue:
-								'This invitation has been created for someone else. Either log out and refresh, or forward the invitation link to the user {{email}}',
-							email: invitation.invitation.invitedEmail,
-						})}
-					</Alert>
-					<FormBody>
-						<FormElement>
-							<Button fullWidth onClick={handleSignOut}>
-								{t('auth.actions.signOutAndRefresh', {
-									defaultValue: 'Sign out and refresh',
-								})}
-							</Button>
-						</FormElement>
-					</FormBody>
-				</CardBody>
-			</Card>
-		</AuthLayout>
-	)
+  return (
+    <AuthLayout>
+      <Card
+        className="border-base-300 bg-base-100 w-full max-w-md border"
+        data-testid="invite-other-session"
+        shadow="xl"
+      >
+        <CardBody className="gap-6 p-8">
+          <div className="flex justify-center">
+            <Logo />
+          </div>
+          <div className="h-4" />
+          <Alert variant="warning">
+            {t('invitations.errors.createdForSomeoneElse', {
+              defaultValue:
+                'This invitation has been created for someone else. Either log out and refresh, or forward the invitation link to the user {{email}}',
+              email: invitation.invitation.invitedEmail,
+            })}
+          </Alert>
+          <FormBody>
+            <FormElement>
+              <Button fullWidth onClick={handleSignOut}>
+                {t('auth.actions.signOutAndRefresh', {
+                  defaultValue: 'Sign out and refresh',
+                })}
+              </Button>
+            </FormElement>
+          </FormBody>
+        </CardBody>
+      </Card>
+    </AuthLayout>
+  )
 }

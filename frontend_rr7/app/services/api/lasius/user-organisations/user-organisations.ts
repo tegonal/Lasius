@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { ModelsTag, ModelsUpdateUserOrganisation, ModelsUser } from './..'
 
@@ -13,96 +13,96 @@ import { lasiusFetch } from '../../lasius-fetch-instance'
  * @summary Change current user's working hours for the selected organisation
  */
 export type updateWorkingHoursByOrganisationResponse200 = {
-	data: ModelsUser
-	status: 200
+  data: ModelsUser
+  status: 200
 }
 
 export type updateWorkingHoursByOrganisationResponseSuccess =
-	updateWorkingHoursByOrganisationResponse200 & {
-		headers: Headers
-	}
+  updateWorkingHoursByOrganisationResponse200 & {
+    headers: Headers
+  }
 export type updateWorkingHoursByOrganisationResponse =
-	updateWorkingHoursByOrganisationResponseSuccess
+  updateWorkingHoursByOrganisationResponseSuccess
 
 export const getUpdateWorkingHoursByOrganisationUrl = (orgId: string) => {
-	return `/user-organisations/organisations/${orgId}/working-hours`
+  return `/user-organisations/organisations/${orgId}/working-hours`
 }
 
 export const updateWorkingHoursByOrganisation = async (
-	orgId: string,
-	modelsUpdateUserOrganisation: ModelsUpdateUserOrganisation,
-	options?: RequestInit,
+  orgId: string,
+  modelsUpdateUserOrganisation: ModelsUpdateUserOrganisation,
+  options?: RequestInit,
 ): Promise<updateWorkingHoursByOrganisationResponse> => {
-	return lasiusFetch<updateWorkingHoursByOrganisationResponse>(
-		getUpdateWorkingHoursByOrganisationUrl(orgId),
-		{
-			...options,
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json', ...options?.headers },
-			body: JSON.stringify(modelsUpdateUserOrganisation),
-		},
-	)
+  return lasiusFetch<updateWorkingHoursByOrganisationResponse>(
+    getUpdateWorkingHoursByOrganisationUrl(orgId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(modelsUpdateUserOrganisation),
+    },
+  )
 }
 
 /**
  * @summary Remove current user's membership from selected organisation
  */
 export type deleteUserMembershipByOrganisationResponse200 = {
-	data: void
-	status: 200
+  data: void
+  status: 200
 }
 
 export type deleteUserMembershipByOrganisationResponseSuccess =
-	deleteUserMembershipByOrganisationResponse200 & {
-		headers: Headers
-	}
+  deleteUserMembershipByOrganisationResponse200 & {
+    headers: Headers
+  }
 export type deleteUserMembershipByOrganisationResponse =
-	deleteUserMembershipByOrganisationResponseSuccess
+  deleteUserMembershipByOrganisationResponseSuccess
 
 export const getDeleteUserMembershipByOrganisationUrl = (orgId: string) => {
-	return `/user-organisations/organisations/${orgId}/leave`
+  return `/user-organisations/organisations/${orgId}/leave`
 }
 
 export const deleteUserMembershipByOrganisation = async (
-	orgId: string,
-	options?: RequestInit,
+  orgId: string,
+  options?: RequestInit,
 ): Promise<deleteUserMembershipByOrganisationResponse> => {
-	return lasiusFetch<deleteUserMembershipByOrganisationResponse>(
-		getDeleteUserMembershipByOrganisationUrl(orgId),
-		{
-			...options,
-			method: 'DELETE',
-		},
-	)
+  return lasiusFetch<deleteUserMembershipByOrganisationResponse>(
+    getDeleteUserMembershipByOrganisationUrl(orgId),
+    {
+      ...options,
+      method: 'DELETE',
+    },
+  )
 }
 
 /**
  * @summary Get tags by organisation and project
  */
 export type getTagsByProjectResponse200 = {
-	data: ModelsTag[]
-	status: 200
+  data: ModelsTag[]
+  status: 200
 }
 
 export type getTagsByProjectResponseSuccess = getTagsByProjectResponse200 & {
-	headers: Headers
+  headers: Headers
 }
 export type getTagsByProjectResponse = getTagsByProjectResponseSuccess
 
 export const getGetTagsByProjectUrl = (orgId: string, projectId: string) => {
-	return `/user-organisations/organisations/${orgId}/projects/${projectId}/tags`
+  return `/user-organisations/organisations/${orgId}/projects/${projectId}/tags`
 }
 
 export const getTagsByProject = async (
-	orgId: string,
-	projectId: string,
-	options?: RequestInit,
+  orgId: string,
+  projectId: string,
+  options?: RequestInit,
 ): Promise<getTagsByProjectResponse> => {
-	return lasiusFetch<getTagsByProjectResponse>(
-		getGetTagsByProjectUrl(orgId, projectId),
-		{
-			...options,
-			method: 'GET',
-		},
-	)
+  return lasiusFetch<getTagsByProjectResponse>(
+    getGetTagsByProjectUrl(orgId, projectId),
+    {
+      ...options,
+      method: 'GET',
+    },
+  )
 }

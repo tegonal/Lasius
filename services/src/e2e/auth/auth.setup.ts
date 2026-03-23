@@ -27,8 +27,8 @@ setup('authenticate via Internal Lasius Sign-in', async ({ page }) => {
   await page.waitForURL(/.*\/login.*/)
 
   // Click the Internal Lasius Sign-in provider button
-  await page.getByTestId('auth-provider-internal_lasius').click()
-  await page.waitForURL(/.*\/internal_oauth\/login.*/)
+  await page.getByTestId('auth-provider-internal').click()
+  await page.waitForURL(/.*\/internal-oauth\/login.*/)
 
   // Wait for the login form to render (SSR can be slow on cold dev server)
   await page.getByTestId('auth-internal-email-input').waitFor({ state: 'visible', timeout: 15000 })

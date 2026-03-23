@@ -24,14 +24,14 @@ import { useFormContext } from 'react-hook-form'
  * This ensures components fail fast if used outside a form context.
  */
 export const useRequiredFormContext = () => {
-	const formContext = useFormContext()
+  const formContext = useFormContext()
 
-	if (!formContext) {
-		throw new Error(
-			'useRequiredFormContext must be used within a FormProvider. ' +
-				"Wrap your component with WithFormContext or ensure it's inside a FormProvider.",
-		)
-	}
+  if (!formContext) {
+    throw new Error(
+      'useRequiredFormContext must be used within a FormProvider. ' +
+        "Wrap your component with WithFormContext or ensure it's inside a FormProvider.",
+    )
+  }
 
-	return formContext
+  return formContext
 }

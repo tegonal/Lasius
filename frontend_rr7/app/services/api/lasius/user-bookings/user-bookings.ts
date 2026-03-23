@@ -3,21 +3,21 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type {
-	GetUserBookingAggregatedStatsByOrganisationParams,
-	GetUserBookingLatestListByOrganisationParams,
-	GetUserBookingListByOrganisationParams,
-	ModelsAddBookingRequest,
-	ModelsBooking,
-	ModelsBookingChangeStartRequest,
-	ModelsBookingStats,
-	ModelsCurrentOrganisationTimeBookings,
-	ModelsCurrentUserTimeBooking,
-	ModelsEditBookingRequest,
-	ModelsStartBookingRequest,
-	ModelsStopBookingRequest,
+  GetUserBookingAggregatedStatsByOrganisationParams,
+  GetUserBookingLatestListByOrganisationParams,
+  GetUserBookingListByOrganisationParams,
+  ModelsAddBookingRequest,
+  ModelsBooking,
+  ModelsBookingChangeStartRequest,
+  ModelsBookingStats,
+  ModelsCurrentOrganisationTimeBookings,
+  ModelsCurrentUserTimeBooking,
+  ModelsEditBookingRequest,
+  ModelsStartBookingRequest,
+  ModelsStopBookingRequest,
 } from './..'
 
 import { lasiusFetch } from '../../lasius-fetch-instance'
@@ -26,419 +26,419 @@ import { lasiusFetch } from '../../lasius-fetch-instance'
  * @summary Start booking time on selected organisation for the current user
  */
 export type startUserBookingCurrentResponse200 = {
-	data: void
-	status: 200
+  data: void
+  status: 200
 }
 
 export type startUserBookingCurrentResponseSuccess =
-	startUserBookingCurrentResponse200 & {
-		headers: Headers
-	}
+  startUserBookingCurrentResponse200 & {
+    headers: Headers
+  }
 export type startUserBookingCurrentResponse =
-	startUserBookingCurrentResponseSuccess
+  startUserBookingCurrentResponseSuccess
 
 export const getStartUserBookingCurrentUrl = (orgId: string) => {
-	return `/user-bookings/organisations/${orgId}/bookings/start`
+  return `/user-bookings/organisations/${orgId}/bookings/start`
 }
 
 export const startUserBookingCurrent = async (
-	orgId: string,
-	modelsStartBookingRequest: ModelsStartBookingRequest,
-	options?: RequestInit,
+  orgId: string,
+  modelsStartBookingRequest: ModelsStartBookingRequest,
+  options?: RequestInit,
 ): Promise<startUserBookingCurrentResponse> => {
-	return lasiusFetch<startUserBookingCurrentResponse>(
-		getStartUserBookingCurrentUrl(orgId),
-		{
-			...options,
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json', ...options?.headers },
-			body: JSON.stringify(modelsStartBookingRequest),
-		},
-	)
+  return lasiusFetch<startUserBookingCurrentResponse>(
+    getStartUserBookingCurrentUrl(orgId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(modelsStartBookingRequest),
+    },
+  )
 }
 
 /**
  * @summary Stop the currently running booking by organisation and booking id for the current user
  */
 export type stopUserBookingCurrentResponse200 = {
-	data: void
-	status: 200
+  data: void
+  status: 200
 }
 
 export type stopUserBookingCurrentResponseSuccess =
-	stopUserBookingCurrentResponse200 & {
-		headers: Headers
-	}
+  stopUserBookingCurrentResponse200 & {
+    headers: Headers
+  }
 export type stopUserBookingCurrentResponse =
-	stopUserBookingCurrentResponseSuccess
+  stopUserBookingCurrentResponseSuccess
 
 export const getStopUserBookingCurrentUrl = (
-	orgId: string,
-	bookingId: string,
+  orgId: string,
+  bookingId: string,
 ) => {
-	return `/user-bookings/organisations/${orgId}/bookings/${bookingId}/stop`
+  return `/user-bookings/organisations/${orgId}/bookings/${bookingId}/stop`
 }
 
 export const stopUserBookingCurrent = async (
-	orgId: string,
-	bookingId: string,
-	modelsStopBookingRequest: ModelsStopBookingRequest,
-	options?: RequestInit,
+  orgId: string,
+  bookingId: string,
+  modelsStopBookingRequest: ModelsStopBookingRequest,
+  options?: RequestInit,
 ): Promise<stopUserBookingCurrentResponse> => {
-	return lasiusFetch<stopUserBookingCurrentResponse>(
-		getStopUserBookingCurrentUrl(orgId, bookingId),
-		{
-			...options,
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json', ...options?.headers },
-			body: JSON.stringify(modelsStopBookingRequest),
-		},
-	)
+  return lasiusFetch<stopUserBookingCurrentResponse>(
+    getStopUserBookingCurrentUrl(orgId, bookingId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(modelsStopBookingRequest),
+    },
+  )
 }
 
 /**
  * @summary Change the currently running booking by organisation and booking id for the current user
  */
 export type updateUserBookingCurrentResponse200 = {
-	data: void
-	status: 200
+  data: void
+  status: 200
 }
 
 export type updateUserBookingCurrentResponseSuccess =
-	updateUserBookingCurrentResponse200 & {
-		headers: Headers
-	}
+  updateUserBookingCurrentResponse200 & {
+    headers: Headers
+  }
 export type updateUserBookingCurrentResponse =
-	updateUserBookingCurrentResponseSuccess
+  updateUserBookingCurrentResponseSuccess
 
 export const getUpdateUserBookingCurrentUrl = (
-	orgId: string,
-	bookingId: string,
+  orgId: string,
+  bookingId: string,
 ) => {
-	return `/user-bookings/organisations/${orgId}/bookings/${bookingId}/start-time`
+  return `/user-bookings/organisations/${orgId}/bookings/${bookingId}/start-time`
 }
 
 export const updateUserBookingCurrent = async (
-	orgId: string,
-	bookingId: string,
-	modelsBookingChangeStartRequest: ModelsBookingChangeStartRequest,
-	options?: RequestInit,
+  orgId: string,
+  bookingId: string,
+  modelsBookingChangeStartRequest: ModelsBookingChangeStartRequest,
+  options?: RequestInit,
 ): Promise<updateUserBookingCurrentResponse> => {
-	return lasiusFetch<updateUserBookingCurrentResponse>(
-		getUpdateUserBookingCurrentUrl(orgId, bookingId),
-		{
-			...options,
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json', ...options?.headers },
-			body: JSON.stringify(modelsBookingChangeStartRequest),
-		},
-	)
+  return lasiusFetch<updateUserBookingCurrentResponse>(
+    getUpdateUserBookingCurrentUrl(orgId, bookingId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(modelsBookingChangeStartRequest),
+    },
+  )
 }
 
 /**
  * @summary Remove a booking by organisation and booking id for the current user
  */
 export type deleteUserBookingResponse200 = {
-	data: void
-	status: 200
+  data: void
+  status: 200
 }
 
 export type deleteUserBookingResponseSuccess = deleteUserBookingResponse200 & {
-	headers: Headers
+  headers: Headers
 }
 export type deleteUserBookingResponse = deleteUserBookingResponseSuccess
 
 export const getDeleteUserBookingUrl = (orgId: string, bookingId: string) => {
-	return `/user-bookings/organisations/${orgId}/bookings/${bookingId}`
+  return `/user-bookings/organisations/${orgId}/bookings/${bookingId}`
 }
 
 export const deleteUserBooking = async (
-	orgId: string,
-	bookingId: string,
-	options?: RequestInit,
+  orgId: string,
+  bookingId: string,
+  options?: RequestInit,
 ): Promise<deleteUserBookingResponse> => {
-	return lasiusFetch<deleteUserBookingResponse>(
-		getDeleteUserBookingUrl(orgId, bookingId),
-		{
-			...options,
-			method: 'DELETE',
-		},
-	)
+  return lasiusFetch<deleteUserBookingResponse>(
+    getDeleteUserBookingUrl(orgId, bookingId),
+    {
+      ...options,
+      method: 'DELETE',
+    },
+  )
 }
 
 /**
  * @summary Change a booking by organisation for the current user
  */
 export type updateUserBookingResponse200 = {
-	data: void
-	status: 200
+  data: void
+  status: 200
 }
 
 export type updateUserBookingResponseSuccess = updateUserBookingResponse200 & {
-	headers: Headers
+  headers: Headers
 }
 export type updateUserBookingResponse = updateUserBookingResponseSuccess
 
 export const getUpdateUserBookingUrl = (orgId: string, bookingId: string) => {
-	return `/user-bookings/organisations/${orgId}/bookings/${bookingId}`
+  return `/user-bookings/organisations/${orgId}/bookings/${bookingId}`
 }
 
 export const updateUserBooking = async (
-	orgId: string,
-	bookingId: string,
-	modelsEditBookingRequest: ModelsEditBookingRequest,
-	options?: RequestInit,
+  orgId: string,
+  bookingId: string,
+  modelsEditBookingRequest: ModelsEditBookingRequest,
+  options?: RequestInit,
 ): Promise<updateUserBookingResponse> => {
-	return lasiusFetch<updateUserBookingResponse>(
-		getUpdateUserBookingUrl(orgId, bookingId),
-		{
-			...options,
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json', ...options?.headers },
-			body: JSON.stringify(modelsEditBookingRequest),
-		},
-	)
+  return lasiusFetch<updateUserBookingResponse>(
+    getUpdateUserBookingUrl(orgId, bookingId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(modelsEditBookingRequest),
+    },
+  )
 }
 
 /**
  * @summary Create a booking by organisation for the current user
  */
 export type addUserBookingByOrganisationResponse200 = {
-	data: void
-	status: 200
+  data: void
+  status: 200
 }
 
 export type addUserBookingByOrganisationResponseSuccess =
-	addUserBookingByOrganisationResponse200 & {
-		headers: Headers
-	}
+  addUserBookingByOrganisationResponse200 & {
+    headers: Headers
+  }
 export type addUserBookingByOrganisationResponse =
-	addUserBookingByOrganisationResponseSuccess
+  addUserBookingByOrganisationResponseSuccess
 
 export const getAddUserBookingByOrganisationUrl = (orgId: string) => {
-	return `/user-bookings/organisations/${orgId}/bookings`
+  return `/user-bookings/organisations/${orgId}/bookings`
 }
 
 export const addUserBookingByOrganisation = async (
-	orgId: string,
-	modelsAddBookingRequest: ModelsAddBookingRequest,
-	options?: RequestInit,
+  orgId: string,
+  modelsAddBookingRequest: ModelsAddBookingRequest,
+  options?: RequestInit,
 ): Promise<addUserBookingByOrganisationResponse> => {
-	return lasiusFetch<addUserBookingByOrganisationResponse>(
-		getAddUserBookingByOrganisationUrl(orgId),
-		{
-			...options,
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json', ...options?.headers },
-			body: JSON.stringify(modelsAddBookingRequest),
-		},
-	)
+  return lasiusFetch<addUserBookingByOrganisationResponse>(
+    getAddUserBookingByOrganisationUrl(orgId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(modelsAddBookingRequest),
+    },
+  )
 }
 
 /**
  * @summary Get current user's booking history for selected organisation
  */
 export type getUserBookingListByOrganisationResponse200 = {
-	data: ModelsBooking[]
-	status: 200
+  data: ModelsBooking[]
+  status: 200
 }
 
 export type getUserBookingListByOrganisationResponseSuccess =
-	getUserBookingListByOrganisationResponse200 & {
-		headers: Headers
-	}
+  getUserBookingListByOrganisationResponse200 & {
+    headers: Headers
+  }
 export type getUserBookingListByOrganisationResponse =
-	getUserBookingListByOrganisationResponseSuccess
+  getUserBookingListByOrganisationResponseSuccess
 
 export const getGetUserBookingListByOrganisationUrl = (
-	orgId: string,
-	params: GetUserBookingListByOrganisationParams,
+  orgId: string,
+  params: GetUserBookingListByOrganisationParams,
 ) => {
-	const normalizedParams = new URLSearchParams()
+  const normalizedParams = new URLSearchParams()
 
-	Object.entries(params || {}).forEach(([key, value]) => {
-		if (value !== undefined) {
-			normalizedParams.append(key, value === null ? 'null' : value.toString())
-		}
-	})
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  })
 
-	const stringifiedParams = normalizedParams.toString()
+  const stringifiedParams = normalizedParams.toString()
 
-	return stringifiedParams.length > 0
-		? `/user-bookings/organisations/${orgId}/bookings/history?${stringifiedParams}`
-		: `/user-bookings/organisations/${orgId}/bookings/history`
+  return stringifiedParams.length > 0
+    ? `/user-bookings/organisations/${orgId}/bookings/history?${stringifiedParams}`
+    : `/user-bookings/organisations/${orgId}/bookings/history`
 }
 
 export const getUserBookingListByOrganisation = async (
-	orgId: string,
-	params: GetUserBookingListByOrganisationParams,
-	options?: RequestInit,
+  orgId: string,
+  params: GetUserBookingListByOrganisationParams,
+  options?: RequestInit,
 ): Promise<getUserBookingListByOrganisationResponse> => {
-	return lasiusFetch<getUserBookingListByOrganisationResponse>(
-		getGetUserBookingListByOrganisationUrl(orgId, params),
-		{
-			...options,
-			method: 'GET',
-		},
-	)
+  return lasiusFetch<getUserBookingListByOrganisationResponse>(
+    getGetUserBookingListByOrganisationUrl(orgId, params),
+    {
+      ...options,
+      method: 'GET',
+    },
+  )
 }
 
 /**
  * @summary Get aggregated stats for current user in selected organisation
  */
 export type getUserBookingAggregatedStatsByOrganisationResponse200 = {
-	data: ModelsBookingStats[]
-	status: 200
+  data: ModelsBookingStats[]
+  status: 200
 }
 
 export type getUserBookingAggregatedStatsByOrganisationResponseSuccess =
-	getUserBookingAggregatedStatsByOrganisationResponse200 & {
-		headers: Headers
-	}
+  getUserBookingAggregatedStatsByOrganisationResponse200 & {
+    headers: Headers
+  }
 export type getUserBookingAggregatedStatsByOrganisationResponse =
-	getUserBookingAggregatedStatsByOrganisationResponseSuccess
+  getUserBookingAggregatedStatsByOrganisationResponseSuccess
 
 export const getGetUserBookingAggregatedStatsByOrganisationUrl = (
-	orgId: string,
-	params: GetUserBookingAggregatedStatsByOrganisationParams,
+  orgId: string,
+  params: GetUserBookingAggregatedStatsByOrganisationParams,
 ) => {
-	const normalizedParams = new URLSearchParams()
+  const normalizedParams = new URLSearchParams()
 
-	Object.entries(params || {}).forEach(([key, value]) => {
-		if (value !== undefined) {
-			normalizedParams.append(key, value === null ? 'null' : value.toString())
-		}
-	})
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  })
 
-	const stringifiedParams = normalizedParams.toString()
+  const stringifiedParams = normalizedParams.toString()
 
-	return stringifiedParams.length > 0
-		? `/user-bookings/organisations/${orgId}/bookings/stats/aggregated?${stringifiedParams}`
-		: `/user-bookings/organisations/${orgId}/bookings/stats/aggregated`
+  return stringifiedParams.length > 0
+    ? `/user-bookings/organisations/${orgId}/bookings/stats/aggregated?${stringifiedParams}`
+    : `/user-bookings/organisations/${orgId}/bookings/stats/aggregated`
 }
 
 export const getUserBookingAggregatedStatsByOrganisation = async (
-	orgId: string,
-	params: GetUserBookingAggregatedStatsByOrganisationParams,
-	options?: RequestInit,
+  orgId: string,
+  params: GetUserBookingAggregatedStatsByOrganisationParams,
+  options?: RequestInit,
 ): Promise<getUserBookingAggregatedStatsByOrganisationResponse> => {
-	return lasiusFetch<getUserBookingAggregatedStatsByOrganisationResponse>(
-		getGetUserBookingAggregatedStatsByOrganisationUrl(orgId, params),
-		{
-			...options,
-			method: 'GET',
-		},
-	)
+  return lasiusFetch<getUserBookingAggregatedStatsByOrganisationResponse>(
+    getGetUserBookingAggregatedStatsByOrganisationUrl(orgId, params),
+    {
+      ...options,
+      method: 'GET',
+    },
+  )
 }
 
 /**
  * @summary Get current user's currently running booking
  */
 export type getUserBookingCurrentResponse200 = {
-	data: ModelsCurrentUserTimeBooking
-	status: 200
+  data: ModelsCurrentUserTimeBooking
+  status: 200
 }
 
 export type getUserBookingCurrentResponseSuccess =
-	getUserBookingCurrentResponse200 & {
-		headers: Headers
-	}
+  getUserBookingCurrentResponse200 & {
+    headers: Headers
+  }
 export type getUserBookingCurrentResponse = getUserBookingCurrentResponseSuccess
 
 export const getGetUserBookingCurrentUrl = () => {
-	return `/user-bookings/current`
+  return `/user-bookings/current`
 }
 
 export const getUserBookingCurrent = async (
-	options?: RequestInit,
+  options?: RequestInit,
 ): Promise<getUserBookingCurrentResponse> => {
-	return lasiusFetch<getUserBookingCurrentResponse>(
-		getGetUserBookingCurrentUrl(),
-		{
-			...options,
-			method: 'GET',
-		},
-	)
+  return lasiusFetch<getUserBookingCurrentResponse>(
+    getGetUserBookingCurrentUrl(),
+    {
+      ...options,
+      method: 'GET',
+    },
+  )
 }
 
 /**
  * @summary Get currently running bookings of members in selected organisation
  */
 export type getUserBookingCurrentListByOrganisationResponse200 = {
-	data: ModelsCurrentOrganisationTimeBookings
-	status: 200
+  data: ModelsCurrentOrganisationTimeBookings
+  status: 200
 }
 
 export type getUserBookingCurrentListByOrganisationResponseSuccess =
-	getUserBookingCurrentListByOrganisationResponse200 & {
-		headers: Headers
-	}
+  getUserBookingCurrentListByOrganisationResponse200 & {
+    headers: Headers
+  }
 export type getUserBookingCurrentListByOrganisationResponse =
-	getUserBookingCurrentListByOrganisationResponseSuccess
+  getUserBookingCurrentListByOrganisationResponseSuccess
 
 export const getGetUserBookingCurrentListByOrganisationUrl = (
-	orgId: string,
+  orgId: string,
 ) => {
-	return `/user-bookings/organisations/${orgId}/current`
+  return `/user-bookings/organisations/${orgId}/current`
 }
 
 export const getUserBookingCurrentListByOrganisation = async (
-	orgId: string,
-	options?: RequestInit,
+  orgId: string,
+  options?: RequestInit,
 ): Promise<getUserBookingCurrentListByOrganisationResponse> => {
-	return lasiusFetch<getUserBookingCurrentListByOrganisationResponse>(
-		getGetUserBookingCurrentListByOrganisationUrl(orgId),
-		{
-			...options,
-			method: 'GET',
-		},
-	)
+  return lasiusFetch<getUserBookingCurrentListByOrganisationResponse>(
+    getGetUserBookingCurrentListByOrganisationUrl(orgId),
+    {
+      ...options,
+      method: 'GET',
+    },
+  )
 }
 
 /**
  * @summary Get latest bookings of members in selected organisation
  */
 export type getUserBookingLatestListByOrganisationResponse200 = {
-	data: void
-	status: 200
+  data: void
+  status: 200
 }
 
 export type getUserBookingLatestListByOrganisationResponseSuccess =
-	getUserBookingLatestListByOrganisationResponse200 & {
-		headers: Headers
-	}
+  getUserBookingLatestListByOrganisationResponse200 & {
+    headers: Headers
+  }
 export type getUserBookingLatestListByOrganisationResponse =
-	getUserBookingLatestListByOrganisationResponseSuccess
+  getUserBookingLatestListByOrganisationResponseSuccess
 
 export const getGetUserBookingLatestListByOrganisationUrl = (
-	orgId: string,
-	params?: GetUserBookingLatestListByOrganisationParams,
+  orgId: string,
+  params?: GetUserBookingLatestListByOrganisationParams,
 ) => {
-	const normalizedParams = new URLSearchParams()
+  const normalizedParams = new URLSearchParams()
 
-	Object.entries(params || {}).forEach(([key, value]) => {
-		if (value !== undefined) {
-			normalizedParams.append(key, value === null ? 'null' : value.toString())
-		}
-	})
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  })
 
-	const stringifiedParams = normalizedParams.toString()
+  const stringifiedParams = normalizedParams.toString()
 
-	return stringifiedParams.length > 0
-		? `/user-bookings/organisations/${orgId}/latest?${stringifiedParams}`
-		: `/user-bookings/organisations/${orgId}/latest`
+  return stringifiedParams.length > 0
+    ? `/user-bookings/organisations/${orgId}/latest?${stringifiedParams}`
+    : `/user-bookings/organisations/${orgId}/latest`
 }
 
 export const getUserBookingLatestListByOrganisation = async (
-	orgId: string,
-	params?: GetUserBookingLatestListByOrganisationParams,
-	options?: RequestInit,
+  orgId: string,
+  params?: GetUserBookingLatestListByOrganisationParams,
+  options?: RequestInit,
 ): Promise<getUserBookingLatestListByOrganisationResponse> => {
-	return lasiusFetch<getUserBookingLatestListByOrganisationResponse>(
-		getGetUserBookingLatestListByOrganisationUrl(orgId, params),
-		{
-			...options,
-			method: 'GET',
-		},
-	)
+  return lasiusFetch<getUserBookingLatestListByOrganisationResponse>(
+    getGetUserBookingLatestListByOrganisationUrl(orgId, params),
+    {
+      ...options,
+      method: 'GET',
+    },
+  )
 }

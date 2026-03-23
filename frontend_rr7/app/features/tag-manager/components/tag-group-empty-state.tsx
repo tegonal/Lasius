@@ -20,21 +20,16 @@
 import { Tags } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+import { EmptyState } from '~/components/ui/data-display/empty-state'
 
 export const TagGroupEmptyState = () => {
-	const { t } = useTranslation('common')
-
-	return (
-		<div className="flex h-full w-full flex-col items-center justify-center py-8">
-			<div className="text-base-content/50 flex flex-col items-center justify-center gap-2 text-sm">
-				<LucideIcon icon={Tags} size={32} />
-				<div className="text-center">
-					{t('tags.noTagGroups', {
-						defaultValue: 'No tag groups defined yet',
-					})}
-				</div>
-			</div>
-		</div>
-	)
+  const { t } = useTranslation('common')
+  return (
+    <EmptyState
+      icon={Tags}
+      label={t('tags.noTagGroups', {
+        defaultValue: 'No tag groups defined yet',
+      })}
+    />
+  )
 }

@@ -22,29 +22,29 @@ import { describe, expect, it } from 'vitest'
 import { routeToHelpFile } from './route-to-help-file'
 
 describe('routeToHelpFile', () => {
-	it('maps root to user-home', () => {
-		expect(routeToHelpFile('/')).toBe('user-home')
-	})
+  it('maps root to user-home', () => {
+    expect(routeToHelpFile('/')).toBe('user-home')
+  })
 
-	it('maps /dashboard to user-dashboard', () => {
-		expect(routeToHelpFile('/dashboard')).toBe('user-dashboard')
-	})
+  it('maps /dashboard to user-dashboard', () => {
+    expect(routeToHelpFile('/dashboard')).toBe('user-dashboard')
+  })
 
-	it('maps /login to login', () => {
-		expect(routeToHelpFile('/login')).toBe('login')
-	})
+  it('maps /login to login', () => {
+    expect(routeToHelpFile('/login')).toBe('login')
+  })
 
-	it('falls back to hyphenated path for unmapped routes', () => {
-		expect(routeToHelpFile('/organisation/projects')).toBe(
-			'organisation-projects',
-		)
-	})
+  it('falls back to hyphenated path for unmapped routes', () => {
+    expect(routeToHelpFile('/organisation/projects')).toBe(
+      'organisation-projects',
+    )
+  })
 
-	it('handles dynamic segments', () => {
-		expect(routeToHelpFile('/settings/:id')).toBe('settings-dynamic')
-	})
+  it('handles dynamic segments', () => {
+    expect(routeToHelpFile('/settings/:id')).toBe('settings-dynamic')
+  })
 
-	it('handles empty string as user-home', () => {
-		expect(routeToHelpFile('')).toBe('user-home')
-	})
+  it('handles empty string as user-home', () => {
+    expect(routeToHelpFile('')).toBe('user-home')
+  })
 })

@@ -22,79 +22,79 @@ import { type RefObject, useEffect, useState } from 'react'
 import { cn } from '~/lib/utils/cn'
 
 const radiusClasses = {
-	all: 'rounded-md',
-	bottom: 'rounded-b-md',
-	left: 'rounded-l-md',
-	right: 'rounded-r-md',
-	top: 'rounded-t-md',
+  all: 'rounded-md',
+  bottom: 'rounded-b-md',
+  left: 'rounded-l-md',
+  right: 'rounded-r-md',
+  top: 'rounded-t-md',
 } as const
 
 export const SlidingIndicator = ({
-	className,
-	itemRefs,
-	radiusOn = 'all',
-	selectedIndex,
+  className,
+  itemRefs,
+  radiusOn = 'all',
+  selectedIndex,
 }: {
-	className?: string
-	itemRefs: RefObject<(HTMLElement | null)[]>
-	radiusOn?: keyof typeof radiusClasses
-	selectedIndex: number
+  className?: string
+  itemRefs: RefObject<(HTMLElement | null)[]>
+  radiusOn?: keyof typeof radiusClasses
+  selectedIndex: number
 }) => {
-	const [indicatorStyle, setIndicatorStyle] = useState({
-		height: 0,
-		left: 0,
-		top: 0,
-		width: 0,
-	})
-	const [isMounted, setIsMounted] = useState(false)
-	const [isPositioned, setIsPositioned] = useState(false)
+  const [indicatorStyle, setIndicatorStyle] = useState({
+    height: 0,
+    left: 0,
+    top: 0,
+    width: 0,
+  })
+  const [isMounted, setIsMounted] = useState(false)
+  const [isPositioned, setIsPositioned] = useState(false)
 
-	useEffect(() => {
-		if (selectedIndex !== -1) {
-			requestAnimationFrame(() => {
-				const element = itemRefs.current[selectedIndex]
-				if (element) {
-					const rect = element.getBoundingClientRect()
-					const containerRect = element.parentElement!.getBoundingClientRect()
-					setIndicatorStyle({
-						height: rect.height,
-						left: rect.left - containerRect.left,
-						top: rect.top - containerRect.top,
-						width: rect.width,
-					})
-					if (!isPositioned) {
-						setIsPositioned(true)
-						// Allow the browser to paint at opacity-0 before fading in
-						setTimeout(() => {
-							setIsMounted(true)
-						}, 50)
-					}
-				}
-			})
-		}
-	}, [selectedIndex, itemRefs, isPositioned])
+  useEffect(() => {
+    if (selectedIndex !== -1) {
+      requestAnimationFrame(() => {
+        const element = itemRefs.current[selectedIndex]
+        if (element) {
+          const rect = element.getBoundingClientRect()
+          const containerRect = element.parentElement!.getBoundingClientRect()
+          setIndicatorStyle({
+            height: rect.height,
+            left: rect.left - containerRect.left,
+            top: rect.top - containerRect.top,
+            width: rect.width,
+          })
+          if (!isPositioned) {
+            setIsPositioned(true)
+            // Allow the browser to paint at opacity-0 before fading in
+            setTimeout(() => {
+              setIsMounted(true)
+            }, 50)
+          }
+        }
+      })
+    }
+  }, [selectedIndex, itemRefs, isPositioned])
 
-	if (!isPositioned) return null
+  if (!isPositioned) return null
 
-	return (
-		<div className="pointer-events-none absolute inset-0">
-			<div
-				className={cn(
-					'bg-red-gradient absolute',
-					radiusClasses[radiusOn],
-					className,
-				)}
-				style={{
-					height: `${indicatorStyle.height}px`,
-					left: `${indicatorStyle.left}px`,
-					opacity: isMounted ? 1 : 0,
-					top: `${indicatorStyle.top}px`,
-					transition:
-						'left 200ms ease-out, top 200ms ease-out, width 200ms ease-out, height 200ms ease-out, opacity 300ms ease-out',
-					width: `${indicatorStyle.width}px`,
-					willChange: 'left, top, width, height, opacity',
-				}}
-			/>
-		</div>
-	)
+  return (
+    <div className="pointer-events-none absolute inset-0">
+      <div
+        className={cn(
+          'bg-red-gradient absolute',
+          radiusClasses[radiusOn],
+          className,
+        )}
+        style={{
+          height: `${indicatorStyle.height}px`,
+          left: `${indicatorStyle.left}px`,
+          opacity: isMounted ? 1 : 0,
+          top: `${indicatorStyle.top}px`,
+          transition:
+            'left 200ms ease-out, top 200ms ease-out, width 200ms ease-out, height 200ms ease-out, opacity 300ms ease-out',
+          width: `${indicatorStyle.width}px`,
+          willChange: 'left, top, width, height, opacity',
+        }}
+      />
+    </div>
+  )
 }

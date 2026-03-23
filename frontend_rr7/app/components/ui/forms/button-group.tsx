@@ -20,8 +20,8 @@
 import { cn } from '~/lib/utils/cn'
 
 interface ButtonGroupProps {
-	children: React.ReactNode
-	className?: string
+  children: React.ReactNode
+  className?: string
 }
 
 /**
@@ -29,7 +29,7 @@ interface ButtonGroupProps {
  * Should be placed as the last FormElement in a form
  */
 export const ButtonGroup = ({ children, className }: ButtonGroupProps) => {
-	return (
-		<div className={cn('fieldset mt-2 gap-4 p-2', className)}>{children}</div>
-	)
+  return (
+    <div className={cn('fieldset mt-2 gap-4 p-2', className)}>{children}</div>
+  )
 }

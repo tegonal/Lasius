@@ -17,12 +17,13 @@
  *
  */
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import { useLoaderData } from 'react-router'
 
 import {
-	ColumnCenter,
-	ColumnRight,
-	innerGridClasses,
+  ColumnCenter,
+  ColumnRight,
+  innerGridClasses,
 } from '~/components/ui/layouts/layout-columns'
 import { ScrollArea } from '~/components/ui/layouts/scroll-area'
 import { Modal } from '~/components/ui/overlays/modal'
@@ -31,41 +32,62 @@ import { MyProjectsRightColumn } from '~/features/projects/components/my-project
 import { MyProjectsStats } from '~/features/projects/components/my-projects-stats'
 import { ProjectAddUpdateForm } from '~/features/projects/components/project-add-update-form'
 import { useProjects } from '~/features/projects/hooks/use-projects'
+import { type UserProjectWithActivity } from '~/types/common'
 
 export const MyProjectsLayout = () => {
-	const [isCreateOpen, setIsCreateOpen] = useState(false)
-	const [searchTerm, setSearchTerm] = useState('')
-	const { userProjects } = useProjects()
+  const { lastActivityDates } = useLoaderData<{
+    lastActivityDates: Record<string, null | string>
+  }>()
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const { userProjects } = useProjects()
 
-	const handleCreateClose = () => setIsCreateOpen(false)
-	const handleCreateOpen = () => setIsCreateOpen(true)
+  const projectsWithActivity: UserProjectWithActivity[] = useMemo(
+    () =>
+      userProjects().map((p) => ({
+        ...p,
+        lastActivityDate: lastActivityDates[p.projectReference.id] ?? null,
+      })),
+    [userProjects, lastActivityDates],
+  )
 
-	return (
-		<div className={innerGridClasses}>
-			<ColumnCenter>
-				<ScrollArea className="bg-base-100">
-					<MyProjectsStats onCreateProject={handleCreateOpen} />
-					<div className="pt-4">
-						<MyProjectsList searchTerm={searchTerm} statusFilter="both" />
-					</div>
-				</ScrollArea>
-			</ColumnCenter>
-			<ColumnRight>
-				<ScrollArea className="bg-base-200 rounded-tr-lg">
-					<MyProjectsRightColumn
-						onSearchChange={setSearchTerm}
-						projectCount={userProjects().length}
-						searchTerm={searchTerm}
-					/>
-				</ScrollArea>
-			</ColumnRight>
-			<Modal onClose={handleCreateClose} open={isCreateOpen}>
-				<ProjectAddUpdateForm
-					mode="add"
-					onCancel={handleCreateClose}
-					onSave={handleCreateClose}
-				/>
-			</Modal>
-		</div>
-	)
+  const handleCreateClose = () => setIsCreateOpen(false)
+  const handleCreateOpen = () => setIsCreateOpen(true)
+
+  return (
+    <div className={innerGridClasses}>
+      <ColumnCenter>
+        <div className="flex h-full flex-col overflow-hidden">
+          <div className="flex-shrink-0">
+            <MyProjectsStats onCreateProject={handleCreateOpen} />
+          </div>
+          <ScrollArea className="min-h-0 flex-1">
+            <div className="pt-4">
+              <MyProjectsList
+                projects={projectsWithActivity}
+                searchTerm={searchTerm}
+                statusFilter="both"
+              />
+            </div>
+          </ScrollArea>
+        </div>
+      </ColumnCenter>
+      <ColumnRight>
+        <ScrollArea className="h-full">
+          <MyProjectsRightColumn
+            onSearchChange={setSearchTerm}
+            projectCount={projectsWithActivity.length}
+            searchTerm={searchTerm}
+          />
+        </ScrollArea>
+      </ColumnRight>
+      <Modal onClose={handleCreateClose} open={isCreateOpen}>
+        <ProjectAddUpdateForm
+          mode="add"
+          onCancel={handleCreateClose}
+          onSave={handleCreateClose}
+        />
+      </Modal>
+    </div>
+  )
 }

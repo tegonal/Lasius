@@ -54,7 +54,7 @@ export TERM=xterm-256color
 
 # Create tmux session with backend in first pane
 tmux new-session -d -s "$SESSION" -c "$ROOT/backend" \
-  "set -a; [ -f $ROOT/frontend/.env.local ] && . $ROOT/frontend/.env.local; set +a; sbt run -Dconfig.resource=dev-large.conf; read -p 'Press Enter to close...'"
+  "set -a; [ -f $ROOT/frontend/.env.local ] && . $ROOT/frontend/.env.local; set +a; LASIUS_CLEAN_DATABASE_ON_STARTUP=false sbt run -Dconfig.resource=dev-large.conf; read -p 'Press Enter to close...'"
 
 # Split: frontend RR7 (waits for backend via port check)
 tmux split-window -t "$SESSION" -v -c "$ROOT/frontend_rr7" \

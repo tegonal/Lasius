@@ -24,18 +24,18 @@
  * @see http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/
  */
 function hashCode(str: string | undefined) {
-	let hash = 0
-	if (!str) {
-		return hash
-	}
-	for (let i = 0, len = str.length; i < len; i += 1) {
-		const chr = str.charCodeAt(i)
+  let hash = 0
+  if (!str) {
+    return hash
+  }
+  for (let i = 0, len = str.length; i < len; i += 1) {
+    const chr = str.charCodeAt(i)
 
-		hash = (hash << 5) - hash + chr
+    hash = (hash << 5) - hash + chr
 
-		hash |= 0 // Convert to 32bit integer
-	}
-	return hash
+    hash |= 0 // Convert to 32bit integer
+  }
+  return hash
 }
 
 /**
@@ -44,7 +44,7 @@ function hashCode(str: string | undefined) {
  * @returns A string representation of the 32-bit hash.
  */
 export const stringHash = (anything: unknown): string => {
-	return hashCode(
-		JSON.stringify(anything, Object.keys(anything as object).sort()),
-	).toString()
+  return hashCode(
+    JSON.stringify(anything, Object.keys(anything as object).sort()),
+  ).toString()
 }

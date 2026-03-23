@@ -39,76 +39,76 @@ import { type ModelsBookingStub } from '~/services/api/lasius'
 import { useDeleteFavoriteBooking } from '~/services/api/lasius-hooks/user-favorites/user-favorites'
 
 type Props = {
-	item: ModelsBookingStub
-	selectedOrgId: string
+  item: ModelsBookingStub
+  selectedOrgId: string
 }
 
 export const FavoriteItemContext = ({ item, selectedOrgId }: Props) => {
-	const { t } = useTranslation('common')
-	const deleteFavoriteApi = useDeleteFavoriteBooking()
-	const stopAndStart = useStopAndStart()
+  const { t } = useTranslation('common')
+  const deleteFavoriteApi = useDeleteFavoriteBooking()
+  const stopAndStart = useStopAndStart()
 
-	const itemHash = stringHash(item)
-	const { currentOpenContextMenuId, handleCloseAll } = useContextMenu()
+  const itemHash = stringHash(item)
+  const { currentOpenContextMenuId, handleCloseAll } = useContextMenu()
 
-	const deleteFavorite = () => {
-		const {
-			projectReference: { id: projectId },
-			tags,
-		} = item
-		deleteFavoriteApi.submit({
-			body: { projectId, tags },
-			orgId: selectedOrgId,
-		})
-		handleCloseAll()
-	}
+  const deleteFavorite = () => {
+    const {
+      projectReference: { id: projectId },
+      tags,
+    } = item
+    deleteFavoriteApi.submit({
+      body: { projectId, tags },
+      orgId: selectedOrgId,
+    })
+    handleCloseAll()
+  }
 
-	const handleStart = () => {
-		stopAndStart.submit({
-			orgId: selectedOrgId,
-			projectId: item.projectReference.id,
-			start: formatISOLocale(
-				roundToNearestMinutes(new Date(), { roundingMethod: 'floor' }),
-			),
-			tags: item.tags,
-		})
-		handleCloseAll()
-	}
+  const handleStart = () => {
+    stopAndStart.submit({
+      orgId: selectedOrgId,
+      projectId: item.projectReference.id,
+      start: formatISOLocale(
+        roundToNearestMinutes(new Date(), { roundingMethod: 'floor' }),
+      ),
+      tags: item.tags,
+    })
+    handleCloseAll()
+  }
 
-	return (
-		<ContextBody variant="compact">
-			<ContextButtonOpen data-testid="favorite-ctx-open-btn" hash={itemHash} />
-			{currentOpenContextMenuId === itemHash && (
-				<ContextAnimatePresence variant="compact">
-					<ContextBar className="-mr-3">
-						<ContextButtonStartBooking
-							data-testid="favorite-ctx-start-btn"
-							item={item}
-							onStart={handleStart}
-							variant="compact"
-						/>
-						<ContextButtonWrapper variant="compact">
-							<Button
-								aria-label={t('favorites.actions.delete', {
-									defaultValue: 'Delete favorite',
-								})}
-								data-testid="favorite-ctx-delete-btn"
-								fullWidth={false}
-								onClick={deleteFavorite}
-								shape="circle"
-								title={t('favorites.actions.delete', {
-									defaultValue: 'Delete favorite',
-								})}
-								variant="contextIcon"
-							>
-								<LucideIcon icon={Trash2} size={24} />
-							</Button>
-						</ContextButtonWrapper>
-						<ContextBarDivider />
-						<ContextButtonClose variant="compact" />
-					</ContextBar>
-				</ContextAnimatePresence>
-			)}
-		</ContextBody>
-	)
+  return (
+    <ContextBody variant="compact">
+      <ContextButtonOpen data-testid="favorite-ctx-open-btn" hash={itemHash} />
+      {currentOpenContextMenuId === itemHash && (
+        <ContextAnimatePresence variant="compact">
+          <ContextBar className="-mr-3">
+            <ContextButtonStartBooking
+              data-testid="favorite-ctx-start-btn"
+              item={item}
+              onStart={handleStart}
+              variant="compact"
+            />
+            <ContextButtonWrapper variant="compact">
+              <Button
+                aria-label={t('favorites.actions.delete', {
+                  defaultValue: 'Delete favorite',
+                })}
+                data-testid="favorite-ctx-delete-btn"
+                fullWidth={false}
+                onClick={deleteFavorite}
+                shape="circle"
+                title={t('favorites.actions.delete', {
+                  defaultValue: 'Delete favorite',
+                })}
+                variant="contextIcon"
+              >
+                <LucideIcon icon={Trash2} size={24} />
+              </Button>
+            </ContextButtonWrapper>
+            <ContextBarDivider />
+            <ContextButtonClose variant="compact" />
+          </ContextBar>
+        </ContextAnimatePresence>
+      )}
+    </ContextBody>
+  )
 }

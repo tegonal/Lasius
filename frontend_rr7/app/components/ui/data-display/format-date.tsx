@@ -18,35 +18,25 @@
  */
 
 import { format } from 'date-fns'
-import { de, enUS, es, fr, it, type Locale } from 'date-fns/locale'
 import { memo } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { getDateLocale } from '~/lib/utils/date-locale'
 import { formatISOLocale, type IsoDateString } from '~/lib/utils/dates'
-
-// ─── Locale map ──────────────────────────────────────────────────────────────
-
-const dateLocales: Record<string, Locale> = {
-	de,
-	en: enUS,
-	es,
-	fr,
-	it,
-}
 
 // ─── Format map ──────────────────────────────────────────────────────────────
 
 const dateFormats = {
-	day: 'd',
-	dayNameLong: 'eeee',
-	dayNameShort: 'eeeeee',
-	dayPadded: 'dd',
-	fullDateLong: 'PPpp',
-	fullDateShort: 'P',
-	monthNameLong: 'MMMM',
-	monthNameShort: 'MMM',
-	time: 'HH:mm',
-	year: 'yyyy',
+  day: 'd',
+  dayNameLong: 'eeee',
+  dayNameShort: 'eeeeee',
+  dayPadded: 'dd',
+  fullDateLong: 'PPpp',
+  fullDateShort: 'P',
+  monthNameLong: 'MMMM',
+  monthNameShort: 'MMM',
+  time: 'HH:mm',
+  year: 'yyyy',
 } as const
 
 export type DateFormatKey = keyof typeof dateFormats
@@ -54,17 +44,17 @@ export type DateFormatKey = keyof typeof dateFormats
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export const FormatDate = memo(function FormatDate({
-	date,
-	format: formatKey,
+  date,
+  format: formatKey,
 }: {
-	date: Date | IsoDateString
-	format: DateFormatKey
+  date: Date | IsoDateString
+  format: DateFormatKey
 }) {
-	const { i18n } = useTranslation('common')
-	const locale = dateLocales[i18n.language] ?? dateLocales['en']
-	const dateStr = typeof date === 'string' ? date : formatISOLocale(date)
-	const formatted = format(new Date(dateStr), dateFormats[formatKey], {
-		locale,
-	})
-	return <>{formatted}</>
+  const { i18n } = useTranslation('common')
+  const locale = getDateLocale(i18n.language)
+  const dateStr = typeof date === 'string' ? date : formatISOLocale(date)
+  const formatted = format(new Date(dateStr), dateFormats[formatKey], {
+    locale,
+  })
+  return <>{formatted}</>
 })

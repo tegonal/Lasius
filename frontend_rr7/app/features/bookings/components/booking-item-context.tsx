@@ -27,8 +27,8 @@ import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { Modal } from '~/components/ui/overlays/modal'
 import { BookingAddUpdateForm } from '~/features/bookings/components/booking-add-update-form'
 import {
-	useHomeLoaderData,
-	useSelectedOrgId,
+  useHomeLoaderData,
+  useSelectedOrgId,
 } from '~/features/bookings/hooks/use-home-loader-data'
 import { useStopAndStart } from '~/features/bookings/hooks/use-stop-and-start'
 import { ContextButtonAddFavorite } from '~/features/context-menu/buttons/context-button-add-favorite'
@@ -45,233 +45,233 @@ import { type AugmentedBooking } from '~/lib/api/functions/augment-bookings-list
 import { formatISOLocale } from '~/lib/utils/dates'
 import { type ModelsBooking } from '~/services/api/lasius'
 import {
-	useDeleteUserBooking,
-	useUpdateUserBooking,
+  useDeleteUserBooking,
+  useUpdateUserBooking,
 } from '~/services/api/lasius-hooks/user-bookings/user-bookings'
 import { useAddFavoriteBooking } from '~/services/api/lasius-hooks/user-favorites/user-favorites'
 
 type Props = {
-	item: AugmentedBooking
+  item: AugmentedBooking
 }
 
 const areTimesWithinOneMinute = (
-	time1: Date | string,
-	time2: Date | string,
+  time1: Date | string,
+  time2: Date | string,
 ): boolean => {
-	const d1 = typeof time1 === 'string' ? new Date(time1) : time1
-	const d2 = typeof time2 === 'string' ? new Date(time2) : time2
-	return Math.abs(d1.getTime() - d2.getTime()) <= 60_000
+  const d1 = typeof time1 === 'string' ? new Date(time1) : time1
+  const d2 = typeof time2 === 'string' ? new Date(time2) : time2
+  return Math.abs(d1.getTime() - d2.getTime()) <= 60_000
 }
 
 const useCurrentBookingId = (): string | undefined => {
-	const loaderData = useHomeLoaderData()
-	return loaderData?.currentBooking?.booking?.id
+  const loaderData = useHomeLoaderData()
+  return loaderData?.currentBooking?.booking?.id
 }
 
 const useGetAdjacentBookings = (item: ModelsBooking) => {
-	const loaderData = useHomeLoaderData()
+  const loaderData = useHomeLoaderData()
 
-	const bookings = loaderData?.augmentedBookings ?? []
-	const index = bookings.findIndex((b) => b.id === item.id)
+  const bookings = loaderData?.augmentedBookings ?? []
+  const index = bookings.findIndex((b) => b.id === item.id)
 
-	return {
-		next: index > 0 ? bookings[index - 1] : null,
-		previous: index < bookings.length - 1 ? bookings[index + 1] : null,
-	}
+  return {
+    next: index > 0 ? bookings[index - 1] : null,
+    previous: index < bookings.length - 1 ? bookings[index + 1] : null,
+  }
 }
 
 export const BookingItemContext = ({ item }: Props) => {
-	const { t } = useTranslation('common')
-	const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-	const { currentOpenContextMenuId, handleCloseAll } = useContextMenu()
-	const { next: nextBooking, previous: previousBooking } =
-		useGetAdjacentBookings(item)
-	const selectedOrgId = useSelectedOrgId()
-	const currentBookingId = useCurrentBookingId()
-	const deleteBookingApi = useDeleteUserBooking()
-	const updateBookingApi = useUpdateUserBooking()
-	const addFavoriteApi = useAddFavoriteBooking()
-	const stopAndStartApi = useStopAndStart()
+  const { t } = useTranslation('common')
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const { currentOpenContextMenuId, handleCloseAll } = useContextMenu()
+  const { next: nextBooking, previous: previousBooking } =
+    useGetAdjacentBookings(item)
+  const selectedOrgId = useSelectedOrgId()
+  const currentBookingId = useCurrentBookingId()
+  const deleteBookingApi = useDeleteUserBooking()
+  const updateBookingApi = useUpdateUserBooking()
+  const addFavoriteApi = useAddFavoriteBooking()
+  const stopAndStartApi = useStopAndStart()
 
-	const shouldShowStartAdjustment =
-		previousBooking?.end?.dateTime &&
-		!areTimesWithinOneMinute(item.start.dateTime, previousBooking.end.dateTime)
+  const shouldShowStartAdjustment =
+    previousBooking?.end?.dateTime &&
+    !areTimesWithinOneMinute(item.start.dateTime, previousBooking.end.dateTime)
 
-	const shouldShowEndAdjustment =
-		nextBooking?.start?.dateTime &&
-		item.end &&
-		!areTimesWithinOneMinute(item.end.dateTime, nextBooking.start.dateTime)
+  const shouldShowEndAdjustment =
+    nextBooking?.start?.dateTime &&
+    item.end &&
+    !areTimesWithinOneMinute(item.end.dateTime, nextBooking.start.dateTime)
 
-	const deleteItem = () => {
-		deleteBookingApi.submit({ bookingId: item.id, orgId: selectedOrgId })
-		handleCloseAll()
-	}
+  const deleteItem = () => {
+    deleteBookingApi.submit({ bookingId: item.id, orgId: selectedOrgId })
+    handleCloseAll()
+  }
 
-	const adjustStartToPrevious = () => {
-		if (previousBooking?.end?.dateTime) {
-			updateBookingApi.submit({
-				body: {
-					end: item.end
-						? formatISOLocale(new Date(item.end.dateTime))
-						: undefined,
-					projectId: item.projectReference?.id || '',
-					start: formatISOLocale(new Date(previousBooking.end.dateTime)),
-					tags: item.tags || [],
-				},
-				bookingId: item.id,
-				orgId: selectedOrgId,
-			})
-			handleCloseAll()
-		}
-	}
+  const adjustStartToPrevious = () => {
+    if (previousBooking?.end?.dateTime) {
+      updateBookingApi.submit({
+        body: {
+          end: item.end
+            ? formatISOLocale(new Date(item.end.dateTime))
+            : undefined,
+          projectId: item.projectReference?.id || '',
+          start: formatISOLocale(new Date(previousBooking.end.dateTime)),
+          tags: item.tags || [],
+        },
+        bookingId: item.id,
+        orgId: selectedOrgId,
+      })
+      handleCloseAll()
+    }
+  }
 
-	const adjustEndToNext = () => {
-		if (nextBooking?.start?.dateTime && item.end) {
-			updateBookingApi.submit({
-				body: {
-					end: formatISOLocale(new Date(nextBooking.start.dateTime)),
-					projectId: item.projectReference?.id || '',
-					start: formatISOLocale(new Date(item.start.dateTime)),
-					tags: item.tags || [],
-				},
-				bookingId: item.id,
-				orgId: selectedOrgId,
-			})
-			handleCloseAll()
-		}
-	}
+  const adjustEndToNext = () => {
+    if (nextBooking?.start?.dateTime && item.end) {
+      updateBookingApi.submit({
+        body: {
+          end: formatISOLocale(new Date(nextBooking.start.dateTime)),
+          projectId: item.projectReference?.id || '',
+          start: formatISOLocale(new Date(item.start.dateTime)),
+          tags: item.tags || [],
+        },
+        bookingId: item.id,
+        orgId: selectedOrgId,
+      })
+      handleCloseAll()
+    }
+  }
 
-	const startBooking = () => {
-		const now = roundToNearestMinutes(new Date(), { roundingMethod: 'floor' })
-		stopAndStartApi.submit({
-			currentBookingId,
-			orgId: selectedOrgId,
-			projectId: item.projectReference?.id || '',
-			start: formatISOLocale(now),
-			tags: item.tags || [],
-		})
-		handleCloseAll()
-	}
+  const startBooking = () => {
+    const now = roundToNearestMinutes(new Date(), { roundingMethod: 'floor' })
+    stopAndStartApi.submit({
+      currentBookingId,
+      orgId: selectedOrgId,
+      projectId: item.projectReference?.id || '',
+      start: formatISOLocale(now),
+      tags: item.tags || [],
+    })
+    handleCloseAll()
+  }
 
-	const addFavorite = () => {
-		addFavoriteApi.submit({
-			body: {
-				projectId: item.projectReference?.id || '',
-				tags: item.tags || [],
-			},
-			orgId: selectedOrgId,
-		})
-		handleCloseAll()
-	}
+  const addFavorite = () => {
+    addFavoriteApi.submit({
+      body: {
+        projectId: item.projectReference?.id || '',
+        tags: item.tags || [],
+      },
+      orgId: selectedOrgId,
+    })
+    handleCloseAll()
+  }
 
-	return (
-		<>
-			<ContextBody>
-				<ContextButtonOpen data-testid="booking-ctx-open-btn" hash={item.id} />
-				{currentOpenContextMenuId === item.id && (
-					<ContextAnimatePresence>
-						<ContextBar>
-							<ContextButtonStartBooking
-								data-testid="booking-ctx-start-btn"
-								item={item}
-								onStart={startBooking}
-							/>
-							<ContextButtonWrapper>
-								<Button
-									aria-label={t('bookings.actions.edit', {
-										defaultValue: 'Edit booking',
-									})}
-									data-testid="booking-ctx-edit-btn"
-									fullWidth={false}
-									onClick={() => {
-										setIsEditModalOpen(true)
-										handleCloseAll()
-									}}
-									shape="circle"
-									title={t('bookings.actions.edit', {
-										defaultValue: 'Edit booking',
-									})}
-									variant="contextIcon"
-								>
-									<LucideIcon icon={Pencil} size={24} />
-								</Button>
-							</ContextButtonWrapper>
-							{shouldShowStartAdjustment && (
-								<ContextButtonWrapper>
-									<Button
-										aria-label={t('bookings.actions.adjustStartToPrevious', {
-											defaultValue: 'Adjust start to previous booking',
-										})}
-										data-testid="booking-ctx-adjust-start-btn"
-										fullWidth={false}
-										onClick={adjustStartToPrevious}
-										shape="circle"
-										title={t('bookings.actions.adjustStartToPrevious', {
-											defaultValue: 'Adjust start to previous booking',
-										})}
-										variant="contextIcon"
-									>
-										<LucideIcon icon={ArrowDownToLine} size={24} />
-									</Button>
-								</ContextButtonWrapper>
-							)}
-							{shouldShowEndAdjustment && (
-								<ContextButtonWrapper>
-									<Button
-										aria-label={t('bookings.actions.adjustEndToNext', {
-											defaultValue: 'Adjust end to next booking',
-										})}
-										data-testid="booking-ctx-adjust-end-btn"
-										fullWidth={false}
-										onClick={adjustEndToNext}
-										shape="circle"
-										title={t('bookings.actions.adjustEndToNext', {
-											defaultValue: 'Adjust end to next booking',
-										})}
-										variant="contextIcon"
-									>
-										<LucideIcon icon={ArrowUpToLine} size={24} />
-									</Button>
-								</ContextButtonWrapper>
-							)}
-							<ContextButtonAddFavorite
-								data-testid="booking-ctx-favorite-btn"
-								item={item}
-								onAddFavorite={addFavorite}
-							/>
-							<ContextButtonWrapper>
-								<Button
-									aria-label={t('bookings.actions.delete', {
-										defaultValue: 'Delete booking',
-									})}
-									data-testid="booking-ctx-delete-btn"
-									fullWidth={false}
-									onClick={deleteItem}
-									shape="circle"
-									title={t('bookings.actions.delete', {
-										defaultValue: 'Delete booking',
-									})}
-									variant="contextIcon"
-								>
-									<LucideIcon icon={Trash2} size={24} />
-								</Button>
-							</ContextButtonWrapper>
-							<ContextBarDivider />
-							<ContextButtonClose />
-						</ContextBar>
-					</ContextAnimatePresence>
-				)}
-			</ContextBody>
-			<Modal onClose={() => setIsEditModalOpen(false)} open={isEditModalOpen}>
-				<BookingAddUpdateForm
-					bookingAfter={nextBooking ?? undefined}
-					bookingBefore={previousBooking ?? undefined}
-					itemUpdate={item}
-					mode="update"
-					onClose={() => setIsEditModalOpen(false)}
-					selectedOrgId={selectedOrgId}
-				/>
-			</Modal>
-		</>
-	)
+  return (
+    <>
+      <ContextBody>
+        <ContextButtonOpen data-testid="booking-ctx-open-btn" hash={item.id} />
+        {currentOpenContextMenuId === item.id && (
+          <ContextAnimatePresence>
+            <ContextBar>
+              <ContextButtonStartBooking
+                data-testid="booking-ctx-start-btn"
+                item={item}
+                onStart={startBooking}
+              />
+              <ContextButtonWrapper>
+                <Button
+                  aria-label={t('bookings.actions.edit', {
+                    defaultValue: 'Edit booking',
+                  })}
+                  data-testid="booking-ctx-edit-btn"
+                  fullWidth={false}
+                  onClick={() => {
+                    setIsEditModalOpen(true)
+                    handleCloseAll()
+                  }}
+                  shape="circle"
+                  title={t('bookings.actions.edit', {
+                    defaultValue: 'Edit booking',
+                  })}
+                  variant="contextIcon"
+                >
+                  <LucideIcon icon={Pencil} size={24} />
+                </Button>
+              </ContextButtonWrapper>
+              {shouldShowStartAdjustment && (
+                <ContextButtonWrapper>
+                  <Button
+                    aria-label={t('bookings.actions.adjustStartToPrevious', {
+                      defaultValue: 'Adjust start to previous booking',
+                    })}
+                    data-testid="booking-ctx-adjust-start-btn"
+                    fullWidth={false}
+                    onClick={adjustStartToPrevious}
+                    shape="circle"
+                    title={t('bookings.actions.adjustStartToPrevious', {
+                      defaultValue: 'Adjust start to previous booking',
+                    })}
+                    variant="contextIcon"
+                  >
+                    <LucideIcon icon={ArrowDownToLine} size={24} />
+                  </Button>
+                </ContextButtonWrapper>
+              )}
+              {shouldShowEndAdjustment && (
+                <ContextButtonWrapper>
+                  <Button
+                    aria-label={t('bookings.actions.adjustEndToNext', {
+                      defaultValue: 'Adjust end to next booking',
+                    })}
+                    data-testid="booking-ctx-adjust-end-btn"
+                    fullWidth={false}
+                    onClick={adjustEndToNext}
+                    shape="circle"
+                    title={t('bookings.actions.adjustEndToNext', {
+                      defaultValue: 'Adjust end to next booking',
+                    })}
+                    variant="contextIcon"
+                  >
+                    <LucideIcon icon={ArrowUpToLine} size={24} />
+                  </Button>
+                </ContextButtonWrapper>
+              )}
+              <ContextButtonAddFavorite
+                data-testid="booking-ctx-favorite-btn"
+                item={item}
+                onAddFavorite={addFavorite}
+              />
+              <ContextButtonWrapper>
+                <Button
+                  aria-label={t('bookings.actions.delete', {
+                    defaultValue: 'Delete booking',
+                  })}
+                  data-testid="booking-ctx-delete-btn"
+                  fullWidth={false}
+                  onClick={deleteItem}
+                  shape="circle"
+                  title={t('bookings.actions.delete', {
+                    defaultValue: 'Delete booking',
+                  })}
+                  variant="contextIcon"
+                >
+                  <LucideIcon icon={Trash2} size={24} />
+                </Button>
+              </ContextButtonWrapper>
+              <ContextBarDivider />
+              <ContextButtonClose />
+            </ContextBar>
+          </ContextAnimatePresence>
+        )}
+      </ContextBody>
+      <Modal onClose={() => setIsEditModalOpen(false)} open={isEditModalOpen}>
+        <BookingAddUpdateForm
+          bookingAfter={nextBooking ?? undefined}
+          bookingBefore={previousBooking ?? undefined}
+          itemUpdate={item}
+          mode="update"
+          onClose={() => setIsEditModalOpen(false)}
+          selectedOrgId={selectedOrgId}
+        />
+      </Modal>
+    </>
+  )
 }

@@ -23,59 +23,59 @@ import { forwardRef, type HTMLAttributes } from 'react'
 import { cn } from '~/lib/utils/cn'
 
 const dividerVariants = cva('divider', {
-	defaultVariants: {
-		color: 'default',
-		textAlign: 'default',
-	},
-	variants: {
-		color: {
-			accent: 'divider-accent',
-			default: '',
-			error: 'divider-error',
-			info: 'divider-info',
-			neutral: 'divider-neutral',
-			primary: 'divider-primary',
-			secondary: 'divider-secondary',
-			success: 'divider-success',
-			warning: 'divider-warning',
-		},
-		orientation: {
-			horizontal: 'divider-horizontal',
-			vertical: 'divider-vertical',
-		},
-		textAlign: {
-			default: '',
-			end: 'divider-end',
-			start: 'divider-start',
-		},
-	},
+  defaultVariants: {
+    color: 'default',
+    textAlign: 'default',
+  },
+  variants: {
+    color: {
+      accent: 'divider-accent',
+      default: '',
+      error: 'divider-error',
+      info: 'divider-info',
+      neutral: 'divider-neutral',
+      primary: 'divider-primary',
+      secondary: 'divider-secondary',
+      success: 'divider-success',
+      warning: 'divider-warning',
+    },
+    orientation: {
+      horizontal: 'divider-horizontal',
+      vertical: 'divider-vertical',
+    },
+    textAlign: {
+      default: '',
+      end: 'divider-end',
+      start: 'divider-start',
+    },
+  },
 })
 
 export interface DividerProps
-	extends
-		Omit<HTMLAttributes<HTMLDivElement>, 'color'>,
-		VariantProps<typeof dividerVariants> {
-	text?: string
+  extends
+    Omit<HTMLAttributes<HTMLDivElement>, 'color'>,
+    VariantProps<typeof dividerVariants> {
+  text?: string
 }
 
 export const Divider = forwardRef<HTMLDivElement, DividerProps>(
-	(
-		{ children, className, color, orientation, text, textAlign, ...props },
-		ref,
-	) => {
-		return (
-			<div
-				className={cn(
-					dividerVariants({ color, orientation, textAlign }),
-					className,
-				)}
-				ref={ref}
-				{...props}
-			>
-				{text || children}
-			</div>
-		)
-	},
+  (
+    { children, className, color, orientation, text, textAlign, ...props },
+    ref,
+  ) => {
+    return (
+      <div
+        className={cn(
+          dividerVariants({ color, orientation, textAlign }),
+          className,
+        )}
+        ref={ref}
+        {...props}
+      >
+        {text || children}
+      </div>
+    )
+  },
 )
 
 Divider.displayName = 'Divider'

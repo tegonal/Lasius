@@ -18,53 +18,53 @@
  */
 
 export type SegmentBounds<T extends string> = Record<
-	T,
-	{ end: number; start: number }
+  T,
+  { end: number; start: number }
 >
 
 /**
  * Calculate segment boundaries in a delimited string
  */
 export function getSegmentBounds<T extends string>(
-	value: string,
-	delimiter: string,
-	segmentNames: T[],
+  value: string,
+  delimiter: string,
+  segmentNames: T[],
 ): null | SegmentBounds<T> {
-	const parts = value.split(delimiter)
-	if (parts.length !== segmentNames.length) return null
+  const parts = value.split(delimiter)
+  if (parts.length !== segmentNames.length) return null
 
-	const bounds = {} as SegmentBounds<T>
-	let currentPos = 0
+  const bounds = {} as SegmentBounds<T>
+  let currentPos = 0
 
-	segmentNames.forEach((name, index) => {
-		const partLength = (parts[index] ?? '').length
-		bounds[name] = {
-			end: currentPos + partLength,
-			start: currentPos,
-		}
-		currentPos += partLength + delimiter.length
-	})
+  segmentNames.forEach((name, index) => {
+    const partLength = (parts[index] ?? '').length
+    bounds[name] = {
+      end: currentPos + partLength,
+      start: currentPos,
+    }
+    currentPos += partLength + delimiter.length
+  })
 
-	return bounds
+  return bounds
 }
 
 /**
  * Determine which segment the cursor is in based on position
  */
 export function getSegmentFromPosition<T extends string>(
-	position: number,
-	value: string,
-	delimiter: string,
-	segmentNames: T[],
+  position: number,
+  value: string,
+  delimiter: string,
+  segmentNames: T[],
 ): null | T {
-	const bounds = getSegmentBounds(value, delimiter, segmentNames)
-	if (!bounds) return null
+  const bounds = getSegmentBounds(value, delimiter, segmentNames)
+  if (!bounds) return null
 
-	for (const segmentName of segmentNames) {
-		if (position <= bounds[segmentName].end) {
-			return segmentName
-		}
-	}
+  for (const segmentName of segmentNames) {
+    if (position <= bounds[segmentName].end) {
+      return segmentName
+    }
+  }
 
-	return segmentNames[segmentNames.length - 1] ?? null
+  return segmentNames[segmentNames.length - 1] ?? null
 }

@@ -27,23 +27,23 @@ import { durationAsString } from '~/lib/utils/duration'
 type Props = { startDate: string }
 
 export const BookingDurationCounter = ({ startDate }: Props) => {
-	const [duration, setDuration] = useState<string>('00:00')
+  const [duration, setDuration] = useState<string>('00:00')
 
-	useEffect(() => {
-		setDuration(durationAsString(startDate, formatISOLocale(new Date())))
-	}, [startDate])
+  useEffect(() => {
+    setDuration(durationAsString(startDate, formatISOLocale(new Date())))
+  }, [startDate])
 
-	useEffect(() => {
-		const interval = setInterval(() => {
-			setDuration(durationAsString(startDate, formatISOLocale(new Date())))
-		}, 25000)
-		return () => clearInterval(interval)
-	}, [startDate])
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDuration(durationAsString(startDate, formatISOLocale(new Date())))
+    }, 25000)
+    return () => clearInterval(interval)
+  }, [startDate])
 
-	return (
-		<div className="flex flex-row items-center justify-start gap-1 leading-normal">
-			<LucideIcon icon={TimerIcon} size={14} />
-			<div>{duration}</div>
-		</div>
-	)
+  return (
+    <div className="flex flex-row items-center justify-start gap-1 leading-normal">
+      <LucideIcon icon={TimerIcon} size={14} />
+      <div>{duration}</div>
+    </div>
+  )
 }

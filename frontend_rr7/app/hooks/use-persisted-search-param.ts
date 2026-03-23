@@ -33,36 +33,36 @@ const STORAGE_PREFIX = 'lasius:'
  * @returns The current value of the search param
  */
 export const usePersistedSearchParam = (
-	key: string,
-	fallback: string,
+  key: string,
+  fallback: string,
 ): string => {
-	const [searchParams, setSearchParams] = useSearchParams()
-	const paramValue = searchParams.get(key)
-	const storageKey = `${STORAGE_PREFIX}${key}`
+  const [searchParams, setSearchParams] = useSearchParams()
+  const paramValue = searchParams.get(key)
+  const storageKey = `${STORAGE_PREFIX}${key}`
 
-	// On mount: restore from localStorage if URL doesn't have the param
-	useEffect(() => {
-		if (paramValue) return
+  // On mount: restore from localStorage if URL doesn't have the param
+  useEffect(() => {
+    if (paramValue) return
 
-		const stored =
-			typeof window !== 'undefined' ? localStorage.getItem(storageKey) : null
-		const valueToSet = stored || fallback
+    const stored =
+      typeof window !== 'undefined' ? localStorage.getItem(storageKey) : null
+    const valueToSet = stored || fallback
 
-		setSearchParams(
-			(prev) => {
-				prev.set(key, valueToSet)
-				return prev
-			},
-			{ preventScrollReset: true, replace: true },
-		)
-	}, []) // eslint-disable-line react-hooks/exhaustive-deps -- intentionally runs once on mount
+    setSearchParams(
+      (prev) => {
+        prev.set(key, valueToSet)
+        return prev
+      },
+      { preventScrollReset: true, replace: true },
+    )
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps -- intentionally runs once on mount
 
-	// On change: persist to localStorage
-	useEffect(() => {
-		if (paramValue && typeof window !== 'undefined') {
-			localStorage.setItem(storageKey, paramValue)
-		}
-	}, [paramValue, storageKey])
+  // On change: persist to localStorage
+  useEffect(() => {
+    if (paramValue && typeof window !== 'undefined') {
+      localStorage.setItem(storageKey, paramValue)
+    }
+  }, [paramValue, storageKey])
 
-	return paramValue || fallback
+  return paramValue || fallback
 }

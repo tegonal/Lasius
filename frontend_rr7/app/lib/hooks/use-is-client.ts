@@ -24,9 +24,9 @@ import { useEffect, useState } from 'react'
  * Useful for guarding client-only rendering to avoid hydration mismatches.
  */
 export const useIsClient = (): boolean => {
-	const [isClient, setIsClient] = useState(false)
-	useEffect(() => {
-		setIsClient(true)
-	}, [])
-	return isClient
+  const [isClient, setIsClient] = useState(false)
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+  return isClient
 }

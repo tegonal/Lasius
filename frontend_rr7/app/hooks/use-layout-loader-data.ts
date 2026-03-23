@@ -23,17 +23,17 @@ import { type ModelsUser } from '~/services/api/lasius/modelsUser'
 import { type AuthProvider } from '~/services/auth/types'
 
 type AppLayoutLoaderData = {
-	accessToken: string
-	tokenIssuer: AuthProvider
-	user: ModelsUser
-	websocketUrl: string
+  accessToken: string
+  tokenIssuer: AuthProvider
+  user: ModelsUser
+  websocketUrl: string
 }
 
 /**
  * Typed hook to access the app-layout loader data from any nested route.
  */
 export function useLayoutLoaderData() {
-	return useRouteLoaderData('routes/app-layout') as
-		| AppLayoutLoaderData
-		| undefined
+  return useRouteLoaderData('routes/app-layout') as
+    | AppLayoutLoaderData
+    | undefined
 }

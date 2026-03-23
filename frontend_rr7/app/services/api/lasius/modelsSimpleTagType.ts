@@ -3,12 +3,12 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 
-export type ModelsSimpleTagType =
-	(typeof ModelsSimpleTagType)[keyof typeof ModelsSimpleTagType]
+export type ModelsSimpleTagType = typeof ModelsSimpleTagType[keyof typeof ModelsSimpleTagType];
+
 
 export const ModelsSimpleTagType = {
-	SimpleTag: 'SimpleTag',
-} as const
+  SimpleTag: 'SimpleTag',
+} as const;

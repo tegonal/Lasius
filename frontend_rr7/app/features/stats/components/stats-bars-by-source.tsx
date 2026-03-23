@@ -26,45 +26,45 @@ import { EmptyStateStats } from './empty-state-stats'
 import { StatsTile } from './stats-tile'
 
 const BarsHours = lazy(() =>
-	import('./bars-hours').then((mod) => ({
-		default: mod.BarsHours,
-	})),
+  import('./bars-hours').then((mod) => ({
+    default: mod.BarsHours,
+  })),
 )
 
 type StatsBarsBySourceProps = {
-	chartData:
-		| undefined
-		| {
-				ceilingData: NivoChartDataType
-				data: NivoChartDataType
-				keys: string[]
-		  }
-	groupMode: BarChartGroupMode
+  chartData:
+    | undefined
+    | {
+        ceilingData: NivoChartDataType
+        data: NivoChartDataType
+        keys: string[]
+      }
+  groupMode: BarChartGroupMode
 }
 
 export const StatsBarsBySource = ({
-	chartData,
-	groupMode,
+  chartData,
+  groupMode,
 }: StatsBarsBySourceProps) => {
-	if (!chartData?.data || chartData.data.length === 0) {
-		return (
-			<StatsTile className="h-[240px]">
-				<EmptyStateStats />
-			</StatsTile>
-		)
-	}
+  if (!chartData?.data || chartData.data.length === 0) {
+    return (
+      <StatsTile className="h-[240px]">
+        <EmptyStateStats />
+      </StatsTile>
+    )
+  }
 
-	return (
-		<StatsTile className="h-[240px]">
-			<Suspense
-				fallback={
-					<div className="bg-base-200 flex h-full w-full items-center justify-center rounded-lg">
-						<span className="loading loading-spinner loading-md" />
-					</div>
-				}
-			>
-				<BarsHours groupMode={groupMode} indexBy="category" stats={chartData} />
-			</Suspense>
-		</StatsTile>
-	)
+  return (
+    <StatsTile className="h-[240px]">
+      <Suspense
+        fallback={
+          <div className="bg-base-200 flex h-full w-full items-center justify-center rounded-lg">
+            <span className="loading loading-spinner loading-md" />
+          </div>
+        }
+      >
+        <BarsHours groupMode={groupMode} indexBy="category" stats={chartData} />
+      </Suspense>
+    </StatsTile>
+  )
 }

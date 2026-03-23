@@ -22,16 +22,16 @@ import { Lightbulb } from 'lucide-react'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 
 interface TipProps {
-	children: React.ReactNode
+  children: React.ReactNode
 }
 
 export const Tip = ({ children }: TipProps) => {
-	return (
-		<div className="mb-3 flex gap-2">
-			<span className="text-warning flex-shrink-0">
-				<LucideIcon icon={Lightbulb} size={20} />
-			</span>
-			<span className="leading-relaxed">{children}</span>
-		</div>
-	)
+  return (
+    <div className="mb-3 flex gap-2">
+      <span className="text-warning flex-shrink-0">
+        <LucideIcon icon={Lightbulb} size={20} />
+      </span>
+      <span className="leading-relaxed">{children}</span>
+    </div>
+  )
 }

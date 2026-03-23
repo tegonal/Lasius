@@ -3,13 +3,13 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { TestConnectivity400Error } from './testConnectivity400Error'
 import type { TestConnectivity400Status } from './testConnectivity400Status'
 
 export type TestConnectivity400 = {
-	status?: TestConnectivity400Status
-	message?: string
-	error?: TestConnectivity400Error
+  status?: TestConnectivity400Status
+  message?: string
+  error?: TestConnectivity400Error
 }

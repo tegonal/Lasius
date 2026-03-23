@@ -23,42 +23,42 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import {
-	type ModelsBooking,
-	type ModelsBookingStub,
+  type ModelsBooking,
+  type ModelsBookingStub,
 } from '~/services/api/lasius'
 
 import { ContextButtonWrapper } from '../context-button-wrapper'
 
 type Props = {
-	'data-testid'?: string
-	item: ModelsBooking | ModelsBookingStub
-	onStart?: () => void
-	variant?: 'compact' | 'default'
+  'data-testid'?: string
+  item: ModelsBooking | ModelsBookingStub
+  onStart?: () => void
+  variant?: 'compact' | 'default'
 }
 
 export const ContextButtonStartBooking = ({
-	'data-testid': testId,
-	item: _item,
-	onStart,
-	variant = 'default',
+  'data-testid': testId,
+  item: _item,
+  onStart,
+  variant = 'default',
 }: Props) => {
-	const { t } = useTranslation('common')
+  const { t } = useTranslation('common')
 
-	return (
-		<ContextButtonWrapper variant={variant}>
-			<Button
-				aria-label={t('bookings.actions.start', {
-					defaultValue: 'Start booking',
-				})}
-				data-testid={testId}
-				fullWidth={false}
-				onClick={onStart}
-				shape="circle"
-				title={t('bookings.actions.start', { defaultValue: 'Start booking' })}
-				variant="contextIcon"
-			>
-				<LucideIcon icon={Timer} size={24} />
-			</Button>
-		</ContextButtonWrapper>
-	)
+  return (
+    <ContextButtonWrapper variant={variant}>
+      <Button
+        aria-label={t('bookings.actions.start', {
+          defaultValue: 'Start booking',
+        })}
+        data-testid={testId}
+        fullWidth={false}
+        onClick={onStart}
+        shape="circle"
+        title={t('bookings.actions.start', { defaultValue: 'Start booking' })}
+        variant="contextIcon"
+      >
+        <LucideIcon icon={Timer} size={24} />
+      </Button>
+    </ContextButtonWrapper>
+  )
 }

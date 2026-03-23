@@ -3,17 +3,17 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 
-export type TestConnectivity400Error =
-	(typeof TestConnectivity400Error)[keyof typeof TestConnectivity400Error]
+export type TestConnectivity400Error = typeof TestConnectivity400Error[keyof typeof TestConnectivity400Error];
+
 
 export const TestConnectivity400Error = {
-	connection_failed: 'connection_failed',
-	authentication_failed: 'authentication_failed',
-	unknown_host: 'unknown_host',
-	timeout: 'timeout',
-	connection_error: 'connection_error',
-	validation_failed: 'validation_failed',
-} as const
+  connection_failed: 'connection_failed',
+  authentication_failed: 'authentication_failed',
+  unknown_host: 'unknown_host',
+  timeout: 'timeout',
+  connection_error: 'connection_error',
+  validation_failed: 'validation_failed',
+} as const;

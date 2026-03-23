@@ -19,7 +19,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { type TFunction } from 'i18next'
-import { useEffect, useMemo, useRef } from 'react'
+import { useMemo } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
@@ -38,200 +38,194 @@ import { ModalDescription } from '~/components/ui/overlays/modal/modal-descripti
 import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import {
-	useCreateProject,
-	useUpdateProject,
+  useCreateProject,
+  useUpdateProject,
 } from '~/services/api/lasius-hooks/projects/projects'
 import { type ModelsProject } from '~/services/api/lasius/modelsProject'
 import { type ModelsUserProject } from '~/services/api/lasius/modelsUserProject'
 
 type Props = {
-	item?: ModelsProject | ModelsUserProject
-	mode: 'add' | 'update'
-	onCancel: () => void
-	onSave: () => void
+  item?: ModelsProject | ModelsUserProject
+  mode: 'add' | 'update'
+  onCancel: () => void
+  onSave: () => void
 }
 
 const createProjectSchema = (t: TFunction) =>
-	z.object({
-		projectKey: z.string().min(
-			1,
-			t('validation.projectKeyRequired', {
-				defaultValue: 'Project name is required',
-			}),
-		),
-	})
+  z.object({
+    projectKey: z.string().min(
+      1,
+      t('validation.projectKeyRequired', {
+        defaultValue: 'Project name is required',
+      }),
+    ),
+  })
 
 type FormData = z.infer<ReturnType<typeof createProjectSchema>>
 
 export const ProjectAddUpdateForm = ({
-	item,
-	mode,
-	onCancel,
-	onSave,
+  item,
+  mode,
+  onCancel,
+  onSave,
 }: Props) => {
-	const { t } = useTranslation('common')
-	const { addToast } = useToast()
-	const { selectedOrganisationId } = useOrganisation()
+  const { t } = useTranslation('common')
+  const { addToast } = useToast()
+  const { selectedOrganisationId } = useOrganisation()
 
-	const createProjectApi = useCreateProject()
-	const updateProjectApi = useUpdateProject()
-	const activeFetcher = mode === 'add' ? createProjectApi : updateProjectApi
+  const onSuccess = () => {
+    addToast({
+      message:
+        mode === 'add'
+          ? t('projects.status.created', {
+              defaultValue: 'Project created',
+            })
+          : t('projects.status.updated', {
+              defaultValue: 'Project updated',
+            }),
+      type: 'SUCCESS',
+    })
+    onSave()
+  }
 
-	const schema = useMemo(() => createProjectSchema(t), [t])
+  const createProjectApi = useCreateProject({ onSuccess })
+  const updateProjectApi = useUpdateProject({ onSuccess })
+  const activeFetcher = mode === 'add' ? createProjectApi : updateProjectApi
 
-	const getProjectKey = (
-		projectItem?: ModelsProject | ModelsUserProject,
-	): string => {
-		if (!projectItem) return ''
-		if ('projectReference' in projectItem) {
-			return projectItem.projectReference.key
-		}
-		return projectItem.key
-	}
+  const schema = useMemo(() => createProjectSchema(t), [t])
 
-	const getProjectId = (
-		projectItem?: ModelsProject | ModelsUserProject,
-	): string => {
-		if (!projectItem) return ''
-		if ('projectReference' in projectItem) {
-			return projectItem.projectReference.id
-		}
-		return projectItem.id
-	}
+  const getProjectKey = (
+    projectItem?: ModelsProject | ModelsUserProject,
+  ): string => {
+    if (!projectItem) return ''
+    if ('projectReference' in projectItem) {
+      return projectItem.projectReference.key
+    }
+    return projectItem.key
+  }
 
-	const hookForm = useForm<FormData>({
-		defaultValues: {
-			projectKey: getProjectKey(item),
-		},
-		resolver: zodResolver(schema),
-	})
+  const getProjectId = (
+    projectItem?: ModelsProject | ModelsUserProject,
+  ): string => {
+    if (!projectItem) return ''
+    if ('projectReference' in projectItem) {
+      return projectItem.projectReference.id
+    }
+    return projectItem.id
+  }
 
-	const isSubmitting = activeFetcher.state !== 'idle'
+  const hookForm = useForm<FormData>({
+    defaultValues: {
+      projectKey: getProjectKey(item),
+    },
+    resolver: zodResolver(schema),
+  })
 
-	// Handle response
-	const handledRef = useRef(false)
-	useEffect(() => {
-		if (activeFetcher.state !== 'idle' || !activeFetcher.data) return
-		if (handledRef.current) return
-		handledRef.current = true
+  const isSubmitting = activeFetcher.isSubmitting
 
-		addToast({
-			message:
-				mode === 'add'
-					? t('projects.status.created', {
-							defaultValue: 'Project created',
-						})
-					: t('projects.status.updated', {
-							defaultValue: 'Project updated',
-						}),
-			type: 'SUCCESS',
-		})
-		onSave()
-	}, [activeFetcher.state, activeFetcher.data, addToast, t, mode, onSave])
+  const onSubmit = () => {
+    const { projectKey } = hookForm.getValues()
 
-	const onSubmit = () => {
-		const { projectKey } = hookForm.getValues()
+    if (mode === 'add') {
+      createProjectApi.submit({
+        body: { bookingCategories: [], key: projectKey },
+        orgId: selectedOrganisationId,
+      })
+    } else {
+      updateProjectApi.submit({
+        body: { key: projectKey },
+        orgId: selectedOrganisationId,
+        projectId: getProjectId(item),
+      })
+    }
+  }
 
-		if (mode === 'add') {
-			createProjectApi.submit({
-				body: { bookingCategories: [], key: projectKey },
-				orgId: selectedOrganisationId,
-			})
-		} else {
-			updateProjectApi.submit({
-				body: { key: projectKey },
-				orgId: selectedOrganisationId,
-				projectId: getProjectId(item),
-			})
-		}
-	}
+  return (
+    <FormProvider {...hookForm}>
+      <div className="flex flex-col">
+        <ModalCloseButton onClose={onCancel} />
 
-	return (
-		<FormProvider {...hookForm}>
-			<div className="flex flex-col">
-				<ModalCloseButton onClose={onCancel} />
+        <ModalHeader>
+          {mode === 'add'
+            ? t('projects.actions.add', {
+                defaultValue: 'Add Project',
+              })
+            : t('projects.actions.edit', {
+                defaultValue: 'Edit project',
+              })}
+        </ModalHeader>
 
-				<ModalHeader>
-					{mode === 'add'
-						? t('projects.actions.add', {
-								defaultValue: 'Add Project',
-							})
-						: t('projects.actions.edit', {
-								defaultValue: 'Edit project',
-							})}
-				</ModalHeader>
+        <ModalDescription className="mb-4">
+          {mode === 'add'
+            ? t('projects.description.add', {
+                defaultValue:
+                  'Create a new project to organize your time tracking.',
+              })
+            : t('projects.description.edit', {
+                defaultValue: 'Update the project details.',
+              })}
+        </ModalDescription>
 
-				<ModalDescription className="mb-4">
-					{mode === 'add'
-						? t('projects.description.add', {
-								defaultValue:
-									'Create a new project to organize your time tracking.',
-							})
-						: t('projects.description.edit', {
-								defaultValue: 'Update the project details.',
-							})}
-				</ModalDescription>
-
-				<form onSubmit={hookForm.handleSubmit(onSubmit)}>
-					<FormBody>
-						<Alert className="mb-4" variant="info">
-							{t('projects.info.uniqueNameRequired', {
-								defaultValue:
-									'Project names must be unique within your organisation.',
-							})}
-						</Alert>
-						<FieldSet>
-							<FormElement
-								htmlFor="projectKey"
-								label={t('projects.projectName', {
-									defaultValue: 'Project name',
-								})}
-								required
-							>
-								<Input
-									aria-describedby="projectKey-error"
-									autoComplete="off"
-									data-testid="project-form-key-input"
-									id="projectKey"
-									{...hookForm.register('projectKey', {
-										onChange: () => {
-											if (hookForm.formState.errors.projectKey) {
-												hookForm.clearErrors('projectKey')
-											}
-										},
-									})}
-								/>
-								<FormErrorBadge
-									error={hookForm.formState.errors.projectKey}
-									id="projectKey-error"
-								/>
-							</FormElement>
-						</FieldSet>
-						<ButtonGroup>
-							<Button
-								className="relative z-0"
-								data-testid="project-form-save-btn"
-								disabled={isSubmitting}
-								type="submit"
-							>
-								{t('common.actions.save', {
-									defaultValue: 'Save',
-								})}
-							</Button>
-							<Button
-								data-testid="project-form-close-btn"
-								onClick={onCancel}
-								type="button"
-								variant="secondary"
-							>
-								{t('common.actions.cancel', {
-									defaultValue: 'Cancel',
-								})}
-							</Button>
-						</ButtonGroup>
-					</FormBody>
-				</form>
-			</div>
-		</FormProvider>
-	)
+        <form onSubmit={hookForm.handleSubmit(onSubmit)}>
+          <FormBody>
+            <Alert className="mb-4" variant="info">
+              {t('projects.info.uniqueNameRequired', {
+                defaultValue:
+                  'Project names must be unique within your organisation.',
+              })}
+            </Alert>
+            <FieldSet>
+              <FormElement
+                htmlFor="projectKey"
+                label={t('projects.projectName', {
+                  defaultValue: 'Project name',
+                })}
+                required
+              >
+                <Input
+                  aria-describedby="projectKey-error"
+                  autoComplete="off"
+                  data-testid="project-form-key-input"
+                  id="projectKey"
+                  {...hookForm.register('projectKey', {
+                    onChange: () => {
+                      if (hookForm.formState.errors.projectKey) {
+                        hookForm.clearErrors('projectKey')
+                      }
+                    },
+                  })}
+                />
+                <FormErrorBadge
+                  error={hookForm.formState.errors.projectKey}
+                  id="projectKey-error"
+                />
+              </FormElement>
+            </FieldSet>
+            <ButtonGroup>
+              <Button
+                className="relative z-0"
+                data-testid="project-form-save-btn"
+                disabled={isSubmitting}
+                type="submit"
+              >
+                {t('common.actions.save', {
+                  defaultValue: 'Save',
+                })}
+              </Button>
+              <Button
+                data-testid="project-form-close-btn"
+                onClick={onCancel}
+                type="button"
+                variant="secondary"
+              >
+                {t('common.actions.cancel', {
+                  defaultValue: 'Cancel',
+                })}
+              </Button>
+            </ButtonGroup>
+          </FormBody>
+        </form>
+      </div>
+    </FormProvider>
+  )
 }

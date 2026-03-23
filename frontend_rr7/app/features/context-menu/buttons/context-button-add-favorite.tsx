@@ -27,35 +27,35 @@ import { type ModelsBooking } from '~/services/api/lasius'
 import { ContextButtonWrapper } from '../context-button-wrapper'
 
 type Props = {
-	'data-testid'?: string
-	item: ModelsBooking
-	onAddFavorite?: () => void
-	variant?: 'compact' | 'default'
+  'data-testid'?: string
+  item: ModelsBooking
+  onAddFavorite?: () => void
+  variant?: 'compact' | 'default'
 }
 
 export const ContextButtonAddFavorite = ({
-	'data-testid': testId,
-	item: _item,
-	onAddFavorite,
-	variant = 'default',
+  'data-testid': testId,
+  item: _item,
+  onAddFavorite,
+  variant = 'default',
 }: Props) => {
-	const { t } = useTranslation('common')
+  const { t } = useTranslation('common')
 
-	return (
-		<ContextButtonWrapper variant={variant}>
-			<Button
-				aria-label={t('favorites.actions.add', {
-					defaultValue: 'Add as favorite',
-				})}
-				data-testid={testId}
-				fullWidth={false}
-				onClick={onAddFavorite}
-				shape="circle"
-				title={t('favorites.actions.add', { defaultValue: 'Add as favorite' })}
-				variant="contextIcon"
-			>
-				<LucideIcon icon={Star} size={24} />
-			</Button>
-		</ContextButtonWrapper>
-	)
+  return (
+    <ContextButtonWrapper variant={variant}>
+      <Button
+        aria-label={t('favorites.actions.add', {
+          defaultValue: 'Add as favorite',
+        })}
+        data-testid={testId}
+        fullWidth={false}
+        onClick={onAddFavorite}
+        shape="circle"
+        title={t('favorites.actions.add', { defaultValue: 'Add as favorite' })}
+        variant="contextIcon"
+      >
+        <LucideIcon icon={Star} size={24} />
+      </Button>
+    </ContextButtonWrapper>
+  )
 }

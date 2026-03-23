@@ -34,7 +34,7 @@ export const DEFAULT_LOCALE: Locale = 'en'
 
 /** Type guard: checks if a string is a valid Locale */
 export function isLocale(value: null | string | undefined): value is Locale {
-	return !!value && (LOCALES as ReadonlyArray<string>).includes(value)
+  return !!value && (LOCALES as ReadonlyArray<string>).includes(value)
 }
 
 /** Translation namespaces — matches locale JSON file names */
@@ -48,20 +48,20 @@ export const resources = { de, en, es, fr, it }
 export const defaultNS = 'common' as const
 
 export const i18nConfig = {
-	defaultNS,
-	/** EN is the source language — use as fallback for untranslated keys */
-	fallbackLng: 'en' as const,
-	/**
-	 * Allow key lookup across all namespaces. Since all namespaces are eagerly
-	 * loaded, this lets utility functions and dynamic keys resolve without
-	 * knowing the source namespace.
-	 */
-	fallbackNS: [...NAMESPACES] as string[],
-	ns: [...NAMESPACES] as string[],
-	resources,
-	/** Treat empty strings as missing translations — fall back to fallbackLng */
-	returnEmptyString: false,
-	/** Suppress i18next sponsorship/Locize banner */
-	showSupportNotice: false,
-	supportedLngs: [...LOCALES] as string[],
+  defaultNS,
+  /** EN is the source language — use as fallback for untranslated keys */
+  fallbackLng: 'en' as const,
+  /**
+   * Allow key lookup across all namespaces. Since all namespaces are eagerly
+   * loaded, this lets utility functions and dynamic keys resolve without
+   * knowing the source namespace.
+   */
+  fallbackNS: [...NAMESPACES] as string[],
+  ns: [...NAMESPACES] as string[],
+  resources,
+  /** Treat empty strings as missing translations — fall back to fallbackLng */
+  returnEmptyString: false,
+  /** Suppress i18next sponsorship/Locize banner */
+  showSupportNotice: false,
+  supportedLngs: [...LOCALES] as string[],
 }

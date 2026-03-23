@@ -22,24 +22,24 @@ import React from 'react'
 import { cn } from '~/lib/utils/cn'
 
 interface Props {
-	children?: React.ReactNode
-	className?: string
-	width?: number | string
+  children?: React.ReactNode
+  className?: string
+  width?: number | string
 }
 
 export const DataListField = ({ children, className, width }: Props) => {
-	return (
-		<td
-			className={cn('p-1 py-3', className)}
-			style={
-				width !== undefined
-					? {
-							width: typeof width === 'number' ? `${width}px` : width,
-						}
-					: undefined
-			}
-		>
-			{children}
-		</td>
-	)
+  return (
+    <td
+      className={cn('p-1 py-3', className)}
+      style={
+        width !== undefined
+          ? {
+              width: typeof width === 'number' ? `${width}px` : width,
+            }
+          : undefined
+      }
+    >
+      {children}
+    </td>
+  )
 }

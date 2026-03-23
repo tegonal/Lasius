@@ -18,14 +18,14 @@
  */
 
 export function getServerEnv(
-	key: string,
-	defaultValue?: string,
+  key: string,
+  defaultValue?: string,
 ): string | undefined {
-	return process.env[key] ?? defaultValue
+  return process.env[key] ?? defaultValue
 }
 
 export function getServerEnvRequired(key: string): string {
-	const value = process.env[key]
-	if (!value) throw new Error(`Missing required env var: ${key}`)
-	return value
+  const value = process.env[key]
+  if (!value) throw new Error(`Missing required env var: ${key}`)
+  return value
 }

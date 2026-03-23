@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { ModelsConnectivityIssue } from './modelsConnectivityIssue'
 import type { ModelsConnectivityStatus } from './modelsConnectivityStatus'
@@ -13,30 +13,30 @@ import type { ModelsProjectSyncStats } from './modelsProjectSyncStats'
  * Overall health and sync statistics for an issue importer configuration
  */
 export interface ModelsConfigSyncStatus {
-	connectivityStatus: ModelsConnectivityStatus
-	/**
-	 * Last time connectivity was verified
-	 * @nullable
-	 * @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ
-	 */
-	lastConnectivityCheck?: string | null
-	currentIssue?: ModelsConnectivityIssue | null
-	/** Per-project sync statistics */
-	projectStats: ModelsProjectSyncStats[]
-	/** Number of projects mapped to this config */
-	totalProjectsMapped: number
-	/** Total issues synced across all projects */
-	totalIssuesSynced: number
-	/**
-	 * Last successful sync across any project
-	 * @nullable
-	 * @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ
-	 */
-	lastSuccessfulSync?: string | null
-	/**
-	 * When next sync is scheduled
-	 * @nullable
-	 * @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ
-	 */
-	nextScheduledSync?: string | null
+  connectivityStatus: ModelsConnectivityStatus
+  /**
+   * Last time connectivity was verified
+   * @nullable
+   * @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ
+   */
+  lastConnectivityCheck?: string | null
+  currentIssue?: ModelsConnectivityIssue | null
+  /** Per-project sync statistics */
+  projectStats: ModelsProjectSyncStats[]
+  /** Number of projects mapped to this config */
+  totalProjectsMapped: number
+  /** Total issues synced across all projects */
+  totalIssuesSynced: number
+  /**
+   * Last successful sync across any project
+   * @nullable
+   * @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ
+   */
+  lastSuccessfulSync?: string | null
+  /**
+   * When next sync is scheduled
+   * @nullable
+   * @pattern yyyy-MM-dd'T'HH:mm:ss.SSSZZ
+   */
+  nextScheduledSync?: string | null
 }

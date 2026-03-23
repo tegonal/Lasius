@@ -25,67 +25,67 @@ import { EmptyStateStats } from './empty-state-stats'
 import { StatsTile } from './stats-tile'
 
 const ProjectStreamChartImpl = lazy(() =>
-	import('~/features/stats/components/project-stream-chart-impl').then(
-		(mod) => ({
-			default: mod.ProjectStreamChartImpl,
-		}),
-	),
+  import('~/features/stats/components/project-stream-chart-impl').then(
+    (mod) => ({
+      default: mod.ProjectStreamChartImpl,
+    }),
+  ),
 )
 
 const BarsHours = lazy(() =>
-	import('./bars-hours').then((mod) => ({
-		default: mod.BarsHours,
-	})),
+  import('./bars-hours').then((mod) => ({
+    default: mod.BarsHours,
+  })),
 )
 
 type StatsProjectStreamProps = {
-	chartData:
-		| undefined
-		| {
-				ceilingData: NivoChartDataType
-				data: NivoChartDataType
-				keys: string[]
-		  }
-	useBarChart: boolean
+  chartData:
+    | undefined
+    | {
+        ceilingData: NivoChartDataType
+        data: NivoChartDataType
+        keys: string[]
+      }
+  useBarChart: boolean
 }
 
 export const StatsProjectStream = ({
-	chartData,
-	useBarChart,
+  chartData,
+  useBarChart,
 }: StatsProjectStreamProps) => {
-	if (!chartData?.data || chartData.data.length === 0) {
-		return (
-			<StatsTile className="h-[320px]">
-				<EmptyStateStats />
-			</StatsTile>
-		)
-	}
+  if (!chartData?.data || chartData.data.length === 0) {
+    return (
+      <StatsTile className="h-[320px]">
+        <EmptyStateStats />
+      </StatsTile>
+    )
+  }
 
-	if (useBarChart) {
-		return (
-			<StatsTile className="h-[320px]">
-				<Suspense
-					fallback={
-						<div className="bg-base-200 flex h-full w-full items-center justify-center rounded-lg">
-							<span className="loading loading-spinner loading-md" />
-						</div>
-					}
-				>
-					<BarsHours groupMode="stacked" indexBy="category" stats={chartData} />
-				</Suspense>
-			</StatsTile>
-		)
-	}
+  if (useBarChart) {
+    return (
+      <StatsTile className="h-[320px]">
+        <Suspense
+          fallback={
+            <div className="bg-base-200 flex h-full w-full items-center justify-center rounded-lg">
+              <span className="loading loading-spinner loading-md" />
+            </div>
+          }
+        >
+          <BarsHours groupMode="stacked" indexBy="category" stats={chartData} />
+        </Suspense>
+      </StatsTile>
+    )
+  }
 
-	return (
-		<Suspense
-			fallback={
-				<div className="bg-base-200 h-80 w-full animate-pulse rounded-lg p-4">
-					<span className="loading loading-spinner loading-md" />
-				</div>
-			}
-		>
-			<ProjectStreamChartImpl data={chartData.data} keys={chartData.keys} />
-		</Suspense>
-	)
+  return (
+    <Suspense
+      fallback={
+        <div className="bg-base-200 h-80 w-full animate-pulse rounded-lg p-4">
+          <span className="loading loading-spinner loading-md" />
+        </div>
+      }
+    >
+      <ProjectStreamChartImpl data={chartData.data} keys={chartData.keys} />
+    </Suspense>
+  )
 }

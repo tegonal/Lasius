@@ -23,30 +23,30 @@ import { Button } from '~/components/primitives/buttons/button'
 import { ModalDescription } from '~/components/ui/overlays/modal/modal-description'
 
 type Props = {
-	memberCount: number
-	onInvite: () => void
+  memberCount: number
+  onInvite: () => void
 }
 
 export const ManageProjectMembersStats = ({ memberCount, onInvite }: Props) => {
-	const { t } = useTranslation('common')
+  const { t } = useTranslation('common')
 
-	return (
-		<div className="mb-4 flex items-center justify-between gap-4">
-			<ModalDescription>
-				{t('members.description', {
-					count: memberCount,
-					defaultValue: 'This project has {{count}} member(s).',
-				})}
-			</ModalDescription>
-			<Button
-				className="w-auto"
-				fullWidth={false}
-				onClick={onInvite}
-				size="sm"
-				variant="neutral"
-			>
-				{t('members.actions.invite', { defaultValue: 'Invite someone' })}
-			</Button>
-		</div>
-	)
+  return (
+    <div className="mb-4 flex items-center justify-between gap-4">
+      <ModalDescription>
+        {t('members.description', {
+          count: memberCount,
+          defaultValue: 'This project has {{count}} member(s).',
+        })}
+      </ModalDescription>
+      <Button
+        className="w-auto"
+        fullWidth={false}
+        onClick={onInvite}
+        size="sm"
+        variant="neutral"
+      >
+        {t('members.actions.invite', { defaultValue: 'Invite someone' })}
+      </Button>
+    </div>
+  )
 }

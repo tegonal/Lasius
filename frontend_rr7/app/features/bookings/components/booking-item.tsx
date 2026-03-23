@@ -40,104 +40,104 @@ import { BookingName } from './booking-name'
 import { BookingOverlapActions } from './booking-overlap-actions'
 
 type Props = {
-	item: AugmentedBooking
-	nextItem?: ModelsBooking
+  item: AugmentedBooking
+  nextItem?: ModelsBooking
 }
 
 export const BookingItem = ({ item, nextItem }: Props) => {
-	const { t } = useTranslation('common')
-	const [isEditOpen, setIsEditOpen] = useState(false)
-	const [isAddOpen, setIsAddOpen] = useState(false)
-	const [isAddBetweenOpen, setIsAddBetweenOpen] = useState(false)
-	const selectedOrgId = useSelectedOrgId()
+  const { t } = useTranslation('common')
+  const [isEditOpen, setIsEditOpen] = useState(false)
+  const [isAddOpen, setIsAddOpen] = useState(false)
+  const [isAddBetweenOpen, setIsAddBetweenOpen] = useState(false)
+  const selectedOrgId = useSelectedOrgId()
 
-	const handleEditClose = () => setIsEditOpen(false)
-	const handleAddClose = () => setIsAddOpen(false)
-	const handleAddBetweenClose = () => setIsAddBetweenOpen(false)
+  const handleEditClose = () => setIsEditOpen(false)
+  const handleAddClose = () => setIsAddOpen(false)
+  const handleAddBetweenClose = () => setIsAddBetweenOpen(false)
 
-	return (
-		<div
-			className={cn(
-				'relative grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-2 py-3 md:gap-4 md:px-4',
-				item.overlapsWithNext
-					? 'border-warning border-b-4 border-dotted'
-					: 'border-base-content/20 border-b',
-				item.isMostRecent && 'border-base-content/20 border-t',
-			)}
-			data-testid="booking-item"
-		>
-			<div className="flex w-full min-w-0 flex-col gap-3">
-				<BookingName item={item} />
-				<TagList items={item.tags} />
-			</div>
-			<div className="flex h-full flex-row items-center justify-start gap-3 md:gap-4">
-				<div className="hidden h-full flex-row items-center justify-start gap-2 md:flex md:gap-4">
-					<BookingFromTo item={item} />
-					<BookingDuration item={item} />
-				</div>
-				<div className="flex h-full flex-col items-end justify-center gap-2 md:hidden">
-					<BookingFromToMobile item={item} />
-					<BookingDuration item={item} />
-				</div>
-				<BookingItemContext item={item} />
-			</div>
-			{item.overlapsWithNext && (
-				<BookingOverlapActions
-					currentItem={item}
-					onEdit={() => setIsEditOpen(true)}
-					overlappingItem={item.overlapsWithNext}
-				/>
-			)}
-			{item.isMostRecent && (
-				<div className="absolute inset-x-0 top-0 flex items-center justify-center text-center">
-					<div className="bg-base-100 absolute rounded-full p-1">
-						<Button
-							data-testid="booking-add-btn"
-							fullWidth={false}
-							onClick={() => setIsAddOpen(true)}
-							shape="circle"
-							title={t('bookings.actions.add', {
-								defaultValue: 'Add booking',
-							})}
-							type="button"
-							variant="icon"
-						>
-							<LucideIcon icon={PlusCircleIcon} size={21} />
-						</Button>
-					</div>
-				</div>
-			)}
-			{item.allowInsert && (
-				<BookingInsertActions
-					currentItem={item}
-					nextItem={nextItem}
-					onAddBetween={() => setIsAddBetweenOpen(true)}
-				/>
-			)}
-			<Modal onClose={handleEditClose} open={isEditOpen}>
-				<BookingAddUpdateForm
-					itemUpdate={item}
-					mode="update"
-					onClose={handleEditClose}
-					selectedOrgId={selectedOrgId}
-				/>
-			</Modal>
-			<Modal onClose={handleAddClose} open={isAddOpen}>
-				<BookingAddUpdateForm
-					itemReference={item}
-					mode="add"
-					onClose={handleAddClose}
-					selectedOrgId={selectedOrgId}
-				/>
-			</Modal>
-			<Modal onClose={handleAddBetweenClose} open={isAddBetweenOpen}>
-				<BookingAddUpdateForm
-					itemReference={item}
-					mode="addBetween"
-					onClose={handleAddBetweenClose}
-					selectedOrgId={selectedOrgId}
-				/>
-			</Modal>
-		</div>
-	)
+  return (
+    <div
+      className={cn(
+        'relative grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-2 py-3 md:gap-4 md:px-4',
+        item.overlapsWithNext
+          ? 'border-warning border-b-4 border-dotted'
+          : 'border-base-content/20 border-b',
+        item.isMostRecent && 'border-base-content/20 border-t',
+      )}
+      data-testid="booking-item"
+    >
+      <div className="flex w-full min-w-0 flex-col gap-3">
+        <BookingName item={item} />
+        <TagList items={item.tags} />
+      </div>
+      <div className="flex h-full flex-row items-center justify-start gap-3 md:gap-4">
+        <div className="hidden h-full flex-row items-center justify-start gap-2 md:flex md:gap-4">
+          <BookingFromTo item={item} />
+          <BookingDuration item={item} />
+        </div>
+        <div className="flex h-full flex-col items-end justify-center gap-2 md:hidden">
+          <BookingFromToMobile item={item} />
+          <BookingDuration item={item} />
+        </div>
+        <BookingItemContext item={item} />
+      </div>
+      {item.overlapsWithNext && (
+        <BookingOverlapActions
+          currentItem={item}
+          onEdit={() => setIsEditOpen(true)}
+          overlappingItem={item.overlapsWithNext}
+        />
+      )}
+      {item.isMostRecent && (
+        <div className="absolute inset-x-0 top-0 flex items-center justify-center text-center">
+          <div className="bg-base-100 absolute rounded-full p-1">
+            <Button
+              data-testid="booking-add-btn"
+              fullWidth={false}
+              onClick={() => setIsAddOpen(true)}
+              shape="circle"
+              title={t('bookings.actions.add', {
+                defaultValue: 'Add booking',
+              })}
+              type="button"
+              variant="icon"
+            >
+              <LucideIcon icon={PlusCircleIcon} size={21} />
+            </Button>
+          </div>
+        </div>
+      )}
+      {item.allowInsert && (
+        <BookingInsertActions
+          currentItem={item}
+          nextItem={nextItem}
+          onAddBetween={() => setIsAddBetweenOpen(true)}
+        />
+      )}
+      <Modal onClose={handleEditClose} open={isEditOpen}>
+        <BookingAddUpdateForm
+          itemUpdate={item}
+          mode="update"
+          onClose={handleEditClose}
+          selectedOrgId={selectedOrgId}
+        />
+      </Modal>
+      <Modal onClose={handleAddClose} open={isAddOpen}>
+        <BookingAddUpdateForm
+          itemReference={item}
+          mode="add"
+          onClose={handleAddClose}
+          selectedOrgId={selectedOrgId}
+        />
+      </Modal>
+      <Modal onClose={handleAddBetweenClose} open={isAddBetweenOpen}>
+        <BookingAddUpdateForm
+          itemReference={item}
+          mode="addBetween"
+          onClose={handleAddBetweenClose}
+          selectedOrgId={selectedOrgId}
+        />
+      </Modal>
+    </div>
+  )
 }

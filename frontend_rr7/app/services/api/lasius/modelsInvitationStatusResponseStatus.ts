@@ -3,13 +3,13 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 
-export type ModelsInvitationStatusResponseStatus =
-	(typeof ModelsInvitationStatusResponseStatus)[keyof typeof ModelsInvitationStatusResponseStatus]
+export type ModelsInvitationStatusResponseStatus = typeof ModelsInvitationStatusResponseStatus[keyof typeof ModelsInvitationStatusResponseStatus];
+
 
 export const ModelsInvitationStatusResponseStatus = {
-	UnregisteredUser: 'UnregisteredUser',
-	InvitationOk: 'InvitationOk',
-} as const
+  UnregisteredUser: 'UnregisteredUser',
+  InvitationOk: 'InvitationOk',
+} as const;

@@ -33,46 +33,55 @@ import { type ModelsUserProject } from '~/services/api/lasius/modelsUserProject'
  *   - findProjectById: Function to find any project by ID (including inactive projects from any organization)
  */
 export const useProjects = () => {
-	const loaderData = useRouteLoaderData('routes/app-layout') as
-		| undefined
-		| { user: ModelsUser; websocketUrl: string }
+  const loaderData = useRouteLoaderData('routes/app-layout') as
+    | undefined
+    | { user: ModelsUser; websocketUrl: string }
 
-	const user = loaderData?.user
+  const user = loaderData?.user
 
-	const userProjects = (): ModelsUserProject[] => {
-		if (user?.organisations) {
-			const org = user.organisations.find(
-				(item) =>
-					item.organisationReference.id === user.settings?.lastSelectedOrganisation?.id,
-			)
-			return orderBy(org?.projects || [], [(data) => data.projectReference.key], ['asc'])
-		}
-		return []
-	}
+  const userProjects = (): ModelsUserProject[] => {
+    if (user?.organisations) {
+      const org = user.organisations.find(
+        (item) =>
+          item.organisationReference.id ===
+          user.settings?.lastSelectedOrganisation?.id,
+      )
+      return orderBy(
+        org?.projects || [],
+        [(data) => data.projectReference.key],
+        ['asc'],
+      )
+    }
+    return []
+  }
 
-	/**
-	 * Finds a project by ID across all organizations in the user's profile.
-	 * This includes inactive/deactivated projects.
-	 *
-	 * @param projectId - The ID of the project to find
-	 * @returns The project reference or undefined if not found
-	 */
-	const findProjectById = (projectId: string): ModelsEntityReference | undefined => {
-		if (!user?.organisations || !projectId) return undefined
+  /**
+   * Finds a project by ID across all organizations in the user's profile.
+   * This includes inactive/deactivated projects.
+   *
+   * @param projectId - The ID of the project to find
+   * @returns The project reference or undefined if not found
+   */
+  const findProjectById = (
+    projectId: string,
+  ): ModelsEntityReference | undefined => {
+    if (!user?.organisations || !projectId) return undefined
 
-		// Search through all organizations (not just the selected one)
-		for (const org of user.organisations) {
-			const project = org.projects.find((p) => p.projectReference.id === projectId)
-			if (project) {
-				return project.projectReference
-			}
-		}
+    // Search through all organizations (not just the selected one)
+    for (const org of user.organisations) {
+      const project = org.projects.find(
+        (p) => p.projectReference.id === projectId,
+      )
+      if (project) {
+        return project.projectReference
+      }
+    }
 
-		return undefined
-	}
+    return undefined
+  }
 
-	return {
-		findProjectById,
-		userProjects,
-	}
+  return {
+    findProjectById,
+    userProjects,
+  }
 }

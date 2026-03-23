@@ -24,72 +24,72 @@ import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 
 type Props = {
-	allExpanded: boolean
-	onAddGroup: () => void
-	onAddPresets: () => void
-	onToggleAll: () => void
-	showToggleAll: boolean
+  allExpanded: boolean
+  onAddGroup: () => void
+  onAddPresets: () => void
+  onToggleAll: () => void
+  showToggleAll: boolean
 }
 
 export const TagGroupToolbar = ({
-	allExpanded,
-	onAddGroup,
-	onAddPresets,
-	onToggleAll,
-	showToggleAll,
+  allExpanded,
+  onAddGroup,
+  onAddPresets,
+  onToggleAll,
+  showToggleAll,
 }: Props) => {
-	const { t } = useTranslation('common')
+  const { t } = useTranslation('common')
 
-	return (
-		<div className="mb-4 flex flex-shrink-0 flex-wrap items-center justify-between gap-2">
-			<div className="flex gap-2">
-				<Button
-					fullWidth={false}
-					onClick={onAddGroup}
-					size="sm"
-					type="button"
-					variant="secondary"
-				>
-					{t('tags.actions.addTagGroup', {
-						defaultValue: 'Add tag group',
-					})}
-				</Button>
-				<Button
-					fullWidth={false}
-					onClick={onAddPresets}
-					size="sm"
-					type="button"
-					variant="secondary"
-				>
-					{t('tags.actions.addDefaultTagGroups', {
-						defaultValue: 'Add default tag groups',
-					})}
-				</Button>
-			</div>
-			{showToggleAll && (
-				<Button
-					fullWidth={false}
-					onClick={onToggleAll}
-					shape="circle"
-					size="sm"
-					title={
-						allExpanded
-							? t('tags.actions.collapseAll', {
-									defaultValue: 'Collapse all',
-								})
-							: t('tags.actions.expandAll', {
-									defaultValue: 'Expand all',
-								})
-					}
-					type="button"
-					variant="ghost"
-				>
-					<LucideIcon
-						icon={allExpanded ? ChevronsDownUp : ChevronsUpDown}
-						size={20}
-					/>
-				</Button>
-			)}
-		</div>
-	)
+  return (
+    <div className="mb-4 flex flex-shrink-0 flex-wrap items-center justify-between gap-2">
+      <div className="flex gap-2">
+        <Button
+          fullWidth={false}
+          onClick={onAddGroup}
+          size="sm"
+          type="button"
+          variant="secondary"
+        >
+          {t('tags.actions.addTagGroup', {
+            defaultValue: 'Add tag group',
+          })}
+        </Button>
+        <Button
+          fullWidth={false}
+          onClick={onAddPresets}
+          size="sm"
+          type="button"
+          variant="secondary"
+        >
+          {t('tags.actions.addDefaultTagGroups', {
+            defaultValue: 'Add default tag groups',
+          })}
+        </Button>
+      </div>
+      {showToggleAll && (
+        <Button
+          fullWidth={false}
+          onClick={onToggleAll}
+          shape="circle"
+          size="sm"
+          title={
+            allExpanded
+              ? t('tags.actions.collapseAll', {
+                  defaultValue: 'Collapse all',
+                })
+              : t('tags.actions.expandAll', {
+                  defaultValue: 'Expand all',
+                })
+          }
+          type="button"
+          variant="ghost"
+        >
+          <LucideIcon
+            icon={allExpanded ? ChevronsDownUp : ChevronsUpDown}
+            size={20}
+          />
+        </Button>
+      )}
+    </div>
+  )
 }

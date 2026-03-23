@@ -18,17 +18,16 @@
  */
 
 import { orderBy } from 'es-toolkit'
-import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useRouteLoaderData } from 'react-router'
 
 import { AvatarUser } from '~/components/ui/data-display/avatar-user'
 import { Badge } from '~/components/ui/data-display/badge'
 import {
-	DataList,
-	DataListField,
-	DataListHeaderItem,
-	DataListRow,
+  DataList,
+  DataListField,
+  DataListHeaderItem,
+  DataListRow,
 } from '~/components/ui/data-display/data-list'
 import { EmptyStateMembers } from '~/features/projects/components/empty-state-members'
 import { isAdminOfProject } from '~/lib/api/functions/is-admin-of-project'
@@ -39,100 +38,98 @@ import { useRemoveProjectUser } from '~/services/api/lasius-hooks/projects/proje
 import { ProjectMemberListItemContext } from './project-member-list-item-context'
 
 type Props = {
-	onRefresh: () => void
-	projectId: string
-	projectOrganisationId: string
-	users: ModelsUserStub[]
+  onRefresh: () => void
+  projectId: string
+  projectOrganisationId: string
+  users: ModelsUserStub[]
 }
 
 export const ProjectMembersList = ({
-	onRefresh,
-	projectId,
-	projectOrganisationId,
-	users,
+  onRefresh,
+  projectId,
+  projectOrganisationId,
+  users,
 }: Props) => {
-	const { t } = useTranslation('common')
-	const loaderData = useRouteLoaderData<typeof loader>('routes/app-layout')
-	const userId = loaderData?.user?.id
+  const { t } = useTranslation('common')
+  const loaderData = useRouteLoaderData<typeof loader>('routes/app-layout')
+  const userId = loaderData?.user?.id
 
-	const amIAdmin = isAdminOfProject(
-		loaderData?.user,
-		projectOrganisationId,
-		projectId,
-	)
+  const amIAdmin = isAdminOfProject(
+    loaderData?.user,
+    projectOrganisationId,
+    projectId,
+  )
 
-	const removeUserApi = useRemoveProjectUser()
+  const removeUserApi = useRemoveProjectUser({
+    onSuccess: () => {
+      onRefresh()
+    },
+  })
 
-	// Refresh list after successful removal
-	useEffect(() => {
-		if (removeUserApi.state !== 'idle' || !removeUserApi.data) return
-		onRefresh()
-	}, [removeUserApi.state, removeUserApi.data, onRefresh])
+  const handleUserRemove = (userIdToRemove: string) => {
+    removeUserApi.submit({
+      orgId: projectOrganisationId,
+      projectId,
+      userId: userIdToRemove,
+    })
+  }
 
-	const handleUserRemove = (userIdToRemove: string) => {
-		removeUserApi.submit({
-			orgId: projectOrganisationId,
-			projectId,
-			userId: userIdToRemove,
-		})
-	}
+  if (users.length === 0) {
+    return <EmptyStateMembers />
+  }
 
-	if (users.length === 0) {
-		return <EmptyStateMembers />
-	}
-
-	return (
-		<DataList>
-			<DataListRow>
-				<DataListHeaderItem />
-				<DataListHeaderItem>
-					{t('common.forms.firstName', { defaultValue: 'First name' })}
-				</DataListHeaderItem>
-				<DataListHeaderItem>
-					{t('common.forms.lastName', { defaultValue: 'Last name' })}
-				</DataListHeaderItem>
-				<DataListHeaderItem>
-					{t('common.forms.email', { defaultValue: 'Email' })}
-				</DataListHeaderItem>
-				<DataListHeaderItem>
-					{t('common.status.label', { defaultValue: 'Status' })}
-				</DataListHeaderItem>
-				<DataListHeaderItem />
-			</DataListRow>
-			{orderBy(
-				users,
-				[(user) => user.lastName, (user) => user.firstName],
-				['asc', 'asc'],
-			).map((user) => (
-				<DataListRow key={user.id}>
-					<DataListField width={90}>
-						<AvatarUser firstName={user.firstName} lastName={user.lastName} />
-					</DataListField>
-					<DataListField>
-						<span>{user.firstName}</span>
-					</DataListField>
-					<DataListField>
-						<span>{user.lastName}</span>
-					</DataListField>
-					<DataListField>
-						<span>{user.email}</span>
-					</DataListField>
-					<DataListField>
-						{user.id === userId && (
-							<Badge variant="tag">
-								{t('common.you', { defaultValue: 'You' })}
-							</Badge>
-						)}
-					</DataListField>
-					<DataListField>
-						<ProjectMemberListItemContext
-							canRemove={amIAdmin && users.length > 1}
-							onRemove={() => handleUserRemove(user.id)}
-							user={user}
-						/>
-					</DataListField>
-				</DataListRow>
-			))}
-		</DataList>
-	)
+  return (
+    <DataList>
+      <DataListRow>
+        <DataListHeaderItem />
+        <DataListHeaderItem>
+          {t('common.forms.firstName', { defaultValue: 'First name' })}
+        </DataListHeaderItem>
+        <DataListHeaderItem>
+          {t('common.forms.lastName', { defaultValue: 'Last name' })}
+        </DataListHeaderItem>
+        <DataListHeaderItem>
+          {t('common.forms.email', { defaultValue: 'Email' })}
+        </DataListHeaderItem>
+        <DataListHeaderItem>
+          {t('common.status.label', { defaultValue: 'Status' })}
+        </DataListHeaderItem>
+        <DataListHeaderItem />
+      </DataListRow>
+      {orderBy(
+        users,
+        [(user) => user.lastName, (user) => user.firstName],
+        ['asc', 'asc'],
+      ).map((user) => (
+        <DataListRow key={user.id}>
+          <DataListField width={90}>
+            <AvatarUser firstName={user.firstName} lastName={user.lastName} />
+          </DataListField>
+          <DataListField>
+            <span>{user.firstName}</span>
+          </DataListField>
+          <DataListField>
+            <span>{user.lastName}</span>
+          </DataListField>
+          <DataListField>
+            <span>{user.email}</span>
+          </DataListField>
+          <DataListField>
+            {user.id === userId && (
+              <Badge variant="tag">
+                {t('common.you', { defaultValue: 'You' })}
+              </Badge>
+            )}
+          </DataListField>
+          <DataListField>
+            <ProjectMemberListItemContext
+              canRemove={amIAdmin && users.length > 1}
+              onRemove={() => handleUserRemove(user.id)}
+              user={user}
+            />
+          </DataListField>
+        </DataListRow>
+      ))}
+    </DataList>
+  )
 }

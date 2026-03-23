@@ -595,7 +595,7 @@ class InvitationsControllerSpec
     }
 
     "for JoinProjectInvitation" in {
-      "badrequest if no organisationReference was provided" in new WithTestApplication {
+      "auto-add user to organisation when no organisationReference provided" in new WithTestApplication {
         implicit val executionContext: ExecutionContext =
           inject[ExecutionContext]
         val systemServices: SystemServices        = inject[SystemServices]
@@ -606,9 +606,124 @@ class InvitationsControllerSpec
                                                 authConfig,
                                                 reactiveMongoApi)
 
-        val invitationId =
-          createJoinProjectInvitation(controller)(
-            invitedEmail = controller.user.email)
+        // Create a second organisation the user is NOT a member of
+        val otherOrg = Organisation(
+          id = OrganisationId(),
+          key = "otherOrg",
+          `private` = false,
+          active = true,
+          createdBy = controller.userReference,
+          deactivatedBy = None
+        )
+        withDBSession()(implicit dbSession =>
+          controller.organisationRepository.upsert(otherOrg)).awaitResult()
+
+        val project = Project(
+          id = ProjectId(),
+          key = "otherProject",
+          organisationReference = otherOrg.getReference,
+          bookingCategories = Set(),
+          active = true,
+          createdBy = controller.userReference,
+          deactivatedBy = None
+        )
+        withDBSession()(implicit dbSession =>
+          controller.projectRepository.upsert(project)).awaitResult()
+
+        // Create invitation referencing otherOrg
+        val invitationId = InvitationId()
+        withDBSession() { implicit dbSession =>
+          controller.invitationRepository.upsert(
+            JoinProjectInvitation(
+              id = invitationId,
+              invitedEmail = controller.user.email,
+              createDate = DateTime.now(),
+              createdBy = controller.userReference,
+              expiration = DateTime.now().plusDays(1),
+              sharedByOrganisationReference = otherOrg.getReference,
+              projectReference = project.getReference,
+              role = ProjectMember,
+              outcome = None
+            ))
+        }.awaitResult()
+
+        val request: FakeRequest[AcceptInvitationRequest] = FakeRequest()
+          .withBody(AcceptInvitationRequest(organisationReference = None))
+        val result: Future[Result] =
+          controller.accept(invitationId)(request)
+
+        status(result) must equalTo(OK)
+        val invitation = contentAsJson(result).as[Invitation]
+        invitation.outcome must beSome
+        invitation.outcome.get.status === InvitationAccepted
+
+        // verify user is now a member of otherOrg
+        val user = withDBSession()(implicit dbSession =>
+          controller.userRepository.findById(controller.userId))
+          .awaitResult()
+          .get
+
+        val userOrg = user.organisations
+          .find(_.organisationReference.id == otherOrg.id)
+        userOrg must beSome
+        userOrg.get.role === OrganisationMember
+
+        // verify user is assigned to project
+        val userProject =
+          userOrg.get.projects.find(_.projectReference.id == project.id)
+        userProject must beSome
+        userProject.get.role === ProjectMember
+      }
+
+      "badrequest if invitation's organisation is inactive and user not a member" in new WithTestApplication {
+        implicit val executionContext: ExecutionContext =
+          inject[ExecutionContext]
+        val systemServices: SystemServices        = inject[SystemServices]
+        val authConfig: AuthConfig                = inject[AuthConfig]
+        val controller: InvitationsControllerMock =
+          controllers.InvitationsControllerMock(config,
+                                                systemServices,
+                                                authConfig,
+                                                reactiveMongoApi)
+
+        val inactiveOrg = Organisation(
+          id = OrganisationId(),
+          key = "inactiveOrg",
+          `private` = false,
+          active = false,
+          createdBy = controller.userReference,
+          deactivatedBy = None
+        )
+        withDBSession()(implicit dbSession =>
+          controller.organisationRepository.upsert(inactiveOrg)).awaitResult()
+
+        val project = Project(
+          id = ProjectId(),
+          key = "someProject",
+          organisationReference = inactiveOrg.getReference,
+          bookingCategories = Set(),
+          active = true,
+          createdBy = controller.userReference,
+          deactivatedBy = None
+        )
+        withDBSession()(implicit dbSession =>
+          controller.projectRepository.upsert(project)).awaitResult()
+
+        val invitationId = InvitationId()
+        withDBSession() { implicit dbSession =>
+          controller.invitationRepository.upsert(
+            JoinProjectInvitation(
+              id = invitationId,
+              invitedEmail = controller.user.email,
+              createDate = DateTime.now(),
+              createdBy = controller.userReference,
+              expiration = DateTime.now().plusDays(1),
+              sharedByOrganisationReference = inactiveOrg.getReference,
+              projectReference = project.getReference,
+              role = ProjectMember,
+              outcome = None
+            ))
+        }.awaitResult()
 
         val request: FakeRequest[AcceptInvitationRequest] = FakeRequest()
           .withBody(AcceptInvitationRequest(organisationReference = None))
@@ -617,7 +732,7 @@ class InvitationsControllerSpec
 
         status(result) must equalTo(BAD_REQUEST)
         contentAsString(result) must equalTo(
-          "Need to specify binding organisation when joining a project")
+          s"Cannot join inactive organisation inactiveOrg")
       }
 
       "badrequest if user is already assigned to project and organisation" in new WithTestApplication {

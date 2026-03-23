@@ -24,390 +24,390 @@ import { Input } from '~/components/primitives/inputs/input'
 import { useRequiredFormContext } from '~/components/ui/forms/with-form-context'
 
 import {
-	createHandleClick,
-	DURATION_SEGMENT_CONFIG,
-	type DurationSegment,
-	getSegmentBounds,
-	getSegmentFromPosition,
-	selectSegment as selectSegmentHelper,
+  createHandleClick,
+  DURATION_SEGMENT_CONFIG,
+  type DurationSegment,
+  getSegmentBounds,
+  getSegmentFromPosition,
+  selectSegment as selectSegmentHelper,
 } from './shared/core'
 import {
-	addMinutesToDate,
-	calculateDurationMinutes,
-	formatDuration,
-	parseDuration,
+  addMinutesToDate,
+  calculateDurationMinutes,
+  formatDuration,
+  parseDuration,
 } from './shared/duration-utils'
 import {
-	createInputChangeHandler,
-	handleBackspaceDelete,
-	handleEscapeKey,
-	handleSeparatorKey,
-	validateInputChar,
+  createInputChangeHandler,
+  handleBackspaceDelete,
+  handleEscapeKey,
+  handleSeparatorKey,
+  validateInputChar,
 } from './shared/input'
 import { SegmentedInputWrapper } from './shared/segmented-input-wrapper'
 import { useRestoreCursorPosition } from './shared/use-restore-cursor-position'
 
 export const SegmentedDurationInputConnected = ({
-	endFieldName,
-	startFieldName,
+  endFieldName,
+  startFieldName,
 }: {
-	endFieldName: string
-	startFieldName: string
+  endFieldName: string
+  startFieldName: string
 }) => {
-	const { t } = useTranslation('common')
-	const parentFormContext = useRequiredFormContext()
-	const inputRef = useRef<HTMLInputElement>(null)
-	const [selectedSegment, setSelectedSegment] =
-		useState<DurationSegment | null>(null)
-	const focusFromArrowRef = useRef<boolean>(false)
-	const focusFromMouseRef = useRef<boolean>(false)
-	const initialDurationRef = useRef<number>(0)
+  const { t } = useTranslation('common')
+  const parentFormContext = useRequiredFormContext()
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [selectedSegment, setSelectedSegment] =
+    useState<DurationSegment | null>(null)
+  const focusFromArrowRef = useRef<boolean>(false)
+  const focusFromMouseRef = useRef<boolean>(false)
+  const initialDurationRef = useRef<number>(0)
 
-	const config = DURATION_SEGMENT_CONFIG
+  const config = DURATION_SEGMENT_CONFIG
 
-	const startValue = parentFormContext.watch(startFieldName)
-	const endValue = parentFormContext.watch(endFieldName)
+  const startValue = parentFormContext.watch(startFieldName)
+  const endValue = parentFormContext.watch(endFieldName)
 
-	// Calculate duration
-	const durationMinutes = calculateDurationMinutes(
-		startValue ? new Date(startValue) : null,
-		endValue ? new Date(endValue) : null,
-	)
-	const durationString = formatDuration(durationMinutes)
+  // Calculate duration
+  const durationMinutes = calculateDurationMinutes(
+    startValue ? new Date(startValue) : null,
+    endValue ? new Date(endValue) : null,
+  )
+  const durationString = formatDuration(durationMinutes)
 
-	const [inputValue, setInputValue] = useState<string>(durationString)
-	const setCursorPosition = useRestoreCursorPosition(inputRef, inputValue)
+  const [inputValue, setInputValue] = useState<string>(durationString)
+  const setCursorPosition = useRestoreCursorPosition(inputRef, inputValue)
 
-	// Store initial duration when component mounts or start/end change externally
-	useEffect(() => {
-		if (!inputRef.current?.matches(':focus')) {
-			initialDurationRef.current = durationMinutes
-		}
-	}, [durationMinutes])
+  // Store initial duration when component mounts or start/end change externally
+  useEffect(() => {
+    if (!inputRef.current?.matches(':focus')) {
+      initialDurationRef.current = durationMinutes
+    }
+  }, [durationMinutes])
 
-	// Sync with calculated duration
-	useEffect(() => {
-		if (!inputRef.current?.matches(':focus')) {
-			setInputValue(durationString)
-		}
-	}, [durationString])
+  // Sync with calculated duration
+  useEffect(() => {
+    if (!inputRef.current?.matches(':focus')) {
+      setInputValue(durationString)
+    }
+  }, [durationString])
 
-	// Select a segment using helper
-	const selectSegment = (segment: DurationSegment): void => {
-		selectSegmentHelper(
-			segment,
-			inputValue,
-			config.delimiter,
-			config.segments,
-			inputRef,
-			setSelectedSegment,
-		)
-	}
+  // Select a segment using helper
+  const selectSegment = (segment: DurationSegment): void => {
+    selectSegmentHelper(
+      segment,
+      inputValue,
+      config.delimiter,
+      config.segments,
+      inputRef,
+      setSelectedSegment,
+    )
+  }
 
-	// Handle mouse down to set flag before focus
-	const handleMouseDown = () => {
-		focusFromMouseRef.current = true
-	}
+  // Handle mouse down to set flag before focus
+  const handleMouseDown = () => {
+    focusFromMouseRef.current = true
+  }
 
-	// Handle click using helper
-	const handleClick = createHandleClick(
-		inputRef,
-		inputValue,
-		config.placeholder,
-		config.delimiter,
-		config.segments,
-		(segment) => {
-			selectSegment(segment)
-		},
-	)
+  // Handle click using helper
+  const handleClick = createHandleClick(
+    inputRef,
+    inputValue,
+    config.placeholder,
+    config.delimiter,
+    config.segments,
+    (segment) => {
+      selectSegment(segment)
+    },
+  )
 
-	// Update end time based on duration change
-	const updateEndTime = (newDurationMinutes: number) => {
-		if (startValue && newDurationMinutes >= 0) {
-			const startDate = new Date(startValue)
-			const newEndDate = addMinutesToDate(startDate, newDurationMinutes)
-			parentFormContext.setValue(endFieldName, newEndDate.toISOString(), {
-				shouldDirty: true,
-				shouldValidate: true,
-			})
-		}
-	}
+  // Update end time based on duration change
+  const updateEndTime = (newDurationMinutes: number) => {
+    if (startValue && newDurationMinutes >= 0) {
+      const startDate = new Date(startValue)
+      const newEndDate = addMinutesToDate(startDate, newDurationMinutes)
+      parentFormContext.setValue(endFieldName, newEndDate.toISOString(), {
+        shouldDirty: true,
+        shouldValidate: true,
+      })
+    }
+  }
 
-	// Reset to initial duration
-	const resetToInitial = () => {
-		updateEndTime(initialDurationRef.current)
-		setInputValue(formatDuration(initialDurationRef.current))
-	}
+  // Reset to initial duration
+  const resetToInitial = () => {
+    updateEndTime(initialDurationRef.current)
+    setInputValue(formatDuration(initialDurationRef.current))
+  }
 
-	// Handle input change using shared utility
-	const handleInputChange = createInputChangeHandler({
-		config,
-		inputRef,
-		inputValue,
-		selectedSegment,
-		selectSegmentFn: selectSegment,
-		setCursorPosition,
-		setInputValue,
-		updateStore: (val: string) => {
-			const minutes = parseDuration(val)
-			if (minutes !== null) {
-				updateEndTime(minutes)
-			}
-		},
-	})
+  // Handle input change using shared utility
+  const handleInputChange = createInputChangeHandler({
+    config,
+    inputRef,
+    inputValue,
+    selectedSegment,
+    selectSegmentFn: selectSegment,
+    setCursorPosition,
+    setInputValue,
+    updateStore: (val: string) => {
+      const minutes = parseDuration(val)
+      if (minutes !== null) {
+        updateEndTime(minutes)
+      }
+    },
+  })
 
-	// Handle keyboard navigation
-	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>): void => {
-		const bounds = getSegmentBounds(
-			inputValue,
-			config.delimiter,
-			config.segments,
-		)
-		if (!bounds) return
+  // Handle keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>): void => {
+    const bounds = getSegmentBounds(
+      inputValue,
+      config.delimiter,
+      config.segments,
+    )
+    if (!bounds) return
 
-		if (!validateInputChar(e.key, config.allowedCharsPattern)) {
-			e.preventDefault()
-			return
-		}
+    if (!validateInputChar(e.key, config.allowedCharsPattern)) {
+      e.preventDefault()
+      return
+    }
 
-		if (handleEscapeKey(e, inputRef, resetToInitial)) {
-			return
-		}
+    if (handleEscapeKey(e, inputRef, resetToInitial)) {
+      return
+    }
 
-		if (
-			handleBackspaceDelete(
-				e,
-				inputRef,
-				inputValue,
-				config.delimiter,
-				config.segments,
-				bounds,
-				config.segmentPlaceholders,
-				setInputValue,
-				(val) => {
-					const minutes = parseDuration(val)
-					if (minutes !== null) {
-						updateEndTime(minutes)
-					}
-				},
-				selectSegment,
-			)
-		) {
-			return
-		}
+    if (
+      handleBackspaceDelete(
+        e,
+        inputRef,
+        inputValue,
+        config.delimiter,
+        config.segments,
+        bounds,
+        config.segmentPlaceholders,
+        setInputValue,
+        (val) => {
+          const minutes = parseDuration(val)
+          if (minutes !== null) {
+            updateEndTime(minutes)
+          }
+        },
+        selectSegment,
+      )
+    ) {
+      return
+    }
 
-		if (
-			handleSeparatorKey(
-				e,
-				config.separatorKeys,
-				inputRef,
-				inputValue,
-				config.delimiter,
-				config.segments,
-				selectSegment,
-			)
-		) {
-			return
-		}
+    if (
+      handleSeparatorKey(
+        e,
+        config.separatorKeys,
+        inputRef,
+        inputValue,
+        config.delimiter,
+        config.segments,
+        selectSegment,
+      )
+    ) {
+      return
+    }
 
-		// Arrow keys for increment/decrement
-		if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-			e.preventDefault()
-			const position = inputRef.current?.selectionStart
-			if (typeof position === 'number') {
-				const segment = getSegmentFromPosition(
-					position,
-					inputValue,
-					config.delimiter,
-					config.segments,
-				)
-				if (!segment) return
+    // Arrow keys for increment/decrement
+    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+      e.preventDefault()
+      const position = inputRef.current?.selectionStart
+      if (typeof position === 'number') {
+        const segment = getSegmentFromPosition(
+          position,
+          inputValue,
+          config.delimiter,
+          config.segments,
+        )
+        if (!segment) return
 
-				const baseIncrement = e.key === 'ArrowUp' ? 1 : -1
-				let newMinutes = durationMinutes
+        const baseIncrement = e.key === 'ArrowUp' ? 1 : -1
+        let newMinutes = durationMinutes
 
-				if (segment === 'hour') {
-					newMinutes += baseIncrement * 60
-				} else {
-					newMinutes += baseIncrement * 5
-				}
+        if (segment === 'hour') {
+          newMinutes += baseIncrement * 60
+        } else {
+          newMinutes += baseIncrement * 5
+        }
 
-				if (newMinutes >= 0) {
-					updateEndTime(newMinutes)
-					const formatted = formatDuration(newMinutes)
-					setInputValue(formatted)
-					setTimeout(() => selectSegment(segment), 0)
-				}
-			}
-		}
+        if (newMinutes >= 0) {
+          updateEndTime(newMinutes)
+          const formatted = formatDuration(newMinutes)
+          setInputValue(formatted)
+          setTimeout(() => selectSegment(segment), 0)
+        }
+      }
+    }
 
-		// Tab navigation
-		if (e.key === 'Tab' && !e.shiftKey) {
-			const position = inputRef.current?.selectionStart
-			if (typeof position === 'number') {
-				const segment = getSegmentFromPosition(
-					position,
-					inputValue,
-					config.delimiter,
-					config.segments,
-				)
-				if (segment === 'hour') {
-					e.preventDefault()
-					selectSegment('minute')
-				}
-			}
-		}
+    // Tab navigation
+    if (e.key === 'Tab' && !e.shiftKey) {
+      const position = inputRef.current?.selectionStart
+      if (typeof position === 'number') {
+        const segment = getSegmentFromPosition(
+          position,
+          inputValue,
+          config.delimiter,
+          config.segments,
+        )
+        if (segment === 'hour') {
+          e.preventDefault()
+          selectSegment('minute')
+        }
+      }
+    }
 
-		if (e.key === 'Tab' && e.shiftKey) {
-			const position = inputRef.current?.selectionStart
-			if (typeof position === 'number') {
-				const segment = getSegmentFromPosition(
-					position,
-					inputValue,
-					config.delimiter,
-					config.segments,
-				)
-				if (segment === 'minute') {
-					e.preventDefault()
-					selectSegment('hour')
-				}
-			}
-		}
+    if (e.key === 'Tab' && e.shiftKey) {
+      const position = inputRef.current?.selectionStart
+      if (typeof position === 'number') {
+        const segment = getSegmentFromPosition(
+          position,
+          inputValue,
+          config.delimiter,
+          config.segments,
+        )
+        if (segment === 'minute') {
+          e.preventDefault()
+          selectSegment('hour')
+        }
+      }
+    }
 
-		// Arrow key navigation
-		if (e.key === 'ArrowLeft') {
-			const position = inputRef.current?.selectionStart
-			if (typeof position === 'number') {
-				const segment = getSegmentFromPosition(
-					position,
-					inputValue,
-					config.delimiter,
-					config.segments,
-				)
-				if (segment === 'minute' && position === bounds.minute.start) {
-					e.preventDefault()
-					selectSegment('hour')
-				}
-			}
-		}
+    // Arrow key navigation
+    if (e.key === 'ArrowLeft') {
+      const position = inputRef.current?.selectionStart
+      if (typeof position === 'number') {
+        const segment = getSegmentFromPosition(
+          position,
+          inputValue,
+          config.delimiter,
+          config.segments,
+        )
+        if (segment === 'minute' && position === bounds.minute.start) {
+          e.preventDefault()
+          selectSegment('hour')
+        }
+      }
+    }
 
-		if (e.key === 'ArrowRight') {
-			const position = inputRef.current?.selectionStart
-			if (typeof position === 'number') {
-				const segment = getSegmentFromPosition(
-					position,
-					inputValue,
-					config.delimiter,
-					config.segments,
-				)
-				if (segment === 'hour' && position === bounds.hour.end) {
-					e.preventDefault()
-					selectSegment('minute')
-				}
-			}
-		}
-	}
+    if (e.key === 'ArrowRight') {
+      const position = inputRef.current?.selectionStart
+      if (typeof position === 'number') {
+        const segment = getSegmentFromPosition(
+          position,
+          inputValue,
+          config.delimiter,
+          config.segments,
+        )
+        if (segment === 'hour' && position === bounds.hour.end) {
+          e.preventDefault()
+          selectSegment('minute')
+        }
+      }
+    }
+  }
 
-	// Handle blur
-	const handleBlur = (e: React.FocusEvent<HTMLInputElement>): void => {
-		const relatedTarget = e.relatedTarget as HTMLElement
-		if (relatedTarget?.tagName === 'BUTTON' && relatedTarget.tabIndex === -1) {
-			return
-		}
-		setSelectedSegment(null)
+  // Handle blur
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>): void => {
+    const relatedTarget = e.relatedTarget as HTMLElement
+    if (relatedTarget?.tagName === 'BUTTON' && relatedTarget.tabIndex === -1) {
+      return
+    }
+    setSelectedSegment(null)
 
-		const minutes = parseDuration(inputValue)
-		if (minutes === null) {
-			setInputValue(durationString)
-		} else {
-			setInputValue(formatDuration(minutes))
-		}
-	}
+    const minutes = parseDuration(inputValue)
+    if (minutes === null) {
+      setInputValue(durationString)
+    } else {
+      setInputValue(formatDuration(minutes))
+    }
+  }
 
-	// Handle focus
-	const handleFocus = (): void => {
-		if (inputValue === config.placeholder) {
-			setInputValue('')
-		} else if (
-			inputValue &&
-			!focusFromArrowRef.current &&
-			!focusFromMouseRef.current
-		) {
-			setTimeout(() => selectSegment('hour'), 0)
-		}
-		focusFromArrowRef.current = false
-		focusFromMouseRef.current = false
-	}
+  // Handle focus
+  const handleFocus = (): void => {
+    if (inputValue === config.placeholder) {
+      setInputValue('')
+    } else if (
+      inputValue &&
+      !focusFromArrowRef.current &&
+      !focusFromMouseRef.current
+    ) {
+      setTimeout(() => selectSegment('hour'), 0)
+    }
+    focusFromArrowRef.current = false
+    focusFromMouseRef.current = false
+  }
 
-	// Handle arrow button clicks
-	const handleArrowClick = (direction: 'down' | 'up') => {
-		const currentStartValue = parentFormContext.getValues(startFieldName)
-		const currentEndValue = parentFormContext.getValues(endFieldName)
+  // Handle arrow button clicks
+  const handleArrowClick = (direction: 'down' | 'up') => {
+    const currentStartValue = parentFormContext.getValues(startFieldName)
+    const currentEndValue = parentFormContext.getValues(endFieldName)
 
-		const currentDurationMinutes = calculateDurationMinutes(
-			currentStartValue ? new Date(currentStartValue) : null,
-			currentEndValue ? new Date(currentEndValue) : null,
-		)
+    const currentDurationMinutes = calculateDurationMinutes(
+      currentStartValue ? new Date(currentStartValue) : null,
+      currentEndValue ? new Date(currentEndValue) : null,
+    )
 
-		let targetSegment: DurationSegment
-		let incrementAmount: number
+    let targetSegment: DurationSegment
+    let incrementAmount: number
 
-		if (selectedSegment === 'hour') {
-			targetSegment = 'hour'
-			incrementAmount = 60
-		} else {
-			targetSegment = 'minute'
-			incrementAmount = 5
-		}
+    if (selectedSegment === 'hour') {
+      targetSegment = 'hour'
+      incrementAmount = 60
+    } else {
+      targetSegment = 'minute'
+      incrementAmount = 5
+    }
 
-		const baseIncrement = direction === 'up' ? 1 : -1
-		const newMinutes = currentDurationMinutes + baseIncrement * incrementAmount
+    const baseIncrement = direction === 'up' ? 1 : -1
+    const newMinutes = currentDurationMinutes + baseIncrement * incrementAmount
 
-		if (newMinutes >= 0) {
-			updateEndTime(newMinutes)
-			const formatted = formatDuration(newMinutes)
-			setInputValue(formatted)
+    if (newMinutes >= 0) {
+      updateEndTime(newMinutes)
+      const formatted = formatDuration(newMinutes)
+      setInputValue(formatted)
 
-			focusFromArrowRef.current = true
+      focusFromArrowRef.current = true
 
-			setTimeout(() => {
-				if (inputRef.current && !inputRef.current.matches(':focus')) {
-					inputRef.current.focus()
-				}
-				selectSegment(targetSegment)
-			}, 10)
-		}
-	}
+      setTimeout(() => {
+        if (inputRef.current && !inputRef.current.matches(':focus')) {
+          inputRef.current.focus()
+        }
+        selectSegment(targetSegment)
+      }, 10)
+    }
+  }
 
-	const isInvalid = durationMinutes < 0
+  const isInvalid = durationMinutes < 0
 
-	return (
-		<SegmentedInputWrapper
-			hasSelection={!!selectedSegment}
-			label={t('common.formats.durationFormat', {
-				defaultValue: 'HH:MM',
-			})}
-			onArrowClick={handleArrowClick}
-		>
-			<Input
-				className={`selection:bg-secondary selection:text-secondary-content join-item m-0 font-mono ${isInvalid ? 'text-error' : ''}`}
-				fullWidth={false}
-				onBlur={handleBlur}
-				onChange={handleInputChange}
-				onClick={handleClick}
-				onFocus={handleFocus}
-				onKeyDown={handleKeyDown}
-				onMouseDown={handleMouseDown}
-				placeholder={t('common.formats.durationFormat', {
-					defaultValue: 'HH:MM',
-				})}
-				ref={inputRef}
-				size="md"
-				style={{ fontSize: '0.95rem', width: 'calc(5ch + 1.6rem)' }}
-				type="text"
-				value={inputValue}
-				variant={isInvalid ? 'error' : 'default'}
-			/>
-		</SegmentedInputWrapper>
-	)
+  return (
+    <SegmentedInputWrapper
+      hasSelection={!!selectedSegment}
+      label={t('common.formats.durationFormat', {
+        defaultValue: 'HH:MM',
+      })}
+      onArrowClick={handleArrowClick}
+    >
+      <Input
+        className={`selection:bg-secondary selection:text-secondary-content join-item m-0 font-mono ${isInvalid ? 'text-error' : ''}`}
+        fullWidth={false}
+        onBlur={handleBlur}
+        onChange={handleInputChange}
+        onClick={handleClick}
+        onFocus={handleFocus}
+        onKeyDown={handleKeyDown}
+        onMouseDown={handleMouseDown}
+        placeholder={t('common.formats.durationFormat', {
+          defaultValue: 'HH:MM',
+        })}
+        ref={inputRef}
+        size="md"
+        style={{ fontSize: '0.95rem', width: 'calc(5ch + 1.6rem)' }}
+        type="text"
+        value={inputValue}
+        variant={isInvalid ? 'error' : 'default'}
+      />
+    </SegmentedInputWrapper>
+  )
 }

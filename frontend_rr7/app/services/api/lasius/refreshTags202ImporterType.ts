@@ -3,15 +3,15 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 
-export type RefreshTags202ImporterType =
-	(typeof RefreshTags202ImporterType)[keyof typeof RefreshTags202ImporterType]
+export type RefreshTags202ImporterType = typeof RefreshTags202ImporterType[keyof typeof RefreshTags202ImporterType];
+
 
 export const RefreshTags202ImporterType = {
-	gitlab: 'gitlab',
-	jira: 'jira',
-	plane: 'plane',
-	github: 'github',
-} as const
+  gitlab: 'gitlab',
+  jira: 'jira',
+  plane: 'plane',
+  github: 'github',
+} as const;

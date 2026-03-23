@@ -22,10 +22,10 @@ import { useTranslation } from 'react-i18next'
 
 import { AvatarProject } from '~/components/ui/data-display/avatar/avatar-project'
 import {
-	DataList,
-	DataListField,
-	DataListHeaderItem,
-	DataListRow,
+  DataList,
+  DataListField,
+  DataListHeaderItem,
+  DataListRow,
 } from '~/components/ui/data-display/data-list'
 import { ROLES } from '~/config/constants'
 import { UserRoles } from '~/config/dynamic-translation-strings'
@@ -34,81 +34,79 @@ import { EmptyStateProjects } from '~/features/projects/components/empty-state-p
 import { MyProjectsListItemAdminContext } from '~/features/projects/components/my-projects-list-item-admin-context'
 import { MyProjectsListItemMemberContext } from '~/features/projects/components/my-projects-list-item-member-context'
 import { ProjectLastActivity } from '~/features/projects/components/project-last-activity'
-import { useProjects } from '~/features/projects/hooks/use-projects'
+import { type UserProjectWithActivity } from '~/types/common'
 
 export type ProjectStatusFilter = 'active' | 'both' | 'inactive'
 
 type Props = {
-	searchTerm: string
-	statusFilter: ProjectStatusFilter
+  projects: UserProjectWithActivity[]
+  searchTerm: string
+  statusFilter: ProjectStatusFilter
 }
 
-export const MyProjectsList = ({ searchTerm }: Props) => {
-	const { t } = useTranslation('common')
-	const { userProjects } = useProjects()
+export const MyProjectsList = ({ projects, searchTerm }: Props) => {
+  const { t } = useTranslation('common')
 
-	const filteredProjects = useMemo(() => {
-		const projects = userProjects()
+  const filteredProjects = useMemo(() => {
+    if (!searchTerm.trim()) return projects
 
-		if (!searchTerm.trim()) return projects
+    const searchLower = searchTerm.toLowerCase()
+    return projects.filter((project) =>
+      project.projectReference.key.toLowerCase().includes(searchLower),
+    )
+  }, [projects, searchTerm])
 
-		const searchLower = searchTerm.toLowerCase()
-		return projects.filter((project) =>
-			project.projectReference.key.toLowerCase().includes(searchLower),
-		)
-	}, [userProjects, searchTerm])
+  if (projects.length === 0) {
+    return <EmptyStateProjects />
+  }
 
-	if (userProjects().length === 0) {
-		return <EmptyStateProjects />
-	}
-
-	return (
-		<ContextMenuProvider>
-			<DataList data-testid="project-list">
-				<DataListRow>
-					<DataListHeaderItem />
-					<DataListHeaderItem>
-						{t('common.forms.name', { defaultValue: 'Name' })}
-					</DataListHeaderItem>
-					<DataListHeaderItem>
-						{t('projects.projectRole', {
-							defaultValue: 'Project role',
-						})}
-					</DataListHeaderItem>
-					<DataListHeaderItem>
-						{t('projects.lastActivity', {
-							defaultValue: 'Last activity',
-						})}
-					</DataListHeaderItem>
-					<DataListHeaderItem />
-				</DataListRow>
-				{filteredProjects.map((item) => (
-					<DataListRow
-						data-testid="project-card"
-						key={item.projectReference.id}
-					>
-						<DataListField width={90}>
-							<AvatarProject name={item.projectReference.key} />
-						</DataListField>
-						<DataListField>
-							<span>{item.projectReference.key}</span>
-						</DataListField>
-						<DataListField>
-							<span>{UserRoles[item.role]}</span>
-						</DataListField>
-						<DataListField>
-							<ProjectLastActivity />
-						</DataListField>
-						<DataListField>
-							{item.role === ROLES.PROJECT_ADMIN ? (
-								<MyProjectsListItemAdminContext item={item} />
-							) : (
-								<MyProjectsListItemMemberContext item={item} />
-							)}
-						</DataListField>
-					</DataListRow>
-				))}
-			</DataList>
-		</ContextMenuProvider>
-	)
+  return (
+    <ContextMenuProvider>
+      <DataList data-testid="project-list">
+        <DataListRow>
+          <DataListHeaderItem />
+          <DataListHeaderItem>
+            {t('common.forms.name', { defaultValue: 'Name' })}
+          </DataListHeaderItem>
+          <DataListHeaderItem>
+            {t('projects.projectRole', {
+              defaultValue: 'Project role',
+            })}
+          </DataListHeaderItem>
+          <DataListHeaderItem>
+            {t('projects.lastActivity', {
+              defaultValue: 'Last activity',
+            })}
+          </DataListHeaderItem>
+          <DataListHeaderItem />
+        </DataListRow>
+        {filteredProjects.map((item) => (
+          <DataListRow
+            data-testid="project-card"
+            key={item.projectReference.id}
+          >
+            <DataListField width={90}>
+              <AvatarProject name={item.projectReference.key} />
+            </DataListField>
+            <DataListField>
+              <span>{item.projectReference.key}</span>
+            </DataListField>
+            <DataListField>
+              <span>{UserRoles[item.role]}</span>
+            </DataListField>
+            <DataListField>
+              <ProjectLastActivity lastActivityDate={item.lastActivityDate} />
+            </DataListField>
+            <DataListField>
+              {item.role === ROLES.PROJECT_ADMIN ? (
+                <MyProjectsListItemAdminContext item={item} />
+              ) : (
+                <MyProjectsListItemMemberContext item={item} />
+              )}
+            </DataListField>
+          </DataListRow>
+        ))}
+      </DataList>
+    </ContextMenuProvider>
+  )
 }

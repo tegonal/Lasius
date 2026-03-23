@@ -17,31 +17,21 @@
  *
  */
 
-import { useEffect, useRef } from 'react'
+import { useRouteLoaderData } from 'react-router'
 
-import { AnimateNumber } from '~/components/ui/animations/animate-number'
-import { StatsTileWrapper } from '~/components/ui/data-display/stats-tile-wrapper'
+import { type AugmentedBooking } from '~/lib/api/functions/augment-bookings-list'
+import { type ModelsCurrentUserTimeBooking } from '~/services/api/lasius'
 
-type Props = {
-	label: string
-	standalone?: boolean
-	value: number
+export type HomeLoaderData = {
+  augmentedBookings: AugmentedBooking[]
+  currentBooking?: ModelsCurrentUserTimeBooking
+  selectedOrgId: string
 }
 
-export const StatsTileNumber = ({ label, standalone = true, value }: Props) => {
-	const previousValue = useRef<number>(0)
-	useEffect(() => {
-		previousValue.current = value
-	}, [value])
+const HOME_ROUTE_ID = 'routes/user.layout._index'
 
-	return (
-		<StatsTileWrapper standalone={standalone}>
-			<div className="stat h-fit">
-				<div className="stat-title">{label}</div>
-				<div className="stat-value text-2xl">
-					<AnimateNumber from={previousValue.current} to={value} />
-				</div>
-			</div>
-		</StatsTileWrapper>
-	)
-}
+export const useHomeLoaderData = (): HomeLoaderData | undefined =>
+  useRouteLoaderData(HOME_ROUTE_ID) as HomeLoaderData | undefined
+
+export const useSelectedOrgId = (): string =>
+  useHomeLoaderData()?.selectedOrgId ?? ''

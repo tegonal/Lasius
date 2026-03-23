@@ -3,13 +3,13 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type {
-	ModelsAcceptTOSRequest,
-	ModelsPersonalDataUpdate,
-	ModelsUser,
-	ModelsUserSettings,
+  ModelsAcceptTOSRequest,
+  ModelsPersonalDataUpdate,
+  ModelsUser,
+  ModelsUserSettings,
 } from './..'
 
 import { lasiusFetch } from '../../lasius-fetch-instance'
@@ -18,112 +18,112 @@ import { lasiusFetch } from '../../lasius-fetch-instance'
  * @summary Get current user's profile
  */
 export type getUserProfileResponse200 = {
-	data: ModelsUser
-	status: 200
+  data: ModelsUser
+  status: 200
 }
 
 export type getUserProfileResponseSuccess = getUserProfileResponse200 & {
-	headers: Headers
+  headers: Headers
 }
 export type getUserProfileResponse = getUserProfileResponseSuccess
 
 export const getGetUserProfileUrl = () => {
-	return `/user/profile`
+  return `/user/profile`
 }
 
 export const getUserProfile = async (
-	options?: RequestInit,
+  options?: RequestInit,
 ): Promise<getUserProfileResponse> => {
-	return lasiusFetch<getUserProfileResponse>(getGetUserProfileUrl(), {
-		...options,
-		method: 'GET',
-	})
+  return lasiusFetch<getUserProfileResponse>(getGetUserProfileUrl(), {
+    ...options,
+    method: 'GET',
+  })
 }
 
 /**
  * @summary Change current user's profile
  */
 export type updateUserProfileResponse200 = {
-	data: ModelsUser
-	status: 200
+  data: ModelsUser
+  status: 200
 }
 
 export type updateUserProfileResponseSuccess = updateUserProfileResponse200 & {
-	headers: Headers
+  headers: Headers
 }
 export type updateUserProfileResponse = updateUserProfileResponseSuccess
 
 export const getUpdateUserProfileUrl = () => {
-	return `/user/profile`
+  return `/user/profile`
 }
 
 export const updateUserProfile = async (
-	modelsPersonalDataUpdate: ModelsPersonalDataUpdate,
-	options?: RequestInit,
+  modelsPersonalDataUpdate: ModelsPersonalDataUpdate,
+  options?: RequestInit,
 ): Promise<updateUserProfileResponse> => {
-	return lasiusFetch<updateUserProfileResponse>(getUpdateUserProfileUrl(), {
-		...options,
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json', ...options?.headers },
-		body: JSON.stringify(modelsPersonalDataUpdate),
-	})
+  return lasiusFetch<updateUserProfileResponse>(getUpdateUserProfileUrl(), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(modelsPersonalDataUpdate),
+  })
 }
 
 /**
  * @summary Change current user's settings
  */
 export type updateUserSettingsResponse200 = {
-	data: ModelsUser
-	status: 200
+  data: ModelsUser
+  status: 200
 }
 
 export type updateUserSettingsResponseSuccess =
-	updateUserSettingsResponse200 & {
-		headers: Headers
-	}
+  updateUserSettingsResponse200 & {
+    headers: Headers
+  }
 export type updateUserSettingsResponse = updateUserSettingsResponseSuccess
 
 export const getUpdateUserSettingsUrl = () => {
-	return `/user/profile/settings`
+  return `/user/profile/settings`
 }
 
 export const updateUserSettings = async (
-	modelsUserSettings: ModelsUserSettings,
-	options?: RequestInit,
+  modelsUserSettings: ModelsUserSettings,
+  options?: RequestInit,
 ): Promise<updateUserSettingsResponse> => {
-	return lasiusFetch<updateUserSettingsResponse>(getUpdateUserSettingsUrl(), {
-		...options,
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json', ...options?.headers },
-		body: JSON.stringify(modelsUserSettings),
-	})
+  return lasiusFetch<updateUserSettingsResponse>(getUpdateUserSettingsUrl(), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(modelsUserSettings),
+  })
 }
 
 /**
  * @summary Accept terms of service (TOS)
  */
 export type acceptUserTOSResponse200 = {
-	data: ModelsUser
-	status: 200
+  data: ModelsUser
+  status: 200
 }
 
 export type acceptUserTOSResponseSuccess = acceptUserTOSResponse200 & {
-	headers: Headers
+  headers: Headers
 }
 export type acceptUserTOSResponse = acceptUserTOSResponseSuccess
 
 export const getAcceptUserTOSUrl = () => {
-	return `/user/accept-tos`
+  return `/user/accept-tos`
 }
 
 export const acceptUserTOS = async (
-	modelsAcceptTOSRequest: ModelsAcceptTOSRequest,
-	options?: RequestInit,
+  modelsAcceptTOSRequest: ModelsAcceptTOSRequest,
+  options?: RequestInit,
 ): Promise<acceptUserTOSResponse> => {
-	return lasiusFetch<acceptUserTOSResponse>(getAcceptUserTOSUrl(), {
-		...options,
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json', ...options?.headers },
-		body: JSON.stringify(modelsAcceptTOSRequest),
-	})
+  return lasiusFetch<acceptUserTOSResponse>(getAcceptUserTOSUrl(), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(modelsAcceptTOSRequest),
+  })
 }

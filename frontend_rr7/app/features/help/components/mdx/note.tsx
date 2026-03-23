@@ -22,16 +22,16 @@ import { Info } from 'lucide-react'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 
 interface NoteProps {
-	children: React.ReactNode
+  children: React.ReactNode
 }
 
 export const Note = ({ children }: NoteProps) => {
-	return (
-		<div className="mb-3 flex gap-2">
-			<span className="text-info flex-shrink-0">
-				<LucideIcon icon={Info} size={20} />
-			</span>
-			<span className="leading-relaxed">{children}</span>
-		</div>
-	)
+  return (
+    <div className="mb-3 flex gap-2">
+      <span className="text-info flex-shrink-0">
+        <LucideIcon icon={Info} size={20} />
+      </span>
+      <span className="leading-relaxed">{children}</span>
+    </div>
+  )
 }

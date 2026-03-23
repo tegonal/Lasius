@@ -18,14 +18,14 @@
  */
 
 import {
-	addMonths,
-	format,
-	isSameDay,
-	isToday,
-	setHours,
-	setMinutes,
-	startOfMonth,
-	subMonths,
+  addMonths,
+  format,
+  isSameDay,
+  isToday,
+  setHours,
+  setMinutes,
+  startOfMonth,
+  subMonths,
 } from 'date-fns'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -37,130 +37,130 @@ import { getDateLocale } from '~/lib/utils/date-locale'
 import { formatISOLocale, type IsoDateString } from '~/lib/utils/dates'
 
 type CalendarDisplayProps = {
-	onChange: (date: IsoDateString) => void
-	value: IsoDateString
+  onChange: (date: IsoDateString) => void
+  value: IsoDateString
 }
 
 export const CalendarDisplay = ({ onChange, value }: CalendarDisplayProps) => {
-	const { i18n, t } = useTranslation('common')
-	const locale = getDateLocale(i18n.language)
-	const selectedDate = new Date(value)
-	const [originalTime, setOriginalTime] = useState<number[]>([0, 0])
+  const { i18n, t } = useTranslation('common')
+  const locale = getDateLocale(i18n.language)
+  const selectedDate = new Date(value)
+  const [originalTime, setOriginalTime] = useState<number[]>([0, 0])
 
-	const [viewDate, setViewDate] = useState(() => startOfMonth(selectedDate))
-	const { monthDays, startOffset, weekDays } = useCalendarMonth(viewDate)
+  const [viewDate, setViewDate] = useState(() => startOfMonth(selectedDate))
+  const { monthDays, startOffset, weekDays } = useCalendarMonth(viewDate)
 
-	// Store the original time when the value changes
-	useEffect(() => {
-		if (value) {
-			const date = new Date(value)
-			setOriginalTime([date.getHours(), date.getMinutes()])
-			setViewDate(startOfMonth(date))
-		}
-	}, [value])
+  // Store the original time when the value changes
+  useEffect(() => {
+    if (value) {
+      const date = new Date(value)
+      setOriginalTime([date.getHours(), date.getMinutes()])
+      setViewDate(startOfMonth(date))
+    }
+  }, [value])
 
-	const handlePrevMonth = () => setViewDate((prev) => subMonths(prev, 1))
-	const handleNextMonth = () => setViewDate((prev) => addMonths(prev, 1))
+  const handlePrevMonth = () => setViewDate((prev) => subMonths(prev, 1))
+  const handleNextMonth = () => setViewDate((prev) => addMonths(prev, 1))
 
-	const handleDayClick = (day: Date) => {
-		// Preserve the original time when selecting a new date
-		const updatedDate = setMinutes(
-			setHours(day, originalTime[0] ?? 0),
-			originalTime[1] ?? 0,
-		)
-		onChange(formatISOLocale(updatedDate))
-	}
+  const handleDayClick = (day: Date) => {
+    // Preserve the original time when selecting a new date
+    const updatedDate = setMinutes(
+      setHours(day, originalTime[0] ?? 0),
+      originalTime[1] ?? 0,
+    )
+    onChange(formatISOLocale(updatedDate))
+  }
 
-	const handleToday = () => {
-		const today = new Date()
-		setViewDate(startOfMonth(today))
-		const updatedDate = setMinutes(
-			setHours(today, originalTime[0] ?? 0),
-			originalTime[1] ?? 0,
-		)
-		onChange(formatISOLocale(updatedDate))
-	}
+  const handleToday = () => {
+    const today = new Date()
+    setViewDate(startOfMonth(today))
+    const updatedDate = setMinutes(
+      setHours(today, originalTime[0] ?? 0),
+      originalTime[1] ?? 0,
+    )
+    onChange(formatISOLocale(updatedDate))
+  }
 
-	const showTodayButton = !isToday(selectedDate)
+  const showTodayButton = !isToday(selectedDate)
 
-	return (
-		<div className="w-full select-none">
-			<div className="mb-3 flex items-center justify-between">
-				<button
-					aria-label={t('calendar.navigation.previousMonth', {
-						defaultValue: 'Previous month',
-					})}
-					className="btn btn-ghost btn-sm btn-circle"
-					onClick={handlePrevMonth}
-				>
-					<ChevronLeft size={16} />
-				</button>
-				<div className="flex flex-col items-center">
-					<div className="text-sm font-medium">
-						{format(viewDate, 'MMMM', { locale })}
-					</div>
-					<div className="text-base-content/60 text-xs">
-						{format(viewDate, 'yyyy')}
-					</div>
-				</div>
-				<button
-					aria-label={t('calendar.navigation.nextMonth', {
-						defaultValue: 'Next month',
-					})}
-					className="btn btn-ghost btn-sm btn-circle"
-					onClick={handleNextMonth}
-				>
-					<ChevronRight size={16} />
-				</button>
-			</div>
+  return (
+    <div className="w-full select-none">
+      <div className="mb-3 flex items-center justify-between">
+        <button
+          aria-label={t('calendar.navigation.previousMonth', {
+            defaultValue: 'Previous month',
+          })}
+          className="btn btn-ghost btn-sm btn-circle"
+          onClick={handlePrevMonth}
+        >
+          <ChevronLeft size={16} />
+        </button>
+        <div className="flex flex-col items-center">
+          <div className="text-sm font-medium">
+            {format(viewDate, 'MMMM', { locale })}
+          </div>
+          <div className="text-base-content/60 text-xs">
+            {format(viewDate, 'yyyy')}
+          </div>
+        </div>
+        <button
+          aria-label={t('calendar.navigation.nextMonth', {
+            defaultValue: 'Next month',
+          })}
+          className="btn btn-ghost btn-sm btn-circle"
+          onClick={handleNextMonth}
+        >
+          <ChevronRight size={16} />
+        </button>
+      </div>
 
-			{showTodayButton && (
-				<div className="mb-2 flex justify-center">
-					<button
-						aria-label={t('common.time.today', {
-							defaultValue: 'Today',
-						})}
-						className="btn btn-ghost btn-xs"
-						onClick={handleToday}
-					>
-						{t('common.time.today', { defaultValue: 'Today' })}
-					</button>
-				</div>
-			)}
+      {showTodayButton && (
+        <div className="mb-2 flex justify-center">
+          <button
+            aria-label={t('common.time.today', {
+              defaultValue: 'Today',
+            })}
+            className="btn btn-ghost btn-xs"
+            onClick={handleToday}
+          >
+            {t('common.time.today', { defaultValue: 'Today' })}
+          </button>
+        </div>
+      )}
 
-			<div className="mb-1 grid grid-cols-7 gap-1 text-center">
-				{weekDays.map((day, index) => (
-					<div className="text-base-content/60 text-xs font-medium" key={index}>
-						{day}
-					</div>
-				))}
-			</div>
+      <div className="mb-1 grid grid-cols-7 gap-1 text-center">
+        {weekDays.map((day, index) => (
+          <div className="text-base-content/60 text-xs font-medium" key={index}>
+            {day}
+          </div>
+        ))}
+      </div>
 
-			<div className="grid w-full grid-cols-7 gap-1">
-				{Array.from({ length: startOffset }, (_, i) => (
-					<div key={`filler-${i}`} />
-				))}
-				{monthDays.map((day) => {
-					const isSelected = isSameDay(day, selectedDate)
-					const isTodayDate = isToday(day)
+      <div className="grid w-full grid-cols-7 gap-1">
+        {Array.from({ length: startOffset }, (_, i) => (
+          <div key={`filler-${i}`} />
+        ))}
+        {monthDays.map((day) => {
+          const isSelected = isSameDay(day, selectedDate)
+          const isTodayDate = isToday(day)
 
-					return (
-						<button
-							aria-label={format(day, 'PPP', { locale })}
-							className={cn(
-								'flex h-8 w-full cursor-pointer items-center justify-center rounded text-sm transition-colors',
-								isSelected && 'bg-secondary text-secondary-content',
-								!isSelected && 'hover:bg-base-200',
-								isTodayDate && !isSelected && 'text-secondary font-bold',
-							)}
-							key={day.toISOString()}
-							onClick={() => handleDayClick(day)}
-						>
-							{day.getDate()}
-						</button>
-					)
-				})}
-			</div>
-		</div>
-	)
+          return (
+            <button
+              aria-label={format(day, 'PPP', { locale })}
+              className={cn(
+                'flex h-8 w-full cursor-pointer items-center justify-center rounded text-sm transition-colors',
+                isSelected && 'bg-secondary text-secondary-content',
+                !isSelected && 'hover:bg-base-200',
+                isTodayDate && !isSelected && 'text-secondary font-bold',
+              )}
+              key={day.toISOString()}
+              onClick={() => handleDayClick(day)}
+            >
+              {day.getDate()}
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
 }

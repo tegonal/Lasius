@@ -17,20 +17,20 @@
  *
  */
 
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useRef } from 'react'
 
 import { type ModelsTag } from '~/services/api/lasius'
 import {
-	useStartUserBookingCurrent,
-	useStopUserBookingCurrent,
+  useStartUserBookingCurrent,
+  useStopUserBookingCurrent,
 } from '~/services/api/lasius-hooks/user-bookings/user-bookings'
 
 type StopAndStartPayload = {
-	currentBookingId?: string
-	orgId: string
-	projectId: string
-	start: string
-	tags: ModelsTag[]
+  currentBookingId?: string
+  orgId: string
+  projectId: string
+  start: string
+  tags: ModelsTag[]
 }
 
 /**
@@ -38,56 +38,55 @@ type StopAndStartPayload = {
  * Chains useStopUserBookingCurrent → useStartUserBookingCurrent.
  */
 export function useStopAndStart() {
-	const stopApi = useStopUserBookingCurrent()
-	const startApi = useStartUserBookingCurrent()
-	const pendingStartRef = useRef<null | {
-		orgId: string
-		projectId: string
-		start: string
-		tags: ModelsTag[]
-	}>(null)
+  const pendingStartRef = useRef<null | {
+    orgId: string
+    projectId: string
+    start: string
+    tags: ModelsTag[]
+  }>(null)
 
-	// When stop completes, fire start
-	useEffect(() => {
-		if (stopApi.state === 'idle' && pendingStartRef.current) {
-			const { orgId, projectId, start, tags } = pendingStartRef.current
-			pendingStartRef.current = null
-			startApi.submit({
-				body: { projectId, start, tags },
-				orgId,
-			})
-		}
-	}, [stopApi.state, startApi])
+  const startApi = useStartUserBookingCurrent()
 
-	const submit = useCallback(
-		(payload: StopAndStartPayload) => {
-			const { currentBookingId, orgId, projectId, start, tags } = payload
+  const stopApi = useStopUserBookingCurrent({
+    onSuccess: () => {
+      if (pendingStartRef.current) {
+        const { orgId, projectId, start, tags } = pendingStartRef.current
+        pendingStartRef.current = null
+        startApi.submit({
+          body: { projectId, start, tags },
+          orgId,
+        })
+      }
+    },
+  })
 
-			if (currentBookingId) {
-				// Stop first, then start on completion
-				pendingStartRef.current = { orgId, projectId, start, tags }
-				stopApi.submit({
-					body: { end: start },
-					bookingId: currentBookingId,
-					orgId,
-				})
-			} else {
-				// No current booking, start directly
-				startApi.submit({
-					body: { projectId, start, tags },
-					orgId,
-				})
-			}
-		},
-		[stopApi, startApi],
-	)
+  const submit = useCallback(
+    (payload: StopAndStartPayload) => {
+      const { currentBookingId, orgId, projectId, start, tags } = payload
 
-	const state =
-		stopApi.state !== 'idle' ||
-		startApi.state !== 'idle' ||
-		pendingStartRef.current
-			? 'submitting'
-			: 'idle'
+      if (currentBookingId) {
+        // Stop first, then start on completion via onSuccess callback
+        pendingStartRef.current = { orgId, projectId, start, tags }
+        stopApi.submit({
+          body: { end: start },
+          bookingId: currentBookingId,
+          orgId,
+        })
+      } else {
+        // No current booking, start directly
+        startApi.submit({
+          body: { projectId, start, tags },
+          orgId,
+        })
+      }
+    },
+    [stopApi, startApi],
+  )
 
-	return { state, submit }
+  const state =
+    stopApi.state !== 'idle' || startApi.state !== 'idle'
+      ? 'submitting'
+      : 'idle'
+
+  return { state, submit }
 }

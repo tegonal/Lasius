@@ -21,9 +21,9 @@ import { data } from 'react-router'
 
 import { getUserBookingListByOrganisation } from '~/services/api/lasius/user-bookings/user-bookings'
 import {
-	authHeaders,
-	mergeAuthHeaders,
-	requireUser,
+  authHeaders,
+  mergeAuthHeaders,
+  requireUser,
 } from '~/services/auth/auth-helpers.server'
 
 /**
@@ -33,24 +33,24 @@ import {
  * Called by CalendarDataProvider via useFetcher.load().
  */
 export async function loader({ request }: { request: Request }) {
-	const auth = await requireUser(request)
-	const url = new URL(request.url)
-	const orgId = url.searchParams.get('orgId')
-	const from = url.searchParams.get('from')
-	const to = url.searchParams.get('to')
+  const auth = await requireUser(request)
+  const url = new URL(request.url)
+  const orgId = url.searchParams.get('orgId')
+  const from = url.searchParams.get('from')
+  const to = url.searchParams.get('to')
 
-	if (!orgId || !from || !to) {
-		return data(
-			{ bookings: [] },
-			{ headers: mergeAuthHeaders(auth), status: 400 },
-		)
-	}
+  if (!orgId || !from || !to) {
+    return data(
+      { bookings: [] },
+      { headers: mergeAuthHeaders(auth), status: 400 },
+    )
+  }
 
-	const result = await getUserBookingListByOrganisation(
-		orgId,
-		{ from, to },
-		{ headers: authHeaders(auth.session) },
-	)
+  const result = await getUserBookingListByOrganisation(
+    orgId,
+    { from, to },
+    { headers: authHeaders(auth.session) },
+  )
 
-	return data({ bookings: result.data }, { headers: mergeAuthHeaders(auth) })
+  return data({ bookings: result.data }, { headers: mergeAuthHeaders(auth) })
 }

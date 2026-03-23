@@ -20,189 +20,189 @@
 @import 'tailwindcss';
 /* Configure DaisyUI settings */
 @plugin 'daisyui' {
-	themes:
-		light --default,
-		dark --prefersdark;
-	logs: false;
+  themes:
+    light --default,
+    dark --prefersdark;
+  logs: false;
 }
 
 /* Roboto font faces */
 /* roboto-300 - latin-ext_latin */
 @font-face {
-	font-family: 'Roboto';
-	font-style: normal;
-	font-weight: 300;
-	src:
-		local(''),
-		url('/fonts/roboto-v29-latin-ext_latin-300.woff2') format('woff2'),
-		url('/fonts/roboto-v29-latin-ext_latin-300.woff') format('woff');
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 300;
+  src:
+    local(''),
+    url('/fonts/roboto-v29-latin-ext_latin-300.woff2') format('woff2'),
+    url('/fonts/roboto-v29-latin-ext_latin-300.woff') format('woff');
 }
 
 /* roboto-regular - latin-ext_latin */
 @font-face {
-	font-family: 'Roboto';
-	font-style: normal;
-	font-weight: 400;
-	src:
-		local(''),
-		url('/fonts/roboto-v29-latin-ext_latin-regular.woff2') format('woff2'),
-		url('/fonts/roboto-v29-latin-ext_latin-regular.woff') format('woff');
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  src:
+    local(''),
+    url('/fonts/roboto-v29-latin-ext_latin-regular.woff2') format('woff2'),
+    url('/fonts/roboto-v29-latin-ext_latin-regular.woff') format('woff');
 }
 
 /* roboto-500 - latin-ext_latin */
 @font-face {
-	font-family: 'Roboto';
-	font-style: normal;
-	font-weight: 500;
-	src:
-		local(''),
-		url('/fonts/roboto-v29-latin-ext_latin-500.woff2') format('woff2'),
-		url('/fonts/roboto-v29-latin-ext_latin-500.woff') format('woff');
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  src:
+    local(''),
+    url('/fonts/roboto-v29-latin-ext_latin-500.woff2') format('woff2'),
+    url('/fonts/roboto-v29-latin-ext_latin-500.woff') format('woff');
 }
 
 /* roboto-700 - latin-ext_latin */
 @font-face {
-	font-family: 'Roboto';
-	font-style: normal;
-	font-weight: 700;
-	src:
-		local(''),
-		url('/fonts/roboto-v29-latin-ext_latin-700.woff2') format('woff2'),
-		url('/fonts/roboto-v29-latin-ext_latin-700.woff') format('woff');
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 700;
+  src:
+    local(''),
+    url('/fonts/roboto-v29-latin-ext_latin-700.woff2') format('woff2'),
+    url('/fonts/roboto-v29-latin-ext_latin-700.woff') format('woff');
 }
 
 /* Define custom theme variables for Tailwind CSS 4 */
 @theme {
-	/* Custom font families */
-	--font-body: Roboto, 'Open Sans', sans-serif;
-	--font-heading: Roboto, 'Open Sans', sans-serif;
-	--font-monospace: Menlo, monospace;
+  /* Custom font families */
+  --font-body: Roboto, 'Open Sans', sans-serif;
+  --font-heading: Roboto, 'Open Sans', sans-serif;
+  --font-monospace: Menlo, monospace;
 
-	/* Custom breakpoints matching Bootstrap/Theme-UI */
-	--breakpoint-xs: 540px;
-	--breakpoint-sm: 720px;
-	--breakpoint-md: 960px;
-	--breakpoint-lg: 1140px;
-	--breakpoint-xl: 1440px;
-	--breakpoint-2xl: 1680px;
+  /* Custom breakpoints matching Bootstrap/Theme-UI */
+  --breakpoint-xs: 540px;
+  --breakpoint-sm: 720px;
+  --breakpoint-md: 960px;
+  --breakpoint-lg: 1140px;
+  --breakpoint-xl: 1440px;
+  --breakpoint-2xl: 1680px;
 
-	/* Custom font sizes */
-	--text-xs: 0.75rem;
-	--text-sm: 0.875rem;
-	--text-base: 1rem;
-	--text-lg: 1.125rem;
-	--text-xl: 1.25rem;
-	--text-2xl: 1.5rem;
-	--text-3xl: 1.875rem;
-	--text-4xl: 2.25rem;
-	--text-5xl: 3rem;
+  /* Custom font sizes */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
 
-	--brand-palette-1: oklch(83.36% 0.190086 115.7359);
-	--brand-palette-2: oklch(91.95% 0.1087 107.22);
-	--brand-palette-3: oklch(63.9% 0.0944 315.55);
-	--brand-palette-4: oklch(47.41% 0.0477 178.24);
-	--brand-palette-5: oklch(28.54% 0.0124 150.21);
+  --brand-palette-1: oklch(83.36% 0.190086 115.7359);
+  --brand-palette-2: oklch(91.95% 0.1087 107.22);
+  --brand-palette-3: oklch(63.9% 0.0944 315.55);
+  --brand-palette-4: oklch(47.41% 0.0477 178.24);
+  --brand-palette-5: oklch(28.54% 0.0124 150.21);
 }
 
 /* DaisyUI theme configuration for light theme */
 @plugin 'daisyui/theme' {
-	name: 'light';
-	default: true;
-	color-scheme: light;
+  name: 'light';
+  default: true;
+  color-scheme: light;
 
-	/* Main theme colors - matching Theme-UI light mode exactly */
-	--color-primary: var(--brand-palette-1);
-	--color-primary-content: oklch(
-		from var(--brand-palette-1) calc(l * 0.33) c h
-	);
-	--color-secondary: var(--brand-palette-3);
-	--color-secondary-content: oklch(98.5% 0 0);
-	--color-accent: var(--brand-palette-4);
-	--color-accent-content: oklch(98.5% 0 0);
-	--color-neutral: oklch(75% 0 0);
-	--color-neutral-content: oklch(98% 0 0);
+  /* Main theme colors - matching Theme-UI light mode exactly */
+  --color-primary: var(--brand-palette-1);
+  --color-primary-content: oklch(
+    from var(--brand-palette-1) calc(l * 0.33) c h
+  );
+  --color-secondary: var(--brand-palette-3);
+  --color-secondary-content: oklch(98.5% 0 0);
+  --color-accent: var(--brand-palette-4);
+  --color-accent-content: oklch(98.5% 0 0);
+  --color-neutral: oklch(75% 0 0);
+  --color-neutral-content: oklch(98% 0 0);
 
-	/* Base colors (backgrounds) - matching Theme-UI light mode */
-	--color-base-100: oklch(95% 0 0);
-	--color-base-200: oklch(92% 0 0);
-	--color-base-300: oklch(98.5% 0 0);
-	--color-base-content: oklch(18% 0 0);
+  /* Base colors (backgrounds) - matching Theme-UI light mode */
+  --color-base-100: oklch(95% 0 0);
+  --color-base-200: oklch(92% 0 0);
+  --color-base-300: oklch(98.5% 0 0);
+  --color-base-content: oklch(18% 0 0);
 
-	/* Custom body background - same as base-100 for consistency */
-	--root-bg: oklch(95% 0 0);
+  /* Custom body background - same as base-100 for consistency */
+  --root-bg: oklch(95% 0 0);
 
-	/* Semantic colors - balanced for light theme */
-	--color-info: oklch(55% 0.15 240);
-	--color-info-content: oklch(98% 0 0);
-	--color-success: oklch(55% 0.35 145);
-	--color-success-content: oklch(98% 0 0);
-	--color-warning: oklch(65% 0.18 70);
-	--color-warning-content: oklch(98% 0 0);
-	--color-error: oklch(55% 0.22 25);
-	--color-error-content: oklch(98% 0 0);
+  /* Semantic colors - balanced for light theme */
+  --color-info: oklch(55% 0.15 240);
+  --color-info-content: oklch(98% 0 0);
+  --color-success: oklch(55% 0.35 145);
+  --color-success-content: oklch(98% 0 0);
+  --color-warning: oklch(65% 0.18 70);
+  --color-warning-content: oklch(98% 0 0);
+  --color-error: oklch(55% 0.22 25);
+  --color-error-content: oklch(98% 0 0);
 
-	/* Border radius */
-	--rounded-box: 0.25rem;
-	--rounded-btn: 0.25rem;
-	--rounded-badge: 0.25rem;
+  /* Border radius */
+  --rounded-box: 0.25rem;
+  --rounded-btn: 0.25rem;
+  --rounded-badge: 0.25rem;
 
-	/* Animation settings */
-	--animation-btn: 0.25s;
-	--animation-input: 0.2s;
-	--btn-focus-scale: 0.95;
-	--border-btn: 1px;
-	--tab-border: 1px;
-	--tab-radius: 0.25rem;
+  /* Animation settings */
+  --animation-btn: 0.25s;
+  --animation-input: 0.2s;
+  --btn-focus-scale: 0.95;
+  --border-btn: 1px;
+  --tab-border: 1px;
+  --tab-radius: 0.25rem;
 }
 
 /* DaisyUI theme configuration for dark theme */
 @plugin 'daisyui/theme' {
-	name: 'dark';
-	color-scheme: dark;
+  name: 'dark';
+  color-scheme: dark;
 
-	/* Main theme colors - matching Theme-UI dark mode exactly */
-	--color-primary: var(--brand-palette-1);
-	--color-primary-content: oklch(
-		from var(--brand-palette-1) calc(l * 0.33) c h
-	);
-	--color-secondary: var(--brand-palette-3);
-	--color-secondary-content: oklch(98.5% 0 0);
-	--color-accent: var(--brand-palette-4);
-	--color-accent-content: oklch(98.5% 0 0);
-	--color-neutral: oklch(from var(--brand-palette-5) calc(l * 1.25) c h);
-	--color-neutral-content: oklch(98.5% 0 0);
+  /* Main theme colors - matching Theme-UI dark mode exactly */
+  --color-primary: var(--brand-palette-1);
+  --color-primary-content: oklch(
+    from var(--brand-palette-1) calc(l * 0.33) c h
+  );
+  --color-secondary: var(--brand-palette-3);
+  --color-secondary-content: oklch(98.5% 0 0);
+  --color-accent: var(--brand-palette-4);
+  --color-accent-content: oklch(98.5% 0 0);
+  --color-neutral: oklch(from var(--brand-palette-5) calc(l * 1.25) c h);
+  --color-neutral-content: oklch(98.5% 0 0);
 
-	/* Base colors (backgrounds) - matching Theme-UI dark mode */
-	--color-base-100: oklch(from var(--brand-palette-5) calc(l * 0.5) c h);
-	--color-base-200: oklch(from var(--brand-palette-5) calc(l * 0.75) c h);
-	--color-base-300: var(--brand-palette-5);
-	--color-base-content: oklch(98.5% 0 0);
+  /* Base colors (backgrounds) - matching Theme-UI dark mode */
+  --color-base-100: oklch(from var(--brand-palette-5) calc(l * 0.5) c h);
+  --color-base-200: oklch(from var(--brand-palette-5) calc(l * 0.75) c h);
+  --color-base-300: var(--brand-palette-5);
+  --color-base-content: oklch(98.5% 0 0);
 
-	/* Custom body background - same as base-100 for consistency */
-	--root-bg: oklch(from var(--brand-palette-5) calc(l * 0.25) c h);
+  /* Custom body background - same as base-100 for consistency */
+  --root-bg: oklch(from var(--brand-palette-5) calc(l * 0.25) c h);
 
-	/* Semantic colors - balanced for dark theme */
-	--color-info: oklch(55% 0.15 240);
-	--color-info-content: oklch(98% 0 0);
-	--color-success: oklch(55% 0.35 145);
-	--color-success-content: oklch(98% 0 0);
-	--color-warning: oklch(65% 0.18 70);
-	--color-warning-content: oklch(98% 0 0);
-	--color-error: oklch(55% 0.22 25);
-	--color-error-content: oklch(98% 0 0);
+  /* Semantic colors - balanced for dark theme */
+  --color-info: oklch(55% 0.15 240);
+  --color-info-content: oklch(98% 0 0);
+  --color-success: oklch(55% 0.35 145);
+  --color-success-content: oklch(98% 0 0);
+  --color-warning: oklch(65% 0.18 70);
+  --color-warning-content: oklch(98% 0 0);
+  --color-error: oklch(55% 0.22 25);
+  --color-error-content: oklch(98% 0 0);
 
-	/* Border radius */
-	--rounded-box: 0.25rem;
-	--rounded-btn: 0.25rem;
-	--rounded-badge: 0.25rem;
+  /* Border radius */
+  --rounded-box: 0.25rem;
+  --rounded-btn: 0.25rem;
+  --rounded-badge: 0.25rem;
 
-	/* Animation settings */
-	--animation-btn: 0.25s;
-	--animation-input: 0.2s;
-	--btn-focus-scale: 0.95;
-	--border-btn: 1px;
-	--tab-border: 1px;
-	--tab-radius: 0.25rem;
+  /* Animation settings */
+  --animation-btn: 0.25s;
+  --animation-input: 0.2s;
+  --btn-focus-scale: 0.95;
+  --border-btn: 1px;
+  --tab-border: 1px;
+  --tab-radius: 0.25rem;
 }
 
 /* Custom variant for dark mode using DaisyUI theme */
@@ -210,181 +210,181 @@
 
 /* Global styles for body/html */
 @layer base {
-	html {
-		height: 100%;
-		min-height: 100vh;
-		min-height: 100dvh;
-		min-height: -webkit-fill-available;
-	}
+  html {
+    height: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    min-height: -webkit-fill-available;
+  }
 
-	body {
-		margin: 0;
-		padding: 0;
-		background-color: var(--root-bg);
-		color: var(--color-base-content);
-		font-family: Roboto, 'Open Sans', sans-serif;
-		font-weight: 400;
-		line-height: 1.666;
-		height: 100%;
-	}
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--root-bg);
+    color: var(--color-base-content);
+    font-family: Roboto, 'Open Sans', sans-serif;
+    font-weight: 400;
+    line-height: 1.666;
+    height: 100%;
+  }
 
-	/* Ensure smooth color transitions when theme changes */
-	html {
-		transition:
-			background-color 0.3s ease,
-			color 0.3s ease;
-	}
+  /* Ensure smooth color transitions when theme changes */
+  html {
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease;
+  }
 }
 
 /* Override DaisyUI select arrow when using custom arrow */
 @layer components {
-	/* Hide default select arrow when appearance-none is used */
-	select.appearance-none::-webkit-outer-spin-button,
-	select.appearance-none::-webkit-inner-spin-button {
-		-webkit-appearance: none;
-		margin: 0;
-	}
+  /* Hide default select arrow when appearance-none is used */
+  select.appearance-none::-webkit-outer-spin-button,
+  select.appearance-none::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 
-	/* Firefox */
-	select.appearance-none {
-		-moz-appearance: none;
-		appearance: none;
-	}
+  /* Firefox */
+  select.appearance-none {
+    -moz-appearance: none;
+    appearance: none;
+  }
 
-	/* IE 10+ */
-	select.appearance-none::-ms-expand {
-		display: none;
-	}
+  /* IE 10+ */
+  select.appearance-none::-ms-expand {
+    display: none;
+  }
 }
 
 /* Custom gradient styles to match Theme-UI gradients */
 @layer utilities {
-	/* Green gradients for primary buttons */
-	.bg-primary-gradient {
-		background: linear-gradient(
-			180deg,
-			oklch(from var(--brand-palette-1) calc(l * 0.85) c h) 0%,
-			oklch(from var(--brand-palette-1) calc(l * 0.75) c h) 100%
-		);
-	}
-	.hover\:bg-primary-gradient-hover:hover {
-		background: linear-gradient(
-			180deg,
-			oklch(from var(--brand-palette-1) calc(l * 0.75) c h) 0%,
-			oklch(from var(--brand-palette-1) calc(l * 0.65) c h) 100%
-		);
-	}
+  /* Green gradients for primary buttons */
+  .bg-primary-gradient {
+    background: linear-gradient(
+      180deg,
+      oklch(from var(--brand-palette-1) calc(l * 0.85) c h) 0%,
+      oklch(from var(--brand-palette-1) calc(l * 0.75) c h) 100%
+    );
+  }
+  .hover\:bg-primary-gradient-hover:hover {
+    background: linear-gradient(
+      180deg,
+      oklch(from var(--brand-palette-1) calc(l * 0.75) c h) 0%,
+      oklch(from var(--brand-palette-1) calc(l * 0.65) c h) 100%
+    );
+  }
 
-	/* Gray gradients for secondary buttons */
-	.bg-neutral-gradient {
-		background: linear-gradient(
-			180deg,
-			oklch(from var(--color-neutral) calc(l * 0.97) c h) 0%,
-			oklch(from var(--color-neutral) calc(l * 0.92) c h) 100%
-		);
-	}
-	.hover\:bg-neutral-gradient-hover:hover {
-		background: linear-gradient(
-			180deg,
-			oklch(from var(--color-neutral) calc(l * 0.9) c h) 0%,
-			oklch(from var(--color-neutral) calc(l * 0.85) c h) 100%
-		);
-	}
+  /* Gray gradients for secondary buttons */
+  .bg-neutral-gradient {
+    background: linear-gradient(
+      180deg,
+      oklch(from var(--color-neutral) calc(l * 0.97) c h) 0%,
+      oklch(from var(--color-neutral) calc(l * 0.92) c h) 100%
+    );
+  }
+  .hover\:bg-neutral-gradient-hover:hover {
+    background: linear-gradient(
+      180deg,
+      oklch(from var(--color-neutral) calc(l * 0.9) c h) 0%,
+      oklch(from var(--color-neutral) calc(l * 0.85) c h) 100%
+    );
+  }
 
-	/* Red gradients for danger/error buttons */
-	.bg-red-gradient {
-		background: linear-gradient(
-			180deg,
-			oklch(60% 0.25 25) 0%,
-			oklch(50% 0.23 25) 100%
-		);
-	}
-	.hover\:bg-red-gradient-hover:hover {
-		background: linear-gradient(
-			180deg,
-			oklch(58% 0.24 25) 0%,
-			oklch(45% 0.22 25) 100%
-		);
-	}
+  /* Red gradients for danger/error buttons */
+  .bg-red-gradient {
+    background: linear-gradient(
+      180deg,
+      oklch(60% 0.25 25) 0%,
+      oklch(50% 0.23 25) 100%
+    );
+  }
+  .hover\:bg-red-gradient-hover:hover {
+    background: linear-gradient(
+      180deg,
+      oklch(58% 0.24 25) 0%,
+      oklch(45% 0.22 25) 100%
+    );
+  }
 
-	/* Fix for btn-circle border-radius issue with Tailwind CSS v4 */
-	.btn-circle {
-		border-radius: 9999px !important;
-		aspect-ratio: 1 / 1;
-	}
+  /* Fix for btn-circle border-radius issue with Tailwind CSS v4 */
+  .btn-circle {
+    border-radius: 9999px !important;
+    aspect-ratio: 1 / 1;
+  }
 
-	/* Animations for modern login page */
-	@keyframes fadeInUp {
-		from {
-			opacity: 0;
-			transform: translateY(20px);
-		}
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
-	}
+  /* Animations for modern login page */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 
-	@keyframes fadeIn {
-		from {
-			opacity: 0;
-		}
-		to {
-			opacity: 1;
-		}
-	}
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 
-	.animate-fade-in {
-		animation-name: fadeIn;
-	}
+  .animate-fade-in {
+    animation-name: fadeIn;
+  }
 
-	@keyframes star-explode {
-		0% {
-			opacity: 1;
-			transform: translate(0, 0) scale(0) rotate(0deg);
-		}
-		25% {
-			opacity: 1;
-			transform: translate(
-					calc(var(--star-tx) * 0.35),
-					calc(var(--star-ty) * 0.35 - 6px)
-				)
-				scale(1.2) rotate(calc(var(--star-rot) * 0.3));
-		}
-		50% {
-			opacity: 0.9;
-			transform: translate(
-					calc(var(--star-tx) * 0.65),
-					calc(var(--star-ty) * 0.65 - 4px)
-				)
-				scale(0.9) rotate(calc(var(--star-rot) * 0.6));
-		}
-		75% {
-			opacity: 0.5;
-			transform: translate(
-					calc(var(--star-tx) * 0.88),
-					calc(var(--star-ty) * 0.88)
-				)
-				scale(0.5) rotate(calc(var(--star-rot) * 0.85));
-		}
-		100% {
-			opacity: 0;
-			transform: translate(var(--star-tx), var(--star-ty)) scale(0)
-				rotate(var(--star-rot));
-		}
-	}
+  @keyframes star-explode {
+    0% {
+      opacity: 1;
+      transform: translate(0, 0) scale(0) rotate(0deg);
+    }
+    25% {
+      opacity: 1;
+      transform: translate(
+          calc(var(--star-tx) * 0.35),
+          calc(var(--star-ty) * 0.35 - 6px)
+        )
+        scale(1.2) rotate(calc(var(--star-rot) * 0.3));
+    }
+    50% {
+      opacity: 0.9;
+      transform: translate(
+          calc(var(--star-tx) * 0.65),
+          calc(var(--star-ty) * 0.65 - 4px)
+        )
+        scale(0.9) rotate(calc(var(--star-rot) * 0.6));
+    }
+    75% {
+      opacity: 0.5;
+      transform: translate(
+          calc(var(--star-tx) * 0.88),
+          calc(var(--star-ty) * 0.88)
+        )
+        scale(0.5) rotate(calc(var(--star-rot) * 0.85));
+    }
+    100% {
+      opacity: 0;
+      transform: translate(var(--star-tx), var(--star-ty)) scale(0)
+        rotate(var(--star-rot));
+    }
+  }
 
-	.input {
-		&:focus,
-		&:focus-within {
-			@apply outline-secondary border-secondary outline-2 outline-offset-0;
-		}
-	}
+  .input {
+    &:focus,
+    &:focus-within {
+      @apply outline-secondary border-secondary outline-2 outline-offset-0;
+    }
+  }
 
-	/* Override 1Password autofill styling - use theme colors */
-	input[data-com-onepassword-filled],
-	textarea[data-com-onepassword-filled],
-	select[data-com-onepassword-filled] {
-		color: rgb(0, 0, 0) !important;
-	}
+  /* Override 1Password autofill styling - use theme colors */
+  input[data-com-onepassword-filled],
+  textarea[data-com-onepassword-filled],
+  select[data-com-onepassword-filled] {
+    color: rgb(0, 0, 0) !important;
+  }
 }

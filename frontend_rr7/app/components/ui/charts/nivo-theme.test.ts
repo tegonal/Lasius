@@ -22,38 +22,38 @@ import { describe, expect, it } from 'vitest'
 import { getConsistentColor, nivoTheme } from './nivo-theme'
 
 describe('nivoTheme', () => {
-	it('has transparent background', () => {
-		expect(nivoTheme.background).toBe('transparent')
-	})
+  it('has transparent background', () => {
+    expect(nivoTheme.background).toBe('transparent')
+  })
 
-	it('uses CSS variables for text color', () => {
-		expect(nivoTheme.textColor).toBe('var(--color-base-content)')
-	})
+  it('uses CSS variables for text color', () => {
+    expect(nivoTheme.textColor).toBe('var(--color-base-content)')
+  })
 })
 
 describe('getConsistentColor', () => {
-	it('returns the same color for the same key', () => {
-		const color1 = getConsistentColor('Week 1', false)
-		const color2 = getConsistentColor('Week 1', false)
-		expect(color1).toBe(color2)
-	})
+  it('returns the same color for the same key', () => {
+    const color1 = getConsistentColor('Week 1', false)
+    const color2 = getConsistentColor('Week 1', false)
+    expect(color1).toBe(color2)
+  })
 
-	it('returns a string starting with #', () => {
-		const color = getConsistentColor('test', false)
-		expect(color).toMatch(/^#[0-9a-f]{6}$/i)
-	})
+  it('returns a string starting with #', () => {
+    const color = getConsistentColor('test', false)
+    expect(color).toMatch(/^#[0-9a-f]{6}$/i)
+  })
 
-	it('returns different palettes for light vs dark', () => {
-		// Not all keys produce different colors, but at least one should differ
-		const keys = ['Week 1', 'Week 2', 'Week 3', 'Project A', 'Project B']
-		const hasDifference = keys.some(
-			(key) => getConsistentColor(key, false) !== getConsistentColor(key, true),
-		)
-		expect(hasDifference).toBe(true)
-	})
+  it('returns different palettes for light vs dark', () => {
+    // Not all keys produce different colors, but at least one should differ
+    const keys = ['Week 1', 'Week 2', 'Week 3', 'Project A', 'Project B']
+    const hasDifference = keys.some(
+      (key) => getConsistentColor(key, false) !== getConsistentColor(key, true),
+    )
+    expect(hasDifference).toBe(true)
+  })
 
-	it('handles empty string key', () => {
-		const color = getConsistentColor('', false)
-		expect(color).toMatch(/^#[0-9a-f]{6}$/i)
-	})
+  it('handles empty string key', () => {
+    const color = getConsistentColor('', false)
+    expect(color).toMatch(/^#[0-9a-f]{6}$/i)
+  })
 })

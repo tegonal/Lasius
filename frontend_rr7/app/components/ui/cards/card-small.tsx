@@ -20,32 +20,32 @@
 import { cn } from '~/lib/utils/cn'
 
 type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-	children: React.ReactNode
-	className?: string
-	disabled?: boolean
-	onClick: () => void
+  children: React.ReactNode
+  className?: string
+  disabled?: boolean
+  onClick: () => void
 }
 
 export const CardSmall = ({
-	children,
-	className,
-	disabled = false,
-	onClick,
-	...rest
+  children,
+  className,
+  disabled = false,
+  onClick,
+  ...rest
 }: Props) => {
-	return (
-		<button
-			className={cn(
-				'bg-base-content/5 relative flex w-full cursor-pointer flex-col items-center justify-center gap-4 rounded-lg p-4',
-				!disabled && 'hover:bg-base-content/11',
-				disabled && 'cursor-not-allowed opacity-50',
-				className,
-			)}
-			disabled={disabled}
-			onClick={onClick}
-			{...rest}
-		>
-			{children}
-		</button>
-	)
+  return (
+    <button
+      className={cn(
+        'bg-base-content/5 relative flex w-full cursor-pointer flex-col items-center justify-center gap-4 rounded-lg p-4',
+        !disabled && 'hover:bg-base-content/11',
+        disabled && 'cursor-not-allowed opacity-50',
+        className,
+      )}
+      disabled={disabled}
+      onClick={onClick}
+      {...rest}
+    >
+      {children}
+    </button>
+  )
 }

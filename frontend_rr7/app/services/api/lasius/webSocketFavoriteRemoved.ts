@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { ModelsBookingStub } from './modelsBookingStub'
 import type { WebSocketFavoriteRemovedType } from './webSocketFavoriteRemovedType'
@@ -12,8 +12,8 @@ import type { WebSocketFavoriteRemovedType } from './webSocketFavoriteRemovedTyp
  * User removed a booking from favorites
  */
 export interface WebSocketFavoriteRemoved {
-	type: WebSocketFavoriteRemovedType
-	userId: string
-	orgId: string
-	bookingStub: ModelsBookingStub
+  type: WebSocketFavoriteRemovedType
+  userId: string
+  orgId: string
+  bookingStub: ModelsBookingStub
 }

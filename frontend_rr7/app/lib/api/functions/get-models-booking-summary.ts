@@ -22,13 +22,13 @@ import { type ModelsBooking } from '~/services/api/lasius'
 import { getExtendedModelsBookingList } from './get-extended-models-booking-list'
 
 export const getModelsBookingSummary = (list: ModelsBooking[]) => {
-	const hours =
-		Math.round(
-			getExtendedModelsBookingList(list).reduce(
-				(acc, item) => acc + item.duration,
-				0,
-			) * 100,
-		) / 100
-	const elements = list.length
-	return { elements, hours }
+  const hours =
+    Math.round(
+      getExtendedModelsBookingList(list).reduce(
+        (acc, item) => acc + item.duration,
+        0,
+      ) * 100,
+    ) / 100
+  const elements = list.length
+  return { elements, hours }
 }

@@ -21,22 +21,23 @@ import { createContext, useContext, useEffect, useMemo } from 'react'
 import { useFetcher } from 'react-router'
 
 import {
-	apiTimespanMonth,
-	apiTimespanWeek,
-	type IsoDateString,
+  apiTimespanMonth,
+  apiTimespanWeek,
+  formatISOLocale,
+  type IsoDateString,
 } from '~/lib/utils/dates'
 import { type ModelsBooking } from '~/services/api/lasius/modelsBooking'
 
 type CalendarDataContextValue = {
-	bookings: ModelsBooking[] | undefined
-	error: unknown
-	isLoading: boolean
+  bookings: ModelsBooking[] | undefined
+  error: unknown
+  isLoading: boolean
 }
 
 type CalendarPeriod = 'month' | 'week'
 
 const CalendarDataContext = createContext<CalendarDataContextValue | undefined>(
-	undefined,
+  undefined,
 )
 
 /**
@@ -50,50 +51,57 @@ const CalendarDataContext = createContext<CalendarDataContextValue | undefined>(
  * Performance: Reduces 7-31 API calls down to 1 per calendar period
  */
 export const CalendarDataProvider = ({
-	children,
-	date,
-	organisationId,
-	period,
+  children,
+  date,
+  organisationId,
+  period,
 }: {
-	children: React.ReactNode
-	date: IsoDateString
-	organisationId: string
-	period: CalendarPeriod
+  children: React.ReactNode
+  date: IsoDateString
+  organisationId: string
+  period: CalendarPeriod
 }) => {
-	const fetcher = useFetcher<{ bookings: ModelsBooking[] }>()
+  const fetcher = useFetcher<{ bookings: ModelsBooking[] }>()
 
-	const timespan = useMemo(
-		() => (period === 'week' ? apiTimespanWeek(date) : apiTimespanMonth(date)),
-		[date, period],
-	)
+  const safeDate = isNaN(new Date(date).getTime())
+    ? formatISOLocale(new Date())
+    : date
 
-	const { load } = fetcher
+  const timespan = useMemo(
+    () =>
+      period === 'week'
+        ? apiTimespanWeek(safeDate)
+        : apiTimespanMonth(safeDate),
+    [safeDate, period],
+  )
 
-	useEffect(() => {
-		if (organisationId && date) {
-			void load(
-				`/api/calendar-bookings?orgId=${organisationId}&from=${timespan.from}&to=${timespan.to}`,
-			)
-		}
-	}, [organisationId, timespan.from, timespan.to, date, load])
+  const { load } = fetcher
 
-	const value = useMemo<CalendarDataContextValue>(
-		() => ({
-			bookings: fetcher.data?.bookings,
-			error:
-				fetcher.data && !('bookings' in fetcher.data)
-					? fetcher.data
-					: undefined,
-			isLoading: fetcher.state === 'loading',
-		}),
-		[fetcher.data, fetcher.state],
-	)
+  useEffect(() => {
+    if (organisationId) {
+      void load(
+        `/api/calendar-bookings?orgId=${organisationId}&from=${timespan.from}&to=${timespan.to}`,
+      )
+    }
+  }, [organisationId, timespan.from, timespan.to, load])
 
-	return (
-		<CalendarDataContext.Provider value={value}>
-			{children}
-		</CalendarDataContext.Provider>
-	)
+  const value = useMemo<CalendarDataContextValue>(
+    () => ({
+      bookings: fetcher.data?.bookings,
+      error:
+        fetcher.data && !('bookings' in fetcher.data)
+          ? fetcher.data
+          : undefined,
+      isLoading: fetcher.state === 'loading',
+    }),
+    [fetcher.data, fetcher.state],
+  )
+
+  return (
+    <CalendarDataContext.Provider value={value}>
+      {children}
+    </CalendarDataContext.Provider>
+  )
 }
 
 /**
@@ -102,13 +110,13 @@ export const CalendarDataProvider = ({
  * Must be used within a CalendarDataProvider
  */
 export const useCalendarData = (): CalendarDataContextValue => {
-	const context = useContext(CalendarDataContext)
+  const context = useContext(CalendarDataContext)
 
-	if (context === undefined) {
-		throw new Error(
-			'useCalendarData must be used within a CalendarDataProvider',
-		)
-	}
+  if (context === undefined) {
+    throw new Error(
+      'useCalendarData must be used within a CalendarDataProvider',
+    )
+  }
 
-	return context
+  return context
 }

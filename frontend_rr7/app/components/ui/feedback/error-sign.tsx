@@ -18,5 +18,5 @@
  */
 
 export const ErrorSign = () => {
-	return <span className="mb-0 text-lg leading-[6px]">&times;</span>
+  return <span className="mb-0 text-lg leading-[6px]">&times;</span>
 }

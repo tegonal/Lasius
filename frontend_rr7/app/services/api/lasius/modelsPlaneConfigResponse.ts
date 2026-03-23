@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+43-e7b745c1+20260321-2204
+ * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
  */
 import type { ModelsAuditInfoResponse } from './modelsAuditInfoResponse'
 import type { ModelsConfigSyncStatus } from './modelsConfigSyncStatus'
@@ -12,15 +12,15 @@ import type { ModelsPlaneConfigResponseImporterType } from './modelsPlaneConfigR
 import type { ModelsPlaneProjectMapping } from './modelsPlaneProjectMapping'
 
 export interface ModelsPlaneConfigResponse {
-	id: ModelsIssueImporterConfigId
-	importerType: ModelsPlaneConfigResponseImporterType
-	name: string
-	baseUrl: string
-	checkFrequency: number
-	projects: ModelsPlaneProjectMapping[]
-	syncStatus: ModelsConfigSyncStatus
-	audit: ModelsAuditInfoResponse
-	workspace?: string
-	type?: string
-	projectCount: number
+  id: ModelsIssueImporterConfigId
+  importerType: ModelsPlaneConfigResponseImporterType
+  name: string
+  baseUrl: string
+  checkFrequency: number
+  projects: ModelsPlaneProjectMapping[]
+  syncStatus: ModelsConfigSyncStatus
+  audit: ModelsAuditInfoResponse
+  workspace?: string
+  type?: string
+  projectCount: number
 }
