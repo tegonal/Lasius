@@ -52,7 +52,8 @@ const BUILTIN_TYPES = new Set([
 
 // Strip array suffix and generic wrappers to get the base type name for imports
 function baseTypeName(type) {
-  return type.replace(/\[\]$/, '').replace(/<.*>$/, '')
+  // eslint-disable-next-line sonarjs/slow-regex -- build-time code generator, no user input
+  return type.replace(/\[\]$/, '').replace(/<[^>]*>$/, '')
 }
 
 function generateFetcherHeader() {

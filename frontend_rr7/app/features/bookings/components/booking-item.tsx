@@ -24,7 +24,7 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '~/components/primitives/buttons/button'
 import { TagList } from '~/components/ui/data-display/tag-list'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
-import { Modal } from '~/components/ui/overlays/modal'
+import { Modal } from '~/components/ui/overlays/modal/modal'
 import { useSelectedOrgId } from '~/features/bookings/hooks/use-home-loader-data'
 import { type AugmentedBooking } from '~/lib/api/functions/augment-bookings-list'
 import { cn } from '~/lib/utils/cn'
@@ -100,7 +100,7 @@ export const BookingItem = ({ item, nextItem }: Props) => {
                 defaultValue: 'Add booking',
               })}
               type="button"
-              variant="icon"
+              variant="iconPrimaryHover"
             >
               <LucideIcon icon={PlusCircleIcon} size={21} />
             </Button>

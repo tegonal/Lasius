@@ -338,6 +338,18 @@
     animation-name: fadeIn;
   }
 
+  @keyframes gradientShift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
   @keyframes star-explode {
     0% {
       opacity: 1;
@@ -385,6 +397,6 @@
   input[data-com-onepassword-filled],
   textarea[data-com-onepassword-filled],
   select[data-com-onepassword-filled] {
-    color: rgb(0, 0, 0) !important;
+    color: var(--color-base-content) !important;
   }
 }

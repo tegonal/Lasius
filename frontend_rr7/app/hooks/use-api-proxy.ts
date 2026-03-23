@@ -51,7 +51,7 @@ type ProxyPayload = {
 type SubmitArgs<TBody, TParams> = (TBody extends undefined
   ? { body?: never }
   : { body: TBody }) &
-  TParams & {
+  (TParams extends Record<string, never> ? unknown : TParams) & {
     skipAuth?: boolean
   }
 
@@ -61,6 +61,7 @@ export function useApiProxy<
   TParams = Record<string, never>,
 >(config: ApiProxyConfig<TParams>, options?: ApiProxyOptions<TResponse>) {
   const fetcher = useFetcher<ProxyEnvelope<TResponse>>()
+  const fetcherSubmit = fetcher.submit
   const submittedRef = useRef(false)
   const onSuccessRef = useRef(options?.onSuccess)
   const onErrorRef = useRef(options?.onError)
@@ -71,7 +72,7 @@ export function useApiProxy<
   const isIdle = fetcher.state === 'idle'
 
   // Derive typed data and error from envelope
-  const data = envelope?.ok === true ? (envelope.data as TResponse) : undefined
+  const data = envelope?.ok === true ? envelope.data : undefined
   const error =
     envelope?.ok === false
       ? { error: envelope.error, status: envelope.status }
@@ -83,15 +84,18 @@ export function useApiProxy<
     submittedRef.current = false
 
     if (envelope.ok) {
-      onSuccessRef.current?.(envelope.data as TResponse)
+      onSuccessRef.current?.(envelope.data)
     } else {
       onErrorRef.current?.({ error: envelope.error, status: envelope.status })
     }
   }, [isIdle, envelope])
 
   const submit = useCallback(
-    (args: SubmitArgs<TBody, TParams> = {} as SubmitArgs<TBody, TParams>) => {
-      const { body, skipAuth, ...params } = args as Record<string, unknown>
+    (args?: SubmitArgs<TBody, TParams>) => {
+      const { body, skipAuth, ...params } = (args ?? {}) as Record<
+        string,
+        unknown
+      >
 
       const payload: ProxyPayload = {
         method: config.method,
@@ -106,13 +110,13 @@ export function useApiProxy<
 
       submittedRef.current = true
 
-      void fetcher.submit(payload, {
+      void fetcherSubmit(payload, {
         action: '/api/proxy',
         encType: 'application/json',
         method: 'POST',
       })
     },
-    [config, fetcher],
+    [config, fetcherSubmit],
   )
 
   return {

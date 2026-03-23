@@ -62,11 +62,11 @@ const createLoginSchema = (t: SchemaTranslationFn) =>
       .string({
         error: t('common.validation.required', { defaultValue: 'Required' }),
       })
-      .email(
-        t('common.validation.emailInvalid', {
+      .email({
+        message: t('common.validation.emailInvalid', {
           defaultValue: 'Invalid email address',
         }),
-      ),
+      }),
     password: z
       .string({
         error: t('common.validation.required', { defaultValue: 'Required' }),

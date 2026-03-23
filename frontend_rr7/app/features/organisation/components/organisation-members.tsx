@@ -22,14 +22,12 @@ import { Users } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { AvatarUser } from '~/components/ui/data-display/avatar-user'
+import { AvatarUser } from '~/components/ui/data-display/avatar/avatar-user'
 import { Badge } from '~/components/ui/data-display/badge'
-import {
-  DataList,
-  DataListField,
-  DataListHeaderItem,
-  DataListRow,
-} from '~/components/ui/data-display/data-list'
+import { DataList } from '~/components/ui/data-display/data-list/data-list'
+import { DataListField } from '~/components/ui/data-display/data-list/data-list-field'
+import { DataListHeaderItem } from '~/components/ui/data-display/data-list/data-list-header-item'
+import { DataListRow } from '~/components/ui/data-display/data-list/data-list-row'
 import { EmptyState } from '~/components/ui/data-display/empty-state'
 import { OrganisationMemberActions } from '~/features/organisation/components/organisation-member-actions'
 import { useLayoutLoaderData } from '~/hooks/use-layout-loader-data'

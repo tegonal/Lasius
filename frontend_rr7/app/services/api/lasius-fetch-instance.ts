@@ -52,7 +52,7 @@ export class ApiError extends Error {
  * Falls back to the public LASIUS_API_URL.
  */
 function getBaseUrl(): string {
-  if (typeof process !== 'undefined') {
+  if (import.meta.env.SSR) {
     // Env vars already include the Play context path (/backend)
     return (
       process.env.LASIUS_API_URL_INTERNAL ||
@@ -91,7 +91,12 @@ export const lasiusFetch = async <T>(
   }
 
   const data = await response.json()
-  return { data, headers: response.headers, status: response.status } as T
+  const result = Object.assign(Object.create(null), {
+    data,
+    headers: response.headers,
+    status: response.status,
+  })
+  return result as T
 }
 
 export type BodyType<BodyData> = BodyData

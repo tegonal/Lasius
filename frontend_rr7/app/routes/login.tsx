@@ -20,7 +20,7 @@
 import { SiGithub, SiGitlab, SiKeycloak } from '@icons-pack/react-simple-icons'
 import { AlertTriangle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { href, redirect, useLoaderData } from 'react-router'
+import { href, redirect } from 'react-router'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { Card, CardBody } from '~/components/ui/cards/card'
@@ -61,9 +61,9 @@ export async function loader({ request }: Route.LoaderArgs) {
   return { demoMode, error, keycloakName, providers, returnTo }
 }
 
-export default function Login() {
-  const { demoMode, error, keycloakName, providers, returnTo } =
-    useLoaderData<typeof loader>()
+export default function Login({
+  loaderData: { demoMode, error, keycloakName, providers, returnTo },
+}: Route.ComponentProps) {
   const { t } = useTranslation('common')
 
   const getErrorMessage = (errorCode: string): string => {

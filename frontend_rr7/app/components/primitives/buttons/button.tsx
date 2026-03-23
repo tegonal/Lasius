@@ -52,7 +52,7 @@ const buttonVariants = cva(
         md: 'text-base font-normal', // default DaisyUI size
         sm: 'btn-sm text-sm font-normal',
         wide: 'btn-wide text-base font-normal',
-        xs: "btn-xs font-normal' text-sm",
+        xs: 'btn-xs text-sm font-normal',
       },
       variant: {
         accent: 'btn-accent',
@@ -63,6 +63,8 @@ const buttonVariants = cva(
         ghost: 'btn-ghost',
         icon: 'btn-ghost btn-square',
         iconMuted: 'btn-ghost btn-square opacity-60 hover:opacity-100',
+        iconPrimaryHover:
+          'btn-ghost btn-square hover:bg-primary hover:text-primary-content',
         info: 'btn-info',
         link: 'btn-link',
         navigation: 'btn-ghost h-auto justify-start gap-3 p-3 text-left',

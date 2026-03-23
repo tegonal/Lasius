@@ -22,7 +22,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
-import { AvatarUser } from '~/components/ui/data-display/avatar-user'
+import { AvatarUser } from '~/components/ui/data-display/avatar/avatar-user'
 import { TagList } from '~/components/ui/data-display/tag-list'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import {
@@ -125,7 +125,7 @@ const RecentBookingsList = ({
   for (const booking of items) {
     const key = `${booking.projectReference.id}-${booking.tags
       .map((tag) => tag.id)
-      .sort()
+      .sort((a, b) => a.localeCompare(b))
       .join(',')}`
     if (!seen.has(key)) {
       seen.add(key)
@@ -220,7 +220,7 @@ const TeamBookingsList = ({
   for (const booking of items) {
     const key = `${booking.projectReference.id}-${booking.tags
       .map((tag) => tag.id)
-      .sort()
+      .sort((a, b) => a.localeCompare(b))
       .join(',')}`
     if (!seen.has(key)) {
       seen.add(key)

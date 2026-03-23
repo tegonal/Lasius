@@ -24,26 +24,30 @@ import { Input } from '~/components/primitives/inputs/input'
 import { useRequiredFormContext } from '~/components/ui/forms/with-form-context'
 
 import {
-  createHandleClick,
-  DURATION_SEGMENT_CONFIG,
-  type DurationSegment,
   getSegmentBounds,
   getSegmentFromPosition,
+} from './shared/core/segment-bounds'
+import {
+  DURATION_SEGMENT_CONFIG,
+  type DurationSegment,
+} from './shared/core/segment-config'
+import {
+  createHandleClick,
   selectSegment as selectSegmentHelper,
-} from './shared/core'
+} from './shared/core/segment-selection'
 import {
   addMinutesToDate,
   calculateDurationMinutes,
   formatDuration,
   parseDuration,
 } from './shared/duration-utils'
+import { createInputChangeHandler } from './shared/input/input-change-handler'
+import { validateInputChar } from './shared/input/input-validation'
 import {
-  createInputChangeHandler,
   handleBackspaceDelete,
   handleEscapeKey,
   handleSeparatorKey,
-  validateInputChar,
-} from './shared/input'
+} from './shared/input/keyboard-handlers'
 import { SegmentedInputWrapper } from './shared/segmented-input-wrapper'
 import { useRestoreCursorPosition } from './shared/use-restore-cursor-position'
 

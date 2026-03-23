@@ -83,6 +83,7 @@ export const TIME_SEGMENT_CONFIG: SegmentConfig<TimeSegment> = {
 /**
  * Duration uses same segment type as time but allows hours > 23
  */
+// eslint-disable-next-line sonarjs/redundant-type-aliases -- semantic alias clarifies intent
 export type DurationSegment = TimeSegment
 
 /**

@@ -52,16 +52,16 @@ const createPasswordChangeSchema = (t: TFunction) =>
       newPassword: z.string().superRefine((val, ctx) => {
         if (val.length < 9) {
           ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+            code: 'custom',
             message: t('validation.passwordTooShort', {
               defaultValue: 'Minimum 9 characters',
             }),
             params: { type: 'notEnoughCharactersPassword' },
           })
         }
-        if (!/(?=.*[A-Z])/.test(val)) {
+        if (!/[A-Z]/.test(val)) {
           ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+            code: 'custom',
             message: t('validation.missingUppercase', {
               defaultValue: 'Must contain uppercase letter',
             }),
@@ -70,7 +70,7 @@ const createPasswordChangeSchema = (t: TFunction) =>
         }
         if (!/\d/.test(val)) {
           ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+            code: 'custom',
             message: t('validation.missingNumber', {
               defaultValue: 'Must contain a number',
             }),
@@ -133,9 +133,10 @@ export const AccountSecurityForm = ({ demoMode }: AccountSecurityFormProps) => {
       })
       return
     }
-    passwordApi.submit({
+    const submitArgs: Parameters<typeof passwordApi.submit>[0] = {
       body: { newPassword: data.newPassword, password: data.password },
-    } as Parameters<typeof passwordApi.submit>[0])
+    }
+    passwordApi.submit(submitArgs)
   }
 
   const handleTogglePasswordsVisible = (e: { preventDefault: () => void }) => {

@@ -26,6 +26,8 @@ import {
   requireUser,
 } from '~/services/auth/auth-helpers.server'
 
+import { type Route } from './+types/api.proxy'
+
 export type ProxyEnvelope<T = unknown> =
   | { data: T; ok: true }
   | { error: string; ok: false; status: number }
@@ -44,7 +46,7 @@ export type ProxyEnvelope<T = unknown> =
  *
  * Returns a consistent envelope: { ok: true, data } or { ok: false, error, status }
  */
-export async function action({ request }: { request: Request }) {
+export async function action({ request }: Route.ActionArgs) {
   const json = (await request.json()) as {
     body?: unknown
     method: string
@@ -86,14 +88,14 @@ export async function action({ request }: { request: Request }) {
   }
 
   try {
-    const result = (await lasiusFetch(url, {
+    const result = await lasiusFetch<{ data?: unknown }>(url, {
       headers: {
         ...(body !== undefined && { 'Content-Type': 'application/json' }),
         ...headers,
       },
       method,
       ...(body !== undefined && { body: JSON.stringify(body) }),
-    })) as undefined | { data: unknown }
+    })
 
     const envelope: ProxyEnvelope = { data: result?.data ?? null, ok: true }
 

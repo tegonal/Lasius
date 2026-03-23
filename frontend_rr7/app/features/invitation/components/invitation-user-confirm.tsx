@@ -35,8 +35,6 @@ import {
 } from '~/services/api/lasius-hooks/invitations-private/invitations-private'
 import { type ModelsEntityReference } from '~/services/api/lasius/modelsEntityReference'
 import { type ModelsInvitationStatusResponse } from '~/services/api/lasius/modelsInvitationStatusResponse'
-import { type ModelsJoinOrganisationInvitation } from '~/services/api/lasius/modelsJoinOrganisationInvitation'
-import { type ModelsJoinProjectInvitation } from '~/services/api/lasius/modelsJoinProjectInvitation'
 import { type ModelsUserOrganisation } from '~/services/api/lasius/modelsUserOrganisation'
 
 interface Props {
@@ -52,19 +50,16 @@ export const InvitationUserConfirm = ({ invitation, organisations }: Props) => {
   const declineInvitation = useDeclineInvitation()
 
   useEffect(() => {
+    const inv = invitation.invitation
     if (
-      invitation.invitation.type === 'JoinProjectInvitation' &&
+      inv.type === 'JoinProjectInvitation' &&
+      'sharedByOrganisationReference' in inv &&
       organisations.find(
         (o) =>
-          o.organisationReference.id ===
-          (invitation.invitation as ModelsJoinProjectInvitation)
-            .sharedByOrganisationReference.id,
+          o.organisationReference.id === inv.sharedByOrganisationReference.id,
       )
     ) {
-      setOrgAssignment(
-        (invitation.invitation as ModelsJoinProjectInvitation)
-          .sharedByOrganisationReference,
-      )
+      setOrgAssignment(inv.sharedByOrganisationReference)
     } else {
       // Fall back to private org or first org
       const fallbackOrg =
@@ -96,9 +91,7 @@ export const InvitationUserConfirm = ({ invitation, organisations }: Props) => {
             defaultValue:
               'You have been invited by {{inviter}} to join organisation {{organisation}}.',
             inviter: invitation.invitation.createdBy.key,
-            organisation: (
-              invitation.invitation as ModelsJoinOrganisationInvitation
-            ).organisationReference.key,
+            organisation: invitation.invitation.organisationReference.key,
           })}
         </Alert>
       )}
@@ -108,8 +101,7 @@ export const InvitationUserConfirm = ({ invitation, organisations }: Props) => {
             defaultValue:
               'You have been invited by {{inviter}} to join project {{project}}.',
             inviter: invitation.invitation.createdBy.key,
-            project: (invitation.invitation as ModelsJoinProjectInvitation)
-              .projectReference.key,
+            project: invitation.invitation.projectReference.key,
           })}
         </Alert>
       )}

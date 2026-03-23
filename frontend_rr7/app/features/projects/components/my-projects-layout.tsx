@@ -26,7 +26,7 @@ import {
   innerGridClasses,
 } from '~/components/ui/layouts/layout-columns'
 import { ScrollArea } from '~/components/ui/layouts/scroll-area'
-import { Modal } from '~/components/ui/overlays/modal'
+import { Modal } from '~/components/ui/overlays/modal/modal'
 import { MyProjectsList } from '~/features/projects/components/my-projects-list'
 import { MyProjectsRightColumn } from '~/features/projects/components/my-projects-right-column'
 import { MyProjectsStats } from '~/features/projects/components/my-projects-stats'
@@ -44,7 +44,7 @@ export const MyProjectsLayout = () => {
 
   const projectsWithActivity: UserProjectWithActivity[] = useMemo(
     () =>
-      userProjects().map((p) => ({
+      userProjects.map((p) => ({
         ...p,
         lastActivityDate: lastActivityDates[p.projectReference.id] ?? null,
       })),

@@ -33,19 +33,18 @@ export function getSegmentBounds<T extends string>(
   const parts = value.split(delimiter)
   if (parts.length !== segmentNames.length) return null
 
-  const bounds = {} as SegmentBounds<T>
   let currentPos = 0
-
-  segmentNames.forEach((name, index) => {
+  const entries = segmentNames.map((name, index) => {
     const partLength = (parts[index] ?? '').length
-    bounds[name] = {
-      end: currentPos + partLength,
-      start: currentPos,
-    }
+    const entry: [T, { end: number; start: number }] = [
+      name,
+      { end: currentPos + partLength, start: currentPos },
+    ]
     currentPos += partLength + delimiter.length
+    return entry
   })
 
-  return bounds
+  return Object.fromEntries(entries) as SegmentBounds<T>
 }
 
 /**

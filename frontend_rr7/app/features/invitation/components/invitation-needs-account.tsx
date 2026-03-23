@@ -28,8 +28,6 @@ import { LasiusIcon } from '~/components/ui/icons/lasius-icon'
 import { LoginInfoPanel } from '~/features/auth/auth-info-panels'
 import { AuthLayout } from '~/features/auth/auth-layout'
 import { type ModelsInvitationStatusResponse } from '~/services/api/lasius/modelsInvitationStatusResponse'
-import { type ModelsJoinOrganisationInvitation } from '~/services/api/lasius/modelsJoinOrganisationInvitation'
-import { type ModelsJoinProjectInvitation } from '~/services/api/lasius/modelsJoinProjectInvitation'
 import { type AuthProvider } from '~/services/auth/types'
 
 interface Props {
@@ -65,16 +63,13 @@ export const InvitationNeedsAccount = ({
           defaultValue:
             'You have been invited by {{inviter}} to join organisation {{organisation}}.',
           inviter: invitation.invitation.createdBy.key,
-          organisation: (
-            invitation.invitation as ModelsJoinOrganisationInvitation
-          ).organisationReference.key,
+          organisation: invitation.invitation.organisationReference.key,
         })
       : t('invitations.messages.invitedToProjectNeedsAccount', {
           defaultValue:
             'You have been invited by {{inviter}} to join project {{project}}.',
           inviter: invitation.invitation.createdBy.key,
-          project: (invitation.invitation as ModelsJoinProjectInvitation)
-            .projectReference.key,
+          project: invitation.invitation.projectReference.key,
         })
 
   return (

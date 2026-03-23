@@ -23,21 +23,25 @@ import { useTranslation } from 'react-i18next'
 import { Input } from '~/components/primitives/inputs/input'
 
 import {
-  createHandleClick,
   getSegmentBounds,
   getSegmentFromPosition,
-  selectSegment as selectSegmentHelper,
+} from './shared/core/segment-bounds'
+import {
   TIME_SEGMENT_CONFIG,
   type TimeSegment,
-} from './shared/core'
-import { formatTimeString } from './shared/date-time-helpers'
+} from './shared/core/segment-config'
 import {
-  createInputChangeHandler,
+  createHandleClick,
+  selectSegment as selectSegmentHelper,
+} from './shared/core/segment-selection'
+import { formatTimeString } from './shared/date-time-helpers'
+import { createInputChangeHandler } from './shared/input/input-change-handler'
+import { validateInputChar } from './shared/input/input-validation'
+import {
   handleBackspaceDelete,
   handleEscapeKey,
   handleSeparatorKey,
-  validateInputChar,
-} from './shared/input'
+} from './shared/input/keyboard-handlers'
 import { SegmentedInputWrapper } from './shared/segmented-input-wrapper'
 import { useRestoreCursorPosition } from './shared/use-restore-cursor-position'
 import {

@@ -33,10 +33,7 @@ export function formatDate(date: Date): string {
  * Format a Date object into a date string (DD.MM.YYYY)
  */
 export function formatDateString(date: Date): string {
-  const d = date.getDate().toString().padStart(2, '0')
-  const m = (date.getMonth() + 1).toString().padStart(2, '0')
-  const y = date.getFullYear()
-  return `${d}.${m}.${y}`
+  return formatDate(date)
 }
 
 /**

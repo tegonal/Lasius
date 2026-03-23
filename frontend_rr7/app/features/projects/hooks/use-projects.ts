@@ -18,10 +18,10 @@
  */
 
 import { orderBy } from 'es-toolkit'
-import { useRouteLoaderData } from 'react-router'
+import { useMemo } from 'react'
 
+import { useLayoutLoaderData } from '~/hooks/use-layout-loader-data'
 import { type ModelsEntityReference } from '~/services/api/lasius/modelsEntityReference'
-import { type ModelsUser } from '~/services/api/lasius/modelsUser'
 import { type ModelsUserProject } from '~/services/api/lasius/modelsUserProject'
 
 /**
@@ -33,13 +33,10 @@ import { type ModelsUserProject } from '~/services/api/lasius/modelsUserProject'
  *   - findProjectById: Function to find any project by ID (including inactive projects from any organization)
  */
 export const useProjects = () => {
-  const loaderData = useRouteLoaderData('routes/app-layout') as
-    | undefined
-    | { user: ModelsUser; websocketUrl: string }
-
+  const loaderData = useLayoutLoaderData()
   const user = loaderData?.user
 
-  const userProjects = (): ModelsUserProject[] => {
+  const projects = useMemo((): ModelsUserProject[] => {
     if (user?.organisations) {
       const org = user.organisations.find(
         (item) =>
@@ -53,7 +50,7 @@ export const useProjects = () => {
       )
     }
     return []
-  }
+  }, [user])
 
   /**
    * Finds a project by ID across all organizations in the user's profile.
@@ -82,6 +79,6 @@ export const useProjects = () => {
 
   return {
     findProjectById,
-    userProjects,
+    userProjects: projects,
   }
 }

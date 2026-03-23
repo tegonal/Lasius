@@ -24,7 +24,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
-import { Modal } from '~/components/ui/overlays/modal'
+import { Modal } from '~/components/ui/overlays/modal/modal'
 import { BookingAddUpdateForm } from '~/features/bookings/components/booking-add-update-form'
 import {
   useHomeLoaderData,
@@ -43,6 +43,7 @@ import { ContextButtonWrapper } from '~/features/context-menu/context-button-wra
 import { useContextMenu } from '~/features/context-menu/hooks/use-context-menu'
 import { type AugmentedBooking } from '~/lib/api/functions/augment-bookings-list'
 import { formatISOLocale } from '~/lib/utils/dates'
+import { areTimesWithinOneMinute } from '~/lib/utils/time'
 import { type ModelsBooking } from '~/services/api/lasius'
 import {
   useDeleteUserBooking,
@@ -52,15 +53,6 @@ import { useAddFavoriteBooking } from '~/services/api/lasius-hooks/user-favorite
 
 type Props = {
   item: AugmentedBooking
-}
-
-const areTimesWithinOneMinute = (
-  time1: Date | string,
-  time2: Date | string,
-): boolean => {
-  const d1 = typeof time1 === 'string' ? new Date(time1) : time1
-  const d2 = typeof time2 === 'string' ? new Date(time2) : time2
-  return Math.abs(d1.getTime() - d2.getTime()) <= 60_000
 }
 
 const useCurrentBookingId = (): string | undefined => {

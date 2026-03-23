@@ -31,7 +31,7 @@ type Props = {
 export const MyProjectsStats = ({ onCreateProject }: Props) => {
   const { t } = useTranslation('common')
   const { userProjects } = useProjects()
-  const projects = userProjects()
+  const projects = userProjects
 
   const totalCount = projects.length
 

@@ -23,23 +23,27 @@ test('help button opens help drawer @smoke', async ({ page }) => {
   await page.goto('/user/home')
   await page.waitForURL(/.*\/user\/.*/, { timeout: 15000 })
 
-  // Click help button (desktop only)
-  await page.getByTestId('help-btn').click()
-
-  // Help drawer should appear
-  await expect(page.getByTestId('help-drawer')).toBeVisible({ timeout: 5000 })
+  // Retry click until hydration is complete and drawer appears
+  await expect(async () => {
+    await page.getByTestId('help-btn').click()
+    await expect(page.getByTestId('help-drawer')).toBeVisible({ timeout: 1000 })
+  }).toPass({ timeout: 15000 })
 })
 
 test('help drawer can be closed @smoke', async ({ page }) => {
   await page.goto('/user/home')
   await page.waitForURL(/.*\/user\/.*/, { timeout: 15000 })
 
-  // Open help
-  await page.getByTestId('help-btn').click()
-  await expect(page.getByTestId('help-drawer')).toBeVisible({ timeout: 5000 })
+  // Open help (only click if not already open to avoid toggle race)
+  await expect(async () => {
+    if ((await page.getByTestId('help-drawer').count()) === 0) {
+      await page.getByTestId('help-btn').click()
+    }
+    await expect(page.getByTestId('help-drawer')).toBeVisible({ timeout: 1000 })
+  }).toPass({ timeout: 15000 })
 
-  // Close help by clicking the button again (toggle)
-  await page.getByTestId('help-btn').click()
+  // Close help via the close button inside the drawer (modal traps focus so external toggle won't work)
+  await page.getByTestId('help-drawer').getByRole('button', { name: /close/i }).click()
 
   await expect(page.getByTestId('help-drawer')).not.toBeVisible({ timeout: 5000 })
 })

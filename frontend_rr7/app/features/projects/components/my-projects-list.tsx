@@ -21,12 +21,10 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { AvatarProject } from '~/components/ui/data-display/avatar/avatar-project'
-import {
-  DataList,
-  DataListField,
-  DataListHeaderItem,
-  DataListRow,
-} from '~/components/ui/data-display/data-list'
+import { DataList } from '~/components/ui/data-display/data-list/data-list'
+import { DataListField } from '~/components/ui/data-display/data-list/data-list-field'
+import { DataListHeaderItem } from '~/components/ui/data-display/data-list/data-list-header-item'
+import { DataListRow } from '~/components/ui/data-display/data-list/data-list-row'
 import { ROLES } from '~/config/constants'
 import { UserRoles } from '~/config/dynamic-translation-strings'
 import { ContextMenuProvider } from '~/features/context-menu/hooks/use-context-menu'

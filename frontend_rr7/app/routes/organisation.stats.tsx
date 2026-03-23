@@ -38,7 +38,6 @@ import { StatsTabs } from '~/features/stats/components/stats-tabs'
 import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
 import { dateOptions } from '~/lib/utils/date/date-options'
 import { apiTimespanFromTo } from '~/lib/utils/dates'
-import { cachedServerLoader } from '~/lib/utils/loader-cache'
 import { ModelsUserOrganisationRole } from '~/services/api/lasius/modelsUserOrganisationRole'
 import { getOrganisationBookingList } from '~/services/api/lasius/organisation-bookings/organisation-bookings'
 import { getUserProfile } from '~/services/api/lasius/user/user'
@@ -75,14 +74,6 @@ export const shouldRevalidate = ({
   }
   return defaultShouldRevalidate
 }
-
-// ─── Client Loader (cache unless full-page refresh) ──────────────────────────
-
-export const clientLoader = async ({
-  request,
-  serverLoader,
-}: Route.ClientLoaderArgs) => cachedServerLoader(request, serverLoader)
-clientLoader.hydrate = false
 
 // ─── Loader ──────────────────────────────────────────────────────────────────
 

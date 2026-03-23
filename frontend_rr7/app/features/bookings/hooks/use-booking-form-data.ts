@@ -17,16 +17,26 @@
  *
  */
 
-import { subDays } from 'date-fns'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useRef } from 'react'
+import { useFetcher } from 'react-router'
 
-import { formatISOLocale } from '~/lib/utils/dates'
-import { useGetUserBookingListByOrganisation } from '~/services/api/lasius-hooks/user-bookings/user-bookings'
-import { useGetTagsByProject } from '~/services/api/lasius-hooks/user-organisations/user-organisations'
-import { useGetUserProfile } from '~/services/api/lasius-hooks/user/user'
+import {
+  type ModelsBooking,
+  type ModelsEntityReference,
+  type ModelsTag,
+} from '~/services/api/lasius'
+
+type BookingFormData = {
+  favorites: unknown
+  orgBookings: ModelsBooking[]
+  projects: ModelsEntityReference[]
+  projectTags: ModelsTag[]
+  recentBookings: ModelsBooking[]
+}
 
 /**
- * Shared hook for loading booking form data (projects + project tags) via useApiProxy hooks.
+ * Shared hook for loading booking form data via the /api/booking-form-data resource route.
+ * Server-side aggregation: 1 round-trip fetches profile, favorites, recent bookings, org bookings.
  *
  * Used by BookingStart, BookingEditRunning, and BookingAddUpdateForm.
  */
@@ -37,27 +47,19 @@ export function useBookingFormData(
   const prevOrgIdRef = useRef('')
   const prevProjectKeyRef = useRef('')
 
-  const profileHook = useGetUserProfile()
-  const recentBookingsHook = useGetUserBookingListByOrganisation()
-  const projectTagsHook = useGetTagsByProject()
+  const formDataFetcher = useFetcher<BookingFormData>()
+  const formDataLoad = formDataFetcher.load
 
-  // Load user profile and recent bookings for the selected org
+  const projectTagsFetcher = useFetcher<BookingFormData>()
+  const projectTagsLoad = projectTagsFetcher.load
+
+  // Load form data (projects, recent bookings, etc.) for the selected org
   useEffect(() => {
     if (selectedOrgId && selectedOrgId !== prevOrgIdRef.current) {
       prevOrgIdRef.current = selectedOrgId
-      profileHook.submit()
-
-      const now = new Date()
-      const sevenDaysAgo = subDays(now, 7)
-      recentBookingsHook.submit({
-        orgId: selectedOrgId,
-        params: {
-          from: formatISOLocale(sevenDaysAgo),
-          to: formatISOLocale(now),
-        },
-      })
+      void formDataLoad(`/api/booking-form-data?orgId=${selectedOrgId}`)
     }
-  }, [selectedOrgId, profileHook, recentBookingsHook])
+  }, [selectedOrgId, formDataLoad])
 
   // Load tags for the selected project
   useEffect(() => {
@@ -68,28 +70,16 @@ export function useBookingFormData(
       key !== prevProjectKeyRef.current
     ) {
       prevProjectKeyRef.current = key
-      projectTagsHook.submit({
-        orgId: selectedOrgId,
-        projectId: watchedProjectId,
-      })
+      void projectTagsLoad(
+        `/api/booking-form-data?orgId=${selectedOrgId}&projectId=${watchedProjectId}`,
+      )
     }
-  }, [selectedOrgId, watchedProjectId, projectTagsHook])
+  }, [selectedOrgId, watchedProjectId, projectTagsLoad])
 
-  // Extract projects for the selected org from the user profile, sorted by key
-  const projects = useMemo(() => {
-    if (!profileHook.data) return []
-    const selectedOrg = profileHook.data.organisations?.find(
-      (o) => o.organisationReference.id === selectedOrgId,
-    )
-    return (selectedOrg?.projects ?? [])
-      .map((p) => p.projectReference)
-      .slice()
-      .sort((a, b) => a.key.localeCompare(b.key))
-  }, [profileHook.data, selectedOrgId])
-
-  const recentBookings = recentBookingsHook.data ?? []
-  const projectTags = projectTagsHook.data ?? []
-  const isLoading = profileHook.isLoading
+  const projects = formDataFetcher.data?.projects ?? []
+  const recentBookings = formDataFetcher.data?.recentBookings ?? []
+  const projectTags = projectTagsFetcher.data?.projectTags ?? []
+  const isLoading = formDataFetcher.state !== 'idle'
 
   return { isLoading, projects, projectTags, recentBookings }
 }

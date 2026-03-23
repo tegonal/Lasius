@@ -17,7 +17,7 @@
  *
  */
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { data } from 'react-router'
 
 import {
@@ -26,7 +26,7 @@ import {
   innerGridClasses,
 } from '~/components/ui/layouts/layout-columns'
 import { ScrollArea } from '~/components/ui/layouts/scroll-area'
-import { Modal } from '~/components/ui/overlays/modal'
+import { Modal } from '~/components/ui/overlays/modal/modal'
 import { OrganisationAddUpdateForm } from '~/features/organisation/components/organisation-add-update-form'
 import { OrganisationDetail } from '~/features/organisation/components/organisation-detail'
 import { OrganisationRightColumn } from '~/features/organisation/components/organisation-right-column'
@@ -76,19 +76,16 @@ const OrganisationCurrentPage = ({ loaderData }: Route.ComponentProps) => {
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [isUpdateOpen, setIsUpdateOpen] = useState(false)
   const [isInviteOpen, setIsInviteOpen] = useState(false)
-  const [users, setUsers] = useState<ModelsUserStub[]>(loaderData.users)
 
-  const userListApi = useGetOrganisationUserList({
-    onSuccess: (responseData) => {
-      const list = Array.isArray(responseData) ? responseData : []
-      setUsers(list)
-    },
-  })
+  const userListApi = useGetOrganisationUserList()
 
-  // Sync loader data on initial render & org switch
-  useEffect(() => {
-    setUsers(loaderData.users)
-  }, [loaderData.users])
+  // Use client-refreshed data if available, otherwise loader data
+  const resolvedApiData = Array.isArray(userListApi.data)
+    ? userListApi.data
+    : []
+  const users: ModelsUserStub[] = userListApi.data
+    ? resolvedApiData
+    : loaderData.users
 
   const handleRefresh = () => {
     userListApi.submit({ orgId: selectedOrganisationId })
@@ -103,20 +100,22 @@ const OrganisationCurrentPage = ({ loaderData }: Route.ComponentProps) => {
     <>
       <div className={innerGridClasses} data-testid="org-current-page">
         <ColumnCenter>
-          <ScrollArea className="bg-base-100 flex-1 overflow-y-auto">
+          <div className="flex h-full flex-col overflow-hidden">
             <OrganisationStats
               memberCount={users.length}
               onCreate={() => setIsAddOpen(true)}
               onEdit={() => setIsUpdateOpen(true)}
               onInvite={() => setIsInviteOpen(true)}
             />
-            <div className="pt-4">
-              <OrganisationDetail onRefresh={handleRefresh} users={users} />
-            </div>
-          </ScrollArea>
+            <ScrollArea className="min-h-0 flex-1">
+              <div className="pt-4">
+                <OrganisationDetail onRefresh={handleRefresh} users={users} />
+              </div>
+            </ScrollArea>
+          </div>
         </ColumnCenter>
         <ColumnRight>
-          <ScrollArea className="flex-1 overflow-y-auto">
+          <ScrollArea className="h-full">
             <OrganisationRightColumn />
           </ScrollArea>
         </ColumnRight>

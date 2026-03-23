@@ -17,7 +17,7 @@
  *
  */
 
-import { AvatarUser } from '~/components/ui/data-display/avatar-user'
+import { AvatarUser } from '~/components/ui/data-display/avatar/avatar-user'
 import { TagList } from '~/components/ui/data-display/tag-list'
 import { cn } from '~/lib/utils/cn'
 import {

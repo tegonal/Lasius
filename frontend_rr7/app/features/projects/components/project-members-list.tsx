@@ -21,14 +21,12 @@ import { orderBy } from 'es-toolkit'
 import { useTranslation } from 'react-i18next'
 import { useRouteLoaderData } from 'react-router'
 
-import { AvatarUser } from '~/components/ui/data-display/avatar-user'
+import { AvatarUser } from '~/components/ui/data-display/avatar/avatar-user'
 import { Badge } from '~/components/ui/data-display/badge'
-import {
-  DataList,
-  DataListField,
-  DataListHeaderItem,
-  DataListRow,
-} from '~/components/ui/data-display/data-list'
+import { DataList } from '~/components/ui/data-display/data-list/data-list'
+import { DataListField } from '~/components/ui/data-display/data-list/data-list-field'
+import { DataListHeaderItem } from '~/components/ui/data-display/data-list/data-list-header-item'
+import { DataListRow } from '~/components/ui/data-display/data-list/data-list-row'
 import { EmptyStateMembers } from '~/features/projects/components/empty-state-members'
 import { isAdminOfProject } from '~/lib/api/functions/is-admin-of-project'
 import { type loader } from '~/routes/app-layout'

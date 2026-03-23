@@ -52,6 +52,13 @@ test.describe.serial('Booking lifecycle @crud', () => {
       await expect(page.locator('[role="option"]').first()).toBeVisible({ timeout: 1000 })
     }).toPass({ timeout: 10000 })
 
+    // Skip if no project options available (e.g. user is in an E2E-created org)
+    const optionCount = await page.locator('[role="option"]').count()
+    if (optionCount === 0) {
+      test.skip()
+      return
+    }
+
     await page.locator('[role="option"]').first().click()
 
     await page.getByTestId('booking-start-submit-btn').click()

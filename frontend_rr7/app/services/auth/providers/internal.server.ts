@@ -73,7 +73,7 @@ export function createInternalProvider(): InternalOAuthProvider {
     return btoa(binary)
       .replace(/\+/g, '-')
       .replace(/\//g, '_')
-      .replace(/=+$/, '')
+      .replace(/={1,2}$/, '')
   }
 
   return {

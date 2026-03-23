@@ -86,14 +86,8 @@ export const BookingStart = ({ onSuccess, selectedOrgId }: Props) => {
 
   useEffect(() => {
     const subscription = hookForm.watch((value, { name }) => {
-      switch (name) {
-        case 'projectId':
-          if (value.projectId) {
-            hookForm.setFocus('tags')
-          }
-          break
-        default:
-          break
+      if (name === 'projectId' && value.projectId) {
+        hookForm.setFocus('tags')
       }
     })
     return () => subscription.unsubscribe()

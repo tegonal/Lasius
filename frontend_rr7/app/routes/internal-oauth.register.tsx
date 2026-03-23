@@ -65,11 +65,11 @@ const createRegisterSchema = (t: SchemaTranslationFn) =>
         .string({
           error: t('common.validation.required', { defaultValue: 'Required' }),
         })
-        .email(
-          t('common.validation.emailInvalid', {
+        .email({
+          message: t('common.validation.emailInvalid', {
             defaultValue: 'Invalid email address',
           }),
-        ),
+        }),
       firstName: z
         .string({
           error: t('common.validation.required', { defaultValue: 'Required' }),
@@ -212,16 +212,14 @@ export default function InternalOAuthRegister() {
   const isSubmitting = navigation.state !== 'idle'
 
   const getErrorMessage = (errorCode: string): string => {
-    switch (errorCode) {
-      case 'user_already_registered':
-        return t('auth.errors.userAlreadyRegistered', {
-          defaultValue: 'User already registered',
-        })
-      default:
-        return t('auth.errors.registerUnknown', {
-          defaultValue: 'Unknown registration error',
-        })
+    if (errorCode === 'user_already_registered') {
+      return t('auth.errors.userAlreadyRegistered', {
+        defaultValue: 'User already registered',
+      })
     }
+    return t('auth.errors.registerUnknown', {
+      defaultValue: 'Unknown registration error',
+    })
   }
 
   return (

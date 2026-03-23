@@ -34,7 +34,7 @@ import { FormElement } from '~/components/ui/forms/form-element'
 import { FormErrorBadge } from '~/components/ui/forms/form-error-badge'
 import { Select } from '~/components/ui/forms/input/select'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
-import { Modal } from '~/components/ui/overlays/modal'
+import { Modal } from '~/components/ui/overlays/modal/modal'
 import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
 import { ModalDescription } from '~/components/ui/overlays/modal/modal-description'
 import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
@@ -70,11 +70,11 @@ export const ManageUserInviteByEmailForm = ({
   const schema = useMemo(
     () =>
       z.object({
-        inviteMemberByEmailAddress: z.string().email(
-          t('common.validation.email', {
+        inviteMemberByEmailAddress: z.string().email({
+          message: t('common.validation.email', {
             defaultValue: 'Please enter a valid email address',
           }),
-        ),
+        }),
         organisationRole: z.string(),
         projectRole: z.string(),
       }),
@@ -264,7 +264,12 @@ export const ManageUserInviteByEmailForm = ({
           </FieldSet>
 
           <ButtonGroup>
-            <Button disabled={isSubmitting} type="submit" variant="primary">
+            <Button
+              data-testid="org-invite-submit-btn"
+              disabled={isSubmitting}
+              type="submit"
+              variant="primary"
+            >
               {t('members.actions.invite', {
                 defaultValue: 'Invite someone',
               })}

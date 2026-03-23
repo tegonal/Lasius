@@ -35,6 +35,7 @@ import {
 } from 'react-router'
 import { useChangeLanguage } from 'remix-i18next/react'
 
+import { DataLoadingProgress } from '~/components/features/system/data-loading-progress'
 import { ToastProvider } from '~/components/ui/feedback/toasts'
 import { HelpDrawer } from '~/features/help/components/help-drawer'
 import { localeCookie } from '~/lib/cookies/i18next-cookie.server'
@@ -246,6 +247,7 @@ export const Layout = ({ children }: PropsWithChildren) => {
         <Meta />
       </head>
       <body>
+        <DataLoadingProgress />
         <ToastProvider>{children}</ToastProvider>
         <ScrollRestoration />
         <Scripts />

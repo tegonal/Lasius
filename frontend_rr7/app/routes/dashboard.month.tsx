@@ -131,7 +131,7 @@ const computeStreamChartData = (
       }
     })
   })
-  const streamKeys = Array.from(allKeys).sort()
+  const streamKeys = Array.from(allKeys).sort((a, b) => a.localeCompare(b))
 
   return { data: streamData, keys: streamKeys }
 }

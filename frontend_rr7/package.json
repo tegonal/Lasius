@@ -2,7 +2,6 @@
   "name": "lasius-frontend",
   "license": "AGPL-3.0",
   "private": true,
-  "sideEffects": false,
   "type": "module",
   "version": "0.1.0",
   "scripts": {
@@ -52,7 +51,6 @@
     "immer": "^11.1.4",
     "isbot": "^5.1.36",
     "lucide-react": "^0.577.0",
-    "motion": "^12.38.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-hook-form": "^7.72.0",
@@ -82,6 +80,7 @@
     "eslint-plugin-check-file": "^3.3.1",
     "eslint-plugin-perfectionist": "^5.7.0",
     "eslint-plugin-react-compiler": "^19.1.0-rc.2",
+    "eslint-plugin-sonarjs": "^4.0.2",
     "i18next-cli": "^1.50.4",
     "jscpd": "^4.0.8",
     "orval": "^8.5.3",

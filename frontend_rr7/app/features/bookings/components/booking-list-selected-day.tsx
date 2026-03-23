@@ -44,7 +44,7 @@ export const BookingListSelectedDay = () => {
 
   return (
     <ContextMenuProvider>
-      <div className="flex flex-col">
+      <div className="flex flex-col pt-5">
         {bookings.map((item, index) => (
           <div
             className="animate-fade-in"

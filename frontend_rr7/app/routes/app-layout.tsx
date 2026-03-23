@@ -29,10 +29,10 @@ import {
 } from 'react-router'
 
 import { Button } from '~/components/primitives/buttons/button'
-import { TokenWatcher } from '~/components/token-watcher'
 import { Logo } from '~/components/ui/icons/logo'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { TegonalFooter } from '~/components/ui/navigation/tegonal-footer'
+import { TokenWatcher } from '~/features/auth/components/token-watcher'
 import { CalendarWeek } from '~/features/calendar/components/calendar-week'
 import { HelpButton } from '~/features/help/components/help-button'
 import { OrgSwitcher } from '~/features/organisation/components/org-switcher'
@@ -69,12 +69,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const profile = await getUserProfile({
     headers: authHeaders(auth.session),
   })
-  // accessToken and tokenIssuer are intentionally exposed to the client —
-  // the WebSocket connection authenticates via these credentials, matching
-  // the original frontend's NextAuth session behavior.
   return data(
     {
-      accessToken: auth.session.accessToken,
       tokenIssuer: auth.session.tokenIssuer,
       user: profile.data,
       websocketUrl: process.env.LASIUS_API_WEBSOCKET_URL || '',

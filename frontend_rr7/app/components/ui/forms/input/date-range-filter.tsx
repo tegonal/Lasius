@@ -28,7 +28,6 @@ import { FormElement } from '~/components/ui/forms/form-element'
 import { InputDatePicker } from '~/components/ui/forms/input/date-picker/input-date-picker'
 import { Select, type SelectOption } from '~/components/ui/forms/input/select'
 import { dateOptions } from '~/lib/utils/date/date-options'
-import { formatISOLocale } from '~/lib/utils/dates'
 
 type DateRangeFilterProps = {
   name: string

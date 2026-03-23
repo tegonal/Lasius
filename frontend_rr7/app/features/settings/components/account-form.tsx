@@ -48,11 +48,11 @@ const createAccountSchema = (t: TFunction) =>
           defaultValue: 'Email is required',
         }),
       )
-      .email(
-        t('validation.emailInvalid', {
+      .email({
+        message: t('validation.emailInvalid', {
           defaultValue: 'Invalid email address',
         }),
-      ),
+      }),
     firstName: z.string().min(
       1,
       t('validation.firstNameRequired', {
@@ -117,13 +117,14 @@ export const AccountForm = ({ demoMode }: AccountFormProps) => {
       return
     }
 
-    profileApi.submit({
+    const submitArgs: Parameters<typeof profileApi.submit>[0] = {
       body: {
         email: data.email,
         firstName: data.firstName,
         lastName: data.lastName,
       },
-    } as Parameters<typeof profileApi.submit>[0])
+    }
+    profileApi.submit(submitArgs)
   }
 
   return (

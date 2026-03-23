@@ -169,7 +169,7 @@ const nivoPaletteDark = [
   '#00b7b8',
 ]
 
-const nivoPalette = [
+export const nivoPalette = [
   '#4d4d4d',
   '#00d2d2',
   '#00ffff',

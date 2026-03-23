@@ -22,17 +22,15 @@ export const getExpectedVsBookedPercentage = (
   worked: number,
 ) => {
   let fulfilledPercentage = 0
-  if (worked === 0) fulfilledPercentage = 0
   if (expected === 0 && worked > 0) fulfilledPercentage = 100
   if (expected > 0 && worked > 0)
     fulfilledPercentage = Math.round((worked / expected) * 100 * 100) / 100
 
+  const cappedPercentage = fulfilledPercentage > 100 ? 100 : fulfilledPercentage
   const progressBarPercentage =
     fulfilledPercentage > 90 && fulfilledPercentage < 100
       ? 90
-      : fulfilledPercentage > 100
-        ? 100
-        : fulfilledPercentage
+      : cappedPercentage
 
   return { fulfilledPercentage, progressBarPercentage }
 }

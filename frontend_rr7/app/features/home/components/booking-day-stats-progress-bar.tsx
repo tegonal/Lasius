@@ -25,15 +25,7 @@ import { decimalHoursToDurationString } from '~/lib/utils/duration'
 
 export const BookingDayStatsProgressBar = () => {
   const { t } = useTranslation('common')
-  const loaderData = useRouteLoaderData('routes/user.layout._index') as
-    | undefined
-    | {
-        daySummary: {
-          fulfilledPercentage: number
-          hours: number
-          plannedWorkingHours: number
-        }
-      }
+  const loaderData = useRouteLoaderData('routes/user.layout._index')
 
   const daySummary = loaderData?.daySummary
   if (!daySummary) return null

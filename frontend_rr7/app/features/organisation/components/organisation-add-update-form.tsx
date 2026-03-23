@@ -122,9 +122,10 @@ export const OrganisationAddUpdateForm = ({
     const { organisationName } = hookForm.getValues()
 
     if (mode === 'add' && organisationName) {
-      createApi.submit({
+      const createArgs: Parameters<typeof createApi.submit>[0] = {
         body: { key: organisationName },
-      } as Parameters<typeof createApi.submit>[0])
+      }
+      createApi.submit(createArgs)
     } else if (selectedOrganisation) {
       updateApi.submit({
         body: { key: organisationName },

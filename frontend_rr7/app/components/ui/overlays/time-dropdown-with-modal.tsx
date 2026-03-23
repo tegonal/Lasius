@@ -17,7 +17,7 @@
  *
  */
 
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
+import { Menu } from '@base-ui/react/menu'
 import { round } from 'es-toolkit'
 import { ChevronDown, Clock } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -28,7 +28,7 @@ import { Heading } from '~/components/primitives/typography/heading'
 import { FieldSet } from '~/components/ui/forms/field-set'
 import { FormElement } from '~/components/ui/forms/form-element'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
-import { Modal } from '~/components/ui/overlays/modal'
+import { Modal } from '~/components/ui/overlays/modal/modal'
 import { cn } from '~/lib/utils/cn'
 
 type Props = {
@@ -89,17 +89,15 @@ export const TimeDropdownWithModal = ({
 
   return (
     <>
-      <Menu as="div" className="relative inline-block">
-        <MenuButton
-          as={Button}
+      <Menu.Root>
+        <Menu.Trigger
           className={cn(
-            'group hover:bg-base-300 flex items-center justify-between gap-1 px-2 py-1',
+            'btn btn-ghost btn-sm group flex items-center justify-between gap-1 px-2 py-1',
+            'hover:bg-base-300',
             isWeekend && 'opacity-60',
             value === 0 && 'text-base-content/50',
           )}
           disabled={disabled}
-          size="sm"
-          variant="ghost"
         >
           <span className="text-sm">{currentDisplay}</span>
           <LucideIcon
@@ -107,50 +105,45 @@ export const TimeDropdownWithModal = ({
             icon={ChevronDown}
             size={12}
           />
-        </MenuButton>
+        </Menu.Trigger>
 
-        <MenuItems className="bg-base-100 border-base-300 absolute left-0 z-[9999] mt-2 w-36 rounded-lg border shadow-lg">
-          <div className="p-1">
-            <div className="border-base-300 mb-1 border-b pb-1">
-              {PRESET_HOURS.map((preset) => (
-                <MenuItem key={preset.value}>
-                  {({ focus }) => (
-                    <button
-                      className={cn(
-                        'flex w-full items-center rounded px-2 py-1.5 text-left text-sm',
-                        focus && 'bg-base-200',
-                        value === preset.value && 'bg-primary/10 font-medium',
-                      )}
-                      onClick={() => handlePresetSelect(preset.value)}
-                    >
-                      {preset.label}
-                    </button>
-                  )}
-                </MenuItem>
-              ))}
-            </div>
+        <Menu.Portal>
+          <Menu.Positioner sideOffset={4}>
+            <Menu.Popup className="bg-base-100 border-base-300 w-36 rounded-lg border p-1 shadow-lg">
+              <div className="border-base-300 mb-1 border-b pb-1">
+                {PRESET_HOURS.map((preset) => (
+                  <Menu.Item
+                    className={cn(
+                      'flex w-full items-center rounded px-2 py-1.5 text-left text-sm',
+                      'hover:bg-base-200 data-[highlighted]:bg-base-200 cursor-pointer',
+                      value === preset.value && 'bg-primary/10 font-medium',
+                    )}
+                    key={preset.value}
+                    onClick={() => handlePresetSelect(preset.value)}
+                  >
+                    {preset.label}
+                  </Menu.Item>
+                ))}
+              </div>
 
-            <MenuItem>
-              {({ focus }) => (
-                <button
-                  className={cn(
-                    'flex w-full items-center justify-between rounded px-2 py-1.5 text-left text-sm',
-                    focus && 'bg-base-200',
-                  )}
-                  onClick={() => setIsOpen(true)}
-                >
-                  <span>
-                    {t('common.time.customTime', {
-                      defaultValue: 'Custom time...',
-                    })}
-                  </span>
-                  <LucideIcon icon={Clock} size={12} />
-                </button>
-              )}
-            </MenuItem>
-          </div>
-        </MenuItems>
-      </Menu>
+              <Menu.Item
+                className={cn(
+                  'flex w-full items-center justify-between rounded px-2 py-1.5 text-left text-sm',
+                  'hover:bg-base-200 data-[highlighted]:bg-base-200 cursor-pointer',
+                )}
+                onClick={() => setIsOpen(true)}
+              >
+                <span>
+                  {t('common.time.customTime', {
+                    defaultValue: 'Custom time...',
+                  })}
+                </span>
+                <LucideIcon icon={Clock} size={12} />
+              </Menu.Item>
+            </Menu.Popup>
+          </Menu.Positioner>
+        </Menu.Portal>
+      </Menu.Root>
 
       <Modal autoSize onClose={handleClose} open={isOpen}>
         <FieldSet>

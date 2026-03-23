@@ -17,10 +17,10 @@
  *
  */
 
-import { useFetcher, useRouteLoaderData } from 'react-router'
+import { useFetcher } from 'react-router'
 
+import { useLayoutLoaderData } from '~/hooks/use-layout-loader-data'
 import { type ModelsEntityReference } from '~/services/api/lasius/modelsEntityReference'
-import { type ModelsUser } from '~/services/api/lasius/modelsUser'
 import { type ModelsUserOrganisation } from '~/services/api/lasius/modelsUserOrganisation'
 import { ModelsUserOrganisationRole } from '~/services/api/lasius/modelsUserOrganisationRole'
 
@@ -40,10 +40,7 @@ import { ModelsUserOrganisationRole } from '~/services/api/lasius/modelsUserOrga
  *   - isAdministrator: Boolean indicating if user is admin of selected org
  */
 export const useOrganisation = () => {
-  const loaderData = useRouteLoaderData('routes/app-layout') as
-    | undefined
-    | { user: ModelsUser; websocketUrl: string }
-
+  const loaderData = useLayoutLoaderData()
   const user = loaderData?.user
   const organisations: ModelsUserOrganisation[] = user?.organisations ?? []
   const settings = user?.settings

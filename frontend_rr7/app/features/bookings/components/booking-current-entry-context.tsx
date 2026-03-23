@@ -17,14 +17,13 @@
  *
  */
 
-import { differenceInSeconds } from 'date-fns'
 import { ArrowDownToLineIcon, PencilIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
-import { Modal } from '~/components/ui/overlays/modal'
+import { Modal } from '~/components/ui/overlays/modal/modal'
 import { BookingEditRunning } from '~/features/bookings/components/booking-edit-running'
 import {
   useHomeLoaderData,
@@ -40,6 +39,7 @@ import { ContextBody } from '~/features/context-menu/context-body'
 import { ContextButtonWrapper } from '~/features/context-menu/context-button-wrapper'
 import { useContextMenu } from '~/features/context-menu/hooks/use-context-menu'
 import { formatISOLocale } from '~/lib/utils/dates'
+import { areTimesWithinOneMinute } from '~/lib/utils/time'
 import {
   type ModelsBooking,
   type ModelsCurrentUserTimeBooking,
@@ -49,15 +49,6 @@ import { useAddFavoriteBooking } from '~/services/api/lasius-hooks/user-favorite
 
 type Props = {
   item: ModelsBooking
-}
-
-const areTimesWithinOneMinute = (
-  time1: Date | string,
-  time2: Date | string,
-): boolean => {
-  const d1 = typeof time1 === 'string' ? new Date(time1) : time1
-  const d2 = typeof time2 === 'string' ? new Date(time2) : time2
-  return Math.abs(differenceInSeconds(d1, d2)) <= 60
 }
 
 const useCurrentBooking = (): ModelsCurrentUserTimeBooking | undefined => {

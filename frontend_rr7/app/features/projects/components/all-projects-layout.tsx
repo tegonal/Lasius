@@ -26,7 +26,7 @@ import {
   innerGridClasses,
 } from '~/components/ui/layouts/layout-columns'
 import { ScrollArea } from '~/components/ui/layouts/scroll-area'
-import { Modal } from '~/components/ui/overlays/modal'
+import { Modal } from '~/components/ui/overlays/modal/modal'
 import {
   AllProjectsList,
   type ProjectStatusFilter,

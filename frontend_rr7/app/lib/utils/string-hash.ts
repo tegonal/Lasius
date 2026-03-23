@@ -45,6 +45,9 @@ function hashCode(str: string | undefined) {
  */
 export const stringHash = (anything: unknown): string => {
   return hashCode(
-    JSON.stringify(anything, Object.keys(anything as object).sort()),
+    JSON.stringify(
+      anything,
+      Object.keys(anything as object).sort((a, b) => a.localeCompare(b)),
+    ),
   ).toString()
 }

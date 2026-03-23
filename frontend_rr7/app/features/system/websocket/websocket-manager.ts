@@ -30,10 +30,7 @@ const PING_INTERVAL_MS = 5000
 const MAX_RECONNECT_ATTEMPTS = 30
 const MAX_BACKOFF_MS = 10000
 
-export type WebSocketAuth = {
-  token: string
-  tokenIssuer?: string
-}
+export type TicketFetcher = () => Promise<string>
 
 export type WebSocketSubscriber = {
   onMessage: (data: unknown) => void
@@ -41,13 +38,13 @@ export type WebSocketSubscriber = {
 }
 
 class WebSocketManager {
-  private auth: null | WebSocketAuth = null
   private intentionallyClosed = false
   private pingTimer: null | ReturnType<typeof setInterval> = null
   private reconnectAttempt = 0
   private reconnectTimer: null | ReturnType<typeof setTimeout> = null
   private status: ConnectionStatus = ConnectionStatus.DISCONNECTED
   private readonly subscribers = new Set<WebSocketSubscriber>()
+  private ticketFetcher: null | TicketFetcher = null
   private readonly url: string
   private ws: null | WebSocket = null
 
@@ -80,15 +77,11 @@ class WebSocketManager {
   }
 
   /**
-   * Update auth credentials. If the socket is already open, re-authenticate immediately.
-   * Called when the token is refreshed or first becomes available.
+   * Set the ticket fetcher function. The fetcher is called on each connect/reconnect
+   * to obtain a fresh, single-use ticket for WebSocket authentication.
    */
-  setAuth(auth: WebSocketAuth): void {
-    this.auth = auth
-    // If already connected, re-authenticate with the new token
-    if (this.ws?.readyState === WebSocket.OPEN) {
-      this.sendHelloServer()
-    }
+  setTicketFetcher(fetcher: TicketFetcher): void {
+    this.ticketFetcher = fetcher
   }
 
   subscribe(subscriber: WebSocketSubscriber): () => void {
@@ -159,7 +152,7 @@ class WebSocketManager {
       logger.info('[WebSocketManager] Connected')
       this.reconnectAttempt = 0
       this.setStatus(ConnectionStatus.CONNECTED)
-      this.sendHelloServer()
+      void this.sendHelloServer()
       this.startPing()
     }
 
@@ -230,23 +223,22 @@ class WebSocketManager {
     }, delay)
   }
 
-  private sendHelloServer(): void {
-    if (!this.auth) {
-      logger.warn(
-        '[WebSocketManager] No auth credentials — skipping HelloServer',
-      )
+  private async sendHelloServer(): Promise<void> {
+    if (!this.ticketFetcher) {
+      logger.warn('[WebSocketManager] No ticket fetcher — skipping HelloServer')
       return
     }
-    logger.info('[WebSocketManager] Sending HelloServer', {
-      hasToken: !!this.auth.token,
-      tokenIssuer: this.auth.tokenIssuer,
-    })
-    this.send({
-      client: 'lasius-rr7-frontend',
-      token: this.auth.token,
-      tokenIssuer: this.auth.tokenIssuer,
-      type: 'HelloServer',
-    })
+    try {
+      const ticket = await this.ticketFetcher()
+      logger.info('[WebSocketManager] Sending HelloServer with ticket')
+      this.send({
+        client: 'lasius-rr7-frontend',
+        token: ticket,
+        type: 'HelloServer',
+      })
+    } catch (error) {
+      logger.error('[WebSocketManager] Failed to fetch ticket', error)
+    }
   }
 
   private setStatus(status: ConnectionStatus): void {

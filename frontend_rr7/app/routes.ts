@@ -50,6 +50,7 @@ export default [
     route('org-switch', 'routes/api.org-switch.ts'),
     route('booking-form-data', 'routes/api.booking-form-data.ts'),
     route('proxy', 'routes/api.proxy.ts'),
+    route('ws-ticket', 'routes/api.ws-ticket.ts'),
     route('locale', 'routes/api.locale.ts'),
   ]),
 

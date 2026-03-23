@@ -84,8 +84,12 @@ export const BookingEditRunning = ({
   const latestBooking = useMemo(() => {
     const completed = recentBookings.filter((b) => b.end?.dateTime)
     if (completed.length === 0) return null
-    return completed.reduce((latest, b) =>
-      new Date(b.end!.dateTime) > new Date(latest.end!.dateTime) ? b : latest,
+    return completed.reduce(
+      (latest, b) =>
+        new Date(b.end!.dateTime) > new Date(latest!.end!.dateTime)
+          ? b
+          : latest,
+      completed[0],
     )
   }, [recentBookings])
 
@@ -111,15 +115,9 @@ export const BookingEditRunning = ({
   // Auto-focus tags when project changes
   useEffect(() => {
     const subscription = hookForm.watch((value, { name }) => {
-      switch (name) {
-        case 'projectId':
-          if (value.projectId) {
-            hookForm.setFocus('tags')
-            void hookForm.trigger()
-          }
-          break
-        default:
-          break
+      if (name === 'projectId' && value.projectId) {
+        hookForm.setFocus('tags')
+        void hookForm.trigger()
       }
     })
     return () => subscription.unsubscribe()
@@ -204,9 +202,9 @@ export const BookingEditRunning = ({
                     validate: {
                       startInPast: (v: string) =>
                         !isFuture(new Date(v)) ||
-                        (t('validation.startMustBeInPast', {
+                        t('validation.startMustBeInPast', {
                           defaultValue: 'Start time must be in the past',
-                        }) as string),
+                        }),
                     },
                   }}
                   withDate={false}

@@ -22,7 +22,6 @@ import { useCallback, useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router'
 
 import {
-  formatISOLocale,
   getMonthOfDate,
   getWeekOfDate,
   type IsoDateString,

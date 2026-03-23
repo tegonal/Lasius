@@ -137,22 +137,32 @@ class ClientMessagingWebsocketActor(
   private def unauthenticated: Receive = default.orElse {
     case HelloServer(client, token, tokenIssuer) =>
       log.debug(s"Received HelloServer($client)")
-      withToken(tokenIssuer = tokenIssuer,
-                token = token,
-                withinTransaction = true,
-                canCreateNewUser = false) {
-        out ! AuthenticationFailed
-        userId = None
-        context.become(unauthenticated)
-        Future.successful(())
-      } { _ => user =>
-        userId = Some(user.userReference.id)
-        log.debug(s"Successfully authenticated websocket for client ($client)")
-        out ! HelloClient
-        context.become(authenticated)
-        Future.successful(())
+      // Try ticket-based auth first (sync lookup)
+      systemServices.consumeWsTicket(token) match {
+        case Some((uid, _)) =>
+          userId = Some(uid)
+          log.debug(s"Authenticated websocket via ticket for client ($client)")
+          out ! HelloClient
+          context.become(authenticated)
+        case None =>
+          // Fall back to JWT validation (backward compat)
+          withToken(tokenIssuer = tokenIssuer,
+                    token = token,
+                    withinTransaction = true,
+                    canCreateNewUser = false) {
+            out ! AuthenticationFailed
+            userId = None
+            context.become(unauthenticated)
+            Future.successful(())
+          } { _ => user =>
+            userId = Some(user.userReference.id)
+            log.debug(s"Authenticated websocket via token for client ($client)")
+            out ! HelloClient
+            context.become(authenticated)
+            Future.successful(())
+          }
+          ()
       }
-      ()
   }
 
   private def authenticated: Receive = unauthenticated.orElse {

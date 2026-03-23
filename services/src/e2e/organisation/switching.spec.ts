@@ -23,11 +23,12 @@ test('org switcher modal opens and shows organisations @crud', async ({ page }) 
   await page.goto('/user/home')
   await page.waitForURL(/.*\/user\/.*/, { timeout: 15000 })
 
-  // Click org switcher button
-  await page.getByTestId('org-selector-btn').click()
+  // Click org switcher button (retry until hydration complete)
+  await expect(async () => {
+    await page.getByTestId('org-selector-btn').click()
+    await expect(page.getByTestId('org-switcher-modal')).toBeVisible({ timeout: 1000 })
+  }).toPass({ timeout: 15000 })
 
-  // Modal should appear with org cards
-  await expect(page.getByTestId('org-switcher-modal')).toBeVisible({ timeout: 5000 })
   await expect(page.getByTestId('org-card').first()).toBeVisible()
 
   // Should have at least 1 org
@@ -39,9 +40,11 @@ test('switch organisation and verify context changes @crud', async ({ page }) =>
   await page.goto('/user/home')
   await page.waitForURL(/.*\/user\/.*/, { timeout: 15000 })
 
-  // Open org switcher
-  await page.getByTestId('org-selector-btn').click()
-  await expect(page.getByTestId('org-switcher-modal')).toBeVisible({ timeout: 5000 })
+  // Open org switcher (retry until hydration complete)
+  await expect(async () => {
+    await page.getByTestId('org-selector-btn').click()
+    await expect(page.getByTestId('org-switcher-modal')).toBeVisible({ timeout: 1000 })
+  }).toPass({ timeout: 15000 })
 
   // Count org cards — if only 1, skip
   const orgCount = await page.getByTestId('org-card').count()

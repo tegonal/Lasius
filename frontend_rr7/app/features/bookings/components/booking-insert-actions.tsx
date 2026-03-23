@@ -18,13 +18,14 @@
  */
 
 import { ArrowDownToLine, ArrowUpDown, ArrowUpToLine, Plus } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { useSelectedOrgId } from '~/features/bookings/hooks/use-home-loader-data'
 import { type AugmentedBooking } from '~/lib/api/functions/augment-bookings-list'
+import { cn } from '~/lib/utils/cn'
 import { formatISOLocale } from '~/lib/utils/dates'
 import { type ModelsBooking } from '~/services/api/lasius'
 import { useUpdateUserBooking } from '~/services/api/lasius-hooks/user-bookings/user-bookings'
@@ -44,7 +45,32 @@ export const BookingInsertActions = ({
   const [isHovered, setIsHovered] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
   const dialogRef = useRef<HTMLDialogElement>(null)
+  const hoverTimeoutRef = useRef<null | ReturnType<typeof setTimeout>>(null)
   const selectedOrgId = useSelectedOrgId()
+
+  const handleMouseEnter = useCallback(() => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current)
+      hoverTimeoutRef.current = null
+    }
+    setIsHovered(true)
+  }, [])
+
+  const handleMouseLeave = useCallback(() => {
+    hoverTimeoutRef.current = setTimeout(() => {
+      setIsHovered(false)
+      setIsExpanded(false)
+    }, 300)
+  }, [])
+
+  // Clean up timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current)
+      }
+    }
+  }, [])
 
   const updateCurrentBooking = useUpdateUserBooking()
   const updateNextBooking = useUpdateUserBooking()
@@ -168,7 +194,7 @@ export const BookingInsertActions = ({
                 defaultValue: 'Extend lower booking end to upper booking start',
               })}
               type="button"
-              variant="icon"
+              variant="iconPrimaryHover"
             >
               <LucideIcon icon={ArrowUpToLine} size={16} />
             </Button>
@@ -185,7 +211,7 @@ export const BookingInsertActions = ({
                 defaultValue: 'Insert booking',
               })}
               type="button"
-              variant="icon"
+              variant="iconPrimaryHover"
             >
               <LucideIcon icon={Plus} size={16} />
             </Button>
@@ -202,7 +228,7 @@ export const BookingInsertActions = ({
                 defaultValue: 'Move upper booking start to lower booking end',
               })}
               type="button"
-              variant="icon"
+              variant="iconPrimaryHover"
             >
               <LucideIcon icon={ArrowDownToLine} size={16} />
             </Button>
@@ -211,16 +237,14 @@ export const BookingInsertActions = ({
       )}
 
       {!isExpanded && (
-        <div
-          className="absolute inset-x-0 bottom-0 z-10 flex items-center justify-center text-center"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => {
-            setIsHovered(false)
-            setIsExpanded(false)
-          }}
-        >
+        <div className="absolute inset-x-0 -bottom-3 z-10 flex items-center justify-center py-3 text-center">
           <div
-            className={`bg-base-100 absolute flex gap-1 rounded-full p-1 transition-all duration-200 ${showExpanded ? 'z-20' : 'z-10'}`}
+            className={cn(
+              'absolute flex gap-1 rounded-full p-3 transition-all duration-200',
+              showExpanded ? 'z-20' : 'z-10',
+            )}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
           >
             {showExpanded ? (
               <>
@@ -238,7 +262,7 @@ export const BookingInsertActions = ({
                       'Extend lower booking end to upper booking start',
                   })}
                   type="button"
-                  variant="icon"
+                  variant="iconPrimaryHover"
                 >
                   <LucideIcon icon={ArrowUpToLine} size={16} />
                 </Button>
@@ -255,7 +279,7 @@ export const BookingInsertActions = ({
                     defaultValue: 'Insert booking',
                   })}
                   type="button"
-                  variant="icon"
+                  variant="iconPrimaryHover"
                 >
                   <LucideIcon icon={Plus} size={16} />
                 </Button>
@@ -274,7 +298,7 @@ export const BookingInsertActions = ({
                       'Move upper booking start to lower booking end',
                   })}
                   type="button"
-                  variant="icon"
+                  variant="iconPrimaryHover"
                 >
                   <LucideIcon icon={ArrowDownToLine} size={16} />
                 </Button>
@@ -288,7 +312,7 @@ export const BookingInsertActions = ({
                   defaultValue: 'Insert booking',
                 })}
                 type="button"
-                variant="icon"
+                variant="iconPrimaryHover"
               >
                 <LucideIcon icon={ArrowUpDown} size={18} />
               </Button>

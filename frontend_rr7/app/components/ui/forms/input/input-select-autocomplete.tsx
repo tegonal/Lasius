@@ -164,12 +164,7 @@ export const InputSelectAutocomplete = ({
                           setFilterText(newValue)
                         }}
                         onFocus={() => {
-                          if (
-                            selected &&
-                            inputText ===
-                              (selected as SelectAutocompleteSuggestionType)
-                                ?.key
-                          ) {
+                          if (selected && inputText === selected?.key) {
                             setFilterText('')
                           }
                         }}
@@ -209,9 +204,9 @@ export const InputSelectAutocomplete = ({
                             key={suggestion.key}
                             value={suggestion}
                           >
-                            {({ active, selected }) => (
+                            {({ focus, selected }) => (
                               <DropdownListItem
-                                active={active}
+                                active={focus}
                                 itemSearchString={inputText}
                                 itemValue={suggestion.key}
                                 key={suggestion.id}

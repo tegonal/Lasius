@@ -17,12 +17,14 @@
  *
  */
 
+import { useTranslation } from 'react-i18next'
+
 import { Button } from '~/components/primitives/buttons/button'
 import { Alert } from '~/components/ui/feedback/alert'
 import { ButtonGroup } from '~/components/ui/forms/button-group'
 import { FormElement } from '~/components/ui/forms/form-element'
-import { Modal } from '~/components/ui/overlays/modal'
 
+import { Modal } from './modal'
 import { ModalCloseButton } from './modal-close-button'
 import { ModalTitle } from './modal-title'
 
@@ -50,7 +52,7 @@ type Props = {
 export const GenericConfirmModal = ({
   alert,
   blockViewport,
-  cancelLabel = 'Close',
+  cancelLabel,
   confirmLabel,
   confirmVariant = 'primary',
   message,
@@ -59,6 +61,10 @@ export const GenericConfirmModal = ({
   open,
   title,
 }: Props) => {
+  const { t } = useTranslation('common')
+  const resolvedCancelLabel =
+    cancelLabel ?? t('common.actions.close', { defaultValue: 'Close' })
+
   return (
     <Modal blockViewport={blockViewport} onClose={onClose} open={open}>
       <div className="flex flex-col gap-4">
@@ -77,7 +83,7 @@ export const GenericConfirmModal = ({
             {confirmLabel}
           </Button>
           <Button onClick={onClose} type="button" variant="secondary">
-            {cancelLabel}
+            {resolvedCancelLabel}
           </Button>
         </ButtonGroup>
       </div>

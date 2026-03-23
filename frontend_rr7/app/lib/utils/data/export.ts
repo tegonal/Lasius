@@ -147,23 +147,22 @@ export const exportBookingList = (
   XLSX.utils.book_append_sheet(wb, ws, 'Bookings')
 
   // Set column widths for better readability
-  const maxLengths = data.reduce(
-    (acc, row) => {
-      Object.keys(row).forEach((key) => {
-        const value = String(row[key as keyof typeof row] || '')
-        acc[key] = Math.max(acc[key] || key.length, value.length)
-      })
-      return acc
-    },
-    {} as Record<string, number>,
-  )
+  const init: Record<string, number> = {}
+  const maxLengths = data.reduce((acc, row) => {
+    Object.keys(row).forEach((key) => {
+      const value = String(row[key as keyof typeof row] || '')
+      acc[key] = Math.max(acc[key] || key.length, value.length)
+    })
+    return acc
+  }, init)
 
   ws['!cols'] = Object.keys(maxLengths).map((key) => ({
     wch: Math.min((maxLengths[key] ?? 0) + 2, 50), // Add padding, cap at 50
   }))
 
   // Determine file extension and bookType based on format
-  const bookType = format === 'csv' ? 'csv' : format === 'xlsx' ? 'xlsx' : 'ods'
+  const bookTypeMap: Record<string, string> = { csv: 'csv', xlsx: 'xlsx' }
+  const bookType = bookTypeMap[format] ?? 'ods'
   const file = filename || generateExportFilename(format, options)
 
   // Export the file

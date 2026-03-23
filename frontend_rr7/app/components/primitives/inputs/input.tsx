@@ -88,11 +88,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     ref,
   ) => {
     // Determine the state based on props
-    const inputState = disabled
-      ? 'disabled'
-      : readOnly
-        ? 'readonly'
-        : state || 'default'
+    const baseState = readOnly ? 'readonly' : state || 'default'
+    const inputState = disabled ? 'disabled' : baseState
 
     // Override variant if error prop is true
     const inputVariant = error ? 'error' : variant
@@ -189,11 +186,8 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     ref,
   ) => {
     // Determine the state based on props
-    const textareaState = disabled
-      ? 'disabled'
-      : readOnly
-        ? 'readonly'
-        : state || 'default'
+    const baseState = readOnly ? 'readonly' : state || 'default'
+    const textareaState = disabled ? 'disabled' : baseState
 
     // Override variant if error prop is true
     const textareaVariant = error ? 'error' : variant

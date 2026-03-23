@@ -103,10 +103,10 @@ export const Select = ({
           >
             {options.map((option) => (
               <ListboxOption
-                className={({ active }) =>
+                className={({ focus }) =>
                   cn(
                     'relative cursor-pointer py-2 pr-4 pl-10 select-none',
-                    active
+                    focus
                       ? 'bg-primary text-primary-content dark:bg-primary/10 dark:text-primary'
                       : 'text-base-content',
                     option.disabled && 'cursor-not-allowed opacity-50',

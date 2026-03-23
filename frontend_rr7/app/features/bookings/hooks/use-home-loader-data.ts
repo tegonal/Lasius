@@ -19,19 +19,17 @@
 
 import { useRouteLoaderData } from 'react-router'
 
-import { type AugmentedBooking } from '~/lib/api/functions/augment-bookings-list'
-import { type ModelsCurrentUserTimeBooking } from '~/services/api/lasius'
+import { type loader } from '~/routes/user.layout._index'
 
-export type HomeLoaderData = {
-  augmentedBookings: AugmentedBooking[]
-  currentBooking?: ModelsCurrentUserTimeBooking
-  selectedOrgId: string
-}
+export type HomeLoaderData = SerializeFrom<typeof loader>
+
+type SerializeFrom<T extends (...args: never[]) => unknown> =
+  Awaited<ReturnType<T>> extends { data: infer D } ? D : Awaited<ReturnType<T>>
 
 const HOME_ROUTE_ID = 'routes/user.layout._index'
 
 export const useHomeLoaderData = (): HomeLoaderData | undefined =>
-  useRouteLoaderData(HOME_ROUTE_ID) as HomeLoaderData | undefined
+  useRouteLoaderData(HOME_ROUTE_ID)
 
 export const useSelectedOrgId = (): string =>
   useHomeLoaderData()?.selectedOrgId ?? ''

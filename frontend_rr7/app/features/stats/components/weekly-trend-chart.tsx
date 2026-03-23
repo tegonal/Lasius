@@ -83,7 +83,8 @@ export const WeeklyTrendChart = ({
     ...weeklyData.map((w) => w.hours),
     ...weeklyData.map((w) => w.plannedHours),
   )
-  const tickStep = maxHours > 100 ? 20 : maxHours > 50 ? 10 : 5
+  const smallStep = maxHours > 50 ? 10 : 5
+  const tickStep = maxHours > 100 ? 20 : smallStep
 
   return (
     <div className="h-64 w-full">

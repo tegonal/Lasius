@@ -30,7 +30,7 @@ import { TagList } from '~/components/ui/data-display/tag-list'
 import { ButtonGroup } from '~/components/ui/forms/button-group'
 import { FormElement } from '~/components/ui/forms/form-element'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
-import { Modal } from '~/components/ui/overlays/modal'
+import { Modal } from '~/components/ui/overlays/modal/modal'
 import { type ModelsSimpleTag } from '~/services/api/lasius/modelsSimpleTag'
 import { type ModelsTag } from '~/services/api/lasius/modelsTag'
 

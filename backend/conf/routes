@@ -155,6 +155,34 @@ POST    /oauth2/logout    controllers.OAuth2Controller.logout()
 GET    /oauth2/profile    controllers.OAuth2Controller.userProfile()
 
 #######
+####### Auth #######
+#######
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - auth
+#  summary: Create a short-lived WebSocket authentication ticket
+#  operationId: createWsTicket
+#  description: Generates a single-use ticket (60s TTL) for WebSocket authentication. Requires authenticated user.
+#  responses:
+#    200:
+#      description: Ticket created
+#      content:
+#        application/json:
+#          schema:
+#            type: object
+#            properties:
+#              ticket:
+#                type: string
+#                format: uuid
+#    401:
+#      description: Unauthorized
+###
+POST /api/v1/auth/ws-ticket  controllers.AuthController.createWsTicket()
+
+#######
 ####### Current User #######
 #######
 

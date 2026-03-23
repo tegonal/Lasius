@@ -39,9 +39,7 @@ export function generateCodeVerifier(): string {
 
 /** Generate a random URL-safe string for CSRF state parameters */
 export function generateState(): string {
-  const array = new Uint8Array(32)
-  crypto.getRandomValues(array)
-  return base64UrlEncode(array)
+  return generateCodeVerifier()
 }
 
 function base64UrlEncode(bytes: Uint8Array): string {
@@ -49,5 +47,8 @@ function base64UrlEncode(bytes: Uint8Array): string {
   for (const byte of bytes) {
     binary += String.fromCharCode(byte)
   }
-  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+  return btoa(binary)
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/={1,2}$/, '')
 }

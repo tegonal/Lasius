@@ -55,7 +55,7 @@ export async function authHeadersWithCsrf(
   const csrf = await getCsrfToken({ headers })
 
   const setCookie = csrf.headers.get('set-cookie') ?? ''
-  const match = setCookie.match(/PLAY_SESSION_CSRF=([^;]+)/)
+  const match = /PLAY_SESSION_CSRF=([^;]+)/.exec(setCookie)
   const csrfCookie = match ? `PLAY_SESSION_CSRF=${match[1]}` : ''
 
   return {

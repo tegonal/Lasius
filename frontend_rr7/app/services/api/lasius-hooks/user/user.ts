@@ -5,7 +5,7 @@ import { type ApiProxyOptions, useApiProxy } from '~/hooks/use-api-proxy'
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+103-fab637e0+20260323-1007
+ * OpenAPI spec version: 2.2.2+109-0a77adda+20260323-1323
  */
 import {
   type ModelsAcceptTOSRequest,

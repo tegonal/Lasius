@@ -124,6 +124,7 @@ export const BookingAddUpdateForm = ({
     projects: ModelsEntityReference[]
     tags: ModelsTag[]
   }>()
+  const formDataLoad = formDataFetcher.load
 
   const isSubmitting = addBookingApi.isLoading || updateBookingApi.isLoading
 
@@ -154,25 +155,26 @@ export const BookingAddUpdateForm = ({
   useEffect(() => {
     if (selectedOrgId && selectedOrgId !== prevOrgIdRef.current) {
       prevOrgIdRef.current = selectedOrgId
-      void formDataFetcher.load(`/api/booking-form-data?orgId=${selectedOrgId}`)
+      void formDataLoad(`/api/booking-form-data?orgId=${selectedOrgId}`)
     }
-  }, [selectedOrgId, formDataFetcher])
+  }, [selectedOrgId, formDataLoad])
 
   const projects = formDataFetcher.data?.projects ?? []
 
   // Watch projectId to load project-specific tags
   const watchedProjectId = hookForm.watch('projectId')
   const projectTagsFetcher = useFetcher<{ tags: ModelsTag[] }>()
+  const projectTagsLoad = projectTagsFetcher.load
 
   useEffect(() => {
     const key = `${selectedOrgId}:${watchedProjectId}`
     if (selectedOrgId && watchedProjectId && key !== prevProjectIdRef.current) {
       prevProjectIdRef.current = key
-      void projectTagsFetcher.load(
+      void projectTagsLoad(
         `/api/booking-form-data?orgId=${selectedOrgId}&projectId=${watchedProjectId}`,
       )
     }
-  }, [selectedOrgId, watchedProjectId, projectTagsFetcher])
+  }, [selectedOrgId, watchedProjectId, projectTagsLoad])
 
   const projectTags = projectTagsFetcher.data?.tags ?? []
 
@@ -286,13 +288,10 @@ export const BookingAddUpdateForm = ({
           break
         case 'start':
           if (value.start && previousEndDate.current === value.end) {
-            const endHours = getHours(new Date(value.end as string))
-            const endMinutes = getMinutes(new Date(value.end as string))
+            const endHours = getHours(new Date(value.end))
+            const endMinutes = getMinutes(new Date(value.end))
             const endDate = formatISOLocale(
-              setMinutes(
-                setHours(new Date(value.start as string), endHours),
-                endMinutes,
-              ),
+              setMinutes(setHours(new Date(value.start), endHours), endMinutes),
             )
             hookForm.setValue('end', endDate)
             previousEndDate.current = endDate

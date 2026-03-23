@@ -26,7 +26,8 @@ import { Label } from '~/components/primitives/typography/label'
 import { ButtonGroup } from '~/components/ui/forms/button-group'
 import { FormElement } from '~/components/ui/forms/form-element'
 import { FormErrorBadge } from '~/components/ui/forms/form-error-badge'
-import { Modal } from '~/components/ui/overlays/modal'
+
+import { Modal } from './modal'
 
 type Props = {
   cancelLabel?: string

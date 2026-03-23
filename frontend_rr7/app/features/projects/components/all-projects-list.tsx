@@ -22,12 +22,10 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { AvatarProject } from '~/components/ui/data-display/avatar/avatar-project'
-import {
-  DataList,
-  DataListField,
-  DataListHeaderItem,
-  DataListRow,
-} from '~/components/ui/data-display/data-list'
+import { DataList } from '~/components/ui/data-display/data-list/data-list'
+import { DataListField } from '~/components/ui/data-display/data-list/data-list-field'
+import { DataListHeaderItem } from '~/components/ui/data-display/data-list/data-list-header-item'
+import { DataListRow } from '~/components/ui/data-display/data-list/data-list-row'
 import { ContextMenuProvider } from '~/features/context-menu/hooks/use-context-menu'
 import { AllProjectsListItemContext } from '~/features/projects/components/all-projects-list-item-context'
 import { EmptyStateProjects } from '~/features/projects/components/empty-state-projects'

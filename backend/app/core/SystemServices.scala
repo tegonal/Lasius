@@ -54,8 +54,9 @@ import services.{
   TimeBookingViewService
 }
 
-import java.time.Clock
+import java.time.{Clock, Instant}
 import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext}
@@ -86,6 +87,9 @@ trait SystemServices {
   val opaqueTokenIssuerCache: AsyncCacheApi
   val userInfoCache: AsyncCacheApi
 
+  def createWsTicket(userId: UserId, userReference: UserReference): String
+  def consumeWsTicket(ticket: String): Option[(UserId, UserReference)]
+
   def initialize(): Unit
 }
 
@@ -105,8 +109,8 @@ class DefaultSystemServices @Inject() (
     @NamedCache("jwk") override val jwkProviderCache: SyncCacheApi,
     @NamedCache("opaque-token-issuer")
     override val opaqueTokenIssuerCache: AsyncCacheApi,
-    @NamedCache("user-info") override val userInfoCache: AsyncCacheApi)(implicit
-    ec: ExecutionContext)
+    @NamedCache("user-info") override val userInfoCache: AsyncCacheApi,
+)(implicit ec: ExecutionContext)
     extends SystemServices
     with DBSupport
     with Logging {
@@ -216,6 +220,30 @@ class DefaultSystemServices @Inject() (
 
   // initialize login handler
   LoginHandler.subscribe(loginHandler, system.eventStream)
+
+  private val WsTicketTtlSeconds: Long = 60L
+  private val wsTicketStore
+      : ConcurrentHashMap[String, (UserId, UserReference, Instant)] =
+    new ConcurrentHashMap()
+
+  override def createWsTicket(userId: UserId,
+                              userReference: UserReference): String = {
+    val ticket = UUID.randomUUID().toString
+    wsTicketStore.put(ticket, (userId, userReference, Instant.now()))
+    ticket
+  }
+
+  override def consumeWsTicket(
+      ticket: String): Option[(UserId, UserReference)] = {
+    Option(wsTicketStore.remove(ticket)).flatMap { case (uid, ref, created) =>
+      if (Instant
+          .now()
+          .getEpochSecond - created.getEpochSecond <= WsTicketTtlSeconds)
+        Some((uid, ref))
+      else
+        None
+    }
+  }
 
   override def initialize(): Unit = {
 

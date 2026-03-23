@@ -18,7 +18,8 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useRouteLoaderData } from 'react-router'
+
+import { useLayoutLoaderData } from '~/hooks/use-layout-loader-data'
 
 import { useIsWindowFocused } from './use-is-window-focused'
 import {
@@ -29,32 +30,28 @@ import {
 
 export { ConnectionStatus } from './websocket-manager'
 
-const MAX_MESSAGE_HISTORY = 100
 const IS_SERVER = typeof window === 'undefined'
 
 export function useLasiusWebsocket() {
   const isWindowFocused = useIsWindowFocused()
-  const appLayoutData = useRouteLoaderData('routes/app-layout') as
-    | undefined
-    | {
-        accessToken?: string
-        tokenIssuer?: string
-        websocketUrl?: string
-      }
+  const appLayoutData = useLayoutLoaderData()
 
   const websocketUrl =
     !IS_SERVER && appLayoutData?.websocketUrl
       ? `${appLayoutData.websocketUrl}/messaging/websocket`
       : null
 
-  const accessToken = appLayoutData?.accessToken
-  const tokenIssuer = appLayoutData?.tokenIssuer
+  const fetchTicket = useCallback(async () => {
+    const r = await fetch('/api/ws-ticket')
+    const d: { ticket: null | string } = await r.json()
+    if (!d.ticket) throw new Error('No ticket received')
+    return d.ticket
+  }, [])
 
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(
     ConnectionStatus.DISCONNECTED,
   )
   const [lastMessage, setLastMessage] = useState<unknown>(null)
-  const [messageHistory, setMessageHistory] = useState<unknown[]>([])
   const managerRef = useRef<null | ReturnType<typeof getWebSocketManager>>(null)
 
   const sendJsonMessage = useCallback((data: unknown) => {
@@ -71,12 +68,6 @@ export function useLasiusWebsocket() {
     const subscriber: WebSocketSubscriber = {
       onMessage: (data) => {
         setLastMessage(data)
-        setMessageHistory((prev) => {
-          const next = [...prev, data]
-          return next.length > MAX_MESSAGE_HISTORY
-            ? next.slice(-MAX_MESSAGE_HISTORY)
-            : next
-        })
       },
       onStatusChange: (status) => {
         setConnectionStatus(status)
@@ -91,12 +82,12 @@ export function useLasiusWebsocket() {
     }
   }, [websocketUrl])
 
-  // Pass auth credentials to the manager (on mount and token refresh)
+  // Pass ticket fetcher to the manager
   useEffect(() => {
-    if (managerRef.current && accessToken) {
-      managerRef.current.setAuth({ token: accessToken, tokenIssuer })
+    if (managerRef.current) {
+      managerRef.current.setTicketFetcher(fetchTicket)
     }
-  }, [accessToken, tokenIssuer])
+  }, [fetchTicket])
 
   // Active reconnect on window refocus
   useEffect(() => {
@@ -104,14 +95,13 @@ export function useLasiusWebsocket() {
       managerRef.current.reconnectNow()
     }
     if (!isWindowFocused && connectionStatus !== ConnectionStatus.CONNECTED) {
-      setMessageHistory([])
+      setLastMessage(null)
     }
   }, [isWindowFocused, connectionStatus])
 
   return {
     connectionStatus,
     lastMessage,
-    messageHistory,
     sendJsonMessage,
   }
 }

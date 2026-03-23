@@ -19,21 +19,12 @@
 
 import { useRouteLoaderData } from 'react-router'
 
-import { type ModelsUser } from '~/services/api/lasius/modelsUser'
-import { type AuthProvider } from '~/services/auth/types'
-
-type AppLayoutLoaderData = {
-  accessToken: string
-  tokenIssuer: AuthProvider
-  user: ModelsUser
-  websocketUrl: string
-}
+import { type loader } from '~/routes/app-layout'
 
 /**
  * Typed hook to access the app-layout loader data from any nested route.
+ * Uses typeof loader so the type stays in sync with the actual loader return.
  */
 export function useLayoutLoaderData() {
-  return useRouteLoaderData('routes/app-layout') as
-    | AppLayoutLoaderData
-    | undefined
+  return useRouteLoaderData<typeof loader>('routes/app-layout')
 }

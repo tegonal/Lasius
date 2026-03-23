@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next'
 
 import { AvatarOrganisation } from '~/components/ui/data-display/avatar/avatar-organisation'
 import { ButtonGroup } from '~/components/ui/forms/button-group'
-import { Modal } from '~/components/ui/overlays/modal'
+import { Modal } from '~/components/ui/overlays/modal/modal'
 import { OrgSwitcherModal } from '~/features/organisation/components/org-switcher-modal'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 

@@ -38,7 +38,6 @@ import { useUpdateProject } from '~/services/api/lasius-hooks/projects/projects'
 import { useGetTagsByProject } from '~/services/api/lasius-hooks/user-organisations/user-organisations'
 import { type ModelsProject } from '~/services/api/lasius/modelsProject'
 import { type ModelsSimpleTag } from '~/services/api/lasius/modelsSimpleTag'
-import { type ModelsTag } from '~/services/api/lasius/modelsTag'
 import { type ModelsTagGroup } from '~/services/api/lasius/modelsTagGroup'
 import { type ModelsUserProject } from '~/services/api/lasius/modelsUserProject'
 
@@ -155,7 +154,7 @@ export const ProjectAddUpdateTagsForm = ({
   useEffect(() => {
     if (!tagsFetcher.isSuccess || !tagsFetcher.data) return
 
-    const tags = tagsFetcher.data as ModelsTag[]
+    const tags = tagsFetcher.data
 
     const tagGroups = tags.filter((tag) => tag.type === 'TagGroup') as
       | []

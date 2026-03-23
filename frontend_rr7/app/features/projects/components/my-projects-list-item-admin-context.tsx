@@ -24,7 +24,7 @@ import { useNavigate } from 'react-router'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
-import { Modal } from '~/components/ui/overlays/modal'
+import { Modal } from '~/components/ui/overlays/modal/modal'
 import { ContextButtonClose } from '~/features/context-menu/buttons/context-button-close'
 import { ContextButtonLeaveProject } from '~/features/context-menu/buttons/context-button-leave-project'
 import { ContextButtonOpen } from '~/features/context-menu/buttons/context-button-open'

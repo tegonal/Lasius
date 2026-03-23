@@ -53,7 +53,7 @@ export function formatDuration(totalMinutes: number): string {
  * Parse duration string (HH:MM) to minutes
  */
 export function parseDuration(durationString: string): null | number {
-  const match = durationString.match(/^(-)?(\d{1,2}):(\d{2})$/)
+  const match = /^(-)?(\d{1,2}):(\d{2})$/.exec(durationString)
   if (!match) return null
 
   const [, sign, hoursStr = '0', minutesStr = '0'] = match

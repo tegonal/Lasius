@@ -82,7 +82,7 @@ export const BookingHistoryLayout = ({
 
   const projectSuggestions: ModelsEntityReference[] = useMemo(() => {
     if (projectsProp) return projectsProp
-    return userProjects().map((p) => p.projectReference)
+    return userProjects.map((p) => p.projectReference)
   }, [projectsProp, userProjects])
 
   const hookForm = useForm<FormValues>({

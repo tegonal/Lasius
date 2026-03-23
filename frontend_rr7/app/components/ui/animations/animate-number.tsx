@@ -28,11 +28,11 @@ type Props = {
   to: number
 }
 
-const formatNumber = (value: number, from: number, to: number) =>
-  round(
-    value,
-    isInteger(to) ? (to === 0 ? countDecimals(from) : 0) : countDecimals(to),
-  )
+const formatNumber = (value: number, from: number, to: number) => {
+  const intPrecision = to === 0 ? countDecimals(from) : 0
+  const precision = isInteger(to) ? intPrecision : countDecimals(to)
+  return round(value, precision)
+}
 
 const formatNumberLeftpadded = (
   value: number,
