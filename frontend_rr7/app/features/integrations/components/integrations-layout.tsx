@@ -24,21 +24,38 @@ import {
   ColumnRight,
   innerGridClasses,
 } from '~/components/ui/layouts/layout-columns'
+import { IntegrationsContent } from '~/features/integrations/components/integrations-content'
 import { IntegrationsRightColumn } from '~/features/integrations/components/integrations-right-column'
 import { IntegrationsStats } from '~/features/integrations/components/integrations-stats'
+import { useIssueImporterConfigManagement } from '~/features/integrations/hooks/use-issue-importer-config-management'
 import { type ModelsIssueImporterConfigResponse } from '~/services/api/lasius/modelsIssueImporterConfigResponse'
 
 export const IntegrationsLayout = () => {
-  const { configs } = useLoaderData<{
+  const { configs, selectedOrgId } = useLoaderData<{
     configs: ModelsIssueImporterConfigResponse[]
+    selectedOrgId: string
   }>()
+
+  const management = useIssueImporterConfigManagement(selectedOrgId)
 
   return (
     <div className={innerGridClasses}>
       <ColumnCenter>
         <div className="flex h-full flex-col overflow-hidden">
           <div className="flex-shrink-0">
-            <IntegrationsStats configs={configs} onAddClick={() => {}} />
+            <IntegrationsStats
+              configs={configs}
+              onAddClick={management.openWizard}
+            />
+          </div>
+          <div className="flex-1 overflow-y-auto">
+            <IntegrationsContent
+              configs={configs}
+              onDelete={management.openDeleteConfirm}
+              onEdit={management.openConfigEdit}
+              onViewInfo={management.openConfigInfo}
+              onViewMappings={management.openProjectMappings}
+            />
           </div>
         </div>
       </ColumnCenter>
