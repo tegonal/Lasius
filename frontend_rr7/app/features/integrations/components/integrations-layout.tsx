@@ -20,15 +20,16 @@
 import { useTranslation } from 'react-i18next'
 import { useLoaderData } from 'react-router'
 
-import { GenericConfirmModal } from '~/components/ui/overlays/modal/generic-confirm-modal'
 import {
   ColumnCenter,
   ColumnRight,
   innerGridClasses,
 } from '~/components/ui/layouts/layout-columns'
+import { GenericConfirmModal } from '~/components/ui/overlays/modal/generic-confirm-modal'
 import { IntegrationsContent } from '~/features/integrations/components/integrations-content'
 import { IntegrationsRightColumn } from '~/features/integrations/components/integrations-right-column'
 import { IntegrationsStats } from '~/features/integrations/components/integrations-stats'
+import { IssueImporterWizard } from '~/features/integrations/components/wizard/issue-importer-wizard'
 import { useIssueImporterConfigManagement } from '~/features/integrations/hooks/use-issue-importer-config-management'
 import { type ModelsIssueImporterConfigResponse } from '~/services/api/lasius/modelsIssueImporterConfigResponse'
 
@@ -77,32 +78,38 @@ export const IntegrationsLayout = () => {
       </div>
 
       <GenericConfirmModal
-        open={management.activeModal === 'deleteConfirm'}
-        onClose={management.closeModal}
-        onConfirm={management.handleDelete}
-        title={t('integrations.delete.title', {
-          defaultValue: 'Delete Integration',
+        alert={
+          hasProjects
+            ? {
+                message: t('integrations.delete.hasProjects', {
+                  defaultValue:
+                    'This configuration has project mappings. Remove all mappings before deleting.',
+                }),
+                variant: 'warning' as const,
+              }
+            : undefined
+        }
+        confirmLabel={t('integrations.delete.confirm', {
+          defaultValue: 'Delete',
         })}
+        confirmVariant="error"
         message={t('integrations.delete.message', {
           defaultValue:
             'Are you sure you want to delete this integration configuration?',
           name: management.selectedConfig?.name ?? '',
         })}
-        confirmLabel={t('integrations.delete.confirm', {
-          defaultValue: 'Delete',
+        onClose={management.closeModal}
+        onConfirm={management.handleDelete}
+        open={management.activeModal === 'deleteConfirm'}
+        title={t('integrations.delete.title', {
+          defaultValue: 'Delete Integration',
         })}
-        confirmVariant="error"
-        alert={
-          hasProjects
-            ? {
-                variant: 'warning' as const,
-                message: t('integrations.delete.hasProjects', {
-                  defaultValue:
-                    'This configuration has project mappings. Remove all mappings before deleting.',
-                }),
-              }
-            : undefined
-        }
+      />
+
+      <IssueImporterWizard
+        onClose={management.closeModal}
+        open={management.activeModal === 'wizard'}
+        selectedOrgId={selectedOrgId}
       />
     </>
   )
