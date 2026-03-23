@@ -365,9 +365,7 @@ export const SegmentedDateInputConnected = ({
   return (
     <SegmentedInputWrapper
       hasSelection={!!selectedSegment}
-      label={t('common.formats.dateFormat', {
-        defaultValue: 'DD.MM.YYYY',
-      })}
+      label={t('formats.dateFormat', 'DD.MM.YYYY')}
       onArrowClick={handleArrowClick}
     >
       <>
@@ -380,9 +378,7 @@ export const SegmentedDateInputConnected = ({
           onFocus={handleFocus}
           onKeyDown={handleKeyDown}
           onMouseDown={handleMouseDown}
-          placeholder={t('common.formats.dateFormat', {
-            defaultValue: 'DD.MM.YYYY',
-          })}
+          placeholder={t('formats.dateFormat', 'DD.MM.YYYY')}
           ref={inputRef}
           size="md"
           style={{ fontSize: '0.95rem', width: 'calc(10ch + 1.6rem)' }}

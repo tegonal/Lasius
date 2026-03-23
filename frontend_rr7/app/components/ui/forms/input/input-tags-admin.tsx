@@ -178,7 +178,7 @@ export const InputTagsAdmin = ({
         </FormElement>
         <ButtonGroup>
           <Button onClick={addTag} type="button" variant="primary">
-            {t('common.actions.add', { defaultValue: 'Add' })}
+            {t('actions.add', 'Add')}
           </Button>
           <Button
             onClick={() => {
@@ -188,9 +188,7 @@ export const InputTagsAdmin = ({
             type="button"
             variant="secondary"
           >
-            {t('common.actions.close', {
-              defaultValue: 'Close',
-            })}
+            {t('actions.close', 'Close')}
           </Button>
         </ButtonGroup>
       </Modal>

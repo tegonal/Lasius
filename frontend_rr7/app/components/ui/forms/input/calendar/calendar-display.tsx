@@ -117,13 +117,11 @@ export const CalendarDisplay = ({ onChange, value }: CalendarDisplayProps) => {
       {showTodayButton && (
         <div className="mb-2 flex justify-center">
           <button
-            aria-label={t('common.time.today', {
-              defaultValue: 'Today',
-            })}
+            aria-label={t('time.today', 'Today')}
             className="btn btn-ghost btn-xs"
             onClick={handleToday}
           >
-            {t('common.time.today', { defaultValue: 'Today' })}
+            {t('time.today', 'Today')}
           </button>
         </div>
       )}

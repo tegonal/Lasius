@@ -133,11 +133,7 @@ export const TimeDropdownWithModal = ({
                 )}
                 onClick={() => setIsOpen(true)}
               >
-                <span>
-                  {t('common.time.customTime', {
-                    defaultValue: 'Custom time...',
-                  })}
-                </span>
+                <span>{t('time.customTime', 'Custom time...')}</span>
                 <LucideIcon icon={Clock} size={12} />
               </Menu.Item>
             </Menu.Popup>
@@ -149,16 +145,14 @@ export const TimeDropdownWithModal = ({
         <FieldSet>
           <FormElement>
             <Heading as="h3" className="mb-4" variant="section">
-              {t('common.time.setCustom', {
-                defaultValue: 'Set custom time',
-              })}
+              {t('time.setCustom', 'Set custom time')}
             </Heading>
           </FormElement>
           <FormElement>
             <div className="flex items-center gap-2">
               <div className="flex flex-col items-center">
                 <label className="text-base-content/70 mb-1 text-xs">
-                  {t('common.time.hours', { defaultValue: 'Hours' })}
+                  {t('time.hours', 'Hours')}
                 </label>
                 <input
                   className="input input-bordered w-20 text-center"
@@ -174,7 +168,7 @@ export const TimeDropdownWithModal = ({
               <span className="mt-5 text-xl font-bold">:</span>
               <div className="flex flex-col items-center">
                 <label className="text-base-content/70 mb-1 text-xs">
-                  {t('common.time.minutes', { defaultValue: 'Minutes' })}
+                  {t('time.minutes', 'Minutes')}
                 </label>
                 <input
                   className="input input-bordered w-20 text-center"
@@ -194,14 +188,14 @@ export const TimeDropdownWithModal = ({
           <FormElement>
             <div className="mt-4 flex flex-col gap-2">
               <Button className="w-full" onClick={handleCustomSubmit}>
-                {t('common.actions.save', { defaultValue: 'Save' })}
+                {t('actions.save', 'Save')}
               </Button>
               <Button
                 className="w-full"
                 onClick={handleClose}
                 variant="secondary"
               >
-                {t('common.actions.close', { defaultValue: 'Close' })}
+                {t('actions.close', 'Close')}
               </Button>
             </div>
           </FormElement>

@@ -77,9 +77,7 @@ export const InputDateStandalone = ({
         {({ close }) => (
           <div className="relative p-4 pr-12">
             <button
-              aria-label={t('common.actions.close', {
-                defaultValue: 'Close',
-              })}
+              aria-label={t('actions.close', 'Close')}
               className="btn btn-ghost btn-sm btn-circle absolute top-2 right-2"
               onClick={() => close()}
             >

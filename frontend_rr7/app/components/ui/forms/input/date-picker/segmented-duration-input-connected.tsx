@@ -388,9 +388,7 @@ export const SegmentedDurationInputConnected = ({
   return (
     <SegmentedInputWrapper
       hasSelection={!!selectedSegment}
-      label={t('common.formats.durationFormat', {
-        defaultValue: 'HH:MM',
-      })}
+      label={t('formats.durationFormat', 'HH:MM')}
       onArrowClick={handleArrowClick}
     >
       <Input
@@ -402,9 +400,7 @@ export const SegmentedDurationInputConnected = ({
         onFocus={handleFocus}
         onKeyDown={handleKeyDown}
         onMouseDown={handleMouseDown}
-        placeholder={t('common.formats.durationFormat', {
-          defaultValue: 'HH:MM',
-        })}
+        placeholder={t('formats.durationFormat', 'HH:MM')}
         ref={inputRef}
         size="md"
         style={{ fontSize: '0.95rem', width: 'calc(5ch + 1.6rem)' }}

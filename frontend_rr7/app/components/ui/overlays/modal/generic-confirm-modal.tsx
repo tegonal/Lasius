@@ -62,8 +62,7 @@ export const GenericConfirmModal = ({
   title,
 }: Props) => {
   const { t } = useTranslation('common')
-  const resolvedCancelLabel =
-    cancelLabel ?? t('common.actions.close', { defaultValue: 'Close' })
+  const resolvedCancelLabel = cancelLabel ?? t('actions.close', 'Close')
 
   return (
     <Modal blockViewport={blockViewport} onClose={onClose} open={open}>

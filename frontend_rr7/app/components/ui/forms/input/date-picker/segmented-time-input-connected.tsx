@@ -337,7 +337,7 @@ export const SegmentedTimeInputConnected = ({
   return (
     <SegmentedInputWrapper
       hasSelection={!!selectedSegment}
-      label={t('common.formats.timeFormat', { defaultValue: 'HH:MM' })}
+      label={t('formats.timeFormat', 'HH:MM')}
       onArrowClick={handleArrowClick}
     >
       <>
@@ -350,9 +350,7 @@ export const SegmentedTimeInputConnected = ({
           onFocus={handleFocus}
           onKeyDown={handleKeyDown}
           onMouseDown={handleMouseDown}
-          placeholder={t('common.formats.timeFormat', {
-            defaultValue: 'HH:MM',
-          })}
+          placeholder={t('formats.timeFormat', 'HH:MM')}
           ref={inputRef}
           size="md"
           style={{

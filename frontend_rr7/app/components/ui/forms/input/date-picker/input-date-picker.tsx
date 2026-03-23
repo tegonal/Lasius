@@ -242,16 +242,12 @@ const InputDatePickerInternal = ({
     () =>
       showResetButton ? (
         <Button
-          aria-label={t('common.actions.resetToInitial', {
-            defaultValue: 'Reset to initial value',
-          })}
+          aria-label={t('actions.resetToInitial', 'Reset to initial value')}
           fullWidth={false}
           onClick={handleReset}
           shape="circle"
           size="sm"
-          title={t('common.actions.resetToInitial', {
-            defaultValue: 'Reset to initial value',
-          })}
+          title={t('actions.resetToInitial', 'Reset to initial value')}
           type="button"
           variant="ghost"
         >
@@ -295,9 +291,7 @@ const InputDatePickerInternal = ({
                         {({ close }) => (
                           <div className="relative p-4 pr-12">
                             <button
-                              aria-label={t('common.actions.close', {
-                                defaultValue: 'Close',
-                              })}
+                              aria-label={t('actions.close', 'Close')}
                               className="btn btn-ghost btn-sm btn-circle absolute top-2 right-2"
                               onClick={() => close()}
                             >

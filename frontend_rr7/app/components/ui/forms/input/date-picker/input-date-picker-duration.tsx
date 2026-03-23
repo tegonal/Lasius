@@ -69,9 +69,7 @@ const InputDatePickerDurationInternal = ({
       />
       {isInvalid && (
         <span className="text-error mt-1 text-xs">
-          {t('common.validation.endBeforeStart', {
-            defaultValue: 'End time is before start time',
-          })}
+          {t('validation.endBeforeStart', 'End time is before start time')}
         </span>
       )}
     </div>

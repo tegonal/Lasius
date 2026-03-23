@@ -138,9 +138,7 @@ export const DateRangeFilter = ({
     <FormBody>
       <FormElement
         htmlFor={rangeFieldName}
-        label={t('common.time.timeRange', {
-          defaultValue: 'Time range',
-        })}
+        label={t('time.timeRange', 'Time range')}
       >
         <Controller
           control={parentFormContext.control}
@@ -151,9 +149,7 @@ export const DateRangeFilter = ({
               name={name}
               onChange={onChange}
               options={selectOptions}
-              placeholder={t('common.time.selectRange', {
-                defaultValue: 'Select time range',
-              })}
+              placeholder={t('time.selectRange', 'Select time range')}
               value={value || dateOptions[0]?.name || ''}
             />
           )}
@@ -164,16 +160,10 @@ export const DateRangeFilter = ({
           }}
         />
       </FormElement>
-      <FormElement
-        htmlFor="from"
-        label={t('common.time.from', { defaultValue: 'From' })}
-      >
+      <FormElement htmlFor="from" label={t('time.from', 'From')}>
         <InputDatePicker name="from" withDate />
       </FormElement>
-      <FormElement
-        htmlFor="to"
-        label={t('common.time.to', { defaultValue: 'To' })}
-      >
+      <FormElement htmlFor="to" label={t('time.to', 'To')}>
         <InputDatePicker name="to" withDate />
       </FormElement>
     </FormBody>

@@ -57,9 +57,7 @@ export const SegmentedInputWrapper = ({
         }`}
       >
         <Button
-          aria-label={t('common.aria.increment', {
-            defaultValue: 'Increment',
-          })}
+          aria-label={t('aria.increment', 'Increment')}
           className="cursor-pointer rounded-t-full rounded-b-none"
           onMouseDown={(e) => {
             e.preventDefault()
@@ -81,9 +79,7 @@ export const SegmentedInputWrapper = ({
         }`}
       >
         <Button
-          aria-label={t('common.aria.decrement', {
-            defaultValue: 'Decrement',
-          })}
+          aria-label={t('aria.decrement', 'Decrement')}
           className={`cursor-pointer rounded-t-none rounded-b-full transition-opacity ${
             hasSelection || isHovered
               ? 'opacity-60 hover:opacity-100'
