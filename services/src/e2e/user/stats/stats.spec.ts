@@ -36,4 +36,18 @@ test.describe('Stats page @smoke', () => {
   test('stats export button is visible', async ({ page }) => {
     await expect(page.getByTestId('stats-export-btn')).toBeVisible({ timeout: 10000 })
   })
+
+  test('redirects to projects tab by default', async ({ page }) => {
+    await expect(page).toHaveURL(/.*\/user\/stats\/projects/)
+  })
+
+  test('can switch between projects and tags tabs', async ({ page }) => {
+    await expect(page).toHaveURL(/.*\/user\/stats\/projects/)
+
+    await page.getByRole('link', { name: /tags/i }).click()
+    await expect(page).toHaveURL(/.*\/user\/stats\/tags/)
+
+    await page.getByRole('link', { name: /projects/i }).click()
+    await expect(page).toHaveURL(/.*\/user\/stats\/projects/)
+  })
 })
