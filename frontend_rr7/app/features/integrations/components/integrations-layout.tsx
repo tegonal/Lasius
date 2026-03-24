@@ -29,6 +29,8 @@ import { GenericConfirmModal } from '~/components/ui/overlays/modal/generic-conf
 import { IntegrationsContent } from '~/features/integrations/components/integrations-content'
 import { IntegrationsRightColumn } from '~/features/integrations/components/integrations-right-column'
 import { IntegrationsStats } from '~/features/integrations/components/integrations-stats'
+import { GenericConfigModal } from '~/features/integrations/components/modals/generic-config-modal'
+import { ProjectMappingsModal } from '~/features/integrations/components/modals/project-mappings-modal'
 import { IssueImporterWizard } from '~/features/integrations/components/wizard/issue-importer-wizard'
 import { useIssueImporterConfigManagement } from '~/features/integrations/hooks/use-issue-importer-config-management'
 import { type ModelsIssueImporterConfigResponse } from '~/services/api/lasius/modelsIssueImporterConfigResponse'
@@ -104,6 +106,20 @@ export const IntegrationsLayout = () => {
         title={t('integrations.delete.title', {
           defaultValue: 'Delete Integration',
         })}
+      />
+
+      <GenericConfigModal
+        config={management.selectedConfig}
+        onClose={management.closeModal}
+        open={management.activeModal === 'configEdit'}
+        selectedOrgId={selectedOrgId}
+      />
+
+      <ProjectMappingsModal
+        config={management.selectedConfig}
+        onClose={management.closeModal}
+        open={management.activeModal === 'projectMappings'}
+        selectedOrgId={selectedOrgId}
       />
 
       <IssueImporterWizard
