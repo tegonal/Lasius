@@ -50,7 +50,7 @@ export const IndexColumnTabs = ({
   selectedOrgId,
   users,
 }: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('bookings')
   const [selectedTab, setSelectedTab] = useState(0)
 
   const tabs: IconTabsItem[] = [

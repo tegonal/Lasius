@@ -30,16 +30,14 @@ type Props = {
 
 export const BookingAddButton = ({ selectedOrgId }: Props) => {
   const [isOpen, setIsOpen] = useState(false)
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('bookings')
 
   const handleClose = () => setIsOpen(false)
 
   return (
     <>
       <Button onClick={() => setIsOpen(true)} variant="secondary">
-        {t('bookings.actions.create', {
-          defaultValue: 'Create a booking',
-        })}
+        {t('actions.create', 'Create a booking')}
       </Button>
       <Modal onClose={handleClose} open={isOpen}>
         <BookingAddUpdateForm

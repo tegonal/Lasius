@@ -35,27 +35,27 @@ export const DashboardTabs = () => {
   const tabs = [
     {
       id: 'day',
-      label: t('common.time.day', { defaultValue: 'Day' }),
+      label: t('time.day', 'Day'),
       to: href('/user/dashboard/day'),
     },
     {
       id: 'week',
-      label: t('common.time.week', { defaultValue: 'Week' }),
+      label: t('time.week', 'Week'),
       to: href('/user/dashboard/week'),
     },
     {
       id: 'month',
-      label: t('common.time.month', { defaultValue: 'Month' }),
+      label: t('time.month', 'Month'),
       to: href('/user/dashboard/month'),
     },
     {
       id: '6months',
-      label: t('workHealth.sixMonths', { defaultValue: '6 Months' }),
+      label: t('dashboard:workHealth.sixMonths', '6 Months'),
       to: href('/user/dashboard/6months'),
     },
     {
       id: 'year',
-      label: t('common.time.year', { defaultValue: 'Year' }),
+      label: t('time.year', 'Year'),
       to: href('/user/dashboard/year'),
     },
   ]

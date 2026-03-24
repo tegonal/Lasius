@@ -23,16 +23,12 @@ import { useTranslation } from 'react-i18next'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 
 export const BookingListEmptyToday = () => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('bookings')
   return (
     <div className="flex h-full w-full flex-col items-center justify-center py-4">
       <div className="text-base-content/50 flex flex-col items-center justify-center gap-2 text-sm">
         <LucideIcon icon={Calendar} size={24} />
-        <div>
-          {t('bookings.emptyToday', {
-            defaultValue: 'No bookings for this day',
-          })}
-        </div>
+        <div>{t('emptyToday', 'No bookings for this day')}</div>
       </div>
     </div>
   )

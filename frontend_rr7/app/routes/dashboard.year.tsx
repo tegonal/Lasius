@@ -210,16 +210,12 @@ export default function DashboardYear({ loaderData }: Route.ComponentProps) {
           {isCalendarYear ? (
             <FormatDate date={dateObj} format="year" />
           ) : (
-            t('statistics.rolling12Months', {
-              defaultValue: 'Rolling 12 Months',
-            })
+            t('stats:rolling12Months', 'Rolling 12 Months')
           )}
         </h2>
         <label className="flex items-center gap-2 text-sm">
           <span className="text-base-content/60">
-            {t('statistics.calendarYear', {
-              defaultValue: 'Calendar year',
-            })}
+            {t('stats:calendarYear', 'Calendar year')}
           </span>
           <input
             checked={isCalendarYear}
@@ -232,9 +228,10 @@ export default function DashboardYear({ loaderData }: Route.ComponentProps) {
       <div className="flex gap-4">
         <StatsOverviewGrid {...stats} />
         <TopProjectsCard
-          emptyMessage={t('statistics.noProjectsForYear', {
-            defaultValue: 'No projects for this period',
-          })}
+          emptyMessage={t(
+            'stats:noProjectsForYear',
+            'No projects for this period',
+          )}
           projects={topProjects}
         />
       </div>
@@ -242,12 +239,8 @@ export default function DashboardYear({ loaderData }: Route.ComponentProps) {
         <>
           <h3 className="text-base font-semibold">
             {isCalendarYear
-              ? t('statistics.yearWorkTrend', {
-                  defaultValue: 'Yearly Work Trend',
-                })
-              : t('statistics.rolling12MonthsTrend', {
-                  defaultValue: '12-Month Work Trend',
-                })}
+              ? t('stats:yearWorkTrend', 'Yearly Work Trend')
+              : t('stats:rolling12MonthsTrend', '12-Month Work Trend')}
           </h3>
           <WeeklyTrendChart tickEvery={4} weeklyData={weeklyData} />
         </>

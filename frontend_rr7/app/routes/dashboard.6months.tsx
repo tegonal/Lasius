@@ -166,23 +166,22 @@ export default function Dashboard6Months({ loaderData }: Route.ComponentProps) {
   return (
     <div className="space-y-6 px-8 py-6">
       <h2 className="text-lg font-semibold">
-        {t('statistics.6months', { defaultValue: '6 Months' })}
+        {t('stats:6months', '6 Months')}
       </h2>
       <div className="flex gap-4">
         <StatsOverviewGrid {...stats} />
         <TopProjectsCard
-          emptyMessage={t('statistics.noProjectsFor6Months', {
-            defaultValue: 'No projects for this period',
-          })}
+          emptyMessage={t(
+            'stats:noProjectsFor6Months',
+            'No projects for this period',
+          )}
           projects={topProjects}
         />
       </div>
       {weeklyData.length > 0 && (
         <>
           <h3 className="text-base font-semibold">
-            {t('statistics.6monthWorkTrend', {
-              defaultValue: '6-Month Work Trend',
-            })}
+            {t('stats:6monthWorkTrend', '6-Month Work Trend')}
           </h3>
           <WeeklyTrendChart weeklyData={weeklyData} />
         </>

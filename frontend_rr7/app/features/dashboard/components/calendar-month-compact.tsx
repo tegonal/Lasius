@@ -114,9 +114,7 @@ export const CalendarMonthCompact = ({ date, onDateChange }: Props) => {
     <div className="w-full" data-testid="calendar-month-compact">
       <div className="mb-3 flex items-center justify-between">
         <button
-          aria-label={t('calendar.navigation.previousMonth', {
-            defaultValue: 'Previous month',
-          })}
+          aria-label={t('calendar:navigation.previousMonth', 'Previous month')}
           className="btn btn-ghost btn-sm btn-circle"
           data-testid="calendar-month-prev-btn"
           onClick={handlePrevMonth}
@@ -132,9 +130,7 @@ export const CalendarMonthCompact = ({ date, onDateChange }: Props) => {
           </div>
         </div>
         <button
-          aria-label={t('calendar.navigation.nextMonth', {
-            defaultValue: 'Next month',
-          })}
+          aria-label={t('calendar:navigation.nextMonth', 'Next month')}
           className="btn btn-ghost btn-sm btn-circle"
           data-testid="calendar-month-next-btn"
           onClick={handleNextMonth}
@@ -146,13 +142,11 @@ export const CalendarMonthCompact = ({ date, onDateChange }: Props) => {
       {showTodayButton && (
         <div className="mb-2 flex justify-center">
           <button
-            aria-label={t('common.time.today', {
-              defaultValue: 'Today',
-            })}
+            aria-label={t('time.today', 'Today')}
             className="btn btn-ghost btn-xs"
             onClick={handleToday}
           >
-            {t('common.time.today', { defaultValue: 'Today' })}
+            {t('time.today', 'Today')}
           </button>
         </div>
       )}

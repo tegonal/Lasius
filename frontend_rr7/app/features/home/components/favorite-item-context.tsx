@@ -44,7 +44,7 @@ type Props = {
 }
 
 export const FavoriteItemContext = ({ item, selectedOrgId }: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('home')
   const deleteFavoriteApi = useDeleteFavoriteBooking()
   const stopAndStart = useStopAndStart()
 
@@ -89,16 +89,12 @@ export const FavoriteItemContext = ({ item, selectedOrgId }: Props) => {
             />
             <ContextButtonWrapper variant="compact">
               <Button
-                aria-label={t('favorites.actions.delete', {
-                  defaultValue: 'Delete favorite',
-                })}
+                aria-label={t('favorites.actions.delete', 'Delete favorite')}
                 data-testid="favorite-ctx-delete-btn"
                 fullWidth={false}
                 onClick={deleteFavorite}
                 shape="circle"
-                title={t('favorites.actions.delete', {
-                  defaultValue: 'Delete favorite',
-                })}
+                title={t('favorites.actions.delete', 'Delete favorite')}
                 variant="contextIcon"
               >
                 <LucideIcon icon={Trash2} size={24} />

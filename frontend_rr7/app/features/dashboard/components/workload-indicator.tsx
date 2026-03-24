@@ -34,7 +34,7 @@ export const WorkloadIndicator = ({
   burnoutMetrics,
   plannedWeeklyHours,
 }: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('dashboard')
   const showDecimalHours = useStatsTileTimeAsDecimals()
 
   if (!burnoutMetrics) {
@@ -76,29 +76,22 @@ export const WorkloadIndicator = ({
 
   const getMessage = () => {
     if (burnoutMetrics.level === 'healthy') {
-      return t('workHealth.healthyLoad', {
-        defaultValue: 'Looking good!',
-      })
+      return t('dashboard:workHealth.healthyLoad', 'Looking good!')
     }
     if (burnoutMetrics.level === 'risk') {
-      return t('workHealth.highLoad', {
-        defaultValue: 'Heavy load detected',
-      })
+      return t('dashboard:workHealth.highLoad', 'Heavy load detected')
     }
-    return t('workHealth.elevatedLoad', {
-      defaultValue: 'Load is elevated',
-    })
+    return t('dashboard:workHealth.elevatedLoad', 'Load is elevated')
   }
 
   const getReminder = () => {
     if (burnoutMetrics.level === 'risk') {
-      return t('workHealth.relaxReminder', {
-        defaultValue: 'Time to relax a little bit',
-      })
+      return t(
+        'dashboard:workHealth.relaxReminder',
+        'Time to relax a little bit',
+      )
     }
-    return t('workHealth.takeItEasy', {
-      defaultValue: 'Consider taking it easy',
-    })
+    return t('dashboard:workHealth.takeItEasy', 'Consider taking it easy')
   }
 
   const Icon = getIcon()
@@ -116,24 +109,18 @@ export const WorkloadIndicator = ({
           <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm opacity-80">
             <span>
               <strong>{hoursText}</strong>{' '}
-              {t('workHealth.thisWeek', {
-                defaultValue: 'this week',
-              })}
+              {t('dashboard:workHealth.thisWeek', 'this week')}
             </span>
             {burnoutMetrics.consecutiveDays >= 6 && (
               <span>
                 <strong>{burnoutMetrics.consecutiveDays}</strong>{' '}
-                {t('workHealth.consecutiveDays', {
-                  defaultValue: 'consecutive days',
-                })}
+                {t('dashboard:workHealth.consecutiveDays', 'consecutive days')}
               </span>
             )}
             {burnoutMetrics.averageDailyHours >= 9 && (
               <span>
                 <strong>{burnoutMetrics.averageDailyHours.toFixed(1)}h</strong>{' '}
-                {t('workHealth.avgPerDay', {
-                  defaultValue: 'avg/day',
-                })}
+                {t('dashboard:workHealth.avgPerDay', 'avg/day')}
               </span>
             )}
           </div>

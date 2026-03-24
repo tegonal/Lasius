@@ -238,18 +238,17 @@ export default function DashboardMonth({ loaderData }: Route.ComponentProps) {
       <div className="flex gap-4">
         <StatsOverviewGrid {...stats} period="month" />
         <TopProjectsCard
-          emptyMessage={t('statistics.noProjectsForMonth', {
-            defaultValue: 'No projects for this month',
-          })}
+          emptyMessage={t(
+            'stats:noProjectsForMonth',
+            'No projects for this month',
+          )}
           projects={topProjects}
         />
       </div>
       {streamChart.keys.length > 0 && (
         <>
           <h3 className="text-base font-semibold">
-            {t('statistics.weeklyHoursDistribution', {
-              defaultValue: 'Weekly Hours Distribution',
-            })}
+            {t('stats:weeklyHoursDistribution', 'Weekly Hours Distribution')}
           </h3>
           <MonthStreamChart data={streamChart.data} keys={streamChart.keys} />
         </>

@@ -149,9 +149,7 @@ export default function DashboardDay({ loaderData }: Route.ComponentProps) {
       <div className="flex gap-4">
         <StatsOverviewGrid {...stats} period="day" />
         <TopProjectsCard
-          emptyMessage={t('statistics.noProjectsForDay', {
-            defaultValue: 'No projects for this day',
-          })}
+          emptyMessage={t('stats:noProjectsForDay', 'No projects for this day')}
           projects={projects}
           showTopPrefix={false}
         />

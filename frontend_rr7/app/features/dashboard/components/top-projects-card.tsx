@@ -35,8 +35,8 @@ export const TopProjectsCard = ({
   const { t } = useTranslation('common')
 
   const title = showTopPrefix
-    ? `Top ${t('projects.title', { defaultValue: 'Projects' })}`
-    : t('projects.title', { defaultValue: 'Projects' })
+    ? `Top ${t('projects:title', 'Projects')}`
+    : t('projects:title', 'Projects')
 
   if (projects.length === 0) {
     return (

@@ -30,20 +30,16 @@ type Props = { variant?: 'compact' | 'default' }
 
 export const ContextButtonClose = ({ variant = 'default' }: Props) => {
   const { handleCloseAll } = useContextMenu()
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('context-menu')
 
   return (
     <ContextButtonWrapper variant={variant}>
       <Button
-        aria-label={t('contextMenu.actions.close', {
-          defaultValue: 'Close context menu',
-        })}
+        aria-label={t('actions.close', 'Close context menu')}
         fullWidth={false}
         onClick={handleCloseAll}
         shape="circle"
-        title={t('contextMenu.actions.close', {
-          defaultValue: 'Close context menu',
-        })}
+        title={t('actions.close', 'Close context menu')}
         variant="contextIcon"
       >
         <LucideIcon icon={XIcon} strokeWidth={2} />

@@ -34,7 +34,7 @@ export const ContextButtonOpen = ({
   hash: string
 }) => {
   const { handleCloseAll, handleOpenContextMenu } = useContextMenu()
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('context-menu')
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -46,16 +46,12 @@ export const ContextButtonOpen = ({
 
   return (
     <Button
-      aria-label={t('contextMenu.actions.open', {
-        defaultValue: 'Open context menu',
-      })}
+      aria-label={t('actions.open', 'Open context menu')}
       data-testid={testId}
       fullWidth={false}
       onClick={() => handleOpenContextMenu(hash)}
       shape="circle"
-      title={t('contextMenu.actions.open', {
-        defaultValue: 'Open context menu',
-      })}
+      title={t('actions.open', 'Open context menu')}
       variant="icon"
     >
       <LucideIcon icon={EllipsisVertical} />

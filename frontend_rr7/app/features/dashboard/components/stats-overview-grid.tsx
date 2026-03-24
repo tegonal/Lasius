@@ -49,16 +49,14 @@ export const StatsOverviewGrid = ({
       : decimalHoursToDurationString(value)
 
   const hoursLabel = showDecimalHours
-    ? t('stats.decimalHours', { defaultValue: 'Decimal hours' })
-    : t('common.time.hours', { defaultValue: 'Hours' })
+    ? t('stats:decimalHours', 'Decimal hours')
+    : t('time.hours', 'Hours')
 
   return (
     <div className="flex-1 space-y-3">
       <div className="stats grid w-full grid-cols-2">
         <div className="stat">
-          <div className="stat-title">
-            {t('bookings.title', { defaultValue: 'Bookings' })}
-          </div>
+          <div className="stat-title">{t('bookings:title', 'Bookings')}</div>
           <div className="stat-value">{bookings}</div>
         </div>
         <div
@@ -75,17 +73,13 @@ export const StatsOverviewGrid = ({
           onClick={toggleStatsTileTimeAsDecimals}
         >
           <div className="stat-title">
-            {t('statistics.expectedHours', {
-              defaultValue: 'Expected hours',
-            })}
+            {t('stats:expectedHours', 'Expected hours')}
           </div>
           <div className="stat-value">{formatHours(expectedHours)}</div>
         </div>
         <div className="stat">
           <div className="stat-title">
-            {t('statistics.percentOfPlannedHours', {
-              defaultValue: '% of planned hours',
-            })}
+            {t('stats:percentOfPlannedHours', '% of planned hours')}
           </div>
           <div className="stat-value">{fulfilledPercentage.toFixed(0)}%</div>
         </div>

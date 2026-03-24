@@ -34,10 +34,10 @@ export const HelpButton = () => {
   return (
     <div
       className="tooltip tooltip-bottom"
-      data-tip={t('common.actions.help', { defaultValue: 'Help' })}
+      data-tip={t('actions.help', 'Help')}
     >
       <Button
-        aria-label={t('common.actions.help', { defaultValue: 'Help' })}
+        aria-label={t('actions.help', 'Help')}
         data-testid="help-btn"
         fullWidth={false}
         onClick={toggleHelp}
@@ -60,7 +60,7 @@ export const ModalHelpButton = ({ helpKey }: { helpKey: string }) => {
 
   return (
     <Button
-      aria-label={t('common.actions.help', { defaultValue: 'Help' })}
+      aria-label={t('actions.help', 'Help')}
       fullWidth={false}
       onClick={() => openHelp(helpKey)}
       shape="circle"

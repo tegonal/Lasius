@@ -47,7 +47,7 @@ type Props = {
 }
 
 export const BookingStart = ({ onSuccess, selectedOrgId }: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation(['bookings', 'projects', 'tag-manager'])
   const stopAndStart = useStopAndStart()
   const hookForm = useForm<FormValues>({
     defaultValues: { projectId: '', tags: [] },
@@ -101,9 +101,7 @@ export const BookingStart = ({ onSuccess, selectedOrgId }: Props) => {
             <FieldSet>
               <FormElement
                 htmlFor="projectId"
-                label={t('projects.label', {
-                  defaultValue: 'Project',
-                })}
+                label={t('projects:label', 'Project')}
                 required
               >
                 <ProjectSelect
@@ -115,9 +113,7 @@ export const BookingStart = ({ onSuccess, selectedOrgId }: Props) => {
               </FormElement>
               <FormElement
                 htmlFor="tags"
-                label={t('tags.label', {
-                  defaultValue: 'Tags',
-                })}
+                label={t('tag-manager:label', 'Tags')}
               >
                 <InputTagsAutocomplete
                   id="tags"
@@ -133,9 +129,7 @@ export const BookingStart = ({ onSuccess, selectedOrgId }: Props) => {
                 type="submit"
               >
                 <LucideIcon icon={Timer} size={24} />
-                {t('bookings.actions.start', {
-                  defaultValue: 'Start booking',
-                })}
+                {t('bookings:actions.start', 'Start booking')}
               </Button>
             </ButtonGroup>
           </FormBody>

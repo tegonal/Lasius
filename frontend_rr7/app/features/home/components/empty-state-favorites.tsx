@@ -23,11 +23,8 @@ import { useTranslation } from 'react-i18next'
 import { EmptyState } from '~/components/ui/data-display/empty-state'
 
 export const EmptyStateFavorites = () => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('home')
   return (
-    <EmptyState
-      icon={Star}
-      label={t('favorites.empty', { defaultValue: 'No favorites yet' })}
-    />
+    <EmptyState icon={Star} label={t('favorites.empty', 'No favorites yet')} />
   )
 }

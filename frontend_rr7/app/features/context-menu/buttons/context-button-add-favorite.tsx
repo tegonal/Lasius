@@ -39,19 +39,17 @@ export const ContextButtonAddFavorite = ({
   onAddFavorite,
   variant = 'default',
 }: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('home')
 
   return (
     <ContextButtonWrapper variant={variant}>
       <Button
-        aria-label={t('favorites.actions.add', {
-          defaultValue: 'Add as favorite',
-        })}
+        aria-label={t('favorites.actions.add', 'Add as favorite')}
         data-testid={testId}
         fullWidth={false}
         onClick={onAddFavorite}
         shape="circle"
-        title={t('favorites.actions.add', { defaultValue: 'Add as favorite' })}
+        title={t('favorites.actions.add', 'Add as favorite')}
         variant="contextIcon"
       >
         <LucideIcon icon={Star} size={24} />

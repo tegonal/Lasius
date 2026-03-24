@@ -181,16 +181,12 @@ export const HelpDrawer = () => {
                   <div className="border-base-300 border-b px-6 py-4">
                     <div className="flex items-center justify-between">
                       <Dialog.Title className="text-lg font-semibold">
-                        {t('common.actions.help', {
-                          defaultValue: 'Help',
-                        })}
+                        {t('actions.help', 'Help')}
                       </Dialog.Title>
                       <Dialog.Close
                         render={
                           <Button
-                            aria-label={t('common.actions.close', {
-                              defaultValue: 'Close',
-                            })}
+                            aria-label={t('actions.close', 'Close')}
                             fullWidth={false}
                             shape="circle"
                             size="sm"
@@ -214,10 +210,10 @@ export const HelpDrawer = () => {
                     {error && !loading && (
                       <div className="alert alert-warning">
                         <p>
-                          {t('common.errors.helpNotAvailable', {
-                            defaultValue:
-                              'Help content not available for this page.',
-                          })}
+                          {t(
+                            'errors.helpNotAvailable',
+                            'Help content not available for this page.',
+                          )}
                         </p>
                       </div>
                     )}
@@ -225,10 +221,10 @@ export const HelpDrawer = () => {
                     {isFallbackLanguage && !loading && !error && (
                       <div className="alert alert-info mb-4">
                         <p>
-                          {t('common.info.helpFallbackLanguage', {
-                            defaultValue:
-                              'This help content is not available in your selected language yet. Showing English version.',
-                          })}
+                          {t(
+                            'info.helpFallbackLanguage',
+                            'This help content is not available in your selected language yet. Showing English version.',
+                          )}
                         </p>
                       </div>
                     )}

@@ -28,6 +28,7 @@ export const BookingDayStatsProgressBar = () => {
   const loaderData = useRouteLoaderData('routes/user.layout._index')
 
   const daySummary = loaderData?.daySummary
+  const selectedDate = loaderData?.selectedDate
   if (!daySummary) return null
 
   const label = `${daySummary.fulfilledPercentage}% (${decimalHoursToDurationString(daySummary.hours)} ${t(
@@ -37,7 +38,11 @@ export const BookingDayStatsProgressBar = () => {
 
   return (
     <div className="w-full">
-      <ProgressBar label={label} percentage={daySummary.fulfilledPercentage} />
+      <ProgressBar
+        key={selectedDate}
+        label={label}
+        percentage={daySummary.fulfilledPercentage}
+      />
     </div>
   )
 }

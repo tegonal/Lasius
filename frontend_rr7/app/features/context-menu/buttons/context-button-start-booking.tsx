@@ -42,19 +42,17 @@ export const ContextButtonStartBooking = ({
   onStart,
   variant = 'default',
 }: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('bookings')
 
   return (
     <ContextButtonWrapper variant={variant}>
       <Button
-        aria-label={t('bookings.actions.start', {
-          defaultValue: 'Start booking',
-        })}
+        aria-label={t('actions.start', 'Start booking')}
         data-testid={testId}
         fullWidth={false}
         onClick={onStart}
         shape="circle"
-        title={t('bookings.actions.start', { defaultValue: 'Start booking' })}
+        title={t('actions.start', 'Start booking')}
         variant="contextIcon"
       >
         <LucideIcon icon={Timer} size={24} />

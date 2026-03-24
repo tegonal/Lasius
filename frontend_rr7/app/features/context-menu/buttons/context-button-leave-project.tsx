@@ -41,7 +41,7 @@ export const ContextButtonLeaveProject = ({
   variant = 'default',
 }: Props) => {
   const { handleCloseAll } = useContextMenu()
-  const { t } = useTranslation('common')
+  const { t } = useTranslation(['projects', 'common'])
   const [showDialog, setShowDialog] = useState(false)
   const { selectedOrganisationId } = useOrganisation()
   const leaveProjectApi = useRemoveProjectOwnUser()
@@ -62,15 +62,11 @@ export const ContextButtonLeaveProject = ({
   return (
     <ContextButtonWrapper variant={variant}>
       <Button
-        aria-label={t('projects.actions.leave', {
-          defaultValue: 'Leave this project',
-        })}
+        aria-label={t('projects:actions.leave', 'Leave this project')}
         fullWidth={false}
         onClick={() => setShowDialog(true)}
         shape="circle"
-        title={t('projects.actions.leave', {
-          defaultValue: 'Leave this project',
-        })}
+        title={t('projects:actions.leave', 'Leave this project')}
         variant="contextIcon"
       >
         <LucideIcon icon={LogOut} size={24} />
@@ -78,22 +74,17 @@ export const ContextButtonLeaveProject = ({
       {showDialog && (
         <GenericConfirmModal
           blockViewport
-          cancelLabel={t('common.actions.cancel', {
-            defaultValue: 'Cancel',
-          })}
-          confirmLabel={t('projects.actions.leave', {
-            defaultValue: 'Leave this project',
-          })}
+          cancelLabel={t('actions.cancel', 'Cancel')}
+          confirmLabel={t('projects:actions.leave', 'Leave this project')}
           confirmVariant="primary"
-          message={t('projects.confirmations.leave', {
-            defaultValue: 'Are you sure you want to leave this project?',
-          })}
+          message={t(
+            'projects:confirmations.leave',
+            'Are you sure you want to leave this project?',
+          )}
           onClose={handleCancel}
           onConfirm={handleConfirm}
           open={showDialog}
-          title={t('projects.actions.leave', {
-            defaultValue: 'Leave this project',
-          })}
+          title={t('projects:actions.leave', 'Leave this project')}
         />
       )}
     </ContextButtonWrapper>
