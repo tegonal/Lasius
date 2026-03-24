@@ -58,15 +58,13 @@ export const IndexColumnTabs = ({
       component: (
         <div className="flex w-full flex-col items-center justify-center gap-1 px-2 py-4 sm:gap-4 sm:px-3">
           <BookingStart selectedOrgId={selectedOrgId} />
-          <Divider text={t('common.or', { defaultValue: 'or' })} />
+          <Divider text={t('or', { defaultValue: 'or' })} />
           <BookingAddButton selectedOrgId={selectedOrgId} />
         </div>
       ),
       icon: Clock,
       id: 'bookingStart',
-      name: t('bookings.actions.start', {
-        defaultValue: 'Start booking',
-      }),
+      name: t('actions.start', 'Start booking'),
     },
     {
       component: (
@@ -77,9 +75,7 @@ export const IndexColumnTabs = ({
       ),
       icon: Star,
       id: 'bookingStartFav',
-      name: t('bookings.actions.startFromFavorite', {
-        defaultValue: 'Start booking from favorite',
-      }),
+      name: t('actions.startFromFavorite', 'Start booking from favorite'),
     },
     {
       component: (
@@ -91,9 +87,7 @@ export const IndexColumnTabs = ({
       ),
       icon: Users,
       id: 'bookingStartTeam',
-      name: t('bookings.actions.startFromTeamMember', {
-        defaultValue: 'Start booking from team member',
-      }),
+      name: t('actions.startFromTeamMember', 'Start booking from team member'),
     },
   ]
 

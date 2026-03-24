@@ -100,15 +100,15 @@ export const AppSettingsForm = () => {
 
   const THEMES: SelectOption[] = [
     {
-      label: t('common.themes.light', { defaultValue: 'Light' }),
+      label: t('themes.light', { defaultValue: 'Light' }),
       value: 'light',
     },
     {
-      label: t('common.themes.dark', { defaultValue: 'Dark' }),
+      label: t('themes.dark', { defaultValue: 'Dark' }),
       value: 'dark',
     },
     {
-      label: t('common.themes.system', { defaultValue: 'System' }),
+      label: t('themes.system', { defaultValue: 'System' }),
       value: 'system',
     },
   ]
@@ -188,9 +188,7 @@ export const AppSettingsForm = () => {
               <FieldSet>
                 <FormElement
                   htmlFor="language-select"
-                  label={t('settings.app.language', {
-                    defaultValue: 'Interface Language',
-                  })}
+                  label={t('app.language', 'Interface Language')}
                 >
                   <Select
                     id="language-select"
@@ -201,9 +199,7 @@ export const AppSettingsForm = () => {
                 </FormElement>
                 <FormElement
                   htmlFor="theme-select"
-                  label={t('settings.app.theme', {
-                    defaultValue: 'Theme',
-                  })}
+                  label={t('app.theme', 'Theme')}
                 >
                   <Select
                     id="theme-select"
@@ -223,18 +219,14 @@ export const AppSettingsForm = () => {
                       className="cursor-pointer"
                       htmlFor="onboarding-toggle"
                     >
-                      {t('settings.app.showOnboarding', {
-                        defaultValue: 'Show Onboarding Tutorial',
-                      })}
+                      {t('app.showOnboarding', 'Show Onboarding Tutorial')}
                     </Label>
                   </div>
                 </FormElement>
               </FieldSet>
               <ButtonGroup>
                 <Button type="submit" variant="primary">
-                  {t('settings.app.save', {
-                    defaultValue: 'Save Settings',
-                  })}
+                  {t('app.save', 'Save Settings')}
                 </Button>
               </ButtonGroup>
             </FormBody>

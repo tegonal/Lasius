@@ -1,14 +1,4 @@
 {
-  "account": {
-    "accountSecurity": "Account Security",
-    "security": {
-      "description": "Update your password to keep your account secure. Make sure to use a strong password with at least 8 characters, including uppercase letters and numbers."
-    },
-    "settings": {
-      "description": "Manage your personal information and account details. Your email address can only be changed if you are using the internal authentication provider.",
-      "title": "Account Settings"
-    }
-  },
   "actions": {
     "add": "Add",
     "back": "Back",
@@ -18,7 +8,8 @@
     "help": "Help",
     "reset": "Reset",
     "resetToInitial": "Reset to initial value",
-    "save": "Save"
+    "save": "Save",
+    "signUp": "Sign up"
   },
   "aria": {
     "decrement": "Decrement",
@@ -98,43 +89,6 @@
     }
   },
   "cancel": "Cancel",
-  "common": {
-    "actions": {
-      "back": "Back",
-      "reset": "Reset",
-      "signUp": "Sign up"
-    },
-    "custom": "Custom",
-    "filter": {
-      "title": "Filter"
-    },
-    "formats": {
-      "durationFormat": "HH:MM"
-    },
-    "forms": {
-      "confirmPassword": "Confirm password",
-      "email": "Email",
-      "firstName": "First name",
-      "lastName": "Last name",
-      "password": "Password"
-    },
-    "help": {
-      "contactAdmin": "Please contact your administrator"
-    },
-    "time": {
-      "from": "From",
-      "timeRange": "Time range",
-      "to": "To"
-    },
-    "validation": {
-      "emailInvalid": "Invalid email address",
-      "missingNumber": "Must contain a number",
-      "missingUppercase": "Must contain an uppercase letter",
-      "passwordMismatch": "Passwords do not match",
-      "passwordTooShort": "Password must be at least 9 characters",
-      "required": "Required"
-    }
-  },
   "custom": "Custom",
   "date": "Date",
   "demo": {
@@ -189,16 +143,18 @@
     "timeFormat": "HH:MM"
   },
   "forms": {
+    "confirmPassword": "Confirm password",
     "email": "Email",
     "firstName": "First name",
     "lastName": "Last name",
-    "name": "Name"
+    "name": "Name",
+    "password": "Password"
+  },
+  "help": {
+    "contactAdmin": "Please contact your administrator"
   },
   "info": {
     "helpFallbackLanguage": "This help content is not available in your selected language yet. Showing English version."
-  },
-  "invitations": {
-    "createAccountMessage": "You have been invited to create an account so that you can use Lasius to track your working hours."
   },
   "issueImporters": {
     "typeLabels": {
@@ -222,24 +178,8 @@
     }
   },
   "of": "of",
-  "organisations": {
-    "myPersonalOrganisation": "My personal organisation",
-    "organization": "Organisation"
-  },
   "projects": {
-    "actions": {
-      "deactivate": "Deactivate project",
-      "edit": "Edit project"
-    },
-    "errors": {
-      "projectNotFound": "This project could not be found. The project ID is shown above."
-    },
-    "selectProject": "Select project",
-    "warnings": {
-      "inactiveProjectContext": "Viewing stats from inactive project",
-      "projectNotInActiveList": "This project is not in your active projects list. It may be inactive or from another organization.",
-      "projectUnavailable": "This project is no longer in your profile. You may have been removed from it."
-    }
+    "selectProject": "Select project"
   },
   "roles": {
     "administrator": "Administrator",
@@ -264,15 +204,6 @@
     "active": "Active",
     "inactive": "Inactive",
     "label": "Status"
-  },
-  "tags": {
-    "actions": {
-      "addTag": "Add a tag",
-      "edit": "Edit tags"
-    },
-    "chooseOrEnter": "Choose or enter tags",
-    "customTag": "Custom tag",
-    "enterTagName": "Enter tag name"
   },
   "time": {
     "customTime": "Custom time...",
@@ -333,24 +264,13 @@
     "passwordRequired": "Password is required",
     "passwordTooShort": "Minimum 9 characters",
     "projectKeyRequired": "Project name is required",
+    "required": "Required",
     "startMustBeInPast": "Start time must be in the past",
     "themeRequired": "Theme is required"
   },
   "workHealth": {
     "actualHours": "actual",
     "plannedHours": "planned"
-  },
-  "workingHours": {
-    "dailyTotal": "Daily Total",
-    "description": "The amount of time you expect to book per day, by organisation, during a typical working week. This data is used to calculate your daily and weekly progress.",
-    "errors": {
-      "updateFailed": "Failed to update working hours"
-    },
-    "status": {
-      "updated": "Working hours updated"
-    },
-    "title": "Working hours",
-    "totalPerWeek": "Total per week"
   },
   "you": "You"
 }

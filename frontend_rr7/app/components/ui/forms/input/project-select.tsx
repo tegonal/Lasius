@@ -72,7 +72,7 @@ export const ProjectSelect = ({
       return {
         selectedItem: item,
         statusMessage: {
-          text: t('projects.warnings.projectNotInActiveList', {
+          text: t('projects:warnings.projectNotInActiveList', {
             defaultValue:
               'This project is not in your active projects list. It may be inactive or from another organization.',
           }),
@@ -86,7 +86,7 @@ export const ProjectSelect = ({
       return {
         selectedItem: fallbackProject,
         statusMessage: {
-          text: t('projects.warnings.projectUnavailable', {
+          text: t('projects:warnings.projectUnavailable', {
             defaultValue:
               'This project is no longer in your profile. You may have been removed from it.',
           }),
@@ -99,7 +99,7 @@ export const ProjectSelect = ({
     return {
       selectedItem: null,
       statusMessage: {
-        text: t('projects.errors.projectNotFound', {
+        text: t('projects:errors.projectNotFound', {
           defaultValue:
             'This project could not be found. The project ID is shown above.',
         }),

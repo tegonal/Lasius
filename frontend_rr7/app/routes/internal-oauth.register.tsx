@@ -58,53 +58,53 @@ const createRegisterSchema = (t: SchemaTranslationFn) =>
     .object({
       confirmPassword: z
         .string({
-          error: t('common.validation.required', { defaultValue: 'Required' }),
+          error: t('validation.required', { defaultValue: 'Required' }),
         })
-        .min(1, t('common.validation.required', { defaultValue: 'Required' })),
+        .min(1, t('validation.required', { defaultValue: 'Required' })),
       email: z
         .string({
-          error: t('common.validation.required', { defaultValue: 'Required' }),
+          error: t('validation.required', { defaultValue: 'Required' }),
         })
         .email({
-          message: t('common.validation.emailInvalid', {
+          message: t('validation.emailInvalid', {
             defaultValue: 'Invalid email address',
           }),
         }),
       firstName: z
         .string({
-          error: t('common.validation.required', { defaultValue: 'Required' }),
+          error: t('validation.required', { defaultValue: 'Required' }),
         })
-        .min(1, t('common.validation.required', { defaultValue: 'Required' })),
+        .min(1, t('validation.required', { defaultValue: 'Required' })),
       invitationId: z.string().optional(),
       lastName: z
         .string({
-          error: t('common.validation.required', { defaultValue: 'Required' }),
+          error: t('validation.required', { defaultValue: 'Required' }),
         })
-        .min(1, t('common.validation.required', { defaultValue: 'Required' })),
+        .min(1, t('validation.required', { defaultValue: 'Required' })),
       password: z
         .string({
-          error: t('common.validation.required', { defaultValue: 'Required' }),
+          error: t('validation.required', { defaultValue: 'Required' }),
         })
         .min(
           9,
-          t('common.validation.passwordTooShort', {
+          t('validation.passwordTooShort', {
             defaultValue: 'Password must be at least 9 characters',
           }),
         )
         .regex(/[A-Z]/, {
-          error: t('common.validation.missingUppercase', {
+          error: t('validation.missingUppercase', {
             defaultValue: 'Must contain an uppercase letter',
           }),
         })
         .regex(/\d/, {
-          error: t('common.validation.missingNumber', {
+          error: t('validation.missingNumber', {
             defaultValue: 'Must contain a number',
           }),
         }),
       returnTo: z.string().optional(),
     })
     .refine((val) => val.password === val.confirmPassword, {
-      message: t('common.validation.passwordMismatch', {
+      message: t('validation.passwordMismatch', {
         defaultValue: 'Passwords do not match',
       }),
       path: ['confirmPassword'],
@@ -235,7 +235,7 @@ export default function InternalOAuthRegister() {
       )}
       {invitationId && (
         <Alert className="animate-[fadeIn_0.4s_ease-out]" variant="info">
-          {t('invitations.createAccountMessage', {
+          {t('invitation:createAccountMessage', {
             defaultValue:
               'You have been invited to create an account so that you can use Lasius to track your working hours.',
           })}
@@ -275,7 +275,7 @@ export default function InternalOAuthRegister() {
               <FieldSet>
                 <FormElement
                   htmlFor={fields.email.id}
-                  label={t('common.forms.email', {
+                  label={t('forms.email', {
                     defaultValue: 'Email',
                   })}
                   required
@@ -292,7 +292,7 @@ export default function InternalOAuthRegister() {
                 </FormElement>
                 <FormElement
                   htmlFor={fields.firstName.id}
-                  label={t('common.forms.firstName', {
+                  label={t('forms.firstName', {
                     defaultValue: 'First name',
                   })}
                   required
@@ -308,7 +308,7 @@ export default function InternalOAuthRegister() {
                 </FormElement>
                 <FormElement
                   htmlFor={fields.lastName.id}
-                  label={t('common.forms.lastName', {
+                  label={t('forms.lastName', {
                     defaultValue: 'Last name',
                   })}
                   required
@@ -324,7 +324,7 @@ export default function InternalOAuthRegister() {
                 </FormElement>
                 <FormElement
                   htmlFor={fields.password.id}
-                  label={t('common.forms.password', {
+                  label={t('forms.password', {
                     defaultValue: 'Password',
                   })}
                   required
@@ -342,7 +342,7 @@ export default function InternalOAuthRegister() {
                 </FormElement>
                 <FormElement
                   htmlFor={fields.confirmPassword.id}
-                  label={t('common.forms.confirmPassword', {
+                  label={t('forms.confirmPassword', {
                     defaultValue: 'Confirm password',
                   })}
                   required
@@ -386,7 +386,7 @@ export default function InternalOAuthRegister() {
                   loading={isSubmitting}
                   type="submit"
                 >
-                  {t('common.actions.signUp', {
+                  {t('actions.signUp', {
                     defaultValue: 'Sign up',
                   })}
                 </Button>

@@ -184,7 +184,7 @@ export const InputTagsAutocomplete = ({
                     onBlur={() => setIsFocused(false)}
                     onChange={inputValueChanged}
                     onFocus={() => setIsFocused(true)}
-                    placeholder={t('tags.chooseOrEnter', {
+                    placeholder={t('tag-manager:chooseOrEnter', {
                       defaultValue: 'Choose or enter tags',
                     })}
                     ref={(el: HTMLInputElement | null) => {
@@ -217,7 +217,7 @@ export const InputTagsAutocomplete = ({
                             >
                               {({ focus }) => (
                                 <>
-                                  <div className="text-sm">{`${t('tags.customTag', { defaultValue: 'Custom tag' })}: `}</div>
+                                  <div className="text-sm">{`${t('tag-manager:customTag', { defaultValue: 'Custom tag' })}: `}</div>
                                   <Tag
                                     active={focus}
                                     clickHandler={noop}

@@ -21,16 +21,16 @@ import { useTranslation } from 'react-i18next'
 
 import { SettingsRightColumn } from '~/features/settings/components/settings-right-column'
 
-export const AccountSecurityRightColumn = () => {
-  const { t } = useTranslation('settings')
+export const WorkingHoursRightColumn = () => {
+  const { t } = useTranslation('common')
   return (
     <SettingsRightColumn
-      description={t('account.security.description', {
+      description={t('working-hours:description', {
         defaultValue:
-          'Update your password to keep your account secure. Make sure to use a strong password with at least 8 characters, including uppercase letters and numbers.',
+          'The amount of time you expect to book per day, by organisation, during a typical working week. This data is used to calculate your daily and weekly progress.',
       })}
-      title={t('account.accountSecurity', {
-        defaultValue: 'Account Security',
+      title={t('working-hours:title', {
+        defaultValue: 'Working hours',
       })}
     />
   )

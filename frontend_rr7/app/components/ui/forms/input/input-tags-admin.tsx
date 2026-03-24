@@ -161,7 +161,7 @@ export const InputTagsAdmin = ({
       >
         <FormElement>
           <Label htmlFor="newTag">
-            {t('tags.actions.addTag', {
+            {t('tag-manager:actions.addTag', {
               defaultValue: 'Add a tag',
             })}
           </Label>
@@ -170,7 +170,7 @@ export const InputTagsAdmin = ({
             autoFocus
             onChange={(e) => setInputText(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={t('tags.enterTagName', {
+            placeholder={t('tag-manager:enterTagName', {
               defaultValue: 'Enter tag name',
             })}
             value={inputText}

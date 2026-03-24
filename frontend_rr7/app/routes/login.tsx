@@ -152,7 +152,7 @@ export default function Login({
               })}
             </p>
             <p className="text-base-content/70 text-center text-sm">
-              {t('common.help.contactAdmin', {
+              {t('help.contactAdmin', {
                 defaultValue: 'Please contact your administrator',
               })}
             </p>

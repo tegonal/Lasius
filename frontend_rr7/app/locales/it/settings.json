@@ -1,9 +1,17 @@
 {
   "account": {
+    "accountSecurity": "Account Security",
     "profileChangesNotAllowedInDemo": "Profile changes are not allowed in demo mode",
     "profileSettings": {
       "description": "Manage your personal information and account details.",
       "title": "Profile Information"
+    },
+    "security": {
+      "description": "Update your password to keep your account secure. Make sure to use a strong password with at least 8 characters, including uppercase letters and numbers."
+    },
+    "settings": {
+      "description": "Manage your personal information and account details. Your email address can only be changed if you are using the internal authentication provider.",
+      "title": "Account Settings"
     },
     "status": {
       "passwordUpdated": "Password updated",
@@ -13,12 +21,11 @@
   "actions": {
     "saveChanges": "Save changes"
   },
-  "common": {
-    "themes": {
-      "dark": "Dark",
-      "light": "Light",
-      "system": "System"
-    }
+  "app": {
+    "language": "Interface Language",
+    "save": "Save Settings",
+    "showOnboarding": "Show Onboarding Tutorial",
+    "theme": "Theme"
   },
   "forms": {
     "confirmNewPassword": "Confirm new password",
@@ -29,13 +36,10 @@
     "password": "Password",
     "role": "Role"
   },
-  "settings": {
-    "app": {
-      "language": "Interface Language",
-      "save": "Save Settings",
-      "showOnboarding": "Show Onboarding Tutorial",
-      "theme": "Theme"
-    }
+  "themes": {
+    "dark": "Dark",
+    "light": "Light",
+    "system": "System"
   },
   "ui": {
     "hidePasswords": "Hide passwords",

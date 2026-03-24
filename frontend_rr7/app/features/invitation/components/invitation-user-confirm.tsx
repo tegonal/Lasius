@@ -140,7 +140,7 @@ export const InvitationUserConfirm = ({ invitation, organisations }: Props) => {
                 fullWidth
                 onClick={handleAcceptInvite}
               >
-                {t('invitations.actions.accept', {
+                {t('actions.accept', {
                   defaultValue: 'Accept invitation',
                 })}
               </Button>
@@ -150,7 +150,7 @@ export const InvitationUserConfirm = ({ invitation, organisations }: Props) => {
                 onClick={handleRejectInvite}
                 variant="ghost"
               >
-                {t('invitations.actions.reject', {
+                {t('actions.reject', {
                   defaultValue: 'Reject invitation',
                 })}
               </Button>

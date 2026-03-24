@@ -116,7 +116,7 @@ const InputDatePickerInternal = ({
       ...rules,
       validate: {
         ...(rules?.validate as Record<string, unknown>),
-        validDate: (fieldValue: string) => {
+        validDate: (fieldValue: string): string | true => {
           const currentValue = value
 
           if (

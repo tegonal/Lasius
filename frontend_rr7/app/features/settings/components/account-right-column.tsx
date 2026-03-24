@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next'
 import { SettingsRightColumn } from '~/features/settings/components/settings-right-column'
 
 export const AccountRightColumn = () => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('settings')
   return (
     <SettingsRightColumn
       description={t('account.settings.description', {

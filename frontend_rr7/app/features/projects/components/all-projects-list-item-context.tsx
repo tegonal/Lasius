@@ -164,13 +164,13 @@ export const AllProjectsListItemContext = ({ item }: Props) => {
                     })}
                   >
                     <Button
-                      aria-label={t('projects.actions.edit', {
+                      aria-label={t('projects:actions.edit', {
                         defaultValue: 'Edit project',
                       })}
                       fullWidth={false}
                       onClick={() => editProject()}
                       shape="circle"
-                      title={t('projects.actions.edit', {
+                      title={t('projects:actions.edit', {
                         defaultValue: 'Edit project',
                       })}
                       variant="contextIcon"
@@ -180,13 +180,13 @@ export const AllProjectsListItemContext = ({ item }: Props) => {
                   </span>
                 ) : (
                   <Button
-                    aria-label={t('projects.actions.edit', {
+                    aria-label={t('projects:actions.edit', {
                       defaultValue: 'Edit project',
                     })}
                     fullWidth={false}
                     onClick={() => editProject()}
                     shape="circle"
-                    title={t('projects.actions.edit', {
+                    title={t('projects:actions.edit', {
                       defaultValue: 'Edit project',
                     })}
                     variant="contextIcon"
@@ -199,13 +199,13 @@ export const AllProjectsListItemContext = ({ item }: Props) => {
                 <>
                   <ContextButtonWrapper variant="compact">
                     <Button
-                      aria-label={t('tags.actions.edit', {
+                      aria-label={t('tag-manager:actions.edit', {
                         defaultValue: 'Edit tags',
                       })}
                       fullWidth={false}
                       onClick={() => manageTags()}
                       shape="circle"
-                      title={t('tags.actions.edit', {
+                      title={t('tag-manager:actions.edit', {
                         defaultValue: 'Edit tags',
                       })}
                       variant="contextIcon"
@@ -215,13 +215,13 @@ export const AllProjectsListItemContext = ({ item }: Props) => {
                   </ContextButtonWrapper>
                   <ContextButtonWrapper variant="compact">
                     <Button
-                      aria-label={t('projects.actions.deactivate', {
+                      aria-label={t('projects:actions.deactivate', {
                         defaultValue: 'Deactivate project',
                       })}
                       fullWidth={false}
                       onClick={() => showDeactivateConfirm()}
                       shape="circle"
-                      title={t('projects.actions.deactivate', {
+                      title={t('projects:actions.deactivate', {
                         defaultValue: 'Deactivate project',
                       })}
                       variant="contextIcon"

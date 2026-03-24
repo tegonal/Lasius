@@ -111,6 +111,12 @@ export const ProgressBar = memo(
       return () => cancelAnimationFrame(frame)
     }, [])
 
+    useEffect(() => {
+      if (percentage < 100) {
+        hasExplodedRef.current = false
+      }
+    }, [percentage])
+
     const handleTransitionEnd = useCallback(() => {
       if (percentage >= 100 && !hasExplodedRef.current && fillRef.current) {
         hasExplodedRef.current = true

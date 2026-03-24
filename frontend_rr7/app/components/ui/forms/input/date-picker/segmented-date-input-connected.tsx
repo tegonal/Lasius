@@ -31,6 +31,10 @@ import {
   type DateSegment,
 } from './shared/core/segment-config'
 import {
+  getArrowKeyTarget,
+  getTabTarget,
+} from './shared/core/segment-navigation'
+import {
   createHandleClick,
   selectSegment as selectSegmentHelper,
 } from './shared/core/segment-selection'
@@ -72,6 +76,15 @@ export const SegmentedDateInputConnected = ({
   const pendingCursorPosRef = useRef<null | number>(null)
 
   const config = DATE_SEGMENT_CONFIG
+
+  const incrementBySegment = (segment: DateSegment, increment: number) => {
+    const incrementFns: Record<DateSegment, (n: number) => void> = {
+      day: incrementDays,
+      month: incrementMonths,
+      year: incrementYears,
+    }
+    incrementFns[segment](increment)
+  }
 
   // Sync with store
   useEffect(() => {
@@ -188,113 +201,63 @@ export const SegmentedDateInputConnected = ({
       return
     }
 
+    // Helper: resolve segment at cursor position
+    const segmentAtCursor = (): DateSegment | null => {
+      const position = inputRef.current?.selectionStart
+      if (typeof position !== 'number') return null
+      return getSegmentFromPosition(
+        position,
+        inputValue,
+        config.delimiter,
+        config.segments,
+      )
+    }
+
     // Arrow keys for increment/decrement
     if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
       e.preventDefault()
-      const position = inputRef.current?.selectionStart
-      if (typeof position === 'number' && value.date) {
-        const segment = getSegmentFromPosition(
-          position,
-          inputValue,
-          config.delimiter,
-          config.segments,
-        )
-        if (!segment) return
+      if (!value.date) return
+      const segment = segmentAtCursor()
+      if (!segment) return
 
-        const increment = e.key === 'ArrowUp' ? 1 : -1
+      const increment = e.key === 'ArrowUp' ? 1 : -1
+      incrementBySegment(segment, increment)
 
-        if (segment === 'day') {
-          incrementDays(increment)
-        } else if (segment === 'month') {
-          incrementMonths(increment)
-        } else if (segment === 'year') {
-          incrementYears(increment)
-        }
-
-        // Update local input value immediately by reading fresh value from store
-        if (store) {
-          const updatedValue = store.getState().value
-          setInputValue(updatedValue.dateString)
-        }
-
-        setTimeout(() => selectSegment(segment), 0)
+      if (store) {
+        setInputValue(store.getState().value.dateString)
       }
+      setTimeout(() => selectSegment(segment), 0)
     }
 
-    // Tab navigation
-    if (e.key === 'Tab' && !e.shiftKey) {
-      const position = inputRef.current?.selectionStart
-      if (typeof position === 'number') {
-        const segment = getSegmentFromPosition(
-          position,
-          inputValue,
-          config.delimiter,
-          config.segments,
-        )
-        if (segment === 'day') {
+    // Tab navigation between segments
+    if (e.key === 'Tab') {
+      const segment = segmentAtCursor()
+      if (segment) {
+        const target = getTabTarget(e.shiftKey, segment, config.segments)
+        if (target) {
           e.preventDefault()
-          selectSegment('month')
-        } else if (segment === 'month') {
-          e.preventDefault()
-          selectSegment('year')
+          selectSegment(target)
         }
       }
     }
 
-    if (e.key === 'Tab' && e.shiftKey) {
+    // Arrow key navigation between segments at boundaries
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
       const position = inputRef.current?.selectionStart
       if (typeof position === 'number') {
-        const segment = getSegmentFromPosition(
-          position,
-          inputValue,
-          config.delimiter,
-          config.segments,
-        )
-        if (segment === 'year') {
-          e.preventDefault()
-          selectSegment('month')
-        } else if (segment === 'month') {
-          e.preventDefault()
-          selectSegment('day')
-        }
-      }
-    }
-
-    // Arrow key navigation
-    if (e.key === 'ArrowLeft') {
-      const position = inputRef.current?.selectionStart
-      if (typeof position === 'number') {
-        const segment = getSegmentFromPosition(
-          position,
-          inputValue,
-          config.delimiter,
-          config.segments,
-        )
-        if (segment === 'year' && position === bounds.year.start) {
-          e.preventDefault()
-          selectSegment('month')
-        } else if (segment === 'month' && position === bounds.month.start) {
-          e.preventDefault()
-          selectSegment('day')
-        }
-      }
-    }
-
-    if (e.key === 'ArrowRight') {
-      const position = inputRef.current?.selectionStart
-      if (typeof position === 'number') {
-        const segment = getSegmentFromPosition(
-          position,
-          inputValue,
-          config.delimiter,
-          config.segments,
-        )
-        if (segment === 'day' && position === bounds.day.end) {
-          e.preventDefault()
-          selectSegment('month')
-        } else if (segment === 'month' && position === bounds.month.end) {
-          e.preventDefault()
-          selectSegment('year')
+        const segment = segmentAtCursor()
+        if (segment) {
+          const target = getArrowKeyTarget(
+            e.key,
+            position,
+            segment,
+            bounds,
+            config.segments,
+          )
+          if (target) {
+            e.preventDefault()
+            selectSegment(target)
+          }
         }
       }
     }
@@ -343,14 +306,7 @@ export const SegmentedDateInputConnected = ({
     const targetSegment = selectedSegment || 'day'
     const increment = direction === 'up' ? 1 : -1
 
-    // Use the date-fns powered increment functions
-    if (targetSegment === 'day') {
-      incrementDays(increment)
-    } else if (targetSegment === 'month') {
-      incrementMonths(increment)
-    } else if (targetSegment === 'year') {
-      incrementYears(increment)
-    }
+    incrementBySegment(targetSegment, increment)
 
     // Update local input value immediately by reading fresh value from store
     if (store) {

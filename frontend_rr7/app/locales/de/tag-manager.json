@@ -18,8 +18,10 @@
     "pasteTags": "Paste tags",
     "save": "Save"
   },
+  "chooseOrEnter": "Choose or enter tags",
   "confirmDeleteGroup": "Are you sure you want to delete the tag group \"{{groupName}}\"?",
   "confirmUnsavedChanges": "You have unsaved changes. Are you sure you want to cancel?",
+  "customTag": "Custom tag",
   "enterTagName": "Enter tag name",
   "forms": {
     "name": "Name"

@@ -75,24 +75,24 @@ export const StatsFilter = ({ inactiveProject = null }: StatsFilterProps) => {
     setSearchParams(
       (prev) => {
         prev.set('from', value)
-        prev.set('dateRange', t('common.custom', { defaultValue: 'Custom' }))
+        prev.set('dateRange', t('custom', { defaultValue: 'Custom' }))
         return prev
       },
       { replace: true },
     )
-    setSelectedRange(t('common.custom', { defaultValue: 'Custom' }))
+    setSelectedRange(t('custom', { defaultValue: 'Custom' }))
   }
 
   const handleToChange = (value: string) => {
     setSearchParams(
       (prev) => {
         prev.set('to', value)
-        prev.set('dateRange', t('common.custom', { defaultValue: 'Custom' }))
+        prev.set('dateRange', t('custom', { defaultValue: 'Custom' }))
         return prev
       },
       { replace: true },
     )
-    setSelectedRange(t('common.custom', { defaultValue: 'Custom' }))
+    setSelectedRange(t('custom', { defaultValue: 'Custom' }))
   }
 
   const resetForm = () => {
@@ -124,12 +124,12 @@ export const StatsFilter = ({ inactiveProject = null }: StatsFilterProps) => {
         <div className="alert alert-warning mb-4">
           <div className="flex w-full items-center justify-between">
             <span>
-              {t('projects.warnings.inactiveProjectContext', {
+              {t('projects:warnings.inactiveProjectContext', {
                 defaultValue: 'Viewing stats from inactive project',
               })}
             </span>
             <Button
-              aria-label={t('common.actions.back', {
+              aria-label={t('actions.back', {
                 defaultValue: 'Back',
               })}
               fullWidth={false}
@@ -138,14 +138,14 @@ export const StatsFilter = ({ inactiveProject = null }: StatsFilterProps) => {
               variant="ghost"
             >
               <LucideIcon icon={ArrowLeft} size={16} />
-              {t('common.actions.back', { defaultValue: 'Back' })}
+              {t('actions.back', { defaultValue: 'Back' })}
             </Button>
           </div>
         </div>
       )}
       <div className="relative">
         <Heading variant="section">
-          {t('common.filter.title', { defaultValue: 'Filter' })}
+          {t('filter.title', { defaultValue: 'Filter' })}
         </Heading>
         {hasChanges && (
           <div className="absolute top-3 right-0">
@@ -154,7 +154,7 @@ export const StatsFilter = ({ inactiveProject = null }: StatsFilterProps) => {
               onClick={resetForm}
               type="button"
             >
-              {t('common.actions.reset', {
+              {t('actions.reset', {
                 defaultValue: 'Reset',
               })}
             </button>
@@ -164,7 +164,7 @@ export const StatsFilter = ({ inactiveProject = null }: StatsFilterProps) => {
       <FormBody>
         <FormElement
           htmlFor="dateRange"
-          label={t('common.time.timeRange', {
+          label={t('time.timeRange', {
             defaultValue: 'Time range',
           })}
         >
@@ -177,7 +177,7 @@ export const StatsFilter = ({ inactiveProject = null }: StatsFilterProps) => {
         </FormElement>
         <FormElement
           htmlFor="from"
-          label={t('common.time.from', { defaultValue: 'From' })}
+          label={t('time.from', { defaultValue: 'From' })}
         >
           <InputDateStandalone
             id="from"
@@ -185,10 +185,7 @@ export const StatsFilter = ({ inactiveProject = null }: StatsFilterProps) => {
             value={currentFrom.split('T')[0] || ''}
           />
         </FormElement>
-        <FormElement
-          htmlFor="to"
-          label={t('common.time.to', { defaultValue: 'To' })}
-        >
+        <FormElement htmlFor="to" label={t('time.to', { defaultValue: 'To' })}>
           <InputDateStandalone
             id="to"
             onChange={handleToChange}

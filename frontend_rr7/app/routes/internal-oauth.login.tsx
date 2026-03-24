@@ -60,18 +60,18 @@ const createLoginSchema = (t: SchemaTranslationFn) =>
   z.object({
     email: z
       .string({
-        error: t('common.validation.required', { defaultValue: 'Required' }),
+        error: t('validation.required', { defaultValue: 'Required' }),
       })
       .email({
-        message: t('common.validation.emailInvalid', {
+        message: t('validation.emailInvalid', {
           defaultValue: 'Invalid email address',
         }),
       }),
     password: z
       .string({
-        error: t('common.validation.required', { defaultValue: 'Required' }),
+        error: t('validation.required', { defaultValue: 'Required' }),
       })
-      .min(1, t('common.validation.required', { defaultValue: 'Required' })),
+      .min(1, t('validation.required', { defaultValue: 'Required' })),
     returnTo: z.string().default('/'),
   })
 
@@ -248,7 +248,7 @@ export default function InternalOAuthLogin() {
               <FieldSet>
                 <FormElement
                   htmlFor={fields.email.id}
-                  label={t('common.forms.email', {
+                  label={t('forms.email', {
                     defaultValue: 'Email',
                   })}
                 >
@@ -264,7 +264,7 @@ export default function InternalOAuthLogin() {
                 </FormElement>
                 <FormElement
                   htmlFor={fields.password.id}
-                  label={t('common.forms.password', {
+                  label={t('forms.password', {
                     defaultValue: 'Password',
                   })}
                 >
@@ -302,7 +302,7 @@ export default function InternalOAuthLogin() {
                     })()}
                   >
                     <Button fullWidth type="button" variant="secondary">
-                      {t('common.actions.signUp', {
+                      {t('actions.signUp', {
                         defaultValue: 'Sign up',
                       })}
                     </Button>
