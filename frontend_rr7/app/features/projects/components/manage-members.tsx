@@ -43,7 +43,7 @@ type Props = {
 }
 
 export const ManageProjectMembers = ({ item, onCancel }: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation()
   const { selectedOrganisationId } = useOrganisation()
   const projectId = 'id' in item ? item.id : item.projectReference.id
   const projectOrganisationId =
@@ -105,7 +105,7 @@ export const ManageProjectMembers = ({ item, onCancel }: Props) => {
       <div className="flex h-full min-h-0 flex-1 flex-col">
         <ModalCloseButton onClose={handleClose} />
         <ModalHeader className="mb-4">
-          {t('members.title', { defaultValue: 'Members' })}
+          {t('organisation:members.title', 'Members')}
         </ModalHeader>
         <ManageProjectMembersStats
           memberCount={users.length}
@@ -121,9 +121,7 @@ export const ManageProjectMembers = ({ item, onCancel }: Props) => {
         </ScrollArea>
         <ButtonGroup>
           <Button onClick={handleClose} type="button" variant="secondary">
-            {t('common.actions.close', {
-              defaultValue: 'Close',
-            })}
+            {t('actions.close', 'Close')}
           </Button>
         </ButtonGroup>
       </div>

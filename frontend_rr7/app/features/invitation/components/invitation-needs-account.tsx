@@ -41,7 +41,7 @@ export const InvitationNeedsAccount = ({
   keycloakName,
   providers = [],
 }: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('invitation')
 
   const returnTo = `/join/${invitation.invitation.id}`
 
@@ -59,13 +59,13 @@ export const InvitationNeedsAccount = ({
 
   const invitationMessage =
     invitation.invitation.type === 'JoinOrganisationInvitation'
-      ? t('invitations.messages.invitedToOrganisationNeedsAccount', {
+      ? t('messages.invitedToOrganisationNeedsAccount', {
           defaultValue:
             'You have been invited by {{inviter}} to join organisation {{organisation}}.',
           inviter: invitation.invitation.createdBy.key,
           organisation: invitation.invitation.organisationReference.key,
         })
-      : t('invitations.messages.invitedToProjectNeedsAccount', {
+      : t('messages.invitedToProjectNeedsAccount', {
           defaultValue:
             'You have been invited by {{inviter}} to join project {{project}}.',
           inviter: invitation.invitation.createdBy.key,
@@ -80,12 +80,10 @@ export const InvitationNeedsAccount = ({
         <CardBody className="p-8 lg:p-10">
           <div className="mb-8 space-y-4 text-center">
             <h2 className="text-3xl font-bold">
-              {t('invitations.needsAccount.title', {
-                defaultValue: 'Account Required',
-              })}
+              {t('needsAccount.title', 'Account Required')}
             </h2>
             <p className="text-base-content/60">
-              {t('invitations.needsAccount.description', {
+              {t('needsAccount.description', {
                 defaultValue:
                   "You'll need to sign in or create an account for {{email}} to accept this invitation.",
                 email: invitation.invitation.invitedEmail,
@@ -94,7 +92,7 @@ export const InvitationNeedsAccount = ({
           </div>
 
           <Alert variant="warning">
-            {t('invitations.needsAccount.emailMatch', {
+            {t('needsAccount.emailMatch', {
               defaultValue:
                 'Make sure to sign in with the email address this invitation was sent to: {{email}}',
               email: invitation.invitation.invitedEmail,
@@ -118,9 +116,10 @@ export const InvitationNeedsAccount = ({
                     {getProviderIcon(provider)}
                   </span>
                   <span className="flex-1 text-left">
-                    {t('invitations.needsAccount.signInOrSignUpWith', {
-                      defaultValue: 'Sign in or sign up with',
-                    })}{' '}
+                    {t(
+                      'needsAccount.signInOrSignUpWith',
+                      'Sign in or sign up with',
+                    )}{' '}
                     <span className="font-semibold">
                       {getProviderDisplayName(provider, keycloakName)}
                     </span>

@@ -28,15 +28,18 @@ type Props = {
 }
 
 export const ManageProjectMembersStats = ({ memberCount, onInvite }: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation()
 
   return (
     <div className="mb-4 flex items-center justify-between gap-4">
       <ModalDescription>
-        {t('members.description', {
-          count: memberCount,
-          defaultValue: 'This project has {{count}} member(s).',
-        })}
+        {t(
+          'organisation:members.description',
+          'This project has {{count}} member(s).',
+          {
+            count: memberCount,
+          },
+        )}
       </ModalDescription>
       <Button
         className="w-auto"
@@ -45,7 +48,7 @@ export const ManageProjectMembersStats = ({ memberCount, onInvite }: Props) => {
         size="sm"
         variant="neutral"
       >
-        {t('members.actions.invite', { defaultValue: 'Invite someone' })}
+        {t('organisation:members.actions.invite', 'Invite someone')}
       </Button>
     </div>
   )

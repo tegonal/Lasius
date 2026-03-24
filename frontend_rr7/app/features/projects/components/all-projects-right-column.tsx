@@ -41,42 +41,39 @@ export const AllProjectsRightColumn = ({
   searchTerm,
   statusFilter,
 }: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation()
   const showSearch = projectCount > 10
 
   return (
     <div className="w-full px-6 pt-3">
       <Heading as="h2" variant="section">
-        {t('projects.allProjects', { defaultValue: 'All projects' })}
+        {t('projects:allProjects', 'All projects')}
       </Heading>
       <p className="text-base-content/60 text-sm">
-        {t('projects.allProjectsDescription', {
-          defaultValue:
-            'All projects in the current organization that you can administer. Create billing reports including time booked by external project members.',
-        })}
+        {t(
+          'projects:allProjectsDescription',
+          'All projects in the current organization that you can administer. Create billing reports including time booked by external project members.',
+        )}
       </p>
       {showSearch && (
         <div className="mt-4">
           <h3 className="mb-2 text-sm font-medium">
-            {t('projects.filter.search', {
-              defaultValue: 'Search',
-            })}
+            {t('projects:filter.search', 'Search')}
           </h3>
           <div className="join w-full">
             <Input
               className="join-item"
               onChange={(e) => onSearchChange(e.target.value)}
-              placeholder={t('projects.filter.searchPlaceholder', {
-                defaultValue: 'Filter projects...',
-              })}
+              placeholder={t(
+                'projects:filter.searchPlaceholder',
+                'Filter projects...',
+              )}
               type="text"
               value={searchTerm}
             />
             {searchTerm && (
               <button
-                aria-label={t('common.actions.clear', {
-                  defaultValue: 'Clear',
-                })}
+                aria-label={t('actions.clear', 'Clear')}
                 className="btn btn-square join-item"
                 onClick={() => onSearchChange('')}
                 type="button"
@@ -89,9 +86,7 @@ export const AllProjectsRightColumn = ({
       )}
       <div className="mt-4 flex flex-col gap-2">
         <h3 className="text-sm font-medium">
-          {t('projects.filter.status', {
-            defaultValue: 'Status',
-          })}
+          {t('projects:filter.status', 'Status')}
         </h3>
         <div className="join">
           <Button
@@ -100,9 +95,7 @@ export const AllProjectsRightColumn = ({
             size="sm"
             variant={statusFilter === 'both' ? 'primary' : 'neutral'}
           >
-            {t('projects.filter.both', {
-              defaultValue: 'Both',
-            })}
+            {t('projects:filter.both', 'Both')}
           </Button>
           <Button
             className="join-item w-auto"
@@ -110,9 +103,7 @@ export const AllProjectsRightColumn = ({
             size="sm"
             variant={statusFilter === 'active' ? 'primary' : 'neutral'}
           >
-            {t('common.status.active', {
-              defaultValue: 'Active',
-            })}
+            {t('status.active', 'Active')}
           </Button>
           <Button
             className="join-item w-auto"
@@ -120,9 +111,7 @@ export const AllProjectsRightColumn = ({
             size="sm"
             variant={statusFilter === 'inactive' ? 'primary' : 'neutral'}
           >
-            {t('common.status.inactive', {
-              defaultValue: 'Inactive',
-            })}
+            {t('status.inactive', 'Inactive')}
           </Button>
         </div>
       </div>

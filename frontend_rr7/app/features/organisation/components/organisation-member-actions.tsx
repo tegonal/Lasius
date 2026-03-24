@@ -43,7 +43,7 @@ export const OrganisationMemberActions = ({
   orgId,
   user,
 }: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('organisation')
   const removeApi = useRemoveOrganisationUser({
     onSuccess: () => onRemoveComplete(),
   })
@@ -57,9 +57,7 @@ export const OrganisationMemberActions = ({
   return (
     <>
       <Button
-        aria-label={t('members.actions.remove', {
-          defaultValue: 'Remove member',
-        })}
+        aria-label={t('members.actions.remove', 'Remove member')}
         fullWidth={false}
         onClick={onRemove}
         shape="circle"
@@ -69,25 +67,22 @@ export const OrganisationMemberActions = ({
       </Button>
       <GenericConfirmModal
         alert={{
-          message: t('members.confirmations.removeWarning', {
-            defaultValue:
-              'This member will be removed from the organisation and lose access to all projects.',
-          }),
+          message: t(
+            'members.confirmations.removeWarning',
+            'This member will be removed from the organisation and lose access to all projects.',
+          ),
           variant: 'warning',
         }}
-        confirmLabel={t('members.actions.remove', {
-          defaultValue: 'Remove member',
-        })}
-        message={t('members.confirmations.removeConfirm', {
-          defaultValue: 'Are you sure you want to remove {{name}}?',
-          name: memberName,
-        })}
+        confirmLabel={t('members.actions.remove', 'Remove member')}
+        message={t(
+          'members.confirmations.removeConfirm',
+          'Are you sure you want to remove {{name}}?',
+          { name: memberName },
+        )}
         onClose={onRemoveCancel}
         onConfirm={handleConfirm}
         open={isRemoving}
-        title={t('members.confirmations.removeTitle', {
-          defaultValue: 'Remove member',
-        })}
+        title={t('members.confirmations.removeTitle', 'Remove member')}
       />
     </>
   )

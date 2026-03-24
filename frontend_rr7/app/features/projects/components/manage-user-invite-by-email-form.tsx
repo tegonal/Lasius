@@ -64,16 +64,14 @@ export const ManageUserInviteByEmailForm = ({
   organisation,
   project,
 }: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation()
   const mode = project ? 'project' : 'organisation'
 
   const schema = useMemo(
     () =>
       z.object({
         inviteMemberByEmailAddress: z.string().email({
-          message: t('common.validation.email', {
-            defaultValue: 'Please enter a valid email address',
-          }),
+          message: t('validation.email', 'Please enter a valid email address'),
         }),
         organisationRole: z.string(),
         projectRole: z.string(),
@@ -161,29 +159,25 @@ export const ManageUserInviteByEmailForm = ({
           <ModalCloseButton onClose={handleClose} />
 
           <ModalHeader className="mb-2">
-            {t('members.actions.invite', {
-              defaultValue: 'Invite someone',
-            })}
+            {t('organisation:members.actions.invite', 'Invite someone')}
           </ModalHeader>
 
           <ModalDescription className="mb-4">
             {mode === 'project'
-              ? t('invitations.inviteProjectDescription', {
-                  defaultValue:
-                    'Enter the email address of the person you want to invite. An invitation link will be generated that you can send to them.',
-                })
-              : t('invitations.inviteOrganisationDescription', {
-                  defaultValue:
-                    'Enter the email address of the person you want to invite. An invitation link will be generated that you can send to them.',
-                })}
+              ? t(
+                  'invitation:inviteProjectDescription',
+                  'Enter the email address of the person you want to invite. An invitation link will be generated that you can send to them.',
+                )
+              : t(
+                  'invitation:inviteOrganisationDescription',
+                  'Enter the email address of the person you want to invite. An invitation link will be generated that you can send to them.',
+                )}
           </ModalDescription>
 
           <FieldSet>
             <FormElement>
               <Label htmlFor="inviteMemberByEmailAddress">
-                {t('invitations.email', {
-                  defaultValue: 'Email',
-                })}
+                {t('invitation:email', 'Email')}
               </Label>
               <Input
                 data-testid="org-invite-email-input"
@@ -197,9 +191,7 @@ export const ManageUserInviteByEmailForm = ({
             {mode === 'project' && (
               <FormElement>
                 <Label htmlFor="projectRole">
-                  {t('projects.projectRole', {
-                    defaultValue: 'Project role',
-                  })}
+                  {t('projects:projectRole', 'Project role')}
                 </Label>
                 <Select
                   id="projectRole"
@@ -229,9 +221,7 @@ export const ManageUserInviteByEmailForm = ({
             {mode === 'organisation' && (
               <FormElement>
                 <Label htmlFor="organisationRole">
-                  {t('organisations.organisationRole', {
-                    defaultValue: 'Organisation role',
-                  })}
+                  {t('organisation:organisationRole', 'Organisation role')}
                 </Label>
                 <Select
                   id="organisationRole"
@@ -270,14 +260,10 @@ export const ManageUserInviteByEmailForm = ({
               type="submit"
               variant="primary"
             >
-              {t('members.actions.invite', {
-                defaultValue: 'Invite someone',
-              })}
+              {t('organisation:members.actions.invite', 'Invite someone')}
             </Button>
             <Button onClick={handleClose} type="button" variant="secondary">
-              {t('common.actions.cancel', {
-                defaultValue: 'Cancel',
-              })}
+              {t('actions.cancel', 'Cancel')}
             </Button>
           </ButtonGroup>
         </FormBody>
@@ -295,16 +281,14 @@ export const ManageUserInviteByEmailForm = ({
               <ModalCloseButton onClose={handleCloseResult} />
 
               <ModalHeader>
-                {t('invitations.title.invitationCreated', {
-                  defaultValue: 'Invitation created',
-                })}
+                {t('invitation:title.invitationCreated', 'Invitation created')}
               </ModalHeader>
 
               <ModalDescription>
-                {t('invitations.description.copyLink', {
-                  defaultValue:
-                    'Copy the link and send it to your colleague. If they do not have an account yet, one will be created when the invitation is accepted.',
-                })}
+                {t(
+                  'invitation:description.copyLink',
+                  'Copy the link and send it to your colleague. If they do not have an account yet, one will be created when the invitation is accepted.',
+                )}
               </ModalDescription>
 
               <div className="flex gap-3">
@@ -316,9 +300,10 @@ export const ManageUserInviteByEmailForm = ({
                 </code>
 
                 <Button
-                  aria-label={t('invitations.copyToClipboard', {
-                    defaultValue: 'Copy to clipboard',
-                  })}
+                  aria-label={t(
+                    'invitation:copyToClipboard',
+                    'Copy to clipboard',
+                  )}
                   data-testid="org-invite-copy-btn"
                   fullWidth={false}
                   onClick={() =>
@@ -340,9 +325,7 @@ export const ManageUserInviteByEmailForm = ({
                   type="button"
                   variant="primary"
                 >
-                  {t('common.actions.close', {
-                    defaultValue: 'Close',
-                  })}
+                  {t('actions.close', 'Close')}
                 </Button>
               </ButtonGroup>
             </div>
@@ -361,15 +344,14 @@ export const ManageUserInviteByEmailForm = ({
               <ModalCloseButton onClose={handleCloseResult} />
 
               <ModalHeader>
-                {t('invitations.title.userAssigned', {
-                  defaultValue: 'User assigned',
-                })}
+                {t('invitation:title.userAssigned', 'User assigned')}
               </ModalHeader>
 
               <ModalDescription>
-                {t('projects.status.assignedToUser', {
-                  defaultValue: 'Project successfully assigned to user.',
-                })}
+                {t(
+                  'projects:status.assignedToUser',
+                  'Project successfully assigned to user.',
+                )}
               </ModalDescription>
 
               <div className="flex gap-3">
@@ -385,9 +367,7 @@ export const ManageUserInviteByEmailForm = ({
                   type="button"
                   variant="primary"
                 >
-                  {t('common.actions.close', {
-                    defaultValue: 'Close',
-                  })}
+                  {t('actions.close', 'Close')}
                 </Button>
               </ButtonGroup>
             </div>

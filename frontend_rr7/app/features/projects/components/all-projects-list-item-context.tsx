@@ -55,7 +55,7 @@ export const AllProjectsListItemContext = ({ item }: Props) => {
   const revalidator = useRevalidator()
   const { submit: deactivateProject } = useDeactivateProject()
 
-  const { t } = useTranslation('common')
+  const { t } = useTranslation()
 
   const handleUpdateClose = () => setIsUpdateOpen(false)
   const handleManageClose = () => setIsManageOpen(false)
@@ -115,15 +115,17 @@ export const AllProjectsListItemContext = ({ item }: Props) => {
               {item.active && (
                 <ContextButtonWrapper variant="compact">
                   <Button
-                    aria-label={t('members.actions.manage', {
-                      defaultValue: 'Manage members',
-                    })}
+                    aria-label={t(
+                      'organisation:members.actions.manage',
+                      'Manage members',
+                    )}
                     fullWidth={false}
                     onClick={() => manageMembers()}
                     shape="circle"
-                    title={t('members.actions.manage', {
-                      defaultValue: 'Manage members',
-                    })}
+                    title={t(
+                      'organisation:members.actions.manage',
+                      'Manage members',
+                    )}
                     variant="contextIcon"
                   >
                     <LucideIcon icon={Users} size={24} />
@@ -132,15 +134,11 @@ export const AllProjectsListItemContext = ({ item }: Props) => {
               )}
               <ContextButtonWrapper variant="compact">
                 <Button
-                  aria-label={t('bookings.showLists', {
-                    defaultValue: 'Show bookings',
-                  })}
+                  aria-label={t('bookings:showLists', 'Show bookings')}
                   fullWidth={false}
                   onClick={() => showLists()}
                   shape="circle"
-                  title={t('bookings.showLists', {
-                    defaultValue: 'Show bookings',
-                  })}
+                  title={t('bookings:showLists', 'Show bookings')}
                   variant="contextIcon"
                 >
                   <LucideIcon icon={List} size={24} />
@@ -148,15 +146,11 @@ export const AllProjectsListItemContext = ({ item }: Props) => {
               </ContextButtonWrapper>
               <ContextButtonWrapper variant="compact">
                 <Button
-                  aria-label={t('statistics.showStatistics', {
-                    defaultValue: 'Show statistics',
-                  })}
+                  aria-label={t('stats:showStatistics', 'Show statistics')}
                   fullWidth={false}
                   onClick={() => showStats()}
                   shape="circle"
-                  title={t('statistics.showStatistics', {
-                    defaultValue: 'Show statistics',
-                  })}
+                  title={t('stats:showStatistics', 'Show statistics')}
                   variant="contextIcon"
                 >
                   <LucideIcon icon={PieChart} size={24} />
@@ -165,8 +159,7 @@ export const AllProjectsListItemContext = ({ item }: Props) => {
               <ContextButtonWrapper variant="compact">
                 {!item.active && item.deactivatedBy ? (
                   <span
-                    title={t('projects.deactivatedBy', {
-                      defaultValue: 'Archived by {{user}}',
+                    title={t('projects:deactivatedBy', 'Archived by {{user}}', {
                       user: item.deactivatedBy.key,
                     })}
                   >
@@ -272,11 +265,13 @@ export const AllProjectsListItemContext = ({ item }: Props) => {
         open={isDeactivateConfirmOpen}
       >
         <ModalDescription>
-          {t('projects.actions.deactivateConfirm', {
-            defaultValue:
-              'Are you sure you want to deactivate the project "{{project}}"?',
-            project: item.key,
-          })}
+          {t(
+            'projects:actions.deactivateConfirm',
+            'Are you sure you want to deactivate the project "{{project}}"?',
+            {
+              project: item.key,
+            },
+          )}
         </ModalDescription>
         <ButtonGroup>
           <Button
@@ -284,16 +279,14 @@ export const AllProjectsListItemContext = ({ item }: Props) => {
             type="button"
             variant="primary"
           >
-            {t('projects.actions.deactivate', {
-              defaultValue: 'Deactivate project',
-            })}
+            {t('projects:actions.deactivate', 'Deactivate project')}
           </Button>
           <Button
             onClick={handleDeactivateConfirmClose}
             type="button"
             variant="secondary"
           >
-            {t('common.cancel', { defaultValue: 'Cancel' })}
+            {t('cancel', 'Cancel')}
           </Button>
         </ButtonGroup>
       </Modal>

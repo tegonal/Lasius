@@ -29,7 +29,7 @@ type Props = {
 }
 
 export const MyProjectsStats = ({ onCreateProject }: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation()
   const { userProjects } = useProjects()
   const projects = userProjects
 
@@ -39,9 +39,7 @@ export const MyProjectsStats = ({ onCreateProject }: Props) => {
     <div className="bg-base-200 flex items-start justify-between gap-4 p-4">
       <StatsGroup>
         <StatsTileNumber
-          label={t('projects.myProjects', {
-            defaultValue: 'My projects',
-          })}
+          label={t('projects:myProjects', 'My projects')}
           standalone={false}
           value={totalCount}
         />
@@ -54,9 +52,7 @@ export const MyProjectsStats = ({ onCreateProject }: Props) => {
         size="sm"
         variant="neutral"
       >
-        {t('projects.actions.create', {
-          defaultValue: 'Create project',
-        })}
+        {t('projects:actions.create', 'Create project')}
       </Button>
     </div>
   )

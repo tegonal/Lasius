@@ -45,7 +45,7 @@ export const ProjectMemberListItemContext = ({
   onRemove,
   user,
 }: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation()
   const { currentOpenContextMenuId, handleCloseAll } = useContextMenu()
   const [isRemoveConfirmOpen, setIsRemoveConfirmOpen] = useState(false)
 
@@ -76,15 +76,17 @@ export const ProjectMemberListItemContext = ({
             <ContextBar>
               <ContextButtonWrapper variant="compact">
                 <Button
-                  aria-label={t('members.actions.remove', {
-                    defaultValue: 'Remove member',
-                  })}
+                  aria-label={t(
+                    'organisation:members.actions.remove',
+                    'Remove member',
+                  )}
                   fullWidth={false}
                   onClick={showRemoveConfirm}
                   shape="circle"
-                  title={t('members.actions.remove', {
-                    defaultValue: 'Remove member',
-                  })}
+                  title={t(
+                    'organisation:members.actions.remove',
+                    'Remove member',
+                  )}
                   variant="contextIcon"
                 >
                   <LucideIcon icon={UserX} size={24} />
@@ -97,20 +99,16 @@ export const ProjectMemberListItemContext = ({
         )}
       </ContextBody>
       <GenericConfirmModal
-        confirmLabel={t('members.actions.remove', {
-          defaultValue: 'Remove member',
-        })}
+        confirmLabel={t('organisation:members.actions.remove', 'Remove member')}
         confirmVariant="error"
-        message={t('members.confirmRemove', {
-          defaultValue:
-            'Are you sure you want to remove this member from the project?',
-        })}
+        message={t(
+          'organisation:members.confirmRemove',
+          'Are you sure you want to remove this member from the project?',
+        )}
         onClose={handleRemoveConfirmClose}
         onConfirm={handleRemove}
         open={isRemoveConfirmOpen}
-        title={t('members.actions.remove', {
-          defaultValue: 'Remove member',
-        })}
+        title={t('organisation:members.actions.remove', 'Remove member')}
       />
     </>
   )

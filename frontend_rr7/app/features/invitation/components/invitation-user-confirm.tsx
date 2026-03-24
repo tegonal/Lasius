@@ -43,7 +43,7 @@ interface Props {
 }
 
 export const InvitationUserConfirm = ({ invitation, organisations }: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('invitation')
   const navigate = useNavigate()
   const [orgAssignment, setOrgAssignment] = useState<ModelsEntityReference>()
   const acceptInvitation = useAcceptInvitation()
@@ -87,7 +87,7 @@ export const InvitationUserConfirm = ({ invitation, organisations }: Props) => {
     <AuthLayout>
       {invitation.invitation.type === 'JoinOrganisationInvitation' && (
         <Alert className="max-w-md" variant="info">
-          {t('invitations.messages.invitedToOrganisation', {
+          {t('messages.invitedToOrganisation', {
             defaultValue:
               'You have been invited by {{inviter}} to join organisation {{organisation}}.',
             inviter: invitation.invitation.createdBy.key,
@@ -97,7 +97,7 @@ export const InvitationUserConfirm = ({ invitation, organisations }: Props) => {
       )}
       {invitation.invitation.type === 'JoinProjectInvitation' && (
         <Alert className="max-w-md" variant="info">
-          {t('invitations.messages.invitedToProject', {
+          {t('messages.invitedToProject', {
             defaultValue:
               'You have been invited by {{inviter}} to join project {{project}}.',
             inviter: invitation.invitation.createdBy.key,
@@ -120,10 +120,10 @@ export const InvitationUserConfirm = ({ invitation, organisations }: Props) => {
                 <>
                   <FormElement>
                     <p>
-                      {t('invitations.messages.selectOrganisation', {
-                        defaultValue:
-                          'Select the organisation you would like to add this project to:',
-                      })}
+                      {t(
+                        'messages.selectOrganisation',
+                        'Select the organisation you would like to add this project to:',
+                      )}
                     </p>
                   </FormElement>
                   <FormElement>

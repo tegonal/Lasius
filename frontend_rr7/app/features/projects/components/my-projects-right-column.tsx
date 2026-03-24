@@ -35,19 +35,19 @@ export const MyProjectsRightColumn = ({
   projectCount,
   searchTerm,
 }: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation()
   const showSearch = projectCount > 10
 
   return (
     <div className="w-full px-6 pt-3">
       <Heading as="h2" variant="section">
-        {t('projects.myProjects', { defaultValue: 'My projects' })}
+        {t('projects:myProjects', 'My projects')}
       </Heading>
       <p className="text-base-content/60 text-sm">
-        {t('projects.myProjectsDescription', {
-          defaultValue:
-            'Projects where you are a member and can book time. Restricted by the currently selected organisation.',
-        })}
+        {t(
+          'projects:myProjectsDescription',
+          'Projects where you are a member and can book time. Restricted by the currently selected organisation.',
+        )}
       </p>
       {showSearch && (
         <div className="mt-4">
@@ -55,17 +55,16 @@ export const MyProjectsRightColumn = ({
             <Input
               className="join-item"
               onChange={(e) => onSearchChange(e.target.value)}
-              placeholder={t('projects.filter.searchPlaceholder', {
-                defaultValue: 'Filter projects...',
-              })}
+              placeholder={t(
+                'projects:filter.searchPlaceholder',
+                'Filter projects...',
+              )}
               type="text"
               value={searchTerm}
             />
             {searchTerm && (
               <button
-                aria-label={t('common.actions.clear', {
-                  defaultValue: 'Clear',
-                })}
+                aria-label={t('actions.clear', 'Clear')}
                 className="btn btn-square join-item"
                 onClick={() => onSearchChange('')}
                 type="button"

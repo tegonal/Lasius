@@ -50,7 +50,7 @@ export const MyProjectsListItemAdminContext = ({ item }: Props) => {
   const { currentOpenContextMenuId, handleCloseAll } = useContextMenu()
   const navigate = useNavigate()
 
-  const { t } = useTranslation('common')
+  const { t } = useTranslation()
 
   const handleUpdateClose = () => setIsUpdateOpen(false)
   const handleManageClose = () => setIsManageOpen(false)
@@ -97,15 +97,17 @@ export const MyProjectsListItemAdminContext = ({ item }: Props) => {
             <ContextBar>
               <ContextButtonWrapper variant="compact">
                 <Button
-                  aria-label={t('members.actions.manage', {
-                    defaultValue: 'Manage members',
-                  })}
+                  aria-label={t(
+                    'organisation:members.actions.manage',
+                    'Manage members',
+                  )}
                   fullWidth={false}
                   onClick={() => manageMembers()}
                   shape="circle"
-                  title={t('members.actions.manage', {
-                    defaultValue: 'Manage members',
-                  })}
+                  title={t(
+                    'organisation:members.actions.manage',
+                    'Manage members',
+                  )}
                   variant="contextIcon"
                 >
                   <LucideIcon icon={Users} size={24} />
@@ -113,15 +115,11 @@ export const MyProjectsListItemAdminContext = ({ item }: Props) => {
               </ContextButtonWrapper>
               <ContextButtonWrapper variant="compact">
                 <Button
-                  aria-label={t('bookings.showLists', {
-                    defaultValue: 'Show bookings',
-                  })}
+                  aria-label={t('bookings:showLists', 'Show bookings')}
                   fullWidth={false}
                   onClick={() => showLists()}
                   shape="circle"
-                  title={t('bookings.showLists', {
-                    defaultValue: 'Show bookings',
-                  })}
+                  title={t('bookings:showLists', 'Show bookings')}
                   variant="contextIcon"
                 >
                   <LucideIcon icon={List} size={24} />
@@ -129,15 +127,11 @@ export const MyProjectsListItemAdminContext = ({ item }: Props) => {
               </ContextButtonWrapper>
               <ContextButtonWrapper variant="compact">
                 <Button
-                  aria-label={t('statistics.showStatistics', {
-                    defaultValue: 'Show statistics',
-                  })}
+                  aria-label={t('stats:showStatistics', 'Show statistics')}
                   fullWidth={false}
                   onClick={() => showStats()}
                   shape="circle"
-                  title={t('statistics.showStatistics', {
-                    defaultValue: 'Show statistics',
-                  })}
+                  title={t('stats:showStatistics', 'Show statistics')}
                   variant="contextIcon"
                 >
                   <LucideIcon icon={PieChart} size={24} />
@@ -145,16 +139,12 @@ export const MyProjectsListItemAdminContext = ({ item }: Props) => {
               </ContextButtonWrapper>
               <ContextButtonWrapper variant="compact">
                 <Button
-                  aria-label={t('projects.actions.edit', {
-                    defaultValue: 'Edit project',
-                  })}
+                  aria-label={t('projects:actions.edit', 'Edit project')}
                   data-testid="project-ctx-edit-btn"
                   fullWidth={false}
                   onClick={() => editProject()}
                   shape="circle"
-                  title={t('projects.actions.edit', {
-                    defaultValue: 'Edit project',
-                  })}
+                  title={t('projects:actions.edit', 'Edit project')}
                   variant="contextIcon"
                 >
                   <LucideIcon icon={Pencil} size={24} />
@@ -162,15 +152,11 @@ export const MyProjectsListItemAdminContext = ({ item }: Props) => {
               </ContextButtonWrapper>
               <ContextButtonWrapper variant="compact">
                 <Button
-                  aria-label={t('tags.actions.edit', {
-                    defaultValue: 'Edit tags',
-                  })}
+                  aria-label={t('tag-manager:actions.edit', 'Edit tags')}
                   fullWidth={false}
                   onClick={() => manageTags()}
                   shape="circle"
-                  title={t('tags.actions.edit', {
-                    defaultValue: 'Edit tags',
-                  })}
+                  title={t('tag-manager:actions.edit', 'Edit tags')}
                   variant="contextIcon"
                 >
                   <LucideIcon icon={Tags} size={24} />

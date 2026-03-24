@@ -31,7 +31,7 @@ type Props = {
 }
 
 export const OrganisationDetail = ({ onRefresh, users }: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('organisation')
   const { isAdministrator, selectedOrganisation, selectedOrganisationId } =
     useOrganisation()
 
@@ -41,10 +41,10 @@ export const OrganisationDetail = ({ onRefresh, users }: Props) => {
         <div className="mx-auto mb-4 flex max-w-[500px] flex-col items-center justify-center gap-3 text-center">
           <LucideIcon icon={Lock} size={24} />
           <div className="w-full max-w-[500px]">
-            {t('organisations.privateDescription', {
-              defaultValue:
-                'This organisation is only visible to you. You can use it to track private projects that you do not want others to have access to. If you want to invite people, invite them to an existing organisation or create a new one.',
-            })}
+            {t(
+              'privateDescription',
+              'This organisation is only visible to you. You can use it to track private projects that you do not want others to have access to. If you want to invite people, invite them to an existing organisation or create a new one.',
+            )}
           </div>
         </div>
       )}

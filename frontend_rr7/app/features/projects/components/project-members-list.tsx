@@ -48,7 +48,7 @@ export const ProjectMembersList = ({
   projectOrganisationId,
   users,
 }: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation()
   const loaderData = useRouteLoaderData<typeof loader>('routes/app-layout')
   const userId = loaderData?.user?.id
 
@@ -81,17 +81,13 @@ export const ProjectMembersList = ({
       <DataListRow>
         <DataListHeaderItem />
         <DataListHeaderItem>
-          {t('common.forms.firstName', { defaultValue: 'First name' })}
+          {t('forms.firstName', 'First name')}
         </DataListHeaderItem>
         <DataListHeaderItem>
-          {t('common.forms.lastName', { defaultValue: 'Last name' })}
+          {t('forms.lastName', 'Last name')}
         </DataListHeaderItem>
-        <DataListHeaderItem>
-          {t('common.forms.email', { defaultValue: 'Email' })}
-        </DataListHeaderItem>
-        <DataListHeaderItem>
-          {t('common.status.label', { defaultValue: 'Status' })}
-        </DataListHeaderItem>
+        <DataListHeaderItem>{t('forms.email', 'Email')}</DataListHeaderItem>
+        <DataListHeaderItem>{t('status.label', 'Status')}</DataListHeaderItem>
         <DataListHeaderItem />
       </DataListRow>
       {orderBy(
@@ -114,9 +110,7 @@ export const ProjectMembersList = ({
           </DataListField>
           <DataListField>
             {user.id === userId && (
-              <Badge variant="tag">
-                {t('common.you', { defaultValue: 'You' })}
-              </Badge>
+              <Badge variant="tag">{t('you', 'You')}</Badge>
             )}
           </DataListField>
           <DataListField>

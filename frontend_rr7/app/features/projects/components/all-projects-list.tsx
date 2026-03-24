@@ -45,7 +45,7 @@ export const AllProjectsList = ({
   searchTerm,
   statusFilter,
 }: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation()
 
   const filteredProjects = useMemo(() => {
     let filtered = projects
@@ -83,16 +83,10 @@ export const AllProjectsList = ({
       <DataList data-testid="project-list">
         <DataListRow>
           <DataListHeaderItem />
+          <DataListHeaderItem>{t('forms.name', 'Name')}</DataListHeaderItem>
+          <DataListHeaderItem>{t('status.label', 'Status')}</DataListHeaderItem>
           <DataListHeaderItem>
-            {t('common.forms.name', { defaultValue: 'Name' })}
-          </DataListHeaderItem>
-          <DataListHeaderItem>
-            {t('common.status.label', { defaultValue: 'Status' })}
-          </DataListHeaderItem>
-          <DataListHeaderItem>
-            {t('projects.lastActivity', {
-              defaultValue: 'Last activity',
-            })}
+            {t('projects:lastActivity', 'Last activity')}
           </DataListHeaderItem>
           <DataListHeaderItem />
         </DataListRow>
@@ -108,12 +102,8 @@ export const AllProjectsList = ({
               <DataListField>
                 <span>
                   {item.active
-                    ? t('common.status.active', {
-                        defaultValue: 'Active',
-                      })
-                    : t('common.status.inactive', {
-                        defaultValue: 'Inactive',
-                      })}
+                    ? t('status.active', 'Active')
+                    : t('status.inactive', 'Inactive')}
                 </span>
               </DataListField>
               <DataListField>

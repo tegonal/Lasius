@@ -30,7 +30,7 @@ type Props = {
 }
 
 export const AllProjectsStats = ({ onCreateProject, projects }: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation()
 
   const totalCount = projects.length
   const activeCount = projects.filter((p) => p.active).length
@@ -40,23 +40,17 @@ export const AllProjectsStats = ({ onCreateProject, projects }: Props) => {
     <div className="bg-base-200 flex items-start justify-between gap-4 p-4">
       <StatsGroup>
         <StatsTileNumber
-          label={t('projects.total', {
-            defaultValue: 'Total',
-          })}
+          label={t('projects:total', 'Total')}
           standalone={false}
           value={totalCount}
         />
         <StatsTileNumber
-          label={t('common.status.active', {
-            defaultValue: 'Active',
-          })}
+          label={t('status.active', 'Active')}
           standalone={false}
           value={activeCount}
         />
         <StatsTileNumber
-          label={t('common.status.inactive', {
-            defaultValue: 'Inactive',
-          })}
+          label={t('status.inactive', 'Inactive')}
           standalone={false}
           value={inactiveCount}
         />
@@ -69,9 +63,7 @@ export const AllProjectsStats = ({ onCreateProject, projects }: Props) => {
         size="sm"
         variant="neutral"
       >
-        {t('projects.actions.create', {
-          defaultValue: 'Create project',
-        })}
+        {t('projects:actions.create', 'Create project')}
       </Button>
     </div>
   )

@@ -24,40 +24,38 @@ import { Text } from '~/components/primitives/typography/text'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 
 export const OrganisationRightColumn = () => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('organisation')
   const { isAdministrator, selectedOrganisation } = useOrganisation()
 
   return (
     <div className="w-full px-6 pt-3">
       <Heading as="h2" variant="section">
-        {t('organisations.currentOrganisation', {
-          defaultValue: 'Current organisation',
-        })}
+        {t('currentOrganisation', 'Current organisation')}
       </Heading>
       {!selectedOrganisation?.private && (
         <>
           {isAdministrator ? (
             <Text variant="infoText">
-              {t('organisations.adminDescription', {
-                defaultValue:
-                  'You are an administrator of this organisation. You can add and remove members and change the organisation name, or create a new one.',
-              })}
+              {t(
+                'adminDescription',
+                'You are an administrator of this organisation. You can add and remove members and change the organisation name, or create a new one.',
+              )}
             </Text>
           ) : (
             <Text variant="infoText">
-              {t('organisations.memberDescription', {
-                defaultValue:
-                  "You are a member of this organisation and don't have the rights to add or remove members. Get in touch with an organisation administrator if you would like to invite someone.",
-              })}
+              {t(
+                'memberDescription',
+                "You are a member of this organisation and don't have the rights to add or remove members. Get in touch with an organisation administrator if you would like to invite someone.",
+              )}
             </Text>
           )}
         </>
       )}
       <Text variant="infoText">
-        {t('organisations.createDescription', {
-          defaultValue:
-            'Add a new organisation using the Actions button at the top of the list.',
-        })}
+        {t(
+          'createDescription',
+          'Add a new organisation using the Actions button at the top of the list.',
+        )}
       </Text>
     </div>
   )

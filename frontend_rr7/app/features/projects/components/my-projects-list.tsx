@@ -43,7 +43,7 @@ type Props = {
 }
 
 export const MyProjectsList = ({ projects, searchTerm }: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation()
 
   const filteredProjects = useMemo(() => {
     if (!searchTerm.trim()) return projects
@@ -63,18 +63,12 @@ export const MyProjectsList = ({ projects, searchTerm }: Props) => {
       <DataList data-testid="project-list">
         <DataListRow>
           <DataListHeaderItem />
+          <DataListHeaderItem>{t('forms.name', 'Name')}</DataListHeaderItem>
           <DataListHeaderItem>
-            {t('common.forms.name', { defaultValue: 'Name' })}
+            {t('projects:projectRole', 'Project role')}
           </DataListHeaderItem>
           <DataListHeaderItem>
-            {t('projects.projectRole', {
-              defaultValue: 'Project role',
-            })}
-          </DataListHeaderItem>
-          <DataListHeaderItem>
-            {t('projects.lastActivity', {
-              defaultValue: 'Last activity',
-            })}
+            {t('projects:lastActivity', 'Last activity')}
           </DataListHeaderItem>
           <DataListHeaderItem />
         </DataListRow>

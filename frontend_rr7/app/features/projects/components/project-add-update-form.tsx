@@ -53,12 +53,9 @@ type Props = {
 
 const createProjectSchema = (t: TFunction) =>
   z.object({
-    projectKey: z.string().min(
-      1,
-      t('validation.projectKeyRequired', {
-        defaultValue: 'Project name is required',
-      }),
-    ),
+    projectKey: z
+      .string()
+      .min(1, t('validation.projectKeyRequired', 'Project name is required')),
   })
 
 type FormData = z.infer<ReturnType<typeof createProjectSchema>>
@@ -69,7 +66,7 @@ export const ProjectAddUpdateForm = ({
   onCancel,
   onSave,
 }: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation()
   const { addToast } = useToast()
   const { selectedOrganisationId } = useOrganisation()
 
@@ -77,12 +74,8 @@ export const ProjectAddUpdateForm = ({
     addToast({
       message:
         mode === 'add'
-          ? t('projects.status.created', {
-              defaultValue: 'Project created',
-            })
-          : t('projects.status.updated', {
-              defaultValue: 'Project updated',
-            }),
+          ? t('projects:status.created', 'Project created')
+          : t('projects:status.updated', 'Project updated'),
       type: 'SUCCESS',
     })
     onSave()
@@ -147,39 +140,31 @@ export const ProjectAddUpdateForm = ({
 
         <ModalHeader>
           {mode === 'add'
-            ? t('projects.actions.add', {
-                defaultValue: 'Add Project',
-              })
-            : t('projects.actions.edit', {
-                defaultValue: 'Edit project',
-              })}
+            ? t('projects:actions.add', 'Add Project')
+            : t('projects:actions.edit', 'Edit project')}
         </ModalHeader>
 
         <ModalDescription className="mb-4">
           {mode === 'add'
-            ? t('projects.description.add', {
-                defaultValue:
-                  'Create a new project to organize your time tracking.',
-              })
-            : t('projects.description.edit', {
-                defaultValue: 'Update the project details.',
-              })}
+            ? t(
+                'projects:description.add',
+                'Create a new project to organize your time tracking.',
+              )
+            : t('projects:description.edit', 'Update the project details.')}
         </ModalDescription>
 
         <form onSubmit={hookForm.handleSubmit(onSubmit)}>
           <FormBody>
             <Alert className="mb-4" variant="info">
-              {t('projects.info.uniqueNameRequired', {
-                defaultValue:
-                  'Project names must be unique within your organisation.',
-              })}
+              {t(
+                'projects:info.uniqueNameRequired',
+                'Project names must be unique within your organisation.',
+              )}
             </Alert>
             <FieldSet>
               <FormElement
                 htmlFor="projectKey"
-                label={t('projects.projectName', {
-                  defaultValue: 'Project name',
-                })}
+                label={t('projects:projectName', 'Project name')}
                 required
               >
                 <Input
@@ -208,9 +193,7 @@ export const ProjectAddUpdateForm = ({
                 disabled={isSubmitting}
                 type="submit"
               >
-                {t('common.actions.save', {
-                  defaultValue: 'Save',
-                })}
+                {t('actions.save', 'Save')}
               </Button>
               <Button
                 data-testid="project-form-close-btn"
@@ -218,9 +201,7 @@ export const ProjectAddUpdateForm = ({
                 type="button"
                 variant="secondary"
               >
-                {t('common.actions.cancel', {
-                  defaultValue: 'Cancel',
-                })}
+                {t('actions.cancel', 'Cancel')}
               </Button>
             </ButtonGroup>
           </FormBody>

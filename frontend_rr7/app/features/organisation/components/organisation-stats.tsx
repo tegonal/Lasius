@@ -36,13 +36,11 @@ export const OrganisationStats = ({
   onEdit,
   onInvite,
 }: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('organisation')
   const { isAdministrator, selectedOrganisation } = useOrganisation()
 
   const organisationName = selectedOrganisation?.private
-    ? t('organisations.myPersonalOrganisation', {
-        defaultValue: 'My personal organisation',
-      })
+    ? t('myPersonalOrganisation', 'My personal organisation')
     : selectedOrganisation?.organisationReference.key || ''
 
   const isPrivate = selectedOrganisation?.private
@@ -52,16 +50,12 @@ export const OrganisationStats = ({
       <div className="stats shadow">
         <div className="stat h-fit">
           <div className="stat-title">
-            {t('organisations.organisationName', {
-              defaultValue: 'Organisation',
-            })}
+            {t('organisationName', 'Organisation')}
           </div>
           <div className="stat-value text-2xl">{organisationName}</div>
         </div>
         <StatsTileNumber
-          label={t('organisations.members', {
-            defaultValue: 'Members',
-          })}
+          label={t('members', 'Members')}
           standalone={false}
           value={memberCount}
         />
@@ -73,7 +67,7 @@ export const OrganisationStats = ({
           tabIndex={0}
           type="button"
         >
-          {t('common.actions.actions', { defaultValue: 'Actions' })}
+          {t('actions.actions', 'Actions')}
           <ChevronDown className="size-4" />
         </button>
         <ul
@@ -84,25 +78,19 @@ export const OrganisationStats = ({
             <>
               <li>
                 <button data-testid="org-actions-invite-btn" onClick={onInvite}>
-                  {t('members.actions.invite', {
-                    defaultValue: 'Invite someone',
-                  })}
+                  {t('members.actions.invite', 'Invite someone')}
                 </button>
               </li>
               <li>
                 <button data-testid="org-actions-edit-btn" onClick={onEdit}>
-                  {t('organisations.actions.edit', {
-                    defaultValue: 'Edit organisation',
-                  })}
+                  {t('actions.edit', 'Edit organisation')}
                 </button>
               </li>
             </>
           )}
           <li>
             <button data-testid="org-actions-create-btn" onClick={onCreate}>
-              {t('organisations.actions.create', {
-                defaultValue: 'Create organisation',
-              })}
+              {t('actions.create', 'Create organisation')}
             </button>
           </li>
         </ul>

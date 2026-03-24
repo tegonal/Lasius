@@ -34,7 +34,7 @@ interface Props {
 }
 
 export const InvitationOtherSession = ({ invitation }: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation(['invitation', 'auth'])
   const navigate = useNavigate()
 
   const handleSignOut = () => {
@@ -54,7 +54,7 @@ export const InvitationOtherSession = ({ invitation }: Props) => {
           </div>
           <div className="h-4" />
           <Alert variant="warning">
-            {t('invitations.errors.createdForSomeoneElse', {
+            {t('invitation:errors.createdForSomeoneElse', {
               defaultValue:
                 'This invitation has been created for someone else. Either log out and refresh, or forward the invitation link to the user {{email}}',
               email: invitation.invitation.invitedEmail,
@@ -63,9 +63,7 @@ export const InvitationOtherSession = ({ invitation }: Props) => {
           <FormBody>
             <FormElement>
               <Button fullWidth onClick={handleSignOut}>
-                {t('auth.actions.signOutAndRefresh', {
-                  defaultValue: 'Sign out and refresh',
-                })}
+                {t('auth:actions.signOutAndRefresh', 'Sign out and refresh')}
               </Button>
             </FormElement>
           </FormBody>

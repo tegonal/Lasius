@@ -27,7 +27,7 @@ import { OrgSwitcherModal } from '~/features/organisation/components/org-switche
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 
 export const OrgSwitcher = () => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('organisation')
   const [isOpen, setIsOpen] = useState(false)
   const { selectedOrganisation, selectedOrganisationKey } = useOrganisation()
 
@@ -44,9 +44,7 @@ export const OrgSwitcher = () => {
         <AvatarOrganisation name={selectedOrganisationKey || ''} size={24} />
         <span>
           {selectedOrganisation?.private
-            ? t('organisations.myPersonalOrganisation', {
-                defaultValue: 'My personal organisation',
-              })
+            ? t('myPersonalOrganisation', 'My personal organisation')
             : selectedOrganisationKey}
         </span>
       </button>
@@ -58,9 +56,7 @@ export const OrgSwitcher = () => {
             onClick={handleClose}
             type="button"
           >
-            {t('common.actions.close', {
-              defaultValue: 'Close',
-            })}
+            {t('actions.close', 'Close')}
           </button>
         </ButtonGroup>
       </Modal>

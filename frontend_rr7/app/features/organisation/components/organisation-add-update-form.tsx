@@ -51,12 +51,15 @@ type Props = {
 
 const createOrganisationSchema = (t: TFunction) =>
   z.object({
-    organisationName: z.string().min(
-      1,
-      t('validation.organisationNameRequired', {
-        defaultValue: 'Organisation name is required',
-      }),
-    ),
+    organisationName: z
+      .string()
+      .min(
+        1,
+        t(
+          'validation.organisationNameRequired',
+          'Organisation name is required',
+        ),
+      ),
   })
 
 type FormData = z.infer<ReturnType<typeof createOrganisationSchema>>
@@ -66,7 +69,7 @@ export const OrganisationAddUpdateForm = ({
   onCancel,
   onSave,
 }: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('organisation')
 
   const schema = useMemo(() => createOrganisationSchema(t), [t])
 
@@ -82,9 +85,10 @@ export const OrganisationAddUpdateForm = ({
 
   const setDuplicateError = useCallback(() => {
     hookForm.setError('organisationName', {
-      message: t('organisations.errors.duplicateKey', {
-        defaultValue: 'An organisation with this name already exists',
-      }),
+      message: t(
+        'errors.duplicateKey',
+        'An organisation with this name already exists',
+      ),
       type: 'manual',
     })
   }, [hookForm, t])
@@ -141,37 +145,27 @@ export const OrganisationAddUpdateForm = ({
 
         <ModalHeader className="mb-2">
           {mode === 'add'
-            ? t('organisations.actions.create', {
-                defaultValue: 'Create organisation',
-              })
-            : t('organisations.actions.edit', {
-                defaultValue: 'Edit organisation',
-              })}
+            ? t('actions.create', 'Create organisation')
+            : t('actions.edit', 'Edit organisation')}
         </ModalHeader>
 
         <ModalDescription className="mb-4">
           {mode === 'add'
-            ? t('organisations.description.create', {
-                defaultValue:
-                  'Create a new organisation to collaborate with your team.',
-              })
-            : t('organisations.description.edit', {
-                defaultValue: 'Update the organisation name.',
-              })}
+            ? t(
+                'description.create',
+                'Create a new organisation to collaborate with your team.',
+              )
+            : t('description.edit', 'Update the organisation name.')}
         </ModalDescription>
 
         <Alert className="mb-4" variant="info">
-          {t('organisations.info.uniqueNameRequired', {
-            defaultValue: 'Organisation names must be unique.',
-          })}
+          {t('info.uniqueNameRequired', 'Organisation names must be unique.')}
         </Alert>
 
         <FieldSet>
           <FormElement>
             <Label htmlFor="organisationName">
-              {t('organisations.organizationName', {
-                defaultValue: 'Organisation name',
-              })}
+              {t('organizationName', 'Organisation name')}
             </Label>
             <Input
               data-testid="org-form-name-input"
@@ -196,7 +190,7 @@ export const OrganisationAddUpdateForm = ({
             disabled={isSubmitting}
             type="submit"
           >
-            {t('common.actions.save', { defaultValue: 'Save' })}
+            {t('actions.save', 'Save')}
           </Button>
           <Button
             data-testid="org-form-cancel-btn"
@@ -204,9 +198,7 @@ export const OrganisationAddUpdateForm = ({
             type="button"
             variant="secondary"
           >
-            {t('common.actions.cancel', {
-              defaultValue: 'Cancel',
-            })}
+            {t('actions.cancel', 'Cancel')}
           </Button>
         </ButtonGroup>
       </FormBody>

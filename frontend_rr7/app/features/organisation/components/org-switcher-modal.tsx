@@ -40,7 +40,7 @@ export const OrgSwitcherModal = ({
   onSelect = noop,
   selected,
 }: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('organisation')
   const { organisations, selectedOrganisationId, setSelectedOrganisation } =
     useOrganisation()
 
@@ -60,9 +60,7 @@ export const OrgSwitcherModal = ({
   return (
     <div data-testid="org-switcher-modal">
       <h1 className="mb-4 text-2xl font-bold">
-        {t('organisations.selectOrganisation', {
-          defaultValue: 'Select organisation',
-        })}
+        {t('selectOrganisation', 'Select organisation')}
       </h1>
       <div className="grid grid-cols-3 gap-3">
         {organisations.map((item) => (
@@ -79,17 +77,13 @@ export const OrgSwitcherModal = ({
             </div>
             <div className="leading-normal">
               {item.private
-                ? t('organisations.myPersonalOrganisation', {
-                    defaultValue: 'My personal organisation',
-                  })
+                ? t('myPersonalOrganisation', 'My personal organisation')
                 : item.organisationReference.key}
             </div>
             {isCurrent(item) && (
               <div
                 className="absolute top-2 right-2"
-                title={t('common.selected', {
-                  defaultValue: 'Selected',
-                })}
+                title={t('selected', 'Selected')}
               >
                 <LucideIcon icon={CheckCircleIcon} size={18} />
               </div>

@@ -150,7 +150,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 // ─── Component ───────────────────────────────────────────────────────────────
 
 const OrgStatsLayout = ({ loaderData }: Route.ComponentProps) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('organisation')
 
   const {
     bookingSummary,
@@ -164,17 +164,17 @@ const OrgStatsLayout = ({ loaderData }: Route.ComponentProps) => {
   const tabs = [
     {
       id: 'projects',
-      label: t('projects.title', { defaultValue: 'Projects' }),
+      label: t('projects:title', 'Projects'),
       to: href('/organisation/stats/projects'),
     },
     {
       id: 'users',
-      label: t('members.title', { defaultValue: 'Members' }),
+      label: t('members.title', 'Members'),
       to: href('/organisation/stats/users'),
     },
     {
       id: 'tags',
-      label: t('tags.title', { defaultValue: 'Tags' }),
+      label: t('tag-manager:title', 'Tags'),
       to: href('/organisation/stats/tags'),
     },
   ]

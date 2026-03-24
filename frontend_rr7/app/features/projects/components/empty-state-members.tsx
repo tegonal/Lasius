@@ -23,11 +23,11 @@ import { useTranslation } from 'react-i18next'
 import { EmptyState } from '~/components/ui/data-display/empty-state'
 
 export const EmptyStateMembers = () => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation()
   return (
     <EmptyState
       icon={Users}
-      label={t('members.empty', { defaultValue: 'No members found' })}
+      label={t('organisation:members.empty', 'No members found')}
     />
   )
 }
