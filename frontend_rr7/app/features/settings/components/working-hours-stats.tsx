@@ -26,7 +26,7 @@ import { StatsTileHours } from '~/features/stats/components/stats-tile-hours'
 import { plannedWorkingHoursStub } from '~/lib/utils/date/stub-planned-working-hours'
 
 export const WorkingHoursStats = () => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('working-hours')
   const { organisations } = useOrganisation()
   const { allOrganisationsWorkingHours } =
     useGetWeeklyPlannedWorkingHoursAggregate()
@@ -43,9 +43,7 @@ export const WorkingHoursStats = () => {
       return {
         hours: total,
         name: org.private
-          ? t('organisations.myPersonalOrganisation', {
-              defaultValue: 'My personal organisation',
-            })
+          ? t('organisation:myPersonalOrganisation', 'My personal organisation')
           : org.organisationReference.key,
       }
     }) ?? []
@@ -62,9 +60,7 @@ export const WorkingHoursStats = () => {
           />
         ))}
         <StatsTileHours
-          label={t('workingHours.totalPerWeek', {
-            defaultValue: 'Total per week',
-          })}
+          label={t('totalPerWeek', 'Total per week')}
           standalone={false}
           value={totalHoursPerWeek}
         />

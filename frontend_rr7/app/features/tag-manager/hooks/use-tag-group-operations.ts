@@ -44,7 +44,7 @@ export const useTagGroupOperations = (
   hookForm: UseFormReturn<FormValues>,
   setHasUnsavedChanges: (value: boolean) => void,
 ) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('tag-manager')
   const { addToast } = useToast()
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
   const [copiedTags, setCopiedTags] = useState<CopiedTags | null>(null)
@@ -105,9 +105,10 @@ export const useTagGroupOperations = (
     const tagGroups: ModelsTagGroup[] = hookForm.getValues('tagGroups')
     if (!newTagGroupName) {
       addToast({
-        message: t('tags.validation.tagGroupNameRequired', {
-          defaultValue: 'Tag group name is required',
-        }),
+        message: t(
+          'validation.tagGroupNameRequired',
+          'Tag group name is required',
+        ),
         type: 'ERROR',
       })
       return false
@@ -115,9 +116,7 @@ export const useTagGroupOperations = (
 
     if (tagGroups.find((tagGroup) => tagGroup.id === newTagGroupName)) {
       addToast({
-        message: t('tags.validation.tagGroupExists', {
-          defaultValue: 'Tag group already exists',
-        }),
+        message: t('validation.tagGroupExists', 'Tag group already exists'),
         type: 'ERROR',
       })
       return false
@@ -163,9 +162,7 @@ export const useTagGroupOperations = (
   const copyTags = (groupId: string, tags: ModelsSimpleTag[]) => {
     setCopiedTags({ fromGroupId: groupId, tags })
     addToast({
-      message: t('tags.status.tagsCopied', {
-        defaultValue: 'Tags copied',
-      }),
+      message: t('status.tagsCopied', 'Tags copied'),
       type: 'SUCCESS',
     })
   }
@@ -189,9 +186,7 @@ export const useTagGroupOperations = (
     setHasUnsavedChanges(true)
 
     addToast({
-      message: t('tags.status.tagsPasted', {
-        defaultValue: 'Tags pasted',
-      }),
+      message: t('status.tagsPasted', 'Tags pasted'),
       type: 'SUCCESS',
     })
 
@@ -203,9 +198,7 @@ export const useTagGroupOperations = (
     const newTagName = hookForm.getValues('newTagName')
     if (!newTagName.trim()) {
       addToast({
-        message: t('tags.validation.tagNameRequired', {
-          defaultValue: 'Tag name is required',
-        }),
+        message: t('validation.tagNameRequired', 'Tag name is required'),
         type: 'ERROR',
       })
       return false
@@ -222,9 +215,7 @@ export const useTagGroupOperations = (
     // Check for duplicates
     if (targetGroup.relatedTags.some((tag) => tag.id === newTagName.trim())) {
       addToast({
-        message: t('tags.validation.tagExists', {
-          defaultValue: 'Tag already exists',
-        }),
+        message: t('validation.tagExists', 'Tag already exists'),
         type: 'ERROR',
       })
       return false

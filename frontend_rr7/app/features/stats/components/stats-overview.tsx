@@ -36,7 +36,7 @@ export const StatsOverview = ({
   elements,
   hours,
 }: StatsOverviewProps) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation()
 
   const hasData = elements > 0
 
@@ -47,25 +47,25 @@ export const StatsOverview = ({
   return (
     <StatsGroup className="flex gap-4">
       <StatsTileHours
-        label={t('common.units.hours', { defaultValue: 'Hours' })}
+        label={t('units.hours', 'Hours')}
         standalone={false}
         value={hours}
       />
       <StatsTileNumber
-        label={t('bookings.title', { defaultValue: 'Bookings' })}
+        label={t('bookings:title', 'Bookings')}
         standalone={false}
         value={elements}
       />
       {distinctUsers > 1 && (
         <StatsTileNumber
-          label={t('users.title', { defaultValue: 'Users' })}
+          label={t('users.title', 'Users')}
           standalone={false}
           value={distinctUsers}
         />
       )}
       {distinctProjects > 1 && (
         <StatsTileNumber
-          label={t('projects.title', { defaultValue: 'Projects' })}
+          label={t('projects:title', 'Projects')}
           standalone={false}
           value={distinctProjects}
         />

@@ -31,7 +31,7 @@ import { useHealthMonitor } from '../hooks/use-health-monitor'
  * The poll writes to the UI store — footer indicators read from the same store.
  */
 export const HealthMonitor = () => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('system')
 
   // Start the polling loop (writes to UI store)
   useHealthMonitor()
@@ -52,10 +52,10 @@ export const HealthMonitor = () => {
         open={backendOffline}
       >
         <div>
-          {t('system.offlineMessage', {
-            defaultValue:
-              'Lasius is currently offline or undergoing maintenance. We will be back shortly.',
-          })}
+          {t(
+            'system:offlineMessage',
+            'Lasius is currently offline or undergoing maintenance. We will be back shortly.',
+          )}
         </div>
       </Modal>
 
@@ -63,21 +63,19 @@ export const HealthMonitor = () => {
       {versionDrift && (
         <GenericConfirmModal
           blockViewport
-          cancelLabel={t('common.actions.cancel', { defaultValue: 'Cancel' })}
-          confirmLabel={t('pwa.reloadApplication', {
-            defaultValue: 'Reload application',
-          })}
+          cancelLabel={t('actions.cancel', 'Cancel')}
+          confirmLabel={t('system:pwa.reloadApplication', 'Reload application')}
           confirmVariant="primary"
-          message={t('pwa.updateMessage', {
-            defaultValue:
-              'Lasius has been updated. The page will reload after your confirmation.',
-          })}
+          message={t(
+            'system:pwa.updateMessage',
+            'Lasius has been updated. The page will reload after your confirmation.',
+          )}
           onClose={() => {
             /* user dismissed — will not nag again until next version change */
           }}
           onConfirm={() => window.location.reload()}
           open={versionDrift}
-          title={t('pwa.updateAvailable', { defaultValue: 'Update available' })}
+          title={t('system:pwa.updateAvailable', 'Update available')}
         />
       )}
     </>

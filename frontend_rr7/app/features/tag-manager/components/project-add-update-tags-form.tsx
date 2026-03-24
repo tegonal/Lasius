@@ -73,7 +73,7 @@ export const ProjectAddUpdateTagsForm = ({
   onCancel,
   onSave,
 }: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation(['tag-manager', 'projects'])
 
   const hookForm = useForm<FormValues>({
     defaultValues: {
@@ -101,9 +101,7 @@ export const ProjectAddUpdateTagsForm = ({
   const updateProjectFetcher = useUpdateProject({
     onSuccess: () => {
       addToast({
-        message: t('projects.status.updated', {
-          defaultValue: 'Project updated',
-        }),
+        message: t('projects:status.updated', 'Project updated'),
         type: 'SUCCESS',
       })
       onSave()
@@ -287,9 +285,7 @@ export const ProjectAddUpdateTagsForm = ({
       <div className="space-y-6 pb-4">
         <Alert variant="info">
           <p>
-            {t('tags.simpleTagsDescription', {
-              defaultValue: 'Tags that are not part of any group',
-            })}
+            {t('simpleTagsDescription', 'Tags that are not part of any group')}
           </p>
         </Alert>
         <InputTagsAdmin
@@ -303,11 +299,11 @@ export const ProjectAddUpdateTagsForm = ({
   const tabs = [
     {
       component: tagGroupsContent,
-      label: t('tags.tagGroups', { defaultValue: 'Tag groups' }),
+      label: t('tagGroups', 'Tag groups'),
     },
     {
       component: simpleTagsContent,
-      label: t('tags.simpleTags', { defaultValue: 'Simple tags' }),
+      label: t('simpleTags', 'Simple tags'),
     },
   ]
 
@@ -323,11 +319,8 @@ export const ProjectAddUpdateTagsForm = ({
 
           <ModalHeader className="mb-4">
             {mode === 'add'
-              ? t('tags.actions.add', {
-                  defaultValue: 'Add tags',
-                })
-              : t('tags.actions.editForProject', {
-                  defaultValue: 'Edit tags for {{projectKey}}',
+              ? t('actions.add', 'Add tags')
+              : t('actions.editForProject', 'Edit tags for {{projectKey}}', {
                   projectKey,
                 })}
           </ModalHeader>
@@ -345,14 +338,10 @@ export const ProjectAddUpdateTagsForm = ({
               disabled={isSubmitting}
               type="submit"
             >
-              {t('common.actions.save', {
-                defaultValue: 'Save',
-              })}
+              {t('actions.save', 'Save')}
             </Button>
             <Button onClick={handleCancel} type="button" variant="secondary">
-              {t('common.actions.cancel', {
-                defaultValue: 'Cancel',
-              })}
+              {t('actions.cancel', 'Cancel')}
             </Button>
           </ButtonGroup>
         </div>
@@ -360,63 +349,45 @@ export const ProjectAddUpdateTagsForm = ({
 
       {/* Modals */}
       <GenericInputModal
-        confirmLabel={t('tags.actions.createTagGroup', {
-          defaultValue: 'Create tag group',
-        })}
+        confirmLabel={t('actions.createTagGroup', 'Create tag group')}
         error={hookForm.formState.errors.newTagGroupName}
         fieldName="newTagGroupName"
-        label={t('tags.actions.addTagGroup', {
-          defaultValue: 'Add tag group',
-        })}
+        label={t('actions.addTagGroup', 'Add tag group')}
         onClose={() => {
           setShowAddGroupModal(false)
           hookForm.setValue('newTagGroupName', '')
         }}
         onConfirm={handleAddGroupConfirm}
         open={showAddGroupModal}
-        placeholder={t('common.forms.name', {
-          defaultValue: 'Name',
-        })}
+        placeholder={t('forms.name', 'Name')}
         register={hookForm.register}
       />
 
       <GenericInputModal
-        cancelLabel={t('common.actions.close', {
-          defaultValue: 'Close',
-        })}
-        confirmLabel={t('common.actions.add', {
-          defaultValue: 'Add',
-        })}
+        cancelLabel={t('actions.close', 'Close')}
+        confirmLabel={t('actions.add', 'Add')}
         enableEnterKey
         fieldName="newTagName"
-        label={t('tags.actions.addTag', {
-          defaultValue: 'Add a tag',
-        })}
+        label={t('actions.addTag', 'Add a tag')}
         onClose={() => {
           setShowAddTagModal(null)
           hookForm.setValue('newTagName', '')
         }}
         onConfirm={handleAddTagConfirm}
         open={!!showAddTagModal}
-        placeholder={t('tags.enterTagName', {
-          defaultValue: 'Enter tag name',
-        })}
+        placeholder={t('enterTagName', 'Enter tag name')}
         register={hookForm.register}
       />
 
       {showDeleteConfirm && (
         <GenericConfirmModal
-          cancelLabel={t('common.actions.close', {
-            defaultValue: 'Close',
-          })}
-          confirmLabel={t('common.actions.delete', {
-            defaultValue: 'Delete',
-          })}
-          message={t('tags.confirmDeleteGroup', {
-            defaultValue:
-              'Are you sure you want to delete the tag group "{{groupName}}"?',
-            groupName: showDeleteConfirm.groupName,
-          })}
+          cancelLabel={t('actions.close', 'Close')}
+          confirmLabel={t('actions.delete', 'Delete')}
+          message={t(
+            'confirmDeleteGroup',
+            'Are you sure you want to delete the tag group "{{groupName}}"?',
+            { groupName: showDeleteConfirm.groupName },
+          )}
           onClose={() => setShowDeleteConfirm(null)}
           onConfirm={handleDeleteConfirm}
           open
@@ -425,16 +396,12 @@ export const ProjectAddUpdateTagsForm = ({
 
       {showCancelConfirm && (
         <GenericConfirmModal
-          cancelLabel={t('common.actions.keepEditing', {
-            defaultValue: 'Keep editing',
-          })}
-          confirmLabel={t('common.actions.discardChanges', {
-            defaultValue: 'Discard changes',
-          })}
-          message={t('common.confirmUnsavedChanges', {
-            defaultValue:
-              'You have unsaved changes. Are you sure you want to cancel?',
-          })}
+          cancelLabel={t('actions.keepEditing', 'Keep editing')}
+          confirmLabel={t('actions.discardChanges', 'Discard changes')}
+          message={t(
+            'confirmUnsavedChanges',
+            'You have unsaved changes. Are you sure you want to cancel?',
+          )}
           onClose={() => setShowCancelConfirm(false)}
           onConfirm={confirmCancel}
           open

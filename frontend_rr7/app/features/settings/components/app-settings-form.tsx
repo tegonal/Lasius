@@ -79,7 +79,7 @@ const createAppSettingsSchema = (t: TFunction) =>
 type FormData = z.infer<ReturnType<typeof createAppSettingsSchema>>
 
 export const AppSettingsForm = () => {
-  const { i18n, t } = useTranslation('common')
+  const { i18n, t } = useTranslation('settings')
   const theme = useTheme()
   const onboardingDismissed = useOnboardingDismissed()
   const { dismissOnboarding, resetOnboarding, setTheme } =

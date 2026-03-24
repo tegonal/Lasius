@@ -34,22 +34,19 @@ const statusDotClass: Record<BackendConnectionStatus, string> = {
 }
 
 export const BackendStatus = () => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('system')
   const isClient = useIsClient()
   const status = useBackendStatus()
 
   if (!isClient) return null
 
   const labels: Record<BackendConnectionStatus, string> = {
-    connected: t('system.connectedToBackend', {
-      defaultValue: 'Connected to backend',
-    }),
-    connecting: t('system.connectingToBackend', {
-      defaultValue: 'Connecting to backend',
-    }),
-    disconnected: t('system.backendUnreachable', {
-      defaultValue: 'Backend seems to be unreachable',
-    }),
+    connected: t('system:connectedToBackend', 'Connected to backend'),
+    connecting: t('system:connectingToBackend', 'Connecting to backend'),
+    disconnected: t(
+      'system:backendUnreachable',
+      'Backend seems to be unreachable',
+    ),
   }
 
   return (

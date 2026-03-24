@@ -58,7 +58,7 @@ export const TagGroupItem = ({
   showPasteButton,
   tagGroup,
 }: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('tag-manager')
 
   return (
     <div className="bg-base-200 group border-base-300 overflow-hidden rounded-lg border">
@@ -114,9 +114,7 @@ export const TagGroupItem = ({
               onClick={onAddTag}
               shape="circle"
               size="sm"
-              title={t('tags.actions.addTag', {
-                defaultValue: 'Add a tag',
-              })}
+              title={t('actions.addTag', 'Add a tag')}
               type="button"
               variant="secondary"
             >
@@ -127,9 +125,7 @@ export const TagGroupItem = ({
               onClick={onCopyTags}
               shape="circle"
               size="sm"
-              title={t('tags.actions.copyTags', {
-                defaultValue: 'Copy tags',
-              })}
+              title={t('actions.copyTags', 'Copy tags')}
               type="button"
               variant="ghost"
             >
@@ -141,9 +137,7 @@ export const TagGroupItem = ({
                 onClick={onPasteTags}
                 shape="circle"
                 size="sm"
-                title={t('tags.actions.pasteTags', {
-                  defaultValue: 'Paste tags',
-                })}
+                title={t('actions.pasteTags', 'Paste tags')}
                 type="button"
                 variant="ghost"
               >

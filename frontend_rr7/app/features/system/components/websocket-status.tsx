@@ -35,25 +35,29 @@ const statusDotClass: Record<ConnectionStatus, string> = {
 }
 
 export const WebsocketStatus = () => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('system')
   const isClient = useIsClient()
   const { connectionStatus } = useLasiusWebsocket()
 
   if (!isClient) return null
 
   const labels: Record<ConnectionStatus, string> = {
-    [ConnectionStatus.CONNECTED]: t('websocket.status.connected', {
-      defaultValue: 'WebSocket connected',
-    }),
-    [ConnectionStatus.CONNECTING]: t('websocket.status.connecting', {
-      defaultValue: 'WebSocket connecting',
-    }),
-    [ConnectionStatus.DISCONNECTED]: t('websocket.status.error', {
-      defaultValue: 'Unable to connect to WebSocket',
-    }),
-    [ConnectionStatus.ERROR]: t('websocket.status.error', {
-      defaultValue: 'Unable to connect to WebSocket',
-    }),
+    [ConnectionStatus.CONNECTED]: t(
+      'system:websocket.status.connected',
+      'WebSocket connected',
+    ),
+    [ConnectionStatus.CONNECTING]: t(
+      'system:websocket.status.connecting',
+      'WebSocket connecting',
+    ),
+    [ConnectionStatus.DISCONNECTED]: t(
+      'system:websocket.status.error',
+      'Unable to connect to WebSocket',
+    ),
+    [ConnectionStatus.ERROR]: t(
+      'system:websocket.status.error',
+      'Unable to connect to WebSocket',
+    ),
   }
 
   return (

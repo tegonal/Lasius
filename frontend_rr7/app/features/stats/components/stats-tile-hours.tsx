@@ -34,7 +34,7 @@ type Props = {
 }
 
 export const StatsTileHours = ({ label, standalone = true, value }: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation()
   const previousValue = useRef<number>(0)
   const previousHours = useRef<number>(0)
   const previousMinutes = useRef<number>(0)
@@ -83,8 +83,8 @@ export const StatsTileHours = ({ label, standalone = true, value }: Props) => {
         </div>
         <div className="stat-desc">
           {showDecimalHours
-            ? t('stats.decimalHours', { defaultValue: 'Decimal hours' })
-            : t('stats.hoursMinutes', { defaultValue: 'HH:MM' })}
+            ? t('stats:decimalHours', 'Decimal hours')
+            : t('stats:hoursMinutes', 'HH:MM')}
         </div>
       </div>
     </StatsTileWrapper>

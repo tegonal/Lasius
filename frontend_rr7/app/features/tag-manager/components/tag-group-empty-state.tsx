@@ -23,13 +23,11 @@ import { useTranslation } from 'react-i18next'
 import { EmptyState } from '~/components/ui/data-display/empty-state'
 
 export const TagGroupEmptyState = () => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('tag-manager')
   return (
     <EmptyState
       icon={Tags}
-      label={t('tags.noTagGroups', {
-        defaultValue: 'No tag groups defined yet',
-      })}
+      label={t('noTagGroups', 'No tag groups defined yet')}
     />
   )
 }

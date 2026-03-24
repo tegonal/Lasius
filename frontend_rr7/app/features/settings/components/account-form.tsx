@@ -42,29 +42,16 @@ const createAccountSchema = (t: TFunction) =>
   z.object({
     email: z
       .string()
-      .min(
-        1,
-        t('validation.emailRequired', {
-          defaultValue: 'Email is required',
-        }),
-      )
+      .min(1, t('validation.emailRequired', 'Email is required'))
       .email({
-        message: t('validation.emailInvalid', {
-          defaultValue: 'Invalid email address',
-        }),
+        message: t('validation.emailInvalid', 'Invalid email address'),
       }),
-    firstName: z.string().min(
-      1,
-      t('validation.firstNameRequired', {
-        defaultValue: 'First name is required',
-      }),
-    ),
-    lastName: z.string().min(
-      1,
-      t('validation.lastNameRequired', {
-        defaultValue: 'Last name is required',
-      }),
-    ),
+    firstName: z
+      .string()
+      .min(1, t('validation.firstNameRequired', 'First name is required')),
+    lastName: z
+      .string()
+      .min(1, t('validation.lastNameRequired', 'Last name is required')),
   })
 
 interface AccountFormProps {
@@ -74,7 +61,7 @@ interface AccountFormProps {
 type FormData = z.infer<ReturnType<typeof createAccountSchema>>
 
 export const AccountForm = ({ demoMode }: AccountFormProps) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('settings')
   const layoutData = useLayoutLoaderData()
   const user = layoutData?.user
   const tokenIssuer = layoutData?.tokenIssuer
@@ -83,9 +70,10 @@ export const AccountForm = ({ demoMode }: AccountFormProps) => {
   const profileApi = useUpdateUserProfile({
     onSuccess: () => {
       addToast({
-        message: t('account.status.settingsUpdated', {
-          defaultValue: 'Account settings updated',
-        }),
+        message: t(
+          'account.status.settingsUpdated',
+          'Account settings updated',
+        ),
         type: 'SUCCESS',
       })
     },
@@ -109,9 +97,10 @@ export const AccountForm = ({ demoMode }: AccountFormProps) => {
   const onSubmit = (data: FormData) => {
     if (demoMode) {
       addToast({
-        message: t('account.profileChangesNotAllowedInDemo', {
-          defaultValue: 'Profile changes are not allowed in demo mode',
-        }),
+        message: t(
+          'account.profileChangesNotAllowedInDemo',
+          'Profile changes are not allowed in demo mode',
+        ),
         type: 'ERROR',
       })
       return
@@ -132,15 +121,13 @@ export const AccountForm = ({ demoMode }: AccountFormProps) => {
       <Card>
         <CardBody className="p-6">
           <h2 className="mb-4 text-xl font-semibold">
-            {t('account.profileSettings.title', {
-              defaultValue: 'Profile Information',
-            })}
+            {t('account.profileSettings.title', 'Profile Information')}
           </h2>
           <p className="text-base-content/70 mb-6 text-sm">
-            {t('account.profileSettings.description', {
-              defaultValue:
-                'Manage your personal information and account details.',
-            })}
+            {t(
+              'account.profileSettings.description',
+              'Manage your personal information and account details.',
+            )}
           </p>
           <form
             onKeyDown={(e) => preventEnterOnForm(e)}
@@ -148,12 +135,7 @@ export const AccountForm = ({ demoMode }: AccountFormProps) => {
           >
             <FormBody>
               <FieldSet>
-                <FormElement
-                  htmlFor="role"
-                  label={t('common.forms.role', {
-                    defaultValue: 'Role',
-                  })}
-                >
+                <FormElement htmlFor="role" label={t('forms.role', 'Role')}>
                   <Input
                     disabled
                     id="role"
@@ -164,9 +146,7 @@ export const AccountForm = ({ demoMode }: AccountFormProps) => {
                 </FormElement>
                 <FormElement
                   htmlFor="firstName"
-                  label={t('common.forms.firstName', {
-                    defaultValue: 'First name',
-                  })}
+                  label={t('forms.firstName', 'First name')}
                   required
                 >
                   <Input
@@ -182,9 +162,7 @@ export const AccountForm = ({ demoMode }: AccountFormProps) => {
                 </FormElement>
                 <FormElement
                   htmlFor="lastName"
-                  label={t('common.forms.lastName', {
-                    defaultValue: 'Last name',
-                  })}
+                  label={t('forms.lastName', 'Last name')}
                   required
                 >
                   <Input
@@ -201,9 +179,7 @@ export const AccountForm = ({ demoMode }: AccountFormProps) => {
                 <FormElementSpacer />
                 <FormElement
                   htmlFor="email"
-                  label={t('common.forms.email', {
-                    defaultValue: 'Email',
-                  })}
+                  label={t('forms.email', 'Email')}
                   required
                 >
                   <Input
@@ -221,9 +197,7 @@ export const AccountForm = ({ demoMode }: AccountFormProps) => {
               </FieldSet>
               <ButtonGroup className="justify-end">
                 <Button disabled={profileApi.isSubmitting} type="submit">
-                  {t('common.actions.saveChanges', {
-                    defaultValue: 'Save changes',
-                  })}
+                  {t('actions.saveChanges', 'Save changes')}
                 </Button>
               </ButtonGroup>
             </FormBody>

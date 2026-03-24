@@ -22,16 +22,14 @@ import { useTranslation } from 'react-i18next'
 import { SettingsRightColumn } from '~/features/settings/components/settings-right-column'
 
 export const WorkingHoursRightColumn = () => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('working-hours')
   return (
     <SettingsRightColumn
-      description={t('workingHours.description', {
-        defaultValue:
-          'The amount of time you expect to book per day, by organisation, during a typical working week. This data is used to calculate your daily and weekly progress.',
-      })}
-      title={t('workingHours.title', {
-        defaultValue: 'Working hours',
-      })}
+      description={t(
+        'description',
+        'The amount of time you expect to book per day, by organisation, during a typical working week. This data is used to calculate your daily and weekly progress.',
+      )}
+      title={t('title', 'Working hours')}
     />
   )
 }

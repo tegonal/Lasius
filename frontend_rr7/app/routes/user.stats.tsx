@@ -140,7 +140,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 // ─── Component ───────────────────────────────────────────────────────────────
 
 const UserStatsLayout = ({ loaderData }: Route.ComponentProps) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation()
 
   const {
     bookingSummary,
@@ -154,12 +154,12 @@ const UserStatsLayout = ({ loaderData }: Route.ComponentProps) => {
   const tabs = [
     {
       id: 'projects',
-      label: t('projects.title', { defaultValue: 'Projects' }),
+      label: t('projects:title', 'Projects'),
       to: href('/user/stats/projects'),
     },
     {
       id: 'tags',
-      label: t('tags.title', { defaultValue: 'Tags' }),
+      label: t('tag-manager:title', 'Tags'),
       to: href('/user/stats/tags'),
     },
   ]

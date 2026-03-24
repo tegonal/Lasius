@@ -45,49 +45,43 @@ const createPasswordChangeSchema = (t: TFunction) =>
   z
     .object({
       confirmPassword: z.string().min(1, {
-        message: t('validation.confirmPasswordRequired', {
-          defaultValue: 'Please confirm your password',
-        }),
+        message: t(
+          'validation.confirmPasswordRequired',
+          'Please confirm your password',
+        ),
       }),
       newPassword: z.string().superRefine((val, ctx) => {
         if (val.length < 9) {
           ctx.addIssue({
             code: 'custom',
-            message: t('validation.passwordTooShort', {
-              defaultValue: 'Minimum 9 characters',
-            }),
+            message: t('validation.passwordTooShort', 'Minimum 9 characters'),
             params: { type: 'notEnoughCharactersPassword' },
           })
         }
         if (!/[A-Z]/.test(val)) {
           ctx.addIssue({
             code: 'custom',
-            message: t('validation.missingUppercase', {
-              defaultValue: 'Must contain uppercase letter',
-            }),
+            message: t(
+              'validation.missingUppercase',
+              'Must contain uppercase letter',
+            ),
             params: { type: 'noUppercase' },
           })
         }
         if (!/\d/.test(val)) {
           ctx.addIssue({
             code: 'custom',
-            message: t('validation.missingNumber', {
-              defaultValue: 'Must contain a number',
-            }),
+            message: t('validation.missingNumber', 'Must contain a number'),
             params: { type: 'noNumber' },
           })
         }
       }),
       password: z.string().min(1, {
-        message: t('validation.passwordRequired', {
-          defaultValue: 'Password is required',
-        }),
+        message: t('validation.passwordRequired', 'Password is required'),
       }),
     })
     .refine((data) => data.newPassword === data.confirmPassword, {
-      message: t('validation.passwordMismatch', {
-        defaultValue: 'Passwords do not match',
-      }),
+      message: t('validation.passwordMismatch', 'Passwords do not match'),
       path: ['confirmPassword'],
     })
 
@@ -98,7 +92,7 @@ type AccountSecurityFormProps = {
 type PasswordFormData = z.infer<ReturnType<typeof createPasswordChangeSchema>>
 
 export const AccountSecurityForm = ({ demoMode }: AccountSecurityFormProps) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('settings')
   const [showPasswords, setShowPasswords] = useState(false)
   const { addToast } = useToast()
 
@@ -115,9 +109,7 @@ export const AccountSecurityForm = ({ demoMode }: AccountSecurityFormProps) => {
     onSuccess: () => {
       hookForm.reset()
       addToast({
-        message: t('account.status.passwordUpdated', {
-          defaultValue: 'Password updated',
-        }),
+        message: t('account.status.passwordUpdated', 'Password updated'),
         type: 'SUCCESS',
       })
     },
@@ -126,9 +118,10 @@ export const AccountSecurityForm = ({ demoMode }: AccountSecurityFormProps) => {
   const onSubmit = (data: PasswordFormData) => {
     if (demoMode) {
       addToast({
-        message: t('account.profileChangesNotAllowedInDemo', {
-          defaultValue: 'Profile changes are not allowed in demo mode',
-        }),
+        message: t(
+          'account.profileChangesNotAllowedInDemo',
+          'Profile changes are not allowed in demo mode',
+        ),
         type: 'ERROR',
       })
       return
@@ -173,9 +166,7 @@ export const AccountSecurityForm = ({ demoMode }: AccountSecurityFormProps) => {
               <FieldSet>
                 <FormElement>
                   <Label htmlFor="password">
-                    {t('common.forms.password', {
-                      defaultValue: 'Password',
-                    })}
+                    {t('forms.password', 'Password')}
                   </Label>
                   <Input
                     {...hookForm.register('password')}
@@ -187,9 +178,7 @@ export const AccountSecurityForm = ({ demoMode }: AccountSecurityFormProps) => {
                 <FormElementSpacer />
                 <FormElement>
                   <Label htmlFor="newPassword">
-                    {t('common.forms.newPassword', {
-                      defaultValue: 'New password',
-                    })}
+                    {t('forms.newPassword', 'New password')}
                   </Label>
                   <Input
                     {...hookForm.register('newPassword')}
@@ -209,9 +198,7 @@ export const AccountSecurityForm = ({ demoMode }: AccountSecurityFormProps) => {
                 </FormElement>
                 <FormElement>
                   <Label htmlFor="confirmPassword">
-                    {t('common.forms.confirmNewPassword', {
-                      defaultValue: 'Confirm new password',
-                    })}
+                    {t('forms.confirmNewPassword', 'Confirm new password')}
                   </Label>
                   <Input
                     {...hookForm.register('confirmPassword')}
@@ -231,12 +218,8 @@ export const AccountSecurityForm = ({ demoMode }: AccountSecurityFormProps) => {
                     <LucideIcon icon={showPasswords ? Eye : EyeOff} size={24} />
                     <span>
                       {showPasswords
-                        ? t('ui.hidePasswords', {
-                            defaultValue: 'Hide passwords',
-                          })
-                        : t('ui.showPasswords', {
-                            defaultValue: 'Show passwords',
-                          })}
+                        ? t('ui.hidePasswords', 'Hide passwords')
+                        : t('ui.showPasswords', 'Show passwords')}
                     </span>
                   </Button>
                 </FormElement>
@@ -247,9 +230,7 @@ export const AccountSecurityForm = ({ demoMode }: AccountSecurityFormProps) => {
                   type="submit"
                   variant="primary"
                 >
-                  {t('common.actions.saveChanges', {
-                    defaultValue: 'Save changes',
-                  })}
+                  {t('actions.saveChanges', 'Save changes')}
                 </Button>
               </ButtonGroup>
             </FormBody>

@@ -38,7 +38,7 @@ import { type ModelsUserOrganisation } from '~/services/api/lasius/modelsUserOrg
 import { type ModelsWorkingHoursWeekdays } from '~/types/common'
 
 export const WorkingHoursGrid = () => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('working-hours')
   const { organisations } = useOrganisation()
   const isClient = useIsClient()
   const { addToast } = useToast()
@@ -49,9 +49,7 @@ export const WorkingHoursGrid = () => {
       setSavingKey(null)
       void revalidator.revalidate()
       addToast({
-        message: t('workingHours.errors.updateFailed', {
-          defaultValue: 'Failed to update working hours',
-        }),
+        message: t('errors.updateFailed', 'Failed to update working hours'),
         type: 'ERROR',
       })
     },
@@ -59,9 +57,7 @@ export const WorkingHoursGrid = () => {
       setSavingKey(null)
       void revalidator.revalidate()
       addToast({
-        message: t('workingHours.status.updated', {
-          defaultValue: 'Working hours updated',
-        }),
+        message: t('status.updated', 'Working hours updated'),
         type: 'SUCCESS',
       })
     },
@@ -117,9 +113,7 @@ export const WorkingHoursGrid = () => {
               <tr>
                 <th className="bg-base-100 border-base-300 sticky left-0 z-10 border-r border-b p-3 text-left">
                   <span className="text-base-content/70 text-sm font-medium">
-                    {t('organisations.organization', {
-                      defaultValue: 'Organisation',
-                    })}
+                    {t('organisation:organization', 'Organisation')}
                   </span>
                 </th>
 
@@ -161,9 +155,10 @@ export const WorkingHoursGrid = () => {
                         title={org.organisationReference.key}
                       >
                         {org.private
-                          ? t('organisations.myPersonalOrganisation', {
-                              defaultValue: 'My personal organisation',
-                            })
+                          ? t(
+                              'organisation:myPersonalOrganisation',
+                              'My personal organisation',
+                            )
                           : org.organisationReference.key}
                       </span>
                     </div>
@@ -209,9 +204,7 @@ export const WorkingHoursGrid = () => {
               <tr className="bg-base-200/50 font-medium">
                 <td className="bg-base-200/50 border-base-300 sticky left-0 z-10 border-t border-r p-3">
                   <span className="text-sm font-semibold">
-                    {t('workingHours.dailyTotal', {
-                      defaultValue: 'Daily Total',
-                    })}
+                    {t('dailyTotal', 'Daily Total')}
                   </span>
                 </td>
                 {weekDays.map((day) => {

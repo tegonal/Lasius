@@ -38,7 +38,7 @@ export const TagGroupToolbar = ({
   onToggleAll,
   showToggleAll,
 }: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('tag-manager')
 
   return (
     <div className="mb-4 flex flex-shrink-0 flex-wrap items-center justify-between gap-2">
@@ -50,9 +50,7 @@ export const TagGroupToolbar = ({
           type="button"
           variant="secondary"
         >
-          {t('tags.actions.addTagGroup', {
-            defaultValue: 'Add tag group',
-          })}
+          {t('actions.addTagGroup', 'Add tag group')}
         </Button>
         <Button
           fullWidth={false}
@@ -61,9 +59,7 @@ export const TagGroupToolbar = ({
           type="button"
           variant="secondary"
         >
-          {t('tags.actions.addDefaultTagGroups', {
-            defaultValue: 'Add default tag groups',
-          })}
+          {t('actions.addDefaultTagGroups', 'Add default tag groups')}
         </Button>
       </div>
       {showToggleAll && (
@@ -74,12 +70,8 @@ export const TagGroupToolbar = ({
           size="sm"
           title={
             allExpanded
-              ? t('tags.actions.collapseAll', {
-                  defaultValue: 'Collapse all',
-                })
-              : t('tags.actions.expandAll', {
-                  defaultValue: 'Expand all',
-                })
+              ? t('actions.collapseAll', 'Collapse all')
+              : t('actions.expandAll', 'Expand all')
           }
           type="button"
           variant="ghost"
