@@ -1,46 +1,53 @@
 {
   "actions": {
-    "create": "Crear organización",
-    "edit": "Editar organización"
+    "actions": "Actions",
+    "cancel": "Cancel",
+    "close": "Close",
+    "create": "Create organisation",
+    "edit": "Edit organisation",
+    "save": "Save"
   },
-  "adminDescription": "Eres un administrador de esta organización. Puedes añadir y eliminar miembros y cambiar el nombre de la organización, o crear una nueva.",
-  "createDescription": "Usa el menú de Acciones para crear una nueva organización.",
-  "currentOrganisation": "Organización actual",
+  "adminDescription": "You are an administrator of this organisation. You can add and remove members and change the organisation name, or create a new one.",
+  "createDescription": "Add a new organisation using the Actions button at the top of the list.",
+  "currentOrganisation": "Current organisation",
   "description": {
-    "create": "Crea una nueva organización para colaborar con tu equipo.",
-    "edit": "Actualiza el nombre de la organización."
+    "create": "Create a new organisation to collaborate with your team.",
+    "edit": "Update the organisation name."
   },
   "errors": {
-    "duplicateKey": "Ya existe una organización con este nombre"
+    "duplicateKey": "An organisation with this name already exists"
+  },
+  "forms": {
+    "email": "Email",
+    "firstName": "First name",
+    "lastName": "Last name"
   },
   "info": {
-    "uniqueNameRequired": "Los nombres de las organizaciones deben ser únicos."
+    "uniqueNameRequired": "Organisation names must be unique."
   },
-  "memberDescription": "Eres miembro de esta organización y no tienes los permisos para añadir o eliminar miembros. Ponte en contacto con un administrador de la organización si quieres invitar a alguien.",
+  "memberDescription": "You are a member of this organisation and don't have the rights to add or remove members. Get in touch with an organisation administrator if you would like to invite someone.",
   "members": {
     "actions": {
-      "invite": "Invitar a alguien",
-      "manage": "Gestionar miembros",
-      "remove": "Eliminar miembro"
+      "invite": "Invite someone",
+      "manage": "Manage members",
+      "remove": "Remove member"
     },
     "confirmations": {
-      "removeConfirm": "¿Estás seguro de que quieres eliminar a {{name}}?",
-      "removeTitle": "Eliminar miembro",
-      "removeWarning": "Este miembro será eliminado de la organización y perderá el acceso a todos los proyectos."
+      "removeConfirm": "Are you sure you want to remove {{name}}?",
+      "removeTitle": "Remove member",
+      "removeWarning": "This member will be removed from the organisation and lose access to all projects."
     },
-    "confirmRemove": "Are you sure you want to remove this member from the project?",
-    "description_one": "Este proyecto tiene {{count}} miembro.",
-    "description_many": "Este proyecto tiene {{count}} miembros.",
-    "description_other": "Este proyecto tiene {{count}} miembros.",
-    "empty": "No se encontraron miembros",
     "emptyState": "No members found",
     "title": "Members"
   },
-  "myPersonalOrganisation": "Mi organización personal",
-  "organisationName": "Organización",
-  "organisationRole": "Rol en la organización",
-  "organization": "Organización",
-  "organizationName": "Nombre de la organización",
-  "privateDescription": "Esta organización solo es visible para ti. Úsala para realizar un seguimiento de proyectos privados. Para colaborar con otros, crea o usa una organización diferente.",
-  "selectOrganisation": "Seleccionar organización"
+  "myPersonalOrganisation": "My personal organisation",
+  "organisationName": "Organisation",
+  "organizationName": "Organisation name",
+  "privateDescription": "This organisation is only visible to you. You can use it to track private projects that you do not want others to have access to. If you want to invite people, invite them to an existing organisation or create a new one.",
+  "selected": "Selected",
+  "selectOrganisation": "Select organisation",
+  "status": {
+    "label": "Status"
+  },
+  "you": "You"
 }

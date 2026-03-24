@@ -4,5 +4,8 @@
     "nextWeek": "Next week",
     "previousMonth": "Previous month",
     "previousWeek": "Previous week"
+  },
+  "time": {
+    "today": "Today"
   }
 }

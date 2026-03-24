@@ -1,12 +1,1 @@
-{
-  "dailyTotal": "Täglich gesamt",
-  "description": "Die Zeitspanne, die du pro Tag nach Organisation während einer typischen Arbeitswoche zu buchen erwartest. Diese Daten werden verwendet, um deinen täglichen und wöchentlichen Fortschritt zu berechnen.",
-  "errors": {
-    "updateFailed": "Fehler beim Aktualisieren der Arbeitszeiten"
-  },
-  "status": {
-    "updated": "Arbeitszeiten aktualisiert"
-  },
-  "title": "Arbeitszeiten",
-  "totalPerWeek": "gesamt pro Woche"
-}
+{}

@@ -1,1 +1,229 @@
-{}
+{
+  "actions": {
+    "back": "Back",
+    "cancel": "Cancel",
+    "close": "Close",
+    "confirm": "Confirm",
+    "finish": "Finish",
+    "next": "Next",
+    "remove": "Remove",
+    "saving": "Saving..."
+  },
+  "clear": "Clear",
+  "integrations": {
+    "actions": {
+      "addIntegration": "Add Integration"
+    },
+    "configurations": "Configurations",
+    "configureDescription": "Use the Add Configuration button to set up a new integration. After creating a configuration, map your external projects to Lasius projects to enable issue imports.",
+    "delete": {
+      "confirm": "Delete",
+      "hasProjects": "This configuration has project mappings. Remove all mappings before deleting.",
+      "message": "Are you sure you want to delete this integration configuration?",
+      "title": "Delete Integration"
+    },
+    "description": "Connect Lasius with external issue tracking systems like GitHub, GitLab, Jira, and Plane. Imported issues become available as tags when booking time in mapped projects, allowing you to track time directly on your issues.",
+    "issueTrackers": "Issue Trackers",
+    "title": "Integrations"
+  },
+  "issueImporters": {
+    "actions": {
+      "delete": "Delete configuration",
+      "deleteDisabled": "Cannot delete: remove all project mappings first",
+      "edit": "Edit configuration",
+      "refreshTags": "Refresh tags",
+      "update": "Update",
+      "viewInfo": "View configuration info",
+      "viewMappings": "View project mappings"
+    },
+    "checkInterval": "Check Interval",
+    "checkIntervalHelp": "How often to check for new issues",
+    "configListItem": {
+      "projectCount_one": "{{count}} project",
+      "projectCount_other": "{{count}} projects"
+    },
+    "descriptions": {
+      "edit": "Update the configuration for this issue importer integration."
+    },
+    "emptyState": "No integrations configured yet. Add one to get started.",
+    "errors": {
+      "invalidMappingData": "Invalid mapping data",
+      "mappingRemoveFailed": "Failed to remove project mapping",
+      "mappingSaveFailed": "Failed to save project mapping",
+      "tagsRefreshFailed": "Failed to refresh tags"
+    },
+    "fields": {
+      "accessToken": "Access Token",
+      "accessTokenEdit": "Access Token (leave empty to keep current)",
+      "apiKey": "API Key",
+      "apiKeyEdit": "API Key (leave empty to keep current)",
+      "baseUrl": "Base URL",
+      "baseUrlPlaceholder": {
+        "github": "https://api.github.com",
+        "gitlab": "https://...",
+        "jira": "https://company.atlassian.net",
+        "plane": "https://..."
+      },
+      "consumerKey": "OAuth Consumer Key",
+      "credentialPlaceholder": "Enter new value to update",
+      "name": "Configuration Name",
+      "namePlaceholder": {
+        "github": "e.g., Company GitHub",
+        "gitlab": "e.g., Company GitLab",
+        "jira": "e.g., Company Jira",
+        "plane": "e.g., Company Plane"
+      },
+      "oauthAccessToken": "OAuth Access Token",
+      "privateKey": "OAuth Private Key",
+      "privateKeyEdit": "Private Key (leave empty to keep current)",
+      "resourceOwner": "Resource Owner",
+      "resourceOwnerHelp": "Select the GitHub user or organization that owns the repositories you want to access.",
+      "resourceOwnerLoading": "Loading organizations...",
+      "resourceOwnerNoResults": "No organizations found",
+      "resourceOwnerPlaceholder": "Enter access token above to load organizations",
+      "resourceOwnerSelect": "Select an organization",
+      "workspace": "Workspace",
+      "workspaceHelp": "The workspace slug from your Plane URL (e.g., \"my-company\" from https://app.plane.so/my-company)",
+      "workspacePlaceholder": "e.g., my-company"
+    },
+    "github": {
+      "instructions": {
+        "content": "<0><0>Verify your email address on GitHub</0><1>Go to Settings → Developer settings → Personal access tokens → Fine-grained tokens</1><2>Click \"Generate new token\"</2><3>Enter a token name and select an expiration date</3><4>Choose a resource owner (your user account or an organization you have access to)</4><5>Select repository access (all repositories or only select repositories)</5><6>Under Repository permissions, set <2>Issues</2> to \"Read-only\" and <6>Metadata</6> to \"Read-only\"</6><7>Click \"Generate token\" and copy it immediately</7></0><1>Important: Fine-grained tokens are required (not classic tokens). The resource owner you select determines which repositories you can access. For organization repositories, you may need organization owner approval. Make sure to select the same resource owner in the configuration form above.</1>",
+        "title": "How to create GitHub credentials:"
+      }
+    },
+    "gitlab": {
+      "instructions": {
+        "content": "<0><0>On the left sidebar, select your avatar</0><1>Select \"Edit profile\"</1><2>Select \"Personal access tokens\"</2><3>Select \"Add new token\"</3><4>Enter a token name and optional description</4><5>Set an expiration date</5><6>Select the <2>read_api</2> scope (grants read access to the API, including all groups and projects)</6><7>Click \"Create personal access token\"</7><8>Copy the token immediately and store it securely</8></0><1>Note: The token will only be shown once. Use <2>read_api</2> for read-only access, or <6>api</6> for full read/write access if needed.</1>",
+        "title": "How to create GitLab credentials:"
+      }
+    },
+    "headers": {
+      "baseUrl": "Base URL",
+      "name": "Name",
+      "projects": "Projects",
+      "type": "Type"
+    },
+    "healthStatus": {
+      "degraded": "Degraded",
+      "failed": "Failed",
+      "healthy": "Healthy",
+      "unknown": "Unknown"
+    },
+    "info": {
+      "auditInfo": "Audit Information",
+      "baseUrl": "Base URL",
+      "basicInfo": "Basic Information",
+      "checkFrequency": "Check Frequency",
+      "checkFrequencyValue": "{{minutes}} minutes",
+      "createdAt": "Created",
+      "createdBy": "Created By",
+      "healthStatus": "Health Status",
+      "issuesSynced": "Issues",
+      "lastChecked": "Last checked: {{date}}",
+      "lastSuccessfulSync": "Last Successful Sync",
+      "lastSync": "Last Sync",
+      "name": "Name",
+      "nextScheduledSync": "Next Scheduled Sync",
+      "noConfig": "No configuration selected.",
+      "projectCount": "Project Mappings",
+      "projectName": "Project",
+      "projectStats": "Project Statistics",
+      "title": "Configuration Info",
+      "totalIssuesSynced": "Total Issues Synced",
+      "totalProjectsMapped": "Projects Mapped",
+      "type": "Type",
+      "updatedAt": "Last Updated",
+      "updatedBy": "Updated By"
+    },
+    "jira": {
+      "instructions": {
+        "content": "<0><0>Generate RSA key pair using OpenSSL: <2>openssl genrsa -out jira_privatekey.pem 1024</2></0><1>Extract public key: <2>openssl rsa -in jira_privatekey.pem -pubout -out jira_publickey.pem</2></1><2>In Jira: Click Settings (cog icon) → Applications → Application links</2><3>Enter any URL (e.g., <2>http://localhost</2>) and click \"Create new link\"</3><4>Ignore the \"No response was received\" warning and click \"Continue\"</4><5>Enter your Application Name and select \"Create incoming link\"</5><6>In the incoming authentication form, enter your Consumer Key, paste the public key content from <2>jira_publickey.pem</2></6><7>Complete the OAuth 1.0a authorization flow using your consumer key and private key to obtain the access token</7></0><1>Note: This uses OAuth 1.0a with RSA-SHA1 signing. Primarily for Jira Server/Data Center. For Jira Cloud, consider using API tokens or OAuth 2.0 for new integrations.</1>",
+        "title": "How to create Jira credentials:"
+      }
+    },
+    "plane": {
+      "instructions": {
+        "content": "<0><0>Log into your Plane account or self-hosted instance</0><1>Go to Profile Settings</1><2>Select \"Personal Access Tokens\" from the list of tabs</2><3>Click \"Add personal access token\"</3><4>Enter a token name and optional description</4><5>Click \"Generate\" or \"Create\"</5><6>Copy the generated token immediately and store it securely</6></0><1>Note: The token will only be shown once. The token is passed as the value of the <2>X-API-Key</2> header in API requests.</1><2>Workspace: You need to specify your workspace slug, which can be found in your Plane URL. For example, if your Plane URL is <2>https://app.plane.so/my-company</2>, then your workspace slug is <5>my-company</5>. This is required to access projects and issues in your workspace.</2>",
+        "title": "How to create Plane credentials:"
+      }
+    },
+    "projectMappings": {
+      "title": "{{platform}} Project Mappings"
+    },
+    "success": {
+      "mappingRemoved": "Project mapping removed successfully",
+      "mappingSaved": "Project mapping saved successfully",
+      "tagsRefreshed": "Tags refresh triggered successfully"
+    },
+    "testConnection": {
+      "editModeNote": "Note: Enter your credentials above to test the connection. Leave empty to keep existing credentials when saving.",
+      "success": "Connection successful",
+      "test": "Test Connection",
+      "testing": "Testing connection..."
+    },
+    "titles": {
+      "edit": "Edit Integration"
+    },
+    "wizard": {
+      "config": {
+        "description": "Enter your connection details to connect to {{platform}}.",
+        "title": "Configure {{platform}}"
+      },
+      "configTodo": "Configuration form (TODO)",
+      "projects": {
+        "addMapping": "Add mapping",
+        "changeMapping": "Change mapping",
+        "confirmRemoveMessage": "Are you sure you want to remove this project mapping? Issues will stop syncing, but existing tags will remain.",
+        "confirmRemoveTitle": "Remove Project Mapping",
+        "createMapping": "Create Project Mapping",
+        "editMapping": "Edit Project Mapping",
+        "externalProject": "External Project",
+        "filterPlaceholder": "Filter projects...",
+        "lasiusProject": "Lasius Project",
+        "loadError": "Failed to load projects. Please try again.",
+        "loading": "Loading projects from {{platform}}...",
+        "mappingCount_one": "Found {{count}} projects from {{platform}}. Map them to your Lasius projects to import issues. {{mapped}} of {{total}} mapped.",
+        "mappingCount_other": "Found {{count}} projects from {{platform}}. Map them to your Lasius projects to import issues. {{mapped}} of {{total}} mapped.",
+        "mappingDescription": "Link this external project to a Lasius project to automatically sync issues as time tracking tags.",
+        "mappingDescription_one": "Found {{count}} projects from {{platform}}. Map them to your Lasius projects to import issues. {{mapped}} of {{total}} mapped.",
+        "mappingDescription_other": "Found {{count}} projects from {{platform}}. Map them to your Lasius projects to import issues. {{mapped}} of {{total}} mapped.",
+        "noProjects": "No projects found in {{platform}}",
+        "notMapped": "Not mapped",
+        "orphanedProject": "Project no longer available",
+        "removeMapping": "Remove mapping",
+        "selectMappingDescription": "Choose which Lasius project should be linked to this external project.",
+        "tagConfigPlaceholder": "Tag configuration options will be available after saving.",
+        "title": "Map External Projects"
+      },
+      "selectPlatform": {
+        "githubDescription": "Import issues and pull requests from GitHub repositories",
+        "gitlabDescription": "Import issues and merge requests from GitLab projects",
+        "jiraDescription": "Import issues and epics from your Jira instance",
+        "planeDescription": "Import issues from your Plane workspace",
+        "subtitle": "Choose the platform you want to import issues from",
+        "title": "Select a platform"
+      },
+      "steps": {
+        "config": "Configure",
+        "platform": "Platform",
+        "projects": "Projects",
+        "test": "Test"
+      },
+      "test": {
+        "createFailed": "Connection succeeded but failed to save configuration.",
+        "error": "Connection failed",
+        "failed": "Connection test failed. Please check your credentials and URL.",
+        "retry": "Retry Connection Test",
+        "saving": "Saving configuration...",
+        "success": "Connection successful!",
+        "successDescription": "Proceeding to next step...",
+        "testing": "Testing connection..."
+      },
+      "title": "Add Integration"
+    }
+  },
+  "projects": {
+    "label": "Project"
+  }
+}

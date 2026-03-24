@@ -1,15 +1,13 @@
 {
   "workHealth": {
-    "actualHours": "tatsächlich",
-    "avgPerDay": "Ø/Tag",
-    "consecutiveDays": "aufeinanderfolgende Tage",
-    "elevatedLoad": "Erhöhte Belastung",
-    "healthyLoad": "Sieht gut aus!",
-    "highLoad": "Hohe Belastung erkannt",
-    "plannedHours": "geplant",
-    "relaxReminder": "Zeit, dich etwas zu entspannen",
-    "sixMonths": "6 Monate",
-    "takeItEasy": "Überlege, es ruhiger angehen zu lassen",
-    "thisWeek": "diese Woche"
+    "avgPerDay": "avg/day",
+    "consecutiveDays": "consecutive days",
+    "elevatedLoad": "Load is elevated",
+    "healthyLoad": "Looking good!",
+    "highLoad": "Heavy load detected",
+    "relaxReminder": "Time to relax a little bit",
+    "sixMonths": "6 Months",
+    "takeItEasy": "Consider taking it easy",
+    "thisWeek": "this week"
   }
 }

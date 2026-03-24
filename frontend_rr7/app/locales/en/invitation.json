@@ -1,20 +1,14 @@
 {
-  "actions": {
-    "accept": "Accept invitation",
-    "reject": "Reject invitation"
-  },
-  "copyToClipboard": "Copy to clipboard",
-  "createAccountMessage": "You've been invited to create a Lasius account to track your working hours.",
-  "description": {
-    "copyLink": "Copy the link and send it to your colleague. If they do not have an account yet, one will be created when the invitation is accepted."
-  },
-  "email": "Email",
   "errors": {
     "createdForSomeoneElse": "This invitation has been created for someone else. Either log out and refresh, or forward the invitation link to the user {{email}}",
     "noLongerValid": "This invitation is no longer valid. It is best to contact the person who sent you the invitation link to get a new one."
   },
-  "inviteOrganisationDescription": "Enter the email address of the person you want to invite. An invitation link will be generated that you can send to them.",
-  "inviteProjectDescription": "Enter the email address of the person you want to invite. An invitation link will be generated that you can send to them.",
+  "invitations": {
+    "actions": {
+      "accept": "Accept invitation",
+      "reject": "Reject invitation"
+    }
+  },
   "messages": {
     "invitedToOrganisation": "You have been invited by {{inviter}} to join organisation {{organisation}}.",
     "invitedToOrganisationNeedsAccount": "You have been invited by {{inviter}} to join organisation {{organisation}}.",
@@ -27,9 +21,5 @@
     "emailMatch": "Make sure to sign in with the email address this invitation was sent to: {{email}}",
     "signInOrSignUpWith": "Sign in or sign up with",
     "title": "Account Required"
-  },
-  "title": {
-    "invitationCreated": "Invitation created",
-    "userAssigned": "User assigned"
   }
 }

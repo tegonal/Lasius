@@ -1,35 +1,25 @@
 {
-  "actions": {
-    "accept": "Einladung annehmen",
-    "reject": "Einladung ablehnen"
-  },
-  "copyToClipboard": "In Zwischenablage kopieren",
-  "createAccountMessage": "Du wurdest eingeladen, ein Konto zu erstellen, damit du Lasius zur Erfassung deiner Arbeitszeit nutzen kannst.",
-  "description": {
-    "copyLink": "Kopiere den Link und sende ihn an deine Kollegen. Falls sie noch kein Konto haben, wird eines erstellt, wenn die Einladung angenommen wird."
-  },
-  "email": "E-Mail",
   "errors": {
-    "createdForSomeoneElse": "Diese Einladung wurde für jemand anderen erstellt. Melde dich entweder ab und lade die Seite neu, oder leite den Einladungslink an den Benutzer {{email}} weiter",
-    "noLongerValid": "Diese Einladung ist nicht mehr gültig. Kontaktiere am besten die Person, die dir den Einladungslink gesendet hat, um einen neuen zu erhalten."
+    "createdForSomeoneElse": "This invitation has been created for someone else. Either log out and refresh, or forward the invitation link to the user {{email}}",
+    "noLongerValid": "This invitation is no longer valid. It is best to contact the person who sent you the invitation link to get a new one."
   },
-  "inviteOrganisationDescription": "Gib die E-Mail-Adresse der Person ein, die du einladen möchtest. Ein Einladungslink wird generiert, den du ihr senden kannst.",
-  "inviteProjectDescription": "Gib die E-Mail-Adresse der Person ein, die du einladen möchtest. Ein Einladungslink wird generiert, den du ihr senden kannst.",
+  "invitations": {
+    "actions": {
+      "accept": "Accept invitation",
+      "reject": "Reject invitation"
+    }
+  },
   "messages": {
-    "invitedToOrganisation": "Du wurdest von {{inviter}} eingeladen, der Organisation {{organisation}} beizutreten.",
-    "invitedToOrganisationNeedsAccount": "Sie wurden von {{inviter}} eingeladen, der Organisation {{organisation}} beizutreten.",
-    "invitedToProject": "Du wurdest von {{inviter}} eingeladen, dem Projekt {{project}} beizutreten.",
-    "invitedToProjectNeedsAccount": "Sie wurden von {{inviter}} eingeladen, dem Projekt {{project}} beizutreten.",
-    "selectOrganisation": "Wähle die Organisation aus, zu der du dieses Projekt hinzufügen möchtest:"
+    "invitedToOrganisation": "You have been invited by {{inviter}} to join organisation {{organisation}}.",
+    "invitedToOrganisationNeedsAccount": "You have been invited by {{inviter}} to join organisation {{organisation}}.",
+    "invitedToProject": "You have been invited by {{inviter}} to join project {{project}}.",
+    "invitedToProjectNeedsAccount": "You have been invited by {{inviter}} to join project {{project}}.",
+    "selectOrganisation": "Select the organisation you would like to add this project to:"
   },
   "needsAccount": {
-    "description": "Du musst dich mit {{email}} anmelden oder ein Konto erstellen, um diese Einladung anzunehmen.",
-    "emailMatch": "Stelle sicher, dass du dich mit der E-Mail-Adresse anmeldest, an die diese Einladung gesendet wurde: {{email}}",
+    "description": "You'll need to sign in or create an account for {{email}} to accept this invitation.",
+    "emailMatch": "Make sure to sign in with the email address this invitation was sent to: {{email}}",
     "signInOrSignUpWith": "Sign in or sign up with",
-    "title": "Konto erforderlich"
-  },
-  "title": {
-    "invitationCreated": "Einladung erstellt",
-    "userAssigned": "Benutzer zugewiesen"
+    "title": "Account Required"
   }
 }

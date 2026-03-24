@@ -1,35 +1,4 @@
 {
-  "actions": {
-    "add": "Añadir etiquetas",
-    "addDefaultTagGroups": "Añadir grupos de etiquetas predeterminados",
-    "addTag": "Añadir una etiqueta",
-    "addTagGroup": "Añadir un nuevo grupo de etiquetas",
-    "collapseAll": "Contraer todo",
-    "copyTags": "Copiar etiquetas",
-    "createTagGroup": "Crear grupo de etiquetas",
-    "edit": "Editar etiquetas",
-    "editForProject": "Editar etiquetas para {{projectKey}}",
-    "expandAll": "Expandir todo",
-    "pasteTags": "Pegar etiquetas"
-  },
-  "chooseOrEnter": "Elige o introduce etiquetas",
-  "confirmDeleteGroup": "¿Estás seguro de que quieres eliminar el grupo de etiquetas \"{{groupName}}\"?",
-  "customTag": "Etiqueta personalizada",
-  "enterTagName": "Introduce nombre de etiqueta",
-  "label": "Etiquetas",
-  "noTagGroups": "Aún no se han definido grupos de etiquetas",
-  "simpleTags": "Etiquetas simples",
-  "simpleTagsDescription": "Etiquetas que no forman parte de ningún grupo",
-  "status": {
-    "tagsCopied": "Etiquetas copiadas",
-    "tagsPasted": "Etiquetas pegadas"
-  },
-  "tagGroups": "Grupos de etiquetas",
-  "title": "Etiquetas",
-  "validation": {
-    "tagExists": "La etiqueta ya existe",
-    "tagGroupExists": "El grupo de etiquetas ya existe",
-    "tagGroupNameRequired": "Se requiere el nombre del grupo de etiquetas",
-    "tagNameRequired": "Se requiere el nombre de la etiqueta"
-  }
+  "label": "Tags",
+  "title": "Tags"
 }

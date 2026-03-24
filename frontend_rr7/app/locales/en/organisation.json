@@ -1,10 +1,14 @@
 {
   "actions": {
+    "actions": "Actions",
+    "cancel": "Cancel",
+    "close": "Close",
     "create": "Create organisation",
-    "edit": "Edit organisation"
+    "edit": "Edit organisation",
+    "save": "Save"
   },
   "adminDescription": "You are an administrator of this organisation. You can add and remove members and change the organisation name, or create a new one.",
-  "createDescription": "Use the Actions menu to create a new organisation.",
+  "createDescription": "Add a new organisation using the Actions button at the top of the list.",
   "currentOrganisation": "Current organisation",
   "description": {
     "create": "Create a new organisation to collaborate with your team.",
@@ -12,6 +16,11 @@
   },
   "errors": {
     "duplicateKey": "An organisation with this name already exists"
+  },
+  "forms": {
+    "email": "Email",
+    "firstName": "First name",
+    "lastName": "Last name"
   },
   "info": {
     "uniqueNameRequired": "Organisation names must be unique."
@@ -28,18 +37,17 @@
       "removeTitle": "Remove member",
       "removeWarning": "This member will be removed from the organisation and lose access to all projects."
     },
-    "confirmRemove": "Are you sure you want to remove this member from the project?",
-    "description_one": "This project has {{count}} member(s).",
-    "description_other": "This project has {{count}} member(s).",
-    "empty": "No members found",
     "emptyState": "No members found",
     "title": "Members"
   },
   "myPersonalOrganisation": "My personal organisation",
   "organisationName": "Organisation",
-  "organisationRole": "Organisation role",
-  "organization": "Organisation",
   "organizationName": "Organisation name",
-  "privateDescription": "This organisation is only visible to you. Use it to track private projects. To collaborate with others, create or use a different organisation.",
-  "selectOrganisation": "Select organisation"
+  "privateDescription": "This organisation is only visible to you. You can use it to track private projects that you do not want others to have access to. If you want to invite people, invite them to an existing organisation or create a new one.",
+  "selected": "Selected",
+  "selectOrganisation": "Select organisation",
+  "status": {
+    "label": "Status"
+  },
+  "you": "You"
 }

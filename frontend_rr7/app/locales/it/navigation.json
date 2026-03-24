@@ -1,25 +1,27 @@
 {
   "organisation": {
+    "current": "Organisation",
     "integrations": "Integrations",
     "lists": "Lists",
-    "overview": "Organisation",
     "projects": "Projects",
-    "stats": "Statistics",
-    "title": "Current organisation"
+    "stats": "Statistics"
   },
   "settings": {
     "account": "Account",
     "accountSecurity": "Account Security",
     "app": "App Settings",
-    "title": "Change user profile settings",
     "workingHours": "Working hours"
+  },
+  "tabs": {
+    "organisation": "Current organisation",
+    "settings": "Settings",
+    "user": "Your time booking view"
   },
   "user": {
     "bookings": "Bookings",
     "dashboard": "Dashboard",
     "lists": "Lists",
     "projects": "My projects",
-    "stats": "Statistics",
-    "title": "Your time booking view"
+    "stats": "Statistics"
   }
 }

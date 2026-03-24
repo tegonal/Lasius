@@ -1,6 +1,6 @@
 {
   "actions": {
-    "close": "Kontextmenü schließen",
-    "open": "Kontextmenü öffnen"
+    "close": "Close context menu",
+    "open": "Open context menu"
   }
 }

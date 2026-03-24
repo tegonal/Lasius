@@ -1,46 +1,53 @@
 {
   "actions": {
-    "create": "Crea organizzazione",
-    "edit": "Modifica organizzazione"
+    "actions": "Actions",
+    "cancel": "Cancel",
+    "close": "Close",
+    "create": "Create organisation",
+    "edit": "Edit organisation",
+    "save": "Save"
   },
-  "adminDescription": "Sei un amministratore di questa organizzazione. Puoi aggiungere e rimuovere membri e modificare il nome dell'organizzazione, o crearne una nuova.",
-  "createDescription": "Usa il menu Azioni per creare una nuova organizzazione.",
-  "currentOrganisation": "Organizzazione corrente",
+  "adminDescription": "You are an administrator of this organisation. You can add and remove members and change the organisation name, or create a new one.",
+  "createDescription": "Add a new organisation using the Actions button at the top of the list.",
+  "currentOrganisation": "Current organisation",
   "description": {
-    "create": "Crea una nuova organizzazione per collaborare con il tuo team.",
-    "edit": "Aggiorna il nome dell'organizzazione."
+    "create": "Create a new organisation to collaborate with your team.",
+    "edit": "Update the organisation name."
   },
   "errors": {
-    "duplicateKey": "Un'organizzazione con questo nome esiste già"
+    "duplicateKey": "An organisation with this name already exists"
+  },
+  "forms": {
+    "email": "Email",
+    "firstName": "First name",
+    "lastName": "Last name"
   },
   "info": {
-    "uniqueNameRequired": "I nomi delle organizzazioni devono essere univoci."
+    "uniqueNameRequired": "Organisation names must be unique."
   },
-  "memberDescription": "Sei un membro di questa organizzazione e non hai i diritti per aggiungere o rimuovere membri. Contatta un amministratore dell'organizzazione se desideri invitare qualcuno.",
+  "memberDescription": "You are a member of this organisation and don't have the rights to add or remove members. Get in touch with an organisation administrator if you would like to invite someone.",
   "members": {
     "actions": {
-      "invite": "Invita qualcuno",
-      "manage": "Gestisci membri",
-      "remove": "Rimuovi membro"
+      "invite": "Invite someone",
+      "manage": "Manage members",
+      "remove": "Remove member"
     },
     "confirmations": {
-      "removeConfirm": "Sei sicuro di voler rimuovere {{name}}?",
-      "removeTitle": "Rimuovi membro",
-      "removeWarning": "Questo membro sarà rimosso dall'organizzazione e perderà l'accesso a tutti i progetti."
+      "removeConfirm": "Are you sure you want to remove {{name}}?",
+      "removeTitle": "Remove member",
+      "removeWarning": "This member will be removed from the organisation and lose access to all projects."
     },
-    "confirmRemove": "Are you sure you want to remove this member from the project?",
-    "description_one": "Questo progetto ha {{count}} membro.",
-    "description_many": "Questo progetto ha {{count}} membri.",
-    "description_other": "Questo progetto ha {{count}} membri.",
-    "empty": "Nessun membro trovato",
     "emptyState": "No members found",
     "title": "Members"
   },
-  "myPersonalOrganisation": "La mia organizzazione personale",
-  "organisationName": "Organizzazione",
-  "organisationRole": "Ruolo nell'organizzazione",
-  "organization": "Organizzazione",
-  "organizationName": "Nome organizzazione",
-  "privateDescription": "Questa organizzazione è visibile solo a te. Usala per monitorare progetti privati. Per collaborare con altri, crea o usa un'organizzazione diversa.",
-  "selectOrganisation": "Seleziona organizzazione"
+  "myPersonalOrganisation": "My personal organisation",
+  "organisationName": "Organisation",
+  "organizationName": "Organisation name",
+  "privateDescription": "This organisation is only visible to you. You can use it to track private projects that you do not want others to have access to. If you want to invite people, invite them to an existing organisation or create a new one.",
+  "selected": "Selected",
+  "selectOrganisation": "Select organisation",
+  "status": {
+    "label": "Status"
+  },
+  "you": "You"
 }

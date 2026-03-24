@@ -15,9 +15,17 @@
     "filterByUser": "Filter by user {{userKey}}",
     "insert": "Insert booking",
     "start": "Start booking",
-    "startFromFavorite": "Start booking from favorite",
-    "startFromTeamMember": "Start booking from team member",
     "stopRecording": "Stop recording current time booking"
+  },
+  "bookings": {
+    "actions": {
+      "start": "Start booking",
+      "startFromFavorite": "Start booking from favorite",
+      "startFromTeamMember": "Start booking from team member"
+    }
+  },
+  "common": {
+    "or": "or"
   },
   "duration": "Duration",
   "emptyToday": "No bookings for this day",
@@ -30,15 +38,15 @@
     "empty": "No bookings found for the selected filters"
   },
   "noBookingsToday": "No bookings for this day",
-  "overlapsWarning": "These bookings overlap. Click to edit and adjust the time.",
+  "overlapsWarning": "These two bookings overlap. Tap to see adjustment options.",
   "presets": {
     "browse": "Browse presets",
-    "empty": "No presets available",
+    "empty": "No bookings found",
     "favorites": "Favorites",
     "recent": "Recent bookings",
     "selectFavorite": "Select favorite: {{projectName}}{{tags}}",
     "selectRecent": "Select recent booking: {{projectName}}{{tags}}",
-    "selectTeam": "Select team booking by {{userName}}: {{projectName}}{{tags}}",
+    "selectTeam": "Select team booking: {{projectName}}{{tags}}",
     "team": "Team bookings",
     "title": "Choose a preset"
   },

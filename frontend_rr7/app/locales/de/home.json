@@ -1,9 +1,9 @@
 {
   "favorites": {
     "actions": {
-      "add": "Als Favorit hinzufügen",
-      "delete": "Favorit löschen"
+      "add": "Add as favorite",
+      "delete": "Delete favorite"
     },
-    "empty": "Noch keine Favoriten"
+    "empty": "No favorites yet"
   }
 }

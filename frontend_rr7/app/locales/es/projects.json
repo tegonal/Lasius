@@ -1,54 +1,32 @@
 {
   "actions": {
-    "add": "Añadir proyecto",
-    "create": "Crear un proyecto",
-    "deactivate": "Desactivar proyecto",
+    "add": "Add Project",
+    "cancel": "Cancel",
+    "deactivate": "Deactivate project",
     "deactivateConfirm": "Are you sure you want to deactivate the project \"{{project}}\"?",
-    "edit": "Editar proyecto",
-    "leave": "Abandonar este proyecto"
+    "edit": "Edit project",
+    "leave": "Leave this project"
   },
-  "allProjects": "Todos los proyectos",
-  "allProjectsDescription": "Todos los proyectos de la organización actual que puedes administrar. Crea informes de facturación incluyendo el tiempo registrado por miembros externos del proyecto.",
   "confirmations": {
-    "leave": "¿Estás seguro de que quieres abandonar este proyecto?"
+    "leave": "Are you sure you want to leave this project?"
   },
-  "deactivatedBy": "Archivado por {{user}}",
+  "deactivatedBy": "Archived by {{user}}",
   "description": {
-    "add": "Crea un nuevo proyecto para organizar tu seguimiento de tiempo.",
-    "edit": "Actualiza los detalles del proyecto."
-  },
-  "empty": "No se encontraron proyectos",
-  "errors": {
-    "projectNotFound": "No se pudo encontrar este proyecto. El ID del proyecto se muestra arriba."
-  },
-  "filter": {
-    "both": "Ambos",
-    "search": "Buscar",
-    "searchPlaceholder": "Filtrar proyectos...",
-    "status": "Estado"
+    "add": "Create a new project to organize your time tracking.",
+    "edit": "Update the project details."
   },
   "info": {
-    "uniqueNameRequired": "Los nombres de los proyectos deben ser únicos dentro de tu organización."
+    "uniqueNameRequired": "Project names must be unique within your organisation."
   },
-  "label": "Proyecto",
-  "lastActivity": "Última actividad",
-  "myProjects": "Mis proyectos",
-  "myProjectsDescription": "Proyectos en los que eres miembro y puedes registrar tiempo, filtrados por la organización actual.",
-  "project": "Proyecto",
-  "projectName": "Nombre del proyecto",
-  "projectRole": "Rol",
-  "selectProject": "Seleccionar proyecto",
+  "label": "Project",
+  "project": "Project",
+  "projectName": "Project name",
   "status": {
-    "assignedToUser": "Proyecto asignado correctamente al usuario.",
-    "created": "Proyecto creado",
-    "updated": "Proyecto actualizado"
+    "created": "Project created",
+    "updated": "Project updated"
   },
-  "title": "Proyectos",
-  "total": "Total",
+  "title": "Projects",
   "warnings": {
-    "inactiveProjectContext": "Viendo estadísticas de proyecto inactivo",
-    "inactiveProjectFilter": "Mostrando datos de proyecto inactivo",
-    "projectNotInActiveList": "Este proyecto no está en tu lista de proyectos activos. Puede estar inactivo o ser de otra organización.",
-    "projectUnavailable": "Este proyecto ya no está en tu perfil. Es posible que hayas sido eliminado del mismo."
+    "inactiveProjectFilter": "Showing data for inactive project"
   }
 }

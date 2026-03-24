@@ -1,8 +1,11 @@
 {
   "navigation": {
-    "nextMonth": "Nächster Monat",
-    "nextWeek": "Nächste Woche",
-    "previousMonth": "Vorheriger Monat",
-    "previousWeek": "Letzte Woche"
+    "nextMonth": "Next month",
+    "nextWeek": "Next week",
+    "previousMonth": "Previous month",
+    "previousWeek": "Previous week"
+  },
+  "time": {
+    "today": "Today"
   }
 }

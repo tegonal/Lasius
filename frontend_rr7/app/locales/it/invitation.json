@@ -1,35 +1,25 @@
 {
-  "actions": {
-    "accept": "Accetta invito",
-    "reject": "Rifiuta invito"
-  },
-  "copyToClipboard": "Copia negli appunti",
-  "createAccountMessage": "Sei stato invitato a creare un account Lasius per monitorare le tue ore di lavoro.",
-  "description": {
-    "copyLink": "Copia il link e invialo al tuo collega. Se non ha ancora un account, ne verrà creato uno quando l'invito sarà accettato."
-  },
-  "email": "Email",
   "errors": {
-    "createdForSomeoneElse": "Questo invito è stato creato per qualcun altro. Disconnettiti e aggiorna, oppure inoltra il link dell'invito all'utente {{email}}",
-    "noLongerValid": "Questo invito non è più valido. È meglio contattare la persona che ti ha inviato il link dell'invito per ottenerne uno nuovo."
+    "createdForSomeoneElse": "This invitation has been created for someone else. Either log out and refresh, or forward the invitation link to the user {{email}}",
+    "noLongerValid": "This invitation is no longer valid. It is best to contact the person who sent you the invitation link to get a new one."
   },
-  "inviteOrganisationDescription": "Inserisci l'indirizzo email della persona che desideri invitare. Verrà generato un link di invito che potrai inviarle.",
-  "inviteProjectDescription": "Inserisci l'indirizzo email della persona che desideri invitare. Verrà generato un link di invito che potrai inviarle.",
+  "invitations": {
+    "actions": {
+      "accept": "Accept invitation",
+      "reject": "Reject invitation"
+    }
+  },
   "messages": {
-    "invitedToOrganisation": "Sei stato invitato da {{inviter}} a unirti all'organizzazione {{organisation}}.",
-    "invitedToOrganisationNeedsAccount": "È stato/a invitato/a da {{inviter}} a unirsi all'organizzazione {{organisation}}.",
-    "invitedToProject": "Sei stato invitato da {{inviter}} a unirti al progetto {{project}}.",
-    "invitedToProjectNeedsAccount": "È stato/a invitato/a da {{inviter}} a unirsi al progetto {{project}}.",
-    "selectOrganisation": "Seleziona l'organizzazione a cui vuoi aggiungere questo progetto:"
+    "invitedToOrganisation": "You have been invited by {{inviter}} to join organisation {{organisation}}.",
+    "invitedToOrganisationNeedsAccount": "You have been invited by {{inviter}} to join organisation {{organisation}}.",
+    "invitedToProject": "You have been invited by {{inviter}} to join project {{project}}.",
+    "invitedToProjectNeedsAccount": "You have been invited by {{inviter}} to join project {{project}}.",
+    "selectOrganisation": "Select the organisation you would like to add this project to:"
   },
   "needsAccount": {
-    "description": "Dovrai accedere o creare un account per {{email}} per accettare questo invito.",
-    "emailMatch": "Assicurati di accedere con l'indirizzo email a cui è stato inviato questo invito: {{email}}",
+    "description": "You'll need to sign in or create an account for {{email}} to accept this invitation.",
+    "emailMatch": "Make sure to sign in with the email address this invitation was sent to: {{email}}",
     "signInOrSignUpWith": "Sign in or sign up with",
-    "title": "Account richiesto"
-  },
-  "title": {
-    "invitationCreated": "Invito creato",
-    "userAssigned": "Utente assegnato"
+    "title": "Account Required"
   }
 }

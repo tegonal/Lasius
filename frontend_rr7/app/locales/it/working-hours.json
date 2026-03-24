@@ -1,12 +1,1 @@
-{
-  "dailyTotal": "Totale giornaliero",
-  "description": "La quantità di tempo che prevedi di registrare al giorno, per organizzazione, durante una tipica settimana lavorativa. Questi dati vengono utilizzati per calcolare il tuo progresso giornaliero e settimanale.",
-  "errors": {
-    "updateFailed": "Aggiornamento delle ore di lavoro non riuscito"
-  },
-  "status": {
-    "updated": "Ore di lavoro aggiornate"
-  },
-  "title": "Ore di lavoro",
-  "totalPerWeek": "totale a settimana"
-}
+{}
