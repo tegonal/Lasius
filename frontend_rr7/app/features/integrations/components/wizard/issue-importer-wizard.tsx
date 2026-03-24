@@ -25,6 +25,7 @@ import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { Modal } from '~/components/ui/overlays/modal/modal'
 import { SelectPlatformStep } from '~/features/integrations/components/wizard/steps/select-platform-step'
+import { TestConnectionStep } from '~/features/integrations/components/wizard/steps/test-connection-step'
 import {
   useWizardState,
   type WizardStep,
@@ -47,11 +48,16 @@ const STEPS: Array<{ id: WizardStep; label: string }> = [
 export const IssueImporterWizard = ({
   onClose,
   open,
-  selectedOrgId: _selectedOrgId,
+  selectedOrgId,
 }: Props) => {
   const { t } = useTranslation('integrations')
-  const { resetWizard, setCurrentStep, state, updateFormData } =
-    useWizardState()
+  const {
+    resetWizard,
+    setCreatedConfig,
+    setCurrentStep,
+    state,
+    updateFormData,
+  } = useWizardState()
 
   const translatedSteps = useMemo(
     () => [
@@ -115,6 +121,17 @@ export const IssueImporterWizard = ({
     },
     [updateFormData, setCurrentStep],
   )
+
+  const handleConfigCreated = useCallback(
+    (config: Parameters<typeof setCreatedConfig>[0]) => {
+      setCreatedConfig(config)
+    },
+    [setCreatedConfig],
+  )
+
+  const handleTestNext = useCallback(() => {
+    setCurrentStep('projects')
+  }, [setCurrentStep])
 
   const handlePrevious = useCallback(() => {
     if (state.currentStep === 'config') {
@@ -187,13 +204,13 @@ export const IssueImporterWizard = ({
           )}
 
           {state.currentStep === 'test' && state.formData.importerType && (
-            <div className="flex h-full items-center justify-center">
-              <p className="text-base-content/60">
-                {t('issueImporters.wizard.testTodo', {
-                  defaultValue: 'Test connection (TODO)',
-                })}
-              </p>
-            </div>
+            <TestConnectionStep
+              formData={state.formData}
+              onBack={handlePrevious}
+              onConfigCreated={handleConfigCreated}
+              onNext={handleTestNext}
+              selectedOrgId={selectedOrgId}
+            />
           )}
 
           {state.currentStep === 'projects' && state.formData.importerType && (
