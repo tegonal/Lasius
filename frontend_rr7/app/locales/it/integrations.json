@@ -171,7 +171,6 @@
         "description": "Inserisci i tuoi dati di connessione per connetterti a {{platform}}.",
         "title": "Configura {{platform}}"
       },
-      "configTodo": "Modulo di configurazione (TODO)",
       "projects": {
         "addMapping": "Aggiungi mappatura",
         "changeMapping": "Modifica mappatura",

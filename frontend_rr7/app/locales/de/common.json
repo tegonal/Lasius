@@ -1,27 +1,19 @@
 {
   "account": {
     "accountSecurity": "Account Security",
-    "profileChangesNotAllowedInDemo": "Profile changes are not allowed in demo mode",
-    "profileSettings": {
-      "description": "Manage your personal information and account details.",
-      "title": "Profile Information"
-    },
     "security": {
       "description": "Update your password to keep your account secure. Make sure to use a strong password with at least 8 characters, including uppercase letters and numbers."
     },
     "settings": {
       "description": "Manage your personal information and account details. Your email address can only be changed if you are using the internal authentication provider.",
       "title": "Account Settings"
-    },
-    "status": {
-      "passwordUpdated": "Password updated",
-      "settingsUpdated": "Account settings updated"
     }
   },
   "actions": {
     "add": "Add",
     "back": "Back",
     "cancel": "Cancel",
+    "clear": "Clear",
     "close": "Schließen",
     "help": "Help",
     "reset": "Reset",
@@ -99,10 +91,6 @@
     "signInToLasius": "Sign in to Lasius"
   },
   "back": "Back",
-  "bookings": {
-    "showLists": "Show bookings",
-    "title": "Bookings"
-  },
   "calendar": {
     "navigation": {
       "nextMonth": "Next month",
@@ -112,20 +100,10 @@
   "cancel": "Cancel",
   "common": {
     "actions": {
-      "add": "Add",
       "back": "Back",
-      "cancel": "Cancel",
-      "clear": "Clear",
-      "close": "Close",
-      "delete": "Delete",
-      "discardChanges": "Discard changes",
-      "keepEditing": "Keep editing",
       "reset": "Reset",
-      "save": "Save",
-      "saveChanges": "Save changes",
       "signUp": "Sign up"
     },
-    "confirmUnsavedChanges": "You have unsaved changes. Are you sure you want to cancel?",
     "custom": "Custom",
     "filter": {
       "title": "Filter"
@@ -134,47 +112,28 @@
       "durationFormat": "HH:MM"
     },
     "forms": {
-      "confirmNewPassword": "Confirm new password",
       "confirmPassword": "Confirm password",
       "email": "Email",
       "firstName": "First name",
       "lastName": "Last name",
-      "name": "Name",
-      "newPassword": "New password",
-      "password": "Password",
-      "role": "Role"
+      "password": "Password"
     },
     "help": {
       "contactAdmin": "Please contact your administrator"
-    },
-    "status": {
-      "active": "Active",
-      "inactive": "Inactive",
-      "label": "Status"
-    },
-    "themes": {
-      "dark": "Dark",
-      "light": "Light",
-      "system": "System"
     },
     "time": {
       "from": "From",
       "timeRange": "Time range",
       "to": "To"
     },
-    "units": {
-      "hours": "Hours"
-    },
     "validation": {
-      "email": "Please enter a valid email address",
       "emailInvalid": "Invalid email address",
       "missingNumber": "Must contain a number",
       "missingUppercase": "Must contain an uppercase letter",
       "passwordMismatch": "Passwords do not match",
       "passwordTooShort": "Password must be at least 9 characters",
       "required": "Required"
-    },
-    "you": "You"
+    }
   },
   "custom": "Custom",
   "date": "Date",
@@ -229,22 +188,17 @@
     "durationFormat": "HH:MM",
     "timeFormat": "HH:MM"
   },
+  "forms": {
+    "email": "Email",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "name": "Name"
+  },
   "info": {
     "helpFallbackLanguage": "This help content is not available in your selected language yet. Showing English version."
   },
   "invitations": {
-    "copyToClipboard": "Copy to clipboard",
-    "createAccountMessage": "You have been invited to create an account so that you can use Lasius to track your working hours.",
-    "description": {
-      "copyLink": "Copy the link and send it to your colleague. If they do not have an account yet, one will be created when the invitation is accepted."
-    },
-    "email": "Email",
-    "inviteOrganisationDescription": "Enter the email address of the person you want to invite. An invitation link will be generated that you can send to them.",
-    "inviteProjectDescription": "Enter the email address of the person you want to invite. An invitation link will be generated that you can send to them.",
-    "title": {
-      "invitationCreated": "Invitation created",
-      "userAssigned": "User assigned"
-    }
+    "createAccountMessage": "You have been invited to create an account so that you can use Lasius to track your working hours."
   },
   "issueImporters": {
     "typeLabels": {
@@ -267,62 +221,25 @@
       "workspaceRequired": "Workspace is required"
     }
   },
-  "members": {
-    "actions": {
-      "invite": "Invite someone",
-      "manage": "Manage members",
-      "remove": "Remove member"
-    },
-    "confirmRemove": "Are you sure you want to remove this member from the project?",
-    "description_one": "This project has {{count}} member(s).",
-    "description_other": "This project has {{count}} member(s).",
-    "empty": "No members found"
-  },
   "of": "von",
   "organisations": {
     "myPersonalOrganisation": "My personal organisation",
-    "organisationRole": "Organisation role",
     "organization": "Organisation"
   },
   "projects": {
     "actions": {
-      "create": "Create project",
       "deactivate": "Deactivate project",
       "edit": "Edit project"
     },
-    "allProjects": "All projects",
-    "allProjectsDescription": "All projects in the current organization that you can administer. Create billing reports including time booked by external project members.",
-    "empty": "No projects found",
     "errors": {
       "projectNotFound": "This project could not be found. The project ID is shown above."
     },
-    "filter": {
-      "both": "Both",
-      "search": "Search",
-      "searchPlaceholder": "Filter projects...",
-      "status": "Status"
-    },
-    "lastActivity": "Last activity",
-    "myProjects": "My projects",
-    "myProjectsDescription": "Projects where you are a member and can book time. Restricted by the currently selected organisation.",
-    "projectRole": "Project role",
     "selectProject": "Select project",
-    "status": {
-      "assignedToUser": "Project successfully assigned to user.",
-      "updated": "Project updated"
-    },
-    "title": "Projects",
-    "total": "Total",
     "warnings": {
       "inactiveProjectContext": "Viewing stats from inactive project",
       "projectNotInActiveList": "This project is not in your active projects list. It may be inactive or from another organization.",
       "projectUnavailable": "This project is no longer in your profile. You may have been removed from it."
     }
-  },
-  "pwa": {
-    "reloadApplication": "Reload application",
-    "updateAvailable": "Update available",
-    "updateMessage": "Lasius has been updated. The page will reload after your confirmation."
   },
   "roles": {
     "administrator": "Administrator",
@@ -337,60 +254,25 @@
   "settings": {
     "app": {
       "description": "Customize your experience with language and theme preferences. These settings are stored locally in your browser.",
-      "language": "Interface Language",
-      "save": "Save Settings",
-      "showOnboarding": "Show Onboarding Tutorial",
-      "theme": "Theme",
       "title": "Application Settings"
     }
   },
-  "statistics": {
-    "showStatistics": "Show statistics"
-  },
   "stats": {
-    "decimalHours": "Decimal hours",
-    "empty": "No data available for the selected period",
-    "hoursMinutes": "HH:MM"
+    "empty": "No data available for the selected period"
   },
-  "system": {
-    "backendUnreachable": "Backend seems to be unreachable",
-    "connectedToBackend": "Connected to backend",
-    "connectingToBackend": "Connecting to backend",
-    "offlineMessage": "Lasius is currently offline or undergoing maintenance. We will be back shortly."
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "label": "Status"
   },
   "tags": {
     "actions": {
-      "add": "Add tags",
-      "addDefaultTagGroups": "Add default tag groups",
       "addTag": "Add a tag",
-      "addTagGroup": "Add tag group",
-      "collapseAll": "Collapse all",
-      "copyTags": "Copy tags",
-      "createTagGroup": "Create tag group",
-      "edit": "Edit tags",
-      "editForProject": "Edit tags for {{projectKey}}",
-      "expandAll": "Expand all",
-      "pasteTags": "Paste tags"
+      "edit": "Edit tags"
     },
     "chooseOrEnter": "Choose or enter tags",
-    "confirmDeleteGroup": "Are you sure you want to delete the tag group \"{{groupName}}\"?",
     "customTag": "Custom tag",
-    "enterTagName": "Enter tag name",
-    "noTagGroups": "No tag groups defined yet",
-    "simpleTags": "Simple tags",
-    "simpleTagsDescription": "Tags that are not part of any group",
-    "status": {
-      "tagsCopied": "Tags copied",
-      "tagsPasted": "Tags pasted"
-    },
-    "tagGroups": "Tag groups",
-    "title": "Tags",
-    "validation": {
-      "tagExists": "Tag already exists",
-      "tagGroupExists": "Tag group already exists",
-      "tagGroupNameRequired": "Tag group name is required",
-      "tagNameRequired": "Tag name is required"
-    }
+    "enterTagName": "Enter tag name"
   },
   "time": {
     "customTime": "Custom time...",
@@ -437,6 +319,7 @@
   },
   "validation": {
     "confirmPasswordRequired": "Bitte bestätige dein Passwort",
+    "email": "Please enter a valid email address",
     "emailInvalid": "Ungültige E-Mail-Adresse",
     "emailRequired": "E-Mail ist erforderlich",
     "endBeforeStart": "End time is before start time",
@@ -453,13 +336,6 @@
     "startMustBeInPast": "Startzeit muss in der Vergangenheit liegen",
     "themeRequired": "Design ist erforderlich"
   },
-  "websocket": {
-    "status": {
-      "connected": "WebSocket connected",
-      "connecting": "WebSocket connecting",
-      "error": "Unable to connect to WebSocket"
-    }
-  },
   "workHealth": {
     "actualHours": "actual",
     "plannedHours": "planned"
@@ -475,5 +351,6 @@
     },
     "title": "Working hours",
     "totalPerWeek": "Total per week"
-  }
+  },
+  "you": "You"
 }

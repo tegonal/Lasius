@@ -2,11 +2,14 @@
   "actions": {
     "add": "Add Project",
     "cancel": "Cancel",
+    "create": "Create project",
     "deactivate": "Deactivate project",
     "deactivateConfirm": "Are you sure you want to deactivate the project \"{{project}}\"?",
     "edit": "Edit project",
     "leave": "Leave this project"
   },
+  "allProjects": "All projects",
+  "allProjectsDescription": "All projects in the current organization that you can administer. Create billing reports including time booked by external project members.",
   "confirmations": {
     "leave": "Are you sure you want to leave this project?"
   },
@@ -15,17 +18,30 @@
     "add": "Create a new project to organize your time tracking.",
     "edit": "Update the project details."
   },
+  "empty": "No projects found",
+  "filter": {
+    "both": "Both",
+    "search": "Search",
+    "searchPlaceholder": "Filter projects...",
+    "status": "Status"
+  },
   "info": {
     "uniqueNameRequired": "Project names must be unique within your organisation."
   },
   "label": "Project",
+  "lastActivity": "Last activity",
+  "myProjects": "My projects",
+  "myProjectsDescription": "Projects where you are a member and can book time. Restricted by the currently selected organisation.",
   "project": "Project",
   "projectName": "Project name",
+  "projectRole": "Project role",
   "status": {
+    "assignedToUser": "Project successfully assigned to user.",
     "created": "Project created",
     "updated": "Project updated"
   },
   "title": "Projects",
+  "total": "Total",
   "warnings": {
     "inactiveProjectFilter": "Showing data for inactive project"
   }

@@ -4,6 +4,7 @@
   "calendarYear": "Calendar year",
   "decimalHours": "Decimal hours",
   "expectedHours": "Expected hours",
+  "hoursMinutes": "HH:MM",
   "noProjectsFor6Months": "No projects for this period",
   "noProjectsForDay": "No projects for this day",
   "noProjectsForMonth": "No projects for this month",

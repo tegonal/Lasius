@@ -170,7 +170,6 @@
         "description": "Enter your connection details to connect to {{platform}}.",
         "title": "Configure {{platform}}"
       },
-      "configTodo": "Configuration form (TODO)",
       "projects": {
         "addMapping": "Add mapping",
         "changeMapping": "Change mapping",

@@ -171,7 +171,6 @@
         "description": "Introduce tus datos de conexión para conectarte a {{platform}}.",
         "title": "Configurar {{platform}}"
       },
-      "configTodo": "Formulario de configuración (TODO)",
       "projects": {
         "addMapping": "Añadir correspondencia",
         "changeMapping": "Cambiar correspondencia",

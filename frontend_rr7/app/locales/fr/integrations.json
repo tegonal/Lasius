@@ -171,7 +171,6 @@
         "description": "Saisis tes informations de connexion pour te connecter à {{platform}}.",
         "title": "Configurer {{platform}}"
       },
-      "configTodo": "Formulaire de configuration (TODO)",
       "projects": {
         "addMapping": "Ajouter une correspondance",
         "changeMapping": "Modifier la correspondance",

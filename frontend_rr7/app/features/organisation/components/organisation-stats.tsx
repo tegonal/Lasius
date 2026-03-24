@@ -55,7 +55,7 @@ export const OrganisationStats = ({
           <div className="stat-value text-2xl">{organisationName}</div>
         </div>
         <StatsTileNumber
-          label={t('members', 'Members')}
+          label={t('members.title', 'Members')}
           standalone={false}
           value={memberCount}
         />

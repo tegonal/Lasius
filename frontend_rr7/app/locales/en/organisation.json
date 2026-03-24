@@ -37,11 +37,17 @@
       "removeTitle": "Remove member",
       "removeWarning": "This member will be removed from the organisation and lose access to all projects."
     },
+    "confirmRemove": "Are you sure you want to remove this member from the project?",
+    "description_one": "This project has {{count}} member(s).",
+    "description_other": "This project has {{count}} member(s).",
+    "empty": "No members found",
     "emptyState": "No members found",
     "title": "Members"
   },
   "myPersonalOrganisation": "My personal organisation",
   "organisationName": "Organisation",
+  "organisationRole": "Organisation role",
+  "organization": "Organisation",
   "organizationName": "Organisation name",
   "privateDescription": "This organisation is only visible to you. You can use it to track private projects that you do not want others to have access to. If you want to invite people, invite them to an existing organisation or create a new one.",
   "selected": "Selected",

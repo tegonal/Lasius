@@ -170,7 +170,6 @@
         "description": "Gib deine Verbindungsdaten ein, um dich mit {{platform}} zu verbinden.",
         "title": "{{platform}} konfigurieren"
       },
-      "configTodo": "Konfigurationsformular (TODO)",
       "projects": {
         "addMapping": "Zuordnung hinzufügen",
         "changeMapping": "Zuordnung ändern",
