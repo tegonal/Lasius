@@ -17,44 +17,34 @@
  *
  */
 
+import { Popover } from '@base-ui/react/popover'
 import { EllipsisVertical } from 'lucide-react'
-import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 
-import { useContextMenu } from '../hooks/use-context-menu'
-
 export const ContextButtonOpen = ({
   'data-testid': testId,
-  hash,
 }: {
   'data-testid'?: string
-  hash: string
 }) => {
-  const { handleCloseAll, handleOpenContextMenu } = useContextMenu()
   const { t } = useTranslation('context-menu')
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') handleCloseAll()
-    }
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [handleCloseAll])
-
   return (
-    <Button
-      aria-label={t('actions.open', 'Open context menu')}
-      data-testid={testId}
-      fullWidth={false}
-      onClick={() => handleOpenContextMenu(hash)}
-      shape="circle"
-      title={t('actions.open', 'Open context menu')}
-      variant="icon"
-    >
-      <LucideIcon icon={EllipsisVertical} />
-    </Button>
+    <Popover.Trigger
+      render={
+        <Button
+          aria-label={t('actions.open', 'Open context menu')}
+          data-testid={testId}
+          fullWidth={false}
+          shape="circle"
+          title={t('actions.open', 'Open context menu')}
+          variant="icon"
+        >
+          <LucideIcon icon={EllipsisVertical} />
+        </Button>
+      }
+    />
   )
 }

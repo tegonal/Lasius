@@ -39,7 +39,7 @@ type Props = {
 
 export const OrganisationItemContext = ({ item, selectedOrgId }: Props) => {
   const itemHash = stringHash(item)
-  const { currentOpenContextMenuId, handleCloseAll } = useContextMenu()
+  const { handleCloseAll } = useContextMenu()
   const stopAndStart = useStopAndStart()
 
   const handleStart = () => {
@@ -56,24 +56,22 @@ export const OrganisationItemContext = ({ item, selectedOrgId }: Props) => {
   }
 
   return (
-    <ContextBody variant="compact">
-      <ContextButtonOpen data-testid="org-ctx-open-btn" hash={itemHash} />
-      {currentOpenContextMenuId === itemHash && (
-        <ContextAnimatePresence variant="compact">
-          <ContextBar className="-mr-3">
-            {item.booking && (
-              <ContextButtonStartBooking
-                data-testid="org-ctx-start-btn"
-                item={item.booking}
-                onStart={handleStart}
-                variant="compact"
-              />
-            )}
-            <ContextBarDivider />
-            <ContextButtonClose variant="compact" />
-          </ContextBar>
-        </ContextAnimatePresence>
-      )}
+    <ContextBody hash={itemHash} variant="compact">
+      <ContextButtonOpen data-testid="org-ctx-open-btn" />
+      <ContextAnimatePresence variant="compact">
+        <ContextBar className="-mr-3">
+          {item.booking && (
+            <ContextButtonStartBooking
+              data-testid="org-ctx-start-btn"
+              item={item.booking}
+              onStart={handleStart}
+              variant="compact"
+            />
+          )}
+          <ContextBarDivider />
+          <ContextButtonClose variant="compact" />
+        </ContextBar>
+      </ContextAnimatePresence>
     </ContextBody>
   )
 }

@@ -49,7 +49,7 @@ export const FavoriteItemContext = ({ item, selectedOrgId }: Props) => {
   const stopAndStart = useStopAndStart()
 
   const itemHash = stringHash(item)
-  const { currentOpenContextMenuId, handleCloseAll } = useContextMenu()
+  const { handleCloseAll } = useContextMenu()
 
   const deleteFavorite = () => {
     const {
@@ -76,35 +76,33 @@ export const FavoriteItemContext = ({ item, selectedOrgId }: Props) => {
   }
 
   return (
-    <ContextBody variant="compact">
-      <ContextButtonOpen data-testid="favorite-ctx-open-btn" hash={itemHash} />
-      {currentOpenContextMenuId === itemHash && (
-        <ContextAnimatePresence variant="compact">
-          <ContextBar className="-mr-3">
-            <ContextButtonStartBooking
-              data-testid="favorite-ctx-start-btn"
-              item={item}
-              onStart={handleStart}
-              variant="compact"
-            />
-            <ContextButtonWrapper variant="compact">
-              <Button
-                aria-label={t('favorites.actions.delete', 'Delete favorite')}
-                data-testid="favorite-ctx-delete-btn"
-                fullWidth={false}
-                onClick={deleteFavorite}
-                shape="circle"
-                title={t('favorites.actions.delete', 'Delete favorite')}
-                variant="contextIcon"
-              >
-                <LucideIcon icon={Trash2} size={24} />
-              </Button>
-            </ContextButtonWrapper>
-            <ContextBarDivider />
-            <ContextButtonClose variant="compact" />
-          </ContextBar>
-        </ContextAnimatePresence>
-      )}
+    <ContextBody hash={itemHash} variant="compact">
+      <ContextButtonOpen data-testid="favorite-ctx-open-btn" />
+      <ContextAnimatePresence variant="compact">
+        <ContextBar className="-mr-3">
+          <ContextButtonStartBooking
+            data-testid="favorite-ctx-start-btn"
+            item={item}
+            onStart={handleStart}
+            variant="compact"
+          />
+          <ContextButtonWrapper variant="compact">
+            <Button
+              aria-label={t('favorites.actions.delete', 'Delete favorite')}
+              data-testid="favorite-ctx-delete-btn"
+              fullWidth={false}
+              onClick={deleteFavorite}
+              shape="circle"
+              title={t('favorites.actions.delete', 'Delete favorite')}
+              variant="contextIcon"
+            >
+              <LucideIcon icon={Trash2} size={24} />
+            </Button>
+          </ContextButtonWrapper>
+          <ContextBarDivider />
+          <ContextButtonClose variant="compact" />
+        </ContextBar>
+      </ContextAnimatePresence>
     </ContextBody>
   )
 }

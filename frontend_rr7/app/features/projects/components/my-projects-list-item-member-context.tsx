@@ -24,7 +24,6 @@ import { ContextAnimatePresence } from '~/features/context-menu/context-animate-
 import { ContextBar } from '~/features/context-menu/context-bar'
 import { ContextBarDivider } from '~/features/context-menu/context-bar-divider'
 import { ContextBody } from '~/features/context-menu/context-body'
-import { useContextMenu } from '~/features/context-menu/hooks/use-context-menu'
 import { type ModelsUserProject } from '~/services/api/lasius/modelsUserProject'
 
 type Props = {
@@ -32,23 +31,16 @@ type Props = {
 }
 
 export const MyProjectsListItemMemberContext = ({ item }: Props) => {
-  const { currentOpenContextMenuId } = useContextMenu()
-
   return (
-    <ContextBody variant="compact">
-      <ContextButtonOpen
-        data-testid="project-ctx-open-btn"
-        hash={item.projectReference.id}
-      />
-      {currentOpenContextMenuId === item.projectReference.id && (
-        <ContextAnimatePresence variant="compact">
-          <ContextBar>
-            <ContextButtonLeaveProject item={item} variant="compact" />
-            <ContextBarDivider />
-            <ContextButtonClose variant="compact" />
-          </ContextBar>
-        </ContextAnimatePresence>
-      )}
+    <ContextBody hash={item.projectReference.id} variant="compact">
+      <ContextButtonOpen data-testid="project-ctx-open-btn" />
+      <ContextAnimatePresence variant="compact">
+        <ContextBar>
+          <ContextButtonLeaveProject item={item} variant="compact" />
+          <ContextBarDivider />
+          <ContextButtonClose variant="compact" />
+        </ContextBar>
+      </ContextAnimatePresence>
     </ContextBody>
   )
 }

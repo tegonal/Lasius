@@ -50,7 +50,7 @@ export const AllProjectsListItemContext = ({ item }: Props) => {
   const [isManageOpen, setIsManageOpen] = useState(false)
   const [isTagOpen, setIsTagOpen] = useState(false)
   const [isDeactivateConfirmOpen, setIsDeactivateConfirmOpen] = useState(false)
-  const { currentOpenContextMenuId, handleCloseAll } = useContextMenu()
+  const { handleCloseAll } = useContextMenu()
   const navigate = useNavigate()
   const revalidator = useRevalidator()
   const { submit: deactivateProject } = useDeactivateProject()
@@ -107,78 +107,61 @@ export const AllProjectsListItemContext = ({ item }: Props) => {
 
   return (
     <>
-      <ContextBody variant="compact">
-        <ContextButtonOpen hash={item.id} />
-        {currentOpenContextMenuId === item.id && (
-          <ContextAnimatePresence variant="compact">
-            <ContextBar>
-              {item.active && (
-                <ContextButtonWrapper variant="compact">
-                  <Button
-                    aria-label={t(
-                      'organisation:members.actions.manage',
-                      'Manage members',
-                    )}
-                    fullWidth={false}
-                    onClick={() => manageMembers()}
-                    shape="circle"
-                    title={t(
-                      'organisation:members.actions.manage',
-                      'Manage members',
-                    )}
-                    variant="contextIcon"
-                  >
-                    <LucideIcon icon={Users} size={24} />
-                  </Button>
-                </ContextButtonWrapper>
-              )}
+      <ContextBody hash={item.id} variant="compact">
+        <ContextButtonOpen />
+        <ContextAnimatePresence variant="compact">
+          <ContextBar>
+            {item.active && (
               <ContextButtonWrapper variant="compact">
                 <Button
-                  aria-label={t('bookings:showLists', 'Show bookings')}
+                  aria-label={t(
+                    'organisation:members.actions.manage',
+                    'Manage members',
+                  )}
                   fullWidth={false}
-                  onClick={() => showLists()}
+                  onClick={() => manageMembers()}
                   shape="circle"
-                  title={t('bookings:showLists', 'Show bookings')}
+                  title={t(
+                    'organisation:members.actions.manage',
+                    'Manage members',
+                  )}
                   variant="contextIcon"
                 >
-                  <LucideIcon icon={List} size={24} />
+                  <LucideIcon icon={Users} size={24} />
                 </Button>
               </ContextButtonWrapper>
-              <ContextButtonWrapper variant="compact">
-                <Button
-                  aria-label={t('stats:showStatistics', 'Show statistics')}
-                  fullWidth={false}
-                  onClick={() => showStats()}
-                  shape="circle"
-                  title={t('stats:showStatistics', 'Show statistics')}
-                  variant="contextIcon"
+            )}
+            <ContextButtonWrapper variant="compact">
+              <Button
+                aria-label={t('bookings:showLists', 'Show bookings')}
+                fullWidth={false}
+                onClick={() => showLists()}
+                shape="circle"
+                title={t('bookings:showLists', 'Show bookings')}
+                variant="contextIcon"
+              >
+                <LucideIcon icon={List} size={24} />
+              </Button>
+            </ContextButtonWrapper>
+            <ContextButtonWrapper variant="compact">
+              <Button
+                aria-label={t('stats:showStatistics', 'Show statistics')}
+                fullWidth={false}
+                onClick={() => showStats()}
+                shape="circle"
+                title={t('stats:showStatistics', 'Show statistics')}
+                variant="contextIcon"
+              >
+                <LucideIcon icon={PieChart} size={24} />
+              </Button>
+            </ContextButtonWrapper>
+            <ContextButtonWrapper variant="compact">
+              {!item.active && item.deactivatedBy ? (
+                <span
+                  title={t('projects:deactivatedBy', 'Archived by {{user}}', {
+                    user: item.deactivatedBy.key,
+                  })}
                 >
-                  <LucideIcon icon={PieChart} size={24} />
-                </Button>
-              </ContextButtonWrapper>
-              <ContextButtonWrapper variant="compact">
-                {!item.active && item.deactivatedBy ? (
-                  <span
-                    title={t('projects:deactivatedBy', 'Archived by {{user}}', {
-                      user: item.deactivatedBy.key,
-                    })}
-                  >
-                    <Button
-                      aria-label={t('projects:actions.edit', {
-                        defaultValue: 'Edit project',
-                      })}
-                      fullWidth={false}
-                      onClick={() => editProject()}
-                      shape="circle"
-                      title={t('projects:actions.edit', {
-                        defaultValue: 'Edit project',
-                      })}
-                      variant="contextIcon"
-                    >
-                      <LucideIcon icon={Pencil} size={24} />
-                    </Button>
-                  </span>
-                ) : (
                   <Button
                     aria-label={t('projects:actions.edit', {
                       defaultValue: 'Edit project',
@@ -193,49 +176,64 @@ export const AllProjectsListItemContext = ({ item }: Props) => {
                   >
                     <LucideIcon icon={Pencil} size={24} />
                   </Button>
-                )}
-              </ContextButtonWrapper>
-              {item.active && (
-                <>
-                  <ContextButtonWrapper variant="compact">
-                    <Button
-                      aria-label={t('tag-manager:actions.edit', {
-                        defaultValue: 'Edit tags',
-                      })}
-                      fullWidth={false}
-                      onClick={() => manageTags()}
-                      shape="circle"
-                      title={t('tag-manager:actions.edit', {
-                        defaultValue: 'Edit tags',
-                      })}
-                      variant="contextIcon"
-                    >
-                      <LucideIcon icon={Tags} size={24} />
-                    </Button>
-                  </ContextButtonWrapper>
-                  <ContextButtonWrapper variant="compact">
-                    <Button
-                      aria-label={t('projects:actions.deactivate', {
-                        defaultValue: 'Deactivate project',
-                      })}
-                      fullWidth={false}
-                      onClick={() => showDeactivateConfirm()}
-                      shape="circle"
-                      title={t('projects:actions.deactivate', {
-                        defaultValue: 'Deactivate project',
-                      })}
-                      variant="contextIcon"
-                    >
-                      <LucideIcon icon={Archive} size={24} />
-                    </Button>
-                  </ContextButtonWrapper>
-                </>
+                </span>
+              ) : (
+                <Button
+                  aria-label={t('projects:actions.edit', {
+                    defaultValue: 'Edit project',
+                  })}
+                  fullWidth={false}
+                  onClick={() => editProject()}
+                  shape="circle"
+                  title={t('projects:actions.edit', {
+                    defaultValue: 'Edit project',
+                  })}
+                  variant="contextIcon"
+                >
+                  <LucideIcon icon={Pencil} size={24} />
+                </Button>
               )}
-              <ContextBarDivider />
-              <ContextButtonClose variant="compact" />
-            </ContextBar>
-          </ContextAnimatePresence>
-        )}
+            </ContextButtonWrapper>
+            {item.active && (
+              <>
+                <ContextButtonWrapper variant="compact">
+                  <Button
+                    aria-label={t('tag-manager:actions.edit', {
+                      defaultValue: 'Edit tags',
+                    })}
+                    fullWidth={false}
+                    onClick={() => manageTags()}
+                    shape="circle"
+                    title={t('tag-manager:actions.edit', {
+                      defaultValue: 'Edit tags',
+                    })}
+                    variant="contextIcon"
+                  >
+                    <LucideIcon icon={Tags} size={24} />
+                  </Button>
+                </ContextButtonWrapper>
+                <ContextButtonWrapper variant="compact">
+                  <Button
+                    aria-label={t('projects:actions.deactivate', {
+                      defaultValue: 'Deactivate project',
+                    })}
+                    fullWidth={false}
+                    onClick={() => showDeactivateConfirm()}
+                    shape="circle"
+                    title={t('projects:actions.deactivate', {
+                      defaultValue: 'Deactivate project',
+                    })}
+                    variant="contextIcon"
+                  >
+                    <LucideIcon icon={Archive} size={24} />
+                  </Button>
+                </ContextButtonWrapper>
+              </>
+            )}
+            <ContextBarDivider />
+            <ContextButtonClose variant="compact" />
+          </ContextBar>
+        </ContextAnimatePresence>
       </ContextBody>
       <Modal onClose={handleUpdateClose} open={isUpdateOpen}>
         <ProjectAddUpdateForm

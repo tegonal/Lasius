@@ -17,9 +17,13 @@
  *
  */
 
+import { Popover } from '@base-ui/react/popover'
 import { cva, type VariantProps } from 'class-variance-authority'
+import { useCallback } from 'react'
 
 import { cn } from '~/lib/utils/cn'
+
+import { useContextMenu } from './hooks/use-context-menu'
 
 const contextBodyVariants = cva('flex items-center', {
   defaultVariants: { variant: 'default' },
@@ -33,8 +37,28 @@ const contextBodyVariants = cva('flex items-center', {
 
 type Props = VariantProps<typeof contextBodyVariants> & {
   children: React.ReactNode
+  hash: string
 }
 
-export const ContextBody = ({ children, variant = 'default' }: Props) => (
-  <div className={cn(contextBodyVariants({ variant }))}>{children}</div>
-)
+export const ContextBody = ({ children, hash, variant = 'default' }: Props) => {
+  const { currentOpenContextMenuId, handleCloseAll, handleOpenContextMenu } =
+    useContextMenu()
+  const isOpen = currentOpenContextMenuId === hash
+
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      if (open) {
+        handleOpenContextMenu(hash)
+      } else {
+        handleCloseAll()
+      }
+    },
+    [hash, handleCloseAll, handleOpenContextMenu],
+  )
+
+  return (
+    <Popover.Root onOpenChange={handleOpenChange} open={isOpen}>
+      <div className={cn(contextBodyVariants({ variant }))}>{children}</div>
+    </Popover.Root>
+  )
+}

@@ -25,10 +25,7 @@ import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { Modal } from '~/components/ui/overlays/modal/modal'
 import { BookingEditRunning } from '~/features/bookings/components/booking-edit-running'
-import {
-  useHomeLoaderData,
-  useSelectedOrgId,
-} from '~/features/bookings/hooks/use-home-loader-data'
+import { useHomeLoaderData } from '~/features/bookings/hooks/use-home-loader-data'
 import { ContextButtonAddFavorite } from '~/features/context-menu/buttons/context-button-add-favorite'
 import { ContextButtonClose } from '~/features/context-menu/buttons/context-button-close'
 import { ContextButtonOpen } from '~/features/context-menu/buttons/context-button-open'
@@ -38,6 +35,7 @@ import { ContextBarDivider } from '~/features/context-menu/context-bar-divider'
 import { ContextBody } from '~/features/context-menu/context-body'
 import { ContextButtonWrapper } from '~/features/context-menu/context-button-wrapper'
 import { useContextMenu } from '~/features/context-menu/hooks/use-context-menu'
+import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { formatISOLocale } from '~/lib/utils/dates'
 import { areTimesWithinOneMinute } from '~/lib/utils/time'
 import {
@@ -48,7 +46,11 @@ import { useUpdateUserBookingCurrent } from '~/services/api/lasius-hooks/user-bo
 import { useAddFavoriteBooking } from '~/services/api/lasius-hooks/user-favorites/user-favorites'
 
 type Props = {
+  /** Override currentBooking (e.g. from app-layout loader when not on home route) */
+  currentBookingOverride?: ModelsCurrentUserTimeBooking
   item: ModelsBooking
+  /** Override selectedOrgId (when not on home route) */
+  selectedOrgIdOverride?: string
 }
 
 const useCurrentBooking = (): ModelsCurrentUserTimeBooking | undefined => {
@@ -64,13 +66,19 @@ const useGetPreviousBooking = (item: ModelsBooking) => {
   return index < bookings.length - 1 ? bookings[index + 1] : null
 }
 
-export const BookingCurrentEntryContext = ({ item }: Props) => {
+export const BookingCurrentEntryContext = ({
+  currentBookingOverride,
+  item,
+  selectedOrgIdOverride,
+}: Props) => {
   const { t } = useTranslation('common')
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const { currentOpenContextMenuId, handleCloseAll } = useContextMenu()
+  const { handleCloseAll } = useContextMenu()
   const previousBooking = useGetPreviousBooking(item)
-  const selectedOrgId = useSelectedOrgId()
-  const currentBooking = useCurrentBooking()
+  const { selectedOrganisationId } = useOrganisation()
+  const homeCurrentBooking = useCurrentBooking()
+  const currentBooking = currentBookingOverride ?? homeCurrentBooking
+  const selectedOrgId = selectedOrgIdOverride ?? selectedOrganisationId
   const updateCurrentApi = useUpdateUserBookingCurrent()
   const addFavoriteApi = useAddFavoriteBooking()
 
@@ -109,58 +117,53 @@ export const BookingCurrentEntryContext = ({ item }: Props) => {
 
   return (
     <>
-      <ContextBody>
-        <ContextButtonOpen
-          data-testid="booking-current-ctx-open-btn"
-          hash={item.id}
-        />
-        {currentOpenContextMenuId === item.id && (
-          <ContextAnimatePresence>
-            <ContextBar>
+      <ContextBody hash={item.id}>
+        <ContextButtonOpen data-testid="booking-current-ctx-open-btn" />
+        <ContextAnimatePresence>
+          <ContextBar>
+            <ContextButtonWrapper>
+              <Button
+                aria-label={t('bookings:actions.edit', 'Edit booking')}
+                data-testid="booking-current-edit-btn"
+                fullWidth={false}
+                onClick={editCurrentBooking}
+                shape="circle"
+                title={t('bookings:actions.edit', 'Edit booking')}
+                variant="contextIcon"
+              >
+                <LucideIcon icon={PencilIcon} size={24} />
+              </Button>
+            </ContextButtonWrapper>
+            {shouldShowStartAdjustment && (
               <ContextButtonWrapper>
                 <Button
-                  aria-label={t('bookings:actions.edit', 'Edit booking')}
-                  data-testid="booking-current-edit-btn"
+                  aria-label={t(
+                    'bookings:actions.adjustStartToPrevious',
+                    'Adjust start to previous booking',
+                  )}
+                  data-testid="booking-current-adjust-start-btn"
                   fullWidth={false}
-                  onClick={editCurrentBooking}
+                  onClick={adjustStartToPrevious}
                   shape="circle"
-                  title={t('bookings:actions.edit', 'Edit booking')}
+                  title={t(
+                    'bookings:actions.adjustStartToPrevious',
+                    'Adjust start to previous booking',
+                  )}
                   variant="contextIcon"
                 >
-                  <LucideIcon icon={PencilIcon} size={24} />
+                  <LucideIcon icon={ArrowDownToLineIcon} size={24} />
                 </Button>
               </ContextButtonWrapper>
-              {shouldShowStartAdjustment && (
-                <ContextButtonWrapper>
-                  <Button
-                    aria-label={t(
-                      'bookings:actions.adjustStartToPrevious',
-                      'Adjust start to previous booking',
-                    )}
-                    data-testid="booking-current-adjust-start-btn"
-                    fullWidth={false}
-                    onClick={adjustStartToPrevious}
-                    shape="circle"
-                    title={t(
-                      'bookings:actions.adjustStartToPrevious',
-                      'Adjust start to previous booking',
-                    )}
-                    variant="contextIcon"
-                  >
-                    <LucideIcon icon={ArrowDownToLineIcon} size={24} />
-                  </Button>
-                </ContextButtonWrapper>
-              )}
-              <ContextButtonAddFavorite
-                data-testid="booking-current-favorite-btn"
-                item={item}
-                onAddFavorite={addFavorite}
-              />
-              <ContextBarDivider />
-              <ContextButtonClose />
-            </ContextBar>
-          </ContextAnimatePresence>
-        )}
+            )}
+            <ContextButtonAddFavorite
+              data-testid="booking-current-favorite-btn"
+              item={item}
+              onAddFavorite={addFavorite}
+            />
+            <ContextBarDivider />
+            <ContextButtonClose />
+          </ContextBar>
+        </ContextAnimatePresence>
       </ContextBody>
       {currentBooking && (
         <Modal onClose={() => setIsEditModalOpen(false)} open={isEditModalOpen}>

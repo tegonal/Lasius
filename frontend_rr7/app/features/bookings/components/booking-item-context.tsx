@@ -75,7 +75,7 @@ const useGetAdjacentBookings = (item: ModelsBooking) => {
 export const BookingItemContext = ({ item }: Props) => {
   const { t } = useTranslation('common')
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const { currentOpenContextMenuId, handleCloseAll } = useContextMenu()
+  const { handleCloseAll } = useContextMenu()
   const { next: nextBooking, previous: previousBooking } =
     useGetAdjacentBookings(item)
   const selectedOrgId = useSelectedOrgId()
@@ -158,97 +158,95 @@ export const BookingItemContext = ({ item }: Props) => {
 
   return (
     <>
-      <ContextBody>
-        <ContextButtonOpen data-testid="booking-ctx-open-btn" hash={item.id} />
-        {currentOpenContextMenuId === item.id && (
-          <ContextAnimatePresence>
-            <ContextBar>
-              <ContextButtonStartBooking
-                data-testid="booking-ctx-start-btn"
-                item={item}
-                onStart={startBooking}
-              />
+      <ContextBody hash={item.id}>
+        <ContextButtonOpen data-testid="booking-ctx-open-btn" />
+        <ContextAnimatePresence>
+          <ContextBar>
+            <ContextButtonStartBooking
+              data-testid="booking-ctx-start-btn"
+              item={item}
+              onStart={startBooking}
+            />
+            <ContextButtonWrapper>
+              <Button
+                aria-label={t('bookings:actions.edit', 'Edit booking')}
+                data-testid="booking-ctx-edit-btn"
+                fullWidth={false}
+                onClick={() => {
+                  setIsEditModalOpen(true)
+                  handleCloseAll()
+                }}
+                shape="circle"
+                title={t('bookings:actions.edit', 'Edit booking')}
+                variant="contextIcon"
+              >
+                <LucideIcon icon={Pencil} size={24} />
+              </Button>
+            </ContextButtonWrapper>
+            {shouldShowStartAdjustment && (
               <ContextButtonWrapper>
                 <Button
-                  aria-label={t('bookings:actions.edit', 'Edit booking')}
-                  data-testid="booking-ctx-edit-btn"
+                  aria-label={t(
+                    'bookings:actions.adjustStartToPrevious',
+                    'Adjust start to previous booking',
+                  )}
+                  data-testid="booking-ctx-adjust-start-btn"
                   fullWidth={false}
-                  onClick={() => {
-                    setIsEditModalOpen(true)
-                    handleCloseAll()
-                  }}
+                  onClick={adjustStartToPrevious}
                   shape="circle"
-                  title={t('bookings:actions.edit', 'Edit booking')}
+                  title={t(
+                    'bookings:actions.adjustStartToPrevious',
+                    'Adjust start to previous booking',
+                  )}
                   variant="contextIcon"
                 >
-                  <LucideIcon icon={Pencil} size={24} />
+                  <LucideIcon icon={ArrowDownToLine} size={24} />
                 </Button>
               </ContextButtonWrapper>
-              {shouldShowStartAdjustment && (
-                <ContextButtonWrapper>
-                  <Button
-                    aria-label={t(
-                      'bookings:actions.adjustStartToPrevious',
-                      'Adjust start to previous booking',
-                    )}
-                    data-testid="booking-ctx-adjust-start-btn"
-                    fullWidth={false}
-                    onClick={adjustStartToPrevious}
-                    shape="circle"
-                    title={t(
-                      'bookings:actions.adjustStartToPrevious',
-                      'Adjust start to previous booking',
-                    )}
-                    variant="contextIcon"
-                  >
-                    <LucideIcon icon={ArrowDownToLine} size={24} />
-                  </Button>
-                </ContextButtonWrapper>
-              )}
-              {shouldShowEndAdjustment && (
-                <ContextButtonWrapper>
-                  <Button
-                    aria-label={t(
-                      'bookings:actions.adjustEndToNext',
-                      'Adjust end to next booking',
-                    )}
-                    data-testid="booking-ctx-adjust-end-btn"
-                    fullWidth={false}
-                    onClick={adjustEndToNext}
-                    shape="circle"
-                    title={t(
-                      'bookings:actions.adjustEndToNext',
-                      'Adjust end to next booking',
-                    )}
-                    variant="contextIcon"
-                  >
-                    <LucideIcon icon={ArrowUpToLine} size={24} />
-                  </Button>
-                </ContextButtonWrapper>
-              )}
-              <ContextButtonAddFavorite
-                data-testid="booking-ctx-favorite-btn"
-                item={item}
-                onAddFavorite={addFavorite}
-              />
+            )}
+            {shouldShowEndAdjustment && (
               <ContextButtonWrapper>
                 <Button
-                  aria-label={t('bookings:actions.delete', 'Delete booking')}
-                  data-testid="booking-ctx-delete-btn"
+                  aria-label={t(
+                    'bookings:actions.adjustEndToNext',
+                    'Adjust end to next booking',
+                  )}
+                  data-testid="booking-ctx-adjust-end-btn"
                   fullWidth={false}
-                  onClick={deleteItem}
+                  onClick={adjustEndToNext}
                   shape="circle"
-                  title={t('bookings:actions.delete', 'Delete booking')}
+                  title={t(
+                    'bookings:actions.adjustEndToNext',
+                    'Adjust end to next booking',
+                  )}
                   variant="contextIcon"
                 >
-                  <LucideIcon icon={Trash2} size={24} />
+                  <LucideIcon icon={ArrowUpToLine} size={24} />
                 </Button>
               </ContextButtonWrapper>
-              <ContextBarDivider />
-              <ContextButtonClose />
-            </ContextBar>
-          </ContextAnimatePresence>
-        )}
+            )}
+            <ContextButtonAddFavorite
+              data-testid="booking-ctx-favorite-btn"
+              item={item}
+              onAddFavorite={addFavorite}
+            />
+            <ContextButtonWrapper>
+              <Button
+                aria-label={t('bookings:actions.delete', 'Delete booking')}
+                data-testid="booking-ctx-delete-btn"
+                fullWidth={false}
+                onClick={deleteItem}
+                shape="circle"
+                title={t('bookings:actions.delete', 'Delete booking')}
+                variant="contextIcon"
+              >
+                <LucideIcon icon={Trash2} size={24} />
+              </Button>
+            </ContextButtonWrapper>
+            <ContextBarDivider />
+            <ContextButtonClose />
+          </ContextBar>
+        </ContextAnimatePresence>
       </ContextBody>
       <Modal onClose={() => setIsEditModalOpen(false)} open={isEditModalOpen}>
         <BookingAddUpdateForm

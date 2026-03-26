@@ -61,7 +61,7 @@ export const ProjectMappingRowContext = ({
   const { t } = useTranslation('integrations')
   const [isSelectorOpen, setIsSelectorOpen] = useState(false)
   const [isConfirmRemoveOpen, setIsConfirmRemoveOpen] = useState(false)
-  const { currentOpenContextMenuId, handleCloseAll } = useContextMenu()
+  const { handleCloseAll } = useContextMenu()
   const { userProjects } = useProjects()
 
   // Build suggestion list from user projects
@@ -89,68 +89,66 @@ export const ProjectMappingRowContext = ({
 
   return (
     <>
-      <ContextBody variant="compact">
-        <ContextButtonOpen hash={externalProject.id} />
-        {currentOpenContextMenuId === externalProject.id && (
-          <ContextAnimatePresence variant="compact">
-            <ContextBar>
+      <ContextBody hash={externalProject.id} variant="compact">
+        <ContextButtonOpen />
+        <ContextAnimatePresence variant="compact">
+          <ContextBar>
+            <ContextButtonWrapper variant="compact">
+              <Button
+                aria-label={
+                  selectedProjectId
+                    ? t('issueImporters.wizard.projects.changeMapping', {
+                        defaultValue: 'Change mapping',
+                      })
+                    : t('issueImporters.wizard.projects.addMapping', {
+                        defaultValue: 'Add mapping',
+                      })
+                }
+                fullWidth={false}
+                onClick={openSelector}
+                shape="circle"
+                title={
+                  selectedProjectId
+                    ? t('issueImporters.wizard.projects.changeMapping', {
+                        defaultValue: 'Change mapping',
+                      })
+                    : t('issueImporters.wizard.projects.addMapping', {
+                        defaultValue: 'Add mapping',
+                      })
+                }
+                variant="contextIcon"
+              >
+                <LucideIcon
+                  icon={selectedProjectId ? Pencil : Plus}
+                  size={24}
+                />
+              </Button>
+            </ContextButtonWrapper>
+            {selectedProjectId && (
               <ContextButtonWrapper variant="compact">
                 <Button
-                  aria-label={
-                    selectedProjectId
-                      ? t('issueImporters.wizard.projects.changeMapping', {
-                          defaultValue: 'Change mapping',
-                        })
-                      : t('issueImporters.wizard.projects.addMapping', {
-                          defaultValue: 'Add mapping',
-                        })
-                  }
+                  aria-label={t(
+                    'issueImporters.wizard.projects.removeMapping',
+                    {
+                      defaultValue: 'Remove mapping',
+                    },
+                  )}
                   fullWidth={false}
-                  onClick={openSelector}
+                  onClick={openConfirmRemove}
                   shape="circle"
-                  title={
-                    selectedProjectId
-                      ? t('issueImporters.wizard.projects.changeMapping', {
-                          defaultValue: 'Change mapping',
-                        })
-                      : t('issueImporters.wizard.projects.addMapping', {
-                          defaultValue: 'Add mapping',
-                        })
-                  }
+                  title={t('issueImporters.wizard.projects.removeMapping', {
+                    defaultValue: 'Remove mapping',
+                  })}
                   variant="contextIcon"
                 >
-                  <LucideIcon
-                    icon={selectedProjectId ? Pencil : Plus}
-                    size={24}
-                  />
+                  <LucideIcon icon={Trash2} size={24} />
                 </Button>
               </ContextButtonWrapper>
-              {selectedProjectId && (
-                <ContextButtonWrapper variant="compact">
-                  <Button
-                    aria-label={t(
-                      'issueImporters.wizard.projects.removeMapping',
-                      {
-                        defaultValue: 'Remove mapping',
-                      },
-                    )}
-                    fullWidth={false}
-                    onClick={openConfirmRemove}
-                    shape="circle"
-                    title={t('issueImporters.wizard.projects.removeMapping', {
-                      defaultValue: 'Remove mapping',
-                    })}
-                    variant="contextIcon"
-                  >
-                    <LucideIcon icon={Trash2} size={24} />
-                  </Button>
-                </ContextButtonWrapper>
-              )}
-              <ContextBarDivider />
-              <ContextButtonClose variant="compact" />
-            </ContextBar>
-          </ContextAnimatePresence>
-        )}
+            )}
+            <ContextBarDivider />
+            <ContextButtonClose variant="compact" />
+          </ContextBar>
+        </ContextAnimatePresence>
       </ContextBody>
       <Modal onClose={handleSelectorClose} open={isSelectorOpen} size="lg">
         <ProjectMappingSelector

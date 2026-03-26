@@ -17,43 +17,43 @@
  *
  */
 
-import { cva, type VariantProps } from 'class-variance-authority'
-import { useEffect, useState } from 'react'
+import { Popover } from '@base-ui/react/popover'
 
 import { cn } from '~/lib/utils/cn'
 
-const variants = cva('absolute', {
-  defaultVariants: { variant: 'default' },
-  variants: {
-    variant: {
-      compact: '-right-2',
-      default: 'right-0 z-50',
-    },
-  },
-})
+type Props = {
+  children: React.ReactNode
+  variant?: 'compact' | 'default'
+}
 
-type Props = VariantProps<typeof variants> & { children: React.ReactNode }
+const positionerClassName = {
+  compact: 'translate-x-1',
+  default: 'translate-x-1.5 md:translate-x-3.5',
+}
+
+/** Allow overflow for shadow + rounded corners, limit right overflow to clip the slide animation */
+const clipStyle = {
+  compact: { clipPath: 'inset(-1rem -0.75rem -1rem -1rem)' },
+  default: { clipPath: 'inset(-1rem -0.25rem -1rem -1rem)' },
+}
 
 export const ContextAnimatePresence = ({
   children,
   variant = 'default',
 }: Props) => {
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    requestAnimationFrame(() => setMounted(true))
-  }, [])
-
   return (
-    <div
-      className={cn(variants({ variant }))}
-      style={{
-        opacity: mounted ? 1 : 0,
-        transform: mounted ? 'translateX(0)' : 'translateX(100%)',
-        transition: 'opacity 0.2s ease-in-out, transform 0.2s ease-in-out',
-      }}
-    >
-      {children}
-    </div>
+    <Popover.Portal>
+      <Popover.Positioner
+        align="center"
+        className={cn(positionerClassName[variant])}
+        side="left"
+        sideOffset={(data) => -data.anchor.width}
+        style={clipStyle[variant]}
+      >
+        <Popover.Popup className="translate-x-0 transition-[translate] duration-200 ease-in-out data-[ending-style]:translate-x-full data-[starting-style]:translate-x-full">
+          {children}
+        </Popover.Popup>
+      </Popover.Positioner>
+    </Popover.Portal>
   )
 }

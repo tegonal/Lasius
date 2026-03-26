@@ -46,7 +46,7 @@ export const ProjectMemberListItemContext = ({
   user,
 }: Props) => {
   const { t } = useTranslation()
-  const { currentOpenContextMenuId, handleCloseAll } = useContextMenu()
+  const { handleCloseAll } = useContextMenu()
   const [isRemoveConfirmOpen, setIsRemoveConfirmOpen] = useState(false)
 
   const showRemoveConfirm = () => {
@@ -69,34 +69,32 @@ export const ProjectMemberListItemContext = ({
 
   return (
     <>
-      <ContextBody variant="compact">
-        <ContextButtonOpen hash={user.id} />
-        {currentOpenContextMenuId === user.id && (
-          <ContextAnimatePresence variant="compact">
-            <ContextBar>
-              <ContextButtonWrapper variant="compact">
-                <Button
-                  aria-label={t(
-                    'organisation:members.actions.remove',
-                    'Remove member',
-                  )}
-                  fullWidth={false}
-                  onClick={showRemoveConfirm}
-                  shape="circle"
-                  title={t(
-                    'organisation:members.actions.remove',
-                    'Remove member',
-                  )}
-                  variant="contextIcon"
-                >
-                  <LucideIcon icon={UserX} size={24} />
-                </Button>
-              </ContextButtonWrapper>
-              <ContextBarDivider />
-              <ContextButtonClose variant="compact" />
-            </ContextBar>
-          </ContextAnimatePresence>
-        )}
+      <ContextBody hash={user.id} variant="compact">
+        <ContextButtonOpen />
+        <ContextAnimatePresence variant="compact">
+          <ContextBar>
+            <ContextButtonWrapper variant="compact">
+              <Button
+                aria-label={t(
+                  'organisation:members.actions.remove',
+                  'Remove member',
+                )}
+                fullWidth={false}
+                onClick={showRemoveConfirm}
+                shape="circle"
+                title={t(
+                  'organisation:members.actions.remove',
+                  'Remove member',
+                )}
+                variant="contextIcon"
+              >
+                <LucideIcon icon={UserX} size={24} />
+              </Button>
+            </ContextButtonWrapper>
+            <ContextBarDivider />
+            <ContextButtonClose variant="compact" />
+          </ContextBar>
+        </ContextAnimatePresence>
       </ContextBody>
       <GenericConfirmModal
         confirmLabel={t('organisation:members.actions.remove', 'Remove member')}

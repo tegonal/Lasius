@@ -47,7 +47,7 @@ export const MyProjectsListItemAdminContext = ({ item }: Props) => {
   const [isUpdateOpen, setIsUpdateOpen] = useState(false)
   const [isManageOpen, setIsManageOpen] = useState(false)
   const [isTagOpen, setIsTagOpen] = useState(false)
-  const { currentOpenContextMenuId, handleCloseAll } = useContextMenu()
+  const { handleCloseAll } = useContextMenu()
   const navigate = useNavigate()
 
   const { t } = useTranslation()
@@ -87,91 +87,86 @@ export const MyProjectsListItemAdminContext = ({ item }: Props) => {
 
   return (
     <>
-      <ContextBody variant="compact">
-        <ContextButtonOpen
-          data-testid="project-ctx-open-btn"
-          hash={item.projectReference.id}
-        />
-        {currentOpenContextMenuId === item.projectReference.id && (
-          <ContextAnimatePresence variant="compact">
-            <ContextBar>
-              <ContextButtonWrapper variant="compact">
-                <Button
-                  aria-label={t(
-                    'organisation:members.actions.manage',
-                    'Manage members',
-                  )}
-                  data-testid="project-ctx-members-btn"
-                  fullWidth={false}
-                  onClick={() => manageMembers()}
-                  shape="circle"
-                  title={t(
-                    'organisation:members.actions.manage',
-                    'Manage members',
-                  )}
-                  variant="contextIcon"
-                >
-                  <LucideIcon icon={Users} size={24} />
-                </Button>
-              </ContextButtonWrapper>
-              <ContextButtonWrapper variant="compact">
-                <Button
-                  aria-label={t('bookings:showLists', 'Show bookings')}
-                  data-testid="project-ctx-lists-btn"
-                  fullWidth={false}
-                  onClick={() => showLists()}
-                  shape="circle"
-                  title={t('bookings:showLists', 'Show bookings')}
-                  variant="contextIcon"
-                >
-                  <LucideIcon icon={List} size={24} />
-                </Button>
-              </ContextButtonWrapper>
-              <ContextButtonWrapper variant="compact">
-                <Button
-                  aria-label={t('stats:showStatistics', 'Show statistics')}
-                  data-testid="project-ctx-stats-btn"
-                  fullWidth={false}
-                  onClick={() => showStats()}
-                  shape="circle"
-                  title={t('stats:showStatistics', 'Show statistics')}
-                  variant="contextIcon"
-                >
-                  <LucideIcon icon={PieChart} size={24} />
-                </Button>
-              </ContextButtonWrapper>
-              <ContextButtonWrapper variant="compact">
-                <Button
-                  aria-label={t('projects:actions.edit', 'Edit project')}
-                  data-testid="project-ctx-edit-btn"
-                  fullWidth={false}
-                  onClick={() => editProject()}
-                  shape="circle"
-                  title={t('projects:actions.edit', 'Edit project')}
-                  variant="contextIcon"
-                >
-                  <LucideIcon icon={Pencil} size={24} />
-                </Button>
-              </ContextButtonWrapper>
-              <ContextButtonWrapper variant="compact">
-                <Button
-                  aria-label={t('tag-manager:actions.edit', 'Edit tags')}
-                  data-testid="project-ctx-tags-btn"
-                  fullWidth={false}
-                  onClick={() => manageTags()}
-                  shape="circle"
-                  title={t('tag-manager:actions.edit', 'Edit tags')}
-                  variant="contextIcon"
-                >
-                  <LucideIcon icon={Tags} size={24} />
-                </Button>
-              </ContextButtonWrapper>
-              <ContextButtonLeaveProject item={item} variant="compact" />
-              <ContextBarDivider />
-              <ContextButtonClose variant="compact" />
-            </ContextBar>
-          </ContextAnimatePresence>
-        )}
+      <ContextBody hash={item.projectReference.id} variant="compact">
+        <ContextButtonOpen data-testid="project-ctx-open-btn" />
+        <ContextAnimatePresence variant="compact">
+          <ContextBar>
+            <ContextButtonWrapper variant="compact">
+              <Button
+                aria-label={t(
+                  'organisation:members.actions.manage',
+                  'Manage members',
+                )}
+                data-testid="project-ctx-members-btn"
+                fullWidth={false}
+                onClick={() => manageMembers()}
+                shape="circle"
+                title={t(
+                  'organisation:members.actions.manage',
+                  'Manage members',
+                )}
+                variant="contextIcon"
+              >
+                <LucideIcon icon={Users} size={24} />
+              </Button>
+            </ContextButtonWrapper>
+            <ContextButtonWrapper variant="compact">
+              <Button
+                aria-label={t('bookings:showLists', 'Show bookings')}
+                data-testid="project-ctx-lists-btn"
+                fullWidth={false}
+                onClick={() => showLists()}
+                shape="circle"
+                title={t('bookings:showLists', 'Show bookings')}
+                variant="contextIcon"
+              >
+                <LucideIcon icon={List} size={24} />
+              </Button>
+            </ContextButtonWrapper>
+            <ContextButtonWrapper variant="compact">
+              <Button
+                aria-label={t('stats:showStatistics', 'Show statistics')}
+                data-testid="project-ctx-stats-btn"
+                fullWidth={false}
+                onClick={() => showStats()}
+                shape="circle"
+                title={t('stats:showStatistics', 'Show statistics')}
+                variant="contextIcon"
+              >
+                <LucideIcon icon={PieChart} size={24} />
+              </Button>
+            </ContextButtonWrapper>
+            <ContextButtonWrapper variant="compact">
+              <Button
+                aria-label={t('projects:actions.edit', 'Edit project')}
+                data-testid="project-ctx-edit-btn"
+                fullWidth={false}
+                onClick={() => editProject()}
+                shape="circle"
+                title={t('projects:actions.edit', 'Edit project')}
+                variant="contextIcon"
+              >
+                <LucideIcon icon={Pencil} size={24} />
+              </Button>
+            </ContextButtonWrapper>
+            <ContextButtonWrapper variant="compact">
+              <Button
+                aria-label={t('tag-manager:actions.edit', 'Edit tags')}
+                data-testid="project-ctx-tags-btn"
+                fullWidth={false}
+                onClick={() => manageTags()}
+                shape="circle"
+                title={t('tag-manager:actions.edit', 'Edit tags')}
+                variant="contextIcon"
+              >
+                <LucideIcon icon={Tags} size={24} />
+              </Button>
+            </ContextButtonWrapper>
+            <ContextButtonLeaveProject item={item} variant="compact" />
+            <ContextBarDivider />
+            <ContextButtonClose variant="compact" />
+          </ContextBar>
+        </ContextAnimatePresence>
       </ContextBody>
       <Modal onClose={handleUpdateClose} open={isUpdateOpen}>
         <ProjectAddUpdateForm

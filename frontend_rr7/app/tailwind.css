@@ -220,6 +220,7 @@
   body {
     margin: 0;
     padding: 0;
+    overflow-x: hidden;
     background-color: var(--root-bg);
     color: var(--color-base-content);
     font-family: Roboto, 'Open Sans', sans-serif;

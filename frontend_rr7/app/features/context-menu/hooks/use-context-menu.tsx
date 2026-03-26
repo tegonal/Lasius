@@ -39,7 +39,7 @@ export const ContextMenuProvider = ({ children }: { children: ReactNode }) => {
   >(null)
 
   const handleOpenContextMenu = useCallback((hash: string) => {
-    setCurrentOpenContextMenuId((prev) => (prev === hash ? null : hash))
+    setCurrentOpenContextMenuId(hash)
   }, [])
 
   const handleCloseAll = useCallback(() => {

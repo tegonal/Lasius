@@ -49,7 +49,7 @@ export const IntegrationConfigItemContext = ({
   projectCount,
 }: Props) => {
   const { t } = useTranslation('integrations')
-  const { currentOpenContextMenuId, handleCloseAll } = useContextMenu()
+  const { handleCloseAll } = useContextMenu()
 
   const handleEdit = () => {
     handleCloseAll()
@@ -74,103 +74,101 @@ export const IntegrationConfigItemContext = ({
   const hasProjects = projectCount > 0
 
   return (
-    <ContextBody variant="compact">
-      <ContextButtonOpen hash={configId} />
-      {currentOpenContextMenuId === configId && (
-        <ContextAnimatePresence variant="compact">
-          <ContextBar>
-            <ContextButtonWrapper variant="compact">
-              <Button
-                aria-label={t('issueImporters.actions.viewInfo', {
-                  defaultValue: 'View configuration info',
+    <ContextBody hash={configId} variant="compact">
+      <ContextButtonOpen />
+      <ContextAnimatePresence variant="compact">
+        <ContextBar>
+          <ContextButtonWrapper variant="compact">
+            <Button
+              aria-label={t('issueImporters.actions.viewInfo', {
+                defaultValue: 'View configuration info',
+              })}
+              fullWidth={false}
+              onClick={handleViewInfo}
+              shape="circle"
+              title={t('issueImporters.actions.viewInfo', {
+                defaultValue: 'View configuration info',
+              })}
+              variant="contextIcon"
+            >
+              <LucideIcon icon={Info} size={24} />
+            </Button>
+          </ContextButtonWrapper>
+          <ContextButtonWrapper variant="compact">
+            <Button
+              aria-label={t('issueImporters.actions.edit', {
+                defaultValue: 'Edit configuration',
+              })}
+              fullWidth={false}
+              onClick={handleEdit}
+              shape="circle"
+              title={t('issueImporters.actions.edit', {
+                defaultValue: 'Edit configuration',
+              })}
+              variant="contextIcon"
+            >
+              <LucideIcon icon={Pencil} size={24} />
+            </Button>
+          </ContextButtonWrapper>
+          <ContextButtonWrapper variant="compact">
+            <Button
+              aria-label={t('issueImporters.actions.viewMappings', {
+                defaultValue: 'View project mappings',
+              })}
+              fullWidth={false}
+              onClick={handleViewMappings}
+              shape="circle"
+              title={t('issueImporters.actions.viewMappings', {
+                defaultValue: 'View project mappings',
+              })}
+              variant="contextIcon"
+            >
+              <LucideIcon icon={FolderTree} size={24} />
+            </Button>
+          </ContextButtonWrapper>
+          <ContextButtonWrapper variant="compact">
+            {hasProjects ? (
+              <div
+                className="tooltip"
+                data-tip={t('issueImporters.actions.deleteDisabled', {
+                  defaultValue:
+                    'Cannot delete: remove all project mappings first',
                 })}
-                fullWidth={false}
-                onClick={handleViewInfo}
-                shape="circle"
-                title={t('issueImporters.actions.viewInfo', {
-                  defaultValue: 'View configuration info',
-                })}
-                variant="contextIcon"
               >
-                <LucideIcon icon={Info} size={24} />
-              </Button>
-            </ContextButtonWrapper>
-            <ContextButtonWrapper variant="compact">
-              <Button
-                aria-label={t('issueImporters.actions.edit', {
-                  defaultValue: 'Edit configuration',
-                })}
-                fullWidth={false}
-                onClick={handleEdit}
-                shape="circle"
-                title={t('issueImporters.actions.edit', {
-                  defaultValue: 'Edit configuration',
-                })}
-                variant="contextIcon"
-              >
-                <LucideIcon icon={Pencil} size={24} />
-              </Button>
-            </ContextButtonWrapper>
-            <ContextButtonWrapper variant="compact">
-              <Button
-                aria-label={t('issueImporters.actions.viewMappings', {
-                  defaultValue: 'View project mappings',
-                })}
-                fullWidth={false}
-                onClick={handleViewMappings}
-                shape="circle"
-                title={t('issueImporters.actions.viewMappings', {
-                  defaultValue: 'View project mappings',
-                })}
-                variant="contextIcon"
-              >
-                <LucideIcon icon={FolderTree} size={24} />
-              </Button>
-            </ContextButtonWrapper>
-            <ContextButtonWrapper variant="compact">
-              {hasProjects ? (
-                <div
-                  className="tooltip"
-                  data-tip={t('issueImporters.actions.deleteDisabled', {
-                    defaultValue:
-                      'Cannot delete: remove all project mappings first',
-                  })}
-                >
-                  <Button
-                    aria-label={t('issueImporters.actions.delete', {
-                      defaultValue: 'Delete configuration',
-                    })}
-                    disabled
-                    fullWidth={false}
-                    onClick={handleDelete}
-                    shape="circle"
-                    variant="contextIcon"
-                  >
-                    <LucideIcon icon={Trash2} size={24} />
-                  </Button>
-                </div>
-              ) : (
                 <Button
                   aria-label={t('issueImporters.actions.delete', {
                     defaultValue: 'Delete configuration',
                   })}
+                  disabled
                   fullWidth={false}
                   onClick={handleDelete}
                   shape="circle"
-                  title={t('issueImporters.actions.delete', {
-                    defaultValue: 'Delete configuration',
-                  })}
                   variant="contextIcon"
                 >
                   <LucideIcon icon={Trash2} size={24} />
                 </Button>
-              )}
-            </ContextButtonWrapper>
-            <ContextBarDivider />
-            <ContextButtonClose variant="compact" />
-          </ContextBar>
-        </ContextAnimatePresence>
-      )}
+              </div>
+            ) : (
+              <Button
+                aria-label={t('issueImporters.actions.delete', {
+                  defaultValue: 'Delete configuration',
+                })}
+                fullWidth={false}
+                onClick={handleDelete}
+                shape="circle"
+                title={t('issueImporters.actions.delete', {
+                  defaultValue: 'Delete configuration',
+                })}
+                variant="contextIcon"
+              >
+                <LucideIcon icon={Trash2} size={24} />
+              </Button>
+            )}
+          </ContextButtonWrapper>
+          <ContextBarDivider />
+          <ContextButtonClose variant="compact" />
+        </ContextBar>
+      </ContextAnimatePresence>
     </ContextBody>
   )
 }
