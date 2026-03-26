@@ -24,7 +24,6 @@ import { type ModelsBookingStub } from '~/services/api/lasius'
 
 import { EmptyStateFavorites } from './empty-state-favorites'
 import { FavoriteItem } from './favorite-item'
-import { FavouriteListWrapper } from './favourite-list-wrapper'
 
 type Props = {
   favorites: ModelsBookingStub[]
@@ -36,7 +35,7 @@ export const FavoriteListCompact = ({ favorites, selectedOrgId }: Props) => {
 
   return (
     <ContextMenuProvider>
-      <FavouriteListWrapper>
+      <div className="flex w-full flex-col px-3 select-none">
         {hasNoData ? (
           <EmptyStateFavorites />
         ) : (
@@ -50,7 +49,7 @@ export const FavoriteListCompact = ({ favorites, selectedOrgId }: Props) => {
             ))}
           </AnimateList>
         )}
-      </FavouriteListWrapper>
+      </div>
     </ContextMenuProvider>
   )
 }

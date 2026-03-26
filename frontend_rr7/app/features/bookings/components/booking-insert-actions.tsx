@@ -18,12 +18,13 @@
  */
 
 import { ArrowDownToLine, ArrowUpDown, ArrowUpToLine, Plus } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { useSelectedOrgId } from '~/features/bookings/hooks/use-home-loader-data'
+import { useDialogActions } from '~/hooks/use-dialog-actions'
 import { type AugmentedBooking } from '~/lib/api/functions/augment-bookings-list'
 import { cn } from '~/lib/utils/cn'
 import { formatISOLocale } from '~/lib/utils/dates'
@@ -42,9 +43,14 @@ export const BookingInsertActions = ({
   onAddBetween,
 }: Props) => {
   const { t } = useTranslation('common')
-  const [isHovered, setIsHovered] = useState(false)
-  const [isExpanded, setIsExpanded] = useState(false)
-  const dialogRef = useRef<HTMLDialogElement>(null)
+  const {
+    collapse,
+    dialogRef,
+    handleToggle,
+    isExpanded,
+    setIsHovered,
+    showExpanded,
+  } = useDialogActions()
   const hoverTimeoutRef = useRef<null | ReturnType<typeof setTimeout>>(null)
   const selectedOrgId = useSelectedOrgId()
 
@@ -54,76 +60,16 @@ export const BookingInsertActions = ({
       hoverTimeoutRef.current = null
     }
     setIsHovered(true)
-  }, [])
+  }, [setIsHovered])
 
   const handleMouseLeave = useCallback(() => {
     hoverTimeoutRef.current = setTimeout(() => {
-      setIsHovered(false)
-      setIsExpanded(false)
+      collapse()
     }, 300)
-  }, [])
-
-  // Clean up timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (hoverTimeoutRef.current) {
-        clearTimeout(hoverTimeoutRef.current)
-      }
-    }
-  }, [])
+  }, [collapse])
 
   const updateCurrentBooking = useUpdateUserBooking()
   const updateNextBooking = useUpdateUserBooking()
-
-  // Open/close dialog when isExpanded changes
-  useEffect(() => {
-    if (isExpanded && dialogRef.current && !dialogRef.current.open) {
-      dialogRef.current.show()
-    } else if (!isExpanded && dialogRef.current?.open) {
-      dialogRef.current.close()
-    }
-  }, [isExpanded])
-
-  // Handle dialog close event (triggered by ESC key)
-  useEffect(() => {
-    const dialog = dialogRef.current
-    if (!dialog) return
-
-    const handleClose = () => {
-      setIsExpanded(false)
-      setIsHovered(false)
-    }
-
-    dialog.addEventListener('close', handleClose)
-    return () => {
-      dialog.removeEventListener('close', handleClose)
-    }
-  }, [])
-
-  // Handle click outside to close
-  useEffect(() => {
-    if (!isExpanded) return
-
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dialogRef.current &&
-        !dialogRef.current.contains(event.target as Node)
-      ) {
-        setIsExpanded(false)
-        setIsHovered(false)
-      }
-    }
-
-    // Use a slight delay to avoid closing immediately after opening
-    const timeoutId = setTimeout(() => {
-      document.addEventListener('mousedown', handleClickOutside)
-    }, 100)
-
-    return () => {
-      clearTimeout(timeoutId)
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [isExpanded])
 
   const handleAdjustCurrentStart = () => {
     if (!nextItem?.end?.dateTime || !selectedOrgId) return
@@ -155,24 +101,18 @@ export const BookingInsertActions = ({
       bookingId: nextItem.id,
       orgId: selectedOrgId,
     })
-    setIsExpanded(false)
+    collapse()
   }
 
   const handleAddBetween = () => {
     onAddBetween()
-    setIsExpanded(false)
+    collapse()
   }
 
   const handleAdjustCurrentStartWithClose = () => {
     handleAdjustCurrentStart()
-    setIsExpanded(false)
+    collapse()
   }
-
-  const handleToggle = () => {
-    setIsExpanded(!isExpanded)
-  }
-
-  const showExpanded = isHovered || isExpanded
 
   return (
     <>

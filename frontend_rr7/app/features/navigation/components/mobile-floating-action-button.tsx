@@ -60,12 +60,11 @@ import { useGetFavoriteBookingList } from '~/services/api/lasius-hooks/user-favo
  *
  * Only visible on mobile (md:hidden)
  */
+
+type ModalId = 'add' | 'favorites' | 'org' | 'settings' | 'start' | null
+
 export const MobileFloatingActionButton = () => {
-  const [isStartBookingOpen, setIsStartBookingOpen] = useState(false)
-  const [isAddBookingOpen, setIsAddBookingOpen] = useState(false)
-  const [isFavoritesOpen, setIsFavoritesOpen] = useState(false)
-  const [isOrgSelectOpen, setIsOrgSelectOpen] = useState(false)
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const [openModal, setOpenModal] = useState<ModalId>(null)
   const { t } = useTranslation('common')
   const fetcher = useFetcher()
   const { selectedOrganisationId } = useOrganisation()
@@ -75,14 +74,10 @@ export const MobileFloatingActionButton = () => {
       : undefined,
   })
 
-  const handleStartBookingClose = () => setIsStartBookingOpen(false)
-  const handleAddBookingClose = () => setIsAddBookingOpen(false)
-  const handleFavoritesClose = () => setIsFavoritesOpen(false)
-  const handleOrgSelectClose = () => setIsOrgSelectOpen(false)
-  const handleSettingsClose = () => setIsSettingsOpen(false)
+  const closeModal = () => setOpenModal(null)
 
   const handleFavoritesOpen = () => {
-    setIsFavoritesOpen(true)
+    setOpenModal('favorites')
     favoritesApi.submit({ orgId: selectedOrganisationId })
   }
 
@@ -93,10 +88,10 @@ export const MobileFloatingActionButton = () => {
   // Refetch favorites when org changes while modal is open
   const favoritesSubmit = favoritesApi.submit
   useEffect(() => {
-    if (isFavoritesOpen && selectedOrganisationId) {
+    if (openModal === 'favorites' && selectedOrganisationId) {
       favoritesSubmit({ orgId: selectedOrganisationId })
     }
-  }, [selectedOrganisationId, isFavoritesOpen, favoritesSubmit])
+  }, [selectedOrganisationId, openModal, favoritesSubmit])
 
   const actions: FABAction[] = [
     {
@@ -104,7 +99,7 @@ export const MobileFloatingActionButton = () => {
       icon: <LucideIcon icon={Play} size={24} />,
       id: 'start-booking',
       label: t('bookings:actions.start', { defaultValue: 'Start booking' }),
-      onClick: () => setIsStartBookingOpen(true),
+      onClick: () => setOpenModal('start'),
       variant: 'primary',
     },
     {
@@ -112,7 +107,7 @@ export const MobileFloatingActionButton = () => {
       icon: <LucideIcon icon={PlusCircle} size={24} />,
       id: 'add-booking',
       label: t('bookings:actions.add', { defaultValue: 'Add booking' }),
-      onClick: () => setIsAddBookingOpen(true),
+      onClick: () => setOpenModal('add'),
       variant: 'secondary',
     },
     {
@@ -132,7 +127,7 @@ export const MobileFloatingActionButton = () => {
       label: t('organisation:actions.switch', {
         defaultValue: 'Switch organisation',
       }),
-      onClick: () => setIsOrgSelectOpen(true),
+      onClick: () => setOpenModal('org'),
       variant: 'secondary',
     },
     {
@@ -140,7 +135,7 @@ export const MobileFloatingActionButton = () => {
       icon: <LucideIcon icon={Settings} size={24} />,
       id: 'settings',
       label: t('navigation.settings', { defaultValue: 'Settings' }),
-      onClick: () => setIsSettingsOpen(true),
+      onClick: () => setOpenModal('settings'),
       variant: 'secondary',
     },
     {
@@ -169,60 +164,60 @@ export const MobileFloatingActionButton = () => {
       </div>
 
       {/* Start Booking Modal - Quick start with project + tags */}
-      <Modal onClose={handleStartBookingClose} open={isStartBookingOpen}>
+      <Modal onClose={closeModal} open={openModal === 'start'}>
         <BookingStart
-          onSuccess={handleStartBookingClose}
+          onSuccess={closeModal}
           selectedOrgId={selectedOrganisationId}
         />
         <ButtonGroup>
-          <Button onClick={handleStartBookingClose} variant="secondary">
+          <Button onClick={closeModal} variant="secondary">
             {t('common.actions.close', { defaultValue: 'Close' })}
           </Button>
         </ButtonGroup>
       </Modal>
 
       {/* Add Booking Modal - Full form */}
-      <Modal onClose={handleAddBookingClose} open={isAddBookingOpen}>
+      <Modal onClose={closeModal} open={openModal === 'add'}>
         <BookingAddUpdateForm
           mode="add"
-          onClose={handleAddBookingClose}
+          onClose={closeModal}
           selectedOrgId={selectedOrganisationId}
         />
         <ButtonGroup>
-          <Button onClick={handleAddBookingClose} variant="secondary">
+          <Button onClick={closeModal} variant="secondary">
             {t('common.actions.close', { defaultValue: 'Close' })}
           </Button>
         </ButtonGroup>
       </Modal>
 
       {/* Favorites Modal */}
-      <Modal onClose={handleFavoritesClose} open={isFavoritesOpen}>
+      <Modal onClose={closeModal} open={openModal === 'favorites'}>
         <FavoriteListCompact
           favorites={favoritesApi.data?.favorites ?? []}
           selectedOrgId={selectedOrganisationId}
         />
         <ButtonGroup>
-          <Button onClick={handleFavoritesClose} variant="secondary">
+          <Button onClick={closeModal} variant="secondary">
             {t('common.actions.close', { defaultValue: 'Close' })}
           </Button>
         </ButtonGroup>
       </Modal>
 
       {/* Organisation Select Modal */}
-      <Modal onClose={handleOrgSelectClose} open={isOrgSelectOpen}>
-        <OrgSwitcherModal onClose={handleOrgSelectClose} />
+      <Modal onClose={closeModal} open={openModal === 'org'}>
+        <OrgSwitcherModal onClose={closeModal} />
         <ButtonGroup>
-          <Button onClick={handleOrgSelectClose} variant="secondary">
+          <Button onClick={closeModal} variant="secondary">
             {t('common.actions.close', { defaultValue: 'Close' })}
           </Button>
         </ButtonGroup>
       </Modal>
 
       {/* Settings Modal with App Settings Form */}
-      <Modal onClose={handleSettingsClose} open={isSettingsOpen} size="lg">
+      <Modal onClose={closeModal} open={openModal === 'settings'} size="lg">
         <AppSettingsForm />
         <ButtonGroup>
-          <Button onClick={handleSettingsClose} variant="secondary">
+          <Button onClick={closeModal} variant="secondary">
             {t('common.actions.close', { defaultValue: 'Close' })}
           </Button>
         </ButtonGroup>

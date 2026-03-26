@@ -27,7 +27,6 @@ import {
 
 import { BookingListEmptyToday } from './booking-list-empty-today'
 import { OrganisationItem } from './organisation-item'
-import { OrganisationListWrapper } from './organisation-list-wrapper'
 
 type Props = {
   orgBookings: ModelsCurrentUserTimeBooking[]
@@ -44,7 +43,7 @@ export const OrganisationListCompact = ({
 
   return (
     <ContextMenuProvider>
-      <OrganisationListWrapper>
+      <div className="relative flex w-full flex-col px-3 select-none">
         {hasNoData ? (
           <BookingListEmptyToday />
         ) : (
@@ -59,7 +58,7 @@ export const OrganisationListCompact = ({
             ))}
           </AnimateList>
         )}
-      </OrganisationListWrapper>
+      </div>
     </ContextMenuProvider>
   )
 }

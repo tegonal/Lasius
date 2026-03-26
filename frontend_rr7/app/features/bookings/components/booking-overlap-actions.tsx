@@ -23,12 +23,12 @@ import {
   ArrowUpToLine,
   Edit2,
 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { useSelectedOrgId } from '~/features/bookings/hooks/use-home-loader-data'
+import { useDialogActions } from '~/hooks/use-dialog-actions'
 import { type AugmentedBooking } from '~/lib/api/functions/augment-bookings-list'
 import { formatISOLocale } from '~/lib/utils/dates'
 import { type ModelsBooking } from '~/services/api/lasius'
@@ -46,62 +46,18 @@ export const BookingOverlapActions = ({
   overlappingItem,
 }: Props) => {
   const { t } = useTranslation('common')
-  const [isHovered, setIsHovered] = useState(false)
-  const [isExpanded, setIsExpanded] = useState(false)
-  const dialogRef = useRef<HTMLDialogElement>(null)
+  const {
+    collapse,
+    dialogRef,
+    handleToggle,
+    isExpanded,
+    setIsHovered,
+    showExpanded,
+  } = useDialogActions()
   const selectedOrgId = useSelectedOrgId()
 
   const updateCurrentBooking = useUpdateUserBooking()
   const updateOverlappingBooking = useUpdateUserBooking()
-
-  // Open/close dialog when isExpanded changes
-  useEffect(() => {
-    if (isExpanded && dialogRef.current && !dialogRef.current.open) {
-      dialogRef.current.show()
-    } else if (!isExpanded && dialogRef.current?.open) {
-      dialogRef.current.close()
-    }
-  }, [isExpanded])
-
-  // Handle dialog close event (triggered by ESC key)
-  useEffect(() => {
-    const dialog = dialogRef.current
-    if (!dialog) return
-
-    const handleClose = () => {
-      setIsExpanded(false)
-      setIsHovered(false)
-    }
-
-    dialog.addEventListener('close', handleClose)
-    return () => {
-      dialog.removeEventListener('close', handleClose)
-    }
-  }, [])
-
-  // Handle click outside to close
-  useEffect(() => {
-    if (!isExpanded) return
-
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dialogRef.current &&
-        !dialogRef.current.contains(event.target as Node)
-      ) {
-        setIsExpanded(false)
-        setIsHovered(false)
-      }
-    }
-
-    const timeoutId = setTimeout(() => {
-      document.addEventListener('mousedown', handleClickOutside)
-    }, 100)
-
-    return () => {
-      clearTimeout(timeoutId)
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [isExpanded])
 
   const handleAdjustCurrentToOverlappingEnd = () => {
     if (!overlappingItem.end?.dateTime || !selectedOrgId) return
@@ -118,7 +74,7 @@ export const BookingOverlapActions = ({
       bookingId: currentItem.id,
       orgId: selectedOrgId,
     })
-    setIsExpanded(false)
+    collapse()
   }
 
   const handleAdjustOverlappingToCurrentStart = () => {
@@ -134,19 +90,13 @@ export const BookingOverlapActions = ({
       bookingId: overlappingItem.id,
       orgId: selectedOrgId,
     })
-    setIsExpanded(false)
+    collapse()
   }
 
   const handleEdit = () => {
     onEdit()
-    setIsExpanded(false)
+    collapse()
   }
-
-  const handleToggle = () => {
-    setIsExpanded(!isExpanded)
-  }
-
-  const showExpanded = isHovered || isExpanded
 
   return (
     <>
@@ -228,10 +178,7 @@ export const BookingOverlapActions = ({
         <div
           className="absolute inset-x-0 bottom-0 z-10 flex items-center justify-center text-center"
           onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => {
-            setIsHovered(false)
-            setIsExpanded(false)
-          }}
+          onMouseLeave={() => collapse()}
         >
           <div
             className={`bg-base-100 absolute flex gap-1 rounded-full p-1 transition-all duration-200 ${showExpanded ? 'z-20' : 'z-10'}`}

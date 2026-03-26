@@ -24,8 +24,7 @@ import {
   useInputControl,
 } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
-import { Loader2 } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useRevalidator } from 'react-router'
 import { z } from 'zod'
@@ -35,18 +34,18 @@ import { useToast } from '~/components/ui/feedback/use-toast'
 import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { DurationInput } from '~/components/ui/forms/input/duration-input'
 import { Modal } from '~/components/ui/overlays/modal/modal'
+import { GithubResourceOwnerField } from '~/features/integrations/components/modals/config-fields/github-resource-owner-field'
+import { JiraCredentialFields } from '~/features/integrations/components/modals/config-fields/jira-credential-fields'
+import { PlaneFields } from '~/features/integrations/components/modals/config-fields/plane-fields'
+import { ConnectionTestPanel } from '~/features/integrations/components/modals/connection-test-panel'
 import { ProviderInstructions } from '~/features/integrations/components/shared/provider-instructions'
-import { useGithubResourceOwners } from '~/features/integrations/hooks/use-github-resource-owners'
+import { useConnectionTest } from '~/features/integrations/hooks/use-connection-test'
 import { createConfigSchema } from '~/features/integrations/lib/config-schemas'
 import { getImporterTypeLabel } from '~/features/integrations/lib/importer-type-labels'
 import { validateFormData } from '~/lib/conform-helpers'
 import { untyped } from '~/lib/i18n-types'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
-import {
-  useTestConnectivity,
-  useTestExistingConfig,
-  useUpdateConfig,
-} from '~/services/api/lasius-hooks/issue-importers/issue-importers'
+import { useUpdateConfig } from '~/services/api/lasius-hooks/issue-importers/issue-importers'
 import { type ModelsIssueImporterConfigResponse } from '~/services/api/lasius/modelsIssueImporterConfigResponse'
 import { type ModelsUpdateIssueImporterConfig } from '~/services/api/lasius/modelsUpdateIssueImporterConfig'
 
@@ -93,8 +92,6 @@ const getImporterType = (
   return 'gitlab'
 }
 
-type ConnectionTestResult = 'error' | 'success' | null
-
 export const GenericConfigModal = ({
   config,
   onClose,
@@ -105,10 +102,6 @@ export const GenericConfigModal = ({
   const { addToast } = useToast()
   const revalidator = useRevalidator()
   const formRef = useRef<HTMLFormElement>(null)
-
-  const [connectionTestResult, setConnectionTestResult] =
-    useState<ConnectionTestResult>(null)
-  const [connectionTestMessage, setConnectionTestMessage] = useState('')
 
   const importerType = config ? getImporterType(config) : 'gitlab'
 
@@ -154,72 +147,29 @@ export const GenericConfigModal = ({
 
   const checkFrequencyControl = useInputControl(fields.checkFrequency)
   const accessTokenControl = useInputControl(fields.accessToken)
-  const resourceOwnerControl = useInputControl(fields.resourceOwner)
-  const resourceOwnerTypeControl = useInputControl(fields.resourceOwnerType)
+
+  // Connection test hook
+  const {
+    connectionTestMessage,
+    connectionTestResult,
+    handleTestConnection,
+    isTestingConnection,
+    resetTestState,
+  } = useConnectionTest({
+    config,
+    formRef,
+    importerType,
+    open,
+    selectedOrgId,
+  })
 
   // Reset form when config changes or modal opens
   useEffect(() => {
     if (config && open) {
       form.reset()
-      setConnectionTestResult(null)
-      setConnectionTestMessage('')
+      resetTestState()
     }
-  }, [config, open, form])
-
-  // Clean up when modal closes
-  useEffect(() => {
-    if (!open) {
-      setConnectionTestResult(null)
-      setConnectionTestMessage('')
-    }
-  }, [open])
-
-  const { isLoadingResourceOwners, resourceOwners } = useGithubResourceOwners({
-    accessToken: accessTokenControl.value ?? '',
-    baseUrl: String(config?.baseUrl ?? ''),
-    importerType,
-    orgId: selectedOrgId,
-  })
-
-  // Test connectivity hooks
-  const testExistingApi = useTestExistingConfig({
-    onError: (error) => {
-      setConnectionTestResult('error')
-      setConnectionTestMessage(
-        error instanceof Error ? error.message : String(error),
-      )
-    },
-    onSuccess: (data) => {
-      setConnectionTestResult(data?.status === 'success' ? 'success' : 'error')
-      setConnectionTestMessage(
-        data?.message ??
-          t('issueImporters.testConnection.success', {
-            defaultValue: 'Connection successful',
-          }),
-      )
-    },
-  })
-
-  const testConnectivityApi = useTestConnectivity({
-    onError: (error) => {
-      setConnectionTestResult('error')
-      setConnectionTestMessage(
-        error instanceof Error ? error.message : String(error),
-      )
-    },
-    onSuccess: (data) => {
-      setConnectionTestResult(data?.status === 'success' ? 'success' : 'error')
-      setConnectionTestMessage(
-        data?.message ??
-          t('issueImporters.testConnection.success', {
-            defaultValue: 'Connection successful',
-          }),
-      )
-    },
-  })
-
-  const isTestingConnection =
-    testExistingApi.isSubmitting || testConnectivityApi.isSubmitting
+  }, [config, open, form, resetTestState])
 
   // Update config hook
   const updateApi = useUpdateConfig({
@@ -244,73 +194,6 @@ export const GenericConfigModal = ({
   })
 
   const isSaving = updateApi.isSubmitting
-
-  /** Read current form values from the DOM */
-  const getFormValues = useCallback(() => {
-    if (!formRef.current) return {} as unknown as Record<string, string>
-    const fd = new FormData(formRef.current)
-    return Object.fromEntries(fd.entries()) as Record<string, string>
-  }, [])
-
-  const hasNewCredentials = useCallback(() => {
-    const values = getFormValues()
-    switch (importerType) {
-      case 'github':
-      case 'gitlab': {
-        return !!values.accessToken
-      }
-      case 'jira': {
-        return (
-          !!values.accessToken || !!values.consumerKey || !!values.privateKey
-        )
-      }
-      case 'plane': {
-        return !!values.apiKey
-      }
-    }
-  }, [getFormValues, importerType])
-
-  const handleTestConnection = useCallback(() => {
-    if (!config) return
-
-    if (hasNewCredentials()) {
-      const values = getFormValues()
-      testConnectivityApi.submit({
-        body: {
-          accessToken: values.accessToken || undefined,
-          apiKey: values.apiKey || undefined,
-          baseUrl: values.baseUrl,
-          checkFrequency: Number(values.checkFrequency),
-          consumerKey: values.consumerKey || undefined,
-          importerType: importerType as unknown as never,
-          name: values.name,
-          privateKey: values.privateKey || undefined,
-          resourceOwner: values.resourceOwner || undefined,
-          resourceOwnerType: values.resourceOwnerType || undefined,
-          workspace: values.workspace || undefined,
-        } as unknown as never,
-        orgId: selectedOrgId,
-      })
-    } else {
-      testExistingApi.submit({
-        configId: config.id,
-        orgId: selectedOrgId,
-      })
-    }
-  }, [
-    config,
-    getFormValues,
-    hasNewCredentials,
-    importerType,
-    selectedOrgId,
-    testConnectivityApi,
-    testExistingApi,
-  ])
-
-  const resetTestState = useCallback(() => {
-    setConnectionTestResult(null)
-    setConnectionTestMessage('')
-  }, [])
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -456,213 +339,40 @@ export const GenericConfigModal = ({
 
             {/* GitHub: Resource Owner */}
             {importerType === 'github' && (
-              <>
-                <fieldset className="fieldset">
-                  <label className="label" htmlFor={fields.resourceOwner.id}>
-                    {t('issueImporters.fields.resourceOwner', {
-                      defaultValue: 'Resource Owner',
-                    })}
-                  </label>
-                  <input
-                    name={fields.resourceOwner.name}
-                    type="hidden"
-                    value={resourceOwnerControl.value ?? ''}
-                  />
-                  <select
-                    className="select select-bordered w-full"
-                    disabled={
-                      resourceOwners.length === 0 || isLoadingResourceOwners
-                    }
-                    id={fields.resourceOwner.id}
-                    onChange={(e) => {
-                      resourceOwnerControl.change(e.target.value)
-                      const selectedOwner = resourceOwners.find(
-                        (owner) => owner.id === e.target.value,
-                      )
-                      if (selectedOwner?.ownerType) {
-                        resourceOwnerTypeControl.change(selectedOwner.ownerType)
-                      }
-                    }}
-                    value={resourceOwnerControl.value || ''}
-                  >
-                    <option disabled value="">
-                      {isLoadingResourceOwners
-                        ? t('issueImporters.fields.resourceOwnerLoading', {
-                            defaultValue: 'Loading organizations...',
-                          })
-                        : resourceOwners.length === 0 &&
-                            !accessTokenControl.value
-                          ? t(
-                              'issueImporters.fields.resourceOwnerPlaceholder',
-                              {
-                                defaultValue:
-                                  'Enter access token above to load organizations',
-                              },
-                            )
-                          : resourceOwners.length === 0
-                            ? t(
-                                'issueImporters.fields.resourceOwnerNoResults',
-                                {
-                                  defaultValue: 'No organizations found',
-                                },
-                              )
-                            : t('issueImporters.fields.resourceOwnerSelect', {
-                                defaultValue: 'Select an organization',
-                              })}
-                    </option>
-                    {resourceOwners.map((owner) => (
-                      <option key={owner.id} value={owner.id}>
-                        {owner.name}
-                      </option>
-                    ))}
-                  </select>
-                  <FormFieldErrors errors={fields.resourceOwner.errors} />
-                  <p className="text-base-content/60 mt-1 text-xs">
-                    {t('issueImporters.fields.resourceOwnerHelp', {
-                      defaultValue:
-                        'Select the GitHub user or organization that owns the repositories you want to access.',
-                    })}
-                  </p>
-                </fieldset>
-                <input
-                  name={fields.resourceOwnerType.name}
-                  type="hidden"
-                  value={resourceOwnerTypeControl.value ?? ''}
-                />
-              </>
+              <GithubResourceOwnerField
+                accessTokenValue={accessTokenControl.value ?? ''}
+                baseUrl={String(config.baseUrl)}
+                fields={{
+                  resourceOwner: fields.resourceOwner,
+                  resourceOwnerType: fields.resourceOwnerType,
+                }}
+                importerType={importerType}
+                selectedOrgId={selectedOrgId}
+              />
             )}
 
             {/* Jira fields */}
             {importerType === 'jira' && (
-              <>
-                <fieldset className="fieldset">
-                  <label className="label" htmlFor={fields.consumerKey.id}>
-                    {t('issueImporters.fields.consumerKey', {
-                      defaultValue: 'OAuth Consumer Key',
-                    })}
-                  </label>
-                  <Input
-                    {...getInputProps(fields.consumerKey, { type: 'text' })}
-                    key={fields.consumerKey.key}
-                    placeholder="jira-oauth-consumer"
-                  />
-                  <FormFieldErrors errors={fields.consumerKey.errors} />
-                </fieldset>
-
-                <fieldset className="fieldset">
-                  <label className="label" htmlFor={fields.privateKey.id}>
-                    {t('issueImporters.fields.privateKeyEdit', {
-                      defaultValue: 'Private Key (leave empty to keep current)',
-                    })}
-                  </label>
-                  <textarea
-                    autoComplete="off"
-                    className="textarea textarea-bordered w-full font-mono text-sm"
-                    data-1p-ignore
-                    data-form-type="other"
-                    data-lpignore="true"
-                    id={fields.privateKey.id}
-                    key={fields.privateKey.key}
-                    name={fields.privateKey.name}
-                    onChange={(e) => {
-                      resetTestState()
-                      // Let the native input update the form value
-                      e.target.dispatchEvent(
-                        new Event('input', { bubbles: true }),
-                      )
-                    }}
-                    placeholder={t(
-                      'issueImporters.fields.credentialPlaceholder',
-                      { defaultValue: 'Enter new value to update' },
-                    )}
-                    rows={4}
-                  />
-                  <FormFieldErrors errors={fields.privateKey.errors} />
-                </fieldset>
-
-                <fieldset className="fieldset">
-                  <label className="label" htmlFor={fields.accessToken.id}>
-                    {t('issueImporters.fields.accessTokenEdit', {
-                      defaultValue:
-                        'Access Token (leave empty to keep current)',
-                    })}
-                  </label>
-                  <Input
-                    {...getInputProps(fields.accessToken, {
-                      type: 'password',
-                    })}
-                    autoComplete="off"
-                    data-1p-ignore
-                    data-form-type="other"
-                    data-lpignore="true"
-                    key={fields.accessToken.key}
-                    onChange={(e) => {
-                      accessTokenControl.change(e.target.value)
-                      resetTestState()
-                    }}
-                    placeholder={t(
-                      'issueImporters.fields.credentialPlaceholder',
-                      { defaultValue: 'Enter new value to update' },
-                    )}
-                  />
-                  <FormFieldErrors errors={fields.accessToken.errors} />
-                </fieldset>
-              </>
+              <JiraCredentialFields
+                accessTokenControl={accessTokenControl}
+                fields={{
+                  accessToken: fields.accessToken,
+                  consumerKey: fields.consumerKey,
+                  privateKey: fields.privateKey,
+                }}
+                resetTestState={resetTestState}
+              />
             )}
 
             {/* Plane fields */}
             {importerType === 'plane' && (
-              <>
-                <fieldset className="fieldset">
-                  <label className="label" htmlFor={fields.apiKey.id}>
-                    {t('issueImporters.fields.apiKeyEdit', {
-                      defaultValue: 'API Key (leave empty to keep current)',
-                    })}
-                  </label>
-                  <Input
-                    {...getInputProps(fields.apiKey, { type: 'password' })}
-                    autoComplete="off"
-                    data-1p-ignore
-                    data-form-type="other"
-                    data-lpignore="true"
-                    key={fields.apiKey.key}
-                    onChange={() => {
-                      resetTestState()
-                    }}
-                    placeholder={t(
-                      'issueImporters.fields.credentialPlaceholder',
-                      { defaultValue: 'Enter new value to update' },
-                    )}
-                  />
-                  <FormFieldErrors errors={fields.apiKey.errors} />
-                </fieldset>
-
-                <fieldset className="fieldset">
-                  <label className="label" htmlFor={fields.workspace.id}>
-                    {t('issueImporters.fields.workspace', {
-                      defaultValue: 'Workspace',
-                    })}
-                  </label>
-                  <Input
-                    {...getInputProps(fields.workspace, { type: 'text' })}
-                    key={fields.workspace.key}
-                    onChange={() => {
-                      resetTestState()
-                    }}
-                    placeholder={t(
-                      'issueImporters.fields.workspacePlaceholder',
-                      { defaultValue: 'e.g., my-company' },
-                    )}
-                  />
-                  <FormFieldErrors errors={fields.workspace.errors} />
-                  <p className="text-base-content/60 mt-1 text-xs">
-                    {t('issueImporters.fields.workspaceHelp', {
-                      defaultValue:
-                        'The workspace slug from your Plane URL (e.g., "my-company" from https://app.plane.so/my-company)',
-                    })}
-                  </p>
-                </fieldset>
-              </>
+              <PlaneFields
+                fields={{
+                  apiKey: fields.apiKey,
+                  workspace: fields.workspace,
+                }}
+                resetTestState={resetTestState}
+              />
             )}
 
             {/* Check Frequency */}
@@ -677,7 +387,7 @@ export const GenericConfigModal = ({
                 type="hidden"
                 value={
                   checkFrequencyControl.value ??
-                  String(config?.checkFrequency || 300_000)
+                  String(config.checkFrequency || 300_000)
                 }
               />
               <div>
@@ -728,41 +438,13 @@ export const GenericConfigModal = ({
               <ProviderInstructions importerType={importerType} />
             </div>
 
-            {/* Test connection section */}
-            <div className="space-y-4">
-              {connectionTestResult && (
-                <div
-                  className={`alert ${connectionTestResult === 'success' ? 'alert-success' : 'alert-error'}`}
-                >
-                  <span>{connectionTestMessage}</span>
-                </div>
-              )}
-              <button
-                className="btn btn-secondary w-full"
-                disabled={isTestingConnection || isSaving}
-                onClick={handleTestConnection}
-                type="button"
-              >
-                {isTestingConnection ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {t('issueImporters.testConnection.testing', {
-                      defaultValue: 'Testing connection...',
-                    })}
-                  </>
-                ) : (
-                  t('issueImporters.testConnection.test', {
-                    defaultValue: 'Test Connection',
-                  })
-                )}
-              </button>
-              <p className="text-base-content/60 text-xs">
-                {t('issueImporters.testConnection.editModeNote', {
-                  defaultValue:
-                    'Note: Enter your credentials above to test the connection. Leave empty to keep existing credentials when saving.',
-                })}
-              </p>
-            </div>
+            <ConnectionTestPanel
+              connectionTestMessage={connectionTestMessage}
+              connectionTestResult={connectionTestResult}
+              handleTestConnection={handleTestConnection}
+              isSaving={isSaving}
+              isTestingConnection={isTestingConnection}
+            />
           </div>
         </div>
       </div>
