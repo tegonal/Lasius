@@ -22,7 +22,7 @@ import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
 
-export const APP_SETTINGS_STORAGE_KEY = 'lasius-app-settings'
+const APP_SETTINGS_STORAGE_KEY = 'lasius-app-settings'
 
 export type ThemeMode = 'dark' | 'light' | 'system'
 
@@ -74,9 +74,6 @@ export const useAppSettingsStore = create<AppSettingsStore>()(
 export const useTheme = () => useAppSettingsStore((state) => state.theme)
 export const useOnboardingDismissed = () =>
   useAppSettingsStore((state) => state.onboardingDismissed)
-export const useOnboardingChecklistReached = () =>
-  useAppSettingsStore((state) => state.onboardingChecklistReached)
-
 export const useAppSettingsActions = () => {
   const setTheme = useAppSettingsStore((state) => state.setTheme)
   const dismissOnboarding = useAppSettingsStore(

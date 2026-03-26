@@ -35,6 +35,7 @@ import {
 } from '~/services/api/lasius-hooks/issue-importers/issue-importers'
 
 type Props = {
+  existingConfig?: ModelsIssueImporterConfigResponse
   formData: WizardFormData
   onBack: () => void
   onConfigCreated: (config: ModelsIssueImporterConfigResponse) => void
@@ -69,6 +70,7 @@ function buildConfigBody(
 }
 
 export const TestConnectionStep = ({
+  existingConfig,
   formData,
   onBack,
   onConfigCreated,
@@ -97,9 +99,18 @@ export const TestConnectionStep = ({
     },
     onSuccess: (data) => {
       if (data.status === 'success') {
-        setTestStatus('saving')
-        const body = buildConfigBody(formData)
-        createConfig.submit({ body, orgId: selectedOrgId })
+        if (existingConfig) {
+          // Config already created from a previous pass — skip creation
+          setTestStatus('success')
+          onConfigCreated(existingConfig)
+          successTimeoutRef.current = setTimeout(() => {
+            onNext()
+          }, 1500)
+        } else {
+          setTestStatus('saving')
+          const body = buildConfigBody(formData)
+          createConfig.submit({ body, orgId: selectedOrgId })
+        }
       } else {
         setTestStatus('error')
         setErrorMessage(

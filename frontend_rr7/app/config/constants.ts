@@ -26,4 +26,79 @@ export const ROLES = {
 }
 
 export const AUTH_PROVIDER_INTERNAL_LASIUS = 'internal_lasius'
-export const AUTH_PROVIDER_CUSTOMER_KEYCLOAK = 'custom_keycloak'
+
+// ---------------------------------------------------------------------------
+// Time unit helpers
+// ---------------------------------------------------------------------------
+
+/** Milliseconds in one hour. Used for converting booking durations to hours in aggregations. */
+export const MS_PER_HOUR = 3_600_000
+
+// ---------------------------------------------------------------------------
+// Polling & session timing
+// ---------------------------------------------------------------------------
+
+/** How often to poll the server for session validity. Balances freshness vs server load. */
+export const SESSION_POLL_INTERVAL_MS = 30_000
+
+/** Time before token expiry to show the "session expiring" warning to the user. */
+export const SESSION_EXPIRY_WARNING_MS = 2 * 60 * 1000
+
+/** How often to poll the backend health endpoint for connectivity status. */
+export const HEALTH_POLL_INTERVAL_MS = 10_000
+
+/** Debounce window for health status changes to avoid UI flicker on transient failures. */
+export const HEALTH_STATUS_DEBOUNCE_MS = 2000
+
+/** Default time-to-live for cached loader responses. Prevents redundant fetches within a session. */
+export const LOADER_CACHE_DEFAULT_TTL_MS = 5 * 60 * 1000
+
+// ---------------------------------------------------------------------------
+// WebSocket config
+// ---------------------------------------------------------------------------
+
+/** Interval between WebSocket keep-alive pings to detect stale connections. */
+export const WS_PING_INTERVAL_MS = 5000
+
+/** Maximum number of reconnection attempts before giving up and showing an error. */
+export const WS_MAX_RECONNECT_ATTEMPTS = 30
+
+/** Upper bound for exponential backoff delay between WebSocket reconnection attempts. */
+export const WS_MAX_BACKOFF_MS = 10_000
+
+// ---------------------------------------------------------------------------
+// API resource paths
+// ---------------------------------------------------------------------------
+
+/** Internal API route paths for client-side resource routes. */
+export const API_ROUTES = {
+  /** Polls backend connectivity and version drift. */
+  HEALTH: '/api/health',
+  /** Persists the user's locale preference via cookie. */
+  LOCALE: '/api/locale',
+  /** Returns current session validity and token expiry for the token watcher. */
+  SESSION_STATUS: '/api/session-status',
+  /** Persists the user's theme preference via cookie. */
+  THEME: '/api/theme',
+} as const
+
+// ---------------------------------------------------------------------------
+// Cookie config
+// ---------------------------------------------------------------------------
+
+/** Max-age for persistent preference cookies (theme, locale). Set to 1 year. */
+export const COOKIE_MAX_AGE_1_YEAR = 60 * 60 * 24 * 365
+
+// ---------------------------------------------------------------------------
+// Auth session
+// ---------------------------------------------------------------------------
+
+/** Progressive backoff delays for token refresh retries on transient failures. */
+export const AUTH_REFRESH_BACKOFF_MS = [500, 1000, 2000] as const
+
+// ---------------------------------------------------------------------------
+// Dev tools
+// ---------------------------------------------------------------------------
+
+/** Refresh interval for the dev-mode token expiry countdown badge. */
+export const TOKEN_TIME_UPDATE_INTERVAL_MS = 5000

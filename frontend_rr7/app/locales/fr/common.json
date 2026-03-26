@@ -265,6 +265,7 @@
     "passwordTooShort": "Minimum 9 caractères",
     "projectKeyRequired": "Nom du projet requis",
     "required": "Required",
+    "startBeforeEnd": "Start time must be before end time",
     "startMustBeInPast": "L'heure de début doit être dans le passé",
     "themeRequired": "Thème requis"
   },

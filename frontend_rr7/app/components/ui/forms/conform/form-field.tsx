@@ -19,12 +19,7 @@
 
 import { type FieldMetadata, getInputProps } from '@conform-to/react'
 
-import {
-  Input,
-  type InputProps,
-  Textarea,
-  type TextareaProps,
-} from '~/components/primitives/inputs/input'
+import { Input, type InputProps } from '~/components/primitives/inputs/input'
 import { FormElement } from '~/components/ui/forms/form-element'
 import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 
@@ -82,44 +77,6 @@ export const FormField = ({
         {...getInputProps(field, { type })}
         key={field.key}
         {...inputProps}
-      />
-      <FormFieldErrors errors={field.errors} id={`${field.id}-errors`} />
-    </FormElement>
-  )
-}
-
-interface FormTextareaFieldProps extends Omit<TextareaProps, 'name'> {
-  field: FieldMetadata<string>
-  label?: string
-  labelActionSlot?: React.ReactNode
-  required?: boolean
-}
-
-/**
- * Conform-native textarea field wrapper.
- */
-export const FormTextareaField = ({
-  field,
-  label,
-  labelActionSlot,
-  required,
-  ...textareaProps
-}: FormTextareaFieldProps) => {
-  const hasErrors = !!field.errors?.length
-
-  return (
-    <FormElement
-      htmlFor={field.id}
-      label={label}
-      labelActionSlot={labelActionSlot}
-      required={required}
-    >
-      <Textarea
-        error={hasErrors}
-        id={field.id}
-        key={field.key}
-        name={field.name}
-        {...textareaProps}
       />
       <FormFieldErrors errors={field.errors} id={`${field.id}-errors`} />
     </FormElement>

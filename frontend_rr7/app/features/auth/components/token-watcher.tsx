@@ -21,10 +21,12 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { href, useNavigate, useRevalidator } from 'react-router'
 
+import {
+  API_ROUTES,
+  SESSION_EXPIRY_WARNING_MS,
+  SESSION_POLL_INTERVAL_MS,
+} from '~/config/constants'
 import { logger } from '~/lib/logger'
-
-const POLL_INTERVAL_MS = 30_000
-const EXPIRY_WARNING_MS = 2 * 60 * 1000 // 2 minutes
 
 interface SessionStatus {
   authenticated: boolean
@@ -45,7 +47,7 @@ export const TokenWatcher = () => {
 
   const poll = useCallback(async () => {
     try {
-      const res = await fetch('/api/session-status')
+      const res = await fetch(API_ROUTES.SESSION_STATUS)
 
       if (!res.ok) {
         logger.warn('[TokenWatcher] Session status request failed', res.status)
@@ -63,7 +65,7 @@ export const TokenWatcher = () => {
       if (status.expiresAt) {
         const remaining = status.expiresAt - Date.now()
 
-        if (remaining <= EXPIRY_WARNING_MS) {
+        if (remaining <= SESSION_EXPIRY_WARNING_MS) {
           setShowWarning(true)
         }
       }
@@ -76,7 +78,7 @@ export const TokenWatcher = () => {
     // Initial check
     void poll()
 
-    const id = setInterval(() => void poll(), POLL_INTERVAL_MS)
+    const id = setInterval(() => void poll(), SESSION_POLL_INTERVAL_MS)
     return () => clearInterval(id)
   }, [poll])
 

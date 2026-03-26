@@ -18,8 +18,10 @@
  */
 
 import { useCallback, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useRevalidator } from 'react-router'
 
+import { useToast } from '~/components/ui/feedback/use-toast'
 import { type ModelsIssueImporterConfigResponse } from '~/services/api/lasius'
 import { useDeleteConfig } from '~/services/api/lasius-hooks/issue-importers/issue-importers'
 
@@ -47,6 +49,8 @@ type UseIssueImporterConfigManagementReturn = {
 export function useIssueImporterConfigManagement(
   selectedOrgId: string,
 ): UseIssueImporterConfigManagementReturn {
+  const { t } = useTranslation('integrations')
+  const { addToast } = useToast()
   const revalidator = useRevalidator()
 
   const [activeModal, setActiveModal] = useState<ModalType>(null)
@@ -54,10 +58,24 @@ export function useIssueImporterConfigManagement(
     useState<ModelsIssueImporterConfigResponse | null>(null)
 
   const deleteApi = useDeleteConfig({
+    onError: () => {
+      addToast({
+        message: t('issueImporters.errors.deleteFailed', {
+          defaultValue: 'Failed to delete integration',
+        }),
+        type: 'ERROR',
+      })
+    },
     onSuccess: () => {
       setActiveModal(null)
       setSelectedConfig(null)
       void revalidator.revalidate()
+      addToast({
+        message: t('issueImporters.success.configDeleted', {
+          defaultValue: 'Integration deleted successfully',
+        }),
+        type: 'SUCCESS',
+      })
     },
   })
 

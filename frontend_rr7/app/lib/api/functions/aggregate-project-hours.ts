@@ -19,6 +19,7 @@
 
 import { sumBy } from 'es-toolkit'
 
+import { MS_PER_HOUR } from '~/config/constants'
 import { type ModelsBookingStats } from '~/services/api/lasius/modelsBookingStats'
 
 export type ProjectSummary = {
@@ -26,8 +27,6 @@ export type ProjectSummary = {
   name: string
   percentage: number
 }
-
-const MS_PER_HOUR = 3_600_000
 
 export const aggregateProjectHours = (
   data?: ModelsBookingStats[],

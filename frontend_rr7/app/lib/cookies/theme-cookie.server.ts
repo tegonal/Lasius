@@ -19,10 +19,11 @@
 
 import { parse, serialize } from 'cookie'
 
+import { COOKIE_MAX_AGE_1_YEAR } from '~/config/constants'
+
 export type Theme = 'dark' | 'light'
 
 const COOKIE_NAME = 'theme'
-const MAX_AGE = 60 * 60 * 24 * 365 // 1 year
 
 export function isValidTheme(value?: unknown): value is Theme {
   return value === 'light' || value === 'dark'
@@ -49,7 +50,7 @@ export function parseThemeCookie(cookieHeader: null | string): null | Theme {
  */
 export function serializeThemeCookie(theme: Theme): string {
   return serialize(COOKIE_NAME, theme, {
-    maxAge: MAX_AGE,
+    maxAge: COOKIE_MAX_AGE_1_YEAR,
     path: '/',
     sameSite: 'lax',
     secure: process.env.NODE_ENV === 'production',

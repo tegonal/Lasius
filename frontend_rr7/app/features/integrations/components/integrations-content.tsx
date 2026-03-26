@@ -17,11 +17,13 @@
  *
  */
 
+import { Plug } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { DataList } from '~/components/ui/data-display/data-list/data-list'
 import { DataListHeaderItem } from '~/components/ui/data-display/data-list/data-list-header-item'
 import { DataListRow } from '~/components/ui/data-display/data-list/data-list-row'
+import { EmptyState } from '~/components/ui/data-display/empty-state'
 import { ContextMenuProvider } from '~/features/context-menu/hooks/use-context-menu'
 import { IntegrationConfigItem } from '~/features/integrations/components/integration-config-item'
 import { type ModelsIssueImporterConfigResponse } from '~/services/api/lasius'
@@ -45,14 +47,13 @@ export const IntegrationsContent = ({
 
   if (configs.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center gap-4 py-16">
-        <p className="text-base-content/60 text-sm">
-          {t('issueImporters.emptyState', {
-            defaultValue:
-              'No integrations configured yet. Add one to get started.',
-          })}
-        </p>
-      </div>
+      <EmptyState
+        icon={Plug}
+        label={t('issueImporters.emptyState', {
+          defaultValue:
+            'No integrations configured yet. Add one to get started.',
+        })}
+      />
     )
   }
 

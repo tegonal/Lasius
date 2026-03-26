@@ -33,6 +33,7 @@ import { FormBody } from '~/components/ui/forms/form-body'
 import { FormElement } from '~/components/ui/forms/form-element'
 import { Select, type SelectOption } from '~/components/ui/forms/input/select'
 import { ToggleSwitch } from '~/components/ui/forms/input/toggle-switch'
+import { API_ROUTES } from '~/config/constants'
 import { DEFAULT_LOCALE, LOCALE_LABELS, LOCALES } from '~/i18n-config'
 import { validateFormData } from '~/lib/conform-helpers'
 import { type SchemaTranslationFn, untyped } from '~/lib/i18n-types'
@@ -144,7 +145,7 @@ export const AppSettingsForm = () => {
     if (languageChanged) {
       void localeFetcher.submit(
         { locale: data.language },
-        { action: '/api/locale', method: 'post' },
+        { action: API_ROUTES.LOCALE, method: 'post' },
       )
     }
 
@@ -161,7 +162,7 @@ export const AppSettingsForm = () => {
         document.documentElement.dataset.theme = systemTheme
         void themeFetcher.submit(
           { theme: systemTheme },
-          { action: '/api/theme', method: 'post' },
+          { action: API_ROUTES.THEME, method: 'post' },
         )
       }
     } else {
@@ -169,7 +170,7 @@ export const AppSettingsForm = () => {
       document.documentElement.dataset.theme = dataTheme
       void themeFetcher.submit(
         { theme: data.theme },
-        { action: '/api/theme', method: 'post' },
+        { action: API_ROUTES.THEME, method: 'post' },
       )
     }
 

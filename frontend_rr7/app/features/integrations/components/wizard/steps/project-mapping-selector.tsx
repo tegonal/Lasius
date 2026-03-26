@@ -20,7 +20,7 @@
 import { getFormProps, useForm, useInputControl } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
 import { FolderOpen } from 'lucide-react'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 
@@ -34,7 +34,9 @@ import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
 import { ModalDescription } from '~/components/ui/overlays/modal/modal-description'
 import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
+import { TagConfigurationForm } from '~/features/integrations/components/shared/tag-configuration-form'
 import { type TagConfiguration } from '~/features/integrations/lib/mapping-helpers'
+import { getDefaultTagConfiguration } from '~/features/integrations/lib/tag-config-defaults'
 import { validateFormData } from '~/lib/conform-helpers'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 import { type ModelsExternalProject } from '~/services/api/lasius'
@@ -59,13 +61,17 @@ type Props = {
 export const ProjectMappingSelector = ({
   existingTagConfig,
   externalProject,
-  importerType: _importerType,
+  importerType,
   lasiusProjects,
   onCancel,
   onSelect,
   selectedProjectId,
 }: Props) => {
   const { t } = useTranslation('integrations')
+
+  const [tagConfig, setTagConfig] = useState<TagConfiguration | undefined>(
+    () => existingTagConfig ?? getDefaultTagConfiguration(importerType),
+  )
 
   const [form, fields] = useForm({
     constraint: getZodConstraint(mappingSchema),
@@ -98,7 +104,7 @@ export const ProjectMappingSelector = ({
     const result = validateFormData(e.currentTarget, mappingSchema)
     if (result.status !== 'success') return
 
-    onSelect(result.value.projectId, existingTagConfig)
+    onSelect(result.value.projectId, tagConfig)
   }
 
   return (
@@ -168,17 +174,14 @@ export const ProjectMappingSelector = ({
               />
             </FormElement>
 
-            {/* Tag configuration form will be added here when TagConfigurationForm is migrated */}
-            {projectIdControl.value &&
-              existingTagConfig &&
-              _importerType !== 'jira' && (
-                <Text className="text-base-content/50" variant="infoText">
-                  {t('issueImporters.wizard.projects.tagConfigPlaceholder', {
-                    defaultValue:
-                      'Tag configuration options will be available after saving.',
-                  })}
-                </Text>
-              )}
+            {projectIdControl.value && tagConfig && importerType !== 'jira' && (
+              <TagConfigurationForm
+                externalProject={externalProject}
+                importerType={importerType}
+                onChange={setTagConfig}
+                value={tagConfig}
+              />
+            )}
           </FormBody>
         </div>
       </div>

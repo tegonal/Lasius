@@ -20,6 +20,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { API_ROUTES, TOKEN_TIME_UPDATE_INTERVAL_MS } from '~/config/constants'
+
 /**
  * Dev-only overlay badge showing current breakpoint, language, theme, and token time remaining.
  * Only renders in development mode. Polls /api/session-status every 5s for token expiry.
@@ -31,7 +33,7 @@ export const DevInfoBadge = () => {
 
   const updateTokenTime = useCallback(async () => {
     try {
-      const res = await fetch('/api/session-status')
+      const res = await fetch(API_ROUTES.SESSION_STATUS)
       if (!res.ok) {
         setTokenTime('N/A')
         return
@@ -59,7 +61,10 @@ export const DevInfoBadge = () => {
 
   useEffect(() => {
     void updateTokenTime()
-    const id = setInterval(() => void updateTokenTime(), 5000)
+    const id = setInterval(
+      () => void updateTokenTime(),
+      TOKEN_TIME_UPDATE_INTERVAL_MS,
+    )
     return () => clearInterval(id)
   }, [updateTokenTime])
 

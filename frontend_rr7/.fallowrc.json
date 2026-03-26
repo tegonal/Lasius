@@ -3,8 +3,12 @@
   "ignorePatterns": [
     "app/services/api/lasius/**",
     "app/services/api/lasius-hooks/**",
-    ".react-router/**"
+    "app/services/api/orval-fetcher-client.ts",
+    ".react-router/**",
+    "public/help/**",
+    "orval.config.mjs"
   ],
+  "entry": ["app/routes.ts"],
   "ignoreDependencies": ["@nivo/core", "daisyui", "immer", "typescript-eslint"],
   "rules": {
     "unused-files": "warn",
@@ -43,6 +47,16 @@
         "unused-exports": "off",
         "unused-types": "off",
         "duplicate-exports": "off"
+      }
+    },
+    {
+      "files": [
+        "app/services/api/orval-fetcher-client.ts",
+        "orval.config.mjs",
+        "public/help/**"
+      ],
+      "rules": {
+        "unused-files": "off"
       }
     }
   ]

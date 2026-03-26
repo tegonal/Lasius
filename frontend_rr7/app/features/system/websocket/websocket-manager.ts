@@ -17,6 +17,11 @@
  *
  */
 
+import {
+  WS_MAX_BACKOFF_MS,
+  WS_MAX_RECONNECT_ATTEMPTS,
+  WS_PING_INTERVAL_MS,
+} from '~/config/constants'
 import { logger } from '~/lib/logger'
 
 export enum ConnectionStatus {
@@ -25,10 +30,6 @@ export enum ConnectionStatus {
   DISCONNECTED = 'DISCONNECTED',
   ERROR = 'ERROR',
 }
-
-const PING_INTERVAL_MS = 5000
-const MAX_RECONNECT_ATTEMPTS = 30
-const MAX_BACKOFF_MS = 10_000
 
 export type TicketFetcher = () => Promise<string>
 
@@ -203,9 +204,9 @@ class WebSocketManager {
       return
     }
 
-    if (this.reconnectAttempt >= MAX_RECONNECT_ATTEMPTS) {
+    if (this.reconnectAttempt >= WS_MAX_RECONNECT_ATTEMPTS) {
       logger.error(
-        `[WebSocketManager] Max reconnect attempts (${MAX_RECONNECT_ATTEMPTS}) reached`,
+        `[WebSocketManager] Max reconnect attempts (${WS_MAX_RECONNECT_ATTEMPTS}) reached`,
       )
       this.setStatus(ConnectionStatus.ERROR)
       return
@@ -213,7 +214,7 @@ class WebSocketManager {
 
     const delay = getBackoffDelay(this.reconnectAttempt)
     logger.info(
-      `[WebSocketManager] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempt + 1}/${MAX_RECONNECT_ATTEMPTS})`,
+      `[WebSocketManager] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempt + 1}/${WS_MAX_RECONNECT_ATTEMPTS})`,
     )
 
     this.clearReconnectTimer()
@@ -260,7 +261,7 @@ class WebSocketManager {
     this.stopPing()
     this.pingTimer = setInterval(() => {
       this.send({ type: 'Ping' })
-    }, PING_INTERVAL_MS)
+    }, WS_PING_INTERVAL_MS)
   }
 
   private stopPing(): void {
@@ -280,7 +281,7 @@ function createWebSocket(url: string): WebSocket {
 }
 
 function getBackoffDelay(attempt: number): number {
-  return Math.min(Math.pow(2, attempt) * 1000, MAX_BACKOFF_MS)
+  return Math.min(Math.pow(2, attempt) * 1000, WS_MAX_BACKOFF_MS)
 }
 
 /**

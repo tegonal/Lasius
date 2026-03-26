@@ -19,6 +19,8 @@
 
 import { describe, expect, it } from 'vitest'
 
+import { MS_PER_HOUR } from '~/config/constants'
+
 import { aggregateProjectHours } from './aggregate-project-hours'
 
 interface StubBookingStats {
@@ -30,8 +32,6 @@ interface StubBookingStatsValue {
   duration?: null | number
   label?: null | string
 }
-
-const MS_PER_HOUR = 3_600_000
 
 const makeStats = (values: StubBookingStatsValue[]): StubBookingStats => ({
   category: {},

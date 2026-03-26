@@ -127,6 +127,29 @@ export const buildMappingPayload = (
 }
 
 /**
+ * Extract tag configuration from a mapping object
+ */
+export const extractTagConfig = (
+  mapping: ProjectMapping,
+): TagConfiguration | undefined => {
+  return (
+    mapping?.settings as unknown as { tagConfiguration?: TagConfiguration }
+  )?.tagConfiguration
+}
+
+/**
+ * Check if a mapping matches a given external project ID
+ */
+export const mappingMatchesProject = (
+  importerType: ImporterType,
+  mapping: ProjectMapping,
+  externalProjectId: string,
+): boolean => {
+  const mappedId = extractExternalProjectId(importerType, mapping)
+  return mappedId === externalProjectId
+}
+
+/**
  * Extract external project ID from a mapping object
  */
 export const extractExternalProjectId = (

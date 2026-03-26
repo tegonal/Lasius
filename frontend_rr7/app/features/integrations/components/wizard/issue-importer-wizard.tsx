@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next'
 import { useRevalidator } from 'react-router'
 
 import { Button } from '~/components/primitives/buttons/button'
+import { useToast } from '~/components/ui/feedback/use-toast'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { Modal } from '~/components/ui/overlays/modal/modal'
 import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
@@ -56,6 +57,7 @@ export const IssueImporterWizard = ({
   selectedOrgId,
 }: Props) => {
   const { t } = useTranslation('integrations')
+  const { addToast } = useToast()
   const {
     resetWizard,
     setAvailableProjects,
@@ -89,7 +91,21 @@ export const IssueImporterWizard = ({
   const { submit: submitAddMapping } = useAddProjectMapping({
     onError: () => {
       logger.error('[IssueImporterWizard] Failed to save project mapping')
-      setIsSaving(false)
+      addToast({
+        message: t('issueImporters.errors.mappingSaveFailed', {
+          defaultValue: 'Failed to save project mapping',
+        }),
+        type: 'ERROR',
+      })
+      // Continue with next mapping instead of stopping
+      mappingsQueueIndexRef.current += 1
+      if (mappingsQueueIndexRef.current < mappingsQueueRef.current.length) {
+        submitNextMappingRef.current()
+      } else {
+        setIsSaving(false)
+        void revalidator.revalidate()
+        handleClose()
+      }
     },
     onSuccess: () => {
       // Process next mapping in queue
@@ -100,6 +116,12 @@ export const IssueImporterWizard = ({
         // All mappings saved
         setIsSaving(false)
         void revalidator.revalidate()
+        addToast({
+          message: t('issueImporters.success.configCreated', {
+            defaultValue: 'Integration created successfully',
+          }),
+          type: 'SUCCESS',
+        })
         handleClose()
       }
     },
@@ -323,8 +345,13 @@ export const IssueImporterWizard = ({
             {translatedSteps.map((step, index) => (
               <div className="flex items-center" key={step.id}>
                 <button
-                  className={`flex items-center gap-1.5 rounded-full px-2 py-1 text-xs transition-colors ${getStepClassName(index, currentStepIndex)} ${index > currentStepIndex ? 'cursor-not-allowed' : ''}`}
-                  disabled={index > currentStepIndex}
+                  className={`flex items-center gap-1.5 rounded-full px-2 py-1 text-xs transition-colors ${getStepClassName(index, currentStepIndex)} ${index >= currentStepIndex ? 'cursor-not-allowed' : 'hover:bg-base-200 cursor-pointer'}`}
+                  disabled={index >= currentStepIndex}
+                  onClick={() => {
+                    if (index < currentStepIndex) {
+                      setCurrentStep(step.id)
+                    }
+                  }}
                   type="button"
                 >
                   {index < currentStepIndex ? (
@@ -359,6 +386,7 @@ export const IssueImporterWizard = ({
 
           {state.currentStep === 'test' && state.formData.importerType && (
             <TestConnectionStep
+              existingConfig={state.createdConfig}
               formData={state.formData}
               onBack={handlePrevious}
               onConfigCreated={handleConfigCreated}

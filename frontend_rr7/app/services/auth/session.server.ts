@@ -19,6 +19,7 @@
 
 import { createCookieSessionStorage, href, redirect } from 'react-router'
 
+import { AUTH_REFRESH_BACKOFF_MS } from '~/config/constants'
 import { logger } from '~/lib/logger'
 
 import { getProvider } from './providers'
@@ -149,29 +150,11 @@ export async function getSessionTokens(
   return { tokens: user }
 }
 
-/** Read user session from the request cookie */
-export async function getUserSession(request: Request) {
-  return getSession(request.headers.get('Cookie'))
-}
-
-/** Update session tokens (e.g., after a refresh) and return the Set-Cookie header */
-export async function setSessionTokens(
-  request: Request,
-  tokens: LasiusSessionData,
-): Promise<string> {
-  const session = await getUserSession(request)
-  session.set('user', tokens)
-  return await commitSession(session)
-}
-
 function commitSession(
   ...args: Parameters<ReturnType<typeof getSessionStorage>['commitSession']>
 ) {
   return sessionStorage().commitSession(...args)
 }
-
-/** Backoff delays for token refresh retries: 500ms → 1s → 2s */
-const REFRESH_BACKOFF_MS = [500, 1000, 2000]
 
 /**
  * Deduplicate concurrent refresh calls: if multiple parallel loaders trigger a refresh
@@ -195,12 +178,12 @@ async function deduplicatedRefresh(
   const promise = (async () => {
     const provider = getProvider(user.tokenIssuer)
 
-    for (let i = 0; i <= REFRESH_BACKOFF_MS.length; i++) {
+    for (let i = 0; i <= AUTH_REFRESH_BACKOFF_MS.length; i++) {
       try {
         return await provider.refreshToken(user.refreshToken)
       } catch (error) {
-        if (i < REFRESH_BACKOFF_MS.length) {
-          const delay = REFRESH_BACKOFF_MS[i]
+        if (i < AUTH_REFRESH_BACKOFF_MS.length) {
+          const delay = AUTH_REFRESH_BACKOFF_MS[i]
           logger.warn(
             `Token refresh attempt ${i + 1} failed, retrying in ${delay}ms`,
             error,
@@ -208,7 +191,7 @@ async function deduplicatedRefresh(
           await new Promise((r) => setTimeout(r, delay))
         } else {
           logger.warn(
-            `Token refresh failed after ${REFRESH_BACKOFF_MS.length + 1} attempts`,
+            `Token refresh failed after ${AUTH_REFRESH_BACKOFF_MS.length + 1} attempts`,
             error,
           )
           return null
@@ -236,6 +219,11 @@ function destroySession(
 
 function getSession(cookieHeader: null | string) {
   return sessionStorage().getSession(cookieHeader)
+}
+
+/** Read user session from the request cookie */
+async function getUserSession(request: Request) {
+  return getSession(request.headers.get('Cookie'))
 }
 
 function sessionStorage() {

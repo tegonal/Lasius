@@ -31,6 +31,7 @@ import { useRevalidator } from 'react-router'
 import { z } from 'zod'
 
 import { Input } from '~/components/primitives/inputs/input'
+import { useToast } from '~/components/ui/feedback/use-toast'
 import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { DurationInput } from '~/components/ui/forms/input/duration-input'
 import { Modal } from '~/components/ui/overlays/modal/modal'
@@ -101,6 +102,7 @@ export const GenericConfigModal = ({
   selectedOrgId,
 }: Props) => {
   const { t } = useTranslation('integrations')
+  const { addToast } = useToast()
   const revalidator = useRevalidator()
   const formRef = useRef<HTMLFormElement>(null)
 
@@ -221,9 +223,23 @@ export const GenericConfigModal = ({
 
   // Update config hook
   const updateApi = useUpdateConfig({
+    onError: () => {
+      addToast({
+        message: t('issueImporters.errors.updateFailed', {
+          defaultValue: 'Failed to update integration',
+        }),
+        type: 'ERROR',
+      })
+    },
     onSuccess: () => {
       onClose()
       void revalidator.revalidate()
+      addToast({
+        message: t('issueImporters.success.configUpdated', {
+          defaultValue: 'Integration updated successfully',
+        }),
+        type: 'SUCCESS',
+      })
     },
   })
 

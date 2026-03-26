@@ -23,13 +23,14 @@
  * Cache is bypassed on full page loads (SSR) — only used on client navigations.
  */
 
+import { LOADER_CACHE_DEFAULT_TTL_MS } from '~/config/constants'
+
 const cache = new Map<string, { data: unknown; timestamp: number }>()
-const DEFAULT_TTL = 5 * 60 * 1000 // 5 minutes
 
 export async function cachedServerLoader<T>(
   request: Request,
   serverLoader: () => Promise<T>,
-  ttl = DEFAULT_TTL,
+  ttl = LOADER_CACHE_DEFAULT_TTL_MS,
 ): Promise<T> {
   const url = new URL(request.url)
   const cacheKey = `${url.pathname}${url.search}`

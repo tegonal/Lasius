@@ -65,7 +65,7 @@ export const NavigationMenuTabs = () => {
 }
 
 /** Find the navigation section index whose routes match the given pathname. */
-export const tabIndexForPath = (
+const tabIndexForPath = (
   navigation: ReturnType<typeof createNavigation>,
   pathname: string,
 ): number => {

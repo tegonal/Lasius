@@ -19,12 +19,14 @@
 
 import { useCallback, useEffect, useRef } from 'react'
 
+import {
+  API_ROUTES,
+  HEALTH_POLL_INTERVAL_MS,
+  HEALTH_STATUS_DEBOUNCE_MS,
+} from '~/config/constants'
 import { logger } from '~/lib/logger'
 import { type HealthResponse } from '~/routes/api.health'
 import { useUIStore } from '~/stores/ui-store'
-
-const POLL_INTERVAL_MS = 10_000
-const STATUS_DEBOUNCE_MS = 2000
 
 /**
  * Polls /api/health every 10s (pauses when tab is unfocused).
@@ -44,12 +46,12 @@ export const useHealthMonitor = () => {
       useUIStore
         .getState()
         .setBackendStatus(offline ? 'disconnected' : 'connected')
-    }, STATUS_DEBOUNCE_MS)
+    }, HEALTH_STATUS_DEBOUNCE_MS)
   }, [])
 
   const poll = useCallback(async () => {
     try {
-      const res = await fetch('/api/health')
+      const res = await fetch(API_ROUTES.HEALTH)
 
       if (!res.ok) {
         logger.warn('[HealthMonitor] Health check request failed', res.status)
@@ -91,7 +93,10 @@ export const useHealthMonitor = () => {
 
     const handleFocus = () => {
       void poll()
-      intervalRef.current = setInterval(() => void poll(), POLL_INTERVAL_MS)
+      intervalRef.current = setInterval(
+        () => void poll(),
+        HEALTH_POLL_INTERVAL_MS,
+      )
     }
 
     const handleBlur = () => {
@@ -101,7 +106,10 @@ export const useHealthMonitor = () => {
       }
     }
 
-    intervalRef.current = setInterval(() => void poll(), POLL_INTERVAL_MS)
+    intervalRef.current = setInterval(
+      () => void poll(),
+      HEALTH_POLL_INTERVAL_MS,
+    )
 
     window.addEventListener('focus', handleFocus)
     window.addEventListener('blur', handleBlur)
