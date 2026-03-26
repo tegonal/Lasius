@@ -33,13 +33,16 @@ import { Logo } from '~/components/ui/icons/logo'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { TegonalFooter } from '~/components/ui/navigation/tegonal-footer'
 import { TokenWatcher } from '~/features/auth/components/token-watcher'
+import { BookingCurrent } from '~/features/bookings/components/booking-current'
 import { CalendarWeek } from '~/features/calendar/components/calendar-week'
 import { HelpButton } from '~/features/help/components/help-button'
+import { MobileFloatingActionButton } from '~/features/navigation/components/mobile-floating-action-button'
 import { OrgSwitcher } from '~/features/organisation/components/org-switcher'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { DevInfoBadge } from '~/features/system/components/dev-info-badge'
 import { HealthMonitor } from '~/features/system/components/health-monitor'
 import { WebSocketEventHandler } from '~/features/system/websocket/websocket-event-handler'
+import { getUserBookingCurrent } from '~/services/api/lasius/user-bookings/user-bookings'
 import { getUserProfile } from '~/services/api/lasius/user/user'
 import {
   authHeaders,
@@ -67,11 +70,14 @@ export const shouldRevalidate = ({
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const auth = await requireUser(request)
-  const profile = await getUserProfile({
-    headers: authHeaders(auth.session),
-  })
+  const headers = authHeaders(auth.session)
+  const [profile, currentBookingRes] = await Promise.all([
+    getUserProfile({ headers }),
+    getUserBookingCurrent({ headers }),
+  ])
   return data(
     {
+      currentBooking: currentBookingRes.data,
       tokenIssuer: auth.session.tokenIssuer,
       user: profile.data,
       websocketUrl: process.env.LASIUS_API_WEBSOCKET_URL || '',
@@ -80,9 +86,10 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   )
 }
 
-export default function AppLayout(_props: Route.ComponentProps) {
+export default function AppLayout({ loaderData }: Route.ComponentProps) {
   const { t } = useTranslation('common')
   const { selectedOrganisationId } = useOrganisation()
+  const hasActiveBooking = Boolean(loaderData.currentBooking?.booking)
 
   return (
     <div className="container mx-auto grid size-full grid-rows-[116px_auto] gap-0 md:grid-rows-[148px_auto] md:pb-4">
@@ -121,27 +128,19 @@ export default function AppLayout(_props: Route.ComponentProps) {
         </section>
       </div>
 
-      {/* Mobile header */}
+      {/* Mobile header — matches original: Calendar or BookingCurrent, no Logo/Logout */}
       <div className="overflow-hidden md:hidden">
-        <section className="flex h-full w-full items-center justify-between px-4">
-          <Link to={href('/')}>
-            <Logo size="sm" />
-          </Link>
-          <CalendarWeek organisationId={selectedOrganisationId} />
-          <Form action="/logout" method="post">
-            <Button
-              aria-label={t('auth.actions.signOut', {
-                defaultValue: 'Sign out',
-              })}
-              data-testid="auth-logout-btn-mobile"
-              fullWidth={false}
-              shape="circle"
-              size="sm"
-              variant="ghost"
-            >
-              <LucideIcon icon={LogOutIcon} size={18} />
-            </Button>
-          </Form>
+        <section className="flex h-full w-full items-center gap-2 overflow-hidden">
+          <div className="min-w-0 flex-1 overflow-hidden">
+            {hasActiveBooking ? (
+              <BookingCurrent
+                currentBooking={loaderData.currentBooking}
+                selectedOrgId={selectedOrganisationId}
+              />
+            ) : (
+              <CalendarWeek organisationId={selectedOrganisationId} />
+            )}
+          </div>
         </section>
       </div>
 
@@ -157,6 +156,7 @@ export default function AppLayout(_props: Route.ComponentProps) {
         </footer>
       </div>
 
+      <MobileFloatingActionButton />
       <DevInfoBadge />
       <TokenWatcher />
       <WebSocketEventHandler />

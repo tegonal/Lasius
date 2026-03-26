@@ -21,6 +21,9 @@
   },
   "duration": "Duration",
   "emptyToday": "No bookings for this day",
+  "favorites": {
+    "title": "Favorites"
+  },
   "hints": {
     "useEndTimeOfLatest": "Use end time of latest booking as start time for this one",
     "useEndTimeOfPrevious": "Use end time of previous booking as start time for this one",

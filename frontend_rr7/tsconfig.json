@@ -1,8 +1,7 @@
 {
-  "extends": ["@epic-web/config/typescript"],
   "include": [
+    "reset.d.ts",
     ".react-router/types/**/*",
-    "@epic-web/config/reset.d.ts",
     "**/*.ts",
     "**/*.tsx",
     "**/*.js",
@@ -10,6 +9,14 @@
   ],
   "exclude": ["node_modules", "dist", "build", "public", "temp"],
   "compilerOptions": {
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "module": "preserve",
+    "target": "ES2022",
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "incremental": true,
     "allowImportingTsExtensions": true,

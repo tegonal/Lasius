@@ -143,9 +143,11 @@ export default function HomeIndex({ loaderData }: Route.ComponentProps) {
   return (
     <div className={innerGridClasses}>
       <ColumnCenter>
-        <div className="grid h-full w-full grid-rows-[min-content_min-content_auto] gap-1">
+        <div className="grid h-full w-full grid-rows-[min-content_min-content_auto] gap-1 pb-20 max-md:grid-rows-[min-content_auto] md:pb-0">
           <BookingDayStatsProgressBar />
-          <BookingCurrent />
+          <div className="hidden md:block">
+            <BookingCurrent />
+          </div>
           <ScrollArea>
             <BookingListSelectedDay />
           </ScrollArea>

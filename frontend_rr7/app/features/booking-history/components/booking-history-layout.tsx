@@ -17,7 +17,7 @@
  *
  */
 
-import { useForm, useInputControl } from '@conform-to/react'
+import { getFormProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
 import { useEffect, useMemo, useRef } from 'react'
 import { useSearchParams } from 'react-router'
@@ -39,7 +39,7 @@ import { filterModelsBookingListProjectId } from '~/lib/api/functions/filter-mod
 import { filterModelsBookingListUserId } from '~/lib/api/functions/filter-models-booking-list-user-id'
 import { getExtendedModelsBookingList } from '~/lib/api/functions/get-extended-models-booking-list'
 import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
-import { formatISOLocale } from '~/lib/utils/dates'
+import { dateOptions } from '~/lib/utils/date/date-options'
 import {
   type ModelsBooking,
   type ModelsEntityReference,
@@ -60,6 +60,8 @@ const filterSchema = z.object({
   to: z.string().optional(),
   userId: z.string().optional(),
 })
+
+const defaultDateRange = dateOptions[0]
 
 export type BookingHistoryControls = {
   dateRange: InputControl
@@ -85,6 +87,18 @@ type Props = {
   users?: ModelsUserStub[]
 }
 
+function getInitialDateRange(searchParams: URLSearchParams) {
+  const fromParam = searchParams.get('from')
+  const toParam = searchParams.get('to')
+  if (fromParam && toParam) {
+    return { from: fromParam, to: toParam }
+  }
+  if (defaultDateRange) {
+    return defaultDateRange.dateRangeFn(new Date())
+  }
+  return { from: '', to: '' }
+}
+
 export const BookingHistoryLayout = ({
   bookings,
   dataSource,
@@ -103,14 +117,16 @@ export const BookingHistoryLayout = ({
     return userProjects.map((p) => p.projectReference)
   }, [projectsProp, userProjects])
 
-  const [, fields] = useForm({
+  const initialRange = getInitialDateRange(searchParams)
+
+  const [form, fields] = useForm({
     constraint: getZodConstraint(filterSchema),
     defaultValue: {
-      dateRange: '',
-      from: formatISOLocale(new Date()),
+      dateRange: defaultDateRange?.name ?? '',
+      from: initialRange.from,
       projectId: projectIdFromUrl,
       tags: '',
-      to: formatISOLocale(new Date()),
+      to: initialRange.to,
       userId: '',
     },
     onValidate({ formData }) {
@@ -120,59 +136,107 @@ export const BookingHistoryLayout = ({
     shouldValidate: 'onSubmit',
   })
 
+  // Read values reactively from fields.xxx.value (subscribes per-field via useSyncExternalStore)
+  // Do NOT use form.value — it only subscribes to root form changes, not individual fields
+  const fromValue = fields.from.value ?? ''
+  const toValue = fields.to.value ?? ''
+  const dateRangeValue = fields.dateRange.value ?? ''
+  const projectIdValue = fields.projectId.value ?? ''
+  const userIdValue = fields.userId.value ?? ''
+  const tagsValue = fields.tags.value ?? ''
+
+  const noop = () => {}
   const controls: BookingHistoryControls = {
-    dateRange: useInputControl(fields.dateRange),
-    from: useInputControl(fields.from),
-    projectId: useInputControl(fields.projectId),
-    tags: useInputControl(fields.tags),
-    to: useInputControl(fields.to),
-    userId: useInputControl(fields.userId),
+    dateRange: {
+      blur: noop,
+      change: (v) => form.update({ name: fields.dateRange.name, value: v }),
+      focus: noop,
+      value: dateRangeValue,
+    },
+    from: {
+      blur: noop,
+      change: (v) => form.update({ name: fields.from.name, value: v }),
+      focus: noop,
+      value: fromValue,
+    },
+    projectId: {
+      blur: noop,
+      change: (v) => form.update({ name: fields.projectId.name, value: v }),
+      focus: noop,
+      value: projectIdValue,
+    },
+    tags: {
+      blur: noop,
+      change: (v) => form.update({ name: fields.tags.name, value: v }),
+      focus: noop,
+      value: tagsValue,
+    },
+    to: {
+      blur: noop,
+      change: (v) => form.update({ name: fields.to.name, value: v }),
+      focus: noop,
+      value: toValue,
+    },
+    userId: {
+      blur: noop,
+      change: (v) => form.update({ name: fields.userId.name, value: v }),
+      focus: noop,
+      value: userIdValue,
+    },
   }
 
   // Sync from/to to URL search params so the loader refetches
   const [, setSearchParams] = useSearchParams()
-  const isInitialMount = useRef(true)
-  const prevFrom = useRef(controls.from.value)
-  const prevTo = useRef(controls.to.value)
+  const prevFrom = useRef(fromValue)
+  const prevTo = useRef(toValue)
 
   useEffect(() => {
-    const fromVal = controls.from.value
-    const toVal = controls.to.value
+    if (!fromValue || !toValue) return
+    if (fromValue === prevFrom.current && toValue === prevTo.current) return
 
-    if (!fromVal || !toVal) return
-    if (fromVal === prevFrom.current && toVal === prevTo.current) return
-
-    prevFrom.current = fromVal
-    prevTo.current = toVal
-
-    if (isInitialMount.current) {
-      isInitialMount.current = false
-      return
-    }
+    prevFrom.current = fromValue
+    prevTo.current = toValue
 
     setSearchParams(
       (prev) => {
-        prev.set('from', fromVal)
-        prev.set('to', toVal)
+        prev.set('from', fromValue)
+        prev.set('to', toValue)
         return prev
       },
       { replace: true },
     )
-  }, [controls.from.value, controls.to.value, setSearchParams])
+  }, [fromValue, toValue, setSearchParams])
+
+  // Set initial search params on mount if missing
+  const didSetInitialParams = useRef(false)
+  useEffect(() => {
+    if (didSetInitialParams.current) return
+    didSetInitialParams.current = true
+
+    if (!searchParams.has('from') || !searchParams.has('to')) {
+      setSearchParams(
+        (prev) => {
+          prev.set('from', initialRange.from)
+          prev.set('to', initialRange.to)
+          return prev
+        },
+        { replace: true },
+      )
+    }
+  }, [searchParams, setSearchParams, initialRange.from, initialRange.to])
 
   // Parse tags for filtering
   const tags: ModelsTag[] = useMemo(() => {
-    const tagsJson = controls.tags.value
-    if (!tagsJson) return []
+    if (!tagsValue) return []
     try {
-      return JSON.parse(tagsJson) as ModelsTag[]
+      return JSON.parse(tagsValue) as ModelsTag[]
     } catch {
       return []
     }
-  }, [controls.tags.value])
+  }, [tagsValue])
 
-  const projectId = controls.projectId.value ?? ''
-  const userId = controls.userId.value ?? ''
+  const projectId = projectIdValue
+  const userId = userIdValue
 
   const processedItems = useMemo(
     () =>
@@ -226,51 +290,53 @@ export const BookingHistoryLayout = ({
   }, [projectIdFromUrl, projectSuggestions, findProjectById])
 
   return (
-    <ContextMenuProvider>
-      <ColumnCenter>
-        <div className="flex h-full flex-col overflow-hidden">
-          <div className="bg-base-200 flex flex-shrink-0 items-start justify-between p-4">
-            <BookingHistoryStats
-              bookings={summary.elements}
-              hours={summary.hours}
-              projects={distinctProjects}
-              users={distinctUsers}
-            />
-            <BookingHistoryExport
-              bookings={processedItems}
-              context={exportContext}
-              from={controls.from.value}
-              to={controls.to.value}
-            />
-          </div>
-          {bookings.length === 0 && isLoading && <Loading />}
-          <ScrollArea className="min-h-0 flex-1" onScroll={onScroll}>
-            <div className="pt-4">
-              <BookingHistoryTable
-                allowDelete={allowDelete}
-                allowEdit={allowEdit}
-                controls={controls}
-                items={visibleElements}
-                showUserColumn={showUserColumn}
+    <form {...getFormProps(form)} className="contents">
+      <ContextMenuProvider>
+        <ColumnCenter>
+          <div className="flex h-full flex-col overflow-hidden">
+            <div className="bg-base-200 flex flex-shrink-0 items-start justify-between p-4">
+              <BookingHistoryStats
+                bookings={summary.elements}
+                hours={summary.hours}
+                projects={distinctProjects}
+                users={distinctUsers}
+              />
+              <BookingHistoryExport
+                bookings={processedItems}
+                context={exportContext}
+                from={fromValue}
+                to={toValue}
               />
             </div>
+            {bookings.length === 0 && isLoading && <Loading />}
+            <ScrollArea className="min-h-0 flex-1" onScroll={onScroll}>
+              <div className="pt-4">
+                <BookingHistoryTable
+                  allowDelete={allowDelete}
+                  allowEdit={allowEdit}
+                  controls={controls}
+                  items={visibleElements}
+                  showUserColumn={showUserColumn}
+                />
+              </div>
+            </ScrollArea>
+          </div>
+        </ColumnCenter>
+        <ColumnRight>
+          <ScrollArea className="h-full">
+            <ColumnList>
+              <BookingHistoryFilter
+                controls={controls}
+                dataSource={dataSource}
+                fields={fields}
+                inactiveProject={inactiveProject}
+                projects={projectSuggestions}
+                users={users}
+              />
+            </ColumnList>
           </ScrollArea>
-        </div>
-      </ColumnCenter>
-      <ColumnRight>
-        <ScrollArea className="h-full">
-          <ColumnList>
-            <BookingHistoryFilter
-              controls={controls}
-              dataSource={dataSource}
-              fields={fields}
-              inactiveProject={inactiveProject}
-              projects={projectSuggestions}
-              users={users}
-            />
-          </ColumnList>
-        </ScrollArea>
-      </ColumnRight>
-    </ContextMenuProvider>
+        </ColumnRight>
+      </ContextMenuProvider>
+    </form>
   )
 }

@@ -5,7 +5,8 @@
     "close": "Close",
     "create": "Create organisation",
     "edit": "Edit organisation",
-    "save": "Save"
+    "save": "Save",
+    "switch": "Switch organisation"
   },
   "adminDescription": "You are an administrator of this organisation. You can add and remove members and change the organisation name, or create a new one.",
   "createDescription": "Add a new organisation using the Actions button at the top of the list.",

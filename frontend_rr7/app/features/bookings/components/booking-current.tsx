@@ -28,17 +28,27 @@ import { useHomeLoaderData } from '~/features/bookings/hooks/use-home-loader-dat
 import { useStopBooking } from '~/features/bookings/hooks/use-stop-booking'
 import { ContextMenuProvider } from '~/features/context-menu/hooks/use-context-menu'
 import { formatISOLocale } from '~/lib/utils/dates'
-import { type ModelsBooking } from '~/services/api/lasius'
+import {
+  type ModelsBooking,
+  type ModelsCurrentUserTimeBooking,
+} from '~/services/api/lasius'
 
 import { BookingCurrentEntryContext } from './booking-current-entry-context'
 import { BookingDurationCounter } from './booking-duration-counter'
 import { BookingFrom } from './booking-from'
 import { BookingName } from './booking-name'
 
-export const BookingCurrent = () => {
+type BookingCurrentProps = {
+  /** When provided, uses this data instead of useHomeLoaderData(). */
+  currentBooking?: ModelsCurrentUserTimeBooking
+  selectedOrgId?: string
+}
+
+export const BookingCurrent = (props: BookingCurrentProps) => {
   const loaderData = useHomeLoaderData()
 
-  const currentBooking = loaderData?.currentBooking
+  const currentBooking = props.currentBooking ?? loaderData?.currentBooking
+  const selectedOrgId = props.selectedOrgId ?? loaderData?.selectedOrgId ?? ''
 
   return (
     <div
@@ -49,7 +59,10 @@ export const BookingCurrent = () => {
         <ContextMenuProvider>
           <CurrentBookingEntry
             booking={currentBooking.booking}
-            selectedOrgId={loaderData?.selectedOrgId ?? ''}
+            currentBookingOverride={
+              props.currentBooking ? currentBooking : undefined
+            }
+            selectedOrgId={selectedOrgId}
           />
         </ContextMenuProvider>
       ) : (
@@ -75,9 +88,11 @@ const NoBooking = () => {
 
 const CurrentBookingEntry = ({
   booking,
+  currentBookingOverride,
   selectedOrgId,
 }: {
   booking: ModelsBooking
+  currentBookingOverride?: ModelsCurrentUserTimeBooking
   selectedOrgId: string
 }) => {
   const { t } = useTranslation('common')
@@ -128,7 +143,11 @@ const CurrentBookingEntry = ({
             startDate={booking.start?.dateTime || formatISOLocale(new Date())}
           />
         </div>
-        <BookingCurrentEntryContext item={booking} />
+        <BookingCurrentEntryContext
+          currentBookingOverride={currentBookingOverride}
+          item={booking}
+          selectedOrgIdOverride={selectedOrgId}
+        />
       </div>
     </div>
   )

@@ -205,8 +205,6 @@
         "lasiusProject": "Lasius-Projekt",
         "loadError": "Projekte konnten nicht geladen werden. Bitte versuche es erneut.",
         "loading": "Lade Projekte von {{platform}}...",
-        "mappingCount_one": "{{count}} Projekt von {{platform}} gefunden. Ordne es deinen Lasius-Projekten zu, um Issues zu importieren. {{mapped}} von {{total}} zugeordnet.",
-        "mappingCount_other": "{{count}} Projekte von {{platform}} gefunden. Ordne sie deinen Lasius-Projekten zu, um Issues zu importieren. {{mapped}} von {{total}} zugeordnet.",
         "mappingDescription": "Verknüpfe dieses externe Projekt mit einem Lasius-Projekt, um Issues automatisch als Zeiterfassungs-Tags zu synchronisieren.",
         "mappingDescription_one": "{{count}} Projekt von {{platform}} gefunden. Ordne es deinen Lasius-Projekten zu, um Issues zu importieren. {{mapped}} von {{total}} zugeordnet.",
         "mappingDescription_other": "{{count}} Projekte von {{platform}} gefunden. Ordne sie deinen Lasius-Projekten zu, um Issues zu importieren. {{mapped}} von {{total}} zugeordnet.",

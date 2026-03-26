@@ -97,7 +97,6 @@ export const BookingEditRunning = ({
   })
 
   const projectIdControl = useInputControl(fields.projectId)
-  const tagsControl = useInputControl(fields.tags)
   const startControl = useInputControl(fields.start)
 
   // Load tags when project changes
@@ -116,9 +115,10 @@ export const BookingEditRunning = ({
   useEffect(() => {
     if (booking) {
       projectIdControl.change(booking.projectReference.id)
-      tagsControl.change(
-        booking.tags.length > 0 ? JSON.stringify(booking.tags) : '',
-      )
+      form.update({
+        name: fields.tags.name,
+        value: booking.tags.length > 0 ? JSON.stringify(booking.tags) : '',
+      })
       startControl.change(formatISOLocale(new Date(booking.start.dateTime)))
     }
   }, [
@@ -128,7 +128,8 @@ export const BookingEditRunning = ({
     booking?.start.dateTime,
     projectIdControl,
     startControl,
-    tagsControl,
+    form,
+    fields.tags.name,
   ])
 
   // Auto-focus tags when project changes
@@ -203,6 +204,7 @@ export const BookingEditRunning = ({
               <InputTagsAutocomplete
                 field={fields.tags}
                 id={fields.tags.id}
+                key={fields.tags.key}
                 suggestions={projectTags}
               />
             </FormElement>

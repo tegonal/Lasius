@@ -110,11 +110,17 @@ export const TagConfigurationForm = ({
       ...(importerType === 'github' && {
         useAssignees: selectedValues.includes('useAssignees'),
       }),
-    } as TagConfiguration)
+    } satisfies TagConfiguration)
   }
 
-  const availableLabels = externalProject?.availableLabels ?? []
-  const availableStates = externalProject?.availableStates ?? []
+  const availableLabels = useMemo(
+    () => externalProject?.availableLabels ?? [],
+    [externalProject?.availableLabels],
+  )
+  const availableStates = useMemo(
+    () => externalProject?.availableStates ?? [],
+    [externalProject?.availableStates],
+  )
 
   const labelOptions: MultiSelectOption[] = useMemo(
     () => availableLabels.map((label) => ({ label, value: label })),

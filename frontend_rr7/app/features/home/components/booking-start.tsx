@@ -21,7 +21,7 @@ import { getFormProps, useForm, useInputControl } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
 import { roundToNearestMinutes } from 'date-fns'
 import { Timer } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
@@ -63,10 +63,12 @@ export const BookingStart = ({ onSuccess, selectedOrgId }: Props) => {
   const prevProjectKeyRef = useRef('')
 
   const schema = createBookingStartSchema(t as unknown as SchemaTranslationFn)
+  const [resetKey, setResetKey] = useState(0)
 
   const [form, fields] = useForm({
     constraint: getZodConstraint(schema),
     defaultValue: { projectId: '', tags: '' },
+    id: `booking-start-${resetKey}`,
     onValidate({ formData }) {
       return parseWithZod(formData, { schema })
     },
@@ -75,7 +77,6 @@ export const BookingStart = ({ onSuccess, selectedOrgId }: Props) => {
   })
 
   const projectIdControl = useInputControl(fields.projectId)
-  const tagsControl = useInputControl(fields.tags)
 
   // Load tags when project changes
   useEffect(() => {
@@ -90,8 +91,8 @@ export const BookingStart = ({ onSuccess, selectedOrgId }: Props) => {
   const projectTags = tagsApi.data ?? []
 
   const resetComponent = () => {
-    projectIdControl.change('')
-    tagsControl.change('')
+    setResetKey((k) => k + 1)
+    prevProjectKeyRef.current = ''
   }
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -150,6 +151,7 @@ export const BookingStart = ({ onSuccess, selectedOrgId }: Props) => {
               <InputTagsAutocomplete
                 field={fields.tags}
                 id={fields.tags.id}
+                key={fields.tags.key}
                 projectId={projectIdControl.value}
                 suggestions={projectTags}
               />

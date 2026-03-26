@@ -89,6 +89,13 @@
     }
   },
   "cancel": "Cancel",
+  "common": {
+    "actions": {
+      "close": "Close",
+      "closeActionsMenu": "Close actions menu",
+      "openActionsMenu": "Open actions menu"
+    }
+  },
   "custom": "Custom",
   "date": "Date",
   "demo": {
@@ -176,6 +183,10 @@
       "resourceOwnerRequired": "Resource owner is required",
       "workspaceRequired": "Workspace is required"
     }
+  },
+  "navigation": {
+    "openMenu": "Open menu",
+    "settings": "Settings"
   },
   "of": "di",
   "projects": {

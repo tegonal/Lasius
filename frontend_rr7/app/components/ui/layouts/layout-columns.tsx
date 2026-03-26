@@ -57,7 +57,7 @@ export const ColumnLeft = ({ children }: { children: ReactNode }) => {
 
 export const ColumnRight = ({ children }: { children?: ReactNode }) => {
   return (
-    <div className="border-base-100 bg-base-200 text-base-content h-full overflow-hidden rounded-tr-xl border-l">
+    <div className="border-base-100 bg-base-200 text-base-content hidden h-full overflow-hidden rounded-tr-xl border-l md:block">
       {children}
     </div>
   )

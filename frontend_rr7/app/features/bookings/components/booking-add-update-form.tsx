@@ -214,7 +214,6 @@ export const BookingAddUpdateForm = ({
   const startControl = useInputControl(fields.start)
   const endControl = useInputControl(fields.end)
   const projectIdControl = useInputControl(fields.projectId)
-  const tagsControl = useInputControl(fields.tags)
 
   const prevProjectKeyRef = useRef('')
 
@@ -320,12 +319,13 @@ export const BookingAddUpdateForm = ({
   const handlePresetSelect = useCallback(
     (preset: PresetSelection) => {
       projectIdControl.change(preset.projectId)
-      tagsControl.change(
-        preset.tags.length > 0 ? JSON.stringify(preset.tags) : '',
-      )
+      form.update({
+        name: fields.tags.name,
+        value: preset.tags.length > 0 ? JSON.stringify(preset.tags) : '',
+      })
       setShowPresetPanel(false)
     },
-    [projectIdControl, tagsControl],
+    [projectIdControl, form, fields.tags.name],
   )
 
   const handleEndChange = useCallback(
@@ -415,6 +415,7 @@ export const BookingAddUpdateForm = ({
                   <InputTagsAutocomplete
                     field={fields.tags}
                     id={fields.tags.id}
+                    key={fields.tags.key}
                     projectId={projectIdControl.value}
                     suggestions={projectTags}
                   />
