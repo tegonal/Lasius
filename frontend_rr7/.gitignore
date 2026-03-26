@@ -4,3 +4,4 @@ build/
 .cache/
 .env
 .env.local
+.fallow/

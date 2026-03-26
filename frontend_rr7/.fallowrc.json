@@ -16,8 +16,8 @@
     "unused-class-members": "warn",
     "unresolved-imports": "error",
     "unlisted-dependencies": "error",
-    "duplicate-exports": "warn",
-    "circular-dependencies": "warn",
+    "duplicate-exports": "off",
+    "circular-dependencies": "off",
     "type-only-dependencies": "warn"
   },
   "duplicates": {
