@@ -17,6 +17,7 @@
  *
  */
 
+import { type TFunction } from 'i18next'
 import {
   Calendar,
   Clock,
@@ -51,35 +52,37 @@ export type NavigationSection = {
   routes: NavigationRouteType[]
 }
 
-export const NAVIGATION: NavigationSection[] = [
+export const createNavigation = (
+  t: TFunction<'navigation'>,
+): NavigationSection[] => [
   {
     icon: UserCircle,
     level: 'user',
-    name: 'navigation.yourTimeBookingView',
+    name: t('tabs.user', 'Your time booking view'),
     routes: [
       {
         icon: Timer,
-        name: 'bookings.title',
+        name: t('user.bookings', 'Bookings'),
         route: ROUTES.USER.INDEX,
       },
       {
         icon: Calendar,
-        name: 'common.dashboard',
+        name: t('user.dashboard', 'Dashboard'),
         route: ROUTES.USER.DASHBOARD,
       },
       {
         icon: Folder,
-        name: 'projects.myProjects',
+        name: t('user.projects', 'My projects'),
         route: ROUTES.USER.PROJECTS,
       },
       {
         icon: PieChart,
-        name: 'statistics.title',
+        name: t('user.stats', 'Statistics'),
         route: ROUTES.USER.STATS,
       },
       {
         icon: FileText,
-        name: 'lists.title',
+        name: t('user.lists', 'Lists'),
         route: ROUTES.USER.LISTS,
       },
     ],
@@ -87,34 +90,34 @@ export const NAVIGATION: NavigationSection[] = [
   {
     icon: Users,
     level: 'organisation',
-    name: 'navigation.currentOrganisation',
+    name: t('tabs.organisation', 'Current organisation'),
     routes: [
       {
         icon: Users,
-        name: 'organisation.title',
+        name: t('organisation.current', 'Organisation'),
         route: ROUTES.ORGANISATION.CURRENT,
       },
       {
         icon: Folder,
-        name: 'projects.title',
+        name: t('organisation.projects', 'Projects'),
         restrictTo: [ROLES.ORGANISATION_ADMIN],
         route: ROUTES.ORGANISATION.PROJECTS,
       },
       {
         icon: PieChart,
-        name: 'statistics.title',
+        name: t('organisation.stats', 'Statistics'),
         restrictTo: [ROLES.ORGANISATION_ADMIN],
         route: ROUTES.ORGANISATION.STATS,
       },
       {
         icon: FileText,
-        name: 'lists.title',
+        name: t('organisation.lists', 'Lists'),
         restrictTo: [ROLES.ORGANISATION_ADMIN],
         route: ROUTES.ORGANISATION.LISTS,
       },
       {
         icon: Link2,
-        name: 'integrations.title',
+        name: t('organisation.integrations', 'Integrations'),
         restrictTo: [ROLES.ORGANISATION_ADMIN],
         route: ROUTES.ORGANISATION.INTEGRATIONS,
       },
@@ -123,27 +126,27 @@ export const NAVIGATION: NavigationSection[] = [
   {
     icon: Settings,
     level: 'settings',
-    name: 'account.changeUserProfileSettings',
+    name: t('tabs.settings', 'Settings'),
     routes: [
       {
         icon: SlidersHorizontal,
-        name: 'settings.app.menuTitle',
+        name: t('settings.app', 'App Settings'),
         route: ROUTES.SETTINGS.APP,
       },
       {
         icon: User,
-        name: 'account.title',
+        name: t('settings.account', 'Account'),
         route: ROUTES.SETTINGS.ACCOUNT,
       },
       {
         icon: Lock,
-        name: 'account.accountSecurity',
+        name: t('settings.accountSecurity', 'Account Security'),
         restrictTo: [AUTH_PROVIDER_INTERNAL_LASIUS],
         route: ROUTES.SETTINGS.ACCOUNT_SECURITY,
       },
       {
         icon: Clock,
-        name: 'workingHours.title',
+        name: t('settings.workingHours', 'Working hours'),
         route: ROUTES.SETTINGS.WORKING_HOURS,
       },
     ],
@@ -154,12 +157,14 @@ export const getNavigation = ({
   id,
   isOrganisationAdministrator,
   isUserOfInternalOAuthProvider,
+  navigation,
 }: {
   id: string
   isOrganisationAdministrator: boolean
   isUserOfInternalOAuthProvider: boolean
+  navigation: NavigationSection[]
 }) => {
-  const section = NAVIGATION.find((item) => item.level === id)
+  const section = navigation.find((item) => item.level === id)
   if (!section) return []
 
   return section.routes.filter((item) => {

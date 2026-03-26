@@ -102,9 +102,9 @@ export async function loader({ request }: Route.LoaderArgs) {
     // Append the clear-state-cookie header to the session redirect response
     session.headers.append('Set-Cookie', clearCookie)
     return session
-  } catch (err) {
+  } catch (error_) {
     logger.error('OAuth callback: token exchange or profile fetch failed', {
-      error: err,
+      error: error_,
       provider: providerName,
     })
     throw redirect(`${href('/login')}?error=token_exchange_failed`)

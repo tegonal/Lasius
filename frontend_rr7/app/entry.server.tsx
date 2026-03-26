@@ -38,7 +38,7 @@ import { logger } from '~/lib/logger'
 
 import { getInstance } from './middleware/i18next'
 
-export const streamTimeout = 5_000
+export const streamTimeout = 5000
 
 /**
  * Handle server-side errors for logging and reporting.

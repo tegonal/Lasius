@@ -162,7 +162,7 @@ export const useUIStore = create<UIStore>()(
                     )
                     useUIStore.getState().setGlobalLoading(false)
                   }
-                }, 30000)
+                }, 30_000)
               }
 
               state.globalLoading = state.globalLoadingCounter > 0

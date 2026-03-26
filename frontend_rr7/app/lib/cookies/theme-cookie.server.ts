@@ -24,7 +24,7 @@ export type Theme = 'dark' | 'light'
 const COOKIE_NAME = 'theme'
 const MAX_AGE = 60 * 60 * 24 * 365 // 1 year
 
-export function isValidTheme(value: unknown): value is Theme {
+export function isValidTheme(value?: unknown): value is Theme {
   return value === 'light' || value === 'dark'
 }
 

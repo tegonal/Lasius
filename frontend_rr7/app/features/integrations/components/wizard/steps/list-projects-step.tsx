@@ -18,7 +18,7 @@
  */
 
 import { AlertTriangle, ArrowRight, FolderOpen, X } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
@@ -33,22 +33,20 @@ import { Loading } from '~/components/ui/data-display/loading'
 import { Alert } from '~/components/ui/feedback/alert'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { ProjectMappingRowContext } from '~/features/integrations/components/wizard/steps/project-mapping-row-context'
+import { useProjectMappingList } from '~/features/integrations/hooks/use-project-mapping-list'
 import { getImporterTypeLabel } from '~/features/integrations/lib/importer-type-labels'
+import {
+  type MappingWithTagConfig,
+  type TagConfiguration,
+} from '~/features/integrations/lib/mapping-helpers'
+import { untyped } from '~/lib/i18n-types'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 import {
   type ModelsExternalProject,
-  type ModelsGithubTagConfiguration,
-  type ModelsGitlabTagConfiguration,
   type ModelsIssueImporterConfigId,
   type ModelsListProjectsResponse,
-  type ModelsPlaneTagConfiguration,
 } from '~/services/api/lasius'
 import { useListProjects } from '~/services/api/lasius-hooks/issue-importers/issue-importers'
-
-export type MappingWithTagConfig = {
-  projectId: string
-  tagConfig?: TagConfiguration
-}
 
 type Props = {
   configId: ModelsIssueImporterConfigId
@@ -57,11 +55,6 @@ type Props = {
   onProjectsLoaded?: (projects: ModelsExternalProject[]) => void
   orgId: string
 }
-
-type TagConfiguration =
-  | ModelsGithubTagConfiguration
-  | ModelsGitlabTagConfiguration
-  | ModelsPlaneTagConfiguration
 
 export const ListProjectsStep = ({
   configId,
@@ -113,6 +106,14 @@ export const ListProjectsStep = ({
     submit({ configId, orgId })
   }, [configId, orgId, submit])
 
+  const onMappingsChangeRef = useRef(onMappingsChange)
+  onMappingsChangeRef.current = onMappingsChange
+
+  // Sync mappings to parent whenever they change
+  useEffect(() => {
+    onMappingsChangeRef.current(mappings)
+  }, [mappings])
+
   const handleMappingChange = useCallback(
     (
       externalProjectId: string,
@@ -129,56 +130,14 @@ export const ListProjectsStep = ({
         } else {
           delete updated[externalProjectId]
         }
-        onMappingsChange(updated)
         return updated
       })
     },
-    [onMappingsChange],
+    [],
   )
 
-  // Filter projects by name or ID
-  const filteredProjects = useMemo(() => {
-    if (!filterText.trim()) return projects
-
-    const searchLower = filterText.toLowerCase()
-    return projects.filter(
-      (project) =>
-        project.name.toLowerCase().includes(searchLower) ||
-        project.id.toLowerCase().includes(searchLower),
-    )
-  }, [projects, filterText])
-
-  // Detect orphaned mappings (mappings to projects no longer in the platform)
-  const orphanedMappings = useMemo(() => {
-    const externalProjectIds = new Set(projects.map((p) => p.id))
-    const orphaned: Array<{
-      externalId: string
-      mapping: MappingWithTagConfig
-    }> = []
-
-    Object.entries(mappings).forEach(([externalId, mapping]) => {
-      if (!externalProjectIds.has(externalId)) {
-        orphaned.push({ externalId, mapping })
-      }
-    })
-
-    return orphaned
-  }, [projects, mappings])
-
-  // Sort projects: mapped first, then unmapped
-  const sortedProjects = useMemo(() => {
-    return [...filteredProjects].sort((a, b) => {
-      const aMapped = !!mappings[a.id]
-      const bMapped = !!mappings[b.id]
-
-      if (aMapped && !bMapped) return -1
-      if (!aMapped && bMapped) return 1
-      return 0
-    })
-  }, [filteredProjects, mappings])
-
-  const mappedCount = Object.keys(mappings).length
-  const showFilter = projects.length > 10
+  const { mappedCount, orphanedMappings, showFilter, sortedProjects } =
+    useProjectMappingList({ filterText, mappings, projects })
 
   if (isLoading) {
     return (
@@ -187,7 +146,7 @@ export const ListProjectsStep = ({
         <p className="text-base-content/70 mt-4">
           {t('issueImporters.wizard.projects.loading', {
             defaultValue: 'Loading projects from {{platform}}...',
-            platform: getImporterTypeLabel(importerType, t),
+            platform: getImporterTypeLabel(importerType, untyped(t)),
           })}
         </p>
       </div>
@@ -219,7 +178,7 @@ export const ListProjectsStep = ({
         <p className="text-base-content/60 mt-4">
           {t('issueImporters.wizard.projects.noProjects', {
             defaultValue: 'No projects found in {{platform}}',
-            platform: getImporterTypeLabel(importerType, t),
+            platform: getImporterTypeLabel(importerType, untyped(t)),
           })}
         </p>
       </div>
@@ -240,7 +199,7 @@ export const ListProjectsStep = ({
           defaultValue:
             'Found {{count}} projects from {{platform}}. Map them to your Lasius projects to import issues. {{mapped}} of {{total}} mapped.',
           mapped: mappedCount,
-          platform: getImporterTypeLabel(importerType, t),
+          platform: getImporterTypeLabel(importerType, untyped(t)),
           total: projects.length,
         })}
       </Text>

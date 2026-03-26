@@ -23,16 +23,21 @@ export type ImporterType = 'github' | 'gitlab' | 'jira' | 'plane'
 
 export function getImporterTypeFromTag(tag: ModelsTag): ImporterType | null {
   switch (tag.type) {
-    case 'GithubIssueTag':
+    case 'GithubIssueTag': {
       return 'github'
-    case 'GitlabIssueTag':
+    }
+    case 'GitlabIssueTag': {
       return 'gitlab'
-    case 'JiraIssueTag':
+    }
+    case 'JiraIssueTag': {
       return 'jira'
-    case 'PlaneIssueTag':
+    }
+    case 'PlaneIssueTag': {
       return 'plane'
-    default:
+    }
+    default: {
       return null
+    }
   }
 }
 

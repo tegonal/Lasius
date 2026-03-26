@@ -35,7 +35,7 @@ export const getAdaptiveGranularity = (
   const fromDate = new Date(from)
   const toDate = new Date(to)
 
-  const effectiveToDate = toDate > today ? today : toDate
+  const effectiveToDate = Math.min(toDate.getTime(), today.getTime())
 
   if (fromDate > today) {
     return 'Day'
@@ -63,7 +63,7 @@ export const shouldUseBarChart = (from: string, to: string): boolean => {
   const today = new Date()
   const fromDate = new Date(from)
   const toDate = new Date(to)
-  const effectiveToDate = toDate > today ? today : toDate
+  const effectiveToDate = Math.min(toDate.getTime(), today.getTime())
 
   if (fromDate > today) {
     return true
@@ -81,15 +81,20 @@ export const getCategoryLabel = (
   granularity: Granularity,
 ): string => {
   switch (granularity) {
-    case 'Day':
+    case 'Day': {
       return `${item.day}.${item.month}`
-    case 'Month':
+    }
+    case 'Month': {
       return `${item.month}.${item.year}`
-    case 'Week':
+    }
+    case 'Week': {
       return `W ${item.week}`
-    case 'Year':
+    }
+    case 'Year': {
       return String(item.year)
-    default:
+    }
+    default: {
       return ''
+    }
   }
 }

@@ -17,49 +17,80 @@
  *
  */
 
+import { type FieldMetadata, getInputProps } from '@conform-to/react'
 import React from 'react'
-import { type FieldError, type UseFormRegister } from 'react-hook-form'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { Input } from '~/components/primitives/inputs/input'
 import { Label } from '~/components/primitives/typography/label'
 import { ButtonGroup } from '~/components/ui/forms/button-group'
 import { FormElement } from '~/components/ui/forms/form-element'
-import { FormErrorBadge } from '~/components/ui/forms/form-error-badge'
+import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 
 import { Modal } from './modal'
 
-type Props = {
+type ConformProps = SharedProps & {
+  /** @deprecated Use field prop instead */
+  error?: never
+  field: FieldMetadata<string>
+  /** @deprecated Use field prop instead */
+  fieldName?: never
+  onChange?: never
+  /** @deprecated Use field prop instead */
+  register?: never
+  value?: never
+}
+
+type ControlledProps = SharedProps & {
+  error?: never
+  field?: never
+  fieldName?: never
+  onChange: (value: string) => void
+  register?: never
+  value: string
+}
+
+type GenericInputModalProps = ConformProps | ControlledProps
+
+type SharedProps = {
   cancelLabel?: string
   confirmLabel: string
   enableEnterKey?: boolean
-  error?: FieldError
-  fieldName: string
   label: string
   onClose: () => void
   onConfirm: () => void
   open: boolean
   placeholder: string
-  register: UseFormRegister<any>
 }
 
 /**
- * Generic input modal component for text input with form validation
- * Consolidates TagGroupAddModal and TagGroupAddTagModal patterns
+ * Generic input modal component for text input with form validation.
+ * Supports both Conform (field prop) and Controlled (value/onChange props) modes.
  */
-export const GenericInputModal = ({
+export const GenericInputModal = (props: GenericInputModalProps) => {
+  if (props.field) {
+    return <ConformInputModal {...props} field={props.field} />
+  }
+  return (
+    <ControlledInputModal
+      {...props}
+      onChange={props.onChange}
+      value={props.value}
+    />
+  )
+}
+
+const ConformInputModal = ({
   cancelLabel = 'Close',
   confirmLabel,
   enableEnterKey = false,
-  error,
-  fieldName,
+  field,
   label,
   onClose,
   onConfirm,
   open,
   placeholder,
-  register,
-}: Props) => {
+}: SharedProps & { field: FieldMetadata<string> }) => {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (enableEnterKey && e.key === 'Enter') {
       e.preventDefault()
@@ -70,15 +101,61 @@ export const GenericInputModal = ({
   return (
     <Modal onClose={onClose} open={open}>
       <FormElement>
-        <Label htmlFor={fieldName}>{label}</Label>
+        <Label htmlFor={field.id}>{label}</Label>
         <Input
-          {...register(fieldName)}
+          {...getInputProps(field, { type: 'text' })}
           autoComplete="off"
           autoFocus
+          key={field.key}
           onKeyDown={enableEnterKey ? handleKeyDown : undefined}
           placeholder={placeholder}
         />
-        {error && <FormErrorBadge error={error} />}
+        <FormFieldErrors errors={field.errors} />
+      </FormElement>
+      <ButtonGroup>
+        <Button onClick={onConfirm} type="button" variant="primary">
+          {confirmLabel}
+        </Button>
+        <Button onClick={onClose} type="button" variant="secondary">
+          {cancelLabel}
+        </Button>
+      </ButtonGroup>
+    </Modal>
+  )
+}
+
+/** Controlled mode — value/onChange props */
+const ControlledInputModal = ({
+  cancelLabel = 'Close',
+  confirmLabel,
+  enableEnterKey = false,
+  label,
+  onChange,
+  onClose,
+  onConfirm,
+  open,
+  placeholder,
+  value,
+}: SharedProps & { onChange: (value: string) => void; value: string }) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (enableEnterKey && e.key === 'Enter') {
+      e.preventDefault()
+      onConfirm()
+    }
+  }
+
+  return (
+    <Modal onClose={onClose} open={open}>
+      <FormElement>
+        <Label>{label}</Label>
+        <Input
+          autoComplete="off"
+          autoFocus
+          onChange={(e) => onChange(e.target.value)}
+          onKeyDown={enableEnterKey ? handleKeyDown : undefined}
+          placeholder={placeholder}
+          value={value}
+        />
       </FormElement>
       <ButtonGroup>
         <Button onClick={onConfirm} type="button" variant="primary">

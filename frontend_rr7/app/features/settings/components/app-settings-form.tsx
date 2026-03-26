@@ -17,10 +17,9 @@
  *
  */
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import { type TFunction } from 'i18next'
-import { useEffect, useMemo } from 'react'
-import { useForm } from 'react-hook-form'
+import { getFormProps, useForm, useInputControl } from '@conform-to/react'
+import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useFetcher } from 'react-router'
 import { z } from 'zod'
@@ -34,7 +33,9 @@ import { FormBody } from '~/components/ui/forms/form-body'
 import { FormElement } from '~/components/ui/forms/form-element'
 import { Select, type SelectOption } from '~/components/ui/forms/input/select'
 import { ToggleSwitch } from '~/components/ui/forms/input/toggle-switch'
-import { DEFAULT_LOCALE, LOCALES } from '~/i18n-config'
+import { DEFAULT_LOCALE, LOCALE_LABELS, LOCALES } from '~/i18n-config'
+import { validateFormData } from '~/lib/conform-helpers'
+import { type SchemaTranslationFn, untyped } from '~/lib/i18n-types'
 import {
   type ThemeMode,
   useAppSettingsActions,
@@ -42,16 +43,8 @@ import {
   useTheme,
 } from '~/stores/app-settings-store'
 
-const LOCALE_LABELS: Record<string, string> = {
-  de: 'Deutsch',
-  en: 'English',
-  es: 'Español',
-  fr: 'Français',
-  it: 'Italiano',
-}
-
 const LANGUAGE_OPTIONS: SelectOption[] = LOCALES.map((locale) => ({
-  label: LOCALE_LABELS[locale] || locale,
+  label: LOCALE_LABELS[locale],
   value: locale,
 }))
 
@@ -60,7 +53,7 @@ const themeModeToDataTheme: Record<string, string> = {
   light: 'light',
 }
 
-const createAppSettingsSchema = (t: TFunction) =>
+const createAppSettingsSchema = (t: SchemaTranslationFn) =>
   z.object({
     language: z.string().min(
       1,
@@ -68,15 +61,13 @@ const createAppSettingsSchema = (t: TFunction) =>
         defaultValue: 'Language is required',
       }),
     ),
-    showOnboarding: z.boolean(),
+    showOnboarding: z.string().optional(),
     theme: z.enum(['light', 'dark', 'system'], {
       message: t('validation.themeRequired', {
         defaultValue: 'Theme is required',
       }),
     }),
   })
-
-type FormData = z.infer<ReturnType<typeof createAppSettingsSchema>>
 
 export const AppSettingsForm = () => {
   const { i18n, t } = useTranslation('settings')
@@ -87,16 +78,7 @@ export const AppSettingsForm = () => {
   const localeFetcher = useFetcher()
   const themeFetcher = useFetcher()
 
-  const schema = useMemo(() => createAppSettingsSchema(t), [t])
-
-  const hookForm = useForm<FormData>({
-    defaultValues: {
-      language: DEFAULT_LOCALE,
-      showOnboarding: !onboardingDismissed,
-      theme: 'system' as ThemeMode,
-    },
-    resolver: zodResolver(schema),
-  })
+  const schema = useMemo(() => createAppSettingsSchema(untyped(t)), [t])
 
   const THEMES: SelectOption[] = [
     {
@@ -113,22 +95,34 @@ export const AppSettingsForm = () => {
     },
   ]
 
-  useEffect(() => {
-    hookForm.setValue('language', i18n.language || DEFAULT_LOCALE)
-    hookForm.setValue('theme', theme)
-    hookForm.setValue('showOnboarding', !onboardingDismissed)
-  }, [i18n.language, theme, onboardingDismissed, hookForm])
+  const [form, fields] = useForm({
+    constraint: getZodConstraint(schema),
+    defaultValue: {
+      language: i18n.language || DEFAULT_LOCALE,
+      showOnboarding: onboardingDismissed ? '' : 'on',
+      theme: theme as string,
+    },
+    onValidate({ formData }) {
+      return parseWithZod(formData, { schema })
+    },
+    shouldRevalidate: 'onInput',
+    shouldValidate: 'onSubmit',
+  })
+
+  const languageControl = useInputControl(fields.language)
+  const themeControl = useInputControl(fields.theme)
+  const onboardingControl = useInputControl(fields.showOnboarding)
 
   const handleLanguageChange = (value: string) => {
-    hookForm.setValue('language', value)
+    languageControl.change(value)
   }
 
   const handleThemeChange = (value: string) => {
-    hookForm.setValue('theme', value as ThemeMode)
+    themeControl.change(value)
   }
 
   const handleOnboardingToggle = (enabled: boolean) => {
-    hookForm.setValue('showOnboarding', enabled)
+    onboardingControl.change(enabled ? 'on' : '')
     if (enabled) {
       resetOnboarding()
     } else {
@@ -136,7 +130,13 @@ export const AppSettingsForm = () => {
     }
   }
 
-  const onSubmit = (data: FormData) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
+    const result = validateFormData(e.currentTarget, schema)
+    if (result.status !== 'success') return
+
+    const data = result.value
     const currentLocale = i18n.language || DEFAULT_LOCALE
     const languageChanged = data.language !== currentLocale
 
@@ -149,16 +149,16 @@ export const AppSettingsForm = () => {
     }
 
     // Save theme to store
-    setTheme(data.theme)
+    setTheme(data.theme as ThemeMode)
 
     // Update theme cookie via server action (for SSR)
     if (data.theme === 'system') {
-      if (typeof window !== 'undefined' && window.matchMedia) {
-        const prefersDark = window.matchMedia(
+      if (globalThis.window !== undefined && globalThis.matchMedia) {
+        const prefersDark = globalThis.matchMedia(
           '(prefers-color-scheme: dark)',
         ).matches
         const systemTheme = prefersDark ? 'dark' : 'light'
-        document.documentElement.setAttribute('data-theme', systemTheme)
+        document.documentElement.dataset.theme = systemTheme
         void themeFetcher.submit(
           { theme: systemTheme },
           { action: '/api/theme', method: 'post' },
@@ -166,7 +166,7 @@ export const AppSettingsForm = () => {
       }
     } else {
       const dataTheme = themeModeToDataTheme[data.theme] || 'light'
-      document.documentElement.setAttribute('data-theme', dataTheme)
+      document.documentElement.dataset.theme = dataTheme
       void themeFetcher.submit(
         { theme: data.theme },
         { action: '/api/theme', method: 'post' },
@@ -175,7 +175,7 @@ export const AppSettingsForm = () => {
 
     // Reload if language changed (to load new translation files)
     if (languageChanged) {
-      window.location.reload()
+      globalThis.location.reload()
     }
   }
 
@@ -183,35 +183,45 @@ export const AppSettingsForm = () => {
     <div className="mx-auto mt-6 w-full max-w-2xl">
       <Card>
         <CardBody className="p-6">
-          <form onSubmit={hookForm.handleSubmit(onSubmit)}>
+          <form {...getFormProps(form)} onSubmit={handleSubmit}>
             <FormBody>
               <FieldSet>
                 <FormElement
-                  htmlFor="language-select"
+                  htmlFor={fields.language.id}
                   label={t('app.language', 'Interface Language')}
                 >
+                  <input
+                    name={fields.language.name}
+                    type="hidden"
+                    value={languageControl.value ?? DEFAULT_LOCALE}
+                  />
                   <Select
-                    id="language-select"
+                    id={fields.language.id}
                     onChange={handleLanguageChange}
                     options={LANGUAGE_OPTIONS}
-                    value={hookForm.watch('language')}
+                    value={languageControl.value ?? DEFAULT_LOCALE}
                   />
                 </FormElement>
                 <FormElement
-                  htmlFor="theme-select"
+                  htmlFor={fields.theme.id}
                   label={t('app.theme', 'Theme')}
                 >
+                  <input
+                    name={fields.theme.name}
+                    type="hidden"
+                    value={themeControl.value ?? 'system'}
+                  />
                   <Select
-                    id="theme-select"
+                    id={fields.theme.id}
                     onChange={handleThemeChange}
                     options={THEMES}
-                    value={hookForm.watch('theme')}
+                    value={themeControl.value ?? 'system'}
                   />
                 </FormElement>
                 <FormElement>
                   <div className="flex items-center gap-3">
                     <ToggleSwitch
-                      checked={hookForm.watch('showOnboarding')}
+                      checked={onboardingControl.value === 'on'}
                       id="onboarding-toggle"
                       onChange={handleOnboardingToggle}
                     />

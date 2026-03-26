@@ -87,15 +87,32 @@ export const loader = async ({ context, request }: Route.LoaderArgs) => {
   return data({ locale, theme }, { headers })
 }
 
-export default function App({ loaderData }: Route.ComponentProps) {
+export default function App({ loaderData: _loaderData }: Route.ComponentProps) {
   return <Outlet />
 }
+
+const ErrorActions = ({ showTryAgain = true }: { showTryAgain?: boolean }) => (
+  <div className="card-actions mt-6 justify-center gap-3">
+    {showTryAgain && (
+      <button
+        className="btn btn-outline btn-sm"
+        onClick={() => globalThis.window?.location.reload()}
+        type="button"
+      >
+        Try again
+      </button>
+    )}
+    <a className="btn btn-primary btn-sm" href={href('/')}>
+      Go home
+    </a>
+  </div>
+)
 
 export const ErrorBoundary = () => {
   const error = useRouteError()
 
   // Log errors client-side only
-  if (typeof window !== 'undefined') {
+  if (globalThis.window !== undefined) {
     logger.error('ErrorBoundary caught error', error)
   }
 
@@ -105,10 +122,15 @@ export const ErrorBoundary = () => {
         <div className="flex min-h-screen items-center justify-center p-4">
           <div className="card bg-base-200 w-full max-w-md shadow-lg">
             <div className="card-body items-center text-center">
-              <h1 className="card-title text-2xl">Unauthorized</h1>
-              <p>You need to sign in to access this page.</p>
-              <div className="card-actions mt-4">
-                <a className="btn btn-primary" href={href('/login')}>
+              <div className="text-base-content/30 text-6xl font-black">
+                401
+              </div>
+              <h1 className="card-title mt-2 text-xl">Unauthorized</h1>
+              <p className="text-base-content/60 text-sm">
+                You need to sign in to access this page.
+              </p>
+              <div className="card-actions mt-6">
+                <a className="btn btn-primary btn-sm" href={href('/login')}>
                   Sign in
                 </a>
               </div>
@@ -123,13 +145,14 @@ export const ErrorBoundary = () => {
         <div className="flex min-h-screen items-center justify-center p-4">
           <div className="card bg-base-200 w-full max-w-md shadow-lg">
             <div className="card-body items-center text-center">
-              <h1 className="card-title text-2xl">Page not found</h1>
-              <p>The page you are looking for does not exist.</p>
-              <div className="card-actions mt-4">
-                <a className="btn btn-primary" href={href('/')}>
-                  Go home
-                </a>
+              <div className="text-base-content/30 text-6xl font-black">
+                404
               </div>
+              <h1 className="card-title mt-2 text-xl">Page not found</h1>
+              <p className="text-base-content/60 text-sm">
+                The page you are looking for does not exist.
+              </p>
+              <ErrorActions showTryAgain={false} />
             </div>
           </div>
         </div>
@@ -139,16 +162,17 @@ export const ErrorBoundary = () => {
     return (
       <div className="flex min-h-screen items-center justify-center p-4">
         <div className="card bg-base-200 w-full max-w-md shadow-lg">
-          <div className="card-body">
-            <h1 className="card-title text-2xl">
-              {error.status} {error.statusText}
-            </h1>
-            <p>{error.data?.toString() ?? 'An error occurred.'}</p>
-            <div className="card-actions mt-4">
-              <a className="btn btn-primary" href={href('/')}>
-                Go home
-              </a>
+          <div className="card-body items-center text-center">
+            <div className="text-base-content/30 text-6xl font-black">
+              {error.status}
             </div>
+            <h1 className="card-title mt-2 text-xl">
+              {error.statusText || 'Something went wrong'}
+            </h1>
+            <p className="text-base-content/60 text-sm">
+              {error.data?.toString() ?? 'An error occurred.'}
+            </p>
+            <ErrorActions />
           </div>
         </div>
       </div>
@@ -157,31 +181,29 @@ export const ErrorBoundary = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
-      <div className="card bg-base-200 w-full max-w-md shadow-lg">
-        <div className="card-body">
-          <div className="alert alert-error mb-4">
-            <span>An unexpected error occurred.</span>
-          </div>
+      <div className="card bg-base-200 w-full max-w-lg shadow-lg">
+        <div className="card-body items-center text-center">
+          <div className="text-error/30 text-6xl font-black">!</div>
+          <h1 className="card-title mt-2 text-xl">Unexpected error</h1>
+          <p className="text-base-content/60 text-sm">
+            Something went wrong. Please try again or return to the home page.
+          </p>
           {process.env.NODE_ENV === 'development' && error instanceof Error && (
-            <details className="collapse-arrow bg-base-300 collapse">
-              <summary className="collapse-title font-medium">
+            <details className="collapse-arrow bg-base-300 collapse mt-4 w-full text-left">
+              <summary className="collapse-title text-sm font-medium">
                 Error details
               </summary>
               <div className="collapse-content">
-                <p className="font-mono text-sm">{error.message}</p>
+                <p className="text-error font-mono text-sm">{error.message}</p>
                 {error.stack && (
-                  <pre className="mt-2 overflow-auto text-xs">
+                  <pre className="bg-base-100 mt-2 overflow-auto rounded-lg p-3 text-xs">
                     {error.stack}
                   </pre>
                 )}
               </div>
             </details>
           )}
-          <div className="card-actions mt-4">
-            <a className="btn btn-primary" href={href('/')}>
-              Go home
-            </a>
-          </div>
+          <ErrorActions />
         </div>
       </div>
     </div>

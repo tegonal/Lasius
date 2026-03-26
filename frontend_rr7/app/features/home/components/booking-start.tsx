@@ -17,10 +17,11 @@
  *
  */
 
+import { getFormProps, useForm, useInputControl } from '@conform-to/react'
+import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
 import { roundToNearestMinutes } from 'date-fns'
 import { Timer } from 'lucide-react'
-import { useEffect } from 'react'
-import { FormProvider, useForm } from 'react-hook-form'
+import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
@@ -31,15 +32,16 @@ import { FormElement } from '~/components/ui/forms/form-element'
 import { InputTagsAutocomplete } from '~/components/ui/forms/input/input-tags-autocomplete'
 import { ProjectSelect } from '~/components/ui/forms/input/project-select'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
-import { useBookingFormData } from '~/features/bookings/hooks/use-booking-form-data'
 import { useStopAndStart } from '~/features/bookings/hooks/use-stop-and-start'
+import {
+  createBookingStartSchema,
+  parseTagsFromFormData,
+} from '~/features/bookings/lib/booking-schemas'
+import { useProjects } from '~/features/projects/hooks/use-projects'
+import { type SchemaTranslationFn } from '~/lib/i18n-types'
 import { formatISOLocale } from '~/lib/utils/dates'
 import { type ModelsTag } from '~/services/api/lasius'
-
-type FormValues = {
-  projectId: string
-  tags: ModelsTag[]
-}
+import { useGetTagsByProject } from '~/services/api/lasius-hooks/user-organisations/user-organisations'
 
 type Props = {
   onSuccess?: () => void
@@ -49,92 +51,122 @@ type Props = {
 export const BookingStart = ({ onSuccess, selectedOrgId }: Props) => {
   const { t } = useTranslation(['bookings', 'projects', 'tag-manager'])
   const stopAndStart = useStopAndStart()
-  const hookForm = useForm<FormValues>({
-    defaultValues: { projectId: '', tags: [] },
-    mode: 'onSubmit',
+
+  // Projects from layout loader (already loaded)
+  const { userProjects } = useProjects()
+  const projects = userProjects.map((p) => p.projectReference)
+
+  // Tags via Orval hook
+  const tagsApi = useGetTagsByProject()
+  const tagsSubmitRef = useRef(tagsApi.submit)
+  tagsSubmitRef.current = tagsApi.submit
+  const prevProjectKeyRef = useRef('')
+
+  const schema = createBookingStartSchema(t as unknown as SchemaTranslationFn)
+
+  const [form, fields] = useForm({
+    constraint: getZodConstraint(schema),
+    defaultValue: { projectId: '', tags: '' },
+    onValidate({ formData }) {
+      return parseWithZod(formData, { schema })
+    },
+    shouldRevalidate: 'onInput',
+    shouldValidate: 'onSubmit',
   })
 
-  const watchedProjectId = hookForm.watch('projectId')
-  const { projects, projectTags } = useBookingFormData(
-    selectedOrgId,
-    watchedProjectId,
-  )
+  const projectIdControl = useInputControl(fields.projectId)
+  const tagsControl = useInputControl(fields.tags)
+
+  // Load tags when project changes
+  useEffect(() => {
+    const pid = projectIdControl.value
+    const key = `${selectedOrgId}:${pid}`
+    if (selectedOrgId && pid && key !== prevProjectKeyRef.current) {
+      prevProjectKeyRef.current = key
+      tagsSubmitRef.current({ orgId: selectedOrgId, projectId: pid })
+    }
+  }, [selectedOrgId, projectIdControl.value])
+
+  const projectTags = tagsApi.data ?? []
 
   const resetComponent = () => {
-    hookForm.setValue('projectId', '')
-    hookForm.setValue('tags', [])
+    projectIdControl.change('')
+    tagsControl.change('')
   }
 
-  const onSubmit = () => {
-    const data = hookForm.getValues()
-    const { projectId, tags = [] } = data
-    if (projectId) {
-      stopAndStart.submit({
-        orgId: selectedOrgId,
-        projectId,
-        start: formatISOLocale(
-          roundToNearestMinutes(new Date(), {
-            roundingMethod: 'floor',
-          }),
-        ),
-        tags,
-      })
-      resetComponent()
-      onSuccess?.()
-    }
-  }
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    const result = parseWithZod(formData, { schema })
+    if (result.status !== 'success') return
 
-  useEffect(() => {
-    const subscription = hookForm.watch((value, { name }) => {
-      if (name === 'projectId' && value.projectId) {
-        hookForm.setFocus('tags')
-      }
+    const { projectId, tags: tagsJson } = result.value
+    const tags = parseTagsFromFormData(tagsJson) as unknown as ModelsTag[]
+
+    stopAndStart.submit({
+      orgId: selectedOrgId,
+      projectId,
+      start: formatISOLocale(
+        roundToNearestMinutes(new Date(), {
+          roundingMethod: 'floor',
+        }),
+      ),
+      tags,
     })
-    return () => subscription.unsubscribe()
-  }, [hookForm])
+    resetComponent()
+    onSuccess?.()
+  }
+
+  // Auto-focus tags when project changes
+  useEffect(() => {
+    if (projectIdControl.value && fields.tags.id) {
+      document.querySelector<HTMLElement>(`#${fields.tags.id}`)?.focus()
+    }
+  }, [projectIdControl.value, fields.tags.id])
 
   return (
     <div className="relative w-full">
-      <FormProvider {...hookForm}>
-        <form onSubmit={hookForm.handleSubmit(onSubmit)}>
-          <FormBody>
-            <FieldSet>
-              <FormElement
-                htmlFor="projectId"
-                label={t('projects:label', 'Project')}
-                required
-              >
-                <ProjectSelect
-                  id="projectId"
-                  name="projectId"
-                  projects={projects}
-                  required
-                />
-              </FormElement>
-              <FormElement
-                htmlFor="tags"
-                label={t('tag-manager:label', 'Tags')}
-              >
-                <InputTagsAutocomplete
-                  id="tags"
-                  name="tags"
-                  suggestions={projectTags}
-                />
-              </FormElement>
-            </FieldSet>
-            <ButtonGroup>
-              <Button
-                data-testid="booking-start-submit-btn"
-                disabled={stopAndStart.state !== 'idle'}
-                type="submit"
-              >
-                <LucideIcon icon={Timer} size={24} />
-                {t('bookings:actions.start', 'Start booking')}
-              </Button>
-            </ButtonGroup>
-          </FormBody>
-        </form>
-      </FormProvider>
+      <form {...getFormProps(form)} onSubmit={onSubmit}>
+        <FormBody>
+          <FieldSet>
+            <FormElement
+              htmlFor={fields.projectId.id}
+              label={t('projects:label', 'Project')}
+              required
+            >
+              <ProjectSelect
+                errors={fields.projectId.errors}
+                id={fields.projectId.id}
+                name={fields.projectId.name}
+                onChange={(id) => projectIdControl.change(id)}
+                projects={projects}
+                value={projectIdControl.value ?? ''}
+              />
+            </FormElement>
+            <FormElement
+              htmlFor={fields.tags.id}
+              label={t('tag-manager:label', 'Tags')}
+            >
+              <InputTagsAutocomplete
+                field={fields.tags}
+                id={fields.tags.id}
+                projectId={projectIdControl.value}
+                suggestions={projectTags}
+              />
+            </FormElement>
+          </FieldSet>
+          <ButtonGroup>
+            <Button
+              data-testid="booking-start-submit-btn"
+              disabled={stopAndStart.state !== 'idle'}
+              type="submit"
+            >
+              <LucideIcon icon={Timer} size={24} />
+              {t('bookings:actions.start', 'Start booking')}
+            </Button>
+          </ButtonGroup>
+        </FormBody>
+      </form>
     </div>
   )
 }

@@ -77,7 +77,7 @@ describe('i18n-config', () => {
 
     it('returns false for null and undefined', () => {
       expect(isLocale(null)).toBe(false)
-      expect(isLocale(undefined)).toBe(false)
+      expect(isLocale()).toBe(false)
     })
 
     it('returns false for empty string', () => {

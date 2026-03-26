@@ -17,16 +17,25 @@
  *
  */
 
-import { useTranslation } from 'react-i18next'
 import { useLocation, useNavigate } from 'react-router'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
-import { getNavigation, type NavigationRouteType } from '~/config/navigation'
+import {
+  getNavigation,
+  type NavigationRouteType,
+  type NavigationSection,
+} from '~/config/navigation'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { useLayoutLoaderData } from '~/hooks/use-layout-loader-data'
 
-export const NavigationTabContent = ({ branch }: { branch: string }) => {
+export const NavigationTabContent = ({
+  branch,
+  navigation,
+}: {
+  branch: string
+  navigation: NavigationSection[]
+}) => {
   const { isAdministrator } = useOrganisation()
   const loaderData = useLayoutLoaderData()
 
@@ -36,6 +45,7 @@ export const NavigationTabContent = ({ branch }: { branch: string }) => {
         id: branch,
         isOrganisationAdministrator: isAdministrator,
         isUserOfInternalOAuthProvider: loaderData?.tokenIssuer === 'internal',
+        navigation,
       }).map((item) => (
         <NavigationButton item={item} key={item.name} />
       ))}
@@ -46,7 +56,6 @@ export const NavigationTabContent = ({ branch }: { branch: string }) => {
 const NavigationButton = ({ item }: { item: NavigationRouteType }) => {
   const navigate = useNavigate()
   const location = useLocation()
-  const { t } = useTranslation('common')
 
   const isActive = location.pathname === item.route
 
@@ -63,7 +72,7 @@ const NavigationButton = ({ item }: { item: NavigationRouteType }) => {
       variant={isActive ? 'navigationActive' : 'navigation'}
     >
       <LucideIcon icon={item.icon} size={24} />
-      <div>{t(item.name)}</div>
+      <div>{item.name}</div>
     </Button>
   )
 }

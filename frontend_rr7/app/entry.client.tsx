@@ -29,11 +29,11 @@ import { getInitialNamespaces } from 'remix-i18next/client'
 import { i18nConfig } from '~/i18n-config.ts'
 import { logger } from '~/lib/logger'
 
-window.addEventListener('error', (event) => {
+globalThis.addEventListener('error', (event) => {
   logger.error({ error: event.error, type: 'window-error' }, 'Uncaught error')
 })
 
-window.addEventListener('unhandledrejection', (event) => {
+globalThis.addEventListener('unhandledrejection', (event) => {
   logger.error(
     { error: event.reason, type: 'unhandled-rejection' },
     'Unhandled rejection',

@@ -66,9 +66,6 @@ type Pages = {
   "/api/org-switch": {
     params: {};
   };
-  "/api/booking-form-data": {
-    params: {};
-  };
   "/api/proxy": {
     params: {};
   };
@@ -120,6 +117,9 @@ type Pages = {
   "/organisation/current": {
     params: {};
   };
+  "/organisation/integrations": {
+    params: {};
+  };
   "/organisation/lists": {
     params: {};
   };
@@ -155,7 +155,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/login" | "/logout" | "/join/:invitationId" | "/auth/error" | "/internal-oauth/login" | "/internal-oauth/register" | "/oauth/:provider/login" | "/oauth/callback" | "/api/session-status" | "/api/locales/:lang/:ns" | "/api/help/:locale/:slug" | "/api/theme" | "/api/calendar-bookings" | "/api/org-switch" | "/api/booking-form-data" | "/api/proxy" | "/api/ws-ticket" | "/api/locale" | "/api/health" | "/user/home" | "/user/dashboard" | "/user/dashboard/day" | "/user/dashboard/week" | "/user/dashboard/month" | "/user/dashboard/6months" | "/user/dashboard/year" | "/user/lists" | "/user/stats" | "/user/stats/projects" | "/user/stats/tags" | "/user/projects" | "/organisation/current" | "/organisation/lists" | "/organisation/projects" | "/organisation/stats" | "/organisation/stats/projects" | "/organisation/stats/users" | "/organisation/stats/tags" | "/settings/account" | "/settings/account-security" | "/settings/app" | "/settings/working-hours";
+    page: "/" | "/login" | "/logout" | "/join/:invitationId" | "/auth/error" | "/internal-oauth/login" | "/internal-oauth/register" | "/oauth/:provider/login" | "/oauth/callback" | "/api/session-status" | "/api/locales/:lang/:ns" | "/api/help/:locale/:slug" | "/api/theme" | "/api/calendar-bookings" | "/api/org-switch" | "/api/proxy" | "/api/ws-ticket" | "/api/locale" | "/api/health" | "/user/home" | "/user/dashboard" | "/user/dashboard/day" | "/user/dashboard/week" | "/user/dashboard/month" | "/user/dashboard/6months" | "/user/dashboard/year" | "/user/lists" | "/user/stats" | "/user/stats/projects" | "/user/stats/tags" | "/user/projects" | "/organisation/current" | "/organisation/integrations" | "/organisation/lists" | "/organisation/projects" | "/organisation/stats" | "/organisation/stats/projects" | "/organisation/stats/users" | "/organisation/stats/tags" | "/settings/account" | "/settings/account-security" | "/settings/app" | "/settings/working-hours";
   };
   "routes/login.tsx": {
     id: "routes/login";
@@ -213,10 +213,6 @@ type RouteFiles = {
     id: "routes/api.org-switch";
     page: "/api/org-switch";
   };
-  "routes/api.booking-form-data.ts": {
-    id: "routes/api.booking-form-data";
-    page: "/api/booking-form-data";
-  };
   "routes/api.proxy.ts": {
     id: "routes/api.proxy";
     page: "/api/proxy";
@@ -235,7 +231,7 @@ type RouteFiles = {
   };
   "routes/app-layout.tsx": {
     id: "routes/app-layout";
-    page: "/" | "/user/home" | "/user/dashboard" | "/user/dashboard/day" | "/user/dashboard/week" | "/user/dashboard/month" | "/user/dashboard/6months" | "/user/dashboard/year" | "/user/lists" | "/user/stats" | "/user/stats/projects" | "/user/stats/tags" | "/user/projects" | "/organisation/current" | "/organisation/lists" | "/organisation/projects" | "/organisation/stats" | "/organisation/stats/projects" | "/organisation/stats/users" | "/organisation/stats/tags" | "/settings/account" | "/settings/account-security" | "/settings/app" | "/settings/working-hours";
+    page: "/" | "/user/home" | "/user/dashboard" | "/user/dashboard/day" | "/user/dashboard/week" | "/user/dashboard/month" | "/user/dashboard/6months" | "/user/dashboard/year" | "/user/lists" | "/user/stats" | "/user/stats/projects" | "/user/stats/tags" | "/user/projects" | "/organisation/current" | "/organisation/integrations" | "/organisation/lists" | "/organisation/projects" | "/organisation/stats" | "/organisation/stats/projects" | "/organisation/stats/users" | "/organisation/stats/tags" | "/settings/account" | "/settings/account-security" | "/settings/app" | "/settings/working-hours";
   };
   "routes/index-redirect.ts": {
     id: "routes/index-redirect";
@@ -307,11 +303,15 @@ type RouteFiles = {
   };
   "routes/organisation.layout.tsx": {
     id: "routes/organisation.layout";
-    page: "/organisation/current" | "/organisation/lists" | "/organisation/projects" | "/organisation/stats" | "/organisation/stats/projects" | "/organisation/stats/users" | "/organisation/stats/tags";
+    page: "/organisation/current" | "/organisation/integrations" | "/organisation/lists" | "/organisation/projects" | "/organisation/stats" | "/organisation/stats/projects" | "/organisation/stats/users" | "/organisation/stats/tags";
   };
   "routes/organisation.current.tsx": {
     id: "routes/organisation.current";
     page: "/organisation/current";
+  };
+  "routes/organisation.integrations.tsx": {
+    id: "routes/organisation.integrations";
+    page: "/organisation/integrations";
   };
   "routes/organisation.lists.tsx": {
     id: "routes/organisation.lists";
@@ -379,7 +379,6 @@ type RouteModules = {
   "routes/api.theme": typeof import("./app/routes/api.theme.ts");
   "routes/api.calendar-bookings": typeof import("./app/routes/api.calendar-bookings.ts");
   "routes/api.org-switch": typeof import("./app/routes/api.org-switch.ts");
-  "routes/api.booking-form-data": typeof import("./app/routes/api.booking-form-data.ts");
   "routes/api.proxy": typeof import("./app/routes/api.proxy.ts");
   "routes/api.ws-ticket": typeof import("./app/routes/api.ws-ticket.ts");
   "routes/api.locale": typeof import("./app/routes/api.locale.ts");
@@ -404,6 +403,7 @@ type RouteModules = {
   "routes/user.projects._index": typeof import("./app/routes/user.projects._index.tsx");
   "routes/organisation.layout": typeof import("./app/routes/organisation.layout.tsx");
   "routes/organisation.current": typeof import("./app/routes/organisation.current.tsx");
+  "routes/organisation.integrations": typeof import("./app/routes/organisation.integrations.tsx");
   "routes/organisation.lists": typeof import("./app/routes/organisation.lists.tsx");
   "routes/organisation.projects._index": typeof import("./app/routes/organisation.projects._index.tsx");
   "routes/organisation.stats": typeof import("./app/routes/organisation.stats.tsx");

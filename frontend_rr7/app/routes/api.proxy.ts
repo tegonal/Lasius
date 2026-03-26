@@ -102,16 +102,16 @@ export async function action({ request }: Route.ActionArgs) {
     return data(envelope, {
       headers: authResult ? mergeAuthHeaders(authResult) : {},
     })
-  } catch (e) {
-    if (e instanceof ApiError) {
+  } catch (error) {
+    if (error instanceof ApiError) {
       const envelope: ProxyEnvelope = {
-        error: e.statusText,
+        error: error.statusText,
         ok: false,
-        status: e.status,
+        status: error.status,
       }
       return data(envelope, {
         headers: authResult ? mergeAuthHeaders(authResult) : {},
-        status: e.status,
+        status: error.status,
       })
     }
     return data(

@@ -28,11 +28,11 @@ export default defineConfig({
     defaultValue: (key, _namespace, _language, value) => {
       if (value) return value
       const parts = key.split('.')
-      const lastPart = parts[parts.length - 1] ?? key
+      const lastPart = parts.at(-1) ?? key
       return lastPart
-        .replace(/([A-Z])/g, ' $1')
-        .replace(/_/g, ' ')
-        .replace(/\b\w/g, (l) => l.toUpperCase())
+        .replaceAll(/([A-Z])/g, ' $1')
+        .replaceAll('_', ' ')
+        .replaceAll(/\b\w/g, (l) => l.toUpperCase())
         .trim()
     },
     extractFromComments: false,
@@ -52,6 +52,8 @@ export default defineConfig({
     ignoredTags: ['noscript'],
   },
 
+  // Keep in sync with app/i18n-config.ts LOCALES
+  // (cannot import directly — CLI config does not resolve app path aliases)
   locales: ['en', 'de', 'fr', 'it', 'es'],
 
   types: {

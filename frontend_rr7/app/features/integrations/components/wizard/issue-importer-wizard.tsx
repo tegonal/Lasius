@@ -25,17 +25,19 @@ import { useRevalidator } from 'react-router'
 import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { Modal } from '~/components/ui/overlays/modal/modal'
-import {
-  ListProjectsStep,
-  type MappingWithTagConfig,
-} from '~/features/integrations/components/wizard/steps/list-projects-step'
+import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
+import { ConfigFormStep } from '~/features/integrations/components/wizard/steps/config-form-step'
+import { ListProjectsStep } from '~/features/integrations/components/wizard/steps/list-projects-step'
 import { SelectPlatformStep } from '~/features/integrations/components/wizard/steps/select-platform-step'
 import { TestConnectionStep } from '~/features/integrations/components/wizard/steps/test-connection-step'
 import {
   useWizardState,
   type WizardStep,
 } from '~/features/integrations/hooks/use-wizard-state'
-import { buildMappingPayload } from '~/features/integrations/lib/mapping-helpers'
+import {
+  buildMappingPayload,
+  type MappingWithTagConfig,
+} from '~/features/integrations/lib/mapping-helpers'
 import { logger } from '~/lib/logger'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 import { useAddProjectMapping } from '~/services/api/lasius-hooks/issue-importers/issue-importers'
@@ -46,12 +48,7 @@ type Props = {
   selectedOrgId: string
 }
 
-const STEPS: Array<{ id: WizardStep; label: string }> = [
-  { id: 'platform', label: 'Platform' },
-  { id: 'config', label: 'Configure' },
-  { id: 'test', label: 'Test' },
-  { id: 'projects', label: 'Projects' },
-]
+const STEP_IDS: WizardStep[] = ['platform', 'config', 'test', 'projects']
 
 export const IssueImporterWizard = ({
   onClose,
@@ -80,6 +77,14 @@ export const IssueImporterWizard = ({
     }>
   >([])
   const mappingsQueueIndexRef = useRef(0)
+  const configFormRef = useRef<HTMLFormElement>(null)
+  const submitNextMappingRef = useRef<() => void>(() => {})
+
+  const handleClose = useCallback(() => {
+    resetWizard()
+    setProjectMappings({})
+    onClose()
+  }, [resetWizard, onClose])
 
   const { submit: submitAddMapping } = useAddProjectMapping({
     onError: () => {
@@ -90,7 +95,7 @@ export const IssueImporterWizard = ({
       // Process next mapping in queue
       mappingsQueueIndexRef.current += 1
       if (mappingsQueueIndexRef.current < mappingsQueueRef.current.length) {
-        submitNextMapping()
+        submitNextMappingRef.current()
       } else {
         // All mappings saved
         setIsSaving(false)
@@ -145,7 +150,9 @@ export const IssueImporterWizard = ({
     submitAddMapping,
     selectedOrgId,
     revalidator,
+    handleClose,
   ])
+  submitNextMappingRef.current = submitNextMapping
 
   const translatedSteps = useMemo(
     () => [
@@ -177,21 +184,15 @@ export const IssueImporterWizard = ({
     [t],
   )
 
-  const currentStepIndex = STEPS.findIndex((s) => s.id === state.currentStep)
+  const currentStepIndex = STEP_IDS.indexOf(state.currentStep)
 
-  const isLastStep = currentStepIndex === STEPS.length - 1
+  const isLastStep = currentStepIndex === STEP_IDS.length - 1
 
   const getStepClassName = (index: number, current: number): string => {
     if (index < current) return 'text-success'
     if (index === current) return 'text-primary font-medium'
     return 'text-base-content/40'
   }
-
-  const handleClose = useCallback(() => {
-    resetWizard()
-    setProjectMappings({})
-    onClose()
-  }, [resetWizard, onClose])
 
   const handleSelectPlatform = useCallback(
     (type: ImporterType) => {
@@ -218,22 +219,41 @@ export const IssueImporterWizard = ({
     [setCreatedConfig],
   )
 
+  const handleConfigSubmit = useCallback(
+    (data: Parameters<typeof updateFormData>[0]) => {
+      updateFormData(data)
+      setCurrentStep('test')
+    },
+    [updateFormData, setCurrentStep],
+  )
+
   const handleTestNext = useCallback(() => {
     setCurrentStep('projects')
   }, [setCurrentStep])
 
   const handlePrevious = useCallback(() => {
-    if (state.currentStep === 'config') {
-      setCurrentStep('platform')
-    } else if (state.currentStep === 'projects') {
-      // Skip test step when going back if config already exists
-      if (state.createdConfig) {
-        setCurrentStep('config')
-      } else {
-        setCurrentStep('test')
+    switch (state.currentStep) {
+      case 'config': {
+        setCurrentStep('platform')
+
+        break
       }
-    } else if (state.currentStep === 'test') {
-      setCurrentStep('config')
+      case 'projects': {
+        // Skip test step when going back if config already exists
+        if (state.createdConfig) {
+          setCurrentStep('config')
+        } else {
+          setCurrentStep('test')
+        }
+
+        break
+      }
+      case 'test': {
+        setCurrentStep('config')
+
+        break
+      }
+      // No default
     }
   }, [state.currentStep, state.createdConfig, setCurrentStep])
 
@@ -288,6 +308,7 @@ export const IssueImporterWizard = ({
 
   return (
     <Modal onClose={handleClose} open={open} size={modalSize}>
+      <ModalCloseButton onClose={handleClose} />
       <div className="flex h-full flex-col">
         {/* Header */}
         <div className="flex-shrink-0 pb-4">
@@ -302,7 +323,7 @@ export const IssueImporterWizard = ({
             {translatedSteps.map((step, index) => (
               <div className="flex items-center" key={step.id}>
                 <button
-                  className={`flex items-center gap-1.5 rounded-full px-2 py-1 text-xs transition-colors ${getStepClassName(index, currentStepIndex)}`}
+                  className={`flex items-center gap-1.5 rounded-full px-2 py-1 text-xs transition-colors ${getStepClassName(index, currentStepIndex)} ${index > currentStepIndex ? 'cursor-not-allowed' : ''}`}
                   disabled={index > currentStepIndex}
                   type="button"
                 >
@@ -313,7 +334,7 @@ export const IssueImporterWizard = ({
                   )}
                   <span>{step.label}</span>
                 </button>
-                {index < STEPS.length - 1 && (
+                {index < STEP_IDS.length - 1 && (
                   <div className="bg-base-content/20 mx-1 h-px w-4" />
                 )}
               </div>
@@ -328,13 +349,12 @@ export const IssueImporterWizard = ({
           )}
 
           {state.currentStep === 'config' && state.formData.importerType && (
-            <div className="flex h-full items-center justify-center">
-              <p className="text-base-content/60">
-                {t('issueImporters.wizard.configTodo', {
-                  defaultValue: 'Configuration form (TODO)',
-                })}
-              </p>
-            </div>
+            <ConfigFormStep
+              formData={state.formData}
+              formRef={configFormRef}
+              onSubmit={handleConfigSubmit}
+              selectedOrgId={selectedOrgId}
+            />
           )}
 
           {state.currentStep === 'test' && state.formData.importerType && (
@@ -375,7 +395,7 @@ export const IssueImporterWizard = ({
             </Button>
 
             <div className="text-base-content/50 text-sm">
-              {currentStepIndex + 1} / {STEPS.length}
+              {currentStepIndex + 1} / {STEP_IDS.length}
             </div>
 
             {isLastStep ? (
@@ -399,8 +419,12 @@ export const IssueImporterWizard = ({
                 disabled={state.currentStep === 'platform'}
                 fullWidth={false}
                 onClick={() => {
-                  const nextStep = STEPS[currentStepIndex + 1]
-                  if (nextStep) setCurrentStep(nextStep.id)
+                  if (state.currentStep === 'config') {
+                    configFormRef.current?.requestSubmit()
+                    return
+                  }
+                  const nextStep = STEP_IDS[currentStepIndex + 1]
+                  if (nextStep) setCurrentStep(nextStep)
                 }}
                 size="sm"
                 variant="primary"

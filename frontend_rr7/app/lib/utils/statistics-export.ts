@@ -51,11 +51,11 @@ const transformByDayData = (stats: ModelsBookingStats[] | undefined) => {
   if (!stats || !Array.isArray(stats) || stats.length === 0) return []
 
   const categories = new Set<string>()
-  stats.forEach((stat) => {
-    stat.values.forEach((v) => {
+  for (const stat of stats) {
+    for (const v of stat.values) {
       if (v.label) categories.add(v.label)
-    })
-  })
+    }
+  }
 
   return stats.map((stat) => {
     const { category } = stat
@@ -74,12 +74,12 @@ const transformByDayData = (stats: ModelsBookingStats[] | undefined) => {
     const row: Record<string, number | string> = { Date: dateStr }
 
     let total = 0
-    categories.forEach((cat) => {
+    for (const cat of categories) {
       const value = stat.values.find((v) => v.label === cat)
       const hours = value?.duration ? millisToHours(value.duration) : 0
       row[cat] = hours
       total += hours
-    })
+    }
 
     row.Total = Math.round(total * 100) / 100
     return row
@@ -106,7 +106,7 @@ const transformAggregatedData = (stats: ModelsBookingStats[] | undefined) => {
       }
     })
     .filter((item) => item.Hours > 0)
-    .sort((a, b) => b.Hours - a.Hours)
+    .toSorted((a, b) => b.Hours - a.Hours)
 }
 
 export const exportStatistics = (
@@ -147,11 +147,11 @@ export const exportStatistics = (
   summarySheet['!cols'] = [{ wch: 20 }, { wch: 40 }]
   XLSX.utils.book_append_sheet(wb, summarySheet, 'Summary')
 
-  data.byDayAndSource.forEach(({ data: stats, source }) => {
-    if (!stats || stats.length === 0) return
+  for (const { data: stats, source } of data.byDayAndSource) {
+    if (!stats || stats.length === 0) continue
 
     const tableData = transformByDayData(stats)
-    if (tableData.length === 0) return
+    if (tableData.length === 0) continue
 
     const ws = XLSX.utils.json_to_sheet(tableData)
 
@@ -161,21 +161,21 @@ export const exportStatistics = (
     ws['!cols'] = colWidths
 
     const sheetName = `By ${capitalize(source)} & Day`
-    XLSX.utils.book_append_sheet(wb, ws, sheetName.substring(0, 31))
-  })
+    XLSX.utils.book_append_sheet(wb, ws, sheetName.slice(0, 31))
+  }
 
-  data.aggregated.forEach(({ data: stats, source }) => {
-    if (!stats || stats.length === 0) return
+  for (const { data: stats, source } of data.aggregated) {
+    if (!stats || stats.length === 0) continue
 
     const tableData = transformAggregatedData(stats)
-    if (tableData.length === 0) return
+    if (tableData.length === 0) continue
 
     const ws = XLSX.utils.json_to_sheet(tableData)
     ws['!cols'] = [{ wch: 30 }, { wch: 15 }, { wch: 15 }]
 
     const sheetName = `${capitalize(source)} Totals`
     XLSX.utils.book_append_sheet(wb, ws, sheetName)
-  })
+  }
 
   const extension = format
   const fromDate = data.summary.from.split('T')[0]

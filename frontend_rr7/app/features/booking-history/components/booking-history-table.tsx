@@ -18,7 +18,6 @@
  */
 
 import { useMemo } from 'react'
-import { useFormContext } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import { DataList } from '~/components/ui/data-display/data-list/data-list'
@@ -31,11 +30,13 @@ import { type ModelsBooking, type ModelsTag } from '~/services/api/lasius'
 import { type ExtendedHistoryBooking } from '~/types/booking'
 
 import { BookingHistoryItemContext } from './booking-history-item-context'
+import { type BookingHistoryControls } from './booking-history-layout'
 import { EmptyStateBookingHistory } from './empty-state-booking-history'
 
 type Props = {
   allowDelete?: boolean
   allowEdit?: boolean
+  controls: BookingHistoryControls
   items: ExtendedHistoryBooking[]
   showUserColumn?: boolean
 }
@@ -43,16 +44,24 @@ type Props = {
 export const BookingHistoryTable = ({
   allowDelete = false,
   allowEdit = false,
+  controls,
   items,
   showUserColumn = false,
 }: Props) => {
   const { t } = useTranslation('common')
-  const formContext = useFormContext()
 
   const tagClickHandler = (tag: ModelsTag) => {
     if (tag) {
-      const tags = formContext.getValues('tags')
-      formContext.setValue('tags', [...tags, tag])
+      const currentTagsJson = controls.tags.value
+      let currentTags: ModelsTag[] = []
+      if (currentTagsJson) {
+        try {
+          currentTags = JSON.parse(currentTagsJson) as ModelsTag[]
+        } catch {
+          currentTags = []
+        }
+      }
+      controls.tags.change(JSON.stringify([...currentTags, tag]))
     }
   }
 
@@ -61,7 +70,7 @@ export const BookingHistoryTable = ({
       projectReference: { id },
     } = booking
     if (id) {
-      formContext.setValue('projectId', id)
+      controls.projectId.change(id)
     }
   }
 
@@ -70,13 +79,13 @@ export const BookingHistoryTable = ({
       userReference: { id },
     } = booking
     if (id) {
-      formContext.setValue('userId', id)
+      controls.userId.change(id)
     }
   }
 
   const sortedList = useMemo(() => sortExtendedBookingsByDate(items), [items])
 
-  if (sortedList.length < 1) return <EmptyStateBookingHistory />
+  if (sortedList.length === 0) return <EmptyStateBookingHistory />
 
   return (
     <DataList>

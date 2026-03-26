@@ -68,36 +68,42 @@ export default function Login({
 
   const getErrorMessage = (errorCode: string): string => {
     switch (errorCode) {
-      case 'Callback':
+      case 'Callback': {
         return t(
           'auth:errors.callback',
           'Authentication callback failed. Please try again.',
         )
-      case 'fetchProfileFailed':
+      }
+      case 'fetchProfileFailed': {
         return t(
           'auth:errors.fetchProfileFailed',
           "Couldn't load user profile. Please try logging in again.",
         )
+      }
       case 'no_code':
       case 'OAuthCallback':
-      case 'OAuthCallbackError':
+      case 'OAuthCallbackError': {
         return t('auth.errors.oauthCallback', {
           defaultValue: 'Authentication failed. Please try again.',
         })
-      case 'SessionRequired':
+      }
+      case 'SessionRequired': {
         return t('auth.errors.sessionRequired.message', {
           defaultValue: 'Please sign in to continue.',
         })
-      case 'state_mismatch':
+      }
+      case 'state_mismatch': {
         return t('auth.errors.stateMismatch', {
           defaultValue:
             'Authentication failed: invalid state. Please try again.',
         })
-      default:
+      }
+      default: {
         return t('auth.errors.general', {
           defaultValue: 'Authentication error. Please try again.',
           error: errorCode,
         })
+      }
     }
   }
 
@@ -266,16 +272,21 @@ const getProviderDisplayName = (
 
 const getProviderIcon = (provider: AuthProvider): React.ReactNode => {
   switch (provider) {
-    case 'github':
+    case 'github': {
       return <SiGithub size={24} />
-    case 'gitlab':
+    }
+    case 'gitlab': {
       return <SiGitlab size={24} />
-    case 'internal':
+    }
+    case 'internal': {
       return <LasiusIcon size={24} />
-    case 'keycloak':
+    }
+    case 'keycloak': {
       return <SiKeycloak size={24} />
-    default:
+    }
+    default: {
       return null
+    }
   }
 }
 

@@ -23,7 +23,7 @@ import { type ExtendedHistoryBooking } from '~/types/booking'
 export const sortBookingsByDate = (
   bookings: ModelsBooking[],
 ): ModelsBooking[] =>
-  [...bookings].sort(
+  [...bookings].toSorted(
     (a, b) =>
       new Date(b.start.dateTime).getTime() -
       new Date(a.start.dateTime).getTime(),
@@ -32,6 +32,6 @@ export const sortBookingsByDate = (
 export const sortExtendedBookingsByDate = (
   bookings: ExtendedHistoryBooking[],
 ): ExtendedHistoryBooking[] =>
-  [...bookings].sort(
+  [...bookings].toSorted(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
   )

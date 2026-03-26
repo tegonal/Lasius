@@ -48,9 +48,7 @@ export const BarsTags = ({ stats }: Props) => {
       axisLeft={{
         format: (value: number | string) => {
           const strValue = String(value)
-          return strValue.length > 16
-            ? `${strValue.substring(0, 16)}...`
-            : strValue
+          return strValue.length > 16 ? `${strValue.slice(0, 16)}...` : strValue
         },
         tickPadding: 5,
         tickRotation: 0,

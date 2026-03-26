@@ -32,11 +32,11 @@ export const DataListField = ({ children, className, width }: Props) => {
     <td
       className={cn('p-1 py-3', className)}
       style={
-        width !== undefined
-          ? {
+        width === undefined
+          ? undefined
+          : {
               width: typeof width === 'number' ? `${width}px` : width,
             }
-          : undefined
       }
     >
       {children}

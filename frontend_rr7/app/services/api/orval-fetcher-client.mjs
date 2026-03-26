@@ -33,7 +33,7 @@ const PUBLIC_ENDPOINTS = new Set([
 ])
 
 function isPublicRoute(route) {
-  const staticRoute = route.replace(/\$\{[^}]+\}/g, '*')
+  const staticRoute = route.replaceAll(/\$\{[^}]+\}/g, '*')
   return PUBLIC_ENDPOINTS.has(staticRoute)
 }
 
@@ -52,7 +52,6 @@ const BUILTIN_TYPES = new Set([
 
 // Strip array suffix and generic wrappers to get the base type name for imports
 function baseTypeName(type) {
-  // eslint-disable-next-line sonarjs/slow-regex -- build-time code generator, no user input
   return type.replace(/\[\]$/, '').replace(/<[^>]*>$/, '')
 }
 
@@ -96,7 +95,7 @@ function generateFetcherHook(verbOptions, options) {
   }
 
   // Remove trailing 'undefined' type args
-  while (typeArgs.length > 1 && typeArgs[typeArgs.length - 1] === 'undefined') {
+  while (typeArgs.length > 1 && typeArgs.at(-1) === 'undefined') {
     typeArgs.pop()
   }
 

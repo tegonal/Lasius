@@ -43,7 +43,7 @@ describe('isValidTheme', () => {
   })
 
   it('rejects undefined', () => {
-    expect(isValidTheme(undefined)).toBe(false)
+    expect(isValidTheme()).toBe(false)
   })
 
   it('rejects arbitrary strings', () => {

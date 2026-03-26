@@ -33,27 +33,28 @@ import { Badge } from '~/components/ui/data-display/badge'
 import { Tag } from '~/components/ui/data-display/tag-list'
 import { InputTagsAdmin } from '~/components/ui/forms/input/input-tags-admin'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+import { type ModelsTag } from '~/services/api/lasius/modelsTag'
 import { type ModelsTagGroup } from '~/services/api/lasius/modelsTagGroup'
 
 type Props = {
-  index: number
   isExpanded: boolean
   onAddTag: () => void
   onCopyTags: () => void
   onDelete: () => void
   onPasteTags: () => void
+  onTagsChange: (tags: ModelsTag[]) => void
   onToggle: () => void
   showPasteButton: boolean
   tagGroup: ModelsTagGroup
 }
 
 export const TagGroupItem = ({
-  index,
   isExpanded,
   onAddTag,
   onCopyTags,
   onDelete,
   onPasteTags,
+  onTagsChange,
   onToggle,
   showPasteButton,
   tagGroup,
@@ -101,8 +102,7 @@ export const TagGroupItem = ({
           <div className="min-w-0">
             <InputTagsAdmin
               hideAddButton
-              name="tagGroups"
-              tagGroupIndex={index}
+              onTagsChange={onTagsChange}
               tags={tagGroup.relatedTags || []}
             />
           </div>

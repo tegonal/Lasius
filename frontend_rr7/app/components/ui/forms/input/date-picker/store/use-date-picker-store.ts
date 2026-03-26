@@ -239,7 +239,7 @@ export const createDatePickerStore = () =>
 
         try {
           const date = new Date(isoString)
-          if (isNaN(date.getTime())) {
+          if (Number.isNaN(date.getTime())) {
             set({
               value: createDateTimeValue(null, '', '', false, false),
             })
@@ -273,7 +273,7 @@ export const createDatePickerStore = () =>
 
         try {
           const date = new Date(isoString)
-          if (isNaN(date.getTime())) {
+          if (Number.isNaN(date.getTime())) {
             set({ initialValue: defaultValue })
             return
           }

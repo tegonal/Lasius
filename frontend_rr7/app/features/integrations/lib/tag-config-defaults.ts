@@ -32,7 +32,7 @@ export const getDefaultTagConfiguration = (
   | ModelsPlaneTagConfiguration
   | undefined => {
   switch (importerType) {
-    case 'github':
+    case 'github': {
       return {
         includeOnlyIssuesWithLabels: [],
         includeOnlyIssuesWithState: ['open'],
@@ -42,8 +42,9 @@ export const getDefaultTagConfiguration = (
         useMilestone: false,
         useTitle: true,
       } satisfies ModelsGithubTagConfiguration
+    }
 
-    case 'gitlab':
+    case 'gitlab': {
       return {
         includeOnlyIssuesWithLabels: [],
         includeOnlyIssuesWithState: [],
@@ -52,11 +53,13 @@ export const getDefaultTagConfiguration = (
         useMilestone: false,
         useTitle: true,
       } satisfies ModelsGitlabTagConfiguration
+    }
 
-    case 'jira':
+    case 'jira': {
       return undefined
+    }
 
-    case 'plane':
+    case 'plane': {
       return {
         includeOnlyIssuesWithLabels: [],
         includeOnlyIssuesWithState: [],
@@ -65,8 +68,6 @@ export const getDefaultTagConfiguration = (
         useMilestone: false,
         useTitle: true,
       } satisfies ModelsPlaneTagConfiguration
-
-    default:
-      return undefined
+    }
   }
 }

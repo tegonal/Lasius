@@ -90,7 +90,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const orgCurrentBookings = orgCurrentBookingsRes.data?.timeBookings ?? []
   const orgUsers = orgUsersRes.data ?? []
 
-  // Compute planned working hours for today's weekday
+  // Compute planned working hours for the selected day's weekday
   const selectedOrg = organisations.find(
     (o) => o.organisationReference.id === selectedOrgId,
   )
@@ -104,9 +104,10 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     5: 'friday',
     6: 'saturday',
   }
-  const todayWeekday = weekdayNames[new Date().getDay()] ?? 'monday'
+  const selectedWeekday =
+    weekdayNames[new Date(selectedDate).getDay()] ?? 'monday'
   const plannedHoursDay =
-    (plannedHours as Record<string, number> | undefined)?.[todayWeekday] ?? 0
+    (plannedHours as Record<string, number> | undefined)?.[selectedWeekday] ?? 0
 
   // Compute day summary
   const daySummary = getModelsBookingSummary(dayBookings)

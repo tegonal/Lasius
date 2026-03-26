@@ -33,7 +33,7 @@ export const ProviderInstructions = ({ importerType }: Props) => {
   let Content: React.ReactNode
 
   switch (importerType) {
-    case 'github':
+    case 'github': {
       title = t('issueImporters.github.instructions.title', {
         defaultValue: 'How to create GitHub credentials:',
       })
@@ -77,7 +77,8 @@ export const ProviderInstructions = ({ importerType }: Props) => {
         </Trans>
       )
       break
-    case 'gitlab':
+    }
+    case 'gitlab': {
       title = t('issueImporters.gitlab.instructions.title', {
         defaultValue: 'How to create GitLab credentials:',
       })
@@ -112,7 +113,8 @@ export const ProviderInstructions = ({ importerType }: Props) => {
         </Trans>
       )
       break
-    case 'jira':
+    }
+    case 'jira': {
       title = t('issueImporters.jira.instructions.title', {
         defaultValue: 'How to create Jira credentials:',
       })
@@ -174,7 +176,8 @@ export const ProviderInstructions = ({ importerType }: Props) => {
         </Trans>
       )
       break
-    case 'plane':
+    }
+    case 'plane': {
       title = t('issueImporters.plane.instructions.title', {
         defaultValue: 'How to create Plane credentials:',
       })
@@ -213,6 +216,7 @@ export const ProviderInstructions = ({ importerType }: Props) => {
         </Trans>
       )
       break
+    }
   }
 
   return (

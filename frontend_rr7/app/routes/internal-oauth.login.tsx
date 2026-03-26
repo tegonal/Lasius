@@ -44,7 +44,7 @@ import { Logo } from '~/components/ui/icons/logo'
 import { InternalLoginInfoPanel } from '~/features/auth/auth-info-panels'
 import { AuthLayout } from '~/features/auth/auth-layout'
 import { getServerEnv } from '~/lib/env.server'
-import { type SchemaTranslationFn } from '~/lib/i18n-types'
+import { type SchemaTranslationFn, untyped } from '~/lib/i18n-types'
 import { logger } from '~/lib/logger'
 import { getConfiguration } from '~/services/api/lasius/general/general'
 import {
@@ -113,8 +113,8 @@ export async function action({ request }: Route.ActionArgs) {
       },
       returnTo,
     )
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Login failed'
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Login failed'
     logger.warn('Internal login failed', { email, error: message })
 
     const errorCode =
@@ -142,7 +142,7 @@ export default function InternalOAuthLogin() {
   const navigation = useNavigation()
   const { t } = useTranslation('common')
 
-  const loginSchema = createLoginSchema(t)
+  const loginSchema = createLoginSchema(untyped(t))
 
   const [form, fields] = useForm({
     defaultValue: { email: prefilledEmail, password: '', returnTo },
@@ -158,15 +158,16 @@ export default function InternalOAuthLogin() {
 
   const getErrorMessage = (errorCode: string): string => {
     switch (errorCode) {
-      case 'usernameOrPasswordWrong':
+      case 'usernameOrPasswordWrong': {
         return t('auth.errors.invalidCredentials', {
           defaultValue: 'Invalid email or password. Please try again.',
         })
-      case 'loginFailed':
-      default:
+      }
+      default: {
         return t('auth.errors.loginFailed', {
           defaultValue: 'Login failed. Please try again.',
         })
+      }
     }
   }
 

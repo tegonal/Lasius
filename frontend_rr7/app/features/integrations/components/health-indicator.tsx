@@ -31,35 +31,43 @@ export const HealthIndicator = ({ size = 'sm', status }: Props) => {
 
   const getStatusColor = () => {
     switch (status) {
-      case 'degraded':
+      case 'degraded': {
         return 'bg-warning'
-      case 'failed':
+      }
+      case 'failed': {
         return 'bg-error'
-      case 'healthy':
+      }
+      case 'healthy': {
         return 'bg-success'
-      case 'unknown':
+      }
+      case 'unknown': {
         return 'bg-base-content/30'
+      }
     }
   }
 
   const getStatusLabel = () => {
     switch (status) {
-      case 'degraded':
+      case 'degraded': {
         return t('issueImporters.healthStatus.degraded', {
           defaultValue: 'Degraded',
         })
-      case 'failed':
+      }
+      case 'failed': {
         return t('issueImporters.healthStatus.failed', {
           defaultValue: 'Failed',
         })
-      case 'healthy':
+      }
+      case 'healthy': {
         return t('issueImporters.healthStatus.healthy', {
           defaultValue: 'Healthy',
         })
-      case 'unknown':
+      }
+      case 'unknown': {
         return t('issueImporters.healthStatus.unknown', {
           defaultValue: 'Unknown',
         })
+      }
     }
   }
 

@@ -34,34 +34,22 @@ import { ContextBody } from '~/features/context-menu/context-body'
 import { ContextButtonWrapper } from '~/features/context-menu/context-button-wrapper'
 import { useContextMenu } from '~/features/context-menu/hooks/use-context-menu'
 import { ProjectMappingSelector } from '~/features/integrations/components/wizard/steps/project-mapping-selector'
+import { type TagConfiguration } from '~/features/integrations/lib/mapping-helpers'
 import { useProjects } from '~/features/projects/hooks/use-projects'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
-import {
-  type ModelsExternalProject,
-  type ModelsGithubTagConfiguration,
-  type ModelsGitlabTagConfiguration,
-  type ModelsPlaneTagConfiguration,
-} from '~/services/api/lasius'
+import { type ModelsExternalProject } from '~/services/api/lasius'
 
 type Props = {
-  existingTagConfig?:
-    | ModelsGithubTagConfiguration
-    | ModelsGitlabTagConfiguration
-    | ModelsPlaneTagConfiguration
+  existingTagConfig?: TagConfiguration
   externalProject: ModelsExternalProject
   importerType: ImporterType
   onMappingChange: (
     externalProjectId: string,
     lasiusProjectId: null | string,
-    tagConfig: TagConfiguration | undefined,
+    tagConfig?: TagConfiguration,
   ) => void
   selectedProjectId?: string
 }
-
-type TagConfiguration =
-  | ModelsGithubTagConfiguration
-  | ModelsGitlabTagConfiguration
-  | ModelsPlaneTagConfiguration
 
 export const ProjectMappingRowContext = ({
   existingTagConfig,
@@ -95,7 +83,7 @@ export const ProjectMappingRowContext = ({
   }
 
   const handleConfirmRemove = () => {
-    onMappingChange(externalProject.id, null, undefined)
+    onMappingChange(externalProject.id, null)
     setIsConfirmRemoveOpen(false)
   }
 

@@ -74,7 +74,9 @@ export const CalendarWeek = ({
             <div>
               {week[0] && <FormatDate date={week[0]} format="monthNameLong" />}
             </div>
-            {!isToday(new Date(selectedDay)) ? (
+            {isToday(new Date(selectedDay)) ? (
+              <div />
+            ) : (
               <Button
                 aria-label={t('time.today', 'Today')}
                 data-testid="calendar-week-today-btn"
@@ -84,8 +86,6 @@ export const CalendarWeek = ({
               >
                 {t('time.today', 'Today')}
               </Button>
-            ) : (
-              <div />
             )}
             <div className="text-right">
               {week[0] && <FormatDate date={week[0]} format="year" />}

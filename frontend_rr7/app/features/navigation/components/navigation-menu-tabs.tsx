@@ -25,26 +25,30 @@ import {
   IconTabs,
   type IconTabsItem,
 } from '~/components/ui/navigation/icon-tabs'
-import { NAVIGATION } from '~/config/navigation'
+import { createNavigation } from '~/config/navigation'
 import { NavigationTabContent } from '~/features/navigation/components/navigation-tab-content'
 
 export const NavigationMenuTabs = () => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('navigation')
   const location = useLocation()
 
+  const navigation = createNavigation(t)
+
   // Derive the tab that matches the current URL; fall back to manual override
-  const locationTab = tabIndexForPath(location.pathname)
+  const locationTab = tabIndexForPath(navigation, location.pathname)
   const [manualTab, setManualTab] = useState<null | number>(null)
 
   // Reset manual override when URL changes to a different section
   const selected =
     manualTab !== null && manualTab !== locationTab ? manualTab : locationTab
 
-  const tabs: IconTabsItem[] = NAVIGATION.map((item) => ({
-    component: <NavigationTabContent branch={item.level} />,
+  const tabs: IconTabsItem[] = navigation.map((item) => ({
+    component: (
+      <NavigationTabContent branch={item.level} navigation={navigation} />
+    ),
     icon: item.icon,
     id: item.level,
-    name: t(item.name),
+    name: item.name,
     routes: item.routes.map((r) => r.route),
   }))
 
@@ -60,10 +64,13 @@ export const NavigationMenuTabs = () => {
   )
 }
 
-/** Find the NAVIGATION section index whose routes match the given pathname. */
-export const tabIndexForPath = (pathname: string): number => {
-  for (let i = 0; i < NAVIGATION.length; i++) {
-    const hasMatch = NAVIGATION[i]?.routes.some((route) =>
+/** Find the navigation section index whose routes match the given pathname. */
+export const tabIndexForPath = (
+  navigation: ReturnType<typeof createNavigation>,
+  pathname: string,
+): number => {
+  for (const [i, section] of navigation.entries()) {
+    const hasMatch = section.routes.some((route) =>
       pathname.startsWith(route.route),
     )
     if (hasMatch) return i

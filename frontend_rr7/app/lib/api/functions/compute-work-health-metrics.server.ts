@@ -65,10 +65,10 @@ export const computeWorkHealthMetrics = (
   // Group bookings by week
   const weekMap = new Map<string, { dates: Set<string>; hours: number }>()
 
-  bookings.forEach((booking) => {
+  for (const booking of bookings) {
     const startDateTime = booking.start?.dateTime
     const endDateTime = booking.end?.dateTime
-    if (!startDateTime || !endDateTime) return
+    if (!startDateTime || !endDateTime) continue
 
     const bookingDate = new Date(startDateTime)
     const weekNum = getWeek(bookingDate, { weekStartsOn: 1 })
@@ -83,7 +83,7 @@ export const computeWorkHealthMetrics = (
     const weekData = weekMap.get(weekKey)!
     weekData.hours += durationInHoursAsNumber(startDateTime, endDateTime)
     weekData.dates.add(dateKey)
-  })
+  }
 
   // Create weekly data array
   const weeks: WeekData[] = []
@@ -104,7 +104,7 @@ export const computeWorkHealthMetrics = (
   }
 
   // Calculate burnout metrics for current week (last item in array)
-  const currentWeek = weeks[weeks.length - 1]
+  const currentWeek = weeks.at(-1)
   if (!currentWeek) {
     return { burnoutMetrics: null, weeklyData: weeks }
   }

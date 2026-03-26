@@ -18,6 +18,7 @@
  */
 
 /* eslint-disable react-compiler/react-compiler -- Form integration effects have intentionally partial deps */
+import { type FieldMetadata, useInputControl } from '@conform-to/react'
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
 import { isEqual } from 'date-fns'
 import {
@@ -27,13 +28,11 @@ import {
   X,
 } from 'lucide-react'
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
-import { useFormContext } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
-import { FormErrorBadge } from '~/components/ui/forms/form-error-badge'
+import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { CalendarDisplay } from '~/components/ui/forms/input/calendar/calendar-display'
-import { useRequiredFormContext } from '~/components/ui/forms/with-form-context'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { formatISOLocale, type IsoDateString } from '~/lib/utils/dates'
 
@@ -46,57 +45,35 @@ import {
 } from './store/use-date-picker-store'
 
 export type InputDatePickerProps = {
-  name: string
+  field: FieldMetadata<string>
   onRenderLabelAction?: (resetButton: React.ReactNode) => void
   presetDate?: IsoDateString
   presetIcon?: LucideIconType
   presetLabel?: string
-  rules?: Record<string, unknown>
   withDate?: boolean
   withTime?: boolean
 }
 
-/**
- * Main component that checks for form context before rendering
- */
 export const InputDatePicker = (props: InputDatePickerProps) => {
-  const formContext = useFormContext()
-
-  if (!formContext) {
-    return null
-  }
-
-  return <InputDatePickerInner {...props} />
-}
-
-/**
- * Wrapper component that provides store isolation
- */
-const InputDatePickerInner = (props: InputDatePickerProps) => {
   const store = useMemo(() => createDatePickerStore(), [])
 
   return (
     <DatePickerStoreContext.Provider value={store}>
-      <InputDatePickerInternal {...props} />
+      <ConformDatePickerBridge {...props} />
     </DatePickerStoreContext.Provider>
   )
 }
 
-/**
- * Internal component that assumes form context is available
- */
-const InputDatePickerInternal = ({
-  name,
+const ConformDatePickerBridge = ({
+  field,
   onRenderLabelAction,
   presetDate,
-  presetIcon: PresetIcon,
+  presetIcon,
   presetLabel,
-  rules,
   withDate = true,
   withTime = true,
 }: InputDatePickerProps) => {
-  const { t } = useTranslation('common')
-  const parentFormContext = useRequiredFormContext()
+  const control = useInputControl(field)
   const {
     getISOString,
     resetToInitial,
@@ -107,112 +84,112 @@ const InputDatePickerInternal = ({
   const isInitializedRef = useRef(false)
   const initialDateRef = useRef<Date | null>(null)
 
-  // Watch the form value
-  const formValue = parentFormContext.watch(name)
-
-  // Register field with validation that runs on every render
+  // Initialize store from field value only once
   useEffect(() => {
-    parentFormContext.register(name, {
-      ...rules,
-      validate: {
-        ...(rules?.validate as Record<string, unknown>),
-        validDate: (fieldValue: string): string | true => {
-          const currentValue = value
-
-          if (
-            !currentValue.isValid &&
-            !currentValue.isPartial &&
-            (currentValue.dateString || currentValue.timeString)
-          ) {
-            return 'Invalid date or time format'
-          }
-
-          if (rules?.required && !fieldValue) {
-            return 'This field is required'
-          }
-
-          return true
-        },
-      },
-    })
-
-    return () => {
-      parentFormContext.unregister(name)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name, rules?.required])
-
-  // Initialize store from form value only once
-  useEffect(() => {
-    if (!isInitializedRef.current) {
-      const initialValue = parentFormContext.getValues(name)
-      if (initialValue) {
-        setFromISOString(initialValue)
-        setInitialValue(initialValue)
-        const initialDate = new Date(initialValue)
-        if (!isNaN(initialDate.getTime())) {
-          initialDateRef.current = initialDate
-        }
-        isInitializedRef.current = true
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  // Sync form value to store when it changes externally
-  useEffect(() => {
-    if (!isInitializedRef.current && formValue) {
-      setFromISOString(formValue)
-      setInitialValue(formValue)
-      const initialDate = new Date(formValue)
-      if (!isNaN(initialDate.getTime())) {
+    if (!isInitializedRef.current && control.value) {
+      setFromISOString(control.value)
+      setInitialValue(control.value)
+      const initialDate = new Date(control.value)
+      if (!Number.isNaN(initialDate.getTime())) {
         initialDateRef.current = initialDate
       }
       isInitializedRef.current = true
-      return
-    }
-
-    if (!isInitializedRef.current) return
-
-    const currentISOString = getISOString()
-
-    if (formValue !== currentISOString && formValue) {
-      setFromISOString(formValue)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formValue])
+  }, [control.value])
 
-  // Update form value and trigger validation
+  // Sync external field value changes to store
+  useEffect(() => {
+    if (!isInitializedRef.current) return
+    const currentISOString = getISOString()
+    if (control.value !== currentISOString && control.value) {
+      setFromISOString(control.value)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [control.value])
+
+  // Update field value when store produces a valid date
   useEffect(() => {
     if (!isInitializedRef.current) return
 
     if (value.isValid && !value.isPartial) {
       const isoString = getISOString()
-      parentFormContext.setValue(name, isoString || '', {
-        shouldDirty: true,
-        shouldTouch: true,
-        shouldValidate: true,
-      })
+      control.change(isoString || '')
     } else if (!value.dateString && !value.timeString) {
-      parentFormContext.setValue(name, '', {
-        shouldDirty: true,
-        shouldTouch: true,
-        shouldValidate: true,
-      })
-    } else {
-      void parentFormContext.trigger(name)
+      control.change('')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getISOString()])
 
-  const hasPreset = presetDate && presetLabel && PresetIcon
-
-  const onPresetClick = () => {
+  const handlePresetClick = () => {
     if (presetDate) {
       setFromISOString(presetDate)
-      parentFormContext.setValue(name, presetDate)
+      control.change(presetDate)
     }
   }
+
+  return (
+    <>
+      <input name={field.name} type="hidden" value={control.value ?? ''} />
+      <DatePickerUI
+        initialDateRef={initialDateRef}
+        onPresetClick={handlePresetClick}
+        onRenderLabelAction={onRenderLabelAction}
+        presetDate={presetDate}
+        presetIcon={presetIcon}
+        presetLabel={presetLabel}
+        resetToInitial={resetToInitial}
+        value={value}
+        withDate={withDate}
+        withTime={withTime}
+      />
+      <FormFieldErrors errors={field.errors} />
+    </>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Shared UI (pure presentation)
+// ---------------------------------------------------------------------------
+
+type DatePickerUIProps = SharedPickerProps & {
+  initialDateRef: React.RefObject<Date | null>
+  onPresetClick: () => void
+  resetToInitial: () => void
+  value: {
+    date: Date | null
+    dateString: string
+    isPartial: boolean
+    isValid: boolean
+    timeString: string
+  }
+}
+
+type SharedPickerProps = {
+  onRenderLabelAction?: (resetButton: React.ReactNode) => void
+  presetDate?: IsoDateString
+  presetIcon?: LucideIconType
+  presetLabel?: string
+  withDate?: boolean
+  withTime?: boolean
+}
+
+const DatePickerUI = ({
+  initialDateRef,
+  onPresetClick,
+  onRenderLabelAction,
+  presetDate,
+  presetIcon: PresetIcon,
+  presetLabel,
+  resetToInitial,
+  value,
+  withDate = true,
+  withTime = true,
+}: DatePickerUIProps) => {
+  const { t } = useTranslation('common')
+  const { setFromISOString } = useDatePickerStore()
+
+  const hasPreset = presetDate && presetLabel && PresetIcon
 
   const handleCalendarDateChange = (
     selectedDate: IsoDateString,
@@ -264,97 +241,92 @@ const InputDatePickerInternal = ({
   }, [resetButtonElement, onRenderLabelAction])
 
   return (
-    <>
-      <div className="flex w-full flex-col gap-2">
-        {/* Input fields */}
-        <div className="flex items-start gap-2">
-          {withDate && (
-            <div className="flex items-start gap-2">
-              <SegmentedDateInputConnected
-                afterSlot={
-                  <>
-                    <Popover>
-                      <PopoverButton
-                        as={Button}
-                        className="px-2"
-                        fullWidth={false}
-                        join
-                        type="button"
-                        variant="neutral"
-                      >
-                        <LucideIcon icon={CalendarIcon} size={20} />
-                      </PopoverButton>
-                      <PopoverPanel
-                        anchor="bottom start"
-                        className="bg-base-100 border-base-300 z-50 w-[360px] rounded-lg border shadow-lg [--anchor-gap:8px]"
-                      >
-                        {({ close }) => (
-                          <div className="relative p-4 pr-12">
-                            <button
-                              aria-label={t('actions.close', 'Close')}
-                              className="btn btn-ghost btn-sm btn-circle absolute top-2 right-2"
-                              onClick={() => close()}
-                            >
-                              <LucideIcon icon={X} size={16} />
-                            </button>
-                            <CalendarDisplay
-                              onChange={(date) =>
-                                handleCalendarDateChange(date, close)
-                              }
-                              value={formatISOLocale(value.date || new Date())}
-                            />
-                          </div>
-                        )}
-                      </PopoverPanel>
-                    </Popover>
-                    {/* Show preset button next to date if no time input */}
-                    {!withTime && hasPreset && PresetIcon && (
-                      <Button
-                        aria-label={presetLabel}
-                        className="p-0"
-                        fullWidth={false}
-                        join
-                        onClick={onPresetClick}
-                        size="sm"
-                        title={presetLabel}
-                        type="button"
-                        variant="ghost"
-                      >
-                        <LucideIcon icon={PresetIcon} size={20} />
-                      </Button>
-                    )}
-                  </>
-                }
-              />
-            </div>
-          )}
-          {withDate && withTime && <div className="w-2" />}
-          {withTime && (
-            <SegmentedTimeInputConnected
+    <div className="flex w-full flex-col gap-2">
+      {/* Input fields */}
+      <div className="flex items-start gap-2">
+        {withDate && (
+          <div className="flex items-start gap-2">
+            <SegmentedDateInputConnected
               afterSlot={
-                hasPreset &&
-                PresetIcon && (
-                  <Button
-                    aria-label={presetLabel}
-                    className="px-2"
-                    fullWidth={false}
-                    join
-                    onClick={onPresetClick}
-                    title={presetLabel}
-                    type="button"
-                    variant="neutral"
-                  >
-                    <LucideIcon icon={PresetIcon} size={20} />
-                  </Button>
-                )
+                <>
+                  <Popover>
+                    <PopoverButton
+                      as={Button}
+                      className="px-2"
+                      fullWidth={false}
+                      join
+                      type="button"
+                      variant="neutral"
+                    >
+                      <LucideIcon icon={CalendarIcon} size={20} />
+                    </PopoverButton>
+                    <PopoverPanel
+                      anchor="bottom start"
+                      className="bg-base-100 border-base-300 z-50 w-[360px] rounded-lg border shadow-lg [--anchor-gap:8px]"
+                    >
+                      {({ close }) => (
+                        <div className="relative p-4 pr-12">
+                          <button
+                            aria-label={t('actions.close', 'Close')}
+                            className="btn btn-ghost btn-sm btn-circle absolute top-2 right-2"
+                            onClick={() => close()}
+                          >
+                            <LucideIcon icon={X} size={16} />
+                          </button>
+                          <CalendarDisplay
+                            onChange={(date) =>
+                              handleCalendarDateChange(date, close)
+                            }
+                            value={formatISOLocale(value.date || new Date())}
+                          />
+                        </div>
+                      )}
+                    </PopoverPanel>
+                  </Popover>
+                  {/* Show preset button next to date if no time input */}
+                  {!withTime && hasPreset && PresetIcon && (
+                    <Button
+                      aria-label={presetLabel}
+                      className="p-0"
+                      fullWidth={false}
+                      join
+                      onClick={onPresetClick}
+                      size="sm"
+                      title={presetLabel}
+                      type="button"
+                      variant="ghost"
+                    >
+                      <LucideIcon icon={PresetIcon} size={20} />
+                    </Button>
+                  )}
+                </>
               }
             />
-          )}
-        </div>
-
-        {/* Error badge */}
-        <FormErrorBadge error={parentFormContext.formState.errors[name]} />
+          </div>
+        )}
+        {withDate && withTime && <div className="w-2" />}
+        {withTime && (
+          <SegmentedTimeInputConnected
+            afterSlot={
+              hasPreset &&
+              PresetIcon && (
+                <Button
+                  aria-label={presetLabel}
+                  className="px-2"
+                  fullWidth={false}
+                  join
+                  onClick={onPresetClick}
+                  title={presetLabel}
+                  type="button"
+                  variant="neutral"
+                >
+                  <LucideIcon icon={PresetIcon} size={20} />
+                </Button>
+              )
+            }
+          />
+        )}
       </div>
-    </>
+    </div>
   )
 }

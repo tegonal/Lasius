@@ -93,7 +93,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const url = new URL(request.url)
   const dateParam = url.searchParams.get('date')
   const selectedDate =
-    dateParam && !isNaN(new Date(dateParam).getTime())
+    dateParam && !Number.isNaN(new Date(dateParam).getTime())
       ? dateParam
       : formatISOLocale(new Date())
 
@@ -137,7 +137,7 @@ const DashboardLayout = ({ loaderData }: Route.ComponentProps) => {
   const [searchParams, setSearchParams] = useSearchParams()
   const dateParam = searchParams.get('date')
   const date =
-    dateParam && !isNaN(new Date(dateParam).getTime())
+    dateParam && !Number.isNaN(new Date(dateParam).getTime())
       ? dateParam
       : loaderData.selectedDate
 

@@ -18,7 +18,6 @@
  */
 
 import { useMemo } from 'react'
-import { useFormContext } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -28,53 +27,43 @@ import {
 import { type ModelsUserStub } from '~/services/api/lasius'
 
 type UserSelectProps = {
+  errors?: string[]
   fallbackUser?: SelectAutocompleteSuggestionType
   id?: string
   name: string
-  required?: boolean
+  onChange: (value: string) => void
   /** Pre-fetched list of organisation users */
   users: ModelsUserStub[]
+  value: string
 }
 
-/**
- * Domain-specific wrapper for InputSelectAutocomplete to handle user selection.
- * Handles finding users in active list and fallback users.
- */
-export const UserSelect = ({
-  fallbackUser,
-  id,
-  name,
-  required,
-  users,
-}: UserSelectProps) => {
-  const { t } = useTranslation('common')
-  const formContext = useFormContext()
-
-  const formValue = formContext?.watch(name)
-
-  const suggestions: SelectAutocompleteSuggestionType[] = useMemo(
+function useSuggestions(users: ModelsUserStub[]) {
+  return useMemo(
     () =>
       [...users]
-        .map((user) => ({
-          id: user.id,
-          key: user.key,
-        }))
-        .sort((a, b) => (a.key ?? '').localeCompare(b.key ?? '')),
+        .map((user) => ({ id: user.id, key: user.key }))
+        .toSorted((a, b) => (a.key ?? '').localeCompare(b.key ?? '')),
     [users],
   )
+}
 
-  const { selectedItem, statusMessage } = useMemo(() => {
+function useUserLookup(
+  formValue: string,
+  suggestions: SelectAutocompleteSuggestionType[],
+  fallbackUser: SelectAutocompleteSuggestionType | undefined,
+) {
+  const { t } = useTranslation('common')
+
+  return useMemo(() => {
     if (!formValue) {
       return { selectedItem: null, statusMessage: null }
     }
 
-    // First try to find in suggestions (active users)
     const item = suggestions.find((u) => u.id === formValue)
     if (item) {
       return { selectedItem: item, statusMessage: null }
     }
 
-    // If not found, use fallbackUser if it matches the formValue
     if (fallbackUser && fallbackUser.id === formValue) {
       return {
         selectedItem: fallbackUser,
@@ -88,7 +77,6 @@ export const UserSelect = ({
       }
     }
 
-    // User not found anywhere
     return {
       selectedItem: null,
       statusMessage: {
@@ -100,15 +88,38 @@ export const UserSelect = ({
       },
     }
   }, [formValue, suggestions, fallbackUser, t])
+}
+
+/**
+ * Domain-specific wrapper for InputSelectAutocomplete to handle user selection.
+ * Controlled component — parent owns the value via useInputControl.
+ */
+export const UserSelect = ({
+  errors,
+  fallbackUser,
+  id,
+  name,
+  onChange,
+  users,
+  value,
+}: UserSelectProps) => {
+  const suggestions = useSuggestions(users)
+  const { selectedItem, statusMessage } = useUserLookup(
+    value,
+    suggestions,
+    fallbackUser,
+  )
 
   return (
     <InputSelectAutocomplete
+      errors={errors}
       id={id}
       name={name}
-      required={required}
+      onChange={onChange}
       selectedItem={selectedItem}
       statusMessage={statusMessage}
       suggestions={suggestions}
+      value={value}
     />
   )
 }

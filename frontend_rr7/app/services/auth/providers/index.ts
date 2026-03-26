@@ -85,15 +85,20 @@ export function isProviderEnabled(provider: AuthProvider): boolean {
 
 function createProvider(issuer: AuthProvider): OAuthProvider {
   switch (issuer) {
-    case 'github':
+    case 'github': {
       return createGitHubProvider()
-    case 'gitlab':
+    }
+    case 'gitlab': {
       return createGitLabProvider()
-    case 'internal':
+    }
+    case 'internal': {
       return createInternalProvider()
-    case 'keycloak':
+    }
+    case 'keycloak': {
       return createKeycloakProvider()
-    default:
+    }
+    default: {
       throw new Error(`Unknown auth provider: ${issuer as string}`)
+    }
   }
 }

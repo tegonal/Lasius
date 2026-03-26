@@ -18,7 +18,6 @@
  */
 
 import { useMemo } from 'react'
-import { useFormContext } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -30,43 +29,34 @@ import { type ModelsEntityReference } from '~/services/api/lasius'
 type ProjectSelectProps = {
   /** All projects across all organisations (for inactive project lookup) */
   allProjects?: ModelsEntityReference[]
+  errors?: string[]
   fallbackProject?: SelectAutocompleteSuggestionType
   id?: string
   name: string
+  onChange: (value: string) => void
   /** Active projects for the current organisation (suggestions list) */
   projects: ModelsEntityReference[]
-  required?: boolean
+  value: string
 }
 
-/**
- * Domain-specific wrapper for InputSelectAutocomplete to handle project selection.
- * Handles finding projects in active list, inactive projects, and fallback projects.
- */
-export const ProjectSelect = ({
-  allProjects = [],
-  fallbackProject,
-  id,
-  name,
-  projects,
-  required,
-}: ProjectSelectProps) => {
+function useProjectLookup(
+  formValue: string,
+  projects: ModelsEntityReference[],
+  allProjects: ModelsEntityReference[],
+  fallbackProject: SelectAutocompleteSuggestionType | undefined,
+) {
   const { t } = useTranslation('common')
-  const formContext = useFormContext()
 
-  const formValue = formContext?.watch(name)
-
-  const { selectedItem, statusMessage } = useMemo(() => {
+  return useMemo(() => {
     if (!formValue) {
       return { selectedItem: null, statusMessage: null }
     }
 
-    // First try to find in suggestions (active projects)
     let item = projects.find((p) => p.id === formValue)
     if (item) {
       return { selectedItem: item, statusMessage: null }
     }
 
-    // If not found in suggestions, try to find it in all projects (inactive projects)
     item = allProjects.find((p) => p.id === formValue)
     if (item) {
       return {
@@ -81,7 +71,6 @@ export const ProjectSelect = ({
       }
     }
 
-    // If still not found, use fallbackProject if it matches the formValue (project from booking, not in profile)
     if (fallbackProject && fallbackProject.id === formValue) {
       return {
         selectedItem: fallbackProject,
@@ -95,7 +84,6 @@ export const ProjectSelect = ({
       }
     }
 
-    // Project not found anywhere
     return {
       selectedItem: null,
       statusMessage: {
@@ -107,15 +95,39 @@ export const ProjectSelect = ({
       },
     }
   }, [formValue, projects, allProjects, fallbackProject, t])
+}
+
+/**
+ * Domain-specific wrapper for InputSelectAutocomplete to handle project selection.
+ * Controlled component — parent owns the value via useInputControl.
+ */
+export const ProjectSelect = ({
+  allProjects = [],
+  errors,
+  fallbackProject,
+  id,
+  name,
+  onChange,
+  projects,
+  value,
+}: ProjectSelectProps) => {
+  const { selectedItem, statusMessage } = useProjectLookup(
+    value,
+    projects,
+    allProjects,
+    fallbackProject,
+  )
 
   return (
     <InputSelectAutocomplete
+      errors={errors}
       id={id}
       name={name}
-      required={required}
+      onChange={onChange}
       selectedItem={selectedItem}
       statusMessage={statusMessage}
       suggestions={projects}
+      value={value}
     />
   )
 }

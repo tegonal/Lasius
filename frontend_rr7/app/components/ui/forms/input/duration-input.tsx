@@ -73,7 +73,7 @@ export const DurationInput = ({
   const config = DURATION_SEGMENT_CONFIG
 
   // Convert milliseconds to minutes for display
-  const durationMinutes = Math.round(value / 60000)
+  const durationMinutes = Math.round(value / 60_000)
   const durationString = formatDuration(durationMinutes)
 
   const [inputValue, setInputValue] = useState<string>(durationString)
@@ -146,7 +146,7 @@ export const DurationInput = ({
   // Update duration
   const updateDuration = (newDurationMinutes: number) => {
     if (newDurationMinutes >= 0) {
-      onChange(newDurationMinutes * 60000)
+      onChange(newDurationMinutes * 60_000)
     }
   }
 
@@ -249,11 +249,8 @@ export const DurationInput = ({
         const baseIncrement = e.key === 'ArrowUp' ? 1 : -1
         let newMinutes = durationMinutes
 
-        if (segment === 'hour') {
-          newMinutes += baseIncrement * 60
-        } else {
-          newMinutes += baseIncrement * 5
-        }
+        newMinutes +=
+          segment === 'hour' ? baseIncrement * 60 : baseIncrement * 5
 
         if (newMinutes >= 0) {
           updateDuration(newMinutes)

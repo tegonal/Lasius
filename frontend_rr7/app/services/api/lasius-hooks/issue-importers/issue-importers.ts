@@ -275,11 +275,11 @@ export function useUpdateProjectMapping(
  */
 function getGetConfigsUrl(orgId: string, params?: GetConfigsParams) {
   const normalizedParams = new URLSearchParams()
-  Object.entries(params || {}).forEach(([key, value]) => {
+  for (const [key, value] of Object.entries(params || {})) {
     if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
-  })
+  }
   const query = normalizedParams.toString()
   return query
     ? `/organisations/${orgId}/issue-importers` + '?' + query

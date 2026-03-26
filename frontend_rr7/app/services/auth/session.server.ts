@@ -24,8 +24,6 @@ import { logger } from '~/lib/logger'
 import { getProvider } from './providers'
 import { type LasiusSessionData } from './types'
 
-export type { LasiusSessionData }
-
 /**
  * In-flight refresh dedup: when multiple parallel loaders call getSessionTokens()
  * with the same refresh token, only the first one actually refreshes. Others await
@@ -246,3 +244,5 @@ function sessionStorage() {
   }
   return _sessionStorage
 }
+
+export { type LasiusSessionData } from './types'

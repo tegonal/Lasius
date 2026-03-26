@@ -18,9 +18,8 @@
  */
 
 /* eslint-disable react-compiler/react-compiler -- Form integration effects have intentionally partial deps */
-import { isAfter, isBefore } from 'date-fns'
+import { type FieldMetadata, useInputControl } from '@conform-to/react'
 import React, { useEffect, useMemo } from 'react'
-import { Controller, useFormContext } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import { FormBody } from '~/components/ui/forms/form-body'
@@ -29,17 +28,22 @@ import { InputDatePicker } from '~/components/ui/forms/input/date-picker/input-d
 import { Select, type SelectOption } from '~/components/ui/forms/input/select'
 import { dateOptions } from '~/lib/utils/date/date-options'
 
-type DateRangeFilterProps = {
-  name: string
+export type DateRangeFilterProps = {
+  fromField: FieldMetadata<string>
+  rangeField: FieldMetadata<string>
+  toField: FieldMetadata<string>
 }
 
 export const DateRangeFilter = ({
-  name: rangeFieldName,
+  fromField,
+  rangeField,
+  toField,
 }: DateRangeFilterProps) => {
   const { t } = useTranslation('common')
-  const parentFormContext = useFormContext()
+  const fromControl = useInputControl(fromField)
+  const toControl = useInputControl(toField)
+  const rangeControl = useInputControl(rangeField)
 
-  // Convert dateOptions to SelectOption format
   const selectOptions: SelectOption[] = useMemo(
     () =>
       dateOptions.map((option) => ({
@@ -49,122 +53,69 @@ export const DateRangeFilter = ({
     [t],
   )
 
-  const resetForm = () => {
-    const firstOption = dateOptions[0]
-    if (!firstOption) return
-    const range = firstOption.dateRangeFn(new Date())
-
-    parentFormContext.setValue('from', range.from)
-    parentFormContext.setValue('to', range.to)
-
-    parentFormContext.register('from', {
-      validate: {
-        fromBeforeTo: (v: string) =>
-          isBefore(new Date(v), new Date(parentFormContext.getValues('to'))),
-      },
-    })
-
-    parentFormContext.register('to', {
-      validate: {
-        toAfterFrom: (v: string) =>
-          isAfter(new Date(v), new Date(parentFormContext.getValues('from'))),
-      },
-    })
-    void parentFormContext.trigger()
-  }
-
+  // Initialize with first date option
   useEffect(() => {
-    resetForm()
+    const firstOption = dateOptions[0]
+    if (!firstOption || fromControl.value) return
+    const range = firstOption.dateRangeFn(new Date())
+    fromControl.change(range.from)
+    toControl.change(range.to)
+    rangeControl.change(firstOption.name)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const watchFrom = parentFormContext.watch('from')
-  const watchTo = parentFormContext.watch('to')
-
+  // Sync range selector when from/to change
   useEffect(() => {
-    if (!watchFrom || !watchTo) return
-    const from = watchFrom
-    const to = watchTo
+    if (!fromControl.value || !toControl.value) return
 
-    // check matching dateRange
     const today = new Date()
     const option = dateOptions.find((opt) => {
-      if (!opt.dateRangeFn) {
-        return true
-      }
+      if (!opt.dateRangeFn) return true
       const dateRange = opt.dateRangeFn(today)
-      return dateRange.from === from && dateRange.to === to
+      return (
+        dateRange.from === fromControl.value && dateRange.to === toControl.value
+      )
     })
 
-    // Update the form value if we found a matching option
-    if (option) {
-      const currentRange = parentFormContext.getValues(rangeFieldName)
-      if (currentRange !== option.name) {
-        parentFormContext.setValue(rangeFieldName, option.name)
-      }
+    if (option && rangeControl.value !== option.name) {
+      rangeControl.change(option.name)
     }
-  }, [watchFrom, watchTo, parentFormContext, rangeFieldName])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fromControl.value, toControl.value])
 
-  useEffect(() => {
-    if (!parentFormContext) return () => null
-    const subscription = parentFormContext.watch(
-      (value, { name: fieldname }) => {
-        switch (fieldname) {
-          case 'from':
-          case 'to':
-            void parentFormContext.trigger()
-            break
-          case rangeFieldName:
-            if (value[rangeFieldName]) {
-              const option = dateOptions.find(
-                (opt) => opt.name === value[rangeFieldName],
-              )
-              if (!option || !option.dateRangeFn) return
-              const { from, to } = option.dateRangeFn(new Date())
-              parentFormContext.setValue('from', from)
-              parentFormContext.setValue('to', to)
-              void parentFormContext.trigger()
-            }
-            break
-          default:
-            break
-        }
-      },
-    )
-    return () => subscription.unsubscribe()
-  }, [parentFormContext, rangeFieldName])
+  const handleRangeChange = (rangeName: string) => {
+    rangeControl.change(rangeName)
+    const option = dateOptions.find((opt) => opt.name === rangeName)
+    if (!option?.dateRangeFn) return
+    const { from, to } = option.dateRangeFn(new Date())
+    fromControl.change(from)
+    toControl.change(to)
+  }
 
   return (
     <FormBody>
       <FormElement
-        htmlFor={rangeFieldName}
+        htmlFor={rangeField.id}
         label={t('time.timeRange', 'Time range')}
       >
-        <Controller
-          control={parentFormContext.control}
-          name={rangeFieldName}
-          render={({ field: { name, onChange, value } }) => (
-            <Select
-              id={name}
-              name={name}
-              onChange={onChange}
-              options={selectOptions}
-              placeholder={t('time.selectRange', 'Select time range')}
-              value={value || dateOptions[0]?.name || ''}
-            />
-          )}
-          rules={{
-            validate: {
-              required: (v: string | undefined) => !!v,
-            },
-          }}
+        <input
+          name={rangeField.name}
+          type="hidden"
+          value={rangeControl.value ?? ''}
+        />
+        <Select
+          id={rangeField.id}
+          onChange={handleRangeChange}
+          options={selectOptions}
+          placeholder={t('time.selectRange', 'Select time range')}
+          value={rangeControl.value || dateOptions[0]?.name || ''}
         />
       </FormElement>
-      <FormElement htmlFor="from" label={t('time.from', 'From')}>
-        <InputDatePicker name="from" withDate />
+      <FormElement htmlFor={fromField.id} label={t('time.from', 'From')}>
+        <InputDatePicker field={fromField} withDate />
       </FormElement>
-      <FormElement htmlFor="to" label={t('time.to', 'To')}>
-        <InputDatePicker name="to" withDate />
+      <FormElement htmlFor={toField.id} label={t('time.to', 'To')}>
+        <InputDatePicker field={toField} withDate />
       </FormElement>
     </FormBody>
   )

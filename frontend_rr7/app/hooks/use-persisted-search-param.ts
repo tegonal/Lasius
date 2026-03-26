@@ -45,7 +45,7 @@ export const usePersistedSearchParam = (
     if (paramValue) return
 
     const stored =
-      typeof window !== 'undefined' ? localStorage.getItem(storageKey) : null
+      globalThis.window === undefined ? null : localStorage.getItem(storageKey)
     const valueToSet = stored || fallback
 
     setSearchParams(
@@ -59,7 +59,7 @@ export const usePersistedSearchParam = (
 
   // On change: persist to localStorage
   useEffect(() => {
-    if (paramValue && typeof window !== 'undefined') {
+    if (paramValue && globalThis.window !== undefined) {
       localStorage.setItem(storageKey, paramValue)
     }
   }, [paramValue, storageKey])

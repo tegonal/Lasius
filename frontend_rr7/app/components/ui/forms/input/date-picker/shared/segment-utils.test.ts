@@ -30,21 +30,26 @@ type TimeSegment = 'hour' | 'minute'
 
 const dateSegmentIndex = (segment: DateSegment): number => {
   switch (segment) {
-    case 'day':
+    case 'day': {
       return 0
-    case 'month':
+    }
+    case 'month': {
       return 1
-    case 'year':
+    }
+    case 'year': {
       return 2
+    }
   }
 }
 
-const timeSegmentIndex = (segment: TimeSegment): number => {
+const _timeSegmentIndex = (segment: TimeSegment): number => {
   switch (segment) {
-    case 'hour':
+    case 'hour': {
       return 0
-    case 'minute':
+    }
+    case 'minute': {
       return 1
+    }
   }
 }
 

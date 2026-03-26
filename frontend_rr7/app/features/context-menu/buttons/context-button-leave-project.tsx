@@ -63,6 +63,7 @@ export const ContextButtonLeaveProject = ({
     <ContextButtonWrapper variant={variant}>
       <Button
         aria-label={t('projects:actions.leave', 'Leave this project')}
+        data-testid="project-ctx-leave-btn"
         fullWidth={false}
         onClick={() => setShowDialog(true)}
         shape="circle"

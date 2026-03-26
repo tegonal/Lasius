@@ -137,6 +137,7 @@ export const BookingCurrentEntryContext = ({ item }: Props) => {
                       'bookings:actions.adjustStartToPrevious',
                       'Adjust start to previous booking',
                     )}
+                    data-testid="booking-current-adjust-start-btn"
                     fullWidth={false}
                     onClick={adjustStartToPrevious}
                     shape="circle"
@@ -151,6 +152,7 @@ export const BookingCurrentEntryContext = ({ item }: Props) => {
                 </ContextButtonWrapper>
               )}
               <ContextButtonAddFavorite
+                data-testid="booking-current-favorite-btn"
                 item={item}
                 onAddFavorite={addFavorite}
               />

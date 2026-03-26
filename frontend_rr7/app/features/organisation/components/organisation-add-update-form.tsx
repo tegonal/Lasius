@@ -17,10 +17,9 @@
  *
  */
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import { type TFunction } from 'i18next'
-import { useCallback, useEffect, useMemo } from 'react'
-import { useForm } from 'react-hook-form'
+import { getFormProps, getInputProps, useForm } from '@conform-to/react'
+import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 
@@ -32,11 +31,13 @@ import { ButtonGroup } from '~/components/ui/forms/button-group'
 import { FieldSet } from '~/components/ui/forms/field-set'
 import { FormBody } from '~/components/ui/forms/form-body'
 import { FormElement } from '~/components/ui/forms/form-element'
-import { FormErrorBadge } from '~/components/ui/forms/form-error-badge'
+import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
 import { ModalDescription } from '~/components/ui/overlays/modal/modal-description'
 import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
+import { mergeErrors, validateFormData } from '~/lib/conform-helpers'
+import { type SchemaTranslationFn, untyped } from '~/lib/i18n-types'
 import { logger } from '~/lib/logger'
 import {
   useCreateOrganisation,
@@ -49,10 +50,15 @@ type Props = {
   onSave: () => void
 }
 
-const createOrganisationSchema = (t: TFunction) =>
+const createOrganisationSchema = (t: SchemaTranslationFn) =>
   z.object({
     organisationName: z
-      .string()
+      .string({
+        error: t(
+          'validation.organisationNameRequired',
+          'Organisation name is required',
+        ),
+      })
       .min(
         1,
         t(
@@ -62,20 +68,15 @@ const createOrganisationSchema = (t: TFunction) =>
       ),
   })
 
-type FormData = z.infer<ReturnType<typeof createOrganisationSchema>>
-
 export const OrganisationAddUpdateForm = ({
   mode,
   onCancel,
   onSave,
 }: Props) => {
   const { t } = useTranslation('organisation')
+  const [serverErrors, setServerErrors] = useState<Record<string, string[]>>({})
 
-  const schema = useMemo(() => createOrganisationSchema(t), [t])
-
-  const hookForm = useForm<FormData>({
-    resolver: zodResolver(schema),
-  })
+  const schema = useMemo(() => createOrganisationSchema(untyped(t)), [t])
 
   const {
     selectedOrganisation,
@@ -83,15 +84,14 @@ export const OrganisationAddUpdateForm = ({
     setSelectedOrganisation,
   } = useOrganisation()
 
-  const setDuplicateError = useCallback(() => {
-    hookForm.setError('organisationName', {
-      message: t(
-        'errors.duplicateKey',
-        'An organisation with this name already exists',
-      ),
-      type: 'manual',
-    })
-  }, [hookForm, t])
+  const duplicateErrorMsg = t(
+    'errors.duplicateKey',
+    'An organisation with this name already exists',
+  )
+
+  const setDuplicateError = () => {
+    setServerErrors({ organisationName: [duplicateErrorMsg] })
+  }
 
   const createApi = useCreateOrganisation({
     onError: ({ error }) => {
@@ -116,20 +116,30 @@ export const OrganisationAddUpdateForm = ({
 
   const isSubmitting = createApi.isLoading || updateApi.isLoading
 
-  useEffect(() => {
-    if (selectedOrganisationKey && mode === 'update') {
-      hookForm.setValue('organisationName', selectedOrganisationKey)
-    }
-  }, [hookForm, mode, selectedOrganisationKey])
+  const [form, fields] = useForm({
+    constraint: getZodConstraint(schema),
+    defaultValue: {
+      organisationName:
+        mode === 'update' ? (selectedOrganisationKey ?? '') : '',
+    },
+    onValidate({ formData }) {
+      setServerErrors({})
+      return parseWithZod(formData, { schema })
+    },
+    shouldRevalidate: 'onInput',
+    shouldValidate: 'onSubmit',
+  })
 
-  const onSubmit = () => {
-    const { organisationName } = hookForm.getValues()
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
+    const result = validateFormData(e.currentTarget, schema)
+    if (result.status !== 'success') return
+
+    const { organisationName } = result.value
 
     if (mode === 'add' && organisationName) {
-      const createArgs: Parameters<typeof createApi.submit>[0] = {
-        body: { key: organisationName },
-      }
-      createApi.submit(createArgs)
+      createApi.submit({ body: { key: organisationName } })
     } else if (selectedOrganisation) {
       updateApi.submit({
         body: { key: organisationName },
@@ -138,8 +148,13 @@ export const OrganisationAddUpdateForm = ({
     }
   }
 
+  const nameErrors = mergeErrors(
+    fields.organisationName.errors,
+    serverErrors.organisationName,
+  )
+
   return (
-    <form onSubmit={hookForm.handleSubmit(onSubmit)}>
+    <form {...getFormProps(form)} onSubmit={handleSubmit}>
       <FormBody>
         <ModalCloseButton onClose={onCancel} />
 
@@ -164,23 +179,17 @@ export const OrganisationAddUpdateForm = ({
 
         <FieldSet>
           <FormElement>
-            <Label htmlFor="organisationName">
+            <Label htmlFor={fields.organisationName.id}>
               {t('organizationName', 'Organisation name')}
             </Label>
             <Input
-              data-testid="org-form-name-input"
-              {...hookForm.register('organisationName', {
-                onChange: () => {
-                  if (hookForm.formState.errors.organisationName) {
-                    hookForm.clearErrors('organisationName')
-                  }
-                },
-              })}
+              {...getInputProps(fields.organisationName, { type: 'text' })}
               autoComplete="off"
+              data-testid="org-form-name-input"
+              error={!!nameErrors?.length}
+              key={fields.organisationName.key}
             />
-            <FormErrorBadge
-              error={hookForm.formState.errors.organisationName}
-            />
+            <FormFieldErrors errors={nameErrors} />
           </FormElement>
         </FieldSet>
         <ButtonGroup>

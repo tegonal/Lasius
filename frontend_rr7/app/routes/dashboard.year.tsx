@@ -92,7 +92,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const url = new URL(request.url)
   const dateParam = url.searchParams.get('date')
   const selectedDate =
-    dateParam && !isNaN(new Date(dateParam).getTime())
+    dateParam && !Number.isNaN(new Date(dateParam).getTime())
       ? dateParam
       : formatISOLocale(new Date())
   const yearMode = url.searchParams.get('year') || 'rolling'
@@ -220,6 +220,7 @@ export default function DashboardYear({ loaderData }: Route.ComponentProps) {
           <input
             checked={isCalendarYear}
             className="toggle toggle-sm"
+            data-testid="dashboard-year-toggle"
             onChange={toggleCalendarYear}
             type="checkbox"
           />

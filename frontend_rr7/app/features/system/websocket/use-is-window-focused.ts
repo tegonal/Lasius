@@ -23,12 +23,23 @@ export function useIsWindowFocused(): boolean {
   const [windowIsActive, setWindowIsActive] = useState(true)
 
   const handleActivity = useCallback((e: Event) => {
-    if (e.type === 'focus') {
-      setWindowIsActive(true)
-    } else if (e.type === 'blur') {
-      setWindowIsActive(false)
-    } else if (e.type === 'visibilitychange') {
-      setWindowIsActive(!document.hidden)
+    switch (e.type) {
+      case 'blur': {
+        setWindowIsActive(false)
+
+        break
+      }
+      case 'focus': {
+        setWindowIsActive(true)
+
+        break
+      }
+      case 'visibilitychange': {
+        setWindowIsActive(!document.hidden)
+
+        break
+      }
+      // No default
     }
   }, [])
 

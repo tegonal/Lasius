@@ -65,5 +65,5 @@ export function getSegmentFromPosition<T extends string>(
     }
   }
 
-  return segmentNames[segmentNames.length - 1] ?? null
+  return segmentNames.at(-1) ?? null
 }

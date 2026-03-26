@@ -54,7 +54,7 @@ export const InvitationUserConfirm = ({ invitation, organisations }: Props) => {
     if (
       inv.type === 'JoinProjectInvitation' &&
       'sharedByOrganisationReference' in inv &&
-      organisations.find(
+      organisations.some(
         (o) =>
           o.organisationReference.id === inv.sharedByOrganisationReference.id,
       )

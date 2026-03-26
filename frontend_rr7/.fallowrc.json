@@ -1,0 +1,49 @@
+{
+  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+  "ignorePatterns": [
+    "app/services/api/lasius/**",
+    "app/services/api/lasius-hooks/**",
+    ".react-router/**"
+  ],
+  "ignoreDependencies": ["@nivo/core", "daisyui", "immer", "typescript-eslint"],
+  "rules": {
+    "unused-files": "warn",
+    "unused-exports": "warn",
+    "unused-types": "warn",
+    "unused-dependencies": "error",
+    "unused-dev-dependencies": "warn",
+    "unused-enum-members": "warn",
+    "unused-class-members": "warn",
+    "unresolved-imports": "error",
+    "unlisted-dependencies": "error",
+    "duplicate-exports": "warn",
+    "circular-dependencies": "warn",
+    "type-only-dependencies": "warn"
+  },
+  "duplicates": {
+    "mode": "mild",
+    "minTokens": 50,
+    "minLines": 5,
+    "threshold": 15,
+    "ignore": ["app/services/api/lasius/**", "app/services/api/lasius-hooks/**"]
+  },
+  "health": {
+    "maxCyclomatic": 20,
+    "maxCognitive": 15,
+    "ignore": ["app/services/api/lasius/**", "app/services/api/lasius-hooks/**"]
+  },
+  "overrides": [
+    {
+      "files": [
+        "app/services/api/lasius/**",
+        "app/services/api/lasius-hooks/**"
+      ],
+      "rules": {
+        "unused-files": "off",
+        "unused-exports": "off",
+        "unused-types": "off",
+        "duplicate-exports": "off"
+      }
+    }
+  ]
+}

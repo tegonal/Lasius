@@ -101,6 +101,7 @@ export const MyProjectsListItemAdminContext = ({ item }: Props) => {
                     'organisation:members.actions.manage',
                     'Manage members',
                   )}
+                  data-testid="project-ctx-members-btn"
                   fullWidth={false}
                   onClick={() => manageMembers()}
                   shape="circle"
@@ -116,6 +117,7 @@ export const MyProjectsListItemAdminContext = ({ item }: Props) => {
               <ContextButtonWrapper variant="compact">
                 <Button
                   aria-label={t('bookings:showLists', 'Show bookings')}
+                  data-testid="project-ctx-lists-btn"
                   fullWidth={false}
                   onClick={() => showLists()}
                   shape="circle"
@@ -128,6 +130,7 @@ export const MyProjectsListItemAdminContext = ({ item }: Props) => {
               <ContextButtonWrapper variant="compact">
                 <Button
                   aria-label={t('stats:showStatistics', 'Show statistics')}
+                  data-testid="project-ctx-stats-btn"
                   fullWidth={false}
                   onClick={() => showStats()}
                   shape="circle"
@@ -153,6 +156,7 @@ export const MyProjectsListItemAdminContext = ({ item }: Props) => {
               <ContextButtonWrapper variant="compact">
                 <Button
                   aria-label={t('tag-manager:actions.edit', 'Edit tags')}
+                  data-testid="project-ctx-tags-btn"
                   fullWidth={false}
                   onClick={() => manageTags()}
                   shape="circle"

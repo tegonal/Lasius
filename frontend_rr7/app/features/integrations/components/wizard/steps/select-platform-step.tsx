@@ -33,36 +33,44 @@ export const SelectPlatformStep = ({ onSelectPlatform }: Props) => {
 
   const getPlatformDescription = (platform: ImporterType): string => {
     switch (platform) {
-      case 'github':
+      case 'github': {
         return t('issueImporters.wizard.selectPlatform.githubDescription', {
           defaultValue:
             'Import issues and pull requests from GitHub repositories',
         })
-      case 'gitlab':
+      }
+      case 'gitlab': {
         return t('issueImporters.wizard.selectPlatform.gitlabDescription', {
           defaultValue: 'Import issues and merge requests from GitLab projects',
         })
-      case 'jira':
+      }
+      case 'jira': {
         return t('issueImporters.wizard.selectPlatform.jiraDescription', {
           defaultValue: 'Import issues and epics from your Jira instance',
         })
-      case 'plane':
+      }
+      case 'plane': {
         return t('issueImporters.wizard.selectPlatform.planeDescription', {
           defaultValue: 'Import issues from your Plane workspace',
         })
+      }
     }
   }
 
   const getPlatformLabel = (platform: ImporterType): string => {
     switch (platform) {
-      case 'github':
+      case 'github': {
         return 'GitHub'
-      case 'gitlab':
+      }
+      case 'gitlab': {
         return 'GitLab'
-      case 'jira':
+      }
+      case 'jira': {
         return 'Jira'
-      case 'plane':
+      }
+      case 'plane': {
         return 'Plane'
+      }
     }
   }
 

@@ -54,8 +54,8 @@ async function performLogout(request: Request): Promise<Response> {
       logger.debug('Token revoked successfully', {
         provider: result.tokens.tokenIssuer,
       })
-    } catch (err) {
-      logger.warn('Token revocation failed during logout', { error: err })
+    } catch (error) {
+      logger.warn('Token revocation failed during logout', { error: error })
     }
   }
 

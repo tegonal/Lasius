@@ -21,7 +21,6 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Input } from '~/components/primitives/inputs/input'
-import { useRequiredFormContext } from '~/components/ui/forms/with-form-context'
 
 import {
   getSegmentBounds,
@@ -51,15 +50,40 @@ import {
 import { SegmentedInputWrapper } from './shared/segmented-input-wrapper'
 import { useRestoreCursorPosition } from './shared/use-restore-cursor-position'
 
+export type SegmentedDurationInputConnectedProps = {
+  endValue: string
+  onEndChange: (isoString: string) => void
+  startValue: string
+}
+
 export const SegmentedDurationInputConnected = ({
-  endFieldName,
-  startFieldName,
+  endValue,
+  onEndChange,
+  startValue,
+}: SegmentedDurationInputConnectedProps) => {
+  return (
+    <DurationInputCore
+      endValue={endValue}
+      getStartEndValues={() => ({ end: endValue, start: startValue })}
+      onEndChange={onEndChange}
+      startValue={startValue}
+    />
+  )
+}
+
+/** Shared core logic — receives reactive values and callbacks */
+const DurationInputCore = ({
+  endValue,
+  getStartEndValues,
+  onEndChange,
+  startValue,
 }: {
-  endFieldName: string
-  startFieldName: string
+  endValue: string
+  getStartEndValues: () => { end: string; start: string }
+  onEndChange: (isoString: string) => void
+  startValue: string
 }) => {
   const { t } = useTranslation('common')
-  const parentFormContext = useRequiredFormContext()
   const inputRef = useRef<HTMLInputElement>(null)
   const [selectedSegment, setSelectedSegment] =
     useState<DurationSegment | null>(null)
@@ -69,10 +93,6 @@ export const SegmentedDurationInputConnected = ({
 
   const config = DURATION_SEGMENT_CONFIG
 
-  const startValue = parentFormContext.watch(startFieldName)
-  const endValue = parentFormContext.watch(endFieldName)
-
-  // Calculate duration
   const durationMinutes = calculateDurationMinutes(
     startValue ? new Date(startValue) : null,
     endValue ? new Date(endValue) : null,
@@ -82,21 +102,18 @@ export const SegmentedDurationInputConnected = ({
   const [inputValue, setInputValue] = useState<string>(durationString)
   const setCursorPosition = useRestoreCursorPosition(inputRef, inputValue)
 
-  // Store initial duration when component mounts or start/end change externally
   useEffect(() => {
     if (!inputRef.current?.matches(':focus')) {
       initialDurationRef.current = durationMinutes
     }
   }, [durationMinutes])
 
-  // Sync with calculated duration
   useEffect(() => {
     if (!inputRef.current?.matches(':focus')) {
       setInputValue(durationString)
     }
   }, [durationString])
 
-  // Select a segment using helper
   const selectSegment = (segment: DurationSegment): void => {
     selectSegmentHelper(
       segment,
@@ -108,12 +125,10 @@ export const SegmentedDurationInputConnected = ({
     )
   }
 
-  // Handle mouse down to set flag before focus
   const handleMouseDown = () => {
     focusFromMouseRef.current = true
   }
 
-  // Handle click using helper
   const handleClick = createHandleClick(
     inputRef,
     inputValue,
@@ -125,25 +140,19 @@ export const SegmentedDurationInputConnected = ({
     },
   )
 
-  // Update end time based on duration change
   const updateEndTime = (newDurationMinutes: number) => {
     if (startValue && newDurationMinutes >= 0) {
       const startDate = new Date(startValue)
       const newEndDate = addMinutesToDate(startDate, newDurationMinutes)
-      parentFormContext.setValue(endFieldName, newEndDate.toISOString(), {
-        shouldDirty: true,
-        shouldValidate: true,
-      })
+      onEndChange(newEndDate.toISOString())
     }
   }
 
-  // Reset to initial duration
   const resetToInitial = () => {
     updateEndTime(initialDurationRef.current)
     setInputValue(formatDuration(initialDurationRef.current))
   }
 
-  // Handle input change using shared utility
   const handleInputChange = createInputChangeHandler({
     config,
     inputRef,
@@ -160,7 +169,6 @@ export const SegmentedDurationInputConnected = ({
     },
   })
 
-  // Handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>): void => {
     const bounds = getSegmentBounds(
       inputValue,
@@ -214,7 +222,6 @@ export const SegmentedDurationInputConnected = ({
       return
     }
 
-    // Arrow keys for increment/decrement
     if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
       e.preventDefault()
       const position = inputRef.current?.selectionStart
@@ -230,11 +237,8 @@ export const SegmentedDurationInputConnected = ({
         const baseIncrement = e.key === 'ArrowUp' ? 1 : -1
         let newMinutes = durationMinutes
 
-        if (segment === 'hour') {
-          newMinutes += baseIncrement * 60
-        } else {
-          newMinutes += baseIncrement * 5
-        }
+        newMinutes +=
+          segment === 'hour' ? baseIncrement * 60 : baseIncrement * 5
 
         if (newMinutes >= 0) {
           updateEndTime(newMinutes)
@@ -245,7 +249,6 @@ export const SegmentedDurationInputConnected = ({
       }
     }
 
-    // Tab navigation
     if (e.key === 'Tab' && !e.shiftKey) {
       const position = inputRef.current?.selectionStart
       if (typeof position === 'number') {
@@ -278,7 +281,6 @@ export const SegmentedDurationInputConnected = ({
       }
     }
 
-    // Arrow key navigation
     if (e.key === 'ArrowLeft') {
       const position = inputRef.current?.selectionStart
       if (typeof position === 'number') {
@@ -312,7 +314,6 @@ export const SegmentedDurationInputConnected = ({
     }
   }
 
-  // Handle blur
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>): void => {
     const relatedTarget = e.relatedTarget as HTMLElement
     if (relatedTarget?.tagName === 'BUTTON' && relatedTarget.tabIndex === -1) {
@@ -328,7 +329,6 @@ export const SegmentedDurationInputConnected = ({
     }
   }
 
-  // Handle focus
   const handleFocus = (): void => {
     if (inputValue === config.placeholder) {
       setInputValue('')
@@ -343,14 +343,12 @@ export const SegmentedDurationInputConnected = ({
     focusFromMouseRef.current = false
   }
 
-  // Handle arrow button clicks
   const handleArrowClick = (direction: 'down' | 'up') => {
-    const currentStartValue = parentFormContext.getValues(startFieldName)
-    const currentEndValue = parentFormContext.getValues(endFieldName)
+    const { end, start } = getStartEndValues()
 
     const currentDurationMinutes = calculateDurationMinutes(
-      currentStartValue ? new Date(currentStartValue) : null,
-      currentEndValue ? new Date(currentEndValue) : null,
+      start ? new Date(start) : null,
+      end ? new Date(end) : null,
     )
 
     let targetSegment: DurationSegment

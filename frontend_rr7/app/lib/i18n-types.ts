@@ -18,11 +18,17 @@
  */
 
 /**
- * Simplified translation function type for use in Zod schema factories.
- * Allows schemas to accept either a real i18next `t()` or a server-side
- * fallback that extracts `defaultValue`.
+ * Loosely-typed translation function for use in Zod schema factories,
+ * helper functions that build dynamic keys, and server-side fallbacks.
  */
-export type SchemaTranslationFn = (
-  key: string,
-  opts?: { defaultValue: string },
-) => string
+
+export type SchemaTranslationFn = (key: string, ...args: any[]) => string
+
+/**
+ * Erase i18next's branded type so a typed `t` can be passed to schema
+ * factories or helper functions that use dynamic keys.
+ *
+ * Usage: `createSchema(untyped(t))`, `getLabel(type, untyped(t))`
+ */
+
+export const untyped = (t: any): SchemaTranslationFn => t

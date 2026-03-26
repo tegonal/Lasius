@@ -2,7 +2,7 @@ import { config as defaultConfig } from '@epic-web/config/eslint'
 import checkFile from 'eslint-plugin-check-file'
 import perfectionist from 'eslint-plugin-perfectionist'
 import reactCompiler from 'eslint-plugin-react-compiler'
-import sonarjs from 'eslint-plugin-sonarjs'
+import unicorn from 'eslint-plugin-unicorn'
 import { globalIgnores } from 'eslint/config'
 
 /** @type {import("eslint").Linter.Config[]} */
@@ -48,41 +48,27 @@ export default [
       ],
     },
   },
-  sonarjs.configs.recommended,
+  unicorn.configs.recommended,
   {
     rules: {
-      // Medium value — code smells, fix over time
-      'sonarjs/cognitive-complexity': 'warn',
-      'sonarjs/deprecation': 'warn',
-      // High value — real bugs and security
-      'sonarjs/different-types-comparison': 'warn',
-      'sonarjs/function-return-type': 'warn',
-
-      'sonarjs/no-alphabetical-sort': 'warn',
-      // Noisy / false positives — disable
-      'sonarjs/no-dead-store': 'warn',
-      'sonarjs/no-hardcoded-passwords': 'off',
-      'sonarjs/no-identical-functions': 'warn',
-      'sonarjs/no-nested-conditional': 'warn',
-      'sonarjs/no-nested-functions': 'off',
-      'sonarjs/no-nested-template-literals': 'off',
-      'sonarjs/no-parameter-reassignment': 'off',
-      'sonarjs/no-redundant-assignments': 'warn',
-
-      'sonarjs/no-small-switch': 'warn',
-      'sonarjs/no-unused-vars': 'off',
-      'sonarjs/prefer-read-only-props': 'off',
-      'sonarjs/pseudo-random': 'off',
-      'sonarjs/reduce-initial-value': 'warn',
-      'sonarjs/redundant-type-aliases': 'warn',
-      'sonarjs/slow-regex': 'error',
-      'sonarjs/todo-tag': 'off',
-    },
-  },
-  {
-    files: ['**/services/api/lasius-hooks/**/*.ts'],
-    rules: {
-      'sonarjs/different-types-comparison': 'off',
+      // React closures need inner functions — too many false positives
+      'unicorn/consistent-function-scoping': 'off',
+      // Too opinionated — disable
+      'unicorn/filename-case': 'off',
+      // Opinionated import style preferences
+      'unicorn/import-style': 'off',
+      // Legitimate pattern in reducers and aggregations
+      'unicorn/no-array-reduce': 'off',
+      // Migrate gradually — warn only
+      'unicorn/no-array-sort': 'warn',
+      // Conflicts with other tooling or project conventions
+      'unicorn/no-nested-ternary': 'off',
+      'unicorn/no-null': 'off',
+      // WebSocket API uses on* handlers by design
+      'unicorn/prefer-add-event-listener': 'off',
+      // Entry file uses IIFE pattern
+      'unicorn/prefer-top-level-await': 'off',
+      'unicorn/prevent-abbreviations': 'off',
     },
   },
   perfectionist.configs['recommended-natural'],

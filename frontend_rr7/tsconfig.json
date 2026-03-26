@@ -10,6 +10,7 @@
   ],
   "exclude": ["node_modules", "dist", "build", "public", "temp"],
   "compilerOptions": {
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "incremental": true,
     "allowImportingTsExtensions": true,
     "noUncheckedIndexedAccess": true,

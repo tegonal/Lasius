@@ -78,10 +78,20 @@ export const GenericConfirmModal = ({
         </FormElement>
 
         <ButtonGroup>
-          <Button onClick={onConfirm} type="button" variant={confirmVariant}>
+          <Button
+            data-testid="confirm-modal-confirm-btn"
+            onClick={onConfirm}
+            type="button"
+            variant={confirmVariant}
+          >
             {confirmLabel}
           </Button>
-          <Button onClick={onClose} type="button" variant="secondary">
+          <Button
+            data-testid="confirm-modal-cancel-btn"
+            onClick={onClose}
+            type="button"
+            variant="secondary"
+          >
             {resolvedCancelLabel}
           </Button>
         </ButtonGroup>

@@ -17,10 +17,9 @@
  *
  */
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import { type TFunction } from 'i18next'
-import { useEffect, useMemo } from 'react'
-import { useForm } from 'react-hook-form'
+import { getFormProps, useForm } from '@conform-to/react'
+import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 
@@ -29,36 +28,41 @@ import { Input } from '~/components/primitives/inputs/input'
 import { Card, CardBody } from '~/components/ui/cards/card'
 import { useToast } from '~/components/ui/feedback/use-toast'
 import { ButtonGroup } from '~/components/ui/forms/button-group'
+import { FormField } from '~/components/ui/forms/conform/form-field'
 import { FieldSet } from '~/components/ui/forms/field-set'
 import { FormBody } from '~/components/ui/forms/form-body'
 import { FormElement } from '~/components/ui/forms/form-element'
 import { FormElementSpacer } from '~/components/ui/forms/form-element-spacer'
-import { FormErrorBadge } from '~/components/ui/forms/form-error-badge'
 import { preventEnterOnForm } from '~/components/ui/forms/input/prevent-enter-on-form'
 import { useLayoutLoaderData } from '~/hooks/use-layout-loader-data'
+import { validateFormData } from '~/lib/conform-helpers'
+import { type SchemaTranslationFn, untyped } from '~/lib/i18n-types'
 import { useUpdateUserProfile } from '~/services/api/lasius-hooks/user/user'
 
-const createAccountSchema = (t: TFunction) =>
+const createAccountSchema = (t: SchemaTranslationFn) =>
   z.object({
     email: z
-      .string()
-      .min(1, t('validation.emailRequired', 'Email is required'))
+      .string({
+        error: t('validation.emailRequired', 'Email is required'),
+      })
       .email({
         message: t('validation.emailInvalid', 'Invalid email address'),
       }),
     firstName: z
-      .string()
+      .string({
+        error: t('validation.firstNameRequired', 'First name is required'),
+      })
       .min(1, t('validation.firstNameRequired', 'First name is required')),
     lastName: z
-      .string()
+      .string({
+        error: t('validation.lastNameRequired', 'Last name is required'),
+      })
       .min(1, t('validation.lastNameRequired', 'Last name is required')),
   })
 
 interface AccountFormProps {
   demoMode: boolean
 }
-
-type FormData = z.infer<ReturnType<typeof createAccountSchema>>
 
 export const AccountForm = ({ demoMode }: AccountFormProps) => {
   const { t } = useTranslation('settings')
@@ -79,22 +83,25 @@ export const AccountForm = ({ demoMode }: AccountFormProps) => {
     },
   })
 
-  const schema = useMemo(() => createAccountSchema(t), [t])
+  const schema = useMemo(() => createAccountSchema(untyped(t)), [t])
 
-  const hookForm = useForm<FormData>({
-    defaultValues: { email: '', firstName: '', lastName: '' },
-    resolver: zodResolver(schema),
+  const [form, fields] = useForm({
+    constraint: getZodConstraint(schema),
+    defaultValue: {
+      email: user?.email ?? '',
+      firstName: user?.firstName ?? '',
+      lastName: user?.lastName ?? '',
+    },
+    onValidate({ formData }) {
+      return parseWithZod(formData, { schema })
+    },
+    shouldRevalidate: 'onInput',
+    shouldValidate: 'onSubmit',
   })
 
-  useEffect(() => {
-    if (user) {
-      hookForm.setValue('firstName', user.firstName || '')
-      hookForm.setValue('lastName', user.lastName || '')
-      hookForm.setValue('email', user.email || '')
-    }
-  }, [user, hookForm])
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
 
-  const onSubmit = (data: FormData) => {
     if (demoMode) {
       addToast({
         message: t(
@@ -106,14 +113,16 @@ export const AccountForm = ({ demoMode }: AccountFormProps) => {
       return
     }
 
-    const submitArgs: Parameters<typeof profileApi.submit>[0] = {
+    const result = validateFormData(e.currentTarget, schema)
+    if (result.status !== 'success') return
+
+    profileApi.submit({
       body: {
-        email: data.email,
-        firstName: data.firstName,
-        lastName: data.lastName,
+        email: result.value.email,
+        firstName: result.value.firstName,
+        lastName: result.value.lastName,
       },
-    }
-    profileApi.submit(submitArgs)
+    })
   }
 
   return (
@@ -130,8 +139,9 @@ export const AccountForm = ({ demoMode }: AccountFormProps) => {
             )}
           </p>
           <form
+            {...getFormProps(form)}
             onKeyDown={(e) => preventEnterOnForm(e)}
-            onSubmit={hookForm.handleSubmit(onSubmit)}
+            onSubmit={handleSubmit}
           >
             <FormBody>
               <FieldSet>
@@ -144,56 +154,27 @@ export const AccountForm = ({ demoMode }: AccountFormProps) => {
                     value={user?.role || ''}
                   />
                 </FormElement>
-                <FormElement
-                  htmlFor="firstName"
+                <FormField
+                  autoComplete="given-name"
+                  field={fields.firstName}
                   label={t('forms.firstName', 'First name')}
                   required
-                >
-                  <Input
-                    aria-describedby="firstName-error"
-                    autoComplete="given-name"
-                    id="firstName"
-                    {...hookForm.register('firstName')}
-                  />
-                  <FormErrorBadge
-                    error={hookForm.formState.errors.firstName}
-                    id="firstName-error"
-                  />
-                </FormElement>
-                <FormElement
-                  htmlFor="lastName"
+                />
+                <FormField
+                  autoComplete="family-name"
+                  field={fields.lastName}
                   label={t('forms.lastName', 'Last name')}
                   required
-                >
-                  <Input
-                    aria-describedby="lastName-error"
-                    autoComplete="family-name"
-                    id="lastName"
-                    {...hookForm.register('lastName')}
-                  />
-                  <FormErrorBadge
-                    error={hookForm.formState.errors.lastName}
-                    id="lastName-error"
-                  />
-                </FormElement>
+                />
                 <FormElementSpacer />
-                <FormElement
-                  htmlFor="email"
+                <FormField
+                  autoComplete="email"
+                  field={fields.email}
                   label={t('forms.email', 'Email')}
+                  readOnly={tokenIssuer !== 'internal'}
                   required
-                >
-                  <Input
-                    aria-describedby="email-error"
-                    autoComplete="email"
-                    id="email"
-                    readOnly={tokenIssuer !== 'internal'}
-                    {...hookForm.register('email')}
-                  />
-                  <FormErrorBadge
-                    error={hookForm.formState.errors.email}
-                    id="email-error"
-                  />
-                </FormElement>
+                  type="email"
+                />
               </FieldSet>
               <ButtonGroup className="justify-end">
                 <Button disabled={profileApi.isSubmitting} type="submit">

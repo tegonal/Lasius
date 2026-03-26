@@ -58,10 +58,10 @@ export const ProjectStreamChartImpl = ({ data, keys }: Props) => {
 
   const streamData = data.map((item) => {
     const transformed: Record<string, number> = {}
-    keys.forEach((key) => {
+    for (const key of keys) {
       const value = item[key]
       transformed[key] = typeof value === 'number' ? value : 0
-    })
+    }
     return transformed
   })
 

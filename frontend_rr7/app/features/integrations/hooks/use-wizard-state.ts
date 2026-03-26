@@ -58,21 +58,19 @@ export type WizardState = {
   formData: WizardFormData
 }
 
-export type WizardStep = 'config' | 'mapping' | 'platform' | 'projects' | 'test'
+export type WizardStep = 'config' | 'platform' | 'projects' | 'test'
 
-const initialFormData: WizardFormData = {
-  baseUrl: '',
-  checkFrequency: 300000, // 5 minutes default
-  name: '',
-}
-
-const initialState: WizardState = {
+const createInitialState = (): WizardState => ({
   currentStep: 'platform',
-  formData: initialFormData,
-}
+  formData: {
+    baseUrl: '',
+    checkFrequency: 300_000, // 5 minutes default
+    name: '',
+  },
+})
 
 export const useWizardState = () => {
-  const [state, setState] = useState<WizardState>(initialState)
+  const [state, setState] = useState<WizardState>(createInitialState)
 
   const updateFormData = (data: Partial<WizardFormData>) => {
     setState((prev) => ({
@@ -94,7 +92,7 @@ export const useWizardState = () => {
   }
 
   const resetWizard = () => {
-    setState(initialState)
+    setState(createInitialState())
   }
 
   return {

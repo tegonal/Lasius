@@ -32,15 +32,16 @@ import { type AuthProvider } from '~/services/auth/types'
 
 import { type Route } from './+types/oauth.$provider.login'
 
-const VALID_PROVIDERS: AuthProvider[] = ['keycloak', 'github', 'gitlab']
+const VALID_PROVIDERS: Set<AuthProvider> = new Set([
+  'github',
+  'gitlab',
+  'keycloak',
+])
 
 export async function loader({ params, request }: Route.LoaderArgs) {
   const providerName = params.provider as AuthProvider
 
-  if (
-    !VALID_PROVIDERS.includes(providerName) ||
-    !isProviderEnabled(providerName)
-  ) {
+  if (!VALID_PROVIDERS.has(providerName) || !isProviderEnabled(providerName)) {
     logger.warn('Invalid or disabled OAuth provider requested', {
       provider: providerName,
     })

@@ -57,12 +57,13 @@ export const OrganisationItemContext = ({ item, selectedOrgId }: Props) => {
 
   return (
     <ContextBody variant="compact">
-      <ContextButtonOpen hash={itemHash} />
+      <ContextButtonOpen data-testid="org-ctx-open-btn" hash={itemHash} />
       {currentOpenContextMenuId === itemHash && (
         <ContextAnimatePresence variant="compact">
           <ContextBar className="-mr-3">
             {item.booking && (
               <ContextButtonStartBooking
+                data-testid="org-ctx-start-btn"
                 item={item.booking}
                 onStart={handleStart}
                 variant="compact"

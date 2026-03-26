@@ -63,7 +63,7 @@ export const CalendarDataProvider = ({
 }) => {
   const fetcher = useFetcher<{ bookings: ModelsBooking[] }>()
 
-  const safeDate = isNaN(new Date(date).getTime())
+  const safeDate = Number.isNaN(new Date(date).getTime())
     ? formatISOLocale(new Date())
     : date
 

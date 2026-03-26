@@ -17,10 +17,10 @@
  *
  */
 
+import { type FieldMetadata, useInputControl } from '@conform-to/react'
 import { differenceBy, filter, uniqBy } from 'es-toolkit/compat'
 import { Plus } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { useFormContext } from 'react-hook-form'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
@@ -29,75 +29,53 @@ import { Label } from '~/components/primitives/typography/label'
 import { TagList } from '~/components/ui/data-display/tag-list'
 import { ButtonGroup } from '~/components/ui/forms/button-group'
 import { FormElement } from '~/components/ui/forms/form-element'
+import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { Modal } from '~/components/ui/overlays/modal/modal'
 import { type ModelsSimpleTag } from '~/services/api/lasius/modelsSimpleTag'
 import { type ModelsTag } from '~/services/api/lasius/modelsTag'
 
-type Props = {
+type BaseProps = {
   hideAddButton?: boolean
-  name: 'simpleTags' | 'tagGroups'
   onAddClick?: () => void
-  tagGroupIndex?: number
   tags: ModelsTag[]
 }
 
-export const InputTagsAdmin = ({
+type CallbackProps = BaseProps & {
+  field?: never
+  onTagsChange: (tags: ModelsTag[]) => void
+}
+
+type ConformProps = BaseProps & {
+  field: FieldMetadata<string>
+  /** @deprecated Use field prop instead */
+  name?: never
+  onTagsChange?: never
+  tagGroupIndex?: never
+}
+
+type InputTagsAdminProps = CallbackProps | ConformProps
+
+/**
+ * Shared tag admin UI — receives tags and callbacks from mode-specific wrapper.
+ */
+const TagsAdminCore = ({
   hideAddButton = false,
-  name,
   onAddClick,
-  tagGroupIndex = 0,
-  tags = [],
-}: Props) => {
+  onTagsChange,
+  selectedTags,
+}: BaseProps & {
+  onTagsChange: (tags: ModelsTag[]) => void
+  selectedTags: ModelsTag[]
+}) => {
   const { t } = useTranslation('common')
-  const parentFormContext = useFormContext()
   const [inputText, setInputText] = useState<string>('')
   const [showAddModal, setShowAddModal] = useState(false)
-
-  const [selectedTags, setSelectedTags] = useState<ModelsTag[]>(tags)
-
-  useEffect(() => {
-    if (!parentFormContext) return () => null
-    const subscription = parentFormContext.watch(
-      (value, { name: fieldname }) => {
-        if (name === fieldname) {
-          if (
-            fieldname === 'tagGroups' &&
-            Array.isArray(value[name]) &&
-            value[name][tagGroupIndex]?.relatedTags
-          ) {
-            setSelectedTags(
-              value[name][tagGroupIndex].relatedTags as ModelsTag[],
-            )
-          } else {
-            setSelectedTags(value[name] as ModelsTag[])
-          }
-        }
-      },
-    )
-    return () => subscription.unsubscribe()
-  }, [name, parentFormContext, tagGroupIndex])
-
-  const updateTags = (updatedTags: ModelsTag[]) => {
-    if (name === 'tagGroups') {
-      const currentTags = parentFormContext.getValues(name) as Array<{
-        relatedTags: ModelsTag[]
-      }>
-      const group = currentTags[tagGroupIndex]
-      if (group) {
-        group.relatedTags = updatedTags
-      }
-      parentFormContext.setValue(name, currentTags)
-    } else {
-      parentFormContext.setValue(name, updatedTags)
-    }
-    setSelectedTags(updatedTags)
-  }
 
   const removeTag = (tag: ModelsTag) => {
     const toRemove = filter(selectedTags, { id: tag.id })
     const remaining = differenceBy(selectedTags, toRemove, 'id')
-    updateTags(remaining)
+    onTagsChange(remaining)
   }
 
   const addTag = () => {
@@ -108,12 +86,10 @@ export const InputTagsAdmin = ({
       }
       const merged = uniqBy([...selectedTags, newTag], 'id')
       setInputText('')
-      updateTags(merged)
+      onTagsChange(merged)
       setShowAddModal(false)
     }
   }
-
-  if (!parentFormContext) return null
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -193,5 +169,64 @@ export const InputTagsAdmin = ({
         </ButtonGroup>
       </Modal>
     </div>
+  )
+}
+
+/** Conform mode — stores tags as JSON string via useInputControl */
+const ConformTagsAdmin = ({
+  field,
+  hideAddButton,
+  onAddClick,
+  tags,
+}: BaseProps & { field: FieldMetadata<string> }) => {
+  const control = useInputControl(field)
+
+  const selectedTags: ModelsTag[] = useMemo(() => {
+    if (!control.value) return tags
+    try {
+      return JSON.parse(control.value) as ModelsTag[]
+    } catch {
+      return tags
+    }
+  }, [control.value, tags])
+
+  const handleTagsChange = (updatedTags: ModelsTag[]) => {
+    control.change(updatedTags.length > 0 ? JSON.stringify(updatedTags) : '')
+  }
+
+  return (
+    <>
+      <input name={field.name} type="hidden" value={control.value ?? ''} />
+      <TagsAdminCore
+        hideAddButton={hideAddButton}
+        onAddClick={onAddClick}
+        onTagsChange={handleTagsChange}
+        selectedTags={selectedTags}
+        tags={tags}
+      />
+      <FormFieldErrors errors={field.errors} />
+    </>
+  )
+}
+
+export const InputTagsAdmin = (props: InputTagsAdminProps) => {
+  if (props.field) {
+    return (
+      <ConformTagsAdmin
+        field={props.field}
+        hideAddButton={props.hideAddButton}
+        onAddClick={props.onAddClick}
+        tags={props.tags}
+      />
+    )
+  }
+  return (
+    <TagsAdminCore
+      hideAddButton={props.hideAddButton}
+      onAddClick={props.onAddClick}
+      onTagsChange={props.onTagsChange}
+      selectedTags={props.tags}
+      tags={props.tags}
+    />
   )
 }

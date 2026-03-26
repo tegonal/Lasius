@@ -29,6 +29,7 @@ import { GenericConfirmModal } from '~/components/ui/overlays/modal/generic-conf
 import { IntegrationsContent } from '~/features/integrations/components/integrations-content'
 import { IntegrationsRightColumn } from '~/features/integrations/components/integrations-right-column'
 import { IntegrationsStats } from '~/features/integrations/components/integrations-stats'
+import { ConfigInfoModal } from '~/features/integrations/components/modals/config-info-modal'
 import { GenericConfigModal } from '~/features/integrations/components/modals/generic-config-modal'
 import { ProjectMappingsModal } from '~/features/integrations/components/modals/project-mappings-modal'
 import { IssueImporterWizard } from '~/features/integrations/components/wizard/issue-importer-wizard'
@@ -106,6 +107,12 @@ export const IntegrationsLayout = () => {
         title={t('integrations.delete.title', {
           defaultValue: 'Delete Integration',
         })}
+      />
+
+      <ConfigInfoModal
+        config={management.selectedConfig}
+        onClose={management.closeModal}
+        open={management.activeModal === 'configInfo'}
       />
 
       <GenericConfigModal

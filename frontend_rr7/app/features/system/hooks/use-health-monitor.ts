@@ -24,7 +24,7 @@ import { type HealthResponse } from '~/routes/api.health'
 import { useUIStore } from '~/stores/ui-store'
 
 const POLL_INTERVAL_MS = 10_000
-const STATUS_DEBOUNCE_MS = 2_000
+const STATUS_DEBOUNCE_MS = 2000
 
 /**
  * Polls /api/health every 10s (pauses when tab is unfocused).

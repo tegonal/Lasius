@@ -20,8 +20,12 @@
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 import {
   type ModelsCreateProjectMapping,
+  type ModelsGithubProjectMapping,
   type ModelsGithubTagConfiguration,
+  type ModelsGitlabProjectMapping,
   type ModelsGitlabTagConfiguration,
+  type ModelsJiraProjectMapping,
+  type ModelsPlaneProjectMapping,
   type ModelsPlaneTagConfiguration,
 } from '~/services/api/lasius'
 
@@ -34,6 +38,17 @@ export type MappingPayloadResult =
       payload: ModelsCreateProjectMapping
       success: true
     }
+
+export type MappingWithTagConfig = {
+  projectId: string
+  tagConfig?: TagConfiguration
+}
+
+export type ProjectMapping =
+  | ModelsGithubProjectMapping
+  | ModelsGitlabProjectMapping
+  | ModelsJiraProjectMapping
+  | ModelsPlaneProjectMapping
 
 export type TagConfiguration =
   | ModelsGithubTagConfiguration
@@ -116,8 +131,7 @@ export const buildMappingPayload = (
  */
 export const extractExternalProjectId = (
   importerType: ImporterType,
-
-  mapping: any,
+  mapping: ProjectMapping,
 ): null | string => {
   if (!mapping?.settings) {
     return null
@@ -125,21 +139,28 @@ export const extractExternalProjectId = (
 
   switch (importerType) {
     case 'github': {
-      const owner = mapping.settings.githubRepoOwner
-      const repo = mapping.settings.githubRepoName
-      return owner && repo ? `${owner}/${repo}` : null
+      const settings = (mapping as ModelsGithubProjectMapping).settings
+      return settings.githubRepoOwner && settings.githubRepoName
+        ? `${settings.githubRepoOwner}/${settings.githubRepoName}`
+        : null
     }
 
-    case 'gitlab':
-      return mapping.settings.gitlabProjectId || null
+    case 'gitlab': {
+      return (
+        (mapping as ModelsGitlabProjectMapping).settings.gitlabProjectId || null
+      )
+    }
 
-    case 'jira':
-      return mapping.settings.jiraProjectKey || null
+    case 'jira': {
+      return (
+        (mapping as ModelsJiraProjectMapping).settings.jiraProjectKey || null
+      )
+    }
 
-    case 'plane':
-      return mapping.settings.planeProjectId || null
-
-    default:
-      return null
+    case 'plane': {
+      return (
+        (mapping as ModelsPlaneProjectMapping).settings.planeProjectId || null
+      )
+    }
   }
 }

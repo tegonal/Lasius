@@ -42,16 +42,16 @@ import {
 } from './type-guards'
 import { useLasiusWebsocket } from './use-lasius-websocket'
 
-const IGNORED_EVENTS = [
+const IGNORED_EVENTS = new Set([
+  'CurrentOrganisationTimeBookings',
   'HelloClient',
   'Pong',
-  'CurrentOrganisationTimeBookings',
+  'UserLoggedOutV2',
   'UserTimeBookingByProjectEntryAdded',
   'UserTimeBookingByProjectEntryRemoved',
-  'UserTimeBookingByTagEntryRemoved',
   'UserTimeBookingByTagEntryAdded',
-  'UserLoggedOutV2',
-]
+  'UserTimeBookingByTagEntryRemoved',
+])
 
 export const WebSocketEventHandler = () => {
   const { lastMessage } = useLasiusWebsocket()
@@ -163,7 +163,7 @@ export const WebSocketEventHandler = () => {
             defaultValue:
               'Issue importer connectivity degraded: {{configName}}',
           }),
-          ttl: 120000,
+          ttl: 120_000,
           type: 'WARNING',
         })
       } else if (
@@ -182,7 +182,7 @@ export const WebSocketEventHandler = () => {
             configName: lastMessage.configName,
             defaultValue: 'Issue importer connectivity failed: {{configName}}',
           }),
-          ttl: 120000,
+          ttl: 120_000,
           type: 'ERROR',
         })
         if (errorMessage) {
@@ -203,12 +203,12 @@ export const WebSocketEventHandler = () => {
         message: tr('auth.status.authenticationFailed', {
           defaultValue: 'Authentication failed. Please log in again.',
         }),
-        ttl: 10000,
+        ttl: 10_000,
         type: 'ERROR',
       })
     } else {
       const messageType = lastMessage.type as string
-      if (IGNORED_EVENTS.includes(messageType)) {
+      if (IGNORED_EVENTS.has(messageType)) {
         logger.info('[WebSocketEventHandler][IgnoredEvent]', messageType)
       } else {
         logger.warn(

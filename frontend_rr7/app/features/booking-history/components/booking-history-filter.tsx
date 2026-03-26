@@ -17,9 +17,9 @@
  *
  */
 
+import { type FieldMetadata } from '@conform-to/react'
 import { ArrowLeft } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { useFormContext } from 'react-hook-form'
+import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
 
@@ -32,24 +32,35 @@ import { InputTagsAutocomplete } from '~/components/ui/forms/input/input-tags-au
 import { ProjectSelect } from '~/components/ui/forms/input/project-select'
 import { UserSelect } from '~/components/ui/forms/input/user-select'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+import { type BookingHistoryControls } from '~/features/booking-history/components/booking-history-layout'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { dateOptions } from '~/lib/utils/date/date-options'
 import {
   type ModelsEntityReference,
-  type ModelsTag,
   type ModelsUserStub,
 } from '~/services/api/lasius'
-import { getTagsByProject } from '~/services/api/lasius/user-organisations/user-organisations'
+import { useGetTagsByProject } from '~/services/api/lasius-hooks/user-organisations/user-organisations'
 
 type Props = {
+  controls: BookingHistoryControls
   dataSource: 'organisationBookings' | 'userBookings'
+  fields: {
+    dateRange: FieldMetadata<string | undefined>
+    from: FieldMetadata<string | undefined>
+    projectId: FieldMetadata<string | undefined>
+    tags: FieldMetadata<string | undefined>
+    to: FieldMetadata<string | undefined>
+    userId: FieldMetadata<string | undefined>
+  }
   inactiveProject?: null | { id: string; key: string }
   projects: ModelsEntityReference[]
   users?: ModelsUserStub[]
 }
 
 export const BookingHistoryFilter = ({
+  controls,
   dataSource,
+  fields,
   inactiveProject = null,
   projects,
   users = [],
@@ -57,26 +68,33 @@ export const BookingHistoryFilter = ({
   const { t } = useTranslation('common')
   const navigate = useNavigate()
   const { selectedOrganisationId } = useOrganisation()
-  const formContext = useFormContext()
-  const [projectTags, setProjectTags] = useState<ModelsTag[]>([])
 
-  const projectId = formContext.watch('projectId') as string
+  // Tags via Orval hook
+  const tagsApi = useGetTagsByProject()
+  const tagsSubmitRef = useRef(tagsApi.submit)
+  tagsSubmitRef.current = tagsApi.submit
+  const prevProjectKeyRef = useRef('')
+
+  const projectId = controls.projectId.value ?? ''
 
   const showUserFilter = dataSource === 'organisationBookings'
 
   const firstDateOption = dateOptions[0]
 
+  // Load tags when project changes
   useEffect(() => {
-    if (projectId && selectedOrganisationId) {
-      void getTagsByProject(selectedOrganisationId, projectId).then(
-        (response) => {
-          setProjectTags(response.data)
-        },
-      )
-    } else {
-      setProjectTags([])
+    const key = `${selectedOrganisationId}:${projectId}`
+    if (
+      selectedOrganisationId &&
+      projectId &&
+      key !== prevProjectKeyRef.current
+    ) {
+      prevProjectKeyRef.current = key
+      tagsSubmitRef.current({ orgId: selectedOrganisationId, projectId })
     }
   }, [projectId, selectedOrganisationId])
+
+  const projectTags = tagsApi.data ?? []
 
   const handleBackToProjects = () => {
     const isUserContext = dataSource === 'userBookings'
@@ -88,36 +106,32 @@ export const BookingHistoryFilter = ({
 
   const defaultProjectId = ''
   const defaultUserId = ''
-  const defaultTags: ModelsTag[] = []
   const defaultDateRange = firstDateOption?.name ?? ''
 
-  const watchedValues = formContext.watch()
   const hasChanges =
-    watchedValues.projectId !== defaultProjectId ||
-    watchedValues.userId !== defaultUserId ||
-    (Array.isArray(watchedValues.tags) && watchedValues.tags.length > 0) ||
-    watchedValues.dateRange !== defaultDateRange
+    (controls.projectId.value ?? '') !== defaultProjectId ||
+    (controls.userId.value ?? '') !== defaultUserId ||
+    !!controls.tags.value ||
+    (controls.dateRange.value ?? '') !== defaultDateRange
 
   const resetForm = () => {
     if (firstDateOption) {
       const { from, to } = firstDateOption.dateRangeFn(new Date())
-      formContext.setValue('from', from)
-      formContext.setValue('to', to)
+      controls.from.change(from)
+      controls.to.change(to)
     }
-    formContext.setValue('dateRange', defaultDateRange)
-    formContext.setValue('projectId', defaultProjectId)
-    formContext.setValue('userId', defaultUserId)
-    formContext.setValue('tags', defaultTags)
+    controls.dateRange.change(defaultDateRange)
+    controls.projectId.change(defaultProjectId)
+    controls.userId.change(defaultUserId)
+    controls.tags.change('')
   }
 
+  // Auto-focus tags after project selection
   useEffect(() => {
-    const subscription = formContext.watch((_value, { name }) => {
-      if (name === 'projectId') {
-        formContext.setFocus('tags')
-      }
-    })
-    return () => subscription.unsubscribe()
-  }, [formContext])
+    if (projectId && fields.tags.id) {
+      document.querySelector<HTMLElement>(`#${fields.tags.id}`)?.focus()
+    }
+  }, [projectId, fields.tags.id])
 
   return (
     <div className="w-full" data-testid="lists-filter">
@@ -160,21 +174,44 @@ export const BookingHistoryFilter = ({
       </div>
       <FormBody>
         {showUserFilter && (
-          <FormElement htmlFor="userId" label={t('user', 'User')}>
-            <UserSelect id="userId" name="userId" users={users} />
+          <FormElement htmlFor={fields.userId.id} label={t('user', 'User')}>
+            <UserSelect
+              id={fields.userId.id}
+              name={fields.userId.name}
+              onChange={(id) => controls.userId.change(id)}
+              users={users}
+              value={controls.userId.value ?? ''}
+            />
           </FormElement>
         )}
-        <FormElement htmlFor="projectId" label={t('projects:label', 'Project')}>
-          <ProjectSelect id="projectId" name="projectId" projects={projects} />
+        <FormElement
+          htmlFor={fields.projectId.id}
+          label={t('projects:label', 'Project')}
+        >
+          <ProjectSelect
+            id={fields.projectId.id}
+            name={fields.projectId.name}
+            onChange={(id) => controls.projectId.change(id)}
+            projects={projects}
+            value={controls.projectId.value ?? ''}
+          />
         </FormElement>
-        <FormElement htmlFor="tags" label={t('tag-manager:label', 'Tags')}>
+        <FormElement
+          htmlFor={fields.tags.id}
+          label={t('tag-manager:label', 'Tags')}
+        >
           <InputTagsAutocomplete
-            id="tags"
-            name="tags"
+            field={fields.tags}
+            id={fields.tags.id}
+            projectId={controls.projectId.value}
             suggestions={projectTags}
           />
         </FormElement>
-        <DateRangeFilter name="dateRange" />
+        <DateRangeFilter
+          fromField={fields.from}
+          rangeField={fields.dateRange}
+          toField={fields.to}
+        />
       </FormBody>
     </div>
   )

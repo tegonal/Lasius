@@ -39,9 +39,9 @@ describe('getBackoffDelay', () => {
   })
 
   it('caps at 10000ms for attempt 4+', () => {
-    expect(_getBackoffDelay(4)).toBe(10000)
-    expect(_getBackoffDelay(5)).toBe(10000)
-    expect(_getBackoffDelay(10)).toBe(10000)
-    expect(_getBackoffDelay(29)).toBe(10000)
+    expect(_getBackoffDelay(4)).toBe(10_000)
+    expect(_getBackoffDelay(5)).toBe(10_000)
+    expect(_getBackoffDelay(10)).toBe(10_000)
+    expect(_getBackoffDelay(29)).toBe(10_000)
   })
 })

@@ -54,6 +54,7 @@ export const MyProjectsRightColumn = ({
           <div className="join w-full">
             <Input
               className="join-item"
+              data-testid="project-search-input"
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder={t(
                 'projects:filter.searchPlaceholder',
@@ -66,6 +67,7 @@ export const MyProjectsRightColumn = ({
               <button
                 aria-label={t('actions.clear', 'Clear')}
                 className="btn btn-square join-item"
+                data-testid="project-search-clear-btn"
                 onClick={() => onSearchChange('')}
                 type="button"
               >

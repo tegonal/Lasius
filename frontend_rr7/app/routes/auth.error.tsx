@@ -49,7 +49,7 @@ export default function AuthError() {
     }
 
     switch (errorCode) {
-      case 'AccessDenied':
+      case 'AccessDenied': {
         return {
           message: t('auth.errors.accessDenied.message', {
             defaultValue:
@@ -59,7 +59,8 @@ export default function AuthError() {
             defaultValue: 'Access Denied',
           }),
         }
-      case 'Configuration':
+      }
+      case 'Configuration': {
         return {
           message: t('auth.errors.configuration.message', {
             defaultValue:
@@ -69,7 +70,8 @@ export default function AuthError() {
             defaultValue: 'Configuration Error',
           }),
         }
-      case 'CredentialsSignin':
+      }
+      case 'CredentialsSignin': {
         return {
           message: t('auth.errors.credentials.message', {
             defaultValue:
@@ -79,8 +81,9 @@ export default function AuthError() {
             defaultValue: 'Sign In Failed',
           }),
         }
+      }
       case 'EmailCreateAccount':
-      case 'EmailSignin':
+      case 'EmailSignin': {
         return {
           message: t('auth.errors.email.message', {
             defaultValue:
@@ -90,10 +93,11 @@ export default function AuthError() {
             defaultValue: 'Email Error',
           }),
         }
+      }
       case 'OAuthAccountNotLinked':
       case 'OAuthCallback':
       case 'OAuthCreateAccount':
-      case 'OAuthSignin':
+      case 'OAuthSignin': {
         return {
           message: t('auth.errors.oauth.message', {
             defaultValue:
@@ -103,7 +107,8 @@ export default function AuthError() {
             defaultValue: 'OAuth Error',
           }),
         }
-      case 'SessionRequired':
+      }
+      case 'SessionRequired': {
         return {
           message: t('auth.errors.sessionRequired.message', {
             defaultValue: 'Please sign in to continue.',
@@ -112,7 +117,8 @@ export default function AuthError() {
             defaultValue: 'Session Required',
           }),
         }
-      case 'Verification':
+      }
+      case 'Verification': {
         return {
           message: t('auth.errors.verification.message', {
             defaultValue:
@@ -122,7 +128,8 @@ export default function AuthError() {
             defaultValue: 'Verification Failed',
           }),
         }
-      default:
+      }
+      default: {
         return {
           message: t('auth.errors.default.message', {
             defaultValue:
@@ -132,6 +139,7 @@ export default function AuthError() {
             defaultValue: 'Authentication Error',
           }),
         }
+      }
     }
   }
 

@@ -48,7 +48,6 @@ export default [
     route('theme', 'routes/api.theme.ts'),
     route('calendar-bookings', 'routes/api.calendar-bookings.ts'),
     route('org-switch', 'routes/api.org-switch.ts'),
-    route('booking-form-data', 'routes/api.booking-form-data.ts'),
     route('proxy', 'routes/api.proxy.ts'),
     route('ws-ticket', 'routes/api.ws-ticket.ts'),
     route('locale', 'routes/api.locale.ts'),
@@ -90,6 +89,7 @@ export default [
     ...prefix('organisation', [
       layout('routes/organisation.layout.tsx', [
         route('current', 'routes/organisation.current.tsx'),
+        route('integrations', 'routes/organisation.integrations.tsx'),
         route('lists', 'routes/organisation.lists.tsx'),
         route('projects', 'routes/organisation.projects._index.tsx'),
         ...prefix('stats', [

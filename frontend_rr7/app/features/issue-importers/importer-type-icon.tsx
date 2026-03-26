@@ -34,13 +34,17 @@ type Props = {
 
 export const ImporterTypeIcon = ({ className = 'h-5 w-5', type }: Props) => {
   switch (type) {
-    case 'github':
+    case 'github': {
       return <SiGithub className={className} />
-    case 'gitlab':
+    }
+    case 'gitlab': {
       return <SiGitlab className={className} />
-    case 'jira':
+    }
+    case 'jira': {
       return <SiJirasoftware className={className} />
-    case 'plane':
+    }
+    case 'plane': {
       return <LucideIcon className={className} icon={Layers} />
+    }
   }
 }

@@ -17,21 +17,29 @@
  *
  */
 
-import { useFormContext } from 'react-hook-form'
+import { parseWithZod } from '@conform-to/zod/v4'
+import { type z } from 'zod'
 
 /**
- * Hook that safely returns form context or throws if not available.
- * This ensures components fail fast if used outside a form context.
+ * Merge Conform field errors with server-side errors (e.g. from API responses).
+ * Returns a combined string[] suitable for FormFieldErrors.
  */
-export const useRequiredFormContext = () => {
-  const formContext = useFormContext()
+export function mergeErrors(
+  conformErrors?: string[] | undefined,
+  serverErrors?: string[] | undefined,
+): string[] | undefined {
+  const combined = [...(conformErrors ?? []), ...(serverErrors ?? [])]
+  return combined.length > 0 ? combined : undefined
+}
 
-  if (!formContext) {
-    throw new Error(
-      'useRequiredFormContext must be used within a FormProvider. ' +
-        "Wrap your component with WithFormContext or ensure it's inside a FormProvider.",
-    )
-  }
-
-  return formContext
+/**
+ * Parse and validate form data against a Zod schema (client-side).
+ * Returns the typed submission result from Conform.
+ */
+export function validateFormData<Schema extends z.ZodType>(
+  formElement: HTMLFormElement,
+  schema: Schema,
+) {
+  const formData = new FormData(formElement)
+  return parseWithZod(formData, { schema })
 }

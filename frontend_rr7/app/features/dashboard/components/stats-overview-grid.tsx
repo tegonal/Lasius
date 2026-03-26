@@ -61,6 +61,7 @@ export const StatsOverviewGrid = ({
         </div>
         <div
           className="stat hover:bg-base-200 cursor-pointer transition-colors"
+          data-testid="stats-hours-tile"
           onClick={toggleStatsTileTimeAsDecimals}
         >
           <div className="stat-title">{hoursLabel}</div>
@@ -70,6 +71,7 @@ export const StatsOverviewGrid = ({
       <div className="stats grid w-full grid-cols-2">
         <div
           className="stat hover:bg-base-200 cursor-pointer transition-colors"
+          data-testid="stats-expected-hours-tile"
           onClick={toggleStatsTileTimeAsDecimals}
         >
           <div className="stat-title">

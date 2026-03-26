@@ -17,28 +17,33 @@
  *
  */
 
+import { type SchemaTranslationFn } from '~/lib/i18n-types'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 
 export const getImporterTypeLabel = (
   type: ImporterType,
-  t: (key: string, options?: Record<string, string>) => string,
+  t: SchemaTranslationFn,
 ): string => {
   switch (type) {
-    case 'github':
+    case 'github': {
       return t('issueImporters.typeLabels.github', {
         defaultValue: 'GitHub',
       })
-    case 'gitlab':
+    }
+    case 'gitlab': {
       return t('issueImporters.typeLabels.gitlab', {
         defaultValue: 'GitLab',
       })
-    case 'jira':
+    }
+    case 'jira': {
       return t('issueImporters.typeLabels.jira', {
         defaultValue: 'Jira',
       })
-    case 'plane':
+    }
+    case 'plane': {
       return t('issueImporters.typeLabels.plane', {
         defaultValue: 'Plane',
       })
+    }
   }
 }

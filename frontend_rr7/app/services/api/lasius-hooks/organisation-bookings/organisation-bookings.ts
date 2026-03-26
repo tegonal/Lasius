@@ -53,11 +53,11 @@ function getGetOrganisationBookingAggregatedStatsUrl(
   params?: GetOrganisationBookingAggregatedStatsParams,
 ) {
   const normalizedParams = new URLSearchParams()
-  Object.entries(params || {}).forEach(([key, value]) => {
+  for (const [key, value] of Object.entries(params || {})) {
     if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
-  })
+  }
   const query = normalizedParams.toString()
   return query
     ? `/organisation-bookings/organisations/${orgId}/bookings/stats/aggregated` +
@@ -74,11 +74,11 @@ function getGetOrganisationBookingListUrl(
   params?: GetOrganisationBookingListParams,
 ) {
   const normalizedParams = new URLSearchParams()
-  Object.entries(params || {}).forEach(([key, value]) => {
+  for (const [key, value] of Object.entries(params || {})) {
     if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
-  })
+  }
   const query = normalizedParams.toString()
   return query
     ? `/organisation-bookings/organisations/${orgId}/bookings/history` +

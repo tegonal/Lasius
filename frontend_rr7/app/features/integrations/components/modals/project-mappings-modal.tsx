@@ -43,12 +43,16 @@ import { Modal } from '~/components/ui/overlays/modal/modal'
 import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
 import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
 import { ProjectMappingRowContext } from '~/features/integrations/components/wizard/steps/project-mapping-row-context'
+import { useProjectMappingList } from '~/features/integrations/hooks/use-project-mapping-list'
 import { getImporterTypeLabel } from '~/features/integrations/lib/importer-type-labels'
 import {
   buildMappingPayload,
   extractExternalProjectId,
+  type MappingWithTagConfig,
+  type ProjectMapping,
   type TagConfiguration,
 } from '~/features/integrations/lib/mapping-helpers'
+import { untyped } from '~/lib/i18n-types'
 import { logger } from '~/lib/logger'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 import {
@@ -63,11 +67,6 @@ import {
   useRefreshTags,
   useRemoveProjectMapping,
 } from '~/services/api/lasius-hooks/issue-importers/issue-importers'
-
-type MappingWithTagConfig = {
-  projectId: string
-  tagConfig?: TagConfiguration
-}
 
 type Props = {
   config: ModelsIssueImporterConfigResponse | null
@@ -92,6 +91,16 @@ export const ProjectMappingsModal = ({
 
   const importerType = (config?.importerType as ImporterType) || 'github'
   const configId = (config?.id as ModelsIssueImporterConfigId) || ''
+
+  // Keep a ref to config.projects so the init effect can read from it
+  // without depending on its referential identity
+  const configProjectsRef = useRef(config?.projects)
+  configProjectsRef.current = config?.projects
+  const configProjectsKey = useMemo(
+    () =>
+      JSON.stringify(config?.projects?.map((p: any) => p.projectId).toSorted()),
+    [config?.projects],
+  )
 
   // Fetch external projects
   const [projects, setProjects] = useState<ModelsExternalProject[]>([])
@@ -169,12 +178,15 @@ export const ProjectMappingsModal = ({
 
   // Build initial mappings from config.projects
   useEffect(() => {
-    if (config?.projects) {
+    const projects = configProjectsRef.current
+    if (projects) {
       const initialMappings: Record<string, MappingWithTagConfig> = {}
 
-      ;(config.projects as any[]).forEach((mapping: any) => {
+      for (const mapping of projects as ProjectMapping[]) {
         const externalId = extractExternalProjectId(importerType, mapping)
-        const existingTagConfig = mapping?.settings?.tagConfiguration
+        const existingTagConfig = (
+          mapping.settings as unknown as { tagConfiguration?: TagConfiguration }
+        )?.tagConfiguration
 
         if (externalId && mapping.projectId) {
           initialMappings[externalId] = {
@@ -182,11 +194,11 @@ export const ProjectMappingsModal = ({
             tagConfig: existingTagConfig,
           }
         }
-      })
+      }
 
       setMappings(initialMappings)
     }
-  }, [config?.projects, importerType])
+  }, [configProjectsKey, importerType])
 
   // Clean up state when modal closes
   useEffect(() => {
@@ -206,13 +218,18 @@ export const ProjectMappingsModal = ({
     listProjectsApi.submit({ configId, orgId: selectedOrgId })
   }, [open, configId, selectedOrgId, listProjectsApi])
 
+  const mappingsRef = useRef(mappings)
+  mappingsRef.current = mappings
+  const projectsRef = useRef(projects)
+  projectsRef.current = projects
+
   const handleMappingChange = useCallback(
     (
       externalProjectId: string,
       lasiusProjectId: null | string,
       tagConfig: TagConfiguration | undefined,
     ) => {
-      const previousMapping = mappings[externalProjectId]
+      const previousMapping = mappingsRef.current[externalProjectId]
 
       // Update local state immediately
       setMappings((prev) => {
@@ -241,7 +258,9 @@ export const ProjectMappingsModal = ({
       }
 
       // Add/update mapping
-      const externalProject = projects.find((p) => p.id === externalProjectId)
+      const externalProject = projectsRef.current.find(
+        (p) => p.id === externalProjectId,
+      )
 
       const result = buildMappingPayload(
         importerType,
@@ -272,11 +291,9 @@ export const ProjectMappingsModal = ({
       })
     },
     [
-      mappings,
       configId,
       selectedOrgId,
       importerType,
-      projects,
       addMappingApi,
       removeMappingApi,
       addToast,
@@ -295,49 +312,8 @@ export const ProjectMappingsModal = ({
     [configId, selectedOrgId, refreshTagsApi],
   )
 
-  // Filter projects
-  const filteredProjects = useMemo(() => {
-    if (!filterText.trim()) return projects
-
-    const searchLower = filterText.toLowerCase()
-    return projects.filter(
-      (project) =>
-        project.name.toLowerCase().includes(searchLower) ||
-        project.id.toLowerCase().includes(searchLower),
-    )
-  }, [projects, filterText])
-
-  // Detect orphaned mappings
-  const orphanedMappings = useMemo(() => {
-    const externalProjectIds = new Set(projects.map((p) => p.id))
-    const orphaned: Array<{
-      externalId: string
-      mapping: MappingWithTagConfig
-    }> = []
-
-    Object.entries(mappings).forEach(([externalId, mapping]) => {
-      if (!externalProjectIds.has(externalId)) {
-        orphaned.push({ externalId, mapping })
-      }
-    })
-
-    return orphaned
-  }, [projects, mappings])
-
-  // Sort projects: mapped first
-  const sortedProjects = useMemo(() => {
-    return [...filteredProjects].sort((a, b) => {
-      const aMapped = !!mappings[a.id]
-      const bMapped = !!mappings[b.id]
-
-      if (aMapped && !bMapped) return -1
-      if (!aMapped && bMapped) return 1
-      return 0
-    })
-  }, [filteredProjects, mappings])
-
-  const mappedCount = Object.keys(mappings).length
-  const showFilter = projects.length > 10
+  const { mappedCount, orphanedMappings, showFilter, sortedProjects } =
+    useProjectMappingList({ filterText, mappings, projects })
 
   const renderContent = () => {
     if (listProjectsApi.isLoading) {
@@ -347,7 +323,7 @@ export const ProjectMappingsModal = ({
           <p className="text-base-content/70 mt-4">
             {t('issueImporters.wizard.projects.loading', {
               defaultValue: 'Loading projects from {{platform}}...',
-              platform: getImporterTypeLabel(importerType, t),
+              platform: getImporterTypeLabel(importerType, untyped(t)),
             })}
           </p>
         </div>
@@ -377,7 +353,7 @@ export const ProjectMappingsModal = ({
           <p className="text-base-content/60 mt-4">
             {t('issueImporters.wizard.projects.noProjects', {
               defaultValue: 'No projects found in {{platform}}',
-              platform: getImporterTypeLabel(importerType, t),
+              platform: getImporterTypeLabel(importerType, untyped(t)),
             })}
           </p>
         </div>
@@ -392,7 +368,7 @@ export const ProjectMappingsModal = ({
             defaultValue:
               'Found {{count}} projects from {{platform}}. Map them to your Lasius projects to import issues. {{mapped}} of {{total}} mapped.',
             mapped: mappedCount,
-            platform: getImporterTypeLabel(importerType, t),
+            platform: getImporterTypeLabel(importerType, untyped(t)),
             total: projects.length,
           })}
         </Text>
@@ -605,7 +581,7 @@ export const ProjectMappingsModal = ({
         <ModalHeader className="mb-4">
           {t('issueImporters.projectMappings.title', {
             defaultValue: '{{platform}} Project Mappings',
-            platform: getImporterTypeLabel(importerType, t),
+            platform: getImporterTypeLabel(importerType, untyped(t)),
           })}
         </ModalHeader>
 

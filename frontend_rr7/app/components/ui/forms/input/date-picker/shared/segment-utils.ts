@@ -28,21 +28,26 @@ export function handleArrowIncrement(
   const newDate = new Date(date)
 
   switch (segment) {
-    case 'day':
+    case 'day': {
       newDate.setDate(newDate.getDate() + increment)
       break
-    case 'hour':
+    }
+    case 'hour': {
       newDate.setHours((newDate.getHours() + increment + 24) % 24)
       break
-    case 'minute':
+    }
+    case 'minute': {
       newDate.setMinutes((newDate.getMinutes() + increment + 60) % 60)
       break
-    case 'month':
+    }
+    case 'month': {
       newDate.setMonth(newDate.getMonth() + increment)
       break
-    case 'year':
+    }
+    case 'year': {
       newDate.setFullYear(newDate.getFullYear() + increment)
       break
+    }
   }
 
   return newDate

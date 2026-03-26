@@ -36,7 +36,7 @@ export const BookingDurationCounter = ({ startDate }: Props) => {
   useEffect(() => {
     const interval = setInterval(() => {
       setDuration(durationAsString(startDate, formatISOLocale(new Date())))
-    }, 25000)
+    }, 25_000)
     return () => clearInterval(interval)
   }, [startDate])
 

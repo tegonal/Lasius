@@ -18,7 +18,6 @@
  */
 
 import { useEffect, useRef, useState } from 'react'
-import { FormProvider, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
@@ -38,6 +37,7 @@ import { useUpdateProject } from '~/services/api/lasius-hooks/projects/projects'
 import { useGetTagsByProject } from '~/services/api/lasius-hooks/user-organisations/user-organisations'
 import { type ModelsProject } from '~/services/api/lasius/modelsProject'
 import { type ModelsSimpleTag } from '~/services/api/lasius/modelsSimpleTag'
+import { type ModelsTag } from '~/services/api/lasius/modelsTag'
 import { type ModelsTagGroup } from '~/services/api/lasius/modelsTagGroup'
 import { type ModelsUserProject } from '~/services/api/lasius/modelsUserProject'
 
@@ -46,13 +46,6 @@ import { useUnsavedChanges } from '../hooks/use-unsaved-changes'
 import { TagGroupEmptyState } from './tag-group-empty-state'
 import { TagGroupItem } from './tag-group-item'
 import { TagGroupToolbar } from './tag-group-toolbar'
-
-type FormValues = {
-  newTagGroupName: string
-  newTagName: string
-  simpleTags: [] | ModelsSimpleTag[]
-  tagGroups: [] | ModelsTagGroup[]
-}
 
 type Props = {
   item: ModelsProject | ModelsUserProject
@@ -75,14 +68,10 @@ export const ProjectAddUpdateTagsForm = ({
 }: Props) => {
   const { t } = useTranslation(['tag-manager', 'projects'])
 
-  const hookForm = useForm<FormValues>({
-    defaultValues: {
-      newTagGroupName: '',
-      newTagName: '',
-      simpleTags: [],
-      tagGroups: [],
-    },
-  })
+  const [tagGroups, setTagGroups] = useState<ModelsTagGroup[]>([])
+  const [simpleTags, setSimpleTags] = useState<ModelsSimpleTag[]>([])
+  const [newTagGroupName, setNewTagGroupName] = useState('')
+  const [newTagName, setNewTagName] = useState('')
 
   const [showAddGroupModal, setShowAddGroupModal] = useState(false)
   const [showAddTagModal, setShowAddTagModal] = useState<null | {
@@ -124,7 +113,20 @@ export const ProjectAddUpdateTagsForm = ({
     removeTagGroup,
     setExpandedGroups,
     toggleGroup,
-  } = useTagGroupOperations(hookForm, setHasUnsavedChanges)
+    updateTagGroupTags,
+  } = useTagGroupOperations(
+    {
+      newTagGroupName,
+      newTagName,
+      setNewTagGroupName,
+      setNewTagName,
+      setSimpleTags,
+      setTagGroups,
+      simpleTags,
+      tagGroups,
+    },
+    setHasUnsavedChanges,
+  )
 
   const projectId =
     'projectReference' in item ? item.projectReference.id : item.id
@@ -148,36 +150,32 @@ export const ProjectAddUpdateTagsForm = ({
     })
   }, [item, projectId, selectedOrganisationId, tagsFetcher])
 
-  // Initialize form when tags arrive
+  // Initialize state when tags arrive
   useEffect(() => {
     if (!tagsFetcher.isSuccess || !tagsFetcher.data) return
 
     const tags = tagsFetcher.data
 
-    const tagGroups = tags.filter((tag) => tag.type === 'TagGroup') as
+    const groups = tags.filter((tag) => tag.type === 'TagGroup') as
       | []
       | ModelsTagGroup[]
 
-    const simpleTags = tags.filter((tag) => tag.type === 'SimpleTag') as
+    const simple = tags.filter((tag) => tag.type === 'SimpleTag') as
       | []
       | ModelsSimpleTag[]
 
-    hookForm.reset({
-      newTagGroupName: '',
-      newTagName: '',
-      simpleTags,
-      tagGroups,
-    })
-
-    setExpandedGroups(new Set(tagGroups.map((g) => g.id)))
-  }, [tagsFetcher.isSuccess, tagsFetcher.data, hookForm, setExpandedGroups])
+    setTagGroups(groups)
+    setSimpleTags(simple)
+    setNewTagGroupName('')
+    setNewTagName('')
+    setExpandedGroups(new Set(groups.map((g) => g.id)))
+  }, [tagsFetcher.isSuccess, tagsFetcher.data, setExpandedGroups])
 
   // Form submit via Orval hook
-  const onSubmit = () => {
-    const bookingCategories = [
-      ...hookForm.getValues('tagGroups'),
-      ...hookForm.getValues('simpleTags'),
-    ]
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    const bookingCategories = [...tagGroups, ...simpleTags]
 
     logger.info('Updating tags', { bookingCategories, projectId })
 
@@ -189,7 +187,7 @@ export const ProjectAddUpdateTagsForm = ({
   }
 
   const handleCancel = () => {
-    if (hasUnsavedChanges || hookForm.formState.isDirty) {
+    if (hasUnsavedChanges) {
       setShowCancelConfirm(true)
     } else {
       onCancel()
@@ -226,8 +224,13 @@ export const ProjectAddUpdateTagsForm = ({
     setShowDeleteConfirm({ groupIndex: index, groupName })
   }
 
+  const handleSimpleTagsChange = (tags: ModelsTag[]) => {
+    setSimpleTags(tags as ModelsSimpleTag[])
+    setHasUnsavedChanges(true)
+  }
+
   // Sort tag groups alphabetically
-  const sortedTagGroups = [...hookForm.watch('tagGroups')].sort((a, b) =>
+  const sortedTagGroups = [...tagGroups].toSorted((a, b) =>
     a.id.localeCompare(b.id),
   )
 
@@ -251,14 +254,11 @@ export const ProjectAddUpdateTagsForm = ({
           {sortedTagGroups.length === 0 && <TagGroupEmptyState />}
 
           {sortedTagGroups.map((tagGroup: ModelsTagGroup) => {
-            const index = hookForm
-              .getValues('tagGroups')
-              .findIndex((g) => g.id === tagGroup.id)
+            const index = tagGroups.findIndex((g) => g.id === tagGroup.id)
             const isExpanded = expandedGroups.has(tagGroup.id)
 
             return (
               <TagGroupItem
-                index={index}
                 isExpanded={isExpanded}
                 key={tagGroup.id}
                 onAddTag={() => setShowAddTagModal({ groupIndex: index })}
@@ -267,6 +267,9 @@ export const ProjectAddUpdateTagsForm = ({
                 }
                 onDelete={() => confirmDeleteTagGroup(index, tagGroup.id)}
                 onPasteTags={() => pasteTags(index)}
+                onTagsChange={(tags) =>
+                  updateTagGroupTags(index, tags as ModelsSimpleTag[])
+                }
                 onToggle={() => toggleGroup(tagGroup.id)}
                 showPasteButton={
                   !!copiedTags && copiedTags.fromGroupId !== tagGroup.id
@@ -289,8 +292,8 @@ export const ProjectAddUpdateTagsForm = ({
           </p>
         </Alert>
         <InputTagsAdmin
-          name="simpleTags"
-          tags={hookForm.getValues('simpleTags')}
+          onTagsChange={handleSimpleTagsChange}
+          tags={simpleTags}
         />
       </div>
     </ScrollArea>
@@ -308,18 +311,18 @@ export const ProjectAddUpdateTagsForm = ({
   ]
 
   return (
-    <FormProvider {...hookForm}>
+    <>
       <form
         className="flex h-full flex-col"
         onKeyDown={preventEnterOnForm}
-        onSubmit={hookForm.handleSubmit(onSubmit)}
+        onSubmit={onSubmit}
       >
         <div className="flex min-h-0 flex-1 flex-col">
           <ModalCloseButton onClose={handleCancel} />
 
           <ModalHeader className="mb-4">
             {mode === 'add'
-              ? t('actions.add', 'Add tags')
+              ? t('actions.addTags', 'Add tags')
               : t('actions.editForProject', 'Edit tags for {{projectKey}}', {
                   projectKey,
                 })}
@@ -350,33 +353,32 @@ export const ProjectAddUpdateTagsForm = ({
       {/* Modals */}
       <GenericInputModal
         confirmLabel={t('actions.createTagGroup', 'Create tag group')}
-        error={hookForm.formState.errors.newTagGroupName}
-        fieldName="newTagGroupName"
         label={t('actions.addTagGroup', 'Add tag group')}
+        onChange={setNewTagGroupName}
         onClose={() => {
           setShowAddGroupModal(false)
-          hookForm.setValue('newTagGroupName', '')
+          setNewTagGroupName('')
         }}
         onConfirm={handleAddGroupConfirm}
         open={showAddGroupModal}
         placeholder={t('forms.name', 'Name')}
-        register={hookForm.register}
+        value={newTagGroupName}
       />
 
       <GenericInputModal
         cancelLabel={t('actions.close', 'Close')}
         confirmLabel={t('actions.add', 'Add')}
         enableEnterKey
-        fieldName="newTagName"
         label={t('actions.addTag', 'Add a tag')}
+        onChange={setNewTagName}
         onClose={() => {
           setShowAddTagModal(null)
-          hookForm.setValue('newTagName', '')
+          setNewTagName('')
         }}
         onConfirm={handleAddTagConfirm}
         open={!!showAddTagModal}
         placeholder={t('enterTagName', 'Enter tag name')}
-        register={hookForm.register}
+        value={newTagName}
       />
 
       {showDeleteConfirm && (
@@ -407,6 +409,6 @@ export const ProjectAddUpdateTagsForm = ({
           open
         />
       )}
-    </FormProvider>
+    </>
   )
 }

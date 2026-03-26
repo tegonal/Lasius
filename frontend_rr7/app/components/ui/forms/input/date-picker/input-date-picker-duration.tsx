@@ -17,42 +17,23 @@
  *
  */
 
-import { useFormContext } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-
-import { useRequiredFormContext } from '~/components/ui/forms/with-form-context'
 
 import { SegmentedDurationInputConnected } from './segmented-duration-input-connected'
 import { calculateDurationMinutes } from './shared/duration-utils'
 
 export type InputDatePickerDurationProps = {
-  endFieldName: string
-  startFieldName: string
+  endValue: string
+  onEndChange: (isoString: string) => void
+  startValue: string
 }
 
-// Export the wrapped version that handles missing context gracefully
-export const InputDatePickerDuration = (
-  props: InputDatePickerDurationProps,
-) => {
-  const formContext = useFormContext()
-
-  if (!formContext) {
-    return null
-  }
-
-  return <InputDatePickerDurationInternal {...props} />
-}
-
-// Internal component that assumes form context is available
-const InputDatePickerDurationInternal = ({
-  endFieldName,
-  startFieldName,
+export const InputDatePickerDuration = ({
+  endValue,
+  onEndChange,
+  startValue,
 }: InputDatePickerDurationProps) => {
   const { t } = useTranslation('common')
-  const parentFormContext = useRequiredFormContext()
-
-  const startValue = parentFormContext.watch(startFieldName)
-  const endValue = parentFormContext.watch(endFieldName)
 
   const durationMinutes = calculateDurationMinutes(
     startValue ? new Date(startValue) : null,
@@ -64,8 +45,9 @@ const InputDatePickerDurationInternal = ({
   return (
     <div className="flex w-full flex-col gap-2">
       <SegmentedDurationInputConnected
-        endFieldName={endFieldName}
-        startFieldName={startFieldName}
+        endValue={endValue}
+        onEndChange={onEndChange}
+        startValue={startValue}
       />
       {isInvalid && (
         <span className="text-error mt-1 text-xs">

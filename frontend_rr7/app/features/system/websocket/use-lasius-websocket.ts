@@ -30,7 +30,7 @@ import {
 
 export { ConnectionStatus } from './websocket-manager'
 
-const IS_SERVER = typeof window === 'undefined'
+const IS_SERVER = globalThis.window === undefined
 
 export function useLasiusWebsocket() {
   const isWindowFocused = useIsWindowFocused()

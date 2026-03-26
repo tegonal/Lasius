@@ -32,7 +32,7 @@ const GRADIENT_ANIMATION_DURATION = 3 // seconds for gradient animation loop
 
 // Pick 3 random colors from the nivo palette for the gradient
 const getRandomGradientColors = () => {
-  const shuffled = [...nivoPalette].sort(() => Math.random() - 0.5)
+  const shuffled = [...nivoPalette].toSorted(() => Math.random() - 0.5)
   return [shuffled[0], shuffled[1], shuffled[2]]
 }
 

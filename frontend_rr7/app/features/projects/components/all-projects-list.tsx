@@ -52,15 +52,17 @@ export const AllProjectsList = ({
 
     // Filter by status
     switch (statusFilter) {
-      case 'active':
+      case 'active': {
         filtered = filtered.filter((project) => project.active)
         break
-      case 'inactive':
+      }
+      case 'inactive': {
         filtered = filtered.filter((project) => !project.active)
         break
-      case 'both':
-      default:
+      }
+      default: {
         break
+      }
     }
 
     // Filter by search term

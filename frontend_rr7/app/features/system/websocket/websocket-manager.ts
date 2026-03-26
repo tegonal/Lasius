@@ -28,7 +28,7 @@ export enum ConnectionStatus {
 
 const PING_INTERVAL_MS = 5000
 const MAX_RECONNECT_ATTEMPTS = 30
-const MAX_BACKOFF_MS = 10000
+const MAX_BACKOFF_MS = 10_000
 
 export type TicketFetcher = () => Promise<string>
 
@@ -148,13 +148,13 @@ class WebSocketManager {
       return
     }
 
-    this.ws.onopen = () => {
+    this.ws.addEventListener('open', () => {
       logger.info('[WebSocketManager] Connected')
       this.reconnectAttempt = 0
       this.setStatus(ConnectionStatus.CONNECTED)
       void this.sendHelloServer()
       this.startPing()
-    }
+    })
 
     this.ws.onmessage = (event: MessageEvent) => {
       let parsed: unknown
@@ -173,7 +173,7 @@ class WebSocketManager {
       }
     }
 
-    this.ws.onclose = (event: CloseEvent) => {
+    this.ws.addEventListener('close', (event: CloseEvent) => {
       logger.info('[WebSocketManager] Closed', {
         code: event.code,
         reason: event.reason,
@@ -189,7 +189,7 @@ class WebSocketManager {
       // Normal close (1000) without intention = server closed, reconnect
       this.setStatus(ConnectionStatus.DISCONNECTED)
       this.scheduleReconnect()
-    }
+    })
 
     this.ws.onerror = (event: Event) => {
       logger.error('[WebSocketManager] Error', event)

@@ -17,58 +17,24 @@
  *
  */
 
-import { type FieldError, type FieldErrors, type Merge } from 'react-hook-form'
-import { useTranslation } from 'react-i18next'
-
 import { ErrorSign } from '~/components/ui/feedback/error-sign'
-import { logger } from '~/lib/logger'
 
 interface FormErrorBadgeProps {
-  error?: FieldError | Merge<FieldError, FieldErrors<Record<string, unknown>>>
+  errors: string[]
   id?: string
 }
 
-const errorTypeToTranslationKey: Record<string, string> = {
-  endAfterStart: 'common.validation.mustBeAfterStart',
-  fromBeforeTo: 'common.validation.fromMustBeBeforeTo',
-  isEmailAddress: 'common.validation.emailInvalid',
-  noNumber: 'common.validation.missingNumber',
-  noSpecialCharacters: 'common.validation.missingSpecialChar',
-  notEnoughCharactersPassword: 'common.validation.passwordTooShort',
-  notEqualPassword: 'common.validation.passwordMismatch',
-  noUppercase: 'common.validation.missingUppercase',
-  pattern: 'common.validation.wrongFormat',
-  required: 'common.validation.required',
-  startBeforeEnd: 'common.validation.mustBeBeforeEnd',
-  startInPast: 'common.validation.mustBeInPast',
-  toAfterFrom: 'common.validation.toMustBeAfterFrom',
-}
-
-export const FormErrorBadge = ({ error, id }: FormErrorBadgeProps) => {
-  const { t } = useTranslation('common')
-
-  if (!error) return null
-  logger.info('[form][FormErrorBadge]', error.type)
-
-  const getErrorMessage = (): string => {
-    if (error.message && typeof error.message === 'string') return error.message
-
-    const errorType = String(error.type || '')
-    const translationKey = errorTypeToTranslationKey[errorType]
-    if (translationKey) {
-      return t(translationKey as Parameters<typeof t>[0])
-    }
-
-    // Fallback to error type if no translation found
-    return errorType
-  }
+export const FormErrorBadge = ({ errors, id }: FormErrorBadgeProps) => {
+  if (!errors || errors.length === 0) return null
 
   return (
     <div className="-mt-2" id={id}>
-      <div className="badge badge-warning">
-        <ErrorSign />
-        {getErrorMessage()}
-      </div>
+      {errors.map((error, index) => (
+        <div className="badge badge-warning" key={index}>
+          <ErrorSign />
+          {error}
+        </div>
+      ))}
     </div>
   )
 }

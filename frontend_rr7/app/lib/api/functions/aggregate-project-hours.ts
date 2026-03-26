@@ -30,7 +30,7 @@ export type ProjectSummary = {
 const MS_PER_HOUR = 3_600_000
 
 export const aggregateProjectHours = (
-  data: ModelsBookingStats[] | undefined,
+  data?: ModelsBookingStats[],
   topN?: number,
 ): ProjectSummary[] => {
   if (!data) return []
@@ -47,7 +47,7 @@ export const aggregateProjectHours = (
     }
   }
 
-  let sorted = Object.entries(projectHours).sort(([, a], [, b]) => b - a)
+  let sorted = Object.entries(projectHours).toSorted(([, a], [, b]) => b - a)
   if (topN !== undefined) {
     sorted = sorted.slice(0, topN)
   }

@@ -40,7 +40,7 @@ const makeStats = (values: StubBookingStatsValue[]): StubBookingStats => ({
 
 describe('aggregateProjectHours', () => {
   it('returns empty array for undefined data', () => {
-    expect(aggregateProjectHours(undefined)).toEqual([])
+    expect(aggregateProjectHours()).toEqual([])
   })
 
   it('returns empty array for empty data', () => {

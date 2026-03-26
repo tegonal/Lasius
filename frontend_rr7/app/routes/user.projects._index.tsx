@@ -58,13 +58,13 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     ),
   )
   const lastActivityDates: Record<string, null | string> = {}
-  projects.forEach((project, i) => {
+  for (const [i, project] of projects.entries()) {
     const result = lastActivityResults[i]
     lastActivityDates[project.id] =
       result?.status === 'fulfilled' && result.value?.status === 200
         ? result.value.data
         : null
-  })
+  }
 
   return data(
     {

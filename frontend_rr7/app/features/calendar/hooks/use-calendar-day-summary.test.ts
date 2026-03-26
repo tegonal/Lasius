@@ -34,7 +34,7 @@ const getExpectedVsBookedPercentage = (expected: number, worked: number) => {
   if (expected > 0 && worked > 0)
     fulfilledPercentage = Math.round((worked / expected) * 100 * 100) / 100
 
-  const cappedPercentage = fulfilledPercentage > 100 ? 100 : fulfilledPercentage
+  const cappedPercentage = Math.min(fulfilledPercentage, 100)
   const progressBarPercentage =
     fulfilledPercentage > 90 && fulfilledPercentage < 100
       ? 90

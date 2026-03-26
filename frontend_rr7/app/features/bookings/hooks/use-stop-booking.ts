@@ -71,13 +71,7 @@ export function useStopBooking() {
       const endDate = new Date(end)
       const spansMidnight = !isSameDay(startDate, endDate)
 
-      if (!spansMidnight) {
-        stopApi.submit({
-          body: { end },
-          bookingId,
-          orgId,
-        })
-      } else {
+      if (spansMidnight) {
         const eod = formatISOLocale(endOfDay(startDate))
         const nextDayStart = formatISOLocale(startOfDay(addDays(startDate, 1)))
 
@@ -91,6 +85,12 @@ export function useStopBooking() {
         }
         stopApi.submit({
           body: { end: eod },
+          bookingId,
+          orgId,
+        })
+      } else {
+        stopApi.submit({
+          body: { end },
           bookingId,
           orgId,
         })

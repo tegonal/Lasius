@@ -32,8 +32,17 @@ export type Locale = (typeof LOCALES)[number]
 /** Default locale for the application */
 export const DEFAULT_LOCALE: Locale = 'en'
 
+/** Human-readable labels for each locale (in their native language) */
+export const LOCALE_LABELS: Record<Locale, string> = {
+  de: 'Deutsch',
+  en: 'English',
+  es: 'Español',
+  fr: 'Français',
+  it: 'Italiano',
+}
+
 /** Type guard: checks if a string is a valid Locale */
-export function isLocale(value: null | string | undefined): value is Locale {
+export function isLocale(value?: null | string): value is Locale {
   return !!value && (LOCALES as ReadonlyArray<string>).includes(value)
 }
 
@@ -70,7 +79,7 @@ export const defaultNS = 'common' as const
 export const i18nConfig = {
   defaultNS,
   /** EN is the source language — use as fallback for untranslated keys */
-  fallbackLng: 'en' as const,
+  fallbackLng: DEFAULT_LOCALE,
   /**
    * Allow key lookup across all namespaces. Since all namespaces are eagerly
    * loaded, this lets utility functions and dynamic keys resolve without

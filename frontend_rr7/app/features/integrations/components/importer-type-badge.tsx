@@ -19,31 +19,13 @@
 
 import { useTranslation } from 'react-i18next'
 
+import { getImporterTypeLabel } from '~/features/integrations/lib/importer-type-labels'
 import { ImporterTypeIcon } from '~/features/issue-importers/importer-type-icon'
+import { untyped } from '~/lib/i18n-types'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 
 type Props = {
   type: ImporterType
-}
-
-const getImporterTypeLabel = (
-  type: ImporterType,
-  t: (key: string, options?: Record<string, string>) => string,
-): string => {
-  switch (type) {
-    case 'github':
-      return t('issueImporters.typeLabels.github', {
-        defaultValue: 'GitHub',
-      })
-    case 'gitlab':
-      return t('issueImporters.typeLabels.gitlab', {
-        defaultValue: 'GitLab',
-      })
-    case 'jira':
-      return t('issueImporters.typeLabels.jira', { defaultValue: 'Jira' })
-    case 'plane':
-      return t('issueImporters.typeLabels.plane', { defaultValue: 'Plane' })
-  }
 }
 
 export const ImporterTypeBadge = ({ type }: Props) => {
@@ -52,7 +34,7 @@ export const ImporterTypeBadge = ({ type }: Props) => {
   return (
     <div className="badge badge-outline gap-2">
       <ImporterTypeIcon className="h-3 w-3" type={type} />
-      {getImporterTypeLabel(type, t)}
+      {getImporterTypeLabel(type, untyped(t))}
     </div>
   )
 }

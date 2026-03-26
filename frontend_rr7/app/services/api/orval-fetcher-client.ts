@@ -41,7 +41,7 @@ const PUBLIC_ENDPOINTS = new Set([
  * Route templates use ${paramName} interpolation.
  */
 function isPublicRoute(route: string): boolean {
-  const staticRoute = route.replace(/\$\{[^}]+\}/g, '*')
+  const staticRoute = route.replaceAll(/\$\{[^}]+\}/g, '*')
   return PUBLIC_ENDPOINTS.has(staticRoute)
 }
 
@@ -126,7 +126,7 @@ function generateFetcherHook(
   }
 
   // Remove trailing 'undefined' type args
-  while (typeArgs.length > 1 && typeArgs[typeArgs.length - 1] === 'undefined') {
+  while (typeArgs.length > 1 && typeArgs.at(-1) === 'undefined') {
     typeArgs.pop()
   }
 

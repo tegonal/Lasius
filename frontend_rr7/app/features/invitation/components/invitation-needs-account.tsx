@@ -152,15 +152,20 @@ const getProviderDisplayName = (
 
 const getProviderIcon = (provider: AuthProvider): React.ReactNode => {
   switch (provider) {
-    case 'github':
+    case 'github': {
       return <SiGithub size={24} />
-    case 'gitlab':
+    }
+    case 'gitlab': {
       return <SiGitlab size={24} />
-    case 'internal':
+    }
+    case 'internal': {
       return <LasiusIcon size={24} />
-    case 'keycloak':
+    }
+    case 'keycloak': {
       return <SiKeycloak size={24} />
-    default:
+    }
+    default: {
       return null
+    }
   }
 }

@@ -83,18 +83,22 @@ export const Tag = ({
   let tagVariant: 'tagSimpleTag' | 'tagTagGroup' | 'tagWithSummary'
 
   switch (true) {
-    case item.type === 'SimpleTag':
+    case item.type === 'SimpleTag': {
       tagVariant = 'tagSimpleTag'
       break
-    case item.type === 'TagGroup':
+    }
+    case item.type === 'TagGroup': {
       tagVariant = 'tagTagGroup'
       break
-    case 'summary' in item:
+    }
+    case 'summary' in item: {
       tagVariant = 'tagWithSummary'
       break
-    default:
+    }
+    default: {
       tagVariant = 'tagSimpleTag'
       break
+    }
   }
 
   const summary = 'summary' in item && item.summary ? String(item.summary) : ''
@@ -210,7 +214,7 @@ export const TagList = ({
   items,
   width,
 }: TagListProps) => {
-  if (!items || items.length < 1) return null
+  if (!items || items.length === 0) return null
   return (
     <div className="flex w-full min-w-0 flex-row flex-wrap gap-1">
       {items

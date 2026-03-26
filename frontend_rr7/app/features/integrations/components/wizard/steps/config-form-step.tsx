@@ -17,37 +17,52 @@
  *
  */
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useCallback, useEffect, useMemo } from 'react'
-import { Controller, useForm } from 'react-hook-form'
+import {
+  getFormProps,
+  getInputProps,
+  useForm,
+  useInputControl,
+} from '@conform-to/react'
+import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { z } from 'zod'
 
 import { Input } from '~/components/primitives/inputs/input'
+import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { DurationInput } from '~/components/ui/forms/input/duration-input'
 import { ProviderInstructions } from '~/features/integrations/components/shared/provider-instructions'
+import { useGithubResourceOwners } from '~/features/integrations/hooks/use-github-resource-owners'
 import { type WizardFormData } from '~/features/integrations/hooks/use-wizard-state'
 import { createConfigSchema } from '~/features/integrations/lib/config-schemas'
+import { getImporterTypeLabel } from '~/features/integrations/lib/importer-type-labels'
+import { validateFormData } from '~/lib/conform-helpers'
+import { untyped } from '~/lib/i18n-types'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
-import { useListGithubResourceOwners } from '~/services/api/lasius-hooks/issue-importers/issue-importers'
+
+/**
+ * Superset schema containing all possible fields across all importer types.
+ * Used only for Conform type inference (getZodConstraint) — actual validation
+ * uses the platform-specific schema from createConfigSchema.
+ */
+const allFieldsConstraintSchema = z.object({
+  accessToken: z.string().optional(),
+  apiKey: z.string().optional(),
+  baseUrl: z.string(),
+  checkFrequency: z.number(),
+  consumerKey: z.string().optional(),
+  name: z.string(),
+  privateKey: z.string().optional(),
+  resourceOwner: z.string().optional(),
+  resourceOwnerType: z.string().optional(),
+  workspace: z.string().optional(),
+})
 
 type Props = {
   formData: WizardFormData
   formRef: React.RefObject<HTMLFormElement | null>
   onSubmit: (data: WizardFormData) => void
   selectedOrgId: string
-}
-
-const getImporterTypeLabel = (type: ImporterType): string => {
-  switch (type) {
-    case 'github':
-      return 'GitHub'
-    case 'gitlab':
-      return 'GitLab'
-    case 'jira':
-      return 'Jira'
-    case 'plane':
-      return 'Plane'
-  }
 }
 
 export const ConfigFormStep = ({
@@ -64,154 +79,128 @@ export const ConfigFormStep = ({
     [t, importerType],
   )
 
-  const {
-    control,
-    formState: { errors },
-    handleSubmit,
-    register,
-    setValue,
-    watch,
-  } = useForm({
-    defaultValues: formData,
-
-    resolver: zodResolver(schema) as any,
+  const [form, fields] = useForm({
+    constraint: getZodConstraint(allFieldsConstraintSchema),
+    defaultValue: {
+      ...formData,
+      checkFrequency: String(formData.checkFrequency),
+    },
+    onValidate({ formData: fd }) {
+      // Cast to superset type for field inference; actual validation uses platform-specific schema
+      return parseWithZod(fd, {
+        schema: schema as typeof allFieldsConstraintSchema,
+      })
+    },
+    shouldRevalidate: 'onInput',
+    shouldValidate: 'onSubmit',
   })
 
-  const watchCheckFrequency = watch('checkFrequency')
-  const watchAccessToken = watch('accessToken')
+  const checkFrequencyControl = useInputControl(fields.checkFrequency)
+  const accessTokenControl = useInputControl(fields.accessToken)
+  const resourceOwnerControl = useInputControl(fields.resourceOwner)
+  const resourceOwnerTypeControl = useInputControl(fields.resourceOwnerType)
 
-  // GitHub resource owners — mutation hook, submit when token is present
-  const {
-    data: resourceOwnersData,
-    isLoading: isLoadingResourceOwners,
-    submit: submitResourceOwners,
-  } = useListGithubResourceOwners()
-
-  const resourceOwners = useMemo(
-    () => resourceOwnersData?.projects ?? [],
-    [resourceOwnersData],
-  )
-
-  // Fetch resource owners when access token changes for GitHub
-  useEffect(() => {
-    if (
-      importerType === 'github' &&
-      watchAccessToken &&
-      watchAccessToken.length > 0
-    ) {
-      submitResourceOwners({
-        body: {
-          accessToken: watchAccessToken,
-          baseUrl: formData.baseUrl,
-        } as never,
-        orgId: selectedOrgId,
-      })
-    }
-  }, [
+  const { isLoadingResourceOwners, resourceOwners } = useGithubResourceOwners({
+    accessToken: accessTokenControl.value ?? '',
+    baseUrl: formData.baseUrl ?? '',
     importerType,
-    watchAccessToken,
-    formData.baseUrl,
-    selectedOrgId,
-    submitResourceOwners,
-  ])
+    orgId: selectedOrgId,
+  })
 
-  const handleFormSubmit = useCallback(
-    (data: Record<string, unknown>) => {
-      onSubmit({ ...formData, ...data } as WizardFormData)
-    },
-    [formData, onSubmit],
-  )
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
+    const result = validateFormData(e.currentTarget, schema)
+    if (result.status !== 'success') return
+
+    onSubmit({ ...formData, ...result.value } as unknown as WizardFormData)
+  }
+
+  const checkFrequencyMs =
+    Number(checkFrequencyControl.value) || formData.checkFrequency
 
   return (
     <div className="flex h-full flex-col">
       <h3 className="text-base font-semibold">
         {t('issueImporters.wizard.config.title', {
-          defaultValue: `Configure ${getImporterTypeLabel(importerType)}`,
+          defaultValue: `Configure ${getImporterTypeLabel(importerType, untyped(t))}`,
         })}
       </h3>
       <p className="text-base-content/60 mt-1 text-sm">
         {t('issueImporters.wizard.config.description', {
-          defaultValue: `Enter your connection details to connect to ${getImporterTypeLabel(importerType)}.`,
+          defaultValue: `Enter your connection details to connect to ${getImporterTypeLabel(importerType, untyped(t))}.`,
         })}
       </p>
 
       <div className="mt-6 grid flex-1 grid-cols-1 gap-8 md:grid-cols-2">
         {/* Left column: Form fields */}
         <form
+          {...getFormProps(form)}
           className="space-y-4"
-          onSubmit={handleSubmit(handleFormSubmit)}
+          onSubmit={handleSubmit}
           ref={formRef}
         >
           {/* Name */}
           <fieldset className="fieldset">
-            <label className="label" htmlFor="name">
+            <label className="label" htmlFor={fields.name.id}>
               {t('issueImporters.fields.name', {
                 defaultValue: 'Configuration Name',
               })}
             </label>
             <Input
-              {...register('name')}
+              {...getInputProps(fields.name, { type: 'text' })}
               autoFocus
-              id="name"
+              key={fields.name.key}
               placeholder={t(
                 `issueImporters.fields.namePlaceholder.${importerType}`,
                 {
-                  defaultValue: `e.g., Company ${getImporterTypeLabel(importerType)}`,
+                  defaultValue: `e.g., Company ${getImporterTypeLabel(importerType, untyped(t))}`,
                 },
               )}
             />
-            {errors.name && (
-              <p className="text-error text-xs">{errors.name.message}</p>
-            )}
+            <FormFieldErrors errors={fields.name.errors} />
           </fieldset>
 
           {/* Base URL */}
           <fieldset className="fieldset">
-            <label className="label" htmlFor="baseUrl">
+            <label className="label" htmlFor={fields.baseUrl.id}>
               {t('issueImporters.fields.baseUrl', {
                 defaultValue: 'Base URL',
               })}
             </label>
             <Input
-              {...register('baseUrl')}
-              id="baseUrl"
+              {...getInputProps(fields.baseUrl, { type: 'text' })}
+              key={fields.baseUrl.key}
               placeholder={t(
                 `issueImporters.fields.baseUrlPlaceholder.${importerType}`,
                 { defaultValue: 'https://...' },
               )}
             />
-            {errors.baseUrl && (
-              <p className="text-error text-xs">{errors.baseUrl.message}</p>
-            )}
+            <FormFieldErrors errors={fields.baseUrl.errors} />
           </fieldset>
 
           {/* GitHub / GitLab: Access Token */}
           {(importerType === 'github' || importerType === 'gitlab') && (
             <fieldset className="fieldset">
-              <label className="label" htmlFor="accessToken">
+              <label className="label" htmlFor={fields.accessToken.id}>
                 {t('issueImporters.fields.accessToken', {
                   defaultValue: 'Access Token',
                 })}
               </label>
               <Input
-                {...register('accessToken')}
+                {...getInputProps(fields.accessToken, { type: 'password' })}
                 autoComplete="off"
                 data-1p-ignore
                 data-form-type="other"
                 data-lpignore="true"
-                id="accessToken"
+                key={fields.accessToken.key}
                 placeholder={
                   importerType === 'github'
                     ? 'github_pat_xxxxxxxxxxxxx'
                     : 'glpat-xxxxxxxxxxxxx'
                 }
-                type="password"
               />
-              {errors.accessToken && (
-                <p className="text-error text-xs">
-                  {errors.accessToken.message}
-                </p>
-              )}
+              <FormFieldErrors errors={fields.accessToken.errors} />
             </fieldset>
           )}
 
@@ -219,74 +208,58 @@ export const ConfigFormStep = ({
           {importerType === 'github' && (
             <>
               <fieldset className="fieldset">
-                <label className="label" htmlFor="resourceOwner">
+                <label className="label" htmlFor={fields.resourceOwner.id}>
                   {t('issueImporters.fields.resourceOwner', {
                     defaultValue: 'Resource Owner',
                   })}
                 </label>
-                <Controller
-                  control={control}
-                  name="resourceOwner"
-                  render={({ field }) => (
-                    <select
-                      className="select select-bordered w-full"
-                      disabled={
-                        resourceOwners.length === 0 || isLoadingResourceOwners
-                      }
-                      id="resourceOwner"
-                      onChange={(e) => {
-                        field.onChange(e.target.value)
-                        const selectedOwner = resourceOwners.find(
-                          (owner) => owner.id === e.target.value,
-                        )
-                        if (selectedOwner?.ownerType) {
-                          setValue(
-                            'resourceOwnerType',
-                            selectedOwner.ownerType as never,
-                            {
-                              shouldDirty: true,
-                              shouldValidate: true,
-                            },
-                          )
-                        }
-                      }}
-                      value={field.value || ''}
-                    >
-                      <option disabled value="">
-                        {isLoadingResourceOwners
-                          ? t('issueImporters.fields.resourceOwnerLoading', {
-                              defaultValue: 'Loading organizations...',
-                            })
-                          : resourceOwners.length === 0 && !watchAccessToken
-                            ? t(
-                                'issueImporters.fields.resourceOwnerPlaceholder',
-                                {
-                                  defaultValue:
-                                    'Enter access token above to load organizations',
-                                },
-                              )
-                            : resourceOwners.length === 0
-                              ? t(
-                                  'issueImporters.fields.resourceOwnerNoResults',
-                                  { defaultValue: 'No organizations found' },
-                                )
-                              : t('issueImporters.fields.resourceOwnerSelect', {
-                                  defaultValue: 'Select an organization',
-                                })}
-                      </option>
-                      {resourceOwners.map((owner) => (
-                        <option key={owner.id} value={owner.id}>
-                          {owner.name}
-                        </option>
-                      ))}
-                    </select>
-                  )}
+                <input
+                  name={fields.resourceOwner.name}
+                  type="hidden"
+                  value={resourceOwnerControl.value ?? ''}
                 />
-                {errors.resourceOwner && (
-                  <p className="text-error text-xs">
-                    {errors.resourceOwner.message}
-                  </p>
-                )}
+                <select
+                  className="select select-bordered w-full"
+                  disabled={
+                    resourceOwners.length === 0 || isLoadingResourceOwners
+                  }
+                  id={fields.resourceOwner.id}
+                  onChange={(e) => {
+                    resourceOwnerControl.change(e.target.value)
+                    const selectedOwner = resourceOwners.find(
+                      (owner) => owner.id === e.target.value,
+                    )
+                    if (selectedOwner?.ownerType) {
+                      resourceOwnerTypeControl.change(selectedOwner.ownerType)
+                    }
+                  }}
+                  value={resourceOwnerControl.value || ''}
+                >
+                  <option disabled value="">
+                    {isLoadingResourceOwners
+                      ? t('issueImporters.fields.resourceOwnerLoading', {
+                          defaultValue: 'Loading organizations...',
+                        })
+                      : resourceOwners.length === 0 && !accessTokenControl.value
+                        ? t('issueImporters.fields.resourceOwnerPlaceholder', {
+                            defaultValue:
+                              'Enter access token above to load organizations',
+                          })
+                        : resourceOwners.length === 0
+                          ? t('issueImporters.fields.resourceOwnerNoResults', {
+                              defaultValue: 'No organizations found',
+                            })
+                          : t('issueImporters.fields.resourceOwnerSelect', {
+                              defaultValue: 'Select an organization',
+                            })}
+                  </option>
+                  {resourceOwners.map((owner) => (
+                    <option key={owner.id} value={owner.id}>
+                      {owner.name}
+                    </option>
+                  ))}
+                </select>
+                <FormFieldErrors errors={fields.resourceOwner.errors} />
                 <p className="text-base-content/60 mt-1 text-xs">
                   {t('issueImporters.fields.resourceOwnerHelp', {
                     defaultValue:
@@ -294,7 +267,11 @@ export const ConfigFormStep = ({
                   })}
                 </p>
               </fieldset>
-              <input type="hidden" {...register('resourceOwnerType')} />
+              <input
+                name={fields.resourceOwnerType.name}
+                type="hidden"
+                value={resourceOwnerTypeControl.value ?? ''}
+              />
             </>
           )}
 
@@ -302,68 +279,56 @@ export const ConfigFormStep = ({
           {importerType === 'jira' && (
             <>
               <fieldset className="fieldset">
-                <label className="label" htmlFor="consumerKey">
+                <label className="label" htmlFor={fields.consumerKey.id}>
                   {t('issueImporters.fields.consumerKey', {
                     defaultValue: 'OAuth Consumer Key',
                   })}
                 </label>
                 <Input
-                  {...register('consumerKey')}
-                  id="consumerKey"
+                  {...getInputProps(fields.consumerKey, { type: 'text' })}
+                  key={fields.consumerKey.key}
                   placeholder="jira-oauth-consumer"
                 />
-                {errors.consumerKey && (
-                  <p className="text-error text-xs">
-                    {errors.consumerKey.message}
-                  </p>
-                )}
+                <FormFieldErrors errors={fields.consumerKey.errors} />
               </fieldset>
 
               <fieldset className="fieldset">
-                <label className="label" htmlFor="privateKey">
+                <label className="label" htmlFor={fields.privateKey.id}>
                   {t('issueImporters.fields.privateKey', {
                     defaultValue: 'OAuth Private Key',
                   })}
                 </label>
                 <textarea
-                  {...register('privateKey')}
                   autoComplete="off"
                   className="textarea textarea-bordered w-full font-mono text-sm"
                   data-1p-ignore
                   data-form-type="other"
                   data-lpignore="true"
-                  id="privateKey"
+                  id={fields.privateKey.id}
+                  key={fields.privateKey.key}
+                  name={fields.privateKey.name}
                   placeholder="-----BEGIN RSA PRIVATE KEY-----"
                   rows={4}
                 />
-                {errors.privateKey && (
-                  <p className="text-error text-xs">
-                    {errors.privateKey.message}
-                  </p>
-                )}
+                <FormFieldErrors errors={fields.privateKey.errors} />
               </fieldset>
 
               <fieldset className="fieldset">
-                <label className="label" htmlFor="accessToken">
+                <label className="label" htmlFor={fields.accessToken.id}>
                   {t('issueImporters.fields.oauthAccessToken', {
                     defaultValue: 'OAuth Access Token',
                   })}
                 </label>
                 <Input
-                  {...register('accessToken')}
+                  {...getInputProps(fields.accessToken, { type: 'password' })}
                   autoComplete="off"
                   data-1p-ignore
                   data-form-type="other"
                   data-lpignore="true"
-                  id="accessToken"
+                  key={fields.accessToken.key}
                   placeholder="your-oauth-access-token"
-                  type="password"
                 />
-                {errors.accessToken && (
-                  <p className="text-error text-xs">
-                    {errors.accessToken.message}
-                  </p>
-                )}
+                <FormFieldErrors errors={fields.accessToken.errors} />
               </fieldset>
             </>
           )}
@@ -372,44 +337,37 @@ export const ConfigFormStep = ({
           {importerType === 'plane' && (
             <>
               <fieldset className="fieldset">
-                <label className="label" htmlFor="apiKey">
+                <label className="label" htmlFor={fields.apiKey.id}>
                   {t('issueImporters.fields.apiKey', {
                     defaultValue: 'API Key',
                   })}
                 </label>
                 <Input
-                  {...register('apiKey')}
+                  {...getInputProps(fields.apiKey, { type: 'password' })}
                   autoComplete="off"
                   data-1p-ignore
                   data-form-type="other"
                   data-lpignore="true"
-                  id="apiKey"
+                  key={fields.apiKey.key}
                   placeholder="plane-api-key-xxxxxxxxxxxxx"
-                  type="password"
                 />
-                {errors.apiKey && (
-                  <p className="text-error text-xs">{errors.apiKey.message}</p>
-                )}
+                <FormFieldErrors errors={fields.apiKey.errors} />
               </fieldset>
 
               <fieldset className="fieldset">
-                <label className="label" htmlFor="workspace">
+                <label className="label" htmlFor={fields.workspace.id}>
                   {t('issueImporters.fields.workspace', {
                     defaultValue: 'Workspace',
                   })}
                 </label>
                 <Input
-                  {...register('workspace')}
-                  id="workspace"
+                  {...getInputProps(fields.workspace, { type: 'text' })}
+                  key={fields.workspace.key}
                   placeholder={t('issueImporters.fields.workspacePlaceholder', {
                     defaultValue: 'e.g., my-company',
                   })}
                 />
-                {errors.workspace && (
-                  <p className="text-error text-xs">
-                    {errors.workspace.message}
-                  </p>
-                )}
+                <FormFieldErrors errors={fields.workspace.errors} />
                 <p className="text-base-content/60 mt-1 text-xs">
                   {t('issueImporters.fields.workspaceHelp', {
                     defaultValue:
@@ -427,21 +385,22 @@ export const ConfigFormStep = ({
                 defaultValue: 'Check Interval',
               })}
             </label>
+            <input
+              name={fields.checkFrequency.name}
+              type="hidden"
+              value={
+                checkFrequencyControl.value ?? String(formData.checkFrequency)
+              }
+            />
             <div>
               <DurationInput
-                error={!!errors.checkFrequency}
+                error={!!fields.checkFrequency.errors?.length}
                 id="checkFrequency"
-                onChange={(ms) =>
-                  setValue('checkFrequency', ms, { shouldValidate: true })
-                }
-                value={watchCheckFrequency}
+                onChange={(ms) => checkFrequencyControl.change(String(ms))}
+                value={checkFrequencyMs}
               />
             </div>
-            {errors.checkFrequency && (
-              <p className="text-error text-xs">
-                {errors.checkFrequency.message}
-              </p>
-            )}
+            <FormFieldErrors errors={fields.checkFrequency.errors} />
             <p className="text-base-content/60 mt-1 text-xs">
               {t('issueImporters.checkIntervalHelp', {
                 defaultValue: 'How often to check for new issues',

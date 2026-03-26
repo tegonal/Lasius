@@ -46,7 +46,7 @@ const placeholders: Record<DateSegment, string> = {
 
 function createMockEvent(
   key: string,
-  overrides?: { selectionEnd?: number; selectionStart?: number },
+  _overrides?: { selectionEnd?: number; selectionStart?: number },
 ) {
   return {
     key,

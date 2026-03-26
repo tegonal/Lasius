@@ -199,11 +199,11 @@ function getGetUserBookingAggregatedStatsByOrganisationUrl(
   params?: GetUserBookingAggregatedStatsByOrganisationParams,
 ) {
   const normalizedParams = new URLSearchParams()
-  Object.entries(params || {}).forEach(([key, value]) => {
+  for (const [key, value] of Object.entries(params || {})) {
     if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
-  })
+  }
   const query = normalizedParams.toString()
   return query
     ? `/user-bookings/organisations/${orgId}/bookings/stats/aggregated` +
@@ -218,11 +218,11 @@ function getGetUserBookingLatestListByOrganisationUrl(
   params?: GetUserBookingLatestListByOrganisationParams,
 ) {
   const normalizedParams = new URLSearchParams()
-  Object.entries(params || {}).forEach(([key, value]) => {
+  for (const [key, value] of Object.entries(params || {})) {
     if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
-  })
+  }
   const query = normalizedParams.toString()
   return query
     ? `/user-bookings/organisations/${orgId}/latest` + '?' + query
@@ -237,11 +237,11 @@ function getGetUserBookingListByOrganisationUrl(
   params?: GetUserBookingListByOrganisationParams,
 ) {
   const normalizedParams = new URLSearchParams()
-  Object.entries(params || {}).forEach(([key, value]) => {
+  for (const [key, value] of Object.entries(params || {})) {
     if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
-  })
+  }
   const query = normalizedParams.toString()
   return query
     ? `/user-bookings/organisations/${orgId}/bookings/history` + '?' + query

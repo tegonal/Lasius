@@ -64,6 +64,7 @@ const CalendarDayCompact = ({
         !isSelected && 'hover:bg-base-200',
         isTodayDate && !isSelected && 'text-secondary font-bold',
       )}
+      data-testid={`calendar-day-${day}`}
       onClick={() => onDayClick(day)}
     >
       {progressBarPercentage > 0 && (
@@ -73,7 +74,7 @@ const CalendarDayCompact = ({
             isSelected ? 'bg-secondary-content/40' : 'bg-base-content/25',
           )}
           style={{
-            height: `${progressBarPercentage <= 100 ? progressBarPercentage : 100}%`,
+            height: `${Math.min(progressBarPercentage, 100)}%`,
           }}
         />
       )}
@@ -144,6 +145,7 @@ export const CalendarMonthCompact = ({ date, onDateChange }: Props) => {
           <button
             aria-label={t('time.today', 'Today')}
             className="btn btn-ghost btn-xs"
+            data-testid="calendar-month-today-btn"
             onClick={handleToday}
           >
             {t('time.today', 'Today')}

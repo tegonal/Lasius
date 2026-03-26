@@ -17,21 +17,20 @@
  *
  */
 
-import { zodResolver } from '@hookform/resolvers/zod'
+import { getFormProps, useForm, useInputControl } from '@conform-to/react'
+import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
 import { Copy } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 
 import { Button } from '~/components/primitives/buttons/button'
-import { Input } from '~/components/primitives/inputs/input'
 import { Label } from '~/components/primitives/typography/label'
 import { ButtonGroup } from '~/components/ui/forms/button-group'
+import { FormField } from '~/components/ui/forms/conform/form-field'
 import { FieldSet } from '~/components/ui/forms/field-set'
 import { FormBody } from '~/components/ui/forms/form-body'
 import { FormElement } from '~/components/ui/forms/form-element'
-import { FormErrorBadge } from '~/components/ui/forms/form-error-badge'
 import { Select } from '~/components/ui/forms/input/select'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { Modal } from '~/components/ui/overlays/modal/modal'
@@ -39,17 +38,13 @@ import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-but
 import { ModalDescription } from '~/components/ui/overlays/modal/modal-description'
 import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
 import { UserRoles } from '~/config/dynamic-translation-strings'
+import { validateFormData } from '~/lib/conform-helpers'
+import { type SchemaTranslationFn, untyped } from '~/lib/i18n-types'
 import { useInviteOrganisationUser } from '~/services/api/lasius-hooks/organisations/organisations'
 import { useInviteProjectUser } from '~/services/api/lasius-hooks/projects/projects'
 import { type ModelsInvitationResult } from '~/services/api/lasius/modelsInvitationResult'
 import { type ModelsUserToOrganisationAssignmentRole } from '~/services/api/lasius/modelsUserToOrganisationAssignmentRole'
 import { type ModelsUserToProjectAssignmentRole } from '~/services/api/lasius/modelsUserToProjectAssignmentRole'
-
-type FormData = {
-  inviteMemberByEmailAddress: string
-  organisationRole: ModelsUserToOrganisationAssignmentRole
-  projectRole: ModelsUserToProjectAssignmentRole
-}
 
 type Props = {
   onCancel?: () => void
@@ -57,6 +52,19 @@ type Props = {
   organisation: string
   project?: string
 }
+
+const createInviteSchema = (t: SchemaTranslationFn) =>
+  z.object({
+    inviteMemberByEmailAddress: z
+      .string({
+        error: t('validation.email', 'Please enter a valid email address'),
+      })
+      .email({
+        message: t('validation.email', 'Please enter a valid email address'),
+      }),
+    organisationRole: z.string().default('OrganisationMember'),
+    projectRole: z.string().default('ProjectMember'),
+  })
 
 export const ManageUserInviteByEmailForm = ({
   onCancel,
@@ -67,27 +75,7 @@ export const ManageUserInviteByEmailForm = ({
   const { t } = useTranslation()
   const mode = project ? 'project' : 'organisation'
 
-  const schema = useMemo(
-    () =>
-      z.object({
-        inviteMemberByEmailAddress: z.string().email({
-          message: t('validation.email', 'Please enter a valid email address'),
-        }),
-        organisationRole: z.string(),
-        projectRole: z.string(),
-      }),
-    [t],
-  )
-
-  const hookForm = useForm<FormData>({
-    defaultValues: {
-      inviteMemberByEmailAddress: '',
-      organisationRole: 'OrganisationMember',
-      projectRole: 'ProjectMember',
-    },
-    mode: 'onSubmit',
-    resolver: zodResolver(schema) as never,
-  })
+  const schema = useMemo(() => createInviteSchema(untyped(t)), [t])
 
   const [showResultState, setShowResultState] = useState(false)
   const [invitationResult, setInvitationResult] =
@@ -106,22 +94,44 @@ export const ManageUserInviteByEmailForm = ({
   })
   const isSubmitting = inviteProjectApi.isLoading || inviteOrgApi.isLoading
 
+  const [form, fields] = useForm({
+    constraint: getZodConstraint(schema),
+    defaultValue: {
+      inviteMemberByEmailAddress: '',
+      organisationRole: 'OrganisationMember',
+      projectRole: 'ProjectMember',
+    },
+    onValidate({ formData }) {
+      return parseWithZod(formData, { schema })
+    },
+    shouldRevalidate: 'onInput',
+    shouldValidate: 'onSubmit',
+  })
+
+  const projectRoleControl = useInputControl(fields.projectRole)
+  const orgRoleControl = useInputControl(fields.organisationRole)
+
   const handleCloseResult = () => {
-    hookForm.reset()
+    form.reset()
     setShowResultState(false)
     setInvitationResult(null)
     onSave()
   }
 
-  const onSubmit = () => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
+    const result = validateFormData(e.currentTarget, schema)
+    if (result.status !== 'success') return
+
     const { inviteMemberByEmailAddress, organisationRole, projectRole } =
-      hookForm.getValues()
+      result.value
 
     if (project && organisation) {
       inviteProjectApi.submit({
         body: {
           email: inviteMemberByEmailAddress,
-          role: projectRole,
+          role: projectRole as ModelsUserToProjectAssignmentRole,
         },
         orgId: organisation,
         projectId: project,
@@ -130,7 +140,7 @@ export const ManageUserInviteByEmailForm = ({
       inviteOrgApi.submit({
         body: {
           email: inviteMemberByEmailAddress,
-          role: organisationRole,
+          role: organisationRole as ModelsUserToOrganisationAssignmentRole,
         },
         orgId: organisation,
       })
@@ -138,7 +148,7 @@ export const ManageUserInviteByEmailForm = ({
   }
 
   const registrationLink = (invitationId: string) => {
-    const url = new URL(window.location.toString())
+    const url = new URL(globalThis.location.toString())
     return `${url.protocol}//${url.host}/join/${invitationId}`
   }
 
@@ -154,7 +164,7 @@ export const ManageUserInviteByEmailForm = ({
 
   return (
     <>
-      <form onSubmit={hookForm.handleSubmit(onSubmit)}>
+      <form {...getFormProps(form)} onSubmit={handleSubmit}>
         <FormBody>
           <ModalCloseButton onClose={handleClose} />
 
@@ -175,35 +185,26 @@ export const ManageUserInviteByEmailForm = ({
           </ModalDescription>
 
           <FieldSet>
-            <FormElement>
-              <Label htmlFor="inviteMemberByEmailAddress">
-                {t('invitation:email', 'Email')}
-              </Label>
-              <Input
-                data-testid="org-invite-email-input"
-                {...hookForm.register('inviteMemberByEmailAddress')}
-                autoComplete="off"
-              />
-              <FormErrorBadge
-                error={hookForm.formState.errors.inviteMemberByEmailAddress}
-              />
-            </FormElement>
+            <FormField
+              autoComplete="off"
+              data-testid="org-invite-email-input"
+              field={fields.inviteMemberByEmailAddress}
+              label={t('invitation:email', 'Email')}
+              type="email"
+            />
             {mode === 'project' && (
               <FormElement>
-                <Label htmlFor="projectRole">
+                <Label htmlFor={fields.projectRole.id}>
                   {t('projects:projectRole', 'Project role')}
                 </Label>
+                <input
+                  name={fields.projectRole.name}
+                  type="hidden"
+                  value={projectRoleControl.value ?? 'ProjectMember'}
+                />
                 <Select
-                  id="projectRole"
-                  onChange={(value) =>
-                    hookForm.setValue(
-                      'projectRole',
-                      value as ModelsUserToProjectAssignmentRole,
-                      {
-                        shouldValidate: true,
-                      },
-                    )
-                  }
+                  id={fields.projectRole.id}
+                  onChange={(value) => projectRoleControl.change(value)}
                   options={[
                     {
                       label: UserRoles.ProjectMember || 'Member',
@@ -214,26 +215,23 @@ export const ManageUserInviteByEmailForm = ({
                       value: 'ProjectAdministrator',
                     },
                   ]}
-                  value={hookForm.watch('projectRole') || 'ProjectMember'}
+                  value={projectRoleControl.value || 'ProjectMember'}
                 />
               </FormElement>
             )}
             {mode === 'organisation' && (
               <FormElement>
-                <Label htmlFor="organisationRole">
+                <Label htmlFor={fields.organisationRole.id}>
                   {t('organisation:organisationRole', 'Organisation role')}
                 </Label>
+                <input
+                  name={fields.organisationRole.name}
+                  type="hidden"
+                  value={orgRoleControl.value ?? 'OrganisationMember'}
+                />
                 <Select
-                  id="organisationRole"
-                  onChange={(value) =>
-                    hookForm.setValue(
-                      'organisationRole',
-                      value as ModelsUserToOrganisationAssignmentRole,
-                      {
-                        shouldValidate: true,
-                      },
-                    )
-                  }
+                  id={fields.organisationRole.id}
+                  onChange={(value) => orgRoleControl.change(value)}
                   options={[
                     {
                       label: UserRoles.OrganisationMember || 'Member',
@@ -245,9 +243,7 @@ export const ManageUserInviteByEmailForm = ({
                       value: 'OrganisationAdministrator',
                     },
                   ]}
-                  value={
-                    hookForm.watch('organisationRole') || 'OrganisationMember'
-                  }
+                  value={orgRoleControl.value || 'OrganisationMember'}
                 />
               </FormElement>
             )}

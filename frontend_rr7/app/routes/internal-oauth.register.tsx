@@ -46,7 +46,7 @@ import { Logo } from '~/components/ui/icons/logo'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { RegisterInfoPanel } from '~/features/auth/auth-info-panels'
 import { AuthLayout } from '~/features/auth/auth-layout'
-import { type SchemaTranslationFn } from '~/lib/i18n-types'
+import { type SchemaTranslationFn, untyped } from '~/lib/i18n-types'
 import { logger } from '~/lib/logger'
 import { registerOAuthUser } from '~/services/api/lasius/oauth2-provider/oauth2-provider'
 import { getOptionalUser } from '~/services/auth/auth-helpers.server'
@@ -88,12 +88,12 @@ const createRegisterSchema = (t: SchemaTranslationFn) =>
         .min(
           9,
           t('validation.passwordTooShort', {
-            defaultValue: 'Password must be at least 9 characters',
+            defaultValue: 'Minimum 9 characters',
           }),
         )
         .regex(/[A-Z]/, {
           error: t('validation.missingUppercase', {
-            defaultValue: 'Must contain an uppercase letter',
+            defaultValue: 'Must contain uppercase letter',
           }),
         })
         .regex(/\d/, {
@@ -181,7 +181,7 @@ export default function InternalOAuthRegister() {
   const { t } = useTranslation('common')
   const [showPasswords, setShowPasswords] = useState(false)
 
-  const registerSchema = createRegisterSchema(t)
+  const registerSchema = createRegisterSchema(untyped(t))
 
   const [form, fields] = useForm<{
     confirmPassword: string

@@ -17,10 +17,12 @@
  *
  */
 
-import { type Locale } from 'date-fns'
+import { type Locale as DateLocale } from 'date-fns'
 import { de, enUS, es, fr, it } from 'date-fns/locale'
 
-const dateLocales: Record<string, Locale> = {
+import { type Locale } from '~/i18n-config'
+
+const dateLocales: Record<Locale, DateLocale> = {
   de,
   en: enUS,
   es,
@@ -29,5 +31,5 @@ const dateLocales: Record<string, Locale> = {
 }
 
 /** Resolve a date-fns Locale from an i18n language code, defaulting to enUS. */
-export const getDateLocale = (language: string): Locale =>
-  dateLocales[language] ?? enUS
+export const getDateLocale = (language: string): DateLocale =>
+  dateLocales[language as Locale] ?? enUS

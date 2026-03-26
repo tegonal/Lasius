@@ -17,26 +17,25 @@
  *
  */
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import { type TFunction } from 'i18next'
+import { getFormProps, useForm } from '@conform-to/react'
+import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
 import { useMemo } from 'react'
-import { FormProvider, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 
 import { Button } from '~/components/primitives/buttons/button'
-import { Input } from '~/components/primitives/inputs/input'
 import { Alert } from '~/components/ui/feedback/alert'
 import { useToast } from '~/components/ui/feedback/use-toast'
 import { ButtonGroup } from '~/components/ui/forms/button-group'
+import { FormField } from '~/components/ui/forms/conform/form-field'
 import { FieldSet } from '~/components/ui/forms/field-set'
 import { FormBody } from '~/components/ui/forms/form-body'
-import { FormElement } from '~/components/ui/forms/form-element'
-import { FormErrorBadge } from '~/components/ui/forms/form-error-badge'
 import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
 import { ModalDescription } from '~/components/ui/overlays/modal/modal-description'
 import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
+import { validateFormData } from '~/lib/conform-helpers'
+import { type SchemaTranslationFn, untyped } from '~/lib/i18n-types'
 import {
   useCreateProject,
   useUpdateProject,
@@ -51,14 +50,34 @@ type Props = {
   onSave: () => void
 }
 
-const createProjectSchema = (t: TFunction) =>
+const createProjectSchema = (t: SchemaTranslationFn) =>
   z.object({
     projectKey: z
-      .string()
+      .string({
+        error: t('validation.projectKeyRequired', 'Project name is required'),
+      })
       .min(1, t('validation.projectKeyRequired', 'Project name is required')),
   })
 
-type FormData = z.infer<ReturnType<typeof createProjectSchema>>
+const getProjectKey = (
+  projectItem?: ModelsProject | ModelsUserProject,
+): string => {
+  if (!projectItem) return ''
+  if ('projectReference' in projectItem) {
+    return projectItem.projectReference.key
+  }
+  return projectItem.key
+}
+
+const getProjectId = (
+  projectItem?: ModelsProject | ModelsUserProject,
+): string => {
+  if (!projectItem) return ''
+  if ('projectReference' in projectItem) {
+    return projectItem.projectReference.id
+  }
+  return projectItem.id
+}
 
 export const ProjectAddUpdateForm = ({
   item,
@@ -85,39 +104,27 @@ export const ProjectAddUpdateForm = ({
   const updateProjectApi = useUpdateProject({ onSuccess })
   const activeFetcher = mode === 'add' ? createProjectApi : updateProjectApi
 
-  const schema = useMemo(() => createProjectSchema(t), [t])
+  const schema = useMemo(() => createProjectSchema(untyped(t)), [t])
 
-  const getProjectKey = (
-    projectItem?: ModelsProject | ModelsUserProject,
-  ): string => {
-    if (!projectItem) return ''
-    if ('projectReference' in projectItem) {
-      return projectItem.projectReference.key
-    }
-    return projectItem.key
-  }
-
-  const getProjectId = (
-    projectItem?: ModelsProject | ModelsUserProject,
-  ): string => {
-    if (!projectItem) return ''
-    if ('projectReference' in projectItem) {
-      return projectItem.projectReference.id
-    }
-    return projectItem.id
-  }
-
-  const hookForm = useForm<FormData>({
-    defaultValues: {
+  const [form, fields] = useForm({
+    constraint: getZodConstraint(schema),
+    defaultValue: {
       projectKey: getProjectKey(item),
     },
-    resolver: zodResolver(schema),
+    onValidate({ formData }) {
+      return parseWithZod(formData, { schema })
+    },
+    shouldRevalidate: 'onInput',
+    shouldValidate: 'onSubmit',
   })
 
-  const isSubmitting = activeFetcher.isSubmitting
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
 
-  const onSubmit = () => {
-    const { projectKey } = hookForm.getValues()
+    const result = validateFormData(e.currentTarget, schema)
+    if (result.status !== 'success') return
+
+    const { projectKey } = result.value
 
     if (mode === 'add') {
       createProjectApi.submit({
@@ -134,79 +141,61 @@ export const ProjectAddUpdateForm = ({
   }
 
   return (
-    <FormProvider {...hookForm}>
-      <div className="flex flex-col">
-        <ModalCloseButton onClose={onCancel} />
+    <div className="flex flex-col">
+      <ModalCloseButton onClose={onCancel} />
 
-        <ModalHeader>
-          {mode === 'add'
-            ? t('projects:actions.add', 'Add Project')
-            : t('projects:actions.edit', 'Edit project')}
-        </ModalHeader>
+      <ModalHeader>
+        {mode === 'add'
+          ? t('projects:actions.add', 'Add Project')
+          : t('projects:actions.edit', 'Edit project')}
+      </ModalHeader>
 
-        <ModalDescription className="mb-4">
-          {mode === 'add'
-            ? t(
-                'projects:description.add',
-                'Create a new project to organize your time tracking.',
-              )
-            : t('projects:description.edit', 'Update the project details.')}
-        </ModalDescription>
+      <ModalDescription className="mb-4">
+        {mode === 'add'
+          ? t(
+              'projects:description.add',
+              'Create a new project to organize your time tracking.',
+            )
+          : t('projects:description.edit', 'Update the project details.')}
+      </ModalDescription>
 
-        <form onSubmit={hookForm.handleSubmit(onSubmit)}>
-          <FormBody>
-            <Alert className="mb-4" variant="info">
-              {t(
-                'projects:info.uniqueNameRequired',
-                'Project names must be unique within your organisation.',
-              )}
-            </Alert>
-            <FieldSet>
-              <FormElement
-                htmlFor="projectKey"
-                label={t('projects:projectName', 'Project name')}
-                required
-              >
-                <Input
-                  aria-describedby="projectKey-error"
-                  autoComplete="off"
-                  data-testid="project-form-key-input"
-                  id="projectKey"
-                  {...hookForm.register('projectKey', {
-                    onChange: () => {
-                      if (hookForm.formState.errors.projectKey) {
-                        hookForm.clearErrors('projectKey')
-                      }
-                    },
-                  })}
-                />
-                <FormErrorBadge
-                  error={hookForm.formState.errors.projectKey}
-                  id="projectKey-error"
-                />
-              </FormElement>
-            </FieldSet>
-            <ButtonGroup>
-              <Button
-                className="relative z-0"
-                data-testid="project-form-save-btn"
-                disabled={isSubmitting}
-                type="submit"
-              >
-                {t('actions.save', 'Save')}
-              </Button>
-              <Button
-                data-testid="project-form-close-btn"
-                onClick={onCancel}
-                type="button"
-                variant="secondary"
-              >
-                {t('actions.cancel', 'Cancel')}
-              </Button>
-            </ButtonGroup>
-          </FormBody>
-        </form>
-      </div>
-    </FormProvider>
+      <form {...getFormProps(form)} onSubmit={handleSubmit}>
+        <FormBody>
+          <Alert className="mb-4" variant="info">
+            {t(
+              'projects:info.uniqueNameRequired',
+              'Project names must be unique within your organisation.',
+            )}
+          </Alert>
+          <FieldSet>
+            <FormField
+              autoComplete="off"
+              data-testid="project-form-key-input"
+              field={fields.projectKey}
+              label={t('projects:projectName', 'Project name')}
+              required
+            />
+          </FieldSet>
+          <ButtonGroup>
+            <Button
+              className="relative z-0"
+              data-testid="project-form-save-btn"
+              disabled={activeFetcher.isSubmitting}
+              type="submit"
+            >
+              {t('actions.save', 'Save')}
+            </Button>
+            <Button
+              data-testid="project-form-close-btn"
+              onClick={onCancel}
+              type="button"
+              variant="secondary"
+            >
+              {t('actions.cancel', 'Cancel')}
+            </Button>
+          </ButtonGroup>
+        </FormBody>
+      </form>
+    </div>
   )
 }

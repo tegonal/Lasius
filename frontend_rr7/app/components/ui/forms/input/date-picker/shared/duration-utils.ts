@@ -57,8 +57,8 @@ export function parseDuration(durationString: string): null | number {
   if (!match) return null
 
   const [, sign, hoursStr = '0', minutesStr = '0'] = match
-  const hours = parseInt(hoursStr, 10)
-  const minutes = parseInt(minutesStr, 10)
+  const hours = Number.parseInt(hoursStr, 10)
+  const minutes = Number.parseInt(minutesStr, 10)
 
   if (minutes >= 60) return null
 

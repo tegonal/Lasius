@@ -37,14 +37,14 @@ export const routeToHelpFile = (path: string): string => {
   }
 
   // Fallback: convert path to hyphenated name
-  let normalized = path.replace(/^\//, '').replace(/\//g, '-')
+  let normalized = path.replace(/^\//, '').replaceAll('/', '-')
 
   if (normalized === '') {
     return 'user-home'
   }
 
   // Handle dynamic route segments (React Router uses :param syntax)
-  normalized = normalized.replace(/:[^-/]+/g, 'dynamic')
+  normalized = normalized.replaceAll(/:[^-/]+/g, 'dynamic')
 
   return normalized
 }

@@ -42,13 +42,13 @@ const createBaseConfigSchema = (t: TFunction<'common' | 'integrations'>) => ({
   checkFrequency: z
     .number()
     .min(
-      60000,
+      60_000,
       t('issueImporters.validation.minInterval', {
         defaultValue: 'Minimum 1 minute',
       }),
     )
     .max(
-      86400000,
+      86_400_000,
       t('issueImporters.validation.maxInterval', {
         defaultValue: 'Maximum 24 hours',
       }),
@@ -120,7 +120,7 @@ export const createConfigSchema = (
   const baseSchema = createBaseConfigSchema(t)
 
   switch (importerType) {
-    case 'github':
+    case 'github': {
       return z.object({
         ...baseSchema,
         accessToken: credentialSchemas.accessToken(t, isEdit),
@@ -132,22 +132,25 @@ export const createConfigSchema = (
         ),
         resourceOwnerType: z.string().nullable().optional(),
       })
+    }
 
-    case 'gitlab':
+    case 'gitlab': {
       return z.object({
         ...baseSchema,
         accessToken: credentialSchemas.accessToken(t, isEdit),
       })
+    }
 
-    case 'jira':
+    case 'jira': {
       return z.object({
         ...baseSchema,
         accessToken: credentialSchemas.accessToken(t, isEdit),
         consumerKey: credentialSchemas.consumerKey(t),
         privateKey: credentialSchemas.privateKey(t, isEdit),
       })
+    }
 
-    case 'plane':
+    case 'plane': {
       return z.object({
         ...baseSchema,
         apiKey: credentialSchemas.apiKey(t, isEdit),
@@ -158,6 +161,7 @@ export const createConfigSchema = (
           }),
         ),
       })
+    }
   }
 }
 

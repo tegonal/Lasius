@@ -17,9 +17,11 @@
  *
  */
 
+import { useForm, useInputControl } from '@conform-to/react'
+import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
 import { useEffect, useMemo, useRef } from 'react'
-import { FormProvider, useForm } from 'react-hook-form'
 import { useSearchParams } from 'react-router'
+import { z } from 'zod'
 
 import { Loading } from '~/components/ui/data-display/loading'
 import { ColumnList } from '~/components/ui/layouts/column-list'
@@ -50,13 +52,29 @@ import { BookingHistoryFilter } from './booking-history-filter'
 import { BookingHistoryStats } from './booking-history-stats'
 import { BookingHistoryTable } from './booking-history-table'
 
-type FormValues = {
-  dateRange: string
-  from: string
-  projectId: string
-  tags: ModelsTag[]
-  to: string
-  userId: string
+const filterSchema = z.object({
+  dateRange: z.string().optional(),
+  from: z.string().optional(),
+  projectId: z.string().optional(),
+  tags: z.string().optional(),
+  to: z.string().optional(),
+  userId: z.string().optional(),
+})
+
+export type BookingHistoryControls = {
+  dateRange: InputControl
+  from: InputControl
+  projectId: InputControl
+  tags: InputControl
+  to: InputControl
+  userId: InputControl
+}
+
+type InputControl = {
+  blur: () => void
+  change: (value: string) => void
+  focus: () => void
+  value: string | undefined
 }
 
 type Props = {
@@ -85,47 +103,76 @@ export const BookingHistoryLayout = ({
     return userProjects.map((p) => p.projectReference)
   }, [projectsProp, userProjects])
 
-  const hookForm = useForm<FormValues>({
-    defaultValues: {
+  const [, fields] = useForm({
+    constraint: getZodConstraint(filterSchema),
+    defaultValue: {
       dateRange: '',
       from: formatISOLocale(new Date()),
       projectId: projectIdFromUrl,
-      tags: [],
+      tags: '',
       to: formatISOLocale(new Date()),
       userId: '',
     },
+    onValidate({ formData }) {
+      return parseWithZod(formData, { schema: filterSchema })
+    },
+    shouldRevalidate: 'onInput',
+    shouldValidate: 'onSubmit',
   })
 
-  // Sync form from/to to URL search params so the loader refetches
+  const controls: BookingHistoryControls = {
+    dateRange: useInputControl(fields.dateRange),
+    from: useInputControl(fields.from),
+    projectId: useInputControl(fields.projectId),
+    tags: useInputControl(fields.tags),
+    to: useInputControl(fields.to),
+    userId: useInputControl(fields.userId),
+  }
+
+  // Sync from/to to URL search params so the loader refetches
   const [, setSearchParams] = useSearchParams()
   const isInitialMount = useRef(true)
+  const prevFrom = useRef(controls.from.value)
+  const prevTo = useRef(controls.to.value)
 
   useEffect(() => {
-    const subscription = hookForm.watch((values, { name }) => {
-      if (name !== 'from' && name !== 'to') return
-      if (!values.from || !values.to) return
+    const fromVal = controls.from.value
+    const toVal = controls.to.value
 
-      // Skip the initial mount — the loader already has the right data
-      if (isInitialMount.current) {
-        isInitialMount.current = false
-        return
-      }
+    if (!fromVal || !toVal) return
+    if (fromVal === prevFrom.current && toVal === prevTo.current) return
 
-      setSearchParams(
-        (prev) => {
-          prev.set('from', values.from as string)
-          prev.set('to', values.to as string)
-          return prev
-        },
-        { replace: true },
-      )
-    })
-    return () => subscription.unsubscribe()
-  }, [hookForm, setSearchParams])
+    prevFrom.current = fromVal
+    prevTo.current = toVal
 
-  const tags = hookForm.watch('tags')
-  const projectId = hookForm.watch('projectId')
-  const userId = hookForm.watch('userId')
+    if (isInitialMount.current) {
+      isInitialMount.current = false
+      return
+    }
+
+    setSearchParams(
+      (prev) => {
+        prev.set('from', fromVal)
+        prev.set('to', toVal)
+        return prev
+      },
+      { replace: true },
+    )
+  }, [controls.from.value, controls.to.value, setSearchParams])
+
+  // Parse tags for filtering
+  const tags: ModelsTag[] = useMemo(() => {
+    const tagsJson = controls.tags.value
+    if (!tagsJson) return []
+    try {
+      return JSON.parse(tagsJson) as ModelsTag[]
+    } catch {
+      return []
+    }
+  }, [controls.tags.value])
+
+  const projectId = controls.projectId.value ?? ''
+  const userId = controls.userId.value ?? ''
 
   const processedItems = useMemo(
     () =>
@@ -167,7 +214,6 @@ export const BookingHistoryLayout = ({
   const showUserColumn = dataSource === 'organisationBookings'
   const exportContext = dataSource === 'userBookings' ? 'user' : 'organisation'
 
-  // Check if the project from URL is inactive (not in active suggestions)
   const inactiveProject = useMemo(() => {
     if (!projectIdFromUrl) return null
     const isActive = projectSuggestions.some((p) => p.id === projectIdFromUrl)
@@ -180,50 +226,51 @@ export const BookingHistoryLayout = ({
   }, [projectIdFromUrl, projectSuggestions, findProjectById])
 
   return (
-    <FormProvider {...hookForm}>
-      <ContextMenuProvider>
-        <ColumnCenter>
-          <div className="flex h-full flex-col overflow-hidden">
-            <div className="bg-base-200 flex flex-shrink-0 items-start justify-between p-4">
-              <BookingHistoryStats
-                bookings={summary.elements}
-                hours={summary.hours}
-                projects={distinctProjects}
-                users={distinctUsers}
-              />
-              <BookingHistoryExport
-                bookings={processedItems}
-                context={exportContext}
-                from={hookForm.watch('from')}
-                to={hookForm.watch('to')}
+    <ContextMenuProvider>
+      <ColumnCenter>
+        <div className="flex h-full flex-col overflow-hidden">
+          <div className="bg-base-200 flex flex-shrink-0 items-start justify-between p-4">
+            <BookingHistoryStats
+              bookings={summary.elements}
+              hours={summary.hours}
+              projects={distinctProjects}
+              users={distinctUsers}
+            />
+            <BookingHistoryExport
+              bookings={processedItems}
+              context={exportContext}
+              from={controls.from.value}
+              to={controls.to.value}
+            />
+          </div>
+          {bookings.length === 0 && isLoading && <Loading />}
+          <ScrollArea className="min-h-0 flex-1" onScroll={onScroll}>
+            <div className="pt-4">
+              <BookingHistoryTable
+                allowDelete={allowDelete}
+                allowEdit={allowEdit}
+                controls={controls}
+                items={visibleElements}
+                showUserColumn={showUserColumn}
               />
             </div>
-            {!bookings.length && isLoading && <Loading />}
-            <ScrollArea className="min-h-0 flex-1" onScroll={onScroll}>
-              <div className="pt-4">
-                <BookingHistoryTable
-                  allowDelete={allowDelete}
-                  allowEdit={allowEdit}
-                  items={visibleElements}
-                  showUserColumn={showUserColumn}
-                />
-              </div>
-            </ScrollArea>
-          </div>
-        </ColumnCenter>
-        <ColumnRight>
-          <ScrollArea className="h-full">
-            <ColumnList>
-              <BookingHistoryFilter
-                dataSource={dataSource}
-                inactiveProject={inactiveProject}
-                projects={projectSuggestions}
-                users={users}
-              />
-            </ColumnList>
           </ScrollArea>
-        </ColumnRight>
-      </ContextMenuProvider>
-    </FormProvider>
+        </div>
+      </ColumnCenter>
+      <ColumnRight>
+        <ScrollArea className="h-full">
+          <ColumnList>
+            <BookingHistoryFilter
+              controls={controls}
+              dataSource={dataSource}
+              fields={fields}
+              inactiveProject={inactiveProject}
+              projects={projectSuggestions}
+              users={users}
+            />
+          </ColumnList>
+        </ScrollArea>
+      </ColumnRight>
+    </ContextMenuProvider>
   )
 }

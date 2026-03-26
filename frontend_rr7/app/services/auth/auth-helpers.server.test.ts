@@ -30,7 +30,7 @@ import { type LasiusSessionData } from './types'
 const mockSession: LasiusSessionData = {
   accessToken: 'test-access-token',
   email: 'test@example.com',
-  expiresAt: Date.now() + 3600_000,
+  expiresAt: Date.now() + 3_600_000,
   issuedAt: Date.now(),
   refreshToken: 'test-refresh-token',
   tokenIssuer: 'keycloak',
@@ -82,11 +82,11 @@ describe('sanitizeReturnTo', () => {
   })
 
   it('rejects backslash paths', () => {
-    expect(sanitizeReturnTo('/\\evil.com')).toBe('/')
+    expect(sanitizeReturnTo(String.raw`/\evil.com`)).toBe('/')
   })
 
   it('rejects paths with embedded backslashes', () => {
-    expect(sanitizeReturnTo('/foo\\bar')).toBe('/')
+    expect(sanitizeReturnTo(String.raw`/foo\bar`)).toBe('/')
   })
 
   it('uses custom fallback', () => {

@@ -73,7 +73,7 @@ export const HealthMonitor = () => {
           onClose={() => {
             /* user dismissed — will not nag again until next version change */
           }}
-          onConfirm={() => window.location.reload()}
+          onConfirm={() => globalThis.location.reload()}
           open={versionDrift}
           title={t('system:pwa.updateAvailable', 'Update available')}
         />

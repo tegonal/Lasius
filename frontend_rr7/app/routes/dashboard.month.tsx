@@ -77,17 +77,17 @@ const computeStreamChartData = (
 
   // Create a map to store hours by day and week
   const hoursMap = new Map<string, Map<string, number>>()
-  weekDays.forEach((day) => {
+  for (const day of weekDays) {
     const weekMap = new Map<string, number>()
-    weeks.forEach((weekStart) => {
+    for (const weekStart of weeks) {
       const weekNum = getWeek(weekStart, { weekStartsOn: 1 })
       weekMap.set(`Week ${weekNum}`, 0)
-    })
+    }
     hoursMap.set(day, weekMap)
-  })
+  }
 
   // Process bookings and aggregate by day and week
-  bookings.forEach((booking) => {
+  for (const booking of bookings) {
     const bookingDate = new Date(booking.start.dateTime)
     const dayName = format(bookingDate, 'EEE')
     const weekNum = getWeek(bookingDate, { weekStartsOn: 1 })
@@ -98,34 +98,34 @@ const computeStreamChartData = (
       const hours = getModelsBookingSummary([booking]).hours
       dayMap.set(weekLabel, (dayMap.get(weekLabel) ?? 0) + hours)
     }
-  })
+  }
 
   // Convert map to Nivo format: array of 7 objects (one per weekday)
   const streamData: Record<string, number>[] = []
-  weekDays.forEach((day) => {
+  for (const day of weekDays) {
     const dayData: Record<string, number> = {}
     const dayMap = hoursMap.get(day)
     if (dayMap) {
-      dayMap.forEach((value, weekLabel) => {
+      for (const [weekLabel, value] of dayMap.entries()) {
         dayData[weekLabel] = Number(value.toFixed(2))
-      })
+      }
     }
     streamData.push(dayData)
-  })
+  }
 
   // Only include weeks that have non-zero booking hours
   const allKeys = new Set<string>()
-  streamData.forEach((dayData) => {
-    Object.keys(dayData).forEach((key) => {
+  for (const dayData of streamData) {
+    for (const key of Object.keys(dayData)) {
       if (key.startsWith('Week')) {
         const hasHours = streamData.some((d) => (d[key] as number) > 0)
         if (hasHours) {
           allKeys.add(key)
         }
       }
-    })
-  })
-  const streamKeys = Array.from(allKeys).sort((a, b) => a.localeCompare(b))
+    }
+  }
+  const streamKeys = [...allKeys].toSorted((a, b) => a.localeCompare(b))
 
   return { data: streamData, keys: streamKeys }
 }
@@ -159,7 +159,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const url = new URL(request.url)
   const dateParam = url.searchParams.get('date')
   const selectedDate =
-    dateParam && !isNaN(new Date(dateParam).getTime())
+    dateParam && !Number.isNaN(new Date(dateParam).getTime())
       ? dateParam
       : formatISOLocale(new Date())
 

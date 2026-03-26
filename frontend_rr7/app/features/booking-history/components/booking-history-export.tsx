@@ -55,7 +55,7 @@ export const BookingHistoryExport = ({
       message: t('export.status.success', 'Export successful: {{filename}}', {
         filename,
       }),
-      ttl: 60000,
+      ttl: 60_000,
       type: 'SUCCESS',
     })
   }
@@ -66,7 +66,7 @@ export const BookingHistoryExport = ({
         aria-haspopup="menu"
         aria-label={t('export.actions.openMenu', 'Open export format menu')}
         className="btn btn-sm btn-neutral w-auto"
-        disabled={bookings.length < 1}
+        disabled={bookings.length === 0}
         tabIndex={0}
         type="button"
       >

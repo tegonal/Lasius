@@ -84,7 +84,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const url = new URL(request.url)
   const dateParam = url.searchParams.get('date')
   const selectedDate =
-    dateParam && !isNaN(new Date(dateParam).getTime())
+    dateParam && !Number.isNaN(new Date(dateParam).getTime())
       ? dateParam
       : formatISOLocale(new Date())
 

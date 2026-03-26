@@ -132,7 +132,7 @@ export const exportBookingList = (
   // Apply time format to the duration column so it renders as [h]:mm in spreadsheets
   const keys = Object.keys(data[0] || {})
   const durationCol = keys.indexOf('duration')
-  if (durationCol >= 0 && ws['!ref']) {
+  if (durationCol !== -1 && ws['!ref']) {
     const range = XLSX.utils.decode_range(ws['!ref'])
     for (let row = range.s.r + 1; row <= range.e.r; row++) {
       const addr = XLSX.utils.encode_cell({ c: durationCol, r: row })
@@ -149,10 +149,13 @@ export const exportBookingList = (
   // Set column widths for better readability
   const init: Record<string, number> = {}
   const maxLengths = data.reduce((acc, row) => {
-    Object.keys(row).forEach((key) => {
+    for (const key of Object.keys(row)) {
       const value = String(row[key as keyof typeof row] || '')
-      acc[key] = Math.max(acc[key] || key.length, value.length)
-    })
+      acc[key] = Math.max(
+        (acc[key] ?? 0) > 0 ? (acc[key] ?? 0) : key.length,
+        value.length,
+      )
+    }
     return acc
   }, init)
 

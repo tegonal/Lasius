@@ -45,15 +45,15 @@ export const BookingCurrent = () => {
       className="bg-base-200 relative flex h-full min-h-[96px] w-full flex-row items-center gap-3 overflow-hidden px-2 py-3 sm:px-3 md:bg-transparent lg:px-4 [&>*]:w-full"
       data-testid="booking-current-section"
     >
-      {!currentBooking?.booking ? (
-        <NoBooking />
-      ) : (
+      {currentBooking?.booking ? (
         <ContextMenuProvider>
           <CurrentBookingEntry
             booking={currentBooking.booking}
             selectedOrgId={loaderData?.selectedOrgId ?? ''}
           />
         </ContextMenuProvider>
+      ) : (
+        <NoBooking />
       )}
     </div>
   )

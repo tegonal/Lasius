@@ -111,10 +111,10 @@ export const MonthStreamChart = ({
     const safeItem: any = {}
 
     // Add all week keys with their values
-    safeKeys.forEach((key) => {
+    for (const key of safeKeys) {
       const value = item[key]
-      safeItem[key] = !isNaN(value) ? value : 0
-    })
+      safeItem[key] = Number.isNaN(value) ? 0 : value
+    }
 
     return safeItem
   })

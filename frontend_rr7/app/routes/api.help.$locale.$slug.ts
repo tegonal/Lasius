@@ -41,8 +41,8 @@ export async function loader({ params }: Route.LoaderArgs) {
   }
 
   // Sanitize inputs to prevent path traversal
-  const safeLocale = locale.replace(/[^a-z-]/g, '')
-  const safeSlug = slug.replace(/[^a-z0-9-]/g, '')
+  const safeLocale = locale.replaceAll(/[^a-z-]/g, '')
+  const safeSlug = slug.replaceAll(/[^a-z0-9-]/g, '')
 
   const filePath = join(
     process.cwd(),

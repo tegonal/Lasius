@@ -104,8 +104,9 @@ const getCeilingValues = (
       const end = new Date(`${item.year}-12-31`)
       return getPlannedHoursForRange(start, end, plannedWorkingHours)
     }
-    default:
+    default: {
       return 0
+    }
   }
 }
 
@@ -114,7 +115,7 @@ export const getNivoChartDataFromApiStatsData = (
   granularity: Granularity,
   plannedWorkingHours?: null | PlannedWorkingHours,
 ) => {
-  if (data.length < 1) return undefined
+  if (data.length === 0) return
 
   const chartData: NivoChartDataType = data.map((cat) => {
     const categoryLabel = getCategoryLabel(cat.category, granularity)

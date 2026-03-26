@@ -56,7 +56,7 @@ export function createInputChangeHandler<T extends string>(
 
     // Replace alternative delimiters (e.g., '.' for ':' in time input)
     if (config.delimiter === ':' && newValue.includes('.')) {
-      newValue = newValue.replace(/\./g, config.delimiter)
+      newValue = newValue.replaceAll('.', config.delimiter)
     }
 
     const prevValue = inputValue
@@ -91,7 +91,7 @@ export function createInputChangeHandler<T extends string>(
             config.segmentPlaceholders[selectedSegment].length
 
           // Build the corrected value with the segment change
-          const parts = prevParts.slice()
+          const parts = [...prevParts]
           parts[segmentIndex] = newSegmentValue
           const updatedValue = parts.join(config.delimiter)
 

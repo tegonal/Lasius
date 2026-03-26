@@ -41,9 +41,7 @@ import {
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-// eslint-disable-next-line sonarjs/redundant-type-aliases -- semantic aliases improve readability
 export type ApiDateParam = string
-// eslint-disable-next-line sonarjs/redundant-type-aliases -- semantic aliases improve readability
 export type IsoDateString = string
 
 // ─── Constants ───────────────────────────────────────────────────────────────

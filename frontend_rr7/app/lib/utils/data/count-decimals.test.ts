@@ -46,7 +46,7 @@ describe('countDecimals', () => {
     })
 
     it('returns 5 for 3.14159', () => {
-      expect(countDecimals(3.14159)).toBe(5)
+      expect(countDecimals(3.141_59)).toBe(5)
     })
 
     it('returns 3 for 0.005', () => {

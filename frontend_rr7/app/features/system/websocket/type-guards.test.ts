@@ -47,7 +47,7 @@ describe('isWebSocketOutEvent', () => {
   it('returns false for non-objects', () => {
     expect(isWebSocketOutEvent('string')).toBe(false)
     expect(isWebSocketOutEvent(42)).toBe(false)
-    expect(isWebSocketOutEvent(undefined)).toBe(false)
+    expect(isWebSocketOutEvent()).toBe(false)
   })
 
   it('returns false for objects without type', () => {

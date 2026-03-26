@@ -40,13 +40,18 @@ type Props = {
   open: boolean
 }
 
-const formatDate = (dateString?: null | string) => {
+const formatDateString = (dateString?: null | string, locale?: string) => {
   if (!dateString) return 'N/A'
   try {
-    return new Date(dateString).toLocaleString()
+    return new Date(dateString).toLocaleString(locale)
   } catch {
     return dateString
   }
+}
+
+const FormattedDateOrNA = ({ date }: { date?: null | string }) => {
+  if (!date) return <>N/A</>
+  return <FormatDate date={date} format="fullDateLong" />
 }
 
 const getUserName = (user: ModelsUserStub | string | undefined): string => {
@@ -57,14 +62,18 @@ const getUserName = (user: ModelsUserStub | string | undefined): string => {
 
 const getConnectivityIcon = (status: string) => {
   switch (status) {
-    case 'degraded':
+    case 'degraded': {
       return { className: 'text-warning', icon: AlertCircle }
-    case 'failed':
+    }
+    case 'failed': {
       return { className: 'text-error', icon: XCircle }
-    case 'healthy':
+    }
+    case 'healthy': {
       return { className: 'text-success', icon: CheckCircle2 }
-    default:
+    }
+    default: {
       return { className: 'text-base-content/50', icon: Clock }
+    }
   }
 }
 
@@ -145,7 +154,7 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
                       {t('issueImporters.info.checkFrequencyValue', {
                         defaultValue: '{{minutes}} minutes',
                         minutes: Math.floor(
-                          (config.checkFrequency || 0) / 60000,
+                          (config.checkFrequency || 0) / 60_000,
                         ),
                       })}
                     </dd>
@@ -186,7 +195,9 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
                       {syncStatus.lastConnectivityCheck && (
                         <p className="text-base-content/60 text-xs">
                           {t('issueImporters.info.lastChecked', {
-                            date: formatDate(syncStatus.lastConnectivityCheck),
+                            date: formatDateString(
+                              syncStatus.lastConnectivityCheck,
+                            ),
                             defaultValue: 'Last checked: {{date}}',
                           })}
                         </p>
@@ -244,7 +255,9 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
                           })}
                         </dt>
                         <dd className="text-sm font-medium">
-                          {formatDate(syncStatus.lastSuccessfulSync)}
+                          <FormattedDateOrNA
+                            date={syncStatus.lastSuccessfulSync}
+                          />
                         </dd>
                       </div>
                     )}
@@ -256,7 +269,9 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
                           })}
                         </dt>
                         <dd className="text-sm font-medium">
-                          {formatDate(syncStatus.nextScheduledSync)}
+                          <FormattedDateOrNA
+                            date={syncStatus.nextScheduledSync}
+                          />
                         </dd>
                       </div>
                     )}
@@ -304,7 +319,7 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
                             {stat.totalIssuesSynced || 0}
                           </td>
                           <td className="text-base-content/70 text-sm">
-                            {formatDate(stat.lastSyncAt)}
+                            <FormattedDateOrNA date={stat.lastSyncAt} />
                           </td>
                         </tr>
                       ))}

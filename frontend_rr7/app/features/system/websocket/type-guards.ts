@@ -101,7 +101,7 @@ export function isUserTimeBookingHistoryEntryRemoved(
   return event.type === 'UserTimeBookingHistoryEntryRemoved'
 }
 
-export function isWebSocketOutEvent(data: unknown): data is WebSocketOutEvent {
+export function isWebSocketOutEvent(data?: unknown): data is WebSocketOutEvent {
   return typeof data === 'object' && data !== null && 'type' in data
 }
 

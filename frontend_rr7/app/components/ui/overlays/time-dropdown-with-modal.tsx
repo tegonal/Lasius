@@ -159,7 +159,9 @@ export const TimeDropdownWithModal = ({
                   max={24}
                   min={0}
                   onChange={(e) =>
-                    setCustomHours(Math.max(0, parseInt(e.target.value) || 0))
+                    setCustomHours(
+                      Math.max(0, Number.parseInt(e.target.value) || 0),
+                    )
                   }
                   type="number"
                   value={customHours}
@@ -176,7 +178,10 @@ export const TimeDropdownWithModal = ({
                   min={0}
                   onChange={(e) =>
                     setCustomMinutes(
-                      Math.max(0, Math.min(59, parseInt(e.target.value) || 0)),
+                      Math.max(
+                        0,
+                        Math.min(59, Number.parseInt(e.target.value) || 0),
+                      ),
                     )
                   }
                   type="number"

@@ -17,8 +17,9 @@
  *
  */
 
+import { subDays } from 'date-fns'
 import { ArrowLeft, Clock, Star, Users } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
@@ -29,9 +30,12 @@ import {
   IconTabs,
   type IconTabsItem,
 } from '~/components/ui/navigation/icon-tabs'
+import { formatISOLocale } from '~/lib/utils/dates'
 import { stringHash } from '~/lib/utils/string-hash'
+import { useGetOrganisationBookingList } from '~/services/api/lasius-hooks/organisation-bookings/organisation-bookings'
+import { useGetUserBookingListByOrganisation } from '~/services/api/lasius-hooks/user-bookings/user-bookings'
+import { useGetFavoriteBookingList } from '~/services/api/lasius-hooks/user-favorites/user-favorites'
 import { type ModelsBooking } from '~/services/api/lasius/modelsBooking'
-import { type ModelsBookingStub } from '~/services/api/lasius/modelsBookingStub'
 import { type ModelsTag } from '~/services/api/lasius/modelsTag'
 
 type PresetSelection = {
@@ -41,11 +45,9 @@ type PresetSelection = {
 }
 
 type Props = {
-  favorites: ModelsBookingStub[]
   onBack: () => void
   onSelect: (preset: PresetSelection) => void
-  orgBookings: ModelsBooking[]
-  recentBookings: ModelsBooking[]
+  selectedOrgId: string
 }
 
 const EmptyState = () => {
@@ -108,31 +110,52 @@ const AnimatedItem = ({
   </div>
 )
 
-const RecentBookingsList = ({
-  items,
-  onSelect,
-}: {
-  items: ModelsBooking[]
-  onSelect: (preset: PresetSelection) => void
-}) => {
-  const { t } = useTranslation()
-
-  if (!items.length) return <EmptyState />
-
-  // Deduplicate by project + tags
+const deduplicateBookings = (items: ModelsBooking[], limit = 20) => {
   const seen = new Set<string>()
   const unique: ModelsBooking[] = []
   for (const booking of items) {
     const key = `${booking.projectReference.id}-${booking.tags
       .map((tag) => tag.id)
-      .sort((a, b) => a.localeCompare(b))
+      .toSorted((a, b) => a.localeCompare(b))
       .join(',')}`
     if (!seen.has(key)) {
       seen.add(key)
       unique.push(booking)
-      if (unique.length >= 20) break
+      if (unique.length >= limit) break
     }
   }
+  return unique
+}
+
+const RecentBookingsList = ({
+  onSelect,
+  selectedOrgId,
+}: {
+  onSelect: (preset: PresetSelection) => void
+  selectedOrgId: string
+}) => {
+  const { t } = useTranslation()
+  const recentApi = useGetUserBookingListByOrganisation()
+  const submitRef = useRef(recentApi.submit)
+  submitRef.current = recentApi.submit
+
+  useEffect(() => {
+    if (selectedOrgId) {
+      const now = new Date()
+      submitRef.current({
+        orgId: selectedOrgId,
+        params: {
+          from: formatISOLocale(subDays(now, 7)),
+          to: formatISOLocale(now),
+        },
+      })
+    }
+  }, [selectedOrgId])
+
+  const items = recentApi.data ?? []
+  const unique = deduplicateBookings(items)
+
+  if (unique.length === 0) return <EmptyState />
 
   return (
     <AnimatedList>
@@ -167,15 +190,26 @@ const RecentBookingsList = ({
 }
 
 const FavoritesList = ({
-  items,
   onSelect,
+  selectedOrgId,
 }: {
-  items: ModelsBookingStub[]
   onSelect: (preset: PresetSelection) => void
+  selectedOrgId: string
 }) => {
   const { t } = useTranslation()
+  const favoritesApi = useGetFavoriteBookingList()
+  const submitRef = useRef(favoritesApi.submit)
+  submitRef.current = favoritesApi.submit
 
-  if (!items.length) return <EmptyState />
+  useEffect(() => {
+    if (selectedOrgId) {
+      submitRef.current({ orgId: selectedOrgId })
+    }
+  }, [selectedOrgId])
+
+  const items = favoritesApi.data?.favorites ?? []
+
+  if (items.length === 0) return <EmptyState />
 
   return (
     <AnimatedList>
@@ -210,30 +244,34 @@ const FavoritesList = ({
 }
 
 const TeamBookingsList = ({
-  items,
   onSelect,
+  selectedOrgId,
 }: {
-  items: ModelsBooking[]
   onSelect: (preset: PresetSelection) => void
+  selectedOrgId: string
 }) => {
   const { t } = useTranslation()
+  const orgBookingsApi = useGetOrganisationBookingList()
+  const submitRef = useRef(orgBookingsApi.submit)
+  submitRef.current = orgBookingsApi.submit
 
-  if (!items.length) return <EmptyState />
-
-  // Deduplicate by project + tags
-  const seen = new Set<string>()
-  const unique: ModelsBooking[] = []
-  for (const booking of items) {
-    const key = `${booking.projectReference.id}-${booking.tags
-      .map((tag) => tag.id)
-      .sort((a, b) => a.localeCompare(b))
-      .join(',')}`
-    if (!seen.has(key)) {
-      seen.add(key)
-      unique.push(booking)
-      if (unique.length >= 20) break
+  useEffect(() => {
+    if (selectedOrgId) {
+      const now = new Date()
+      submitRef.current({
+        orgId: selectedOrgId,
+        params: {
+          from: formatISOLocale(subDays(now, 7)),
+          to: formatISOLocale(now),
+        },
+      })
     }
-  }
+  }, [selectedOrgId])
+
+  const items = orgBookingsApi.data ?? []
+  const unique = deduplicateBookings(items)
+
+  if (unique.length === 0) return <EmptyState />
 
   return (
     <AnimatedList>
@@ -273,11 +311,9 @@ const TeamBookingsList = ({
 }
 
 export const BookingPresetSelector = ({
-  favorites,
   onBack,
   onSelect,
-  orgBookings,
-  recentBookings,
+  selectedOrgId,
 }: Props) => {
   const { t } = useTranslation()
   const [selectedTab, setSelectedTab] = useState(0)
@@ -285,20 +321,24 @@ export const BookingPresetSelector = ({
   const tabs: IconTabsItem[] = [
     {
       component: (
-        <RecentBookingsList items={recentBookings} onSelect={onSelect} />
+        <RecentBookingsList onSelect={onSelect} selectedOrgId={selectedOrgId} />
       ),
       icon: Clock,
       id: 'recent',
       name: t('bookings:presets.recent', 'Recent bookings'),
     },
     {
-      component: <FavoritesList items={favorites} onSelect={onSelect} />,
+      component: (
+        <FavoritesList onSelect={onSelect} selectedOrgId={selectedOrgId} />
+      ),
       icon: Star,
       id: 'favorites',
       name: t('bookings:presets.favorites', 'Favorites'),
     },
     {
-      component: <TeamBookingsList items={orgBookings} onSelect={onSelect} />,
+      component: (
+        <TeamBookingsList onSelect={onSelect} selectedOrgId={selectedOrgId} />
+      ),
       icon: Users,
       id: 'team',
       name: t('bookings:presets.team', 'Team bookings'),

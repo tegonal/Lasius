@@ -17,10 +17,11 @@
  *
  */
 
-import { addSeconds, isFuture } from 'date-fns'
+import { getFormProps, useForm, useInputControl } from '@conform-to/react'
+import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
+import { addSeconds } from 'date-fns'
 import { ArrowDownToLine } from 'lucide-react'
-import { useCallback, useEffect, useMemo } from 'react'
-import { FormProvider, useForm } from 'react-hook-form'
+import { useCallback, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
@@ -31,28 +32,30 @@ import { FormElement } from '~/components/ui/forms/form-element'
 import { InputDatePicker } from '~/components/ui/forms/input/date-picker/input-date-picker'
 import { InputTagsAutocomplete } from '~/components/ui/forms/input/input-tags-autocomplete'
 import { ProjectSelect } from '~/components/ui/forms/input/project-select'
-import { useBookingFormData } from '~/features/bookings/hooks/use-booking-form-data'
+import {
+  createBookingEditRunningSchema,
+  parseTagsFromFormData,
+} from '~/features/bookings/lib/booking-schemas'
+import { useProjects } from '~/features/projects/hooks/use-projects'
+import { type SchemaTranslationFn } from '~/lib/i18n-types'
 import { formatISOLocale } from '~/lib/utils/dates'
 import {
   type ModelsCurrentUserTimeBooking,
   type ModelsTag,
 } from '~/services/api/lasius'
 import { useUpdateUserBooking } from '~/services/api/lasius-hooks/user-bookings/user-bookings'
+import { useGetTagsByProject } from '~/services/api/lasius-hooks/user-organisations/user-organisations'
 
 type BookingEditRunningProps = {
   item: ModelsCurrentUserTimeBooking
+  latestBooking?: null | { end?: { dateTime: string } }
   onClose: () => void
   selectedOrgId: string
 }
 
-type FormValues = {
-  projectId: string
-  start: string
-  tags: ModelsTag[]
-}
-
 export const BookingEditRunning = ({
   item,
+  latestBooking,
   onClose,
   selectedOrgId,
 }: BookingEditRunningProps) => {
@@ -63,65 +66,77 @@ export const BookingEditRunning = ({
     },
   })
 
-  const hookForm = useForm<FormValues>({
-    defaultValues: {
-      projectId: '',
-      start: '',
-      tags: [],
-    },
-    mode: 'onChange',
-  })
-
   const booking = item.booking
 
-  const watchedProjectId = hookForm.watch('projectId')
-  const { projects, projectTags, recentBookings } = useBookingFormData(
-    selectedOrgId,
-    watchedProjectId,
+  // Projects from layout loader
+  const { userProjects } = useProjects()
+  const projects = userProjects.map((p) => p.projectReference)
+
+  // Tags via Orval hook
+  const tagsApi = useGetTagsByProject()
+  const tagsSubmitRef = useRef(tagsApi.submit)
+  tagsSubmitRef.current = tagsApi.submit
+  const prevProjectKeyRef = useRef('')
+
+  const schema = createBookingEditRunningSchema(
+    t as unknown as SchemaTranslationFn,
   )
 
-  // Derive latest completed booking from recent bookings for start-time preset
-  const latestBooking = useMemo(() => {
-    const completed = recentBookings.filter((b) => b.end?.dateTime)
-    if (completed.length === 0) return null
-    return completed.reduce(
-      (latest, b) =>
-        new Date(b.end!.dateTime) > new Date(latest!.end!.dateTime)
-          ? b
-          : latest,
-      completed[0],
-    )
-  }, [recentBookings])
+  const [form, fields] = useForm({
+    constraint: getZodConstraint(schema),
+    defaultValue: {
+      projectId: booking?.projectReference.id ?? '',
+      start: booking ? formatISOLocale(new Date(booking.start.dateTime)) : '',
+      tags: booking?.tags ? JSON.stringify(booking.tags) : '',
+    },
+    onValidate({ formData }) {
+      return parseWithZod(formData, { schema })
+    },
+    shouldRevalidate: 'onInput',
+    shouldValidate: 'onSubmit',
+  })
 
-  // Initialize form values from the running booking
+  const projectIdControl = useInputControl(fields.projectId)
+  const tagsControl = useInputControl(fields.tags)
+  const startControl = useInputControl(fields.start)
+
+  // Load tags when project changes
+  useEffect(() => {
+    const pid = projectIdControl.value
+    const key = `${selectedOrgId}:${pid}`
+    if (selectedOrgId && pid && key !== prevProjectKeyRef.current) {
+      prevProjectKeyRef.current = key
+      tagsSubmitRef.current({ orgId: selectedOrgId, projectId: pid })
+    }
+  }, [selectedOrgId, projectIdControl.value])
+
+  const projectTags = tagsApi.data ?? []
+
+  // Re-initialize form values when booking changes
   useEffect(() => {
     if (booking) {
-      hookForm.setValue('projectId', booking.projectReference.id)
-      hookForm.setValue('tags', booking.tags)
-      hookForm.setValue(
-        'start',
-        formatISOLocale(new Date(booking.start.dateTime)),
+      projectIdControl.change(booking.projectReference.id)
+      tagsControl.change(
+        booking.tags.length > 0 ? JSON.stringify(booking.tags) : '',
       )
-      void hookForm.trigger()
+      startControl.change(formatISOLocale(new Date(booking.start.dateTime)))
     }
   }, [
-    hookForm,
     booking,
     booking?.projectReference.id,
     booking?.tags,
     booking?.start.dateTime,
+    projectIdControl,
+    startControl,
+    tagsControl,
   ])
 
   // Auto-focus tags when project changes
   useEffect(() => {
-    const subscription = hookForm.watch((value, { name }) => {
-      if (name === 'projectId' && value.projectId) {
-        hookForm.setFocus('tags')
-        void hookForm.trigger()
-      }
-    })
-    return () => subscription.unsubscribe()
-  }, [hookForm])
+    if (projectIdControl.value && fields.tags.id) {
+      document.querySelector<HTMLElement>(`#${fields.tags.id}`)?.focus()
+    }
+  }, [projectIdControl.value, fields.tags.id])
 
   const presetStart = latestBooking?.end
     ? {
@@ -137,12 +152,16 @@ export const BookingEditRunning = ({
     : {}
 
   const onSubmit = useCallback(
-    (formValues: FormValues) => {
-      const { projectId, start, tags = [] } = formValues
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault()
+      const formData = new FormData(e.currentTarget)
+      const result = parseWithZod(formData, { schema })
+      if (result.status !== 'success') return
 
-      if (!projectId || !booking) {
-        return
-      }
+      const { projectId, start, tags: tagsJson } = result.value
+      const tags = parseTagsFromFormData(tagsJson) as unknown as ModelsTag[]
+
+      if (!projectId || !booking) return
 
       updateBookingApi.submit({
         body: {
@@ -154,73 +173,71 @@ export const BookingEditRunning = ({
         orgId: selectedOrgId,
       })
     },
-    [selectedOrgId, booking, updateBookingApi],
+    [selectedOrgId, booking, updateBookingApi, schema],
   )
 
   return (
     <div className="relative w-full">
-      <FormProvider {...hookForm}>
-        <form onSubmit={hookForm.handleSubmit(onSubmit)}>
-          <FormBody>
-            <FieldSet>
-              <FormElement
-                htmlFor="projectId"
-                label={t('projects:label', 'Project')}
-                required
-              >
-                <ProjectSelect
-                  fallbackProject={booking?.projectReference}
-                  id="projectId"
-                  name="projectId"
-                  projects={projects}
-                  required
-                />
-              </FormElement>
-              <FormElement
-                htmlFor="tags"
-                label={t('tag-manager:label', 'Tags')}
-              >
-                <InputTagsAutocomplete
-                  id="tags"
-                  name="tags"
-                  suggestions={projectTags}
-                />
-              </FormElement>
-              <FormElement htmlFor="start" label={t('time.starts', 'Starts')}>
-                <InputDatePicker
-                  name="start"
-                  rules={{
-                    validate: {
-                      startInPast: (v: string) =>
-                        !isFuture(new Date(v)) ||
-                        t(
-                          'validation.startMustBeInPast',
-                          'Start time must be in the past',
-                        ),
-                    },
-                  }}
-                  withDate={false}
-                  withTime={true}
-                  {...presetStart}
-                />
-              </FormElement>
-            </FieldSet>
-            <ButtonGroup>
-              <Button loading={updateBookingApi.isSubmitting} type="submit">
-                {t('actions.save', 'Save')}
-              </Button>
-              <Button
-                disabled={updateBookingApi.isSubmitting}
-                onClick={onClose}
-                type="button"
-                variant="secondary"
-              >
-                {t('actions.close', 'Close')}
-              </Button>
-            </ButtonGroup>
-          </FormBody>
-        </form>
-      </FormProvider>
+      <form {...getFormProps(form)} onSubmit={onSubmit}>
+        <FormBody>
+          <FieldSet>
+            <FormElement
+              htmlFor={fields.projectId.id}
+              label={t('projects:label', 'Project')}
+              required
+            >
+              <ProjectSelect
+                errors={fields.projectId.errors}
+                fallbackProject={booking?.projectReference}
+                id={fields.projectId.id}
+                name={fields.projectId.name}
+                onChange={(id) => projectIdControl.change(id)}
+                projects={projects}
+                value={projectIdControl.value ?? ''}
+              />
+            </FormElement>
+            <FormElement
+              htmlFor={fields.tags.id}
+              label={t('tag-manager:label', 'Tags')}
+            >
+              <InputTagsAutocomplete
+                field={fields.tags}
+                id={fields.tags.id}
+                suggestions={projectTags}
+              />
+            </FormElement>
+            <FormElement
+              htmlFor={fields.start.id}
+              label={t('time.starts', 'Starts')}
+            >
+              <InputDatePicker
+                field={fields.start}
+                withDate={false}
+                withTime={true}
+                {...presetStart}
+              />
+            </FormElement>
+          </FieldSet>
+          <ButtonGroup>
+            <Button
+              data-testid="booking-edit-running-save-btn"
+              loading={updateBookingApi.isSubmitting}
+              type="submit"
+            >
+              {t('actions.save', 'Save')}
+            </Button>
+            <Button
+              data-testid="booking-edit-running-close-btn"
+              disabled={updateBookingApi.isSubmitting}
+              onClick={onClose}
+              type="button"
+              variant="secondary"
+            >
+              {t('actions.close', 'Close')}
+            </Button>
+          </ButtonGroup>
+        </FormBody>
+      </form>
     </div>
   )
 }

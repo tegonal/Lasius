@@ -17,6 +17,7 @@
  *
  */
 
+import { type FieldMetadata, useInputControl } from '@conform-to/react'
 import {
   Combobox,
   ComboboxInput,
@@ -24,11 +25,11 @@ import {
   ComboboxOptions,
 } from '@headlessui/react'
 import { XCircleIcon } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { Controller, useFormContext } from 'react-hook-form'
+import { useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Tag, TagList } from '~/components/ui/data-display/tag-list'
+import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { DropdownList } from '~/components/ui/forms/input/shared/dropdown-list'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { cleanStrForCmp } from '~/lib/utils/strings'
@@ -40,7 +41,7 @@ type ModelsTagWithSummary = ModelsTag & { summary?: string }
 const noop = () => {}
 
 const sortById = (items: ModelsTag[]) =>
-  [...items].sort((a, b) => a.id.localeCompare(b.id))
+  [...items].toSorted((a, b) => a.id.localeCompare(b.id))
 
 const differenceById = (
   arr: ModelsTagWithSummary[],
@@ -59,69 +60,58 @@ const uniqById = (arr: ModelsTag[]): ModelsTag[] => {
   })
 }
 
-type Props = {
+type InputTagsAutocompleteProps = {
+  field: FieldMetadata<string>
   id?: string
-  name: string
+  /** Context value for projectId — in Conform mode there's no shared form context */
+  projectId?: string
   suggestions: ModelsTag[] | undefined
 }
 
-export const InputTagsAutocomplete = ({
+/**
+ * Shared combobox UI for tag selection — receives tags and callbacks from mode-specific wrapper.
+ */
+const TagsComboboxCore = ({
   id,
-  name,
+  inputRef,
+  onTagsChange,
+  projectId,
+  selectedTags,
   suggestions = [],
-}: Props) => {
+}: {
+  id?: string
+  inputRef: React.RefObject<HTMLInputElement | null>
+  onTagsChange: (tags: ModelsTag[]) => void
+  projectId: string | undefined
+  selectedTags: ModelsTag[]
+  suggestions: ModelsTag[] | undefined
+}) => {
   const { t } = useTranslation('common')
-  const parentFormContext = useFormContext()
-
   const [inputText, setInputText] = useState<string>('')
-  const [selectedTags, setSelectedTags] = useState<ModelsTag[]>([])
   const [isFocused, setIsFocused] = useState<boolean>(false)
-  const inputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => {
-    if (!parentFormContext) return () => null
-    const subscription = parentFormContext.watch(
-      (value, { name: fieldname }) => {
-        if (name === fieldname && Array.isArray(value[name])) {
-          setSelectedTags(value[name] as ModelsTag[])
-        }
-      },
-    )
-    return () => subscription.unsubscribe()
-  }, [name, parentFormContext])
-
-  // Get the current projectId from the form
-  const projectId = parentFormContext?.watch('projectId') as string | undefined
-
-  // Show all tags when focused with a project selected and no input text
-  // Otherwise filter by input text
   const filteredSuggestions = differenceById(
     suggestions as ModelsTagWithSummary[],
     selectedTags ?? [],
   ).filter((tag: ModelsTagWithSummary) => {
-    // If no input text, show all tags
-    if (!inputText) {
-      return true
-    }
-    // Otherwise filter by input text
+    if (!inputText) return true
     return (
       cleanStrForCmp(tag.summary || '').includes(cleanStrForCmp(inputText)) ||
       cleanStrForCmp(tag.id).includes(cleanStrForCmp(inputText))
     )
   })
 
-  // Separate platform tags (importers) from non-platform tags
   const { nonPlatformTags, platformTags } = useMemo(() => {
     const nonPlatform: ModelsTag[] = []
     const platform: ModelsTag[] = []
 
-    filteredSuggestions.forEach((tag: ModelsTag) => {
+    for (const tag of filteredSuggestions) {
       if (isImporterTag(tag)) {
         platform.push(tag)
       } else {
         nonPlatform.push(tag)
       }
-    })
+    }
 
     return {
       nonPlatformTags: sortById(nonPlatform),
@@ -130,18 +120,13 @@ export const InputTagsAutocomplete = ({
   }, [filteredSuggestions])
 
   const removeTag = (tag: ModelsTag) => {
-    const tags = selectedTags.filter((s) => s.id !== tag.id)
-    setSelectedTags(tags)
-    parentFormContext.setValue(name, tags)
+    onTagsChange(selectedTags.filter((s) => s.id !== tag.id))
   }
 
   const handleChange = (newTags: ModelsTag[]) => {
     const tags = uniqById(newTags)
     setInputText('')
-    setSelectedTags(tags)
-    parentFormContext.setValue(name, tags)
-    // Refocus the input to allow continuous tag entry
-    // Use setTimeout to ensure the focus happens after any blur events
+    onTagsChange(tags)
     setTimeout(() => {
       inputRef.current?.focus()
     }, 0)
@@ -150,12 +135,10 @@ export const InputTagsAutocomplete = ({
   const inputTag: ModelsSimpleTag = { id: inputText, type: 'SimpleTag' }
 
   const displayCreateTag =
-    inputText.length > 0 && !selectedTags.find((s) => s && s.id === inputText)
+    inputText.length > 0 && !selectedTags.some((s) => s && s.id === inputText)
 
   const hasAnySuggestions =
     nonPlatformTags.length > 0 || platformTags.length > 0
-
-  if (!parentFormContext) return null
 
   const inputValueChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputText(e.currentTarget.value)
@@ -169,108 +152,137 @@ export const InputTagsAutocomplete = ({
         </div>
       )}
       <div className="relative">
-        <Controller
-          control={parentFormContext.control}
-          name={name}
-          render={({ field }) => (
-            <Combobox multiple onChange={handleChange} value={selectedTags}>
-              {({ open }) => (
-                <>
-                  <ComboboxInput
-                    autoComplete="off"
-                    className="input input-bordered w-full pr-10 text-sm"
-                    displayValue={() => inputText}
-                    id={id || name}
-                    onBlur={() => setIsFocused(false)}
-                    onChange={inputValueChanged}
-                    onFocus={() => setIsFocused(true)}
-                    placeholder={t('tag-manager:chooseOrEnter', {
-                      defaultValue: 'Choose or enter tags',
-                    })}
-                    ref={(el: HTMLInputElement | null) => {
-                      inputRef.current = el
-                      field.ref(el)
-                    }}
-                    value={inputText}
-                  />
-                  {inputText && (
-                    <div
-                      className="hover:text-accent absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer"
-                      onClick={() => setInputText('')}
-                    >
-                      <LucideIcon icon={XCircleIcon} size={20} />
-                    </div>
-                  )}
-                  <ComboboxOptions
-                    as="div"
-                    static={isFocused && !!projectId && !open}
-                  >
-                    {(open || (isFocused && projectId)) &&
-                      (displayCreateTag || hasAnySuggestions) && (
-                        <DropdownList className="flex flex-wrap gap-0 px-2">
-                          {displayCreateTag && (
-                            <ComboboxOption
-                              as="div"
-                              className="mb-2 flex w-fit basis-full items-center gap-2 p-1"
-                              key="create_tag"
-                              value={inputTag}
-                            >
-                              {({ focus }) => (
-                                <>
-                                  <div className="text-sm">{`${t('tag-manager:customTag', { defaultValue: 'Custom tag' })}: `}</div>
-                                  <Tag
-                                    active={focus}
-                                    clickHandler={noop}
-                                    hideRemoveIcon
-                                    item={inputTag}
-                                  />
-                                </>
-                              )}
-                            </ComboboxOption>
-                          )}
-                          {nonPlatformTags.map((item: ModelsTag) => (
-                            <ComboboxOption
-                              as="div"
-                              className="w-fit p-1"
-                              key={item.id}
-                              value={item}
-                            >
-                              {({ focus }: { focus: boolean }) => (
-                                <Tag
-                                  active={focus}
-                                  clickHandler={noop}
-                                  hideRemoveIcon
-                                  item={item}
-                                />
-                              )}
-                            </ComboboxOption>
-                          ))}
-                          {platformTags.map((item: ModelsTag) => (
-                            <ComboboxOption
-                              as="div"
-                              className="w-fit p-1"
-                              key={item.id}
-                              value={item}
-                            >
-                              {({ focus }: { focus: boolean }) => (
-                                <Tag
-                                  active={focus}
-                                  clickHandler={noop}
-                                  hideRemoveIcon
-                                  item={item}
-                                />
-                              )}
-                            </ComboboxOption>
-                          ))}
-                        </DropdownList>
-                      )}
-                  </ComboboxOptions>
-                </>
+        <Combobox multiple onChange={handleChange} value={selectedTags}>
+          {({ open }) => (
+            <>
+              <ComboboxInput
+                autoComplete="off"
+                className="input input-bordered w-full pr-10 text-sm"
+                displayValue={() => inputText}
+                id={id}
+                onBlur={() => setIsFocused(false)}
+                onChange={inputValueChanged}
+                onFocus={() => setIsFocused(true)}
+                placeholder={t('tag-manager:chooseOrEnter', {
+                  defaultValue: 'Choose or enter tags',
+                })}
+                ref={inputRef}
+                value={inputText}
+              />
+              {inputText && (
+                <div
+                  className="hover:text-accent absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer"
+                  onClick={() => setInputText('')}
+                >
+                  <LucideIcon icon={XCircleIcon} size={20} />
+                </div>
               )}
-            </Combobox>
+              <ComboboxOptions
+                as="div"
+                static={isFocused && !!projectId && !open}
+              >
+                {(open || (isFocused && projectId)) &&
+                  (displayCreateTag || hasAnySuggestions) && (
+                    <DropdownList className="flex flex-wrap gap-0 px-2">
+                      {displayCreateTag && (
+                        <ComboboxOption
+                          as="div"
+                          className="mb-2 flex w-fit basis-full items-center gap-2 p-1"
+                          key="create_tag"
+                          value={inputTag}
+                        >
+                          {({ focus }) => (
+                            <>
+                              <div className="text-sm">{`${t('tag-manager:customTag', { defaultValue: 'Custom tag' })}: `}</div>
+                              <Tag
+                                active={focus}
+                                clickHandler={noop}
+                                hideRemoveIcon
+                                item={inputTag}
+                              />
+                            </>
+                          )}
+                        </ComboboxOption>
+                      )}
+                      {nonPlatformTags.map((item: ModelsTag) => (
+                        <ComboboxOption
+                          as="div"
+                          className="w-fit p-1"
+                          key={item.id}
+                          value={item}
+                        >
+                          {({ focus }: { focus: boolean }) => (
+                            <Tag
+                              active={focus}
+                              clickHandler={noop}
+                              hideRemoveIcon
+                              item={item}
+                            />
+                          )}
+                        </ComboboxOption>
+                      ))}
+                      {platformTags.map((item: ModelsTag) => (
+                        <ComboboxOption
+                          as="div"
+                          className="w-fit p-1"
+                          key={item.id}
+                          value={item}
+                        >
+                          {({ focus }: { focus: boolean }) => (
+                            <Tag
+                              active={focus}
+                              clickHandler={noop}
+                              hideRemoveIcon
+                              item={item}
+                            />
+                          )}
+                        </ComboboxOption>
+                      ))}
+                    </DropdownList>
+                  )}
+              </ComboboxOptions>
+            </>
           )}
-        />
+        </Combobox>
       </div>
     </div>
+  )
+}
+
+export const InputTagsAutocomplete = ({
+  field,
+  id,
+  projectId,
+  suggestions,
+}: InputTagsAutocompleteProps) => {
+  const control = useInputControl(field)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const selectedTags: ModelsTag[] = useMemo(() => {
+    if (!control.value) return []
+    try {
+      return JSON.parse(control.value) as ModelsTag[]
+    } catch {
+      return []
+    }
+  }, [control.value])
+
+  const handleTagsChange = (tags: ModelsTag[]) => {
+    control.change(tags.length > 0 ? JSON.stringify(tags) : '')
+  }
+
+  return (
+    <>
+      <input name={field.name} type="hidden" value={control.value ?? ''} />
+      <TagsComboboxCore
+        id={id || field.id}
+        inputRef={inputRef}
+        onTagsChange={handleTagsChange}
+        projectId={projectId}
+        selectedTags={selectedTags}
+        suggestions={suggestions}
+      />
+      <FormFieldErrors errors={field.errors} />
+    </>
   )
 }

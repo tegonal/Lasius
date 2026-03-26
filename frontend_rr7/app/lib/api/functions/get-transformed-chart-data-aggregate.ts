@@ -28,7 +28,7 @@ export const getTransformedChartDataAggregate = (
   limit = -1,
 ) => {
   const first = data?.[0]
-  if (!first || first.values.length < 1) return { data: undefined }
+  if (!first || first.values.length === 0) return { data: undefined }
   const keys = first.values.map((item) => item.label)
   const chartData = first.values
     .map((item) => ({

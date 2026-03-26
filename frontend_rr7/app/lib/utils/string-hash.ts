@@ -29,11 +29,11 @@ function hashCode(str: string | undefined) {
     return hash
   }
   for (let i = 0, len = str.length; i < len; i += 1) {
-    const chr = str.charCodeAt(i)
+    const chr = str.codePointAt(i) ?? 0
 
     hash = (hash << 5) - hash + chr
 
-    hash |= 0 // Convert to 32bit integer
+    hash = Math.trunc(hash) // Convert to 32bit integer
   }
   return hash
 }
@@ -47,7 +47,7 @@ export const stringHash = (anything: unknown): string => {
   return hashCode(
     JSON.stringify(
       anything,
-      Object.keys(anything as object).sort((a, b) => a.localeCompare(b)),
+      Object.keys(anything as object).toSorted((a, b) => a.localeCompare(b)),
     ),
   ).toString()
 }

@@ -48,8 +48,8 @@ export const DevInfoBadge = () => {
       if (diffMs <= 0) {
         setTokenTime('EXPIRED')
       } else {
-        const m = Math.floor(diffMs / 60000)
-        const s = Math.floor((diffMs % 60000) / 1000)
+        const m = Math.floor(diffMs / 60_000)
+        const s = Math.floor((diffMs % 60_000) / 1000)
         setTokenTime(`${m}m ${s}s`)
       }
     } catch {
@@ -64,13 +64,11 @@ export const DevInfoBadge = () => {
   }, [updateTokenTime])
 
   useEffect(() => {
-    const theme = document.documentElement.getAttribute('data-theme') || 'light'
+    const theme = document.documentElement.dataset.theme || 'light'
     setColorMode(theme)
 
     const observer = new MutationObserver(() => {
-      setColorMode(
-        document.documentElement.getAttribute('data-theme') || 'light',
-      )
+      setColorMode(document.documentElement.dataset.theme || 'light')
     })
     observer.observe(document.documentElement, {
       attributeFilter: ['data-theme'],

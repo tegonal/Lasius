@@ -17,11 +17,10 @@
  *
  */
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import { type TFunction } from 'i18next'
+import { getFormProps, getInputProps, useForm } from '@conform-to/react'
+import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
 import { Eye, EyeOff } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 
@@ -36,12 +35,14 @@ import { FieldSet } from '~/components/ui/forms/field-set'
 import { FormBody } from '~/components/ui/forms/form-body'
 import { FormElement } from '~/components/ui/forms/form-element'
 import { FormElementSpacer } from '~/components/ui/forms/form-element-spacer'
-import { FormErrorBadge } from '~/components/ui/forms/form-error-badge'
+import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { preventEnterOnForm } from '~/components/ui/forms/input/prevent-enter-on-form'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+import { validateFormData } from '~/lib/conform-helpers'
+import { type SchemaTranslationFn, untyped } from '~/lib/i18n-types'
 import { useUpdateUserPassword } from '~/services/api/lasius-hooks/oauth2-provider/oauth2-provider'
 
-const createPasswordChangeSchema = (t: TFunction) =>
+const createPasswordChangeSchema = (t: SchemaTranslationFn) =>
   z
     .object({
       confirmPassword: z.string().min(1, {
@@ -55,7 +56,6 @@ const createPasswordChangeSchema = (t: TFunction) =>
           ctx.addIssue({
             code: 'custom',
             message: t('validation.passwordTooShort', 'Minimum 9 characters'),
-            params: { type: 'notEnoughCharactersPassword' },
           })
         }
         if (!/[A-Z]/.test(val)) {
@@ -65,14 +65,12 @@ const createPasswordChangeSchema = (t: TFunction) =>
               'validation.missingUppercase',
               'Must contain uppercase letter',
             ),
-            params: { type: 'noUppercase' },
           })
         }
         if (!/\d/.test(val)) {
           ctx.addIssue({
             code: 'custom',
             message: t('validation.missingNumber', 'Must contain a number'),
-            params: { type: 'noNumber' },
           })
         }
       }),
@@ -89,25 +87,26 @@ type AccountSecurityFormProps = {
   demoMode: boolean
 }
 
-type PasswordFormData = z.infer<ReturnType<typeof createPasswordChangeSchema>>
-
 export const AccountSecurityForm = ({ demoMode }: AccountSecurityFormProps) => {
   const { t } = useTranslation('settings')
   const [showPasswords, setShowPasswords] = useState(false)
   const { addToast } = useToast()
 
-  const schema = useMemo(() => createPasswordChangeSchema(t), [t])
+  const schema = useMemo(() => createPasswordChangeSchema(untyped(t)), [t])
 
-  const hookForm = useForm<PasswordFormData>({
-    criteriaMode: 'all',
-    defaultValues: { confirmPassword: '', newPassword: '', password: '' },
-    mode: 'onSubmit',
-    resolver: zodResolver(schema),
+  const [form, fields] = useForm({
+    constraint: getZodConstraint(schema),
+    defaultValue: { confirmPassword: '', newPassword: '', password: '' },
+    onValidate({ formData }) {
+      return parseWithZod(formData, { schema })
+    },
+    shouldRevalidate: 'onInput',
+    shouldValidate: 'onSubmit',
   })
 
   const passwordApi = useUpdateUserPassword({
     onSuccess: () => {
-      hookForm.reset()
+      form.reset()
       addToast({
         message: t('account.status.passwordUpdated', 'Password updated'),
         type: 'SUCCESS',
@@ -115,7 +114,9 @@ export const AccountSecurityForm = ({ demoMode }: AccountSecurityFormProps) => {
     },
   })
 
-  const onSubmit = (data: PasswordFormData) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
     if (demoMode) {
       addToast({
         message: t(
@@ -126,10 +127,16 @@ export const AccountSecurityForm = ({ demoMode }: AccountSecurityFormProps) => {
       })
       return
     }
-    const submitArgs: Parameters<typeof passwordApi.submit>[0] = {
-      body: { newPassword: data.newPassword, password: data.password },
-    }
-    passwordApi.submit(submitArgs)
+
+    const result = validateFormData(e.currentTarget, schema)
+    if (result.status !== 'success') return
+
+    passwordApi.submit({
+      body: {
+        newPassword: result.value.newPassword,
+        password: result.value.password,
+      },
+    })
   }
 
   const handleTogglePasswordsVisible = (e: { preventDefault: () => void }) => {
@@ -137,77 +144,66 @@ export const AccountSecurityForm = ({ demoMode }: AccountSecurityFormProps) => {
     setShowPasswords(!showPasswords)
   }
 
-  // Extract multiple errors from newPassword (superRefine produces array)
-  const newPasswordErrors = hookForm.formState.errors.newPassword
-  const newPasswordMessages: string[] = []
-  if (newPasswordErrors) {
-    if (newPasswordErrors.message) {
-      newPasswordMessages.push(newPasswordErrors.message)
-    }
-    // criteriaMode: 'all' puts additional errors in .types
-    if (newPasswordErrors.types) {
-      for (const msg of Object.values(newPasswordErrors.types)) {
-        if (typeof msg === 'string' && !newPasswordMessages.includes(msg)) {
-          newPasswordMessages.push(msg)
-        }
-      }
-    }
-  }
+  const passwordType = showPasswords ? 'text' : 'password'
 
   return (
     <div className="mx-auto w-full max-w-2xl">
       <Card>
         <CardBody className="p-6">
           <form
+            {...getFormProps(form)}
             onKeyDown={(e) => preventEnterOnForm(e)}
-            onSubmit={hookForm.handleSubmit(onSubmit)}
+            onSubmit={handleSubmit}
           >
             <FormBody>
               <FieldSet>
                 <FormElement>
-                  <Label htmlFor="password">
+                  <Label htmlFor={fields.password.id}>
                     {t('forms.password', 'Password')}
                   </Label>
                   <Input
-                    {...hookForm.register('password')}
+                    {...getInputProps(fields.password, { type: passwordType })}
                     autoComplete="off"
-                    type={showPasswords ? 'text' : 'password'}
+                    key={fields.password.key}
                   />
-                  <FormErrorBadge error={hookForm.formState.errors.password} />
+                  <FormFieldErrors errors={fields.password.errors} />
                 </FormElement>
                 <FormElementSpacer />
                 <FormElement>
-                  <Label htmlFor="newPassword">
+                  <Label htmlFor={fields.newPassword.id}>
                     {t('forms.newPassword', 'New password')}
                   </Label>
                   <Input
-                    {...hookForm.register('newPassword')}
+                    {...getInputProps(fields.newPassword, {
+                      type: passwordType,
+                    })}
                     autoComplete="off"
-                    type={showPasswords ? 'text' : 'password'}
+                    key={fields.newPassword.key}
                   />
-                  {newPasswordMessages.length > 0 && (
-                    <div className="-mt-2 flex flex-col gap-1">
-                      {newPasswordMessages.map((msg) => (
-                        <div className="badge badge-warning" key={msg}>
-                          <ErrorSign />
-                          {msg}
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  {fields.newPassword.errors &&
+                    fields.newPassword.errors.length > 0 && (
+                      <div className="-mt-2 flex flex-col gap-1">
+                        {fields.newPassword.errors.map((msg) => (
+                          <div className="badge badge-warning" key={msg}>
+                            <ErrorSign />
+                            {msg}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                 </FormElement>
                 <FormElement>
-                  <Label htmlFor="confirmPassword">
+                  <Label htmlFor={fields.confirmPassword.id}>
                     {t('forms.confirmNewPassword', 'Confirm new password')}
                   </Label>
                   <Input
-                    {...hookForm.register('confirmPassword')}
+                    {...getInputProps(fields.confirmPassword, {
+                      type: passwordType,
+                    })}
                     autoComplete="off"
-                    type={showPasswords ? 'text' : 'password'}
+                    key={fields.confirmPassword.key}
                   />
-                  <FormErrorBadge
-                    error={hookForm.formState.errors.confirmPassword}
-                  />
+                  <FormFieldErrors errors={fields.confirmPassword.errors} />
                 </FormElement>
                 <FormElement>
                   <Button

@@ -76,9 +76,9 @@ export const Text = React.forwardRef<HTMLElement, TextProps>(
         : ''
 
     const anchorStyles =
-      variant !== 'footer'
-        ? '[&_a]:text-base-content [&_a:hover]:text-base-content [&_a:hover]:no-underline [&_a:visited]:text-base-content'
-        : ''
+      variant === 'footer'
+        ? ''
+        : '[&_a]:text-base-content [&_a:hover]:text-base-content [&_a:hover]:no-underline [&_a:visited]:text-base-content'
 
     const combinedClassName = cn(
       textVariants({ variant }),
