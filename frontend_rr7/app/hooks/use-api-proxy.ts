@@ -23,6 +23,7 @@ import { useFetcher } from 'react-router'
 import { type ProxyEnvelope } from '~/routes/api.proxy'
 
 export type ApiProxyOptions<TResponse> = {
+  fetcherKey?: string
   onError?: (error: { error: string; status: number }) => void
   onSuccess?: (data: TResponse) => void
 }
@@ -60,7 +61,9 @@ export function useApiProxy<
   TBody = undefined,
   TParams = Record<string, never>,
 >(config: ApiProxyConfig<TParams>, options?: ApiProxyOptions<TResponse>) {
-  const fetcher = useFetcher<ProxyEnvelope<TResponse>>()
+  const fetcher = useFetcher<ProxyEnvelope<TResponse>>(
+    options?.fetcherKey ? { key: options.fetcherKey } : undefined,
+  )
   const fetcherSubmit = fetcher.submit
   const submittedRef = useRef(false)
   const onSuccessRef = useRef(options?.onSuccess)

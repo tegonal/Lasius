@@ -197,7 +197,9 @@ const FavoritesList = ({
   selectedOrgId: string
 }) => {
   const { t } = useTranslation()
-  const favoritesApi = useGetFavoriteBookingList()
+  const favoritesApi = useGetFavoriteBookingList({
+    fetcherKey: selectedOrgId ? `favorites:${selectedOrgId}` : undefined,
+  })
   const submitRef = useRef(favoritesApi.submit)
   submitRef.current = favoritesApi.submit
 
