@@ -18,7 +18,7 @@
  */
 
 /* eslint-disable react-compiler/react-compiler -- Form integration effects have intentionally partial deps */
-import { type FieldMetadata, useInputControl } from '@conform-to/react'
+import { type FieldMetadata } from '@conform-to/react'
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
 import { isEqual } from 'date-fns'
 import {
@@ -46,10 +46,12 @@ import {
 
 export type InputDatePickerProps = {
   field: FieldMetadata<string>
+  onChange?: (isoString: string) => void
   onRenderLabelAction?: (resetButton: React.ReactNode) => void
   presetDate?: IsoDateString
   presetIcon?: LucideIconType
   presetLabel?: string
+  value?: string
   withDate?: boolean
   withTime?: boolean
 }
@@ -59,21 +61,22 @@ export const InputDatePicker = (props: InputDatePickerProps) => {
 
   return (
     <DatePickerStoreContext.Provider value={store}>
-      <ConformDatePickerBridge {...props} />
+      <DatePickerBridge {...props} />
     </DatePickerStoreContext.Provider>
   )
 }
 
-const ConformDatePickerBridge = ({
+const DatePickerBridge = ({
   field,
+  onChange,
   onRenderLabelAction,
   presetDate,
   presetIcon,
   presetLabel,
+  value: externalValue,
   withDate = true,
   withTime = true,
 }: InputDatePickerProps) => {
-  const control = useInputControl(field)
   const {
     getISOString,
     resetToInitial,
@@ -84,39 +87,44 @@ const ConformDatePickerBridge = ({
   const isInitializedRef = useRef(false)
   const initialDateRef = useRef<Date | null>(null)
 
+  // The effective value — from parent's useInputControl or fall back to field default
+  const fieldValue = externalValue ?? ''
+
   // Initialize store from field value only once
   useEffect(() => {
-    if (!isInitializedRef.current && control.value) {
-      setFromISOString(control.value)
-      setInitialValue(control.value)
-      const initialDate = new Date(control.value)
+    if (!isInitializedRef.current && fieldValue) {
+      setFromISOString(fieldValue)
+      setInitialValue(fieldValue)
+      const initialDate = new Date(fieldValue)
       if (!Number.isNaN(initialDate.getTime())) {
         initialDateRef.current = initialDate
       }
       isInitializedRef.current = true
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [control.value])
+  }, [fieldValue])
 
-  // Sync external field value changes to store
+  // Sync external value changes to store (e.g. duration changed the end time)
   useEffect(() => {
     if (!isInitializedRef.current) return
     const currentISOString = getISOString()
-    if (control.value !== currentISOString && control.value) {
-      setFromISOString(control.value)
+    if (fieldValue !== currentISOString && fieldValue) {
+      setFromISOString(fieldValue)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [control.value])
+  }, [fieldValue])
 
-  // Update field value when store produces a valid date
+  // Update parent when store produces a valid date
   useEffect(() => {
     if (!isInitializedRef.current) return
 
     if (value.isValid && !value.isPartial) {
       const isoString = getISOString()
-      control.change(isoString || '')
+      if (isoString && onChange) {
+        onChange(isoString)
+      }
     } else if (!value.dateString && !value.timeString) {
-      control.change('')
+      onChange?.('')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getISOString()])
@@ -124,13 +132,13 @@ const ConformDatePickerBridge = ({
   const handlePresetClick = () => {
     if (presetDate) {
       setFromISOString(presetDate)
-      control.change(presetDate)
+      onChange?.(presetDate)
     }
   }
 
   return (
     <>
-      <input name={field.name} type="hidden" value={control.value ?? ''} />
+      <input name={field.name} type="hidden" value={fieldValue} />
       <DatePickerUI
         initialDateRef={initialDateRef}
         onPresetClick={handlePresetClick}

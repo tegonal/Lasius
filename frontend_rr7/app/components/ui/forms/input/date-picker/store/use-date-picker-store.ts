@@ -22,6 +22,8 @@ import { createContext, useContext } from 'react'
 import { createStore, type StoreApi, useStore } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
 
+import { formatISOLocale } from '~/lib/utils/dates'
+
 import {
   formatDateString,
   formatTimeString,
@@ -100,7 +102,7 @@ export const createDatePickerStore = () =>
       getISOString: () => {
         const { date, isPartial, isValid } = get().value
         if (!date || !isValid || isPartial) return null
-        return date.toISOString()
+        return formatISOLocale(date)
       },
       incrementDays: (amount) => {
         const { date } = get().value

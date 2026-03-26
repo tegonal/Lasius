@@ -430,7 +430,9 @@ export const BookingAddUpdateForm = ({
                   >
                     <InputDatePicker
                       field={fields.start}
+                      onChange={(v) => startControl.change(v)}
                       onRenderLabelAction={setStartResetButton}
+                      value={startControl.value ?? ''}
                       {...presetStart}
                     />
                   </FormElement>
@@ -441,7 +443,9 @@ export const BookingAddUpdateForm = ({
                   >
                     <InputDatePicker
                       field={fields.end}
+                      onChange={(v) => endControl.change(v)}
                       onRenderLabelAction={setEndResetButton}
+                      value={endControl.value ?? ''}
                       {...presetEnd}
                     />
                   </FormElement>

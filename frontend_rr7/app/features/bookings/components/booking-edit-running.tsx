@@ -212,6 +212,8 @@ export const BookingEditRunning = ({
             >
               <InputDatePicker
                 field={fields.start}
+                onChange={(v) => startControl.change(v)}
+                value={startControl.value ?? ''}
                 withDate={false}
                 withTime={true}
                 {...presetStart}

@@ -21,6 +21,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Input } from '~/components/primitives/inputs/input'
+import { formatISOLocale } from '~/lib/utils/dates'
 
 import {
   getSegmentBounds,
@@ -144,7 +145,7 @@ const DurationInputCore = ({
     if (startValue && newDurationMinutes >= 0) {
       const startDate = new Date(startValue)
       const newEndDate = addMinutesToDate(startDate, newDurationMinutes)
-      onEndChange(newEndDate.toISOString())
+      onEndChange(formatISOLocale(newEndDate))
     }
   }
 

@@ -112,10 +112,20 @@ export const DateRangeFilter = ({
         />
       </FormElement>
       <FormElement htmlFor={fromField.id} label={t('time.from', 'From')}>
-        <InputDatePicker field={fromField} withDate />
+        <InputDatePicker
+          field={fromField}
+          onChange={(v) => fromControl.change(v)}
+          value={fromControl.value ?? ''}
+          withDate
+        />
       </FormElement>
       <FormElement htmlFor={toField.id} label={t('time.to', 'To')}>
-        <InputDatePicker field={toField} withDate />
+        <InputDatePicker
+          field={toField}
+          onChange={(v) => toControl.change(v)}
+          value={toControl.value ?? ''}
+          withDate
+        />
       </FormElement>
     </FormBody>
   )
