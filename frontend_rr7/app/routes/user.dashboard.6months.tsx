@@ -23,70 +23,38 @@ import { data } from 'react-router'
 
 import { StatsOverviewGrid } from '~/features/dashboard/components/stats-overview-grid'
 import { TopProjectsCard } from '~/features/dashboard/components/top-projects-card'
+import { dashboardClientLoader } from '~/features/dashboard/dashboard-loader'
+import {
+  computeDashboardStats,
+  dashboardResponseHeaders,
+  loadDashboardContext,
+} from '~/features/dashboard/dashboard-loader.server'
 import { WeeklyTrendChart } from '~/features/stats/components/weekly-trend-chart'
 import { aggregateProjectHours } from '~/lib/api/functions/aggregate-project-hours'
 import { computeWorkHealthMetrics } from '~/lib/api/functions/compute-work-health-metrics.server'
-import { getExpectedVsBookedPercentage } from '~/lib/api/functions/get-expected-vs-booked-percentage'
-import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
 import {
   getPlannedHoursForRange,
   getWeeklyPlannedHours,
 } from '~/lib/api/functions/get-planned-working-hours'
-import { formatDateTimeToURLParam, formatISOLocale } from '~/lib/utils/dates'
-import { cachedServerLoader } from '~/lib/utils/loader-cache'
+import { formatDateTimeToURLParam } from '~/lib/utils/dates'
 import {
   getUserBookingAggregatedStatsByOrganisation,
   getUserBookingListByOrganisation,
 } from '~/services/api/lasius/user-bookings/user-bookings'
-import { getUserProfile } from '~/services/api/lasius/user/user'
-import {
-  authHeaders,
-  mergeAuthHeaders,
-  requireUser,
-} from '~/services/auth/auth-helpers.server'
 
-import { type Route } from './+types/dashboard.6months'
+import { type Route } from './+types/user.dashboard.6months'
 
 // ─── Client Loader (cache unless full-page refresh) ──────────────────────────
 
-export const clientLoader = async ({
-  request,
-  serverLoader,
-}: Route.ClientLoaderArgs) => cachedServerLoader(request, serverLoader)
+export const clientLoader = async (args: Route.ClientLoaderArgs) =>
+  dashboardClientLoader(args)
 clientLoader.hydrate = false
 
 // ─── Loader ──────────────────────────────────────────────────────────────────
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const auth = await requireUser(request)
-  const headers = authHeaders(auth.session)
-
-  const profile = await getUserProfile({ headers })
-  const user = profile.data
-
-  // Determine selected org
-  const organisations = user.organisations ?? []
-  const selectedOrgId =
-    user.settings?.lastSelectedOrganisation?.id ??
-    organisations.find((o) => o.private)?.organisationReference.id ??
-    organisations[0]?.organisationReference.id ??
-    ''
-
-  // Extract planned working hours for the selected org
-  const selectedOrg = organisations.find(
-    (o) => o.organisationReference.id === selectedOrgId,
-  )
-  const plannedHours = selectedOrg?.plannedWorkingHours
-    ? { ...selectedOrg.plannedWorkingHours }
-    : null
-
-  // Read selected date from URL search param, fall back to today
-  const url = new URL(request.url)
-  const dateParam = url.searchParams.get('date')
-  const selectedDate =
-    dateParam && !Number.isNaN(new Date(dateParam).getTime())
-      ? dateParam
-      : formatISOLocale(new Date())
+  const ctx = await loadDashboardContext(request)
+  const { headers, plannedHours, selectedDate, selectedOrgId } = ctx
 
   const dateObj = new Date(selectedDate)
   const rangeStart = subWeeks(dateObj, 26)
@@ -127,33 +95,19 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   )
 
   // Compute summary stats
-  const summary = getModelsBookingSummary(bookings)
   const expectedHours = getPlannedHoursForRange(
     rangeStart,
     dateObj,
     plannedHours,
   )
-  const { fulfilledPercentage } = getExpectedVsBookedPercentage(
-    expectedHours,
-    summary.hours,
-  )
+  const stats = computeDashboardStats(bookings, expectedHours)
 
   // Aggregate top 5 projects
   const topProjects = aggregateProjectHours(projectStats, 5)
 
   return data(
-    {
-      selectedDate,
-      stats: {
-        bookings: summary.elements,
-        expectedHours,
-        fulfilledPercentage,
-        hours: summary.hours,
-      },
-      topProjects,
-      weeklyData,
-    },
-    { headers: mergeAuthHeaders(auth) },
+    { selectedDate, stats, topProjects, weeklyData },
+    { headers: dashboardResponseHeaders(ctx.auth) },
   )
 }
 

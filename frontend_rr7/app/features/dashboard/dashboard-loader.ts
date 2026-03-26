@@ -17,12 +17,16 @@
  *
  */
 
-import { redirect } from 'react-router'
+import { cachedServerLoader } from '~/lib/utils/loader-cache'
 
-import { type Route } from './+types/dashboard._index'
-
-export const loader = ({ request }: Route.LoaderArgs) => {
-  const url = new URL(request.url)
-  const search = url.search || ''
-  throw redirect(`/user/dashboard/month${search}`)
-}
+/**
+ * Shared client loader for all dashboard period routes.
+ * Client-safe — must NOT be in a .server.ts file.
+ */
+export const dashboardClientLoader = async <T>({
+  request,
+  serverLoader,
+}: {
+  request: Request
+  serverLoader: () => Promise<T>
+}) => cachedServerLoader(request, serverLoader)

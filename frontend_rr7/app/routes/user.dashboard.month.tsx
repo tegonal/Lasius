@@ -30,33 +30,29 @@ import { data } from 'react-router'
 import { FormatDate } from '~/components/ui/data-display/format-date'
 import { StatsOverviewGrid } from '~/features/dashboard/components/stats-overview-grid'
 import { TopProjectsCard } from '~/features/dashboard/components/top-projects-card'
+import { dashboardClientLoader } from '~/features/dashboard/dashboard-loader'
+import {
+  computeDashboardStats,
+  dashboardResponseHeaders,
+  loadDashboardContext,
+} from '~/features/dashboard/dashboard-loader.server'
 import { MonthStreamChart } from '~/features/stats/components/month-stream-chart'
 import { aggregateProjectHours } from '~/lib/api/functions/aggregate-project-hours'
-import { getExpectedVsBookedPercentage } from '~/lib/api/functions/get-expected-vs-booked-percentage'
 import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
 import { getPlannedHoursForRange } from '~/lib/api/functions/get-planned-working-hours'
-import { apiTimespanMonth, formatISOLocale } from '~/lib/utils/dates'
-import { cachedServerLoader } from '~/lib/utils/loader-cache'
+import { apiTimespanMonth } from '~/lib/utils/dates'
 import { type ModelsBooking } from '~/services/api/lasius'
 import {
   getUserBookingAggregatedStatsByOrganisation,
   getUserBookingListByOrganisation,
 } from '~/services/api/lasius/user-bookings/user-bookings'
-import { getUserProfile } from '~/services/api/lasius/user/user'
-import {
-  authHeaders,
-  mergeAuthHeaders,
-  requireUser,
-} from '~/services/auth/auth-helpers.server'
 
-import { type Route } from './+types/dashboard.month'
+import { type Route } from './+types/user.dashboard.month'
 
 // ─── Client Loader (cache unless full-page refresh) ──────────────────────────
 
-export const clientLoader = async ({
-  request,
-  serverLoader,
-}: Route.ClientLoaderArgs) => cachedServerLoader(request, serverLoader)
+export const clientLoader = async (args: Route.ClientLoaderArgs) =>
+  dashboardClientLoader(args)
 clientLoader.hydrate = false
 
 // ─── Stream chart computation ────────────────────────────────────────────────
@@ -133,35 +129,8 @@ const computeStreamChartData = (
 // ─── Loader ──────────────────────────────────────────────────────────────────
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const auth = await requireUser(request)
-  const headers = authHeaders(auth.session)
-
-  const profile = await getUserProfile({ headers })
-  const user = profile.data
-
-  // Determine selected org
-  const organisations = user.organisations ?? []
-  const selectedOrgId =
-    user.settings?.lastSelectedOrganisation?.id ??
-    organisations.find((o) => o.private)?.organisationReference.id ??
-    organisations[0]?.organisationReference.id ??
-    ''
-
-  // Extract planned working hours for the selected org
-  const selectedOrg = organisations.find(
-    (o) => o.organisationReference.id === selectedOrgId,
-  )
-  const plannedHours = selectedOrg?.plannedWorkingHours
-    ? { ...selectedOrg.plannedWorkingHours }
-    : null
-
-  // Read selected date from URL search param, fall back to today
-  const url = new URL(request.url)
-  const dateParam = url.searchParams.get('date')
-  const selectedDate =
-    dateParam && !Number.isNaN(new Date(dateParam).getTime())
-      ? dateParam
-      : formatISOLocale(new Date())
+  const ctx = await loadDashboardContext(request)
+  const { headers, plannedHours, selectedDate, selectedOrgId } = ctx
 
   const monthTimespan = apiTimespanMonth(selectedDate)
   const dateObj = new Date(selectedDate)
@@ -189,16 +158,12 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const projectStats = projectStatsRes.data ?? []
 
   // Compute month summary
-  const summary = getModelsBookingSummary(monthBookings)
   const expectedHours = getPlannedHoursForRange(
     monthStartDate,
     monthEndDate,
     plannedHours,
   )
-  const { fulfilledPercentage } = getExpectedVsBookedPercentage(
-    expectedHours,
-    summary.hours,
-  )
+  const stats = computeDashboardStats(monthBookings, expectedHours)
 
   // Aggregate top projects
   const topProjects = aggregateProjectHours(projectStats, 5)
@@ -207,18 +172,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const streamChart = computeStreamChartData(monthBookings, selectedDate)
 
   return data(
-    {
-      selectedDate,
-      stats: {
-        bookings: summary.elements,
-        expectedHours,
-        fulfilledPercentage,
-        hours: summary.hours,
-      },
-      streamChart,
-      topProjects,
-    },
-    { headers: mergeAuthHeaders(auth) },
+    { selectedDate, stats, streamChart, topProjects },
+    { headers: dashboardResponseHeaders(ctx.auth) },
   )
 }
 

@@ -34,9 +34,9 @@ import {
   useRouteLoaderData,
 } from 'react-router'
 
-import { DataLoadingProgress } from '~/components/features/system/data-loading-progress'
 import { ToastProvider } from '~/components/ui/feedback/toasts'
 import { HelpDrawer } from '~/features/help/components/help-drawer'
+import { DataLoadingProgress } from '~/features/system/components/data-loading-progress'
 import { localeCookie } from '~/lib/cookies/i18next-cookie.server'
 import { parseThemeCookie } from '~/lib/cookies/theme-cookie.server'
 import { logger } from '~/lib/logger'

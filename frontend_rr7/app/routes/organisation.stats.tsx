@@ -18,12 +18,7 @@
  */
 
 import { useTranslation } from 'react-i18next'
-import {
-  data,
-  href,
-  Outlet,
-  type ShouldRevalidateFunctionArgs,
-} from 'react-router'
+import { data, href, Outlet } from 'react-router'
 
 import {
   ColumnCenter,
@@ -35,84 +30,23 @@ import { StatsExport } from '~/features/stats/components/stats-export'
 import { StatsFilter } from '~/features/stats/components/stats-filter'
 import { StatsOverview } from '~/features/stats/components/stats-overview'
 import { StatsTabs } from '~/features/stats/components/stats-tabs'
-import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
-import { dateOptions } from '~/lib/utils/date/date-options'
-import { apiTimespanFromTo } from '~/lib/utils/dates'
-import { ModelsUserOrganisationRole } from '~/services/api/lasius/modelsUserOrganisationRole'
-import { getOrganisationBookingList } from '~/services/api/lasius/organisation-bookings/organisation-bookings'
-import { getUserProfile } from '~/services/api/lasius/user/user'
 import {
-  authHeaders,
-  mergeAuthHeaders,
-  requireUser,
-} from '~/services/auth/auth-helpers.server'
+  loadOrgStatsContext,
+  statsResponseHeaders,
+} from '~/features/stats/stats-loader.server'
+import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
+import { apiTimespanFromTo } from '~/lib/utils/dates'
+import { getOrganisationBookingList } from '~/services/api/lasius/organisation-bookings/organisation-bookings'
 
 import { type Route } from './+types/organisation.stats'
 
 // ─── Revalidation ────────────────────────────────────────────────────────────
 
-/** Only revalidate when date range search params change */
-export const shouldRevalidate = ({
-  currentUrl,
-  defaultShouldRevalidate,
-  formMethod,
-  nextUrl,
-}: ShouldRevalidateFunctionArgs) => {
-  if (formMethod) return defaultShouldRevalidate
-  const currentFrom = currentUrl.searchParams.get('from')
-  const currentTo = currentUrl.searchParams.get('to')
-  const currentDateRange = currentUrl.searchParams.get('dateRange')
-  const nextFrom = nextUrl.searchParams.get('from')
-  const nextTo = nextUrl.searchParams.get('to')
-  const nextDateRange = nextUrl.searchParams.get('dateRange')
-  if (
-    currentFrom === nextFrom &&
-    currentTo === nextTo &&
-    currentDateRange === nextDateRange
-  ) {
-    return false
-  }
-  return defaultShouldRevalidate
-}
-
 // ─── Loader ──────────────────────────────────────────────────────────────────
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const auth = await requireUser(request)
-  const headers = authHeaders(auth.session)
-
-  const profile = await getUserProfile({ headers })
-  const user = profile.data
-
-  // Determine selected org
-  const organisations = user.organisations ?? []
-  const selectedOrgId =
-    user.settings?.lastSelectedOrganisation?.id ??
-    organisations.find((o) => o.private)?.organisationReference.id ??
-    organisations[0]?.organisationReference.id ??
-    ''
-
-  // Check admin role
-  const selectedOrg = organisations.find(
-    (o) => o.organisationReference.id === selectedOrgId,
-  )
-  const isAdmin =
-    selectedOrg?.role === ModelsUserOrganisationRole.OrganisationAdministrator
-
-  if (!isAdmin) {
-    throw new Response('Forbidden', { status: 403 })
-  }
-
-  // Read date range from URL search params or compute defaults
-  const url = new URL(request.url)
-  let from = url.searchParams.get('from')
-  let to = url.searchParams.get('to')
-
-  if (!from || !to) {
-    const defaultRange = dateOptions[0]?.dateRangeFn(new Date())
-    from = defaultRange?.from ?? ''
-    to = defaultRange?.to ?? ''
-  }
+  const ctx = await loadOrgStatsContext(request)
+  const { from, headers, selectedOrgId, to } = ctx
 
   // Compute API params
   const timespan = apiTimespanFromTo(from, to)
@@ -143,7 +77,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
       selectedOrgId,
       to,
     },
-    { headers: mergeAuthHeaders(auth) },
+    { headers: statsResponseHeaders(ctx.auth) },
   )
 }
 
@@ -228,3 +162,5 @@ const OrgStatsLayout = ({ loaderData }: Route.ComponentProps) => {
 }
 
 export default OrgStatsLayout
+
+export { statsShouldRevalidate as shouldRevalidate } from '~/features/stats/stats-loader'

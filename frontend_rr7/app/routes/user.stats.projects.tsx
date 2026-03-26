@@ -17,91 +17,40 @@
  *
  */
 
-import { data, type ShouldRevalidateFunctionArgs } from 'react-router'
+import { data } from 'react-router'
 
 import { ChartErrorBoundary } from '~/features/stats/components/error-boundary-chart'
 import { StatsCircleCategoryRange } from '~/features/stats/components/stats-circle-category-range'
 import { StatsProjectStream } from '~/features/stats/components/stats-project-stream'
+import { statsClientLoader } from '~/features/stats/stats-loader'
+import {
+  loadStatsContext,
+  statsResponseHeaders,
+} from '~/features/stats/stats-loader.server'
 import {
   getAdaptiveGranularity,
   shouldUseBarChart,
 } from '~/lib/api/config/granularity-config'
 import { getNivoChartDataFromApiStatsData } from '~/lib/api/functions/get-nivo-chart-data-from-api-stats-data'
 import { getTransformedChartDataAggregate } from '~/lib/api/functions/get-transformed-chart-data-aggregate'
-import { dateOptions } from '~/lib/utils/date/date-options'
 import { apiDatespanFromTo } from '~/lib/utils/dates'
-import { cachedServerLoader } from '~/lib/utils/loader-cache'
 import { getUserBookingAggregatedStatsByOrganisation } from '~/services/api/lasius/user-bookings/user-bookings'
-import { getUserProfile } from '~/services/api/lasius/user/user'
-import {
-  authHeaders,
-  mergeAuthHeaders,
-  requireUser,
-} from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/user.stats.projects'
 
 // ─── Revalidation ────────────────────────────────────────────────────────────
 
-/** Only revalidate when date range search params change */
-export const shouldRevalidate = ({
-  currentUrl,
-  defaultShouldRevalidate,
-  formMethod,
-  nextUrl,
-}: ShouldRevalidateFunctionArgs) => {
-  if (formMethod) return defaultShouldRevalidate
-  const currentFrom = currentUrl.searchParams.get('from')
-  const currentTo = currentUrl.searchParams.get('to')
-  const currentDateRange = currentUrl.searchParams.get('dateRange')
-  const nextFrom = nextUrl.searchParams.get('from')
-  const nextTo = nextUrl.searchParams.get('to')
-  const nextDateRange = nextUrl.searchParams.get('dateRange')
-  if (
-    currentFrom === nextFrom &&
-    currentTo === nextTo &&
-    currentDateRange === nextDateRange
-  ) {
-    return false
-  }
-  return defaultShouldRevalidate
-}
-
 // ─── Client Loader (cache unless full-page refresh) ──────────────────────────
 
-export const clientLoader = async ({
-  request,
-  serverLoader,
-}: Route.ClientLoaderArgs) => cachedServerLoader(request, serverLoader)
+export const clientLoader = async (args: Route.ClientLoaderArgs) =>
+  statsClientLoader(args)
 clientLoader.hydrate = false
 
 // ─── Loader ──────────────────────────────────────────────────────────────────
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const auth = await requireUser(request)
-  const headers = authHeaders(auth.session)
-
-  const profile = await getUserProfile({ headers })
-  const user = profile.data
-
-  // Determine selected org
-  const organisations = user.organisations ?? []
-  const selectedOrgId =
-    user.settings?.lastSelectedOrganisation?.id ??
-    organisations.find((o) => o.private)?.organisationReference.id ??
-    organisations[0]?.organisationReference.id ??
-    ''
-
-  // Read date range from URL search params or compute defaults
-  const url = new URL(request.url)
-  let from = url.searchParams.get('from')
-  let to = url.searchParams.get('to')
-
-  if (!from || !to) {
-    const defaultRange = dateOptions[0]?.dateRangeFn(new Date())
-    from = defaultRange?.from ?? ''
-    to = defaultRange?.to ?? ''
-  }
+  const ctx = await loadStatsContext(request)
+  const { from, headers, selectedOrgId, to } = ctx
 
   const granularity = getAdaptiveGranularity(from, to)
   const useBarChart = shouldUseBarChart(from, to)
@@ -154,7 +103,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
       projectStreamChart,
       useBarChart,
     },
-    { headers: mergeAuthHeaders(auth) },
+    { headers: statsResponseHeaders(ctx.auth) },
   )
 }
 
@@ -179,3 +128,5 @@ const UserStatsProjects = ({ loaderData }: Route.ComponentProps) => {
 }
 
 export default UserStatsProjects
+
+export { statsShouldRevalidate as shouldRevalidate } from '~/features/stats/stats-loader'

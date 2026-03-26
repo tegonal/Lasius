@@ -17,33 +17,69 @@
  *
  */
 
-import { ArrowUpDown } from 'lucide-react'
+import { ArrowLeftRight, ArrowUpDown } from 'lucide-react'
 
 import { FormatDate } from '~/components/ui/data-display/format-date'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { type ModelsBooking } from '~/services/api/lasius'
 
-type Props = { item: ModelsBooking }
+type Props = {
+  item: ModelsBooking
+  orientation?: 'horizontal' | 'vertical'
+}
 
-export const BookingFromTo = ({ item }: Props) => {
+export const BookingFromTo = ({ item, orientation = 'vertical' }: Props) => {
   const { end, start } = item
+  const isHorizontal = orientation === 'horizontal'
+
+  const startTime = (
+    <div
+      className={isHorizontal ? 'flex items-center justify-center' : undefined}
+    >
+      <span className="text-sm opacity-50">
+        <FormatDate date={start.dateTime} format="time" />
+      </span>
+    </div>
+  )
+
+  const endTime = (
+    <div
+      className={isHorizontal ? 'flex items-center justify-center' : undefined}
+    >
+      <span className="text-sm opacity-50">
+        <FormatDate date={end?.dateTime || ''} format="time" />
+      </span>
+    </div>
+  )
+
+  const icon = (
+    <div className="flex items-center justify-center gap-1">
+      <span className="text-sm opacity-50">
+        <LucideIcon
+          icon={isHorizontal ? ArrowLeftRight : ArrowUpDown}
+          size={isHorizontal ? 16 : 12}
+        />
+      </span>
+    </div>
+  )
+
   return (
-    <div className="flex flex-col gap-1 leading-normal">
-      <div>
-        <span className="text-sm opacity-50">
-          <FormatDate date={end?.dateTime || ''} format="time" />
-        </span>
-      </div>
-      <div className="flex items-center justify-center gap-1">
-        <span className="text-sm opacity-50">
-          <LucideIcon icon={ArrowUpDown} size={12} />
-        </span>
-      </div>
-      <div>
-        <span className="text-sm opacity-50">
-          <FormatDate date={start.dateTime} format="time" />
-        </span>
-      </div>
+    <div
+      className={`flex ${isHorizontal ? 'flex-row' : 'flex-col'} gap-1 leading-normal`}
+    >
+      {isHorizontal ? (
+        <>
+          {startTime}
+          {icon}
+          {endTime}
+        </>
+      ) : (
+        <>
+          {endTime}
+          {icon}
+          {startTime}
+        </>
+      )}
     </div>
   )
 }

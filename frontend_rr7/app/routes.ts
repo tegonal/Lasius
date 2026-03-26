@@ -63,13 +63,13 @@ export default [
       layout('routes/user.layout.tsx', [
         route('home', 'routes/user.layout._index.tsx'),
         ...prefix('dashboard', [
-          layout('routes/dashboard.tsx', [
-            index('routes/dashboard._index.tsx'),
-            route('day', 'routes/dashboard.day.tsx'),
-            route('week', 'routes/dashboard.week.tsx'),
-            route('month', 'routes/dashboard.month.tsx'),
-            route('6months', 'routes/dashboard.6months.tsx'),
-            route('year', 'routes/dashboard.year.tsx'),
+          layout('routes/user.dashboard.tsx', [
+            index('routes/user.dashboard._index.tsx'),
+            route('day', 'routes/user.dashboard.day.tsx'),
+            route('week', 'routes/user.dashboard.week.tsx'),
+            route('month', 'routes/user.dashboard.month.tsx'),
+            route('6months', 'routes/user.dashboard.6months.tsx'),
+            route('year', 'routes/user.dashboard.year.tsx'),
           ]),
         ]),
         route('lists', 'routes/user.lists.tsx'),

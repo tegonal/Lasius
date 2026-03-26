@@ -33,7 +33,6 @@ import { type ModelsBooking } from '~/services/api/lasius'
 import { BookingAddUpdateForm } from './booking-add-update-form'
 import { BookingDuration } from './booking-duration'
 import { BookingFromTo } from './booking-from-to'
-import { BookingFromToMobile } from './booking-from-to-mobile'
 import { BookingInsertActions } from './booking-insert-actions'
 import { BookingItemContext } from './booking-item-context'
 import { BookingName } from './booking-name'
@@ -76,7 +75,7 @@ export const BookingItem = ({ item, nextItem }: Props) => {
           <BookingDuration item={item} />
         </div>
         <div className="flex h-full flex-col items-end justify-center gap-2 md:hidden">
-          <BookingFromToMobile item={item} />
+          <BookingFromTo item={item} orientation="horizontal" />
           <BookingDuration item={item} />
         </div>
         <BookingItemContext item={item} />

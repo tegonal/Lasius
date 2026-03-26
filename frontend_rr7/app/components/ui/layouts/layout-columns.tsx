@@ -41,7 +41,7 @@ export const outerGridClasses =
 
 /** Inner grid: center content + right sidebar. Rendered by child routes. */
 export const innerGridClasses =
-  'grid size-full overflow-auto grid-cols-[auto_18rem] lg:grid-cols-[auto_19rem] xl:grid-cols-[auto_20rem] 2xl:grid-cols-[auto_24rem]'
+  'grid size-full overflow-auto max-md:grid-cols-[1fr] grid-cols-[auto_18rem] lg:grid-cols-[auto_19rem] xl:grid-cols-[auto_20rem] 2xl:grid-cols-[auto_24rem]'
 
 export const ColumnCenter = ({ children }: { children: ReactNode }) => {
   return (

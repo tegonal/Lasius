@@ -245,32 +245,32 @@ type RouteFiles = {
     id: "routes/user.layout._index";
     page: "/user/home";
   };
-  "routes/dashboard.tsx": {
-    id: "routes/dashboard";
+  "routes/user.dashboard.tsx": {
+    id: "routes/user.dashboard";
     page: "/user/dashboard" | "/user/dashboard/day" | "/user/dashboard/week" | "/user/dashboard/month" | "/user/dashboard/6months" | "/user/dashboard/year";
   };
-  "routes/dashboard._index.tsx": {
-    id: "routes/dashboard._index";
+  "routes/user.dashboard._index.tsx": {
+    id: "routes/user.dashboard._index";
     page: "/user/dashboard";
   };
-  "routes/dashboard.day.tsx": {
-    id: "routes/dashboard.day";
+  "routes/user.dashboard.day.tsx": {
+    id: "routes/user.dashboard.day";
     page: "/user/dashboard/day";
   };
-  "routes/dashboard.week.tsx": {
-    id: "routes/dashboard.week";
+  "routes/user.dashboard.week.tsx": {
+    id: "routes/user.dashboard.week";
     page: "/user/dashboard/week";
   };
-  "routes/dashboard.month.tsx": {
-    id: "routes/dashboard.month";
+  "routes/user.dashboard.month.tsx": {
+    id: "routes/user.dashboard.month";
     page: "/user/dashboard/month";
   };
-  "routes/dashboard.6months.tsx": {
-    id: "routes/dashboard.6months";
+  "routes/user.dashboard.6months.tsx": {
+    id: "routes/user.dashboard.6months";
     page: "/user/dashboard/6months";
   };
-  "routes/dashboard.year.tsx": {
-    id: "routes/dashboard.year";
+  "routes/user.dashboard.year.tsx": {
+    id: "routes/user.dashboard.year";
     page: "/user/dashboard/year";
   };
   "routes/user.lists.tsx": {
@@ -387,13 +387,13 @@ type RouteModules = {
   "routes/index-redirect": typeof import("./app/routes/index-redirect.ts");
   "routes/user.layout": typeof import("./app/routes/user.layout.tsx");
   "routes/user.layout._index": typeof import("./app/routes/user.layout._index.tsx");
-  "routes/dashboard": typeof import("./app/routes/dashboard.tsx");
-  "routes/dashboard._index": typeof import("./app/routes/dashboard._index.tsx");
-  "routes/dashboard.day": typeof import("./app/routes/dashboard.day.tsx");
-  "routes/dashboard.week": typeof import("./app/routes/dashboard.week.tsx");
-  "routes/dashboard.month": typeof import("./app/routes/dashboard.month.tsx");
-  "routes/dashboard.6months": typeof import("./app/routes/dashboard.6months.tsx");
-  "routes/dashboard.year": typeof import("./app/routes/dashboard.year.tsx");
+  "routes/user.dashboard": typeof import("./app/routes/user.dashboard.tsx");
+  "routes/user.dashboard._index": typeof import("./app/routes/user.dashboard._index.tsx");
+  "routes/user.dashboard.day": typeof import("./app/routes/user.dashboard.day.tsx");
+  "routes/user.dashboard.week": typeof import("./app/routes/user.dashboard.week.tsx");
+  "routes/user.dashboard.month": typeof import("./app/routes/user.dashboard.month.tsx");
+  "routes/user.dashboard.6months": typeof import("./app/routes/user.dashboard.6months.tsx");
+  "routes/user.dashboard.year": typeof import("./app/routes/user.dashboard.year.tsx");
   "routes/user.lists": typeof import("./app/routes/user.lists.tsx");
   "routes/user.stats": typeof import("./app/routes/user.stats.tsx");
   "routes/user.stats._index": typeof import("./app/routes/user.stats._index.tsx");
