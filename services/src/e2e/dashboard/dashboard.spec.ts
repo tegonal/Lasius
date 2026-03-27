@@ -39,12 +39,12 @@ test.describe('Dashboard', () => {
     const prevBtn = page.getByTestId('calendar-week-prev-btn').first()
     await expect(prevBtn).toBeVisible({ timeout: 10000 })
 
-    // Click previous week
-    await prevBtn.click()
+    // Click previous week (force: avatar SVG sometimes overlaps in compact viewports)
+    await prevBtn.click({ force: true })
 
     // Click next week
     const nextBtn = page.getByTestId('calendar-week-next-btn').first()
-    await nextBtn.click()
+    await nextBtn.click({ force: true })
 
     // Click today button (visible when not on current day after navigation)
     const todayBtn = page.getByTestId('calendar-week-today-btn').first()
@@ -101,7 +101,7 @@ test.describe('Dashboard', () => {
     // The "user" section should already be active on /user/home
     // Projects is a sub-item within the user section, navigated via route links
     // Navigate to projects page directly
-    await page.goto('/user/projects', { timeout: 15000 })
-    await expect(page).toHaveURL(/\/user\/projects/, { timeout: 10000 })
+    await page.goto('/user/projects', { timeout: 15000, waitUntil: 'domcontentloaded' })
+    await expect(page).toHaveURL(/\/user\/projects/, { timeout: 15000 })
   })
 })

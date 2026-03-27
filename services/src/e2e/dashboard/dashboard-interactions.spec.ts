@@ -17,15 +17,16 @@
  *
  */
 
-import { expect, test } from '@playwright/test'
+import { expect, type Page, test } from '@playwright/test'
 
 /**
- * Builds an ISO date string (YYYY-MM-DD) for a given day in the current month,
- * matching the `calendar-day-YYYY-MM-DD` testid format.
+ * Builds a locator for a calendar day cell.
+ * The component uses `formatISOLocale` which returns full ISO datetime (e.g. "2026-03-01T00:00:00.000+01:00"),
+ * so we match by starts-with on the date portion.
  */
-const calendarDayTestId = (year: number, month: number, day: number) => {
+const calendarDayLocator = (page: Page, year: number, month: number, day: number) => {
   const iso = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-  return `calendar-day-${iso}`
+  return page.locator(`[data-testid^="calendar-day-${iso}"]`)
 }
 
 /**
@@ -54,8 +55,7 @@ test.describe('Dashboard interactions @dashboard', () => {
 
     // Click day 1 of the current month
     const now = new Date()
-    const dayTestId = calendarDayTestId(now.getFullYear(), now.getMonth() + 1, 1)
-    const dayCell = page.getByTestId(dayTestId)
+    const dayCell = calendarDayLocator(page, now.getFullYear(), now.getMonth() + 1, 1)
     await expect(dayCell).toBeVisible({ timeout: 5000 })
     await dayCell.click()
 
@@ -71,12 +71,16 @@ test.describe('Dashboard interactions @dashboard', () => {
     }
 
     // Navigate to previous month so the "Today" button appears
-    await page.getByTestId('calendar-month-prev-btn').click()
+    const prev = prevMonth()
+    await expect(async () => {
+      await page.getByTestId('calendar-month-prev-btn').click()
+      await expect(calendarDayLocator(page, prev.year, prev.month, 15)).toBeVisible({
+        timeout: 2000,
+      })
+    }).toPass({ timeout: 15000 })
 
     // Click day 15 in the previous month
-    const prev = prevMonth()
-    const dayTestId = calendarDayTestId(prev.year, prev.month, 15)
-    await page.getByTestId(dayTestId).click()
+    await calendarDayLocator(page, prev.year, prev.month, 15).click()
     await expect(page).toHaveURL(/[?&]date=/, { timeout: 10000 })
 
     // The "Today" button should now be visible
@@ -99,15 +103,21 @@ test.describe('Dashboard interactions @dashboard', () => {
 
     // After navigating to previous month, day cells from that month should appear
     const prev = prevMonth()
-    await page.getByTestId('calendar-month-prev-btn').click()
-    const prevDayTestId = calendarDayTestId(prev.year, prev.month, 1)
-    await expect(page.getByTestId(prevDayTestId)).toBeVisible({ timeout: 5000 })
+    await expect(async () => {
+      await page.getByTestId('calendar-month-prev-btn').click()
+      await expect(calendarDayLocator(page, prev.year, prev.month, 1)).toBeVisible({
+        timeout: 2000,
+      })
+    }).toPass({ timeout: 15000 })
 
     // Navigate forward — current month's day 1 should reappear
     const now = new Date()
-    await page.getByTestId('calendar-month-next-btn').click()
-    const currentDayTestId = calendarDayTestId(now.getFullYear(), now.getMonth() + 1, 1)
-    await expect(page.getByTestId(currentDayTestId)).toBeVisible({ timeout: 5000 })
+    await expect(async () => {
+      await page.getByTestId('calendar-month-next-btn').click()
+      await expect(calendarDayLocator(page, now.getFullYear(), now.getMonth() + 1, 1)).toBeVisible({
+        timeout: 2000,
+      })
+    }).toPass({ timeout: 15000 })
   })
 
   test('date param preserved when switching period tabs', async ({ page }) => {
@@ -119,40 +129,45 @@ test.describe('Dashboard interactions @dashboard', () => {
 
     // Navigate to previous month and click day 10 to set a specific date
     const prev = prevMonth()
-    await page.getByTestId('calendar-month-prev-btn').click()
-    const dayTestId = calendarDayTestId(prev.year, prev.month, 10)
-    await page.getByTestId(dayTestId).click()
+    await expect(async () => {
+      await page.getByTestId('calendar-month-prev-btn').click()
+      await expect(calendarDayLocator(page, prev.year, prev.month, 10)).toBeVisible({
+        timeout: 2000,
+      })
+    }).toPass({ timeout: 15000 })
+    await calendarDayLocator(page, prev.year, prev.month, 10).click()
     await expect(page).toHaveURL(/[?&]date=/, { timeout: 10000 })
 
-    // Extract the date param value
+    // Extract the date portion (YYYY-MM-DD) which doesn't need encoding
     const url = new URL(page.url())
     const dateParam = url.searchParams.get('date')
     expect(dateParam).toBeTruthy()
+    const datePrefix = dateParam!.slice(0, 10) // e.g. "2026-02-10"
 
     // Switch to week tab — date param should be preserved
     await page.getByTestId('dashboard-tab-week').click()
     await expect(page).toHaveURL(/\/user\/dashboard\/week/, { timeout: 10000 })
-    await expect(page).toHaveURL(new RegExp(`date=${dateParam}`), { timeout: 5000 })
+    await expect(page).toHaveURL(new RegExp(`date=.*${datePrefix}`), { timeout: 5000 })
 
     // Switch to day tab
     await page.getByTestId('dashboard-tab-day').click()
     await expect(page).toHaveURL(/\/user\/dashboard\/day/, { timeout: 10000 })
-    await expect(page).toHaveURL(new RegExp(`date=${dateParam}`), { timeout: 5000 })
+    await expect(page).toHaveURL(new RegExp(`date=.*${datePrefix}`), { timeout: 5000 })
 
     // Switch to 6months tab
     await page.getByTestId('dashboard-tab-6months').click()
     await expect(page).toHaveURL(/\/user\/dashboard\/6months/, { timeout: 10000 })
-    await expect(page).toHaveURL(new RegExp(`date=${dateParam}`), { timeout: 5000 })
+    await expect(page).toHaveURL(new RegExp(`date=.*${datePrefix}`), { timeout: 5000 })
 
     // Switch to year tab
     await page.getByTestId('dashboard-tab-year').click()
     await expect(page).toHaveURL(/\/user\/dashboard\/year/, { timeout: 10000 })
-    await expect(page).toHaveURL(new RegExp(`date=${dateParam}`), { timeout: 5000 })
+    await expect(page).toHaveURL(new RegExp(`date=.*${datePrefix}`), { timeout: 5000 })
 
     // Switch back to month tab
     await page.getByTestId('dashboard-tab-month').click()
     await expect(page).toHaveURL(/\/user\/dashboard\/month/, { timeout: 10000 })
-    await expect(page).toHaveURL(new RegExp(`date=${dateParam}`), { timeout: 5000 })
+    await expect(page).toHaveURL(new RegExp(`date=.*${datePrefix}`), { timeout: 5000 })
   })
 
   test('stats tile toggles between decimal and duration format', async ({ page }) => {

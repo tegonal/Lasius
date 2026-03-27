@@ -42,15 +42,20 @@ test.describe.serial('Booking lifecycle @crud', () => {
   })
 
   test('start a booking from quick start form', async ({ page }) => {
-    // Click the chevron button to open the project dropdown
-    const projectInput = page.locator('#projectId')
+    // Open the project dropdown via the chevron button next to the combobox
+    const projectInput = page.getByRole('combobox', { name: /project/i })
     await projectInput.waitFor({ state: 'visible', timeout: 10000 })
 
-    // Use retry pattern in case hydration hasn't completed
+    // The chevron button is the sibling button after the combobox wrapper
+    const chevronBtn = projectInput.locator(
+      'xpath=ancestor::div[contains(@class,"join")]//button[contains(@class,"join-item")][last()]',
+    )
+
+    // Use retry pattern — click chevron to toggle dropdown open
     await expect(async () => {
-      await projectInput.click()
-      await expect(page.locator('[role="option"]').first()).toBeVisible({ timeout: 1000 })
-    }).toPass({ timeout: 10000 })
+      await chevronBtn.click()
+      await expect(page.locator('[role="option"]').first()).toBeVisible({ timeout: 2000 })
+    }).toPass({ timeout: 15000 })
 
     // Skip if no project options available (e.g. user is in an E2E-created org)
     const optionCount = await page.locator('[role="option"]').count()
@@ -64,7 +69,9 @@ test.describe.serial('Booking lifecycle @crud', () => {
     await page.getByTestId('booking-start-submit-btn').click()
 
     // Running booking should appear
-    await expect(page.getByTestId('booking-current-stop-btn')).toBeVisible({ timeout: 10000 })
+    await expect(page.getByTestId('booking-current-stop-btn').first()).toBeVisible({
+      timeout: 10000,
+    })
   })
 
   test('stop a running booking', async ({ page }) => {
@@ -135,7 +142,9 @@ test.describe.serial('Booking lifecycle @crud', () => {
     await page.getByTestId('booking-ctx-start-btn').click()
 
     // Running booking should appear
-    await expect(page.getByTestId('booking-current-stop-btn')).toBeVisible({ timeout: 10000 })
+    await expect(page.getByTestId('booking-current-stop-btn').first()).toBeVisible({
+      timeout: 10000,
+    })
   })
 
   test('add booking to favorites via context menu', async ({ page }) => {

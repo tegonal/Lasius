@@ -55,8 +55,11 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   const codeVerifier = generateCodeVerifier()
   const codeChallenge = await generateCodeChallenge(codeVerifier)
 
-  // Build the callback URL using type-safe href
-  const origin = url.origin
+  // Build the callback URL — use Host header for correct origin behind reverse proxy
+  const host =
+    request.headers.get('x-forwarded-host') || request.headers.get('host')
+  const protocol = request.headers.get('x-forwarded-proto') || 'http'
+  const origin = host ? `${protocol}://${host}` : url.origin
   const redirectUri = `${origin}${href('/oauth/callback')}`
 
   // Store state, provider, code verifier, and returnTo in a cookie

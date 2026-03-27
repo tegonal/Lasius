@@ -68,7 +68,12 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   try {
     const provider = getProvider(providerName)
-    const redirectUri = `${url.origin}${href('/oauth/callback')}`
+    // Use Host header for correct origin behind reverse proxy
+    const host =
+      request.headers.get('x-forwarded-host') || request.headers.get('host')
+    const protocol = request.headers.get('x-forwarded-proto') || 'http'
+    const origin = host ? `${protocol}://${host}` : url.origin
+    const redirectUri = `${origin}${href('/oauth/callback')}`
 
     // Exchange authorization code for tokens
     const tokens = await provider.exchangeCode(code, redirectUri, codeVerifier)

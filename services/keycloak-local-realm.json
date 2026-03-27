@@ -321,7 +321,8 @@
       "clientAuthenticatorType": "client-secret",
       "secret": "AdDO2qcf39jJj6H7YyqXeQwuzR0vpMSd",
       "redirectUris": [
-        "http://localhost:3000/api/auth/callback/custom_keycloak"
+        "http://localhost:3000/*",
+        "http://localhost:5173/*"
       ],
       "webOrigins": [
         "http://localhost:3000/"

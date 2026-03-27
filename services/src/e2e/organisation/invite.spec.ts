@@ -77,9 +77,12 @@ test.describe.serial('Organisation + Invitation lifecycle @org', () => {
     await page.waitForURL(/.*\/organisation\/current.*/, { timeout: 15000 })
     await acceptTosIfVisible(page)
 
-    // LayoutResponsive renders children twice (desktop + mobile); use .first() for desktop
-    await page.getByTestId('org-actions-dropdown').first().click()
-    await page.getByTestId('org-actions-create-btn').first().click()
+    // DaisyUI dropdown: click may not register on first try due to focus/blur timing
+    await expect(async () => {
+      await page.getByTestId('org-actions-dropdown').first().click()
+      await page.getByTestId('org-actions-create-btn').first().click()
+      await expect(page.getByTestId('org-form-name-input')).toBeVisible({ timeout: 2000 })
+    }).toPass({ timeout: 15000 })
 
     // Fill org name and submit
     await page.getByTestId('org-form-name-input').fill(orgName)
@@ -93,9 +96,12 @@ test.describe.serial('Organisation + Invitation lifecycle @org', () => {
     // Shared page still shows the newly created org from previous test
     await expect(page.getByText(orgName).first()).toBeVisible({ timeout: 10000 })
 
-    // LayoutResponsive renders children twice (desktop + mobile); use .first() for desktop
-    await page.getByTestId('org-actions-dropdown').first().click()
-    await page.getByTestId('org-actions-invite-btn').first().click()
+    // DaisyUI dropdown: retry pattern for click timing
+    await expect(async () => {
+      await page.getByTestId('org-actions-dropdown').first().click()
+      await page.getByTestId('org-actions-invite-btn').first().click()
+      await expect(page.getByTestId('org-invite-email-input')).toBeVisible({ timeout: 2000 })
+    }).toPass({ timeout: 15000 })
 
     // Fill email and submit
     await page.getByTestId('org-invite-email-input').fill('demo2@lasius.ch')
@@ -185,9 +191,12 @@ test.describe.serial('Organisation + Invitation lifecycle @org', () => {
     // Shared page still shows the newly created org
     await expect(page.getByText(orgName).first()).toBeVisible({ timeout: 10000 })
 
-    // LayoutResponsive renders children twice (desktop + mobile); use .first() for desktop
-    await page.getByTestId('org-actions-dropdown').first().click()
-    await page.getByTestId('org-actions-invite-btn').first().click()
+    // DaisyUI dropdown: retry pattern for click timing
+    await expect(async () => {
+      await page.getByTestId('org-actions-dropdown').first().click()
+      await page.getByTestId('org-actions-invite-btn').first().click()
+      await expect(page.getByTestId('org-invite-email-input')).toBeVisible({ timeout: 2000 })
+    }).toPass({ timeout: 15000 })
 
     // Fill email and submit
     await page.getByTestId('org-invite-email-input').fill(newUserEmail)

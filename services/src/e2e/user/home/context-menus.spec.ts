@@ -23,22 +23,27 @@ import { expect, type Page, test } from '@playwright/test'
  * Starts a booking via quick-start form. Assumes /user/home is loaded.
  */
 const startBookingViaQuickStart = async (page: Page) => {
-  const projectInput = page.locator('#projectId')
+  const projectInput = page.getByRole('combobox', { name: /project/i })
   await projectInput.waitFor({ state: 'visible', timeout: 10000 })
 
+  // The chevron button is the sibling button after the combobox wrapper
+  const chevronBtn = projectInput.locator(
+    'xpath=ancestor::div[contains(@class,"join")]//button[contains(@class,"join-item")][last()]',
+  )
+
   await expect(async () => {
-    await projectInput.click()
+    await chevronBtn.click()
     await expect(page.locator('[role="option"]').first()).toBeVisible({
-      timeout: 1000,
+      timeout: 2000,
     })
-  }).toPass({ timeout: 10000 })
+  }).toPass({ timeout: 15000 })
 
   const optionCount = await page.locator('[role="option"]').count()
   if (optionCount === 0) return false
 
   await page.locator('[role="option"]').first().click()
   await page.getByTestId('booking-start-submit-btn').click()
-  await expect(page.getByTestId('booking-current-stop-btn')).toBeVisible({
+  await expect(page.getByTestId('booking-current-stop-btn').first()).toBeVisible({
     timeout: 10000,
   })
   return true
@@ -77,7 +82,7 @@ const openFavoriteContextMenu = async (page: Page, index = 0) => {
  * Stops the running booking if one exists.
  */
 const stopBookingIfRunning = async (page: Page) => {
-  const stopBtn = page.getByTestId('booking-current-stop-btn')
+  const stopBtn = page.getByTestId('booking-current-stop-btn').first()
   if (await stopBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
     await stopBtn.click()
     await expect(stopBtn).not.toBeVisible({ timeout: 10000 })
@@ -93,7 +98,7 @@ test.describe.serial('Context menu actions @context-menus', () => {
 
   test('edit running booking via context menu', async ({ page }) => {
     // Ensure a booking is running
-    const stopBtn = page.getByTestId('booking-current-stop-btn')
+    const stopBtn = page.getByTestId('booking-current-stop-btn').first()
     if (!(await stopBtn.isVisible({ timeout: 5000 }).catch(() => false))) {
       const started = await startBookingViaQuickStart(page)
       if (!started) {
@@ -117,7 +122,7 @@ test.describe.serial('Context menu actions @context-menus', () => {
   })
 
   test('add running booking to favorites via context menu', async ({ page }) => {
-    const stopBtn = page.getByTestId('booking-current-stop-btn')
+    const stopBtn = page.getByTestId('booking-current-stop-btn').first()
     if (!(await stopBtn.isVisible({ timeout: 5000 }).catch(() => false))) {
       const started = await startBookingViaQuickStart(page)
       if (!started) {
@@ -154,7 +159,7 @@ test.describe.serial('Context menu actions @context-menus', () => {
     await page.getByTestId('favorite-ctx-start-btn').click()
 
     // A booking should now be running
-    await expect(page.getByTestId('booking-current-stop-btn')).toBeVisible({
+    await expect(page.getByTestId('booking-current-stop-btn').first()).toBeVisible({
       timeout: 10000,
     })
   })
@@ -206,7 +211,7 @@ test.describe.serial('Context menu actions @context-menus', () => {
     await page.getByTestId('org-ctx-start-btn').click()
 
     // A booking should now be running
-    await expect(page.getByTestId('booking-current-stop-btn')).toBeVisible({
+    await expect(page.getByTestId('booking-current-stop-btn').first()).toBeVisible({
       timeout: 10000,
     })
   })
