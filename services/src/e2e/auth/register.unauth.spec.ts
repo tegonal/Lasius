@@ -39,11 +39,13 @@ test.describe('Registration flow @auth', () => {
       test.skip()
       return
     }
-    await signupBtn.click()
-
-    // Client-side navigation — wait for the register form to appear
+    // The signup button uses globalThis.location.href for navigation.
+    // In Playwright headless, trigger the navigation and wait for it.
+    await Promise.all([
+      page.waitForURL(/.*\/internal-oauth\/register.*/, { timeout: 15000 }),
+      signupBtn.click(),
+    ])
     await expect(page.getByTestId('auth-register-email-input')).toBeVisible({ timeout: 15000 })
-    await expect(page).toHaveURL(/.*\/internal-oauth\/register.*/)
   })
 
   test('register with valid data redirects to login with success message', async ({ page }) => {

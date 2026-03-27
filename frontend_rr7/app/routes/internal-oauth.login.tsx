@@ -19,11 +19,13 @@
 
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { parseWithZod } from '@conform-to/zod/v4'
+import { ChevronLeft } from 'lucide-react'
 import { Trans, useTranslation } from 'react-i18next'
 import {
   data,
   Form,
   href,
+  Link,
   redirect,
   useActionData,
   useLoaderData,
@@ -224,6 +226,21 @@ export default function InternalOAuthLogin() {
       )}
       <Card className="bg-base-100/80 border-0 shadow-2xl backdrop-blur-sm">
         <CardBody className="p-8 lg:p-10">
+          <Button
+            className="self-center"
+            fullWidth={false}
+            onClick={() => {
+              globalThis.location.href = href('/login')
+            }}
+            size="sm"
+            type="button"
+            variant="ghost"
+          >
+            <ChevronLeft size={16} />
+            {t('actions.back', {
+              defaultValue: 'Back',
+            })}
+          </Button>
           <div className="mb-4 flex justify-center lg:hidden">
             <Logo />
           </div>
@@ -291,24 +308,22 @@ export default function InternalOAuthLogin() {
                   })}
                 </Button>
                 {allowRegistration && (
-                  <Button
+                  <Link
+                    className="btn bg-neutral-gradient hover:bg-neutral-gradient-hover w-full border-none text-white"
                     data-testid="auth-internal-signup-btn"
-                    fullWidth
-                    onClick={() => {
+                    to={(() => {
                       const params = new URLSearchParams()
                       if (invitationId)
                         params.set('invitation_id', invitationId)
                       if (returnTo) params.set('returnTo', returnTo)
                       const qs = params.toString()
-                      globalThis.location.href = `${href('/internal-oauth/register')}${qs ? `?${qs}` : ''}`
-                    }}
-                    type="button"
-                    variant="secondary"
+                      return `${href('/internal-oauth/register')}${qs ? `?${qs}` : ''}`
+                    })()}
                   >
                     {t('actions.signUp', {
                       defaultValue: 'Sign up',
                     })}
-                  </Button>
+                  </Link>
                 )}
               </ButtonGroup>
             </FormBody>
