@@ -730,51 +730,51 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fallow-cli/darwin-arm64@npm:2.2.1":
-  version: 2.2.1
-  resolution: "@fallow-cli/darwin-arm64@npm:2.2.1"
+"@fallow-cli/darwin-arm64@npm:2.2.2":
+  version: 2.2.2
+  resolution: "@fallow-cli/darwin-arm64@npm:2.2.2"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@fallow-cli/darwin-x64@npm:2.2.1":
-  version: 2.2.1
-  resolution: "@fallow-cli/darwin-x64@npm:2.2.1"
+"@fallow-cli/darwin-x64@npm:2.2.2":
+  version: 2.2.2
+  resolution: "@fallow-cli/darwin-x64@npm:2.2.2"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@fallow-cli/linux-arm64-gnu@npm:2.2.1":
-  version: 2.2.1
-  resolution: "@fallow-cli/linux-arm64-gnu@npm:2.2.1"
+"@fallow-cli/linux-arm64-gnu@npm:2.2.2":
+  version: 2.2.2
+  resolution: "@fallow-cli/linux-arm64-gnu@npm:2.2.2"
   conditions: os=linux & cpu=arm64
   languageName: node
   linkType: hard
 
-"@fallow-cli/linux-arm64-musl@npm:2.2.1":
-  version: 2.2.1
-  resolution: "@fallow-cli/linux-arm64-musl@npm:2.2.1"
+"@fallow-cli/linux-arm64-musl@npm:2.2.2":
+  version: 2.2.2
+  resolution: "@fallow-cli/linux-arm64-musl@npm:2.2.2"
   conditions: os=linux & cpu=arm64
   languageName: node
   linkType: hard
 
-"@fallow-cli/linux-x64-gnu@npm:2.2.1":
-  version: 2.2.1
-  resolution: "@fallow-cli/linux-x64-gnu@npm:2.2.1"
+"@fallow-cli/linux-x64-gnu@npm:2.2.2":
+  version: 2.2.2
+  resolution: "@fallow-cli/linux-x64-gnu@npm:2.2.2"
   conditions: os=linux & cpu=x64
   languageName: node
   linkType: hard
 
-"@fallow-cli/linux-x64-musl@npm:2.2.1":
-  version: 2.2.1
-  resolution: "@fallow-cli/linux-x64-musl@npm:2.2.1"
+"@fallow-cli/linux-x64-musl@npm:2.2.2":
+  version: 2.2.2
+  resolution: "@fallow-cli/linux-x64-musl@npm:2.2.2"
   conditions: os=linux & cpu=x64
   languageName: node
   linkType: hard
 
-"@fallow-cli/win32-x64-msvc@npm:2.2.1":
-  version: 2.2.1
-  resolution: "@fallow-cli/win32-x64-msvc@npm:2.2.1"
+"@fallow-cli/win32-x64-msvc@npm:2.2.2":
+  version: 2.2.2
+  resolution: "@fallow-cli/win32-x64-msvc@npm:2.2.2"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -3509,22 +3509,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitest/eslint-plugin@npm:^1.3.4":
-  version: 1.6.12
-  resolution: "@vitest/eslint-plugin@npm:1.6.12"
+"@vitest/eslint-plugin@npm:^1.6.13":
+  version: 1.6.13
+  resolution: "@vitest/eslint-plugin@npm:1.6.13"
   dependencies:
     "@typescript-eslint/scope-manager": "npm:^8.55.0"
     "@typescript-eslint/utils": "npm:^8.55.0"
   peerDependencies:
+    "@typescript-eslint/eslint-plugin": "*"
     eslint: ">=8.57.0"
     typescript: ">=5.0.0"
     vitest: "*"
   peerDependenciesMeta:
+    "@typescript-eslint/eslint-plugin":
+      optional: true
     typescript:
       optional: true
     vitest:
       optional: true
-  checksum: 10c0/e7d18ff416589e10ab8b76988eb82469cde9a24f5e2a81356c76d844da54a68297a4ec0561c8bb432591785456fbb6da03b9d082f6edd045a48d603b4db6af9a
+  checksum: 10c0/3fbe4d60e77897d0a6c28a21bd22aa8540fca0d07f5d218b301b17bf269fac4e1f35aec2cad8e216b05583e849cabc4c8a0118ef50d245b6aab5f0550cd58241
   languageName: node
   linkType: hard
 
@@ -5168,7 +5171,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-import-x@npm:^4.16.1":
+"eslint-plugin-import-x@npm:^4.16.2":
   version: 4.16.2
   resolution: "eslint-plugin-import-x@npm:4.16.2"
   dependencies:
@@ -5223,12 +5226,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-react-hooks@npm:^5.2.0":
-  version: 5.2.0
-  resolution: "eslint-plugin-react-hooks@npm:5.2.0"
+"eslint-plugin-react-hooks@npm:^7.0.1":
+  version: 7.0.1
+  resolution: "eslint-plugin-react-hooks@npm:7.0.1"
+  dependencies:
+    "@babel/core": "npm:^7.24.4"
+    "@babel/parser": "npm:^7.24.4"
+    hermes-parser: "npm:^0.25.1"
+    zod: "npm:^3.25.0 || ^4.0.0"
+    zod-validation-error: "npm:^3.5.0 || ^4.0.0"
   peerDependencies:
     eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0 || ^9.0.0
-  checksum: 10c0/1c8d50fa5984c6dea32470651807d2922cc3934cf3425e78f84a24c2dfd972e7f019bee84aefb27e0cf2c13fea0ac1d4473267727408feeb1c56333ca1489385
+  checksum: 10c0/1e711d1a9d1fa9cfc51fa1572500656577201199c70c795c6a27adfc1df39e5c598f69aab6aa91117753d23cc1f11388579a2bed14921cf9a4efe60ae8618496
   languageName: node
   linkType: hard
 
@@ -5578,17 +5587,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fallow@npm:^2.2.1":
-  version: 2.2.1
-  resolution: "fallow@npm:2.2.1"
+"fallow@npm:^2.2.2":
+  version: 2.2.2
+  resolution: "fallow@npm:2.2.2"
   dependencies:
-    "@fallow-cli/darwin-arm64": "npm:2.2.1"
-    "@fallow-cli/darwin-x64": "npm:2.2.1"
-    "@fallow-cli/linux-arm64-gnu": "npm:2.2.1"
-    "@fallow-cli/linux-arm64-musl": "npm:2.2.1"
-    "@fallow-cli/linux-x64-gnu": "npm:2.2.1"
-    "@fallow-cli/linux-x64-musl": "npm:2.2.1"
-    "@fallow-cli/win32-x64-msvc": "npm:2.2.1"
+    "@fallow-cli/darwin-arm64": "npm:2.2.2"
+    "@fallow-cli/darwin-x64": "npm:2.2.2"
+    "@fallow-cli/linux-arm64-gnu": "npm:2.2.2"
+    "@fallow-cli/linux-arm64-musl": "npm:2.2.2"
+    "@fallow-cli/linux-x64-gnu": "npm:2.2.2"
+    "@fallow-cli/linux-x64-musl": "npm:2.2.2"
+    "@fallow-cli/win32-x64-msvc": "npm:2.2.2"
     detect-libc: "npm:^2.0.0"
   dependenciesMeta:
     "@fallow-cli/darwin-arm64":
@@ -5607,7 +5616,7 @@ __metadata:
       optional: true
   bin:
     fallow: bin/fallow
-  checksum: 10c0/e1d3828b76390199c9f575f3520f45ec616259e5fe0645f41261cbecbdbe4018a38626ddc21c8596a28e92c9623f8e47eea470be3d65a7723ec37e6b0ef0cae9
+  checksum: 10c0/2352a736569fb0a3addbce9288a59301672d158de32fe39c098c593854d9a23c6bcd869da7b681d913bfa2111e9030523b9f1c24afcb320f5ca9b8a8f93fbbbd
   languageName: node
   linkType: hard
 
@@ -5999,10 +6008,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"globals@npm:^16.3.0, globals@npm:^16.4.0":
+"globals@npm:^16.4.0":
   version: 16.5.0
   resolution: "globals@npm:16.5.0"
   checksum: 10c0/615241dae7851c8012f5aa0223005b1ed6607713d6813de0741768bd4ddc39353117648f1a7086b4b0fa45eae733f1c0a0fe369aa4e543bb63f8de8990178ea9
+  languageName: node
+  linkType: hard
+
+"globals@npm:^17.4.0":
+  version: 17.4.0
+  resolution: "globals@npm:17.4.0"
+  checksum: 10c0/2be9e8c2b9035836f13d420b22f0247a328db82967d3bebfc01126d888ed609305f06c05895914e969653af5c6ba35fd7a0920f3e6c869afa60666c810630feb
   languageName: node
   linkType: hard
 
@@ -6941,7 +6957,7 @@ __metadata:
     "@types/node": "npm:^24.12.0"
     "@types/react": "npm:^19.2.14"
     "@types/react-dom": "npm:^19.2.3"
-    "@vitest/eslint-plugin": "npm:^1.3.4"
+    "@vitest/eslint-plugin": "npm:^1.6.13"
     accept-language-parser: "npm:^1.5.0"
     babel-plugin-react-compiler: "npm:^1.0.0"
     babel-plugin-react-remove-properties: "npm:^0.3.1"
@@ -6956,14 +6972,14 @@ __metadata:
     es-toolkit: "npm:^1.45.1"
     eslint: "npm:^9.39.4"
     eslint-plugin-check-file: "npm:^3.3.1"
-    eslint-plugin-import-x: "npm:^4.16.1"
+    eslint-plugin-import-x: "npm:^4.16.2"
     eslint-plugin-perfectionist: "npm:^5.7.0"
     eslint-plugin-react: "npm:^7.37.5"
     eslint-plugin-react-compiler: "npm:^19.1.0-rc.2"
-    eslint-plugin-react-hooks: "npm:^5.2.0"
+    eslint-plugin-react-hooks: "npm:^7.0.1"
     eslint-plugin-unicorn: "npm:^63.0.0"
-    fallow: "npm:^2.2.1"
-    globals: "npm:^16.3.0"
+    fallow: "npm:^2.2.2"
+    globals: "npm:^17.4.0"
     i18next: "npm:25.10.10"
     i18next-browser-languagedetector: "npm:^8.2.1"
     i18next-cli: "npm:^1.51.3"
@@ -10808,6 +10824,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"zod-validation-error@npm:^3.5.0 || ^4.0.0":
+  version: 4.0.2
+  resolution: "zod-validation-error@npm:4.0.2"
+  peerDependencies:
+    zod: ^3.25.0 || ^4.0.0
+  checksum: 10c0/0ccfec48c46de1be440b719cd02044d4abb89ed0e14c13e637cd55bf29102f67ccdba373f25def0fc7130e5f15025be4d557a7edcc95d5a3811599aade689e1b
+  languageName: node
+  linkType: hard
+
 "zod@npm:^3.22.4":
   version: 3.25.76
   resolution: "zod@npm:3.25.76"
@@ -10815,7 +10840,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:^4.1.11, zod@npm:^4.3.5, zod@npm:^4.3.6":
+"zod@npm:^3.25.0 || ^4.0.0, zod@npm:^4.1.11, zod@npm:^4.3.5, zod@npm:^4.3.6":
   version: 4.3.6
   resolution: "zod@npm:4.3.6"
   checksum: 10c0/860d25a81ab41d33aa25f8d0d07b091a04acb426e605f396227a796e9e800c44723ed96d0f53a512b57be3d1520f45bf69c0cb3b378a232a00787a2609625307

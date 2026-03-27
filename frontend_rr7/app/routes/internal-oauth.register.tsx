@@ -390,6 +390,22 @@ export default function InternalOAuthRegister() {
                     defaultValue: 'Sign up',
                   })}
                 </Button>
+                <Button
+                  fullWidth
+                  onClick={() => {
+                    const params = new URLSearchParams()
+                    if (invitationId) params.set('invitation_id', invitationId)
+                    if (returnTo) params.set('returnTo', returnTo)
+                    const qs = params.toString()
+                    globalThis.location.href = `${href('/internal-oauth/login')}${qs ? `?${qs}` : ''}`
+                  }}
+                  type="button"
+                  variant="secondary"
+                >
+                  {t('auth.errors.backToLogin', {
+                    defaultValue: 'Back to Login',
+                  })}
+                </Button>
               </ButtonGroup>
             </FormBody>
           </Form>

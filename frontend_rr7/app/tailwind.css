@@ -229,6 +229,15 @@
     height: 100%;
   }
 
+  a {
+    color: var(--color-primary);
+    text-decoration: underline;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
   /* Ensure smooth color transitions when theme changes */
   html {
     transition:

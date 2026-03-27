@@ -42,19 +42,22 @@ test.describe.serial('Booking lifecycle @crud', () => {
   })
 
   test('start a booking from quick start form', async ({ page }) => {
-    // Open the project dropdown via the chevron button next to the combobox
+    // Open the project dropdown via the dedicated ComboboxButton (chevron)
     const projectInput = page.getByRole('combobox', { name: /project/i })
     await projectInput.waitFor({ state: 'visible', timeout: 10000 })
 
-    // The chevron button is the sibling button after the combobox wrapper
-    const chevronBtn = projectInput.locator(
-      'xpath=ancestor::div[contains(@class,"join")]//button[contains(@class,"join-item")][last()]',
-    )
-
-    // Use retry pattern — click chevron to toggle dropdown open
+    // The chevron ComboboxButton toggles the dropdown — only click when closed
     await expect(async () => {
-      await chevronBtn.click()
-      await expect(page.locator('[role="option"]').first()).toBeVisible({ timeout: 2000 })
+      const isExpanded = await projectInput.getAttribute('aria-expanded')
+      if (isExpanded !== 'true') {
+        // Click the chevron button (sibling of the input wrapper)
+        await projectInput
+          .locator(
+            'xpath=ancestor::div[contains(@class,"join")]//button[contains(@class,"join-item")]',
+          )
+          .click()
+      }
+      await expect(page.locator('[role="option"]').first()).toBeVisible({ timeout: 3000 })
     }).toPass({ timeout: 15000 })
 
     // Skip if no project options available (e.g. user is in an E2E-created org)
@@ -69,7 +72,9 @@ test.describe.serial('Booking lifecycle @crud', () => {
     await page.getByTestId('booking-start-submit-btn').click()
 
     // Running booking should appear
-    await expect(page.getByTestId('booking-current-stop-btn').first()).toBeVisible({
+    await expect(
+      page.getByTestId('booking-current-stop-btn').locator('visible=true').first(),
+    ).toBeVisible({
       timeout: 10000,
     })
   })
@@ -142,7 +147,9 @@ test.describe.serial('Booking lifecycle @crud', () => {
     await page.getByTestId('booking-ctx-start-btn').click()
 
     // Running booking should appear
-    await expect(page.getByTestId('booking-current-stop-btn').first()).toBeVisible({
+    await expect(
+      page.getByTestId('booking-current-stop-btn').locator('visible=true').first(),
+    ).toBeVisible({
       timeout: 10000,
     })
   })

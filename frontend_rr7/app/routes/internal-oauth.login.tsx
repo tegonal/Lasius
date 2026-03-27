@@ -291,23 +291,24 @@ export default function InternalOAuthLogin() {
                   })}
                 </Button>
                 {allowRegistration && (
-                  <a
+                  <Button
                     data-testid="auth-internal-signup-btn"
-                    href={(() => {
+                    fullWidth
+                    onClick={() => {
                       const params = new URLSearchParams()
                       if (invitationId)
                         params.set('invitation_id', invitationId)
                       if (returnTo) params.set('returnTo', returnTo)
                       const qs = params.toString()
-                      return `${href('/internal-oauth/register')}${qs ? `?${qs}` : ''}`
-                    })()}
+                      globalThis.location.href = `${href('/internal-oauth/register')}${qs ? `?${qs}` : ''}`
+                    }}
+                    type="button"
+                    variant="secondary"
                   >
-                    <Button fullWidth type="button" variant="secondary">
-                      {t('actions.signUp', {
-                        defaultValue: 'Sign up',
-                      })}
-                    </Button>
-                  </a>
+                    {t('actions.signUp', {
+                      defaultValue: 'Sign up',
+                    })}
+                  </Button>
                 )}
               </ButtonGroup>
             </FormBody>

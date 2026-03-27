@@ -26,15 +26,18 @@ const startBookingViaQuickStart = async (page: Page) => {
   const projectInput = page.getByRole('combobox', { name: /project/i })
   await projectInput.waitFor({ state: 'visible', timeout: 10000 })
 
-  // The chevron button is the sibling button after the combobox wrapper
-  const chevronBtn = projectInput.locator(
-    'xpath=ancestor::div[contains(@class,"join")]//button[contains(@class,"join-item")][last()]',
-  )
-
+  // The chevron ComboboxButton toggles the dropdown — only click when closed
   await expect(async () => {
-    await chevronBtn.click()
+    const isExpanded = await projectInput.getAttribute('aria-expanded')
+    if (isExpanded !== 'true') {
+      await projectInput
+        .locator(
+          'xpath=ancestor::div[contains(@class,"join")]//button[contains(@class,"join-item")]',
+        )
+        .click()
+    }
     await expect(page.locator('[role="option"]').first()).toBeVisible({
-      timeout: 2000,
+      timeout: 3000,
     })
   }).toPass({ timeout: 15000 })
 
