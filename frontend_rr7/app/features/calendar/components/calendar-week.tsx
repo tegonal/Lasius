@@ -31,7 +31,7 @@ import { useCalendarNavigation } from '~/features/calendar/hooks/use-calendar-na
 import { useCalendarSelection } from '~/features/calendar/hooks/use-calendar-selection'
 import { usePersistedSearchParam } from '~/hooks/use-persisted-search-param'
 import { cn } from '~/lib/utils/cn'
-import { formatISOLocale } from '~/lib/utils/dates'
+import { formatDateToURLParam } from '~/lib/utils/dates'
 
 // ─── CalendarWeek ───────────────────────────────────────────────────────────
 
@@ -43,7 +43,7 @@ export const CalendarWeek = ({
   const { t } = useTranslation(['calendar', 'common'])
   const selectedDate = usePersistedSearchParam(
     'date',
-    formatISOLocale(new Date()),
+    formatDateToURLParam(new Date()),
   )
   const dayRefs = useRef<(HTMLElement | null)[]>([])
 

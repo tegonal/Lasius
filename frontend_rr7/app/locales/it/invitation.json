@@ -24,9 +24,12 @@
   },
   "needsAccount": {
     "description": "Dovrai accedere o creare un account per {{email}} per accettare questo invito.",
+    "descriptionSignIn": "Sign in as {{email}} to accept this invitation.",
     "emailMatch": "Assicurati di accedere con l'indirizzo email a cui è stato inviato questo invito: {{email}}",
     "signInOrSignUpWith": "Continua all'accesso",
-    "title": "Account richiesto"
+    "signInWith": "Sign in with",
+    "title": "Account richiesto",
+    "titleSignIn": "Sign In Required"
   },
   "title": {
     "invitationCreated": "Invito creato",

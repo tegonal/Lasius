@@ -32,6 +32,7 @@ import { FormElement } from '~/components/ui/forms/form-element'
 import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { Modal } from '~/components/ui/overlays/modal/modal'
+import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
 import { type ModelsSimpleTag } from '~/services/api/lasius/modelsSimpleTag'
 import { type ModelsTag } from '~/services/api/lasius/modelsTag'
 
@@ -135,6 +136,12 @@ const TagsAdminCore = ({
         }}
         open={showAddModal}
       >
+        <ModalCloseButton
+          onClose={() => {
+            setShowAddModal(false)
+            setInputText('')
+          }}
+        />
         <FormElement>
           <Label htmlFor="newTag">
             {t('tag-manager:actions.addTag', {

@@ -28,6 +28,7 @@ import { FormElement } from '~/components/ui/forms/form-element'
 import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 
 import { Modal } from './modal'
+import { ModalCloseButton } from './modal-close-button'
 
 type ConformProps = SharedProps & {
   /** @deprecated Use field prop instead */
@@ -100,6 +101,7 @@ const ConformInputModal = ({
 
   return (
     <Modal onClose={onClose} open={open}>
+      <ModalCloseButton onClose={onClose} />
       <FormElement>
         <Label htmlFor={field.id}>{label}</Label>
         <Input
@@ -146,6 +148,7 @@ const ControlledInputModal = ({
 
   return (
     <Modal onClose={onClose} open={open}>
+      <ModalCloseButton onClose={onClose} />
       <FormElement>
         <Label>{label}</Label>
         <Input

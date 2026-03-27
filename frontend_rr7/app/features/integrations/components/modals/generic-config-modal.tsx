@@ -34,6 +34,7 @@ import { useToast } from '~/components/ui/feedback/use-toast'
 import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { DurationInput } from '~/components/ui/forms/input/duration-input'
 import { Modal } from '~/components/ui/overlays/modal/modal'
+import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
 import { GithubResourceOwnerField } from '~/features/integrations/components/modals/config-fields/github-resource-owner-field'
 import { JiraCredentialFields } from '~/features/integrations/components/modals/config-fields/jira-credential-fields'
 import { PlaneFields } from '~/features/integrations/components/modals/config-fields/plane-fields'
@@ -239,19 +240,13 @@ export const GenericConfigModal = ({
       <div className="flex h-full flex-col">
         {/* Header */}
         <div className="flex-shrink-0">
-          <div className="mb-2 flex items-center justify-between">
+          <ModalCloseButton onClose={onClose} />
+          <div className="mb-2">
             <h3 className="text-lg font-semibold">
               {t('issueImporters.titles.edit', {
                 defaultValue: 'Edit Integration',
               })}
             </h3>
-            <button
-              className="btn btn-ghost btn-sm btn-circle"
-              onClick={onClose}
-              type="button"
-            >
-              &times;
-            </button>
           </div>
           <p className="text-base-content/60 mb-6 text-sm">
             {t('issueImporters.descriptions.edit', {

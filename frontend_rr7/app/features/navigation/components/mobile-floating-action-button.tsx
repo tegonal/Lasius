@@ -39,6 +39,7 @@ import {
 import { ButtonGroup } from '~/components/ui/forms/button-group'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { Modal } from '~/components/ui/overlays/modal/modal'
+import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
 import { BookingAddUpdateForm } from '~/features/bookings/components/booking-add-update-form'
 import { BookingStart } from '~/features/home/components/booking-start'
 import { FavoriteListCompact } from '~/features/home/components/favorite-list-compact'
@@ -165,6 +166,7 @@ export const MobileFloatingActionButton = () => {
 
       {/* Start Booking Modal - Quick start with project + tags */}
       <Modal onClose={closeModal} open={openModal === 'start'}>
+        <ModalCloseButton onClose={closeModal} />
         <BookingStart
           onSuccess={closeModal}
           selectedOrgId={selectedOrganisationId}
@@ -178,6 +180,7 @@ export const MobileFloatingActionButton = () => {
 
       {/* Add Booking Modal - Full form */}
       <Modal onClose={closeModal} open={openModal === 'add'}>
+        <ModalCloseButton onClose={closeModal} />
         <BookingAddUpdateForm
           mode="add"
           onClose={closeModal}
@@ -192,6 +195,7 @@ export const MobileFloatingActionButton = () => {
 
       {/* Favorites Modal */}
       <Modal onClose={closeModal} open={openModal === 'favorites'}>
+        <ModalCloseButton onClose={closeModal} />
         <FavoriteListCompact
           favorites={favoritesApi.data?.favorites ?? []}
           selectedOrgId={selectedOrganisationId}
@@ -205,6 +209,7 @@ export const MobileFloatingActionButton = () => {
 
       {/* Organisation Select Modal */}
       <Modal onClose={closeModal} open={openModal === 'org'}>
+        <ModalCloseButton onClose={closeModal} />
         <OrgSwitcherModal onClose={closeModal} />
         <ButtonGroup>
           <Button onClick={closeModal} variant="secondary">
@@ -215,6 +220,7 @@ export const MobileFloatingActionButton = () => {
 
       {/* Settings Modal with App Settings Form */}
       <Modal onClose={closeModal} open={openModal === 'settings'} size="lg">
+        <ModalCloseButton onClose={closeModal} />
         <AppSettingsForm />
         <ButtonGroup>
           <Button onClick={closeModal} variant="secondary">

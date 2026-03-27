@@ -27,6 +27,7 @@
     "showOnboarding": "Afficher le tutoriel d'introduction",
     "theme": "Thème"
   },
+  "changeUserProfileSettings": "Change user profile settings",
   "forms": {
     "confirmNewPassword": "Confirmer le mot de passe",
     "email": "E-mail",

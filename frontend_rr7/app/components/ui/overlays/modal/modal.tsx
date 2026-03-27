@@ -23,7 +23,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '~/lib/utils/cn'
 
 const modalContainerVariants = cva(
-  'bg-base-100 text-base-content relative mx-2 rounded-lg p-6 shadow-lg md:mx-0 md:p-8',
+  'bg-base-100 text-base-content relative mx-2 flex flex-col overflow-hidden rounded-lg p-6 shadow-lg md:mx-0 md:p-8',
   {
     defaultVariants: {
       size: 'md',
@@ -32,7 +32,7 @@ const modalContainerVariants = cva(
       size: {
         auto: 'h-auto w-full max-w-full md:w-auto md:max-w-[80%]',
         lg: 'h-[90vh] w-full max-w-full md:w-4/5 md:max-w-[800px]',
-        md: 'w-full max-w-full md:w-4/5 md:max-w-[500px]',
+        md: 'max-h-[90vh] w-full max-w-full md:w-4/5 md:max-w-[500px]',
         xl: 'h-[90vh] w-full max-w-full md:w-4/5 md:max-w-[1200px]',
       },
     },

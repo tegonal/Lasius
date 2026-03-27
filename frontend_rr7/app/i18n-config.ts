@@ -60,6 +60,7 @@ export const NAMESPACES = [
   'integrations',
   'invitation',
   'navigation',
+  'onboarding',
   'organisation',
   'projects',
   'settings',

@@ -6,6 +6,7 @@
     "clear": "Clear",
     "close": "Close",
     "help": "Help",
+    "next": "Next",
     "reset": "Reset",
     "resetToInitial": "Reset to initial value",
     "save": "Save",
@@ -189,6 +190,7 @@
     "settings": "Settings"
   },
   "of": "of",
+  "ok": "Ok",
   "projects": {
     "selectProject": "Select project"
   },

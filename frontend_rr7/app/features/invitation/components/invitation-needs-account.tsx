@@ -17,17 +17,20 @@
  *
  */
 
-import { SiGithub, SiGitlab, SiKeycloak } from '@icons-pack/react-simple-icons'
 import { useTranslation } from 'react-i18next'
-import { href } from 'react-router'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { Card, CardBody } from '~/components/ui/cards/card'
 import { Alert } from '~/components/ui/feedback/alert'
-import { LasiusIcon } from '~/components/ui/icons/lasius-icon'
 import { LoginInfoPanel } from '~/features/auth/auth-info-panels'
 import { AuthLayout } from '~/features/auth/auth-layout'
+import { maskEmail } from '~/lib/utils/mask-email'
 import { type ModelsInvitationStatusResponse } from '~/services/api/lasius/modelsInvitationStatusResponse'
+import { providerLoginUrl } from '~/services/auth/auth-urls'
+import {
+  getProviderDisplayName,
+  getProviderIcon,
+} from '~/services/auth/provider-display'
 import { type AuthProvider } from '~/services/auth/types'
 
 interface Props {
@@ -44,18 +47,8 @@ export const InvitationNeedsAccount = ({
   const { t } = useTranslation('invitation')
 
   const returnTo = `/join/${invitation.invitation.id}`
-
-  const getProviderLoginUrl = (provider: AuthProvider): string => {
-    const params = new URLSearchParams({
-      invitation_id: invitation.invitation.id,
-      returnTo,
-    })
-    if (provider === 'internal') {
-      params.set('email', invitation.invitation.invitedEmail)
-      return `${href('/internal-oauth/login')}?${params.toString()}`
-    }
-    return `${href('/oauth/:provider/login', { provider })}?${params.toString()}`
-  }
+  const isRegistered = invitation.status === 'InvitationOk'
+  const maskedEmail = maskEmail(invitation.invitation.invitedEmail)
 
   const invitationMessage =
     invitation.invitation.type === 'JoinOrganisationInvitation'
@@ -80,14 +73,22 @@ export const InvitationNeedsAccount = ({
         <CardBody className="p-8 lg:p-10">
           <div className="mb-8 space-y-4 text-center">
             <h2 className="text-3xl font-bold">
-              {t('needsAccount.title', 'Account Required')}
+              {isRegistered
+                ? t('needsAccount.titleSignIn', 'Sign In Required')
+                : t('needsAccount.title', 'Account Required')}
             </h2>
             <p className="text-base-content/60">
-              {t('needsAccount.description', {
-                defaultValue:
-                  "You'll need to sign in or create an account for {{email}} to accept this invitation.",
-                email: invitation.invitation.invitedEmail,
-              })}
+              {isRegistered
+                ? t('needsAccount.descriptionSignIn', {
+                    defaultValue:
+                      'Sign in as {{email}} to accept this invitation.',
+                    email: maskedEmail,
+                  })
+                : t('needsAccount.description', {
+                    defaultValue:
+                      "You'll need to sign in or create an account for {{email}} to accept this invitation.",
+                    email: maskedEmail,
+                  })}
             </p>
           </div>
 
@@ -95,7 +96,7 @@ export const InvitationNeedsAccount = ({
             {t('needsAccount.emailMatch', {
               defaultValue:
                 'Make sure to sign in with the email address this invitation was sent to: {{email}}',
-              email: invitation.invitation.invitedEmail,
+              email: maskedEmail,
             })}
           </Alert>
 
@@ -103,7 +104,11 @@ export const InvitationNeedsAccount = ({
             {providers.map((provider) => (
               <a
                 data-testid={`invite-provider-${provider}`}
-                href={getProviderLoginUrl(provider)}
+                href={providerLoginUrl(provider, {
+                  email: invitation.invitation.invitedEmail,
+                  invitation_id: invitation.invitation.id,
+                  returnTo,
+                })}
                 key={provider}
               >
                 <Button
@@ -116,10 +121,12 @@ export const InvitationNeedsAccount = ({
                     {getProviderIcon(provider)}
                   </span>
                   <span className="flex-1 text-left">
-                    {t(
-                      'needsAccount.signInOrSignUpWith',
-                      'Sign in or sign up with',
-                    )}{' '}
+                    {isRegistered
+                      ? t('needsAccount.signInWith', 'Sign in with')
+                      : t(
+                          'needsAccount.signInOrSignUpWith',
+                          'Sign in or sign up with',
+                        )}{' '}
                     <span className="font-semibold">
                       {getProviderDisplayName(provider, keycloakName)}
                     </span>
@@ -132,40 +139,4 @@ export const InvitationNeedsAccount = ({
       </Card>
     </AuthLayout>
   )
-}
-
-const getProviderDisplayName = (
-  provider: AuthProvider,
-  keycloakName: string | undefined,
-): string => {
-  if (provider === 'keycloak' && keycloakName) {
-    return keycloakName
-  }
-  const names: Record<AuthProvider, string> = {
-    github: 'GitHub',
-    gitlab: 'GitLab',
-    internal: 'Email & Password',
-    keycloak: 'Keycloak',
-  }
-  return names[provider]
-}
-
-const getProviderIcon = (provider: AuthProvider): React.ReactNode => {
-  switch (provider) {
-    case 'github': {
-      return <SiGithub size={24} />
-    }
-    case 'gitlab': {
-      return <SiGitlab size={24} />
-    }
-    case 'internal': {
-      return <LasiusIcon size={24} />
-    }
-    case 'keycloak': {
-      return <SiKeycloak size={24} />
-    }
-    default: {
-      return null
-    }
-  }
 }

@@ -24,9 +24,12 @@
   },
   "needsAccount": {
     "description": "Tu devras te connecter ou créer un compte pour {{email}} afin d'accepter cette invitation.",
+    "descriptionSignIn": "Sign in as {{email}} to accept this invitation.",
     "emailMatch": "Assure-toi de te connecter avec l'adresse e-mail à laquelle cette invitation a été envoyée : {{email}}",
     "signInOrSignUpWith": "Se connecter ou s'inscrire avec",
-    "title": "Compte requis"
+    "signInWith": "Sign in with",
+    "title": "Compte requis",
+    "titleSignIn": "Sign In Required"
   },
   "title": {
     "invitationCreated": "Invitation créée",

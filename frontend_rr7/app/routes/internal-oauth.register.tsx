@@ -49,8 +49,13 @@ import { RegisterInfoPanel } from '~/features/auth/auth-info-panels'
 import { AuthLayout } from '~/features/auth/auth-layout'
 import { type SchemaTranslationFn, untyped } from '~/lib/i18n-types'
 import { logger } from '~/lib/logger'
+import { ApiError } from '~/services/api/lasius-fetch-instance'
 import { registerOAuthUser } from '~/services/api/lasius/oauth2-provider/oauth2-provider'
-import { getOptionalUser } from '~/services/auth/auth-helpers.server'
+import {
+  getOptionalUser,
+  sanitizeReturnTo,
+} from '~/services/auth/auth-helpers.server'
+import { internalLoginUrl } from '~/services/auth/auth-urls'
 
 import { type Route } from './+types/internal-oauth.register'
 
@@ -138,26 +143,26 @@ export async function action({ request }: Route.ActionArgs) {
       password,
     })
 
-    const params = new URLSearchParams({
-      email: email.trim(),
-      registered: 'true',
-    })
-    if (invitationId) {
-      params.set('invitation_id', invitationId)
-    }
-    if (returnTo) {
-      params.set('returnTo', returnTo)
-    }
-
-    return redirect(`${href('/internal-oauth/login')}?${params.toString()}`)
+    return redirect(
+      internalLoginUrl({
+        email: email.trim(),
+        invitation_id: invitationId,
+        registered: true,
+        returnTo,
+      }),
+    )
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'unknown_error'
-    logger.warn('Registration failed', { email, error: message })
+    const isApiError = error instanceof ApiError
+    const body = isApiError ? String(error.body) : ''
 
-    const errorCode =
-      message.includes('user_already_registered') || message.includes('409')
-        ? 'user_already_registered'
-        : 'register_unknown'
+    logger.warn('Registration failed', {
+      email,
+      error: isApiError ? `${error.status}: ${body}` : String(error),
+    })
+
+    const errorCode = body.includes('user_already_registered')
+      ? 'user_already_registered'
+      : 'register_unknown'
 
     return data(
       {
@@ -182,13 +187,10 @@ export default function InternalOAuthRegister() {
   const { t } = useTranslation('common')
   const [showPasswords, setShowPasswords] = useState(false)
 
-  const backToLoginHref = (() => {
-    const params = new URLSearchParams()
-    if (invitationId) params.set('invitation_id', invitationId)
-    if (returnTo) params.set('returnTo', returnTo)
-    const qs = params.toString()
-    return `${href('/internal-oauth/login')}${qs ? `?${qs}` : ''}`
-  })()
+  const backToLoginHref = internalLoginUrl({
+    invitation_id: invitationId,
+    returnTo,
+  })
 
   const registerSchema = createRegisterSchema(untyped(t))
 
@@ -427,7 +429,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url)
   const email = url.searchParams.get('email') ?? ''
   const invitationId = url.searchParams.get('invitation_id') ?? ''
-  const returnTo = url.searchParams.get('returnTo') ?? ''
+  const returnTo = sanitizeReturnTo(url.searchParams.get('returnTo') ?? '')
 
   return { email, invitationId, returnTo }
 }

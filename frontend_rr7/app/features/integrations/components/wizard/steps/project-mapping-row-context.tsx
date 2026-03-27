@@ -17,7 +17,7 @@
  *
  */
 
-import { Pencil, Plus, Trash2 } from 'lucide-react'
+import { Pencil, Plus, RefreshCw, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -48,6 +48,7 @@ type Props = {
     lasiusProjectId: null | string,
     tagConfig?: TagConfiguration,
   ) => void
+  onRefreshTags?: (projectId: string) => void
   selectedProjectId?: string
 }
 
@@ -56,6 +57,7 @@ export const ProjectMappingRowContext = ({
   externalProject,
   importerType,
   onMappingChange,
+  onRefreshTags,
   selectedProjectId,
 }: Props) => {
   const { t } = useTranslation('integrations')
@@ -91,7 +93,7 @@ export const ProjectMappingRowContext = ({
     <>
       <ContextBody hash={externalProject.id} variant="compact">
         <ContextButtonOpen />
-        <ContextAnimatePresence variant="compact">
+        <ContextAnimatePresence inModal variant="compact">
           <ContextBar>
             <ContextButtonWrapper variant="compact">
               <Button
@@ -142,6 +144,27 @@ export const ProjectMappingRowContext = ({
                   variant="contextIcon"
                 >
                   <LucideIcon icon={Trash2} size={24} />
+                </Button>
+              </ContextButtonWrapper>
+            )}
+            {onRefreshTags && selectedProjectId && (
+              <ContextButtonWrapper variant="compact">
+                <Button
+                  aria-label={t('issueImporters.actions.refreshTags', {
+                    defaultValue: 'Refresh tags',
+                  })}
+                  fullWidth={false}
+                  onClick={() => {
+                    onRefreshTags(selectedProjectId)
+                    handleCloseAll()
+                  }}
+                  shape="circle"
+                  title={t('issueImporters.actions.refreshTags', {
+                    defaultValue: 'Refresh tags',
+                  })}
+                  variant="contextIcon"
+                >
+                  <LucideIcon icon={RefreshCw} size={24} />
                 </Button>
               </ContextButtonWrapper>
             )}

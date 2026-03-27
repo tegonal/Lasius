@@ -17,10 +17,11 @@
  *
  */
 
-import { href, redirect } from 'react-router'
+import { redirect } from 'react-router'
 
 import { getCsrfToken } from '~/services/api/lasius/general/general'
 
+import { loginUrl } from './auth-urls'
 import { getSessionTokens } from './session.server'
 import { type LasiusSessionData } from './types'
 
@@ -114,11 +115,9 @@ export async function requireUser(request: Request): Promise<AuthResult> {
 
     // Resource routes (fetcher-only endpoints) should not set returnTo —
     // redirecting to /api/* after login makes no sense for the user.
-    const returnTo = pathname.startsWith('/api/')
-      ? '/'
-      : encodeURIComponent(pathname)
+    const returnTo = pathname.startsWith('/api/') ? '/' : pathname
 
-    throw redirect(`${href('/login')}?returnTo=${returnTo}`)
+    throw redirect(loginUrl({ returnTo }))
   }
 
   return { headers: result.headers, session: result.tokens }

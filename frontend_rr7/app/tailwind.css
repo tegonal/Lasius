@@ -367,6 +367,37 @@
     animation-name: fadeIn;
   }
 
+  /* Onboarding slide transitions */
+  @keyframes slideInFromRight {
+    from {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slideInFromLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .animate-slide-in-right {
+    animation: slideInFromRight 0.3s ease-out;
+  }
+
+  .animate-slide-in-left {
+    animation: slideInFromLeft 0.3s ease-out;
+  }
+
   @keyframes gradientShift {
     0% {
       background-position: 0% 50%;

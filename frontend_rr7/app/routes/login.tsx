@@ -17,15 +17,13 @@
  *
  */
 
-import { SiGithub, SiGitlab, SiKeycloak } from '@icons-pack/react-simple-icons'
 import { AlertTriangle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { href, redirect } from 'react-router'
+import { redirect } from 'react-router'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { Card, CardBody } from '~/components/ui/cards/card'
 import { Alert } from '~/components/ui/feedback/alert'
-import { LasiusIcon } from '~/components/ui/icons/lasius-icon'
 import { Logo } from '~/components/ui/icons/logo'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import {
@@ -39,8 +37,12 @@ import {
   getOptionalUser,
   sanitizeReturnTo,
 } from '~/services/auth/auth-helpers.server'
+import { providerLoginUrl } from '~/services/auth/auth-urls'
+import {
+  getProviderDisplayName,
+  getProviderIcon,
+} from '~/services/auth/provider-display'
 import { getEnabledProviders } from '~/services/auth/providers'
-import { type AuthProvider } from '~/services/auth/types'
 
 import { type Route } from './+types/login'
 
@@ -124,7 +126,7 @@ export default function Login({
               })}
             </p>
             <meta
-              content={`0;url=${getProviderLoginUrl(singleProvider, returnTo)}`}
+              content={`0;url=${providerLoginUrl(singleProvider, { returnTo })}`}
               httpEquiv="refresh"
             />
           </CardBody>
@@ -192,7 +194,7 @@ export default function Login({
               {providers.map((provider) => (
                 <a
                   data-testid={`auth-provider-${provider}`}
-                  href={getProviderLoginUrl(provider, returnTo)}
+                  href={providerLoginUrl(provider, { returnTo })}
                   key={provider}
                 >
                   <Button
@@ -252,50 +254,4 @@ export default function Login({
       </div>
     </AuthLayout>
   )
-}
-
-const getProviderDisplayName = (
-  provider: AuthProvider,
-  keycloakName: string | undefined,
-): string => {
-  if (provider === 'keycloak' && keycloakName) {
-    return keycloakName
-  }
-  const names: Record<AuthProvider, string> = {
-    github: 'GitHub',
-    gitlab: 'GitLab',
-    internal: 'Email & Password',
-    keycloak: 'Keycloak',
-  }
-  return names[provider]
-}
-
-const getProviderIcon = (provider: AuthProvider): React.ReactNode => {
-  switch (provider) {
-    case 'github': {
-      return <SiGithub size={24} />
-    }
-    case 'gitlab': {
-      return <SiGitlab size={24} />
-    }
-    case 'internal': {
-      return <LasiusIcon size={24} />
-    }
-    case 'keycloak': {
-      return <SiKeycloak size={24} />
-    }
-    default: {
-      return null
-    }
-  }
-}
-
-const getProviderLoginUrl = (
-  provider: AuthProvider,
-  returnTo: string,
-): string => {
-  if (provider === 'internal') {
-    return `${href('/internal-oauth/login')}?returnTo=${encodeURIComponent(returnTo)}`
-  }
-  return `${href('/oauth/:provider/login', { provider })}?returnTo=${encodeURIComponent(returnTo)}`
 }

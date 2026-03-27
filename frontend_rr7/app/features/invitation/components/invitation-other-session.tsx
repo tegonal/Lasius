@@ -27,7 +27,9 @@ import { FormBody } from '~/components/ui/forms/form-body'
 import { FormElement } from '~/components/ui/forms/form-element'
 import { Logo } from '~/components/ui/icons/logo'
 import { AuthLayout } from '~/features/auth/auth-layout'
+import { maskEmail } from '~/lib/utils/mask-email'
 import { type ModelsInvitationStatusResponse } from '~/services/api/lasius/modelsInvitationStatusResponse'
+import { logoutUrl } from '~/services/auth/auth-urls'
 
 interface Props {
   invitation: ModelsInvitationStatusResponse
@@ -38,7 +40,7 @@ export const InvitationOtherSession = ({ invitation }: Props) => {
   const navigate = useNavigate()
 
   const handleSignOut = () => {
-    void navigate('/logout')
+    void navigate(logoutUrl())
   }
 
   return (
@@ -57,7 +59,7 @@ export const InvitationOtherSession = ({ invitation }: Props) => {
             {t('invitation:errors.createdForSomeoneElse', {
               defaultValue:
                 'This invitation has been created for someone else. Either log out and refresh, or forward the invitation link to the user {{email}}',
-              email: invitation.invitation.invitedEmail,
+              email: maskEmail(invitation.invitation.invitedEmail),
             })}
           </Alert>
           <FormBody>

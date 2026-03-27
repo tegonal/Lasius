@@ -40,15 +40,6 @@ type Props = {
   open: boolean
 }
 
-const formatDateString = (dateString?: null | string, locale?: string) => {
-  if (!dateString) return 'N/A'
-  try {
-    return new Date(dateString).toLocaleString(locale)
-  } catch {
-    return dateString
-  }
-}
-
 const FormattedDateOrNA = ({ date }: { date?: null | string }) => {
   if (!date) return <>N/A</>
   return <FormatDate date={date} format="fullDateLong" />
@@ -57,7 +48,8 @@ const FormattedDateOrNA = ({ date }: { date?: null | string }) => {
 const getUserName = (user: ModelsUserStub | string | undefined): string => {
   if (!user) return 'N/A'
   if (typeof user === 'string') return user
-  return user.key
+  const name = `${user.firstName} ${user.lastName}`.trim()
+  return name || user.email || user.key
 }
 
 const getConnectivityIcon = (status: string) => {
@@ -153,20 +145,10 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
                     <dd className="text-sm font-medium">
                       {t('issueImporters.info.checkFrequencyValue', {
                         defaultValue: '{{minutes}} minutes',
-                        minutes: Math.floor(
+                        minutes: Math.round(
                           (config.checkFrequency || 0) / 60_000,
                         ),
                       })}
-                    </dd>
-                  </div>
-                  <div className="flex justify-between">
-                    <dt className="text-base-content/70 text-sm">
-                      {t('issueImporters.info.projectCount', {
-                        defaultValue: 'Project Mappings',
-                      })}
-                    </dt>
-                    <dd className="text-sm font-medium">
-                      {config.projectCount}
                     </dd>
                   </div>
                 </dl>
@@ -190,16 +172,20 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
                     />
                     <div>
                       <p className="font-medium">
-                        {String(connectivityStatus || 'unknown')}
+                        {t(
+                          `issueImporters.healthStatus.${connectivityStatus || 'unknown'}`,
+                          { defaultValue: connectivityStatus || 'unknown' },
+                        )}
                       </p>
                       {syncStatus.lastConnectivityCheck && (
                         <p className="text-base-content/60 text-xs">
                           {t('issueImporters.info.lastChecked', {
-                            date: formatDateString(
-                              syncStatus.lastConnectivityCheck,
-                            ),
-                            defaultValue: 'Last checked: {{date}}',
-                          })}
+                            defaultValue: 'Last checked:',
+                          })}{' '}
+                          <FormatDate
+                            date={syncStatus.lastConnectivityCheck}
+                            format="fullDateLong"
+                          />
                         </p>
                       )}
                     </div>
@@ -210,7 +196,9 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
                       <div>
                         <p className="text-sm font-medium">
                           {syncStatus.currentIssue.errorCode ||
-                            'Issue detected'}
+                            t('issueImporters.info.issueDetected', {
+                              defaultValue: 'Issue detected',
+                            })}
                         </p>
                         {syncStatus.currentIssue.message && (
                           <p className="mt-1 text-xs">
@@ -362,9 +350,7 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
                           })}
                         </dt>
                         <dd className="text-sm font-medium">
-                          {getUserName(
-                            config.audit.createdBy as ModelsUserStub | string,
-                          )}
+                          {getUserName(config.audit.createdBy)}
                         </dd>
                       </div>
                     )}
@@ -391,9 +377,7 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
                           })}
                         </dt>
                         <dd className="text-sm font-medium">
-                          {getUserName(
-                            config.audit.updatedBy as ModelsUserStub | string,
-                          )}
+                          {getUserName(config.audit.updatedBy)}
                         </dd>
                       </div>
                     )}

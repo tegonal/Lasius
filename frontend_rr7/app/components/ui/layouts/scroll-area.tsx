@@ -26,13 +26,15 @@ export const ScrollArea = ({
   children,
   className,
   onScroll,
+  style,
 }: {
   children: ReactNode
   className?: string
   onScroll?: React.UIEventHandler<HTMLDivElement>
+  style?: React.CSSProperties
 }) => {
   return (
-    <BaseScrollArea.Root className={cn('min-h-0', className)}>
+    <BaseScrollArea.Root className={cn('min-h-0', className)} style={style}>
       <BaseScrollArea.Viewport
         className="h-full overscroll-contain"
         onScroll={onScroll}

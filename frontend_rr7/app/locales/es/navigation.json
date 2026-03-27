@@ -1,4 +1,5 @@
 {
+  "currentOrganisation": "Current organisation",
   "organisation": {
     "current": "Organización actual",
     "integrations": "Integraciones",
@@ -23,5 +24,6 @@
     "lists": "Listas",
     "projects": "Mis proyectos",
     "stats": "Estadísticas"
-  }
+  },
+  "yourTimeBookingView": "Your time booking view"
 }

@@ -6,6 +6,7 @@
     "clear": "Cancella",
     "close": "Chiudi",
     "help": "Aiuto",
+    "next": "Next",
     "reset": "Ripristina",
     "resetToInitial": "Ripristina al valore iniziale",
     "save": "Salva",
@@ -189,6 +190,7 @@
     "settings": "Impostazioni"
   },
   "of": "di",
+  "ok": "Ok",
   "projects": {
     "selectProject": "Seleziona progetto"
   },

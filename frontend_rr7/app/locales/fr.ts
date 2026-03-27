@@ -29,6 +29,7 @@ import home from './fr/home.json'
 import integrations from './fr/integrations.json'
 import invitation from './fr/invitation.json'
 import navigation from './fr/navigation.json'
+import onboarding from './fr/onboarding.json'
 import organisation from './fr/organisation.json'
 import projects from './fr/projects.json'
 import settings from './fr/settings.json'
@@ -50,6 +51,7 @@ export default {
   integrations,
   invitation,
   navigation,
+  onboarding,
   organisation,
   projects,
   settings,

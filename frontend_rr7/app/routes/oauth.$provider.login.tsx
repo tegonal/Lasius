@@ -26,6 +26,7 @@ import {
 } from '~/lib/crypto.server'
 import { logger } from '~/lib/logger'
 import { sanitizeReturnTo } from '~/services/auth/auth-helpers.server'
+import { loginUrl } from '~/services/auth/auth-urls'
 import { oauthStateCookie } from '~/services/auth/oauth-state-cookie.server'
 import { getProvider, isProviderEnabled } from '~/services/auth/providers'
 import { type AuthProvider } from '~/services/auth/types'
@@ -45,7 +46,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     logger.warn('Invalid or disabled OAuth provider requested', {
       provider: providerName,
     })
-    throw redirect(`${href('/login')}?error=invalid_provider`)
+    throw redirect(loginUrl({ error: 'invalid_provider' }))
   }
 
   const url = new URL(request.url)

@@ -20,6 +20,7 @@
 import { href, redirect } from 'react-router'
 
 import { logger } from '~/lib/logger'
+import { loginUrl } from '~/services/auth/auth-urls'
 import {
   oauthStateCookie,
   type OAuthStateCookieData,
@@ -37,12 +38,12 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   if (error) {
     logger.error('OAuth callback received error from provider', { error })
-    throw redirect(`${href('/login')}?error=${encodeURIComponent(error)}`)
+    throw redirect(loginUrl({ error }))
   }
 
   if (!code || !state) {
     logger.warn('OAuth callback missing code or state')
-    throw redirect(`${href('/login')}?error=no_code`)
+    throw redirect(loginUrl({ error: 'no_code' }))
   }
 
   // Read and validate state cookie
@@ -53,7 +54,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   if (!cookieData) {
     logger.warn('OAuth callback: state cookie missing or expired')
-    throw redirect(`${href('/login')}?error=state_mismatch`)
+    throw redirect(loginUrl({ error: 'state_mismatch' }))
   }
 
   if (cookieData.state !== state) {
@@ -61,7 +62,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       expected: cookieData.state,
       received: state,
     })
-    throw redirect(`${href('/login')}?error=state_mismatch`)
+    throw redirect(loginUrl({ error: 'state_mismatch' }))
   }
 
   const { codeVerifier, provider: providerName, returnTo } = cookieData
@@ -112,7 +113,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       error: error_,
       provider: providerName,
     })
-    throw redirect(`${href('/login')}?error=token_exchange_failed`)
+    throw redirect(loginUrl({ error: 'token_exchange_failed' }))
   }
 }
 

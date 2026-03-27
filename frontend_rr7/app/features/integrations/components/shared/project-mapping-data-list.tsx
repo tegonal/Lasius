@@ -17,13 +17,7 @@
  *
  */
 
-import {
-  AlertTriangle,
-  ArrowRight,
-  FolderOpen,
-  RefreshCw,
-  X,
-} from 'lucide-react'
+import { AlertTriangle, ArrowRight, FolderOpen, X } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -45,6 +39,7 @@ import {
   type MappingWithTagConfig,
   type TagConfiguration,
 } from '~/features/integrations/lib/mapping-helpers'
+import { useProjects } from '~/features/projects/hooks/use-projects'
 import { untyped } from '~/lib/i18n-types'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 import { type ModelsExternalProject } from '~/services/api/lasius'
@@ -73,6 +68,7 @@ export const ProjectMappingDataList = ({
   projects,
 }: ProjectMappingDataListProps) => {
   const { t } = useTranslation('integrations')
+  const { findProjectById } = useProjects()
   const [filterText, setFilterText] = useState('')
 
   const { mappedCount, orphanedMappings, showFilter, sortedProjects } =
@@ -219,39 +215,25 @@ export const ProjectMappingDataList = ({
                       icon={FolderOpen}
                       size={16}
                     />
-                    <span className="text-sm">{mapping.projectId}</span>
+                    <span className="text-sm">
+                      {findProjectById(mapping.projectId)?.key ??
+                        mapping.projectId}
+                    </span>
                   </div>
                 </DataListField>
                 <DataListField>
-                  <div className="flex items-center gap-1">
-                    {onRefreshTags && (
-                      <Button
-                        aria-label={t('issueImporters.actions.refreshTags', {
-                          defaultValue: 'Refresh tags',
-                        })}
-                        fullWidth={false}
-                        onClick={() => onRefreshTags(mapping.projectId)}
-                        size="sm"
-                        title={t('issueImporters.actions.refreshTags', {
-                          defaultValue: 'Refresh tags',
-                        })}
-                        variant="ghost"
-                      >
-                        <LucideIcon icon={RefreshCw} size={14} />
-                      </Button>
-                    )}
-                    <ProjectMappingRowContext
-                      existingTagConfig={mapping.tagConfig}
-                      externalProject={{
-                        id: externalId,
-                        name: externalId,
-                        ownerType: 'User',
-                      }}
-                      importerType={importerType}
-                      onMappingChange={onMappingChange}
-                      selectedProjectId={mapping.projectId}
-                    />
-                  </div>
+                  <ProjectMappingRowContext
+                    existingTagConfig={mapping.tagConfig}
+                    externalProject={{
+                      id: externalId,
+                      name: externalId,
+                      ownerType: 'User',
+                    }}
+                    importerType={importerType}
+                    onMappingChange={onMappingChange}
+                    onRefreshTags={onRefreshTags}
+                    selectedProjectId={mapping.projectId}
+                  />
                 </DataListField>
               </DataListRow>
             ))}
@@ -290,7 +272,8 @@ export const ProjectMappingDataList = ({
                         size={16}
                       />
                       <span className="text-sm">
-                        {mappings[project.id]?.projectId}
+                        {findProjectById(mappings[project.id]?.projectId ?? '')
+                          ?.key ?? mappings[project.id]?.projectId}
                       </span>
                     </div>
                   ) : (
@@ -302,33 +285,14 @@ export const ProjectMappingDataList = ({
                   )}
                 </DataListField>
                 <DataListField>
-                  <div className="flex items-center gap-1">
-                    {onRefreshTags && mappings[project.id] && (
-                      <Button
-                        aria-label={t('issueImporters.actions.refreshTags', {
-                          defaultValue: 'Refresh tags',
-                        })}
-                        fullWidth={false}
-                        onClick={() =>
-                          onRefreshTags(mappings[project.id]!.projectId)
-                        }
-                        size="sm"
-                        title={t('issueImporters.actions.refreshTags', {
-                          defaultValue: 'Refresh tags',
-                        })}
-                        variant="ghost"
-                      >
-                        <LucideIcon icon={RefreshCw} size={14} />
-                      </Button>
-                    )}
-                    <ProjectMappingRowContext
-                      existingTagConfig={mappings[project.id]?.tagConfig}
-                      externalProject={project}
-                      importerType={importerType}
-                      onMappingChange={onMappingChange}
-                      selectedProjectId={mappings[project.id]?.projectId}
-                    />
-                  </div>
+                  <ProjectMappingRowContext
+                    existingTagConfig={mappings[project.id]?.tagConfig}
+                    externalProject={project}
+                    importerType={importerType}
+                    onMappingChange={onMappingChange}
+                    onRefreshTags={onRefreshTags}
+                    selectedProjectId={mappings[project.id]?.projectId}
+                  />
                 </DataListField>
               </DataListRow>
             ))}

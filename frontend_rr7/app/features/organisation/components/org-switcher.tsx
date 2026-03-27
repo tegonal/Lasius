@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next'
 import { AvatarOrganisation } from '~/components/ui/data-display/avatar/avatar-organisation'
 import { ButtonGroup } from '~/components/ui/forms/button-group'
 import { Modal } from '~/components/ui/overlays/modal/modal'
+import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
 import { OrgSwitcherModal } from '~/features/organisation/components/org-switcher-modal'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 
@@ -49,6 +50,7 @@ export const OrgSwitcher = () => {
         </span>
       </button>
       <Modal onClose={handleClose} open={isOpen}>
+        <ModalCloseButton onClose={handleClose} />
         <OrgSwitcherModal onClose={handleClose} />
         <ButtonGroup>
           <button

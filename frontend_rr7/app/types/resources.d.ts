@@ -40,6 +40,9 @@ interface Resources {
     }
     duration: 'Duration'
     emptyToday: 'No bookings for this day'
+    favorites: {
+      title: 'Favorites'
+    }
     hints: {
       useEndTimeOfLatest: 'Use end time of latest booking as start time for this one'
       useEndTimeOfPrevious: 'Use end time of previous booking as start time for this one'
@@ -92,6 +95,7 @@ interface Resources {
       clear: 'Clear'
       close: 'Close'
       help: 'Help'
+      next: 'Next'
       reset: 'Reset'
       resetToInitial: 'Reset to initial value'
       save: 'Save'
@@ -175,6 +179,13 @@ interface Resources {
       }
     }
     cancel: 'Cancel'
+    common: {
+      actions: {
+        close: 'Close'
+        closeActionsMenu: 'Close actions menu'
+        openActionsMenu: 'Open actions menu'
+      }
+    }
     custom: 'Custom'
     date: 'Date'
     demo: {
@@ -263,7 +274,12 @@ interface Resources {
         workspaceRequired: 'Workspace is required'
       }
     }
+    navigation: {
+      openMenu: 'Open menu'
+      settings: 'Settings'
+    }
     of: 'of'
+    ok: 'Ok'
     projects: {
       selectProject: 'Select project'
     }
@@ -351,6 +367,7 @@ interface Resources {
       passwordTooShort: 'Minimum 9 characters'
       projectKeyRequired: 'Project name is required'
       required: 'Required'
+      startBeforeEnd: 'Start time must be before end time'
       startMustBeInPast: 'Start time must be in the past'
       themeRequired: 'Theme is required'
     }
@@ -439,18 +456,20 @@ interface Resources {
       checkInterval: 'Check Interval'
       checkIntervalHelp: 'How often to check for new issues'
       configListItem: {
-        projectCount_one: '{{count}} project'
-        projectCount_other: '{{count}} projects'
+        projectCount_one: '{{count}} mapping'
+        projectCount_other: '{{count}} mappings'
       }
       descriptions: {
         edit: 'Update the configuration for this issue importer integration.'
       }
       emptyState: 'No integrations configured yet. Add one to get started.'
       errors: {
+        deleteFailed: 'Failed to delete integration'
         invalidMappingData: 'Invalid mapping data'
         mappingRemoveFailed: 'Failed to remove project mapping'
         mappingSaveFailed: 'Failed to save project mapping'
         tagsRefreshFailed: 'Failed to refresh tags'
+        updateFailed: 'Failed to update integration'
       }
       fields: {
         accessToken: 'Access Token'
@@ -519,14 +538,14 @@ interface Resources {
         createdAt: 'Created'
         createdBy: 'Created By'
         healthStatus: 'Health Status'
+        issueDetected: 'Issue detected'
         issuesSynced: 'Issues'
-        lastChecked: 'Last checked: {{date}}'
+        lastChecked: 'Last checked:'
         lastSuccessfulSync: 'Last Successful Sync'
         lastSync: 'Last Sync'
         name: 'Name'
         nextScheduledSync: 'Next Scheduled Sync'
         noConfig: 'No configuration selected.'
-        projectCount: 'Project Mappings'
         projectName: 'Project'
         projectStats: 'Project Statistics'
         title: 'Configuration Info'
@@ -552,9 +571,30 @@ interface Resources {
         title: '{{platform}} Project Mappings'
       }
       success: {
+        configCreated: 'Integration created successfully'
+        configDeleted: 'Integration deleted successfully'
+        configUpdated: 'Integration updated successfully'
         mappingRemoved: 'Project mapping removed successfully'
         mappingSaved: 'Project mapping saved successfully'
         tagsRefreshed: 'Tags refresh triggered successfully'
+      }
+      tagConfiguration: {
+        description: 'Configure which fields from external issues should be used to create tags in Lasius.'
+        issueLabelFilterHelp: 'Leave empty to import all issues, or select labels to import only issues that have at least one of these labels.'
+        issueLabelFilterLabel: 'Import only issues with specific labels'
+        issueLabelFilterPlaceholder: 'All issues (or select labels to filter...)'
+        issueStateFilterHelp: 'Leave empty to import all issues, or select states to import only issues in those states.'
+        issueStateFilterLabel: 'Import only issues with specific states'
+        issueStateFilterPlaceholder: 'All states (or select specific states...)'
+        labelFilterHelp: 'Leave empty to import all labels, or select specific labels to import only those.'
+        labelFilterLabel: 'Import only specific labels'
+        labelFilterPlaceholder: 'All labels (or select specific labels...)'
+        tagFieldsLabel: 'Tag fields to import'
+        tagFieldsPlaceholder: 'Select fields...'
+        useAssignees: 'Use assignees as tags'
+        useLabels: 'Use labels as tags'
+        useMilestone: 'Use milestone as tag'
+        useTitle: 'Use issue title as tag'
       }
       testConnection: {
         editModeNote: 'Note: Enter your credentials above to test the connection. Leave empty to keep existing credentials when saving.'
@@ -582,8 +622,6 @@ interface Resources {
           lasiusProject: 'Lasius Project'
           loadError: 'Failed to load projects. Please try again.'
           loading: 'Loading projects from {{platform}}...'
-          mappingCount_one: 'Found {{count}} projects from {{platform}}. Map them to your Lasius projects to import issues. {{mapped}} of {{total}} mapped.'
-          mappingCount_other: 'Found {{count}} projects from {{platform}}. Map them to your Lasius projects to import issues. {{mapped}} of {{total}} mapped.'
           mappingDescription: 'Link this external project to a Lasius project to automatically sync issues as time tracking tags.'
           mappingDescription_one: 'Found {{count}} projects from {{platform}}. Map them to your Lasius projects to import issues. {{mapped}} of {{total}} mapped.'
           mappingDescription_other: 'Found {{count}} projects from {{platform}}. Map them to your Lasius projects to import issues. {{mapped}} of {{total}} mapped.'
@@ -592,7 +630,6 @@ interface Resources {
           orphanedProject: 'Project no longer available'
           removeMapping: 'Remove mapping'
           selectMappingDescription: 'Choose which Lasius project should be linked to this external project.'
-          tagConfigPlaceholder: 'Tag configuration options will be available after saving.'
           title: 'Map External Projects'
         }
         selectPlatform: {
@@ -652,9 +689,12 @@ interface Resources {
     }
     needsAccount: {
       description: "You'll need to sign in or create an account for {{email}} to accept this invitation."
+      descriptionSignIn: 'Sign in as {{email}} to accept this invitation.'
       emailMatch: 'Make sure to sign in with the email address this invitation was sent to: {{email}}'
       signInOrSignUpWith: 'Sign in or sign up with'
+      signInWith: 'Sign in with'
       title: 'Account Required'
+      titleSignIn: 'Sign In Required'
     }
     title: {
       invitationCreated: 'Invitation created'
@@ -662,6 +702,7 @@ interface Resources {
     }
   }
   navigation: {
+    currentOrganisation: 'Current organisation'
     organisation: {
       current: 'Organisation'
       integrations: 'Integrations'
@@ -687,6 +728,98 @@ interface Resources {
       projects: 'My projects'
       stats: 'Statistics'
     }
+    yourTimeBookingView: 'Your time booking view'
+  }
+  onboarding: {
+    actions: {
+      backToChecklist: 'Back to Checklist'
+      gotIt: 'Ok, got it!'
+    }
+    booking: {
+      step1: 'Use the Booking Form'
+      step1Desc: 'Find the booking form in the right column and select a project.'
+      step2: 'Or Use Context Menu'
+      step2Desc: 'Right-click any booking, favorite, or team booking and choose the stopwatch icon.'
+      step3: 'Stop When Done'
+      step3Desc: 'When you finish working, stop the timer.'
+      subtitle: "You're all set! Here's how to create your first booking."
+      title: 'Start Tracking Time'
+    }
+    checklist: {
+      booking: 'Start tracking time'
+      help: 'Click on any item to learn more about it'
+      organisation: 'Create or join an organization'
+      progress: 'Your Progress'
+      project: 'Create or join a project'
+      subtitle: 'Follow these simple steps to start tracking time'
+      title: "Let's Get You Started"
+      workingHours: 'Set working hours for this organization'
+    }
+    closeTutorial: 'Close tutorial'
+    confirmClose: 'Are you sure you want to close the tutorial? You can re-enable it in App Settings.'
+    navigation: {
+      importantUI: 'Important UI Elements'
+      mainNavigation: 'Main Navigation'
+      organisationDesc: 'Manage your current organization, create new organizations and view organization-wide data'
+      orgSwitcher: 'Organization Switcher'
+      orgSwitcherDesc: 'In the top-right corner, switch between your organizations'
+      settingsDesc: 'Configure app settings, account, security and working hours'
+      subtitle: 'Here are the main parts of Lasius you will use every day.'
+      title: 'Getting Around Lasius'
+      userDesc: 'Track your time, view your bookings, dashboard, projects, statistics and lists'
+      weeklyCalendar: 'Weekly Calendar'
+      weeklyCalendarDesc: 'At the top of the page, switch between days to view your bookings'
+    }
+    organisation: {
+      action: 'Manage Organizations'
+      step1: 'Create Your Own'
+      step1Desc: 'Go to Organization settings and create a new organization to invite others.'
+      step2: 'Or Join an Existing One'
+      step2Desc: 'Ask someone to invite you and wait for them to send you an invite link.'
+      subtitle: 'Organizations let you work with team members and track time together.'
+      title: 'Create or Join an Organization'
+    }
+    overview: {
+      exports: 'Exports & Lists'
+      exportsDesc: 'Find your reports in the Lists section'
+      help: "Click 'Next' to see what you need to set up"
+      organisations: 'Organizations'
+      organisationsDesc: 'Collaborate with your team members'
+      projects: 'Projects'
+      projectsDesc: 'Organize work into trackable projects'
+      subtitle: 'Here are the basic building blocks you should know about'
+      tags: 'Tags & Tag Groups'
+      tagsDesc: 'Categorize your bookings for detailed reports'
+      title: 'Welcome to Lasius'
+      workingHours: 'Working Hours'
+      workingHoursDesc: 'Track your planned work hours per week'
+    }
+    privateOrganisation: {
+      explanation: "Your private organization is perfect for tracking personal projects and anything you don't need to share with others. Only you can see the projects and time tracked here."
+      help: "Click 'Next' to continue"
+      subtitle: 'You already have a private organization for personal use.'
+      tip: 'Good to Know'
+      tipDesc: 'If you want to work with team members, you can create or join additional organizations.'
+      title: 'Your Private Organization'
+    }
+    projects: {
+      action: 'Go to My Projects'
+      step1: 'Create Your Own'
+      step1Desc: 'Go to My Projects and create a new project.'
+      step2: 'Or Join an Existing One'
+      step2Desc: 'Ask an administrator to add you to their project.'
+      subtitle: 'Projects help you organize your time. You need at least one to get started.'
+      title: 'Create or Join a Project'
+    }
+    workingHours: {
+      action: 'Set Working Hours'
+      step1: 'Go to Working Hours'
+      step1Desc: 'Click the button below to set your hours.'
+      step2: 'Enter Your Weekly Hours'
+      step2Desc: 'Set how many hours you work each day. Lasius will show your progress.'
+      subtitle: 'Tell Lasius how many hours per week you plan to work.'
+      title: 'Set Working Hours'
+    }
   }
   organisation: {
     actions: {
@@ -696,6 +829,7 @@ interface Resources {
       create: 'Create organisation'
       edit: 'Edit organisation'
       save: 'Save'
+      switch: 'Switch organisation'
     }
     adminDescription: 'You are an administrator of this organisation. You can add and remove members and change the organisation name, or create a new one.'
     createDescription: 'Add a new organisation using the Actions button at the top of the list.'
@@ -830,6 +964,7 @@ interface Resources {
       showOnboarding: 'Show Onboarding Tutorial'
       theme: 'Theme'
     }
+    changeUserProfileSettings: 'Change user profile settings'
     forms: {
       confirmNewPassword: 'Confirm new password'
       email: 'Email'

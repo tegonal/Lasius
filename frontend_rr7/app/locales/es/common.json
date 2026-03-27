@@ -6,6 +6,7 @@
     "clear": "Borrar",
     "close": "Cerrar",
     "help": "Ayuda",
+    "next": "Next",
     "reset": "Restablecer",
     "resetToInitial": "Restablecer al valor inicial",
     "save": "Guardar",
@@ -189,6 +190,7 @@
     "settings": "Configuración"
   },
   "of": "de",
+  "ok": "Ok",
   "projects": {
     "selectProject": "Seleccionar proyecto"
   },

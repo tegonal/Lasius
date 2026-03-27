@@ -29,6 +29,7 @@ import { FieldSet } from '~/components/ui/forms/field-set'
 import { FormElement } from '~/components/ui/forms/form-element'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { Modal } from '~/components/ui/overlays/modal/modal'
+import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
 import { cn } from '~/lib/utils/cn'
 
 type Props = {
@@ -142,6 +143,7 @@ export const TimeDropdownWithModal = ({
       </Menu.Root>
 
       <Modal autoSize onClose={handleClose} open={isOpen}>
+        <ModalCloseButton onClose={handleClose} />
         <FieldSet>
           <FormElement>
             <Heading as="h3" className="mb-4" variant="section">

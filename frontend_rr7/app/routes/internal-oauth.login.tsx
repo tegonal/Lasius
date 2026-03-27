@@ -53,6 +53,7 @@ import {
   getOptionalUser,
   sanitizeReturnTo,
 } from '~/services/auth/auth-helpers.server'
+import { internalRegisterUrl } from '~/services/auth/auth-urls'
 import { getInternalProvider } from '~/services/auth/providers'
 import { createUserSession } from '~/services/auth/session.server'
 
@@ -305,14 +306,10 @@ export default function InternalOAuthLogin() {
                   <Link
                     className="btn bg-neutral-gradient hover:bg-neutral-gradient-hover w-full border-none text-white"
                     data-testid="auth-internal-signup-btn"
-                    to={(() => {
-                      const params = new URLSearchParams()
-                      if (invitationId)
-                        params.set('invitation_id', invitationId)
-                      if (returnTo) params.set('returnTo', returnTo)
-                      const qs = params.toString()
-                      return `${href('/internal-oauth/register')}${qs ? `?${qs}` : ''}`
-                    })()}
+                    to={internalRegisterUrl({
+                      invitation_id: invitationId,
+                      returnTo,
+                    })}
                   >
                     {t('actions.signUp', {
                       defaultValue: 'Sign up',

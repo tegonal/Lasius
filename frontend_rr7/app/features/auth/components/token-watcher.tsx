@@ -19,7 +19,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { href, useNavigate, useRevalidator } from 'react-router'
+import { useNavigate, useRevalidator } from 'react-router'
 
 import { ButtonGroup } from '~/components/ui/forms/button-group'
 import { Modal } from '~/components/ui/overlays/modal/modal'
@@ -30,6 +30,7 @@ import {
   SESSION_POLL_INTERVAL_MS,
 } from '~/config/constants'
 import { logger } from '~/lib/logger'
+import { loginUrl, logoutUrl } from '~/services/auth/auth-urls'
 import { useUIStore } from '~/stores/ui-store'
 
 interface SessionStatus {
@@ -64,7 +65,7 @@ export const TokenWatcher = () => {
 
       if (!status.authenticated) {
         logger.info('[TokenWatcher] Session gone, redirecting to login')
-        void navigate(href('/login'), { replace: true })
+        void navigate(loginUrl(), { replace: true })
         return
       }
 
@@ -100,7 +101,7 @@ export const TokenWatcher = () => {
 
   const handleLogout = useCallback(() => {
     setShowWarning(false)
-    void navigate(href('/logout'))
+    void navigate(logoutUrl())
   }, [navigate])
 
   return (

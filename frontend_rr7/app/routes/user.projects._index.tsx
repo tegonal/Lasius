@@ -20,10 +20,7 @@
 import { data } from 'react-router'
 
 import { MyProjectsLayout } from '~/features/projects/components/my-projects-layout'
-import {
-  getProjectLastActivityDate,
-  getProjectList,
-} from '~/services/api/lasius/projects/projects'
+import { getProjectLastActivityDate } from '~/services/api/lasius/projects/projects'
 import { getUserProfile } from '~/services/api/lasius/user/user'
 import {
   authHeaders,
@@ -37,7 +34,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const auth = await requireUser(request)
   const headers = authHeaders(auth.session)
 
-  // Get user profile for org selection
+  // Get user profile — projects are embedded in the user's org memberships
   const profile = await getUserProfile({ headers })
   const user = profile.data
   const organisations = user.organisations ?? []
@@ -47,20 +44,24 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     organisations[0]?.organisationReference.id ??
     ''
 
-  // Fetch projects for selected org
-  const projectsRes = await getProjectList(selectedOrgId, { headers })
-  const projects = projectsRes.data ?? []
+  // Get projects from the user's org membership (no admin-only API call needed)
+  const selectedOrg = organisations.find(
+    (o) => o.organisationReference.id === selectedOrgId,
+  )
+  const projects = selectedOrg?.projects ?? []
 
   // Fetch last activity dates for all projects in parallel
   const lastActivityResults = await Promise.allSettled(
     projects.map((p) =>
-      getProjectLastActivityDate(selectedOrgId, p.id, { headers }),
+      getProjectLastActivityDate(selectedOrgId, p.projectReference.id, {
+        headers,
+      }),
     ),
   )
   const lastActivityDates: Record<string, null | string> = {}
   for (const [i, project] of projects.entries()) {
     const result = lastActivityResults[i]
-    lastActivityDates[project.id] =
+    lastActivityDates[project.projectReference.id] =
       result?.status === 'fulfilled' && result.value?.status === 200
         ? result.value.data
         : null

@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next'
 import { CardSmall } from '~/components/ui/cards/card-small'
 import { AvatarOrganisation } from '~/components/ui/data-display/avatar/avatar-organisation'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+import { ModalBody } from '~/components/ui/overlays/modal/modal-body'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { type ModelsEntityReference } from '~/services/api/lasius/modelsEntityReference'
 import { type ModelsUserOrganisation } from '~/services/api/lasius/modelsUserOrganisation'
@@ -58,39 +59,44 @@ export const OrgSwitcherModal = ({
   }
 
   return (
-    <div data-testid="org-switcher-modal">
-      <h1 className="mb-4 text-2xl font-bold">
+    <div
+      className="flex h-full min-h-0 flex-1 flex-col"
+      data-testid="org-switcher-modal"
+    >
+      <h1 className="mb-4 shrink-0 text-2xl font-bold">
         {t('selectOrganisation', 'Select organisation')}
       </h1>
-      <div className="grid grid-cols-3 gap-3">
-        {organisations.map((item) => (
-          <CardSmall
-            data-testid="org-card"
-            key={item.organisationReference.id}
-            onClick={() => selectOrganisation(item.organisationReference)}
-          >
-            <div className="flex flex-col items-center justify-center pt-2">
-              <AvatarOrganisation
-                name={item.organisationReference.key}
-                size={64}
-              />
-            </div>
-            <div className="leading-normal">
-              {item.private
-                ? t('myPersonalOrganisation', 'My personal organisation')
-                : item.organisationReference.key}
-            </div>
-            {isCurrent(item) && (
-              <div
-                className="absolute top-2 right-2"
-                title={t('selected', 'Selected')}
-              >
-                <LucideIcon icon={CheckCircleIcon} size={18} />
+      <ModalBody>
+        <div className="grid grid-cols-3 gap-3 pb-1">
+          {organisations.map((item) => (
+            <CardSmall
+              data-testid="org-card"
+              key={item.organisationReference.id}
+              onClick={() => selectOrganisation(item.organisationReference)}
+            >
+              <div className="flex flex-col items-center justify-center pt-2">
+                <AvatarOrganisation
+                  name={item.organisationReference.key}
+                  size={64}
+                />
               </div>
-            )}
-          </CardSmall>
-        ))}
-      </div>
+              <div className="leading-normal">
+                {item.private
+                  ? t('myPersonalOrganisation', 'My personal organisation')
+                  : item.organisationReference.key}
+              </div>
+              {isCurrent(item) && (
+                <div
+                  className="absolute top-2 right-2"
+                  title={t('selected', 'Selected')}
+                >
+                  <LucideIcon icon={CheckCircleIcon} size={18} />
+                </div>
+              )}
+            </CardSmall>
+          ))}
+        </div>
+      </ModalBody>
     </div>
   )
 }

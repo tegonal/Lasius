@@ -29,6 +29,7 @@ import { BookingCurrent } from '~/features/bookings/components/booking-current'
 import { BookingListSelectedDay } from '~/features/bookings/components/booking-list-selected-day'
 import { BookingDayStatsProgressBar } from '~/features/home/components/booking-day-stats-progress-bar'
 import { IndexColumnTabs } from '~/features/home/components/index-column-tabs'
+import { OnboardingTutorial } from '~/features/onboarding/components/onboarding-tutorial'
 import { augmentBookingsList } from '~/lib/api/functions/augment-bookings-list'
 import { getExpectedVsBookedPercentage } from '~/lib/api/functions/get-expected-vs-booked-percentage'
 import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
@@ -66,7 +67,10 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   // Read selected date from URL search param, fall back to today
   const url = new URL(request.url)
   const dateParam = url.searchParams.get('date')
-  const selectedDate = dateParam || formatISOLocale(new Date())
+  const selectedDate =
+    dateParam && !Number.isNaN(new Date(dateParam).getTime())
+      ? dateParam
+      : formatISOLocale(new Date())
   const dayTimespan = apiTimespanDay(selectedDate)
 
   // Fetch day bookings, current booking, favorites, org current bookings, and users in parallel
@@ -142,6 +146,7 @@ export default function HomeIndex({ loaderData }: Route.ComponentProps) {
 
   return (
     <div className={innerGridClasses}>
+      <OnboardingTutorial />
       <ColumnCenter>
         <div className="grid h-full w-full grid-rows-[min-content_min-content_auto] gap-1 pb-20 max-md:grid-rows-[min-content_auto] md:pb-0">
           <BookingDayStatsProgressBar />
