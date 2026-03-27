@@ -229,13 +229,32 @@
     height: 100%;
   }
 
-  a {
+  a:not(:has(*)) {
     color: var(--color-primary);
     text-decoration: underline;
 
     &:hover {
       text-decoration: none;
     }
+  }
+
+  /* Interactive elements should always show pointer cursor */
+  a,
+  button,
+  select,
+  summary,
+  [role='button'],
+  [role='link'],
+  [role='tab'],
+  [role='menuitem'],
+  [role='option'],
+  label.cursor-pointer,
+  input[type='checkbox'],
+  input[type='radio'],
+  input[type='submit'],
+  input[type='reset'],
+  input[type='button'] {
+    cursor: pointer;
   }
 
   /* Ensure smooth color transitions when theme changes */

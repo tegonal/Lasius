@@ -43,10 +43,10 @@ async function acceptTosIfVisible(page: Page, timeout = 5000) {
 async function loginAsInternalUser(page: Page, email: string, password: string) {
   // If on the login provider page, click internal provider
   try {
-    const providerBtn = page.getByTestId('auth-provider-internal_lasius')
+    const providerBtn = page.getByTestId('auth-provider-internal')
     await providerBtn.waitFor({ state: 'visible', timeout: 10000 })
     await providerBtn.click()
-    await page.waitForURL(/.*\/internal_oauth\/login.*/, { timeout: 10000 })
+    await page.waitForURL(/.*\/internal-oauth\/login.*/, { timeout: 10000 })
   } catch {
     // Already on the internal login page — continue
   }
@@ -147,30 +147,17 @@ test.describe.serial('Organisation + Invitation lifecycle @org', () => {
     test.setTimeout(120000)
     test.skip(!existingUserInviteLink, 'No invitation link — user was assigned directly')
 
-    // Phase 1: Login as demo2 and save session state
-    const loginContext = await browser.newContext()
-    const loginPage = await loginContext.newPage()
-
-    try {
-      await loginPage.goto('/login')
-      await loginAsInternalUser(loginPage, 'demo2@lasius.ch', 'demo')
-      await loginPage.waitForURL(/.*\/user\/.*/, { timeout: 30000 })
-      await acceptTosIfVisible(loginPage, 15000)
-      await loginContext.storageState({ path: '.auth/demo2.json' })
-    } finally {
-      await loginContext.close()
-    }
-
-    // Phase 2: Use saved session to visit the invite link
-    const context = await browser.newContext({ storageState: '.auth/demo2.json' })
+    // Phase 1: Login as demo2
+    const context = await browser.newContext()
     const freshPage = await context.newPage()
 
     try {
-      // Visit a protected page first to ensure auth middleware refreshes tokens
-      await freshPage.goto('/user/home')
-      await freshPage.waitForURL(/.*\/user\/.*/, { timeout: 15000 })
+      await freshPage.goto('/login')
+      await loginAsInternalUser(freshPage, 'demo2@lasius.ch', 'demo')
+      await freshPage.waitForURL(/.*\/user\/.*/, { timeout: 30000 })
+      await acceptTosIfVisible(freshPage, 15000)
 
-      // Navigate to the invite link
+      // Phase 2: Visit the invite link in the same session
       await freshPage.goto(existingUserInviteLink!)
       await freshPage.waitForURL(/.*\/join\/.*/, { timeout: 15000 })
 
@@ -212,50 +199,37 @@ test.describe.serial('Organisation + Invitation lifecycle @org', () => {
   })
 
   test('new user registers and accepts invitation', async ({ browser }) => {
-    test.setTimeout(90000)
+    test.setTimeout(120000)
     test.skip(!newUserInviteLink, 'No invitation link from previous test')
 
-    // Phase 1: Register the new user
-    const regContext = await browser.newContext()
-    const regPage = await regContext.newPage()
-
-    try {
-      await regPage.goto('/login')
-      await regPage.getByTestId('auth-provider-internal_lasius').click()
-      await regPage.waitForURL(/.*\/internal_oauth\/login.*/, { timeout: 10000 })
-
-      await regPage.getByTestId('auth-internal-signup-btn').click()
-      await regPage.waitForURL(/.*\/internal_oauth\/register.*/, { timeout: 20000 })
-
-      await regPage.getByTestId('auth-register-email-input').fill(newUserEmail)
-      await regPage.getByTestId('auth-register-firstname-input').fill('E2E')
-      await regPage.getByTestId('auth-register-lastname-input').fill('User')
-      await regPage.getByTestId('auth-register-password-input').fill(newUserPassword)
-      await regPage.getByTestId('auth-register-confirmpassword-input').fill(newUserPassword)
-
-      // Submit registration — redirects to login page
-      await regPage.getByTestId('auth-register-submit-btn').click()
-      await regPage.waitForURL(/.*\/login.*/, { timeout: 15000 })
-
-      // Log in with new credentials and save session state
-      await loginAsInternalUser(regPage, newUserEmail, newUserPassword)
-      await regPage.waitForURL(/.*\/user\/.*/, { timeout: 30000 })
-      await acceptTosIfVisible(regPage)
-      await regContext.storageState({ path: '.auth/newuser.json' })
-    } finally {
-      await regContext.close()
-    }
-
-    // Phase 2: Open a new context with the saved session and visit the invite link
-    const context = await browser.newContext({ storageState: '.auth/newuser.json' })
+    const context = await browser.newContext()
     const freshPage = await context.newPage()
 
     try {
-      // Visit a protected page first so the auth middleware refreshes the session token
-      await freshPage.goto('/user/home')
-      await freshPage.waitForURL(/.*\/user\/.*/, { timeout: 15000 })
+      // Register the new user
+      await freshPage.goto('/login')
+      await freshPage.getByTestId('auth-provider-internal').click()
+      await freshPage.waitForURL(/.*\/internal-oauth\/login.*/, { timeout: 10000 })
 
-      // Visit the invite link as an authenticated user
+      await freshPage.getByTestId('auth-internal-signup-btn').click()
+      await freshPage.waitForURL(/.*\/internal-oauth\/register.*/, { timeout: 20000 })
+
+      await freshPage.getByTestId('auth-register-email-input').fill(newUserEmail)
+      await freshPage.getByTestId('auth-register-firstname-input').fill('E2E')
+      await freshPage.getByTestId('auth-register-lastname-input').fill('User')
+      await freshPage.getByTestId('auth-register-password-input').fill(newUserPassword)
+      await freshPage.getByTestId('auth-register-confirmpassword-input').fill(newUserPassword)
+
+      // Submit registration — redirects to login page
+      await freshPage.getByTestId('auth-register-submit-btn').click()
+      await freshPage.waitForURL(/.*\/login.*/, { timeout: 15000 })
+
+      // Log in with new credentials in the same context
+      await loginAsInternalUser(freshPage, newUserEmail, newUserPassword)
+      await freshPage.waitForURL(/.*\/user\/.*/, { timeout: 30000 })
+      await acceptTosIfVisible(freshPage)
+
+      // Visit the invite link
       await freshPage.goto(newUserInviteLink!)
       await freshPage.waitForURL(/.*\/join\/.*/, { timeout: 15000 })
 

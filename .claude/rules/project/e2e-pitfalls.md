@@ -124,6 +124,33 @@ page.getByRole('dialog')
 
 `globalThis.location.href` assignment inside React onClick handlers doesn't reliably fire in Playwright headless. Use React Router `<Link>` or `useNavigate()` instead. If you encounter a button that doesn't navigate in tests but works manually, check for `location.href` in the handler.
 
+## Session State Does Not Persist Across Browser Contexts
+
+`storageState` saved from one `browser.newContext()` does not reliably restore the session in a new context. Server-side session cookies (HttpOnly, cookie-based auth) may not survive the save/restore cycle.
+
+**Always login again** at the start of each new browser context that needs authentication. Do not rely on saved `storageState` for authenticated flows.
+
+```typescript
+// ❌ Session lost — freshPage redirects to /login
+const context1 = await browser.newContext()
+// ... login, save state ...
+await context1.storageState({ path: '.auth/user.json' })
+await context1.close()
+const context2 = await browser.newContext({ storageState: '.auth/user.json' })
+// Page redirects to /login — session not restored
+
+// ✅ Login in the same context that needs the session
+const context = await browser.newContext()
+const page = await context.newPage()
+await page.goto('/login')
+await loginAsInternalUser(page, email, password)
+// ... continue in the same context ...
+```
+
+## Provider Test ID
+
+The internal auth provider button test ID is `auth-provider-internal` (not `auth-provider-internal_lasius`). The URL pattern is `/internal-oauth/login` (hyphen, not underscore).
+
 ## WebSocket Revalidation Load
 
 Starting/stopping bookings triggers WebSocket events → `revalidator.revalidate()` → re-runs ALL active loaders. Multiple parallel test workers amplify this. The Playwright config limits workers to 2 to reduce backend contention.

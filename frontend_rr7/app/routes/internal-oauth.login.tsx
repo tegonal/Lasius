@@ -226,21 +226,15 @@ export default function InternalOAuthLogin() {
       )}
       <Card className="bg-base-100/80 border-0 shadow-2xl backdrop-blur-sm">
         <CardBody className="p-8 lg:p-10">
-          <Button
-            className="self-center"
-            fullWidth={false}
-            onClick={() => {
-              globalThis.location.href = href('/login')
-            }}
-            size="sm"
-            type="button"
-            variant="ghost"
+          <Link
+            className="flex items-center gap-1 self-center text-sm"
+            to={href('/login')}
           >
             <ChevronLeft size={16} />
             {t('actions.back', {
               defaultValue: 'Back',
             })}
-          </Button>
+          </Link>
           <div className="mb-4 flex justify-center lg:hidden">
             <Logo />
           </div>

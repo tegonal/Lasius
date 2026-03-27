@@ -95,14 +95,15 @@ export const ConfigFormStep = ({
     shouldValidate: 'onSubmit',
   })
 
-  const checkFrequencyControl = useInputControl(fields.checkFrequency)
   const accessTokenControl = useInputControl(fields.accessToken)
+  const baseUrlControl = useInputControl(fields.baseUrl)
+  const checkFrequencyControl = useInputControl(fields.checkFrequency)
   const resourceOwnerControl = useInputControl(fields.resourceOwner)
   const resourceOwnerTypeControl = useInputControl(fields.resourceOwnerType)
 
   const { isLoadingResourceOwners, resourceOwners } = useGithubResourceOwners({
     accessToken: accessTokenControl.value ?? '',
-    baseUrl: formData.baseUrl ?? '',
+    baseUrl: baseUrlControl.value ?? '',
     importerType,
     orgId: selectedOrgId,
   })
@@ -168,13 +169,23 @@ export const ConfigFormStep = ({
                 defaultValue: 'Base URL',
               })}
             </label>
+            <input
+              name={fields.baseUrl.name}
+              type="hidden"
+              value={baseUrlControl.value ?? ''}
+            />
             <Input
-              {...getInputProps(fields.baseUrl, { type: 'text' })}
+              id={fields.baseUrl.id}
               key={fields.baseUrl.key}
+              onBlur={() => baseUrlControl.blur()}
+              onChange={(e) => baseUrlControl.change(e.target.value)}
+              onFocus={() => baseUrlControl.focus()}
               placeholder={t(
                 `issueImporters.fields.baseUrlPlaceholder.${importerType}`,
                 { defaultValue: 'https://...' },
               )}
+              type="text"
+              value={baseUrlControl.value ?? ''}
             />
             <FormFieldErrors errors={fields.baseUrl.errors} />
           </fieldset>
@@ -187,18 +198,28 @@ export const ConfigFormStep = ({
                   defaultValue: 'Access Token',
                 })}
               </label>
+              <input
+                name={fields.accessToken.name}
+                type="hidden"
+                value={accessTokenControl.value ?? ''}
+              />
               <Input
-                {...getInputProps(fields.accessToken, { type: 'password' })}
                 autoComplete="off"
                 data-1p-ignore
                 data-form-type="other"
                 data-lpignore="true"
+                id={fields.accessToken.id}
                 key={fields.accessToken.key}
+                onBlur={() => accessTokenControl.blur()}
+                onChange={(e) => accessTokenControl.change(e.target.value)}
+                onFocus={() => accessTokenControl.focus()}
                 placeholder={
                   importerType === 'github'
                     ? 'github_pat_xxxxxxxxxxxxx'
                     : 'glpat-xxxxxxxxxxxxx'
                 }
+                type="password"
+                value={accessTokenControl.value ?? ''}
               />
               <FormFieldErrors errors={fields.accessToken.errors} />
             </fieldset>
@@ -319,14 +340,24 @@ export const ConfigFormStep = ({
                     defaultValue: 'OAuth Access Token',
                   })}
                 </label>
+                <input
+                  name={fields.accessToken.name}
+                  type="hidden"
+                  value={accessTokenControl.value ?? ''}
+                />
                 <Input
-                  {...getInputProps(fields.accessToken, { type: 'password' })}
                   autoComplete="off"
                   data-1p-ignore
                   data-form-type="other"
                   data-lpignore="true"
+                  id={fields.accessToken.id}
                   key={fields.accessToken.key}
+                  onBlur={() => accessTokenControl.blur()}
+                  onChange={(e) => accessTokenControl.change(e.target.value)}
+                  onFocus={() => accessTokenControl.focus()}
                   placeholder="your-oauth-access-token"
+                  type="password"
+                  value={accessTokenControl.value ?? ''}
                 />
                 <FormFieldErrors errors={fields.accessToken.errors} />
               </fieldset>

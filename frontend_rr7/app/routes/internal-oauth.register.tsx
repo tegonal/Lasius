@@ -19,13 +19,14 @@
 
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { parseWithZod } from '@conform-to/zod/v4'
-import { Eye, EyeOff } from 'lucide-react'
+import { ChevronLeft, Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   data,
   Form,
   href,
+  Link,
   redirect,
   useActionData,
   useLoaderData,
@@ -181,6 +182,14 @@ export default function InternalOAuthRegister() {
   const { t } = useTranslation('common')
   const [showPasswords, setShowPasswords] = useState(false)
 
+  const backToLoginHref = (() => {
+    const params = new URLSearchParams()
+    if (invitationId) params.set('invitation_id', invitationId)
+    if (returnTo) params.set('returnTo', returnTo)
+    const qs = params.toString()
+    return `${href('/internal-oauth/login')}${qs ? `?${qs}` : ''}`
+  })()
+
   const registerSchema = createRegisterSchema(untyped(t))
 
   const [form, fields] = useForm<{
@@ -243,6 +252,15 @@ export default function InternalOAuthRegister() {
       )}
       <Card className="bg-base-100/80 border-0 shadow-2xl backdrop-blur-sm">
         <CardBody className="p-8 lg:p-10">
+          <Link
+            className="flex items-center gap-1 self-center text-sm"
+            to={backToLoginHref}
+          >
+            <ChevronLeft size={16} />
+            {t('auth.errors.backToLogin', {
+              defaultValue: 'Back to Login',
+            })}
+          </Link>
           <div className="mb-4 flex justify-center lg:hidden">
             <Logo />
           </div>
@@ -388,22 +406,6 @@ export default function InternalOAuthRegister() {
                 >
                   {t('actions.signUp', {
                     defaultValue: 'Sign up',
-                  })}
-                </Button>
-                <Button
-                  fullWidth
-                  onClick={() => {
-                    const params = new URLSearchParams()
-                    if (invitationId) params.set('invitation_id', invitationId)
-                    if (returnTo) params.set('returnTo', returnTo)
-                    const qs = params.toString()
-                    globalThis.location.href = `${href('/internal-oauth/login')}${qs ? `?${qs}` : ''}`
-                  }}
-                  type="button"
-                  variant="secondary"
-                >
-                  {t('auth.errors.backToLogin', {
-                    defaultValue: 'Back to Login',
                   })}
                 </Button>
               </ButtonGroup>
