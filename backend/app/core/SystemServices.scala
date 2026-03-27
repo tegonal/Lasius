@@ -228,16 +228,24 @@ class DefaultSystemServices @Inject() (
 
   override def createWsTicket(userId: UserId,
                               userReference: UserReference): String = {
+    evictExpiredTickets()
     val ticket = UUID.randomUUID().toString
-    wsTicketStore.put(ticket, (userId, userReference, Instant.now()))
+    wsTicketStore.put(ticket, (userId, userReference, Instant.now(clock)))
     ticket
+  }
+
+  private def evictExpiredTickets(): Unit = {
+    val now = Instant.now(clock).getEpochSecond
+    wsTicketStore.entrySet().removeIf { entry =>
+      now - entry.getValue._3.getEpochSecond > WsTicketTtlSeconds
+    }
   }
 
   override def consumeWsTicket(
       ticket: String): Option[(UserId, UserReference)] = {
     Option(wsTicketStore.remove(ticket)).flatMap { case (uid, ref, created) =>
       if (Instant
-          .now()
+          .now(clock)
           .getEpochSecond - created.getEpochSecond <= WsTicketTtlSeconds)
         Some((uid, ref))
       else

@@ -114,7 +114,8 @@ class InvitationsController @Inject() (
                     _ <- validate(
                       org.active,
                       s"Cannot join inactive organisation ${i.sharedByOrganisationReference.key}")
-                    // Auto-add to organisation if not already a member
+                    // Auto-add to organisation if not already a member.
+                    // projects = Seq() is correct — assignUserToProject below adds the project.
                     userOrg <- maybeUserOrg match {
                       case Some(uo) => Future.successful(uo)
                       case None     =>

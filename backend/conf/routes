@@ -180,7 +180,7 @@ GET    /oauth2/profile    controllers.OAuth2Controller.userProfile()
 #    401:
 #      description: Unauthorized
 ###
-POST /api/v1/auth/ws-ticket  controllers.AuthController.createWsTicket()
+POST /auth/ws-ticket  controllers.AuthController.createWsTicket()
 
 #######
 ####### Current User #######

@@ -156,7 +156,7 @@ export function ${hookName}(options?: ApiProxyOptions<${responseType}>) {
   if (hasBody) {
     imports.push({ name: baseTypeName(body.definition) })
   }
-  if (!BUILTIN_TYPES.has(baseTypeName(responseType))) {
+  if (!isBuiltinType(responseType)) {
     imports.push({ name: baseTypeName(responseType) })
   }
   if (queryParams) {
@@ -183,6 +183,14 @@ function getFetcherDependencies() {
       exports: [{ name: 'useFetcher', values: true }],
     },
   ]
+}
+
+// Check if a type string is entirely built-in (handles unions like "string | void")
+function isBuiltinType(type) {
+  return type
+    .split('|')
+    .map((t) => t.trim())
+    .every((t) => BUILTIN_TYPES.has(baseTypeName(t)))
 }
 
 export const fetcherClientBuilder = () => ({
