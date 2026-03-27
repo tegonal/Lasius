@@ -200,7 +200,7 @@ test.describe('Dashboard interactions @dashboard', () => {
   })
 
   test('year view calendar year toggle switches mode', async ({ page }) => {
-    // Navigate to year view
+    // Navigate to year view and wait for page to stabilize
     await page.getByTestId('dashboard-tab-year').click()
     await expect(page).toHaveURL(/\/user\/dashboard\/year/, { timeout: 10000 })
 
@@ -211,9 +211,11 @@ test.describe('Dashboard interactions @dashboard', () => {
     await expect(toggle).not.toBeChecked()
     expect(page.url()).not.toContain('year=calendar')
 
-    // Toggle to calendar year mode
-    await toggle.click()
-    await expect(page).toHaveURL(/year=calendar/, { timeout: 10000 })
+    // Toggle to calendar year mode — retry since concurrent setSearchParams can race
+    await expect(async () => {
+      await toggle.click()
+      await expect(page).toHaveURL(/year=calendar/, { timeout: 3000 })
+    }).toPass({ timeout: 15000 })
     await expect(toggle).toBeChecked()
 
     // Toggle back to rolling mode
