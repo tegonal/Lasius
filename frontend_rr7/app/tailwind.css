@@ -394,7 +394,28 @@
     }
   }
 
-  /* Override 1Password autofill styling - use theme colors */
+  /* Override 1Password + browser autofill styling in dark mode.
+   * 1Password has a bug where oklch() colors (used by Tailwind v4)
+   * break its theme detection, always applying light-mode autofill.
+   * The box-shadow inset trick visually covers the forced background. */
+  [data-theme='dark'] {
+    input[data-com-onepassword-filled],
+    textarea[data-com-onepassword-filled],
+    select[data-com-onepassword-filled],
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    textarea:-webkit-autofill,
+    textarea:-webkit-autofill:focus,
+    select:-webkit-autofill,
+    select:-webkit-autofill:focus {
+      -webkit-box-shadow: 0 0 0 1000px var(--color-base-100) inset !important;
+      -webkit-text-fill-color: var(--color-base-content) !important;
+      transition: background-color 5000s ease-in-out 0s;
+    }
+  }
+
+  /* Light mode: fix text color for 1Password-filled fields */
   input[data-com-onepassword-filled],
   textarea[data-com-onepassword-filled],
   select[data-com-onepassword-filled] {

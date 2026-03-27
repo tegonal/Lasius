@@ -75,7 +75,7 @@ test.describe.serial('Booking lifecycle @crud', () => {
   })
 
   test('stop a running booking', async ({ page }) => {
-    const stopBtn = page.getByTestId('booking-current-stop-btn')
+    const stopBtn = page.getByTestId('booking-current-stop-btn').first()
 
     // Skip if no booking is running
     if (!(await stopBtn.isVisible({ timeout: 5000 }).catch(() => false))) {

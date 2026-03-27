@@ -83,7 +83,7 @@ const ensureProjectsLoaded = async (page: Page) => {
   })
 
   const projectList = page.getByTestId('project-list')
-  if (!(await projectList.isVisible({ timeout: 3000 }).catch(() => false))) {
+  if (!(await projectList.isVisible({ timeout: 10000 }).catch(() => false))) {
     // No projects — create one
     await createProject(page)
   }
