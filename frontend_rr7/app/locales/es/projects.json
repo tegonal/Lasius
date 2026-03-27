@@ -1,54 +1,54 @@
 {
   "actions": {
-    "add": "Add Project",
-    "cancel": "Cancel",
-    "create": "Create project",
-    "deactivate": "Deactivate project",
-    "deactivateConfirm": "Are you sure you want to deactivate the project \"{{project}}\"?",
-    "edit": "Edit project",
-    "leave": "Leave this project"
+    "add": "Añadir proyecto",
+    "cancel": "Cancelar",
+    "create": "Crear un proyecto",
+    "deactivate": "Desactivar proyecto",
+    "deactivateConfirm": "¿Estás seguro de que quieres desactivar el proyecto \"{{project}}\"?",
+    "edit": "Editar proyecto",
+    "leave": "Abandonar este proyecto"
   },
-  "allProjects": "All projects",
-  "allProjectsDescription": "All projects in the current organization that you can administer. Create billing reports including time booked by external project members.",
+  "allProjects": "Todos los proyectos",
+  "allProjectsDescription": "Todos los proyectos de la organización actual que puedes administrar. Crea informes de facturación incluyendo el tiempo registrado por miembros externos del proyecto.",
   "confirmations": {
-    "leave": "Are you sure you want to leave this project?"
+    "leave": "¿Estás seguro de que quieres abandonar este proyecto?"
   },
-  "deactivatedBy": "Archived by {{user}}",
+  "deactivatedBy": "Archivado por {{user}}",
   "description": {
-    "add": "Create a new project to organize your time tracking.",
-    "edit": "Update the project details."
+    "add": "Crea un nuevo proyecto para organizar tu seguimiento de tiempo.",
+    "edit": "Actualiza los detalles del proyecto."
   },
-  "empty": "No projects found",
+  "empty": "No se encontraron proyectos",
   "errors": {
-    "projectNotFound": "This project could not be found. The project ID is shown above."
+    "projectNotFound": "No se pudo encontrar este proyecto. El ID del proyecto se muestra arriba."
   },
   "filter": {
-    "both": "Both",
-    "search": "Search",
-    "searchPlaceholder": "Filter projects...",
-    "status": "Status"
+    "both": "Ambos",
+    "search": "Buscar",
+    "searchPlaceholder": "Filtrar proyectos...",
+    "status": "Estado"
   },
   "info": {
-    "uniqueNameRequired": "Project names must be unique within your organisation."
+    "uniqueNameRequired": "Los nombres de los proyectos deben ser únicos dentro de tu organización."
   },
-  "label": "Project",
-  "lastActivity": "Last activity",
-  "myProjects": "My projects",
-  "myProjectsDescription": "Projects where you are a member and can book time. Restricted by the currently selected organisation.",
-  "project": "Project",
-  "projectName": "Project name",
-  "projectRole": "Project role",
+  "label": "Proyecto",
+  "lastActivity": "Última actividad",
+  "myProjects": "Mis proyectos",
+  "myProjectsDescription": "Proyectos en los que eres miembro y puedes registrar tiempo, filtrados por la organización actual.",
+  "project": "Proyecto",
+  "projectName": "Nombre del proyecto",
+  "projectRole": "Rol",
   "status": {
-    "assignedToUser": "Project successfully assigned to user.",
-    "created": "Project created",
-    "updated": "Project updated"
+    "assignedToUser": "Proyecto asignado correctamente al usuario.",
+    "created": "Proyecto creado",
+    "updated": "Proyecto actualizado"
   },
-  "title": "Projects",
+  "title": "Proyectos",
   "total": "Total",
   "warnings": {
-    "inactiveProjectContext": "Viewing stats from inactive project",
-    "inactiveProjectFilter": "Showing data for inactive project",
-    "projectNotInActiveList": "This project is not in your active projects list. It may be inactive or from another organization.",
-    "projectUnavailable": "This project is no longer in your profile. You may have been removed from it."
+    "inactiveProjectContext": "Viendo estadísticas de proyecto inactivo",
+    "inactiveProjectFilter": "Mostrando datos de proyecto inactivo",
+    "projectNotInActiveList": "Este proyecto no está en tu lista de proyectos activos. Puede estar inactivo o ser de otra organización.",
+    "projectUnavailable": "Este proyecto ya no está en tu perfil. Es posible que hayas sido eliminado del mismo."
   }
 }

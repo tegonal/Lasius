@@ -1,21 +1,21 @@
 {
   "actions": {
-    "cancel": "Cancel"
+    "cancel": "Abbrechen"
   },
-  "backendUnreachable": "Backend seems to be unreachable",
-  "connectedToBackend": "Connected to backend",
-  "connectingToBackend": "Connecting to backend",
-  "offlineMessage": "Lasius is currently offline or undergoing maintenance. We will be back shortly.",
+  "backendUnreachable": "Das Backend scheint nicht erreichbar zu sein",
+  "connectedToBackend": "Mit Backend verbunden",
+  "connectingToBackend": "Verbinde mit Backend",
+  "offlineMessage": "Lasius ist derzeit offline oder wird gewartet. Wir sind gleich wieder da.",
   "pwa": {
-    "reloadApplication": "Reload application",
-    "updateAvailable": "Update available",
-    "updateMessage": "Lasius has been updated. The page will reload after your confirmation."
+    "reloadApplication": "Anwendung neu laden",
+    "updateAvailable": "Update verfügbar",
+    "updateMessage": "Lasius wurde aktualisiert. Die Seite wird nach deiner Bestätigung neu geladen."
   },
   "websocket": {
     "status": {
-      "connected": "WebSocket connected",
-      "connecting": "WebSocket connecting",
-      "error": "Unable to connect to WebSocket"
+      "connected": "WebSocket verbunden",
+      "connecting": "WebSocket verbindet",
+      "error": "Verbindung zum WebSocket nicht möglich"
     }
   }
 }

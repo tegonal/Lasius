@@ -1,59 +1,59 @@
 {
   "actions": {
-    "add": "Add booking",
-    "adjustCurrentStart": "Adjust current booking to start at overlapping booking end",
-    "adjustEndToNext": "Adjust end to next booking",
-    "adjustLowerEnd": "Extend lower booking end to upper booking start",
-    "adjustOverlappingEnd": "Adjust overlapping booking to end at current booking start",
-    "adjustStartToPrevious": "Adjust start to previous booking",
-    "adjustUpperStart": "Move upper booking start to lower booking end",
-    "create": "Create a booking",
-    "delete": "Delete booking",
-    "edit": "Edit booking",
-    "editOverlapping": "Edit booking to resolve overlap",
-    "filterByProject": "Filter by project {{projectKey}}",
-    "filterByUser": "Filter by user {{userKey}}",
-    "insert": "Insert booking",
-    "start": "Start booking",
-    "startFromFavorite": "Start booking from favorite",
-    "startFromTeamMember": "Start booking from team member",
-    "stopRecording": "Stop recording current time booking"
+    "add": "Ajouter une réservation",
+    "adjustCurrentStart": "Ajuster la réservation actuelle pour qu'elle commence à la fin de la réservation chevauchante",
+    "adjustEndToNext": "Ajuster la fin à la réservation suivante",
+    "adjustLowerEnd": "Étendre la fin de la réservation inférieure jusqu'au début de la réservation supérieure",
+    "adjustOverlappingEnd": "Ajuster la réservation chevauchante pour qu'elle se termine au début de la réservation actuelle",
+    "adjustStartToPrevious": "Ajuster le début à la réservation précédente",
+    "adjustUpperStart": "Déplacer le début de la réservation supérieure à la fin de la réservation inférieure",
+    "create": "Créer une réservation",
+    "delete": "Supprimer la réservation",
+    "edit": "Modifier la réservation",
+    "editOverlapping": "Modifier la réservation pour résoudre le chevauchement",
+    "filterByProject": "Filtrer par projet {{projectKey}}",
+    "filterByUser": "Filtrer par utilisateur {{userKey}}",
+    "insert": "Insérer une réservation",
+    "start": "Démarrer la réservation",
+    "startFromFavorite": "Démarrer la réservation à partir d'un favori",
+    "startFromTeamMember": "Démarrer la réservation à partir d'un membre de l'équipe",
+    "stopRecording": "Arrêter l'enregistrement de la réservation en cours"
   },
-  "duration": "Duration",
-  "emptyToday": "No bookings for this day",
+  "duration": "Durée",
+  "emptyToday": "Aucune réservation pour ce jour",
   "favorites": {
-    "title": "Favorites"
+    "title": "Favoris"
   },
   "hints": {
-    "useEndTimeOfLatest": "Use end time of latest booking as start time for this one",
-    "useEndTimeOfPrevious": "Use end time of previous booking as start time for this one",
-    "useStartTimeOfNext": "Use start time of next booking as end time for this one"
+    "useEndTimeOfLatest": "Utiliser l'heure de fin de la dernière réservation comme heure de début pour celle-ci",
+    "useEndTimeOfPrevious": "Utiliser l'heure de fin de la réservation précédente comme heure de début pour celle-ci",
+    "useStartTimeOfNext": "Utiliser l'heure de début de la réservation suivante comme heure de fin pour celle-ci"
   },
   "history": {
-    "empty": "No bookings found for the selected filters"
+    "empty": "Aucune réservation trouvée pour les filtres sélectionnés"
   },
-  "noBookingsToday": "No bookings for this day",
-  "or": "or",
-  "overlapsWarning": "These two bookings overlap. Tap to see adjustment options.",
+  "noBookingsToday": "Aucune réservation pour ce jour",
+  "or": "ou",
+  "overlapsWarning": "Ces réservations se chevauchent. Cliquez pour modifier et ajuster l'heure.",
   "presets": {
-    "browse": "Browse presets",
-    "empty": "No bookings found",
-    "favorites": "Favorites",
-    "recent": "Recent bookings",
-    "selectFavorite": "Select favorite: {{projectName}}{{tags}}",
-    "selectRecent": "Select recent booking: {{projectName}}{{tags}}",
-    "selectTeam": "Select team booking: {{projectName}}{{tags}}",
-    "team": "Team bookings",
-    "title": "Choose a preset"
+    "browse": "Parcourir les modèles",
+    "empty": "Aucun modèle disponible",
+    "favorites": "Favoris",
+    "recent": "Réservations récentes",
+    "selectFavorite": "Sélectionner un favori : {{projectName}}{{tags}}",
+    "selectRecent": "Sélectionner une réservation récente : {{projectName}}{{tags}}",
+    "selectTeam": "Sélectionner une réservation d'équipe par {{userName}} : {{projectName}}{{tags}}",
+    "team": "Réservations de l'équipe",
+    "title": "Choisir un modèle"
   },
-  "showLists": "Show bookings",
+  "showLists": "Afficher les réservations",
   "status": {
-    "currentlyNotBooking": "Currently not booking"
+    "currentlyNotBooking": "Aucune réservation en cours"
   },
-  "title": "Bookings",
+  "title": "Réservations",
   "warnings": {
-    "durationIsZero": "This booking's duration is zero",
-    "longDuration": "Long duration detected",
-    "longDurationDescription": "This booking is longer than a typical 8-hour work day. Please verify that the start and end times are correct."
+    "durationIsZero": "La durée de cette réservation est nulle",
+    "longDuration": "Durée prolongée détectée",
+    "longDurationDescription": "Cette réservation dépasse une journée de travail typique de 8 heures. Veuillez vérifier les heures de début et de fin."
   }
 }

@@ -1,46 +1,46 @@
 {
   "actions": {
-    "add": "Add tags",
-    "addDefaultTagGroups": "Add default tag groups",
-    "addTag": "Add a tag",
-    "addTagGroup": "Add tag group",
-    "addTags": "Add tags",
-    "cancel": "Cancel",
-    "close": "Close",
-    "collapseAll": "Collapse all",
-    "copyTags": "Copy tags",
-    "createTagGroup": "Create tag group",
-    "delete": "Delete",
-    "discardChanges": "Discard changes",
-    "edit": "Edit tags",
-    "editForProject": "Edit tags for {{projectKey}}",
-    "expandAll": "Expand all",
-    "keepEditing": "Keep editing",
-    "pasteTags": "Paste tags",
-    "save": "Save"
+    "add": "Aggiungi tag",
+    "addDefaultTagGroups": "Aggiungi gruppi di tag predefiniti",
+    "addTag": "Aggiungi un tag",
+    "addTagGroup": "Aggiungi un nuovo gruppo di tag",
+    "addTags": "Aggiungi tag",
+    "cancel": "Annulla",
+    "close": "Chiudi",
+    "collapseAll": "Comprimi tutto",
+    "copyTags": "Copia tag",
+    "createTagGroup": "Crea gruppo di tag",
+    "delete": "Elimina",
+    "discardChanges": "Scarta modifiche",
+    "edit": "Modifica tag",
+    "editForProject": "Modifica tag per {{projectKey}}",
+    "expandAll": "Espandi tutto",
+    "keepEditing": "Continua a modificare",
+    "pasteTags": "Incolla tag",
+    "save": "Salva"
   },
-  "chooseOrEnter": "Choose or enter tags",
-  "confirmDeleteGroup": "Are you sure you want to delete the tag group \"{{groupName}}\"?",
-  "confirmUnsavedChanges": "You have unsaved changes. Are you sure you want to cancel?",
-  "customTag": "Custom tag",
-  "enterTagName": "Enter tag name",
+  "chooseOrEnter": "Scegli o inserisci tag",
+  "confirmDeleteGroup": "Sei sicuro di voler eliminare il gruppo di tag \"{{groupName}}\"?",
+  "confirmUnsavedChanges": "Hai modifiche non salvate. Sei sicuro di volerle annullare?",
+  "customTag": "Tag personalizzato",
+  "enterTagName": "Inserisci nome tag",
   "forms": {
-    "name": "Name"
+    "name": "Nome"
   },
-  "label": "Tags",
-  "noTagGroups": "No tag groups defined yet",
-  "simpleTags": "Simple tags",
-  "simpleTagsDescription": "Tags that are not part of any group",
+  "label": "Tag",
+  "noTagGroups": "Nessun gruppo di tag ancora definito",
+  "simpleTags": "Tag semplici",
+  "simpleTagsDescription": "Tag che non fanno parte di alcun gruppo",
   "status": {
-    "tagsCopied": "Tags copied",
-    "tagsPasted": "Tags pasted"
+    "tagsCopied": "Tag copiati",
+    "tagsPasted": "Tag incollati"
   },
-  "tagGroups": "Tag groups",
-  "title": "Tags",
+  "tagGroups": "Gruppi di tag",
+  "title": "Tag",
   "validation": {
-    "tagExists": "Tag already exists",
-    "tagGroupExists": "Tag group already exists",
-    "tagGroupNameRequired": "Tag group name is required",
-    "tagNameRequired": "Tag name is required"
+    "tagExists": "Il tag esiste già",
+    "tagGroupExists": "Il gruppo di tag esiste già",
+    "tagGroupNameRequired": "Il nome del gruppo di tag è obbligatorio",
+    "tagNameRequired": "Il nome del tag è obbligatorio"
   }
 }

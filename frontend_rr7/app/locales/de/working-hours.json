@@ -1,12 +1,12 @@
 {
-  "dailyTotal": "Daily Total",
-  "description": "The amount of time you expect to book per day, by organisation, during a typical working week. This data is used to calculate your daily and weekly progress.",
+  "dailyTotal": "Täglich gesamt",
+  "description": "Die Zeitspanne, die du pro Tag nach Organisation während einer typischen Arbeitswoche zu buchen erwartest. Diese Daten werden verwendet, um deinen täglichen und wöchentlichen Fortschritt zu berechnen.",
   "errors": {
-    "updateFailed": "Failed to update working hours"
+    "updateFailed": "Fehler beim Aktualisieren der Arbeitszeiten"
   },
   "status": {
-    "updated": "Working hours updated"
+    "updated": "Arbeitszeiten aktualisiert"
   },
-  "title": "Working hours",
-  "totalPerWeek": "Total per week"
+  "title": "Arbeitszeiten",
+  "totalPerWeek": "Gesamt pro Woche"
 }

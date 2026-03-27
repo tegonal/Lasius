@@ -1,9 +1,9 @@
 {
   "navigation": {
-    "nextMonth": "Next month",
-    "nextWeek": "Next week",
-    "previousMonth": "Previous month",
-    "previousWeek": "Previous week"
+    "nextMonth": "Mese successivo",
+    "nextWeek": "Settimana successiva",
+    "previousMonth": "Mese precedente",
+    "previousWeek": "Settimana scorsa"
   },
   "time": {
     "today": "Today"

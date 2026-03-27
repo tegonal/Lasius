@@ -1,15 +1,15 @@
 {
   "actions": {
-    "add": "Add",
-    "back": "Back",
-    "cancel": "Cancel",
-    "clear": "Clear",
+    "add": "Añadir",
+    "back": "Atrás",
+    "cancel": "Cancelar",
+    "clear": "Borrar",
     "close": "Cerrar",
-    "help": "Help",
-    "reset": "Reset",
-    "resetToInitial": "Reset to initial value",
-    "save": "Save",
-    "signUp": "Sign up"
+    "help": "Ayuda",
+    "reset": "Restablecer",
+    "resetToInitial": "Restablecer al valor inicial",
+    "save": "Guardar",
+    "signUp": "Registrarse"
   },
   "aria": {
     "decrement": "Decrement",
@@ -17,94 +17,94 @@
   },
   "auth": {
     "actions": {
-      "signOut": "Sign out"
+      "signOut": "Cerrar sesión"
     },
-    "chooseMethod": "Choose your preferred method below",
-    "continueWith": "Continue with",
-    "continueWithProvider": "Continue with your account",
-    "createYourAccount": "Create your account",
-    "enterEmailAndPassword": "Enter your email and password to access your account",
+    "chooseMethod": "Elige tu método de inicio de sesión preferido",
+    "continueWith": "Continuar con",
+    "continueWithProvider": "Continuar con tu cuenta",
+    "createYourAccount": "Crea tu cuenta",
+    "enterEmailAndPassword": "Introduce tu correo electrónico y contraseña para acceder a tu cuenta",
     "errors": {
       "accessDenied": {
-        "message": "You do not have permission to sign in. Please contact your administrator.",
-        "title": "Access Denied"
+        "message": "No tienes permiso para iniciar sesión. Contacta con tu administrador.",
+        "title": "Acceso denegado"
       },
-      "backToLogin": "Back to Login",
+      "backToLogin": "Volver al inicio de sesión",
       "configuration": {
-        "message": "There is a problem with the server configuration. Please contact your administrator.",
-        "title": "Configuration Error"
+        "message": "Hay un problema con la configuración del servidor. Contacta con tu administrador.",
+        "title": "Error de configuración"
       },
       "credentials": {
-        "message": "The credentials you provided are incorrect. Please try again.",
-        "title": "Sign In Failed"
+        "message": "Las credenciales proporcionadas son incorrectas. Inténtalo de nuevo.",
+        "title": "Error de inicio de sesión"
       },
       "default": {
-        "message": "An error occurred during authentication. Please try again.",
-        "title": "Authentication Error"
+        "message": "Se ha producido un error durante la autenticación. Inténtalo de nuevo.",
+        "title": "Error de autenticación"
       },
       "email": {
-        "message": "Could not send sign-in email. Please try again later.",
-        "title": "Email Error"
+        "message": "No se pudo enviar el correo de inicio de sesión. Inténtalo más tarde.",
+        "title": "Error de correo"
       },
-      "errorCode": "Error code",
-      "general": "Authentication error. Please try again.",
-      "invalidCredentials": "Invalid email or password. Please try again.",
-      "loginFailed": "Login failed. Please try again.",
+      "errorCode": "Código de error",
+      "general": "Error de autenticación. Por favor, inténtalo de nuevo.",
+      "invalidCredentials": "Correo electrónico o contraseña incorrectos. Por favor, inténtalo de nuevo.",
+      "loginFailed": "Error de inicio de sesión. Por favor, inténtalo de nuevo.",
       "oauth": {
-        "message": "An error occurred during OAuth authentication. Please try again or use a different sign-in method.",
-        "title": "OAuth Error"
+        "message": "Se ha producido un error durante la autenticación OAuth. Inténtalo de nuevo o usa un método de inicio de sesión diferente.",
+        "title": "Error de OAuth"
       },
-      "oauthCallback": "Authentication failed. Please try again.",
-      "persistentIssue": "If this issue persists, please contact your administrator.",
-      "registerUnknown": "Unknown registration error",
+      "oauthCallback": "Error de autenticación. Por favor, inténtalo de nuevo.",
+      "persistentIssue": "Si este problema persiste, contacta con tu administrador.",
+      "registerUnknown": "Error desconocido en el registro",
       "sessionRequired": {
-        "message": "Please sign in to continue.",
-        "title": "Session Required"
+        "message": "Inicia sesión para continuar.",
+        "title": "Sesión requerida"
       },
-      "stateMismatch": "Authentication failed: invalid state. Please try again.",
+      "stateMismatch": "Error de autenticación: estado inválido. Por favor, inténtalo de nuevo.",
       "unknown": {
-        "message": "An unexpected error occurred during authentication.",
-        "title": "Authentication Error"
+        "message": "Se ha producido un error inesperado durante la autenticación.",
+        "title": "Error de autenticación"
       },
-      "userAlreadyRegistered": "User already registered",
+      "userAlreadyRegistered": "Usuario ya registrado",
       "verification": {
-        "message": "The verification token has expired or has already been used. Please try signing in again.",
-        "title": "Verification Failed"
+        "message": "El token de verificación ha expirado o ya ha sido usado. Intenta iniciar sesión de nuevo.",
+        "title": "Verificación fallida"
       }
     },
-    "fillDetailsToStart": "Please fill in your details to get started",
-    "needHelp": "Need help? Click the help button",
-    "noAuthMethodsAvailable": "No authentication methods available",
-    "preparingSecureLogin": "Preparing secure login...",
-    "registrationSuccess": "Thank you for registering. You can now sign in with your credentials.",
-    "signIn": "Sign in",
-    "signInTitle": "Sign in to your account",
-    "signInToLasius": "Sign in to Lasius"
+    "fillDetailsToStart": "Por favor, completa tus datos para comenzar",
+    "needHelp": "¿Necesitas ayuda? Haz clic en el botón de ayuda",
+    "noAuthMethodsAvailable": "No hay métodos de autenticación disponibles",
+    "preparingSecureLogin": "Preparando inicio de sesión seguro...",
+    "registrationSuccess": "Gracias por registrarte. Ahora puedes iniciar sesión con tus credenciales.",
+    "signIn": "Iniciar sesión",
+    "signInTitle": "Inicia sesión en tu cuenta",
+    "signInToLasius": "Iniciar sesión en Lasius"
   },
-  "back": "Back",
+  "back": "Atrás",
   "calendar": {
     "navigation": {
-      "nextMonth": "Next month",
-      "previousMonth": "Previous month"
+      "nextMonth": "Mes siguiente",
+      "previousMonth": "Mes anterior"
     }
   },
-  "cancel": "Cancel",
+  "cancel": "Cancelar",
   "common": {
     "actions": {
-      "close": "Close",
-      "closeActionsMenu": "Close actions menu",
-      "openActionsMenu": "Open actions menu"
+      "close": "Cerrar",
+      "closeActionsMenu": "Cerrar menú de acciones",
+      "openActionsMenu": "Abrir menú de acciones"
     }
   },
-  "custom": "Custom",
-  "date": "Date",
+  "custom": "Personalizado",
+  "date": "Fecha",
   "demo": {
-    "credentials": "Use \"demo1@lasius.ch\" and password \"demo\" to log in and have a look around.",
-    "title": "Demo Mode",
+    "credentials": "Usa \"demo1@lasius.ch\" y contraseña \"demo\" para iniciar sesión y echar un vistazo.",
+    "title": "Modo demostración",
     "welcome": "Bienvenido a la instancia de demostración de Lasius. Usa \"demo1@lasius.ch\" y contraseña \"demo\" para iniciar sesión y echar un vistazo. La instancia de demostración se restablece una vez al día."
   },
   "errors": {
-    "helpNotAvailable": "Help content not available for this page."
+    "helpNotAvailable": "Contenido de ayuda no disponible para esta página."
   },
   "export": {
     "actions": {
@@ -123,7 +123,7 @@
       "label": "Selección de formato de exportación"
     },
     "stats": {
-      "error": "Failed to export statistics. Please try again.",
+      "error": "Error al exportar estadísticas. Por favor, inténtalo de nuevo.",
       "menuLabel": "Selección de formato de exportación de estadísticas",
       "openMenu": "Abrir menú de formato de exportación de estadísticas"
     },
@@ -132,7 +132,7 @@
     }
   },
   "filter": {
-    "title": "Filter"
+    "title": "Filtrar"
   },
   "footer": {
     "developedBy": "Desarrollado por <0>Tegonal</0>, disponible en <1>GitHub</1>, publicado bajo <2>AGPL 3.0</2>",
@@ -150,18 +150,18 @@
     "timeFormat": "HH:MM"
   },
   "forms": {
-    "confirmPassword": "Confirm password",
-    "email": "Email",
-    "firstName": "First name",
-    "lastName": "Last name",
-    "name": "Name",
-    "password": "Password"
+    "confirmPassword": "Confirmar contraseña",
+    "email": "Correo electrónico",
+    "firstName": "Nombre",
+    "lastName": "Apellidos",
+    "name": "Nombre",
+    "password": "Contraseña"
   },
   "help": {
-    "contactAdmin": "Please contact your administrator"
+    "contactAdmin": "Por favor, contacta con tu administrador"
   },
   "info": {
-    "helpFallbackLanguage": "This help content is not available in your selected language yet. Showing English version."
+    "helpFallbackLanguage": "Este contenido de ayuda aún no está disponible en tu idioma seleccionado. Se muestra la versión en inglés."
   },
   "issueImporters": {
     "typeLabels": {
@@ -171,30 +171,30 @@
       "plane": "Plane"
     },
     "validation": {
-      "accessTokenRequired": "Access token is required",
-      "apiKeyRequired": "API key is required",
-      "baseUrlRequired": "Base URL is required",
-      "consumerKeyRequired": "Consumer key is required",
-      "invalidUrl": "Invalid URL",
-      "maxInterval": "Maximum 24 hours",
-      "minInterval": "Minimum 1 minute",
-      "nameRequired": "Name is required",
-      "privateKeyRequired": "Private key is required",
-      "resourceOwnerRequired": "Resource owner is required",
-      "workspaceRequired": "Workspace is required"
+      "accessTokenRequired": "Token de acceso requerido",
+      "apiKeyRequired": "Clave API requerida",
+      "baseUrlRequired": "URL base requerida",
+      "consumerKeyRequired": "Clave de consumidor requerida",
+      "invalidUrl": "URL inválida",
+      "maxInterval": "Máximo 24 horas",
+      "minInterval": "Mínimo 1 minuto",
+      "nameRequired": "Nombre requerido",
+      "privateKeyRequired": "Clave privada requerida",
+      "resourceOwnerRequired": "Propietario de recurso requerido",
+      "workspaceRequired": "Espacio de trabajo requerido"
     }
   },
   "navigation": {
-    "openMenu": "Open menu",
-    "settings": "Settings"
+    "openMenu": "Abrir menú",
+    "settings": "Configuración"
   },
   "of": "de",
   "projects": {
-    "selectProject": "Select project"
+    "selectProject": "Seleccionar proyecto"
   },
   "roles": {
-    "administrator": "Administrator",
-    "member": "Member"
+    "administrator": "Administrador",
+    "member": "Miembro"
   },
   "SessionTimeout": {
     "extend": "Extend Session",
@@ -204,52 +204,52 @@
   },
   "settings": {
     "app": {
-      "description": "Customize your experience with language and theme preferences. These settings are stored locally in your browser.",
-      "title": "Application Settings"
+      "description": "Personaliza tu experiencia con las preferencias de idioma y tema. Estas configuraciones se almacenan localmente en tu navegador.",
+      "title": "Configuración de la aplicación"
     }
   },
   "stats": {
-    "empty": "No data available for the selected period"
+    "empty": "No hay datos disponibles para el período seleccionado"
   },
   "status": {
-    "active": "Active",
-    "inactive": "Inactive",
-    "label": "Status"
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "label": "Estado"
   },
   "time": {
-    "customTime": "Custom time...",
-    "day": "Day",
-    "ends": "Ends",
-    "from": "From",
-    "hours": "Hours",
-    "lastMonth": "Last month",
-    "lastQuarter": "Last quarter",
-    "lastWeek": "Last week",
-    "lastYear": "Last year",
-    "minutes": "Minutes",
-    "month": "Month",
-    "selectRange": "Select time range",
-    "setCustom": "Set custom time",
-    "starts": "Starts",
-    "thisMonth": "This month",
-    "thisQuarter": "This quarter",
-    "thisWeek": "This week",
-    "thisYear": "This year",
-    "timeRange": "Time range",
-    "to": "To",
-    "today": "Today",
-    "week": "Week",
-    "year": "Year",
-    "yesterday": "Yesterday"
+    "customTime": "Hora personalizada...",
+    "day": "Día",
+    "ends": "Finaliza",
+    "from": "Desde",
+    "hours": "Horas",
+    "lastMonth": "Mes pasado",
+    "lastQuarter": "Último trimestre",
+    "lastWeek": "Semana pasada",
+    "lastYear": "Año pasado",
+    "minutes": "Minutos",
+    "month": "Mes",
+    "selectRange": "Seleccionar rango de tiempo",
+    "setCustom": "Establecer hora personalizada",
+    "starts": "Comienza",
+    "thisMonth": "Este mes",
+    "thisQuarter": "Este trimestre",
+    "thisWeek": "Esta semana",
+    "thisYear": "Este año",
+    "timeRange": "Rango de tiempo",
+    "to": "Hasta",
+    "today": "Hoy",
+    "week": "Semana",
+    "year": "Año",
+    "yesterday": "Ayer"
   },
   "ui": {
     "hidePasswords": "Ocultar contraseñas",
     "showPasswords": "Mostrar contraseñas"
   },
   "units": {
-    "hours": "Hours"
+    "hours": "Horas"
   },
-  "user": "User",
+  "user": "Usuario",
   "users": {
     "errors": {
       "userNotFound": "No se pudo encontrar este usuario. El ID de usuario se muestra arriba."
@@ -261,10 +261,10 @@
   },
   "validation": {
     "confirmPasswordRequired": "Confirma tu contraseña",
-    "email": "Please enter a valid email address",
+    "email": "Introduce una dirección de correo electrónico válida",
     "emailInvalid": "Dirección de correo electrónico inválida",
     "emailRequired": "Correo electrónico requerido",
-    "endBeforeStart": "End time is before start time",
+    "endBeforeStart": "La hora de finalización es anterior a la hora de inicio",
     "firstNameRequired": "Nombre requerido",
     "languageRequired": "Idioma requerido",
     "lastNameRequired": "Apellidos requeridos",
@@ -275,14 +275,14 @@
     "passwordRequired": "Contraseña requerida",
     "passwordTooShort": "Mínimo 9 caracteres",
     "projectKeyRequired": "Nombre del proyecto requerido",
-    "required": "Required",
-    "startBeforeEnd": "Start time must be before end time",
+    "required": "Obligatorio",
+    "startBeforeEnd": "La hora de inicio debe ser anterior a la hora de finalización",
     "startMustBeInPast": "La hora de inicio debe estar en el pasado",
     "themeRequired": "Tema requerido"
   },
   "workHealth": {
-    "actualHours": "actual",
-    "plannedHours": "planned"
+    "actualHours": "reales",
+    "plannedHours": "planificadas"
   },
-  "you": "You"
+  "you": "Tú"
 }

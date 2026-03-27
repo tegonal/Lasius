@@ -18,8 +18,8 @@
     "configureDescription": "Usa el botón Añadir integración para configurar una nueva integración. Después de crear una configuración, asocia tus proyectos externos a proyectos Lasius para habilitar la importación de incidencias.",
     "delete": {
       "confirm": "Eliminar",
-      "hasProjects": "Esta configuración tiene correspondencias de proyecto. Elimina todas las correspondencias antes de eliminar.",
-      "message": "¿Estás seguro de que deseas eliminar esta configuración de integración?",
+      "hasProjects": "Esta configuración tiene asignaciones de proyecto. Elimina todas las asignaciones antes de borrar.",
+      "message": "¿Estás seguro de que quieres eliminar esta configuración de integración?",
       "title": "Eliminar integración"
     },
     "description": "Conecta Lasius con sistemas externos de seguimiento de incidencias como GitHub, GitLab, Jira y Plane. Las incidencias importadas están disponibles como etiquetas al registrar tiempo en proyectos asociados, permitiéndote hacer seguimiento del tiempo directamente en tus incidencias.",
@@ -40,7 +40,6 @@
     "checkIntervalHelp": "Frecuencia de verificación de nuevas incidencias",
     "configListItem": {
       "projectCount_one": "{{count}} proyecto",
-      "projectCount_many": "",
       "projectCount_other": "{{count}} proyectos"
     },
     "descriptions": {
@@ -48,12 +47,12 @@
     },
     "emptyState": "Aún no hay integraciones configuradas. Añade una para empezar.",
     "errors": {
-      "deleteFailed": "Failed to delete integration",
+      "deleteFailed": "Error al eliminar la integración",
       "invalidMappingData": "Datos de correspondencia inválidos",
       "mappingRemoveFailed": "Error al eliminar la correspondencia de proyecto",
       "mappingSaveFailed": "Error al guardar las correspondencias de proyecto",
-      "tagsRefreshFailed": "Error al actualizar las etiquetas",
-      "updateFailed": "Failed to update integration"
+      "tagsRefreshFailed": "Error al actualizar etiquetas",
+      "updateFailed": "Error al actualizar la integración"
     },
     "fields": {
       "accessToken": "Token de acceso",
@@ -63,12 +62,12 @@
       "baseUrl": "URL base",
       "baseUrlPlaceholder": {
         "github": "https://api.github.com",
-        "gitlab": "https://gitlab.company.com",
+        "gitlab": "https://...",
         "jira": "https://company.atlassian.net",
-        "plane": "https://plane.company.com"
+        "plane": "https://..."
       },
       "consumerKey": "Clave de consumidor OAuth",
-      "credentialPlaceholder": "Introduce un nuevo valor para actualizar",
+      "credentialPlaceholder": "Introduce nuevo valor para actualizar",
       "name": "Nombre de configuración",
       "namePlaceholder": {
         "github": "p. ej., Empresa GitHub",
@@ -91,13 +90,13 @@
     },
     "github": {
       "instructions": {
-        "content": "<0><1>Verifica tu dirección de correo electrónico en GitHub</1><1>Ve a Settings → Developer settings → Personal access tokens → Fine-grained tokens</1><1>Haz clic en \"Generate new token\"</1><1>Introduce un nombre de token y selecciona una fecha de caducidad</1><1>Elige un propietario del recurso (tu cuenta de usuario o una organización a la que tengas acceso)</1><1>Selecciona el acceso al repositorio (todos los repositorios o solo repositorios seleccionados)</1><1>Bajo Repository permissions, establece <2>Issues</2> en \"Read-only\" y <2>Metadata</2> en \"Read-only\"</1><1>Haz clic en \"Generate token\" y cópialo inmediatamente</1></0><3>Importante: Se requieren tokens fine-grained (no tokens clásicos). El propietario del recurso que selecciones determina a qué repositorios puedes acceder. Para repositorios de organización, es posible que necesites la aprobación del propietario de la organización. Asegúrate de seleccionar el mismo propietario del recurso en el formulario de configuración anterior.</3>",
+        "content": "<0><0>Verifica tu dirección de correo electrónico en GitHub</0><1>Ve a Settings → Developer settings → Personal access tokens → Fine-grained tokens</1><2>Haz clic en \"Generate new token\"</2><3>Introduce un nombre de token y selecciona una fecha de caducidad</3><4>Elige un propietario del recurso (tu cuenta de usuario o una organización a la que tengas acceso)</4><5>Selecciona el acceso al repositorio (todos los repositorios o solo repositorios seleccionados)</5><6>Bajo Repository permissions, establece <2>Issues</2> en \"Read-only\" y <6>Metadata</6> en \"Read-only\"</6><7>Haz clic en \"Generate token\" y cópialo inmediatamente</7></0><1>Importante: Se requieren tokens fine-grained (no tokens clásicos). El propietario del recurso que selecciones determina a qué repositorios puedes acceder. Para repositorios de organización, es posible que necesites la aprobación del propietario de la organización. Asegúrate de seleccionar el mismo propietario del recurso en el formulario de configuración anterior.</1>",
         "title": "Cómo crear credenciales de GitHub:"
       }
     },
     "gitlab": {
       "instructions": {
-        "content": "<0><1>En la barra lateral izquierda, selecciona tu avatar</1><1>Selecciona \"Edit profile\"</1><1>Selecciona \"Personal access tokens\"</1><1>Selecciona \"Add new token\"</1><1>Introduce un nombre de token y una descripción opcional</1><1>Establece una fecha de caducidad</1><1>Selecciona el ámbito <2>read_api</2> (otorga acceso de lectura a la API, incluidos todos los grupos y proyectos)</1><1>Haz clic en \"Create personal access token\"</1><1>Copia el token inmediatamente y guárdalo de forma segura</1></0><3>Nota: El token solo se mostrará una vez. Usa <2>read_api</2> para acceso de solo lectura, o <2>api</2> para acceso completo de lectura/escritura si es necesario.</3>",
+        "content": "<0><0>En la barra lateral izquierda, selecciona tu avatar</0><1>Selecciona \"Edit profile\"</1><2>Selecciona \"Personal access tokens\"</2><3>Selecciona \"Add new token\"</3><4>Introduce un nombre de token y una descripción opcional</4><5>Establece una fecha de caducidad</5><6>Selecciona el ámbito <2>read_api</2> (otorga acceso de lectura a la API, incluidos todos los grupos y proyectos)</6><7>Haz clic en \"Create personal access token\"</7><8>Copia el token inmediatamente y guárdalo de forma segura</8></0><1>Nota: El token solo se mostrará una vez. Usa <2>read_api</2> para acceso de solo lectura, o <6>api</6> para acceso completo de lectura/escritura si es necesario.</1>",
         "title": "Cómo crear credenciales de GitLab:"
       }
     },
@@ -129,7 +128,7 @@
       "name": "Nombre",
       "nextScheduledSync": "Próxima sincronización programada",
       "noConfig": "Ninguna configuración seleccionada.",
-      "projectCount": "Correspondencias de proyecto",
+      "projectCount": "Asignaciones de proyecto",
       "projectName": "Proyecto",
       "projectStats": "Estadísticas del proyecto",
       "title": "Información de configuración",
@@ -141,13 +140,13 @@
     },
     "jira": {
       "instructions": {
-        "content": "<0><1>Genera un par de claves RSA usando OpenSSL: <2>openssl genrsa -out jira_privatekey.pem 1024</2></1><1>Extrae la clave pública: <2>openssl rsa -in jira_privatekey.pem -pubout -out jira_publickey.pem</2></1><1>En Jira: Haz clic en Configuración (icono de engranaje) → Applications → Application links</1><1>Introduce cualquier URL (ej., <2>http://localhost</2>) y haz clic en \"Create new link\"</1><1>Ignora la advertencia \"No response was received\" y haz clic en \"Continue\"</1><1>Introduce tu nombre de aplicación y selecciona \"Create incoming link\"</1><1>En el formulario de autenticación entrante, introduce tu Consumer Key y pega el contenido de la clave pública desde <2>jira_publickey.pem</2></1><1>Completa el flujo de autorización OAuth 1.0a usando tu consumer key y clave privada para obtener el token de acceso</1></0><3>Nota: Esto utiliza OAuth 1.0a con firma RSA-SHA1. Principalmente para Jira Server/Data Center. Para Jira Cloud, considera usar tokens API u OAuth 2.0 para nuevas integraciones.</3>",
+        "content": "<0><0>Genera un par de claves RSA usando OpenSSL: <2>openssl genrsa -out jira_privatekey.pem 1024</2></0><1>Extrae la clave pública: <2>openssl rsa -in jira_privatekey.pem -pubout -out jira_publickey.pem</2></1><2>En Jira: Haz clic en Configuración (icono de engranaje) → Applications → Application links</2><3>Introduce cualquier URL (ej., <2>http://localhost</2>) y haz clic en \"Create new link\"</3><4>Ignora la advertencia \"No response was received\" y haz clic en \"Continue\"</4><5>Introduce tu nombre de aplicación y selecciona \"Create incoming link\"</5><6>En el formulario de autenticación entrante, introduce tu Consumer Key y pega el contenido de la clave pública desde <2>jira_publickey.pem</2></6><7>Completa el flujo de autorización OAuth 1.0a usando tu consumer key y clave privada para obtener el token de acceso</7></0><1>Nota: Esto utiliza OAuth 1.0a con firma RSA-SHA1. Principalmente para Jira Server/Data Center. Para Jira Cloud, considera usar tokens API u OAuth 2.0 para nuevas integraciones.</1>",
         "title": "Cómo crear credenciales de Jira:"
       }
     },
     "plane": {
       "instructions": {
-        "content": "<0><1>Inicia sesión en tu cuenta de Plane o instancia auto-alojada</1><1>Ve a Configuración del perfil</1><1>Selecciona \"Personal Access Tokens\" de la lista de pestañas</1><1>Haz clic en \"Add personal access token\"</1><1>Introduce un nombre de token y una descripción opcional</1><1>Haz clic en \"Generate\" o \"Create\"</1><1>Copia el token generado inmediatamente y guárdalo de forma segura</1></0><3>Nota: El token solo se mostrará una vez. El token se pasa como valor del encabezado <2>X-API-Key</2> en las solicitudes API.</3><3>Espacio de trabajo: Debes especificar el slug de tu espacio de trabajo, que se encuentra en tu URL de Plane. Por ejemplo, si tu URL de Plane es <2>https://app.plane.so/mi-empresa</2>, entonces tu slug de espacio de trabajo es <2>mi-empresa</2>. Esto es necesario para acceder a proyectos e incidencias en tu espacio de trabajo.</3>",
+        "content": "<0><0>Inicia sesión en tu cuenta de Plane o instancia auto-alojada</0><1>Ve a Configuración del perfil</1><2>Selecciona \"Personal Access Tokens\" de la lista de pestañas</2><3>Haz clic en \"Add personal access token\"</3><4>Introduce un nombre de token y una descripción opcional</4><5>Haz clic en \"Generate\" o \"Create\"</5><6>Copia el token generado inmediatamente y guárdalo de forma segura</6></0><1>Nota: El token solo se mostrará una vez. El token se pasa como valor del encabezado <2>X-API-Key</2> en las solicitudes API.</1><2>Espacio de trabajo: Debes especificar el slug de tu espacio de trabajo, que se encuentra en tu URL de Plane. Por ejemplo, si tu URL de Plane es <2>https://app.plane.so/mi-empresa</2>, entonces tu slug de espacio de trabajo es <5>mi-empresa</5>. Esto es necesario para acceder a proyectos e incidencias en tu espacio de trabajo.</2>",
         "title": "Cómo crear credenciales de Plane:"
       }
     },
@@ -155,30 +154,30 @@
       "title": "Asignaciones de proyectos {{platform}}"
     },
     "success": {
-      "configCreated": "Integration created successfully",
-      "configDeleted": "Integration deleted successfully",
-      "configUpdated": "Integration updated successfully",
+      "configCreated": "Integración creada con éxito",
+      "configDeleted": "Configuración eliminada con éxito",
+      "configUpdated": "Integración actualizada con éxito",
       "mappingRemoved": "Correspondencia de proyecto eliminada con éxito",
       "mappingSaved": "Correspondencia de proyecto guardada con éxito",
       "tagsRefreshed": "Actualización de etiquetas iniciada con éxito"
     },
     "tagConfiguration": {
-      "description": "Configure which fields from external issues should be used to create tags in Lasius.",
-      "issueLabelFilterHelp": "Leave empty to import all issues, or select labels to import only issues that have at least one of these labels.",
-      "issueLabelFilterLabel": "Import only issues with specific labels",
-      "issueLabelFilterPlaceholder": "All issues (or select labels to filter...)",
-      "issueStateFilterHelp": "Leave empty to import all issues, or select states to import only issues in those states.",
-      "issueStateFilterLabel": "Import only issues with specific states",
-      "issueStateFilterPlaceholder": "All states (or select specific states...)",
-      "labelFilterHelp": "Leave empty to import all labels, or select specific labels to import only those.",
-      "labelFilterLabel": "Import only specific labels",
-      "labelFilterPlaceholder": "All labels (or select specific labels...)",
-      "tagFieldsLabel": "Tag fields to import",
-      "tagFieldsPlaceholder": "Select fields...",
-      "useAssignees": "Use assignees as tags",
-      "useLabels": "Use labels as tags",
-      "useMilestone": "Use milestone as tag",
-      "useTitle": "Use issue title as tag"
+      "description": "Configura qué campos de las incidencias externas deben usarse para crear etiquetas en Lasius.",
+      "issueLabelFilterHelp": "Dejar vacío para importar todas las incidencias, o seleccionar etiquetas para importar solo incidencias que tengan al menos una de estas etiquetas.",
+      "issueLabelFilterLabel": "Importar solo incidencias con etiquetas específicas",
+      "issueLabelFilterPlaceholder": "Todas las incidencias (o seleccionar etiquetas para filtrar...)",
+      "issueStateFilterHelp": "Dejar vacío para importar todas las incidencias, o seleccionar estados para importar solo incidencias en esos estados.",
+      "issueStateFilterLabel": "Importar solo incidencias con estados específicos",
+      "issueStateFilterPlaceholder": "Todos los estados (o seleccionar estados específicos...)",
+      "labelFilterHelp": "Dejar vacío para importar todas las etiquetas, o seleccionar etiquetas específicas para importar solo esas.",
+      "labelFilterLabel": "Importar solo etiquetas específicas",
+      "labelFilterPlaceholder": "Todas las etiquetas (o seleccionar etiquetas específicas...)",
+      "tagFieldsLabel": "Campos de etiquetas a importar",
+      "tagFieldsPlaceholder": "Selecciona campos...",
+      "useAssignees": "Usar asignados como etiquetas",
+      "useLabels": "Usar etiquetas como etiquetas",
+      "useMilestone": "Usar hito como etiqueta",
+      "useTitle": "Usar título de incidencia como etiqueta"
     },
     "testConnection": {
       "editModeNote": "Nota: Introduce tus credenciales arriba para probar la conexión. Dejar vacío para mantener las credenciales existentes al guardar.",
@@ -208,7 +207,6 @@
         "loading": "Cargando proyectos desde {{platform}}...",
         "mappingDescription": "Vincula este proyecto externo a un proyecto de Lasius para sincronizar automáticamente problemas como etiquetas de seguimiento de tiempo.",
         "mappingDescription_one": "Se encontró {{count}} proyecto en {{platform}}. Asócialo a tus proyectos Lasius para importar incidencias. {{mapped}} de {{total}} asociado.",
-        "mappingDescription_many": "Found {{count}} projects from {{platform}}. Map them to your Lasius projects to import issues. {{mapped}} of {{total}} mapped.",
         "mappingDescription_other": "Se encontraron {{count}} proyectos en {{platform}}. Asócialos a tus proyectos Lasius para importar incidencias. {{mapped}} de {{total}} asociados.",
         "noProjects": "No se encontraron proyectos en {{platform}}",
         "notMapped": "No asociado",
@@ -222,17 +220,17 @@
         "gitlabDescription": "Importar incidencias y merge requests desde proyectos de GitLab",
         "jiraDescription": "Importar incidencias y epics desde tableros de Jira",
         "planeDescription": "Importar incidencias y tareas desde espacios de trabajo de Plane",
-        "subtitle": "Elige la plataforma de la que quieres importar incidencias",
-        "title": "Seleccionar sistema de seguimiento de incidencias"
+        "subtitle": "Elige la plataforma desde la que quieres importar incidencias",
+        "title": "Seleccionar una plataforma"
       },
       "steps": {
-        "config": "Configure",
+        "config": "Configurar",
         "platform": "Plataforma",
         "projects": "Proyectos",
         "test": "Probar"
       },
       "test": {
-        "createFailed": "Conexión exitosa pero error al guardar la configuración.",
+        "createFailed": "La conexión se realizó correctamente, pero no se pudo guardar la configuración.",
         "error": "Conexión fallida",
         "failed": "Prueba de conexión fallida. Por favor, verifica tus credenciales y URL.",
         "retry": "Reintentar prueba de conexión",
@@ -241,7 +239,7 @@
         "successDescription": "Continuando al siguiente paso...",
         "testing": "Probando conexión..."
       },
-      "title": "Add Integration"
+      "title": "Añadir integración"
     }
   },
   "projects": {

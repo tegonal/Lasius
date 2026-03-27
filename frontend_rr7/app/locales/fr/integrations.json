@@ -18,8 +18,8 @@
     "configureDescription": "Utilise le bouton Ajouter une intégration pour configurer une nouvelle intégration. Après avoir créé une configuration, associe tes projets externes aux projets Lasius pour activer l'importation des tickets.",
     "delete": {
       "confirm": "Supprimer",
-      "hasProjects": "Cette configuration a des correspondances de projet. Supprimez toutes les correspondances avant de supprimer.",
-      "message": "Êtes-vous sûr de vouloir supprimer cette configuration d'intégration ?",
+      "hasProjects": "Cette configuration a des mappages de projets. Supprimez tous les mappages avant de la supprimer.",
+      "message": "Êtes-vous sûr(e) de vouloir supprimer cette configuration d'intégration ?",
       "title": "Supprimer l'intégration"
     },
     "description": "Connecte Lasius avec des systèmes externes de suivi des tickets comme GitHub, GitLab, Jira et Plane. Les tickets importés deviennent disponibles en tant qu'étiquettes lors de la réservation de temps dans les projets associés, te permettant de suivre le temps directement sur tes tickets.",
@@ -31,7 +31,7 @@
       "delete": "Supprimer la configuration",
       "deleteDisabled": "Impossible de supprimer : supprimez d'abord toutes les correspondances de projet",
       "edit": "Modifier la configuration",
-      "refreshTags": "Actualiser les tags",
+      "refreshTags": "Actualiser les étiquettes",
       "update": "Mettre à jour",
       "viewInfo": "Voir les informations de configuration",
       "viewMappings": "Voir les correspondances de projet"
@@ -40,20 +40,26 @@
     "checkIntervalHelp": "Fréquence de vérification des nouveaux tickets",
     "configListItem": {
       "projectCount_one": "{{count}} projet",
-      "projectCount_many": "",
       "projectCount_other": "{{count}} projets"
     },
     "descriptions": {
       "edit": "Mettez à jour la configuration de cette intégration d'importateur de problèmes."
     },
-    "emptyState": "Aucune intégration configurée pour le moment. Ajoutez-en une pour commencer.",
+    "emptyState": {
+      "message": "Aucune configuration de système de suivi des tickets pour le moment"
+    },
     "errors": {
-      "deleteFailed": "Failed to delete integration",
+      "deleteFailed": {
+        "github": "issueImporters.errors.deleteFailed.github",
+        "gitlab": "issueImporters.errors.deleteFailed.gitlab",
+        "jira": "issueImporters.errors.deleteFailed.jira",
+        "plane": "issueImporters.errors.deleteFailed.plane"
+      },
       "invalidMappingData": "Données de correspondance invalides",
       "mappingRemoveFailed": "Échec de la suppression de la correspondance de projet",
       "mappingSaveFailed": "Échec de l'enregistrement des correspondances de projet",
-      "tagsRefreshFailed": "Échec de l'actualisation des tags",
-      "updateFailed": "Failed to update integration"
+      "tagsRefreshFailed": "Échec de l'actualisation des étiquettes",
+      "updateFailed": "Échec de la mise à jour de l'intégration"
     },
     "fields": {
       "accessToken": "Jeton d'accès",
@@ -129,7 +135,7 @@
       "name": "Nom",
       "nextScheduledSync": "Prochaine synchronisation programmée",
       "noConfig": "Aucune configuration sélectionnée.",
-      "projectCount": "Correspondances de projet",
+      "projectCount": "Mappages de projets",
       "projectName": "Projet",
       "projectStats": "Statistiques du projet",
       "title": "Informations de configuration",
@@ -155,30 +161,30 @@
       "title": "Mappages de projets {{platform}}"
     },
     "success": {
-      "configCreated": "Integration created successfully",
-      "configDeleted": "Integration deleted successfully",
-      "configUpdated": "Integration updated successfully",
+      "configCreated": "Intégration créée avec succès",
+      "configDeleted": "Configuration supprimée avec succès",
+      "configUpdated": "Intégration mise à jour avec succès",
       "mappingRemoved": "Correspondance de projet supprimée avec succès",
       "mappingSaved": "Correspondance de projet enregistrée avec succès",
-      "tagsRefreshed": "Actualisation des tags déclenchée avec succès"
+      "tagsRefreshed": "Actualisation des étiquettes déclenchée avec succès"
     },
     "tagConfiguration": {
-      "description": "Configure which fields from external issues should be used to create tags in Lasius.",
-      "issueLabelFilterHelp": "Leave empty to import all issues, or select labels to import only issues that have at least one of these labels.",
-      "issueLabelFilterLabel": "Import only issues with specific labels",
-      "issueLabelFilterPlaceholder": "All issues (or select labels to filter...)",
-      "issueStateFilterHelp": "Leave empty to import all issues, or select states to import only issues in those states.",
-      "issueStateFilterLabel": "Import only issues with specific states",
-      "issueStateFilterPlaceholder": "All states (or select specific states...)",
-      "labelFilterHelp": "Leave empty to import all labels, or select specific labels to import only those.",
-      "labelFilterLabel": "Import only specific labels",
-      "labelFilterPlaceholder": "All labels (or select specific labels...)",
-      "tagFieldsLabel": "Tag fields to import",
-      "tagFieldsPlaceholder": "Select fields...",
-      "useAssignees": "Use assignees as tags",
-      "useLabels": "Use labels as tags",
-      "useMilestone": "Use milestone as tag",
-      "useTitle": "Use issue title as tag"
+      "description": "Configure les champs des tickets externes à utiliser pour créer des étiquettes dans Lasius.",
+      "issueLabelFilterHelp": "Laisser vide pour importer tous les tickets, ou sélectionner des étiquettes pour importer uniquement les tickets ayant au moins une de ces étiquettes.",
+      "issueLabelFilterLabel": "Importer uniquement les tickets avec des étiquettes spécifiques",
+      "issueLabelFilterPlaceholder": "Tous les tickets (ou sélectionner des étiquettes pour filtrer...)",
+      "issueStateFilterHelp": "Laisser vide pour importer tous les tickets, ou sélectionner des états pour importer uniquement les tickets dans ces états.",
+      "issueStateFilterLabel": "Importer uniquement les tickets avec des états spécifiques",
+      "issueStateFilterPlaceholder": "Tous les états (ou sélectionner des états spécifiques...)",
+      "labelFilterHelp": "Laisser vide pour importer toutes les étiquettes, ou sélectionner des étiquettes spécifiques pour importer uniquement celles-ci.",
+      "labelFilterLabel": "Importer uniquement des étiquettes spécifiques",
+      "labelFilterPlaceholder": "Toutes les étiquettes (ou sélectionner des étiquettes spécifiques...)",
+      "tagFieldsLabel": "Champs de tags à importer",
+      "tagFieldsPlaceholder": "Sélectionne des champs...",
+      "useAssignees": "Utiliser les assignés comme étiquettes",
+      "useLabels": "Utiliser les labels comme étiquettes",
+      "useMilestone": "Utiliser le jalon comme étiquette",
+      "useTitle": "Utiliser le titre du ticket comme étiquette"
     },
     "testConnection": {
       "editModeNote": "Note : Saisis tes identifiants ci-dessus pour tester la connexion. Laisser vide pour conserver les identifiants existants lors de l'enregistrement.",
@@ -208,7 +214,6 @@
         "loading": "Chargement des projets depuis {{platform}}...",
         "mappingDescription": "Liez ce projet externe à un projet Lasius pour synchroniser automatiquement les problèmes en tant qu'étiquettes de suivi du temps.",
         "mappingDescription_one": "{{count}} projet trouvé dans {{platform}}. Associe-le à tes projets Lasius pour importer les tickets. {{mapped}} sur {{total}} associé.",
-        "mappingDescription_many": "Found {{count}} projects from {{platform}}. Map them to your Lasius projects to import issues. {{mapped}} of {{total}} mapped.",
         "mappingDescription_other": "{{count}} projets trouvés dans {{platform}}. Associe-les à tes projets Lasius pour importer les tickets. {{mapped}} sur {{total}} associés.",
         "noProjects": "Aucun projet trouvé dans {{platform}}",
         "notMapped": "Non associé",
@@ -222,26 +227,26 @@
         "gitlabDescription": "Importer les tickets et les merge requests depuis les projets GitLab",
         "jiraDescription": "Importer les tickets et les epics depuis les tableaux Jira",
         "planeDescription": "Importer les tickets et les tâches depuis les espaces de travail Plane",
-        "subtitle": "Choisis la plateforme dont tu veux importer les tickets",
+        "subtitle": "Choisissez la plateforme depuis laquelle vous souhaitez importer des tickets",
         "title": "Sélectionner le système de suivi des tickets"
       },
       "steps": {
-        "config": "Configure",
+        "config": "Configurer",
         "platform": "Plateforme",
         "projects": "Projets",
         "test": "Tester"
       },
       "test": {
-        "createFailed": "Connexion réussie mais échec de l'enregistrement de la configuration.",
+        "createFailed": "La connexion a réussi mais l'enregistrement de la configuration a échoué.",
         "error": "Échec de la connexion",
-        "failed": "Échec du test de connexion. Vérifie tes identifiants et l'URL.",
+        "failed": "Le test de connexion a échoué. Vérifiez vos identifiants et l'URL.",
         "retry": "Réessayer le test de connexion",
         "saving": "Enregistrement de la configuration...",
         "success": "Connexion réussie !",
         "successDescription": "Passage à l'étape suivante...",
         "testing": "Test de connexion en cours..."
       },
-      "title": "Add Integration"
+      "title": "Ajouter une intégration"
     }
   },
   "projects": {

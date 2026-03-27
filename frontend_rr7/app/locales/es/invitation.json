@@ -1,35 +1,35 @@
 {
   "actions": {
-    "accept": "Accept invitation",
-    "reject": "Reject invitation"
+    "accept": "Aceptar invitación",
+    "reject": "Rechazar invitación"
   },
-  "copyToClipboard": "Copy to clipboard",
-  "createAccountMessage": "You have been invited to create an account so that you can use Lasius to track your working hours.",
+  "copyToClipboard": "Copiar al portapapeles",
+  "createAccountMessage": "Has sido invitado a crear una cuenta de Lasius para registrar tus horas de trabajo.",
   "description": {
-    "copyLink": "Copy the link and send it to your colleague. If they do not have an account yet, one will be created when the invitation is accepted."
+    "copyLink": "Copia el enlace y envíalo a tu colega. Si aún no tiene una cuenta, se creará una cuando se acepte la invitación."
   },
-  "email": "Email",
+  "email": "Correo electrónico",
   "errors": {
-    "createdForSomeoneElse": "This invitation has been created for someone else. Either log out and refresh, or forward the invitation link to the user {{email}}",
-    "noLongerValid": "This invitation is no longer valid. It is best to contact the person who sent you the invitation link to get a new one."
+    "createdForSomeoneElse": "Esta invitación ha sido creada para otra persona. Cierra sesión y actualiza, o reenvía el enlace de invitación al usuario {{email}}",
+    "noLongerValid": "Esta invitación ya no es válida. Es mejor que contactes con la persona que te envió el enlace de invitación para obtener uno nuevo."
   },
-  "inviteOrganisationDescription": "Enter the email address of the person you want to invite. An invitation link will be generated that you can send to them.",
-  "inviteProjectDescription": "Enter the email address of the person you want to invite. An invitation link will be generated that you can send to them.",
+  "inviteOrganisationDescription": "Introduce la dirección de correo electrónico de la persona que deseas invitar. Se generará un enlace de invitación que puedes enviarle.",
+  "inviteProjectDescription": "Introduce la dirección de correo electrónico de la persona que deseas invitar. Se generará un enlace de invitación que puedes enviarle.",
   "messages": {
-    "invitedToOrganisation": "You have been invited by {{inviter}} to join organisation {{organisation}}.",
-    "invitedToOrganisationNeedsAccount": "You have been invited by {{inviter}} to join organisation {{organisation}}.",
-    "invitedToProject": "You have been invited by {{inviter}} to join project {{project}}.",
-    "invitedToProjectNeedsAccount": "You have been invited by {{inviter}} to join project {{project}}.",
-    "selectOrganisation": "Select the organisation you would like to add this project to:"
+    "invitedToOrganisation": "Has sido invitado por {{inviter}} a unirte a la organización {{organisation}}.",
+    "invitedToOrganisationNeedsAccount": "Ha sido invitado/a por {{inviter}} a unirse a la organización {{organisation}}.",
+    "invitedToProject": "Has sido invitado por {{inviter}} a unirte al proyecto {{project}}.",
+    "invitedToProjectNeedsAccount": "Ha sido invitado/a por {{inviter}} a unirse al proyecto {{project}}.",
+    "selectOrganisation": "Selecciona la organización a la que quieres añadir este proyecto:"
   },
   "needsAccount": {
-    "description": "You'll need to sign in or create an account for {{email}} to accept this invitation.",
-    "emailMatch": "Make sure to sign in with the email address this invitation was sent to: {{email}}",
-    "signInOrSignUpWith": "Sign in or sign up with",
-    "title": "Account Required"
+    "description": "Necesitarás iniciar sesión o crear una cuenta para {{email}} para aceptar esta invitación.",
+    "emailMatch": "Asegúrate de iniciar sesión con la dirección de correo electrónico a la que se envió esta invitación: {{email}}",
+    "signInOrSignUpWith": "Iniciar sesión o registrarse con",
+    "title": "Cuenta requerida"
   },
   "title": {
-    "invitationCreated": "Invitation created",
-    "userAssigned": "User assigned"
+    "invitationCreated": "Invitación creada",
+    "userAssigned": "Usuario asignado"
   }
 }

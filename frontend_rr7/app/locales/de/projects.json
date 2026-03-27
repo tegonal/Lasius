@@ -1,54 +1,52 @@
 {
   "actions": {
-    "add": "Add Project",
-    "cancel": "Cancel",
-    "create": "Create project",
-    "deactivate": "Deactivate project",
-    "deactivateConfirm": "Are you sure you want to deactivate the project \"{{project}}\"?",
-    "edit": "Edit project",
-    "leave": "Leave this project"
+    "add": "Projekt hinzufügen",
+    "cancel": "Abbrechen",
+    "create": "Ein Projekt erstellen",
+    "deactivate": "Projekt deaktivieren",
+    "deactivateConfirm": "Bist du sicher, dass du das Projekt \"{{project}}\" deaktivieren möchtest?",
+    "edit": "Projekt bearbeiten",
+    "leave": "Dieses Projekt verlassen"
   },
-  "allProjects": "All projects",
-  "allProjectsDescription": "All projects in the current organization that you can administer. Create billing reports including time booked by external project members.",
+  "allProjects": "Alle Projekte",
+  "allProjectsDescription": "Alle Projekte in der aktuellen Organisation, die du verwalten kannst. Erstelle Abrechnungsberichte einschließlich der Zeit, die von externen Projektmitgliedern gebucht wurde.",
   "confirmations": {
-    "leave": "Are you sure you want to leave this project?"
+    "leave": "Bist du sicher, dass du dieses Projekt verlassen möchtest?"
   },
-  "deactivatedBy": "Archived by {{user}}",
+  "deactivatedBy": "Archiviert von {{user}}",
   "description": {
-    "add": "Create a new project to organize your time tracking.",
-    "edit": "Update the project details."
+    "add": "Erstelle ein neues Projekt, um deine Zeiterfassung zu organisieren.",
+    "edit": "Aktualisiere die Projektdetails."
   },
-  "empty": "No projects found",
+  "empty": "Keine Projekte gefunden",
   "errors": {
-    "projectNotFound": "This project could not be found. The project ID is shown above."
+    "projectNotFound": "Dieses Projekt konnte nicht gefunden werden. Die Projekt-ID wird oben angezeigt."
   },
   "filter": {
-    "both": "Both",
-    "search": "Search",
-    "searchPlaceholder": "Filter projects...",
+    "both": "Beide",
+    "search": "Suchen",
+    "searchPlaceholder": "Projekte filtern...",
     "status": "Status"
   },
   "info": {
-    "uniqueNameRequired": "Project names must be unique within your organisation."
+    "uniqueNameRequired": "Projektnamen müssen innerhalb deiner Organisation eindeutig sein."
   },
-  "label": "Project",
-  "lastActivity": "Last activity",
-  "myProjects": "My projects",
-  "myProjectsDescription": "Projects where you are a member and can book time. Restricted by the currently selected organisation.",
-  "project": "Project",
-  "projectName": "Project name",
-  "projectRole": "Project role",
+  "label": "Projekt",
+  "lastActivity": "Letzte Aktivität",
+  "myProjects": "Meine Projekte",
+  "myProjectsDescription": "Projekte, in denen du Mitglied bist und Zeit buchen kannst. Eingeschränkt durch die aktuell ausgewählte Organisation.",
+  "project": "Projekt",
+  "projectName": "Projektname",
+  "projectRole": "Rolle",
   "status": {
-    "assignedToUser": "Project successfully assigned to user.",
-    "created": "Project created",
-    "updated": "Project updated"
+    "assignedToUser": "Projekt erfolgreich an Benutzer zugewiesen.",
+    "created": "Projekt erstellt",
+    "updated": "Projekt aktualisiert"
   },
-  "title": "Projects",
-  "total": "Total",
+  "title": "Projekte",
+  "total": "Gesamt",
   "warnings": {
-    "inactiveProjectContext": "Viewing stats from inactive project",
-    "inactiveProjectFilter": "Showing data for inactive project",
-    "projectNotInActiveList": "This project is not in your active projects list. It may be inactive or from another organization.",
-    "projectUnavailable": "This project is no longer in your profile. You may have been removed from it."
+    "projectNotInActiveList": "Dieses Projekt ist nicht in deiner Liste aktiver Projekte. Es könnte inaktiv sein oder aus einer anderen Organisation stammen.",
+    "projectUnavailable": "Dieses Projekt ist nicht mehr in deinem Profil vorhanden. Du wurdest möglicherweise daraus entfernt."
   }
 }

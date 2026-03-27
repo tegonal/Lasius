@@ -1,61 +1,60 @@
 {
   "actions": {
-    "actions": "Actions",
-    "cancel": "Cancel",
-    "close": "Close",
-    "create": "Create organisation",
-    "edit": "Edit organisation",
-    "save": "Save",
-    "switch": "Switch organisation"
+    "actions": "Azioni",
+    "cancel": "Annulla",
+    "close": "Chiudi",
+    "create": "Crea organizzazione",
+    "edit": "Modifica organizzazione",
+    "save": "Salva",
+    "switch": "Cambia organizzazione"
   },
-  "adminDescription": "You are an administrator of this organisation. You can add and remove members and change the organisation name, or create a new one.",
-  "createDescription": "Add a new organisation using the Actions button at the top of the list.",
-  "currentOrganisation": "Current organisation",
+  "adminDescription": "Sei un amministratore di questa organizzazione. Puoi aggiungere e rimuovere membri e modificare il nome dell'organizzazione, o crearne una nuova.",
+  "createDescription": "Usa il menu Azioni per creare una nuova organizzazione.",
+  "currentOrganisation": "Organizzazione corrente",
   "description": {
-    "create": "Create a new organisation to collaborate with your team.",
-    "edit": "Update the organisation name."
+    "create": "Crea una nuova organizzazione per collaborare con il tuo team.",
+    "edit": "Aggiorna il nome dell'organizzazione."
   },
   "errors": {
-    "duplicateKey": "An organisation with this name already exists"
+    "duplicateKey": "Un'organizzazione con questo nome esiste già"
   },
   "forms": {
     "email": "Email",
-    "firstName": "First name",
-    "lastName": "Last name"
+    "firstName": "Nome",
+    "lastName": "Cognome"
   },
   "info": {
-    "uniqueNameRequired": "Organisation names must be unique."
+    "uniqueNameRequired": "I nomi delle organizzazioni devono essere univoci."
   },
-  "memberDescription": "You are a member of this organisation and don't have the rights to add or remove members. Get in touch with an organisation administrator if you would like to invite someone.",
+  "memberDescription": "Sei un membro di questa organizzazione e non hai i diritti per aggiungere o rimuovere membri. Contatta un amministratore dell'organizzazione se desideri invitare qualcuno.",
   "members": {
     "actions": {
-      "invite": "Invite someone",
-      "manage": "Manage members",
-      "remove": "Remove member"
+      "invite": "Invita qualcuno",
+      "manage": "Gestisci membri",
+      "remove": "Rimuovi membro"
     },
     "confirmations": {
-      "removeConfirm": "Are you sure you want to remove {{name}}?",
-      "removeTitle": "Remove member",
-      "removeWarning": "This member will be removed from the organisation and lose access to all projects."
+      "removeConfirm": "Sei sicuro di voler rimuovere {{name}}?",
+      "removeTitle": "Rimuovi membro",
+      "removeWarning": "Questo membro sarà rimosso dall'organizzazione e perderà l'accesso a tutti i progetti."
     },
-    "confirmRemove": "Are you sure you want to remove this member from the project?",
-    "description_one": "This project has {{count}} member(s).",
-    "description_many": "This project has {{count}} member(s).",
-    "description_other": "This project has {{count}} member(s).",
-    "empty": "No members found",
-    "emptyState": "No members found",
-    "title": "Members"
+    "confirmRemove": "Sei sicuro di voler rimuovere questo membro dal progetto?",
+    "description_one": "Questo progetto ha {{count}} membro.",
+    "description_other": "Questo progetto ha {{count}} membri.",
+    "empty": "Nessun membro trovato",
+    "emptyState": "Nessun membro trovato",
+    "title": "Membri"
   },
-  "myPersonalOrganisation": "My personal organisation",
-  "organisationName": "Organisation",
-  "organisationRole": "Organisation role",
-  "organization": "Organisation",
-  "organizationName": "Organisation name",
-  "privateDescription": "This organisation is only visible to you. You can use it to track private projects that you do not want others to have access to. If you want to invite people, invite them to an existing organisation or create a new one.",
-  "selected": "Selected",
-  "selectOrganisation": "Select organisation",
+  "myPersonalOrganisation": "La mia organizzazione personale",
+  "organisationName": "Organizzazione",
+  "organisationRole": "Ruolo nell'organizzazione",
+  "organization": "Organizzazione",
+  "organizationName": "Nome organizzazione",
+  "privateDescription": "Questa organizzazione è visibile solo a te. Usala per monitorare progetti privati. Per collaborare con altri, crea o usa un'organizzazione diversa.",
+  "selected": "Selezionato",
+  "selectOrganisation": "Seleziona organizzazione",
   "status": {
-    "label": "Status"
+    "label": "Stato"
   },
-  "you": "You"
+  "you": "Tu"
 }

@@ -40,20 +40,19 @@
     "checkIntervalHelp": "Frequenza di verifica delle nuove issue",
     "configListItem": {
       "projectCount_one": "{{count}} progetto",
-      "projectCount_many": "",
       "projectCount_other": "{{count}} progetti"
     },
     "descriptions": {
       "edit": "Aggiorna la configurazione di questa integrazione importatore problemi."
     },
-    "emptyState": "Nessuna integrazione configurata ancora. Aggiungine una per iniziare.",
+    "emptyState": "Nessuna integrazione configurata. Aggiungine una per iniziare.",
     "errors": {
-      "deleteFailed": "Failed to delete integration",
+      "deleteFailed": "Eliminazione integrazione non riuscita",
       "invalidMappingData": "Dati di mappatura non validi",
       "mappingRemoveFailed": "Impossibile rimuovere la mappatura del progetto",
       "mappingSaveFailed": "Impossibile salvare le mappature del progetto",
       "tagsRefreshFailed": "Aggiornamento tag non riuscito",
-      "updateFailed": "Failed to update integration"
+      "updateFailed": "Aggiornamento integrazione non riuscito"
     },
     "fields": {
       "accessToken": "Token di accesso",
@@ -68,7 +67,7 @@
         "plane": "https://plane.company.com"
       },
       "consumerKey": "Chiave consumer OAuth",
-      "credentialPlaceholder": "Inserisci un nuovo valore per aggiornare",
+      "credentialPlaceholder": "Inserisci il nuovo valore per aggiornare",
       "name": "Nome configurazione",
       "namePlaceholder": {
         "github": "es. Azienda GitHub",
@@ -155,30 +154,30 @@
       "title": "Mappature progetti {{platform}}"
     },
     "success": {
-      "configCreated": "Integration created successfully",
-      "configDeleted": "Integration deleted successfully",
-      "configUpdated": "Integration updated successfully",
+      "configCreated": "Integrazione creata con successo",
+      "configDeleted": "Configurazione eliminata con successo",
+      "configUpdated": "Integrazione aggiornata con successo",
       "mappingRemoved": "Mappatura del progetto rimossa con successo",
       "mappingSaved": "Mappatura del progetto salvata con successo",
       "tagsRefreshed": "Aggiornamento tag avviato con successo"
     },
     "tagConfiguration": {
-      "description": "Configure which fields from external issues should be used to create tags in Lasius.",
-      "issueLabelFilterHelp": "Leave empty to import all issues, or select labels to import only issues that have at least one of these labels.",
-      "issueLabelFilterLabel": "Import only issues with specific labels",
-      "issueLabelFilterPlaceholder": "All issues (or select labels to filter...)",
-      "issueStateFilterHelp": "Leave empty to import all issues, or select states to import only issues in those states.",
-      "issueStateFilterLabel": "Import only issues with specific states",
-      "issueStateFilterPlaceholder": "All states (or select specific states...)",
-      "labelFilterHelp": "Leave empty to import all labels, or select specific labels to import only those.",
-      "labelFilterLabel": "Import only specific labels",
-      "labelFilterPlaceholder": "All labels (or select specific labels...)",
-      "tagFieldsLabel": "Tag fields to import",
-      "tagFieldsPlaceholder": "Select fields...",
-      "useAssignees": "Use assignees as tags",
-      "useLabels": "Use labels as tags",
-      "useMilestone": "Use milestone as tag",
-      "useTitle": "Use issue title as tag"
+      "description": "Configura quali campi delle issue esterne devono essere usati per creare tag in Lasius.",
+      "issueLabelFilterHelp": "Lasciare vuoto per importare tutte le issue, oppure selezionare etichette per importare solo le issue che hanno almeno una di queste etichette.",
+      "issueLabelFilterLabel": "Importa solo issue con etichette specifiche",
+      "issueLabelFilterPlaceholder": "Tutte le issue (o seleziona etichette per filtrare...)",
+      "issueStateFilterHelp": "Lasciare vuoto per importare tutte le issue, oppure selezionare stati per importare solo le issue in quegli stati.",
+      "issueStateFilterLabel": "Importa solo issue con stati specifici",
+      "issueStateFilterPlaceholder": "Tutti gli stati (o seleziona stati specifici...)",
+      "labelFilterHelp": "Lasciare vuoto per importare tutte le etichette, oppure selezionare etichette specifiche per importare solo quelle.",
+      "labelFilterLabel": "Importa solo etichette specifiche",
+      "labelFilterPlaceholder": "Tutte le etichette (o seleziona etichette specifiche...)",
+      "tagFieldsLabel": "Campi tag da importare",
+      "tagFieldsPlaceholder": "Seleziona campi...",
+      "useAssignees": "Usa assegnatari come tag",
+      "useLabels": "Usa etichette come tag",
+      "useMilestone": "Usa milestone come tag",
+      "useTitle": "Usa titolo issue come tag"
     },
     "testConnection": {
       "editModeNote": "Nota: Inserisci le tue credenziali sopra per testare la connessione. Lasciare vuoto per mantenere le credenziali esistenti durante il salvataggio.",
@@ -208,7 +207,6 @@
         "loading": "Caricamento progetti da {{platform}} in corso...",
         "mappingDescription": "Collega questo progetto esterno a un progetto Lasius per sincronizzare automaticamente i problemi come etichette di tracciamento del tempo.",
         "mappingDescription_one": "Trovato {{count}} progetto da {{platform}}. Associalo ai tuoi progetti Lasius per importare le issue. {{mapped}} di {{total}} associato.",
-        "mappingDescription_many": "Found {{count}} projects from {{platform}}. Map them to your Lasius projects to import issues. {{mapped}} of {{total}} mapped.",
         "mappingDescription_other": "Trovati {{count}} progetti da {{platform}}. Associali ai tuoi progetti Lasius per importare le issue. {{mapped}} di {{total}} associati.",
         "noProjects": "Nessun progetto trovato in {{platform}}",
         "notMapped": "Non associato",
@@ -226,22 +224,22 @@
         "title": "Seleziona sistema di tracciamento issue"
       },
       "steps": {
-        "config": "Configure",
+        "config": "Configura",
         "platform": "Piattaforma",
         "projects": "Progetti",
         "test": "Testa"
       },
       "test": {
-        "createFailed": "Connessione riuscita ma impossibile salvare la configurazione.",
+        "createFailed": "Connessione riuscita ma salvataggio della configurazione non riuscito.",
         "error": "Connessione fallita",
-        "failed": "Test di connessione fallito. Verifica le tue credenziali e l'URL.",
+        "failed": "Test di connessione non riuscito. Controlla le credenziali e l'URL.",
         "retry": "Riprova test di connessione",
         "saving": "Salvataggio configurazione...",
         "success": "Connessione riuscita!",
         "successDescription": "Passaggio al prossimo step...",
         "testing": "Test di connessione in corso..."
       },
-      "title": "Add Integration"
+      "title": "Aggiungi integrazione"
     }
   },
   "projects": {

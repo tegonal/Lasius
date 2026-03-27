@@ -1,12 +1,12 @@
 {
-  "dailyTotal": "Daily Total",
-  "description": "The amount of time you expect to book per day, by organisation, during a typical working week. This data is used to calculate your daily and weekly progress.",
+  "dailyTotal": "Total diario",
+  "description": "La cantidad de tiempo que esperas registrar por día, por organización, durante una semana laboral típica. Estos datos se utilizan para calcular tu progreso diario y semanal.",
   "errors": {
-    "updateFailed": "Failed to update working hours"
+    "updateFailed": "Error al actualizar las horas de trabajo"
   },
   "status": {
-    "updated": "Working hours updated"
+    "updated": "Horas de trabajo actualizadas"
   },
-  "title": "Working hours",
-  "totalPerWeek": "Total per week"
+  "title": "Horas de trabajo",
+  "totalPerWeek": "total por semana"
 }

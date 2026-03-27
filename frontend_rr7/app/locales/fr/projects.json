@@ -1,54 +1,54 @@
 {
   "actions": {
-    "add": "Add Project",
-    "cancel": "Cancel",
-    "create": "Create project",
-    "deactivate": "Deactivate project",
-    "deactivateConfirm": "Are you sure you want to deactivate the project \"{{project}}\"?",
-    "edit": "Edit project",
-    "leave": "Leave this project"
+    "add": "Ajouter un projet",
+    "cancel": "Annuler",
+    "create": "Créer un projet",
+    "deactivate": "Désactiver le projet",
+    "deactivateConfirm": "Êtes-vous sûr(e) de vouloir désactiver le projet «{{project}}» ?",
+    "edit": "Modifier le projet",
+    "leave": "Quitter ce projet"
   },
-  "allProjects": "All projects",
-  "allProjectsDescription": "All projects in the current organization that you can administer. Create billing reports including time booked by external project members.",
+  "allProjects": "Tous les projets",
+  "allProjectsDescription": "Tous les projets de l'organisation actuelle que tu peux administrer. Crée des rapports de facturation incluant le temps réservé par les membres externes du projet.",
   "confirmations": {
-    "leave": "Are you sure you want to leave this project?"
+    "leave": "Es-tu sûr de vouloir quitter ce projet ?"
   },
-  "deactivatedBy": "Archived by {{user}}",
+  "deactivatedBy": "Archivé par {{user}}",
   "description": {
-    "add": "Create a new project to organize your time tracking.",
-    "edit": "Update the project details."
+    "add": "Créez un nouveau projet pour organiser votre suivi du temps.",
+    "edit": "Mettez à jour les détails du projet."
   },
-  "empty": "No projects found",
+  "empty": "Aucun projet trouvé",
   "errors": {
-    "projectNotFound": "This project could not be found. The project ID is shown above."
+    "projectNotFound": "Ce projet n'a pas pu être trouvé. L'ID du projet est affiché ci-dessus."
   },
   "filter": {
-    "both": "Both",
-    "search": "Search",
-    "searchPlaceholder": "Filter projects...",
-    "status": "Status"
+    "both": "Les deux",
+    "search": "Rechercher",
+    "searchPlaceholder": "Filtrer les projets...",
+    "status": "Statut"
   },
   "info": {
-    "uniqueNameRequired": "Project names must be unique within your organisation."
+    "uniqueNameRequired": "Les noms de projet doivent être uniques au sein de votre organisation."
   },
-  "label": "Project",
-  "lastActivity": "Last activity",
-  "myProjects": "My projects",
-  "myProjectsDescription": "Projects where you are a member and can book time. Restricted by the currently selected organisation.",
-  "project": "Project",
-  "projectName": "Project name",
-  "projectRole": "Project role",
+  "label": "Projet",
+  "lastActivity": "Dernière activité",
+  "myProjects": "Mes projets",
+  "myProjectsDescription": "Projets dont tu es membre et pour lesquels tu peux réserver du temps, filtrés par l'organisation actuelle.",
+  "project": "Projet",
+  "projectName": "Nom du projet",
+  "projectRole": "Rôle",
   "status": {
-    "assignedToUser": "Project successfully assigned to user.",
-    "created": "Project created",
-    "updated": "Project updated"
+    "assignedToUser": "Projet assigné à l'utilisateur avec succès.",
+    "created": "Projet créé",
+    "updated": "Projet mis à jour"
   },
-  "title": "Projects",
+  "title": "Projets",
   "total": "Total",
   "warnings": {
-    "inactiveProjectContext": "Viewing stats from inactive project",
-    "inactiveProjectFilter": "Showing data for inactive project",
-    "projectNotInActiveList": "This project is not in your active projects list. It may be inactive or from another organization.",
-    "projectUnavailable": "This project is no longer in your profile. You may have been removed from it."
+    "inactiveProjectContext": "Affichage des statistiques d'un projet inactif",
+    "inactiveProjectFilter": "Affichage des données pour un projet inactif",
+    "projectNotInActiveList": "Ce projet ne figure pas dans ta liste de projets actifs. Il peut être inactif ou provenir d'une autre organisation.",
+    "projectUnavailable": "Ce projet n'est plus dans ton profil. Tu as peut-être été retiré de celui-ci."
   }
 }

@@ -1,48 +1,48 @@
 {
   "account": {
-    "accountSecurity": "Account Security",
-    "profileChangesNotAllowedInDemo": "Profile changes are not allowed in demo mode",
+    "accountSecurity": "Konto-Sicherheit",
+    "profileChangesNotAllowedInDemo": "Profil-Änderungen sind im Demo-Modus nicht erlaubt",
     "profileSettings": {
-      "description": "Manage your personal information and account details.",
-      "title": "Profile Information"
+      "description": "Verwalte deine persönlichen Informationen und Konto-Details.",
+      "title": "Profilinformationen"
     },
     "security": {
-      "description": "Update your password to keep your account secure. Make sure to use a strong password with at least 8 characters, including uppercase letters and numbers."
+      "description": "Aktualisiere dein Passwort, um dein Konto sicher zu halten. Verwende ein starkes Passwort mit mindestens 8 Zeichen, einschließlich Großbuchstaben und Zahlen."
     },
     "settings": {
-      "description": "Manage your personal information and account details. Your email address can only be changed if you are using the internal authentication provider.",
-      "title": "Account Settings"
+      "description": "Verwalte deine persönlichen Informationen und Konto-Details. Deine E-Mail-Adresse kann nur geändert werden, wenn du den internen Authentifizierungsanbieter verwendest.",
+      "title": "Konto-Einstellungen"
     },
     "status": {
-      "passwordUpdated": "Password updated",
-      "settingsUpdated": "Account settings updated"
+      "passwordUpdated": "Passwort aktualisiert",
+      "settingsUpdated": "Konto-Einstellungen aktualisiert"
     }
   },
   "actions": {
-    "saveChanges": "Save changes"
+    "saveChanges": "Änderungen speichern"
   },
   "app": {
-    "language": "Interface Language",
-    "save": "Save Settings",
-    "showOnboarding": "Show Onboarding Tutorial",
-    "theme": "Theme"
+    "language": "Sprache der Benutzeroberfläche",
+    "save": "Einstellungen speichern",
+    "showOnboarding": "Onboarding-Tutorial anzeigen",
+    "theme": "Erscheinungsbild"
   },
   "forms": {
-    "confirmNewPassword": "Confirm new password",
-    "email": "Email",
-    "firstName": "First name",
-    "lastName": "Last name",
-    "newPassword": "New password",
-    "password": "Password",
-    "role": "Role"
+    "confirmNewPassword": "Neues Passwort bestätigen",
+    "email": "E-Mail",
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "newPassword": "Neues Passwort",
+    "password": "Passwort",
+    "role": "Rolle"
   },
   "themes": {
-    "dark": "Dark",
-    "light": "Light",
+    "dark": "Dunkel",
+    "light": "Hell",
     "system": "System"
   },
   "ui": {
-    "hidePasswords": "Hide passwords",
-    "showPasswords": "Show passwords"
+    "hidePasswords": "Passwörter verbergen",
+    "showPasswords": "Passwörter anzeigen"
   }
 }

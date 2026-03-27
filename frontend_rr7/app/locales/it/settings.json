@@ -1,48 +1,48 @@
 {
   "account": {
-    "accountSecurity": "Account Security",
-    "profileChangesNotAllowedInDemo": "Profile changes are not allowed in demo mode",
+    "accountSecurity": "Sicurezza dell'account",
+    "profileChangesNotAllowedInDemo": "Le modifiche al profilo non sono consentite in modalità demo",
     "profileSettings": {
-      "description": "Manage your personal information and account details.",
-      "title": "Profile Information"
+      "description": "Gestisci le tue informazioni personali e i dettagli dell'account.",
+      "title": "Informazioni profilo"
     },
     "security": {
-      "description": "Update your password to keep your account secure. Make sure to use a strong password with at least 8 characters, including uppercase letters and numbers."
+      "description": "Aggiorna la password per mantenere sicuro il tuo account. Usa una password robusta con almeno 8 caratteri, che includa lettere maiuscole e numeri."
     },
     "settings": {
-      "description": "Manage your personal information and account details. Your email address can only be changed if you are using the internal authentication provider.",
-      "title": "Account Settings"
+      "description": "Gestisci le tue informazioni personali e i dettagli dell'account. Il tuo indirizzo email può essere modificato solo se stai utilizzando il provider di autenticazione interno.",
+      "title": "Impostazioni account"
     },
     "status": {
-      "passwordUpdated": "Password updated",
-      "settingsUpdated": "Account settings updated"
+      "passwordUpdated": "Password aggiornata",
+      "settingsUpdated": "Impostazioni account aggiornate"
     }
   },
   "actions": {
-    "saveChanges": "Save changes"
+    "saveChanges": "Salva modifiche"
   },
   "app": {
-    "language": "Interface Language",
-    "save": "Save Settings",
-    "showOnboarding": "Show Onboarding Tutorial",
-    "theme": "Theme"
+    "language": "Lingua dell'interfaccia",
+    "save": "Salva impostazioni",
+    "showOnboarding": "Mostra tutorial introduttivo",
+    "theme": "Tema"
   },
   "forms": {
-    "confirmNewPassword": "Confirm new password",
+    "confirmNewPassword": "Conferma nuova password",
     "email": "Email",
-    "firstName": "First name",
-    "lastName": "Last name",
-    "newPassword": "New password",
+    "firstName": "Nome",
+    "lastName": "Cognome",
+    "newPassword": "Nuova password",
     "password": "Password",
-    "role": "Role"
+    "role": "Ruolo"
   },
   "themes": {
-    "dark": "Dark",
-    "light": "Light",
-    "system": "System"
+    "dark": "Scuro",
+    "light": "Chiaro",
+    "system": "Sistema"
   },
   "ui": {
-    "hidePasswords": "Hide passwords",
-    "showPasswords": "Show passwords"
+    "hidePasswords": "Nascondi password",
+    "showPasswords": "Mostra password"
   }
 }

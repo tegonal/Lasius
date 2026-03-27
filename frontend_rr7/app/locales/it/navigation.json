@@ -1,27 +1,27 @@
 {
   "organisation": {
-    "current": "Organisation",
+    "current": "Organizzazione corrente",
     "integrations": "Integrations",
     "lists": "Lists",
-    "projects": "Projects",
-    "stats": "Statistics"
+    "projects": "Progetti",
+    "stats": "Statistiche"
   },
   "settings": {
     "account": "Account",
-    "accountSecurity": "Account Security",
+    "accountSecurity": "Sicurezza dell'account",
     "app": "App Settings",
-    "workingHours": "Working hours"
+    "workingHours": "Ore di lavoro"
   },
   "tabs": {
-    "organisation": "Current organisation",
-    "settings": "Settings",
-    "user": "Your time booking view"
+    "organisation": "Organizzazione corrente",
+    "settings": "Impostazioni",
+    "user": "La tua vista registrazioni tempo"
   },
   "user": {
-    "bookings": "Bookings",
+    "bookings": "Registrazioni",
     "dashboard": "Dashboard",
     "lists": "Lists",
-    "projects": "My projects",
-    "stats": "Statistics"
+    "projects": "I miei progetti",
+    "stats": "Statistiche"
   }
 }

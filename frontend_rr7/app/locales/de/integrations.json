@@ -4,25 +4,25 @@
     "cancel": "Abbrechen",
     "close": "Schließen",
     "confirm": "Bestätigen",
-    "finish": "Fertig",
+    "finish": "Fertigstellen",
     "next": "Weiter",
     "remove": "Entfernen",
     "saving": "Wird gespeichert..."
   },
-  "clear": "Löschen",
+  "clear": "Zurücksetzen",
   "integrations": {
     "actions": {
       "addIntegration": "Integration hinzufügen"
     },
     "configurations": "Konfigurationen",
-    "configureDescription": "Verwende die Schaltfläche \"Integration hinzufügen\", um eine neue Integration einzurichten. Nach dem Erstellen einer Konfiguration ordne deine externen Projekte Lasius-Projekten zu, um den Import von Issues zu aktivieren.",
+    "configureDescription": "Verwende die Schaltfläche 'Konfiguration hinzufügen', um eine neue Integration einzurichten. Ordne nach dem Erstellen einer Konfiguration deine externen Projekte Lasius-Projekten zu, um Issue-Importe zu aktivieren.",
     "delete": {
       "confirm": "Löschen",
-      "hasProjects": "Diese Konfiguration hat Projekt-Zuordnungen. Entferne alle Zuordnungen vor dem Löschen.",
+      "hasProjects": "Diese Konfiguration hat Projekt-Zuordnungen. Entferne zuerst alle Zuordnungen, bevor du sie löschst.",
       "message": "Bist du sicher, dass du diese Integrationskonfiguration löschen möchtest?",
       "title": "Integration löschen"
     },
-    "description": "Verbinde Lasius mit externen Issue-Tracking-Systemen wie GitHub, GitLab, Jira und Plane. Importierte Issues werden als Tags verfügbar, wenn du Zeit in zugeordneten Projekten buchst, sodass du Zeit direkt auf deine Issues erfassen kannst.",
+    "description": "Verbinde Lasius mit externen Issue-Tracking-Systemen wie GitHub, GitLab, Jira und Plane. Importierte Issues werden als Tags beim Zeitbuchen in zugeordneten Projekten verfügbar, sodass du Zeit direkt auf deinen Issues erfassen kannst.",
     "issueTrackers": "Issue-Tracker",
     "title": "Integrationen"
   },
@@ -37,7 +37,7 @@
       "viewMappings": "Projekt-Zuordnungen anzeigen"
     },
     "checkInterval": "Prüfintervall",
-    "checkIntervalHelp": "Wie oft auf neue Issues geprüft werden soll",
+    "checkIntervalHelp": "Wie oft nach neuen Issues gesucht werden soll",
     "configListItem": {
       "projectCount_one": "{{count}} Projekt",
       "projectCount_other": "{{count}} Projekte"
@@ -45,14 +45,14 @@
     "descriptions": {
       "edit": "Aktualisiere die Konfiguration für diese Issue-Importer-Integration."
     },
-    "emptyState": "Noch keine Integrationen konfiguriert. Füge eine hinzu, um loszulegen.",
+    "emptyState": "Noch keine Integrationen konfiguriert. Füge eine hinzu, um zu starten.",
     "errors": {
-      "deleteFailed": "Failed to delete integration",
+      "deleteFailed": "Integration konnte nicht gelöscht werden",
       "invalidMappingData": "Ungültige Zuordnungsdaten",
       "mappingRemoveFailed": "Projekt-Zuordnung konnte nicht entfernt werden",
       "mappingSaveFailed": "Projekt-Zuordnungen konnten nicht gespeichert werden",
-      "tagsRefreshFailed": "Tags-Aktualisierung fehlgeschlagen",
-      "updateFailed": "Failed to update integration"
+      "tagsRefreshFailed": "Tags konnten nicht aktualisiert werden",
+      "updateFailed": "Integration konnte nicht aktualisiert werden"
     },
     "fields": {
       "accessToken": "Zugangstoken",
@@ -62,42 +62,42 @@
       "baseUrl": "Basis-URL",
       "baseUrlPlaceholder": {
         "github": "https://api.github.com",
-        "gitlab": "https://gitlab.company.com",
+        "gitlab": "https://...",
         "jira": "https://company.atlassian.net",
-        "plane": "https://plane.company.com"
+        "plane": "https://..."
       },
-      "consumerKey": "OAuth Consumer Key",
+      "consumerKey": "OAuth Consumer-Schlüssel",
       "credentialPlaceholder": "Neuen Wert zum Aktualisieren eingeben",
       "name": "Konfigurationsname",
       "namePlaceholder": {
-        "github": "z.B. Firma GitHub",
-        "gitlab": "z.B. Firma GitLab",
-        "jira": "z.B. Firma Jira",
-        "plane": "z.B. Firma Plane"
+        "github": "z. B. Firmen-GitHub",
+        "gitlab": "z. B. Firmen-GitLab",
+        "jira": "z. B. Firmen-Jira",
+        "plane": "z. B. Firmen-Plane"
       },
       "oauthAccessToken": "OAuth Zugangstoken",
       "privateKey": "OAuth Private Key",
-      "privateKeyEdit": "OAuth Private Key (leer lassen, um aktuellen beizubehalten)",
+      "privateKeyEdit": "Private Key (leer lassen, um aktuellen beizubehalten)",
       "resourceOwner": "Ressourcenbesitzer",
-      "resourceOwnerHelp": "Wähle den GitHub-Benutzer oder die Organisation aus, die die Repositories besitzt, auf die du zugreifen möchtest.",
-      "resourceOwnerLoading": "Lade Organisationen...",
+      "resourceOwnerHelp": "Wähle den GitHub-Benutzer oder die Organisation aus, der/die die Repositories besitzt, auf die du zugreifen möchtest.",
+      "resourceOwnerLoading": "Organisationen werden geladen...",
       "resourceOwnerNoResults": "Keine Organisationen gefunden",
       "resourceOwnerPlaceholder": "Zugangstoken oben eingeben, um Organisationen zu laden",
       "resourceOwnerSelect": "Organisation auswählen",
       "workspace": "Arbeitsbereich",
-      "workspaceHelp": "Der Arbeitsbereich-Slug aus Ihrer Plane-URL (z.B. \"meine-firma\" aus https://app.plane.so/meine-firma)",
-      "workspacePlaceholder": "z.B. meine-firma"
+      "workspaceHelp": "Der Arbeitsbereich-Slug aus deiner Plane-URL (z. B. \"meine-firma\" aus https://app.plane.so/meine-firma)",
+      "workspacePlaceholder": "z. B. meine-firma"
     },
     "github": {
       "instructions": {
-        "content": "<0><1>Verifiziere deine E-Mail-Adresse auf GitHub</1><1>Gehe zu Settings → Developer settings → Personal access tokens → Fine-grained tokens</1><1>Klicke auf \"Generate new token\"</1><1>Gib einen Token-Namen ein und wähle ein Ablaufdatum</1><1>Wähle einen Resource Owner (dein Benutzerkonto oder eine Organisation, auf die du Zugriff hast)</1><1>Wähle Repository-Zugriff (alle Repositories oder nur ausgewählte Repositories)</1><1>Unter Repository permissions setze <2>Issues</2> auf \"Read-only\" und <2>Metadata</2> auf \"Read-only\"</1><1>Klicke auf \"Generate token\" und kopiere ihn sofort</1></0><3>Wichtig: Fine-grained Tokens sind erforderlich (keine klassischen Tokens). Der ausgewählte Resource Owner bestimmt, auf welche Repositories du zugreifen kannst. Für Organisations-Repositories benötigst du möglicherweise die Genehmigung des Organisations-Eigentümers. Stelle sicher, dass du denselben Resource Owner im Konfigurationsformular oben auswählst.</3>",
-        "title": "So erstellst du GitHub-Anmeldedaten:"
+        "content": "<0><0>Bestätige deine E-Mail-Adresse auf GitHub</0><1>Gehe zu Einstellungen → Entwicklereinstellungen → Personal access tokens → Fine-grained tokens</1><2>Klicke auf \"Generate new token\"</2><3>Gib einen Token-Namen ein und wähle ein Ablaufdatum</3><4>Wähle einen Ressourcenbesitzer (dein Benutzerkonto oder eine Organisation, auf die du Zugriff hast)</4><5>Wähle den Repository-Zugriff (alle Repositories oder nur bestimmte)</5><6>Setze unter Repository-Berechtigungen <2>Issues</2> auf \"Read-only\" und <6>Metadata</6> auf \"Read-only\"</6><7>Klicke auf \"Generate token\" und kopiere ihn sofort</7></0><1>Wichtig: Fine-grained tokens sind erforderlich (keine Classic-Tokens). Der gewählte Ressourcenbesitzer bestimmt, auf welche Repositories du zugreifen kannst. Für Organisations-Repositories benötigst du möglicherweise die Genehmigung des Organisationsinhabers. Stelle sicher, dass du denselben Ressourcenbesitzer im Konfigurationsformular oben auswählst.</1>",
+        "title": "So erstellst du GitHub-Zugangsdaten:"
       }
     },
     "gitlab": {
       "instructions": {
-        "content": "<0><1>Wähle in der linken Seitenleiste dein Avatar aus</1><1>Wähle \"Profil bearbeiten\"</1><1>Wähle \"Personal access tokens\"</1><1>Wähle \"Add new token\"</1><1>Gib einen Token-Namen und eine optionale Beschreibung ein</1><1>Lege ein Ablaufdatum fest</1><1>Wähle den <2>read_api</2> Scope (gewährt Lesezugriff auf die API, einschließlich aller Gruppen und Projekte)</1><1>Klicke auf \"Create personal access token\"</1><1>Kopiere den Token sofort und speichere ihn sicher</1></0><3>Hinweis: Der Token wird nur einmal angezeigt. Verwende <2>read_api</2> für Nur-Lese-Zugriff oder <2>api</2> für vollständigen Lese-/Schreibzugriff, falls erforderlich.</3>",
-        "title": "So erstellst du GitLab-Anmeldedaten:"
+        "content": "<0><0>Wähle in der linken Seitenleiste deinen Avatar</0><1>Wähle \"Profil bearbeiten\"</1><2>Wähle \"Personal access tokens\"</2><3>Wähle \"Add new token\"</3><4>Gib einen Token-Namen und eine optionale Beschreibung ein</4><5>Setze ein Ablaufdatum</5><6>Wähle den Bereich <2>read_api</2> (gewährt Lesezugriff auf die API, einschließlich aller Gruppen und Projekte)</6><7>Klicke auf \"Create personal access token\"</7><8>Kopiere den Token sofort und speichere ihn sicher</8></0><1>Hinweis: Der Token wird nur einmal angezeigt. Verwende <2>read_api</2> für schreibgeschützten Zugriff oder <6>api</6> für vollen Lese-/Schreibzugriff bei Bedarf.</1>",
+        "title": "So erstellst du GitLab-Zugangsdaten:"
       }
     },
     "headers": {
@@ -115,7 +115,7 @@
     "info": {
       "auditInfo": "Audit-Informationen",
       "baseUrl": "Basis-URL",
-      "basicInfo": "Grundinformationen",
+      "basicInfo": "Grundlegende Informationen",
       "checkFrequency": "Prüfhäufigkeit",
       "checkFrequencyValue": "{{minutes}} Minuten",
       "createdAt": "Erstellt",
@@ -123,15 +123,15 @@
       "healthStatus": "Gesundheitsstatus",
       "issuesSynced": "Issues",
       "lastChecked": "Zuletzt geprüft: {{date}}",
-      "lastSuccessfulSync": "Letzte erfolgreiche Synchronisation",
-      "lastSync": "Letzte Synchronisation",
+      "lastSuccessfulSync": "Letzter erfolgreicher Sync",
+      "lastSync": "Letzter Sync",
       "name": "Name",
-      "nextScheduledSync": "Nächste geplante Synchronisation",
+      "nextScheduledSync": "Nächster geplanter Sync",
       "noConfig": "Keine Konfiguration ausgewählt.",
       "projectCount": "Projekt-Zuordnungen",
       "projectName": "Projekt",
-      "projectStats": "Projekt-Statistiken",
-      "title": "Konfigurationsinformationen",
+      "projectStats": "Projektstatistiken",
+      "title": "Konfigurationsinfo",
       "totalIssuesSynced": "Gesamt synchronisierte Issues",
       "totalProjectsMapped": "Zugeordnete Projekte",
       "type": "Typ",
@@ -140,48 +140,48 @@
     },
     "jira": {
       "instructions": {
-        "content": "<0><1>Generiere RSA-Schlüsselpaar mit OpenSSL: <2>openssl genrsa -out jira_privatekey.pem 1024</2></1><1>Extrahiere öffentlichen Schlüssel: <2>openssl rsa -in jira_privatekey.pem -pubout -out jira_publickey.pem</2></1><1>In Jira: Klicke auf Einstellungen (Zahnrad-Symbol) → Applications → Application links</1><1>Gib eine beliebige URL ein (z.B. <2>http://localhost</2>) und klicke auf \"Create new link\"</1><1>Ignoriere die Warnung \"No response was received\" und klicke auf \"Continue\"</1><1>Gib deinen Application Name ein und wähle \"Create incoming link\"</1><1>Gib im Formular für eingehende Authentifizierung deinen Consumer Key ein und füge den Inhalt des öffentlichen Schlüssels aus <2>jira_publickey.pem</2> ein</1><1>Schließe den OAuth 1.0a-Autorisierungsablauf mit deinem Consumer Key und Private Key ab, um das Zugriffstoken zu erhalten</1></0><3>Hinweis: Dies verwendet OAuth 1.0a mit RSA-SHA1-Signierung. Hauptsächlich für Jira Server/Data Center. Für Jira Cloud solltest du API-Tokens oder OAuth 2.0 für neue Integrationen in Betracht ziehen.</3>",
-        "title": "So erstellst du Jira-Anmeldedaten:"
+        "content": "<0><0>RSA-Schlüsselpaar mit OpenSSL generieren: <2>openssl genrsa -out jira_privatekey.pem 1024</2></0><1>Öffentlichen Schlüssel extrahieren: <2>openssl rsa -in jira_privatekey.pem -pubout -out jira_publickey.pem</2></1><2>In Jira: Klicke auf Einstellungen (Zahnrad-Symbol) → Anwendungen → Anwendungslinks</2><3>Gib eine beliebige URL ein (z. B. <2>http://localhost</2>) und klicke auf \"Neuen Link erstellen\"</3><4>Ignoriere die Warnung \"Keine Antwort erhalten\" und klicke auf \"Weiter\"</4><5>Gib deinen Anwendungsnamen ein und wähle \"Eingehenden Link erstellen\"</5><6>Gib im Formular für eingehende Authentifizierung deinen Consumer-Schlüssel ein und füge den öffentlichen Schlüssel aus <2>jira_publickey.pem</2> ein</6><7>Schließe den OAuth 1.0a-Autorisierungsablauf mit deinem Consumer-Schlüssel und Private Key ab, um den Zugangstoken zu erhalten</7></0><1>Hinweis: Dies verwendet OAuth 1.0a mit RSA-SHA1-Signierung. Primär für Jira Server/Data Center. Für Jira Cloud solltest du API-Tokens oder OAuth 2.0 für neue Integrationen verwenden.</1>",
+        "title": "So erstellst du Jira-Zugangsdaten:"
       }
     },
     "plane": {
       "instructions": {
-        "content": "<0><1>Melde dich bei deinem Plane-Konto oder deiner selbst gehosteten Instanz an</1><1>Gehe zu Profileinstellungen</1><1>Wähle \"Personal Access Tokens\" aus der Liste der Tabs</1><1>Klicke auf \"Add personal access token\"</1><1>Gib einen Token-Namen und eine optionale Beschreibung ein</1><1>Klicke auf \"Generate\" oder \"Create\"</1><1>Kopiere den generierten Token sofort und speichere ihn sicher</1></0><3>Hinweis: Der Token wird nur einmal angezeigt. Der Token wird als Wert des <2>X-API-Key</2>-Headers in API-Anfragen übergeben.</3><3>Arbeitsbereich: Du musst deinen Arbeitsbereich-Slug angeben, der in deiner Plane-URL zu finden ist. Wenn deine Plane-URL beispielsweise <2>https://app.plane.so/meine-firma</2> ist, dann ist dein Arbeitsbereich-Slug <2>meine-firma</2>. Dies ist erforderlich, um auf Projekte und Issues in deinem Arbeitsbereich zuzugreifen.</3>",
-        "title": "So erstellst du Plane-Anmeldedaten:"
+        "content": "<0><0>Melde dich bei deinem Plane-Konto oder deiner selbst gehosteten Instanz an</0><1>Gehe zu Profileinstellungen</1><2>Wähle \"Personal Access Tokens\" aus der Registerkartenliste</2><3>Klicke auf \"Add personal access token\"</3><4>Gib einen Token-Namen und eine optionale Beschreibung ein</4><5>Klicke auf \"Generate\" oder \"Create\"</5><6>Kopiere den generierten Token sofort und speichere ihn sicher</6></0><1>Hinweis: Der Token wird nur einmal angezeigt. Er wird als Wert des <2>X-API-Key</2>-Headers in API-Anfragen übergeben.</1><2>Arbeitsbereich: Du musst deinen Arbeitsbereich-Slug angeben, der in deiner Plane-URL zu finden ist. Wenn deine Plane-URL z. B. <2>https://app.plane.so/meine-firma</2> lautet, ist dein Arbeitsbereich-Slug <5>meine-firma</5>. Dies ist erforderlich, um auf Projekte und Issues in deinem Arbeitsbereich zuzugreifen.</2>",
+        "title": "So erstellst du Plane-Zugangsdaten:"
       }
     },
     "projectMappings": {
       "title": "{{platform}} Projekt-Zuordnungen"
     },
     "success": {
-      "configCreated": "Integration created successfully",
-      "configDeleted": "Integration deleted successfully",
-      "configUpdated": "Integration updated successfully",
+      "configCreated": "Integration erfolgreich erstellt",
+      "configDeleted": "Integration erfolgreich gelöscht",
+      "configUpdated": "Integration erfolgreich aktualisiert",
       "mappingRemoved": "Projekt-Zuordnung erfolgreich entfernt",
       "mappingSaved": "Projekt-Zuordnung erfolgreich gespeichert",
-      "tagsRefreshed": "Tags-Aktualisierung erfolgreich ausgelöst"
+      "tagsRefreshed": "Tag-Aktualisierung wurde gestartet"
     },
     "tagConfiguration": {
-      "description": "Configure which fields from external issues should be used to create tags in Lasius.",
-      "issueLabelFilterHelp": "Leave empty to import all issues, or select labels to import only issues that have at least one of these labels.",
-      "issueLabelFilterLabel": "Import only issues with specific labels",
-      "issueLabelFilterPlaceholder": "All issues (or select labels to filter...)",
-      "issueStateFilterHelp": "Leave empty to import all issues, or select states to import only issues in those states.",
-      "issueStateFilterLabel": "Import only issues with specific states",
-      "issueStateFilterPlaceholder": "All states (or select specific states...)",
-      "labelFilterHelp": "Leave empty to import all labels, or select specific labels to import only those.",
-      "labelFilterLabel": "Import only specific labels",
-      "labelFilterPlaceholder": "All labels (or select specific labels...)",
-      "tagFieldsLabel": "Tag fields to import",
-      "tagFieldsPlaceholder": "Select fields...",
-      "useAssignees": "Use assignees as tags",
-      "useLabels": "Use labels as tags",
-      "useMilestone": "Use milestone as tag",
-      "useTitle": "Use issue title as tag"
+      "description": "Konfiguriere, welche Felder aus externen Issues verwendet werden sollen, um Tags in Lasius zu erstellen.",
+      "issueLabelFilterHelp": "Leer lassen, um alle Issues zu importieren, oder Labels auswählen, um nur Issues mit mindestens einem dieser Labels zu importieren.",
+      "issueLabelFilterLabel": "Nur Issues mit bestimmten Labels importieren",
+      "issueLabelFilterPlaceholder": "Alle Issues (oder Labels zum Filtern auswählen...)",
+      "issueStateFilterHelp": "Leer lassen, um alle Issues zu importieren, oder Status auswählen, um nur Issues in diesen Status zu importieren.",
+      "issueStateFilterLabel": "Nur Issues mit bestimmten Status importieren",
+      "issueStateFilterPlaceholder": "Alle Status (oder bestimmte Status auswählen...)",
+      "labelFilterHelp": "Leer lassen, um alle Labels zu importieren, oder bestimmte Labels auswählen, um nur diese zu importieren.",
+      "labelFilterLabel": "Nur bestimmte Labels importieren",
+      "labelFilterPlaceholder": "Alle Labels (oder bestimmte Labels auswählen...)",
+      "tagFieldsLabel": "Zu importierende Tag-Felder",
+      "tagFieldsPlaceholder": "Felder auswählen...",
+      "useAssignees": "Beauftragte als Tags verwenden",
+      "useLabels": "Labels als Tags verwenden",
+      "useMilestone": "Meilenstein als Tag verwenden",
+      "useTitle": "Issue-Titel als Tag verwenden"
     },
     "testConnection": {
-      "editModeNote": "Hinweis: Gib deine Anmeldedaten oben ein, um die Verbindung zu testen. Leer lassen, um bestehende Anmeldedaten beim Speichern beizubehalten.",
-      "success": "Verbindungstest erfolgreich",
+      "editModeNote": "Hinweis: Gib deine Zugangsdaten oben ein, um die Verbindung zu testen. Leer lassen, um vorhandene Zugangsdaten beim Speichern beizubehalten.",
+      "success": "Verbindung erfolgreich",
       "test": "Verbindung testen",
       "testing": "Verbindung wird getestet..."
     },
@@ -190,13 +190,13 @@
     },
     "wizard": {
       "config": {
-        "description": "Gib deine Verbindungsdaten ein, um dich mit {{platform}} zu verbinden.",
+        "description": "Gib deine Verbindungsdetails ein, um dich mit {{platform}} zu verbinden.",
         "title": "{{platform}} konfigurieren"
       },
       "projects": {
         "addMapping": "Zuordnung hinzufügen",
         "changeMapping": "Zuordnung ändern",
-        "confirmRemoveMessage": "Bist du sicher, dass du diese Projekt-Zuordnung entfernen möchtest? Issues werden nicht mehr synchronisiert, aber bestehende Tags bleiben erhalten.",
+        "confirmRemoveMessage": "Bist du sicher, dass du diese Projekt-Zuordnung entfernen möchtest? Issues werden nicht mehr synchronisiert, aber vorhandene Tags bleiben erhalten.",
         "confirmRemoveTitle": "Projekt-Zuordnung entfernen",
         "createMapping": "Projekt-Zuordnung erstellen",
         "editMapping": "Projekt-Zuordnung bearbeiten",
@@ -204,7 +204,7 @@
         "filterPlaceholder": "Projekte filtern...",
         "lasiusProject": "Lasius-Projekt",
         "loadError": "Projekte konnten nicht geladen werden. Bitte versuche es erneut.",
-        "loading": "Lade Projekte von {{platform}}...",
+        "loading": "Projekte von {{platform}} werden geladen...",
         "mappingDescription": "Verknüpfe dieses externe Projekt mit einem Lasius-Projekt, um Issues automatisch als Zeiterfassungs-Tags zu synchronisieren.",
         "mappingDescription_one": "{{count}} Projekt von {{platform}} gefunden. Ordne es deinen Lasius-Projekten zu, um Issues zu importieren. {{mapped}} von {{total}} zugeordnet.",
         "mappingDescription_other": "{{count}} Projekte von {{platform}} gefunden. Ordne sie deinen Lasius-Projekten zu, um Issues zu importieren. {{mapped}} von {{total}} zugeordnet.",
@@ -212,34 +212,34 @@
         "notMapped": "Nicht zugeordnet",
         "orphanedProject": "Projekt nicht mehr verfügbar",
         "removeMapping": "Zuordnung entfernen",
-        "selectMappingDescription": "Wähle aus, welches Lasius-Projekt mit diesem externen Projekt verknüpft werden soll.",
+        "selectMappingDescription": "Wähle, welches Lasius-Projekt mit diesem externen Projekt verknüpft werden soll.",
         "title": "Externe Projekte zuordnen"
       },
       "selectPlatform": {
-        "githubDescription": "Importiere Issues und Pull Requests aus GitHub-Repositories",
-        "gitlabDescription": "Importiere Issues und Merge Requests aus GitLab-Projekten",
-        "jiraDescription": "Importiere Issues und Epics aus Jira-Boards",
-        "planeDescription": "Importiere Issues und Tasks aus Plane-Workspaces",
-        "subtitle": "Wähle die Plattform, von der du Issues importieren möchtest",
-        "title": "Issue-Tracker auswählen"
+        "githubDescription": "Issues und Pull Requests aus GitHub-Repositories importieren",
+        "gitlabDescription": "Issues und Merge Requests aus GitLab-Projekten importieren",
+        "jiraDescription": "Issues und Epics aus deiner Jira-Instanz importieren",
+        "planeDescription": "Issues aus deinem Plane-Arbeitsbereich importieren",
+        "subtitle": "Wähle die Plattform, aus der du Issues importieren möchtest",
+        "title": "Plattform auswählen"
       },
       "steps": {
-        "config": "Configure",
+        "config": "Konfigurieren",
         "platform": "Plattform",
         "projects": "Projekte",
-        "test": "Testen"
+        "test": "Test"
       },
       "test": {
         "createFailed": "Verbindung erfolgreich, aber Konfiguration konnte nicht gespeichert werden.",
         "error": "Verbindung fehlgeschlagen",
-        "failed": "Verbindungstest fehlgeschlagen. Bitte überprüfe deine Anmeldedaten und URL.",
+        "failed": "Verbindungstest fehlgeschlagen. Bitte überprüfe deine Zugangsdaten und die URL.",
         "retry": "Verbindungstest wiederholen",
         "saving": "Konfiguration wird gespeichert...",
         "success": "Verbindung erfolgreich!",
-        "successDescription": "Fahre mit nächstem Schritt fort...",
+        "successDescription": "Nächster Schritt wird aufgerufen...",
         "testing": "Verbindung wird getestet..."
       },
-      "title": "Add Integration"
+      "title": "Integration hinzufügen"
     }
   },
   "projects": {

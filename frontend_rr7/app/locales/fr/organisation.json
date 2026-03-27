@@ -1,61 +1,60 @@
 {
   "actions": {
     "actions": "Actions",
-    "cancel": "Cancel",
-    "close": "Close",
-    "create": "Create organisation",
-    "edit": "Edit organisation",
-    "save": "Save",
-    "switch": "Switch organisation"
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "create": "Créer une organisation",
+    "edit": "Modifier l'organisation",
+    "save": "Enregistrer",
+    "switch": "Changer d'organisation"
   },
-  "adminDescription": "You are an administrator of this organisation. You can add and remove members and change the organisation name, or create a new one.",
-  "createDescription": "Add a new organisation using the Actions button at the top of the list.",
-  "currentOrganisation": "Current organisation",
+  "adminDescription": "Tu es administrateur de cette organisation. Tu peux ajouter et retirer des membres, modifier le nom de l'organisation ou en créer une nouvelle.",
+  "createDescription": "Utilisez le menu Actions pour créer une nouvelle organisation.",
+  "currentOrganisation": "Organisation actuelle",
   "description": {
-    "create": "Create a new organisation to collaborate with your team.",
-    "edit": "Update the organisation name."
+    "create": "Créez une nouvelle organisation pour collaborer avec votre équipe.",
+    "edit": "Mettez à jour le nom de l'organisation."
   },
   "errors": {
-    "duplicateKey": "An organisation with this name already exists"
+    "duplicateKey": "Une organisation avec ce nom existe déjà"
   },
   "forms": {
-    "email": "Email",
-    "firstName": "First name",
-    "lastName": "Last name"
+    "email": "E-mail",
+    "firstName": "Prénom",
+    "lastName": "Nom"
   },
   "info": {
-    "uniqueNameRequired": "Organisation names must be unique."
+    "uniqueNameRequired": "Les noms d'organisation doivent être uniques."
   },
-  "memberDescription": "You are a member of this organisation and don't have the rights to add or remove members. Get in touch with an organisation administrator if you would like to invite someone.",
+  "memberDescription": "Tu es membre de cette organisation et n'as pas les droits pour ajouter ou retirer des membres. Contacte un administrateur de l'organisation si tu souhaites inviter quelqu'un.",
   "members": {
     "actions": {
-      "invite": "Invite someone",
-      "manage": "Manage members",
-      "remove": "Remove member"
+      "invite": "Inviter quelqu'un",
+      "manage": "Gérer les membres",
+      "remove": "Retirer le membre"
     },
     "confirmations": {
-      "removeConfirm": "Are you sure you want to remove {{name}}?",
-      "removeTitle": "Remove member",
-      "removeWarning": "This member will be removed from the organisation and lose access to all projects."
+      "removeConfirm": "Es-tu sûr de vouloir retirer {{name}} ?",
+      "removeTitle": "Retirer un membre",
+      "removeWarning": "Ce membre sera retiré de l'organisation et perdra l'accès à tous les projets."
     },
-    "confirmRemove": "Are you sure you want to remove this member from the project?",
-    "description_one": "This project has {{count}} member(s).",
-    "description_many": "This project has {{count}} member(s).",
-    "description_other": "This project has {{count}} member(s).",
-    "empty": "No members found",
-    "emptyState": "No members found",
-    "title": "Members"
+    "confirmRemove": "Êtes-vous sûr(e) de vouloir retirer ce membre du projet ?",
+    "description_one": "Ce projet a {{count}} membre.",
+    "description_other": "Ce projet a {{count}} membres.",
+    "empty": "Aucun membre trouvé",
+    "emptyState": "Aucun membre trouvé",
+    "title": "Membres"
   },
-  "myPersonalOrganisation": "My personal organisation",
+  "myPersonalOrganisation": "Mon organisation personnelle",
   "organisationName": "Organisation",
-  "organisationRole": "Organisation role",
+  "organisationRole": "Rôle dans l'organisation",
   "organization": "Organisation",
-  "organizationName": "Organisation name",
-  "privateDescription": "This organisation is only visible to you. You can use it to track private projects that you do not want others to have access to. If you want to invite people, invite them to an existing organisation or create a new one.",
-  "selected": "Selected",
-  "selectOrganisation": "Select organisation",
+  "organizationName": "Nom de l'organisation",
+  "privateDescription": "Cette organisation n'est visible que par toi. Utilise-la pour suivre des projets privés. Pour collaborer avec d'autres personnes, crée ou utilise une organisation différente.",
+  "selected": "Sélectionné",
+  "selectOrganisation": "Sélectionner une organisation",
   "status": {
-    "label": "Status"
+    "label": "Statut"
   },
-  "you": "You"
+  "you": "Tu"
 }

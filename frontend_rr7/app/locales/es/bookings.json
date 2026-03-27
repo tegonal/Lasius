@@ -1,59 +1,59 @@
 {
   "actions": {
-    "add": "Add booking",
-    "adjustCurrentStart": "Adjust current booking to start at overlapping booking end",
-    "adjustEndToNext": "Adjust end to next booking",
-    "adjustLowerEnd": "Extend lower booking end to upper booking start",
-    "adjustOverlappingEnd": "Adjust overlapping booking to end at current booking start",
-    "adjustStartToPrevious": "Adjust start to previous booking",
-    "adjustUpperStart": "Move upper booking start to lower booking end",
-    "create": "Create a booking",
-    "delete": "Delete booking",
-    "edit": "Edit booking",
-    "editOverlapping": "Edit booking to resolve overlap",
-    "filterByProject": "Filter by project {{projectKey}}",
-    "filterByUser": "Filter by user {{userKey}}",
-    "insert": "Insert booking",
-    "start": "Start booking",
-    "startFromFavorite": "Start booking from favorite",
-    "startFromTeamMember": "Start booking from team member",
-    "stopRecording": "Stop recording current time booking"
+    "add": "Añadir registro",
+    "adjustCurrentStart": "Ajustar el inicio del registro actual al final del registro superpuesto",
+    "adjustEndToNext": "Ajustar el final al siguiente registro",
+    "adjustLowerEnd": "Extender el final del registro inferior al inicio del registro superior",
+    "adjustOverlappingEnd": "Ajustar el final del registro superpuesto al inicio del registro actual",
+    "adjustStartToPrevious": "Ajustar el inicio al registro anterior",
+    "adjustUpperStart": "Mover el inicio del registro superior al final del registro inferior",
+    "create": "Crear un registro",
+    "delete": "Eliminar registro",
+    "edit": "Editar registro",
+    "editOverlapping": "Editar registro para resolver la superposición",
+    "filterByProject": "Filtrar por proyecto {{projectKey}}",
+    "filterByUser": "Filtrar por usuario {{userKey}}",
+    "insert": "Insertar registro",
+    "start": "Iniciar registro",
+    "startFromFavorite": "Iniciar registro desde favorito",
+    "startFromTeamMember": "Iniciar registro desde miembro del equipo",
+    "stopRecording": "Detener el registro de tiempo actual"
   },
-  "duration": "Duration",
-  "emptyToday": "No bookings for this day",
+  "duration": "Duración",
+  "emptyToday": "No hay registros para este día",
   "favorites": {
-    "title": "Favorites"
+    "title": "Favoritos"
   },
   "hints": {
-    "useEndTimeOfLatest": "Use end time of latest booking as start time for this one",
-    "useEndTimeOfPrevious": "Use end time of previous booking as start time for this one",
-    "useStartTimeOfNext": "Use start time of next booking as end time for this one"
+    "useEndTimeOfLatest": "Usar la hora de finalización del último registro como hora de inicio para este",
+    "useEndTimeOfPrevious": "Usar la hora de finalización del registro anterior como hora de inicio para este",
+    "useStartTimeOfNext": "Usar la hora de inicio del siguiente registro como hora de finalización para este"
   },
   "history": {
-    "empty": "No bookings found for the selected filters"
+    "empty": "No se encontraron registros para los filtros seleccionados"
   },
-  "noBookingsToday": "No bookings for this day",
-  "or": "or",
-  "overlapsWarning": "These two bookings overlap. Tap to see adjustment options.",
+  "noBookingsToday": "No hay registros para este día",
+  "or": "o",
+  "overlapsWarning": "Estos registros se superponen. Haz clic para editar y ajustar la hora.",
   "presets": {
-    "browse": "Browse presets",
-    "empty": "No bookings found",
-    "favorites": "Favorites",
-    "recent": "Recent bookings",
-    "selectFavorite": "Select favorite: {{projectName}}{{tags}}",
-    "selectRecent": "Select recent booking: {{projectName}}{{tags}}",
-    "selectTeam": "Select team booking: {{projectName}}{{tags}}",
-    "team": "Team bookings",
-    "title": "Choose a preset"
+    "browse": "Explorar plantillas",
+    "empty": "No hay plantillas disponibles",
+    "favorites": "Favoritos",
+    "recent": "Registros recientes",
+    "selectFavorite": "Seleccionar favorito: {{projectName}}{{tags}}",
+    "selectRecent": "Seleccionar registro reciente: {{projectName}}{{tags}}",
+    "selectTeam": "Seleccionar registro del equipo: {{projectName}}{{tags}}",
+    "team": "Registros del equipo",
+    "title": "Elegir una plantilla"
   },
-  "showLists": "Show bookings",
+  "showLists": "Mostrar registros",
   "status": {
-    "currentlyNotBooking": "Currently not booking"
+    "currentlyNotBooking": "Actualmente sin registrar"
   },
-  "title": "Bookings",
+  "title": "Registros",
   "warnings": {
-    "durationIsZero": "This booking's duration is zero",
-    "longDuration": "Long duration detected",
-    "longDurationDescription": "This booking is longer than a typical 8-hour work day. Please verify that the start and end times are correct."
+    "durationIsZero": "La duración de este registro es cero",
+    "longDuration": "Duración prolongada detectada",
+    "longDurationDescription": "Esta reserva supera una jornada laboral típica de 8 horas. Verifique las horas de inicio y fin."
   }
 }
