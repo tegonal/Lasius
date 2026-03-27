@@ -22,5 +22,14 @@
     "invitedToProjectNeedsAccount": "Du wurdest von {{inviter}} eingeladen, dem Projekt {{project}} beizutreten.",
     "selectOrganisation": "Wähle die Organisation, der das Projekt zugewiesen werden soll"
   },
-  "title": "Einladung"
+  "needsAccount": {
+    "description": "Du musst dich anmelden oder ein Konto für {{email}} erstellen, um diese Einladung anzunehmen.",
+    "emailMatch": "Stelle sicher, dass du dich mit der E-Mail-Adresse anmeldest, an die diese Einladung gesendet wurde: {{email}}",
+    "signInOrSignUpWith": "Anmelden oder registrieren mit",
+    "title": "Konto erforderlich"
+  },
+  "title": {
+    "invitationCreated": "Einladung erstellt",
+    "userAssigned": "Benutzer zugewiesen"
+  }
 }

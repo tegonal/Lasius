@@ -40,6 +40,7 @@
     },
     "confirmRemove": "Sei sicuro di voler rimuovere questo membro dal progetto?",
     "description_one": "Questo progetto ha {{count}} membro.",
+    "description_many": "Questo progetto ha {{count}} membri.",
     "description_other": "Questo progetto ha {{count}} membri.",
     "empty": "Nessun membro trovato",
     "emptyState": "Nessun membro trovato",

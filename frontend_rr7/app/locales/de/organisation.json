@@ -38,9 +38,11 @@
       "removeTitle": "Mitglied entfernen",
       "removeWarning": "Dieses Mitglied wird aus der Organisation entfernt und verliert den Zugriff auf alle Projekte."
     },
+    "confirmRemove": "Bist du sicher, dass du dieses Mitglied aus dem Projekt entfernen möchtest?",
     "description_one": "Dieses Projekt hat {{count}} Mitglied.",
     "description_other": "Dieses Projekt hat {{count}} Mitglieder.",
     "empty": "Keine Mitglieder gefunden",
+    "emptyState": "Keine Mitglieder gefunden",
     "title": "Mitglieder"
   },
   "myPersonalOrganisation": "Meine persönliche Organisation",
@@ -49,5 +51,10 @@
   "organization": "Organisation",
   "organizationName": "Organisationsname",
   "privateDescription": "Diese Organisation ist nur für dich sichtbar. Nutze sie für private Projekte. Um mit anderen zusammenzuarbeiten, erstelle oder verwende eine andere Organisation.",
-  "selectOrganisation": "Organisation auswählen"
+  "selected": "Ausgewählt",
+  "selectOrganisation": "Organisation auswählen",
+  "status": {
+    "label": "Status"
+  },
+  "you": "Du"
 }

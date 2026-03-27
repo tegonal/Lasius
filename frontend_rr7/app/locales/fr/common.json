@@ -54,21 +54,9 @@
         "message": "Une erreur s'est produite lors de l'authentification OAuth. Réessaie ou utilise une autre méthode de connexion.",
         "title": "Erreur OAuth"
       },
-      "oauthCallback": {
-        "message": {
-          "message": "Une erreur s'est produite lors de l'authentification OAuth. Réessaie ou utilise une autre méthode de connexion.",
-          "title": "Erreur OAuth"
-        },
-        "title": "Erreur OAuth"
-      },
-      "persistentIssue": {
-        "message": "Si le problème persiste, veuillez contacter le support.",
-        "title": "Problème persistant"
-      },
-      "registerUnknown": {
-        "message": "Une erreur inattendue s'est produite lors de l'inscription.",
-        "title": "Erreur d'inscription"
-      },
+      "oauthCallback": "L'authentification a échoué. Veuillez réessayer.",
+      "persistentIssue": "Si le problème persiste, veuillez contacter votre administrateur.",
+      "registerUnknown": "Erreur d'inscription inconnue",
       "sessionRequired": {
         "message": "Connecte-toi pour continuer.",
         "title": "Session requise"
@@ -78,10 +66,7 @@
         "message": "Une erreur inattendue s'est produite lors de l'authentification.",
         "title": "Erreur d'authentification"
       },
-      "userAlreadyRegistered": {
-        "message": "Un compte avec cet e-mail existe déjà.",
-        "title": "Utilisateur déjà enregistré"
-      },
+      "userAlreadyRegistered": "Utilisateur déjà enregistré",
       "verification": {
         "message": "Le jeton de vérification a expiré ou a déjà été utilisé. Réessaie de te connecter.",
         "title": "Échec de vérification"

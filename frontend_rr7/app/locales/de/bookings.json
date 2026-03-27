@@ -48,12 +48,7 @@
   },
   "showLists": "Buchungen anzeigen",
   "status": {
-    "added": "Buchung hinzugefügt",
-    "currentlyNotBooking": "Derzeit keine Buchung aktiv",
-    "historyCleared": "Buchungsverlauf gelöscht",
-    "removed": "Buchung entfernt",
-    "started": "Buchung gestartet",
-    "updated": "Buchung aktualisiert"
+    "currentlyNotBooking": "Derzeit keine Buchung aktiv"
   },
   "title": "Buchungen",
   "warnings": {

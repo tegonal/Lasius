@@ -40,6 +40,7 @@
     "checkIntervalHelp": "Frequenza di verifica delle nuove issue",
     "configListItem": {
       "projectCount_one": "{{count}} progetto",
+      "projectCount_many": "{{count}} progetti",
       "projectCount_other": "{{count}} progetti"
     },
     "descriptions": {
@@ -207,6 +208,7 @@
         "loading": "Caricamento progetti da {{platform}} in corso...",
         "mappingDescription": "Collega questo progetto esterno a un progetto Lasius per sincronizzare automaticamente i problemi come etichette di tracciamento del tempo.",
         "mappingDescription_one": "Trovato {{count}} progetto da {{platform}}. Associalo ai tuoi progetti Lasius per importare le issue. {{mapped}} di {{total}} associato.",
+        "mappingDescription_many": "Trovati {{count}} progetti da {{platform}}. Associali ai tuoi progetti Lasius per importare le issue. {{mapped}} di {{total}} associati.",
         "mappingDescription_other": "Trovati {{count}} progetti da {{platform}}. Associali ai tuoi progetti Lasius per importare le issue. {{mapped}} di {{total}} associati.",
         "noProjects": "Nessun progetto trovato in {{platform}}",
         "notMapped": "Non associato",

@@ -1,7 +1,6 @@
 {
   "actions": {
     "add": "Aggiungi registrazione",
-    "addedToFavorites": "Registrazione aggiunta ai preferiti",
     "adjustCurrentStart": "Adatta l'inizio della registrazione corrente alla fine della registrazione sovrapposta",
     "adjustEndToNext": "Adatta la fine alla registrazione successiva",
     "adjustLowerEnd": "Estendi la fine della registrazione inferiore all'inizio della registrazione superiore",
@@ -21,9 +20,10 @@
     "stopRecording": "Interrompi registrazione tempo corrente"
   },
   "duration": "Durata",
-  "emptyNever": "Nessuna registrazione ancora",
-  "emptyNeverHelp": "Crea la tua prima registrazione per iniziare. Serve aiuto?",
   "emptyToday": "Nessuna registrazione per questo giorno",
+  "favorites": {
+    "title": "Preferiti"
+  },
   "hints": {
     "useEndTimeOfLatest": "Usa l'ora di fine dell'ultima registrazione come ora di inizio per questa",
     "useEndTimeOfPrevious": "Usa l'ora di fine della registrazione precedente come ora di inizio per questa",
@@ -32,6 +32,8 @@
   "history": {
     "empty": "Nessuna registrazione trovata per i filtri selezionati"
   },
+  "noBookingsToday": "Nessuna registrazione per questo giorno",
+  "or": "o",
   "overlapsWarning": "Queste registrazioni si sovrappongono. Fai clic per modificare e adattare l'orario.",
   "presets": {
     "browse": "Sfoglia preset",
@@ -46,12 +48,7 @@
   },
   "showLists": "Mostra registrazioni",
   "status": {
-    "added": "Registrazione aggiunta",
-    "currentlyNotBooking": "Nessuna registrazione in corso",
-    "historyCleared": "Cronologia prenotazioni cancellata",
-    "removed": "Registrazione rimossa",
-    "started": "Registrazione avviata",
-    "updated": "Registrazione aggiornata"
+    "currentlyNotBooking": "Nessuna registrazione in corso"
   },
   "title": "Registrazioni",
   "warnings": {

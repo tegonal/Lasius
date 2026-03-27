@@ -40,21 +40,15 @@
     "checkIntervalHelp": "Fréquence de vérification des nouveaux tickets",
     "configListItem": {
       "projectCount_one": "{{count}} projet",
+      "projectCount_many": "{{count}} projets",
       "projectCount_other": "{{count}} projets"
     },
     "descriptions": {
       "edit": "Mettez à jour la configuration de cette intégration d'importateur de problèmes."
     },
-    "emptyState": {
-      "message": "Aucune configuration de système de suivi des tickets pour le moment"
-    },
+    "emptyState": "Aucune intégration configurée. Ajoutez-en une pour commencer.",
     "errors": {
-      "deleteFailed": {
-        "github": "issueImporters.errors.deleteFailed.github",
-        "gitlab": "issueImporters.errors.deleteFailed.gitlab",
-        "jira": "issueImporters.errors.deleteFailed.jira",
-        "plane": "issueImporters.errors.deleteFailed.plane"
-      },
+      "deleteFailed": "Échec de la suppression de l'intégration",
       "invalidMappingData": "Données de correspondance invalides",
       "mappingRemoveFailed": "Échec de la suppression de la correspondance de projet",
       "mappingSaveFailed": "Échec de l'enregistrement des correspondances de projet",
@@ -214,6 +208,7 @@
         "loading": "Chargement des projets depuis {{platform}}...",
         "mappingDescription": "Liez ce projet externe à un projet Lasius pour synchroniser automatiquement les problèmes en tant qu'étiquettes de suivi du temps.",
         "mappingDescription_one": "{{count}} projet trouvé dans {{platform}}. Associe-le à tes projets Lasius pour importer les tickets. {{mapped}} sur {{total}} associé.",
+        "mappingDescription_many": "{{count}} projets trouvés dans {{platform}}. Associe-les à tes projets Lasius pour importer les tickets. {{mapped}} sur {{total}} associés.",
         "mappingDescription_other": "{{count}} projets trouvés dans {{platform}}. Associe-les à tes projets Lasius pour importer les tickets. {{mapped}} sur {{total}} associés.",
         "noProjects": "Aucun projet trouvé dans {{platform}}",
         "notMapped": "Non associé",
