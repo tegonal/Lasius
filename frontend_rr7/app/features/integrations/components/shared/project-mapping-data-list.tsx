@@ -37,6 +37,7 @@ import { DataListRow } from '~/components/ui/data-display/data-list/data-list-ro
 import { Loading } from '~/components/ui/data-display/loading'
 import { Alert } from '~/components/ui/feedback/alert'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+import { ContextMenuProvider } from '~/features/context-menu/hooks/use-context-menu'
 import { ProjectMappingRowContext } from '~/features/integrations/components/wizard/steps/project-mapping-row-context'
 import { useProjectMappingList } from '~/features/integrations/hooks/use-project-mapping-list'
 import { getImporterTypeLabel } from '~/features/integrations/lib/importer-type-labels'
@@ -122,216 +123,218 @@ export const ProjectMappingDataList = ({
   }
 
   return (
-    <div className="flex min-h-0 flex-1 grow flex-col">
-      <Text className="mt-2" variant="infoText">
-        {t('issueImporters.wizard.projects.mappingDescription', {
-          count: projects.length,
-          defaultValue:
-            'Found {{count}} projects from {{platform}}. Map them to your Lasius projects to import issues. {{mapped}} of {{total}} mapped.',
-          mapped: mappedCount,
-          platform: getImporterTypeLabel(importerType, untyped(t)),
-          total: projects.length,
-        })}
-      </Text>
+    <ContextMenuProvider>
+      <div className="flex min-h-0 flex-1 grow flex-col">
+        <Text className="mt-2" variant="infoText">
+          {t('issueImporters.wizard.projects.mappingDescription', {
+            count: projects.length,
+            defaultValue:
+              'Found {{count}} projects from {{platform}}. Map them to your Lasius projects to import issues. {{mapped}} of {{total}} mapped.',
+            mapped: mappedCount,
+            platform: getImporterTypeLabel(importerType, untyped(t)),
+            total: projects.length,
+          })}
+        </Text>
 
-      {showFilter && (
-        <div className="mt-4 min-h-0">
-          <div className="join w-full">
-            <Input
-              className="join-item"
-              onChange={(e) => setFilterText(e.target.value)}
-              placeholder={t(
-                'issueImporters.wizard.projects.filterPlaceholder',
-                {
-                  defaultValue: 'Filter projects...',
-                },
-              )}
-              type="text"
-              value={filterText}
-            />
-            {filterText && (
-              <Button
-                aria-label={t('clear', { defaultValue: 'Clear' })}
+        {showFilter && (
+          <div className="mt-4 min-h-0">
+            <div className="join w-full">
+              <Input
                 className="join-item"
-                fullWidth={false}
-                onClick={() => setFilterText('')}
-                variant="neutral"
-              >
-                <LucideIcon icon={X} size={16} />
-              </Button>
-            )}
+                onChange={(e) => setFilterText(e.target.value)}
+                placeholder={t(
+                  'issueImporters.wizard.projects.filterPlaceholder',
+                  {
+                    defaultValue: 'Filter projects...',
+                  },
+                )}
+                type="text"
+                value={filterText}
+              />
+              {filterText && (
+                <Button
+                  aria-label={t('clear', { defaultValue: 'Clear' })}
+                  className="join-item"
+                  fullWidth={false}
+                  onClick={() => setFilterText('')}
+                  variant="neutral"
+                >
+                  <LucideIcon icon={X} size={16} />
+                </Button>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      <div className="mt-4 overflow-y-auto">
-        <DataList>
-          <DataListRow>
-            <DataListHeaderItem>
-              {t('issueImporters.wizard.projects.externalProject', {
-                defaultValue: 'External Project',
-              })}
-            </DataListHeaderItem>
-            <DataListHeaderItem />
-            <DataListHeaderItem>
-              {t('issueImporters.wizard.projects.lasiusProject', {
-                defaultValue: 'Lasius Project',
-              })}
-            </DataListHeaderItem>
-            <DataListHeaderItem />
-          </DataListRow>
-          {orphanedMappings.map(({ externalId, mapping }) => (
-            <DataListRow key={`orphaned-${externalId}`}>
-              <DataListField>
-                <div className="flex items-center gap-3">
-                  <LucideIcon
-                    className="text-warning flex-shrink-0"
-                    icon={AlertTriangle}
-                    size={20}
-                  />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-base-content/60 truncate font-medium">
-                      {t('issueImporters.wizard.projects.orphanedProject', {
-                        defaultValue: 'Project no longer available',
-                      })}
-                    </p>
-                    <p className="text-base-content/50 truncate text-xs">
-                      {externalId}
-                    </p>
-                  </div>
-                </div>
-              </DataListField>
-              <DataListField width={48}>
-                <div className="flex items-center justify-center">
-                  <LucideIcon
-                    className="text-base-content/30"
-                    icon={ArrowRight}
-                    size={20}
-                  />
-                </div>
-              </DataListField>
-              <DataListField>
-                <div className="flex items-center gap-2">
-                  <LucideIcon
-                    className="text-primary flex-shrink-0"
-                    icon={FolderOpen}
-                    size={16}
-                  />
-                  <span className="text-sm">{mapping.projectId}</span>
-                </div>
-              </DataListField>
-              <DataListField>
-                <div className="flex items-center gap-1">
-                  {onRefreshTags && (
-                    <Button
-                      aria-label={t('issueImporters.actions.refreshTags', {
-                        defaultValue: 'Refresh tags',
-                      })}
-                      fullWidth={false}
-                      onClick={() => onRefreshTags(mapping.projectId)}
-                      size="sm"
-                      title={t('issueImporters.actions.refreshTags', {
-                        defaultValue: 'Refresh tags',
-                      })}
-                      variant="ghost"
-                    >
-                      <LucideIcon icon={RefreshCw} size={14} />
-                    </Button>
-                  )}
-                  <ProjectMappingRowContext
-                    existingTagConfig={mapping.tagConfig}
-                    externalProject={{
-                      id: externalId,
-                      name: externalId,
-                      ownerType: 'User',
-                    }}
-                    importerType={importerType}
-                    onMappingChange={onMappingChange}
-                    selectedProjectId={mapping.projectId}
-                  />
-                </div>
-              </DataListField>
+        <div className="mt-4 overflow-y-auto">
+          <DataList>
+            <DataListRow>
+              <DataListHeaderItem>
+                {t('issueImporters.wizard.projects.externalProject', {
+                  defaultValue: 'External Project',
+                })}
+              </DataListHeaderItem>
+              <DataListHeaderItem />
+              <DataListHeaderItem>
+                {t('issueImporters.wizard.projects.lasiusProject', {
+                  defaultValue: 'Lasius Project',
+                })}
+              </DataListHeaderItem>
+              <DataListHeaderItem />
             </DataListRow>
-          ))}
-          {sortedProjects.map((project) => (
-            <DataListRow key={project.id}>
-              <DataListField>
-                <div className="flex items-center gap-3">
-                  <LucideIcon
-                    className="text-base-content/60 flex-shrink-0"
-                    icon={FolderOpen}
-                    size={20}
-                  />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium">{project.name}</p>
-                    <p className="text-base-content/50 truncate text-xs">
-                      {project.id}
-                    </p>
+            {orphanedMappings.map(({ externalId, mapping }) => (
+              <DataListRow key={`orphaned-${externalId}`}>
+                <DataListField>
+                  <div className="flex items-center gap-3">
+                    <LucideIcon
+                      className="text-warning flex-shrink-0"
+                      icon={AlertTriangle}
+                      size={20}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-base-content/60 truncate font-medium">
+                        {t('issueImporters.wizard.projects.orphanedProject', {
+                          defaultValue: 'Project no longer available',
+                        })}
+                      </p>
+                      <p className="text-base-content/50 truncate text-xs">
+                        {externalId}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </DataListField>
-              <DataListField width={48}>
-                <div className="flex items-center justify-center">
-                  <LucideIcon
-                    className="text-base-content/30"
-                    icon={ArrowRight}
-                    size={20}
-                  />
-                </div>
-              </DataListField>
-              <DataListField>
-                {mappings[project.id] ? (
+                </DataListField>
+                <DataListField width={48}>
+                  <div className="flex items-center justify-center">
+                    <LucideIcon
+                      className="text-base-content/30"
+                      icon={ArrowRight}
+                      size={20}
+                    />
+                  </div>
+                </DataListField>
+                <DataListField>
                   <div className="flex items-center gap-2">
                     <LucideIcon
                       className="text-primary flex-shrink-0"
                       icon={FolderOpen}
                       size={16}
                     />
-                    <span className="text-sm">
-                      {mappings[project.id]?.projectId}
-                    </span>
+                    <span className="text-sm">{mapping.projectId}</span>
                   </div>
-                ) : (
-                  <span className="text-base-content/50 text-sm">
-                    {t('issueImporters.wizard.projects.notMapped', {
-                      defaultValue: 'Not mapped',
-                    })}
-                  </span>
-                )}
-              </DataListField>
-              <DataListField>
-                <div className="flex items-center gap-1">
-                  {onRefreshTags && mappings[project.id] && (
-                    <Button
-                      aria-label={t('issueImporters.actions.refreshTags', {
-                        defaultValue: 'Refresh tags',
+                </DataListField>
+                <DataListField>
+                  <div className="flex items-center gap-1">
+                    {onRefreshTags && (
+                      <Button
+                        aria-label={t('issueImporters.actions.refreshTags', {
+                          defaultValue: 'Refresh tags',
+                        })}
+                        fullWidth={false}
+                        onClick={() => onRefreshTags(mapping.projectId)}
+                        size="sm"
+                        title={t('issueImporters.actions.refreshTags', {
+                          defaultValue: 'Refresh tags',
+                        })}
+                        variant="ghost"
+                      >
+                        <LucideIcon icon={RefreshCw} size={14} />
+                      </Button>
+                    )}
+                    <ProjectMappingRowContext
+                      existingTagConfig={mapping.tagConfig}
+                      externalProject={{
+                        id: externalId,
+                        name: externalId,
+                        ownerType: 'User',
+                      }}
+                      importerType={importerType}
+                      onMappingChange={onMappingChange}
+                      selectedProjectId={mapping.projectId}
+                    />
+                  </div>
+                </DataListField>
+              </DataListRow>
+            ))}
+            {sortedProjects.map((project) => (
+              <DataListRow key={project.id}>
+                <DataListField>
+                  <div className="flex items-center gap-3">
+                    <LucideIcon
+                      className="text-base-content/60 flex-shrink-0"
+                      icon={FolderOpen}
+                      size={20}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-medium">{project.name}</p>
+                      <p className="text-base-content/50 truncate text-xs">
+                        {project.id}
+                      </p>
+                    </div>
+                  </div>
+                </DataListField>
+                <DataListField width={48}>
+                  <div className="flex items-center justify-center">
+                    <LucideIcon
+                      className="text-base-content/30"
+                      icon={ArrowRight}
+                      size={20}
+                    />
+                  </div>
+                </DataListField>
+                <DataListField>
+                  {mappings[project.id] ? (
+                    <div className="flex items-center gap-2">
+                      <LucideIcon
+                        className="text-primary flex-shrink-0"
+                        icon={FolderOpen}
+                        size={16}
+                      />
+                      <span className="text-sm">
+                        {mappings[project.id]?.projectId}
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-base-content/50 text-sm">
+                      {t('issueImporters.wizard.projects.notMapped', {
+                        defaultValue: 'Not mapped',
                       })}
-                      fullWidth={false}
-                      onClick={() =>
-                        onRefreshTags(mappings[project.id]!.projectId)
-                      }
-                      size="sm"
-                      title={t('issueImporters.actions.refreshTags', {
-                        defaultValue: 'Refresh tags',
-                      })}
-                      variant="ghost"
-                    >
-                      <LucideIcon icon={RefreshCw} size={14} />
-                    </Button>
+                    </span>
                   )}
-                  <ProjectMappingRowContext
-                    existingTagConfig={mappings[project.id]?.tagConfig}
-                    externalProject={project}
-                    importerType={importerType}
-                    onMappingChange={onMappingChange}
-                    selectedProjectId={mappings[project.id]?.projectId}
-                  />
-                </div>
-              </DataListField>
-            </DataListRow>
-          ))}
-        </DataList>
+                </DataListField>
+                <DataListField>
+                  <div className="flex items-center gap-1">
+                    {onRefreshTags && mappings[project.id] && (
+                      <Button
+                        aria-label={t('issueImporters.actions.refreshTags', {
+                          defaultValue: 'Refresh tags',
+                        })}
+                        fullWidth={false}
+                        onClick={() =>
+                          onRefreshTags(mappings[project.id]!.projectId)
+                        }
+                        size="sm"
+                        title={t('issueImporters.actions.refreshTags', {
+                          defaultValue: 'Refresh tags',
+                        })}
+                        variant="ghost"
+                      >
+                        <LucideIcon icon={RefreshCw} size={14} />
+                      </Button>
+                    )}
+                    <ProjectMappingRowContext
+                      existingTagConfig={mappings[project.id]?.tagConfig}
+                      externalProject={project}
+                      importerType={importerType}
+                      onMappingChange={onMappingChange}
+                      selectedProjectId={mappings[project.id]?.projectId}
+                    />
+                  </div>
+                </DataListField>
+              </DataListRow>
+            ))}
+          </DataList>
+        </div>
       </div>
-    </div>
+    </ContextMenuProvider>
   )
 }

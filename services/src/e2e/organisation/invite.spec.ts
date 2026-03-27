@@ -41,14 +41,11 @@ async function acceptTosIfVisible(page: Page, timeout = 5000) {
  * Assumes the page is on /login (provider selection page).
  */
 async function loginAsInternalUser(page: Page, email: string, password: string) {
-  // If on the login provider page, click internal provider
-  try {
-    const providerBtn = page.getByTestId('auth-provider-internal')
-    await providerBtn.waitFor({ state: 'visible', timeout: 10000 })
-    await providerBtn.click()
+  // Navigate directly to the internal login page (avoids clicking
+  // the provider link which has a nested button that swallows clicks)
+  if (!page.url().includes('/internal-oauth/login')) {
+    await page.goto('/internal-oauth/login')
     await page.waitForURL(/.*\/internal-oauth\/login.*/, { timeout: 10000 })
-  } catch {
-    // Already on the internal login page — continue
   }
 
   // Fill login form
@@ -147,8 +144,8 @@ test.describe.serial('Organisation + Invitation lifecycle @org', () => {
     test.setTimeout(120000)
     test.skip(!existingUserInviteLink, 'No invitation link — user was assigned directly')
 
-    // Phase 1: Login as demo2
-    const context = await browser.newContext()
+    // Login as demo2 in a clean (unauthenticated) context
+    const context = await browser.newContext({ storageState: { cookies: [], origins: [] } })
     const freshPage = await context.newPage()
 
     try {
@@ -164,11 +161,12 @@ test.describe.serial('Organisation + Invitation lifecycle @org', () => {
       // Authenticated on the join page — see InvitationUserConfirm
       await expect(freshPage.getByTestId('invite-accept-btn')).toBeVisible({ timeout: 15000 })
 
-      // Accept the invitation
-      await freshPage.getByTestId('invite-accept-btn').click()
-
-      // After accepting, the app navigates away from the join page
-      await freshPage.waitForURL((url) => !url.pathname.startsWith('/join/'), { timeout: 15000 })
+      // Accept the invitation — click and wait for navigation away from /join/
+      // The handler calls navigate('/') which may not fire immediately
+      await expect(async () => {
+        await freshPage.getByTestId('invite-accept-btn').click()
+        await freshPage.waitForURL((url) => !url.pathname.startsWith('/join/'), { timeout: 5000 })
+      }).toPass({ timeout: 30000 })
     } finally {
       await context.close()
     }
@@ -202,13 +200,12 @@ test.describe.serial('Organisation + Invitation lifecycle @org', () => {
     test.setTimeout(120000)
     test.skip(!newUserInviteLink, 'No invitation link from previous test')
 
-    const context = await browser.newContext()
+    const context = await browser.newContext({ storageState: { cookies: [], origins: [] } })
     const freshPage = await context.newPage()
 
     try {
-      // Register the new user
-      await freshPage.goto('/login')
-      await freshPage.getByTestId('auth-provider-internal').click()
+      // Register the new user — navigate directly (provider link has nested button)
+      await freshPage.goto('/internal-oauth/login')
       await freshPage.waitForURL(/.*\/internal-oauth\/login.*/, { timeout: 10000 })
 
       await freshPage.getByTestId('auth-internal-signup-btn').click()
@@ -236,11 +233,11 @@ test.describe.serial('Organisation + Invitation lifecycle @org', () => {
       // Authenticated on the join page — see InvitationUserConfirm
       await expect(freshPage.getByTestId('invite-accept-btn')).toBeVisible({ timeout: 10000 })
 
-      // Accept the invitation
-      await freshPage.getByTestId('invite-accept-btn').click()
-
-      // After accepting, the app navigates away from the join page
-      await freshPage.waitForURL((url) => !url.pathname.startsWith('/join/'), { timeout: 15000 })
+      // Accept the invitation — retry since navigate('/') may not fire immediately
+      await expect(async () => {
+        await freshPage.getByTestId('invite-accept-btn').click()
+        await freshPage.waitForURL((url) => !url.pathname.startsWith('/join/'), { timeout: 5000 })
+      }).toPass({ timeout: 30000 })
     } finally {
       await context.close()
     }

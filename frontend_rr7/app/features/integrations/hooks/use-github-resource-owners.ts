@@ -55,7 +55,10 @@ export const useGithubResourceOwners = ({
           body: {
             accessToken,
             baseUrl,
-          } as unknown as never,
+            checkFrequency: 300_000,
+            importerType: 'github',
+            name: 'resource-owner-lookup',
+          },
           orgId,
         })
       }, 500)

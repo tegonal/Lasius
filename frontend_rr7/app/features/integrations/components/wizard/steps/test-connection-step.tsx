@@ -167,13 +167,18 @@ export const TestConnectionStep = ({
   // Auto-test on mount (ref guard prevents re-runs)
   useEffect(() => {
     runTest()
+  }, [runTest])
 
+  // Clean up success timeout on unmount only — must be separate from the
+  // auto-test effect because runTest changes identity when testConnectivity
+  // state changes, which would clear the navigation timeout prematurely.
+  useEffect(() => {
     return () => {
       if (successTimeoutRef.current) {
         clearTimeout(successTimeoutRef.current)
       }
     }
-  }, [runTest])
+  }, [])
 
   return (
     <div className="flex h-full flex-col items-center justify-center">

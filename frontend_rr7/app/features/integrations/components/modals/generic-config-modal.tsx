@@ -136,6 +136,7 @@ export const GenericConfigModal = ({
   const [form, fields] = useForm({
     constraint: getZodConstraint(allFieldsConstraintSchema),
     defaultValue,
+    id: config ? `edit-config-${config.id}` : undefined,
     onValidate({ formData: fd }) {
       return parseWithZod(fd, {
         schema: schema as typeof allFieldsConstraintSchema,
@@ -163,13 +164,12 @@ export const GenericConfigModal = ({
     selectedOrgId,
   })
 
-  // Reset form when config changes or modal opens
+  // Reset test state when config changes or modal opens
   useEffect(() => {
     if (config && open) {
-      form.reset()
       resetTestState()
     }
-  }, [config, open, form, resetTestState])
+  }, [config, open, resetTestState])
 
   // Update config hook
   const updateApi = useUpdateConfig({
