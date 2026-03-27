@@ -41,6 +41,10 @@ export const WorkloadIndicator = ({
     return null
   }
 
+  if (plannedWeeklyHours <= 0) {
+    return null
+  }
+
   // Only show healthy message if at least 80% of planned hours are reached
   if (
     burnoutMetrics.level === 'healthy' &&
