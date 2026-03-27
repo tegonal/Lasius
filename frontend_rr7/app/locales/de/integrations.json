@@ -39,8 +39,8 @@
     "checkInterval": "Prüfintervall",
     "checkIntervalHelp": "Wie oft nach neuen Issues gesucht werden soll",
     "configListItem": {
-      "projectCount_one": "{{count}} Projekt",
-      "projectCount_other": "{{count}} Projekte"
+      "projectCount_one": "{{count}} Zuordnung",
+      "projectCount_other": "{{count}} Zuordnungen"
     },
     "descriptions": {
       "edit": "Aktualisiere die Konfiguration für diese Issue-Importer-Integration."

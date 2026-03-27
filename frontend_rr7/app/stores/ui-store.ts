@@ -42,12 +42,16 @@ interface UIStore {
   removeToast: (id: string) => void
   setBackendStatus: (status: BackendConnectionStatus) => void
   setGlobalLoading: (isLoading: boolean) => void
+  // Session expiry state (written by TokenWatcher, read by DevInfoBadge)
+  setTokenExpiresAt: (expiresAt: null | number) => void
   setVersionDrift: (drift: boolean) => void
   // Stats tile display preferences
   statsTileTimeAsDecimals: boolean
   // Toast state
   toastViews: ToastViewType[]
   toggleStatsTileTimeAsDecimals: () => void
+  // Session token expiry timestamp (epoch ms), null when unknown
+  tokenExpiresAt: null | number
   // Version drift state (written by useHealthMonitor, read by HealthMonitor component)
   versionDrift: boolean
 }
@@ -90,6 +94,10 @@ export const useUIStore = create<UIStore>()(
           set((state) => {
             state.globalLoading = isLoading
           }),
+        setTokenExpiresAt: (expiresAt) =>
+          set((state) => {
+            state.tokenExpiresAt = expiresAt
+          }),
         setVersionDrift: (drift) =>
           set((state) => {
             state.versionDrift = drift
@@ -102,6 +110,8 @@ export const useUIStore = create<UIStore>()(
           set((state) => {
             state.statsTileTimeAsDecimals = !state.statsTileTimeAsDecimals
           }),
+        // Session token expiry
+        tokenExpiresAt: null,
         // Version drift state
         versionDrift: false,
       })),
@@ -123,4 +133,6 @@ export const useGlobalLoading = () => useUIStore((state) => state.globalLoading)
 export const useStatsTileTimeAsDecimals = () =>
   useUIStore((state) => state.statsTileTimeAsDecimals)
 export const useBackendStatus = () => useUIStore((state) => state.backendStatus)
+export const useTokenExpiresAt = () =>
+  useUIStore((state) => state.tokenExpiresAt)
 export const useVersionDrift = () => useUIStore((state) => state.versionDrift)

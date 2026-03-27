@@ -39,8 +39,8 @@
     "checkInterval": "Check Interval",
     "checkIntervalHelp": "How often to check for new issues",
     "configListItem": {
-      "projectCount_one": "{{count}} project",
-      "projectCount_other": "{{count}} projects"
+      "projectCount_one": "{{count}} mapping",
+      "projectCount_other": "{{count}} mappings"
     },
     "descriptions": {
       "edit": "Update the configuration for this issue importer integration."

@@ -17,16 +17,20 @@
  *
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { href, useNavigate, useRevalidator } from 'react-router'
 
+import { ButtonGroup } from '~/components/ui/forms/button-group'
+import { Modal } from '~/components/ui/overlays/modal/modal'
+import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
 import {
   API_ROUTES,
   SESSION_EXPIRY_WARNING_MS,
   SESSION_POLL_INTERVAL_MS,
 } from '~/config/constants'
 import { logger } from '~/lib/logger'
+import { useUIStore } from '~/stores/ui-store'
 
 interface SessionStatus {
   authenticated: boolean
@@ -43,7 +47,6 @@ export const TokenWatcher = () => {
   const navigate = useNavigate()
   const revalidator = useRevalidator()
   const [showWarning, setShowWarning] = useState(false)
-  const dialogRef = useRef<HTMLDialogElement>(null)
 
   const poll = useCallback(async () => {
     try {
@@ -55,6 +58,9 @@ export const TokenWatcher = () => {
       }
 
       const status: SessionStatus = await res.json()
+
+      // Write expiry to store so DevInfoBadge (and other consumers) can read it
+      useUIStore.getState().setTokenExpiresAt(status.expiresAt)
 
       if (!status.authenticated) {
         logger.info('[TokenWatcher] Session gone, redirecting to login')
@@ -82,17 +88,9 @@ export const TokenWatcher = () => {
     return () => clearInterval(id)
   }, [poll])
 
-  // Sync dialog open/close with state
-  useEffect(() => {
-    const dialog = dialogRef.current
-    if (!dialog) return
-
-    if (showWarning && !dialog.open) {
-      dialog.showModal()
-    } else if (!showWarning && dialog.open) {
-      dialog.close()
-    }
-  }, [showWarning])
+  const handleClose = useCallback(() => {
+    setShowWarning(false)
+  }, [])
 
   const handleExtendSession = useCallback(() => {
     setShowWarning(false)
@@ -106,44 +104,35 @@ export const TokenWatcher = () => {
   }, [navigate])
 
   return (
-    <dialog
-      className="modal"
-      data-testid="session-timeout-dialog"
-      onClose={() => setShowWarning(false)}
-      ref={dialogRef}
-    >
-      <div className="modal-box">
-        <h3 className="text-lg font-bold">
-          {t('common:SessionTimeout.title', 'Session Expiring')}
-        </h3>
-        <p className="py-4">
-          {t(
-            'common:SessionTimeout.message',
-            'Your session will expire soon. Would you like to extend it?',
-          )}
-        </p>
-        <div className="modal-action">
-          <button
-            className="btn btn-outline"
-            data-testid="session-timeout-logout-btn"
-            onClick={handleLogout}
-            type="button"
-          >
-            {t('common:SessionTimeout.logout', 'Logout')}
-          </button>
-          <button
-            className="btn btn-primary"
-            data-testid="session-timeout-extend-btn"
-            onClick={handleExtendSession}
-            type="button"
-          >
-            {t('common:SessionTimeout.extend', 'Extend Session')}
-          </button>
-        </div>
-      </div>
-      <form className="modal-backdrop" method="dialog">
-        <button type="submit">close</button>
-      </form>
-    </dialog>
+    <Modal onClose={handleClose} open={showWarning}>
+      <ModalCloseButton onClose={handleClose} />
+      <h3 className="text-lg font-bold">
+        {t('common:SessionTimeout.title', 'Session Expiring')}
+      </h3>
+      <p className="py-4">
+        {t(
+          'common:SessionTimeout.message',
+          'Your session will expire soon. Would you like to extend it?',
+        )}
+      </p>
+      <ButtonGroup>
+        <button
+          className="btn btn-outline"
+          data-testid="session-timeout-logout-btn"
+          onClick={handleLogout}
+          type="button"
+        >
+          {t('common:SessionTimeout.logout', 'Logout')}
+        </button>
+        <button
+          className="btn btn-primary"
+          data-testid="session-timeout-extend-btn"
+          onClick={handleExtendSession}
+          type="button"
+        >
+          {t('common:SessionTimeout.extend', 'Extend Session')}
+        </button>
+      </ButtonGroup>
+    </Modal>
   )
 }

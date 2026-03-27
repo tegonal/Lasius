@@ -39,9 +39,9 @@
     "checkInterval": "Intervalo de verificación",
     "checkIntervalHelp": "Frecuencia de verificación de nuevas incidencias",
     "configListItem": {
-      "projectCount_one": "{{count}} proyecto",
-      "projectCount_many": "{{count}} proyectos",
-      "projectCount_other": "{{count}} proyectos"
+      "projectCount_one": "{{count}} asignación",
+      "projectCount_many": "{{count}} asignaciones",
+      "projectCount_other": "{{count}} asignaciones"
     },
     "descriptions": {
       "edit": "Actualiza la configuración de esta integración de importador de problemas."

@@ -39,9 +39,9 @@
     "checkInterval": "Intervalle de vérification",
     "checkIntervalHelp": "Fréquence de vérification des nouveaux tickets",
     "configListItem": {
-      "projectCount_one": "{{count}} projet",
-      "projectCount_many": "{{count}} projets",
-      "projectCount_other": "{{count}} projets"
+      "projectCount_one": "{{count}} association",
+      "projectCount_many": "{{count}} associations",
+      "projectCount_other": "{{count}} associations"
     },
     "descriptions": {
       "edit": "Mettez à jour la configuration de cette intégration d'importateur de problèmes."

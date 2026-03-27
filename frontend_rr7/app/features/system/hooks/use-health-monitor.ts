@@ -91,12 +91,17 @@ export const useHealthMonitor = () => {
   useEffect(() => {
     void poll()
 
-    const handleFocus = () => {
-      void poll()
+    const startInterval = () => {
+      if (intervalRef.current) clearInterval(intervalRef.current)
       intervalRef.current = setInterval(
         () => void poll(),
         HEALTH_POLL_INTERVAL_MS,
       )
+    }
+
+    const handleFocus = () => {
+      void poll()
+      startInterval()
     }
 
     const handleBlur = () => {
@@ -106,10 +111,7 @@ export const useHealthMonitor = () => {
       }
     }
 
-    intervalRef.current = setInterval(
-      () => void poll(),
-      HEALTH_POLL_INTERVAL_MS,
-    )
+    startInterval()
 
     window.addEventListener('focus', handleFocus)
     window.addEventListener('blur', handleBlur)

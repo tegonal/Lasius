@@ -43,7 +43,10 @@ export const IntegrationConfigItem = ({
   onViewMappings,
 }: Props) => {
   const { t } = useTranslation('integrations')
-  const projectCount = config.projectCount
+  const projectCount =
+    'projects' in config && Array.isArray(config.projects)
+      ? config.projects.length
+      : 0
 
   return (
     <DataListRow>
@@ -67,8 +70,9 @@ export const IntegrationConfigItem = ({
         <span className="text-base-content/60 text-xs">
           {t('issueImporters.configListItem.projectCount', {
             count: projectCount,
-            defaultValue_one: '{{count}} project',
-            defaultValue_other: '{{count}} projects',
+            defaultValue: '{{count}} mappings',
+            defaultValue_one: '{{count}} mapping',
+            defaultValue_other: '{{count}} mappings',
           })}
         </span>
       </DataListField>

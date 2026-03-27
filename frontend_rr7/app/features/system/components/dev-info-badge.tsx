@@ -17,56 +17,39 @@
  *
  */
 
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { API_ROUTES, TOKEN_TIME_UPDATE_INTERVAL_MS } from '~/config/constants'
+import { TOKEN_TIME_UPDATE_INTERVAL_MS } from '~/config/constants'
+import { useTokenExpiresAt } from '~/stores/ui-store'
 
 /**
  * Dev-only overlay badge showing current breakpoint, language, theme, and token time remaining.
- * Only renders in development mode. Polls /api/session-status every 5s for token expiry.
+ * Only renders in development mode. Reads token expiry from the UI store (written by TokenWatcher).
  */
 export const DevInfoBadge = () => {
   const { i18n } = useTranslation()
-  const [tokenTime, setTokenTime] = useState('N/A')
+  const expiresAt = useTokenExpiresAt()
+  const [now, setNow] = useState(Date.now())
   const [colorMode, setColorMode] = useState('light')
 
-  const updateTokenTime = useCallback(async () => {
-    try {
-      const res = await fetch(API_ROUTES.SESSION_STATUS)
-      if (!res.ok) {
-        setTokenTime('N/A')
-        return
-      }
-      const status: { authenticated: boolean; expiresAt: null | number } =
-        await res.json()
-
-      if (!status.authenticated || !status.expiresAt) {
-        setTokenTime('N/A')
-        return
-      }
-
-      const diffMs = status.expiresAt - Date.now()
-      if (diffMs <= 0) {
-        setTokenTime('EXPIRED')
-      } else {
-        const m = Math.floor(diffMs / 60_000)
-        const s = Math.floor((diffMs % 60_000) / 1000)
-        setTokenTime(`${m}m ${s}s`)
-      }
-    } catch {
-      setTokenTime('ERR')
-    }
-  }, [])
-
+  // Tick a local clock to update the countdown display
   useEffect(() => {
-    void updateTokenTime()
     const id = setInterval(
-      () => void updateTokenTime(),
+      () => setNow(Date.now()),
       TOKEN_TIME_UPDATE_INTERVAL_MS,
     )
     return () => clearInterval(id)
-  }, [updateTokenTime])
+  }, [])
+
+  const tokenTime = useMemo(() => {
+    if (!expiresAt) return 'N/A'
+    const diffMs = expiresAt - now
+    if (diffMs <= 0) return 'EXPIRED'
+    const m = Math.floor(diffMs / 60_000)
+    const s = Math.floor((diffMs % 60_000) / 1000)
+    return `${m}m ${s}s`
+  }, [expiresAt, now])
 
   useEffect(() => {
     const theme = document.documentElement.dataset.theme || 'light'

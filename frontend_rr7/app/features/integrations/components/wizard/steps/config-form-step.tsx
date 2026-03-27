@@ -124,12 +124,15 @@ export const ConfigFormStep = ({
     <div className="flex h-full flex-col">
       <h3 className="text-base font-semibold">
         {t('issueImporters.wizard.config.title', {
-          defaultValue: `Configure ${getImporterTypeLabel(importerType, untyped(t))}`,
+          defaultValue: 'Configure {{platform}}',
+          platform: getImporterTypeLabel(importerType, untyped(t)),
         })}
       </h3>
       <p className="text-base-content/60 mt-1 text-sm">
         {t('issueImporters.wizard.config.description', {
-          defaultValue: `Enter your connection details to connect to ${getImporterTypeLabel(importerType, untyped(t))}.`,
+          defaultValue:
+            'Enter your connection details to connect to {{platform}}.',
+          platform: getImporterTypeLabel(importerType, untyped(t)),
         })}
       </p>
 
