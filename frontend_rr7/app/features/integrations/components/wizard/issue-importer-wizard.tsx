@@ -26,6 +26,7 @@ import { Button } from '~/components/primitives/buttons/button'
 import { useToast } from '~/components/ui/feedback/use-toast'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { Modal } from '~/components/ui/overlays/modal/modal'
+import { ModalBody } from '~/components/ui/overlays/modal/modal-body'
 import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
 import { ConfigFormStep } from '~/features/integrations/components/wizard/steps/config-form-step'
 import { ListProjectsStep } from '~/features/integrations/components/wizard/steps/list-projects-step'
@@ -37,6 +38,7 @@ import {
 } from '~/features/integrations/hooks/use-wizard-state'
 import {
   buildMappingPayload,
+  type MappingsByExternalProject,
   type MappingWithTagConfig,
 } from '~/features/integrations/lib/mapping-helpers'
 import { logger } from '~/lib/logger'
@@ -67,9 +69,8 @@ export const IssueImporterWizard = ({
     updateFormData,
   } = useWizardState()
 
-  const [projectMappings, setProjectMappings] = useState<
-    Record<string, MappingWithTagConfig>
-  >({})
+  const [projectMappings, setProjectMappings] =
+    useState<MappingsByExternalProject>({})
   const [isSaving, setIsSaving] = useState(false)
   const revalidator = useRevalidator()
   const mappingsQueueRef = useRef<
@@ -280,7 +281,7 @@ export const IssueImporterWizard = ({
   }, [state.currentStep, state.createdConfig, setCurrentStep])
 
   const handleMappingsChange = useCallback(
-    (mappings: Record<string, MappingWithTagConfig>) => {
+    (mappings: MappingsByExternalProject) => {
       setProjectMappings(mappings)
     },
     [],
@@ -304,11 +305,9 @@ export const IssueImporterWizard = ({
     }
 
     setIsSaving(true)
-    mappingsQueueRef.current = mappingEntries.map(
-      ([externalProjectId, mapping]) => ({
-        externalProjectId,
-        mapping,
-      }),
+    mappingsQueueRef.current = mappingEntries.flatMap(
+      ([externalProjectId, arr]) =>
+        arr.map((mapping) => ({ externalProjectId, mapping })),
     )
     mappingsQueueIndexRef.current = 0
     submitNextMapping()
@@ -331,7 +330,7 @@ export const IssueImporterWizard = ({
   return (
     <Modal onClose={handleClose} open={open} size={modalSize}>
       <ModalCloseButton onClose={handleClose} />
-      <div className="flex h-full flex-col">
+      <div className="flex min-h-0 flex-1 flex-col">
         {/* Header */}
         <div className="flex-shrink-0 pb-4">
           <h2 className="text-lg font-semibold">
@@ -370,7 +369,7 @@ export const IssueImporterWizard = ({
         </div>
 
         {/* Step content */}
-        <div className="relative flex-1 overflow-y-auto">
+        <ModalBody className="relative">
           {state.currentStep === 'platform' && (
             <SelectPlatformStep onSelectPlatform={handleSelectPlatform} />
           )}
@@ -406,7 +405,7 @@ export const IssueImporterWizard = ({
                 orgId={selectedOrgId}
               />
             )}
-        </div>
+        </ModalBody>
 
         {/* Footer navigation */}
         {state.currentStep !== 'test' && (

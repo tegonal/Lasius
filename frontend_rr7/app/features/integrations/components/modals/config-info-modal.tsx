@@ -25,6 +25,7 @@ import { FormatDate } from '~/components/ui/data-display/format-date'
 import { Alert } from '~/components/ui/feedback/alert'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { Modal } from '~/components/ui/overlays/modal/modal'
+import { ModalBody } from '~/components/ui/overlays/modal/modal-body'
 import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
 import { ModalTitle } from '~/components/ui/overlays/modal/modal-title'
 import { ImporterTypeBadge } from '~/features/integrations/components/importer-type-badge'
@@ -79,7 +80,7 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
 
   return (
     <Modal onClose={onClose} open={open} size="lg">
-      <div className="flex flex-col gap-4">
+      <div className="flex min-h-0 flex-1 flex-col gap-4">
         <ModalCloseButton onClose={onClose} />
         <ModalTitle>
           {t('issueImporters.info.title', {
@@ -96,7 +97,7 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
         )}
 
         {config && (
-          <div className="max-h-[70vh] space-y-6 overflow-y-auto">
+          <ModalBody className="space-y-6">
             {/* Basic Info */}
             <div>
               <h3 className="text-base-content/70 mb-2 text-sm font-semibold tracking-wide uppercase">
@@ -385,7 +386,7 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
                 </div>
               </div>
             )}
-          </div>
+          </ModalBody>
         )}
 
         <div className="mt-2">

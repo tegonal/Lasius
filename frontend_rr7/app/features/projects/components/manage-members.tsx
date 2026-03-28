@@ -22,8 +22,8 @@ import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { ButtonGroup } from '~/components/ui/forms/button-group'
-import { ScrollArea } from '~/components/ui/layouts/scroll-area'
 import { Modal } from '~/components/ui/overlays/modal/modal'
+import { ModalBody } from '~/components/ui/overlays/modal/modal-body'
 import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
 import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
@@ -102,7 +102,7 @@ export const ManageProjectMembers = ({ item, onCancel }: Props) => {
 
   return (
     <>
-      <div className="flex h-full min-h-0 flex-1 flex-col">
+      <div className="flex min-h-0 flex-1 flex-col">
         <ModalCloseButton onClose={handleClose} />
         <ModalHeader className="mb-4">
           {t('organisation:members.title', 'Members')}
@@ -111,14 +111,14 @@ export const ManageProjectMembers = ({ item, onCancel }: Props) => {
           memberCount={users.length}
           onInvite={handleInviteOpen}
         />
-        <ScrollArea className="min-h-0 grow">
+        <ModalBody>
           <ProjectMembersList
             onRefresh={handleRefresh}
             projectId={projectId}
             projectOrganisationId={projectOrganisationId}
             users={users}
           />
-        </ScrollArea>
+        </ModalBody>
         <ButtonGroup>
           <Button onClick={handleClose} type="button" variant="secondary">
             {t('actions.close', 'Close')}

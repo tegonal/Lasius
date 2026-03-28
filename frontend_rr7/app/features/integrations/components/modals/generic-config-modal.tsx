@@ -34,6 +34,7 @@ import { useToast } from '~/components/ui/feedback/use-toast'
 import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { DurationInput } from '~/components/ui/forms/input/duration-input'
 import { Modal } from '~/components/ui/overlays/modal/modal'
+import { ModalBody } from '~/components/ui/overlays/modal/modal-body'
 import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
 import { GithubResourceOwnerField } from '~/features/integrations/components/modals/config-fields/github-resource-owner-field'
 import { JiraCredentialFields } from '~/features/integrations/components/modals/config-fields/jira-credential-fields'
@@ -237,7 +238,7 @@ export const GenericConfigModal = ({
 
   return (
     <Modal onClose={onClose} open={open} size="xl">
-      <div className="flex h-full flex-col">
+      <div className="flex min-h-0 flex-1 flex-col">
         {/* Header */}
         <div className="flex-shrink-0">
           <ModalCloseButton onClose={onClose} />
@@ -257,7 +258,7 @@ export const GenericConfigModal = ({
         </div>
 
         {/* Two-column layout */}
-        <div className="grid flex-1 grid-cols-1 gap-8 overflow-y-auto lg:grid-cols-2">
+        <ModalBody className="grid grid-cols-1 gap-8 lg:grid-cols-2">
           {/* Left column: Form */}
           <form
             {...getFormProps(form)}
@@ -441,7 +442,7 @@ export const GenericConfigModal = ({
               isTestingConnection={isTestingConnection}
             />
           </div>
-        </div>
+        </ModalBody>
       </div>
     </Modal>
   )

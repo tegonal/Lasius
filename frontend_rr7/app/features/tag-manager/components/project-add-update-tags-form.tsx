@@ -25,10 +25,10 @@ import { Alert } from '~/components/ui/feedback/alert'
 import { useToast } from '~/components/ui/feedback/use-toast'
 import { ButtonGroup } from '~/components/ui/forms/button-group'
 import { InputTagsAdmin } from '~/components/ui/forms/input/input-tags-admin'
-import { ScrollArea } from '~/components/ui/layouts/scroll-area'
 import { Tabs } from '~/components/ui/navigation/tabs'
 import { GenericConfirmModal } from '~/components/ui/overlays/modal/generic-confirm-modal'
 import { GenericInputModal } from '~/components/ui/overlays/modal/generic-input-modal'
+import { ModalBody } from '~/components/ui/overlays/modal/modal-body'
 import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
 import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
@@ -249,7 +249,7 @@ export const ProjectAddUpdateTagsForm = ({
         showToggleAll={sortedTagGroups.length > 0}
       />
 
-      <ScrollArea className="min-h-0 flex-1 pr-2">
+      <ModalBody className="min-h-0 flex-1 pr-2">
         <div className="space-y-2 pb-4">
           {sortedTagGroups.length === 0 && <TagGroupEmptyState />}
 
@@ -279,12 +279,12 @@ export const ProjectAddUpdateTagsForm = ({
             )
           })}
         </div>
-      </ScrollArea>
+      </ModalBody>
     </div>
   )
 
   const simpleTagsContent = (
-    <ScrollArea className="min-h-0 flex-1 pr-2">
+    <ModalBody className="min-h-0 flex-1 pr-2">
       <div className="space-y-6 pb-4">
         <Alert variant="info">
           <p>
@@ -296,7 +296,7 @@ export const ProjectAddUpdateTagsForm = ({
           tags={simpleTags}
         />
       </div>
-    </ScrollArea>
+    </ModalBody>
   )
 
   const tabs = [
@@ -313,7 +313,7 @@ export const ProjectAddUpdateTagsForm = ({
   return (
     <>
       <form
-        className="flex h-full flex-col"
+        className="flex min-h-0 flex-1 flex-col"
         onKeyDown={preventEnterOnForm}
         onSubmit={onSubmit}
       >
