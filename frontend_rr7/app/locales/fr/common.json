@@ -1,6 +1,7 @@
 {
   "actions": {
     "add": "Ajouter",
+    "adding": "Ajout en cours...",
     "back": "Retour",
     "cancel": "Annuler",
     "clear": "Effacer",

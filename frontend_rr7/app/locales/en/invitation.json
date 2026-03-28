@@ -3,6 +3,14 @@
     "accept": "Accept invitation",
     "reject": "Reject invitation"
   },
+  "addExistingMembers": {
+    "addButton": "Add",
+    "description": "Select organisation members to add to this project.",
+    "empty": "All organisation members are already in this project.",
+    "title": "Add existing members"
+  },
+  "copiedToClipboard": "Link copied to clipboard",
+  "copyFailed": "Failed to copy link",
   "copyToClipboard": "Copy to clipboard",
   "createAccountMessage": "You have been invited to create an account so that you can use Lasius to track your working hours.",
   "description": {
@@ -15,6 +23,8 @@
   },
   "inviteOrganisationDescription": "Enter the email address of the person you want to invite. An invitation link will be generated that you can send to them.",
   "inviteProjectDescription": "Enter the email address of the person you want to invite. An invitation link will be generated that you can send to them.",
+  "memberAdded": "Member added to project",
+  "memberAddFailed": "Failed to add member",
   "messages": {
     "invitedToOrganisation": "You have been invited by {{inviter}} to join organisation {{organisation}}.",
     "invitedToOrganisationNeedsAccount": "You have been invited by {{inviter}} to join organisation {{organisation}}.",

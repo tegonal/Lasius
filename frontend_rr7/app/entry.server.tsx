@@ -83,7 +83,7 @@ export default function handleRequest(
       // Fall back to a minimal synchronous i18n instance
       i18nInstance = createInstance({
         ...i18nConfig,
-        initImmediate: false,
+        initAsync: false,
         lng: i18nConfig.fallbackLng,
       })
       void i18nInstance.init()

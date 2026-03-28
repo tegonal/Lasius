@@ -17,7 +17,7 @@
  *
  */
 
-import { UserX } from 'lucide-react'
+import { UserMinus } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -71,7 +71,7 @@ export const ProjectMemberListItemContext = ({
     <>
       <ContextBody hash={user.id} variant="compact">
         <ContextButtonOpen />
-        <ContextAnimatePresence variant="compact">
+        <ContextAnimatePresence inModal variant="compact">
           <ContextBar>
             <ContextButtonWrapper variant="compact">
               <Button
@@ -88,7 +88,7 @@ export const ProjectMemberListItemContext = ({
                 )}
                 variant="contextIcon"
               >
-                <LucideIcon icon={UserX} size={24} />
+                <LucideIcon icon={UserMinus} size={24} />
               </Button>
             </ContextButtonWrapper>
             <ContextBarDivider />

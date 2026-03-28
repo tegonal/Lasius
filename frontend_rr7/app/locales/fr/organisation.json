@@ -29,7 +29,10 @@
   "memberDescription": "Tu es membre de cette organisation et n'as pas les droits pour ajouter ou retirer des membres. Contacte un administrateur de l'organisation si tu souhaites inviter quelqu'un.",
   "members": {
     "actions": {
+      "addFromOrganisation": "Ajouter depuis l'organisation",
+      "addMember": "Ajouter un membre",
       "invite": "Inviter quelqu'un",
+      "inviteByEmail": "Inviter par e-mail",
       "manage": "Gérer les membres",
       "remove": "Retirer le membre"
     },

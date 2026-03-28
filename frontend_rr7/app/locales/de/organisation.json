@@ -29,7 +29,10 @@
   "memberDescription": "Du bist Mitglied dieser Organisation und hast keine Berechtigung, Mitglieder hinzuzufügen oder zu entfernen. Wende dich an einen Organisationsadministrator, wenn du jemanden einladen möchtest.",
   "members": {
     "actions": {
+      "addFromOrganisation": "Aus Organisation hinzufügen",
+      "addMember": "Mitglied hinzufügen",
       "invite": "Jemanden einladen",
+      "inviteByEmail": "Per E-Mail einladen",
       "manage": "Mitglieder verwalten",
       "remove": "Mitglied entfernen"
     },
@@ -40,6 +43,7 @@
     },
     "confirmRemove": "Bist du sicher, dass du dieses Mitglied aus dem Projekt entfernen möchtest?",
     "description_one": "Dieses Projekt hat {{count}} Mitglied.",
+    "description_many": "Dieses Projekt hat {{count}} Mitglieder.",
     "description_other": "Dieses Projekt hat {{count}} Mitglieder.",
     "empty": "Keine Mitglieder gefunden",
     "emptyState": "Keine Mitglieder gefunden",

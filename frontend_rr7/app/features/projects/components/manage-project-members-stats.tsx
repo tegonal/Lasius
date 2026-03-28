@@ -17,17 +17,22 @@
  *
  */
 
+import { ChevronDown } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-import { Button } from '~/components/primitives/buttons/button'
 import { ModalDescription } from '~/components/ui/overlays/modal/modal-description'
 
 type Props = {
   memberCount: number
+  onAddExisting: () => void
   onInvite: () => void
 }
 
-export const ManageProjectMembersStats = ({ memberCount, onInvite }: Props) => {
+export const ManageProjectMembersStats = ({
+  memberCount,
+  onAddExisting,
+  onInvite,
+}: Props) => {
   const { t } = useTranslation()
 
   return (
@@ -41,15 +46,41 @@ export const ManageProjectMembersStats = ({ memberCount, onInvite }: Props) => {
           },
         )}
       </ModalDescription>
-      <Button
-        className="w-auto"
-        fullWidth={false}
-        onClick={onInvite}
-        size="sm"
-        variant="neutral"
-      >
-        {t('organisation:members.actions.invite', 'Invite someone')}
-      </Button>
+      <div className="dropdown dropdown-end">
+        <button
+          className="btn btn-sm btn-neutral w-auto"
+          data-testid="project-members-actions-dropdown"
+          tabIndex={0}
+          type="button"
+        >
+          {t('organisation:members.actions.addMember', 'Add member')}
+          <ChevronDown className="size-4" />
+        </button>
+        <ul
+          className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+          tabIndex={0}
+        >
+          <li>
+            <button
+              data-testid="project-members-add-existing-btn"
+              onClick={onAddExisting}
+            >
+              {t(
+                'organisation:members.actions.addFromOrganisation',
+                'Add from organisation',
+              )}
+            </button>
+          </li>
+          <li>
+            <button data-testid="project-members-invite-btn" onClick={onInvite}>
+              {t(
+                'organisation:members.actions.inviteByEmail',
+                'Invite by email',
+              )}
+            </button>
+          </li>
+        </ul>
+      </div>
     </div>
   )
 }

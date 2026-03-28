@@ -18,35 +18,49 @@
  */
 
 import { UserMinus } from 'lucide-react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { GenericConfirmModal } from '~/components/ui/overlays/modal/generic-confirm-modal'
+import { ContextButtonClose } from '~/features/context-menu/buttons/context-button-close'
+import { ContextButtonOpen } from '~/features/context-menu/buttons/context-button-open'
+import { ContextAnimatePresence } from '~/features/context-menu/context-animate-presence'
+import { ContextBar } from '~/features/context-menu/context-bar'
+import { ContextBarDivider } from '~/features/context-menu/context-bar-divider'
+import { ContextBody } from '~/features/context-menu/context-body'
+import { ContextButtonWrapper } from '~/features/context-menu/context-button-wrapper'
+import { useContextMenu } from '~/features/context-menu/hooks/use-context-menu'
 import { type ModelsUserStub } from '~/services/api/lasius'
 import { useRemoveOrganisationUser } from '~/services/api/lasius-hooks/organisations/organisations'
 
 type Props = {
-  isRemoving: boolean
-  onRemove: () => void
-  onRemoveCancel: () => void
   onRemoveComplete: () => void
   orgId: string
   user: ModelsUserStub
 }
 
 export const OrganisationMemberActions = ({
-  isRemoving,
-  onRemove,
-  onRemoveCancel,
   onRemoveComplete,
   orgId,
   user,
 }: Props) => {
   const { t } = useTranslation('organisation')
+  const { handleCloseAll } = useContextMenu()
+  const [isRemoveConfirmOpen, setIsRemoveConfirmOpen] = useState(false)
+
   const removeApi = useRemoveOrganisationUser({
-    onSuccess: () => onRemoveComplete(),
+    onSuccess: () => {
+      setIsRemoveConfirmOpen(false)
+      onRemoveComplete()
+    },
   })
+
+  const showRemoveConfirm = () => {
+    setIsRemoveConfirmOpen(true)
+    handleCloseAll()
+  }
 
   const handleConfirm = () => {
     removeApi.submit({ orgId, userId: user.id })
@@ -56,15 +70,27 @@ export const OrganisationMemberActions = ({
 
   return (
     <>
-      <Button
-        aria-label={t('members.actions.remove', 'Remove member')}
-        fullWidth={false}
-        onClick={onRemove}
-        shape="circle"
-        variant="ghost"
-      >
-        <LucideIcon icon={UserMinus} size={16} />
-      </Button>
+      <ContextBody hash={user.id} variant="compact">
+        <ContextButtonOpen />
+        <ContextAnimatePresence variant="compact">
+          <ContextBar>
+            <ContextButtonWrapper variant="compact">
+              <Button
+                aria-label={t('members.actions.remove', 'Remove member')}
+                fullWidth={false}
+                onClick={showRemoveConfirm}
+                shape="circle"
+                title={t('members.actions.remove', 'Remove member')}
+                variant="contextIcon"
+              >
+                <LucideIcon icon={UserMinus} size={24} />
+              </Button>
+            </ContextButtonWrapper>
+            <ContextBarDivider />
+            <ContextButtonClose variant="compact" />
+          </ContextBar>
+        </ContextAnimatePresence>
+      </ContextBody>
       <GenericConfirmModal
         alert={{
           message: t(
@@ -79,9 +105,9 @@ export const OrganisationMemberActions = ({
           'Are you sure you want to remove {{name}}?',
           { name: memberName },
         )}
-        onClose={onRemoveCancel}
+        onClose={() => setIsRemoveConfirmOpen(false)}
         onConfirm={handleConfirm}
-        open={isRemoving}
+        open={isRemoveConfirmOpen}
         title={t('members.confirmations.removeTitle', 'Remove member')}
       />
     </>

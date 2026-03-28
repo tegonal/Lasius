@@ -32,6 +32,7 @@ import { useGetProjectUserList } from '~/services/api/lasius-hooks/projects/proj
 import { type ModelsProject } from '~/services/api/lasius/modelsProject'
 import { type ModelsUserProject } from '~/services/api/lasius/modelsUserProject'
 
+import { AddExistingMemberList } from './add-existing-member-list'
 import { ManageProjectMembersStats } from './manage-project-members-stats'
 import { ManageUserInviteByEmailForm } from './manage-user-invite-by-email-form'
 import { ProjectMembersList } from './project-members-list'
@@ -52,6 +53,7 @@ export const ManageProjectMembers = ({ item, onCancel }: Props) => {
       : selectedOrganisationId
   const [users, setUsers] = useState<ModelsUserStub[]>([])
   const [isInviteOpen, setIsInviteOpen] = useState(false)
+  const [isAddExistingOpen, setIsAddExistingOpen] = useState(false)
 
   const handleUserListSuccess = useCallback((data: ModelsUserStub[]) => {
     const list = Array.isArray(data) ? data : []
@@ -62,22 +64,14 @@ export const ManageProjectMembers = ({ item, onCancel }: Props) => {
     onSuccess: handleUserListSuccess,
   })
 
-  // Initial load
+  // Initial load and refresh on org/project change
+  const submitUserList = userListApi.submit
   useEffect(() => {
-    userListApi.submit({
+    submitUserList({
       orgId: selectedOrganisationId,
       projectId,
     })
-  }, [selectedOrganisationId, projectId, userListApi])
-
-  const handleUserInvite = () => {
-    // Reload members after invite
-    userListApi.submit({
-      orgId: selectedOrganisationId,
-      projectId,
-    })
-    setIsInviteOpen(false)
-  }
+  }, [selectedOrganisationId, projectId, submitUserList])
 
   const handleRefresh = () => {
     userListApi.submit({
@@ -86,12 +80,29 @@ export const ManageProjectMembers = ({ item, onCancel }: Props) => {
     })
   }
 
+  const handleUserInvite = () => {
+    handleRefresh()
+    setIsInviteOpen(false)
+  }
+
+  const handleMemberAdded = () => {
+    handleRefresh()
+  }
+
   const handleInviteOpen = () => {
     setIsInviteOpen(true)
   }
 
   const handleInviteClose = () => {
     setIsInviteOpen(false)
+  }
+
+  const handleAddExistingOpen = () => {
+    setIsAddExistingOpen(true)
+  }
+
+  const handleAddExistingClose = () => {
+    setIsAddExistingOpen(false)
   }
 
   const handleClose = () => {
@@ -109,6 +120,7 @@ export const ManageProjectMembers = ({ item, onCancel }: Props) => {
         </ModalHeader>
         <ManageProjectMembersStats
           memberCount={users.length}
+          onAddExisting={handleAddExistingOpen}
           onInvite={handleInviteOpen}
         />
         <ModalBody>
@@ -131,6 +143,15 @@ export const ManageProjectMembers = ({ item, onCancel }: Props) => {
           onSave={handleUserInvite}
           organisation={projectOrganisationId}
           project={projectId}
+        />
+      </Modal>
+      <Modal onClose={handleAddExistingClose} open={isAddExistingOpen}>
+        <AddExistingMemberList
+          onCancel={handleAddExistingClose}
+          onMemberAdded={handleMemberAdded}
+          orgId={projectOrganisationId}
+          projectId={projectId}
+          projectUsers={users}
         />
       </Modal>
     </>

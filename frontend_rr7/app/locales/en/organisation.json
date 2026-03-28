@@ -29,7 +29,10 @@
   "memberDescription": "You are a member of this organisation and don't have the rights to add or remove members. Get in touch with an organisation administrator if you would like to invite someone.",
   "members": {
     "actions": {
+      "addFromOrganisation": "Add from organisation",
+      "addMember": "Add member",
       "invite": "Invite someone",
+      "inviteByEmail": "Invite by email",
       "manage": "Manage members",
       "remove": "Remove member"
     },

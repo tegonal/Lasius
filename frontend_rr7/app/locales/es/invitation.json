@@ -3,6 +3,14 @@
     "accept": "Aceptar invitación",
     "reject": "Rechazar invitación"
   },
+  "addExistingMembers": {
+    "addButton": "Añadir",
+    "description": "Selecciona los miembros de la organización que quieres añadir a este proyecto.",
+    "empty": "Todos los miembros de la organización ya están en este proyecto.",
+    "title": "Añadir miembros existentes"
+  },
+  "copiedToClipboard": "Enlace copiado al portapapeles",
+  "copyFailed": "No se pudo copiar el enlace",
   "copyToClipboard": "Copiar al portapapeles",
   "createAccountMessage": "Has sido invitado a crear una cuenta de Lasius para registrar tus horas de trabajo.",
   "description": {
@@ -15,6 +23,8 @@
   },
   "inviteOrganisationDescription": "Introduce la dirección de correo electrónico de la persona que deseas invitar. Se generará un enlace de invitación que puedes enviarle.",
   "inviteProjectDescription": "Introduce la dirección de correo electrónico de la persona que deseas invitar. Se generará un enlace de invitación que puedes enviarle.",
+  "memberAdded": "Miembro añadido al proyecto",
+  "memberAddFailed": "No se pudo añadir el miembro",
   "messages": {
     "invitedToOrganisation": "Has sido invitado por {{inviter}} a unirte a la organización {{organisation}}.",
     "invitedToOrganisationNeedsAccount": "Ha sido invitado/a por {{inviter}} a unirse a la organización {{organisation}}.",

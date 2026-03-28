@@ -60,6 +60,5 @@ export const [i18nextMiddleware, getLocale, getInstance] =
       ns: i18nConfig.ns,
       resources: i18nConfig.resources,
       returnEmptyString: i18nConfig.returnEmptyString,
-      showSupportNotice: false,
     },
   })

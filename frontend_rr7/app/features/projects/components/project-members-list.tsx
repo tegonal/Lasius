@@ -27,6 +27,7 @@ import { DataList } from '~/components/ui/data-display/data-list/data-list'
 import { DataListField } from '~/components/ui/data-display/data-list/data-list-field'
 import { DataListHeaderItem } from '~/components/ui/data-display/data-list/data-list-header-item'
 import { DataListRow } from '~/components/ui/data-display/data-list/data-list-row'
+import { ContextMenuProvider } from '~/features/context-menu/hooks/use-context-menu'
 import { EmptyStateMembers } from '~/features/projects/components/empty-state-members'
 import { isAdminOfProject } from '~/lib/api/functions/is-admin-of-project'
 import { type loader } from '~/routes/app-layout'
@@ -77,51 +78,53 @@ export const ProjectMembersList = ({
   }
 
   return (
-    <DataList>
-      <DataListRow>
-        <DataListHeaderItem />
-        <DataListHeaderItem>
-          {t('forms.firstName', 'First name')}
-        </DataListHeaderItem>
-        <DataListHeaderItem>
-          {t('forms.lastName', 'Last name')}
-        </DataListHeaderItem>
-        <DataListHeaderItem>{t('forms.email', 'Email')}</DataListHeaderItem>
-        <DataListHeaderItem>{t('status.label', 'Status')}</DataListHeaderItem>
-        <DataListHeaderItem />
-      </DataListRow>
-      {orderBy(
-        users,
-        [(user) => user.lastName, (user) => user.firstName],
-        ['asc', 'asc'],
-      ).map((user) => (
-        <DataListRow key={user.id}>
-          <DataListField width={90}>
-            <AvatarUser firstName={user.firstName} lastName={user.lastName} />
-          </DataListField>
-          <DataListField>
-            <span>{user.firstName}</span>
-          </DataListField>
-          <DataListField>
-            <span>{user.lastName}</span>
-          </DataListField>
-          <DataListField>
-            <span>{user.email}</span>
-          </DataListField>
-          <DataListField>
-            {user.id === userId && (
-              <Badge variant="tag">{t('you', 'You')}</Badge>
-            )}
-          </DataListField>
-          <DataListField>
-            <ProjectMemberListItemContext
-              canRemove={amIAdmin && users.length > 1}
-              onRemove={() => handleUserRemove(user.id)}
-              user={user}
-            />
-          </DataListField>
+    <ContextMenuProvider>
+      <DataList>
+        <DataListRow>
+          <DataListHeaderItem />
+          <DataListHeaderItem>
+            {t('forms.firstName', 'First name')}
+          </DataListHeaderItem>
+          <DataListHeaderItem>
+            {t('forms.lastName', 'Last name')}
+          </DataListHeaderItem>
+          <DataListHeaderItem>{t('forms.email', 'Email')}</DataListHeaderItem>
+          <DataListHeaderItem>{t('status.label', 'Status')}</DataListHeaderItem>
+          <DataListHeaderItem />
         </DataListRow>
-      ))}
-    </DataList>
+        {orderBy(
+          users,
+          [(user) => user.lastName, (user) => user.firstName],
+          ['asc', 'asc'],
+        ).map((user) => (
+          <DataListRow key={user.id}>
+            <DataListField width={90}>
+              <AvatarUser firstName={user.firstName} lastName={user.lastName} />
+            </DataListField>
+            <DataListField>
+              <span>{user.firstName}</span>
+            </DataListField>
+            <DataListField>
+              <span>{user.lastName}</span>
+            </DataListField>
+            <DataListField>
+              <span>{user.email}</span>
+            </DataListField>
+            <DataListField>
+              {user.id === userId && (
+                <Badge variant="tag">{t('you', 'You')}</Badge>
+              )}
+            </DataListField>
+            <DataListField>
+              <ProjectMemberListItemContext
+                canRemove={amIAdmin && users.length > 1}
+                onRemove={() => handleUserRemove(user.id)}
+                user={user}
+              />
+            </DataListField>
+          </DataListRow>
+        ))}
+      </DataList>
+    </ContextMenuProvider>
   )
 }

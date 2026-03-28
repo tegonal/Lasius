@@ -26,6 +26,7 @@ import { z } from 'zod'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { Label } from '~/components/primitives/typography/label'
+import { useToast } from '~/components/ui/feedback/use-toast'
 import { ButtonGroup } from '~/components/ui/forms/button-group'
 import { FormField } from '~/components/ui/forms/conform/form-field'
 import { FieldSet } from '~/components/ui/forms/field-set'
@@ -33,7 +34,6 @@ import { FormBody } from '~/components/ui/forms/form-body'
 import { FormElement } from '~/components/ui/forms/form-element'
 import { Select } from '~/components/ui/forms/input/select'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
-import { Modal } from '~/components/ui/overlays/modal/modal'
 import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
 import { ModalDescription } from '~/components/ui/overlays/modal/modal-description'
 import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
@@ -73,6 +73,7 @@ export const ManageUserInviteByEmailForm = ({
   project,
 }: Props) => {
   const { t } = useTranslation()
+  const { addToast } = useToast()
   const mode = project ? 'project' : 'organisation'
 
   const schema = useMemo(() => createInviteSchema(untyped(t)), [t])
@@ -153,7 +154,25 @@ export const ManageUserInviteByEmailForm = ({
   }
 
   const handleCopy = (text: string) => {
-    void navigator.clipboard.writeText(text)
+    navigator.clipboard.writeText(text).then(
+      () => {
+        addToast({
+          message: t(
+            'invitation:copiedToClipboard',
+            'Link copied to clipboard',
+          ),
+          ttl: 3000,
+          type: 'SUCCESS',
+        })
+      },
+      () => {
+        addToast({
+          message: t('invitation:copyFailed', 'Failed to copy link'),
+          ttl: 3000,
+          type: 'ERROR',
+        })
+      },
+    )
   }
 
   const handleClose = () => {
@@ -164,210 +183,202 @@ export const ManageUserInviteByEmailForm = ({
 
   return (
     <>
-      <form {...getFormProps(form)} onSubmit={handleSubmit}>
-        <FormBody>
-          <ModalCloseButton onClose={handleClose} />
+      {!showResultState && (
+        <form {...getFormProps(form)} onSubmit={handleSubmit}>
+          <FormBody>
+            <ModalCloseButton onClose={handleClose} />
 
-          <ModalHeader className="mb-2">
-            {t('organisation:members.actions.invite', 'Invite someone')}
-          </ModalHeader>
-
-          <ModalDescription className="mb-4">
-            {mode === 'project'
-              ? t(
-                  'invitation:inviteProjectDescription',
-                  'Enter the email address of the person you want to invite. An invitation link will be generated that you can send to them.',
-                )
-              : t(
-                  'invitation:inviteOrganisationDescription',
-                  'Enter the email address of the person you want to invite. An invitation link will be generated that you can send to them.',
-                )}
-          </ModalDescription>
-
-          <FieldSet>
-            <FormField
-              autoComplete="off"
-              data-testid="org-invite-email-input"
-              field={fields.inviteMemberByEmailAddress}
-              label={t('invitation:email', 'Email')}
-              type="email"
-            />
-            {mode === 'project' && (
-              <FormElement>
-                <Label htmlFor={fields.projectRole.id}>
-                  {t('projects:projectRole', 'Project role')}
-                </Label>
-                <input
-                  name={fields.projectRole.name}
-                  type="hidden"
-                  value={projectRoleControl.value ?? 'ProjectMember'}
-                />
-                <Select
-                  id={fields.projectRole.id}
-                  onChange={(value) => projectRoleControl.change(value)}
-                  options={[
-                    {
-                      label: UserRoles.ProjectMember || 'Member',
-                      value: 'ProjectMember',
-                    },
-                    {
-                      label: UserRoles.ProjectAdministrator || 'Administrator',
-                      value: 'ProjectAdministrator',
-                    },
-                  ]}
-                  value={projectRoleControl.value || 'ProjectMember'}
-                />
-              </FormElement>
-            )}
-            {mode === 'organisation' && (
-              <FormElement>
-                <Label htmlFor={fields.organisationRole.id}>
-                  {t('organisation:organisationRole', 'Organisation role')}
-                </Label>
-                <input
-                  name={fields.organisationRole.name}
-                  type="hidden"
-                  value={orgRoleControl.value ?? 'OrganisationMember'}
-                />
-                <Select
-                  id={fields.organisationRole.id}
-                  onChange={(value) => orgRoleControl.change(value)}
-                  options={[
-                    {
-                      label: UserRoles.OrganisationMember || 'Member',
-                      value: 'OrganisationMember',
-                    },
-                    {
-                      label:
-                        UserRoles.OrganisationAdministrator || 'Administrator',
-                      value: 'OrganisationAdministrator',
-                    },
-                  ]}
-                  value={orgRoleControl.value || 'OrganisationMember'}
-                />
-              </FormElement>
-            )}
-          </FieldSet>
-
-          <ButtonGroup>
-            <Button
-              data-testid="org-invite-submit-btn"
-              disabled={isSubmitting}
-              type="submit"
-              variant="primary"
-            >
+            <ModalHeader className="mb-2">
               {t('organisation:members.actions.invite', 'Invite someone')}
-            </Button>
-            <Button onClick={handleClose} type="button" variant="secondary">
-              {t('actions.cancel', 'Cancel')}
-            </Button>
-          </ButtonGroup>
-        </FormBody>
-      </form>
+            </ModalHeader>
+
+            <ModalDescription className="mb-4">
+              {mode === 'project'
+                ? t(
+                    'invitation:inviteProjectDescription',
+                    'Enter the email address of the person you want to invite. An invitation link will be generated that you can send to them.',
+                  )
+                : t(
+                    'invitation:inviteOrganisationDescription',
+                    'Enter the email address of the person you want to invite. An invitation link will be generated that you can send to them.',
+                  )}
+            </ModalDescription>
+
+            <FieldSet>
+              <FormField
+                autoComplete="off"
+                data-testid="org-invite-email-input"
+                field={fields.inviteMemberByEmailAddress}
+                label={t('invitation:email', 'Email')}
+                type="email"
+              />
+              {mode === 'project' && (
+                <FormElement>
+                  <Label htmlFor={fields.projectRole.id}>
+                    {t('projects:projectRole', 'Project role')}
+                  </Label>
+                  <input
+                    name={fields.projectRole.name}
+                    type="hidden"
+                    value={projectRoleControl.value ?? 'ProjectMember'}
+                  />
+                  <Select
+                    id={fields.projectRole.id}
+                    onChange={(value) => projectRoleControl.change(value)}
+                    options={[
+                      {
+                        label: UserRoles.ProjectMember || 'Member',
+                        value: 'ProjectMember',
+                      },
+                      {
+                        label:
+                          UserRoles.ProjectAdministrator || 'Administrator',
+                        value: 'ProjectAdministrator',
+                      },
+                    ]}
+                    value={projectRoleControl.value || 'ProjectMember'}
+                  />
+                </FormElement>
+              )}
+              {mode === 'organisation' && (
+                <FormElement>
+                  <Label htmlFor={fields.organisationRole.id}>
+                    {t('organisation:organisationRole', 'Organisation role')}
+                  </Label>
+                  <input
+                    name={fields.organisationRole.name}
+                    type="hidden"
+                    value={orgRoleControl.value ?? 'OrganisationMember'}
+                  />
+                  <Select
+                    id={fields.organisationRole.id}
+                    onChange={(value) => orgRoleControl.change(value)}
+                    options={[
+                      {
+                        label: UserRoles.OrganisationMember || 'Member',
+                        value: 'OrganisationMember',
+                      },
+                      {
+                        label:
+                          UserRoles.OrganisationAdministrator ||
+                          'Administrator',
+                        value: 'OrganisationAdministrator',
+                      },
+                    ]}
+                    value={orgRoleControl.value || 'OrganisationMember'}
+                  />
+                </FormElement>
+              )}
+            </FieldSet>
+
+            <ButtonGroup>
+              <Button
+                data-testid="org-invite-submit-btn"
+                disabled={isSubmitting}
+                type="submit"
+                variant="primary"
+              >
+                {t('organisation:members.actions.invite', 'Invite someone')}
+              </Button>
+              <Button onClick={handleClose} type="button" variant="secondary">
+                {t('actions.cancel', 'Cancel')}
+              </Button>
+            </ButtonGroup>
+          </FormBody>
+        </form>
+      )}
 
       {showResultState &&
         invitationResult &&
         invitationResult.invitationLinkId && (
-          <Modal
-            blockViewport
-            onClose={handleCloseResult}
-            open={showResultState}
-          >
-            <div className="flex flex-col gap-4">
-              <ModalCloseButton onClose={handleCloseResult} />
+          <FormBody>
+            <ModalCloseButton onClose={handleCloseResult} />
 
-              <ModalHeader>
-                {t('invitation:title.invitationCreated', 'Invitation created')}
-              </ModalHeader>
+            <ModalHeader>
+              {t('invitation:title.invitationCreated', 'Invitation created')}
+            </ModalHeader>
 
-              <ModalDescription>
-                {t(
-                  'invitation:description.copyLink',
-                  'Copy the link and send it to your colleague. If they do not have an account yet, one will be created when the invitation is accepted.',
+            <ModalDescription>
+              {t(
+                'invitation:description.copyLink',
+                'Copy the link and send it to your colleague. If they do not have an account yet, one will be created when the invitation is accepted.',
+              )}
+            </ModalDescription>
+
+            <div className="flex gap-3">
+              <code
+                className="bg-base-200 flex-1 rounded px-2 py-1"
+                data-testid="org-invite-link"
+              >
+                {registrationLink(invitationResult.invitationLinkId)}
+              </code>
+
+              <Button
+                aria-label={t(
+                  'invitation:copyToClipboard',
+                  'Copy to clipboard',
                 )}
-              </ModalDescription>
-
-              <div className="flex gap-3">
-                <code
-                  className="bg-base-200 flex-1 rounded px-2 py-1"
-                  data-testid="org-invite-link"
-                >
-                  {registrationLink(invitationResult.invitationLinkId)}
-                </code>
-
-                <Button
-                  aria-label={t(
-                    'invitation:copyToClipboard',
-                    'Copy to clipboard',
-                  )}
-                  data-testid="org-invite-copy-btn"
-                  fullWidth={false}
-                  onClick={() =>
-                    handleCopy(
-                      registrationLink(invitationResult.invitationLinkId || ''),
-                    )
-                  }
-                  shape="circle"
-                  variant="primary"
-                >
-                  <LucideIcon icon={Copy} size={16} />
-                </Button>
-              </div>
-
-              <ButtonGroup>
-                <Button
-                  data-testid="org-invite-close-btn"
-                  onClick={handleCloseResult}
-                  type="button"
-                  variant="primary"
-                >
-                  {t('actions.close', 'Close')}
-                </Button>
-              </ButtonGroup>
+                data-testid="org-invite-copy-btn"
+                fullWidth={false}
+                onClick={() =>
+                  handleCopy(
+                    registrationLink(invitationResult.invitationLinkId || ''),
+                  )
+                }
+                shape="circle"
+                variant="primary"
+              >
+                <LucideIcon icon={Copy} size={16} />
+              </Button>
             </div>
-          </Modal>
+
+            <ButtonGroup>
+              <Button
+                data-testid="org-invite-close-btn"
+                onClick={handleCloseResult}
+                type="button"
+                variant="primary"
+              >
+                {t('actions.close', 'Close')}
+              </Button>
+            </ButtonGroup>
+          </FormBody>
         )}
 
       {showResultState &&
         invitationResult &&
         !invitationResult.invitationLinkId && (
-          <Modal
-            blockViewport
-            onClose={handleCloseResult}
-            open={showResultState}
-          >
-            <div className="flex flex-col gap-4">
-              <ModalCloseButton onClose={handleCloseResult} />
+          <FormBody>
+            <ModalCloseButton onClose={handleCloseResult} />
 
-              <ModalHeader>
-                {t('invitation:title.userAssigned', 'User assigned')}
-              </ModalHeader>
+            <ModalHeader>
+              {t('invitation:title.userAssigned', 'User assigned')}
+            </ModalHeader>
 
-              <ModalDescription>
-                {t(
-                  'projects:status.assignedToUser',
-                  'Project successfully assigned to user.',
-                )}
-              </ModalDescription>
+            <ModalDescription>
+              {t(
+                'projects:status.assignedToUser',
+                'Project successfully assigned to user.',
+              )}
+            </ModalDescription>
 
-              <div className="flex gap-3">
-                <code className="bg-base-200 rounded px-2 py-1">
-                  {invitationResult.email}
-                </code>
-              </div>
-
-              <ButtonGroup>
-                <Button
-                  data-testid="org-invite-assigned-close-btn"
-                  onClick={handleCloseResult}
-                  type="button"
-                  variant="primary"
-                >
-                  {t('actions.close', 'Close')}
-                </Button>
-              </ButtonGroup>
+            <div className="flex gap-3">
+              <code className="bg-base-200 rounded px-2 py-1">
+                {invitationResult.email}
+              </code>
             </div>
-          </Modal>
+
+            <ButtonGroup>
+              <Button
+                data-testid="org-invite-assigned-close-btn"
+                onClick={handleCloseResult}
+                type="button"
+                variant="primary"
+              >
+                {t('actions.close', 'Close')}
+              </Button>
+            </ButtonGroup>
+          </FormBody>
         )}
     </>
   )
