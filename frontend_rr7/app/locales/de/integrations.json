@@ -31,6 +31,7 @@
       "delete": "Konfiguration löschen",
       "deleteDisabled": "Löschen nicht möglich: Entferne zuerst alle Projekt-Zuordnungen",
       "edit": "Konfiguration bearbeiten",
+      "refreshAllTags": "Refresh all tags",
       "refreshTags": "Tags aktualisieren",
       "update": "Aktualisieren",
       "viewInfo": "Konfigurationsinfo anzeigen",
@@ -40,6 +41,7 @@
     "checkIntervalHelp": "Wie oft nach neuen Issues gesucht werden soll",
     "configListItem": {
       "projectCount_one": "{{count}} Zuordnung",
+      "projectCount_many": "{{count}} Zuordnungen",
       "projectCount_other": "{{count}} Zuordnungen"
     },
     "descriptions": {
@@ -123,13 +125,14 @@
       "healthStatus": "Gesundheitsstatus",
       "issueDetected": "Issue detected",
       "issuesSynced": "Issues",
+      "lasiusProject": "Lasius Project",
       "lastChecked": "Zuletzt geprüft:",
       "lastSuccessfulSync": "Letzter erfolgreicher Sync",
       "lastSync": "Letzter Sync",
       "name": "Name",
       "nextScheduledSync": "Nächster geplanter Sync",
       "noConfig": "Keine Konfiguration ausgewählt.",
-      "projectName": "Projekt",
+      "pendingFirstSync": "Pending first sync",
       "projectStats": "Projektstatistiken",
       "title": "Konfigurationsinfo",
       "totalIssuesSynced": "Gesamt synchronisierte Issues",
@@ -139,12 +142,14 @@
       "updatedBy": "Aktualisiert von"
     },
     "jira": {
+      "credentialsLabel": "Jira Credentials",
       "instructions": {
         "content": "<0><0>RSA-Schlüsselpaar mit OpenSSL generieren: <2>openssl genrsa -out jira_privatekey.pem 1024</2></0><1>Öffentlichen Schlüssel extrahieren: <2>openssl rsa -in jira_privatekey.pem -pubout -out jira_publickey.pem</2></1><2>In Jira: Klicke auf Einstellungen (Zahnrad-Symbol) → Anwendungen → Anwendungslinks</2><3>Gib eine beliebige URL ein (z. B. <2>http://localhost</2>) und klicke auf \"Neuen Link erstellen\"</3><4>Ignoriere die Warnung \"Keine Antwort erhalten\" und klicke auf \"Weiter\"</4><5>Gib deinen Anwendungsnamen ein und wähle \"Eingehenden Link erstellen\"</5><6>Gib im Formular für eingehende Authentifizierung deinen Consumer-Schlüssel ein und füge den öffentlichen Schlüssel aus <2>jira_publickey.pem</2> ein</6><7>Schließe den OAuth 1.0a-Autorisierungsablauf mit deinem Consumer-Schlüssel und Private Key ab, um den Zugangstoken zu erhalten</7></0><1>Hinweis: Dies verwendet OAuth 1.0a mit RSA-SHA1-Signierung. Primär für Jira Server/Data Center. Für Jira Cloud solltest du API-Tokens oder OAuth 2.0 für neue Integrationen verwenden.</1>",
         "title": "So erstellst du Jira-Zugangsdaten:"
       }
     },
     "plane": {
+      "credentialsLabel": "Plane Credentials",
       "instructions": {
         "content": "<0><0>Melde dich bei deinem Plane-Konto oder deiner selbst gehosteten Instanz an</0><1>Gehe zu Profileinstellungen</1><2>Wähle \"Personal Access Tokens\" aus der Registerkartenliste</2><3>Klicke auf \"Add personal access token\"</3><4>Gib einen Token-Namen und eine optionale Beschreibung ein</4><5>Klicke auf \"Generate\" oder \"Create\"</5><6>Kopiere den generierten Token sofort und speichere ihn sicher</6></0><1>Hinweis: Der Token wird nur einmal angezeigt. Er wird als Wert des <2>X-API-Key</2>-Headers in API-Anfragen übergeben.</1><2>Arbeitsbereich: Du musst deinen Arbeitsbereich-Slug angeben, der in deiner Plane-URL zu finden ist. Wenn deine Plane-URL z. B. <2>https://app.plane.so/meine-firma</2> lautet, ist dein Arbeitsbereich-Slug <5>meine-firma</5>. Dies ist erforderlich, um auf Projekte und Issues in deinem Arbeitsbereich zuzugreifen.</2>",
         "title": "So erstellst du Plane-Zugangsdaten:"
@@ -195,7 +200,6 @@
       },
       "projects": {
         "addMapping": "Zuordnung hinzufügen",
-        "changeMapping": "Zuordnung ändern",
         "confirmRemoveMessage": "Bist du sicher, dass du diese Projekt-Zuordnung entfernen möchtest? Issues werden nicht mehr synchronisiert, aber vorhandene Tags bleiben erhalten.",
         "confirmRemoveTitle": "Projekt-Zuordnung entfernen",
         "createMapping": "Projekt-Zuordnung erstellen",
@@ -207,6 +211,7 @@
         "loading": "Projekte von {{platform}} werden geladen...",
         "mappingDescription": "Verknüpfe dieses externe Projekt mit einem Lasius-Projekt, um Issues automatisch als Zeiterfassungs-Tags zu synchronisieren.",
         "mappingDescription_one": "{{count}} Projekt von {{platform}} gefunden. Ordne es deinen Lasius-Projekten zu, um Issues zu importieren. {{mapped}} von {{total}} zugeordnet.",
+        "mappingDescription_many": "{{count}} Projekte von {{platform}} gefunden. Ordne sie deinen Lasius-Projekten zu, um Issues zu importieren. {{mapped}} von {{total}} zugeordnet.",
         "mappingDescription_other": "{{count}} Projekte von {{platform}} gefunden. Ordne sie deinen Lasius-Projekten zu, um Issues zu importieren. {{mapped}} von {{total}} zugeordnet.",
         "noProjects": "Keine Projekte in {{platform}} gefunden",
         "notMapped": "Nicht zugeordnet",

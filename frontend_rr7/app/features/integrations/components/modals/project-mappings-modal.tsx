@@ -26,12 +26,13 @@ import { useToast } from '~/components/ui/feedback/use-toast'
 import { Modal } from '~/components/ui/overlays/modal/modal'
 import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
 import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
+import { ModalHelpButton } from '~/features/help/components/help-button'
 import { ProjectMappingDataList } from '~/features/integrations/components/shared/project-mapping-data-list'
+import { useMappingState } from '~/features/integrations/hooks/use-mapping-state'
 import { getImporterTypeLabel } from '~/features/integrations/lib/importer-type-labels'
 import {
   buildMappingPayload,
   extractExternalProjectId,
-  type MappingWithTagConfig,
   type ProjectMapping,
   type TagConfiguration,
 } from '~/features/integrations/lib/mapping-helpers'
@@ -43,6 +44,7 @@ import {
   type ModelsIssueImporterConfigId,
   type ModelsIssueImporterConfigResponse,
   type ModelsListProjectsResponse,
+  type ModelsProjectMappingId,
 } from '~/services/api/lasius'
 import {
   useAddProjectMapping,
@@ -67,9 +69,8 @@ export const ProjectMappingsModal = ({
   const { t } = useTranslation('integrations')
   const { addToast } = useToast()
   const revalidator = useRevalidator()
-  const [mappings, setMappings] = useState<
-    Record<string, MappingWithTagConfig>
-  >({})
+  const { mappings, removeMapping, setMappings, upsertMapping } =
+    useMappingState()
 
   const importerType = (config?.importerType as ImporterType) || 'github'
   const configId = (config?.id as ModelsIssueImporterConfigId) || ''
@@ -158,11 +159,18 @@ export const ProjectMappingsModal = ({
     },
   })
 
-  // Build initial mappings from config.projects
+  // Build initial mappings from config.projects (supports multiple mappings per external project)
   useEffect(() => {
     const projects = configProjectsRef.current
     if (projects) {
-      const initialMappings: Record<string, MappingWithTagConfig> = {}
+      const initialMappings: Record<
+        string,
+        Array<{
+          id?: ModelsProjectMappingId
+          projectId: string
+          tagConfig?: TagConfiguration
+        }>
+      > = {}
 
       for (const mapping of projects as ProjectMapping[]) {
         const externalId = extractExternalProjectId(importerType, mapping)
@@ -171,16 +179,20 @@ export const ProjectMappingsModal = ({
         )?.tagConfiguration
 
         if (externalId && mapping.projectId) {
-          initialMappings[externalId] = {
+          const existing = initialMappings[externalId] ?? []
+          existing.push({
+            id: (mapping as ProjectMapping & { id?: ModelsProjectMappingId })
+              .id,
             projectId: mapping.projectId,
             tagConfig: existingTagConfig,
-          }
+          })
+          initialMappings[externalId] = existing
         }
       }
 
       setMappings(initialMappings)
     }
-  }, [configProjectsKey, importerType])
+  }, [configProjectsKey, importerType, open])
 
   // Clean up state when modal closes
   useEffect(() => {
@@ -199,46 +211,18 @@ export const ProjectMappingsModal = ({
     listProjectsApi.submit({ configId, orgId: selectedOrgId })
   }, [open, configId, selectedOrgId, listProjectsApi])
 
-  const mappingsRef = useRef(mappings)
-  mappingsRef.current = mappings
   const projectsRef = useRef(projects)
   projectsRef.current = projects
 
-  const handleMappingChange = useCallback(
+  const handleMappingUpsert = useCallback(
     (
       externalProjectId: string,
-      lasiusProjectId: null | string,
+      lasiusProjectId: string,
       tagConfig: TagConfiguration | undefined,
     ) => {
-      const previousMapping = mappingsRef.current[externalProjectId]
+      upsertMapping(externalProjectId, lasiusProjectId, tagConfig)
 
-      // Update local state immediately
-      setMappings((prev) => {
-        const updated = { ...prev }
-        if (lasiusProjectId) {
-          updated[externalProjectId] = {
-            projectId: lasiusProjectId,
-            tagConfig,
-          }
-        } else {
-          delete updated[externalProjectId]
-        }
-        return updated
-      })
-
-      // Remove mapping
-      if (!lasiusProjectId) {
-        if (!previousMapping) return
-
-        removeMappingApi.submit({
-          configId,
-          orgId: selectedOrgId,
-          projectId: previousMapping.projectId,
-        })
-        return
-      }
-
-      // Add/update mapping
+      // Add/update via API
       const externalProject = projectsRef.current.find(
         (p) => p.id === externalProjectId,
       )
@@ -276,18 +260,44 @@ export const ProjectMappingsModal = ({
       selectedOrgId,
       importerType,
       addMappingApi,
-      removeMappingApi,
       addToast,
       t,
+      upsertMapping,
     ],
   )
 
+  const handleMappingRemove = useCallback(
+    (externalProjectId: string, lasiusProjectId: string) => {
+      const currentMappings = mappings[externalProjectId] ?? []
+      const mappingToRemove = currentMappings.find(
+        (m) => m.projectId === lasiusProjectId,
+      )
+      if (!mappingToRemove) return
+
+      removeMapping(externalProjectId, lasiusProjectId)
+
+      // Remove via API — use mapping ID if available (persisted mappings)
+      if (mappingToRemove.id) {
+        removeMappingApi.submit({
+          configId,
+          mappingId: mappingToRemove.id,
+          orgId: selectedOrgId,
+        })
+      } else {
+        logger.warn(
+          '[ProjectMappingsModal] Removing mapping without ID — not persisted yet',
+        )
+      }
+    },
+    [configId, selectedOrgId, removeMappingApi, mappings, removeMapping],
+  )
+
   const handleRefreshTags = useCallback(
-    (projectId: string) => {
+    (mappingIdValue: string) => {
       refreshTagsApi.submit({
         configId,
+        mappingId: { value: mappingIdValue } as ModelsProjectMappingId,
         orgId: selectedOrgId,
-        projectId,
       })
     },
     [configId, selectedOrgId, refreshTagsApi],
@@ -298,19 +308,23 @@ export const ProjectMappingsModal = ({
       <div className="flex h-full flex-1 flex-col">
         <ModalCloseButton onClose={onClose} />
 
-        <ModalHeader className="mb-4">
-          {t('issueImporters.projectMappings.title', {
-            defaultValue: '{{platform}} Project Mappings',
-            platform: getImporterTypeLabel(importerType, untyped(t)),
-          })}
-        </ModalHeader>
+        <div className="mb-4 flex items-center gap-2">
+          <ModalHeader>
+            {t('issueImporters.projectMappings.title', {
+              defaultValue: '{{platform}} Project Mappings',
+              platform: getImporterTypeLabel(importerType, untyped(t)),
+            })}
+          </ModalHeader>
+          <ModalHelpButton helpKey="modal-project-mappings" />
+        </div>
 
         <ProjectMappingDataList
           importerType={importerType}
           isError={listProjectsApi.isError || !!fetchError}
           isLoading={listProjectsApi.isLoading}
           mappings={mappings}
-          onMappingChange={handleMappingChange}
+          onMappingRemove={handleMappingRemove}
+          onMappingUpsert={handleMappingUpsert}
           onRefreshTags={handleRefreshTags}
           projects={projects}
         />

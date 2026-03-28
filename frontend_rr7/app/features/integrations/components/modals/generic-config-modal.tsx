@@ -36,11 +36,11 @@ import { DurationInput } from '~/components/ui/forms/input/duration-input'
 import { Modal } from '~/components/ui/overlays/modal/modal'
 import { ModalBody } from '~/components/ui/overlays/modal/modal-body'
 import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
+import { ModalHelpButton } from '~/features/help/components/help-button'
 import { GithubResourceOwnerField } from '~/features/integrations/components/modals/config-fields/github-resource-owner-field'
 import { JiraCredentialFields } from '~/features/integrations/components/modals/config-fields/jira-credential-fields'
 import { PlaneFields } from '~/features/integrations/components/modals/config-fields/plane-fields'
 import { ConnectionTestPanel } from '~/features/integrations/components/modals/connection-test-panel'
-import { ProviderInstructions } from '~/features/integrations/components/shared/provider-instructions'
 import { useConnectionTest } from '~/features/integrations/hooks/use-connection-test'
 import { createConfigSchema } from '~/features/integrations/lib/config-schemas'
 import { getImporterTypeLabel } from '~/features/integrations/lib/importer-type-labels'
@@ -237,17 +237,18 @@ export const GenericConfigModal = ({
   if (!config) return null
 
   return (
-    <Modal onClose={onClose} open={open} size="xl">
+    <Modal onClose={onClose} open={open} size="lg">
       <div className="flex min-h-0 flex-1 flex-col">
         {/* Header */}
         <div className="flex-shrink-0">
           <ModalCloseButton onClose={onClose} />
-          <div className="mb-2">
+          <div className="mb-2 flex items-center gap-2">
             <h3 className="text-lg font-semibold">
               {t('issueImporters.titles.edit', {
                 defaultValue: 'Edit Integration',
               })}
             </h3>
+            <ModalHelpButton helpKey="modal-importer-config" />
           </div>
           <p className="text-base-content/60 mb-6 text-sm">
             {t('issueImporters.descriptions.edit', {
@@ -257,9 +258,7 @@ export const GenericConfigModal = ({
           </p>
         </div>
 
-        {/* Two-column layout */}
-        <ModalBody className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          {/* Left column: Form */}
+        <ModalBody>
           <form
             {...getFormProps(form)}
             className="space-y-4"
@@ -308,11 +307,15 @@ export const GenericConfigModal = ({
             {/* GitHub / GitLab: Access Token */}
             {(importerType === 'github' || importerType === 'gitlab') && (
               <fieldset className="fieldset">
-                <label className="label" htmlFor={fields.accessToken.id}>
-                  {t('issueImporters.fields.accessTokenEdit', {
-                    defaultValue: 'Access Token (leave empty to keep current)',
-                  })}
-                </label>
+                <div className="flex items-center gap-1">
+                  <label className="label" htmlFor={fields.accessToken.id}>
+                    {t('issueImporters.fields.accessTokenEdit', {
+                      defaultValue:
+                        'Access Token (leave empty to keep current)',
+                    })}
+                  </label>
+                  <ModalHelpButton helpKey={`setup-${importerType}`} />
+                </div>
                 <Input
                   {...getInputProps(fields.accessToken, { type: 'password' })}
                   autoComplete="off"
@@ -349,26 +352,46 @@ export const GenericConfigModal = ({
 
             {/* Jira fields */}
             {importerType === 'jira' && (
-              <JiraCredentialFields
-                accessTokenControl={accessTokenControl}
-                fields={{
-                  accessToken: fields.accessToken,
-                  consumerKey: fields.consumerKey,
-                  privateKey: fields.privateKey,
-                }}
-                resetTestState={resetTestState}
-              />
+              <div>
+                <div className="mb-2 flex items-center gap-1">
+                  <span className="label">
+                    {t('issueImporters.jira.credentialsLabel', {
+                      defaultValue: 'Jira Credentials',
+                    })}
+                  </span>
+                  <ModalHelpButton helpKey="setup-jira" />
+                </div>
+                <JiraCredentialFields
+                  accessTokenControl={accessTokenControl}
+                  fields={{
+                    accessToken: fields.accessToken,
+                    consumerKey: fields.consumerKey,
+                    privateKey: fields.privateKey,
+                  }}
+                  resetTestState={resetTestState}
+                />
+              </div>
             )}
 
             {/* Plane fields */}
             {importerType === 'plane' && (
-              <PlaneFields
-                fields={{
-                  apiKey: fields.apiKey,
-                  workspace: fields.workspace,
-                }}
-                resetTestState={resetTestState}
-              />
+              <div>
+                <div className="mb-2 flex items-center gap-1">
+                  <span className="label">
+                    {t('issueImporters.plane.credentialsLabel', {
+                      defaultValue: 'Plane Credentials',
+                    })}
+                  </span>
+                  <ModalHelpButton helpKey="setup-plane" />
+                </div>
+                <PlaneFields
+                  fields={{
+                    apiKey: fields.apiKey,
+                    workspace: fields.workspace,
+                  }}
+                  resetTestState={resetTestState}
+                />
+              </div>
             )}
 
             {/* Check Frequency */}
@@ -402,6 +425,14 @@ export const GenericConfigModal = ({
               </p>
             </fieldset>
 
+            <ConnectionTestPanel
+              connectionTestMessage={connectionTestMessage}
+              connectionTestResult={connectionTestResult}
+              handleTestConnection={handleTestConnection}
+              isSaving={isSaving}
+              isTestingConnection={isTestingConnection}
+            />
+
             {/* Divider + Action buttons */}
             <div className="border-base-300 border-t pt-4">
               <div className="flex gap-2">
@@ -427,21 +458,6 @@ export const GenericConfigModal = ({
               </div>
             </div>
           </form>
-
-          {/* Right column: Instructions + Test Connection */}
-          <div className="hidden lg:flex lg:flex-col lg:gap-6">
-            <div className="flex-1">
-              <ProviderInstructions importerType={importerType} />
-            </div>
-
-            <ConnectionTestPanel
-              connectionTestMessage={connectionTestMessage}
-              connectionTestResult={connectionTestResult}
-              handleTestConnection={handleTestConnection}
-              isSaving={isSaving}
-              isTestingConnection={isTestingConnection}
-            />
-          </div>
         </ModalBody>
       </div>
     </Modal>

@@ -23,7 +23,10 @@ import { useRevalidator } from 'react-router'
 
 import { useToast } from '~/components/ui/feedback/use-toast'
 import { type ModelsIssueImporterConfigResponse } from '~/services/api/lasius'
-import { useDeleteConfig } from '~/services/api/lasius-hooks/issue-importers/issue-importers'
+import {
+  useDeleteConfig,
+  useRefreshTags,
+} from '~/services/api/lasius-hooks/issue-importers/issue-importers'
 
 type ModalType =
   | 'configEdit'
@@ -37,6 +40,7 @@ type UseIssueImporterConfigManagementReturn = {
   activeModal: ModalType
   closeModal: () => void
   handleDelete: () => void
+  handleRefreshAllTags: (config: ModelsIssueImporterConfigResponse) => void
   isDeleting: boolean
   openConfigEdit: (config: ModelsIssueImporterConfigResponse) => void
   openConfigInfo: (config: ModelsIssueImporterConfigResponse) => void
@@ -121,6 +125,25 @@ export function useIssueImporterConfigManagement(
     setSelectedConfig(null)
   }, [])
 
+  const refreshTagsApi = useRefreshTags({
+    onError: () => {
+      addToast({
+        message: t('issueImporters.errors.tagsRefreshFailed', {
+          defaultValue: 'Failed to refresh tags',
+        }),
+        type: 'ERROR',
+      })
+    },
+    onSuccess: () => {
+      addToast({
+        message: t('issueImporters.success.tagsRefreshed', {
+          defaultValue: 'Tags refresh triggered successfully',
+        }),
+        type: 'SUCCESS',
+      })
+    },
+  })
+
   const handleDelete = useCallback(() => {
     if (!selectedConfig) return
     deleteApi.submit({
@@ -129,10 +152,31 @@ export function useIssueImporterConfigManagement(
     })
   }, [selectedConfig, selectedOrgId, deleteApi])
 
+  const handleRefreshAllTags = useCallback(
+    (config: ModelsIssueImporterConfigResponse) => {
+      const projects =
+        'projects' in config && Array.isArray(config.projects)
+          ? config.projects
+          : []
+
+      for (const mapping of projects) {
+        if (mapping.id) {
+          refreshTagsApi.submit({
+            configId: config.id,
+            mappingId: mapping.id,
+            orgId: selectedOrgId,
+          })
+        }
+      }
+    },
+    [selectedOrgId, refreshTagsApi],
+  )
+
   return {
     activeModal,
     closeModal,
     handleDelete,
+    handleRefreshAllTags,
     isDeleting: deleteApi.isSubmitting,
     openConfigEdit,
     openConfigInfo,

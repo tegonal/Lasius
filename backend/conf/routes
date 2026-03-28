@@ -1555,13 +1555,13 @@ DELETE /organisations/:orgId/issue-importers/:configId                          
 #      schema:
 #        type: string
 #      description: Issue importer configuration ID
-#    - name: projectId
+#    - name: mappingId
 #      in: path
 #      required: true
 #      schema:
 #        type: string
 #        format: uuid
-#      description: Project ID
+#      description: Project mapping ID
 #  responses:
 #    202:
 #      description: Refresh request accepted - tags will be updated immediately
@@ -1578,7 +1578,7 @@ DELETE /organisations/:orgId/issue-importers/:configId                          
 #                example: Tag refresh triggered immediately. Tags will be updated shortly.
 #              configId:
 #                type: string
-#              projectId:
+#              mappingId:
 #                type: string
 #              importerType:
 #                type: string
@@ -1586,7 +1586,7 @@ DELETE /organisations/:orgId/issue-importers/:configId                          
 #    403:
 #      description: Configuration does not belong to organization
 #    404:
-#      description: Configuration not found or project not mapped to configuration
+#      description: Configuration not found or mapping not found in configuration
 #      content:
 #        application/json:
 #          schema:
@@ -1599,13 +1599,13 @@ DELETE /organisations/:orgId/issue-importers/:configId                          
 #                type: string
 #              error:
 #                type: string
-#                enum: [config_not_found, project_not_found]
+#                enum: [config_not_found, mapping_not_found]
 #              configId:
 #                type: string
-#              projectId:
+#              mappingId:
 #                type: string
 ###
-POST /organisations/:orgId/issue-importers/:configId/projects/:projectId/refresh-tags         controllers.IssueImporterConfigController.refreshTags(orgId: models.OrganisationId, configId: models.IssueImporterConfigId, projectId: models.ProjectId)
+POST /organisations/:orgId/issue-importers/:configId/projects/:mappingId/refresh-tags         controllers.IssueImporterConfigController.refreshTags(orgId: models.OrganisationId, configId: models.IssueImporterConfigId, mappingId: models.ProjectMappingId)
 
 ###
 #  security:
@@ -1671,13 +1671,13 @@ POST /organisations/:orgId/issue-importers/:configId/projects                   
 #      schema:
 #        type: string
 #      description: Importer configuration ID
-#    - name: projectId
+#    - name: mappingId
 #      in: path
 #      required: true
 #      schema:
 #        type: string
 #        format: uuid
-#      description: Project ID
+#      description: Project mapping ID
 #  requestBody:
 #    required: true
 #    content:
@@ -1696,9 +1696,9 @@ POST /organisations/:orgId/issue-importers/:configId/projects                   
 #    403:
 #      description: user not authorized (requires OrganisationAdministrator role)
 #    404:
-#      description: configuration not found or project not found in mapping
+#      description: configuration not found or mapping not found
 ###
-PUT /organisations/:orgId/issue-importers/:configId/projects/:projectId                         controllers.IssueImporterConfigController.updateProjectMapping(orgId: models.OrganisationId, configId: models.IssueImporterConfigId, projectId: models.ProjectId)
+PUT /organisations/:orgId/issue-importers/:configId/projects/:mappingId                         controllers.IssueImporterConfigController.updateProjectMapping(orgId: models.OrganisationId, configId: models.IssueImporterConfigId, mappingId: models.ProjectMappingId)
 
 ###
 #  security:
@@ -1721,13 +1721,13 @@ PUT /organisations/:orgId/issue-importers/:configId/projects/:projectId         
 #      schema:
 #        type: string
 #      description: Importer configuration ID
-#    - name: projectId
+#    - name: mappingId
 #      in: path
 #      required: true
 #      schema:
 #        type: string
 #        format: uuid
-#      description: Project ID
+#      description: Project mapping ID
 #  responses:
 #    200:
 #      description: project mapping removed
@@ -1738,9 +1738,9 @@ PUT /organisations/:orgId/issue-importers/:configId/projects/:projectId         
 #    403:
 #      description: user not authorized (requires OrganisationAdministrator role)
 #    404:
-#      description: configuration not found or project not found in mapping
+#      description: configuration not found or mapping not found
 ###
-DELETE /organisations/:orgId/issue-importers/:configId/projects/:projectId                      controllers.IssueImporterConfigController.removeProjectMapping(orgId: models.OrganisationId, configId: models.IssueImporterConfigId, projectId: models.ProjectId)
+DELETE /organisations/:orgId/issue-importers/:configId/projects/:mappingId                      controllers.IssueImporterConfigController.removeProjectMapping(orgId: models.OrganisationId, configId: models.IssueImporterConfigId, mappingId: models.ProjectMappingId)
 
 #######
 ####### Static Files #######

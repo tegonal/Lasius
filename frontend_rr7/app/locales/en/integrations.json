@@ -31,6 +31,7 @@
       "delete": "Delete configuration",
       "deleteDisabled": "Cannot delete: remove all project mappings first",
       "edit": "Edit configuration",
+      "refreshAllTags": "Refresh all tags",
       "refreshTags": "Refresh tags",
       "update": "Update",
       "viewInfo": "View configuration info",
@@ -123,13 +124,14 @@
       "healthStatus": "Health Status",
       "issueDetected": "Issue detected",
       "issuesSynced": "Issues",
+      "lasiusProject": "Lasius Project",
       "lastChecked": "Last checked:",
       "lastSuccessfulSync": "Last Successful Sync",
       "lastSync": "Last Sync",
       "name": "Name",
       "nextScheduledSync": "Next Scheduled Sync",
       "noConfig": "No configuration selected.",
-      "projectName": "Project",
+      "pendingFirstSync": "Pending first sync",
       "projectStats": "Project Statistics",
       "title": "Configuration Info",
       "totalIssuesSynced": "Total Issues Synced",
@@ -139,12 +141,14 @@
       "updatedBy": "Updated By"
     },
     "jira": {
+      "credentialsLabel": "Jira Credentials",
       "instructions": {
         "content": "<0><0>Generate RSA key pair using OpenSSL: <2>openssl genrsa -out jira_privatekey.pem 1024</2></0><1>Extract public key: <2>openssl rsa -in jira_privatekey.pem -pubout -out jira_publickey.pem</2></1><2>In Jira: Click Settings (cog icon) → Applications → Application links</2><3>Enter any URL (e.g., <2>http://localhost</2>) and click \"Create new link\"</3><4>Ignore the \"No response was received\" warning and click \"Continue\"</4><5>Enter your Application Name and select \"Create incoming link\"</5><6>In the incoming authentication form, enter your Consumer Key, paste the public key content from <2>jira_publickey.pem</2></6><7>Complete the OAuth 1.0a authorization flow using your consumer key and private key to obtain the access token</7></0><1>Note: This uses OAuth 1.0a with RSA-SHA1 signing. Primarily for Jira Server/Data Center. For Jira Cloud, consider using API tokens or OAuth 2.0 for new integrations.</1>",
         "title": "How to create Jira credentials:"
       }
     },
     "plane": {
+      "credentialsLabel": "Plane Credentials",
       "instructions": {
         "content": "<0><0>Log into your Plane account or self-hosted instance</0><1>Go to Profile Settings</1><2>Select \"Personal Access Tokens\" from the list of tabs</2><3>Click \"Add personal access token\"</3><4>Enter a token name and optional description</4><5>Click \"Generate\" or \"Create\"</5><6>Copy the generated token immediately and store it securely</6></0><1>Note: The token will only be shown once. The token is passed as the value of the <2>X-API-Key</2> header in API requests.</1><2>Workspace: You need to specify your workspace slug, which can be found in your Plane URL. For example, if your Plane URL is <2>https://app.plane.so/my-company</2>, then your workspace slug is <5>my-company</5>. This is required to access projects and issues in your workspace.</2>",
         "title": "How to create Plane credentials:"
@@ -195,7 +199,6 @@
       },
       "projects": {
         "addMapping": "Add mapping",
-        "changeMapping": "Change mapping",
         "confirmRemoveMessage": "Are you sure you want to remove this project mapping? Issues will stop syncing, but existing tags will remain.",
         "confirmRemoveTitle": "Remove Project Mapping",
         "createMapping": "Create Project Mapping",

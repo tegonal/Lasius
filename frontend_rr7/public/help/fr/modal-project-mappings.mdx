@@ -1,94 +1,110 @@
-# Mappages de projets
+# Project Mappings
 
-Liez les projets externes de votre plateforme d'intégration aux projets Lasius. Les problèmes des projets mappés sont automatiquement synchronisés et disponibles en tant qu'étiquettes de suivi du temps.
+Link external projects from your integration platform to Lasius projects. Issues from mapped projects are automatically synced and available as time tracking tags.
 
-## Comprendre la liste
+## Understanding the List
 
-Chaque ligne affiche :
-- **Côté gauche** : Nom et ID du projet externe
-- **Flèche** : Indicateur visuel de mappage
-- **Côté droit** :
-  - Nom du projet Lasius mappé (ou "Non mappé" en gris)
-  - Bouton de menu à trois points
+Each row represents one external project. The row shows:
+- **Left side**: External project name and ID
+- **Right side**: Mapped Lasius projects as badge chips, plus an **Add** button (<Icon name="Plus" />)
 
-## Filtrer les projets
+If no mappings exist yet, the right side is empty.
 
-Utilisez la zone de filtre en haut pour rechercher par nom de projet ou ID. Cliquez sur le X pour effacer.
+## Orphaned Mappings
 
-<Tip>Les projets mappés apparaissent en premier, puis les projets non mappés</Tip>
+If an external project no longer exists on the remote platform (e.g., it was deleted or your token lost access), its row displays a warning icon with "Project no longer available". These orphaned mappings still appear so you can remove them manually.
 
-## Mapper un projet
+## Filtering Projects
 
-1. Cliquez sur le **menu à trois points** du projet que vous souhaitez mapper
-2. Cliquez sur l'**icône crayon** pour ajouter ou modifier le mappage
-3. Sélectionnez un projet Lasius dans la liste déroulante
-4. Configurez les paramètres d'étiquettes (apparaît après la sélection d'un projet)
-5. Cliquez sur **Confirmer** pour enregistrer
+Use the filter box at the top to search by project name or ID. Click the X to clear.
 
-<Tip>La configuration des étiquettes n'est disponible que pour GitHub, GitLab et Plane (pas pour Jira)</Tip>
+<Tip>Mapped projects appear first, then unmapped projects</Tip>
 
-## Configuration des étiquettes
+## Many-to-Many Mapping
 
-Après avoir sélectionné un projet Lasius, configurez les champs de problème à importer en tant qu'étiquettes :
+Mappings are many-to-many. This means:
+- The **same external project** can be mapped to multiple Lasius projects — for example, to give different teams their own view of the same repository
+- The **same Lasius project** can receive issues from multiple external projects — for example, to aggregate work across several repositories
 
-**Champs d'étiquettes à importer** (Sélection multiple, au moins un requis) :
-- Utiliser le titre du problème comme étiquette
-- Utiliser les labels comme étiquettes
-- Utiliser le jalon comme étiquette
-- Utiliser les personnes assignées comme étiquettes (GitHub uniquement)
+Each mapping is independent and has its own tag and filter configuration.
 
-**Filtre de labels** (apparaît si "Utiliser les labels" est sélectionné) :
-- Laisser vide pour importer tous les labels comme étiquettes
-- Sélectionner des labels spécifiques pour n'importer que ceux-là
+## Adding a Mapping
 
-**Filtre de labels des problèmes** :
-- Laisser vide pour importer tous les problèmes
-- Sélectionner des labels pour n'importer que les problèmes avec ces labels
+1. Find the external project row you want to map
+2. Click the **+** button (<Icon name="Plus" />) on the right side of the row
+3. Select a Lasius project from the dropdown
+4. Configure tag settings (see Tag Configuration below)
+5. Click **Confirm** to save
 
-**Filtre d'état des problèmes** :
-- **GitHub/GitLab** : Sélection unique (ouvert ou fermé)
-- **Plane** : Sélection multiple (états de workflow personnalisés)
-- Laisser vide pour importer les problèmes dans tous les états
+The project selector only excludes Lasius projects already mapped to the same external project. The same Lasius project can still be selected for other external project rows.
 
-<Tip>Pour GitHub/GitLab, sélectionnez "ouvert" pour éviter d'encombrer votre liste d'étiquettes avec des problèmes fermés</Tip>
+<Tip>Tag configuration is only available for GitHub, GitLab, and Plane (not Jira)</Tip>
 
-## Modifier un mappage
+## Editing a Mapping
 
-1. Cliquez sur le **menu à trois points** du projet mappé
-2. Cliquez sur l'**icône crayon**
-3. Modifiez le projet Lasius ou les paramètres d'étiquettes
-4. Cliquez sur **Confirmer** pour enregistrer
+Each existing mapping appears as a **badge chip** on the external project row. Click a chip to open its tag configuration and edit it:
 
-## Supprimer un mappage
+1. Click the badge chip for the mapping you want to edit
+2. Adjust the tag settings as needed
+3. Click **Confirm** to save
 
-1. Cliquez sur le **menu à trois points** du projet mappé
-2. Cliquez sur l'**icône corbeille**
-3. Une boîte de dialogue de confirmation apparaît
-4. Cliquez sur **Supprimer** pour confirmer
+## Removing a Mapping
 
-<Tip>La suppression d'un mappage arrête la synchronisation mais ne supprime pas les étiquettes existantes</Tip>
+Click the **×** on a badge chip to remove that mapping:
 
-## Après le mappage
+1. Click the **×** icon on the chip
+2. A confirmation dialog appears
+3. Click **Remove** to confirm
 
-La synchronisation se produit automatiquement :
-- La première synchronisation a lieu lors du prochain intervalle de vérification planifié
-- Les synchronisations suivantes ne récupèrent que les problèmes nouveaux ou mis à jour
-- Vérifiez l'état de santé de l'intégration pour surveiller la progression
+<Tip>Removing a mapping stops syncing but doesn't delete existing tags</Tip>
 
-## Dépannage
+## Tag Configuration
 
-**La liste de projets est vide :**
-- Vérifiez les identifiants d'intégration dans les paramètres
-- Vérifiez que votre compte a accès aux projets sur la plateforme
-- Attendez que le chargement initial soit terminé
+When adding or editing a mapping, configure which issue fields to import as tags:
 
-**Impossible de sélectionner un projet Lasius :**
-- Assurez-vous d'avoir créé au moins un projet dans Lasius
-- Vérifiez que vous avez la permission d'accéder au projet
-- Essayez de fermer et rouvrir la fenêtre modale
+**Tag Fields to Import** (Multi-select, at least one required):
+- Use issue title as tag
+- Use labels as tags
+- Use milestone as tag
+- Use assignees as tags (GitHub only)
 
-**Le mappage s'enregistre mais les étiquettes n'apparaissent pas :**
-- Attendez le prochain cycle de synchronisation (vérifiez l'intervalle de l'intégration)
-- Vérifiez qu'au moins un champ d'étiquette est sélectionné
-- Vérifiez que les problèmes correspondent à votre filtre d'état (tous, ouverts ou fermés)
-- Consultez l'état de santé de l'intégration pour détecter les erreurs
+**Label Filter** (appears if "Use labels" is selected):
+- Leave empty to import all labels as tags
+- Select specific labels to import only those
+
+**Issue Label Filter**:
+- Leave empty to import all issues
+- Select labels to import only issues with those labels
+
+**Issue State Filter**:
+- **GitHub/GitLab**: Single selection (open or closed)
+- **Plane**: Multi-select (custom workflow states)
+- Leave empty to import issues in all states
+
+<Tip>For GitHub/GitLab, select "open" to avoid cluttering your tag list with closed issues</Tip>
+
+## After Mapping
+
+Syncing happens automatically:
+- First sync occurs on the next scheduled check interval
+- Subsequent syncs only fetch new or updated issues
+- Check the integration's health status to monitor progress
+- Use **Refresh all tags** from the integrations list context menu for an immediate sync
+
+## Troubleshooting
+
+**Project list is empty:**
+- Verify integration credentials in settings
+- Check your account has access to projects on the platform
+- Wait for the initial load to complete
+
+**Cannot select a Lasius project:**
+- Ensure you have at least one project created in Lasius
+- Check you have permission to access the project
+- Try closing and reopening the modal
+
+**Mapping saves but tags don't appear:**
+- Wait for the next sync cycle (check the integration's interval)
+- Verify at least one tag field is selected
+- Check issues match your state filter (all, open, or closed)
+- Review the integration's health status for errors

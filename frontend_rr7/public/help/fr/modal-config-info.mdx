@@ -1,0 +1,39 @@
+# Integration Details
+
+This panel shows a full overview of a configured integration, including its current health, project statistics, and audit history.
+
+## Basic Information
+
+- **Name** - Your custom label for this integration
+- **Type** - The platform (GitHub, GitLab, Jira, Plane)
+- **Base URL** - The API endpoint the integration connects to
+- **Check Frequency** - How often Lasius polls for new issues
+
+## Health Status
+
+- **Connectivity** - Whether Lasius can currently reach the platform
+- **Projects Mapped** - Number of external-to-Lasius project mappings configured
+- **Total Issues Synced** - Cumulative count of issues synced across all mappings
+- **Last Successful Sync** - Timestamp of the most recent successful sync
+- **Next Scheduled Sync** - When the next automatic sync will occur
+- **Last Check** - Timestamp of the most recent connectivity check
+- **Current Issues** - Any errors or warnings from the last check
+
+<Note>A failed health check does not mean all syncing has stopped. If the issue is temporary, syncing will resume automatically on the next check cycle.</Note>
+
+## Project Statistics
+
+Each external project mapped through this integration appears as its own section. Inside each section, a table lists the Lasius projects that receive issues from it, showing:
+
+- **Lasius Project** - The destination project in Lasius
+- **Issues** - Total issues synced
+- **Last Sync** - Timestamp of the most recent successful sync
+
+Projects that have not yet completed their first sync show **Pending first sync** in the Last Sync column.
+
+<Note>Each external project appears once as a group header. The Lasius projects mapped to it appear as individual rows within that group, each with its own independent sync state.</Note>
+
+## Audit Information
+
+- **Created** - When this integration was first set up, and by whom
+- **Last Updated** - When the configuration was most recently changed, and by whom

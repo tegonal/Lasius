@@ -17,7 +17,7 @@
  *
  */
 
-import { FolderTree, Info, Pencil, Trash2 } from 'lucide-react'
+import { FolderTree, Info, Pencil, RefreshCw, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
@@ -35,6 +35,7 @@ type Props = {
   configId: string
   onDelete: () => void
   onEdit: () => void
+  onRefreshAllTags: () => void
   onViewInfo: () => void
   onViewMappings: () => void
   projectCount: number
@@ -44,6 +45,7 @@ export const IntegrationConfigItemContext = ({
   configId,
   onDelete,
   onEdit,
+  onRefreshAllTags,
   onViewInfo,
   onViewMappings,
   projectCount,
@@ -69,6 +71,11 @@ export const IntegrationConfigItemContext = ({
   const handleDelete = () => {
     handleCloseAll()
     onDelete()
+  }
+
+  const handleRefreshAllTags = () => {
+    handleCloseAll()
+    onRefreshAllTags()
   }
 
   const hasProjects = projectCount > 0
@@ -126,6 +133,24 @@ export const IntegrationConfigItemContext = ({
               <LucideIcon icon={FolderTree} size={24} />
             </Button>
           </ContextButtonWrapper>
+          {hasProjects && (
+            <ContextButtonWrapper variant="compact">
+              <Button
+                aria-label={t('issueImporters.actions.refreshAllTags', {
+                  defaultValue: 'Refresh all tags',
+                })}
+                fullWidth={false}
+                onClick={handleRefreshAllTags}
+                shape="circle"
+                title={t('issueImporters.actions.refreshAllTags', {
+                  defaultValue: 'Refresh all tags',
+                })}
+                variant="contextIcon"
+              >
+                <LucideIcon icon={RefreshCw} size={24} />
+              </Button>
+            </ContextButtonWrapper>
+          )}
           <ContextButtonWrapper variant="compact">
             {hasProjects ? (
               <div

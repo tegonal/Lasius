@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+137-fd682fb0+20260327-0053
+ * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 import type { RefreshTags202ImporterType } from './refreshTags202ImporterType'
 import type { RefreshTags202Status } from './refreshTags202Status'
@@ -12,6 +12,6 @@ export type RefreshTags202 = {
   status?: RefreshTags202Status
   message?: string
   configId?: string
-  projectId?: string
+  mappingId?: string
   importerType?: RefreshTags202ImporterType
 }

@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+137-fd682fb0+20260327-0053
+ * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
 export * from './createWsTicket200'
@@ -115,6 +115,7 @@ export * from './modelsPlaneProjectMapping'
 export * from './modelsPlaneProjectSettings'
 export * from './modelsPlaneTagConfiguration'
 export * from './modelsProject'
+export * from './modelsProjectMappingId'
 export * from './modelsProjectSyncStats'
 export * from './modelsSimpleTag'
 export * from './modelsSimpleTagType'

@@ -48,6 +48,7 @@ case class GitlabProjectSettings(
 )
 
 case class GitlabProjectMapping(
+    id: ProjectMappingId = ProjectMappingId(),
     projectId: ProjectId,
     settings: GitlabProjectSettings
 )
@@ -74,7 +75,7 @@ case class GitlabConfig(
 
 object GitlabProjectMapping {
   implicit val mappingFormat: Format[GitlabProjectMapping] =
-    Json.format[GitlabProjectMapping]
+    Json.using[Json.WithDefaultValues].format[GitlabProjectMapping]
 }
 
 object GitlabSettings {

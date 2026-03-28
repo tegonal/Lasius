@@ -1,0 +1,16 @@
+# Jira Credentials Setup
+
+## How to set up OAuth 1.0a authentication
+
+1. Generate an RSA key pair using OpenSSL:
+   `openssl genrsa -out jira_privatekey.pem 1024`
+2. Extract the public key:
+   `openssl rsa -in jira_privatekey.pem -pubout -out jira_publickey.pem`
+3. In Jira: Click **Settings** (cog icon) → **Applications** → **Application links**
+4. Enter any URL (e.g., `http://localhost`) and click "Create new link"
+5. Ignore the "No response was received" warning and click "Continue"
+6. Enter your Application Name and select "Create incoming link"
+7. In the incoming authentication form, enter your **Consumer Key** and paste the public key content from `jira_publickey.pem`
+8. Complete the OAuth 1.0a authorization flow using your consumer key and private key to obtain the **access token**
+
+<Note>This uses OAuth 1.0a with RSA-SHA1 signing. Primarily for Jira Server/Data Center. For Jira Cloud, consider using API tokens or OAuth 2.0 for new integrations.</Note>

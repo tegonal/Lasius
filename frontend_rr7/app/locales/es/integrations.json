@@ -31,6 +31,7 @@
       "delete": "Eliminar configuración",
       "deleteDisabled": "No se puede eliminar: primero elimina todas las correspondencias de proyecto",
       "edit": "Editar configuración",
+      "refreshAllTags": "Refresh all tags",
       "refreshTags": "Actualizar etiquetas",
       "update": "Actualizar",
       "viewInfo": "Ver información de configuración",
@@ -124,13 +125,14 @@
       "healthStatus": "Estado de salud",
       "issueDetected": "Issue detected",
       "issuesSynced": "Incidencias",
+      "lasiusProject": "Lasius Project",
       "lastChecked": "Última verificación:",
       "lastSuccessfulSync": "Última sincronización exitosa",
       "lastSync": "Última sincronización",
       "name": "Nombre",
       "nextScheduledSync": "Próxima sincronización programada",
       "noConfig": "Ninguna configuración seleccionada.",
-      "projectName": "Proyecto",
+      "pendingFirstSync": "Pending first sync",
       "projectStats": "Estadísticas del proyecto",
       "title": "Información de configuración",
       "totalIssuesSynced": "Total de incidencias sincronizadas",
@@ -140,12 +142,14 @@
       "updatedBy": "Actualizado por"
     },
     "jira": {
+      "credentialsLabel": "Jira Credentials",
       "instructions": {
         "content": "<0><0>Genera un par de claves RSA usando OpenSSL: <2>openssl genrsa -out jira_privatekey.pem 1024</2></0><1>Extrae la clave pública: <2>openssl rsa -in jira_privatekey.pem -pubout -out jira_publickey.pem</2></1><2>En Jira: Haz clic en Configuración (icono de engranaje) → Applications → Application links</2><3>Introduce cualquier URL (ej., <2>http://localhost</2>) y haz clic en \"Create new link\"</3><4>Ignora la advertencia \"No response was received\" y haz clic en \"Continue\"</4><5>Introduce tu nombre de aplicación y selecciona \"Create incoming link\"</5><6>En el formulario de autenticación entrante, introduce tu Consumer Key y pega el contenido de la clave pública desde <2>jira_publickey.pem</2></6><7>Completa el flujo de autorización OAuth 1.0a usando tu consumer key y clave privada para obtener el token de acceso</7></0><1>Nota: Esto utiliza OAuth 1.0a con firma RSA-SHA1. Principalmente para Jira Server/Data Center. Para Jira Cloud, considera usar tokens API u OAuth 2.0 para nuevas integraciones.</1>",
         "title": "Cómo crear credenciales de Jira:"
       }
     },
     "plane": {
+      "credentialsLabel": "Plane Credentials",
       "instructions": {
         "content": "<0><0>Inicia sesión en tu cuenta de Plane o instancia auto-alojada</0><1>Ve a Configuración del perfil</1><2>Selecciona \"Personal Access Tokens\" de la lista de pestañas</2><3>Haz clic en \"Add personal access token\"</3><4>Introduce un nombre de token y una descripción opcional</4><5>Haz clic en \"Generate\" o \"Create\"</5><6>Copia el token generado inmediatamente y guárdalo de forma segura</6></0><1>Nota: El token solo se mostrará una vez. El token se pasa como valor del encabezado <2>X-API-Key</2> en las solicitudes API.</1><2>Espacio de trabajo: Debes especificar el slug de tu espacio de trabajo, que se encuentra en tu URL de Plane. Por ejemplo, si tu URL de Plane es <2>https://app.plane.so/mi-empresa</2>, entonces tu slug de espacio de trabajo es <5>mi-empresa</5>. Esto es necesario para acceder a proyectos e incidencias en tu espacio de trabajo.</2>",
         "title": "Cómo crear credenciales de Plane:"
@@ -196,7 +200,6 @@
       },
       "projects": {
         "addMapping": "Añadir correspondencia",
-        "changeMapping": "Cambiar correspondencia",
         "confirmRemoveMessage": "¿Estás seguro de que deseas eliminar esta asignación de proyecto? Los problemas dejarán de sincronizarse, pero las etiquetas existentes permanecerán.",
         "confirmRemoveTitle": "Eliminar asignación de proyecto",
         "createMapping": "Crear asignación de proyecto",

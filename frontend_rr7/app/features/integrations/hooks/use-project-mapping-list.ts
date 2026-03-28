@@ -19,12 +19,15 @@
 
 import { useMemo } from 'react'
 
-import { type MappingWithTagConfig } from '~/features/integrations/lib/mapping-helpers'
+import {
+  type MappingsByExternalProject,
+  type MappingWithTagConfig,
+} from '~/features/integrations/lib/mapping-helpers'
 import { type ModelsExternalProject } from '~/services/api/lasius'
 
 type UseProjectMappingListOptions = {
   filterText: string
-  mappings: Record<string, MappingWithTagConfig>
+  mappings: MappingsByExternalProject
   projects: ModelsExternalProject[]
 }
 
@@ -48,12 +51,12 @@ export const useProjectMappingList = ({
     const externalProjectIds = new Set(projects.map((p) => p.id))
     const orphaned: Array<{
       externalId: string
-      mapping: MappingWithTagConfig
+      mappings: MappingWithTagConfig[]
     }> = []
 
-    for (const [externalId, mapping] of Object.entries(mappings)) {
-      if (!externalProjectIds.has(externalId)) {
-        orphaned.push({ externalId, mapping })
+    for (const [externalId, mappingList] of Object.entries(mappings)) {
+      if (!externalProjectIds.has(externalId) && mappingList.length > 0) {
+        orphaned.push({ externalId, mappings: mappingList })
       }
     }
 
@@ -62,8 +65,8 @@ export const useProjectMappingList = ({
 
   const sortedProjects = useMemo(() => {
     return [...filteredProjects].toSorted((a, b) => {
-      const aMapped = !!mappings[a.id]
-      const bMapped = !!mappings[b.id]
+      const aMapped = (mappings[a.id]?.length ?? 0) > 0
+      const bMapped = (mappings[b.id]?.length ?? 0) > 0
 
       if (aMapped && !bMapped) return -1
       if (!aMapped && bMapped) return 1
@@ -71,7 +74,10 @@ export const useProjectMappingList = ({
     })
   }, [filteredProjects, mappings])
 
-  const mappedCount = Object.keys(mappings).length
+  const mappedCount = useMemo(
+    () => Object.values(mappings).reduce((sum, arr) => sum + arr.length, 0),
+    [mappings],
+  )
   const showFilter = projects.length > 10
 
   return {

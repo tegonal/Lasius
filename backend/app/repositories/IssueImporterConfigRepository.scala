@@ -64,12 +64,15 @@ trait IssueImporterConfigRepository
       dbSession: DBSession): Future[IssueImporterConfig]
 
   def updateProjectMapping(id: IssueImporterConfigId,
-                           projectId: ProjectId,
+                           mappingId: ProjectMappingId,
                            mapping: UpdateProjectMapping)(implicit
       dbSession: DBSession): Future[IssueImporterConfig]
 
-  def removeProjectMapping(id: IssueImporterConfigId, projectId: ProjectId)(
-      implicit dbSession: DBSession): Future[IssueImporterConfig]
+  def removeProjectMapping(id: IssueImporterConfigId,
+                           mappingId: ProjectMappingId)(implicit
+      dbSession: DBSession): Future[IssueImporterConfig]
+
+  def migrateProjectMappingIds()(implicit dbSession: DBSession): Future[Int]
 }
 
 class IssueImporterConfigMongoRepository @Inject() (
@@ -304,9 +307,11 @@ class IssueImporterConfigMongoRepository @Inject() (
                 ))
             )
           )
-          // Remove existing mapping for same project if any
-          val filteredProjects =
-            c.projects.filterNot(_.projectId == mapping.projectId)
+          // Remove exact duplicate (same project + same external project) if any
+          val filteredProjects = c.projects.filterNot(p =>
+            p.projectId == mapping.projectId &&
+              p.settings.gitlabProjectId == mapping.gitlabProjectId
+                .getOrElse(""))
           c.copy(projects = filteredProjects :+ gitlabMapping)
 
         case c: JiraConfig =>
@@ -319,8 +324,10 @@ class IssueImporterConfigMongoRepository @Inject() (
               jql = mapping.params
             )
           )
-          val filteredProjects =
-            c.projects.filterNot(_.projectId == mapping.projectId)
+          val filteredProjects = c.projects.filterNot(p =>
+            p.projectId == mapping.projectId &&
+              p.settings.jiraProjectKey == mapping.jiraProjectKey
+                .getOrElse(""))
           c.copy(projects = filteredProjects :+ jiraMapping)
 
         case c: PlaneConfig =>
@@ -338,8 +345,10 @@ class IssueImporterConfigMongoRepository @Inject() (
                 ))
             )
           )
-          val filteredProjects =
-            c.projects.filterNot(_.projectId == mapping.projectId)
+          val filteredProjects = c.projects.filterNot(p =>
+            p.projectId == mapping.projectId &&
+              p.settings.planeProjectId == mapping.planeProjectId
+                .getOrElse(""))
           c.copy(projects = filteredProjects :+ planeMapping)
 
         case c: GithubConfig =>
@@ -359,8 +368,12 @@ class IssueImporterConfigMongoRepository @Inject() (
                 ))
             )
           )
-          val filteredProjects =
-            c.projects.filterNot(_.projectId == mapping.projectId)
+          val filteredProjects = c.projects.filterNot(p =>
+            p.projectId == mapping.projectId &&
+              p.settings.githubRepoOwner == mapping.githubRepoOwner
+                .getOrElse("") &&
+              p.settings.githubRepoName == mapping.githubRepoName
+                .getOrElse(""))
           c.copy(projects = filteredProjects :+ githubMapping)
       }
 
@@ -369,7 +382,7 @@ class IssueImporterConfigMongoRepository @Inject() (
   }
 
   def updateProjectMapping(id: IssueImporterConfigId,
-                           projectId: ProjectId,
+                           mappingId: ProjectMappingId,
                            mapping: UpdateProjectMapping)(implicit
       dbSession: DBSession): Future[IssueImporterConfig] = {
     for {
@@ -379,7 +392,7 @@ class IssueImporterConfigMongoRepository @Inject() (
         case c: GitlabConfig =>
           c.copy(
             projects = c.projects.map {
-              case m if m.projectId == projectId =>
+              case m if m.id == mappingId =>
                 m.copy(
                   settings = m.settings.copy(
                     gitlabProjectId = mapping.gitlabProjectId.getOrElse(
@@ -402,7 +415,7 @@ class IssueImporterConfigMongoRepository @Inject() (
         case c: JiraConfig =>
           c.copy(
             projects = c.projects.map {
-              case m if m.projectId == projectId =>
+              case m if m.id == mappingId =>
                 m.copy(
                   settings = m.settings.copy(
                     jiraProjectKey = mapping.jiraProjectKey.getOrElse(
@@ -421,7 +434,7 @@ class IssueImporterConfigMongoRepository @Inject() (
         case c: PlaneConfig =>
           c.copy(
             projects = c.projects.map {
-              case m if m.projectId == projectId =>
+              case m if m.id == mappingId =>
                 m.copy(
                   settings = m.settings.copy(
                     planeProjectId = mapping.planeProjectId.getOrElse(
@@ -442,7 +455,7 @@ class IssueImporterConfigMongoRepository @Inject() (
         case c: GithubConfig =>
           c.copy(
             projects = c.projects.map {
-              case m if m.projectId == projectId =>
+              case m if m.id == mappingId =>
                 m.copy(
                   settings = m.settings.copy(
                     githubRepoOwner = mapping.githubRepoOwner.getOrElse(
@@ -469,23 +482,47 @@ class IssueImporterConfigMongoRepository @Inject() (
     } yield updated
   }
 
-  def removeProjectMapping(id: IssueImporterConfigId, projectId: ProjectId)(
-      implicit dbSession: DBSession): Future[IssueImporterConfig] = {
+  def removeProjectMapping(id: IssueImporterConfigId,
+                           mappingId: ProjectMappingId)(implicit
+      dbSession: DBSession): Future[IssueImporterConfig] = {
     for {
       config <- findById(id).noneToFailed(s"Config ${id.value} not found")
 
       updated = config match {
         case c: GitlabConfig =>
-          c.copy(projects = c.projects.filterNot(_.projectId == projectId))
+          c.copy(projects = c.projects.filterNot(_.id == mappingId))
         case c: JiraConfig =>
-          c.copy(projects = c.projects.filterNot(_.projectId == projectId))
+          c.copy(projects = c.projects.filterNot(_.id == mappingId))
         case c: PlaneConfig =>
-          c.copy(projects = c.projects.filterNot(_.projectId == projectId))
+          c.copy(projects = c.projects.filterNot(_.id == mappingId))
         case c: GithubConfig =>
-          c.copy(projects = c.projects.filterNot(_.projectId == projectId))
+          c.copy(projects = c.projects.filterNot(_.id == mappingId))
       }
 
       _ <- upsert(updated)
     } yield updated
+  }
+
+  def migrateProjectMappingIds()(implicit dbSession: DBSession): Future[Int] = {
+    // Find configs where any project mapping lacks an "id" field
+    val selector = Json.obj(
+      "projects" -> Json.obj(
+        "$elemMatch" -> Json.obj("id" -> Json.obj("$exists" -> false))
+      )
+    )
+    find(selector).flatMap { configs =>
+      val configSeq = configs.toSeq
+      if (configSeq.isEmpty) {
+        Future.successful(0)
+      } else {
+        // Deserialization already generated default IDs via case class defaults.
+        // Save to persist the auto-generated IDs.
+        Future
+          .traverse(configSeq) { case (config, _) =>
+            upsert(config)
+          }
+          .map(_ => configSeq.size)
+      }
+    }
   }
 }

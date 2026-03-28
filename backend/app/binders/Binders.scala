@@ -417,4 +417,9 @@ object Binders {
       stringBinder: PathBindable[String]): PathBindable[IssueImporterConfigId] =
     uuidBaseIdPathBindable[IssueImporterConfigId](stringBinder,
                                                   IssueImporterConfigId.apply)
+
+  implicit def ProjectMappingIdPathBindable(implicit
+      stringBinder: PathBindable[String]): PathBindable[ProjectMappingId] =
+    uuidBaseIdPathBindable[ProjectMappingId](stringBinder,
+                                             ProjectMappingId.apply)
 }

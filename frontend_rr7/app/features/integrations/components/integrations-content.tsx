@@ -32,6 +32,7 @@ type Props = {
   configs: ModelsIssueImporterConfigResponse[]
   onDelete: (config: ModelsIssueImporterConfigResponse) => void
   onEdit: (config: ModelsIssueImporterConfigResponse) => void
+  onRefreshAllTags: (config: ModelsIssueImporterConfigResponse) => void
   onViewInfo: (config: ModelsIssueImporterConfigResponse) => void
   onViewMappings: (config: ModelsIssueImporterConfigResponse) => void
 }
@@ -40,6 +41,7 @@ export const IntegrationsContent = ({
   configs,
   onDelete,
   onEdit,
+  onRefreshAllTags,
   onViewInfo,
   onViewMappings,
 }: Props) => {
@@ -86,6 +88,7 @@ export const IntegrationsContent = ({
               key={config.id}
               onDelete={onDelete}
               onEdit={onEdit}
+              onRefreshAllTags={onRefreshAllTags}
               onViewInfo={onViewInfo}
               onViewMappings={onViewMappings}
             />

@@ -31,6 +31,7 @@
       "delete": "Supprimer la configuration",
       "deleteDisabled": "Impossible de supprimer : supprimez d'abord toutes les correspondances de projet",
       "edit": "Modifier la configuration",
+      "refreshAllTags": "Refresh all tags",
       "refreshTags": "Actualiser les étiquettes",
       "update": "Mettre à jour",
       "viewInfo": "Voir les informations de configuration",
@@ -124,13 +125,14 @@
       "healthStatus": "État de santé",
       "issueDetected": "Issue detected",
       "issuesSynced": "Tickets",
+      "lasiusProject": "Lasius Project",
       "lastChecked": "Dernière vérification :",
       "lastSuccessfulSync": "Dernière synchronisation réussie",
       "lastSync": "Dernière synchronisation",
       "name": "Nom",
       "nextScheduledSync": "Prochaine synchronisation programmée",
       "noConfig": "Aucune configuration sélectionnée.",
-      "projectName": "Projet",
+      "pendingFirstSync": "Pending first sync",
       "projectStats": "Statistiques du projet",
       "title": "Informations de configuration",
       "totalIssuesSynced": "Total de tickets synchronisés",
@@ -140,12 +142,14 @@
       "updatedBy": "Mis à jour par"
     },
     "jira": {
+      "credentialsLabel": "Jira Credentials",
       "instructions": {
         "content": "<0><1>Génère une paire de clés RSA avec OpenSSL : <2>openssl genrsa -out jira_privatekey.pem 1024</2></1><1>Extrait la clé publique : <2>openssl rsa -in jira_privatekey.pem -pubout -out jira_publickey.pem</2></1><1>Dans Jira : Clique sur Paramètres (icône d'engrenage) → Applications → Application links</1><1>Saisis n'importe quelle URL (par ex., <2>http://localhost</2>) et clique sur \"Create new link\"</1><1>Ignore l'avertissement \"No response was received\" et clique sur \"Continue\"</1><1>Saisis ton nom d'application et sélectionne \"Create incoming link\"</1><1>Dans le formulaire d'authentification entrante, saisis ta clé de consommateur et colle le contenu de la clé publique depuis <2>jira_publickey.pem</2></1><1>Complète le flux d'autorisation OAuth 1.0a en utilisant ta clé de consommateur et ta clé privée pour obtenir le jeton d'accès</1></0><3>Note : Cela utilise OAuth 1.0a avec signature RSA-SHA1. Principalement pour Jira Server/Data Center. Pour Jira Cloud, envisage d'utiliser des jetons API ou OAuth 2.0 pour les nouvelles intégrations.</3>",
         "title": "Comment créer des identifiants Jira :"
       }
     },
     "plane": {
+      "credentialsLabel": "Plane Credentials",
       "instructions": {
         "content": "<0><1>Connecte-toi à ton compte Plane ou à ton instance auto-hébergée</1><1>Va dans les paramètres du profil</1><1>Sélectionne \"Personal Access Tokens\" dans la liste des onglets</1><1>Clique sur \"Add personal access token\"</1><1>Saisis un nom de jeton et une description optionnelle</1><1>Clique sur \"Generate\" ou \"Create\"</1><1>Copie le jeton généré immédiatement et stocke-le en toute sécurité</1></0><3>Note : Le jeton ne sera affiché qu'une seule fois. Le jeton est transmis en tant que valeur de l'en-tête <2>X-API-Key</2> dans les requêtes API.</3><3>Espace de travail : Tu dois spécifier le slug de ton espace de travail, qui se trouve dans ton URL Plane. Par exemple, si ton URL Plane est <2>https://app.plane.so/ma-societe</2>, alors ton slug d'espace de travail est <2>ma-societe</2>. Ceci est nécessaire pour accéder aux projets et tickets de ton espace de travail.</3>",
         "title": "Comment créer des identifiants Plane :"
@@ -196,7 +200,6 @@
       },
       "projects": {
         "addMapping": "Ajouter une correspondance",
-        "changeMapping": "Modifier la correspondance",
         "confirmRemoveMessage": "Êtes-vous sûr de vouloir supprimer ce mappage de projet ? Les problèmes ne seront plus synchronisés, mais les étiquettes existantes resteront.",
         "confirmRemoveTitle": "Supprimer le mappage de projet",
         "createMapping": "Créer un mappage de projet",

@@ -3,11 +3,13 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+137-fd682fb0+20260327-0053
+ * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 import type { ModelsGithubProjectSettings } from './modelsGithubProjectSettings'
+import type { ModelsProjectMappingId } from './modelsProjectMappingId'
 
 export interface ModelsGithubProjectMapping {
+  id: ModelsProjectMappingId
   projectId: string
   settings: ModelsGithubProjectSettings
 }

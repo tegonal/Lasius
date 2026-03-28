@@ -47,6 +47,7 @@ case class PlaneProjectSettings(
 )
 
 case class PlaneProjectMapping(
+    id: ProjectMappingId = ProjectMappingId(),
     projectId: ProjectId,
     settings: PlaneProjectSettings
 )
@@ -75,7 +76,7 @@ case class PlaneConfig(
 
 object PlaneProjectMapping {
   implicit val mappingFormat: Format[PlaneProjectMapping] =
-    Json.format[PlaneProjectMapping]
+    Json.using[Json.WithDefaultValues].format[PlaneProjectMapping]
 }
 
 object PlaneSettings {

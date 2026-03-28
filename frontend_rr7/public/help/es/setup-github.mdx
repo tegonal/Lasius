@@ -1,0 +1,16 @@
+# GitHub Credentials Setup
+
+## How to create a fine-grained personal access token
+
+1. Verify your email address on GitHub
+2. Go to **Settings** → **Developer settings** → **Personal access tokens** → **Fine-grained tokens**
+3. Click "Generate new token"
+4. Enter a token name and select an expiration date
+5. Choose a **resource owner** (your user account or an organization you have access to)
+6. Select **repository access** (all repositories or only select repositories)
+7. Under **Repository permissions**, set `Issues` to "Read-only" and `Metadata` to "Read-only"
+8. Click "Generate token" and copy it immediately
+
+<Warning>Fine-grained tokens are required (not classic tokens). The resource owner you select determines which repositories you can access. For organization repositories, you may need organization owner approval.</Warning>
+
+<Tip>Make sure to select the same resource owner in the configuration form that matches the token you created</Tip>

@@ -50,6 +50,7 @@ case class GithubProjectSettings(
 )
 
 case class GithubProjectMapping(
+    id: ProjectMappingId = ProjectMappingId(),
     projectId: ProjectId,
     settings: GithubProjectSettings
 )
@@ -80,7 +81,7 @@ case class GithubConfig(
 
 object GithubProjectMapping {
   implicit val mappingFormat: Format[GithubProjectMapping] =
-    Json.format[GithubProjectMapping]
+    Json.using[Json.WithDefaultValues].format[GithubProjectMapping]
 }
 
 object GithubSettings {

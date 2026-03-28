@@ -7,10 +7,8 @@ Configure connections to external project management platforms (GitHub, GitLab, 
 1. Enter a **Configuration Name** to identify this integration (e.g., "Company GitLab")
 2. Enter the **Base URL** for your platform instance
 3. Enter your **Access Token** or authentication credentials
-4. Set the **Check Interval** (how often to check for new issues)
+4. Set the **Check Interval** — a freeform duration input specifying how often to check for new issues (minimum 5 minutes)
 5. Click **Create** to save
-
-<Tip>The right column shows step-by-step instructions for generating tokens on your platform</Tip>
 
 ## Editing an Integration
 
@@ -30,12 +28,53 @@ When editing, credential fields show placeholder text to indicate they're option
 
 ## Check Interval
 
-This controls how often Lasius fetches new issues from your platform.
+This controls how often Lasius fetches new issues from your platform. Enter any duration of 5 minutes or longer (e.g., "10 minutes", "1 hour"). Shorter intervals give you faster updates but make more API calls; longer intervals reduce load on the external platform.
 
-**Recommended settings:**
-- **5 minutes**: For active teams with frequent updates
-- **15 minutes**: For most teams (good balance)
-- **30 minutes**: For smaller teams or to reduce API calls
+## Getting Credentials
+
+### GitHub
+
+Use a fine-grained personal access token:
+
+1. Go to **Settings** → **Developer settings** → **Personal access tokens** → **Fine-grained tokens**
+2. Click **Generate new token**
+3. Under **Repository permissions**, set **Issues** to Read-only and **Metadata** to Read-only
+4. Under **Resource owner**, select the user or organization that owns the repositories you want to sync
+5. Click **Generate token** and copy the value
+
+<Note>If the resource owner is an organization, the organization may require approval before the token becomes active. Check your organization's settings if the token does not work immediately.</Note>
+
+After entering the token, select the resource owner from the dropdown that appears in the form.
+
+### GitLab
+
+Use a personal access token with the `read_api` scope:
+
+1. Go to your GitLab profile → **Access Tokens**
+2. Create a new token with the **read_api** scope
+3. Copy the token value and paste it into the Access Token field
+
+Works with GitLab.com or any self-hosted GitLab instance. Set the **Base URL** to your instance root (e.g., `https://gitlab.example.com`).
+
+### Jira
+
+Jira uses OAuth 1.0a with RSA keys. You need three values: a consumer key, a private key, and an access token.
+
+1. In Jira, go to **Settings** → **Applications** → **Application Links** and create a new link pointing to your Lasius instance
+2. Configure the incoming authentication with your consumer key and RSA public key
+3. Authorize the link to generate an access token
+4. Paste the consumer key, private key (PEM format), and access token into the corresponding fields
+
+<Note>The private key field expects the full PEM block including the header and footer lines.</Note>
+
+### Plane
+
+Use a personal API key:
+
+1. In Plane, go to **Profile Settings** → **Personal Access Tokens**
+2. Create a new token and copy it
+3. Find your workspace slug in the Plane URL (e.g., `my-workspace` from `app.plane.so/my-workspace/`)
+4. Enter both the API key and workspace slug in the form
 
 ## Platform-Specific Notes
 
@@ -49,18 +88,18 @@ This controls how often Lasius fetches new issues from your platform.
 
 **Jira:**
 - Requires OAuth consumer key, private key, and access token
-- Follow the right-column instructions carefully for OAuth setup
 
 **Plane:**
-- Get your API key from Plane workspace settings
+- Get your API key from Profile Settings → Personal Access Tokens
 
 ## After Creating
 
-Once created, you need to:
-1. Go back to the integrations list
-2. Open the context menu for your integration
-3. Select **Map Projects** to link projects
-4. Configure which issues to sync as tags
+When using the **wizard**, project mapping is handled in step 4 — you do not need to return to the integrations list.
+
+When using the **edit modal** to update an existing integration, manage project mappings via the context menu on the integrations list:
+1. Open the context menu for your integration
+2. Select **View project mappings** to link or update projects
+3. Configure which issues to sync as tags
 
 ## Troubleshooting
 

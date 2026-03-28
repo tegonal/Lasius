@@ -1,47 +1,56 @@
-# Integraciones
+# Integrations
 
-Conecta Lasius con sistemas externos de seguimiento de problemas como GitHub, GitLab, Jira y Plane. Importa automáticamente problemas como etiquetas para optimizar tu flujo de trabajo de seguimiento de tiempo.
+Connect Lasius with external issue tracking systems like GitHub, GitLab, Jira, and Plane. Automatically import issues as tags to streamline your time tracking workflow.
 
-## Lo que puedes hacer
+## What You Can Do
 
-### Ver estadísticas de integración
-En la parte superior de la página, consulta el número total de integraciones configuradas en tu organización.
+### View Integration Statistics
+At the top of the page, see the total number of configured integrations in your organization.
 
-### Explorar integraciones activas
-Visualiza todas las integraciones configuradas en una tabla que muestra:
-- **Tipo** - La plataforma (GitHub, GitLab, Jira, Plane)
-- **Nombre** - Tu nombre personalizado para esta integración
-- **URL base** - El endpoint de la API utilizado
-- **Proyectos** - Número de proyectos que utilizan esta integración
+### Browse Active Integrations
+View all configured integrations in a table showing:
+- **Type** - The platform (GitHub, GitLab, Jira, Plane)
+- **Name** - Your custom name for this integration
+- **Base URL** - The API endpoint being used
+- **Projects** - Number of project mappings
 
-### Agregar nuevas integraciones
-Haz clic en **Agregar configuración** en la esquina superior derecha para configurar una nueva integración. Sigue el asistente para:
-1. Seleccionar el tipo de plataforma
-2. Introducir detalles de conexión y credenciales
-3. Probar la conexión
-4. Mapear proyectos externos a proyectos de Lasius
-5. Configurar los ajustes de importación de etiquetas
+### Add New Integrations
+Click **Add Configuration** in the top right to set up a new integration. Follow the wizard to:
+1. Select the platform type
+2. Enter connection details and credentials
+3. Test the connection
+4. Map external projects to Lasius projects and configure tag import settings
 
-### Gestionar integraciones
-Haz clic en el menú contextual (<Icon name="EllipsisVertical" />) de cualquier integración para:
-- **Ver información de configuración** - Ver configuración de conexión detallada y estado
-- **Editar configuración** - Actualizar credenciales, URL u otros ajustes
-- **Ver asignaciones de proyectos** - Ver y modificar qué proyectos externos se sincronizan con qué proyectos de Lasius
-- **Eliminar configuración** - Eliminar la integración (detiene la sincronización de etiquetas)
+### Manage Integrations
+Click the context menu (<Icon name="EllipsisVertical" />) on any integration to:
+- **View configuration info** - See detailed connection settings and status
+- **Edit configuration** - Update credentials, URL, or other settings
+- **View project mappings** - See and modify which external projects sync to which Lasius projects. Each mapped Lasius project appears as a clickable badge chip â€” click a chip to edit its tag configuration, or click the Ã— to remove the mapping
+- **Refresh all tags** - Trigger an immediate refresh of all project mappings in this integration, without waiting for the next scheduled check. This option only appears when the integration has at least one project mapping
+- **Delete configuration** - Remove the integration (stops syncing tags). The delete button is disabled when project mappings exist â€” remove all mappings first before deleting
 
-### Sincronización automática de etiquetas
-Una vez configurado, Lasius importa automáticamente problemas de tus plataformas externas como etiquetas. Los miembros del equipo pueden seleccionar estas etiquetas al hacer seguimiento del tiempo, creando una conexión directa entre las entradas de tiempo y los elementos de trabajo externos.
+### Many-to-Many Project Mapping
 
-## Consejos
+Mappings between external projects and Lasius projects are many-to-many:
 
-<Tip>Comienza con una única asignación de proyecto para probar tu integración antes de expandirla a todos los proyectos</Tip>
+- One external project can sync to **multiple Lasius projects** â€” useful when different teams track time against the same repository
+- One Lasius project can receive issues from **multiple external projects** â€” useful when aggregating work from several repositories or platforms
 
-<Tip>Usa nombres significativos para tus integraciones si tienes múltiples instancias de la misma plataforma</Tip>
+Each mapping is independent and has its own tag and filter configuration.
 
-<Tip>Las etiquetas se sincronizan automáticamente - no se necesita importación manual una vez configuradas</Tip>
+### Automatic Tag Syncing
+Once configured, Lasius automatically imports issues from your external platforms as tags. Team members can then select these tags when tracking time, creating a direct connection between time entries and external work items.
 
-<Tip>Cada integración puede asignarse a múltiples proyectos de Lasius, permitiendo estructuras organizativas flexibles</Tip>
+## Tips
 
-<Tip>Si una integración muestra problemas de conectividad, consulta la información de configuración para mensajes de error detallados</Tip>
+<Tip>Start with a single project mapping to test your integration before expanding to all projects</Tip>
 
-<Tip>Eliminar una integración no eliminará las etiquetas existentes - solo detiene la sincronización futura</Tip>
+<Tip>Use meaningful names for your integrations if you have multiple instances of the same platform</Tip>
+
+<Tip>Tags are automatically synced - no manual imports needed once configured. Use Refresh all tags for an immediate update</Tip>
+
+<Tip>Map the same external project to multiple Lasius projects to give different teams their own view of the same issues</Tip>
+
+<Tip>If an integration shows connectivity issues, check the configuration info for detailed error messages</Tip>
+
+<Tip>Deleting an integration won't delete existing tags - only stops future syncing</Tip>

@@ -31,7 +31,7 @@ import { z } from 'zod'
 import { Input } from '~/components/primitives/inputs/input'
 import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { DurationInput } from '~/components/ui/forms/input/duration-input'
-import { ProviderInstructions } from '~/features/integrations/components/shared/provider-instructions'
+import { ModalHelpButton } from '~/features/help/components/help-button'
 import { useGithubResourceOwners } from '~/features/integrations/hooks/use-github-resource-owners'
 import { type WizardFormData } from '~/features/integrations/hooks/use-wizard-state'
 import { createConfigSchema } from '~/features/integrations/lib/config-schemas'
@@ -196,11 +196,14 @@ export const ConfigFormStep = ({
           {/* GitHub / GitLab: Access Token */}
           {(importerType === 'github' || importerType === 'gitlab') && (
             <fieldset className="fieldset">
-              <label className="label" htmlFor={fields.accessToken.id}>
-                {t('issueImporters.fields.accessToken', {
-                  defaultValue: 'Access Token',
-                })}
-              </label>
+              <div className="flex items-center gap-1">
+                <label className="label" htmlFor={fields.accessToken.id}>
+                  {t('issueImporters.fields.accessToken', {
+                    defaultValue: 'Access Token',
+                  })}
+                </label>
+                <ModalHelpButton helpKey={`setup-${importerType}`} />
+              </div>
               <input
                 name={fields.accessToken.name}
                 type="hidden"
@@ -303,11 +306,14 @@ export const ConfigFormStep = ({
           {importerType === 'jira' && (
             <>
               <fieldset className="fieldset">
-                <label className="label" htmlFor={fields.consumerKey.id}>
-                  {t('issueImporters.fields.consumerKey', {
-                    defaultValue: 'OAuth Consumer Key',
-                  })}
-                </label>
+                <div className="flex items-center gap-1">
+                  <label className="label" htmlFor={fields.consumerKey.id}>
+                    {t('issueImporters.fields.consumerKey', {
+                      defaultValue: 'OAuth Consumer Key',
+                    })}
+                  </label>
+                  <ModalHelpButton helpKey="setup-jira" />
+                </div>
                 <Input
                   {...getInputProps(fields.consumerKey, { type: 'text' })}
                   key={fields.consumerKey.key}
@@ -371,11 +377,14 @@ export const ConfigFormStep = ({
           {importerType === 'plane' && (
             <>
               <fieldset className="fieldset">
-                <label className="label" htmlFor={fields.apiKey.id}>
-                  {t('issueImporters.fields.apiKey', {
-                    defaultValue: 'API Key',
-                  })}
-                </label>
+                <div className="flex items-center gap-1">
+                  <label className="label" htmlFor={fields.apiKey.id}>
+                    {t('issueImporters.fields.apiKey', {
+                      defaultValue: 'API Key',
+                    })}
+                  </label>
+                  <ModalHelpButton helpKey="setup-plane" />
+                </div>
                 <Input
                   {...getInputProps(fields.apiKey, { type: 'password' })}
                   autoComplete="off"
@@ -442,11 +451,6 @@ export const ConfigFormStep = ({
             </p>
           </fieldset>
         </form>
-
-        {/* Right column: Platform-specific instructions */}
-        <div className="hidden md:block">
-          <ProviderInstructions importerType={importerType} />
-        </div>
       </div>
     </div>
   )

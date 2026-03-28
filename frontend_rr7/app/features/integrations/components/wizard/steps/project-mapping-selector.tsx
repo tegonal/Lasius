@@ -46,6 +46,7 @@ const mappingSchema = z.object({
 })
 
 type Props = {
+  excludeProjectIds?: string[]
   existingTagConfig?: TagConfiguration
   externalProject: ModelsExternalProject
   importerType: ImporterType
@@ -59,6 +60,7 @@ type Props = {
 }
 
 export const ProjectMappingSelector = ({
+  excludeProjectIds,
   existingTagConfig,
   externalProject,
   importerType,
@@ -88,9 +90,16 @@ export const ProjectMappingSelector = ({
   const projectIdControl = useInputControl(fields.projectId)
 
   // Build suggestions in the format InputSelectAutocomplete expects
+  // Filter out already-mapped projects (unless editing the current one)
   const suggestions = useMemo(
-    () => lasiusProjects.map((p) => ({ id: p.id, key: p.key })),
-    [lasiusProjects],
+    () =>
+      lasiusProjects
+        .filter(
+          (p) =>
+            !excludeProjectIds?.includes(p.id) || p.id === selectedProjectId,
+        )
+        .map((p) => ({ id: p.id, key: p.key })),
+    [lasiusProjects, excludeProjectIds, selectedProjectId],
   )
 
   const selectedItem = useMemo(

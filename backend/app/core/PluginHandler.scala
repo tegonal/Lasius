@@ -63,17 +63,17 @@ object PluginHandler {
 
   case class RefreshProjectTags(importerType: ImporterType,
                                 configId: IssueImporterConfigId,
-                                projectId: ProjectId)
+                                mappingId: ProjectMappingId)
 
   case class StartProjectScheduler(importerType: ImporterType,
                                    config: IssueImporterConfig,
-                                   projectId: ProjectId)
+                                   mappingId: ProjectMappingId)
 
   case class StartConfigSchedulers(config: IssueImporterConfig)
 
   case class StopProjectScheduler(importerType: ImporterType,
                                   configId: IssueImporterConfigId,
-                                  projectId: ProjectId)
+                                  mappingId: ProjectMappingId)
 
   case class StopConfigSchedulers(importerType: ImporterType,
                                   configId: IssueImporterConfigId)
@@ -117,32 +117,32 @@ class PluginHandler(
       }
     case Shutdown =>
 
-    case RefreshProjectTags(importerType, configId, projectId) =>
+    case RefreshProjectTags(importerType, configId, mappingId) =>
       log.debug(
-        s"RefreshProjectTags: type=$importerType, configId=$configId, projectId=$projectId")
+        s"RefreshProjectTags: type=$importerType, configId=$configId, mappingId=$mappingId")
       importerType match {
         case ImporterType.Gitlab =>
           gitlabTagParseScheduler ! GitlabTagParseScheduler.RefreshTags(
             configId,
-            projectId)
+            mappingId)
         case ImporterType.Jira =>
           jiraTagParseScheduler ! JiraTagParseScheduler.RefreshTags(configId,
-                                                                    projectId)
+                                                                    mappingId)
         case ImporterType.Plane =>
           planeTagParseScheduler ! PlaneTagParseScheduler.RefreshTags(configId,
-                                                                      projectId)
+                                                                      mappingId)
         case ImporterType.Github =>
           githubTagParseScheduler ! GithubTagParseScheduler.RefreshTags(
             configId,
-            projectId)
+            mappingId)
       }
 
-    case StartProjectScheduler(importerType, config, projectId) =>
+    case StartProjectScheduler(importerType, config, mappingId) =>
       log.debug(
-        s"StartProjectScheduler: type=$importerType, configId=${config.id}, projectId=$projectId")
+        s"StartProjectScheduler: type=$importerType, configId=${config.id}, mappingId=$mappingId")
       config match {
         case c: GitlabConfig =>
-          c.projects.find(_.projectId == projectId).foreach { proj =>
+          c.projects.find(_.id == mappingId).foreach { proj =>
             val serviceConfig = ServiceConfiguration(c.baseUrl.toString)
             val auth          = OAuth2Authentication(c.auth.accessToken)
             gitlabTagParseScheduler ! GitlabTagParseScheduler.StartScheduler(
@@ -152,11 +152,12 @@ class PluginHandler(
               auth,
               c.id,
               c.organisationReference.id,
+              proj.id,
               proj.projectId
             )
           }
         case c: JiraConfig =>
-          c.projects.find(_.projectId == projectId).foreach { proj =>
+          c.projects.find(_.id == mappingId).foreach { proj =>
             val serviceConfig = ServiceConfiguration(c.baseUrl.toString)
             val auth          = OAuth2Authentication(c.auth.accessToken)
             jiraTagParseScheduler ! JiraTagParseScheduler.StartScheduler(
@@ -166,11 +167,12 @@ class PluginHandler(
               auth,
               c.id,
               c.organisationReference.id,
+              proj.id,
               proj.projectId
             )
           }
         case c: PlaneConfig =>
-          c.projects.find(_.projectId == projectId).foreach { proj =>
+          c.projects.find(_.id == mappingId).foreach { proj =>
             val serviceConfig = ServiceConfiguration(c.baseUrl.toString)
             val auth          = ApiKeyAuthentication(c.auth.apiKey)
             planeTagParseScheduler ! PlaneTagParseScheduler.StartScheduler(
@@ -181,11 +183,12 @@ class PluginHandler(
               auth,
               c.id,
               c.organisationReference.id,
+              proj.id,
               proj.projectId
             )
           }
         case c: GithubConfig =>
-          c.projects.find(_.projectId == projectId).foreach { proj =>
+          c.projects.find(_.id == mappingId).foreach { proj =>
             val serviceConfig = ServiceConfiguration(c.baseUrl.toString)
             val auth          = OAuth2Authentication(c.auth.accessToken)
             githubTagParseScheduler ! GithubTagParseScheduler.StartScheduler(
@@ -195,6 +198,7 @@ class PluginHandler(
               auth,
               c.id,
               c.organisationReference.id,
+              proj.id,
               proj.projectId
             )
           }
@@ -215,6 +219,7 @@ class PluginHandler(
               auth,
               c.id,
               c.organisationReference.id,
+              proj.id,
               proj.projectId
             )
           }
@@ -229,6 +234,7 @@ class PluginHandler(
               auth,
               c.id,
               c.organisationReference.id,
+              proj.id,
               proj.projectId
             )
           }
@@ -244,6 +250,7 @@ class PluginHandler(
               auth,
               c.id,
               c.organisationReference.id,
+              proj.id,
               proj.projectId
             )
           }
@@ -258,42 +265,47 @@ class PluginHandler(
               auth,
               c.id,
               c.organisationReference.id,
+              proj.id,
               proj.projectId
             )
           }
       }
 
-    case StopProjectScheduler(importerType, configId, projectId) =>
+    case StopProjectScheduler(importerType, configId, mappingId) =>
       log.debug(
-        s"StopProjectScheduler: type=$importerType, configId=$configId, projectId=$projectId")
+        s"StopProjectScheduler: type=$importerType, configId=$configId, mappingId=$mappingId")
       importerType match {
         case ImporterType.Gitlab =>
           gitlabTagParseScheduler ! GitlabTagParseScheduler
-            .StopProjectScheduler(configId, projectId)
+            .StopProjectScheduler(configId, mappingId)
         case ImporterType.Jira =>
           jiraTagParseScheduler ! JiraTagParseScheduler.StopProjectScheduler(
             configId,
-            projectId)
+            mappingId)
         case ImporterType.Plane =>
           planeTagParseScheduler ! PlaneTagParseScheduler.StopProjectScheduler(
             configId,
-            projectId)
+            mappingId)
         case ImporterType.Github =>
           githubTagParseScheduler ! GithubTagParseScheduler
-            .StopProjectScheduler(configId, projectId)
+            .StopProjectScheduler(configId, mappingId)
       }
 
     case StopConfigSchedulers(importerType, configId) =>
       log.debug(s"StopConfigSchedulers: type=$importerType, configId=$configId")
       importerType match {
         case ImporterType.Gitlab =>
-          gitlabTagParseScheduler ! GitlabTagParseScheduler.StopAllSchedulers
+          gitlabTagParseScheduler ! GitlabTagParseScheduler
+            .StopConfigWorkers(configId)
         case ImporterType.Jira =>
-          jiraTagParseScheduler ! JiraTagParseScheduler.StopAllSchedulers
+          jiraTagParseScheduler ! JiraTagParseScheduler.StopConfigWorkers(
+            configId)
         case ImporterType.Plane =>
-          planeTagParseScheduler ! PlaneTagParseScheduler.StopAllSchedulers
+          planeTagParseScheduler ! PlaneTagParseScheduler.StopConfigWorkers(
+            configId)
         case ImporterType.Github =>
-          githubTagParseScheduler ! GithubTagParseScheduler.StopAllSchedulers
+          githubTagParseScheduler ! GithubTagParseScheduler
+            .StopConfigWorkers(configId)
       }
 
     case msg if msg.getClass.getSimpleName == "SchedulerStarted" =>
@@ -306,6 +318,22 @@ class PluginHandler(
 
   def initialize()(implicit dbSession: DBSession): Unit = {
     initializeUserViews()
+    // Migrate existing project mappings to have ProjectMappingId before starting schedulers.
+    // Schedulers must wait for migration to complete so that mapping IDs are stable.
+    issueImporterConfigRepository.migrateProjectMappingIds().onComplete {
+      case Success(count) =>
+        if (count > 0)
+          log.info(s"Migrated $count configs with missing ProjectMappingIds")
+        initializePlugins()
+      case Failure(exception) =>
+        log.warning(
+          exception,
+          "Failed migrating ProjectMappingIds - continuing with initialization")
+        initializePlugins()
+    }
+  }
+
+  private def initializePlugins()(implicit dbSession: DBSession): Unit = {
     initializeGitlabPlugin()
     initializeJiraPlugin()
     initializePlanePlugin()
@@ -347,6 +375,7 @@ class PluginHandler(
                 auth,
                 config.id,
                 config.organisationReference.id,
+                proj.id,
                 proj.projectId)
             }
           case _ =>
@@ -387,6 +416,7 @@ class PluginHandler(
                 auth,
                 config.id,
                 config.organisationReference.id,
+                proj.id,
                 proj.projectId)
             }
           case _ =>
@@ -428,6 +458,7 @@ class PluginHandler(
                 auth,
                 config.id,
                 config.organisationReference.id,
+                proj.id,
                 proj.projectId)
             }
           case _ =>
@@ -468,6 +499,7 @@ class PluginHandler(
                 auth,
                 config.id,
                 config.organisationReference.id,
+                proj.id,
                 proj.projectId)
             }
           case _ =>

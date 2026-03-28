@@ -17,15 +17,13 @@
  *
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Heading } from '~/components/primitives/typography/heading'
 import { ProjectMappingDataList } from '~/features/integrations/components/shared/project-mapping-data-list'
-import {
-  type MappingWithTagConfig,
-  type TagConfiguration,
-} from '~/features/integrations/lib/mapping-helpers'
+import { useMappingState } from '~/features/integrations/hooks/use-mapping-state'
+import { type MappingsByExternalProject } from '~/features/integrations/lib/mapping-helpers'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 import {
   type ModelsExternalProject,
@@ -37,7 +35,7 @@ import { useListProjects } from '~/services/api/lasius-hooks/issue-importers/iss
 type Props = {
   configId: ModelsIssueImporterConfigId
   importerType: ImporterType
-  onMappingsChange: (mappings: Record<string, MappingWithTagConfig>) => void
+  onMappingsChange: (mappings: MappingsByExternalProject) => void
   onProjectsLoaded?: (projects: ModelsExternalProject[]) => void
   orgId: string
 }
@@ -50,9 +48,7 @@ export const ListProjectsStep = ({
   orgId,
 }: Props) => {
   const { t } = useTranslation('integrations')
-  const [mappings, setMappings] = useState<
-    Record<string, MappingWithTagConfig>
-  >({})
+  const { mappings, removeMapping, upsertMapping } = useMappingState()
 
   const [projects, setProjects] = useState<ModelsExternalProject[]>([])
   const [fetchError, setFetchError] = useState<null | string>(null)
@@ -99,28 +95,6 @@ export const ListProjectsStep = ({
     onMappingsChangeRef.current(mappings)
   }, [mappings])
 
-  const handleMappingChange = useCallback(
-    (
-      externalProjectId: string,
-      lasiusProjectId: null | string,
-      tagConfig: TagConfiguration | undefined,
-    ) => {
-      setMappings((prev) => {
-        const updated = { ...prev }
-        if (lasiusProjectId) {
-          updated[externalProjectId] = {
-            projectId: lasiusProjectId,
-            tagConfig,
-          }
-        } else {
-          delete updated[externalProjectId]
-        }
-        return updated
-      })
-    },
-    [],
-  )
-
   return (
     <div className="flex min-h-0 flex-1 grow flex-col">
       <Heading variant="section">
@@ -134,7 +108,8 @@ export const ListProjectsStep = ({
         isError={isError || !!fetchError}
         isLoading={isLoading}
         mappings={mappings}
-        onMappingChange={handleMappingChange}
+        onMappingRemove={removeMapping}
+        onMappingUpsert={upsertMapping}
         projects={projects}
       />
     </div>

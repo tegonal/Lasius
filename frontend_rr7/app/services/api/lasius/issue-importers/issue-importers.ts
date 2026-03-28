@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+137-fd682fb0+20260327-0053
+ * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 import type {
   DeleteConfig400,
@@ -17,6 +17,7 @@ import type {
   ModelsIssueImporterConfigId,
   ModelsIssueImporterConfigResponse,
   ModelsListProjectsResponse,
+  ModelsProjectMappingId,
   ModelsUpdateIssueImporterConfig,
   ModelsUpdateProjectMapping,
   RefreshTags202,
@@ -659,19 +660,19 @@ export type refreshTagsResponse =
 export const getRefreshTagsUrl = (
   orgId: string,
   configId: ModelsIssueImporterConfigId,
-  projectId: string,
+  mappingId: ModelsProjectMappingId,
 ) => {
-  return `/organisations/${orgId}/issue-importers/${configId}/projects/${projectId}/refresh-tags`
+  return `/organisations/${orgId}/issue-importers/${configId}/projects/${mappingId}/refresh-tags`
 }
 
 export const refreshTags = async (
   orgId: string,
   configId: ModelsIssueImporterConfigId,
-  projectId: string,
+  mappingId: ModelsProjectMappingId,
   options?: RequestInit,
 ): Promise<refreshTagsResponse> => {
   return lasiusFetch<refreshTagsResponse>(
-    getRefreshTagsUrl(orgId, configId, projectId),
+    getRefreshTagsUrl(orgId, configId, mappingId),
     {
       ...options,
       method: 'POST',
@@ -721,20 +722,20 @@ export type updateProjectMappingResponse =
 export const getUpdateProjectMappingUrl = (
   orgId: string,
   configId: ModelsIssueImporterConfigId,
-  projectId: string,
+  mappingId: ModelsProjectMappingId,
 ) => {
-  return `/organisations/${orgId}/issue-importers/${configId}/projects/${projectId}`
+  return `/organisations/${orgId}/issue-importers/${configId}/projects/${mappingId}`
 }
 
 export const updateProjectMapping = async (
   orgId: string,
   configId: ModelsIssueImporterConfigId,
-  projectId: string,
+  mappingId: ModelsProjectMappingId,
   modelsUpdateProjectMapping: ModelsUpdateProjectMapping,
   options?: RequestInit,
 ): Promise<updateProjectMappingResponse> => {
   return lasiusFetch<updateProjectMappingResponse>(
-    getUpdateProjectMappingUrl(orgId, configId, projectId),
+    getUpdateProjectMappingUrl(orgId, configId, mappingId),
     {
       ...options,
       method: 'PUT',
@@ -780,19 +781,19 @@ export type removeProjectMappingResponse =
 export const getRemoveProjectMappingUrl = (
   orgId: string,
   configId: ModelsIssueImporterConfigId,
-  projectId: string,
+  mappingId: ModelsProjectMappingId,
 ) => {
-  return `/organisations/${orgId}/issue-importers/${configId}/projects/${projectId}`
+  return `/organisations/${orgId}/issue-importers/${configId}/projects/${mappingId}`
 }
 
 export const removeProjectMapping = async (
   orgId: string,
   configId: ModelsIssueImporterConfigId,
-  projectId: string,
+  mappingId: ModelsProjectMappingId,
   options?: RequestInit,
 ): Promise<removeProjectMappingResponse> => {
   return lasiusFetch<removeProjectMappingResponse>(
-    getRemoveProjectMappingUrl(orgId, configId, projectId),
+    getRemoveProjectMappingUrl(orgId, configId, mappingId),
     {
       ...options,
       method: 'DELETE',

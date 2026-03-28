@@ -5,7 +5,7 @@ import { type ApiProxyOptions, useApiProxy } from '~/hooks/use-api-proxy'
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+137-fd682fb0+20260327-0053
+ * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 import {
   type GetConfigsParams,
@@ -14,6 +14,7 @@ import {
   type ModelsIssueImporterConfigId,
   type ModelsIssueImporterConfigResponse,
   type ModelsListProjectsResponse,
+  type ModelsProjectMappingId,
   type ModelsUpdateIssueImporterConfig,
   type ModelsUpdateProjectMapping,
   type RefreshTags202,
@@ -170,11 +171,15 @@ export function useRefreshTags(options?: ApiProxyOptions<RefreshTags202>) {
   return useApiProxy<
     RefreshTags202,
     undefined,
-    { configId: ModelsIssueImporterConfigId; orgId: string; projectId: string }
+    {
+      configId: ModelsIssueImporterConfigId
+      mappingId: ModelsProjectMappingId
+      orgId: string
+    }
   >(
     {
-      getUrl: ({ configId, orgId, projectId }) =>
-        `/organisations/${orgId}/issue-importers/${configId}/projects/${projectId}/refresh-tags`,
+      getUrl: ({ configId, mappingId, orgId }) =>
+        `/organisations/${orgId}/issue-importers/${configId}/projects/${mappingId}/refresh-tags`,
       method: 'POST',
     },
     options,
@@ -188,11 +193,15 @@ export function useRemoveProjectMapping(
   return useApiProxy<
     ModelsIssueImporterConfigResponse,
     undefined,
-    { configId: ModelsIssueImporterConfigId; orgId: string; projectId: string }
+    {
+      configId: ModelsIssueImporterConfigId
+      mappingId: ModelsProjectMappingId
+      orgId: string
+    }
   >(
     {
-      getUrl: ({ configId, orgId, projectId }) =>
-        `/organisations/${orgId}/issue-importers/${configId}/projects/${projectId}`,
+      getUrl: ({ configId, mappingId, orgId }) =>
+        `/organisations/${orgId}/issue-importers/${configId}/projects/${mappingId}`,
       method: 'DELETE',
     },
     options,
@@ -261,11 +270,15 @@ export function useUpdateProjectMapping(
   return useApiProxy<
     ModelsIssueImporterConfigResponse,
     ModelsUpdateProjectMapping,
-    { configId: ModelsIssueImporterConfigId; orgId: string; projectId: string }
+    {
+      configId: ModelsIssueImporterConfigId
+      mappingId: ModelsProjectMappingId
+      orgId: string
+    }
   >(
     {
-      getUrl: ({ configId, orgId, projectId }) =>
-        `/organisations/${orgId}/issue-importers/${configId}/projects/${projectId}`,
+      getUrl: ({ configId, mappingId, orgId }) =>
+        `/organisations/${orgId}/issue-importers/${configId}/projects/${mappingId}`,
       method: 'PUT',
     },
     options,

@@ -69,6 +69,7 @@ export const IntegrationsLayout = () => {
                 configs={configs}
                 onDelete={management.openDeleteConfirm}
                 onEdit={management.openConfigEdit}
+                onRefreshAllTags={management.handleRefreshAllTags}
                 onViewInfo={management.openConfigInfo}
                 onViewMappings={management.openProjectMappings}
               />

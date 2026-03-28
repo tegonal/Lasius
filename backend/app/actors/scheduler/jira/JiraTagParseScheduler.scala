@@ -28,7 +28,8 @@ import _root_.models.{
   JiraProjectSettings,
   JiraSettings,
   OrganisationId,
-  ProjectId
+  ProjectId,
+  ProjectMappingId
 }
 import actors.scheduler.{ServiceAuthentication, ServiceConfiguration}
 import actors.scheduler.jira.JiraTagParseWorker.StartParsing
@@ -50,21 +51,25 @@ object JiraTagParseScheduler {
                             auth: ServiceAuthentication,
                             configId: IssueImporterConfigId,
                             organisationId: OrganisationId,
+                            mappingId: ProjectMappingId,
                             projectId: ProjectId)
   case class StopScheduler(uuid: UUID)
   case class StopProjectScheduler(configId: IssueImporterConfigId,
-                                  projectId: ProjectId)
+                                  mappingId: ProjectMappingId)
   case object StopAllSchedulers
+  case class StopConfigWorkers(configId: IssueImporterConfigId)
   case class SchedulerStarted(uuid: UUID)
-  case class RefreshTags(configId: IssueImporterConfigId, projectId: ProjectId)
+  case class RefreshTags(configId: IssueImporterConfigId,
+                         mappingId: ProjectMappingId)
 }
 
 class JiraTagParseScheduler(wsClient: WSClient, systemServices: SystemServices)
     extends Actor
     with ActorLogging {
   import JiraTagParseScheduler._
-  var workers: Map[UUID, ActorRef]                                      = Map()
-  var projectWorkers: Map[(IssueImporterConfigId, ProjectId), ActorRef] = Map()
+  var workers: Map[UUID, ActorRef] = Map()
+  var projectWorkers: Map[(IssueImporterConfigId, ProjectMappingId), ActorRef] =
+    Map()
 
   override val supervisorStrategy: OneForOneStrategy =
     OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1.minute) {
@@ -78,9 +83,10 @@ class JiraTagParseScheduler(wsClient: WSClient, systemServices: SystemServices)
                         auth,
                         configId,
                         organisationId,
+                        mappingId,
                         projectId) =>
       log.debug(
-        s"StartScheduler: $config, $auth, $projectId, ${projectSettings.jiraProjectKey}")
+        s"StartScheduler: $config, $auth, mappingId=$mappingId, projectId=$projectId, ${projectSettings.jiraProjectKey}")
       val uuid = UUID.randomUUID
       val ref  = context.actorOf(
         JiraTagParseWorker.props(wsClient,
@@ -93,7 +99,7 @@ class JiraTagParseScheduler(wsClient: WSClient, systemServices: SystemServices)
                                  organisationId,
                                  projectId))
       workers += uuid                         -> ref
-      projectWorkers += (configId, projectId) -> ref
+      projectWorkers += (configId, mappingId) -> ref
       ref ! StartParsing
       sender() ! SchedulerStarted(uuid)
     case StopScheduler(uuid) =>
@@ -110,35 +116,47 @@ class JiraTagParseScheduler(wsClient: WSClient, systemServices: SystemServices)
 
     case StopAllSchedulers =>
       log.debug("Stopping all workers")
-      workers.map { case (_, worker) => worker ! PoisonPill }
+      workers.foreach { case (_, worker) => worker ! PoisonPill }
+      workers = Map()
       projectWorkers = Map()
 
-    case StopProjectScheduler(configId, projectId) =>
+    case StopConfigWorkers(configId) =>
+      log.debug(s"StopConfigWorkers: configId=$configId")
+      val toStop = projectWorkers.filter { case ((cId, _), _) =>
+        cId == configId
+      }
+      toStop.foreach { case (key, worker) =>
+        worker ! PoisonPill
+        workers = workers.filter(_._2 != worker)
+      }
+      projectWorkers = projectWorkers -- toStop.keys
+
+    case StopProjectScheduler(configId, mappingId) =>
       log.debug(
-        s"StopProjectScheduler: configId=$configId, projectId=$projectId")
-      projectWorkers.get((configId, projectId)) match {
+        s"StopProjectScheduler: configId=$configId, mappingId=$mappingId")
+      projectWorkers.get((configId, mappingId)) match {
         case Some(worker) =>
           log.debug(
-            s"Stopping worker for configId=$configId, projectId=$projectId")
+            s"Stopping worker for configId=$configId, mappingId=$mappingId")
           worker ! PoisonPill
-          projectWorkers -= ((configId, projectId))
+          projectWorkers -= ((configId, mappingId))
           // Also remove from workers map
           workers = workers.filter(_._2 != worker)
         case None =>
           log.warning(
-            s"No worker found for configId=$configId, projectId=$projectId")
+            s"No worker found for configId=$configId, mappingId=$mappingId")
       }
 
-    case RefreshTags(configId, projectId) =>
-      log.debug(s"RefreshTags: configId=$configId, projectId=$projectId")
-      projectWorkers.get((configId, projectId)) match {
+    case RefreshTags(configId, mappingId) =>
+      log.debug(s"RefreshTags: configId=$configId, mappingId=$mappingId")
+      projectWorkers.get((configId, mappingId)) match {
         case Some(worker) =>
           log.debug(
-            s"Found worker for project $projectId, sending Parse message")
+            s"Found worker for mapping $mappingId, sending Parse message")
           worker ! JiraTagParseWorker.Parse
         case None =>
           log.warning(
-            s"No worker found for configId=$configId, projectId=$projectId")
+            s"No worker found for configId=$configId, mappingId=$mappingId")
       }
   }
 }

@@ -1,0 +1,46 @@
+# Add Integration Wizard
+
+The wizard guides you through connecting a new external platform to Lasius in four steps.
+
+## Step 1: Platform
+
+Choose the external platform you want to integrate:
+
+- **GitHub** - GitHub.com or GitHub Enterprise
+- **GitLab** - GitLab.com or self-hosted GitLab
+- **Jira** - Atlassian Jira (Cloud or Server)
+- **Plane** - Plane.so workspace
+
+Select the platform and click **Next** to continue.
+
+## Step 2: Configure
+
+Enter the connection details for your chosen platform:
+
+- **Configuration Name** - A label to identify this integration (e.g., "Company GitLab")
+- **Base URL** - The API root for your instance (e.g., `https://gitlab.example.com`)
+- **Credentials** - Access token, API key, or OAuth credentials depending on the platform
+- **Check Interval** - How often Lasius polls for new issues — a freeform duration input (minimum 5 minutes)
+
+See the help panel in the configuration modal for step-by-step credential setup instructions per platform.
+
+## Step 3: Test
+
+Lasius validates the credentials by making a live connection to the platform. If the test succeeds, the integration configuration is saved automatically and you move on to project mapping.
+
+If the test fails, check the error message and go back to step 2 to correct your credentials or base URL.
+
+## Step 4: Projects
+
+Map external projects to Lasius projects so issues are imported as time tracking tags.
+
+Each external project can be mapped to one or more Lasius projects. For each mapping you configure:
+
+- **Lasius Project** - Which Lasius project receives the synced issues as tags
+- **Tag Fields** - Which issue fields to import (title, labels, milestone, assignees)
+- **Label Filter** - Optionally restrict which labels are imported as tags
+- **Issue Filters** - Optionally filter by label or state to limit which issues are synced
+
+<Tip>You can map the same external project to multiple Lasius projects — for example, to split issues by team. Likewise, the same Lasius project can receive issues from multiple external projects.</Tip>
+
+Click **Finish** when you are done adding mappings. You can always add or change mappings later from the integrations list.

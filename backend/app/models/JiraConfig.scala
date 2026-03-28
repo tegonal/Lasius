@@ -37,6 +37,7 @@ case class JiraProjectSettings(
 )
 
 case class JiraProjectMapping(
+    id: ProjectMappingId = ProjectMappingId(),
     projectId: ProjectId,
     settings: JiraProjectSettings
 )
@@ -67,7 +68,7 @@ case class JiraConfig(
 
 object JiraProjectMapping {
   implicit val mappingFormat: Format[JiraProjectMapping] =
-    Json.format[JiraProjectMapping]
+    Json.using[Json.WithDefaultValues].format[JiraProjectMapping]
 }
 
 object JiraSettings {

@@ -187,16 +187,17 @@ class IssueImporterConfigController @Inject() (
                                                request.body)
             updated <- issueImporterRepository
               .addProjectMapping(configId, request.body)
-            _ <- Future.successful(
-              startSchedulerForProject(updated, request.body.projectId))
+            _ <- Future.successful(lastMappingId(updated).foreach(id =>
+              startSchedulerForMapping(updated, id)))
             response <- toResponse(updated)
           } yield Ok(Json.toJson(response))
         }
     }
 
-  def updateProjectMapping(orgId: OrganisationId,
-                           configId: IssueImporterConfigId,
-                           projectId: ProjectId): Action[UpdateProjectMapping] =
+  def updateProjectMapping(
+      orgId: OrganisationId,
+      configId: IssueImporterConfigId,
+      mappingId: ProjectMappingId): Action[UpdateProjectMapping] =
     HasUserRole(FreeUser,
                 validateJson[UpdateProjectMapping],
                 withinTransaction = true) {
@@ -209,7 +210,7 @@ class IssueImporterConfigController @Inject() (
             _ <- validateConfigOwnership(config,
                                          userOrg.organisationReference.id)
             updated <- issueImporterRepository
-              .updateProjectMapping(configId, projectId, request.body)
+              .updateProjectMapping(configId, mappingId, request.body)
             response <- toResponse(updated)
           } yield Ok(Json.toJson(response))
         }
@@ -217,7 +218,7 @@ class IssueImporterConfigController @Inject() (
 
   def removeProjectMapping(orgId: OrganisationId,
                            configId: IssueImporterConfigId,
-                           projectId: ProjectId): Action[Unit] =
+                           mappingId: ProjectMappingId): Action[Unit] =
     HasUserRole(FreeUser, parse.empty, withinTransaction = true) {
       implicit dbSession => _ => user => implicit request =>
         HasOrganisationRole(user, orgId, OrganisationAdministrator) { userOrg =>
@@ -227,9 +228,9 @@ class IssueImporterConfigController @Inject() (
               .noneToFailed(ConfigErrorResponses.configNotFound(configId))
             _ <- validateConfigOwnership(config,
                                          userOrg.organisationReference.id)
-            _ <- Future.successful(stopSchedulerForProject(config, projectId))
+            _ <- Future.successful(stopSchedulerForMapping(config, mappingId))
             updated <- issueImporterRepository
-              .removeProjectMapping(configId, projectId)
+              .removeProjectMapping(configId, mappingId)
             response <- toResponse(updated)
           } yield Ok(Json.toJson(response))
         }
@@ -265,7 +266,7 @@ class IssueImporterConfigController @Inject() (
     */
   def refreshTags(orgId: OrganisationId,
                   configId: IssueImporterConfigId,
-                  projectId: ProjectId): Action[Unit] =
+                  mappingId: ProjectMappingId): Action[Unit] =
     HasUserRole(FreeUser, parse.empty, withinTransaction = false) {
       implicit dbSession => _ => user => implicit request =>
         HasOrganisationRole(user, orgId, OrganisationMember) { userOrg =>
@@ -275,7 +276,7 @@ class IssueImporterConfigController @Inject() (
               case Some(config) =>
                 for {
                   _      <- validateConfigOwnership(config, orgId)
-                  result <- triggerRefreshForConfig(config, projectId)
+                  result <- triggerRefreshForMapping(config, mappingId)
                 } yield result
 
               case None =>
@@ -285,25 +286,26 @@ class IssueImporterConfigController @Inject() (
         }
     }
 
-  private def triggerRefreshForConfig(config: IssueImporterConfig,
-                                      projectId: ProjectId): Future[Result] = {
-    // Find the project mapping
+  private def triggerRefreshForMapping(
+      config: IssueImporterConfig,
+      mappingId: ProjectMappingId): Future[Result] = {
+    // Find the project mapping by mapping ID
     val projectMappingOpt = config match {
-      case c: GitlabConfig => c.projects.find(_.projectId == projectId)
-      case c: JiraConfig   => c.projects.find(_.projectId == projectId)
-      case c: PlaneConfig  => c.projects.find(_.projectId == projectId)
-      case c: GithubConfig => c.projects.find(_.projectId == projectId)
+      case c: GitlabConfig => c.projects.find(_.id == mappingId)
+      case c: JiraConfig   => c.projects.find(_.id == mappingId)
+      case c: PlaneConfig  => c.projects.find(_.id == mappingId)
+      case c: GithubConfig => c.projects.find(_.id == mappingId)
     }
 
     projectMappingOpt match {
-      case Some(projectMapping) =>
+      case Some(_) =>
         val importerType = config.importerType.value
 
         // Trigger immediate refresh via PluginHandler
         systemServices.pluginHandler ! PluginHandler.RefreshProjectTags(
           config.importerType,
           config.id,
-          projectId
+          mappingId
         )
 
         Future.successful(
@@ -312,7 +314,7 @@ class IssueImporterConfigController @Inject() (
               "status" -> "accepted",
               "message" -> s"Tag refresh triggered immediately. Tags will be updated shortly.",
               "configId"     -> config.id.value.toString,
-              "projectId"    -> projectId.value.toString,
+              "mappingId"    -> mappingId.value.toString,
               "importerType" -> importerType
             ))
         )
@@ -322,10 +324,10 @@ class IssueImporterConfigController @Inject() (
           NotFound(
             Json.obj(
               "status" -> "error",
-              "message" -> s"Project ${projectId.value} is not mapped to this configuration",
-              "error"     -> "project_not_found",
+              "message" -> s"Mapping ${mappingId.value} is not found in this configuration",
+              "error"     -> "mapping_not_found",
               "configId"  -> config.id.value.toString,
-              "projectId" -> projectId.value.toString
+              "mappingId" -> mappingId.value.toString
             ))
         )
     }
@@ -931,25 +933,38 @@ class IssueImporterConfigController @Inject() (
   /** Starts a scheduler for a single project mapping. Called after adding a
     * project mapping to an existing config.
     */
-  private def startSchedulerForProject(config: IssueImporterConfig,
-                                       projectId: ProjectId): Unit = {
+  private def startSchedulerForMapping(config: IssueImporterConfig,
+                                       mappingId: ProjectMappingId): Unit = {
     systemServices.pluginHandler ! PluginHandler.StartProjectScheduler(
       config.importerType,
       config,
-      projectId
+      mappingId
     )
   }
 
   /** Stops scheduler for a single project mapping. Called after removing a
     * project mapping.
     */
-  private def stopSchedulerForProject(config: IssueImporterConfig,
-                                      projectId: ProjectId): Unit = {
+  private def stopSchedulerForMapping(config: IssueImporterConfig,
+                                      mappingId: ProjectMappingId): Unit = {
     systemServices.pluginHandler ! PluginHandler.StopProjectScheduler(
       config.importerType,
       config.id,
-      projectId
+      mappingId
     )
+  }
+
+  /** Returns the mapping ID of the last mapping in a config's projects list.
+    * Used after addProjectMapping to identify the newly appended mapping.
+    */
+  private def lastMappingId(
+      config: IssueImporterConfig): Option[ProjectMappingId] = {
+    config match {
+      case c: GitlabConfig => c.projects.lastOption.map(_.id)
+      case c: JiraConfig   => c.projects.lastOption.map(_.id)
+      case c: PlaneConfig  => c.projects.lastOption.map(_.id)
+      case c: GithubConfig => c.projects.lastOption.map(_.id)
+    }
   }
 
   /** Stops all schedulers for a config. Called before updating config with

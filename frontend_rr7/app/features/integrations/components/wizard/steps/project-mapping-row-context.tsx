@@ -17,7 +17,7 @@
  *
  */
 
-import { Pencil, Plus, RefreshCw, Trash2 } from 'lucide-react'
+import { FolderOpen, RefreshCw, X } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -26,7 +26,6 @@ import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { GenericConfirmModal } from '~/components/ui/overlays/modal/generic-confirm-modal'
 import { Modal } from '~/components/ui/overlays/modal/modal'
 import { ContextButtonClose } from '~/features/context-menu/buttons/context-button-close'
-import { ContextButtonOpen } from '~/features/context-menu/buttons/context-button-open'
 import { ContextAnimatePresence } from '~/features/context-menu/context-animate-presence'
 import { ContextBar } from '~/features/context-menu/context-bar'
 import { ContextBarDivider } from '~/features/context-menu/context-bar-divider'
@@ -34,43 +33,47 @@ import { ContextBody } from '~/features/context-menu/context-body'
 import { ContextButtonWrapper } from '~/features/context-menu/context-button-wrapper'
 import { useContextMenu } from '~/features/context-menu/hooks/use-context-menu'
 import { ProjectMappingSelector } from '~/features/integrations/components/wizard/steps/project-mapping-selector'
-import { type TagConfiguration } from '~/features/integrations/lib/mapping-helpers'
+import {
+  type MappingWithTagConfig,
+  type TagConfiguration,
+} from '~/features/integrations/lib/mapping-helpers'
 import { useProjects } from '~/features/projects/hooks/use-projects'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 import { type ModelsExternalProject } from '~/services/api/lasius'
 
 type Props = {
-  existingTagConfig?: TagConfiguration
+  excludeProjectIds: string[]
   externalProject: ModelsExternalProject
   importerType: ImporterType
-  onMappingChange: (
-    externalProjectId: string,
-    lasiusProjectId: null | string,
+  lasiusProjects: Array<{ id: string; key: string }>
+  mapping: MappingWithTagConfig
+  onMappingRemove: (extId: string, projectId: string) => void
+  onMappingUpsert: (
+    extId: string,
+    projectId: string,
     tagConfig?: TagConfiguration,
   ) => void
-  onRefreshTags?: (projectId: string) => void
-  selectedProjectId?: string
+  onRefreshTags?: (mappingId: string) => void
 }
 
 export const ProjectMappingRowContext = ({
-  existingTagConfig,
+  excludeProjectIds,
   externalProject,
   importerType,
-  onMappingChange,
+  lasiusProjects,
+  mapping,
+  onMappingRemove,
+  onMappingUpsert,
   onRefreshTags,
-  selectedProjectId,
 }: Props) => {
   const { t } = useTranslation('integrations')
   const [isSelectorOpen, setIsSelectorOpen] = useState(false)
   const [isConfirmRemoveOpen, setIsConfirmRemoveOpen] = useState(false)
   const { handleCloseAll } = useContextMenu()
-  const { userProjects } = useProjects()
+  const { findProjectById } = useProjects()
 
-  // Build suggestion list from user projects
-  const lasiusProjects = userProjects.map((p) => ({
-    id: p.projectReference.id,
-    key: p.projectReference.key,
-  }))
+  const projectName =
+    findProjectById(mapping.projectId)?.key ?? mapping.projectId
 
   const handleSelectorClose = () => setIsSelectorOpen(false)
 
@@ -85,69 +88,50 @@ export const ProjectMappingRowContext = ({
   }
 
   const handleConfirmRemove = () => {
-    onMappingChange(externalProject.id, null)
+    onMappingRemove(externalProject.id, mapping.projectId)
     setIsConfirmRemoveOpen(false)
   }
 
   return (
     <>
-      <ContextBody hash={externalProject.id} variant="compact">
-        <ContextButtonOpen />
+      <ContextBody
+        hash={`${externalProject.id}::${mapping.projectId}`}
+        variant="compact"
+      >
+        <div
+          aria-label={t('issueImporters.wizard.projects.editMapping', {
+            defaultValue: 'Edit Project Mapping',
+          })}
+          className="badge badge-outline cursor-pointer gap-1"
+          onClick={openSelector}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              openSelector()
+            }
+          }}
+          role="button"
+          tabIndex={0}
+        >
+          <LucideIcon className="text-primary" icon={FolderOpen} size={12} />
+          <span className="text-xs">{projectName}</span>
+          <button
+            aria-label={t('issueImporters.wizard.projects.removeMapping', {
+              defaultValue: 'Remove mapping',
+            })}
+            className="btn btn-ghost btn-xs p-0"
+            onClick={(e) => {
+              e.stopPropagation()
+              openConfirmRemove()
+            }}
+            type="button"
+          >
+            <LucideIcon icon={X} size={12} />
+          </button>
+        </div>
         <ContextAnimatePresence inModal variant="compact">
           <ContextBar>
-            <ContextButtonWrapper variant="compact">
-              <Button
-                aria-label={
-                  selectedProjectId
-                    ? t('issueImporters.wizard.projects.changeMapping', {
-                        defaultValue: 'Change mapping',
-                      })
-                    : t('issueImporters.wizard.projects.addMapping', {
-                        defaultValue: 'Add mapping',
-                      })
-                }
-                fullWidth={false}
-                onClick={openSelector}
-                shape="circle"
-                title={
-                  selectedProjectId
-                    ? t('issueImporters.wizard.projects.changeMapping', {
-                        defaultValue: 'Change mapping',
-                      })
-                    : t('issueImporters.wizard.projects.addMapping', {
-                        defaultValue: 'Add mapping',
-                      })
-                }
-                variant="contextIcon"
-              >
-                <LucideIcon
-                  icon={selectedProjectId ? Pencil : Plus}
-                  size={24}
-                />
-              </Button>
-            </ContextButtonWrapper>
-            {selectedProjectId && (
-              <ContextButtonWrapper variant="compact">
-                <Button
-                  aria-label={t(
-                    'issueImporters.wizard.projects.removeMapping',
-                    {
-                      defaultValue: 'Remove mapping',
-                    },
-                  )}
-                  fullWidth={false}
-                  onClick={openConfirmRemove}
-                  shape="circle"
-                  title={t('issueImporters.wizard.projects.removeMapping', {
-                    defaultValue: 'Remove mapping',
-                  })}
-                  variant="contextIcon"
-                >
-                  <LucideIcon icon={Trash2} size={24} />
-                </Button>
-              </ContextButtonWrapper>
-            )}
-            {onRefreshTags && selectedProjectId && (
+            {onRefreshTags && mapping.id && (
               <ContextButtonWrapper variant="compact">
                 <Button
                   aria-label={t('issueImporters.actions.refreshTags', {
@@ -155,7 +139,7 @@ export const ProjectMappingRowContext = ({
                   })}
                   fullWidth={false}
                   onClick={() => {
-                    onRefreshTags(selectedProjectId)
+                    onRefreshTags(mapping.id!.value)
                     handleCloseAll()
                   }}
                   shape="circle"
@@ -175,16 +159,19 @@ export const ProjectMappingRowContext = ({
       </ContextBody>
       <Modal onClose={handleSelectorClose} open={isSelectorOpen} size="lg">
         <ProjectMappingSelector
-          existingTagConfig={existingTagConfig}
+          excludeProjectIds={excludeProjectIds}
+          existingTagConfig={mapping.tagConfig}
           externalProject={externalProject}
           importerType={importerType}
           lasiusProjects={lasiusProjects}
           onCancel={handleSelectorClose}
           onSelect={(projectId, tagConfig) => {
-            onMappingChange(externalProject.id, projectId, tagConfig)
+            if (projectId) {
+              onMappingUpsert(externalProject.id, projectId, tagConfig)
+            }
             handleSelectorClose()
           }}
-          selectedProjectId={selectedProjectId}
+          selectedProjectId={mapping.projectId}
         />
       </Modal>
       <GenericConfirmModal

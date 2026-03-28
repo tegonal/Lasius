@@ -4,12 +4,15 @@ Link external projects from your integration platform to Lasius projects. Issues
 
 ## Understanding the List
 
-Each row shows:
+Each row represents one external project. The row shows:
 - **Left side**: External project name and ID
-- **Arrow**: Visual mapping indicator
-- **Right side**:
-  - Mapped Lasius project name (or "Not mapped" in gray)
-  - Three-dot menu button
+- **Right side**: Mapped Lasius projects as badge chips, plus an **Add** button (<Icon name="Plus" />)
+
+If no mappings exist yet, the right side is empty.
+
+## Orphaned Mappings
+
+If an external project no longer exists on the remote platform (e.g., it was deleted or your token lost access), its row displays a warning icon with "Project no longer available". These orphaned mappings still appear so you can remove them manually.
 
 ## Filtering Projects
 
@@ -17,19 +20,47 @@ Use the filter box at the top to search by project name or ID. Click the X to cl
 
 <Tip>Mapped projects appear first, then unmapped projects</Tip>
 
-## Mapping a Project
+## Many-to-Many Mapping
 
-1. Click the **three-dot menu** for the project you want to map
-2. Click the **pencil icon** to add or edit the mapping
+Mappings are many-to-many. This means:
+- The **same external project** can be mapped to multiple Lasius projects — for example, to give different teams their own view of the same repository
+- The **same Lasius project** can receive issues from multiple external projects — for example, to aggregate work across several repositories
+
+Each mapping is independent and has its own tag and filter configuration.
+
+## Adding a Mapping
+
+1. Find the external project row you want to map
+2. Click the **+** button (<Icon name="Plus" />) on the right side of the row
 3. Select a Lasius project from the dropdown
-4. Configure tag settings (appears after selecting a project)
+4. Configure tag settings (see Tag Configuration below)
 5. Click **Confirm** to save
+
+The project selector only excludes Lasius projects already mapped to the same external project. The same Lasius project can still be selected for other external project rows.
 
 <Tip>Tag configuration is only available for GitHub, GitLab, and Plane (not Jira)</Tip>
 
+## Editing a Mapping
+
+Each existing mapping appears as a **badge chip** on the external project row. Click a chip to open its tag configuration and edit it:
+
+1. Click the badge chip for the mapping you want to edit
+2. Adjust the tag settings as needed
+3. Click **Confirm** to save
+
+## Removing a Mapping
+
+Click the **×** on a badge chip to remove that mapping:
+
+1. Click the **×** icon on the chip
+2. A confirmation dialog appears
+3. Click **Remove** to confirm
+
+<Tip>Removing a mapping stops syncing but doesn't delete existing tags</Tip>
+
 ## Tag Configuration
 
-After selecting a Lasius project, configure which issue fields to import as tags:
+When adding or editing a mapping, configure which issue fields to import as tags:
 
 **Tag Fields to Import** (Multi-select, at least one required):
 - Use issue title as tag
@@ -52,28 +83,13 @@ After selecting a Lasius project, configure which issue fields to import as tags
 
 <Tip>For GitHub/GitLab, select "open" to avoid cluttering your tag list with closed issues</Tip>
 
-## Editing a Mapping
-
-1. Click the **three-dot menu** for the mapped project
-2. Click the **pencil icon**
-3. Change the Lasius project or tag settings
-4. Click **Confirm** to save
-
-## Removing a Mapping
-
-1. Click the **three-dot menu** for the mapped project
-2. Click the **trash icon**
-3. A confirmation dialog appears
-4. Click **Remove** to confirm
-
-<Tip>Removing a mapping stops syncing but doesn't delete existing tags</Tip>
-
 ## After Mapping
 
 Syncing happens automatically:
 - First sync occurs on the next scheduled check interval
 - Subsequent syncs only fetch new or updated issues
 - Check the integration's health status to monitor progress
+- Use **Refresh all tags** from the integrations list context menu for an immediate sync
 
 ## Troubleshooting
 

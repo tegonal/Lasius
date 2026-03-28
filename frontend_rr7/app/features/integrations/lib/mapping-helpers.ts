@@ -27,6 +27,8 @@ import {
   type ModelsJiraProjectMapping,
   type ModelsPlaneProjectMapping,
   type ModelsPlaneTagConfiguration,
+  type ModelsProjectMappingId,
+  type ModelsProjectSyncStats,
 } from '~/services/api/lasius'
 
 export type MappingPayloadResult =
@@ -39,7 +41,10 @@ export type MappingPayloadResult =
       success: true
     }
 
+export type MappingsByExternalProject = Record<string, MappingWithTagConfig[]>
+
 export type MappingWithTagConfig = {
+  id?: ModelsProjectMappingId
   projectId: string
   tagConfig?: TagConfiguration
 }
@@ -186,4 +191,31 @@ export const extractExternalProjectId = (
       )
     }
   }
+}
+
+export type MappingStatEntry = {
+  projectId: string
+  stat?: ModelsProjectSyncStats
+}
+
+export const buildMappingStatsGroups = (
+  importerType: ImporterType,
+  mappings: ProjectMapping[],
+  stats: ModelsProjectSyncStats[],
+): Record<string, MappingStatEntry[]> => {
+  const statsByProjectId = new Map(stats.map((s) => [s.projectId, s]))
+  const groups: Record<string, MappingStatEntry[]> = {}
+
+  for (const mapping of mappings) {
+    const externalName =
+      extractExternalProjectId(importerType, mapping) ?? mapping.projectId
+    const entries = groups[externalName] ?? []
+    entries.push({
+      projectId: mapping.projectId,
+      stat: statsByProjectId.get(mapping.projectId),
+    })
+    groups[externalName] = entries
+  }
+
+  return groups
 }

@@ -1,80 +1,119 @@
-# Configuración de integración
+# Integration Configuration
 
-Configura conexiones a plataformas externas de gestión de proyectos (GitHub, GitLab, Jira, Plane) para sincronizar automáticamente problemas como etiquetas de seguimiento de tiempo.
+Configure connections to external project management platforms (GitHub, GitLab, Jira, Plane) to automatically sync issues as time tracking tags.
 
-## Crear una integración
+## Creating an Integration
 
-1. Introduce un **nombre de configuración** para identificar esta integración (ej. "GitLab Empresa")
-2. Introduce la **URL base** de tu instancia de plataforma
-3. Introduce tu **token de acceso** o credenciales de autenticación
-4. Establece el **intervalo de verificación** (frecuencia de verificación de nuevos problemas)
-5. Haz clic en **Crear** para guardar
+1. Enter a **Configuration Name** to identify this integration (e.g., "Company GitLab")
+2. Enter the **Base URL** for your platform instance
+3. Enter your **Access Token** or authentication credentials
+4. Set the **Check Interval** — a freeform duration input specifying how often to check for new issues (minimum 5 minutes)
+5. Click **Create** to save
 
-<Tip>La columna derecha muestra instrucciones paso a paso para generar tokens en tu plataforma</Tip>
+## Editing an Integration
 
-## Editar una integración
+When editing, credential fields show placeholder text to indicate they're optional:
 
-Al editar, los campos de credenciales muestran texto de marcador de posición para indicar que son opcionales:
+- Leave credential fields **empty** to keep existing values
+- Fill in credential fields **only if you want to update them**
 
-- Deja los campos de credenciales **vacíos** para mantener los valores existentes
-- Rellena los campos de credenciales **solo si deseas actualizarlos**
+### Testing Your Connection
 
-### Probar tu conexión
+1. Fill in any credentials you want to update
+2. Click **Test Connection** (bottom right)
+3. Check the result message that appears
+4. Click **Update** to save if the test succeeds
 
-1. Rellena las credenciales que desees actualizar
-2. Haz clic en **Probar conexión** (abajo a la derecha)
-3. Verifica el mensaje de resultado que aparece
-4. Haz clic en **Actualizar** para guardar si la prueba tiene éxito
+<Tip>Always test the connection before saving to catch authentication problems early</Tip>
 
-<Tip>Prueba siempre la conexión antes de guardar para detectar problemas de autenticación temprano</Tip>
+## Check Interval
 
-## Intervalo de verificación
+This controls how often Lasius fetches new issues from your platform. Enter any duration of 5 minutes or longer (e.g., "10 minutes", "1 hour"). Shorter intervals give you faster updates but make more API calls; longer intervals reduce load on the external platform.
 
-Esto controla con qué frecuencia Lasius obtiene nuevos problemas de tu plataforma.
+## Getting Credentials
 
-**Configuraciones recomendadas:**
-- **5 minutos**: Para equipos activos con actualizaciones frecuentes
-- **15 minutos**: Para la mayoría de equipos (buen equilibrio)
-- **30 minutos**: Para equipos pequeños o para reducir llamadas a la API
+### GitHub
 
-## Notas específicas de la plataforma
+Use a fine-grained personal access token:
+
+1. Go to **Settings** → **Developer settings** → **Personal access tokens** → **Fine-grained tokens**
+2. Click **Generate new token**
+3. Under **Repository permissions**, set **Issues** to Read-only and **Metadata** to Read-only
+4. Under **Resource owner**, select the user or organization that owns the repositories you want to sync
+5. Click **Generate token** and copy the value
+
+<Note>If the resource owner is an organization, the organization may require approval before the token becomes active. Check your organization's settings if the token does not work immediately.</Note>
+
+After entering the token, select the resource owner from the dropdown that appears in the form.
+
+### GitLab
+
+Use a personal access token with the `read_api` scope:
+
+1. Go to your GitLab profile → **Access Tokens**
+2. Create a new token with the **read_api** scope
+3. Copy the token value and paste it into the Access Token field
+
+Works with GitLab.com or any self-hosted GitLab instance. Set the **Base URL** to your instance root (e.g., `https://gitlab.example.com`).
+
+### Jira
+
+Jira uses OAuth 1.0a with RSA keys. You need three values: a consumer key, a private key, and an access token.
+
+1. In Jira, go to **Settings** → **Applications** → **Application Links** and create a new link pointing to your Lasius instance
+2. Configure the incoming authentication with your consumer key and RSA public key
+3. Authorize the link to generate an access token
+4. Paste the consumer key, private key (PEM format), and access token into the corresponding fields
+
+<Note>The private key field expects the full PEM block including the header and footer lines.</Note>
+
+### Plane
+
+Use a personal API key:
+
+1. In Plane, go to **Profile Settings** → **Personal Access Tokens**
+2. Create a new token and copy it
+3. Find your workspace slug in the Plane URL (e.g., `my-workspace` from `app.plane.so/my-workspace/`)
+4. Enter both the API key and workspace slug in the form
+
+## Platform-Specific Notes
 
 **GitHub:**
-- Después de introducir tu token de acceso, selecciona qué usuario/organización posee los repositorios
-- El menú desplegable se carga automáticamente después de introducir un token válido
+- After entering your access token, select which user/organization owns the repositories
+- The dropdown loads automatically after you enter a valid token
 
 **GitLab:**
-- Funciona con GitLab.com o instancias autohospedadas
-- El token necesita el alcance `read_api`
+- Works with GitLab.com or self-hosted instances
+- Token needs `read_api` scope
 
 **Jira:**
-- Requiere clave de consumidor OAuth, clave privada y token de acceso
-- Sigue cuidadosamente las instrucciones de la columna derecha para la configuración de OAuth
+- Requires OAuth consumer key, private key, and access token
 
 **Plane:**
-- Obtén tu clave API desde la configuración del espacio de trabajo de Plane
+- Get your API key from Profile Settings → Personal Access Tokens
 
-## Después de crear
+## After Creating
 
-Una vez creada, necesitas:
-1. Volver a la lista de integraciones
-2. Abrir el menú contextual de tu integración
-3. Seleccionar **Mapear proyectos** para vincular proyectos
-4. Configurar qué problemas sincronizar como etiquetas
+When using the **wizard**, project mapping is handled in step 4 — you do not need to return to the integrations list.
 
-## Resolución de problemas
+When using the **edit modal** to update an existing integration, manage project mappings via the context menu on the integrations list:
+1. Open the context menu for your integration
+2. Select **View project mappings** to link or update projects
+3. Configure which issues to sync as tags
 
-**La prueba de conexión falla:**
-- Verifica que la URL base sea correcta
-- Verifica que tus credenciales tengan los permisos correctos
-- Consulta el mensaje de error para obtener detalles específicos
+## Troubleshooting
 
-**GitHub: No aparecen organizaciones:**
-- Asegúrate de haber introducido un token de acceso válido
-- Espera un momento para que se cargue el menú desplegable
-- Verifica que tu token tenga acceso a organizaciones
+**Test connection fails:**
+- Double-check the base URL is correct
+- Verify your credentials have the right permissions
+- Check the error message for specific details
 
-**El formulario no se guarda:**
-- Todos los campos son obligatorios al crear
-- El nombre de configuración debe ser único
-- Busca mensajes de error debajo de cada campo
+**GitHub: No organizations appear:**
+- Make sure you entered a valid access token
+- Wait a moment for the dropdown to load
+- Check that your token has access to organizations
+
+**Form won't save:**
+- All fields are required when creating
+- Configuration name must be unique
+- Check for error messages below each field

@@ -28,7 +28,13 @@ import { Modal } from '~/components/ui/overlays/modal/modal'
 import { ModalBody } from '~/components/ui/overlays/modal/modal-body'
 import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
 import { ModalTitle } from '~/components/ui/overlays/modal/modal-title'
+import { ModalHelpButton } from '~/features/help/components/help-button'
 import { ImporterTypeBadge } from '~/features/integrations/components/importer-type-badge'
+import {
+  buildMappingStatsGroups,
+  type ProjectMapping,
+} from '~/features/integrations/lib/mapping-helpers'
+import { useProjects } from '~/features/projects/hooks/use-projects'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 import {
   type ModelsIssueImporterConfigResponse,
@@ -72,6 +78,7 @@ const getConnectivityIcon = (status: string) => {
 
 export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
   const { t } = useTranslation('integrations')
+  const { findProjectById } = useProjects()
 
   const syncStatus = config?.syncStatus
   const connectivityStatus = syncStatus?.connectivityStatus
@@ -82,11 +89,14 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
     <Modal onClose={onClose} open={open} size="lg">
       <div className="flex min-h-0 flex-1 flex-col gap-4">
         <ModalCloseButton onClose={onClose} />
-        <ModalTitle>
-          {t('issueImporters.info.title', {
-            defaultValue: 'Configuration Info',
-          })}
-        </ModalTitle>
+        <div className="flex items-center gap-2">
+          <ModalTitle>
+            {t('issueImporters.info.title', {
+              defaultValue: 'Configuration Info',
+            })}
+          </ModalTitle>
+          <ModalHelpButton helpKey="modal-config-info" />
+        </div>
 
         {!config && (
           <p className="text-base-content/60 text-sm">
@@ -269,51 +279,78 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
               </div>
             )}
 
-            {/* Project Statistics */}
-            {syncStatus?.projectStats && syncStatus.projectStats.length > 0 && (
+            {/* Project Mappings & Sync Statistics */}
+            {config.projects && config.projects.length > 0 && (
               <div>
                 <h3 className="text-base-content/70 mb-2 text-sm font-semibold tracking-wide uppercase">
                   {t('issueImporters.info.projectStats', {
                     defaultValue: 'Project Statistics',
                   })}
                 </h3>
-                <div className="bg-base-200 overflow-x-auto rounded-lg p-4">
-                  <table className="table-sm table">
-                    <thead>
-                      <tr>
-                        <th>
-                          {t('issueImporters.info.projectName', {
-                            defaultValue: 'Project',
-                          })}
-                        </th>
-                        <th>
-                          {t('issueImporters.info.issuesSynced', {
-                            defaultValue: 'Issues',
-                          })}
-                        </th>
-                        <th>
-                          {t('issueImporters.info.lastSync', {
-                            defaultValue: 'Last Sync',
-                          })}
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {syncStatus.projectStats.map((stat) => (
-                        <tr key={stat.projectId}>
-                          <td className="text-sm font-medium">
-                            {stat.projectName}
-                          </td>
-                          <td className="text-sm">
-                            {stat.totalIssuesSynced || 0}
-                          </td>
-                          <td className="text-base-content/70 text-sm">
-                            <FormattedDateOrNA date={stat.lastSyncAt} />
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <div className="space-y-3">
+                  {Object.entries(
+                    buildMappingStatsGroups(
+                      config.importerType as ImporterType,
+                      config.projects as ProjectMapping[],
+                      syncStatus?.projectStats ?? [],
+                    ),
+                  ).map(([externalName, entries]) => (
+                    <div
+                      className="bg-base-200 rounded-lg p-4"
+                      key={externalName}
+                    >
+                      <p className="mb-2 text-sm font-medium">{externalName}</p>
+                      <table className="table-sm table">
+                        <thead>
+                          <tr>
+                            <th>
+                              {t('issueImporters.info.lasiusProject', {
+                                defaultValue: 'Lasius Project',
+                              })}
+                            </th>
+                            <th>
+                              {t('issueImporters.info.issuesSynced', {
+                                defaultValue: 'Issues',
+                              })}
+                            </th>
+                            <th>
+                              {t('issueImporters.info.lastSync', {
+                                defaultValue: 'Last Sync',
+                              })}
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {entries.map((entry) => (
+                            <tr key={entry.projectId}>
+                              <td className="text-sm">
+                                {findProjectById(entry.projectId)?.key ??
+                                  entry.projectId}
+                              </td>
+                              <td className="text-sm">
+                                {entry.stat
+                                  ? entry.stat.totalIssuesSynced || 0
+                                  : '—'}
+                              </td>
+                              <td className="text-base-content/70 text-sm">
+                                {entry.stat ? (
+                                  <FormattedDateOrNA
+                                    date={entry.stat.lastSyncAt}
+                                  />
+                                ) : (
+                                  <span className="text-base-content/40 italic">
+                                    {t('issueImporters.info.pendingFirstSync', {
+                                      defaultValue: 'Pending first sync',
+                                    })}
+                                  </span>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}

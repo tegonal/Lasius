@@ -1,94 +1,110 @@
-# Projektzuordnungen
+# Project Mappings
 
-Verknüpfe externe Projekte von deiner Integrationsplattform mit Lasius-Projekten. Issues aus zugeordneten Projekten werden automatisch synchronisiert und als Zeiterfassungs-Tags verfügbar gemacht.
+Link external projects from your integration platform to Lasius projects. Issues from mapped projects are automatically synced and available as time tracking tags.
 
-## Die Liste verstehen
+## Understanding the List
 
-Jede Zeile zeigt:
-- **Linke Seite**: Name und ID des externen Projekts
-- **Pfeil**: Visueller Zuordnungsindikator
-- **Rechte Seite**:
-  - Name des zugeordneten Lasius-Projekts (oder "Nicht zugeordnet" in Grau)
-  - Drei-Punkte-Menü-Button
+Each row represents one external project. The row shows:
+- **Left side**: External project name and ID
+- **Right side**: Mapped Lasius projects as badge chips, plus an **Add** button (<Icon name="Plus" />)
 
-## Projekte filtern
+If no mappings exist yet, the right side is empty.
 
-Verwende das Filterfeld oben, um nach Projektname oder ID zu suchen. Klicke auf das X zum Löschen.
+## Orphaned Mappings
 
-<Tip>Zugeordnete Projekte erscheinen zuerst, dann nicht zugeordnete Projekte</Tip>
+If an external project no longer exists on the remote platform (e.g., it was deleted or your token lost access), its row displays a warning icon with "Project no longer available". These orphaned mappings still appear so you can remove them manually.
 
-## Projekt zuordnen
+## Filtering Projects
 
-1. Klicke auf das **Drei-Punkte-Menü** für das Projekt, das du zuordnen möchtest
-2. Klicke auf das **Stift-Symbol**, um die Zuordnung hinzuzufügen oder zu bearbeiten
-3. Wähle ein Lasius-Projekt aus dem Dropdown
-4. Konfiguriere die Tag-Einstellungen (erscheint nach Auswahl eines Projekts)
-5. Klicke auf **Bestätigen**, um zu speichern
+Use the filter box at the top to search by project name or ID. Click the X to clear.
 
-<Tip>Tag-Konfiguration ist nur für GitHub, GitLab und Plane verfügbar (nicht für Jira)</Tip>
+<Tip>Mapped projects appear first, then unmapped projects</Tip>
 
-## Tag-Konfiguration
+## Many-to-Many Mapping
 
-Nach Auswahl eines Lasius-Projekts konfiguriere, welche Issue-Felder als Tags importiert werden:
+Mappings are many-to-many. This means:
+- The **same external project** can be mapped to multiple Lasius projects — for example, to give different teams their own view of the same repository
+- The **same Lasius project** can receive issues from multiple external projects — for example, to aggregate work across several repositories
 
-**Zu importierende Tag-Felder** (Mehrfachauswahl, mindestens eines erforderlich):
-- Issue-Titel als Tag verwenden
-- Labels als Tags verwenden
-- Meilenstein als Tag verwenden
-- Zugewiesene Personen als Tags verwenden (nur GitHub)
+Each mapping is independent and has its own tag and filter configuration.
 
-**Label-Filter** (erscheint, wenn "Labels verwenden" ausgewählt ist):
-- Leer lassen, um alle Labels als Tags zu importieren
-- Bestimmte Labels auswählen, um nur diese zu importieren
+## Adding a Mapping
 
-**Issue-Label-Filter**:
-- Leer lassen, um alle Issues zu importieren
-- Labels auswählen, um nur Issues mit diesen Labels zu importieren
+1. Find the external project row you want to map
+2. Click the **+** button (<Icon name="Plus" />) on the right side of the row
+3. Select a Lasius project from the dropdown
+4. Configure tag settings (see Tag Configuration below)
+5. Click **Confirm** to save
 
-**Issue-Status-Filter**:
-- **GitHub/GitLab**: Einfachauswahl (offen oder geschlossen)
-- **Plane**: Mehrfachauswahl (benutzerdefinierte Workflow-Status)
-- Leer lassen, um Issues in allen Status zu importieren
+The project selector only excludes Lasius projects already mapped to the same external project. The same Lasius project can still be selected for other external project rows.
 
-<Tip>Wähle bei GitHub/GitLab "offen", um deine Tag-Liste nicht mit geschlossenen Issues zu überladen</Tip>
+<Tip>Tag configuration is only available for GitHub, GitLab, and Plane (not Jira)</Tip>
 
-## Zuordnung bearbeiten
+## Editing a Mapping
 
-1. Klicke auf das **Drei-Punkte-Menü** für das zugeordnete Projekt
-2. Klicke auf das **Stift-Symbol**
-3. Ändere das Lasius-Projekt oder die Tag-Einstellungen
-4. Klicke auf **Bestätigen**, um zu speichern
+Each existing mapping appears as a **badge chip** on the external project row. Click a chip to open its tag configuration and edit it:
 
-## Zuordnung entfernen
+1. Click the badge chip for the mapping you want to edit
+2. Adjust the tag settings as needed
+3. Click **Confirm** to save
 
-1. Klicke auf das **Drei-Punkte-Menü** für das zugeordnete Projekt
-2. Klicke auf das **Papierkorb-Symbol**
-3. Ein Bestätigungsdialog erscheint
-4. Klicke auf **Entfernen**, um zu bestätigen
+## Removing a Mapping
 
-<Tip>Das Entfernen einer Zuordnung stoppt die Synchronisierung, löscht aber keine bestehenden Tags</Tip>
+Click the **×** on a badge chip to remove that mapping:
 
-## Nach der Zuordnung
+1. Click the **×** icon on the chip
+2. A confirmation dialog appears
+3. Click **Remove** to confirm
 
-Die Synchronisierung erfolgt automatisch:
-- Erste Synchronisierung erfolgt beim nächsten geplanten Prüfintervall
-- Nachfolgende Synchronisierungen holen nur neue oder aktualisierte Issues
-- Prüfe den Gesundheitsstatus der Integration, um den Fortschritt zu überwachen
+<Tip>Removing a mapping stops syncing but doesn't delete existing tags</Tip>
 
-## Fehlerbehebung
+## Tag Configuration
 
-**Projektliste ist leer:**
-- Verifiziere die Integrations-Anmeldedaten in den Einstellungen
-- Prüfe, ob dein Konto Zugriff auf Projekte der Plattform hat
-- Warte, bis das initiale Laden abgeschlossen ist
+When adding or editing a mapping, configure which issue fields to import as tags:
 
-**Kann kein Lasius-Projekt auswählen:**
-- Stelle sicher, dass du mindestens ein Projekt in Lasius erstellt hast
-- Prüfe, ob du Zugriffsberechtigung auf das Projekt hast
-- Versuche, den Dialog zu schließen und erneut zu öffnen
+**Tag Fields to Import** (Multi-select, at least one required):
+- Use issue title as tag
+- Use labels as tags
+- Use milestone as tag
+- Use assignees as tags (GitHub only)
 
-**Zuordnung wird gespeichert, aber Tags erscheinen nicht:**
-- Warte auf den nächsten Synchronisierungszyklus (prüfe das Intervall der Integration)
-- Verifiziere, dass mindestens ein Tag-Feld ausgewählt ist
-- Prüfe, ob Issues deinem Status-Filter entsprechen (alle, offen oder geschlossen)
-- Überprüfe den Gesundheitsstatus der Integration auf Fehler
+**Label Filter** (appears if "Use labels" is selected):
+- Leave empty to import all labels as tags
+- Select specific labels to import only those
+
+**Issue Label Filter**:
+- Leave empty to import all issues
+- Select labels to import only issues with those labels
+
+**Issue State Filter**:
+- **GitHub/GitLab**: Single selection (open or closed)
+- **Plane**: Multi-select (custom workflow states)
+- Leave empty to import issues in all states
+
+<Tip>For GitHub/GitLab, select "open" to avoid cluttering your tag list with closed issues</Tip>
+
+## After Mapping
+
+Syncing happens automatically:
+- First sync occurs on the next scheduled check interval
+- Subsequent syncs only fetch new or updated issues
+- Check the integration's health status to monitor progress
+- Use **Refresh all tags** from the integrations list context menu for an immediate sync
+
+## Troubleshooting
+
+**Project list is empty:**
+- Verify integration credentials in settings
+- Check your account has access to projects on the platform
+- Wait for the initial load to complete
+
+**Cannot select a Lasius project:**
+- Ensure you have at least one project created in Lasius
+- Check you have permission to access the project
+- Try closing and reopening the modal
+
+**Mapping saves but tags don't appear:**
+- Wait for the next sync cycle (check the integration's interval)
+- Verify at least one tag field is selected
+- Check issues match your state filter (all, open, or closed)
+- Review the integration's health status for errors
