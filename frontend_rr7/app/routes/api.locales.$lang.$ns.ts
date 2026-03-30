@@ -20,17 +20,13 @@
 import { data } from 'react-router'
 import { z } from 'zod'
 
-import { i18nConfig } from '~/i18n-config'
+import { LOCALES } from '~/i18n-config'
+import { resources } from '~/i18n-resources.server'
 import { logger } from '~/lib/logger'
 
 import { type Route } from './+types/api.locales.$lang.$ns'
 
-const resources = i18nConfig.resources
-type Language = keyof typeof resources
-
-const languageSchema = z.enum(
-  i18nConfig.supportedLngs as [Language, ...Language[]],
-)
+const languageSchema = z.enum(LOCALES)
 
 export async function loader({ params }: Route.LoaderArgs) {
   const lng = languageSchema.safeParse(params.lang)

@@ -17,12 +17,6 @@
  *
  */
 
-import de from '~/locales/de'
-import en from '~/locales/en'
-import es from '~/locales/es'
-import fr from '~/locales/fr'
-import it from '~/locales/it'
-
 /** Supported application locales — matches the Next.js frontend config */
 export const LOCALES = ['en', 'de', 'fr', 'it', 'es'] as const
 
@@ -73,22 +67,13 @@ export const NAMESPACES = [
 /** Namespace type derived from the NAMESPACES array */
 export type Namespace = (typeof NAMESPACES)[number]
 
-export const resources = { de, en, es, fr, it }
-
 export const defaultNS = 'common' as const
 
 export const i18nConfig = {
   defaultNS,
   /** EN is the source language — use as fallback for untranslated keys */
   fallbackLng: DEFAULT_LOCALE,
-  /**
-   * Allow key lookup across all namespaces. Since all namespaces are eagerly
-   * loaded, this lets utility functions and dynamic keys resolve without
-   * knowing the source namespace.
-   */
-  fallbackNS: [...NAMESPACES] as string[],
   ns: [...NAMESPACES] as string[],
-  resources,
   /** Treat empty strings as missing translations — fall back to fallbackLng */
   returnEmptyString: false,
   /** Suppress i18next sponsorship/Locize banner */

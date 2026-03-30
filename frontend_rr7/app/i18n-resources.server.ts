@@ -17,23 +17,24 @@
  *
  */
 
-import { createI18nextMiddleware } from 'remix-i18next/middleware'
+import { i18nConfig, NAMESPACES } from '~/i18n-config'
+import de from '~/locales/de'
+import en from '~/locales/en'
+import es from '~/locales/es'
+import fr from '~/locales/fr'
+import it from '~/locales/it'
 
-import { i18nServerConfig } from '~/i18n-resources.server'
-import { localeCookie } from '~/lib/cookies/i18next-cookie.server'
+/** All locale resources — server-only to avoid bundling all languages in the client */
+export const resources = { de, en, es, fr, it }
 
-export const [i18nextMiddleware, getLocale, getInstance] =
-  createI18nextMiddleware({
-    detection: {
-      cookie: localeCookie,
-      fallbackLanguage: i18nServerConfig.fallbackLng,
-      supportedLanguages: i18nServerConfig.supportedLngs,
-    },
-    i18next: {
-      defaultNS: i18nServerConfig.defaultNS,
-      fallbackNS: i18nServerConfig.fallbackNS,
-      ns: i18nServerConfig.ns,
-      resources: i18nServerConfig.resources,
-      returnEmptyString: i18nServerConfig.returnEmptyString,
-    },
-  })
+/** Server-side i18n config with resources and cross-namespace fallback */
+export const i18nServerConfig = {
+  ...i18nConfig,
+  /**
+   * Allow key lookup across all namespaces. Since all namespaces are eagerly
+   * loaded server-side, this lets utility functions and dynamic keys resolve
+   * without knowing the source namespace.
+   */
+  fallbackNS: [...NAMESPACES] as string[],
+  resources,
+}

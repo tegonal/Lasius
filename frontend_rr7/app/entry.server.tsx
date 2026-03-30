@@ -33,7 +33,7 @@ import {
   ServerRouter,
 } from 'react-router'
 
-import { i18nConfig } from '~/i18n-config'
+import { i18nServerConfig } from '~/i18n-resources.server'
 import { logger } from '~/lib/logger'
 
 import { getInstance } from './middleware/i18next'
@@ -82,9 +82,9 @@ export default function handleRequest(
       // Middleware context unavailable for non-route requests (favicon, .well-known, etc.)
       // Fall back to a minimal synchronous i18n instance
       i18nInstance = createInstance({
-        ...i18nConfig,
+        ...i18nServerConfig,
         initAsync: false,
-        lng: i18nConfig.fallbackLng,
+        lng: i18nServerConfig.fallbackLng,
       })
       void i18nInstance.init()
     }
