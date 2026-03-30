@@ -19,7 +19,7 @@
 
 import { getFormProps, useForm, useInputControl } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useFetcher } from 'react-router'
 import { z } from 'zod'
@@ -78,6 +78,15 @@ export const AppSettingsForm = () => {
     useAppSettingsActions()
   const localeFetcher = useFetcher()
   const themeFetcher = useFetcher()
+  const pendingLocaleReload = useRef(false)
+
+  // Reload after locale cookie has been set by the server
+  useEffect(() => {
+    if (pendingLocaleReload.current && localeFetcher.state === 'idle') {
+      pendingLocaleReload.current = false
+      globalThis.location.reload()
+    }
+  }, [localeFetcher.state])
 
   const schema = useMemo(() => createAppSettingsSchema(untyped(t)), [t])
 
@@ -174,9 +183,9 @@ export const AppSettingsForm = () => {
       )
     }
 
-    // Reload if language changed (to load new translation files)
+    // Reload after locale cookie is persisted (watched by useEffect above)
     if (languageChanged) {
-      globalThis.location.reload()
+      pendingLocaleReload.current = true
     }
   }
 

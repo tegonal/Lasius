@@ -17,41 +17,16 @@
  *
  */
 
-import parser from 'accept-language-parser'
 import { createI18nextMiddleware } from 'remix-i18next/middleware'
 
 import { i18nConfig } from '~/i18n-config.ts'
 import { localeCookie } from '~/lib/cookies/i18next-cookie.server'
-
-const ignorePrefixes = ['/api/']
 
 export const [i18nextMiddleware, getLocale, getInstance] =
   createI18nextMiddleware({
     detection: {
       cookie: localeCookie,
       fallbackLanguage: i18nConfig.fallbackLng,
-      async findLocale(request) {
-        const pathname = new URL(request.url).pathname
-        if (ignorePrefixes.some((prefix) => pathname.startsWith(prefix))) {
-          return null
-        }
-
-        // Try Accept-Language header as fallback (cookie is checked automatically by remix-i18next)
-        const acceptLanguageHeader = request.headers.get('Accept-Language')
-        if (acceptLanguageHeader) {
-          const preferredLanguages = parser.parse(acceptLanguageHeader)
-          if (preferredLanguages.length > 0) {
-            const match = preferredLanguages.find((lang) =>
-              i18nConfig.supportedLngs.includes(lang.code),
-            )
-            if (match) {
-              return match.code
-            }
-          }
-        }
-
-        return null
-      },
       supportedLanguages: i18nConfig.supportedLngs,
     },
     i18next: {
