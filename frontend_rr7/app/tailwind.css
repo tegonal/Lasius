@@ -229,7 +229,7 @@
     height: 100%;
   }
 
-  a:not(:has(*)) {
+  a:not(:has(*)):not(.btn) {
     color: var(--color-primary);
     text-decoration: underline;
 
