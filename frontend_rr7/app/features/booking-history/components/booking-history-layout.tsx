@@ -111,6 +111,8 @@ export const BookingHistoryLayout = ({
   const { findProjectById, userProjects } = useProjects()
 
   const projectIdFromUrl = searchParams.get('projectId') ?? ''
+  const userIdFromUrl = searchParams.get('userId') ?? ''
+  const tagsFromUrl = searchParams.get('tags') ?? ''
 
   const projectSuggestions: ModelsEntityReference[] = useMemo(() => {
     if (projectsProp) return projectsProp
@@ -125,9 +127,9 @@ export const BookingHistoryLayout = ({
       dateRange: defaultDateRange?.name ?? '',
       from: initialRange.from,
       projectId: projectIdFromUrl,
-      tags: '',
+      tags: tagsFromUrl,
       to: initialRange.to,
-      userId: '',
+      userId: userIdFromUrl,
     },
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: filterSchema })
@@ -185,27 +187,62 @@ export const BookingHistoryLayout = ({
     },
   }
 
-  // Sync from/to to URL search params so the loader refetches
+  // Sync filter values to URL search params so the loader refetches and filters are shareable
   const [, setSearchParams] = useSearchParams()
   const prevFrom = useRef(fromValue)
   const prevTo = useRef(toValue)
+  const prevProjectId = useRef(projectIdValue)
+  const prevUserId = useRef(userIdValue)
+  const prevTags = useRef(tagsValue)
 
   useEffect(() => {
     if (!fromValue || !toValue) return
-    if (fromValue === prevFrom.current && toValue === prevTo.current) return
+    if (
+      fromValue === prevFrom.current &&
+      toValue === prevTo.current &&
+      projectIdValue === prevProjectId.current &&
+      userIdValue === prevUserId.current &&
+      tagsValue === prevTags.current
+    )
+      return
 
     prevFrom.current = fromValue
     prevTo.current = toValue
+    prevProjectId.current = projectIdValue
+    prevUserId.current = userIdValue
+    prevTags.current = tagsValue
 
     setSearchParams(
       (prev) => {
         prev.set('from', fromValue)
         prev.set('to', toValue)
+        if (projectIdValue) {
+          prev.set('projectId', projectIdValue)
+        } else {
+          prev.delete('projectId')
+        }
+        if (userIdValue) {
+          prev.set('userId', userIdValue)
+        } else {
+          prev.delete('userId')
+        }
+        if (tagsValue) {
+          prev.set('tags', tagsValue)
+        } else {
+          prev.delete('tags')
+        }
         return prev
       },
       { replace: true },
     )
-  }, [fromValue, toValue, setSearchParams])
+  }, [
+    fromValue,
+    toValue,
+    projectIdValue,
+    userIdValue,
+    tagsValue,
+    setSearchParams,
+  ])
 
   // Set initial search params on mount if missing
   const didSetInitialParams = useRef(false)
@@ -302,10 +339,17 @@ export const BookingHistoryLayout = ({
                 users={distinctUsers}
               />
               <BookingHistoryExport
-                bookings={processedItems}
                 context={exportContext}
                 from={fromValue}
+                hasBookings={processedItems.length > 0}
+                projectId={projectId}
+                tags={
+                  tags.length > 0
+                    ? tags.map((tag) => tag.id).join(',')
+                    : undefined
+                }
                 to={toValue}
+                userId={userId}
               />
             </div>
             {bookings.length === 0 && isLoading && <Loading />}

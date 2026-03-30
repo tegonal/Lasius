@@ -36,6 +36,7 @@ import { DurationInput } from '~/components/ui/forms/input/duration-input'
 import { Modal } from '~/components/ui/overlays/modal/modal'
 import { ModalBody } from '~/components/ui/overlays/modal/modal-body'
 import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
+import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
 import { ModalHelpButton } from '~/features/help/components/help-button'
 import { GithubResourceOwnerField } from '~/features/integrations/components/modals/config-fields/github-resource-owner-field'
 import { JiraCredentialFields } from '~/features/integrations/components/modals/config-fields/jira-credential-fields'
@@ -242,14 +243,13 @@ export const GenericConfigModal = ({
         {/* Header */}
         <div className="flex-shrink-0">
           <ModalCloseButton onClose={onClose} />
-          <div className="mb-2 flex items-center gap-2">
-            <h3 className="text-lg font-semibold">
-              {t('issueImporters.titles.edit', {
-                defaultValue: 'Edit Integration',
-              })}
-            </h3>
-            <ModalHelpButton helpKey="modal-importer-config" />
-          </div>
+          <ModalHeader
+            actionSlot={<ModalHelpButton helpKey="modal-importer-config" />}
+          >
+            {t('issueImporters.titles.edit', {
+              defaultValue: 'Edit Integration',
+            })}
+          </ModalHeader>
           <p className="text-base-content/60 mb-6 text-sm">
             {t('issueImporters.descriptions.edit', {
               defaultValue:

@@ -308,15 +308,15 @@ export const ProjectMappingsModal = ({
       <div className="flex h-full flex-1 flex-col">
         <ModalCloseButton onClose={onClose} />
 
-        <div className="mb-4 flex items-center gap-2">
-          <ModalHeader>
-            {t('issueImporters.projectMappings.title', {
-              defaultValue: '{{platform}} Project Mappings',
-              platform: getImporterTypeLabel(importerType, untyped(t)),
-            })}
-          </ModalHeader>
-          <ModalHelpButton helpKey="modal-project-mappings" />
-        </div>
+        <ModalHeader
+          actionSlot={<ModalHelpButton helpKey="modal-project-mappings" />}
+          className="mb-4"
+        >
+          {t('issueImporters.projectMappings.title', {
+            defaultValue: '{{platform}} Project Mappings',
+            platform: getImporterTypeLabel(importerType, untyped(t)),
+          })}
+        </ModalHeader>
 
         <ProjectMappingDataList
           importerType={importerType}

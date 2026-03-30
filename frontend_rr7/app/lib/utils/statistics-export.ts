@@ -109,11 +109,14 @@ const transformAggregatedData = (stats: ModelsBookingStats[] | undefined) => {
     .toSorted((a, b) => b.Hours - a.Hours)
 }
 
+/**
+ * Generates a statistics spreadsheet buffer.
+ * Server-only — uses XLSX.write() to return a buffer instead of writing to disk.
+ */
 export const exportStatistics = (
   data: StatisticsExportData,
   format: ExportFormat,
-  filename?: string,
-) => {
+): { buffer: Uint8Array; filename: string } => {
   const wb = XLSX.utils.book_new()
 
   const formatSummaryDate = (dateStr: string) => {
@@ -177,15 +180,15 @@ export const exportStatistics = (
     XLSX.utils.book_append_sheet(wb, ws, sheetName)
   }
 
-  const extension = format
   const fromDate = data.summary.from.split('T')[0]
   const toDate = data.summary.to.split('T')[0]
-  const file =
-    filename ||
-    `lasius-statistics-${data.scope}-${fromDate}_to_${toDate}.${extension}`
+  const filename = `lasius-statistics-${data.scope}-${fromDate}_to_${toDate}.${format}`
 
-  XLSX.writeFile(wb, file, {
+  const buffer = XLSX.write(wb, {
     bookType: format as XLSX.BookType,
     compression: true,
-  })
+    type: 'array',
+  }) as Uint8Array
+
+  return { buffer, filename }
 }

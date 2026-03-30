@@ -27,7 +27,7 @@ import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { Modal } from '~/components/ui/overlays/modal/modal'
 import { ModalBody } from '~/components/ui/overlays/modal/modal-body'
 import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
-import { ModalTitle } from '~/components/ui/overlays/modal/modal-title'
+import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
 import { ModalHelpButton } from '~/features/help/components/help-button'
 import { ImporterTypeBadge } from '~/features/integrations/components/importer-type-badge'
 import {
@@ -89,14 +89,14 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
     <Modal onClose={onClose} open={open} size="lg">
       <div className="flex min-h-0 flex-1 flex-col gap-4">
         <ModalCloseButton onClose={onClose} />
-        <div className="flex items-center gap-2">
-          <ModalTitle>
-            {t('issueImporters.info.title', {
-              defaultValue: 'Configuration Info',
-            })}
-          </ModalTitle>
-          <ModalHelpButton helpKey="modal-config-info" />
-        </div>
+        <ModalHeader
+          actionSlot={<ModalHelpButton helpKey="modal-config-info" />}
+          className="mb-0"
+        >
+          {t('issueImporters.info.title', {
+            defaultValue: 'Configuration Info',
+          })}
+        </ModalHeader>
 
         {!config && (
           <p className="text-base-content/60 text-sm">

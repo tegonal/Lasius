@@ -17,18 +17,61 @@
  *
  */
 
-import { type LucideIcon as LucideIconType } from 'lucide-react'
-import * as LucideIcons from 'lucide-react'
+import {
+  ArrowDownToLine,
+  ArrowUpToLine,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  Clipboard,
+  Clock,
+  Copy,
+  EllipsisVertical,
+  Eye,
+  type LucideIcon as LucideIconType,
+  PlayCircle,
+  Plus,
+  Square,
+  Star,
+  Trash2,
+  Users,
+} from 'lucide-react'
 
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 
+/**
+ * Explicit map of icons available in MDX help content.
+ * Only these icons are bundled — keeps lucide-react tree-shakeable.
+ * When adding a new <Icon name="..." /> in MDX, add the import + map entry here.
+ */
+const iconMap: Record<string, LucideIconType> = {
+  ArrowDownToLine,
+  ArrowUpToLine,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  Clipboard,
+  Clock,
+  Copy,
+  EllipsisVertical,
+  Eye,
+  PlayCircle,
+  Plus,
+  Square,
+  Star,
+  Trash2,
+  Users,
+}
+
 interface InlineIconProps {
-  name: keyof typeof LucideIcons
+  name: string
   size?: number
 }
 
 export const InlineIcon = ({ name, size = 18 }: InlineIconProps) => {
-  const IconComponent = LucideIcons[name] as LucideIconType
+  const IconComponent = iconMap[name]
 
   if (!IconComponent) {
     return <span>{name}</span>

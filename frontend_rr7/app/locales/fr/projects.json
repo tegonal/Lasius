@@ -20,6 +20,7 @@
   },
   "empty": "Aucun projet trouvé",
   "errors": {
+    "duplicateKey": "Un projet avec ce nom existe déjà dans votre organisation",
     "projectNotFound": "Ce projet n'a pas pu être trouvé. L'ID du projet est affiché ci-dessus."
   },
   "filter": {

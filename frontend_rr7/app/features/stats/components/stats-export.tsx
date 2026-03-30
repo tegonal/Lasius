@@ -17,19 +17,10 @@
  *
  */
 
-import { endOfDay, format, isValid, startOfDay } from 'date-fns'
-import { ChevronDown, Download, Loader2 } from 'lucide-react'
-import { useState } from 'react'
+import { ChevronDown, Download } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-import { useToast } from '~/components/ui/feedback/use-toast'
-import { getAdaptiveGranularity } from '~/lib/api/config/granularity-config'
-import { logger } from '~/lib/logger'
-import {
-  type ExportFormat,
-  exportStatistics,
-} from '~/lib/utils/statistics-export'
-import { type ModelsBookingStats } from '~/services/api/lasius'
+type ExportFormat = 'ods' | 'xlsx'
 
 type StatsExportProps = {
   bookingList: {
@@ -44,69 +35,6 @@ type StatsExportProps = {
   to: string
 }
 
-const apiDateFormat = 'yyyy-MM-dd'
-
-const formatDateParam = (dateStr: string): string => {
-  const date = new Date(dateStr)
-  if (!isValid(date)) return dateStr
-  return format(startOfDay(date), apiDateFormat)
-}
-
-const formatDateParamEnd = (dateStr: string): string => {
-  const date = new Date(dateStr)
-  if (!isValid(date)) return dateStr
-  return format(endOfDay(date), apiDateFormat)
-}
-
-type FetchStatsParams = {
-  from: string
-  granularity: string
-  scope: 'organisation' | 'user'
-  selectedOrgId: string
-  source: string
-  to: string
-}
-
-const fetchAggregatedStats = async ({
-  from,
-  granularity,
-  scope,
-  selectedOrgId,
-  source,
-  to,
-}: FetchStatsParams): Promise<ModelsBookingStats[]> => {
-  const apiFrom = formatDateParam(from)
-  const apiTo = formatDateParamEnd(to)
-
-  const basePath =
-    scope === 'organisation'
-      ? `/organisation-bookings/organisations/${selectedOrgId}/bookings/stats/aggregated`
-      : `/user-bookings/organisations/${selectedOrgId}/bookings/stats/aggregated`
-
-  const params = new URLSearchParams({
-    from: apiFrom,
-    granularity,
-    source,
-    to: apiTo,
-  })
-
-  const response = await fetch('/api/proxy', {
-    body: JSON.stringify({
-      method: 'GET',
-      url: `${basePath}?${params.toString()}`,
-    }),
-    headers: { 'Content-Type': 'application/json' },
-    method: 'POST',
-  })
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch ${source} stats: ${response.status}`)
-  }
-
-  const data = (await response.json()) as { data?: ModelsBookingStats[] }
-  return data.data ?? []
-}
-
 export const StatsExport = ({
   bookingList,
   distinctProjects,
@@ -117,107 +45,24 @@ export const StatsExport = ({
   to,
 }: StatsExportProps) => {
   const { t } = useTranslation('common')
-  const { addToast } = useToast()
-  const [isExporting, setIsExporting] = useState(false)
 
   const hasData = bookingList.elements > 0
 
-  const handleExport = async (exportFormat: ExportFormat) => {
-    setIsExporting(true)
+  const handleExport = (exportFormat: ExportFormat) => {
+    const params = new URLSearchParams({
+      format: exportFormat,
+      from,
+      orgId: selectedOrgId,
+      scope,
+      to,
+      totalBookings: String(bookingList.elements),
+      totalHours: String(bookingList.hours),
+      totalProjects: String(distinctProjects),
+      totalUsers: String(distinctUsers),
+      type: 'statistics',
+    })
 
-    try {
-      const granularity = getAdaptiveGranularity(from, to)
-
-      const fetchParams = (source: string, gran: string): FetchStatsParams => ({
-        from,
-        granularity: gran,
-        scope,
-        selectedOrgId,
-        source,
-        to,
-      })
-
-      let projectsByDay: ModelsBookingStats[] = []
-      let tagsByDay: ModelsBookingStats[] = []
-      let usersByDay: ModelsBookingStats[] = []
-      let projectsAggregated: ModelsBookingStats[] = []
-      let tagsAggregated: ModelsBookingStats[] = []
-      let usersAggregated: ModelsBookingStats[] = []
-
-      if (scope === 'organisation') {
-        ;[
-          tagsByDay,
-          usersByDay,
-          projectsAggregated,
-          usersAggregated,
-          tagsAggregated,
-        ] = await Promise.all([
-          fetchAggregatedStats(fetchParams('tag', granularity)),
-          fetchAggregatedStats(fetchParams('user', granularity)),
-          fetchAggregatedStats(fetchParams('project', 'All')),
-          fetchAggregatedStats(fetchParams('user', 'All')),
-          fetchAggregatedStats(fetchParams('tag', 'All')),
-        ])
-      } else {
-        ;[projectsByDay, tagsByDay, projectsAggregated, tagsAggregated] =
-          await Promise.all([
-            fetchAggregatedStats(fetchParams('project', granularity)),
-            fetchAggregatedStats(fetchParams('tag', granularity)),
-            fetchAggregatedStats(fetchParams('project', 'All')),
-            fetchAggregatedStats(fetchParams('tag', 'All')),
-          ])
-      }
-
-      const byDayAndSource =
-        scope === 'organisation'
-          ? [
-              { data: tagsByDay, source: 'tag' as const },
-              { data: usersByDay, source: 'user' as const },
-            ]
-          : [
-              { data: projectsByDay, source: 'project' as const },
-              { data: tagsByDay, source: 'tag' as const },
-            ]
-
-      const aggregated =
-        scope === 'organisation'
-          ? [
-              { data: projectsAggregated, source: 'project' as const },
-              { data: usersAggregated, source: 'user' as const },
-              { data: tagsAggregated, source: 'tag' as const },
-            ]
-          : [
-              { data: projectsAggregated, source: 'project' as const },
-              { data: tagsAggregated, source: 'tag' as const },
-            ]
-
-      exportStatistics(
-        {
-          aggregated,
-          byDayAndSource,
-          scope,
-          summary: {
-            from,
-            to,
-            totalBookings: bookingList.elements,
-            totalHours: bookingList.hours,
-            totalProjects: distinctProjects,
-            totalUsers: distinctUsers,
-          },
-        },
-        exportFormat,
-      )
-    } catch (error) {
-      logger.error('Failed to export statistics', error)
-      addToast({
-        message: t('export.stats.error', {
-          defaultValue: 'Failed to export statistics. Please try again.',
-        }),
-        type: 'ERROR',
-      })
-    } finally {
-      setIsExporting(false)
-    }
+    window.open(`/api/export?${params.toString()}`, '_blank')
   }
 
   return (
@@ -229,15 +74,11 @@ export const StatsExport = ({
         })}
         className="btn btn-sm btn-neutral w-auto"
         data-testid="stats-export-btn"
-        disabled={!hasData || isExporting}
+        disabled={!hasData}
         tabIndex={0}
         type="button"
       >
-        {isExporting ? (
-          <Loader2 className="size-4 animate-spin" />
-        ) : (
-          <Download className="size-4" />
-        )}
+        <Download className="size-4" />
         {t('export.actions.export', { defaultValue: 'Export' })}
         <ChevronDown className="size-4" />
       </button>

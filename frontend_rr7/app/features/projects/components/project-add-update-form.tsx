@@ -17,25 +17,28 @@
  *
  */
 
-import { getFormProps, useForm } from '@conform-to/react'
+import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 
 import { Button } from '~/components/primitives/buttons/button'
+import { Input } from '~/components/primitives/inputs/input'
 import { Alert } from '~/components/ui/feedback/alert'
 import { useToast } from '~/components/ui/feedback/use-toast'
 import { ButtonGroup } from '~/components/ui/forms/button-group'
-import { FormField } from '~/components/ui/forms/conform/form-field'
 import { FieldSet } from '~/components/ui/forms/field-set'
 import { FormBody } from '~/components/ui/forms/form-body'
+import { FormElement } from '~/components/ui/forms/form-element'
+import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
 import { ModalDescription } from '~/components/ui/overlays/modal/modal-description'
 import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
-import { validateFormData } from '~/lib/conform-helpers'
+import { mergeErrors, validateFormData } from '~/lib/conform-helpers'
 import { type SchemaTranslationFn, untyped } from '~/lib/i18n-types'
+import { logger } from '~/lib/logger'
 import {
   useCreateProject,
   useUpdateProject,
@@ -89,6 +92,8 @@ export const ProjectAddUpdateForm = ({
   const { addToast } = useToast()
   const { selectedOrganisationId } = useOrganisation()
 
+  const [serverErrors, setServerErrors] = useState<Record<string, string[]>>({})
+
   const onSuccess = () => {
     addToast({
       message:
@@ -100,8 +105,29 @@ export const ProjectAddUpdateForm = ({
     onSave()
   }
 
-  const createProjectApi = useCreateProject({ onSuccess })
-  const updateProjectApi = useUpdateProject({ onSuccess })
+  const duplicateErrorMsg = t(
+    'projects:errors.duplicateKey',
+    'A project with this name already exists in your organisation',
+  )
+
+  const setDuplicateError = () => {
+    setServerErrors({ projectKey: [duplicateErrorMsg] })
+  }
+
+  const createProjectApi = useCreateProject({
+    onError: ({ error }) => {
+      logger.error('Failed to create project', error)
+      setDuplicateError()
+    },
+    onSuccess,
+  })
+  const updateProjectApi = useUpdateProject({
+    onError: ({ error }) => {
+      logger.error('Failed to update project', error)
+      setDuplicateError()
+    },
+    onSuccess,
+  })
   const activeFetcher = mode === 'add' ? createProjectApi : updateProjectApi
 
   const schema = useMemo(() => createProjectSchema(untyped(t)), [t])
@@ -112,6 +138,7 @@ export const ProjectAddUpdateForm = ({
       projectKey: getProjectKey(item),
     },
     onValidate({ formData }) {
+      setServerErrors({})
       return parseWithZod(formData, { schema })
     },
     shouldRevalidate: 'onInput',
@@ -139,6 +166,11 @@ export const ProjectAddUpdateForm = ({
       })
     }
   }
+
+  const nameErrors = mergeErrors(
+    fields.projectKey.errors,
+    serverErrors.projectKey,
+  )
 
   return (
     <div className="flex flex-col">
@@ -168,13 +200,20 @@ export const ProjectAddUpdateForm = ({
             )}
           </Alert>
           <FieldSet>
-            <FormField
-              autoComplete="off"
-              data-testid="project-form-key-input"
-              field={fields.projectKey}
+            <FormElement
+              htmlFor={fields.projectKey.id}
               label={t('projects:projectName', 'Project name')}
               required
-            />
+            >
+              <Input
+                {...getInputProps(fields.projectKey, { type: 'text' })}
+                autoComplete="off"
+                data-testid="project-form-key-input"
+                error={!!nameErrors?.length}
+                key={fields.projectKey.key}
+              />
+              <FormFieldErrors errors={nameErrors} />
+            </FormElement>
           </FieldSet>
           <ButtonGroup>
             <Button

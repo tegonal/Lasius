@@ -20,44 +20,46 @@
 import { ChevronDown, Download } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-import { useToast } from '~/components/ui/feedback/use-toast'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
-import {
-  exportBookingList,
-  type ExportContext,
-  type ExportFormat,
-} from '~/lib/utils/data/export'
-import { type ExtendedHistoryBooking } from '~/types/booking'
+import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
+import { type ExportContext, type ExportFormat } from '~/lib/utils/data/export'
 
 type Props = {
-  bookings: ExtendedHistoryBooking[]
   context: ExportContext
   from?: string
+  hasBookings: boolean
+  projectId?: string
+  tags?: string
   to?: string
+  userId?: string
 }
 
 export const BookingHistoryExport = ({
-  bookings,
   context,
   from,
+  hasBookings,
+  projectId,
+  tags,
   to,
+  userId,
 }: Props) => {
   const { t } = useTranslation('common')
-  const { addToast } = useToast()
+  const { selectedOrganisationId } = useOrganisation()
 
   const handleExport = (format: ExportFormat) => {
-    const filename = exportBookingList(bookings, format, undefined, {
+    const params = new URLSearchParams({
       context,
-      from,
-      to,
+      format,
+      orgId: selectedOrganisationId,
+      type: 'bookings',
     })
-    addToast({
-      message: t('export.status.success', 'Export successful: {{filename}}', {
-        filename,
-      }),
-      ttl: 60_000,
-      type: 'SUCCESS',
-    })
+    if (from) params.set('from', from)
+    if (to) params.set('to', to)
+    if (projectId) params.set('projectId', projectId)
+    if (userId) params.set('userId', userId)
+    if (tags) params.set('tags', tags)
+
+    window.open(`/api/export?${params.toString()}`, '_blank')
   }
 
   return (
@@ -66,7 +68,7 @@ export const BookingHistoryExport = ({
         aria-haspopup="menu"
         aria-label={t('export.actions.openMenu', 'Open export format menu')}
         className="btn btn-sm btn-neutral w-auto"
-        disabled={bookings.length === 0}
+        disabled={!hasBookings}
         tabIndex={0}
         type="button"
       >

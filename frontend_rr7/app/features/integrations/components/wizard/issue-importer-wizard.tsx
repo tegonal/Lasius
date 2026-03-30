@@ -28,6 +28,7 @@ import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { Modal } from '~/components/ui/overlays/modal/modal'
 import { ModalBody } from '~/components/ui/overlays/modal/modal-body'
 import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
+import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
 import { ModalHelpButton } from '~/features/help/components/help-button'
 import { ConfigFormStep } from '~/features/integrations/components/wizard/steps/config-form-step'
 import { ListProjectsStep } from '~/features/integrations/components/wizard/steps/list-projects-step'
@@ -334,14 +335,14 @@ export const IssueImporterWizard = ({
       <div className="flex min-h-0 flex-1 flex-col">
         {/* Header */}
         <div className="flex-shrink-0 pb-4">
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg font-semibold">
-              {t('issueImporters.wizard.title', {
-                defaultValue: 'Add Integration',
-              })}
-            </h2>
-            <ModalHelpButton helpKey="modal-importer-wizard" />
-          </div>
+          <ModalHeader
+            actionSlot={<ModalHelpButton helpKey="modal-importer-wizard" />}
+            className="mb-0"
+          >
+            {t('issueImporters.wizard.title', {
+              defaultValue: 'Add Integration',
+            })}
+          </ModalHeader>
 
           {/* Progress indicator */}
           <div className="mt-4 flex items-center justify-center gap-1">

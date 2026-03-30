@@ -17,7 +17,13 @@
  *
  */
 
-import { type PropsWithChildren } from 'react'
+import {
+  lazy,
+  type PropsWithChildren,
+  Suspense,
+  useEffect,
+  useState,
+} from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   data,
@@ -35,8 +41,14 @@ import {
 } from 'react-router'
 
 import { ToastProvider } from '~/components/ui/feedback/toasts'
-import { HelpDrawer } from '~/features/help/components/help-drawer'
+import { useHelpStore } from '~/features/help/store/help-store'
 import { DataLoadingProgress } from '~/features/system/components/data-loading-progress'
+
+const LazyHelpDrawer = lazy(() =>
+  import('~/features/help/components/help-drawer').then((m) => ({
+    default: m.HelpDrawer,
+  })),
+)
 import { localeCookie } from '~/lib/cookies/i18next-cookie.server'
 import { parseThemeCookie } from '~/lib/cookies/theme-cookie.server'
 import { logger } from '~/lib/logger'
@@ -251,6 +263,12 @@ export const Layout = ({ children }: PropsWithChildren) => {
   const rootData = useRouteLoaderData<typeof loader>('root')
   const theme = rootData?.theme ?? 'light'
 
+  const isHelpOpen = useHelpStore((s) => s.isOpen)
+  const [helpMounted, setHelpMounted] = useState(false)
+  useEffect(() => {
+    if (isHelpOpen) setHelpMounted(true)
+  }, [isHelpOpen])
+
   return (
     <html
       data-theme={theme}
@@ -271,7 +289,11 @@ export const Layout = ({ children }: PropsWithChildren) => {
         <ToastProvider>{children}</ToastProvider>
         <ScrollRestoration />
         <Scripts />
-        <HelpDrawer />
+        {helpMounted && (
+          <Suspense fallback={null}>
+            <LazyHelpDrawer />
+          </Suspense>
+        )}
       </body>
     </html>
   )

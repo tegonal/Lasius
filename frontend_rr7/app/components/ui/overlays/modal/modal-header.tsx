@@ -22,6 +22,7 @@ import { cn } from '~/lib/utils/cn'
 import { ModalTitle } from './modal-title'
 
 type Props = {
+  actionSlot?: React.ReactNode
   children: React.ReactNode
   className?: string
 }
@@ -34,11 +35,17 @@ type Props = {
  * <ModalHeader>
  *   Settings
  * </ModalHeader>
+ *
+ * With help button:
+ * <ModalHeader actionSlot={<ModalHelpButton helpKey="modal-settings" />}>
+ *   Settings
+ * </ModalHeader>
  */
-export const ModalHeader = ({ children, className }: Props) => {
+export const ModalHeader = ({ actionSlot, children, className }: Props) => {
   return (
     <div className={cn('mb-2 flex items-center gap-2', className)}>
       <ModalTitle>{children}</ModalTitle>
+      {actionSlot}
     </div>
   )
 }

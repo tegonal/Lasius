@@ -31,6 +31,7 @@ import { GenericInputModal } from '~/components/ui/overlays/modal/generic-input-
 import { ModalBody } from '~/components/ui/overlays/modal/modal-body'
 import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
 import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
+import { ModalHelpButton } from '~/features/help/components/help-button'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { logger } from '~/lib/logger'
 import { useUpdateProject } from '~/services/api/lasius-hooks/projects/projects'
@@ -320,7 +321,10 @@ export const ProjectAddUpdateTagsForm = ({
         <div className="flex min-h-0 flex-1 flex-col">
           <ModalCloseButton onClose={handleCancel} />
 
-          <ModalHeader className="mb-4">
+          <ModalHeader
+            actionSlot={<ModalHelpButton helpKey="modal-edit-tags" />}
+            className="mb-4"
+          >
             {mode === 'add'
               ? t('actions.addTags', 'Add tags')
               : t('actions.editForProject', 'Edit tags for {{projectKey}}', {

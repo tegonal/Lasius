@@ -20,8 +20,9 @@
 import { differenceInDays, parseISO } from 'date-fns'
 import * as XLSX from 'xlsx'
 
+import { getExtendedModelsBookingList } from '~/lib/api/functions/get-extended-models-booking-list'
 import { modelsLocalDateTimeWithTimeZoneToString } from '~/lib/utils/dates'
-import { type ExtendedHistoryBooking } from '~/types/booking'
+import { type ModelsBooking } from '~/services/api/lasius'
 
 /**
  * Context for export filename generation
@@ -45,14 +46,6 @@ export type ExportOptions = {
 
 /**
  * Generates a filename for the export based on context and timespan.
- *
- * @param format - Export format extension
- * @param options - Export options including context and timespan
- * @returns Generated filename
- *
- * @example
- * generateExportFilename('xlsx', { context: 'user', from: '2025-01-01', to: '2025-01-31' })
- * // Returns: 'lasius-user-bookings-2025-01-01-to-2025-01-31.xlsx'
  */
 const generateExportFilename = (
   format: ExportFormat,
@@ -70,7 +63,6 @@ const generateExportFilename = (
     parts.push(options.contextName)
   }
 
-  // Add timespan if dates are provided and span more than 1 day
   if (options?.from && options?.to) {
     const daysDiff = differenceInDays(
       parseISO(options.to),
@@ -81,12 +73,10 @@ const generateExportFilename = (
       const toDate = options.to.split('T')[0]
       parts.push(`${fromDate}-to-${toDate}`)
     } else {
-      // Single day export
       const date = options.from.split('T')[0] ?? ''
       parts.push(date)
     }
   } else {
-    // No dates provided, use current date
     parts.push(new Date().toISOString().split('T')[0] ?? '')
   }
 
@@ -94,27 +84,18 @@ const generateExportFilename = (
 }
 
 /**
- * Exports a list of bookings to CSV, Excel (XLSX), or OpenDocument (ODS) format.
- * Creates a formatted spreadsheet with booking data including user, organization, project,
- * tags, start/end times, and duration.
+ * Generates a spreadsheet buffer from booking data.
+ * Server-only — uses XLSX.write() to return a buffer instead of writing to disk.
  *
- * @param bookings - Array of extended history booking records to export
- * @param format - Export format: 'csv', 'xlsx', or 'ods'
- * @param filename - Optional custom filename (defaults to context-based name)
- * @param options - Optional export options for context and timespan
- * @returns The filename of the exported file
- *
- * @example
- * const filename = exportBookingList(bookings, 'xlsx', undefined, { context: 'user', from: '2025-01-01', to: '2025-01-31' })
- * exportBookingList(bookings, 'csv') // Uses default filename
+ * Accepts raw ModelsBooking[] from the API and computes duration fields internally.
  */
 export const exportBookingList = (
-  bookings: ExtendedHistoryBooking[],
+  rawBookings: ModelsBooking[],
   format: ExportFormat,
-  filename?: string,
   options?: ExportOptions,
-): string => {
-  // Transform data - same logic as old CSV export
+): { buffer: Uint8Array; filename: string } => {
+  const bookings = getExtendedModelsBookingList(rawBookings)
+
   const data = bookings.map((item) => ({
     duration: Math.round(item.duration * 60) / 60 / 24,
     durationString: item.durationString,
@@ -126,10 +107,8 @@ export const exportBookingList = (
     user: item.userReference.key,
   }))
 
-  // Create worksheet from JSON data
   const ws = XLSX.utils.json_to_sheet(data)
 
-  // Apply time format to the duration column so it renders as [h]:mm in spreadsheets
   const keys = Object.keys(data[0] || {})
   const durationCol = keys.indexOf('duration')
   if (durationCol !== -1 && ws['!ref']) {
@@ -142,11 +121,9 @@ export const exportBookingList = (
     }
   }
 
-  // Create workbook and add the worksheet
   const wb = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(wb, ws, 'Bookings')
 
-  // Set column widths for better readability
   const init: Record<string, number> = {}
   const maxLengths = data.reduce((acc, row) => {
     for (const key of Object.keys(row)) {
@@ -160,19 +137,18 @@ export const exportBookingList = (
   }, init)
 
   ws['!cols'] = Object.keys(maxLengths).map((key) => ({
-    wch: Math.min((maxLengths[key] ?? 0) + 2, 50), // Add padding, cap at 50
+    wch: Math.min((maxLengths[key] ?? 0) + 2, 50),
   }))
 
-  // Determine file extension and bookType based on format
   const bookTypeMap: Record<string, string> = { csv: 'csv', xlsx: 'xlsx' }
   const bookType = bookTypeMap[format] ?? 'ods'
-  const file = filename || generateExportFilename(format, options)
+  const filename = generateExportFilename(format, options)
 
-  // Export the file
-  XLSX.writeFile(wb, file, {
+  const buffer = XLSX.write(wb, {
     bookType: bookType as XLSX.BookType,
-    compression: format !== 'csv', // Use compression for XLSX and ODS
-  })
+    compression: format !== 'csv',
+    type: 'array',
+  }) as Uint8Array
 
-  return file
+  return { buffer, filename }
 }
