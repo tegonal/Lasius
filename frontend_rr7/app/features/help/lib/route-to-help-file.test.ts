@@ -47,4 +47,28 @@ describe('routeToHelpFile', () => {
   it('handles empty string as user-home', () => {
     expect(routeToHelpFile('')).toBe('user-home')
   })
+
+  it('maps dashboard sub-routes to parent help file', () => {
+    expect(routeToHelpFile('/user/dashboard')).toBe('user-dashboard')
+    expect(routeToHelpFile('/user/dashboard/week')).toBe('user-dashboard')
+    expect(routeToHelpFile('/user/dashboard/month')).toBe('user-dashboard')
+    expect(routeToHelpFile('/user/dashboard/6months')).toBe('user-dashboard')
+    expect(routeToHelpFile('/user/dashboard/year')).toBe('user-dashboard')
+  })
+
+  it('maps stats sub-routes to parent help file', () => {
+    expect(routeToHelpFile('/user/stats')).toBe('user-stats')
+    expect(routeToHelpFile('/user/stats/projects')).toBe('user-stats')
+    expect(routeToHelpFile('/user/stats/tags')).toBe('user-stats')
+    expect(routeToHelpFile('/organisation/stats')).toBe('organisation-stats')
+    expect(routeToHelpFile('/organisation/stats/projects')).toBe(
+      'organisation-stats',
+    )
+    expect(routeToHelpFile('/organisation/stats/tags')).toBe(
+      'organisation-stats',
+    )
+    expect(routeToHelpFile('/organisation/stats/users')).toBe(
+      'organisation-stats',
+    )
+  })
 })

@@ -23,6 +23,16 @@
  * Help files were authored for the Next.js route structure (e.g. /user/home → user-home).
  * RR7 uses a flatter route structure, so we need an explicit mapping.
  */
+/**
+ * Maps route prefixes to their help file. Checked in order — first match wins.
+ * This handles sub-routes that should share a parent's help file.
+ */
+const prefixMap: Array<[prefix: string, helpFile: string]> = [
+  ['/user/dashboard', 'user-dashboard'],
+  ['/user/stats', 'user-stats'],
+  ['/organisation/stats', 'organisation-stats'],
+]
+
 const routeMap: Record<string, string> = {
   '/': 'user-home',
   '/dashboard': 'user-dashboard',
@@ -34,6 +44,12 @@ export const routeToHelpFile = (path: string): string => {
   const mapped = routeMap[path]
   if (mapped) {
     return mapped
+  }
+
+  // Check prefix-based mapping (sub-routes sharing a parent help file)
+  const prefix = prefixMap.find(([p]) => path.startsWith(p))
+  if (prefix) {
+    return prefix[1]
   }
 
   // Fallback: convert path to hyphenated name
