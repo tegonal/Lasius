@@ -70,10 +70,7 @@ const mdxComponents = {
     <h3 className="mt-8 mb-2 text-xl font-semibold">{children}</h3>
   ),
   Icon: ({ name, size }: { name: string; size?: number }) => (
-    <InlineIcon
-      name={name as React.ComponentProps<typeof InlineIcon>['name']}
-      size={size}
-    />
+    <InlineIcon name={name} size={size} />
   ),
   li: ({ children }: { children: React.ReactNode }) => (
     <li className="mb-1">{children}</li>

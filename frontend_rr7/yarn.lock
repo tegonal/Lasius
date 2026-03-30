@@ -730,51 +730,51 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fallow-cli/darwin-arm64@npm:2.2.2":
-  version: 2.2.2
-  resolution: "@fallow-cli/darwin-arm64@npm:2.2.2"
+"@fallow-cli/darwin-arm64@npm:2.5.5":
+  version: 2.5.5
+  resolution: "@fallow-cli/darwin-arm64@npm:2.5.5"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@fallow-cli/darwin-x64@npm:2.2.2":
-  version: 2.2.2
-  resolution: "@fallow-cli/darwin-x64@npm:2.2.2"
+"@fallow-cli/darwin-x64@npm:2.5.5":
+  version: 2.5.5
+  resolution: "@fallow-cli/darwin-x64@npm:2.5.5"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@fallow-cli/linux-arm64-gnu@npm:2.2.2":
-  version: 2.2.2
-  resolution: "@fallow-cli/linux-arm64-gnu@npm:2.2.2"
+"@fallow-cli/linux-arm64-gnu@npm:2.5.5":
+  version: 2.5.5
+  resolution: "@fallow-cli/linux-arm64-gnu@npm:2.5.5"
   conditions: os=linux & cpu=arm64
   languageName: node
   linkType: hard
 
-"@fallow-cli/linux-arm64-musl@npm:2.2.2":
-  version: 2.2.2
-  resolution: "@fallow-cli/linux-arm64-musl@npm:2.2.2"
+"@fallow-cli/linux-arm64-musl@npm:2.5.5":
+  version: 2.5.5
+  resolution: "@fallow-cli/linux-arm64-musl@npm:2.5.5"
   conditions: os=linux & cpu=arm64
   languageName: node
   linkType: hard
 
-"@fallow-cli/linux-x64-gnu@npm:2.2.2":
-  version: 2.2.2
-  resolution: "@fallow-cli/linux-x64-gnu@npm:2.2.2"
+"@fallow-cli/linux-x64-gnu@npm:2.5.5":
+  version: 2.5.5
+  resolution: "@fallow-cli/linux-x64-gnu@npm:2.5.5"
   conditions: os=linux & cpu=x64
   languageName: node
   linkType: hard
 
-"@fallow-cli/linux-x64-musl@npm:2.2.2":
-  version: 2.2.2
-  resolution: "@fallow-cli/linux-x64-musl@npm:2.2.2"
+"@fallow-cli/linux-x64-musl@npm:2.5.5":
+  version: 2.5.5
+  resolution: "@fallow-cli/linux-x64-musl@npm:2.5.5"
   conditions: os=linux & cpu=x64
   languageName: node
   linkType: hard
 
-"@fallow-cli/win32-x64-msvc@npm:2.2.2":
-  version: 2.2.2
-  resolution: "@fallow-cli/win32-x64-msvc@npm:2.2.2"
+"@fallow-cli/win32-x64-msvc@npm:2.5.5":
+  version: 2.5.5
+  resolution: "@fallow-cli/win32-x64-msvc@npm:2.5.5"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -5588,16 +5588,16 @@ __metadata:
   linkType: hard
 
 "fallow@npm:^2.2.2":
-  version: 2.2.2
-  resolution: "fallow@npm:2.2.2"
+  version: 2.5.5
+  resolution: "fallow@npm:2.5.5"
   dependencies:
-    "@fallow-cli/darwin-arm64": "npm:2.2.2"
-    "@fallow-cli/darwin-x64": "npm:2.2.2"
-    "@fallow-cli/linux-arm64-gnu": "npm:2.2.2"
-    "@fallow-cli/linux-arm64-musl": "npm:2.2.2"
-    "@fallow-cli/linux-x64-gnu": "npm:2.2.2"
-    "@fallow-cli/linux-x64-musl": "npm:2.2.2"
-    "@fallow-cli/win32-x64-msvc": "npm:2.2.2"
+    "@fallow-cli/darwin-arm64": "npm:2.5.5"
+    "@fallow-cli/darwin-x64": "npm:2.5.5"
+    "@fallow-cli/linux-arm64-gnu": "npm:2.5.5"
+    "@fallow-cli/linux-arm64-musl": "npm:2.5.5"
+    "@fallow-cli/linux-x64-gnu": "npm:2.5.5"
+    "@fallow-cli/linux-x64-musl": "npm:2.5.5"
+    "@fallow-cli/win32-x64-msvc": "npm:2.5.5"
     detect-libc: "npm:^2.0.0"
   dependenciesMeta:
     "@fallow-cli/darwin-arm64":
@@ -5616,7 +5616,7 @@ __metadata:
       optional: true
   bin:
     fallow: bin/fallow
-  checksum: 10c0/2352a736569fb0a3addbce9288a59301672d158de32fe39c098c593854d9a23c6bcd869da7b681d913bfa2111e9030523b9f1c24afcb320f5ca9b8a8f93fbbbd
+  checksum: 10c0/355ff00024ac8c7cbdb5fa9587d350e436ace23a1cf9bad251d60a199d5d6432c661bc331e88c8a148f8db9e298612ae1bbe456c362639b27cb7c477dd526f11
   languageName: node
   linkType: hard
 
@@ -6255,8 +6255,8 @@ __metadata:
   linkType: hard
 
 "i18next-cli@npm:^1.51.3":
-  version: 1.51.3
-  resolution: "i18next-cli@npm:1.51.3"
+  version: 1.51.4
+  resolution: "i18next-cli@npm:1.51.4"
   dependencies:
     "@croct/json5-parser": "npm:^0.2.2"
     "@swc/core": "npm:^1.15.21"
@@ -6272,11 +6272,11 @@ __metadata:
     minimatch: "npm:^10.2.4"
     ora: "npm:^9.3.0"
     react: "npm:^19.2.4"
-    react-i18next: "npm:^16.6.1"
+    react-i18next: "npm:^17.0.0"
     yaml: "npm:^2.8.3"
   bin:
     i18next-cli: dist/esm/cli.js
-  checksum: 10c0/074ec93bd60afcbe73cce0207ea0301f39611d1d24ba5cfc5cecb3f9fed60574c1be41e425b240a6805b0a848d557118ddd5371750dc8e356221d83524c972c3
+  checksum: 10c0/3e8bc1885711ec3398180fca3ff12e62abba8ba2564f254e56ee1948d0b155072baae4185d7666d8b1fdb96bb4168bb8051387083697e2c77f2558fdd85b8dfa
   languageName: node
   linkType: hard
 
@@ -8697,28 +8697,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-i18next@npm:^16.6.1":
-  version: 16.6.1
-  resolution: "react-i18next@npm:16.6.1"
-  dependencies:
-    "@babel/runtime": "npm:^7.29.2"
-    html-parse-stringify: "npm:^3.0.1"
-    use-sync-external-store: "npm:^1.6.0"
-  peerDependencies:
-    i18next: ">= 25.6.2"
-    react: ">= 16.8.0"
-    typescript: ^5
-  peerDependenciesMeta:
-    react-dom:
-      optional: true
-    react-native:
-      optional: true
-    typescript:
-      optional: true
-  checksum: 10c0/80b6d3ddd5a8c8ae5c40b3ea696f89e8ee6443c6a9d10040be58f18e65a06d6b866a8eb56f58502470f52644ef0171dbe23dc2fc14a5ec7bb48fb3cf5270271f
-  languageName: node
-  linkType: hard
-
 "react-i18next@npm:^16.6.6":
   version: 16.6.6
   resolution: "react-i18next@npm:16.6.6"
@@ -8738,6 +8716,28 @@ __metadata:
     typescript:
       optional: true
   checksum: 10c0/7d6660d382a529d4dc56e7a7bbab59689ac0f435b3a18bba81d6bbf52c87b2a41fd5d1bffcf60b92b5e6e2a1ad9443949fcf16329d9c63d582316557199a7d32
+  languageName: node
+  linkType: hard
+
+"react-i18next@npm:^17.0.0":
+  version: 17.0.1
+  resolution: "react-i18next@npm:17.0.1"
+  dependencies:
+    "@babel/runtime": "npm:^7.29.2"
+    html-parse-stringify: "npm:^3.0.1"
+    use-sync-external-store: "npm:^1.6.0"
+  peerDependencies:
+    i18next: ">= 26.0.1"
+    react: ">= 16.8.0"
+    typescript: ^5 || ^6
+  peerDependenciesMeta:
+    react-dom:
+      optional: true
+    react-native:
+      optional: true
+    typescript:
+      optional: true
+  checksum: 10c0/eb363db5a15cebda8e6964d3f417133372c3ff5560887233a5e937b86bad3023728362754b3c1aa7bce0fb754e8d3660804c7abbc6c6eb4e85f9f48823b6a7b0
   languageName: node
   linkType: hard
 
