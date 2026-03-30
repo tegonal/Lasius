@@ -26,7 +26,7 @@ swaggerDomainNameSpaces := Seq("models", "controllers")
 swaggerPrettyJson       := true
 swaggerOutputTransformers += "core.swagger.SwaggerRenameModelClassesTransformer"
 
-scalaVersion := "2.13.18"
+scalaVersion := "3.8.3"
 
 buildInfoKeys := Seq[BuildInfoKey](organization,
                                    name,
