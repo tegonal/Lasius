@@ -46,7 +46,7 @@ const createPasswordChangeSchema = (t: SchemaTranslationFn) =>
   z
     .object({
       confirmPassword: z.string().min(1, {
-        message: t(
+        error: t(
           'validation.confirmPasswordRequired',
           'Please confirm your password',
         ),
@@ -55,13 +55,13 @@ const createPasswordChangeSchema = (t: SchemaTranslationFn) =>
         if (val.length < 9) {
           ctx.addIssue({
             code: 'custom',
-            message: t('validation.passwordTooShort', 'Minimum 9 characters'),
+            error: t('validation.passwordTooShort', 'Minimum 9 characters'),
           })
         }
         if (!/[A-Z]/.test(val)) {
           ctx.addIssue({
             code: 'custom',
-            message: t(
+            error: t(
               'validation.missingUppercase',
               'Must contain uppercase letter',
             ),
@@ -70,16 +70,16 @@ const createPasswordChangeSchema = (t: SchemaTranslationFn) =>
         if (!/\d/.test(val)) {
           ctx.addIssue({
             code: 'custom',
-            message: t('validation.missingNumber', 'Must contain a number'),
+            error: t('validation.missingNumber', 'Must contain a number'),
           })
         }
       }),
       password: z.string().min(1, {
-        message: t('validation.passwordRequired', 'Password is required'),
+        error: t('validation.passwordRequired', 'Password is required'),
       }),
     })
     .refine((data) => data.newPassword === data.confirmPassword, {
-      message: t('validation.passwordMismatch', 'Passwords do not match'),
+      error: t('validation.passwordMismatch', 'Passwords do not match'),
       path: ['confirmPassword'],
     })
 

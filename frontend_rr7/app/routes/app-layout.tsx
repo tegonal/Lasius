@@ -42,8 +42,8 @@ import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { DevInfoBadge } from '~/features/system/components/dev-info-badge'
 import { HealthMonitor } from '~/features/system/components/health-monitor'
 import { WebSocketEventHandler } from '~/features/system/websocket/websocket-event-handler'
+import { getDeduplicatedUserProfile } from '~/lib/organisation-helpers.server'
 import { getUserBookingCurrent } from '~/services/api/lasius/user-bookings/user-bookings'
-import { getUserProfile } from '~/services/api/lasius/user/user'
 import {
   authHeaders,
   mergeAuthHeaders,
@@ -72,7 +72,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const auth = await requireUser(request)
   const headers = authHeaders(auth.session)
   const [profile, currentBookingRes] = await Promise.all([
-    getUserProfile({ headers }),
+    getDeduplicatedUserProfile({ headers }),
     getUserBookingCurrent({ headers }),
   ])
   return data(

@@ -33,10 +33,13 @@ import { OrganisationRightColumn } from '~/features/organisation/components/orga
 import { OrganisationStats } from '~/features/organisation/components/organisation-stats'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { ManageUserInviteByEmailForm } from '~/features/projects/components/manage-user-invite-by-email-form'
+import {
+  getDeduplicatedUserProfile,
+  getSelectedOrganisationId,
+} from '~/lib/organisation-helpers.server'
 import { type ModelsUserStub } from '~/services/api/lasius'
 import { useGetOrganisationUserList } from '~/services/api/lasius-hooks/organisations/organisations'
 import { getOrganisationUserList } from '~/services/api/lasius/organisations/organisations'
-import { getUserProfile } from '~/services/api/lasius/user/user'
 import {
   authHeaders,
   mergeAuthHeaders,
@@ -49,15 +52,9 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const auth = await requireUser(request)
   const headers = authHeaders(auth.session)
 
-  const profile = await getUserProfile({ headers })
+  const profile = await getDeduplicatedUserProfile({ headers })
   const user = profile.data
-
-  const organisations = user.organisations ?? []
-  const selectedOrgId =
-    user.settings?.lastSelectedOrganisation?.id ??
-    organisations.find((o) => o.private)?.organisationReference.id ??
-    organisations[0]?.organisationReference.id ??
-    ''
+  const selectedOrgId = getSelectedOrganisationId(user)
 
   const usersResponse = await getOrganisationUserList(selectedOrgId, {
     headers,

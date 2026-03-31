@@ -48,21 +48,42 @@ export function authHeaders(
  * PLAY_SESSION_CSRF cookie. Browser requests forward the cookie automatically,
  * but server-side calls (loaders/actions) have no cookie jar — we must fetch
  * the token and forward both the header and cookie explicitly.
+ *
+ * CSRF tokens are session-scoped in Play — we cache the result per access token
+ * to avoid redundant round-trips on every mutation.
  */
+
+const CSRF_CACHE_TTL_MS = 30_000
+
+const csrfCache = new Map<
+  string,
+  { expiresAt: number; promise: Promise<{ cookie: string; token: string }> }
+>()
+
 export async function authHeadersWithCsrf(
   session: LasiusSessionData,
 ): Promise<Record<string, string>> {
   const headers = authHeaders(session)
-  const csrf = await getCsrfToken({ headers })
+  const cacheKey = session.accessToken
 
-  const setCookie = csrf.headers.get('set-cookie') ?? ''
-  const match = /PLAY_SESSION_CSRF=([^;]+)/.exec(setCookie)
-  const csrfCookie = match ? `PLAY_SESSION_CSRF=${match[1]}` : ''
+  const cached = csrfCache.get(cacheKey)
+  if (cached && cached.expiresAt > Date.now()) {
+    const { cookie, token } = await cached.promise
+    return { ...headers, Cookie: cookie, 'Csrf-Token': token }
+  }
 
-  return {
-    ...headers,
-    Cookie: csrfCookie,
-    'Csrf-Token': csrf.data.value,
+  const promise = fetchCsrfToken(headers)
+  csrfCache.set(cacheKey, {
+    expiresAt: Date.now() + CSRF_CACHE_TTL_MS,
+    promise,
+  })
+
+  try {
+    const { cookie, token } = await promise
+    return { ...headers, Cookie: cookie, 'Csrf-Token': token }
+  } catch (error) {
+    csrfCache.delete(cacheKey)
+    throw error
   }
 }
 
@@ -137,4 +158,14 @@ export function sanitizeReturnTo(value: string, fallback = '/'): string {
     return fallback
   }
   return value
+}
+
+async function fetchCsrfToken(
+  headers: Record<string, string>,
+): Promise<{ cookie: string; token: string }> {
+  const csrf = await getCsrfToken({ headers })
+  const setCookie = csrf.headers.get('set-cookie') ?? ''
+  const match = /PLAY_SESSION_CSRF=([^;]+)/.exec(setCookie)
+  const cookie = match ? `PLAY_SESSION_CSRF=${match[1]}` : ''
+  return { cookie, token: csrf.data.value }
 }

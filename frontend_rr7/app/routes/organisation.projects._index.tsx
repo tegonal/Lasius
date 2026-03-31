@@ -20,12 +20,15 @@
 import { data, redirect } from 'react-router'
 
 import { AllProjectsLayout } from '~/features/projects/components/all-projects-layout'
+import {
+  getDeduplicatedUserProfile,
+  getSelectedOrganisationId,
+} from '~/lib/organisation-helpers.server'
 import { ModelsUserOrganisationRole } from '~/services/api/lasius/modelsUserOrganisationRole'
 import {
   getProjectLastActivityDate,
   getProjectList,
 } from '~/services/api/lasius/projects/projects'
-import { getUserProfile } from '~/services/api/lasius/user/user'
 import {
   authHeaders,
   mergeAuthHeaders,
@@ -39,14 +42,10 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const auth = await requireUser(request)
   const headers = authHeaders(auth.session)
 
-  const profile = await getUserProfile({ headers })
+  const profile = await getDeduplicatedUserProfile({ headers })
   const user = profile.data
   const organisations = user.organisations ?? []
-  const selectedOrgId =
-    user.settings?.lastSelectedOrganisation?.id ??
-    organisations.find((o) => o.private)?.organisationReference.id ??
-    organisations[0]?.organisationReference.id ??
-    ''
+  const selectedOrgId = getSelectedOrganisationId(user)
 
   // Admin guard: only organisation administrators can access this page
   const selectedOrg = organisations.find(

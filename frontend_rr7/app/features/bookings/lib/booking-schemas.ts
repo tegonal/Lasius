@@ -48,7 +48,7 @@ export const createBookingEditRunningSchema = (t: SchemaTranslationFn) =>
         return !isFuture(new Date(d.start))
       },
       {
-        message: t(
+        error: t(
           'validation.startMustBeInPast',
           'Start time must be in the past',
         ),
@@ -74,7 +74,7 @@ export const createBookingSchema = (t: SchemaTranslationFn) =>
         return isBefore(new Date(d.start), new Date(d.end))
       },
       {
-        message: t(
+        error: t(
           'validation.startBeforeEnd',
           'Start time must be before end time',
         ),

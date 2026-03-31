@@ -20,8 +20,11 @@
 import { data } from 'react-router'
 
 import { MyProjectsLayout } from '~/features/projects/components/my-projects-layout'
+import {
+  getDeduplicatedUserProfile,
+  getSelectedOrganisationId,
+} from '~/lib/organisation-helpers.server'
 import { getProjectLastActivityDate } from '~/services/api/lasius/projects/projects'
-import { getUserProfile } from '~/services/api/lasius/user/user'
 import {
   authHeaders,
   mergeAuthHeaders,
@@ -35,14 +38,10 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const headers = authHeaders(auth.session)
 
   // Get user profile — projects are embedded in the user's org memberships
-  const profile = await getUserProfile({ headers })
+  const profile = await getDeduplicatedUserProfile({ headers })
   const user = profile.data
   const organisations = user.organisations ?? []
-  const selectedOrgId =
-    user.settings?.lastSelectedOrganisation?.id ??
-    organisations.find((o) => o.private)?.organisationReference.id ??
-    organisations[0]?.organisationReference.id ??
-    ''
+  const selectedOrgId = getSelectedOrganisationId(user)
 
   // Get projects from the user's org membership (no admin-only API call needed)
   const selectedOrg = organisations.find(

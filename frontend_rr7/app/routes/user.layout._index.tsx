@@ -33,6 +33,10 @@ import { OnboardingTutorial } from '~/features/onboarding/components/onboarding-
 import { augmentBookingsList } from '~/lib/api/functions/augment-bookings-list'
 import { getExpectedVsBookedPercentage } from '~/lib/api/functions/get-expected-vs-booked-percentage'
 import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
+import {
+  getDeduplicatedUserProfile,
+  getSelectedOrganisationId,
+} from '~/lib/organisation-helpers.server'
 import { apiTimespanDay, formatISOLocale } from '~/lib/utils/dates'
 import { getOrganisationUserList } from '~/services/api/lasius/organisations/organisations'
 import {
@@ -41,7 +45,6 @@ import {
   getUserBookingListByOrganisation,
 } from '~/services/api/lasius/user-bookings/user-bookings'
 import { getFavoriteBookingList } from '~/services/api/lasius/user-favorites/user-favorites'
-import { getUserProfile } from '~/services/api/lasius/user/user'
 import {
   authHeaders,
   mergeAuthHeaders,
@@ -55,14 +58,10 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const headers = authHeaders(auth.session)
 
   // Get user profile for planned working hours + org selection
-  const profile = await getUserProfile({ headers })
+  const profile = await getDeduplicatedUserProfile({ headers })
   const user = profile.data
   const organisations = user.organisations ?? []
-  const selectedOrgId =
-    user.settings?.lastSelectedOrganisation?.id ??
-    organisations.find((o) => o.private)?.organisationReference.id ??
-    organisations[0]?.organisationReference.id ??
-    ''
+  const selectedOrgId = getSelectedOrganisationId(user)
 
   // Read selected date from URL search param, fall back to today
   const url = new URL(request.url)

@@ -19,9 +19,12 @@
 
 import { getExpectedVsBookedPercentage } from '~/lib/api/functions/get-expected-vs-booked-percentage'
 import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
+import {
+  getDeduplicatedUserProfile,
+  getSelectedOrganisationId,
+} from '~/lib/organisation-helpers.server'
 import { formatISOLocale } from '~/lib/utils/dates'
 import { type ModelsBooking } from '~/services/api/lasius'
-import { getUserProfile } from '~/services/api/lasius/user/user'
 import {
   authHeaders,
   mergeAuthHeaders,
@@ -36,16 +39,12 @@ export const loadDashboardContext = async (request: Request) => {
   const auth = await requireUser(request)
   const headers = authHeaders(auth.session)
 
-  const profile = await getUserProfile({ headers })
+  const profile = await getDeduplicatedUserProfile({ headers })
   const user = profile.data
 
   // Determine selected org
   const organisations = user.organisations ?? []
-  const selectedOrgId =
-    user.settings?.lastSelectedOrganisation?.id ??
-    organisations.find((o) => o.private)?.organisationReference.id ??
-    organisations[0]?.organisationReference.id ??
-    ''
+  const selectedOrgId = getSelectedOrganisationId(user)
 
   // Extract planned working hours for the selected org
   const selectedOrg = organisations.find(

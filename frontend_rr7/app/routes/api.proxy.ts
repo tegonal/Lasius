@@ -18,6 +18,7 @@
  */
 
 import { data } from 'react-router'
+import { z } from 'zod'
 
 import { ApiError, lasiusFetch } from '~/services/api/lasius-fetch-instance'
 import {
@@ -27,6 +28,22 @@ import {
 } from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/api.proxy'
+
+const ALLOWED_METHODS = [
+  'GET',
+  'POST',
+  'PUT',
+  'PATCH',
+  'DELETE',
+  'HEAD',
+] as const
+
+const proxyPayloadSchema = z.object({
+  body: z.unknown().optional(),
+  method: z.enum(ALLOWED_METHODS),
+  skipAuth: z.boolean().optional(),
+  url: z.string().min(1),
+})
 
 export type ProxyEnvelope<T = unknown> =
   | { data: T; ok: true }
@@ -47,25 +64,20 @@ export type ProxyEnvelope<T = unknown> =
  * Returns a consistent envelope: { ok: true, data } or { ok: false, error, status }
  */
 export async function action({ request }: Route.ActionArgs) {
-  const json = (await request.json()) as {
-    body?: unknown
-    method: string
-    skipAuth?: boolean
-    url: string
-  }
+  const parsed = proxyPayloadSchema.safeParse(await request.json())
 
-  const { body, method, skipAuth, url } = json
-
-  if (!url || !method) {
+  if (!parsed.success) {
     return data(
       {
-        error: 'Missing url or method',
+        error: `Invalid proxy payload: ${parsed.error.issues.map((i) => i.message).join(', ')}`,
         ok: false,
         status: 400,
       } satisfies ProxyEnvelope,
       { status: 400 },
     )
   }
+
+  const { body, method, skipAuth, url } = parsed.data
 
   // Prevent SSRF — only allow relative paths
   if (!url.startsWith('/')) {

@@ -25,8 +25,9 @@ import { InvitationOtherSession } from '~/features/invitation/components/invitat
 import { InvitationUserConfirm } from '~/features/invitation/components/invitation-user-confirm'
 import { getServerEnv } from '~/lib/env.server'
 import { logger } from '~/lib/logger'
+import { getDeduplicatedUserProfile } from '~/lib/organisation-helpers.server'
 import { getInvitationStatus } from '~/services/api/lasius/invitations-public/invitations-public'
-import { getUserProfile } from '~/services/api/lasius/user/user'
+import { type getUserProfileResponse } from '~/services/api/lasius/user/user'
 import {
   authHeaders,
   getOptionalUser,
@@ -90,12 +91,10 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   const userEmail = auth?.session.email ?? null
 
   // Fetch user organisations for the confirm flow (needed for project invitations)
-  let organisations: Awaited<
-    ReturnType<typeof getUserProfile>
-  >['data']['organisations'] = []
+  let organisations: getUserProfileResponse['data']['organisations'] = []
   if (auth) {
     try {
-      const profile = await getUserProfile({
+      const profile = await getDeduplicatedUserProfile({
         headers: authHeaders(auth.session),
       })
       organisations = profile.data.organisations

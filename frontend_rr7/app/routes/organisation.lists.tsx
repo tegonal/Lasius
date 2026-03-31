@@ -21,13 +21,16 @@ import { data } from 'react-router'
 
 import { innerGridClasses } from '~/components/ui/layouts/layout-columns'
 import { BookingHistoryLayout } from '~/features/booking-history/components/booking-history-layout'
+import {
+  getDeduplicatedUserProfile,
+  getSelectedOrganisationId,
+} from '~/lib/organisation-helpers.server'
 import { dateOptions } from '~/lib/utils/date/date-options'
 import { apiTimespanFromTo, formatISOLocale } from '~/lib/utils/dates'
 import { ModelsUserOrganisationRole } from '~/services/api/lasius/modelsUserOrganisationRole'
 import { getOrganisationBookingList } from '~/services/api/lasius/organisation-bookings/organisation-bookings'
 import { getOrganisationUserList } from '~/services/api/lasius/organisations/organisations'
 import { getProjectList } from '~/services/api/lasius/projects/projects'
-import { getUserProfile } from '~/services/api/lasius/user/user'
 import {
   authHeaders,
   mergeAuthHeaders,
@@ -40,15 +43,11 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const auth = await requireUser(request)
   const headers = authHeaders(auth.session)
 
-  const profile = await getUserProfile({ headers })
+  const profile = await getDeduplicatedUserProfile({ headers })
   const user = profile.data
 
   const organisations = user.organisations ?? []
-  const selectedOrgId =
-    user.settings?.lastSelectedOrganisation?.id ??
-    organisations.find((o) => o.private)?.organisationReference.id ??
-    organisations[0]?.organisationReference.id ??
-    ''
+  const selectedOrgId = getSelectedOrganisationId(user)
 
   // Check admin role
   const selectedOrg = organisations.find(

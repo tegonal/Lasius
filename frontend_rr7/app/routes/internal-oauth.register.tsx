@@ -72,7 +72,7 @@ const createRegisterSchema = (t: SchemaTranslationFn) =>
           error: t('validation.required', { defaultValue: 'Required' }),
         })
         .email({
-          message: t('validation.emailInvalid', {
+          error: t('validation.emailInvalid', {
             defaultValue: 'Invalid email address',
           }),
         }),
@@ -110,7 +110,7 @@ const createRegisterSchema = (t: SchemaTranslationFn) =>
       returnTo: z.string().optional(),
     })
     .refine((val) => val.password === val.confirmPassword, {
-      message: t('validation.passwordMismatch', {
+      error: t('validation.passwordMismatch', {
         defaultValue: 'Passwords do not match',
       }),
       path: ['confirmPassword'],
