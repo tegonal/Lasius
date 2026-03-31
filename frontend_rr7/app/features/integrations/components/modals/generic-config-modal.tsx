@@ -139,7 +139,7 @@ export const GenericConfigModal = ({
   const [form, fields] = useForm({
     constraint: getZodConstraint(allFieldsConstraintSchema),
     defaultValue,
-    id: config ? `edit-config-${config.id}` : undefined,
+    id: open && config ? `edit-config-${config.id}` : undefined,
     onValidate({ formData: fd }) {
       return parseWithZod(fd, {
         schema: schema as typeof allFieldsConstraintSchema,
