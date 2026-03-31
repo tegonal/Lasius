@@ -93,7 +93,6 @@ export const CalendarWeek = ({
           </div>
           <div className="min-h-[82px] w-full overflow-x-auto">
             <div className="relative">
-              {/* TODO: Add AnimateChange wrapper (hash={week[0]}) for month label transitions */}
               <div className="grid w-max grid-cols-[repeat(7,62px)] gap-1 sm:gap-2 md:w-full md:grid-cols-[repeat(7,1fr)] lg:gap-3">
                 {week.map((day, index) => (
                   <div

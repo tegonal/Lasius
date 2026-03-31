@@ -17,7 +17,7 @@
  *
  */
 
-import { noop } from 'es-toolkit/compat'
+import { noop } from 'es-toolkit'
 import {
   ChevronDown,
   ChevronUp,

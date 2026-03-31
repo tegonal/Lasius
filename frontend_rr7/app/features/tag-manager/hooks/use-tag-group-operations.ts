@@ -17,7 +17,7 @@
  *
  */
 
-import { unionWith } from 'es-toolkit/compat'
+import { unionWith } from 'es-toolkit'
 import { type Dispatch, type SetStateAction, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 

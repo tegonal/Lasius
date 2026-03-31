@@ -18,7 +18,7 @@
  */
 
 import { type FieldMetadata, useInputControl } from '@conform-to/react'
-import { differenceBy, filter, uniqBy } from 'es-toolkit/compat'
+import { differenceBy, uniqBy } from 'es-toolkit'
 import { Plus } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -74,8 +74,8 @@ const TagsAdminCore = ({
   const [showAddModal, setShowAddModal] = useState(false)
 
   const removeTag = (tag: ModelsTag) => {
-    const toRemove = filter(selectedTags, { id: tag.id })
-    const remaining = differenceBy(selectedTags, toRemove, 'id')
+    const toRemove = selectedTags.filter((t) => t.id === tag.id)
+    const remaining = differenceBy(selectedTags, toRemove, (t) => t.id)
     onTagsChange(remaining)
   }
 
@@ -85,7 +85,7 @@ const TagsAdminCore = ({
         id: inputText.trim(),
         type: 'SimpleTag',
       }
-      const merged = uniqBy([...selectedTags, newTag], 'id')
+      const merged = uniqBy([...selectedTags, newTag], (t) => t.id)
       setInputText('')
       onTagsChange(merged)
       setShowAddModal(false)

@@ -57,7 +57,7 @@ export default [
 
   // Authenticated app routes — requireUser redirects to /login if unauthenticated
   layout('routes/app-layout.tsx', [
-    // / → /user/home (matches Next.js index redirect)
+    // / → /user/home (root redirect for authenticated users)
     index('routes/index-redirect.ts'),
 
     ...prefix('user', [

@@ -17,7 +17,7 @@
  *
  */
 
-import { isInteger, padStart, round } from 'es-toolkit/compat'
+import { round } from 'es-toolkit'
 import { useEffect, useRef } from 'react'
 
 import { countDecimals } from '~/lib/utils/data/count-decimals'
@@ -30,7 +30,7 @@ type Props = {
 
 const formatNumber = (value: number, from: number, to: number) => {
   const intPrecision = to === 0 ? countDecimals(from) : 0
-  const precision = isInteger(to) ? intPrecision : countDecimals(to)
+  const precision = Number.isInteger(to) ? intPrecision : countDecimals(to)
   return round(value, precision)
 }
 
@@ -39,7 +39,10 @@ const formatNumberLeftpadded = (
   from: number,
   to: number,
   leftpad: number,
-) => padStart(formatNumber(value, from, to).toString(), 1 + leftpad, '0')
+) =>
+  formatNumber(value, from, to)
+    .toString()
+    .padStart(1 + leftpad, '0')
 
 const DURATION_MS = 330
 

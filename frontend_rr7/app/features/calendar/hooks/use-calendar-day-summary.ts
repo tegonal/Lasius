@@ -46,7 +46,6 @@ const durationInHours = (start: string, end: string): number => {
  * Performance: No API calls - all data comes from context
  *
  * Note: plannedWorkingHours uses a fixed 8h default for now.
- * TODO: Replace with useGetPlannedWorkingHoursByDate when available.
  *
  * @param date - ISO date string for the day to summarize
  */
