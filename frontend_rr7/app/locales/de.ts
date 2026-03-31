@@ -24,6 +24,7 @@ import calendar from './de/calendar.json'
 import common from './de/common.json'
 import contextMenu from './de/context-menu.json'
 import dashboard from './de/dashboard.json'
+import features from './de/features.json'
 import help from './de/help.json'
 import home from './de/home.json'
 import integrations from './de/integrations.json'
@@ -46,6 +47,7 @@ export default {
   common,
   'context-menu': contextMenu,
   dashboard,
+  features,
   help,
   home,
   integrations,

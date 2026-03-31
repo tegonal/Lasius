@@ -9,7 +9,7 @@ declare module 'react-router' {
 
 export default {
   future: {
-    unstable_optimizeDeps: true,
+    unstable_optimizeDeps: true, // TODO: remove once stabilized upstream
     v8_middleware: true,
   },
   ssr: true,

@@ -32,6 +32,7 @@ import { FormElement } from '~/components/ui/forms/form-element'
 import { InputDatePicker } from '~/components/ui/forms/input/date-picker/input-date-picker'
 import { InputTagsAutocomplete } from '~/components/ui/forms/input/input-tags-autocomplete'
 import { ProjectSelect } from '~/components/ui/forms/input/project-select'
+import { useProjectTags } from '~/features/bookings/hooks/use-project-tags'
 import {
   createBookingEditRunningSchema,
   parseTagsFromFormData,
@@ -44,7 +45,6 @@ import {
   type ModelsTag,
 } from '~/services/api/lasius'
 import { useUpdateUserBooking } from '~/services/api/lasius-hooks/user-bookings/user-bookings'
-import { useGetTagsByProject } from '~/services/api/lasius-hooks/user-organisations/user-organisations'
 
 type BookingEditRunningProps = {
   item: ModelsCurrentUserTimeBooking
@@ -72,12 +72,6 @@ export const BookingEditRunning = ({
   const { userProjects } = useProjects()
   const projects = userProjects.map((p) => p.projectReference)
 
-  // Tags via Orval hook
-  const tagsApi = useGetTagsByProject()
-  const tagsSubmitRef = useRef(tagsApi.submit)
-  tagsSubmitRef.current = tagsApi.submit
-  const prevProjectKeyRef = useRef('')
-
   const schema = createBookingEditRunningSchema(
     t as unknown as SchemaTranslationFn,
   )
@@ -99,17 +93,8 @@ export const BookingEditRunning = ({
   const projectIdControl = useInputControl(fields.projectId)
   const startControl = useInputControl(fields.start)
 
-  // Load tags when project changes
-  useEffect(() => {
-    const pid = projectIdControl.value
-    const key = `${selectedOrgId}:${pid}`
-    if (selectedOrgId && pid && key !== prevProjectKeyRef.current) {
-      prevProjectKeyRef.current = key
-      tagsSubmitRef.current({ orgId: selectedOrgId, projectId: pid })
-    }
-  }, [selectedOrgId, projectIdControl.value])
-
-  const projectTags = tagsApi.data ?? []
+  // Tags via shared hook
+  const { projectTags } = useProjectTags(selectedOrgId, projectIdControl.value)
 
   // Re-initialize form values when booking changes
   useEffect(() => {

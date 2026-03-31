@@ -17,11 +17,7 @@
  *
  */
 
-import { getFormProps, useForm } from '@conform-to/react'
-import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
-import { useEffect, useMemo, useRef } from 'react'
-import { useSearchParams } from 'react-router'
-import { z } from 'zod'
+import { useMemo } from 'react'
 
 import { Loading } from '~/components/ui/data-display/loading'
 import { ColumnList } from '~/components/ui/layouts/column-list'
@@ -30,6 +26,7 @@ import {
   ColumnRight,
 } from '~/components/ui/layouts/layout-columns'
 import { ScrollArea } from '~/components/ui/layouts/scroll-area'
+import { useBookingHistoryFilters } from '~/features/booking-history/hooks/use-booking-history-filters'
 import { ContextMenuProvider } from '~/features/context-menu/hooks/use-context-menu'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { useProjects } from '~/features/projects/hooks/use-projects'
@@ -39,11 +36,9 @@ import { filterModelsBookingListProjectId } from '~/lib/api/functions/filter-mod
 import { filterModelsBookingListUserId } from '~/lib/api/functions/filter-models-booking-list-user-id'
 import { getExtendedModelsBookingList } from '~/lib/api/functions/get-extended-models-booking-list'
 import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
-import { dateOptions } from '~/lib/utils/date/date-options'
 import {
   type ModelsBooking,
   type ModelsEntityReference,
-  type ModelsTag,
   type ModelsUserStub,
 } from '~/services/api/lasius'
 
@@ -51,17 +46,6 @@ import { BookingHistoryExport } from './booking-history-export'
 import { BookingHistoryFilter } from './booking-history-filter'
 import { BookingHistoryStats } from './booking-history-stats'
 import { BookingHistoryTable } from './booking-history-table'
-
-const filterSchema = z.object({
-  dateRange: z.string().optional(),
-  from: z.string().optional(),
-  projectId: z.string().optional(),
-  tags: z.string().optional(),
-  to: z.string().optional(),
-  userId: z.string().optional(),
-})
-
-const defaultDateRange = dateOptions[0]
 
 export type BookingHistoryControls = {
   dateRange: InputControl
@@ -87,18 +71,6 @@ type Props = {
   users?: ModelsUserStub[]
 }
 
-function getInitialDateRange(searchParams: URLSearchParams) {
-  const fromParam = searchParams.get('from')
-  const toParam = searchParams.get('to')
-  if (fromParam && toParam) {
-    return { from: fromParam, to: toParam }
-  }
-  if (defaultDateRange) {
-    return defaultDateRange.dateRangeFn(new Date())
-  }
-  return { from: '', to: '' }
-}
-
 export const BookingHistoryLayout = ({
   bookings,
   dataSource,
@@ -106,174 +78,25 @@ export const BookingHistoryLayout = ({
   projects: projectsProp,
   users = [],
 }: Props) => {
-  const [searchParams] = useSearchParams()
   const { selectedOrganisationId: _selectedOrganisationId } = useOrganisation()
   const { findProjectById, userProjects } = useProjects()
-
-  const projectIdFromUrl = searchParams.get('projectId') ?? ''
-  const userIdFromUrl = searchParams.get('userId') ?? ''
-  const tagsFromUrl = searchParams.get('tags') ?? ''
 
   const projectSuggestions: ModelsEntityReference[] = useMemo(() => {
     if (projectsProp) return projectsProp
     return userProjects.map((p) => p.projectReference)
   }, [projectsProp, userProjects])
 
-  const initialRange = getInitialDateRange(searchParams)
-
-  const [form, fields] = useForm({
-    constraint: getZodConstraint(filterSchema),
-    defaultValue: {
-      dateRange: defaultDateRange?.name ?? '',
-      from: initialRange.from,
-      projectId: projectIdFromUrl,
-      tags: tagsFromUrl,
-      to: initialRange.to,
-      userId: userIdFromUrl,
-    },
-    onValidate({ formData }) {
-      return parseWithZod(formData, { schema: filterSchema })
-    },
-    shouldRevalidate: 'onInput',
-    shouldValidate: 'onSubmit',
-  })
-
-  // Read values reactively from fields.xxx.value (subscribes per-field via useSyncExternalStore)
-  // Do NOT use form.value — it only subscribes to root form changes, not individual fields
-  const fromValue = fields.from.value ?? ''
-  const toValue = fields.to.value ?? ''
-  const dateRangeValue = fields.dateRange.value ?? ''
-  const projectIdValue = fields.projectId.value ?? ''
-  const userIdValue = fields.userId.value ?? ''
-  const tagsValue = fields.tags.value ?? ''
-
-  const noop = () => {}
-  const controls: BookingHistoryControls = {
-    dateRange: {
-      blur: noop,
-      change: (v) => form.update({ name: fields.dateRange.name, value: v }),
-      focus: noop,
-      value: dateRangeValue,
-    },
-    from: {
-      blur: noop,
-      change: (v) => form.update({ name: fields.from.name, value: v }),
-      focus: noop,
-      value: fromValue,
-    },
-    projectId: {
-      blur: noop,
-      change: (v) => form.update({ name: fields.projectId.name, value: v }),
-      focus: noop,
-      value: projectIdValue,
-    },
-    tags: {
-      blur: noop,
-      change: (v) => form.update({ name: fields.tags.name, value: v }),
-      focus: noop,
-      value: tagsValue,
-    },
-    to: {
-      blur: noop,
-      change: (v) => form.update({ name: fields.to.name, value: v }),
-      focus: noop,
-      value: toValue,
-    },
-    userId: {
-      blur: noop,
-      change: (v) => form.update({ name: fields.userId.name, value: v }),
-      focus: noop,
-      value: userIdValue,
-    },
-  }
-
-  // Sync filter values to URL search params so the loader refetches and filters are shareable
-  const [, setSearchParams] = useSearchParams()
-  const prevFrom = useRef(fromValue)
-  const prevTo = useRef(toValue)
-  const prevProjectId = useRef(projectIdValue)
-  const prevUserId = useRef(userIdValue)
-  const prevTags = useRef(tagsValue)
-
-  useEffect(() => {
-    if (!fromValue || !toValue) return
-    if (
-      fromValue === prevFrom.current &&
-      toValue === prevTo.current &&
-      projectIdValue === prevProjectId.current &&
-      userIdValue === prevUserId.current &&
-      tagsValue === prevTags.current
-    )
-      return
-
-    prevFrom.current = fromValue
-    prevTo.current = toValue
-    prevProjectId.current = projectIdValue
-    prevUserId.current = userIdValue
-    prevTags.current = tagsValue
-
-    setSearchParams(
-      (prev) => {
-        prev.set('from', fromValue)
-        prev.set('to', toValue)
-        if (projectIdValue) {
-          prev.set('projectId', projectIdValue)
-        } else {
-          prev.delete('projectId')
-        }
-        if (userIdValue) {
-          prev.set('userId', userIdValue)
-        } else {
-          prev.delete('userId')
-        }
-        if (tagsValue) {
-          prev.set('tags', tagsValue)
-        } else {
-          prev.delete('tags')
-        }
-        return prev
-      },
-      { replace: true },
-    )
-  }, [
+  const {
+    controls,
+    fields,
+    formProps,
     fromValue,
+    projectId,
+    projectIdFromUrl,
+    tags,
     toValue,
-    projectIdValue,
-    userIdValue,
-    tagsValue,
-    setSearchParams,
-  ])
-
-  // Set initial search params on mount if missing
-  const didSetInitialParams = useRef(false)
-  useEffect(() => {
-    if (didSetInitialParams.current) return
-    didSetInitialParams.current = true
-
-    if (!searchParams.has('from') || !searchParams.has('to')) {
-      setSearchParams(
-        (prev) => {
-          prev.set('from', initialRange.from)
-          prev.set('to', initialRange.to)
-          return prev
-        },
-        { replace: true },
-      )
-    }
-  }, [searchParams, setSearchParams, initialRange.from, initialRange.to])
-
-  // Parse tags for filtering
-  const tags: ModelsTag[] = useMemo(() => {
-    if (!tagsValue) return []
-    try {
-      return JSON.parse(tagsValue) as ModelsTag[]
-    } catch {
-      return []
-    }
-  }, [tagsValue])
-
-  const projectId = projectIdValue
-  const userId = userIdValue
+    userId,
+  } = useBookingHistoryFilters()
 
   const processedItems = useMemo(
     () =>
@@ -327,7 +150,7 @@ export const BookingHistoryLayout = ({
   }, [projectIdFromUrl, projectSuggestions, findProjectById])
 
   return (
-    <form {...getFormProps(form)} className="contents">
+    <form {...formProps} className="contents">
       <ContextMenuProvider>
         <ColumnCenter>
           <div className="flex h-full flex-col overflow-hidden">

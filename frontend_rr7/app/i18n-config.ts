@@ -49,6 +49,7 @@ export const NAMESPACES = [
   'calendar',
   'context-menu',
   'dashboard',
+  'features',
   'help',
   'home',
   'integrations',

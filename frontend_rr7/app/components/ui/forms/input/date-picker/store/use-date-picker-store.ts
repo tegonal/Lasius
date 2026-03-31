@@ -331,9 +331,15 @@ export const createDatePickerStore = () =>
 export const DatePickerStoreContext =
   createContext<null | StoreApi<DatePickerState>>(null)
 
-// Hook to use the store from context
-export const useDatePickerStore = () => {
+// Hook to use the store from context — supports optional selector to avoid full re-renders
+export function useDatePickerStore(): DatePickerState
+export function useDatePickerStore<T>(
+  selector: (state: DatePickerState) => T,
+): T
+export function useDatePickerStore<T>(
+  selector?: (state: DatePickerState) => T,
+) {
   const store = useContext(DatePickerStoreContext)
   if (!store) throw new Error('Missing DatePickerStoreContext.Provider')
-  return useStore(store)
+  return useStore(store, selector as (state: DatePickerState) => T)
 }
