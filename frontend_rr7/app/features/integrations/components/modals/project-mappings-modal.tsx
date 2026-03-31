@@ -192,7 +192,7 @@ export const ProjectMappingsModal = ({
 
       setMappings(initialMappings)
     }
-  }, [configProjectsKey, importerType, open])
+  }, [configProjectsKey, importerType, open, setMappings])
 
   // Clean up state when modal closes
   useEffect(() => {
@@ -201,7 +201,7 @@ export const ProjectMappingsModal = ({
       setProjects([])
       hasFetchedRef.current = false
     }
-  }, [open])
+  }, [open, setMappings])
 
   // Fetch external projects when modal opens
   useEffect(() => {
@@ -296,7 +296,9 @@ export const ProjectMappingsModal = ({
     (mappingIdValue: string) => {
       refreshTagsApi.submit({
         configId,
-        mappingId: { value: mappingIdValue } as ModelsProjectMappingId,
+        mappingId: {
+          value: mappingIdValue,
+        } as unknown as ModelsProjectMappingId,
         orgId: selectedOrgId,
       })
     },

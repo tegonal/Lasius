@@ -18,7 +18,7 @@
  */
 
 import { AlertTriangle, ArrowRight, FolderOpen, Plus, X } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
