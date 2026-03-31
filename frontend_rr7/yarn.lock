@@ -2889,13 +2889,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/accept-language-parser@npm:^1.5.8":
-  version: 1.5.8
-  resolution: "@types/accept-language-parser@npm:1.5.8"
-  checksum: 10c0/acd6909999f8761d812e2eb8878bcb22c270937560766f6ba404f98e9b2c76144b4c556c76f78c0b0387ff1c2bef8665dae69c617d6ef87cd32c957f53e8b446
-  languageName: node
-  linkType: hard
-
 "@types/babel__core@npm:^7.20.5":
   version: 7.20.5
   resolution: "@types/babel__core@npm:7.20.5"
@@ -3617,13 +3610,6 @@ __metadata:
   version: 4.0.0
   resolution: "abbrev@npm:4.0.0"
   checksum: 10c0/b4cc16935235e80702fc90192e349e32f8ef0ed151ef506aa78c81a7c455ec18375c4125414b99f84b2e055199d66383e787675f0bcd87da7a4dbd59f9eac1d5
-  languageName: node
-  linkType: hard
-
-"accept-language-parser@npm:^1.5.0":
-  version: 1.5.0
-  resolution: "accept-language-parser@npm:1.5.0"
-  checksum: 10c0/d736afcd9e47eef82b821c2548c114882f41498c68f43a2223fe1800b4bed7524fc3ad72e16d0f70e0ffc90ef006ac8e2f74df27532e8aecbd4699834949aea1
   languageName: node
   linkType: hard
 
@@ -6951,14 +6937,12 @@ __metadata:
     "@react-router/dev": "npm:^7.13.2"
     "@react-router/serve": "npm:^7.13.2"
     "@tailwindcss/vite": "npm:^4.2.2"
-    "@types/accept-language-parser": "npm:^1.5.8"
     "@types/babel__core": "npm:^7.20.5"
     "@types/d3-shape": "npm:^3.1.8"
     "@types/node": "npm:^24.12.0"
     "@types/react": "npm:^19.2.14"
     "@types/react-dom": "npm:^19.2.3"
     "@vitest/eslint-plugin": "npm:^1.6.13"
-    accept-language-parser: "npm:^1.5.0"
     babel-plugin-react-compiler: "npm:^1.0.0"
     babel-plugin-react-remove-properties: "npm:^0.3.1"
     boring-avatars: "npm:^2.0.4"

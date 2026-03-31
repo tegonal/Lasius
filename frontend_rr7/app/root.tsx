@@ -43,6 +43,7 @@ import {
 import { ToastProvider } from '~/components/ui/feedback/toasts'
 import { useHelpStore } from '~/features/help/store/help-store'
 import { DataLoadingProgress } from '~/features/system/components/data-loading-progress'
+import { NAMESPACES } from '~/i18n-config'
 
 const LazyHelpDrawer = lazy(() =>
   import('~/features/help/components/help-drawer').then((m) => ({
@@ -84,7 +85,7 @@ export const links: LinksFunction = () => [
 ]
 
 export const handle = {
-  i18n: 'common',
+  i18n: [...NAMESPACES],
 }
 
 export const loader = async ({ context, request }: Route.LoaderArgs) => {
