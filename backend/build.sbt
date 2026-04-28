@@ -48,7 +48,7 @@ val reactiveMongoPlayVersion = "1.1.0-play30.RC20"
 // Play framework 3.x is still bound to older guice version
 val guiceVersion      = "6.0.0"
 val pureConfigVersion = "0.17.10"
-val jacksonVersion    = "2.21.1"
+val jacksonVersion    = "2.21.3"
 
 libraryDependencies ++= Seq(
   "org.reactivemongo" %% "play2-reactivemongo" % reactiveMongoPlayVersion,
