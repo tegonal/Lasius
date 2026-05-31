@@ -48,7 +48,7 @@ val reactiveMongoPlayVersion = "1.1.0-play30.RC20"
 // Play framework 3.x is still bound to older guice version
 val guiceVersion      = "6.0.0"
 val pureConfigVersion = "0.17.10"
-val jacksonVersion    = "2.21.1"
+val jacksonVersion    = "2.21.4"
 
 libraryDependencies ++= Seq(
   "org.reactivemongo" %% "play2-reactivemongo" % reactiveMongoPlayVersion,
@@ -100,7 +100,7 @@ dependencyOverrides ++= Seq(
   "com.fasterxml.jackson.core"   % "jackson-databind"          % jacksonVersion,
   "com.fasterxml.jackson.core"   % "jackson-core"              % jacksonVersion,
   // jackson-annotations dropped patch versions from 2.20+; only publishes minor (e.g. "2.21")
-  "com.fasterxml.jackson.core"   % "jackson-annotations"       % "2.21",
+  "com.fasterxml.jackson.core"   % "jackson-annotations"       % "2.22",
 )
 
 Test / javaOptions += "-Dconfig.file=conf/test.conf"
