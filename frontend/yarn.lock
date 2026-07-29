@@ -7126,7 +7126,7 @@ __metadata:
     next-auth: "npm:4.24.13"
     next-i18next: "npm:^15.4.3"
     next-mdx-remote: "npm:^6.0.0"
-    next-seo: "npm:^6.8.0"
+    next-seo: "npm:^7.0.0"
     orval: "npm:8.5.3"
     parse-json: "npm:^8.3.0"
     prettier: "npm:^3.8.1"
@@ -8230,14 +8230,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"next-seo@npm:^6.8.0":
-  version: 6.8.0
-  resolution: "next-seo@npm:6.8.0"
+"next-seo@npm:^7.0.0":
+  version: 7.3.0
+  resolution: "next-seo@npm:7.3.0"
   peerDependencies:
-    next: ^8.1.1-canary.54 || >=9.0.0
-    react: ">=16.0.0"
-    react-dom: ">=16.0.0"
-  checksum: 10/0b7f08b682719c0f27408ab1f5c5267e7a475a43e7b0711b7d6c3db440996d1b83226ce88d69c1049a00d27fd55585b9f1134b094ec617e08b7e56cb27221846
+    next: ">=13.4.0"
+    react: ">=18.2.0"
+  checksum: 10/c58835d9c49cfe8de744a739f7785bba85c8a8f4816223c1ceda837ff5c343be51888ffcff749f6803ca6668532a329f8ec238d030855b70df69d40aaa34a667
   languageName: node
   linkType: hard
 

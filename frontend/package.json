@@ -63,7 +63,7 @@
     "next-auth": "4.24.13",
     "next-i18next": "^15.4.3",
     "next-mdx-remote": "^6.0.0",
-    "next-seo": "^6.8.0",
+    "next-seo": "^7.0.0",
     "parse-json": "^8.3.0",
     "react": "19.2.4",
     "react-async-hook": "^4.0.0",
