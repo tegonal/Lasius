@@ -50,7 +50,7 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
   const isAdmin = selectedOrg?.role === ModelsUserOrganisationRole.OrganisationAdministrator
 
   if (!isAdmin) {
-    throw new Response('Unauthorized', { status: 401 })
+    throw new Response('Unauthorized', { headers: mergeAuthHeaders(auth), status: 401 })
   }
 
   // Read date range from search params: from/to (set by filter), or default

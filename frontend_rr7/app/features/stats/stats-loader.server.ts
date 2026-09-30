@@ -66,7 +66,7 @@ export const loadOrgStatsContext = async (request: Request, url: URL) => {
   const isAdmin = selectedOrg?.role === ModelsUserOrganisationRole.OrganisationAdministrator
 
   if (!isAdmin) {
-    throw new Response('Forbidden', { status: 403 })
+    throw new Response('Forbidden', { headers: mergeAuthHeaders(context.auth), status: 403 })
   }
 
   return context

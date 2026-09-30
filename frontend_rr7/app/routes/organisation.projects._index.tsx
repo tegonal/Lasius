@@ -43,7 +43,7 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
   // Admin guard: only organisation administrators can access this page
   const selectedOrg = organisations.find((o) => o.organisationReference.id === selectedOrgId)
   if (selectedOrg?.role !== ModelsUserOrganisationRole.OrganisationAdministrator) {
-    throw redirect('/user/home')
+    throw redirect('/user/home', { headers: mergeAuthHeaders(auth) })
   }
 
   const projectsResponse = await getProjectList(selectedOrgId, { headers })

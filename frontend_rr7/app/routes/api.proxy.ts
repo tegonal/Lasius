@@ -124,7 +124,7 @@ export async function action({ request, url: routeUrl }: Route.ActionArgs) {
         ok: false,
         status: 500,
       } satisfies ProxyEnvelope,
-      { status: 500 },
+      { headers: authResult ? mergeAuthHeaders(authResult) : {}, status: 500 },
     )
   }
 }

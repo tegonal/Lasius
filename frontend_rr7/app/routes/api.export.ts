@@ -36,7 +36,7 @@ import {
   getUserBookingAggregatedStatsByOrganisation,
   getUserBookingListByOrganisation,
 } from '~/services/api/lasius/user-bookings/user-bookings'
-import { authHeaders, requireUser } from '~/services/auth/auth-helpers.server'
+import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/api.export'
 
@@ -78,8 +78,16 @@ const contentTypeMap: Record<string, string> = {
  */
 export async function loader({ request, url }: Route.LoaderArgs) {
   const auth = await requireUser(request, url)
-  const headers = authHeaders(auth.session)
+  const response = await createExportResponse(url, authHeaders(auth.session))
 
+  const sessionCookie = mergeAuthHeaders(auth).get('Set-Cookie')
+  if (sessionCookie) {
+    response.headers.append('Set-Cookie', sessionCookie)
+  }
+  return response
+}
+
+async function createExportResponse(url: URL, headers: HeadersInit): Promise<Response> {
   const type = url.searchParams.get('type')
   const formatParameter = url.searchParams.get('format') as ExportFormat | null
   const orgId = url.searchParams.get('orgId')

@@ -49,7 +49,11 @@ import { getServerEnvironment } from '~/lib/environment.server'
 import { type SchemaTranslationFunction, untyped } from '~/lib/i18n-types'
 import { logger } from '~/lib/logger'
 import { getConfiguration } from '~/services/api/lasius/general/general'
-import { getOptionalUser, sanitizeReturnTo } from '~/services/auth/auth-helpers.server'
+import {
+  getOptionalUser,
+  mergeAuthHeaders,
+  sanitizeReturnTo,
+} from '~/services/auth/auth-helpers.server'
 import { internalRegisterUrl } from '~/services/auth/auth-urls'
 import { getInternalProvider } from '~/services/auth/providers'
 import { createUserSession } from '~/services/auth/session.server'
@@ -311,7 +315,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const returnTo = sanitizeReturnTo(url.searchParams.get('returnTo') ?? '/')
 
   if (user) {
-    throw redirect(returnTo)
+    throw redirect(returnTo, { headers: mergeAuthHeaders(user) })
   }
 
   const isDemoMode = getServerEnvironment('LASIUS_DEMO_MODE') === 'true'

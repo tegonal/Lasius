@@ -51,7 +51,11 @@ import { type SchemaTranslationFunction, untyped } from '~/lib/i18n-types'
 import { logger } from '~/lib/logger'
 import { ApiError } from '~/services/api/lasius-fetch-instance'
 import { registerOAuthUser } from '~/services/api/lasius/oauth2-provider/oauth2-provider'
-import { getOptionalUser, sanitizeReturnTo } from '~/services/auth/auth-helpers.server'
+import {
+  getOptionalUser,
+  mergeAuthHeaders,
+  sanitizeReturnTo,
+} from '~/services/auth/auth-helpers.server'
 import { internalLoginUrl } from '~/services/auth/auth-urls'
 
 import { type Route } from './+types/internal-oauth.register'
@@ -399,7 +403,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const user = await getOptionalUser(request)
 
   if (user) {
-    throw redirect(href('/'))
+    throw redirect(href('/'), { headers: mergeAuthHeaders(user) })
   }
 
   const url = new URL(request.url)

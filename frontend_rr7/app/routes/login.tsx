@@ -30,7 +30,11 @@ import { LoadingInfoPanel, LoginInfoPanel } from '~/features/auth/auth-info-pane
 import { AuthLayout } from '~/features/auth/auth-layout'
 import { HelpButton } from '~/features/help/components/help-button'
 import { getServerEnvironment } from '~/lib/environment.server'
-import { getOptionalUser, sanitizeReturnTo } from '~/services/auth/auth-helpers.server'
+import {
+  getOptionalUser,
+  mergeAuthHeaders,
+  sanitizeReturnTo,
+} from '~/services/auth/auth-helpers.server'
 import { providerLoginUrl } from '~/services/auth/auth-urls'
 import { getProviderDisplayName, getProviderIcon } from '~/services/auth/provider-display'
 import { getEnabledProviders } from '~/services/auth/providers'
@@ -43,7 +47,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const returnTo = sanitizeReturnTo(url.searchParams.get('returnTo') ?? '/')
 
   if (user) {
-    throw redirect(returnTo)
+    throw redirect(returnTo, { headers: mergeAuthHeaders(user) })
   }
 
   const error = url.searchParams.get('error') ?? null

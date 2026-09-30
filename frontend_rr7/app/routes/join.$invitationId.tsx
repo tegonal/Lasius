@@ -17,7 +17,7 @@
  *
  */
 
-import { useLoaderData } from 'react-router'
+import { data, useLoaderData } from 'react-router'
 
 import { InvitationInvalid } from '~/features/invitation/components/invitation-invalid'
 import { InvitationNeedsAccount } from '~/features/invitation/components/invitation-needs-account'
@@ -28,7 +28,7 @@ import { logger } from '~/lib/logger'
 import { getDeduplicatedUserProfile } from '~/lib/organisation-helpers.server'
 import { getInvitationStatus } from '~/services/api/lasius/invitations-public/invitations-public'
 import { type getUserProfileResponse } from '~/services/api/lasius/user/user'
-import { authHeaders, getOptionalUser } from '~/services/auth/auth-helpers.server'
+import { authHeaders, getOptionalUser, mergeAuthHeaders } from '~/services/auth/auth-helpers.server'
 import { getEnabledProviders } from '~/services/auth/providers'
 
 import { type Route } from './+types/join.$invitationId'
@@ -94,5 +94,8 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   const providers = getEnabledProviders()
   const keycloakName = getServerEnvironment('KEYCLOAK_OAUTH_PROVIDER_NAME')
 
-  return { invitation, keycloakName, organisations, providers, userEmail }
+  return data(
+    { invitation, keycloakName, organisations, providers, userEmail },
+    { headers: auth ? mergeAuthHeaders(auth) : {} },
+  )
 }
