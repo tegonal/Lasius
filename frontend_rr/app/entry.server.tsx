@@ -18,7 +18,6 @@
  */
 
 import { createReadableStreamFromReadable } from '@react-router/node'
-import { createInstance } from 'i18next'
 import { isbot } from 'isbot'
 import { PassThrough } from 'node:stream'
 import { renderToPipeableStream, type RenderToPipeableStreamOptions } from 'react-dom/server'
@@ -30,12 +29,9 @@ import {
   ServerRouter,
 } from 'react-router'
 
-import { isLocale } from '~/i18n-config'
-import { i18nServerConfig } from '~/i18n-resources.server'
-import { localeCookie } from '~/lib/cookies/i18next-cookie.server'
 import { logger } from '~/lib/logger'
 
-import { getInstance } from './middleware/i18next'
+import { getInstance, i18nextMiddleware } from './middleware/i18next'
 
 export const streamTimeout = 5000
 
@@ -65,22 +61,17 @@ export default async function handleRequest(
   entryContext: EntryContext,
   routerContext: RouterContextProvider,
 ) {
-  let i18nInstance: ReturnType<typeof createInstance>
+  let i18nInstance: ReturnType<typeof getInstance>
   try {
     i18nInstance = getInstance(routerContext)
   } catch {
     // React Router answers a URL without a matching route before the middleware runs. The 404
-    // page then takes the language from the lng cookie that the root loader writes.
-    const cookieLocale: unknown = await localeCookie.parse(request.headers.get('Cookie'))
-    i18nInstance = createInstance({
-      ...i18nServerConfig,
-      initAsync: false,
-      lng:
-        typeof cookieLocale === 'string' && isLocale(cookieLocale)
-          ? cookieLocale
-          : i18nServerConfig.fallbackLng,
-    })
-    void i18nInstance.init()
+    // page runs the i18next middleware here, so it detects the language like every other page.
+    await i18nextMiddleware(
+      { context: routerContext, params: {}, pattern: '', request, url: new URL(request.url) },
+      () => Promise.resolve(new Response()),
+    )
+    i18nInstance = getInstance(routerContext)
   }
 
   return new Promise((resolve, reject) => {
