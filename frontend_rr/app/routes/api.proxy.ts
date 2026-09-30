@@ -56,13 +56,7 @@ export type ProxyEnvelope<T = unknown> =
  * Returns a consistent envelope: { ok: true, data } or { ok: false, error, status }
  */
 export async function action({ request, url: routeUrl }: Route.ActionArgs) {
-  let payload: unknown
-  try {
-    payload = await request.json()
-  } catch {
-    // A body that is not JSON stays undefined and fails the schema check, so the client gets a 400.
-  }
-  const parsed = proxyPayloadSchema.safeParse(payload)
+  const parsed = proxyPayloadSchema.safeParse(await readJsonBody(request))
 
   if (!parsed.success) {
     return data(
@@ -132,5 +126,14 @@ export async function action({ request, url: routeUrl }: Route.ActionArgs) {
       } satisfies ProxyEnvelope,
       { headers: authResult ? mergeAuthHeaders(authResult) : {}, status: 500 },
     )
+  }
+}
+
+/** Returns undefined for a body that is not JSON, so the schema check answers with the 400 envelope. */
+async function readJsonBody(request: Request): Promise<unknown> {
+  try {
+    return await request.json()
+  } catch {
+    return undefined
   }
 }
