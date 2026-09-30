@@ -25,7 +25,6 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '~/components/primitives/buttons/button'
 import { SlidingIndicator } from '~/components/ui/animations/sliding-indicator'
 import { FormatDate } from '~/components/ui/data-display/format-date'
-import { CalendarDataProvider } from '~/features/calendar/calendar-data-provider'
 import { CalendarDay } from '~/features/calendar/components/calendar-day'
 import { useCalendarNavigation } from '~/features/calendar/hooks/use-calendar-navigation'
 import { useCalendarSelection } from '~/features/calendar/hooks/use-calendar-selection'
@@ -35,7 +34,8 @@ import { formatDateToURLParameter } from '~/lib/utils/dates'
 
 // ─── CalendarWeek ───────────────────────────────────────────────────────────
 
-export const CalendarWeek = ({ organisationId }: { organisationId: string }) => {
+/** Reads its bookings from the CalendarDataProvider that app-layout.tsx places around both headers. */
+export const CalendarWeek = () => {
   const { t } = useTranslation(['calendar', 'common'])
   const selectedDate = usePersistedSearchParameter('date', formatDateToURLParameter(new Date()))
   const dayReferences = useRef<(HTMLElement | null)[]>([])
@@ -44,72 +44,68 @@ export const CalendarWeek = ({ organisationId }: { organisationId: string }) => 
   const { isDaySelected, selectDay, selectedDay, selectToday } = useCalendarSelection(selectedDate)
 
   return (
-    <CalendarDataProvider date={selectedDate} organisationId={organisationId} period="week">
-      <div className="flex min-w-0 items-center justify-center overflow-hidden">
-        <div className="flex flex-shrink-0 items-center justify-center pt-3">
-          <ButtonLeft
-            aria-label={t('calendar:navigation.previousWeek', 'Previous week')}
-            data-testid="calendar-week-prev-btn"
-            onClick={previous}
-          />
+    <div className="flex min-w-0 items-center justify-center overflow-hidden">
+      <div className="flex flex-shrink-0 items-center justify-center pt-3">
+        <ButtonLeft
+          aria-label={t('calendar:navigation.previousWeek', 'Previous week')}
+          data-testid="calendar-week-prev-btn"
+          onClick={previous}
+        />
+      </div>
+      <div className="min-w-0 flex-1 overflow-hidden md:max-w-[500px]">
+        <div className="border-base-content/50 grid min-h-[22px] w-full grid-cols-3 border-b text-sm">
+          <div>{week[0] && <FormatDate date={week[0]} format="monthNameLong" />}</div>
+          {isToday(new Date(selectedDay)) ? (
+            <div />
+          ) : (
+            <Button
+              aria-label={t('time.today', 'Today')}
+              data-testid="calendar-week-today-btn"
+              onClick={selectToday}
+              size="xs"
+              variant="unstyled">
+              {t('time.today', 'Today')}
+            </Button>
+          )}
+          <div className="text-right">{week[0] && <FormatDate date={week[0]} format="year" />}</div>
         </div>
-        <div className="min-w-0 flex-1 overflow-hidden md:max-w-[500px]">
-          <div className="border-base-content/50 grid min-h-[22px] w-full grid-cols-3 border-b text-sm">
-            <div>{week[0] && <FormatDate date={week[0]} format="monthNameLong" />}</div>
-            {isToday(new Date(selectedDay)) ? (
-              <div />
-            ) : (
-              <Button
-                aria-label={t('time.today', 'Today')}
-                data-testid="calendar-week-today-btn"
-                onClick={selectToday}
-                size="xs"
-                variant="unstyled">
-                {t('time.today', 'Today')}
-              </Button>
-            )}
-            <div className="text-right">
-              {week[0] && <FormatDate date={week[0]} format="year" />}
+        <div className="min-h-[82px] w-full overflow-x-auto">
+          <div className="relative">
+            <div className="grid w-max grid-cols-[repeat(7,62px)] gap-1 sm:gap-2 md:w-full md:grid-cols-[repeat(7,1fr)] lg:gap-3">
+              {week.map((day, index) => (
+                <div
+                  className={cn(
+                    'relative',
+                    isDaySelected(day) ? 'text-neutral-content' : 'text-base-content',
+                  )}
+                  key={day}
+                  ref={(element) => {
+                    dayReferences.current[index] = element
+                  }}>
+                  <CalendarDay
+                    date={day}
+                    isSelected={isDaySelected(day)}
+                    onClick={() => selectDay(day)}
+                  />
+                </div>
+              ))}
             </div>
+            <SlidingIndicator
+              itemRefs={dayReferences}
+              radiusOn="bottom"
+              selectedIndex={week.findIndex((day) => isDaySelected(day))}
+            />
           </div>
-          <div className="min-h-[82px] w-full overflow-x-auto">
-            <div className="relative">
-              <div className="grid w-max grid-cols-[repeat(7,62px)] gap-1 sm:gap-2 md:w-full md:grid-cols-[repeat(7,1fr)] lg:gap-3">
-                {week.map((day, index) => (
-                  <div
-                    className={cn(
-                      'relative',
-                      isDaySelected(day) ? 'text-neutral-content' : 'text-base-content',
-                    )}
-                    key={day}
-                    ref={(element) => {
-                      dayReferences.current[index] = element
-                    }}>
-                    <CalendarDay
-                      date={day}
-                      isSelected={isDaySelected(day)}
-                      onClick={() => selectDay(day)}
-                    />
-                  </div>
-                ))}
-              </div>
-              <SlidingIndicator
-                itemRefs={dayReferences}
-                radiusOn="bottom"
-                selectedIndex={week.findIndex((day) => isDaySelected(day))}
-              />
-            </div>
-          </div>
-        </div>
-        <div className="flex h-full flex-shrink-0 items-center justify-center pt-3">
-          <ButtonRight
-            aria-label={t('calendar:navigation.nextWeek', 'Next week')}
-            data-testid="calendar-week-next-btn"
-            onClick={next}
-          />
         </div>
       </div>
-    </CalendarDataProvider>
+      <div className="flex h-full flex-shrink-0 items-center justify-center pt-3">
+        <ButtonRight
+          aria-label={t('calendar:navigation.nextWeek', 'Next week')}
+          data-testid="calendar-week-next-btn"
+          onClick={next}
+        />
+      </div>
+    </div>
   )
 }
 

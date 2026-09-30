@@ -27,6 +27,7 @@ import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { TegonalFooter } from '~/components/ui/navigation/tegonal-footer'
 import { TokenWatcher } from '~/features/auth/components/token-watcher'
 import { BookingCurrent } from '~/features/bookings/components/booking-current'
+import { CalendarDataProvider } from '~/features/calendar/calendar-data-provider'
 import { CalendarWeek } from '~/features/calendar/components/calendar-week'
 import { HelpButton } from '~/features/help/components/help-button'
 import { MobileFloatingActionButton } from '~/features/navigation/components/mobile-floating-action-button'
@@ -37,8 +38,10 @@ import { HealthMonitor } from '~/features/system/components/health-monitor'
 import { WebSocketEventHandler } from '~/features/system/websocket/websocket-event-handler'
 import { TermsOfServiceDialog } from '~/features/terms-of-service/components/terms-of-service-dialog'
 import { loadTermsOfService } from '~/features/terms-of-service/terms-of-service.server'
+import { usePersistedSearchParameter } from '~/hooks/use-persisted-search-parameter'
 import { DEFAULT_LOCALE, isLocale } from '~/i18n-config'
 import { getDeduplicatedUserProfile } from '~/lib/organisation-helpers.server'
+import { formatDateToURLParameter } from '~/lib/utils/dates'
 import { getLocale } from '~/middleware/i18next'
 import { getUserBookingCurrent } from '~/services/api/lasius/user-bookings/user-bookings'
 import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
@@ -88,59 +91,66 @@ export const loader = async ({ context, request, url }: Route.LoaderArgs) => {
 export default function AppLayout({ loaderData }: Route.ComponentProps) {
   const { t } = useTranslation('common')
   const { selectedOrganisationId } = useOrganisation()
+  const selectedDate = usePersistedSearchParameter('date', formatDateToURLParameter(new Date()))
   const hasActiveBooking = Boolean(loaderData.currentBooking?.booking)
 
   return (
     <div className="container mx-auto grid size-full grid-rows-[116px_auto] gap-0 md:grid-rows-[148px_auto] md:pb-4">
-      {/* Desktop header */}
-      <div className="hidden md:block">
-        <section className="h-full w-full overflow-visible">
-          <div className="grid h-full w-full grid-cols-[minmax(200px,310px)_minmax(max-content,auto)_minmax(200px,310px)] gap-0 overflow-visible 2xl:grid-cols-[minmax(200px,340px)_minmax(max-content,auto)_minmax(200px,340px)]">
-            <div className="hover:text-info flex cursor-pointer items-center justify-start gap-8 pl-8">
-              <Link to={href('/')}>
-                <Logo />
-              </Link>
-            </div>
+      {/* One provider for both headers, so each week loads once. */}
+      <CalendarDataProvider
+        date={selectedDate}
+        organisationId={selectedOrganisationId}
+        period="week">
+        {/* Desktop header */}
+        <div className="hidden md:block">
+          <section className="h-full w-full overflow-visible">
+            <div className="grid h-full w-full grid-cols-[minmax(200px,310px)_minmax(max-content,auto)_minmax(200px,310px)] gap-0 overflow-visible 2xl:grid-cols-[minmax(200px,340px)_minmax(max-content,auto)_minmax(200px,340px)]">
+              <div className="hover:text-info flex cursor-pointer items-center justify-start gap-8 pl-8">
+                <Link to={href('/')}>
+                  <Logo />
+                </Link>
+              </div>
 
-            <div className="flex h-full w-full items-center justify-center gap-8">
-              <CalendarWeek organisationId={selectedOrganisationId} />
-            </div>
+              <div className="flex h-full w-full items-center justify-center gap-8">
+                <CalendarWeek />
+              </div>
 
-            <div className="flex items-center justify-end gap-2 pr-8">
-              <OrgSwitcher />
-              <HelpButton />
-              <Form action="/logout" method="post">
-                <Button
-                  aria-label={t('auth.actions.signOut', {
-                    defaultValue: 'Sign out',
-                  })}
-                  data-testid="auth-logout-btn"
-                  fullWidth={false}
-                  shape="circle"
-                  variant="ghost">
-                  <LucideIcon icon={LogOutIcon} size={20} />
-                </Button>
-              </Form>
+              <div className="flex items-center justify-end gap-2 pr-8">
+                <OrgSwitcher />
+                <HelpButton />
+                <Form action="/logout" method="post">
+                  <Button
+                    aria-label={t('auth.actions.signOut', {
+                      defaultValue: 'Sign out',
+                    })}
+                    data-testid="auth-logout-btn"
+                    fullWidth={false}
+                    shape="circle"
+                    variant="ghost">
+                    <LucideIcon icon={LogOutIcon} size={20} />
+                  </Button>
+                </Form>
+              </div>
             </div>
-          </div>
-        </section>
-      </div>
+          </section>
+        </div>
 
-      {/* Mobile header — matches original: Calendar or BookingCurrent, no Logo/Logout */}
-      <div className="overflow-hidden md:hidden">
-        <section className="flex h-full w-full items-center gap-2 overflow-hidden">
-          <div className="min-w-0 flex-1 overflow-hidden">
-            {hasActiveBooking ? (
-              <BookingCurrent
-                currentBooking={loaderData.currentBooking}
-                selectedOrgId={selectedOrganisationId}
-              />
-            ) : (
-              <CalendarWeek organisationId={selectedOrganisationId} />
-            )}
-          </div>
-        </section>
-      </div>
+        {/* Mobile header — matches original: Calendar or BookingCurrent, no Logo/Logout */}
+        <div className="overflow-hidden md:hidden">
+          <section className="flex h-full w-full items-center gap-2 overflow-hidden">
+            <div className="min-w-0 flex-1 overflow-hidden">
+              {hasActiveBooking ? (
+                <BookingCurrent
+                  currentBooking={loaderData.currentBooking}
+                  selectedOrgId={selectedOrganisationId}
+                />
+              ) : (
+                <CalendarWeek />
+              )}
+            </div>
+          </section>
+        </div>
+      </CalendarDataProvider>
 
       {/* Content area — single Outlet for unique test IDs */}
       {/* overflow-clip, not overflow-hidden: a clipped box is no scroll container, so a focus
