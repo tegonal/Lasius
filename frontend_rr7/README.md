@@ -1,13 +1,13 @@
-# Lasius Frontend (React Router 7)
+# Lasius Frontend (React Router 8)
 
-Open source time tracker for teams. This is the React Router 7 frontend,
+Open source time tracker for teams. This is the React Router 8 frontend,
 replacing the legacy Next.js frontend.
 
 ## Tech Stack
 
 | Layer        | Technology                                          |
 | ------------ | --------------------------------------------------- |
-| Framework    | React Router 7 (v7.13) with SSR + v8 middleware     |
+| Framework    | React Router 8 (v8.4) with SSR + middleware         |
 | UI           | React 19 + React Compiler                           |
 | Styling      | Tailwind CSS v4 + DaisyUI 5                         |
 | Build        | Vite 8                                              |
@@ -119,12 +119,11 @@ Copy `.env.template` to `.env.local` and configure:
 ## Vite Configuration
 
 - **Tailwind CSS v4** via `@tailwindcss/vite` plugin
-- **React Compiler** via `babel-plugin-react-compiler`
+- **React Compiler** via `babel-plugin-react-compiler`, run by
+  `@rolldown/plugin-babel` (it also compiles the split route chunks)
 - **Production**: `data-testid` attributes stripped via
   `babel-plugin-react-remove-properties`
-- **Vite 8 compatibility**: Patches applied to `reactRouter()` plugin to strip
-  deprecated esbuild options (temporary, until `@react-router/dev` supports Vite
-  8 natively)
+- **Route module splitting** is on (the React Router 8 default)
 
 ## License
 
