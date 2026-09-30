@@ -7,15 +7,15 @@
     "clear": "Borrar",
     "close": "Cerrar",
     "help": "Ayuda",
-    "next": "Next",
+    "next": "Siguiente",
     "reset": "Restablecer",
     "resetToInitial": "Restablecer al valor inicial",
     "save": "Guardar",
     "signUp": "Registrarse"
   },
   "aria": {
-    "decrement": "Decrement",
-    "increment": "Increment"
+    "decrement": "Disminuir",
+    "increment": "Aumentar"
   },
   "auth": {
     "actions": {
@@ -83,20 +83,20 @@
     "signInTitle": "Inicia sesión en tu cuenta",
     "signInToLasius": "Iniciar sesión en Lasius",
     "status": {
-      "authenticationFailed": "Authentication failed. Please log in again."
+      "authenticationFailed": "Error de autenticación. Por favor, inicia sesión de nuevo."
     }
   },
   "back": "Atrás",
   "bookings": {
     "actions": {
-      "addedToFavorites": "Booking added to favorites"
+      "addedToFavorites": "Registro añadido a favoritos"
     },
     "status": {
-      "added": "Booking added",
-      "historyCleared": "Booking history cleared",
-      "removed": "Booking removed",
-      "started": "Booking started",
-      "updated": "Booking updated"
+      "added": "Registro añadido",
+      "historyCleared": "Historial de registros borrado",
+      "removed": "Registro eliminado",
+      "started": "Registro iniciado",
+      "updated": "Registro actualizado"
     }
   },
   "calendar": {
@@ -146,7 +146,7 @@
   },
   "favorites": {
     "status": {
-      "removed": "Favorite removed"
+      "removed": "Favorito eliminado"
     }
   },
   "filter": {
@@ -216,10 +216,10 @@
     "member": "Miembro"
   },
   "SessionTimeout": {
-    "extend": "Extend Session",
-    "logout": "Logout",
-    "message": "Your session will expire soon. Would you like to extend it?",
-    "title": "Session Expiring"
+    "extend": "Prolongar sesión",
+    "logout": "Cerrar sesión",
+    "message": "Tu sesión expirará pronto. ¿Quieres prolongarla?",
+    "title": "Sesión a punto de expirar"
   },
   "settings": {
     "app": {

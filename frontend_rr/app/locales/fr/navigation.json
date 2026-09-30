@@ -1,5 +1,5 @@
 {
-  "currentOrganisation": "Current organisation",
+  "currentOrganisation": "Organisation actuelle",
   "organisation": {
     "current": "Organisation actuelle",
     "integrations": "Intégrations",
@@ -25,5 +25,5 @@
     "projects": "Mes projets",
     "stats": "Statistiques"
   },
-  "yourTimeBookingView": "Your time booking view"
+  "yourTimeBookingView": "Ta vue des réservations"
 }

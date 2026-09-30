@@ -7,7 +7,7 @@
     "clear": "Effacer",
     "close": "Fermer",
     "help": "Aide",
-    "next": "Next",
+    "next": "Suivant",
     "reset": "Réinitialiser",
     "resetToInitial": "Réinitialiser à la valeur initiale",
     "save": "Enregistrer",
@@ -83,20 +83,20 @@
     "signInTitle": "Connecte-toi à ton compte",
     "signInToLasius": "Se connecter à Lasius",
     "status": {
-      "authenticationFailed": "Authentication failed. Please log in again."
+      "authenticationFailed": "Échec de l'authentification. Reconnecte-toi."
     }
   },
   "back": "Retour",
   "bookings": {
     "actions": {
-      "addedToFavorites": "Booking added to favorites"
+      "addedToFavorites": "Réservation ajoutée aux favoris"
     },
     "status": {
-      "added": "Booking added",
-      "historyCleared": "Booking history cleared",
-      "removed": "Booking removed",
-      "started": "Booking started",
-      "updated": "Booking updated"
+      "added": "Réservation ajoutée",
+      "historyCleared": "Historique des réservations effacé",
+      "removed": "Réservation supprimée",
+      "started": "Réservation démarrée",
+      "updated": "Réservation mise à jour"
     }
   },
   "calendar": {
@@ -146,7 +146,7 @@
   },
   "favorites": {
     "status": {
-      "removed": "Favorite removed"
+      "removed": "Favori supprimé"
     }
   },
   "filter": {

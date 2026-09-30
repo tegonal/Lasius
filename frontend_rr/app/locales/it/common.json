@@ -7,15 +7,15 @@
     "clear": "Cancella",
     "close": "Chiudi",
     "help": "Aiuto",
-    "next": "Next",
+    "next": "Avanti",
     "reset": "Ripristina",
     "resetToInitial": "Ripristina al valore iniziale",
     "save": "Salva",
     "signUp": "Registrati"
   },
   "aria": {
-    "decrement": "Decrement",
-    "increment": "Increment"
+    "decrement": "Diminuisci",
+    "increment": "Aumenta"
   },
   "auth": {
     "actions": {
@@ -83,20 +83,20 @@
     "signInTitle": "Accedi al tuo account",
     "signInToLasius": "Accedi a Lasius",
     "status": {
-      "authenticationFailed": "Authentication failed. Please log in again."
+      "authenticationFailed": "Autenticazione non riuscita. Effettua nuovamente l'accesso."
     }
   },
   "back": "Indietro",
   "bookings": {
     "actions": {
-      "addedToFavorites": "Booking added to favorites"
+      "addedToFavorites": "Registrazione aggiunta ai preferiti"
     },
     "status": {
-      "added": "Booking added",
-      "historyCleared": "Booking history cleared",
-      "removed": "Booking removed",
-      "started": "Booking started",
-      "updated": "Booking updated"
+      "added": "Registrazione aggiunta",
+      "historyCleared": "Cronologia registrazioni cancellata",
+      "removed": "Registrazione rimossa",
+      "started": "Registrazione avviata",
+      "updated": "Registrazione aggiornata"
     }
   },
   "calendar": {
@@ -109,8 +109,8 @@
   "common": {
     "actions": {
       "close": "Chiudi",
-      "closeActionsMenu": "Close actions menu",
-      "openActionsMenu": "Open actions menu"
+      "closeActionsMenu": "Chiudi menu azioni",
+      "openActionsMenu": "Apri menu azioni"
     }
   },
   "custom": "Personalizzato",
@@ -146,7 +146,7 @@
   },
   "favorites": {
     "status": {
-      "removed": "Favorite removed"
+      "removed": "Preferito rimosso"
     }
   },
   "filter": {
@@ -216,10 +216,10 @@
     "member": "Membro"
   },
   "SessionTimeout": {
-    "extend": "Extend Session",
-    "logout": "Logout",
-    "message": "Your session will expire soon. Would you like to extend it?",
-    "title": "Session Expiring"
+    "extend": "Prolunga sessione",
+    "logout": "Disconnetti",
+    "message": "La tua sessione scadrà a breve. Vuoi prolungarla?",
+    "title": "Sessione in scadenza"
   },
   "settings": {
     "app": {
@@ -236,7 +236,7 @@
     "label": "Stato"
   },
   "time": {
-    "customTime": "Custom time...",
+    "customTime": "Orario personalizzato...",
     "day": "Giorno",
     "ends": "Fine",
     "from": "Da",
