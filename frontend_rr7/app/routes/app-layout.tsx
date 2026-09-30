@@ -143,7 +143,9 @@ export default function AppLayout({ loaderData }: Route.ComponentProps) {
       </div>
 
       {/* Content area — single Outlet for unique test IDs */}
-      <div className="bg-base-200 border-base-content/20 h-full w-full overflow-hidden md:flex md:flex-col md:rounded-xl md:border md:shadow-2xl">
+      {/* overflow-clip, not overflow-hidden: a clipped box is no scroll container, so a focus
+          change cannot scroll the hidden footer tooltips into view and shift the layout. */}
+      <div className="bg-base-200 border-base-content/20 h-full w-full overflow-clip md:flex md:flex-col md:rounded-xl md:border md:shadow-2xl">
         <div className="h-full w-full overflow-auto">
           <Outlet />
         </div>
