@@ -34,5 +34,6 @@ export const [i18nextMiddleware, getLocale, getInstance] = createI18nextMiddlewa
     ns: i18nServerConfig.ns,
     resources: i18nServerConfig.resources,
     returnEmptyString: i18nServerConfig.returnEmptyString,
+    showSupportNotice: i18nServerConfig.showSupportNotice,
   },
 })
