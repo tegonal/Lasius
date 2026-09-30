@@ -72,6 +72,20 @@ export function providerLoginUrl(
 }
 
 /**
+ * Turn the `callbackUrl` of a Lasius 2.x link into a `returnTo` path. NextAuth stored an absolute URL,
+ * so only the path and the search remain. The receiving loader still sanitizes the value.
+ */
+export function returnToFromCallbackUrl(callbackUrl: null | string): string | undefined {
+  if (!callbackUrl) return undefined
+  try {
+    const url = new URL(callbackUrl, 'http://localhost')
+    return `${url.pathname}${url.search}`
+  } catch {
+    return undefined
+  }
+}
+
+/**
  * Build a query string from params, omitting falsy values.
  * Returns `?key=value&...` or empty string when no params are set.
  */

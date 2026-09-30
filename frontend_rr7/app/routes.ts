@@ -91,6 +91,10 @@ export default [
     route('callback', 'routes/oauth.callback.tsx'),
   ]),
 
+  // Lasius 2.x URLs
+  route('internal_oauth/*', 'routes/legacy.internal-oauth.ts'),
+  route('api/auth/*', 'routes/legacy.api-auth.ts'),
+
   // API resource routes
   ...prefix('api', [
     route('session-status', 'routes/api.session-status.tsx'),

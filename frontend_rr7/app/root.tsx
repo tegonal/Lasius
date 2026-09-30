@@ -47,11 +47,12 @@ import { localeCookie } from '~/lib/cookies/i18next-cookie.server'
 import { parseThemeCookie } from '~/lib/cookies/theme-cookie.server'
 import { logger } from '~/lib/logger'
 import { getLocale, i18nextMiddleware } from '~/middleware/i18next'
+import { legacyAuthCookieMiddleware } from '~/middleware/legacy-auth-cookies'
 
 import { type Route } from './+types/root.ts'
 import './tailwind.css'
 
-export const middleware = [i18nextMiddleware]
+export const middleware = [legacyAuthCookieMiddleware, i18nextMiddleware]
 
 /** Locale and theme rarely change — skip revalidation unless navigation target changes */
 export const shouldRevalidate = ({

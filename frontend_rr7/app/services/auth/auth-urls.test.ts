@@ -25,7 +25,30 @@ import {
   loginUrl,
   logoutUrl,
   providerLoginUrl,
+  returnToFromCallbackUrl,
 } from './auth-urls'
+
+describe('returnToFromCallbackUrl', () => {
+  it('keeps the path and the search of an absolute NextAuth URL', () => {
+    expect(returnToFromCallbackUrl('https://lasius.example/user/lists?from=2026-09-01')).toBe(
+      '/user/lists?from=2026-09-01',
+    )
+  })
+
+  it('keeps a relative path', () => {
+    expect(returnToFromCallbackUrl('/join/ABC123')).toBe('/join/ABC123')
+  })
+
+  it('drops the host of a foreign or protocol-relative URL', () => {
+    expect(returnToFromCallbackUrl('https://evil.example/steal')).toBe('/steal')
+    expect(returnToFromCallbackUrl('//evil.example/steal')).toBe('/steal')
+  })
+
+  it('returns undefined without a value', () => {
+    expect(returnToFromCallbackUrl(null)).toBeUndefined()
+    expect(returnToFromCallbackUrl('')).toBeUndefined()
+  })
+})
 
 describe('loginUrl', () => {
   it('returns base path with no params', () => {

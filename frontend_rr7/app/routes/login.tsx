@@ -35,7 +35,7 @@ import {
   mergeAuthHeaders,
   sanitizeReturnTo,
 } from '~/services/auth/auth-helpers.server'
-import { providerLoginUrl } from '~/services/auth/auth-urls'
+import { providerLoginUrl, returnToFromCallbackUrl } from '~/services/auth/auth-urls'
 import { getProviderDisplayName, getProviderIcon } from '~/services/auth/provider-display'
 import { getEnabledProviders } from '~/services/auth/providers'
 
@@ -44,7 +44,11 @@ import { type Route } from './+types/login'
 export async function loader({ request }: Route.LoaderArgs) {
   const user = await getOptionalUser(request)
   const url = new URL(request.url)
-  const returnTo = sanitizeReturnTo(url.searchParams.get('returnTo') ?? '/')
+  const returnTo = sanitizeReturnTo(
+    url.searchParams.get('returnTo') ??
+      returnToFromCallbackUrl(url.searchParams.get('callbackUrl')) ??
+      '/',
+  )
 
   if (user) {
     throw redirect(returnTo, { headers: mergeAuthHeaders(user) })
