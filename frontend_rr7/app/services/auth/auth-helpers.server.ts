@@ -19,11 +19,12 @@
 
 import { redirect } from 'react-router'
 
+import { getServerEnvironment } from '~/lib/environment.server'
 import { getCsrfToken } from '~/services/api/lasius/general/general'
 
 import { loginUrl } from './auth-urls'
 import { getSessionTokens } from './session.server'
-import { type LasiusSessionData } from './types'
+import { type AuthProvider, type LasiusSessionData } from './types'
 
 export interface AuthResult {
   /** Set-Cookie header to propagate if the token was refreshed */
@@ -35,7 +36,26 @@ export interface AuthResult {
 export function authHeaders(session: LasiusSessionData): Record<string, string> {
   return {
     Authorization: `Bearer ${session.accessToken}`,
-    'X-Token-Issuer': session.tokenIssuer,
+    'X-Token-Issuer': backendTokenIssuer(session.tokenIssuer),
+  }
+}
+
+/**
+ * The backend compares the issuer header of an opaque token with the issuer URLs in
+ * `backend/conf/all_providers.conf`. A JWT names its own issuer, so the backend ignores the header.
+ */
+function backendTokenIssuer(provider: AuthProvider): string {
+  switch (provider) {
+    case 'github': {
+      return 'https://api.github.com/'
+    }
+    case 'gitlab': {
+      return getServerEnvironment('GITLAB_OAUTH_URL') ?? 'https://gitlab.com'
+    }
+    case 'internal':
+    case 'keycloak': {
+      return provider
+    }
   }
 }
 

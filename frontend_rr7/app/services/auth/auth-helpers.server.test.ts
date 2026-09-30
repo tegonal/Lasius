@@ -49,6 +49,10 @@ const mockSession: LasiusSessionData = {
 }
 
 describe('authHeaders', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs()
+  })
+
   it('returns Authorization and X-Token-Issuer headers', () => {
     const headers = authHeaders(mockSession)
     expect(headers).toEqual({
@@ -64,6 +68,24 @@ describe('authHeaders', () => {
     }
     const headers = authHeaders(internalSession)
     expect(headers['X-Token-Issuer']).toBe('internal')
+  })
+
+  // backend/conf/all_providers.conf holds these issuer URLs for the opaque tokens.
+  it('sends the GitHub issuer URL for a GitHub token', () => {
+    const headers = authHeaders({ ...mockSession, tokenIssuer: 'github' })
+    expect(headers['X-Token-Issuer']).toBe('https://api.github.com/')
+  })
+
+  it('sends the default GitLab issuer URL for a GitLab token', () => {
+    vi.stubEnv('GITLAB_OAUTH_URL', undefined)
+    const headers = authHeaders({ ...mockSession, tokenIssuer: 'gitlab' })
+    expect(headers['X-Token-Issuer']).toBe('https://gitlab.com')
+  })
+
+  it('sends GITLAB_OAUTH_URL for a GitLab token on a self-hosted instance', () => {
+    vi.stubEnv('GITLAB_OAUTH_URL', 'https://gitlab.example.com')
+    const headers = authHeaders({ ...mockSession, tokenIssuer: 'gitlab' })
+    expect(headers['X-Token-Issuer']).toBe('https://gitlab.example.com')
   })
 })
 
