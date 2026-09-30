@@ -36,7 +36,10 @@ export interface OAuthProvider {
   getUserProfile(accessToken: string): Promise<{ email: string; userId: string }>
   provider: AuthProvider
   refreshToken(refreshToken: string): Promise<null | TokenResponse>
-  /** Ends the session at the provider. Each provider sends the token its endpoint expects. Throws on failure. */
+  /**
+   * Revokes the token that the endpoint of the provider expects, and throws on a rejection. The
+   * internal backend then refuses the refresh token. Its JWT access token stays valid until it expires.
+   */
   revokeToken(tokens: Pick<LasiusSessionData, 'accessToken' | 'refreshToken'>): Promise<void>
 }
 
