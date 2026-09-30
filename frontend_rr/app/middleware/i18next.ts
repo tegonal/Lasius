@@ -28,12 +28,6 @@ export const [i18nextMiddleware, getLocale, getInstance] = createI18nextMiddlewa
     fallbackLanguage: i18nServerConfig.fallbackLng,
     supportedLanguages: i18nServerConfig.supportedLngs,
   },
-  i18next: {
-    defaultNS: i18nServerConfig.defaultNS,
-    fallbackNS: i18nServerConfig.fallbackNS,
-    ns: i18nServerConfig.ns,
-    resources: i18nServerConfig.resources,
-    returnEmptyString: i18nServerConfig.returnEmptyString,
-    showSupportNotice: i18nServerConfig.showSupportNotice,
-  },
+  // A copy, because i18next rewrites the options object it receives, for example fallbackLng to ['en'].
+  i18next: { ...i18nServerConfig },
 })
