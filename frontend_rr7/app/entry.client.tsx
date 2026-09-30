@@ -29,41 +29,40 @@ import { getInitialNamespaces } from 'remix-i18next/client'
 import { i18nConfig } from '~/i18n-config.ts'
 import { logger } from '~/lib/logger'
 
-globalThis.addEventListener('error', (event) => {
+addEventListener('error', (event) => {
   logger.error({ error: event.error, type: 'window-error' }, 'Uncaught error')
 })
 
-globalThis.addEventListener('unhandledrejection', (event) => {
-  logger.error(
-    { error: event.reason, type: 'unhandled-rejection' },
-    'Unhandled rejection',
-  )
+addEventListener('unhandledrejection', (event) => {
+  logger.error({ error: event.reason, type: 'unhandled-rejection' }, 'Unhandled rejection')
 })
 
 async function main() {
-  await i18next
-    .use(initReactI18next)
-    .use(Fetch)
-    .use(I18nextBrowserLanguageDetector)
-    .init({
-      ...i18nConfig,
-      backend: { loadPath: '/api/locales/{{lng}}/{{ns}}' },
-      detection: { caches: [], order: ['htmlTag'] },
-      ns: getInitialNamespaces(),
-    })
+  try {
+    await i18next
+      .use(initReactI18next)
+      .use(Fetch)
+      .use(I18nextBrowserLanguageDetector)
+      .init({
+        ...i18nConfig,
+        backend: { loadPath: '/api/locales/{{lng}}/{{ns}}' },
+        detection: { caches: [], order: ['htmlTag'] },
+        ns: getInitialNamespaces(),
+      })
 
-  startTransition(() => {
-    hydrateRoot(
-      document,
-      <I18nextProvider i18n={i18next}>
-        <StrictMode>
-          <HydratedRouter />
-        </StrictMode>
-      </I18nextProvider>,
-    )
-  })
+    startTransition(() => {
+      hydrateRoot(
+        document,
+        <I18nextProvider i18n={i18next}>
+          <StrictMode>
+            <HydratedRouter />
+          </StrictMode>
+        </I18nextProvider>,
+      )
+    })
+  } catch (error) {
+    logger.error({ error, type: 'hydration' }, 'Hydration error')
+  }
 }
 
-main().catch((error) => {
-  logger.error({ error, type: 'hydration' }, 'Hydration error')
-})
+void main()

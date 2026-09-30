@@ -23,19 +23,14 @@ import { useTranslation } from 'react-i18next'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { StatsTileNumber } from '~/features/stats/components/stats-tile-number'
 
-type Props = {
+type Properties = {
   memberCount: number
   onCreate: () => void
   onEdit: () => void
   onInvite: () => void
 }
 
-export const OrganisationStats = ({
-  memberCount,
-  onCreate,
-  onEdit,
-  onInvite,
-}: Props) => {
+export const OrganisationStats = ({ memberCount, onCreate, onEdit, onInvite }: Properties) => {
   const { t } = useTranslation('organisation')
   const { isAdministrator, selectedOrganisation } = useOrganisation()
 
@@ -49,9 +44,7 @@ export const OrganisationStats = ({
     <div className="bg-base-200 flex items-start justify-between gap-4 p-4">
       <div className="stats shadow">
         <div className="stat h-fit">
-          <div className="stat-title">
-            {t('organisationName', 'Organisation')}
-          </div>
+          <div className="stat-title">{t('organisationName', 'Organisation')}</div>
           <div className="stat-value text-2xl">{organisationName}</div>
         </div>
         <StatsTileNumber
@@ -65,15 +58,13 @@ export const OrganisationStats = ({
           className="btn btn-sm btn-neutral w-auto"
           data-testid="org-actions-dropdown"
           tabIndex={0}
-          type="button"
-        >
+          type="button">
           {t('actions.actions', 'Actions')}
           <ChevronDown className="size-4" />
         </button>
         <ul
           className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
-          tabIndex={0}
-        >
+          tabIndex={-1}>
           {isAdministrator && !isPrivate && (
             <>
               <li>

@@ -60,7 +60,7 @@ export const computeWorkHealthMetrics = (
     return { burnoutMetrics: null, weeklyData: [] }
   }
 
-  const refDate = new Date(referenceDate)
+  const referenceDate_ = new Date(referenceDate)
 
   // Group bookings by week
   const weekMap = new Map<string, { dates: Set<string>; hours: number }>()
@@ -71,10 +71,10 @@ export const computeWorkHealthMetrics = (
     if (!startDateTime || !endDateTime) continue
 
     const bookingDate = new Date(startDateTime)
-    const weekNum = getWeek(bookingDate, { weekStartsOn: 1 })
+    const weekNumber = getWeek(bookingDate, { weekStartsOn: 1 })
     const year = bookingDate.getFullYear()
-    const weekKey = `${year}-W${weekNum}`
-    const dateKey = bookingDate.toISOString().split('T')[0] ?? ''
+    const weekKey = `${year}-W${weekNumber}`
+    const dateKey = bookingDate.toISOString().split('T', 1)[0] ?? ''
 
     if (!weekMap.has(weekKey)) {
       weekMap.set(weekKey, { dates: new Set(), hours: 0 })
@@ -87,18 +87,18 @@ export const computeWorkHealthMetrics = (
 
   // Create weekly data array
   const weeks: WeekData[] = []
-  for (let i = weeksToAnalyze - 1; i >= 0; i--) {
-    const weekDate = subWeeks(refDate, i)
-    const weekNum = getWeek(weekDate, { weekStartsOn: 1 })
+  for (let index = weeksToAnalyze - 1; index >= 0; index--) {
+    const weekDate = subWeeks(referenceDate_, index)
+    const weekNumber = getWeek(weekDate, { weekStartsOn: 1 })
     const year = weekDate.getFullYear()
-    const weekKey = `${year}-W${weekNum}`
+    const weekKey = `${year}-W${weekNumber}`
     const weekData = weekMap.get(weekKey)
 
     weeks.push({
       hours: weekData?.hours || 0,
       plannedHours: plannedWeeklyHours,
-      weekLabel: `W${weekNum}/${year}`,
-      weekNumber: weekNum,
+      weekLabel: `W${weekNumber}/${year}`,
+      weekNumber: weekNumber,
       year,
     })
   }
@@ -109,8 +109,7 @@ export const computeWorkHealthMetrics = (
     return { burnoutMetrics: null, weeklyData: weeks }
   }
 
-  const overtimePercentage =
-    (currentWeek.hours / plannedWeeklyHours) * 100 - 100
+  const overtimePercentage = (currentWeek.hours / plannedWeeklyHours) * 100 - 100
 
   // Calculate consecutive working days (simplified - using current week's date count)
   const currentWeekKey = `${currentWeek.year}-W${currentWeek.weekNumber}`
@@ -118,8 +117,7 @@ export const computeWorkHealthMetrics = (
   const consecutiveDays = currentWeekData?.dates.size || 0
 
   // Calculate average daily hours for current week
-  const averageDailyHours =
-    consecutiveDays > 0 ? currentWeek.hours / consecutiveDays : 0
+  const averageDailyHours = consecutiveDays > 0 ? currentWeek.hours / consecutiveDays : 0
 
   // Determine burnout level
   let level: BurnoutLevel = 'healthy'

@@ -22,7 +22,7 @@ import { PieDiagram } from '~/components/ui/charts/pie-diagram'
 import { EmptyStateStats } from './empty-state-stats'
 import { StatsTile } from './stats-tile'
 
-type StatsCircleCategoryRangeProps = {
+type StatsCircleCategoryRangeProperties = {
   chartData:
     | undefined
     | {
@@ -31,9 +31,7 @@ type StatsCircleCategoryRangeProps = {
       }
 }
 
-export const StatsCircleCategoryRange = ({
-  chartData,
-}: StatsCircleCategoryRangeProps) => {
+export const StatsCircleCategoryRange = ({ chartData }: StatsCircleCategoryRangeProperties) => {
   if (!chartData?.data || chartData.data.length === 0) {
     return (
       <StatsTile className="h-[340px]">

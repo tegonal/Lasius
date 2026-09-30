@@ -17,7 +17,7 @@
  *
  */
 
-import { getServerEnvRequired } from '~/lib/env.server'
+import { getServerEnvironmentRequired } from '~/lib/environment.server'
 import { logger } from '~/lib/logger'
 
 import { type OAuthProvider, type TokenResponse } from '../types'
@@ -29,30 +29,24 @@ interface GitHubEmail {
 }
 
 export function createGitHubProvider(): OAuthProvider {
-  const clientId = getServerEnvRequired('GITHUB_OAUTH_CLIENT_ID')
-  const clientSecret = getServerEnvRequired('GITHUB_OAUTH_CLIENT_SECRET')
+  const clientId = getServerEnvironmentRequired('GITHUB_OAUTH_CLIENT_ID')
+  const clientSecret = getServerEnvironmentRequired('GITHUB_OAUTH_CLIENT_SECRET')
 
   return {
-    async exchangeCode(
-      code: string,
-      redirectUri: string,
-    ): Promise<TokenResponse> {
-      const response = await fetch(
-        'https://github.com/login/oauth/access_token',
-        {
-          body: new URLSearchParams({
-            client_id: clientId,
-            client_secret: clientSecret,
-            code,
-            redirect_uri: redirectUri,
-          }),
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          method: 'POST',
+    async exchangeCode(code: string, redirectUri: string): Promise<TokenResponse> {
+      const response = await fetch('https://github.com/login/oauth/access_token', {
+        body: new URLSearchParams({
+          client_id: clientId,
+          client_secret: clientSecret,
+          code,
+          redirect_uri: redirectUri,
+        }),
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
-      )
+        method: 'POST',
+      })
 
       if (!response.ok) {
         const error = await response.text()
@@ -84,12 +78,10 @@ export function createGitHubProvider(): OAuthProvider {
       url.searchParams.set('scope', 'read:user user:email')
       url.searchParams.set('state', state)
       url.searchParams.set('redirect_uri', redirectUri)
-      return url.toString()
+      return url.href
     },
 
-    async getUserProfile(
-      accessToken: string,
-    ): Promise<{ email: string; userId: string }> {
+    async getUserProfile(accessToken: string): Promise<{ email: string; userId: string }> {
       const [userResponse, emailsResponse] = await Promise.all([
         fetch('https://api.github.com/user', {
           headers: {
@@ -115,7 +107,7 @@ export function createGitHubProvider(): OAuthProvider {
       let email = ''
       if (emailsResponse.ok) {
         const emails = (await emailsResponse.json()) as GitHubEmail[]
-        const primary = emails.find((e) => e.primary && e.verified)
+        const primary = emails.find((githubEmail) => githubEmail.primary && githubEmail.verified)
         email = primary?.email ?? emails[0]?.email ?? ''
       }
 

@@ -26,7 +26,7 @@ import { type ModelsBooking } from '~/services/api/lasius'
 
 import { ContextButtonWrapper } from '../context-button-wrapper'
 
-type Props = {
+type Properties = {
   'data-testid'?: string
   item: ModelsBooking
   onAddFavorite?: () => void
@@ -38,7 +38,7 @@ export const ContextButtonAddFavorite = ({
   item: _item,
   onAddFavorite,
   variant = 'default',
-}: Props) => {
+}: Properties) => {
   const { t } = useTranslation('home')
 
   return (
@@ -50,8 +50,7 @@ export const ContextButtonAddFavorite = ({
         onClick={onAddFavorite}
         shape="circle"
         title={t('favorites.actions.add', 'Add as favorite')}
-        variant="contextIcon"
-      >
+        variant="contextIcon">
         <LucideIcon icon={Star} size={24} />
       </Button>
     </ContextButtonWrapper>

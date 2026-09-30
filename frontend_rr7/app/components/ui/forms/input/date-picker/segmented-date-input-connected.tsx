@@ -22,41 +22,25 @@ import { useTranslation } from 'react-i18next'
 
 import { Input } from '~/components/primitives/inputs/input'
 
-import {
-  getSegmentBounds,
-  getSegmentFromPosition,
-} from './shared/core/segment-bounds'
-import {
-  DATE_SEGMENT_CONFIG,
-  type DateSegment,
-} from './shared/core/segment-config'
-import {
-  getArrowKeyTarget,
-  getTabTarget,
-} from './shared/core/segment-navigation'
+import { getSegmentBounds, getSegmentFromPosition } from './shared/core/segment-bounds'
+import { DATE_SEGMENT_CONFIG, type DateSegment } from './shared/core/segment-config'
+import { getArrowKeyTarget, getTabTarget } from './shared/core/segment-navigation'
 import {
   createHandleClick,
   selectSegment as selectSegmentHelper,
 } from './shared/core/segment-selection'
 import { formatDate } from './shared/date-time-helpers'
 import { createInputChangeHandler } from './shared/input/input-change-handler'
-import { validateInputChar } from './shared/input/input-validation'
+import { isValidInputChar } from './shared/input/input-validation'
 import {
-  handleBackspaceDelete,
-  handleEscapeKey,
-  handleSeparatorKey,
+  didHandleBackspaceDelete,
+  didHandleEscapeKey,
+  didHandleSeparatorKey,
 } from './shared/input/keyboard-handlers'
 import { SegmentedInputWrapper } from './shared/segmented-input-wrapper'
-import {
-  DatePickerStoreContext,
-  useDatePickerStore,
-} from './store/use-date-picker-store'
+import { DatePickerStoreContext, useDatePickerStore } from './store/use-date-picker-store'
 
-export const SegmentedDateInputConnected = ({
-  afterSlot,
-}: {
-  afterSlot?: React.ReactNode
-}) => {
+export const SegmentedDateInputConnected = ({ afterSlot }: { afterSlot?: React.ReactNode }) => {
   const { t } = useTranslation('common')
   const store = useContext(DatePickerStoreContext)
   const {
@@ -68,12 +52,10 @@ export const SegmentedDateInputConnected = ({
     value,
   } = useDatePickerStore()
   const [inputValue, setInputValue] = useState<string>(value.dateString)
-  const [selectedSegment, setSelectedSegment] = useState<DateSegment | null>(
-    null,
-  )
-  const inputRef = useRef<HTMLInputElement>(null)
-  const focusFromMouseRef = useRef<boolean>(false)
-  const pendingCursorPosRef = useRef<null | number>(null)
+  const [selectedSegment, setSelectedSegment] = useState<DateSegment | null>(null)
+  const inputReference = useRef<HTMLInputElement>(null)
+  const focusFromMouseReference = useRef<boolean>(false)
+  const pendingCursorPosReference = useRef<null | number>(null)
 
   const config = DATE_SEGMENT_CONFIG
 
@@ -88,24 +70,20 @@ export const SegmentedDateInputConnected = ({
 
   // Sync with store
   useEffect(() => {
-    if (
-      value.dateString !== inputValue &&
-      !inputRef.current?.matches(':focus')
-    ) {
+    if (value.dateString !== inputValue && !inputReference.current?.matches(':focus')) {
       setInputValue(value.dateString || config.placeholder)
     }
   }, [value.dateString, inputValue, config.placeholder])
 
   // Restore cursor position after inputValue changes (runs synchronously before paint)
   React.useLayoutEffect(() => {
-    if (
-      pendingCursorPosRef.current !== null &&
-      inputRef.current?.matches(':focus')
-    ) {
-      const pos = pendingCursorPosRef.current
-      pendingCursorPosRef.current = null
-      inputRef.current.setSelectionRange(pos, pos)
+    if (pendingCursorPosReference.current === null || !inputReference.current?.matches(':focus')) {
+      return
     }
+
+    const pos = pendingCursorPosReference.current
+    pendingCursorPosReference.current = null
+    inputReference.current.setSelectionRange(pos, pos)
   }, [inputValue])
 
   // Select a segment using helper
@@ -115,64 +93,64 @@ export const SegmentedDateInputConnected = ({
       inputValue,
       config.delimiter,
       config.segments,
-      inputRef,
+      inputReference,
       setSelectedSegment,
     )
   }
 
   // Handle mouse down to set flag before focus
   const handleMouseDown = () => {
-    focusFromMouseRef.current = true
+    focusFromMouseReference.current = true
   }
 
-  const handleClick = createHandleClick(
-    inputRef,
-    inputValue,
-    config.placeholder,
-    config.delimiter,
-    config.segments,
-    selectSegment,
-  )
-
-  // Handle input change with generic handler
-  const handleInputChange = createInputChangeHandler({
-    config,
-    inputRef,
-    inputValue,
-    selectedSegment,
-    selectSegmentFn: selectSegment,
-    setCursorPosition: (pos) => {
-      pendingCursorPosRef.current = pos
-    },
-    setInputValue,
-    updateStore: setDateFromString,
-  })
-
-  // Handle keyboard navigation
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>): void => {
-    const bounds = getSegmentBounds(
+  const handleClick = (event: React.MouseEvent<HTMLInputElement>) => {
+    createHandleClick(
+      inputReference,
       inputValue,
+      config.placeholder,
       config.delimiter,
       config.segments,
-    )
+      selectSegment,
+    )(event)
+  }
+
+  // Handle input change with generic handler
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    createInputChangeHandler({
+      config,
+      inputRef: inputReference,
+      inputValue,
+      selectedSegment,
+      selectSegmentFn: selectSegment,
+      setCursorPosition: (pos) => {
+        pendingCursorPosReference.current = pos
+      },
+      setInputValue,
+      updateStore: setDateFromString,
+    })(event)
+  }
+
+  // Handle keyboard navigation
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>): void => {
+    const bounds = getSegmentBounds(inputValue, config.delimiter, config.segments)
     if (!bounds) return
 
     // Block invalid characters to prevent selection loss
-    if (!validateInputChar(e.key, config.allowedCharsPattern)) {
-      e.preventDefault()
+    if (!isValidInputChar(event.key, config.allowedCharsPattern)) {
+      event.preventDefault()
       return
     }
 
     // Escape key - reset to initial value
-    if (handleEscapeKey(e, inputRef, resetToInitial)) {
+    if (didHandleEscapeKey(event, inputReference, resetToInitial)) {
       return
     }
 
     // Backspace/Delete handling
     if (
-      handleBackspaceDelete(
-        e,
-        inputRef,
+      didHandleBackspaceDelete(
+        event,
+        inputReference,
         inputValue,
         config.delimiter,
         config.segments,
@@ -188,10 +166,10 @@ export const SegmentedDateInputConnected = ({
 
     // Period/Dot key to move to next segment
     if (
-      handleSeparatorKey(
-        e,
+      didHandleSeparatorKey(
+        event,
         config.separatorKeys,
-        inputRef,
+        inputReference,
         inputValue,
         config.delimiter,
         config.segments,
@@ -203,70 +181,68 @@ export const SegmentedDateInputConnected = ({
 
     // Helper: resolve segment at cursor position
     const segmentAtCursor = (): DateSegment | null => {
-      const position = inputRef.current?.selectionStart
+      const position = inputReference.current?.selectionStart
       if (typeof position !== 'number') return null
-      return getSegmentFromPosition(
-        position,
-        inputValue,
-        config.delimiter,
-        config.segments,
-      )
+      return getSegmentFromPosition(position, inputValue, config.delimiter, config.segments)
     }
 
-    // Arrow keys for increment/decrement
-    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-      e.preventDefault()
-      if (!value.date) return
-      const segment = segmentAtCursor()
-      if (!segment) return
+    switch (event.key) {
+      case 'ArrowDown':
+      case 'ArrowUp': {
+        // Arrow keys for increment/decrement
+        event.preventDefault()
+        if (!value.date) return
+        const segment = segmentAtCursor()
+        if (!segment) return
 
-      const increment = e.key === 'ArrowUp' ? 1 : -1
-      incrementBySegment(segment, increment)
+        const increment = event.key === 'ArrowUp' ? 1 : -1
+        incrementBySegment(segment, increment)
 
-      if (store) {
-        setInputValue(store.getState().value.dateString)
-      }
-      setTimeout(() => selectSegment(segment), 0)
-    }
-
-    // Tab navigation between segments
-    if (e.key === 'Tab') {
-      const segment = segmentAtCursor()
-      if (segment) {
-        const target = getTabTarget(e.shiftKey, segment, config.segments)
-        if (target) {
-          e.preventDefault()
-          selectSegment(target)
+        if (store) {
+          setInputValue(store.getState().value.dateString)
         }
-      }
-    }
+        setTimeout(() => selectSegment(segment), 0)
 
-    // Arrow key navigation between segments at boundaries
-    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-      const position = inputRef.current?.selectionStart
-      if (typeof position === 'number') {
+        break
+      }
+      case 'ArrowLeft':
+      case 'ArrowRight': {
+        // Arrow key navigation between segments at boundaries
+        const position = inputReference.current?.selectionStart
+        if (typeof position === 'number') {
+          const segment = segmentAtCursor()
+          if (segment) {
+            const target = getArrowKeyTarget(event.key, position, segment, bounds, config.segments)
+            if (target) {
+              event.preventDefault()
+              selectSegment(target)
+            }
+          }
+        }
+
+        break
+      }
+      case 'Tab': {
+        // Tab navigation between segments
         const segment = segmentAtCursor()
         if (segment) {
-          const target = getArrowKeyTarget(
-            e.key,
-            position,
-            segment,
-            bounds,
-            config.segments,
-          )
+          const target = getTabTarget(event.shiftKey, segment, config.segments)
           if (target) {
-            e.preventDefault()
+            event.preventDefault()
             selectSegment(target)
           }
         }
+
+        break
       }
+      // No default
     }
   }
 
   // Format on blur
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>): void => {
+  const handleBlur = (event: React.FocusEvent<HTMLInputElement>): void => {
     // Don't clear selection if clicking on arrow buttons (they have tabIndex=-1)
-    const relatedTarget = e.relatedTarget as HTMLElement
+    const relatedTarget = event.relatedTarget as HTMLElement
     if (relatedTarget?.tagName === 'BUTTON' && relatedTarget.tabIndex === -1) {
       return
     }
@@ -292,12 +268,12 @@ export const SegmentedDateInputConnected = ({
   const handleFocus = (): void => {
     if (inputValue === config.placeholder) {
       setInputValue('')
-    } else if (inputValue && !focusFromMouseRef.current) {
+    } else if (inputValue && !focusFromMouseReference.current) {
       // Only auto-select first segment if focus came from keyboard (tab), not from mouse click
       setTimeout(() => selectSegment('day'), 0)
     }
     // Reset the flag after handling
-    focusFromMouseRef.current = false
+    focusFromMouseReference.current = false
   }
 
   // Handle arrow button clicks
@@ -322,8 +298,7 @@ export const SegmentedDateInputConnected = ({
     <SegmentedInputWrapper
       hasSelection={!!selectedSegment}
       label={t('formats.dateFormat', 'DD.MM.YYYY')}
-      onArrowClick={handleArrowClick}
-    >
+      onArrowClick={handleArrowClick}>
       <>
         <Input
           className={`selection:bg-secondary selection:text-secondary-content join-item m-0 font-mono ${!value.isValid && !value.isPartial ? 'text-error' : ''}`}
@@ -335,7 +310,7 @@ export const SegmentedDateInputConnected = ({
           onKeyDown={handleKeyDown}
           onMouseDown={handleMouseDown}
           placeholder={t('formats.dateFormat', 'DD.MM.YYYY')}
-          ref={inputRef}
+          ref={inputReference}
           size="md"
           style={{ fontSize: '0.95rem', width: 'calc(10ch + 1.6rem)' }}
           type="text"

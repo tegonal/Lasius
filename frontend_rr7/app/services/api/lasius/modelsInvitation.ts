@@ -9,5 +9,4 @@ import type { ModelsJoinOrganisationInvitation } from './modelsJoinOrganisationI
 import type { ModelsJoinProjectInvitation } from './modelsJoinProjectInvitation'
 
 export type ModelsInvitation =
-  | (ModelsJoinOrganisationInvitation & unknown)
-  | (ModelsJoinProjectInvitation & unknown)
+  (ModelsJoinOrganisationInvitation & unknown) | (ModelsJoinProjectInvitation & unknown)

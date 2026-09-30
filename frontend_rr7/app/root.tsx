@@ -17,13 +17,7 @@
  *
  */
 
-import {
-  lazy,
-  type PropsWithChildren,
-  Suspense,
-  useEffect,
-  useState,
-} from 'react'
+import { lazy, type PropsWithChildren, Suspense, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   data,
@@ -45,11 +39,10 @@ import { useHelpStore } from '~/features/help/store/help-store'
 import { DataLoadingProgress } from '~/features/system/components/data-loading-progress'
 import { NAMESPACES } from '~/i18n-config'
 
-const LazyHelpDrawer = lazy(() =>
-  import('~/features/help/components/help-drawer').then((m) => ({
-    default: m.HelpDrawer,
-  })),
-)
+const LazyHelpDrawer = lazy(async () => {
+  const m = await import('~/features/help/components/help-drawer')
+  return { default: m.HelpDrawer }
+})
 import { localeCookie } from '~/lib/cookies/i18next-cookie.server'
 import { parseThemeCookie } from '~/lib/cookies/theme-cookie.server'
 import { logger } from '~/lib/logger'
@@ -110,8 +103,7 @@ const ErrorActions = ({ showTryAgain = true }: { showTryAgain?: boolean }) => (
       <button
         className="btn btn-outline btn-sm"
         onClick={() => globalThis.window?.location.reload()}
-        type="button"
-      >
+        type="button">
         Try again
       </button>
     )}
@@ -135,9 +127,7 @@ export const ErrorBoundary = () => {
         <div className="flex min-h-screen items-center justify-center p-4">
           <div className="card bg-base-200 w-full max-w-md shadow-lg">
             <div className="card-body items-center text-center">
-              <div className="text-base-content/30 text-6xl font-black">
-                401
-              </div>
+              <div className="text-base-content/30 text-6xl font-black">401</div>
               <h1 className="card-title mt-2 text-xl">Unauthorized</h1>
               <p className="text-base-content/60 text-sm">
                 You need to sign in to access this page.
@@ -158,9 +148,7 @@ export const ErrorBoundary = () => {
         <div className="flex min-h-screen items-center justify-center p-4">
           <div className="card bg-base-200 w-full max-w-md shadow-lg">
             <div className="card-body items-center text-center">
-              <div className="text-base-content/30 text-6xl font-black">
-                404
-              </div>
+              <div className="text-base-content/30 text-6xl font-black">404</div>
               <h1 className="card-title mt-2 text-xl">Page not found</h1>
               <p className="text-base-content/60 text-sm">
                 The page you are looking for does not exist.
@@ -176,9 +164,7 @@ export const ErrorBoundary = () => {
       <div className="flex min-h-screen items-center justify-center p-4">
         <div className="card bg-base-200 w-full max-w-md shadow-lg">
           <div className="card-body items-center text-center">
-            <div className="text-base-content/30 text-6xl font-black">
-              {error.status}
-            </div>
+            <div className="text-base-content/30 text-6xl font-black">{error.status}</div>
             <h1 className="card-title mt-2 text-xl">
               {error.statusText || 'Something went wrong'}
             </h1>
@@ -203,9 +189,7 @@ export const ErrorBoundary = () => {
           </p>
           {process.env.NODE_ENV === 'development' && error instanceof Error && (
             <details className="collapse-arrow bg-base-300 collapse mt-4 w-full text-left">
-              <summary className="collapse-title text-sm font-medium">
-                Error details
-              </summary>
+              <summary className="collapse-title text-sm font-medium">Error details</summary>
               <div className="collapse-content">
                 <p className="text-error font-mono text-sm">{error.message}</p>
                 {error.stack && (
@@ -265,18 +249,16 @@ export const Layout = ({ children }: PropsWithChildren) => {
   const theme = rootData?.theme ?? 'light'
 
   const isHelpOpen = useHelpStore((s) => s.isOpen)
+  // Mount the help drawer on the first open, and keep it mounted afterwards
   const [helpMounted, setHelpMounted] = useState(false)
-  useEffect(() => {
-    if (isHelpOpen) setHelpMounted(true)
-  }, [isHelpOpen])
+  if (isHelpOpen && !helpMounted) setHelpMounted(true)
 
   return (
     <html
       data-theme={theme}
       dir={i18n.dir(i18n.language)}
       lang={i18n.language}
-      suppressHydrationWarning
-    >
+      suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta content="dark light" name="color-scheme" />

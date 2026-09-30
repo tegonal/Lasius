@@ -17,13 +17,7 @@
  *
  */
 
-export const DotRed = ({
-  size = 6,
-  title,
-}: {
-  size?: number
-  title?: string
-}) => {
+export const DotRed = ({ size = 6, title }: { size?: number; title?: string }) => {
   return (
     <div
       className="bg-error"

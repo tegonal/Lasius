@@ -26,7 +26,7 @@ import {
 } from '~/components/ui/forms/input/input-select-autocomplete'
 import { type ModelsUserStub } from '~/services/api/lasius'
 
-type UserSelectProps = {
+type UserSelectProperties = {
   errors?: string[]
   fallbackUser?: SelectAutocompleteSuggestionType
   id?: string
@@ -69,8 +69,7 @@ function useUserLookup(
         selectedItem: fallbackUser,
         statusMessage: {
           text: t('users.warnings.userUnavailable', {
-            defaultValue:
-              'This user is no longer available in your organisation.',
+            defaultValue: 'This user is no longer available in your organisation.',
           }),
           variant: 'warning' as const,
         },
@@ -81,8 +80,7 @@ function useUserLookup(
       selectedItem: null,
       statusMessage: {
         text: t('users.errors.userNotFound', {
-          defaultValue:
-            'This user could not be found. The user ID is shown above.',
+          defaultValue: 'This user could not be found. The user ID is shown above.',
         }),
         variant: 'error' as const,
       },
@@ -102,13 +100,9 @@ export const UserSelect = ({
   onChange,
   users,
   value,
-}: UserSelectProps) => {
+}: UserSelectProperties) => {
   const suggestions = useSuggestions(users)
-  const { selectedItem, statusMessage } = useUserLookup(
-    value,
-    suggestions,
-    fallbackUser,
-  )
+  const { selectedItem, statusMessage } = useUserLookup(value, suggestions, fallbackUser)
 
   return (
     <InputSelectAutocomplete

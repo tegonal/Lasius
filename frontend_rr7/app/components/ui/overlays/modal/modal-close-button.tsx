@@ -23,7 +23,7 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 
-type Props = {
+type Properties = {
   onClose: () => void
 }
 
@@ -31,7 +31,7 @@ type Props = {
  * Standard modal close button for top-right corner
  * Positioned absolutely for consistent placement
  */
-export const ModalCloseButton = ({ onClose }: Props) => {
+export const ModalCloseButton = ({ onClose }: Properties) => {
   const { t } = useTranslation('common')
 
   return (
@@ -42,8 +42,7 @@ export const ModalCloseButton = ({ onClose }: Props) => {
         onClick={onClose}
         shape="circle"
         type="button"
-        variant="ghost"
-      >
+        variant="ghost">
         <LucideIcon icon={X} size={20} />
       </Button>
     </div>

@@ -21,20 +21,16 @@ import { type CSSProperties, type PropsWithChildren } from 'react'
 
 import { cn } from '~/lib/utils/cn'
 
-type Props = PropsWithChildren & {
+type Properties = PropsWithChildren & {
   className?: string
   style?: CSSProperties
 }
 
-export const StatsTile = ({ children, className, style }: Props) => {
+export const StatsTile = ({ children, className, style }: Properties) => {
   return (
     <div
-      className={cn(
-        'bg-base-200 relative h-[100px] w-full rounded-md',
-        className,
-      )}
-      style={style}
-    >
+      className={cn('bg-base-200 relative h-[100px] w-full rounded-md', className)}
+      style={style}>
       {children}
     </div>
   )

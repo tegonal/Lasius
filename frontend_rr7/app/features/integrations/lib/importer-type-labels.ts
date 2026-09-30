@@ -17,13 +17,10 @@
  *
  */
 
-import { type SchemaTranslationFn } from '~/lib/i18n-types'
+import { type SchemaTranslationFunction } from '~/lib/i18n-types'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 
-export const getImporterTypeLabel = (
-  type: ImporterType,
-  t: SchemaTranslationFn,
-): string => {
+export const getImporterTypeLabel = (type: ImporterType, t: SchemaTranslationFunction): string => {
   switch (type) {
     case 'github': {
       return t('issueImporters.typeLabels.github', {

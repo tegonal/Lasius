@@ -19,10 +19,5 @@
 
 import { type ModelsBooking } from '~/services/api/lasius'
 
-export const filterModelsBookingListUserId = (
-  list: ModelsBooking[],
-  userId: string,
-) =>
-  list.filter((booking) =>
-    userId ? booking.userReference.id === userId : true,
-  )
+export const filterModelsBookingListUserId = (list: ModelsBooking[], userId: string) =>
+  list.filter((booking) => (userId ? booking.userReference.id === userId : true))

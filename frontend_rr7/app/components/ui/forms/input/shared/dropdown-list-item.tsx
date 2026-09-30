@@ -40,8 +40,7 @@ export const DropdownListItem = ({
         active && 'bg-secondary text-secondary-content',
         selected && !active && 'bg-base-200',
         !active && !selected && 'hover:bg-base-200',
-      )}
-    >
+      )}>
       {prependString}
       {itemValue}
     </div>

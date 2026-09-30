@@ -29,8 +29,7 @@ export function useCreateProject(options?: ApiProxyOptions<ModelsProject>) {
 export function useDeactivateProject(options?: ApiProxyOptions<void>) {
   return useApiProxy<void, undefined, { orgId: string; projectId: string }>(
     {
-      getUrl: ({ orgId, projectId }) =>
-        `/organisations/${orgId}/projects/${projectId}`,
+      getUrl: ({ orgId, projectId }) => `/organisations/${orgId}/projects/${projectId}`,
       method: 'DELETE',
     },
     options,
@@ -38,14 +37,8 @@ export function useDeactivateProject(options?: ApiProxyOptions<void>) {
 } /**
  * Get last activity date for a project.
  */
-export function useGetProjectLastActivityDate(
-  options?: ApiProxyOptions<string | void>,
-) {
-  return useApiProxy<
-    string | void,
-    undefined,
-    { orgId: string; projectId: string }
-  >(
+export function useGetProjectLastActivityDate(options?: ApiProxyOptions<string | void>) {
+  return useApiProxy<string | void, undefined, { orgId: string; projectId: string }>(
     {
       getUrl: ({ orgId, projectId }) =>
         `/organisations/${orgId}/projects/${projectId}/last-activity`,
@@ -63,33 +56,23 @@ export function useGetProjectList(options?: ApiProxyOptions<ModelsProject[]>) {
     options,
   )
 }
-export function useGetProjectUserList(
-  options?: ApiProxyOptions<ModelsUserStub[]>,
-) {
-  return useApiProxy<
-    ModelsUserStub[],
-    undefined,
-    { orgId: string; projectId: string }
-  >(
+export function useGetProjectUserList(options?: ApiProxyOptions<ModelsUserStub[]>) {
+  return useApiProxy<ModelsUserStub[], undefined, { orgId: string; projectId: string }>(
     {
-      getUrl: ({ orgId, projectId }) =>
-        `/organisations/${orgId}/projects/${projectId}/users`,
+      getUrl: ({ orgId, projectId }) => `/organisations/${orgId}/projects/${projectId}/users`,
       method: 'GET',
     },
     options,
   )
 }
-export function useInviteProjectUser(
-  options?: ApiProxyOptions<ModelsInvitationResult>,
-) {
+export function useInviteProjectUser(options?: ApiProxyOptions<ModelsInvitationResult>) {
   return useApiProxy<
     ModelsInvitationResult,
     ModelsUserToProjectAssignment,
     { orgId: string; projectId: string }
   >(
     {
-      getUrl: ({ orgId, projectId }) =>
-        `/organisations/${orgId}/projects/${projectId}/users`,
+      getUrl: ({ orgId, projectId }) => `/organisations/${orgId}/projects/${projectId}/users`,
       method: 'POST',
     },
     options,
@@ -100,19 +83,14 @@ export function useInviteProjectUser(
 export function useRemoveProjectOwnUser(options?: ApiProxyOptions<void>) {
   return useApiProxy<void, undefined, { orgId: string; projectId: string }>(
     {
-      getUrl: ({ orgId, projectId }) =>
-        `/organisations/${orgId}/projects/${projectId}/leave`,
+      getUrl: ({ orgId, projectId }) => `/organisations/${orgId}/projects/${projectId}/leave`,
       method: 'DELETE',
     },
     options,
   )
 }
 export function useRemoveProjectUser(options?: ApiProxyOptions<void>) {
-  return useApiProxy<
-    void,
-    undefined,
-    { orgId: string; projectId: string; userId: string }
-  >(
+  return useApiProxy<void, undefined, { orgId: string; projectId: string; userId: string }>(
     {
       getUrl: ({ orgId, projectId, userId }) =>
         `/organisations/${orgId}/projects/${projectId}/users/${userId}`,
@@ -124,14 +102,9 @@ export function useRemoveProjectUser(options?: ApiProxyOptions<void>) {
  * @summary update a project
  */
 export function useUpdateProject(options?: ApiProxyOptions<ModelsProject>) {
-  return useApiProxy<
-    ModelsProject,
-    ModelsUpdateProject,
-    { orgId: string; projectId: string }
-  >(
+  return useApiProxy<ModelsProject, ModelsUpdateProject, { orgId: string; projectId: string }>(
     {
-      getUrl: ({ orgId, projectId }) =>
-        `/organisations/${orgId}/projects/${projectId}`,
+      getUrl: ({ orgId, projectId }) => `/organisations/${orgId}/projects/${projectId}`,
       method: 'POST',
     },
     options,

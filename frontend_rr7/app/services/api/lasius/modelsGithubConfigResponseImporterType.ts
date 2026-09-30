@@ -6,9 +6,9 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type ModelsGithubConfigResponseImporterType = typeof ModelsGithubConfigResponseImporterType[keyof typeof ModelsGithubConfigResponseImporterType];
-
+export type ModelsGithubConfigResponseImporterType =
+  (typeof ModelsGithubConfigResponseImporterType)[keyof typeof ModelsGithubConfigResponseImporterType]
 
 export const ModelsGithubConfigResponseImporterType = {
   github: 'github',
-} as const;
+} as const

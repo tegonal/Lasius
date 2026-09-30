@@ -24,7 +24,7 @@ import {
   type ModelsPlaneTagConfiguration,
 } from '~/services/api/lasius'
 
-export const getDefaultTagConfiguration = (
+export const getDefaultTagConfig = (
   importerType: ImporterType,
 ):
   | ModelsGithubTagConfiguration

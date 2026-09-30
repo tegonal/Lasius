@@ -20,10 +20,7 @@
 /**
  * Returns true if the two times are within one minute of each other.
  */
-export const areTimesWithinOneMinute = (
-  time1: Date | string,
-  time2: Date | string,
-): boolean => {
+export const areTimesWithinOneMinute = (time1: Date | string, time2: Date | string): boolean => {
   const d1 = typeof time1 === 'string' ? new Date(time1) : time1
   const d2 = typeof time2 === 'string' ? new Date(time2) : time2
   return Math.abs(d1.getTime() - d2.getTime()) <= 60_000

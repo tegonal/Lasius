@@ -17,16 +17,22 @@
  *
  */
 
-// @ts-nocheck
-
-import { ResponsiveStream } from '@nivo/stream'
+import {
+  ResponsiveStream,
+  type StackTooltipProps,
+  type StreamSliceData,
+  type TooltipProps,
+} from '@nivo/stream'
 import { format } from 'date-fns'
+import { type Locale } from 'date-fns/locale'
+import { round, sumBy } from 'es-toolkit'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  ChartSingleTooltip,
   ChartStackTooltip,
+  TooltipContainer,
+  TooltipItem,
 } from '~/components/ui/charts/chart-tooltips'
 import { useNivoColors } from '~/components/ui/charts/nivo-theme'
 import { EmptyStateStats } from '~/features/stats/components/empty-state-stats'
@@ -37,6 +43,64 @@ import { getDateLocale } from '~/lib/utils/date-locale'
 export type MonthlyWeekStreamData = MonthlyWeekStreamDataItem[]
 export type MonthlyWeekStreamDataItem = Record<string, number>
 export type MonthlyWeekStreamKeys = string[]
+
+// Generate translated weekday labels using date-fns
+const getWeekdayLabels = (dateLocale: Locale) => {
+  // Create dates for each weekday (Monday = 0, Sunday = 6 in our array)
+  const dates = [
+    new Date(2025, 0, 6), // Monday
+    new Date(2025, 0, 7), // Tuesday
+    new Date(2025, 0, 8), // Wednesday
+    new Date(2025, 0, 9), // Thursday
+    new Date(2025, 0, 10), // Friday
+    new Date(2025, 0, 11), // Saturday
+    new Date(2025, 0, 12), // Sunday
+  ]
+  return dates.map((date) => format(date, 'EEE', { locale: dateLocale }))
+}
+
+// Nivo renders this tooltip with its own props only, so it reads the locale itself.
+const MonthStackTooltip = ({ slice }: StackTooltipProps) => {
+  const { i18n } = useTranslation('common')
+  const weekDays = getWeekdayLabels(getDateLocale(i18n.language))
+
+  return (
+    <ChartStackTooltip
+      formatLabel={(id) => id || ''}
+      formatValue={(value) => `${value}h`}
+      getTitle={(index) => {
+        const weekDay = index === undefined ? undefined : weekDays[index]
+        return weekDay || `Day ${(index || 0) + 1}`
+      }}
+      slice={toStackTooltipSlice(slice)}
+    />
+  )
+}
+
+// ChartStackTooltip expects string layer ids. Nivo types a layer id as a string or a number.
+const toStackTooltipSlice = (slice: StreamSliceData) => ({
+  index: slice.index,
+  stack: slice.stack.map((datum) => ({
+    color: datum.color,
+    layerId: String(datum.layerId),
+    layerLabel: String(datum.layerLabel),
+    value: datum.value,
+  })),
+})
+
+// Nivo passes the hovered layer, not a point. The tooltip shows the total hours of that layer.
+const MonthLayerTooltip = ({ layer }: TooltipProps) => (
+  <TooltipContainer>
+    <TooltipItem
+      color={layer.color}
+      label={String(layer.label)}
+      value={`${round(
+        sumBy(layer.data, (datum) => datum.value),
+        2,
+      )}h`}
+    />
+  </TooltipContainer>
+)
 
 export const MonthStreamChart = ({
   data,
@@ -51,20 +115,7 @@ export const MonthStreamChart = ({
   // Get the correct locale for date-fns from centralized config
   const dateLocale = getDateLocale(i18n.language)
 
-  // Generate translated weekday labels using date-fns
-  const weekDays = useMemo(() => {
-    // Create dates for each weekday (Monday = 0, Sunday = 6 in our array)
-    const dates = [
-      new Date(2025, 0, 6), // Monday
-      new Date(2025, 0, 7), // Tuesday
-      new Date(2025, 0, 8), // Wednesday
-      new Date(2025, 0, 9), // Thursday
-      new Date(2025, 0, 10), // Friday
-      new Date(2025, 0, 11), // Saturday
-      new Date(2025, 0, 12), // Sunday
-    ]
-    return dates.map((date) => format(date, 'EEE', { locale: dateLocale }))
-  }, [dateLocale])
+  const weekDays = useMemo(() => getWeekdayLabels(dateLocale), [dateLocale])
 
   // Validate data structure using type guard
   if (!isValidMonthlyWeekStreamData(data)) {
@@ -76,13 +127,7 @@ export const MonthStreamChart = ({
   }
 
   // Defensive checks
-  if (
-    !data ||
-    !keys ||
-    !Array.isArray(data) ||
-    !Array.isArray(keys) ||
-    data.length !== 7
-  ) {
+  if (!data || !keys || !Array.isArray(data) || !Array.isArray(keys) || data.length !== 7) {
     return (
       <div className="h-64 w-full">
         <EmptyStateStats />
@@ -91,12 +136,7 @@ export const MonthStreamChart = ({
   }
 
   // Check if we have any actual data - but still need valid keys
-  const hasData =
-    keys.length > 0 &&
-    data.some((d) => keys.some((key) => (d[key] as number) > 0))
-
-  // If no keys, provide at least one dummy key to avoid null issues
-  const safeKeys = keys.length > 0 ? keys : ['Week 1']
+  const hasData = keys.length > 0 && data.some((d) => keys.some((key) => (d[key] as number) > 0))
 
   if (!hasData) {
     return (
@@ -106,13 +146,16 @@ export const MonthStreamChart = ({
     )
   }
 
+  // If no keys, provide at least one dummy key to avoid null issues
+  const safeKeys = keys.length > 0 ? keys : ['Week 1']
+
   // Prepare data for Nivo - ensure all keys exist in all objects
   const safeData = data.map((item) => {
-    const safeItem: any = {}
+    const safeItem: MonthlyWeekStreamDataItem = {}
 
     // Add all week keys with their values
     for (const key of safeKeys) {
-      const value = item[key]
+      const value = item[key] ?? 0
       safeItem[key] = Number.isNaN(value) ? 0 : value
     }
 
@@ -204,25 +247,9 @@ export const MonthStreamChart = ({
             margin={{ bottom: 30, left: 10, right: 10, top: 0 }}
             motionConfig="stiff"
             offsetType="silhouette"
-            stackTooltip={({ slice }) => (
-              <ChartStackTooltip
-                formatLabel={(id) => id || ''}
-                formatValue={(value) => `${value}h`}
-                getTitle={(index) =>
-                  index !== undefined && weekDays[index]
-                    ? weekDays[index]
-                    : `Day ${(index || 0) + 1}`
-                }
-                slice={slice}
-              />
-            )}
+            stackTooltip={MonthStackTooltip}
             theme={theme}
-            tooltip={({ point }) => (
-              <ChartSingleTooltip
-                formatValue={(value) => `${value}h`}
-                point={point}
-              />
-            )}
+            tooltip={MonthLayerTooltip}
           />
         </div>
       </div>
@@ -232,9 +259,7 @@ export const MonthStreamChart = ({
 
 // ─── Validation ──────────────────────────────────────────────────────────────
 
-const isValidMonthlyWeekStreamData = (
-  data: unknown,
-): data is MonthlyWeekStreamData => {
+const isValidMonthlyWeekStreamData = (data: unknown): data is MonthlyWeekStreamData => {
   if (!Array.isArray(data) || data.length !== 7) return false
   return data.every(
     (item) =>

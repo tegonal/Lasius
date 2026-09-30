@@ -21,9 +21,9 @@ import { round } from 'es-toolkit'
 import { useTranslation } from 'react-i18next'
 
 import { decimalHoursToDurationString } from '~/lib/utils/duration'
-import { useStatsTileTimeAsDecimals, useUIStore } from '~/stores/ui-store'
+import { useShouldShowStatsTileTimeAsDecimals, useUIStore } from '~/stores/ui-store'
 
-type Props = {
+type Properties = {
   bookings: number
   expectedHours: number
   fulfilledPercentage: number
@@ -36,19 +36,15 @@ export const StatsOverviewGrid = ({
   expectedHours,
   fulfilledPercentage,
   hours,
-}: Props) => {
+}: Properties) => {
   const { t } = useTranslation('common')
-  const showDecimalHours = useStatsTileTimeAsDecimals()
-  const toggleStatsTileTimeAsDecimals = useUIStore(
-    (state) => state.toggleStatsTileTimeAsDecimals,
-  )
+  const isShowDecimalHours = useShouldShowStatsTileTimeAsDecimals()
+  const toggleStatsTileTimeAsDecimals = useUIStore((state) => state.toggleStatsTileTimeAsDecimals)
 
   const formatHours = (value: number) =>
-    showDecimalHours
-      ? round(value, 2).toString()
-      : decimalHoursToDurationString(value)
+    isShowDecimalHours ? round(value, 2).toString() : decimalHoursToDurationString(value)
 
-  const hoursLabel = showDecimalHours
+  const hoursLabel = isShowDecimalHours
     ? t('stats:decimalHours', 'Decimal hours')
     : t('time.hours', 'Hours')
 
@@ -62,8 +58,7 @@ export const StatsOverviewGrid = ({
         <div
           className="stat hover:bg-base-200 cursor-pointer transition-colors"
           data-testid="stats-hours-tile"
-          onClick={toggleStatsTileTimeAsDecimals}
-        >
+          onClick={toggleStatsTileTimeAsDecimals}>
           <div className="stat-title">{hoursLabel}</div>
           <div className="stat-value">{formatHours(hours)}</div>
         </div>
@@ -72,17 +67,12 @@ export const StatsOverviewGrid = ({
         <div
           className="stat hover:bg-base-200 cursor-pointer transition-colors"
           data-testid="stats-expected-hours-tile"
-          onClick={toggleStatsTileTimeAsDecimals}
-        >
-          <div className="stat-title">
-            {t('stats:expectedHours', 'Expected hours')}
-          </div>
+          onClick={toggleStatsTileTimeAsDecimals}>
+          <div className="stat-title">{t('stats:expectedHours', 'Expected hours')}</div>
           <div className="stat-value">{formatHours(expectedHours)}</div>
         </div>
         <div className="stat">
-          <div className="stat-title">
-            {t('stats:percentOfPlannedHours', '% of planned hours')}
-          </div>
+          <div className="stat-title">{t('stats:percentOfPlannedHours', '% of planned hours')}</div>
           <div className="stat-value">{fulfilledPercentage.toFixed(0)}%</div>
         </div>
       </div>

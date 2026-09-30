@@ -19,9 +19,48 @@
 
 import { describe, expect, it } from 'vitest'
 
+import { type ModelsTag } from '~/services/api/lasius'
+
 import { getImporterTypeFromTag, isImporterTag } from './tag-helpers'
 
-const makeTag = (type: string) => ({ id: 't1', type }) as any
+const tagsByType = {
+  GithubIssueTag: {
+    id: 't1',
+    issueLink: 'https://github.com/owner/repo/issues/1',
+    issueNumber: 1,
+    relatedTags: [],
+    repoName: 'repo',
+    repoOwner: 'owner',
+    type: 'GithubIssueTag',
+  },
+  GitlabIssueTag: {
+    id: 't1',
+    issueLink: 'https://gitlab.com/group/project/-/issues/1',
+    projectId: 1,
+    relatedTags: [],
+    type: 'GitlabIssueTag',
+  },
+  JiraIssueTag: {
+    baseUrl: 'https://example.atlassian.net',
+    id: 't1',
+    projectKey: 'PRJ',
+    type: 'JiraIssueTag',
+    url: 'https://example.atlassian.net/browse/PRJ-1',
+  },
+  PlaneIssueTag: {
+    id: 't1',
+    issueLink: 'https://app.plane.so/workspace/projects/p1/issues/1',
+    projectId: 'p1',
+    relatedTags: [],
+    type: 'PlaneIssueTag',
+  },
+  SimpleTag: { id: 't1', type: 'SimpleTag' },
+  TagGroup: { id: 't1', relatedTags: [], type: 'TagGroup' },
+} satisfies Record<string, ModelsTag>
+
+type TagType = keyof typeof tagsByType
+
+const makeTag = (type: TagType): ModelsTag => tagsByType[type]
 
 describe('getImporterTypeFromTag', () => {
   it('returns "github" for GithubIssueTag', () => {
@@ -46,16 +85,14 @@ describe('getImporterTypeFromTag', () => {
 })
 
 describe('isImporterTag', () => {
-  it.each([
-    'GithubIssueTag',
-    'GitlabIssueTag',
-    'JiraIssueTag',
-    'PlaneIssueTag',
-  ])('returns true for %s', (type) => {
-    expect(isImporterTag(makeTag(type))).toBe(true)
-  })
+  it.each<TagType>(['GithubIssueTag', 'GitlabIssueTag', 'JiraIssueTag', 'PlaneIssueTag'])(
+    'returns true for %s',
+    (type) => {
+      expect(isImporterTag(makeTag(type))).toBe(true)
+    },
+  )
 
-  it.each(['SimpleTag', 'TagGroup'])('returns false for %s', (type) => {
+  it.each<TagType>(['SimpleTag', 'TagGroup'])('returns false for %s', (type) => {
     expect(isImporterTag(makeTag(type))).toBe(false)
   })
 })

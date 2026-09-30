@@ -20,11 +20,7 @@
 import { data } from 'react-router'
 
 import { getUserBookingListByOrganisation } from '~/services/api/lasius/user-bookings/user-bookings'
-import {
-  authHeaders,
-  mergeAuthHeaders,
-  requireUser,
-} from '~/services/auth/auth-helpers.server'
+import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
 
 /**
  * GET /api/calendar-bookings?orgId=xxx&from=xxx&to=xxx
@@ -40,10 +36,7 @@ export async function loader({ request }: { request: Request }) {
   const to = url.searchParams.get('to')
 
   if (!orgId || !from || !to) {
-    return data(
-      { bookings: [] },
-      { headers: mergeAuthHeaders(auth), status: 400 },
-    )
+    return data({ bookings: [] }, { headers: mergeAuthHeaders(auth), status: 400 })
   }
 
   const result = await getUserBookingListByOrganisation(

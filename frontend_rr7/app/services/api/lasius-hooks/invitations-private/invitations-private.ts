@@ -7,18 +7,9 @@ import { type ApiProxyOptions, useApiProxy } from '~/hooks/use-api-proxy'
  * Track your time
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
-import {
-  type ModelsAcceptInvitationRequest,
-  type ModelsInvitation,
-} from '../../lasius'
-export function useAcceptInvitation(
-  options?: ApiProxyOptions<ModelsInvitation>,
-) {
-  return useApiProxy<
-    ModelsInvitation,
-    ModelsAcceptInvitationRequest,
-    { invitationId: string }
-  >(
+import { type ModelsAcceptInvitationRequest, type ModelsInvitation } from '../../lasius'
+export function useAcceptInvitation(options?: ApiProxyOptions<ModelsInvitation>) {
+  return useApiProxy<ModelsInvitation, ModelsAcceptInvitationRequest, { invitationId: string }>(
     {
       getUrl: ({ invitationId }) => `/invitations/${invitationId}/accept`,
       method: 'POST',
@@ -26,9 +17,7 @@ export function useAcceptInvitation(
     options,
   )
 }
-export function useDeclineInvitation(
-  options?: ApiProxyOptions<ModelsInvitation>,
-) {
+export function useDeclineInvitation(options?: ApiProxyOptions<ModelsInvitation>) {
   return useApiProxy<ModelsInvitation, undefined, { invitationId: string }>(
     {
       getUrl: ({ invitationId }) => `/invitations/${invitationId}/decline`,

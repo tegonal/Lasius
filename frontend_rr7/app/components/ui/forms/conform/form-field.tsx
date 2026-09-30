@@ -19,11 +19,11 @@
 
 import { type FieldMetadata, getInputProps } from '@conform-to/react'
 
-import { Input, type InputProps } from '~/components/primitives/inputs/input'
+import { Input, type InputProperties } from '~/components/primitives/inputs/input'
 import { FormElement } from '~/components/ui/forms/form-element'
 import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 
-interface FormFieldProps extends Omit<InputProps, 'name' | 'type'> {
+interface FormFieldProperties extends Omit<InputProperties, 'name' | 'type'> {
   field: FieldMetadata<string>
   label?: string
   labelActionSlot?: React.ReactNode
@@ -31,14 +31,7 @@ interface FormFieldProps extends Omit<InputProps, 'name' | 'type'> {
   type?: InputType
 }
 
-type InputType =
-  | 'email'
-  | 'hidden'
-  | 'number'
-  | 'password'
-  | 'tel'
-  | 'text'
-  | 'url'
+type InputType = 'email' | 'hidden' | 'number' | 'password' | 'tel' | 'text' | 'url'
 
 /**
  * Conform-native form field wrapper.
@@ -55,28 +48,25 @@ export const FormField = ({
   labelActionSlot,
   required,
   type = 'text',
-  ...inputProps
-}: FormFieldProps) => {
-  const hasErrors = !!field.errors?.length
-
+  ...inputProperties
+}: FormFieldProperties) => {
   if (type === 'hidden') {
-    return (
-      <input {...getInputProps(field, { type: 'hidden' })} key={field.key} />
-    )
+    return <input {...getInputProps(field, { type: 'hidden' })} key={field.key} />
   }
+
+  const hasErrors = !!field.errors?.length
 
   return (
     <FormElement
       htmlFor={field.id}
       label={label}
       labelActionSlot={labelActionSlot}
-      required={required}
-    >
+      required={required}>
       <Input
         error={hasErrors}
         {...getInputProps(field, { type })}
         key={field.key}
-        {...inputProps}
+        {...inputProperties}
       />
       <FormFieldErrors errors={field.errors} id={`${field.id}-errors`} />
     </FormElement>

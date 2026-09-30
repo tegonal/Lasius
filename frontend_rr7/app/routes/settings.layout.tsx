@@ -20,10 +20,7 @@
 import { Suspense } from 'react'
 import { Outlet } from 'react-router'
 
-import {
-  ColumnLeft,
-  outerGridClasses,
-} from '~/components/ui/layouts/layout-columns'
+import { ColumnLeft, outerGridClasses } from '~/components/ui/layouts/layout-columns'
 import { NavigationMenuTabs } from '~/features/navigation/components/navigation-menu-tabs'
 
 export default function SettingsLayout() {
@@ -40,8 +37,7 @@ export default function SettingsLayout() {
               <div className="flex h-full flex-1 items-center justify-center">
                 <span className="loading loading-spinner loading-lg text-primary" />
               </div>
-            }
-          >
+            }>
             <Outlet />
           </Suspense>
         </div>

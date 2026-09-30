@@ -23,14 +23,8 @@ import { ChartErrorBoundary } from '~/features/stats/components/error-boundary-c
 import { StatsCircleCategoryRange } from '~/features/stats/components/stats-circle-category-range'
 import { StatsUserStream } from '~/features/stats/components/stats-user-stream'
 import { statsClientLoader } from '~/features/stats/stats-loader'
-import {
-  loadOrgStatsContext,
-  statsResponseHeaders,
-} from '~/features/stats/stats-loader.server'
-import {
-  getAdaptiveGranularity,
-  shouldUseBarChart,
-} from '~/lib/api/config/granularity-config'
+import { loadOrgStatsContext, statsResponseHeaders } from '~/features/stats/stats-loader.server'
+import { getAdaptiveGranularity, shouldUseBarChart } from '~/lib/api/config/granularity-config'
 import { getNivoChartDataFromApiStatsData } from '~/lib/api/functions/get-nivo-chart-data-from-api-stats-data'
 import { getTransformedChartDataAggregate } from '~/lib/api/functions/get-transformed-chart-data-aggregate'
 import { apiDatespanFromTo } from '~/lib/utils/dates'
@@ -42,24 +36,24 @@ import { type Route } from './+types/organisation.stats.users'
 
 // ─── Client Loader (cache unless full-page refresh) ──────────────────────────
 
-export const clientLoader = async (args: Route.ClientLoaderArgs) =>
-  statsClientLoader(args)
+export const clientLoader = async (arguments_: Route.ClientLoaderArgs) =>
+  statsClientLoader(arguments_)
 clientLoader.hydrate = false
 
 // ─── Loader ──────────────────────────────────────────────────────────────────
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const ctx = await loadOrgStatsContext(request)
-  const { from, headers, selectedOrgId, to } = ctx
+  const context = await loadOrgStatsContext(request)
+  const { from, headers, selectedOrgId, to } = context
 
   const granularity = getAdaptiveGranularity(from, to)
-  const useBarChart = shouldUseBarChart(from, to)
+  const isUseBarChart = shouldUseBarChart(from, to)
 
   // Compute API params
   const datespan = apiDatespanFromTo(from, to)
 
   // Fetch user stats in parallel
-  const [usersByDayRes, usersAggregatedRes] = await Promise.all([
+  const [usersByDayResponse, usersAggregatedResponse] = await Promise.all([
     datespan
       ? getOrganisationBookingAggregatedStats(
           selectedOrgId,
@@ -86,23 +80,20 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
       : Promise.resolve({ data: [] }),
   ])
 
-  const usersByDay = usersByDayRes.data ?? []
-  const usersAggregated = usersAggregatedRes.data ?? []
+  const usersByDay = usersByDayResponse.data ?? []
+  const usersAggregated = usersAggregatedResponse.data ?? []
 
   // Transform data server-side
-  const usersStreamChart = getNivoChartDataFromApiStatsData(
-    usersByDay,
-    granularity,
-  )
+  const usersStreamChart = getNivoChartDataFromApiStatsData(usersByDay, granularity)
   const usersAggregatedChart = getTransformedChartDataAggregate(usersAggregated)
 
   return data(
     {
-      useBarChart,
+      useBarChart: isUseBarChart,
       usersAggregatedChart,
       usersStreamChart,
     },
-    { headers: statsResponseHeaders(ctx.auth) },
+    { headers: statsResponseHeaders(context.auth) },
   )
 }
 
@@ -116,10 +107,7 @@ const OrgStatsUsers = ({ loaderData }: Route.ComponentProps) => {
       <ChartErrorBoundary>
         <StatsCircleCategoryRange chartData={usersAggregatedChart} />
         <div className="divider my-4" />
-        <StatsUserStream
-          chartData={usersStreamChart}
-          useBarChart={useBarChart}
-        />
+        <StatsUserStream chartData={usersStreamChart} useBarChart={useBarChart} />
       </ChartErrorBoundary>
     </div>
   )

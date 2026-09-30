@@ -32,9 +32,7 @@ export interface AuthResult {
 }
 
 /** Build authorization headers for backend API calls */
-export function authHeaders(
-  session: LasiusSessionData,
-): Record<string, string> {
+export function authHeaders(session: LasiusSessionData): Record<string, string> {
   return {
     Authorization: `Bearer ${session.accessToken}`,
     'X-Token-Issuer': session.tokenIssuer,
@@ -91,9 +89,7 @@ export async function authHeadersWithCsrf(
  * Get the current user session if it exists, without requiring authentication.
  * Use in loaders that show different content for authenticated vs anonymous users.
  */
-export async function getOptionalUser(
-  request: Request,
-): Promise<AuthResult | null> {
+export async function getOptionalUser(request: Request): Promise<AuthResult | null> {
   const result = await getSessionTokens(request)
   if (!result) return null
   return { headers: result.headers, session: result.tokens }
@@ -103,18 +99,15 @@ export async function getOptionalUser(
  * Merge auth Set-Cookie headers into a Headers object for loader/action responses.
  * Call this when building the response headers for any loader/action that uses requireUser.
  */
-export function mergeAuthHeaders(
-  authResult: AuthResult,
-  responseHeaders?: HeadersInit,
-): Headers {
+export function mergeAuthHeaders(authResult: AuthResult, responseHeaders?: HeadersInit): Headers {
   const headers = new Headers(responseHeaders)
   if (authResult.headers) {
-    const setCookie =
+    const sessionCookie =
       authResult.headers instanceof Headers
         ? authResult.headers.get('Set-Cookie')
         : (authResult.headers as Record<string, string>)['Set-Cookie']
-    if (setCookie) {
-      headers.append('Set-Cookie', setCookie)
+    if (sessionCookie) {
+      headers.append('Set-Cookie', sessionCookie)
     }
   }
   return headers
@@ -164,8 +157,8 @@ async function fetchCsrfToken(
   headers: Record<string, string>,
 ): Promise<{ cookie: string; token: string }> {
   const csrf = await getCsrfToken({ headers })
-  const setCookie = csrf.headers.get('set-cookie') ?? ''
-  const match = /PLAY_SESSION_CSRF=([^;]+)/.exec(setCookie)
+  const csrfCookieHeader = csrf.headers.get('set-cookie') ?? ''
+  const match = /PLAY_SESSION_CSRF=([^;]+)/.exec(csrfCookieHeader)
   const cookie = match ? `PLAY_SESSION_CSRF=${match[1]}` : ''
   return { cookie, token: csrf.data.value }
 }

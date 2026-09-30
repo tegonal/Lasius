@@ -22,65 +22,60 @@ import React from 'react'
 
 import { cn } from '~/lib/utils/cn'
 
-const badgeVariants = cva(
-  'badge inline-flex items-center gap-2 rounded-sm px-2',
-  {
-    compoundVariants: [
-      {
-        class: 'hover:bg-neutral hover:text-neutral-content',
-        clickable: true,
-        variant: 'tagSimpleTag',
-      },
-      {
-        class: 'hover:bg-neutral hover:text-neutral-content',
-        clickable: true,
-        variant: 'tagTagGroup',
-      },
-      {
-        class: 'hover:bg-neutral hover:text-neutral-content',
-        clickable: true,
-        variant: 'tagWithSummary',
-      },
-    ],
-    defaultVariants: {
-      clickable: false,
-      variant: 'primary',
+const badgeVariants = cva('badge inline-flex items-center gap-2 rounded-sm px-2', {
+  compoundVariants: [
+    {
+      class: 'hover:bg-neutral hover:text-neutral-content',
+      clickable: true,
+      variant: 'tagSimpleTag',
     },
-    variants: {
-      clickable: {
-        false: 'select-none',
-        true: 'cursor-pointer transition-colors',
-      },
-      variant: {
-        muted: 'bg-base-100 text-base-content',
-        outline: 'border-base-content text-base-content border bg-transparent',
-        primary: 'badge-primary',
-        secondary: 'badge-secondary',
-        tag: 'bg-accent text-accent-content overflow-visible whitespace-nowrap',
-        tagSimpleTag: 'bg-accent text-accent-content whitespace-nowrap',
-        tagTagGroup: 'bg-primary text-primary-content whitespace-nowrap',
-        tagWithSummary: 'bg-secondary text-secondary-content',
-        tooltip:
-          'badge-neutral h-auto w-auto max-w-[45ch] whitespace-pre-wrap text-white',
-        warning: 'bg-warning text-warning-content',
-      },
+    {
+      class: 'hover:bg-neutral hover:text-neutral-content',
+      clickable: true,
+      variant: 'tagTagGroup',
+    },
+    {
+      class: 'hover:bg-neutral hover:text-neutral-content',
+      clickable: true,
+      variant: 'tagWithSummary',
+    },
+  ],
+  defaultVariants: {
+    clickable: false,
+    variant: 'primary',
+  },
+  variants: {
+    clickable: {
+      false: 'select-none',
+      true: 'cursor-pointer transition-colors',
+    },
+    variant: {
+      muted: 'bg-base-100 text-base-content',
+      outline: 'border-base-content text-base-content border bg-transparent',
+      primary: 'badge-primary',
+      secondary: 'badge-secondary',
+      tag: 'bg-accent text-accent-content overflow-visible whitespace-nowrap',
+      tagSimpleTag: 'bg-accent text-accent-content whitespace-nowrap',
+      tagTagGroup: 'bg-primary text-primary-content whitespace-nowrap',
+      tagWithSummary: 'bg-secondary text-secondary-content',
+      tooltip: 'badge-neutral h-auto w-auto max-w-[45ch] whitespace-pre-wrap text-white',
+      warning: 'bg-warning text-warning-content',
     },
   },
-)
+})
 
-type BadgeProps = React.HTMLAttributes<HTMLSpanElement> &
+type BadgeProperties = React.HTMLAttributes<HTMLSpanElement> &
   VariantProps<typeof badgeVariants> & {
     children?: React.ReactNode
   }
 
-const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
-  ({ children, className, clickable, variant, ...props }, ref) => {
+const Badge = React.forwardRef<HTMLSpanElement, BadgeProperties>(
+  ({ children, className, clickable, variant, ...properties }, reference) => {
     return (
       <span
         className={cn(badgeVariants({ clickable, variant }), className)}
-        ref={ref}
-        {...props}
-      >
+        ref={reference}
+        {...properties}>
         {children}
       </span>
     )
@@ -90,4 +85,4 @@ const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
 Badge.displayName = 'Badge'
 
 export { Badge, badgeVariants }
-export type { BadgeProps }
+export type { BadgeProperties as BadgeProps }

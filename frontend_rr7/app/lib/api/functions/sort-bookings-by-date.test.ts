@@ -19,18 +19,9 @@
 
 import { describe, expect, it } from 'vitest'
 
-import { sortBookingsByDate } from './sort-bookings-by-date'
+import { type ModelsBooking } from '~/services/api/lasius'
 
-interface ModelsBooking {
-  bookingHash: number
-  end?: null | { dateTime: string; zone: string }
-  id: string
-  organisationReference: { id: string; key: string }
-  projectReference: { id: string; key: string }
-  start: { dateTime: string; zone: string }
-  tags: Array<{ id: string; type: string }>
-  userReference: { id: string; key: string }
-}
+import { sortBookingsByDate } from './sort-bookings-by-date'
 
 const makeBooking = (
   overrides: Partial<ModelsBooking> & { start: ModelsBooking['start'] },
@@ -57,7 +48,7 @@ describe('sortBookingsByDate', () => {
     const booking = makeBooking({
       start: { dateTime: '2024-01-15T10:00:00.000Z', zone: 'UTC' },
     })
-    expect(sortBookingsByDate([booking] as any)).toEqual([booking])
+    expect(sortBookingsByDate([booking])).toEqual([booking])
   })
 
   it('preserves order when already sorted descending', () => {
@@ -69,7 +60,7 @@ describe('sortBookingsByDate', () => {
       id: 'b',
       start: { dateTime: '2024-01-15T10:00:00.000Z', zone: 'UTC' },
     })
-    const result = sortBookingsByDate([a, b] as any)
+    const result = sortBookingsByDate([a, b])
     expect(result.map((r) => r.id)).toEqual(['a', 'b'])
   })
 
@@ -86,7 +77,7 @@ describe('sortBookingsByDate', () => {
       id: 'c',
       start: { dateTime: '2024-01-15T11:00:00.000Z', zone: 'UTC' },
     })
-    const result = sortBookingsByDate([a, b, c] as any)
+    const result = sortBookingsByDate([a, b, c])
     expect(result.map((r) => r.id)).toEqual(['b', 'c', 'a'])
   })
 
@@ -99,8 +90,8 @@ describe('sortBookingsByDate', () => {
       id: 'b',
       start: { dateTime: '2024-01-15T14:00:00.000Z', zone: 'UTC' },
     })
-    const original = [a, b] as any
+    const original = [a, b]
     sortBookingsByDate(original)
-    expect(original.map((r: any) => r.id)).toEqual(['a', 'b'])
+    expect(original.map((r) => r.id)).toEqual(['a', 'b'])
   })
 })

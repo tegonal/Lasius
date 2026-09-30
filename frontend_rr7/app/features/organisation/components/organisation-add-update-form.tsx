@@ -37,63 +37,47 @@ import { ModalDescription } from '~/components/ui/overlays/modal/modal-descripti
 import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { mergeErrors, validateFormData } from '~/lib/conform-helpers'
-import { type SchemaTranslationFn, untyped } from '~/lib/i18n-types'
+import { type SchemaTranslationFunction, untyped } from '~/lib/i18n-types'
 import { logger } from '~/lib/logger'
 import {
   useCreateOrganisation,
   useUpdateOrganisation,
 } from '~/services/api/lasius-hooks/organisations/organisations'
 
-type Props = {
+type Properties = {
   mode: 'add' | 'update'
   onCancel: () => void
   onSave: () => void
 }
 
-const createOrganisationSchema = (t: SchemaTranslationFn) =>
+const createOrganisationSchema = (t: SchemaTranslationFunction) =>
   z.object({
     organisationName: z
       .string({
-        error: t(
-          'validation.organisationNameRequired',
-          'Organisation name is required',
-        ),
+        error: t('validation.organisationNameRequired', 'Organisation name is required'),
       })
-      .min(
-        1,
-        t(
-          'validation.organisationNameRequired',
-          'Organisation name is required',
-        ),
-      ),
+      .min(1, t('validation.organisationNameRequired', 'Organisation name is required')),
   })
 
-export const OrganisationAddUpdateForm = ({
-  mode,
-  onCancel,
-  onSave,
-}: Props) => {
+export const OrganisationAddUpdateForm = ({ mode, onCancel, onSave }: Properties) => {
   const { t } = useTranslation('organisation')
   const [serverErrors, setServerErrors] = useState<Record<string, string[]>>({})
 
   const schema = useMemo(() => createOrganisationSchema(untyped(t)), [t])
 
-  const {
-    selectedOrganisation,
-    selectedOrganisationKey,
-    setSelectedOrganisation,
-  } = useOrganisation()
+  const { selectedOrganisation, selectedOrganisationKey, setSelectedOrganisation } =
+    useOrganisation()
 
-  const duplicateErrorMsg = t(
+  const duplicateErrorMessage = t(
     'errors.duplicateKey',
     'An organisation with this name already exists',
   )
 
   const setDuplicateError = () => {
-    setServerErrors({ organisationName: [duplicateErrorMsg] })
+    setServerErrors({ organisationName: [duplicateErrorMessage] })
   }
 
-  const createApi = useCreateOrganisation({
+  const organisationCreationApi = useCreateOrganisation({
     onError: ({ error }) => {
       logger.error('Failed to create organisation', error)
       setDuplicateError()
@@ -114,13 +98,12 @@ export const OrganisationAddUpdateForm = ({
     onSuccess: () => onSave(),
   })
 
-  const isSubmitting = createApi.isLoading || updateApi.isLoading
+  const isSubmitting = organisationCreationApi.isLoading || updateApi.isLoading
 
   const [form, fields] = useForm({
     constraint: getZodConstraint(schema),
     defaultValue: {
-      organisationName:
-        mode === 'update' ? (selectedOrganisationKey ?? '') : '',
+      organisationName: mode === 'update' ? (selectedOrganisationKey ?? '') : '',
     },
     onValidate({ formData }) {
       setServerErrors({})
@@ -130,16 +113,16 @@ export const OrganisationAddUpdateForm = ({
     shouldValidate: 'onSubmit',
   })
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault()
 
-    const result = validateFormData(e.currentTarget, schema)
+    const result = validateFormData(event.currentTarget, schema)
     if (result.status !== 'success') return
 
     const { organisationName } = result.value
 
     if (mode === 'add' && organisationName) {
-      createApi.submit({ body: { key: organisationName } })
+      organisationCreationApi.submit({ body: { key: organisationName } })
     } else if (selectedOrganisation) {
       updateApi.submit({
         body: { key: organisationName },
@@ -148,10 +131,7 @@ export const OrganisationAddUpdateForm = ({
     }
   }
 
-  const nameErrors = mergeErrors(
-    fields.organisationName.errors,
-    serverErrors.organisationName,
-  )
+  const nameErrors = mergeErrors(fields.organisationName.errors, serverErrors.organisationName)
 
   return (
     <form {...getFormProps(form)} onSubmit={handleSubmit}>
@@ -166,10 +146,7 @@ export const OrganisationAddUpdateForm = ({
 
         <ModalDescription className="mb-4">
           {mode === 'add'
-            ? t(
-                'description.create',
-                'Create a new organisation to collaborate with your team.',
-              )
+            ? t('description.create', 'Create a new organisation to collaborate with your team.')
             : t('description.edit', 'Update the organisation name.')}
         </ModalDescription>
 
@@ -197,16 +174,14 @@ export const OrganisationAddUpdateForm = ({
             className="relative z-0"
             data-testid="org-form-submit-btn"
             disabled={isSubmitting}
-            type="submit"
-          >
+            type="submit">
             {t('actions.save', 'Save')}
           </Button>
           <Button
             data-testid="org-form-cancel-btn"
             onClick={onCancel}
             type="button"
-            variant="secondary"
-          >
+            variant="secondary">
             {t('actions.cancel', 'Cancel')}
           </Button>
         </ButtonGroup>

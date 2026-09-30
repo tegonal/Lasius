@@ -19,28 +19,21 @@
 
 import Avatar from 'boring-avatars'
 
-const organisationAvatarPalette = [
-  '#4a4343',
-  '#52fbba',
-  '#fffa45',
-  '#ff1d00',
-  '#723431',
-]
+const organisationAvatarPalette = ['#4a4343', '#52fbba', '#fffa45', '#ff1d00', '#723431']
 
-interface Props {
+interface Properties {
   name: string
   size?: number
 }
 
-export const AvatarOrganisation = ({ name, size = 39 }: Props) => {
+export const AvatarOrganisation = ({ name, size = 39 }: Properties) => {
   return (
     <div
       className="relative"
       style={{
         height: `${size}px`,
         width: `${size}px`,
-      }}
-    >
+      }}>
       <Avatar
         colors={organisationAvatarPalette}
         name={name}

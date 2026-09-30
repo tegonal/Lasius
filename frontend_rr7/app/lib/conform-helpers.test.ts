@@ -35,16 +35,11 @@ describe('mergeErrors', () => {
   })
 
   it('returns server errors when conform errors are undefined', () => {
-    expect(mergeErrors(undefined, ['Already exists'])).toEqual([
-      'Already exists',
-    ])
+    expect(mergeErrors(undefined, ['Already exists'])).toEqual(['Already exists'])
   })
 
   it('merges both error arrays', () => {
-    expect(mergeErrors(['Required'], ['Already exists'])).toEqual([
-      'Required',
-      'Already exists',
-    ])
+    expect(mergeErrors(['Required'], ['Already exists'])).toEqual(['Required', 'Already exists'])
   })
 
   it('returns conform errors when server errors are empty', () => {

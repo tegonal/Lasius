@@ -17,9 +17,7 @@ import {
 /**
  * @summary access to internally provided oauth2 provider. Use for demo purposes only!
  */
-export function useGetUOAuthUserProfile(
-  options?: ApiProxyOptions<ModelsOAuthUser>,
-) {
+export function useGetUOAuthUserProfile(options?: ApiProxyOptions<ModelsOAuthUser>) {
   return useApiProxy<ModelsOAuthUser>(
     {
       getUrl: () => `/oauth2/profile`,
@@ -65,9 +63,7 @@ export function useOauthAccessToken(options?: ApiProxyOptions<void>) {
 } /**
  * @summary --------please annotate------
  */
-export function useRegisterOAuthUser(
-  options?: ApiProxyOptions<ModelsOAuthUserId>,
-) {
+export function useRegisterOAuthUser(options?: ApiProxyOptions<ModelsOAuthUserId>) {
   return useApiProxy<ModelsOAuthUserId, ModelsOAuthUserRegistration>(
     {
       getUrl: () => `/oauth2/user/register`,

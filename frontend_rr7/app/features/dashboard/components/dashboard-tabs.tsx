@@ -26,11 +26,11 @@ import { cn } from '~/lib/utils/cn'
 
 export const DashboardTabs = () => {
   const { t } = useTranslation('common')
-  const [searchParams] = useSearchParams()
+  const [searchParameters] = useSearchParams()
   const location = useLocation()
-  const dateParam = searchParams.get('date')
-  const search = dateParam ? `?${new URLSearchParams({ date: dateParam })}` : ''
-  const itemRefs = useRef<(HTMLElement | null)[]>([])
+  const dateParameter = searchParameters.get('date')
+  const search = dateParameter ? `?${new URLSearchParams({ date: dateParameter })}` : ''
+  const itemReferences = useRef<(HTMLElement | null)[]>([])
 
   const tabs = [
     {
@@ -60,15 +60,13 @@ export const DashboardTabs = () => {
     },
   ]
 
-  const selectedIndex = tabs.findIndex((tab) =>
-    location.pathname.endsWith(tab.to),
-  )
+  const selectedIndex = tabs.findIndex((tab) => location.pathname.endsWith(tab.to))
 
   return (
     <div className="border-base-content/20 relative flex flex-shrink-0 flex-row justify-start gap-3 border-b">
       <SlidingIndicator
         className="!top-auto !bottom-0 !h-[2px]"
-        itemRefs={itemRefs}
+        itemRefs={itemReferences}
         radiusOn="bottom"
         selectedIndex={selectedIndex}
       />
@@ -76,10 +74,9 @@ export const DashboardTabs = () => {
         <div
           className="relative z-10"
           key={tab.to}
-          ref={(el) => {
-            itemRefs.current[index] = el
-          }}
-        >
+          ref={(element) => {
+            itemReferences.current[index] = element
+          }}>
           <NavLink
             className={({ isActive }) =>
               cn(
@@ -88,8 +85,7 @@ export const DashboardTabs = () => {
               )
             }
             data-testid={`dashboard-tab-${tab.id}`}
-            to={`${tab.to}${search}`}
-          >
+            to={`${tab.to}${search}`}>
             {tab.label}
           </NavLink>
         </div>

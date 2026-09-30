@@ -25,29 +25,20 @@ import { getSegmentBounds, getSegmentFromPosition } from './segment-bounds'
  * Handle click to select segment
  */
 export function createHandleClick<T extends string>(
-  inputRef: React.RefObject<HTMLInputElement | null>,
+  inputReference: React.RefObject<HTMLInputElement | null>,
   inputValue: string,
   placeholder: string,
   delimiter: string,
   segmentNames: T[],
-  selectSegmentFn: (segment: T) => void,
+  selectSegmentFunction: (segment: T) => void,
 ) {
-  return (_e: React.MouseEvent<HTMLInputElement>): void => {
+  return (_event: React.MouseEvent<HTMLInputElement>): void => {
     setTimeout(() => {
-      const position = inputRef.current?.selectionStart
-      if (
-        typeof position === 'number' &&
-        inputValue &&
-        inputValue !== placeholder
-      ) {
-        const segment = getSegmentFromPosition(
-          position,
-          inputValue,
-          delimiter,
-          segmentNames,
-        )
+      const position = inputReference.current?.selectionStart
+      if (typeof position === 'number' && inputValue && inputValue !== placeholder) {
+        const segment = getSegmentFromPosition(position, inputValue, delimiter, segmentNames)
         if (segment) {
-          selectSegmentFn(segment)
+          selectSegmentFunction(segment)
         }
       }
     }, 0)
@@ -62,16 +53,16 @@ export function selectSegment<T extends string>(
   inputValue: string,
   delimiter: string,
   segmentNames: T[],
-  inputRef: React.RefObject<HTMLInputElement | null>,
+  inputReference: React.RefObject<HTMLInputElement | null>,
   setSelectedSegment: (segment: null | T) => void,
 ): void {
   const bounds = getSegmentBounds(inputValue, delimiter, segmentNames)
-  if (!bounds || !inputRef.current) return
+  if (!bounds || !inputReference.current) return
 
   const segmentBounds = bounds[segment]
   if (!segmentBounds) return
 
-  inputRef.current.focus()
-  inputRef.current.setSelectionRange(segmentBounds.start, segmentBounds.end)
+  inputReference.current.focus()
+  inputReference.current.setSelectionRange(segmentBounds.start, segmentBounds.end)
   setSelectedSegment(segment)
 }

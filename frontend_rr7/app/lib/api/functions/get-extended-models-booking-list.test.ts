@@ -20,18 +20,9 @@
 import { format } from 'date-fns'
 import { describe, expect, it } from 'vitest'
 
-import { getExtendedModelsBookingList } from './get-extended-models-booking-list'
+import { type ModelsBooking } from '~/services/api/lasius'
 
-interface ModelsBooking {
-  bookingHash: number
-  end?: null | { dateTime: string; zone: string }
-  id: string
-  organisationReference: { id: string; key: string }
-  projectReference: { id: string; key: string }
-  start: { dateTime: string; zone: string }
-  tags: Array<{ id: string; type: string }>
-  userReference: { id: string; key: string }
-}
+import { getExtendedModelsBookingList } from './get-extended-models-booking-list'
 
 const makeBooking = (
   overrides: Partial<ModelsBooking> & { start: ModelsBooking['start'] },
@@ -51,7 +42,7 @@ const makeBooking = (
 
 describe('getExtendedModelsBookingList', () => {
   it('returns empty array for empty input', () => {
-    expect(getExtendedModelsBookingList([] as any)).toEqual([])
+    expect(getExtendedModelsBookingList([])).toEqual([])
   })
 
   it('extends a booking with date, duration, durationString, and fromTo', () => {
@@ -61,7 +52,7 @@ describe('getExtendedModelsBookingList', () => {
       end: { dateTime: endDt, zone: 'UTC' },
       start: { dateTime: startDt, zone: 'UTC' },
     })
-    const result = getExtendedModelsBookingList([booking] as any)
+    const result = getExtendedModelsBookingList([booking])
 
     // format() uses local timezone, so compute expected values the same way
     const expectedDate = format(new Date(startDt), 'd.M.y')
@@ -81,7 +72,7 @@ describe('getExtendedModelsBookingList', () => {
       start: { dateTime: '2024-01-15T10:00:00.000Z', zone: 'UTC' },
       tags: [{ id: 'tag1', type: 'SimpleTag' }],
     })
-    const result = getExtendedModelsBookingList([booking] as any)
+    const result = getExtendedModelsBookingList([booking])
 
     expect(result[0]!.id).toBe('custom-id')
     expect(result[0]!.tags).toEqual([{ id: 'tag1', type: 'SimpleTag' }])

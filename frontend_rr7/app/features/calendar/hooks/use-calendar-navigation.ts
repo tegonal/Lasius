@@ -18,51 +18,40 @@
  */
 
 import { addMonths, addWeeks, format } from 'date-fns'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useSearchParams } from 'react-router'
 
-import {
-  getMonthOfDate,
-  getWeekOfDate,
-  type IsoDateString,
-} from '~/lib/utils/dates'
+import { getMonthOfDate, getWeekOfDate, type IsoDateString } from '~/lib/utils/dates'
 
 /** Simple yyyy-MM-dd format safe for URL search params (no +/: characters) */
-const toDateParam = (d: Date): string => format(d, 'yyyy-MM-dd')
+const toDateParameter = (d: Date): string => format(d, 'yyyy-MM-dd')
 
 type ViewType = 'month' | 'week'
 
-export const useCalendarNavigation = (
-  selectedDate: IsoDateString,
-  viewType: ViewType,
-) => {
-  const [, setSearchParams] = useSearchParams()
+export const useCalendarNavigation = (selectedDate: IsoDateString, viewType: ViewType) => {
+  const [, setSearchParameters] = useSearchParams()
   const [period, setPeriod] = useState<IsoDateString[]>(
-    viewType === 'month'
-      ? getMonthOfDate(selectedDate)
-      : getWeekOfDate(selectedDate),
+    viewType === 'month' ? getMonthOfDate(selectedDate) : getWeekOfDate(selectedDate),
   )
 
   // Update period when selectedDate changes (e.g., from URL search param)
-  useEffect(() => {
-    const newPeriod =
-      viewType === 'month'
-        ? getMonthOfDate(selectedDate)
-        : getWeekOfDate(selectedDate)
-    setPeriod(newPeriod)
-  }, [selectedDate, viewType])
+  const [periodSource, setPeriodSource] = useState({ selectedDate, viewType })
+  if (periodSource.selectedDate !== selectedDate || periodSource.viewType !== viewType) {
+    setPeriodSource({ selectedDate, viewType })
+    setPeriod(viewType === 'month' ? getMonthOfDate(selectedDate) : getWeekOfDate(selectedDate))
+  }
 
   const navigateToDate = useCallback(
     (date: IsoDateString) => {
-      setSearchParams(
-        (prev) => {
-          prev.set('date', date)
-          return prev
+      setSearchParameters(
+        (previous_) => {
+          previous_.set('date', date)
+          return previous_
         },
         { preventScrollReset: true },
       )
     },
-    [setSearchParams],
+    [setSearchParameters],
   )
 
   const next = useCallback(() => {
@@ -71,13 +60,9 @@ export const useCalendarNavigation = (
       if (!firstDay) return currentPeriod
       const currentFirst = new Date(firstDay)
       const nextPeriod =
-        viewType === 'month'
-          ? addMonths(currentFirst, 1)
-          : addWeeks(currentFirst, 1)
-      navigateToDate(toDateParam(nextPeriod))
-      return viewType === 'month'
-        ? getMonthOfDate(nextPeriod)
-        : getWeekOfDate(nextPeriod)
+        viewType === 'month' ? addMonths(currentFirst, 1) : addWeeks(currentFirst, 1)
+      navigateToDate(toDateParameter(nextPeriod))
+      return viewType === 'month' ? getMonthOfDate(nextPeriod) : getWeekOfDate(nextPeriod)
     })
   }, [viewType, navigateToDate])
 
@@ -86,22 +71,16 @@ export const useCalendarNavigation = (
       const firstDay = currentPeriod[0]
       if (!firstDay) return currentPeriod
       const currentFirst = new Date(firstDay)
-      const prevPeriod =
-        viewType === 'month'
-          ? addMonths(currentFirst, -1)
-          : addWeeks(currentFirst, -1)
-      navigateToDate(toDateParam(prevPeriod))
-      return viewType === 'month'
-        ? getMonthOfDate(prevPeriod)
-        : getWeekOfDate(prevPeriod)
+      const previousPeriod =
+        viewType === 'month' ? addMonths(currentFirst, -1) : addWeeks(currentFirst, -1)
+      navigateToDate(toDateParameter(previousPeriod))
+      return viewType === 'month' ? getMonthOfDate(previousPeriod) : getWeekOfDate(previousPeriod)
     })
   }, [viewType, navigateToDate])
 
   const goToDate = useCallback(
     (date: IsoDateString) => {
-      setPeriod(
-        viewType === 'month' ? getMonthOfDate(date) : getWeekOfDate(date),
-      )
+      setPeriod(viewType === 'month' ? getMonthOfDate(date) : getWeekOfDate(date))
     },
     [viewType],
   )

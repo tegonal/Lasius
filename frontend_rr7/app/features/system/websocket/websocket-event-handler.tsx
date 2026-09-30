@@ -59,42 +59,42 @@ export const WebSocketEventHandler = () => {
   const { addToast } = useToast()
   const { t } = useTranslation('common')
   const { t: tIntegrations } = useTranslation('integrations')
-  const lastMessageHashRef = useRef<null | string>(null)
+  const lastMessageHashReference = useRef<null | string>(null)
 
   // Use refs for callbacks so the effect closure always has the latest
-  const revalidatorRef = useRef(revalidator)
-  const addToastRef = useRef(addToast)
-  const tRef = useRef(t)
-  const tIntegrationsRef = useRef(tIntegrations)
+  const revalidatorReference = useRef(revalidator)
+  const latestAddToastReference = useRef(addToast)
+  const tReference = useRef(t)
+  const tIntegrationsReference = useRef(tIntegrations)
 
   useEffect(() => {
-    revalidatorRef.current = revalidator
+    revalidatorReference.current = revalidator
   }, [revalidator])
   useEffect(() => {
-    addToastRef.current = addToast
+    latestAddToastReference.current = addToast
   }, [addToast])
   useEffect(() => {
-    tRef.current = t
+    tReference.current = t
   }, [t])
   useEffect(() => {
-    tIntegrationsRef.current = tIntegrations
+    tIntegrationsReference.current = tIntegrations
   }, [tIntegrations])
 
   useEffect(() => {
     if (!lastMessage) return
 
     const hash = stringHash(lastMessage)
-    if (hash === lastMessageHashRef.current) return
-    lastMessageHashRef.current = hash
+    if (hash === lastMessageHashReference.current) return
+    lastMessageHashReference.current = hash
 
     if (!isWebSocketOutEvent(lastMessage)) return
 
     logger.info('[WebSocketEventHandler]', lastMessage)
 
-    const toast = addToastRef.current
-    const revalidate = () => void revalidatorRef.current.revalidate()
-    const tr = tRef.current
-    const trI = tIntegrationsRef.current
+    const toast = latestAddToastReference.current
+    const revalidate = () => void revalidatorReference.current.revalidate()
+    const tr = tReference.current
+    const trI = tIntegrationsReference.current
 
     if (isCurrentUserTimeBookingEvent(lastMessage)) {
       revalidate()
@@ -147,10 +147,7 @@ export const WebSocketEventHandler = () => {
       })
     } else if (isIssueImporterSyncStatsChanged(lastMessage)) {
       revalidate()
-      if (
-        lastMessage.syncStatus.connectivityStatus ===
-        ModelsConnectivityStatus.degraded
-      ) {
+      if (lastMessage.syncStatus.connectivityStatus === ModelsConnectivityStatus.degraded) {
         toast({
           action: {
             href: ROUTES.ORGANISATION.INTEGRATIONS,
@@ -160,16 +157,12 @@ export const WebSocketEventHandler = () => {
           },
           message: trI('issueImporters.status.connectivityDegraded', {
             configName: lastMessage.configName,
-            defaultValue:
-              'Issue importer connectivity degraded: {{configName}}',
+            defaultValue: 'Issue importer connectivity degraded: {{configName}}',
           }),
           ttl: 120_000,
           type: 'WARNING',
         })
-      } else if (
-        lastMessage.syncStatus.connectivityStatus ===
-        ModelsConnectivityStatus.failed
-      ) {
+      } else if (lastMessage.syncStatus.connectivityStatus === ModelsConnectivityStatus.failed) {
         const errorMessage = lastMessage.syncStatus.currentIssue?.message || ''
         toast({
           action: {
@@ -211,11 +204,7 @@ export const WebSocketEventHandler = () => {
       if (IGNORED_EVENTS.has(messageType)) {
         logger.info('[WebSocketEventHandler][IgnoredEvent]', messageType)
       } else {
-        logger.warn(
-          '[WebSocketEventHandler][UnhandledEvent]',
-          messageType,
-          lastMessage,
-        )
+        logger.warn('[WebSocketEventHandler][UnhandledEvent]', messageType, lastMessage)
       }
     }
   }, [lastMessage])

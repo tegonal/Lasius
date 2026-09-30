@@ -26,28 +26,22 @@ import { CalendarDisplay } from '~/components/ui/forms/input/calendar/calendar-d
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { formatISOLocale } from '~/lib/utils/dates'
 
-type InputDateStandaloneProps = {
+type InputDateStandaloneProperties = {
   id?: string
   onChange: (value: string) => void
   value: string
 }
 
-export const InputDateStandalone = ({
-  id,
-  onChange,
-  value,
-}: InputDateStandaloneProps) => {
+export const InputDateStandalone = ({ id, onChange, value }: InputDateStandaloneProperties) => {
   const { t } = useTranslation('common')
 
   const handleCalendarChange = (isoDateString: string, close: () => void) => {
-    const datePart = isoDateString.split('T')[0] || ''
+    const datePart = isoDateString.split('T', 1)[0] || ''
     onChange(datePart)
     close()
   }
 
-  const calendarValue = value
-    ? formatISOLocale(new Date(value))
-    : formatISOLocale(new Date())
+  const calendarValue = formatISOLocale(value ? new Date(value) : new Date())
 
   return (
     <Popover>
@@ -55,7 +49,7 @@ export const InputDateStandalone = ({
         <input
           className="input input-bordered join-item w-full"
           id={id}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(event) => onChange(event.target.value)}
           type="date"
           value={value}
         />
@@ -65,22 +59,19 @@ export const InputDateStandalone = ({
           fullWidth={false}
           join
           type="button"
-          variant="neutral"
-        >
+          variant="neutral">
           <LucideIcon icon={CalendarIcon} size={20} />
         </PopoverButton>
       </div>
       <PopoverPanel
         anchor="bottom start"
-        className="bg-base-100 border-base-300 z-50 w-[360px] rounded-lg border shadow-lg [--anchor-gap:8px]"
-      >
+        className="bg-base-100 border-base-300 z-50 w-[360px] rounded-lg border shadow-lg [--anchor-gap:8px]">
         {({ close }) => (
           <div className="relative p-4 pr-12">
             <button
               aria-label={t('actions.close', 'Close')}
               className="btn btn-ghost btn-sm btn-circle absolute top-2 right-2"
-              onClick={() => close()}
-            >
+              onClick={() => close()}>
               <LucideIcon icon={X} size={16} />
             </button>
             <CalendarDisplay

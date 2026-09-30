@@ -29,14 +29,7 @@ import {
 
 import { type Route } from './+types/api.proxy'
 
-const ALLOWED_METHODS = [
-  'GET',
-  'POST',
-  'PUT',
-  'PATCH',
-  'DELETE',
-  'HEAD',
-] as const
+const ALLOWED_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD'] as const
 
 const proxyPayloadSchema = z.object({
   body: z.unknown().optional(),
@@ -46,8 +39,7 @@ const proxyPayloadSchema = z.object({
 })
 
 export type ProxyEnvelope<T = unknown> =
-  | { data: T; ok: true }
-  | { error: string; ok: false; status: number }
+  { data: T; ok: true } | { error: string; ok: false; status: number }
 
 /**
  * POST /api/proxy
@@ -69,7 +61,7 @@ export async function action({ request }: Route.ActionArgs) {
   if (!parsed.success) {
     return data(
       {
-        error: `Invalid proxy payload: ${parsed.error.issues.map((i) => i.message).join(', ')}`,
+        error: `Invalid proxy payload: ${parsed.error.issues.map((index) => index.message).join(', ')}`,
         ok: false,
         status: 400,
       } satisfies ProxyEnvelope,

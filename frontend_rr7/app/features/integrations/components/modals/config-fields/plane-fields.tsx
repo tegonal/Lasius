@@ -23,7 +23,7 @@ import { useTranslation } from 'react-i18next'
 import { Input } from '~/components/primitives/inputs/input'
 import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 
-type Props = {
+type Properties = {
   fields: {
     apiKey: FieldMetadata<string | undefined>
     workspace: FieldMetadata<string | undefined>
@@ -31,7 +31,7 @@ type Props = {
   resetTestState: () => void
 }
 
-export const PlaneFields = ({ fields, resetTestState }: Props) => {
+export const PlaneFields = ({ fields, resetTestState }: Properties) => {
   const { t } = useTranslation('integrations')
 
   return (

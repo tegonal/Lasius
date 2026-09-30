@@ -17,21 +17,14 @@
  *
  */
 
-import {
-  differenceInMilliseconds,
-  differenceInMinutes,
-  roundToNearestMinutes,
-} from 'date-fns'
+import { differenceInMilliseconds, differenceInMinutes, roundToNearestMinutes } from 'date-fns'
 
 import { type IsoDateString } from '~/lib/utils/dates'
 
 /**
  * Calculate duration between two ISO date strings in decimal hours.
  */
-export const durationInHoursAsNumber = (
-  start: IsoDateString,
-  end: IsoDateString,
-): number => {
+export const durationInHoursAsNumber = (start: IsoDateString, end: IsoDateString): number => {
   const ms = differenceInMilliseconds(new Date(end), new Date(start))
   return ms / 1000 / 60 / 60
 }
@@ -39,10 +32,7 @@ export const durationInHoursAsNumber = (
 /**
  * Format duration between two ISO date strings as "HH:MM".
  */
-export const durationAsString = (
-  start: IsoDateString,
-  end: IsoDateString,
-): string => {
+export const durationAsString = (start: IsoDateString, end: IsoDateString): string => {
   const minutes = differenceInMinutes(new Date(end), new Date(start))
   return decimalMinutesToTimeString(minutes)
 }
@@ -67,9 +57,7 @@ export const decimalHoursToDurationString = (decimalHours: number): string => {
 /**
  * Convert decimal hours to "HH:MM" string, rounded to nearest 5 minutes.
  */
-export const decimalHoursToDurationStringRounded = (
-  decimalHours: number,
-): string => {
+export const decimalHoursToDurationStringRounded = (decimalHours: number): string => {
   const start = new Date(0, 0, 0, 0, 0)
   const end = roundToNearestMinutes(
     new Date(new Date(0, 0, 0, 0, 0).setMinutes(decimalHours * 60)),

@@ -6,9 +6,9 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type WebSocketUserTimeBookingHistoryEntryChangedType = typeof WebSocketUserTimeBookingHistoryEntryChangedType[keyof typeof WebSocketUserTimeBookingHistoryEntryChangedType];
-
+export type WebSocketUserTimeBookingHistoryEntryChangedType =
+  (typeof WebSocketUserTimeBookingHistoryEntryChangedType)[keyof typeof WebSocketUserTimeBookingHistoryEntryChangedType]
 
 export const WebSocketUserTimeBookingHistoryEntryChangedType = {
   UserTimeBookingHistoryEntryChanged: 'UserTimeBookingHistoryEntryChanged',
-} as const;
+} as const

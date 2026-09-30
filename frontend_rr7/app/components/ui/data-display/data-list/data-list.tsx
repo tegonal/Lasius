@@ -19,9 +19,9 @@
 
 import React from 'react'
 
-type Props = React.ComponentPropsWithoutRef<'table'>
+type Properties = React.ComponentPropsWithoutRef<'table'>
 
-export const DataList = ({ children, ...rest }: Props) => {
+export const DataList = ({ children, ...rest }: Properties) => {
   return (
     <table className="w-full border-collapse" {...rest}>
       <tbody>{children}</tbody>

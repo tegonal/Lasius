@@ -17,11 +17,11 @@
  *
  */
 
-type Props = {
+type Properties = {
   children: React.ReactNode
 }
 
-export const DataList = ({ children }: Props) => (
+export const DataList = ({ children }: Properties) => (
   <table className="w-full border-collapse">
     <tbody>{children}</tbody>
   </table>

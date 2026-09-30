@@ -51,9 +51,7 @@ export const SlideOrganisation = () => {
             1
           </div>
           <div>
-            <div className="font-semibold">
-              {t('organisation.step1', 'Create Your Own')}
-            </div>
+            <div className="font-semibold">{t('organisation.step1', 'Create Your Own')}</div>
             <p className="text-base-content/60">
               {t(
                 'organisation.step1Desc',

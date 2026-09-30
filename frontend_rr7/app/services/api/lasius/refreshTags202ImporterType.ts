@@ -6,12 +6,12 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type RefreshTags202ImporterType = typeof RefreshTags202ImporterType[keyof typeof RefreshTags202ImporterType];
-
+export type RefreshTags202ImporterType =
+  (typeof RefreshTags202ImporterType)[keyof typeof RefreshTags202ImporterType]
 
 export const RefreshTags202ImporterType = {
   gitlab: 'gitlab',
   jira: 'jira',
   plane: 'plane',
   github: 'github',
-} as const;
+} as const

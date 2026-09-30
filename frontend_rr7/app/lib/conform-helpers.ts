@@ -25,8 +25,8 @@ import { type z } from 'zod'
  * Returns a combined string[] suitable for FormFieldErrors.
  */
 export function mergeErrors(
-  conformErrors?: string[] | undefined,
-  serverErrors?: string[] | undefined,
+  conformErrors?: string[],
+  serverErrors?: string[],
 ): string[] | undefined {
   const combined = [...(conformErrors ?? []), ...(serverErrors ?? [])]
   return combined.length > 0 ? combined : undefined

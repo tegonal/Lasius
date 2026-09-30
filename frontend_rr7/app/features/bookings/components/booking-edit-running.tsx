@@ -38,15 +38,12 @@ import {
   parseTagsFromFormData,
 } from '~/features/bookings/lib/booking-schemas'
 import { useProjects } from '~/features/projects/hooks/use-projects'
-import { type SchemaTranslationFn } from '~/lib/i18n-types'
+import { type SchemaTranslationFunction } from '~/lib/i18n-types'
 import { formatISOLocale } from '~/lib/utils/dates'
-import {
-  type ModelsCurrentUserTimeBooking,
-  type ModelsTag,
-} from '~/services/api/lasius'
+import { type ModelsCurrentUserTimeBooking, type ModelsTag } from '~/services/api/lasius'
 import { useUpdateUserBooking } from '~/services/api/lasius-hooks/user-bookings/user-bookings'
 
-type BookingEditRunningProps = {
+type BookingEditRunningProperties = {
   item: ModelsCurrentUserTimeBooking
   latestBooking?: null | { end?: { dateTime: string } }
   onClose: () => void
@@ -58,7 +55,7 @@ export const BookingEditRunning = ({
   latestBooking,
   onClose,
   selectedOrgId,
-}: BookingEditRunningProps) => {
+}: BookingEditRunningProperties) => {
   const { t } = useTranslation('common')
   const updateBookingApi = useUpdateUserBooking({
     onSuccess: () => {
@@ -72,9 +69,7 @@ export const BookingEditRunning = ({
   const { userProjects } = useProjects()
   const projects = userProjects.map((p) => p.projectReference)
 
-  const schema = createBookingEditRunningSchema(
-    t as unknown as SchemaTranslationFn,
-  )
+  const schema = createBookingEditRunningSchema(t as unknown as SchemaTranslationFunction)
 
   const [form, fields] = useForm({
     constraint: getZodConstraint(schema),
@@ -98,14 +93,16 @@ export const BookingEditRunning = ({
 
   // Re-initialize form values when booking changes
   useEffect(() => {
-    if (booking) {
-      projectIdControl.change(booking.projectReference.id)
-      form.update({
-        name: fields.tags.name,
-        value: booking.tags.length > 0 ? JSON.stringify(booking.tags) : '',
-      })
-      startControl.change(formatISOLocale(new Date(booking.start.dateTime)))
+    if (!booking) {
+      return
     }
+
+    projectIdControl.change(booking.projectReference.id)
+    form.update({
+      name: fields.tags.name,
+      value: booking.tags.length > 0 ? JSON.stringify(booking.tags) : '',
+    })
+    startControl.change(formatISOLocale(new Date(booking.start.dateTime)))
   }, [
     booking,
     booking?.projectReference.id,
@@ -126,9 +123,7 @@ export const BookingEditRunning = ({
 
   const presetStart = latestBooking?.end
     ? {
-        presetDate: formatISOLocale(
-          addSeconds(new Date(latestBooking.end.dateTime), 1),
-        ),
+        presetDate: formatISOLocale(addSeconds(new Date(latestBooking.end.dateTime), 1)),
         presetIcon: ArrowDownToLine,
         presetLabel: t(
           'bookings:hints.useEndTimeOfLatest',
@@ -138,16 +133,17 @@ export const BookingEditRunning = ({
     : {}
 
   const onSubmit = useCallback(
-    (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault()
-      const formData = new FormData(e.currentTarget)
+    (event: React.SubmitEvent<HTMLFormElement>) => {
+      event.preventDefault()
+      const formData = new FormData(event.currentTarget)
       const result = parseWithZod(formData, { schema })
       if (result.status !== 'success') return
 
       const { projectId, start, tags: tagsJson } = result.value
-      const tags = parseTagsFromFormData(tagsJson) as unknown as ModelsTag[]
 
       if (!projectId || !booking) return
+
+      const tags = parseTagsFromFormData(tagsJson) as unknown as ModelsTag[]
 
       updateBookingApi.submit({
         body: {
@@ -170,8 +166,7 @@ export const BookingEditRunning = ({
             <FormElement
               htmlFor={fields.projectId.id}
               label={t('projects:label', 'Project')}
-              required
-            >
+              required>
               <ProjectSelect
                 errors={fields.projectId.errors}
                 fallbackProject={booking?.projectReference}
@@ -182,10 +177,7 @@ export const BookingEditRunning = ({
                 value={projectIdControl.value ?? ''}
               />
             </FormElement>
-            <FormElement
-              htmlFor={fields.tags.id}
-              label={t('tag-manager:label', 'Tags')}
-            >
+            <FormElement htmlFor={fields.tags.id} label={t('tag-manager:label', 'Tags')}>
               <InputTagsAutocomplete
                 field={fields.tags}
                 id={fields.tags.id}
@@ -193,10 +185,7 @@ export const BookingEditRunning = ({
                 suggestions={projectTags}
               />
             </FormElement>
-            <FormElement
-              htmlFor={fields.start.id}
-              label={t('time.starts', 'Starts')}
-            >
+            <FormElement htmlFor={fields.start.id} label={t('time.starts', 'Starts')}>
               <InputDatePicker
                 field={fields.start}
                 onChange={(v) => startControl.change(v)}
@@ -211,8 +200,7 @@ export const BookingEditRunning = ({
             <Button
               data-testid="booking-edit-running-save-btn"
               loading={updateBookingApi.isSubmitting}
-              type="submit"
-            >
+              type="submit">
               {t('actions.save', 'Save')}
             </Button>
             <Button
@@ -220,8 +208,7 @@ export const BookingEditRunning = ({
               disabled={updateBookingApi.isSubmitting}
               onClick={onClose}
               type="button"
-              variant="secondary"
-            >
+              variant="secondary">
               {t('actions.close', 'Close')}
             </Button>
           </ButtonGroup>

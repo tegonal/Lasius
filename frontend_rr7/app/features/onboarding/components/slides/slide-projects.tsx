@@ -34,9 +34,7 @@ export const SlideProjects = () => {
         <div className="mb-4 flex justify-center">
           <LucideIcon className="text-primary" icon={FolderKanban} size={48} />
         </div>
-        <h2 className="text-xl font-bold">
-          {t('projects.title', 'Create or Join a Project')}
-        </h2>
+        <h2 className="text-xl font-bold">{t('projects.title', 'Create or Join a Project')}</h2>
         <p className="text-base-content/70 mt-2">
           {t(
             'projects.subtitle',
@@ -51,14 +49,9 @@ export const SlideProjects = () => {
             1
           </div>
           <div>
-            <div className="font-semibold">
-              {t('projects.step1', 'Create Your Own')}
-            </div>
+            <div className="font-semibold">{t('projects.step1', 'Create Your Own')}</div>
             <p className="text-base-content/60">
-              {t(
-                'projects.step1Desc',
-                'Go to My Projects and create a new project.',
-              )}
+              {t('projects.step1Desc', 'Go to My Projects and create a new project.')}
             </p>
           </div>
         </div>
@@ -68,14 +61,9 @@ export const SlideProjects = () => {
             2
           </div>
           <div>
-            <div className="font-semibold">
-              {t('projects.step2', 'Or Join an Existing One')}
-            </div>
+            <div className="font-semibold">{t('projects.step2', 'Or Join an Existing One')}</div>
             <p className="text-base-content/60">
-              {t(
-                'projects.step2Desc',
-                'Ask an administrator to add you to their project.',
-              )}
+              {t('projects.step2Desc', 'Ask an administrator to add you to their project.')}
             </p>
           </div>
         </div>

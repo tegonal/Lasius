@@ -23,14 +23,13 @@ import { useTranslation } from 'react-i18next'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { useOnboardingStatus } from '~/features/onboarding/hooks/use-onboarding-status'
 
-interface SlideChecklistProps {
+interface SlideChecklistProperties {
   onNavigateToSlide?: (slideId: string) => void
 }
 
-export const SlideChecklist = ({ onNavigateToSlide }: SlideChecklistProps) => {
+export const SlideChecklist = ({ onNavigateToSlide }: SlideChecklistProperties) => {
   const { t } = useTranslation('onboarding')
-  const { hasMultipleOrganisations, hasProjects, hasWorkingHours } =
-    useOnboardingStatus()
+  const { hasMultipleOrganisations, hasProjects, hasWorkingHours } = useOnboardingStatus()
 
   const checklistItems = [
     {
@@ -49,10 +48,7 @@ export const SlideChecklist = ({ onNavigateToSlide }: SlideChecklistProps) => {
       completed: hasWorkingHours,
       icon: Clock,
       id: 'workingHours',
-      label: t(
-        'checklist.workingHours',
-        'Set working hours for this organization',
-      ),
+      label: t('checklist.workingHours', 'Set working hours for this organization'),
     },
     {
       completed: false,
@@ -68,22 +64,15 @@ export const SlideChecklist = ({ onNavigateToSlide }: SlideChecklistProps) => {
   return (
     <div className="flex h-full flex-col items-center justify-center gap-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold">
-          {t('checklist.title', "Let's Get You Started")}
-        </h2>
+        <h2 className="text-2xl font-bold">{t('checklist.title', "Let's Get You Started")}</h2>
         <p className="text-base-content/70 mt-2">
-          {t(
-            'checklist.subtitle',
-            'Follow these simple steps to start tracking time',
-          )}
+          {t('checklist.subtitle', 'Follow these simple steps to start tracking time')}
         </p>
       </div>
 
       <div className="bg-base-100 w-full max-w-md rounded-lg p-6">
         <div className="mb-4 flex items-center justify-between">
-          <div className="text-sm font-semibold">
-            {t('checklist.progress', 'Your Progress')}
-          </div>
+          <div className="text-sm font-semibold">{t('checklist.progress', 'Your Progress')}</div>
           <div className="text-primary text-sm font-bold">
             {completedCount} / {totalCount}
           </div>
@@ -98,13 +87,10 @@ export const SlideChecklist = ({ onNavigateToSlide }: SlideChecklistProps) => {
               disabled={!onNavigateToSlide}
               key={item.id}
               onClick={() => onNavigateToSlide?.(item.id)}
-              type="button"
-            >
+              type="button">
               <div className="shrink-0">
                 <LucideIcon
-                  className={
-                    item.completed ? 'text-success' : 'text-base-content/30'
-                  }
+                  className={item.completed ? 'text-success' : 'text-base-content/30'}
                   icon={item.completed ? CheckCircle2 : Circle}
                   size={20}
                 />
@@ -115,8 +101,7 @@ export const SlideChecklist = ({ onNavigateToSlide }: SlideChecklistProps) => {
                 </div>
                 <div className="flex-1">
                   <div
-                    className={`text-sm ${item.completed ? 'text-success line-through' : 'font-medium'}`}
-                  >
+                    className={`text-sm ${item.completed ? 'text-success line-through' : 'font-medium'}`}>
                     {item.label}
                   </div>
                 </div>

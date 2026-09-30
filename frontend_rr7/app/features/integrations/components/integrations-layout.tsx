@@ -20,11 +20,7 @@
 import { useTranslation } from 'react-i18next'
 import { useLoaderData } from 'react-router'
 
-import {
-  ColumnCenter,
-  ColumnRight,
-  innerGridClasses,
-} from '~/components/ui/layouts/layout-columns'
+import { ColumnCenter, ColumnRight, innerGridClasses } from '~/components/ui/layouts/layout-columns'
 import { GenericConfirmModal } from '~/components/ui/overlays/modal/generic-confirm-modal'
 import { IntegrationsContent } from '~/features/integrations/components/integrations-content'
 import { IntegrationsRightColumn } from '~/features/integrations/components/integrations-right-column'
@@ -59,10 +55,7 @@ export const IntegrationsLayout = () => {
         <ColumnCenter>
           <div className="flex h-full flex-col overflow-hidden">
             <div className="flex-shrink-0">
-              <IntegrationsStats
-                configs={configs}
-                onAddClick={management.openWizard}
-              />
+              <IntegrationsStats configs={configs} onAddClick={management.openWizard} />
             </div>
             <div className="flex-1 overflow-y-auto">
               <IntegrationsContent
@@ -98,8 +91,7 @@ export const IntegrationsLayout = () => {
         })}
         confirmVariant="error"
         message={t('integrations.delete.message', {
-          defaultValue:
-            'Are you sure you want to delete this integration configuration?',
+          defaultValue: 'Are you sure you want to delete this integration configuration?',
           name: management.selectedConfig?.name ?? '',
         })}
         onClose={management.closeModal}

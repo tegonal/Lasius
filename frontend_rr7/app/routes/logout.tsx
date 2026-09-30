@@ -19,10 +19,7 @@
 
 import { logger } from '~/lib/logger'
 import { getProvider } from '~/services/auth/providers'
-import {
-  destroyUserSession,
-  getSessionTokens,
-} from '~/services/auth/session.server'
+import { destroyUserSession, getSessionTokens } from '~/services/auth/session.server'
 
 import { type Route } from './+types/logout'
 

@@ -38,10 +38,11 @@ export const aggregateProjectHours = (
   for (const entry of data) {
     for (const item of entry.values) {
       const name = item.label
-      if (!name) continue
-      const hours = (item.duration ?? 0) / MS_PER_HOUR
-      if (hours > 0) {
-        projectHours[name] = (projectHours[name] || 0) + hours
+      if (name) {
+        const hours = (item.duration ?? 0) / MS_PER_HOUR
+        if (hours > 0) {
+          projectHours[name] = (projectHours[name] || 0) + hours
+        }
       }
     }
   }

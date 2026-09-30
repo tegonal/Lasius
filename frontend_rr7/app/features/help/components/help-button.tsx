@@ -32,18 +32,14 @@ export const HelpButton = () => {
   const { toggleHelp } = useHelpStore()
 
   return (
-    <div
-      className="tooltip tooltip-bottom"
-      data-tip={t('actions.help', 'Help')}
-    >
+    <div className="tooltip tooltip-bottom" data-tip={t('actions.help', 'Help')}>
       <Button
         aria-label={t('actions.help', 'Help')}
         data-testid="help-btn"
         fullWidth={false}
         onClick={toggleHelp}
         shape="circle"
-        variant="ghost"
-      >
+        variant="ghost">
         <LucideIcon icon={HelpCircleIcon} size={20} />
       </Button>
     </div>
@@ -66,8 +62,7 @@ export const ModalHelpButton = ({ helpKey }: { helpKey: string }) => {
       shape="circle"
       size="sm"
       type="button"
-      variant="ghost"
-    >
+      variant="ghost">
       <LucideIcon icon={HelpCircleIcon} size={20} />
     </Button>
   )

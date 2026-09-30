@@ -31,11 +31,11 @@ import { maskEmail } from '~/lib/utils/mask-email'
 import { type ModelsInvitationStatusResponse } from '~/services/api/lasius/modelsInvitationStatusResponse'
 import { logoutUrl } from '~/services/auth/auth-urls'
 
-interface Props {
+interface Properties {
   invitation: ModelsInvitationStatusResponse
 }
 
-export const InvitationOtherSession = ({ invitation }: Props) => {
+export const InvitationOtherSession = ({ invitation }: Properties) => {
   const { t } = useTranslation(['invitation', 'auth'])
   const navigate = useNavigate()
 
@@ -48,8 +48,7 @@ export const InvitationOtherSession = ({ invitation }: Props) => {
       <Card
         className="border-base-300 bg-base-100 w-full max-w-md border"
         data-testid="invite-other-session"
-        shadow="xl"
-      >
+        shadow="xl">
         <CardBody className="gap-6 p-8">
           <div className="flex justify-center">
             <Logo />

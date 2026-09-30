@@ -52,9 +52,7 @@ export type NavigationSection = {
   routes: NavigationRouteType[]
 }
 
-export const createNavigation = (
-  t: TFunction<'navigation'>,
-): NavigationSection[] => [
+export const createNavigation = (t: TFunction<'navigation'>): NavigationSection[] => [
   {
     icon: UserCircle,
     level: 'user',
@@ -170,10 +168,8 @@ export const getNavigation = ({
   return section.routes.filter((item) => {
     return (
       !item.restrictTo ||
-      (item.restrictTo.includes(ROLES.ORGANISATION_ADMIN) &&
-        isOrganisationAdministrator) ||
-      (item.restrictTo.includes(AUTH_PROVIDER_INTERNAL_LASIUS) &&
-        isUserOfInternalOAuthProvider)
+      (item.restrictTo.includes(ROLES.ORGANISATION_ADMIN) && isOrganisationAdministrator) ||
+      (item.restrictTo.includes(AUTH_PROVIDER_INTERNAL_LASIUS) && isUserOfInternalOAuthProvider)
     )
   })
 }

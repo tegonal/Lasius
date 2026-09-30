@@ -24,12 +24,12 @@ import { StatsGroup } from '~/features/stats/components/stats-group'
 import { StatsTileNumber } from '~/features/stats/components/stats-tile-number'
 import { type ModelsIssueImporterConfigResponse } from '~/services/api/lasius/modelsIssueImporterConfigResponse'
 
-type Props = {
+type Properties = {
   configs: ModelsIssueImporterConfigResponse[]
   onAddClick: () => void
 }
 
-export const IntegrationsStats = ({ configs, onAddClick }: Props) => {
+export const IntegrationsStats = ({ configs, onAddClick }: Properties) => {
   const { t } = useTranslation('integrations')
 
   const totalConfigs = configs.length
@@ -55,13 +55,7 @@ export const IntegrationsStats = ({ configs, onAddClick }: Props) => {
           value={totalConfigs}
         />
       </StatsGroup>
-      <Button
-        className="w-auto"
-        fullWidth={false}
-        onClick={onAddClick}
-        size="sm"
-        variant="neutral"
-      >
+      <Button className="w-auto" fullWidth={false} onClick={onAddClick} size="sm" variant="neutral">
         {t('integrations.actions.addIntegration', {
           defaultValue: 'Add Integration',
         })}

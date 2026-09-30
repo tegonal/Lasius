@@ -6,10 +6,9 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type RefreshTags404Error = typeof RefreshTags404Error[keyof typeof RefreshTags404Error];
-
+export type RefreshTags404Error = (typeof RefreshTags404Error)[keyof typeof RefreshTags404Error]
 
 export const RefreshTags404Error = {
   config_not_found: 'config_not_found',
   mapping_not_found: 'mapping_not_found',
-} as const;
+} as const

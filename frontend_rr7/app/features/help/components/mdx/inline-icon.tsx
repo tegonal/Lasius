@@ -65,12 +65,12 @@ const iconMap: Record<string, LucideIconType> = {
   Users,
 }
 
-interface InlineIconProps {
+interface InlineIconProperties {
   name: string
   size?: number
 }
 
-export const InlineIcon = ({ name, size = 18 }: InlineIconProps) => {
+export const InlineIcon = ({ name, size = 18 }: InlineIconProperties) => {
   const IconComponent = iconMap[name]
 
   if (!IconComponent) {

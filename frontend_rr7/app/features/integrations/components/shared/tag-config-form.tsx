@@ -22,31 +22,23 @@ import { useTranslation } from 'react-i18next'
 
 import { FormBody } from '~/components/ui/forms/form-body'
 import { FormElement } from '~/components/ui/forms/form-element'
-import {
-  MultiSelect,
-  type MultiSelectOption,
-} from '~/components/ui/forms/input/multi-select'
+import { MultiSelect, type MultiSelectOption } from '~/components/ui/forms/input/multi-select'
 import { Select, type SelectOption } from '~/components/ui/forms/input/select'
-import { type TagConfiguration } from '~/features/integrations/lib/mapping-helpers'
+import { type TagConfig } from '~/features/integrations/lib/mapping-helpers'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 import {
   type ModelsExternalProject,
   type ModelsGithubTagConfiguration,
 } from '~/services/api/lasius'
 
-type Props = {
+type Properties = {
   externalProject?: ModelsExternalProject
   importerType: ImporterType
-  onChange: (value: TagConfiguration) => void
-  value: TagConfiguration
+  onChange: (value: TagConfig) => void
+  value: TagConfig
 }
 
-export const TagConfigurationForm = ({
-  externalProject,
-  importerType,
-  onChange,
-  value,
-}: Props) => {
+export const TagConfigForm = ({ externalProject, importerType, onChange, value }: Properties) => {
   const { t } = useTranslation('integrations')
 
   const tagFieldOptions: MultiSelectOption[] = useMemo(() => {
@@ -88,10 +80,7 @@ export const TagConfigurationForm = ({
     if (value.useTitle) selected.push('useTitle')
     if (value.useLabels) selected.push('useLabels')
     if (value.useMilestone) selected.push('useMilestone')
-    if (
-      importerType === 'github' &&
-      (value as ModelsGithubTagConfiguration).useAssignees
-    ) {
+    if (importerType === 'github' && (value as ModelsGithubTagConfiguration).useAssignees) {
       selected.push('useAssignees')
     }
     return selected
@@ -110,7 +99,7 @@ export const TagConfigurationForm = ({
       ...(importerType === 'github' && {
         useAssignees: selectedValues.includes('useAssignees'),
       }),
-    } satisfies TagConfiguration)
+    } satisfies TagConfig)
   }
 
   const availableLabels = useMemo(
@@ -138,18 +127,14 @@ export const TagConfigurationForm = ({
         htmlFor="tag-fields-select"
         label={t('issueImporters.tagConfiguration.tagFieldsLabel', {
           defaultValue: 'Tag fields to import',
-        })}
-      >
+        })}>
         <MultiSelect
           id="tag-fields-select"
           onChange={handleTagFieldsChange}
           options={tagFieldOptions}
-          placeholder={t(
-            'issueImporters.tagConfiguration.tagFieldsPlaceholder',
-            {
-              defaultValue: 'Select fields...',
-            },
-          )}
+          placeholder={t('issueImporters.tagConfiguration.tagFieldsPlaceholder', {
+            defaultValue: 'Select fields...',
+          })}
           value={selectedTagFields}
         />
         <p className="text-base-content/60 text-xs">
@@ -165,8 +150,7 @@ export const TagConfigurationForm = ({
           htmlFor="label-filter-select"
           label={t('issueImporters.tagConfiguration.labelFilterLabel', {
             defaultValue: 'Import only specific labels',
-          })}
-        >
+          })}>
           <MultiSelect
             disabled={availableLabels.length === 0}
             id="label-filter-select"
@@ -177,12 +161,9 @@ export const TagConfigurationForm = ({
               })
             }
             options={labelOptions}
-            placeholder={t(
-              'issueImporters.tagConfiguration.labelFilterPlaceholder',
-              {
-                defaultValue: 'All labels (or select specific labels...)',
-              },
-            )}
+            placeholder={t('issueImporters.tagConfiguration.labelFilterPlaceholder', {
+              defaultValue: 'All labels (or select specific labels...)',
+            })}
             value={value.labelFilter || []}
           />
           <p className="text-base-content/60 text-xs">
@@ -199,8 +180,7 @@ export const TagConfigurationForm = ({
           htmlFor="issue-label-filter-select"
           label={t('issueImporters.tagConfiguration.issueLabelFilterLabel', {
             defaultValue: 'Import only issues with specific labels',
-          })}
-        >
+          })}>
           <MultiSelect
             disabled={availableLabels.length === 0}
             id="issue-label-filter-select"
@@ -211,12 +191,9 @@ export const TagConfigurationForm = ({
               })
             }
             options={labelOptions}
-            placeholder={t(
-              'issueImporters.tagConfiguration.issueLabelFilterPlaceholder',
-              {
-                defaultValue: 'All issues (or select labels to filter...)',
-              },
-            )}
+            placeholder={t('issueImporters.tagConfiguration.issueLabelFilterPlaceholder', {
+              defaultValue: 'All issues (or select labels to filter...)',
+            })}
             value={value.includeOnlyIssuesWithLabels || []}
           />
           <p className="text-base-content/60 text-xs">
@@ -233,8 +210,7 @@ export const TagConfigurationForm = ({
           htmlFor="issue-state-filter-select"
           label={t('issueImporters.tagConfiguration.issueStateFilterLabel', {
             defaultValue: 'Import only issues with specific states',
-          })}
-        >
+          })}>
           {importerType === 'plane' ? (
             <MultiSelect
               disabled={availableStates.length === 0}
@@ -246,12 +222,9 @@ export const TagConfigurationForm = ({
                 })
               }
               options={stateOptions}
-              placeholder={t(
-                'issueImporters.tagConfiguration.issueStateFilterPlaceholder',
-                {
-                  defaultValue: 'All states (or select specific states...)',
-                },
-              )}
+              placeholder={t('issueImporters.tagConfiguration.issueStateFilterPlaceholder', {
+                defaultValue: 'All states (or select specific states...)',
+              })}
               value={value.includeOnlyIssuesWithState || []}
             />
           ) : (
@@ -261,18 +234,13 @@ export const TagConfigurationForm = ({
               onChange={(selectedState) =>
                 onChange({
                   ...value,
-                  includeOnlyIssuesWithState: selectedState
-                    ? [selectedState]
-                    : [],
+                  includeOnlyIssuesWithState: selectedState ? [selectedState] : [],
                 })
               }
               options={stateOptions}
-              placeholder={t(
-                'issueImporters.tagConfiguration.issueStateFilterPlaceholder',
-                {
-                  defaultValue: 'All states (or select specific states...)',
-                },
-              )}
+              placeholder={t('issueImporters.tagConfiguration.issueStateFilterPlaceholder', {
+                defaultValue: 'All states (or select specific states...)',
+              })}
               value={value.includeOnlyIssuesWithState?.[0] || ''}
             />
           )}

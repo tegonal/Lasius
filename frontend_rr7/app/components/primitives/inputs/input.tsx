@@ -64,7 +64,7 @@ const inputVariants = cva(
   },
 )
 
-export interface InputProps
+export interface InputProperties
   extends
     Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'>,
     VariantProps<typeof inputVariants> {
@@ -72,20 +72,10 @@ export interface InputProps
   fullWidth?: boolean
 }
 
-export const Input = React.forwardRef<HTMLInputElement, InputProps>(
+export const Input = React.forwardRef<HTMLInputElement, InputProperties>(
   (
-    {
-      className,
-      disabled,
-      error,
-      fullWidth = true,
-      readOnly,
-      size,
-      state,
-      variant,
-      ...props
-    },
-    ref,
+    { className, disabled, error, fullWidth = true, readOnly, size, state, variant, ...properties },
+    reference,
   ) => {
     // Determine the state based on props
     const baseState = readOnly ? 'readonly' : state || 'default'
@@ -107,8 +97,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         )}
         disabled={disabled}
         readOnly={readOnly}
-        ref={ref}
-        {...props}
+        ref={reference}
+        {...properties}
       />
     )
   },
@@ -162,7 +152,7 @@ const textareaVariants = cva(
   },
 )
 
-export interface TextareaProps
+export interface TextareaProperties
   extends
     Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'size'>,
     VariantProps<typeof textareaVariants> {
@@ -170,20 +160,10 @@ export interface TextareaProps
   fullWidth?: boolean
 }
 
-export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
+export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProperties>(
   (
-    {
-      className,
-      disabled,
-      error,
-      fullWidth = true,
-      readOnly,
-      size,
-      state,
-      variant,
-      ...props
-    },
-    ref,
+    { className, disabled, error, fullWidth = true, readOnly, size, state, variant, ...properties },
+    reference,
   ) => {
     // Determine the state based on props
     const baseState = readOnly ? 'readonly' : state || 'default'
@@ -205,8 +185,8 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         )}
         disabled={disabled}
         readOnly={readOnly}
-        ref={ref}
-        {...props}
+        ref={reference}
+        {...properties}
       />
     )
   },

@@ -31,19 +31,9 @@ export interface LasiusSessionData {
 
 /** Provider interface — each provider implements these */
 export interface OAuthProvider {
-  exchangeCode(
-    code: string,
-    redirectUri: string,
-    codeVerifier?: string,
-  ): Promise<TokenResponse>
-  getAuthorizationUrl(
-    state: string,
-    redirectUri: string,
-    codeChallenge?: string,
-  ): string
-  getUserProfile(
-    accessToken: string,
-  ): Promise<{ email: string; userId: string }>
+  exchangeCode(code: string, redirectUri: string, codeVerifier?: string): Promise<TokenResponse>
+  getAuthorizationUrl(state: string, redirectUri: string, codeChallenge?: string): string
+  getUserProfile(accessToken: string): Promise<{ email: string; userId: string }>
   provider: AuthProvider
   refreshToken(refreshToken: string): Promise<null | TokenResponse>
   revokeToken(token: string): Promise<void>

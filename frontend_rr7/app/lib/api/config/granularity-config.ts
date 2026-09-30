@@ -27,10 +27,7 @@ export type Granularity = 'Day' | 'Month' | 'Week' | 'Year'
  * Determines the appropriate granularity based on the date range.
  * Only counts days in the past (up to today), future days are ignored.
  */
-export const getAdaptiveGranularity = (
-  from: string,
-  to: string,
-): Granularity => {
+export const getAdaptiveGranularity = (from: string, to: string): Granularity => {
   const today = new Date()
   const fromDate = new Date(from)
   const toDate = new Date(to)

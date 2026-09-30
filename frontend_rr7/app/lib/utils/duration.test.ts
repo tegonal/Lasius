@@ -19,61 +19,41 @@
 
 import { describe, expect, it } from 'vitest'
 
-import {
-  decimalHoursToDurationString,
-  durationAsString,
-  durationInHoursAsNumber,
-} from './duration'
+import { decimalHoursToDurationString, durationAsString, durationInHoursAsNumber } from './duration'
 
 describe('durationInHoursAsNumber', () => {
   it('returns 1 for a 1-hour difference', () => {
-    expect(
-      durationInHoursAsNumber('2024-01-01T10:00:00Z', '2024-01-01T11:00:00Z'),
-    ).toBe(1)
+    expect(durationInHoursAsNumber('2024-01-01T10:00:00Z', '2024-01-01T11:00:00Z')).toBe(1)
   })
 
   it('returns 0.5 for a 30-minute difference', () => {
-    expect(
-      durationInHoursAsNumber('2024-01-01T10:00:00Z', '2024-01-01T10:30:00Z'),
-    ).toBe(0.5)
+    expect(durationInHoursAsNumber('2024-01-01T10:00:00Z', '2024-01-01T10:30:00Z')).toBe(0.5)
   })
 
   it('returns 0 when start and end are the same', () => {
-    expect(
-      durationInHoursAsNumber('2024-01-01T10:00:00Z', '2024-01-01T10:00:00Z'),
-    ).toBe(0)
+    expect(durationInHoursAsNumber('2024-01-01T10:00:00Z', '2024-01-01T10:00:00Z')).toBe(0)
   })
 
   it('returns a negative value when end is before start', () => {
-    expect(
-      durationInHoursAsNumber('2024-01-01T11:00:00Z', '2024-01-01T10:00:00Z'),
-    ).toBe(-1)
+    expect(durationInHoursAsNumber('2024-01-01T11:00:00Z', '2024-01-01T10:00:00Z')).toBe(-1)
   })
 })
 
 describe('durationAsString', () => {
   it('formats 1 hour as "01:00"', () => {
-    expect(
-      durationAsString('2024-01-01T10:00:00Z', '2024-01-01T11:00:00Z'),
-    ).toBe('01:00')
+    expect(durationAsString('2024-01-01T10:00:00Z', '2024-01-01T11:00:00Z')).toBe('01:00')
   })
 
   it('formats 1 hour 30 minutes as "01:30"', () => {
-    expect(
-      durationAsString('2024-01-01T10:00:00Z', '2024-01-01T11:30:00Z'),
-    ).toBe('01:30')
+    expect(durationAsString('2024-01-01T10:00:00Z', '2024-01-01T11:30:00Z')).toBe('01:30')
   })
 
   it('formats zero duration as "00:00"', () => {
-    expect(
-      durationAsString('2024-01-01T10:00:00Z', '2024-01-01T10:00:00Z'),
-    ).toBe('00:00')
+    expect(durationAsString('2024-01-01T10:00:00Z', '2024-01-01T10:00:00Z')).toBe('00:00')
   })
 
   it('formats multi-hour durations correctly', () => {
-    expect(
-      durationAsString('2024-01-01T08:00:00Z', '2024-01-01T17:45:00Z'),
-    ).toBe('09:45')
+    expect(durationAsString('2024-01-01T08:00:00Z', '2024-01-01T17:45:00Z')).toBe('09:45')
   })
 })
 

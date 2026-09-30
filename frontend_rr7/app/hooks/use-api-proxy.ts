@@ -28,19 +28,13 @@ export type ApiProxyOptions<TResponse> = {
   onSuccess?: (data: TResponse) => void
 }
 
-type ApiProxyConfig<TParams> = {
-  getUrl: (params: TParams) => string
+type ApiProxyConfig<TParameters> = {
+  getUrl: (parameters: TParameters) => string
   method: string
   skipAuth?: boolean
 }
 
-type JsonValue =
-  | boolean
-  | JsonValue[]
-  | null
-  | number
-  | string
-  | { [key: string]: JsonValue }
+type JsonValue = boolean | JsonValue[] | null | number | string | { [key: string]: JsonValue }
 
 type ProxyPayload = {
   body?: JsonValue
@@ -49,27 +43,31 @@ type ProxyPayload = {
   url: string
 }
 
-type SubmitArgs<TBody, TParams> = (TBody extends undefined
+type SubmitArguments<TBody, TParameters> = (TBody extends undefined
   ? { body?: never }
   : { body: TBody }) &
-  (TParams extends Record<string, never> ? unknown : TParams) & {
+  (TParameters extends Record<string, never> ? unknown : TParameters) & {
     skipAuth?: boolean
   }
 
-export function useApiProxy<
-  TResponse,
-  TBody = undefined,
-  TParams = Record<string, never>,
->(config: ApiProxyConfig<TParams>, options?: ApiProxyOptions<TResponse>) {
+export function useApiProxy<TResponse, TBody = undefined, TParameters = Record<string, never>>(
+  config: ApiProxyConfig<TParameters>,
+  options?: ApiProxyOptions<TResponse>,
+) {
   const fetcher = useFetcher<ProxyEnvelope<TResponse>>(
     options?.fetcherKey ? { key: options.fetcherKey } : undefined,
   )
   const fetcherSubmit = fetcher.submit
-  const submittedRef = useRef(false)
-  const onSuccessRef = useRef(options?.onSuccess)
-  const onErrorRef = useRef(options?.onError)
-  onSuccessRef.current = options?.onSuccess
-  onErrorRef.current = options?.onError
+  const submittedReference = useRef(false)
+  const onSuccessReference = useRef(options?.onSuccess)
+  const onErrorReference = useRef(options?.onError)
+
+  // This effect must stay above the callback effect. Effects run in declaration order,
+  // so the callback effect then reads the callbacks of the current render.
+  useEffect(() => {
+    onSuccessReference.current = options?.onSuccess
+    onErrorReference.current = options?.onError
+  })
 
   const envelope = fetcher.data
   const isIdle = fetcher.state === 'idle'
@@ -77,32 +75,27 @@ export function useApiProxy<
   // Derive typed data and error from envelope
   const data = envelope?.ok === true ? envelope.data : undefined
   const error =
-    envelope?.ok === false
-      ? { error: envelope.error, status: envelope.status }
-      : undefined
+    envelope?.ok === false ? { error: envelope.error, status: envelope.status } : undefined
 
   // Fire callbacks when request completes
   useEffect(() => {
-    if (!isIdle || !submittedRef.current || !envelope) return
-    submittedRef.current = false
+    if (!isIdle || !submittedReference.current || !envelope) return
+    submittedReference.current = false
 
     if (envelope.ok) {
-      onSuccessRef.current?.(envelope.data)
+      onSuccessReference.current?.(envelope.data)
     } else {
-      onErrorRef.current?.({ error: envelope.error, status: envelope.status })
+      onErrorReference.current?.({ error: envelope.error, status: envelope.status })
     }
   }, [isIdle, envelope])
 
   const submit = useCallback(
-    (args?: SubmitArgs<TBody, TParams>) => {
-      const { body, skipAuth, ...params } = (args ?? {}) as Record<
-        string,
-        unknown
-      >
+    (arguments_?: SubmitArguments<TBody, TParameters>) => {
+      const { body, skipAuth, ...parameters } = (arguments_ ?? {}) as Record<string, unknown>
 
       const payload: ProxyPayload = {
         method: config.method,
-        url: config.getUrl(params as TParams),
+        url: config.getUrl(parameters as TParameters),
       }
       if (body !== undefined) {
         payload.body = body as JsonValue
@@ -111,7 +104,7 @@ export function useApiProxy<
         payload.skipAuth = true
       }
 
-      submittedRef.current = true
+      submittedReference.current = true
 
       void fetcherSubmit(payload, {
         action: '/api/proxy',

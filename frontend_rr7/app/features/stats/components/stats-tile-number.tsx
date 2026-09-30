@@ -17,30 +17,31 @@
  *
  */
 
-import { useEffect, useRef } from 'react'
+import { useState } from 'react'
 
 import { AnimateNumber } from '~/components/ui/animations/animate-number'
 
 import { StatsTileWrapper } from './stats-tile-wrapper'
 
-type Props = {
+type Properties = {
   label: string
   standalone?: boolean
   value: number
 }
 
-export const StatsTileNumber = ({ label, standalone = true, value }: Props) => {
-  const previousValue = useRef<number>(0)
-  useEffect(() => {
-    previousValue.current = value
-  }, [value])
+export const StatsTileNumber = ({ label, standalone = true, value }: Properties) => {
+  // Animate from the previous value to the new value
+  const [animation, setAnimation] = useState({ from: 0, to: value })
+  if (!Object.is(animation.to, value)) {
+    setAnimation({ from: animation.to, to: value })
+  }
 
   return (
     <StatsTileWrapper standalone={standalone}>
       <div className="stat h-fit">
         <div className="stat-title">{label}</div>
         <div className="stat-value text-2xl">
-          <AnimateNumber from={previousValue.current} to={value} />
+          <AnimateNumber from={animation.from} to={value} />
         </div>
       </div>
     </StatsTileWrapper>

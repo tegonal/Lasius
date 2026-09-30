@@ -32,24 +32,23 @@ import { formatISOLocale } from '~/lib/utils/dates'
 import { stringHash } from '~/lib/utils/string-hash'
 import { type ModelsCurrentUserTimeBooking } from '~/services/api/lasius'
 
-type Props = {
+type Properties = {
   item: ModelsCurrentUserTimeBooking
   selectedOrgId: string
 }
 
-export const OrganisationItemContext = ({ item, selectedOrgId }: Props) => {
+export const OrganisationItemContext = ({ item, selectedOrgId }: Properties) => {
   const itemHash = stringHash(item)
   const { handleCloseAll } = useContextMenu()
   const stopAndStart = useStopAndStart()
 
   const handleStart = () => {
     if (!item.booking) return
+    const start = formatISOLocale(roundToNearestMinutes(new Date(), { roundingMethod: 'floor' }))
     stopAndStart.submit({
       orgId: selectedOrgId,
       projectId: item.booking.projectReference.id,
-      start: formatISOLocale(
-        roundToNearestMinutes(new Date(), { roundingMethod: 'floor' }),
-      ),
+      start,
       tags: item.booking.tags,
     })
     handleCloseAll()

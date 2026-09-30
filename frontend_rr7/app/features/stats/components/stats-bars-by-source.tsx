@@ -23,7 +23,7 @@ import { type BarChartGroupMode, BarsHours } from './bars-hours'
 import { EmptyStateStats } from './empty-state-stats'
 import { StatsTile } from './stats-tile'
 
-type StatsBarsBySourceProps = {
+type StatsBarsBySourceProperties = {
   chartData:
     | undefined
     | {
@@ -34,10 +34,7 @@ type StatsBarsBySourceProps = {
   groupMode: BarChartGroupMode
 }
 
-export const StatsBarsBySource = ({
-  chartData,
-  groupMode,
-}: StatsBarsBySourceProps) => {
+export const StatsBarsBySource = ({ chartData, groupMode }: StatsBarsBySourceProperties) => {
   if (!chartData?.data || chartData.data.length === 0) {
     return (
       <StatsTile className="h-[240px]">

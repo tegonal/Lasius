@@ -23,19 +23,22 @@ import { useTranslation } from 'react-i18next'
 
 import { type BurnoutMetrics } from '~/lib/api/functions/compute-work-health-metrics.server'
 import { decimalHoursToDurationString } from '~/lib/utils/duration'
-import { useStatsTileTimeAsDecimals } from '~/stores/ui-store'
+import { useShouldShowStatsTileTimeAsDecimals } from '~/stores/ui-store'
 
-type Props = {
+type Properties = {
   burnoutMetrics: BurnoutMetrics | null
   plannedWeeklyHours: number
 }
 
-export const WorkloadIndicator = ({
-  burnoutMetrics,
-  plannedWeeklyHours,
-}: Props) => {
+const WorkloadLevelIcon = ({ level }: { level: BurnoutMetrics['level'] }) => {
+  if (level === 'healthy') return <Smile className="h-6 w-6" />
+  if (level === 'risk') return <Coffee className="h-6 w-6" />
+  return <Zap className="h-6 w-6" />
+}
+
+export const WorkloadIndicator = ({ burnoutMetrics, plannedWeeklyHours }: Properties) => {
   const { t } = useTranslation('dashboard')
-  const showDecimalHours = useStatsTileTimeAsDecimals()
+  const isShowDecimalHours = useShouldShowStatsTileTimeAsDecimals()
 
   if (!burnoutMetrics) {
     return null
@@ -46,25 +49,14 @@ export const WorkloadIndicator = ({
   }
 
   // Only show healthy message if at least 80% of planned hours are reached
-  if (
-    burnoutMetrics.level === 'healthy' &&
-    burnoutMetrics.weeklyHours < plannedWeeklyHours * 0.8
-  ) {
+  if (burnoutMetrics.level === 'healthy' && burnoutMetrics.weeklyHours < plannedWeeklyHours * 0.8) {
     return null
   }
 
   const formatHours = (value: number) =>
-    showDecimalHours
-      ? round(value, 2).toString()
-      : decimalHoursToDurationString(value)
+    isShowDecimalHours ? round(value, 2).toString() : decimalHoursToDurationString(value)
 
   const hoursText = `${formatHours(burnoutMetrics.weeklyHours)}/${formatHours(burnoutMetrics.plannedHours)}`
-
-  const getIcon = () => {
-    if (burnoutMetrics.level === 'healthy') return Smile
-    if (burnoutMetrics.level === 'risk') return Coffee
-    return Zap
-  }
 
   const getColor = () => {
     if (burnoutMetrics.level === 'healthy') return 'text-success'
@@ -90,30 +82,22 @@ export const WorkloadIndicator = ({
 
   const getReminder = () => {
     if (burnoutMetrics.level === 'risk') {
-      return t(
-        'dashboard:workHealth.relaxReminder',
-        'Time to relax a little bit',
-      )
+      return t('dashboard:workHealth.relaxReminder', 'Time to relax a little bit')
     }
     return t('dashboard:workHealth.takeItEasy', 'Consider taking it easy')
   }
 
-  const Icon = getIcon()
-
   return (
-    <div
-      className={`${getBgColor()} rounded-lg p-4 transition-all duration-300 hover:shadow-sm`}
-    >
+    <div className={`${getBgColor()} rounded-lg p-4 transition-all duration-300 hover:shadow-sm`}>
       <div className="flex items-start gap-3">
         <div className={`${getColor()} flex-shrink-0`}>
-          <Icon className="h-6 w-6" />
+          <WorkloadLevelIcon level={burnoutMetrics.level} />
         </div>
         <div className="flex-1">
           <h3 className="font-semibold">{getMessage()}</h3>
           <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm opacity-80">
             <span>
-              <strong>{hoursText}</strong>{' '}
-              {t('dashboard:workHealth.thisWeek', 'this week')}
+              <strong>{hoursText}</strong> {t('dashboard:workHealth.thisWeek', 'this week')}
             </span>
             {burnoutMetrics.consecutiveDays >= 6 && (
               <span>

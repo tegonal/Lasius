@@ -76,32 +76,23 @@ const headingVariants = cva('', {
   },
 })
 
-export interface HeadingProps
-  extends
-    React.HTMLAttributes<HTMLHeadingElement>,
-    VariantProps<typeof headingVariants> {
+export interface HeadingProperties
+  extends React.HTMLAttributes<HTMLHeadingElement>, VariantProps<typeof headingVariants> {
   as?: HeadingElement
   children: React.ReactNode
 }
 
 type HeadingElement = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
 
-export const Heading = React.forwardRef<HTMLHeadingElement, HeadingProps>(
-  (
-    { align, as = 'h2', children, className, size, tone, variant, ...props },
-    ref,
-  ) => {
+export const Heading = React.forwardRef<HTMLHeadingElement, HeadingProperties>(
+  ({ align, as = 'h2', children, className, size, tone, variant, ...properties }, reference) => {
     const Component = as
 
     return (
       <Component
-        className={cn(
-          headingVariants({ align, size, tone, variant }),
-          className,
-        )}
-        ref={ref}
-        {...props}
-      >
+        className={cn(headingVariants({ align, size, tone, variant }), className)}
+        ref={reference}
+        {...properties}>
         {children}
       </Component>
     )

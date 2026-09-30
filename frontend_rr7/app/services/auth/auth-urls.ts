@@ -22,7 +22,7 @@ import { href } from 'react-router'
 import { type AuthProvider } from './types'
 
 /** Params carried through the internal auth flow (login ↔ register) */
-interface InternalAuthParams {
+interface InternalAuthParameters {
   email?: string
   invitation_id?: string
   registered?: boolean
@@ -30,23 +30,20 @@ interface InternalAuthParams {
 }
 
 /** Build `/internal-oauth/login` URL with full auth params. */
-export function internalLoginUrl(params?: InternalAuthParams): string {
-  return `${href('/internal-oauth/login')}${buildQuery({ ...params })}`
+export function internalLoginUrl(parameters?: InternalAuthParameters): string {
+  return `${href('/internal-oauth/login')}${buildQuery({ ...parameters })}`
 }
 
 /** Build `/internal-oauth/register` URL with invitation context. */
 export function internalRegisterUrl(
-  params?: Pick<InternalAuthParams, 'invitation_id' | 'returnTo'>,
+  parameters?: Pick<InternalAuthParameters, 'invitation_id' | 'returnTo'>,
 ): string {
-  return `${href('/internal-oauth/register')}${buildQuery({ ...params })}`
+  return `${href('/internal-oauth/register')}${buildQuery({ ...parameters })}`
 }
 
 /** Build `/login` URL with optional returnTo or error params. */
-export function loginUrl(params?: {
-  error?: string
-  returnTo?: string
-}): string {
-  return `${href('/login')}${buildQuery(params ?? {})}`
+export function loginUrl(parameters?: { error?: string; returnTo?: string }): string {
+  return `${href('/login')}${buildQuery(parameters ?? {})}`
 }
 
 /** Build `/logout` URL. */
@@ -64,13 +61,13 @@ export function logoutUrl(): string {
  */
 export function providerLoginUrl(
   provider: AuthProvider,
-  params?: Pick<InternalAuthParams, 'email' | 'invitation_id' | 'returnTo'>,
+  parameters?: Pick<InternalAuthParameters, 'email' | 'invitation_id' | 'returnTo'>,
 ): string {
   if (provider === 'internal') {
-    return `${href('/internal-oauth/login')}${buildQuery({ ...params })}`
+    return `${href('/internal-oauth/login')}${buildQuery({ ...parameters })}`
   }
   return `${href('/oauth/:provider/login', { provider })}${buildQuery({
-    returnTo: params?.returnTo,
+    returnTo: parameters?.returnTo,
   })}`
 }
 
@@ -78,14 +75,12 @@ export function providerLoginUrl(
  * Build a query string from params, omitting falsy values.
  * Returns `?key=value&...` or empty string when no params are set.
  */
-function buildQuery(
-  entries: Record<string, boolean | string | undefined>,
-): string {
-  const params = new URLSearchParams()
+function buildQuery(entries: Record<string, boolean | string | undefined>): string {
+  const parameters = new URLSearchParams()
   for (const [key, value] of Object.entries(entries)) {
-    if (value === undefined || value === '' || value === false) continue
-    params.set(key, typeof value === 'boolean' ? 'true' : value)
+    if (!value) continue
+    parameters.set(key, typeof value === 'boolean' ? 'true' : value)
   }
-  const qs = params.toString()
+  const qs = parameters.toString()
   return qs ? `?${qs}` : ''
 }

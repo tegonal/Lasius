@@ -19,10 +19,7 @@
 
 import { type BarTooltipProps, ResponsiveBar } from '@nivo/bar'
 
-import {
-  TooltipContainer,
-  TooltipItem,
-} from '~/components/ui/charts/chart-tooltips'
+import { TooltipContainer, TooltipItem } from '~/components/ui/charts/chart-tooltips'
 import {
   getContrastLabelTextColor,
   nivoTheme,
@@ -30,11 +27,21 @@ import {
 } from '~/components/ui/charts/nivo-theme'
 import { type NivoChartDataType } from '~/lib/api/functions/get-nivo-chart-data-from-api-stats-data'
 
-type Props = {
+type Properties = {
   stats: { data: NivoChartDataType | undefined }
 }
 
-export const BarsTags = ({ stats }: Props) => {
+const TagsBarTooltip = (properties: BarTooltipProps<{ id: string; value: number }>) => (
+  <TooltipContainer>
+    <TooltipItem
+      color={properties.color}
+      label={String(properties.indexValue)}
+      value={`${properties.value}h`}
+    />
+  </TooltipContainer>
+)
+
+export const BarsTags = ({ stats }: Properties) => {
   const nivoColors = useNivoColors()
   const { data } = stats
   if (!data) return null
@@ -47,8 +54,8 @@ export const BarsTags = ({ stats }: Props) => {
       }}
       axisLeft={{
         format: (value: number | string) => {
-          const strValue = String(value)
-          return strValue.length > 16 ? `${strValue.slice(0, 16)}...` : strValue
+          const stringValue = String(value)
+          return stringValue.length > 16 ? `${stringValue.slice(0, 16)}...` : stringValue
         },
         tickPadding: 5,
         tickRotation: 0,
@@ -77,15 +84,7 @@ export const BarsTags = ({ stats }: Props) => {
       margin={{ bottom: 60, left: 140, right: 50, top: 60 }}
       padding={0.3}
       theme={nivoTheme}
-      tooltip={(props: BarTooltipProps<{ id: string; value: number }>) => (
-        <TooltipContainer>
-          <TooltipItem
-            color={props.color}
-            label={String(props.indexValue)}
-            value={`${props.value}h`}
-          />
-        </TooltipContainer>
-      )}
+      tooltip={TagsBarTooltip}
       valueScale={{ type: 'linear' }}
     />
   )

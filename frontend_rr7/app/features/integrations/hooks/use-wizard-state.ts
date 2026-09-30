@@ -73,22 +73,22 @@ export const useWizardState = () => {
   const [state, setState] = useState<WizardState>(createInitialState)
 
   const updateFormData = (data: Partial<WizardFormData>) => {
-    setState((prev) => ({
-      ...prev,
-      formData: { ...prev.formData, ...data },
+    setState((previous) => ({
+      ...previous,
+      formData: { ...previous.formData, ...data },
     }))
   }
 
   const setCurrentStep = (step: WizardStep) => {
-    setState((prev) => ({ ...prev, currentStep: step }))
+    setState((previous) => ({ ...previous, currentStep: step }))
   }
 
   const setCreatedConfig = (config: ModelsIssueImporterConfigResponse) => {
-    setState((prev) => ({ ...prev, createdConfig: config }))
+    setState((previous) => ({ ...previous, createdConfig: config }))
   }
 
   const setAvailableProjects = (projects: ModelsExternalProject[]) => {
-    setState((prev) => ({ ...prev, availableProjects: projects }))
+    setState((previous) => ({ ...previous, availableProjects: projects }))
   }
 
   const resetWizard = () => {

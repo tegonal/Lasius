@@ -46,8 +46,5 @@ export async function loader({ request }: Route.LoaderArgs) {
     { 'Cache-Control': 'no-store' },
   )
 
-  return data(
-    { authenticated: true, expiresAt: result.tokens.expiresAt },
-    { headers },
-  )
+  return data({ authenticated: true, expiresAt: result.tokens.expiresAt }, { headers })
 }

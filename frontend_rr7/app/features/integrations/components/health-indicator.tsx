@@ -21,12 +21,12 @@ import { useTranslation } from 'react-i18next'
 
 import { type ModelsConnectivityStatus } from '~/services/api/lasius'
 
-type Props = {
+type Properties = {
   size?: 'md' | 'sm'
   status: ModelsConnectivityStatus
 }
 
-export const HealthIndicator = ({ size = 'sm', status }: Props) => {
+export const HealthIndicator = ({ size = 'sm', status }: Properties) => {
   const { t } = useTranslation('integrations')
 
   const getStatusColor = () => {

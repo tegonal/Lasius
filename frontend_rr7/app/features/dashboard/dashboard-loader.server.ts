@@ -25,11 +25,7 @@ import {
 } from '~/lib/organisation-helpers.server'
 import { formatISOLocale } from '~/lib/utils/dates'
 import { type ModelsBooking } from '~/services/api/lasius'
-import {
-  authHeaders,
-  mergeAuthHeaders,
-  requireUser,
-} from '~/services/auth/auth-helpers.server'
+import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
 
 /**
  * Shared context extracted from all dashboard period loaders.
@@ -47,19 +43,17 @@ export const loadDashboardContext = async (request: Request) => {
   const selectedOrgId = getSelectedOrganisationId(user)
 
   // Extract planned working hours for the selected org
-  const selectedOrg = organisations.find(
-    (o) => o.organisationReference.id === selectedOrgId,
-  )
+  const selectedOrg = organisations.find((o) => o.organisationReference.id === selectedOrgId)
   const plannedHours = selectedOrg?.plannedWorkingHours
     ? { ...selectedOrg.plannedWorkingHours }
     : null
 
   // Read selected date from URL search param, fall back to today
   const url = new URL(request.url)
-  const dateParam = url.searchParams.get('date')
+  const dateParameter = url.searchParams.get('date')
   const selectedDate =
-    dateParam && !Number.isNaN(new Date(dateParam).getTime())
-      ? dateParam
+    dateParameter && !Number.isNaN(new Date(dateParameter).getTime())
+      ? dateParameter
       : formatISOLocale(new Date())
 
   return {
@@ -75,15 +69,9 @@ export const loadDashboardContext = async (request: Request) => {
 /**
  * Compute the standard stats object from bookings and expected hours.
  */
-export const computeDashboardStats = (
-  bookings: ModelsBooking[],
-  expectedHours: number,
-) => {
+export const computeDashboardStats = (bookings: ModelsBooking[], expectedHours: number) => {
   const summary = getModelsBookingSummary(bookings)
-  const { fulfilledPercentage } = getExpectedVsBookedPercentage(
-    expectedHours,
-    summary.hours,
-  )
+  const { fulfilledPercentage } = getExpectedVsBookedPercentage(expectedHours, summary.hours)
   return {
     bookings: summary.elements,
     expectedHours,
@@ -95,6 +83,5 @@ export const computeDashboardStats = (
 /**
  * Return merged auth headers for the loader response.
  */
-export const dashboardResponseHeaders = (
-  auth: Awaited<ReturnType<typeof requireUser>>,
-) => mergeAuthHeaders(auth)
+export const dashboardResponseHeaders = (auth: Awaited<ReturnType<typeof requireUser>>) =>
+  mergeAuthHeaders(auth)

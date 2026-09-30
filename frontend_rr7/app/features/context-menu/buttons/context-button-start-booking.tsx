@@ -22,14 +22,11 @@ import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
-import {
-  type ModelsBooking,
-  type ModelsBookingStub,
-} from '~/services/api/lasius'
+import { type ModelsBooking, type ModelsBookingStub } from '~/services/api/lasius'
 
 import { ContextButtonWrapper } from '../context-button-wrapper'
 
-type Props = {
+type Properties = {
   'data-testid'?: string
   item: ModelsBooking | ModelsBookingStub
   onStart?: () => void
@@ -41,7 +38,7 @@ export const ContextButtonStartBooking = ({
   item: _item,
   onStart,
   variant = 'default',
-}: Props) => {
+}: Properties) => {
   const { t } = useTranslation('bookings')
 
   return (
@@ -53,8 +50,7 @@ export const ContextButtonStartBooking = ({
         onClick={onStart}
         shape="circle"
         title={t('actions.start', 'Start booking')}
-        variant="contextIcon"
-      >
+        variant="contextIcon">
         <LucideIcon icon={Timer} size={24} />
       </Button>
     </ContextButtonWrapper>

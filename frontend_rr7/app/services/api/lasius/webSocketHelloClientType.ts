@@ -6,9 +6,9 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type WebSocketHelloClientType = typeof WebSocketHelloClientType[keyof typeof WebSocketHelloClientType];
-
+export type WebSocketHelloClientType =
+  (typeof WebSocketHelloClientType)[keyof typeof WebSocketHelloClientType]
 
 export const WebSocketHelloClientType = {
   HelloClient: 'HelloClient',
-} as const;
+} as const

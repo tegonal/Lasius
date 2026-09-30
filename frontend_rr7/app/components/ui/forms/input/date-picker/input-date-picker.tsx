@@ -17,16 +17,10 @@
  *
  */
 
-/* eslint-disable react-compiler/react-compiler -- Form integration effects have intentionally partial deps */
 import { type FieldMetadata } from '@conform-to/react'
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
 import { isEqual } from 'date-fns'
-import {
-  CalendarIcon,
-  type LucideIcon as LucideIconType,
-  RotateCcw,
-  X,
-} from 'lucide-react'
+import { CalendarIcon, type LucideIcon as LucideIconType, RotateCcw, X } from 'lucide-react'
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -44,7 +38,7 @@ import {
   useDatePickerStore,
 } from './store/use-date-picker-store'
 
-export type InputDatePickerProps = {
+export type InputDatePickerProperties = {
   field: FieldMetadata<string>
   onChange?: (isoString: string) => void
   onRenderLabelAction?: (resetButton: React.ReactNode) => void
@@ -56,12 +50,12 @@ export type InputDatePickerProps = {
   withTime?: boolean
 }
 
-export const InputDatePicker = (props: InputDatePickerProps) => {
+export const InputDatePicker = (properties: InputDatePickerProperties) => {
   const store = useMemo(() => createDatePickerStore(), [])
 
   return (
     <DatePickerStoreContext.Provider value={store}>
-      <DatePickerBridge {...props} />
+      <DatePickerBridge {...properties} />
     </DatePickerStoreContext.Provider>
   )
 }
@@ -76,37 +70,26 @@ const DatePickerBridge = ({
   value: externalValue,
   withDate = true,
   withTime = true,
-}: InputDatePickerProps) => {
-  const {
-    getISOString,
-    resetToInitial,
-    setFromISOString,
-    setInitialValue,
-    value,
-  } = useDatePickerStore()
-  const isInitializedRef = useRef(false)
-  const initialDateRef = useRef<Date | null>(null)
+}: InputDatePickerProperties) => {
+  const { getISOString, resetToInitial, setFromISOString, setInitialValue, value } =
+    useDatePickerStore()
+  const isInitializedReference = useRef(false)
 
   // The effective value — from parent's useInputControl or fall back to field default
   const fieldValue = externalValue ?? ''
 
   // Initialize store from field value only once
   useEffect(() => {
-    if (!isInitializedRef.current && fieldValue) {
-      setFromISOString(fieldValue)
-      setInitialValue(fieldValue)
-      const initialDate = new Date(fieldValue)
-      if (!Number.isNaN(initialDate.getTime())) {
-        initialDateRef.current = initialDate
-      }
-      isInitializedRef.current = true
-    }
+    if (isInitializedReference.current || !fieldValue) return
+    setFromISOString(fieldValue)
+    setInitialValue(fieldValue)
+    isInitializedReference.current = true
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fieldValue])
 
   // Sync external value changes to store (e.g. duration changed the end time)
   useEffect(() => {
-    if (!isInitializedRef.current) return
+    if (!isInitializedReference.current) return
     const currentISOString = getISOString()
     if (fieldValue !== currentISOString && fieldValue) {
       setFromISOString(fieldValue)
@@ -116,7 +99,7 @@ const DatePickerBridge = ({
 
   // Update parent when store produces a valid date
   useEffect(() => {
-    if (!isInitializedRef.current) return
+    if (!isInitializedReference.current) return
 
     if (value.isValid && !value.isPartial) {
       const isoString = getISOString()
@@ -130,17 +113,18 @@ const DatePickerBridge = ({
   }, [getISOString()])
 
   const handlePresetClick = () => {
-    if (presetDate) {
-      setFromISOString(presetDate)
-      onChange?.(presetDate)
+    if (!presetDate) {
+      return
     }
+
+    setFromISOString(presetDate)
+    onChange?.(presetDate)
   }
 
   return (
     <>
       <input name={field.name} type="hidden" value={fieldValue} />
       <DatePickerUI
-        initialDateRef={initialDateRef}
         onPresetClick={handlePresetClick}
         onRenderLabelAction={onRenderLabelAction}
         presetDate={presetDate}
@@ -160,8 +144,7 @@ const DatePickerBridge = ({
 // Shared UI (pure presentation)
 // ---------------------------------------------------------------------------
 
-type DatePickerUIProps = SharedPickerProps & {
-  initialDateRef: React.RefObject<Date | null>
+type DatePickerUIProperties = SharedPickerProperties & {
   onPresetClick: () => void
   resetToInitial: () => void
   value: {
@@ -173,7 +156,7 @@ type DatePickerUIProps = SharedPickerProps & {
   }
 }
 
-type SharedPickerProps = {
+type SharedPickerProperties = {
   onRenderLabelAction?: (resetButton: React.ReactNode) => void
   presetDate?: IsoDateString
   presetIcon?: LucideIconType
@@ -183,7 +166,6 @@ type SharedPickerProps = {
 }
 
 const DatePickerUI = ({
-  initialDateRef,
   onPresetClick,
   onRenderLabelAction,
   presetDate,
@@ -193,16 +175,14 @@ const DatePickerUI = ({
   value,
   withDate = true,
   withTime = true,
-}: DatePickerUIProps) => {
+}: DatePickerUIProperties) => {
   const { t } = useTranslation('common')
-  const { setFromISOString } = useDatePickerStore()
+  const { initialValue, setFromISOString } = useDatePickerStore()
+  const initialDate = initialValue.date
 
   const hasPreset = presetDate && presetLabel && PresetIcon
 
-  const handleCalendarDateChange = (
-    selectedDate: IsoDateString,
-    close: () => void,
-  ) => {
+  const handleCalendarDateChange = (selectedDate: IsoDateString, close: () => void) => {
     setFromISOString(selectedDate)
     close()
   }
@@ -212,16 +192,11 @@ const DatePickerUI = ({
   }, [resetToInitial])
 
   const dateTimeHasChanged =
-    initialDateRef.current &&
-    value.date &&
-    value.isValid &&
-    !isEqual(initialDateRef.current, value.date)
+    initialDate && value.date && value.isValid && !isEqual(initialDate, value.date)
 
   const showResetButton =
     dateTimeHasChanged ||
-    (!value.isValid &&
-      !value.isPartial &&
-      (value.dateString || value.timeString))
+    (!value.isValid && !value.isPartial && (value.dateString || value.timeString))
 
   const resetButtonElement = useMemo(
     () =>
@@ -234,8 +209,7 @@ const DatePickerUI = ({
           size="sm"
           title={t('actions.resetToInitial', 'Reset to initial value')}
           type="button"
-          variant="ghost"
-        >
+          variant="ghost">
           <LucideIcon icon={RotateCcw} size={16} />
         </Button>
       ) : null,
@@ -264,27 +238,22 @@ const DatePickerUI = ({
                       fullWidth={false}
                       join
                       type="button"
-                      variant="neutral"
-                    >
+                      variant="neutral">
                       <LucideIcon icon={CalendarIcon} size={20} />
                     </PopoverButton>
                     <PopoverPanel
                       anchor="bottom start"
-                      className="bg-base-100 border-base-300 z-50 w-[360px] rounded-lg border shadow-lg [--anchor-gap:8px]"
-                    >
+                      className="bg-base-100 border-base-300 z-50 w-[360px] rounded-lg border shadow-lg [--anchor-gap:8px]">
                       {({ close }) => (
                         <div className="relative p-4 pr-12">
                           <button
                             aria-label={t('actions.close', 'Close')}
                             className="btn btn-ghost btn-sm btn-circle absolute top-2 right-2"
-                            onClick={() => close()}
-                          >
+                            onClick={() => close()}>
                             <LucideIcon icon={X} size={16} />
                           </button>
                           <CalendarDisplay
-                            onChange={(date) =>
-                              handleCalendarDateChange(date, close)
-                            }
+                            onChange={(date) => handleCalendarDateChange(date, close)}
                             value={formatISOLocale(value.date || new Date())}
                           />
                         </div>
@@ -302,8 +271,7 @@ const DatePickerUI = ({
                       size="sm"
                       title={presetLabel}
                       type="button"
-                      variant="ghost"
-                    >
+                      variant="ghost">
                       <LucideIcon icon={PresetIcon} size={20} />
                     </Button>
                   )}
@@ -326,8 +294,7 @@ const DatePickerUI = ({
                   onClick={onPresetClick}
                   title={presetLabel}
                   type="button"
-                  variant="neutral"
-                >
+                  variant="neutral">
                   <LucideIcon icon={PresetIcon} size={20} />
                 </Button>
               )

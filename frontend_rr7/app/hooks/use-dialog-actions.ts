@@ -28,12 +28,12 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 export const useDialogActions = () => {
   const [isHovered, setIsHovered] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
-  const dialogRef = useRef<HTMLDialogElement>(null)
+  const dialogReference = useRef<HTMLDialogElement>(null)
 
-  const showExpanded = isHovered || isExpanded
+  const isShowExpanded = isHovered || isExpanded
 
   const handleToggle = useCallback(() => {
-    setIsExpanded((prev) => !prev)
+    setIsExpanded((previous) => !previous)
   }, [])
 
   const collapse = useCallback(() => {
@@ -43,16 +43,16 @@ export const useDialogActions = () => {
 
   // Sync dialog open/close with isExpanded state
   useEffect(() => {
-    if (isExpanded && dialogRef.current && !dialogRef.current.open) {
-      dialogRef.current.show()
-    } else if (!isExpanded && dialogRef.current?.open) {
-      dialogRef.current.close()
+    if (isExpanded && dialogReference.current && !dialogReference.current.open) {
+      dialogReference.current.show()
+    } else if (!isExpanded && dialogReference.current?.open) {
+      dialogReference.current.close()
     }
   }, [isExpanded])
 
   // Handle dialog close event (triggered by ESC key)
   useEffect(() => {
-    const dialog = dialogRef.current
+    const dialog = dialogReference.current
     if (!dialog) return
 
     const handleClose = () => {
@@ -71,13 +71,12 @@ export const useDialogActions = () => {
     if (!isExpanded) return
 
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dialogRef.current &&
-        !dialogRef.current.contains(event.target as Node)
-      ) {
-        setIsExpanded(false)
-        setIsHovered(false)
+      if (!dialogReference.current || dialogReference.current.contains(event.target as Node)) {
+        return
       }
+
+      setIsExpanded(false)
+      setIsHovered(false)
     }
 
     const timeoutId = setTimeout(() => {
@@ -92,11 +91,11 @@ export const useDialogActions = () => {
 
   return {
     collapse,
-    dialogRef,
+    dialogRef: dialogReference,
     handleToggle,
     isExpanded,
     isHovered,
     setIsHovered,
-    showExpanded,
+    showExpanded: isShowExpanded,
   }
 }

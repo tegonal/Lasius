@@ -17,13 +17,7 @@
  *
  */
 
-import {
-  createContext,
-  type ReactNode,
-  useCallback,
-  useContext,
-  useState,
-} from 'react'
+import { createContext, type ReactNode, useCallback, useContext, useMemo, useState } from 'react'
 
 type ContextMenuState = {
   currentOpenContextMenuId: null | string
@@ -34,9 +28,7 @@ type ContextMenuState = {
 const ContextMenuContext = createContext<ContextMenuState | null>(null)
 
 export const ContextMenuProvider = ({ children }: { children: ReactNode }) => {
-  const [currentOpenContextMenuId, setCurrentOpenContextMenuId] = useState<
-    null | string
-  >(null)
+  const [currentOpenContextMenuId, setCurrentOpenContextMenuId] = useState<null | string>(null)
 
   const handleOpenContextMenu = useCallback((hash: string) => {
     setCurrentOpenContextMenuId(hash)
@@ -46,17 +38,16 @@ export const ContextMenuProvider = ({ children }: { children: ReactNode }) => {
     setCurrentOpenContextMenuId(null)
   }, [])
 
-  return (
-    <ContextMenuContext.Provider
-      value={{
-        currentOpenContextMenuId,
-        handleCloseAll,
-        handleOpenContextMenu,
-      }}
-    >
-      {children}
-    </ContextMenuContext.Provider>
+  const contextValue = useMemo(
+    () => ({
+      currentOpenContextMenuId,
+      handleCloseAll,
+      handleOpenContextMenu,
+    }),
+    [currentOpenContextMenuId, handleCloseAll, handleOpenContextMenu],
   )
+
+  return <ContextMenuContext.Provider value={contextValue}>{children}</ContextMenuContext.Provider>
 }
 
 export const useContextMenu = (): ContextMenuState => {

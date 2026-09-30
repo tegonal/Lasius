@@ -19,7 +19,7 @@
 
 import { cn } from '~/lib/utils/cn'
 
-type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+type Properties = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   children: React.ReactNode
   className?: string
   disabled?: boolean
@@ -32,7 +32,7 @@ export const CardSmall = ({
   disabled = false,
   onClick,
   ...rest
-}: Props) => {
+}: Properties) => {
   return (
     <button
       className={cn(
@@ -43,8 +43,7 @@ export const CardSmall = ({
       )}
       disabled={disabled}
       onClick={onClick}
-      {...rest}
-    >
+      {...rest}>
       {children}
     </button>
   )

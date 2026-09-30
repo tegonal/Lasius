@@ -22,21 +22,20 @@ import { useTranslation } from 'react-i18next'
 import { ImporterTypeIcon } from '~/features/issue-importers/importer-type-icon'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 
-type Props = {
+type Properties = {
   onSelectPlatform: (type: ImporterType) => void
 }
 
 const PLATFORMS: ImporterType[] = ['github', 'gitlab', 'jira', 'plane']
 
-export const SelectPlatformStep = ({ onSelectPlatform }: Props) => {
+export const SelectPlatformStep = ({ onSelectPlatform }: Properties) => {
   const { t } = useTranslation('integrations')
 
   const getPlatformDescription = (platform: ImporterType): string => {
     switch (platform) {
       case 'github': {
         return t('issueImporters.wizard.selectPlatform.githubDescription', {
-          defaultValue:
-            'Import issues and pull requests from GitHub repositories',
+          defaultValue: 'Import issues and pull requests from GitHub repositories',
         })
       }
       case 'gitlab': {
@@ -93,8 +92,7 @@ export const SelectPlatformStep = ({ onSelectPlatform }: Props) => {
             className="border-base-content/10 hover:border-primary hover:bg-base-200 flex items-start gap-4 rounded-lg border p-4 text-left transition-colors"
             key={platform}
             onClick={() => onSelectPlatform(platform)}
-            type="button"
-          >
+            type="button">
             <div className="bg-base-200 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg">
               <ImporterTypeIcon className="h-5 w-5" type={platform} />
             </div>

@@ -6,9 +6,9 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type ListGithubResourceOwners400Status = typeof ListGithubResourceOwners400Status[keyof typeof ListGithubResourceOwners400Status];
-
+export type ListGithubResourceOwners400Status =
+  (typeof ListGithubResourceOwners400Status)[keyof typeof ListGithubResourceOwners400Status]
 
 export const ListGithubResourceOwners400Status = {
   error: 'error',
-} as const;
+} as const

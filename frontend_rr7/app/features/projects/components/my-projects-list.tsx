@@ -36,13 +36,13 @@ import { type UserProjectWithActivity } from '~/types/common'
 
 export type ProjectStatusFilter = 'active' | 'both' | 'inactive'
 
-type Props = {
+type Properties = {
   projects: UserProjectWithActivity[]
   searchTerm: string
   statusFilter: ProjectStatusFilter
 }
 
-export const MyProjectsList = ({ projects, searchTerm }: Props) => {
+export const MyProjectsList = ({ projects, searchTerm }: Properties) => {
   const { t } = useTranslation()
 
   const filteredProjects = useMemo(() => {
@@ -64,19 +64,12 @@ export const MyProjectsList = ({ projects, searchTerm }: Props) => {
         <DataListRow>
           <DataListHeaderItem />
           <DataListHeaderItem>{t('forms.name', 'Name')}</DataListHeaderItem>
-          <DataListHeaderItem>
-            {t('projects:projectRole', 'Project role')}
-          </DataListHeaderItem>
-          <DataListHeaderItem>
-            {t('projects:lastActivity', 'Last activity')}
-          </DataListHeaderItem>
+          <DataListHeaderItem>{t('projects:projectRole', 'Project role')}</DataListHeaderItem>
+          <DataListHeaderItem>{t('projects:lastActivity', 'Last activity')}</DataListHeaderItem>
           <DataListHeaderItem />
         </DataListRow>
         {filteredProjects.map((item) => (
-          <DataListRow
-            data-testid="project-card"
-            key={item.projectReference.id}
-          >
+          <DataListRow data-testid="project-card" key={item.projectReference.id}>
             <DataListField width={90}>
               <AvatarProject name={item.projectReference.key} />
             </DataListField>

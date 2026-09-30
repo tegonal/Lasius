@@ -51,27 +51,18 @@ const dividerVariants = cva('divider', {
   },
 })
 
-export interface DividerProps
-  extends
-    Omit<HTMLAttributes<HTMLDivElement>, 'color'>,
-    VariantProps<typeof dividerVariants> {
+export interface DividerProperties
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'color'>, VariantProps<typeof dividerVariants> {
   text?: string
 }
 
-export const Divider = forwardRef<HTMLDivElement, DividerProps>(
-  (
-    { children, className, color, orientation, text, textAlign, ...props },
-    ref,
-  ) => {
+export const Divider = forwardRef<HTMLDivElement, DividerProperties>(
+  ({ children, className, color, orientation, text, textAlign, ...properties }, reference) => {
     return (
       <div
-        className={cn(
-          dividerVariants({ color, orientation, textAlign }),
-          className,
-        )}
-        ref={ref}
-        {...props}
-      >
+        className={cn(dividerVariants({ color, orientation, textAlign }), className)}
+        ref={reference}
+        {...properties}>
         {text || children}
       </div>
     )

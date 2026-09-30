@@ -17,15 +17,15 @@
  *
  */
 
-import { getServerEnvRequired } from '~/lib/env.server'
+import { getServerEnvironmentRequired } from '~/lib/environment.server'
 import { logger } from '~/lib/logger'
 
 import { type OAuthProvider, type TokenResponse } from '../types'
 
 export function createKeycloakProvider(): OAuthProvider {
-  const clientId = getServerEnvRequired('KEYCLOAK_OAUTH_CLIENT_ID')
-  const clientSecret = getServerEnvRequired('KEYCLOAK_OAUTH_CLIENT_SECRET')
-  const baseUrl = getServerEnvRequired('KEYCLOAK_OAUTH_URL')
+  const clientId = getServerEnvironmentRequired('KEYCLOAK_OAUTH_CLIENT_ID')
+  const clientSecret = getServerEnvironmentRequired('KEYCLOAK_OAUTH_CLIENT_SECRET')
+  const baseUrl = getServerEnvironmentRequired('KEYCLOAK_OAUTH_URL')
 
   const authorizationUrl = `${baseUrl}/protocol/openid-connect/auth`
   const tokenUrl = `${baseUrl}/protocol/openid-connect/token`
@@ -33,10 +33,7 @@ export function createKeycloakProvider(): OAuthProvider {
   const revokeUrl = `${baseUrl}/protocol/openid-connect/revoke`
 
   return {
-    async exchangeCode(
-      code: string,
-      redirectUri: string,
-    ): Promise<TokenResponse> {
+    async exchangeCode(code: string, redirectUri: string): Promise<TokenResponse> {
       const response = await fetch(tokenUrl, {
         body: new URLSearchParams({
           client_id: clientId,
@@ -68,12 +65,10 @@ export function createKeycloakProvider(): OAuthProvider {
       url.searchParams.set('scope', 'openid profile email')
       url.searchParams.set('state', state)
       url.searchParams.set('redirect_uri', redirectUri)
-      return url.toString()
+      return url.href
     },
 
-    async getUserProfile(
-      accessToken: string,
-    ): Promise<{ email: string; userId: string }> {
+    async getUserProfile(accessToken: string): Promise<{ email: string; userId: string }> {
       const response = await fetch(userinfoUrl, {
         headers: { Authorization: `Bearer ${accessToken}` },
       })
@@ -88,9 +83,7 @@ export function createKeycloakProvider(): OAuthProvider {
 
     provider: 'keycloak',
 
-    async refreshToken(
-      refreshTokenValue: string,
-    ): Promise<null | TokenResponse> {
+    async refreshToken(refreshTokenValue: string): Promise<null | TokenResponse> {
       try {
         const response = await fetch(tokenUrl, {
           body: new URLSearchParams({

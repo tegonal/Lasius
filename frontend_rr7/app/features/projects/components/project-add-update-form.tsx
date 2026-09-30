@@ -37,23 +37,20 @@ import { ModalDescription } from '~/components/ui/overlays/modal/modal-descripti
 import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { mergeErrors, validateFormData } from '~/lib/conform-helpers'
-import { type SchemaTranslationFn, untyped } from '~/lib/i18n-types'
+import { type SchemaTranslationFunction, untyped } from '~/lib/i18n-types'
 import { logger } from '~/lib/logger'
-import {
-  useCreateProject,
-  useUpdateProject,
-} from '~/services/api/lasius-hooks/projects/projects'
+import { useCreateProject, useUpdateProject } from '~/services/api/lasius-hooks/projects/projects'
 import { type ModelsProject } from '~/services/api/lasius/modelsProject'
 import { type ModelsUserProject } from '~/services/api/lasius/modelsUserProject'
 
-type Props = {
+type Properties = {
   item?: ModelsProject | ModelsUserProject
   mode: 'add' | 'update'
   onCancel: () => void
   onSave: () => void
 }
 
-const createProjectSchema = (t: SchemaTranslationFn) =>
+const createProjectSchema = (t: SchemaTranslationFunction) =>
   z.object({
     projectKey: z
       .string({
@@ -62,9 +59,7 @@ const createProjectSchema = (t: SchemaTranslationFn) =>
       .min(1, t('validation.projectKeyRequired', 'Project name is required')),
   })
 
-const getProjectKey = (
-  projectItem?: ModelsProject | ModelsUserProject,
-): string => {
+const getProjectKey = (projectItem?: ModelsProject | ModelsUserProject): string => {
   if (!projectItem) return ''
   if ('projectReference' in projectItem) {
     return projectItem.projectReference.key
@@ -72,9 +67,7 @@ const getProjectKey = (
   return projectItem.key
 }
 
-const getProjectId = (
-  projectItem?: ModelsProject | ModelsUserProject,
-): string => {
+const getProjectId = (projectItem?: ModelsProject | ModelsUserProject): string => {
   if (!projectItem) return ''
   if ('projectReference' in projectItem) {
     return projectItem.projectReference.id
@@ -82,12 +75,7 @@ const getProjectId = (
   return projectItem.id
 }
 
-export const ProjectAddUpdateForm = ({
-  item,
-  mode,
-  onCancel,
-  onSave,
-}: Props) => {
+export const ProjectAddUpdateForm = ({ item, mode, onCancel, onSave }: Properties) => {
   const { t } = useTranslation()
   const { addToast } = useToast()
   const { selectedOrganisationId } = useOrganisation()
@@ -105,16 +93,16 @@ export const ProjectAddUpdateForm = ({
     onSave()
   }
 
-  const duplicateErrorMsg = t(
+  const duplicateErrorMessage = t(
     'projects:errors.duplicateKey',
     'A project with this name already exists in your organisation',
   )
 
   const setDuplicateError = () => {
-    setServerErrors({ projectKey: [duplicateErrorMsg] })
+    setServerErrors({ projectKey: [duplicateErrorMessage] })
   }
 
-  const createProjectApi = useCreateProject({
+  const projectCreationApi = useCreateProject({
     onError: ({ error }) => {
       logger.error('Failed to create project', error)
       setDuplicateError()
@@ -128,7 +116,7 @@ export const ProjectAddUpdateForm = ({
     },
     onSuccess,
   })
-  const activeFetcher = mode === 'add' ? createProjectApi : updateProjectApi
+  const activeFetcher = mode === 'add' ? projectCreationApi : updateProjectApi
 
   const schema = useMemo(() => createProjectSchema(untyped(t)), [t])
 
@@ -145,16 +133,16 @@ export const ProjectAddUpdateForm = ({
     shouldValidate: 'onSubmit',
   })
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault()
 
-    const result = validateFormData(e.currentTarget, schema)
+    const result = validateFormData(event.currentTarget, schema)
     if (result.status !== 'success') return
 
     const { projectKey } = result.value
 
     if (mode === 'add') {
-      createProjectApi.submit({
+      projectCreationApi.submit({
         body: { bookingCategories: [], key: projectKey },
         orgId: selectedOrganisationId,
       })
@@ -167,10 +155,7 @@ export const ProjectAddUpdateForm = ({
     }
   }
 
-  const nameErrors = mergeErrors(
-    fields.projectKey.errors,
-    serverErrors.projectKey,
-  )
+  const nameErrors = mergeErrors(fields.projectKey.errors, serverErrors.projectKey)
 
   return (
     <div className="flex flex-col">
@@ -184,10 +169,7 @@ export const ProjectAddUpdateForm = ({
 
       <ModalDescription className="mb-4">
         {mode === 'add'
-          ? t(
-              'projects:description.add',
-              'Create a new project to organize your time tracking.',
-            )
+          ? t('projects:description.add', 'Create a new project to organize your time tracking.')
           : t('projects:description.edit', 'Update the project details.')}
       </ModalDescription>
 
@@ -203,8 +185,7 @@ export const ProjectAddUpdateForm = ({
             <FormElement
               htmlFor={fields.projectKey.id}
               label={t('projects:projectName', 'Project name')}
-              required
-            >
+              required>
               <Input
                 {...getInputProps(fields.projectKey, { type: 'text' })}
                 autoComplete="off"
@@ -220,16 +201,14 @@ export const ProjectAddUpdateForm = ({
               className="relative z-0"
               data-testid="project-form-save-btn"
               disabled={activeFetcher.isSubmitting}
-              type="submit"
-            >
+              type="submit">
               {t('actions.save', 'Save')}
             </Button>
             <Button
               data-testid="project-form-close-btn"
               onClick={onCancel}
               type="button"
-              variant="secondary"
-            >
+              variant="secondary">
               {t('actions.cancel', 'Cancel')}
             </Button>
           </ButtonGroup>

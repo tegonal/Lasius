@@ -21,12 +21,12 @@ import { type LucideIcon as LucideIconType } from 'lucide-react'
 
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 
-type EmptyStateProps = {
+type EmptyStateProperties = {
   icon: LucideIconType
   label: string
 }
 
-export const EmptyState = ({ icon, label }: EmptyStateProps) => {
+export const EmptyState = ({ icon, label }: EmptyStateProperties) => {
   return (
     <div className="flex h-full w-full flex-col items-center justify-center py-8">
       <div className="text-base-content/50 flex flex-col items-center justify-center gap-2 text-sm">

@@ -27,8 +27,8 @@ describe('stringHash', () => {
   })
 
   it('returns the same hash for identical objects', () => {
-    const obj = { name: 'test', value: 42 }
-    expect(stringHash(obj)).toBe(stringHash(obj))
+    const object = { name: 'test', value: 42 }
+    expect(stringHash(object)).toBe(stringHash(object))
   })
 
   it('returns different hashes for different objects', () => {
@@ -49,8 +49,8 @@ describe('stringHash', () => {
   })
 
   it('handles arrays', () => {
-    const arr = [1, 2, 3]
-    const hash = stringHash(arr)
+    const array = [1, 2, 3]
+    const hash = stringHash(array)
     expect(hash).toBeTruthy()
   })
 

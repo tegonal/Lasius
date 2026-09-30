@@ -17,19 +17,14 @@
  *
  */
 
-// @ts-nocheck
-import { ResponsivePie } from '@nivo/pie'
+import { type PieTooltipProps, ResponsivePie } from '@nivo/pie'
 
 import { type NivoChartDataType } from '~/lib/api/functions/get-nivo-chart-data-from-api-stats-data'
 
 import { TooltipContainer, TooltipItem } from './chart-tooltips'
-import {
-  getContrastLabelTextColor,
-  nivoTheme,
-  useNivoColors,
-} from './nivo-theme'
+import { getContrastLabelTextColor, nivoTheme, useNivoColors } from './nivo-theme'
 
-type Props = {
+type Properties = {
   stats: { data: NivoChartDataType | undefined }
 }
 
@@ -44,7 +39,13 @@ const pieTheme = {
   },
 }
 
-export const PieDiagram = ({ stats }: Props) => {
+const PieTooltip = ({ datum }: PieTooltipProps<NivoChartDataType[number]>) => (
+  <TooltipContainer>
+    <TooltipItem color={datum.color} label={String(datum.id)} value={`${datum.value}h`} />
+  </TooltipContainer>
+)
+
+export const PieDiagram = ({ stats }: Properties) => {
   const nivoColors = useNivoColors()
   const { data } = stats
   if (!data) return null
@@ -56,9 +57,8 @@ export const PieDiagram = ({ stats }: Props) => {
       arcLabelsRadiusOffset={0.55}
       arcLabelsSkipAngle={20}
       arcLabelsTextColor={getContrastLabelTextColor}
-      arcLinkLabel={(item) => `${item.id}`}
+      arcLinkLabel={(item) => String(item.id)}
       arcLinkLabelsColor={{ from: 'color' }}
-      arcLinkLabelsFontSize={16}
       arcLinkLabelsSkipAngle={12}
       arcLinkLabelsTextColor="var(--color-base-content)"
       arcLinkLabelsThickness={2}
@@ -69,15 +69,7 @@ export const PieDiagram = ({ stats }: Props) => {
       margin={{ bottom: 40, left: 80, right: 80, top: 40 }}
       padAngle={0.75}
       theme={pieTheme}
-      tooltip={({ datum }) => (
-        <TooltipContainer>
-          <TooltipItem
-            color={datum.color}
-            label={datum.id}
-            value={`${datum.value}h`}
-          />
-        </TooltipContainer>
-      )}
+      tooltip={PieTooltip}
     />
   )
 }

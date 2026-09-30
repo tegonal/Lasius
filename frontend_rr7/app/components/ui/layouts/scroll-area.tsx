@@ -35,10 +35,7 @@ export const ScrollArea = ({
 }) => {
   return (
     <BaseScrollArea.Root className={cn('min-h-0', className)} style={style}>
-      <BaseScrollArea.Viewport
-        className="h-full overscroll-contain"
-        onScroll={onScroll}
-      >
+      <BaseScrollArea.Viewport className="h-full overscroll-contain" onScroll={onScroll}>
         <BaseScrollArea.Content>{children}</BaseScrollArea.Content>
       </BaseScrollArea.Viewport>
       <BaseScrollArea.Scrollbar className="pointer-events-none m-0.5 flex w-1 justify-center rounded-sm opacity-0 transition-opacity data-[hovering]:pointer-events-auto data-[hovering]:opacity-100 data-[hovering]:delay-0 data-[scrolling]:pointer-events-auto data-[scrolling]:opacity-100 data-[scrolling]:duration-0">

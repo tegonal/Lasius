@@ -1,20 +1,7 @@
 /** @type {import("prettier").Options} */
 export default {
-  arrowParens: 'always',
-  bracketSameLine: false,
-  bracketSpacing: true,
-  embeddedLanguageFormatting: 'auto',
-  endOfLine: 'lf',
-  htmlWhitespaceSensitivity: 'css',
-  insertPragma: false,
-  jsxSingleQuote: false,
+  bracketSameLine: true,
   overrides: [
-    {
-      files: ['**/package.json'],
-      options: {
-        useTabs: false,
-      },
-    },
     {
       files: ['**/*.mdx'],
       options: {
@@ -24,16 +11,11 @@ export default {
     },
   ],
   plugins: ['prettier-plugin-tailwindcss'],
-  printWidth: 80,
-  proseWrap: 'always',
-  quoteProps: 'as-needed',
-  requirePragma: false,
+  printWidth: 100,
   semi: false,
-  singleAttributePerLine: false,
   singleQuote: true,
-  tabWidth: 2,
-  tailwindAttributes: ['class', 'className', 'ngClass', '.*[cC]lassName'],
-  tailwindFunctions: ['clsx', 'cn', 'cva'],
+  tailwindAttributes: ['class', 'className', '.*[cC]lassName'],
+  tailwindFunctions: ['clsx', 'cva', 'cn'],
   trailingComma: 'all',
   useTabs: false,
 }

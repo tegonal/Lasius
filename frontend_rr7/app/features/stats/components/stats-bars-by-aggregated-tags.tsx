@@ -21,7 +21,7 @@ import { BarsTags } from './bars-tags'
 import { EmptyStateStats } from './empty-state-stats'
 import { StatsTile } from './stats-tile'
 
-type StatsBarsByAggregatedTagsProps = {
+type StatsBarsByAggregatedTagsProperties = {
   chartData:
     | undefined
     | {
@@ -30,9 +30,7 @@ type StatsBarsByAggregatedTagsProps = {
       }
 }
 
-export const StatsBarsByAggregatedTags = ({
-  chartData,
-}: StatsBarsByAggregatedTagsProps) => {
+export const StatsBarsByAggregatedTags = ({ chartData }: StatsBarsByAggregatedTagsProperties) => {
   if (!chartData?.data || chartData.data.length === 0) {
     return (
       <StatsTile className="h-[300px]">
@@ -42,10 +40,7 @@ export const StatsBarsByAggregatedTags = ({
   }
 
   return (
-    <StatsTile
-      className="min-h-[200px]"
-      style={{ height: `${chartData.data.length * 36}px` }}
-    >
+    <StatsTile className="min-h-[200px]" style={{ height: `${chartData.data.length * 36}px` }}>
       <BarsTags stats={chartData} />
     </StatsTile>
   )

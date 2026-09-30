@@ -34,17 +34,13 @@ import { type ProjectWithActivity } from '~/types/common'
 
 export type ProjectStatusFilter = 'active' | 'both' | 'inactive'
 
-type Props = {
+type Properties = {
   projects: ProjectWithActivity[]
   searchTerm: string
   statusFilter: ProjectStatusFilter
 }
 
-export const AllProjectsList = ({
-  projects,
-  searchTerm,
-  statusFilter,
-}: Props) => {
+export const AllProjectsList = ({ projects, searchTerm, statusFilter }: Properties) => {
   const { t } = useTranslation()
 
   const filteredProjects = useMemo(() => {
@@ -56,11 +52,11 @@ export const AllProjectsList = ({
         filtered = filtered.filter((project) => project.active)
         break
       }
-      case 'inactive': {
-        filtered = filtered.filter((project) => !project.active)
+      case 'both': {
         break
       }
-      default: {
+      case 'inactive': {
+        filtered = filtered.filter((project) => !project.active)
         break
       }
     }
@@ -68,9 +64,7 @@ export const AllProjectsList = ({
     // Filter by search term
     if (searchTerm.trim()) {
       const searchLower = searchTerm.toLowerCase()
-      filtered = filtered.filter((project) =>
-        project.key.toLowerCase().includes(searchLower),
-      )
+      filtered = filtered.filter((project) => project.key.toLowerCase().includes(searchLower))
     }
 
     return filtered
@@ -87,36 +81,30 @@ export const AllProjectsList = ({
           <DataListHeaderItem />
           <DataListHeaderItem>{t('forms.name', 'Name')}</DataListHeaderItem>
           <DataListHeaderItem>{t('status.label', 'Status')}</DataListHeaderItem>
-          <DataListHeaderItem>
-            {t('projects:lastActivity', 'Last activity')}
-          </DataListHeaderItem>
+          <DataListHeaderItem>{t('projects:lastActivity', 'Last activity')}</DataListHeaderItem>
           <DataListHeaderItem />
         </DataListRow>
-        {orderBy(filteredProjects, [(data) => data.key], ['asc']).map(
-          (item) => (
-            <DataListRow data-testid="project-card" key={item.id}>
-              <DataListField width={90}>
-                <AvatarProject name={item.key} />
-              </DataListField>
-              <DataListField>
-                <span>{item.key}</span>
-              </DataListField>
-              <DataListField>
-                <span>
-                  {item.active
-                    ? t('status.active', 'Active')
-                    : t('status.inactive', 'Inactive')}
-                </span>
-              </DataListField>
-              <DataListField>
-                <ProjectLastActivity lastActivityDate={item.lastActivityDate} />
-              </DataListField>
-              <DataListField>
-                <AllProjectsListItemContext item={item} />
-              </DataListField>
-            </DataListRow>
-          ),
-        )}
+        {orderBy(filteredProjects, [(data) => data.key], ['asc']).map((item) => (
+          <DataListRow data-testid="project-card" key={item.id}>
+            <DataListField width={90}>
+              <AvatarProject name={item.key} />
+            </DataListField>
+            <DataListField>
+              <span>{item.key}</span>
+            </DataListField>
+            <DataListField>
+              <span>
+                {item.active ? t('status.active', 'Active') : t('status.inactive', 'Inactive')}
+              </span>
+            </DataListField>
+            <DataListField>
+              <ProjectLastActivity lastActivityDate={item.lastActivityDate} />
+            </DataListField>
+            <DataListField>
+              <AllProjectsListItemContext item={item} />
+            </DataListField>
+          </DataListRow>
+        ))}
       </DataList>
     </ContextMenuProvider>
   )

@@ -19,7 +19,7 @@
 
 import { Label } from '~/components/primitives/typography/label'
 
-interface FormElementProps {
+interface FormElementProperties {
   children: React.ReactNode
   htmlFor?: string
   label?: string
@@ -33,7 +33,7 @@ export const FormElement = ({
   label,
   labelActionSlot,
   required,
-}: FormElementProps) => {
+}: FormElementProperties) => {
   return (
     <div className="space-y-2">
       {label && (
@@ -42,9 +42,7 @@ export const FormElement = ({
             {label}
           </Label>
           {labelActionSlot && (
-            <div className="absolute top-0 right-0 flex items-center">
-              {labelActionSlot}
-            </div>
+            <div className="absolute top-0 right-0 flex items-center">{labelActionSlot}</div>
           )}
         </div>
       )}

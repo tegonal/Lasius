@@ -17,13 +17,7 @@
  *
  */
 
-import {
-  eachDayOfInterval,
-  endOfMonth,
-  format,
-  getDay,
-  startOfMonth,
-} from 'date-fns'
+import { eachDayOfInterval, endOfMonth, format, getDay, startOfMonth } from 'date-fns'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -51,8 +45,8 @@ export const useCalendarMonth = (viewDate: Date) => {
   }, [viewDate])
 
   const weekDays = useMemo(() => {
-    return Array.from({ length: 7 }, (_, i) => {
-      const d = new Date(2025, 0, 6 + i) // Jan 6, 2025 is a Monday
+    return Array.from({ length: 7 }, (_, index) => {
+      const d = new Date(2025, 0, 6 + index) // Jan 6, 2025 is a Monday
       return format(d, 'EEEEE', { locale })
     })
   }, [locale])

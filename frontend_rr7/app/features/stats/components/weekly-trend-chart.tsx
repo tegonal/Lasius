@@ -17,9 +17,7 @@
  *
  */
 
-// @ts-nocheck
-
-import { type Point, ResponsiveLine } from '@nivo/line'
+import { type PointTooltipProps, ResponsiveLine } from '@nivo/line'
 import { useTranslation } from 'react-i18next'
 
 import { nivoTheme, useNivoColors } from '~/components/ui/charts/nivo-theme'
@@ -35,6 +33,20 @@ export type WeekData = {
   weekNumber: number
   year: number
 }
+
+type WeeklyTrendSeries = {
+  data: { x: string; y: number }[]
+  id: string
+}
+
+const WeeklyTrendTooltip = ({ point }: PointTooltipProps<WeeklyTrendSeries>) => (
+  <div className="bg-base-100 border-base-300 rounded-lg border px-3 py-2 shadow-lg">
+    <div className="text-sm font-medium">{point.seriesId}</div>
+    <div className="text-base-content/60 text-sm">
+      {point.data.x}: <strong>{decimalHoursToDurationString(point.data.y)}</strong>
+    </div>
+  </div>
+)
 
 // ─── Empty State ─────────────────────────────────────────────────────────────
 
@@ -96,9 +108,7 @@ export const WeeklyTrendChart = ({
           tickRotation: -45,
           tickSize: 5,
           tickValues: tickEvery
-            ? weeklyData
-                .filter((_, i) => i % tickEvery === 0)
-                .map((w) => w.weekLabel)
+            ? weeklyData.filter((_, index) => index % tickEvery === 0).map((w) => w.weekLabel)
             : undefined,
         }}
         axisLeft={{
@@ -149,17 +159,7 @@ export const WeeklyTrendChart = ({
         pointLabelYOffset={-12}
         pointSize={8}
         theme={nivoTheme}
-        tooltip={({ point }: { point: Point }) => (
-          <div className="bg-base-100 border-base-300 rounded-lg border px-3 py-2 shadow-lg">
-            <div className="text-sm font-medium">{String(point.seriesId)}</div>
-            <div className="text-base-content/60 text-sm">
-              {point.data.x}:{' '}
-              <strong>
-                {decimalHoursToDurationString(point.data.y as number)}
-              </strong>
-            </div>
-          </div>
-        )}
+        tooltip={WeeklyTrendTooltip}
         useMesh={true}
         xScale={{ type: 'point' }}
         yFormat={(value) => decimalHoursToDurationString(value)}

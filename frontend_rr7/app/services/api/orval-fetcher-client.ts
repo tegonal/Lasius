@@ -29,12 +29,7 @@
  */
 
 // Endpoints without security in the OpenAPI spec
-const PUBLIC_ENDPOINTS = new Set([
-  '/config',
-  '/csrf-token',
-  '/oauth2/login',
-  '/oauth2/logout',
-])
+const PUBLIC_ENDPOINTS = new Set(['/config', '/csrf-token', '/oauth2/login', '/oauth2/logout'])
 
 /**
  * Detect if a route template matches a public endpoint.
@@ -64,7 +59,7 @@ type Import = {
   values?: boolean
 }
 
-type Prop = {
+type Property = {
   definition: string
   destructured?: string
   implementation: string
@@ -78,7 +73,7 @@ type VerbOptions = {
   operationName: string
   override: Record<string, unknown>
   params: Array<{ definition: string; name: string }>
-  props: Prop[]
+  props: Property[]
   queryParams?: { schema: { name: string } }
   response: { definition: { success: string } }
   summary?: string
@@ -93,64 +88,58 @@ function generateFetcherHook(
   verbOptions: VerbOptions,
   options: GeneratorOptions,
 ): { implementation: string; imports: Import[] } {
-  const { body, operationName, props, queryParams, response, verb } =
-    verbOptions
+  const { body, operationName, props, queryParams, response, verb } = verbOptions
   const { route } = options
 
   const hookName = `use${operationName.charAt(0).toUpperCase()}${operationName.slice(1)}`
   const responseType = response.definition.success || `${operationName}Response`
 
   // Collect path params
-  const pathParams = props.filter(
+  const pathParameters = props.filter(
     (p) => p.type === PROP_TYPE.PARAM || p.type === PROP_TYPE.NAMED_PATH_PARAMS,
   )
 
   // Build TParams type fields
-  const paramFields: string[] = []
-  for (const p of pathParams) {
-    paramFields.push(`${p.name}: ${p.definition}`)
-  }
+  const parameterFields: string[] = Array.from(pathParameters, (p) => `${p.name}: ${p.definition}`)
   if (queryParams) {
-    paramFields.push(`params?: ${queryParams.schema.name}`)
+    parameterFields.push(`params?: ${queryParams.schema.name}`)
   }
 
   // Build type arguments for useApiProxy<TResponse, TBody, TParams>
-  const typeArgs: string[] = [responseType]
+  const typeArguments: string[] = [responseType]
   if (body) {
-    typeArgs.push(body.definition)
+    typeArguments.push(body.definition)
   } else {
-    typeArgs.push('undefined')
+    typeArguments.push('undefined')
   }
-  if (paramFields.length > 0) {
-    typeArgs.push(`{ ${paramFields.join('; ')} }`)
+  if (parameterFields.length > 0) {
+    typeArguments.push(`{ ${parameterFields.join('; ')} }`)
   }
 
   // Remove trailing 'undefined' type args
-  while (typeArgs.length > 1 && typeArgs.at(-1) === 'undefined') {
-    typeArgs.pop()
+  while (typeArguments.length > 1 && typeArguments.at(-1) === 'undefined') {
+    typeArguments.pop()
   }
 
-  const typeArgsStr = typeArgs.join(', ')
+  const typeArgumentsString = typeArguments.join(', ')
 
   // Build getUrl parameter destructure
-  const urlParamNames = [
-    ...pathParams.map((p) => p.name),
+  const urlParameterNames = [
+    ...pathParameters.map((p) => p.name),
     ...(queryParams ? ['params'] : []),
   ]
-  const paramDestructure =
-    urlParamNames.length > 0 ? `{ ${urlParamNames.join(', ')} }` : ''
+  const parameterDestructure =
+    urlParameterNames.length > 0 ? `{ ${urlParameterNames.join(', ')} }` : ''
 
   // Build URL expression
-  let urlExpr: string
+  let urlExpression: string
   if (queryParams) {
     // Use the generated URL builder for query param serialization
     const urlBuilderName = `get${operationName.charAt(0).toUpperCase()}${operationName.slice(1)}Url`
-    const urlBuilderArgs = [...pathParams.map((p) => p.name), 'params'].join(
-      ', ',
-    )
-    urlExpr = `${urlBuilderName}(${urlBuilderArgs})`
+    const urlBuilderArguments = [...pathParameters.map((p) => p.name), 'params'].join(', ')
+    urlExpression = `${urlBuilderName}(${urlBuilderArguments})`
   } else {
-    urlExpr = '`' + route + '`'
+    urlExpression = '`' + route + '`'
   }
 
   const isPublic = isPublicRoute(route)
@@ -158,8 +147,8 @@ function generateFetcherHook(
 
   const implementation = `
 export function ${hookName}(options?: ApiProxyOptions<${responseType}>) {
-\treturn useApiProxy<${typeArgsStr}>({
-\t\tgetUrl: (${paramDestructure}) => ${urlExpr},
+\treturn useApiProxy<${typeArgumentsString}>({
+\t\tgetUrl: (${parameterDestructure}) => ${urlExpression},
 \t\tmethod: '${verb.toUpperCase()}',${skipAuthLine}
 \t}, options)
 }

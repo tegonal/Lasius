@@ -18,18 +18,9 @@
  */
 
 import { endOfWeek, format, startOfWeek, subWeeks } from 'date-fns'
-import {
-  data,
-  Outlet,
-  type ShouldRevalidateFunctionArgs,
-  useSearchParams,
-} from 'react-router'
+import { data, Outlet, type ShouldRevalidateFunctionArgs, useSearchParams } from 'react-router'
 
-import {
-  ColumnCenter,
-  ColumnRight,
-  innerGridClasses,
-} from '~/components/ui/layouts/layout-columns'
+import { ColumnCenter, ColumnRight, innerGridClasses } from '~/components/ui/layouts/layout-columns'
 import { CalendarDataProvider } from '~/features/calendar/calendar-data-provider'
 import { CalendarMonthCompact } from '~/features/dashboard/components/calendar-month-compact'
 import { DashboardTabs } from '~/features/dashboard/components/dashboard-tabs'
@@ -40,7 +31,7 @@ import {
 } from '~/features/dashboard/dashboard-loader.server'
 import { computeWorkHealthMetrics } from '~/lib/api/functions/compute-work-health-metrics.server'
 import { getWeeklyPlannedHours } from '~/lib/api/functions/get-planned-working-hours'
-import { formatDateTimeToURLParam } from '~/lib/utils/dates'
+import { formatDateTimeToURLParameter } from '~/lib/utils/dates'
 import { getUserBookingListByOrganisation } from '~/services/api/lasius/user-bookings/user-bookings'
 
 import { type Route } from './+types/user.dashboard'
@@ -64,18 +55,18 @@ export const shouldRevalidate = ({
 const WEEKS_TO_ANALYZE = 12
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const ctx = await loadDashboardContext(request)
-  const { headers, plannedHours, selectedDate, selectedOrgId } = ctx
+  const context = await loadDashboardContext(request)
+  const { headers, plannedHours, selectedDate, selectedOrgId } = context
   const weeklyPlannedHours = getWeeklyPlannedHours(plannedHours)
 
   // Fetch 12-week booking data for burnout metrics
-  const refDate = new Date(selectedDate)
-  const from = formatDateTimeToURLParam(
-    startOfWeek(subWeeks(refDate, WEEKS_TO_ANALYZE - 1), {
+  const referenceDate = new Date(selectedDate)
+  const from = formatDateTimeToURLParameter(
+    startOfWeek(subWeeks(referenceDate, WEEKS_TO_ANALYZE - 1), {
       weekStartsOn: 1,
     }),
   )
-  const to = formatDateTimeToURLParam(endOfWeek(refDate, { weekStartsOn: 1 }))
+  const to = formatDateTimeToURLParameter(endOfWeek(referenceDate, { weekStartsOn: 1 }))
 
   const bookingsResponse = await getUserBookingListByOrganisation(
     selectedOrgId,
@@ -100,22 +91,22 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
       weeklyData,
       weeklyPlannedHours,
     },
-    { headers: dashboardResponseHeaders(ctx.auth) },
+    { headers: dashboardResponseHeaders(context.auth) },
   )
 }
 
 const DashboardLayout = ({ loaderData }: Route.ComponentProps) => {
-  const [searchParams, setSearchParams] = useSearchParams()
-  const dateParam = searchParams.get('date')
+  const [searchParameters, setSearchParameters] = useSearchParams()
+  const dateParameter = searchParameters.get('date')
   const date =
-    dateParam && !Number.isNaN(new Date(dateParam).getTime())
-      ? dateParam
+    dateParameter && !Number.isNaN(new Date(dateParameter).getTime())
+      ? dateParameter
       : loaderData.selectedDate
 
   const handleDateChange = (newDate: string) => {
     const safe = format(new Date(newDate), 'yyyy-MM-dd')
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev)
+    setSearchParameters((previous) => {
+      const next = new URLSearchParams(previous)
       next.set('date', safe)
       return next
     })
@@ -136,8 +127,7 @@ const DashboardLayout = ({ loaderData }: Route.ComponentProps) => {
           <CalendarDataProvider
             date={date}
             organisationId={loaderData.selectedOrgId}
-            period="month"
-          >
+            period="month">
             <CalendarMonthCompact date={date} onDateChange={handleDateChange} />
           </CalendarDataProvider>
           <div className="border-base-content/10 my-4 border-t" />

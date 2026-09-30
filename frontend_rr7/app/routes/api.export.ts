@@ -19,10 +19,7 @@
 
 import { endOfDay, format, isValid, startOfDay } from 'date-fns'
 
-import {
-  getAdaptiveGranularity,
-  type Granularity,
-} from '~/lib/api/config/granularity-config'
+import { getAdaptiveGranularity, type Granularity } from '~/lib/api/config/granularity-config'
 import { filterModelsBookingListByTags } from '~/lib/api/functions/filter-models-booking-list-by-tags'
 import { filterModelsBookingListProjectId } from '~/lib/api/functions/filter-models-booking-list-project-id'
 import { filterModelsBookingListUserId } from '~/lib/api/functions/filter-models-booking-list-user-id'
@@ -43,15 +40,15 @@ import { authHeaders, requireUser } from '~/services/auth/auth-helpers.server'
 
 const apiDateFormat = 'yyyy-MM-dd'
 
-const formatDateParam = (dateStr: string): string => {
-  const date = new Date(dateStr)
-  if (!isValid(date)) return dateStr
+const formatDateParameter = (dateString: string): string => {
+  const date = new Date(dateString)
+  if (!isValid(date)) return dateString
   return format(startOfDay(date), apiDateFormat)
 }
 
-const formatDateParamEnd = (dateStr: string): string => {
-  const date = new Date(dateStr)
-  if (!isValid(date)) return dateStr
+const formatDateParameterEnd = (dateString: string): string => {
+  const date = new Date(dateString)
+  if (!isValid(date)) return dateString
   return format(endOfDay(date), apiDateFormat)
 }
 
@@ -83,24 +80,20 @@ export async function loader({ request }: { request: Request }) {
 
   const url = new URL(request.url)
   const type = url.searchParams.get('type')
-  const formatParam = url.searchParams.get('format') as ExportFormat | null
+  const formatParameter = url.searchParams.get('format') as ExportFormat | null
   const orgId = url.searchParams.get('orgId')
   const from = url.searchParams.get('from')
   const to = url.searchParams.get('to')
 
-  if (!type || !formatParam || !orgId || !from || !to) {
+  if (!type || !formatParameter || !orgId || !from || !to) {
     return new Response('Missing required parameters', { status: 400 })
   }
 
   try {
     if (type === 'bookings') {
       return handleBookingsExport({
-        context:
-          (url.searchParams.get('context') as
-            | 'organisation'
-            | 'project'
-            | 'user') ?? 'user',
-        format: formatParam,
+        context: (url.searchParams.get('context') as 'organisation' | 'project' | 'user') ?? 'user',
+        format: formatParameter,
         from,
         headers,
         orgId,
@@ -113,12 +106,11 @@ export async function loader({ request }: { request: Request }) {
 
     if (type === 'statistics') {
       return handleStatisticsExport({
-        format: formatParam as 'ods' | 'xlsx',
+        format: formatParameter as 'ods' | 'xlsx',
         from,
         headers,
         orgId,
-        scope:
-          (url.searchParams.get('scope') as 'organisation' | 'user') ?? 'user',
+        scope: (url.searchParams.get('scope') as 'organisation' | 'user') ?? 'user',
         summary: {
           totalBookings: Number(url.searchParams.get('totalBookings') ?? 0),
           totalHours: Number(url.searchParams.get('totalHours') ?? 0),
@@ -136,7 +128,7 @@ export async function loader({ request }: { request: Request }) {
   }
 }
 
-async function handleBookingsExport(params: {
+async function handleBookingsExport(parameters: {
   context: 'organisation' | 'project' | 'user'
   format: ExportFormat
   from: string
@@ -147,45 +139,44 @@ async function handleBookingsExport(params: {
   to: string
   userId: string
 }) {
-  const timespan = apiTimespanFromTo(params.from, params.to)
+  const timespan = apiTimespanFromTo(parameters.from, parameters.to)
   if (!timespan) {
     return new Response('Invalid date range', { status: 400 })
   }
 
   const response =
-    params.context === 'organisation'
-      ? await getOrganisationBookingList(params.orgId, timespan, {
-          headers: params.headers,
+    parameters.context === 'organisation'
+      ? await getOrganisationBookingList(parameters.orgId, timespan, {
+          headers: parameters.headers,
         })
-      : await getUserBookingListByOrganisation(params.orgId, timespan, {
-          headers: params.headers,
+      : await getUserBookingListByOrganisation(parameters.orgId, timespan, {
+          headers: parameters.headers,
         })
 
   // Apply client-side filters (same logic as booking-history-layout)
-  const tagFilters = params.tags
-    ? params.tags.split(',').map((id) => ({ id, type: 'SimpleTag' as const }))
+  const tagFilters = parameters.tags
+    ? parameters.tags.split(',').map((id) => ({ id, type: 'SimpleTag' as const }))
     : []
   let bookings = response.data
   bookings = filterModelsBookingListByTags(bookings, tagFilters)
-  bookings = filterModelsBookingListProjectId(bookings, params.projectId)
-  bookings = filterModelsBookingListUserId(bookings, params.userId)
+  bookings = filterModelsBookingListProjectId(bookings, parameters.projectId)
+  bookings = filterModelsBookingListUserId(bookings, parameters.userId)
 
-  const { buffer, filename } = exportBookingList(bookings, params.format, {
-    context: params.context,
-    from: params.from,
-    to: params.to,
+  const { buffer, filename } = exportBookingList(bookings, parameters.format, {
+    context: parameters.context,
+    from: parameters.from,
+    to: parameters.to,
   })
 
   return new Response(buffer as Uint8Array<ArrayBuffer>, {
     headers: {
       'Content-Disposition': `attachment; filename="${filename}"`,
-      'Content-Type':
-        contentTypeMap[params.format] ?? 'application/octet-stream',
+      'Content-Type': contentTypeMap[parameters.format] ?? 'application/octet-stream',
     },
   })
 }
 
-async function handleStatisticsExport(params: {
+async function handleStatisticsExport(parameters: {
   format: 'ods' | 'xlsx'
   from: string
   headers: HeadersInit
@@ -199,31 +190,24 @@ async function handleStatisticsExport(params: {
   }
   to: string
 }) {
-  const {
-    format: exportFormat,
-    from,
-    headers: reqHeaders,
-    orgId,
-    scope,
-    to,
-  } = params
+  const { format: exportFormat, from, headers: requestHeaders, orgId, scope, to } = parameters
   const granularity = getAdaptiveGranularity(from, to)
-  const apiFrom = formatDateParam(from)
-  const apiTo = formatDateParamEnd(to)
+  const apiFrom = formatDateParameter(from)
+  const apiTo = formatDateParameterEnd(to)
 
   const fetchStats = (source: string, gran: 'All' | Granularity) => {
-    const fetchParams = {
+    const fetchParameters = {
       from: apiFrom,
       granularity: gran,
       source,
       to: apiTo,
     }
     return scope === 'organisation'
-      ? getOrganisationBookingAggregatedStats(orgId, fetchParams, {
-          headers: reqHeaders,
+      ? getOrganisationBookingAggregatedStats(orgId, fetchParameters, {
+          headers: requestHeaders,
         })
-      : getUserBookingAggregatedStatsByOrganisation(orgId, fetchParams, {
-          headers: reqHeaders,
+      : getUserBookingAggregatedStatsByOrganisation(orgId, fetchParameters, {
+          headers: requestHeaders,
         })
   }
 
@@ -231,14 +215,13 @@ async function handleStatisticsExport(params: {
   let aggregated: { data: ModelsBookingStats[]; source: string }[]
 
   if (scope === 'organisation') {
-    const [tagsByDay, usersByDay, projectsAgg, usersAgg, tagsAgg] =
-      await Promise.all([
-        fetchStats('tag', granularity),
-        fetchStats('user', granularity),
-        fetchStats('project', 'All'),
-        fetchStats('user', 'All'),
-        fetchStats('tag', 'All'),
-      ])
+    const [tagsByDay, usersByDay, projectsAgg, usersAgg, tagsAgg] = await Promise.all([
+      fetchStats('tag', granularity),
+      fetchStats('user', granularity),
+      fetchStats('project', 'All'),
+      fetchStats('user', 'All'),
+      fetchStats('tag', 'All'),
+    ])
 
     byDayAndSource = [
       { data: tagsByDay.data, source: 'tag' },
@@ -272,7 +255,7 @@ async function handleStatisticsExport(params: {
       aggregated,
       byDayAndSource,
       scope,
-      summary: { from, to, ...params.summary },
+      summary: { from, to, ...parameters.summary },
     },
     exportFormat,
   )
@@ -280,8 +263,7 @@ async function handleStatisticsExport(params: {
   return new Response(buffer as Uint8Array<ArrayBuffer>, {
     headers: {
       'Content-Disposition': `attachment; filename="${filename}"`,
-      'Content-Type':
-        contentTypeMap[exportFormat] ?? 'application/octet-stream',
+      'Content-Type': contentTypeMap[exportFormat] ?? 'application/octet-stream',
     },
   })
 }

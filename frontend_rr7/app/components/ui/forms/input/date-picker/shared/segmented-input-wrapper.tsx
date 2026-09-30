@@ -24,7 +24,7 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 
-type SegmentedInputWrapperProps = {
+type SegmentedInputWrapperProperties = {
   children: React.ReactElement
   hasSelection: boolean
   label?: string
@@ -36,38 +36,35 @@ export const SegmentedInputWrapper = ({
   hasSelection,
   label,
   onArrowClick,
-}: SegmentedInputWrapperProps) => {
+}: SegmentedInputWrapperProperties) => {
   const { t } = useTranslation('common')
   const [isHovered, setIsHovered] = useState(false)
-  const containerRef = useRef<HTMLDivElement>(null)
+  const containerReference = useRef<HTMLDivElement>(null)
 
   return (
     <div
       className="relative inline-block"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      ref={containerRef}
-    >
+      ref={containerReference}>
       {/* Up Arrow - positioned above input */}
       <div
         className={`absolute -top-6 right-0 left-0 flex justify-center transition-opacity ${
           hasSelection || isHovered
             ? 'opacity-60 hover:opacity-100'
             : 'pointer-events-none opacity-0'
-        }`}
-      >
+        }`}>
         <Button
           aria-label={t('aria.increment', 'Increment')}
           className="cursor-pointer rounded-t-full rounded-b-none"
-          onMouseDown={(e) => {
-            e.preventDefault()
+          onMouseDown={(event) => {
+            event.preventDefault()
             onArrowClick('up')
           }}
           size="xs"
           tabIndex={-1}
           type="button"
-          variant="neutral"
-        >
+          variant="neutral">
           <LucideIcon icon={ChevronUp} size={24} />
         </Button>
       </div>
@@ -76,32 +73,27 @@ export const SegmentedInputWrapper = ({
       <div
         className={`absolute right-0 -bottom-10 left-0 flex flex-col items-center ${
           hasSelection || isHovered ? '' : 'pointer-events-none'
-        }`}
-      >
+        }`}>
         <Button
           aria-label={t('aria.decrement', 'Decrement')}
           className={`cursor-pointer rounded-t-none rounded-b-full transition-opacity ${
-            hasSelection || isHovered
-              ? 'opacity-60 hover:opacity-100'
-              : 'opacity-0'
+            hasSelection || isHovered ? 'opacity-60 hover:opacity-100' : 'opacity-0'
           }`}
-          onMouseDown={(e) => {
-            e.preventDefault()
+          onMouseDown={(event) => {
+            event.preventDefault()
             onArrowClick('down')
           }}
           size="xs"
           tabIndex={-1}
           type="button"
-          variant="neutral"
-        >
+          variant="neutral">
           <LucideIcon icon={ChevronDown} size={24} />
         </Button>
         {label && (
           <span
             className={`text-base-content/60 mt-1 text-xs whitespace-nowrap transition-opacity ${
               hasSelection || isHovered ? 'opacity-100' : 'opacity-0'
-            }`}
-          >
+            }`}>
             {label}
           </span>
         )}

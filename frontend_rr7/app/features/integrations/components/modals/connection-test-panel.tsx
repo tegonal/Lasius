@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next'
 
 import { type ConnectionTestResult } from '~/features/integrations/hooks/use-connection-test'
 
-type Props = {
+type Properties = {
   connectionTestMessage: string
   connectionTestResult: ConnectionTestResult
   handleTestConnection: () => void
@@ -36,15 +36,14 @@ export const ConnectionTestPanel = ({
   handleTestConnection,
   isSaving,
   isTestingConnection,
-}: Props) => {
+}: Properties) => {
   const { t } = useTranslation('integrations')
 
   return (
     <div className="space-y-4">
       {connectionTestResult && (
         <div
-          className={`alert ${connectionTestResult === 'success' ? 'alert-success' : 'alert-error'}`}
-        >
+          className={`alert ${connectionTestResult === 'success' ? 'alert-success' : 'alert-error'}`}>
           <span>{connectionTestMessage}</span>
         </div>
       )}
@@ -52,8 +51,7 @@ export const ConnectionTestPanel = ({
         className="btn btn-secondary w-full"
         disabled={isTestingConnection || isSaving}
         onClick={handleTestConnection}
-        type="button"
-      >
+        type="button">
         {isTestingConnection ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

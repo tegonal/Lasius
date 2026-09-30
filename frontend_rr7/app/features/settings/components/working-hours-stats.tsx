@@ -28,8 +28,7 @@ import { plannedWorkingHoursStub } from '~/lib/utils/date/stub-planned-working-h
 export const WorkingHoursStats = () => {
   const { t } = useTranslation('working-hours')
   const { organisations } = useOrganisation()
-  const { allOrganisationsWorkingHours } =
-    useGetWeeklyPlannedWorkingHoursAggregate()
+  const { allOrganisationsWorkingHours } = useGetWeeklyPlannedWorkingHoursAggregate()
 
   const totalHoursPerWeek = Object.values(allOrganisationsWorkingHours).reduce(
     (sum, h) => sum + h,
@@ -52,12 +51,7 @@ export const WorkingHoursStats = () => {
     <div className="bg-base-200 p-4">
       <StatsGroup>
         {orgHours.map((org) => (
-          <StatsTileHours
-            key={org.name}
-            label={org.name}
-            standalone={false}
-            value={org.hours}
-          />
+          <StatsTileHours key={org.name} label={org.name} standalone={false} value={org.hours} />
         ))}
         <StatsTileHours
           label={t('totalPerWeek', 'Total per week')}

@@ -22,18 +22,17 @@ import { createI18nextMiddleware } from 'remix-i18next/middleware'
 import { i18nServerConfig } from '~/i18n-resources.server'
 import { localeCookie } from '~/lib/cookies/i18next-cookie.server'
 
-export const [i18nextMiddleware, getLocale, getInstance] =
-  createI18nextMiddleware({
-    detection: {
-      cookie: localeCookie,
-      fallbackLanguage: i18nServerConfig.fallbackLng,
-      supportedLanguages: i18nServerConfig.supportedLngs,
-    },
-    i18next: {
-      defaultNS: i18nServerConfig.defaultNS,
-      fallbackNS: i18nServerConfig.fallbackNS,
-      ns: i18nServerConfig.ns,
-      resources: i18nServerConfig.resources,
-      returnEmptyString: i18nServerConfig.returnEmptyString,
-    },
-  })
+export const [i18nextMiddleware, getLocale, getInstance] = createI18nextMiddleware({
+  detection: {
+    cookie: localeCookie,
+    fallbackLanguage: i18nServerConfig.fallbackLng,
+    supportedLanguages: i18nServerConfig.supportedLngs,
+  },
+  i18next: {
+    defaultNS: i18nServerConfig.defaultNS,
+    fallbackNS: i18nServerConfig.fallbackNS,
+    ns: i18nServerConfig.ns,
+    resources: i18nServerConfig.resources,
+    returnEmptyString: i18nServerConfig.returnEmptyString,
+  },
+})

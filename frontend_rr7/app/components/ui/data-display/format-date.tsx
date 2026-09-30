@@ -52,8 +52,8 @@ export const FormatDate = memo(function FormatDate({
 }) {
   const { i18n } = useTranslation('common')
   const locale = getDateLocale(i18n.language)
-  const dateStr = typeof date === 'string' ? date : formatISOLocale(date)
-  const formatted = format(new Date(dateStr), dateFormats[formatKey], {
+  const dateString = typeof date === 'string' ? date : formatISOLocale(date)
+  const formatted = format(new Date(dateString), dateFormats[formatKey], {
     locale,
   })
   return <>{formatted}</>

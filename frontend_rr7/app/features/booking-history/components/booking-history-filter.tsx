@@ -35,13 +35,10 @@ import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { type BookingHistoryControls } from '~/features/booking-history/components/booking-history-layout'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { dateOptions } from '~/lib/utils/date/date-options'
-import {
-  type ModelsEntityReference,
-  type ModelsUserStub,
-} from '~/services/api/lasius'
+import { type ModelsEntityReference, type ModelsUserStub } from '~/services/api/lasius'
 import { useGetTagsByProject } from '~/services/api/lasius-hooks/user-organisations/user-organisations'
 
-type Props = {
+type Properties = {
   controls: BookingHistoryControls
   dataSource: 'organisationBookings' | 'userBookings'
   fields: {
@@ -57,50 +54,44 @@ type Props = {
   users?: ModelsUserStub[]
 }
 
+const NO_USERS: ModelsUserStub[] = []
+
 export const BookingHistoryFilter = ({
   controls,
   dataSource,
   fields,
   inactiveProject = null,
   projects,
-  users = [],
-}: Props) => {
+  users = NO_USERS,
+}: Properties) => {
   const { t } = useTranslation('common')
   const navigate = useNavigate()
   const { selectedOrganisationId } = useOrganisation()
 
   // Tags via Orval hook
-  const tagsApi = useGetTagsByProject()
-  const tagsSubmitRef = useRef(tagsApi.submit)
-  tagsSubmitRef.current = tagsApi.submit
-  const prevProjectKeyRef = useRef('')
+  const { data: tagsData, submit: submitTags } = useGetTagsByProject()
+  const previousProjectKeyReference = useRef('')
 
   const projectId = controls.projectId.value ?? ''
 
-  const showUserFilter = dataSource === 'organisationBookings'
+  const isShowUserFilter = dataSource === 'organisationBookings'
 
   const firstDateOption = dateOptions[0]
 
   // Load tags when project changes
   useEffect(() => {
     const key = `${selectedOrganisationId}:${projectId}`
-    if (
-      selectedOrganisationId &&
-      projectId &&
-      key !== prevProjectKeyRef.current
-    ) {
-      prevProjectKeyRef.current = key
-      tagsSubmitRef.current({ orgId: selectedOrganisationId, projectId })
+    if (selectedOrganisationId && projectId && key !== previousProjectKeyReference.current) {
+      previousProjectKeyReference.current = key
+      submitTags({ orgId: selectedOrganisationId, projectId })
     }
-  }, [projectId, selectedOrganisationId])
+  }, [projectId, selectedOrganisationId, submitTags])
 
-  const projectTags = tagsApi.data ?? []
+  const projectTags = tagsData ?? []
 
   const handleBackToProjects = () => {
     const isUserContext = dataSource === 'userBookings'
-    const projectsPath = isUserContext
-      ? '/user/projects'
-      : '/organisation/projects'
+    const projectsPath = isUserContext ? '/user/projects' : '/organisation/projects'
     void navigate(projectsPath)
   }
 
@@ -139,18 +130,14 @@ export const BookingHistoryFilter = ({
         <div className="alert alert-warning mb-4">
           <div className="flex w-full items-center justify-between">
             <span>
-              {t(
-                'projects:warnings.inactiveProjectFilter',
-                'Showing data for inactive project',
-              )}
+              {t('projects:warnings.inactiveProjectFilter', 'Showing data for inactive project')}
             </span>
             <Button
               aria-label={t('actions.back', 'Back')}
               fullWidth={false}
               onClick={handleBackToProjects}
               size="sm"
-              variant="ghost"
-            >
+              variant="ghost">
               <LucideIcon icon={ArrowLeft} size={16} />
               {t('actions.back', 'Back')}
             </Button>
@@ -161,19 +148,14 @@ export const BookingHistoryFilter = ({
         <Heading variant="section">{t('filter.title', 'Filter')}</Heading>
         {hasChanges && (
           <div className="absolute top-3 right-0">
-            <Button
-              fullWidth={false}
-              onClick={resetForm}
-              size="xs"
-              variant="ghost"
-            >
+            <Button fullWidth={false} onClick={resetForm} size="xs" variant="ghost">
               {t('actions.reset', 'Reset')}
             </Button>
           </div>
         )}
       </div>
       <FormBody>
-        {showUserFilter && (
+        {isShowUserFilter && (
           <FormElement htmlFor={fields.userId.id} label={t('user', 'User')}>
             <UserSelect
               id={fields.userId.id}
@@ -184,10 +166,7 @@ export const BookingHistoryFilter = ({
             />
           </FormElement>
         )}
-        <FormElement
-          htmlFor={fields.projectId.id}
-          label={t('projects:label', 'Project')}
-        >
+        <FormElement htmlFor={fields.projectId.id} label={t('projects:label', 'Project')}>
           <ProjectSelect
             id={fields.projectId.id}
             name={fields.projectId.name}
@@ -196,10 +175,7 @@ export const BookingHistoryFilter = ({
             value={controls.projectId.value ?? ''}
           />
         </FormElement>
-        <FormElement
-          htmlFor={fields.tags.id}
-          label={t('tag-manager:label', 'Tags')}
-        >
+        <FormElement htmlFor={fields.tags.id} label={t('tag-manager:label', 'Tags')}>
           <InputTagsAutocomplete
             field={fields.tags}
             id={fields.tags.id}

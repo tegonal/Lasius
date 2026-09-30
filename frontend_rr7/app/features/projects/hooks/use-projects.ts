@@ -39,15 +39,9 @@ export const useProjects = () => {
   const projects = useMemo((): ModelsUserProject[] => {
     if (user?.organisations) {
       const org = user.organisations.find(
-        (item) =>
-          item.organisationReference.id ===
-          user.settings?.lastSelectedOrganisation?.id,
+        (item) => item.organisationReference.id === user.settings?.lastSelectedOrganisation?.id,
       )
-      return orderBy(
-        org?.projects || [],
-        [(data) => data.projectReference.key],
-        ['asc'],
-      )
+      return orderBy(org?.projects || [], [(data) => data.projectReference.key], ['asc'])
     }
     return []
   }, [user])
@@ -59,16 +53,12 @@ export const useProjects = () => {
    * @param projectId - The ID of the project to find
    * @returns The project reference or undefined if not found
    */
-  const findProjectById = (
-    projectId: string,
-  ): ModelsEntityReference | undefined => {
+  const findProjectById = (projectId: string): ModelsEntityReference | undefined => {
     if (!user?.organisations || !projectId) return undefined
 
     // Search through all organizations (not just the selected one)
     for (const org of user.organisations) {
-      const project = org.projects.find(
-        (p) => p.projectReference.id === projectId,
-      )
+      const project = org.projects.find((p) => p.projectReference.id === projectId)
       if (project) {
         return project.projectReference
       }

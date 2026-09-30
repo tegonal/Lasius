@@ -24,19 +24,15 @@ import { Input } from '~/components/primitives/inputs/input'
 import { Heading } from '~/components/primitives/typography/heading'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 
-type Props = {
+type Properties = {
   onSearchChange: (value: string) => void
   projectCount: number
   searchTerm: string
 }
 
-export const MyProjectsRightColumn = ({
-  onSearchChange,
-  projectCount,
-  searchTerm,
-}: Props) => {
+export const MyProjectsRightColumn = ({ onSearchChange, projectCount, searchTerm }: Properties) => {
   const { t } = useTranslation()
-  const showSearch = projectCount > 10
+  const isShowSearch = projectCount > 10
 
   return (
     <div className="w-full px-6 pt-3">
@@ -49,17 +45,14 @@ export const MyProjectsRightColumn = ({
           'Projects where you are a member and can book time. Restricted by the currently selected organisation.',
         )}
       </p>
-      {showSearch && (
+      {isShowSearch && (
         <div className="mt-4">
           <div className="join w-full">
             <Input
               className="join-item"
               data-testid="project-search-input"
-              onChange={(e) => onSearchChange(e.target.value)}
-              placeholder={t(
-                'projects:filter.searchPlaceholder',
-                'Filter projects...',
-              )}
+              onChange={(event) => onSearchChange(event.target.value)}
+              placeholder={t('projects:filter.searchPlaceholder', 'Filter projects...')}
               type="text"
               value={searchTerm}
             />
@@ -69,8 +62,7 @@ export const MyProjectsRightColumn = ({
                 className="btn btn-square join-item"
                 data-testid="project-search-clear-btn"
                 onClick={() => onSearchChange('')}
-                type="button"
-              >
+                type="button">
                 <LucideIcon icon={X} size={20} />
               </button>
             )}

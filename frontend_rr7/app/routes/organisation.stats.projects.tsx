@@ -23,14 +23,8 @@ import { ChartErrorBoundary } from '~/features/stats/components/error-boundary-c
 import { StatsCircleCategoryRange } from '~/features/stats/components/stats-circle-category-range'
 import { StatsProjectStream } from '~/features/stats/components/stats-project-stream'
 import { statsClientLoader } from '~/features/stats/stats-loader'
-import {
-  loadOrgStatsContext,
-  statsResponseHeaders,
-} from '~/features/stats/stats-loader.server'
-import {
-  getAdaptiveGranularity,
-  shouldUseBarChart,
-} from '~/lib/api/config/granularity-config'
+import { loadOrgStatsContext, statsResponseHeaders } from '~/features/stats/stats-loader.server'
+import { getAdaptiveGranularity, shouldUseBarChart } from '~/lib/api/config/granularity-config'
 import { getNivoChartDataFromApiStatsData } from '~/lib/api/functions/get-nivo-chart-data-from-api-stats-data'
 import { getTransformedChartDataAggregate } from '~/lib/api/functions/get-transformed-chart-data-aggregate'
 import { apiDatespanFromTo } from '~/lib/utils/dates'
@@ -42,24 +36,24 @@ import { type Route } from './+types/organisation.stats.projects'
 
 // ─── Client Loader (cache unless full-page refresh) ──────────────────────────
 
-export const clientLoader = async (args: Route.ClientLoaderArgs) =>
-  statsClientLoader(args)
+export const clientLoader = async (arguments_: Route.ClientLoaderArgs) =>
+  statsClientLoader(arguments_)
 clientLoader.hydrate = false
 
 // ─── Loader ──────────────────────────────────────────────────────────────────
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const ctx = await loadOrgStatsContext(request)
-  const { from, headers, selectedOrgId, to } = ctx
+  const context = await loadOrgStatsContext(request)
+  const { from, headers, selectedOrgId, to } = context
 
   const granularity = getAdaptiveGranularity(from, to)
-  const useBarChart = shouldUseBarChart(from, to)
+  const isUseBarChart = shouldUseBarChart(from, to)
 
   // Compute API params
   const datespan = apiDatespanFromTo(from, to)
 
   // Fetch project stats in parallel
-  const [projectsByDayRes, projectsAggregatedRes] = await Promise.all([
+  const [projectsByDayResponse, projectsAggregatedResponse] = await Promise.all([
     datespan
       ? getOrganisationBookingAggregatedStats(
           selectedOrgId,
@@ -86,42 +80,34 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
       : Promise.resolve({ data: [] }),
   ])
 
-  const projectsByDay = projectsByDayRes.data ?? []
-  const projectsAggregated = projectsAggregatedRes.data ?? []
+  const projectsByDay = projectsByDayResponse.data ?? []
+  const projectsAggregated = projectsAggregatedResponse.data ?? []
 
   // Transform data server-side
-  const projectStreamChart = getNivoChartDataFromApiStatsData(
-    projectsByDay,
-    granularity,
-  )
-  const projectsAggregatedChart =
-    getTransformedChartDataAggregate(projectsAggregated)
+  const projectStreamChart = getNivoChartDataFromApiStatsData(projectsByDay, granularity)
+  const projectsAggregatedChart = getTransformedChartDataAggregate(projectsAggregated)
 
   return data(
     {
       projectsAggregatedChart,
       projectStreamChart,
-      useBarChart,
+      useBarChart: isUseBarChart,
     },
-    { headers: statsResponseHeaders(ctx.auth) },
+    { headers: statsResponseHeaders(context.auth) },
   )
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
 const OrgStatsProjects = ({ loaderData }: Route.ComponentProps) => {
-  const { projectsAggregatedChart, projectStreamChart, useBarChart } =
-    loaderData
+  const { projectsAggregatedChart, projectStreamChart, useBarChart } = loaderData
 
   return (
     <div className="px-6">
       <ChartErrorBoundary>
         <StatsCircleCategoryRange chartData={projectsAggregatedChart} />
         <div className="divider my-4" />
-        <StatsProjectStream
-          chartData={projectStreamChart}
-          useBarChart={useBarChart}
-        />
+        <StatsProjectStream chartData={projectStreamChart} useBarChart={useBarChart} />
       </ChartErrorBoundary>
     </div>
   )

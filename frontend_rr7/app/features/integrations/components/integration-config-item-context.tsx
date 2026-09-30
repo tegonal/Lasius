@@ -31,7 +31,7 @@ import { ContextBody } from '~/features/context-menu/context-body'
 import { ContextButtonWrapper } from '~/features/context-menu/context-button-wrapper'
 import { useContextMenu } from '~/features/context-menu/hooks/use-context-menu'
 
-type Props = {
+type Properties = {
   configId: string
   onDelete: () => void
   onEdit: () => void
@@ -49,7 +49,7 @@ export const IntegrationConfigItemContext = ({
   onViewInfo,
   onViewMappings,
   projectCount,
-}: Props) => {
+}: Properties) => {
   const { t } = useTranslation('integrations')
   const { handleCloseAll } = useContextMenu()
 
@@ -96,8 +96,7 @@ export const IntegrationConfigItemContext = ({
               title={t('issueImporters.actions.viewInfo', {
                 defaultValue: 'View configuration info',
               })}
-              variant="contextIcon"
-            >
+              variant="contextIcon">
               <LucideIcon icon={Info} size={24} />
             </Button>
           </ContextButtonWrapper>
@@ -112,8 +111,7 @@ export const IntegrationConfigItemContext = ({
               title={t('issueImporters.actions.edit', {
                 defaultValue: 'Edit configuration',
               })}
-              variant="contextIcon"
-            >
+              variant="contextIcon">
               <LucideIcon icon={Pencil} size={24} />
             </Button>
           </ContextButtonWrapper>
@@ -128,8 +126,7 @@ export const IntegrationConfigItemContext = ({
               title={t('issueImporters.actions.viewMappings', {
                 defaultValue: 'View project mappings',
               })}
-              variant="contextIcon"
-            >
+              variant="contextIcon">
               <LucideIcon icon={FolderTree} size={24} />
             </Button>
           </ContextButtonWrapper>
@@ -145,8 +142,7 @@ export const IntegrationConfigItemContext = ({
                 title={t('issueImporters.actions.refreshAllTags', {
                   defaultValue: 'Refresh all tags',
                 })}
-                variant="contextIcon"
-              >
+                variant="contextIcon">
                 <LucideIcon icon={RefreshCw} size={24} />
               </Button>
             </ContextButtonWrapper>
@@ -156,10 +152,8 @@ export const IntegrationConfigItemContext = ({
               <div
                 className="tooltip"
                 data-tip={t('issueImporters.actions.deleteDisabled', {
-                  defaultValue:
-                    'Cannot delete: remove all project mappings first',
-                })}
-              >
+                  defaultValue: 'Cannot delete: remove all project mappings first',
+                })}>
                 <Button
                   aria-label={t('issueImporters.actions.delete', {
                     defaultValue: 'Delete configuration',
@@ -168,8 +162,7 @@ export const IntegrationConfigItemContext = ({
                   fullWidth={false}
                   onClick={handleDelete}
                   shape="circle"
-                  variant="contextIcon"
-                >
+                  variant="contextIcon">
                   <LucideIcon icon={Trash2} size={24} />
                 </Button>
               </div>
@@ -184,8 +177,7 @@ export const IntegrationConfigItemContext = ({
                 title={t('issueImporters.actions.delete', {
                   defaultValue: 'Delete configuration',
                 })}
-                variant="contextIcon"
-              >
+                variant="contextIcon">
                 <LucideIcon icon={Trash2} size={24} />
               </Button>
             )}

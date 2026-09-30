@@ -23,7 +23,7 @@ import { FormElement } from '~/components/ui/forms/form-element'
 import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { cn } from '~/lib/utils/cn'
 
-interface FormSelectProps {
+interface FormSelectProperties {
   className?: string
   disabled?: boolean
   field: FieldMetadata<string>
@@ -61,7 +61,7 @@ export const FormSelect = ({
   options,
   placeholder,
   required,
-}: FormSelectProps) => {
+}: FormSelectProperties) => {
   const hasErrors = !!field.errors?.length
 
   return (
@@ -69,18 +69,12 @@ export const FormSelect = ({
       htmlFor={field.id}
       label={label}
       labelActionSlot={labelActionSlot}
-      required={required}
-    >
+      required={required}>
       <select
         {...getSelectProps(field)}
-        className={cn(
-          'select select-bordered w-full',
-          hasErrors && 'select-error',
-          className,
-        )}
+        className={cn('select select-bordered w-full', hasErrors && 'select-error', className)}
         disabled={disabled}
-        key={field.key}
-      >
+        key={field.key}>
         {placeholder && (
           <option disabled value="">
             {placeholder}

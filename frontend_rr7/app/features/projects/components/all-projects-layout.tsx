@@ -20,11 +20,7 @@
 import { useState } from 'react'
 import { useLoaderData } from 'react-router'
 
-import {
-  ColumnCenter,
-  ColumnRight,
-  innerGridClasses,
-} from '~/components/ui/layouts/layout-columns'
+import { ColumnCenter, ColumnRight, innerGridClasses } from '~/components/ui/layouts/layout-columns'
 import { ScrollArea } from '~/components/ui/layouts/scroll-area'
 import { Modal } from '~/components/ui/overlays/modal/modal'
 import {
@@ -52,10 +48,7 @@ export const AllProjectsLayout = () => {
       <ColumnCenter>
         <div className="flex h-full flex-col overflow-hidden">
           <div className="flex-shrink-0">
-            <AllProjectsStats
-              onCreateProject={handleCreateOpen}
-              projects={projects}
-            />
+            <AllProjectsStats onCreateProject={handleCreateOpen} projects={projects} />
           </div>
           <ScrollArea className="min-h-0 flex-1">
             <div className="pt-4">
@@ -80,11 +73,7 @@ export const AllProjectsLayout = () => {
         </ScrollArea>
       </ColumnRight>
       <Modal onClose={handleCreateClose} open={isCreateOpen}>
-        <ProjectAddUpdateForm
-          mode="add"
-          onCancel={handleCreateClose}
-          onSave={handleCreateClose}
-        />
+        <ProjectAddUpdateForm mode="add" onCancel={handleCreateClose} onSave={handleCreateClose} />
       </Modal>
     </div>
   )

@@ -20,6 +20,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import {
+  didProcessWebSocketEvent,
   isAuthenticationFailed,
   isCurrentOrganisationTimeBookings,
   isCurrentUserTimeBookingEvent,
@@ -32,7 +33,6 @@ import {
   isUserTimeBookingHistoryEntryCleaned,
   isUserTimeBookingHistoryEntryRemoved,
   isWebSocketOutEvent,
-  processWebSocketEvent,
 } from './type-guards'
 
 describe('isWebSocketOutEvent', () => {
@@ -91,45 +91,53 @@ describe('type guard functions', () => {
     },
   ] as const
 
+  // The guards receive socket messages. The input passes the same boundary guard as a real message.
+  const toWebSocketEvent = (value: unknown) => {
+    if (!isWebSocketOutEvent(value)) {
+      throw new TypeError('The test value is not a WebSocket event')
+    }
+    return value
+  }
+
   for (const { fn, type } of guards) {
     it(`${fn.name} returns true for type "${type}"`, () => {
-      expect(fn({ type } as any)).toBe(true)
+      expect(fn(toWebSocketEvent({ type }))).toBe(true)
     })
 
     it(`${fn.name} returns false for other types`, () => {
-      expect(fn({ type: 'Other' } as any)).toBe(false)
+      expect(fn(toWebSocketEvent({ type: 'Other' }))).toBe(false)
     })
   }
 })
 
-describe('processWebSocketEvent', () => {
+describe('didProcessWebSocketEvent', () => {
   it('returns false for non-event data', () => {
-    expect(processWebSocketEvent('not an event', [])).toBe(false)
-    expect(processWebSocketEvent(null, [])).toBe(false)
+    expect(didProcessWebSocketEvent('not an event', [])).toBe(false)
+    expect(didProcessWebSocketEvent(null, [])).toBe(false)
   })
 
   it('returns false when no handler matches', () => {
-    const result = processWebSocketEvent({ type: 'Unknown' }, [
+    const isResult = didProcessWebSocketEvent({ type: 'Unknown' }, [
       {
         handler: () => {},
         typeGuard: isFavoriteAdded,
       },
     ])
-    expect(result).toBe(false)
+    expect(isResult).toBe(false)
   })
 
   it('calls the matching handler and returns true', () => {
     const handler = vi.fn()
     const event = { type: 'FavoriteAdded' }
 
-    const result = processWebSocketEvent(event, [
+    const isResult = didProcessWebSocketEvent(event, [
       {
         handler,
         typeGuard: isFavoriteAdded,
       },
     ])
 
-    expect(result).toBe(true)
+    expect(isResult).toBe(true)
     expect(handler).toHaveBeenCalledWith(event)
   })
 
@@ -138,7 +146,7 @@ describe('processWebSocketEvent', () => {
     const handler2 = vi.fn()
     const event = { type: 'FavoriteAdded' }
 
-    processWebSocketEvent(event, [
+    didProcessWebSocketEvent(event, [
       { handler: handler1, typeGuard: isFavoriteAdded },
       { handler: handler2, typeGuard: isFavoriteAdded },
     ])

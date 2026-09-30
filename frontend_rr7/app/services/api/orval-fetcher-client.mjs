@@ -25,12 +25,7 @@
  */
 
 // Endpoints without security in the OpenAPI spec
-const PUBLIC_ENDPOINTS = new Set([
-  '/config',
-  '/csrf-token',
-  '/oauth2/login',
-  '/oauth2/logout',
-])
+const PUBLIC_ENDPOINTS = new Set(['/config', '/csrf-token', '/oauth2/login', '/oauth2/logout'])
 
 function isPublicRoute(route) {
   const staticRoute = route.replaceAll(/\$\{[^}]+\}/g, '*')
@@ -60,8 +55,7 @@ function generateFetcherHeader() {
 }
 
 function generateFetcherHook(verbOptions, options) {
-  const { body, operationName, props, queryParams, response, verb } =
-    verbOptions
+  const { body, operationName, props, queryParams, response, verb } = verbOptions
   const { route } = options
 
   const hookName = `use${operationName.charAt(0).toUpperCase()}${operationName.slice(1)}`
@@ -69,61 +63,54 @@ function generateFetcherHook(verbOptions, options) {
 
   // Props have type as string: "param", "body", "query_param", "named_path_params", "header"
   // Definition includes name: "orgId: string"
-  const pathParams = props.filter(
-    (p) => p.type === 'param' || p.type === 'named_path_params',
-  )
+  const pathParameters = props.filter((p) => p.type === 'param' || p.type === 'named_path_params')
   const hasBody = body && body.definition !== ''
 
   // Build TParams type fields — extract just the type from "name: type" definitions
-  const paramFields = []
-  for (const p of pathParams) {
-    paramFields.push(p.definition)
-  }
+  const parameterFields = Array.from(pathParameters, (p) => p.definition)
   if (queryParams) {
-    paramFields.push(`params?: ${queryParams.schema.name}`)
+    parameterFields.push(`params?: ${queryParams.schema.name}`)
   }
 
   // Build type arguments for useApiProxy<TResponse, TBody, TParams>
-  const typeArgs = [responseType]
+  const typeArguments = [responseType]
   if (hasBody) {
-    typeArgs.push(body.definition)
+    typeArguments.push(body.definition)
   } else {
-    typeArgs.push('undefined')
+    typeArguments.push('undefined')
   }
-  if (paramFields.length > 0) {
-    typeArgs.push(`{ ${paramFields.join('; ')} }`)
+  if (parameterFields.length > 0) {
+    typeArguments.push(`{ ${parameterFields.join('; ')} }`)
   }
 
   // Remove trailing 'undefined' type args
-  while (typeArgs.length > 1 && typeArgs.at(-1) === 'undefined') {
-    typeArgs.pop()
+  while (typeArguments.length > 1 && typeArguments.at(-1) === 'undefined') {
+    typeArguments.pop()
   }
 
-  const typeArgsStr = typeArgs.join(', ')
+  const typeArgumentsString = typeArguments.join(', ')
 
   // Build getUrl parameter destructure
-  const urlParamNames = [
-    ...pathParams.map((p) => p.name),
+  const urlParameterNames = [
+    ...pathParameters.map((p) => p.name),
     ...(queryParams ? ['params'] : []),
   ]
-  const paramDestructure =
-    urlParamNames.length > 0 ? `{ ${urlParamNames.join(', ')} }` : ''
+  const parameterDestructure =
+    urlParameterNames.length > 0 ? `{ ${urlParameterNames.join(', ')} }` : ''
 
   // Build URL expression and optional URL builder function
-  let urlExpr
-  let urlBuilderFn = ''
+  let urlExpression
+  let urlBuilderFunction = ''
   if (queryParams) {
     const urlBuilderName = `get${operationName.charAt(0).toUpperCase()}${operationName.slice(1)}Url`
-    const urlBuilderParams = [
-      ...pathParams.map((p) => `${p.name}: string`),
+    const urlBuilderParameters = [
+      ...pathParameters.map((p) => `${p.name}: string`),
       `params?: ${queryParams.schema.name}`,
     ].join(', ')
-    const urlBuilderArgs = [...pathParams.map((p) => p.name), 'params'].join(
-      ', ',
-    )
+    const urlBuilderArguments = [...pathParameters.map((p) => p.name), 'params'].join(', ')
     const baseUrl = '`' + route + '`'
-    urlBuilderFn = `
-function ${urlBuilderName}(${urlBuilderParams}) {
+    urlBuilderFunction = `
+function ${urlBuilderName}(${urlBuilderParameters}) {
 \tconst normalizedParams = new URLSearchParams()
 \tObject.entries(params || {}).forEach(([key, value]) => {
 \t\tif (value !== undefined) {
@@ -134,18 +121,18 @@ function ${urlBuilderName}(${urlBuilderParams}) {
 \treturn query ? ${baseUrl} + '?' + query : ${baseUrl}
 }
 `
-    urlExpr = `${urlBuilderName}(${urlBuilderArgs})`
+    urlExpression = `${urlBuilderName}(${urlBuilderArguments})`
   } else {
-    urlExpr = '`' + route + '`'
+    urlExpression = '`' + route + '`'
   }
 
   const isPublic = isPublicRoute(route)
   const skipAuthLine = isPublic ? '\n\t\tskipAuth: true,' : ''
 
-  const implementation = `${urlBuilderFn}
+  const implementation = `${urlBuilderFunction}
 export function ${hookName}(options?: ApiProxyOptions<${responseType}>) {
-\treturn useApiProxy<${typeArgsStr}>({
-\t\tgetUrl: (${paramDestructure}) => ${urlExpr},
+\treturn useApiProxy<${typeArgumentsString}>({
+\t\tgetUrl: (${parameterDestructure}) => ${urlExpression},
 \t\tmethod: '${verb.toUpperCase()}',${skipAuthLine}
 \t}, options)
 }
@@ -163,7 +150,7 @@ export function ${hookName}(options?: ApiProxyOptions<${responseType}>) {
     imports.push({ name: queryParams.schema.name })
   }
   // Import types used in path param definitions (e.g. "configId: ModelsIssueImporterConfigId")
-  for (const p of pathParams) {
+  for (const p of pathParameters) {
     const parts = p.definition.split(':')
     if (parts.length >= 2) {
       const typeName = baseTypeName(parts.slice(1).join(':').trim())

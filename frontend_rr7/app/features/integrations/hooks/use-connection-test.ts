@@ -17,7 +17,7 @@
  *
  */
 
-import { type RefObject, useCallback, useEffect, useState } from 'react'
+import { type RefObject, useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { type ImporterType } from '~/lib/utils/tag-helpers'
@@ -46,24 +46,23 @@ export const useConnectionTest = ({
 }: UseConnectionTestOptions) => {
   const { t } = useTranslation('integrations')
 
-  const [connectionTestResult, setConnectionTestResult] =
-    useState<ConnectionTestResult>(null)
+  const [connectionTestResult, setConnectionTestResult] = useState<ConnectionTestResult>(null)
   const [connectionTestMessage, setConnectionTestMessage] = useState('')
 
   // Reset when modal closes
-  useEffect(() => {
+  const [wasOpen, setWasOpen] = useState(open)
+  if (open !== wasOpen) {
+    setWasOpen(open)
     if (!open) {
       setConnectionTestResult(null)
       setConnectionTestMessage('')
     }
-  }, [open])
+  }
 
   const testExistingApi = useTestExistingConfig({
     onError: (error) => {
       setConnectionTestResult('error')
-      setConnectionTestMessage(
-        error instanceof Error ? error.message : String(error),
-      )
+      setConnectionTestMessage(error.error)
     },
     onSuccess: (data) => {
       setConnectionTestResult(data?.status === 'success' ? 'success' : 'error')
@@ -79,9 +78,7 @@ export const useConnectionTest = ({
   const testConnectivityApi = useTestConnectivity({
     onError: (error) => {
       setConnectionTestResult('error')
-      setConnectionTestMessage(
-        error instanceof Error ? error.message : String(error),
-      )
+      setConnectionTestMessage(error.error)
     },
     onSuccess: (data) => {
       setConnectionTestResult(data?.status === 'success' ? 'success' : 'error')
@@ -94,13 +91,12 @@ export const useConnectionTest = ({
     },
   })
 
-  const isTestingConnection =
-    testExistingApi.isSubmitting || testConnectivityApi.isSubmitting
+  const isTestingConnection = testExistingApi.isSubmitting || testConnectivityApi.isSubmitting
 
   const getFormValues = useCallback((): Record<string, string> => {
     if (!formRef.current) return {}
     const fd = new FormData(formRef.current)
-    return Object.fromEntries(fd.entries()) as Record<string, string>
+    return Object.fromEntries(fd) as Record<string, string>
   }, [formRef])
 
   const hasNewCredentials = useCallback(() => {
@@ -111,9 +107,7 @@ export const useConnectionTest = ({
         return !!values.accessToken
       }
       case 'jira': {
-        return (
-          !!values.accessToken || !!values.consumerKey || !!values.privateKey
-        )
+        return !!values.accessToken || !!values.consumerKey || !!values.privateKey
       }
       case 'plane': {
         return !!values.apiKey

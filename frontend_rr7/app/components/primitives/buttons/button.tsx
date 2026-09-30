@@ -58,24 +58,19 @@ const buttonVariants = cva(
         accent: 'btn-accent',
         contextIcon:
           'text-neutral-content hover:bg-neutral-content/20 h-auto min-h-0 border-none bg-transparent p-2 shadow-none',
-        error:
-          'bg-red-gradient hover:bg-red-gradient-hover border-none text-white',
+        error: 'bg-red-gradient hover:bg-red-gradient-hover border-none text-white',
         ghost: 'btn-ghost',
         icon: 'btn-ghost btn-square',
         iconMuted: 'btn-ghost btn-square opacity-60 hover:opacity-100',
-        iconPrimaryHover:
-          'btn-ghost btn-square hover:bg-primary hover:text-primary-content',
+        iconPrimaryHover: 'btn-ghost btn-square hover:bg-primary hover:text-primary-content',
         info: 'btn-info',
         link: 'btn-link',
         navigation: 'btn-ghost h-auto justify-start gap-3 p-3 text-left',
-        navigationActive:
-          'btn-ghost bg-base-content/10 h-auto justify-start gap-3 p-3 text-left',
+        navigationActive: 'btn-ghost bg-base-content/10 h-auto justify-start gap-3 p-3 text-left',
         neutral: 'btn-neutral',
         outline: 'btn-outline',
-        primary:
-          'bg-primary-gradient hover:bg-primary-gradient-hover border-none text-white',
-        secondary:
-          'bg-neutral-gradient hover:bg-neutral-gradient-hover border-none text-white',
+        primary: 'bg-primary-gradient hover:bg-primary-gradient-hover border-none text-white',
+        secondary: 'bg-neutral-gradient hover:bg-neutral-gradient-hover border-none text-white',
         stopRecording:
           'bg-red-gradient hover:bg-red-gradient-hover mt-1 h-auto w-auto min-w-0 flex-col rounded-full border-none p-2 text-white shadow-sm',
         success: 'btn-success',
@@ -88,7 +83,7 @@ const buttonVariants = cva(
   },
 )
 
-export interface ButtonProps
+export interface ButtonProperties
   extends
     React.ButtonHTMLAttributes<HTMLButtonElement>,
     Omit<VariantProps<typeof buttonVariants>, 'disabled'> {
@@ -98,7 +93,7 @@ export interface ButtonProps
   join?: boolean
 }
 
-export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProperties>(
   (
     {
       children,
@@ -110,9 +105,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       shape,
       size,
       variant,
-      ...props
+      ...properties
     },
-    ref,
+    reference,
   ) => {
     const isDisabled = !!disabled || !!loading
 
@@ -131,9 +126,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           className,
         )}
         disabled={isDisabled}
-        ref={ref}
-        {...props}
-      >
+        ref={reference}
+        {...properties}>
         {loading && <span className="loading loading-spinner loading-sm" />}
         {children}
       </button>

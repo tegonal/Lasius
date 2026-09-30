@@ -11,17 +11,10 @@ import { type ModelsPersonalDataUpdate, type ModelsUser } from '../../lasius'
 /**
  * @summary Change selected user's profile in selected organisation
  */
-export function useUpdateUserProfileByOrganisation(
-  options?: ApiProxyOptions<ModelsUser>,
-) {
-  return useApiProxy<
-    ModelsUser,
-    ModelsPersonalDataUpdate,
-    { orgId: string; userId: string }
-  >(
+export function useUpdateUserProfileByOrganisation(options?: ApiProxyOptions<ModelsUser>) {
+  return useApiProxy<ModelsUser, ModelsPersonalDataUpdate, { orgId: string; userId: string }>(
     {
-      getUrl: ({ orgId, userId }) =>
-        `/users/organisations/${orgId}/users/${userId}`,
+      getUrl: ({ orgId, userId }) => `/users/organisations/${orgId}/users/${userId}`,
       method: 'POST',
     },
     options,

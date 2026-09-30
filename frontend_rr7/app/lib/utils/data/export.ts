@@ -47,10 +47,7 @@ export type ExportOptions = {
 /**
  * Generates a filename for the export based on context and timespan.
  */
-const generateExportFilename = (
-  format: ExportFormat,
-  options?: ExportOptions,
-): string => {
+const generateExportFilename = (format: ExportFormat, options?: ExportOptions): string => {
   const parts = ['lasius']
 
   if (options?.context) {
@@ -63,21 +60,18 @@ const generateExportFilename = (
     parts.push(options.contextName)
   }
 
-  if (options?.from && options?.to) {
-    const daysDiff = differenceInDays(
-      parseISO(options.to),
-      parseISO(options.from),
-    )
+  if (options?.from && options.to) {
+    const daysDiff = differenceInDays(parseISO(options.to), parseISO(options.from))
     if (daysDiff > 1) {
-      const fromDate = options.from.split('T')[0]
-      const toDate = options.to.split('T')[0]
+      const fromDate = options.from.split('T', 1)[0]
+      const toDate = options.to.split('T', 1)[0]
       parts.push(`${fromDate}-to-${toDate}`)
     } else {
-      const date = options.from.split('T')[0] ?? ''
+      const date = options.from.split('T', 1)[0] ?? ''
       parts.push(date)
     }
   } else {
-    parts.push(new Date().toISOString().split('T')[0] ?? '')
+    parts.push(new Date().toISOString().split('T', 1)[0] ?? '')
   }
 
   return `${parts.join('-')}.${format}`
@@ -115,8 +109,9 @@ export const exportBookingList = (
     const range = XLSX.utils.decode_range(ws['!ref'])
     for (let row = range.s.r + 1; row <= range.e.r; row++) {
       const addr = XLSX.utils.encode_cell({ c: durationCol, r: row })
-      if (ws[addr]) {
-        ws[addr].z = '[h]:mm'
+      const cell = ws[addr]
+      if (cell) {
+        cell.z = '[h]:mm'
       }
     }
   }
@@ -125,19 +120,19 @@ export const exportBookingList = (
   XLSX.utils.book_append_sheet(wb, ws, 'Bookings')
 
   const init: Record<string, number> = {}
-  const maxLengths = data.reduce((acc, row) => {
+  const maxLengths = data.reduce((accumulator, row) => {
     for (const key of Object.keys(row)) {
       const value = String(row[key as keyof typeof row] || '')
-      acc[key] = Math.max(
-        (acc[key] ?? 0) > 0 ? (acc[key] ?? 0) : key.length,
+      accumulator[key] = Math.max(
+        (accumulator[key] ?? 0) > 0 ? (accumulator[key] ?? 0) : key.length,
         value.length,
       )
     }
-    return acc
+    return accumulator
   }, init)
 
-  ws['!cols'] = Object.keys(maxLengths).map((key) => ({
-    wch: Math.min((maxLengths[key] ?? 0) + 2, 50),
+  ws['!cols'] = Object.values(maxLengths).map((value) => ({
+    wch: Math.min((value ?? 0) + 2, 50),
   }))
 
   const bookTypeMap: Record<string, string> = { csv: 'csv', xlsx: 'xlsx' }

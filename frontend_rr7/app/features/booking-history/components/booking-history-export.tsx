@@ -24,7 +24,7 @@ import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { type ExportContext, type ExportFormat } from '~/lib/utils/data/export'
 
-type Props = {
+type Properties = {
   context: ExportContext
   from?: string
   hasBookings: boolean
@@ -42,24 +42,24 @@ export const BookingHistoryExport = ({
   tags,
   to,
   userId,
-}: Props) => {
+}: Properties) => {
   const { t } = useTranslation('common')
   const { selectedOrganisationId } = useOrganisation()
 
   const handleExport = (format: ExportFormat) => {
-    const params = new URLSearchParams({
+    const parameters = new URLSearchParams({
       context,
       format,
       orgId: selectedOrganisationId,
       type: 'bookings',
     })
-    if (from) params.set('from', from)
-    if (to) params.set('to', to)
-    if (projectId) params.set('projectId', projectId)
-    if (userId) params.set('userId', userId)
-    if (tags) params.set('tags', tags)
+    if (from) parameters.set('from', from)
+    if (to) parameters.set('to', to)
+    if (projectId) parameters.set('projectId', projectId)
+    if (userId) parameters.set('userId', userId)
+    if (tags) parameters.set('tags', tags)
 
-    window.open(`/api/export?${params.toString()}`, '_blank')
+    window.open(`/api/export?${parameters.toString()}`, '_blank')
   }
 
   return (
@@ -70,8 +70,7 @@ export const BookingHistoryExport = ({
         className="btn btn-sm btn-neutral w-auto"
         disabled={!hasBookings}
         tabIndex={0}
-        type="button"
-      >
+        type="button">
         <LucideIcon icon={Download} size={16} />
         {t('export.actions.export', 'Export')}
         <LucideIcon icon={ChevronDown} size={16} />
@@ -80,15 +79,13 @@ export const BookingHistoryExport = ({
         aria-label={t('export.menu.label', 'Export format selection')}
         className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
         role="menu"
-        tabIndex={0}
-      >
+        tabIndex={0}>
         <li role="none">
           <button
             aria-label={t('export.formats.csvAria', 'Export as CSV file')}
             onClick={() => handleExport('csv')}
             role="menuitem"
-            type="button"
-          >
+            type="button">
             {t('export.formats.csv', 'CSV (.csv)')}
           </button>
         </li>
@@ -97,21 +94,16 @@ export const BookingHistoryExport = ({
             aria-label={t('export.formats.excelAria', 'Export as Excel file')}
             onClick={() => handleExport('xlsx')}
             role="menuitem"
-            type="button"
-          >
+            type="button">
             {t('export.formats.excel', 'Excel (.xlsx)')}
           </button>
         </li>
         <li role="none">
           <button
-            aria-label={t(
-              'export.formats.odsAria',
-              'Export as OpenDocument file',
-            )}
+            aria-label={t('export.formats.odsAria', 'Export as OpenDocument file')}
             onClick={() => handleExport('ods')}
             role="menuitem"
-            type="button"
-          >
+            type="button">
             {t('export.formats.ods', 'OpenDocument (.ods)')}
           </button>
         </li>

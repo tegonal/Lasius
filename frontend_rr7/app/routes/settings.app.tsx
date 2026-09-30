@@ -17,16 +17,12 @@
  *
  */
 
-import {
-  ColumnCenter,
-  ColumnRight,
-  innerGridClasses,
-} from '~/components/ui/layouts/layout-columns'
+import { ColumnCenter, ColumnRight, innerGridClasses } from '~/components/ui/layouts/layout-columns'
 import { ScrollArea } from '~/components/ui/layouts/scroll-area'
 import { AppSettingsForm } from '~/features/settings/components/app-settings-form'
 import { AppSettingsRightColumn } from '~/features/settings/components/app-settings-right-column'
 
-const AppSettingsPage = () => {
+export default function AppSettingsPage() {
   return (
     <div className={innerGridClasses} data-testid="settings-app-page">
       <ColumnCenter>
@@ -40,5 +36,3 @@ const AppSettingsPage = () => {
     </div>
   )
 }
-
-export default AppSettingsPage

@@ -7,13 +7,15 @@ function patchPluginsForVite8(plugins: Plugin[]): Plugin[] {
   return plugins.map((plugin) => {
     const originalConfig = plugin.config
     if (typeof originalConfig === 'function') {
-      plugin.config = async function (
-        ...args: Parameters<typeof originalConfig>
-      ) {
-        const result = await (originalConfig as Function).apply(this, args)
-        if (result && typeof result === 'object') stripEsbuildOptions(result)
-        return result
-      }
+      // The apply trap receives the plugin context that Vite binds to the hook.
+      // Reflect.apply passes that same receiver to the original hook.
+      plugin.config = new Proxy(originalConfig, {
+        async apply(target, thisArgument, arguments_) {
+          const result = await Reflect.apply(target, thisArgument, arguments_)
+          if (result && typeof result === 'object') stripEsbuildOptions(result)
+          return result
+        },
+      })
     }
     return plugin
   })
@@ -24,15 +26,13 @@ function patchPluginsForVite8(plugins: Plugin[]): Plugin[] {
  * from their config hook returns before Vite processes them.
  * Remove once @react-router/dev adds vite ^8 support.
  */
-function stripEsbuildOptions(obj: Record<string, unknown>): void {
-  delete obj.esbuild
-  const optimizeDeps = obj.optimizeDeps as Record<string, unknown> | undefined
-  if (optimizeDeps) delete optimizeDeps.esbuildOptions
-  const environments = obj.environments as
-    | Record<string, Record<string, unknown>>
-    | undefined
+function stripEsbuildOptions(object: Record<string, unknown>): void {
+  delete object.esbuild
+  const optimizeDependencies = object.optimizeDeps as Record<string, unknown> | undefined
+  if (optimizeDependencies) delete optimizeDependencies.esbuildOptions
+  const environments = object.environments as Record<string, Record<string, unknown>> | undefined
   if (environments) {
-    for (const env of Object.values(environments)) delete env.esbuild
+    for (const environment of Object.values(environments)) delete environment.esbuild
   }
 }
 

@@ -22,7 +22,7 @@ import { useEffect, useRef } from 'react'
 
 import { countDecimals } from '~/lib/utils/data/count-decimals'
 
-type Props = {
+type Properties = {
   from: number
   leftpad?: number
   to: number
@@ -30,16 +30,11 @@ type Props = {
 
 const formatNumber = (value: number, from: number, to: number) => {
   const intPrecision = to === 0 ? countDecimals(from) : 0
-  const precision = Number.isInteger(to) ? intPrecision : countDecimals(to)
+  const precision = Number.isSafeInteger(to) ? intPrecision : countDecimals(to)
   return round(value, precision)
 }
 
-const formatNumberLeftpadded = (
-  value: number,
-  from: number,
-  to: number,
-  leftpad: number,
-) =>
+const formatNumberLeftpadded = (value: number, from: number, to: number, leftpad: number) =>
   formatNumber(value, from, to)
     .toString()
     .padStart(1 + leftpad, '0')
@@ -53,11 +48,11 @@ const DURATION_MS = 330
  * @param to
  * @param leftpad
  */
-export const AnimateNumber = ({ from, leftpad = 0, to }: Props) => {
-  const nodeRef = useRef<HTMLSpanElement>(null)
+export const AnimateNumber = ({ from, leftpad = 0, to }: Properties) => {
+  const nodeReference = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
-    const node = nodeRef.current
+    const node = nodeReference.current
     if (!node) return
 
     const startTime = performance.now()
@@ -84,5 +79,5 @@ export const AnimateNumber = ({ from, leftpad = 0, to }: Props) => {
     return () => cancelAnimationFrame(rafId)
   }, [from, leftpad, to])
 
-  return <span ref={nodeRef} />
+  return <span ref={nodeReference} />
 }

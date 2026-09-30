@@ -6,9 +6,8 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type WebSocketPongType = typeof WebSocketPongType[keyof typeof WebSocketPongType];
-
+export type WebSocketPongType = (typeof WebSocketPongType)[keyof typeof WebSocketPongType]
 
 export const WebSocketPongType = {
   Pong: 'Pong',
-} as const;
+} as const

@@ -20,14 +20,12 @@
 import {
   type BarCustomLayerProps,
   type BarDatum,
+  type BarTooltipProps,
   ResponsiveBar,
 } from '@nivo/bar'
 import { line } from 'd3-shape'
 
-import {
-  TooltipContainer,
-  TooltipItem,
-} from '~/components/ui/charts/chart-tooltips'
+import { TooltipContainer, TooltipItem } from '~/components/ui/charts/chart-tooltips'
 import {
   getContrastLabelTextColor,
   nivoTheme,
@@ -36,21 +34,23 @@ import {
 import { type NivoChartDataType } from '~/lib/api/functions/get-nivo-chart-data-from-api-stats-data'
 
 const Line =
-  (props: undefined | { category: string; value: number }[]) =>
-  (layerProps: BarCustomLayerProps<BarDatum>) => {
-    if (!props) return null
-    const { bars, xScale, yScale } = layerProps
+  (properties: undefined | { category: string; value: number }[]) =>
+  (layerProperties: BarCustomLayerProps<BarDatum>) => {
+    if (!properties) return null
+    const { bars, xScale, yScale } = layerProperties
+    // The chart sets a band index scale, so the x scale of a vertical bar chart is a band scale.
+    if (xScale.type !== 'band') return null
 
     const lineBegins = line<{ category: string; value: number }>()
       .x((item) => {
-        const scaleValue = xScale(item.category as any)
+        const scaleValue = xScale(item.category)
         return (scaleValue as number) + (bars[0]?.width || 0) / 2
       })
       .y((item) => yScale(item.value) as number)
 
     return (
       <path
-        d={lineBegins(props) || undefined}
+        d={lineBegins(properties) || undefined}
         fill="none"
         stroke="oklch(var(--color-secondary))"
         strokeWidth={1}
@@ -59,9 +59,15 @@ const Line =
     )
   }
 
+const HoursBarTooltip = ({ color, id, indexValue, value }: BarTooltipProps<BarDatum>) => (
+  <TooltipContainer title={String(indexValue)}>
+    <TooltipItem color={color} label={String(id)} value={`${value}h`} />
+  </TooltipContainer>
+)
+
 export type BarChartGroupMode = 'grouped' | 'stacked'
 
-type Props = {
+type Properties = {
   groupMode: BarChartGroupMode
   indexBy: string
   stats:
@@ -73,7 +79,7 @@ type Props = {
       }
 }
 
-export const BarsHours = ({ groupMode, indexBy, stats }: Props) => {
+export const BarsHours = ({ groupMode, indexBy, stats }: Properties) => {
   const nivoColors = useNivoColors()
   const { ceilingData, data, keys } = stats || {}
   if (!data) return null
@@ -113,11 +119,7 @@ export const BarsHours = ({ groupMode, indexBy, stats }: Props) => {
       margin={{ bottom: 60, left: 60, right: 30, top: 25 }}
       padding={0.3}
       theme={nivoTheme}
-      tooltip={({ color, id, indexValue, value }) => (
-        <TooltipContainer title={String(indexValue)}>
-          <TooltipItem color={color} label={String(id)} value={`${value}h`} />
-        </TooltipContainer>
-      )}
+      tooltip={HoursBarTooltip}
       valueScale={{ type: 'linear' }}
     />
   )

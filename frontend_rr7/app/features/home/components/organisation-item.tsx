@@ -20,30 +20,25 @@
 import { AvatarUser } from '~/components/ui/data-display/avatar/avatar-user'
 import { TagList } from '~/components/ui/data-display/tag-list'
 import { cn } from '~/lib/utils/cn'
-import {
-  type ModelsCurrentUserTimeBooking,
-  type ModelsUserStub,
-} from '~/services/api/lasius'
+import { type ModelsCurrentUserTimeBooking, type ModelsUserStub } from '~/services/api/lasius'
 
 import { BookingName } from '../../bookings/components/booking-name'
 import { OrganisationItemContext } from './organisation-item-context'
 
-type Props = {
+type Properties = {
   item: ModelsCurrentUserTimeBooking
   selectedOrgId: string
   users: ModelsUserStub[]
 }
 
-export const OrganisationItem = ({ item, selectedOrgId, users }: Props) => {
+export const OrganisationItem = ({ item, selectedOrgId, users }: Properties) => {
   if (!item?.userReference?.id) return null
 
   const userData = users.find((u) => u.id === item.userReference.id)
 
   const userKey = item.userReference.key || ''
-  const firstName =
-    userData?.firstName || userKey.split('.')[0] || userKey[0] || ''
-  const lastName =
-    userData?.lastName || userKey.split('.')[1] || userKey[1] || ''
+  const firstName = userData?.firstName || userKey.split('.', 1)[0] || userKey[0] || ''
+  const lastName = userData?.lastName || userKey.split('.', 2)[1] || userKey[1] || ''
 
   const { booking } = item
   return (
@@ -52,8 +47,7 @@ export const OrganisationItem = ({ item, selectedOrgId, users }: Props) => {
         className={cn(
           'flex flex-row items-center justify-center gap-2',
           !booking && 'opacity-[0.333] grayscale',
-        )}
-      >
+        )}>
         <AvatarUser firstName={firstName} lastName={lastName} />
         {booking && (
           <div className="flex flex-col gap-1">

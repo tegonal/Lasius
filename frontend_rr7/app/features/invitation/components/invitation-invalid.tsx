@@ -32,8 +32,7 @@ export const InvitationInvalid = () => {
       <Card
         className="border-base-300 bg-base-100 w-full max-w-md border"
         data-testid="invite-invalid"
-        shadow="xl"
-      >
+        shadow="xl">
         <CardBody className="gap-6 p-8">
           <div className="flex justify-center">
             <Logo />

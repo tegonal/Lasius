@@ -23,15 +23,12 @@ import { InvitationInvalid } from '~/features/invitation/components/invitation-i
 import { InvitationNeedsAccount } from '~/features/invitation/components/invitation-needs-account'
 import { InvitationOtherSession } from '~/features/invitation/components/invitation-other-session'
 import { InvitationUserConfirm } from '~/features/invitation/components/invitation-user-confirm'
-import { getServerEnv } from '~/lib/env.server'
+import { getServerEnvironment } from '~/lib/environment.server'
 import { logger } from '~/lib/logger'
 import { getDeduplicatedUserProfile } from '~/lib/organisation-helpers.server'
 import { getInvitationStatus } from '~/services/api/lasius/invitations-public/invitations-public'
 import { type getUserProfileResponse } from '~/services/api/lasius/user/user'
-import {
-  authHeaders,
-  getOptionalUser,
-} from '~/services/auth/auth-helpers.server'
+import { authHeaders, getOptionalUser } from '~/services/auth/auth-helpers.server'
 import { getEnabledProviders } from '~/services/auth/providers'
 
 import { type Route } from './+types/join.$invitationId'
@@ -44,11 +41,7 @@ export default function Join() {
     return <InvitationInvalid />
   }
 
-  if (
-    invitation.invitation?.id &&
-    invitation.invitation?.invitedEmail &&
-    !userEmail
-  ) {
+  if (invitation.invitation?.id && invitation.invitation.invitedEmail && !userEmail) {
     return (
       <InvitationNeedsAccount
         invitation={invitation}
@@ -63,12 +56,7 @@ export default function Join() {
   }
 
   if (userEmail) {
-    return (
-      <InvitationUserConfirm
-        invitation={invitation}
-        organisations={organisations}
-      />
-    )
+    return <InvitationUserConfirm invitation={invitation} organisations={organisations} />
   }
 
   return null
@@ -104,7 +92,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   }
 
   const providers = getEnabledProviders()
-  const keycloakName = getServerEnv('KEYCLOAK_OAUTH_PROVIDER_NAME')
+  const keycloakName = getServerEnvironment('KEYCLOAK_OAUTH_PROVIDER_NAME')
 
   return { invitation, keycloakName, organisations, providers, userEmail }
 }

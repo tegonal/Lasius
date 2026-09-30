@@ -35,24 +35,20 @@ import { useContextMenu } from '~/features/context-menu/hooks/use-context-menu'
 import { ProjectMappingSelector } from '~/features/integrations/components/wizard/steps/project-mapping-selector'
 import {
   type MappingWithTagConfig,
-  type TagConfiguration,
+  type TagConfig,
 } from '~/features/integrations/lib/mapping-helpers'
 import { useProjects } from '~/features/projects/hooks/use-projects'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 import { type ModelsExternalProject } from '~/services/api/lasius'
 
-type Props = {
+type Properties = {
   excludeProjectIds: string[]
   externalProject: ModelsExternalProject
   importerType: ImporterType
   lasiusProjects: Array<{ id: string; key: string }>
   mapping: MappingWithTagConfig
-  onMappingRemove: (extId: string, projectId: string) => void
-  onMappingUpsert: (
-    extId: string,
-    projectId: string,
-    tagConfig?: TagConfiguration,
-  ) => void
+  onMappingRemove: (extensionId: string, projectId: string) => void
+  onMappingUpsert: (extensionId: string, projectId: string, tagConfig?: TagConfig) => void
   onRefreshTags?: (mappingId: string) => void
 }
 
@@ -65,15 +61,14 @@ export const ProjectMappingRowContext = ({
   onMappingRemove,
   onMappingUpsert,
   onRefreshTags,
-}: Props) => {
+}: Properties) => {
   const { t } = useTranslation('integrations')
   const [isSelectorOpen, setIsSelectorOpen] = useState(false)
   const [isConfirmRemoveOpen, setIsConfirmRemoveOpen] = useState(false)
   const { handleCloseAll } = useContextMenu()
   const { findProjectById } = useProjects()
 
-  const projectName =
-    findProjectById(mapping.projectId)?.key ?? mapping.projectId
+  const projectName = findProjectById(mapping.projectId)?.key ?? mapping.projectId
 
   const handleSelectorClose = () => setIsSelectorOpen(false)
 
@@ -94,25 +89,23 @@ export const ProjectMappingRowContext = ({
 
   return (
     <>
-      <ContextBody
-        hash={`${externalProject.id}::${mapping.projectId}`}
-        variant="compact"
-      >
+      <ContextBody hash={`${externalProject.id}::${mapping.projectId}`} variant="compact">
         <div
           aria-label={t('issueImporters.wizard.projects.editMapping', {
             defaultValue: 'Edit Project Mapping',
           })}
           className="badge badge-outline cursor-pointer gap-1"
           onClick={openSelector}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault()
-              openSelector()
+          onKeyDown={(event) => {
+            if (!(event.key === 'Enter' || event.key === ' ')) {
+              return
             }
+
+            event.preventDefault()
+            openSelector()
           }}
           role="button"
-          tabIndex={0}
-        >
+          tabIndex={0}>
           <LucideIcon className="text-primary" icon={FolderOpen} size={12} />
           <span className="text-xs">{projectName}</span>
           <button
@@ -120,12 +113,11 @@ export const ProjectMappingRowContext = ({
               defaultValue: 'Remove mapping',
             })}
             className="btn btn-ghost btn-xs p-0"
-            onClick={(e) => {
-              e.stopPropagation()
+            onClick={(event) => {
+              event.stopPropagation()
               openConfirmRemove()
             }}
-            type="button"
-          >
+            type="button">
             <LucideIcon icon={X} size={12} />
           </button>
         </div>
@@ -146,8 +138,7 @@ export const ProjectMappingRowContext = ({
                   title={t('issueImporters.actions.refreshTags', {
                     defaultValue: 'Refresh tags',
                   })}
-                  variant="contextIcon"
-                >
+                  variant="contextIcon">
                   <LucideIcon icon={RefreshCw} size={24} />
                 </Button>
               </ContextButtonWrapper>

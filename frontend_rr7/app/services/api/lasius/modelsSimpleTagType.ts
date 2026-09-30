@@ -6,9 +6,8 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type ModelsSimpleTagType = typeof ModelsSimpleTagType[keyof typeof ModelsSimpleTagType];
-
+export type ModelsSimpleTagType = (typeof ModelsSimpleTagType)[keyof typeof ModelsSimpleTagType]
 
 export const ModelsSimpleTagType = {
   SimpleTag: 'SimpleTag',
-} as const;
+} as const

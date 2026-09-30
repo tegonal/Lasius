@@ -19,15 +19,11 @@
 
 import { data } from 'react-router'
 
-import { type BarChartGroupMode } from '~/features/stats/components/bars-hours'
 import { ChartErrorBoundary } from '~/features/stats/components/error-boundary-chart'
 import { StatsBarsByAggregatedTags } from '~/features/stats/components/stats-bars-by-aggregated-tags'
 import { StatsBarsBySource } from '~/features/stats/components/stats-bars-by-source'
 import { statsClientLoader } from '~/features/stats/stats-loader'
-import {
-  loadOrgStatsContext,
-  statsResponseHeaders,
-} from '~/features/stats/stats-loader.server'
+import { loadOrgStatsContext, statsResponseHeaders } from '~/features/stats/stats-loader.server'
 import { getAdaptiveGranularity } from '~/lib/api/config/granularity-config'
 import { getNivoChartDataFromApiStatsData } from '~/lib/api/functions/get-nivo-chart-data-from-api-stats-data'
 import { getTransformedChartDataAggregate } from '~/lib/api/functions/get-transformed-chart-data-aggregate'
@@ -40,15 +36,15 @@ import { type Route } from './+types/organisation.stats.tags'
 
 // ─── Client Loader (cache unless full-page refresh) ──────────────────────────
 
-export const clientLoader = async (args: Route.ClientLoaderArgs) =>
-  statsClientLoader(args)
+export const clientLoader = async (arguments_: Route.ClientLoaderArgs) =>
+  statsClientLoader(arguments_)
 clientLoader.hydrate = false
 
 // ─── Loader ──────────────────────────────────────────────────────────────────
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const ctx = await loadOrgStatsContext(request)
-  const { from, headers, selectedOrgId, to } = ctx
+  const context = await loadOrgStatsContext(request)
+  const { from, headers, selectedOrgId, to } = context
 
   const granularity = getAdaptiveGranularity(from, to)
 
@@ -56,7 +52,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const datespan = apiDatespanFromTo(from, to)
 
   // Fetch tag stats in parallel
-  const [tagsByDayRes, tagsAggregatedRes] = await Promise.all([
+  const [tagsByDayResponse, tagsAggregatedResponse] = await Promise.all([
     datespan
       ? getOrganisationBookingAggregatedStats(
           selectedOrgId,
@@ -83,14 +79,11 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
       : Promise.resolve({ data: [] }),
   ])
 
-  const tagsByDay = tagsByDayRes.data ?? []
-  const tagsAggregated = tagsAggregatedRes.data ?? []
+  const tagsByDay = tagsByDayResponse.data ?? []
+  const tagsAggregated = tagsAggregatedResponse.data ?? []
 
   // Transform data server-side
-  const tagsByDayChart = getNivoChartDataFromApiStatsData(
-    tagsByDay,
-    granularity,
-  )
+  const tagsByDayChart = getNivoChartDataFromApiStatsData(tagsByDay, granularity)
   const tagsAggregatedChart = getTransformedChartDataAggregate(tagsAggregated)
 
   return data(
@@ -98,7 +91,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
       tagsAggregatedChart,
       tagsByDayChart,
     },
-    { headers: statsResponseHeaders(ctx.auth) },
+    { headers: statsResponseHeaders(context.auth) },
   )
 }
 
@@ -110,10 +103,7 @@ const OrgStatsTags = ({ loaderData }: Route.ComponentProps) => {
   return (
     <div className="px-6">
       <ChartErrorBoundary>
-        <StatsBarsBySource
-          chartData={tagsByDayChart}
-          groupMode={'stacked' as BarChartGroupMode}
-        />
+        <StatsBarsBySource chartData={tagsByDayChart} groupMode="stacked" />
         <div className="divider my-4" />
         <StatsBarsByAggregatedTags chartData={tagsAggregatedChart} />
       </ChartErrorBoundary>

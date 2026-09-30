@@ -20,7 +20,7 @@
 import { Menu } from '@base-ui/react/menu'
 import { round } from 'es-toolkit'
 import { ChevronDown, Clock } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
@@ -32,7 +32,7 @@ import { Modal } from '~/components/ui/overlays/modal/modal'
 import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
 import { cn } from '~/lib/utils/cn'
 
-type Props = {
+type Properties = {
   dayName?: string
   disabled?: boolean
   isWeekend?: boolean
@@ -50,11 +50,15 @@ const PRESET_HOURS = [
 ]
 
 const formatHours = (decimal: number) => {
-  if (decimal === 0) return '\u2014'
+  if (decimal === 0) return '\u{2014}'
   const hours = Math.floor(decimal)
   const minutes = Math.round((decimal - hours) * 60)
   return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
 }
+
+const getWholeHours = (decimal: number) => Math.floor(decimal)
+
+const getRemainingMinutes = (decimal: number) => Math.round((decimal % 1) * 60)
 
 export const TimeDropdownWithModal = ({
   dayName: _dayName = 'time',
@@ -63,18 +67,21 @@ export const TimeDropdownWithModal = ({
   onChange,
   orgId: _orgId = 'default',
   value,
-}: Props) => {
+}: Properties) => {
   const { t } = useTranslation('common')
   const [isOpen, setIsOpen] = useState(false)
-  const [customHours, setCustomHours] = useState(0)
-  const [customMinutes, setCustomMinutes] = useState(0)
+  const [customHours, setCustomHours] = useState(() => getWholeHours(value))
+  const [customMinutes, setCustomMinutes] = useState(() => getRemainingMinutes(value))
 
   const handleClose = () => setIsOpen(false)
 
-  useEffect(() => {
-    setCustomHours(Math.floor(value))
-    setCustomMinutes(Math.round((value % 1) * 60))
-  }, [value])
+  // Copy a new value into the custom time fields
+  const [previousValue, setPreviousValue] = useState(value)
+  if (!Object.is(value, previousValue)) {
+    setPreviousValue(value)
+    setCustomHours(getWholeHours(value))
+    setCustomMinutes(getRemainingMinutes(value))
+  }
 
   const currentDisplay = formatHours(value)
 
@@ -98,14 +105,9 @@ export const TimeDropdownWithModal = ({
             isWeekend && 'opacity-60',
             value === 0 && 'text-base-content/50',
           )}
-          disabled={disabled}
-        >
+          disabled={disabled}>
           <span className="text-sm">{currentDisplay}</span>
-          <LucideIcon
-            className="opacity-50 group-hover:opacity-100"
-            icon={ChevronDown}
-            size={12}
-          />
+          <LucideIcon className="opacity-50 group-hover:opacity-100" icon={ChevronDown} size={12} />
         </Menu.Trigger>
 
         <Menu.Portal>
@@ -120,8 +122,7 @@ export const TimeDropdownWithModal = ({
                       value === preset.value && 'bg-primary/10 font-medium',
                     )}
                     key={preset.value}
-                    onClick={() => handlePresetSelect(preset.value)}
-                  >
+                    onClick={() => handlePresetSelect(preset.value)}>
                     {preset.label}
                   </Menu.Item>
                 ))}
@@ -132,8 +133,7 @@ export const TimeDropdownWithModal = ({
                   'flex w-full items-center justify-between rounded px-2 py-1.5 text-left text-sm',
                   'hover:bg-base-200 data-[highlighted]:bg-base-200 cursor-pointer',
                 )}
-                onClick={() => setIsOpen(true)}
-              >
+                onClick={() => setIsOpen(true)}>
                 <span>{t('time.customTime', 'Custom time...')}</span>
                 <LucideIcon icon={Clock} size={12} />
               </Menu.Item>
@@ -160,10 +160,8 @@ export const TimeDropdownWithModal = ({
                   className="input input-bordered w-20 text-center"
                   max={24}
                   min={0}
-                  onChange={(e) =>
-                    setCustomHours(
-                      Math.max(0, Number.parseInt(e.target.value) || 0),
-                    )
+                  onChange={(event) =>
+                    setCustomHours(Math.max(0, Number.parseInt(event.target.value) || 0))
                   }
                   type="number"
                   value={customHours}
@@ -178,14 +176,10 @@ export const TimeDropdownWithModal = ({
                   className="input input-bordered w-20 text-center"
                   max={59}
                   min={0}
-                  onChange={(e) =>
-                    setCustomMinutes(
-                      Math.max(
-                        0,
-                        Math.min(59, Number.parseInt(e.target.value) || 0),
-                      ),
-                    )
-                  }
+                  onChange={(event) => {
+                    const minutes = Number.parseInt(event.target.value) || 0
+                    setCustomMinutes(Math.max(0, Math.min(59, minutes)))
+                  }}
                   type="number"
                   value={customMinutes}
                 />
@@ -197,11 +191,7 @@ export const TimeDropdownWithModal = ({
               <Button className="w-full" onClick={handleCustomSubmit}>
                 {t('actions.save', 'Save')}
               </Button>
-              <Button
-                className="w-full"
-                onClick={handleClose}
-                variant="secondary"
-              >
+              <Button className="w-full" onClick={handleClose} variant="secondary">
                 {t('actions.close', 'Close')}
               </Button>
             </div>

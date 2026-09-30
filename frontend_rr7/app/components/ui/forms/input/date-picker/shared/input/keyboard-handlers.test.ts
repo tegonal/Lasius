@@ -20,9 +20,9 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import {
-  handleBackspaceDelete,
-  handleEscapeKey,
-  handleSeparatorKey,
+  didHandleBackspaceDelete,
+  didHandleEscapeKey,
+  didHandleSeparatorKey,
 } from './keyboard-handlers'
 
 type DateSegment = 'day' | 'month' | 'year'
@@ -44,182 +44,193 @@ const placeholders: Record<DateSegment, string> = {
   year: '____',
 }
 
+type MockInputElement = Pick<HTMLInputElement, 'blur' | 'selectionEnd' | 'selectionStart'>
+// The handlers read only these members. A Node test cannot build a React event or a DOM element.
+// The helpers below widen these typed partial mocks to the parameter types of the handlers.
+type MockKeyboardEvent = Pick<
+  React.KeyboardEvent<HTMLInputElement>,
+  'key' | 'preventDefault' | 'stopPropagation'
+>
+
 function createMockEvent(
   key: string,
   _overrides?: { selectionEnd?: number; selectionStart?: number },
 ) {
-  return {
+  const event: MockKeyboardEvent = {
     key,
     preventDefault: vi.fn(),
     stopPropagation: vi.fn(),
-  } as any
+  }
+  return event as React.KeyboardEvent<HTMLInputElement>
 }
 
-function createMockInputRef(overrides?: {
+function createMockInputReference(overrides?: {
   blur?: () => void
   selectionEnd?: number
   selectionStart?: number
 }) {
-  return {
-    current: {
-      blur: overrides?.blur ?? vi.fn(),
-      selectionEnd: overrides?.selectionEnd ?? 0,
-      selectionStart: overrides?.selectionStart ?? 0,
-    },
-  } as any
+  return toInputReference({
+    blur: overrides?.blur ?? vi.fn(),
+    selectionEnd: overrides?.selectionEnd ?? 0,
+    selectionStart: overrides?.selectionStart ?? 0,
+  })
 }
 
-describe('handleEscapeKey', () => {
+function toInputReference(element: MockInputElement): React.RefObject<HTMLInputElement | null> {
+  return { current: element as HTMLInputElement }
+}
+
+describe('didHandleEscapeKey', () => {
   it('calls preventDefault, stopPropagation, resetToInitial, and blur on Escape', () => {
     const blur = vi.fn()
-    const e = createMockEvent('Escape')
-    const inputRef = createMockInputRef({ blur })
+    const event = createMockEvent('Escape')
+    const inputReference = createMockInputReference({ blur })
     const resetToInitial = vi.fn()
 
-    const result = handleEscapeKey(e, inputRef, resetToInitial)
+    const isResult = didHandleEscapeKey(event, inputReference, resetToInitial)
 
-    expect(result).toBe(true)
-    expect(e.preventDefault).toHaveBeenCalled()
-    expect(e.stopPropagation).toHaveBeenCalled()
+    expect(isResult).toBe(true)
+    expect(event.preventDefault).toHaveBeenCalled()
+    expect(event.stopPropagation).toHaveBeenCalled()
     expect(resetToInitial).toHaveBeenCalled()
     expect(blur).toHaveBeenCalled()
   })
 
   it('returns false and does nothing for non-Escape key', () => {
     const blur = vi.fn()
-    const e = createMockEvent('Enter')
-    const inputRef = createMockInputRef({ blur })
+    const event = createMockEvent('Enter')
+    const inputReference = createMockInputReference({ blur })
     const resetToInitial = vi.fn()
 
-    const result = handleEscapeKey(e, inputRef, resetToInitial)
+    const isResult = didHandleEscapeKey(event, inputReference, resetToInitial)
 
-    expect(result).toBe(false)
-    expect(e.preventDefault).not.toHaveBeenCalled()
-    expect(e.stopPropagation).not.toHaveBeenCalled()
+    expect(isResult).toBe(false)
+    expect(event.preventDefault).not.toHaveBeenCalled()
+    expect(event.stopPropagation).not.toHaveBeenCalled()
     expect(resetToInitial).not.toHaveBeenCalled()
     expect(blur).not.toHaveBeenCalled()
   })
 })
 
-describe('handleSeparatorKey', () => {
+describe('didHandleSeparatorKey', () => {
   const separatorKeys = ['.', ',']
 
   it('advances to next segment when "." is pressed', () => {
-    const e = createMockEvent('.')
-    const inputRef = createMockInputRef({ selectionStart: 1 }) // inside 'day'
-    const selectSegmentFn = vi.fn()
+    const event = createMockEvent('.')
+    const inputReference = createMockInputReference({ selectionStart: 1 }) // inside 'day'
+    const selectSegmentFunction = vi.fn()
 
-    const result = handleSeparatorKey(
-      e,
+    const isResult = didHandleSeparatorKey(
+      event,
       separatorKeys,
-      inputRef,
+      inputReference,
       inputValue,
       delimiter,
       segmentNames,
-      selectSegmentFn,
+      selectSegmentFunction,
     )
 
-    expect(result).toBe(true)
-    expect(e.preventDefault).toHaveBeenCalled()
-    expect(selectSegmentFn).toHaveBeenCalledWith('month')
+    expect(isResult).toBe(true)
+    expect(event.preventDefault).toHaveBeenCalled()
+    expect(selectSegmentFunction).toHaveBeenCalledWith('month')
   })
 
   it('advances to next segment when "," is pressed', () => {
-    const e = createMockEvent(',')
-    const inputRef = createMockInputRef({ selectionStart: 1 })
-    const selectSegmentFn = vi.fn()
+    const event = createMockEvent(',')
+    const inputReference = createMockInputReference({ selectionStart: 1 })
+    const selectSegmentFunction = vi.fn()
 
-    const result = handleSeparatorKey(
-      e,
+    const isResult = didHandleSeparatorKey(
+      event,
       separatorKeys,
-      inputRef,
+      inputReference,
       inputValue,
       delimiter,
       segmentNames,
-      selectSegmentFn,
+      selectSegmentFunction,
     )
 
-    expect(result).toBe(true)
-    expect(e.preventDefault).toHaveBeenCalled()
-    expect(selectSegmentFn).toHaveBeenCalledWith('month')
+    expect(isResult).toBe(true)
+    expect(event.preventDefault).toHaveBeenCalled()
+    expect(selectSegmentFunction).toHaveBeenCalledWith('month')
   })
 
   it('returns false for non-separator key', () => {
-    const e = createMockEvent('a')
-    const inputRef = createMockInputRef({ selectionStart: 1 })
-    const selectSegmentFn = vi.fn()
+    const event = createMockEvent('a')
+    const inputReference = createMockInputReference({ selectionStart: 1 })
+    const selectSegmentFunction = vi.fn()
 
-    const result = handleSeparatorKey(
-      e,
+    const isResult = didHandleSeparatorKey(
+      event,
       separatorKeys,
-      inputRef,
+      inputReference,
       inputValue,
       delimiter,
       segmentNames,
-      selectSegmentFn,
+      selectSegmentFunction,
     )
 
-    expect(result).toBe(false)
-    expect(e.preventDefault).not.toHaveBeenCalled()
-    expect(selectSegmentFn).not.toHaveBeenCalled()
+    expect(isResult).toBe(false)
+    expect(event.preventDefault).not.toHaveBeenCalled()
+    expect(selectSegmentFunction).not.toHaveBeenCalled()
   })
 
   it('returns true but does not advance when at last segment', () => {
-    const e = createMockEvent('.')
-    const inputRef = createMockInputRef({ selectionStart: 8 }) // inside 'year'
-    const selectSegmentFn = vi.fn()
+    const event = createMockEvent('.')
+    const inputReference = createMockInputReference({ selectionStart: 8 }) // inside 'year'
+    const selectSegmentFunction = vi.fn()
 
-    const result = handleSeparatorKey(
-      e,
+    const isResult = didHandleSeparatorKey(
+      event,
       separatorKeys,
-      inputRef,
+      inputReference,
       inputValue,
       delimiter,
       segmentNames,
-      selectSegmentFn,
+      selectSegmentFunction,
     )
 
-    expect(result).toBe(true)
-    expect(e.preventDefault).toHaveBeenCalled()
-    expect(selectSegmentFn).not.toHaveBeenCalled()
+    expect(isResult).toBe(true)
+    expect(event.preventDefault).toHaveBeenCalled()
+    expect(selectSegmentFunction).not.toHaveBeenCalled()
   })
 
   it('advances from first segment to second', () => {
-    const e = createMockEvent('.')
-    const inputRef = createMockInputRef({ selectionStart: 0 }) // start of 'day'
-    const selectSegmentFn = vi.fn()
+    const event = createMockEvent('.')
+    const inputReference = createMockInputReference({ selectionStart: 0 }) // start of 'day'
+    const selectSegmentFunction = vi.fn()
 
-    const result = handleSeparatorKey(
-      e,
+    const isResult = didHandleSeparatorKey(
+      event,
       separatorKeys,
-      inputRef,
+      inputReference,
       inputValue,
       delimiter,
       segmentNames,
-      selectSegmentFn,
+      selectSegmentFunction,
     )
 
-    expect(result).toBe(true)
-    expect(selectSegmentFn).toHaveBeenCalledWith('month')
+    expect(isResult).toBe(true)
+    expect(selectSegmentFunction).toHaveBeenCalledWith('month')
   })
 })
 
-describe('handleBackspaceDelete', () => {
+describe('didHandleBackspaceDelete', () => {
   it('replaces day segment with placeholder when entire segment is selected', () => {
     vi.useFakeTimers()
 
-    const e = createMockEvent('Backspace')
-    const inputRef = createMockInputRef({
+    const event = createMockEvent('Backspace')
+    const inputReference = createMockInputReference({
       selectionEnd: 2,
       selectionStart: 0,
     })
     const setInputValue = vi.fn()
     const updateStore = vi.fn()
-    const selectSegmentFn = vi.fn()
+    const selectSegmentFunction = vi.fn()
 
-    const result = handleBackspaceDelete(
-      e,
-      inputRef,
+    const isResult = didHandleBackspaceDelete(
+      event,
+      inputReference,
       inputValue,
       delimiter,
       segmentNames,
@@ -227,33 +238,33 @@ describe('handleBackspaceDelete', () => {
       placeholders,
       setInputValue,
       updateStore,
-      selectSegmentFn,
+      selectSegmentFunction,
     )
 
-    expect(result).toBe(true)
-    expect(e.preventDefault).toHaveBeenCalled()
+    expect(isResult).toBe(true)
+    expect(event.preventDefault).toHaveBeenCalled()
     expect(setInputValue).toHaveBeenCalledWith('__.03.2026')
     expect(updateStore).toHaveBeenCalledWith('__.03.2026')
 
     vi.runAllTimers()
-    expect(selectSegmentFn).toHaveBeenCalledWith('day')
+    expect(selectSegmentFunction).toHaveBeenCalledWith('day')
 
     vi.useRealTimers()
   })
 
   it('returns false when segment is not fully selected (partial selection)', () => {
-    const e = createMockEvent('Backspace')
-    const inputRef = createMockInputRef({
+    const event = createMockEvent('Backspace')
+    const inputReference = createMockInputReference({
       selectionEnd: 1,
       selectionStart: 0,
     })
     const setInputValue = vi.fn()
     const updateStore = vi.fn()
-    const selectSegmentFn = vi.fn()
+    const selectSegmentFunction = vi.fn()
 
-    const result = handleBackspaceDelete(
-      e,
-      inputRef,
+    const isResult = didHandleBackspaceDelete(
+      event,
+      inputReference,
       inputValue,
       delimiter,
       segmentNames,
@@ -261,10 +272,10 @@ describe('handleBackspaceDelete', () => {
       placeholders,
       setInputValue,
       updateStore,
-      selectSegmentFn,
+      selectSegmentFunction,
     )
 
-    expect(result).toBe(false)
+    expect(isResult).toBe(false)
     expect(setInputValue).not.toHaveBeenCalled()
     expect(updateStore).not.toHaveBeenCalled()
   })
@@ -272,18 +283,18 @@ describe('handleBackspaceDelete', () => {
   it('handles Delete key same as Backspace', () => {
     vi.useFakeTimers()
 
-    const e = createMockEvent('Delete')
-    const inputRef = createMockInputRef({
+    const event = createMockEvent('Delete')
+    const inputReference = createMockInputReference({
       selectionEnd: 5,
       selectionStart: 3,
     })
     const setInputValue = vi.fn()
     const updateStore = vi.fn()
-    const selectSegmentFn = vi.fn()
+    const selectSegmentFunction = vi.fn()
 
-    const result = handleBackspaceDelete(
-      e,
-      inputRef,
+    const isResult = didHandleBackspaceDelete(
+      event,
+      inputReference,
       inputValue,
       delimiter,
       segmentNames,
@@ -291,32 +302,32 @@ describe('handleBackspaceDelete', () => {
       placeholders,
       setInputValue,
       updateStore,
-      selectSegmentFn,
+      selectSegmentFunction,
     )
 
-    expect(result).toBe(true)
+    expect(isResult).toBe(true)
     expect(setInputValue).toHaveBeenCalledWith('24.__.2026')
     expect(updateStore).toHaveBeenCalledWith('24.__.2026')
 
     vi.runAllTimers()
-    expect(selectSegmentFn).toHaveBeenCalledWith('month')
+    expect(selectSegmentFunction).toHaveBeenCalledWith('month')
 
     vi.useRealTimers()
   })
 
   it('returns false for non-Backspace/Delete key', () => {
-    const e = createMockEvent('a')
-    const inputRef = createMockInputRef({
+    const event = createMockEvent('a')
+    const inputReference = createMockInputReference({
       selectionEnd: 2,
       selectionStart: 0,
     })
     const setInputValue = vi.fn()
     const updateStore = vi.fn()
-    const selectSegmentFn = vi.fn()
+    const selectSegmentFunction = vi.fn()
 
-    const result = handleBackspaceDelete(
-      e,
-      inputRef,
+    const isResult = didHandleBackspaceDelete(
+      event,
+      inputReference,
       inputValue,
       delimiter,
       segmentNames,
@@ -324,28 +335,27 @@ describe('handleBackspaceDelete', () => {
       placeholders,
       setInputValue,
       updateStore,
-      selectSegmentFn,
+      selectSegmentFunction,
     )
 
-    expect(result).toBe(false)
+    expect(isResult).toBe(false)
     expect(setInputValue).not.toHaveBeenCalled()
   })
 
   it('returns false when selectionStart is null', () => {
-    const e = createMockEvent('Backspace')
-    const inputRef = {
-      current: {
-        selectionEnd: null,
-        selectionStart: null,
-      },
-    } as any
+    const event = createMockEvent('Backspace')
+    const inputReference = toInputReference({
+      blur: vi.fn(),
+      selectionEnd: null,
+      selectionStart: null,
+    })
     const setInputValue = vi.fn()
     const updateStore = vi.fn()
-    const selectSegmentFn = vi.fn()
+    const selectSegmentFunction = vi.fn()
 
-    const result = handleBackspaceDelete(
-      e,
-      inputRef,
+    const isResult = didHandleBackspaceDelete(
+      event,
+      inputReference,
       inputValue,
       delimiter,
       segmentNames,
@@ -353,10 +363,10 @@ describe('handleBackspaceDelete', () => {
       placeholders,
       setInputValue,
       updateStore,
-      selectSegmentFn,
+      selectSegmentFunction,
     )
 
-    expect(result).toBe(false)
+    expect(isResult).toBe(false)
     expect(setInputValue).not.toHaveBeenCalled()
   })
 })

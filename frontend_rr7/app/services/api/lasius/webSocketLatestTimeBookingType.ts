@@ -6,9 +6,9 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type WebSocketLatestTimeBookingType = typeof WebSocketLatestTimeBookingType[keyof typeof WebSocketLatestTimeBookingType];
-
+export type WebSocketLatestTimeBookingType =
+  (typeof WebSocketLatestTimeBookingType)[keyof typeof WebSocketLatestTimeBookingType]
 
 export const WebSocketLatestTimeBookingType = {
   LatestTimeBooking: 'LatestTimeBooking',
-} as const;
+} as const

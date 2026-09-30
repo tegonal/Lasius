@@ -67,9 +67,7 @@ export const useCalendarDaySummary = (date: IsoDateString) => {
   // Calculate total hours for this day
   const hours = useMemo(() => {
     const total = sumBy(dayBookings, (booking) =>
-      booking.end?.dateTime
-        ? durationInHours(booking.start.dateTime, booking.end.dateTime)
-        : 0,
+      booking.end?.dateTime ? durationInHours(booking.start.dateTime, booking.end.dateTime) : 0,
     )
     return Math.round(total * 100) / 100
   }, [dayBookings])

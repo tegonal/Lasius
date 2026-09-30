@@ -32,13 +32,13 @@ const bookingNameVariants = cva('leading-normal', {
   },
 })
 
-type Props = {
+type Properties = {
   className?: string
   item: undefined | { projectReference: ModelsEntityReference }
   variant?: 'compact'
 }
 
-export const BookingName = ({ className, item, variant }: Props) => {
+export const BookingName = ({ className, item, variant }: Properties) => {
   if (!item?.projectReference?.key) return null
   return (
     <div className={cn(bookingNameVariants({ variant }), className)}>

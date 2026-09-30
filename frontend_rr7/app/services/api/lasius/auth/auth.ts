@@ -30,17 +30,13 @@ export type createWsTicketResponseError = createWsTicketResponse401 & {
   headers: Headers
 }
 
-export type createWsTicketResponse =
-  | createWsTicketResponseSuccess
-  | createWsTicketResponseError
+export type createWsTicketResponse = createWsTicketResponseSuccess | createWsTicketResponseError
 
 export const getCreateWsTicketUrl = () => {
   return `/auth/ws-ticket`
 }
 
-export const createWsTicket = async (
-  options?: RequestInit,
-): Promise<createWsTicketResponse> => {
+export const createWsTicket = async (options?: RequestInit): Promise<createWsTicketResponse> => {
   return lasiusFetch<createWsTicketResponse>(getCreateWsTicketUrl(), {
     ...options,
     method: 'POST',

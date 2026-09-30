@@ -36,7 +36,7 @@ export interface SelectOption {
   value: string
 }
 
-interface SelectProps {
+interface SelectProperties {
   buttonClassName?: string
   className?: string
   disabled?: boolean
@@ -60,7 +60,7 @@ export const Select = ({
   optionsClassName,
   placeholder = 'Select an option',
   value,
-}: SelectProps) => {
+}: SelectProperties) => {
   const selectedOption = options.find((option) => option.value === value)
 
   return (
@@ -73,14 +73,8 @@ export const Select = ({
             'disabled:bg-base-200 disabled:text-base-content/50',
             buttonClassName,
           )}
-          id={id}
-        >
-          <span
-            className={cn(
-              'block truncate',
-              !selectedOption && 'text-base-content/50',
-            )}
-          >
+          id={id}>
+          <span className={cn('block truncate', !selectedOption && 'text-base-content/50')}>
             {selectedOption?.label || placeholder}
           </span>
         </ListboxButton>
@@ -91,16 +85,14 @@ export const Select = ({
           as={Fragment}
           leave="transition ease-in duration-100"
           leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
+          leaveTo="opacity-0">
           <ListboxOptions
             className={cn(
               'absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-lg',
               'bg-base-100 ring-base-300 py-1 shadow-lg ring-1',
               'focus:outline-none',
               optionsClassName,
-            )}
-          >
+            )}>
             {options.map((option) => (
               <ListboxOption
                 className={({ focus }) =>
@@ -114,16 +106,14 @@ export const Select = ({
                 }
                 disabled={option.disabled}
                 key={option.value}
-                value={option.value}
-              >
+                value={option.value}>
                 {({ selected }) => (
                   <>
                     <span
                       className={cn(
                         'block truncate text-base',
                         selected ? 'font-medium' : 'font-normal',
-                      )}
-                    >
+                      )}>
                       {option.label}
                     </span>
                     {selected && (

@@ -28,20 +28,17 @@ import { type ModelsTag } from '~/services/api/lasius'
 
 import { Badge } from './badge'
 
-const tagLabelVariants = cva(
-  'block overflow-hidden text-ellipsis whitespace-nowrap',
-  {
-    defaultVariants: { width: 'md' },
-    variants: {
-      width: {
-        lg: 'max-w-[50ch]',
-        md: 'max-w-[35ch]',
-        sm: 'max-w-[23ch]',
-        xs: 'max-w-[18ch]',
-      },
+const tagLabelVariants = cva('block overflow-hidden text-ellipsis whitespace-nowrap', {
+  defaultVariants: { width: 'md' },
+  variants: {
+    width: {
+      lg: 'max-w-[50ch]',
+      md: 'max-w-[35ch]',
+      sm: 'max-w-[23ch]',
+      xs: 'max-w-[18ch]',
     },
   },
-)
+})
 
 type TagWidth = VariantProps<typeof tagLabelVariants>['width']
 
@@ -62,7 +59,7 @@ const ItemLabel = ({
   )
 }
 
-type TagProps = {
+type TagProperties = {
   active?: boolean
   clickHandler?: (tag: ModelsTag) => void
   hideRemoveIcon?: boolean
@@ -76,32 +73,23 @@ export const Tag = ({
   hideRemoveIcon,
   item,
   width = 'md',
-}: TagProps) => {
-  const clickable = !!clickHandler
-  const clickableAndRemovable = !!clickHandler && !hideRemoveIcon
+}: TagProperties) => {
+  const isClickable = !!clickHandler
+  const isClickableAndRemovable = !!clickHandler && !hideRemoveIcon
 
   let tagVariant: 'tagSimpleTag' | 'tagTagGroup' | 'tagWithSummary'
 
-  switch (true) {
-    case item.type === 'SimpleTag': {
-      tagVariant = 'tagSimpleTag'
-      break
-    }
-    case item.type === 'TagGroup': {
-      tagVariant = 'tagTagGroup'
-      break
-    }
-    case 'summary' in item: {
-      tagVariant = 'tagWithSummary'
-      break
-    }
-    default: {
-      tagVariant = 'tagSimpleTag'
-      break
-    }
+  if (item.type === 'SimpleTag') {
+    tagVariant = 'tagSimpleTag'
+  } else if (item.type === 'TagGroup') {
+    tagVariant = 'tagTagGroup'
+  } else if ('summary' in item) {
+    tagVariant = 'tagWithSummary'
+  } else {
+    tagVariant = 'tagSimpleTag'
   }
 
-  const summary = 'summary' in item && item.summary ? String(item.summary) : ''
+  const summary = 'summary' in item && item.summary ? item.summary : ''
   const importerType = getImporterTypeFromTag(item)
   const isPlatformTag = !!importerType
 
@@ -109,7 +97,7 @@ export const Tag = ({
     if (clickHandler) {
       clickHandler(tag)
     } else if ('issueLink' in tag) {
-      window.open(String(tag.issueLink), '_blank')
+      window.open(tag.issueLink, '_blank')
     }
   }
 
@@ -118,28 +106,23 @@ export const Tag = ({
   // Platform tags: Use join with multiple Badge components
   if (isPlatformTag && summary) {
     return (
-      <div
-        className={cn(tagLabelVariants({ width }), 'join group inline-flex')}
-        title={fullText}
-      >
+      <div className={cn(tagLabelVariants({ width }), 'join group inline-flex')} title={fullText}>
         {importerType && (
           <Badge
             className={cn(
               'join-item !rounded-l-badge group-hover:bg-neutral group-hover:text-neutral-content rounded-r-none px-1',
               active && 'bg-neutral text-neutral-content',
             )}
-            clickable={clickable}
+            clickable={isClickable}
             onClick={() => clickTag(item)}
             style={
               active
                 ? undefined
                 : {
-                    background:
-                      'oklch(from var(--color-secondary) calc(l - 0.3) c h)',
+                    background: 'oklch(from var(--color-secondary) calc(l - 0.3) c h)',
                   }
             }
-            variant="tagWithSummary"
-          >
+            variant="tagWithSummary">
             <ImporterTypeIcon className="h-4 w-4" type={importerType} />
           </Badge>
         )}
@@ -148,18 +131,16 @@ export const Tag = ({
             'join-item group-hover:bg-neutral group-hover:text-neutral-content rounded-none px-1',
             active && 'bg-neutral text-neutral-content',
           )}
-          clickable={clickable}
+          clickable={isClickable}
           onClick={() => clickTag(item)}
           style={
             active
               ? undefined
               : {
-                  background:
-                    'oklch(from var(--color-secondary) calc(l - 0.15) c h)',
+                  background: 'oklch(from var(--color-secondary) calc(l - 0.15) c h)',
                 }
           }
-          variant="tagWithSummary"
-        >
+          variant="tagWithSummary">
           {item.id}
         </Badge>
         <Badge
@@ -167,19 +148,15 @@ export const Tag = ({
             'join-item !rounded-r-badge group-hover:bg-neutral group-hover:text-neutral-content min-w-0 rounded-l-none',
             active && 'bg-neutral text-neutral-content',
           )}
-          clickable={clickable}
+          clickable={isClickable}
           onClick={() => clickTag(item)}
-          variant="tagWithSummary"
-        >
+          variant="tagWithSummary">
           <span
             className="block w-full overflow-hidden text-ellipsis whitespace-nowrap"
-            title={summary}
-          >
+            title={summary}>
             {summary}
           </span>
-          {clickableAndRemovable && (
-            <LucideIcon icon={XIcon} size={16} strokeWidth={2} />
-          )}
+          {isClickableAndRemovable && <LucideIcon icon={XIcon} size={16} strokeWidth={2} />}
         </Badge>
       </div>
     )
@@ -189,19 +166,16 @@ export const Tag = ({
   return (
     <Badge
       className={active ? 'bg-neutral text-neutral-content' : undefined}
-      clickable={clickable}
+      clickable={isClickable}
       onClick={() => clickTag(item)}
-      variant={tagVariant}
-    >
+      variant={tagVariant}>
       <ItemLabel label={item.id} summary={summary} width={width} />
-      {clickableAndRemovable && (
-        <LucideIcon icon={XIcon} size={16} strokeWidth={2} />
-      )}
+      {isClickableAndRemovable && <LucideIcon icon={XIcon} size={16} strokeWidth={2} />}
     </Badge>
   )
 }
 
-type TagListProps = {
+type TagListProperties = {
   clickHandler?: (tag: ModelsTag) => void
   hideRemoveIcon?: boolean
   items: ModelsTag[] | null | undefined
@@ -213,7 +187,7 @@ export const TagList = ({
   hideRemoveIcon = false,
   items,
   width,
-}: TagListProps) => {
+}: TagListProperties) => {
   if (!items || items.length === 0) return null
   return (
     <div className="flex w-full min-w-0 flex-row flex-wrap gap-1">

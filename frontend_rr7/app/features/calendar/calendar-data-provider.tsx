@@ -36,9 +36,7 @@ type CalendarDataContextValue = {
 
 type CalendarPeriod = 'month' | 'week'
 
-const CalendarDataContext = createContext<CalendarDataContextValue | undefined>(
-  undefined,
-)
+const CalendarDataContext = createContext<CalendarDataContextValue | undefined>(undefined)
 
 /**
  * CalendarDataProvider - Fetches booking data for an entire calendar period (week/month)
@@ -63,15 +61,10 @@ export const CalendarDataProvider = ({
 }) => {
   const fetcher = useFetcher<{ bookings: ModelsBooking[] }>()
 
-  const safeDate = Number.isNaN(new Date(date).getTime())
-    ? formatISOLocale(new Date())
-    : date
+  const safeDate = Number.isNaN(new Date(date).getTime()) ? formatISOLocale(new Date()) : date
 
   const timespan = useMemo(
-    () =>
-      period === 'week'
-        ? apiTimespanWeek(safeDate)
-        : apiTimespanMonth(safeDate),
+    () => (period === 'week' ? apiTimespanWeek(safeDate) : apiTimespanMonth(safeDate)),
     [safeDate, period],
   )
 
@@ -88,20 +81,13 @@ export const CalendarDataProvider = ({
   const value = useMemo<CalendarDataContextValue>(
     () => ({
       bookings: fetcher.data?.bookings,
-      error:
-        fetcher.data && !('bookings' in fetcher.data)
-          ? fetcher.data
-          : undefined,
+      error: fetcher.data && !('bookings' in fetcher.data) ? fetcher.data : undefined,
       isLoading: fetcher.state === 'loading',
     }),
     [fetcher.data, fetcher.state],
   )
 
-  return (
-    <CalendarDataContext.Provider value={value}>
-      {children}
-    </CalendarDataContext.Provider>
-  )
+  return <CalendarDataContext.Provider value={value}>{children}</CalendarDataContext.Provider>
 }
 
 /**
@@ -113,9 +99,7 @@ export const useCalendarData = (): CalendarDataContextValue => {
   const context = useContext(CalendarDataContext)
 
   if (context === undefined) {
-    throw new Error(
-      'useCalendarData must be used within a CalendarDataProvider',
-    )
+    throw new Error('useCalendarData must be used within a CalendarDataProvider')
   }
 
   return context

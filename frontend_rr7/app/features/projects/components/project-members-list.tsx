@@ -36,7 +36,7 @@ import { useRemoveProjectUser } from '~/services/api/lasius-hooks/projects/proje
 
 import { ProjectMemberListItemContext } from './project-member-list-item-context'
 
-type Props = {
+type Properties = {
   onRefresh: () => void
   projectId: string
   projectOrganisationId: string
@@ -48,33 +48,29 @@ export const ProjectMembersList = ({
   projectId,
   projectOrganisationId,
   users,
-}: Props) => {
+}: Properties) => {
   const { t } = useTranslation()
   const loaderData = useRouteLoaderData<typeof loader>('routes/app-layout')
   const userId = loaderData?.user?.id
 
-  const amIAdmin = isAdminOfProject(
-    loaderData?.user,
-    projectOrganisationId,
-    projectId,
-  )
+  const isAmIAdmin = isAdminOfProject(loaderData?.user, projectOrganisationId, projectId)
 
-  const removeUserApi = useRemoveProjectUser({
+  const memberRemovalApi = useRemoveProjectUser({
     onSuccess: () => {
       onRefresh()
     },
   })
 
+  if (users.length === 0) {
+    return <EmptyStateMembers />
+  }
+
   const handleUserRemove = (userIdToRemove: string) => {
-    removeUserApi.submit({
+    memberRemovalApi.submit({
       orgId: projectOrganisationId,
       projectId,
       userId: userIdToRemove,
     })
-  }
-
-  if (users.length === 0) {
-    return <EmptyStateMembers />
   }
 
   return (
@@ -82,48 +78,40 @@ export const ProjectMembersList = ({
       <DataList>
         <DataListRow>
           <DataListHeaderItem />
-          <DataListHeaderItem>
-            {t('forms.firstName', 'First name')}
-          </DataListHeaderItem>
-          <DataListHeaderItem>
-            {t('forms.lastName', 'Last name')}
-          </DataListHeaderItem>
+          <DataListHeaderItem>{t('forms.firstName', 'First name')}</DataListHeaderItem>
+          <DataListHeaderItem>{t('forms.lastName', 'Last name')}</DataListHeaderItem>
           <DataListHeaderItem>{t('forms.email', 'Email')}</DataListHeaderItem>
           <DataListHeaderItem>{t('status.label', 'Status')}</DataListHeaderItem>
           <DataListHeaderItem />
         </DataListRow>
-        {orderBy(
-          users,
-          [(user) => user.lastName, (user) => user.firstName],
-          ['asc', 'asc'],
-        ).map((user) => (
-          <DataListRow key={user.id}>
-            <DataListField width={90}>
-              <AvatarUser firstName={user.firstName} lastName={user.lastName} />
-            </DataListField>
-            <DataListField>
-              <span>{user.firstName}</span>
-            </DataListField>
-            <DataListField>
-              <span>{user.lastName}</span>
-            </DataListField>
-            <DataListField>
-              <span>{user.email}</span>
-            </DataListField>
-            <DataListField>
-              {user.id === userId && (
-                <Badge variant="tag">{t('you', 'You')}</Badge>
-              )}
-            </DataListField>
-            <DataListField>
-              <ProjectMemberListItemContext
-                canRemove={amIAdmin && users.length > 1}
-                onRemove={() => handleUserRemove(user.id)}
-                user={user}
-              />
-            </DataListField>
-          </DataListRow>
-        ))}
+        {orderBy(users, [(user) => user.lastName, (user) => user.firstName], ['asc', 'asc']).map(
+          (user) => (
+            <DataListRow key={user.id}>
+              <DataListField width={90}>
+                <AvatarUser firstName={user.firstName} lastName={user.lastName} />
+              </DataListField>
+              <DataListField>
+                <span>{user.firstName}</span>
+              </DataListField>
+              <DataListField>
+                <span>{user.lastName}</span>
+              </DataListField>
+              <DataListField>
+                <span>{user.email}</span>
+              </DataListField>
+              <DataListField>
+                {user.id === userId && <Badge variant="tag">{t('you', 'You')}</Badge>}
+              </DataListField>
+              <DataListField>
+                <ProjectMemberListItemContext
+                  canRemove={isAmIAdmin && users.length > 1}
+                  onRemove={() => handleUserRemove(user.id)}
+                  user={user}
+                />
+              </DataListField>
+            </DataListRow>
+          ),
+        )}
       </DataList>
     </ContextMenuProvider>
   )

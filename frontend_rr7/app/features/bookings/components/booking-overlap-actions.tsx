@@ -17,12 +17,7 @@
  *
  */
 
-import {
-  AlertTriangle,
-  ArrowDownToLine,
-  ArrowUpToLine,
-  Edit2,
-} from 'lucide-react'
+import { AlertTriangle, ArrowDownToLine, ArrowUpToLine, Edit2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
@@ -34,26 +29,16 @@ import { formatISOLocale } from '~/lib/utils/dates'
 import { type ModelsBooking } from '~/services/api/lasius'
 import { useUpdateUserBooking } from '~/services/api/lasius-hooks/user-bookings/user-bookings'
 
-type Props = {
+type Properties = {
   currentItem: AugmentedBooking
   onEdit: () => void
   overlappingItem: ModelsBooking
 }
 
-export const BookingOverlapActions = ({
-  currentItem,
-  onEdit,
-  overlappingItem,
-}: Props) => {
+export const BookingOverlapActions = ({ currentItem, onEdit, overlappingItem }: Properties) => {
   const { t } = useTranslation('common')
-  const {
-    collapse,
-    dialogRef,
-    handleToggle,
-    isExpanded,
-    setIsHovered,
-    showExpanded,
-  } = useDialogActions()
+  const { collapse, dialogRef, handleToggle, isExpanded, setIsHovered, showExpanded } =
+    useDialogActions()
   const selectedOrgId = useSelectedOrgId()
 
   const updateCurrentBooking = useUpdateUserBooking()
@@ -103,8 +88,7 @@ export const BookingOverlapActions = ({
       {isExpanded && (
         <dialog
           className="absolute top-full left-1/2 m-0 -translate-x-1/2 -translate-y-1/2 transform bg-transparent p-0"
-          ref={dialogRef}
-        >
+          ref={dialogRef}>
           <div className="bg-base-100 flex gap-1 rounded-full p-1">
             <Button
               aria-label={t(
@@ -120,31 +104,19 @@ export const BookingOverlapActions = ({
                 'Adjust overlapping booking to end at current booking start',
               )}
               type="button"
-              variant="icon"
-            >
-              <LucideIcon
-                className="text-warning"
-                icon={ArrowUpToLine}
-                size={16}
-              />
+              variant="icon">
+              <LucideIcon className="text-warning" icon={ArrowUpToLine} size={16} />
             </Button>
 
             <Button
-              aria-label={t(
-                'bookings:actions.editOverlapping',
-                'Edit booking to resolve overlap',
-              )}
+              aria-label={t('bookings:actions.editOverlapping', 'Edit booking to resolve overlap')}
               fullWidth={false}
               onClick={handleEdit}
               shape="circle"
               size="sm"
-              title={t(
-                'bookings:actions.editOverlapping',
-                'Edit booking to resolve overlap',
-              )}
+              title={t('bookings:actions.editOverlapping', 'Edit booking to resolve overlap')}
               type="button"
-              variant="icon"
-            >
+              variant="icon">
               <LucideIcon className="text-warning" icon={Edit2} size={16} />
             </Button>
 
@@ -162,13 +134,8 @@ export const BookingOverlapActions = ({
                 'Adjust current booking to start at overlapping booking end',
               )}
               type="button"
-              variant="icon"
-            >
-              <LucideIcon
-                className="text-warning"
-                icon={ArrowDownToLine}
-                size={16}
-              />
+              variant="icon">
+              <LucideIcon className="text-warning" icon={ArrowDownToLine} size={16} />
             </Button>
           </div>
         </dialog>
@@ -178,11 +145,9 @@ export const BookingOverlapActions = ({
         <div
           className="absolute inset-x-0 bottom-0 z-10 flex items-center justify-center text-center"
           onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => collapse()}
-        >
+          onMouseLeave={() => collapse()}>
           <div
-            className={`bg-base-100 absolute flex gap-1 rounded-full p-1 transition-all duration-200 ${showExpanded ? 'z-20' : 'z-10'}`}
-          >
+            className={`bg-base-100 absolute flex gap-1 rounded-full p-1 transition-all duration-200 ${showExpanded ? 'z-20' : 'z-10'}`}>
             {showExpanded ? (
               <>
                 <Button
@@ -199,13 +164,8 @@ export const BookingOverlapActions = ({
                     'Adjust overlapping booking to end at current booking start',
                   )}
                   type="button"
-                  variant="icon"
-                >
-                  <LucideIcon
-                    className="text-warning"
-                    icon={ArrowUpToLine}
-                    size={16}
-                  />
+                  variant="icon">
+                  <LucideIcon className="text-warning" icon={ArrowUpToLine} size={16} />
                 </Button>
 
                 <Button
@@ -217,13 +177,9 @@ export const BookingOverlapActions = ({
                   onClick={handleEdit}
                   shape="circle"
                   size="sm"
-                  title={t(
-                    'bookings:actions.editOverlapping',
-                    'Edit booking to resolve overlap',
-                  )}
+                  title={t('bookings:actions.editOverlapping', 'Edit booking to resolve overlap')}
                   type="button"
-                  variant="icon"
-                >
+                  variant="icon">
                   <LucideIcon className="text-warning" icon={Edit2} size={16} />
                 </Button>
 
@@ -241,13 +197,8 @@ export const BookingOverlapActions = ({
                     'Adjust current booking to start at overlapping booking end',
                   )}
                   type="button"
-                  variant="icon"
-                >
-                  <LucideIcon
-                    className="text-warning"
-                    icon={ArrowDownToLine}
-                    size={16}
-                  />
+                  variant="icon">
+                  <LucideIcon className="text-warning" icon={ArrowDownToLine} size={16} />
                 </Button>
               </>
             ) : (
@@ -260,8 +211,7 @@ export const BookingOverlapActions = ({
                   'These two bookings overlap. Tap to see adjustment options.',
                 )}
                 type="button"
-                variant="icon"
-              >
+                variant="icon">
                 <LucideIcon icon={AlertTriangle} size={18} />
               </Button>
             )}

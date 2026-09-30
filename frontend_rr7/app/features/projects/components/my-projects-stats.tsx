@@ -24,11 +24,11 @@ import { useProjects } from '~/features/projects/hooks/use-projects'
 import { StatsGroup } from '~/features/stats/components/stats-group'
 import { StatsTileNumber } from '~/features/stats/components/stats-tile-number'
 
-type Props = {
+type Properties = {
   onCreateProject: () => void
 }
 
-export const MyProjectsStats = ({ onCreateProject }: Props) => {
+export const MyProjectsStats = ({ onCreateProject }: Properties) => {
   const { t } = useTranslation()
   const { userProjects } = useProjects()
   const projects = userProjects
@@ -50,8 +50,7 @@ export const MyProjectsStats = ({ onCreateProject }: Props) => {
         fullWidth={false}
         onClick={onCreateProject}
         size="sm"
-        variant="neutral"
-      >
+        variant="neutral">
         {t('projects:actions.create', 'Create project')}
       </Button>
     </div>

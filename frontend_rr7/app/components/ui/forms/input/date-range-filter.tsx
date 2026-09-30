@@ -17,7 +17,6 @@
  *
  */
 
-/* eslint-disable react-compiler/react-compiler -- Form integration effects have intentionally partial deps */
 import { type FieldMetadata, useInputControl } from '@conform-to/react'
 import React, { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -28,17 +27,13 @@ import { InputDatePicker } from '~/components/ui/forms/input/date-picker/input-d
 import { Select, type SelectOption } from '~/components/ui/forms/input/select'
 import { dateOptions } from '~/lib/utils/date/date-options'
 
-export type DateRangeFilterProps = {
+export type DateRangeFilterProperties = {
   fromField: FieldMetadata<string>
   rangeField: FieldMetadata<string>
   toField: FieldMetadata<string>
 }
 
-export const DateRangeFilter = ({
-  fromField,
-  rangeField,
-  toField,
-}: DateRangeFilterProps) => {
+export const DateRangeFilter = ({ fromField, rangeField, toField }: DateRangeFilterProperties) => {
   const { t } = useTranslation('common')
   const fromControl = useInputControl(fromField)
   const toControl = useInputControl(toField)
@@ -72,9 +67,7 @@ export const DateRangeFilter = ({
     const option = dateOptions.find((opt) => {
       if (!opt.dateRangeFn) return true
       const dateRange = opt.dateRangeFn(today)
-      return (
-        dateRange.from === fromControl.value && dateRange.to === toControl.value
-      )
+      return dateRange.from === fromControl.value && dateRange.to === toControl.value
     })
 
     if (option && rangeControl.value !== option.name) {
@@ -94,15 +87,8 @@ export const DateRangeFilter = ({
 
   return (
     <FormBody>
-      <FormElement
-        htmlFor={rangeField.id}
-        label={t('time.timeRange', 'Time range')}
-      >
-        <input
-          name={rangeField.name}
-          type="hidden"
-          value={rangeControl.value ?? ''}
-        />
+      <FormElement htmlFor={rangeField.id} label={t('time.timeRange', 'Time range')}>
+        <input name={rangeField.name} type="hidden" value={rangeControl.value ?? ''} />
         <Select
           id={rangeField.id}
           onChange={handleRangeChange}

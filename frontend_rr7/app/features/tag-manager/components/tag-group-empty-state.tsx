@@ -24,10 +24,5 @@ import { EmptyState } from '~/components/ui/data-display/empty-state'
 
 export const TagGroupEmptyState = () => {
   const { t } = useTranslation('tag-manager')
-  return (
-    <EmptyState
-      icon={Tags}
-      label={t('noTagGroups', 'No tag groups defined yet')}
-    />
-  )
+  return <EmptyState icon={Tags} label={t('noTagGroups', 'No tag groups defined yet')} />
 }

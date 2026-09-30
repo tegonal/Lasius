@@ -18,71 +18,62 @@
  */
 
 import { round } from 'es-toolkit'
-import { useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { AnimateNumber } from '~/components/ui/animations/animate-number'
 import { decimalHoursToObject } from '~/lib/utils/dates'
-import { useStatsTileTimeAsDecimals, useUIStore } from '~/stores/ui-store'
+import { useShouldShowStatsTileTimeAsDecimals, useUIStore } from '~/stores/ui-store'
 
 import { StatsTileWrapper } from './stats-tile-wrapper'
 
-type Props = {
+type Properties = {
   label: string
   standalone?: boolean
   value: number
 }
 
-export const StatsTileHours = ({ label, standalone = true, value }: Props) => {
+export const StatsTileHours = ({ label, standalone = true, value }: Properties) => {
   const { t } = useTranslation()
-  const previousValue = useRef<number>(0)
-  const previousHours = useRef<number>(0)
-  const previousMinutes = useRef<number>(0)
 
-  const showDecimalHours = useStatsTileTimeAsDecimals()
-  const toggleStatsTileTimeAsDecimals = useUIStore(
-    (state) => state.toggleStatsTileTimeAsDecimals,
-  )
+  const isShowDecimalHours = useShouldShowStatsTileTimeAsDecimals()
+  const toggleStatsTileTimeAsDecimals = useUIStore((state) => state.toggleStatsTileTimeAsDecimals)
 
   const duration = decimalHoursToObject(value)
 
-  useEffect(() => {
-    previousValue.current = value
-    previousHours.current = duration.hours
-    previousMinutes.current = duration.minutes
-  }, [value, duration.hours, duration.minutes])
+  // A new value animates from the previous value.
+  // A new display format mounts new numbers, and they start at the current value.
+  const [animation, setAnimation] = useState({
+    from: 0,
+    isDecimal: isShowDecimalHours,
+    to: value,
+  })
+  if (!Object.is(animation.to, value)) {
+    setAnimation({ from: animation.to, isDecimal: isShowDecimalHours, to: value })
+  } else if (animation.isDecimal !== isShowDecimalHours) {
+    setAnimation({ from: value, isDecimal: isShowDecimalHours, to: value })
+  }
+  const fromDuration = decimalHoursToObject(animation.from)
 
   return (
     <StatsTileWrapper standalone={standalone}>
       <div
         className="stat hover:bg-base-200 h-fit cursor-pointer transition-colors select-none"
-        onClick={toggleStatsTileTimeAsDecimals}
-      >
+        onClick={toggleStatsTileTimeAsDecimals}>
         <div className="stat-title">{label}</div>
         <div className="stat-value text-2xl">
-          {showDecimalHours ? (
-            <AnimateNumber
-              from={round(previousValue.current, 2)}
-              to={round(value, 2)}
-            />
+          {isShowDecimalHours ? (
+            <AnimateNumber from={round(animation.from, 2)} to={round(value, 2)} />
           ) : (
             <>
-              <AnimateNumber
-                from={previousHours.current}
-                leftpad={1}
-                to={duration.hours}
-              />
+              <AnimateNumber from={fromDuration.hours} leftpad={1} to={duration.hours} />
               :
-              <AnimateNumber
-                from={previousMinutes.current}
-                leftpad={1}
-                to={duration.minutes}
-              />
+              <AnimateNumber from={fromDuration.minutes} leftpad={1} to={duration.minutes} />
             </>
           )}
         </div>
         <div className="stat-desc">
-          {showDecimalHours
+          {isShowDecimalHours
             ? t('stats:decimalHours', 'Decimal hours')
             : t('stats:hoursMinutes', 'HH:MM')}
         </div>

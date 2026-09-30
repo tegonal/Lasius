@@ -11,14 +11,8 @@ import { type ModelsInvitationStatusResponse } from '../../lasius'
 /**
  * @summary get status of an invitation
  */
-export function useGetInvitationStatus(
-  options?: ApiProxyOptions<ModelsInvitationStatusResponse>,
-) {
-  return useApiProxy<
-    ModelsInvitationStatusResponse,
-    undefined,
-    { invitationId: string }
-  >(
+export function useGetInvitationStatus(options?: ApiProxyOptions<ModelsInvitationStatusResponse>) {
+  return useApiProxy<ModelsInvitationStatusResponse, undefined, { invitationId: string }>(
     {
       getUrl: ({ invitationId }) => `/invitations/${invitationId}/status`,
       method: 'GET',

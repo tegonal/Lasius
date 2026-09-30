@@ -19,12 +19,12 @@
 
 import { ErrorSign } from '~/components/ui/feedback/error-sign'
 
-interface FormFieldErrorsProps {
+interface FormFieldErrorsProperties {
   errors?: string[]
   id?: string
 }
 
-export const FormFieldErrors = ({ errors, id }: FormFieldErrorsProps) => {
+export const FormFieldErrors = ({ errors, id }: FormFieldErrorsProperties) => {
   if (!errors?.length) return null
 
   if (errors.length === 1) {

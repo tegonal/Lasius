@@ -24,11 +24,11 @@ import { Button } from '~/components/primitives/buttons/button'
 import { Modal } from '~/components/ui/overlays/modal/modal'
 import { BookingAddUpdateForm } from '~/features/bookings/components/booking-add-update-form'
 
-type Props = {
+type Properties = {
   selectedOrgId: string
 }
 
-export const BookingAddButton = ({ selectedOrgId }: Props) => {
+export const BookingAddButton = ({ selectedOrgId }: Properties) => {
   const [isOpen, setIsOpen] = useState(false)
   const { t } = useTranslation('bookings')
 
@@ -40,11 +40,7 @@ export const BookingAddButton = ({ selectedOrgId }: Props) => {
         {t('actions.create', 'Create a booking')}
       </Button>
       <Modal onClose={handleClose} open={isOpen}>
-        <BookingAddUpdateForm
-          mode="add"
-          onClose={handleClose}
-          selectedOrgId={selectedOrgId}
-        />
+        <BookingAddUpdateForm mode="add" onClose={handleClose} selectedOrgId={selectedOrgId} />
       </Modal>
     </>
   )

@@ -36,18 +36,17 @@ import { FormElementSpacer } from '~/components/ui/forms/form-element-spacer'
 import { preventEnterOnForm } from '~/components/ui/forms/input/prevent-enter-on-form'
 import { useLayoutLoaderData } from '~/hooks/use-layout-loader-data'
 import { validateFormData } from '~/lib/conform-helpers'
-import { type SchemaTranslationFn, untyped } from '~/lib/i18n-types'
+import { type SchemaTranslationFunction, untyped } from '~/lib/i18n-types'
 import { useUpdateUserProfile } from '~/services/api/lasius-hooks/user/user'
 
-const createAccountSchema = (t: SchemaTranslationFn) =>
+const createAccountSchema = (t: SchemaTranslationFunction) =>
   z.object({
-    email: z
-      .string({
-        error: t('validation.emailRequired', 'Email is required'),
-      })
-      .email({
-        message: t('validation.emailInvalid', 'Invalid email address'),
-      }),
+    email: z.email({
+      error: (issue) =>
+        issue.code === 'invalid_type'
+          ? t('validation.emailRequired', 'Email is required')
+          : t('validation.emailInvalid', 'Invalid email address'),
+    }),
     firstName: z
       .string({
         error: t('validation.firstNameRequired', 'First name is required'),
@@ -60,11 +59,11 @@ const createAccountSchema = (t: SchemaTranslationFn) =>
       .min(1, t('validation.lastNameRequired', 'Last name is required')),
   })
 
-interface AccountFormProps {
+interface AccountFormProperties {
   demoMode: boolean
 }
 
-export const AccountForm = ({ demoMode }: AccountFormProps) => {
+export const AccountForm = ({ demoMode }: AccountFormProperties) => {
   const { t } = useTranslation('settings')
   const layoutData = useLayoutLoaderData()
   const user = layoutData?.user
@@ -74,10 +73,7 @@ export const AccountForm = ({ demoMode }: AccountFormProps) => {
   const profileApi = useUpdateUserProfile({
     onSuccess: () => {
       addToast({
-        message: t(
-          'account.status.settingsUpdated',
-          'Account settings updated',
-        ),
+        message: t('account.status.settingsUpdated', 'Account settings updated'),
         type: 'SUCCESS',
       })
     },
@@ -99,8 +95,8 @@ export const AccountForm = ({ demoMode }: AccountFormProps) => {
     shouldValidate: 'onSubmit',
   })
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault()
 
     if (demoMode) {
       addToast({
@@ -113,7 +109,7 @@ export const AccountForm = ({ demoMode }: AccountFormProps) => {
       return
     }
 
-    const result = validateFormData(e.currentTarget, schema)
+    const result = validateFormData(event.currentTarget, schema)
     if (result.status !== 'success') return
 
     profileApi.submit({
@@ -138,50 +134,42 @@ export const AccountForm = ({ demoMode }: AccountFormProps) => {
               'Manage your personal information and account details.',
             )}
           </p>
-          <form
-            {...getFormProps(form)}
-            onKeyDown={(e) => preventEnterOnForm(e)}
-            onSubmit={handleSubmit}
-          >
-            <FormBody>
-              <FieldSet>
-                <FormElement htmlFor="role" label={t('forms.role', 'Role')}>
-                  <Input
-                    disabled
-                    id="role"
-                    readOnly
-                    tabIndex={-1}
-                    value={user?.role || ''}
+          <form {...getFormProps(form)} onSubmit={handleSubmit}>
+            <div onKeyDown={preventEnterOnForm} role="presentation">
+              <FormBody>
+                <FieldSet>
+                  <FormElement htmlFor="role" label={t('forms.role', 'Role')}>
+                    <Input disabled id="role" readOnly tabIndex={-1} value={user?.role || ''} />
+                  </FormElement>
+                  <FormField
+                    autoComplete="given-name"
+                    field={fields.firstName}
+                    label={t('forms.firstName', 'First name')}
+                    required
                   />
-                </FormElement>
-                <FormField
-                  autoComplete="given-name"
-                  field={fields.firstName}
-                  label={t('forms.firstName', 'First name')}
-                  required
-                />
-                <FormField
-                  autoComplete="family-name"
-                  field={fields.lastName}
-                  label={t('forms.lastName', 'Last name')}
-                  required
-                />
-                <FormElementSpacer />
-                <FormField
-                  autoComplete="email"
-                  field={fields.email}
-                  label={t('forms.email', 'Email')}
-                  readOnly={tokenIssuer !== 'internal'}
-                  required
-                  type="email"
-                />
-              </FieldSet>
-              <ButtonGroup className="justify-end">
-                <Button disabled={profileApi.isSubmitting} type="submit">
-                  {t('actions.saveChanges', 'Save changes')}
-                </Button>
-              </ButtonGroup>
-            </FormBody>
+                  <FormField
+                    autoComplete="family-name"
+                    field={fields.lastName}
+                    label={t('forms.lastName', 'Last name')}
+                    required
+                  />
+                  <FormElementSpacer />
+                  <FormField
+                    autoComplete="email"
+                    field={fields.email}
+                    label={t('forms.email', 'Email')}
+                    readOnly={tokenIssuer !== 'internal'}
+                    required
+                    type="email"
+                  />
+                </FieldSet>
+                <ButtonGroup className="justify-end">
+                  <Button disabled={profileApi.isSubmitting} type="submit">
+                    {t('actions.saveChanges', 'Save changes')}
+                  </Button>
+                </ButtonGroup>
+              </FormBody>
+            </div>
           </form>
         </CardBody>
       </Card>

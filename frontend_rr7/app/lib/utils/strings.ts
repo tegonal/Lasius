@@ -21,12 +21,11 @@
  * Cleans and normalizes a string for case-insensitive comparison.
  * Converts to uppercase and removes leading/trailing whitespace.
  *
- * @param str - The string to clean
+ * @param text - The string to clean
  * @returns Cleaned string in uppercase with trimmed whitespace
  *
  * @example
- * cleanStrForCmp('  Hello World  ') // "HELLO WORLD"
- * cleanStrForCmp('test') === cleanStrForCmp('TEST') // true
+ * cleanStringForComparison('  Hello World  ') // "HELLO WORLD"
+ * cleanStringForComparison('test') === cleanStringForComparison('TEST') // true
  */
-export const cleanStrForCmp = (str: string) =>
-  (str ?? '').toString().trim().toUpperCase()
+export const cleanStringForComparison = (text: string) => (text ?? '').trim().toUpperCase()

@@ -17,12 +17,10 @@ export type getFavoriteBookingListResponse200 = {
   status: 200
 }
 
-export type getFavoriteBookingListResponseSuccess =
-  getFavoriteBookingListResponse200 & {
-    headers: Headers
-  }
-export type getFavoriteBookingListResponse =
-  getFavoriteBookingListResponseSuccess
+export type getFavoriteBookingListResponseSuccess = getFavoriteBookingListResponse200 & {
+  headers: Headers
+}
+export type getFavoriteBookingListResponse = getFavoriteBookingListResponseSuccess
 
 export const getGetFavoriteBookingListUrl = (orgId: string) => {
   return `/user-favorites/organisations/${orgId}`
@@ -32,13 +30,10 @@ export const getFavoriteBookingList = async (
   orgId: string,
   options?: RequestInit,
 ): Promise<getFavoriteBookingListResponse> => {
-  return lasiusFetch<getFavoriteBookingListResponse>(
-    getGetFavoriteBookingListUrl(orgId),
-    {
-      ...options,
-      method: 'GET',
-    },
-  )
+  return lasiusFetch<getFavoriteBookingListResponse>(getGetFavoriteBookingListUrl(orgId), {
+    ...options,
+    method: 'GET',
+  })
 }
 
 /**
@@ -49,10 +44,9 @@ export type addFavoriteBookingResponse200 = {
   status: 200
 }
 
-export type addFavoriteBookingResponseSuccess =
-  addFavoriteBookingResponse200 & {
-    headers: Headers
-  }
+export type addFavoriteBookingResponseSuccess = addFavoriteBookingResponse200 & {
+  headers: Headers
+}
 export type addFavoriteBookingResponse = addFavoriteBookingResponseSuccess
 
 export const getAddFavoriteBookingUrl = (orgId: string) => {
@@ -64,15 +58,12 @@ export const addFavoriteBooking = async (
   modelsFavoritesRequest: ModelsFavoritesRequest,
   options?: RequestInit,
 ): Promise<addFavoriteBookingResponse> => {
-  return lasiusFetch<addFavoriteBookingResponse>(
-    getAddFavoriteBookingUrl(orgId),
-    {
-      ...options,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...options?.headers },
-      body: JSON.stringify(modelsFavoritesRequest),
-    },
-  )
+  return lasiusFetch<addFavoriteBookingResponse>(getAddFavoriteBookingUrl(orgId), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(modelsFavoritesRequest),
+  })
 }
 
 /**
@@ -83,10 +74,9 @@ export type deleteFavoriteBookingResponse200 = {
   status: 200
 }
 
-export type deleteFavoriteBookingResponseSuccess =
-  deleteFavoriteBookingResponse200 & {
-    headers: Headers
-  }
+export type deleteFavoriteBookingResponseSuccess = deleteFavoriteBookingResponse200 & {
+  headers: Headers
+}
 export type deleteFavoriteBookingResponse = deleteFavoriteBookingResponseSuccess
 
 export const getDeleteFavoriteBookingUrl = (orgId: string) => {
@@ -98,13 +88,10 @@ export const deleteFavoriteBooking = async (
   modelsFavoritesRequest: ModelsFavoritesRequest,
   options?: RequestInit,
 ): Promise<deleteFavoriteBookingResponse> => {
-  return lasiusFetch<deleteFavoriteBookingResponse>(
-    getDeleteFavoriteBookingUrl(orgId),
-    {
-      ...options,
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json', ...options?.headers },
-      body: JSON.stringify(modelsFavoritesRequest),
-    },
-  )
+  return lasiusFetch<deleteFavoriteBookingResponse>(getDeleteFavoriteBookingUrl(orgId), {
+    ...options,
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(modelsFavoritesRequest),
+  })
 }

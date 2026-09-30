@@ -21,13 +21,9 @@ export type updateUserProfileByOrganisationResponseSuccess =
   updateUserProfileByOrganisationResponse200 & {
     headers: Headers
   }
-export type updateUserProfileByOrganisationResponse =
-  updateUserProfileByOrganisationResponseSuccess
+export type updateUserProfileByOrganisationResponse = updateUserProfileByOrganisationResponseSuccess
 
-export const getUpdateUserProfileByOrganisationUrl = (
-  orgId: string,
-  userId: string,
-) => {
+export const getUpdateUserProfileByOrganisationUrl = (orgId: string, userId: string) => {
   return `/users/organisations/${orgId}/users/${userId}`
 }
 

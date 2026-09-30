@@ -17,28 +17,38 @@
  *
  */
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useSyncExternalStore } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { TOKEN_TIME_UPDATE_INTERVAL_MS } from '~/config/constants'
 import { useTokenExpiresAt } from '~/stores/ui-store'
 
+const subscribeToTheme = (onThemeChange: () => void) => {
+  const observer = new MutationObserver(onThemeChange)
+  observer.observe(document.documentElement, {
+    attributeFilter: ['data-theme'],
+    attributes: true,
+  })
+  return () => observer.disconnect()
+}
+
+const getTheme = () => document.documentElement.dataset.theme || 'light'
+
+const getServerTheme = () => 'light'
+
 /**
  * Dev-only overlay badge showing current breakpoint, language, theme, and token time remaining.
  * Only renders in development mode. Reads token expiry from the UI store (written by TokenWatcher).
  */
-export const DevInfoBadge = () => {
+export const DevelopmentInfoBadge = () => {
   const { i18n } = useTranslation()
   const expiresAt = useTokenExpiresAt()
-  const [now, setNow] = useState(Date.now())
-  const [colorMode, setColorMode] = useState('light')
+  const [now, setNow] = useState(() => Date.now())
+  const colorMode = useSyncExternalStore(subscribeToTheme, getTheme, getServerTheme)
 
   // Tick a local clock to update the countdown display
   useEffect(() => {
-    const id = setInterval(
-      () => setNow(Date.now()),
-      TOKEN_TIME_UPDATE_INTERVAL_MS,
-    )
+    const id = setInterval(() => setNow(Date.now()), TOKEN_TIME_UPDATE_INTERVAL_MS)
     return () => clearInterval(id)
   }, [])
 
@@ -51,21 +61,7 @@ export const DevInfoBadge = () => {
     return `${m}m ${s}s`
   }, [expiresAt, now])
 
-  useEffect(() => {
-    const theme = document.documentElement.dataset.theme || 'light'
-    setColorMode(theme)
-
-    const observer = new MutationObserver(() => {
-      setColorMode(document.documentElement.dataset.theme || 'light')
-    })
-    observer.observe(document.documentElement, {
-      attributeFilter: ['data-theme'],
-      attributes: true,
-    })
-    return () => observer.disconnect()
-  }, [])
-
-  if (process.env.NODE_ENV !== 'development') return null
+  if (!import.meta.env.DEV) return null
 
   const info = `${i18n.language} | ${colorMode} | Token: ${tokenTime}`
 
@@ -94,7 +90,5 @@ export const DevInfoBadge = () => {
 }
 
 const Badge = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <span className="badge badge-neutral badge-sm opacity-70">{children}</span>
-  )
+  return <span className="badge badge-neutral badge-sm opacity-70">{children}</span>
 }

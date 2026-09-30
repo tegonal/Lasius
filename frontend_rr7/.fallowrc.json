@@ -38,10 +38,7 @@
   },
   "overrides": [
     {
-      "files": [
-        "app/services/api/lasius/**",
-        "app/services/api/lasius-hooks/**"
-      ],
+      "files": ["app/services/api/lasius/**", "app/services/api/lasius-hooks/**"],
       "rules": {
         "unused-files": "off",
         "unused-exports": "off",
@@ -50,11 +47,7 @@
       }
     },
     {
-      "files": [
-        "app/services/api/orval-fetcher-client.ts",
-        "orval.config.mjs",
-        "public/help/**"
-      ],
+      "files": ["app/services/api/orval-fetcher-client.ts", "orval.config.mjs", "public/help/**"],
       "rules": {
         "unused-files": "off"
       }

@@ -38,12 +38,12 @@ import { BookingItemContext } from './booking-item-context'
 import { BookingName } from './booking-name'
 import { BookingOverlapActions } from './booking-overlap-actions'
 
-type Props = {
+type Properties = {
   item: AugmentedBooking
   nextItem?: ModelsBooking
 }
 
-export const BookingItem = ({ item, nextItem }: Props) => {
+export const BookingItem = ({ item, nextItem }: Properties) => {
   const { t } = useTranslation('common')
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [isAddOpen, setIsAddOpen] = useState(false)
@@ -63,8 +63,7 @@ export const BookingItem = ({ item, nextItem }: Props) => {
           : 'border-base-content/20 border-b',
         item.isMostRecent && 'border-base-content/20 border-t',
       )}
-      data-testid="booking-item"
-    >
+      data-testid="booking-item">
       <div className="flex w-full min-w-0 flex-col gap-3">
         <BookingName item={item} />
         <TagList items={item.tags} />
@@ -97,8 +96,7 @@ export const BookingItem = ({ item, nextItem }: Props) => {
               shape="circle"
               title={t('bookings:actions.add', 'Add booking')}
               type="button"
-              variant="iconPrimaryHover"
-            >
+              variant="iconPrimaryHover">
               <LucideIcon icon={PlusCircleIcon} size={21} />
             </Button>
           </div>

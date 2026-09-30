@@ -52,10 +52,10 @@ export function useLasiusWebsocket() {
     ConnectionStatus.DISCONNECTED,
   )
   const [lastMessage, setLastMessage] = useState<unknown>(null)
-  const managerRef = useRef<null | ReturnType<typeof getWebSocketManager>>(null)
+  const managerReference = useRef<null | ReturnType<typeof getWebSocketManager>>(null)
 
   const sendJsonMessage = useCallback((data: unknown) => {
-    managerRef.current?.send(data)
+    managerReference.current?.send(data)
   }, [])
 
   // Subscribe to the WebSocket manager
@@ -63,7 +63,7 @@ export function useLasiusWebsocket() {
     if (!websocketUrl) return
 
     const manager = getWebSocketManager(websocketUrl)
-    managerRef.current = manager
+    managerReference.current = manager
 
     const subscriber: WebSocketSubscriber = {
       onMessage: (data) => {
@@ -78,26 +78,38 @@ export function useLasiusWebsocket() {
 
     return () => {
       unsubscribe()
-      managerRef.current = null
+      managerReference.current = null
     }
   }, [websocketUrl])
 
   // Pass ticket fetcher to the manager
   useEffect(() => {
-    if (managerRef.current) {
-      managerRef.current.setTicketFetcher(fetchTicket)
+    if (managerReference.current) {
+      managerReference.current.setTicketFetcher(fetchTicket)
     }
   }, [fetchTicket])
 
   // Active reconnect on window refocus
   useEffect(() => {
-    if (isWindowFocused && managerRef.current) {
-      managerRef.current.reconnectNow()
+    if (isWindowFocused && managerReference.current) {
+      managerReference.current.reconnectNow()
     }
+  }, [isWindowFocused, connectionStatus])
+
+  // Drop the last message when the window loses focus without a connection
+  const [focusAndStatus, setFocusAndStatus] = useState({
+    connectionStatus,
+    isWindowFocused,
+  })
+  if (
+    focusAndStatus.connectionStatus !== connectionStatus ||
+    focusAndStatus.isWindowFocused !== isWindowFocused
+  ) {
+    setFocusAndStatus({ connectionStatus, isWindowFocused })
     if (!isWindowFocused && connectionStatus !== ConnectionStatus.CONNECTED) {
       setLastMessage(null)
     }
-  }, [isWindowFocused, connectionStatus])
+  }
 
   return {
     connectionStatus,

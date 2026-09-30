@@ -21,17 +21,13 @@ import { useTranslation } from 'react-i18next'
 
 import { type ProjectSummary } from '~/lib/api/functions/aggregate-project-hours'
 
-type Props = {
+type Properties = {
   emptyMessage: string
   projects: ProjectSummary[]
   showTopPrefix?: boolean
 }
 
-export const TopProjectsCard = ({
-  emptyMessage,
-  projects,
-  showTopPrefix = true,
-}: Props) => {
+export const TopProjectsCard = ({ emptyMessage, projects, showTopPrefix = true }: Properties) => {
   const { t } = useTranslation('common')
 
   const title = showTopPrefix
@@ -44,9 +40,7 @@ export const TopProjectsCard = ({
         <div className="stats h-fit w-full">
           <div className="stat">
             <div className="stat-title">{title}</div>
-            <div className="text-base-content/60 py-8 text-center text-sm">
-              {emptyMessage}
-            </div>
+            <div className="text-base-content/60 py-8 text-center text-sm">{emptyMessage}</div>
           </div>
         </div>
       </div>
@@ -62,9 +56,7 @@ export const TopProjectsCard = ({
             {projects.map((project) => (
               <div className="flex flex-col gap-1" key={project.name}>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="flex-1 truncate font-medium">
-                    {project.name}
-                  </span>
+                  <span className="flex-1 truncate font-medium">{project.name}</span>
                   <span className="text-base-content/60 ml-2 text-xs">
                     {project.hours.toFixed(1)}h
                   </span>

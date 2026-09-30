@@ -20,11 +20,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { type SegmentBounds } from './segment-bounds'
-import {
-  getAdjacentSegment,
-  getArrowKeyTarget,
-  getTabTarget,
-} from './segment-navigation'
+import { getAdjacentSegment, getArrowKeyTarget, getTabTarget } from './segment-navigation'
 
 type DateSegment = 'day' | 'month' | 'year'
 const DATE_SEGMENTS: DateSegment[] = ['day', 'month', 'year']
@@ -62,9 +58,7 @@ describe('getAdjacentSegment', () => {
   })
 
   it('returns null for unknown segment', () => {
-    expect(
-      getAdjacentSegment('unknown' as DateSegment, 'next', DATE_SEGMENTS),
-    ).toBeNull()
+    expect(getAdjacentSegment('unknown' as DateSegment, 'next', DATE_SEGMENTS)).toBeNull()
   })
 
   it('works with time segments', () => {
@@ -77,48 +71,28 @@ describe('getAdjacentSegment', () => {
 
 describe('getArrowKeyTarget', () => {
   it('ArrowLeft at segment start navigates to prev segment', () => {
-    expect(
-      getArrowKeyTarget('ArrowLeft', 3, 'month', DATE_BOUNDS, DATE_SEGMENTS),
-    ).toBe('day')
-    expect(
-      getArrowKeyTarget('ArrowLeft', 6, 'year', DATE_BOUNDS, DATE_SEGMENTS),
-    ).toBe('month')
+    expect(getArrowKeyTarget('ArrowLeft', 3, 'month', DATE_BOUNDS, DATE_SEGMENTS)).toBe('day')
+    expect(getArrowKeyTarget('ArrowLeft', 6, 'year', DATE_BOUNDS, DATE_SEGMENTS)).toBe('month')
   })
 
   it('ArrowRight at segment end navigates to next segment', () => {
-    expect(
-      getArrowKeyTarget('ArrowRight', 2, 'day', DATE_BOUNDS, DATE_SEGMENTS),
-    ).toBe('month')
-    expect(
-      getArrowKeyTarget('ArrowRight', 5, 'month', DATE_BOUNDS, DATE_SEGMENTS),
-    ).toBe('year')
+    expect(getArrowKeyTarget('ArrowRight', 2, 'day', DATE_BOUNDS, DATE_SEGMENTS)).toBe('month')
+    expect(getArrowKeyTarget('ArrowRight', 5, 'month', DATE_BOUNDS, DATE_SEGMENTS)).toBe('year')
   })
 
   it('returns null when not at boundary', () => {
-    expect(
-      getArrowKeyTarget('ArrowLeft', 4, 'month', DATE_BOUNDS, DATE_SEGMENTS),
-    ).toBeNull()
-    expect(
-      getArrowKeyTarget('ArrowRight', 1, 'day', DATE_BOUNDS, DATE_SEGMENTS),
-    ).toBeNull()
+    expect(getArrowKeyTarget('ArrowLeft', 4, 'month', DATE_BOUNDS, DATE_SEGMENTS)).toBeNull()
+    expect(getArrowKeyTarget('ArrowRight', 1, 'day', DATE_BOUNDS, DATE_SEGMENTS)).toBeNull()
   })
 
   it('returns null at edges (no adjacent segment)', () => {
-    expect(
-      getArrowKeyTarget('ArrowLeft', 0, 'day', DATE_BOUNDS, DATE_SEGMENTS),
-    ).toBeNull()
-    expect(
-      getArrowKeyTarget('ArrowRight', 10, 'year', DATE_BOUNDS, DATE_SEGMENTS),
-    ).toBeNull()
+    expect(getArrowKeyTarget('ArrowLeft', 0, 'day', DATE_BOUNDS, DATE_SEGMENTS)).toBeNull()
+    expect(getArrowKeyTarget('ArrowRight', 10, 'year', DATE_BOUNDS, DATE_SEGMENTS)).toBeNull()
   })
 
   it('works with time segments', () => {
-    expect(
-      getArrowKeyTarget('ArrowRight', 2, 'hour', TIME_BOUNDS, TIME_SEGMENTS),
-    ).toBe('minute')
-    expect(
-      getArrowKeyTarget('ArrowLeft', 3, 'minute', TIME_BOUNDS, TIME_SEGMENTS),
-    ).toBe('hour')
+    expect(getArrowKeyTarget('ArrowRight', 2, 'hour', TIME_BOUNDS, TIME_SEGMENTS)).toBe('minute')
+    expect(getArrowKeyTarget('ArrowLeft', 3, 'minute', TIME_BOUNDS, TIME_SEGMENTS)).toBe('hour')
   })
 })
 

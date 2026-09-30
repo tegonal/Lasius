@@ -6,9 +6,9 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type ModelsJoinProjectInvitationType = typeof ModelsJoinProjectInvitationType[keyof typeof ModelsJoinProjectInvitationType];
-
+export type ModelsJoinProjectInvitationType =
+  (typeof ModelsJoinProjectInvitationType)[keyof typeof ModelsJoinProjectInvitationType]
 
 export const ModelsJoinProjectInvitationType = {
   JoinProjectInvitation: 'JoinProjectInvitation',
-} as const;
+} as const

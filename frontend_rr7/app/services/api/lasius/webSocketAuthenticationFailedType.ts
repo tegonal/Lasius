@@ -6,9 +6,9 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type WebSocketAuthenticationFailedType = typeof WebSocketAuthenticationFailedType[keyof typeof WebSocketAuthenticationFailedType];
-
+export type WebSocketAuthenticationFailedType =
+  (typeof WebSocketAuthenticationFailedType)[keyof typeof WebSocketAuthenticationFailedType]
 
 export const WebSocketAuthenticationFailedType = {
   AuthenticationFailed: 'AuthenticationFailed',
-} as const;
+} as const

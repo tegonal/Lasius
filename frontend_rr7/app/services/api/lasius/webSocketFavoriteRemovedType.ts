@@ -6,9 +6,9 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type WebSocketFavoriteRemovedType = typeof WebSocketFavoriteRemovedType[keyof typeof WebSocketFavoriteRemovedType];
-
+export type WebSocketFavoriteRemovedType =
+  (typeof WebSocketFavoriteRemovedType)[keyof typeof WebSocketFavoriteRemovedType]
 
 export const WebSocketFavoriteRemovedType = {
   FavoriteRemoved: 'FavoriteRemoved',
-} as const;
+} as const

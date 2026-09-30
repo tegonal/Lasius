@@ -36,7 +36,7 @@ export type HealthResponse = {
 export async function loader() {
   const version = process.env.LASIUS_VERSION || 'dev'
 
-  let backend: HealthResponse['backend'] = 'disconnected'
+  let backend: HealthResponse['backend']
   try {
     await getConfiguration()
     backend = 'connected'

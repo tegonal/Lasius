@@ -17,16 +17,17 @@
  *
  */
 
-import { useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
+
+const subscribeToNothing = () => () => {}
+
+const isClientOnClient = () => true
+
+const isClientOnServer = () => false
 
 /**
- * Returns true once the component has mounted on the client.
+ * Returns false on the server and during hydration, and true in every later client render.
  * Useful for guarding client-only rendering to avoid hydration mismatches.
  */
-export const useIsClient = (): boolean => {
-  const [isClient, setIsClient] = useState(false)
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
-  return isClient
-}
+export const useIsClient = (): boolean =>
+  useSyncExternalStore(subscribeToNothing, isClientOnClient, isClientOnServer)

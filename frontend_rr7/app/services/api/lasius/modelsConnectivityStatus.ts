@@ -9,12 +9,12 @@
 /**
  * Health status of connection to external service
  */
-export type ModelsConnectivityStatus = typeof ModelsConnectivityStatus[keyof typeof ModelsConnectivityStatus];
-
+export type ModelsConnectivityStatus =
+  (typeof ModelsConnectivityStatus)[keyof typeof ModelsConnectivityStatus]
 
 export const ModelsConnectivityStatus = {
   healthy: 'healthy',
   degraded: 'degraded',
   failed: 'failed',
   unknown: 'unknown',
-} as const;
+} as const

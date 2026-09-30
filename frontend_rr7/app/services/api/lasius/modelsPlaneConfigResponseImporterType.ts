@@ -6,9 +6,9 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type ModelsPlaneConfigResponseImporterType = typeof ModelsPlaneConfigResponseImporterType[keyof typeof ModelsPlaneConfigResponseImporterType];
-
+export type ModelsPlaneConfigResponseImporterType =
+  (typeof ModelsPlaneConfigResponseImporterType)[keyof typeof ModelsPlaneConfigResponseImporterType]
 
 export const ModelsPlaneConfigResponseImporterType = {
   plane: 'plane',
-} as const;
+} as const

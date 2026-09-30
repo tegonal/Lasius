@@ -28,40 +28,34 @@ import { useHomeLoaderData } from '~/features/bookings/hooks/use-home-loader-dat
 import { useStopBooking } from '~/features/bookings/hooks/use-stop-booking'
 import { ContextMenuProvider } from '~/features/context-menu/hooks/use-context-menu'
 import { formatISOLocale } from '~/lib/utils/dates'
-import {
-  type ModelsBooking,
-  type ModelsCurrentUserTimeBooking,
-} from '~/services/api/lasius'
+import { type ModelsBooking, type ModelsCurrentUserTimeBooking } from '~/services/api/lasius'
 
 import { BookingCurrentEntryContext } from './booking-current-entry-context'
 import { BookingDurationCounter } from './booking-duration-counter'
 import { BookingFrom } from './booking-from'
 import { BookingName } from './booking-name'
 
-type BookingCurrentProps = {
+type BookingCurrentProperties = {
   /** When provided, uses this data instead of useHomeLoaderData(). */
   currentBooking?: ModelsCurrentUserTimeBooking
   selectedOrgId?: string
 }
 
-export const BookingCurrent = (props: BookingCurrentProps) => {
+export const BookingCurrent = (properties: BookingCurrentProperties) => {
   const loaderData = useHomeLoaderData()
 
-  const currentBooking = props.currentBooking ?? loaderData?.currentBooking
-  const selectedOrgId = props.selectedOrgId ?? loaderData?.selectedOrgId ?? ''
+  const currentBooking = properties.currentBooking ?? loaderData?.currentBooking
+  const selectedOrgId = properties.selectedOrgId ?? loaderData?.selectedOrgId ?? ''
 
   return (
     <div
       className="bg-base-200 relative flex h-full min-h-[96px] w-full flex-row items-center gap-3 overflow-hidden px-2 py-3 sm:px-3 md:bg-transparent lg:px-4 [&>*]:w-full"
-      data-testid="booking-current-section"
-    >
+      data-testid="booking-current-section">
       {currentBooking?.booking ? (
         <ContextMenuProvider>
           <CurrentBookingEntry
             booking={currentBooking.booking}
-            currentBookingOverride={
-              props.currentBooking ? currentBooking : undefined
-            }
+            currentBookingOverride={properties.currentBooking ? currentBooking : undefined}
             selectedOrgId={selectedOrgId}
           />
         </ContextMenuProvider>
@@ -79,9 +73,7 @@ const NoBooking = () => {
       <div>
         <LucideIcon icon={ClockIcon} size={24} />
       </div>
-      <div>
-        {t('bookings:status.currentlyNotBooking', 'Currently not booking')}
-      </div>
+      <div>{t('bookings:status.currentlyNotBooking', 'Currently not booking')}</div>
     </div>
   )
 }
@@ -118,12 +110,8 @@ const CurrentBookingEntry = ({
         data-testid="booking-current-stop-btn"
         fullWidth={false}
         onClick={stop}
-        title={t(
-          'bookings:actions.stopRecording',
-          'Stop recording current time booking',
-        )}
-        variant="stopRecording"
-      >
+        title={t('bookings:actions.stopRecording', 'Stop recording current time booking')}
+        variant="stopRecording">
         <LucideIcon icon={SquareIcon} size={24} />
       </Button>
       <div className="flex w-full min-w-0 flex-col gap-1 overflow-hidden leading-normal">

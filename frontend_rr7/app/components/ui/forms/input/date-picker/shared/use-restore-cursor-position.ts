@@ -28,24 +28,23 @@ import React, { useCallback, useRef } from 'react'
  * Returns a setter function to schedule cursor restoration before updating inputValue.
  */
 export function useRestoreCursorPosition(
-  inputRef: React.RefObject<HTMLInputElement | null>,
+  inputReference: React.RefObject<HTMLInputElement | null>,
   inputValue: string,
 ) {
-  const pendingCursorPosRef = useRef<null | number>(null)
+  const pendingCursorPosReference = useRef<null | number>(null)
 
   React.useLayoutEffect(() => {
-    if (
-      pendingCursorPosRef.current !== null &&
-      inputRef.current?.matches(':focus')
-    ) {
-      const pos = pendingCursorPosRef.current
-      pendingCursorPosRef.current = null
-      inputRef.current.setSelectionRange(pos, pos)
+    if (pendingCursorPosReference.current === null || !inputReference.current?.matches(':focus')) {
+      return
     }
-  }, [inputValue, inputRef])
+
+    const pos = pendingCursorPosReference.current
+    pendingCursorPosReference.current = null
+    inputReference.current.setSelectionRange(pos, pos)
+  }, [inputValue, inputReference])
 
   const setCursorPosition = useCallback((pos: number) => {
-    pendingCursorPosRef.current = pos
+    pendingCursorPosReference.current = pos
   }, [])
 
   return setCursorPosition

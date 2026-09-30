@@ -17,8 +17,7 @@
  *
  */
 
-const t = (key: string, options?: { defaultValue?: string }) =>
-  options?.defaultValue || key
+const t = (key: string, options?: { defaultValue?: string }) => options?.defaultValue || key
 
 export const UserRoles: Record<string, string> = {
   OrganisationAdministrator: t('roles.administrator', {

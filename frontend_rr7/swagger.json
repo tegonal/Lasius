@@ -4590,15 +4590,7 @@
             "enum": ["FreeUser", "Administrator"]
           }
         },
-        "required": [
-          "id",
-          "key",
-          "email",
-          "firstName",
-          "lastName",
-          "active",
-          "role"
-        ]
+        "required": ["id", "key", "email", "firstName", "lastName", "active", "role"]
       },
       "models.UpdateProject": {
         "properties": {
@@ -5067,15 +5059,7 @@
             "format": "float"
           }
         },
-        "required": [
-          "monday",
-          "tuesday",
-          "wednesday",
-          "thursday",
-          "friday",
-          "saturday",
-          "sunday"
-        ]
+        "required": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
       },
       "models.EntityReference": {
         "properties": {
@@ -5110,13 +5094,7 @@
             }
           }
         },
-        "required": [
-          "organisationReference",
-          "private",
-          "role",
-          "plannedWorkingHours",
-          "projects"
-        ]
+        "required": ["organisationReference", "private", "role", "plannedWorkingHours", "projects"]
       },
       "models.User": {
         "properties": {

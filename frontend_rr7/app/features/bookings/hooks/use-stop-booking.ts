@@ -42,8 +42,8 @@ type StopBookingPayload = {
  * Chains useStopUserBookingCurrent → useAddUserBookingByOrganisation (conditional).
  */
 export function useStopBooking() {
-  const addApi = useAddUserBookingByOrganisation()
-  const pendingAddRef = useRef<null | {
+  const bookingAdditionApi = useAddUserBookingByOrganisation()
+  const pendingAddReference = useRef<null | {
     end: string
     orgId: string
     projectId: string
@@ -53,14 +53,16 @@ export function useStopBooking() {
 
   const stopApi = useStopUserBookingCurrent({
     onSuccess: () => {
-      if (pendingAddRef.current) {
-        const { end, orgId, projectId, start, tags } = pendingAddRef.current
-        pendingAddRef.current = null
-        addApi.submit({
-          body: { end, projectId, start, tags },
-          orgId,
-        })
+      if (!pendingAddReference.current) {
+        return
       }
+
+      const { end, orgId, projectId, start, tags } = pendingAddReference.current
+      pendingAddReference.current = null
+      bookingAdditionApi.submit({
+        body: { end, projectId, start, tags },
+        orgId,
+      })
     },
   })
 
@@ -69,14 +71,14 @@ export function useStopBooking() {
       const { bookingId, end, orgId, projectId, start, tags } = payload
       const startDate = new Date(start)
       const endDate = new Date(end)
-      const spansMidnight = !isSameDay(startDate, endDate)
+      const isSpansMidnight = !isSameDay(startDate, endDate)
 
-      if (spansMidnight) {
+      if (isSpansMidnight) {
         const eod = formatISOLocale(endOfDay(startDate))
         const nextDayStart = formatISOLocale(startOfDay(addDays(startDate, 1)))
 
         // Queue the next-day booking, then stop at end-of-day
-        pendingAddRef.current = {
+        pendingAddReference.current = {
           end: formatISOLocale(endDate),
           orgId,
           projectId,
@@ -100,7 +102,7 @@ export function useStopBooking() {
   )
 
   const state =
-    stopApi.state !== 'idle' || addApi.state !== 'idle' ? 'submitting' : 'idle'
+    stopApi.state !== 'idle' || bookingAdditionApi.state !== 'idle' ? 'submitting' : 'idle'
 
   return { state, submit }
 }

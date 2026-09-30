@@ -34,9 +34,7 @@ export function useGetAggregatedStatisticsByProject(
   )
 }
 
-export function useGetProjectBookingList(
-  options?: ApiProxyOptions<ModelsBooking[]>,
-) {
+export function useGetProjectBookingList(options?: ApiProxyOptions<ModelsBooking[]>) {
   return useApiProxy<
     ModelsBooking[],
     undefined,
@@ -63,9 +61,7 @@ function getGetAggregatedStatisticsByProjectUrl(
   }
   const query = normalizedParams.toString()
   return query
-    ? `/organisations/${orgId}/projects/${projectId}/bookings/stats/aggregated` +
-        '?' +
-        query
+    ? `/organisations/${orgId}/projects/${projectId}/bookings/stats/aggregated` + '?' + query
     : `/organisations/${orgId}/projects/${projectId}/bookings/stats/aggregated`
 }
 
@@ -85,8 +81,6 @@ function getGetProjectBookingListUrl(
   }
   const query = normalizedParams.toString()
   return query
-    ? `/organisations/${orgId}/projects/${projectId}/bookings/history` +
-        '?' +
-        query
+    ? `/organisations/${orgId}/projects/${projectId}/bookings/history` + '?' + query
     : `/organisations/${orgId}/projects/${projectId}/bookings/history`
 }

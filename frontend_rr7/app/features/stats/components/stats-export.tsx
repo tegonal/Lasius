@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next'
 
 type ExportFormat = 'ods' | 'xlsx'
 
-type StatsExportProps = {
+type StatsExportProperties = {
   bookingList: {
     elements: number
     hours: number
@@ -43,13 +43,13 @@ export const StatsExport = ({
   scope = 'user',
   selectedOrgId,
   to,
-}: StatsExportProps) => {
+}: StatsExportProperties) => {
   const { t } = useTranslation('common')
 
   const hasData = bookingList.elements > 0
 
   const handleExport = (exportFormat: ExportFormat) => {
-    const params = new URLSearchParams({
+    const parameters = new URLSearchParams({
       format: exportFormat,
       from,
       orgId: selectedOrgId,
@@ -62,7 +62,7 @@ export const StatsExport = ({
       type: 'statistics',
     })
 
-    window.open(`/api/export?${params.toString()}`, '_blank')
+    window.open(`/api/export?${parameters.toString()}`, '_blank')
   }
 
   return (
@@ -76,8 +76,7 @@ export const StatsExport = ({
         data-testid="stats-export-btn"
         disabled={!hasData}
         tabIndex={0}
-        type="button"
-      >
+        type="button">
         <Download className="size-4" />
         {t('export.actions.export', { defaultValue: 'Export' })}
         <ChevronDown className="size-4" />
@@ -88,16 +87,14 @@ export const StatsExport = ({
         })}
         className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
         role="menu"
-        tabIndex={0}
-      >
+        tabIndex={0}>
         <li role="none">
           <button
             aria-label={t('export.formats.excelAria', {
               defaultValue: 'Export as Excel file',
             })}
             onClick={() => handleExport('xlsx')}
-            role="menuitem"
-          >
+            role="menuitem">
             {t('export.formats.excel', {
               defaultValue: 'Excel (.xlsx)',
             })}
@@ -109,8 +106,7 @@ export const StatsExport = ({
               defaultValue: 'Export as OpenDocument file',
             })}
             onClick={() => handleExport('ods')}
-            role="menuitem"
-          >
+            role="menuitem">
             {t('export.formats.ods', {
               defaultValue: 'OpenDocument (.ods)',
             })}

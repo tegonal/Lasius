@@ -33,80 +33,63 @@ import { OrganisationMemberActions } from '~/features/organisation/components/or
 import { useLayoutLoaderData } from '~/hooks/use-layout-loader-data'
 import { type ModelsUserStub } from '~/services/api/lasius'
 
-type Props = {
+type Properties = {
   isAdmin: boolean
   onRefresh: () => void
   orgId: string
   users: ModelsUserStub[]
 }
 
-export const OrganisationMembers = ({
-  isAdmin,
-  onRefresh,
-  orgId,
-  users,
-}: Props) => {
+export const OrganisationMembers = ({ isAdmin, onRefresh, orgId, users }: Properties) => {
   const { t } = useTranslation('organisation')
   const layoutData = useLayoutLoaderData()
-  const userId = layoutData?.user.id ?? ''
   if (!users || users.length === 0) {
-    return (
-      <EmptyState
-        icon={Users}
-        label={t('members.emptyState', 'No members found')}
-      />
-    )
+    return <EmptyState icon={Users} label={t('members.emptyState', 'No members found')} />
   }
+
+  const userId = layoutData?.user.id ?? ''
 
   return (
     <ContextMenuProvider>
       <DataList>
         <DataListRow>
           <DataListHeaderItem />
-          <DataListHeaderItem>
-            {t('forms.firstName', 'First name')}
-          </DataListHeaderItem>
-          <DataListHeaderItem>
-            {t('forms.lastName', 'Last name')}
-          </DataListHeaderItem>
+          <DataListHeaderItem>{t('forms.firstName', 'First name')}</DataListHeaderItem>
+          <DataListHeaderItem>{t('forms.lastName', 'Last name')}</DataListHeaderItem>
           <DataListHeaderItem>{t('forms.email', 'Email')}</DataListHeaderItem>
           <DataListHeaderItem>{t('status.label', 'Status')}</DataListHeaderItem>
           <DataListHeaderItem />
         </DataListRow>
-        {orderBy(
-          users,
-          [(user) => user.lastName, (user) => user.firstName],
-          ['asc', 'asc'],
-        ).map((user) => (
-          <DataListRow key={user.id}>
-            <DataListField width={90}>
-              <AvatarUser firstName={user.firstName} lastName={user.lastName} />
-            </DataListField>
-            <DataListField>
-              <span>{user.firstName}</span>
-            </DataListField>
-            <DataListField>
-              <span>{user.lastName}</span>
-            </DataListField>
-            <DataListField>
-              <span>{user.email}</span>
-            </DataListField>
-            <DataListField>
-              {user.id === userId && (
-                <Badge variant="tag">{t('you', 'You')}</Badge>
-              )}
-            </DataListField>
-            <DataListField>
-              {isAdmin && user.id !== userId && (
-                <OrganisationMemberActions
-                  onRemoveComplete={onRefresh}
-                  orgId={orgId}
-                  user={user}
-                />
-              )}
-            </DataListField>
-          </DataListRow>
-        ))}
+        {orderBy(users, [(user) => user.lastName, (user) => user.firstName], ['asc', 'asc']).map(
+          (user) => (
+            <DataListRow key={user.id}>
+              <DataListField width={90}>
+                <AvatarUser firstName={user.firstName} lastName={user.lastName} />
+              </DataListField>
+              <DataListField>
+                <span>{user.firstName}</span>
+              </DataListField>
+              <DataListField>
+                <span>{user.lastName}</span>
+              </DataListField>
+              <DataListField>
+                <span>{user.email}</span>
+              </DataListField>
+              <DataListField>
+                {user.id === userId && <Badge variant="tag">{t('you', 'You')}</Badge>}
+              </DataListField>
+              <DataListField>
+                {isAdmin && user.id !== userId && (
+                  <OrganisationMemberActions
+                    onRemoveComplete={onRefresh}
+                    orgId={orgId}
+                    user={user}
+                  />
+                )}
+              </DataListField>
+            </DataListRow>
+          ),
+        )}
       </DataList>
     </ContextMenuProvider>
   )

@@ -22,18 +22,15 @@ export type getInvitationStatusResponse400 = {
   status: 400
 }
 
-export type getInvitationStatusResponseSuccess =
-  getInvitationStatusResponse200 & {
-    headers: Headers
-  }
-export type getInvitationStatusResponseError =
-  getInvitationStatusResponse400 & {
-    headers: Headers
-  }
+export type getInvitationStatusResponseSuccess = getInvitationStatusResponse200 & {
+  headers: Headers
+}
+export type getInvitationStatusResponseError = getInvitationStatusResponse400 & {
+  headers: Headers
+}
 
 export type getInvitationStatusResponse =
-  | getInvitationStatusResponseSuccess
-  | getInvitationStatusResponseError
+  getInvitationStatusResponseSuccess | getInvitationStatusResponseError
 
 export const getGetInvitationStatusUrl = (invitationId: string) => {
   return `/invitations/${invitationId}/status`
@@ -43,11 +40,8 @@ export const getInvitationStatus = async (
   invitationId: string,
   options?: RequestInit,
 ): Promise<getInvitationStatusResponse> => {
-  return lasiusFetch<getInvitationStatusResponse>(
-    getGetInvitationStatusUrl(invitationId),
-    {
-      ...options,
-      method: 'GET',
-    },
-  )
+  return lasiusFetch<getInvitationStatusResponse>(getGetInvitationStatusUrl(invitationId), {
+    ...options,
+    method: 'GET',
+  })
 }

@@ -19,7 +19,7 @@
 
 import { cn } from '~/lib/utils/cn'
 
-interface ButtonGroupProps {
+interface ButtonGroupProperties {
   children: React.ReactNode
   className?: string
 }
@@ -28,8 +28,6 @@ interface ButtonGroupProps {
  * Container for form action buttons (submit, cancel, etc.)
  * Should be placed as the last FormElement in a form
  */
-export const ButtonGroup = ({ children, className }: ButtonGroupProps) => {
-  return (
-    <div className={cn('fieldset mt-2 gap-4 p-2', className)}>{children}</div>
-  )
+export const ButtonGroup = ({ children, className }: ButtonGroupProperties) => {
+  return <div className={cn('fieldset mt-2 gap-4 p-2', className)}>{children}</div>
 }

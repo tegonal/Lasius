@@ -45,7 +45,7 @@ type TagGroupOpsInput = {
 
 export const useTagGroupOperations = (
   input: TagGroupOpsInput,
-  setHasUnsavedChanges: (value: boolean) => void,
+  setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void,
 ) => {
   const { t } = useTranslation('tag-manager')
   const { addToast } = useToast()
@@ -61,15 +61,13 @@ export const useTagGroupOperations = (
       (tag) => tag.type === 'SimpleTag',
     ) as ModelsSimpleTag[]
 
-    input.setTagGroups((prev) => {
-      const merged = unionWith(prev, newTagGroups, (a, b) => a.id === b.id)
+    input.setTagGroups((previous) => {
+      const merged = unionWith(previous, newTagGroups, (a, b) => a.id === b.id)
       setExpandedGroups(new Set(merged.map((g) => g.id)))
       return merged
     })
 
-    input.setSimpleTags((prev) =>
-      unionWith(prev, newSimpleTags, (a, b) => a.id === b.id),
-    )
+    input.setSimpleTags((previous) => unionWith(previous, newSimpleTags, (a, b) => a.id === b.id))
 
     setHasUnsavedChanges(true)
   }
@@ -79,10 +77,10 @@ export const useTagGroupOperations = (
     if (!group) return
     const removedGroupId = group.id
 
-    input.setTagGroups((prev) => prev.filter((_, i) => i !== index))
+    input.setTagGroups((previous) => previous.filter((_, index_) => index_ !== index))
 
-    setExpandedGroups((prev) => {
-      const next = new Set(prev)
+    setExpandedGroups((previous) => {
+      const next = new Set(previous)
       next.delete(removedGroupId)
       return next
     })
@@ -94,10 +92,7 @@ export const useTagGroupOperations = (
     const name = input.newTagGroupName
     if (!name) {
       addToast({
-        message: t(
-          'validation.tagGroupNameRequired',
-          'Tag group name is required',
-        ),
+        message: t('validation.tagGroupNameRequired', 'Tag group name is required'),
         type: 'ERROR',
       })
       return false
@@ -117,10 +112,10 @@ export const useTagGroupOperations = (
       type: 'TagGroup',
     }
 
-    input.setTagGroups((prev) => [...prev, newTagGroup])
+    input.setTagGroups((previous) => [...previous, newTagGroup])
     input.setNewTagGroupName('')
     setHasUnsavedChanges(true)
-    setExpandedGroups((prev) => new Set([...prev, name]))
+    setExpandedGroups((previous) => new Set([...previous, name]))
     return true
   }
 
@@ -133,8 +128,8 @@ export const useTagGroupOperations = (
   }
 
   const toggleGroup = (groupId: string) => {
-    setExpandedGroups((prev) => {
-      const next = new Set(prev)
+    setExpandedGroups((previous) => {
+      const next = new Set(previous)
       if (next.has(groupId)) {
         next.delete(groupId)
       } else {
@@ -155,14 +150,14 @@ export const useTagGroupOperations = (
   const pasteTags = (targetIndex: number) => {
     if (!copiedTags) return
 
-    input.setTagGroups((prev) => {
-      const updated = [...prev]
+    input.setTagGroups((previous) => {
+      const updated = [...previous]
       const targetGroup = updated[targetIndex]
-      if (!targetGroup) return prev
+      if (!targetGroup) return previous
 
       const existingTags = targetGroup.relatedTags || []
-      const newTags = copiedTags.tags.filter(
-        (tag) => !existingTags.some((existing) => existing.id === tag.id),
+      const newTags = copiedTags.tags.filter((tag) =>
+        existingTags.every((existing) => existing.id !== tag.id),
       )
 
       updated[targetIndex] = {
@@ -206,10 +201,10 @@ export const useTagGroupOperations = (
       type: 'SimpleTag',
     }
 
-    input.setTagGroups((prev) => {
-      const updated = [...prev]
+    input.setTagGroups((previous) => {
+      const updated = [...previous]
       const group = updated[groupIndex]
-      if (!group) return prev
+      if (!group) return previous
       updated[groupIndex] = {
         ...group,
         relatedTags: [...(group.relatedTags || []), newTag],
@@ -223,10 +218,10 @@ export const useTagGroupOperations = (
   }
 
   const updateTagGroupTags = (groupIndex: number, tags: ModelsSimpleTag[]) => {
-    input.setTagGroups((prev) => {
-      const updated = [...prev]
+    input.setTagGroups((previous) => {
+      const updated = [...previous]
       const group = updated[groupIndex]
-      if (!group) return prev
+      if (!group) return previous
       updated[groupIndex] = {
         ...group,
         relatedTags: tags,

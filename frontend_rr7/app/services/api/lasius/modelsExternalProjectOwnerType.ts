@@ -11,8 +11,7 @@
  * @nullable
  */
 export type ModelsExternalProjectOwnerType =
-  | (typeof ModelsExternalProjectOwnerType)[keyof typeof ModelsExternalProjectOwnerType]
-  | null
+  (typeof ModelsExternalProjectOwnerType)[keyof typeof ModelsExternalProjectOwnerType] | null
 
 export const ModelsExternalProjectOwnerType = {
   User: 'User',

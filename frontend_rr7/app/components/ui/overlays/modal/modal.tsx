@@ -39,12 +39,13 @@ const modalContainerVariants = cva(
   },
 )
 
-type ModalContainerProps = VariantProps<typeof modalContainerVariants>
+type ModalContainerProperties = VariantProps<typeof modalContainerVariants>
 
-interface Props extends ModalContainerProps {
+interface Properties extends ModalContainerProperties {
   autoSize?: boolean
   blockViewport?: boolean
   children: React.ReactNode
+  initialFocus?: React.RefObject<HTMLElement | null>
   minHeight?: number | string
   onClose: () => void
   open: boolean
@@ -58,15 +59,16 @@ export const Modal = ({
   autoSize = false,
   blockViewport = false,
   children,
+  initialFocus,
   minHeight,
   onClose,
   open,
   size,
-}: Props) => {
+}: Properties) => {
   const modalSize = autoSize ? 'auto' : size || 'md'
 
-  const handleOpenChange = (nextOpen: boolean) => {
-    if (!nextOpen && !blockViewport) {
+  const handleOpenChange = (willBeOpen: boolean) => {
+    if (!willBeOpen && !blockViewport) {
       onClose()
     }
   }
@@ -77,15 +79,14 @@ export const Modal = ({
         <Dialog.Backdrop className="fixed inset-0 z-50 bg-black/40 backdrop-blur-[5px] transition-opacity duration-300 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0" />
         <Dialog.Popup
           className={cn('fixed inset-0 z-50 flex items-center justify-center')}
-        >
+          initialFocus={initialFocus}>
           <div
             className={cn(
               modalContainerVariants({ size: modalSize }),
               minHeight && 'h-auto',
               'transition-all duration-300 data-[ending-style]:translate-y-full data-[ending-style]:opacity-0 data-[starting-style]:translate-y-full data-[starting-style]:opacity-0',
             )}
-            style={{ minHeight: minHeight || undefined }}
-          >
+            style={{ minHeight: minHeight || undefined }}>
             {children}
           </div>
         </Dialog.Popup>

@@ -19,11 +19,7 @@
 
 import { href, redirect } from 'react-router'
 
-import {
-  generateCodeChallenge,
-  generateCodeVerifier,
-  generateState,
-} from '~/lib/crypto.server'
+import { generateCodeChallenge, generateCodeVerifier, generateState } from '~/lib/crypto.server'
 import { logger } from '~/lib/logger'
 import { sanitizeReturnTo } from '~/services/auth/auth-helpers.server'
 import { loginUrl } from '~/services/auth/auth-urls'
@@ -33,11 +29,7 @@ import { type AuthProvider } from '~/services/auth/types'
 
 import { type Route } from './+types/oauth.$provider.login'
 
-const VALID_PROVIDERS: Set<AuthProvider> = new Set([
-  'github',
-  'gitlab',
-  'keycloak',
-])
+const VALID_PROVIDERS: Set<AuthProvider> = new Set(['github', 'gitlab', 'keycloak'])
 
 export async function loader({ params, request }: Route.LoaderArgs) {
   const providerName = params.provider as AuthProvider
@@ -57,8 +49,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   const codeChallenge = await generateCodeChallenge(codeVerifier)
 
   // Build the callback URL — use Host header for correct origin behind reverse proxy
-  const host =
-    request.headers.get('x-forwarded-host') || request.headers.get('host')
+  const host = request.headers.get('x-forwarded-host') || request.headers.get('host')
   const protocol = request.headers.get('x-forwarded-proto') || 'http'
   const origin = host ? `${protocol}://${host}` : url.origin
   const redirectUri = `${origin}${href('/oauth/callback')}`
@@ -72,11 +63,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   }
 
   const provider = getProvider(providerName)
-  const authorizationUrl = provider.getAuthorizationUrl(
-    state,
-    redirectUri,
-    codeChallenge,
-  )
+  const authorizationUrl = provider.getAuthorizationUrl(state, redirectUri, codeChallenge)
 
   logger.debug('Redirecting to OAuth provider', { provider: providerName })
 

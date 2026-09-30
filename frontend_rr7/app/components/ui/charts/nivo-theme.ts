@@ -226,9 +226,7 @@ export function getConsistentColor(key: string, isDark: boolean): string {
 export function useNivoColors() {
   // Read theme from the data-theme attribute set on <html>
   const isDark =
-    typeof document === 'undefined'
-      ? false
-      : document.documentElement.dataset.theme === 'dark'
+    typeof document === 'undefined' ? false : document.documentElement.dataset.theme === 'dark'
 
   // Memoize the function so it only changes when theme changes
   return useMemo(
@@ -255,8 +253,8 @@ const hexToRgb = (hex: string): null | { b: number; g: number; r: number } => {
 
 const getLuminance = (r: number, g: number, b: number): number => {
   const channels = [r, g, b].map((c) => {
-    c = c / 255
-    return c <= 0.039_28 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
+    c /= 255
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
   })
   return 0.2126 * channels[0]! + 0.7152 * channels[1]! + 0.0722 * channels[2]!
 }
@@ -268,7 +266,7 @@ const getContrastTextColor = (backgroundColor: string): string => {
   return luminance < 0.5 ? '#ffffff' : '#000000'
 }
 
-export const getContrastLabelTextColor = (datum: any) => {
+export const getContrastLabelTextColor = (datum: { color: string }) => {
   if (datum.color) {
     return getContrastTextColor(datum.color)
   }
@@ -280,12 +278,12 @@ export const getContrastLabelTextColor = (datum: any) => {
 /**
  * Hash a string to a number
  */
-function hashString(str: string): number {
+function hashString(string_: string): number {
   let hash = 0
-  for (let i = 0; i < str.length; i++) {
-    const char = str.codePointAt(i) ?? 0
+  for (let index = 0; index < string_.length; index++) {
+    const char = string_.codePointAt(index) ?? 0
     hash = (hash << 5) - hash + char
-    hash = hash & hash // Convert to 32bit integer
+    hash &= hash // Convert to 32bit integer
   }
   return Math.abs(hash)
 }

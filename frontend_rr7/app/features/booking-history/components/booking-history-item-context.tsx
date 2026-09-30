@@ -39,7 +39,7 @@ import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { type ModelsBooking } from '~/services/api/lasius'
 import { deleteUserBooking } from '~/services/api/lasius/user-bookings/user-bookings'
 
-type Props = {
+type Properties = {
   allowDelete?: boolean
   allowEdit?: boolean
   item: ModelsBooking
@@ -49,7 +49,7 @@ export const BookingHistoryItemContext = ({
   allowDelete = false,
   allowEdit = false,
   item,
-}: Props) => {
+}: Properties) => {
   const [isOpen, setIsOpen] = useState(false)
   const { t } = useTranslation('common')
   const { handleCloseAll } = useContextMenu()
@@ -82,8 +82,7 @@ export const BookingHistoryItemContext = ({
                   onClick={() => updateItem()}
                   shape="circle"
                   title={t('bookings:actions.edit', 'Edit booking')}
-                  variant="contextIcon"
-                >
+                  variant="contextIcon">
                   <LucideIcon icon={Pencil} size={24} />
                 </Button>
               </ContextButtonWrapper>
@@ -97,8 +96,7 @@ export const BookingHistoryItemContext = ({
                   onClick={() => void deleteItem()}
                   shape="circle"
                   title={t('bookings:actions.delete', 'Delete booking')}
-                  variant="contextIcon"
-                >
+                  variant="contextIcon">
                   <LucideIcon icon={Trash2} size={24} />
                 </Button>
               </ContextButtonWrapper>

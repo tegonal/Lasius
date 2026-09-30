@@ -20,11 +20,7 @@
 /**
  * Common arrow key increment/decrement for date/time values
  */
-export function handleArrowIncrement(
-  date: Date,
-  segment: string,
-  increment: number,
-): Date {
+export function handleArrowIncrement(date: Date, segment: string, increment: number): Date {
   const newDate = new Date(date)
 
   switch (segment) {
@@ -65,11 +61,7 @@ export function handleMultiDigitInput<TSegment extends string>(
   shouldAutoAdvance: (segment: TSegment, parts: string[]) => boolean,
 ) {
   // Check if we're typing a digit and the segment already has content
-  if (
-    /^\d$/.test(newValue.slice(-1)) &&
-    newValue.length > inputValue.length &&
-    selectedSegment
-  ) {
+  if (/^\d$/.test(newValue.slice(-1)) && newValue.length > inputValue.length && selectedSegment) {
     const parts = inputValue.split(separator)
     const newDigit = newValue.slice(-1)
     const segmentIndex = getSegmentIndex(selectedSegment)
@@ -104,10 +96,7 @@ export function handleSegmentReplacement<TSegment extends string>(
   formatSegmentValue: (value: string, segment: TSegment) => string,
 ) {
   // Check if selection matches the segment bounds (user is replacing the segment)
-  if (
-    selectionStart === segmentBounds.start &&
-    selectionEnd === segmentBounds.end
-  ) {
+  if (selectionStart === segmentBounds.start && selectionEnd === segmentBounds.end) {
     const parts = inputValue.split(separator)
     const typedChar = newValue.slice(selectionStart, selectionStart + 1)
 

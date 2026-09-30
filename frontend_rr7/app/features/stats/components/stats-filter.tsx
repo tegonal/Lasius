@@ -32,16 +32,16 @@ import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { dateOptions } from '~/lib/utils/date/date-options'
 import { formatISOLocale } from '~/lib/utils/dates'
 
-type StatsFilterProps = {
+type StatsFilterProperties = {
   inactiveProject?: null | { id: string; key: string }
 }
 
-export const StatsFilter = ({ inactiveProject = null }: StatsFilterProps) => {
+export const StatsFilter = ({ inactiveProject = null }: StatsFilterProperties) => {
   const { t } = useTranslation('common')
   const navigate = useNavigate()
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParameters, setSearchParameters] = useSearchParams()
   const [selectedRange, setSelectedRange] = useState(
-    () => searchParams.get('dateRange') || dateOptions[0]?.name || '',
+    () => searchParameters.get('dateRange') || dateOptions[0]?.name || '',
   )
 
   const defaultDateRange = dateOptions[0]?.name || ''
@@ -60,23 +60,23 @@ export const StatsFilter = ({ inactiveProject = null }: StatsFilterProps) => {
     if (!option?.dateRangeFn) return
 
     const { from, to } = option.dateRangeFn(new Date())
-    setSearchParams(
-      (prev) => {
-        prev.set('from', from)
-        prev.set('to', to)
-        prev.set('dateRange', value)
-        return prev
+    setSearchParameters(
+      (previous) => {
+        previous.set('from', from)
+        previous.set('to', to)
+        previous.set('dateRange', value)
+        return previous
       },
       { replace: true },
     )
   }
 
   const handleFromChange = (value: string) => {
-    setSearchParams(
-      (prev) => {
-        prev.set('from', value)
-        prev.set('dateRange', t('custom', { defaultValue: 'Custom' }))
-        return prev
+    setSearchParameters(
+      (previous) => {
+        previous.set('from', value)
+        previous.set('dateRange', t('custom', { defaultValue: 'Custom' }))
+        return previous
       },
       { replace: true },
     )
@@ -84,11 +84,11 @@ export const StatsFilter = ({ inactiveProject = null }: StatsFilterProps) => {
   }
 
   const handleToChange = (value: string) => {
-    setSearchParams(
-      (prev) => {
-        prev.set('to', value)
-        prev.set('dateRange', t('custom', { defaultValue: 'Custom' }))
-        return prev
+    setSearchParameters(
+      (previous) => {
+        previous.set('to', value)
+        previous.set('dateRange', t('custom', { defaultValue: 'Custom' }))
+        return previous
       },
       { replace: true },
     )
@@ -100,12 +100,12 @@ export const StatsFilter = ({ inactiveProject = null }: StatsFilterProps) => {
     if (!firstOption) return
     const { from, to } = firstOption.dateRangeFn(new Date())
     setSelectedRange(defaultDateRange)
-    setSearchParams(
-      (prev) => {
-        prev.set('from', from)
-        prev.set('to', to)
-        prev.set('dateRange', defaultDateRange)
-        return prev
+    setSearchParameters(
+      (previous) => {
+        previous.set('from', from)
+        previous.set('to', to)
+        previous.set('dateRange', defaultDateRange)
+        return previous
       },
       { replace: true },
     )
@@ -115,8 +115,8 @@ export const StatsFilter = ({ inactiveProject = null }: StatsFilterProps) => {
     void navigate('/user/projects')
   }
 
-  const currentFrom = searchParams.get('from') || formatISOLocale(new Date())
-  const currentTo = searchParams.get('to') || formatISOLocale(new Date())
+  const currentFrom = searchParameters.get('from') || formatISOLocale(new Date())
+  const currentTo = searchParameters.get('to') || formatISOLocale(new Date())
 
   return (
     <div className="w-full" data-testid="stats-filter">
@@ -135,8 +135,7 @@ export const StatsFilter = ({ inactiveProject = null }: StatsFilterProps) => {
               fullWidth={false}
               onClick={handleBackToProjects}
               size="sm"
-              variant="ghost"
-            >
+              variant="ghost">
               <LucideIcon icon={ArrowLeft} size={16} />
               {t('actions.back', { defaultValue: 'Back' })}
             </Button>
@@ -144,16 +143,10 @@ export const StatsFilter = ({ inactiveProject = null }: StatsFilterProps) => {
         </div>
       )}
       <div className="relative">
-        <Heading variant="section">
-          {t('filter.title', { defaultValue: 'Filter' })}
-        </Heading>
+        <Heading variant="section">{t('filter.title', { defaultValue: 'Filter' })}</Heading>
         {hasChanges && (
           <div className="absolute top-3 right-0">
-            <button
-              className="btn btn-ghost btn-xs"
-              onClick={resetForm}
-              type="button"
-            >
+            <button className="btn btn-ghost btn-xs" onClick={resetForm} type="button">
               {t('actions.reset', {
                 defaultValue: 'Reset',
               })}
@@ -166,8 +159,7 @@ export const StatsFilter = ({ inactiveProject = null }: StatsFilterProps) => {
           htmlFor="dateRange"
           label={t('time.timeRange', {
             defaultValue: 'Time range',
-          })}
-        >
+          })}>
           <Select
             id="dateRange"
             onChange={handleRangeChange}
@@ -175,21 +167,18 @@ export const StatsFilter = ({ inactiveProject = null }: StatsFilterProps) => {
             value={selectedRange}
           />
         </FormElement>
-        <FormElement
-          htmlFor="from"
-          label={t('time.from', { defaultValue: 'From' })}
-        >
+        <FormElement htmlFor="from" label={t('time.from', { defaultValue: 'From' })}>
           <InputDateStandalone
             id="from"
             onChange={handleFromChange}
-            value={currentFrom.split('T')[0] || ''}
+            value={currentFrom.split('T', 1)[0] || ''}
           />
         </FormElement>
         <FormElement htmlFor="to" label={t('time.to', { defaultValue: 'To' })}>
           <InputDateStandalone
             id="to"
             onChange={handleToChange}
-            value={currentTo.split('T')[0] || ''}
+            value={currentTo.split('T', 1)[0] || ''}
           />
         </FormElement>
       </FormBody>

@@ -26,10 +26,7 @@ import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { Modal } from '~/components/ui/overlays/modal/modal'
 import { BookingAddUpdateForm } from '~/features/bookings/components/booking-add-update-form'
-import {
-  useHomeLoaderData,
-  useSelectedOrgId,
-} from '~/features/bookings/hooks/use-home-loader-data'
+import { useHomeLoaderData, useSelectedOrgId } from '~/features/bookings/hooks/use-home-loader-data'
 import { useStopAndStart } from '~/features/bookings/hooks/use-stop-and-start'
 import { ContextButtonAddFavorite } from '~/features/context-menu/buttons/context-button-add-favorite'
 import { ContextButtonClose } from '~/features/context-menu/buttons/context-button-close'
@@ -51,7 +48,7 @@ import {
 } from '~/services/api/lasius-hooks/user-bookings/user-bookings'
 import { useAddFavoriteBooking } from '~/services/api/lasius-hooks/user-favorites/user-favorites'
 
-type Props = {
+type Properties = {
   item: AugmentedBooking
 }
 
@@ -72,65 +69,66 @@ const useGetAdjacentBookings = (item: ModelsBooking) => {
   }
 }
 
-export const BookingItemContext = ({ item }: Props) => {
+export const BookingItemContext = ({ item }: Properties) => {
   const { t } = useTranslation('common')
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const { handleCloseAll } = useContextMenu()
-  const { next: nextBooking, previous: previousBooking } =
-    useGetAdjacentBookings(item)
+  const { next: nextBooking, previous: previousBooking } = useGetAdjacentBookings(item)
   const selectedOrgId = useSelectedOrgId()
   const currentBookingId = useCurrentBookingId()
-  const deleteBookingApi = useDeleteUserBooking()
+  const bookingDeletionApi = useDeleteUserBooking()
   const updateBookingApi = useUpdateUserBooking()
-  const addFavoriteApi = useAddFavoriteBooking()
+  const favoriteAdditionApi = useAddFavoriteBooking()
   const stopAndStartApi = useStopAndStart()
 
   const shouldShowStartAdjustment =
-    previousBooking?.end?.dateTime &&
+    !!previousBooking?.end?.dateTime &&
     !areTimesWithinOneMinute(item.start.dateTime, previousBooking.end.dateTime)
 
   const shouldShowEndAdjustment =
-    nextBooking?.start?.dateTime &&
-    item.end &&
+    !!nextBooking?.start?.dateTime &&
+    !!item.end &&
     !areTimesWithinOneMinute(item.end.dateTime, nextBooking.start.dateTime)
 
   const deleteItem = () => {
-    deleteBookingApi.submit({ bookingId: item.id, orgId: selectedOrgId })
+    bookingDeletionApi.submit({ bookingId: item.id, orgId: selectedOrgId })
     handleCloseAll()
   }
 
   const adjustStartToPrevious = () => {
-    if (previousBooking?.end?.dateTime) {
-      updateBookingApi.submit({
-        body: {
-          end: item.end
-            ? formatISOLocale(new Date(item.end.dateTime))
-            : undefined,
-          projectId: item.projectReference?.id || '',
-          start: formatISOLocale(new Date(previousBooking.end.dateTime)),
-          tags: item.tags || [],
-        },
-        bookingId: item.id,
-        orgId: selectedOrgId,
-      })
-      handleCloseAll()
+    if (!previousBooking?.end?.dateTime) {
+      return
     }
+
+    updateBookingApi.submit({
+      body: {
+        end: item.end ? formatISOLocale(new Date(item.end.dateTime)) : undefined,
+        projectId: item.projectReference?.id || '',
+        start: formatISOLocale(new Date(previousBooking.end.dateTime)),
+        tags: item.tags || [],
+      },
+      bookingId: item.id,
+      orgId: selectedOrgId,
+    })
+    handleCloseAll()
   }
 
   const adjustEndToNext = () => {
-    if (nextBooking?.start?.dateTime && item.end) {
-      updateBookingApi.submit({
-        body: {
-          end: formatISOLocale(new Date(nextBooking.start.dateTime)),
-          projectId: item.projectReference?.id || '',
-          start: formatISOLocale(new Date(item.start.dateTime)),
-          tags: item.tags || [],
-        },
-        bookingId: item.id,
-        orgId: selectedOrgId,
-      })
-      handleCloseAll()
+    if (!(nextBooking?.start?.dateTime && item.end)) {
+      return
     }
+
+    updateBookingApi.submit({
+      body: {
+        end: formatISOLocale(new Date(nextBooking.start.dateTime)),
+        projectId: item.projectReference?.id || '',
+        start: formatISOLocale(new Date(item.start.dateTime)),
+        tags: item.tags || [],
+      },
+      bookingId: item.id,
+      orgId: selectedOrgId,
+    })
+    handleCloseAll()
   }
 
   const startBooking = () => {
@@ -146,7 +144,7 @@ export const BookingItemContext = ({ item }: Props) => {
   }
 
   const addFavorite = () => {
-    addFavoriteApi.submit({
+    favoriteAdditionApi.submit({
       body: {
         projectId: item.projectReference?.id || '',
         tags: item.tags || [],
@@ -178,8 +176,7 @@ export const BookingItemContext = ({ item }: Props) => {
                 }}
                 shape="circle"
                 title={t('bookings:actions.edit', 'Edit booking')}
-                variant="contextIcon"
-              >
+                variant="contextIcon">
                 <LucideIcon icon={Pencil} size={24} />
               </Button>
             </ContextButtonWrapper>
@@ -198,8 +195,7 @@ export const BookingItemContext = ({ item }: Props) => {
                     'bookings:actions.adjustStartToPrevious',
                     'Adjust start to previous booking',
                   )}
-                  variant="contextIcon"
-                >
+                  variant="contextIcon">
                   <LucideIcon icon={ArrowDownToLine} size={24} />
                 </Button>
               </ContextButtonWrapper>
@@ -207,20 +203,13 @@ export const BookingItemContext = ({ item }: Props) => {
             {shouldShowEndAdjustment && (
               <ContextButtonWrapper>
                 <Button
-                  aria-label={t(
-                    'bookings:actions.adjustEndToNext',
-                    'Adjust end to next booking',
-                  )}
+                  aria-label={t('bookings:actions.adjustEndToNext', 'Adjust end to next booking')}
                   data-testid="booking-ctx-adjust-end-btn"
                   fullWidth={false}
                   onClick={adjustEndToNext}
                   shape="circle"
-                  title={t(
-                    'bookings:actions.adjustEndToNext',
-                    'Adjust end to next booking',
-                  )}
-                  variant="contextIcon"
-                >
+                  title={t('bookings:actions.adjustEndToNext', 'Adjust end to next booking')}
+                  variant="contextIcon">
                   <LucideIcon icon={ArrowUpToLine} size={24} />
                 </Button>
               </ContextButtonWrapper>
@@ -238,8 +227,7 @@ export const BookingItemContext = ({ item }: Props) => {
                 onClick={deleteItem}
                 shape="circle"
                 title={t('bookings:actions.delete', 'Delete booking')}
-                variant="contextIcon"
-              >
+                variant="contextIcon">
                 <LucideIcon icon={Trash2} size={24} />
               </Button>
             </ContextButtonWrapper>

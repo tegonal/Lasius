@@ -17,11 +17,11 @@
  *
  */
 
-type Props = {
+type Properties = {
   children: React.ReactNode
 }
 
-export const DataListRow = ({ children }: Props) => (
+export const DataListRow = ({ children }: Properties) => (
   <tr className="border-base-content/20 border-b [&>td:first-child]:pl-4 [&>td:last-child]:w-12 [&>td:last-child]:pr-2">
     {children}
   </tr>

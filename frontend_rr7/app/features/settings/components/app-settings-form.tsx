@@ -36,11 +36,10 @@ import { ToggleSwitch } from '~/components/ui/forms/input/toggle-switch'
 import { API_ROUTES } from '~/config/constants'
 import { DEFAULT_LOCALE, LOCALE_LABELS, LOCALES } from '~/i18n-config'
 import { validateFormData } from '~/lib/conform-helpers'
-import { type SchemaTranslationFn, untyped } from '~/lib/i18n-types'
+import { type SchemaTranslationFunction, untyped } from '~/lib/i18n-types'
 import {
-  type ThemeMode,
   useAppSettingsActions,
-  useOnboardingDismissed,
+  useIsOnboardingDismissed,
   useTheme,
 } from '~/stores/app-settings-store'
 
@@ -54,7 +53,7 @@ const themeModeToDataTheme: Record<string, string> = {
   light: 'light',
 }
 
-const createAppSettingsSchema = (t: SchemaTranslationFn) =>
+const createAppSettingsSchema = (t: SchemaTranslationFunction) =>
   z.object({
     language: z.string().min(
       1,
@@ -73,19 +72,20 @@ const createAppSettingsSchema = (t: SchemaTranslationFn) =>
 export const AppSettingsForm = () => {
   const { i18n, t } = useTranslation('settings')
   const theme = useTheme()
-  const onboardingDismissed = useOnboardingDismissed()
-  const { dismissOnboarding, resetOnboarding, setTheme } =
-    useAppSettingsActions()
+  const isOnboardingDismissed = useIsOnboardingDismissed()
+  const { dismissOnboarding, resetOnboarding, setTheme } = useAppSettingsActions()
   const localeFetcher = useFetcher()
   const themeFetcher = useFetcher()
   const pendingLocaleReload = useRef(false)
 
   // Reload after locale cookie has been set by the server
   useEffect(() => {
-    if (pendingLocaleReload.current && localeFetcher.state === 'idle') {
-      pendingLocaleReload.current = false
-      globalThis.location.reload()
+    if (!(pendingLocaleReload.current && localeFetcher.state === 'idle')) {
+      return
     }
+
+    pendingLocaleReload.current = false
+    location.reload()
   }, [localeFetcher.state])
 
   const schema = useMemo(() => createAppSettingsSchema(untyped(t)), [t])
@@ -109,8 +109,8 @@ export const AppSettingsForm = () => {
     constraint: getZodConstraint(schema),
     defaultValue: {
       language: i18n.language || DEFAULT_LOCALE,
-      showOnboarding: onboardingDismissed ? '' : 'on',
-      theme: theme as string,
+      showOnboarding: isOnboardingDismissed ? '' : 'on',
+      theme: theme,
     },
     onValidate({ formData }) {
       return parseWithZod(formData, { schema })
@@ -131,27 +131,27 @@ export const AppSettingsForm = () => {
     themeControl.change(value)
   }
 
-  const handleOnboardingToggle = (enabled: boolean) => {
-    onboardingControl.change(enabled ? 'on' : '')
-    if (enabled) {
+  const handleOnboardingToggle = (isEnabled: boolean) => {
+    onboardingControl.change(isEnabled ? 'on' : '')
+    if (isEnabled) {
       resetOnboarding()
     } else {
       dismissOnboarding()
     }
   }
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault()
 
-    const result = validateFormData(e.currentTarget, schema)
+    const result = validateFormData(event.currentTarget, schema)
     if (result.status !== 'success') return
 
     const data = result.value
     const currentLocale = i18n.language || DEFAULT_LOCALE
-    const languageChanged = data.language !== currentLocale
+    const isLanguageChanged = data.language !== currentLocale
 
     // Update locale cookie via server action
-    if (languageChanged) {
+    if (isLanguageChanged) {
       void localeFetcher.submit(
         { locale: data.language },
         { action: API_ROUTES.LOCALE, method: 'post' },
@@ -159,15 +159,13 @@ export const AppSettingsForm = () => {
     }
 
     // Save theme to store
-    setTheme(data.theme as ThemeMode)
+    setTheme(data.theme)
 
     // Update theme cookie via server action (for SSR)
     if (data.theme === 'system') {
-      if (globalThis.window !== undefined && globalThis.matchMedia) {
-        const prefersDark = globalThis.matchMedia(
-          '(prefers-color-scheme: dark)',
-        ).matches
-        const systemTheme = prefersDark ? 'dark' : 'light'
+      if (globalThis.window !== undefined && typeof matchMedia === 'function') {
+        const isPrefersDark = matchMedia('(prefers-color-scheme: dark)').matches
+        const systemTheme = isPrefersDark ? 'dark' : 'light'
         document.documentElement.dataset.theme = systemTheme
         void themeFetcher.submit(
           { theme: systemTheme },
@@ -177,14 +175,11 @@ export const AppSettingsForm = () => {
     } else {
       const dataTheme = themeModeToDataTheme[data.theme] || 'light'
       document.documentElement.dataset.theme = dataTheme
-      void themeFetcher.submit(
-        { theme: data.theme },
-        { action: API_ROUTES.THEME, method: 'post' },
-      )
+      void themeFetcher.submit({ theme: data.theme }, { action: API_ROUTES.THEME, method: 'post' })
     }
 
     // Reload after locale cookie is persisted (watched by useEffect above)
-    if (languageChanged) {
+    if (isLanguageChanged) {
       pendingLocaleReload.current = true
     }
   }
@@ -198,8 +193,7 @@ export const AppSettingsForm = () => {
               <FieldSet>
                 <FormElement
                   htmlFor={fields.language.id}
-                  label={t('app.language', 'Interface Language')}
-                >
+                  label={t('app.language', 'Interface Language')}>
                   <input
                     name={fields.language.name}
                     type="hidden"
@@ -212,10 +206,7 @@ export const AppSettingsForm = () => {
                     value={languageControl.value ?? DEFAULT_LOCALE}
                   />
                 </FormElement>
-                <FormElement
-                  htmlFor={fields.theme.id}
-                  label={t('app.theme', 'Theme')}
-                >
+                <FormElement htmlFor={fields.theme.id} label={t('app.theme', 'Theme')}>
                   <input
                     name={fields.theme.name}
                     type="hidden"
@@ -235,10 +226,7 @@ export const AppSettingsForm = () => {
                       id="onboarding-toggle"
                       onChange={handleOnboardingToggle}
                     />
-                    <Label
-                      className="cursor-pointer"
-                      htmlFor="onboarding-toggle"
-                    >
+                    <Label className="cursor-pointer" htmlFor="onboarding-toggle">
                       {t('app.showOnboarding', 'Show Onboarding Tutorial')}
                     </Label>
                   </div>

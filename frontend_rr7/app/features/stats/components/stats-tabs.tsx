@@ -29,33 +29,31 @@ type StatsTab = {
   to: string
 }
 
-type StatsTabsProps = {
+type StatsTabsProperties = {
   tabs: StatsTab[]
 }
 
-export const StatsTabs = ({ tabs }: StatsTabsProps) => {
-  const [searchParams] = useSearchParams()
+export const StatsTabs = ({ tabs }: StatsTabsProperties) => {
+  const [searchParameters] = useSearchParams()
   const location = useLocation()
-  const itemRefs = useRef<(HTMLElement | null)[]>([])
+  const itemReferences = useRef<(HTMLElement | null)[]>([])
 
-  const preservedParams = new URLSearchParams()
-  const from = searchParams.get('from')
-  const to = searchParams.get('to')
-  const dateRange = searchParams.get('dateRange')
-  if (from) preservedParams.set('from', from)
-  if (to) preservedParams.set('to', to)
-  if (dateRange) preservedParams.set('dateRange', dateRange)
-  const search = preservedParams.size > 0 ? `?${preservedParams}` : ''
+  const preservedParameters = new URLSearchParams()
+  const from = searchParameters.get('from')
+  const to = searchParameters.get('to')
+  const dateRange = searchParameters.get('dateRange')
+  if (from) preservedParameters.set('from', from)
+  if (to) preservedParameters.set('to', to)
+  if (dateRange) preservedParameters.set('dateRange', dateRange)
+  const search = preservedParameters.size > 0 ? `?${preservedParameters}` : ''
 
-  const selectedIndex = tabs.findIndex((tab) =>
-    location.pathname.endsWith(tab.to),
-  )
+  const selectedIndex = tabs.findIndex((tab) => location.pathname.endsWith(tab.to))
 
   return (
     <div className="border-base-content/20 relative flex flex-shrink-0 flex-row justify-start gap-3 border-b">
       <SlidingIndicator
         className="!top-auto !bottom-0 !h-[2px]"
-        itemRefs={itemRefs}
+        itemRefs={itemReferences}
         radiusOn="bottom"
         selectedIndex={selectedIndex}
       />
@@ -63,10 +61,9 @@ export const StatsTabs = ({ tabs }: StatsTabsProps) => {
         <div
           className="relative z-10"
           key={tab.to}
-          ref={(el) => {
-            itemRefs.current[index] = el
-          }}
-        >
+          ref={(element) => {
+            itemReferences.current[index] = element
+          }}>
           <NavLink
             className={({ isActive }) =>
               cn(
@@ -75,8 +72,7 @@ export const StatsTabs = ({ tabs }: StatsTabsProps) => {
               )
             }
             data-testid={`stats-tab-${tab.id}`}
-            to={`${tab.to}${search}`}
-          >
+            to={`${tab.to}${search}`}>
             {tab.label}
           </NavLink>
         </div>

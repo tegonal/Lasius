@@ -26,7 +26,7 @@ import {
 } from '~/components/ui/forms/input/input-select-autocomplete'
 import { type ModelsEntityReference } from '~/services/api/lasius'
 
-type ProjectSelectProps = {
+type ProjectSelectProperties = {
   /** All projects across all organisations (for inactive project lookup) */
   allProjects?: ModelsEntityReference[]
   errors?: string[]
@@ -38,6 +38,8 @@ type ProjectSelectProps = {
   projects: ModelsEntityReference[]
   value: string
 }
+
+const NO_PROJECTS: ModelsEntityReference[] = []
 
 function useProjectLookup(
   formValue: string,
@@ -88,8 +90,7 @@ function useProjectLookup(
       selectedItem: null,
       statusMessage: {
         text: t('projects:errors.projectNotFound', {
-          defaultValue:
-            'This project could not be found. The project ID is shown above.',
+          defaultValue: 'This project could not be found. The project ID is shown above.',
         }),
         variant: 'error' as const,
       },
@@ -102,7 +103,7 @@ function useProjectLookup(
  * Controlled component — parent owns the value via useInputControl.
  */
 export const ProjectSelect = ({
-  allProjects = [],
+  allProjects = NO_PROJECTS,
   errors,
   fallbackProject,
   id,
@@ -110,7 +111,7 @@ export const ProjectSelect = ({
   onChange,
   projects,
   value,
-}: ProjectSelectProps) => {
+}: ProjectSelectProperties) => {
   const { selectedItem, statusMessage } = useProjectLookup(
     value,
     projects,

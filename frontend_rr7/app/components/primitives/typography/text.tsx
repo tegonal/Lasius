@@ -48,32 +48,18 @@ const textVariants = cva('', {
   },
 })
 
-export interface TextProps
-  extends
-    Omit<React.HTMLAttributes<HTMLElement>, 'as'>,
-    VariantProps<typeof textVariants> {
+export interface TextProperties
+  extends Omit<React.HTMLAttributes<HTMLElement>, 'as'>, VariantProps<typeof textVariants> {
   as?: TextElement
   children: React.ReactNode
 }
 
-type TextElement =
-  | 'div'
-  | 'h1'
-  | 'h2'
-  | 'h3'
-  | 'h4'
-  | 'h5'
-  | 'h6'
-  | 'label'
-  | 'p'
-  | 'span'
+type TextElement = 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'label' | 'p' | 'span'
 
-export const Text = React.forwardRef<HTMLElement, TextProps>(
-  ({ as: Component = 'p', children, className, variant, ...props }, ref) => {
+export const Text = React.forwardRef<HTMLElement, TextProperties>(
+  ({ as: Component = 'p', children, className, variant, ...properties }, reference) => {
     const footerLinkStyles =
-      variant === 'footer'
-        ? '[&_a]:text-base-content/75 [&_a:hover]:no-underline'
-        : ''
+      variant === 'footer' ? '[&_a]:text-base-content/75 [&_a:hover]:no-underline' : ''
 
     const anchorStyles =
       variant === 'footer'
@@ -91,8 +77,8 @@ export const Text = React.forwardRef<HTMLElement, TextProps>(
       Component,
       {
         className: combinedClassName,
-        ref: ref as React.Ref<HTMLElement>,
-        ...props,
+        ref: reference,
+        ...properties,
       },
       children,
     )

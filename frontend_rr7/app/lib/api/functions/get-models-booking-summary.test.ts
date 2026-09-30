@@ -19,18 +19,9 @@
 
 import { describe, expect, it } from 'vitest'
 
-import { getModelsBookingSummary } from './get-models-booking-summary'
+import { type ModelsBooking } from '~/services/api/lasius'
 
-interface ModelsBooking {
-  bookingHash: number
-  end?: null | { dateTime: string; zone: string }
-  id: string
-  organisationReference: { id: string; key: string }
-  projectReference: { id: string; key: string }
-  start: { dateTime: string; zone: string }
-  tags: Array<{ id: string; type: string }>
-  userReference: { id: string; key: string }
-}
+import { getModelsBookingSummary } from './get-models-booking-summary'
 
 const makeBooking = (
   overrides: Partial<ModelsBooking> & { start: ModelsBooking['start'] },
@@ -50,7 +41,7 @@ const makeBooking = (
 
 describe('getModelsBookingSummary', () => {
   it('returns zero elements and zero hours for empty list', () => {
-    expect(getModelsBookingSummary([] as any)).toEqual({
+    expect(getModelsBookingSummary([])).toEqual({
       elements: 0,
       hours: 0,
     })
@@ -61,7 +52,7 @@ describe('getModelsBookingSummary', () => {
       end: { dateTime: '2024-01-15T11:00:00.000Z', zone: 'UTC' },
       start: { dateTime: '2024-01-15T10:00:00.000Z', zone: 'UTC' },
     })
-    const result = getModelsBookingSummary([booking] as any)
+    const result = getModelsBookingSummary([booking])
     expect(result.elements).toBe(1)
     expect(result.hours).toBe(1)
   })
@@ -82,7 +73,7 @@ describe('getModelsBookingSummary', () => {
       id: 'c',
       start: { dateTime: '2024-01-15T13:00:00.000Z', zone: 'UTC' },
     })
-    const result = getModelsBookingSummary([a, b, c] as any)
+    const result = getModelsBookingSummary([a, b, c])
     expect(result.elements).toBe(3)
     expect(result.hours).toBe(3.25)
   })

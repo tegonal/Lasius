@@ -24,12 +24,12 @@ import { StatsGroup } from '~/features/stats/components/stats-group'
 import { StatsTileNumber } from '~/features/stats/components/stats-tile-number'
 import { type ModelsProject } from '~/services/api/lasius/modelsProject'
 
-type Props = {
+type Properties = {
   onCreateProject: () => void
   projects: ModelsProject[]
 }
 
-export const AllProjectsStats = ({ onCreateProject, projects }: Props) => {
+export const AllProjectsStats = ({ onCreateProject, projects }: Properties) => {
   const { t } = useTranslation()
 
   const totalCount = projects.length
@@ -61,8 +61,7 @@ export const AllProjectsStats = ({ onCreateProject, projects }: Props) => {
         fullWidth={false}
         onClick={onCreateProject}
         size="sm"
-        variant="neutral"
-      >
+        variant="neutral">
         {t('projects:actions.create', 'Create project')}
       </Button>
     </div>

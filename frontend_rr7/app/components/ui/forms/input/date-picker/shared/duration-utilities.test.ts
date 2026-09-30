@@ -24,7 +24,7 @@ import {
   calculateDurationMinutes,
   formatDuration,
   parseDuration,
-} from './duration-utils'
+} from './duration-utilities'
 
 describe('addMinutesToDate', () => {
   it('should add 30 minutes to a date', () => {

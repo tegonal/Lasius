@@ -36,8 +36,7 @@ export const DropdownList = ({
         'z-50 shadow-lg',
         'scrollbar-thin scrollbar-thumb-base-content/20 scrollbar-track-transparent',
         className,
-      )}
-    >
+      )}>
       {children}
     </div>
   )

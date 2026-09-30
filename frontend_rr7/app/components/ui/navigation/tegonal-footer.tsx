@@ -25,24 +25,21 @@ import { TegonalIcon } from '~/components/ui/icons/tegonal-icon'
 import { BackendStatus } from '~/features/system/components/backend-status'
 import { WebsocketStatus } from '~/features/system/components/websocket-status'
 
-const footerVariants = cva(
-  'text-base-content/50 [&_a:hover]:text-base-content flex',
-  {
-    defaultVariants: {
-      variant: 'default',
-    },
-    variants: {
-      variant: {
-        compact: 'w-full flex-row items-center justify-between gap-2',
-        default: 'flex-col items-center justify-center gap-2',
-      },
+const footerVariants = cva('text-base-content/50 [&_a:hover]:text-base-content flex', {
+  defaultVariants: {
+    variant: 'default',
+  },
+  variants: {
+    variant: {
+      compact: 'w-full flex-row items-center justify-between gap-2',
+      default: 'flex-col items-center justify-center gap-2',
     },
   },
-)
+})
 
-type TegonalFooterProps = VariantProps<typeof footerVariants>
+type TegonalFooterProperties = VariantProps<typeof footerVariants>
 
-export const TegonalFooter = ({ variant }: TegonalFooterProps) => {
+export const TegonalFooter = ({ variant }: TegonalFooterProperties) => {
   const { t } = useTranslation('common')
   const isCompact = variant === 'compact'
 
@@ -56,24 +53,18 @@ export const TegonalFooter = ({ variant }: TegonalFooterProps) => {
           title={t('footer.tegonal.title', {
             defaultValue:
               'Lasius is developed and maintained by Tegonal Cooperative and released under AGPL 3.0',
-          })}
-        >
+          })}>
           <TegonalIcon size={isCompact ? 16 : 24} />
         </a>
       </div>
       <div className={isCompact ? 'text-xs' : 'text-sm'}>
         {isCompact ? (
           <div className="flex flex-row items-center gap-4">
-            <a
-              href="https://github.com/tegonal/lasius"
-              rel="noopener noreferrer"
-              target="_blank"
-            >
+            <a href="https://github.com/tegonal/lasius" rel="noopener noreferrer" target="_blank">
               <SiGithub
                 size={16}
                 title={t('footer.github.title', {
-                  defaultValue:
-                    'Find issues, post feedback and get the source code on GitHub',
+                  defaultValue: 'Find issues, post feedback and get the source code on GitHub',
                 })}
               />
             </a>
@@ -82,25 +73,29 @@ export const TegonalFooter = ({ variant }: TegonalFooterProps) => {
           </div>
         ) : (
           <Trans
+            // Trans replaces each link text below with the text of the matching tag in the translation.
             components={[
               <a
                 href="https://tegonal.com"
                 key="tegonalLink"
                 rel="noopener noreferrer"
-                target="_blank"
-              />,
+                target="_blank">
+                Tegonal
+              </a>,
               <a
                 href="https://github.com/tegonal/lasius"
                 key="gitHubLink"
                 rel="noopener noreferrer"
-                target="_blank"
-              />,
+                target="_blank">
+                GitHub
+              </a>,
               <a
                 href="https://www.gnu.org/licenses/agpl-3.0.en.html"
                 key="agplLink"
                 rel="noopener noreferrer"
-                target="_blank"
-              />,
+                target="_blank">
+                AGPL 3.0
+              </a>,
             ]}
             defaults="Developed by <0>Tegonal</0>, available on <1>GitHub</1>, released under <2>AGPL 3.0</2>"
             i18nKey="footer.developedBy"

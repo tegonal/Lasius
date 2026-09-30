@@ -118,8 +118,7 @@ export const WorkingHoursGrid = () => {
                 </th>
 
                 {weekDays.map((day) => {
-                  const isWeekend =
-                    day.key === 'saturday' || day.key === 'sunday'
+                  const isWeekend = day.key === 'saturday' || day.key === 'sunday'
                   return (
                     <th
                       className={cn(
@@ -127,8 +126,7 @@ export const WorkingHoursGrid = () => {
                         isWeekend && 'bg-base-200/30',
                         day.key !== 'sunday' && 'border-r',
                       )}
-                      key={day.key}
-                    >
+                      key={day.key}>
                       <div className="text-sm font-medium">
                         <FormatDate date={day.date} format="dayNameShort" />
                       </div>
@@ -140,35 +138,23 @@ export const WorkingHoursGrid = () => {
 
             <tbody>
               {organisations?.map((org) => (
-                <tr
-                  className="group hover:bg-base-200/20"
-                  key={org.organisationReference.id}
-                >
+                <tr className="group hover:bg-base-200/20" key={org.organisationReference.id}>
                   <td className="bg-base-100 border-base-300 sticky left-0 z-10 border-r p-3">
                     <div className="flex items-center gap-2">
-                      <AvatarOrganisation
-                        name={org.organisationReference.key}
-                        size={24}
-                      />
+                      <AvatarOrganisation name={org.organisationReference.key} size={24} />
                       <span
                         className="max-w-[15ch] truncate text-sm font-medium"
-                        title={org.organisationReference.key}
-                      >
+                        title={org.organisationReference.key}>
                         {org.private
-                          ? t(
-                              'organisation:myPersonalOrganisation',
-                              'My personal organisation',
-                            )
+                          ? t('organisation:myPersonalOrganisation', 'My personal organisation')
                           : org.organisationReference.key}
                       </span>
                     </div>
                   </td>
 
                   {weekDays.map((day) => {
-                    const hours = (org.plannedWorkingHours ??
-                      plannedWorkingHoursStub)[day.key]
-                    const isWeekend =
-                      day.key === 'saturday' || day.key === 'sunday'
+                    const hours = (org.plannedWorkingHours ?? plannedWorkingHoursStub)[day.key]
+                    const isWeekend = day.key === 'saturday' || day.key === 'sunday'
                     const cellKey = `${org.organisationReference.id}-${day.key}`
                     const isSaving = savingKey === cellKey
 
@@ -180,8 +166,7 @@ export const WorkingHoursGrid = () => {
                           'hover:bg-base-200/40',
                           day.key !== 'sunday' && 'border-r',
                         )}
-                        key={day.key}
-                      >
+                        key={day.key}>
                         <TimeDropdownWithModal
                           dayName={day.label}
                           disabled={isSaving}
@@ -203,13 +188,10 @@ export const WorkingHoursGrid = () => {
 
               <tr className="bg-base-200/50 font-medium">
                 <td className="bg-base-200/50 border-base-300 sticky left-0 z-10 border-t border-r p-3">
-                  <span className="text-sm font-semibold">
-                    {t('dailyTotal', 'Daily Total')}
-                  </span>
+                  <span className="text-sm font-semibold">{t('dailyTotal', 'Daily Total')}</span>
                 </td>
                 {weekDays.map((day) => {
-                  const isWeekend =
-                    day.key === 'saturday' || day.key === 'sunday'
+                  const isWeekend = day.key === 'saturday' || day.key === 'sunday'
                   const dayTotal = calculateDayTotal(day.key)
                   return (
                     <td
@@ -218,12 +200,9 @@ export const WorkingHoursGrid = () => {
                         isWeekend && 'bg-base-200/30',
                         day.key !== 'sunday' && 'border-r',
                       )}
-                      key={day.key}
-                    >
+                      key={day.key}>
                       <span className="inline-block px-3 py-1 text-sm font-semibold">
-                        {dayTotal > 0
-                          ? decimalHoursToDurationStringRounded(dayTotal)
-                          : '\u2014'}
+                        {dayTotal > 0 ? decimalHoursToDurationStringRounded(dayTotal) : '\u{2014}'}
                       </span>
                     </td>
                   )

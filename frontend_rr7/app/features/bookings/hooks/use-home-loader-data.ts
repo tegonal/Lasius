@@ -23,13 +23,11 @@ import { type loader } from '~/routes/user.layout._index'
 
 export type HomeLoaderData = SerializeFrom<typeof loader>
 
-type SerializeFrom<T extends (...args: never[]) => unknown> =
+type SerializeFrom<T extends (...arguments_: never[]) => unknown> =
   Awaited<ReturnType<T>> extends { data: infer D } ? D : Awaited<ReturnType<T>>
 
 const HOME_ROUTE_ID = 'routes/user.layout._index'
 
-export const useHomeLoaderData = (): HomeLoaderData | undefined =>
-  useRouteLoaderData(HOME_ROUTE_ID)
+export const useHomeLoaderData = (): HomeLoaderData | undefined => useRouteLoaderData(HOME_ROUTE_ID)
 
-export const useSelectedOrgId = (): string =>
-  useHomeLoaderData()?.selectedOrgId ?? ''
+export const useSelectedOrgId = (): string => useHomeLoaderData()?.selectedOrgId ?? ''

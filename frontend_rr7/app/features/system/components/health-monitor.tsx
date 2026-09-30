@@ -21,7 +21,7 @@ import { useTranslation } from 'react-i18next'
 
 import { GenericConfirmModal } from '~/components/ui/overlays/modal/generic-confirm-modal'
 import { Modal } from '~/components/ui/overlays/modal/modal'
-import { useBackendStatus, useVersionDrift } from '~/stores/ui-store'
+import { useBackendStatus, useHasVersionDrift } from '~/stores/ui-store'
 
 import { useHealthMonitor } from '../hooks/use-health-monitor'
 
@@ -38,8 +38,8 @@ export const HealthMonitor = () => {
 
   // Read state from store
   const backendStatus = useBackendStatus()
-  const versionDrift = useVersionDrift()
-  const backendOffline = backendStatus === 'disconnected'
+  const isVersionDrift = useHasVersionDrift()
+  const isBackendOffline = backendStatus === 'disconnected'
 
   return (
     <>
@@ -49,8 +49,7 @@ export const HealthMonitor = () => {
         onClose={() => {
           /* dismissible via backdrop — will reappear on next poll if still offline */
         }}
-        open={backendOffline}
-      >
+        open={isBackendOffline}>
         <div>
           {t(
             'system:offlineMessage',
@@ -60,7 +59,7 @@ export const HealthMonitor = () => {
       </Modal>
 
       {/* Version drift — confirm to reload */}
-      {versionDrift && (
+      {isVersionDrift && (
         <GenericConfirmModal
           blockViewport
           cancelLabel={t('actions.cancel', 'Cancel')}
@@ -73,8 +72,8 @@ export const HealthMonitor = () => {
           onClose={() => {
             /* user dismissed — will not nag again until next version change */
           }}
-          onConfirm={() => globalThis.location.reload()}
-          open={versionDrift}
+          onConfirm={() => location.reload()}
+          open={isVersionDrift}
           title={t('system:pwa.updateAvailable', 'Update available')}
         />
       )}

@@ -42,10 +42,5 @@ export function getImporterTypeFromTag(tag: ModelsTag): ImporterType | null {
 }
 
 export function isImporterTag(tag: ModelsTag): boolean {
-  return (
-    tag.type === 'GithubIssueTag' ||
-    tag.type === 'GitlabIssueTag' ||
-    tag.type === 'JiraIssueTag' ||
-    tag.type === 'PlaneIssueTag'
-  )
+  return ['GithubIssueTag', 'GitlabIssueTag', 'JiraIssueTag', 'PlaneIssueTag'].includes(tag.type)
 }

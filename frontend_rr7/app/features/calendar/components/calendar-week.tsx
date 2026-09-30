@@ -29,38 +29,22 @@ import { CalendarDataProvider } from '~/features/calendar/calendar-data-provider
 import { CalendarDay } from '~/features/calendar/components/calendar-day'
 import { useCalendarNavigation } from '~/features/calendar/hooks/use-calendar-navigation'
 import { useCalendarSelection } from '~/features/calendar/hooks/use-calendar-selection'
-import { usePersistedSearchParam } from '~/hooks/use-persisted-search-param'
+import { usePersistedSearchParameter } from '~/hooks/use-persisted-search-parameter'
 import { cn } from '~/lib/utils/cn'
-import { formatDateToURLParam } from '~/lib/utils/dates'
+import { formatDateToURLParameter } from '~/lib/utils/dates'
 
 // ─── CalendarWeek ───────────────────────────────────────────────────────────
 
-export const CalendarWeek = ({
-  organisationId,
-}: {
-  organisationId: string
-}) => {
+export const CalendarWeek = ({ organisationId }: { organisationId: string }) => {
   const { t } = useTranslation(['calendar', 'common'])
-  const selectedDate = usePersistedSearchParam(
-    'date',
-    formatDateToURLParam(new Date()),
-  )
-  const dayRefs = useRef<(HTMLElement | null)[]>([])
+  const selectedDate = usePersistedSearchParameter('date', formatDateToURLParameter(new Date()))
+  const dayReferences = useRef<(HTMLElement | null)[]>([])
 
-  const {
-    next,
-    period: week,
-    previous,
-  } = useCalendarNavigation(selectedDate, 'week')
-  const { isDaySelected, selectDay, selectedDay, selectToday } =
-    useCalendarSelection(selectedDate)
+  const { next, period: week, previous } = useCalendarNavigation(selectedDate, 'week')
+  const { isDaySelected, selectDay, selectedDay, selectToday } = useCalendarSelection(selectedDate)
 
   return (
-    <CalendarDataProvider
-      date={selectedDate}
-      organisationId={organisationId}
-      period="week"
-    >
+    <CalendarDataProvider date={selectedDate} organisationId={organisationId} period="week">
       <div className="flex min-w-0 items-center justify-center overflow-hidden">
         <div className="flex flex-shrink-0 items-center justify-center pt-3">
           <ButtonLeft
@@ -71,9 +55,7 @@ export const CalendarWeek = ({
         </div>
         <div className="min-w-0 flex-1 overflow-hidden md:max-w-[500px]">
           <div className="border-base-content/50 grid min-h-[22px] w-full grid-cols-3 border-b text-sm">
-            <div>
-              {week[0] && <FormatDate date={week[0]} format="monthNameLong" />}
-            </div>
+            <div>{week[0] && <FormatDate date={week[0]} format="monthNameLong" />}</div>
             {isToday(new Date(selectedDay)) ? (
               <div />
             ) : (
@@ -82,8 +64,7 @@ export const CalendarWeek = ({
                 data-testid="calendar-week-today-btn"
                 onClick={selectToday}
                 size="xs"
-                variant="unstyled"
-              >
+                variant="unstyled">
                 {t('time.today', 'Today')}
               </Button>
             )}
@@ -98,15 +79,12 @@ export const CalendarWeek = ({
                   <div
                     className={cn(
                       'relative',
-                      isDaySelected(day)
-                        ? 'text-neutral-content'
-                        : 'text-base-content',
+                      isDaySelected(day) ? 'text-neutral-content' : 'text-base-content',
                     )}
                     key={day}
-                    ref={(el) => {
-                      dayRefs.current[index] = el
-                    }}
-                  >
+                    ref={(element) => {
+                      dayReferences.current[index] = element
+                    }}>
                     <CalendarDay
                       date={day}
                       isSelected={isDaySelected(day)}
@@ -116,7 +94,7 @@ export const CalendarWeek = ({
                 ))}
               </div>
               <SlidingIndicator
-                itemRefs={dayRefs}
+                itemRefs={dayReferences}
                 radiusOn="bottom"
                 selectedIndex={week.findIndex((day) => isDaySelected(day))}
               />
@@ -135,9 +113,9 @@ export const CalendarWeek = ({
   )
 }
 
-function ButtonLeft(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+function ButtonLeft(properties: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
-    <Button shape="square" size="sm" variant="ghost" {...props}>
+    <Button shape="square" size="sm" variant="ghost" {...properties}>
       <ChevronLeft className="h-5 w-5" />
     </Button>
   )
@@ -145,9 +123,9 @@ function ButtonLeft(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
 
 // ─── Arrow buttons ──────────────────────────────────────────────────────────
 
-function ButtonRight(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+function ButtonRight(properties: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
-    <Button shape="square" size="sm" variant="ghost" {...props}>
+    <Button shape="square" size="sm" variant="ghost" {...properties}>
       <ChevronRight className="h-5 w-5" />
     </Button>
   )

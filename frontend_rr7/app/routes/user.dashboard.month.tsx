@@ -17,13 +17,7 @@
  *
  */
 
-import {
-  eachWeekOfInterval,
-  endOfMonth,
-  format,
-  getWeek,
-  startOfMonth,
-} from 'date-fns'
+import { eachWeekOfInterval, endOfMonth, format, getWeek, startOfMonth } from 'date-fns'
 import { useTranslation } from 'react-i18next'
 import { data } from 'react-router'
 
@@ -51,24 +45,18 @@ import { type Route } from './+types/user.dashboard.month'
 
 // ─── Client Loader (cache unless full-page refresh) ──────────────────────────
 
-export const clientLoader = async (args: Route.ClientLoaderArgs) =>
-  dashboardClientLoader(args)
+export const clientLoader = async (arguments_: Route.ClientLoaderArgs) =>
+  dashboardClientLoader(arguments_)
 clientLoader.hydrate = false
 
 // ─── Stream chart computation ────────────────────────────────────────────────
 
-const computeStreamChartData = (
-  bookings: ModelsBooking[],
-  selectedDate: string,
-) => {
-  const dateObj = new Date(selectedDate)
-  const monthStart = startOfMonth(dateObj)
-  const monthEnd = endOfMonth(dateObj)
+const computeStreamChartData = (bookings: ModelsBooking[], selectedDate: string) => {
+  const dateObject = new Date(selectedDate)
+  const monthStart = startOfMonth(dateObject)
+  const monthEnd = endOfMonth(dateObject)
 
-  const weeks = eachWeekOfInterval(
-    { end: monthEnd, start: monthStart },
-    { weekStartsOn: 1 },
-  )
+  const weeks = eachWeekOfInterval({ end: monthEnd, start: monthStart }, { weekStartsOn: 1 })
   const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
   // Create a map to store hours by day and week
@@ -76,8 +64,8 @@ const computeStreamChartData = (
   for (const day of weekDays) {
     const weekMap = new Map<string, number>()
     for (const weekStart of weeks) {
-      const weekNum = getWeek(weekStart, { weekStartsOn: 1 })
-      weekMap.set(`Week ${weekNum}`, 0)
+      const weekNumber = getWeek(weekStart, { weekStartsOn: 1 })
+      weekMap.set(`Week ${weekNumber}`, 0)
     }
     hoursMap.set(day, weekMap)
   }
@@ -86,8 +74,8 @@ const computeStreamChartData = (
   for (const booking of bookings) {
     const bookingDate = new Date(booking.start.dateTime)
     const dayName = format(bookingDate, 'EEE')
-    const weekNum = getWeek(bookingDate, { weekStartsOn: 1 })
-    const weekLabel = `Week ${weekNum}`
+    const weekNumber = getWeek(bookingDate, { weekStartsOn: 1 })
+    const weekLabel = `Week ${weekNumber}`
 
     const dayMap = hoursMap.get(dayName)
     if (dayMap && dayMap.has(weekLabel)) {
@@ -102,7 +90,7 @@ const computeStreamChartData = (
     const dayData: Record<string, number> = {}
     const dayMap = hoursMap.get(day)
     if (dayMap) {
-      for (const [weekLabel, value] of dayMap.entries()) {
+      for (const [weekLabel, value] of dayMap) {
         dayData[weekLabel] = Number(value.toFixed(2))
       }
     }
@@ -113,11 +101,8 @@ const computeStreamChartData = (
   const allKeys = new Set<string>()
   for (const dayData of streamData) {
     for (const key of Object.keys(dayData)) {
-      if (key.startsWith('Week')) {
-        const hasHours = streamData.some((d) => (d[key] as number) > 0)
-        if (hasHours) {
-          allKeys.add(key)
-        }
+      if (key.startsWith('Week') && streamData.some((d) => (d[key] as number) > 0)) {
+        allKeys.add(key)
       }
     }
   }
@@ -129,16 +114,16 @@ const computeStreamChartData = (
 // ─── Loader ──────────────────────────────────────────────────────────────────
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const ctx = await loadDashboardContext(request)
-  const { headers, plannedHours, selectedDate, selectedOrgId } = ctx
+  const context = await loadDashboardContext(request)
+  const { headers, plannedHours, selectedDate, selectedOrgId } = context
 
   const monthTimespan = apiTimespanMonth(selectedDate)
-  const dateObj = new Date(selectedDate)
-  const monthStartDate = startOfMonth(dateObj)
-  const monthEndDate = endOfMonth(dateObj)
+  const dateObject = new Date(selectedDate)
+  const monthStartDate = startOfMonth(dateObject)
+  const monthEndDate = endOfMonth(dateObject)
 
   // Fetch month bookings and aggregated project stats in parallel
-  const [monthBookingsRes, projectStatsRes] = await Promise.all([
+  const [monthBookingsResponse, projectStatsResponse] = await Promise.all([
     getUserBookingListByOrganisation(selectedOrgId, monthTimespan, {
       headers,
     }),
@@ -154,15 +139,11 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     ),
   ])
 
-  const monthBookings = monthBookingsRes.data ?? []
-  const projectStats = projectStatsRes.data ?? []
+  const monthBookings = monthBookingsResponse.data ?? []
+  const projectStats = projectStatsResponse.data ?? []
 
   // Compute month summary
-  const expectedHours = getPlannedHoursForRange(
-    monthStartDate,
-    monthEndDate,
-    plannedHours,
-  )
+  const expectedHours = getPlannedHoursForRange(monthStartDate, monthEndDate, plannedHours)
   const stats = computeDashboardStats(monthBookings, expectedHours)
 
   // Aggregate top projects
@@ -173,7 +154,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
   return data(
     { selectedDate, stats, streamChart, topProjects },
-    { headers: dashboardResponseHeaders(ctx.auth) },
+    { headers: dashboardResponseHeaders(context.auth) },
   )
 }
 
@@ -182,21 +163,18 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 export default function DashboardMonth({ loaderData }: Route.ComponentProps) {
   const { t } = useTranslation('common')
   const { selectedDate, stats, streamChart, topProjects } = loaderData
-  const dateObj = new Date(selectedDate)
+  const dateObject = new Date(selectedDate)
 
   return (
     <div className="space-y-6 px-8 py-6">
       <h2 className="text-lg font-semibold">
-        <FormatDate date={dateObj} format="monthNameLong" />{' '}
-        <FormatDate date={dateObj} format="year" />
+        <FormatDate date={dateObject} format="monthNameLong" />{' '}
+        <FormatDate date={dateObject} format="year" />
       </h2>
       <div className="flex gap-4">
         <StatsOverviewGrid {...stats} period="month" />
         <TopProjectsCard
-          emptyMessage={t(
-            'stats:noProjectsForMonth',
-            'No projects for this month',
-          )}
+          emptyMessage={t('stats:noProjectsForMonth', 'No projects for this month')}
           projects={topProjects}
         />
       </div>

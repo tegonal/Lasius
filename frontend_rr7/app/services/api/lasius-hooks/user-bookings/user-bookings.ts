@@ -24,9 +24,7 @@ import {
 /**
  * @summary Create a booking by organisation for the current user
  */
-export function useAddUserBookingByOrganisation(
-  options?: ApiProxyOptions<void>,
-) {
+export function useAddUserBookingByOrganisation(options?: ApiProxyOptions<void>) {
   return useApiProxy<void, ModelsAddBookingRequest, { orgId: string }>(
     {
       getUrl: ({ orgId }) => `/user-bookings/organisations/${orgId}/bookings`,
@@ -68,9 +66,7 @@ export function useGetUserBookingAggregatedStatsByOrganisation(
 } /**
  * @summary Get current user's currently running booking
  */
-export function useGetUserBookingCurrent(
-  options?: ApiProxyOptions<ModelsCurrentUserTimeBooking>,
-) {
+export function useGetUserBookingCurrent(options?: ApiProxyOptions<ModelsCurrentUserTimeBooking>) {
   return useApiProxy<ModelsCurrentUserTimeBooking>(
     {
       getUrl: () => `/user-bookings/current`,
@@ -84,11 +80,7 @@ export function useGetUserBookingCurrent(
 export function useGetUserBookingCurrentListByOrganisation(
   options?: ApiProxyOptions<ModelsCurrentOrganisationTimeBookings>,
 ) {
-  return useApiProxy<
-    ModelsCurrentOrganisationTimeBookings,
-    undefined,
-    { orgId: string }
-  >(
+  return useApiProxy<ModelsCurrentOrganisationTimeBookings, undefined, { orgId: string }>(
     {
       getUrl: ({ orgId }) => `/user-bookings/organisations/${orgId}/current`,
       method: 'GET',
@@ -96,33 +88,27 @@ export function useGetUserBookingCurrentListByOrganisation(
     options,
   )
 }
-export function useGetUserBookingLatestListByOrganisation(
-  options?: ApiProxyOptions<void>,
-) {
+export function useGetUserBookingLatestListByOrganisation(options?: ApiProxyOptions<void>) {
   return useApiProxy<
     void,
     undefined,
     { orgId: string; params?: GetUserBookingLatestListByOrganisationParams }
   >(
     {
-      getUrl: ({ orgId, params }) =>
-        getGetUserBookingLatestListByOrganisationUrl(orgId, params),
+      getUrl: ({ orgId, params }) => getGetUserBookingLatestListByOrganisationUrl(orgId, params),
       method: 'GET',
     },
     options,
   )
 }
-export function useGetUserBookingListByOrganisation(
-  options?: ApiProxyOptions<ModelsBooking[]>,
-) {
+export function useGetUserBookingListByOrganisation(options?: ApiProxyOptions<ModelsBooking[]>) {
   return useApiProxy<
     ModelsBooking[],
     undefined,
     { orgId: string; params?: GetUserBookingListByOrganisationParams }
   >(
     {
-      getUrl: ({ orgId, params }) =>
-        getGetUserBookingListByOrganisationUrl(orgId, params),
+      getUrl: ({ orgId, params }) => getGetUserBookingListByOrganisationUrl(orgId, params),
       method: 'GET',
     },
     options,
@@ -135,8 +121,7 @@ export function useGetUserBookingListByOrganisation(
 export function useStartUserBookingCurrent(options?: ApiProxyOptions<void>) {
   return useApiProxy<void, ModelsStartBookingRequest, { orgId: string }>(
     {
-      getUrl: ({ orgId }) =>
-        `/user-bookings/organisations/${orgId}/bookings/start`,
+      getUrl: ({ orgId }) => `/user-bookings/organisations/${orgId}/bookings/start`,
       method: 'POST',
     },
     options,
@@ -145,11 +130,7 @@ export function useStartUserBookingCurrent(options?: ApiProxyOptions<void>) {
  * @summary Stop the currently running booking by organisation and booking id for the current user
  */
 export function useStopUserBookingCurrent(options?: ApiProxyOptions<void>) {
-  return useApiProxy<
-    void,
-    ModelsStopBookingRequest,
-    { bookingId: string; orgId: string }
-  >(
+  return useApiProxy<void, ModelsStopBookingRequest, { bookingId: string; orgId: string }>(
     {
       getUrl: ({ bookingId, orgId }) =>
         `/user-bookings/organisations/${orgId}/bookings/${bookingId}/stop`,
@@ -163,11 +144,7 @@ export function useStopUserBookingCurrent(options?: ApiProxyOptions<void>) {
  * @summary Change a booking by organisation for the current user
  */
 export function useUpdateUserBooking(options?: ApiProxyOptions<void>) {
-  return useApiProxy<
-    void,
-    ModelsEditBookingRequest,
-    { bookingId: string; orgId: string }
-  >(
+  return useApiProxy<void, ModelsEditBookingRequest, { bookingId: string; orgId: string }>(
     {
       getUrl: ({ bookingId, orgId }) =>
         `/user-bookings/organisations/${orgId}/bookings/${bookingId}`,
@@ -179,11 +156,7 @@ export function useUpdateUserBooking(options?: ApiProxyOptions<void>) {
  * @summary Change the currently running booking by organisation and booking id for the current user
  */
 export function useUpdateUserBookingCurrent(options?: ApiProxyOptions<void>) {
-  return useApiProxy<
-    void,
-    ModelsBookingChangeStartRequest,
-    { bookingId: string; orgId: string }
-  >(
+  return useApiProxy<void, ModelsBookingChangeStartRequest, { bookingId: string; orgId: string }>(
     {
       getUrl: ({ bookingId, orgId }) =>
         `/user-bookings/organisations/${orgId}/bookings/${bookingId}/start-time`,
@@ -206,9 +179,7 @@ function getGetUserBookingAggregatedStatsByOrganisationUrl(
   }
   const query = normalizedParams.toString()
   return query
-    ? `/user-bookings/organisations/${orgId}/bookings/stats/aggregated` +
-        '?' +
-        query
+    ? `/user-bookings/organisations/${orgId}/bookings/stats/aggregated` + '?' + query
     : `/user-bookings/organisations/${orgId}/bookings/stats/aggregated`
 } /**
  * @summary Get latest bookings of members in selected organisation

@@ -56,19 +56,15 @@ export const useOrganisation = () => {
     (o) => o.organisationReference.id === selectedOrganisationId,
   )
 
-  const selectedOrganisationKey =
-    selectedOrganisation?.organisationReference?.key ?? ''
+  const selectedOrganisationKey = selectedOrganisation?.organisationReference?.key ?? ''
 
   const isAdministrator =
-    selectedOrganisation?.role ===
-    ModelsUserOrganisationRole.OrganisationAdministrator
+    selectedOrganisation?.role === ModelsUserOrganisationRole.OrganisationAdministrator
 
   // Use fetcher to switch org without full navigation
   const fetcher = useFetcher()
 
-  const setSelectedOrganisation = (
-    organisationReference: ModelsEntityReference,
-  ) => {
+  const setSelectedOrganisation = (organisationReference: ModelsEntityReference) => {
     if (organisationReference) {
       void fetcher.submit(
         {

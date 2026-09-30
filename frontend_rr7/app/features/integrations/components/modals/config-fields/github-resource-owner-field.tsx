@@ -24,7 +24,7 @@ import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { useGithubResourceOwners } from '~/features/integrations/hooks/use-github-resource-owners'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 
-type Props = {
+type Properties = {
   accessTokenValue: string
   baseUrl: string
   fields: {
@@ -41,7 +41,7 @@ export const GithubResourceOwnerField = ({
   fields,
   importerType,
   selectedOrgId,
-}: Props) => {
+}: Properties) => {
   const { t } = useTranslation('integrations')
   const resourceOwnerControl = useInputControl(fields.resourceOwner)
   const resourceOwnerTypeControl = useInputControl(fields.resourceOwnerType)
@@ -70,17 +70,14 @@ export const GithubResourceOwnerField = ({
           className="select select-bordered w-full"
           disabled={resourceOwners.length === 0 || isLoadingResourceOwners}
           id={fields.resourceOwner.id}
-          onChange={(e) => {
-            resourceOwnerControl.change(e.target.value)
-            const selectedOwner = resourceOwners.find(
-              (owner) => owner.id === e.target.value,
-            )
+          onChange={(event) => {
+            resourceOwnerControl.change(event.target.value)
+            const selectedOwner = resourceOwners.find((owner) => owner.id === event.target.value)
             if (selectedOwner?.ownerType) {
               resourceOwnerTypeControl.change(selectedOwner.ownerType)
             }
           }}
-          value={resourceOwnerControl.value || ''}
-        >
+          value={resourceOwnerControl.value || ''}>
           <option disabled value="">
             {isLoadingResourceOwners
               ? t('issueImporters.fields.resourceOwnerLoading', {
@@ -88,8 +85,7 @@ export const GithubResourceOwnerField = ({
                 })
               : resourceOwners.length === 0 && !accessTokenValue
                 ? t('issueImporters.fields.resourceOwnerPlaceholder', {
-                    defaultValue:
-                      'Enter access token above to load organizations',
+                    defaultValue: 'Enter access token above to load organizations',
                   })
                 : resourceOwners.length === 0
                   ? t('issueImporters.fields.resourceOwnerNoResults', {

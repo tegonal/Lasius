@@ -22,7 +22,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { cn } from '~/lib/utils/cn'
 
-type Props = {
+type Properties = {
   children: React.ReactNode
   /** Render the portal inside the nearest modal dialog instead of document.body.
    * Required when used inside a Base UI Dialog with modal={true}, because the
@@ -46,30 +46,31 @@ export const ContextAnimatePresence = ({
   children,
   inModal = false,
   variant = 'default',
-}: Props) => {
-  const anchorRef = useRef<HTMLSpanElement>(null)
+}: Properties) => {
+  const anchorReference = useRef<HTMLSpanElement>(null)
   const [modalContainer, setModalContainer] = useState<HTMLElement | null>(null)
 
   useEffect(() => {
-    if (inModal && anchorRef.current) {
-      const dialog = anchorRef.current.closest('[role="dialog"]')
-      if (dialog instanceof HTMLElement) {
-        setModalContainer(dialog)
-      }
+    if (!(inModal && anchorReference.current)) {
+      return
+    }
+
+    const dialog = anchorReference.current.closest('[role="dialog"]')
+    if (dialog instanceof HTMLElement) {
+      setModalContainer(dialog)
     }
   }, [inModal])
 
   return (
     <>
-      {inModal && <span className="hidden" ref={anchorRef} />}
+      {inModal && <span className="hidden" ref={anchorReference} />}
       <Popover.Portal container={modalContainer ?? undefined}>
         <Popover.Positioner
           align="center"
           className={cn(positionerClassName[variant])}
           side="left"
           sideOffset={(data) => -data.anchor.width}
-          style={clipStyle[variant]}
-        >
+          style={clipStyle[variant]}>
           <Popover.Popup className="translate-x-0 transition-[translate] duration-200 ease-in-out data-[ending-style]:translate-x-full data-[starting-style]:translate-x-full">
             {children}
           </Popover.Popup>

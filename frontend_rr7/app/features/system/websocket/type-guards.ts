@@ -35,6 +35,29 @@ export type WebSocketEventHandler<T extends WebSocketOutEvent> = {
   typeGuard: (event: WebSocketOutEvent) => event is T
 }
 
+// A union with one handler type for each event type.
+// The mapped form lets TypeScript correlate the type guard and the handler of one entry.
+type AnyWebSocketEventHandler<Type extends WebSocketEventType = WebSocketEventType> = {
+  [Key in Type]: WebSocketEventHandler<WebSocketEventByType[Key]>
+}[Type]
+
+type WebSocketEventByType = {
+  [Event in WebSocketOutEvent as Event['type']]: Event
+}
+
+type WebSocketEventType = keyof WebSocketEventByType
+
+export function didProcessWebSocketEvent(
+  message: unknown,
+  handlers: AnyWebSocketEventHandler[],
+): boolean {
+  if (!isWebSocketOutEvent(message)) {
+    return false
+  }
+
+  return handlers.some((entry) => didRunHandler(entry, message))
+}
+
 export function isAuthenticationFailed(
   event: WebSocketOutEvent,
 ): event is WebSocketAuthenticationFailed {
@@ -53,15 +76,11 @@ export function isCurrentUserTimeBookingEvent(
   return event.type === 'CurrentUserTimeBookingEvent'
 }
 
-export function isFavoriteAdded(
-  event: WebSocketOutEvent,
-): event is WebSocketFavoriteAdded {
+export function isFavoriteAdded(event: WebSocketOutEvent): event is WebSocketFavoriteAdded {
   return event.type === 'FavoriteAdded'
 }
 
-export function isFavoriteRemoved(
-  event: WebSocketOutEvent,
-): event is WebSocketFavoriteRemoved {
+export function isFavoriteRemoved(event: WebSocketOutEvent): event is WebSocketFavoriteRemoved {
   return event.type === 'FavoriteRemoved'
 }
 
@@ -71,9 +90,7 @@ export function isIssueImporterSyncStatsChanged(
   return event.type === 'IssueImporterSyncStatsChanged'
 }
 
-export function isLatestTimeBooking(
-  event: WebSocketOutEvent,
-): event is WebSocketLatestTimeBooking {
+export function isLatestTimeBooking(event: WebSocketOutEvent): event is WebSocketLatestTimeBooking {
   return event.type === 'LatestTimeBooking'
 }
 
@@ -105,19 +122,13 @@ export function isWebSocketOutEvent(data?: unknown): data is WebSocketOutEvent {
   return typeof data === 'object' && data !== null && 'type' in data
 }
 
-export function processWebSocketEvent(
-  message: unknown,
-  handlers: WebSocketEventHandler<any>[],
+function didRunHandler<Type extends WebSocketEventType>(
+  entry: AnyWebSocketEventHandler<Type>,
+  event: WebSocketOutEvent,
 ): boolean {
-  if (!isWebSocketOutEvent(message)) {
+  if (!entry.typeGuard(event)) {
     return false
   }
-
-  for (const { handler, typeGuard } of handlers) {
-    if (typeGuard(message)) {
-      handler(message)
-      return true
-    }
-  }
-  return false
+  entry.handler(event)
+  return true
 }

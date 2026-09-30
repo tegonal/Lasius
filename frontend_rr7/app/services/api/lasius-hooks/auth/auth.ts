@@ -12,9 +12,7 @@ import { type CreateWsTicket200 } from '../../lasius'
  * Generates a single-use ticket (60s TTL) for WebSocket authentication. Requires authenticated user.
  * @summary Create a short-lived WebSocket authentication ticket
  */
-export function useCreateWsTicket(
-  options?: ApiProxyOptions<CreateWsTicket200>,
-) {
+export function useCreateWsTicket(options?: ApiProxyOptions<CreateWsTicket200>) {
   return useApiProxy<CreateWsTicket200>(
     {
       getUrl: () => `/auth/ws-ticket`,

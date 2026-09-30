@@ -28,11 +28,7 @@ import {
 import { dateOptions } from '~/lib/utils/date/date-options'
 import { apiTimespanFromTo, formatISOLocale } from '~/lib/utils/dates'
 import { getUserBookingListByOrganisation } from '~/services/api/lasius/user-bookings/user-bookings'
-import {
-  authHeaders,
-  mergeAuthHeaders,
-  requireUser,
-} from '~/services/auth/auth-helpers.server'
+import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/user.lists'
 
@@ -46,12 +42,12 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
   // Read date range from search params: from/to (set by filter), or default
   const url = new URL(request.url)
-  const fromParam = url.searchParams.get('from')
-  const toParam = url.searchParams.get('to')
+  const fromParameter = url.searchParams.get('from')
+  const toParameter = url.searchParams.get('to')
 
   let dateRange: { from: string; to: string }
-  if (fromParam && toParam) {
-    dateRange = { from: fromParam, to: toParam }
+  if (fromParameter && toParameter) {
+    dateRange = { from: fromParameter, to: toParameter }
   } else {
     const firstOption = dateOptions[0]
     const now = new Date()
@@ -79,10 +75,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 const UserListsPage = ({ loaderData }: Route.ComponentProps) => {
   return (
     <div className={innerGridClasses} data-testid="lists-page">
-      <BookingHistoryLayout
-        bookings={loaderData.bookings}
-        dataSource="userBookings"
-      />
+      <BookingHistoryLayout bookings={loaderData.bookings} dataSource="userBookings" />
     </div>
   )
 }

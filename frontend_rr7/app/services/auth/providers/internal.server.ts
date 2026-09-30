@@ -17,7 +17,7 @@
  *
  */
 
-import { getServerEnvRequired } from '~/lib/env.server'
+import { getServerEnvironmentRequired } from '~/lib/environment.server'
 import { logger } from '~/lib/logger'
 
 import { type OAuthProvider, type TokenResponse } from '../types'
@@ -41,9 +41,9 @@ export interface InternalOAuthProvider extends OAuthProvider {
 }
 
 export function createInternalProvider(): InternalOAuthProvider {
-  const clientId = getServerEnvRequired('LASIUS_OAUTH_CLIENT_ID')
-  const clientSecret = getServerEnvRequired('LASIUS_OAUTH_CLIENT_SECRET')
-  const apiUrl = getServerEnvRequired('LASIUS_API_URL')
+  const clientId = getServerEnvironmentRequired('LASIUS_OAUTH_CLIENT_ID')
+  const clientSecret = getServerEnvironmentRequired('LASIUS_OAUTH_CLIENT_SECRET')
+  const apiUrl = getServerEnvironmentRequired('LASIUS_API_URL')
 
   const tokenUrl = `${apiUrl}/oauth2/access_token`
   const loginUrl = `${apiUrl}/oauth2/login`
@@ -76,7 +76,7 @@ export function createInternalProvider(): InternalOAuthProvider {
       .replace(/={1,2}$/, '')
   }
 
-  return {
+  const provider: InternalOAuthProvider = {
     async exchangeCode(
       code: string,
       redirectUri: string,
@@ -120,9 +120,7 @@ export function createInternalProvider(): InternalOAuthProvider {
       )
     },
 
-    async getUserProfile(
-      accessToken: string,
-    ): Promise<{ email: string; userId: string }> {
+    async getUserProfile(accessToken: string): Promise<{ email: string; userId: string }> {
       const response = await fetch(profileUrl, {
         headers: { Authorization: `Bearer ${accessToken}` },
       })
@@ -191,19 +189,17 @@ export function createInternalProvider(): InternalOAuthProvider {
       }
 
       // Step 3: Exchange code for tokens using PKCE verifier
-      const tokens = await this.exchangeCode(code, '/', codeVerifier)
+      const tokens = await provider.exchangeCode(code, '/', codeVerifier)
 
       // Step 4: Fetch user profile
-      const profile = await this.getUserProfile(tokens.access_token)
+      const profile = await provider.getUserProfile(tokens.access_token)
 
       return { profile, tokens }
     },
 
     provider: 'internal',
 
-    async refreshToken(
-      refreshTokenValue: string,
-    ): Promise<null | TokenResponse> {
+    async refreshToken(refreshTokenValue: string): Promise<null | TokenResponse> {
       try {
         const response = await fetch(tokenUrl, {
           body: new URLSearchParams({
@@ -241,4 +237,6 @@ export function createInternalProvider(): InternalOAuthProvider {
       }
     },
   }
+
+  return provider
 }

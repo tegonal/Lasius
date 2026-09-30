@@ -7,16 +7,11 @@ import { type ApiProxyOptions, useApiProxy } from '~/hooks/use-api-proxy'
  * Track your time
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
-import {
-  type ModelsApplicationConfig,
-  type ModelsCsrfToken,
-} from '../../lasius'
+import { type ModelsApplicationConfig, type ModelsCsrfToken } from '../../lasius'
 /**
  * @summary Get application config
  */
-export function useGetConfiguration(
-  options?: ApiProxyOptions<ModelsApplicationConfig>,
-) {
+export function useGetConfiguration(options?: ApiProxyOptions<ModelsApplicationConfig>) {
   return useApiProxy<ModelsApplicationConfig>(
     {
       getUrl: () => `/config`,

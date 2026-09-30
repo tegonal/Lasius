@@ -48,9 +48,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   // Read and validate state cookie
   const cookieHeader = request.headers.get('Cookie')
-  const cookieData = (await oauthStateCookie.parse(
-    cookieHeader,
-  )) as null | OAuthStateCookieData
+  const cookieData = (await oauthStateCookie.parse(cookieHeader)) as null | OAuthStateCookieData
 
   if (!cookieData) {
     logger.warn('OAuth callback: state cookie missing or expired')
@@ -70,8 +68,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   try {
     const provider = getProvider(providerName)
     // Use Host header for correct origin behind reverse proxy
-    const host =
-      request.headers.get('x-forwarded-host') || request.headers.get('host')
+    const host = request.headers.get('x-forwarded-host') || request.headers.get('host')
     const protocol = request.headers.get('x-forwarded-proto') || 'http'
     const origin = host ? `${protocol}://${host}` : url.origin
     const redirectUri = `${origin}${href('/oauth/callback')}`

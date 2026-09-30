@@ -66,16 +66,16 @@ export function parseDateTimeStrings(
   }
 
   // Check for placeholders
-  const hasDate = dateString && dateString !== '__.__.____'
-  const hasTime = timeString && timeString !== '__:__'
+  const hasDate = Boolean(dateString) && dateString !== '__.__.____'
+  const hasTime = Boolean(timeString) && timeString !== '__:__'
 
   if (!hasDate && !hasTime) {
     return { date: null, isPartial: false, isValid: true }
   }
 
   // Check if input is partial (contains underscores)
-  const hasDatePlaceholder = dateString?.includes('_') || false
-  const hasTimePlaceholder = timeString?.includes('_') || false
+  const hasDatePlaceholder = dateString?.includes('_')
+  const hasTimePlaceholder = timeString?.includes('_')
 
   if (hasDatePlaceholder || hasTimePlaceholder) {
     return { date: null, isPartial: true, isValid: true }
@@ -93,7 +93,7 @@ export function parseDateTimeStrings(
       // If year has 1-3 digits, assume current century (20XX)
       if (yearPart && /^\d{1,3}$/.test(yearPart)) {
         const currentCentury = Math.floor(new Date().getFullYear() / 100) * 100
-        const normalizedYear = currentCentury + Number.parseInt(yearPart, 10)
+        const normalizedYear = currentCentury + Number(yearPart)
         dateParts[2] = normalizedYear.toString()
         normalizedDateString = dateParts.join('.')
       }

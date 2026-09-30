@@ -53,9 +53,7 @@ export const SlidePrivateOrg = () => {
         </div>
 
         <div className="bg-info/10 text-info-content rounded-lg p-4">
-          <div className="font-semibold">
-            {t('privateOrganisation.tip', 'Good to Know')}
-          </div>
+          <div className="font-semibold">{t('privateOrganisation.tip', 'Good to Know')}</div>
           <p className="text-info-content/80 mt-1">
             {t(
               'privateOrganisation.tipDesc',

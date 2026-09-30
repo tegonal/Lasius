@@ -6,8 +6,8 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type TestExistingConfig400Error = typeof TestExistingConfig400Error[keyof typeof TestExistingConfig400Error];
-
+export type TestExistingConfig400Error =
+  (typeof TestExistingConfig400Error)[keyof typeof TestExistingConfig400Error]
 
 export const TestExistingConfig400Error = {
   connection_failed: 'connection_failed',
@@ -15,4 +15,4 @@ export const TestExistingConfig400Error = {
   unknown_host: 'unknown_host',
   timeout: 'timeout',
   connection_error: 'connection_error',
-} as const;
+} as const

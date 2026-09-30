@@ -28,7 +28,7 @@ import { Modal } from './modal'
 import { ModalCloseButton } from './modal-close-button'
 import { ModalTitle } from './modal-title'
 
-type Props = {
+type Properties = {
   alert?: {
     message: string
     variant: 'error' | 'info' | 'success' | 'warning'
@@ -60,7 +60,7 @@ export const GenericConfirmModal = ({
   onConfirm,
   open,
   title,
-}: Props) => {
+}: Properties) => {
   const { t } = useTranslation('common')
   const resolvedCancelLabel = cancelLabel ?? t('actions.close', 'Close')
 
@@ -82,16 +82,14 @@ export const GenericConfirmModal = ({
             data-testid="confirm-modal-confirm-btn"
             onClick={onConfirm}
             type="button"
-            variant={confirmVariant}
-          >
+            variant={confirmVariant}>
             {confirmLabel}
           </Button>
           <Button
             data-testid="confirm-modal-cancel-btn"
             onClick={onClose}
             type="button"
-            variant="secondary"
-          >
+            variant="secondary">
             {resolvedCancelLabel}
           </Button>
         </ButtonGroup>

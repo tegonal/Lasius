@@ -26,11 +26,9 @@ import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { GenericConfirmModal } from '~/components/ui/overlays/modal/generic-confirm-modal'
 import { Modal } from '~/components/ui/overlays/modal/modal'
 import { useOnboardingStatus } from '~/features/onboarding/hooks/use-onboarding-status'
+import { useIsClient } from '~/lib/hooks/use-is-client'
 import { cn } from '~/lib/utils/cn'
-import {
-  useAppSettingsStore,
-  useOnboardingDismissed,
-} from '~/stores/app-settings-store'
+import { useAppSettingsStore, useIsOnboardingDismissed } from '~/stores/app-settings-store'
 
 import { SlideBooking } from './slides/slide-booking'
 import { SlideChecklist } from './slides/slide-checklist'
@@ -43,30 +41,21 @@ import { SlideWorkingHours } from './slides/slide-working-hours'
 
 export const OnboardingTutorial = () => {
   const { t } = useTranslation('onboarding')
-  const onboardingDismissed = useOnboardingDismissed()
-  const checklistReached = useAppSettingsStore(
-    (s) => s.onboardingChecklistReached,
-  )
+  const isOnboardingDismissed = useIsOnboardingDismissed()
+  const isChecklistReached = useAppSettingsStore((s) => s.onboardingChecklistReached)
   const dismissOnboarding = useAppSettingsStore((s) => s.dismissOnboarding)
-  const markChecklistReached = useAppSettingsStore(
-    (s) => s.markChecklistReached,
-  )
+  const markChecklistReached = useAppSettingsStore((s) => s.markChecklistReached)
 
-  const { hasMultipleOrganisations, hasProjects, hasWorkingHours } =
-    useOnboardingStatus()
+  const { hasMultipleOrganisations, hasProjects, hasWorkingHours } = useOnboardingStatus()
 
-  const [currentSlide, setCurrentSlide] = useState(checklistReached ? 2 : 0)
+  const [currentSlide, setCurrentSlide] = useState(isChecklistReached ? 2 : 0)
   const [dismissed, setDismissed] = useState(false)
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
-  const [returnToChecklistIndex, setReturnToChecklistIndex] = useState<
-    null | number
-  >(null)
+  const [returnToChecklistIndex, setReturnToChecklistIndex] = useState<null | number>(null)
   const [direction, setDirection] = useState<'backward' | 'forward'>('forward')
-  const [mounted, setMounted] = useState(false)
-  const scrollRef = useRef<HTMLDivElement>(null)
-
   // Client-only rendering to avoid SSR hydration flash with localStorage
-  useEffect(() => setMounted(true), [])
+  const isMounted = useIsClient()
+  const scrollReference = useRef<HTMLDivElement>(null)
 
   const slides = useMemo(() => {
     const allSlides = [
@@ -112,12 +101,7 @@ export const OnboardingTutorial = () => {
 
     return allSlides.toSorted((a, b) => {
       // Fixed-position slides first
-      const fixedIds = [
-        'overview',
-        'navigation',
-        'checklist',
-        'privateOrganisation',
-      ]
+      const fixedIds = ['overview', 'navigation', 'checklist', 'privateOrganisation']
       const aFixed = fixedIds.indexOf(a.id)
       const bFixed = fixedIds.indexOf(b.id)
       if (aFixed !== -1 && bFixed !== -1) return aFixed - bFixed
@@ -131,22 +115,24 @@ export const OnboardingTutorial = () => {
 
   // Mark checklist as reached
   useEffect(() => {
-    if (slides[currentSlide]?.id === 'checklist' && !checklistReached) {
+    if (slides[currentSlide]?.id === 'checklist' && !isChecklistReached) {
       markChecklistReached()
     }
-  }, [currentSlide, slides, checklistReached, markChecklistReached])
+  }, [currentSlide, slides, isChecklistReached, markChecklistReached])
 
   // Don't render on server or if already dismissed
-  if (!mounted) return null
-  if (onboardingDismissed || dismissed) return null
+  if (!isMounted) return null
+  if (isOnboardingDismissed || dismissed) return null
 
   const handleNext = () => {
-    if (currentSlide < slides.length - 1) {
-      setDirection('forward')
-      setCurrentSlide(currentSlide + 1)
-      setReturnToChecklistIndex(null)
-      scrollRef.current?.scrollTo({ behavior: 'smooth', top: 0 })
+    if (currentSlide >= slides.length - 1) {
+      return
     }
+
+    setDirection('forward')
+    setCurrentSlide(currentSlide + 1)
+    setReturnToChecklistIndex(null)
+    scrollReference.current?.scrollTo({ behavior: 'smooth', top: 0 })
   }
 
   const handlePrevious = () => {
@@ -154,13 +140,13 @@ export const OnboardingTutorial = () => {
       setDirection('backward')
       setCurrentSlide(returnToChecklistIndex)
       setReturnToChecklistIndex(null)
-      scrollRef.current?.scrollTo({ behavior: 'smooth', top: 0 })
+      scrollReference.current?.scrollTo({ behavior: 'smooth', top: 0 })
       return
     }
     if (currentSlide > 0) {
       setDirection('backward')
       setCurrentSlide(currentSlide - 1)
-      scrollRef.current?.scrollTo({ behavior: 'smooth', top: 0 })
+      scrollReference.current?.scrollTo({ behavior: 'smooth', top: 0 })
     }
   }
 
@@ -170,7 +156,7 @@ export const OnboardingTutorial = () => {
       setDirection(targetIndex > currentSlide ? 'forward' : 'backward')
       setReturnToChecklistIndex(currentSlide)
       setCurrentSlide(targetIndex)
-      scrollRef.current?.scrollTo({ behavior: 'smooth', top: 0 })
+      scrollReference.current?.scrollTo({ behavior: 'smooth', top: 0 })
     }
   }
 
@@ -204,8 +190,7 @@ export const OnboardingTutorial = () => {
               fullWidth={false}
               onClick={handleClose}
               shape="circle"
-              variant="ghost"
-            >
+              variant="ghost">
               <LucideIcon icon={X} size={20} />
             </Button>
           </div>
@@ -225,8 +210,7 @@ export const OnboardingTutorial = () => {
                     setDirection(index > currentSlide ? 'forward' : 'backward')
                     setCurrentSlide(index)
                   }}
-                  type="button"
-                >
+                  type="button">
                   <LucideIcon
                     className={
                       isCompleted
@@ -235,13 +219,7 @@ export const OnboardingTutorial = () => {
                           ? 'text-primary'
                           : 'text-base-content/30'
                     }
-                    icon={
-                      isCompleted
-                        ? CheckCircle2
-                        : isActive
-                          ? CheckCircle2
-                          : Circle
-                    }
+                    icon={isCompleted || isActive ? CheckCircle2 : Circle}
                     size={12}
                   />
                 </button>
@@ -252,22 +230,16 @@ export const OnboardingTutorial = () => {
           {/* Slide content */}
           <div
             className="relative min-h-0 flex-1 overflow-x-hidden overflow-y-auto"
-            ref={scrollRef}
-          >
+            ref={scrollReference}>
             <div
               className={cn(
                 'h-full',
-                direction === 'forward'
-                  ? 'animate-slide-in-right'
-                  : 'animate-slide-in-left',
+                direction === 'forward' ? 'animate-slide-in-right' : 'animate-slide-in-left',
               )}
-              key={currentSlide}
-            >
+              key={currentSlide}>
               {CurrentSlideComponent &&
                 (isChecklistSlide ? (
-                  <CurrentSlideComponent
-                    onNavigateToSlide={handleNavigateFromChecklist}
-                  />
+                  <CurrentSlideComponent onNavigateToSlide={handleNavigateFromChecklist} />
                 ) : (
                   <CurrentSlideComponent />
                 ))}
@@ -282,8 +254,7 @@ export const OnboardingTutorial = () => {
               fullWidth={false}
               onClick={handlePrevious}
               size="sm"
-              variant="ghost"
-            >
+              variant="ghost">
               <LucideIcon icon={ArrowLeft} size={16} />
               {returnToChecklistIndex === null
                 ? t('common:actions.back', 'Back')
@@ -295,12 +266,7 @@ export const OnboardingTutorial = () => {
             </div>
 
             {isLastSlide ? (
-              <Button
-                fullWidth={false}
-                onClick={handleDismiss}
-                size="sm"
-                variant="primary"
-              >
+              <Button fullWidth={false} onClick={handleDismiss} size="sm" variant="primary">
                 {t('actions.gotIt', 'Ok, got it!')}
               </Button>
             ) : (
@@ -309,8 +275,7 @@ export const OnboardingTutorial = () => {
                 fullWidth={false}
                 onClick={handleNext}
                 size="sm"
-                variant="primary"
-              >
+                variant="primary">
                 {t('common:actions.next', 'Next')}
                 <LucideIcon icon={ArrowRight} size={16} />
               </Button>

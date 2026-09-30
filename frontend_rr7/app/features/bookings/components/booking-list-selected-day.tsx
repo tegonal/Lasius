@@ -33,9 +33,7 @@ export const BookingListSelectedDay = () => {
   if (bookings.length === 0) {
     return (
       <div className="text-base-content/60 flex flex-col items-center justify-center gap-2 p-8">
-        <span className="text-sm">
-          {t('bookings:noBookingsToday', 'No bookings for this day')}
-        </span>
+        <span className="text-sm">{t('bookings:noBookingsToday', 'No bookings for this day')}</span>
       </div>
     )
   }
@@ -51,8 +49,7 @@ export const BookingListSelectedDay = () => {
               animationDelay: `${index * 0.12}s`,
               animationDuration: '0.5s',
               animationFillMode: 'both',
-            }}
-          >
+            }}>
             <BookingItem item={item} nextItem={bookings[index + 1]} />
           </div>
         ))}

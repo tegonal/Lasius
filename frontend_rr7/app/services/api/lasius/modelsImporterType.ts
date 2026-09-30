@@ -6,12 +6,11 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type ModelsImporterType = typeof ModelsImporterType[keyof typeof ModelsImporterType];
-
+export type ModelsImporterType = (typeof ModelsImporterType)[keyof typeof ModelsImporterType]
 
 export const ModelsImporterType = {
   gitlab: 'gitlab',
   jira: 'jira',
   plane: 'plane',
   github: 'github',
-} as const;
+} as const

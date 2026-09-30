@@ -25,11 +25,7 @@ import {
   getSelectedOrganisationId,
 } from '~/lib/organisation-helpers.server'
 import { getProjectLastActivityDate } from '~/services/api/lasius/projects/projects'
-import {
-  authHeaders,
-  mergeAuthHeaders,
-  requireUser,
-} from '~/services/auth/auth-helpers.server'
+import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/user.projects._index'
 
@@ -44,9 +40,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const selectedOrgId = getSelectedOrganisationId(user)
 
   // Get projects from the user's org membership (no admin-only API call needed)
-  const selectedOrg = organisations.find(
-    (o) => o.organisationReference.id === selectedOrgId,
-  )
+  const selectedOrg = organisations.find((o) => o.organisationReference.id === selectedOrgId)
   const projects = selectedOrg?.projects ?? []
 
   // Fetch last activity dates for all projects in parallel
@@ -58,12 +52,10 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     ),
   )
   const lastActivityDates: Record<string, null | string> = {}
-  for (const [i, project] of projects.entries()) {
-    const result = lastActivityResults[i]
+  for (const [index, project] of projects.entries()) {
+    const result = lastActivityResults[index]
     lastActivityDates[project.projectReference.id] =
-      result?.status === 'fulfilled' && result.value?.status === 200
-        ? result.value.data
-        : null
+      result?.status === 'fulfilled' && result.value?.status === 200 ? result.value.data : null
   }
 
   return data(

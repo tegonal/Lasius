@@ -24,7 +24,7 @@ import { useSearchParams } from 'react-router'
 import { formatISOLocale, type IsoDateString } from '~/lib/utils/dates'
 
 /** Simple yyyy-MM-dd format safe for URL search params (no +/: characters) */
-const toDateParam = (d: Date): string => format(d, 'yyyy-MM-dd')
+const toDateParameter = (d: Date): string => format(d, 'yyyy-MM-dd')
 
 /**
  * Manages day selection via URL search params.
@@ -32,27 +32,27 @@ const toDateParam = (d: Date): string => format(d, 'yyyy-MM-dd')
  * is handled by usePersistedSearchParam in the parent component.
  */
 export const useCalendarSelection = (selectedDate: IsoDateString) => {
-  const [, setSearchParams] = useSearchParams()
+  const [, setSearchParameters] = useSearchParams()
 
   const selectDay = useCallback(
     (day: IsoDateString) => {
-      setSearchParams(
-        (prev) => {
-          prev.set('date', toDateParam(new Date(day)))
-          return prev
+      setSearchParameters(
+        (previous) => {
+          previous.set('date', toDateParameter(new Date(day)))
+          return previous
         },
         { preventScrollReset: true },
       )
     },
-    [setSearchParams],
+    [setSearchParameters],
   )
 
   const selectToday = useCallback(() => {
     selectDay(formatISOLocale(new Date()))
   }, [selectDay])
 
-  const getDay = (str: IsoDateString) => {
-    return toDate(new Date(str)).getDate()
+  const getDay = (string_: IsoDateString) => {
+    return toDate(new Date(string_)).getDate()
   }
 
   const isDaySelected = (day: IsoDateString) => {

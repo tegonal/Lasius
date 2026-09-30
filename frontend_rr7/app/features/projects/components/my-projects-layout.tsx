@@ -20,11 +20,7 @@
 import { useMemo, useState } from 'react'
 import { useLoaderData } from 'react-router'
 
-import {
-  ColumnCenter,
-  ColumnRight,
-  innerGridClasses,
-} from '~/components/ui/layouts/layout-columns'
+import { ColumnCenter, ColumnRight, innerGridClasses } from '~/components/ui/layouts/layout-columns'
 import { ScrollArea } from '~/components/ui/layouts/scroll-area'
 import { Modal } from '~/components/ui/overlays/modal/modal'
 import { MyProjectsList } from '~/features/projects/components/my-projects-list'
@@ -82,11 +78,7 @@ export const MyProjectsLayout = () => {
         </ScrollArea>
       </ColumnRight>
       <Modal onClose={handleCreateClose} open={isCreateOpen}>
-        <ProjectAddUpdateForm
-          mode="add"
-          onCancel={handleCreateClose}
-          onSave={handleCreateClose}
-        />
+        <ProjectAddUpdateForm mode="add" onCancel={handleCreateClose} onSave={handleCreateClose} />
       </Modal>
     </div>
   )

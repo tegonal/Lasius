@@ -18,9 +18,7 @@ import {
 /**
  * @summary create an organisation
  */
-export function useCreateOrganisation(
-  options?: ApiProxyOptions<ModelsOrganisation>,
-) {
+export function useCreateOrganisation(options?: ApiProxyOptions<ModelsOrganisation>) {
   return useApiProxy<ModelsOrganisation, ModelsCreateOrganisation>(
     {
       getUrl: () => `/organisations`,
@@ -40,9 +38,7 @@ export function useDeactivateOrganisation(options?: ApiProxyOptions<void>) {
     options,
   )
 }
-export function useGetOrganisation(
-  options?: ApiProxyOptions<ModelsOrganisation>,
-) {
+export function useGetOrganisation(options?: ApiProxyOptions<ModelsOrganisation>) {
   return useApiProxy<ModelsOrganisation, undefined, { orgId: string }>(
     {
       getUrl: ({ orgId }) => `/organisations/${orgId}`,
@@ -51,9 +47,7 @@ export function useGetOrganisation(
     options,
   )
 }
-export function useGetOrganisationUserList(
-  options?: ApiProxyOptions<ModelsUserStub[]>,
-) {
+export function useGetOrganisationUserList(options?: ApiProxyOptions<ModelsUserStub[]>) {
   return useApiProxy<ModelsUserStub[], undefined, { orgId: string }>(
     {
       getUrl: ({ orgId }) => `/organisations/${orgId}/users`,
@@ -64,14 +58,8 @@ export function useGetOrganisationUserList(
 } /**
  * @summary assign a user to an organisation
  */
-export function useInviteOrganisationUser(
-  options?: ApiProxyOptions<ModelsInvitationResult>,
-) {
-  return useApiProxy<
-    ModelsInvitationResult,
-    ModelsUserToOrganisationAssignment,
-    { orgId: string }
-  >(
+export function useInviteOrganisationUser(options?: ApiProxyOptions<ModelsInvitationResult>) {
+  return useApiProxy<ModelsInvitationResult, ModelsUserToOrganisationAssignment, { orgId: string }>(
     {
       getUrl: ({ orgId }) => `/organisations/${orgId}/invite`,
       method: 'POST',
@@ -92,14 +80,8 @@ export function useRemoveOrganisationUser(options?: ApiProxyOptions<void>) {
 } /**
  * @summary update an organisation
  */
-export function useUpdateOrganisation(
-  options?: ApiProxyOptions<ModelsOrganisation>,
-) {
-  return useApiProxy<
-    ModelsOrganisation,
-    ModelsUpdateOrganisation,
-    { orgId: string }
-  >(
+export function useUpdateOrganisation(options?: ApiProxyOptions<ModelsOrganisation>) {
+  return useApiProxy<ModelsOrganisation, ModelsUpdateOrganisation, { orgId: string }>(
     {
       getUrl: ({ orgId }) => `/organisations/${orgId}`,
       method: 'POST',

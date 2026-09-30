@@ -41,16 +41,13 @@ export const useGithubResourceOwners = ({
     submit: submitResourceOwners,
   } = useListGithubResourceOwners()
 
-  const resourceOwners = useMemo(
-    () => resourceOwnersData?.projects ?? [],
-    [resourceOwnersData],
-  )
+  const resourceOwners = useMemo(() => resourceOwnersData?.projects ?? [], [resourceOwnersData])
 
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>(null)
+  const debounceReference = useRef<ReturnType<typeof setTimeout>>(null)
   useEffect(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current)
+    if (debounceReference.current) clearTimeout(debounceReference.current)
     if (importerType === 'github' && accessToken && accessToken.length > 0) {
-      debounceRef.current = setTimeout(() => {
+      debounceReference.current = setTimeout(() => {
         submitResourceOwners({
           body: {
             accessToken,
@@ -64,7 +61,7 @@ export const useGithubResourceOwners = ({
       }, 500)
     }
     return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current)
+      if (debounceReference.current) clearTimeout(debounceReference.current)
     }
   }, [importerType, accessToken, baseUrl, orgId, submitResourceOwners])
 

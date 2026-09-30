@@ -34,9 +34,7 @@ export default function AuthError() {
   const { error } = useLoaderData<typeof loader>()
   const { t } = useTranslation('common')
 
-  const getErrorDetails = (
-    errorCode: null | string,
-  ): { message: string; title: string } => {
+  const getErrorDetails = (errorCode: null | string): { message: string; title: string } => {
     if (!errorCode) {
       return {
         message: t('auth.errors.unknown.message', {
@@ -74,8 +72,7 @@ export default function AuthError() {
       case 'CredentialsSignin': {
         return {
           message: t('auth.errors.credentials.message', {
-            defaultValue:
-              'The credentials you provided are incorrect. Please try again.',
+            defaultValue: 'The credentials you provided are incorrect. Please try again.',
           }),
           title: t('auth.errors.credentials.title', {
             defaultValue: 'Sign In Failed',
@@ -86,8 +83,7 @@ export default function AuthError() {
       case 'EmailSignin': {
         return {
           message: t('auth.errors.email.message', {
-            defaultValue:
-              'Could not send sign-in email. Please try again later.',
+            defaultValue: 'Could not send sign-in email. Please try again later.',
           }),
           title: t('auth.errors.email.title', {
             defaultValue: 'Email Error',
@@ -132,8 +128,7 @@ export default function AuthError() {
       default: {
         return {
           message: t('auth.errors.default.message', {
-            defaultValue:
-              'An error occurred during authentication. Please try again.',
+            defaultValue: 'An error occurred during authentication. Please try again.',
           }),
           title: t('auth.errors.default.title', {
             defaultValue: 'Authentication Error',
@@ -158,43 +153,28 @@ export default function AuthError() {
           </div>
 
           <div className="text-center">
-            <h2
-              className="mb-2 text-2xl font-bold"
-              data-testid="auth-error-title"
-            >
+            <h2 className="mb-2 text-2xl font-bold" data-testid="auth-error-title">
               {errorDetails.title}
             </h2>
-            <p
-              className="text-base-content/70 max-w-md"
-              data-testid="auth-error-message"
-            >
+            <p className="text-base-content/70 max-w-md" data-testid="auth-error-message">
               {errorDetails.message}
             </p>
           </div>
 
           {error && (
-            <div
-              className="bg-base-200 rounded-lg p-3"
-              data-testid="auth-error-code"
-            >
+            <div className="bg-base-200 rounded-lg p-3" data-testid="auth-error-code">
               <p className="text-base-content/50 text-center text-xs">
                 {t('auth.errors.errorCode', {
                   defaultValue: 'Error code',
                 })}
-                :{' '}
-                <code className="text-base-content/70 font-mono">{error}</code>
+                : <code className="text-base-content/70 font-mono">{error}</code>
               </p>
             </div>
           )}
 
           <div className="mt-4 w-full">
             <a data-testid="auth-error-back-btn" href={href('/login')}>
-              <Button
-                className="w-full gap-2"
-                size="lg"
-                type="button"
-                variant="primary"
-              >
+              <Button className="w-full gap-2" size="lg" type="button" variant="primary">
                 <LucideIcon icon={ArrowLeft} size={20} />
                 {t('auth.errors.backToLogin', {
                   defaultValue: 'Back to Login',
@@ -206,8 +186,7 @@ export default function AuthError() {
           <div className="text-center">
             <p className="text-base-content/50 text-sm">
               {t('auth.errors.persistentIssue', {
-                defaultValue:
-                  'If this issue persists, please contact your administrator.',
+                defaultValue: 'If this issue persists, please contact your administrator.',
               })}
             </p>
           </div>

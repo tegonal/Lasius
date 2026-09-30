@@ -20,15 +20,12 @@
 import { Heading } from '~/components/primitives/typography/heading'
 import { Text } from '~/components/primitives/typography/text'
 
-interface SettingsRightColumnProps {
+interface SettingsRightColumnProperties {
   description: string
   title: string
 }
 
-export const SettingsRightColumn = ({
-  description,
-  title,
-}: SettingsRightColumnProps) => {
+export const SettingsRightColumn = ({ description, title }: SettingsRightColumnProperties) => {
   return (
     <div className="w-full px-6 pt-3">
       <Heading as="h2" variant="section">

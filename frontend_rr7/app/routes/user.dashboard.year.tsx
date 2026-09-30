@@ -17,14 +17,7 @@
  *
  */
 
-import {
-  differenceInWeeks,
-  endOfYear,
-  format,
-  min,
-  startOfYear,
-  subWeeks,
-} from 'date-fns'
+import { differenceInWeeks, endOfYear, format, min, startOfYear, subWeeks } from 'date-fns'
 import { useTranslation } from 'react-i18next'
 import { data, useSearchParams } from 'react-router'
 
@@ -44,7 +37,7 @@ import {
   getPlannedHoursForRange,
   getWeeklyPlannedHours,
 } from '~/lib/api/functions/get-planned-working-hours'
-import { formatDateTimeToURLParam } from '~/lib/utils/dates'
+import { formatDateTimeToURLParameter } from '~/lib/utils/dates'
 import {
   getUserBookingAggregatedStatsByOrganisation,
   getUserBookingListByOrganisation,
@@ -54,20 +47,20 @@ import { type Route } from './+types/user.dashboard.year'
 
 // ─── Client Loader (cache unless full-page refresh) ──────────────────────────
 
-export const clientLoader = async (args: Route.ClientLoaderArgs) =>
-  dashboardClientLoader(args)
+export const clientLoader = async (arguments_: Route.ClientLoaderArgs) =>
+  dashboardClientLoader(arguments_)
 clientLoader.hydrate = false
 
 // ─── Loader ──────────────────────────────────────────────────────────────────
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const ctx = await loadDashboardContext(request)
-  const { headers, plannedHours, selectedDate, selectedOrgId, url } = ctx
+  const context = await loadDashboardContext(request)
+  const { headers, plannedHours, selectedDate, selectedOrgId, url } = context
 
   const yearMode = url.searchParams.get('year') || 'rolling'
   const isCalendarYear = yearMode === 'calendar'
 
-  const dateObj = new Date(selectedDate)
+  const dateObject = new Date(selectedDate)
   const today = new Date()
 
   // Compute date range based on year mode
@@ -75,23 +68,23 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   let rangeEnd: Date
 
   if (isCalendarYear) {
-    rangeStart = startOfYear(dateObj)
-    rangeEnd = min([endOfYear(dateObj), today])
+    rangeStart = startOfYear(dateObject)
+    rangeEnd = min([endOfYear(dateObject), today])
   } else {
-    rangeStart = subWeeks(dateObj, 52)
-    rangeEnd = dateObj
+    rangeStart = subWeeks(dateObject, 52)
+    rangeEnd = dateObject
   }
 
   const weeksCount = differenceInWeeks(rangeEnd, rangeStart) + 1
 
   // Build timespan for the range
   const timespan = {
-    from: formatDateTimeToURLParam(rangeStart),
-    to: formatDateTimeToURLParam(rangeEnd),
+    from: formatDateTimeToURLParameter(rangeStart),
+    to: formatDateTimeToURLParameter(rangeEnd),
   }
 
   // Fetch bookings and aggregated project stats in parallel
-  const [bookingsRes, projectStatsRes] = await Promise.all([
+  const [bookingsResponse, projectStatsResponse] = await Promise.all([
     getUserBookingListByOrganisation(selectedOrgId, timespan, {
       headers,
     }),
@@ -107,8 +100,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     ),
   ])
 
-  const bookings = bookingsRes.data ?? []
-  const projectStats = projectStatsRes.data ?? []
+  const bookings = bookingsResponse.data ?? []
+  const projectStats = projectStatsResponse.data ?? []
 
   // Compute work health metrics
   const weeklyPlannedHours = getWeeklyPlannedHours(plannedHours)
@@ -120,11 +113,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   )
 
   // Compute summary stats
-  const expectedHours = getPlannedHoursForRange(
-    rangeStart,
-    rangeEnd,
-    plannedHours,
-  )
+  const expectedHours = getPlannedHoursForRange(rangeStart, rangeEnd, plannedHours)
   const stats = computeDashboardStats(bookings, expectedHours)
 
   // Aggregate top 5 projects
@@ -132,7 +121,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
   return data(
     { isCalendarYear, selectedDate, stats, topProjects, weeklyData },
-    { headers: dashboardResponseHeaders(ctx.auth) },
+    { headers: dashboardResponseHeaders(context.auth) },
   )
 }
 
@@ -140,14 +129,13 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
 export default function DashboardYear({ loaderData }: Route.ComponentProps) {
   const { t } = useTranslation('common')
-  const [, setSearchParams] = useSearchParams()
-  const { isCalendarYear, selectedDate, stats, topProjects, weeklyData } =
-    loaderData
-  const dateObj = new Date(selectedDate)
+  const [, setSearchParameters] = useSearchParams()
+  const { isCalendarYear, selectedDate, stats, topProjects, weeklyData } = loaderData
+  const dateObject = new Date(selectedDate)
 
   const toggleCalendarYear = () => {
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev)
+    setSearchParameters((previous) => {
+      const next = new URLSearchParams(previous)
       if (isCalendarYear) {
         next.delete('year')
       } else {
@@ -162,15 +150,13 @@ export default function DashboardYear({ loaderData }: Route.ComponentProps) {
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">
           {isCalendarYear ? (
-            <FormatDate date={dateObj} format="year" />
+            <FormatDate date={dateObject} format="year" />
           ) : (
             t('stats:rolling12Months', 'Rolling 12 Months')
           )}
         </h2>
         <label className="flex items-center gap-2 text-sm">
-          <span className="text-base-content/60">
-            {t('stats:calendarYear', 'Calendar year')}
-          </span>
+          <span className="text-base-content/60">{t('stats:calendarYear', 'Calendar year')}</span>
           <input
             checked={isCalendarYear}
             className="toggle toggle-sm"
@@ -183,10 +169,7 @@ export default function DashboardYear({ loaderData }: Route.ComponentProps) {
       <div className="flex gap-4">
         <StatsOverviewGrid {...stats} />
         <TopProjectsCard
-          emptyMessage={t(
-            'stats:noProjectsForYear',
-            'No projects for this period',
-          )}
+          emptyMessage={t('stats:noProjectsForYear', 'No projects for this period')}
           projects={topProjects}
         />
       </div>

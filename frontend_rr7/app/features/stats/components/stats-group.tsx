@@ -21,7 +21,7 @@ import { type ReactNode } from 'react'
 
 import { cn } from '~/lib/utils/cn'
 
-type Props = {
+type Properties = {
   children: ReactNode
   className?: string
 }
@@ -30,14 +30,9 @@ type Props = {
  * Wrapper for DaisyUI stats components that combines them into a single group
  * Use this when you want multiple stats to appear as a unified component
  */
-export const StatsGroup = ({ children, className }: Props) => {
+export const StatsGroup = ({ children, className }: Properties) => {
   return (
-    <div
-      className={cn(
-        'stats stats-vertical lg:stats-horizontal overflow-visible',
-        className,
-      )}
-    >
+    <div className={cn('stats stats-vertical lg:stats-horizontal overflow-visible', className)}>
       {children}
     </div>
   )

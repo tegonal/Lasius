@@ -19,21 +19,15 @@
 
 import Avatar from 'boring-avatars'
 
-const USER_AVATAR_PALETTE = [
-  '#212020',
-  '#0f455b',
-  '#224431',
-  '#836c02',
-  '#D9832D',
-]
+const USER_AVATAR_PALETTE = ['#212020', '#0f455b', '#224431', '#836c02', '#D9832D']
 
-type Props = {
+type Properties = {
   firstName: string
   lastName: string
   size?: number
 }
 
-export const AvatarUser = ({ firstName, lastName, size = 39 }: Props) => {
+export const AvatarUser = ({ firstName, lastName, size = 39 }: Properties) => {
   const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
   const fullName = `${firstName} ${lastName}`
 
@@ -41,8 +35,7 @@ export const AvatarUser = ({ firstName, lastName, size = 39 }: Props) => {
     <div
       className="relative shrink-0"
       style={{ height: `${size}px`, width: `${size}px` }}
-      title={fullName}
-    >
+      title={fullName}>
       <Avatar
         colors={USER_AVATAR_PALETTE}
         name={fullName}
@@ -52,8 +45,7 @@ export const AvatarUser = ({ firstName, lastName, size = 39 }: Props) => {
       />
       <div
         className="pointer-events-none absolute inset-0 flex items-center justify-center font-semibold text-white"
-        style={{ fontSize: `${size * 0.4}px` }}
-      >
+        style={{ fontSize: `${size * 0.4}px` }}>
         {initials}
       </div>
     </div>

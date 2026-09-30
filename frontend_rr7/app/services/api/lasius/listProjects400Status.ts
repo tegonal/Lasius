@@ -6,9 +6,9 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type ListProjects400Status = typeof ListProjects400Status[keyof typeof ListProjects400Status];
-
+export type ListProjects400Status =
+  (typeof ListProjects400Status)[keyof typeof ListProjects400Status]
 
 export const ListProjects400Status = {
   error: 'error',
-} as const;
+} as const

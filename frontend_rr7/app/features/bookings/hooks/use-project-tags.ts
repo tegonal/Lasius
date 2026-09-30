@@ -26,22 +26,18 @@ import { useGetTagsByProject } from '~/services/api/lasius-hooks/user-organisati
  * Fetches tags for the selected project, deduplicating requests via a stable ref.
  * Triggers a new fetch only when the org+project key changes.
  */
-export function useProjectTags(
-  selectedOrgId: string,
-  projectId: string | undefined,
-) {
+export function useProjectTags(selectedOrgId: string, projectId: string | undefined) {
   const tagsApi = useGetTagsByProject()
-  const tagsSubmitRef = useRef(tagsApi.submit)
-  tagsSubmitRef.current = tagsApi.submit
-  const prevProjectKeyRef = useRef('')
+  const { submit: submitTags } = tagsApi
+  const previousProjectKeyReference = useRef('')
 
   useEffect(() => {
     const key = `${selectedOrgId}:${projectId}`
-    if (selectedOrgId && projectId && key !== prevProjectKeyRef.current) {
-      prevProjectKeyRef.current = key
-      tagsSubmitRef.current({ orgId: selectedOrgId, projectId })
+    if (selectedOrgId && projectId && key !== previousProjectKeyReference.current) {
+      previousProjectKeyReference.current = key
+      submitTags({ orgId: selectedOrgId, projectId })
     }
-  }, [selectedOrgId, projectId])
+  }, [selectedOrgId, projectId, submitTags])
 
   const projectTags: ModelsTag[] = tagsApi.data ?? []
 

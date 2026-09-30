@@ -24,7 +24,5 @@ import { EmptyState } from '~/components/ui/data-display/empty-state'
 
 export const EmptyStateFavorites = () => {
   const { t } = useTranslation('home')
-  return (
-    <EmptyState icon={Star} label={t('favorites.empty', 'No favorites yet')} />
-  )
+  return <EmptyState icon={Star} label={t('favorites.empty', 'No favorites yet')} />
 }

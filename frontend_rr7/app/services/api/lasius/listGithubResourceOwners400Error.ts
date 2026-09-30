@@ -6,11 +6,11 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type ListGithubResourceOwners400Error = typeof ListGithubResourceOwners400Error[keyof typeof ListGithubResourceOwners400Error];
-
+export type ListGithubResourceOwners400Error =
+  (typeof ListGithubResourceOwners400Error)[keyof typeof ListGithubResourceOwners400Error]
 
 export const ListGithubResourceOwners400Error = {
   list_resource_owners_failed: 'list_resource_owners_failed',
   missing_access_token: 'missing_access_token',
   invalid_importer_type: 'invalid_importer_type',
-} as const;
+} as const

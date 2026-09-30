@@ -30,12 +30,10 @@ export type startUserBookingCurrentResponse200 = {
   status: 200
 }
 
-export type startUserBookingCurrentResponseSuccess =
-  startUserBookingCurrentResponse200 & {
-    headers: Headers
-  }
-export type startUserBookingCurrentResponse =
-  startUserBookingCurrentResponseSuccess
+export type startUserBookingCurrentResponseSuccess = startUserBookingCurrentResponse200 & {
+  headers: Headers
+}
+export type startUserBookingCurrentResponse = startUserBookingCurrentResponseSuccess
 
 export const getStartUserBookingCurrentUrl = (orgId: string) => {
   return `/user-bookings/organisations/${orgId}/bookings/start`
@@ -46,15 +44,12 @@ export const startUserBookingCurrent = async (
   modelsStartBookingRequest: ModelsStartBookingRequest,
   options?: RequestInit,
 ): Promise<startUserBookingCurrentResponse> => {
-  return lasiusFetch<startUserBookingCurrentResponse>(
-    getStartUserBookingCurrentUrl(orgId),
-    {
-      ...options,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...options?.headers },
-      body: JSON.stringify(modelsStartBookingRequest),
-    },
-  )
+  return lasiusFetch<startUserBookingCurrentResponse>(getStartUserBookingCurrentUrl(orgId), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(modelsStartBookingRequest),
+  })
 }
 
 /**
@@ -65,17 +60,12 @@ export type stopUserBookingCurrentResponse200 = {
   status: 200
 }
 
-export type stopUserBookingCurrentResponseSuccess =
-  stopUserBookingCurrentResponse200 & {
-    headers: Headers
-  }
-export type stopUserBookingCurrentResponse =
-  stopUserBookingCurrentResponseSuccess
+export type stopUserBookingCurrentResponseSuccess = stopUserBookingCurrentResponse200 & {
+  headers: Headers
+}
+export type stopUserBookingCurrentResponse = stopUserBookingCurrentResponseSuccess
 
-export const getStopUserBookingCurrentUrl = (
-  orgId: string,
-  bookingId: string,
-) => {
+export const getStopUserBookingCurrentUrl = (orgId: string, bookingId: string) => {
   return `/user-bookings/organisations/${orgId}/bookings/${bookingId}/stop`
 }
 
@@ -104,17 +94,12 @@ export type updateUserBookingCurrentResponse200 = {
   status: 200
 }
 
-export type updateUserBookingCurrentResponseSuccess =
-  updateUserBookingCurrentResponse200 & {
-    headers: Headers
-  }
-export type updateUserBookingCurrentResponse =
-  updateUserBookingCurrentResponseSuccess
+export type updateUserBookingCurrentResponseSuccess = updateUserBookingCurrentResponse200 & {
+  headers: Headers
+}
+export type updateUserBookingCurrentResponse = updateUserBookingCurrentResponseSuccess
 
-export const getUpdateUserBookingCurrentUrl = (
-  orgId: string,
-  bookingId: string,
-) => {
+export const getUpdateUserBookingCurrentUrl = (orgId: string, bookingId: string) => {
   return `/user-bookings/organisations/${orgId}/bookings/${bookingId}/start-time`
 }
 
@@ -157,13 +142,10 @@ export const deleteUserBooking = async (
   bookingId: string,
   options?: RequestInit,
 ): Promise<deleteUserBookingResponse> => {
-  return lasiusFetch<deleteUserBookingResponse>(
-    getDeleteUserBookingUrl(orgId, bookingId),
-    {
-      ...options,
-      method: 'DELETE',
-    },
-  )
+  return lasiusFetch<deleteUserBookingResponse>(getDeleteUserBookingUrl(orgId, bookingId), {
+    ...options,
+    method: 'DELETE',
+  })
 }
 
 /**
@@ -189,15 +171,12 @@ export const updateUserBooking = async (
   modelsEditBookingRequest: ModelsEditBookingRequest,
   options?: RequestInit,
 ): Promise<updateUserBookingResponse> => {
-  return lasiusFetch<updateUserBookingResponse>(
-    getUpdateUserBookingUrl(orgId, bookingId),
-    {
-      ...options,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...options?.headers },
-      body: JSON.stringify(modelsEditBookingRequest),
-    },
-  )
+  return lasiusFetch<updateUserBookingResponse>(getUpdateUserBookingUrl(orgId, bookingId), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(modelsEditBookingRequest),
+  })
 }
 
 /**
@@ -212,8 +191,7 @@ export type addUserBookingByOrganisationResponseSuccess =
   addUserBookingByOrganisationResponse200 & {
     headers: Headers
   }
-export type addUserBookingByOrganisationResponse =
-  addUserBookingByOrganisationResponseSuccess
+export type addUserBookingByOrganisationResponse = addUserBookingByOrganisationResponseSuccess
 
 export const getAddUserBookingByOrganisationUrl = (orgId: string) => {
   return `/user-bookings/organisations/${orgId}/bookings`
@@ -339,10 +317,9 @@ export type getUserBookingCurrentResponse200 = {
   status: 200
 }
 
-export type getUserBookingCurrentResponseSuccess =
-  getUserBookingCurrentResponse200 & {
-    headers: Headers
-  }
+export type getUserBookingCurrentResponseSuccess = getUserBookingCurrentResponse200 & {
+  headers: Headers
+}
 export type getUserBookingCurrentResponse = getUserBookingCurrentResponseSuccess
 
 export const getGetUserBookingCurrentUrl = () => {
@@ -352,13 +329,10 @@ export const getGetUserBookingCurrentUrl = () => {
 export const getUserBookingCurrent = async (
   options?: RequestInit,
 ): Promise<getUserBookingCurrentResponse> => {
-  return lasiusFetch<getUserBookingCurrentResponse>(
-    getGetUserBookingCurrentUrl(),
-    {
-      ...options,
-      method: 'GET',
-    },
-  )
+  return lasiusFetch<getUserBookingCurrentResponse>(getGetUserBookingCurrentUrl(), {
+    ...options,
+    method: 'GET',
+  })
 }
 
 /**
@@ -376,9 +350,7 @@ export type getUserBookingCurrentListByOrganisationResponseSuccess =
 export type getUserBookingCurrentListByOrganisationResponse =
   getUserBookingCurrentListByOrganisationResponseSuccess
 
-export const getGetUserBookingCurrentListByOrganisationUrl = (
-  orgId: string,
-) => {
+export const getGetUserBookingCurrentListByOrganisationUrl = (orgId: string) => {
   return `/user-bookings/organisations/${orgId}/current`
 }
 

@@ -58,7 +58,9 @@ function getSessionStorage() {
   })
 }
 
-let _sessionStorage: ReturnType<typeof getSessionStorage> | undefined
+const sessionStorageCache: {
+  instance?: ReturnType<typeof getSessionStorage>
+} = {}
 
 /** Create a new user session and redirect */
 export async function createUserSession(
@@ -112,9 +114,9 @@ export async function getSessionTokens(
   const issuedAt = user.issuedAt ?? fallbackIssuedAt
   const tokenLifetime = user.expiresAt - issuedAt
   const halfLife = tokenLifetime > 0 ? tokenLifetime / 2 : 60_000
-  const needsRefresh = Date.now() > issuedAt + halfLife
+  const isNeedsRefresh = Date.now() > issuedAt + halfLife
 
-  if (needsRefresh) {
+  if (isNeedsRefresh) {
     logger.debug('Access token past half-life, refreshing')
 
     const refreshKey = user.refreshToken
@@ -133,10 +135,10 @@ export async function getSessionTokens(
       }
 
       session.set('user', updatedUser)
-      const setCookie = await commitSession(session)
+      const sessionCookie = await commitSession(session)
 
       return {
-        headers: { 'Set-Cookie': setCookie },
+        headers: { 'Set-Cookie': sessionCookie },
         tokens: updatedUser,
       }
     }
@@ -151,9 +153,9 @@ export async function getSessionTokens(
 }
 
 function commitSession(
-  ...args: Parameters<ReturnType<typeof getSessionStorage>['commitSession']>
+  ...arguments_: Parameters<ReturnType<typeof getSessionStorage>['commitSession']>
 ) {
-  return sessionStorage().commitSession(...args)
+  return sessionStorage().commitSession(...arguments_)
 }
 
 /**
@@ -178,16 +180,13 @@ async function deduplicatedRefresh(
   const promise = (async () => {
     const provider = getProvider(user.tokenIssuer)
 
-    for (let i = 0; i <= AUTH_REFRESH_BACKOFF_MS.length; i++) {
+    for (let index = 0; index <= AUTH_REFRESH_BACKOFF_MS.length; index++) {
       try {
         return await provider.refreshToken(user.refreshToken)
       } catch (error) {
-        if (i < AUTH_REFRESH_BACKOFF_MS.length) {
-          const delay = AUTH_REFRESH_BACKOFF_MS[i]
-          logger.warn(
-            `Token refresh attempt ${i + 1} failed, retrying in ${delay}ms`,
-            error,
-          )
+        if (index < AUTH_REFRESH_BACKOFF_MS.length) {
+          const delay = AUTH_REFRESH_BACKOFF_MS[index]
+          logger.warn(`Token refresh attempt ${index + 1} failed, retrying in ${delay}ms`, error)
           await new Promise((r) => setTimeout(r, delay))
         } else {
           logger.warn(
@@ -212,9 +211,9 @@ async function deduplicatedRefresh(
 }
 
 function destroySession(
-  ...args: Parameters<ReturnType<typeof getSessionStorage>['destroySession']>
+  ...arguments_: Parameters<ReturnType<typeof getSessionStorage>['destroySession']>
 ) {
-  return sessionStorage().destroySession(...args)
+  return sessionStorage().destroySession(...arguments_)
 }
 
 function getSession(cookieHeader: null | string) {
@@ -227,10 +226,10 @@ async function getUserSession(request: Request) {
 }
 
 function sessionStorage() {
-  if (!_sessionStorage) {
-    _sessionStorage = getSessionStorage()
+  if (!sessionStorageCache.instance) {
+    sessionStorageCache.instance = getSessionStorage()
   }
-  return _sessionStorage
+  return sessionStorageCache.instance
 }
 
 export { type LasiusSessionData } from './types'

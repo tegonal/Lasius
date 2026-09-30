@@ -65,51 +65,35 @@ describe('getSegmentBounds', () => {
 
 describe('getSegmentFromPosition', () => {
   it('position 0 in "24.03.2026" returns day', () => {
-    expect(getSegmentFromPosition(0, '24.03.2026', '.', DATE_SEGMENTS)).toBe(
-      'day',
-    )
+    expect(getSegmentFromPosition(0, '24.03.2026', '.', DATE_SEGMENTS)).toBe('day')
   })
 
   it('position 1 in "24.03.2026" returns day', () => {
-    expect(getSegmentFromPosition(1, '24.03.2026', '.', DATE_SEGMENTS)).toBe(
-      'day',
-    )
+    expect(getSegmentFromPosition(1, '24.03.2026', '.', DATE_SEGMENTS)).toBe('day')
   })
 
   it('position 2 (end of day segment) in "24.03.2026" returns day', () => {
-    expect(getSegmentFromPosition(2, '24.03.2026', '.', DATE_SEGMENTS)).toBe(
-      'day',
-    )
+    expect(getSegmentFromPosition(2, '24.03.2026', '.', DATE_SEGMENTS)).toBe('day')
   })
 
   it('position 3 in "24.03.2026" returns month', () => {
-    expect(getSegmentFromPosition(3, '24.03.2026', '.', DATE_SEGMENTS)).toBe(
-      'month',
-    )
+    expect(getSegmentFromPosition(3, '24.03.2026', '.', DATE_SEGMENTS)).toBe('month')
   })
 
   it('position 5 in "24.03.2026" returns month', () => {
-    expect(getSegmentFromPosition(5, '24.03.2026', '.', DATE_SEGMENTS)).toBe(
-      'month',
-    )
+    expect(getSegmentFromPosition(5, '24.03.2026', '.', DATE_SEGMENTS)).toBe('month')
   })
 
   it('position 6 in "24.03.2026" returns year', () => {
-    expect(getSegmentFromPosition(6, '24.03.2026', '.', DATE_SEGMENTS)).toBe(
-      'year',
-    )
+    expect(getSegmentFromPosition(6, '24.03.2026', '.', DATE_SEGMENTS)).toBe('year')
   })
 
   it('position 10 in "24.03.2026" returns year', () => {
-    expect(getSegmentFromPosition(10, '24.03.2026', '.', DATE_SEGMENTS)).toBe(
-      'year',
-    )
+    expect(getSegmentFromPosition(10, '24.03.2026', '.', DATE_SEGMENTS)).toBe('year')
   })
 
   it('position beyond end returns last segment', () => {
-    expect(getSegmentFromPosition(15, '24.03.2026', '.', DATE_SEGMENTS)).toBe(
-      'year',
-    )
+    expect(getSegmentFromPosition(15, '24.03.2026', '.', DATE_SEGMENTS)).toBe('year')
   })
 
   it('returns null for invalid input (mismatched segments)', () => {
@@ -118,8 +102,6 @@ describe('getSegmentFromPosition', () => {
 
   it('works with time segments', () => {
     expect(getSegmentFromPosition(0, '14:30', ':', TIME_SEGMENTS)).toBe('hour')
-    expect(getSegmentFromPosition(3, '14:30', ':', TIME_SEGMENTS)).toBe(
-      'minute',
-    )
+    expect(getSegmentFromPosition(3, '14:30', ':', TIME_SEGMENTS)).toBe('minute')
   })
 })

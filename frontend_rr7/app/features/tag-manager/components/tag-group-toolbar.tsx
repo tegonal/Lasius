@@ -23,7 +23,7 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 
-type Props = {
+type Properties = {
   allExpanded: boolean
   onAddGroup: () => void
   onAddPresets: () => void
@@ -37,19 +37,13 @@ export const TagGroupToolbar = ({
   onAddPresets,
   onToggleAll,
   showToggleAll,
-}: Props) => {
+}: Properties) => {
   const { t } = useTranslation('tag-manager')
 
   return (
     <div className="mb-4 flex flex-shrink-0 flex-wrap items-center justify-between gap-2">
       <div className="flex gap-2">
-        <Button
-          fullWidth={false}
-          onClick={onAddGroup}
-          size="sm"
-          type="button"
-          variant="secondary"
-        >
+        <Button fullWidth={false} onClick={onAddGroup} size="sm" type="button" variant="secondary">
           {t('actions.addTagGroup', 'Add tag group')}
         </Button>
         <Button
@@ -57,8 +51,7 @@ export const TagGroupToolbar = ({
           onClick={onAddPresets}
           size="sm"
           type="button"
-          variant="secondary"
-        >
+          variant="secondary">
           {t('actions.addDefaultTagGroups', 'Add default tag groups')}
         </Button>
       </div>
@@ -74,12 +67,8 @@ export const TagGroupToolbar = ({
               : t('actions.expandAll', 'Expand all')
           }
           type="button"
-          variant="ghost"
-        >
-          <LucideIcon
-            icon={allExpanded ? ChevronsDownUp : ChevronsUpDown}
-            size={20}
-          />
+          variant="ghost">
+          <LucideIcon icon={allExpanded ? ChevronsDownUp : ChevronsUpDown} size={20} />
         </Button>
       )}
     </div>

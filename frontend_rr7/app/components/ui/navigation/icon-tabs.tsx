@@ -45,38 +45,29 @@ export const IconTabs = ({
   selected: number
   tabs: IconTabsItem[]
 }) => {
-  const itemRefs = useRef<(HTMLElement | null)[]>([])
+  const itemReferences = useRef<(HTMLElement | null)[]>([])
 
   return (
     <div
       className={cn(
         'relative grid h-full w-full justify-stretch gap-0 overflow-hidden',
-        position === 'top'
-          ? 'grid-rows-[min-content_auto]'
-          : 'grid-cols-[min-content_auto]',
-      )}
-    >
+        position === 'top' ? 'grid-rows-[min-content_auto]' : 'grid-cols-[min-content_auto]',
+      )}>
       <div
         className={cn(
           'relative flex',
           position === 'top'
             ? 'border-base-content/10 flex-row justify-center border-b pt-2 lg:pt-4 xl:pt-6'
             : 'border-base-content/10 mr-2 flex-col justify-start gap-2 border-r',
-        )}
-      >
-        <SlidingIndicator
-          itemRefs={itemRefs}
-          radiusOn={position}
-          selectedIndex={selected}
-        />
+        )}>
+        <SlidingIndicator itemRefs={itemReferences} radiusOn={position} selectedIndex={selected} />
         {tabs.map((item, index) => (
           <div
             className={cn('relative z-10', index === selected && 'selected')}
             key={item.id}
-            ref={(el) => {
-              itemRefs.current[index] = el
-            }}
-          >
+            ref={(element) => {
+              itemReferences.current[index] = element
+            }}>
             <Button
               aria-label={item.name}
               className="relative z-20"
@@ -84,8 +75,7 @@ export const IconTabs = ({
               fullWidth={false}
               onClick={() => onSelect(index)}
               title={item.name}
-              variant="tabs"
-            >
+              variant="tabs">
               <LucideIcon icon={item.icon} size={24} />
             </Button>
           </div>

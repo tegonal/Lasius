@@ -38,17 +38,17 @@ import {
   parseTagsFromFormData,
 } from '~/features/bookings/lib/booking-schemas'
 import { useProjects } from '~/features/projects/hooks/use-projects'
-import { type SchemaTranslationFn } from '~/lib/i18n-types'
+import { type SchemaTranslationFunction } from '~/lib/i18n-types'
 import { formatISOLocale } from '~/lib/utils/dates'
 import { type ModelsTag } from '~/services/api/lasius'
 import { useGetTagsByProject } from '~/services/api/lasius-hooks/user-organisations/user-organisations'
 
-type Props = {
+type Properties = {
   onSuccess?: () => void
   selectedOrgId: string
 }
 
-export const BookingStart = ({ onSuccess, selectedOrgId }: Props) => {
+export const BookingStart = ({ onSuccess, selectedOrgId }: Properties) => {
   const { t } = useTranslation(['bookings', 'projects', 'tag-manager'])
   const stopAndStart = useStopAndStart()
 
@@ -57,12 +57,10 @@ export const BookingStart = ({ onSuccess, selectedOrgId }: Props) => {
   const projects = userProjects.map((p) => p.projectReference)
 
   // Tags via Orval hook
-  const tagsApi = useGetTagsByProject()
-  const tagsSubmitRef = useRef(tagsApi.submit)
-  tagsSubmitRef.current = tagsApi.submit
-  const prevProjectKeyRef = useRef('')
+  const { data: tagsData, submit: submitTags } = useGetTagsByProject()
+  const previousProjectKeyReference = useRef('')
 
-  const schema = createBookingStartSchema(t as unknown as SchemaTranslationFn)
+  const schema = createBookingStartSchema(t as unknown as SchemaTranslationFunction)
   const [resetKey, setResetKey] = useState(0)
 
   const [form, fields] = useForm({
@@ -82,36 +80,37 @@ export const BookingStart = ({ onSuccess, selectedOrgId }: Props) => {
   useEffect(() => {
     const pid = projectIdControl.value
     const key = `${selectedOrgId}:${pid}`
-    if (selectedOrgId && pid && key !== prevProjectKeyRef.current) {
-      prevProjectKeyRef.current = key
-      tagsSubmitRef.current({ orgId: selectedOrgId, projectId: pid })
+    if (selectedOrgId && pid && key !== previousProjectKeyReference.current) {
+      previousProjectKeyReference.current = key
+      submitTags({ orgId: selectedOrgId, projectId: pid })
     }
-  }, [selectedOrgId, projectIdControl.value])
+  }, [selectedOrgId, projectIdControl.value, submitTags])
 
-  const projectTags = tagsApi.data ?? []
+  const projectTags = tagsData ?? []
 
   const resetComponent = () => {
     setResetKey((k) => k + 1)
-    prevProjectKeyRef.current = ''
+    previousProjectKeyReference.current = ''
   }
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const formData = new FormData(e.currentTarget)
+  const onSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const formData = new FormData(event.currentTarget)
     const result = parseWithZod(formData, { schema })
     if (result.status !== 'success') return
 
     const { projectId, tags: tagsJson } = result.value
     const tags = parseTagsFromFormData(tagsJson) as unknown as ModelsTag[]
+    const start = formatISOLocale(
+      roundToNearestMinutes(new Date(), {
+        roundingMethod: 'floor',
+      }),
+    )
 
     stopAndStart.submit({
       orgId: selectedOrgId,
       projectId,
-      start: formatISOLocale(
-        roundToNearestMinutes(new Date(), {
-          roundingMethod: 'floor',
-        }),
-      ),
+      start,
       tags,
     })
     resetComponent()
@@ -133,8 +132,7 @@ export const BookingStart = ({ onSuccess, selectedOrgId }: Props) => {
             <FormElement
               htmlFor={fields.projectId.id}
               label={t('projects:label', 'Project')}
-              required
-            >
+              required>
               <ProjectSelect
                 errors={fields.projectId.errors}
                 id={fields.projectId.id}
@@ -144,10 +142,7 @@ export const BookingStart = ({ onSuccess, selectedOrgId }: Props) => {
                 value={projectIdControl.value ?? ''}
               />
             </FormElement>
-            <FormElement
-              htmlFor={fields.tags.id}
-              label={t('tag-manager:label', 'Tags')}
-            >
+            <FormElement htmlFor={fields.tags.id} label={t('tag-manager:label', 'Tags')}>
               <InputTagsAutocomplete
                 field={fields.tags}
                 id={fields.tags.id}
@@ -161,8 +156,7 @@ export const BookingStart = ({ onSuccess, selectedOrgId }: Props) => {
             <Button
               data-testid="booking-start-submit-btn"
               disabled={stopAndStart.state !== 'idle'}
-              type="submit"
-            >
+              type="submit">
               <LucideIcon icon={Timer} size={24} />
               {t('bookings:actions.start', 'Start booking')}
             </Button>

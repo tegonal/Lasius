@@ -39,11 +39,7 @@ export const statsShouldRevalidate = ({
   const nextFrom = nextUrl.searchParams.get('from')
   const nextTo = nextUrl.searchParams.get('to')
   const nextDateRange = nextUrl.searchParams.get('dateRange')
-  if (
-    currentFrom === nextFrom &&
-    currentTo === nextTo &&
-    currentDateRange === nextDateRange
-  ) {
+  if (currentFrom === nextFrom && currentTo === nextTo && currentDateRange === nextDateRange) {
     return false
   }
   return defaultShouldRevalidate

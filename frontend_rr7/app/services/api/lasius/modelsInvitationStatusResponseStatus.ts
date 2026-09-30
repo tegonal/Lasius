@@ -6,10 +6,10 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type ModelsInvitationStatusResponseStatus = typeof ModelsInvitationStatusResponseStatus[keyof typeof ModelsInvitationStatusResponseStatus];
-
+export type ModelsInvitationStatusResponseStatus =
+  (typeof ModelsInvitationStatusResponseStatus)[keyof typeof ModelsInvitationStatusResponseStatus]
 
 export const ModelsInvitationStatusResponseStatus = {
   UnregisteredUser: 'UnregisteredUser',
   InvitationOk: 'InvitationOk',
-} as const;
+} as const

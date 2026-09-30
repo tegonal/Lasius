@@ -28,13 +28,7 @@ import {
   useRefreshTags,
 } from '~/services/api/lasius-hooks/issue-importers/issue-importers'
 
-type ModalType =
-  | 'configEdit'
-  | 'configInfo'
-  | 'deleteConfirm'
-  | 'projectMappings'
-  | 'wizard'
-  | null
+type ModalType = 'configEdit' | 'configInfo' | 'deleteConfirm' | 'projectMappings' | 'wizard' | null
 
 type UseIssueImporterConfigManagementReturn = {
   activeModal: ModalType
@@ -58,10 +52,11 @@ export function useIssueImporterConfigManagement(
   const revalidator = useRevalidator()
 
   const [activeModal, setActiveModal] = useState<ModalType>(null)
-  const [selectedConfig, setSelectedConfig] =
-    useState<ModelsIssueImporterConfigResponse | null>(null)
+  const [selectedConfig, setSelectedConfig] = useState<ModelsIssueImporterConfigResponse | null>(
+    null,
+  )
 
-  const deleteApi = useDeleteConfig({
+  const configDeletionApi = useDeleteConfig({
     onError: () => {
       addToast({
         message: t('issueImporters.errors.deleteFailed', {
@@ -88,37 +83,25 @@ export function useIssueImporterConfigManagement(
     setSelectedConfig(null)
   }, [])
 
-  const openConfigInfo = useCallback(
-    (config: ModelsIssueImporterConfigResponse) => {
-      setActiveModal('configInfo')
-      setSelectedConfig(config)
-    },
-    [],
-  )
+  const openConfigInfo = useCallback((config: ModelsIssueImporterConfigResponse) => {
+    setActiveModal('configInfo')
+    setSelectedConfig(config)
+  }, [])
 
-  const openConfigEdit = useCallback(
-    (config: ModelsIssueImporterConfigResponse) => {
-      setActiveModal('configEdit')
-      setSelectedConfig(config)
-    },
-    [],
-  )
+  const openConfigEdit = useCallback((config: ModelsIssueImporterConfigResponse) => {
+    setActiveModal('configEdit')
+    setSelectedConfig(config)
+  }, [])
 
-  const openProjectMappings = useCallback(
-    (config: ModelsIssueImporterConfigResponse) => {
-      setActiveModal('projectMappings')
-      setSelectedConfig(config)
-    },
-    [],
-  )
+  const openProjectMappings = useCallback((config: ModelsIssueImporterConfigResponse) => {
+    setActiveModal('projectMappings')
+    setSelectedConfig(config)
+  }, [])
 
-  const openDeleteConfirm = useCallback(
-    (config: ModelsIssueImporterConfigResponse) => {
-      setActiveModal('deleteConfirm')
-      setSelectedConfig(config)
-    },
-    [],
-  )
+  const openDeleteConfirm = useCallback((config: ModelsIssueImporterConfigResponse) => {
+    setActiveModal('deleteConfirm')
+    setSelectedConfig(config)
+  }, [])
 
   const closeModal = useCallback(() => {
     setActiveModal(null)
@@ -146,18 +129,15 @@ export function useIssueImporterConfigManagement(
 
   const handleDelete = useCallback(() => {
     if (!selectedConfig) return
-    deleteApi.submit({
+    configDeletionApi.submit({
       configId: selectedConfig.id,
       orgId: selectedOrgId,
     })
-  }, [selectedConfig, selectedOrgId, deleteApi])
+  }, [selectedConfig, selectedOrgId, configDeletionApi])
 
   const handleRefreshAllTags = useCallback(
     (config: ModelsIssueImporterConfigResponse) => {
-      const projects =
-        'projects' in config && Array.isArray(config.projects)
-          ? config.projects
-          : []
+      const projects = 'projects' in config && Array.isArray(config.projects) ? config.projects : []
 
       for (const mapping of projects) {
         if (mapping.id) {
@@ -177,7 +157,7 @@ export function useIssueImporterConfigManagement(
     closeModal,
     handleDelete,
     handleRefreshAllTags,
-    isDeleting: deleteApi.isSubmitting,
+    isDeleting: configDeletionApi.isSubmitting,
     openConfigEdit,
     openConfigInfo,
     openDeleteConfirm,

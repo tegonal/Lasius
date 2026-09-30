@@ -29,9 +29,7 @@ export type getInvitationResponseError = getInvitationResponse400 & {
   headers: Headers
 }
 
-export type getInvitationResponse =
-  | getInvitationResponseSuccess
-  | getInvitationResponseError
+export type getInvitationResponse = getInvitationResponseSuccess | getInvitationResponseError
 
 export const getGetInvitationUrl = (invitationId: string) => {
   return `/invitations/${invitationId}`
@@ -66,15 +64,12 @@ export const acceptInvitation = async (
   modelsAcceptInvitationRequest: ModelsAcceptInvitationRequest,
   options?: RequestInit,
 ): Promise<acceptInvitationResponse> => {
-  return lasiusFetch<acceptInvitationResponse>(
-    getAcceptInvitationUrl(invitationId),
-    {
-      ...options,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...options?.headers },
-      body: JSON.stringify(modelsAcceptInvitationRequest),
-    },
-  )
+  return lasiusFetch<acceptInvitationResponse>(getAcceptInvitationUrl(invitationId), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(modelsAcceptInvitationRequest),
+  })
 }
 
 export type declineInvitationResponse200 = {
@@ -95,11 +90,8 @@ export const declineInvitation = async (
   invitationId: string,
   options?: RequestInit,
 ): Promise<declineInvitationResponse> => {
-  return lasiusFetch<declineInvitationResponse>(
-    getDeclineInvitationUrl(invitationId),
-    {
-      ...options,
-      method: 'POST',
-    },
-  )
+  return lasiusFetch<declineInvitationResponse>(getDeclineInvitationUrl(invitationId), {
+    ...options,
+    method: 'POST',
+  })
 }

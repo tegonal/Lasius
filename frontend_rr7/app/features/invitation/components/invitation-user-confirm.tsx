@@ -17,7 +17,7 @@
  *
  */
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
 
@@ -37,36 +37,48 @@ import { type ModelsEntityReference } from '~/services/api/lasius/modelsEntityRe
 import { type ModelsInvitationStatusResponse } from '~/services/api/lasius/modelsInvitationStatusResponse'
 import { type ModelsUserOrganisation } from '~/services/api/lasius/modelsUserOrganisation'
 
-interface Props {
+interface Properties {
   invitation: ModelsInvitationStatusResponse
   organisations: ModelsUserOrganisation[]
 }
 
-export const InvitationUserConfirm = ({ invitation, organisations }: Props) => {
+const getDefaultOrganisation = (
+  inv: ModelsInvitationStatusResponse['invitation'],
+  organisations: ModelsUserOrganisation[],
+): ModelsEntityReference | undefined => {
+  if (
+    inv.type === 'JoinProjectInvitation' &&
+    'sharedByOrganisationReference' in inv &&
+    organisations.some((o) => o.organisationReference.id === inv.sharedByOrganisationReference.id)
+  ) {
+    return inv.sharedByOrganisationReference
+  }
+  // Fall back to private org or first org
+  const fallbackOrg = organisations.find((o) => o.private) ?? organisations[0]
+  return fallbackOrg?.organisationReference
+}
+
+export const InvitationUserConfirm = ({ invitation, organisations }: Properties) => {
   const { t } = useTranslation('invitation')
   const navigate = useNavigate()
-  const [orgAssignment, setOrgAssignment] = useState<ModelsEntityReference>()
+  const [orgAssignment, setOrgAssignment] = useState(() =>
+    getDefaultOrganisation(invitation.invitation, organisations),
+  )
   const acceptInvitation = useAcceptInvitation()
   const declineInvitation = useDeclineInvitation()
 
-  useEffect(() => {
-    const inv = invitation.invitation
-    if (
-      inv.type === 'JoinProjectInvitation' &&
-      'sharedByOrganisationReference' in inv &&
-      organisations.some(
-        (o) =>
-          o.organisationReference.id === inv.sharedByOrganisationReference.id,
-      )
-    ) {
-      setOrgAssignment(inv.sharedByOrganisationReference)
-    } else {
-      // Fall back to private org or first org
-      const fallbackOrg =
-        organisations.find((o) => o.private) ?? organisations[0]
-      setOrgAssignment(fallbackOrg?.organisationReference)
-    }
-  }, [organisations, invitation.invitation])
+  // Select the default organisation again when the loader data changes
+  const [defaultSource, setDefaultSource] = useState({
+    invitation: invitation.invitation,
+    organisations,
+  })
+  if (
+    defaultSource.invitation !== invitation.invitation ||
+    defaultSource.organisations !== organisations
+  ) {
+    setDefaultSource({ invitation: invitation.invitation, organisations })
+    setOrgAssignment(getDefaultOrganisation(invitation.invitation, organisations))
+  }
 
   const handleAcceptInvite = () => {
     acceptInvitation.submit({
@@ -98,48 +110,36 @@ export const InvitationUserConfirm = ({ invitation, organisations }: Props) => {
       {invitation.invitation.type === 'JoinProjectInvitation' && (
         <Alert className="max-w-md" variant="info">
           {t('messages.invitedToProject', {
-            defaultValue:
-              'You have been invited by {{inviter}} to join project {{project}}.',
+            defaultValue: 'You have been invited by {{inviter}} to join project {{project}}.',
             inviter: invitation.invitation.createdBy.key,
             project: invitation.invitation.projectReference.key,
           })}
         </Alert>
       )}
-      <Card
-        className="border-base-300 bg-base-100 w-full max-w-md border"
-        shadow="xl"
-      >
+      <Card className="border-base-300 bg-base-100 w-full max-w-md border" shadow="xl">
         <CardBody className="gap-6 p-8">
           <div className="flex justify-center">
             <Logo />
           </div>
           <div className="h-4" />
           <FormBody>
-            {organisations &&
-              invitation.invitation.type === 'JoinProjectInvitation' && (
-                <>
-                  <FormElement>
-                    <p>
-                      {t(
-                        'messages.selectOrganisation',
-                        'Select the organisation you would like to add this project to:',
-                      )}
-                    </p>
-                  </FormElement>
-                  <FormElement>
-                    <OrgSwitcherModal
-                      onSelect={setOrgAssignment}
-                      selected={orgAssignment}
-                    />
-                  </FormElement>
-                </>
-              )}
+            {organisations && invitation.invitation.type === 'JoinProjectInvitation' && (
+              <>
+                <FormElement>
+                  <p>
+                    {t(
+                      'messages.selectOrganisation',
+                      'Select the organisation you would like to add this project to:',
+                    )}
+                  </p>
+                </FormElement>
+                <FormElement>
+                  <OrgSwitcherModal onSelect={setOrgAssignment} selected={orgAssignment} />
+                </FormElement>
+              </>
+            )}
             <FormElement>
-              <Button
-                data-testid="invite-accept-btn"
-                fullWidth
-                onClick={handleAcceptInvite}
-              >
+              <Button data-testid="invite-accept-btn" fullWidth onClick={handleAcceptInvite}>
                 {t('actions.accept', {
                   defaultValue: 'Accept invitation',
                 })}
@@ -148,8 +148,7 @@ export const InvitationUserConfirm = ({ invitation, organisations }: Props) => {
                 data-testid="invite-reject-btn"
                 fullWidth
                 onClick={handleRejectInvite}
-                variant="ghost"
-              >
+                variant="ghost">
                 {t('actions.reject', {
                   defaultValue: 'Reject invitation',
                 })}

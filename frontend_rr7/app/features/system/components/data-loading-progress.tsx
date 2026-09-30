@@ -17,11 +17,11 @@
  *
  */
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigation } from 'react-router'
 
 import { nivoPalette } from '~/components/ui/charts/nivo-theme'
-import { useGlobalLoading } from '~/stores/ui-store'
+import { useIsGlobalLoading } from '~/stores/ui-store'
 
 const SHOW_DELAY = 100 // ms - delay before showing progress bar
 const MIN_INCREMENT = 5 // Minimum % to increment per tick
@@ -42,55 +42,61 @@ const DEFAULT_GRADIENT_COLORS = [nivoPalette[0], nivoPalette[1], nivoPalette[2]]
 export const DataLoadingProgress = () => {
   const navigation = useNavigation()
   const isNavigating = navigation.state !== 'idle'
-  const isGlobalLoading = useGlobalLoading()
+  const isGlobalLoading = useIsGlobalLoading()
   const isLoading = isNavigating || isGlobalLoading
 
   const [shouldShow, setShouldShow] = useState(false)
   const [progress, setProgress] = useState(0)
 
-  // Use deterministic colors for SSR, then randomize on client after mount
+  // Use deterministic colors for SSR, then randomize on the client when the bar first shows
   const [gradientColors, setGradientColors] = useState(DEFAULT_GRADIENT_COLORS)
+  const hasRandomGradientColorsReference = useRef(false)
 
-  useEffect(() => {
-    setGradientColors(getRandomGradientColors())
-  }, [])
+  // Reset progress when loading starts. Complete the progress bar when loading finishes.
+  const [wasLoading, setWasLoading] = useState(isLoading)
+  if (isLoading !== wasLoading) {
+    setWasLoading(isLoading)
+    if (isLoading) {
+      setProgress(0)
+    } else if (shouldShow) {
+      setProgress(100)
+    }
+  }
 
   useEffect(() => {
     let showTimer: null | ReturnType<typeof setTimeout> = null
     let progressTimer: null | ReturnType<typeof setInterval> = null
 
     if (isLoading) {
-      // Reset progress and delay showing the bar
-      setProgress(0)
-
+      // Delay showing the bar
       showTimer = setTimeout(() => {
+        if (!hasRandomGradientColorsReference.current) {
+          hasRandomGradientColorsReference.current = true
+          setGradientColors(getRandomGradientColors())
+        }
         setShouldShow(true)
 
         // Start incrementing progress randomly
         progressTimer = setInterval(() => {
-          setProgress((prev) => {
-            if (prev >= MAX_PROGRESS) {
-              return prev // Stay at MAX_PROGRESS until loading completes
+          setProgress((previous) => {
+            if (previous >= MAX_PROGRESS) {
+              return previous // Stay at MAX_PROGRESS until loading completes
             }
 
             // Random increment between MIN and MAX
             const increment =
-              Math.floor(Math.random() * (MAX_INCREMENT - MIN_INCREMENT + 1)) +
-              MIN_INCREMENT
+              Math.floor(Math.random() * (MAX_INCREMENT - MIN_INCREMENT + 1)) + MIN_INCREMENT
 
             // Use exponential slowdown as we approach MAX_PROGRESS
-            const slowdownFactor = 1 - prev / MAX_PROGRESS
+            const slowdownFactor = 1 - previous / MAX_PROGRESS
             const adjustedIncrement = increment * slowdownFactor
 
-            return Math.min(prev + adjustedIncrement, MAX_PROGRESS)
+            return Math.min(previous + adjustedIncrement, MAX_PROGRESS)
           })
         }, TICK_INTERVAL)
       }, SHOW_DELAY)
     } else {
-      // Complete the progress bar when loading finishes
       if (shouldShow) {
-        setProgress(100)
-
         // Hide after a short delay to show completion
         const hideTimer = setTimeout(() => {
           setShouldShow(false)
@@ -113,8 +119,7 @@ export const DataLoadingProgress = () => {
       style={{
         opacity: shouldShow ? 1 : 0,
         transition: 'opacity 0.2s ease',
-      }}
-    >
+      }}>
       <div
         className="h-full shadow-lg"
         style={{

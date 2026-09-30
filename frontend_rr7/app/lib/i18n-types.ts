@@ -17,12 +17,17 @@
  *
  */
 
+import { type Namespace, type TFunction } from 'i18next'
+
 /**
  * Loosely-typed translation function for use in Zod schema factories,
  * helper functions that build dynamic keys, and server-side fallbacks.
  */
 
-export type SchemaTranslationFn = (key: string, ...args: any[]) => string
+export type SchemaTranslationFunction = (
+  key: string,
+  defaultValue: string | { defaultValue: string },
+) => string
 
 /**
  * Erase i18next's branded type so a typed `t` can be passed to schema
@@ -31,4 +36,7 @@ export type SchemaTranslationFn = (key: string, ...args: any[]) => string
  * Usage: `createSchema(untyped(t))`, `getLabel(type, untyped(t))`
  */
 
-export const untyped = (t: any): SchemaTranslationFn => t
+export const untyped =
+  (translate: TFunction<Namespace>): SchemaTranslationFunction =>
+  (key, defaultValue) =>
+    typeof defaultValue === 'string' ? translate(key, defaultValue) : translate(key, defaultValue)

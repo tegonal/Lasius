@@ -38,7 +38,7 @@ type StopAndStartPayload = {
  * Chains useStopUserBookingCurrent → useStartUserBookingCurrent.
  */
 export function useStopAndStart() {
-  const pendingStartRef = useRef<null | {
+  const pendingStartReference = useRef<null | {
     orgId: string
     projectId: string
     start: string
@@ -49,14 +49,16 @@ export function useStopAndStart() {
 
   const stopApi = useStopUserBookingCurrent({
     onSuccess: () => {
-      if (pendingStartRef.current) {
-        const { orgId, projectId, start, tags } = pendingStartRef.current
-        pendingStartRef.current = null
-        startApi.submit({
-          body: { projectId, start, tags },
-          orgId,
-        })
+      if (!pendingStartReference.current) {
+        return
       }
+
+      const { orgId, projectId, start, tags } = pendingStartReference.current
+      pendingStartReference.current = null
+      startApi.submit({
+        body: { projectId, start, tags },
+        orgId,
+      })
     },
   })
 
@@ -66,7 +68,7 @@ export function useStopAndStart() {
 
       if (currentBookingId) {
         // Stop first, then start on completion via onSuccess callback
-        pendingStartRef.current = { orgId, projectId, start, tags }
+        pendingStartReference.current = { orgId, projectId, start, tags }
         stopApi.submit({
           body: { end: start },
           bookingId: currentBookingId,
@@ -83,10 +85,7 @@ export function useStopAndStart() {
     [stopApi, startApi],
   )
 
-  const state =
-    stopApi.state !== 'idle' || startApi.state !== 'idle'
-      ? 'submitting'
-      : 'idle'
+  const state = stopApi.state !== 'idle' || startApi.state !== 'idle' ? 'submitting' : 'idle'
 
   return { state, submit }
 }

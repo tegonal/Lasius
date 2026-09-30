@@ -25,15 +25,14 @@ import { OrganisationMembers } from '~/features/organisation/components/organisa
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { type ModelsUserStub } from '~/services/api/lasius'
 
-type Props = {
+type Properties = {
   onRefresh: () => void
   users: ModelsUserStub[]
 }
 
-export const OrganisationDetail = ({ onRefresh, users }: Props) => {
+export const OrganisationDetail = ({ onRefresh, users }: Properties) => {
   const { t } = useTranslation('organisation')
-  const { isAdministrator, selectedOrganisation, selectedOrganisationId } =
-    useOrganisation()
+  const { isAdministrator, selectedOrganisation, selectedOrganisationId } = useOrganisation()
 
   return (
     <div className="flex flex-col gap-8">

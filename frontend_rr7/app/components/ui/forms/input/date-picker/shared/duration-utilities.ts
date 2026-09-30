@@ -29,10 +29,7 @@ export function addMinutesToDate(date: Date, minutes: number): Date {
 /**
  * Calculate duration in minutes between two dates
  */
-export function calculateDurationMinutes(
-  start: Date | null,
-  end: Date | null,
-): number {
+export function calculateDurationMinutes(start: Date | null, end: Date | null): number {
   if (!start || !end) return 0
   const diffMs = end.getTime() - start.getTime()
   return Math.floor(diffMs / (1000 * 60))
@@ -56,9 +53,9 @@ export function parseDuration(durationString: string): null | number {
   const match = /^(-)?(\d{1,2}):(\d{2})$/.exec(durationString)
   if (!match) return null
 
-  const [, sign, hoursStr = '0', minutesStr = '0'] = match
-  const hours = Number.parseInt(hoursStr, 10)
-  const minutes = Number.parseInt(minutesStr, 10)
+  const [, sign, hoursString = '0', minutesString = '0'] = match
+  const hours = Number(hoursString)
+  const minutes = Number(minutesString)
 
   if (minutes >= 60) return null
 

@@ -37,20 +37,18 @@ import { ManageProjectMembersStats } from './manage-project-members-stats'
 import { ManageUserInviteByEmailForm } from './manage-user-invite-by-email-form'
 import { ProjectMembersList } from './project-members-list'
 
-type Props = {
+type Properties = {
   item: ModelsProject | ModelsUserProject
   onCancel?: () => void
   onSave: () => void
 }
 
-export const ManageProjectMembers = ({ item, onCancel }: Props) => {
+export const ManageProjectMembers = ({ item, onCancel }: Properties) => {
   const { t } = useTranslation()
   const { selectedOrganisationId } = useOrganisation()
-  const projectId = 'id' in item ? item.id : item.projectReference.id
+  const projectId = ('id' in item ? item : item.projectReference).id
   const projectOrganisationId =
-    'organisationReference' in item
-      ? item.organisationReference.id
-      : selectedOrganisationId
+    'organisationReference' in item ? item.organisationReference.id : selectedOrganisationId
   const [users, setUsers] = useState<ModelsUserStub[]>([])
   const [isInviteOpen, setIsInviteOpen] = useState(false)
   const [isAddExistingOpen, setIsAddExistingOpen] = useState(false)
@@ -115,9 +113,7 @@ export const ManageProjectMembers = ({ item, onCancel }: Props) => {
     <>
       <div className="flex min-h-0 flex-1 flex-col">
         <ModalCloseButton onClose={handleClose} />
-        <ModalHeader className="mb-4">
-          {t('organisation:members.title', 'Members')}
-        </ModalHeader>
+        <ModalHeader className="mb-4">{t('organisation:members.title', 'Members')}</ModalHeader>
         <ManageProjectMembersStats
           memberCount={users.length}
           onAddExisting={handleAddExistingOpen}

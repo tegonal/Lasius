@@ -43,13 +43,13 @@ const defaultDateRange = dateOptions[0]
  * Manages filter state, Conform form binding, and URL sync for booking history.
  */
 export function useBookingHistoryFilters() {
-  const [searchParams] = useSearchParams()
+  const [searchParameters] = useSearchParams()
 
-  const projectIdFromUrl = searchParams.get('projectId') ?? ''
-  const userIdFromUrl = searchParams.get('userId') ?? ''
-  const tagsFromUrl = searchParams.get('tags') ?? ''
+  const projectIdFromUrl = searchParameters.get('projectId') ?? ''
+  const userIdFromUrl = searchParameters.get('userId') ?? ''
+  const tagsFromUrl = searchParameters.get('tags') ?? ''
 
-  const initialRange = getInitialDateRange(searchParams)
+  const initialRange = getInitialDateRange(searchParameters)
 
   const [form, fields] = useForm({
     constraint: getZodConstraint(filterSchema),
@@ -117,79 +117,72 @@ export function useBookingHistoryFilters() {
   }
 
   // Sync filter values to URL search params so the loader refetches and filters are shareable
-  const [, setSearchParams] = useSearchParams()
-  const prevFrom = useRef(fromValue)
-  const prevTo = useRef(toValue)
-  const prevProjectId = useRef(projectIdValue)
-  const prevUserId = useRef(userIdValue)
-  const prevTags = useRef(tagsValue)
+  const [, setSearchParameters] = useSearchParams()
+  const previousFrom = useRef(fromValue)
+  const previousTo = useRef(toValue)
+  const previousProjectId = useRef(projectIdValue)
+  const previousUserId = useRef(userIdValue)
+  const previousTags = useRef(tagsValue)
 
   useEffect(() => {
     if (!fromValue || !toValue) return
     if (
-      fromValue === prevFrom.current &&
-      toValue === prevTo.current &&
-      projectIdValue === prevProjectId.current &&
-      userIdValue === prevUserId.current &&
-      tagsValue === prevTags.current
+      fromValue === previousFrom.current &&
+      toValue === previousTo.current &&
+      projectIdValue === previousProjectId.current &&
+      userIdValue === previousUserId.current &&
+      tagsValue === previousTags.current
     )
       return
 
-    prevFrom.current = fromValue
-    prevTo.current = toValue
-    prevProjectId.current = projectIdValue
-    prevUserId.current = userIdValue
-    prevTags.current = tagsValue
+    previousFrom.current = fromValue
+    previousTo.current = toValue
+    previousProjectId.current = projectIdValue
+    previousUserId.current = userIdValue
+    previousTags.current = tagsValue
 
-    setSearchParams(
-      (prev) => {
-        prev.set('from', fromValue)
-        prev.set('to', toValue)
+    setSearchParameters(
+      (previous) => {
+        previous.set('from', fromValue)
+        previous.set('to', toValue)
         if (projectIdValue) {
-          prev.set('projectId', projectIdValue)
+          previous.set('projectId', projectIdValue)
         } else {
-          prev.delete('projectId')
+          previous.delete('projectId')
         }
         if (userIdValue) {
-          prev.set('userId', userIdValue)
+          previous.set('userId', userIdValue)
         } else {
-          prev.delete('userId')
+          previous.delete('userId')
         }
         if (tagsValue) {
-          prev.set('tags', tagsValue)
+          previous.set('tags', tagsValue)
         } else {
-          prev.delete('tags')
+          previous.delete('tags')
         }
-        return prev
+        return previous
       },
       { replace: true },
     )
-  }, [
-    fromValue,
-    toValue,
-    projectIdValue,
-    userIdValue,
-    tagsValue,
-    setSearchParams,
-  ])
+  }, [fromValue, toValue, projectIdValue, userIdValue, tagsValue, setSearchParameters])
 
   // Set initial search params on mount if missing
-  const didSetInitialParams = useRef(false)
+  const didSetInitialParameters = useRef(false)
   useEffect(() => {
-    if (didSetInitialParams.current) return
-    didSetInitialParams.current = true
+    if (didSetInitialParameters.current) return
+    didSetInitialParameters.current = true
 
-    if (!searchParams.has('from') || !searchParams.has('to')) {
-      setSearchParams(
-        (prev) => {
-          prev.set('from', initialRange.from)
-          prev.set('to', initialRange.to)
-          return prev
+    if (!searchParameters.has('from') || !searchParameters.has('to')) {
+      setSearchParameters(
+        (previous) => {
+          previous.set('from', initialRange.from)
+          previous.set('to', initialRange.to)
+          return previous
         },
         { replace: true },
       )
     }
-  }, [searchParams, setSearchParams, initialRange.from, initialRange.to])
+  }, [searchParameters, setSearchParameters, initialRange.from, initialRange.to])
 
   // Parse tags for filtering
   const tags: ModelsTag[] = useMemo(() => {
@@ -214,11 +207,11 @@ export function useBookingHistoryFilters() {
   }
 }
 
-function getInitialDateRange(searchParams: URLSearchParams) {
-  const fromParam = searchParams.get('from')
-  const toParam = searchParams.get('to')
-  if (fromParam && toParam) {
-    return { from: fromParam, to: toParam }
+function getInitialDateRange(searchParameters: URLSearchParams) {
+  const fromParameter = searchParameters.get('from')
+  const toParameter = searchParameters.get('to')
+  if (fromParameter && toParameter) {
+    return { from: fromParameter, to: toParameter }
   }
   if (defaultDateRange) {
     return defaultDateRange.dateRangeFn(new Date())

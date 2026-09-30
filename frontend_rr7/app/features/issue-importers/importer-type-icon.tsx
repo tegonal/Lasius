@@ -17,22 +17,18 @@
  *
  */
 
-import {
-  SiGithub,
-  SiGitlab,
-  SiJirasoftware,
-} from '@icons-pack/react-simple-icons'
+import { SiGithub, SiGitlab, SiJirasoftware } from '@icons-pack/react-simple-icons'
 import { Layers } from 'lucide-react'
 
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 
-type Props = {
+type Properties = {
   className?: string
   type: ImporterType
 }
 
-export const ImporterTypeIcon = ({ className = 'h-5 w-5', type }: Props) => {
+export const ImporterTypeIcon = ({ className = 'h-5 w-5', type }: Properties) => {
   switch (type) {
     case 'github': {
       return <SiGithub className={className} />

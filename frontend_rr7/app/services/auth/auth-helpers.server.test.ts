@@ -102,11 +102,11 @@ describe('mergeAuthHeaders', () => {
   })
 
   it('propagates Set-Cookie from Headers instance', () => {
-    const setCookieHeaders = new Headers({
+    const cookieHeaders = new Headers({
       'Set-Cookie': 'session=abc123',
     })
     const authResult: AuthResult = {
-      headers: setCookieHeaders,
+      headers: cookieHeaders,
       session: mockSession,
     }
     const merged = mergeAuthHeaders(authResult)

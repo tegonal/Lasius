@@ -6,10 +6,10 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type ModelsUserToProjectAssignmentRole = typeof ModelsUserToProjectAssignmentRole[keyof typeof ModelsUserToProjectAssignmentRole];
-
+export type ModelsUserToProjectAssignmentRole =
+  (typeof ModelsUserToProjectAssignmentRole)[keyof typeof ModelsUserToProjectAssignmentRole]
 
 export const ModelsUserToProjectAssignmentRole = {
   ProjectMember: 'ProjectMember',
   ProjectAdministrator: 'ProjectAdministrator',
-} as const;
+} as const

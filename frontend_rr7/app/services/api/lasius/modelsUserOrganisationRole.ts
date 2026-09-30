@@ -6,10 +6,10 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type ModelsUserOrganisationRole = typeof ModelsUserOrganisationRole[keyof typeof ModelsUserOrganisationRole];
-
+export type ModelsUserOrganisationRole =
+  (typeof ModelsUserOrganisationRole)[keyof typeof ModelsUserOrganisationRole]
 
 export const ModelsUserOrganisationRole = {
   OrganisationMember: 'OrganisationMember',
   OrganisationAdministrator: 'OrganisationAdministrator',
-} as const;
+} as const

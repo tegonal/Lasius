@@ -23,11 +23,7 @@ import {
 } from '~/lib/organisation-helpers.server'
 import { dateOptions } from '~/lib/utils/date/date-options'
 import { ModelsUserOrganisationRole } from '~/services/api/lasius/modelsUserOrganisationRole'
-import {
-  authHeaders,
-  mergeAuthHeaders,
-  requireUser,
-} from '~/services/auth/auth-helpers.server'
+import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
 
 /**
  * Shared context for user stats routes.
@@ -63,24 +59,22 @@ export const loadStatsContext = async (request: Request) => {
  * Same as loadStatsContext but adds admin role check.
  */
 export const loadOrgStatsContext = async (request: Request) => {
-  const ctx = await loadStatsContext(request)
+  const context = await loadStatsContext(request)
 
-  const selectedOrg = ctx.organisations.find(
-    (o) => o.organisationReference.id === ctx.selectedOrgId,
+  const selectedOrg = context.organisations.find(
+    (o) => o.organisationReference.id === context.selectedOrgId,
   )
-  const isAdmin =
-    selectedOrg?.role === ModelsUserOrganisationRole.OrganisationAdministrator
+  const isAdmin = selectedOrg?.role === ModelsUserOrganisationRole.OrganisationAdministrator
 
   if (!isAdmin) {
     throw new Response('Forbidden', { status: 403 })
   }
 
-  return ctx
+  return context
 }
 
 /**
  * Return merged auth headers for the stats response.
  */
-export const statsResponseHeaders = (
-  auth: Awaited<ReturnType<typeof requireUser>>,
-) => mergeAuthHeaders(auth)
+export const statsResponseHeaders = (auth: Awaited<ReturnType<typeof requireUser>>) =>
+  mergeAuthHeaders(auth)

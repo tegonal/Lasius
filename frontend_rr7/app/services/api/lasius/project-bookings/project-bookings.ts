@@ -22,10 +22,9 @@ export type getProjectBookingListResponse200 = {
   status: 200
 }
 
-export type getProjectBookingListResponseSuccess =
-  getProjectBookingListResponse200 & {
-    headers: Headers
-  }
+export type getProjectBookingListResponseSuccess = getProjectBookingListResponse200 & {
+  headers: Headers
+}
 export type getProjectBookingListResponse = getProjectBookingListResponseSuccess
 
 export const getGetProjectBookingListUrl = (

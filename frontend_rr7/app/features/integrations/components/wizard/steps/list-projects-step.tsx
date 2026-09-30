@@ -32,7 +32,7 @@ import {
 } from '~/services/api/lasius'
 import { useListProjects } from '~/services/api/lasius-hooks/issue-importers/issue-importers'
 
-type Props = {
+type Properties = {
   configId: ModelsIssueImporterConfigId
   importerType: ImporterType
   onMappingsChange: (mappings: MappingsByExternalProject) => void
@@ -46,16 +46,18 @@ export const ListProjectsStep = ({
   onMappingsChange,
   onProjectsLoaded,
   orgId,
-}: Props) => {
+}: Properties) => {
   const { t } = useTranslation('integrations')
   const { mappings, removeMapping, upsertMapping } = useMappingState()
 
   const [projects, setProjects] = useState<ModelsExternalProject[]>([])
   const [fetchError, setFetchError] = useState<null | string>(null)
-  const hasFetchedRef = useRef(false)
-  const lastConfigIdRef = useRef(configId)
-  const onProjectsLoadedRef = useRef(onProjectsLoaded)
-  onProjectsLoadedRef.current = onProjectsLoaded
+  const hasFetchedReference = useRef(false)
+  const lastConfigIdReference = useRef(configId)
+  const onProjectsLoadedReference = useRef(onProjectsLoaded)
+  useEffect(() => {
+    onProjectsLoadedReference.current = onProjectsLoaded
+  })
 
   const { isError, isLoading, submit } = useListProjects({
     onError: () => {
@@ -65,34 +67,39 @@ export const ListProjectsStep = ({
       const loadedProjects = response?.projects ?? []
       setProjects(loadedProjects)
       setFetchError(null)
-      if (onProjectsLoadedRef.current && loadedProjects.length > 0) {
-        onProjectsLoadedRef.current(loadedProjects)
+      if (onProjectsLoadedReference.current && loadedProjects.length > 0) {
+        onProjectsLoadedReference.current(loadedProjects)
       }
     },
   })
 
   // Reset fetch flag when configId changes
   useEffect(() => {
-    if (lastConfigIdRef.current !== configId) {
-      hasFetchedRef.current = false
-      lastConfigIdRef.current = configId
+    if (lastConfigIdReference.current === configId) {
+      return
     }
+
+    hasFetchedReference.current = false
+    lastConfigIdReference.current = configId
   }, [configId])
 
   // Fetch projects on mount
   useEffect(() => {
-    if (hasFetchedRef.current) return
+    if (hasFetchedReference.current) return
 
-    hasFetchedRef.current = true
+    hasFetchedReference.current = true
     submit({ configId, orgId })
   }, [configId, orgId, submit])
 
-  const onMappingsChangeRef = useRef(onMappingsChange)
-  onMappingsChangeRef.current = onMappingsChange
+  const onMappingsChangeReference = useRef(onMappingsChange)
+  // This effect must stay above the sync effect, so that the sync effect calls the current callback.
+  useEffect(() => {
+    onMappingsChangeReference.current = onMappingsChange
+  })
 
   // Sync mappings to parent whenever they change
   useEffect(() => {
-    onMappingsChangeRef.current(mappings)
+    onMappingsChangeReference.current(mappings)
   }, [mappings])
 
   return (

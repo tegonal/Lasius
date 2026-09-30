@@ -20,7 +20,7 @@
 import { type FieldMetadata, useInputControl } from '@conform-to/react'
 import { differenceBy, uniqBy } from 'es-toolkit'
 import { Plus } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
@@ -36,18 +36,18 @@ import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-but
 import { type ModelsSimpleTag } from '~/services/api/lasius/modelsSimpleTag'
 import { type ModelsTag } from '~/services/api/lasius/modelsTag'
 
-type BaseProps = {
+type BaseProperties = {
   hideAddButton?: boolean
   onAddClick?: () => void
   tags: ModelsTag[]
 }
 
-type CallbackProps = BaseProps & {
+type CallbackProperties = BaseProperties & {
   field?: never
   onTagsChange: (tags: ModelsTag[]) => void
 }
 
-type ConformProps = BaseProps & {
+type ConformProperties = BaseProperties & {
   field: FieldMetadata<string>
   /** @deprecated Use field prop instead */
   name?: never
@@ -55,7 +55,7 @@ type ConformProps = BaseProps & {
   tagGroupIndex?: never
 }
 
-type InputTagsAdminProps = CallbackProps | ConformProps
+type InputTagsAdminProperties = CallbackProperties | ConformProperties
 
 /**
  * Shared tag admin UI — receives tags and callbacks from mode-specific wrapper.
@@ -65,13 +65,14 @@ const TagsAdminCore = ({
   onAddClick,
   onTagsChange,
   selectedTags,
-}: BaseProps & {
+}: BaseProperties & {
   onTagsChange: (tags: ModelsTag[]) => void
   selectedTags: ModelsTag[]
 }) => {
   const { t } = useTranslation('common')
   const [inputText, setInputText] = useState<string>('')
   const [showAddModal, setShowAddModal] = useState(false)
+  const tagInputReference = useRef<HTMLInputElement>(null)
 
   const removeTag = (tag: ModelsTag) => {
     const toRemove = selectedTags.filter((t) => t.id === tag.id)
@@ -80,23 +81,27 @@ const TagsAdminCore = ({
   }
 
   const addTag = () => {
-    if (inputText.trim()) {
-      const newTag: ModelsSimpleTag = {
-        id: inputText.trim(),
-        type: 'SimpleTag',
-      }
-      const merged = uniqBy([...selectedTags, newTag], (t) => t.id)
-      setInputText('')
-      onTagsChange(merged)
-      setShowAddModal(false)
+    if (!inputText.trim()) {
+      return
     }
+
+    const newTag: ModelsSimpleTag = {
+      id: inputText.trim(),
+      type: 'SimpleTag',
+    }
+    const merged = uniqBy([...selectedTags, newTag], (t) => t.id)
+    setInputText('')
+    onTagsChange(merged)
+    setShowAddModal(false)
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      addTag()
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key !== 'Enter') {
+      return
     }
+
+    event.preventDefault()
+    addTag()
   }
 
   const handleAddClick = () => {
@@ -122,20 +127,19 @@ const TagsAdminCore = ({
           shape="circle"
           size="sm"
           type="button"
-          variant="secondary"
-        >
+          variant="secondary">
           <LucideIcon icon={Plus} size={18} />
         </Button>
       )}
 
       {/* Add Tag Modal */}
       <Modal
+        initialFocus={tagInputReference}
         onClose={() => {
           setShowAddModal(false)
           setInputText('')
         }}
-        open={showAddModal}
-      >
+        open={showAddModal}>
         <ModalCloseButton
           onClose={() => {
             setShowAddModal(false)
@@ -150,12 +154,12 @@ const TagsAdminCore = ({
           </Label>
           <Input
             autoComplete="off"
-            autoFocus
-            onChange={(e) => setInputText(e.target.value)}
+            onChange={(event) => setInputText(event.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={t('tag-manager:enterTagName', {
               defaultValue: 'Enter tag name',
             })}
+            ref={tagInputReference}
             value={inputText}
           />
         </FormElement>
@@ -169,8 +173,7 @@ const TagsAdminCore = ({
               setInputText('')
             }}
             type="button"
-            variant="secondary"
-          >
+            variant="secondary">
             {t('actions.close', 'Close')}
           </Button>
         </ButtonGroup>
@@ -185,7 +188,7 @@ const ConformTagsAdmin = ({
   hideAddButton,
   onAddClick,
   tags,
-}: BaseProps & { field: FieldMetadata<string> }) => {
+}: BaseProperties & { field: FieldMetadata<string> }) => {
   const control = useInputControl(field)
 
   const selectedTags: ModelsTag[] = useMemo(() => {
@@ -216,24 +219,24 @@ const ConformTagsAdmin = ({
   )
 }
 
-export const InputTagsAdmin = (props: InputTagsAdminProps) => {
-  if (props.field) {
+export const InputTagsAdmin = (properties: InputTagsAdminProperties) => {
+  if (properties.field) {
     return (
       <ConformTagsAdmin
-        field={props.field}
-        hideAddButton={props.hideAddButton}
-        onAddClick={props.onAddClick}
-        tags={props.tags}
+        field={properties.field}
+        hideAddButton={properties.hideAddButton}
+        onAddClick={properties.onAddClick}
+        tags={properties.tags}
       />
     )
   }
   return (
     <TagsAdminCore
-      hideAddButton={props.hideAddButton}
-      onAddClick={props.onAddClick}
-      onTagsChange={props.onTagsChange}
-      selectedTags={props.tags}
-      tags={props.tags}
+      hideAddButton={properties.hideAddButton}
+      onAddClick={properties.onAddClick}
+      onTagsChange={properties.onTagsChange}
+      selectedTags={properties.tags}
+      tags={properties.tags}
     />
   )
 }

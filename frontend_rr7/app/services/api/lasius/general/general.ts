@@ -52,9 +52,7 @@ export const getGetCsrfTokenUrl = () => {
   return `/csrf-token`
 }
 
-export const getCsrfToken = async (
-  options?: RequestInit,
-): Promise<getCsrfTokenResponse> => {
+export const getCsrfToken = async (options?: RequestInit): Promise<getCsrfTokenResponse> => {
   return lasiusFetch<getCsrfTokenResponse>(getGetCsrfTokenUrl(), {
     ...options,
     method: 'GET',

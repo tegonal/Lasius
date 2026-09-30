@@ -22,8 +22,8 @@ import { useCallback, useEffect, useState } from 'react'
 export function useIsWindowFocused(): boolean {
   const [windowIsActive, setWindowIsActive] = useState(true)
 
-  const handleActivity = useCallback((e: Event) => {
-    switch (e.type) {
+  const handleActivity = useCallback((event: Event) => {
+    switch (event.type) {
       case 'blur': {
         setWindowIsActive(false)
 

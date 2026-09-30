@@ -23,19 +23,17 @@ import { FormatDate } from '~/components/ui/data-display/format-date'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { type ModelsBooking } from '~/services/api/lasius'
 
-type Props = {
+type Properties = {
   item: ModelsBooking
   orientation?: 'horizontal' | 'vertical'
 }
 
-export const BookingFromTo = ({ item, orientation = 'vertical' }: Props) => {
+export const BookingFromTo = ({ item, orientation = 'vertical' }: Properties) => {
   const { end, start } = item
   const isHorizontal = orientation === 'horizontal'
 
   const startTime = (
-    <div
-      className={isHorizontal ? 'flex items-center justify-center' : undefined}
-    >
+    <div className={isHorizontal ? 'flex items-center justify-center' : undefined}>
       <span className="text-sm opacity-50">
         <FormatDate date={start.dateTime} format="time" />
       </span>
@@ -43,9 +41,7 @@ export const BookingFromTo = ({ item, orientation = 'vertical' }: Props) => {
   )
 
   const endTime = (
-    <div
-      className={isHorizontal ? 'flex items-center justify-center' : undefined}
-    >
+    <div className={isHorizontal ? 'flex items-center justify-center' : undefined}>
       <span className="text-sm opacity-50">
         <FormatDate date={end?.dateTime || ''} format="time" />
       </span>
@@ -64,9 +60,7 @@ export const BookingFromTo = ({ item, orientation = 'vertical' }: Props) => {
   )
 
   return (
-    <div
-      className={`flex ${isHorizontal ? 'flex-row' : 'flex-col'} gap-1 leading-normal`}
-    >
+    <div className={`flex ${isHorizontal ? 'flex-row' : 'flex-col'} gap-1 leading-normal`}>
       {isHorizontal ? (
         <>
           {startTime}

@@ -19,18 +19,14 @@
 
 import { format, parseISO } from 'date-fns'
 
-interface Props {
+interface Properties {
   lastActivityDate?: null | string
 }
 
-export const ProjectLastActivity = ({ lastActivityDate }: Props) => {
+export const ProjectLastActivity = ({ lastActivityDate }: Properties) => {
   if (!lastActivityDate) {
     return <span className="text-sm">—</span>
   }
 
-  return (
-    <span className="text-sm">
-      {format(parseISO(lastActivityDate), 'dd.MM.yyyy')}
-    </span>
-  )
+  return <span className="text-sm">{format(parseISO(lastActivityDate), 'dd.MM.yyyy')}</span>
 }

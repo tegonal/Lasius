@@ -24,11 +24,11 @@ import { ImporterTypeIcon } from '~/features/issue-importers/importer-type-icon'
 import { untyped } from '~/lib/i18n-types'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 
-type Props = {
+type Properties = {
   type: ImporterType
 }
 
-export const ImporterTypeBadge = ({ type }: Props) => {
+export const ImporterTypeBadge = ({ type }: Properties) => {
   const { t } = useTranslation('integrations')
 
   return (

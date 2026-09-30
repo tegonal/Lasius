@@ -19,11 +19,7 @@
 
 import { data } from 'react-router'
 
-import {
-  ColumnCenter,
-  ColumnRight,
-  innerGridClasses,
-} from '~/components/ui/layouts/layout-columns'
+import { ColumnCenter, ColumnRight, innerGridClasses } from '~/components/ui/layouts/layout-columns'
 import { ScrollArea } from '~/components/ui/layouts/scroll-area'
 import { BookingCurrent } from '~/features/bookings/components/booking-current'
 import { BookingListSelectedDay } from '~/features/bookings/components/booking-list-selected-day'
@@ -45,11 +41,7 @@ import {
   getUserBookingListByOrganisation,
 } from '~/services/api/lasius/user-bookings/user-bookings'
 import { getFavoriteBookingList } from '~/services/api/lasius/user-favorites/user-favorites'
-import {
-  authHeaders,
-  mergeAuthHeaders,
-  requireUser,
-} from '~/services/auth/auth-helpers.server'
+import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/user.layout._index'
 
@@ -65,20 +57,20 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
   // Read selected date from URL search param, fall back to today
   const url = new URL(request.url)
-  const dateParam = url.searchParams.get('date')
+  const dateParameter = url.searchParams.get('date')
   const selectedDate =
-    dateParam && !Number.isNaN(new Date(dateParam).getTime())
-      ? dateParam
+    dateParameter && !Number.isNaN(new Date(dateParameter).getTime())
+      ? dateParameter
       : formatISOLocale(new Date())
   const dayTimespan = apiTimespanDay(selectedDate)
 
   // Fetch day bookings, current booking, favorites, org current bookings, and users in parallel
   const [
-    dayBookingsRes,
-    currentBookingRes,
-    favoritesRes,
-    orgCurrentBookingsRes,
-    orgUsersRes,
+    dayBookingsResponse,
+    currentBookingResponse,
+    favoritesResponse,
+    orgCurrentBookingsResponse,
+    orgUsersResponse,
   ] = await Promise.all([
     getUserBookingListByOrganisation(selectedOrgId, dayTimespan, { headers }),
     getUserBookingCurrent({ headers }),
@@ -87,16 +79,14 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     getOrganisationUserList(selectedOrgId, { headers }),
   ])
 
-  const dayBookings = dayBookingsRes.data ?? []
-  const currentBooking = currentBookingRes.data
-  const favorites = favoritesRes.data?.favorites ?? []
-  const orgCurrentBookings = orgCurrentBookingsRes.data?.timeBookings ?? []
-  const orgUsers = orgUsersRes.data ?? []
+  const dayBookings = dayBookingsResponse.data ?? []
+  const currentBooking = currentBookingResponse.data
+  const favorites = favoritesResponse.data?.favorites ?? []
+  const orgCurrentBookings = orgCurrentBookingsResponse.data?.timeBookings ?? []
+  const orgUsers = orgUsersResponse.data ?? []
 
   // Compute planned working hours for the selected day's weekday
-  const selectedOrg = organisations.find(
-    (o) => o.organisationReference.id === selectedOrgId,
-  )
+  const selectedOrg = organisations.find((o) => o.organisationReference.id === selectedOrgId)
   const plannedHours = selectedOrg?.plannedWorkingHours
   const weekdayNames: Record<number, string> = {
     0: 'sunday',
@@ -107,15 +97,16 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     5: 'friday',
     6: 'saturday',
   }
-  const selectedWeekday =
-    weekdayNames[new Date(selectedDate).getDay()] ?? 'monday'
+  const selectedWeekday = weekdayNames[new Date(selectedDate).getDay()] ?? 'monday'
   const plannedHoursDay =
     (plannedHours as Record<string, number> | undefined)?.[selectedWeekday] ?? 0
 
   // Compute day summary
   const daySummary = getModelsBookingSummary(dayBookings)
-  const { fulfilledPercentage, progressBarPercentage } =
-    getExpectedVsBookedPercentage(plannedHoursDay, daySummary.hours)
+  const { fulfilledPercentage, progressBarPercentage } = getExpectedVsBookedPercentage(
+    plannedHoursDay,
+    daySummary.hours,
+  )
 
   // Augment bookings list for display
   const augmentedBookings = augmentBookingsList(dayBookings)

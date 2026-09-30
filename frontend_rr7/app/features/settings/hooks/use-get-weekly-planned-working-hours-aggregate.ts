@@ -34,9 +34,7 @@ export const useGetWeeklyPlannedWorkingHoursAggregate = () => {
     const aggregate: ModelsWorkingHours = { ...plannedWorkingHoursStub }
     for (const org of organisations) {
       const hours = org.plannedWorkingHours ?? plannedWorkingHoursStub
-      for (const key of Object.keys(
-        aggregate,
-      ) as (keyof ModelsWorkingHours)[]) {
+      for (const key of Object.keys(aggregate) as (keyof ModelsWorkingHours)[]) {
         aggregate[key] += hours[key]
       }
     }
@@ -49,11 +47,7 @@ export const useGetWeeklyPlannedWorkingHoursAggregate = () => {
   )
 
   const selectedOrganisationWorkingHoursTotal = useMemo(
-    () =>
-      Object.values(selectedOrganisationWorkingHours).reduce(
-        (sum, h) => sum + h,
-        0,
-      ),
+    () => Object.values(selectedOrganisationWorkingHours).reduce((sum, h) => sum + h, 0),
     [selectedOrganisationWorkingHours],
   )
 

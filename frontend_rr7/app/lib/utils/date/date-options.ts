@@ -42,8 +42,7 @@ import { formatISOLocale } from '~/lib/utils/dates'
  * Stub `t` function — at module level we just return the defaultValue (or key).
  * The real `t()` runs in the component where `useTranslation` is available.
  */
-const t = (key: string, opts?: { defaultValue?: string }) =>
-  opts?.defaultValue ?? key
+const t = (key: string, options?: { defaultValue?: string }) => options?.defaultValue ?? key
 
 export interface DateOption {
   dateRangeFn: (day: Date) => { from: string; to: string }
@@ -93,40 +92,40 @@ export const dateOptions: DateOption[] = [
   },
   {
     dateRangeFn: (day: Date) => {
-      const ref = addWeeks(day, -1)
+      const reference = addWeeks(day, -1)
       return {
-        from: formatISOLocale(startOfWeek(ref, { weekStartsOn: 1 })),
-        to: formatISOLocale(endOfWeek(ref, { weekStartsOn: 1 })),
+        from: formatISOLocale(startOfWeek(reference, { weekStartsOn: 1 })),
+        to: formatISOLocale(endOfWeek(reference, { weekStartsOn: 1 })),
       }
     },
     name: t('time.lastWeek', { defaultValue: 'Last week' }),
   },
   {
     dateRangeFn: (day: Date) => {
-      const ref = addMonths(day, -1)
+      const reference = addMonths(day, -1)
       return {
-        from: formatISOLocale(startOfMonth(ref)),
-        to: formatISOLocale(endOfMonth(ref)),
+        from: formatISOLocale(startOfMonth(reference)),
+        to: formatISOLocale(endOfMonth(reference)),
       }
     },
     name: t('time.lastMonth', { defaultValue: 'Last month' }),
   },
   {
     dateRangeFn: (day: Date) => {
-      const ref = addQuarters(day, -1)
+      const reference = addQuarters(day, -1)
       return {
-        from: formatISOLocale(startOfQuarter(ref)),
-        to: formatISOLocale(endOfQuarter(ref)),
+        from: formatISOLocale(startOfQuarter(reference)),
+        to: formatISOLocale(endOfQuarter(reference)),
       }
     },
     name: t('time.lastQuarter', { defaultValue: 'Last quarter' }),
   },
   {
     dateRangeFn: (day: Date) => {
-      const ref = addYears(day, -1)
+      const reference = addYears(day, -1)
       return {
-        from: formatISOLocale(startOfYear(ref)),
-        to: formatISOLocale(endOfYear(ref)),
+        from: formatISOLocale(startOfYear(reference)),
+        to: formatISOLocale(endOfYear(reference)),
       }
     },
     name: t('time.lastYear', { defaultValue: 'Last year' }),

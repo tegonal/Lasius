@@ -17,10 +17,10 @@
  *
  */
 
-type Props = {
+type Properties = {
   children: React.ReactNode
 }
 
-export const ColumnList = ({ children }: Props) => (
+export const ColumnList = ({ children }: Properties) => (
   <div className="flex w-full flex-col gap-4 px-6 pt-3 pb-4">{children}</div>
 )

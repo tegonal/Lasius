@@ -28,7 +28,7 @@ import {
   subMonths,
 } from 'date-fns'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useCalendarMonth } from '~/features/calendar/hooks/use-calendar-month'
@@ -36,52 +36,64 @@ import { cn } from '~/lib/utils/cn'
 import { getDateLocale } from '~/lib/utils/date-locale'
 import { formatISOLocale, type IsoDateString } from '~/lib/utils/dates'
 
-type CalendarDisplayProps = {
+type CalendarDisplayProperties = {
   onChange: (date: IsoDateString) => void
   value: IsoDateString
 }
 
-export const CalendarDisplay = ({ onChange, value }: CalendarDisplayProps) => {
+// useCalendarMonth returns the weekday labels from Monday to Sunday.
+// A narrow label repeats (T, S), so the column key comes from this list.
+const WEEKDAY_IDS = [
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+  'sunday',
+] as const
+
+const getTimeOfDay = (date: Date) => [date.getHours(), date.getMinutes()]
+
+export const CalendarDisplay = ({ onChange, value }: CalendarDisplayProperties) => {
   const { i18n, t } = useTranslation('common')
   const locale = getDateLocale(i18n.language)
   const selectedDate = new Date(value)
-  const [originalTime, setOriginalTime] = useState<number[]>([0, 0])
+  const [originalTime, setOriginalTime] = useState<number[]>(() =>
+    value ? getTimeOfDay(new Date(value)) : [0, 0],
+  )
 
   const [viewDate, setViewDate] = useState(() => startOfMonth(selectedDate))
   const { monthDays, startOffset, weekDays } = useCalendarMonth(viewDate)
 
-  // Store the original time when the value changes
-  useEffect(() => {
+  // Store the original time and show its month when the value changes
+  const [previousValue, setPreviousValue] = useState(value)
+  if (value !== previousValue) {
+    setPreviousValue(value)
     if (value) {
       const date = new Date(value)
-      setOriginalTime([date.getHours(), date.getMinutes()])
+      setOriginalTime(getTimeOfDay(date))
       setViewDate(startOfMonth(date))
     }
-  }, [value])
+  }
 
-  const handlePrevMonth = () => setViewDate((prev) => subMonths(prev, 1))
-  const handleNextMonth = () => setViewDate((prev) => addMonths(prev, 1))
+  const handlePreviousMonth = () => setViewDate((previous) => subMonths(previous, 1))
+  const handleNextMonth = () => setViewDate((previous) => addMonths(previous, 1))
 
   const handleDayClick = (day: Date) => {
     // Preserve the original time when selecting a new date
-    const updatedDate = setMinutes(
-      setHours(day, originalTime[0] ?? 0),
-      originalTime[1] ?? 0,
-    )
+    const updatedDate = setMinutes(setHours(day, originalTime[0] ?? 0), originalTime[1] ?? 0)
     onChange(formatISOLocale(updatedDate))
   }
 
   const handleToday = () => {
     const today = new Date()
     setViewDate(startOfMonth(today))
-    const updatedDate = setMinutes(
-      setHours(today, originalTime[0] ?? 0),
-      originalTime[1] ?? 0,
-    )
+    const updatedDate = setMinutes(setHours(today, originalTime[0] ?? 0), originalTime[1] ?? 0)
     onChange(formatISOLocale(updatedDate))
   }
 
-  const showTodayButton = !isToday(selectedDate)
+  const isShowTodayButton = !isToday(selectedDate)
 
   return (
     <div className="w-full select-none">
@@ -91,52 +103,45 @@ export const CalendarDisplay = ({ onChange, value }: CalendarDisplayProps) => {
             defaultValue: 'Previous month',
           })}
           className="btn btn-ghost btn-sm btn-circle"
-          onClick={handlePrevMonth}
-        >
+          onClick={handlePreviousMonth}>
           <ChevronLeft size={16} />
         </button>
         <div className="flex flex-col items-center">
-          <div className="text-sm font-medium">
-            {format(viewDate, 'MMMM', { locale })}
-          </div>
-          <div className="text-base-content/60 text-xs">
-            {format(viewDate, 'yyyy')}
-          </div>
+          <div className="text-sm font-medium">{format(viewDate, 'MMMM', { locale })}</div>
+          <div className="text-base-content/60 text-xs">{format(viewDate, 'yyyy')}</div>
         </div>
         <button
           aria-label={t('calendar.navigation.nextMonth', {
             defaultValue: 'Next month',
           })}
           className="btn btn-ghost btn-sm btn-circle"
-          onClick={handleNextMonth}
-        >
+          onClick={handleNextMonth}>
           <ChevronRight size={16} />
         </button>
       </div>
 
-      {showTodayButton && (
+      {isShowTodayButton && (
         <div className="mb-2 flex justify-center">
           <button
             aria-label={t('time.today', 'Today')}
             className="btn btn-ghost btn-xs"
-            onClick={handleToday}
-          >
+            onClick={handleToday}>
             {t('time.today', 'Today')}
           </button>
         </div>
       )}
 
       <div className="mb-1 grid grid-cols-7 gap-1 text-center">
-        {weekDays.map((day, index) => (
-          <div className="text-base-content/60 text-xs font-medium" key={index}>
-            {day}
+        {WEEKDAY_IDS.map((weekdayId, index) => (
+          <div className="text-base-content/60 text-xs font-medium" key={weekdayId}>
+            {weekDays[index]}
           </div>
         ))}
       </div>
 
       <div className="grid w-full grid-cols-7 gap-1">
-        {Array.from({ length: startOffset }, (_, i) => (
-          <div key={`filler-${i}`} />
+        {Array.from({ length: startOffset }, (_, index) => (
+          <div key={`filler-${index}`} />
         ))}
         {monthDays.map((day) => {
           const isSelected = isSameDay(day, selectedDate)
@@ -152,8 +157,7 @@ export const CalendarDisplay = ({ onChange, value }: CalendarDisplayProps) => {
                 isTodayDate && !isSelected && 'text-secondary font-bold',
               )}
               key={day.toISOString()}
-              onClick={() => handleDayClick(day)}
-            >
+              onClick={() => handleDayClick(day)}>
               {day.getDate()}
             </button>
           )

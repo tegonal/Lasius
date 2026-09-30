@@ -52,25 +52,16 @@ const toggleSwitchVariants = cva('toggle', {
   },
 })
 
-export interface ToggleSwitchProps
+export interface ToggleSwitchProperties
   extends
-    Omit<
-      React.InputHTMLAttributes<HTMLInputElement>,
-      'onChange' | 'size' | 'type'
-    >,
+    Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'type'>,
     VariantProps<typeof toggleSwitchVariants> {
   checked: boolean
-  onChange: (checked: boolean) => void
+  onChange: (isChecked: boolean) => void
 }
 
-export const ToggleSwitch = React.forwardRef<
-  HTMLInputElement,
-  ToggleSwitchProps
->(
-  (
-    { checked, className, disabled, onChange, size, state, variant, ...props },
-    ref,
-  ) => {
+export const ToggleSwitch = React.forwardRef<HTMLInputElement, ToggleSwitchProperties>(
+  ({ checked, className, disabled, onChange, size, state, variant, ...properties }, reference) => {
     const toggleState = disabled ? 'disabled' : state || 'default'
 
     return (
@@ -85,10 +76,10 @@ export const ToggleSwitch = React.forwardRef<
           className,
         )}
         disabled={disabled}
-        onChange={(e) => onChange(e.target.checked)}
-        ref={ref}
+        onChange={(event) => onChange(event.target.checked)}
+        ref={reference}
         type="checkbox"
-        {...props}
+        {...properties}
       />
     )
   },

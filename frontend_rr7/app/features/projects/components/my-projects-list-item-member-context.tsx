@@ -26,11 +26,11 @@ import { ContextBarDivider } from '~/features/context-menu/context-bar-divider'
 import { ContextBody } from '~/features/context-menu/context-body'
 import { type ModelsUserProject } from '~/services/api/lasius/modelsUserProject'
 
-type Props = {
+type Properties = {
   item: ModelsUserProject
 }
 
-export const MyProjectsListItemMemberContext = ({ item }: Props) => {
+export const MyProjectsListItemMemberContext = ({ item }: Properties) => {
   return (
     <ContextBody hash={item.projectReference.id} variant="compact">
       <ContextButtonOpen data-testid="project-ctx-open-btn" />

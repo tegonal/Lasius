@@ -42,14 +42,14 @@ interface StarParticle {
 }
 
 const generateStars = (originX: number, originY: number): StarParticle[] =>
-  Array.from({ length: STAR_COUNT }, (_, i) => {
-    const angle = (360 / STAR_COUNT) * i + (Math.random() * 30 - 15)
+  Array.from({ length: STAR_COUNT }, (_, index) => {
+    const angle = (360 / STAR_COUNT) * index + (Math.random() * 30 - 15)
     const distance = 20 + Math.random() * 30
     return {
       angle,
       distance,
       drift: (Math.random() - 0.5) * 15,
-      id: i,
+      id: index,
       rotation: Math.random() * 1440 - 720,
       size: 8 + Math.random() * 10,
       speed: 0.7 + Math.random() * 0.6,
@@ -81,8 +81,7 @@ const StarExplosion = ({ stars }: { stars: StarParticle[] }) => {
               left: star.x,
               top: star.y,
               width: star.size,
-            }}
-          >
+            }}>
             <StarSvg />
           </div>
         )
@@ -92,79 +91,77 @@ const StarExplosion = ({ stars }: { stars: StarParticle[] }) => {
   )
 }
 
-export const ProgressBar = memo(
-  ({ label, percentage }: { label: string; percentage: number }) => {
-    const [animated, setAnimated] = useState(false)
-    const [stars, setStars] = useState<null | StarParticle[]>(null)
-    const fillRef = useRef<HTMLDivElement>(null)
-    const hasExplodedRef = useRef(false)
+export const ProgressBar = memo(({ label, percentage }: { label: string; percentage: number }) => {
+  const [animated, setAnimated] = useState(false)
+  const [stars, setStars] = useState<null | StarParticle[]>(null)
+  const fillReference = useRef<HTMLDivElement>(null)
+  const hasExplodedReference = useRef(false)
 
-    const visualPercentage = percentage >= 100 ? 100 : Math.min(percentage, 97)
-    const normalizedDisplayPercentage = Math.min(visualPercentage, 100)
-    const overflowDisplayPercentage = Math.max(0, percentage - 100)
+  const visualPercentage = percentage >= 100 ? 100 : Math.min(percentage, 97)
+  const normalizedDisplayPercentage = Math.min(visualPercentage, 100)
+  const overflowDisplayPercentage = Math.max(0, percentage - 100)
 
-    useEffect(() => {
-      // Trigger animation after mount
-      const frame = requestAnimationFrame(() => {
-        setAnimated(true)
-      })
-      return () => cancelAnimationFrame(frame)
-    }, [])
+  useEffect(() => {
+    // Trigger animation after mount
+    const frame = requestAnimationFrame(() => {
+      setAnimated(true)
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [])
 
-    useEffect(() => {
-      if (percentage < 100) {
-        hasExplodedRef.current = false
-      }
-    }, [percentage])
+  useEffect(() => {
+    if (percentage < 100) {
+      hasExplodedReference.current = false
+    }
+  }, [percentage])
 
-    const handleTransitionEnd = useCallback(() => {
-      if (percentage >= 100 && !hasExplodedRef.current && fillRef.current) {
-        hasExplodedRef.current = true
-        const rect = fillRef.current.getBoundingClientRect()
-        const originX = rect.right
-        const originY = rect.top + rect.height / 2
-        const newStars = generateStars(originX, originY)
-        setStars(newStars)
-        setTimeout(() => setStars(null), STAR_ANIMATION_DURATION)
-      }
-    }, [percentage])
+  const handleTransitionEnd = useCallback(() => {
+    if (!(percentage >= 100 && !hasExplodedReference.current && fillReference.current)) {
+      return
+    }
 
-    return (
-      <div className="relative w-full" title={label}>
-        <div className="space-y-[2px]">
-          {/* Main progress bar */}
-          <div className="bg-base-content/25 relative h-[5px] w-full overflow-visible text-[10px]">
-            <div className="absolute inset-0 overflow-hidden">
-              <div
-                className="bg-secondary dark:bg-base-content/75 h-full max-w-full"
-                onTransitionEnd={handleTransitionEnd}
-                ref={fillRef}
-                style={{
-                  transition: 'width 1s ease-in-out',
-                  width: animated ? `${normalizedDisplayPercentage}%` : '0%',
-                  willChange: 'width',
-                }}
-              />
-            </div>
-          </div>
-          {/* Overflow bar — fills when > 100% */}
-          <div className="bg-base-content/15 h-[3px] w-full overflow-hidden">
-            {percentage > 100 && (
-              <div
-                className="bg-warning h-full max-w-full"
-                style={{
-                  transition: `width 1s ease-in-out ${normalizedDisplayPercentage === 100 ? '1s' : '0s'}`,
-                  width: animated
-                    ? `${Math.min(overflowDisplayPercentage, 100)}%`
-                    : '0%',
-                  willChange: 'width',
-                }}
-              />
-            )}
+    hasExplodedReference.current = true
+    const rect = fillReference.current.getBoundingClientRect()
+    const originX = rect.right
+    const originY = rect.top + rect.height / 2
+    const newStars = generateStars(originX, originY)
+    setStars(newStars)
+    setTimeout(() => setStars(null), STAR_ANIMATION_DURATION)
+  }, [percentage])
+
+  return (
+    <div className="relative w-full" title={label}>
+      <div className="space-y-[2px]">
+        {/* Main progress bar */}
+        <div className="bg-base-content/25 relative h-[5px] w-full overflow-visible text-[10px]">
+          <div className="absolute inset-0 overflow-hidden">
+            <div
+              className="bg-secondary dark:bg-base-content/75 h-full max-w-full"
+              onTransitionEnd={handleTransitionEnd}
+              ref={fillReference}
+              style={{
+                transition: 'width 1s ease-in-out',
+                width: animated ? `${normalizedDisplayPercentage}%` : '0%',
+                willChange: 'width',
+              }}
+            />
           </div>
         </div>
-        {stars && <StarExplosion stars={stars} />}
+        {/* Overflow bar — fills when > 100% */}
+        <div className="bg-base-content/15 h-[3px] w-full overflow-hidden">
+          {percentage > 100 && (
+            <div
+              className="bg-warning h-full max-w-full"
+              style={{
+                transition: `width 1s ease-in-out ${normalizedDisplayPercentage === 100 ? '1s' : '0s'}`,
+                width: animated ? `${Math.min(overflowDisplayPercentage, 100)}%` : '0%',
+                willChange: 'width',
+              }}
+            />
+          )}
+        </div>
       </div>
-    )
-  },
-)
+      {stars && <StarExplosion stars={stars} />}
+    </div>
+  )
+})

@@ -35,9 +35,7 @@ describe('routeToHelpFile', () => {
   })
 
   it('falls back to hyphenated path for unmapped routes', () => {
-    expect(routeToHelpFile('/organisation/projects')).toBe(
-      'organisation-projects',
-    )
+    expect(routeToHelpFile('/organisation/projects')).toBe('organisation-projects')
   })
 
   it('handles dynamic segments', () => {
@@ -61,14 +59,8 @@ describe('routeToHelpFile', () => {
     expect(routeToHelpFile('/user/stats/projects')).toBe('user-stats')
     expect(routeToHelpFile('/user/stats/tags')).toBe('user-stats')
     expect(routeToHelpFile('/organisation/stats')).toBe('organisation-stats')
-    expect(routeToHelpFile('/organisation/stats/projects')).toBe(
-      'organisation-stats',
-    )
-    expect(routeToHelpFile('/organisation/stats/tags')).toBe(
-      'organisation-stats',
-    )
-    expect(routeToHelpFile('/organisation/stats/users')).toBe(
-      'organisation-stats',
-    )
+    expect(routeToHelpFile('/organisation/stats/projects')).toBe('organisation-stats')
+    expect(routeToHelpFile('/organisation/stats/tags')).toBe('organisation-stats')
+    expect(routeToHelpFile('/organisation/stats/users')).toBe('organisation-stats')
   })
 })

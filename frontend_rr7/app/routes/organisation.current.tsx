@@ -20,11 +20,7 @@
 import { useState } from 'react'
 import { data } from 'react-router'
 
-import {
-  ColumnCenter,
-  ColumnRight,
-  innerGridClasses,
-} from '~/components/ui/layouts/layout-columns'
+import { ColumnCenter, ColumnRight, innerGridClasses } from '~/components/ui/layouts/layout-columns'
 import { ScrollArea } from '~/components/ui/layouts/scroll-area'
 import { Modal } from '~/components/ui/overlays/modal/modal'
 import { OrganisationAddUpdateForm } from '~/features/organisation/components/organisation-add-update-form'
@@ -40,11 +36,7 @@ import {
 import { type ModelsUserStub } from '~/services/api/lasius'
 import { useGetOrganisationUserList } from '~/services/api/lasius-hooks/organisations/organisations'
 import { getOrganisationUserList } from '~/services/api/lasius/organisations/organisations'
-import {
-  authHeaders,
-  mergeAuthHeaders,
-  requireUser,
-} from '~/services/auth/auth-helpers.server'
+import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/organisation.current'
 
@@ -77,12 +69,8 @@ const OrganisationCurrentPage = ({ loaderData }: Route.ComponentProps) => {
   const userListApi = useGetOrganisationUserList()
 
   // Use client-refreshed data if available, otherwise loader data
-  const resolvedApiData = Array.isArray(userListApi.data)
-    ? userListApi.data
-    : []
-  const users: ModelsUserStub[] = userListApi.data
-    ? resolvedApiData
-    : loaderData.users
+  const resolvedApiData = Array.isArray(userListApi.data) ? userListApi.data : []
+  const users: ModelsUserStub[] = userListApi.data ? resolvedApiData : loaderData.users
 
   const handleRefresh = () => {
     userListApi.submit({ orgId: selectedOrganisationId })

@@ -6,8 +6,8 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type GetAggregatedStatisticsByProjectGranularity = typeof GetAggregatedStatisticsByProjectGranularity[keyof typeof GetAggregatedStatisticsByProjectGranularity];
-
+export type GetAggregatedStatisticsByProjectGranularity =
+  (typeof GetAggregatedStatisticsByProjectGranularity)[keyof typeof GetAggregatedStatisticsByProjectGranularity]
 
 export const GetAggregatedStatisticsByProjectGranularity = {
   All: 'All',
@@ -15,4 +15,4 @@ export const GetAggregatedStatisticsByProjectGranularity = {
   Month: 'Month',
   Week: 'Week',
   Day: 'Day',
-} as const;
+} as const

@@ -19,18 +19,9 @@
 
 import { describe, expect, it } from 'vitest'
 
-import { augmentBookingsList } from './augment-bookings-list'
+import { type ModelsBooking } from '~/services/api/lasius'
 
-interface ModelsBooking {
-  bookingHash: number
-  end?: null | { dateTime: string; zone: string }
-  id: string
-  organisationReference: { id: string; key: string }
-  projectReference: { id: string; key: string }
-  start: { dateTime: string; zone: string }
-  tags: Array<{ id: string; type: string }>
-  userReference: { id: string; key: string }
-}
+import { augmentBookingsList } from './augment-bookings-list'
 
 const makeBooking = (
   overrides: Partial<ModelsBooking> & { start: ModelsBooking['start'] },
@@ -58,7 +49,7 @@ describe('augmentBookingsList', () => {
       end: { dateTime: '2024-01-15T11:00:00.000Z', zone: 'UTC' },
       start: { dateTime: '2024-01-15T10:00:00.000Z', zone: 'UTC' },
     })
-    const result = augmentBookingsList([booking] as any)
+    const result = augmentBookingsList([booking])
     expect(result).toHaveLength(1)
     expect(result[0]!.isMostRecent).toBe(true)
     expect(result[0]!.hasNextItem).toBe(false)
@@ -76,7 +67,7 @@ describe('augmentBookingsList', () => {
       id: 'b',
       start: { dateTime: '2024-01-15T09:00:00.000Z', zone: 'UTC' },
     })
-    const result = augmentBookingsList([a, b] as any)
+    const result = augmentBookingsList([a, b])
     // Sorted desc: a (10:00), b (09:00)
     const first = result[0]!
     expect(first.id).toBe('a')
@@ -97,7 +88,7 @@ describe('augmentBookingsList', () => {
       id: 'b',
       start: { dateTime: '2024-01-15T08:00:00.000Z', zone: 'UTC' },
     })
-    const result = augmentBookingsList([a, b] as any)
+    const result = augmentBookingsList([a, b])
     const first = result[0]!
     expect(first.id).toBe('a')
     expect(first.allowInsert).toBe(true)
@@ -115,7 +106,7 @@ describe('augmentBookingsList', () => {
       id: 'b',
       start: { dateTime: '2024-01-15T09:00:00.000Z', zone: 'UTC' },
     })
-    const result = augmentBookingsList([a, b] as any)
+    const result = augmentBookingsList([a, b])
     const first = result[0]!
     expect(first.id).toBe('a')
     expect(first.overlapsWithNext).toBeDefined()
@@ -138,7 +129,7 @@ describe('augmentBookingsList', () => {
       id: 'c',
       start: { dateTime: '2024-01-15T08:00:00.000Z', zone: 'UTC' },
     })
-    const result = augmentBookingsList([c, a, b] as any)
+    const result = augmentBookingsList([c, a, b])
     // Sorted desc: a, b, c
     expect(result[0]!.isMostRecent).toBe(true)
     expect(result[1]!.isMostRecent).toBe(false)

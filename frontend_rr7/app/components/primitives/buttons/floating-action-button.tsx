@@ -64,7 +64,7 @@ export interface FABAction {
   variant?: 'accent' | 'ghost' | 'neutral' | 'primary' | 'secondary'
 }
 
-interface FloatingActionButtonProps extends VariantProps<typeof fabVariants> {
+interface FloatingActionButtonProperties extends VariantProps<typeof fabVariants> {
   actions: FABAction[]
   ariaLabel?: string
   className?: string
@@ -93,28 +93,25 @@ export const FloatingActionButton = ({
   position = 'bottomRight',
   size = 'lg',
   zIndex = 10,
-}: FloatingActionButtonProps) => {
+}: FloatingActionButtonProperties) => {
   const { t } = useTranslation('common')
-  const containerRef = useRef<HTMLDivElement>(null)
+  const containerReference = useRef<HTMLDivElement>(null)
   const resolvedAriaLabel =
-    ariaLabel ??
-    t('common.actions.openActionsMenu', { defaultValue: 'Open actions menu' })
-  const sizeClass =
-    size === 'sm' ? 'btn-sm' : size === 'lg' ? 'btn-lg' : 'btn-md'
+    ariaLabel ?? t('common.actions.openActionsMenu', { defaultValue: 'Open actions menu' })
+  const sizeClass = size === 'sm' ? 'btn-sm' : size === 'lg' ? 'btn-lg' : 'btn-md'
 
   const handleClose = () => {
     // DaisyUI FAB uses :focus-within to show/hide actions.
     // Blur the container to close the menu.
-    containerRef.current?.blur()
+    containerReference.current?.blur()
     ;(document.activeElement as HTMLElement)?.blur()
   }
 
   return (
     <div
       className={cn(fabVariants({ layout, position }), className)}
-      ref={containerRef}
-      style={{ zIndex }}
-    >
+      ref={containerReference}
+      style={{ zIndex }}>
       {/* Primary FAB button - uses div for Safari accessibility bug */}
       <div
         aria-label={resolvedAriaLabel}
@@ -124,8 +121,7 @@ export const FloatingActionButton = ({
           'bg-primary-gradient hover:bg-primary-gradient-hover border-none text-white',
         )}
         role="button"
-        tabIndex={0}
-      >
+        tabIndex={0}>
         {icon}
       </div>
 
@@ -137,8 +133,7 @@ export const FloatingActionButton = ({
               defaultValue: 'Close actions menu',
             })}
             className={cn('btn btn-circle', sizeClass, 'btn-ghost')}
-            onClick={handleClose}
-          >
+            onClick={handleClose}>
             {closeIcon}
           </button>
         </div>
@@ -160,8 +155,7 @@ export const FloatingActionButton = ({
             className={cn('btn btn-circle', sizeClass, variantClass)}
             key={action.id}
             onClick={action.onClick}
-            title={action.label}
-          >
+            title={action.label}>
             {action.icon}
           </button>
         )

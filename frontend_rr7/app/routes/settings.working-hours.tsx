@@ -17,16 +17,12 @@
  *
  */
 
-import {
-  ColumnCenter,
-  ColumnRight,
-  innerGridClasses,
-} from '~/components/ui/layouts/layout-columns'
+import { ColumnCenter, ColumnRight, innerGridClasses } from '~/components/ui/layouts/layout-columns'
 import { WorkingHoursGrid } from '~/features/settings/components/working-hours-grid'
 import { WorkingHoursRightColumn } from '~/features/settings/components/working-hours-right-column'
 import { WorkingHoursStats } from '~/features/settings/components/working-hours-stats'
 
-const WorkingHoursPage = () => {
+export default function WorkingHoursPage() {
   return (
     <div className={innerGridClasses} data-testid="settings-working-hours-page">
       <ColumnCenter>
@@ -41,5 +37,3 @@ const WorkingHoursPage = () => {
     </div>
   )
 }
-
-export default WorkingHoursPage

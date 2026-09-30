@@ -26,9 +26,9 @@ import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { ContextButtonWrapper } from '../context-button-wrapper'
 import { useContextMenu } from '../hooks/use-context-menu'
 
-type Props = { variant?: 'compact' | 'default' }
+type Properties = { variant?: 'compact' | 'default' }
 
-export const ContextButtonClose = ({ variant = 'default' }: Props) => {
+export const ContextButtonClose = ({ variant = 'default' }: Properties) => {
   const { handleCloseAll } = useContextMenu()
   const { t } = useTranslation('context-menu')
 
@@ -40,8 +40,7 @@ export const ContextButtonClose = ({ variant = 'default' }: Props) => {
         onClick={handleCloseAll}
         shape="circle"
         title={t('actions.close', 'Close context menu')}
-        variant="contextIcon"
-      >
+        variant="contextIcon">
         <LucideIcon icon={XIcon} strokeWidth={2} />
       </Button>
     </ContextButtonWrapper>

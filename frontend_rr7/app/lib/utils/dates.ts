@@ -34,19 +34,16 @@ import {
 import { fromZonedTime, toZonedTime } from 'date-fns-tz'
 
 import { type ModelsLocalDateTimeWithTimeZone } from '~/services/api/lasius'
-import {
-  type Granularity,
-  type ModelsWorkingHoursWeekdays,
-} from '~/types/common'
+import { type Granularity, type ModelsWorkingHoursWeekdays } from '~/types/common'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export type ApiDateParam = string
+export type ApiDateParameter = string
 export type IsoDateString = string
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-export const apiUrlDateParamFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS"
+export const apiUrlDateParameterFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS"
 
 // ─── Core date utilities ─────────────────────────────────────────────────────
 
@@ -75,16 +72,11 @@ export const formatISOLocale = (d: Date): string => {
     const absOffset = Math.abs(offset)
     const hours = Math.floor(absOffset / 60)
     const minutes = Math.round(absOffset % 60)
-    return (
-      sign + addLeadingZeros(hours, 2) + delimiter + addLeadingZeros(minutes, 2)
-    )
+    return sign + addLeadingZeros(hours, 2) + delimiter + addLeadingZeros(minutes, 2)
   }
 
   if (isValid(d)) {
-    return (
-      format(d, "yyyy-MM-dd'T'HH':'mm':'ss'.'SSS") +
-      formatTimezoneShort(d.getTimezoneOffset())
-    )
+    return format(d, "yyyy-MM-dd'T'HH':'mm':'ss'.'SSS") + formatTimezoneShort(d.getTimezoneOffset())
   }
   return ''
 }
@@ -115,13 +107,11 @@ export const getMonthOfDate = (date: Date | IsoDateString): IsoDateString[] => {
 
 // ─── API timespan helpers ────────────────────────────────────────────────────
 
-export const formatDateTimeToURLParam = (date: Date): ApiDateParam => {
+export const formatDateTimeToURLParameter = (date: Date): ApiDateParameter => {
   if (!date || !isValid(date)) {
-    throw new Error(
-      `Invalid date provided to formatDateTimeToURLParam: ${date}`,
-    )
+    throw new Error(`Invalid date provided to formatDateTimeToURLParameter: ${date}`)
   }
-  return format(date, apiUrlDateParamFormat)
+  return format(date, apiUrlDateParameterFormat)
 }
 
 /**
@@ -130,15 +120,11 @@ export const formatDateTimeToURLParam = (date: Date): ApiDateParam => {
  */
 export const apiTimespanWeek = (
   date: IsoDateString,
-): { from: ApiDateParam; to: ApiDateParam } => {
-  const dateObj = new Date(date)
+): { from: ApiDateParameter; to: ApiDateParameter } => {
+  const dateObject = new Date(date)
   return {
-    from: formatDateTimeToURLParam(
-      startOfDay(startOfWeek(dateObj, { weekStartsOn: 1 })),
-    ),
-    to: formatDateTimeToURLParam(
-      endOfDay(endOfWeek(dateObj, { weekStartsOn: 1 })),
-    ),
+    from: formatDateTimeToURLParameter(startOfDay(startOfWeek(dateObject, { weekStartsOn: 1 }))),
+    to: formatDateTimeToURLParameter(endOfDay(endOfWeek(dateObject, { weekStartsOn: 1 }))),
   }
 }
 
@@ -148,11 +134,11 @@ export const apiTimespanWeek = (
  */
 export const apiTimespanMonth = (
   date: IsoDateString,
-): { from: ApiDateParam; to: ApiDateParam } => {
-  const dateObj = new Date(date)
+): { from: ApiDateParameter; to: ApiDateParameter } => {
+  const dateObject = new Date(date)
   return {
-    from: formatDateTimeToURLParam(startOfDay(startOfMonth(dateObj))),
-    to: formatDateTimeToURLParam(endOfDay(endOfMonth(dateObj))),
+    from: formatDateTimeToURLParameter(startOfDay(startOfMonth(dateObject))),
+    to: formatDateTimeToURLParameter(endOfDay(endOfMonth(dateObject))),
   }
 }
 
@@ -161,11 +147,11 @@ export const apiTimespanMonth = (
  */
 export const apiTimespanDay = (
   date: IsoDateString,
-): { from: ApiDateParam; to: ApiDateParam } => {
-  const dateObj = new Date(date)
+): { from: ApiDateParameter; to: ApiDateParameter } => {
+  const dateObject = new Date(date)
   return {
-    from: formatDateTimeToURLParam(startOfDay(dateObj)),
-    to: formatDateTimeToURLParam(endOfDay(dateObj)),
+    from: formatDateTimeToURLParameter(startOfDay(dateObject)),
+    to: formatDateTimeToURLParameter(endOfDay(dateObject)),
   }
 }
 
@@ -176,33 +162,33 @@ export const apiTimespanDay = (
 export const apiTimespanFromTo = (
   from: IsoDateString,
   to: IsoDateString,
-): null | { from: ApiDateParam; to: ApiDateParam } => {
+): null | { from: ApiDateParameter; to: ApiDateParameter } => {
   if (!from || !to) return null
   const fromDate = new Date(from)
   const toDate = new Date(to)
   if (!isValid(fromDate) || !isValid(toDate)) return null
   return {
-    from: formatDateTimeToURLParam(startOfDay(fromDate)),
-    to: formatDateTimeToURLParam(endOfDay(toDate)),
+    from: formatDateTimeToURLParameter(startOfDay(fromDate)),
+    to: formatDateTimeToURLParameter(endOfDay(toDate)),
   }
 }
 
 export const apiUrlDateFormat = 'yyyy-MM-dd'
 
-export const formatDateToURLParam = (date: Date): ApiDateParam =>
+export const formatDateToURLParameter = (date: Date): ApiDateParameter =>
   format(date, apiUrlDateFormat)
 
 export const apiDatespanFromTo = (
   from: IsoDateString,
   to: IsoDateString,
-): null | { from: ApiDateParam; to: ApiDateParam } => {
+): null | { from: ApiDateParameter; to: ApiDateParameter } => {
   if (!from || !to) return null
   const fromDate = new Date(from)
   const toDate = new Date(to)
   if (!isValid(fromDate) || !isValid(toDate)) return null
   return {
-    from: formatDateToURLParam(startOfDay(fromDate)),
-    to: formatDateToURLParam(endOfDay(toDate)),
+    from: formatDateToURLParameter(startOfDay(fromDate)),
+    to: formatDateToURLParameter(endOfDay(toDate)),
   }
 }
 
@@ -241,12 +227,9 @@ export const modelsLocalDateTimeWithTimeZoneToString = (
  * @param precision - Number of decimal places (default: 2)
  */
 export const millisToHours = (millis: number, precision?: number) =>
-  Math.round((millis / 1000 / 60 / 60) * 10 ** (precision || 2)) /
-  10 ** (precision || 2)
+  Math.round((millis / 1000 / 60 / 60) * 10 ** (precision || 2)) / 10 ** (precision || 2)
 
-export const decimalHoursToObject = (
-  value: number,
-): { hours: number; minutes: number } => ({
+export const decimalHoursToObject = (value: number): { hours: number; minutes: number } => ({
   hours: Math.floor(value),
   minutes: Math.round((value % 1) * 60),
 })
@@ -264,9 +247,7 @@ export const decimalHoursToDate = (decimalHours: number): IsoDateString => {
  * Gets the weekday name (lowercase) from an IsoDateString.
  * Returns the English weekday name matching ModelsWorkingHoursWeekdays.
  */
-export const getWorkingHoursWeekdayString = (
-  date: IsoDateString,
-): ModelsWorkingHoursWeekdays => {
+export const getWorkingHoursWeekdayString = (date: IsoDateString): ModelsWorkingHoursWeekdays => {
   const parsed = typeof date === 'string' ? parseISO(date) : date
   return format(parsed, 'EEEE', {}).toLowerCase() as ModelsWorkingHoursWeekdays
 }

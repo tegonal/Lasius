@@ -29,14 +29,8 @@ export const getExtendedModelsBookingList = (list: ModelsBooking[]) =>
   list.map((booking) => ({
     ...booking,
     date: format(new Date(booking.start.dateTime), DATE_FORMAT_SHORT),
-    duration: durationInHoursAsNumber(
-      booking.start.dateTime,
-      booking.end?.dateTime || '',
-    ),
-    durationString: durationAsString(
-      booking.start.dateTime,
-      booking.end?.dateTime || '',
-    ),
+    duration: durationInHoursAsNumber(booking.start.dateTime, booking.end?.dateTime || ''),
+    durationString: durationAsString(booking.start.dateTime, booking.end?.dateTime || ''),
     fromTo: `${format(new Date(booking.start.dateTime), TIME_FORMAT)} - ${format(
       new Date(booking.end?.dateTime || ''),
       TIME_FORMAT,

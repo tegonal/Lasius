@@ -22,10 +22,7 @@ import { useTranslation } from 'react-i18next'
 
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { useIsClient } from '~/lib/hooks/use-is-client'
-import {
-  type BackendConnectionStatus,
-  useBackendStatus,
-} from '~/stores/ui-store'
+import { type BackendConnectionStatus, useBackendStatus } from '~/stores/ui-store'
 
 const statusDotClass: Record<BackendConnectionStatus, string> = {
   connected: 'bg-success',
@@ -43,18 +40,11 @@ export const BackendStatus = () => {
   const labels: Record<BackendConnectionStatus, string> = {
     connected: t('system:connectedToBackend', 'Connected to backend'),
     connecting: t('system:connectingToBackend', 'Connecting to backend'),
-    disconnected: t(
-      'system:backendUnreachable',
-      'Backend seems to be unreachable',
-    ),
+    disconnected: t('system:backendUnreachable', 'Backend seems to be unreachable'),
   }
 
   return (
-    <div
-      className="tooltip tooltip-top"
-      data-testid="backend-status"
-      data-tip={labels[status]}
-    >
+    <div className="tooltip tooltip-top" data-testid="backend-status" data-tip={labels[status]}>
       <div className="relative inline-flex">
         <LucideIcon icon={ServerIcon} size={14} />
         <span

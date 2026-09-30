@@ -39,9 +39,6 @@ export async function loader({ request }: Route.LoaderArgs) {
   const auth = await requireUser(request)
   const headers = await authHeadersWithCsrf(auth.session)
   const response = await createWsTicket({ headers })
-  const ticket =
-    response.data && 'ticket' in response.data
-      ? (response.data.ticket ?? null)
-      : null
+  const ticket = response.data && 'ticket' in response.data ? (response.data.ticket ?? null) : null
   return data({ ticket }, { headers: mergeAuthHeaders(auth) })
 }

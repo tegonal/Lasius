@@ -59,19 +59,19 @@ const transformByDayData = (stats: ModelsBookingStats[] | undefined) => {
 
   return stats.map((stat) => {
     const { category } = stat
-    let dateStr = ''
-    if (category?.day && category?.month && category?.year) {
+    let dateString = ''
+    if (category?.day && category.month && category.year) {
       try {
-        dateStr = formatDate(
+        dateString = formatDate(
           new Date(category.year, category.month - 1, category.day),
           'dd.MM.yyyy',
         )
       } catch {
-        dateStr = `${category.day}.${category.month}.${category.year}`
+        dateString = `${category.day}.${category.month}.${category.year}`
       }
     }
 
-    const row: Record<string, number | string> = { Date: dateStr }
+    const row: Record<string, number | string> = { Date: dateString }
 
     let total = 0
     for (const cat of categories) {
@@ -90,15 +90,14 @@ const transformAggregatedData = (stats: ModelsBookingStats[] | undefined) => {
   if (!stats || stats.length === 0 || !stats[0]) return []
 
   const totalDuration = stats[0].values.reduce(
-    (acc, v) => acc + (v.duration || 0),
+    (accumulator, v) => accumulator + (v.duration || 0),
     0,
   )
 
   return stats[0].values
     .map((item) => {
       const hours = item.duration ? millisToHours(item.duration) : 0
-      const percentage =
-        totalDuration > 0 ? ((item.duration || 0) / totalDuration) * 100 : 0
+      const percentage = totalDuration > 0 ? ((item.duration || 0) / totalDuration) * 100 : 0
       return {
         Category: item.label || '',
         Hours: Math.round(hours * 100) / 100,
@@ -119,11 +118,11 @@ export const exportStatistics = (
 ): { buffer: Uint8Array; filename: string } => {
   const wb = XLSX.utils.book_new()
 
-  const formatSummaryDate = (dateStr: string) => {
+  const formatSummaryDate = (dateString: string) => {
     try {
-      return formatDate(parseISO(dateStr), 'dd.MM.yyyy')
+      return formatDate(parseISO(dateString), 'dd.MM.yyyy')
     } catch {
-      return dateStr
+      return dateString
     }
   }
 
@@ -139,10 +138,7 @@ export const exportStatistics = (
   if (data.summary.totalUsers !== undefined && data.summary.totalUsers > 0) {
     summaryData.push(['Total Users', data.summary.totalUsers])
   }
-  if (
-    data.summary.totalProjects !== undefined &&
-    data.summary.totalProjects > 0
-  ) {
+  if (data.summary.totalProjects !== undefined && data.summary.totalProjects > 0) {
     summaryData.push(['Total Projects', data.summary.totalProjects])
   }
 
@@ -180,12 +176,12 @@ export const exportStatistics = (
     XLSX.utils.book_append_sheet(wb, ws, sheetName)
   }
 
-  const fromDate = data.summary.from.split('T')[0]
-  const toDate = data.summary.to.split('T')[0]
+  const fromDate = data.summary.from.split('T', 1)[0]
+  const toDate = data.summary.to.split('T', 1)[0]
   const filename = `lasius-statistics-${data.scope}-${fromDate}_to_${toDate}.${format}`
 
   const buffer = XLSX.write(wb, {
-    bookType: format as XLSX.BookType,
+    bookType: format,
     compression: true,
     type: 'array',
   }) as Uint8Array

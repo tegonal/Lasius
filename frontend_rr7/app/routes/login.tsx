@@ -26,22 +26,13 @@ import { Card, CardBody } from '~/components/ui/cards/card'
 import { Alert } from '~/components/ui/feedback/alert'
 import { Logo } from '~/components/ui/icons/logo'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
-import {
-  LoadingInfoPanel,
-  LoginInfoPanel,
-} from '~/features/auth/auth-info-panels'
+import { LoadingInfoPanel, LoginInfoPanel } from '~/features/auth/auth-info-panels'
 import { AuthLayout } from '~/features/auth/auth-layout'
 import { HelpButton } from '~/features/help/components/help-button'
-import { getServerEnv } from '~/lib/env.server'
-import {
-  getOptionalUser,
-  sanitizeReturnTo,
-} from '~/services/auth/auth-helpers.server'
+import { getServerEnvironment } from '~/lib/environment.server'
+import { getOptionalUser, sanitizeReturnTo } from '~/services/auth/auth-helpers.server'
 import { providerLoginUrl } from '~/services/auth/auth-urls'
-import {
-  getProviderDisplayName,
-  getProviderIcon,
-} from '~/services/auth/provider-display'
+import { getProviderDisplayName, getProviderIcon } from '~/services/auth/provider-display'
 import { getEnabledProviders } from '~/services/auth/providers'
 
 import { type Route } from './+types/login'
@@ -50,17 +41,17 @@ export async function loader({ request }: Route.LoaderArgs) {
   const user = await getOptionalUser(request)
   const url = new URL(request.url)
   const returnTo = sanitizeReturnTo(url.searchParams.get('returnTo') ?? '/')
-  const error = url.searchParams.get('error') ?? null
 
   if (user) {
     throw redirect(returnTo)
   }
 
+  const error = url.searchParams.get('error') ?? null
   const providers = getEnabledProviders()
-  const demoMode = getServerEnv('LASIUS_DEMO_MODE') === 'true'
-  const keycloakName = getServerEnv('KEYCLOAK_OAUTH_PROVIDER_NAME')
+  const isDemoMode = getServerEnvironment('LASIUS_DEMO_MODE') === 'true'
+  const keycloakName = getServerEnvironment('KEYCLOAK_OAUTH_PROVIDER_NAME')
 
-  return { demoMode, error, keycloakName, providers, returnTo }
+  return { demoMode: isDemoMode, error, keycloakName, providers, returnTo }
 }
 
 export default function Login({
@@ -71,10 +62,7 @@ export default function Login({
   const getErrorMessage = (errorCode: string): string => {
     switch (errorCode) {
       case 'Callback': {
-        return t(
-          'auth:errors.callback',
-          'Authentication callback failed. Please try again.',
-        )
+        return t('auth:errors.callback', 'Authentication callback failed. Please try again.')
       }
       case 'fetchProfileFailed': {
         return t(
@@ -96,8 +84,7 @@ export default function Login({
       }
       case 'state_mismatch': {
         return t('auth.errors.stateMismatch', {
-          defaultValue:
-            'Authentication failed: invalid state. Please try again.',
+          defaultValue: 'Authentication failed: invalid state. Please try again.',
         })
       }
       default: {
@@ -195,14 +182,12 @@ export default function Login({
                 <a
                   data-testid={`auth-provider-${provider}`}
                   href={providerLoginUrl(provider, { returnTo })}
-                  key={provider}
-                >
+                  key={provider}>
                   <Button
                     className="w-full justify-start gap-3 transition-colors duration-200"
                     size="lg"
                     type="button"
-                    variant="secondary"
-                  >
+                    variant="secondary">
                     <span className="flex h-6 w-6 items-center justify-center">
                       {getProviderIcon(provider)}
                     </span>

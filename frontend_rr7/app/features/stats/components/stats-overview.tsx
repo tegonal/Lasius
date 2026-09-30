@@ -23,7 +23,7 @@ import { StatsGroup } from './stats-group'
 import { StatsTileHours } from './stats-tile-hours'
 import { StatsTileNumber } from './stats-tile-number'
 
-type StatsOverviewProps = {
+type StatsOverviewProperties = {
   distinctProjects: number
   distinctUsers: number
   elements: number
@@ -35,7 +35,7 @@ export const StatsOverview = ({
   distinctUsers,
   elements,
   hours,
-}: StatsOverviewProps) => {
+}: StatsOverviewProperties) => {
   const { t } = useTranslation()
 
   const hasData = elements > 0
@@ -46,11 +46,7 @@ export const StatsOverview = ({
 
   return (
     <StatsGroup className="flex gap-4">
-      <StatsTileHours
-        label={t('units.hours', 'Hours')}
-        standalone={false}
-        value={hours}
-      />
+      <StatsTileHours label={t('units.hours', 'Hours')} standalone={false} value={hours} />
       <StatsTileNumber
         label={t('bookings:title', 'Bookings')}
         standalone={false}

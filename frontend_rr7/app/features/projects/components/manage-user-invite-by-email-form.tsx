@@ -39,29 +39,25 @@ import { ModalDescription } from '~/components/ui/overlays/modal/modal-descripti
 import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
 import { UserRoles } from '~/config/dynamic-translation-strings'
 import { validateFormData } from '~/lib/conform-helpers'
-import { type SchemaTranslationFn, untyped } from '~/lib/i18n-types'
+import { type SchemaTranslationFunction, untyped } from '~/lib/i18n-types'
 import { useInviteOrganisationUser } from '~/services/api/lasius-hooks/organisations/organisations'
 import { useInviteProjectUser } from '~/services/api/lasius-hooks/projects/projects'
 import { type ModelsInvitationResult } from '~/services/api/lasius/modelsInvitationResult'
 import { type ModelsUserToOrganisationAssignmentRole } from '~/services/api/lasius/modelsUserToOrganisationAssignmentRole'
 import { type ModelsUserToProjectAssignmentRole } from '~/services/api/lasius/modelsUserToProjectAssignmentRole'
 
-type Props = {
+type Properties = {
   onCancel?: () => void
   onSave: () => void
   organisation: string
   project?: string
 }
 
-const createInviteSchema = (t: SchemaTranslationFn) =>
+const createInviteSchema = (t: SchemaTranslationFunction) =>
   z.object({
-    inviteMemberByEmailAddress: z
-      .string({
-        error: t('validation.email', 'Please enter a valid email address'),
-      })
-      .email({
-        message: t('validation.email', 'Please enter a valid email address'),
-      }),
+    inviteMemberByEmailAddress: z.email({
+      error: t('validation.email', 'Please enter a valid email address'),
+    }),
     organisationRole: z.string().default('OrganisationMember'),
     projectRole: z.string().default('ProjectMember'),
   })
@@ -71,7 +67,7 @@ export const ManageUserInviteByEmailForm = ({
   onSave,
   organisation,
   project,
-}: Props) => {
+}: Properties) => {
   const { t } = useTranslation()
   const { addToast } = useToast()
   const mode = project ? 'project' : 'organisation'
@@ -79,8 +75,7 @@ export const ManageUserInviteByEmailForm = ({
   const schema = useMemo(() => createInviteSchema(untyped(t)), [t])
 
   const [showResultState, setShowResultState] = useState(false)
-  const [invitationResult, setInvitationResult] =
-    useState<ModelsInvitationResult | null>(null)
+  const [invitationResult, setInvitationResult] = useState<ModelsInvitationResult | null>(null)
 
   const handleInviteSuccess = useCallback((result: ModelsInvitationResult) => {
     setInvitationResult(result)
@@ -119,14 +114,13 @@ export const ManageUserInviteByEmailForm = ({
     onSave()
   }
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault()
 
-    const result = validateFormData(e.currentTarget, schema)
+    const result = validateFormData(event.currentTarget, schema)
     if (result.status !== 'success') return
 
-    const { inviteMemberByEmailAddress, organisationRole, projectRole } =
-      result.value
+    const { inviteMemberByEmailAddress, organisationRole, projectRole } = result.value
 
     if (project && organisation) {
       inviteProjectApi.submit({
@@ -149,36 +143,46 @@ export const ManageUserInviteByEmailForm = ({
   }
 
   const registrationLink = (invitationId: string) => {
-    const url = new URL(globalThis.location.toString())
+    const url = new URL(location.toString())
     return `${url.protocol}//${url.host}/join/${invitationId}`
   }
 
-  const handleCopy = (text: string) => {
-    navigator.clipboard.writeText(text).then(
-      () => {
-        addToast({
-          message: t(
-            'invitation:copiedToClipboard',
-            'Link copied to clipboard',
-          ),
-          ttl: 3000,
-          type: 'SUCCESS',
-        })
-      },
-      () => {
-        addToast({
-          message: t('invitation:copyFailed', 'Failed to copy link'),
-          ttl: 3000,
-          type: 'ERROR',
-        })
-      },
-    )
+  const handleCopy = async (text: string) => {
+    // Only a rejected write shows the error toast. The call stays outside the
+    // try block, so a missing clipboard API does not show the toast.
+    const writePromise = navigator.clipboard.writeText(text)
+    try {
+      await writePromise
+    } catch {
+      addToast({
+        message: t('invitation:copyFailed', 'Failed to copy link'),
+        ttl: 3000,
+        type: 'ERROR',
+      })
+      return
+    }
+    addToast({
+      message: t('invitation:copiedToClipboard', 'Link copied to clipboard'),
+      ttl: 3000,
+      type: 'SUCCESS',
+    })
   }
 
   const handleClose = () => {
     if (onCancel) {
       onCancel()
     }
+  }
+
+  const inviteDescriptions = {
+    organisation: t(
+      'invitation:inviteOrganisationDescription',
+      'Enter the email address of the person you want to invite. An invitation link will be generated that you can send to them.',
+    ),
+    project: t(
+      'invitation:inviteProjectDescription',
+      'Enter the email address of the person you want to invite. An invitation link will be generated that you can send to them.',
+    ),
   }
 
   return (
@@ -192,17 +196,7 @@ export const ManageUserInviteByEmailForm = ({
               {t('organisation:members.actions.invite', 'Invite someone')}
             </ModalHeader>
 
-            <ModalDescription className="mb-4">
-              {mode === 'project'
-                ? t(
-                    'invitation:inviteProjectDescription',
-                    'Enter the email address of the person you want to invite. An invitation link will be generated that you can send to them.',
-                  )
-                : t(
-                    'invitation:inviteOrganisationDescription',
-                    'Enter the email address of the person you want to invite. An invitation link will be generated that you can send to them.',
-                  )}
-            </ModalDescription>
+            <ModalDescription className="mb-4">{inviteDescriptions[mode]}</ModalDescription>
 
             <FieldSet>
               <FormField
@@ -231,8 +225,7 @@ export const ManageUserInviteByEmailForm = ({
                         value: 'ProjectMember',
                       },
                       {
-                        label:
-                          UserRoles.ProjectAdministrator || 'Administrator',
+                        label: UserRoles.ProjectAdministrator || 'Administrator',
                         value: 'ProjectAdministrator',
                       },
                     ]}
@@ -259,9 +252,7 @@ export const ManageUserInviteByEmailForm = ({
                         value: 'OrganisationMember',
                       },
                       {
-                        label:
-                          UserRoles.OrganisationAdministrator ||
-                          'Administrator',
+                        label: UserRoles.OrganisationAdministrator || 'Administrator',
                         value: 'OrganisationAdministrator',
                       },
                     ]}
@@ -276,8 +267,7 @@ export const ManageUserInviteByEmailForm = ({
                 data-testid="org-invite-submit-btn"
                 disabled={isSubmitting}
                 type="submit"
-                variant="primary"
-              >
+                variant="primary">
                 {t('organisation:members.actions.invite', 'Invite someone')}
               </Button>
               <Button onClick={handleClose} type="button" variant="secondary">
@@ -288,98 +278,72 @@ export const ManageUserInviteByEmailForm = ({
         </form>
       )}
 
-      {showResultState &&
-        invitationResult &&
-        invitationResult.invitationLinkId && (
-          <FormBody>
-            <ModalCloseButton onClose={handleCloseResult} />
+      {showResultState && invitationResult && invitationResult.invitationLinkId && (
+        <FormBody>
+          <ModalCloseButton onClose={handleCloseResult} />
 
-            <ModalHeader>
-              {t('invitation:title.invitationCreated', 'Invitation created')}
-            </ModalHeader>
+          <ModalHeader>{t('invitation:title.invitationCreated', 'Invitation created')}</ModalHeader>
 
-            <ModalDescription>
-              {t(
-                'invitation:description.copyLink',
-                'Copy the link and send it to your colleague. If they do not have an account yet, one will be created when the invitation is accepted.',
-              )}
-            </ModalDescription>
+          <ModalDescription>
+            {t(
+              'invitation:description.copyLink',
+              'Copy the link and send it to your colleague. If they do not have an account yet, one will be created when the invitation is accepted.',
+            )}
+          </ModalDescription>
 
-            <div className="flex gap-3">
-              <code
-                className="bg-base-200 flex-1 rounded px-2 py-1"
-                data-testid="org-invite-link"
-              >
-                {registrationLink(invitationResult.invitationLinkId)}
-              </code>
+          <div className="flex gap-3">
+            <code className="bg-base-200 flex-1 rounded px-2 py-1" data-testid="org-invite-link">
+              {registrationLink(invitationResult.invitationLinkId)}
+            </code>
 
-              <Button
-                aria-label={t(
-                  'invitation:copyToClipboard',
-                  'Copy to clipboard',
-                )}
-                data-testid="org-invite-copy-btn"
-                fullWidth={false}
-                onClick={() =>
-                  handleCopy(
-                    registrationLink(invitationResult.invitationLinkId || ''),
-                  )
-                }
-                shape="circle"
-                variant="primary"
-              >
-                <LucideIcon icon={Copy} size={16} />
-              </Button>
-            </div>
+            <Button
+              aria-label={t('invitation:copyToClipboard', 'Copy to clipboard')}
+              data-testid="org-invite-copy-btn"
+              fullWidth={false}
+              onClick={() => handleCopy(registrationLink(invitationResult.invitationLinkId || ''))}
+              shape="circle"
+              variant="primary">
+              <LucideIcon icon={Copy} size={16} />
+            </Button>
+          </div>
 
-            <ButtonGroup>
-              <Button
-                data-testid="org-invite-close-btn"
-                onClick={handleCloseResult}
-                type="button"
-                variant="primary"
-              >
-                {t('actions.close', 'Close')}
-              </Button>
-            </ButtonGroup>
-          </FormBody>
-        )}
+          <ButtonGroup>
+            <Button
+              data-testid="org-invite-close-btn"
+              onClick={handleCloseResult}
+              type="button"
+              variant="primary">
+              {t('actions.close', 'Close')}
+            </Button>
+          </ButtonGroup>
+        </FormBody>
+      )}
 
-      {showResultState &&
-        invitationResult &&
-        !invitationResult.invitationLinkId && (
-          <FormBody>
-            <ModalCloseButton onClose={handleCloseResult} />
+      {showResultState && invitationResult && !invitationResult.invitationLinkId && (
+        <FormBody>
+          <ModalCloseButton onClose={handleCloseResult} />
 
-            <ModalHeader>
-              {t('invitation:title.userAssigned', 'User assigned')}
-            </ModalHeader>
+          <ModalHeader>{t('invitation:title.userAssigned', 'User assigned')}</ModalHeader>
 
-            <ModalDescription>
-              {t(
-                'projects:status.assignedToUser',
-                'Project successfully assigned to user.',
-              )}
-            </ModalDescription>
+          <ModalDescription>
+            {t('projects:status.assignedToUser', 'Project successfully assigned to user.')}
+          </ModalDescription>
 
-            <div className="flex gap-3">
-              <code className="bg-base-200 rounded px-2 py-1">
-                {invitationResult.email}
-              </code>
-            </div>
+          <div className="flex gap-3">
+            <code className="bg-base-200 rounded px-2 py-1">{invitationResult.email}</code>
+          </div>
 
-            <ButtonGroup>
-              <Button
-                data-testid="org-invite-assigned-close-btn"
-                onClick={handleCloseResult}
-                type="button"
-                variant="primary"
-              >
-                {t('actions.close', 'Close')}
-              </Button>
-            </ButtonGroup>
-          </FormBody>
-        )}
+          <ButtonGroup>
+            <Button
+              data-testid="org-invite-assigned-close-btn"
+              onClick={handleCloseResult}
+              type="button"
+              variant="primary">
+              {t('actions.close', 'Close')}
+            </Button>
+          </ButtonGroup>
+        </FormBody>
+      )}
     </>
   )
 }

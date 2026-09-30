@@ -21,10 +21,7 @@ import { createReadableStreamFromReadable } from '@react-router/node'
 import { createInstance } from 'i18next'
 import { isbot } from 'isbot'
 import { PassThrough } from 'node:stream'
-import {
-  renderToPipeableStream,
-  type RenderToPipeableStreamOptions,
-} from 'react-dom/server'
+import { renderToPipeableStream, type RenderToPipeableStreamOptions } from 'react-dom/server'
 import { I18nextProvider } from 'react-i18next'
 import {
   type EntryContext,
@@ -67,13 +64,11 @@ export default function handleRequest(
   routerContext: RouterContextProvider,
 ) {
   return new Promise((resolve, reject) => {
-    let shellRendered = false
+    let isShellRendered = false
     const userAgent = request.headers.get('user-agent')
 
     const readyOption: keyof RenderToPipeableStreamOptions =
-      (userAgent && isbot(userAgent)) || entryContext.isSpaMode
-        ? 'onAllReady'
-        : 'onShellReady'
+      (userAgent && isbot(userAgent)) || entryContext.isSpaMode ? 'onAllReady' : 'onShellReady'
 
     let i18nInstance: ReturnType<typeof createInstance>
     try {
@@ -96,13 +91,15 @@ export default function handleRequest(
       {
         onError(error: unknown) {
           responseStatusCode = 500
-          if (shellRendered) logger.error(error)
+          if (isShellRendered) logger.error(error)
         },
         onShellError(error: unknown) {
-          reject(error)
+          reject(
+            error instanceof Error ? error : new Error('The shell render failed', { cause: error }),
+          )
         },
         [readyOption]() {
-          shellRendered = true
+          isShellRendered = true
           const body = new PassThrough()
           const stream = createReadableStreamFromReadable(body)
 

@@ -24,11 +24,7 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 
-export const ContextButtonOpen = ({
-  'data-testid': testId,
-}: {
-  'data-testid'?: string
-}) => {
+export const ContextButtonOpen = ({ 'data-testid': testId }: { 'data-testid'?: string }) => {
   const { t } = useTranslation('context-menu')
 
   return (
@@ -40,8 +36,7 @@ export const ContextButtonOpen = ({
           fullWidth={false}
           shape="circle"
           title={t('actions.open', 'Open context menu')}
-          variant="icon"
-        >
+          variant="icon">
           <LucideIcon icon={EllipsisVertical} />
         </Button>
       }

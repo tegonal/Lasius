@@ -48,10 +48,7 @@ export const SlideNavigation = () => {
         'Configure app settings, account, security and working hours',
       ),
       icon: Settings,
-      title: t(
-        'settings:changeUserProfileSettings',
-        'Change user profile settings',
-      ),
+      title: t('settings:changeUserProfileSettings', 'Change user profile settings'),
     },
   ]
 
@@ -77,14 +74,9 @@ export const SlideNavigation = () => {
   return (
     <div className="flex h-full flex-col items-center justify-center gap-6">
       <div className="text-center">
-        <h2 className="text-xl font-bold">
-          {t('navigation.title', 'Getting Around Lasius')}
-        </h2>
+        <h2 className="text-xl font-bold">{t('navigation.title', 'Getting Around Lasius')}</h2>
         <p className="text-base-content/70 mt-2">
-          {t(
-            'navigation.subtitle',
-            'Here are the main parts of Lasius you will use every day.',
-          )}
+          {t('navigation.subtitle', 'Here are the main parts of Lasius you will use every day.')}
         </p>
       </div>
 

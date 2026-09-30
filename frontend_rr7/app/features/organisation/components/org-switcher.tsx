@@ -40,8 +40,7 @@ export const OrgSwitcher = () => {
         className="btn btn-ghost hidden md:flex"
         data-testid="org-selector-btn"
         onClick={() => setIsOpen(true)}
-        type="button"
-      >
+        type="button">
         <AvatarOrganisation name={selectedOrganisationKey || ''} size={24} />
         <span>
           {selectedOrganisation?.private
@@ -53,11 +52,7 @@ export const OrgSwitcher = () => {
         <ModalCloseButton onClose={handleClose} />
         <OrgSwitcherModal onClose={handleClose} />
         <ButtonGroup>
-          <button
-            className="btn btn-secondary"
-            onClick={handleClose}
-            type="button"
-          >
+          <button className="btn btn-secondary" onClick={handleClose} type="button">
             {t('actions.close', 'Close')}
           </button>
         </ButtonGroup>

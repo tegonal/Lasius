@@ -57,24 +57,18 @@ const cardVariants = cva('card', {
   },
 })
 
-export interface CardProps
-  extends
-    React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof cardVariants> {
+export interface CardProperties
+  extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof cardVariants> {
   children: React.ReactNode
 }
 
-export const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ children, className, layout, shadow, size, variant, ...props }, ref) => {
+export const Card = React.forwardRef<HTMLDivElement, CardProperties>(
+  ({ children, className, layout, shadow, size, variant, ...properties }, reference) => {
     return (
       <div
-        className={cn(
-          cardVariants({ layout, shadow, size, variant }),
-          className,
-        )}
-        ref={ref}
-        {...props}
-      >
+        className={cn(cardVariants({ layout, shadow, size, variant }), className)}
+        ref={reference}
+        {...properties}>
         {children}
       </div>
     )
@@ -83,14 +77,14 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
 
 Card.displayName = 'Card'
 
-export interface CardBodyProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface CardBodyProperties extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
 }
 
-export const CardBody = React.forwardRef<HTMLDivElement, CardBodyProps>(
-  ({ children, className, ...props }, ref) => {
+export const CardBody = React.forwardRef<HTMLDivElement, CardBodyProperties>(
+  ({ children, className, ...properties }, reference) => {
     return (
-      <div className={cn('card-body', className)} ref={ref} {...props}>
+      <div className={cn('card-body', className)} ref={reference} {...properties}>
         {children}
       </div>
     )

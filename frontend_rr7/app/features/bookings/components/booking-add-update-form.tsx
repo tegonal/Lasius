@@ -19,20 +19,8 @@
 
 import { getFormProps, useForm, useInputControl } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
-import {
-  addHours,
-  getHours,
-  getMinutes,
-  isToday,
-  setHours,
-  setMinutes,
-} from 'date-fns'
-import {
-  ArrowDownToLine,
-  ArrowRight,
-  ArrowUpToLine,
-  HelpCircle,
-} from 'lucide-react'
+import { addHours, getHours, getMinutes, isToday, setHours, setMinutes } from 'date-fns'
+import { ArrowDownToLine, ArrowRight, ArrowUpToLine, HelpCircle } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -47,10 +35,7 @@ import { InputTagsAutocomplete } from '~/components/ui/forms/input/input-tags-au
 import { ProjectSelect } from '~/components/ui/forms/input/project-select'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { useProjectTags } from '~/features/bookings/hooks/use-project-tags'
-import {
-  createBookingSchema,
-  parseTagsFromFormData,
-} from '~/features/bookings/lib/booking-schemas'
+import { createBookingSchema, parseTagsFromFormData } from '~/features/bookings/lib/booking-schemas'
 import { ModalHelpButton } from '~/features/help/components/help-button'
 import { useProjects } from '~/features/projects/hooks/use-projects'
 import { untyped } from '~/lib/i18n-types'
@@ -63,7 +48,7 @@ import {
 
 import { BookingPresetSelector } from './booking-preset-selector'
 
-type BookingAddUpdateFormProps = {
+type BookingAddUpdateFormProperties = {
   bookingAfter?: ModelsBooking
   bookingBefore?: ModelsBooking
   itemReference?: ModelsBooking
@@ -154,9 +139,9 @@ export const BookingAddUpdateForm = ({
   onClose,
   selectedDate,
   selectedOrgId,
-}: BookingAddUpdateFormProps) => {
+}: BookingAddUpdateFormProperties) => {
   const { t } = useTranslation('common')
-  const addBookingApi = useAddUserBookingByOrganisation({
+  const bookingAdditionApi = useAddUserBookingByOrganisation({
     onSuccess: () => onClose(),
   })
   const updateBookingApi = useUpdateUserBooking({
@@ -166,10 +151,9 @@ export const BookingAddUpdateForm = ({
   const { userProjects } = useProjects()
   const projects = userProjects.map((p) => p.projectReference)
 
-  const isSubmitting = addBookingApi.isLoading || updateBookingApi.isLoading
+  const isSubmitting = bookingAdditionApi.isLoading || updateBookingApi.isLoading
 
-  const [startResetButton, setStartResetButton] =
-    useState<React.ReactNode>(null)
+  const [startResetButton, setStartResetButton] = useState<React.ReactNode>(null)
   const [endResetButton, setEndResetButton] = useState<React.ReactNode>(null)
   const [showPresetPanel, setShowPresetPanel] = useState(false)
 
@@ -180,14 +164,7 @@ export const BookingAddUpdateForm = ({
   const schema = useMemo(() => createBookingSchema(untyped(t)), [t])
 
   const initialValues = useMemo(
-    () =>
-      computeInitialValues(
-        mode,
-        dateForForm,
-        itemUpdate,
-        itemReference,
-        bookingBefore,
-      ),
+    () => computeInitialValues(mode, dateForForm, itemUpdate, itemReference, bookingBefore),
     [mode, dateForForm, itemUpdate, itemReference, bookingBefore],
   )
 
@@ -216,13 +193,13 @@ export const BookingAddUpdateForm = ({
   // Calculate duration for warning
   const durationHours = useMemo(() => {
     const sv = startControl.value
-    const ev = endControl.value
-    if (!sv || !ev) return 0
+    const event_ = endControl.value
+    if (!sv || !event_) return 0
     const start = new Date(sv)
-    const end = new Date(ev)
+    const end = new Date(event_)
     return (end.getTime() - start.getTime()) / (1000 * 60 * 60)
   }, [startControl.value, endControl.value])
-  const showDurationWarning = durationHours > 8
+  const isShowDurationWarning = durationHours > 8
 
   // Auto-focus tags after project selection
   useEffect(() => {
@@ -232,20 +209,19 @@ export const BookingAddUpdateForm = ({
   }, [projectIdControl.value, fields.tags.id])
 
   // Auto-adjust end date when start changes — preserve time offset
-  const prevStartRef = useRef(startControl.value)
+  const previousStartReference = useRef(startControl.value)
   useEffect(() => {
     const sv = startControl.value
-    const ev = endControl.value
-    if (sv && sv !== prevStartRef.current && previousEndDate.current === ev) {
-      const endHours = getHours(new Date(ev))
-      const endMinutes = getMinutes(new Date(ev))
-      const endDate = formatISOLocale(
-        setMinutes(setHours(new Date(sv), endHours), endMinutes),
-      )
+    const event_ = endControl.value
+    if (sv && sv !== previousStartReference.current && previousEndDate.current === event_) {
+      const endHours = getHours(new Date(event_))
+      const endMinutes = getMinutes(new Date(event_))
+      const startDate = new Date(sv)
+      const endDate = formatISOLocale(setMinutes(setHours(startDate, endHours), endMinutes))
       endControl.change(endDate)
       previousEndDate.current = endDate
     }
-    prevStartRef.current = sv
+    previousStartReference.current = sv
   }, [startControl.value, endControl.value, endControl])
 
   // Compute preset start props
@@ -253,9 +229,7 @@ export const BookingAddUpdateForm = ({
     if (mode === 'addBetween') return {}
 
     const referenceTime =
-      mode === 'add'
-        ? latestBooking?.end?.dateTime
-        : bookingBefore?.end?.dateTime
+      mode === 'add' ? latestBooking?.end?.dateTime : bookingBefore?.end?.dateTime
 
     if (!referenceTime) return {}
 
@@ -319,10 +293,10 @@ export const BookingAddUpdateForm = ({
     [endControl],
   )
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault()
 
-    const formData = new FormData(e.currentTarget)
+    const formData = new FormData(event.currentTarget)
     const result = parseWithZod(formData, { schema })
     if (result.status !== 'success') return
 
@@ -333,7 +307,7 @@ export const BookingAddUpdateForm = ({
     const tags = parseTagsFromFormData(tagsJson) as ModelsTag[]
 
     if (mode === 'add' || mode === 'addBetween') {
-      addBookingApi.submit({
+      bookingAdditionApi.submit({
         body: { end, projectId, start, tags },
         orgId: selectedOrgId,
       })
@@ -357,8 +331,7 @@ export const BookingAddUpdateForm = ({
         className="flex w-[200%] items-stretch transition-transform duration-300 ease-out"
         style={{
           transform: showPresetPanel ? 'translateX(-50%)' : 'translateX(0)',
-        }}
-      >
+        }}>
         {/* Form content */}
         <div className="w-1/2">
           <form {...getFormProps(form)} onSubmit={handleSubmit}>
@@ -370,8 +343,7 @@ export const BookingAddUpdateForm = ({
                     onClick={() => setShowPresetPanel(true)}
                     size="sm"
                     type="button"
-                    variant="neutral"
-                  >
+                    variant="neutral">
                     {t('bookings:presets.browse', 'Browse presets')}
                     <LucideIcon icon={ArrowRight} size={16} />
                   </Button>
@@ -380,8 +352,7 @@ export const BookingAddUpdateForm = ({
                 <FormElement
                   htmlFor={fields.projectId.id}
                   label={t('projects:label', 'Project')}
-                  required
-                >
+                  required>
                   <ProjectSelect
                     errors={fields.projectId.errors}
                     fallbackProject={itemUpdate?.projectReference}
@@ -392,10 +363,7 @@ export const BookingAddUpdateForm = ({
                     value={projectIdControl.value ?? ''}
                   />
                 </FormElement>
-                <FormElement
-                  htmlFor={fields.tags.id}
-                  label={t('tag-manager:label', 'Tags')}
-                >
+                <FormElement htmlFor={fields.tags.id} label={t('tag-manager:label', 'Tags')}>
                   <InputTagsAutocomplete
                     field={fields.tags}
                     id={fields.tags.id}
@@ -411,8 +379,7 @@ export const BookingAddUpdateForm = ({
                   <FormElement
                     htmlFor={fields.start.id}
                     label={t('time.starts', 'Starts')}
-                    labelActionSlot={startResetButton}
-                  >
+                    labelActionSlot={startResetButton}>
                     <InputDatePicker
                       field={fields.start}
                       onChange={(v) => startControl.change(v)}
@@ -424,8 +391,7 @@ export const BookingAddUpdateForm = ({
                   <FormElement
                     htmlFor={fields.end.id}
                     label={t('time.ends', 'Ends')}
-                    labelActionSlot={endResetButton}
-                  >
+                    labelActionSlot={endResetButton}>
                     <InputDatePicker
                       field={fields.end}
                       onChange={(v) => endControl.change(v)}
@@ -444,15 +410,12 @@ export const BookingAddUpdateForm = ({
                 </div>
               </FieldSet>
 
-              {showDurationWarning && (
+              {isShowDurationWarning && (
                 <div className="alert alert-warning mb-4" role="alert">
                   <LucideIcon icon={HelpCircle} size={20} />
                   <div className="flex flex-col gap-1">
                     <div className="font-semibold">
-                      {t(
-                        'bookings:warnings.longDuration',
-                        'Long duration detected',
-                      )}
+                      {t('bookings:warnings.longDuration', 'Long duration detected')}
                     </div>
                     <div className="text-sm">
                       {t(
@@ -465,11 +428,7 @@ export const BookingAddUpdateForm = ({
               )}
 
               <ButtonGroup>
-                <Button
-                  data-testid="booking-form-save-btn"
-                  loading={isSubmitting}
-                  type="submit"
-                >
+                <Button data-testid="booking-form-save-btn" loading={isSubmitting} type="submit">
                   {t('actions.save', 'Save')}
                 </Button>
                 <Button
@@ -477,8 +436,7 @@ export const BookingAddUpdateForm = ({
                   disabled={isSubmitting}
                   onClick={onClose}
                   type="button"
-                  variant="secondary"
-                >
+                  variant="secondary">
                   {t('actions.close', 'Close')}
                 </Button>
               </ButtonGroup>

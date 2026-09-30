@@ -7,17 +7,11 @@ import { type ApiProxyOptions, useApiProxy } from '~/hooks/use-api-proxy'
  * Track your time
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
-import {
-  type ModelsTag,
-  type ModelsUpdateUserOrganisation,
-  type ModelsUser,
-} from '../../lasius'
+import { type ModelsTag, type ModelsUpdateUserOrganisation, type ModelsUser } from '../../lasius'
 /**
  * @summary Remove current user's membership from selected organisation
  */
-export function useDeleteUserMembershipByOrganisation(
-  options?: ApiProxyOptions<void>,
-) {
+export function useDeleteUserMembershipByOrganisation(options?: ApiProxyOptions<void>) {
   return useApiProxy<void, undefined, { orgId: string }>(
     {
       getUrl: ({ orgId }) => `/user-organisations/organisations/${orgId}/leave`,
@@ -29,11 +23,7 @@ export function useDeleteUserMembershipByOrganisation(
  * @summary Get tags by organisation and project
  */
 export function useGetTagsByProject(options?: ApiProxyOptions<ModelsTag[]>) {
-  return useApiProxy<
-    ModelsTag[],
-    undefined,
-    { orgId: string; projectId: string }
-  >(
+  return useApiProxy<ModelsTag[], undefined, { orgId: string; projectId: string }>(
     {
       getUrl: ({ orgId, projectId }) =>
         `/user-organisations/organisations/${orgId}/projects/${projectId}/tags`,
@@ -44,17 +34,10 @@ export function useGetTagsByProject(options?: ApiProxyOptions<ModelsTag[]>) {
 } /**
  * @summary Change current user's working hours for the selected organisation
  */
-export function useUpdateWorkingHoursByOrganisation(
-  options?: ApiProxyOptions<ModelsUser>,
-) {
-  return useApiProxy<
-    ModelsUser,
-    ModelsUpdateUserOrganisation,
-    { orgId: string }
-  >(
+export function useUpdateWorkingHoursByOrganisation(options?: ApiProxyOptions<ModelsUser>) {
+  return useApiProxy<ModelsUser, ModelsUpdateUserOrganisation, { orgId: string }>(
     {
-      getUrl: ({ orgId }) =>
-        `/user-organisations/organisations/${orgId}/working-hours`,
+      getUrl: ({ orgId }) => `/user-organisations/organisations/${orgId}/working-hours`,
       method: 'POST',
     },
     options,

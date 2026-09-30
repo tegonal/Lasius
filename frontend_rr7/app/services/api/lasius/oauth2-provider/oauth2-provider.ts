@@ -52,10 +52,9 @@ export type updateUserPasswordResponse200 = {
   status: 200
 }
 
-export type updateUserPasswordResponseSuccess =
-  updateUserPasswordResponse200 & {
-    headers: Headers
-  }
+export type updateUserPasswordResponseSuccess = updateUserPasswordResponse200 & {
+  headers: Headers
+}
 export type updateUserPasswordResponse = updateUserPasswordResponseSuccess
 
 export const getUpdateUserPasswordUrl = () => {
@@ -146,9 +145,7 @@ export const getLogoutUrl = () => {
   return `/oauth2/logout`
 }
 
-export const logout = async (
-  options?: RequestInit,
-): Promise<logoutResponse> => {
+export const logout = async (options?: RequestInit): Promise<logoutResponse> => {
   return lasiusFetch<logoutResponse>(getLogoutUrl(), {
     ...options,
     method: 'POST',
@@ -163,10 +160,9 @@ export type getUOAuthUserProfileResponse200 = {
   status: 200
 }
 
-export type getUOAuthUserProfileResponseSuccess =
-  getUOAuthUserProfileResponse200 & {
-    headers: Headers
-  }
+export type getUOAuthUserProfileResponseSuccess = getUOAuthUserProfileResponse200 & {
+  headers: Headers
+}
 export type getUOAuthUserProfileResponse = getUOAuthUserProfileResponseSuccess
 
 export const getGetUOAuthUserProfileUrl = () => {
@@ -176,11 +172,8 @@ export const getGetUOAuthUserProfileUrl = () => {
 export const getUOAuthUserProfile = async (
   options?: RequestInit,
 ): Promise<getUOAuthUserProfileResponse> => {
-  return lasiusFetch<getUOAuthUserProfileResponse>(
-    getGetUOAuthUserProfileUrl(),
-    {
-      ...options,
-      method: 'GET',
-    },
-  )
+  return lasiusFetch<getUOAuthUserProfileResponse>(getGetUOAuthUserProfileUrl(), {
+    ...options,
+    method: 'GET',
+  })
 }

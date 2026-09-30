@@ -21,13 +21,13 @@ import React from 'react'
 
 import { cn } from '~/lib/utils/cn'
 
-interface Props {
+interface Properties {
   children?: React.ReactNode
   className?: string
   width?: number | string
 }
 
-export const DataListField = ({ children, className, width }: Props) => {
+export const DataListField = ({ children, className, width }: Properties) => {
   return (
     <td
       className={cn('p-1 py-3', className)}
@@ -37,8 +37,7 @@ export const DataListField = ({ children, className, width }: Props) => {
           : {
               width: typeof width === 'number' ? `${width}px` : width,
             }
-      }
-    >
+      }>
       {children}
     </td>
   )

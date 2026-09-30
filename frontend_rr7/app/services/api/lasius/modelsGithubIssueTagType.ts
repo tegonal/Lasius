@@ -6,9 +6,9 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type ModelsGithubIssueTagType = typeof ModelsGithubIssueTagType[keyof typeof ModelsGithubIssueTagType];
-
+export type ModelsGithubIssueTagType =
+  (typeof ModelsGithubIssueTagType)[keyof typeof ModelsGithubIssueTagType]
 
 export const ModelsGithubIssueTagType = {
   GithubIssueTag: 'GithubIssueTag',
-} as const;
+} as const

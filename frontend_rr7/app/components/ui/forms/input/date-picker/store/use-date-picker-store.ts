@@ -74,27 +74,21 @@ const createDateTimeValue = (
   date,
   get dateString() {
     // If partial or invalid, return the raw input
-    if (this.isPartial || !this.isValid) return this._inputDateString
+    if (isPartial || !isValid) return _inputDateString
     // If valid and complete, return formatted date
-    return this.date ? formatDateString(this.date) : ''
+    return date ? formatDateString(date) : ''
   },
   isPartial,
   isValid,
   get timeString() {
     // If partial or invalid, return the raw input
-    if (this.isPartial || !this.isValid) return this._inputTimeString
+    if (isPartial || !isValid) return _inputTimeString
     // If valid and complete, return formatted time
-    return this.date ? formatTimeString(this.date) : ''
+    return date ? formatTimeString(date) : ''
   },
 })
 
-const defaultValue: DateTimeValue = createDateTimeValue(
-  null,
-  '',
-  '',
-  true,
-  false,
-)
+const defaultValue: DateTimeValue = createDateTimeValue(null, '', '', true, false)
 
 export const createDatePickerStore = () =>
   createStore<DatePickerState>()(
@@ -114,13 +108,7 @@ export const createDatePickerStore = () =>
         const timeString = formatTimeString(newDate)
 
         set({
-          value: createDateTimeValue(
-            newDate,
-            dateString,
-            timeString,
-            true,
-            false,
-          ),
+          value: createDateTimeValue(newDate, dateString, timeString, true, false),
         })
       },
 
@@ -134,13 +122,7 @@ export const createDatePickerStore = () =>
         const timeString = formatTimeString(newDate)
 
         set({
-          value: createDateTimeValue(
-            newDate,
-            dateString,
-            timeString,
-            true,
-            false,
-          ),
+          value: createDateTimeValue(newDate, dateString, timeString, true, false),
         })
       },
 
@@ -153,13 +135,7 @@ export const createDatePickerStore = () =>
         const timeString = formatTimeString(newDate)
 
         set({
-          value: createDateTimeValue(
-            newDate,
-            dateString,
-            timeString,
-            true,
-            false,
-          ),
+          value: createDateTimeValue(newDate, dateString, timeString, true, false),
         })
       },
 
@@ -173,13 +149,7 @@ export const createDatePickerStore = () =>
         const timeString = formatTimeString(newDate)
 
         set({
-          value: createDateTimeValue(
-            newDate,
-            dateString,
-            timeString,
-            true,
-            false,
-          ),
+          value: createDateTimeValue(newDate, dateString, timeString, true, false),
         })
       },
 
@@ -193,13 +163,7 @@ export const createDatePickerStore = () =>
         const timeString = formatTimeString(newDate)
 
         set({
-          value: createDateTimeValue(
-            newDate,
-            dateString,
-            timeString,
-            true,
-            false,
-          ),
+          value: createDateTimeValue(newDate, dateString, timeString, true, false),
         })
       },
 
@@ -222,9 +186,7 @@ export const createDatePickerStore = () =>
 
         set({
           value: createDateTimeValue(
-            parsed.isValid && !parsed.isPartial
-              ? parsed.date
-              : get().value.date,
+            (parsed.isValid && !parsed.isPartial ? parsed : get().value).date,
             dateString,
             timeString,
             parsed.isValid,
@@ -252,13 +214,7 @@ export const createDatePickerStore = () =>
           const timeString = formatTimeString(date)
 
           set({
-            value: createDateTimeValue(
-              date,
-              dateString,
-              timeString,
-              true,
-              false,
-            ),
+            value: createDateTimeValue(date, dateString, timeString, true, false),
           })
         } catch {
           set({
@@ -284,13 +240,7 @@ export const createDatePickerStore = () =>
           const timeString = formatTimeString(date)
 
           set({
-            initialValue: createDateTimeValue(
-              date,
-              dateString,
-              timeString,
-              true,
-              false,
-            ),
+            initialValue: createDateTimeValue(date, dateString, timeString, true, false),
           })
         } catch {
           set({ initialValue: defaultValue })
@@ -307,9 +257,7 @@ export const createDatePickerStore = () =>
 
         set({
           value: createDateTimeValue(
-            parsed.isValid && !parsed.isPartial
-              ? parsed.date
-              : get().value.date,
+            (parsed.isValid && !parsed.isPartial ? parsed : get().value).date,
             dateString,
             timeString,
             parsed.isValid,
@@ -328,17 +276,12 @@ export const createDatePickerStore = () =>
   )
 
 // Context for providing store instance
-export const DatePickerStoreContext =
-  createContext<null | StoreApi<DatePickerState>>(null)
+export const DatePickerStoreContext = createContext<null | StoreApi<DatePickerState>>(null)
 
 // Hook to use the store from context — supports optional selector to avoid full re-renders
 export function useDatePickerStore(): DatePickerState
-export function useDatePickerStore<T>(
-  selector: (state: DatePickerState) => T,
-): T
-export function useDatePickerStore<T>(
-  selector?: (state: DatePickerState) => T,
-) {
+export function useDatePickerStore<T>(selector: (state: DatePickerState) => T): T
+export function useDatePickerStore<T>(selector?: (state: DatePickerState) => T) {
   const store = useContext(DatePickerStoreContext)
   if (!store) throw new Error('Missing DatePickerStoreContext.Provider')
   return useStore(store, selector as (state: DatePickerState) => T)

@@ -97,16 +97,11 @@ const ToastList = () => {
           config.borderColor,
         )}
         key={toast.id}
-        toast={toast}
-      >
+        toast={toast}>
         <Toast.Content className="flex flex-col gap-2 px-4 py-3">
           <div className="flex items-center gap-3">
             <LucideIcon
-              className={cn(
-                config.textColor,
-                'shrink-0',
-                toast.description && 'self-start',
-              )}
+              className={cn(config.textColor, 'shrink-0', toast.description && 'self-start')}
               icon={Icon}
               size={20}
             />
@@ -120,8 +115,7 @@ const ToastList = () => {
                 'shrink-0 rounded-md p-1 transition-colors',
                 'hover:bg-base-content/10',
                 'focus:ring-base-content/20 focus:ring-2 focus:ring-offset-2 focus:outline-none',
-              )}
-            >
+              )}>
               <LucideIcon className="text-base-content/60" icon={X} size={16} />
             </Toast.Close>
           </div>
@@ -136,8 +130,7 @@ const ToastList = () => {
                     )}
                     to={action.href}
                   />
-                }
-              >
+                }>
                 {action.label}
               </Toast.Close>
             </div>

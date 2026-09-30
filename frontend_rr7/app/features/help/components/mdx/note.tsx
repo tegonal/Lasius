@@ -21,11 +21,11 @@ import { Info } from 'lucide-react'
 
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 
-interface NoteProps {
+interface NoteProperties {
   children: React.ReactNode
 }
 
-export const Note = ({ children }: NoteProps) => {
+export const Note = ({ children }: NoteProperties) => {
   return (
     <div className="mb-3 flex gap-2">
       <span className="text-info flex-shrink-0">

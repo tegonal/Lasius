@@ -6,9 +6,8 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type ModelsTagGroupType = typeof ModelsTagGroupType[keyof typeof ModelsTagGroupType];
-
+export type ModelsTagGroupType = (typeof ModelsTagGroupType)[keyof typeof ModelsTagGroupType]
 
 export const ModelsTagGroupType = {
   TagGroup: 'TagGroup',
-} as const;
+} as const

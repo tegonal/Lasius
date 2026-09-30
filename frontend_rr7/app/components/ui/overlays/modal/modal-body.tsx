@@ -37,19 +37,13 @@ import { cn } from '~/lib/utils/cn'
  *   <ButtonGroup>{footer}</ButtonGroup>
  * </Modal>
  */
-export const ModalBody = ({
-  children,
-  className,
-}: {
-  children: ReactNode
-  className?: string
-}) => {
+export const ModalBody = ({ children, className }: { children: ReactNode; className?: string }) => {
   const [height, setHeight] = useState<number | undefined>()
-  const wrapperRef = useRef<HTMLDivElement>(null)
+  const wrapperReference = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const el = wrapperRef.current
-    if (!el) return
+    const element = wrapperReference.current
+    if (!element) return
 
     const observer = new ResizeObserver((entries) => {
       const entry = entries[0]
@@ -58,15 +52,13 @@ export const ModalBody = ({
       }
     })
 
-    observer.observe(el)
+    observer.observe(element)
     return () => observer.disconnect()
   }, [])
 
   return (
-    <div className={cn('min-h-0 flex-1', className)} ref={wrapperRef}>
-      <ScrollArea style={height ? { height } : undefined}>
-        {children}
-      </ScrollArea>
+    <div className={cn('min-h-0 flex-1', className)} ref={wrapperReference}>
+      <ScrollArea style={height ? { height } : undefined}>{children}</ScrollArea>
     </div>
   )
 }

@@ -17,10 +17,7 @@
  *
  */
 
-export type SegmentBounds<T extends string> = Record<
-  T,
-  { end: number; start: number }
->
+export type SegmentBounds<T extends string> = Record<T, { end: number; start: number }>
 
 /**
  * Calculate segment boundaries in a delimited string

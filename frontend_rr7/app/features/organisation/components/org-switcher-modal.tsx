@@ -30,20 +30,15 @@ import { type ModelsUserOrganisation } from '~/services/api/lasius/modelsUserOrg
 
 const noop = () => {}
 
-interface Props {
+interface Properties {
   onClose?: () => void
   onSelect?: (organisation: ModelsEntityReference) => void
   selected?: ModelsEntityReference
 }
 
-export const OrgSwitcherModal = ({
-  onClose = noop,
-  onSelect = noop,
-  selected,
-}: Props) => {
+export const OrgSwitcherModal = ({ onClose = noop, onSelect = noop, selected }: Properties) => {
   const { t } = useTranslation('organisation')
-  const { organisations, selectedOrganisationId, setSelectedOrganisation } =
-    useOrganisation()
+  const { organisations, selectedOrganisationId, setSelectedOrganisation } = useOrganisation()
 
   const selectOrganisation = (orgReference: ModelsEntityReference) => {
     setSelectedOrganisation(orgReference)
@@ -59,10 +54,7 @@ export const OrgSwitcherModal = ({
   }
 
   return (
-    <div
-      className="flex h-full min-h-0 flex-1 flex-col"
-      data-testid="org-switcher-modal"
-    >
+    <div className="flex h-full min-h-0 flex-1 flex-col" data-testid="org-switcher-modal">
       <h1 className="mb-4 shrink-0 text-2xl font-bold">
         {t('selectOrganisation', 'Select organisation')}
       </h1>
@@ -72,13 +64,9 @@ export const OrgSwitcherModal = ({
             <CardSmall
               data-testid="org-card"
               key={item.organisationReference.id}
-              onClick={() => selectOrganisation(item.organisationReference)}
-            >
+              onClick={() => selectOrganisation(item.organisationReference)}>
               <div className="flex flex-col items-center justify-center pt-2">
-                <AvatarOrganisation
-                  name={item.organisationReference.key}
-                  size={64}
-                />
+                <AvatarOrganisation name={item.organisationReference.key} size={64} />
               </div>
               <div className="leading-normal">
                 {item.private
@@ -86,10 +74,7 @@ export const OrgSwitcherModal = ({
                   : item.organisationReference.key}
               </div>
               {isCurrent(item) && (
-                <div
-                  className="absolute top-2 right-2"
-                  title={t('selected', 'Selected')}
-                >
+                <div className="absolute top-2 right-2" title={t('selected', 'Selected')}>
                   <LucideIcon icon={CheckCircleIcon} size={18} />
                 </div>
               )}

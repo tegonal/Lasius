@@ -22,29 +22,23 @@ import { useTranslation } from 'react-i18next'
 
 import { Input } from '~/components/primitives/inputs/input'
 
-import {
-  getSegmentBounds,
-  getSegmentFromPosition,
-} from './date-picker/shared/core/segment-bounds'
+import { getSegmentBounds, getSegmentFromPosition } from './date-picker/shared/core/segment-bounds'
 import {
   DURATION_SEGMENT_CONFIG,
   type DurationSegment,
 } from './date-picker/shared/core/segment-config'
 import { selectSegment as selectSegmentHelper } from './date-picker/shared/core/segment-selection'
-import {
-  formatDuration,
-  parseDuration,
-} from './date-picker/shared/duration-utils'
+import { formatDuration, parseDuration } from './date-picker/shared/duration-utilities'
 import { createInputChangeHandler } from './date-picker/shared/input/input-change-handler'
-import { validateInputChar } from './date-picker/shared/input/input-validation'
+import { isValidInputChar } from './date-picker/shared/input/input-validation'
 import {
-  handleBackspaceDelete,
-  handleEscapeKey,
-  handleSeparatorKey,
+  didHandleBackspaceDelete,
+  didHandleEscapeKey,
+  didHandleSeparatorKey,
 } from './date-picker/shared/input/keyboard-handlers'
 import { SegmentedInputWrapper } from './date-picker/shared/segmented-input-wrapper'
 
-type DurationInputProps = {
+type DurationInputProperties = {
   error?: boolean
   id?: string
   onChange: (milliseconds: number) => void
@@ -55,20 +49,14 @@ type DurationInputProps = {
  * Interactive duration input component with HH:MM format and arrow controls.
  * Works with milliseconds internally but displays as hours:minutes.
  */
-export const DurationInput = ({
-  error,
-  id,
-  onChange,
-  value,
-}: DurationInputProps) => {
+export const DurationInput = ({ error, id, onChange, value }: DurationInputProperties) => {
   const { t } = useTranslation('common')
-  const inputRef = useRef<HTMLInputElement>(null)
-  const [selectedSegment, setSelectedSegment] =
-    useState<DurationSegment | null>(null)
-  const focusFromArrowRef = useRef<boolean>(false)
-  const focusFromMouseRef = useRef<boolean>(false)
-  const initialDurationRef = useRef<number>(0)
-  const pendingCursorPosRef = useRef<null | number>(null)
+  const inputReference = useRef<HTMLInputElement>(null)
+  const [selectedSegment, setSelectedSegment] = useState<DurationSegment | null>(null)
+  const focusFromArrowReference = useRef<boolean>(false)
+  const focusFromMouseReference = useRef<boolean>(false)
+  const initialDurationReference = useRef<number>(0)
+  const pendingCursorPosReference = useRef<null | number>(null)
 
   const config = DURATION_SEGMENT_CONFIG
 
@@ -80,28 +68,27 @@ export const DurationInput = ({
 
   // Store initial duration when component mounts or value changes externally
   useEffect(() => {
-    if (!inputRef.current?.matches(':focus')) {
-      initialDurationRef.current = durationMinutes
+    if (!inputReference.current?.matches(':focus')) {
+      initialDurationReference.current = durationMinutes
     }
   }, [durationMinutes])
 
   // Sync with external value
   useEffect(() => {
-    if (!inputRef.current?.matches(':focus')) {
+    if (!inputReference.current?.matches(':focus')) {
       setInputValue(durationString)
     }
   }, [durationString])
 
   // Restore cursor position after inputValue changes
   React.useLayoutEffect(() => {
-    if (
-      pendingCursorPosRef.current !== null &&
-      inputRef.current?.matches(':focus')
-    ) {
-      const pos = pendingCursorPosRef.current
-      pendingCursorPosRef.current = null
-      inputRef.current.setSelectionRange(pos, pos)
+    if (pendingCursorPosReference.current === null || !inputReference.current?.matches(':focus')) {
+      return
     }
+
+    const pos = pendingCursorPosReference.current
+    pendingCursorPosReference.current = null
+    inputReference.current.setSelectionRange(pos, pos)
   }, [inputValue])
 
   // Select a segment
@@ -111,25 +98,21 @@ export const DurationInput = ({
       inputValue,
       config.delimiter,
       config.segments,
-      inputRef,
+      inputReference,
       setSelectedSegment,
     )
   }
 
   // Handle mouse down to set flag before focus
   const handleMouseDown = () => {
-    focusFromMouseRef.current = true
+    focusFromMouseReference.current = true
   }
 
   // Handle click
   const handleClick = () => {
     setTimeout(() => {
-      const position = inputRef.current?.selectionStart
-      if (
-        typeof position === 'number' &&
-        inputValue &&
-        inputValue !== config.placeholder
-      ) {
+      const position = inputReference.current?.selectionStart
+      if (typeof position === 'number' && inputValue && inputValue !== config.placeholder) {
         const segment = getSegmentFromPosition(
           position,
           inputValue,
@@ -152,62 +135,60 @@ export const DurationInput = ({
 
   // Reset to initial duration
   const resetToInitial = () => {
-    updateDuration(initialDurationRef.current)
-    setInputValue(formatDuration(initialDurationRef.current))
+    updateDuration(initialDurationReference.current)
+    setInputValue(formatDuration(initialDurationReference.current))
   }
 
   // Handle input change
-  const handleInputChange = createInputChangeHandler({
-    config,
-    inputRef,
-    inputValue,
-    selectedSegment,
-    selectSegmentFn: selectSegment,
-    setCursorPosition: (pos) => {
-      pendingCursorPosRef.current = pos
-    },
-    setInputValue,
-    updateStore: (val: string) => {
-      const minutes = parseDuration(val)
-      if (minutes !== null) {
-        updateDuration(minutes)
-      }
-    },
-  })
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    createInputChangeHandler({
+      config,
+      inputRef: inputReference,
+      inputValue,
+      selectedSegment,
+      selectSegmentFn: selectSegment,
+      setCursorPosition: (pos) => {
+        pendingCursorPosReference.current = pos
+      },
+      setInputValue,
+      updateStore: (value_: string) => {
+        const minutes = parseDuration(value_)
+        if (minutes !== null) {
+          updateDuration(minutes)
+        }
+      },
+    })(event)
+  }
 
   // Handle keyboard navigation
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>): void => {
-    const bounds = getSegmentBounds(
-      inputValue,
-      config.delimiter,
-      config.segments,
-    )
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>): void => {
+    const bounds = getSegmentBounds(inputValue, config.delimiter, config.segments)
     if (!bounds) return
 
     // Block invalid characters
-    if (!validateInputChar(e.key, config.allowedCharsPattern)) {
-      e.preventDefault()
+    if (!isValidInputChar(event.key, config.allowedCharsPattern)) {
+      event.preventDefault()
       return
     }
 
     // Escape key - reset to initial value
-    if (handleEscapeKey(e, inputRef, resetToInitial)) {
+    if (didHandleEscapeKey(event, inputReference, resetToInitial)) {
       return
     }
 
     // Backspace/Delete handling
     if (
-      handleBackspaceDelete(
-        e,
-        inputRef,
+      didHandleBackspaceDelete(
+        event,
+        inputReference,
         inputValue,
         config.delimiter,
         config.segments,
         bounds,
         config.segmentPlaceholders,
         setInputValue,
-        (val) => {
-          const minutes = parseDuration(val)
+        (value_) => {
+          const minutes = parseDuration(value_)
           if (minutes !== null) {
             updateDuration(minutes)
           }
@@ -220,10 +201,10 @@ export const DurationInput = ({
 
     // Separator key to move to next segment
     if (
-      handleSeparatorKey(
-        e,
+      didHandleSeparatorKey(
+        event,
         config.separatorKeys,
-        inputRef,
+        inputReference,
         inputValue,
         config.delimiter,
         config.segments,
@@ -234,9 +215,9 @@ export const DurationInput = ({
     }
 
     // Arrow keys for increment/decrement
-    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-      e.preventDefault()
-      const position = inputRef.current?.selectionStart
+    if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+      event.preventDefault()
+      const position = inputReference.current?.selectionStart
       if (typeof position === 'number') {
         const segment = getSegmentFromPosition(
           position,
@@ -246,11 +227,10 @@ export const DurationInput = ({
         )
         if (!segment) return
 
-        const baseIncrement = e.key === 'ArrowUp' ? 1 : -1
+        const baseIncrement = event.key === 'ArrowUp' ? 1 : -1
         let newMinutes = durationMinutes
 
-        newMinutes +=
-          segment === 'hour' ? baseIncrement * 60 : baseIncrement * 5
+        newMinutes += baseIncrement * (segment === 'hour' ? 60 : 5)
 
         if (newMinutes >= 0) {
           updateDuration(newMinutes)
@@ -262,8 +242,8 @@ export const DurationInput = ({
     }
 
     // Tab navigation
-    if (e.key === 'Tab' && !e.shiftKey) {
-      const position = inputRef.current?.selectionStart
+    if (event.key === 'Tab' && !event.shiftKey) {
+      const position = inputReference.current?.selectionStart
       if (typeof position === 'number') {
         const segment = getSegmentFromPosition(
           position,
@@ -272,14 +252,14 @@ export const DurationInput = ({
           config.segments,
         )
         if (segment === 'hour') {
-          e.preventDefault()
+          event.preventDefault()
           selectSegment('minute')
         }
       }
     }
 
-    if (e.key === 'Tab' && e.shiftKey) {
-      const position = inputRef.current?.selectionStart
+    if (event.key === 'Tab' && event.shiftKey) {
+      const position = inputReference.current?.selectionStart
       if (typeof position === 'number') {
         const segment = getSegmentFromPosition(
           position,
@@ -288,15 +268,15 @@ export const DurationInput = ({
           config.segments,
         )
         if (segment === 'minute') {
-          e.preventDefault()
+          event.preventDefault()
           selectSegment('hour')
         }
       }
     }
 
     // Arrow key navigation between segments
-    if (e.key === 'ArrowLeft') {
-      const position = inputRef.current?.selectionStart
+    if (event.key === 'ArrowLeft') {
+      const position = inputReference.current?.selectionStart
       if (typeof position === 'number') {
         const segment = getSegmentFromPosition(
           position,
@@ -304,19 +284,13 @@ export const DurationInput = ({
           config.delimiter,
           config.segments,
         )
-        if (
-          segment === 'minute' &&
-          bounds['minute'] &&
-          position === bounds['minute'].start
-        ) {
-          e.preventDefault()
+        if (segment === 'minute' && bounds['minute'] && position === bounds['minute'].start) {
+          event.preventDefault()
           selectSegment('hour')
         }
       }
-    }
-
-    if (e.key === 'ArrowRight') {
-      const position = inputRef.current?.selectionStart
+    } else if (event.key === 'ArrowRight') {
+      const position = inputReference.current?.selectionStart
       if (typeof position === 'number') {
         const segment = getSegmentFromPosition(
           position,
@@ -324,12 +298,8 @@ export const DurationInput = ({
           config.delimiter,
           config.segments,
         )
-        if (
-          segment === 'hour' &&
-          bounds['hour'] &&
-          position === bounds['hour'].end
-        ) {
-          e.preventDefault()
+        if (segment === 'hour' && bounds['hour'] && position === bounds['hour'].end) {
+          event.preventDefault()
           selectSegment('minute')
         }
       }
@@ -337,8 +307,8 @@ export const DurationInput = ({
   }
 
   // Handle blur
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>): void => {
-    const relatedTarget = e.relatedTarget as HTMLElement
+  const handleBlur = (event: React.FocusEvent<HTMLInputElement>): void => {
+    const relatedTarget = event.relatedTarget as HTMLElement
     if (relatedTarget?.tagName === 'BUTTON' && relatedTarget.tabIndex === -1) {
       return
     }
@@ -356,15 +326,11 @@ export const DurationInput = ({
   const handleFocus = (): void => {
     if (inputValue === config.placeholder) {
       setInputValue('')
-    } else if (
-      inputValue &&
-      !focusFromArrowRef.current &&
-      !focusFromMouseRef.current
-    ) {
+    } else if (inputValue && !focusFromArrowReference.current && !focusFromMouseReference.current) {
       setTimeout(() => selectSegment('hour'), 0)
     }
-    focusFromArrowRef.current = false
-    focusFromMouseRef.current = false
+    focusFromArrowReference.current = false
+    focusFromMouseReference.current = false
   }
 
   // Handle arrow button clicks
@@ -388,11 +354,11 @@ export const DurationInput = ({
       const formatted = formatDuration(newMinutes)
       setInputValue(formatted)
 
-      focusFromArrowRef.current = true
+      focusFromArrowReference.current = true
 
       setTimeout(() => {
-        if (inputRef.current && !inputRef.current.matches(':focus')) {
-          inputRef.current.focus()
+        if (inputReference.current && !inputReference.current.matches(':focus')) {
+          inputReference.current.focus()
         }
         selectSegment(targetSegment)
       }, 10)
@@ -403,8 +369,7 @@ export const DurationInput = ({
     <SegmentedInputWrapper
       hasSelection={!!selectedSegment}
       label={t('formats.durationFormat', { defaultValue: 'HH:MM' })}
-      onArrowClick={handleArrowClick}
-    >
+      onArrowClick={handleArrowClick}>
       <Input
         className={`selection:bg-secondary selection:text-secondary-content join-item m-0 font-mono ${error ? 'text-error' : ''}`}
         fullWidth={false}
@@ -418,7 +383,7 @@ export const DurationInput = ({
         placeholder={t('formats.durationFormat', {
           defaultValue: 'HH:MM',
         })}
-        ref={inputRef}
+        ref={inputReference}
         size="md"
         style={{ fontSize: '0.95rem', width: 'calc(5ch + 1.6rem)' }}
         type="text"

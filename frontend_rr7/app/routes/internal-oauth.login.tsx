@@ -45,31 +45,27 @@ import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { Logo } from '~/components/ui/icons/logo'
 import { InternalLoginInfoPanel } from '~/features/auth/auth-info-panels'
 import { AuthLayout } from '~/features/auth/auth-layout'
-import { getServerEnv } from '~/lib/env.server'
-import { type SchemaTranslationFn, untyped } from '~/lib/i18n-types'
+import { getServerEnvironment } from '~/lib/environment.server'
+import { type SchemaTranslationFunction, untyped } from '~/lib/i18n-types'
 import { logger } from '~/lib/logger'
 import { getConfiguration } from '~/services/api/lasius/general/general'
-import {
-  getOptionalUser,
-  sanitizeReturnTo,
-} from '~/services/auth/auth-helpers.server'
+import { getOptionalUser, sanitizeReturnTo } from '~/services/auth/auth-helpers.server'
 import { internalRegisterUrl } from '~/services/auth/auth-urls'
 import { getInternalProvider } from '~/services/auth/providers'
 import { createUserSession } from '~/services/auth/session.server'
 
 import { type Route } from './+types/internal-oauth.login'
 
-const createLoginSchema = (t: SchemaTranslationFn) =>
+const createLoginSchema = (t: SchemaTranslationFunction) =>
   z.object({
-    email: z
-      .string({
-        error: t('validation.required', { defaultValue: 'Required' }),
-      })
-      .email({
-        message: t('validation.emailInvalid', {
-          defaultValue: 'Invalid email address',
-        }),
-      }),
+    email: z.email({
+      error: (issue) =>
+        issue.code === 'invalid_type'
+          ? t('validation.required', { defaultValue: 'Required' })
+          : t('validation.emailInvalid', {
+              defaultValue: 'Invalid email address',
+            }),
+    }),
     password: z
       .string({
         error: t('validation.required', { defaultValue: 'Required' }),
@@ -79,8 +75,8 @@ const createLoginSchema = (t: SchemaTranslationFn) =>
   })
 
 // Server-side schema with English defaults
-const serverLoginSchema = createLoginSchema(
-  (_, opts) => opts?.defaultValue ?? '',
+const serverLoginSchema = createLoginSchema((_, defaultValue) =>
+  typeof defaultValue === 'string' ? defaultValue : defaultValue.defaultValue,
 )
 
 export async function action({ request }: Route.ActionArgs) {
@@ -88,10 +84,7 @@ export async function action({ request }: Route.ActionArgs) {
   const submission = parseWithZod(formData, { schema: serverLoginSchema })
 
   if (submission.status !== 'success') {
-    return data(
-      { lastResult: submission.reply(), serverError: null },
-      { status: 400 },
-    )
+    return data({ lastResult: submission.reply(), serverError: null }, { status: 400 })
   }
 
   const { email, password, returnTo } = submission.value
@@ -120,10 +113,7 @@ export async function action({ request }: Route.ActionArgs) {
     const message = error instanceof Error ? error.message : 'Login failed'
     logger.warn('Internal login failed', { email, error: message })
 
-    const errorCode =
-      message === 'Invalid credentials'
-        ? 'usernameOrPasswordWrong'
-        : 'loginFailed'
+    const errorCode = message === 'Invalid credentials' ? 'usernameOrPasswordWrong' : 'loginFailed'
 
     return data(
       { lastResult: submission.reply(), serverError: errorCode },
@@ -180,11 +170,9 @@ export default function InternalOAuthLogin() {
         <Alert
           className="animate-[fadeIn_0.4s_ease-out]"
           data-testid="auth-internal-registered-success"
-          variant="success"
-        >
+          variant="success">
           {t('auth.registrationSuccess', {
-            defaultValue:
-              'Thank you for registering. You can now sign in with your credentials.',
+            defaultValue: 'Thank you for registering. You can now sign in with your credentials.',
           })}
         </Alert>
       )}
@@ -192,8 +180,7 @@ export default function InternalOAuthLogin() {
         <Alert
           className="animate-[fadeIn_0.4s_ease-out]"
           data-testid="auth-internal-login-error"
-          variant="warning"
-        >
+          variant="warning">
           {getErrorMessage(actionData.serverError)}
         </Alert>
       )}
@@ -208,14 +195,16 @@ export default function InternalOAuthLogin() {
             </p>
             <p>
               <Trans
+                // Trans replaces the link text below with the text of the matching tag in the translation.
                 components={[
                   <a
                     className="text-primary hover:underline"
                     href="https://github.com/tegonal/lasius"
                     key="gitHubLink"
                     rel="noopener noreferrer"
-                    target="_blank"
-                  />,
+                    target="_blank">
+                    GitHub
+                  </a>,
                 ]}
                 defaults="We appreciate your feedback. Please leave a comment on <0>GitHub</0>"
                 i18nKey="footer.feedbackOnGithub"
@@ -227,10 +216,7 @@ export default function InternalOAuthLogin() {
       )}
       <Card className="bg-base-100/80 border-0 shadow-2xl backdrop-blur-sm">
         <CardBody className="p-8 lg:p-10">
-          <Link
-            className="flex items-center gap-1 self-center text-sm"
-            to={href('/login')}
-          >
+          <Link className="flex items-center gap-1 self-center text-sm" to={href('/login')}>
             <ChevronLeft size={16} />
             {t('actions.back', {
               defaultValue: 'Back',
@@ -247,8 +233,7 @@ export default function InternalOAuthLogin() {
             </h2>
             <p className="text-base-content/60 text-sm">
               {t('auth.enterEmailAndPassword', {
-                defaultValue:
-                  'Enter your email and password to access your account',
+                defaultValue: 'Enter your email and password to access your account',
               })}
             </p>
           </div>
@@ -263,11 +248,9 @@ export default function InternalOAuthLogin() {
                   htmlFor={fields.email.id}
                   label={t('forms.email', {
                     defaultValue: 'Email',
-                  })}
-                >
+                  })}>
                   <Input
                     autoComplete="email"
-                    autoFocus
                     data-testid="auth-internal-email-input"
                     error={!!fields.email.errors?.length}
                     {...getInputProps(fields.email, { type: 'email' })}
@@ -279,8 +262,7 @@ export default function InternalOAuthLogin() {
                   htmlFor={fields.password.id}
                   label={t('forms.password', {
                     defaultValue: 'Password',
-                  })}
-                >
+                  })}>
                   <Input
                     autoComplete="current-password"
                     data-testid="auth-internal-password-input"
@@ -296,8 +278,7 @@ export default function InternalOAuthLogin() {
                   data-testid="auth-internal-submit-btn"
                   fullWidth
                   loading={isSubmitting}
-                  type="submit"
-                >
+                  type="submit">
                   {t('auth.signIn', {
                     defaultValue: 'Sign in',
                   })}
@@ -309,8 +290,7 @@ export default function InternalOAuthLogin() {
                     to={internalRegisterUrl({
                       invitation_id: invitationId,
                       returnTo,
-                    })}
-                  >
+                    })}>
                     {t('actions.signUp', {
                       defaultValue: 'Sign up',
                     })}
@@ -334,26 +314,25 @@ export async function loader({ request }: Route.LoaderArgs) {
     throw redirect(returnTo)
   }
 
-  const demoMode = getServerEnv('LASIUS_DEMO_MODE') === 'true'
+  const isDemoMode = getServerEnvironment('LASIUS_DEMO_MODE') === 'true'
   const email = url.searchParams.get('email') ?? ''
   const invitationId = url.searchParams.get('invitation_id') ?? ''
-  const registered = url.searchParams.get('registered') === 'true'
+  const isRegistered = url.searchParams.get('registered') === 'true'
 
-  let allowRegistration = false
+  let isAllowRegistration = false
   try {
     const config = await getConfiguration()
-    allowRegistration =
-      config.data.lasiusOAuthProviderAllowUserRegistration ?? false
+    isAllowRegistration = config.data.lasiusOAuthProviderAllowUserRegistration ?? false
   } catch (error) {
     logger.warn('Failed to fetch configuration', error)
   }
 
   return {
-    allowRegistration,
-    demoMode,
+    allowRegistration: isAllowRegistration,
+    demoMode: isDemoMode,
     email,
     invitationId,
-    registered,
+    registered: isRegistered,
     returnTo,
   }
 }

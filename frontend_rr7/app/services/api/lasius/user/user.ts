@@ -31,9 +31,7 @@ export const getGetUserProfileUrl = () => {
   return `/user/profile`
 }
 
-export const getUserProfile = async (
-  options?: RequestInit,
-): Promise<getUserProfileResponse> => {
+export const getUserProfile = async (options?: RequestInit): Promise<getUserProfileResponse> => {
   return lasiusFetch<getUserProfileResponse>(getGetUserProfileUrl(), {
     ...options,
     method: 'GET',
@@ -77,10 +75,9 @@ export type updateUserSettingsResponse200 = {
   status: 200
 }
 
-export type updateUserSettingsResponseSuccess =
-  updateUserSettingsResponse200 & {
-    headers: Headers
-  }
+export type updateUserSettingsResponseSuccess = updateUserSettingsResponse200 & {
+  headers: Headers
+}
 export type updateUserSettingsResponse = updateUserSettingsResponseSuccess
 
 export const getUpdateUserSettingsUrl = () => {

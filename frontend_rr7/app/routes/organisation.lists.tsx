@@ -31,11 +31,7 @@ import { ModelsUserOrganisationRole } from '~/services/api/lasius/modelsUserOrga
 import { getOrganisationBookingList } from '~/services/api/lasius/organisation-bookings/organisation-bookings'
 import { getOrganisationUserList } from '~/services/api/lasius/organisations/organisations'
 import { getProjectList } from '~/services/api/lasius/projects/projects'
-import {
-  authHeaders,
-  mergeAuthHeaders,
-  requireUser,
-} from '~/services/auth/auth-helpers.server'
+import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/organisation.lists'
 
@@ -50,11 +46,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const selectedOrgId = getSelectedOrganisationId(user)
 
   // Check admin role
-  const selectedOrg = organisations.find(
-    (o) => o.organisationReference.id === selectedOrgId,
-  )
-  const isAdmin =
-    selectedOrg?.role === ModelsUserOrganisationRole.OrganisationAdministrator
+  const selectedOrg = organisations.find((o) => o.organisationReference.id === selectedOrgId)
+  const isAdmin = selectedOrg?.role === ModelsUserOrganisationRole.OrganisationAdministrator
 
   if (!isAdmin) {
     throw new Response('Unauthorized', { status: 401 })
@@ -62,12 +55,12 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
   // Read date range from search params: from/to (set by filter), or default
   const url = new URL(request.url)
-  const fromParam = url.searchParams.get('from')
-  const toParam = url.searchParams.get('to')
+  const fromParameter = url.searchParams.get('from')
+  const toParameter = url.searchParams.get('to')
 
   let dateRange: { from: string; to: string }
-  if (fromParam && toParam) {
-    dateRange = { from: fromParam, to: toParam }
+  if (fromParameter && toParameter) {
+    dateRange = { from: fromParameter, to: toParameter }
   } else {
     const firstOption = dateOptions[0]
     const now = new Date()
@@ -78,17 +71,11 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
   const timespan = apiTimespanFromTo(dateRange.from, dateRange.to)
 
-  const [bookingsResponse, usersResponse, projectsResponse] = await Promise.all(
-    [
-      getOrganisationBookingList(
-        selectedOrgId,
-        timespan ?? { from: '', to: '' },
-        { headers },
-      ),
-      getOrganisationUserList(selectedOrgId, { headers }),
-      getProjectList(selectedOrgId, { headers }),
-    ],
-  )
+  const [bookingsResponse, usersResponse, projectsResponse] = await Promise.all([
+    getOrganisationBookingList(selectedOrgId, timespan ?? { from: '', to: '' }, { headers }),
+    getOrganisationUserList(selectedOrgId, { headers }),
+    getProjectList(selectedOrgId, { headers }),
+  ])
 
   return data(
     {

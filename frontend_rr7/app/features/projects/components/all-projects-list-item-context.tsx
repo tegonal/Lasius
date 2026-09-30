@@ -41,11 +41,11 @@ import { ProjectAddUpdateTagsForm } from '~/features/tag-manager/components/proj
 import { useDeactivateProject } from '~/services/api/lasius-hooks/projects/projects'
 import { type ModelsProject } from '~/services/api/lasius/modelsProject'
 
-type Props = {
+type Properties = {
   item: ModelsProject
 }
 
-export const AllProjectsListItemContext = ({ item }: Props) => {
+export const AllProjectsListItemContext = ({ item }: Properties) => {
   const [isUpdateOpen, setIsUpdateOpen] = useState(false)
   const [isManageOpen, setIsManageOpen] = useState(false)
   const [isTagOpen, setIsTagOpen] = useState(false)
@@ -81,8 +81,8 @@ export const AllProjectsListItemContext = ({ item }: Props) => {
     handleCloseAll()
   }
 
-  const handleDeactivateProject = async () => {
-    await deactivateProject({
+  const handleDeactivateProject = () => {
+    deactivateProject({
       orgId: item.organisationReference.id,
       projectId: item.id,
     })
@@ -114,19 +114,12 @@ export const AllProjectsListItemContext = ({ item }: Props) => {
             {item.active && (
               <ContextButtonWrapper variant="compact">
                 <Button
-                  aria-label={t(
-                    'organisation:members.actions.manage',
-                    'Manage members',
-                  )}
+                  aria-label={t('organisation:members.actions.manage', 'Manage members')}
                   fullWidth={false}
                   onClick={() => manageMembers()}
                   shape="circle"
-                  title={t(
-                    'organisation:members.actions.manage',
-                    'Manage members',
-                  )}
-                  variant="contextIcon"
-                >
+                  title={t('organisation:members.actions.manage', 'Manage members')}
+                  variant="contextIcon">
                   <LucideIcon icon={Users} size={24} />
                 </Button>
               </ContextButtonWrapper>
@@ -138,8 +131,7 @@ export const AllProjectsListItemContext = ({ item }: Props) => {
                 onClick={() => showLists()}
                 shape="circle"
                 title={t('bookings:showLists', 'Show bookings')}
-                variant="contextIcon"
-              >
+                variant="contextIcon">
                 <LucideIcon icon={List} size={24} />
               </Button>
             </ContextButtonWrapper>
@@ -150,8 +142,7 @@ export const AllProjectsListItemContext = ({ item }: Props) => {
                 onClick={() => showStats()}
                 shape="circle"
                 title={t('stats:showStatistics', 'Show statistics')}
-                variant="contextIcon"
-              >
+                variant="contextIcon">
                 <LucideIcon icon={PieChart} size={24} />
               </Button>
             </ContextButtonWrapper>
@@ -160,8 +151,7 @@ export const AllProjectsListItemContext = ({ item }: Props) => {
                 <span
                   title={t('projects:deactivatedBy', 'Archived by {{user}}', {
                     user: item.deactivatedBy.key,
-                  })}
-                >
+                  })}>
                   <Button
                     aria-label={t('projects:actions.edit', {
                       defaultValue: 'Edit project',
@@ -172,8 +162,7 @@ export const AllProjectsListItemContext = ({ item }: Props) => {
                     title={t('projects:actions.edit', {
                       defaultValue: 'Edit project',
                     })}
-                    variant="contextIcon"
-                  >
+                    variant="contextIcon">
                     <LucideIcon icon={Pencil} size={24} />
                   </Button>
                 </span>
@@ -188,8 +177,7 @@ export const AllProjectsListItemContext = ({ item }: Props) => {
                   title={t('projects:actions.edit', {
                     defaultValue: 'Edit project',
                   })}
-                  variant="contextIcon"
-                >
+                  variant="contextIcon">
                   <LucideIcon icon={Pencil} size={24} />
                 </Button>
               )}
@@ -207,8 +195,7 @@ export const AllProjectsListItemContext = ({ item }: Props) => {
                     title={t('tag-manager:actions.edit', {
                       defaultValue: 'Edit tags',
                     })}
-                    variant="contextIcon"
-                  >
+                    variant="contextIcon">
                     <LucideIcon icon={Tags} size={24} />
                   </Button>
                 </ContextButtonWrapper>
@@ -223,8 +210,7 @@ export const AllProjectsListItemContext = ({ item }: Props) => {
                     title={t('projects:actions.deactivate', {
                       defaultValue: 'Deactivate project',
                     })}
-                    variant="contextIcon"
-                  >
+                    variant="contextIcon">
                     <LucideIcon icon={Archive} size={24} />
                   </Button>
                 </ContextButtonWrapper>
@@ -252,16 +238,9 @@ export const AllProjectsListItemContext = ({ item }: Props) => {
         />
       </Modal>
       <Modal onClose={handleManageClose} open={isManageOpen} size="xl">
-        <ManageProjectMembers
-          item={item}
-          onCancel={handleManageClose}
-          onSave={handleManageClose}
-        />
+        <ManageProjectMembers item={item} onCancel={handleManageClose} onSave={handleManageClose} />
       </Modal>
-      <Modal
-        onClose={handleDeactivateConfirmClose}
-        open={isDeactivateConfirmOpen}
-      >
+      <Modal onClose={handleDeactivateConfirmClose} open={isDeactivateConfirmOpen}>
         <ModalDescription>
           {t(
             'projects:actions.deactivateConfirm',
@@ -272,18 +251,10 @@ export const AllProjectsListItemContext = ({ item }: Props) => {
           )}
         </ModalDescription>
         <ButtonGroup>
-          <Button
-            onClick={() => void handleDeactivateProject()}
-            type="button"
-            variant="primary"
-          >
+          <Button onClick={handleDeactivateProject} type="button" variant="primary">
             {t('projects:actions.deactivate', 'Deactivate project')}
           </Button>
-          <Button
-            onClick={handleDeactivateConfirmClose}
-            type="button"
-            variant="secondary"
-          >
+          <Button onClick={handleDeactivateConfirmClose} type="button" variant="secondary">
             {t('cancel', 'Cancel')}
           </Button>
         </ButtonGroup>

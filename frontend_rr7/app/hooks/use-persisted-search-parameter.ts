@@ -32,26 +32,22 @@ const STORAGE_PREFIX = 'lasius:'
  * @param fallback - Default value when neither URL nor localStorage has the param
  * @returns The current value of the search param
  */
-export const usePersistedSearchParam = (
-  key: string,
-  fallback: string,
-): string => {
-  const [searchParams, setSearchParams] = useSearchParams()
-  const paramValue = searchParams.get(key)
+export const usePersistedSearchParameter = (key: string, fallback: string): string => {
+  const [searchParameters, setSearchParameters] = useSearchParams()
+  const parameterValue = searchParameters.get(key)
   const storageKey = `${STORAGE_PREFIX}${key}`
 
   // On mount: restore from localStorage if URL doesn't have the param
   useEffect(() => {
-    if (paramValue) return
+    if (parameterValue) return
 
-    const stored =
-      globalThis.window === undefined ? null : localStorage.getItem(storageKey)
+    const stored = globalThis.window === undefined ? null : localStorage.getItem(storageKey)
     const valueToSet = stored || fallback
 
-    setSearchParams(
-      (prev) => {
-        prev.set(key, valueToSet)
-        return prev
+    setSearchParameters(
+      (previous) => {
+        previous.set(key, valueToSet)
+        return previous
       },
       { preventScrollReset: true, replace: true },
     )
@@ -59,10 +55,10 @@ export const usePersistedSearchParam = (
 
   // On change: persist to localStorage
   useEffect(() => {
-    if (paramValue && globalThis.window !== undefined) {
-      localStorage.setItem(storageKey, paramValue)
+    if (parameterValue && globalThis.window !== undefined) {
+      localStorage.setItem(storageKey, parameterValue)
     }
-  }, [paramValue, storageKey])
+  }, [parameterValue, storageKey])
 
-  return paramValue || fallback
+  return parameterValue || fallback
 }

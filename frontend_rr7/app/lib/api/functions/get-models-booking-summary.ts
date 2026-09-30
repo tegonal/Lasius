@@ -25,7 +25,7 @@ export const getModelsBookingSummary = (list: ModelsBooking[]) => {
   const hours =
     Math.round(
       getExtendedModelsBookingList(list).reduce(
-        (acc, item) => acc + item.duration,
+        (accumulator, item) => accumulator + item.duration,
         0,
       ) * 100,
     ) / 100

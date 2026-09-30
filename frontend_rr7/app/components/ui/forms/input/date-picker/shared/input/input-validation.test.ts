@@ -19,72 +19,66 @@
 
 import { describe, expect, it } from 'vitest'
 
-import { validateInputChar } from './input-validation'
+import { isValidInputChar } from './input-validation'
 
 const datePattern = /[\d.]/
 const timePattern = /[\d:]/
 
-describe('validateInputChar', () => {
+describe('isValidInputChar', () => {
   describe('digits (0-9)', () => {
     it.each(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])(
       'allows digit "%s" for date pattern',
       (digit) => {
-        expect(validateInputChar(digit, datePattern)).toBe(true)
+        expect(isValidInputChar(digit, datePattern)).toBe(true)
       },
     )
 
     it.each(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])(
       'allows digit "%s" for time pattern',
       (digit) => {
-        expect(validateInputChar(digit, timePattern)).toBe(true)
+        expect(isValidInputChar(digit, timePattern)).toBe(true)
       },
     )
   })
 
   describe('pattern-specific characters', () => {
     it('allows "." for date pattern', () => {
-      expect(validateInputChar('.', datePattern)).toBe(true)
+      expect(isValidInputChar('.', datePattern)).toBe(true)
     })
 
     it('allows ":" for time pattern', () => {
-      expect(validateInputChar(':', timePattern)).toBe(true)
+      expect(isValidInputChar(':', timePattern)).toBe(true)
     })
 
     it('rejects "." for time pattern', () => {
-      expect(validateInputChar('.', timePattern)).toBe(false)
+      expect(isValidInputChar('.', timePattern)).toBe(false)
     })
 
     it('rejects ":" for date pattern', () => {
-      expect(validateInputChar(':', datePattern)).toBe(false)
+      expect(isValidInputChar(':', datePattern)).toBe(false)
     })
   })
 
   describe('rejected characters', () => {
-    it.each(['a', 'b', 'z', 'A', 'Z'])(
-      'rejects letter "%s" for date pattern',
-      (letter) => {
-        expect(validateInputChar(letter, datePattern)).toBe(false)
-      },
-    )
+    it.each(['a', 'b', 'z', 'A', 'Z'])('rejects letter "%s" for date pattern', (letter) => {
+      expect(isValidInputChar(letter, datePattern)).toBe(false)
+    })
 
-    it.each(['a', 'b', 'z', 'A', 'Z'])(
-      'rejects letter "%s" for time pattern',
-      (letter) => {
-        expect(validateInputChar(letter, timePattern)).toBe(false)
-      },
-    )
+    it.each(['a', 'b', 'z', 'A', 'Z'])('rejects letter "%s" for time pattern', (letter) => {
+      expect(isValidInputChar(letter, timePattern)).toBe(false)
+    })
 
     it.each(['@', '#', '$', '%', '!', '&'])(
       'rejects special character "%s" for date pattern',
       (char) => {
-        expect(validateInputChar(char, datePattern)).toBe(false)
+        expect(isValidInputChar(char, datePattern)).toBe(false)
       },
     )
 
     it.each(['@', '#', '$', '%', '!', '&'])(
       'rejects special character "%s" for time pattern',
       (char) => {
-        expect(validateInputChar(char, timePattern)).toBe(false)
+        expect(isValidInputChar(char, timePattern)).toBe(false)
       },
     )
   })
@@ -101,20 +95,20 @@ describe('validateInputChar', () => {
       'ArrowUp',
       'ArrowDown',
     ])('allows special key "%s" regardless of pattern', (key) => {
-      expect(validateInputChar(key, datePattern)).toBe(true)
-      expect(validateInputChar(key, timePattern)).toBe(true)
+      expect(isValidInputChar(key, datePattern)).toBe(true)
+      expect(isValidInputChar(key, timePattern)).toBe(true)
     })
 
     it('allows other multi-character keys like "Shift"', () => {
-      expect(validateInputChar('Shift', datePattern)).toBe(true)
-      expect(validateInputChar('Control', timePattern)).toBe(true)
+      expect(isValidInputChar('Shift', datePattern)).toBe(true)
+      expect(isValidInputChar('Control', timePattern)).toBe(true)
     })
   })
 
   describe('empty string key', () => {
     it('returns true for empty string', () => {
-      expect(validateInputChar('', datePattern)).toBe(true)
-      expect(validateInputChar('', timePattern)).toBe(true)
+      expect(isValidInputChar('', datePattern)).toBe(true)
+      expect(isValidInputChar('', timePattern)).toBe(true)
     })
   })
 })

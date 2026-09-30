@@ -34,15 +34,11 @@ export const CalendarDay = ({
 }: {
   date: IsoDateString
   isSelected?: boolean
-  onClick: (args: IsoDateString) => void
+  onClick: (arguments_: IsoDateString) => void
 }) => {
   return (
     <Suspense fallback={<CalendarDaySkeleton />}>
-      <CalendarDayContent
-        date={date}
-        isSelected={isSelected}
-        onClick={onClick}
-      />
+      <CalendarDayContent date={date} isSelected={isSelected} onClick={onClick} />
     </Suspense>
   )
 }
@@ -54,7 +50,7 @@ const CalendarDayContent = ({
 }: {
   date: IsoDateString
   isSelected: boolean
-  onClick: (args: IsoDateString) => void
+  onClick: (arguments_: IsoDateString) => void
 }) => {
   const day = new Date(date)
   const { progressBarPercentage } = useCalendarDaySummary(date)
@@ -66,8 +62,7 @@ const CalendarDayContent = ({
         isWeekend(day) && 'opacity-50',
         isSelected && 'shadow-none hover:bg-transparent hover:text-current',
       )}
-      onClick={() => onClick(date)}
-    >
+      onClick={() => onClick(date)}>
       <div className="pt-1 text-center text-xs leading-none font-normal uppercase">
         <FormatDate date={day} format="dayNameShort" />
       </div>

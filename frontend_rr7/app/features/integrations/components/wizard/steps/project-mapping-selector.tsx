@@ -34,9 +34,9 @@ import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
 import { ModalDescription } from '~/components/ui/overlays/modal/modal-description'
 import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
-import { TagConfigurationForm } from '~/features/integrations/components/shared/tag-configuration-form'
-import { type TagConfiguration } from '~/features/integrations/lib/mapping-helpers'
-import { getDefaultTagConfiguration } from '~/features/integrations/lib/tag-config-defaults'
+import { TagConfigForm } from '~/features/integrations/components/shared/tag-config-form'
+import { type TagConfig } from '~/features/integrations/lib/mapping-helpers'
+import { getDefaultTagConfig } from '~/features/integrations/lib/tag-config-defaults'
 import { validateFormData } from '~/lib/conform-helpers'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 import { type ModelsExternalProject } from '~/services/api/lasius'
@@ -45,17 +45,14 @@ const mappingSchema = z.object({
   projectId: z.string().min(1, 'Project is required'),
 })
 
-type Props = {
+type Properties = {
   excludeProjectIds?: string[]
-  existingTagConfig?: TagConfiguration
+  existingTagConfig?: TagConfig
   externalProject: ModelsExternalProject
   importerType: ImporterType
   lasiusProjects: Array<{ id: string; key: string }>
   onCancel: () => void
-  onSelect: (
-    projectId: null | string,
-    tagConfig: TagConfiguration | undefined,
-  ) => void
+  onSelect: (projectId: null | string, tagConfig: TagConfig | undefined) => void
   selectedProjectId?: string
 }
 
@@ -68,11 +65,11 @@ export const ProjectMappingSelector = ({
   onCancel,
   onSelect,
   selectedProjectId,
-}: Props) => {
+}: Properties) => {
   const { t } = useTranslation('integrations')
 
-  const [tagConfig, setTagConfig] = useState<TagConfiguration | undefined>(
-    () => existingTagConfig ?? getDefaultTagConfiguration(importerType),
+  const [tagConfig, setTagConfig] = useState<TagConfig | undefined>(
+    () => existingTagConfig ?? getDefaultTagConfig(importerType),
   )
 
   const [form, fields] = useForm({
@@ -94,10 +91,7 @@ export const ProjectMappingSelector = ({
   const suggestions = useMemo(
     () =>
       lasiusProjects
-        .filter(
-          (p) =>
-            !excludeProjectIds?.includes(p.id) || p.id === selectedProjectId,
-        )
+        .filter((p) => !excludeProjectIds?.includes(p.id) || p.id === selectedProjectId)
         .map((p) => ({ id: p.id, key: p.key })),
     [lasiusProjects, excludeProjectIds, selectedProjectId],
   )
@@ -107,21 +101,17 @@ export const ProjectMappingSelector = ({
     [suggestions, projectIdControl.value],
   )
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault()
 
-    const result = validateFormData(e.currentTarget, mappingSchema)
+    const result = validateFormData(event.currentTarget, mappingSchema)
     if (result.status !== 'success') return
 
     onSelect(result.value.projectId, tagConfig)
   }
 
   return (
-    <form
-      {...getFormProps(form)}
-      className="flex h-full flex-col"
-      onSubmit={handleSubmit}
-    >
+    <form {...getFormProps(form)} className="flex h-full flex-col" onSubmit={handleSubmit}>
       <ModalCloseButton onClose={onCancel} />
 
       <div className="flex h-full flex-col">
@@ -151,9 +141,7 @@ export const ProjectMappingSelector = ({
             />
             <div className="min-w-0 flex-1">
               <p className="text-sm font-medium">{externalProject.name}</p>
-              <p className="text-base-content/50 truncate text-xs">
-                {externalProject.id}
-              </p>
+              <p className="text-base-content/50 truncate text-xs">{externalProject.id}</p>
             </div>
           </div>
 
@@ -170,8 +158,7 @@ export const ProjectMappingSelector = ({
               label={t('projects.label', {
                 defaultValue: 'Project',
               })}
-              required
-            >
+              required>
               <InputSelectAutocomplete
                 errors={fields.projectId.errors}
                 id={fields.projectId.id}
@@ -184,7 +171,7 @@ export const ProjectMappingSelector = ({
             </FormElement>
 
             {projectIdControl.value && tagConfig && importerType !== 'jira' && (
-              <TagConfigurationForm
+              <TagConfigForm
                 externalProject={externalProject}
                 importerType={importerType}
                 onChange={setTagConfig}
@@ -197,11 +184,7 @@ export const ProjectMappingSelector = ({
 
       <div className="mt-6">
         <ButtonGroup>
-          <Button
-            disabled={!projectIdControl.value}
-            type="submit"
-            variant="primary"
-          >
+          <Button disabled={!projectIdControl.value} type="submit" variant="primary">
             {t('actions.confirm', { defaultValue: 'Confirm' })}
           </Button>
           <Button onClick={onCancel} type="button" variant="secondary">

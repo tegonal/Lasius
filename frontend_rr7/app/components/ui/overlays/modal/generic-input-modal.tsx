@@ -18,7 +18,7 @@
  */
 
 import { type FieldMetadata, getInputProps } from '@conform-to/react'
-import React from 'react'
+import React, { useRef } from 'react'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { Input } from '~/components/primitives/inputs/input'
@@ -30,7 +30,7 @@ import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { Modal } from './modal'
 import { ModalCloseButton } from './modal-close-button'
 
-type ConformProps = SharedProps & {
+type ConformProperties = SharedProperties & {
   /** @deprecated Use field prop instead */
   error?: never
   field: FieldMetadata<string>
@@ -42,7 +42,7 @@ type ConformProps = SharedProps & {
   value?: never
 }
 
-type ControlledProps = SharedProps & {
+type ControlledProperties = SharedProperties & {
   error?: never
   field?: never
   fieldName?: never
@@ -51,9 +51,9 @@ type ControlledProps = SharedProps & {
   value: string
 }
 
-type GenericInputModalProps = ConformProps | ControlledProps
+type GenericInputModalProperties = ConformProperties | ControlledProperties
 
-type SharedProps = {
+type SharedProperties = {
   cancelLabel?: string
   confirmLabel: string
   enableEnterKey?: boolean
@@ -68,16 +68,12 @@ type SharedProps = {
  * Generic input modal component for text input with form validation.
  * Supports both Conform (field prop) and Controlled (value/onChange props) modes.
  */
-export const GenericInputModal = (props: GenericInputModalProps) => {
-  if (props.field) {
-    return <ConformInputModal {...props} field={props.field} />
+export const GenericInputModal = (properties: GenericInputModalProperties) => {
+  if (properties.field) {
+    return <ConformInputModal {...properties} field={properties.field} />
   }
   return (
-    <ControlledInputModal
-      {...props}
-      onChange={props.onChange}
-      value={props.value}
-    />
+    <ControlledInputModal {...properties} onChange={properties.onChange} value={properties.value} />
   )
 }
 
@@ -91,26 +87,30 @@ const ConformInputModal = ({
   onConfirm,
   open,
   placeholder,
-}: SharedProps & { field: FieldMetadata<string> }) => {
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (enableEnterKey && e.key === 'Enter') {
-      e.preventDefault()
-      onConfirm()
+}: SharedProperties & { field: FieldMetadata<string> }) => {
+  const inputReference = useRef<HTMLInputElement>(null)
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (!(enableEnterKey && event.key === 'Enter')) {
+      return
     }
+
+    event.preventDefault()
+    onConfirm()
   }
 
   return (
-    <Modal onClose={onClose} open={open}>
+    <Modal initialFocus={inputReference} onClose={onClose} open={open}>
       <ModalCloseButton onClose={onClose} />
       <FormElement>
         <Label htmlFor={field.id}>{label}</Label>
         <Input
           {...getInputProps(field, { type: 'text' })}
           autoComplete="off"
-          autoFocus
           key={field.key}
           onKeyDown={enableEnterKey ? handleKeyDown : undefined}
           placeholder={placeholder}
+          ref={inputReference}
         />
         <FormFieldErrors errors={field.errors} />
       </FormElement>
@@ -138,25 +138,29 @@ const ControlledInputModal = ({
   open,
   placeholder,
   value,
-}: SharedProps & { onChange: (value: string) => void; value: string }) => {
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (enableEnterKey && e.key === 'Enter') {
-      e.preventDefault()
-      onConfirm()
+}: SharedProperties & { onChange: (value: string) => void; value: string }) => {
+  const inputReference = useRef<HTMLInputElement>(null)
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (!(enableEnterKey && event.key === 'Enter')) {
+      return
     }
+
+    event.preventDefault()
+    onConfirm()
   }
 
   return (
-    <Modal onClose={onClose} open={open}>
+    <Modal initialFocus={inputReference} onClose={onClose} open={open}>
       <ModalCloseButton onClose={onClose} />
       <FormElement>
         <Label>{label}</Label>
         <Input
           autoComplete="off"
-          autoFocus
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(event) => onChange(event.target.value)}
           onKeyDown={enableEnterKey ? handleKeyDown : undefined}
           placeholder={placeholder}
+          ref={inputReference}
           value={value}
         />
       </FormElement>

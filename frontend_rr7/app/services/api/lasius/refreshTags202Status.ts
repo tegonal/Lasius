@@ -6,9 +6,8 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type RefreshTags202Status = typeof RefreshTags202Status[keyof typeof RefreshTags202Status];
-
+export type RefreshTags202Status = (typeof RefreshTags202Status)[keyof typeof RefreshTags202Status]
 
 export const RefreshTags202Status = {
   accepted: 'accepted',
-} as const;
+} as const

@@ -32,7 +32,7 @@ export function useSegmentedInput<TSegment extends string>(
 ) {
   const [inputValue, setInputValue] = useState<string>(initialValue)
   const [selectedSegment, setSelectedSegment] = useState<null | TSegment>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const inputReference = useRef<HTMLInputElement>(null)
 
   // Handle focus to select first segment
   const handleFocus = (onFirstSegmentSelect: () => void) => {
@@ -45,19 +45,12 @@ export function useSegmentedInput<TSegment extends string>(
 
   // Handle click to select segment
   const handleClick = (
-    getSegmentFromPosition: (
-      position: number,
-      value: string,
-    ) => null | TSegment,
+    getSegmentFromPosition: (position: number, value: string) => null | TSegment,
     selectSegment: (segment: TSegment) => void,
   ) => {
     setTimeout(() => {
-      const position = inputRef.current?.selectionStart
-      if (
-        typeof position === 'number' &&
-        inputValue &&
-        inputValue !== placeholder
-      ) {
+      const position = inputReference.current?.selectionStart
+      if (typeof position === 'number' && inputValue && inputValue !== placeholder) {
         const segment = getSegmentFromPosition(position, inputValue)
         if (segment) {
           selectSegment(segment)
@@ -72,20 +65,20 @@ export function useSegmentedInput<TSegment extends string>(
     getSegmentBounds: (value: string) => null | SegmentBounds,
   ): void => {
     const bounds = getSegmentBounds(inputValue)
-    if (!bounds || !inputRef.current) return
+    if (!bounds || !inputReference.current) return
 
     const segmentBounds = bounds[segment]
     if (!segmentBounds) return
 
-    inputRef.current.focus()
-    inputRef.current.setSelectionRange(segmentBounds.start, segmentBounds.end)
+    inputReference.current.focus()
+    inputReference.current.setSelectionRange(segmentBounds.start, segmentBounds.end)
     setSelectedSegment(segment)
   }
 
   return {
     handleClick,
     handleFocus,
-    inputRef,
+    inputRef: inputReference,
     inputValue,
     selectedSegment,
     selectSegment,
@@ -104,14 +97,14 @@ export function useSegmentNavigation<TSegment extends string>(
   separator: string,
 ) {
   const handleSegmentNavigation = (
-    e: React.KeyboardEvent<HTMLInputElement>,
-    inputRef: React.RefObject<HTMLInputElement>,
+    event: React.KeyboardEvent<HTMLInputElement>,
+    inputReference: React.RefObject<HTMLInputElement>,
     inputValue: string,
   ) => {
     // Separator key to move to next segment
-    if (e.key === separator) {
-      e.preventDefault()
-      const position = inputRef.current?.selectionStart
+    if (event.key === separator) {
+      event.preventDefault()
+      const position = inputReference.current?.selectionStart
       if (typeof position === 'number') {
         const segment = getSegmentFromPosition(position, inputValue)
         if (segment) {
@@ -125,21 +118,21 @@ export function useSegmentNavigation<TSegment extends string>(
     }
 
     // Tab navigation
-    if (e.key === 'Tab') {
-      const position = inputRef.current?.selectionStart
+    if (event.key === 'Tab') {
+      const position = inputReference.current?.selectionStart
       if (typeof position === 'number') {
         const segment = getSegmentFromPosition(position, inputValue)
         if (segment) {
           const currentIndex = segments.indexOf(segment)
 
           const nextSeg = segments[currentIndex + 1]
-          const prevSeg = segments[currentIndex - 1]
-          if (!e.shiftKey && currentIndex < segments.length - 1 && nextSeg) {
-            e.preventDefault()
+          const previousSeg = segments[currentIndex - 1]
+          if (!event.shiftKey && currentIndex < segments.length - 1 && nextSeg) {
+            event.preventDefault()
             selectSegment(nextSeg)
-          } else if (e.shiftKey && currentIndex > 0 && prevSeg) {
-            e.preventDefault()
-            selectSegment(prevSeg)
+          } else if (event.shiftKey && currentIndex > 0 && previousSeg) {
+            event.preventDefault()
+            selectSegment(previousSeg)
           }
         }
       }

@@ -17,15 +17,15 @@
  *
  */
 
-import { getServerEnv, getServerEnvRequired } from '~/lib/env.server'
+import { getServerEnvironment, getServerEnvironmentRequired } from '~/lib/environment.server'
 import { logger } from '~/lib/logger'
 
 import { type OAuthProvider, type TokenResponse } from '../types'
 
 export function createGitLabProvider(): OAuthProvider {
-  const clientId = getServerEnvRequired('GITLAB_OAUTH_CLIENT_ID')
-  const clientSecret = getServerEnvRequired('GITLAB_OAUTH_CLIENT_SECRET')
-  const baseUrl = getServerEnv('GITLAB_OAUTH_URL', 'https://gitlab.com')!
+  const clientId = getServerEnvironmentRequired('GITLAB_OAUTH_CLIENT_ID')
+  const clientSecret = getServerEnvironmentRequired('GITLAB_OAUTH_CLIENT_SECRET')
+  const baseUrl = getServerEnvironment('GITLAB_OAUTH_URL', 'https://gitlab.com')!
 
   const authorizationUrl = `${baseUrl}/oauth/authorize`
   const tokenUrl = `${baseUrl}/oauth/token`
@@ -33,10 +33,7 @@ export function createGitLabProvider(): OAuthProvider {
   const revokeUrl = `${baseUrl}/oauth/revoke`
 
   return {
-    async exchangeCode(
-      code: string,
-      redirectUri: string,
-    ): Promise<TokenResponse> {
+    async exchangeCode(code: string, redirectUri: string): Promise<TokenResponse> {
       const response = await fetch(tokenUrl, {
         body: new URLSearchParams({
           client_id: clientId,
@@ -68,12 +65,10 @@ export function createGitLabProvider(): OAuthProvider {
       url.searchParams.set('scope', 'openid email')
       url.searchParams.set('state', state)
       url.searchParams.set('redirect_uri', redirectUri)
-      return url.toString()
+      return url.href
     },
 
-    async getUserProfile(
-      accessToken: string,
-    ): Promise<{ email: string; userId: string }> {
+    async getUserProfile(accessToken: string): Promise<{ email: string; userId: string }> {
       const response = await fetch(userinfoUrl, {
         headers: { Authorization: `Bearer ${accessToken}` },
       })
@@ -91,9 +86,7 @@ export function createGitLabProvider(): OAuthProvider {
 
     provider: 'gitlab',
 
-    async refreshToken(
-      refreshTokenValue: string,
-    ): Promise<null | TokenResponse> {
+    async refreshToken(refreshTokenValue: string): Promise<null | TokenResponse> {
       try {
         const response = await fetch(tokenUrl, {
           body: new URLSearchParams({

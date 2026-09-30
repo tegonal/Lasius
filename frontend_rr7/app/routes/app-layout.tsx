@@ -19,14 +19,7 @@
 
 import { LogOutIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import {
-  data,
-  Form,
-  href,
-  Link,
-  Outlet,
-  type ShouldRevalidateFunctionArgs,
-} from 'react-router'
+import { data, Form, href, Link, Outlet, type ShouldRevalidateFunctionArgs } from 'react-router'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { Logo } from '~/components/ui/icons/logo'
@@ -39,16 +32,12 @@ import { HelpButton } from '~/features/help/components/help-button'
 import { MobileFloatingActionButton } from '~/features/navigation/components/mobile-floating-action-button'
 import { OrgSwitcher } from '~/features/organisation/components/org-switcher'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
-import { DevInfoBadge } from '~/features/system/components/dev-info-badge'
+import { DevelopmentInfoBadge } from '~/features/system/components/development-info-badge'
 import { HealthMonitor } from '~/features/system/components/health-monitor'
 import { WebSocketEventHandler } from '~/features/system/websocket/websocket-event-handler'
 import { getDeduplicatedUserProfile } from '~/lib/organisation-helpers.server'
 import { getUserBookingCurrent } from '~/services/api/lasius/user-bookings/user-bookings'
-import {
-  authHeaders,
-  mergeAuthHeaders,
-  requireUser,
-} from '~/services/auth/auth-helpers.server'
+import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/app-layout'
 
@@ -71,13 +60,13 @@ export const shouldRevalidate = ({
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const auth = await requireUser(request)
   const headers = authHeaders(auth.session)
-  const [profile, currentBookingRes] = await Promise.all([
+  const [profile, currentBookingResponse] = await Promise.all([
     getDeduplicatedUserProfile({ headers }),
     getUserBookingCurrent({ headers }),
   ])
   return data(
     {
-      currentBooking: currentBookingRes.data,
+      currentBooking: currentBookingResponse.data,
       tokenIssuer: auth.session.tokenIssuer,
       user: profile.data,
       websocketUrl: process.env.LASIUS_API_WEBSOCKET_URL || '',
@@ -118,8 +107,7 @@ export default function AppLayout({ loaderData }: Route.ComponentProps) {
                   data-testid="auth-logout-btn"
                   fullWidth={false}
                   shape="circle"
-                  variant="ghost"
-                >
+                  variant="ghost">
                   <LucideIcon icon={LogOutIcon} size={20} />
                 </Button>
               </Form>
@@ -157,7 +145,7 @@ export default function AppLayout({ loaderData }: Route.ComponentProps) {
       </div>
 
       <MobileFloatingActionButton />
-      <DevInfoBadge />
+      <DevelopmentInfoBadge />
       <TokenWatcher />
       <WebSocketEventHandler />
       <HealthMonitor />

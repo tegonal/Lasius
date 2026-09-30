@@ -18,27 +18,30 @@
  */
 
 import { TimerIcon } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
 
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { formatISOLocale } from '~/lib/utils/dates'
 import { durationAsString } from '~/lib/utils/duration'
 
-type Props = { startDate: string }
+type Properties = { startDate: string }
 
-export const BookingDurationCounter = ({ startDate }: Props) => {
-  const [duration, setDuration] = useState<string>('00:00')
+const TICK_INTERVAL_MS = 25_000
 
-  useEffect(() => {
-    setDuration(durationAsString(startDate, formatISOLocale(new Date())))
-  }, [startDate])
+const subscribeToTicks = (onTick: () => void) => {
+  const interval = setInterval(onTick, TICK_INTERVAL_MS)
+  return () => clearInterval(interval)
+}
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setDuration(durationAsString(startDate, formatISOLocale(new Date())))
-    }, 25_000)
-    return () => clearInterval(interval)
-  }, [startDate])
+// The server and the hydration render show this value, because the server clock differs.
+const getServerDuration = () => '00:00'
+
+export const BookingDurationCounter = ({ startDate }: Properties) => {
+  const duration = useSyncExternalStore(
+    subscribeToTicks,
+    () => durationAsString(startDate, formatISOLocale(new Date())),
+    getServerDuration,
+  )
 
   return (
     <div className="flex flex-row items-center justify-start gap-1 leading-normal">

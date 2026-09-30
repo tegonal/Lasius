@@ -31,39 +31,29 @@ import { formatISOLocale } from '~/lib/utils/dates'
 import { type ModelsBooking } from '~/services/api/lasius'
 import { useUpdateUserBooking } from '~/services/api/lasius-hooks/user-bookings/user-bookings'
 
-type Props = {
+type Properties = {
   currentItem: AugmentedBooking
   nextItem?: ModelsBooking
   onAddBetween: () => void
 }
 
-export const BookingInsertActions = ({
-  currentItem,
-  nextItem,
-  onAddBetween,
-}: Props) => {
+export const BookingInsertActions = ({ currentItem, nextItem, onAddBetween }: Properties) => {
   const { t } = useTranslation('common')
-  const {
-    collapse,
-    dialogRef,
-    handleToggle,
-    isExpanded,
-    setIsHovered,
-    showExpanded,
-  } = useDialogActions()
-  const hoverTimeoutRef = useRef<null | ReturnType<typeof setTimeout>>(null)
+  const { collapse, dialogRef, handleToggle, isExpanded, setIsHovered, showExpanded } =
+    useDialogActions()
+  const hoverTimeoutReference = useRef<null | ReturnType<typeof setTimeout>>(null)
   const selectedOrgId = useSelectedOrgId()
 
   const handleMouseEnter = useCallback(() => {
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current)
-      hoverTimeoutRef.current = null
+    if (hoverTimeoutReference.current) {
+      clearTimeout(hoverTimeoutReference.current)
+      hoverTimeoutReference.current = null
     }
     setIsHovered(true)
   }, [setIsHovered])
 
   const handleMouseLeave = useCallback(() => {
-    hoverTimeoutRef.current = setTimeout(() => {
+    hoverTimeoutReference.current = setTimeout(() => {
       collapse()
     }, 300)
   }, [collapse])
@@ -119,8 +109,7 @@ export const BookingInsertActions = ({
       {isExpanded && (
         <dialog
           className="absolute top-full left-1/2 m-0 -translate-x-1/2 -translate-y-1/2 transform bg-transparent p-0"
-          ref={dialogRef}
-        >
+          ref={dialogRef}>
           <div className="bg-base-100 flex gap-1 rounded-full p-1">
             <Button
               aria-label={t(
@@ -136,8 +125,7 @@ export const BookingInsertActions = ({
                 'Extend lower booking end to upper booking start',
               )}
               type="button"
-              variant="iconPrimaryHover"
-            >
+              variant="iconPrimaryHover">
               <LucideIcon icon={ArrowUpToLine} size={16} />
             </Button>
 
@@ -149,8 +137,7 @@ export const BookingInsertActions = ({
               size="sm"
               title={t('bookings:actions.insert', 'Insert booking')}
               type="button"
-              variant="iconPrimaryHover"
-            >
+              variant="iconPrimaryHover">
               <LucideIcon icon={Plus} size={16} />
             </Button>
 
@@ -168,8 +155,7 @@ export const BookingInsertActions = ({
                 'Move upper booking start to lower booking end',
               )}
               type="button"
-              variant="iconPrimaryHover"
-            >
+              variant="iconPrimaryHover">
               <LucideIcon icon={ArrowDownToLine} size={16} />
             </Button>
           </div>
@@ -184,8 +170,7 @@ export const BookingInsertActions = ({
               showExpanded ? 'z-20' : 'z-10',
             )}
             onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-          >
+            onMouseLeave={handleMouseLeave}>
             {showExpanded ? (
               <>
                 <Button
@@ -202,8 +187,7 @@ export const BookingInsertActions = ({
                     'Extend lower booking end to upper booking start',
                   )}
                   type="button"
-                  variant="iconPrimaryHover"
-                >
+                  variant="iconPrimaryHover">
                   <LucideIcon icon={ArrowUpToLine} size={16} />
                 </Button>
 
@@ -215,8 +199,7 @@ export const BookingInsertActions = ({
                   size="sm"
                   title={t('bookings:actions.insert', 'Insert booking')}
                   type="button"
-                  variant="iconPrimaryHover"
-                >
+                  variant="iconPrimaryHover">
                   <LucideIcon icon={Plus} size={16} />
                 </Button>
 
@@ -234,8 +217,7 @@ export const BookingInsertActions = ({
                     'Move upper booking start to lower booking end',
                   )}
                   type="button"
-                  variant="iconPrimaryHover"
-                >
+                  variant="iconPrimaryHover">
                   <LucideIcon icon={ArrowDownToLine} size={16} />
                 </Button>
               </>
@@ -246,8 +228,7 @@ export const BookingInsertActions = ({
                 shape="circle"
                 title={t('bookings:actions.insert', 'Insert booking')}
                 type="button"
-                variant="iconPrimaryHover"
-              >
+                variant="iconPrimaryHover">
                 <LucideIcon icon={ArrowUpDown} size={18} />
               </Button>
             )}

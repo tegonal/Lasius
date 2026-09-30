@@ -41,23 +41,23 @@ import { type Route } from './+types/user.dashboard.week'
 
 // ─── Client Loader (cache unless full-page refresh) ──────────────────────────
 
-export const clientLoader = async (args: Route.ClientLoaderArgs) =>
-  dashboardClientLoader(args)
+export const clientLoader = async (arguments_: Route.ClientLoaderArgs) =>
+  dashboardClientLoader(arguments_)
 clientLoader.hydrate = false
 
 // ─── Loader ──────────────────────────────────────────────────────────────────
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const ctx = await loadDashboardContext(request)
-  const { headers, plannedHours, selectedDate, selectedOrgId } = ctx
+  const context = await loadDashboardContext(request)
+  const { headers, plannedHours, selectedDate, selectedOrgId } = context
 
   const weekTimespan = apiTimespanWeek(selectedDate)
-  const dateObj = new Date(selectedDate)
-  const weekStartDate = startOfWeek(dateObj, { weekStartsOn: 1 })
-  const weekEndDate = endOfWeek(dateObj, { weekStartsOn: 1 })
+  const dateObject = new Date(selectedDate)
+  const weekStartDate = startOfWeek(dateObject, { weekStartsOn: 1 })
+  const endOfWeekDate = endOfWeek(dateObject, { weekStartsOn: 1 })
 
   // Fetch week bookings and aggregated project stats in parallel
-  const [weekBookingsRes, projectStatsRes] = await Promise.all([
+  const [weekBookingsResponse, projectStatsResponse] = await Promise.all([
     getUserBookingListByOrganisation(selectedOrgId, weekTimespan, {
       headers,
     }),
@@ -67,32 +67,28 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
         from: format(weekStartDate, 'yyyy-MM-dd'),
         granularity: 'Day',
         source: 'project',
-        to: format(weekEndDate, 'yyyy-MM-dd'),
+        to: format(endOfWeekDate, 'yyyy-MM-dd'),
       },
       { headers },
     ),
   ])
 
-  const weekBookings = weekBookingsRes.data ?? []
-  const projectStats = projectStatsRes.data ?? []
+  const weekBookings = weekBookingsResponse.data ?? []
+  const projectStats = projectStatsResponse.data ?? []
 
   // Compute week summary
-  const expectedHours = getPlannedHoursForRange(
-    weekStartDate,
-    weekEndDate,
-    plannedHours,
-  )
+  const expectedHours = getPlannedHoursForRange(weekStartDate, endOfWeekDate, plannedHours)
   const stats = computeDashboardStats(weekBookings, expectedHours)
 
   // Aggregate top 5 projects
   const topProjects = aggregateProjectHours(projectStats, 5)
 
   // Get week number
-  const weekNumber = getWeek(dateObj, { weekStartsOn: 1 })
+  const weekNumber = getWeek(dateObject, { weekStartsOn: 1 })
 
   return data(
     { selectedDate, stats, topProjects, weekNumber },
-    { headers: dashboardResponseHeaders(ctx.auth) },
+    { headers: dashboardResponseHeaders(context.auth) },
   )
 }
 
@@ -110,10 +106,7 @@ export default function DashboardWeek({ loaderData }: Route.ComponentProps) {
       <div className="flex gap-4">
         <StatsOverviewGrid {...stats} period="week" />
         <TopProjectsCard
-          emptyMessage={t(
-            'stats:noProjectsForWeek',
-            'No projects for this week',
-          )}
+          emptyMessage={t('stats:noProjectsForWeek', 'No projects for this week')}
           projects={topProjects}
         />
       </div>

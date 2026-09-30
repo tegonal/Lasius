@@ -21,16 +21,6 @@ import { type ReactNode } from 'react'
 
 // ─── Tooltip Container ──────────────────────────────────────────────────────
 
-interface SingleTooltipPoint {
-  color: string
-  data: {
-    x: number | string
-    y: number
-  }
-  id: string
-  value: number
-}
-
 // ─── Tooltip Item ────────────────────────────────────────────────────────────
 
 interface StackTooltipSlice {
@@ -46,29 +36,13 @@ interface StackTooltipSlice {
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export const ChartSingleTooltip = ({
-  formatValue = (val) => `${val}h`,
-  point,
-}: {
-  formatValue?: (value: number) => string
-  point: SingleTooltipPoint
-}) => {
-  if (!point) return null
+const formatHoursValue = (value: number) => `${value}h`
 
-  return (
-    <TooltipContainer>
-      <TooltipItem
-        color={point.color}
-        label={point.data.x.toString()}
-        value={formatValue(point.value)}
-      />
-    </TooltipContainer>
-  )
-}
+const formatIdentityLabel = (id: string) => id
 
 export const ChartStackTooltip = ({
-  formatLabel = (id) => id,
-  formatValue = (val) => `${val}h`,
+  formatLabel = formatIdentityLabel,
+  formatValue = formatHoursValue,
   getTitle,
   slice,
 }: {
@@ -79,9 +53,7 @@ export const ChartStackTooltip = ({
 }) => {
   if (!slice) return null
 
-  const title = getTitle
-    ? getTitle(slice.index)
-    : `Item ${(slice.index || 0) + 1}`
+  const title = getTitle ? getTitle(slice.index) : `Item ${(slice.index || 0) + 1}`
 
   return (
     <TooltipContainer title={title}>
@@ -90,8 +62,7 @@ export const ChartStackTooltip = ({
           slice.stack
             .filter((point) => point && point.value > 0)
             .map((point) => {
-              const pointId =
-                point.layerLabel || point.layerId || point.id || ''
+              const pointId = point.layerLabel || point.layerId || point.id || ''
               return (
                 <TooltipItem
                   color={point.color}
@@ -108,19 +79,11 @@ export const ChartStackTooltip = ({
 
 // ─── Stack Tooltip ───────────────────────────────────────────────────────────
 
-export const TooltipContainer = ({
-  children,
-  title,
-}: {
-  children: ReactNode
-  title?: string
-}) => {
+export const TooltipContainer = ({ children, title }: { children: ReactNode; title?: string }) => {
   return (
     <div className="bg-base-100 border-base-200 w-auto rounded border p-2 shadow-lg">
       {title && (
-        <div className="text-base-content mb-2 text-sm font-medium whitespace-nowrap">
-          {title}
-        </div>
+        <div className="text-base-content mb-2 text-sm font-medium whitespace-nowrap">{title}</div>
       )}
       {children}
     </div>
@@ -142,18 +105,11 @@ export const TooltipItem = ({
     <div className="flex min-w-0 items-center justify-between gap-3 whitespace-nowrap">
       <div className="flex min-w-0 items-center gap-2">
         {color && (
-          <div
-            className="h-3 w-3 flex-shrink-0 rounded-full"
-            style={{ backgroundColor: color }}
-          />
+          <div className="h-3 w-3 flex-shrink-0 rounded-full" style={{ backgroundColor: color }} />
         )}
-        <span className="text-base-content truncate text-sm font-medium">
-          {label}
-        </span>
+        <span className="text-base-content truncate text-sm font-medium">{label}</span>
       </div>
-      <span className="text-base-content/70 flex-shrink-0 text-sm">
-        {value}
-      </span>
+      <span className="text-base-content/70 flex-shrink-0 text-sm">{value}</span>
     </div>
   )
 }

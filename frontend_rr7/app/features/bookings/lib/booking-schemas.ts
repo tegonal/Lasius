@@ -20,12 +20,12 @@
 import { isBefore, isFuture } from 'date-fns'
 import { z } from 'zod'
 
-import { type SchemaTranslationFn } from '~/lib/i18n-types'
+import { type SchemaTranslationFunction } from '~/lib/i18n-types'
 
 /**
  * Schema for the booking start form (projectId + tags only).
  */
-export const createBookingStartSchema = (t: SchemaTranslationFn) =>
+export const createBookingStartSchema = (t: SchemaTranslationFunction) =>
   z.object({
     projectId: z.string().min(1, t('validation.required', 'Required')),
     tags: z.string().optional(),
@@ -35,7 +35,7 @@ export const createBookingStartSchema = (t: SchemaTranslationFn) =>
  * Schema for editing a running booking.
  * Validates that start time is in the past.
  */
-export const createBookingEditRunningSchema = (t: SchemaTranslationFn) =>
+export const createBookingEditRunningSchema = (t: SchemaTranslationFunction) =>
   z
     .object({
       projectId: z.string().min(1, t('validation.required', 'Required')),
@@ -48,10 +48,7 @@ export const createBookingEditRunningSchema = (t: SchemaTranslationFn) =>
         return !isFuture(new Date(d.start))
       },
       {
-        error: t(
-          'validation.startMustBeInPast',
-          'Start time must be in the past',
-        ),
+        error: t('validation.startMustBeInPast', 'Start time must be in the past'),
         path: ['start'],
       },
     )
@@ -60,7 +57,7 @@ export const createBookingEditRunningSchema = (t: SchemaTranslationFn) =>
  * Schema for the booking add/update form.
  * Cross-field validation ensures start < end.
  */
-export const createBookingSchema = (t: SchemaTranslationFn) =>
+export const createBookingSchema = (t: SchemaTranslationFunction) =>
   z
     .object({
       end: z.string().min(1, t('validation.required', 'Required')),
@@ -74,10 +71,7 @@ export const createBookingSchema = (t: SchemaTranslationFn) =>
         return isBefore(new Date(d.start), new Date(d.end))
       },
       {
-        error: t(
-          'validation.startBeforeEnd',
-          'Start time must be before end time',
-        ),
+        error: t('validation.startBeforeEnd', 'Start time must be before end time'),
         path: ['start'],
       },
     )
@@ -93,8 +87,7 @@ export const parseTagsFromFormData = (
     const parsed = JSON.parse(tagsJson)
     if (!Array.isArray(parsed)) return []
     return parsed.filter(
-      (t: unknown) =>
-        typeof t === 'object' && t !== null && 'id' in t && 'type' in t,
+      (t: unknown) => typeof t === 'object' && t !== null && 'id' in t && 'type' in t,
     ) as Array<{ id: string; type: string }>
   } catch {
     return []

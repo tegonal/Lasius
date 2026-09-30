@@ -21,10 +21,7 @@ import { useMemo } from 'react'
 
 import { Loading } from '~/components/ui/data-display/loading'
 import { ColumnList } from '~/components/ui/layouts/column-list'
-import {
-  ColumnCenter,
-  ColumnRight,
-} from '~/components/ui/layouts/layout-columns'
+import { ColumnCenter, ColumnRight } from '~/components/ui/layouts/layout-columns'
 import { ScrollArea } from '~/components/ui/layouts/scroll-area'
 import { useBookingHistoryFilters } from '~/features/booking-history/hooks/use-booking-history-filters'
 import { ContextMenuProvider } from '~/features/context-menu/hooks/use-context-menu'
@@ -63,7 +60,7 @@ type InputControl = {
   value: string | undefined
 }
 
-type Props = {
+type Properties = {
   bookings: ModelsBooking[]
   dataSource: 'organisationBookings' | 'userBookings'
   isLoading?: boolean
@@ -71,20 +68,22 @@ type Props = {
   users?: ModelsUserStub[]
 }
 
+const NO_USERS: ModelsUserStub[] = []
+
 export const BookingHistoryLayout = ({
   bookings,
   dataSource,
   isLoading = false,
-  projects: projectsProp,
-  users = [],
-}: Props) => {
+  projects: projectsProperty,
+  users = NO_USERS,
+}: Properties) => {
   const { selectedOrganisationId: _selectedOrganisationId } = useOrganisation()
   const { findProjectById, userProjects } = useProjects()
 
   const projectSuggestions: ModelsEntityReference[] = useMemo(() => {
-    if (projectsProp) return projectsProp
+    if (projectsProperty) return projectsProperty
     return userProjects.map((p) => p.projectReference)
-  }, [projectsProp, userProjects])
+  }, [projectsProperty, userProjects])
 
   const {
     controls,
@@ -98,29 +97,20 @@ export const BookingHistoryLayout = ({
     userId,
   } = useBookingHistoryFilters()
 
-  const processedItems = useMemo(
-    () =>
-      getExtendedModelsBookingList(
-        filterModelsBookingListUserId(
-          filterModelsBookingListProjectId(
-            filterModelsBookingListByTags(bookings, tags),
-            projectId,
-          ),
-          userId,
-        ),
+  const processedItems = useMemo(() => {
+    const taggedBookings = filterModelsBookingListByTags(bookings, tags)
+    return getExtendedModelsBookingList(
+      filterModelsBookingListUserId(
+        filterModelsBookingListProjectId(taggedBookings, projectId),
+        userId,
       ),
-    [bookings, tags, projectId, userId],
-  )
+    )
+  }, [bookings, tags, projectId, userId])
 
-  const summary = useMemo(
-    () => getModelsBookingSummary(processedItems),
-    [processedItems],
-  )
+  const summary = useMemo(() => getModelsBookingSummary(processedItems), [processedItems])
 
   const distinctUsers = useMemo(() => {
-    const userSet = new Set(
-      processedItems.map((item) => item.userReference?.key).filter(Boolean),
-    )
+    const userSet = new Set(processedItems.map((item) => item.userReference?.key).filter(Boolean))
     return userSet.size
   }, [processedItems])
 
@@ -133,9 +123,9 @@ export const BookingHistoryLayout = ({
 
   const { onScroll, visibleElements } = useScrollPagination(processedItems)
 
-  const allowEdit = dataSource === 'userBookings'
-  const allowDelete = dataSource === 'userBookings'
-  const showUserColumn = dataSource === 'organisationBookings'
+  const isAllowEdit = dataSource === 'userBookings'
+  const isAllowDelete = dataSource === 'userBookings'
+  const isShowUserColumn = dataSource === 'organisationBookings'
   const exportContext = dataSource === 'userBookings' ? 'user' : 'organisation'
 
   const inactiveProject = useMemo(() => {
@@ -166,11 +156,7 @@ export const BookingHistoryLayout = ({
                 from={fromValue}
                 hasBookings={processedItems.length > 0}
                 projectId={projectId}
-                tags={
-                  tags.length > 0
-                    ? tags.map((tag) => tag.id).join(',')
-                    : undefined
-                }
+                tags={tags.length > 0 ? tags.map((tag) => tag.id).join(',') : undefined}
                 to={toValue}
                 userId={userId}
               />
@@ -179,11 +165,11 @@ export const BookingHistoryLayout = ({
             <ScrollArea className="min-h-0 flex-1" onScroll={onScroll}>
               <div className="pt-4">
                 <BookingHistoryTable
-                  allowDelete={allowDelete}
-                  allowEdit={allowEdit}
+                  allowDelete={isAllowDelete}
+                  allowEdit={isAllowEdit}
                   controls={controls}
                   items={visibleElements}
-                  showUserColumn={showUserColumn}
+                  showUserColumn={isShowUserColumn}
                 />
               </div>
             </ScrollArea>

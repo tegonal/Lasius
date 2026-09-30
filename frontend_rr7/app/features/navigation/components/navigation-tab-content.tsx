@@ -60,17 +60,13 @@ const NavigationButton = ({ item }: { item: NavigationRouteType }) => {
   const isActive = location.pathname === item.route
 
   const handleClick = () => {
-    const dateParam = new URLSearchParams(location.search).get('date')
-    const search = dateParam ? `?date=${dateParam}` : ''
+    const dateParameter = new URLSearchParams(location.search).get('date')
+    const search = dateParameter ? `?date=${dateParameter}` : ''
     void navigate(`${item.route}${search}`)
   }
 
   return (
-    <Button
-      fullWidth
-      onClick={handleClick}
-      variant={isActive ? 'navigationActive' : 'navigation'}
-    >
+    <Button fullWidth onClick={handleClick} variant={isActive ? 'navigationActive' : 'navigation'}>
       <LucideIcon icon={item.icon} size={24} />
       <div>{item.name}</div>
     </Button>

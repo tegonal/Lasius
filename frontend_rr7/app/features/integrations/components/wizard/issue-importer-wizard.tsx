@@ -18,7 +18,7 @@
  */
 
 import { ArrowLeft, ArrowRight, CheckCircle2, Circle } from 'lucide-react'
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useRevalidator } from 'react-router'
 
@@ -34,10 +34,7 @@ import { ConfigFormStep } from '~/features/integrations/components/wizard/steps/
 import { ListProjectsStep } from '~/features/integrations/components/wizard/steps/list-projects-step'
 import { SelectPlatformStep } from '~/features/integrations/components/wizard/steps/select-platform-step'
 import { TestConnectionStep } from '~/features/integrations/components/wizard/steps/test-connection-step'
-import {
-  useWizardState,
-  type WizardStep,
-} from '~/features/integrations/hooks/use-wizard-state'
+import { useWizardState, type WizardStep } from '~/features/integrations/hooks/use-wizard-state'
 import {
   buildMappingPayload,
   type MappingsByExternalProject,
@@ -47,7 +44,7 @@ import { logger } from '~/lib/logger'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 import { useAddProjectMapping } from '~/services/api/lasius-hooks/issue-importers/issue-importers'
 
-type Props = {
+type Properties = {
   onClose: () => void
   open: boolean
   selectedOrgId: string
@@ -55,11 +52,7 @@ type Props = {
 
 const STEP_IDS: WizardStep[] = ['platform', 'config', 'test', 'projects']
 
-export const IssueImporterWizard = ({
-  onClose,
-  open,
-  selectedOrgId,
-}: Props) => {
+export const IssueImporterWizard = ({ onClose, open, selectedOrgId }: Properties) => {
   const { t } = useTranslation('integrations')
   const { addToast } = useToast()
   const {
@@ -71,19 +64,18 @@ export const IssueImporterWizard = ({
     updateFormData,
   } = useWizardState()
 
-  const [projectMappings, setProjectMappings] =
-    useState<MappingsByExternalProject>({})
+  const [projectMappings, setProjectMappings] = useState<MappingsByExternalProject>({})
   const [isSaving, setIsSaving] = useState(false)
   const revalidator = useRevalidator()
-  const mappingsQueueRef = useRef<
+  const mappingsQueueReference = useRef<
     Array<{
       externalProjectId: string
       mapping: MappingWithTagConfig
     }>
   >([])
-  const mappingsQueueIndexRef = useRef(0)
-  const configFormRef = useRef<HTMLFormElement>(null)
-  const submitNextMappingRef = useRef<() => void>(() => {})
+  const mappingsQueueIndexReference = useRef(0)
+  const configFormReference = useRef<HTMLFormElement>(null)
+  const submitNextMappingReference = useRef<() => void>(() => {})
 
   const handleClose = useCallback(() => {
     resetWizard()
@@ -101,9 +93,9 @@ export const IssueImporterWizard = ({
         type: 'ERROR',
       })
       // Continue with next mapping instead of stopping
-      mappingsQueueIndexRef.current += 1
-      if (mappingsQueueIndexRef.current < mappingsQueueRef.current.length) {
-        submitNextMappingRef.current()
+      mappingsQueueIndexReference.current += 1
+      if (mappingsQueueIndexReference.current < mappingsQueueReference.current.length) {
+        submitNextMappingReference.current()
       } else {
         setIsSaving(false)
         void revalidator.revalidate()
@@ -112,9 +104,9 @@ export const IssueImporterWizard = ({
     },
     onSuccess: () => {
       // Process next mapping in queue
-      mappingsQueueIndexRef.current += 1
-      if (mappingsQueueIndexRef.current < mappingsQueueRef.current.length) {
-        submitNextMappingRef.current()
+      mappingsQueueIndexReference.current += 1
+      if (mappingsQueueIndexReference.current < mappingsQueueReference.current.length) {
+        submitNextMappingReference.current()
       } else {
         // All mappings saved
         setIsSaving(false)
@@ -131,12 +123,10 @@ export const IssueImporterWizard = ({
   })
 
   const submitNextMapping = useCallback(() => {
-    const entry = mappingsQueueRef.current[mappingsQueueIndexRef.current]
+    const entry = mappingsQueueReference.current[mappingsQueueIndexReference.current]
     if (!entry || !state.createdConfig || !state.formData.importerType) return
 
-    const externalProject = state.availableProjects?.find(
-      (p) => p.id === entry.externalProjectId,
-    )
+    const externalProject = state.availableProjects?.find((p) => p.id === entry.externalProjectId)
 
     const result = buildMappingPayload(
       state.formData.importerType,
@@ -147,14 +137,11 @@ export const IssueImporterWizard = ({
     )
 
     if (!result.success) {
-      logger.error(
-        '[IssueImporterWizard] Mapping payload build failed:',
-        result.error,
-      )
+      logger.error('[IssueImporterWizard] Mapping payload build failed:', result.error)
       // Skip this mapping and process next
-      mappingsQueueIndexRef.current += 1
-      if (mappingsQueueIndexRef.current < mappingsQueueRef.current.length) {
-        submitNextMapping()
+      mappingsQueueIndexReference.current += 1
+      if (mappingsQueueIndexReference.current < mappingsQueueReference.current.length) {
+        submitNextMappingReference.current()
       } else {
         setIsSaving(false)
         void revalidator.revalidate()
@@ -177,7 +164,11 @@ export const IssueImporterWizard = ({
     revalidator,
     handleClose,
   ])
-  submitNextMappingRef.current = submitNextMapping
+  // A layout effect runs before the passive callback effect of useAddProjectMapping.
+  // onSuccess and onError therefore call the submitNextMapping of the current render.
+  useLayoutEffect(() => {
+    submitNextMappingReference.current = submitNextMapping
+  })
 
   const translatedSteps = useMemo(
     () => [
@@ -263,6 +254,10 @@ export const IssueImporterWizard = ({
 
         break
       }
+      case 'platform': {
+        // The platform step is the first step and has no previous step.
+        break
+      }
       case 'projects': {
         // Skip test step when going back if config already exists
         if (state.createdConfig) {
@@ -282,18 +277,13 @@ export const IssueImporterWizard = ({
     }
   }, [state.currentStep, state.createdConfig, setCurrentStep])
 
-  const handleMappingsChange = useCallback(
-    (mappings: MappingsByExternalProject) => {
-      setProjectMappings(mappings)
-    },
-    [],
-  )
+  const handleMappingsChange = useCallback((mappings: MappingsByExternalProject) => {
+    setProjectMappings(mappings)
+  }, [])
 
   const handleFinish = useCallback(() => {
     if (!state.createdConfig || !state.formData.importerType) {
-      logger.error(
-        '[IssueImporterWizard] Cannot save mappings: missing config or importer type',
-      )
+      logger.error('[IssueImporterWizard] Cannot save mappings: missing config or importer type')
       return
     }
 
@@ -307,11 +297,10 @@ export const IssueImporterWizard = ({
     }
 
     setIsSaving(true)
-    mappingsQueueRef.current = mappingEntries.flatMap(
-      ([externalProjectId, arr]) =>
-        arr.map((mapping) => ({ externalProjectId, mapping })),
+    mappingsQueueReference.current = mappingEntries.flatMap(([externalProjectId, array]) =>
+      array.map((mapping) => ({ externalProjectId, mapping })),
     )
-    mappingsQueueIndexRef.current = 0
+    mappingsQueueIndexReference.current = 0
     submitNextMapping()
   }, [
     state.createdConfig,
@@ -324,10 +313,7 @@ export const IssueImporterWizard = ({
 
   const canGoPrevious = state.currentStep !== 'platform'
 
-  const modalSize =
-    state.currentStep === 'config' || state.currentStep === 'projects'
-      ? 'xl'
-      : 'lg'
+  const modalSize = state.currentStep === 'config' || state.currentStep === 'projects' ? 'xl' : 'lg'
 
   return (
     <Modal onClose={handleClose} open={open} size={modalSize}>
@@ -337,8 +323,7 @@ export const IssueImporterWizard = ({
         <div className="flex-shrink-0 pb-4">
           <ModalHeader
             actionSlot={<ModalHelpButton helpKey="modal-importer-wizard" />}
-            className="mb-0"
-          >
+            className="mb-0">
             {t('issueImporters.wizard.title', {
               defaultValue: 'Add Integration',
             })}
@@ -356,8 +341,7 @@ export const IssueImporterWizard = ({
                       setCurrentStep(step.id)
                     }
                   }}
-                  type="button"
-                >
+                  type="button">
                   {index < currentStepIndex ? (
                     <LucideIcon icon={CheckCircle2} size={16} />
                   ) : (
@@ -382,7 +366,7 @@ export const IssueImporterWizard = ({
           {state.currentStep === 'config' && state.formData.importerType && (
             <ConfigFormStep
               formData={state.formData}
-              formRef={configFormRef}
+              formRef={configFormReference}
               onSubmit={handleConfigSubmit}
               selectedOrgId={selectedOrgId}
             />
@@ -420,8 +404,7 @@ export const IssueImporterWizard = ({
               fullWidth={false}
               onClick={handlePrevious}
               size="sm"
-              variant="ghost"
-            >
+              variant="ghost">
               <LucideIcon icon={ArrowLeft} size={16} />
               {t('actions.back', { defaultValue: 'Back' })}
             </Button>
@@ -436,8 +419,7 @@ export const IssueImporterWizard = ({
                 fullWidth={false}
                 onClick={handleFinish}
                 size="sm"
-                variant="primary"
-              >
+                variant="primary">
                 {isSaving
                   ? t('actions.saving', {
                       defaultValue: 'Saving...',
@@ -452,15 +434,14 @@ export const IssueImporterWizard = ({
                 fullWidth={false}
                 onClick={() => {
                   if (state.currentStep === 'config') {
-                    configFormRef.current?.requestSubmit()
+                    configFormReference.current?.requestSubmit()
                     return
                   }
                   const nextStep = STEP_IDS[currentStepIndex + 1]
                   if (nextStep) setCurrentStep(nextStep)
                 }}
                 size="sm"
-                variant="primary"
-              >
+                variant="primary">
                 {t('actions.next', { defaultValue: 'Next' })}
                 <LucideIcon icon={ArrowRight} size={16} />
               </Button>

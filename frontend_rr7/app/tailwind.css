@@ -112,9 +112,7 @@
 
   /* Main theme colors - matching Theme-UI light mode exactly */
   --color-primary: var(--brand-palette-1);
-  --color-primary-content: oklch(
-    from var(--brand-palette-1) calc(l * 0.33) c h
-  );
+  --color-primary-content: oklch(from var(--brand-palette-1) calc(l * 0.33) c h);
   --color-secondary: var(--brand-palette-3);
   --color-secondary-content: oklch(98.5% 0 0);
   --color-accent: var(--brand-palette-4);
@@ -162,9 +160,7 @@
 
   /* Main theme colors - matching Theme-UI dark mode exactly */
   --color-primary: var(--brand-palette-1);
-  --color-primary-content: oklch(
-    from var(--brand-palette-1) calc(l * 0.33) c h
-  );
+  --color-primary-content: oklch(from var(--brand-palette-1) calc(l * 0.33) c h);
   --color-secondary: var(--brand-palette-3);
   --color-secondary-content: oklch(98.5% 0 0);
   --color-accent: var(--brand-palette-4);
@@ -322,18 +318,10 @@
 
   /* Red gradients for danger/error buttons */
   .bg-red-gradient {
-    background: linear-gradient(
-      180deg,
-      oklch(60% 0.25 25) 0%,
-      oklch(50% 0.23 25) 100%
-    );
+    background: linear-gradient(180deg, oklch(60% 0.25 25) 0%, oklch(50% 0.23 25) 100%);
   }
   .hover\:bg-red-gradient-hover:hover {
-    background: linear-gradient(
-      180deg,
-      oklch(58% 0.24 25) 0%,
-      oklch(45% 0.22 25) 100%
-    );
+    background: linear-gradient(180deg, oklch(58% 0.24 25) 0%, oklch(45% 0.22 25) 100%);
   }
 
   /* Fix for btn-circle border-radius issue with Tailwind CSS v4 */
@@ -417,32 +405,22 @@
     }
     25% {
       opacity: 1;
-      transform: translate(
-          calc(var(--star-tx) * 0.35),
-          calc(var(--star-ty) * 0.35 - 6px)
-        )
+      transform: translate(calc(var(--star-tx) * 0.35), calc(var(--star-ty) * 0.35 - 6px))
         scale(1.2) rotate(calc(var(--star-rot) * 0.3));
     }
     50% {
       opacity: 0.9;
-      transform: translate(
-          calc(var(--star-tx) * 0.65),
-          calc(var(--star-ty) * 0.65 - 4px)
-        )
+      transform: translate(calc(var(--star-tx) * 0.65), calc(var(--star-ty) * 0.65 - 4px))
         scale(0.9) rotate(calc(var(--star-rot) * 0.6));
     }
     75% {
       opacity: 0.5;
-      transform: translate(
-          calc(var(--star-tx) * 0.88),
-          calc(var(--star-ty) * 0.88)
-        )
-        scale(0.5) rotate(calc(var(--star-rot) * 0.85));
+      transform: translate(calc(var(--star-tx) * 0.88), calc(var(--star-ty) * 0.88)) scale(0.5)
+        rotate(calc(var(--star-rot) * 0.85));
     }
     100% {
       opacity: 0;
-      transform: translate(var(--star-tx), var(--star-ty)) scale(0)
-        rotate(var(--star-rot));
+      transform: translate(var(--star-tx), var(--star-ty)) scale(0) rotate(var(--star-rot));
     }
   }
 

@@ -6,8 +6,8 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type GetOrganisationBookingAggregatedStatsGranularity = typeof GetOrganisationBookingAggregatedStatsGranularity[keyof typeof GetOrganisationBookingAggregatedStatsGranularity];
-
+export type GetOrganisationBookingAggregatedStatsGranularity =
+  (typeof GetOrganisationBookingAggregatedStatsGranularity)[keyof typeof GetOrganisationBookingAggregatedStatsGranularity]
 
 export const GetOrganisationBookingAggregatedStatsGranularity = {
   All: 'All',
@@ -15,4 +15,4 @@ export const GetOrganisationBookingAggregatedStatsGranularity = {
   Month: 'Month',
   Week: 'Week',
   Day: 'Day',
-} as const;
+} as const

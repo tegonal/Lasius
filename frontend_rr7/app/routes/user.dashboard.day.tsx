@@ -42,22 +42,22 @@ import { type Route } from './+types/user.dashboard.day'
 
 // ─── Client Loader (cache unless full-page refresh) ──────────────────────────
 
-export const clientLoader = async (args: Route.ClientLoaderArgs) =>
-  dashboardClientLoader(args)
+export const clientLoader = async (arguments_: Route.ClientLoaderArgs) =>
+  dashboardClientLoader(arguments_)
 clientLoader.hydrate = false
 
 // ─── Loader ──────────────────────────────────────────────────────────────────
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const ctx = await loadDashboardContext(request)
-  const { headers, plannedHours, selectedDate, selectedOrgId } = ctx
+  const context = await loadDashboardContext(request)
+  const { headers, plannedHours, selectedDate, selectedOrgId } = context
 
   const dayTimespan = apiTimespanDay(selectedDate)
-  const dateObj = new Date(selectedDate)
-  const dayDate = format(dateObj, 'yyyy-MM-dd')
+  const dateObject = new Date(selectedDate)
+  const dayDate = format(dateObject, 'yyyy-MM-dd')
 
   // Fetch day bookings and aggregated project stats in parallel
-  const [dayBookingsRes, projectStatsRes] = await Promise.all([
+  const [dayBookingsResponse, projectStatsResponse] = await Promise.all([
     getUserBookingListByOrganisation(selectedOrgId, dayTimespan, {
       headers,
     }),
@@ -73,11 +73,11 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     ),
   ])
 
-  const dayBookings = dayBookingsRes.data ?? []
-  const projectStats = projectStatsRes.data ?? []
+  const dayBookings = dayBookingsResponse.data ?? []
+  const projectStats = projectStatsResponse.data ?? []
 
   // Compute day summary
-  const expectedHours = getPlannedHoursForDay(dateObj, plannedHours)
+  const expectedHours = getPlannedHoursForDay(dateObject, plannedHours)
   const stats = computeDashboardStats(dayBookings, expectedHours)
 
   // Aggregate ALL projects (day shows all, no topN limit)
@@ -85,7 +85,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
   return data(
     { projects, selectedDate, stats },
-    { headers: dashboardResponseHeaders(ctx.auth) },
+    { headers: dashboardResponseHeaders(context.auth) },
   )
 }
 
@@ -94,12 +94,12 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 export default function DashboardDay({ loaderData }: Route.ComponentProps) {
   const { t } = useTranslation('common')
   const { projects, selectedDate, stats } = loaderData
-  const dateObj = new Date(selectedDate)
+  const dateObject = new Date(selectedDate)
 
   return (
     <div className="space-y-6 px-8 py-6">
       <h2 className="text-lg font-semibold">
-        <FormatDate date={dateObj} format="fullDateShort" />
+        <FormatDate date={dateObject} format="fullDateShort" />
       </h2>
       <div className="flex gap-4">
         <StatsOverviewGrid {...stats} period="day" />

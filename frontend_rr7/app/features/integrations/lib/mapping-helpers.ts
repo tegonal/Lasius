@@ -46,7 +46,7 @@ export type MappingsByExternalProject = Record<string, MappingWithTagConfig[]>
 export type MappingWithTagConfig = {
   id?: ModelsProjectMappingId
   projectId: string
-  tagConfig?: TagConfiguration
+  tagConfig?: TagConfig
 }
 
 export type ProjectMapping =
@@ -55,10 +55,8 @@ export type ProjectMapping =
   | ModelsJiraProjectMapping
   | ModelsPlaneProjectMapping
 
-export type TagConfiguration =
-  | ModelsGithubTagConfiguration
-  | ModelsGitlabTagConfiguration
-  | ModelsPlaneTagConfiguration
+export type TagConfig =
+  ModelsGithubTagConfiguration | ModelsGitlabTagConfiguration | ModelsPlaneTagConfiguration
 
 /**
  * Build platform-specific project mapping payload
@@ -67,7 +65,7 @@ export const buildMappingPayload = (
   importerType: ImporterType,
   externalProjectId: string,
   lasiusProjectId: string,
-  tagConfig?: TagConfiguration,
+  tagConfig?: TagConfig,
   externalProjectName?: string,
 ): MappingPayloadResult => {
   const payload: ModelsCreateProjectMapping = {
@@ -106,7 +104,7 @@ export const buildMappingPayload = (
     case 'gitlab': {
       payload.gitlabProjectId = externalProjectId
       if (tagConfig) {
-        payload.gitlabTagConfig = tagConfig as ModelsGitlabTagConfiguration
+        payload.gitlabTagConfig = tagConfig
       }
       break
     }
@@ -119,7 +117,7 @@ export const buildMappingPayload = (
     case 'plane': {
       payload.planeProjectId = externalProjectId
       if (tagConfig) {
-        payload.planeTagConfig = tagConfig as ModelsPlaneTagConfiguration
+        payload.planeTagConfig = tagConfig
       }
       break
     }
@@ -134,18 +132,14 @@ export const buildMappingPayload = (
 /**
  * Extract tag configuration from a mapping object
  */
-export const extractTagConfig = (
-  mapping: ProjectMapping,
-): TagConfiguration | undefined => {
-  return (
-    mapping?.settings as unknown as { tagConfiguration?: TagConfiguration }
-  )?.tagConfiguration
+export const extractTagConfig = (mapping: ProjectMapping): TagConfig | undefined => {
+  return (mapping?.settings as unknown as { tagConfiguration?: TagConfig })?.tagConfiguration
 }
 
 /**
  * Check if a mapping matches a given external project ID
  */
-export const mappingMatchesProject = (
+export const isMappingForProject = (
   importerType: ImporterType,
   mapping: ProjectMapping,
   externalProjectId: string,
@@ -174,21 +168,15 @@ export const extractExternalProjectId = (
     }
 
     case 'gitlab': {
-      return (
-        (mapping as ModelsGitlabProjectMapping).settings.gitlabProjectId || null
-      )
+      return (mapping as ModelsGitlabProjectMapping).settings.gitlabProjectId || null
     }
 
     case 'jira': {
-      return (
-        (mapping as ModelsJiraProjectMapping).settings.jiraProjectKey || null
-      )
+      return (mapping as ModelsJiraProjectMapping).settings.jiraProjectKey || null
     }
 
     case 'plane': {
-      return (
-        (mapping as ModelsPlaneProjectMapping).settings.planeProjectId || null
-      )
+      return (mapping as ModelsPlaneProjectMapping).settings.planeProjectId || null
     }
   }
 }
@@ -207,8 +195,7 @@ export const buildMappingStatsGroups = (
   const groups: Record<string, MappingStatEntry[]> = {}
 
   for (const mapping of mappings) {
-    const externalName =
-      extractExternalProjectId(importerType, mapping) ?? mapping.projectId
+    const externalName = extractExternalProjectId(importerType, mapping) ?? mapping.projectId
     const entries = groups[externalName] ?? []
     entries.push({
       projectId: mapping.projectId,

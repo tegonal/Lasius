@@ -20,20 +20,13 @@
 import { useTranslation } from 'react-i18next'
 import { data, href, Outlet } from 'react-router'
 
-import {
-  ColumnCenter,
-  ColumnRight,
-  innerGridClasses,
-} from '~/components/ui/layouts/layout-columns'
+import { ColumnCenter, ColumnRight, innerGridClasses } from '~/components/ui/layouts/layout-columns'
 import { ScrollArea } from '~/components/ui/layouts/scroll-area'
 import { StatsExport } from '~/features/stats/components/stats-export'
 import { StatsFilter } from '~/features/stats/components/stats-filter'
 import { StatsOverview } from '~/features/stats/components/stats-overview'
 import { StatsTabs } from '~/features/stats/components/stats-tabs'
-import {
-  loadStatsContext,
-  statsResponseHeaders,
-} from '~/features/stats/stats-loader.server'
+import { loadStatsContext, statsResponseHeaders } from '~/features/stats/stats-loader.server'
 import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
 import { apiTimespanFromTo } from '~/lib/utils/dates'
 import { getUserBookingListByOrganisation } from '~/services/api/lasius/user-bookings/user-bookings'
@@ -45,30 +38,26 @@ import { type Route } from './+types/user.stats'
 // ─── Loader ──────────────────────────────────────────────────────────────────
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const ctx = await loadStatsContext(request)
-  const { from, headers, selectedOrgId, to } = ctx
+  const context = await loadStatsContext(request)
+  const { from, headers, selectedOrgId, to } = context
 
   // Compute API params
   const timespan = apiTimespanFromTo(from, to)
 
   // Fetch bookings for overview summary
-  const bookingsRes = timespan
+  const bookingsResponse = timespan
     ? await getUserBookingListByOrganisation(selectedOrgId, timespan, {
         headers,
       })
     : { data: [] }
 
-  const bookings = bookingsRes.data ?? []
+  const bookings = bookingsResponse.data ?? []
 
   // Transform data server-side
   const bookingSummary = getModelsBookingSummary(bookings)
 
-  const distinctUsers = new Set(
-    bookings.map((b) => b.userReference?.id).filter(Boolean),
-  ).size
-  const distinctProjects = new Set(
-    bookings.map((b) => b.projectReference?.id).filter(Boolean),
-  ).size
+  const distinctUsers = new Set(bookings.map((b) => b.userReference?.id).filter(Boolean)).size
+  const distinctProjects = new Set(bookings.map((b) => b.projectReference?.id).filter(Boolean)).size
 
   return data(
     {
@@ -79,7 +68,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
       selectedOrgId,
       to,
     },
-    { headers: statsResponseHeaders(ctx.auth) },
+    { headers: statsResponseHeaders(context.auth) },
   )
 }
 
@@ -88,14 +77,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 const UserStatsLayout = ({ loaderData }: Route.ComponentProps) => {
   const { t } = useTranslation()
 
-  const {
-    bookingSummary,
-    distinctProjects,
-    distinctUsers,
-    from,
-    selectedOrgId,
-    to,
-  } = loaderData
+  const { bookingSummary, distinctProjects, distinctUsers, from, selectedOrgId, to } = loaderData
 
   const tabs = [
     {

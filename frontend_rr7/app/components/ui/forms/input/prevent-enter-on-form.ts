@@ -19,6 +19,8 @@
 
 import type React from 'react'
 
-export const preventEnterOnForm = (e: React.KeyboardEvent<HTMLFormElement>) => {
-  if (e.key === 'Enter') e.preventDefault()
+// Enter in an input field submits the surrounding form implicitly, so the handler cancels it there.
+// Enter on a button still activates the button, and Enter in a textarea still adds a line.
+export const preventEnterOnForm = (event: React.KeyboardEvent) => {
+  if (event.key === 'Enter' && event.target instanceof HTMLInputElement) event.preventDefault()
 }

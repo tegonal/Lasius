@@ -36,7 +36,7 @@ export interface MultiSelectOption {
   value: string
 }
 
-interface MultiSelectProps {
+interface MultiSelectProperties {
   buttonClassName?: string
   className?: string
   disabled?: boolean
@@ -60,10 +60,8 @@ export const MultiSelect = ({
   optionsClassName,
   placeholder = 'Select options',
   value,
-}: MultiSelectProps) => {
-  const selectedOptions = options.filter((option) =>
-    value.includes(option.value),
-  )
+}: MultiSelectProperties) => {
+  const selectedOptions = options.filter((option) => value.includes(option.value))
 
   const displayText =
     selectedOptions.length === 0
@@ -73,13 +71,7 @@ export const MultiSelect = ({
         : `${selectedOptions.length} selected`
 
   return (
-    <Listbox
-      disabled={disabled}
-      multiple
-      name={name}
-      onChange={onChange}
-      value={value}
-    >
+    <Listbox disabled={disabled} multiple name={name} onChange={onChange} value={value}>
       <div className={cn('join relative w-full', className)}>
         <ListboxButton
           className={cn(
@@ -88,14 +80,12 @@ export const MultiSelect = ({
             'disabled:bg-base-200 disabled:text-base-content/50',
             buttonClassName,
           )}
-          id={id}
-        >
+          id={id}>
           <span
             className={cn(
               'block truncate',
               selectedOptions.length === 0 && 'text-base-content/50',
-            )}
-          >
+            )}>
             {displayText}
           </span>
         </ListboxButton>
@@ -106,16 +96,14 @@ export const MultiSelect = ({
           as={Fragment}
           leave="transition ease-in duration-100"
           leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
+          leaveTo="opacity-0">
           <ListboxOptions
             className={cn(
               'absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-lg',
               'bg-base-100 ring-base-300 py-1 shadow-lg ring-1',
               'focus:outline-none',
               optionsClassName,
-            )}
-          >
+            )}>
             {options.map((option) => (
               <ListboxOption
                 className={({ focus }) =>
@@ -129,16 +117,14 @@ export const MultiSelect = ({
                 }
                 disabled={option.disabled}
                 key={option.value}
-                value={option.value}
-              >
+                value={option.value}>
                 {({ selected }) => (
                   <>
                     <span
                       className={cn(
                         'block truncate text-base',
                         selected ? 'font-medium' : 'font-normal',
-                      )}
-                    >
+                      )}>
                       {option.label}
                     </span>
                     {selected && (

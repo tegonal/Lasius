@@ -98,11 +98,8 @@ export const getTagsByProject = async (
   projectId: string,
   options?: RequestInit,
 ): Promise<getTagsByProjectResponse> => {
-  return lasiusFetch<getTagsByProjectResponse>(
-    getGetTagsByProjectUrl(orgId, projectId),
-    {
-      ...options,
-      method: 'GET',
-    },
-  )
+  return lasiusFetch<getTagsByProjectResponse>(getGetTagsByProjectUrl(orgId, projectId), {
+    ...options,
+    method: 'GET',
+  })
 }

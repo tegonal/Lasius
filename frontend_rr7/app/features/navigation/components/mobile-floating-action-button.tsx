@@ -17,16 +17,7 @@
  *
  */
 
-import {
-  Building2,
-  LogOut,
-  Menu,
-  Play,
-  PlusCircle,
-  Settings,
-  Star,
-  X,
-} from 'lucide-react'
+import { Building2, LogOut, Menu, Play, PlusCircle, Settings, Star, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useFetcher } from 'react-router'
@@ -70,9 +61,7 @@ export const MobileFloatingActionButton = () => {
   const fetcher = useFetcher()
   const { selectedOrganisationId } = useOrganisation()
   const favoritesApi = useGetFavoriteBookingList({
-    fetcherKey: selectedOrganisationId
-      ? `favorites:${selectedOrganisationId}`
-      : undefined,
+    fetcherKey: selectedOrganisationId ? `favorites:${selectedOrganisationId}` : undefined,
   })
 
   const closeModal = () => setOpenModal(null)
@@ -167,10 +156,7 @@ export const MobileFloatingActionButton = () => {
       {/* Start Booking Modal - Quick start with project + tags */}
       <Modal onClose={closeModal} open={openModal === 'start'}>
         <ModalCloseButton onClose={closeModal} />
-        <BookingStart
-          onSuccess={closeModal}
-          selectedOrgId={selectedOrganisationId}
-        />
+        <BookingStart onSuccess={closeModal} selectedOrgId={selectedOrganisationId} />
         <ButtonGroup>
           <Button onClick={closeModal} variant="secondary">
             {t('common.actions.close', { defaultValue: 'Close' })}

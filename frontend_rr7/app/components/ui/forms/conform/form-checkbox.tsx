@@ -22,7 +22,7 @@ import { type FieldMetadata, getInputProps } from '@conform-to/react'
 import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { cn } from '~/lib/utils/cn'
 
-interface FormCheckboxProps {
+interface FormCheckboxProperties {
   children: React.ReactNode
   className?: string
   field: FieldMetadata<boolean>
@@ -38,11 +38,7 @@ interface FormCheckboxProps {
  * </FormCheckbox>
  * ```
  */
-export const FormCheckbox = ({
-  children,
-  className,
-  field,
-}: FormCheckboxProps) => {
+export const FormCheckbox = ({ children, className, field }: FormCheckboxProperties) => {
   const hasErrors = !!field.errors?.length
 
   return (

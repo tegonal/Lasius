@@ -24,11 +24,7 @@ import { useNavigate, useRevalidator } from 'react-router'
 import { ButtonGroup } from '~/components/ui/forms/button-group'
 import { Modal } from '~/components/ui/overlays/modal/modal'
 import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
-import {
-  API_ROUTES,
-  SESSION_EXPIRY_WARNING_MS,
-  SESSION_POLL_INTERVAL_MS,
-} from '~/config/constants'
+import { API_ROUTES, SESSION_EXPIRY_WARNING_MS, SESSION_POLL_INTERVAL_MS } from '~/config/constants'
 import { logger } from '~/lib/logger'
 import { loginUrl, logoutUrl } from '~/services/auth/auth-urls'
 import { useUIStore } from '~/stores/ui-store'
@@ -49,45 +45,45 @@ export const TokenWatcher = () => {
   const revalidator = useRevalidator()
   const [showWarning, setShowWarning] = useState(false)
 
-  const poll = useCallback(async () => {
-    try {
-      const res = await fetch(API_ROUTES.SESSION_STATUS)
-
-      if (!res.ok) {
-        logger.warn('[TokenWatcher] Session status request failed', res.status)
-        return
-      }
-
-      const status: SessionStatus = await res.json()
-
-      // Write expiry to store so DevInfoBadge (and other consumers) can read it
-      useUIStore.getState().setTokenExpiresAt(status.expiresAt)
-
-      if (!status.authenticated) {
-        logger.info('[TokenWatcher] Session gone, redirecting to login')
-        void navigate(loginUrl(), { replace: true })
-        return
-      }
-
-      if (status.expiresAt) {
-        const remaining = status.expiresAt - Date.now()
-
-        if (remaining <= SESSION_EXPIRY_WARNING_MS) {
-          setShowWarning(true)
-        }
-      }
-    } catch (error) {
-      logger.warn('[TokenWatcher] Failed to check session status', error)
-    }
-  }, [navigate])
-
   useEffect(() => {
+    const poll = async () => {
+      try {
+        const response = await fetch(API_ROUTES.SESSION_STATUS)
+
+        if (!response.ok) {
+          logger.warn('[TokenWatcher] Session status request failed', response.status)
+          return
+        }
+
+        const status: SessionStatus = await response.json()
+
+        // Write expiry to store so DevelopmentInfoBadge (and other consumers) can read it
+        useUIStore.getState().setTokenExpiresAt(status.expiresAt)
+
+        if (!status.authenticated) {
+          logger.info('[TokenWatcher] Session gone, redirecting to login')
+          void navigate(loginUrl(), { replace: true })
+          return
+        }
+
+        if (status.expiresAt) {
+          const remaining = status.expiresAt - Date.now()
+
+          if (remaining <= SESSION_EXPIRY_WARNING_MS) {
+            setShowWarning(true)
+          }
+        }
+      } catch (error) {
+        logger.warn('[TokenWatcher] Failed to check session status', error)
+      }
+    }
+
     // Initial check
     void poll()
 
     const id = setInterval(() => void poll(), SESSION_POLL_INTERVAL_MS)
     return () => clearInterval(id)
-  }, [poll])
+  }, [navigate])
 
   const handleClose = useCallback(() => {
     setShowWarning(false)
@@ -107,9 +103,7 @@ export const TokenWatcher = () => {
   return (
     <Modal onClose={handleClose} open={showWarning}>
       <ModalCloseButton onClose={handleClose} />
-      <h3 className="text-lg font-bold">
-        {t('common:SessionTimeout.title', 'Session Expiring')}
-      </h3>
+      <h3 className="text-lg font-bold">{t('common:SessionTimeout.title', 'Session Expiring')}</h3>
       <p className="py-4">
         {t(
           'common:SessionTimeout.message',
@@ -121,16 +115,14 @@ export const TokenWatcher = () => {
           className="btn btn-outline"
           data-testid="session-timeout-logout-btn"
           onClick={handleLogout}
-          type="button"
-        >
+          type="button">
           {t('common:SessionTimeout.logout', 'Logout')}
         </button>
         <button
           className="btn btn-primary"
           data-testid="session-timeout-extend-btn"
           onClick={handleExtendSession}
-          type="button"
-        >
+          type="button">
           {t('common:SessionTimeout.extend', 'Extend Session')}
         </button>
       </ButtonGroup>

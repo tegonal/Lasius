@@ -19,35 +19,25 @@
 
 import { data } from 'react-router'
 
-import {
-  ColumnCenter,
-  ColumnRight,
-  innerGridClasses,
-} from '~/components/ui/layouts/layout-columns'
+import { ColumnCenter, ColumnRight, innerGridClasses } from '~/components/ui/layouts/layout-columns'
 import { ScrollArea } from '~/components/ui/layouts/scroll-area'
 import { AccountSecurityForm } from '~/features/settings/components/account-security-form'
 import { AccountSecurityRightColumn } from '~/features/settings/components/account-security-right-column'
-import { getServerEnv } from '~/lib/env.server'
-import {
-  mergeAuthHeaders,
-  requireUser,
-} from '~/services/auth/auth-helpers.server'
+import { getServerEnvironment } from '~/lib/environment.server'
+import { mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/settings.account-security'
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const auth = await requireUser(request)
-  const demoMode = getServerEnv('LASIUS_DEMO_MODE') === 'true'
+  const isDemoMode = getServerEnvironment('LASIUS_DEMO_MODE') === 'true'
 
-  return data({ demoMode }, { headers: mergeAuthHeaders(auth) })
+  return data({ demoMode: isDemoMode }, { headers: mergeAuthHeaders(auth) })
 }
 
 const AccountSecurityPage = ({ loaderData }: Route.ComponentProps) => {
   return (
-    <div
-      className={innerGridClasses}
-      data-testid="settings-account-security-page"
-    >
+    <div className={innerGridClasses} data-testid="settings-account-security-page">
       <ColumnCenter>
         <ScrollArea className="bg-base-100 flex-1 overflow-y-auto p-4">
           <AccountSecurityForm demoMode={loaderData.demoMode} />

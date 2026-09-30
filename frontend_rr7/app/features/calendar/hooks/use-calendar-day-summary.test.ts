@@ -36,48 +36,34 @@ const getExpectedVsBookedPercentage = (expected: number, worked: number) => {
 
   const cappedPercentage = Math.min(fulfilledPercentage, 100)
   const progressBarPercentage =
-    fulfilledPercentage > 90 && fulfilledPercentage < 100
-      ? 90
-      : cappedPercentage
+    fulfilledPercentage > 90 && fulfilledPercentage < 100 ? 90 : cappedPercentage
 
   return { fulfilledPercentage, progressBarPercentage }
 }
 
 describe('durationInHours', () => {
   it('returns 1 for a 1-hour duration', () => {
-    expect(
-      durationInHours(
-        '2026-01-15T09:00:00.000+01:00',
-        '2026-01-15T10:00:00.000+01:00',
-      ),
-    ).toBe(1)
+    expect(durationInHours('2026-01-15T09:00:00.000+01:00', '2026-01-15T10:00:00.000+01:00')).toBe(
+      1,
+    )
   })
 
   it('returns 0.5 for a 30-minute duration', () => {
-    expect(
-      durationInHours(
-        '2026-01-15T09:00:00.000+01:00',
-        '2026-01-15T09:30:00.000+01:00',
-      ),
-    ).toBe(0.5)
+    expect(durationInHours('2026-01-15T09:00:00.000+01:00', '2026-01-15T09:30:00.000+01:00')).toBe(
+      0.5,
+    )
   })
 
   it('returns 8 for a full workday', () => {
-    expect(
-      durationInHours(
-        '2026-01-15T08:00:00.000+01:00',
-        '2026-01-15T16:00:00.000+01:00',
-      ),
-    ).toBe(8)
+    expect(durationInHours('2026-01-15T08:00:00.000+01:00', '2026-01-15T16:00:00.000+01:00')).toBe(
+      8,
+    )
   })
 
   it('returns 0 when start equals end', () => {
-    expect(
-      durationInHours(
-        '2026-01-15T09:00:00.000+01:00',
-        '2026-01-15T09:00:00.000+01:00',
-      ),
-    ).toBe(0)
+    expect(durationInHours('2026-01-15T09:00:00.000+01:00', '2026-01-15T09:00:00.000+01:00')).toBe(
+      0,
+    )
   })
 })
 

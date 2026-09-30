@@ -24,10 +24,5 @@ import { EmptyState } from '~/components/ui/data-display/empty-state'
 
 export const EmptyStateProjects = () => {
   const { t } = useTranslation()
-  return (
-    <EmptyState
-      icon={FolderOpen}
-      label={t('projects:empty', 'No projects found')}
-    />
-  )
+  return <EmptyState icon={FolderOpen} label={t('projects:empty', 'No projects found')} />
 }

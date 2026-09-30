@@ -25,31 +25,22 @@ import { cn } from '~/lib/utils/cn'
 import { durationAsString } from '~/lib/utils/duration'
 import { type ModelsBooking } from '~/services/api/lasius'
 
-type Props = { item: ModelsBooking }
+type Properties = { item: ModelsBooking }
 
-export const BookingDuration = ({ item }: Props) => {
-  const duration = durationAsString(
-    item.start.dateTime,
-    item.end?.dateTime || '',
-  )
-  const durationIsZero = duration === '00:00'
+export const BookingDuration = ({ item }: Properties) => {
+  const duration = durationAsString(item.start.dateTime, item.end?.dateTime || '')
+  const isDurationIsZero = duration === '00:00'
   const { t } = useTranslation('common')
   return (
     <div
       className={cn(
         'flex flex-row items-center justify-start gap-1 leading-normal',
-        durationIsZero && 'text-warning',
-      )}
-    >
+        isDurationIsZero && 'text-warning',
+      )}>
       <LucideIcon icon={Clock3} size={14} />
       <div>{duration}</div>
-      {durationIsZero && (
-        <span
-          title={t(
-            'bookings:warnings.durationIsZero',
-            "This booking's duration is zero",
-          )}
-        >
+      {isDurationIsZero && (
+        <span title={t('bookings:warnings.durationIsZero', "This booking's duration is zero")}>
           <LucideIcon icon={AlertTriangle} size={14} />
         </span>
       )}

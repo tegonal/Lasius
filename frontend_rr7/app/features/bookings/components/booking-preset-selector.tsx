@@ -19,17 +19,14 @@
 
 import { subDays } from 'date-fns'
 import { ArrowLeft, Clock, Star, Users } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { AvatarUser } from '~/components/ui/data-display/avatar/avatar-user'
 import { TagList } from '~/components/ui/data-display/tag-list'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
-import {
-  IconTabs,
-  type IconTabsItem,
-} from '~/components/ui/navigation/icon-tabs'
+import { IconTabs, type IconTabsItem } from '~/components/ui/navigation/icon-tabs'
 import { formatISOLocale } from '~/lib/utils/dates'
 import { stringHash } from '~/lib/utils/string-hash'
 import { useGetOrganisationBookingList } from '~/services/api/lasius-hooks/organisation-bookings/organisation-bookings'
@@ -44,7 +41,7 @@ type PresetSelection = {
   tags: ModelsTag[]
 }
 
-type Props = {
+type Properties = {
   onBack: () => void
   onSelect: (preset: PresetSelection) => void
   selectedOrgId: string
@@ -72,8 +69,7 @@ const PresetButton = ({
     aria-label={ariaLabel}
     className="hover:bg-base-200 flex w-full cursor-pointer items-start gap-2 rounded-lg p-3 text-left transition-colors"
     onClick={onClick}
-    type="button"
-  >
+    type="button">
     {children}
   </button>
 )
@@ -95,17 +91,10 @@ const AnimatedList = ({ children }: { children: React.ReactNode }) => (
   <div className="flex flex-col">{children}</div>
 )
 
-const AnimatedItem = ({
-  children,
-  index,
-}: {
-  children: React.ReactNode
-  index: number
-}) => (
+const AnimatedItem = ({ children, index }: { children: React.ReactNode; index: number }) => (
   <div
     className="animate-in fade-in"
-    style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'both' }}
-  >
+    style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'both' }}>
     {children}
   </div>
 )
@@ -135,24 +124,25 @@ const RecentBookingsList = ({
   selectedOrgId: string
 }) => {
   const { t } = useTranslation()
-  const recentApi = useGetUserBookingListByOrganisation()
-  const submitRef = useRef(recentApi.submit)
-  submitRef.current = recentApi.submit
+  const { data: recentBookings, submit: submitRecentBookings } =
+    useGetUserBookingListByOrganisation()
 
   useEffect(() => {
-    if (selectedOrgId) {
-      const now = new Date()
-      submitRef.current({
-        orgId: selectedOrgId,
-        params: {
-          from: formatISOLocale(subDays(now, 7)),
-          to: formatISOLocale(now),
-        },
-      })
+    if (!selectedOrgId) {
+      return
     }
-  }, [selectedOrgId])
 
-  const items = recentApi.data ?? []
+    const now = new Date()
+    submitRecentBookings({
+      orgId: selectedOrgId,
+      params: {
+        from: formatISOLocale(subDays(now, 7)),
+        to: formatISOLocale(now),
+      },
+    })
+  }, [selectedOrgId, submitRecentBookings])
+
+  const items = recentBookings ?? []
   const unique = deduplicateBookings(items)
 
   if (unique.length === 0) return <EmptyState />
@@ -166,21 +156,17 @@ const RecentBookingsList = ({
               'bookings:presets.selectRecent',
               'Select recent booking: {{projectName}}{{tags}}',
               {
-                projectName:
-                  item.projectReference.key || item.projectReference.id,
-                tags:
-                  item.tags.length > 0 ? ` with ${item.tags.length} tags` : '',
+                projectName: item.projectReference.key || item.projectReference.id,
+                tags: item.tags.length > 0 ? ` with ${item.tags.length} tags` : '',
               },
             )}
             onClick={() =>
               onSelect({
                 projectId: item.projectReference.id,
-                projectName:
-                  item.projectReference.key || item.projectReference.id,
+                projectName: item.projectReference.key || item.projectReference.id,
                 tags: item.tags,
               })
-            }
-          >
+            }>
             <BookingPresetItem item={item} />
           </PresetButton>
         </AnimatedItem>
@@ -197,19 +183,17 @@ const FavoritesList = ({
   selectedOrgId: string
 }) => {
   const { t } = useTranslation()
-  const favoritesApi = useGetFavoriteBookingList({
+  const { data: favoriteBookings, submit: submitFavoriteBookings } = useGetFavoriteBookingList({
     fetcherKey: selectedOrgId ? `favorites:${selectedOrgId}` : undefined,
   })
-  const submitRef = useRef(favoritesApi.submit)
-  submitRef.current = favoritesApi.submit
 
   useEffect(() => {
     if (selectedOrgId) {
-      submitRef.current({ orgId: selectedOrgId })
+      submitFavoriteBookings({ orgId: selectedOrgId })
     }
-  }, [selectedOrgId])
+  }, [selectedOrgId, submitFavoriteBookings])
 
-  const items = favoritesApi.data?.favorites ?? []
+  const items = favoriteBookings?.favorites ?? []
 
   if (items.length === 0) return <EmptyState />
 
@@ -222,21 +206,17 @@ const FavoritesList = ({
               'bookings:presets.selectFavorite',
               'Select favorite: {{projectName}}{{tags}}',
               {
-                projectName:
-                  item.projectReference.key || item.projectReference.id,
-                tags:
-                  item.tags.length > 0 ? ` with ${item.tags.length} tags` : '',
+                projectName: item.projectReference.key || item.projectReference.id,
+                tags: item.tags.length > 0 ? ` with ${item.tags.length} tags` : '',
               },
             )}
             onClick={() =>
               onSelect({
                 projectId: item.projectReference.id,
-                projectName:
-                  item.projectReference.key || item.projectReference.id,
+                projectName: item.projectReference.key || item.projectReference.id,
                 tags: item.tags,
               })
-            }
-          >
+            }>
             <BookingPresetItem item={item} />
           </PresetButton>
         </AnimatedItem>
@@ -253,24 +233,24 @@ const TeamBookingsList = ({
   selectedOrgId: string
 }) => {
   const { t } = useTranslation()
-  const orgBookingsApi = useGetOrganisationBookingList()
-  const submitRef = useRef(orgBookingsApi.submit)
-  submitRef.current = orgBookingsApi.submit
+  const { data: teamBookings, submit: submitTeamBookings } = useGetOrganisationBookingList()
 
   useEffect(() => {
-    if (selectedOrgId) {
-      const now = new Date()
-      submitRef.current({
-        orgId: selectedOrgId,
-        params: {
-          from: formatISOLocale(subDays(now, 7)),
-          to: formatISOLocale(now),
-        },
-      })
+    if (!selectedOrgId) {
+      return
     }
-  }, [selectedOrgId])
 
-  const items = orgBookingsApi.data ?? []
+    const now = new Date()
+    submitTeamBookings({
+      orgId: selectedOrgId,
+      params: {
+        from: formatISOLocale(subDays(now, 7)),
+        to: formatISOLocale(now),
+      },
+    })
+  }, [selectedOrgId, submitTeamBookings])
+
+  const items = teamBookings ?? []
   const unique = deduplicateBookings(items)
 
   if (unique.length === 0) return <EmptyState />
@@ -284,24 +264,20 @@ const TeamBookingsList = ({
               'bookings:presets.selectTeam',
               'Select team booking: {{projectName}}{{tags}}',
               {
-                projectName:
-                  item.projectReference.key || item.projectReference.id,
-                tags:
-                  item.tags.length > 0 ? ` with ${item.tags.length} tags` : '',
+                projectName: item.projectReference.key || item.projectReference.id,
+                tags: item.tags.length > 0 ? ` with ${item.tags.length} tags` : '',
               },
             )}
             onClick={() =>
               onSelect({
                 projectId: item.projectReference.id,
-                projectName:
-                  item.projectReference.key || item.projectReference.id,
+                projectName: item.projectReference.key || item.projectReference.id,
                 tags: item.tags,
               })
-            }
-          >
+            }>
             <AvatarUser
-              firstName={item.userReference?.key?.split(' ')[0] ?? '?'}
-              lastName={item.userReference?.key?.split(' ')[1] ?? ''}
+              firstName={item.userReference?.key?.split(' ', 1)[0] ?? '?'}
+              lastName={item.userReference?.key?.split(' ', 2)[1] ?? ''}
               size={32}
             />
             <BookingPresetItem item={item} />
@@ -312,35 +288,25 @@ const TeamBookingsList = ({
   )
 }
 
-export const BookingPresetSelector = ({
-  onBack,
-  onSelect,
-  selectedOrgId,
-}: Props) => {
+export const BookingPresetSelector = ({ onBack, onSelect, selectedOrgId }: Properties) => {
   const { t } = useTranslation()
   const [selectedTab, setSelectedTab] = useState(0)
 
   const tabs: IconTabsItem[] = [
     {
-      component: (
-        <RecentBookingsList onSelect={onSelect} selectedOrgId={selectedOrgId} />
-      ),
+      component: <RecentBookingsList onSelect={onSelect} selectedOrgId={selectedOrgId} />,
       icon: Clock,
       id: 'recent',
       name: t('bookings:presets.recent', 'Recent bookings'),
     },
     {
-      component: (
-        <FavoritesList onSelect={onSelect} selectedOrgId={selectedOrgId} />
-      ),
+      component: <FavoritesList onSelect={onSelect} selectedOrgId={selectedOrgId} />,
       icon: Star,
       id: 'favorites',
       name: t('bookings:presets.favorites', 'Favorites'),
     },
     {
-      component: (
-        <TeamBookingsList onSelect={onSelect} selectedOrgId={selectedOrgId} />
-      ),
+      component: <TeamBookingsList onSelect={onSelect} selectedOrgId={selectedOrgId} />,
       icon: Users,
       id: 'team',
       name: t('bookings:presets.team', 'Team bookings'),
@@ -350,12 +316,7 @@ export const BookingPresetSelector = ({
   return (
     <div className="flex h-full flex-col">
       <div className="border-base-content/10 border-b px-4 py-3">
-        <Button
-          className="w-full gap-2"
-          onClick={onBack}
-          size="sm"
-          variant="neutral"
-        >
+        <Button className="w-full gap-2" onClick={onBack} size="sm" variant="neutral">
           <LucideIcon icon={ArrowLeft} size={16} />
           {t('back', 'Back')}
         </Button>
@@ -364,11 +325,7 @@ export const BookingPresetSelector = ({
         </h6>
       </div>
       <div className="flex-1 overflow-hidden">
-        <IconTabs
-          onSelect={setSelectedTab}
-          selected={selectedTab}
-          tabs={tabs}
-        />
+        <IconTabs onSelect={setSelectedTab} selected={selectedTab} tabs={tabs} />
       </div>
     </div>
   )

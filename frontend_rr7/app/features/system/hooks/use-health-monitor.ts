@@ -19,11 +19,7 @@
 
 import { useCallback, useEffect, useRef } from 'react'
 
-import {
-  API_ROUTES,
-  HEALTH_POLL_INTERVAL_MS,
-  HEALTH_STATUS_DEBOUNCE_MS,
-} from '~/config/constants'
+import { API_ROUTES, HEALTH_POLL_INTERVAL_MS, HEALTH_STATUS_DEBOUNCE_MS } from '~/config/constants'
 import { logger } from '~/lib/logger'
 import { type HealthResponse } from '~/routes/api.health'
 import { useUIStore } from '~/stores/ui-store'
@@ -34,48 +30,44 @@ import { useUIStore } from '~/stores/ui-store'
  * Mount once in app-layout — consumers read from the store via selectors.
  */
 export const useHealthMonitor = () => {
-  const initialVersionRef = useRef<null | string>(null)
-  const debounceRef = useRef<null | ReturnType<typeof setTimeout>>(null)
-  const intervalRef = useRef<null | ReturnType<typeof setInterval>>(null)
+  const initialVersionReference = useRef<null | string>(null)
+  const debounceReference = useRef<null | ReturnType<typeof setTimeout>>(null)
+  const intervalReference = useRef<null | ReturnType<typeof setInterval>>(null)
 
-  const scheduleDebouncedOffline = useCallback((offline: boolean) => {
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current)
+  const scheduleDebouncedOffline = useCallback((isOffline: boolean) => {
+    if (debounceReference.current) {
+      clearTimeout(debounceReference.current)
     }
-    debounceRef.current = setTimeout(() => {
-      useUIStore
-        .getState()
-        .setBackendStatus(offline ? 'disconnected' : 'connected')
+    debounceReference.current = setTimeout(() => {
+      useUIStore.getState().setBackendStatus(isOffline ? 'disconnected' : 'connected')
     }, HEALTH_STATUS_DEBOUNCE_MS)
   }, [])
 
   const poll = useCallback(async () => {
     try {
-      const res = await fetch(API_ROUTES.HEALTH)
+      const response = await fetch(API_ROUTES.HEALTH)
 
-      if (!res.ok) {
-        logger.warn('[HealthMonitor] Health check request failed', res.status)
+      if (!response.ok) {
+        logger.warn('[HealthMonitor] Health check request failed', response.status)
         useUIStore.getState().setBackendStatus('disconnected')
         scheduleDebouncedOffline(true)
         return
       }
 
-      const health: HealthResponse = await res.json()
+      const health: HealthResponse = await response.json()
 
       // Backend connectivity — immediate for indicator, debounced for modal
       const isDisconnected = health.backend === 'disconnected'
-      useUIStore
-        .getState()
-        .setBackendStatus(isDisconnected ? 'disconnected' : 'connected')
+      useUIStore.getState().setBackendStatus(isDisconnected ? 'disconnected' : 'connected')
       scheduleDebouncedOffline(isDisconnected)
 
       // Version drift detection
       if (health.version && health.version !== 'dev') {
-        if (initialVersionRef.current === null) {
-          initialVersionRef.current = health.version
-        } else if (health.version !== initialVersionRef.current) {
+        if (initialVersionReference.current === null) {
+          initialVersionReference.current = health.version
+        } else if (health.version !== initialVersionReference.current) {
           logger.info('[HealthMonitor] Version drift detected', {
-            client: initialVersionRef.current,
+            client: initialVersionReference.current,
             server: health.version,
           })
           useUIStore.getState().setVersionDrift(true)
@@ -92,11 +84,8 @@ export const useHealthMonitor = () => {
     void poll()
 
     const startInterval = () => {
-      if (intervalRef.current) clearInterval(intervalRef.current)
-      intervalRef.current = setInterval(
-        () => void poll(),
-        HEALTH_POLL_INTERVAL_MS,
-      )
+      if (intervalReference.current) clearInterval(intervalReference.current)
+      intervalReference.current = setInterval(() => void poll(), HEALTH_POLL_INTERVAL_MS)
     }
 
     const handleFocus = () => {
@@ -105,10 +94,12 @@ export const useHealthMonitor = () => {
     }
 
     const handleBlur = () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current)
-        intervalRef.current = null
+      if (!intervalReference.current) {
+        return
       }
+
+      clearInterval(intervalReference.current)
+      intervalReference.current = null
     }
 
     startInterval()
@@ -117,8 +108,8 @@ export const useHealthMonitor = () => {
     window.addEventListener('blur', handleBlur)
 
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current)
-      if (debounceRef.current) clearTimeout(debounceRef.current)
+      if (intervalReference.current) clearInterval(intervalReference.current)
+      if (debounceReference.current) clearTimeout(debounceReference.current)
       window.removeEventListener('focus', handleFocus)
       window.removeEventListener('blur', handleBlur)
     }

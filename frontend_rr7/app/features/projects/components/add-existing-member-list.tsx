@@ -41,7 +41,7 @@ import { useGetOrganisationUserList } from '~/services/api/lasius-hooks/organisa
 import { useInviteProjectUser } from '~/services/api/lasius-hooks/projects/projects'
 import { type ModelsUserToProjectAssignmentRole } from '~/services/api/lasius/modelsUserToProjectAssignmentRole'
 
-type Props = {
+type Properties = {
   onCancel: () => void
   onMemberAdded: () => void
   orgId: string
@@ -55,7 +55,7 @@ export const AddExistingMemberList = ({
   orgId,
   projectId,
   projectUsers,
-}: Props) => {
+}: Properties) => {
   const { t } = useTranslation()
   const { addToast } = useToast()
 
@@ -63,7 +63,7 @@ export const AddExistingMemberList = ({
   const [addedUserIds, setAddedUserIds] = useState<Set<string>>(new Set())
   const [roles, setRoles] = useState<Record<string, string>>({})
   const [addingUserId, setAddingUserId] = useState<null | string>(null)
-  const addingUserIdRef = useRef<null | string>(null)
+  const addingUserIdReference = useRef<null | string>(null)
 
   const orgUserListApi = useGetOrganisationUserList({
     onSuccess: useCallback((data: ModelsUserStub[]) => {
@@ -73,7 +73,7 @@ export const AddExistingMemberList = ({
 
   const inviteApi = useInviteProjectUser({
     onError: useCallback(() => {
-      addingUserIdRef.current = null
+      addingUserIdReference.current = null
       setAddingUserId(null)
       addToast({
         message: t('invitation:memberAddFailed', 'Failed to add member'),
@@ -82,11 +82,11 @@ export const AddExistingMemberList = ({
       })
     }, [addToast, t]),
     onSuccess: useCallback(() => {
-      const userId = addingUserIdRef.current
-      addingUserIdRef.current = null
-      setAddedUserIds((prev) => {
-        if (!userId) return prev
-        return new Set([...prev, userId])
+      const userId = addingUserIdReference.current
+      addingUserIdReference.current = null
+      setAddedUserIds((previous) => {
+        if (!userId) return previous
+        return new Set([...previous, userId])
       })
       setAddingUserId(null)
       onMemberAdded()
@@ -103,17 +103,12 @@ export const AddExistingMemberList = ({
     submitOrgUserList({ orgId })
   }, [orgId, submitOrgUserList])
 
-  const projectUserIds = useMemo(
-    () => new Set(projectUsers.map((u) => u.id)),
-    [projectUsers],
-  )
+  const projectUserIds = useMemo(() => new Set(projectUsers.map((u) => u.id)), [projectUsers])
 
   const availableMembers = useMemo(
     () =>
       orderBy(
-        orgUsers.filter(
-          (u) => !projectUserIds.has(u.id) && !addedUserIds.has(u.id),
-        ),
+        orgUsers.filter((u) => !projectUserIds.has(u.id) && !addedUserIds.has(u.id)),
         [(u) => u.lastName, (u) => u.firstName],
         ['asc', 'asc'],
       ),
@@ -121,13 +116,12 @@ export const AddExistingMemberList = ({
   )
 
   const handleRoleChange = (userId: string, role: string) => {
-    setRoles((prev) => ({ ...prev, [userId]: role }))
+    setRoles((previous) => ({ ...previous, [userId]: role }))
   }
 
   const handleAdd = (user: ModelsUserStub) => {
-    const role = (roles[user.id] ||
-      'ProjectMember') as ModelsUserToProjectAssignmentRole
-    addingUserIdRef.current = user.id
+    const role = (roles[user.id] || 'ProjectMember') as ModelsUserToProjectAssignmentRole
+    addingUserIdReference.current = user.id
     setAddingUserId(user.id)
     inviteApi.submit({
       body: { email: user.email, role },
@@ -171,24 +165,15 @@ export const AddExistingMemberList = ({
           <DataList>
             <DataListRow>
               <DataListHeaderItem />
-              <DataListHeaderItem>
-                {t('forms.firstName', 'First name')}
-              </DataListHeaderItem>
-              <DataListHeaderItem>
-                {t('forms.lastName', 'Last name')}
-              </DataListHeaderItem>
-              <DataListHeaderItem>
-                {t('projects:projectRole', 'Project role')}
-              </DataListHeaderItem>
+              <DataListHeaderItem>{t('forms.firstName', 'First name')}</DataListHeaderItem>
+              <DataListHeaderItem>{t('forms.lastName', 'Last name')}</DataListHeaderItem>
+              <DataListHeaderItem>{t('projects:projectRole', 'Project role')}</DataListHeaderItem>
               <DataListHeaderItem />
             </DataListRow>
             {availableMembers.map((user) => (
               <DataListRow key={user.id}>
                 <DataListField width={90}>
-                  <AvatarUser
-                    firstName={user.firstName}
-                    lastName={user.lastName}
-                  />
+                  <AvatarUser firstName={user.firstName} lastName={user.lastName} />
                 </DataListField>
                 <DataListField>
                   <span>{user.firstName}</span>
@@ -205,8 +190,7 @@ export const AddExistingMemberList = ({
                         value: 'ProjectMember',
                       },
                       {
-                        label:
-                          UserRoles.ProjectAdministrator || 'Administrator',
+                        label: UserRoles.ProjectAdministrator || 'Administrator',
                         value: 'ProjectAdministrator',
                       },
                     ]}
@@ -219,8 +203,7 @@ export const AddExistingMemberList = ({
                     fullWidth={false}
                     onClick={() => handleAdd(user)}
                     size="sm"
-                    variant="primary"
-                  >
+                    variant="primary">
                     {addingUserId === user.id
                       ? t('actions.adding', 'Adding...')
                       : t('invitation:addExistingMembers.addButton', 'Add')}

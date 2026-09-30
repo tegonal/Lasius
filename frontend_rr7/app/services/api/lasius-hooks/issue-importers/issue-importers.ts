@@ -24,9 +24,7 @@ import {
 /**
  * @summary Add project mapping to configuration (Organisation Admin only)
  */
-export function useAddProjectMapping(
-  options?: ApiProxyOptions<ModelsIssueImporterConfigResponse>,
-) {
+export function useAddProjectMapping(options?: ApiProxyOptions<ModelsIssueImporterConfigResponse>) {
   return useApiProxy<
     ModelsIssueImporterConfigResponse,
     ModelsCreateProjectMapping,
@@ -44,9 +42,7 @@ export function useAddProjectMapping(
 /**
  * @summary Create new importer configuration (Organisation Admin only)
  */
-export function useCreateConfig(
-  options?: ApiProxyOptions<ModelsIssueImporterConfigResponse>,
-) {
+export function useCreateConfig(options?: ApiProxyOptions<ModelsIssueImporterConfigResponse>) {
   return useApiProxy<
     ModelsIssueImporterConfigResponse,
     ModelsCreateIssueImporterConfig,
@@ -62,14 +58,9 @@ export function useCreateConfig(
  * @summary Delete importer configuration (Organisation Admin only)
  */
 export function useDeleteConfig(options?: ApiProxyOptions<void>) {
-  return useApiProxy<
-    void,
-    undefined,
-    { configId: ModelsIssueImporterConfigId; orgId: string }
-  >(
+  return useApiProxy<void, undefined, { configId: ModelsIssueImporterConfigId; orgId: string }>(
     {
-      getUrl: ({ configId, orgId }) =>
-        `/organisations/${orgId}/issue-importers/${configId}`,
+      getUrl: ({ configId, orgId }) => `/organisations/${orgId}/issue-importers/${configId}`,
       method: 'DELETE',
     },
     options,
@@ -77,17 +68,14 @@ export function useDeleteConfig(options?: ApiProxyOptions<void>) {
 } /**
  * @summary Get importer configuration by ID
  */
-export function useGetConfig(
-  options?: ApiProxyOptions<ModelsIssueImporterConfigResponse>,
-) {
+export function useGetConfig(options?: ApiProxyOptions<ModelsIssueImporterConfigResponse>) {
   return useApiProxy<
     ModelsIssueImporterConfigResponse,
     undefined,
     { configId: ModelsIssueImporterConfigId; orgId: string }
   >(
     {
-      getUrl: ({ configId, orgId }) =>
-        `/organisations/${orgId}/issue-importers/${configId}`,
+      getUrl: ({ configId, orgId }) => `/organisations/${orgId}/issue-importers/${configId}`,
       method: 'GET',
     },
     options,
@@ -111,9 +99,7 @@ export function useGetConfigForProject(
     options,
   )
 }
-export function useGetConfigs(
-  options?: ApiProxyOptions<ModelsIssueImporterConfigResponse[]>,
-) {
+export function useGetConfigs(options?: ApiProxyOptions<ModelsIssueImporterConfigResponse[]>) {
   return useApiProxy<
     ModelsIssueImporterConfigResponse[],
     undefined,
@@ -129,17 +115,14 @@ export function useGetConfigs(
  * Lists available resource owners for a GitHub token. Returns the authenticated user plus all organizations they have access to. This helps users select the correct resource owner when creating organization-scoped fine-grained tokens. GitHub-specific endpoint.
  * @summary List GitHub resource owners (user + organizations)
  */
-export function useListGithubResourceOwners(
-  options?: ApiProxyOptions<ModelsListProjectsResponse>,
-) {
+export function useListGithubResourceOwners(options?: ApiProxyOptions<ModelsListProjectsResponse>) {
   return useApiProxy<
     ModelsListProjectsResponse,
     ModelsCreateIssueImporterConfig,
     { orgId: string }
   >(
     {
-      getUrl: ({ orgId }) =>
-        `/organisations/${orgId}/issue-importers/github/resource-owners`,
+      getUrl: ({ orgId }) => `/organisations/${orgId}/issue-importers/github/resource-owners`,
       method: 'POST',
     },
     options,
@@ -148,9 +131,7 @@ export function useListGithubResourceOwners(
  * Fetches list of accessible projects from the configured external service (GitLab/Jira/Plane/GitHub). Returns flat list of projects for all importer types. GitLab/GitHub/Plane projects include available labels and states to help configure filters. GitLab states are "opened", "closed", "all". GitHub states are "open", "closed", "all". Plane states are custom per project. Jira returns basic project information only. Requires only OrganisationMember role since it only reads from external API.
  * @summary List available projects from external service
  */
-export function useListProjects(
-  options?: ApiProxyOptions<ModelsListProjectsResponse>,
-) {
+export function useListProjects(options?: ApiProxyOptions<ModelsListProjectsResponse>) {
   return useApiProxy<
     ModelsListProjectsResponse,
     undefined,
@@ -210,14 +191,8 @@ export function useRemoveProjectMapping(
  * Tests connectivity to GitLab/Jira/Plane without saving configuration. Useful for validating credentials before creating a config. Requires only OrganisationMember role since nothing is saved.
  * @summary Test connectivity to external service
  */
-export function useTestConnectivity(
-  options?: ApiProxyOptions<TestConnectivity200>,
-) {
-  return useApiProxy<
-    TestConnectivity200,
-    ModelsCreateIssueImporterConfig,
-    { orgId: string }
-  >(
+export function useTestConnectivity(options?: ApiProxyOptions<TestConnectivity200>) {
+  return useApiProxy<TestConnectivity200, ModelsCreateIssueImporterConfig, { orgId: string }>(
     {
       getUrl: ({ orgId }) => `/organisations/${orgId}/issue-importers/test`,
       method: 'POST',
@@ -228,17 +203,14 @@ export function useTestConnectivity(
  * Tests connectivity to external service using credentials from an existing saved configuration. Useful for validating that saved credentials still work or testing after updating configuration. Requires only OrganisationMember role since nothing is modified.
  * @summary Test connectivity for existing configuration
  */
-export function useTestExistingConfig(
-  options?: ApiProxyOptions<TestExistingConfig200>,
-) {
+export function useTestExistingConfig(options?: ApiProxyOptions<TestExistingConfig200>) {
   return useApiProxy<
     TestExistingConfig200,
     undefined,
     { configId: ModelsIssueImporterConfigId; orgId: string }
   >(
     {
-      getUrl: ({ configId, orgId }) =>
-        `/organisations/${orgId}/issue-importers/${configId}/test`,
+      getUrl: ({ configId, orgId }) => `/organisations/${orgId}/issue-importers/${configId}/test`,
       method: 'POST',
     },
     options,
@@ -246,17 +218,14 @@ export function useTestExistingConfig(
 } /**
  * @summary Update importer configuration (Organisation Admin only)
  */
-export function useUpdateConfig(
-  options?: ApiProxyOptions<ModelsIssueImporterConfigResponse>,
-) {
+export function useUpdateConfig(options?: ApiProxyOptions<ModelsIssueImporterConfigResponse>) {
   return useApiProxy<
     ModelsIssueImporterConfigResponse,
     ModelsUpdateIssueImporterConfig,
     { configId: ModelsIssueImporterConfigId; orgId: string }
   >(
     {
-      getUrl: ({ configId, orgId }) =>
-        `/organisations/${orgId}/issue-importers/${configId}`,
+      getUrl: ({ configId, orgId }) => `/organisations/${orgId}/issue-importers/${configId}`,
       method: 'PUT',
     },
     options,

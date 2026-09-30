@@ -24,10 +24,5 @@ import { EmptyState } from '~/components/ui/data-display/empty-state'
 
 export const EmptyStateMembers = () => {
   const { t } = useTranslation()
-  return (
-    <EmptyState
-      icon={Users}
-      label={t('organisation:members.empty', 'No members found')}
-    />
-  )
+  return <EmptyState icon={Users} label={t('organisation:members.empty', 'No members found')} />
 }

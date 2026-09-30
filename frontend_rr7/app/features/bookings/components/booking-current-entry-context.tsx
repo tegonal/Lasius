@@ -38,14 +38,11 @@ import { useContextMenu } from '~/features/context-menu/hooks/use-context-menu'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { formatISOLocale } from '~/lib/utils/dates'
 import { areTimesWithinOneMinute } from '~/lib/utils/time'
-import {
-  type ModelsBooking,
-  type ModelsCurrentUserTimeBooking,
-} from '~/services/api/lasius'
+import { type ModelsBooking, type ModelsCurrentUserTimeBooking } from '~/services/api/lasius'
 import { useUpdateUserBookingCurrent } from '~/services/api/lasius-hooks/user-bookings/user-bookings'
 import { useAddFavoriteBooking } from '~/services/api/lasius-hooks/user-favorites/user-favorites'
 
-type Props = {
+type Properties = {
   /** Override currentBooking (e.g. from app-layout loader when not on home route) */
   currentBookingOverride?: ModelsCurrentUserTimeBooking
   item: ModelsBooking
@@ -70,7 +67,7 @@ export const BookingCurrentEntryContext = ({
   currentBookingOverride,
   item,
   selectedOrgIdOverride,
-}: Props) => {
+}: Properties) => {
   const { t } = useTranslation('common')
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const { handleCloseAll } = useContextMenu()
@@ -80,10 +77,10 @@ export const BookingCurrentEntryContext = ({
   const currentBooking = currentBookingOverride ?? homeCurrentBooking
   const selectedOrgId = selectedOrgIdOverride ?? selectedOrganisationId
   const updateCurrentApi = useUpdateUserBookingCurrent()
-  const addFavoriteApi = useAddFavoriteBooking()
+  const favoriteAdditionApi = useAddFavoriteBooking()
 
   const shouldShowStartAdjustment =
-    previousBooking?.end?.dateTime &&
+    !!previousBooking?.end?.dateTime &&
     !areTimesWithinOneMinute(item.start.dateTime, previousBooking.end.dateTime)
 
   const editCurrentBooking = () => {
@@ -92,20 +89,22 @@ export const BookingCurrentEntryContext = ({
   }
 
   const adjustStartToPrevious = () => {
-    if (previousBooking?.end?.dateTime) {
-      updateCurrentApi.submit({
-        body: {
-          newStart: formatISOLocale(new Date(previousBooking.end.dateTime)),
-        },
-        bookingId: item.id,
-        orgId: selectedOrgId,
-      })
-      handleCloseAll()
+    if (!previousBooking?.end?.dateTime) {
+      return
     }
+
+    updateCurrentApi.submit({
+      body: {
+        newStart: formatISOLocale(new Date(previousBooking.end.dateTime)),
+      },
+      bookingId: item.id,
+      orgId: selectedOrgId,
+    })
+    handleCloseAll()
   }
 
   const addFavorite = () => {
-    addFavoriteApi.submit({
+    favoriteAdditionApi.submit({
       body: {
         projectId: item.projectReference?.id || '',
         tags: item.tags || [],
@@ -129,8 +128,7 @@ export const BookingCurrentEntryContext = ({
                 onClick={editCurrentBooking}
                 shape="circle"
                 title={t('bookings:actions.edit', 'Edit booking')}
-                variant="contextIcon"
-              >
+                variant="contextIcon">
                 <LucideIcon icon={PencilIcon} size={24} />
               </Button>
             </ContextButtonWrapper>
@@ -149,8 +147,7 @@ export const BookingCurrentEntryContext = ({
                     'bookings:actions.adjustStartToPrevious',
                     'Adjust start to previous booking',
                   )}
-                  variant="contextIcon"
-                >
+                  variant="contextIcon">
                   <LucideIcon icon={ArrowDownToLineIcon} size={24} />
                 </Button>
               </ContextButtonWrapper>

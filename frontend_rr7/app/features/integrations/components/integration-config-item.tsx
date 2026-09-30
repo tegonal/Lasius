@@ -24,10 +24,9 @@ import { DataListRow } from '~/components/ui/data-display/data-list/data-list-ro
 import { HealthIndicator } from '~/features/integrations/components/health-indicator'
 import { ImporterTypeBadge } from '~/features/integrations/components/importer-type-badge'
 import { IntegrationConfigItemContext } from '~/features/integrations/components/integration-config-item-context'
-import { type ImporterType } from '~/lib/utils/tag-helpers'
 import { type ModelsIssueImporterConfigResponse } from '~/services/api/lasius'
 
-type Props = {
+type Properties = {
   config: ModelsIssueImporterConfigResponse
   onDelete: (config: ModelsIssueImporterConfigResponse) => void
   onEdit: (config: ModelsIssueImporterConfigResponse) => void
@@ -43,18 +42,16 @@ export const IntegrationConfigItem = ({
   onRefreshAllTags,
   onViewInfo,
   onViewMappings,
-}: Props) => {
+}: Properties) => {
   const { t } = useTranslation('integrations')
   const projectCount =
-    'projects' in config && Array.isArray(config.projects)
-      ? config.projects.length
-      : 0
+    'projects' in config && Array.isArray(config.projects) ? config.projects.length : 0
 
   return (
     <DataListRow>
       <DataListField>
         <div className="flex items-center gap-2">
-          <ImporterTypeBadge type={config.importerType as ImporterType} />
+          <ImporterTypeBadge type={config.importerType} />
           {config.syncStatus?.connectivityStatus && (
             <HealthIndicator status={config.syncStatus.connectivityStatus} />
           )}
@@ -64,9 +61,7 @@ export const IntegrationConfigItem = ({
         <span className="font-medium">{config.name}</span>
       </DataListField>
       <DataListField>
-        <span className="text-base-content/70 text-sm">
-          {String(config.baseUrl)}
-        </span>
+        <span className="text-base-content/70 text-sm">{config.baseUrl}</span>
       </DataListField>
       <DataListField>
         <span className="text-base-content/60 text-xs">

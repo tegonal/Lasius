@@ -36,7 +36,7 @@ import {
   getPlannedHoursForRange,
   getWeeklyPlannedHours,
 } from '~/lib/api/functions/get-planned-working-hours'
-import { formatDateTimeToURLParam } from '~/lib/utils/dates'
+import { formatDateTimeToURLParameter } from '~/lib/utils/dates'
 import {
   getUserBookingAggregatedStatsByOrganisation,
   getUserBookingListByOrganisation,
@@ -46,27 +46,27 @@ import { type Route } from './+types/user.dashboard.6months'
 
 // ─── Client Loader (cache unless full-page refresh) ──────────────────────────
 
-export const clientLoader = async (args: Route.ClientLoaderArgs) =>
-  dashboardClientLoader(args)
+export const clientLoader = async (arguments_: Route.ClientLoaderArgs) =>
+  dashboardClientLoader(arguments_)
 clientLoader.hydrate = false
 
 // ─── Loader ──────────────────────────────────────────────────────────────────
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const ctx = await loadDashboardContext(request)
-  const { headers, plannedHours, selectedDate, selectedOrgId } = ctx
+  const context = await loadDashboardContext(request)
+  const { headers, plannedHours, selectedDate, selectedOrgId } = context
 
-  const dateObj = new Date(selectedDate)
-  const rangeStart = subWeeks(dateObj, 26)
+  const dateObject = new Date(selectedDate)
+  const rangeStart = subWeeks(dateObject, 26)
 
   // Build timespan for 26-week range
   const timespan = {
-    from: formatDateTimeToURLParam(rangeStart),
-    to: formatDateTimeToURLParam(dateObj),
+    from: formatDateTimeToURLParameter(rangeStart),
+    to: formatDateTimeToURLParameter(dateObject),
   }
 
   // Fetch bookings and aggregated project stats in parallel
-  const [bookingsRes, projectStatsRes] = await Promise.all([
+  const [bookingsResponse, projectStatsResponse] = await Promise.all([
     getUserBookingListByOrganisation(selectedOrgId, timespan, {
       headers,
     }),
@@ -76,30 +76,21 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
         from: format(rangeStart, 'yyyy-MM-dd'),
         granularity: 'Week',
         source: 'project',
-        to: format(dateObj, 'yyyy-MM-dd'),
+        to: format(dateObject, 'yyyy-MM-dd'),
       },
       { headers },
     ),
   ])
 
-  const bookings = bookingsRes.data ?? []
-  const projectStats = projectStatsRes.data ?? []
+  const bookings = bookingsResponse.data ?? []
+  const projectStats = projectStatsResponse.data ?? []
 
   // Compute work health metrics
   const weeklyPlannedHours = getWeeklyPlannedHours(plannedHours)
-  const { weeklyData } = computeWorkHealthMetrics(
-    bookings,
-    weeklyPlannedHours,
-    26,
-    selectedDate,
-  )
+  const { weeklyData } = computeWorkHealthMetrics(bookings, weeklyPlannedHours, 26, selectedDate)
 
   // Compute summary stats
-  const expectedHours = getPlannedHoursForRange(
-    rangeStart,
-    dateObj,
-    plannedHours,
-  )
+  const expectedHours = getPlannedHoursForRange(rangeStart, dateObject, plannedHours)
   const stats = computeDashboardStats(bookings, expectedHours)
 
   // Aggregate top 5 projects
@@ -107,7 +98,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
   return data(
     { selectedDate, stats, topProjects, weeklyData },
-    { headers: dashboardResponseHeaders(ctx.auth) },
+    { headers: dashboardResponseHeaders(context.auth) },
   )
 }
 
@@ -119,16 +110,11 @@ export default function Dashboard6Months({ loaderData }: Route.ComponentProps) {
 
   return (
     <div className="space-y-6 px-8 py-6">
-      <h2 className="text-lg font-semibold">
-        {t('stats:6months', '6 Months')}
-      </h2>
+      <h2 className="text-lg font-semibold">{t('stats:6months', '6 Months')}</h2>
       <div className="flex gap-4">
         <StatsOverviewGrid {...stats} />
         <TopProjectsCard
-          emptyMessage={t(
-            'stats:noProjectsFor6Months',
-            'No projects for this period',
-          )}
+          emptyMessage={t('stats:noProjectsFor6Months', 'No projects for this period')}
           projects={topProjects}
         />
       </div>

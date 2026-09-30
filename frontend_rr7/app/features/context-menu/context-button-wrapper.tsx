@@ -31,9 +31,8 @@ const variants = cva('', {
   },
 })
 
-type Props = VariantProps<typeof variants> & { children: React.ReactNode }
+type Properties = VariantProps<typeof variants> & { children: React.ReactNode }
 
-export const ContextButtonWrapper = ({
-  children,
-  variant = 'default',
-}: Props) => <div className={cn(variants({ variant }))}>{children}</div>
+export const ContextButtonWrapper = ({ children, variant = 'default' }: Properties) => (
+  <div className={cn(variants({ variant }))}>{children}</div>
+)

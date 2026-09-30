@@ -35,13 +35,9 @@ import {
   type ProjectMapping,
 } from '~/features/integrations/lib/mapping-helpers'
 import { useProjects } from '~/features/projects/hooks/use-projects'
-import { type ImporterType } from '~/lib/utils/tag-helpers'
-import {
-  type ModelsIssueImporterConfigResponse,
-  type ModelsUserStub,
-} from '~/services/api/lasius'
+import { type ModelsIssueImporterConfigResponse, type ModelsUserStub } from '~/services/api/lasius'
 
-type Props = {
+type Properties = {
   config: ModelsIssueImporterConfigResponse | null
   onClose: () => void
   open: boolean
@@ -52,7 +48,7 @@ const FormattedDateOrNA = ({ date }: { date?: null | string }) => {
   return <FormatDate date={date} format="fullDateLong" />
 }
 
-const getUserName = (user: ModelsUserStub | string | undefined): string => {
+const getUserDisplayName = (user: ModelsUserStub | string | undefined): string => {
   if (!user) return 'N/A'
   if (typeof user === 'string') return user
   const name = `${user.firstName} ${user.lastName}`.trim()
@@ -76,23 +72,21 @@ const getConnectivityIcon = (status: string) => {
   }
 }
 
-export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
+export const ConfigInfoModal = ({ config, onClose, open }: Properties) => {
   const { t } = useTranslation('integrations')
   const { findProjectById } = useProjects()
 
   const syncStatus = config?.syncStatus
   const connectivityStatus = syncStatus?.connectivityStatus
-  const { className: iconClassName, icon: ConnectivityIcon } =
-    getConnectivityIcon(connectivityStatus || '')
+  const { className: iconClassName, icon: ConnectivityIcon } = getConnectivityIcon(
+    connectivityStatus || '',
+  )
 
   return (
     <Modal onClose={onClose} open={open} size="lg">
       <div className="flex min-h-0 flex-1 flex-col gap-4">
         <ModalCloseButton onClose={onClose} />
-        <ModalHeader
-          actionSlot={<ModalHelpButton helpKey="modal-config-info" />}
-          className="mb-0"
-        >
+        <ModalHeader actionSlot={<ModalHelpButton helpKey="modal-config-info" />} className="mb-0">
           {t('issueImporters.info.title', {
             defaultValue: 'Configuration Info',
           })}
@@ -132,9 +126,7 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
                       })}
                     </dt>
                     <dd>
-                      <ImporterTypeBadge
-                        type={config.importerType as ImporterType}
-                      />
+                      <ImporterTypeBadge type={config.importerType} />
                     </dd>
                   </div>
                   <div className="flex justify-between">
@@ -143,9 +135,7 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
                         defaultValue: 'Base URL',
                       })}
                     </dt>
-                    <dd className="text-sm font-medium">
-                      {String(config.baseUrl)}
-                    </dd>
+                    <dd className="text-sm font-medium">{config.baseUrl}</dd>
                   </div>
                   <div className="flex justify-between">
                     <dt className="text-base-content/70 text-sm">
@@ -156,9 +146,7 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
                     <dd className="text-sm font-medium">
                       {t('issueImporters.info.checkFrequencyValue', {
                         defaultValue: '{{minutes}} minutes',
-                        minutes: Math.round(
-                          (config.checkFrequency || 0) / 60_000,
-                        ),
+                        minutes: Math.round((config.checkFrequency || 0) / 60_000),
                       })}
                     </dd>
                   </div>
@@ -176,17 +164,12 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
                 </h3>
                 <div className="bg-base-200 rounded-lg p-4">
                   <div className="mb-4 flex items-center gap-3">
-                    <LucideIcon
-                      className={iconClassName}
-                      icon={ConnectivityIcon}
-                      size={24}
-                    />
+                    <LucideIcon className={iconClassName} icon={ConnectivityIcon} size={24} />
                     <div>
                       <p className="font-medium">
-                        {t(
-                          `issueImporters.healthStatus.${connectivityStatus || 'unknown'}`,
-                          { defaultValue: connectivityStatus || 'unknown' },
-                        )}
+                        {t(`issueImporters.healthStatus.${connectivityStatus || 'unknown'}`, {
+                          defaultValue: connectivityStatus || 'unknown',
+                        })}
                       </p>
                       {syncStatus.lastConnectivityCheck && (
                         <p className="text-base-content/60 text-xs">
@@ -212,14 +195,10 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
                             })}
                         </p>
                         {syncStatus.currentIssue.message && (
-                          <p className="mt-1 text-xs">
-                            {syncStatus.currentIssue.message}
-                          </p>
+                          <p className="mt-1 text-xs">{syncStatus.currentIssue.message}</p>
                         )}
                         {syncStatus.currentIssue.httpStatus && (
-                          <p className="mt-1 text-xs">
-                            HTTP {syncStatus.currentIssue.httpStatus}
-                          </p>
+                          <p className="mt-1 text-xs">HTTP {syncStatus.currentIssue.httpStatus}</p>
                         )}
                       </div>
                     </Alert>
@@ -232,9 +211,7 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
                           defaultValue: 'Projects Mapped',
                         })}
                       </dt>
-                      <dd className="text-sm font-medium">
-                        {syncStatus.totalProjectsMapped}
-                      </dd>
+                      <dd className="text-sm font-medium">{syncStatus.totalProjectsMapped}</dd>
                     </div>
                     <div className="flex justify-between">
                       <dt className="text-base-content/70 text-sm">
@@ -242,9 +219,7 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
                           defaultValue: 'Total Issues Synced',
                         })}
                       </dt>
-                      <dd className="text-sm font-medium">
-                        {syncStatus.totalIssuesSynced}
-                      </dd>
+                      <dd className="text-sm font-medium">{syncStatus.totalIssuesSynced}</dd>
                     </div>
                     {syncStatus.lastSuccessfulSync && (
                       <div className="flex justify-between">
@@ -254,9 +229,7 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
                           })}
                         </dt>
                         <dd className="text-sm font-medium">
-                          <FormattedDateOrNA
-                            date={syncStatus.lastSuccessfulSync}
-                          />
+                          <FormattedDateOrNA date={syncStatus.lastSuccessfulSync} />
                         </dd>
                       </div>
                     )}
@@ -268,9 +241,7 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
                           })}
                         </dt>
                         <dd className="text-sm font-medium">
-                          <FormattedDateOrNA
-                            date={syncStatus.nextScheduledSync}
-                          />
+                          <FormattedDateOrNA date={syncStatus.nextScheduledSync} />
                         </dd>
                       </div>
                     )}
@@ -290,15 +261,12 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
                 <div className="space-y-3">
                   {Object.entries(
                     buildMappingStatsGroups(
-                      config.importerType as ImporterType,
+                      config.importerType,
                       config.projects as ProjectMapping[],
                       syncStatus?.projectStats ?? [],
                     ),
                   ).map(([externalName, entries]) => (
-                    <div
-                      className="bg-base-200 rounded-lg p-4"
-                      key={externalName}
-                    >
+                    <div className="bg-base-200 rounded-lg p-4" key={externalName}>
                       <p className="mb-2 text-sm font-medium">{externalName}</p>
                       <table className="table-sm table">
                         <thead>
@@ -324,19 +292,14 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
                           {entries.map((entry) => (
                             <tr key={entry.projectId}>
                               <td className="text-sm">
-                                {findProjectById(entry.projectId)?.key ??
-                                  entry.projectId}
+                                {findProjectById(entry.projectId)?.key ?? entry.projectId}
                               </td>
                               <td className="text-sm">
-                                {entry.stat
-                                  ? entry.stat.totalIssuesSynced || 0
-                                  : '—'}
+                                {entry.stat ? entry.stat.totalIssuesSynced || 0 : '—'}
                               </td>
                               <td className="text-base-content/70 text-sm">
                                 {entry.stat ? (
-                                  <FormattedDateOrNA
-                                    date={entry.stat.lastSyncAt}
-                                  />
+                                  <FormattedDateOrNA date={entry.stat.lastSyncAt} />
                                 ) : (
                                   <span className="text-base-content/40 italic">
                                     {t('issueImporters.info.pendingFirstSync', {
@@ -373,10 +336,7 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
                           })}
                         </dt>
                         <dd className="text-sm font-medium">
-                          <FormatDate
-                            date={config.audit.createdAt}
-                            format="fullDateLong"
-                          />
+                          <FormatDate date={config.audit.createdAt} format="fullDateLong" />
                         </dd>
                       </div>
                     )}
@@ -388,7 +348,7 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
                           })}
                         </dt>
                         <dd className="text-sm font-medium">
-                          {getUserName(config.audit.createdBy)}
+                          {getUserDisplayName(config.audit.createdBy)}
                         </dd>
                       </div>
                     )}
@@ -400,10 +360,7 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
                           })}
                         </dt>
                         <dd className="text-sm font-medium">
-                          <FormatDate
-                            date={config.audit.updatedAt}
-                            format="fullDateLong"
-                          />
+                          <FormatDate date={config.audit.updatedAt} format="fullDateLong" />
                         </dd>
                       </div>
                     )}
@@ -415,7 +372,7 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
                           })}
                         </dt>
                         <dd className="text-sm font-medium">
-                          {getUserName(config.audit.updatedBy)}
+                          {getUserDisplayName(config.audit.updatedBy)}
                         </dd>
                       </div>
                     )}
@@ -427,12 +384,7 @@ export const ConfigInfoModal = ({ config, onClose, open }: Props) => {
         )}
 
         <div className="mt-2">
-          <Button
-            className="w-full"
-            onClick={onClose}
-            type="button"
-            variant="secondary"
-          >
+          <Button className="w-full" onClick={onClose} type="button" variant="secondary">
             {t('actions.close', { defaultValue: 'Close' })}
           </Button>
         </div>

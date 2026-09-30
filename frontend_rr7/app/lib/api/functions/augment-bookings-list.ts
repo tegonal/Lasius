@@ -30,9 +30,7 @@ export type AugmentedBooking = ModelsBooking & {
   overlapsWithNext?: ModelsBooking
 }
 
-export const augmentBookingsList = (
-  bookings: ModelsBooking[],
-): AugmentedBooking[] => {
+export const augmentBookingsList = (bookings: ModelsBooking[]): AugmentedBooking[] => {
   const sorted = sortBookingsByDate(bookings)
 
   return sorted.map((booking, index) => {
@@ -43,16 +41,11 @@ export const augmentBookingsList = (
     if (nextBooking && booking.end && nextBooking.end) {
       const isOverlapping =
         nextBooking.end.dateTime !== booking.start.dateTime &&
-        !isBefore(
-          new Date(nextBooking.end.dateTime),
-          new Date(booking.start.dateTime),
-        )
+        !isBefore(new Date(nextBooking.end.dateTime), new Date(booking.start.dateTime))
 
       const hasGap =
-        differenceInMinutes(
-          new Date(booking.start.dateTime),
-          new Date(nextBooking.end.dateTime),
-        ) > 1
+        differenceInMinutes(new Date(booking.start.dateTime), new Date(nextBooking.end.dateTime)) >
+        1
 
       return {
         ...booking,

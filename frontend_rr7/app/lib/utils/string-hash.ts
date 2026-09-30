@@ -19,17 +19,17 @@
 
 /**
  * Returns a hash code from a string
- * @param  {String} str The string to hash.
+ * @param  {String} text The string to hash.
  * @return {Number}    A 32bit integer
- * @see http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/
+ * @see https://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/
  */
-function hashCode(str: string | undefined) {
+function hashCode(text: string | undefined) {
   let hash = 0
-  if (!str) {
+  if (!text) {
     return hash
   }
-  for (let i = 0, len = str.length; i < len; i += 1) {
-    const chr = str.codePointAt(i) ?? 0
+  for (let index = 0, length_ = text.length; index < length_; index += 1) {
+    const chr = text.codePointAt(index) ?? 0
 
     hash = (hash << 5) - hash + chr
 

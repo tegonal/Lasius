@@ -34,14 +34,9 @@ export const SlideWorkingHours = () => {
         <div className="mb-4 flex justify-center">
           <LucideIcon className="text-primary" icon={Clock} size={48} />
         </div>
-        <h2 className="text-xl font-bold">
-          {t('workingHours.title', 'Set Working Hours')}
-        </h2>
+        <h2 className="text-xl font-bold">{t('workingHours.title', 'Set Working Hours')}</h2>
         <p className="text-base-content/70 mt-2">
-          {t(
-            'workingHours.subtitle',
-            'Tell Lasius how many hours per week you plan to work.',
-          )}
+          {t('workingHours.subtitle', 'Tell Lasius how many hours per week you plan to work.')}
         </p>
       </div>
 
@@ -51,14 +46,9 @@ export const SlideWorkingHours = () => {
             1
           </div>
           <div>
-            <div className="font-semibold">
-              {t('workingHours.step1', 'Go to Working Hours')}
-            </div>
+            <div className="font-semibold">{t('workingHours.step1', 'Go to Working Hours')}</div>
             <p className="text-base-content/60">
-              {t(
-                'workingHours.step1Desc',
-                'Click the button below to set your hours.',
-              )}
+              {t('workingHours.step1Desc', 'Click the button below to set your hours.')}
             </p>
           </div>
         </div>

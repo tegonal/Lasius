@@ -25,15 +25,8 @@ import {
   getSelectedOrganisationId,
 } from '~/lib/organisation-helpers.server'
 import { ModelsUserOrganisationRole } from '~/services/api/lasius/modelsUserOrganisationRole'
-import {
-  getProjectLastActivityDate,
-  getProjectList,
-} from '~/services/api/lasius/projects/projects'
-import {
-  authHeaders,
-  mergeAuthHeaders,
-  requireUser,
-} from '~/services/auth/auth-helpers.server'
+import { getProjectLastActivityDate, getProjectList } from '~/services/api/lasius/projects/projects'
+import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
 import { type ProjectWithActivity } from '~/types/common'
 
 import { type Route } from './+types/organisation.projects._index'
@@ -48,34 +41,24 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const selectedOrgId = getSelectedOrganisationId(user)
 
   // Admin guard: only organisation administrators can access this page
-  const selectedOrg = organisations.find(
-    (o) => o.organisationReference.id === selectedOrgId,
-  )
-  if (
-    selectedOrg?.role !== ModelsUserOrganisationRole.OrganisationAdministrator
-  ) {
+  const selectedOrg = organisations.find((o) => o.organisationReference.id === selectedOrgId)
+  if (selectedOrg?.role !== ModelsUserOrganisationRole.OrganisationAdministrator) {
     throw redirect('/user/home')
   }
 
-  const projectsRes = await getProjectList(selectedOrgId, { headers })
-  const projects = projectsRes.data ?? []
+  const projectsResponse = await getProjectList(selectedOrgId, { headers })
+  const projects = projectsResponse.data ?? []
 
   // Fetch last activity dates for all projects in parallel
   const lastActivityResults = await Promise.allSettled(
-    projects.map((p) =>
-      getProjectLastActivityDate(selectedOrgId, p.id, { headers }),
-    ),
+    projects.map((p) => getProjectLastActivityDate(selectedOrgId, p.id, { headers })),
   )
-  const projectsWithActivity: ProjectWithActivity[] = projects.map(
-    (project, i) => {
-      const result = lastActivityResults[i]
-      const lastActivityDate =
-        result?.status === 'fulfilled' && result.value?.status === 200
-          ? result.value.data
-          : null
-      return { ...project, lastActivityDate }
-    },
-  )
+  const projectsWithActivity: ProjectWithActivity[] = projects.map((project, index) => {
+    const result = lastActivityResults[index]
+    const lastActivityDate =
+      result?.status === 'fulfilled' && result.value?.status === 200 ? result.value.data : null
+    return { ...project, lastActivityDate }
+  })
 
   return data(
     {

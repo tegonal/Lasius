@@ -21,10 +21,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router'
 
-import {
-  IconTabs,
-  type IconTabsItem,
-} from '~/components/ui/navigation/icon-tabs'
+import { IconTabs, type IconTabsItem } from '~/components/ui/navigation/icon-tabs'
 import { createNavigation } from '~/config/navigation'
 import { NavigationTabContent } from '~/features/navigation/components/navigation-tab-content'
 
@@ -39,13 +36,10 @@ export const NavigationMenuTabs = () => {
   const [manualTab, setManualTab] = useState<null | number>(null)
 
   // Reset manual override when URL changes to a different section
-  const selected =
-    manualTab !== null && manualTab !== locationTab ? manualTab : locationTab
+  const selected = manualTab !== null && manualTab !== locationTab ? manualTab : locationTab
 
   const tabs: IconTabsItem[] = navigation.map((item) => ({
-    component: (
-      <NavigationTabContent branch={item.level} navigation={navigation} />
-    ),
+    component: <NavigationTabContent branch={item.level} navigation={navigation} />,
     icon: item.icon,
     id: item.level,
     name: item.name,
@@ -54,12 +48,7 @@ export const NavigationMenuTabs = () => {
 
   return (
     <div className="h-full w-full px-2 pt-1 lg:px-4 lg:pt-4 xl:px-6 xl:pt-6">
-      <IconTabs
-        onSelect={setManualTab}
-        position="left"
-        selected={selected}
-        tabs={tabs}
-      />
+      <IconTabs onSelect={setManualTab} position="left" selected={selected} tabs={tabs} />
     </div>
   )
 }
@@ -69,11 +58,9 @@ const tabIndexForPath = (
   navigation: ReturnType<typeof createNavigation>,
   pathname: string,
 ): number => {
-  for (const [i, section] of navigation.entries()) {
-    const hasMatch = section.routes.some((route) =>
-      pathname.startsWith(route.route),
-    )
-    if (hasMatch) return i
+  for (const [index, section] of navigation.entries()) {
+    const hasMatch = section.routes.some((route) => pathname.startsWith(route.route))
+    if (hasMatch) return index
   }
   return 0
 }

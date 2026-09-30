@@ -22,12 +22,10 @@ export type getOrganisationBookingListResponse200 = {
   status: 200
 }
 
-export type getOrganisationBookingListResponseSuccess =
-  getOrganisationBookingListResponse200 & {
-    headers: Headers
-  }
-export type getOrganisationBookingListResponse =
-  getOrganisationBookingListResponseSuccess
+export type getOrganisationBookingListResponseSuccess = getOrganisationBookingListResponse200 & {
+  headers: Headers
+}
+export type getOrganisationBookingListResponse = getOrganisationBookingListResponseSuccess
 
 export const getGetOrganisationBookingListUrl = (
   orgId: string,

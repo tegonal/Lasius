@@ -28,22 +28,16 @@ export type TabItem = {
   label: string
 }
 
-export const Tabs = ({
-  defaultIndex = 0,
-  tabs,
-}: {
-  defaultIndex?: number
-  tabs: TabItem[]
-}) => {
+export const Tabs = ({ defaultIndex = 0, tabs }: { defaultIndex?: number; tabs: TabItem[] }) => {
   const [selected, setSelected] = useState(defaultIndex)
-  const itemRefs = useRef<(HTMLElement | null)[]>([])
+  const itemReferences = useRef<(HTMLElement | null)[]>([])
 
   return (
     <div className="border-base-content/20 flex min-h-0 w-full flex-1 flex-col border-b">
       <div className="border-base-content/20 relative flex flex-shrink-0 flex-row justify-start gap-3 border-b">
         <SlidingIndicator
           className="!top-auto !bottom-0 !h-[2px]"
-          itemRefs={itemRefs}
+          itemRefs={itemReferences}
           radiusOn="bottom"
           selectedIndex={selected}
         />
@@ -51,22 +45,18 @@ export const Tabs = ({
           <div
             className="relative z-10"
             key={item.label}
-            ref={(el) => {
-              itemRefs.current[index] = el
-            }}
-          >
+            ref={(element) => {
+              itemReferences.current[index] = element
+            }}>
             <Button
               className={cn(
                 'relative z-20 rounded-none hover:bg-transparent hover:shadow-[inset_0_-2px_0_0_currentColor]',
-                index === selected
-                  ? 'text-base-content'
-                  : 'text-base-content/60',
+                index === selected ? 'text-base-content' : 'text-base-content/60',
               )}
               fullWidth={false}
               onClick={() => setSelected(index)}
               type="button"
-              variant="ghost"
-            >
+              variant="ghost">
               {item.label}
             </Button>
           </div>
@@ -77,12 +67,9 @@ export const Tabs = ({
           <div
             className={cn(
               'flex min-h-0 w-full flex-1 flex-col py-3 transition-opacity duration-200',
-              index === selected
-                ? 'opacity-100'
-                : 'pointer-events-none absolute inset-0 opacity-0',
+              index === selected ? 'opacity-100' : 'pointer-events-none absolute inset-0 opacity-0',
             )}
-            key={item.label}
-          >
+            key={item.label}>
             {item.component}
           </div>
         ))}

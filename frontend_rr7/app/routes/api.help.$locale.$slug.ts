@@ -44,13 +44,7 @@ export async function loader({ params }: Route.LoaderArgs) {
   const safeLocale = locale.replaceAll(/[^a-z-]/g, '')
   const safeSlug = slug.replaceAll(/[^a-z0-9-]/g, '')
 
-  const filePath = join(
-    process.cwd(),
-    'public',
-    'help',
-    safeLocale,
-    `${safeSlug}.mdx`,
-  )
+  const filePath = join(process.cwd(), 'public', 'help', safeLocale, `${safeSlug}.mdx`)
 
   if (!existsSync(filePath)) {
     return data({ error: 'Help file not found' }, { status: 404 })

@@ -50,9 +50,7 @@ export type getConfigsResponseError = getConfigsResponse403 & {
   headers: Headers
 }
 
-export type getConfigsResponse =
-  | getConfigsResponseSuccess
-  | getConfigsResponseError
+export type getConfigsResponse = getConfigsResponseSuccess | getConfigsResponseError
 
 export const getGetConfigsUrl = (orgId: string, params?: GetConfigsParams) => {
   const normalizedParams = new URLSearchParams()
@@ -102,16 +100,11 @@ export type createConfigResponse403 = {
 export type createConfigResponseSuccess = createConfigResponse201 & {
   headers: Headers
 }
-export type createConfigResponseError = (
-  | createConfigResponse400
-  | createConfigResponse403
-) & {
+export type createConfigResponseError = (createConfigResponse400 | createConfigResponse403) & {
   headers: Headers
 }
 
-export type createConfigResponse =
-  | createConfigResponseSuccess
-  | createConfigResponseError
+export type createConfigResponse = createConfigResponseSuccess | createConfigResponseError
 
 export const getCreateConfigUrl = (orgId: string) => {
   return `/organisations/${orgId}/issue-importers`
@@ -151,21 +144,13 @@ export type getConfigResponse404 = {
 export type getConfigResponseSuccess = getConfigResponse200 & {
   headers: Headers
 }
-export type getConfigResponseError = (
-  | getConfigResponse403
-  | getConfigResponse404
-) & {
+export type getConfigResponseError = (getConfigResponse403 | getConfigResponse404) & {
   headers: Headers
 }
 
-export type getConfigResponse =
-  | getConfigResponseSuccess
-  | getConfigResponseError
+export type getConfigResponse = getConfigResponseSuccess | getConfigResponseError
 
-export const getGetConfigUrl = (
-  orgId: string,
-  configId: ModelsIssueImporterConfigId,
-) => {
+export const getGetConfigUrl = (orgId: string, configId: ModelsIssueImporterConfigId) => {
   return `/organisations/${orgId}/issue-importers/${configId}`
 }
 
@@ -207,21 +192,14 @@ export type updateConfigResponseSuccess = updateConfigResponse200 & {
   headers: Headers
 }
 export type updateConfigResponseError = (
-  | updateConfigResponse400
-  | updateConfigResponse403
-  | updateConfigResponse404
+  updateConfigResponse400 | updateConfigResponse403 | updateConfigResponse404
 ) & {
   headers: Headers
 }
 
-export type updateConfigResponse =
-  | updateConfigResponseSuccess
-  | updateConfigResponseError
+export type updateConfigResponse = updateConfigResponseSuccess | updateConfigResponseError
 
-export const getUpdateConfigUrl = (
-  orgId: string,
-  configId: ModelsIssueImporterConfigId,
-) => {
+export const getUpdateConfigUrl = (orgId: string, configId: ModelsIssueImporterConfigId) => {
   return `/organisations/${orgId}/issue-importers/${configId}`
 }
 
@@ -231,15 +209,12 @@ export const updateConfig = async (
   modelsUpdateIssueImporterConfig: ModelsUpdateIssueImporterConfig,
   options?: RequestInit,
 ): Promise<updateConfigResponse> => {
-  return lasiusFetch<updateConfigResponse>(
-    getUpdateConfigUrl(orgId, configId),
-    {
-      ...options,
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', ...options?.headers },
-      body: JSON.stringify(modelsUpdateIssueImporterConfig),
-    },
-  )
+  return lasiusFetch<updateConfigResponse>(getUpdateConfigUrl(orgId, configId), {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(modelsUpdateIssueImporterConfig),
+  })
 }
 
 /**
@@ -269,21 +244,14 @@ export type deleteConfigResponseSuccess = deleteConfigResponse204 & {
   headers: Headers
 }
 export type deleteConfigResponseError = (
-  | deleteConfigResponse400
-  | deleteConfigResponse403
-  | deleteConfigResponse404
+  deleteConfigResponse400 | deleteConfigResponse403 | deleteConfigResponse404
 ) & {
   headers: Headers
 }
 
-export type deleteConfigResponse =
-  | deleteConfigResponseSuccess
-  | deleteConfigResponseError
+export type deleteConfigResponse = deleteConfigResponseSuccess | deleteConfigResponseError
 
-export const getDeleteConfigUrl = (
-  orgId: string,
-  configId: ModelsIssueImporterConfigId,
-) => {
+export const getDeleteConfigUrl = (orgId: string, configId: ModelsIssueImporterConfigId) => {
   return `/organisations/${orgId}/issue-importers/${configId}`
 }
 
@@ -292,13 +260,10 @@ export const deleteConfig = async (
   configId: ModelsIssueImporterConfigId,
   options?: RequestInit,
 ): Promise<deleteConfigResponse> => {
-  return lasiusFetch<deleteConfigResponse>(
-    getDeleteConfigUrl(orgId, configId),
-    {
-      ...options,
-      method: 'DELETE',
-    },
-  )
+  return lasiusFetch<deleteConfigResponse>(getDeleteConfigUrl(orgId, configId), {
+    ...options,
+    method: 'DELETE',
+  })
 }
 
 /**
@@ -319,20 +284,17 @@ export type getConfigForProjectResponse404 = {
   status: 404
 }
 
-export type getConfigForProjectResponseSuccess =
-  getConfigForProjectResponse200 & {
-    headers: Headers
-  }
+export type getConfigForProjectResponseSuccess = getConfigForProjectResponse200 & {
+  headers: Headers
+}
 export type getConfigForProjectResponseError = (
-  | getConfigForProjectResponse403
-  | getConfigForProjectResponse404
+  getConfigForProjectResponse403 | getConfigForProjectResponse404
 ) & {
   headers: Headers
 }
 
 export type getConfigForProjectResponse =
-  | getConfigForProjectResponseSuccess
-  | getConfigForProjectResponseError
+  getConfigForProjectResponseSuccess | getConfigForProjectResponseError
 
 export const getGetConfigForProjectUrl = (orgId: string, projectId: string) => {
   return `/organisations/${orgId}/projects/${projectId}/issue-importer`
@@ -343,13 +305,10 @@ export const getConfigForProject = async (
   projectId: string,
   options?: RequestInit,
 ): Promise<getConfigForProjectResponse> => {
-  return lasiusFetch<getConfigForProjectResponse>(
-    getGetConfigForProjectUrl(orgId, projectId),
-    {
-      ...options,
-      method: 'GET',
-    },
-  )
+  return lasiusFetch<getConfigForProjectResponse>(getGetConfigForProjectUrl(orgId, projectId), {
+    ...options,
+    method: 'GET',
+  })
 }
 
 /**
@@ -374,8 +333,7 @@ export type testConnectivityResponseError = testConnectivityResponse400 & {
 }
 
 export type testConnectivityResponse =
-  | testConnectivityResponseSuccess
-  | testConnectivityResponseError
+  testConnectivityResponseSuccess | testConnectivityResponseError
 
 export const getTestConnectivityUrl = (orgId: string) => {
   return `/organisations/${orgId}/issue-importers/test`
@@ -418,26 +376,19 @@ export type testExistingConfigResponse404 = {
   status: 404
 }
 
-export type testExistingConfigResponseSuccess =
-  testExistingConfigResponse200 & {
-    headers: Headers
-  }
+export type testExistingConfigResponseSuccess = testExistingConfigResponse200 & {
+  headers: Headers
+}
 export type testExistingConfigResponseError = (
-  | testExistingConfigResponse400
-  | testExistingConfigResponse403
-  | testExistingConfigResponse404
+  testExistingConfigResponse400 | testExistingConfigResponse403 | testExistingConfigResponse404
 ) & {
   headers: Headers
 }
 
 export type testExistingConfigResponse =
-  | testExistingConfigResponseSuccess
-  | testExistingConfigResponseError
+  testExistingConfigResponseSuccess | testExistingConfigResponseError
 
-export const getTestExistingConfigUrl = (
-  orgId: string,
-  configId: ModelsIssueImporterConfigId,
-) => {
+export const getTestExistingConfigUrl = (orgId: string, configId: ModelsIssueImporterConfigId) => {
   return `/organisations/${orgId}/issue-importers/${configId}/test`
 }
 
@@ -446,13 +397,10 @@ export const testExistingConfig = async (
   configId: ModelsIssueImporterConfigId,
   options?: RequestInit,
 ): Promise<testExistingConfigResponse> => {
-  return lasiusFetch<testExistingConfigResponse>(
-    getTestExistingConfigUrl(orgId, configId),
-    {
-      ...options,
-      method: 'POST',
-    },
-  )
+  return lasiusFetch<testExistingConfigResponse>(getTestExistingConfigUrl(orgId, configId), {
+    ...options,
+    method: 'POST',
+  })
 }
 
 /**
@@ -483,21 +431,14 @@ export type listProjectsResponseSuccess = listProjectsResponse200 & {
   headers: Headers
 }
 export type listProjectsResponseError = (
-  | listProjectsResponse400
-  | listProjectsResponse403
-  | listProjectsResponse404
+  listProjectsResponse400 | listProjectsResponse403 | listProjectsResponse404
 ) & {
   headers: Headers
 }
 
-export type listProjectsResponse =
-  | listProjectsResponseSuccess
-  | listProjectsResponseError
+export type listProjectsResponse = listProjectsResponseSuccess | listProjectsResponseError
 
-export const getListProjectsUrl = (
-  orgId: string,
-  configId: ModelsIssueImporterConfigId,
-) => {
+export const getListProjectsUrl = (orgId: string, configId: ModelsIssueImporterConfigId) => {
   return `/organisations/${orgId}/issue-importers/${configId}/projects`
 }
 
@@ -506,13 +447,10 @@ export const listProjects = async (
   configId: ModelsIssueImporterConfigId,
   options?: RequestInit,
 ): Promise<listProjectsResponse> => {
-  return lasiusFetch<listProjectsResponse>(
-    getListProjectsUrl(orgId, configId),
-    {
-      ...options,
-      method: 'GET',
-    },
-  )
+  return lasiusFetch<listProjectsResponse>(getListProjectsUrl(orgId, configId), {
+    ...options,
+    method: 'GET',
+  })
 }
 
 /**
@@ -542,21 +480,15 @@ export type addProjectMappingResponseSuccess = addProjectMappingResponse200 & {
   headers: Headers
 }
 export type addProjectMappingResponseError = (
-  | addProjectMappingResponse400
-  | addProjectMappingResponse403
-  | addProjectMappingResponse404
+  addProjectMappingResponse400 | addProjectMappingResponse403 | addProjectMappingResponse404
 ) & {
   headers: Headers
 }
 
 export type addProjectMappingResponse =
-  | addProjectMappingResponseSuccess
-  | addProjectMappingResponseError
+  addProjectMappingResponseSuccess | addProjectMappingResponseError
 
-export const getAddProjectMappingUrl = (
-  orgId: string,
-  configId: ModelsIssueImporterConfigId,
-) => {
+export const getAddProjectMappingUrl = (orgId: string, configId: ModelsIssueImporterConfigId) => {
   return `/organisations/${orgId}/issue-importers/${configId}/projects`
 }
 
@@ -566,15 +498,12 @@ export const addProjectMapping = async (
   modelsCreateProjectMapping: ModelsCreateProjectMapping,
   options?: RequestInit,
 ): Promise<addProjectMappingResponse> => {
-  return lasiusFetch<addProjectMappingResponse>(
-    getAddProjectMappingUrl(orgId, configId),
-    {
-      ...options,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...options?.headers },
-      body: JSON.stringify(modelsCreateProjectMapping),
-    },
-  )
+  return lasiusFetch<addProjectMappingResponse>(getAddProjectMappingUrl(orgId, configId), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(modelsCreateProjectMapping),
+  })
 }
 
 /**
@@ -591,18 +520,15 @@ export type listGithubResourceOwnersResponse400 = {
   status: 400
 }
 
-export type listGithubResourceOwnersResponseSuccess =
-  listGithubResourceOwnersResponse200 & {
-    headers: Headers
-  }
-export type listGithubResourceOwnersResponseError =
-  listGithubResourceOwnersResponse400 & {
-    headers: Headers
-  }
+export type listGithubResourceOwnersResponseSuccess = listGithubResourceOwnersResponse200 & {
+  headers: Headers
+}
+export type listGithubResourceOwnersResponseError = listGithubResourceOwnersResponse400 & {
+  headers: Headers
+}
 
 export type listGithubResourceOwnersResponse =
-  | listGithubResourceOwnersResponseSuccess
-  | listGithubResourceOwnersResponseError
+  listGithubResourceOwnersResponseSuccess | listGithubResourceOwnersResponseError
 
 export const getListGithubResourceOwnersUrl = (orgId: string) => {
   return `/organisations/${orgId}/issue-importers/github/resource-owners`
@@ -613,15 +539,12 @@ export const listGithubResourceOwners = async (
   modelsCreateIssueImporterConfig: ModelsCreateIssueImporterConfig,
   options?: RequestInit,
 ): Promise<listGithubResourceOwnersResponse> => {
-  return lasiusFetch<listGithubResourceOwnersResponse>(
-    getListGithubResourceOwnersUrl(orgId),
-    {
-      ...options,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...options?.headers },
-      body: JSON.stringify(modelsCreateIssueImporterConfig),
-    },
-  )
+  return lasiusFetch<listGithubResourceOwnersResponse>(getListGithubResourceOwnersUrl(orgId), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(modelsCreateIssueImporterConfig),
+  })
 }
 
 /**
@@ -646,16 +569,11 @@ export type refreshTagsResponse404 = {
 export type refreshTagsResponseSuccess = refreshTagsResponse202 & {
   headers: Headers
 }
-export type refreshTagsResponseError = (
-  | refreshTagsResponse403
-  | refreshTagsResponse404
-) & {
+export type refreshTagsResponseError = (refreshTagsResponse403 | refreshTagsResponse404) & {
   headers: Headers
 }
 
-export type refreshTagsResponse =
-  | refreshTagsResponseSuccess
-  | refreshTagsResponseError
+export type refreshTagsResponse = refreshTagsResponseSuccess | refreshTagsResponseError
 
 export const getRefreshTagsUrl = (
   orgId: string,
@@ -671,13 +589,10 @@ export const refreshTags = async (
   mappingId: ModelsProjectMappingId,
   options?: RequestInit,
 ): Promise<refreshTagsResponse> => {
-  return lasiusFetch<refreshTagsResponse>(
-    getRefreshTagsUrl(orgId, configId, mappingId),
-    {
-      ...options,
-      method: 'POST',
-    },
-  )
+  return lasiusFetch<refreshTagsResponse>(getRefreshTagsUrl(orgId, configId, mappingId), {
+    ...options,
+    method: 'POST',
+  })
 }
 
 /**
@@ -703,10 +618,9 @@ export type updateProjectMappingResponse404 = {
   status: 404
 }
 
-export type updateProjectMappingResponseSuccess =
-  updateProjectMappingResponse200 & {
-    headers: Headers
-  }
+export type updateProjectMappingResponseSuccess = updateProjectMappingResponse200 & {
+  headers: Headers
+}
 export type updateProjectMappingResponseError = (
   | updateProjectMappingResponse400
   | updateProjectMappingResponse403
@@ -716,8 +630,7 @@ export type updateProjectMappingResponseError = (
 }
 
 export type updateProjectMappingResponse =
-  | updateProjectMappingResponseSuccess
-  | updateProjectMappingResponseError
+  updateProjectMappingResponseSuccess | updateProjectMappingResponseError
 
 export const getUpdateProjectMappingUrl = (
   orgId: string,
@@ -763,20 +676,17 @@ export type removeProjectMappingResponse404 = {
   status: 404
 }
 
-export type removeProjectMappingResponseSuccess =
-  removeProjectMappingResponse200 & {
-    headers: Headers
-  }
+export type removeProjectMappingResponseSuccess = removeProjectMappingResponse200 & {
+  headers: Headers
+}
 export type removeProjectMappingResponseError = (
-  | removeProjectMappingResponse403
-  | removeProjectMappingResponse404
+  removeProjectMappingResponse403 | removeProjectMappingResponse404
 ) & {
   headers: Headers
 }
 
 export type removeProjectMappingResponse =
-  | removeProjectMappingResponseSuccess
-  | removeProjectMappingResponseError
+  removeProjectMappingResponseSuccess | removeProjectMappingResponseError
 
 export const getRemoveProjectMappingUrl = (
   orgId: string,

@@ -61,14 +61,13 @@ class WebSocketManager {
    * Called on window refocus — if the socket is dead, reconnect immediately.
    */
   reconnectNow(): void {
-    if (
-      this.subscribers.size > 0 &&
-      (!this.ws || this.ws.readyState === WebSocket.CLOSED)
-    ) {
-      this.clearReconnectTimer()
-      this.reconnectAttempt = 0
-      this.connect()
+    if (!(this.subscribers.size > 0 && (!this.ws || this.ws.readyState === WebSocket.CLOSED))) {
+      return
     }
+
+    this.clearReconnectTimer()
+    this.reconnectAttempt = 0
+    this.connect()
   }
 
   send(data: unknown): void {
@@ -103,10 +102,12 @@ class WebSocketManager {
   }
 
   private clearReconnectTimer(): void {
-    if (this.reconnectTimer !== null) {
-      clearTimeout(this.reconnectTimer)
-      this.reconnectTimer = null
+    if (this.reconnectTimer === null) {
+      return
     }
+
+    clearTimeout(this.reconnectTimer)
+    this.reconnectTimer = null
   }
 
   private close(): void {
@@ -118,10 +119,7 @@ class WebSocketManager {
       this.ws.onmessage = null
       this.ws.onclose = null
       this.ws.onerror = null
-      if (
-        this.ws.readyState === WebSocket.OPEN ||
-        this.ws.readyState === WebSocket.CONNECTING
-      ) {
+      if (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING) {
         this.ws.close(1000, 'Client closing')
       }
       this.ws = null
@@ -130,10 +128,7 @@ class WebSocketManager {
   }
 
   private connect(): void {
-    if (
-      this.ws?.readyState === WebSocket.OPEN ||
-      this.ws?.readyState === WebSocket.CONNECTING
-    ) {
+    if (this.ws?.readyState === WebSocket.OPEN || this.ws?.readyState === WebSocket.CONNECTING) {
       return
     }
 
@@ -249,10 +244,7 @@ class WebSocketManager {
       try {
         subscriber.onStatusChange(status)
       } catch (error) {
-        logger.error(
-          '[WebSocketManager] Subscriber onStatusChange threw',
-          error,
-        )
+        logger.error('[WebSocketManager] Subscriber onStatusChange threw', error)
       }
     }
   }
@@ -265,10 +257,12 @@ class WebSocketManager {
   }
 
   private stopPing(): void {
-    if (this.pingTimer !== null) {
-      clearInterval(this.pingTimer)
-      this.pingTimer = null
+    if (this.pingTimer === null) {
+      return
     }
+
+    clearInterval(this.pingTimer)
+    this.pingTimer = null
   }
 }
 
@@ -295,11 +289,9 @@ function getBackoffDelay(attempt: number): number {
 let managers = new Map<string, WebSocketManager>()
 
 if (import.meta.hot) {
-  const prev = import.meta.hot.data?.managers as
-    | Map<string, WebSocketManager>
-    | undefined
-  if (prev) {
-    managers = prev
+  const previous = import.meta.hot.data?.managers as Map<string, WebSocketManager> | undefined
+  if (previous) {
+    managers = previous
   }
   import.meta.hot.dispose((data) => {
     data.managers = managers

@@ -39,36 +39,30 @@ import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { preventEnterOnForm } from '~/components/ui/forms/input/prevent-enter-on-form'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { validateFormData } from '~/lib/conform-helpers'
-import { type SchemaTranslationFn, untyped } from '~/lib/i18n-types'
+import { type SchemaTranslationFunction, untyped } from '~/lib/i18n-types'
 import { useUpdateUserPassword } from '~/services/api/lasius-hooks/oauth2-provider/oauth2-provider'
 
-const createPasswordChangeSchema = (t: SchemaTranslationFn) =>
+const createPasswordChangeSchema = (t: SchemaTranslationFunction) =>
   z
     .object({
       confirmPassword: z.string().min(1, {
-        error: t(
-          'validation.confirmPasswordRequired',
-          'Please confirm your password',
-        ),
+        error: t('validation.confirmPasswordRequired', 'Please confirm your password'),
       }),
-      newPassword: z.string().superRefine((val, ctx) => {
-        if (val.length < 9) {
-          ctx.addIssue({
+      newPassword: z.string().superRefine((value, context) => {
+        if (value.length < 9) {
+          context.addIssue({
             code: 'custom',
             error: t('validation.passwordTooShort', 'Minimum 9 characters'),
           })
         }
-        if (!/[A-Z]/.test(val)) {
-          ctx.addIssue({
+        if (!/[A-Z]/.test(value)) {
+          context.addIssue({
             code: 'custom',
-            error: t(
-              'validation.missingUppercase',
-              'Must contain uppercase letter',
-            ),
+            error: t('validation.missingUppercase', 'Must contain uppercase letter'),
           })
         }
-        if (!/\d/.test(val)) {
-          ctx.addIssue({
+        if (!/\d/.test(value)) {
+          context.addIssue({
             code: 'custom',
             error: t('validation.missingNumber', 'Must contain a number'),
           })
@@ -83,11 +77,11 @@ const createPasswordChangeSchema = (t: SchemaTranslationFn) =>
       path: ['confirmPassword'],
     })
 
-type AccountSecurityFormProps = {
+type AccountSecurityFormProperties = {
   demoMode: boolean
 }
 
-export const AccountSecurityForm = ({ demoMode }: AccountSecurityFormProps) => {
+export const AccountSecurityForm = ({ demoMode }: AccountSecurityFormProperties) => {
   const { t } = useTranslation('settings')
   const [showPasswords, setShowPasswords] = useState(false)
   const { addToast } = useToast()
@@ -114,8 +108,8 @@ export const AccountSecurityForm = ({ demoMode }: AccountSecurityFormProps) => {
     },
   })
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault()
 
     if (demoMode) {
       addToast({
@@ -128,7 +122,7 @@ export const AccountSecurityForm = ({ demoMode }: AccountSecurityFormProps) => {
       return
     }
 
-    const result = validateFormData(e.currentTarget, schema)
+    const result = validateFormData(event.currentTarget, schema)
     if (result.status !== 'success') return
 
     passwordApi.submit({
@@ -139,8 +133,8 @@ export const AccountSecurityForm = ({ demoMode }: AccountSecurityFormProps) => {
     })
   }
 
-  const handleTogglePasswordsVisible = (e: { preventDefault: () => void }) => {
-    e.preventDefault()
+  const handleTogglePasswordsVisible = (event: { preventDefault: () => void }) => {
+    event.preventDefault()
     setShowPasswords(!showPasswords)
   }
 
@@ -150,86 +144,73 @@ export const AccountSecurityForm = ({ demoMode }: AccountSecurityFormProps) => {
     <div className="mx-auto w-full max-w-2xl">
       <Card>
         <CardBody className="p-6">
-          <form
-            {...getFormProps(form)}
-            onKeyDown={(e) => preventEnterOnForm(e)}
-            onSubmit={handleSubmit}
-          >
-            <FormBody>
-              <FieldSet>
-                <FormElement>
-                  <Label htmlFor={fields.password.id}>
-                    {t('forms.password', 'Password')}
-                  </Label>
-                  <Input
-                    {...getInputProps(fields.password, { type: passwordType })}
-                    autoComplete="off"
-                    key={fields.password.key}
-                  />
-                  <FormFieldErrors errors={fields.password.errors} />
-                </FormElement>
-                <FormElementSpacer />
-                <FormElement>
-                  <Label htmlFor={fields.newPassword.id}>
-                    {t('forms.newPassword', 'New password')}
-                  </Label>
-                  <Input
-                    {...getInputProps(fields.newPassword, {
-                      type: passwordType,
-                    })}
-                    autoComplete="off"
-                    key={fields.newPassword.key}
-                  />
-                  {fields.newPassword.errors &&
-                    fields.newPassword.errors.length > 0 && (
+          <form {...getFormProps(form)} onSubmit={handleSubmit}>
+            <div onKeyDown={preventEnterOnForm} role="presentation">
+              <FormBody>
+                <FieldSet>
+                  <FormElement>
+                    <Label htmlFor={fields.password.id}>{t('forms.password', 'Password')}</Label>
+                    <Input
+                      {...getInputProps(fields.password, { type: passwordType })}
+                      autoComplete="off"
+                      key={fields.password.key}
+                    />
+                    <FormFieldErrors errors={fields.password.errors} />
+                  </FormElement>
+                  <FormElementSpacer />
+                  <FormElement>
+                    <Label htmlFor={fields.newPassword.id}>
+                      {t('forms.newPassword', 'New password')}
+                    </Label>
+                    <Input
+                      {...getInputProps(fields.newPassword, {
+                        type: passwordType,
+                      })}
+                      autoComplete="off"
+                      key={fields.newPassword.key}
+                    />
+                    {fields.newPassword.errors && fields.newPassword.errors.length > 0 && (
                       <div className="-mt-2 flex flex-col gap-1">
-                        {fields.newPassword.errors.map((msg) => (
-                          <div className="badge badge-warning" key={msg}>
+                        {fields.newPassword.errors.map((message) => (
+                          <div className="badge badge-warning" key={message}>
                             <ErrorSign />
-                            {msg}
+                            {message}
                           </div>
                         ))}
                       </div>
                     )}
-                </FormElement>
-                <FormElement>
-                  <Label htmlFor={fields.confirmPassword.id}>
-                    {t('forms.confirmNewPassword', 'Confirm new password')}
-                  </Label>
-                  <Input
-                    {...getInputProps(fields.confirmPassword, {
-                      type: passwordType,
-                    })}
-                    autoComplete="off"
-                    key={fields.confirmPassword.key}
-                  />
-                  <FormFieldErrors errors={fields.confirmPassword.errors} />
-                </FormElement>
-                <FormElement>
-                  <Button
-                    onClick={handleTogglePasswordsVisible}
-                    type="button"
-                    variant="ghost"
-                  >
-                    <LucideIcon icon={showPasswords ? Eye : EyeOff} size={24} />
-                    <span>
-                      {showPasswords
-                        ? t('ui.hidePasswords', 'Hide passwords')
-                        : t('ui.showPasswords', 'Show passwords')}
-                    </span>
+                  </FormElement>
+                  <FormElement>
+                    <Label htmlFor={fields.confirmPassword.id}>
+                      {t('forms.confirmNewPassword', 'Confirm new password')}
+                    </Label>
+                    <Input
+                      {...getInputProps(fields.confirmPassword, {
+                        type: passwordType,
+                      })}
+                      autoComplete="off"
+                      key={fields.confirmPassword.key}
+                    />
+                    <FormFieldErrors errors={fields.confirmPassword.errors} />
+                  </FormElement>
+                  <FormElement>
+                    <Button onClick={handleTogglePasswordsVisible} type="button" variant="ghost">
+                      <LucideIcon icon={showPasswords ? Eye : EyeOff} size={24} />
+                      <span>
+                        {showPasswords
+                          ? t('ui.hidePasswords', 'Hide passwords')
+                          : t('ui.showPasswords', 'Show passwords')}
+                      </span>
+                    </Button>
+                  </FormElement>
+                </FieldSet>
+                <ButtonGroup>
+                  <Button disabled={passwordApi.isLoading} type="submit" variant="primary">
+                    {t('actions.saveChanges', 'Save changes')}
                   </Button>
-                </FormElement>
-              </FieldSet>
-              <ButtonGroup>
-                <Button
-                  disabled={passwordApi.isLoading}
-                  type="submit"
-                  variant="primary"
-                >
-                  {t('actions.saveChanges', 'Save changes')}
-                </Button>
-              </ButtonGroup>
-            </FormBody>
+                </ButtonGroup>
+              </FormBody>
+            </div>
           </form>
         </CardBody>
       </Card>

@@ -23,7 +23,7 @@ import {
   handleArrowIncrement,
   handleMultiDigitInput,
   handleSegmentReplacement,
-} from './segment-utils'
+} from './segment-utilities'
 
 type DateSegment = 'day' | 'month' | 'year'
 type TimeSegment = 'hour' | 'minute'
@@ -190,8 +190,7 @@ describe('handleMultiDigitInput', () => {
 })
 
 describe('handleSegmentReplacement', () => {
-  const formatSegmentValue = (value: string, _segment: DateSegment): string =>
-    value
+  const formatSegmentValue = (value: string, _segment: DateSegment): string => value
 
   it('replaces segment when selection matches bounds and digit is typed', () => {
     const result = handleSegmentReplacement<DateSegment>(

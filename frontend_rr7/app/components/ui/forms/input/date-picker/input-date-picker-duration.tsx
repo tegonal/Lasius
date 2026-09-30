@@ -20,9 +20,9 @@
 import { useTranslation } from 'react-i18next'
 
 import { SegmentedDurationInputConnected } from './segmented-duration-input-connected'
-import { calculateDurationMinutes } from './shared/duration-utils'
+import { calculateDurationMinutes } from './shared/duration-utilities'
 
-export type InputDatePickerDurationProps = {
+export type InputDatePickerDurationProperties = {
   endValue: string
   onEndChange: (isoString: string) => void
   startValue: string
@@ -32,7 +32,7 @@ export const InputDatePickerDuration = ({
   endValue,
   onEndChange,
   startValue,
-}: InputDatePickerDurationProps) => {
+}: InputDatePickerDurationProperties) => {
   const { t } = useTranslation('common')
 
   const durationMinutes = calculateDurationMinutes(

@@ -1,17 +1,33 @@
+import js from '@eslint/js'
 import vitest from '@vitest/eslint-plugin'
 import checkFile from 'eslint-plugin-check-file'
 import importX from 'eslint-plugin-import-x'
+import jsxA11y from 'eslint-plugin-jsx-a11y'
 import perfectionist from 'eslint-plugin-perfectionist'
 import react from 'eslint-plugin-react'
-import reactCompiler from 'eslint-plugin-react-compiler'
 import reactHooks from 'eslint-plugin-react-hooks'
 import unicorn from 'eslint-plugin-unicorn'
 import { globalIgnores } from 'eslint/config'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
+// Ported from tegonalcom-website-new/frontend on 2026-09-30. Both projects lint to the same
+// standard. Port a change there first, then mirror it here.
+//
+// The config uses no warning severity. `lint` and `lint:fix` pass `--max-warnings 0`, so a warning
+// fails `yarn check` exactly as an error does. Declare a new rule as 'error'.
+
 const vitestFiles = ['**/__tests__/**/*', '**/*.test.*', '**/*.spec.*']
 const testFiles = ['**/tests/**', '**/#tests/**', ...vitestFiles]
+
+// These files run only under Node. React Router strips the `.server.*` suffix from the client
+// bundle. Every other file under `app/` reaches a browser, including a route module's component.
+const serverFiles = [
+  '**/*.server.ts',
+  '**/*.server.tsx',
+  'app/entry.server.tsx',
+  '*.config.{js,mjs,ts}',
+]
 
 /** @type {import("eslint").Linter.Config[]} */
 export default [
@@ -21,6 +37,8 @@ export default [
     '**/build/**',
     '**/public/**',
     '**/*.json',
+    '**/*.md',
+    '**/*.mdx',
     '**/playwright-report/**',
     '**/server-build/**',
     '**/dist/**',
@@ -28,67 +46,127 @@ export default [
     '**/*.tsbuildinfo',
     '**/.react-router/**',
     '.react-router/',
+    // Orval generates both directories. `yarn orval` overwrites every manual edit.
     'app/services/api/lasius/',
+    'app/services/api/lasius-hooks/',
+    // `yarn i18n:types` generates this file from app/locales/en/*.json.
+    'app/types/resources.d.ts',
+    'reset.d.ts',
   ]),
 
-  // All files — core rules + import plugin
+  // tseslint.configs.recommended does not include ESLint's own recommended set. It must stay above
+  // the tseslint spread, so that the tseslint layer can switch off the core rules that tsc covers.
+  js.configs.recommended,
+
+  ...tseslint.configs.recommended,
+
+  // Each environment declares its own globals. One shared set would declare `process` in every
+  // component and `window` in every `.server.ts`.
   {
-    languageOptions: {
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-      },
-    },
-    plugins: {
-      import: importX,
-    },
+    files: ['app/**/*.{ts,tsx,js,jsx}'],
+    ignores: serverFiles,
+    languageOptions: { globals: globals.browser },
+  },
+
+  {
+    files: serverFiles,
+    languageOptions: { globals: globals.node },
+  },
+
+  {
+    // Vite replaces only `process.env.NODE_ENV` in the client bundle. Any other `process.env` read
+    // evaluates to `undefined` in the browser. The list holds only directories without server code.
+    files: [
+      'app/components/**/*.{ts,tsx}',
+      'app/config/**/*.{ts,tsx}',
+      'app/features/*/components/**/*.{ts,tsx}',
+    ],
     rules: {
-      'import/no-duplicates': ['warn', { 'prefer-inline': true }],
-      'import/order': 'off',
-      'no-unexpected-multiline': 'error',
-      'no-warning-comments': [
+      'no-restricted-globals': [
         'error',
-        { location: 'anywhere', terms: ['FIXME'] },
+        {
+          message:
+            'process is undefined in the browser — use import.meta.env.DEV, or window.ENV for a value the root loader passes down.',
+          name: 'process',
+        },
       ],
     },
   },
 
-  // JSX/TSX files — React plugin
+  {
+    // A `.server.*` module never runs in a browser. A browser global in one is dead code or an SSR crash.
+    files: ['**/*.server.ts', '**/*.server.tsx'],
+    rules: {
+      'no-restricted-globals': [
+        'error',
+        'document',
+        'localStorage',
+        'navigator',
+        'sessionStorage',
+        'window',
+      ],
+    },
+  },
+
+  {
+    plugins: {
+      import: importX,
+    },
+    rules: {
+      '@typescript-eslint/no-empty-object-type': 'error',
+      '@typescript-eslint/no-explicit-any': 'error',
+      eqeqeq: 'error',
+      'import/no-duplicates': ['error', { 'prefer-inline': true }],
+      // `perfectionist/sort-imports` owns the import order. Both rules autofix the same lines.
+      'import/order': 'off',
+      // Application code logs through the tslog `logger`. CLAUDE.md forbids every `console.*` call.
+      'no-console': 'error',
+      'no-unexpected-multiline': 'error',
+      'no-warning-comments': ['error', { location: 'anywhere', terms: ['FIXME'] }],
+    },
+  },
+
   {
     files: ['**/*.tsx', '**/*.jsx'],
     languageOptions: {
       parser: tseslint.parser,
-      parserOptions: {
-        jsx: true,
-      },
+      parserOptions: { jsx: true },
     },
-    plugins: {
-      react,
-    },
+    plugins: { 'jsx-a11y': jsxA11y, react },
     rules: {
-      'react/jsx-key': 'warn',
+      ...jsxA11y.flatConfigs.recommended.rules,
+      'jsx-a11y/click-events-have-key-events': 'off',
+      'jsx-a11y/html-has-lang': 'off',
+      'jsx-a11y/no-static-element-interactions': 'off',
+      'react/jsx-key': 'error',
+      // A context value that is rebuilt on every render re-renders every consumer.
+      'react/jsx-no-constructed-context-values': 'error',
+      // `target="_blank"` without `rel="noopener noreferrer"` allows tabnabbing.
+      'react/jsx-no-target-blank': 'error',
+      // An index key breaks reconciliation when the list reorders or filters.
+      'react/no-array-index-key': 'error',
+      // An object or array literal as a default prop is a new identity on every render.
+      'react/no-object-type-as-default-prop': 'error',
+      // A component declared during render is a new type each time, so React loses its state.
+      'react/no-unstable-nested-components': 'error',
     },
   },
 
-  // All JS/TS/JSX/TSX — React hooks
   {
     files: ['**/*.ts?(x)', '**/*.js?(x)'],
-    plugins: {
-      'react-hooks': reactHooks,
-    },
+    plugins: { 'react-hooks': reactHooks },
     rules: {
-      'react-hooks/exhaustive-deps': 'warn',
+      'react-hooks/exhaustive-deps': 'error',
       'react-hooks/rules-of-hooks': 'error',
     },
   },
 
-  // JS and JSX files
   {
     files: ['**/*.js?(x)'],
     rules: {
       'no-undef': 'error',
       'no-unused-vars': [
-        'warn',
+        'error',
         {
           args: 'after-used',
           argsIgnorePattern: '^(_|ignored)',
@@ -99,34 +177,40 @@ export default [
     },
   },
 
-  // TS and TSX files — TypeScript parser + rules
   {
     files: ['**/*.ts?(x)'],
     languageOptions: {
       parser: tseslint.parser,
-      parserOptions: {
-        projectService: true,
-      },
+      parserOptions: { projectService: true },
     },
-    plugins: {
-      '@typescript-eslint': tseslint.plugin,
-    },
+    plugins: { '@typescript-eslint': tseslint.plugin },
     rules: {
+      // `await` on a value that is not a promise usually means a missing `()` on the call.
+      '@typescript-eslint/await-thenable': 'error',
       '@typescript-eslint/consistent-type-imports': [
-        'warn',
+        'error',
         {
           disallowTypeAnnotations: true,
           fixStyle: 'inline-type-imports',
           prefer: 'type-imports',
         },
       ],
+      '@typescript-eslint/no-array-delete': 'error',
+      // A value that stringifies to '[object Object]' reaches the screen or collides as a React key.
+      '@typescript-eslint/no-base-to-string': 'error',
+      '@typescript-eslint/no-deprecated': 'error',
+      '@typescript-eslint/no-duplicate-type-constituents': 'error',
       '@typescript-eslint/no-floating-promises': 'error',
-      '@typescript-eslint/no-misused-promises': [
-        'error',
-        { checksVoidReturn: false },
-      ],
+      '@typescript-eslint/no-for-in-array': 'error',
+      '@typescript-eslint/no-implied-eval': 'error',
+      '@typescript-eslint/no-misused-promises': ['error', { checksVoidReturn: false }],
+      '@typescript-eslint/no-misused-spread': 'error',
+      '@typescript-eslint/no-mixed-enums': 'error',
+      '@typescript-eslint/no-non-null-asserted-nullish-coalescing': 'error',
+      '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'error',
+      '@typescript-eslint/no-unsafe-enum-comparison': 'error',
       '@typescript-eslint/no-unused-vars': [
-        'warn',
+        'error',
         {
           args: 'after-used',
           argsIgnorePattern: '^(_|ignored)',
@@ -134,11 +218,20 @@ export default [
           varsIgnorePattern: '^(_|ignored)',
         },
       ],
-      'import/consistent-type-specifier-style': ['warn', 'prefer-inline'],
+      // A loader bails out with `throw redirect()` or `throw new Response()`, so Response is allowed.
+      // The rule still catches a thrown string or plain object, which has no message and no stack.
+      '@typescript-eslint/only-throw-error': [
+        'error',
+        { allow: [{ from: 'lib', name: 'Response' }] },
+      ],
+      '@typescript-eslint/prefer-promise-reject-errors': 'error',
+      '@typescript-eslint/restrict-plus-operands': 'error',
+      // A `switch` over a union must handle every member, including a member added later.
+      '@typescript-eslint/switch-exhaustiveness-check': 'error',
+      'import/consistent-type-specifier-style': ['error', 'prefer-inline'],
     },
   },
 
-  // Prevent importing test files in source files
   {
     files: ['**/*.ts?(x)', '**/*.js?(x)'],
     ignores: testFiles,
@@ -157,14 +250,12 @@ export default [
     },
   },
 
-  // Vitest rules for test files
   {
     files: testFiles,
-    plugins: {
-      vitest,
-    },
+    plugins: { vitest },
     rules: {
-      'vitest/no-focused-tests': ['warn', { fixable: false }],
+      // A stray `.only` skips the rest of the suite while CI stays green.
+      'vitest/no-focused-tests': ['error', { fixable: false }],
       'vitest/no-import-node-test': 'error',
       'vitest/prefer-comparison-matcher': 'error',
       'vitest/prefer-equality-matcher': 'error',
@@ -176,89 +267,110 @@ export default [
     },
   },
 
-  // Project-specific TypeScript rules
   {
     files: ['./app/**/*.ts', './app/**/*.tsx'],
     rules: {
       '@typescript-eslint/consistent-type-assertions': [
-        'warn',
+        'error',
         { assertionStyle: 'as', objectLiteralTypeAssertions: 'never' },
       ],
-      '@typescript-eslint/no-redundant-type-constituents': 'warn',
+      '@typescript-eslint/no-redundant-type-constituents': 'error',
       '@typescript-eslint/no-unnecessary-type-assertion': 'error',
     },
   },
 
-  // React Compiler
   {
     files: ['./app/**/*.ts', './app/**/*.tsx'],
-    plugins: {
-      'react-compiler': reactCompiler,
-    },
+    plugins: { 'react-hooks': reactHooks },
     rules: {
-      'react-compiler/react-compiler': 'error',
+      // The React Compiler rules ship inside eslint-plugin-react-hooks 7. They replace the
+      // separate eslint-plugin-react-compiler, which reports the same bailouts.
+      'react-hooks/config': 'error',
+      'react-hooks/error-boundaries': 'error',
+      'react-hooks/gating': 'error',
+      'react-hooks/globals': 'error',
+      'react-hooks/immutability': 'error',
+      'react-hooks/incompatible-library': 'error',
+      'react-hooks/preserve-manual-memoization': 'error',
+      'react-hooks/purity': 'error',
+      'react-hooks/refs': 'error',
+      'react-hooks/set-state-in-effect': 'error',
+      'react-hooks/set-state-in-render': 'error',
+      'react-hooks/static-components': 'error',
+      'react-hooks/unsupported-syntax': 'error',
+      'react-hooks/use-memo': 'error',
     },
   },
 
-  // JSX curly brace presence
   {
     files: ['./app/**/*.tsx', './app/**/*.jsx'],
     rules: {
-      'react/jsx-curly-brace-presence': [
-        'error',
-        { children: 'never', props: 'never' },
-      ],
+      'react/jsx-curly-brace-presence': ['error', { children: 'never', props: 'never' }],
     },
   },
 
-  // Unicorn
   unicorn.configs.recommended,
   {
     rules: {
-      // React closures need inner functions — too many false positives
+      // Off because `perfectionist/sort-classes` owns the class member order, the same hand-off as
+      // `import/order`. unicorn groups getters and arrow-function properties differently, so for
+      // such a class no member order passes both rules. The website config still enables it.
+      'unicorn/consistent-class-member-order': 'off',
+      // A change below, or a unicorn bump, applies new autofixes to the whole project on the next
+      // edit. Land it as its own commit on a clean tree (core/dependencies § Changing an ESLint config).
       'unicorn/consistent-function-scoping': 'off',
-      // Too opinionated — disable
       'unicorn/filename-case': 'off',
-      // Opinionated import style preferences
       'unicorn/import-style': 'off',
-      // Legitimate pattern in reducers and aggregations
+      'unicorn/no-array-callback-reference': 'off',
       'unicorn/no-array-reduce': 'off',
-      // Migrate gradually — warn only
-      'unicorn/no-array-sort': 'warn',
-      // Conflicts with other tooling or project conventions
+      'unicorn/no-array-reverse': 'error',
+      'unicorn/no-array-sort': 'error',
+      'unicorn/no-for-each': 'error',
+      'unicorn/no-for-loop': 'off',
+      'unicorn/no-immediate-mutation': 'off',
       'unicorn/no-nested-ternary': 'off',
       'unicorn/no-null': 'off',
-      // WebSocket API uses on* handlers by design
+      'unicorn/no-object-as-default-parameter': 'off',
+      'unicorn/no-process-exit': 'off',
+      'unicorn/no-useless-switch-case': 'error',
+      'unicorn/no-useless-undefined': 'off',
+      // Prettier owns the numeric literal case and runs after `lint:fix`. Both would rewrite it.
+      'unicorn/number-literal-case': 'off',
+      // The WebSocket API uses on* handlers by design.
       'unicorn/prefer-add-event-listener': 'off',
-      // Entry file uses IIFE pattern
+      'unicorn/prefer-event-target': 'off',
+      'unicorn/prefer-global-this': 'off',
+      'unicorn/prefer-logical-operator-over-ternary': 'error',
+      'unicorn/prefer-module': 'off',
+      'unicorn/prefer-number-properties': 'error',
+      'unicorn/prefer-single-call': 'off',
+      'unicorn/prefer-spread': 'off',
+      'unicorn/prefer-ternary': 'off',
       'unicorn/prefer-top-level-await': 'off',
       'unicorn/prevent-abbreviations': 'off',
     },
   },
 
-  // Perfectionist
   perfectionist.configs['recommended-natural'],
 
-  // Filename conventions
   {
     files: ['**/*.js', '**/*.ts', '**/*.tsx'],
+    // React Router special files use names that are not kebab-case: pathless layouts and index
+    // routes (_layout, _index), splats ($) and numeric error routes (404, 500).
     ignores: [
-      // React Router special files
       '**/routes/_*.tsx',
-      '**/routes/$.tsx',
+      '**/routes/**/_*.tsx',
+      '**/routes/$*.tsx',
+      '**/routes/**/$*.tsx',
+      '**/routes/[0-9]*.tsx',
+      '**/routes/**/[0-9]*.tsx',
     ],
-    plugins: {
-      'check-file': checkFile,
-    },
+    plugins: { 'check-file': checkFile },
     rules: {
       'check-file/filename-naming-convention': [
         'error',
-        {
-          '**/*.{js,ts,tsx}': 'KEBAB_CASE',
-        },
-        {
-          ignoreMiddleExtensions: true,
-        },
+        { '**/*.{js,ts,tsx}': 'KEBAB_CASE' },
+        { ignoreMiddleExtensions: true },
       ],
     },
   },

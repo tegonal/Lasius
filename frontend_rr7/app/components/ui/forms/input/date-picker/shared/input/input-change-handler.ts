@@ -22,7 +22,7 @@ import type React from 'react'
 import { getSegmentBounds } from '../core/segment-bounds'
 import { type SegmentConfig } from '../core/segment-config'
 
-type InputChangeHandlerParams<T extends string> = {
+type InputChangeHandlerParameters<T extends string> = {
   config: SegmentConfig<T>
   inputRef: React.RefObject<HTMLInputElement | null>
   inputValue: string
@@ -38,7 +38,7 @@ type InputChangeHandlerParams<T extends string> = {
  * Handles smart segment replacement and auto-advance on overflow
  */
 export function createInputChangeHandler<T extends string>(
-  params: InputChangeHandlerParams<T>,
+  parameters: InputChangeHandlerParameters<T>,
 ) {
   const {
     config,
@@ -49,17 +49,17 @@ export function createInputChangeHandler<T extends string>(
     setCursorPosition,
     setInputValue,
     updateStore,
-  } = params
+  } = parameters
 
-  return (e: React.ChangeEvent<HTMLInputElement>): void => {
-    let newValue = e.target.value
+  return (event: React.ChangeEvent<HTMLInputElement>): void => {
+    let newValue = event.target.value
 
     // Replace alternative delimiters (e.g., '.' for ':' in time input)
     if (config.delimiter === ':' && newValue.includes('.')) {
-      newValue = newValue.replaceAll('.', config.delimiter)
+      newValue = newValue.replaceAll('.', ':')
     }
 
-    const prevValue = inputValue
+    const previousValue = inputValue
 
     // Smart input validation: only allow configured characters
     const pattern = new RegExp(`^${config.allowedCharsPattern.source}*$`)
@@ -69,29 +69,24 @@ export function createInputChangeHandler<T extends string>(
 
     // Check if we're editing a segment
     if (selectedSegment && inputRef.current) {
-      const bounds = getSegmentBounds(
-        prevValue,
-        config.delimiter,
-        config.segments,
-      )
+      const bounds = getSegmentBounds(previousValue, config.delimiter, config.segments)
       if (bounds) {
         const segmentIndex = config.segments.indexOf(selectedSegment)
-        const prevParts = prevValue.split(config.delimiter)
+        const previousParts = previousValue.split(config.delimiter)
         const newParts = newValue.split(config.delimiter)
-        const prevSegmentValue = prevParts[segmentIndex]
+        const previousSegmentValue = previousParts[segmentIndex]
         const newSegmentValue = newParts[segmentIndex]
 
         // If the segment value changed and we got a digit
         if (
-          newSegmentValue !== prevSegmentValue &&
+          newSegmentValue !== previousSegmentValue &&
           newSegmentValue &&
           /^\d+$/.test(newSegmentValue)
         ) {
-          const requiredLength =
-            config.segmentPlaceholders[selectedSegment].length
+          const requiredLength = config.segmentPlaceholders[selectedSegment].length
 
           // Build the corrected value with the segment change
-          const parts = [...prevParts]
+          const parts = [...previousParts]
           parts[segmentIndex] = newSegmentValue
           const updatedValue = parts.join(config.delimiter)
 
@@ -109,8 +104,8 @@ export function createInputChangeHandler<T extends string>(
           } else {
             // Still typing in this segment, position cursor after the last digit
             let cursorPos = 0
-            for (let i = 0; i < segmentIndex; i++) {
-              cursorPos += (parts[i] ?? '').length + config.delimiter.length
+            for (let index = 0; index < segmentIndex; index++) {
+              cursorPos += (parts[index] ?? '').length + config.delimiter.length
             }
             cursorPos += (parts[segmentIndex] ?? '').length
             if (setCursorPosition) {

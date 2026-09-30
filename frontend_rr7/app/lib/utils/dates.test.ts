@@ -34,9 +34,7 @@ describe('formatISOLocale', () => {
     const date = new Date(2024, 0, 15, 10, 30, 0, 0)
     const result = formatISOLocale(date)
     // Should match pattern: yyyy-MM-ddTHH:mm:ss.SSS+HH:MM
-    expect(result).toMatch(
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}[+-]\d{2}:\d{2}$/,
-    )
+    expect(result).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}[+-]\d{2}:\d{2}$/)
     expect(result).toContain('2024-01-15T10:30:00.000')
   })
 

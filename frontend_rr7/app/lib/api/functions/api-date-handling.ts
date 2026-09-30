@@ -29,12 +29,12 @@ export {
   apiTimespanMonth,
   apiTimespanWeek,
   apiUrlDateFormat,
-  apiUrlDateParamFormat,
-  formatDateTimeToURLParam,
-  formatDateToURLParam,
+  apiUrlDateParameterFormat,
+  formatDateTimeToURLParameter,
+  formatDateToURLParameter,
   formatISOLocale,
   granularityFromDatespanFromTo,
   modelsLocalDateTimeWithTimeZoneToString,
 } from '~/lib/utils/dates'
 
-export type { ApiDateParam, IsoDateString } from '~/lib/utils/dates'
+export type { ApiDateParameter, IsoDateString } from '~/lib/utils/dates'

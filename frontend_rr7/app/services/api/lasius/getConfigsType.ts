@@ -6,9 +6,7 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type GetConfigsType =
-  | (typeof GetConfigsType)[keyof typeof GetConfigsType]
-  | null
+export type GetConfigsType = (typeof GetConfigsType)[keyof typeof GetConfigsType] | null
 
 export const GetConfigsType = {
   gitlab: 'gitlab',

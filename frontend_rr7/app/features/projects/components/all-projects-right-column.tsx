@@ -26,7 +26,7 @@ import { Heading } from '~/components/primitives/typography/heading'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { type ProjectStatusFilter } from '~/features/projects/components/all-projects-list'
 
-type Props = {
+type Properties = {
   onSearchChange: (value: string) => void
   onStatusFilterChange: (filter: ProjectStatusFilter) => void
   projectCount: number
@@ -40,9 +40,9 @@ export const AllProjectsRightColumn = ({
   projectCount,
   searchTerm,
   statusFilter,
-}: Props) => {
+}: Properties) => {
   const { t } = useTranslation()
-  const showSearch = projectCount > 10
+  const isShowSearch = projectCount > 10
 
   return (
     <div className="w-full px-6 pt-3">
@@ -55,19 +55,14 @@ export const AllProjectsRightColumn = ({
           'All projects in the current organization that you can administer. Create billing reports including time booked by external project members.',
         )}
       </p>
-      {showSearch && (
+      {isShowSearch && (
         <div className="mt-4">
-          <h3 className="mb-2 text-sm font-medium">
-            {t('projects:filter.search', 'Search')}
-          </h3>
+          <h3 className="mb-2 text-sm font-medium">{t('projects:filter.search', 'Search')}</h3>
           <div className="join w-full">
             <Input
               className="join-item"
-              onChange={(e) => onSearchChange(e.target.value)}
-              placeholder={t(
-                'projects:filter.searchPlaceholder',
-                'Filter projects...',
-              )}
+              onChange={(event) => onSearchChange(event.target.value)}
+              placeholder={t('projects:filter.searchPlaceholder', 'Filter projects...')}
               type="text"
               value={searchTerm}
             />
@@ -76,8 +71,7 @@ export const AllProjectsRightColumn = ({
                 aria-label={t('actions.clear', 'Clear')}
                 className="btn btn-square join-item"
                 onClick={() => onSearchChange('')}
-                type="button"
-              >
+                type="button">
                 <LucideIcon icon={X} size={20} />
               </button>
             )}
@@ -85,32 +79,27 @@ export const AllProjectsRightColumn = ({
         </div>
       )}
       <div className="mt-4 flex flex-col gap-2">
-        <h3 className="text-sm font-medium">
-          {t('projects:filter.status', 'Status')}
-        </h3>
+        <h3 className="text-sm font-medium">{t('projects:filter.status', 'Status')}</h3>
         <div className="join">
           <Button
             className="join-item w-auto"
             onClick={() => onStatusFilterChange('both')}
             size="sm"
-            variant={statusFilter === 'both' ? 'primary' : 'neutral'}
-          >
+            variant={statusFilter === 'both' ? 'primary' : 'neutral'}>
             {t('projects:filter.both', 'Both')}
           </Button>
           <Button
             className="join-item w-auto"
             onClick={() => onStatusFilterChange('active')}
             size="sm"
-            variant={statusFilter === 'active' ? 'primary' : 'neutral'}
-          >
+            variant={statusFilter === 'active' ? 'primary' : 'neutral'}>
             {t('status.active', 'Active')}
           </Button>
           <Button
             className="join-item w-auto"
             onClick={() => onStatusFilterChange('inactive')}
             size="sm"
-            variant={statusFilter === 'inactive' ? 'primary' : 'neutral'}
-          >
+            variant={statusFilter === 'inactive' ? 'primary' : 'neutral'}>
             {t('status.inactive', 'Inactive')}
           </Button>
         </div>

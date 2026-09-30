@@ -19,26 +19,26 @@
 
 import { describe, expect, it } from 'vitest'
 
-import { cleanStrForCmp } from './strings'
+import { cleanStringForComparison } from './strings'
 
-describe('cleanStrForCmp', () => {
+describe('cleanStringForComparison', () => {
   it('converts to uppercase', () => {
-    expect(cleanStrForCmp('hello')).toBe('HELLO')
+    expect(cleanStringForComparison('hello')).toBe('HELLO')
   })
 
   it('trims whitespace', () => {
-    expect(cleanStrForCmp('  hello  ')).toBe('HELLO')
+    expect(cleanStringForComparison('  hello  ')).toBe('HELLO')
   })
 
   it('handles mixed case with whitespace', () => {
-    expect(cleanStrForCmp('  Hello World  ')).toBe('HELLO WORLD')
+    expect(cleanStringForComparison('  Hello World  ')).toBe('HELLO WORLD')
   })
 
   it('returns empty string for empty input', () => {
-    expect(cleanStrForCmp('')).toBe('')
+    expect(cleanStringForComparison('')).toBe('')
   })
 
   it('enables case-insensitive comparison', () => {
-    expect(cleanStrForCmp('test')).toBe(cleanStrForCmp('TEST'))
+    expect(cleanStringForComparison('test')).toBe(cleanStringForComparison('TEST'))
   })
 })

@@ -24,10 +24,7 @@ import { LasiusIcon } from '~/components/ui/icons/lasius-icon'
 import { type AuthProvider } from './types'
 
 /** Human-readable display name for an auth provider. */
-export const getProviderDisplayName = (
-  provider: AuthProvider,
-  keycloakName?: string,
-): string => {
+export const getProviderDisplayName = (provider: AuthProvider, keycloakName?: string): string => {
   if (provider === 'keycloak' && keycloakName) {
     return keycloakName
   }

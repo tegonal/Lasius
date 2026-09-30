@@ -63,10 +63,7 @@ function getBaseUrl(): string {
   return ''
 }
 
-export const lasiusFetch = async <T>(
-  url: string,
-  init: RequestInit,
-): Promise<T> => {
+export const lasiusFetch = async <T>(url: string, init: RequestInit): Promise<T> => {
   const baseUrl = getBaseUrl()
   const fullUrl = `${baseUrl}${url}`
 
@@ -77,16 +74,17 @@ export const lasiusFetch = async <T>(
     try {
       body = await response.json()
     } catch {
-      body = await response.text().catch(() => null)
+      try {
+        body = await response.text()
+      } catch {
+        body = null
+      }
     }
     throw new ApiError(response.status, response.statusText, body)
   }
 
   // Handle empty responses (204 No Content, etc.)
-  if (
-    response.status === 204 ||
-    response.headers.get('content-length') === '0'
-  ) {
+  if (response.status === 204 || response.headers.get('content-length') === '0') {
     return undefined as T
   }
 

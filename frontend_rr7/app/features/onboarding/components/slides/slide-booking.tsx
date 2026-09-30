@@ -31,14 +31,9 @@ export const SlideBooking = () => {
         <div className="mb-4 flex justify-center">
           <LucideIcon className="text-primary" icon={CalendarClock} size={48} />
         </div>
-        <h2 className="text-xl font-bold">
-          {t('booking.title', 'Start Tracking Time')}
-        </h2>
+        <h2 className="text-xl font-bold">{t('booking.title', 'Start Tracking Time')}</h2>
         <p className="text-base-content/70 mt-2">
-          {t(
-            'booking.subtitle',
-            "You're all set! Here's how to create your first booking.",
-          )}
+          {t('booking.subtitle', "You're all set! Here's how to create your first booking.")}
         </p>
       </div>
 
@@ -48,9 +43,7 @@ export const SlideBooking = () => {
             1
           </div>
           <div>
-            <div className="font-semibold">
-              {t('booking.step1', 'Use the Booking Form')}
-            </div>
+            <div className="font-semibold">{t('booking.step1', 'Use the Booking Form')}</div>
             <p className="text-base-content/60">
               {t(
                 'booking.step1Desc',
@@ -66,14 +59,8 @@ export const SlideBooking = () => {
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <div className="font-semibold">
-                {t('booking.step2', 'Or Use Context Menu')}
-              </div>
-              <LucideIcon
-                className="text-base-content/50"
-                icon={Timer}
-                size={14}
-              />
+              <div className="font-semibold">{t('booking.step2', 'Or Use Context Menu')}</div>
+              <LucideIcon className="text-base-content/50" icon={Timer} size={14} />
             </div>
             <p className="text-base-content/60">
               {t(
@@ -90,16 +77,11 @@ export const SlideBooking = () => {
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <div className="font-semibold">
-                {t('booking.step3', 'Stop When Done')}
-              </div>
+              <div className="font-semibold">{t('booking.step3', 'Stop When Done')}</div>
               <LucideIcon className="text-error" icon={Square} size={14} />
             </div>
             <p className="text-base-content/60">
-              {t(
-                'booking.step3Desc',
-                'When you finish working, stop the timer.',
-              )}
+              {t('booking.step3Desc', 'When you finish working, stop the timer.')}
             </p>
           </div>
         </div>

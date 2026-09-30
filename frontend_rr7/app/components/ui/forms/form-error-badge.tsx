@@ -19,18 +19,18 @@
 
 import { ErrorSign } from '~/components/ui/feedback/error-sign'
 
-interface FormErrorBadgeProps {
+interface FormErrorBadgeProperties {
   errors: string[]
   id?: string
 }
 
-export const FormErrorBadge = ({ errors, id }: FormErrorBadgeProps) => {
+export const FormErrorBadge = ({ errors, id }: FormErrorBadgeProperties) => {
   if (!errors || errors.length === 0) return null
 
   return (
     <div className="-mt-2" id={id}>
-      {errors.map((error, index) => (
-        <div className="badge badge-warning" key={index}>
+      {errors.map((error) => (
+        <div className="badge badge-warning" key={error}>
           <ErrorSign />
           {error}
         </div>

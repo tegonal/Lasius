@@ -35,19 +35,18 @@ const contextBodyVariants = cva('flex items-center', {
   },
 })
 
-type Props = VariantProps<typeof contextBodyVariants> & {
+type Properties = VariantProps<typeof contextBodyVariants> & {
   children: React.ReactNode
   hash: string
 }
 
-export const ContextBody = ({ children, hash, variant = 'default' }: Props) => {
-  const { currentOpenContextMenuId, handleCloseAll, handleOpenContextMenu } =
-    useContextMenu()
+export const ContextBody = ({ children, hash, variant = 'default' }: Properties) => {
+  const { currentOpenContextMenuId, handleCloseAll, handleOpenContextMenu } = useContextMenu()
   const isOpen = currentOpenContextMenuId === hash
 
   const handleOpenChange = useCallback(
-    (open: boolean) => {
-      if (open) {
+    (willBeOpen: boolean) => {
+      if (willBeOpen) {
         handleOpenContextMenu(hash)
       } else {
         handleCloseAll()

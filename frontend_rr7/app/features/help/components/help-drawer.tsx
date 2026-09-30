@@ -43,20 +43,15 @@ const mdxComponents = {
       className="text-primary hover:underline"
       href={href}
       rel="noopener noreferrer"
-      target="_blank"
-    >
+      target="_blank">
       {children}
     </a>
   ),
   blockquote: ({ children }: { children: React.ReactNode }) => (
-    <blockquote className="border-primary mb-4 border-l-4 pl-4 italic">
-      {children}
-    </blockquote>
+    <blockquote className="border-primary mb-4 border-l-4 pl-4 italic">{children}</blockquote>
   ),
   code: ({ children }: { children: React.ReactNode }) => (
-    <code className="bg-base-200 rounded px-1.5 py-0.5 font-mono text-sm">
-      {children}
-    </code>
+    <code className="bg-base-200 rounded px-1.5 py-0.5 font-mono text-sm">{children}</code>
   ),
   h1: ({ children }: { children: React.ReactNode }) => (
     <h1 className="mb-4 text-3xl font-bold">{children}</h1>
@@ -69,15 +64,9 @@ const mdxComponents = {
   h3: ({ children }: { children: React.ReactNode }) => (
     <h3 className="mt-8 mb-2 text-xl font-semibold">{children}</h3>
   ),
-  Icon: ({ name, size }: { name: string; size?: number }) => (
-    <InlineIcon name={name} size={size} />
-  ),
-  li: ({ children }: { children: React.ReactNode }) => (
-    <li className="mb-1">{children}</li>
-  ),
-  Note: ({ children }: { children: React.ReactNode }) => (
-    <Note>{children}</Note>
-  ),
+  Icon: ({ name, size }: { name: string; size?: number }) => <InlineIcon name={name} size={size} />,
+  li: ({ children }: { children: React.ReactNode }) => <li className="mb-1">{children}</li>,
+  Note: ({ children }: { children: React.ReactNode }) => <Note>{children}</Note>,
   ol: ({ children }: { children: React.ReactNode }) => (
     <ol className="mt-4 mb-4 list-decimal pl-6">{children}</ol>
   ),
@@ -85,17 +74,13 @@ const mdxComponents = {
     <p className="mt-4 mb-4 leading-relaxed">{children}</p>
   ),
   pre: ({ children }: { children: React.ReactNode }) => (
-    <pre className="bg-base-200 mb-4 overflow-x-auto rounded-lg p-4">
-      {children}
-    </pre>
+    <pre className="bg-base-200 mb-4 overflow-x-auto rounded-lg p-4">{children}</pre>
   ),
   Tip: ({ children }: { children: React.ReactNode }) => <Tip>{children}</Tip>,
   ul: ({ children }: { children: React.ReactNode }) => (
     <ul className="mt-4 mb-4 list-disc pl-6">{children}</ul>
   ),
-  Warning: ({ children }: { children: React.ReactNode }) => (
-    <Warning>{children}</Warning>
-  ),
+  Warning: ({ children }: { children: React.ReactNode }) => <Warning>{children}</Warning>,
 }
 
 export const HelpDrawer = () => {
@@ -107,8 +92,8 @@ export const HelpDrawer = () => {
   const [error, setError] = useState(false)
   const [isFallbackLanguage, setIsFallbackLanguage] = useState(false)
 
-  const handleOpenChange = (nextOpen: boolean) => {
-    if (!nextOpen) {
+  const handleOpenChange = (willBeOpen: boolean) => {
+    if (!willBeOpen) {
       closeHelp()
     }
   }
@@ -123,8 +108,7 @@ export const HelpDrawer = () => {
       setIsFallbackLanguage(false)
 
       try {
-        const helpFileName =
-          customHelpFile ?? routeToHelpFile(location.pathname)
+        const helpFileName = customHelpFile ?? routeToHelpFile(location.pathname)
         const locale = i18n.language
 
         // Try user's locale first
@@ -171,8 +155,7 @@ export const HelpDrawer = () => {
             <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full">
               <Dialog.Popup
                 className="pointer-events-auto w-screen max-w-[90vw] transform transition-transform duration-300 data-[ending-style]:translate-x-full data-[starting-style]:translate-x-full sm:max-w-[500px] md:max-w-[600px] lg:max-w-[700px]"
-                data-testid="help-drawer"
-              >
+                data-testid="help-drawer">
                 <div className="bg-base-100 flex h-full flex-col shadow-2xl">
                   {/* Header */}
                   <div className="border-base-300 border-b px-6 py-4">
@@ -187,8 +170,7 @@ export const HelpDrawer = () => {
                             fullWidth={false}
                             shape="circle"
                             size="sm"
-                            variant="ghost"
-                          >
+                            variant="ghost">
                             <LucideIcon icon={X} size={20} />
                           </Button>
                         }
@@ -227,9 +209,7 @@ export const HelpDrawer = () => {
                     )}
 
                     {mdxContent && !loading && !error && (
-                      <div className="prose prose-sm max-w-none">
-                        {mdxContent}
-                      </div>
+                      <div className="prose prose-sm max-w-none">{mdxContent}</div>
                     )}
                   </div>
                 </div>

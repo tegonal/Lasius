@@ -22,25 +22,21 @@ export function useGetOrganisationBookingAggregatedStats(
     { orgId: string; params?: GetOrganisationBookingAggregatedStatsParams }
   >(
     {
-      getUrl: ({ orgId, params }) =>
-        getGetOrganisationBookingAggregatedStatsUrl(orgId, params),
+      getUrl: ({ orgId, params }) => getGetOrganisationBookingAggregatedStatsUrl(orgId, params),
       method: 'GET',
     },
     options,
   )
 }
 
-export function useGetOrganisationBookingList(
-  options?: ApiProxyOptions<ModelsBooking[]>,
-) {
+export function useGetOrganisationBookingList(options?: ApiProxyOptions<ModelsBooking[]>) {
   return useApiProxy<
     ModelsBooking[],
     undefined,
     { orgId: string; params?: GetOrganisationBookingListParams }
   >(
     {
-      getUrl: ({ orgId, params }) =>
-        getGetOrganisationBookingListUrl(orgId, params),
+      getUrl: ({ orgId, params }) => getGetOrganisationBookingListUrl(orgId, params),
       method: 'GET',
     },
     options,
@@ -60,9 +56,7 @@ function getGetOrganisationBookingAggregatedStatsUrl(
   }
   const query = normalizedParams.toString()
   return query
-    ? `/organisation-bookings/organisations/${orgId}/bookings/stats/aggregated` +
-        '?' +
-        query
+    ? `/organisation-bookings/organisations/${orgId}/bookings/stats/aggregated` + '?' + query
     : `/organisation-bookings/organisations/${orgId}/bookings/stats/aggregated`
 }
 
@@ -81,8 +75,6 @@ function getGetOrganisationBookingListUrl(
   }
   const query = normalizedParams.toString()
   return query
-    ? `/organisation-bookings/organisations/${orgId}/bookings/history` +
-        '?' +
-        query
+    ? `/organisation-bookings/organisations/${orgId}/bookings/history` + '?' + query
     : `/organisation-bookings/organisations/${orgId}/bookings/history`
 }

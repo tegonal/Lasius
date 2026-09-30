@@ -29,18 +29,22 @@ export const LoginInfoPanel = () => {
   const features = [
     {
       icon: Clock,
+      id: 'trackTime',
       text: t('features:trackTime', 'Track time effortlessly'),
     },
     {
       icon: Users,
+      id: 'organizeTeams',
       text: t('features:organizeTeams', 'Organize by teams & projects'),
     },
     {
       icon: BarChart3,
+      id: 'insightfulReports',
       text: t('features:insightfulReports', 'Insightful reports & analytics'),
     },
     {
       icon: Globe,
+      id: 'openSource',
       text: t('features:openSource', 'Open source & self-hosted'),
     },
   ]
@@ -48,9 +52,7 @@ export const LoginInfoPanel = () => {
   return (
     <>
       <Logo className="text-secondary-content mb-16 h-16 w-auto" />
-      <h1 className="mb-4 text-4xl font-bold">
-        {t('auth:welcomeToLasius', 'Welcome to Lasius')}
-      </h1>
+      <h1 className="mb-4 text-4xl font-bold">{t('auth:welcomeToLasius', 'Welcome to Lasius')}</h1>
       <p className="mb-8 text-xl opacity-90">
         {t('auth:tagline', 'Open source time tracking for teams')}
       </p>
@@ -59,9 +61,8 @@ export const LoginInfoPanel = () => {
         {features.map((feature, index) => (
           <div
             className="flex animate-[fadeInUp_0.6s_ease-out_forwards] items-center gap-3 opacity-0"
-            key={index}
-            style={{ animationDelay: `${index * 100}ms` }}
-          >
+            key={feature.id}
+            style={{ animationDelay: `${index * 100}ms` }}>
             <div className="bg-secondary-content/10 rounded-lg p-2 backdrop-blur-sm">
               <LucideIcon icon={feature.icon} size={20} />
             </div>
@@ -86,9 +87,7 @@ export const InternalLoginInfoPanel = () => {
   return (
     <>
       <Logo className="text-secondary-content mb-16 h-16 w-auto" />
-      <h1 className="mb-4 text-4xl font-bold">
-        {t('auth:welcomeBack', 'Welcome back')}
-      </h1>
+      <h1 className="mb-4 text-4xl font-bold">{t('auth:welcomeBack', 'Welcome back')}</h1>
     </>
   )
 }
@@ -99,17 +98,17 @@ export const RegisterInfoPanel = () => {
   const benefits = [
     {
       icon: Globe,
+      id: 'freeAndOpenSource',
       text: t('features:freeAndOpenSource', 'Free and open source'),
     },
     {
       icon: Clock,
-      text: t(
-        'features:startTrackingMinutes',
-        'Start tracking time in minutes',
-      ),
+      id: 'startTrackingMinutes',
+      text: t('features:startTrackingMinutes', 'Start tracking time in minutes'),
     },
     {
       icon: Users,
+      id: 'inviteTeamMembers',
       text: t('features:inviteTeamMembers', 'Invite your team members'),
     },
   ]
@@ -117,9 +116,7 @@ export const RegisterInfoPanel = () => {
   return (
     <>
       <Logo className="text-secondary-content mb-16 h-16 w-auto" />
-      <h1 className="mb-4 text-4xl font-bold">
-        {t('auth:joinLasius', 'Join Lasius')}
-      </h1>
+      <h1 className="mb-4 text-4xl font-bold">{t('auth:joinLasius', 'Join Lasius')}</h1>
       <p className="mb-8 text-xl opacity-90">
         {t('auth:getStartedFree', 'Get started with open source time tracking')}
       </p>
@@ -128,9 +125,8 @@ export const RegisterInfoPanel = () => {
         {benefits.map((benefit, index) => (
           <div
             className="flex animate-[fadeInUp_0.6s_ease-out_forwards] items-center gap-3 opacity-0"
-            key={index}
-            style={{ animationDelay: `${index * 100}ms` }}
-          >
+            key={benefit.id}
+            style={{ animationDelay: `${index * 100}ms` }}>
             <div className="bg-secondary-content/10 rounded-lg p-2 backdrop-blur-sm">
               <LucideIcon icon={benefit.icon} size={20} />
             </div>

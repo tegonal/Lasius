@@ -19,17 +19,14 @@
 
 import { difference } from 'es-toolkit'
 
-import { cleanStrForCmp } from '~/lib/utils/strings'
+import { cleanStringForComparison } from '~/lib/utils/strings'
 import { type ModelsBooking } from '~/services/api/lasius'
 import { type ModelsTags } from '~/types/common'
 
-export const filterModelsBookingListByTags = (
-  list: ModelsBooking[],
-  tags: ModelsTags[],
-) =>
+export const filterModelsBookingListByTags = (list: ModelsBooking[], tags: ModelsTags[]) =>
   list.filter((booking) => {
-    const arrFilter = tags.map((item) => cleanStrForCmp(item.id))
-    const arrBooking = booking.tags.map((item) => cleanStrForCmp(item.id))
+    const arrayFilter = tags.map((item) => cleanStringForComparison(item.id))
+    const arrayBooking = booking.tags.map((item) => cleanStringForComparison(item.id))
     // Check if all elements in arrFilter exist in arrBooking
-    return difference(arrFilter, arrBooking).length === 0
+    return difference(arrayFilter, arrayBooking).length === 0
   })

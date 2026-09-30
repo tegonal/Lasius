@@ -6,9 +6,9 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type TestConnectivity400Status = typeof TestConnectivity400Status[keyof typeof TestConnectivity400Status];
-
+export type TestConnectivity400Status =
+  (typeof TestConnectivity400Status)[keyof typeof TestConnectivity400Status]
 
 export const TestConnectivity400Status = {
   error: 'error',
-} as const;
+} as const

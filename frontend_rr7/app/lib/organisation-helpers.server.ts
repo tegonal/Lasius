@@ -18,10 +18,7 @@
  */
 
 import { type ModelsUser } from '~/services/api/lasius'
-import {
-  getUserProfile,
-  type getUserProfileResponse,
-} from '~/services/api/lasius/user/user'
+import { getUserProfile, type getUserProfileResponse } from '~/services/api/lasius/user/user'
 
 /**
  * In-flight deduplication for getUserProfile.

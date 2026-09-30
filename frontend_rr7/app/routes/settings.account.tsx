@@ -19,21 +19,17 @@
 
 import { data } from 'react-router'
 
-import {
-  ColumnCenter,
-  ColumnRight,
-  innerGridClasses,
-} from '~/components/ui/layouts/layout-columns'
+import { ColumnCenter, ColumnRight, innerGridClasses } from '~/components/ui/layouts/layout-columns'
 import { ScrollArea } from '~/components/ui/layouts/scroll-area'
 import { AccountForm } from '~/features/settings/components/account-form'
 import { AccountRightColumn } from '~/features/settings/components/account-right-column'
-import { getServerEnv } from '~/lib/env.server'
+import { getServerEnvironment } from '~/lib/environment.server'
 
 import { type Route } from './+types/settings.account'
 
 export const loader = async () => {
-  const demoMode = getServerEnv('LASIUS_DEMO_MODE') === 'true'
-  return data({ demoMode })
+  const isDemoMode = getServerEnvironment('LASIUS_DEMO_MODE') === 'true'
+  return data({ demoMode: isDemoMode })
 }
 
 const AccountPage = ({ loaderData }: Route.ComponentProps) => {

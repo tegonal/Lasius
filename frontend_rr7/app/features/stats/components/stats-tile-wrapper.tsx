@@ -19,7 +19,7 @@
 
 import { type ReactNode } from 'react'
 
-type Props = {
+type Properties = {
   children: ReactNode
   standalone: boolean
 }
@@ -28,7 +28,7 @@ type Props = {
  * Shared wrapper component for stats tiles
  * Handles the standalone vs grouped rendering logic
  */
-export const StatsTileWrapper = ({ children, standalone }: Props) => {
+export const StatsTileWrapper = ({ children, standalone }: Properties) => {
   if (!standalone) {
     return <>{children}</>
   }

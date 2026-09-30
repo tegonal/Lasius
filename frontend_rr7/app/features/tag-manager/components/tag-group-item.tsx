@@ -18,14 +18,7 @@
  */
 
 import { noop } from 'es-toolkit'
-import {
-  ChevronDown,
-  ChevronUp,
-  Clipboard,
-  Copy,
-  Plus,
-  Trash2,
-} from 'lucide-react'
+import { ChevronDown, ChevronUp, Clipboard, Copy, Plus, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
@@ -36,7 +29,7 @@ import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { type ModelsTag } from '~/services/api/lasius/modelsTag'
 import { type ModelsTagGroup } from '~/services/api/lasius/modelsTagGroup'
 
-type Props = {
+type Properties = {
   isExpanded: boolean
   onAddTag: () => void
   onCopyTags: () => void
@@ -58,7 +51,7 @@ export const TagGroupItem = ({
   onToggle,
   showPasteButton,
   tagGroup,
-}: Props) => {
+}: Properties) => {
   const { t } = useTranslation('tag-manager')
 
   return (
@@ -68,8 +61,7 @@ export const TagGroupItem = ({
         <button
           className="hover:text-primary flex min-w-0 flex-shrink items-center gap-2 text-left transition-colors"
           onClick={onToggle}
-          type="button"
-        >
+          type="button">
           <LucideIcon
             className="text-base-content/60 flex-shrink-0"
             icon={isExpanded ? ChevronUp : ChevronDown}
@@ -87,8 +79,7 @@ export const TagGroupItem = ({
             shape="circle"
             size="sm"
             type="button"
-            variant="ghost"
-          >
+            variant="ghost">
             <LucideIcon icon={Trash2} size={18} />
           </Button>
           <Badge variant="muted">{tagGroup.relatedTags?.length || 0}</Badge>
@@ -116,8 +107,7 @@ export const TagGroupItem = ({
               size="sm"
               title={t('actions.addTag', 'Add a tag')}
               type="button"
-              variant="secondary"
-            >
+              variant="secondary">
               <LucideIcon icon={Plus} size={18} />
             </Button>
             <Button
@@ -127,8 +117,7 @@ export const TagGroupItem = ({
               size="sm"
               title={t('actions.copyTags', 'Copy tags')}
               type="button"
-              variant="ghost"
-            >
+              variant="ghost">
               <LucideIcon icon={Copy} size={18} />
             </Button>
             {showPasteButton && (
@@ -139,8 +128,7 @@ export const TagGroupItem = ({
                 size="sm"
                 title={t('actions.pasteTags', 'Paste tags')}
                 type="button"
-                variant="ghost"
-              >
+                variant="ghost">
                 <LucideIcon icon={Clipboard} size={18} />
               </Button>
             )}

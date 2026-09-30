@@ -7,21 +7,12 @@ import { type ApiProxyOptions, useApiProxy } from '~/hooks/use-api-proxy'
  * Track your time
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
-import {
-  type ModelsFavoritesRequest,
-  type ModelsUserFavorites,
-} from '../../lasius'
+import { type ModelsFavoritesRequest, type ModelsUserFavorites } from '../../lasius'
 /**
  * @summary Save a new favorite booking for the current user in the selected organisation
  */
-export function useAddFavoriteBooking(
-  options?: ApiProxyOptions<ModelsUserFavorites[]>,
-) {
-  return useApiProxy<
-    ModelsUserFavorites[],
-    ModelsFavoritesRequest,
-    { orgId: string }
-  >(
+export function useAddFavoriteBooking(options?: ApiProxyOptions<ModelsUserFavorites[]>) {
+  return useApiProxy<ModelsUserFavorites[], ModelsFavoritesRequest, { orgId: string }>(
     {
       getUrl: ({ orgId }) => `/user-favorites/organisations/${orgId}`,
       method: 'POST',
@@ -42,9 +33,7 @@ export function useDeleteFavoriteBooking(options?: ApiProxyOptions<void>) {
 } /**
  * @summary Get current user's favorite bookings list for the selected organisation
  */
-export function useGetFavoriteBookingList(
-  options?: ApiProxyOptions<ModelsUserFavorites>,
-) {
+export function useGetFavoriteBookingList(options?: ApiProxyOptions<ModelsUserFavorites>) {
   return useApiProxy<ModelsUserFavorites, undefined, { orgId: string }>(
     {
       getUrl: ({ orgId }) => `/user-favorites/organisations/${orgId}`,

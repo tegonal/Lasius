@@ -25,12 +25,12 @@ import { type ModelsBookingStub } from '~/services/api/lasius'
 import { EmptyStateFavorites } from './empty-state-favorites'
 import { FavoriteItem } from './favorite-item'
 
-type Props = {
+type Properties = {
   favorites: ModelsBookingStub[]
   selectedOrgId: string
 }
 
-export const FavoriteListCompact = ({ favorites, selectedOrgId }: Props) => {
+export const FavoriteListCompact = ({ favorites, selectedOrgId }: Properties) => {
   const hasNoData = !favorites || favorites.length === 0
 
   return (
@@ -41,11 +41,7 @@ export const FavoriteListCompact = ({ favorites, selectedOrgId }: Props) => {
         ) : (
           <AnimateList>
             {favorites.map((item) => (
-              <FavoriteItem
-                item={item}
-                key={stringHash(item)}
-                selectedOrgId={selectedOrgId}
-              />
+              <FavoriteItem item={item} key={stringHash(item)} selectedOrgId={selectedOrgId} />
             ))}
           </AnimateList>
         )}

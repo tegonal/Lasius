@@ -25,7 +25,7 @@ import {
   ComboboxOptions,
 } from '@headlessui/react'
 import { ChevronDown, ChevronUp, X } from 'lucide-react'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Input } from '~/components/primitives/inputs/input'
@@ -33,12 +33,12 @@ import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { DropdownList } from '~/components/ui/forms/input/shared/dropdown-list'
 import { DropdownListItem } from '~/components/ui/forms/input/shared/dropdown-list-item'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
-import { cleanStrForCmp } from '~/lib/utils/strings'
+import { cleanStringForComparison } from '~/lib/utils/strings'
 import { type ModelsEntityReference } from '~/services/api/lasius'
 
 export type SelectAutocompleteSuggestionType = ModelsEntityReference
 
-type InputSelectAutocompleteProps = {
+type InputSelectAutocompleteProperties = {
   /** Field errors to display */
   errors?: string[]
   /** HTML id for the input element */
@@ -87,12 +87,10 @@ const ComboboxCore = ({
   value: string
 }) => {
   const { t } = useTranslation('common')
-  const inputRef = useRef<HTMLInputElement>(null)
+  const inputReference = useRef<HTMLInputElement>(null)
 
   const [inputText, setInputText] = useState<string>('')
-  const [selected, setSelected] = useState<
-    '' | SelectAutocompleteSuggestionType
-  >('')
+  const [selected, setSelected] = useState<'' | SelectAutocompleteSuggestionType>('')
   const [filterText, setFilterText] = useState<string>('')
 
   const resetSelection = () => {
@@ -101,11 +99,17 @@ const ComboboxCore = ({
     setFilterText('')
     onChange(null)
     setTimeout(() => {
-      inputRef.current?.focus()
+      inputReference.current?.focus()
     }, 0)
   }
 
-  useEffect(() => {
+  // Sync the local combobox state when the parent value or the selected item changes
+  const [syncedProperties, setSyncedProperties] = useState<null | {
+    selectedItem: typeof selectedItem
+    value: string
+  }>(null)
+  if (syncedProperties?.value !== value || syncedProperties.selectedItem !== selectedItem) {
+    setSyncedProperties({ selectedItem, value })
     if (value && selectedItem) {
       setSelected(selectedItem)
       setInputText(selectedItem.key)
@@ -119,12 +123,12 @@ const ComboboxCore = ({
       setInputText('')
       setFilterText('')
     }
-  }, [value, selectedItem])
+  }
 
   const availableSuggestions = (
     filterText
       ? suggestions.filter((item) =>
-          cleanStrForCmp(item.key).includes(cleanStrForCmp(filterText)),
+          cleanStringForComparison(item.key).includes(cleanStringForComparison(filterText)),
         )
       : suggestions
   ).toSorted((a, b) => (a.key ?? '').localeCompare(b.key ?? ''))
@@ -135,18 +139,19 @@ const ComboboxCore = ({
         <Combobox
           as="div"
           onChange={(change: null | SelectAutocompleteSuggestionType) => {
-            if (change?.id) {
-              setSelected(change)
-              setInputText(change.key)
-              setFilterText(change.key)
-              onChange(change)
-              setTimeout(() => {
-                inputRef.current?.blur()
-              }, 0)
+            if (!change?.id) {
+              return
             }
+
+            setSelected(change)
+            setInputText(change.key)
+            setFilterText(change.key)
+            onChange(change)
+            setTimeout(() => {
+              inputReference.current?.blur()
+            }, 0)
           }}
-          value={selected || null}
-        >
+          value={selected || null}>
           {({ open }) => (
             <>
               <div className="join w-full">
@@ -157,12 +162,10 @@ const ComboboxCore = ({
                     autoComplete="off"
                     autoCorrect="off"
                     className="mb-0 w-full text-sm"
-                    displayValue={(item: SelectAutocompleteSuggestionType) =>
-                      item?.key || ''
-                    }
+                    displayValue={(item: SelectAutocompleteSuggestionType) => item?.key || ''}
                     id={id || fieldId}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      const newValue = e.currentTarget.value
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                      const newValue = event.currentTarget.value
                       setInputText(newValue)
                       setFilterText(newValue)
                     }}
@@ -172,7 +175,7 @@ const ComboboxCore = ({
                       }
                     }}
                     placeholder={t('projects.selectProject', 'Select project')}
-                    ref={inputRef}
+                    ref={inputReference}
                     spellCheck={false}
                     value={inputText}
                   />
@@ -182,8 +185,7 @@ const ComboboxCore = ({
                   <button
                     className="btn btn-neutral join-item px-2"
                     onClick={resetSelection}
-                    type="button"
-                  >
+                    type="button">
                     <LucideIcon icon={X} size={20} />
                   </button>
                 )}
@@ -196,11 +198,7 @@ const ComboboxCore = ({
                 {open && availableSuggestions.length > 0 && (
                   <DropdownList>
                     {availableSuggestions.map((suggestion) => (
-                      <ComboboxOption
-                        as="div"
-                        key={suggestion.key}
-                        value={suggestion}
-                      >
+                      <ComboboxOption as="div" key={suggestion.key} value={suggestion}>
                         {({ focus, selected: isSelected }) => (
                           <DropdownListItem
                             active={focus}
@@ -220,9 +218,7 @@ const ComboboxCore = ({
         </Combobox>
       </div>
       {statusMessage && (
-        <div
-          className={`${alertVariantClass[statusMessage.variant] || 'alert'} mt-2`}
-        >
+        <div className={`${alertVariantClass[statusMessage.variant] || 'alert'} mt-2`}>
           {statusMessage.text}
         </div>
       )}
@@ -239,7 +235,7 @@ export const InputSelectAutocomplete = ({
   statusMessage,
   suggestions,
   value,
-}: InputSelectAutocompleteProps) => {
+}: InputSelectAutocompleteProperties) => {
   return (
     <>
       <input name={name} type="hidden" value={value} />

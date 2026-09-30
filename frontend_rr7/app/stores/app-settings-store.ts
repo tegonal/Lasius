@@ -36,35 +36,34 @@ interface AppSettingsStore {
   theme: ThemeMode
 }
 
+const appSettingsState = immer<AppSettingsStore>((set) => ({
+  dismissOnboarding: () =>
+    set((state) => {
+      state.onboardingDismissed = true
+    }),
+  markChecklistReached: () =>
+    set((state) => {
+      state.onboardingChecklistReached = true
+    }),
+  onboardingChecklistReached: false,
+  onboardingDismissed: false,
+  resetOnboarding: () =>
+    set((state) => {
+      state.onboardingDismissed = false
+      state.onboardingChecklistReached = false
+    }),
+  setTheme: (theme) =>
+    set((state) => {
+      state.theme = theme
+    }),
+  theme: 'system',
+}))
+
 export const useAppSettingsStore = create<AppSettingsStore>()(
   devtools(
-    persist(
-      immer((set) => ({
-        dismissOnboarding: () =>
-          set((state) => {
-            state.onboardingDismissed = true
-          }),
-        markChecklistReached: () =>
-          set((state) => {
-            state.onboardingChecklistReached = true
-          }),
-        onboardingChecklistReached: false,
-        onboardingDismissed: false,
-        resetOnboarding: () =>
-          set((state) => {
-            state.onboardingDismissed = false
-            state.onboardingChecklistReached = false
-          }),
-        setTheme: (theme) =>
-          set((state) => {
-            state.theme = theme
-          }),
-        theme: 'system',
-      })),
-      {
-        name: APP_SETTINGS_STORAGE_KEY,
-      },
-    ),
+    persist(appSettingsState, {
+      name: APP_SETTINGS_STORAGE_KEY,
+    }),
     {
       name: 'lasius-app-settings-devtools',
     },
@@ -72,17 +71,13 @@ export const useAppSettingsStore = create<AppSettingsStore>()(
 )
 
 export const useTheme = () => useAppSettingsStore((state) => state.theme)
-export const useOnboardingDismissed = () =>
+export const useIsOnboardingDismissed = () =>
   useAppSettingsStore((state) => state.onboardingDismissed)
 export const useAppSettingsActions = () => {
   const setTheme = useAppSettingsStore((state) => state.setTheme)
-  const dismissOnboarding = useAppSettingsStore(
-    (state) => state.dismissOnboarding,
-  )
+  const dismissOnboarding = useAppSettingsStore((state) => state.dismissOnboarding)
   const resetOnboarding = useAppSettingsStore((state) => state.resetOnboarding)
-  const markChecklistReached = useAppSettingsStore(
-    (state) => state.markChecklistReached,
-  )
+  const markChecklistReached = useAppSettingsStore((state) => state.markChecklistReached)
 
   return useMemo(
     () => ({

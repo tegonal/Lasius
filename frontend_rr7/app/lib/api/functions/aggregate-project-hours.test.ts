@@ -49,7 +49,7 @@ describe('aggregateProjectHours', () => {
 
   it('handles a single project with one entry', () => {
     const data = [makeStats([{ duration: MS_PER_HOUR, label: 'Proj' }])]
-    const result = aggregateProjectHours(data as any)
+    const result = aggregateProjectHours(data)
     expect(result).toEqual([{ hours: 1, name: 'Proj', percentage: 100 }])
   })
 
@@ -61,7 +61,7 @@ describe('aggregateProjectHours', () => {
         { duration: MS_PER_HOUR * 2, label: 'Medium' },
       ]),
     ]
-    const result = aggregateProjectHours(data as any)
+    const result = aggregateProjectHours(data)
     expect(result[0]!.name).toBe('Big')
     expect(result[1]!.name).toBe('Medium')
     expect(result[2]!.name).toBe('Small')
@@ -74,7 +74,7 @@ describe('aggregateProjectHours', () => {
         { duration: MS_PER_HOUR * 1, label: 'B' },
       ]),
     ]
-    const result = aggregateProjectHours(data as any)
+    const result = aggregateProjectHours(data)
     const totalPercentage = result.reduce((sum, r) => sum + r.percentage, 0)
     expect(totalPercentage).toBe(100)
     expect(result[0]!.percentage).toBe(75)
@@ -86,7 +86,7 @@ describe('aggregateProjectHours', () => {
       makeStats([{ duration: MS_PER_HOUR, label: 'Proj' }]),
       makeStats([{ duration: MS_PER_HOUR * 2, label: 'Proj' }]),
     ]
-    const result = aggregateProjectHours(data as any)
+    const result = aggregateProjectHours(data)
     expect(result).toEqual([{ hours: 3, name: 'Proj', percentage: 100 }])
   })
 
@@ -98,7 +98,7 @@ describe('aggregateProjectHours', () => {
         { duration: MS_PER_HOUR * 2, label: 'C' },
       ]),
     ]
-    const result = aggregateProjectHours(data as any, 2)
+    const result = aggregateProjectHours(data, 2)
     expect(result).toHaveLength(2)
     expect(result[0]!.name).toBe('A')
     expect(result[1]!.name).toBe('B')
@@ -114,7 +114,7 @@ describe('aggregateProjectHours', () => {
         { duration: MS_PER_HOUR, label: 'Valid' },
       ]),
     ]
-    const result = aggregateProjectHours(data as any)
+    const result = aggregateProjectHours(data)
     expect(result).toHaveLength(1)
     expect(result[0]!.name).toBe('Valid')
   })
@@ -126,7 +126,7 @@ describe('aggregateProjectHours', () => {
         { duration: MS_PER_HOUR, label: 'Valid' },
       ]),
     ]
-    const result = aggregateProjectHours(data as any)
+    const result = aggregateProjectHours(data)
     expect(result).toHaveLength(1)
     expect(result[0]!.name).toBe('Valid')
   })
@@ -138,7 +138,7 @@ describe('aggregateProjectHours', () => {
         { duration: MS_PER_HOUR, label: 'Valid' },
       ]),
     ]
-    const result = aggregateProjectHours(data as any)
+    const result = aggregateProjectHours(data)
     expect(result).toHaveLength(1)
     expect(result[0]!.name).toBe('Valid')
   })
@@ -150,7 +150,7 @@ describe('aggregateProjectHours', () => {
         { duration: MS_PER_HOUR, label: 'Valid' },
       ]),
     ]
-    const result = aggregateProjectHours(data as any)
+    const result = aggregateProjectHours(data)
     expect(result).toHaveLength(1)
     expect(result[0]!.name).toBe('Valid')
   })

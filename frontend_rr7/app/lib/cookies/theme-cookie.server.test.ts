@@ -19,11 +19,7 @@
 
 import { describe, expect, it } from 'vitest'
 
-import {
-  isValidTheme,
-  parseThemeCookie,
-  serializeThemeCookie,
-} from './theme-cookie.server'
+import { isValidTheme, parseThemeCookie, serializeThemeCookie } from './theme-cookie.server'
 
 describe('isValidTheme', () => {
   it('accepts "light"', () => {
@@ -86,9 +82,9 @@ describe('serializeThemeCookie', () => {
   })
 
   it('round-trips with parseThemeCookie', () => {
-    const setCookie = serializeThemeCookie('light')
+    const serializedCookie = serializeThemeCookie('light')
     // Extract just the key=value part (before first ;)
-    const cookieValue = setCookie.split(';')[0] ?? ''
+    const cookieValue = serializedCookie.split(';', 1)[0] ?? ''
     expect(parseThemeCookie(cookieValue)).toBe('light')
   })
 })

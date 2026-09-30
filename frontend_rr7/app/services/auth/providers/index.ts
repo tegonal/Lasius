@@ -17,15 +17,12 @@
  *
  */
 
-import { getServerEnv } from '~/lib/env.server'
+import { getServerEnvironment } from '~/lib/environment.server'
 
 import { type AuthProvider, type OAuthProvider } from '../types'
 import { createGitHubProvider } from './github.server'
 import { createGitLabProvider } from './gitlab.server'
-import {
-  createInternalProvider,
-  type InternalOAuthProvider,
-} from './internal.server'
+import { createInternalProvider, type InternalOAuthProvider } from './internal.server'
 import { createKeycloakProvider } from './keycloak.server'
 
 /**
@@ -47,16 +44,16 @@ const providerCache = new Map<AuthProvider, OAuthProvider>()
 export function getEnabledProviders(): AuthProvider[] {
   const providers: AuthProvider[] = []
 
-  if (getServerEnv('LASIUS_OAUTH_CLIENT_ID')) {
+  if (getServerEnvironment('LASIUS_OAUTH_CLIENT_ID')) {
     providers.push('internal')
   }
-  if (getServerEnv('KEYCLOAK_OAUTH_CLIENT_ID')) {
+  if (getServerEnvironment('KEYCLOAK_OAUTH_CLIENT_ID')) {
     providers.push('keycloak')
   }
-  if (getServerEnv('GITHUB_OAUTH_CLIENT_ID')) {
+  if (getServerEnvironment('GITHUB_OAUTH_CLIENT_ID')) {
     providers.push('github')
   }
-  if (getServerEnv('GITLAB_OAUTH_CLIENT_ID')) {
+  if (getServerEnvironment('GITLAB_OAUTH_CLIENT_ID')) {
     providers.push('gitlab')
   }
 

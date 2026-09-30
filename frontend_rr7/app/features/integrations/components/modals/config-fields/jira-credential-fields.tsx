@@ -31,7 +31,7 @@ type InputControl = {
   value: string | undefined
 }
 
-type Props = {
+type Properties = {
   accessTokenControl: InputControl
   fields: {
     accessToken: FieldMetadata<string | undefined>
@@ -45,7 +45,7 @@ export const JiraCredentialFields = ({
   accessTokenControl,
   fields,
   resetTestState,
-}: Props) => {
+}: Properties) => {
   const { t } = useTranslation('integrations')
 
   return (
@@ -79,10 +79,10 @@ export const JiraCredentialFields = ({
           id={fields.privateKey.id}
           key={fields.privateKey.key}
           name={fields.privateKey.name}
-          onChange={(e) => {
+          onChange={(event) => {
             resetTestState()
             // Conform workaround: dispatch native input event to update form state
-            e.target.dispatchEvent(new Event('input', { bubbles: true }))
+            event.target.dispatchEvent(new Event('input', { bubbles: true }))
           }}
           placeholder={t('issueImporters.fields.credentialPlaceholder', {
             defaultValue: 'Enter new value to update',
@@ -107,8 +107,8 @@ export const JiraCredentialFields = ({
           data-form-type="other"
           data-lpignore="true"
           key={fields.accessToken.key}
-          onChange={(e) => {
-            accessTokenControl.change(e.target.value)
+          onChange={(event) => {
+            accessTokenControl.change(event.target.value)
             resetTestState()
           }}
           placeholder={t('issueImporters.fields.credentialPlaceholder', {

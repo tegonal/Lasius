@@ -79,11 +79,7 @@ export const SlidingIndicator = ({
   return (
     <div className="pointer-events-none absolute inset-0">
       <div
-        className={cn(
-          'bg-red-gradient absolute',
-          radiusClasses[radiusOn],
-          className,
-        )}
+        className={cn('bg-red-gradient absolute', radiusClasses[radiusOn], className)}
         style={{
           height: `${indicatorStyle.height}px`,
           left: `${indicatorStyle.left}px`,

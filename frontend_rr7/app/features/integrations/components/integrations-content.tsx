@@ -28,7 +28,7 @@ import { ContextMenuProvider } from '~/features/context-menu/hooks/use-context-m
 import { IntegrationConfigItem } from '~/features/integrations/components/integration-config-item'
 import { type ModelsIssueImporterConfigResponse } from '~/services/api/lasius'
 
-type Props = {
+type Properties = {
   configs: ModelsIssueImporterConfigResponse[]
   onDelete: (config: ModelsIssueImporterConfigResponse) => void
   onEdit: (config: ModelsIssueImporterConfigResponse) => void
@@ -44,7 +44,7 @@ export const IntegrationsContent = ({
   onRefreshAllTags,
   onViewInfo,
   onViewMappings,
-}: Props) => {
+}: Properties) => {
   const { t } = useTranslation('integrations')
 
   if (configs.length === 0) {
@@ -52,8 +52,7 @@ export const IntegrationsContent = ({
       <EmptyState
         icon={Plug}
         label={t('issueImporters.emptyState', {
-          defaultValue:
-            'No integrations configured yet. Add one to get started.',
+          defaultValue: 'No integrations configured yet. Add one to get started.',
         })}
       />
     )

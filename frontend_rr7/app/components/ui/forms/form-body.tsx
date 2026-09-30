@@ -17,10 +17,10 @@
  *
  */
 
-interface FormBodyProps {
+interface FormBodyProperties {
   children: React.ReactNode
 }
 
-export const FormBody = ({ children }: FormBodyProps) => {
+export const FormBody = ({ children }: FormBodyProperties) => {
   return <div className="flex w-full flex-col gap-2 md:gap-6">{children}</div>
 }

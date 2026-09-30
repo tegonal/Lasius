@@ -17,15 +17,7 @@
  *
  */
 
-import {
-  addMonths,
-  format,
-  isSameDay,
-  isToday,
-  parseISO,
-  startOfMonth,
-  subMonths,
-} from 'date-fns'
+import { addMonths, format, isSameDay, isToday, parseISO, startOfMonth, subMonths } from 'date-fns'
 import { type Locale } from 'date-fns/locale'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
@@ -37,7 +29,7 @@ import { cn } from '~/lib/utils/cn'
 import { getDateLocale } from '~/lib/utils/date-locale'
 import { formatISOLocale, type IsoDateString } from '~/lib/utils/dates'
 
-type CalendarDayCompactProps = {
+type CalendarDayCompactProperties = {
   day: IsoDateString
   isSelected: boolean
   isTodayDate: boolean
@@ -51,7 +43,7 @@ const CalendarDayCompact = ({
   isTodayDate,
   locale,
   onDayClick,
-}: CalendarDayCompactProps) => {
+}: CalendarDayCompactProperties) => {
   const { progressBarPercentage } = useCalendarDaySummary(day)
   const dayDate = parseISO(day)
 
@@ -65,8 +57,7 @@ const CalendarDayCompact = ({
         isTodayDate && !isSelected && 'text-secondary font-bold',
       )}
       data-testid={`calendar-day-${day}`}
-      onClick={() => onDayClick(day)}
-    >
+      onClick={() => onDayClick(day)}>
       {progressBarPercentage > 0 && (
         <div
           className={cn(
@@ -83,12 +74,24 @@ const CalendarDayCompact = ({
   )
 }
 
-type Props = {
+type Properties = {
   date: string // ISO date string
   onDateChange: (date: string) => void
 }
 
-export const CalendarMonthCompact = ({ date, onDateChange }: Props) => {
+// useCalendarMonth returns the weekday labels from Monday to Sunday.
+// A narrow label repeats (T, S), so the column key comes from this list.
+const WEEKDAY_IDS = [
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+  'sunday',
+] as const
+
+export const CalendarMonthCompact = ({ date, onDateChange }: Properties) => {
   const { i18n, t } = useTranslation('common')
   const locale = getDateLocale(i18n.language)
   const selectedDate = new Date(date)
@@ -96,8 +99,8 @@ export const CalendarMonthCompact = ({ date, onDateChange }: Props) => {
   const [viewDate, setViewDate] = useState(() => startOfMonth(selectedDate))
   const { monthDays, startOffset, weekDays } = useCalendarMonth(viewDate)
 
-  const handlePrevMonth = () => setViewDate((prev) => subMonths(prev, 1))
-  const handleNextMonth = () => setViewDate((prev) => addMonths(prev, 1))
+  const handlePreviousMonth = () => setViewDate((previous) => subMonths(previous, 1))
+  const handleNextMonth = () => setViewDate((previous) => addMonths(previous, 1))
 
   const handleDayClick = (day: IsoDateString) => {
     onDateChange(day)
@@ -109,7 +112,7 @@ export const CalendarMonthCompact = ({ date, onDateChange }: Props) => {
     onDateChange(formatISOLocale(today))
   }
 
-  const showTodayButton = !isToday(selectedDate)
+  const isShowTodayButton = !isToday(selectedDate)
 
   return (
     <div className="w-full" data-testid="calendar-month-compact">
@@ -118,52 +121,45 @@ export const CalendarMonthCompact = ({ date, onDateChange }: Props) => {
           aria-label={t('calendar:navigation.previousMonth', 'Previous month')}
           className="btn btn-ghost btn-sm btn-circle"
           data-testid="calendar-month-prev-btn"
-          onClick={handlePrevMonth}
-        >
+          onClick={handlePreviousMonth}>
           <ChevronLeft size={16} />
         </button>
         <div className="flex flex-col items-center">
-          <div className="text-sm font-medium">
-            {format(viewDate, 'MMMM', { locale })}
-          </div>
-          <div className="text-base-content/60 text-xs">
-            {format(viewDate, 'yyyy')}
-          </div>
+          <div className="text-sm font-medium">{format(viewDate, 'MMMM', { locale })}</div>
+          <div className="text-base-content/60 text-xs">{format(viewDate, 'yyyy')}</div>
         </div>
         <button
           aria-label={t('calendar:navigation.nextMonth', 'Next month')}
           className="btn btn-ghost btn-sm btn-circle"
           data-testid="calendar-month-next-btn"
-          onClick={handleNextMonth}
-        >
+          onClick={handleNextMonth}>
           <ChevronRight size={16} />
         </button>
       </div>
 
-      {showTodayButton && (
+      {isShowTodayButton && (
         <div className="mb-2 flex justify-center">
           <button
             aria-label={t('time.today', 'Today')}
             className="btn btn-ghost btn-xs"
             data-testid="calendar-month-today-btn"
-            onClick={handleToday}
-          >
+            onClick={handleToday}>
             {t('time.today', 'Today')}
           </button>
         </div>
       )}
 
       <div className="mb-1 grid grid-cols-7 gap-1 text-center">
-        {weekDays.map((day, index) => (
-          <div className="text-base-content/60 text-xs font-medium" key={index}>
-            {day}
+        {WEEKDAY_IDS.map((weekdayId, index) => (
+          <div className="text-base-content/60 text-xs font-medium" key={weekdayId}>
+            {weekDays[index]}
           </div>
         ))}
       </div>
 
       <div className="grid w-full grid-cols-7 gap-1">
-        {Array.from({ length: startOffset }, (_, i) => (
-          <div key={`filler-${i}`} />
+        {Array.from({ length: startOffset }, (_, index) => (
+          <div key={`filler-${index}`} />
         ))}
         {monthDays.map((day) => {
           const isoDay = formatISOLocale(day)

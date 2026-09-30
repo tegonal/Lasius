@@ -27,16 +27,19 @@ import { type ImporterType } from '~/lib/utils/tag-helpers'
  */
 const createBaseConfigSchema = (t: TFunction<'common' | 'integrations'>) => ({
   baseUrl: z
-    .string()
+    .url({
+      // A missing value keeps the default Zod message, as the former z.string() base did.
+      error: (issue) =>
+        issue.code === 'invalid_type'
+          ? undefined
+          : t('issueImporters.validation.invalidUrl', {
+              defaultValue: 'Invalid URL',
+            }),
+    })
     .min(
       1,
       t('issueImporters.validation.baseUrlRequired', {
         defaultValue: 'Base URL is required',
-      }),
-    )
-    .url(
-      t('issueImporters.validation.invalidUrl', {
-        defaultValue: 'Invalid URL',
       }),
     ),
   checkFrequency: z

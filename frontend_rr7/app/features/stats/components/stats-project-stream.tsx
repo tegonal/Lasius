@@ -24,7 +24,7 @@ import { EmptyStateStats } from './empty-state-stats'
 import { ProjectStreamChartImpl } from './project-stream-chart-impl'
 import { StatsTile } from './stats-tile'
 
-type StatsProjectStreamProps = {
+type StatsProjectStreamProperties = {
   chartData:
     | undefined
     | {
@@ -35,10 +35,7 @@ type StatsProjectStreamProps = {
   useBarChart: boolean
 }
 
-export const StatsProjectStream = ({
-  chartData,
-  useBarChart,
-}: StatsProjectStreamProps) => {
+export const StatsProjectStream = ({ chartData, useBarChart }: StatsProjectStreamProperties) => {
   if (!chartData?.data || chartData.data.length === 0) {
     return (
       <StatsTile className="h-[320px]">

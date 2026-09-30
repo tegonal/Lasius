@@ -17,12 +17,7 @@
  *
  */
 
-import {
-  getFormProps,
-  getInputProps,
-  useForm,
-  useInputControl,
-} from '@conform-to/react'
+import { getFormProps, getInputProps, useForm, useInputControl } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
 import { useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -60,7 +55,7 @@ import { type ModelsUpdateIssueImporterConfig } from '~/services/api/lasius/mode
 const allFieldsConstraintSchema = z.object({
   accessToken: z.string().optional(),
   apiKey: z.string().optional(),
-  baseUrl: z.string(),
+  baseUrl: z.url(),
   checkFrequency: z.number(),
   consumerKey: z.string().optional(),
   name: z.string(),
@@ -70,68 +65,57 @@ const allFieldsConstraintSchema = z.object({
   workspace: z.string().optional(),
 })
 
-type Props = {
+type Properties = {
   config: ModelsIssueImporterConfigResponse | null
   onClose: () => void
   open: boolean
   selectedOrgId: string
 }
 
-const getImporterType = (
-  config: ModelsIssueImporterConfigResponse,
-): ImporterType => {
+const IMPORTER_TYPES: readonly string[] = [
+  'github',
+  'gitlab',
+  'jira',
+  'plane',
+] satisfies ImporterType[]
+
+const isImporterType = (value: string): value is ImporterType => IMPORTER_TYPES.includes(value)
+
+const getImporterType = (config: ModelsIssueImporterConfigResponse): ImporterType => {
   if ('importerType' in config) {
     const raw = config.importerType as string
     const normalized = raw.replace(/Config$/, '').toLowerCase()
-    if (
-      normalized === 'github' ||
-      normalized === 'gitlab' ||
-      normalized === 'jira' ||
-      normalized === 'plane'
-    ) {
+    if (isImporterType(normalized)) {
       return normalized
     }
   }
   return 'gitlab'
 }
 
-export const GenericConfigModal = ({
-  config,
-  onClose,
-  open,
-  selectedOrgId,
-}: Props) => {
+export const GenericConfigModal = ({ config, onClose, open, selectedOrgId }: Properties) => {
   const { t } = useTranslation('integrations')
   const { addToast } = useToast()
   const revalidator = useRevalidator()
-  const formRef = useRef<HTMLFormElement>(null)
+  const formReference = useRef<HTMLFormElement>(null)
+  const nameInputReference = useRef<HTMLInputElement>(null)
 
   const importerType = config ? getImporterType(config) : 'gitlab'
 
-  const schema = useMemo(
-    () => createConfigSchema(t, importerType, true),
-    [t, importerType],
-  )
+  const schema = useMemo(() => createConfigSchema(t, importerType, true), [t, importerType])
 
   const defaultValue = useMemo(
     () => ({
       accessToken: '',
       apiKey: '',
-      baseUrl: config ? String(config.baseUrl) : '',
+      baseUrl: config ? config.baseUrl : '',
       checkFrequency: config ? String(config.checkFrequency) : '300000',
       consumerKey: '',
       name: config?.name ?? '',
       privateKey: '',
-      resourceOwner:
-        config && 'resourceOwner' in config
-          ? String(config.resourceOwner ?? '')
-          : '',
+      resourceOwner: config && 'resourceOwner' in config ? (config.resourceOwner ?? '') : '',
       resourceOwnerType:
-        config && 'resourceOwnerType' in config
-          ? String(config.resourceOwnerType ?? '')
-          : '',
-      workspace:
-        config && 'workspace' in config ? String(config.workspace ?? '') : '',
+        config && 'resourceOwnerType' in config ? (config.resourceOwnerType ?? '') : '',
+      workspace: config && 'workspace' in config ? (config.workspace ?? '') : '',
     }),
     [config],
   )
@@ -161,7 +145,7 @@ export const GenericConfigModal = ({
     resetTestState,
   } = useConnectionTest({
     config,
-    formRef,
+    formRef: formReference,
     importerType,
     open,
     selectedOrgId,
@@ -198,11 +182,11 @@ export const GenericConfigModal = ({
 
   const isSaving = updateApi.isSubmitting
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault()
     if (!config) return
 
-    const result = validateFormData(e.currentTarget, schema)
+    const result = validateFormData(event.currentTarget, schema)
     if (result.status !== 'success') return
 
     const data = result.value as Record<string, unknown>
@@ -222,8 +206,7 @@ export const GenericConfigModal = ({
     // Always include non-credential config fields so they can be updated/cleared
     body.workspace = (data.workspace as string) || null
     body.resourceOwner = (data.resourceOwner as string) || null
-    if (data.resourceOwnerType)
-      body.resourceOwnerType = data.resourceOwnerType as never
+    if (data.resourceOwnerType) body.resourceOwnerType = data.resourceOwnerType as never
 
     updateApi.submit({
       body,
@@ -232,28 +215,24 @@ export const GenericConfigModal = ({
     })
   }
 
-  const checkFrequencyMs =
-    Number(checkFrequencyControl.value) || config?.checkFrequency || 300_000
+  const checkFrequencyMs = Number(checkFrequencyControl.value) || config?.checkFrequency || 300_000
 
   if (!config) return null
 
   return (
-    <Modal onClose={onClose} open={open} size="lg">
+    <Modal initialFocus={nameInputReference} onClose={onClose} open={open} size="lg">
       <div className="flex min-h-0 flex-1 flex-col">
         {/* Header */}
         <div className="flex-shrink-0">
           <ModalCloseButton onClose={onClose} />
-          <ModalHeader
-            actionSlot={<ModalHelpButton helpKey="modal-importer-config" />}
-          >
+          <ModalHeader actionSlot={<ModalHelpButton helpKey="modal-importer-config" />}>
             {t('issueImporters.titles.edit', {
               defaultValue: 'Edit Integration',
             })}
           </ModalHeader>
           <p className="text-base-content/60 mb-6 text-sm">
             {t('issueImporters.descriptions.edit', {
-              defaultValue:
-                'Update the configuration for this issue importer integration.',
+              defaultValue: 'Update the configuration for this issue importer integration.',
             })}
           </p>
         </div>
@@ -263,8 +242,7 @@ export const GenericConfigModal = ({
             {...getFormProps(form)}
             className="space-y-4"
             onSubmit={handleSubmit}
-            ref={formRef}
-          >
+            ref={formReference}>
             {/* Name */}
             <fieldset className="fieldset">
               <label className="label" htmlFor={fields.name.id}>
@@ -274,14 +252,11 @@ export const GenericConfigModal = ({
               </label>
               <Input
                 {...getInputProps(fields.name, { type: 'text' })}
-                autoFocus
                 key={fields.name.key}
-                placeholder={t(
-                  `issueImporters.fields.namePlaceholder.${importerType}`,
-                  {
-                    defaultValue: `e.g., Company ${getImporterTypeLabel(importerType, untyped(t))}`,
-                  },
-                )}
+                placeholder={t(`issueImporters.fields.namePlaceholder.${importerType}`, {
+                  defaultValue: `e.g., Company ${getImporterTypeLabel(importerType, untyped(t))}`,
+                })}
+                ref={nameInputReference}
               />
               <FormFieldErrors errors={fields.name.errors} />
             </fieldset>
@@ -296,10 +271,9 @@ export const GenericConfigModal = ({
               <Input
                 {...getInputProps(fields.baseUrl, { type: 'text' })}
                 key={fields.baseUrl.key}
-                placeholder={t(
-                  `issueImporters.fields.baseUrlPlaceholder.${importerType}`,
-                  { defaultValue: 'https://...' },
-                )}
+                placeholder={t(`issueImporters.fields.baseUrlPlaceholder.${importerType}`, {
+                  defaultValue: 'https://...',
+                })}
               />
               <FormFieldErrors errors={fields.baseUrl.errors} />
             </fieldset>
@@ -310,8 +284,7 @@ export const GenericConfigModal = ({
                 <div className="flex items-center gap-1">
                   <label className="label" htmlFor={fields.accessToken.id}>
                     {t('issueImporters.fields.accessTokenEdit', {
-                      defaultValue:
-                        'Access Token (leave empty to keep current)',
+                      defaultValue: 'Access Token (leave empty to keep current)',
                     })}
                   </label>
                   <ModalHelpButton helpKey={`setup-${importerType}`} />
@@ -323,14 +296,13 @@ export const GenericConfigModal = ({
                   data-form-type="other"
                   data-lpignore="true"
                   key={fields.accessToken.key}
-                  onChange={(e) => {
-                    accessTokenControl.change(e.target.value)
+                  onChange={(event) => {
+                    accessTokenControl.change(event.target.value)
                     resetTestState()
                   }}
-                  placeholder={t(
-                    'issueImporters.fields.credentialPlaceholder',
-                    { defaultValue: 'Enter new value to update' },
-                  )}
+                  placeholder={t('issueImporters.fields.credentialPlaceholder', {
+                    defaultValue: 'Enter new value to update',
+                  })}
                 />
                 <FormFieldErrors errors={fields.accessToken.errors} />
               </fieldset>
@@ -340,7 +312,7 @@ export const GenericConfigModal = ({
             {importerType === 'github' && (
               <GithubResourceOwnerField
                 accessTokenValue={accessTokenControl.value ?? ''}
-                baseUrl={String(config.baseUrl)}
+                baseUrl={config.baseUrl}
                 fields={{
                   resourceOwner: fields.resourceOwner,
                   resourceOwnerType: fields.resourceOwnerType,
@@ -404,10 +376,7 @@ export const GenericConfigModal = ({
               <input
                 name={fields.checkFrequency.name}
                 type="hidden"
-                value={
-                  checkFrequencyControl.value ??
-                  String(config.checkFrequency || 300_000)
-                }
+                value={checkFrequencyControl.value ?? String(config.checkFrequency || 300_000)}
               />
               <div>
                 <DurationInput
@@ -436,11 +405,7 @@ export const GenericConfigModal = ({
             {/* Divider + Action buttons */}
             <div className="border-base-300 border-t pt-4">
               <div className="flex gap-2">
-                <button
-                  className="btn btn-primary"
-                  disabled={isSaving}
-                  type="submit"
-                >
+                <button className="btn btn-primary" disabled={isSaving} type="submit">
                   {isSaving
                     ? t('actions.saving', { defaultValue: 'Saving...' })
                     : t('issueImporters.actions.update', {
@@ -451,8 +416,7 @@ export const GenericConfigModal = ({
                   className="btn btn-ghost"
                   disabled={isSaving}
                   onClick={onClose}
-                  type="button"
-                >
+                  type="button">
                   {t('actions.cancel', { defaultValue: 'Cancel' })}
                 </button>
               </div>

@@ -6,9 +6,8 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type RefreshTags404Status = typeof RefreshTags404Status[keyof typeof RefreshTags404Status];
-
+export type RefreshTags404Status = (typeof RefreshTags404Status)[keyof typeof RefreshTags404Status]
 
 export const RefreshTags404Status = {
   error: 'error',
-} as const;
+} as const

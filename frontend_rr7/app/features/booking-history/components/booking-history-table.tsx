@@ -33,7 +33,7 @@ import { BookingHistoryItemContext } from './booking-history-item-context'
 import { type BookingHistoryControls } from './booking-history-layout'
 import { EmptyStateBookingHistory } from './empty-state-booking-history'
 
-type Props = {
+type Properties = {
   allowDelete?: boolean
   allowEdit?: boolean
   controls: BookingHistoryControls
@@ -47,22 +47,24 @@ export const BookingHistoryTable = ({
   controls,
   items,
   showUserColumn = false,
-}: Props) => {
+}: Properties) => {
   const { t } = useTranslation('common')
 
   const tagClickHandler = (tag: ModelsTag) => {
-    if (tag) {
-      const currentTagsJson = controls.tags.value
-      let currentTags: ModelsTag[] = []
-      if (currentTagsJson) {
-        try {
-          currentTags = JSON.parse(currentTagsJson) as ModelsTag[]
-        } catch {
-          currentTags = []
-        }
-      }
-      controls.tags.change(JSON.stringify([...currentTags, tag]))
+    if (!tag) {
+      return
     }
+
+    const currentTagsJson = controls.tags.value
+    let currentTags: ModelsTag[] = []
+    if (currentTagsJson) {
+      try {
+        currentTags = JSON.parse(currentTagsJson) as ModelsTag[]
+      } catch {
+        currentTags = []
+      }
+    }
+    controls.tags.change(JSON.stringify([...currentTags, tag]))
   }
 
   const projectClickHandler = (booking: ModelsBooking) => {
@@ -90,19 +92,11 @@ export const BookingHistoryTable = ({
   return (
     <DataList>
       <DataListRow>
-        {showUserColumn && (
-          <DataListHeaderItem>{t('user', 'User')}</DataListHeaderItem>
-        )}
-        <DataListHeaderItem>
-          {t('projects:project', 'Project')}
-        </DataListHeaderItem>
-        <DataListHeaderItem>
-          {t('tag-manager:title', 'Tags')}
-        </DataListHeaderItem>
+        {showUserColumn && <DataListHeaderItem>{t('user', 'User')}</DataListHeaderItem>}
+        <DataListHeaderItem>{t('projects:project', 'Project')}</DataListHeaderItem>
+        <DataListHeaderItem>{t('tag-manager:title', 'Tags')}</DataListHeaderItem>
         <DataListHeaderItem>{t('date', 'Date')}</DataListHeaderItem>
-        <DataListHeaderItem>
-          {t('bookings:duration', 'Duration')}
-        </DataListHeaderItem>
+        <DataListHeaderItem>{t('bookings:duration', 'Duration')}</DataListHeaderItem>
         <DataListHeaderItem />
       </DataListRow>
       {sortedList.map((booking) => (
@@ -110,18 +104,13 @@ export const BookingHistoryTable = ({
           {showUserColumn && (
             <DataListField className="whitespace-nowrap">
               <button
-                aria-label={t(
-                  'bookings:actions.filterByUser',
-                  'Filter by user {{userKey}}',
-                  {
-                    userKey: booking.userReference.key,
-                  },
-                )}
+                aria-label={t('bookings:actions.filterByUser', 'Filter by user {{userKey}}', {
+                  userKey: booking.userReference.key,
+                })}
                 className="hover:text-accent font-inherit cursor-pointer border-none bg-transparent p-0 text-inherit"
                 data-value={booking.userReference.key}
                 onClick={() => userIdClickHandler(booking)}
-                type="button"
-              >
+                type="button">
                 {booking.userReference.key}
               </button>
             </DataListField>
@@ -138,8 +127,7 @@ export const BookingHistoryTable = ({
               className="hover:text-accent font-inherit cursor-pointer border-none bg-transparent p-0 text-inherit"
               data-value={booking.projectReference.key}
               onClick={() => projectClickHandler(booking)}
-              type="button"
-            >
+              type="button">
               {booking.projectReference.key}
             </button>
           </DataListField>
@@ -155,9 +143,7 @@ export const BookingHistoryTable = ({
             <span className="text-sm">{booking.fromTo}</span>{' '}
             <span className="text-sm">{booking.date}</span>
           </DataListField>
-          <DataListField className="whitespace-nowrap">
-            {booking.durationString}
-          </DataListField>
+          <DataListField className="whitespace-nowrap">{booking.durationString}</DataListField>
           <DataListField>
             <BookingHistoryItemContext
               allowDelete={allowDelete}

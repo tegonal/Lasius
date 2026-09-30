@@ -34,11 +34,11 @@ export const countDecimals = (value: number) => {
   // verify if number 0.000005 is represented as "5e-6"
   if (text.includes('e-')) {
     const [, trail] = text.split('e-')
-    return Number.parseInt(trail ?? '0', 10)
+    return Number(trail ?? '0')
   }
   // count decimals for number in representation like "0.123456"
   if (Math.floor(value) !== value) {
-    return value.toString().split('.')[1]?.length ?? 0
+    return value.toString().split('.', 2)[1]?.length ?? 0
   }
   return 0
 }

@@ -6,8 +6,8 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type TestConnectivity400Error = typeof TestConnectivity400Error[keyof typeof TestConnectivity400Error];
-
+export type TestConnectivity400Error =
+  (typeof TestConnectivity400Error)[keyof typeof TestConnectivity400Error]
 
 export const TestConnectivity400Error = {
   connection_failed: 'connection_failed',
@@ -16,4 +16,4 @@ export const TestConnectivity400Error = {
   timeout: 'timeout',
   connection_error: 'connection_error',
   validation_failed: 'validation_failed',
-} as const;
+} as const

@@ -31,15 +31,12 @@ import { type ModelsUserProject } from '~/services/api/lasius/modelsUserProject'
 import { ContextButtonWrapper } from '../context-button-wrapper'
 import { useContextMenu } from '../hooks/use-context-menu'
 
-type Props = {
+type Properties = {
   item: ModelsUserProject
   variant?: 'compact' | 'default'
 }
 
-export const ContextButtonLeaveProject = ({
-  item,
-  variant = 'default',
-}: Props) => {
+export const ContextButtonLeaveProject = ({ item, variant = 'default' }: Properties) => {
   const { handleCloseAll } = useContextMenu()
   const { t } = useTranslation(['projects', 'common'])
   const [showDialog, setShowDialog] = useState(false)
@@ -68,8 +65,7 @@ export const ContextButtonLeaveProject = ({
         onClick={() => setShowDialog(true)}
         shape="circle"
         title={t('projects:actions.leave', 'Leave this project')}
-        variant="contextIcon"
-      >
+        variant="contextIcon">
         <LucideIcon icon={LogOut} size={24} />
       </Button>
       {showDialog && (

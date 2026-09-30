@@ -27,23 +27,22 @@ import { AuthLayout } from '~/features/auth/auth-layout'
 import { maskEmail } from '~/lib/utils/mask-email'
 import { type ModelsInvitationStatusResponse } from '~/services/api/lasius/modelsInvitationStatusResponse'
 import { providerLoginUrl } from '~/services/auth/auth-urls'
-import {
-  getProviderDisplayName,
-  getProviderIcon,
-} from '~/services/auth/provider-display'
+import { getProviderDisplayName, getProviderIcon } from '~/services/auth/provider-display'
 import { type AuthProvider } from '~/services/auth/types'
 
-interface Props {
+interface Properties {
   invitation: ModelsInvitationStatusResponse
   keycloakName?: string
   providers: AuthProvider[]
 }
 
+const NO_PROVIDERS: AuthProvider[] = []
+
 export const InvitationNeedsAccount = ({
   invitation,
   keycloakName,
-  providers = [],
-}: Props) => {
+  providers = NO_PROVIDERS,
+}: Properties) => {
   const { t } = useTranslation('invitation')
 
   const returnTo = `/join/${invitation.invitation.id}`
@@ -59,8 +58,7 @@ export const InvitationNeedsAccount = ({
           organisation: invitation.invitation.organisationReference.key,
         })
       : t('messages.invitedToProjectNeedsAccount', {
-          defaultValue:
-            'You have been invited by {{inviter}} to join project {{project}}.',
+          defaultValue: 'You have been invited by {{inviter}} to join project {{project}}.',
           inviter: invitation.invitation.createdBy.key,
           project: invitation.invitation.projectReference.key,
         })
@@ -80,8 +78,7 @@ export const InvitationNeedsAccount = ({
             <p className="text-base-content/60">
               {isRegistered
                 ? t('needsAccount.descriptionSignIn', {
-                    defaultValue:
-                      'Sign in as {{email}} to accept this invitation.',
+                    defaultValue: 'Sign in as {{email}} to accept this invitation.',
                     email: maskedEmail,
                   })
                 : t('needsAccount.description', {
@@ -109,24 +106,19 @@ export const InvitationNeedsAccount = ({
                   invitation_id: invitation.invitation.id,
                   returnTo,
                 })}
-                key={provider}
-              >
+                key={provider}>
                 <Button
                   className="w-full justify-start gap-3 transition-colors duration-200"
                   size="lg"
                   type="button"
-                  variant="secondary"
-                >
+                  variant="secondary">
                   <span className="flex h-6 w-6 items-center justify-center">
                     {getProviderIcon(provider)}
                   </span>
                   <span className="flex-1 text-left">
                     {isRegistered
                       ? t('needsAccount.signInWith', 'Sign in with')
-                      : t(
-                          'needsAccount.signInOrSignUpWith',
-                          'Sign in or sign up with',
-                        )}{' '}
+                      : t('needsAccount.signInOrSignUpWith', 'Sign in or sign up with')}{' '}
                     <span className="font-semibold">
                       {getProviderDisplayName(provider, keycloakName)}
                     </span>

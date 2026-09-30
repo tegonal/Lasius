@@ -35,22 +35,18 @@ import { useContextMenu } from '~/features/context-menu/hooks/use-context-menu'
 import { type ModelsUserStub } from '~/services/api/lasius'
 import { useRemoveOrganisationUser } from '~/services/api/lasius-hooks/organisations/organisations'
 
-type Props = {
+type Properties = {
   onRemoveComplete: () => void
   orgId: string
   user: ModelsUserStub
 }
 
-export const OrganisationMemberActions = ({
-  onRemoveComplete,
-  orgId,
-  user,
-}: Props) => {
+export const OrganisationMemberActions = ({ onRemoveComplete, orgId, user }: Properties) => {
   const { t } = useTranslation('organisation')
   const { handleCloseAll } = useContextMenu()
   const [isRemoveConfirmOpen, setIsRemoveConfirmOpen] = useState(false)
 
-  const removeApi = useRemoveOrganisationUser({
+  const memberRemovalApi = useRemoveOrganisationUser({
     onSuccess: () => {
       setIsRemoveConfirmOpen(false)
       onRemoveComplete()
@@ -63,7 +59,7 @@ export const OrganisationMemberActions = ({
   }
 
   const handleConfirm = () => {
-    removeApi.submit({ orgId, userId: user.id })
+    memberRemovalApi.submit({ orgId, userId: user.id })
   }
 
   const memberName = `${user.firstName} ${user.lastName}`
@@ -81,8 +77,7 @@ export const OrganisationMemberActions = ({
                 onClick={showRemoveConfirm}
                 shape="circle"
                 title={t('members.actions.remove', 'Remove member')}
-                variant="contextIcon"
-              >
+                variant="contextIcon">
                 <LucideIcon icon={UserMinus} size={24} />
               </Button>
             </ContextButtonWrapper>

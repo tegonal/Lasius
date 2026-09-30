@@ -19,18 +19,12 @@
 
 import { lastDayOfMonth, lastDayOfWeek } from 'date-fns'
 
-import {
-  getCategoryLabel,
-  type Granularity,
-} from '~/lib/api/config/granularity-config'
+import { getCategoryLabel, type Granularity } from '~/lib/api/config/granularity-config'
 import {
   getPlannedHoursForRange,
   type PlannedWorkingHours,
 } from '~/lib/api/functions/get-planned-working-hours'
-import {
-  type ModelsBookingStats,
-  type ModelsBookingStatsCategory,
-} from '~/services/api/lasius'
+import { type ModelsBookingStats, type ModelsBookingStatsCategory } from '~/services/api/lasius'
 
 import { formatISOLocale, millisToHours } from '../../utils/dates'
 
@@ -72,24 +66,14 @@ const getCeilingValues = (
     case 'Day': {
       const weekday = getWeekdayString(
         formatISOLocale(
-          new Date(
-            item.year as number,
-            (item.month as number) - 1,
-            item.day as number,
-          ),
+          new Date(item.year as number, (item.month as number) - 1, item.day as number),
         ),
       )
       return plannedWorkingHours[weekday] ?? 0
     }
     case 'Month': {
-      const dateOfMonth = new Date(
-        `${item.year}-${String(item.month).padStart(2, '0')}-01`,
-      )
-      return getPlannedHoursForRange(
-        dateOfMonth,
-        lastDayOfMonth(dateOfMonth),
-        plannedWorkingHours,
-      )
+      const dateOfMonth = new Date(`${item.year}-${String(item.month).padStart(2, '0')}-01`)
+      return getPlannedHoursForRange(dateOfMonth, lastDayOfMonth(dateOfMonth), plannedWorkingHours)
     }
     case 'Week': {
       const dateOfWeek = getISOWeek(item.week || 0, item.year || undefined)
@@ -120,10 +104,7 @@ export const getNivoChartDataFromApiStatsData = (
   const chartData: NivoChartDataType = data.map((cat) => {
     const categoryLabel = getCategoryLabel(cat.category, granularity)
     const categoryValues = Object.fromEntries(
-      cat.values.map((item) => [
-        item.label || '',
-        millisToHours(item.duration || 0),
-      ]),
+      cat.values.map((item) => [item.label || '', millisToHours(item.duration || 0)]),
     )
     return {
       category: categoryLabel,
@@ -132,20 +113,12 @@ export const getNivoChartDataFromApiStatsData = (
   })
 
   const keys = [
-    ...new Set(
-      data.flatMap((category) =>
-        category.values.map((item) => item.label || ''),
-      ),
-    ),
+    ...new Set(data.flatMap((category) => category.values.map((item) => item.label || ''))),
   ]
 
   const ceilingData: NivoChartDataType = data.map((cat) => {
     const categoryLabel = getCategoryLabel(cat.category, granularity)
-    const ceilingDataValue = getCeilingValues(
-      granularity,
-      cat.category,
-      plannedWorkingHours,
-    )
+    const ceilingDataValue = getCeilingValues(granularity, cat.category, plannedWorkingHours)
     return {
       category: categoryLabel,
       value: ceilingDataValue,

@@ -39,11 +39,11 @@ import { ProjectAddUpdateForm } from '~/features/projects/components/project-add
 import { ProjectAddUpdateTagsForm } from '~/features/tag-manager/components/project-add-update-tags-form'
 import { type ModelsUserProject } from '~/services/api/lasius/modelsUserProject'
 
-type Props = {
+type Properties = {
   item: ModelsUserProject
 }
 
-export const MyProjectsListItemAdminContext = ({ item }: Props) => {
+export const MyProjectsListItemAdminContext = ({ item }: Properties) => {
   const [isUpdateOpen, setIsUpdateOpen] = useState(false)
   const [isManageOpen, setIsManageOpen] = useState(false)
   const [isTagOpen, setIsTagOpen] = useState(false)
@@ -93,20 +93,13 @@ export const MyProjectsListItemAdminContext = ({ item }: Props) => {
           <ContextBar>
             <ContextButtonWrapper variant="compact">
               <Button
-                aria-label={t(
-                  'organisation:members.actions.manage',
-                  'Manage members',
-                )}
+                aria-label={t('organisation:members.actions.manage', 'Manage members')}
                 data-testid="project-ctx-members-btn"
                 fullWidth={false}
                 onClick={() => manageMembers()}
                 shape="circle"
-                title={t(
-                  'organisation:members.actions.manage',
-                  'Manage members',
-                )}
-                variant="contextIcon"
-              >
+                title={t('organisation:members.actions.manage', 'Manage members')}
+                variant="contextIcon">
                 <LucideIcon icon={Users} size={24} />
               </Button>
             </ContextButtonWrapper>
@@ -118,8 +111,7 @@ export const MyProjectsListItemAdminContext = ({ item }: Props) => {
                 onClick={() => showLists()}
                 shape="circle"
                 title={t('bookings:showLists', 'Show bookings')}
-                variant="contextIcon"
-              >
+                variant="contextIcon">
                 <LucideIcon icon={List} size={24} />
               </Button>
             </ContextButtonWrapper>
@@ -131,8 +123,7 @@ export const MyProjectsListItemAdminContext = ({ item }: Props) => {
                 onClick={() => showStats()}
                 shape="circle"
                 title={t('stats:showStatistics', 'Show statistics')}
-                variant="contextIcon"
-              >
+                variant="contextIcon">
                 <LucideIcon icon={PieChart} size={24} />
               </Button>
             </ContextButtonWrapper>
@@ -144,8 +135,7 @@ export const MyProjectsListItemAdminContext = ({ item }: Props) => {
                 onClick={() => editProject()}
                 shape="circle"
                 title={t('projects:actions.edit', 'Edit project')}
-                variant="contextIcon"
-              >
+                variant="contextIcon">
                 <LucideIcon icon={Pencil} size={24} />
               </Button>
             </ContextButtonWrapper>
@@ -157,8 +147,7 @@ export const MyProjectsListItemAdminContext = ({ item }: Props) => {
                 onClick={() => manageTags()}
                 shape="circle"
                 title={t('tag-manager:actions.edit', 'Edit tags')}
-                variant="contextIcon"
-              >
+                variant="contextIcon">
                 <LucideIcon icon={Tags} size={24} />
               </Button>
             </ContextButtonWrapper>
@@ -185,11 +174,7 @@ export const MyProjectsListItemAdminContext = ({ item }: Props) => {
         />
       </Modal>
       <Modal onClose={handleManageClose} open={isManageOpen} size="xl">
-        <ManageProjectMembers
-          item={item}
-          onCancel={handleManageClose}
-          onSave={handleManageClose}
-        />
+        <ManageProjectMembers item={item} onCancel={handleManageClose} onSave={handleManageClose} />
       </Modal>
     </>
   )

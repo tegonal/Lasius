@@ -65,26 +65,26 @@ export const useProjectMappingList = ({
 
   const sortedProjects = useMemo(() => {
     return [...filteredProjects].toSorted((a, b) => {
-      const aMapped = (mappings[a.id]?.length ?? 0) > 0
-      const bMapped = (mappings[b.id]?.length ?? 0) > 0
+      const isAMapped = (mappings[a.id]?.length ?? 0) > 0
+      const isBMapped = (mappings[b.id]?.length ?? 0) > 0
 
-      if (aMapped && !bMapped) return -1
-      if (!aMapped && bMapped) return 1
+      if (isAMapped && !isBMapped) return -1
+      if (!isAMapped && isBMapped) return 1
       return 0
     })
   }, [filteredProjects, mappings])
 
   const mappedCount = useMemo(
-    () => Object.values(mappings).reduce((sum, arr) => sum + arr.length, 0),
+    () => Object.values(mappings).reduce((sum, array) => sum + array.length, 0),
     [mappings],
   )
-  const showFilter = projects.length > 10
+  const isShowFilter = projects.length > 10
 
   return {
     filteredProjects,
     mappedCount,
     orphanedMappings,
-    showFilter,
+    showFilter: isShowFilter,
     sortedProjects,
   }
 }

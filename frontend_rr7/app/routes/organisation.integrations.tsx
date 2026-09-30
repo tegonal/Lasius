@@ -27,11 +27,7 @@ import {
 import { getConfigs } from '~/services/api/lasius/issue-importers/issue-importers'
 import { ModelsUserOrganisationRole } from '~/services/api/lasius/modelsUserOrganisationRole'
 import { getProjectList } from '~/services/api/lasius/projects/projects'
-import {
-  authHeaders,
-  mergeAuthHeaders,
-  requireUser,
-} from '~/services/auth/auth-helpers.server'
+import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/organisation.integrations'
 
@@ -45,25 +41,21 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const selectedOrgId = getSelectedOrganisationId(user)
 
   // Admin guard: only organisation administrators can access this page
-  const selectedOrg = organisations.find(
-    (o) => o.organisationReference.id === selectedOrgId,
-  )
-  if (
-    selectedOrg?.role !== ModelsUserOrganisationRole.OrganisationAdministrator
-  ) {
+  const selectedOrg = organisations.find((o) => o.organisationReference.id === selectedOrgId)
+  if (selectedOrg?.role !== ModelsUserOrganisationRole.OrganisationAdministrator) {
     throw redirect('/user/home')
   }
 
   // Fetch configs and projects in parallel
-  const [configsRes, projectsRes] = await Promise.all([
+  const [configsResponse, projectsResponse] = await Promise.all([
     getConfigs(selectedOrgId, undefined, { headers }),
     getProjectList(selectedOrgId, { headers }),
   ])
 
   return data(
     {
-      configs: configsRes.status === 200 ? configsRes.data : [],
-      projects: projectsRes.status === 200 ? projectsRes.data : [],
+      configs: configsResponse.status === 200 ? configsResponse.data : [],
+      projects: projectsResponse.status === 200 ? projectsResponse.data : [],
       selectedOrgId,
     },
     { headers: mergeAuthHeaders(auth) },

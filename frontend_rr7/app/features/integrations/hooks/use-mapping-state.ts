@@ -21,51 +21,38 @@ import { useCallback, useState } from 'react'
 
 import {
   type MappingsByExternalProject,
-  type TagConfiguration,
+  type TagConfig,
 } from '~/features/integrations/lib/mapping-helpers'
 
-export const useMappingState = (
-  initialMappings: MappingsByExternalProject = {},
-) => {
-  const [mappings, setMappings] =
-    useState<MappingsByExternalProject>(initialMappings)
+export const useMappingState = (initialMappings: MappingsByExternalProject = {}) => {
+  const [mappings, setMappings] = useState<MappingsByExternalProject>(initialMappings)
 
   const upsertMapping = useCallback(
-    (
-      externalProjectId: string,
-      lasiusProjectId: string,
-      tagConfig: TagConfiguration | undefined,
-    ) => {
-      setMappings((prev) => {
-        const arr = prev[externalProjectId] ?? []
-        const filtered = arr.filter((m) => m.projectId !== lasiusProjectId)
+    (externalProjectId: string, lasiusProjectId: string, tagConfig: TagConfig | undefined) => {
+      setMappings((previous) => {
+        const array = previous[externalProjectId] ?? []
+        const filtered = array.filter((m) => m.projectId !== lasiusProjectId)
         return {
-          ...prev,
-          [externalProjectId]: [
-            ...filtered,
-            { projectId: lasiusProjectId, tagConfig },
-          ],
+          ...previous,
+          [externalProjectId]: [...filtered, { projectId: lasiusProjectId, tagConfig }],
         }
       })
     },
     [],
   )
 
-  const removeMapping = useCallback(
-    (externalProjectId: string, lasiusProjectId: string) => {
-      setMappings((prev) => {
-        const arr = (prev[externalProjectId] ?? []).filter(
-          (m) => m.projectId !== lasiusProjectId,
-        )
-        if (arr.length === 0) {
-          const { [externalProjectId]: _, ...rest } = prev
-          return rest
-        }
-        return { ...prev, [externalProjectId]: arr }
-      })
-    },
-    [],
-  )
+  const removeMapping = useCallback((externalProjectId: string, lasiusProjectId: string) => {
+    setMappings((previous) => {
+      const array = (previous[externalProjectId] ?? []).filter(
+        (m) => m.projectId !== lasiusProjectId,
+      )
+      if (array.length === 0) {
+        const { [externalProjectId]: _, ...rest } = previous
+        return rest
+      }
+      return { ...previous, [externalProjectId]: array }
+    })
+  }, [])
 
   return { mappings, removeMapping, setMappings, upsertMapping }
 }

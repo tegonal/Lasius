@@ -17,7 +17,7 @@
  *
  */
 
-import { type UIEvent, useEffect, useState } from 'react'
+import { type UIEvent, useState } from 'react'
 
 interface UseScrollPagination<E> {
   onScroll: (event: UIEvent<HTMLDivElement>) => void
@@ -52,26 +52,28 @@ export const useScrollPagination = <E>(
 ): UseScrollPagination<E> => {
   const [shownNumberOfItems, setShownNumberOfItems] = useState(showItemsPerStep)
 
+  // Show the first step again when the list length or the step size changes
+  const [paginationSource, setPaginationSource] = useState({
+    length: elements.length,
+    step: showItemsPerStep,
+  })
+  if (paginationSource.length !== elements.length || paginationSource.step !== showItemsPerStep) {
+    setPaginationSource({ length: elements.length, step: showItemsPerStep })
+    setShownNumberOfItems(showItemsPerStep)
+  }
+
   const onScroll = (event: UIEvent<HTMLDivElement>) => {
     if (!event.target) return
-    const { clientHeight, scrollHeight, scrollTop } =
-      event.target as HTMLDivElement
+    const { clientHeight, scrollHeight, scrollTop } = event.target as HTMLDivElement
     const scroll = scrollHeight - scrollTop - clientHeight
 
     if (scroll < scrollBeforeEnd && elements.length > shownNumberOfItems) {
-      const newNumberOfItems = Math.min(
-        shownNumberOfItems + showItemsPerStep,
-        elements.length,
-      )
+      const newNumberOfItems = Math.min(shownNumberOfItems + showItemsPerStep, elements.length)
       if (newNumberOfItems > shownNumberOfItems) {
         setShownNumberOfItems(newNumberOfItems)
       }
     }
   }
-
-  useEffect(() => {
-    setShownNumberOfItems(showItemsPerStep)
-  }, [elements.length, showItemsPerStep])
 
   return { onScroll, visibleElements: elements.slice(0, shownNumberOfItems) }
 }

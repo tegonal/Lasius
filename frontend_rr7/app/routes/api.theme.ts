@@ -19,10 +19,7 @@
 
 import { data } from 'react-router'
 
-import {
-  isValidTheme,
-  serializeThemeCookie,
-} from '~/lib/cookies/theme-cookie.server'
+import { isValidTheme, serializeThemeCookie } from '~/lib/cookies/theme-cookie.server'
 
 import { type Route } from './+types/api.theme.ts'
 

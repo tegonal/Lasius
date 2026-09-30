@@ -6,10 +6,9 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type ModelsUserStubRole = typeof ModelsUserStubRole[keyof typeof ModelsUserStubRole];
-
+export type ModelsUserStubRole = (typeof ModelsUserStubRole)[keyof typeof ModelsUserStubRole]
 
 export const ModelsUserStubRole = {
   FreeUser: 'FreeUser',
   Administrator: 'Administrator',
-} as const;
+} as const

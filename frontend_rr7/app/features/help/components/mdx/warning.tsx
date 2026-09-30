@@ -21,11 +21,11 @@ import { TriangleAlert } from 'lucide-react'
 
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 
-interface WarningProps {
+interface WarningProperties {
   children: React.ReactNode
 }
 
-export const Warning = ({ children }: WarningProps) => {
+export const Warning = ({ children }: WarningProperties) => {
   return (
     <div className="mb-3 flex gap-2">
       <span className="text-error flex-shrink-0">

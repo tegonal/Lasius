@@ -27,42 +27,27 @@ export const SlideOverview = () => {
 
   const buildingBlocks = [
     {
-      description: t(
-        'overview.organisationsDesc',
-        'Collaborate with your team members',
-      ),
+      description: t('overview.organisationsDesc', 'Collaborate with your team members'),
       icon: Users,
       title: t('overview.organisations', 'Organizations'),
     },
     {
-      description: t(
-        'overview.projectsDesc',
-        'Organize work into trackable projects',
-      ),
+      description: t('overview.projectsDesc', 'Organize work into trackable projects'),
       icon: Folder,
       title: t('overview.projects', 'Projects'),
     },
     {
-      description: t(
-        'overview.tagsDesc',
-        'Categorize your bookings for detailed reports',
-      ),
+      description: t('overview.tagsDesc', 'Categorize your bookings for detailed reports'),
       icon: Tags,
       title: t('overview.tags', 'Tags & Tag Groups'),
     },
     {
-      description: t(
-        'overview.workingHoursDesc',
-        'Track your planned work hours per week',
-      ),
+      description: t('overview.workingHoursDesc', 'Track your planned work hours per week'),
       icon: Clock,
       title: t('overview.workingHours', 'Working Hours'),
     },
     {
-      description: t(
-        'overview.exportsDesc',
-        'Find your reports in the Lists section',
-      ),
+      description: t('overview.exportsDesc', 'Find your reports in the Lists section'),
       icon: FileText,
       title: t('overview.exports', 'Exports & Lists'),
     },
@@ -71,14 +56,9 @@ export const SlideOverview = () => {
   return (
     <div className="flex h-full flex-col items-center justify-center gap-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold">
-          {t('overview.title', 'Welcome to Lasius')}
-        </h2>
+        <h2 className="text-2xl font-bold">{t('overview.title', 'Welcome to Lasius')}</h2>
         <p className="text-base-content/70 mt-2">
-          {t(
-            'overview.subtitle',
-            'Here are the basic building blocks you should know about',
-          )}
+          {t('overview.subtitle', 'Here are the basic building blocks you should know about')}
         </p>
       </div>
 

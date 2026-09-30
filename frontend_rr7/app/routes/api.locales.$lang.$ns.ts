@@ -40,7 +40,7 @@ export async function loader({ params }: Route.LoaderArgs) {
   const namespaces = resources[language]
 
   const namespace = params.ns
-  if (!namespace || !(namespace in namespaces)) {
+  if (!namespace || !Object.hasOwn(namespaces, namespace)) {
     logger.error(`Invalid namespace: ${namespace}`)
     return data({ error: `Invalid namespace: ${namespace}` }, { status: 400 })
   }

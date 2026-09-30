@@ -61,9 +61,9 @@ export function getArrowKeyTarget<T extends string>(
  * Returns the target segment or null if the browser default should apply.
  */
 export function getTabTarget<T extends string>(
-  shiftKey: boolean,
+  isShiftPressed: boolean,
   segment: T,
   segmentNames: T[],
 ): null | T {
-  return getAdjacentSegment(segment, shiftKey ? 'prev' : 'next', segmentNames)
+  return getAdjacentSegment(segment, isShiftPressed ? 'prev' : 'next', segmentNames)
 }

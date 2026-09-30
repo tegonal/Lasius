@@ -17,12 +17,7 @@
  *
  */
 
-import {
-  getFormProps,
-  getInputProps,
-  useForm,
-  useInputControl,
-} from '@conform-to/react'
+import { getFormProps, getInputProps, useForm, useInputControl } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -48,7 +43,7 @@ import { type ImporterType } from '~/lib/utils/tag-helpers'
 const allFieldsConstraintSchema = z.object({
   accessToken: z.string().optional(),
   apiKey: z.string().optional(),
-  baseUrl: z.string(),
+  baseUrl: z.url(),
   checkFrequency: z.number(),
   consumerKey: z.string().optional(),
   name: z.string(),
@@ -58,26 +53,18 @@ const allFieldsConstraintSchema = z.object({
   workspace: z.string().optional(),
 })
 
-type Props = {
+type Properties = {
   formData: WizardFormData
   formRef: React.RefObject<HTMLFormElement | null>
   onSubmit: (data: WizardFormData) => void
   selectedOrgId: string
 }
 
-export const ConfigFormStep = ({
-  formData,
-  formRef,
-  onSubmit,
-  selectedOrgId,
-}: Props) => {
+export const ConfigFormStep = ({ formData, formRef, onSubmit, selectedOrgId }: Properties) => {
   const { t } = useTranslation('integrations')
   const importerType = formData.importerType as ImporterType
 
-  const schema = useMemo(
-    () => createConfigSchema(t, importerType, false),
-    [t, importerType],
-  )
+  const schema = useMemo(() => createConfigSchema(t, importerType, false), [t, importerType])
 
   const [form, fields] = useForm({
     constraint: getZodConstraint(allFieldsConstraintSchema),
@@ -108,17 +95,16 @@ export const ConfigFormStep = ({
     orgId: selectedOrgId,
   })
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault()
 
-    const result = validateFormData(e.currentTarget, schema)
+    const result = validateFormData(event.currentTarget, schema)
     if (result.status !== 'success') return
 
-    onSubmit({ ...formData, ...result.value } as unknown as WizardFormData)
+    onSubmit({ ...formData, ...result.value })
   }
 
-  const checkFrequencyMs =
-    Number(checkFrequencyControl.value) || formData.checkFrequency
+  const checkFrequencyMs = Number(checkFrequencyControl.value) || formData.checkFrequency
 
   return (
     <div className="flex h-full flex-col">
@@ -130,20 +116,14 @@ export const ConfigFormStep = ({
       </h3>
       <p className="text-base-content/60 mt-1 text-sm">
         {t('issueImporters.wizard.config.description', {
-          defaultValue:
-            'Enter your connection details to connect to {{platform}}.',
+          defaultValue: 'Enter your connection details to connect to {{platform}}.',
           platform: getImporterTypeLabel(importerType, untyped(t)),
         })}
       </p>
 
       <div className="mt-6 grid flex-1 grid-cols-1 gap-8 md:grid-cols-2">
         {/* Left column: Form fields */}
-        <form
-          {...getFormProps(form)}
-          className="space-y-4"
-          onSubmit={handleSubmit}
-          ref={formRef}
-        >
+        <form {...getFormProps(form)} className="space-y-4" onSubmit={handleSubmit} ref={formRef}>
           {/* Name */}
           <fieldset className="fieldset">
             <label className="label" htmlFor={fields.name.id}>
@@ -153,14 +133,10 @@ export const ConfigFormStep = ({
             </label>
             <Input
               {...getInputProps(fields.name, { type: 'text' })}
-              autoFocus
               key={fields.name.key}
-              placeholder={t(
-                `issueImporters.fields.namePlaceholder.${importerType}`,
-                {
-                  defaultValue: `e.g., Company ${getImporterTypeLabel(importerType, untyped(t))}`,
-                },
-              )}
+              placeholder={t(`issueImporters.fields.namePlaceholder.${importerType}`, {
+                defaultValue: `e.g., Company ${getImporterTypeLabel(importerType, untyped(t))}`,
+              })}
             />
             <FormFieldErrors errors={fields.name.errors} />
           </fieldset>
@@ -172,21 +148,16 @@ export const ConfigFormStep = ({
                 defaultValue: 'Base URL',
               })}
             </label>
-            <input
-              name={fields.baseUrl.name}
-              type="hidden"
-              value={baseUrlControl.value ?? ''}
-            />
+            <input name={fields.baseUrl.name} type="hidden" value={baseUrlControl.value ?? ''} />
             <Input
               id={fields.baseUrl.id}
               key={fields.baseUrl.key}
               onBlur={() => baseUrlControl.blur()}
-              onChange={(e) => baseUrlControl.change(e.target.value)}
+              onChange={(event) => baseUrlControl.change(event.target.value)}
               onFocus={() => baseUrlControl.focus()}
-              placeholder={t(
-                `issueImporters.fields.baseUrlPlaceholder.${importerType}`,
-                { defaultValue: 'https://...' },
-              )}
+              placeholder={t(`issueImporters.fields.baseUrlPlaceholder.${importerType}`, {
+                defaultValue: 'https://...',
+              })}
               type="text"
               value={baseUrlControl.value ?? ''}
             />
@@ -217,12 +188,10 @@ export const ConfigFormStep = ({
                 id={fields.accessToken.id}
                 key={fields.accessToken.key}
                 onBlur={() => accessTokenControl.blur()}
-                onChange={(e) => accessTokenControl.change(e.target.value)}
+                onChange={(event) => accessTokenControl.change(event.target.value)}
                 onFocus={() => accessTokenControl.focus()}
                 placeholder={
-                  importerType === 'github'
-                    ? 'github_pat_xxxxxxxxxxxxx'
-                    : 'glpat-xxxxxxxxxxxxx'
+                  importerType === 'github' ? 'github_pat_xxxxxxxxxxxxx' : 'glpat-xxxxxxxxxxxxx'
                 }
                 type="password"
                 value={accessTokenControl.value ?? ''}
@@ -247,21 +216,18 @@ export const ConfigFormStep = ({
                 />
                 <select
                   className="select select-bordered w-full"
-                  disabled={
-                    resourceOwners.length === 0 || isLoadingResourceOwners
-                  }
+                  disabled={resourceOwners.length === 0 || isLoadingResourceOwners}
                   id={fields.resourceOwner.id}
-                  onChange={(e) => {
-                    resourceOwnerControl.change(e.target.value)
+                  onChange={(event) => {
+                    resourceOwnerControl.change(event.target.value)
                     const selectedOwner = resourceOwners.find(
-                      (owner) => owner.id === e.target.value,
+                      (owner) => owner.id === event.target.value,
                     )
                     if (selectedOwner?.ownerType) {
                       resourceOwnerTypeControl.change(selectedOwner.ownerType)
                     }
                   }}
-                  value={resourceOwnerControl.value || ''}
-                >
+                  value={resourceOwnerControl.value || ''}>
                   <option disabled value="">
                     {isLoadingResourceOwners
                       ? t('issueImporters.fields.resourceOwnerLoading', {
@@ -269,8 +235,7 @@ export const ConfigFormStep = ({
                         })
                       : resourceOwners.length === 0 && !accessTokenControl.value
                         ? t('issueImporters.fields.resourceOwnerPlaceholder', {
-                            defaultValue:
-                              'Enter access token above to load organizations',
+                            defaultValue: 'Enter access token above to load organizations',
                           })
                         : resourceOwners.length === 0
                           ? t('issueImporters.fields.resourceOwnerNoResults', {
@@ -362,7 +327,7 @@ export const ConfigFormStep = ({
                   id={fields.accessToken.id}
                   key={fields.accessToken.key}
                   onBlur={() => accessTokenControl.blur()}
-                  onChange={(e) => accessTokenControl.change(e.target.value)}
+                  onChange={(event) => accessTokenControl.change(event.target.value)}
                   onFocus={() => accessTokenControl.focus()}
                   placeholder="your-oauth-access-token"
                   type="password"
@@ -431,9 +396,7 @@ export const ConfigFormStep = ({
             <input
               name={fields.checkFrequency.name}
               type="hidden"
-              value={
-                checkFrequencyControl.value ?? String(formData.checkFrequency)
-              }
+              value={checkFrequencyControl.value ?? String(formData.checkFrequency)}
             />
             <div>
               <DurationInput

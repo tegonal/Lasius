@@ -19,23 +19,22 @@
 
 import { Children, type ReactElement } from 'react'
 
-type Props = {
+type Properties = {
   children: ReactElement[]
   popLayout?: boolean
 }
 
-export const AnimateList = ({ children }: Props) => {
+export const AnimateList = ({ children }: Properties) => {
   return (
     <div className="flex flex-col">
-      {Children.map(children, (child, idx) => (
+      {Children.map(children, (child, index) => (
         <div
           className="animate-in fade-in"
-          key={child.key ?? idx}
+          key={child.key ?? index}
           style={{
-            animationDelay: `${idx * 50}ms`,
+            animationDelay: `${index * 50}ms`,
             animationFillMode: 'both',
-          }}
-        >
+          }}>
           {child}
         </div>
       ))}

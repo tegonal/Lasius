@@ -22,10 +22,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Divider } from '~/components/primitives/divider'
-import {
-  IconTabs,
-  type IconTabsItem,
-} from '~/components/ui/navigation/icon-tabs'
+import { IconTabs, type IconTabsItem } from '~/components/ui/navigation/icon-tabs'
 import {
   type ModelsBookingStub,
   type ModelsCurrentUserTimeBooking,
@@ -37,19 +34,14 @@ import { BookingStart } from './booking-start'
 import { FavoriteListCompact } from './favorite-list-compact'
 import { OrganisationListCompact } from './organisation-list-compact'
 
-type Props = {
+type Properties = {
   favorites: ModelsBookingStub[]
   orgBookings: ModelsCurrentUserTimeBooking[]
   selectedOrgId: string
   users: ModelsUserStub[]
 }
 
-export const IndexColumnTabs = ({
-  favorites,
-  orgBookings,
-  selectedOrgId,
-  users,
-}: Props) => {
+export const IndexColumnTabs = ({ favorites, orgBookings, selectedOrgId, users }: Properties) => {
   const { t } = useTranslation('bookings')
   const [selectedTab, setSelectedTab] = useState(0)
 
@@ -67,12 +59,7 @@ export const IndexColumnTabs = ({
       name: t('actions.start', 'Start booking'),
     },
     {
-      component: (
-        <FavoriteListCompact
-          favorites={favorites}
-          selectedOrgId={selectedOrgId}
-        />
-      ),
+      component: <FavoriteListCompact favorites={favorites} selectedOrgId={selectedOrgId} />,
       icon: Star,
       id: 'bookingStartFav',
       name: t('actions.startFromFavorite', 'Start booking from favorite'),
@@ -91,7 +78,5 @@ export const IndexColumnTabs = ({
     },
   ]
 
-  return (
-    <IconTabs onSelect={setSelectedTab} selected={selectedTab} tabs={tabs} />
-  )
+  return <IconTabs onSelect={setSelectedTab} selected={selectedTab} tabs={tabs} />
 }

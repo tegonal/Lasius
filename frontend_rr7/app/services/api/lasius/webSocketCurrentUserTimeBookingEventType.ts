@@ -6,9 +6,9 @@
  * OpenAPI spec version: 2.2.2+154-fb40149e+20260327-1931
  */
 
-export type WebSocketCurrentUserTimeBookingEventType = typeof WebSocketCurrentUserTimeBookingEventType[keyof typeof WebSocketCurrentUserTimeBookingEventType];
-
+export type WebSocketCurrentUserTimeBookingEventType =
+  (typeof WebSocketCurrentUserTimeBookingEventType)[keyof typeof WebSocketCurrentUserTimeBookingEventType]
 
 export const WebSocketCurrentUserTimeBookingEventType = {
   CurrentUserTimeBookingEvent: 'CurrentUserTimeBookingEvent',
-} as const;
+} as const

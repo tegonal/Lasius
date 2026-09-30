@@ -47,19 +47,16 @@ import { Logo } from '~/components/ui/icons/logo'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { RegisterInfoPanel } from '~/features/auth/auth-info-panels'
 import { AuthLayout } from '~/features/auth/auth-layout'
-import { type SchemaTranslationFn, untyped } from '~/lib/i18n-types'
+import { type SchemaTranslationFunction, untyped } from '~/lib/i18n-types'
 import { logger } from '~/lib/logger'
 import { ApiError } from '~/services/api/lasius-fetch-instance'
 import { registerOAuthUser } from '~/services/api/lasius/oauth2-provider/oauth2-provider'
-import {
-  getOptionalUser,
-  sanitizeReturnTo,
-} from '~/services/auth/auth-helpers.server'
+import { getOptionalUser, sanitizeReturnTo } from '~/services/auth/auth-helpers.server'
 import { internalLoginUrl } from '~/services/auth/auth-urls'
 
 import { type Route } from './+types/internal-oauth.register'
 
-const createRegisterSchema = (t: SchemaTranslationFn) =>
+const createRegisterSchema = (t: SchemaTranslationFunction) =>
   z
     .object({
       confirmPassword: z
@@ -67,15 +64,14 @@ const createRegisterSchema = (t: SchemaTranslationFn) =>
           error: t('validation.required', { defaultValue: 'Required' }),
         })
         .min(1, t('validation.required', { defaultValue: 'Required' })),
-      email: z
-        .string({
-          error: t('validation.required', { defaultValue: 'Required' }),
-        })
-        .email({
-          error: t('validation.emailInvalid', {
-            defaultValue: 'Invalid email address',
-          }),
-        }),
+      email: z.email({
+        error: (issue) =>
+          issue.code === 'invalid_type'
+            ? t('validation.required', { defaultValue: 'Required' })
+            : t('validation.emailInvalid', {
+                defaultValue: 'Invalid email address',
+              }),
+      }),
       firstName: z
         .string({
           error: t('validation.required', { defaultValue: 'Required' }),
@@ -109,7 +105,7 @@ const createRegisterSchema = (t: SchemaTranslationFn) =>
         }),
       returnTo: z.string().optional(),
     })
-    .refine((val) => val.password === val.confirmPassword, {
+    .refine((value) => value.password === value.confirmPassword, {
       error: t('validation.passwordMismatch', {
         defaultValue: 'Passwords do not match',
       }),
@@ -117,8 +113,8 @@ const createRegisterSchema = (t: SchemaTranslationFn) =>
     })
 
 // Server-side schema with English defaults
-const serverRegisterSchema = createRegisterSchema(
-  (_, opts) => opts?.defaultValue ?? '',
+const serverRegisterSchema = createRegisterSchema((_, defaultValue) =>
+  typeof defaultValue === 'string' ? defaultValue : defaultValue.defaultValue,
 )
 
 export async function action({ request }: Route.ActionArgs) {
@@ -126,14 +122,10 @@ export async function action({ request }: Route.ActionArgs) {
   const submission = parseWithZod(formData, { schema: serverRegisterSchema })
 
   if (submission.status !== 'success') {
-    return data(
-      { lastResult: submission.reply(), serverError: null },
-      { status: 400 },
-    )
+    return data({ lastResult: submission.reply(), serverError: null }, { status: 400 })
   }
 
-  const { email, firstName, invitationId, lastName, password, returnTo } =
-    submission.value
+  const { email, firstName, invitationId, lastName, password, returnTo } = submission.value
 
   try {
     await registerOAuthUser({
@@ -177,11 +169,7 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export default function InternalOAuthRegister() {
-  const {
-    email: prefilledEmail,
-    invitationId,
-    returnTo,
-  } = useLoaderData<typeof loader>()
+  const { email: prefilledEmail, invitationId, returnTo } = useLoaderData<typeof loader>()
   const actionData = useActionData<typeof action>()
   const navigation = useNavigation()
   const { t } = useTranslation('common')
@@ -239,8 +227,7 @@ export default function InternalOAuthRegister() {
         <Alert
           className="animate-[fadeIn_0.4s_ease-out]"
           data-testid="auth-register-error"
-          variant="warning"
-        >
+          variant="warning">
           {getErrorMessage(actionData.serverError)}
         </Alert>
       )}
@@ -254,10 +241,7 @@ export default function InternalOAuthRegister() {
       )}
       <Card className="bg-base-100/80 border-0 shadow-2xl backdrop-blur-sm">
         <CardBody className="p-8 lg:p-10">
-          <Link
-            className="flex items-center gap-1 self-center text-sm"
-            to={backToLoginHref}
-          >
+          <Link className="flex items-center gap-1 self-center text-sm" to={backToLoginHref}>
             <ChevronLeft size={16} />
             {t('auth.errors.backToLogin', {
               defaultValue: 'Back to Login',
@@ -298,11 +282,9 @@ export default function InternalOAuthRegister() {
                   label={t('forms.email', {
                     defaultValue: 'Email',
                   })}
-                  required
-                >
+                  required>
                   <Input
                     autoComplete="email"
-                    autoFocus={!prefilledEmail}
                     data-testid="auth-register-email-input"
                     error={!!fields.email.errors?.length}
                     {...getInputProps(fields.email, { type: 'email' })}
@@ -315,8 +297,7 @@ export default function InternalOAuthRegister() {
                   label={t('forms.firstName', {
                     defaultValue: 'First name',
                   })}
-                  required
-                >
+                  required>
                   <Input
                     autoComplete="given-name"
                     data-testid="auth-register-firstname-input"
@@ -331,8 +312,7 @@ export default function InternalOAuthRegister() {
                   label={t('forms.lastName', {
                     defaultValue: 'Last name',
                   })}
-                  required
-                >
+                  required>
                   <Input
                     autoComplete="family-name"
                     data-testid="auth-register-lastname-input"
@@ -347,8 +327,7 @@ export default function InternalOAuthRegister() {
                   label={t('forms.password', {
                     defaultValue: 'Password',
                   })}
-                  required
-                >
+                  required>
                   <Input
                     autoComplete="new-password"
                     data-testid="auth-register-password-input"
@@ -365,8 +344,7 @@ export default function InternalOAuthRegister() {
                   label={t('forms.confirmPassword', {
                     defaultValue: 'Confirm password',
                   })}
-                  required
-                >
+                  required>
                   <Input
                     autoComplete="new-password"
                     data-testid="auth-register-confirmpassword-input"
@@ -383,12 +361,11 @@ export default function InternalOAuthRegister() {
                 <Button
                   className="justify-start gap-2"
                   fullWidth
-                  onClick={(e) => {
-                    e.preventDefault()
+                  onClick={(event) => {
+                    event.preventDefault()
                     setShowPasswords(!showPasswords)
                   }}
-                  variant="ghost"
-                >
+                  variant="ghost">
                   <LucideIcon icon={showPasswords ? Eye : EyeOff} size={24} />
                   <span>
                     {showPasswords
@@ -404,8 +381,7 @@ export default function InternalOAuthRegister() {
                   data-testid="auth-register-submit-btn"
                   fullWidth
                   loading={isSubmitting}
-                  type="submit"
-                >
+                  type="submit">
                   {t('actions.signUp', {
                     defaultValue: 'Sign up',
                   })}

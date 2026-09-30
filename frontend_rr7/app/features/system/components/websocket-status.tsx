@@ -42,30 +42,20 @@ export const WebsocketStatus = () => {
   if (!isClient) return null
 
   const labels: Record<ConnectionStatus, string> = {
-    [ConnectionStatus.CONNECTED]: t(
-      'system:websocket.status.connected',
-      'WebSocket connected',
-    ),
-    [ConnectionStatus.CONNECTING]: t(
-      'system:websocket.status.connecting',
-      'WebSocket connecting',
-    ),
+    [ConnectionStatus.CONNECTED]: t('system:websocket.status.connected', 'WebSocket connected'),
+    [ConnectionStatus.CONNECTING]: t('system:websocket.status.connecting', 'WebSocket connecting'),
     [ConnectionStatus.DISCONNECTED]: t(
       'system:websocket.status.error',
       'Unable to connect to WebSocket',
     ),
-    [ConnectionStatus.ERROR]: t(
-      'system:websocket.status.error',
-      'Unable to connect to WebSocket',
-    ),
+    [ConnectionStatus.ERROR]: t('system:websocket.status.error', 'Unable to connect to WebSocket'),
   }
 
   return (
     <div
       className="tooltip tooltip-top"
       data-testid="websocket-status"
-      data-tip={labels[connectionStatus]}
-    >
+      data-tip={labels[connectionStatus]}>
       <div className="relative inline-flex">
         <LucideIcon icon={RadioTowerIcon} size={14} />
         <span

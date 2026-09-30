@@ -19,7 +19,7 @@
 
 import { Component, type ReactNode } from 'react'
 
-type ChartErrorBoundaryProps = {
+type ChartErrorBoundaryProperties = {
   children: ReactNode
   fallback?: ReactNode
 }
@@ -29,7 +29,7 @@ type ChartErrorBoundaryState = {
 }
 
 export class ChartErrorBoundary extends Component<
-  ChartErrorBoundaryProps,
+  ChartErrorBoundaryProperties,
   ChartErrorBoundaryState
 > {
   state: ChartErrorBoundaryState = { hasError: false }
@@ -43,9 +43,7 @@ export class ChartErrorBoundary extends Component<
       return (
         this.props.fallback || (
           <div className="bg-base-200 flex h-[320px] w-full items-center justify-center rounded-lg">
-            <span className="text-base-content/50 text-sm">
-              Chart failed to load
-            </span>
+            <span className="text-base-content/50 text-sm">Chart failed to load</span>
           </div>
         )
       )

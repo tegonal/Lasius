@@ -38,14 +38,14 @@ import { stringHash } from '~/lib/utils/string-hash'
 import { type ModelsBookingStub } from '~/services/api/lasius'
 import { useDeleteFavoriteBooking } from '~/services/api/lasius-hooks/user-favorites/user-favorites'
 
-type Props = {
+type Properties = {
   item: ModelsBookingStub
   selectedOrgId: string
 }
 
-export const FavoriteItemContext = ({ item, selectedOrgId }: Props) => {
+export const FavoriteItemContext = ({ item, selectedOrgId }: Properties) => {
   const { t } = useTranslation('home')
-  const deleteFavoriteApi = useDeleteFavoriteBooking()
+  const favoriteDeletionApi = useDeleteFavoriteBooking()
   const stopAndStart = useStopAndStart()
 
   const itemHash = stringHash(item)
@@ -56,7 +56,7 @@ export const FavoriteItemContext = ({ item, selectedOrgId }: Props) => {
       projectReference: { id: projectId },
       tags,
     } = item
-    deleteFavoriteApi.submit({
+    favoriteDeletionApi.submit({
       body: { projectId, tags },
       orgId: selectedOrgId,
     })
@@ -64,12 +64,11 @@ export const FavoriteItemContext = ({ item, selectedOrgId }: Props) => {
   }
 
   const handleStart = () => {
+    const start = formatISOLocale(roundToNearestMinutes(new Date(), { roundingMethod: 'floor' }))
     stopAndStart.submit({
       orgId: selectedOrgId,
       projectId: item.projectReference.id,
-      start: formatISOLocale(
-        roundToNearestMinutes(new Date(), { roundingMethod: 'floor' }),
-      ),
+      start,
       tags: item.tags,
     })
     handleCloseAll()
@@ -94,8 +93,7 @@ export const FavoriteItemContext = ({ item, selectedOrgId }: Props) => {
               onClick={deleteFavorite}
               shape="circle"
               title={t('favorites.actions.delete', 'Delete favorite')}
-              variant="contextIcon"
-            >
+              variant="contextIcon">
               <LucideIcon icon={Trash2} size={24} />
             </Button>
           </ContextButtonWrapper>

@@ -34,20 +34,20 @@ import { ContextButtonWrapper } from '~/features/context-menu/context-button-wra
 import { useContextMenu } from '~/features/context-menu/hooks/use-context-menu'
 import { type ModelsUserStub } from '~/services/api/lasius'
 
-type Props = {
+type Properties = {
   canRemove: boolean
   onRemove: () => void
   user: ModelsUserStub
 }
 
-export const ProjectMemberListItemContext = ({
-  canRemove,
-  onRemove,
-  user,
-}: Props) => {
+export const ProjectMemberListItemContext = ({ canRemove, onRemove, user }: Properties) => {
   const { t } = useTranslation()
   const { handleCloseAll } = useContextMenu()
   const [isRemoveConfirmOpen, setIsRemoveConfirmOpen] = useState(false)
+
+  if (!canRemove) {
+    return null
+  }
 
   const showRemoveConfirm = () => {
     setIsRemoveConfirmOpen(true)
@@ -63,10 +63,6 @@ export const ProjectMemberListItemContext = ({
     setIsRemoveConfirmOpen(false)
   }
 
-  if (!canRemove) {
-    return null
-  }
-
   return (
     <>
       <ContextBody hash={user.id} variant="compact">
@@ -75,19 +71,12 @@ export const ProjectMemberListItemContext = ({
           <ContextBar>
             <ContextButtonWrapper variant="compact">
               <Button
-                aria-label={t(
-                  'organisation:members.actions.remove',
-                  'Remove member',
-                )}
+                aria-label={t('organisation:members.actions.remove', 'Remove member')}
                 fullWidth={false}
                 onClick={showRemoveConfirm}
                 shape="circle"
-                title={t(
-                  'organisation:members.actions.remove',
-                  'Remove member',
-                )}
-                variant="contextIcon"
-              >
+                title={t('organisation:members.actions.remove', 'Remove member')}
+                variant="contextIcon">
                 <LucideIcon icon={UserMinus} size={24} />
               </Button>
             </ContextButtonWrapper>

@@ -25,6 +25,7 @@ import { Alert } from '~/components/ui/feedback/alert'
 import { useToast } from '~/components/ui/feedback/use-toast'
 import { ButtonGroup } from '~/components/ui/forms/button-group'
 import { InputTagsAdmin } from '~/components/ui/forms/input/input-tags-admin'
+import { preventEnterOnForm } from '~/components/ui/forms/input/prevent-enter-on-form'
 import { Tabs } from '~/components/ui/navigation/tabs'
 import { GenericConfirmModal } from '~/components/ui/overlays/modal/generic-confirm-modal'
 import { GenericInputModal } from '~/components/ui/overlays/modal/generic-input-modal'
@@ -48,25 +49,14 @@ import { TagGroupEmptyState } from './tag-group-empty-state'
 import { TagGroupItem } from './tag-group-item'
 import { TagGroupToolbar } from './tag-group-toolbar'
 
-type Props = {
+type Properties = {
   item: ModelsProject | ModelsUserProject
   mode: 'add' | 'update'
   onCancel: () => void
   onSave: () => void
 }
 
-const preventEnterOnForm = (e: React.KeyboardEvent) => {
-  if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'TEXTAREA') {
-    e.preventDefault()
-  }
-}
-
-export const ProjectAddUpdateTagsForm = ({
-  item,
-  mode,
-  onCancel,
-  onSave,
-}: Props) => {
+export const ProjectAddUpdateTagsForm = ({ item, mode, onCancel, onSave }: Properties) => {
   const { t } = useTranslation(['tag-manager', 'projects'])
 
   const [tagGroups, setTagGroups] = useState<ModelsTagGroup[]>([])
@@ -129,52 +119,44 @@ export const ProjectAddUpdateTagsForm = ({
     setHasUnsavedChanges,
   )
 
-  const projectId =
-    'projectReference' in item ? item.projectReference.id : item.id
-  const projectKey =
-    'projectReference' in item ? item.projectReference.key : item.key
-  const projectOrganisationId =
-    'organisationReference' in item
-      ? (item as unknown as { organisationReference: { id: string } })
-          .organisationReference.id
-      : selectedOrganisationId
-
-  // Load tags via Orval hook
-  const loadedRef = useRef(false)
-  useEffect(() => {
-    if (!item || !selectedOrganisationId || !projectId || loadedRef.current)
-      return
-    loadedRef.current = true
-    tagsFetcher.submit({
-      orgId: selectedOrganisationId,
-      projectId,
-    })
-  }, [item, projectId, selectedOrganisationId, tagsFetcher])
-
   // Initialize state when tags arrive
-  useEffect(() => {
-    if (!tagsFetcher.isSuccess || !tagsFetcher.data) return
-
+  const [initializedTags, setInitializedTags] = useState<typeof tagsFetcher.data>()
+  if (tagsFetcher.isSuccess && tagsFetcher.data && tagsFetcher.data !== initializedTags) {
     const tags = tagsFetcher.data
+    setInitializedTags(tags)
 
-    const groups = tags.filter((tag) => tag.type === 'TagGroup') as
-      | []
-      | ModelsTagGroup[]
+    const groups = tags.filter((tag) => tag.type === 'TagGroup') as [] | ModelsTagGroup[]
 
-    const simple = tags.filter((tag) => tag.type === 'SimpleTag') as
-      | []
-      | ModelsSimpleTag[]
+    const simple = tags.filter((tag) => tag.type === 'SimpleTag') as [] | ModelsSimpleTag[]
 
     setTagGroups(groups)
     setSimpleTags(simple)
     setNewTagGroupName('')
     setNewTagName('')
     setExpandedGroups(new Set(groups.map((g) => g.id)))
-  }, [tagsFetcher.isSuccess, tagsFetcher.data, setExpandedGroups])
+  }
+
+  const projectId = ('projectReference' in item ? item.projectReference : item).id
+  const projectKey = ('projectReference' in item ? item.projectReference : item).key
+  const projectOrganisationId =
+    'organisationReference' in item
+      ? (item as unknown as { organisationReference: { id: string } }).organisationReference.id
+      : selectedOrganisationId
+
+  // Load tags via Orval hook
+  const loadedReference = useRef(false)
+  useEffect(() => {
+    if (!item || !selectedOrganisationId || !projectId || loadedReference.current) return
+    loadedReference.current = true
+    tagsFetcher.submit({
+      orgId: selectedOrganisationId,
+      projectId,
+    })
+  }, [item, projectId, selectedOrganisationId, tagsFetcher])
 
   // Form submit via Orval hook
-  const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const onSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault()
 
     const bookingCategories = [...tagGroups, ...simpleTags]
 
@@ -201,16 +183,16 @@ export const ProjectAddUpdateTagsForm = ({
   }
 
   const handleAddGroupConfirm = () => {
-    const success = createTagGroup()
-    if (success) {
+    const isSuccess = createTagGroup()
+    if (isSuccess) {
       setShowAddGroupModal(false)
     }
   }
 
   const handleAddTagConfirm = () => {
     if (!showAddTagModal) return
-    const success = addTagToGroup(showAddTagModal.groupIndex)
-    if (success) {
+    const isSuccess = addTagToGroup(showAddTagModal.groupIndex)
+    if (isSuccess) {
       setShowAddTagModal(null)
     }
   }
@@ -231,9 +213,7 @@ export const ProjectAddUpdateTagsForm = ({
   }
 
   // Sort tag groups alphabetically
-  const sortedTagGroups = [...tagGroups].toSorted((a, b) =>
-    a.id.localeCompare(b.id),
-  )
+  const sortedTagGroups = [...tagGroups].toSorted((a, b) => a.id.localeCompare(b.id))
 
   // Tab content
   const tagGroupsContent = (
@@ -242,11 +222,7 @@ export const ProjectAddUpdateTagsForm = ({
         allExpanded={expandedGroups.size === sortedTagGroups.length}
         onAddGroup={() => setShowAddGroupModal(true)}
         onAddPresets={addTemplate}
-        onToggleAll={
-          expandedGroups.size === sortedTagGroups.length
-            ? collapseAll
-            : expandAll
-        }
+        onToggleAll={expandedGroups.size === sortedTagGroups.length ? collapseAll : expandAll}
         showToggleAll={sortedTagGroups.length > 0}
       />
 
@@ -263,18 +239,12 @@ export const ProjectAddUpdateTagsForm = ({
                 isExpanded={isExpanded}
                 key={tagGroup.id}
                 onAddTag={() => setShowAddTagModal({ groupIndex: index })}
-                onCopyTags={() =>
-                  copyTags(tagGroup.id, tagGroup.relatedTags || [])
-                }
+                onCopyTags={() => copyTags(tagGroup.id, tagGroup.relatedTags || [])}
                 onDelete={() => confirmDeleteTagGroup(index, tagGroup.id)}
                 onPasteTags={() => pasteTags(index)}
-                onTagsChange={(tags) =>
-                  updateTagGroupTags(index, tags as ModelsSimpleTag[])
-                }
+                onTagsChange={(tags) => updateTagGroupTags(index, tags as ModelsSimpleTag[])}
                 onToggle={() => toggleGroup(tagGroup.id)}
-                showPasteButton={
-                  !!copiedTags && copiedTags.fromGroupId !== tagGroup.id
-                }
+                showPasteButton={!!copiedTags && copiedTags.fromGroupId !== tagGroup.id}
                 tagGroup={tagGroup}
               />
             )
@@ -288,14 +258,9 @@ export const ProjectAddUpdateTagsForm = ({
     <ModalBody className="min-h-0 flex-1 pr-2">
       <div className="space-y-6 pb-4">
         <Alert variant="info">
-          <p>
-            {t('simpleTagsDescription', 'Tags that are not part of any group')}
-          </p>
+          <p>{t('simpleTagsDescription', 'Tags that are not part of any group')}</p>
         </Alert>
-        <InputTagsAdmin
-          onTagsChange={handleSimpleTagsChange}
-          tags={simpleTags}
-        />
+        <InputTagsAdmin onTagsChange={handleSimpleTagsChange} tags={simpleTags} />
       </div>
     </ModalBody>
   )
@@ -313,44 +278,40 @@ export const ProjectAddUpdateTagsForm = ({
 
   return (
     <>
-      <form
-        className="flex min-h-0 flex-1 flex-col"
-        onKeyDown={preventEnterOnForm}
-        onSubmit={onSubmit}
-      >
-        <div className="flex min-h-0 flex-1 flex-col">
-          <ModalCloseButton onClose={handleCancel} />
-
-          <ModalHeader
-            actionSlot={<ModalHelpButton helpKey="modal-edit-tags" />}
-            className="mb-4"
-          >
-            {mode === 'add'
-              ? t('actions.addTags', 'Add tags')
-              : t('actions.editForProject', 'Edit tags for {{projectKey}}', {
-                  projectKey,
-                })}
-          </ModalHeader>
-
+      <form className="flex min-h-0 flex-1 flex-col" onSubmit={onSubmit}>
+        <div
+          className="flex min-h-0 flex-1 flex-col"
+          onKeyDown={preventEnterOnForm}
+          role="presentation">
           <div className="flex min-h-0 flex-1 flex-col">
-            <Tabs tabs={tabs} />
-          </div>
-        </div>
+            <ModalCloseButton onClose={handleCancel} />
 
-        {/* Footer Actions */}
-        <div className="border-base-300 mt-auto flex-shrink-0 border-t pt-4">
-          <ButtonGroup>
-            <Button
-              className="relative z-0"
-              disabled={isSubmitting}
-              type="submit"
-            >
-              {t('actions.save', 'Save')}
-            </Button>
-            <Button onClick={handleCancel} type="button" variant="secondary">
-              {t('actions.cancel', 'Cancel')}
-            </Button>
-          </ButtonGroup>
+            <ModalHeader
+              actionSlot={<ModalHelpButton helpKey="modal-edit-tags" />}
+              className="mb-4">
+              {mode === 'add'
+                ? t('actions.addTags', 'Add tags')
+                : t('actions.editForProject', 'Edit tags for {{projectKey}}', {
+                    projectKey,
+                  })}
+            </ModalHeader>
+
+            <div className="flex min-h-0 flex-1 flex-col">
+              <Tabs tabs={tabs} />
+            </div>
+          </div>
+
+          {/* Footer Actions */}
+          <div className="border-base-300 mt-auto flex-shrink-0 border-t pt-4">
+            <ButtonGroup>
+              <Button className="relative z-0" disabled={isSubmitting} type="submit">
+                {t('actions.save', 'Save')}
+              </Button>
+              <Button onClick={handleCancel} type="button" variant="secondary">
+                {t('actions.cancel', 'Cancel')}
+              </Button>
+            </ButtonGroup>
+          </div>
         </div>
       </form>
 
