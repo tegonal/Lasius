@@ -9,7 +9,7 @@ on:
   #pull_request:
   push:
     paths:
-      - "frontend/**"
+      - "frontend_rr7/**"
     branches:
       - "**"
     tags-ignore:
@@ -27,13 +27,13 @@ jobs:
         with:
           node-version: 24
           cache: yarn
-          cache-dependency-path: frontend/yarn.lock
+          cache-dependency-path: frontend_rr7/yarn.lock
       - name: build frontend
-        working-directory: ./frontend
+        working-directory: ./frontend_rr7
         run: |
-          npm --version
           yarn --version
-          node ./scripts/updatePackageJsonVersion.js ${{github.ref_name}}
-          yarn workspaces focus
+          yarn install --immutable
           yarn run lint
+          yarn exec prettier --check .
+          yarn exec vitest run
           yarn run build

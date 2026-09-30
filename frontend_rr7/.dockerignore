@@ -1,0 +1,14 @@
+.env
+.env.*
+!.env.template
+.fallow
+.git
+.logs
+.react-router
+.yarn
+build
+frontend_rr7
+node_modules
+Dockerfile
+.dockerignore
+*.tsbuildinfo
