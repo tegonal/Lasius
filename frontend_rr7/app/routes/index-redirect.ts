@@ -19,7 +19,13 @@
 
 import { redirect } from 'react-router'
 
+import { mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
+
+import { type Route } from './+types/index-redirect'
+
 // Matches Next.js index page: / → /user/home
-export function loader() {
-  throw redirect('/user/home')
+export async function loader({ request, url }: Route.LoaderArgs) {
+  // A thrown redirect drops the refreshed cookie of the layout loader (pitfalls/rr7-propagate-auth-headers).
+  const auth = await requireUser(request, url)
+  throw redirect('/user/home', { headers: mergeAuthHeaders(auth) })
 }

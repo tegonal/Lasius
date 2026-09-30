@@ -19,8 +19,12 @@
 
 import { redirect } from 'react-router'
 
+import { mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
+
 import { type Route } from './+types/user.stats._index'
 
-export const loader = ({ url }: Route.LoaderArgs) => {
-  throw redirect(`/user/stats/projects${url.search}`)
+export const loader = async ({ request, url }: Route.LoaderArgs) => {
+  // A thrown redirect drops the refreshed cookie of the layout loader (pitfalls/rr7-propagate-auth-headers).
+  const auth = await requireUser(request, url)
+  throw redirect(`/user/stats/projects${url.search}`, { headers: mergeAuthHeaders(auth) })
 }

@@ -26,19 +26,29 @@ import { getAuthSecret } from './auth-secret.server'
 import { getProvider } from './providers'
 import { type LasiusSessionData } from './types'
 
+interface RefreshResult {
+  access_token: string
+  expires_in: number
+  refresh_token?: string
+  /** Date.now() when the provider answered. The new expiry counts from this moment. */
+  refreshedAt: number
+}
+
 /**
  * In-flight refresh dedup: when multiple parallel loaders call getSessionTokens()
  * with the same refresh token, only the first one actually refreshes. Others await
  * the same promise. Keyed by refresh token to handle concurrent requests correctly.
  */
-const inflightRefreshes = new Map<
-  string,
-  Promise<null | {
-    access_token: string
-    expires_in: number
-    refresh_token?: string
-  }>
->()
+const inflightRefreshes = new Map<string, Promise<null | RefreshResult>>()
+
+/**
+ * A completed refresh, keyed by the old refresh token. A response can miss the new cookie, for
+ * example a redirect of a sibling loader, and the browser then sends the old cookie again. The
+ * provider revoked the old refresh token, so a second refresh would log the user out.
+ */
+const recentRefreshes = new Map<string, { expiresAt: number; result: RefreshResult }>()
+const REFRESH_REUSE_WINDOW_MS = 60_000
+const RECENT_REFRESHES_LIMIT = 1000
 
 function getSessionStorage() {
   const secret = getAuthSecret()
@@ -129,12 +139,11 @@ export async function getSessionTokens(
     if (refreshed) {
       logger.debug('Token refresh successful')
 
-      const now = Date.now()
       const updatedUser: LasiusSessionData = {
         ...user,
         accessToken: refreshed.access_token,
-        expiresAt: now + refreshed.expires_in * 1000,
-        issuedAt: now,
+        expiresAt: refreshed.refreshedAt + refreshed.expires_in * 1000,
+        issuedAt: refreshed.refreshedAt,
         refreshToken: refreshed.refresh_token ?? user.refreshToken,
       }
 
@@ -170,11 +179,13 @@ function commitSession(
 async function deduplicatedRefresh(
   refreshKey: string,
   user: LasiusSessionData,
-): Promise<null | {
-  access_token: string
-  expires_in: number
-  refresh_token?: string
-}> {
+): Promise<null | RefreshResult> {
+  const recent = recentRefreshes.get(refreshKey)
+  if (recent && recent.expiresAt > Date.now()) {
+    logger.debug('Reusing a completed refresh for the same refresh token')
+    return recent.result
+  }
+
   const inflight = inflightRefreshes.get(refreshKey)
   if (inflight) {
     logger.debug('Joining in-flight refresh for dedup')
@@ -186,7 +197,8 @@ async function deduplicatedRefresh(
 
     for (let index = 0; index <= AUTH_REFRESH_BACKOFF_MS.length; index++) {
       try {
-        return await provider.refreshToken(user.refreshToken)
+        const tokens = await provider.refreshToken(user.refreshToken)
+        return tokens ? { ...tokens, refreshedAt: Date.now() } : null
       } catch (error) {
         if (index < AUTH_REFRESH_BACKOFF_MS.length) {
           const delay = AUTH_REFRESH_BACKOFF_MS[index]
@@ -208,7 +220,9 @@ async function deduplicatedRefresh(
   inflightRefreshes.set(refreshKey, promise)
 
   try {
-    return await promise
+    const result = await promise
+    if (result) rememberRefresh(refreshKey, result)
+    return result
   } finally {
     inflightRefreshes.delete(refreshKey)
   }
@@ -227,6 +241,18 @@ function getSession(cookieHeader: null | string) {
 /** Read user session from the request cookie */
 async function getUserSession(request: Request) {
   return getSession(request.headers.get('Cookie'))
+}
+
+function rememberRefresh(refreshKey: string, result: RefreshResult) {
+  const now = Date.now()
+  for (const [key, entry] of recentRefreshes) {
+    if (entry.expiresAt <= now) recentRefreshes.delete(key)
+  }
+  if (recentRefreshes.size >= RECENT_REFRESHES_LIMIT) {
+    const oldestKey = recentRefreshes.keys().next().value
+    if (oldestKey !== undefined) recentRefreshes.delete(oldestKey)
+  }
+  recentRefreshes.set(refreshKey, { expiresAt: now + REFRESH_REUSE_WINDOW_MS, result })
 }
 
 function sessionStorage() {
