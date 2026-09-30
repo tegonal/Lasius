@@ -30,7 +30,9 @@ import {
   ServerRouter,
 } from 'react-router'
 
+import { isLocale } from '~/i18n-config'
 import { i18nServerConfig } from '~/i18n-resources.server'
+import { localeCookie } from '~/lib/cookies/i18next-cookie.server'
 import { logger } from '~/lib/logger'
 
 import { getInstance } from './middleware/i18next'
@@ -56,33 +58,37 @@ export function handleError(error: unknown, { request }: { request: Request }) {
   logger.error({ error, url: request.url }, 'Unhandled server error')
 }
 
-export default function handleRequest(
+export default async function handleRequest(
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
   entryContext: EntryContext,
   routerContext: RouterContextProvider,
 ) {
+  let i18nInstance: ReturnType<typeof createInstance>
+  try {
+    i18nInstance = getInstance(routerContext)
+  } catch {
+    // React Router answers a URL without a matching route before the middleware runs. The 404
+    // page then takes the language from the lng cookie that the root loader writes.
+    const cookieLocale: unknown = await localeCookie.parse(request.headers.get('Cookie'))
+    i18nInstance = createInstance({
+      ...i18nServerConfig,
+      initAsync: false,
+      lng:
+        typeof cookieLocale === 'string' && isLocale(cookieLocale)
+          ? cookieLocale
+          : i18nServerConfig.fallbackLng,
+    })
+    void i18nInstance.init()
+  }
+
   return new Promise((resolve, reject) => {
     let isShellRendered = false
     const userAgent = request.headers.get('user-agent')
 
     const readyOption: keyof RenderToPipeableStreamOptions =
       (userAgent && isbot(userAgent)) || entryContext.isSpaMode ? 'onAllReady' : 'onShellReady'
-
-    let i18nInstance: ReturnType<typeof createInstance>
-    try {
-      i18nInstance = getInstance(routerContext)
-    } catch {
-      // Middleware context unavailable for non-route requests (favicon, .well-known, etc.)
-      // Fall back to a minimal synchronous i18n instance
-      i18nInstance = createInstance({
-        ...i18nServerConfig,
-        initAsync: false,
-        lng: i18nServerConfig.fallbackLng,
-      })
-      void i18nInstance.init()
-    }
 
     const { abort, pipe } = renderToPipeableStream(
       <I18nextProvider i18n={i18nInstance}>
