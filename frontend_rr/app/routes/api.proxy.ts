@@ -56,7 +56,13 @@ export type ProxyEnvelope<T = unknown> =
  * Returns a consistent envelope: { ok: true, data } or { ok: false, error, status }
  */
 export async function action({ request, url: routeUrl }: Route.ActionArgs) {
-  const parsed = proxyPayloadSchema.safeParse(await request.json())
+  let payload: unknown
+  try {
+    payload = await request.json()
+  } catch {
+    // A body that is not JSON stays undefined and fails the schema check, so the client gets a 400.
+  }
+  const parsed = proxyPayloadSchema.safeParse(payload)
 
   if (!parsed.success) {
     return data(
