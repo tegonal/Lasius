@@ -34,7 +34,7 @@ export const DropdownList = ({
         'bg-base-100 border-base-content/20 absolute mt-1 rounded-lg border',
         'h-auto max-h-[240px] w-full overflow-auto py-1',
         'z-50 shadow-lg',
-        'scrollbar-thin scrollbar-thumb-base-content/20 scrollbar-track-transparent',
+        'scrollbar-thumb-base-content/20 scrollbar-thin scrollbar-track-transparent',
         className,
       )}>
       {children}
