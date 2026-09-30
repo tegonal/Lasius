@@ -48,7 +48,7 @@ async function performLogout(request: Request): Promise<Response> {
     forgetRefresh(result.tokens.refreshToken)
     try {
       const provider = getProvider(result.tokens.tokenIssuer)
-      await provider.revokeToken(result.tokens.refreshToken)
+      await provider.revokeToken(result.tokens)
       logger.debug('Token revoked successfully', {
         provider: result.tokens.tokenIssuer,
       })

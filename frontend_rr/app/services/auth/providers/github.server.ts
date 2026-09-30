@@ -122,19 +122,19 @@ export function createGitHubProvider(): OAuthProvider {
       return null
     },
 
-    async revokeToken(token: string): Promise<void> {
-      try {
-        await fetch(`https://api.github.com/applications/${clientId}/token`, {
-          body: JSON.stringify({ access_token: token }),
-          headers: {
-            Accept: 'application/json',
-            Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
-            'Content-Type': 'application/json',
-          },
-          method: 'DELETE',
-        })
-      } catch (error) {
-        logger.warn('GitHub token revocation failed', { error })
+    // A GitHub session has no refresh token, so the app revokes the access token.
+    async revokeToken({ accessToken }): Promise<void> {
+      const response = await fetch(`https://api.github.com/applications/${clientId}/token`, {
+        body: JSON.stringify({ access_token: accessToken }),
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
+          'Content-Type': 'application/json',
+        },
+        method: 'DELETE',
+      })
+      if (!response.ok) {
+        throw new Error(`GitHub token revocation failed: ${response.status}`)
       }
     },
   }

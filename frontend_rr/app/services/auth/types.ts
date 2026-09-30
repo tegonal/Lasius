@@ -36,7 +36,8 @@ export interface OAuthProvider {
   getUserProfile(accessToken: string): Promise<{ email: string; userId: string }>
   provider: AuthProvider
   refreshToken(refreshToken: string): Promise<null | TokenResponse>
-  revokeToken(token: string): Promise<void>
+  /** Ends the session at the provider. Each provider sends the token its endpoint expects. Throws on failure. */
+  revokeToken(tokens: Pick<LasiusSessionData, 'accessToken' | 'refreshToken'>): Promise<void>
 }
 
 export interface TokenResponse {

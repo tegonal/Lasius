@@ -226,14 +226,14 @@ export function createInternalProvider(): InternalOAuthProvider {
       }
     },
 
-    async revokeToken(token: string): Promise<void> {
-      try {
-        await fetch(logoutUrl, {
-          headers: { Authorization: `Bearer ${token}` },
-          method: 'POST',
-        })
-      } catch (error) {
-        logger.warn('Internal token revocation failed', { error })
+    // The backend logout checks the Bearer token as an access token and deletes it.
+    async revokeToken({ accessToken }): Promise<void> {
+      const response = await fetch(logoutUrl, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        method: 'POST',
+      })
+      if (!response.ok) {
+        throw new Error(`Internal logout failed: ${response.status}`)
       }
     },
   }

@@ -110,19 +110,18 @@ export function createKeycloakProvider(): OAuthProvider {
       }
     },
 
-    async revokeToken(token: string): Promise<void> {
-      try {
-        await fetch(revokeUrl, {
-          body: new URLSearchParams({
-            client_id: clientId,
-            client_secret: clientSecret,
-            token,
-          }),
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          method: 'POST',
-        })
-      } catch (error) {
-        logger.warn('Keycloak token revocation failed', { error })
+    async revokeToken({ refreshToken }): Promise<void> {
+      const response = await fetch(revokeUrl, {
+        body: new URLSearchParams({
+          client_id: clientId,
+          client_secret: clientSecret,
+          token: refreshToken,
+        }),
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        method: 'POST',
+      })
+      if (!response.ok) {
+        throw new Error(`Keycloak token revocation failed: ${response.status}`)
       }
     },
   }
