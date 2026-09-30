@@ -41,4 +41,5 @@ playwright-transform-cache-*/
 playwright_*
 CLAUDE.md
 **/.logs/
-/docs
+/docs/plans/
+/docs/reviews/
