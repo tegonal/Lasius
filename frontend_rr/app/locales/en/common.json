@@ -121,7 +121,28 @@
     "welcome": "Welcome to the Lasius demo instance. Use \"demo1@lasius.ch\" and password \"demo\" to log in and have a look around. The demo instance is reset once a day."
   },
   "errors": {
-    "helpNotAvailable": "Help content not available for this page."
+    "helpNotAvailable": "Help content not available for this page.",
+    "page": {
+      "details": "Error details",
+      "generic": {
+        "message": "An error occurred.",
+        "title": "Something went wrong"
+      },
+      "goHome": "Go home",
+      "notFound": {
+        "message": "The page you are looking for does not exist.",
+        "title": "Page not found"
+      },
+      "tryAgain": "Try again",
+      "unauthorized": {
+        "message": "You need to sign in to access this page.",
+        "title": "Unauthorized"
+      },
+      "unexpected": {
+        "message": "Something went wrong. Please try again or return to the home page.",
+        "title": "Unexpected error"
+      }
+    }
   },
   "export": {
     "actions": {

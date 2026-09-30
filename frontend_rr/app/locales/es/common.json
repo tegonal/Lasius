@@ -121,7 +121,28 @@
     "welcome": "Bienvenido a la instancia de demostración de Lasius. Usa \"demo1@lasius.ch\" y contraseña \"demo\" para iniciar sesión y echar un vistazo. La instancia de demostración se restablece una vez al día."
   },
   "errors": {
-    "helpNotAvailable": "Contenido de ayuda no disponible para esta página."
+    "helpNotAvailable": "Contenido de ayuda no disponible para esta página.",
+    "page": {
+      "details": "Detalles del error",
+      "generic": {
+        "message": "Se ha producido un error.",
+        "title": "Algo salió mal"
+      },
+      "goHome": "Ir al inicio",
+      "notFound": {
+        "message": "La página que buscas no existe.",
+        "title": "Página no encontrada"
+      },
+      "tryAgain": "Reintentar",
+      "unauthorized": {
+        "message": "Inicia sesión para acceder a esta página.",
+        "title": "No autorizado"
+      },
+      "unexpected": {
+        "message": "Algo salió mal. Inténtalo de nuevo o vuelve al inicio.",
+        "title": "Error inesperado"
+      }
+    }
   },
   "export": {
     "actions": {

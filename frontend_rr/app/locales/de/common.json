@@ -121,7 +121,28 @@
     "welcome": "Willkommen zur Lasius-Demo-Instanz. Verwende \"demo1@lasius.ch\" und das Passwort \"demo\", um dich anzumelden und dich umzusehen. Die Demo-Instanz wird einmal am Tag zurückgesetzt."
   },
   "errors": {
-    "helpNotAvailable": "Hilfeinhalt für diese Seite nicht verfügbar."
+    "helpNotAvailable": "Hilfeinhalt für diese Seite nicht verfügbar.",
+    "page": {
+      "details": "Fehlerdetails",
+      "generic": {
+        "message": "Ein Fehler ist aufgetreten.",
+        "title": "Etwas ist schiefgelaufen"
+      },
+      "goHome": "Zur Startseite",
+      "notFound": {
+        "message": "Die gesuchte Seite gibt es nicht.",
+        "title": "Seite nicht gefunden"
+      },
+      "tryAgain": "Erneut versuchen",
+      "unauthorized": {
+        "message": "Melde dich an, um diese Seite zu sehen.",
+        "title": "Nicht autorisiert"
+      },
+      "unexpected": {
+        "message": "Etwas ist schiefgelaufen. Versuche es erneut oder kehre zur Startseite zurück.",
+        "title": "Unerwarteter Fehler"
+      }
+    }
   },
   "export": {
     "actions": {

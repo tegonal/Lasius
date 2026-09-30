@@ -98,23 +98,27 @@ export default function App({ loaderData: _loaderData }: Route.ComponentProps) {
   return <Outlet />
 }
 
-const ErrorActions = ({ showTryAgain = true }: { showTryAgain?: boolean }) => (
-  <div className="card-actions mt-6 justify-center gap-3">
-    {showTryAgain && (
-      <button
-        className="btn btn-outline btn-sm"
-        onClick={() => globalThis.window?.location.reload()}
-        type="button">
-        Try again
-      </button>
-    )}
-    <a className="btn btn-primary btn-sm" href={href('/')}>
-      Go home
-    </a>
-  </div>
-)
+const ErrorActions = ({ showTryAgain = true }: { showTryAgain?: boolean }) => {
+  const { t } = useTranslation('common')
+  return (
+    <div className="card-actions mt-6 justify-center gap-3">
+      {showTryAgain && (
+        <button
+          className="btn btn-outline btn-sm"
+          onClick={() => globalThis.window?.location.reload()}
+          type="button">
+          {t('errors.page.tryAgain', 'Try again')}
+        </button>
+      )}
+      <a className="btn btn-primary btn-sm" href={href('/')}>
+        {t('errors.page.goHome', 'Go home')}
+      </a>
+    </div>
+  )
+}
 
 export const ErrorBoundary = () => {
+  const { t } = useTranslation('common')
   const error = useRouteError()
 
   // Log errors client-side only
@@ -129,13 +133,15 @@ export const ErrorBoundary = () => {
           <div className="card bg-base-200 w-full max-w-md shadow-lg">
             <div className="card-body items-center text-center">
               <div className="text-base-content/30 text-6xl font-black">401</div>
-              <h1 className="card-title mt-2 text-xl">Unauthorized</h1>
+              <h1 className="card-title mt-2 text-xl">
+                {t('errors.page.unauthorized.title', 'Unauthorized')}
+              </h1>
               <p className="text-base-content/60 text-sm">
-                You need to sign in to access this page.
+                {t('errors.page.unauthorized.message', 'You need to sign in to access this page.')}
               </p>
               <div className="card-actions mt-6">
                 <a className="btn btn-primary btn-sm" href={href('/login')}>
-                  Sign in
+                  {t('auth.signIn', 'Sign in')}
                 </a>
               </div>
             </div>
@@ -150,9 +156,11 @@ export const ErrorBoundary = () => {
           <div className="card bg-base-200 w-full max-w-md shadow-lg">
             <div className="card-body items-center text-center">
               <div className="text-base-content/30 text-6xl font-black">404</div>
-              <h1 className="card-title mt-2 text-xl">Page not found</h1>
+              <h1 className="card-title mt-2 text-xl">
+                {t('errors.page.notFound.title', 'Page not found')}
+              </h1>
               <p className="text-base-content/60 text-sm">
-                The page you are looking for does not exist.
+                {t('errors.page.notFound.message', 'The page you are looking for does not exist.')}
               </p>
               <ErrorActions showTryAgain={false} />
             </div>
@@ -167,10 +175,10 @@ export const ErrorBoundary = () => {
           <div className="card-body items-center text-center">
             <div className="text-base-content/30 text-6xl font-black">{error.status}</div>
             <h1 className="card-title mt-2 text-xl">
-              {error.statusText || 'Something went wrong'}
+              {error.statusText || t('errors.page.generic.title', 'Something went wrong')}
             </h1>
             <p className="text-base-content/60 text-sm">
-              {error.data?.toString() ?? 'An error occurred.'}
+              {error.data?.toString() ?? t('errors.page.generic.message', 'An error occurred.')}
             </p>
             <ErrorActions />
           </div>
@@ -184,13 +192,20 @@ export const ErrorBoundary = () => {
       <div className="card bg-base-200 w-full max-w-lg shadow-lg">
         <div className="card-body items-center text-center">
           <div className="text-error/30 text-6xl font-black">!</div>
-          <h1 className="card-title mt-2 text-xl">Unexpected error</h1>
+          <h1 className="card-title mt-2 text-xl">
+            {t('errors.page.unexpected.title', 'Unexpected error')}
+          </h1>
           <p className="text-base-content/60 text-sm">
-            Something went wrong. Please try again or return to the home page.
+            {t(
+              'errors.page.unexpected.message',
+              'Something went wrong. Please try again or return to the home page.',
+            )}
           </p>
           {process.env.NODE_ENV === 'development' && error instanceof Error && (
             <details className="collapse-arrow bg-base-300 collapse mt-4 w-full text-left">
-              <summary className="collapse-title text-sm font-medium">Error details</summary>
+              <summary className="collapse-title text-sm font-medium">
+                {t('errors.page.details', 'Error details')}
+              </summary>
               <div className="collapse-content">
                 <p className="text-error font-mono text-sm">{error.message}</p>
                 {error.stack && (

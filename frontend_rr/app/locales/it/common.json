@@ -121,7 +121,28 @@
     "welcome": "Benvenuto nell'istanza demo di Lasius. Usa \"demo1@lasius.ch\" e password \"demo\" per accedere e dare un'occhiata. L'istanza demo viene ripristinata una volta al giorno."
   },
   "errors": {
-    "helpNotAvailable": "Contenuto di aiuto non disponibile per questa pagina."
+    "helpNotAvailable": "Contenuto di aiuto non disponibile per questa pagina.",
+    "page": {
+      "details": "Dettagli dell'errore",
+      "generic": {
+        "message": "Si è verificato un errore.",
+        "title": "Qualcosa è andato storto"
+      },
+      "goHome": "Vai alla home",
+      "notFound": {
+        "message": "La pagina che cerchi non esiste.",
+        "title": "Pagina non trovata"
+      },
+      "tryAgain": "Riprova",
+      "unauthorized": {
+        "message": "Accedi per visualizzare questa pagina.",
+        "title": "Non autorizzato"
+      },
+      "unexpected": {
+        "message": "Qualcosa è andato storto. Riprova o torna alla home.",
+        "title": "Errore imprevisto"
+      }
+    }
   },
   "export": {
     "actions": {

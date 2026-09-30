@@ -121,7 +121,28 @@
     "welcome": "Bienvenue sur l'instance de démonstration de Lasius. Utilise \"demo1@lasius.ch\" avec le mot de passe \"demo\" pour te connecter et explorer l'application. L'instance de démonstration est réinitialisée une fois par jour."
   },
   "errors": {
-    "helpNotAvailable": "Le contenu d'aide n'est pas disponible pour cette page."
+    "helpNotAvailable": "Le contenu d'aide n'est pas disponible pour cette page.",
+    "page": {
+      "details": "Détails de l'erreur",
+      "generic": {
+        "message": "Une erreur est survenue.",
+        "title": "Un problème est survenu"
+      },
+      "goHome": "Retour à l'accueil",
+      "notFound": {
+        "message": "La page que tu cherches n'existe pas.",
+        "title": "Page introuvable"
+      },
+      "tryAgain": "Réessayer",
+      "unauthorized": {
+        "message": "Connecte-toi pour accéder à cette page.",
+        "title": "Non autorisé"
+      },
+      "unexpected": {
+        "message": "Un problème est survenu. Réessaie ou retourne à l'accueil.",
+        "title": "Erreur inattendue"
+      }
+    }
   },
   "export": {
     "actions": {
