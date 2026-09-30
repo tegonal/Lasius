@@ -36,7 +36,7 @@ export function internalLoginUrl(parameters?: InternalAuthParameters): string {
 
 /** Build `/internal-oauth/register` URL with invitation context. */
 export function internalRegisterUrl(
-  parameters?: Pick<InternalAuthParameters, 'invitation_id' | 'returnTo'>,
+  parameters?: Pick<InternalAuthParameters, 'email' | 'invitation_id' | 'returnTo'>,
 ): string {
   return `${href('/internal-oauth/register')}${buildQuery({ ...parameters })}`
 }

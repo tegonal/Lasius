@@ -30,16 +30,17 @@ import { type Route } from './+types/legacy.internal-oauth'
 /** Lasius 2.x served the internal sign-in pages under /internal_oauth/. */
 export function loader({ params, url }: Route.LoaderArgs) {
   const search = url.searchParams
+  const email = search.get('email') ?? undefined
   const invitationId = search.get('invitation_id') ?? undefined
   const returnTo = returnToFromCallbackUrl(search.get('callbackUrl'))
 
   if (params['*'] === 'register') {
-    return redirect(internalRegisterUrl({ invitation_id: invitationId, returnTo }), 301)
+    return redirect(internalRegisterUrl({ email, invitation_id: invitationId, returnTo }), 301)
   }
 
   return redirect(
     internalLoginUrl({
-      email: search.get('email') ?? undefined,
+      email,
       invitation_id: invitationId,
       registered: search.get('registered') === 'true',
       returnTo,

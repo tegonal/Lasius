@@ -127,6 +127,12 @@ describe('internalRegisterUrl', () => {
     expect(url).toContain('invitation_id=inv-123')
     expect(url).toContain('returnTo=%2Fjoin%2Finv-123')
   })
+
+  // A Lasius 2.x register link carries the invited e-mail address.
+  it('includes email', () => {
+    const url = internalRegisterUrl({ email: 'invited@example.com', invitation_id: 'inv-123' })
+    expect(url).toContain('email=invited%40example.com')
+  })
 })
 
 describe('providerLoginUrl', () => {
