@@ -125,12 +125,8 @@
       "label": "Sélection du format d'exportation"
     },
     "stats": {
-      "error": "Échec de l'exportation des statistiques. Veuillez réessayer.",
       "menuLabel": "Sélection du format d'exportation des statistiques",
       "openMenu": "Ouvrir le menu de format d'exportation des statistiques"
-    },
-    "status": {
-      "success": "Export réussi : {{filename}}"
     }
   },
   "filter": {
@@ -244,6 +240,16 @@
     "week": "Semaine",
     "year": "Année",
     "yesterday": "Hier"
+  },
+  "tos": {
+    "acceptMessage": "Accepte les conditions d'utilisation suivantes (version {{version}}) si tu souhaites continuer à utiliser Lasius :",
+    "actions": {
+      "accept": "Accepter les conditions d'utilisation",
+      "reject": "Refuser et se déconnecter"
+    },
+    "title": "Conditions d'utilisation (version {{version}})",
+    "fallbackNotice": "Les conditions d'utilisation ne sont pas disponibles dans ta langue. La version anglaise est affichée ci-dessous.",
+    "notAvailable": "Les conditions d'utilisation ne sont pas disponibles dans la langue actuelle. Choisis une langue prise en charge."
   },
   "ui": {
     "hidePasswords": "Masquer les mots de passe",

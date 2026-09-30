@@ -125,12 +125,8 @@
       "label": "Export format selection"
     },
     "stats": {
-      "error": "Failed to export statistics. Please try again.",
       "menuLabel": "Statistics export format selection",
       "openMenu": "Open statistics export format menu"
-    },
-    "status": {
-      "success": "Export successful: {{filename}}"
     }
   },
   "filter": {
@@ -244,6 +240,16 @@
     "week": "Week",
     "year": "Year",
     "yesterday": "Yesterday"
+  },
+  "tos": {
+    "acceptMessage": "Please accept the following Terms of Service (version {{version}}), if you want to continue using Lasius:",
+    "actions": {
+      "accept": "Accept Terms of Service",
+      "reject": "Reject and logout"
+    },
+    "fallbackNotice": "The Terms of Service are not available in your language. The English version is displayed below.",
+    "notAvailable": "The Terms of Service are not available in the current language. Please change to a supported language.",
+    "title": "Terms of Service (version {{version}})"
   },
   "ui": {
     "hidePasswords": "Hide passwords",

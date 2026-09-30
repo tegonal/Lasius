@@ -88,8 +88,15 @@ interface Resources {
     }
   }
   common: {
+    SessionTimeout: {
+      extend: 'Extend Session'
+      logout: 'Logout'
+      message: 'Your session will expire soon. Would you like to extend it?'
+      title: 'Session Expiring'
+    }
     actions: {
       add: 'Add'
+      adding: 'Adding...'
       back: 'Back'
       cancel: 'Cancel'
       clear: 'Clear'
@@ -213,12 +220,8 @@ interface Resources {
         label: 'Export format selection'
       }
       stats: {
-        error: 'Failed to export statistics. Please try again.'
         menuLabel: 'Statistics export format selection'
         openMenu: 'Open statistics export format menu'
-      }
-      status: {
-        success: 'Export successful: {{filename}}'
       }
     }
     filter: {
@@ -287,12 +290,6 @@ interface Resources {
       administrator: 'Administrator'
       member: 'Member'
     }
-    SessionTimeout: {
-      extend: 'Extend Session'
-      logout: 'Logout'
-      message: 'Your session will expire soon. Would you like to extend it?'
-      title: 'Session Expiring'
-    }
     settings: {
       app: {
         description: 'Customize your experience with language and theme preferences. These settings are stored locally in your browser.'
@@ -332,6 +329,16 @@ interface Resources {
       week: 'Week'
       year: 'Year'
       yesterday: 'Yesterday'
+    }
+    tos: {
+      acceptMessage: 'Please accept the following Terms of Service (version {{version}}), if you want to continue using Lasius:'
+      actions: {
+        accept: 'Accept Terms of Service'
+        reject: 'Reject and logout'
+      }
+      fallbackNotice: 'The Terms of Service are not available in your language. The English version is displayed below.'
+      notAvailable: 'The Terms of Service are not available in the current language. Please change to a supported language.'
+      title: 'Terms of Service (version {{version}})'
     }
     ui: {
       hidePasswords: 'Hide passwords'
@@ -448,6 +455,7 @@ interface Resources {
         delete: 'Delete configuration'
         deleteDisabled: 'Cannot delete: remove all project mappings first'
         edit: 'Edit configuration'
+        refreshAllTags: 'Refresh all tags'
         refreshTags: 'Refresh tags'
         update: 'Update'
         viewInfo: 'View configuration info'
@@ -540,13 +548,14 @@ interface Resources {
         healthStatus: 'Health Status'
         issueDetected: 'Issue detected'
         issuesSynced: 'Issues'
+        lasiusProject: 'Lasius Project'
         lastChecked: 'Last checked:'
         lastSuccessfulSync: 'Last Successful Sync'
         lastSync: 'Last Sync'
         name: 'Name'
         nextScheduledSync: 'Next Scheduled Sync'
         noConfig: 'No configuration selected.'
-        projectName: 'Project'
+        pendingFirstSync: 'Pending first sync'
         projectStats: 'Project Statistics'
         title: 'Configuration Info'
         totalIssuesSynced: 'Total Issues Synced'
@@ -556,12 +565,14 @@ interface Resources {
         updatedBy: 'Updated By'
       }
       jira: {
+        credentialsLabel: 'Jira Credentials'
         instructions: {
           content: '<0><0>Generate RSA key pair using OpenSSL: <2>openssl genrsa -out jira_privatekey.pem 1024</2></0><1>Extract public key: <2>openssl rsa -in jira_privatekey.pem -pubout -out jira_publickey.pem</2></1><2>In Jira: Click Settings (cog icon) → Applications → Application links</2><3>Enter any URL (e.g., <2>http://localhost</2>) and click "Create new link"</3><4>Ignore the "No response was received" warning and click "Continue"</4><5>Enter your Application Name and select "Create incoming link"</5><6>In the incoming authentication form, enter your Consumer Key, paste the public key content from <2>jira_publickey.pem</2></6><7>Complete the OAuth 1.0a authorization flow using your consumer key and private key to obtain the access token</7></0><1>Note: This uses OAuth 1.0a with RSA-SHA1 signing. Primarily for Jira Server/Data Center. For Jira Cloud, consider using API tokens or OAuth 2.0 for new integrations.</1>'
           title: 'How to create Jira credentials:'
         }
       }
       plane: {
+        credentialsLabel: 'Plane Credentials'
         instructions: {
           content: '<0><0>Log into your Plane account or self-hosted instance</0><1>Go to Profile Settings</1><2>Select "Personal Access Tokens" from the list of tabs</2><3>Click "Add personal access token"</3><4>Enter a token name and optional description</4><5>Click "Generate" or "Create"</5><6>Copy the generated token immediately and store it securely</6></0><1>Note: The token will only be shown once. The token is passed as the value of the <2>X-API-Key</2> header in API requests.</1><2>Workspace: You need to specify your workspace slug, which can be found in your Plane URL. For example, if your Plane URL is <2>https://app.plane.so/my-company</2>, then your workspace slug is <5>my-company</5>. This is required to access projects and issues in your workspace.</2>'
           title: 'How to create Plane credentials:'
@@ -612,7 +623,6 @@ interface Resources {
         }
         projects: {
           addMapping: 'Add mapping'
-          changeMapping: 'Change mapping'
           confirmRemoveMessage: 'Are you sure you want to remove this project mapping? Issues will stop syncing, but existing tags will remain.'
           confirmRemoveTitle: 'Remove Project Mapping'
           createMapping: 'Create Project Mapping'
@@ -668,6 +678,14 @@ interface Resources {
       accept: 'Accept invitation'
       reject: 'Reject invitation'
     }
+    addExistingMembers: {
+      addButton: 'Add'
+      description: 'Select organisation members to add to this project.'
+      empty: 'All organisation members are already in this project.'
+      title: 'Add existing members'
+    }
+    copiedToClipboard: 'Link copied to clipboard'
+    copyFailed: 'Failed to copy link'
     copyToClipboard: 'Copy to clipboard'
     createAccountMessage: 'You have been invited to create an account so that you can use Lasius to track your working hours.'
     description: {
@@ -680,6 +698,8 @@ interface Resources {
     }
     inviteOrganisationDescription: 'Enter the email address of the person you want to invite. An invitation link will be generated that you can send to them.'
     inviteProjectDescription: 'Enter the email address of the person you want to invite. An invitation link will be generated that you can send to them.'
+    memberAddFailed: 'Failed to add member'
+    memberAdded: 'Member added to project'
     messages: {
       invitedToOrganisation: 'You have been invited by {{inviter}} to join organisation {{organisation}}.'
       invitedToOrganisationNeedsAccount: 'You have been invited by {{inviter}} to join organisation {{organisation}}.'
@@ -760,9 +780,9 @@ interface Resources {
     navigation: {
       importantUI: 'Important UI Elements'
       mainNavigation: 'Main Navigation'
-      organisationDesc: 'Manage your current organization, create new organizations and view organization-wide data'
       orgSwitcher: 'Organization Switcher'
       orgSwitcherDesc: 'In the top-right corner, switch between your organizations'
+      organisationDesc: 'Manage your current organization, create new organizations and view organization-wide data'
       settingsDesc: 'Configure app settings, account, security and working hours'
       subtitle: 'Here are the main parts of Lasius you will use every day.'
       title: 'Getting Around Lasius'
@@ -852,16 +872,19 @@ interface Resources {
     memberDescription: "You are a member of this organisation and don't have the rights to add or remove members. Get in touch with an organisation administrator if you would like to invite someone."
     members: {
       actions: {
+        addFromOrganisation: 'Add from organisation'
+        addMember: 'Add member'
         invite: 'Invite someone'
+        inviteByEmail: 'Invite by email'
         manage: 'Manage members'
         remove: 'Remove member'
       }
+      confirmRemove: 'Are you sure you want to remove this member from the project?'
       confirmations: {
         removeConfirm: 'Are you sure you want to remove {{name}}?'
         removeTitle: 'Remove member'
         removeWarning: 'This member will be removed from the organisation and lose access to all projects.'
       }
-      confirmRemove: 'Are you sure you want to remove this member from the project?'
       description_one: 'This project has {{count}} member(s).'
       description_other: 'This project has {{count}} member(s).'
       empty: 'No members found'
@@ -874,8 +897,8 @@ interface Resources {
     organization: 'Organisation'
     organizationName: 'Organisation name'
     privateDescription: 'This organisation is only visible to you. You can use it to track private projects that you do not want others to have access to. If you want to invite people, invite them to an existing organisation or create a new one.'
-    selected: 'Selected'
     selectOrganisation: 'Select organisation'
+    selected: 'Selected'
     status: {
       label: 'Status'
     }
@@ -903,6 +926,7 @@ interface Resources {
     }
     empty: 'No projects found'
     errors: {
+      duplicateKey: 'A project with this name already exists in your organisation'
       projectNotFound: 'This project could not be found. The project ID is shown above.'
     }
     filter: {
@@ -985,8 +1009,8 @@ interface Resources {
     }
   }
   stats: {
-    '6months': '6 Months'
     '6monthWorkTrend': '6-Month Work Trend'
+    '6months': '6 Months'
     calendarYear: 'Calendar year'
     decimalHours: 'Decimal hours'
     expectedHours: 'Expected hours'

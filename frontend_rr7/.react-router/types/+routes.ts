@@ -42,6 +42,16 @@ type Pages = {
   "/oauth/callback": {
     params: {};
   };
+  "/internal_oauth/*": {
+    params: {
+      "*": string;
+    };
+  };
+  "/api/auth/*": {
+    params: {
+      "*": string;
+    };
+  };
   "/api/session-status": {
     params: {};
   };
@@ -158,7 +168,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/login" | "/logout" | "/join/:invitationId" | "/auth/error" | "/internal-oauth/login" | "/internal-oauth/register" | "/oauth/:provider/login" | "/oauth/callback" | "/api/session-status" | "/api/locales/:lang/:ns" | "/api/help/:locale/:slug" | "/api/theme" | "/api/calendar-bookings" | "/api/org-switch" | "/api/proxy" | "/api/ws-ticket" | "/api/locale" | "/api/health" | "/api/export" | "/user/home" | "/user/dashboard" | "/user/dashboard/day" | "/user/dashboard/week" | "/user/dashboard/month" | "/user/dashboard/6months" | "/user/dashboard/year" | "/user/lists" | "/user/stats" | "/user/stats/projects" | "/user/stats/tags" | "/user/projects" | "/organisation/current" | "/organisation/integrations" | "/organisation/lists" | "/organisation/projects" | "/organisation/stats" | "/organisation/stats/projects" | "/organisation/stats/users" | "/organisation/stats/tags" | "/settings/account" | "/settings/account-security" | "/settings/app" | "/settings/working-hours";
+    page: "/" | "/login" | "/logout" | "/join/:invitationId" | "/auth/error" | "/internal-oauth/login" | "/internal-oauth/register" | "/oauth/:provider/login" | "/oauth/callback" | "/internal_oauth/*" | "/api/auth/*" | "/api/session-status" | "/api/locales/:lang/:ns" | "/api/help/:locale/:slug" | "/api/theme" | "/api/calendar-bookings" | "/api/org-switch" | "/api/proxy" | "/api/ws-ticket" | "/api/locale" | "/api/health" | "/api/export" | "/user/home" | "/user/dashboard" | "/user/dashboard/day" | "/user/dashboard/week" | "/user/dashboard/month" | "/user/dashboard/6months" | "/user/dashboard/year" | "/user/lists" | "/user/stats" | "/user/stats/projects" | "/user/stats/tags" | "/user/projects" | "/organisation/current" | "/organisation/integrations" | "/organisation/lists" | "/organisation/projects" | "/organisation/stats" | "/organisation/stats/projects" | "/organisation/stats/users" | "/organisation/stats/tags" | "/settings/account" | "/settings/account-security" | "/settings/app" | "/settings/working-hours";
   };
   "routes/login.tsx": {
     id: "routes/login";
@@ -191,6 +201,14 @@ type RouteFiles = {
   "routes/oauth.callback.tsx": {
     id: "routes/oauth.callback";
     page: "/oauth/callback";
+  };
+  "routes/legacy.internal-oauth.ts": {
+    id: "routes/legacy.internal-oauth";
+    page: "/internal_oauth/*";
+  };
+  "routes/legacy.api-auth.ts": {
+    id: "routes/legacy.api-auth";
+    page: "/api/auth/*";
   };
   "routes/api.session-status.tsx": {
     id: "routes/api.session-status";
@@ -380,6 +398,8 @@ type RouteModules = {
   "routes/internal-oauth.register": typeof import("./app/routes/internal-oauth.register.tsx");
   "routes/oauth.$provider.login": typeof import("./app/routes/oauth.$provider.login.tsx");
   "routes/oauth.callback": typeof import("./app/routes/oauth.callback.tsx");
+  "routes/legacy.internal-oauth": typeof import("./app/routes/legacy.internal-oauth.ts");
+  "routes/legacy.api-auth": typeof import("./app/routes/legacy.api-auth.ts");
   "routes/api.session-status": typeof import("./app/routes/api.session-status.tsx");
   "routes/api.locales.$lang.$ns": typeof import("./app/routes/api.locales.$lang.$ns.ts");
   "routes/api.help.$locale.$slug": typeof import("./app/routes/api.help.$locale.$slug.ts");

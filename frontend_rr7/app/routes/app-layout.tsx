@@ -35,7 +35,11 @@ import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { DevelopmentInfoBadge } from '~/features/system/components/development-info-badge'
 import { HealthMonitor } from '~/features/system/components/health-monitor'
 import { WebSocketEventHandler } from '~/features/system/websocket/websocket-event-handler'
+import { TermsOfServiceDialog } from '~/features/terms-of-service/components/terms-of-service-dialog'
+import { loadTermsOfService } from '~/features/terms-of-service/terms-of-service.server'
+import { DEFAULT_LOCALE, isLocale } from '~/i18n-config'
 import { getDeduplicatedUserProfile } from '~/lib/organisation-helpers.server'
+import { getLocale } from '~/middleware/i18next'
 import { getUserBookingCurrent } from '~/services/api/lasius/user-bookings/user-bookings'
 import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
 
@@ -57,16 +61,22 @@ export const shouldRevalidate = ({
   return defaultShouldRevalidate
 }
 
-export const loader = async ({ request, url }: Route.LoaderArgs) => {
+export const loader = async ({ context, request, url }: Route.LoaderArgs) => {
   const auth = await requireUser(request, url)
   const headers = authHeaders(auth.session)
   const [profile, currentBookingResponse] = await Promise.all([
     getDeduplicatedUserProfile({ headers }),
     getUserBookingCurrent({ headers }),
   ])
+  const locale = getLocale(context)
+  const termsOfService = await loadTermsOfService({
+    acceptedVersion: profile.data.acceptedTOS?.version,
+    locale: isLocale(locale) ? locale : DEFAULT_LOCALE,
+  })
   return data(
     {
       currentBooking: currentBookingResponse.data,
+      termsOfService,
       tokenIssuer: auth.session.tokenIssuer,
       user: profile.data,
       websocketUrl: process.env.LASIUS_API_WEBSOCKET_URL || '',
@@ -145,6 +155,7 @@ export default function AppLayout({ loaderData }: Route.ComponentProps) {
       </div>
 
       <MobileFloatingActionButton />
+      <TermsOfServiceDialog termsOfService={loaderData.termsOfService} />
       <DevelopmentInfoBadge />
       <TokenWatcher />
       <WebSocketEventHandler />
