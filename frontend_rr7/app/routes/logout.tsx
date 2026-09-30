@@ -19,7 +19,7 @@
 
 import { logger } from '~/lib/logger'
 import { getProvider } from '~/services/auth/providers'
-import { destroyUserSession, getSessionTokens } from '~/services/auth/session.server'
+import { destroyUserSession, forgetRefresh, getSessionTokens } from '~/services/auth/session.server'
 
 import { type Route } from './+types/logout'
 
@@ -45,6 +45,7 @@ async function performLogout(request: Request): Promise<Response> {
   const result = await getSessionTokens(request)
 
   if (result?.tokens) {
+    forgetRefresh(result.tokens.refreshToken)
     try {
       const provider = getProvider(result.tokens.tokenIssuer)
       await provider.revokeToken(result.tokens.refreshToken)

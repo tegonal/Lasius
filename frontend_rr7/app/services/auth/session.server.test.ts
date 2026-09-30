@@ -17,9 +17,9 @@
  *
  */
 
-import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { createUserSession, getSessionTokens } from './session.server'
+import { createUserSession, forgetRefresh, getSessionTokens } from './session.server'
 
 const { refreshToken } = vi.hoisted(() => ({ refreshToken: vi.fn() }))
 
@@ -87,6 +87,54 @@ describe('getSessionTokens refresh', () => {
   it('refreshes each refresh token on its own', async () => {
     await getSessionTokens(requestWith(await staleSessionCookie('rotating-2')))
     await getSessionTokens(requestWith(await staleSessionCookie('rotating-3')))
+
+    expect(refreshToken).toHaveBeenCalledTimes(2)
+  })
+})
+
+describe('getSessionTokens reuse window', () => {
+  const tokens = {
+    access_token: 'access',
+    expires_in: 300,
+    refresh_token: 'refresh-next',
+    token_type: 'Bearer',
+  }
+
+  beforeAll(() => {
+    vi.stubEnv('AUTH_SECRET', 'test-secret')
+  })
+
+  afterAll(() => {
+    vi.unstubAllEnvs()
+  })
+
+  beforeEach(() => {
+    // This provider accepts a reused refresh token, so each test counts the provider calls.
+    refreshToken.mockReset()
+    refreshToken.mockResolvedValue(tokens)
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  it('refreshes again once the window of 60 seconds is over', async () => {
+    const cookie = await staleSessionCookie('window-1')
+    await getSessionTokens(requestWith(cookie))
+
+    const later = Date.now() + 61_000
+    vi.spyOn(Date, 'now').mockReturnValue(later)
+    await getSessionTokens(requestWith(cookie))
+
+    expect(refreshToken).toHaveBeenCalledTimes(2)
+  })
+
+  it('gives no reused tokens to an old cookie after logout', async () => {
+    const cookie = await staleSessionCookie('logout-1')
+    const session = await getSessionTokens(requestWith(cookie))
+
+    forgetRefresh(session?.tokens.refreshToken ?? '')
+    await getSessionTokens(requestWith(cookie))
 
     expect(refreshToken).toHaveBeenCalledTimes(2)
   })

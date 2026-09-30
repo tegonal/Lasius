@@ -105,6 +105,15 @@ export async function destroyUserSession(
   })
 }
 
+/** Remove the reuse entries of a session at logout, so that an old cookie of the session gets no tokens. */
+export function forgetRefresh(refreshToken: string) {
+  for (const [key, entry] of recentRefreshes) {
+    if (key === refreshToken || entry.result.refresh_token === refreshToken) {
+      recentRefreshes.delete(key)
+    }
+  }
+}
+
 /**
  * Read session tokens, auto-refreshing if expired (60s buffer).
  * Returns tokens + optional Set-Cookie header if refreshed, or null if no valid session.
