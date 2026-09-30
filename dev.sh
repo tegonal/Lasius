@@ -54,20 +54,23 @@ export TERM=xterm-256color
 
 # Create tmux session with backend in first pane
 tmux new-session -d -s "$SESSION" -c "$ROOT/backend" \
-  "set -a; [ -f $ROOT/frontend/.env.local ] && . $ROOT/frontend/.env.local; set +a; LASIUS_CLEAN_DATABASE_ON_STARTUP=false sbt run -Dconfig.resource=dev-large.conf; read -p 'Press Enter to close...'"
+  "set -a; [ -f $ROOT/frontend/.env.local ] && . $ROOT/frontend/.env.local; set +a; LASIUS_CLEAN_DATABASE_ON_STARTUP=false sbt run -Dconfig.resource=dev-large.conf; code=\$?; echo \"[dev.sh] backend exited with code \$code at \$(date)\"; read -p 'Press Enter to close...'"
 
 # Split: frontend RR7 (waits for backend via port check)
 tmux split-window -t "$SESSION" -v -c "$ROOT/frontend_rr" \
   "echo 'Waiting for backend on port 9000...' && \
    while ! nc -z localhost 9000 2>/dev/null; do sleep 2; done && \
    echo 'Backend ready. Starting frontend (RR7)...' && \
-   yarn dev; read -p 'Press Enter to close...'"
+   yarn dev; code=\$?; echo \"[dev.sh] frontend exited with code \$code at \$(date)\"; read -p 'Press Enter to close...'"
 
 # --- Logging ---
 
 mkdir -p "$ROOT/backend/.logs" "$ROOT/frontend_rr/.logs"
-: > "$ROOT/backend/.logs/dev-server.log"
-: > "$ROOT/frontend_rr/.logs/dev-server.log"
+# Keep the log of the previous run, so that the output of a crash survives a restart.
+for log in "$ROOT/backend/.logs/dev-server.log" "$ROOT/frontend_rr/.logs/dev-server.log"; do
+  [ -f "$log" ] && mv "$log" "${log%.log}.previous.log"
+  : > "$log"
+done
 tmux pipe-pane -t "$SESSION:0.0" -o "cat >> $ROOT/backend/.logs/dev-server.log"
 tmux pipe-pane -t "$SESSION:0.1" -o "cat >> $ROOT/frontend_rr/.logs/dev-server.log"
 
