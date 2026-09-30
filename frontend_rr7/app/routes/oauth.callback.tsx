@@ -20,6 +20,7 @@
 import { href, redirect } from 'react-router'
 
 import { logger } from '~/lib/logger'
+import { sanitizeReturnTo } from '~/services/auth/auth-helpers.server'
 import { loginUrl } from '~/services/auth/auth-urls'
 import {
   oauthStateCookie,
@@ -99,7 +100,8 @@ export async function loader({ request }: Route.LoaderArgs) {
         tokenIssuer: providerName,
         userId: profile.userId,
       },
-      returnTo || '/',
+      // The state cookie is not signed, so its value is client input.
+      sanitizeReturnTo(returnTo),
     )
 
     // Append the clear-state-cookie header to the session redirect response

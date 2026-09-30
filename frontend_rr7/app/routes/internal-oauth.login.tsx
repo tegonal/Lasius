@@ -107,7 +107,7 @@ export async function action({ request }: Route.ActionArgs) {
         tokenIssuer: 'internal',
         userId: result.profile.userId,
       },
-      returnTo,
+      sanitizeReturnTo(returnTo),
     )
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Login failed'
