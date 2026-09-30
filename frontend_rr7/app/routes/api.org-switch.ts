@@ -26,14 +26,16 @@ import {
   requireUser,
 } from '~/services/auth/auth-helpers.server'
 
+import { type Route } from './+types/api.org-switch'
+
 /**
  * POST /api/org-switch
  *
  * Resource route action that persists the selected organisation to user settings.
  * Called by the org switcher modal via useFetcher POST.
  */
-export async function action({ request }: { request: Request }) {
-  const auth = await requireUser(request)
+export async function action({ request, url }: Route.ActionArgs) {
+  const auth = await requireUser(request, url)
   const formData = await request.formData()
   const orgId = formData.get('organisationId')
   const orgKey = formData.get('organisationKey')

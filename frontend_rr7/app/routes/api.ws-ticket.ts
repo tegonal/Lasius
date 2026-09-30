@@ -35,8 +35,8 @@ import { type Route } from './+types/api.ws-ticket'
  * single-use WebSocket authentication ticket. The real access token never
  * reaches the browser — only the ticket does.
  */
-export async function loader({ request }: Route.LoaderArgs) {
-  const auth = await requireUser(request)
+export async function loader({ request, url }: Route.LoaderArgs) {
+  const auth = await requireUser(request, url)
   const headers = await authHeadersWithCsrf(auth.session)
   const response = await createWsTicket({ headers })
   const ticket = response.data && 'ticket' in response.data ? (response.data.ticket ?? null) : null

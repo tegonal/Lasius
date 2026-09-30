@@ -38,6 +38,8 @@ import {
 } from '~/services/api/lasius/user-bookings/user-bookings'
 import { authHeaders, requireUser } from '~/services/auth/auth-helpers.server'
 
+import { type Route } from './+types/api.export'
+
 const apiDateFormat = 'yyyy-MM-dd'
 
 const formatDateParameter = (dateString: string): string => {
@@ -74,11 +76,10 @@ const contentTypeMap: Record<string, string> = {
  *   scope: 'user' | 'organisation' (statistics only)
  *   totalBookings, totalHours, totalProjects, totalUsers (statistics summary)
  */
-export async function loader({ request }: { request: Request }) {
-  const auth = await requireUser(request)
+export async function loader({ request, url }: Route.LoaderArgs) {
+  const auth = await requireUser(request, url)
   const headers = authHeaders(auth.session)
 
-  const url = new URL(request.url)
   const type = url.searchParams.get('type')
   const formatParameter = url.searchParams.get('format') as ExportFormat | null
   const orgId = url.searchParams.get('orgId')

@@ -113,8 +113,8 @@ const computeStreamChartData = (bookings: ModelsBooking[], selectedDate: string)
 
 // ─── Loader ──────────────────────────────────────────────────────────────────
 
-export const loader = async ({ request }: Route.LoaderArgs) => {
-  const context = await loadDashboardContext(request)
+export const loader = async ({ request, url }: Route.LoaderArgs) => {
+  const context = await loadDashboardContext(request, url)
   const { headers, plannedHours, selectedDate, selectedOrgId } = context
 
   const monthTimespan = apiTimespanMonth(selectedDate)

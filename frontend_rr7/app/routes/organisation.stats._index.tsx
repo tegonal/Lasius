@@ -21,8 +21,6 @@ import { redirect } from 'react-router'
 
 import { type Route } from './+types/organisation.stats._index'
 
-export const loader = ({ request }: Route.LoaderArgs) => {
-  const url = new URL(request.url)
-  const search = url.search || ''
-  throw redirect(`/organisation/stats/projects${search}`)
+export const loader = ({ url }: Route.LoaderArgs) => {
+  throw redirect(`/organisation/stats/projects${url.search}`)
 }

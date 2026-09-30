@@ -55,7 +55,7 @@ export type ProxyEnvelope<T = unknown> =
  *
  * Returns a consistent envelope: { ok: true, data } or { ok: false, error, status }
  */
-export async function action({ request }: Route.ActionArgs) {
+export async function action({ request, url: routeUrl }: Route.ActionArgs) {
   const parsed = proxyPayloadSchema.safeParse(await request.json())
 
   if (!parsed.success) {
@@ -87,7 +87,7 @@ export async function action({ request }: Route.ActionArgs) {
   let authResult
 
   if (!skipAuth) {
-    authResult = await requireUser(request)
+    authResult = await requireUser(request, routeUrl)
     headers = await authHeadersWithCsrf(authResult.session)
   }
 

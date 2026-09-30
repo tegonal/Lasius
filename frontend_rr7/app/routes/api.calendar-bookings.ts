@@ -22,15 +22,16 @@ import { data } from 'react-router'
 import { getUserBookingListByOrganisation } from '~/services/api/lasius/user-bookings/user-bookings'
 import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
 
+import { type Route } from './+types/api.calendar-bookings'
+
 /**
  * GET /api/calendar-bookings?orgId=xxx&from=xxx&to=xxx
  *
  * Resource route loader that fetches booking data for a date range.
  * Called by CalendarDataProvider via useFetcher.load().
  */
-export async function loader({ request }: { request: Request }) {
-  const auth = await requireUser(request)
-  const url = new URL(request.url)
+export async function loader({ request, url }: Route.LoaderArgs) {
+  const auth = await requireUser(request, url)
   const orgId = url.searchParams.get('orgId')
   const from = url.searchParams.get('from')
   const to = url.searchParams.get('to')

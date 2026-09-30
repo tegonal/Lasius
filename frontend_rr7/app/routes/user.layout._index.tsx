@@ -45,8 +45,8 @@ import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth
 
 import { type Route } from './+types/user.layout._index'
 
-export const loader = async ({ request }: Route.LoaderArgs) => {
-  const auth = await requireUser(request)
+export const loader = async ({ request, url }: Route.LoaderArgs) => {
+  const auth = await requireUser(request, url)
   const headers = authHeaders(auth.session)
 
   // Get user profile for planned working hours + org selection
@@ -56,7 +56,6 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const selectedOrgId = getSelectedOrganisationId(user)
 
   // Read selected date from URL search param, fall back to today
-  const url = new URL(request.url)
   const dateParameter = url.searchParams.get('date')
   const selectedDate =
     dateParameter && !Number.isNaN(new Date(dateParameter).getTime())

@@ -17,15 +17,26 @@
  *
  */
 
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import {
   authHeaders,
   type AuthResult,
   mergeAuthHeaders,
+  requireUser,
   sanitizeReturnTo,
 } from './auth-helpers.server'
 import { type LasiusSessionData } from './types'
+
+/** Call requireUser without a session cookie and return the Location of the login redirect. */
+async function loginRedirectLocation(requestUrl: string, routeUrl: string) {
+  try {
+    await requireUser(new Request(requestUrl), new URL(routeUrl))
+  } catch (error) {
+    return error instanceof Response ? error.headers.get('Location') : null
+  }
+  return null
+}
 
 const mockSession: LasiusSessionData = {
   accessToken: 'test-access-token',
@@ -132,5 +143,29 @@ describe('mergeAuthHeaders', () => {
     })
     expect(merged.get('Content-Type')).toBe('application/json')
     expect(merged.get('Set-Cookie')).toBe('session=abc123')
+  })
+})
+
+describe('requireUser', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs()
+  })
+
+  it('takes returnTo from the route url, not from the raw data request url', async () => {
+    vi.stubEnv('AUTH_SECRET', 'test-secret')
+    const location = await loginRedirectLocation(
+      'http://localhost/user/home.data?_routes=routes%2Fuser.home',
+      'http://localhost/user/home',
+    )
+    expect(location).toBe('/login?returnTo=%2Fuser%2Fhome')
+  })
+
+  it('sends a resource route request to / after the sign-in', async () => {
+    vi.stubEnv('AUTH_SECRET', 'test-secret')
+    const location = await loginRedirectLocation(
+      'http://localhost/api/proxy.data',
+      'http://localhost/api/proxy',
+    )
+    expect(location).toBe('/login?returnTo=%2F')
   })
 })

@@ -42,8 +42,8 @@ clientLoader.hydrate = false
 
 // ─── Loader ──────────────────────────────────────────────────────────────────
 
-export const loader = async ({ request }: Route.LoaderArgs) => {
-  const context = await loadStatsContext(request)
+export const loader = async ({ request, url }: Route.LoaderArgs) => {
+  const context = await loadStatsContext(request, url)
   const { from, headers, selectedOrgId, to } = context
 
   const granularity = getAdaptiveGranularity(from, to)

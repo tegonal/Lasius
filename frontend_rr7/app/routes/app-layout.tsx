@@ -57,8 +57,8 @@ export const shouldRevalidate = ({
   return defaultShouldRevalidate
 }
 
-export const loader = async ({ request }: Route.LoaderArgs) => {
-  const auth = await requireUser(request)
+export const loader = async ({ request, url }: Route.LoaderArgs) => {
+  const auth = await requireUser(request, url)
   const headers = authHeaders(auth.session)
   const [profile, currentBookingResponse] = await Promise.all([
     getDeduplicatedUserProfile({ headers }),

@@ -119,12 +119,14 @@ export function mergeAuthHeaders(authResult: AuthResult, responseHeaders?: Heade
  *
  * Returns both the session and any Set-Cookie headers needed to persist a refreshed token.
  * Always propagate `result.headers` via `mergeAuthHeaders()` in your loader response.
+ *
+ * Pass the `url` argument of the loader or action. React Router passes the raw request, so
+ * `request.url` of a data request ends in `.data`. The `url` argument has no such suffix.
  */
-export async function requireUser(request: Request): Promise<AuthResult> {
+export async function requireUser(request: Request, url: URL): Promise<AuthResult> {
   const result = await getSessionTokens(request)
 
   if (!result) {
-    const url = new URL(request.url)
     const pathname = url.pathname
 
     // Resource routes (fetcher-only endpoints) should not set returnTo —

@@ -37,8 +37,8 @@ import { type Route } from './+types/organisation.stats'
 
 // ─── Loader ──────────────────────────────────────────────────────────────────
 
-export const loader = async ({ request }: Route.LoaderArgs) => {
-  const context = await loadOrgStatsContext(request)
+export const loader = async ({ request, url }: Route.LoaderArgs) => {
+  const context = await loadOrgStatsContext(request, url)
   const { from, headers, selectedOrgId, to } = context
 
   // Compute API params

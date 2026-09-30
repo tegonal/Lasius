@@ -31,8 +31,8 @@ import { type ProjectWithActivity } from '~/types/common'
 
 import { type Route } from './+types/organisation.projects._index'
 
-export const loader = async ({ request }: Route.LoaderArgs) => {
-  const auth = await requireUser(request)
+export const loader = async ({ request, url }: Route.LoaderArgs) => {
+  const auth = await requireUser(request, url)
   const headers = authHeaders(auth.session)
 
   const profile = await getDeduplicatedUserProfile({ headers })

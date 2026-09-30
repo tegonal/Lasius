@@ -29,8 +29,8 @@ import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth
  * Shared context for user stats routes.
  * Handles auth, profile, org selection, and date range parsing.
  */
-export const loadStatsContext = async (request: Request) => {
-  const auth = await requireUser(request)
+export const loadStatsContext = async (request: Request, url: URL) => {
+  const auth = await requireUser(request, url)
   const headers = authHeaders(auth.session)
 
   const profile = await getDeduplicatedUserProfile({ headers })
@@ -41,7 +41,6 @@ export const loadStatsContext = async (request: Request) => {
   const selectedOrgId = getSelectedOrganisationId(user)
 
   // Read date range from URL search params or compute defaults
-  const url = new URL(request.url)
   let from = url.searchParams.get('from')
   let to = url.searchParams.get('to')
 
@@ -58,8 +57,8 @@ export const loadStatsContext = async (request: Request) => {
  * Shared context for organisation stats routes.
  * Same as loadStatsContext but adds admin role check.
  */
-export const loadOrgStatsContext = async (request: Request) => {
-  const context = await loadStatsContext(request)
+export const loadOrgStatsContext = async (request: Request, url: URL) => {
+  const context = await loadStatsContext(request, url)
 
   const selectedOrg = context.organisations.find(
     (o) => o.organisationReference.id === context.selectedOrgId,

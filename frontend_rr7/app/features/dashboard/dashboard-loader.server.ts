@@ -31,8 +31,8 @@ import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth
  * Shared context extracted from all dashboard period loaders.
  * Handles auth, profile, org selection, planned hours, and date parsing.
  */
-export const loadDashboardContext = async (request: Request) => {
-  const auth = await requireUser(request)
+export const loadDashboardContext = async (request: Request, url: URL) => {
+  const auth = await requireUser(request, url)
   const headers = authHeaders(auth.session)
 
   const profile = await getDeduplicatedUserProfile({ headers })
@@ -49,7 +49,6 @@ export const loadDashboardContext = async (request: Request) => {
     : null
 
   // Read selected date from URL search param, fall back to today
-  const url = new URL(request.url)
   const dateParameter = url.searchParams.get('date')
   const selectedDate =
     dateParameter && !Number.isNaN(new Date(dateParameter).getTime())
@@ -62,7 +61,6 @@ export const loadDashboardContext = async (request: Request) => {
     plannedHours,
     selectedDate,
     selectedOrgId,
-    url,
   }
 }
 

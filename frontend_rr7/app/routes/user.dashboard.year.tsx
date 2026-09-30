@@ -53,9 +53,9 @@ clientLoader.hydrate = false
 
 // ─── Loader ──────────────────────────────────────────────────────────────────
 
-export const loader = async ({ request }: Route.LoaderArgs) => {
-  const context = await loadDashboardContext(request)
-  const { headers, plannedHours, selectedDate, selectedOrgId, url } = context
+export const loader = async ({ request, url }: Route.LoaderArgs) => {
+  const context = await loadDashboardContext(request, url)
+  const { headers, plannedHours, selectedDate, selectedOrgId } = context
 
   const yearMode = url.searchParams.get('year') || 'rolling'
   const isCalendarYear = yearMode === 'calendar'

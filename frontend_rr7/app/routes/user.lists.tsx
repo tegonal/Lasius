@@ -32,8 +32,8 @@ import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth
 
 import { type Route } from './+types/user.lists'
 
-export const loader = async ({ request }: Route.LoaderArgs) => {
-  const auth = await requireUser(request)
+export const loader = async ({ request, url }: Route.LoaderArgs) => {
+  const auth = await requireUser(request, url)
   const headers = authHeaders(auth.session)
 
   const profile = await getDeduplicatedUserProfile({ headers })
@@ -41,7 +41,6 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const selectedOrgId = getSelectedOrganisationId(user)
 
   // Read date range from search params: from/to (set by filter), or default
-  const url = new URL(request.url)
   const fromParameter = url.searchParams.get('from')
   const toParameter = url.searchParams.get('to')
 

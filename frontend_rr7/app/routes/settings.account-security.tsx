@@ -28,8 +28,8 @@ import { mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.serv
 
 import { type Route } from './+types/settings.account-security'
 
-export const loader = async ({ request }: Route.LoaderArgs) => {
-  const auth = await requireUser(request)
+export const loader = async ({ request, url }: Route.LoaderArgs) => {
+  const auth = await requireUser(request, url)
   const isDemoMode = getServerEnvironment('LASIUS_DEMO_MODE') === 'true'
 
   return data({ demoMode: isDemoMode }, { headers: mergeAuthHeaders(auth) })

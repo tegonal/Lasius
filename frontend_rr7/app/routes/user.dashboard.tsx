@@ -54,8 +54,8 @@ export const shouldRevalidate = ({
 
 const WEEKS_TO_ANALYZE = 12
 
-export const loader = async ({ request }: Route.LoaderArgs) => {
-  const context = await loadDashboardContext(request)
+export const loader = async ({ request, url }: Route.LoaderArgs) => {
+  const context = await loadDashboardContext(request, url)
   const { headers, plannedHours, selectedDate, selectedOrgId } = context
   const weeklyPlannedHours = getWeeklyPlannedHours(plannedHours)
 
