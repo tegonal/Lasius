@@ -35,6 +35,7 @@
       "refreshTags": "Actualizar etiquetas",
       "update": "Actualizar",
       "viewInfo": "Ver información de configuración",
+      "viewIntegrations": "View Integrations",
       "viewMappings": "Ver correspondencias de proyecto"
     },
     "checkInterval": "Intervalo de verificación",
@@ -157,6 +158,10 @@
     },
     "projectMappings": {
       "title": "Asignaciones de proyectos {{platform}}"
+    },
+    "status": {
+      "connectivityDegraded": "Issue importer connectivity degraded: {{configName}}",
+      "connectivityFailed": "Issue importer connectivity failed: {{configName}}"
     },
     "success": {
       "configCreated": "Integración creada con éxito",

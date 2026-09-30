@@ -35,6 +35,7 @@
       "refreshTags": "Refresh tags",
       "update": "Update",
       "viewInfo": "View configuration info",
+      "viewIntegrations": "View Integrations",
       "viewMappings": "View project mappings"
     },
     "checkInterval": "Check Interval",
@@ -156,6 +157,10 @@
     },
     "projectMappings": {
       "title": "{{platform}} Project Mappings"
+    },
+    "status": {
+      "connectivityDegraded": "Issue importer connectivity degraded: {{configName}}",
+      "connectivityFailed": "Issue importer connectivity failed: {{configName}}"
     },
     "success": {
       "configCreated": "Integration created successfully",

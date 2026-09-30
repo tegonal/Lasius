@@ -81,9 +81,24 @@
     "registrationSuccess": "Merci de t'être inscrit ! Tu peux maintenant te connecter avec ton adresse e-mail et ton mot de passe. Bienvenue sur Lasius !",
     "signIn": "Se connecter",
     "signInTitle": "Connecte-toi à ton compte",
-    "signInToLasius": "Se connecter à Lasius"
+    "signInToLasius": "Se connecter à Lasius",
+    "status": {
+      "authenticationFailed": "Authentication failed. Please log in again."
+    }
   },
   "back": "Retour",
+  "bookings": {
+    "actions": {
+      "addedToFavorites": "Booking added to favorites"
+    },
+    "status": {
+      "added": "Booking added",
+      "historyCleared": "Booking history cleared",
+      "removed": "Booking removed",
+      "started": "Booking started",
+      "updated": "Booking updated"
+    }
+  },
   "calendar": {
     "navigation": {
       "nextMonth": "Mois suivant",
@@ -127,6 +142,11 @@
     "stats": {
       "menuLabel": "Sélection du format d'exportation des statistiques",
       "openMenu": "Ouvrir le menu de format d'exportation des statistiques"
+    }
+  },
+  "favorites": {
+    "status": {
+      "removed": "Favorite removed"
     }
   },
   "filter": {
@@ -247,9 +267,9 @@
       "accept": "Accepter les conditions d'utilisation",
       "reject": "Refuser et se déconnecter"
     },
-    "title": "Conditions d'utilisation (version {{version}})",
     "fallbackNotice": "Les conditions d'utilisation ne sont pas disponibles dans ta langue. La version anglaise est affichée ci-dessous.",
-    "notAvailable": "Les conditions d'utilisation ne sont pas disponibles dans la langue actuelle. Choisis une langue prise en charge."
+    "notAvailable": "Les conditions d'utilisation ne sont pas disponibles dans la langue actuelle. Choisis une langue prise en charge.",
+    "title": "Conditions d'utilisation (version {{version}})"
   },
   "ui": {
     "hidePasswords": "Masquer les mots de passe",

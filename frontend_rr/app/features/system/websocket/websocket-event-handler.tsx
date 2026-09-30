@@ -57,15 +57,13 @@ export const WebSocketEventHandler = () => {
   const { lastMessage } = useLasiusWebsocket()
   const revalidator = useRevalidator()
   const { addToast } = useToast()
-  const { t } = useTranslation('common')
-  const { t: tIntegrations } = useTranslation('integrations')
+  const { t: translate } = useTranslation('common')
   const lastMessageHashReference = useRef<null | string>(null)
 
   // Use refs for callbacks so the effect closure always has the latest
   const revalidatorReference = useRef(revalidator)
   const latestAddToastReference = useRef(addToast)
-  const tReference = useRef(t)
-  const tIntegrationsReference = useRef(tIntegrations)
+  const tReference = useRef(translate)
 
   useEffect(() => {
     revalidatorReference.current = revalidator
@@ -74,11 +72,8 @@ export const WebSocketEventHandler = () => {
     latestAddToastReference.current = addToast
   }, [addToast])
   useEffect(() => {
-    tReference.current = t
-  }, [t])
-  useEffect(() => {
-    tIntegrationsReference.current = tIntegrations
-  }, [tIntegrations])
+    tReference.current = translate
+  }, [translate])
 
   useEffect(() => {
     if (!lastMessage) return
@@ -93,15 +88,15 @@ export const WebSocketEventHandler = () => {
 
     const toast = latestAddToastReference.current
     const revalidate = () => void revalidatorReference.current.revalidate()
-    const tr = tReference.current
-    const trI = tIntegrationsReference.current
+    // i18next-cli extracts only calls named t(). Integration keys name their namespace.
+    const t = tReference.current
 
     if (isCurrentUserTimeBookingEvent(lastMessage)) {
       revalidate()
     } else if (isUserTimeBookingHistoryEntryAdded(lastMessage)) {
       revalidate()
       toast({
-        message: tr('bookings.status.added', {
+        message: t('bookings.status.added', {
           defaultValue: 'Booking added',
         }),
         type: 'SUCCESS',
@@ -109,7 +104,7 @@ export const WebSocketEventHandler = () => {
     } else if (isUserTimeBookingHistoryEntryChanged(lastMessage)) {
       revalidate()
       toast({
-        message: tr('bookings.status.updated', {
+        message: t('bookings.status.updated', {
           defaultValue: 'Booking updated',
         }),
         type: 'SUCCESS',
@@ -117,7 +112,7 @@ export const WebSocketEventHandler = () => {
     } else if (isUserTimeBookingHistoryEntryRemoved(lastMessage)) {
       revalidate()
       toast({
-        message: tr('bookings.status.removed', {
+        message: t('bookings.status.removed', {
           defaultValue: 'Booking removed',
         }),
         type: 'SUCCESS',
@@ -125,7 +120,7 @@ export const WebSocketEventHandler = () => {
     } else if (isFavoriteAdded(lastMessage)) {
       revalidate()
       toast({
-        message: tr('bookings.actions.addedToFavorites', {
+        message: t('bookings.actions.addedToFavorites', {
           defaultValue: 'Booking added to favorites',
         }),
         type: 'SUCCESS',
@@ -133,14 +128,14 @@ export const WebSocketEventHandler = () => {
     } else if (isFavoriteRemoved(lastMessage)) {
       revalidate()
       toast({
-        message: tr('favorites.status.removed', {
+        message: t('favorites.status.removed', {
           defaultValue: 'Favorite removed',
         }),
         type: 'SUCCESS',
       })
     } else if (isLatestTimeBooking(lastMessage)) {
       toast({
-        message: tr('bookings.status.started', {
+        message: t('bookings.status.started', {
           defaultValue: 'Booking started',
         }),
         type: 'SUCCESS',
@@ -151,11 +146,11 @@ export const WebSocketEventHandler = () => {
         toast({
           action: {
             href: ROUTES.ORGANISATION.INTEGRATIONS,
-            label: trI('issueImporters.actions.viewIntegrations', {
+            label: t('integrations:issueImporters.actions.viewIntegrations', {
               defaultValue: 'View Integrations',
             }),
           },
-          message: trI('issueImporters.status.connectivityDegraded', {
+          message: t('integrations:issueImporters.status.connectivityDegraded', {
             configName: lastMessage.configName,
             defaultValue: 'Issue importer connectivity degraded: {{configName}}',
           }),
@@ -167,11 +162,11 @@ export const WebSocketEventHandler = () => {
         toast({
           action: {
             href: ROUTES.ORGANISATION.INTEGRATIONS,
-            label: trI('issueImporters.actions.viewIntegrations', {
+            label: t('integrations:issueImporters.actions.viewIntegrations', {
               defaultValue: 'View Integrations',
             }),
           },
-          message: trI('issueImporters.status.connectivityFailed', {
+          message: t('integrations:issueImporters.status.connectivityFailed', {
             configName: lastMessage.configName,
             defaultValue: 'Issue importer connectivity failed: {{configName}}',
           }),
@@ -185,7 +180,7 @@ export const WebSocketEventHandler = () => {
     } else if (isUserTimeBookingHistoryEntryCleaned(lastMessage)) {
       revalidate()
       toast({
-        message: tr('bookings.status.historyCleared', {
+        message: t('bookings.status.historyCleared', {
           defaultValue: 'Booking history cleared',
         }),
         type: 'NOTIFICATION',
@@ -193,7 +188,7 @@ export const WebSocketEventHandler = () => {
     } else if (isAuthenticationFailed(lastMessage)) {
       logger.error('[AuthenticationFailed]', 'WebSocket authentication failed')
       toast({
-        message: tr('auth.status.authenticationFailed', {
+        message: t('auth.status.authenticationFailed', {
           defaultValue: 'Authentication failed. Please log in again.',
         }),
         ttl: 10_000,

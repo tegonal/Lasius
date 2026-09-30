@@ -35,6 +35,7 @@
       "refreshTags": "Tags aktualisieren",
       "update": "Aktualisieren",
       "viewInfo": "Konfigurationsinfo anzeigen",
+      "viewIntegrations": "View Integrations",
       "viewMappings": "Projekt-Zuordnungen anzeigen"
     },
     "checkInterval": "Prüfintervall",
@@ -157,6 +158,10 @@
     },
     "projectMappings": {
       "title": "{{platform}} Projekt-Zuordnungen"
+    },
+    "status": {
+      "connectivityDegraded": "Issue importer connectivity degraded: {{configName}}",
+      "connectivityFailed": "Issue importer connectivity failed: {{configName}}"
     },
     "success": {
       "configCreated": "Integration erfolgreich erstellt",

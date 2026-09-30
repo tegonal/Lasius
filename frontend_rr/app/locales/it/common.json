@@ -81,9 +81,24 @@
     "registrationSuccess": "Grazie per esserti registrato! Ora puoi accedere utilizzando il tuo indirizzo email e password. Benvenuto in Lasius!",
     "signIn": "Accedi",
     "signInTitle": "Accedi al tuo account",
-    "signInToLasius": "Accedi a Lasius"
+    "signInToLasius": "Accedi a Lasius",
+    "status": {
+      "authenticationFailed": "Authentication failed. Please log in again."
+    }
   },
   "back": "Indietro",
+  "bookings": {
+    "actions": {
+      "addedToFavorites": "Booking added to favorites"
+    },
+    "status": {
+      "added": "Booking added",
+      "historyCleared": "Booking history cleared",
+      "removed": "Booking removed",
+      "started": "Booking started",
+      "updated": "Booking updated"
+    }
+  },
   "calendar": {
     "navigation": {
       "nextMonth": "Mese successivo",
@@ -127,6 +142,11 @@
     "stats": {
       "menuLabel": "Selezione formato esportazione statistiche",
       "openMenu": "Apri menu formato esportazione statistiche"
+    }
+  },
+  "favorites": {
+    "status": {
+      "removed": "Favorite removed"
     }
   },
   "filter": {
@@ -247,9 +267,9 @@
       "accept": "Accetta Termini di servizio",
       "reject": "Rifiuta e disconnetti"
     },
-    "title": "Condizioni di servizio (versione {{version}})",
     "fallbackNotice": "I Termini di servizio non sono disponibili nella tua lingua. Di seguito è mostrata la versione inglese.",
-    "notAvailable": "I Termini di servizio non sono disponibili nella lingua attuale. Passa a una lingua supportata."
+    "notAvailable": "I Termini di servizio non sono disponibili nella lingua attuale. Passa a una lingua supportata.",
+    "title": "Condizioni di servizio (versione {{version}})"
   },
   "ui": {
     "hidePasswords": "Nascondi password",

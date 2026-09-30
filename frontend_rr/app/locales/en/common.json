@@ -81,9 +81,24 @@
     "registrationSuccess": "Thank you for registering. You can now sign in with your credentials.",
     "signIn": "Sign in",
     "signInTitle": "Sign in to your account",
-    "signInToLasius": "Sign in to Lasius"
+    "signInToLasius": "Sign in to Lasius",
+    "status": {
+      "authenticationFailed": "Authentication failed. Please log in again."
+    }
   },
   "back": "Back",
+  "bookings": {
+    "actions": {
+      "addedToFavorites": "Booking added to favorites"
+    },
+    "status": {
+      "added": "Booking added",
+      "historyCleared": "Booking history cleared",
+      "removed": "Booking removed",
+      "started": "Booking started",
+      "updated": "Booking updated"
+    }
+  },
   "calendar": {
     "navigation": {
       "nextMonth": "Next month",
@@ -127,6 +142,11 @@
     "stats": {
       "menuLabel": "Statistics export format selection",
       "openMenu": "Open statistics export format menu"
+    }
+  },
+  "favorites": {
+    "status": {
+      "removed": "Favorite removed"
     }
   },
   "filter": {

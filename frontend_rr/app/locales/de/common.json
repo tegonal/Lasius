@@ -81,9 +81,24 @@
     "registrationSuccess": "Danke für deine Registrierung. Du kannst dich jetzt mit deinen Zugangsdaten anmelden.",
     "signIn": "Anmelden",
     "signInTitle": "Bei deinem Konto anmelden",
-    "signInToLasius": "Bei Lasius anmelden"
+    "signInToLasius": "Bei Lasius anmelden",
+    "status": {
+      "authenticationFailed": "Authentication failed. Please log in again."
+    }
   },
   "back": "Zurück",
+  "bookings": {
+    "actions": {
+      "addedToFavorites": "Booking added to favorites"
+    },
+    "status": {
+      "added": "Booking added",
+      "historyCleared": "Booking history cleared",
+      "removed": "Booking removed",
+      "started": "Booking started",
+      "updated": "Booking updated"
+    }
+  },
   "calendar": {
     "navigation": {
       "nextMonth": "Nächster Monat",
@@ -127,6 +142,11 @@
     "stats": {
       "menuLabel": "Statistik-Exportformat-Auswahl",
       "openMenu": "Statistik-Exportformat-Menü öffnen"
+    }
+  },
+  "favorites": {
+    "status": {
+      "removed": "Favorite removed"
     }
   },
   "filter": {
@@ -247,9 +267,9 @@
       "accept": "Nutzungsbedingungen akzeptieren",
       "reject": "Ablehnen und abmelden"
     },
-    "title": "Nutzungsbedingungen (Version {{version}})",
     "fallbackNotice": "Die Nutzungsbedingungen sind in deiner Sprache nicht verfügbar. Unten wird die englische Version angezeigt.",
-    "notAvailable": "Die Nutzungsbedingungen sind in der aktuellen Sprache nicht verfügbar. Bitte wechsle zu einer unterstützten Sprache."
+    "notAvailable": "Die Nutzungsbedingungen sind in der aktuellen Sprache nicht verfügbar. Bitte wechsle zu einer unterstützten Sprache.",
+    "title": "Nutzungsbedingungen (Version {{version}})"
   },
   "ui": {
     "hidePasswords": "Passwörter ausblenden",
