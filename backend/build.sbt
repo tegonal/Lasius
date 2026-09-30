@@ -205,6 +205,36 @@ dockerAliases ++= {
 // Use multi-stage build for better security and smaller images
 dockerPermissionStrategy := DockerPermissionStrategy.MultiStage
 
+// These options form the low-resource profile for demo and test hosts (README § Low-resource profile).
+// The values come from measurements in a 512 MB container. The profile is off by default.
+val smallProfileJavaOptions = Seq(
+  "-XX:+UseSerialGC",
+  "-XX:MaxRAMPercentage=30",
+  "-XX:MaxMetaspaceSize=160m",
+  "-XX:ReservedCodeCacheSize=64m",
+  "-XX:ActiveProcessorCount=2",
+  "-XX:+ExitOnOutOfMemoryError",
+  "-Dpekko.actor.default-dispatcher.fork-join-executor.parallelism-min=2",
+  "-Dpekko.actor.internal-dispatcher.fork-join-executor.parallelism-min=2",
+  "-Dpekko-contrib-persistence-dispatcher.thread-pool-executor.core-pool-size-max=4",
+  "-Dpekko-contrib-persistence-query-dispatcher.thread-pool-executor.core-pool-size-max=4",
+  "-Dmongo-async-driver.pekko.actor.default-dispatcher.fork-join-executor.parallelism-min=2",
+  "-Dmongo-async-driver.pekko.actor.internal-dispatcher.fork-join-executor.parallelism-min=2"
+)
+
+// The ash start script adds JAVA_OPTS before these defines run. The profile options go in front
+// of java_opts, so JAVA_OPTS and command-line arguments can override each profile value.
+bashScriptExtraDefines +=
+  s"""case "$${LASIUS_RESOURCE_PROFILE:-default}" in
+     |  small)
+     |    echo "LASIUS_RESOURCE_PROFILE=small: the low-resource JVM options are active" 1>&2
+     |    java_opts="${smallProfileJavaOptions.mkString(" ")} $$java_opts"
+     |    ;;
+     |  default) ;;
+     |  *) echo "LASIUS_RESOURCE_PROFILE=$$LASIUS_RESOURCE_PROFILE is unknown, the default JVM options stay active" 1>&2 ;;
+     |esac
+     |""".stripMargin
+
 // Run as non-root user (security best practice)
 // Default user is "demiourgos728" with UID 1001 (provided by sbt-native-packager)
 

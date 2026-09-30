@@ -1,0 +1,100 @@
+/*
+ *
+ * Lasius - Open source time tracker for teams
+ * Copyright (c) Tegonal Genossenschaft (https://tegonal.com)
+ *
+ * This file is part of Lasius.
+ *
+ * Lasius is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, either version 3 of the License, or (at your option)
+ * any later version.
+ *
+ * Lasius is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Lasius. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package controllers
+
+import com.typesafe.config.Config
+import core.{SystemServices, TestDBSupport}
+import models.{
+  OrganisationAdministrator,
+  OrganisationRole,
+  ProjectAdministrator,
+  ProjectRole
+}
+import org.specs2.mock.Mockito
+import play.api.mvc.ControllerComponents
+import play.api.test.Helpers
+import play.modules.reactivemongo.ReactiveMongoApi
+import repositories.{BookingHistoryMongoRepository, ProjectMongoRepository}
+import util.{Awaitable, MockAwaitable}
+
+import scala.concurrent.ExecutionContext
+
+class TimeBookingHistoryControllerMock(
+    conf: Config,
+    controllerComponents: ControllerComponents,
+    systemServices: SystemServices,
+    val projectRepository: ProjectMongoRepository,
+    bookingHistoryMongoRepository: BookingHistoryMongoRepository,
+    authConfig: AuthConfig,
+    reactiveMongoApi: ReactiveMongoApi,
+    override val organisationRole: OrganisationRole,
+    override val projectRole: ProjectRole)(implicit ec: ExecutionContext)
+    extends TimeBookingHistoryController(
+      conf = conf,
+      controllerComponents = controllerComponents,
+      systemServices = systemServices,
+      authConfig = authConfig,
+      reactiveMongoApi = reactiveMongoApi,
+      bookingHistoryRepository = bookingHistoryMongoRepository,
+      projectRepository = projectRepository
+    )
+    with SecurityControllerMock
+    with TestDBSupport
+
+object TimeBookingHistoryControllerMock
+    extends MockAwaitable
+    with Mockito
+    with Awaitable {
+  def apply(conf: Config,
+            systemServices: SystemServices,
+            authConfig: AuthConfig,
+            reactiveMongoApi: ReactiveMongoApi,
+            organisationRole: OrganisationRole = OrganisationAdministrator,
+            projectRole: ProjectRole = ProjectAdministrator)(implicit
+      ec: ExecutionContext): TimeBookingHistoryControllerMock = {
+    val projectMongoRepository        = new ProjectMongoRepository()
+    val bookingHistoryMongoRepository = new BookingHistoryMongoRepository()
+
+    val controller = new TimeBookingHistoryControllerMock(
+      conf = conf,
+      controllerComponents = Helpers.stubControllerComponents(),
+      systemServices = systemServices,
+      projectRepository = projectMongoRepository,
+      bookingHistoryMongoRepository = bookingHistoryMongoRepository,
+      authConfig = authConfig,
+      reactiveMongoApi = reactiveMongoApi,
+      organisationRole = organisationRole,
+      projectRole = projectRole
+    )
+
+    controller
+      .withDBSession() { implicit dbSession =>
+        for {
+          _ <- projectMongoRepository.dropAll()
+          _ <- projectMongoRepository.upsert(controller.project)
+        } yield ()
+      }
+      .awaitResult()
+
+    controller
+  }
+}

@@ -108,7 +108,8 @@ Specific to `backend` container:
 | LASIUS_INITIAL_USER_EMAIL                  | Username of initial admin user to login. Only used when `LASIUS_INITIALIZE_DATA` is set to `'true'` and no users where found in the database.                  | admin@lasius.ch          |
 | LASIUS_INITIAL_USER_KEY                    | Initial internal user key for to the intial user account. Only used when `LASIUS_INITIALIZE_DATA` is set to `'true'` and no users where found in the database. | admin                    |
 | LASIUS_INITIAL_USER_PASSWORD               | Password of initial admin user to login. Only used when `LASIUS_INITIALIZE_DATA` is set to `true` and no users where found in the database.                    | admin                    |
-| LASIUS_START_PARAMS                        | Provide special start arguments to the play server. Might be used to inject a different `application.conf` to the server.                                      | see `docker-compose.yml` |
+| LASIUS_RESOURCE_PROFILE                    | `small` adds the low-resource JVM options for demo and test hosts, see [Low-resource profile](#low-resource-profile). Other values keep the JVM defaults.      | unset                    |
+| LASIUS_START_PARAMS                        | Not read by the Docker image. To load another config file, set `JAVA_OPTS: "-Dconfig.file=/path/to/backend.conf"` on the backend container.                  | unset                    |
 | LASIUS_SUPPORTS_TRANSACTIONS               | To be able to benefit of transactions in MongoDB you need a replica set first.                                                                                 | 'false'                  |
 | LASIUS_OAUTH_PROVIDER_ENABLED              | Enable or disable internal oauth provider                                                                                                                      | 'false'                  |
 | LASIUS_OAUTH_PROVIDER_ALLOW_REGISTER_USERS | Enable or disable registering new users in internal oauth provider, required internal oauth provider to be enabled                                             | 'false'                  |
@@ -205,6 +206,127 @@ To enable external OAuth support, register an application with your provider and
 
 To simply bring up a test environment, check out
 the [lasius-docker-compose](https://github.com/tegonal/lasius-docker-compose) companion repo.
+
+### Low-resource profile
+
+Use this profile for demo and test instances on a small VM. Do not use it in production.
+
+The profile has two parts for each Java service: a container memory limit and a set of JVM options.
+For the backend, one variable activates the options: `LASIUS_RESOURCE_PROFILE=small`. When the
+variable is unset, empty or `default`, the start script adds no option. The backend then starts with
+the same JVM options as an image without the profile.
+
+```yaml
+services:
+  backend:
+    image: tegonal/lasius-backend:${LASIUS_VERSION:-latest}
+    restart: always
+    mem_limit: 512m
+    environment:
+      LASIUS_RESOURCE_PROFILE: small
+      # Keep all other backend variables.
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.5.6
+    command: start
+    restart: always
+    mem_limit: 768m
+    environment:
+      KC_CACHE: local
+      JAVA_OPTS_KC_HEAP: "-XX:MaxRAMPercentage=50 -XX:InitialRAMPercentage=25"
+      # Keep all other Keycloak variables (database, hostname, admin user).
+```
+
+Always set `mem_limit`. The JVM calculates the heap size from the container limit. Without a limit,
+the JVM uses the memory of the whole VM.
+
+#### Backend options
+
+`LASIUS_RESOURCE_PROFILE=small` adds these options:
+
+| Option | Effect | Value without the profile |
+| --- | --- | --- |
+| `-XX:+UseSerialGC` | Selects the garbage collector with the smallest memory overhead. | Selected from the limit and the CPU count. At 512 MiB, the JVM also selects Serial GC. |
+| `-XX:MaxRAMPercentage=30` | Limits the heap to 30 % of `mem_limit`. At 512 MiB, the heap limit is 154 MiB. | 25 %, 128 MiB at 512 MiB |
+| `-XX:MaxMetaspaceSize=160m` | Limits the class metadata. The backend uses about 97 MiB. | No limit |
+| `-XX:ReservedCodeCacheSize=64m` | Limits the memory for compiled code. The backend uses about 25 MiB. | 240 MiB |
+| `-XX:ActiveProcessorCount=2` | Sizes the pools that follow the CPU count for 2 CPUs: Netty, the channel group of the MongoDB driver, the Scala pool and the JIT compiler. | The CPU count of the container |
+| `-XX:+ExitOnOutOfMemoryError` | Stops the JVM at the first `OutOfMemoryError`. The `restart` policy then starts a new container. | The JVM continues to run after the error. |
+| `-Dpekko.actor.default-dispatcher.fork-join-executor.parallelism-min=2` and `-Dpekko.actor.internal-dispatcher.fork-join-executor.parallelism-min=2` | Lowers the thread minimum of the Pekko dispatchers in the Play and Lasius actor systems. | Minimum 8 and 4 threads |
+| `-Dmongo-async-driver.pekko.actor.default-dispatcher.fork-join-executor.parallelism-min=2` and `-Dmongo-async-driver.pekko.actor.internal-dispatcher.fork-join-executor.parallelism-min=2` | Lowers the same minimum in the actor system of ReactiveMongo. | Minimum 8 and 4 threads |
+| `-Dpekko-contrib-persistence-dispatcher.thread-pool-executor.core-pool-size-max=4` and `-Dpekko-contrib-persistence-query-dispatcher.thread-pool-executor.core-pool-size-max=4` | Limits the thread pools of the Pekko persistence plugin for MongoDB. | Up to 16 and up to 60 threads |
+
+To change one value, set `JAVA_OPTS` on the backend, for example `JAVA_OPTS: "-XX:MaxRAMPercentage=40"`.
+The start script adds `JAVA_OPTS` after the profile options, and the JVM uses the last value of an
+option. Arguments in the `command:` of the container come after `JAVA_OPTS`, so they also override the
+profile. The start script does not read `START_PARAMS` or `LASIUS_START_PARAMS`.
+
+#### Keycloak settings
+
+| Setting | Effect | Keycloak default |
+| --- | --- | --- |
+| `mem_limit: 768m` | Sets the container limit. `kc.sh` calculates the heap size from it. | No limit |
+| `JAVA_OPTS_KC_HEAP` | Sets the heap limit to 50 % (384 MiB) and the initial heap to 25 % (192 MiB) of `mem_limit`. | 70 % and 50 % |
+| `KC_CACHE: local` | Keeps all caches local. Keycloak starts no cluster transport. Use it only for a single node. | `ispn` (distributed caches) |
+
+- Do not set `JAVA_OPTS` for Keycloak. `JAVA_OPTS` replaces all defaults of `kc.sh`, for example
+  `-XX:+ExitOnOutOfMemoryError` and the Metaspace limit.
+- Do not add `-XX:MaxHeapFreeRatio=30` from the Keycloak container guide. In the image
+  `quay.io/keycloak/keycloak:26.5.6`, the JVM then stops at startup with `MinHeapFreeRatio (40) must be
+  less than or equal to MaxHeapFreeRatio (30)`.
+- `KC_CACHE` is a build option. With `command: start`, Keycloak builds its configuration again at each
+  start. For a custom image, run `kc.sh build --cache=local` in the Dockerfile and start the container
+  with `start --optimized`.
+
+#### Measured values
+
+The values come from Docker Desktop (aarch64, 10 CPUs) with the demo data of `InitialDemoDataLoader`.
+Each backend run sent 596 requests. The requests covered login, profile, statistics, booking history,
+and the current and latest bookings. Each run also started and stopped one booking and sent a burst
+from 8 parallel clients. "Peak" is the `memory.peak` value of the container cgroup. It includes the
+page cache.
+
+| Backend, `mem_limit: 512m` | Profile unset | `small` |
+| --- | --- | --- |
+| Heap limit | 128 MiB | 154 MiB |
+| Time until `GET /backend/config` answers | 3.3 s | 3.6 s |
+| Peak after startup | 289 MiB | 283 MiB |
+| Peak after all requests | 381 MiB | 391 MiB |
+| Highest `docker stats` value | 377 MiB | 383 MiB |
+| JVM threads | 103 to 115 | 66 to 68 |
+| Request latency, 95th percentile | 517 ms | 393 ms |
+| Container stopped by the OOM killer | no | no |
+
+At 512 MiB, the JVM defaults also fit, because the JVM selects Serial GC and a 128 MiB heap. The
+profile adds limits for the areas that have no limit by default. When each limited area is full, the
+backend uses about 470 MiB. The heap takes 154 MiB, Metaspace 160 MiB and the code cache 64 MiB.
+Symbols, shared classes, thread stacks and native memory took about 90 MiB in the test. Thread stacks
+and direct buffers have no limit. A blocking call in an actor can add threads to a Pekko pool. The
+thread count does not change on a host with more CPUs.
+
+| Keycloak 26.5.6, `start`, `mem_limit: 768m`, 10 logins | Keycloak defaults | `JAVA_OPTS_KC_HEAP` above |
+| --- | --- | --- |
+| Time until the realm answers | 17 s | 15 s to 17 s |
+| Peak | 768 MiB (the limit) | 715 MiB to 717 MiB |
+| Highest `docker stats` value | 641 MiB to 653 MiB | 547 MiB to 549 MiB |
+| Container stopped by the OOM killer | no | no |
+
+The Keycloak runs used the `dev-file` database and the realm of `services/keycloak-local-realm.json`.
+A test with `mem_limit: 512m` and a heap of 40 % also passed the logins. But the container used
+474 MiB, and the peak reached the limit. Therefore 768 MiB is the proposal for Keycloak.
+
+Measure again on the VM with `docker stats` and
+`docker inspect --format '{{.State.OOMKilled}}' <container>`.
+
+#### MongoDB connection pool
+
+ReactiveMongo reads its pool size only from the MongoDB URI, for example
+`?rm.nbChannelsPerNode=4&rm.minIdleChannelsPerNode=1` (defaults: 10 and 1). The profile does not
+set these options, for two reasons:
+
+- The persistence plugin reads the same `MONGODB_URI` with the official MongoDB driver. That driver
+  writes a `WARN` line for each `rm.*` option.
+- With `rm.nbChannelsPerNode=4`, the peak was 387 MiB instead of 391 MiB. The gain is about 1 %.
 
 ## Production Environment
 

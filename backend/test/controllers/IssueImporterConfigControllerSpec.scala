@@ -29,6 +29,7 @@ import org.specs2.mock.mockito.MockitoMatchers
 import play.api.libs.json._
 import play.api.mvc._
 import play.api.test._
+import repositories.ProjectMongoRepository
 
 import java.net.URL
 import scala.concurrent.{ExecutionContext, Future}
@@ -43,6 +44,43 @@ class IssueImporterConfigControllerSpec
     with MockitoMatchers
     with EmbedMongo
     with TestApplication {
+
+  private def gitlabMapping(projectId: ProjectId): CreateProjectMapping =
+    CreateProjectMapping(
+      projectId = projectId,
+      gitlabProjectId = Some("99"),
+      projectKeyPrefix = Some("NEW-"),
+      gitlabTagConfig = Some(
+        GitlabTagConfiguration(
+          useLabels = true,
+          labelFilter = Set.empty,
+          useMilestone = false,
+          useTitle = false
+        )),
+      maxResults = Some(50)
+    )
+
+  private def upsertProject(project: Project): Unit =
+    withDBSession()(implicit dbSession =>
+      new ProjectMongoRepository().upsert(project)).awaitResult()
+
+  /** Stores a new project of the organisation of the mock user.
+    * addProjectMapping rejects a project id without a stored project.
+    */
+  private def upsertOwnProject(
+      controller: IssueImporterConfigControllerMock): Project = {
+    val ownProject: Project = Project(
+      id = ProjectId(),
+      key = "ownProject",
+      organisationReference = controller.organisation.getReference,
+      bookingCategories = Set(),
+      active = true,
+      createdBy = controller.userReference,
+      deactivatedBy = None
+    )
+    upsertProject(ownProject)
+    ownProject
+  }
 
   // ===== Unified Config Tests =====
 
@@ -373,9 +411,10 @@ class IssueImporterConfigControllerSpec
 
       // First remove all project mappings
       val removeResult: Future[Result] =
-        controller.removeProjectMapping(controller.organisation.id,
-                                        configId,
-                                        controller.project.id)(request)
+        controller.removeProjectMapping(
+          controller.organisation.id,
+          configId,
+          controller.gitlabConfig.projects.head.id)(request)
       status(removeResult) must equalTo(OK)
 
       // Now delete the config
@@ -424,7 +463,7 @@ class IssueImporterConfigControllerSpec
                                           authConfig,
                                           reactiveMongoApi)
 
-      val newProject = ProjectId()
+      val newProject = upsertOwnProject(controller).id
       val mapping    = CreateProjectMapping(
         projectId = newProject,
         gitlabProjectId = Some("99"),
@@ -455,6 +494,109 @@ class IssueImporterConfigControllerSpec
       val gitlabConfig = contentAsJson(result).as[GitlabConfigResponse]
       gitlabConfig.projects.exists(_.projectId == newProject) must beTrue
     }
+
+    "badrequest if OrganisationAdministrator maps a project of another organisation" in new WithTestApplication {
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: IssueImporterConfigControllerMock =
+        IssueImporterConfigControllerMock(config,
+                                          systemServices,
+                                          authConfig,
+                                          reactiveMongoApi,
+                                          organisationRole =
+                                            OrganisationAdministrator)
+
+      val foreignProject: Project = Project(
+        id = ProjectId(),
+        key = "foreignProject",
+        organisationReference = EntityReference(OrganisationId(), "otherOrg"),
+        bookingCategories = Set(),
+        active = true,
+        createdBy = EntityReference(UserId(), "otherUser"),
+        deactivatedBy = None
+      )
+      upsertProject(foreignProject)
+
+      val request: FakeRequest[CreateProjectMapping] =
+        FakeRequest().withBody(gitlabMapping(foreignProject.id))
+      val result: Future[Result] =
+        controller.addProjectMapping(controller.organisation.id,
+                                     controller.gitlabConfig.id)(request)
+
+      status(result) must equalTo(BAD_REQUEST)
+      contentAsString(result) must equalTo(
+        s"Project ${foreignProject.id.value} is not assigned to organisation ${controller.organisation.id.value}")
+
+      val storedConfig = withDBSession()(implicit dbSession =>
+        controller.issueImporterConfigRepository.findById(
+          controller.gitlabConfig.id)).awaitResult()
+      storedConfig must beSome
+      storedConfig.get
+        .asInstanceOf[GitlabConfig]
+        .projects
+        .map(_.projectId) must not contain foreignProject.id
+    }
+
+    "successful if OrganisationAdministrator maps a project of the own organisation" in new WithTestApplication {
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: IssueImporterConfigControllerMock =
+        IssueImporterConfigControllerMock(config,
+                                          systemServices,
+                                          authConfig,
+                                          reactiveMongoApi,
+                                          organisationRole =
+                                            OrganisationAdministrator)
+
+      val ownProject: Project = upsertOwnProject(controller)
+
+      val request: FakeRequest[CreateProjectMapping] =
+        FakeRequest().withBody(gitlabMapping(ownProject.id))
+      val result: Future[Result] =
+        controller.addProjectMapping(controller.organisation.id,
+                                     controller.gitlabConfig.id)(request)
+
+      status(result) must equalTo(OK)
+      contentAsJson(result)
+        .as[GitlabConfigResponse]
+        .projects
+        .exists(_.projectId == ownProject.id) must beTrue
+    }
+
+    "badrequest if OrganisationAdministrator maps an unknown project" in new WithTestApplication {
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: IssueImporterConfigControllerMock =
+        IssueImporterConfigControllerMock(config,
+                                          systemServices,
+                                          authConfig,
+                                          reactiveMongoApi,
+                                          organisationRole =
+                                            OrganisationAdministrator)
+      val unknownProjectId: ProjectId = ProjectId()
+
+      val request: FakeRequest[CreateProjectMapping] =
+        FakeRequest().withBody(gitlabMapping(unknownProjectId))
+      val result: Future[Result] =
+        controller.addProjectMapping(controller.organisation.id,
+                                     controller.gitlabConfig.id)(request)
+
+      status(result) must equalTo(BAD_REQUEST)
+      contentAsString(result) must equalTo(
+        s"Project ${unknownProjectId.value} does not exist")
+
+      val storedConfig = withDBSession()(implicit dbSession =>
+        controller.issueImporterConfigRepository.findById(
+          controller.gitlabConfig.id)).awaitResult()
+      storedConfig must beSome
+      storedConfig.get
+        .asInstanceOf[GitlabConfig]
+        .projects
+        .map(_.projectId) must not contain unknownProjectId
+    }
   }
 
   "remove project mapping" should {
@@ -472,9 +614,10 @@ class IssueImporterConfigControllerSpec
       val configId = IssueImporterConfigId(controller.gitlabConfig.id.value)
       val request  = FakeRequest().withBody(())
       val result: Future[Result] =
-        controller.removeProjectMapping(controller.organisation.id,
-                                        configId,
-                                        controller.project.id)(request)
+        controller.removeProjectMapping(
+          controller.organisation.id,
+          configId,
+          controller.gitlabConfig.projects.head.id)(request)
 
       status(result) must equalTo(OK)
       val gitlabConfig = contentAsJson(result).as[GitlabConfigResponse]
@@ -517,9 +660,10 @@ class IssueImporterConfigControllerSpec
       val request: FakeRequest[UpdateProjectMapping] =
         FakeRequest().withBody(newSettings)
       val result: Future[Result] =
-        controller.updateProjectMapping(controller.organisation.id,
-                                        configId,
-                                        controller.project.id)(request)
+        controller.updateProjectMapping(
+          controller.organisation.id,
+          configId,
+          controller.gitlabConfig.projects.head.id)(request)
 
       status(result) must equalTo(OK)
       val gitlabConfig = contentAsJson(result).as[GitlabConfigResponse]
@@ -545,7 +689,7 @@ class IssueImporterConfigControllerSpec
                                           authConfig,
                                           reactiveMongoApi)
 
-      val newProject = ProjectId()
+      val newProject = upsertOwnProject(controller).id
       val mapping    = CreateProjectMapping(
         projectId = newProject,
         githubRepoOwner = Some("test-owner"),
@@ -1173,9 +1317,10 @@ class IssueImporterConfigControllerSpec
 
       val request                = FakeRequest().withBody(())
       val result: Future[Result] =
-        controller.refreshTags(controller.organisation.id,
-                               controller.gitlabConfig.id,
-                               controller.project.id)(request)
+        controller.refreshTags(
+          controller.organisation.id,
+          controller.gitlabConfig.id,
+          controller.gitlabConfig.projects.head.id)(request)
 
       status(result) must equalTo(ACCEPTED)
       val json = contentAsJson(result)
@@ -1183,8 +1328,8 @@ class IssueImporterConfigControllerSpec
       (json \ "message").as[String] must contain("immediately")
       (json \ "configId").as[String] must equalTo(
         controller.gitlabConfig.id.value.toString)
-      (json \ "projectId").as[String] must equalTo(
-        controller.project.id.value.toString)
+      (json \ "mappingId").as[String] must equalTo(
+        controller.gitlabConfig.projects.head.id.value.toString)
       (json \ "importerType").as[String] must equalTo("gitlab")
     }
 
@@ -1203,9 +1348,10 @@ class IssueImporterConfigControllerSpec
 
       val request                = FakeRequest().withBody(())
       val result: Future[Result] =
-        controller.refreshTags(controller.organisation.id,
-                               controller.gitlabConfig.id,
-                               controller.project.id)(request)
+        controller.refreshTags(
+          controller.organisation.id,
+          controller.gitlabConfig.id,
+          controller.gitlabConfig.projects.head.id)(request)
 
       status(result) must equalTo(ACCEPTED)
     }
@@ -1227,9 +1373,10 @@ class IssueImporterConfigControllerSpec
 
       val request                = FakeRequest().withBody(())
       val result: Future[Result] =
-        controller.refreshTags(controller.organisation.id,
-                               nonExistentId,
-                               controller.project.id)(request)
+        controller.refreshTags(
+          controller.organisation.id,
+          nonExistentId,
+          controller.gitlabConfig.projects.head.id)(request)
 
       status(result) must equalTo(NOT_FOUND)
       val json = contentAsJson(result)
@@ -1249,19 +1396,19 @@ class IssueImporterConfigControllerSpec
           organisationRole = OrganisationMember
         )
 
-      val unmappedProjectId = ProjectId()
+      val unmappedMappingId = ProjectMappingId()
 
       val request                = FakeRequest().withBody(())
       val result: Future[Result] =
         controller.refreshTags(controller.organisation.id,
                                controller.gitlabConfig.id,
-                               unmappedProjectId)(request)
+                               unmappedMappingId)(request)
 
       status(result) must equalTo(NOT_FOUND)
       val json = contentAsJson(result)
       (json \ "status").as[String] must equalTo("error")
-      (json \ "error").as[String] must equalTo("project_not_found")
-      (json \ "message").as[String] must contain("not mapped")
+      (json \ "error").as[String] must equalTo("mapping_not_found")
+      (json \ "message").as[String] must contain("not found")
     }
 
     "return 403 when config belongs to different organization" in new WithTestApplication {
@@ -1281,9 +1428,10 @@ class IssueImporterConfigControllerSpec
 
       val request                = FakeRequest().withBody(())
       val result: Future[Result] =
-        controller.refreshTags(differentOrgId,
-                               controller.gitlabConfig.id,
-                               controller.project.id)(request)
+        controller.refreshTags(
+          differentOrgId,
+          controller.gitlabConfig.id,
+          controller.gitlabConfig.projects.head.id)(request)
 
       status(result) must equalTo(FORBIDDEN)
     }
@@ -1305,9 +1453,10 @@ class IssueImporterConfigControllerSpec
 
       // Test GitLab
       val gitlabResult: Future[Result] =
-        controller.refreshTags(controller.organisation.id,
-                               controller.gitlabConfig.id,
-                               controller.project.id)(request)
+        controller.refreshTags(
+          controller.organisation.id,
+          controller.gitlabConfig.id,
+          controller.gitlabConfig.projects.head.id)(request)
       status(gitlabResult) must equalTo(ACCEPTED)
       val gitlabJson = contentAsJson(gitlabResult)
       (gitlabJson \ "importerType").as[String] must equalTo("gitlab")
@@ -1316,7 +1465,7 @@ class IssueImporterConfigControllerSpec
       val jiraResult: Future[Result] =
         controller.refreshTags(controller.organisation.id,
                                controller.jiraConfig.id,
-                               controller.project.id)(request)
+                               controller.jiraConfig.projects.head.id)(request)
       status(jiraResult) must equalTo(ACCEPTED)
       val jiraJson = contentAsJson(jiraResult)
       (jiraJson \ "importerType").as[String] must equalTo("jira")
@@ -1325,16 +1474,17 @@ class IssueImporterConfigControllerSpec
       val planeResult: Future[Result] =
         controller.refreshTags(controller.organisation.id,
                                controller.planeConfig.id,
-                               controller.project.id)(request)
+                               controller.planeConfig.projects.head.id)(request)
       status(planeResult) must equalTo(ACCEPTED)
       val planeJson = contentAsJson(planeResult)
       (planeJson \ "importerType").as[String] must equalTo("plane")
 
       // Test GitHub
       val githubResult: Future[Result] =
-        controller.refreshTags(controller.organisation.id,
-                               controller.githubConfig.id,
-                               controller.project.id)(request)
+        controller.refreshTags(
+          controller.organisation.id,
+          controller.githubConfig.id,
+          controller.githubConfig.projects.head.id)(request)
       status(githubResult) must equalTo(ACCEPTED)
       val githubJson = contentAsJson(githubResult)
       (githubJson \ "importerType").as[String] must equalTo("github")

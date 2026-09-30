@@ -31,7 +31,7 @@ import play.api.cache.SyncCacheApi
 import play.api.libs.json._
 import play.api.mvc.{Action, ControllerComponents}
 import play.modules.reactivemongo.ReactiveMongoApi
-import repositories.BookingHistoryRepository
+import repositories.{BookingHistoryRepository, ProjectRepository}
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
@@ -42,8 +42,8 @@ class TimeBookingHistoryController @Inject() (
     override val systemServices: SystemServices,
     override val authConfig: AuthConfig,
     override val reactiveMongoApi: ReactiveMongoApi,
-    bookingHistoryRepository: BookingHistoryRepository)(implicit
-    ec: ExecutionContext)
+    bookingHistoryRepository: BookingHistoryRepository,
+    projectRepository: ProjectRepository)(implicit ec: ExecutionContext)
     extends BaseLasiusController() {
 
   implicit val timeout: Timeout = systemServices.timeout
@@ -100,7 +100,8 @@ class TimeBookingHistoryController @Inject() (
         isOrgAdminOrHasProjectRoleInOrganisation(user,
                                                  orgId,
                                                  projectId,
-                                                 ProjectAdministrator) { _ =>
+                                                 ProjectAdministrator,
+                                                 projectRepository) { _ =>
           logger.debug(
             s"getTimeBookingHistory, userId:$subject.userId, from:$from, to:$to")
           bookingHistoryRepository

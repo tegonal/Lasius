@@ -57,6 +57,7 @@ class IssueImporterConfigController @Inject() (
     override val reactiveMongoApi: ReactiveMongoApi,
     issueImporterRepository: IssueImporterConfigRepository,
     userRepository: repositories.UserRepository,
+    projectRepository: repositories.ProjectRepository,
     wsClient: play.api.libs.ws.WSClient
 )(implicit ec: ExecutionContext)
     extends BaseLasiusController() {
@@ -183,6 +184,15 @@ class IssueImporterConfigController @Inject() (
               .noneToFailed(ConfigErrorResponses.configNotFound(configId))
             _ <- validateConfigOwnership(config,
                                          userOrg.organisationReference.id)
+            // The tag cache stores tags by project id only. A mapping to a
+            // project of another organisation writes tags into that project.
+            project <- projectRepository
+              .findById(request.body.projectId)
+              .noneToFailed(
+                s"Project ${request.body.projectId.value} does not exist")
+            _ <- validate(
+              project.organisationReference.id == orgId,
+              s"Project ${request.body.projectId.value} is not assigned to organisation ${orgId.value}")
             _ <- validateProjectMappingForType(config.importerType,
                                                request.body)
             updated <- issueImporterRepository

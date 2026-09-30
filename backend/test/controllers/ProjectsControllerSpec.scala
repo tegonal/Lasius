@@ -41,6 +41,69 @@ class ProjectsControllerSpec
     with EmbedMongo
     with TestApplication {
 
+  private val foreignOrganisation: EntityReference[OrganisationId] =
+    EntityReference(OrganisationId(), "otherOrg")
+
+  /** Stores a project of another organisation, and a member of that
+    * organisation who is assigned to the project.
+    */
+  private def upsertForeignProjectWithMember(
+      controller: ProjectsControllerMock): (Project, User) = {
+    val foreignProject: Project = Project(
+      id = ProjectId(),
+      key = "foreignProject",
+      organisationReference = foreignOrganisation,
+      bookingCategories = Set(),
+      active = true,
+      createdBy = EntityReference(UserId(), "otherUser"),
+      deactivatedBy = None
+    )
+    val foreignUser: User = User(
+      UserId(),
+      "foreignUser",
+      email = "foreign@user.com",
+      firstName = "foreign",
+      lastName = "user",
+      active = true,
+      role = FreeUser,
+      organisations = Seq(
+        UserOrganisation(
+          organisationReference = foreignOrganisation,
+          `private` = false,
+          role = OrganisationMember,
+          plannedWorkingHours = WorkingHours(),
+          projects = Seq(
+            UserProject(sharedByOrganisationReference = None,
+                        projectReference = foreignProject.getReference,
+                        role = ProjectMember))
+        )),
+      settings = None,
+      acceptedTOS = None
+    )
+    withDBSession() { implicit dbSession =>
+      for {
+        _ <- controller.projectRepository.upsert(foreignProject)
+        _ <- controller.userRepository.upsert(foreignUser)
+      } yield ()
+    }.awaitResult()
+    (foreignProject, foreignUser)
+  }
+
+  /** Moves the project of the mock user to another organisation. An accepted
+    * project invitation creates this state, because the invited user selects
+    * the organisation that holds the project.
+    */
+  private def shareProjectFromForeignOrganisation(
+      controller: ProjectsControllerMock): Unit =
+    withDBSession()(implicit dbSession =>
+      controller.projectRepository.upsert(
+        controller.project.copy(organisationReference = foreignOrganisation)))
+      .awaitResult()
+
+  private def notAssignedMessage(projectId: ProjectId,
+                                 orgId: OrganisationId): String =
+    s"Project ${projectId.value} is not assigned to organisation ${orgId.value}"
+
   "create project" should {
 
     "forbidden create project in organisation not assigned to user" in new WithTestApplication {
@@ -457,6 +520,34 @@ class ProjectsControllerSpec
       invitationResult.email === email
       invitationResult.invitationLinkId === None
     }
+
+    "badrequest if OrganisationAdministrator invites to an unknown project" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: ProjectsControllerMock          =
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
+                                           authConfig,
+                                           reactiveMongoApi,
+                                           organisationRole =
+                                             OrganisationAdministrator,
+                                           projectRole = ProjectMember)
+      val unknownProjectId: ProjectId = ProjectId()
+
+      val request: FakeRequest[UserToProjectAssignment] =
+        FakeRequest().withBody(
+          UserToProjectAssignment(email = "newUserEmail@test.com",
+                                  role = ProjectMember))
+      val result: Future[Result] =
+        controller.inviteUser(controller.organisationId, unknownProjectId)(
+          request)
+
+      status(result) must equalTo(BAD_REQUEST)
+      contentAsString(result) must equalTo(
+        s"Project ${unknownProjectId.value} does not exist")
+    }
   }
 
   "remove other user from project" should {
@@ -503,8 +594,7 @@ class ProjectsControllerSpec
       status(result) must equalTo(FORBIDDEN)
     }
 
-    def successfulUnassignUser(controller: ProjectsControllerMock) = {
-      // initialize second user
+    def upsertSecondProjectMember(controller: ProjectsControllerMock): User = {
       val userProject = UserProject(
         sharedByOrganisationReference = None,
         projectReference = controller.project.getReference,
@@ -532,6 +622,11 @@ class ProjectsControllerSpec
 
       withDBSession()(implicit dbSession =>
         controller.userRepository.upsert(user2)).awaitResult()
+      user2
+    }
+
+    def successfulUnassignUser(controller: ProjectsControllerMock) = {
+      val user2: User = upsertSecondProjectMember(controller)
 
       val request: FakeRequest[Unit] = FakeRequest().withBody(())
       val result: Future[Result]     =
@@ -577,6 +672,114 @@ class ProjectsControllerSpec
                                              OrganisationMember,
                                            projectRole = ProjectAdministrator)
       successfulUnassignUser(controller)
+    }
+
+    "successful if OrganisationAdministrator is ProjectAdministrator of a project shared by another organisation" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: ProjectsControllerMock          =
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
+                                           authConfig,
+                                           reactiveMongoApi,
+                                           organisationRole =
+                                             OrganisationAdministrator,
+                                           projectRole = ProjectAdministrator)
+      shareProjectFromForeignOrganisation(controller)
+      successfulUnassignUser(controller)
+    }
+
+    "badrequest if OrganisationAdministrator removes a user from a project of another organisation" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: ProjectsControllerMock          =
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
+                                           authConfig,
+                                           reactiveMongoApi,
+                                           organisationRole =
+                                             OrganisationAdministrator,
+                                           projectRole = ProjectAdministrator)
+      val (foreignProject, foreignUser) =
+        upsertForeignProjectWithMember(controller)
+
+      val request: FakeRequest[Unit] = FakeRequest().withBody(())
+      val result: Future[Result]     =
+        controller.unassignUser(controller.organisationId,
+                                foreignProject.id,
+                                foreignUser.id)(request)
+
+      status(result) must equalTo(BAD_REQUEST)
+      contentAsString(result) must equalTo(
+        notAssignedMessage(foreignProject.id, controller.organisationId))
+
+      val remainingUsers = withDBSession()(implicit dbSession =>
+        controller.userRepository.findByProject(foreignProject.id))
+        .awaitResult()
+      remainingUsers.map(_.id) must equalTo(Seq(foreignUser.id))
+    }
+
+    "badrequest if OrganisationAdministrator is only ProjectMember of a project shared by another organisation" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: ProjectsControllerMock          =
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
+                                           authConfig,
+                                           reactiveMongoApi,
+                                           organisationRole =
+                                             OrganisationAdministrator,
+                                           projectRole = ProjectMember)
+      shareProjectFromForeignOrganisation(controller)
+      val user2: User = upsertSecondProjectMember(controller)
+
+      val request: FakeRequest[Unit] = FakeRequest().withBody(())
+      val result: Future[Result]     =
+        controller.unassignUser(controller.organisationId,
+                                controller.project.id,
+                                user2.id)(request)
+
+      status(result) must equalTo(BAD_REQUEST)
+      contentAsString(result) must equalTo(
+        notAssignedMessage(controller.project.id, controller.organisationId))
+
+      val remainingUsers = withDBSession()(implicit dbSession =>
+        controller.userRepository.findByProject(controller.project.id))
+        .awaitResult()
+      remainingUsers.map(_.id) must containTheSameElementsAs(
+        Seq(controller.userId, user2.id))
+    }
+
+    "badrequest if OrganisationAdministrator removes a user from an unknown project" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: ProjectsControllerMock          =
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
+                                           authConfig,
+                                           reactiveMongoApi,
+                                           organisationRole =
+                                             OrganisationAdministrator,
+                                           projectRole = ProjectMember)
+      val unknownProjectId: ProjectId = ProjectId()
+
+      val request: FakeRequest[Unit] = FakeRequest().withBody(())
+      val result: Future[Result]     =
+        controller.unassignUser(controller.organisationId,
+                                unknownProjectId,
+                                UserId())(request)
+
+      status(result) must equalTo(BAD_REQUEST)
+      contentAsString(result) must equalTo(
+        s"Project ${unknownProjectId.value} does not exist")
     }
   }
 
@@ -912,6 +1115,318 @@ class ProjectsControllerSpec
 
       updatedProject.bookingCategories must containTheSameElementsAs(
         Seq(SimpleTag(TagId("myTag"))))
+    }
+
+    "badrequest if OrganisationAdministrator updates an unknown project" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: ProjectsControllerMock          =
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
+                                           authConfig,
+                                           reactiveMongoApi,
+                                           organisationRole =
+                                             OrganisationAdministrator,
+                                           projectRole = ProjectMember)
+      val unknownProjectId: ProjectId = ProjectId()
+
+      val request: FakeRequest[UpdateProject] = FakeRequest().withBody(
+        UpdateProject(key = Some("newKey"), bookingCategories = None))
+      val result: Future[Result] =
+        controller.updateProject(controller.organisationId, unknownProjectId)(
+          request)
+
+      status(result) must equalTo(BAD_REQUEST)
+      contentAsString(result) must equalTo(
+        s"Project ${unknownProjectId.value} does not exist")
+    }
+  }
+
+  "get project users" should {
+    "badrequest if OrganisationAdministrator requests a project of another organisation" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: ProjectsControllerMock          =
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
+                                           authConfig,
+                                           reactiveMongoApi,
+                                           organisationRole =
+                                             OrganisationAdministrator,
+                                           projectRole = ProjectAdministrator)
+      val (foreignProject, _) = upsertForeignProjectWithMember(controller)
+
+      val request: FakeRequest[Unit] = FakeRequest().withBody(())
+      val result: Future[Result]     =
+        controller.getUsers(controller.organisationId, foreignProject.id)(
+          request)
+
+      status(result) must equalTo(BAD_REQUEST)
+      contentAsString(result) must equalTo(
+        notAssignedMessage(foreignProject.id, controller.organisationId))
+    }
+
+    "successful if OrganisationAdministrator requests a project of the own organisation" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: ProjectsControllerMock          =
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
+                                           authConfig,
+                                           reactiveMongoApi,
+                                           organisationRole =
+                                             OrganisationAdministrator,
+                                           projectRole = ProjectMember)
+
+      val request: FakeRequest[Unit] = FakeRequest().withBody(())
+      val result: Future[Result]     =
+        controller.getUsers(controller.organisationId, controller.project.id)(
+          request)
+
+      status(result) must equalTo(OK)
+      contentAsJson(result).as[Seq[UserStub]].map(_.id) must equalTo(
+        Seq(controller.userId))
+    }
+
+    "successful if OrganisationMember is ProjectMember" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: ProjectsControllerMock          =
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
+                                           authConfig,
+                                           reactiveMongoApi,
+                                           organisationRole =
+                                             OrganisationMember,
+                                           projectRole = ProjectMember)
+
+      val request: FakeRequest[Unit] = FakeRequest().withBody(())
+      val result: Future[Result]     =
+        controller.getUsers(controller.organisationId, controller.project.id)(
+          request)
+
+      status(result) must equalTo(OK)
+    }
+
+    "successful if OrganisationAdministrator is ProjectMember of a project shared by another organisation" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: ProjectsControllerMock          =
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
+                                           authConfig,
+                                           reactiveMongoApi,
+                                           organisationRole =
+                                             OrganisationAdministrator,
+                                           projectRole = ProjectMember)
+      shareProjectFromForeignOrganisation(controller)
+
+      val request: FakeRequest[Unit] = FakeRequest().withBody(())
+      val result: Future[Result]     =
+        controller.getUsers(controller.organisationId, controller.project.id)(
+          request)
+
+      status(result) must equalTo(OK)
+    }
+
+    "successful with an empty list if OrganisationAdministrator requests an unknown project" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: ProjectsControllerMock          =
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
+                                           authConfig,
+                                           reactiveMongoApi,
+                                           organisationRole =
+                                             OrganisationAdministrator,
+                                           projectRole = ProjectMember)
+
+      val request: FakeRequest[Unit] = FakeRequest().withBody(())
+      val result: Future[Result]     =
+        controller.getUsers(controller.organisationId, ProjectId())(request)
+
+      status(result) must equalTo(OK)
+      contentAsJson(result).as[Seq[UserStub]] must beEmpty
+    }
+  }
+
+  "get last activity date of project" should {
+    "badrequest if OrganisationAdministrator requests a project of another organisation" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: ProjectsControllerMock          =
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
+                                           authConfig,
+                                           reactiveMongoApi,
+                                           organisationRole =
+                                             OrganisationAdministrator,
+                                           projectRole = ProjectAdministrator)
+      val (foreignProject, _) = upsertForeignProjectWithMember(controller)
+
+      val request: FakeRequest[Unit] = FakeRequest().withBody(())
+      val result: Future[Result]     =
+        controller.getLastActivityDate(controller.organisationId,
+                                       foreignProject.id)(request)
+
+      status(result) must equalTo(BAD_REQUEST)
+      contentAsString(result) must equalTo(
+        notAssignedMessage(foreignProject.id, controller.organisationId))
+    }
+
+    "no content if OrganisationAdministrator requests a project of the own organisation without bookings" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: ProjectsControllerMock          =
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
+                                           authConfig,
+                                           reactiveMongoApi,
+                                           organisationRole =
+                                             OrganisationAdministrator,
+                                           projectRole = ProjectMember)
+
+      val request: FakeRequest[Unit] = FakeRequest().withBody(())
+      val result: Future[Result]     =
+        controller.getLastActivityDate(controller.organisationId,
+                                       controller.project.id)(request)
+
+      status(result) must equalTo(NO_CONTENT)
+    }
+
+    "no content if OrganisationMember is ProjectMember of a project without bookings" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: ProjectsControllerMock          =
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
+                                           authConfig,
+                                           reactiveMongoApi,
+                                           organisationRole =
+                                             OrganisationMember,
+                                           projectRole = ProjectMember)
+
+      val request: FakeRequest[Unit] = FakeRequest().withBody(())
+      val result: Future[Result]     =
+        controller.getLastActivityDate(controller.organisationId,
+                                       controller.project.id)(request)
+
+      status(result) must equalTo(NO_CONTENT)
+    }
+
+    "no content if OrganisationAdministrator is ProjectMember of a project shared by another organisation" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: ProjectsControllerMock          =
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
+                                           authConfig,
+                                           reactiveMongoApi,
+                                           organisationRole =
+                                             OrganisationAdministrator,
+                                           projectRole = ProjectMember)
+      shareProjectFromForeignOrganisation(controller)
+
+      val request: FakeRequest[Unit] = FakeRequest().withBody(())
+      val result: Future[Result]     =
+        controller.getLastActivityDate(controller.organisationId,
+                                       controller.project.id)(request)
+
+      status(result) must equalTo(NO_CONTENT)
+    }
+
+    "badrequest if OrganisationAdministrator has no role on a project shared by another organisation" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: ProjectsControllerMock          =
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
+                                           authConfig,
+                                           reactiveMongoApi,
+                                           organisationRole =
+                                             OrganisationAdministrator,
+                                           projectRole = ProjectMember)
+      val (sharedProject, _) = upsertForeignProjectWithMember(controller)
+
+      // A second member of the organisation accepted an invitation to the
+      // project. The mock user has no role on the project.
+      val sharedProjectMember: User = User(
+        UserId(),
+        "sharedProjectMember",
+        email = "shared@user.com",
+        firstName = "shared",
+        lastName = "user",
+        active = true,
+        role = FreeUser,
+        organisations = Seq(
+          UserOrganisation(
+            organisationReference = controller.organisation.getReference,
+            `private` = false,
+            role = OrganisationMember,
+            plannedWorkingHours = WorkingHours(),
+            projects = Seq(
+              UserProject(sharedByOrganisationReference = None,
+                          projectReference = sharedProject.getReference,
+                          role = ProjectMember))
+          )),
+        settings = None,
+        acceptedTOS = None
+      )
+      withDBSession()(implicit dbSession =>
+        controller.userRepository.upsert(sharedProjectMember)).awaitResult()
+
+      val request: FakeRequest[Unit] = FakeRequest().withBody(())
+      val result: Future[Result]     =
+        controller.getLastActivityDate(controller.organisationId,
+                                       sharedProject.id)(request)
+
+      status(result) must equalTo(BAD_REQUEST)
+      contentAsString(result) must equalTo(
+        notAssignedMessage(sharedProject.id, controller.organisationId))
+    }
+
+    "no content if OrganisationAdministrator requests an unknown project" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: ProjectsControllerMock          =
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
+                                           authConfig,
+                                           reactiveMongoApi,
+                                           organisationRole =
+                                             OrganisationAdministrator,
+                                           projectRole = ProjectMember)
+
+      val request: FakeRequest[Unit] = FakeRequest().withBody(())
+      val result: Future[Result]     =
+        controller.getLastActivityDate(controller.organisationId, ProjectId())(
+          request)
+
+      status(result) must equalTo(NO_CONTENT)
     }
   }
 }

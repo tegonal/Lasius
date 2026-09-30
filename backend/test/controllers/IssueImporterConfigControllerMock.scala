@@ -56,6 +56,7 @@ class IssueImporterConfigControllerMock(
       reactiveMongoApi = reactiveMongoApi,
       issueImporterRepository = issueImporterConfigRepository,
       userRepository = userRepositoryMock,
+      projectRepository = new ProjectMongoRepository(),
       wsClient = wsClientOverride.getOrElse(
         org.specs2.mock.Mockito.mock[play.api.libs.ws.WSClient])
     )

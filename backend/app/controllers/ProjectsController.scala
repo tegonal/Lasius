@@ -91,26 +91,26 @@ class ProjectsController @Inject() (
         isOrgAdminOrHasProjectRoleInOrganisation(user,
                                                  orgId,
                                                  projectId,
-                                                 ProjectAdministrator) {
-          userOrg =>
-            for {
-              project <- projectRepository
-                .findById(projectId)
-                .noneToFailed(s"Project ${projectId.value} does not exist")
-              _ <- validate(
-                project.organisationReference.id == orgId,
-                s"Project ${projectId.value} is not assigned to organisation ${orgId.value}")
-              // update project
-              updatedProject <- projectRepository
-                .update(userOrg.organisationReference, projectId, request.body)
-              // update key on referenced entities
-              _ <- request.body.key.fold(success()) { newKey =>
-                for {
-                  _ <- userRepository.updateProjectKey(projectId, newKey)
-                  _ <- invitationRepository.updateProjectKey(projectId, newKey)
-                } yield play.api.mvc.Results.Ok
-              }
-            } yield Ok(Json.toJson(updatedProject))
+                                                 ProjectAdministrator,
+                                                 projectRepository) { userOrg =>
+          for {
+            project <- projectRepository
+              .findById(projectId)
+              .noneToFailed(s"Project ${projectId.value} does not exist")
+            _ <- validate(
+              project.organisationReference.id == orgId,
+              s"Project ${projectId.value} is not assigned to organisation ${orgId.value}")
+            // update project
+            updatedProject <- projectRepository
+              .update(userOrg.organisationReference, projectId, request.body)
+            // update key on referenced entities
+            _ <- request.body.key.fold(success()) { newKey =>
+              for {
+                _ <- userRepository.updateProjectKey(projectId, newKey)
+                _ <- invitationRepository.updateProjectKey(projectId, newKey)
+              } yield play.api.mvc.Results.Ok
+            }
+          } yield Ok(Json.toJson(updatedProject))
         }
     }
   }
@@ -122,21 +122,21 @@ class ProjectsController @Inject() (
         isOrgAdminOrHasProjectRoleInOrganisation(user,
                                                  orgId,
                                                  projectId,
-                                                 ProjectAdministrator) {
-          userOrg =>
-            for {
-              project <- projectRepository
-                .findById(projectId)
-                .noneToFailed(s"Project ${projectId.value} does not exist")
-              _ <- validate(
-                project.organisationReference.id == orgId,
-                s"Project ${projectId.value} is not assigned to organisation ${orgId.value}")
-              // remove from all users
-              _ <- userRepository.unassignAllUsersFromProject(projectId)
-              // deactivate project
-              _ <- projectRepository.deactivate(userOrg.organisationReference,
-                                                projectId)
-            } yield Ok("")
+                                                 ProjectAdministrator,
+                                                 projectRepository) { userOrg =>
+          for {
+            project <- projectRepository
+              .findById(projectId)
+              .noneToFailed(s"Project ${projectId.value} does not exist")
+            _ <- validate(
+              project.organisationReference.id == orgId,
+              s"Project ${projectId.value} is not assigned to organisation ${orgId.value}")
+            // remove from all users
+            _ <- userRepository.unassignAllUsersFromProject(projectId)
+            // deactivate project
+            _ <- projectRepository.deactivate(userOrg.organisationReference,
+                                              projectId)
+          } yield Ok("")
         }
     }
 
@@ -147,7 +147,8 @@ class ProjectsController @Inject() (
         isOrgAdminOrHasProjectRoleInOrganisation(user,
                                                  orgId,
                                                  projectId,
-                                                 ProjectMember) { _ =>
+                                                 ProjectMember,
+                                                 projectRepository) { _ =>
           logger.debug(s"Getting last activity for project ${projectId.value}")
           bookingHistoryRepository
             .findLastActivityDateByProjects(Seq(projectId))
@@ -172,7 +173,8 @@ class ProjectsController @Inject() (
         isOrgAdminOrHasProjectRoleInOrganisation(user,
                                                  orgId,
                                                  projectId,
-                                                 ProjectMember) { _ =>
+                                                 ProjectMember,
+                                                 projectRepository) { _ =>
           userRepository
             .findByProject(projectId)
             .map(users => Ok(Json.toJson(users.map(_.toStub))))
@@ -188,56 +190,55 @@ class ProjectsController @Inject() (
         isOrgAdminOrHasProjectRoleInOrganisation(user,
                                                  orgId,
                                                  projectId,
-                                                 ProjectAdministrator) {
-          userOrg =>
-            for {
-              _       <- validateEmail(request.body.email)
-              project <- projectRepository
-                .findById(projectId)
-                .noneToFailed(s"Project ${projectId.value} does not exist")
-              _ <- validate(
-                project.organisationReference.id == orgId,
-                s"Project ${projectId.value} is not assigned to organisation ${orgId.value}")
-              _ <- validate(
-                project.active,
-                s"Cannot invite to an inactive project ${project.key}")
-              maybeExistingUser <- userRepository.findByEmail(
-                request.body.email)
-              partOfSameOrganisation <- Future.successful(
-                maybeExistingUser.fold(false)(
-                  _.organisations.exists(_.organisationReference.id == orgId)))
-              invitationId <-
-                if (partOfSameOrganisation) {
-                  // auto-assign user to project if user is already member of the organisation the project is part of
-                  userRepository
-                    .assignUserToProject(
-                      userId = maybeExistingUser.get.id,
-                      organisationReference = project.organisationReference,
+                                                 ProjectAdministrator,
+                                                 projectRepository) { userOrg =>
+          for {
+            _       <- validateEmail(request.body.email)
+            project <- projectRepository
+              .findById(projectId)
+              .noneToFailed(s"Project ${projectId.value} does not exist")
+            _ <- validate(
+              project.organisationReference.id == orgId,
+              s"Project ${projectId.value} is not assigned to organisation ${orgId.value}")
+            _ <- validate(
+              project.active,
+              s"Cannot invite to an inactive project ${project.key}")
+            maybeExistingUser <- userRepository.findByEmail(request.body.email)
+            partOfSameOrganisation <- Future.successful(
+              maybeExistingUser.fold(false)(
+                _.organisations.exists(_.organisationReference.id == orgId)))
+            invitationId <-
+              if (partOfSameOrganisation) {
+                // auto-assign user to project if user is already member of the organisation the project is part of
+                userRepository
+                  .assignUserToProject(
+                    userId = maybeExistingUser.get.id,
+                    organisationReference = project.organisationReference,
+                    projectReference = project.getReference,
+                    role = request.body.role
+                  )
+                  .map(_ => None)
+              } else {
+                // otherwise create invitation
+                val invitationId = InvitationId()
+                invitationRepository
+                  .upsert(
+                    JoinProjectInvitation(
+                      id = invitationId,
+                      invitedEmail = request.body.email,
+                      createDate = DateTime.now(),
+                      createdBy = subject.userReference,
+                      expiration = DateTime.now().plusDays(7),
+                      sharedByOrganisationReference =
+                        userOrg.organisationReference,
                       projectReference = project.getReference,
-                      role = request.body.role
-                    )
-                    .map(_ => None)
-                } else {
-                  // otherwise create invitation
-                  val invitationId = InvitationId()
-                  invitationRepository
-                    .upsert(
-                      JoinProjectInvitation(
-                        id = invitationId,
-                        invitedEmail = request.body.email,
-                        createDate = DateTime.now(),
-                        createdBy = subject.userReference,
-                        expiration = DateTime.now().plusDays(7),
-                        sharedByOrganisationReference =
-                          userOrg.organisationReference,
-                        projectReference = project.getReference,
-                        role = request.body.role,
-                        outcome = None
-                      ))
-                    .map(_ => Some(invitationId))
-                }
-            } yield Created(
-              Json.toJson(InvitationResult(invitationId, request.body.email)))
+                      role = request.body.role,
+                      outcome = None
+                    ))
+                  .map(_ => Some(invitationId))
+              }
+          } yield Created(
+            Json.toJson(InvitationResult(invitationId, request.body.email)))
         }
     }
 
@@ -249,7 +250,8 @@ class ProjectsController @Inject() (
         isOrgAdminOrHasProjectRoleInOrganisation(user,
                                                  orgId,
                                                  projectId,
-                                                 ProjectAdministrator) { _ =>
+                                                 ProjectAdministrator,
+                                                 projectRepository) { _ =>
           for {
             project <- projectRepository
               .findById(projectId)

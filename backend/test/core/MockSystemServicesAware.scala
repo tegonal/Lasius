@@ -116,5 +116,15 @@ class MockServices(actorSystem: ActorSystem) extends SystemServices {
   override val opaqueTokenIssuerCache: AsyncCacheApi = new MockAsyncCache()
   override val userInfoCache: AsyncCacheApi          = new MockAsyncCache()
 
+  // No spec uses WebSocket tickets. The stubs throw an exception if a spec
+  // calls them.
+  override def createWsTicket(userId: UserId,
+                              userReference: UserReference): String =
+    throw new UnsupportedOperationException("createWsTicket")
+
+  override def consumeWsTicket(
+      ticket: String): Option[(UserId, UserReference)] =
+    throw new UnsupportedOperationException("consumeWsTicket")
+
   override def initialize(): Unit = {}
 }

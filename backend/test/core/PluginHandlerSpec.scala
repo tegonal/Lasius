@@ -48,13 +48,13 @@ class PluginHandlerSpec
       val systemServices: SystemServices = inject[SystemServices]
 
       val configId  = IssueImporterConfigId()
-      val projectId = ProjectId()
+      val mappingId = ProjectMappingId()
 
       // Send message to pluginHandler (which is a TestProbe in MockSystemServices)
       systemServices.pluginHandler ! PluginHandler.StopProjectScheduler(
         ImporterType.Gitlab,
         configId,
-        projectId
+        mappingId
       )
 
       // The message should be accepted without error
@@ -68,7 +68,7 @@ class PluginHandlerSpec
       systemServices.pluginHandler ! PluginHandler.StopProjectScheduler(
         ImporterType.Jira,
         IssueImporterConfigId(),
-        ProjectId()
+        ProjectMappingId()
       )
 
       success
@@ -80,7 +80,7 @@ class PluginHandlerSpec
       systemServices.pluginHandler ! PluginHandler.StopProjectScheduler(
         ImporterType.Plane,
         IssueImporterConfigId(),
-        ProjectId()
+        ProjectMappingId()
       )
 
       success
@@ -92,7 +92,7 @@ class PluginHandlerSpec
       systemServices.pluginHandler ! PluginHandler.StopProjectScheduler(
         ImporterType.Github,
         IssueImporterConfigId(),
-        ProjectId()
+        ProjectMappingId()
       )
 
       success
@@ -140,7 +140,7 @@ class PluginHandlerSpec
       systemServices.pluginHandler ! PluginHandler.RefreshProjectTags(
         ImporterType.Gitlab,
         IssueImporterConfigId(),
-        ProjectId()
+        ProjectMappingId()
       )
 
       success
@@ -149,28 +149,28 @@ class PluginHandlerSpec
     "accept RefreshProjectTags message for all types" in new WithTestApplication {
       val systemServices: SystemServices = inject[SystemServices]
       val configId                       = IssueImporterConfigId()
-      val projectId                      = ProjectId()
+      val mappingId                      = ProjectMappingId()
 
       // Test all four importer types
       systemServices.pluginHandler ! PluginHandler.RefreshProjectTags(
         ImporterType.Gitlab,
         configId,
-        projectId
+        mappingId
       )
       systemServices.pluginHandler ! PluginHandler.RefreshProjectTags(
         ImporterType.Jira,
         configId,
-        projectId
+        mappingId
       )
       systemServices.pluginHandler ! PluginHandler.RefreshProjectTags(
         ImporterType.Plane,
         configId,
-        projectId
+        mappingId
       )
       systemServices.pluginHandler ! PluginHandler.RefreshProjectTags(
         ImporterType.Github,
         configId,
-        projectId
+        mappingId
       )
 
       success

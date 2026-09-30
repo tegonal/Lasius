@@ -28,6 +28,7 @@ import core.{DBSession, DBSupport, SystemServices}
 import models._
 import play.api.libs.json.Reads
 import play.api.mvc._
+import repositories.ProjectRepository
 
 import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
@@ -185,29 +186,52 @@ trait ControllerSecurity extends TokenSecurity {
       })
   }
 
-  /** This helper method checks if a user has at least the role
-    * OrganisationMember and is either OrganisationAdministrator or has provided
-    * project role
+  /** This method checks that the user is at least OrganisationMember of orgId.
+    * An OrganisationAdministrator passes for each project of orgId. For any
+    * other project, the user needs projectRole.
     */
   protected def isOrgAdminOrHasProjectRoleInOrganisation[A](
       user: User,
       orgId: OrganisationId,
       projectId: ProjectId,
-      projectRole: ProjectRole)(f: UserOrganisation => Future[Result])(implicit
+      projectRole: ProjectRole,
+      projectRepository: ProjectRepository)(
+      f: UserOrganisation => Future[Result])(implicit
       context: ExecutionContext,
-      request: Request[A]): Future[Result] = {
+      request: Request[A],
+      dbSession: DBSession): Future[Result] = {
     HasOrganisationRole(user, orgId, OrganisationMember) { userOrg =>
-      // either org admin or project admin
-      val projectToCheck = if (userOrg.role == OrganisationAdministrator) {
-        None
+      if (userOrg.role == OrganisationAdministrator) {
+        projectRepository.findById(projectId).flatMap {
+          case Some(project) if project.organisationReference.id != orgId =>
+            // An accepted project invitation can put a project of another
+            // organisation into orgId. The administrator role does not
+            // cover that project, so the user needs the project role.
+            hasProjectRole(userOrg, projectId, projectRole).flatMap {
+              case true  => f(userOrg)
+              case false =>
+                Future.failed(ValidationFailedException(
+                  s"Project ${projectId.value} is not assigned to organisation ${orgId.value}"))
+            }
+          // An unknown project id passes this check. The actions that load
+          // the project with noneToFailed return 400. getUsers,
+          // getLastActivityDate and getTimeBookingHistoryByProject return an
+          // empty result.
+          case _ => f(userOrg)
+        }
       } else {
-        Some(projectId)
-      }
-      HasOptionalProjectRole(userOrg, projectToCheck, projectRole) { _ =>
-        f(userOrg)
+        HasProjectRole(userOrg, projectId, projectRole)(_ => f(userOrg))
       }
     }
   }
+
+  private def hasProjectRole(userOrganisation: UserOrganisation,
+                             projectId: ProjectId,
+                             role: ProjectRole)(implicit
+      context: ExecutionContext): Future[Boolean] =
+    userOrganisation.projects
+      .find(_.projectReference.id == projectId)
+      .fold(Future.successful(false))(authConfig.authorizeUserProject(_, role))
 
   def HasOptionalProjectRole[A, R <: ProjectRole](
       userOrganisation: UserOrganisation,
