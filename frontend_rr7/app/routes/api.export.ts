@@ -100,7 +100,7 @@ async function createExportResponse(url: URL, headers: HeadersInit): Promise<Res
 
   try {
     if (type === 'bookings') {
-      return handleBookingsExport({
+      return await handleBookingsExport({
         context: (url.searchParams.get('context') as 'organisation' | 'project' | 'user') ?? 'user',
         format: formatParameter,
         from,
@@ -114,7 +114,7 @@ async function createExportResponse(url: URL, headers: HeadersInit): Promise<Res
     }
 
     if (type === 'statistics') {
-      return handleStatisticsExport({
+      return await handleStatisticsExport({
         format: formatParameter as 'ods' | 'xlsx',
         from,
         headers,
