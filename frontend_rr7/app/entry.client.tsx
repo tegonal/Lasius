@@ -24,7 +24,6 @@ import { startTransition, StrictMode } from 'react'
 import { hydrateRoot } from 'react-dom/client'
 import { I18nextProvider, initReactI18next } from 'react-i18next'
 import { HydratedRouter } from 'react-router/dom'
-import { getInitialNamespaces } from 'remix-i18next/client'
 
 import { i18nConfig } from '~/i18n-config.ts'
 import { logger } from '~/lib/logger'
@@ -47,7 +46,6 @@ async function main() {
         ...i18nConfig,
         backend: { loadPath: '/api/locales/{{lng}}/{{ns}}' },
         detection: { caches: [], order: ['htmlTag'] },
-        ns: getInitialNamespaces(),
       })
 
     startTransition(() => {

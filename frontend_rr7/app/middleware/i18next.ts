@@ -17,7 +17,7 @@
  *
  */
 
-import { createI18nextMiddleware } from 'remix-i18next/middleware'
+import { createI18nextMiddleware } from 'remix-i18next'
 
 import { i18nServerConfig } from '~/i18n-resources.server'
 import { localeCookie } from '~/lib/cookies/i18next-cookie.server'
