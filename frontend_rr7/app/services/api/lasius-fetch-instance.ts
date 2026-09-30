@@ -70,17 +70,7 @@ export const lasiusFetch = async <T>(url: string, init: RequestInit): Promise<T>
   const response = await fetch(fullUrl, init)
 
   if (!response.ok) {
-    let body: unknown
-    try {
-      body = await response.json()
-    } catch {
-      try {
-        body = await response.text()
-      } catch {
-        body = null
-      }
-    }
-    throw new ApiError(response.status, response.statusText, body)
+    throw new ApiError(response.status, response.statusText, await readErrorBody(response))
   }
 
   // Handle empty responses (204 No Content, etc.)
@@ -98,4 +88,34 @@ export const lasiusFetch = async <T>(url: string, init: RequestInit): Promise<T>
 }
 
 export type BodyType<BodyData> = BodyData
+
 export type ErrorType<Error> = ApiError & { data?: Error }
+
+/**
+ * The backend reason of a failed request, for display to the user. The backend sends a reason such
+ * as `user_already_registered` as a short plain-text body. A 5xx body or an HTML page stays hidden.
+ */
+export function getApiErrorReason(error: ApiError): string {
+  const body = typeof error.body === 'string' ? error.body.trim() : ''
+  const isClientError = error.status >= 400 && error.status < 500
+  if (isClientError && body !== '' && body.length <= 500 && !body.startsWith('<')) {
+    return body
+  }
+  return error.statusText
+}
+
+/** Read the body once as text. A second read of the same body throws "Body already used". */
+async function readErrorBody(response: Response): Promise<unknown> {
+  let text: string
+  try {
+    text = await response.text()
+  } catch {
+    return null
+  }
+  if (text === '') return null
+  try {
+    return JSON.parse(text) as unknown
+  } catch {
+    return text
+  }
+}

@@ -20,7 +20,7 @@
 import { data } from 'react-router'
 import { z } from 'zod'
 
-import { ApiError, lasiusFetch } from '~/services/api/lasius-fetch-instance'
+import { ApiError, getApiErrorReason, lasiusFetch } from '~/services/api/lasius-fetch-instance'
 import {
   authHeadersWithCsrf,
   mergeAuthHeaders,
@@ -109,7 +109,7 @@ export async function action({ request, url: routeUrl }: Route.ActionArgs) {
   } catch (error) {
     if (error instanceof ApiError) {
       const envelope: ProxyEnvelope = {
-        error: error.statusText,
+        error: getApiErrorReason(error),
         ok: false,
         status: error.status,
       }
