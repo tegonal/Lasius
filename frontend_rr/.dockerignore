@@ -7,7 +7,7 @@
 .react-router
 .yarn
 build
-frontend_rr7
+frontend_rr
 node_modules
 Dockerfile
 .dockerignore

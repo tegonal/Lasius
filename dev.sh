@@ -57,7 +57,7 @@ tmux new-session -d -s "$SESSION" -c "$ROOT/backend" \
   "set -a; [ -f $ROOT/frontend/.env.local ] && . $ROOT/frontend/.env.local; set +a; LASIUS_CLEAN_DATABASE_ON_STARTUP=false sbt run -Dconfig.resource=dev-large.conf; read -p 'Press Enter to close...'"
 
 # Split: frontend RR7 (waits for backend via port check)
-tmux split-window -t "$SESSION" -v -c "$ROOT/frontend_rr7" \
+tmux split-window -t "$SESSION" -v -c "$ROOT/frontend_rr" \
   "echo 'Waiting for backend on port 9000...' && \
    while ! nc -z localhost 9000 2>/dev/null; do sleep 2; done && \
    echo 'Backend ready. Starting frontend (RR7)...' && \
@@ -65,11 +65,11 @@ tmux split-window -t "$SESSION" -v -c "$ROOT/frontend_rr7" \
 
 # --- Logging ---
 
-mkdir -p "$ROOT/backend/.logs" "$ROOT/frontend_rr7/.logs"
+mkdir -p "$ROOT/backend/.logs" "$ROOT/frontend_rr/.logs"
 : > "$ROOT/backend/.logs/dev-server.log"
-: > "$ROOT/frontend_rr7/.logs/dev-server.log"
+: > "$ROOT/frontend_rr/.logs/dev-server.log"
 tmux pipe-pane -t "$SESSION:0.0" -o "cat >> $ROOT/backend/.logs/dev-server.log"
-tmux pipe-pane -t "$SESSION:0.1" -o "cat >> $ROOT/frontend_rr7/.logs/dev-server.log"
+tmux pipe-pane -t "$SESSION:0.1" -o "cat >> $ROOT/frontend_rr/.logs/dev-server.log"
 
 # --- Layout ---
 

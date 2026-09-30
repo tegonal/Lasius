@@ -27,14 +27,14 @@ jobs:
       - name: Build & push frontend image to docker hub
         uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
         with:
-          context: "{{defaultContext}}:frontend_rr7"
+          context: "{{defaultContext}}:frontend_rr"
           build-args: |
             LASIUS_VERSION=${{github.ref_name}}
             COMMIT_SHORT_SHA=${{env.COMMIT_SHORT_SHA}}
           push: true
           tags: tegonal/lasius-frontend:${{github.ref_name}}
-          cache-from: type=gha,scope=frontend_rr7
-          cache-to: type=gha,mode=max,scope=frontend_rr7
+          cache-from: type=gha,scope=frontend_rr
+          cache-to: type=gha,mode=max,scope=frontend_rr
 
   backend:
     name: Build & push backend

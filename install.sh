@@ -25,7 +25,7 @@ yarn install
 # Frontend RR7 (active)
 echo ""
 echo "--- Frontend RR7 (yarn) ---"
-cd "$REPO_ROOT/frontend_rr7"
+cd "$REPO_ROOT/frontend_rr"
 corepack enable
 yarn install
 
@@ -42,6 +42,6 @@ echo "=== Installation complete ==="
 echo ""
 echo "Next steps:"
 echo "  1. Copy frontend/.env.template to frontend/.env.local (if not done)"
-echo "     (frontend_rr7 will auto-symlink to it when running dev.sh)"
+echo "     (frontend_rr will auto-symlink to it when running dev.sh)"
 echo "  2. Start services: cd services && yarn services:start"
 echo "  3. Start dev servers: ./dev.sh"
