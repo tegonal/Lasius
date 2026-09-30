@@ -11,6 +11,7 @@ export default {
   future: {
     unstable_optimizeDeps: true, // TODO: remove once stabilized upstream
     v8_middleware: true,
+    v8_splitRouteModules: true,
     v8_viteEnvironmentApi: true,
   },
   ssr: true,
