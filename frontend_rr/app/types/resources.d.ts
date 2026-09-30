@@ -217,6 +217,27 @@ export default interface Resources {
     }
     errors: {
       helpNotAvailable: 'Help content not available for this page.'
+      page: {
+        details: 'Error details'
+        generic: {
+          message: 'An error occurred.'
+          title: 'Something went wrong'
+        }
+        goHome: 'Go home'
+        notFound: {
+          message: 'The page you are looking for does not exist.'
+          title: 'Page not found'
+        }
+        tryAgain: 'Try again'
+        unauthorized: {
+          message: 'You need to sign in to access this page.'
+          title: 'Unauthorized'
+        }
+        unexpected: {
+          message: 'Something went wrong. Please try again or return to the home page.'
+          title: 'Unexpected error'
+        }
+      }
     }
     export: {
       actions: {
@@ -1037,6 +1058,7 @@ export default interface Resources {
     '6monthWorkTrend': '6-Month Work Trend'
     '6months': '6 Months'
     calendarYear: 'Calendar year'
+    chartFailedToLoad: 'Chart failed to load'
     decimalHours: 'Decimal hours'
     expectedHours: 'Expected hours'
     hoursMinutes: 'HH:MM'
