@@ -18,6 +18,7 @@
  */
 
 import { Component, type ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 
 type ChartErrorBoundaryProperties = {
   children: ReactNode
@@ -40,14 +41,20 @@ export class ChartErrorBoundary extends Component<
 
   render() {
     if (this.state.hasError) {
-      return (
-        this.props.fallback || (
-          <div className="bg-base-200 flex h-[320px] w-full items-center justify-center rounded-lg">
-            <span className="text-base-content/50 text-sm">Chart failed to load</span>
-          </div>
-        )
-      )
+      return this.props.fallback || <ChartLoadError />
     }
     return this.props.children
   }
+}
+
+// A class component cannot call useTranslation, so the default fallback is a function component.
+const ChartLoadError = () => {
+  const { t } = useTranslation('stats')
+  return (
+    <div className="bg-base-200 flex h-[320px] w-full items-center justify-center rounded-lg">
+      <span className="text-base-content/50 text-sm">
+        {t('chartFailedToLoad', 'Chart failed to load')}
+      </span>
+    </div>
+  )
 }
