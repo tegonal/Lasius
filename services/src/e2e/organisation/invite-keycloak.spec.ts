@@ -64,7 +64,7 @@ async function forceKeycloakLoginPrompt(page: Page) {
  */
 async function loginAsKeycloakUser(page: Page, email: string, password: string) {
   await page.goto('/login')
-  await page.getByTestId('auth-provider-custom_keycloak').click()
+  await page.getByTestId('auth-provider-keycloak').click()
   await page.waitForURL(/.*localhost:8080.*/, { timeout: 15000 })
   await page.getByLabel('Email').fill(email)
   await page.locator('input#password').fill(password)
@@ -134,7 +134,7 @@ async function registerViaKeycloak(
   lastName: string,
 ) {
   await page.goto('/login')
-  await page.getByTestId('auth-provider-custom_keycloak').click()
+  await page.getByTestId('auth-provider-keycloak').click()
   await page.waitForURL(/.*localhost:8080.*/, { timeout: 15000 })
 
   // Click "Register" link on Keycloak login page
@@ -179,7 +179,6 @@ test.describe.serial('Keycloak Organisation + Invitation lifecycle @org @keycloa
     await page.waitForURL(/.*\/organisation\/current.*/, { timeout: 15000 })
     await acceptTosIfVisible(page)
 
-    // LayoutResponsive renders children twice (desktop + mobile); use .first() for desktop
     await page.getByTestId('org-actions-dropdown').first().click()
     await page.getByTestId('org-actions-create-btn').first().click()
 
@@ -230,7 +229,6 @@ test.describe.serial('Keycloak Organisation + Invitation lifecycle @org @keycloa
   test('invite existing user to organisation', async () => {
     await expect(page.getByText(orgName).first()).toBeVisible({ timeout: 10000 })
 
-    // LayoutResponsive renders children twice (desktop + mobile); use .first() for desktop
     await page.getByTestId('org-actions-dropdown').first().click()
     await page.getByTestId('org-actions-invite-btn').first().click()
 
@@ -326,7 +324,6 @@ test.describe.serial('Keycloak Organisation + Invitation lifecycle @org @keycloa
     // Shared page still shows the newly created org
     await expect(page.getByText(orgName).first()).toBeVisible({ timeout: 10000 })
 
-    // LayoutResponsive renders children twice (desktop + mobile); use .first() for desktop
     await page.getByTestId('org-actions-dropdown').first().click()
     await page.getByTestId('org-actions-invite-btn').first().click()
 

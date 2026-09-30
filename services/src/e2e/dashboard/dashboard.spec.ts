@@ -26,9 +26,14 @@ test.describe('Dashboard', () => {
     // Verify redirected to authenticated user area
     await expect(page).toHaveURL(/\/user\//, { timeout: 15000 })
 
-    // Verify calendar week navigation buttons are visible
-    await expect(page.getByTestId('calendar-week-prev-btn').first()).toBeVisible({ timeout: 10000 })
-    await expect(page.getByTestId('calendar-week-next-btn').first()).toBeVisible()
+    // Verify calendar week navigation buttons are visible. The hidden mobile header can
+    // render a second CalendarWeek, so every calendar-week locator filters to the visible copy.
+    await expect(
+      page.getByTestId('calendar-week-prev-btn').locator('visible=true').first(),
+    ).toBeVisible({ timeout: 10000 })
+    await expect(
+      page.getByTestId('calendar-week-next-btn').locator('visible=true').first(),
+    ).toBeVisible()
   })
 
   test('calendar week navigation works @smoke', async ({ page }) => {
@@ -36,18 +41,18 @@ test.describe('Dashboard', () => {
     await expect(page).toHaveURL(/\/user\//, { timeout: 15000 })
 
     // Wait for calendar to load
-    const prevBtn = page.getByTestId('calendar-week-prev-btn').first()
+    const prevBtn = page.getByTestId('calendar-week-prev-btn').locator('visible=true').first()
     await expect(prevBtn).toBeVisible({ timeout: 10000 })
 
     // Click previous week (force: avatar SVG sometimes overlaps in compact viewports)
     await prevBtn.click({ force: true })
 
     // Click next week
-    const nextBtn = page.getByTestId('calendar-week-next-btn').first()
+    const nextBtn = page.getByTestId('calendar-week-next-btn').locator('visible=true').first()
     await nextBtn.click({ force: true })
 
     // Click today button (visible when not on current day after navigation)
-    const todayBtn = page.getByTestId('calendar-week-today-btn').first()
+    const todayBtn = page.getByTestId('calendar-week-today-btn').locator('visible=true').first()
     if (await todayBtn.isVisible()) {
       await todayBtn.click()
     }

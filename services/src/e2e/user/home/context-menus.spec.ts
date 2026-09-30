@@ -46,7 +46,9 @@ const startBookingViaQuickStart = async (page: Page) => {
 
   await page.locator('[role="option"]').first().click()
   await page.getByTestId('booking-start-submit-btn').click()
-  await expect(page.getByTestId('booking-current-stop-btn').first()).toBeVisible({
+  await expect(
+    page.getByTestId('booking-current-stop-btn').locator('visible=true').first(),
+  ).toBeVisible({
     timeout: 10000,
   })
   return true
@@ -54,9 +56,12 @@ const startBookingViaQuickStart = async (page: Page) => {
 
 /**
  * Opens the context menu on the running booking.
+ * The hidden mobile header renders a second BookingCurrent first in the DOM.
+ * The stop and ctx-open locators therefore filter to the visible copy.
+ * The menu buttons render only in the opened copy.
  */
 const openCurrentBookingContextMenu = async (page: Page) => {
-  const openBtn = page.getByTestId('booking-current-ctx-open-btn')
+  const openBtn = page.getByTestId('booking-current-ctx-open-btn').locator('visible=true').first()
 
   await expect(async () => {
     await openBtn.click()
@@ -85,7 +90,7 @@ const openFavoriteContextMenu = async (page: Page, index = 0) => {
  * Stops the running booking if one exists.
  */
 const stopBookingIfRunning = async (page: Page) => {
-  const stopBtn = page.getByTestId('booking-current-stop-btn').first()
+  const stopBtn = page.getByTestId('booking-current-stop-btn').locator('visible=true').first()
   if (await stopBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
     await stopBtn.click()
     await expect(stopBtn).not.toBeVisible({ timeout: 10000 })
@@ -101,7 +106,7 @@ test.describe.serial('Context menu actions @context-menus', () => {
 
   test('edit running booking via context menu', async ({ page }) => {
     // Ensure a booking is running
-    const stopBtn = page.getByTestId('booking-current-stop-btn').first()
+    const stopBtn = page.getByTestId('booking-current-stop-btn').locator('visible=true').first()
     if (!(await stopBtn.isVisible({ timeout: 5000 }).catch(() => false))) {
       const started = await startBookingViaQuickStart(page)
       if (!started) {
@@ -125,7 +130,7 @@ test.describe.serial('Context menu actions @context-menus', () => {
   })
 
   test('add running booking to favorites via context menu', async ({ page }) => {
-    const stopBtn = page.getByTestId('booking-current-stop-btn').first()
+    const stopBtn = page.getByTestId('booking-current-stop-btn').locator('visible=true').first()
     if (!(await stopBtn.isVisible({ timeout: 5000 }).catch(() => false))) {
       const started = await startBookingViaQuickStart(page)
       if (!started) {
@@ -162,7 +167,9 @@ test.describe.serial('Context menu actions @context-menus', () => {
     await page.getByTestId('favorite-ctx-start-btn').click()
 
     // A booking should now be running
-    await expect(page.getByTestId('booking-current-stop-btn').first()).toBeVisible({
+    await expect(
+      page.getByTestId('booking-current-stop-btn').locator('visible=true').first(),
+    ).toBeVisible({
       timeout: 10000,
     })
   })
@@ -214,7 +221,9 @@ test.describe.serial('Context menu actions @context-menus', () => {
     await page.getByTestId('org-ctx-start-btn').click()
 
     // A booking should now be running
-    await expect(page.getByTestId('booking-current-stop-btn').first()).toBeVisible({
+    await expect(
+      page.getByTestId('booking-current-stop-btn').locator('visible=true').first(),
+    ).toBeVisible({
       timeout: 10000,
     })
   })
