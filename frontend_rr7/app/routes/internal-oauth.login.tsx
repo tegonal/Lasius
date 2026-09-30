@@ -101,7 +101,7 @@ export async function action({ request }: Route.ActionArgs) {
       email: result.profile.email,
     })
 
-    return createUserSession(
+    return await createUserSession(
       {
         accessToken: result.tokens.access_token,
         email: result.profile.email,
