@@ -17,7 +17,7 @@
  *
  */
 
-import { parse, serialize } from 'cookie'
+import { parseCookie, stringifySetCookie } from 'cookie'
 
 import { COOKIE_MAX_AGE_1_YEAR } from '~/config/constants'
 
@@ -35,7 +35,7 @@ export function isValidTheme(value?: unknown): value is Theme {
  */
 export function parseThemeCookie(cookieHeader: null | string): null | Theme {
   if (!cookieHeader) return null
-  const cookies = parse(cookieHeader)
+  const cookies = parseCookie(cookieHeader)
   const value = cookies[COOKIE_NAME]
   return isValidTheme(value) ? value : null
 }
@@ -49,10 +49,12 @@ export function parseThemeCookie(cookieHeader: null | string): null | Theme {
  * Theme preference is not sensitive data.
  */
 export function serializeThemeCookie(theme: Theme): string {
-  return serialize(COOKIE_NAME, theme, {
+  return stringifySetCookie({
     maxAge: COOKIE_MAX_AGE_1_YEAR,
+    name: COOKIE_NAME,
     path: '/',
     sameSite: 'lax',
     secure: process.env.NODE_ENV === 'production',
+    value: theme,
   })
 }

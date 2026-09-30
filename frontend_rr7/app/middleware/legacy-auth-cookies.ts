@@ -17,7 +17,7 @@
  *
  */
 
-import { parse } from 'cookie'
+import { parseCookie } from 'cookie'
 import { type MiddlewareFunction } from 'react-router'
 
 /**
@@ -26,7 +26,7 @@ import { type MiddlewareFunction } from 'react-router'
  */
 export function expireLegacyAuthCookies(cookieHeader: null | string): string[] {
   if (!cookieHeader) return []
-  return Object.keys(parse(cookieHeader))
+  return Object.keys(parseCookie(cookieHeader))
     .filter((name) => name.includes('next-auth.'))
     .map((name) => {
       // A browser deletes a __Secure- or __Host- cookie only with the Secure attribute.
