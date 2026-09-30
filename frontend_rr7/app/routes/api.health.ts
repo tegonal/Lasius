@@ -20,10 +20,11 @@
 import { data } from 'react-router'
 
 import { getConfiguration } from '~/services/api/lasius/general/general'
+import { getAuthSecret } from '~/services/auth/auth-secret.server'
 
 export type HealthResponse = {
   backend: 'connected' | 'disconnected'
-  status: 'ok'
+  status: 'error' | 'ok'
   version: string
 }
 
@@ -32,6 +33,7 @@ export type HealthResponse = {
  *
  * Returns app self-status, backend connectivity, and build version.
  * No auth required — must work even when session is expired.
+ * Answers 503 without a session secret, because every page then fails.
  */
 export async function loader() {
   const version = process.env.LASIUS_VERSION || 'dev'
@@ -44,7 +46,13 @@ export async function loader() {
     backend = 'disconnected'
   }
 
-  return data({ backend, status: 'ok', version } satisfies HealthResponse, {
-    headers: { 'Cache-Control': 'no-store' },
-  })
+  const isConfigured = getAuthSecret() !== undefined
+
+  return data(
+    { backend, status: isConfigured ? 'ok' : 'error', version } satisfies HealthResponse,
+    {
+      headers: { 'Cache-Control': 'no-store' },
+      status: isConfigured ? 200 : 503,
+    },
+  )
 }

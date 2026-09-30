@@ -22,6 +22,7 @@ import { createCookieSessionStorage, href, redirect } from 'react-router'
 import { AUTH_REFRESH_BACKOFF_MS } from '~/config/constants'
 import { logger } from '~/lib/logger'
 
+import { getAuthSecret } from './auth-secret.server'
 import { getProvider } from './providers'
 import { type LasiusSessionData } from './types'
 
@@ -40,9 +41,12 @@ const inflightRefreshes = new Map<
 >()
 
 function getSessionStorage() {
-  const secret = process.env.AUTH_SECRET
+  const secret = getAuthSecret()
   if (!secret) {
     throw new Error('Missing required env var: AUTH_SECRET')
+  }
+  if (!process.env.AUTH_SECRET) {
+    logger.warn('AUTH_SECRET is not set. The session cookie uses NEXTAUTH_SECRET instead.')
   }
 
   return createCookieSessionStorage<{ user: LasiusSessionData }>({
