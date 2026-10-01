@@ -30,6 +30,7 @@ playwright-transform-cache-*/
 
 # Environment
 .env.local
+.env*.local
 
 # Claude Code / AI agents (local only)
 .claude/
