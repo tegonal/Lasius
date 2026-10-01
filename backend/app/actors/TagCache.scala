@@ -74,8 +74,9 @@ class TagCache extends Actor with ActorLogging {
     val current      = externalTags.getOrElse(tagType, Set.empty)
 
     if (current != tags) {
-      log.debug(
-        s"TagCache updated for project $projectId: removed=${(current -- tags).size}, added=${(tags -- current).size}")
+      if (log.isDebugEnabled)
+        log.debug(
+          s"TagCache updated for project $projectId: removed=${(current -- tags).size}, added=${(tags -- current).size}")
       tagCache += projectId ->
         (projectTags + (externalProjectId -> (externalTags + (tagType -> tags))))
     }

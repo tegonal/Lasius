@@ -30,6 +30,7 @@ import play.api.libs.json._
 /** An item of a Plane answer, identified by its UUID. */
 sealed trait PlaneEntity {
   def id: String
+  def name: String
 }
 
 final case class PlaneLabel(id: String, name: String) extends PlaneEntity

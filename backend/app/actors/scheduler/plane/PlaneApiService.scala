@@ -82,13 +82,12 @@ class PlaneApiServiceImpl(override val ws: WSClient,
       resourcePath(workspace, projectId, "states"),
       maxResults).map(_.toSet)
 
-  def findIssues(
-      workspace: String,
-      projectId: String,
-      paramString: String,
-      maxResults: Int,
-      includeOnlyIssuesWithLabelsIds: Set[String] = Set.empty,
-      includeOnlyIssuesWithStateIds: Set[String] = Set.empty)(implicit
+  def findIssues(workspace: String,
+                 projectId: String,
+                 paramString: String,
+                 maxResults: Int,
+                 includeOnlyIssuesWithLabelsIds: Set[String],
+                 includeOnlyIssuesWithStateIds: Set[String])(implicit
       auth: ServiceAuthentication,
       executionContext: ExecutionContext): Future[Seq[PlaneIssue]] = {
     val filterParams = Seq(
@@ -100,20 +99,20 @@ class PlaneApiServiceImpl(override val ws: WSClient,
     }
     val params = Some(paramString) +: filterParams
 
-    def loadFrom(resource: String): Future[Seq[PlaneIssue]] =
+    def loadIssuesOf(resource: String): Future[Seq[PlaneIssue]] =
       loadAllPages[PlaneIssue, PlaneIssuesQueryResult](
         resourcePath(workspace, projectId, resource),
         maxResults,
         params)
 
-    if (useLegacyIssuesResource) loadFrom("issues")
+    if (useLegacyIssuesResource) loadIssuesOf("issues")
     else
-      loadFrom("work-items").recoverWith {
+      loadIssuesOf("work-items").recoverWith {
         case e: HttpStatusException if e.status == 404 =>
           logger.info(
             s"Plane at ${config.baseUrl} has no work-items endpoint, using /issues/")
           useLegacyIssuesResource = true
-          loadFrom("issues")
+          loadIssuesOf("issues")
       }
   }
 
@@ -129,7 +128,7 @@ class PlaneApiServiceImpl(override val ws: WSClient,
       executionContext: ExecutionContext,
       reads: Reads[P]): Future[Seq[R]] = {
 
-    def loadFrom(cursor: String,
+    def loadPage(cursor: String,
                  page: Int,
                  loaded: Vector[R],
                  loadedIds: Set[String]): Future[Seq[R]] = {
@@ -150,14 +149,14 @@ class PlaneApiServiceImpl(override val ws: WSClient,
             result.next_cursor == cursor
         if (isLastPage) Future.successful(all)
         else
-          loadFrom(result.next_cursor,
+          loadPage(result.next_cursor,
                    page + 1,
                    all,
                    loadedIds ++ newResults.map(_.id))
       }
     }
 
-    loadFrom(cursor = s"$perPage:0:0",
+    loadPage(cursor = s"$perPage:0:0",
              page = 0,
              loaded = Vector.empty,
              loadedIds = Set.empty)

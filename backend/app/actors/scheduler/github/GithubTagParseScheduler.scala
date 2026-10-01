@@ -23,7 +23,7 @@ package actors.scheduler.github
 
 import java.util.UUID
 
-import actors.scheduler.github.GithubTagParseWorker.StartParsing
+import actors.scheduler.TagParseWorker.{Parse, StartParsing}
 import actors.scheduler.{ServiceAuthentication, ServiceConfiguration}
 import org.apache.pekko.actor.SupervisorStrategy._
 import org.apache.pekko.actor.{OneForOneStrategy, _}
@@ -147,7 +147,7 @@ class GithubTagParseScheduler(wsClient: WSClient,
         case Some(worker) =>
           log.debug(
             s"Found worker for mapping $mappingId, sending Parse message")
-          worker ! GithubTagParseWorker.Parse
+          worker ! Parse
         case None =>
           log.warning(
             s"No worker found for configId=$configId, mappingId=$mappingId")

@@ -21,25 +21,18 @@
 
 package actors.scheduler.jira
 
-import actors.IssueImporterStatusMonitor.{
-  UpdateConnectivityStatus,
-  UpdateProjectSyncStats
-}
-import models._
-import actors.TagCache.TagsUpdated
 import actors.scheduler.{
-  ImporterErrors,
   ServiceAuthentication,
-  ServiceConfiguration
+  ServiceConfiguration,
+  TagParseWorker
 }
-import org.apache.pekko.actor._
 import core.SystemServices
+import models._
+import org.apache.pekko.actor.Props
 import play.api.libs.ws.WSClient
 
-import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.concurrent.Future
 import scala.concurrent.duration._
-import scala.language.postfixOps
-import scala.util.{Failure, Success}
 
 object JiraTagParseWorker {
   def props(wsClient: WSClient,
@@ -61,159 +54,58 @@ object JiraTagParseWorker {
           configId,
           organisationId,
           projectId)
-
-  case object StartParsing
-  case object Parse
 }
 
 class JiraTagParseWorker(wsClient: WSClient,
-                         systemServices: SystemServices,
+                         protected val systemServices: SystemServices,
                          config: ServiceConfiguration,
                          settings: JiraSettings,
                          projectSettings: JiraProjectSettings,
-                         implicit val auth: ServiceAuthentication,
-                         configId: IssueImporterConfigId,
-                         organisationId: OrganisationId,
-                         projectId: ProjectId)
-    extends Actor
-    with ActorLogging {
-  import JiraTagParseWorker._
+                         private implicit val auth: ServiceAuthentication,
+                         protected val configId: IssueImporterConfigId,
+                         protected val organisationId: OrganisationId,
+                         protected val projectId: ProjectId)
+    extends TagParseWorker[JiraIssueTag] {
 
-  var cancellable: Option[Cancellable]   = None
-  private var lastIssueSize: Option[Int] = None
-  private val jiraApiService = new JiraApiServiceImpl(wsClient, config)
-  private val defaultJql     =
-    s"project=${projectSettings.jiraProjectKey} and resolution=Unresolved ORDER BY created DESC"
-  val maxResults: Int = projectSettings.maxResults.getOrElse(100)
-  implicit val executionContext: ExecutionContextExecutor =
-    context.system.dispatcher
+  private val apiService = new JiraApiServiceImpl(wsClient, config)
+  private val maxResults = projectSettings.maxResults.getOrElse(100)
+  private val jql        = projectSettings.jql.getOrElse(
+    s"project=${projectSettings.jiraProjectKey} and resolution=Unresolved ORDER BY created DESC")
 
-  val receive: Receive = { case StartParsing =>
-    cancellable = Some(
-      context.system.scheduler.scheduleOnce(0.milliseconds, self, Parse))
-    context.become(parsing)
-  }
+  override protected val externalProjectId: String =
+    projectSettings.jiraProjectKey
+  override protected val projectName: String =
+    projectSettings.externalProjectName.getOrElse(
+      s"Jira Project ${projectSettings.jiraProjectKey}")
+  override protected val checkFrequency: FiniteDuration =
+    settings.checkFrequency.milliseconds
 
-  val parsing: Receive = { case Parse =>
-    loadIssues(0, lastIssueSize)
-      .map { result =>
-        // fetched all results, notify
-        lastIssueSize = Some(result.size)
-        if (log.isDebugEnabled) {
-          val keys = result.map(_.key)
-          log.debug(s"Parsed keys:$keys")
-        }
+  override protected def loadTags(): Future[Set[JiraIssueTag]] =
+    loadIssues(startAt = 0).map(_.map(toJiraIssueTag))
 
-        // assemble jira issuetag
-        val tags = result.map(toJiraIssueTag)
-        systemServices.tagCache ! TagsUpdated[JiraIssueTag](
-          projectSettings.jiraProjectKey,
-          projectId,
-          tags)
-
-        // Report successful sync
-        systemServices.issueImporterStatusMonitor ! UpdateProjectSyncStats(
-          configId = configId,
-          organisationId = organisationId,
-          projectId = projectId,
-          projectName = projectSettings.externalProjectName.getOrElse(
-            s"Jira Project ${projectSettings.jiraProjectKey}"),
-          issueCount = result.size,
-          success = true
-        )
-
-        systemServices.issueImporterStatusMonitor ! UpdateConnectivityStatus(
-          configId = configId,
-          organisationId = organisationId,
-          status = ConnectivityStatus.Healthy,
-          issue = None
-        )
+  /** Pages through the search result with startAt until Jira's total is
+    * reached.
+    */
+  private def loadIssues(
+      startAt: Int,
+      loaded: Set[JiraIssue] = Set.empty): Future[Set[JiraIssue]] =
+    apiService
+      .findIssues(jql,
+                  Some(startAt),
+                  Some(maxResults),
+                  fields = Some("summary"))
+      .flatMap { result =>
+        val all         = loaded ++ result.issues
+        val nextStartAt = result.startAt + result.issues.size
+        if (result.issues.isEmpty || nextStartAt >= result.total)
+          Future.successful(all)
+        else loadIssues(nextStartAt, all)
       }
-      .andThen {
-        case Success(_) =>
-          log.debug(s"Parse successful, restarting timer")
-          cancellable = Some(
-            context.system.scheduler
-              .scheduleOnce(settings.checkFrequency.milliseconds, self, Parse))
 
-        case Failure(ex) =>
-          log.error(ex, s"Failed to parse Jira issues for project $projectId")
-
-          val issue = ImporterErrors.connectivityIssue(ex)
-
-          systemServices.issueImporterStatusMonitor ! UpdateProjectSyncStats(
-            configId = configId,
-            organisationId = organisationId,
-            projectId = projectId,
-            projectName = projectSettings.externalProjectName.getOrElse(
-              s"Jira Project ${projectSettings.jiraProjectKey}"),
-            issueCount = 0,
-            success = false,
-            error = Some(issue)
-          )
-
-          systemServices.issueImporterStatusMonitor ! UpdateConnectivityStatus(
-            configId = configId,
-            organisationId = organisationId,
-            status = ConnectivityStatus.Failed,
-            issue = Some(issue)
-          )
-
-          cancellable = Some(
-            context.system.scheduler
-              .scheduleOnce(settings.checkFrequency.milliseconds, self, Parse))
-      }
-  }
-
-  private def toJiraIssueTag(issue: JiraIssue): JiraIssueTag = {
-    issue.fields
-      .map { fields =>
-        JiraIssueTag(TagId(issue.key),
-                     config.baseUrl,
-                     fields.primary.summary,
-                     issue.self,
-                     projectSettings.jiraProjectKey)
-      }
-      .getOrElse {
-        JiraIssueTag(TagId(issue.key),
-                     config.baseUrl,
-                     None,
-                     issue.self,
-                     projectSettings.jiraProjectKey)
-      }
-  }
-
-  def loadIssues(offset: Int,
-                 max: Option[Int],
-                 lastResult: Set[JiraIssue] = Set()): Future[Set[JiraIssue]] = {
-    val newMax = max.getOrElse(maxResults)
-    issues(offset, newMax).flatMap { result =>
-      val concat: Set[JiraIssue] = lastResult ++ result.issues.toSet
-      log.debug(
-        s"loaded issues: maxResults:${result.maxResults}, fetch count${concat.size}")
-      if (result.maxResults >= concat.size) {
-        // fetched all results, notify
-        Future.successful(concat)
-      } else {
-        val maxNextRun = Math.min(result.maxResults, maxResults)
-        loadIssues(newMax, Some(maxNextRun), concat)
-      }
-    }
-  }
-
-  def issues(offset: Int, max: Int): Future[JiraSearchResult] = {
-    log.debug(
-      s"Parse issues projectId=${projectId.value}, project=${projectSettings.jiraProjectKey}, offset:$offset, max:$max")
-    val query = projectSettings.jql.getOrElse(defaultJql)
-    jiraApiService.findIssues(query,
-                              Some(offset),
-                              Some(max),
-                              fields = Some("summary"))
-  }
-
-  override def postStop(): Unit = {
-    cancellable.map(c => c.cancel())
-    cancellable = None
-    super.postStop()
-  }
+  private def toJiraIssueTag(issue: JiraIssue): JiraIssueTag =
+    JiraIssueTag(TagId(issue.key),
+                 config.baseUrl,
+                 issue.fields.flatMap(_.primary.summary),
+                 issue.self,
+                 projectSettings.jiraProjectKey)
 }

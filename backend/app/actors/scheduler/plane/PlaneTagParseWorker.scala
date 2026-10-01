@@ -21,26 +21,19 @@
 
 package actors.scheduler.plane
 
-import actors.IssueImporterStatusMonitor.{
-  UpdateConnectivityStatus,
-  UpdateProjectSyncStats
-}
-import actors.TagCache.TagsUpdated
 import actors.scheduler.{
-  ImporterErrors,
   ServiceAuthentication,
-  ServiceConfiguration
+  ServiceConfiguration,
+  TagParseWorker
 }
-import org.apache.pekko.actor._
 import core.SystemServices
 import models._
+import org.apache.pekko.actor.Props
 import play.api.libs.ws.WSClient
 
 import java.net.URL
-import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.concurrent.Future
 import scala.concurrent.duration._
-import scala.language.postfixOps
-import scala.util.{Failure, Success}
 
 object PlaneTagParseWorker {
   def props(wsClient: WSClient,
@@ -65,209 +58,95 @@ object PlaneTagParseWorker {
           organisationId,
           projectId)
 
-  case object StartParsing
-  case object Parse
-
-  /** The Plane API documents no labels or state query parameter, so the
-    * importer applies both filters itself. An empty set means no filter.
+  /** Plane ignores the labels and state query parameters, so the importer
+    * filters itself. None means no filter; an empty set matches no issue.
     */
   def matchesFilters(issue: PlaneIssue,
-                     labelIds: Set[String],
-                     stateIds: Set[String]): Boolean =
-    (labelIds.isEmpty || issue.labels.exists(
-      _.exists(label => labelIds.contains(label.id)))) &&
-      (stateIds.isEmpty || issue.stateId.exists(stateIds.contains))
+                     labelIds: Option[Set[String]],
+                     stateIds: Option[Set[String]]): Boolean =
+    labelIds.forall(ids =>
+      issue.labels.exists(_.exists(label => ids.contains(label.id)))) &&
+      stateIds.forall(ids => issue.stateId.exists(ids.contains))
 }
 
 class PlaneTagParseWorker(wsClient: WSClient,
-                          systemServices: SystemServices,
+                          protected val systemServices: SystemServices,
                           config: ServiceConfiguration,
                           baseURL: URL,
                           settings: PlaneSettings,
                           projectSettings: PlaneProjectSettings,
-                          implicit val auth: ServiceAuthentication,
-                          configId: IssueImporterConfigId,
-                          organisationId: OrganisationId,
-                          projectId: ProjectId)
-    extends Actor
-    with ActorLogging {
-  import PlaneTagParseWorker._
+                          private implicit val auth: ServiceAuthentication,
+                          protected val configId: IssueImporterConfigId,
+                          protected val organisationId: OrganisationId,
+                          protected val projectId: ProjectId)
+    extends TagParseWorker[PlaneIssueTag] {
 
-  var cancellable: Option[Cancellable] = None
-  val apiService      = new PlaneApiServiceImpl(wsClient, config)
-  val defaultParams   = "expand=labels,state,project"
-  val maxResults: Int = projectSettings.maxResults.getOrElse(100)
-  implicit val executionContext: ExecutionContextExecutor =
-    context.system.dispatcher
+  import PlaneTagParseWorker.matchesFilters
 
-  val receive: Receive = { case StartParsing =>
-    cancellable = Some(
-      context.system.scheduler.scheduleOnce(0.milliseconds, self, Parse))
-    context.become(parsing)
-  }
+  private val apiService       = new PlaneApiServiceImpl(wsClient, config)
+  private val tagConfiguration = projectSettings.tagConfiguration
+  private val workspace        = settings.workspace
+  private val planeProjectId   = projectSettings.planeProjectId
+  private val maxResults       = projectSettings.maxResults.getOrElse(100)
 
-  val parsing: Receive = { case Parse =>
-    (for {
-      labelIds <- loadLabels()
-        .map { labels =>
-          val labelFilter =
-            projectSettings.tagConfiguration.includeOnlyIssuesWithLabels
-          val filteredLabels = labels.filter(l => labelFilter.contains(l.name))
-          log.debug(
-            s"Filtered labels: ${filteredLabels.map(_.name).mkString(",")}")
-          filteredLabels.map(_.id)
-        }
-      stateIds <- loadStates()
-        .map { states =>
-          val stateFilter =
-            projectSettings.tagConfiguration.includeOnlyIssuesWithState
-          val filteredStates = states.filter(s => stateFilter.contains(s.name))
-          log.debug(
-            s"Filtered states: ${filteredStates.map(_.name).mkString(",")}")
-          filteredStates.map(_.id)
-        }
-      issues <- loadIssues(labelIds, stateIds)
-        .map(_.filter(matchesFilters(_, labelIds, stateIds)))
-    } yield {
-      // fetched all results, notify
-      if (log.isDebugEnabled) {
-        val keys = issues.map(i => s"#${i.id}")
-        log.debug(s"Parsed keys:$keys")
-      }
-      // assemble issue tags
-      val tags = issues.map(toPlaneIssueTag).toSet
-      systemServices.tagCache ! TagsUpdated[PlaneIssueTag](
-        projectSettings.planeProjectId,
-        projectId,
-        tags)
+  override protected val externalProjectId: String = planeProjectId
+  override protected val projectName: String       =
+    projectSettings.externalProjectName.getOrElse(
+      s"Plane Project $planeProjectId")
+  override protected val checkFrequency: FiniteDuration =
+    settings.checkFrequency.milliseconds
 
-      // Report successful sync
-      systemServices.issueImporterStatusMonitor ! UpdateProjectSyncStats(
-        configId = configId,
-        organisationId = organisationId,
-        projectId = projectId,
-        projectName = projectSettings.externalProjectName.getOrElse(
-          s"Plane Project ${projectSettings.planeProjectId}"),
-        issueCount = issues.size,
-        success = true
+  override protected def loadTags(): Future[Set[PlaneIssueTag]] =
+    for {
+      labelIds <- idsOfNames(
+        tagConfiguration.includeOnlyIssuesWithLabels,
+        apiService.getLabels(maxResults, workspace, planeProjectId))
+      stateIds <- idsOfNames(
+        tagConfiguration.includeOnlyIssuesWithState,
+        apiService.getStates(maxResults, workspace, planeProjectId))
+      issues <- apiService.findIssues(
+        workspace = workspace,
+        projectId = planeProjectId,
+        paramString =
+          projectSettings.params.getOrElse("expand=labels,state,project"),
+        maxResults = maxResults,
+        includeOnlyIssuesWithLabelsIds = labelIds.getOrElse(Set.empty),
+        includeOnlyIssuesWithStateIds = stateIds.getOrElse(Set.empty)
       )
+    } yield issues
+      .filter(matchesFilters(_, labelIds, stateIds))
+      .map(toPlaneIssueTag)
+      .toSet
 
-      systemServices.issueImporterStatusMonitor ! UpdateConnectivityStatus(
-        configId = configId,
-        organisationId = organisationId,
-        status = ConnectivityStatus.Healthy,
-        issue = None
-      )
-    }).andThen {
-      case Success(_) =>
-        log.debug(s"Parse successful, restarting timer")
-        cancellable = Some(
-          context.system.scheduler
-            .scheduleOnce(settings.checkFrequency.milliseconds, self, Parse))
-
-      case Failure(ex) =>
-        log.error(ex, s"Failed to parse Plane issues for project $projectId")
-
-        val issue = ImporterErrors.connectivityIssue(ex)
-
-        systemServices.issueImporterStatusMonitor ! UpdateProjectSyncStats(
-          configId = configId,
-          organisationId = organisationId,
-          projectId = projectId,
-          projectName = projectSettings.externalProjectName.getOrElse(
-            s"Plane Project ${projectSettings.planeProjectId}"),
-          issueCount = 0,
-          success = false,
-          error = Some(issue)
-        )
-
-        systemServices.issueImporterStatusMonitor ! UpdateConnectivityStatus(
-          configId = configId,
-          organisationId = organisationId,
-          status = ConnectivityStatus.Failed,
-          issue = Some(issue)
-        )
-
-        // restart timer anyway
-        cancellable = Some(
-          context.system.scheduler
-            .scheduleOnce(settings.checkFrequency.milliseconds, self, Parse))
-    }
-  }
+  /** Resolves the configured names to Plane ids. It loads the entities only
+    * when a filter is configured.
+    */
+  private def idsOfNames(
+      names: Set[String],
+      entities: => Future[Iterable[PlaneEntity]]): Future[Option[Set[String]]] =
+    if (names.isEmpty) Future.successful(None)
+    else
+      entities.map(all =>
+        Some(all.collect { case e if names.contains(e.name) => e.id }.toSet))
 
   private def toPlaneIssueTag(issue: PlaneIssue): PlaneIssueTag = {
-
-    val nameTag = if (projectSettings.tagConfiguration.useTitle) {
-      Some(SimpleTag(TagId(issue.name)))
-    } else {
-      None
-    }
-
-    val labelTags = if (projectSettings.tagConfiguration.useLabels) {
-      issue.labels match {
-        case Some(labels) =>
-          labels
-            .filterNot(l =>
-              projectSettings.tagConfiguration.labelFilter.contains(l.name))
-            .map(l => SimpleTag(TagId(l.name)))
-        case None => Seq()
-      }
-    } else {
-      Seq()
-    }
-
-    val tags =
-      nameTag.map(t => labelTags :+ t).getOrElse(labelTags)
-
-    val issueLink =
-      s"$baseURL/${settings.workspace}/projects/${issue.project.id}/issues/${issue.id}"
+    val labelTags =
+      if (tagConfiguration.useLabels)
+        issue.labels
+          .getOrElse(Seq.empty)
+          .map(_.name)
+          .filterNot(tagConfiguration.labelFilter.contains)
+          .map(name => SimpleTag(TagId(name)))
+      else Seq.empty
+    val titleTag =
+      Option.when(tagConfiguration.useTitle)(SimpleTag(TagId(issue.name)))
 
     PlaneIssueTag(
-      TagId(
-        issue.project.identifier + "-" +
-          issue.sequence_id.toString),
+      TagId(s"${issue.project.identifier}-${issue.sequence_id}"),
       issue.project.id,
       Some(issue.name),
-      tags,
-      issueLink
+      labelTags ++ titleTag,
+      s"$baseURL/$workspace/projects/${issue.project.id}/issues/${issue.id}"
     )
-  }
-
-  private def loadLabels(): Future[Set[PlaneLabel]] = {
-    log.debug(
-      s"Fetch labels for projectId=${projectId.value}, planeProjectId=${projectSettings.planeProjectId}")
-    apiService
-      .getLabels(maxResults = maxResults,
-                 workspace = settings.workspace,
-                 projectId = projectSettings.planeProjectId)
-  }
-
-  private def loadStates(): Future[Set[PlaneState]] = {
-    log.debug(
-      s"Fetch states for projectId=${projectId.value}, planeProjectId=${projectSettings.planeProjectId}")
-    apiService
-      .getStates(maxResults = maxResults,
-                 workspace = settings.workspace,
-                 projectId = projectSettings.planeProjectId)
-  }
-
-  private def loadIssues(labelIds: Set[String],
-                         stateIds: Set[String]): Future[Seq[PlaneIssue]] = {
-    log.debug(
-      s"Parse issues projectId=${projectId.value}, project=${projectSettings.planeProjectId}")
-    apiService.findIssues(
-      workspace = settings.workspace,
-      projectId = projectSettings.planeProjectId,
-      paramString = projectSettings.params.getOrElse(defaultParams),
-      maxResults = maxResults,
-      includeOnlyIssuesWithLabelsIds = labelIds,
-      includeOnlyIssuesWithStateIds = stateIds
-    )
-  }
-
-  override def postStop(): Unit = {
-    cancellable.map(c => c.cancel())
-    cancellable = None
-    super.postStop()
   }
 }

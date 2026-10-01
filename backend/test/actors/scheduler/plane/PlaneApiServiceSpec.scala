@@ -50,7 +50,7 @@ class PlaneApiServiceSpec extends Specification with Mockito {
     "sequence_id"      -> i,
     "estimate_point"   -> "8b7a3c4e-0000-4000-8000-000000000001",
     "description_html" -> JsNull,
-    "project" -> Json.obj("id"          -> "p1",
+    "project"          -> Json.obj("id" -> "p1",
                           "identifier"  -> "LAS",
                           "cover_image" -> JsNull),
     "labels" -> Json.arr(
@@ -105,11 +105,17 @@ class PlaneApiServiceSpec extends Specification with Mockito {
   }
 
   private def findIssues(client: WSClient): Seq[PlaneIssue] =
-    Await.result(new PlaneApiServiceImpl(
-                   client,
-                   ServiceConfiguration("https://plane.test"))
-                   .findIssues("ws", "p1", "expand=labels,state,project", 100),
-                 5.seconds)
+    Await.result(
+      new PlaneApiServiceImpl(client,
+                              ServiceConfiguration("https://plane.test"))
+        .findIssues("ws",
+                    "p1",
+                    "expand=labels,state,project",
+                    100,
+                    Set.empty,
+                    Set.empty),
+      5.seconds
+    )
 
   "The Plane models" should {
     "read a page with a string estimate_point and an object extra_stats" in {
@@ -154,13 +160,17 @@ class PlaneApiServiceSpec extends Specification with Mockito {
         if (url.contains("/work-items/")) (404, JsNull)
         else (200, page(1 to 5, "100:1:0", hasNext = false, 5, 1))
       }
-      val service = new PlaneApiServiceImpl(
-        client,
-        ServiceConfiguration("https://plane.test"))
+      val service =
+        new PlaneApiServiceImpl(client,
+                                ServiceConfiguration("https://plane.test"))
 
-      def run() = Await.result(
-        service.findIssues("ws", "p1", "expand=labels,state,project", 100),
-        5.seconds)
+      def run() = Await.result(service.findIssues("ws",
+                                                  "p1",
+                                                  "expand=labels,state,project",
+                                                  100,
+                                                  Set.empty,
+                                                  Set.empty),
+                               5.seconds)
 
       run() must haveSize(5)
       run() must haveSize(5)

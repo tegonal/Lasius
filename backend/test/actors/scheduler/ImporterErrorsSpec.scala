@@ -36,9 +36,11 @@ class ImporterErrorsSpec extends Specification {
     }
 
     "map the HTTP status of a failed request" in {
-      ImporterErrors.classify(new HttpStatusException(401, "Http status:401")) must
+      ImporterErrors.classify(
+        new HttpStatusException(401, "Http status:401")) must
         equalTo(("authentication_failed", Some(401)))
-      ImporterErrors.classify(new HttpStatusException(429, "Http status:429")) must
+      ImporterErrors.classify(
+        new HttpStatusException(429, "Http status:429")) must
         equalTo(("unknown_error", Some(429)))
     }
 

@@ -32,7 +32,7 @@ import _root_.models.{
   ProjectMappingId
 }
 import actors.scheduler.{ServiceAuthentication, ServiceConfiguration}
-import actors.scheduler.jira.JiraTagParseWorker.StartParsing
+import actors.scheduler.TagParseWorker.{Parse, StartParsing}
 import org.apache.pekko.actor.SupervisorStrategy._
 import org.apache.pekko.actor.{OneForOneStrategy, Props, _}
 import core.SystemServices
@@ -153,7 +153,7 @@ class JiraTagParseScheduler(wsClient: WSClient, systemServices: SystemServices)
         case Some(worker) =>
           log.debug(
             s"Found worker for mapping $mappingId, sending Parse message")
-          worker ! JiraTagParseWorker.Parse
+          worker ! Parse
         case None =>
           log.warning(
             s"No worker found for configId=$configId, mappingId=$mappingId")

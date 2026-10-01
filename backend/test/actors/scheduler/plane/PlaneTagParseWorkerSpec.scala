@@ -21,49 +21,46 @@
 
 package actors.scheduler.plane
 
+import actors.scheduler.plane.PlaneTagParseWorker.matchesFilters
 import org.specs2.mutable.Specification
 import play.api.libs.json.{JsString, Json}
 
 class PlaneTagParseWorkerSpec extends Specification {
 
-  private val bug       = PlaneLabel("label-bug", "bug")
-  private val feature   = PlaneLabel("label-feature", "feature")
-  private val project   = PlaneProject("p1", "LAS")
-  private val todoState = Json.obj("id" -> "state-todo", "name" -> "Todo")
+  private val bug     = PlaneLabel("label-bug", "bug")
+  private val feature = PlaneLabel("label-feature", "feature")
 
-  private val issue = PlaneIssue(id = "i1",
-                                 name = "Issue",
-                                 sequence_id = 1,
-                                 project = project,
-                                 labels = Some(Seq(bug)),
-                                 state = Some(todoState))
+  private val issue = PlaneIssue(
+    id = "i1",
+    name = "Issue",
+    sequence_id = 1,
+    project = PlaneProject("p1", "LAS"),
+    labels = Some(Seq(bug)),
+    state = Some(Json.obj("id" -> "state-todo", "name" -> "Todo")))
 
   "PlaneTagParseWorker.matchesFilters" should {
-    "accept every issue when no filter is set" in {
-      PlaneTagParseWorker.matchesFilters(issue, Set.empty, Set.empty) must beTrue
+    "accept every issue when no filter is configured" in {
+      matchesFilters(issue, None, None) must beTrue
     }
 
     "accept an issue with one of the label ids and reject one without" in {
-      PlaneTagParseWorker.matchesFilters(issue, Set(bug.id), Set.empty) must beTrue
-      PlaneTagParseWorker.matchesFilters(issue,
-                                         Set(feature.id),
-                                         Set.empty) must beFalse
-      PlaneTagParseWorker.matchesFilters(issue.copy(labels = None),
-                                         Set(bug.id),
-                                         Set.empty) must beFalse
+      matchesFilters(issue, Some(Set(bug.id)), None) must beTrue
+      matchesFilters(issue, Some(Set(feature.id)), None) must beFalse
+      matchesFilters(issue.copy(labels = None), Some(Set(bug.id)), None) must
+        beFalse
+    }
+
+    "reject every issue when a configured filter resolves to no id" in {
+      matchesFilters(issue, Some(Set.empty), None) must beFalse
+      matchesFilters(issue, None, Some(Set.empty)) must beFalse
     }
 
     "read the state id from an expanded object and from a plain id" in {
-      PlaneTagParseWorker.matchesFilters(issue,
-                                         Set.empty,
-                                         Set("state-todo")) must beTrue
-      PlaneTagParseWorker.matchesFilters(
-        issue.copy(state = Some(JsString("state-todo"))),
-        Set.empty,
-        Set("state-todo")) must beTrue
-      PlaneTagParseWorker.matchesFilters(issue,
-                                         Set.empty,
-                                         Set("state-done")) must beFalse
+      matchesFilters(issue, None, Some(Set("state-todo"))) must beTrue
+      matchesFilters(issue.copy(state = Some(JsString("state-todo"))),
+                     None,
+                     Some(Set("state-todo"))) must beTrue
+      matchesFilters(issue, None, Some(Set("state-done"))) must beFalse
     }
   }
 }

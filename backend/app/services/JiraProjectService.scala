@@ -22,6 +22,7 @@
 package services
 
 import actors.scheduler.{
+  HttpStatusException,
   OAuthAuthentication,
   ServiceConfiguration,
   WebServiceHelper
@@ -55,7 +56,7 @@ class JiraProjectService(wsClient: WSClient)(implicit ec: ExecutionContext)
         .map {
           case scala.util.Success((_, _)) =>
             successResult("Jira")
-          case scala.util.Failure(e) if e.getMessage.contains("401") =>
+          case scala.util.Failure(e: HttpStatusException) if e.status == 401 =>
             authenticationFailedResult("OAuth credentials")
           case scala.util.Failure(e) =>
             ConnectivityTestResult(

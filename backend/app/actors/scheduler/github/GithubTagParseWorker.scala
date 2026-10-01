@@ -21,25 +21,18 @@
 
 package actors.scheduler.github
 
-import actors.IssueImporterStatusMonitor.{
-  UpdateConnectivityStatus,
-  UpdateProjectSyncStats
-}
-import actors.TagCache.TagsUpdated
 import actors.scheduler.{
-  ImporterErrors,
   ServiceAuthentication,
-  ServiceConfiguration
+  ServiceConfiguration,
+  TagParseWorker
 }
-import org.apache.pekko.actor._
 import core.SystemServices
 import models._
+import org.apache.pekko.actor.Props
 import play.api.libs.ws.WSClient
 
-import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.concurrent.Future
 import scala.concurrent.duration._
-import scala.language.postfixOps
-import scala.util.{Failure, Success}
 
 object GithubTagParseWorker {
   def props(wsClient: WSClient,
@@ -61,206 +54,83 @@ object GithubTagParseWorker {
           configId,
           organisationId,
           projectId)
-
-  case object StartParsing
-  case object Parse
 }
 
 class GithubTagParseWorker(wsClient: WSClient,
-                           systemServices: SystemServices,
+                           protected val systemServices: SystemServices,
                            config: ServiceConfiguration,
                            settings: GithubSettings,
                            projectSettings: GithubProjectSettings,
-                           implicit val auth: ServiceAuthentication,
-                           configId: IssueImporterConfigId,
-                           organisationId: OrganisationId,
-                           projectId: ProjectId)
-    extends Actor
-    with ActorLogging {
-  import GithubTagParseWorker._
+                           private implicit val auth: ServiceAuthentication,
+                           protected val configId: IssueImporterConfigId,
+                           protected val organisationId: OrganisationId,
+                           protected val projectId: ProjectId)
+    extends TagParseWorker[GithubIssueTag] {
 
-  var cancellable: Option[Cancellable] = None
-  val apiService = new GithubApiServiceImpl(wsClient, config)
-
-  // GitHub query parameters: state=open by default
-  val defaultParams =
+  private val apiService = new GithubApiServiceImpl(wsClient, config)
+  private val repository =
+    s"${projectSettings.githubRepoOwner}/${projectSettings.githubRepoName}"
+  private val maxResults = projectSettings.maxResults.getOrElse(100)
+  private val query      = projectSettings.params.getOrElse(
     projectSettings.tagConfiguration.includeOnlyIssuesWithState.headOption
       .map(state => s"state=$state")
-      .getOrElse("state=open")
+      .getOrElse("state=open"))
 
-  val maxResults: Int = projectSettings.maxResults.getOrElse(100)
-  implicit val executionContext: ExecutionContextExecutor =
-    context.system.dispatcher
+  override protected val externalProjectId: String = repository
+  override protected val projectName: String       =
+    projectSettings.externalProjectName.getOrElse(s"GitHub $repository")
+  override protected val checkFrequency: FiniteDuration =
+    settings.checkFrequency.milliseconds
 
-  val receive: Receive = { case StartParsing =>
-    cancellable = Some(
-      context.system.scheduler.scheduleOnce(0.milliseconds, self, Parse))
-    context.become(parsing)
-  }
+  override protected def loadTags(): Future[Set[GithubIssueTag]] =
+    loadIssues(page = 1).map(_.map(toGithubIssueTag))
 
-  val parsing: Receive = { case Parse =>
-    loadIssues(1, None) // GitHub pagination starts at 1, not 0
-      .map { result =>
-        // fetched all results, notify
-        if (log.isDebugEnabled) {
-          val keys = result.map(i => s"#${i.number}")
-          log.debug(s"Parsed keys:$keys")
-        }
-
-        // assemble issue tags
-        val tags = result.map(toGithubIssueTag)
-        systemServices.tagCache ! TagsUpdated[GithubIssueTag](
-          s"${projectSettings.githubRepoOwner}/${projectSettings.githubRepoName}",
-          projectId,
-          tags)
-
-        // Report successful sync
-        systemServices.issueImporterStatusMonitor ! UpdateProjectSyncStats(
-          configId = configId,
-          organisationId = organisationId,
-          projectId = projectId,
-          projectName = projectSettings.externalProjectName.getOrElse(
-            s"GitHub ${projectSettings.githubRepoOwner}/${projectSettings.githubRepoName}"),
-          issueCount = result.size,
-          success = true
-        )
-
-        systemServices.issueImporterStatusMonitor ! UpdateConnectivityStatus(
-          configId = configId,
-          organisationId = organisationId,
-          status = ConnectivityStatus.Healthy,
-          issue = None
-        )
-      }
-      .andThen {
-        case Success(_) =>
-          log.debug(s"Parse successful, restarting timer")
-          cancellable = Some(
-            context.system.scheduler
-              .scheduleOnce(settings.checkFrequency.milliseconds, self, Parse))
-
-        case Failure(ex) =>
-          log.error(ex, s"Failed to parse GitHub issues for project $projectId")
-
-          val issue = ImporterErrors.connectivityIssue(ex)
-
-          systemServices.issueImporterStatusMonitor ! UpdateProjectSyncStats(
-            configId = configId,
-            organisationId = organisationId,
-            projectId = projectId,
-            projectName = projectSettings.externalProjectName.getOrElse(
-              s"GitHub ${projectSettings.githubRepoOwner}/${projectSettings.githubRepoName}"),
-            issueCount = 0,
-            success = false,
-            error = Some(issue)
-          )
-
-          systemServices.issueImporterStatusMonitor ! UpdateConnectivityStatus(
-            configId = configId,
-            organisationId = organisationId,
-            status = ConnectivityStatus.Failed,
-            issue = Some(issue)
-          )
-
-          // restart timer anyway
-          cancellable = Some(
-            context.system.scheduler
-              .scheduleOnce(settings.checkFrequency.milliseconds, self, Parse))
-      }
-  }
-
-  private def toGithubIssueTag(issue: GithubIssue): GithubIssueTag = {
-    // create tag for milestone
-    val milestoneTag = if (projectSettings.tagConfiguration.useMilestone) {
-      issue.milestone.map(m => SimpleTag(TagId(m.title)))
-    } else {
-      None
-    }
-
-    val titleTag = if (projectSettings.tagConfiguration.useTitle) {
-      Some(SimpleTag(TagId(issue.title)))
-    } else {
-      None
-    }
-
-    val assigneeTags = if (projectSettings.tagConfiguration.useAssignees) {
-      issue.assignees.map(a => SimpleTag(TagId(a.login)))
-    } else {
-      Seq()
-    }
-
-    val labelTags = if (projectSettings.tagConfiguration.useLabels) {
-      issue.labels
-        .filterNot(l =>
-          projectSettings.tagConfiguration.labelFilter.contains(l.name))
-        .map(l => SimpleTag(TagId(l.name)))
-    } else {
-      Seq()
-    }
-
-    val tags =
-      milestoneTag
-        .map { m =>
-          labelTags ++ assigneeTags ++ titleTag
-            .map(t => Seq(m, t))
-            .getOrElse(Seq(m))
-        }
-        .getOrElse {
-          titleTag
-            .map(t => labelTags ++ assigneeTags :+ t)
-            .getOrElse(labelTags ++ assigneeTags)
-        }
-
-    val issueLink = issue.html_url
-
-    GithubIssueTag(
-      TagId(
-        projectSettings.projectKeyPrefix.getOrElse("") +
-          s"#${issue.number}"),
-      projectSettings.githubRepoOwner,
-      projectSettings.githubRepoName,
-      issue.number,
-      Some(issue.title),
-      tags,
-      issueLink
-    )
-  }
-
-  def loadIssues(
+  /** GitHub reports no total, so a page with fewer issues than requested is the
+    * last one. The first page is 1.
+    */
+  private def loadIssues(
       page: Int,
-      max: Option[Int],
-      lastResult: Set[GithubIssue] = Set()): Future[Set[GithubIssue]] = {
-    val newMax = max.getOrElse(maxResults)
-    issues(page, newMax).flatMap { result =>
-      val concat: Set[GithubIssue] = lastResult ++ result.issues.toSet
-      log.debug(s"loaded issues: page:$page, fetch count:${concat.size}")
-
-      // GitHub doesn't provide total count easily, so we stop when we get fewer results than requested
-      if (result.issues.size < newMax) {
-        // Last page (partial results)
-        Future.successful(concat)
-      } else {
-        // Load next page
-        loadIssues(page + 1, max, concat)
-      }
-    }
-  }
-
-  def issues(page: Int, perPage: Int): Future[GithubIssuesSearchResult] = {
-    log.debug(
-      s"Parse issues projectId=${projectId.value}, repo=${projectSettings.githubRepoOwner}/${projectSettings.githubRepoName}, page:$page, per_page:$perPage")
-    val query = projectSettings.params.getOrElse(defaultParams)
+      loaded: Set[GithubIssue] = Set.empty): Future[Set[GithubIssue]] =
     apiService
       .findIssues(projectSettings.githubRepoOwner,
                   projectSettings.githubRepoName,
                   query,
                   Some(page),
-                  Some(perPage))
-  }
+                  Some(maxResults))
+      .flatMap { result =>
+        val all = loaded ++ result.issues
+        if (result.issues.size < maxResults) Future.successful(all)
+        else loadIssues(page + 1, all)
+      }
 
-  override def postStop(): Unit = {
-    cancellable.map(c => c.cancel())
-    cancellable = None
-    super.postStop()
+  private def toGithubIssueTag(issue: GithubIssue): GithubIssueTag = {
+    val tagConfiguration = projectSettings.tagConfiguration
+    val labelTags        =
+      if (tagConfiguration.useLabels)
+        issue.labels
+          .map(_.name)
+          .filterNot(tagConfiguration.labelFilter.contains)
+          .map(name => SimpleTag(TagId(name)))
+      else Seq.empty
+    val assigneeTags =
+      if (tagConfiguration.useAssignees)
+        issue.assignees.map(assignee => SimpleTag(TagId(assignee.login)))
+      else Seq.empty
+    val milestoneTag = issue.milestone
+      .filter(_ => tagConfiguration.useMilestone)
+      .map(milestone => SimpleTag(TagId(milestone.title)))
+    val titleTag =
+      Option.when(tagConfiguration.useTitle)(SimpleTag(TagId(issue.title)))
+
+    GithubIssueTag(
+      TagId(
+        projectSettings.projectKeyPrefix.getOrElse("") + s"#${issue.number}"),
+      projectSettings.githubRepoOwner,
+      projectSettings.githubRepoName,
+      issue.number,
+      Some(issue.title),
+      labelTags ++ assigneeTags ++ milestoneTag ++ titleTag,
+      issue.html_url
+    )
   }
 }

@@ -22,7 +22,7 @@
 package actors.scheduler.plane
 
 import java.util.UUID
-import actors.scheduler.plane.PlaneTagParseWorker.StartParsing
+import actors.scheduler.TagParseWorker.{Parse, StartParsing}
 import actors.scheduler.{ServiceAuthentication, ServiceConfiguration}
 import org.apache.pekko.actor.SupervisorStrategy._
 import org.apache.pekko.actor.{OneForOneStrategy, _}
@@ -149,7 +149,7 @@ class PlaneTagParseScheduler(wsClient: WSClient, systemServices: SystemServices)
         case Some(worker) =>
           log.debug(
             s"Found worker for mapping $mappingId, sending Parse message")
-          worker ! PlaneTagParseWorker.Parse
+          worker ! Parse
         case None =>
           log.warning(
             s"No worker found for configId=$configId, mappingId=$mappingId")
