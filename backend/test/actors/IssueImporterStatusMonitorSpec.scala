@@ -131,10 +131,10 @@ class IssueImporterStatusMonitorSpec
     }
 
     "apply each update to the status that the previous update wrote" in new ActorTestScope {
-      private val stored     = new StoredConfig(planeConfig())
-      private val config     = stored.config.get()
-      private val first      = ProjectId()
-      private val second     = ProjectId()
+      private val stored      = new StoredConfig(planeConfig())
+      private val config      = stored.config.get()
+      private val first       = ProjectId()
+      private val second      = ProjectId()
       private val statusActor = monitor(this, stored.repository)
 
       statusActor ! UpdateProjectSyncStats(config.id,

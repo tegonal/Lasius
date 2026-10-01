@@ -60,10 +60,10 @@ class IssueImporterConfigRepositorySpec extends EmbedMongo {
         projects = Seq(mapping("first")),
         audit = AuditInfo.initial(UserId())
       )
-      val edited = read.copy(projects = read.projects :+ mapping("second"))
-      val syncStatus = ConfigSyncStatus.empty.copy(
-        connectivityStatus = ConnectivityStatus.Healthy,
-        totalIssuesSynced = 7L)
+      val edited     = read.copy(projects = read.projects :+ mapping("second"))
+      val syncStatus = ConfigSyncStatus.empty.copy(connectivityStatus =
+                                                     ConnectivityStatus.Healthy,
+                                                   totalIssuesSynced = 7L)
 
       // The status comes from the first read, and the mapping edit lands
       // before the status write.
