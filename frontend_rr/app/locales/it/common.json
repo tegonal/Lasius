@@ -124,6 +124,10 @@
     "helpNotAvailable": "Contenuto di aiuto non disponibile per questa pagina.",
     "page": {
       "details": "Dettagli dell'errore",
+      "forbidden": {
+        "message": "Non hai il permesso di visualizzare questa pagina.",
+        "title": "Accesso negato"
+      },
       "generic": {
         "message": "Si è verificato un errore.",
         "title": "Qualcosa è andato storto"

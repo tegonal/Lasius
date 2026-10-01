@@ -18,7 +18,7 @@
  */
 
 import { RouterContextProvider } from 'react-router'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { action } from './api.proxy'
 
@@ -44,5 +44,17 @@ describe('api.proxy action', () => {
     const result = await post(body)
     expect(result.init?.status).toBe(400)
     expect(result.data).toMatchObject({ ok: false, status: 400 })
+  })
+
+  it('answers a backend 403 with the 403 envelope and the reason', async () => {
+    const backend = new Response('not_org_admin', { status: 403, statusText: 'Forbidden' })
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(backend))
+    try {
+      const result = await post(JSON.stringify({ method: 'GET', skipAuth: true, url: '/projects' }))
+      expect(result.init?.status).toBe(403)
+      expect(result.data).toEqual({ error: 'not_org_admin', ok: false, status: 403 })
+    } finally {
+      vi.unstubAllGlobals()
+    }
   })
 })

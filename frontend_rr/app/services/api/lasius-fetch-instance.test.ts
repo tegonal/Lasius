@@ -19,7 +19,7 @@
 
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { ApiError, getApiErrorReason, lasiusFetch } from './lasius-fetch-instance'
+import { ApiError, getApiErrorReason, lasiusFetch, toApiError } from './lasius-fetch-instance'
 
 async function fetchError(response: Response): Promise<ApiError> {
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue(response))
@@ -51,6 +51,59 @@ describe('lasiusFetch error body', () => {
   it('returns null for an empty body', async () => {
     const error = await fetchError(new Response(null, { status: 404 }))
     expect(error.body).toBeNull()
+  })
+})
+
+describe('lasiusFetch 403', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  async function rejection(response: Response): Promise<unknown> {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(response))
+    try {
+      await lasiusFetch('/organisations/org/projects', { method: 'GET' })
+    } catch (error) {
+      return error
+    }
+    throw new Error('lasiusFetch did not throw')
+  }
+
+  it('throws a 403 Response with the reason, so the root ErrorBoundary sees the status', async () => {
+    const thrown = await rejection(
+      new Response('not_org_admin', { status: 403, statusText: 'Forbidden' }),
+    )
+    if (!(thrown instanceof Response)) throw new Error('expected a Response')
+    expect(thrown.status).toBe(403)
+    expect(await thrown.text()).toBe('not_org_admin')
+  })
+
+  it('hides an HTML body behind the status text', async () => {
+    const thrown = await rejection(
+      new Response('<html>denied</html>', { status: 403, statusText: 'Forbidden' }),
+    )
+    if (!(thrown instanceof Response)) throw new Error('expected a Response')
+    expect(await thrown.text()).toBe('Forbidden')
+  })
+
+  it('converts the 403 Response back to an ApiError', async () => {
+    const thrown = await rejection(
+      new Response('not_org_admin', { status: 403, statusText: 'Forbidden' }),
+    )
+    const error = await toApiError(thrown)
+    expect(error).toBeInstanceOf(ApiError)
+    expect(error?.status).toBe(403)
+    expect(error?.body).toBe('not_org_admin')
+  })
+
+  it('keeps an ApiError for any other status', async () => {
+    const thrown = await rejection(new Response('missing', { status: 404 }))
+    expect(thrown).toBeInstanceOf(ApiError)
+    expect(await toApiError(thrown)).toBe(thrown)
+  })
+
+  it('returns undefined for a value that is not an API error', async () => {
+    expect(await toApiError(new TypeError('fetch failed'))).toBeUndefined()
   })
 })
 

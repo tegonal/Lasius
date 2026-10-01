@@ -150,6 +150,28 @@ export const ErrorBoundary = () => {
       )
     }
 
+    if (error.status === 403) {
+      return (
+        <div className="flex min-h-screen items-center justify-center p-4">
+          <div className="card bg-base-200 w-full max-w-md shadow-lg">
+            <div className="card-body items-center text-center">
+              <div className="text-base-content/30 text-6xl font-black">403</div>
+              <h1 className="card-title mt-2 text-xl">
+                {t('errors.page.forbidden.title', 'Access denied')}
+              </h1>
+              <p className="text-base-content/60 text-sm">
+                {t(
+                  'errors.page.forbidden.message',
+                  'You do not have permission to view this page.',
+                )}
+              </p>
+              <ErrorActions showTryAgain={false} />
+            </div>
+          </div>
+        </div>
+      )
+    }
+
     if (error.status === 404) {
       return (
         <div className="flex min-h-screen items-center justify-center p-4">

@@ -124,6 +124,10 @@
     "helpNotAvailable": "Hilfeinhalt für diese Seite nicht verfügbar.",
     "page": {
       "details": "Fehlerdetails",
+      "forbidden": {
+        "message": "Du hast keine Berechtigung für diese Seite.",
+        "title": "Zugriff verweigert"
+      },
       "generic": {
         "message": "Ein Fehler ist aufgetreten.",
         "title": "Etwas ist schiefgelaufen"

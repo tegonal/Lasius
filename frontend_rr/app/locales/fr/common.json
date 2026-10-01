@@ -124,6 +124,10 @@
     "helpNotAvailable": "Le contenu d'aide n'est pas disponible pour cette page.",
     "page": {
       "details": "Détails de l'erreur",
+      "forbidden": {
+        "message": "Tu n'as pas l'autorisation de voir cette page.",
+        "title": "Accès refusé"
+      },
       "generic": {
         "message": "Une erreur est survenue.",
         "title": "Un problème est survenu"

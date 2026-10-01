@@ -219,6 +219,10 @@ export default interface Resources {
       helpNotAvailable: 'Help content not available for this page.'
       page: {
         details: 'Error details'
+        forbidden: {
+          message: 'You do not have permission to view this page.'
+          title: 'Access denied'
+        }
         generic: {
           message: 'An error occurred.'
           title: 'Something went wrong'

@@ -49,7 +49,7 @@ import { RegisterInfoPanel } from '~/features/auth/auth-info-panels'
 import { AuthLayout } from '~/features/auth/auth-layout'
 import { type SchemaTranslationFunction, untyped } from '~/lib/i18n-types'
 import { logger } from '~/lib/logger'
-import { ApiError } from '~/services/api/lasius-fetch-instance'
+import { toApiError } from '~/services/api/lasius-fetch-instance'
 import { registerOAuthUser } from '~/services/api/lasius/oauth2-provider/oauth2-provider'
 import {
   getOptionalUser,
@@ -148,12 +148,12 @@ export async function action({ request }: Route.ActionArgs) {
       }),
     )
   } catch (error) {
-    const isApiError = error instanceof ApiError
-    const body = isApiError ? String(error.body) : ''
+    const apiError = await toApiError(error)
+    const body = apiError ? String(apiError.body) : ''
 
     logger.warn('Registration failed', {
       email,
-      error: isApiError ? `${error.status}: ${body}` : String(error),
+      error: apiError ? `${apiError.status}: ${body}` : String(error),
     })
 
     const errorCode = body.includes('user_already_registered')

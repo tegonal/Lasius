@@ -33,6 +33,8 @@
  *   })
  */
 
+const FORBIDDEN = 403
+
 export class ApiError extends Error {
   constructor(
     public status: number,
@@ -70,7 +72,9 @@ export const lasiusFetch = async <T>(url: string, init: RequestInit): Promise<T>
   const response = await fetch(fullUrl, init)
 
   if (!response.ok) {
-    throw new ApiError(response.status, response.statusText, await readErrorBody(response))
+    const error = new ApiError(response.status, response.statusText, await readErrorBody(response))
+    if (error.status === FORBIDDEN) throw forbiddenResponse(error)
+    throw error
   }
 
   // Handle empty responses (204 No Content, etc.)
@@ -102,6 +106,30 @@ export function getApiErrorReason(error: ApiError): string {
     return body
   }
   return error.statusText
+}
+
+/**
+ * The ApiError of a failed backend call. lasiusFetch throws a 403 as a Response, so this function
+ * also converts that form back.
+ */
+export async function toApiError(error: unknown): Promise<ApiError | undefined> {
+  if (error instanceof ApiError) return error
+  if (error instanceof Response && error.status === FORBIDDEN) {
+    return new ApiError(error.status, error.statusText, await error.text())
+  }
+  return undefined
+}
+
+/**
+ * React Router replaces an Error from a loader before the render, so the root ErrorBoundary never
+ * sees `ApiError.status`. A thrown Response reaches it as a route error response with status 403.
+ */
+function forbiddenResponse(error: ApiError): Response {
+  return new Response(getApiErrorReason(error), {
+    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+    status: FORBIDDEN,
+    statusText: error.statusText,
+  })
 }
 
 /** Read the body once as text. A second read of the same body throws "Body already used". */
