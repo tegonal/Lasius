@@ -31,6 +31,7 @@ import models._
 import org.joda.time.{Duration, _}
 
 import scala.annotation.{nowarn, unused}
+import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
@@ -72,7 +73,7 @@ class CurrentUserTimeBookingsView(val clientReceiver: ClientReceiver,
       sender() ! currentUserTimeBookings
   }: Receive).orElse(defaultReceive)
 
-  override def restoreViewFromState(snapshot: UserTimeBooking): Unit = {
+  override def restoreViewFromState(snapshot: UserTimeBooking): Future[Unit] = {
     val today = LocalDate.now()
 
     snapshot.bookings
@@ -87,6 +88,7 @@ class CurrentUserTimeBookingsView(val clientReceiver: ClientReceiver,
           else Some(booking)
         state = updateBooking(currentBooking, today, dailyBookingsMap)
       }
+    Future.unit
   }
 
   override protected val live: Receive = {

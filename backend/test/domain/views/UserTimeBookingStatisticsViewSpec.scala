@@ -25,6 +25,7 @@ import actors.ClientReceiver
 import pekko.PersistentActorTestScope
 import org.apache.pekko.actor.{ActorSystem, Props}
 import org.apache.pekko.pattern.StatusReply.Ack
+import org.apache.pekko.persistence.PersistentActor
 import org.apache.pekko.testkit._
 import core.{DBSession, SystemServices}
 import domain.AggregateRoot.{InitializeViewLive, RestoreViewFromState}
@@ -42,6 +43,9 @@ import play.api.libs.json._
 import play.modules.reactivemongo.ReactiveMongoApi
 import repositories._
 
+import scala.concurrent.Future
+import scala.concurrent.duration.DurationInt
+
 class UserTimeBookingStatisticsViewSpec
     extends Specification
     with Mockito
@@ -50,14 +54,30 @@ class UserTimeBookingStatisticsViewSpec
     with EmbedMongo {
   sequential
 
+  /** The rebuild reads the ids that `bulkInsert` returns, so these mocks answer
+    * with a list.
+    */
+  private def statisticsRepositories()
+      : (BookingByProjectRepository, BookingByTagRepository) = {
+    val bookingByProjectRepository = mockAwaitable[BookingByProjectRepository]
+    val bookingByTagRepository     = mockAwaitable[BookingByTagMongoRepository]
+    bookingByProjectRepository
+      .bulkInsert(any[List[BookingByProject]])(any[DBSession])
+      .returns(Future.successful(Nil))
+    bookingByTagRepository
+      .bulkInsert(any[List[BookingByTag]])(any[DBSession])
+      .returns(Future.successful(Nil))
+    (bookingByProjectRepository, bookingByTagRepository)
+  }
+
   "UserTimeBookingStatisticsView UserTimeBookingInitialized" should {
     "delete collections" in new PersistentActorTestScope {
 
       val userReference =
         EntityReference(UserId(), "noob")
-      val probe                      = TestProbe()
-      val bookingByProjectRepository = mockAwaitable[BookingByProjectRepository]
-      val bookingByTagRepository = mockAwaitable[BookingByTagMongoRepository]
+      val probe                                                = TestProbe()
+      val (bookingByProjectRepository, bookingByTagRepository) =
+        statisticsRepositories()
 
       val actorRef = system.actorOf(
         UserTimeBookingStatisticsViewMock.props(userReference,
@@ -71,12 +91,6 @@ class UserTimeBookingStatisticsViewSpec
                                       UserTimeBooking(userReference, Seq())))
       probe.expectMsg(RestoreViewFromStateSuccess)
 
-      // RestoreViewFromState triggers async database operations.
-      // We need to wait for them to complete before verifying mock calls.
-      // This is not a smell - it's the correct way to test fire-and-forget async operations.
-      probe.expectNoMessage(
-        scala.concurrent.duration.DurationInt(500).milliseconds)
-
       there.was(
         one(bookingByProjectRepository).deleteByUserReference(
           anyOf(userReference))(any[Format[BookingByProject]], any[DBSession]))
@@ -85,6 +99,55 @@ class UserTimeBookingStatisticsViewSpec
           .deleteByUserReference(anyOf(userReference))(
             any[Format[BookingByTag]],
             any[DBSession]))
+    }
+  }
+
+  "UserTimeBookingStatisticsView RestoreViewFromState" should {
+    "count each booking of the restored state once" in new PersistentActorTestScope {
+      val userReference = EntityReference(UserId(), "noob")
+      val booking       = BookingV2(
+        BookingId(),
+        DateTime.parse("2000-01-01T08:00").toLocalDateTimeWithZone(),
+        Some(DateTime.parse("2000-01-01T10:00").toLocalDateTimeWithZone()),
+        userReference,
+        EntityReference(OrganisationId(), "team1"),
+        EntityReference(ProjectId(), "proj"),
+        Set()
+      )
+      val probe = TestProbe()
+
+      val journal = system.actorOf(
+        JournalWriter.props(s"user-time-booking-${userReference.id.value}"))
+      probe.send(journal, UserTimeBookingAddedV2(booking))
+      probe.expectMsg(Ack)
+
+      val (bookingByProjectRepository, bookingByTagRepository) =
+        statisticsRepositories()
+      val actorRef = system.actorOf(
+        UserTimeBookingStatisticsViewMock.props(userReference,
+                                                bookingByProjectRepository,
+                                                bookingByTagRepository,
+                                                reactiveMongoApi))
+
+      probe.send(actorRef,
+                 RestoreViewFromState(userReference,
+                                      1,
+                                      UserTimeBooking(userReference,
+                                                      Seq(booking))))
+      probe.expectMsg(RestoreViewFromStateSuccess)
+      // A replay of the journal reaches the view after the answer, so the
+      // check for a second count must wait.
+      probe.expectNoMessage(500.millis)
+
+      there.was(one(bookingByProjectRepository).bulkInsert {
+        beLike[List[BookingByProject]] { case List(stats) =>
+          stats.duration must equalTo(Duration.standardHours(2))
+        }
+      }(any[DBSession]))
+      there.was(
+        no(bookingByProjectRepository).add(any[BookingByProject])(
+          any[Writes[BookingByProjectId]],
+          any[DBSession]))
     }
   }
 
@@ -1307,6 +1370,21 @@ class UserTimeBookingStatisticsViewSpec
       no(bookingByTagRepository)
         .add(any[BookingByTag])(any[Writes[BookingByTagId]], any[DBSession]))
   }
+}
+
+/** Writes events to the journal of one persistence id, as an aggregate does. */
+class JournalWriter(override val persistenceId: String)
+    extends PersistentActor {
+  override def receiveRecover: Receive = { case _ => }
+
+  override def receiveCommand: Receive = { case event: PersistedEvent =>
+    persist(event)(_ => sender() ! Ack)
+  }
+}
+
+object JournalWriter {
+  def props(persistenceId: String): Props =
+    Props(classOf[JournalWriter], persistenceId)
 }
 
 object UserTimeBookingStatisticsViewMock extends Mockito {

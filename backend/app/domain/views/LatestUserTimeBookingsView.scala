@@ -32,6 +32,7 @@ import org.joda.time.DateTime
 import utils.DateTimeUtils._
 
 import scala.annotation.{nowarn, unused}
+import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
@@ -80,8 +81,9 @@ class LatestUserTimeBookingsView(clientReceiver: ClientReceiver,
     state.startTimeMap.getOrElse(booking, oldDateTime)
   }
 
-  override def restoreViewFromState(snapshot: UserTimeBooking): Unit = {
+  override def restoreViewFromState(snapshot: UserTimeBooking): Future[Unit] = {
     snapshot.bookings.takeRight(maxInternalHistory).foreach(addBooking)
+    Future.unit
   }
 
   override protected val live: Receive = {

@@ -26,24 +26,42 @@ import domain.UserTimeBookingAggregate.UserTimeBooking
 import models.PersistedEvent
 import org.apache.pekko.NotUsed
 import org.apache.pekko.actor.SupervisorStrategy.Restart
-import org.apache.pekko.actor.{Actor, ActorLogging, OneForOneStrategy}
+import org.apache.pekko.actor.{
+  Actor,
+  ActorLogging,
+  ActorRef,
+  OneForOneStrategy,
+  Stash
+}
+import org.apache.pekko.pattern.pipe
+import org.apache.pekko.persistence.query.PersistenceQuery
 import org.apache.pekko.persistence.query.scaladsl.{
   CurrentEventsByPersistenceIdQuery,
   ReadJournal
 }
-import org.apache.pekko.persistence.query.{EventEnvelope, PersistenceQuery}
 import org.apache.pekko.stream.Materializer
 import org.apache.pekko.stream.scaladsl.Source
 import pekko.contrib.persistence.mongodb.MongoReadJournal
 
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration.DurationInt
-import scala.language.postfixOps
+import scala.util.{Success, Try}
 
 case object RestoreViewFromStateSuccess
 
 case object JournalReadingViewIsLive
 
-trait JournalReadingView extends Actor with ActorLogging {
+object JournalReadingView {
+  private final case class ViewRestored(requester: ActorRef, result: Try[Unit])
+}
+
+/** A read model of one user time booking aggregate. At startup the aggregate
+  * sends its restored state, and the view rebuilds from it. Later events reach
+  * the view as messages from the aggregate.
+  */
+trait JournalReadingView extends Actor with Stash with ActorLogging {
+  import JournalReadingView.ViewRestored
+
   val persistenceId: String
 
   private lazy val readJournal
@@ -73,11 +91,7 @@ trait JournalReadingView extends Actor with ActorLogging {
       .currentEventsByPersistenceId(persistenceId,
                                     fromSequenceNr = fromSequenceNr,
                                     toSequenceNr = Long.MaxValue)
-      .map((e: EventEnvelope) => {
-        e.event match {
-          case e => e
-        }
-      })
+      .map(_.event)
 
   private def replayJournalSource(fromSequenceNr: Long): Unit = {
     implicit val materializer: Materializer =
@@ -86,13 +100,18 @@ trait JournalReadingView extends Actor with ActorLogging {
   }
 
   val defaultReceive: Receive = {
+    // The state holds every event up to `sequenceNr`, and the aggregate forwards
+    // each later event. A journal replay therefore counts events twice.
     case RestoreViewFromState(userReference, sequenceNr, snapshot) =>
-      log.debug(
-        s"RestoreViewFromState: ${userReference.id}, $sequenceNr, $snapshot")
+      log.debug(s"RestoreViewFromState: ${userReference.id}, $sequenceNr")
+      implicit val executionContext: ExecutionContext = context.dispatcher
+      val requester                                   = sender()
       restoreViewFromState(snapshot)
-      sender() ! RestoreViewFromStateSuccess
-      context.self ! InitializeViewLive(userReference, sequenceNr)
+        .transform(result => Success(ViewRestored(requester, result)))
+        .pipeTo(self)
+      context.become(restoring)
 
+    // Builds the view from the journal alone, from the given sequence number.
     case InitializeViewLive(userId, fromSequenceNr) =>
       log.debug(s"InitializeViewLive: $userId, $fromSequenceNr")
       context.become(live)
@@ -106,9 +125,23 @@ trait JournalReadingView extends Actor with ActorLogging {
       log.error(s"Unknown event: $e")
   }
 
+  /** Holds every other message until the rebuild has written its result. */
+  private def restoring: Receive = {
+    case ViewRestored(requester, result) =>
+      result.failed.foreach(cause =>
+        log.error(cause, s"Failed to restore the view of $persistenceId"))
+      requester ! RestoreViewFromStateSuccess
+      unstashAll()
+      context.become(live)
+    case _ => stash()
+  }
+
   val receive: Receive = defaultReceive
 
   protected val live: Receive
 
-  protected def restoreViewFromState(snapshot: UserTimeBooking): Unit
+  /** Rebuilds the view from the restored aggregate state. The view stays closed
+    * for other messages until the returned future completes.
+    */
+  protected def restoreViewFromState(snapshot: UserTimeBooking): Future[Unit]
 }

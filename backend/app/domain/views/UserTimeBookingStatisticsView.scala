@@ -33,9 +33,7 @@ import play.modules.reactivemongo.ReactiveMongoApi
 import repositories._
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContextExecutor}
-import scala.language.postfixOps
-import scala.util.{Failure, Success}
+import scala.concurrent.{Await, ExecutionContextExecutor, Future}
 
 object UserTimeBookingStatisticsView {
 
@@ -76,50 +74,32 @@ class UserTimeBookingStatisticsView(
   private implicit val executionContext: ExecutionContextExecutor =
     context.dispatcher
 
-  override def restoreViewFromState(snapshot: UserTimeBooking): Unit = {
-    println(
-      s"~~~~~~~~~~~~~~~~~ Started building STATISTICS FOR $userReference: ${snapshot.bookings.size}")
-
-    val startTime = System.currentTimeMillis()
-
-    // recalculate states
-    val durations = snapshot.bookings.flatMap { booking =>
-      if (booking.end.isDefined) {
-        calculateDurations(booking)
-      } else {
-        Seq()
-      }
-    }
+  override def restoreViewFromState(snapshot: UserTimeBooking): Future[Unit] = {
+    val durations = snapshot.bookings.flatMap(calculateDurations)
 
     val bookingsByProject = durations
-      .filter(_.isInstanceOf[BookingByProject])
-      .map(_.asInstanceOf[BookingByProject])
+      .collect { case b: BookingByProject => b }
       .groupBy(b => (b.day, b.organisationReference, b.projectReference))
       .map { case ((day, organisationReference, projectReference), bookings) =>
-        val sum = bookings.map(_.duration).reduce((l, r) => l.plus(r))
         BookingByProject(BookingByProjectId(),
                          userReference,
                          organisationReference,
                          day,
                          projectReference,
-                         duration = sum)
+                         duration = bookings.map(_.duration).reduce(_ plus _))
       }
-      .toSeq
 
     val bookingsByTag = durations
-      .filter(_.isInstanceOf[BookingByTag])
-      .map(_.asInstanceOf[BookingByTag])
+      .collect { case b: BookingByTag => b }
       .groupBy(b => (b.day, b.organisationReference, b.tagId))
-      .map { case ((day, organisationReference, tag), bookings) =>
-        val sum = bookings.map(_.duration).reduce((l, r) => l.plus(r))
+      .map { case ((day, organisationReference, tagId), bookings) =>
         BookingByTag(BookingByTagId(),
                      userReference,
                      organisationReference,
                      day,
-                     tag,
-                     duration = sum)
+                     tagId,
+                     duration = bookings.map(_.duration).reduce(_ plus _))
       }
-      .toSeq
 
     withinTransaction { implicit dbSession =>
       for {
@@ -127,18 +107,10 @@ class UserTimeBookingStatisticsView(
         _ <- bookingByTagRepository.deleteByUserReference(userReference)
         _ <- bookingByProjectRepository.bulkInsert(bookingsByProject.toList)
         _ <- bookingByTagRepository.bulkInsert(bookingsByTag.toList)
-      } yield ()
-    }.onComplete {
-      case Success(_) =>
-        println(
-          s"~~~~~~~~~~~~~~~~~ STATISTICS FOR ${userReference} COMPLETED IN ${System
-              .currentTimeMillis() - startTime}ms")
+      } yield {
         notifyClient(UserTimeBookingByProjectEntryCleaned(userReference.id))
         notifyClient(UserTimeBookingByTagEntryCleaned(userReference.id))
-      case Failure(th) =>
-        println(
-          s"~~~~~~~~~~~~~~~~~ STATISTICS FOR ${userReference} FAILED IN ${System
-              .currentTimeMillis() - startTime}ms, failure:${th.getMessage}")
+      }
     }
   }
 
@@ -338,10 +310,8 @@ class UserTimeBookingStatisticsView(
       }
   }
 
-  private def notifyClient(events: Seq[OutEvent]) = {
-    events.map(event =>
-      clientReceiver ! (userReference.id, event, List(userReference.id)))
-  }
+  private def notifyClient(events: Seq[OutEvent]): Unit =
+    events.foreach(event => notifyClient(event))
 
   private def notifyClient(event: OutEvent): Unit = {
     clientReceiver ! (userReference.id, event, List(userReference.id))
