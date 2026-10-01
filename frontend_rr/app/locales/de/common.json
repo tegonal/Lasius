@@ -317,7 +317,6 @@
     "confirmPasswordRequired": "Bitte bestätige dein Passwort",
     "email": "Bitte gib eine gültige E-Mail-Adresse ein",
     "emailInvalid": "Ungültige E-Mail-Adresse",
-    "emailRequired": "E-Mail ist erforderlich",
     "endBeforeStart": "Endzeit liegt vor der Startzeit",
     "firstNameRequired": "Vorname ist erforderlich",
     "languageRequired": "Sprache ist erforderlich",

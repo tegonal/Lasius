@@ -34,19 +34,13 @@ import { FormBody } from '~/components/ui/forms/form-body'
 import { FormElement } from '~/components/ui/forms/form-element'
 import { FormElementSpacer } from '~/components/ui/forms/form-element-spacer'
 import { preventEnterOnForm } from '~/components/ui/forms/input/prevent-enter-on-form'
+import { useGuardedSubmit } from '~/features/settings/hooks/use-guarded-submit'
 import { useLayoutLoaderData } from '~/hooks/use-layout-loader-data'
-import { validateFormData } from '~/lib/conform-helpers'
 import { type SchemaTranslationFunction, untyped } from '~/lib/i18n-types'
 import { useUpdateUserProfile } from '~/services/api/lasius-hooks/user/user'
 
 const createAccountSchema = (t: SchemaTranslationFunction) =>
   z.object({
-    email: z.email({
-      error: (issue) =>
-        issue.code === 'invalid_type'
-          ? t('validation.emailRequired', 'Email is required')
-          : t('validation.emailInvalid', 'Invalid email address'),
-    }),
     firstName: z
       .string({
         error: t('validation.firstNameRequired', 'First name is required'),
@@ -67,7 +61,6 @@ export const AccountForm = ({ demoMode }: AccountFormProperties) => {
   const { t } = useTranslation('settings')
   const layoutData = useLayoutLoaderData()
   const user = layoutData?.user
-  const tokenIssuer = layoutData?.tokenIssuer
   const { addToast } = useToast()
 
   const profileApi = useUpdateUserProfile({
@@ -84,7 +77,6 @@ export const AccountForm = ({ demoMode }: AccountFormProperties) => {
   const [form, fields] = useForm({
     constraint: getZodConstraint(schema),
     defaultValue: {
-      email: user?.email ?? '',
       firstName: user?.firstName ?? '',
       lastName: user?.lastName ?? '',
     },
@@ -95,31 +87,9 @@ export const AccountForm = ({ demoMode }: AccountFormProperties) => {
     shouldValidate: 'onSubmit',
   })
 
-  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
-    event.preventDefault()
-
-    if (demoMode) {
-      addToast({
-        message: t(
-          'account.profileChangesNotAllowedInDemo',
-          'Profile changes are not allowed in demo mode',
-        ),
-        type: 'ERROR',
-      })
-      return
-    }
-
-    const result = validateFormData(event.currentTarget, schema)
-    if (result.status !== 'success') return
-
-    profileApi.submit({
-      body: {
-        email: result.value.email,
-        firstName: result.value.firstName,
-        lastName: result.value.lastName,
-      },
-    })
-  }
+  const handleSubmit = useGuardedSubmit(demoMode, schema, ({ firstName, lastName }) => {
+    profileApi.submit({ body: { firstName, lastName } })
+  })
 
   return (
     <div className="mx-auto w-full max-w-2xl">
@@ -154,14 +124,10 @@ export const AccountForm = ({ demoMode }: AccountFormProperties) => {
                     required
                   />
                   <FormElementSpacer />
-                  <FormField
-                    autoComplete="email"
-                    field={fields.email}
-                    label={t('forms.email', 'Email')}
-                    readOnly={tokenIssuer !== 'internal'}
-                    required
-                    type="email"
-                  />
+                  {/* The backend finds the user by this email at sign-in, so it refuses a change. */}
+                  <FormElement htmlFor="email" label={t('forms.email', 'Email')}>
+                    <Input disabled id="email" readOnly tabIndex={-1} value={user?.email ?? ''} />
+                  </FormElement>
                 </FieldSet>
                 <ButtonGroup className="justify-end">
                   <Button disabled={profileApi.isSubmitting} type="submit">

@@ -71,7 +71,7 @@ class UsersControllerSpec
         "At least one field needs to be defined as update for user: someUserId")
     }
 
-    "badrequest if tried to update with no email" in new WithTestApplication {
+    "badrequest if the email changes" in new WithTestApplication {
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       private val systemServices: SystemServices      = inject[SystemServices]
       private val authConfig: AuthConfig              = inject[AuthConfig]
@@ -84,18 +84,17 @@ class UsersControllerSpec
       private val request: FakeRequest[PersonalDataUpdate] = FakeRequest()
         .withBody(
           PersonalDataUpdate(
-            email = Some("incorrectEmail"),
-            firstName = None,
+            email = Some("new-address@test.com"),
+            firstName = Some("FirstName"),
             lastName = None
           ))
       val result: Future[Result] = controller.updatePersonalData()(request)
 
       status(result) must equalTo(BAD_REQUEST)
-      contentAsString(result) must equalTo(
-        "Not a valid email address 'incorrectEmail'")
+      contentAsString(result) must equalTo("email_read_only")
     }
 
-    "badrequest email address user already exists" in new WithTestApplication {
+    "badrequest if the email changes to the address of another user" in new WithTestApplication {
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
@@ -133,10 +132,10 @@ class UsersControllerSpec
       val result: Future[Result] = controller.updatePersonalData()(request)
 
       status(result) must equalTo(BAD_REQUEST)
-      contentAsString(result) must equalTo("Email Address already registered")
+      contentAsString(result) must equalTo("email_read_only")
     }
 
-    "update all fields correctly" in new WithTestApplication {
+    "update the names and keep the unchanged email" in new WithTestApplication {
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
@@ -149,7 +148,7 @@ class UsersControllerSpec
       val request: FakeRequest[PersonalDataUpdate] = FakeRequest()
         .withBody(
           PersonalDataUpdate(
-            email = Some("test@test.com"),
+            email = Some(controller.user.email),
             firstName = Some("newFirstName"),
             lastName = Some("newLastName")
           ))
@@ -159,7 +158,7 @@ class UsersControllerSpec
       contentAsJson(result).as[UserDTO] must like {
         case UserDTO(_,
                      _,
-                     "test@test.com",
+                     "user@user.com",
                      "newFirstName",
                      "newLastName",
                      true,
@@ -196,6 +195,31 @@ class UsersControllerSpec
         controller.updateUserData(teamId, userId)(request)
 
       status(result) must equalTo(FORBIDDEN)
+    }
+
+    "badrequest if the admin changes the email of a member" in new WithTestApplication {
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: UsersController with SecurityControllerMock =
+        UsersControllerMock(config,
+                            systemServices,
+                            authConfig,
+                            reactiveMongoApi)
+
+      val request: FakeRequest[PersonalDataUpdate] = FakeRequest()
+        .withBody(
+          PersonalDataUpdate(
+            email = Some("admin-chosen@test.com"),
+            firstName = Some("FirstName"),
+            lastName = None
+          ))
+      val result: Future[Result] =
+        controller.updateUserData(controller.organisation.id,
+                                  controller.user.id)(request)
+
+      status(result) must equalTo(BAD_REQUEST)
+      contentAsString(result) must equalTo("email_read_only")
     }
   }
 

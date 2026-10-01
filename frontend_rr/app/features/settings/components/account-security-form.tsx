@@ -38,7 +38,7 @@ import { FormElementSpacer } from '~/components/ui/forms/form-element-spacer'
 import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { preventEnterOnForm } from '~/components/ui/forms/input/prevent-enter-on-form'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
-import { validateFormData } from '~/lib/conform-helpers'
+import { useGuardedSubmit } from '~/features/settings/hooks/use-guarded-submit'
 import { type SchemaTranslationFunction, untyped } from '~/lib/i18n-types'
 import { useUpdateUserPassword } from '~/services/api/lasius-hooks/oauth2-provider/oauth2-provider'
 
@@ -108,30 +108,9 @@ export const AccountSecurityForm = ({ demoMode }: AccountSecurityFormProperties)
     },
   })
 
-  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
-    event.preventDefault()
-
-    if (demoMode) {
-      addToast({
-        message: t(
-          'account.profileChangesNotAllowedInDemo',
-          'Profile changes are not allowed in demo mode',
-        ),
-        type: 'ERROR',
-      })
-      return
-    }
-
-    const result = validateFormData(event.currentTarget, schema)
-    if (result.status !== 'success') return
-
-    passwordApi.submit({
-      body: {
-        newPassword: result.value.newPassword,
-        password: result.value.password,
-      },
-    })
-  }
+  const handleSubmit = useGuardedSubmit(demoMode, schema, ({ newPassword, password }) => {
+    passwordApi.submit({ body: { newPassword, password } })
+  })
 
   const handleTogglePasswordsVisible = (event: { preventDefault: () => void }) => {
     event.preventDefault()

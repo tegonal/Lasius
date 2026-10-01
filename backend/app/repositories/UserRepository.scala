@@ -166,19 +166,18 @@ class UserMongoRepository @Inject() (
 
     for {
       _ <- validate(
-        personalData.email.isDefined || personalData.lastName.isDefined || personalData.firstName.isDefined,
+        personalData.lastName.isDefined || personalData.firstName.isDefined,
         s"At least one field needs to be defined as update for user: ${userReference.key}"
       )
-      _ <- personalData.email.fold(success())(validateEmail)
-      _ <- personalData.email.fold(success())(email =>
-        findByEmail(email).flatMap(user =>
-          validate(user.fold(true)(u =>
-                     u.id == userReference.id && u.key == userReference.key),
-                   "Email Address already registered")))
+      current <- findByUserReference(userReference).noneToFailed(
+        s"Could not find user with id ${userReference.key}")
+      // The sign-in finds the user by email. A changed email gives the account to the person who
+      // signs in with the new address, and it locks out the owner.
+      _ <- validate(personalData.email.forall(_ == current.email),
+                    "email_read_only")
       result <- updateFields(
         sel,
         Seq[Option[(String, JsValueWrapper)]](
-          personalData.email.map(value => "email" -> value),
           personalData.firstName.map(value => "firstName" -> value),
           personalData.lastName.map(value => "lastName" -> value)
         ).flatten

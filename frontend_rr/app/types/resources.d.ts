@@ -406,7 +406,6 @@ export default interface Resources {
       confirmPasswordRequired: 'Please confirm your password'
       email: 'Please enter a valid email address'
       emailInvalid: 'Invalid email address'
-      emailRequired: 'Email is required'
       endBeforeStart: 'End time is before start time'
       firstNameRequired: 'First name is required'
       languageRequired: 'Language is required'

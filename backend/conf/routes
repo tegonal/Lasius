@@ -209,6 +209,7 @@ GET /user/profile         controllers.UsersController.authUser()
 #  tags: 
 #    - user
 #  summary: Change current user's profile
+#  description: The email is read-only. A request with a changed email answers 400 with the body email_read_only.
 #  operationId: updateUserProfile
 #  requestBody:
 #    content:
@@ -279,6 +280,7 @@ POST /user/accept-tos      controllers.UsersController.acceptTOS()
 #  tags:
 #    - users
 #  summary: Change selected user's profile in selected organisation
+#  description: The email is read-only. A request with a changed email answers 400 with the body email_read_only.
 #  operationId: updateUserProfileByOrganisation
 #  requestBody:
 #    content:
