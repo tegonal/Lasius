@@ -239,6 +239,7 @@ class SecuritySpec
         // check results
         status(result) === HttpStatus.SC_UNAUTHORIZED
         contentAsString(result) must startWith("Invalid token provided")
+        contentAsString(result) must not(contain(jwtToken))
       }
 
       "return unauthorized when token issuer is not configured" in new WithTestApplication {

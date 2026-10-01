@@ -101,7 +101,7 @@ trait ControllerSecurity extends TokenSecurity {
                   token = token,
                   withinTransaction = withinTransaction,
                   canCreateNewUser = true) {
-          successful(Unauthorized(s"Invalid token provided $token"))
+          successful(Unauthorized("Invalid token provided"))
         } { dbSession => subject =>
           f(dbSession)(subject)(request)
         }
