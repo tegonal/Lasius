@@ -37,8 +37,9 @@ import repositories.{
 }
 import services.OpaqueTokenService
 
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future, Promise}
 
 @ImplementedBy(classOf[DefaultAuthConfig])
 trait AuthConfig {
@@ -134,29 +135,59 @@ class DefaultAuthConfig @Inject() (
       dbSession: DBSession): Future[UserReference] = {
 
     userRepository.findByEmail(userInfo.email).flatMap {
-      _.map(user => Future.successful(user.getReference))
-        .getOrElse {
-          if (canCreateNewUser) {
-            for {
-              // Create new private organisation
-              newOrg <- organisationRepository.create(
-                userInfo.key,
-                `private` = true)(systemServices.systemSubject, dbSession)
-              // Create new user and assign to private organisation
-              user <- userRepository.createInitialUserBasedOnProfile(
-                userInfo,
-                newOrg,
-                OrganisationAdministrator)
-            } yield user.getReference
-          } else {
-            Future.failed(
-              UnauthorizedException("Cannot find user for provided jwt token"))
-          }
-        }
+      case Some(user)               => Future.successful(user.getReference)
+      case None if canCreateNewUser =>
+        DefaultAuthConfig.createOnce(userInfo.email)(createUser(userInfo))
+      case None =>
+        Future.failed(
+          UnauthorizedException("Cannot find user for provided jwt token"))
     }
   }
+
+  private def createUser(userInfo: UserInfo)(implicit
+      context: ExecutionContext,
+      dbSession: DBSession): Future[UserReference] =
+    // Another request can create the user between the first lookup and the lock.
+    userRepository.findByEmail(userInfo.email).flatMap {
+      case Some(user) => Future.successful(user.getReference)
+      case None       =>
+        for {
+          // Create new private organisation
+          newOrg <- organisationRepository.create(
+            userInfo.key,
+            `private` = true)(systemServices.systemSubject, dbSession)
+          // Create new user and assign to private organisation
+          user <- userRepository.createInitialUserBasedOnProfile(
+            userInfo,
+            newOrg,
+            OrganisationAdministrator)
+        } yield user.getReference
+    }
 
   override def authorizationFailed(request: RequestHeader)(implicit
       context: ExecutionContext): Future[Result] =
     Future.successful(Forbidden(Json.obj("message" -> "Unauthorized")))
+}
+
+object DefaultAuthConfig {
+
+  // The first page of a new user sends several requests at once, and each one created a user.
+  // The map lives in the JVM, so it covers one backend instance, as the operator runbook requires.
+  private val pendingCreations =
+    new ConcurrentHashMap[String, Future[UserReference]]()
+
+  /** Runs `create` once per email; a concurrent call for the same email waits
+    * for that result.
+    */
+  private[controllers] def createOnce(email: String)(
+      create: => Future[UserReference])(implicit
+      context: ExecutionContext): Future[UserReference] = {
+    val promise = Promise[UserReference]()
+    Option(pendingCreations.putIfAbsent(email, promise.future)).getOrElse {
+      promise.completeWith(Future.delegate(create))
+      promise.future.onComplete(_ =>
+        pendingCreations.remove(email, promise.future))
+      promise.future
+    }
+  }
 }
