@@ -187,7 +187,7 @@ class DefaultSystemServices @Inject() (
     .asInstanceOf[ActorRef]
   val tagCache: ActorRef =
     Await
-      .result(supervisor ? TagCache.props(this, clientReceiver), duration)
+      .result(supervisor ? TagCache.props, duration)
       .asInstanceOf[ActorRef]
   val issueImporterStatusMonitor: ActorRef = Await
     .result(

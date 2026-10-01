@@ -22,9 +22,7 @@
 package actors
 
 import org.apache.pekko.actor._
-import core.SystemServices
 import models._
-import shapeless._
 
 object TagCache {
 
@@ -38,78 +36,48 @@ object TagCache {
     val manifest: Manifest[X] = m
   }
 
-  def props(systemServices: SystemServices,
-            clientReceiver: ClientReceiver): Props =
-    Props(classOf[TagCache], systemServices, clientReceiver)
+  def props: Props = Props(classOf[TagCache])
 }
 
-class TagCache(systemServices: SystemServices, clientReceiver: ClientReceiver)
-    extends Actor
-    with ActorLogging {
+/** Holds the imported issue tags of each Lasius project in memory. Clients read
+  * them through the tag endpoint; the cache sends no notification.
+  */
+class TagCache extends Actor with ActorLogging {
 
   import TagCache._
 
-  import scala.reflect.runtime.universe._
-
-  var tagCache: Map[ProjectId, Map[String, Map[Manifest[_], Set[Tag]]]] =
-    Map()
+  /** Tags by Lasius project, by external project, and by tag type. */
+  private var tagCache
+      : Map[ProjectId, Map[String, Map[Manifest[_], Set[Tag]]]] =
+    Map.empty
 
   val receive: Receive = {
-    case t @ TagsUpdated(externalProjectId, projectId, tags) =>
-      adjustCache(t.manifest, externalProjectId, projectId, tags)
+    case update @ TagsUpdated(externalProjectId, projectId, tags) =>
+      updateTags(update.manifest, externalProjectId, projectId, tags.toSet[Tag])
+
     case GetTags(projectId) =>
-      val projectTags = tagCache
-        .get(projectId)
-        .map(_.flatMap(_._2.flatMap(_._2)).toSet)
-      sender() ! CachedTags(projectId, projectTags.getOrElse(Set()))
+      val projectTags =
+        tagCache
+          .getOrElse(projectId, Map.empty)
+          .values
+          .flatMap(_.values)
+          .flatten
+      sender() ! CachedTags(projectId, projectTags.toSet)
   }
 
-  def adjustCache[T <: Tag: TypeTag](typ: Manifest[T],
-                                     externalProjectId: String,
-                                     projectId: ProjectId,
-                                     tags: Set[Tag]): Unit = {
-    // Needed to allow V to be inferred in Case1 resolution (ie. map sand pairApply)
-    implicit object MS extends (Manifest ~?> Set)
+  private def updateTags(tagType: Manifest[_],
+                         externalProjectId: String,
+                         projectId: ProjectId,
+                         tags: Set[Tag]): Unit = {
+    val projectTags  = tagCache.getOrElse(projectId, Map.empty)
+    val externalTags = projectTags.getOrElse(externalProjectId, Map.empty)
+    val current      = externalTags.getOrElse(tagType, Set.empty)
 
-    val currentMap = tagCache.get(projectId).flatMap(_.get(externalProjectId))
-    val current    = currentMap.map(_.getOrElse(typ, Set())).getOrElse(Set())
-
-    val diff = calcDiff(current, tags)
-
-    // Update cache (no WebSocket notification sent)
-    log.debug(s"TagCache changed:$diff")
-    tagCache = diff
-      .map { case (removed, added) =>
-        // Note: TagCacheChanged event is NOT broadcasted to clients
-        // Clients retrieve tags via API endpoints when needed
-        log.debug(
-          s"TagCache updated for project $projectId: removed=${removed.size}, added=${added.size}")
-
-        // update cache
-        val newMap = currentMap.map(_ + (typ -> tags)).getOrElse(Map())
-
-        val allProjectTags = tagCache
-          .get(projectId)
-          .getOrElse(Map()) + (externalProjectId -> newMap)
-        tagCache + (projectId                    -> allProjectTags)
-      }
-      .getOrElse(tagCache)
+    if (current != tags) {
+      log.debug(
+        s"TagCache updated for project $projectId: removed=${(current -- tags).size}, added=${(tags -- current).size}")
+      tagCache += projectId ->
+        (projectTags + (externalProjectId -> (externalTags + (tagType -> tags))))
+    }
   }
-
-  def calcDiff(current: Set[Tag],
-               tags: Set[Tag]): Option[(Set[Tag], Set[Tag])] = {
-    // find tags removed
-    val removed = diff(current, tags)
-
-    // tag tags added
-    val added = diff(tags, current)
-
-    if ((removed.size + added.size) > 0)
-      Some((removed, added))
-    else
-      None
-  }
-
-  def diff(current: Set[Tag], updated: Set[Tag]): Set[Tag] =
-    current -- (updated)
 }
