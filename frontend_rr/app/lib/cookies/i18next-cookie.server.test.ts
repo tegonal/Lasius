@@ -17,14 +17,21 @@
  *
  */
 
-import { createCookie } from 'react-router'
+import { describe, expect, it } from 'vitest'
 
 import { COOKIE_MAX_AGE_1_YEAR } from '~/config/constants'
 
-export const localeCookie = createCookie('lng', {
-  httpOnly: true,
-  maxAge: COOKIE_MAX_AGE_1_YEAR,
-  path: '/',
-  sameSite: 'lax',
-  secure: process.env.NODE_ENV === 'production',
+import { localeCookie } from './i18next-cookie.server'
+
+describe('localeCookie', () => {
+  it('keeps the language for one year, like the theme cookie', async () => {
+    const serialized = await localeCookie.serialize('de')
+    expect(serialized).toContain(`Max-Age=${COOKIE_MAX_AGE_1_YEAR}`)
+  })
+
+  it('round-trips the locale', async () => {
+    const serialized = await localeCookie.serialize('fr')
+    const cookieValue = serialized.split(';', 1)[0] ?? ''
+    expect(await localeCookie.parse(cookieValue)).toBe('fr')
+  })
 })
