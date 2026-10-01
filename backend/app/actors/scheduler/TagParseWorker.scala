@@ -33,6 +33,7 @@ import org.apache.pekko.pattern.pipe
 
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 import scala.util.control.NonFatal
 
 object TagParseWorker {
@@ -44,6 +45,10 @@ object TagParseWorker {
   case object Parse
 
   private case object NextParseTimer
+
+  private final case class TagsLoaded[T <: Tag](tags: Set[T])
+
+  private final case class LoadFailed(cause: Throwable)
 }
 
 /** Imports the issues of one external project as tags. The worker loads the
@@ -66,15 +71,13 @@ abstract class TagParseWorker[T <: Tag: Manifest]
   protected def projectName: String
   protected def checkFrequency: FiniteDuration
 
-  /** Loads the tags of the external project. The returned future must not
-    * touch actor state.
+  /** Loads the tags of the external project. The worker calls it on the actor
+    * thread, but the callbacks of the returned future must not touch actor
+    * state.
     */
   protected def loadTags(): Future[Set[T]]
 
   protected implicit val executionContext: ExecutionContext = context.dispatcher
-
-  private final case class TagsLoaded(tags: Set[T])
-  private final case class LoadFailed(cause: Throwable)
 
   override def receive: Receive = idle
 
@@ -86,8 +89,9 @@ abstract class TagParseWorker[T <: Tag: Manifest]
     case StartParsing | Parse =>
       log.debug(s"A parse of $externalProjectId runs already")
 
-    case TagsLoaded(tags) =>
-      publish(tags)
+    // Only this worker sends TagsLoaded, so the tags are of type T.
+    case loaded: TagsLoaded[T @unchecked] =>
+      publish(loaded.tags)
       scheduleNextParse()
 
     case LoadFailed(cause) =>
@@ -97,7 +101,8 @@ abstract class TagParseWorker[T <: Tag: Manifest]
 
   private def startParse(): Unit = {
     Future
-      .delegate(loadTags())
+      .fromTry(Try(loadTags()))
+      .flatten
       .map(TagsLoaded(_))
       .recover { case NonFatal(cause) => LoadFailed(cause) }
       .pipeTo(self)

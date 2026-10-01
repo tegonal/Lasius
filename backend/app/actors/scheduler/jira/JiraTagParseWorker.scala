@@ -31,8 +31,8 @@ import models._
 import org.apache.pekko.actor.Props
 import play.api.libs.ws.WSClient
 
-import scala.concurrent.Future
 import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 
 object JiraTagParseWorker {
   def props(wsClient: WSClient,
@@ -54,6 +54,24 @@ object JiraTagParseWorker {
           configId,
           organisationId,
           projectId)
+
+  /** Loads the search pages from `startAt` 0 until Jira's `total` is reached. A
+    * page that does not move `startAt` forward ends the load, because a server
+    * that ignores `startAt` returns the same page again.
+    */
+  private[jira] def loadAllPages(loadPage: Int => Future[JiraSearchResult])(
+      implicit executionContext: ExecutionContext): Future[Set[JiraIssue]] = {
+    def loadFrom(startAt: Int, loaded: Set[JiraIssue]): Future[Set[JiraIssue]] =
+      loadPage(startAt).flatMap { page =>
+        val issues      = loaded ++ page.issues
+        val nextStartAt = page.startAt + page.issues.size
+        if (nextStartAt <= startAt || nextStartAt >= page.total)
+          Future.successful(issues)
+        else loadFrom(nextStartAt, issues)
+      }
+
+    loadFrom(startAt = 0, loaded = Set.empty)
+  }
 }
 
 class JiraTagParseWorker(wsClient: WSClient,
@@ -66,6 +84,8 @@ class JiraTagParseWorker(wsClient: WSClient,
                          protected val organisationId: OrganisationId,
                          protected val projectId: ProjectId)
     extends TagParseWorker[JiraIssueTag] {
+
+  import JiraTagParseWorker.loadAllPages
 
   private val apiService = new JiraApiServiceImpl(wsClient, config)
   private val maxResults = projectSettings.maxResults.getOrElse(100)
@@ -81,26 +101,12 @@ class JiraTagParseWorker(wsClient: WSClient,
     settings.checkFrequency.milliseconds
 
   override protected def loadTags(): Future[Set[JiraIssueTag]] =
-    loadIssues(startAt = 0).map(_.map(toJiraIssueTag))
-
-  /** Pages through the search result with startAt until Jira's total is
-    * reached.
-    */
-  private def loadIssues(
-      startAt: Int,
-      loaded: Set[JiraIssue] = Set.empty): Future[Set[JiraIssue]] =
-    apiService
-      .findIssues(jql,
-                  Some(startAt),
-                  Some(maxResults),
-                  fields = Some("summary"))
-      .flatMap { result =>
-        val all         = loaded ++ result.issues
-        val nextStartAt = result.startAt + result.issues.size
-        if (result.issues.isEmpty || nextStartAt >= result.total)
-          Future.successful(all)
-        else loadIssues(nextStartAt, all)
-      }
+    loadAllPages { startAt =>
+      apiService.findIssues(jql,
+                            Some(startAt),
+                            Some(maxResults),
+                            fields = Some("summary"))
+    }.map(_.map(toJiraIssueTag))
 
   private def toJiraIssueTag(issue: JiraIssue): JiraIssueTag =
     JiraIssueTag(TagId(issue.key),

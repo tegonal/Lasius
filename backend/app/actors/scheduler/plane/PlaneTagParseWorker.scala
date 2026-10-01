@@ -67,6 +67,13 @@ object PlaneTagParseWorker {
     labelIds.forall(ids =>
       issue.labels.exists(_.exists(label => ids.contains(label.id)))) &&
       stateIds.forall(ids => issue.stateId.exists(ids.contains))
+
+  /** True when a configured filter resolves to no id. The import then has no
+    * issue to load.
+    */
+  def filtersAdmitNoIssue(labelIds: Option[Set[String]],
+                          stateIds: Option[Set[String]]): Boolean =
+    labelIds.exists(_.isEmpty) || stateIds.exists(_.isEmpty)
 }
 
 class PlaneTagParseWorker(wsClient: WSClient,
@@ -81,7 +88,7 @@ class PlaneTagParseWorker(wsClient: WSClient,
                           protected val projectId: ProjectId)
     extends TagParseWorker[PlaneIssueTag] {
 
-  import PlaneTagParseWorker.matchesFilters
+  import PlaneTagParseWorker.{filtersAdmitNoIssue, matchesFilters}
 
   private val apiService       = new PlaneApiServiceImpl(wsClient, config)
   private val tagConfiguration = projectSettings.tagConfiguration
@@ -104,15 +111,19 @@ class PlaneTagParseWorker(wsClient: WSClient,
       stateIds <- idsOfNames(
         tagConfiguration.includeOnlyIssuesWithState,
         apiService.getStates(maxResults, workspace, planeProjectId))
-      issues <- apiService.findIssues(
-        workspace = workspace,
-        projectId = planeProjectId,
-        paramString =
-          projectSettings.params.getOrElse("expand=labels,state,project"),
-        maxResults = maxResults,
-        includeOnlyIssuesWithLabelsIds = labelIds.getOrElse(Set.empty),
-        includeOnlyIssuesWithStateIds = stateIds.getOrElse(Set.empty)
-      )
+      issues <-
+        if (filtersAdmitNoIssue(labelIds, stateIds))
+          Future.successful(Seq.empty)
+        else
+          apiService.findIssues(
+            workspace = workspace,
+            projectId = planeProjectId,
+            paramString =
+              projectSettings.params.getOrElse("expand=labels,state,project"),
+            maxResults = maxResults,
+            includeOnlyIssuesWithLabelsIds = labelIds.getOrElse(Set.empty),
+            includeOnlyIssuesWithStateIds = stateIds.getOrElse(Set.empty)
+          )
     } yield issues
       .filter(matchesFilters(_, labelIds, stateIds))
       .map(toPlaneIssueTag)

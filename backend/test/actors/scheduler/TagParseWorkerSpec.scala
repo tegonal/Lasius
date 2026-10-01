@@ -46,12 +46,12 @@ class TagParseWorkerSpec extends Specification with Mockito {
   private val tag = SimpleTag(TagId("LAS-1"))
 
   private class Probes(implicit scope: ActorTestScope) {
-    val tagCache: TestProbe = TestProbe()(scope.system)
-    val monitor: TestProbe  = TestProbe()(scope.system)
+    val tagCache: TestProbe      = TestProbe()(scope.system)
+    val monitor: TestProbe       = TestProbe()(scope.system)
     val services: SystemServices = {
       val services = mock[SystemServices]
-      services.tagCache returns tagCache.ref
-      services.issueImporterStatusMonitor returns monitor.ref
+      services.tagCache.returns(tagCache.ref)
+      services.issueImporterStatusMonitor.returns(monitor.ref)
       services
     }
   }
@@ -60,9 +60,10 @@ class TagParseWorkerSpec extends Specification with Mockito {
     "publish the loaded tags and report a healthy sync" in new ActorTestScope {
       private val probes = new Probes()(this)
       private val worker = system.actorOf(
-        Props(new TestWorker(probes.services,
-                             () => Future.successful(Set(tag)),
-                             1.hour)))
+        Props(
+          new TestWorker(probes.services,
+                         () => Future.successful(Set(tag)),
+                         1.hour)))
 
       worker ! StartParsing
 
@@ -79,13 +80,14 @@ class TagParseWorkerSpec extends Specification with Mockito {
     "report a failed load with a message and load again after the frequency" in new ActorTestScope {
       private val probes = new Probes()(this)
       private val loads  = new AtomicInteger()
-      private val worker = system.actorOf(Props(new TestWorker(
-        probes.services,
-        () => {
-          loads.incrementAndGet()
-          Future.failed(new ClosedChannelException)
-        },
-        200.millis)))
+      private val worker = system.actorOf(
+        Props(
+          new TestWorker(probes.services,
+                         () => {
+                           loads.incrementAndGet()
+                           Future.failed(new ClosedChannelException)
+                         },
+                         200.millis)))
 
       worker ! StartParsing
 
@@ -104,13 +106,15 @@ class TagParseWorkerSpec extends Specification with Mockito {
       private val probes  = new Probes()(this)
       private val loads   = new AtomicInteger()
       private val pending = Promise[Set[SimpleTag]]()
-      private val worker = system.actorOf(Props(new TestWorker(probes.services,
-                                                               () => {
-                                                                 loads
-                                                                   .incrementAndGet()
-                                                                 pending.future
-                                                               },
-                                                               1.hour)))
+      private val worker  = system.actorOf(
+        Props(
+          new TestWorker(probes.services,
+                         () => {
+                           loads
+                             .incrementAndGet()
+                           pending.future
+                         },
+                         1.hour)))
 
       worker ! StartParsing
       worker ! Parse

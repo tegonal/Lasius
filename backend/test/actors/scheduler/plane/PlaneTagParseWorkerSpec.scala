@@ -21,7 +21,10 @@
 
 package actors.scheduler.plane
 
-import actors.scheduler.plane.PlaneTagParseWorker.matchesFilters
+import actors.scheduler.plane.PlaneTagParseWorker.{
+  filtersAdmitNoIssue,
+  matchesFilters
+}
 import org.specs2.mutable.Specification
 import play.api.libs.json.{JsString, Json}
 
@@ -61,6 +64,16 @@ class PlaneTagParseWorkerSpec extends Specification {
                      None,
                      Some(Set("state-todo"))) must beTrue
       matchesFilters(issue, None, Some(Set("state-done"))) must beFalse
+    }
+  }
+
+  "PlaneTagParseWorker.filtersAdmitNoIssue" should {
+    "be true only when a configured filter resolves to no id" in {
+      filtersAdmitNoIssue(Some(Set.empty), None) must beTrue
+      filtersAdmitNoIssue(None, Some(Set.empty)) must beTrue
+      filtersAdmitNoIssue(None, None) must beFalse
+      filtersAdmitNoIssue(Some(Set(bug.id)), Some(Set("state-todo"))) must
+        beFalse
     }
   }
 }
