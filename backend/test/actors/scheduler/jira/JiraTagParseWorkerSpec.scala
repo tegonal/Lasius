@@ -33,10 +33,10 @@ class JiraTagParseWorkerSpec extends Specification {
   implicit val executionContext: ExecutionContext = ExecutionContext.global
 
   private def issue(number: Int): JiraIssue =
-    JiraIssue(id = number.toString,
-              self = URI.create(
-                s"https://jira.example.com/rest/api/2/issue/$number"),
-              key = s"LAS-$number")
+    JiraIssue(
+      id = number.toString,
+      self = URI.create(s"https://jira.example.com/rest/api/2/issue/$number"),
+      key = s"LAS-$number")
 
   private def page(startAt: Int,
                    total: Int,
