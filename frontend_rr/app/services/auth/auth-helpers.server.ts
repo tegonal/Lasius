@@ -17,7 +17,7 @@
  *
  */
 
-import { redirect } from 'react-router'
+import { href, redirect } from 'react-router'
 
 import { getServerEnvironment } from '~/lib/environment.server'
 import { getCsrfToken } from '~/services/api/lasius/general/general'
@@ -132,6 +132,17 @@ export function mergeAuthHeaders(authResult: AuthResult, responseHeaders?: Heade
     }
   }
   return headers
+}
+
+/**
+ * The OAuth callback URL. Behind a reverse proxy the request URL holds the internal host, so the
+ * forwarded headers give the public origin. The token exchange must repeat the URL exactly.
+ */
+export function oauthCallbackUrl(request: Request): string {
+  const host = request.headers.get('x-forwarded-host') || request.headers.get('host')
+  const protocol = request.headers.get('x-forwarded-proto') || 'http'
+  const origin = host ? `${protocol}://${host}` : new URL(request.url).origin
+  return `${origin}${href('/oauth/callback')}`
 }
 
 /** Send a signed-in user on to `returnTo`. The sign-in and registration pages call this first. */

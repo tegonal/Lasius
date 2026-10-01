@@ -21,6 +21,7 @@ import { getServerEnvironmentRequired } from '~/lib/environment.server'
 import { logger } from '~/lib/logger'
 
 import { type OAuthProvider, type TokenResponse } from '../types'
+import { buildAuthorizationUrl, fetchProfile, postTokenRequest } from './oauth2-client.server'
 
 interface GitHubEmail {
   email: string
@@ -33,35 +34,21 @@ export function createGitHubProvider(): OAuthProvider {
   const clientSecret = getServerEnvironmentRequired('GITHUB_OAUTH_CLIENT_SECRET')
 
   return {
-    async exchangeCode(code: string, redirectUri: string): Promise<TokenResponse> {
-      const response = await fetch('https://github.com/login/oauth/access_token', {
-        body: new URLSearchParams({
-          client_id: clientId,
-          client_secret: clientSecret,
-          code,
-          redirect_uri: redirectUri,
-        }),
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        method: 'POST',
-      })
-
-      if (!response.ok) {
-        const error = await response.text()
-        logger.error('GitHub token exchange failed', {
-          error,
-          status: response.status,
-        })
-        throw new Error(`GitHub token exchange failed: ${response.status}`)
-      }
-
-      const data = (await response.json()) as {
+    async exchangeCode(code, redirectUri, codeVerifier): Promise<TokenResponse> {
+      const data = await postTokenRequest<{
         access_token: string
+        error?: string
         scope: string
         token_type: string
-      }
+      }>('GitHub', 'https://github.com/login/oauth/access_token', {
+        client_id: clientId,
+        client_secret: clientSecret,
+        code,
+        redirect_uri: redirectUri,
+        ...(codeVerifier && { code_verifier: codeVerifier }),
+      })
+      // GitHub can answer a refused exchange, for example `bad_verification_code`, with status 200.
+      if (data.error) throw new Error(`GitHub token request failed: ${data.error}`)
 
       // GitHub tokens don't expire by default — set a long expiry
       return {
@@ -72,23 +59,19 @@ export function createGitHubProvider(): OAuthProvider {
       }
     },
 
-    getAuthorizationUrl(state: string, redirectUri: string): string {
-      const url = new URL('https://github.com/login/oauth/authorize')
-      url.searchParams.set('client_id', clientId)
-      url.searchParams.set('scope', 'read:user user:email')
-      url.searchParams.set('state', state)
-      url.searchParams.set('redirect_uri', redirectUri)
-      return url.href
-    },
+    getAuthorizationUrl: (state, redirectUri, codeChallenge) =>
+      buildAuthorizationUrl('https://github.com/login/oauth/authorize', {
+        clientId,
+        codeChallenge,
+        redirectUri,
+        responseType: false,
+        scope: 'read:user user:email',
+        state,
+      }),
 
     async getUserProfile(accessToken: string): Promise<{ email: string; userId: string }> {
-      const [userResponse, emailsResponse] = await Promise.all([
-        fetch('https://api.github.com/user', {
-          headers: {
-            Accept: 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }),
+      const [user, emailsResponse] = await Promise.all([
+        fetchProfile<{ id: number }>('GitHub', 'https://api.github.com/user', accessToken),
         fetch('https://api.github.com/user/emails', {
           headers: {
             Accept: 'application/json',
@@ -97,11 +80,6 @@ export function createGitHubProvider(): OAuthProvider {
         }),
       ])
 
-      if (!userResponse.ok) {
-        throw new Error(`GitHub user profile failed: ${userResponse.status}`)
-      }
-
-      const user = (await userResponse.json()) as { id: number }
       const userId = user.id.toString()
 
       let email = ''

@@ -18,111 +18,31 @@
  */
 
 import { getServerEnvironmentRequired } from '~/lib/environment.server'
-import { logger } from '~/lib/logger'
 
-import { type OAuthProvider, type TokenResponse } from '../types'
+import { type OAuthProvider } from '../types'
+import { createOAuth2Provider, fetchProfile } from './oauth2-client.server'
 
 export function createKeycloakProvider(): OAuthProvider {
-  const clientId = getServerEnvironmentRequired('KEYCLOAK_OAUTH_CLIENT_ID')
-  const clientSecret = getServerEnvironmentRequired('KEYCLOAK_OAUTH_CLIENT_SECRET')
-  const baseUrl = getServerEnvironmentRequired('KEYCLOAK_OAUTH_URL')
+  const baseUrl = `${getServerEnvironmentRequired('KEYCLOAK_OAUTH_URL')}/protocol/openid-connect`
 
-  const authorizationUrl = `${baseUrl}/protocol/openid-connect/auth`
-  const tokenUrl = `${baseUrl}/protocol/openid-connect/token`
-  const userinfoUrl = `${baseUrl}/protocol/openid-connect/userinfo`
-  const revokeUrl = `${baseUrl}/protocol/openid-connect/revoke`
-
-  return {
-    async exchangeCode(code: string, redirectUri: string): Promise<TokenResponse> {
-      const response = await fetch(tokenUrl, {
-        body: new URLSearchParams({
-          client_id: clientId,
-          client_secret: clientSecret,
-          code,
-          grant_type: 'authorization_code',
-          redirect_uri: redirectUri,
-        }),
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        method: 'POST',
-      })
-
-      if (!response.ok) {
-        const error = await response.text()
-        logger.error('Keycloak token exchange failed', {
-          error,
-          status: response.status,
-        })
-        throw new Error(`Keycloak token exchange failed: ${response.status}`)
-      }
-
-      return (await response.json()) as TokenResponse
+  return createOAuth2Provider({
+    authorizationUrl: `${baseUrl}/auth`,
+    credentials: {
+      clientId: getServerEnvironmentRequired('KEYCLOAK_OAUTH_CLIENT_ID'),
+      clientSecret: getServerEnvironmentRequired('KEYCLOAK_OAUTH_CLIENT_SECRET'),
     },
-
-    getAuthorizationUrl(state: string, redirectUri: string): string {
-      const url = new URL(authorizationUrl)
-      url.searchParams.set('client_id', clientId)
-      url.searchParams.set('response_type', 'code')
-      url.searchParams.set('scope', 'openid profile email')
-      url.searchParams.set('state', state)
-      url.searchParams.set('redirect_uri', redirectUri)
-      return url.href
-    },
-
-    async getUserProfile(accessToken: string): Promise<{ email: string; userId: string }> {
-      const response = await fetch(userinfoUrl, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      })
-
-      if (!response.ok) {
-        throw new Error(`Keycloak userinfo failed: ${response.status}`)
-      }
-
-      const profile = (await response.json()) as { email: string; sub: string }
+    async getUserProfile(accessToken) {
+      const profile = await fetchProfile<{ email: string; sub: string }>(
+        'Keycloak',
+        `${baseUrl}/userinfo`,
+        accessToken,
+      )
       return { email: profile.email, userId: profile.sub }
     },
-
+    label: 'Keycloak',
     provider: 'keycloak',
-
-    async refreshToken(refreshTokenValue: string): Promise<null | TokenResponse> {
-      try {
-        const response = await fetch(tokenUrl, {
-          body: new URLSearchParams({
-            client_id: clientId,
-            client_secret: clientSecret,
-            grant_type: 'refresh_token',
-            refresh_token: refreshTokenValue,
-          }),
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          method: 'POST',
-        })
-
-        if (!response.ok) {
-          logger.warn('Keycloak token refresh failed', {
-            status: response.status,
-          })
-          return null
-        }
-
-        return (await response.json()) as TokenResponse
-      } catch (error) {
-        logger.error('Keycloak token refresh error', { error })
-        return null
-      }
-    },
-
-    async revokeToken({ refreshToken }): Promise<void> {
-      const response = await fetch(revokeUrl, {
-        body: new URLSearchParams({
-          client_id: clientId,
-          client_secret: clientSecret,
-          token: refreshToken,
-        }),
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        method: 'POST',
-      })
-      if (!response.ok) {
-        throw new Error(`Keycloak token revocation failed: ${response.status}`)
-      }
-    },
-  }
+    revokeUrl: `${baseUrl}/revoke`,
+    scope: 'openid profile email',
+    tokenUrl: `${baseUrl}/token`,
+  })
 }

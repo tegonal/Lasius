@@ -23,6 +23,7 @@ import {
   authHeaders,
   type AuthResult,
   mergeAuthHeaders,
+  oauthCallbackUrl,
   redirectIfSignedIn,
   requireUser,
 } from './auth-helpers.server'
@@ -128,6 +129,20 @@ describe('mergeAuthHeaders', () => {
     })
     expect(merged.get('Content-Type')).toBe('application/json')
     expect(merged.get('Set-Cookie')).toBe('session=abc123')
+  })
+})
+
+describe('oauthCallbackUrl', () => {
+  it('takes the public origin from the forwarded headers', () => {
+    const request = new Request('http://127.0.0.1:5173/oauth/keycloak/login', {
+      headers: { 'x-forwarded-host': 'lasius.example', 'x-forwarded-proto': 'https' },
+    })
+    expect(oauthCallbackUrl(request)).toBe('https://lasius.example/oauth/callback')
+  })
+
+  it('uses the request origin without forwarded headers', () => {
+    const request = new Request('http://localhost:5173/oauth/callback?code=x')
+    expect(oauthCallbackUrl(request)).toBe('http://localhost:5173/oauth/callback')
   })
 })
 

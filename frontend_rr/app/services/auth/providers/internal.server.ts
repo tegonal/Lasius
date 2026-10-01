@@ -17,10 +17,12 @@
  *
  */
 
+import { generateCodeChallenge, generateCodeVerifier } from '~/lib/crypto.server'
 import { getServerEnvironmentRequired } from '~/lib/environment.server'
 import { logger } from '~/lib/logger'
 
 import { type OAuthProvider, type TokenResponse } from '../types'
+import { exchangeAuthorizationCode, fetchProfile, refreshAccessToken } from './oauth2-client.server'
 
 /**
  * Internal Lasius OAuth provider.
@@ -45,72 +47,19 @@ export function createInternalProvider(): InternalOAuthProvider {
   const clientSecret = getServerEnvironmentRequired('LASIUS_OAUTH_CLIENT_SECRET')
   const apiUrl = getServerEnvironmentRequired('LASIUS_API_URL')
 
+  const credentials = { clientId, clientSecret }
   const tokenUrl = `${apiUrl}/oauth2/access_token`
   const loginUrl = `${apiUrl}/oauth2/login`
   const profileUrl = `${apiUrl}/oauth2/profile`
   const logoutUrl = `${apiUrl}/oauth2/logout`
 
-  /** Generate a random PKCE code verifier */
-  function generateCodeVerifier(): string {
-    const array = new Uint8Array(32)
-    crypto.getRandomValues(array)
-    return base64UrlEncode(array)
-  }
-
-  /** Create a SHA-256 code challenge from a code verifier */
-  async function generateCodeChallenge(verifier: string): Promise<string> {
-    const encoder = new TextEncoder()
-    const data = encoder.encode(verifier)
-    const digest = await crypto.subtle.digest('SHA-256', data)
-    return base64UrlEncode(new Uint8Array(digest))
-  }
-
-  function base64UrlEncode(bytes: Uint8Array): string {
-    let binary = ''
-    for (const byte of bytes) {
-      binary += String.fromCodePoint(byte)
-    }
-    return btoa(binary)
-      .replaceAll('+', '-')
-      .replaceAll('/', '_')
-      .replace(/={1,2}$/, '')
-  }
-
   const provider: InternalOAuthProvider = {
-    async exchangeCode(
-      code: string,
-      redirectUri: string,
-      codeVerifier?: string,
-    ): Promise<TokenResponse> {
-      const body: Record<string, string> = {
-        client_id: clientId,
-        client_secret: clientSecret,
+    exchangeCode: (code, redirectUri, codeVerifier) =>
+      exchangeAuthorizationCode('Internal', tokenUrl, credentials, {
         code,
-        grant_type: 'authorization_code',
-        redirect_uri: redirectUri,
-      }
-
-      if (codeVerifier) {
-        body.code_verifier = codeVerifier
-      }
-
-      const response = await fetch(tokenUrl, {
-        body: new URLSearchParams(body),
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        method: 'POST',
-      })
-
-      if (!response.ok) {
-        const error = await response.text()
-        logger.error('Internal token exchange failed', {
-          error,
-          status: response.status,
-        })
-        throw new Error(`Internal token exchange failed: ${response.status}`)
-      }
-
-      return (await response.json()) as TokenResponse
-    },
+        codeVerifier,
+        redirectUri,
+      }),
 
     getAuthorizationUrl(_state: string, _redirectUri: string): string {
       // Internal provider does not use browser-redirect authorization.
@@ -121,15 +70,11 @@ export function createInternalProvider(): InternalOAuthProvider {
     },
 
     async getUserProfile(accessToken: string): Promise<{ email: string; userId: string }> {
-      const response = await fetch(profileUrl, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      })
-
-      if (!response.ok) {
-        throw new Error(`Internal profile fetch failed: ${response.status}`)
-      }
-
-      const profile = (await response.json()) as { email: string; sub: string }
+      const profile = await fetchProfile<{ email: string; sub: string }>(
+        'Internal',
+        profileUrl,
+        accessToken,
+      )
       return { email: profile.email, userId: profile.sub }
     },
 
@@ -199,32 +144,8 @@ export function createInternalProvider(): InternalOAuthProvider {
 
     provider: 'internal',
 
-    async refreshToken(refreshTokenValue: string): Promise<null | TokenResponse> {
-      try {
-        const response = await fetch(tokenUrl, {
-          body: new URLSearchParams({
-            client_id: clientId,
-            client_secret: clientSecret,
-            grant_type: 'refresh_token',
-            refresh_token: refreshTokenValue,
-          }),
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          method: 'POST',
-        })
-
-        if (!response.ok) {
-          logger.warn('Internal token refresh failed', {
-            status: response.status,
-          })
-          return null
-        }
-
-        return (await response.json()) as TokenResponse
-      } catch (error) {
-        logger.error('Internal token refresh error', { error })
-        return null
-      }
-    },
+    refreshToken: (refreshTokenValue) =>
+      refreshAccessToken('Internal', tokenUrl, credentials, refreshTokenValue),
 
     // The backend logout checks the Bearer token as an access token and deletes it.
     async revokeToken({ accessToken }): Promise<void> {
