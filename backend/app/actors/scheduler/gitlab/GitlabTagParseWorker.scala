@@ -31,8 +31,8 @@ import models._
 import org.apache.pekko.actor.Props
 import play.api.libs.ws.WSClient
 
-import scala.concurrent.Future
 import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 
 object GitlabTagParseWorker {
   def props(wsClient: WSClient,
@@ -54,6 +54,31 @@ object GitlabTagParseWorker {
           configId,
           organisationId,
           projectId)
+
+  /** Follows the next page that GitLab reports until all issues are loaded. A
+    * next page that does not move forward ends the load, because its request
+    * repeats a page.
+    */
+  private[gitlab] def loadAllPages(
+      loadPage: Int => Future[GitlabIssuesSearchResult])(implicit
+      executionContext: ExecutionContext): Future[Set[GitlabIssue]] = {
+    def loadFrom(page: Int,
+                 loaded: Set[GitlabIssue]): Future[Set[GitlabIssue]] =
+      loadPage(page).flatMap { result =>
+        val issues    = loaded ++ result.issues
+        val allLoaded =
+          result.totalNumberOfItems.exists(issues.size >= _) ||
+            result.page.zip(result.totalPages).exists { case (current, total) =>
+              current >= total
+            }
+        result.nextPage.filter(_ > page) match {
+          case Some(nextPage) if !allLoaded => loadFrom(nextPage, issues)
+          case _                            => Future.successful(issues)
+        }
+      }
+
+    loadFrom(page = 0, loaded = Set.empty)
+  }
 }
 
 class GitlabTagParseWorker(wsClient: WSClient,
@@ -66,6 +91,8 @@ class GitlabTagParseWorker(wsClient: WSClient,
                            protected val organisationId: OrganisationId,
                            protected val projectId: ProjectId)
     extends TagParseWorker[GitlabIssueTag] {
+
+  import GitlabTagParseWorker.loadAllPages
 
   private val apiService = new GitlabApiServiceImpl(wsClient, config)
   private val maxResults = projectSettings.maxResults.getOrElse(500)
@@ -81,30 +108,12 @@ class GitlabTagParseWorker(wsClient: WSClient,
     settings.checkFrequency.milliseconds
 
   override protected def loadTags(): Future[Set[GitlabIssueTag]] =
-    loadIssues(page = 0).map(_.map(toGitlabIssueTag))
-
-  /** Follows the next page that GitLab reports, until all issues are loaded.
-    */
-  private def loadIssues(
-      page: Int,
-      loaded: Set[GitlabIssue] = Set.empty): Future[Set[GitlabIssue]] =
-    apiService
-      .findIssues(projectSettings.gitlabProjectId,
-                  query,
-                  Some(page),
-                  Some(maxResults))
-      .flatMap { result =>
-        val all       = loaded ++ result.issues
-        val allLoaded =
-          result.totalNumberOfItems.exists(all.size >= _) ||
-            result.page.zip(result.totalPages).exists { case (current, total) =>
-              current >= total
-            }
-        result.nextPage.filter(_ > 0) match {
-          case Some(nextPage) if !allLoaded => loadIssues(nextPage, all)
-          case _                            => Future.successful(all)
-        }
-      }
+    loadAllPages { page =>
+      apiService.findIssues(projectSettings.gitlabProjectId,
+                            query,
+                            Some(page),
+                            Some(maxResults))
+    }.map(_.map(toGitlabIssueTag))
 
   private def toGitlabIssueTag(issue: GitlabIssue): GitlabIssueTag = {
     val tagConfiguration = projectSettings.tagConfiguration

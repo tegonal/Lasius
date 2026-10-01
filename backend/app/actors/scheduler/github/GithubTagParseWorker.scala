@@ -31,8 +31,8 @@ import models._
 import org.apache.pekko.actor.Props
 import play.api.libs.ws.WSClient
 
-import scala.concurrent.Future
 import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 
 object GithubTagParseWorker {
   def props(wsClient: WSClient,
@@ -54,6 +54,25 @@ object GithubTagParseWorker {
           configId,
           organisationId,
           projectId)
+
+  /** Loads the issue pages from page 1. GitHub reports no total, so a page with
+    * fewer than `maxResults` issues is the last one. A page without a new issue
+    * also ends the load, because a server that ignores `page` repeats a page.
+    */
+  private[github] def loadAllPages(maxResults: Int)(
+      loadPage: Int => Future[GithubIssuesSearchResult])(implicit
+      executionContext: ExecutionContext): Future[Set[GithubIssue]] = {
+    def loadFrom(page: Int,
+                 loaded: Set[GithubIssue]): Future[Set[GithubIssue]] =
+      loadPage(page).flatMap { result =>
+        val issues = loaded ++ result.issues
+        if (result.issues.size < maxResults || issues.size == loaded.size)
+          Future.successful(issues)
+        else loadFrom(page + 1, issues)
+      }
+
+    loadFrom(page = 1, loaded = Set.empty)
+  }
 }
 
 class GithubTagParseWorker(wsClient: WSClient,
@@ -66,6 +85,8 @@ class GithubTagParseWorker(wsClient: WSClient,
                            protected val organisationId: OrganisationId,
                            protected val projectId: ProjectId)
     extends TagParseWorker[GithubIssueTag] {
+
+  import GithubTagParseWorker.loadAllPages
 
   private val apiService = new GithubApiServiceImpl(wsClient, config)
   private val repository =
@@ -83,25 +104,13 @@ class GithubTagParseWorker(wsClient: WSClient,
     settings.checkFrequency.milliseconds
 
   override protected def loadTags(): Future[Set[GithubIssueTag]] =
-    loadIssues(page = 1).map(_.map(toGithubIssueTag))
-
-  /** GitHub reports no total, so a page with fewer issues than requested is the
-    * last one. The first page is 1.
-    */
-  private def loadIssues(
-      page: Int,
-      loaded: Set[GithubIssue] = Set.empty): Future[Set[GithubIssue]] =
-    apiService
-      .findIssues(projectSettings.githubRepoOwner,
-                  projectSettings.githubRepoName,
-                  query,
-                  Some(page),
-                  Some(maxResults))
-      .flatMap { result =>
-        val all = loaded ++ result.issues
-        if (result.issues.size < maxResults) Future.successful(all)
-        else loadIssues(page + 1, all)
-      }
+    loadAllPages(maxResults) { page =>
+      apiService.findIssues(projectSettings.githubRepoOwner,
+                            projectSettings.githubRepoName,
+                            query,
+                            Some(page),
+                            Some(maxResults))
+    }.map(_.map(toGithubIssueTag))
 
   private def toGithubIssueTag(issue: GithubIssue): GithubIssueTag = {
     val tagConfiguration = projectSettings.tagConfiguration

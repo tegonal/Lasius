@@ -21,12 +21,12 @@
 
 package actors.scheduler.jira
 
+import actors.scheduler.StubPages
 import org.specs2.mutable.Specification
 
 import java.net.URI
-import scala.collection.mutable
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext}
 
 class JiraTagParseWorkerSpec extends Specification {
 
@@ -46,28 +46,14 @@ class JiraTagParseWorkerSpec extends Specification {
                      total = total,
                      issues = numbers.map(issue))
 
-  /** Records each requested `startAt`. A stub that answers more than 10
-    * requests fails, so a load without end stops the example.
-    */
-  private class StubJira(answer: Int => JiraSearchResult) {
-    val requests: mutable.Buffer[Int] = mutable.Buffer.empty
-
-    def loadPage(startAt: Int): Future[JiraSearchResult] = {
-      requests += startAt
-      if (requests.size > 10)
-        Future.failed(new IllegalStateException("The load does not end"))
-      else Future.successful(answer(startAt))
-    }
-  }
-
-  private def loadAll(jira: StubJira): Set[String] =
+  private def loadAll(jira: StubPages[JiraSearchResult]): Set[String] =
     Await
       .result(JiraTagParseWorker.loadAllPages(jira.loadPage), 5.seconds)
       .map(_.key)
 
   "JiraTagParseWorker.loadAllPages" should {
     "load every page up to the total" in {
-      val jira = new StubJira({
+      val jira = new StubPages({
         case 0 => page(startAt = 0, total = 5, Seq(1, 2))
         case 2 => page(startAt = 2, total = 5, Seq(3, 4))
         case 4 => page(startAt = 4, total = 5, Seq(5))
@@ -78,7 +64,7 @@ class JiraTagParseWorkerSpec extends Specification {
     }
 
     "end the load at an empty page" in {
-      val jira = new StubJira({
+      val jira = new StubPages({
         case 0 => page(startAt = 0, total = 10, Seq(1, 2))
         case 2 => page(startAt = 2, total = 10, Seq())
       })
@@ -88,7 +74,7 @@ class JiraTagParseWorkerSpec extends Specification {
     }
 
     "end the load when the server ignores startAt" in {
-      val jira = new StubJira(_ => page(startAt = 0, total = 6, Seq(1, 2)))
+      val jira = new StubPages(_ => page(startAt = 0, total = 6, Seq(1, 2)))
 
       loadAll(jira) must equalTo(Set("LAS-1", "LAS-2"))
       jira.requests must equalTo(Seq(0, 2))
