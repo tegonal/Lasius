@@ -90,33 +90,23 @@ export const ProjectMappingRowContext = ({
   return (
     <>
       <ContextBody hash={`${externalProject.id}::${mapping.projectId}`} variant="compact">
-        <div
-          aria-label={t('issueImporters.wizard.projects.editMapping', {
-            defaultValue: 'Edit Project Mapping',
-          })}
-          className="badge badge-outline cursor-pointer gap-1"
-          onClick={openSelector}
-          onKeyDown={(event) => {
-            if (!(event.key === 'Enter' || event.key === ' ')) {
-              return
-            }
-
-            event.preventDefault()
-            openSelector()
-          }}
-          role="button"
-          tabIndex={0}>
-          <LucideIcon className="text-primary" icon={FolderOpen} size={12} />
-          <span className="text-xs">{projectName}</span>
+        <div className="badge badge-outline gap-1 pr-0.5">
+          <button
+            aria-label={t('issueImporters.wizard.projects.editMapping', {
+              defaultValue: 'Edit Project Mapping',
+            })}
+            className="flex cursor-pointer items-center gap-1"
+            onClick={openSelector}
+            type="button">
+            <LucideIcon className="text-primary" icon={FolderOpen} size={12} />
+            <span className="text-xs">{projectName}</span>
+          </button>
           <button
             aria-label={t('issueImporters.wizard.projects.removeMapping', {
               defaultValue: 'Remove mapping',
             })}
-            className="btn btn-ghost btn-xs p-0"
-            onClick={(event) => {
-              event.stopPropagation()
-              openConfirmRemove()
-            }}
+            className="btn btn-ghost btn-circle size-4 p-0"
+            onClick={openConfirmRemove}
             type="button">
             <LucideIcon icon={X} size={12} />
           </button>
