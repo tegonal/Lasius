@@ -19,7 +19,6 @@
 
 import { AlertTriangle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { redirect } from 'react-router'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { Card, CardBody } from '~/components/ui/cards/card'
@@ -30,29 +29,22 @@ import { LoadingInfoPanel, LoginInfoPanel } from '~/features/auth/auth-info-pane
 import { AuthLayout } from '~/features/auth/auth-layout'
 import { HelpButton } from '~/features/help/components/help-button'
 import { getServerEnvironment } from '~/lib/environment.server'
-import {
-  getOptionalUser,
-  mergeAuthHeaders,
-  sanitizeReturnTo,
-} from '~/services/auth/auth-helpers.server'
+import { redirectIfSignedIn } from '~/services/auth/auth-helpers.server'
 import { providerLoginUrl, returnToFromCallbackUrl } from '~/services/auth/auth-urls'
 import { getProviderDisplayName, getProviderIcon } from '~/services/auth/provider-display'
 import { getEnabledProviders } from '~/services/auth/providers'
+import { sanitizeReturnTo } from '~/services/auth/return-to'
 
 import { type Route } from './+types/login'
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const user = await getOptionalUser(request)
   const url = new URL(request.url)
   const returnTo = sanitizeReturnTo(
     url.searchParams.get('returnTo') ??
       returnToFromCallbackUrl(url.searchParams.get('callbackUrl')) ??
       '/',
   )
-
-  if (user) {
-    throw redirect(returnTo, { headers: mergeAuthHeaders(user) })
-  }
+  await redirectIfSignedIn(request, returnTo)
 
   const error = url.searchParams.get('error') ?? null
   const providers = getEnabledProviders()

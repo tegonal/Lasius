@@ -23,9 +23,10 @@ import {
   authHeaders,
   type AuthResult,
   mergeAuthHeaders,
+  redirectIfSignedIn,
   requireUser,
-  sanitizeReturnTo,
 } from './auth-helpers.server'
+import { createUserSession } from './session.server'
 import { type LasiusSessionData } from './types'
 
 /** Call requireUser without a session cookie and return the Location of the login redirect. */
@@ -89,44 +90,6 @@ describe('authHeaders', () => {
   })
 })
 
-describe('sanitizeReturnTo', () => {
-  it('allows a valid relative path', () => {
-    expect(sanitizeReturnTo('/dashboard')).toBe('/dashboard')
-  })
-
-  it('allows nested relative paths', () => {
-    expect(sanitizeReturnTo('/org/123/projects')).toBe('/org/123/projects')
-  })
-
-  it('rejects empty string', () => {
-    expect(sanitizeReturnTo('')).toBe('/')
-  })
-
-  it('rejects protocol-relative URLs', () => {
-    expect(sanitizeReturnTo('//evil.com')).toBe('/')
-  })
-
-  it('rejects absolute URLs', () => {
-    expect(sanitizeReturnTo('https://evil.com')).toBe('/')
-  })
-
-  it('rejects paths not starting with /', () => {
-    expect(sanitizeReturnTo('evil.com/path')).toBe('/')
-  })
-
-  it('rejects backslash paths', () => {
-    expect(sanitizeReturnTo(String.raw`/\evil.com`)).toBe('/')
-  })
-
-  it('rejects paths with embedded backslashes', () => {
-    expect(sanitizeReturnTo(String.raw`/foo\bar`)).toBe('/')
-  })
-
-  it('uses custom fallback', () => {
-    expect(sanitizeReturnTo('', '/home')).toBe('/home')
-  })
-})
-
 describe('mergeAuthHeaders', () => {
   it('returns empty headers when authResult has no headers', () => {
     const authResult: AuthResult = { session: mockSession }
@@ -165,6 +128,41 @@ describe('mergeAuthHeaders', () => {
     })
     expect(merged.get('Content-Type')).toBe('application/json')
     expect(merged.get('Set-Cookie')).toBe('session=abc123')
+  })
+})
+
+describe('redirectIfSignedIn', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs()
+  })
+
+  async function signedInRequest(): Promise<Request> {
+    const response = await createUserSession(mockSession, '/')
+    const cookie = (response.headers.get('Set-Cookie') ?? '').split(';', 1)[0] ?? ''
+    return new Request('http://localhost/login', { headers: { Cookie: cookie } })
+  }
+
+  async function redirectLocation(request: Request, returnTo: string) {
+    try {
+      await redirectIfSignedIn(request, returnTo)
+    } catch (error) {
+      return error instanceof Response ? error.headers.get('Location') : null
+    }
+    return null
+  }
+
+  it('sends a signed-in user to the sanitized returnTo', async () => {
+    vi.stubEnv('AUTH_SECRET', 'test-secret')
+    const request = await signedInRequest()
+    expect(await redirectLocation(request, '/\t/example.com')).toBe('/')
+    expect(await redirectLocation(request, '/user/lists?from=2026-10-01')).toBe(
+      '/user/lists?from=2026-10-01',
+    )
+  })
+
+  it('lets a signed-out user stay on the page', async () => {
+    vi.stubEnv('AUTH_SECRET', 'test-secret')
+    expect(await redirectLocation(new Request('http://localhost/login'), '/user/lists')).toBeNull()
   })
 })
 

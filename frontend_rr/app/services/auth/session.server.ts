@@ -24,6 +24,7 @@ import { logger } from '~/lib/logger'
 
 import { getAuthSecret } from './auth-secret.server'
 import { getProvider } from './providers'
+import { sanitizeReturnTo } from './return-to'
 import { type LasiusSessionData } from './types'
 
 interface RefreshResult {
@@ -76,15 +77,15 @@ const sessionStorageCache: {
   instance?: ReturnType<typeof getSessionStorage>
 } = {}
 
-/** Create a new user session and redirect */
+/** Create a new user session and redirect to `returnTo`, sanitized here because callers pass client input. */
 export async function createUserSession(
   data: LasiusSessionData,
-  redirectTo: string,
+  returnTo: string,
 ): Promise<Response> {
   const session = await getSession(null)
   session.set('user', data)
 
-  return redirect(redirectTo, {
+  return redirect(sanitizeReturnTo(returnTo), {
     headers: {
       'Set-Cookie': await commitSession(session),
     },

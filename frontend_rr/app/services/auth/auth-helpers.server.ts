@@ -23,6 +23,7 @@ import { getServerEnvironment } from '~/lib/environment.server'
 import { getCsrfToken } from '~/services/api/lasius/general/general'
 
 import { loginUrl } from './auth-urls'
+import { sanitizeReturnTo } from './return-to'
 import { getSessionTokens } from './session.server'
 import { type AuthProvider, type LasiusSessionData } from './types'
 
@@ -133,6 +134,14 @@ export function mergeAuthHeaders(authResult: AuthResult, responseHeaders?: Heade
   return headers
 }
 
+/** Send a signed-in user on to `returnTo`. The sign-in and registration pages call this first. */
+export async function redirectIfSignedIn(request: Request, returnTo: string): Promise<void> {
+  const user = await getOptionalUser(request)
+  if (user) {
+    throw redirect(sanitizeReturnTo(returnTo), { headers: mergeAuthHeaders(user) })
+  }
+}
+
 /**
  * Require an authenticated user session. Redirects to /login if no valid session exists.
  * Use in loaders/actions that need authentication.
@@ -157,22 +166,6 @@ export async function requireUser(request: Request, url: URL): Promise<AuthResul
   }
 
   return { headers: result.headers, session: result.tokens }
-}
-
-/**
- * Sanitize a returnTo URL to prevent open redirects.
- * Only allows relative paths — rejects absolute URLs, protocol-relative URLs, and data URIs.
- */
-export function sanitizeReturnTo(value: string, fallback = '/'): string {
-  if (!value || !value.startsWith('/') || value.startsWith('//')) {
-    return fallback
-  }
-  // Reject backslash paths — some browsers normalize `\` to `/`,
-  // turning `/\evil.com` into `//evil.com` (protocol-relative URL).
-  if (value.includes('\\')) {
-    return fallback
-  }
-  return value
 }
 
 async function fetchCsrfToken(

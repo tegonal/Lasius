@@ -25,7 +25,6 @@ import { useTranslation } from 'react-i18next'
 import {
   data,
   Form,
-  href,
   Link,
   redirect,
   useActionData,
@@ -51,12 +50,9 @@ import { type SchemaTranslationFunction, untyped } from '~/lib/i18n-types'
 import { logger } from '~/lib/logger'
 import { toApiError } from '~/services/api/lasius-fetch-instance'
 import { registerOAuthUser } from '~/services/api/lasius/oauth2-provider/oauth2-provider'
-import {
-  getOptionalUser,
-  mergeAuthHeaders,
-  sanitizeReturnTo,
-} from '~/services/auth/auth-helpers.server'
+import { redirectIfSignedIn } from '~/services/auth/auth-helpers.server'
 import { internalLoginUrl } from '~/services/auth/auth-urls'
+import { sanitizeReturnTo } from '~/services/auth/return-to'
 
 import { type Route } from './+types/internal-oauth.register'
 
@@ -144,7 +140,7 @@ export async function action({ request }: Route.ActionArgs) {
         email: email.trim(),
         invitation_id: invitationId,
         registered: true,
-        returnTo,
+        returnTo: sanitizeReturnTo(returnTo),
       }),
     )
   } catch (error) {
@@ -400,16 +396,12 @@ export default function InternalOAuthRegister() {
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const user = await getOptionalUser(request)
-
-  if (user) {
-    throw redirect(href('/'), { headers: mergeAuthHeaders(user) })
-  }
-
   const url = new URL(request.url)
+  const returnTo = sanitizeReturnTo(url.searchParams.get('returnTo') ?? '/')
+  await redirectIfSignedIn(request, returnTo)
+
   const email = url.searchParams.get('email') ?? ''
   const invitationId = url.searchParams.get('invitation_id') ?? ''
-  const returnTo = sanitizeReturnTo(url.searchParams.get('returnTo') ?? '')
 
   return { email, invitationId, returnTo }
 }

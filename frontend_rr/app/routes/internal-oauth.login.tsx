@@ -21,16 +21,7 @@ import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { parseWithZod } from '@conform-to/zod/v4'
 import { ChevronLeft } from 'lucide-react'
 import { Trans, useTranslation } from 'react-i18next'
-import {
-  data,
-  Form,
-  href,
-  Link,
-  redirect,
-  useActionData,
-  useLoaderData,
-  useNavigation,
-} from 'react-router'
+import { data, Form, href, Link, useActionData, useLoaderData, useNavigation } from 'react-router'
 import { z } from 'zod'
 
 import { Button } from '~/components/primitives/buttons/button'
@@ -49,13 +40,10 @@ import { getServerEnvironment } from '~/lib/environment.server'
 import { type SchemaTranslationFunction, untyped } from '~/lib/i18n-types'
 import { logger } from '~/lib/logger'
 import { getConfiguration } from '~/services/api/lasius/general/general'
-import {
-  getOptionalUser,
-  mergeAuthHeaders,
-  sanitizeReturnTo,
-} from '~/services/auth/auth-helpers.server'
+import { redirectIfSignedIn } from '~/services/auth/auth-helpers.server'
 import { internalRegisterUrl } from '~/services/auth/auth-urls'
 import { getInternalProvider } from '~/services/auth/providers'
+import { sanitizeReturnTo } from '~/services/auth/return-to'
 import { createUserSession } from '~/services/auth/session.server'
 
 import { type Route } from './+types/internal-oauth.login'
@@ -111,7 +99,7 @@ export async function action({ request }: Route.ActionArgs) {
         tokenIssuer: 'internal',
         userId: result.profile.userId,
       },
-      sanitizeReturnTo(returnTo),
+      returnTo,
     )
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Login failed'
@@ -310,13 +298,9 @@ export default function InternalOAuthLogin() {
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const user = await getOptionalUser(request)
   const url = new URL(request.url)
   const returnTo = sanitizeReturnTo(url.searchParams.get('returnTo') ?? '/')
-
-  if (user) {
-    throw redirect(returnTo, { headers: mergeAuthHeaders(user) })
-  }
+  await redirectIfSignedIn(request, returnTo)
 
   const isDemoMode = getServerEnvironment('LASIUS_DEMO_MODE') === 'true'
   const email = url.searchParams.get('email') ?? ''

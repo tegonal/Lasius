@@ -21,10 +21,10 @@ import { href, redirect } from 'react-router'
 
 import { generateCodeChallenge, generateCodeVerifier, generateState } from '~/lib/crypto.server'
 import { logger } from '~/lib/logger'
-import { sanitizeReturnTo } from '~/services/auth/auth-helpers.server'
 import { loginUrl } from '~/services/auth/auth-urls'
 import { oauthStateCookie } from '~/services/auth/oauth-state-cookie.server'
 import { getProvider, isProviderEnabled } from '~/services/auth/providers'
+import { sanitizeReturnTo } from '~/services/auth/return-to'
 import { type AuthProvider } from '~/services/auth/types'
 
 import { type Route } from './+types/oauth.$provider.login'

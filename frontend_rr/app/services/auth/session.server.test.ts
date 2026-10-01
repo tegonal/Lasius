@@ -46,6 +46,37 @@ async function staleSessionCookie(refreshTokenValue: string): Promise<string> {
 const requestWith = (cookie: string) =>
   new Request('https://lasius.test/user/home', { headers: { Cookie: cookie } })
 
+describe('createUserSession', () => {
+  beforeAll(() => {
+    vi.stubEnv('AUTH_SECRET', 'test-secret')
+  })
+
+  afterAll(() => {
+    vi.unstubAllEnvs()
+  })
+
+  const session = {
+    accessToken: 'access',
+    email: 'user@example.com',
+    expiresAt: Date.now() + 3_600_000,
+    issuedAt: Date.now(),
+    refreshToken: 'refresh',
+    tokenIssuer: 'keycloak' as const,
+    userId: 'user-1',
+  }
+
+  // Callers pass the unsigned state cookie and a posted form field, so the sink must sanitize.
+  it('sanitizes the redirect target', async () => {
+    const response = await createUserSession(session, '/\t/example.com')
+    expect(response.headers.get('Location')).toBe('/')
+  })
+
+  it('keeps a same-origin path with its query', async () => {
+    const response = await createUserSession(session, '/user/lists?from=2026-10-01')
+    expect(response.headers.get('Location')).toBe('/user/lists?from=2026-10-01')
+  })
+})
+
 describe('getSessionTokens refresh', () => {
   beforeAll(() => {
     vi.stubEnv('AUTH_SECRET', 'test-secret')
