@@ -29,7 +29,10 @@ import repositories.{OrganisationMongoRepository, UserMongoRepository}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthConfigSpec extends PlaySpecification with EmbedMongo with TestApplication {
+class AuthConfigSpec
+    extends PlaySpecification
+    with EmbedMongo
+    with TestApplication {
 
   "resolveOrCreateUserByUserInfo" should {
     // The first page of a new user sends several requests at once (review finding B13).
@@ -49,13 +52,14 @@ class AuthConfigSpec extends PlaySpecification with EmbedMongo with TestApplicat
 
       val users = withDBSession()(implicit dbSession =>
         new UserMongoRepository().findAll()).awaitResult()
-      val organisation = withDBSession()(implicit dbSession =>
-        new OrganisationMongoRepository().findByKey(userInfo.key))
-        .awaitResult()
+      val organisations = withDBSession()(implicit dbSession =>
+        new OrganisationMongoRepository().findAll()).awaitResult()
 
       references.map(_.id).distinct must haveSize(1)
       users.count(_.email == userInfo.email) must equalTo(1)
-      organisation must beSome
+      organisations.count { case (organisation, _) =>
+        organisation.key == userInfo.key
+      } must equalTo(1)
     }
   }
 }
