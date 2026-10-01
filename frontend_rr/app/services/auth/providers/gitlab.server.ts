@@ -31,13 +31,14 @@ export function createGitLabProvider(): OAuthProvider {
       clientId: getServerEnvironmentRequired('GITLAB_OAUTH_CLIENT_ID'),
       clientSecret: getServerEnvironmentRequired('GITLAB_OAUTH_CLIENT_SECRET'),
     },
+    // The OIDC userinfo endpoint works with the `openid` scope; `/api/v4/user` needs `read_user`.
     async getUserProfile(accessToken) {
-      const profile = await fetchProfile<{ email: string; id: number }>(
+      const profile = await fetchProfile<{ email: string; sub: string }>(
         'GitLab',
-        `${baseUrl}/api/v4/user`,
+        `${baseUrl}/oauth/userinfo`,
         accessToken,
       )
-      return { email: profile.email, userId: profile.id.toString() }
+      return { email: profile.email, userId: profile.sub }
     },
     label: 'GitLab',
     provider: 'gitlab',
