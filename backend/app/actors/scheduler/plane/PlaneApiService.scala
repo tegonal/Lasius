@@ -23,6 +23,7 @@ package actors.scheduler.plane
 
 import actors.scheduler.{
   ApiServiceBase,
+  HttpStatusException,
   ServiceAuthentication,
   ServiceConfiguration
 }
@@ -33,9 +34,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait PlaneApiService {
 
-  /** Searches for issues using post params.
+  /** Loads every issue of a Plane project. Plane may ignore the label and state
+    * ids, so the caller filters the result as well.
     */
-
   def findIssues(workspace: String,
                  projectId: String,
                  paramString: String,
@@ -59,101 +60,106 @@ class PlaneApiServiceImpl(override val ws: WSClient,
     extends PlaneApiService
     with ApiServiceBase {
 
-  private val findIssuesUrl = s"/api/v1/workspaces/%s/projects/%s/issues/?"
-  private val fetchLabelUrl = s"/api/v1/workspaces/%s/projects/%s/labels/?"
-  private val fetchStateUrl = s"/api/v1/workspaces/%s/projects/%s/states/?"
+  // The Plane docs list only /work-items/, but Plane 1.0.0 and 1.14.1 answer it with 404.
+  @volatile private var useLegacyIssuesResource = false
+
+  private def resourcePath(workspace: String,
+                           projectId: String,
+                           resource: String): String =
+    s"/api/v1/workspaces/$workspace/projects/$projectId/$resource/?"
 
   def getLabels(maxResults: Int, workspace: String, projectId: String)(implicit
       auth: ServiceAuthentication,
-      executionContext: ExecutionContext): Future[Set[PlaneLabel]] = {
-    val url = fetchLabelUrl.format(workspace, projectId)
-    loadResults[PlaneLabel, PlaneLabelsQueryResult](
-      baseUrl = url,
-      maxResults = maxResults).map(_.toSet)
-  }
+      executionContext: ExecutionContext): Future[Set[PlaneLabel]] =
+    loadAllPages[PlaneLabel, PlaneLabelsQueryResult](
+      resourcePath(workspace, projectId, "labels"),
+      maxResults).map(_.toSet)
 
   def getStates(maxResults: Int, workspace: String, projectId: String)(implicit
       auth: ServiceAuthentication,
-      executionContext: ExecutionContext): Future[Set[PlaneState]] = {
-    val url = fetchStateUrl.format(workspace, projectId)
-    loadResults[PlaneState, PlaneStatesQueryResult](
-      baseUrl = url,
-      maxResults = maxResults).map(_.toSet)
-  }
+      executionContext: ExecutionContext): Future[Set[PlaneState]] =
+    loadAllPages[PlaneState, PlaneStatesQueryResult](
+      resourcePath(workspace, projectId, "states"),
+      maxResults).map(_.toSet)
 
-  def findIssues(workspace: String,
-                 projectId: String,
-                 paramString: String,
-                 maxResults: Int,
-                 includeOnlyIssuesWithLabelsIds: Set[String] = Set(),
-                 includeOnlyIssuesWithStateIds: Set[String] = Set())(implicit
+  def findIssues(
+      workspace: String,
+      projectId: String,
+      paramString: String,
+      maxResults: Int,
+      includeOnlyIssuesWithLabelsIds: Set[String] = Set.empty,
+      includeOnlyIssuesWithStateIds: Set[String] = Set.empty)(implicit
       auth: ServiceAuthentication,
       executionContext: ExecutionContext): Future[Seq[PlaneIssue]] = {
+    val filterParams = Seq(
+      "labels" -> includeOnlyIssuesWithLabelsIds,
+      "state"  -> includeOnlyIssuesWithStateIds
+    ).collect {
+      case (name, ids) if ids.nonEmpty =>
+        getParam(name, ids.mkString(","))
+    }
+    val params = Some(paramString) +: filterParams
 
-    val params = Seq(
-      Some(paramString),
-      if (includeOnlyIssuesWithLabelsIds.isEmpty) None
-      else getParam("labels", includeOnlyIssuesWithLabelsIds.mkString(",")),
-      if (includeOnlyIssuesWithStateIds.isEmpty) None
-      else getParam("state", includeOnlyIssuesWithStateIds.mkString(","))
-    )
+    def loadFrom(resource: String): Future[Seq[PlaneIssue]] =
+      loadAllPages[PlaneIssue, PlaneIssuesQueryResult](
+        resourcePath(workspace, projectId, resource),
+        maxResults,
+        params)
 
-    val url = findIssuesUrl.format(workspace, projectId)
-    logger.debug(s"findIssues: $url")
-    loadResults[PlaneIssue, PlaneIssuesQueryResult](baseUrl = url,
-                                                    maxResults = maxResults,
-                                                    params = params)
+    if (useLegacyIssuesResource) loadFrom("issues")
+    else
+      loadFrom("work-items").recoverWith {
+        case e: HttpStatusException if e.status == 404 =>
+          logger.info(
+            s"Plane at ${config.baseUrl} has no work-items endpoint, using /issues/")
+          useLegacyIssuesResource = true
+          loadFrom("issues")
+      }
   }
 
-  private def loadResults[R, P <: PaginatedQueryResult[R]](
-      baseUrl: String,
-      maxResults: Int,
-      params: Seq[Option[String]] = Seq())(implicit
-      auth: ServiceAuthentication,
-      executionContext: ExecutionContext,
-      reads: Reads[P]): Future[Seq[R]] =
-    loadPage[R, P](baseUrl = baseUrl,
-                   page = 0,
-                   maxResults = maxResults,
-                   params = params,
-                   lastResult = Seq())
-
-  private def loadPage[R, P <: PaginatedQueryResult[R]](
-      baseUrl: String,
-      page: Int,
-      maxResults: Int,
-      params: Seq[Option[String]] = Seq(),
-      lastResult: Seq[R] = Seq())(implicit
+  /** Follows the next_cursor of each answer until Plane reports the last page.
+    * It also stops on a page without a new id, because some Plane versions
+    * answer every page with the first one (makeplane/plane#9340).
+    */
+  private def loadAllPages[R <: PlaneEntity, P <: PaginatedQueryResult[R]](
+      path: String,
+      perPage: Int,
+      params: Seq[Option[String]] = Seq.empty)(implicit
       auth: ServiceAuthentication,
       executionContext: ExecutionContext,
       reads: Reads[P]): Future[Seq[R]] = {
-    val queryParams = getParamList(
-      params :+
-        getParam("cursor", s"$maxResults:$page:0") :+
-        getParam("per_page", maxResults): _*,
-    )
 
-    val url = baseUrl + queryParams
-    logger.debug(s"loadPage: $url")
-    getSingleValue[P](url).flatMap { case (pageWrapper, _) =>
-      val concat = lastResult ++ pageWrapper.results
-      if (concat.size >= pageWrapper.total_results) {
-        // fetched all results, notify
-        Future.successful(concat)
-      } else if (page >= pageWrapper.total_pages) {
-        // fetched all pages
-        Future.successful(concat)
-      } else if (!pageWrapper.next_page_results) {
-        // no next page
-        Future.successful(concat)
-      } else {
-        // load next page
-        loadPage(baseUrl = baseUrl,
-                 page = page,
-                 maxResults = maxResults,
-                 params = params,
-                 lastResult = concat)
+    def loadFrom(cursor: String,
+                 page: Int,
+                 loaded: Vector[R],
+                 loadedIds: Set[String]): Future[Seq[R]] = {
+      val url = path + getParamList(
+        params :+ getParam("cursor", cursor) :+ getParam("per_page",
+                                                         perPage): _*)
+      logger.debug(s"loadPage: $url")
+      getSingleValue[P](url).flatMap { case (result, _) =>
+        val newResults = result.results
+          .filterNot(r => loadedIds.contains(r.id))
+          .distinctBy(_.id)
+        val all        = loaded ++ newResults
+        val isLastPage =
+          !result.next_page_results ||
+            newResults.isEmpty ||
+            all.size >= result.total_results ||
+            page + 1 >= result.total_pages ||
+            result.next_cursor == cursor
+        if (isLastPage) Future.successful(all)
+        else
+          loadFrom(result.next_cursor,
+                   page + 1,
+                   all,
+                   loadedIds ++ newResults.map(_.id))
       }
     }
+
+    loadFrom(cursor = s"$perPage:0:0",
+             page = 0,
+             loaded = Vector.empty,
+             loadedIds = Set.empty)
   }
 }

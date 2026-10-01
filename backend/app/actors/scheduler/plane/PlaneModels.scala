@@ -23,149 +23,97 @@ package actors.scheduler.plane
 
 import play.api.libs.json._
 
-import java.util.Date
-import scala.annotation.unused
+// The models only read Plane answers, and they hold only the fields that the tag
+// import uses. Plane changes the type of other fields between versions, and one
+// such field made a whole page unreadable (estimate_point, number to string).
 
-sealed trait PaginatedQueryResult[T] {
-  val grouped_by: Option[String]
-  val sub_grouped_by: Option[String]
-  val next_cursor: String
-  val prev_cursor: String
-  val next_page_results: Boolean
-  val prev_page_results: Boolean
-  val count: Int
-  val total_pages: Int
-  val total_results: Int
-  val extra_stats: Option[String]
-  val results: Seq[T]
+/** An item of a Plane answer, identified by its UUID. */
+sealed trait PlaneEntity {
+  def id: String
 }
 
-case class PlaneIssuesQueryResult(
-    grouped_by: Option[String],
-    sub_grouped_by: Option[String],
-    next_cursor: String,
-    prev_cursor: String,
-    next_page_results: Boolean,
-    prev_page_results: Boolean,
-    count: Int,
-    total_pages: Int,
-    total_results: Int,
-    extra_stats: Option[String],
-    results: Seq[PlaneIssue],
-) extends PaginatedQueryResult[PlaneIssue]
+final case class PlaneLabel(id: String, name: String) extends PlaneEntity
 
-case class PlaneLabelsQueryResult(
-    grouped_by: Option[String],
-    sub_grouped_by: Option[String],
-    next_cursor: String,
-    prev_cursor: String,
-    next_page_results: Boolean,
-    prev_page_results: Boolean,
-    count: Int,
-    total_pages: Int,
-    total_results: Int,
-    extra_stats: Option[String],
-    results: Seq[PlaneLabel],
-) extends PaginatedQueryResult[PlaneLabel]
+final case class PlaneState(id: String, name: String) extends PlaneEntity
 
-case class PlaneStatesQueryResult(
-    grouped_by: Option[String],
-    sub_grouped_by: Option[String],
-    next_cursor: String,
-    prev_cursor: String,
-    next_page_results: Boolean,
-    prev_page_results: Boolean,
-    count: Int,
-    total_pages: Int,
-    total_results: Int,
-    extra_stats: Option[String],
-    results: Seq[PlaneState],
-) extends PaginatedQueryResult[PlaneState]
+final case class PlaneProject(id: String, identifier: String)
 
-case class PlaneLabel(
-    id: String,
-    // created_at: DateTime, // Nanosecond format not parsable by joda time "2024-08-27T14:33:01.364694+02:00"
-    // updated_at: DateTime,
-    name: String,
-    description: String,
-    color: String,
-    sort_order: Double,
-    project: String,
-    workspace: String,
-    parent: Option[String]
-)
-
-case class PlaneState(
+final case class PlaneIssue(
     id: String,
     name: String,
-    color: String,
-    group: String
-)
-
-case class PlaneProject(
-    id: String,
-    identifier: String,
-    name: String,
-    cover_image: String,
-    // icon_prop: IconProp,
-    emoji: Option[String],
-    description: String
-)
-
-case class PlaneIssue(
-    id: String,
-    // created_at: DateTime,
-    // updated_at: DateTime,
-    estimate_point: Option[Int],
-    name: String,
-    description_html: Option[String],
-    description_stripped: Option[String],
-    priority: Option[String],
-    start_date: Option[Date],
-    target_date: Option[Date],
     sequence_id: Int,
-    sort_order: Double,
-    // completed_at: Option[DateTime],
-    // archived_at: Option[DateTime],
-    // is_draft: Boolean, // currently not available on Plane UI
-    created_by: String,
-    updated_by: Option[String],
     project: PlaneProject,
-    workspace: String,
-    parent: Option[String],
-    state: Option[PlaneState],
-    assignees: Seq[String],
     labels: Option[Seq[PlaneLabel]],
-)
+    state: Option[JsValue]
+) extends PlaneEntity {
 
-object PlaneIssuesQueryResult {
-  implicit val jsonFormat: Format[PlaneIssuesQueryResult] =
-    Json.format[PlaneIssuesQueryResult]
+  /** With expand=state Plane returns the state as an object, otherwise as its
+    * id.
+    */
+  def stateId: Option[String] = state.flatMap {
+    case JsString(id)          => Some(id)
+    case stateObject: JsObject => (stateObject \ "id").asOpt[String]
+    case _                     => None
+  }
 }
 
-object PlaneLabelsQueryResult {
-  implicit val jsonFormat: Format[PlaneLabelsQueryResult] =
-    Json.format[PlaneLabelsQueryResult]
+/** One page of a cursor-paginated Plane list. */
+sealed trait PaginatedQueryResult[T <: PlaneEntity] {
+  def next_cursor: String
+  def next_page_results: Boolean
+  def total_pages: Int
+  def total_results: Int
+  def results: Seq[T]
 }
 
-object PlaneStatesQueryResult {
-  implicit val jsonFormat: Format[PlaneStatesQueryResult] =
-    Json.format[PlaneStatesQueryResult]
-}
+final case class PlaneIssuesQueryResult(next_cursor: String,
+                                        next_page_results: Boolean,
+                                        total_pages: Int,
+                                        total_results: Int,
+                                        results: Seq[PlaneIssue])
+    extends PaginatedQueryResult[PlaneIssue]
+
+final case class PlaneLabelsQueryResult(next_cursor: String,
+                                        next_page_results: Boolean,
+                                        total_pages: Int,
+                                        total_results: Int,
+                                        results: Seq[PlaneLabel])
+    extends PaginatedQueryResult[PlaneLabel]
+
+final case class PlaneStatesQueryResult(next_cursor: String,
+                                        next_page_results: Boolean,
+                                        total_pages: Int,
+                                        total_results: Int,
+                                        results: Seq[PlaneState])
+    extends PaginatedQueryResult[PlaneState]
 
 object PlaneLabel {
-  implicit val jsonFormat: Format[PlaneLabel] = Json.format[PlaneLabel]
+  implicit val reads: Reads[PlaneLabel] = Json.reads[PlaneLabel]
 }
 
 object PlaneState {
-  implicit val jsonFormat: Format[PlaneState] = Json.format[PlaneState]
+  implicit val reads: Reads[PlaneState] = Json.reads[PlaneState]
 }
 
-@unused("Used to build json format of PlaneIssue")
 object PlaneProject {
-  implicit val jsonFormat: Format[PlaneProject] = Json.format[PlaneProject]
+  implicit val reads: Reads[PlaneProject] = Json.reads[PlaneProject]
 }
 
 object PlaneIssue {
-  implicit val jsonFormat: Format[PlaneIssue] = Json.format[PlaneIssue]
+  implicit val reads: Reads[PlaneIssue] = Json.reads[PlaneIssue]
+}
+
+object PlaneIssuesQueryResult {
+  implicit val reads: Reads[PlaneIssuesQueryResult] =
+    Json.reads[PlaneIssuesQueryResult]
+}
+
+object PlaneLabelsQueryResult {
+  implicit val reads: Reads[PlaneLabelsQueryResult] =
+    Json.reads[PlaneLabelsQueryResult]
+}
+
+object PlaneStatesQueryResult {
+  implicit val reads: Reads[PlaneStatesQueryResult] =
+    Json.reads[PlaneStatesQueryResult]
 }

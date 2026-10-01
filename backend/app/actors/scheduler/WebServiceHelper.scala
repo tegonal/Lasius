@@ -31,6 +31,12 @@ import play.api.libs.ws.WSClient
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
+/** A non-200 answer of an issue tracker API. The message keeps the text "Http
+  * status:<code>", which older error checks read.
+  */
+class HttpStatusException(val status: Int, message: String)
+    extends IOException(message)
+
 object WebServiceHelper {
 
   def call(wsClient: WSClient, config: ServiceConfiguration, url: String)(
@@ -77,7 +83,10 @@ object WebServiceHelper {
         result.status match {
           case 200   => Success((result.json, result.headers))
           case error =>
-            Failure(new IOException(s"Http status:$error:${result.statusText}"))
+            Failure(
+              new HttpStatusException(
+                error,
+                s"Http status:$error:${result.statusText}"))
         }
       }
   }
@@ -97,7 +106,10 @@ object WebServiceHelper {
         result.status match {
           case 200   => Success((result.json, result.headers))
           case error =>
-            Failure(new IOException(s"Http status:$error:${result.statusText}"))
+            Failure(
+              new HttpStatusException(
+                error,
+                s"Http status:$error:${result.statusText}"))
         }
       }
   }
@@ -117,7 +129,8 @@ object WebServiceHelper {
           case 200   => Success((result.json, result.headers))
           case error =>
             Failure(
-              new IOException(
+              new HttpStatusException(
+                error,
                 s"Http status:$error:${result.statusText}, url:$url"))
         }
       }
@@ -141,7 +154,8 @@ object WebServiceHelper {
       .map { resp =>
         resp.status match {
           case 200   => Success((resp.json, resp.headers))
-          case error => Failure(new IOException(s"Http status:$error"))
+          case error =>
+            Failure(new HttpStatusException(error, s"Http status:$error"))
         }
       }
   }

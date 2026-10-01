@@ -26,11 +26,14 @@ import actors.IssueImporterStatusMonitor.{
   UpdateProjectSyncStats
 }
 import actors.TagCache.TagsUpdated
-import actors.scheduler.{ServiceAuthentication, ServiceConfiguration}
+import actors.scheduler.{
+  ImporterErrors,
+  ServiceAuthentication,
+  ServiceConfiguration
+}
 import org.apache.pekko.actor._
 import core.SystemServices
 import models._
-import org.joda.time.DateTime
 import play.api.libs.ws.WSClient
 
 import java.net.URL
@@ -64,6 +67,16 @@ object PlaneTagParseWorker {
 
   case object StartParsing
   case object Parse
+
+  /** The Plane API documents no labels or state query parameter, so the
+    * importer applies both filters itself. An empty set means no filter.
+    */
+  def matchesFilters(issue: PlaneIssue,
+                     labelIds: Set[String],
+                     stateIds: Set[String]): Boolean =
+    (labelIds.isEmpty || issue.labels.exists(
+      _.exists(label => labelIds.contains(label.id)))) &&
+      (stateIds.isEmpty || issue.stateId.exists(stateIds.contains))
 }
 
 class PlaneTagParseWorker(wsClient: WSClient,
@@ -113,10 +126,8 @@ class PlaneTagParseWorker(wsClient: WSClient,
             s"Filtered states: ${filteredStates.map(_.name).mkString(",")}")
           filteredStates.map(_.id)
         }
-      issues <- loadIssues(offset = 0,
-                           max = None,
-                           labelIds = labelIds,
-                           stateIds = stateIds)
+      issues <- loadIssues(labelIds, stateIds)
+        .map(_.filter(matchesFilters(_, labelIds, stateIds)))
     } yield {
       // fetched all results, notify
       if (log.isDebugEnabled) {
@@ -157,14 +168,7 @@ class PlaneTagParseWorker(wsClient: WSClient,
       case Failure(ex) =>
         log.error(ex, s"Failed to parse Plane issues for project $projectId")
 
-        // Classify error and report
-        val (errorCode, httpStatus) = classifyError(ex)
-        val issue                   = ConnectivityIssue(
-          errorCode = errorCode,
-          message = ex.getMessage,
-          timestamp = DateTime.now,
-          httpStatus = httpStatus
-        )
+        val issue = ImporterErrors.connectivityIssue(ex)
 
         systemServices.issueImporterStatusMonitor ! UpdateProjectSyncStats(
           configId = configId,
@@ -247,41 +251,18 @@ class PlaneTagParseWorker(wsClient: WSClient,
                  projectId = projectSettings.planeProjectId)
   }
 
-  def loadIssues(offset: Int,
-                 max: Option[Int],
-                 labelIds: Set[String],
-                 stateIds: Set[String]): Future[Seq[PlaneIssue]] = {
-    val newMax = max.getOrElse(maxResults)
+  private def loadIssues(labelIds: Set[String],
+                         stateIds: Set[String]): Future[Seq[PlaneIssue]] = {
     log.debug(
-      s"Parse issues projectId=${projectId.value}, project=${projectSettings.planeProjectId}, offset:$offset, max:$max")
-    val query = projectSettings.params.getOrElse(defaultParams)
-    apiService
-      .findIssues(
-        workspace = settings.workspace,
-        projectId = projectSettings.planeProjectId,
-        paramString = query,
-        maxResults = newMax,
-        includeOnlyIssuesWithLabelsIds = labelIds,
-        includeOnlyIssuesWithStateIds = stateIds
-      )
-  }
-
-  private def classifyError(ex: Throwable): (String, Option[Int]) = {
-    ex.getMessage match {
-      case msg if msg.contains("401") || msg.contains("Unauthorized") =>
-        ("authentication_failed", Some(401))
-      case msg if msg.contains("403") || msg.contains("Forbidden") =>
-        ("permission_denied", Some(403))
-      case msg if msg.contains("404") || msg.contains("Not Found") =>
-        ("resource_not_found", Some(404))
-      case msg if msg.contains("timeout") || msg.contains("timed out") =>
-        ("timeout", None)
-      case msg
-          if msg.contains("Connection refused") || msg.contains(
-            "ConnectException") =>
-        ("connection_refused", None)
-      case _ => ("unknown_error", None)
-    }
+      s"Parse issues projectId=${projectId.value}, project=${projectSettings.planeProjectId}")
+    apiService.findIssues(
+      workspace = settings.workspace,
+      projectId = projectSettings.planeProjectId,
+      paramString = projectSettings.params.getOrElse(defaultParams),
+      maxResults = maxResults,
+      includeOnlyIssuesWithLabelsIds = labelIds,
+      includeOnlyIssuesWithStateIds = stateIds
+    )
   }
 
   override def postStop(): Unit = {

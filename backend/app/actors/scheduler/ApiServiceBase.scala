@@ -24,11 +24,17 @@ package actors.scheduler
 import java.net.URLEncoder
 
 import play.api.Logging
-import play.api.libs.json.{JsArray, Json, Reads}
+import play.api.libs.json.{JsArray, JsPath, Json, JsonValidationError, Reads}
 import play.api.libs.ws.WSClient
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
+
+/** The answer of an issue tracker API does not match the model. The message
+  * names the failing JSON paths but no values, because the sync status stores
+  * it.
+  */
+class ApiParseException(message: String) extends RuntimeException(message)
 
 trait ApiServiceBase extends Logging {
   val ws: WSClient
@@ -55,24 +61,20 @@ trait ApiServiceBase extends Logging {
     logger.debug(s"getList(url:$url")
     WebServiceHelper.call(ws, config, url).flatMap {
       case Success((json: JsArray, headers)) =>
-        logger.debug(s"getList:Success (JsArray) -> $json")
+        logger.debug(s"getList:Success (JsArray, ${json.value.size} items)")
         Json
           .fromJson[Seq[T]](json)
           .asEither match {
           case Right(j)      => Future.successful((j, headers))
-          case Left(jsError) =>
-            logger.error(s"Couldn't parse json:$jsError")
-            Future.failed(new RuntimeException(s"Could not parse $json"))
+          case Left(jsError) => parseFailure(relUrl, jsError)
         }
       case Success((json, headers)) =>
-        logger.debug(s"getList:Success (json) -> $json")
+        logger.debug(s"getList:Success (json) from $relUrl")
         Json
           .fromJson[T](json)
           .asEither match {
           case Right(j)      => Future.successful((Seq(j), headers))
-          case Left(jsError) =>
-            logger.error(s"Couldn't parse json:$jsError")
-            Future.failed(new RuntimeException(s"Could not parse $json"))
+          case Left(jsError) => parseFailure(relUrl, jsError)
         }
       case Failure(e) =>
         logger.debug(s"getList:Failure -> $e")
@@ -89,18 +91,27 @@ trait ApiServiceBase extends Logging {
     logger.debug(s"getSingleValue(url:$url")
     WebServiceHelper.call(ws, config, url).flatMap {
       case Success((json, headers)) =>
-        logger.debug(s"getOption:Success (json) -> $json")
+        logger.debug(s"getOption:Success (json) from $relUrl")
         Json
           .fromJson[T](json)
           .asEither match {
           case Right(j)      => Future.successful((j, headers))
-          case Left(jsError) =>
-            logger.error(s"Couldn't parse json:$jsError")
-            Future.failed(new RuntimeException(s"Could not parse $json"))
+          case Left(jsError) => parseFailure(relUrl, jsError)
         }
       case Failure(e) =>
         logger.debug(s"getOption:Failure -> $e")
         Future.failed(e)
     }
+  }
+
+  private def parseFailure(
+      relUrl: String,
+      errors: scala.collection.Seq[(JsPath,
+                                    scala.collection.Seq[JsonValidationError])])
+      : Future[Nothing] = {
+    logger.error(s"Couldn't parse json:$errors")
+    val paths = errors.map(_._1.toString).distinct
+    Future.failed(new ApiParseException(
+      s"Could not parse the response of $relUrl at ${paths.take(5).mkString(", ")}"))
   }
 }
