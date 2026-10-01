@@ -91,4 +91,19 @@ class LasiusConfigSpec extends Specification {
         contain("gitlab-token"))
     }
   }
+
+  "The text form of a request subject" should {
+    "hide the bearer token" in {
+      val subject = Subject(
+        token = "bearer-token",
+        userInfo = UserInfo(key = "the-key",
+                            firstName = None,
+                            lastName = None,
+                            email = "user@test.com"),
+        userReference = EntityReference(UserId(), "the-key")
+      )
+      subject.toString must not(contain("bearer-token"))
+      subject.toString must contain("token=<redacted>")
+    }
+  }
 }

@@ -31,3 +31,4 @@ case class UserInfo(key: String,
 case class Subject(token: String,
                    userInfo: UserInfo,
                    userReference: UserReference)
+    extends RedactedSecrets

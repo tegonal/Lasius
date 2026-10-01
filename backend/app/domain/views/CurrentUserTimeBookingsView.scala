@@ -101,7 +101,7 @@ class CurrentUserTimeBookingsView(val clientReceiver: ClientReceiver,
       sender() ! currentUserTimeBookings
     case e: UserTimeBookingStartedV2 =>
       log.debug(
-        s"CurrentUserTimeBookingsView -> UserTimeBookingStarted($e.booking)")
+        s"CurrentUserTimeBookingsView -> UserTimeBookingStarted(${e.booking})")
       val day       = e.booking.start.dateTime.toLocalDate
       val durations = state.booking
         .filter(_.end.isDefined)
@@ -113,7 +113,7 @@ class CurrentUserTimeBookingsView(val clientReceiver: ClientReceiver,
       sender() ! Ack
     case e: UserTimeBookingStoppedV2 =>
       log.debug(
-        s"CurrentUserTimeBookingsView -> UserTimeBookingStopped($e.booking)")
+        s"CurrentUserTimeBookingsView -> UserTimeBookingStopped(${e.booking})")
       val day       = e.booking.end.get.dateTime.toLocalDate
       val durations = addDailyDuration(e.booking)
       state = updateBooking(None, day, durations)

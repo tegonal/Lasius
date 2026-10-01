@@ -57,7 +57,7 @@ class TimeBookingHistoryController @Inject() (
       implicit dbSession => implicit subject => user => implicit request =>
         HasOrganisationRole(user, orgId, OrganisationMember) { _ =>
           logger.debug(
-            s"getTimeBookingHistory, userId:$subject.userId, from:$from, to:$to")
+            s"getTimeBookingHistory, userId:${subject.userReference.id.value}, from:$from, to:$to")
           bookingHistoryRepository
             .findByUserAndRange(orgId,
                                 subject.userReference,
@@ -80,7 +80,7 @@ class TimeBookingHistoryController @Inject() (
       implicit dbSession => implicit subject => user => implicit request =>
         HasOrganisationRole(user, orgId, OrganisationAdministrator) { _ =>
           logger.debug(
-            s"getTimeBookingHistory, userId:$subject.userId, from:$from, to:$to")
+            s"getTimeBookingHistory, userId:${subject.userReference.id.value}, from:$from, to:$to")
           bookingHistoryRepository
             .findByOrganisationAndRange(orgId, from, to, limit, skip)
             .map { bookings =>
@@ -103,7 +103,7 @@ class TimeBookingHistoryController @Inject() (
                                                  ProjectAdministrator,
                                                  projectRepository) { _ =>
           logger.debug(
-            s"getTimeBookingHistory, userId:$subject.userId, from:$from, to:$to")
+            s"getTimeBookingHistory, userId:${subject.userReference.id.value}, from:$from, to:$to")
           bookingHistoryRepository
             .findByProjectAndRange(projectId, from, to, limit, skip)
             .map { bookings =>
