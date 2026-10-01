@@ -102,6 +102,28 @@ class TagParseWorkerSpec extends Specification with Mockito {
       probes.tagCache.expectNoMessage(100.millis)
     }
 
+    "report a load that throws before it returns a future, and load again" in new ActorTestScope {
+      private val probes = new Probes()(this)
+      private val loads  = new AtomicInteger()
+      private val worker = system.actorOf(
+        Props(
+          new TestWorker(probes.services,
+                         () => {
+                           loads.incrementAndGet()
+                           throw new IllegalArgumentException("bad setting")
+                         },
+                         200.millis)))
+
+      worker ! StartParsing
+
+      probes.monitor
+        .expectMsgType[UpdateProjectSyncStats]
+        .success must beFalse
+      probes.monitor.expectMsgType[UpdateConnectivityStatus]
+      probes.monitor.expectMsgType[UpdateProjectSyncStats](3.seconds)
+      loads.get must beGreaterThanOrEqualTo(2)
+    }
+
     "start no second load while a load runs" in new ActorTestScope {
       private val probes  = new Probes()(this)
       private val loads   = new AtomicInteger()

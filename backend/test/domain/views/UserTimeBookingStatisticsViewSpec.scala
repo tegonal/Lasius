@@ -149,6 +149,60 @@ class UserTimeBookingStatisticsViewSpec
           any[Writes[BookingByProjectId]],
           any[DBSession]))
     }
+
+    "sum the restored bookings per day and project, and per day and tag" in new PersistentActorTestScope {
+      val userReference = EntityReference(UserId(), "noob")
+      val organisation  = EntityReference(OrganisationId(), "team1")
+      val project       = EntityReference(ProjectId(), "proj")
+      val tag1          = SimpleTag(TagId("tag1"))
+      val tag2          = SimpleTag(TagId("tag2"))
+
+      def booking(from: String, to: String, tags: Set[Tag]): BookingV2 =
+        BookingV2(
+          BookingId(),
+          DateTime.parse(s"2000-01-01T$from").toLocalDateTimeWithZone(),
+          Some(DateTime.parse(s"2000-01-01T$to").toLocalDateTimeWithZone()),
+          userReference,
+          organisation,
+          project,
+          tags
+        )
+
+      val probe                                                = TestProbe()
+      val (bookingByProjectRepository, bookingByTagRepository) =
+        statisticsRepositories()
+      val actorRef = system.actorOf(
+        UserTimeBookingStatisticsViewMock.props(userReference,
+                                                bookingByProjectRepository,
+                                                bookingByTagRepository,
+                                                reactiveMongoApi))
+
+      probe.send(
+        actorRef,
+        RestoreViewFromState(
+          userReference,
+          2,
+          UserTimeBooking(userReference,
+                          Seq(booking("08:00", "10:00", Set(tag1, tag2)),
+                              booking("13:00", "14:00", Set(tag1))))
+        )
+      )
+      probe.expectMsg(RestoreViewFromStateSuccess)
+
+      there.was(one(bookingByProjectRepository).bulkInsert {
+        beLike[List[BookingByProject]] { case List(stats) =>
+          (stats.day, stats.projectReference, stats.duration) must equalTo(
+            (LocalDate.parse("2000-01-01"), project, Duration.standardHours(3)))
+        }
+      }(any[DBSession]))
+      there.was(one(bookingByTagRepository).bulkInsert {
+        beLike[List[BookingByTag]] { case stats =>
+          stats.map(s => s.tagId -> s.duration).toMap must equalTo(
+            Map(tag1.id -> Duration.standardHours(3),
+                tag2.id -> Duration.standardHours(2)))
+        }
+      }(any[DBSession]))
+    }
   }
 
   "UserTimeBookingStatisticsView UserTimeBookingStopped" should {
