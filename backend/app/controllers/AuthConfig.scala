@@ -152,6 +152,8 @@ class DefaultAuthConfig @Inject() (
       case Some(user) => Future.successful(user.getReference)
       case None       =>
         for {
+          // A failed user check after the organisation write left an organisation that blocked every later sign-in.
+          _ <- userRepository.validateCreate(userInfo)
           // Create new private organisation
           newOrg <- organisationRepository.create(
             userInfo.key,

@@ -79,6 +79,9 @@ trait UserRepository
                                       orgRole: OrganisationRole)(implicit
       dbSession: DBSession): Future[User]
 
+  def validateCreate(userInfo: UserInfo)(implicit
+      dbSession: DBSession): Future[Boolean]
+
   def findByOrganisationAndUserId(id: UserId, orgId: OrganisationId)(implicit
       dbSession: DBSession): Future[Option[User]]
 
@@ -392,13 +395,13 @@ class UserMongoRepository @Inject() (
     find(sel).map(_.map(_._1).toSeq)
   }
 
-  def validateCreate(registration: User)(implicit
+  override def validateCreate(userInfo: UserInfo)(implicit
       dbSession: DBSession): Future[Boolean] = {
     for {
-      _            <- validateNonBlankString("key", registration.key)
-      existingUser <- findByEmail(registration.email)
+      _            <- validateNonBlankString("key", userInfo.key)
+      existingUser <- findByEmail(userInfo.email)
       _            <- validate(existingUser.isEmpty, s"user_already_registered")
-      existingKey  <- findByKey(registration.key)
+      existingKey  <- findByKey(userInfo.key)
       _            <- validate(existingKey.isEmpty, s"user_key_already_exists")
     } yield true
   }
@@ -429,7 +432,7 @@ class UserMongoRepository @Inject() (
           settings = None,
           acceptedTOS = None
         ))
-      _ <- validateCreate(newUser)
+      _ <- validateCreate(userInfo)
       _ <- upsert(newUser)
     } yield newUser
   }

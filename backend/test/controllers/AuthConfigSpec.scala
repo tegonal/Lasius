@@ -61,5 +61,42 @@ class AuthConfigSpec
         organisation.key == userInfo.key
       } must equalTo(1)
     }
+
+    "create no organisation when another user has the key" in new WithTestApplication {
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val organisationRepository = new OrganisationMongoRepository()
+      val existing: UserInfo     = UserInfo(key = "taken-key",
+                                        firstName = None,
+                                        lastName = None,
+                                        email = "first@test.com")
+
+      // The private organisation of the existing user has another key, so
+      // only the user check can reject the second sign-in.
+      withDBSession() { implicit dbSession =>
+        for {
+          organisation <- organisationRepository.create(
+            "other-key",
+            `private` = true)(systemServices.systemSubject, dbSession)
+          _ <- new UserMongoRepository().createInitialUserBasedOnProfile(
+            existing,
+            organisation,
+            OrganisationAdministrator)
+        } yield ()
+      }.awaitResult()
+
+      withDBSession() { implicit dbSession =>
+        authConfig.resolveOrCreateUserByUserInfo(
+          existing.copy(email = "second@test.com"))
+      }.awaitResult() must throwA[Validation.ValidationFailedException](
+        "user_key_already_exists")
+
+      val organisations = withDBSession()(implicit dbSession =>
+        organisationRepository.findAll()).awaitResult()
+      organisations.count { case (organisation, _) =>
+        organisation.key == existing.key
+      } must equalTo(0)
+    }
   }
 }
