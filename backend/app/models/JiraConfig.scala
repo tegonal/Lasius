@@ -46,7 +46,7 @@ case class JiraAuth(
     consumerKey: String,
     privateKey: String,
     accessToken: String
-)
+) extends RedactedSecrets
 
 case class JiraConfig(
     id: IssueImporterConfigId,

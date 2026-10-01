@@ -53,7 +53,7 @@ case class GitlabProjectMapping(
     settings: GitlabProjectSettings
 )
 
-case class GitlabAuth(accessToken: String)
+case class GitlabAuth(accessToken: String) extends RedactedSecrets
 
 case class GitlabConfig(
     id: IssueImporterConfigId,

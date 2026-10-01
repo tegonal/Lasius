@@ -21,7 +21,9 @@
 
 package actors.scheduler
 
-sealed trait ServiceAuthentication
+import models.RedactedSecrets
+
+sealed trait ServiceAuthentication extends Product with RedactedSecrets
 case class BasicAuthentication(username: String, password: String)
     extends ServiceAuthentication
 case class OAuthAuthentication(consumerKey: String,

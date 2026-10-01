@@ -52,7 +52,7 @@ case class PlaneProjectMapping(
     settings: PlaneProjectSettings
 )
 
-case class PlaneAuth(apiKey: String)
+case class PlaneAuth(apiKey: String) extends RedactedSecrets
 
 case class PlaneConfig(
     id: IssueImporterConfigId,

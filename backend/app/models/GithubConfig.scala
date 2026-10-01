@@ -59,7 +59,7 @@ case class GithubAuth(
     accessToken: String,
     resourceOwner: Option[String] = None,    // Login name (user or org)
     resourceOwnerType: Option[String] = None // "User" or "Organization"
-)
+) extends RedactedSecrets
 
 case class GithubConfig(
     id: IssueImporterConfigId,
