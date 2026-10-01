@@ -24,11 +24,13 @@ package actors
 import core.{DBSupport, SystemServices}
 import models._
 import org.apache.pekko.actor._
+import org.apache.pekko.pattern.pipe
 import org.joda.time.DateTime
 import play.modules.reactivemongo.ReactiveMongoApi
 import repositories.{IssueImporterConfigRepository, UserRepository}
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.util.control.NonFatal
 
 object IssueImporterStatusMonitor {
   def props(repository: IssueImporterConfigRepository,
@@ -61,6 +63,8 @@ object IssueImporterStatusMonitor {
       success: Boolean,
       error: Option[ConnectivityIssue] = None
   )
+
+  private case object SyncStatusWritten
 }
 
 class IssueImporterStatusMonitor(
@@ -70,6 +74,7 @@ class IssueImporterStatusMonitor(
     systemServices: SystemServices,
     override val reactiveMongoApi: ReactiveMongoApi
 ) extends Actor
+    with Stash
     with ActorLogging
     with DBSupport {
 
@@ -79,9 +84,15 @@ class IssueImporterStatusMonitor(
   implicit val executionContext: ExecutionContextExecutor =
     context.system.dispatcher
 
-  val receive: Receive = {
+  val receive: Receive = idle
+
+  private def idle: Receive = {
     case UpdateConnectivityStatus(configId, orgId, status, issue) =>
-      updateConnectivity(configId, orgId, status, issue)
+      writeSyncStatus(configId, orgId) {
+        _.copy(connectivityStatus = status,
+               lastConnectivityCheck = Some(DateTime.now),
+               currentIssue = issue)
+      }
 
     case UpdateProjectSyncStats(configId,
                                 orgId,
@@ -90,82 +101,47 @@ class IssueImporterStatusMonitor(
                                 issueCount,
                                 success,
                                 error) =>
-      updateProjectStats(configId,
-                         orgId,
-                         projectId,
-                         projectName,
-                         issueCount,
-                         success,
-                         error)
+      writeSyncStatus(configId, orgId) {
+        calculateUpdatedStats(_,
+                              projectId,
+                              projectName,
+                              issueCount,
+                              success,
+                              error)
+      }
   }
 
-  private def updateConnectivity(
-      configId: IssueImporterConfigId,
-      orgId: OrganisationId,
-      status: ConnectivityStatus,
-      issue: Option[ConnectivityIssue]
-  ): Unit = {
+  /** Holds the next update until the current write completes, because each
+    * update starts from the status that the previous one wrote.
+    */
+  private def writing: Receive = {
+    case SyncStatusWritten =>
+      unstashAll()
+      context.become(idle)
+    case _ => stash()
+  }
+
+  private def writeSyncStatus(configId: IssueImporterConfigId,
+                              orgId: OrganisationId)(
+      update: ConfigSyncStatus => ConfigSyncStatus): Unit = {
     withDBSession() { implicit dbSession =>
       repository.findById(configId).flatMap {
         case Some(config) =>
-          val updatedStatus = config.syncStatus.copy(
-            connectivityStatus = status,
-            lastConnectivityCheck = Some(DateTime.now),
-            currentIssue = issue
-          )
-
-          val updated = updateConfigWithStats(config, updatedStatus)
-
-          repository.upsert(updated).map { _ =>
-            log.debug(
-              s"Updated connectivity status for config $configId: $status")
-            broadcastStatusChange(config, updatedStatus, orgId)
+          val syncStatus = update(config.syncStatus)
+          repository.updateSyncStatus(configId, syncStatus).map { _ =>
+            log.debug(s"Updated the sync status of config $configId")
+            broadcastStatusChange(config, syncStatus, orgId)
           }
 
         case None =>
           log.warning(s"Config not found: $configId")
-          Future.successful(())
+          Future.unit
       }
-    }
-    ()
-  }
-
-  private def updateProjectStats(
-      configId: IssueImporterConfigId,
-      orgId: OrganisationId,
-      projectId: ProjectId,
-      projectName: String,
-      issueCount: Int,
-      success: Boolean,
-      error: Option[ConnectivityIssue]
-  ): Unit = {
-    withDBSession() { implicit dbSession =>
-      repository.findById(configId).flatMap {
-        case Some(config) =>
-          val updatedStats = calculateUpdatedStats(
-            config.syncStatus,
-            projectId,
-            projectName,
-            issueCount,
-            success,
-            error
-          )
-
-          val updated = updateConfigWithStats(config, updatedStats)
-
-          repository.upsert(updated).map { _ =>
-            log.debug(
-              s"Updated sync stats for config $configId, project $projectId: ${if (success) "success"
-                else "failure"}, $issueCount issues")
-            broadcastStatusChange(config, updatedStats, orgId)
-          }
-
-        case None =>
-          log.warning(s"Config not found: $configId")
-          Future.successful(())
-      }
-    }
-    ()
+    }.recover { case NonFatal(cause) =>
+      log.error(cause, s"Failed to write the sync status of config $configId")
+    }.map(_ => SyncStatusWritten)
+      .pipeTo(self)
+    context.become(writing)
   }
 
   private def calculateUpdatedStats(
@@ -253,16 +229,6 @@ class IssueImporterStatusMonitor(
       connectivityStatus = connectivityStatus,
       nextScheduledSync = nextScheduledSync
     )
-  }
-
-  private def updateConfigWithStats(
-      config: IssueImporterConfig,
-      stats: ConfigSyncStatus
-  ): IssueImporterConfig = config match {
-    case c: GitlabConfig => c.copy(syncStatus = stats)
-    case c: JiraConfig   => c.copy(syncStatus = stats)
-    case c: PlaneConfig  => c.copy(syncStatus = stats)
-    case c: GithubConfig => c.copy(syncStatus = stats)
   }
 
   private def broadcastStatusChange(

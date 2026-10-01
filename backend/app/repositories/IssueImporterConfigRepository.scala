@@ -72,6 +72,12 @@ trait IssueImporterConfigRepository
                            mappingId: ProjectMappingId)(implicit
       dbSession: DBSession): Future[IssueImporterConfig]
 
+  /** Writes only the sync status, so a concurrent edit of the other fields
+    * stays.
+    */
+  def updateSyncStatus(id: IssueImporterConfigId, syncStatus: ConfigSyncStatus)(
+      implicit dbSession: DBSession): Future[Boolean]
+
   def migrateProjectMappingIds()(implicit dbSession: DBSession): Future[Int]
 }
 
@@ -502,6 +508,10 @@ class IssueImporterConfigMongoRepository @Inject() (
       _ <- upsert(updated)
     } yield updated
   }
+
+  def updateSyncStatus(id: IssueImporterConfigId, syncStatus: ConfigSyncStatus)(
+      implicit dbSession: DBSession): Future[Boolean] =
+    updateFields(Json.obj("id" -> id), Seq("syncStatus" -> syncStatus))
 
   def migrateProjectMappingIds()(implicit dbSession: DBSession): Future[Int] = {
     // Find configs where any project mapping lacks an "id" field
