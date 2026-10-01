@@ -97,6 +97,20 @@ case class AccessRestrictionConfig(
   def canAccess(email: String): Boolean = email.matches(emailRegex)
 }
 
+/** Hides the value of every field named `clientSecret` or `privateKey` in
+  * `toString`. A debug log printed the issuer config with the provider secret.
+  */
+trait RedactedSecrets { self: Product =>
+  override def toString: String =
+    productElementNames
+      .zip(productIterator)
+      .map {
+        case (name @ ("clientSecret" | "privateKey"), _) => s"$name=<redacted>"
+        case (name, value)                               => s"$name=$value"
+      }
+      .mkString(s"$productPrefix(", ",", ")")
+}
+
 case class InternalOauth2ProviderConfig(
     enabled: Boolean,
     allowRegisterUsers: Boolean,
@@ -104,7 +118,7 @@ case class InternalOauth2ProviderConfig(
     clientSecret: String,
     authorizationCode: AuthorizationCodeConfig,
     jwtToken: JWTTokenConfig
-)
+) extends RedactedSecrets
 
 case class AuthorizationCodeConfig(
     lifespan: Duration
@@ -114,7 +128,7 @@ case class JWTTokenConfig(
     issuer: String,
     lifespan: Duration,
     privateKey: String
-)
+) extends RedactedSecrets
 
 sealed trait IssuerConfig {
   val issuer: String
@@ -139,12 +153,14 @@ case class OpaqueTokenIssuerConfig(
     introspectionPath: Option[String],
     userInfoPath: Option[String]
 ) extends IssuerConfig
+    with RedactedSecrets
 
 case class JWTIssuerConfig(issuer: String,
                            publicKey: Option[String] = None,
                            privateKey: Option[String] = None,
                            jwk: Option[JWKConfig] = None)
     extends IssuerConfig
+    with RedactedSecrets
 
 case class JWKConfig(url: String,
                      cache: Option[JWKProviderCacheConfig] = None,
