@@ -192,11 +192,11 @@ class IssueImporterConfigController @Inject() (
               s"Project ${request.body.projectId.value} is not assigned to organisation ${orgId.value}")
             _ <- validateProjectMappingForType(config.importerType,
                                                request.body)
-            updated <- issueImporterRepository
+            saved <- issueImporterRepository
               .addProjectMapping(configId, request.body)
-            _ <- Future.successful(lastMappingId(updated).foreach(id =>
-              startWorkerForMapping(updated, id)))
-            response <- toResponse(updated)
+            _ <- Future.successful(
+              startWorkerForMapping(saved.config, saved.mappingId))
+            response <- toResponse(saved.config)
           } yield Ok(Json.toJson(response))
         }
     }
@@ -216,10 +216,17 @@ class IssueImporterConfigController @Inject() (
               .noneToFailed(ConfigErrorResponses.configNotFound(configId))
             _ <- validateConfigOwnership(config,
                                          userOrg.organisationReference.id)
-            updated <- issueImporterRepository
+            result <- issueImporterRepository
               .updateProjectMapping(configId, mappingId, request.body)
-            response <- toResponse(updated)
-          } yield Ok(Json.toJson(response))
+              .flatMap {
+                case Some(updated) =>
+                  startWorkerForMapping(updated, mappingId)
+                  toResponse(updated).map(response => Ok(Json.toJson(response)))
+                case None =>
+                  Future.successful(NotFound(
+                    ConfigErrorResponses.mappingNotFound(configId, mappingId)))
+              }
+          } yield result
         }
     }
 
@@ -235,11 +242,17 @@ class IssueImporterConfigController @Inject() (
               .noneToFailed(ConfigErrorResponses.configNotFound(configId))
             _ <- validateConfigOwnership(config,
                                          userOrg.organisationReference.id)
-            _ <- Future.successful(stopWorkerForMapping(config, mappingId))
-            updated <- issueImporterRepository
+            result <- issueImporterRepository
               .removeProjectMapping(configId, mappingId)
-            response <- toResponse(updated)
-          } yield Ok(Json.toJson(response))
+              .flatMap {
+                case Some(updated) =>
+                  stopWorkerForMapping(updated, mappingId)
+                  toResponse(updated).map(response => Ok(Json.toJson(response)))
+                case None =>
+                  Future.successful(NotFound(
+                    ConfigErrorResponses.mappingNotFound(configId, mappingId)))
+              }
+          } yield result
         }
     }
 
@@ -317,15 +330,7 @@ class IssueImporterConfigController @Inject() (
 
       case None =>
         Future.successful(
-          NotFound(
-            Json.obj(
-              "status" -> "error",
-              "message" -> s"Mapping ${mappingId.value} is not found in this configuration",
-              "error"     -> "mapping_not_found",
-              "configId"  -> config.id.value.toString,
-              "mappingId" -> mappingId.value.toString
-            ))
-        )
+          NotFound(ConfigErrorResponses.mappingNotFound(config.id, mappingId)))
     }
   }
 
@@ -927,13 +932,6 @@ class IssueImporterConfigController @Inject() (
                                    mappingId: ProjectMappingId): Unit =
     systemServices.pluginHandler ! PluginHandler.StopMappingWorker(config.id,
                                                                    mappingId)
-
-  /** Returns the mapping ID of the last mapping in a config's projects list.
-    * Used after addProjectMapping to identify the newly appended mapping.
-    */
-  private def lastMappingId(
-      config: IssueImporterConfig): Option[ProjectMappingId] =
-    config.projects.lastOption.map(_.id)
 
   /** A worker reads the URL, the check frequency and the credentials once, when
     * it starts.

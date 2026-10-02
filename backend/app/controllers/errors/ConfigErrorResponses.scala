@@ -48,6 +48,17 @@ object ConfigErrorResponses {
     )
   }
 
+  /** The config has no project mapping with this id (404). */
+  def mappingNotFound(configId: IssueImporterConfigId,
+                      mappingId: ProjectMappingId): JsObject =
+    Json.obj(
+      "status" -> "error",
+      "message" -> s"Mapping ${mappingId.value} is not found in this configuration",
+      "error"     -> "mapping_not_found",
+      "configId"  -> configId.value.toString,
+      "mappingId" -> mappingId.value.toString
+    )
+
   /** Access denied - config belongs to different organisation (403). */
   def accessDenied(configId: IssueImporterConfigId): String = {
     Json.stringify(

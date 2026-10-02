@@ -624,6 +624,27 @@ class IssueImporterConfigControllerSpec
       gitlabConfig.projects.exists(
         _.projectId == controller.project.id) must beFalse
     }
+
+    "return 404 for an unknown mapping id" in new WithTestApplication {
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: IssueImporterConfigControllerMock =
+        IssueImporterConfigControllerMock(config,
+                                          systemServices,
+                                          authConfig,
+                                          reactiveMongoApi)
+
+      val result: Future[Result] =
+        controller.removeProjectMapping(
+          controller.organisation.id,
+          controller.gitlabConfig.id,
+          ProjectMappingId())(FakeRequest().withBody(()))
+
+      status(result) must equalTo(NOT_FOUND)
+      (contentAsJson(result) \ "error").as[String] must equalTo(
+        "mapping_not_found")
+    }
   }
 
   "update project mapping" should {
@@ -672,6 +693,27 @@ class IssueImporterConfigControllerSpec
       mapping must beSome
       mapping.get.settings.gitlabProjectId must equalTo("999")
       mapping.get.settings.maxResults must beSome(200)
+    }
+
+    "return 404 for an unknown mapping id" in new WithTestApplication {
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: IssueImporterConfigControllerMock =
+        IssueImporterConfigControllerMock(config,
+                                          systemServices,
+                                          authConfig,
+                                          reactiveMongoApi)
+
+      val result: Future[Result] =
+        controller.updateProjectMapping(
+          controller.organisation.id,
+          controller.gitlabConfig.id,
+          ProjectMappingId())(FakeRequest().withBody(UpdateProjectMapping()))
+
+      status(result) must equalTo(NOT_FOUND)
+      (contentAsJson(result) \ "error").as[String] must equalTo(
+        "mapping_not_found")
     }
   }
 

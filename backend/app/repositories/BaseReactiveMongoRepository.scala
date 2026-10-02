@@ -150,6 +150,16 @@ abstract class BaseReactiveMongoRepository[T <: BaseEntity[ID],
       .map(_.writeErrors.isEmpty)
   }
 
+  /** Applies the modifier to the first matching document, and returns the
+    * number of matched documents. Zero means that no document met the selector.
+    */
+  protected[repositories] def updateFirst(sel: JsObject, modifier: JsObject)(
+      implicit dbSession: DBSession): Future[Int] =
+    coll
+      .update(ordered = true)
+      .one(sel, modifier, upsert = false, multi = false)
+      .map(_.n)
+
   protected[repositories] def remove(sel: JsObject)(implicit
       dbSession: DBSession): Future[Boolean] = {
     coll
