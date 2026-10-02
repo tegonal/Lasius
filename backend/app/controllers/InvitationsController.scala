@@ -106,33 +106,13 @@ class InvitationsController @Inject() (
               _ <- invitation match {
                 case i: JoinProjectInvitation =>
                   for {
-                    // Look up the organisation from the invitation
-                    org <- organisationRepository
-                      .findById(i.sharedByOrganisationReference.id)
-                      .noneToFailed(
-                        s"Organisation ${i.sharedByOrganisationReference.key} does not exist")
-                    _ <- validate(
-                      org.active,
-                      s"Cannot join inactive organisation ${i.sharedByOrganisationReference.key}")
-                    // Auto-add to organisation if not already a member.
-                    // projects = Seq() is correct — assignUserToProject below adds the project.
-                    userOrg <- maybeUserOrg match {
-                      case Some(uo) => Future.successful(uo)
-                      case None     =>
-                        for {
-                          _ <- userRepository.assignUserToOrganisation(
-                            user.id,
-                            org,
-                            OrganisationMember,
-                            WorkingHours())
-                        } yield UserOrganisation(organisationReference =
-                                                   org.getReference,
-                                                 `private` = org.`private`,
-                                                 role = OrganisationMember,
-                                                 plannedWorkingHours =
-                                                   WorkingHours(),
-                                                 projects = Seq())
-                    }
+                    // A project invitation grants no membership in the inviting
+                    // organisation. The invitee binds the project to an
+                    // organisation of their own.
+                    userOrg <- maybeUserOrg.fold[Future[UserOrganisation]](
+                      Future.failed(ValidationFailedException(
+                        "Need to specify binding organisation when joining a project")))(
+                      Future.successful)
                     project <- projectRepository
                       .findById(i.projectReference.id)
                       .noneToFailed(
