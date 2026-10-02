@@ -39,34 +39,38 @@ class JiraProjectService(wsClient: WSClient)(implicit ec: ExecutionContext)
     extends ExternalProjectService {
 
   override def testConnectivity(
-      config: CreateIssueImporterConfig): Future[ConnectivityTestResult] = {
-    implicit val auth: OAuthAuthentication = OAuthAuthentication(
-      consumerKey = config.consumerKey.get,
-      privateKey = config.privateKey.get,
-      token = config.accessToken.get,
-      tokenSecret = "" // Empty for initial test
-    )
+      config: CreateIssueImporterConfig): Future[ConnectivityTestResult] =
+    (config.consumerKey, config.privateKey, config.accessToken) match {
+      case (Some(consumerKey), Some(privateKey), Some(accessToken)) =>
+        // The first test has no token secret yet.
+        val auth = OAuthAuthentication(consumerKey = consumerKey,
+                                       privateKey = privateKey,
+                                       token = accessToken,
+                                       tokenSecret = "")
+        val serviceConfig = ServiceConfiguration(config.baseUrl.toString)
+        val testUrl       = serviceConfig.baseUrl + "/rest/api/2/myself"
 
-    val serviceConfig = ServiceConfiguration(config.baseUrl.toString)
-    val testUrl       = serviceConfig.baseUrl + "/rest/api/2/myself"
-
-    handleConnectivityErrors("Jira") {
-      WebServiceHelper
-        .callWithOAuth(wsClient, serviceConfig, testUrl, auth)
-        .map {
-          case scala.util.Success((_, _)) =>
-            successResult("Jira")
-          case scala.util.Failure(e: HttpStatusException) if e.status == 401 =>
-            authenticationFailedResult("OAuth credentials")
-          case scala.util.Failure(e) =>
-            ConnectivityTestResult(
-              success = false,
-              message = s"Connection failed: ${e.getMessage}",
-              errorCode = Some("connection_failed")
-            )
+        handleConnectivityErrors("Jira") {
+          WebServiceHelper
+            .callWithOAuth(wsClient, serviceConfig, testUrl, auth)
+            .map {
+              case scala.util.Success((_, _)) =>
+                successResult("Jira")
+              case scala.util.Failure(e: HttpStatusException)
+                  if e.status == 401 =>
+                authenticationFailedResult("OAuth credentials")
+              case scala.util.Failure(e) =>
+                ConnectivityTestResult(
+                  success = false,
+                  message = s"Connection failed: ${e.getMessage}",
+                  errorCode = Some("connection_failed")
+                )
+            }
         }
+
+      case _ =>
+        Future.successful(authenticationFailedResult("OAuth credentials"))
     }
-  }
 
   override def listProjects(
       config: IssueImporterConfig): Future[ListProjectsResponse] = {

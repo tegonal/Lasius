@@ -204,22 +204,20 @@ class ProjectsController @Inject() (
               project.active,
               s"Cannot invite to an inactive project ${project.key}")
             maybeExistingUser <- userRepository.findByEmail(request.body.email)
-            partOfSameOrganisation <- Future.successful(
-              maybeExistingUser.fold(false)(
-                _.organisations.exists(_.organisationReference.id == orgId)))
-            invitationId <-
-              if (partOfSameOrganisation) {
-                // auto-assign user to project if user is already member of the organisation the project is part of
+            organisationMember = maybeExistingUser.filter(
+              _.organisations.exists(_.organisationReference.id == orgId))
+            invitationId <- organisationMember match {
+              // A member of the organisation joins the project at once.
+              case Some(member) =>
                 userRepository
                   .assignUserToProject(
-                    userId = maybeExistingUser.get.id,
+                    userId = member.id,
                     organisationReference = project.organisationReference,
                     projectReference = project.getReference,
                     role = request.body.role
                   )
                   .map(_ => None)
-              } else {
-                // otherwise create invitation
+              case None =>
                 val invitationId = InvitationId()
                 invitationRepository
                   .upsert(
@@ -236,7 +234,7 @@ class ProjectsController @Inject() (
                       outcome = None
                     ))
                   .map(_ => Some(invitationId))
-              }
+            }
           } yield Created(
             Json.toJson(InvitationResult(invitationId, request.body.email)))
         }
