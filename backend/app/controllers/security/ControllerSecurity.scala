@@ -173,17 +173,10 @@ trait ControllerSecurity extends TokenSecurity {
       f: UserProject => Future[Result])(implicit
       context: ExecutionContext,
       request: Request[A]): Future[Result] = {
-    checked(
-      userOrganisation.projects.find(_.projectReference.id == projectId) match {
-        case Some(userProject) =>
-          authConfig
-            .authorizeUserProject(userProject, role)
-            .flatMap {
-              case true => f(userProject)
-              case _    => authConfig.authorizationFailed(request)
-            }
-        case _ => authConfig.authorizationFailed(request)
-      })
+    checked(authorizedProject(userOrganisation, projectId, role).flatMap {
+      case Some(userProject) => f(userProject)
+      case None              => authConfig.authorizationFailed(request)
+    })
   }
 
   /** This method checks that the user is at least OrganisationMember of orgId.
@@ -207,9 +200,9 @@ trait ControllerSecurity extends TokenSecurity {
             // An accepted project invitation can put a project of another
             // organisation into orgId. The administrator role does not
             // cover that project, so the user needs the project role.
-            hasProjectRole(userOrg, projectId, projectRole).flatMap {
-              case true  => f(userOrg)
-              case false =>
+            authorizedProject(userOrg, projectId, projectRole).flatMap {
+              case Some(_) => f(userOrg)
+              case None    =>
                 Future.failed(ValidationFailedException(
                   s"Project ${projectId.value} is not assigned to organisation ${orgId.value}"))
             }
@@ -225,13 +218,17 @@ trait ControllerSecurity extends TokenSecurity {
     }
   }
 
-  private def hasProjectRole(userOrganisation: UserOrganisation,
-                             projectId: ProjectId,
-                             role: ProjectRole)(implicit
-      context: ExecutionContext): Future[Boolean] =
-    userOrganisation.projects
-      .find(_.projectReference.id == projectId)
-      .fold(Future.successful(false))(authConfig.authorizeUserProject(_, role))
+  private def authorizedProject(userOrganisation: UserOrganisation,
+                                projectId: ProjectId,
+                                role: ProjectRole)(implicit
+      context: ExecutionContext): Future[Option[UserProject]] =
+    userOrganisation.projects.find(_.projectReference.id == projectId) match {
+      case Some(userProject) =>
+        authConfig
+          .authorizeUserProject(userProject, role)
+          .map(Option.when(_)(userProject))
+      case None => Future.successful(None)
+    }
 
   def HasOptionalProjectRole[A, R <: ProjectRole](
       userOrganisation: UserOrganisation,
