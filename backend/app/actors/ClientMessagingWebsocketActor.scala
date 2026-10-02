@@ -29,10 +29,12 @@ import controllers.security.{SecurityComponent, TokenSecurity}
 import core.{DBSupport, SystemServices}
 import models._
 import org.apache.pekko.actor._
+import org.apache.pekko.pattern.pipe
 import play.modules.reactivemongo.ReactiveMongoApi
 
 import java.util.concurrent.ConcurrentLinkedQueue
 import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.util.control.NonFatal
 
 object ControlCommands {
   case class SendToClient(senderUserId: UserId,
@@ -96,6 +98,10 @@ object ClientMessagingWebsocketActor {
                                         authConfig = authConfig,
                                         out = out))
   var actors: ConcurrentLinkedQueue[ActorRef] = new ConcurrentLinkedQueue()
+
+  private sealed trait TokenValidated
+  private final case class TokenAccepted(userId: UserId) extends TokenValidated
+  private case object TokenRejected                      extends TokenValidated
 }
 
 class ClientMessagingWebsocketActor(
@@ -110,11 +116,12 @@ class ClientMessagingWebsocketActor(
     with SecurityComponent
     with TokenSecurity {
 
+  import ClientMessagingWebsocketActor._
+
   override val supportTransaction: Boolean = systemServices.supportTransaction
   implicit val executionContext: ExecutionContextExecutor =
     context.system.dispatcher
   private var userId: Option[UserId] = None
-  // val (enumerator, channel) = Concurrent.broadcast[OutEvent]
 
   // append to map of active actors
   ClientMessagingWebsocketActor.actors.add(self)
@@ -137,32 +144,36 @@ class ClientMessagingWebsocketActor(
   private def unauthenticated: Receive = default.orElse {
     case HelloServer(client, token, tokenIssuer) =>
       log.debug(s"Received HelloServer($client)")
-      // Try ticket-based auth first (sync lookup)
       systemServices.consumeWsTicket(token) match {
         case Some((uid, _)) =>
-          userId = Some(uid)
-          log.debug(s"Authenticated websocket via ticket for client ($client)")
-          out ! HelloClient
-          context.become(authenticated)
+          authenticate(uid)
         case None =>
-          // Fall back to JWT validation (backward compat)
+          // A client without a ticket can still send an access token.
           withToken(tokenIssuer = tokenIssuer,
                     token = token,
                     withinTransaction = true,
                     canCreateNewUser = false) {
-            out ! AuthenticationFailed
-            userId = None
-            context.become(unauthenticated)
-            Future.successful(())
-          } { _ => user =>
-            userId = Some(user.userReference.id)
-            log.debug(s"Authenticated websocket via token for client ($client)")
-            out ! HelloClient
-            context.become(authenticated)
-            Future.successful(())
-          }
-          ()
+            Future.successful[TokenValidated](TokenRejected)
+          } { _ => subject =>
+            Future.successful(TokenAccepted(subject.userReference.id))
+          }.recover { case NonFatal(_) => TokenRejected }
+            .pipeTo(self)
       }
+
+    case TokenAccepted(uid) =>
+      authenticate(uid)
+
+    case TokenRejected =>
+      userId = None
+      out ! AuthenticationFailed
+      context.become(unauthenticated)
+  }
+
+  private def authenticate(uid: UserId): Unit = {
+    userId = Some(uid)
+    log.debug(s"Authenticated the websocket of user ${uid.value}")
+    out ! HelloClient
+    context.become(authenticated)
   }
 
   private def authenticated: Receive = unauthenticated.orElse {
