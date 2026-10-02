@@ -34,19 +34,20 @@ import play.modules.reactivemongo.ReactiveMongoApi
 
 import java.util.concurrent.ConcurrentLinkedQueue
 import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.util.Try
 import scala.util.control.NonFatal
 
 object ControlCommands {
   case class SendToClient(senderUserId: UserId,
                           event: OutEvent,
-                          receivers: List[UserId] = Nil)
+                          receivers: List[UserId])
 }
 
 @ImplementedBy(classOf[ClientReceiverWebsocket])
 trait ClientReceiver {
-  def broadcast(senderUserId: UserId, event: OutEvent): Unit
 
-  /** Send OutEvent to a list of receiving clients exclusing sender itself
+  /** Sends the event to the open websockets of the receivers. An empty list
+    * reaches nobody.
     */
   def send(senderUserId: UserId, event: OutEvent, receivers: List[UserId]): Unit
 
@@ -55,19 +56,6 @@ trait ClientReceiver {
 
 class ClientReceiverWebsocket extends ClientReceiver {
 
-  /** Broadcast OutEvent to every client except sender itself
-    */
-  def broadcast(senderUserId: UserId, event: OutEvent): Unit = {
-    ClientMessagingWebsocketActor.actors
-      .iterator()
-      .forEachRemaining { actor =>
-        // Send message - let dead letter handling deal with terminated actors
-        actor ! SendToClient(senderUserId, event)
-      }
-  }
-
-  /** Send OutEvent to a list of receiving clients exclusing sender itself
-    */
   def send(senderUserId: UserId,
            event: OutEvent,
            receivers: List[UserId]): Unit = {
@@ -149,14 +137,19 @@ class ClientMessagingWebsocketActor(
           authenticate(uid)
         case None =>
           // A client without a ticket can still send an access token.
-          withToken(tokenIssuer = tokenIssuer,
-                    token = token,
-                    withinTransaction = true,
-                    canCreateNewUser = false) {
-            Future.successful[TokenValidated](TokenRejected)
-          } { _ => subject =>
-            Future.successful(TokenAccepted(subject.userReference.id))
-          }.recover { case NonFatal(_) => TokenRejected }
+          Future
+            .fromTry(
+              Try(
+                withToken(tokenIssuer = tokenIssuer,
+                          token = token,
+                          withinTransaction = true,
+                          canCreateNewUser = false) {
+                  Future.successful[TokenValidated](TokenRejected)
+                } { _ => subject =>
+                  Future.successful(TokenAccepted(subject.userReference.id))
+                }))
+            .flatten
+            .recover { case NonFatal(_) => TokenRejected }
             .pipeTo(self)
       }
 
@@ -177,34 +170,11 @@ class ClientMessagingWebsocketActor(
   }
 
   private def authenticated: Receive = unauthenticated.orElse {
-    case SendToClient(senderUserId, event, Nil) =>
-      // broadcast to all others
-      if (userId.isDefined && !userId.contains(senderUserId)) {
-        log.info(
-          s"[WebSocket] Broadcasting ${event.getClass.getSimpleName} to user ${userId.get}")
-        out ! event
-      } else {
-        log.debug(s"[WebSocket] Skipping broadcast to sender ${senderUserId}")
-      }
     case SendToClient(_, event, receivers) =>
-      // send to specific clients only
-      if (userId.isDefined && receivers.contains(userId.get)) {
-        log.info(
-          s"[WebSocket] Sending ${event.getClass.getSimpleName} to user ${userId.get}")
-        out ! event
-      } else {
-        log.debug(
-          s"[WebSocket] User ${userId.getOrElse("unauthenticated")} not in receivers list")
-      }
+      if (userId.exists(receivers.contains)) out ! event
   }
 
   def receive: Receive = unauthenticated
-
-  def broadcast(event: OutEvent): Unit = {
-    ClientMessagingWebsocketActor.actors
-      .iterator()
-      .forEachRemaining(ref => ref ! event)
-  }
 
   override def postStop(): Unit = {
     // remove from active actors

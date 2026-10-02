@@ -194,8 +194,6 @@ class IssueImporterStatusMonitor(
                                    orgId: OrganisationId): Future[Unit] =
     withDBSession() { implicit dbSession =>
       userRepository.findAdministratorsByOrganisation(orgId).map { admins =>
-        // An empty receiver list sends the event to every client, so a config
-        // without administrators sends nothing.
         if (admins.nonEmpty)
           clientReceiver.send(
             systemServices.systemUser,

@@ -112,7 +112,7 @@ class IssueImporterStatusMonitorSpec
   private def monitor(
       scope: ActorTestScope,
       repository: IssueImporterConfigRepository,
-      userRepository: UserRepository = mock[UserRepository],
+      userRepository: UserRepository = administrators(Seq.empty),
       clientReceiver: ClientReceiver = mock[ClientReceiver]): ActorRef =
     scope.system.actorOf(
       IssueImporterStatusMonitor.props(repository,
