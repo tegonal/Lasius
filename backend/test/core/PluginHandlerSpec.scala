@@ -21,159 +21,142 @@
 
 package core
 
+import actors.scheduler.TagParseWorker
+import core.PluginHandler._
+import core.PluginHandlerSpec._
 import models._
-import mongo.EmbedMongo
+import org.apache.pekko.actor.{Actor, ActorRef, Props}
 import org.apache.pekko.testkit.TestProbe
-import play.api.test.PlaySpecification
+import org.specs2.mock.Mockito
+import org.specs2.mutable.Specification
+import pekko.ActorTestScope
+import play.api.libs.ws.WSClient
+import play.modules.reactivemongo.ReactiveMongoApi
+import repositories.{IssueImporterConfigRepository, UserRepository}
 
-import scala.concurrent.duration._
+import java.net.URI
 
-/** Tests for PluginHandler message routing. Verifies that messages are
-  * correctly routed from the controller to PluginHandler.
-  *
-  * Note: Since MockSystemServicesAware.scala:112 provides pluginHandler as
-  * TestProbe().ref, we can verify that messages are sent to it from the
-  * controller layer.
-  */
-class PluginHandlerSpec
-    extends PlaySpecification
-    with EmbedMongo
-    with TestApplication {
+class PluginHandlerSpec extends Specification with Mockito {
 
-  sequential
+  private val first  = ProjectMappingId()
+  private val second = ProjectMappingId()
 
-  "PluginHandler message routing" should {
+  private def mapping(id: ProjectMappingId): PlaneProjectMapping =
+    PlaneProjectMapping(
+      id = id,
+      projectId = ProjectId(),
+      settings = PlaneProjectSettings(
+        planeProjectId = s"plane-${id.value}",
+        tagConfiguration =
+          PlaneTagConfiguration(useLabels = false, labelFilter = Set.empty))
+    )
 
-    "accept StopProjectScheduler message for GitLab" in new WithTestApplication {
-      val systemServices: SystemServices = inject[SystemServices]
+  private val config = PlaneConfig(
+    id = IssueImporterConfigId(),
+    organisationReference = EntityReference(OrganisationId(), "org"),
+    name = "Plane",
+    baseUrl = URI.create("https://plane.example.com").toURL,
+    auth = PlaneAuth("key"),
+    settings = PlaneSettings(checkFrequency = 300000L, workspace = "ws"),
+    projects = Seq(mapping(first), mapping(second)),
+    audit = AuditInfo.initial(UserId())
+  )
 
-      val configId  = IssueImporterConfigId()
-      val mappingId = ProjectMappingId()
+  /** A plugin handler whose workers report to the probe. */
+  private def pluginHandler(scope: ActorTestScope, probe: TestProbe): ActorRef =
+    scope.system.actorOf(
+      Props(
+        new PluginHandler(mock[UserRepository],
+                          mock[IssueImporterConfigRepository],
+                          mock[SystemServices],
+                          mock[WSClient],
+                          mock[LasiusConfig],
+                          mock[ReactiveMongoApi]) {
+          override protected def workerProps(
+              config: IssueImporterConfig): Seq[(ProjectMappingId, Props)] =
+            Seq(first, second).map(id =>
+              id -> Props(classOf[ProbeWorker], probe.ref, id))
+        }))
 
-      // Send message to pluginHandler (which is a TestProbe in MockSystemServices)
-      systemServices.pluginHandler ! PluginHandler.StopProjectScheduler(
-        ImporterType.Gitlab,
-        configId,
-        mappingId
-      )
+  "PluginHandler" should {
+    "start one worker for each mapping of a config" in new ActorTestScope {
+      private val probe   = TestProbe()
+      private val handler = pluginHandler(this, probe)
 
-      // The message should be accepted without error
-      // (TestProbe accepts all messages by default)
-      success
+      handler ! StartConfigWorkers(config)
+
+      probe
+        .receiveN(2)
+        .collect { case Started(id, _) => id }
+        .toSet must equalTo(Set(first, second))
     }
 
-    "accept StopProjectScheduler message for Jira" in new WithTestApplication {
-      val systemServices: SystemServices = inject[SystemServices]
+    "replace the running worker when a mapping starts again" in new ActorTestScope {
+      private val probe   = TestProbe()
+      private val handler = pluginHandler(this, probe)
 
-      systemServices.pluginHandler ! PluginHandler.StopProjectScheduler(
-        ImporterType.Jira,
-        IssueImporterConfigId(),
-        ProjectMappingId()
-      )
+      handler ! StartMappingWorker(config, first)
+      private val running = probe.expectMsgType[Started].worker
+      handler ! StartMappingWorker(config, first)
 
-      success
+      private val events = probe.receiveN(2)
+      events must contain(Stopped(first, running))
+      events.collect { case Started(`first`, worker) => worker } must
+        haveSize[Seq[ActorRef]](1).and(not(contain(running)))
     }
 
-    "accept StopProjectScheduler message for Plane" in new WithTestApplication {
-      val systemServices: SystemServices = inject[SystemServices]
+    "stop the worker of a mapping" in new ActorTestScope {
+      private val probe   = TestProbe()
+      private val handler = pluginHandler(this, probe)
 
-      systemServices.pluginHandler ! PluginHandler.StopProjectScheduler(
-        ImporterType.Plane,
-        IssueImporterConfigId(),
-        ProjectMappingId()
-      )
+      handler ! StartMappingWorker(config, first)
+      private val running = probe.expectMsgType[Started].worker
+      handler ! StopMappingWorker(config.id, first)
 
-      success
+      probe.expectMsg(Stopped(first, running))
     }
 
-    "accept StopProjectScheduler message for GitHub" in new WithTestApplication {
-      val systemServices: SystemServices = inject[SystemServices]
+    "stop the workers of a config" in new ActorTestScope {
+      private val probe   = TestProbe()
+      private val handler = pluginHandler(this, probe)
 
-      systemServices.pluginHandler ! PluginHandler.StopProjectScheduler(
-        ImporterType.Github,
-        IssueImporterConfigId(),
-        ProjectMappingId()
-      )
+      handler ! StartConfigWorkers(config)
+      probe.receiveN(2)
+      handler ! StopConfigWorkers(config.id)
 
-      success
+      probe
+        .receiveN(2)
+        .collect { case Stopped(id, _) => id }
+        .toSet must equalTo(Set(first, second))
     }
 
-    "accept StopConfigSchedulers message for GitLab" in new WithTestApplication {
-      val systemServices: SystemServices = inject[SystemServices]
+    "send a parse request to the worker of a refreshed mapping" in new ActorTestScope {
+      private val probe   = TestProbe()
+      private val handler = pluginHandler(this, probe)
 
-      systemServices.pluginHandler ! PluginHandler.StopConfigSchedulers(
-        ImporterType.Gitlab,
-        IssueImporterConfigId()
-      )
+      handler ! StartMappingWorker(config, first)
+      probe.expectMsgType[Started]
+      handler ! RefreshMappingTags(config.id, first)
 
-      success
+      probe.expectMsg(Received(first, TagParseWorker.Parse))
     }
+  }
+}
 
-    "accept StopConfigSchedulers message for all types" in new WithTestApplication {
-      val systemServices: SystemServices = inject[SystemServices]
-      val configId                       = IssueImporterConfigId()
+object PluginHandlerSpec {
+  final case class Started(mappingId: ProjectMappingId, worker: ActorRef)
+  final case class Stopped(mappingId: ProjectMappingId, worker: ActorRef)
+  final case class Received(mappingId: ProjectMappingId, message: Any)
 
-      // Test all four importer types
-      systemServices.pluginHandler ! PluginHandler.StopConfigSchedulers(
-        ImporterType.Gitlab,
-        configId
-      )
-      systemServices.pluginHandler ! PluginHandler.StopConfigSchedulers(
-        ImporterType.Jira,
-        configId
-      )
-      systemServices.pluginHandler ! PluginHandler.StopConfigSchedulers(
-        ImporterType.Plane,
-        configId
-      )
-      systemServices.pluginHandler ! PluginHandler.StopConfigSchedulers(
-        ImporterType.Github,
-        configId
-      )
+  /** Reports its start, its stop and each message to the probe. */
+  class ProbeWorker(probe: ActorRef, mappingId: ProjectMappingId)
+      extends Actor {
+    override def preStart(): Unit = probe ! Started(mappingId, self)
 
-      success
-    }
+    override def postStop(): Unit = probe ! Stopped(mappingId, self)
 
-    "accept RefreshProjectTags message for GitLab" in new WithTestApplication {
-      val systemServices: SystemServices = inject[SystemServices]
-
-      systemServices.pluginHandler ! PluginHandler.RefreshProjectTags(
-        ImporterType.Gitlab,
-        IssueImporterConfigId(),
-        ProjectMappingId()
-      )
-
-      success
-    }
-
-    "accept RefreshProjectTags message for all types" in new WithTestApplication {
-      val systemServices: SystemServices = inject[SystemServices]
-      val configId                       = IssueImporterConfigId()
-      val mappingId                      = ProjectMappingId()
-
-      // Test all four importer types
-      systemServices.pluginHandler ! PluginHandler.RefreshProjectTags(
-        ImporterType.Gitlab,
-        configId,
-        mappingId
-      )
-      systemServices.pluginHandler ! PluginHandler.RefreshProjectTags(
-        ImporterType.Jira,
-        configId,
-        mappingId
-      )
-      systemServices.pluginHandler ! PluginHandler.RefreshProjectTags(
-        ImporterType.Plane,
-        configId,
-        mappingId
-      )
-      systemServices.pluginHandler ! PluginHandler.RefreshProjectTags(
-        ImporterType.Github,
-        configId,
-        mappingId
-      )
-
-      success
+    override def receive: Receive = { case message =>
+      probe ! Received(mappingId, message)
     }
   }
 }

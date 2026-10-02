@@ -21,24 +21,27 @@
 
 package core
 
-import actors.scheduler.gitlab.GitlabTagParseScheduler
-import actors.scheduler.github.GithubTagParseScheduler
-import actors.scheduler.jira.JiraTagParseScheduler
-import actors.scheduler.plane.PlaneTagParseScheduler
+import actors.scheduler.github.GithubTagParseWorker
+import actors.scheduler.gitlab.GitlabTagParseWorker
+import actors.scheduler.jira.JiraTagParseWorker
+import actors.scheduler.plane.PlaneTagParseWorker
 import actors.scheduler.{
   ApiKeyAuthentication,
   OAuth2Authentication,
-  ServiceConfiguration
+  ServiceConfiguration,
+  TagParseWorker
 }
-import org.apache.pekko.actor._
 import core.LoginHandler.InitializeUserViews
 import models._
+import org.apache.pekko.actor.SupervisorStrategy.Restart
+import org.apache.pekko.actor._
+import org.apache.pekko.pattern.pipe
 import play.api.libs.ws.WSClient
 import play.modules.reactivemongo.ReactiveMongoApi
 import repositories._
 
-import scala.concurrent.{ExecutionContextExecutor, Future}
-import scala.util.{Failure, Success}
+import scala.concurrent.ExecutionContextExecutor
+import scala.concurrent.duration.DurationInt
 
 object PluginHandler {
   def props(userRepository: UserRepository,
@@ -57,28 +60,36 @@ object PluginHandler {
       reactiveMongoApi
     )
 
+  /** Initializes the user views, migrates the mapping ids, and starts a worker
+    * for each project mapping.
+    */
   case object Startup
 
-  case object Shutdown
+  /** Starts the worker of one mapping. A running worker of the mapping stops
+    * first, so a changed mapping imports with its new settings.
+    */
+  final case class StartMappingWorker(config: IssueImporterConfig,
+                                      mappingId: ProjectMappingId)
 
-  case class RefreshProjectTags(importerType: ImporterType,
-                                configId: IssueImporterConfigId,
-                                mappingId: ProjectMappingId)
+  /** Starts the workers of all mappings of a config, and replaces running ones.
+    */
+  final case class StartConfigWorkers(config: IssueImporterConfig)
 
-  case class StartProjectScheduler(importerType: ImporterType,
-                                   config: IssueImporterConfig,
-                                   mappingId: ProjectMappingId)
+  final case class StopMappingWorker(configId: IssueImporterConfigId,
+                                     mappingId: ProjectMappingId)
 
-  case class StartConfigSchedulers(config: IssueImporterConfig)
+  final case class StopConfigWorkers(configId: IssueImporterConfigId)
 
-  case class StopProjectScheduler(importerType: ImporterType,
-                                  configId: IssueImporterConfigId,
-                                  mappingId: ProjectMappingId)
+  final case class RefreshMappingTags(configId: IssueImporterConfigId,
+                                      mappingId: ProjectMappingId)
 
-  case class StopConfigSchedulers(importerType: ImporterType,
-                                  configId: IssueImporterConfigId)
+  private final case class ConfigsLoaded(configs: Seq[IssueImporterConfig])
+
+  private type WorkerKey = (IssueImporterConfigId, ProjectMappingId)
 }
 
+/** Runs one tag parse worker for each project mapping of the issue importers.
+  */
 class PluginHandler(
     userRepository: UserRepository,
     issueImporterConfigRepository: IssueImporterConfigRepository,
@@ -90,429 +101,155 @@ class PluginHandler(
     with ActorLogging
     with DBSupport {
 
-  override val supportTransaction: Boolean = systemServices.supportTransaction
-
   import PluginHandler._
 
-  implicit val executionContext: ExecutionContextExecutor = context.dispatcher
+  override val supportTransaction: Boolean = systemServices.supportTransaction
 
-  private val jiraTagParseScheduler: ActorRef =
-    context.actorOf(JiraTagParseScheduler.props(wsClient, systemServices))
-  private val gitlabTagParseScheduler: ActorRef =
-    context.actorOf(GitlabTagParseScheduler.props(wsClient, systemServices))
-  private val planeTagParseScheduler: ActorRef =
-    context.actorOf(PlaneTagParseScheduler.props(wsClient, systemServices))
-  private val githubTagParseScheduler: ActorRef =
-    context.actorOf(GithubTagParseScheduler.props(wsClient, systemServices))
+  private implicit val executionContext: ExecutionContextExecutor =
+    context.dispatcher
 
-  log.debug(s"PluginHandler started")
+  private var workers: Map[WorkerKey, ActorRef] = Map.empty
+
+  override val supervisorStrategy: OneForOneStrategy =
+    OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1.minute) {
+      case _ => Restart
+    }
 
   val receive: Receive = {
     case Startup =>
-      log.debug(s"PluginHandler startup")
-      withDBSession() { implicit dbSession =>
-        Future {
-          initialize()
-        }
+      initializeUserViews()
+      loadConfigs()
+
+    case ConfigsLoaded(configs) =>
+      configs.foreach(startWorkers(_, _ => true))
+
+    case Status.Failure(cause) =>
+      log.error(
+        cause,
+        "The issue importers did not start, because their configs did not load")
+
+    case StartMappingWorker(config, mappingId) =>
+      startWorkers(config, _ == mappingId)
+
+    case StartConfigWorkers(config) =>
+      startWorkers(config, _ => true)
+
+    case StopMappingWorker(configId, mappingId) =>
+      stopWorker(configId -> mappingId)
+
+    case StopConfigWorkers(configId) =>
+      workers.keys.filter(_._1 == configId).foreach(stopWorker)
+
+    case RefreshMappingTags(configId, mappingId) =>
+      workers.get(configId -> mappingId) match {
+        case Some(worker) => worker ! TagParseWorker.Parse
+        case None         =>
+          log.warning(
+            s"No worker runs for mapping $mappingId of config $configId")
       }
-    case Shutdown =>
-
-    case RefreshProjectTags(importerType, configId, mappingId) =>
-      log.debug(
-        s"RefreshProjectTags: type=$importerType, configId=$configId, mappingId=$mappingId")
-      importerType match {
-        case ImporterType.Gitlab =>
-          gitlabTagParseScheduler ! GitlabTagParseScheduler.RefreshTags(
-            configId,
-            mappingId)
-        case ImporterType.Jira =>
-          jiraTagParseScheduler ! JiraTagParseScheduler.RefreshTags(configId,
-                                                                    mappingId)
-        case ImporterType.Plane =>
-          planeTagParseScheduler ! PlaneTagParseScheduler.RefreshTags(configId,
-                                                                      mappingId)
-        case ImporterType.Github =>
-          githubTagParseScheduler ! GithubTagParseScheduler.RefreshTags(
-            configId,
-            mappingId)
-      }
-
-    case StartProjectScheduler(importerType, config, mappingId) =>
-      log.debug(
-        s"StartProjectScheduler: type=$importerType, configId=${config.id}, mappingId=$mappingId")
-      config match {
-        case c: GitlabConfig =>
-          c.projects.find(_.id == mappingId).foreach { proj =>
-            val serviceConfig = ServiceConfiguration(c.baseUrl.toString)
-            val auth          = OAuth2Authentication(c.auth.accessToken)
-            gitlabTagParseScheduler ! GitlabTagParseScheduler.StartScheduler(
-              serviceConfig,
-              c.settings,
-              proj.settings,
-              auth,
-              c.id,
-              c.organisationReference.id,
-              proj.id,
-              proj.projectId
-            )
-          }
-        case c: JiraConfig =>
-          c.projects.find(_.id == mappingId).foreach { proj =>
-            val serviceConfig = ServiceConfiguration(c.baseUrl.toString)
-            val auth          = OAuth2Authentication(c.auth.accessToken)
-            jiraTagParseScheduler ! JiraTagParseScheduler.StartScheduler(
-              serviceConfig,
-              c.settings,
-              proj.settings,
-              auth,
-              c.id,
-              c.organisationReference.id,
-              proj.id,
-              proj.projectId
-            )
-          }
-        case c: PlaneConfig =>
-          c.projects.find(_.id == mappingId).foreach { proj =>
-            val serviceConfig = ServiceConfiguration(c.baseUrl.toString)
-            val auth          = ApiKeyAuthentication(c.auth.apiKey)
-            planeTagParseScheduler ! PlaneTagParseScheduler.StartScheduler(
-              serviceConfig,
-              c.baseUrl,
-              c.settings,
-              proj.settings,
-              auth,
-              c.id,
-              c.organisationReference.id,
-              proj.id,
-              proj.projectId
-            )
-          }
-        case c: GithubConfig =>
-          c.projects.find(_.id == mappingId).foreach { proj =>
-            val serviceConfig = ServiceConfiguration(c.baseUrl.toString)
-            val auth          = OAuth2Authentication(c.auth.accessToken)
-            githubTagParseScheduler ! GithubTagParseScheduler.StartScheduler(
-              serviceConfig,
-              c.settings,
-              proj.settings,
-              auth,
-              c.id,
-              c.organisationReference.id,
-              proj.id,
-              proj.projectId
-            )
-          }
-      }
-
-    case StartConfigSchedulers(config) =>
-      log.debug(
-        s"StartConfigSchedulers: type=${config.importerType}, configId=${config.id}")
-      config match {
-        case c: GitlabConfig =>
-          c.projects.foreach { proj =>
-            val serviceConfig = ServiceConfiguration(c.baseUrl.toString)
-            val auth          = OAuth2Authentication(c.auth.accessToken)
-            gitlabTagParseScheduler ! GitlabTagParseScheduler.StartScheduler(
-              serviceConfig,
-              c.settings,
-              proj.settings,
-              auth,
-              c.id,
-              c.organisationReference.id,
-              proj.id,
-              proj.projectId
-            )
-          }
-        case c: JiraConfig =>
-          c.projects.foreach { proj =>
-            val serviceConfig = ServiceConfiguration(c.baseUrl.toString)
-            val auth          = OAuth2Authentication(c.auth.accessToken)
-            jiraTagParseScheduler ! JiraTagParseScheduler.StartScheduler(
-              serviceConfig,
-              c.settings,
-              proj.settings,
-              auth,
-              c.id,
-              c.organisationReference.id,
-              proj.id,
-              proj.projectId
-            )
-          }
-        case c: PlaneConfig =>
-          c.projects.foreach { proj =>
-            val serviceConfig = ServiceConfiguration(c.baseUrl.toString)
-            val auth          = ApiKeyAuthentication(c.auth.apiKey)
-            planeTagParseScheduler ! PlaneTagParseScheduler.StartScheduler(
-              serviceConfig,
-              c.baseUrl,
-              c.settings,
-              proj.settings,
-              auth,
-              c.id,
-              c.organisationReference.id,
-              proj.id,
-              proj.projectId
-            )
-          }
-        case c: GithubConfig =>
-          c.projects.foreach { proj =>
-            val serviceConfig = ServiceConfiguration(c.baseUrl.toString)
-            val auth          = OAuth2Authentication(c.auth.accessToken)
-            githubTagParseScheduler ! GithubTagParseScheduler.StartScheduler(
-              serviceConfig,
-              c.settings,
-              proj.settings,
-              auth,
-              c.id,
-              c.organisationReference.id,
-              proj.id,
-              proj.projectId
-            )
-          }
-      }
-
-    case StopProjectScheduler(importerType, configId, mappingId) =>
-      log.debug(
-        s"StopProjectScheduler: type=$importerType, configId=$configId, mappingId=$mappingId")
-      importerType match {
-        case ImporterType.Gitlab =>
-          gitlabTagParseScheduler ! GitlabTagParseScheduler
-            .StopProjectScheduler(configId, mappingId)
-        case ImporterType.Jira =>
-          jiraTagParseScheduler ! JiraTagParseScheduler.StopProjectScheduler(
-            configId,
-            mappingId)
-        case ImporterType.Plane =>
-          planeTagParseScheduler ! PlaneTagParseScheduler.StopProjectScheduler(
-            configId,
-            mappingId)
-        case ImporterType.Github =>
-          githubTagParseScheduler ! GithubTagParseScheduler
-            .StopProjectScheduler(configId, mappingId)
-      }
-
-    case StopConfigSchedulers(importerType, configId) =>
-      log.debug(s"StopConfigSchedulers: type=$importerType, configId=$configId")
-      importerType match {
-        case ImporterType.Gitlab =>
-          gitlabTagParseScheduler ! GitlabTagParseScheduler
-            .StopConfigWorkers(configId)
-        case ImporterType.Jira =>
-          jiraTagParseScheduler ! JiraTagParseScheduler.StopConfigWorkers(
-            configId)
-        case ImporterType.Plane =>
-          planeTagParseScheduler ! PlaneTagParseScheduler.StopConfigWorkers(
-            configId)
-        case ImporterType.Github =>
-          githubTagParseScheduler ! GithubTagParseScheduler
-            .StopConfigWorkers(configId)
-      }
-
-    case msg if msg.getClass.getSimpleName == "SchedulerStarted" =>
-      // Schedulers send SchedulerStarted acknowledgment - we can ignore it
-      log.debug(s"Scheduler started: $msg")
-
-    case e =>
-      log.warning(s"Received unknown event:$e")
   }
 
-  def initialize()(implicit dbSession: DBSession): Unit = {
-    initializeUserViews()
-    // Migrate existing project mappings to have ProjectMappingId before starting schedulers.
-    // Schedulers must wait for migration to complete so that mapping IDs are stable.
-    issueImporterConfigRepository.migrateProjectMappingIds().onComplete {
-      case Success(count) =>
-        if (count > 0)
-          log.info(s"Migrated $count configs with missing ProjectMappingIds")
-        initializePlugins()
-      case Failure(exception) =>
-        log.warning(
-          exception,
-          "Failed migrating ProjectMappingIds - continuing with initialization")
-        initializePlugins()
-    }
-  }
-
-  private def initializePlugins()(implicit dbSession: DBSession): Unit = {
-    initializeGitlabPlugin()
-    initializeJiraPlugin()
-    initializePlanePlugin()
-    initializeGithubPlugin()
-  }
-
-  private def initializeUserViews()(implicit dbSession: DBSession): Unit = {
-    log.debug(s"initializeUserViews:${config.initializeViewsOnStartup}")
+  private def initializeUserViews(): Unit =
     if (config.initializeViewsOnStartup) {
-      userRepository.findAll().foreach { users =>
-        log.debug(s"findAllUsers:${users.map(_.getReference)}")
-        users.foreach(user =>
-          systemServices.loginHandler ! InitializeUserViews(user.getReference))
+      withDBSession()(implicit dbSession => userRepository.findAll())
+        .foreach(_.foreach(user =>
+          systemServices.loginHandler ! InitializeUserViews(user.getReference)))
+    }
+
+  /** Loads the configs after the mapping id migration. A worker that starts
+    * before the migration gets a random mapping id that no request can match.
+    */
+  private def loadConfigs(): Unit =
+    withDBSession() { implicit dbSession =>
+      for {
+        migrated <- issueImporterConfigRepository.migrateProjectMappingIds()
+        configs  <- issueImporterConfigRepository.findAllConfigs()
+      } yield {
+        if (migrated > 0)
+          log.info(s"Migrated the project mapping ids of $migrated configs")
+        ConfigsLoaded(configs)
+      }
+    }.pipeTo(self)
+
+  private def startWorkers(config: IssueImporterConfig,
+                           selected: ProjectMappingId => Boolean): Unit =
+    workerProps(config).foreach { case (mappingId, props) =>
+      if (selected(mappingId)) {
+        val key = config.id -> mappingId
+        stopWorker(key)
+        workers += key -> context.actorOf(props)
       }
     }
-  }
 
-  private def initializeJiraPlugin()(implicit dbSession: DBSession): Unit = {
-    log.debug(
-      s"PluginHandler initializeJiraPlugin:$issueImporterConfigRepository")
-    // start jira parse scheduler for every project attached to a jira configuration
-    issueImporterConfigRepository
-      .findAllConfigs(Some(ImporterType.Jira))
-      .map { configs =>
-        log.debug(s"Got jira configs:${configs.size}")
-        configs.foreach {
-          case config: JiraConfig =>
-            log.debug(s"Start Jira Scheduler for config:$config")
-            val jiraConfig = ServiceConfiguration(config.baseUrl.toString)
-            val auth       = OAuth2Authentication(config.auth.accessToken)
+  private def stopWorker(key: WorkerKey): Unit =
+    workers.get(key).foreach { worker =>
+      context.stop(worker)
+      workers -= key
+    }
 
-            config.projects.foreach { proj =>
-              log.debug(
-                s"Start parsing for the following configuration:$jiraConfig - $proj")
-              jiraTagParseScheduler ! JiraTagParseScheduler.StartScheduler(
-                jiraConfig,
-                config.settings,
-                proj.settings,
-                auth,
-                config.id,
-                config.organisationReference.id,
-                proj.id,
-                proj.projectId)
-            }
-          case _ =>
-            log.warning(
-              s"Expected JiraConfig but got different type - should not happen")
+  /** Builds the worker of each project mapping of a config. */
+  protected def workerProps(
+      config: IssueImporterConfig): Seq[(ProjectMappingId, Props)] = {
+    val service = ServiceConfiguration(config.baseUrl.toString)
+    val owner   = config.organisationReference.id
+
+    config match {
+      case c: GitlabConfig =>
+        val auth = OAuth2Authentication(c.auth.accessToken)
+        c.projects.map { mapping =>
+          mapping.id -> GitlabTagParseWorker.props(wsClient,
+                                                   systemServices,
+                                                   service,
+                                                   c.settings,
+                                                   mapping.settings,
+                                                   auth,
+                                                   c.id,
+                                                   owner,
+                                                   mapping.projectId)
         }
-      }
-      .onComplete {
-        case Success(_) =>
-          log.debug(s"Successfully loaded jira plugins")
-        case Failure(exception) =>
-          log.warning(exception, "Failed loading jira configuration")
-      }
-    ()
-  }
 
-  private def initializeGitlabPlugin()(implicit dbSession: DBSession): Unit = {
-    log.debug(
-      s"PluginHandler initializeGitlabPlugin:$issueImporterConfigRepository")
-    // start gitlab parse scheduler for every project attached to a gitlab configuration
-    issueImporterConfigRepository
-      .findAllConfigs(Some(ImporterType.Gitlab))
-      .map { configs =>
-        log.debug(s"Got gitlab configs:${configs.size}")
-        configs.foreach {
-          case config: GitlabConfig =>
-            log.debug(s"Start Gitlab Scheduler for config:$config")
-            val serviceConfig = ServiceConfiguration(config.baseUrl.toString)
-            val auth          = OAuth2Authentication(config.auth.accessToken)
-
-            config.projects.foreach { proj =>
-              log.debug(
-                s"Start parsing for the following configuration:$serviceConfig - $proj")
-              gitlabTagParseScheduler ! GitlabTagParseScheduler.StartScheduler(
-                serviceConfig,
-                config.settings,
-                proj.settings,
-                auth,
-                config.id,
-                config.organisationReference.id,
-                proj.id,
-                proj.projectId)
-            }
-          case _ =>
-            log.warning(
-              s"Expected GitlabConfig but got different type - should not happen")
+      case c: JiraConfig =>
+        val auth = OAuth2Authentication(c.auth.accessToken)
+        c.projects.map { mapping =>
+          mapping.id -> JiraTagParseWorker.props(wsClient,
+                                                 systemServices,
+                                                 service,
+                                                 c.settings,
+                                                 mapping.settings,
+                                                 auth,
+                                                 c.id,
+                                                 owner,
+                                                 mapping.projectId)
         }
-      }
-      .onComplete {
-        case Success(_) =>
-          log.debug(s"Successfully loaded gitlab plugins")
-        case Failure(exception) =>
-          log.warning(exception, "Failed loading gitlab configuration")
-      }
-    ()
-  }
 
-  private def initializePlanePlugin()(implicit dbSession: DBSession): Unit = {
-    log.debug(
-      s"PluginHandler initializePlanePlugin:$issueImporterConfigRepository")
-    // start plane parse scheduler for every project attached to a plane configuration
-    issueImporterConfigRepository
-      .findAllConfigs(Some(ImporterType.Plane))
-      .map { configs =>
-        log.debug(s"Got plane configs:${configs.size}")
-        configs.foreach {
-          case config: PlaneConfig =>
-            log.debug(s"Start Plane Scheduler for config:$config")
-            val serviceConfig = ServiceConfiguration(config.baseUrl.toString)
-            val auth          = ApiKeyAuthentication(config.auth.apiKey)
-
-            config.projects.foreach { proj =>
-              log.debug(
-                s"Start parsing for the following configuration:$serviceConfig - $proj")
-              planeTagParseScheduler ! PlaneTagParseScheduler.StartScheduler(
-                serviceConfig,
-                config.baseUrl,
-                config.settings,
-                proj.settings,
-                auth,
-                config.id,
-                config.organisationReference.id,
-                proj.id,
-                proj.projectId)
-            }
-          case _ =>
-            log.warning(
-              s"Expected PlaneConfig but got different type - should not happen")
+      case c: PlaneConfig =>
+        val auth = ApiKeyAuthentication(c.auth.apiKey)
+        c.projects.map { mapping =>
+          mapping.id -> PlaneTagParseWorker.props(wsClient,
+                                                  systemServices,
+                                                  service,
+                                                  c.baseUrl,
+                                                  c.settings,
+                                                  mapping.settings,
+                                                  auth,
+                                                  c.id,
+                                                  owner,
+                                                  mapping.projectId)
         }
-      }
-      .onComplete {
-        case Success(_) =>
-          log.debug(s"Successfully loaded plane plugins")
-        case Failure(exception) =>
-          log.warning(exception, "Failed loading plane configuration")
-      }
-    ()
-  }
 
-  private def initializeGithubPlugin()(implicit dbSession: DBSession): Unit = {
-    log.debug(
-      s"PluginHandler initializeGithubPlugin:$issueImporterConfigRepository")
-    // start github parse scheduler for every project attached to a github configuration
-    issueImporterConfigRepository
-      .findAllConfigs(Some(ImporterType.Github))
-      .map { configs =>
-        log.debug(s"Got github configs:${configs.size}")
-        configs.foreach {
-          case config: GithubConfig =>
-            log.debug(s"Start Github Scheduler for config:$config")
-            val serviceConfig = ServiceConfiguration(config.baseUrl.toString)
-            val auth          = OAuth2Authentication(config.auth.accessToken)
-
-            config.projects.foreach { proj =>
-              log.debug(
-                s"Start parsing for the following configuration:$serviceConfig - $proj")
-              githubTagParseScheduler ! GithubTagParseScheduler.StartScheduler(
-                serviceConfig,
-                config.settings,
-                proj.settings,
-                auth,
-                config.id,
-                config.organisationReference.id,
-                proj.id,
-                proj.projectId)
-            }
-          case _ =>
-            log.warning(
-              s"Expected GithubConfig but got different type - should not happen")
+      case c: GithubConfig =>
+        val auth = OAuth2Authentication(c.auth.accessToken)
+        c.projects.map { mapping =>
+          mapping.id -> GithubTagParseWorker.props(wsClient,
+                                                   systemServices,
+                                                   service,
+                                                   c.settings,
+                                                   mapping.settings,
+                                                   auth,
+                                                   c.id,
+                                                   owner,
+                                                   mapping.projectId)
         }
-      }
-      .onComplete {
-        case Success(_) =>
-          log.debug(s"Successfully loaded github plugins")
-        case Failure(exception) =>
-          log.warning(exception, "Failed loading github configuration")
-      }
-    ()
+    }
   }
 }

@@ -26,7 +26,7 @@ import actors.IssueImporterStatusMonitor.{
   UpdateProjectSyncStats
 }
 import actors.TagCache.TagsUpdated
-import actors.scheduler.TagParseWorker.{Parse, StartParsing}
+import actors.scheduler.TagParseWorker.Parse
 import actors.scheduler.TagParseWorkerSpec.TestWorker
 import core.SystemServices
 import models._
@@ -59,13 +59,11 @@ class TagParseWorkerSpec extends Specification with Mockito {
   "A TagParseWorker" should {
     "publish the loaded tags and report a healthy sync" in new ActorTestScope {
       private val probes = new Probes()(this)
-      private val worker = system.actorOf(
+      system.actorOf(
         Props(
           new TestWorker(probes.services,
                          () => Future.successful(Set(tag)),
                          1.hour)))
-
-      worker ! StartParsing
 
       probes.tagCache.expectMsgType[TagsUpdated[SimpleTag]].tags must equalTo(
         Set(tag))
@@ -80,7 +78,7 @@ class TagParseWorkerSpec extends Specification with Mockito {
     "report a failed load with a message and load again after the frequency" in new ActorTestScope {
       private val probes = new Probes()(this)
       private val loads  = new AtomicInteger()
-      private val worker = system.actorOf(
+      system.actorOf(
         Props(
           new TestWorker(probes.services,
                          () => {
@@ -88,8 +86,6 @@ class TagParseWorkerSpec extends Specification with Mockito {
                            Future.failed(new ClosedChannelException)
                          },
                          200.millis)))
-
-      worker ! StartParsing
 
       private val stats = probes.monitor.expectMsgType[UpdateProjectSyncStats]
       stats.success must beFalse
@@ -105,7 +101,7 @@ class TagParseWorkerSpec extends Specification with Mockito {
     "report a load that throws before it returns a future, and load again" in new ActorTestScope {
       private val probes = new Probes()(this)
       private val loads  = new AtomicInteger()
-      private val worker = system.actorOf(
+      system.actorOf(
         Props(
           new TestWorker(probes.services,
                          () => {
@@ -113,8 +109,6 @@ class TagParseWorkerSpec extends Specification with Mockito {
                            throw new IllegalArgumentException("bad setting")
                          },
                          200.millis)))
-
-      worker ! StartParsing
 
       probes.monitor
         .expectMsgType[UpdateProjectSyncStats]
@@ -138,7 +132,6 @@ class TagParseWorkerSpec extends Specification with Mockito {
                          },
                          1.hour)))
 
-      worker ! StartParsing
       worker ! Parse
       worker ! Parse
       probes.tagCache.expectNoMessage(200.millis)

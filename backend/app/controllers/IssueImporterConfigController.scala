@@ -114,7 +114,7 @@ class IssueImporterConfigController @Inject() (
               userOrg.organisationReference,
               request.body,
               user.id)
-            _        <- Future.successful(startSchedulersForConfig(config))
+            _        <- Future.successful(startWorkersForConfig(config))
             response <- toResponse(config)
           } yield Created(Json.toJson(response))
         }
@@ -136,16 +136,13 @@ class IssueImporterConfigController @Inject() (
                                          userOrg.organisationReference.id)
             _ <- request.body.name.fold(success())(name =>
               validateNonBlankString("name", name))
-            // Check if changes require scheduler restart
-            needsRestart = requiresSchedulerRestart(request.body)
-            _ <- Future.successful(
-              if (needsRestart) stopSchedulersForConfig(config) else ())
             updated <- issueImporterRepository.update(configId,
                                                       request.body,
                                                       user.id)
             _ <- validateUpdatedGithubConfig(updated)
             _ <- Future.successful(
-              if (needsRestart) startSchedulersForConfig(updated) else ())
+              if (requiresWorkerRestart(request.body))
+                startWorkersForConfig(updated))
             response <- toResponse(updated)
           } yield Ok(Json.toJson(response))
         }
@@ -198,7 +195,7 @@ class IssueImporterConfigController @Inject() (
             updated <- issueImporterRepository
               .addProjectMapping(configId, request.body)
             _ <- Future.successful(lastMappingId(updated).foreach(id =>
-              startSchedulerForMapping(updated, id)))
+              startWorkerForMapping(updated, id)))
             response <- toResponse(updated)
           } yield Ok(Json.toJson(response))
         }
@@ -238,7 +235,7 @@ class IssueImporterConfigController @Inject() (
               .noneToFailed(ConfigErrorResponses.configNotFound(configId))
             _ <- validateConfigOwnership(config,
                                          userOrg.organisationReference.id)
-            _ <- Future.successful(stopSchedulerForMapping(config, mappingId))
+            _ <- Future.successful(stopWorkerForMapping(config, mappingId))
             updated <- issueImporterRepository
               .removeProjectMapping(configId, mappingId)
             response <- toResponse(updated)
@@ -311,12 +308,9 @@ class IssueImporterConfigController @Inject() (
       case Some(_) =>
         val importerType = config.importerType.value
 
-        // Trigger immediate refresh via PluginHandler
-        systemServices.pluginHandler ! PluginHandler.RefreshProjectTags(
-          config.importerType,
+        systemServices.pluginHandler ! PluginHandler.RefreshMappingTags(
           config.id,
-          mappingId
-        )
+          mappingId)
 
         Future.successful(
           Accepted(
@@ -931,38 +925,23 @@ class IssueImporterConfigController @Inject() (
     }
   }
 
-  // ===== Scheduler Management =====
+  // ===== Importer Workers =====
 
-  /** Starts schedulers for all project mappings in a config. Called after
-    * creating a new config.
+  /** Starts the workers of all mappings of a config. A start replaces a running
+    * worker of the same mapping.
     */
-  private def startSchedulersForConfig(config: IssueImporterConfig): Unit = {
-    systemServices.pluginHandler ! PluginHandler.StartConfigSchedulers(config)
-  }
+  private def startWorkersForConfig(config: IssueImporterConfig): Unit =
+    systemServices.pluginHandler ! PluginHandler.StartConfigWorkers(config)
 
-  /** Starts a scheduler for a single project mapping. Called after adding a
-    * project mapping to an existing config.
-    */
-  private def startSchedulerForMapping(config: IssueImporterConfig,
-                                       mappingId: ProjectMappingId): Unit = {
-    systemServices.pluginHandler ! PluginHandler.StartProjectScheduler(
-      config.importerType,
-      config,
-      mappingId
-    )
-  }
+  private def startWorkerForMapping(config: IssueImporterConfig,
+                                    mappingId: ProjectMappingId): Unit =
+    systemServices.pluginHandler ! PluginHandler.StartMappingWorker(config,
+                                                                    mappingId)
 
-  /** Stops scheduler for a single project mapping. Called after removing a
-    * project mapping.
-    */
-  private def stopSchedulerForMapping(config: IssueImporterConfig,
-                                      mappingId: ProjectMappingId): Unit = {
-    systemServices.pluginHandler ! PluginHandler.StopProjectScheduler(
-      config.importerType,
-      config.id,
-      mappingId
-    )
-  }
+  private def stopWorkerForMapping(config: IssueImporterConfig,
+                                   mappingId: ProjectMappingId): Unit =
+    systemServices.pluginHandler ! PluginHandler.StopMappingWorker(config.id,
+                                                                   mappingId)
 
   /** Returns the mapping ID of the last mapping in a config's projects list.
     * Used after addProjectMapping to identify the newly appended mapping.
@@ -977,22 +956,10 @@ class IssueImporterConfigController @Inject() (
     }
   }
 
-  /** Stops all schedulers for a config. Called before updating config with
-    * credential/connection changes.
+  /** A worker reads the URL, the check frequency and the credentials once, when
+    * it starts.
     */
-  private def stopSchedulersForConfig(config: IssueImporterConfig): Unit = {
-    systemServices.pluginHandler ! PluginHandler.StopConfigSchedulers(
-      config.importerType,
-      config.id
-    )
-  }
-
-  /** Determines if an update requires scheduler restart. Returns true if any of
-    * the following fields are being updated: - baseUrl (API endpoint changes) -
-    * checkFrequency (polling interval changes) - Any authentication credentials
-    * (accessToken, consumerKey, privateKey, apiKey, resourceOwner)
-    */
-  private def requiresSchedulerRestart(
+  private def requiresWorkerRestart(
       update: UpdateIssueImporterConfig): Boolean = {
     update.baseUrl.isDefined ||
     update.checkFrequency.isDefined ||

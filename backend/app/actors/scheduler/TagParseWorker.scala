@@ -38,9 +38,6 @@ import scala.util.control.NonFatal
 
 object TagParseWorker {
 
-  /** Starts the first parse of a new worker. */
-  case object StartParsing
-
   /** Starts a parse now, for example on a refresh request. */
   case object Parse
 
@@ -51,10 +48,9 @@ object TagParseWorker {
   private final case class LoadFailed(cause: Throwable)
 }
 
-/** Imports the issues of one external project as tags. The worker loads the
-  * tags, publishes them to the tag cache, reports the sync status, and parses
-  * again after `checkFrequency`. A load result comes back as a message, so all
-  * state changes happen in `receive`.
+/** Imports the issues of one external project as tags. The worker parses when
+  * it starts, also after a restart, and again after `checkFrequency`. A load
+  * result comes back as a message, so all state changes happen in `receive`.
   */
 abstract class TagParseWorker[T <: Tag: Manifest]
     extends Actor
@@ -79,14 +75,16 @@ abstract class TagParseWorker[T <: Tag: Manifest]
 
   protected implicit val executionContext: ExecutionContext = context.dispatcher
 
+  override def preStart(): Unit = self ! Parse
+
   override def receive: Receive = idle
 
-  private def idle: Receive = { case StartParsing | Parse =>
+  private def idle: Receive = { case Parse =>
     startParse()
   }
 
   private def parsing: Receive = {
-    case StartParsing | Parse =>
+    case Parse =>
       log.debug(s"A parse of $externalProjectId runs already")
 
     // Only this worker sends TagsLoaded, so the tags are of type T.
