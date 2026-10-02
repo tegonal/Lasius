@@ -168,16 +168,16 @@ class UserMongoRepository @Inject() (
     val sel = userSelection(userReference)
 
     for {
-      _ <- validate(
-        personalData.lastName.isDefined || personalData.firstName.isDefined,
-        s"At least one field needs to be defined as update for user: ${userReference.key}"
-      )
       current <- findByUserReference(userReference).noneToFailed(
         s"Could not find user with id ${userReference.key}")
       // The sign-in finds the user by email. A changed email gives the account to the person who
       // signs in with the new address, and it locks out the owner.
       _ <- validate(personalData.email.forall(_ == current.email),
                     "email_read_only")
+      _ <- validate(
+        personalData.lastName.isDefined || personalData.firstName.isDefined,
+        s"At least one field needs to be defined as update for user: ${userReference.key}"
+      )
       result <- updateFields(
         sel,
         Seq[Option[(String, JsValueWrapper)]](

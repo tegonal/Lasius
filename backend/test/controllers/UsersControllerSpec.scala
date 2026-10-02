@@ -94,6 +94,29 @@ class UsersControllerSpec
       contentAsString(result) must equalTo("email_read_only")
     }
 
+    "badrequest if only the email changes" in new WithTestApplication {
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      private val systemServices: SystemServices      = inject[SystemServices]
+      private val authConfig: AuthConfig              = inject[AuthConfig]
+      private val controller: UsersController with SecurityControllerMock =
+        UsersControllerMock(config,
+                            systemServices,
+                            authConfig,
+                            reactiveMongoApi)
+
+      private val request: FakeRequest[PersonalDataUpdate] = FakeRequest()
+        .withBody(
+          PersonalDataUpdate(
+            email = Some("new-address@test.com"),
+            firstName = None,
+            lastName = None
+          ))
+      val result: Future[Result] = controller.updatePersonalData()(request)
+
+      status(result) must equalTo(BAD_REQUEST)
+      contentAsString(result) must equalTo("email_read_only")
+    }
+
     "badrequest if the email changes to the address of another user" in new WithTestApplication {
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
