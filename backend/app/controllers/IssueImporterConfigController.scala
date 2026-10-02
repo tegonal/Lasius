@@ -23,6 +23,7 @@ package controllers
 
 import com.typesafe.config.Config
 import controllers.errors.ConfigErrorResponses
+import actors.IssueImporterStatusMonitor
 import core.{PluginHandler, SystemServices}
 import models._
 import play.api.libs.json.Json
@@ -247,6 +248,8 @@ class IssueImporterConfigController @Inject() (
               .flatMap {
                 case Some(updated) =>
                   stopWorkerForMapping(updated, mappingId)
+                  systemServices.issueImporterStatusMonitor ! IssueImporterStatusMonitor
+                    .ProjectMappingRemoved(configId, orgId)
                   toResponse(updated).map(response => Ok(Json.toJson(response)))
                 case None =>
                   Future.successful(NotFound(

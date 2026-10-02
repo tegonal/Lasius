@@ -51,14 +51,23 @@ class IssueImporterStatusMonitorSpec
   private val organisationId = OrganisationId()
   private val project        = ProjectId()
 
-  private def planeConfig(): PlaneConfig = PlaneConfig(
+  /** A config that maps each of the projects, by default the one project. */
+  private def planeConfig(mapped: ProjectId*): PlaneConfig = PlaneConfig(
     id = IssueImporterConfigId(),
     organisationReference = EntityReference(organisationId, "org"),
     name = "Plane",
     baseUrl = URI.create("https://plane.example.com").toURL,
     auth = PlaneAuth("key"),
     settings = PlaneSettings(checkFrequency = 300000L, workspace = "ws"),
-    projects = Seq.empty,
+    projects = (if (mapped.isEmpty) Seq(project) else mapped).map(projectId =>
+      PlaneProjectMapping(
+        projectId = projectId,
+        settings =
+          PlaneProjectSettings(planeProjectId = s"plane-${projectId.value}",
+                               tagConfiguration =
+                                 PlaneTagConfiguration(useLabels = false,
+                                                       labelFilter = Set.empty))
+      )),
     audit = AuditInfo.initial(UserId())
   )
 
@@ -152,9 +161,9 @@ class IssueImporterStatusMonitorSpec
     }
 
     "apply each result to the status that the previous result wrote" in new ActorTestScope {
-      private val stored      = new StoredConfig(planeConfig())
-      private val config      = stored.config.get()
       private val second      = ProjectId()
+      private val stored      = new StoredConfig(planeConfig(project, second))
+      private val config      = stored.config.get()
       private val statusActor = monitor(this, stored.repository)
 
       statusActor ! result(config, success = true)
@@ -163,6 +172,35 @@ class IssueImporterStatusMonitorSpec
       awaitAssert(stored.syncStatus.projectStats.map(_.projectId) must
                     containTheSameElementsAs(Seq(project, second)),
                   3.seconds)
+    }
+
+    "drop the statistics of a removed mapping and its late result" in new ActorTestScope {
+      private val removed     = ProjectId()
+      private val stored      = new StoredConfig(planeConfig(project, removed))
+      private val statusActor = monitor(this, stored.repository)
+
+      statusActor ! result(stored.config.get(), removed, success = false)
+      awaitAssert(stored.syncStatus.connectivityStatus must equalTo(
+                    ConnectivityStatus.Degraded),
+                  3.seconds)
+
+      stored.config.updateAndGet {
+        case c: PlaneConfig =>
+          c.copy(projects = c.projects.filterNot(_.projectId == removed))
+        case c => c
+      }
+      statusActor ! IssueImporterStatusMonitor.ProjectMappingRemoved(
+        stored.config.get().id,
+        organisationId)
+      statusActor ! result(stored.config.get(), removed, success = false)
+      statusActor ! result(stored.config.get(), success = true)
+
+      awaitAssert(
+        (stored.syncStatus.connectivityStatus,
+         stored.syncStatus.projectStats.map(_.projectId)) must equalTo(
+          (ConnectivityStatus.Healthy, Seq(project))),
+        3.seconds
+      )
     }
 
     "report Degraded after one failure and Failed from the failure threshold on" in new ActorTestScope {

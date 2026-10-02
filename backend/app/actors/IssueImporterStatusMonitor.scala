@@ -58,6 +58,10 @@ object IssueImporterStatusMonitor {
       error: Option[ConnectivityIssue] = None
   )
 
+  /** Drops the statistics of projects that the config no longer maps. */
+  final case class ProjectMappingRemoved(configId: IssueImporterConfigId,
+                                         organisationId: OrganisationId)
+
   private case object SyncStatusWritten
 }
 
@@ -84,8 +88,14 @@ class IssueImporterStatusMonitor(
 
   val receive: Receive = idle
 
-  private def idle: Receive = { case result: UpdateProjectSyncStats =>
-    writeSyncStatus(result)
+  private def idle: Receive = {
+    case result: UpdateProjectSyncStats =>
+      writeSyncStatus(result.configId, result.organisationId)(
+        withProjectResult(_, result))
+
+    case ProjectMappingRemoved(configId, organisationId) =>
+      writeSyncStatus(configId, organisationId)(config =>
+        summarized(config, config.syncStatus.projectStats))
   }
 
   /** Holds the next result until the current write completes, because each
@@ -98,16 +108,17 @@ class IssueImporterStatusMonitor(
     case _ => stash()
   }
 
-  private def writeSyncStatus(result: UpdateProjectSyncStats): Unit = {
-    val configId = result.configId
+  private def writeSyncStatus(configId: IssueImporterConfigId,
+                              organisationId: OrganisationId)(
+      update: IssueImporterConfig => ConfigSyncStatus): Unit = {
     withDBSession() { implicit dbSession =>
       repository.findById(configId).flatMap {
         case Some(config) =>
-          val syncStatus = withProjectResult(config.syncStatus, result)
+          val syncStatus = update(config)
           repository.updateSyncStatus(configId, syncStatus).flatMap {
             case true
                 if syncStatus.connectivityStatus != config.syncStatus.connectivityStatus =>
-              notifyAdministrators(config, syncStatus, result.organisationId)
+              notifyAdministrators(config, syncStatus, organisationId)
             case _ => Future.unit
           }
 
@@ -122,16 +133,14 @@ class IssueImporterStatusMonitor(
     context.become(writing)
   }
 
-  /** Applies one sync result. A config without failed syncs is Healthy. Below
-    * the failure threshold of the circuit breaker it is Degraded, and from the
-    * threshold on it is Failed.
+  /** Applies one sync result. A late result of a removed mapping only drops its
+    * old statistics.
     */
   private def withProjectResult(
-      current: ConfigSyncStatus,
+      config: IssueImporterConfig,
       result: UpdateProjectSyncStats): ConfigSyncStatus = {
-    val circuitBreaker =
-      systemServices.lasiusConfig.issueImporters.circuitBreaker
-    val now = DateTime.now
+    val current = config.syncStatus
+    val now     = DateTime.now
 
     val projectStats =
       current.projectStats.find(_.projectId == result.projectId) match {
@@ -161,31 +170,46 @@ class IssueImporterStatusMonitor(
           )
       }
 
-    val allProjectStats =
+    summarized(
+      config,
       current.projectStats.filterNot(_.projectId == result.projectId) :+
-        projectStats
-    val maxFailures =
+        projectStats)
+      .copy(lastConnectivityCheck = Some(now))
+  }
+
+  /** Derives the config status from the statistics of the mapped projects. A
+    * config without failed syncs is Healthy. Below the failure threshold of the
+    * circuit breaker it is Degraded, and from the threshold on it is Failed.
+    */
+  private def summarized(
+      config: IssueImporterConfig,
+      projectStats: Seq[ProjectSyncStats]): ConfigSyncStatus = {
+    val circuitBreaker =
+      systemServices.lasiusConfig.issueImporters.circuitBreaker
+    val mappedProjects  = config.projects.map(_.projectId).toSet
+    val allProjectStats = projectStats.filter(s => mappedProjects(s.projectId))
+    val maxFailures     =
       allProjectStats.map(_.consecutiveFailures).maxOption.getOrElse(0)
     val backoffMillis = circuitBreaker.calculateBackoffMillis(maxFailures)
 
-    current.copy(
+    config.syncStatus.copy(
       connectivityStatus =
-        if (maxFailures == 0) ConnectivityStatus.Healthy
+        if (allProjectStats.isEmpty) ConnectivityStatus.Unknown
+        else if (maxFailures == 0) ConnectivityStatus.Healthy
         else if (circuitBreaker.isCircuitOpen(maxFailures))
           ConnectivityStatus.Failed
         else ConnectivityStatus.Degraded,
-      lastConnectivityCheck = Some(now),
       currentIssue = allProjectStats
         .filter(_.consecutiveFailures > 0)
         .flatMap(_.lastError)
         .maxByOption(_.timestamp.getMillis),
       projectStats = allProjectStats,
-      totalProjectsMapped = allProjectStats.size,
+      totalProjectsMapped = config.projects.size,
       totalIssuesSynced = allProjectStats.map(_.totalIssuesSynced.toLong).sum,
       lastSuccessfulSync =
         allProjectStats.flatMap(_.lastSyncAt).maxByOption(_.getMillis),
-      nextScheduledSync =
-        Option.when(backoffMillis > 0)(now.plusMillis(backoffMillis.toInt))
+      nextScheduledSync = Option.when(backoffMillis > 0)(
+        DateTime.now.plusMillis(backoffMillis.toInt))
     )
   }
 
