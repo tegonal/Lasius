@@ -153,12 +153,10 @@ class DefaultAuthConfig @Inject() (
       case None       =>
         for {
           // A failed user check after the organisation write left an organisation that blocked every later sign-in.
-          _ <- userRepository.validateCreate(userInfo)
-          // Create new private organisation
+          _      <- userRepository.validateCreate(userInfo)
           newOrg <- organisationRepository.create(
             userInfo.key,
             `private` = true)(systemServices.systemSubject, dbSession)
-          // Create new user and assign to private organisation
           user <- userRepository.createInitialUserBasedOnProfile(
             userInfo,
             newOrg,

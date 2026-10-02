@@ -97,31 +97,6 @@ case class AccessRestrictionConfig(
   def canAccess(email: String): Boolean = email.matches(emailRegex)
 }
 
-/** Hides the value of every credential field in `toString`. Debug logs print
-  * the issuer configs and the importer credentials.
-  */
-trait RedactedSecrets { self: Product =>
-  override def toString: String =
-    productElementNames
-      .zip(productIterator)
-      .map {
-        case (name, _) if RedactedSecrets.secretFields(name) =>
-          s"$name=<redacted>"
-        case (name, value) => s"$name=$value"
-      }
-      .mkString(s"$productPrefix(", ",", ")")
-}
-
-object RedactedSecrets {
-  private val secretFields = Set("accessToken",
-                                 "apiKey",
-                                 "clientSecret",
-                                 "password",
-                                 "privateKey",
-                                 "token",
-                                 "tokenSecret")
-}
-
 case class InternalOauth2ProviderConfig(
     enabled: Boolean,
     allowRegisterUsers: Boolean,
