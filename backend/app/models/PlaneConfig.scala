@@ -50,7 +50,9 @@ case class PlaneProjectMapping(
     id: ProjectMappingId = ProjectMappingId(),
     projectId: ProjectId,
     settings: PlaneProjectSettings
-)
+) extends ProjectMapping {
+  def externalProjectId: String = settings.planeProjectId
+}
 
 case class PlaneAuth(apiKey: String) extends RedactedSecrets
 

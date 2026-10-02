@@ -44,6 +44,10 @@ trait IssueImporterConfig extends BaseEntity[IssueImporterConfigId] {
   def baseUrl: URL
   def checkFrequency: Long
   def syncStatus: ConfigSyncStatus
+  def projects: Seq[ProjectMapping]
+
+  def mapping(mappingId: ProjectMappingId): Option[ProjectMapping] =
+    projects.find(_.id == mappingId)
 }
 
 object IssueImporterConfig {

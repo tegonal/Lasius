@@ -53,7 +53,10 @@ case class GithubProjectMapping(
     id: ProjectMappingId = ProjectMappingId(),
     projectId: ProjectId,
     settings: GithubProjectSettings
-)
+) extends ProjectMapping {
+  def externalProjectId: String =
+    s"${settings.githubRepoOwner}/${settings.githubRepoName}"
+}
 
 case class GithubAuth(
     accessToken: String,

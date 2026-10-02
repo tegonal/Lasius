@@ -40,7 +40,9 @@ case class JiraProjectMapping(
     id: ProjectMappingId = ProjectMappingId(),
     projectId: ProjectId,
     settings: JiraProjectSettings
-)
+) extends ProjectMapping {
+  def externalProjectId: String = settings.jiraProjectKey
+}
 
 case class JiraAuth(
     consumerKey: String,

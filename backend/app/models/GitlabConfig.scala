@@ -51,7 +51,9 @@ case class GitlabProjectMapping(
     id: ProjectMappingId = ProjectMappingId(),
     projectId: ProjectId,
     settings: GitlabProjectSettings
-)
+) extends ProjectMapping {
+  def externalProjectId: String = settings.gitlabProjectId
+}
 
 case class GitlabAuth(accessToken: String) extends RedactedSecrets
 

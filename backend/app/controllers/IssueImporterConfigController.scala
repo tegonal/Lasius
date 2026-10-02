@@ -296,15 +296,7 @@ class IssueImporterConfigController @Inject() (
   private def triggerRefreshForMapping(
       config: IssueImporterConfig,
       mappingId: ProjectMappingId): Future[Result] = {
-    // Find the project mapping by mapping ID
-    val projectMappingOpt = config match {
-      case c: GitlabConfig => c.projects.find(_.id == mappingId)
-      case c: JiraConfig   => c.projects.find(_.id == mappingId)
-      case c: PlaneConfig  => c.projects.find(_.id == mappingId)
-      case c: GithubConfig => c.projects.find(_.id == mappingId)
-    }
-
-    projectMappingOpt match {
+    config.mapping(mappingId) match {
       case Some(_) =>
         val importerType = config.importerType.value
 
@@ -650,14 +642,7 @@ class IssueImporterConfigController @Inject() (
     */
   private def validateNoProjectDependencies(
       config: IssueImporterConfig): Future[Result] = {
-    val projectCount = config match {
-      case c: GitlabConfig => c.projects.size
-      case c: JiraConfig   => c.projects.size
-      case c: PlaneConfig  => c.projects.size
-      case c: GithubConfig => c.projects.size
-    }
-
-    if (projectCount > 0) {
+    if (config.projects.nonEmpty) {
       Future.failed(
         new IllegalStateException(ConfigErrorResponses.hasDependencies(config)))
     } else {
@@ -947,14 +932,8 @@ class IssueImporterConfigController @Inject() (
     * Used after addProjectMapping to identify the newly appended mapping.
     */
   private def lastMappingId(
-      config: IssueImporterConfig): Option[ProjectMappingId] = {
-    config match {
-      case c: GitlabConfig => c.projects.lastOption.map(_.id)
-      case c: JiraConfig   => c.projects.lastOption.map(_.id)
-      case c: PlaneConfig  => c.projects.lastOption.map(_.id)
-      case c: GithubConfig => c.projects.lastOption.map(_.id)
-    }
-  }
+      config: IssueImporterConfig): Option[ProjectMappingId] =
+    config.projects.lastOption.map(_.id)
 
   /** A worker reads the URL, the check frequency and the credentials once, when
     * it starts.

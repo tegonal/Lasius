@@ -59,30 +59,15 @@ object ConfigErrorResponses {
   }
 
   /** Config has project dependencies and cannot be deleted (500). */
-  def hasDependencies(config: IssueImporterConfig): String = {
-    val projectCount = config match {
-      case c: GitlabConfig => c.projects.size
-      case c: JiraConfig   => c.projects.size
-      case c: PlaneConfig  => c.projects.size
-      case c: GithubConfig => c.projects.size
-    }
-
-    val projectIds = config match {
-      case c: GitlabConfig => c.projects.map(_.projectId.value).mkString(", ")
-      case c: JiraConfig   => c.projects.map(_.projectId.value).mkString(", ")
-      case c: PlaneConfig  => c.projects.map(_.projectId.value).mkString(", ")
-      case c: GithubConfig => c.projects.map(_.projectId.value).mkString(", ")
-    }
-
+  def hasDependencies(config: IssueImporterConfig): String =
     Json.stringify(
       Json.obj(
         "error" -> "has_dependencies",
         "message" -> "Cannot delete configuration that still has project mappings. Remove all project mappings first.",
         "configId"     -> config.id.value.toString,
-        "projectCount" -> projectCount,
-        "projectIds"   -> projectIds
+        "projectCount" -> config.projects.size,
+        "projectIds"   -> config.projects.map(_.projectId.value).mkString(", ")
       ))
-  }
 
   /** Validation failed for config creation/update. */
   def validationFailed(field: String,
