@@ -21,6 +21,7 @@
 
 package core
 
+import actors.TagCache
 import actors.scheduler.TagParseWorker
 import core.PluginHandler._
 import core.PluginHandlerSpec._
@@ -35,6 +36,7 @@ import play.modules.reactivemongo.ReactiveMongoApi
 import repositories.{IssueImporterConfigRepository, UserRepository}
 
 import java.net.URI
+import scala.concurrent.duration.DurationInt
 
 class PluginHandlerSpec extends Specification with Mockito {
 
@@ -63,20 +65,28 @@ class PluginHandlerSpec extends Specification with Mockito {
   )
 
   /** A plugin handler whose workers report to the probe. */
-  private def pluginHandler(scope: ActorTestScope, probe: TestProbe): ActorRef =
+  private def pluginHandler(scope: ActorTestScope,
+                            probe: TestProbe,
+                            tagCache: TestProbe): ActorRef = {
+    val systemServices = mock[SystemServices]
+    systemServices.tagCache.returns(tagCache.ref)
     scope.system.actorOf(
       Props(
         new PluginHandler(mock[UserRepository],
                           mock[IssueImporterConfigRepository],
-                          mock[SystemServices],
+                          systemServices,
                           mock[WSClient],
                           mock[LasiusConfig],
                           mock[ReactiveMongoApi]) {
           override protected def workerProps(
-              config: IssueImporterConfig): Seq[(ProjectMappingId, Props)] =
-            Seq(first, second).map(id =>
-              id -> Props(classOf[ProbeWorker], probe.ref, id))
+              config: IssueImporterConfig): Seq[(ProjectMapping, Props)] =
+            config.projects.map(mapping =>
+              mapping -> Props(classOf[ProbeWorker], probe.ref, mapping.id))
         }))
+  }
+
+  private def pluginHandler(scope: ActorTestScope, probe: TestProbe): ActorRef =
+    pluginHandler(scope, probe, TestProbe()(scope.system))
 
   "PluginHandler" should {
     "start one worker for each mapping of a config" in new ActorTestScope {
@@ -91,9 +101,10 @@ class PluginHandlerSpec extends Specification with Mockito {
         .toSet must equalTo(Set(first, second))
     }
 
-    "replace the running worker when a mapping starts again" in new ActorTestScope {
-      private val probe   = TestProbe()
-      private val handler = pluginHandler(this, probe)
+    "replace the running worker and keep its tags when a mapping starts again" in new ActorTestScope {
+      private val probe    = TestProbe()
+      private val tagCache = TestProbe()
+      private val handler  = pluginHandler(this, probe, tagCache)
 
       handler ! StartMappingWorker(config, first)
       private val running = probe.expectMsgType[Started].worker
@@ -103,31 +114,38 @@ class PluginHandlerSpec extends Specification with Mockito {
       events must contain(Stopped(first, running))
       events.collect { case Started(`first`, worker) => worker } must
         haveSize[Seq[ActorRef]](1).and(not(contain(running)))
+      tagCache.expectNoMessage(200.millis)
     }
 
-    "stop the worker of a mapping" in new ActorTestScope {
-      private val probe   = TestProbe()
-      private val handler = pluginHandler(this, probe)
+    "remove the tags of a mapping that points to another external project" in new ActorTestScope {
+      private val probe    = TestProbe()
+      private val tagCache = TestProbe()
+      private val handler  = pluginHandler(this, probe, tagCache)
+      private val previous = config.projects.head
+      private val moved    = previous.copy(settings =
+        previous.settings.copy(planeProjectId = "another-plane-project"))
+
+      handler ! StartMappingWorker(config, first)
+      probe.expectMsgType[Started]
+      handler ! StartMappingWorker(config.copy(projects = Seq(moved)), first)
+
+      tagCache.expectMsg(
+        TagCache.RemoveTags(previous.projectId, previous.externalProjectId))
+    }
+
+    "stop the worker of a removed mapping and remove its tags" in new ActorTestScope {
+      private val probe    = TestProbe()
+      private val tagCache = TestProbe()
+      private val handler  = pluginHandler(this, probe, tagCache)
 
       handler ! StartMappingWorker(config, first)
       private val running = probe.expectMsgType[Started].worker
       handler ! StopMappingWorker(config.id, first)
 
       probe.expectMsg(Stopped(first, running))
-    }
-
-    "stop the workers of a config" in new ActorTestScope {
-      private val probe   = TestProbe()
-      private val handler = pluginHandler(this, probe)
-
-      handler ! StartConfigWorkers(config)
-      probe.receiveN(2)
-      handler ! StopConfigWorkers(config.id)
-
-      probe
-        .receiveN(2)
-        .collect { case Stopped(id, _) => id }
-        .toSet must equalTo(Set(first, second))
+      tagCache.expectMsg(
+        TagCache.RemoveTags(config.projects.head.projectId,
+                            config.projects.head.externalProjectId))
     }
 
     "send a parse request to the worker of a refreshed mapping" in new ActorTestScope {

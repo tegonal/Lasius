@@ -31,6 +31,7 @@ import actors.scheduler.{
   ServiceConfiguration,
   TagParseWorker
 }
+import actors.TagCache
 import core.LoginHandler.InitializeUserViews
 import models._
 import org.apache.pekko.actor.SupervisorStrategy.Restart
@@ -75,15 +76,17 @@ object PluginHandler {
     */
   final case class StartConfigWorkers(config: IssueImporterConfig)
 
+  /** Stops the worker of a removed mapping and removes its cached tags. */
   final case class StopMappingWorker(configId: IssueImporterConfigId,
                                      mappingId: ProjectMappingId)
-
-  final case class StopConfigWorkers(configId: IssueImporterConfigId)
 
   final case class RefreshMappingTags(configId: IssueImporterConfigId,
                                       mappingId: ProjectMappingId)
 
   private final case class ConfigsLoaded(configs: Seq[IssueImporterConfig])
+
+  private final case class RunningWorker(worker: ActorRef,
+                                         mapping: ProjectMapping)
 
   private type WorkerKey = (IssueImporterConfigId, ProjectMappingId)
 }
@@ -108,7 +111,7 @@ class PluginHandler(
   private implicit val executionContext: ExecutionContextExecutor =
     context.dispatcher
 
-  private var workers: Map[WorkerKey, ActorRef] = Map.empty
+  private var workers: Map[WorkerKey, RunningWorker] = Map.empty
 
   override val supervisorStrategy: OneForOneStrategy =
     OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1.minute) {
@@ -120,8 +123,10 @@ class PluginHandler(
       initializeUserViews()
       loadConfigs()
 
+    // A mapping that a request started during the load has newer settings.
     case ConfigsLoaded(configs) =>
-      configs.foreach(startWorkers(_, _ => true))
+      configs.foreach(config =>
+        startWorkers(config, id => !workers.contains(config.id -> id)))
 
     case Status.Failure(cause) =>
       log.error(
@@ -135,17 +140,23 @@ class PluginHandler(
       startWorkers(config, _ => true)
 
     case StopMappingWorker(configId, mappingId) =>
-      stopWorker(configId -> mappingId)
-
-    case StopConfigWorkers(configId) =>
-      workers.keys.filter(_._1 == configId).foreach(stopWorker)
+      workers.get(configId -> mappingId).foreach { running =>
+        stopWorker(configId -> mappingId)
+        removeTags(running.mapping)
+      }
 
     case RefreshMappingTags(configId, mappingId) =>
       workers.get(configId -> mappingId) match {
-        case Some(worker) => worker ! TagParseWorker.Parse
-        case None         =>
+        case Some(running) => running.worker ! TagParseWorker.Parse
+        case None          =>
           log.warning(
             s"No worker runs for mapping $mappingId of config $configId")
+      }
+
+    // The supervisor stops a worker that fails too often.
+    case Terminated(worker) =>
+      workers = workers.filterNot { case (_, running) =>
+        running.worker == worker
       }
   }
 
@@ -171,25 +182,41 @@ class PluginHandler(
       }
     }.pipeTo(self)
 
+  /** Replaces the worker of each selected mapping. The cached tags stay while
+    * the new worker loads, unless the mapping points to another project now.
+    */
   private def startWorkers(config: IssueImporterConfig,
                            selected: ProjectMappingId => Boolean): Unit =
-    workerProps(config).foreach { case (mappingId, props) =>
-      if (selected(mappingId)) {
-        val key = config.id -> mappingId
-        stopWorker(key)
-        workers += key -> context.actorOf(props)
+    workerProps(config).foreach { case (mapping, props) =>
+      if (selected(mapping.id)) {
+        val key = config.id -> mapping.id
+        workers.get(key).foreach { previous =>
+          stopWorker(key)
+          if (!isSamePair(previous.mapping, mapping))
+            removeTags(previous.mapping)
+        }
+        val worker = context.watch(context.actorOf(props))
+        workers += key -> RunningWorker(worker, mapping)
       }
     }
 
   private def stopWorker(key: WorkerKey): Unit =
-    workers.get(key).foreach { worker =>
-      context.stop(worker)
+    workers.get(key).foreach { running =>
+      context.unwatch(running.worker)
+      context.stop(running.worker)
       workers -= key
     }
 
+  private def removeTags(mapping: ProjectMapping): Unit =
+    systemServices.tagCache ! TagCache.RemoveTags(mapping.projectId,
+                                                  mapping.externalProjectId)
+
+  private def isSamePair(a: ProjectMapping, b: ProjectMapping): Boolean =
+    a.projectId == b.projectId && a.externalProjectId == b.externalProjectId
+
   /** Builds the worker of each project mapping of a config. */
   protected def workerProps(
-      config: IssueImporterConfig): Seq[(ProjectMappingId, Props)] = {
+      config: IssueImporterConfig): Seq[(ProjectMapping, Props)] = {
     val service = ServiceConfiguration(config.baseUrl.toString)
     val owner   = config.organisationReference.id
 
@@ -197,58 +224,58 @@ class PluginHandler(
       case c: GitlabConfig =>
         val auth = OAuth2Authentication(c.auth.accessToken)
         c.projects.map { mapping =>
-          mapping.id -> GitlabTagParseWorker.props(wsClient,
-                                                   systemServices,
-                                                   service,
-                                                   c.settings,
-                                                   mapping.settings,
-                                                   auth,
-                                                   c.id,
-                                                   owner,
-                                                   mapping.projectId)
+          mapping -> GitlabTagParseWorker.props(wsClient,
+                                                systemServices,
+                                                service,
+                                                c.settings,
+                                                mapping.settings,
+                                                auth,
+                                                c.id,
+                                                owner,
+                                                mapping.projectId)
         }
 
       case c: JiraConfig =>
         val auth = OAuth2Authentication(c.auth.accessToken)
         c.projects.map { mapping =>
-          mapping.id -> JiraTagParseWorker.props(wsClient,
-                                                 systemServices,
-                                                 service,
-                                                 c.settings,
-                                                 mapping.settings,
-                                                 auth,
-                                                 c.id,
-                                                 owner,
-                                                 mapping.projectId)
+          mapping -> JiraTagParseWorker.props(wsClient,
+                                              systemServices,
+                                              service,
+                                              c.settings,
+                                              mapping.settings,
+                                              auth,
+                                              c.id,
+                                              owner,
+                                              mapping.projectId)
         }
 
       case c: PlaneConfig =>
         val auth = ApiKeyAuthentication(c.auth.apiKey)
         c.projects.map { mapping =>
-          mapping.id -> PlaneTagParseWorker.props(wsClient,
-                                                  systemServices,
-                                                  service,
-                                                  c.baseUrl,
-                                                  c.settings,
-                                                  mapping.settings,
-                                                  auth,
-                                                  c.id,
-                                                  owner,
-                                                  mapping.projectId)
+          mapping -> PlaneTagParseWorker.props(wsClient,
+                                               systemServices,
+                                               service,
+                                               c.baseUrl,
+                                               c.settings,
+                                               mapping.settings,
+                                               auth,
+                                               c.id,
+                                               owner,
+                                               mapping.projectId)
         }
 
       case c: GithubConfig =>
         val auth = OAuth2Authentication(c.auth.accessToken)
         c.projects.map { mapping =>
-          mapping.id -> GithubTagParseWorker.props(wsClient,
-                                                   systemServices,
-                                                   service,
-                                                   c.settings,
-                                                   mapping.settings,
-                                                   auth,
-                                                   c.id,
-                                                   owner,
-                                                   mapping.projectId)
+          mapping -> GithubTagParseWorker.props(wsClient,
+                                                systemServices,
+                                                service,
+                                                c.settings,
+                                                mapping.settings,
+                                                auth,
+                                                c.id,
+                                                owner,
+                                                mapping.projectId)
         }
     }
   }

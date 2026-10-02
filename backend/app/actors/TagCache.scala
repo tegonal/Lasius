@@ -36,15 +36,16 @@ object TagCache {
     val manifest: Manifest[X] = m
   }
 
-  def props: Props = Props(classOf[TagCache])
+  /** Removes the tags of an external project from a Lasius project, after its
+    * mapping is removed or points to another external project.
+    */
+  final case class RemoveTags(projectId: ProjectId, externalProjectId: String)
 
-  private final case class WorkerTags(worker: ActorRef, tags: Set[Tag])
+  def props: Props = Props(classOf[TagCache])
 }
 
 /** Holds the imported issue tags of each Lasius project in memory. Clients read
-  * them through the tag endpoint; the cache sends no notification. The tags of
-  * a worker go when the worker stops, so a removed or changed mapping leaves no
-  * old tags.
+  * them through the tag endpoint; the cache sends no notification.
   */
 class TagCache extends Actor with ActorLogging {
 
@@ -52,20 +53,20 @@ class TagCache extends Actor with ActorLogging {
 
   /** Tags by Lasius project, by external project, and by tag type. */
   private var tagCache
-      : Map[ProjectId, Map[String, Map[Manifest[_], WorkerTags]]] =
+      : Map[ProjectId, Map[String, Map[Manifest[_], Set[Tag]]]] =
     Map.empty
 
   val receive: Receive = {
     case update @ TagsUpdated(externalProjectId, projectId, tags) =>
-      val worker = sender()
-      if (worker != context.system.deadLetters) context.watch(worker)
-      updateTags(WorkerTags(worker, tags.toSet[Tag]),
-                 update.manifest,
-                 externalProjectId,
-                 projectId)
+      updateTags(update.manifest, externalProjectId, projectId, tags.toSet[Tag])
 
-    case Terminated(worker) =>
-      removeTagsOf(worker)
+    case RemoveTags(projectId, externalProjectId) =>
+      tagCache.get(projectId).foreach { projectTags =>
+        val kept = projectTags - externalProjectId
+        tagCache =
+          if (kept.isEmpty) tagCache - projectId
+          else tagCache + (projectId -> kept)
+      }
 
     case GetTags(projectId) =>
       val projectTags =
@@ -73,38 +74,24 @@ class TagCache extends Actor with ActorLogging {
           .getOrElse(projectId, Map.empty)
           .values
           .flatMap(_.values)
-          .flatMap(_.tags)
+          .flatten
       sender() ! CachedTags(projectId, projectTags.toSet)
   }
 
-  private def updateTags(update: WorkerTags,
-                         tagType: Manifest[_],
+  private def updateTags(tagType: Manifest[_],
                          externalProjectId: String,
-                         projectId: ProjectId): Unit = {
+                         projectId: ProjectId,
+                         tags: Set[Tag]): Unit = {
     val projectTags  = tagCache.getOrElse(projectId, Map.empty)
     val externalTags = projectTags.getOrElse(externalProjectId, Map.empty)
-    val current      = externalTags.get(tagType)
+    val current      = externalTags.getOrElse(tagType, Set.empty)
 
-    // A new worker of the same mapping takes over the entry, also with equal
-    // tags, so the stop of the old worker does not remove it.
-    if (!current.contains(update)) {
-      val currentTags = current.fold(Set.empty[Tag])(_.tags)
-      if (log.isDebugEnabled && currentTags != update.tags)
+    if (current != tags) {
+      if (log.isDebugEnabled)
         log.debug(
-          s"TagCache updated for project $projectId: removed=${(currentTags -- update.tags).size}, added=${(update.tags -- currentTags).size}")
+          s"TagCache updated for project $projectId: removed=${(current -- tags).size}, added=${(tags -- current).size}")
       tagCache += projectId ->
-        (projectTags + (externalProjectId -> (externalTags + (tagType -> update))))
+        (projectTags + (externalProjectId -> (externalTags + (tagType -> tags))))
     }
   }
-
-  private def removeTagsOf(worker: ActorRef): Unit =
-    tagCache = tagCache.flatMap { case (projectId, externalTags) =>
-      val kept = externalTags.flatMap { case (externalProjectId, typedTags) =>
-        val keptTypes = typedTags.filter { case (_, entry) =>
-          entry.worker != worker
-        }
-        Option.when(keptTypes.nonEmpty)(externalProjectId -> keptTypes)
-      }
-      Option.when(kept.nonEmpty)(projectId -> kept)
-    }
 }
