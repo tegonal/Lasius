@@ -21,10 +21,7 @@
 
 package actors.scheduler
 
-import actors.IssueImporterStatusMonitor.{
-  UpdateConnectivityStatus,
-  UpdateProjectSyncStats
-}
+import actors.IssueImporterStatusMonitor.UpdateProjectSyncStats
 import actors.TagCache.TagsUpdated
 import core.SystemServices
 import models._
@@ -122,12 +119,6 @@ abstract class TagParseWorker[T <: Tag: Manifest]
       issueCount = tags.size,
       success = true
     )
-    systemServices.issueImporterStatusMonitor ! UpdateConnectivityStatus(
-      configId = configId,
-      organisationId = organisationId,
-      status = ConnectivityStatus.Healthy,
-      issue = None
-    )
   }
 
   private def reportFailure(cause: Throwable): Unit = {
@@ -142,12 +133,6 @@ abstract class TagParseWorker[T <: Tag: Manifest]
       issueCount = 0,
       success = false,
       error = Some(issue)
-    )
-    systemServices.issueImporterStatusMonitor ! UpdateConnectivityStatus(
-      configId = configId,
-      organisationId = organisationId,
-      status = ConnectivityStatus.Failed,
-      issue = Some(issue)
     )
   }
 }

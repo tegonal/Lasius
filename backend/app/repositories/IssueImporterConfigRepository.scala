@@ -84,7 +84,7 @@ trait IssueImporterConfigRepository
       dbSession: DBSession): Future[Option[IssueImporterConfig]]
 
   /** Writes only the sync status, so a concurrent edit of the other fields
-    * stays.
+    * stays. False means that no config has this id.
     */
   def updateSyncStatus(id: IssueImporterConfigId, syncStatus: ConfigSyncStatus)(
       implicit dbSession: DBSession): Future[Boolean]
@@ -282,7 +282,9 @@ class IssueImporterConfigMongoRepository @Inject() (
 
   def updateSyncStatus(id: IssueImporterConfigId, syncStatus: ConfigSyncStatus)(
       implicit dbSession: DBSession): Future[Boolean] =
-    updateFields(Json.obj("id" -> id), Seq("syncStatus" -> syncStatus))
+    updateFirst(Json.obj("id"   -> id),
+                Json.obj("$set" -> Json.obj("syncStatus" -> syncStatus)))
+      .map(_ > 0)
 
   def migrateProjectMappingIds()(implicit dbSession: DBSession): Future[Int] = {
     val selector = Json.obj(

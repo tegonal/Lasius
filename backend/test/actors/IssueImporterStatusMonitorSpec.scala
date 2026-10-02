@@ -21,14 +21,12 @@
 
 package actors
 
-import actors.IssueImporterStatusMonitor.{
-  UpdateConnectivityStatus,
-  UpdateProjectSyncStats
-}
+import actors.IssueImporterStatusMonitor.UpdateProjectSyncStats
 import core.{DBSession, MockServices}
 import models._
 import mongo.EmbedMongo
 import org.apache.pekko.actor.ActorRef
+import org.joda.time.DateTime
 import org.mockito.Mockito.when
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
@@ -51,6 +49,7 @@ class IssueImporterStatusMonitorSpec
   sequential
 
   private val organisationId = OrganisationId()
+  private val project        = ProjectId()
 
   private def planeConfig(): PlaneConfig = PlaneConfig(
     id = IssueImporterConfigId(),
@@ -98,65 +97,132 @@ class IssueImporterStatusMonitorSpec
           }
         }
       })
+
+    def syncStatus: ConfigSyncStatus = config.get().syncStatus
   }
 
-  private def monitor(scope: ActorTestScope,
-                      repository: IssueImporterConfigRepository): ActorRef =
+  private def administrators(admins: Seq[User]): UserRepository = {
+    val userRepository = mock[UserRepository]
+    userRepository
+      .findAdministratorsByOrganisation(any[OrganisationId])(any[DBSession])
+      .returns(Future.successful(admins))
+    userRepository
+  }
+
+  private def monitor(
+      scope: ActorTestScope,
+      repository: IssueImporterConfigRepository,
+      userRepository: UserRepository = mock[UserRepository],
+      clientReceiver: ClientReceiver = mock[ClientReceiver]): ActorRef =
     scope.system.actorOf(
       IssueImporterStatusMonitor.props(repository,
-                                       mock[UserRepository],
-                                       mock[ClientReceiver],
+                                       userRepository,
+                                       clientReceiver,
                                        new MockServices(scope.system),
                                        reactiveMongoApi))
+
+  private def result(config: IssueImporterConfig,
+                     projectId: ProjectId = project,
+                     success: Boolean): UpdateProjectSyncStats =
+    UpdateProjectSyncStats(
+      config.id,
+      organisationId,
+      projectId,
+      "Project",
+      issueCount = if (success) 3 else 0,
+      success = success,
+      error = Option.unless(success)(
+        ConnectivityIssue("connection_error", "refused", DateTime.now))
+    )
 
   "IssueImporterStatusMonitor" should {
     "write only the sync status of the config" in new ActorTestScope {
       private val stored = new StoredConfig(planeConfig())
-      private val config = stored.config.get()
 
-      monitor(this, stored.repository) ! UpdateConnectivityStatus(
-        config.id,
-        organisationId,
-        ConnectivityStatus.Healthy,
-        None)
+      monitor(this, stored.repository) ! result(stored.config.get(),
+                                                success = true)
 
-      awaitAssert(
-        stored.config.get().syncStatus.connectivityStatus must equalTo(
-          ConnectivityStatus.Healthy),
-        3.seconds)
+      awaitAssert(stored.syncStatus.connectivityStatus must equalTo(
+                    ConnectivityStatus.Healthy),
+                  3.seconds)
       there.was(
         no(stored.repository).upsert(any[IssueImporterConfig])(
           any[Writes[IssueImporterConfigId]],
           any[DBSession]))
     }
 
-    "apply each update to the status that the previous update wrote" in new ActorTestScope {
+    "apply each result to the status that the previous result wrote" in new ActorTestScope {
       private val stored      = new StoredConfig(planeConfig())
       private val config      = stored.config.get()
-      private val first       = ProjectId()
       private val second      = ProjectId()
       private val statusActor = monitor(this, stored.repository)
 
-      statusActor ! UpdateProjectSyncStats(config.id,
-                                           organisationId,
-                                           first,
-                                           "First",
-                                           issueCount = 3,
-                                           success = true)
-      statusActor ! UpdateProjectSyncStats(config.id,
-                                           organisationId,
-                                           second,
-                                           "Second",
-                                           issueCount = 4,
-                                           success = true)
+      statusActor ! result(config, success = true)
+      statusActor ! result(config, second, success = true)
 
-      awaitAssert(
-        stored.config
-          .get()
-          .syncStatus
-          .projectStats
-          .map(_.projectId) must containTheSameElementsAs(Seq(first, second)),
-        3.seconds)
+      awaitAssert(stored.syncStatus.projectStats.map(_.projectId) must
+                    containTheSameElementsAs(Seq(project, second)),
+                  3.seconds)
+    }
+
+    "report Degraded after one failure and Failed from the failure threshold on" in new ActorTestScope {
+      private val stored      = new StoredConfig(planeConfig())
+      private val config      = stored.config.get()
+      private val statusActor = monitor(this, stored.repository)
+
+      statusActor ! result(config, success = false)
+      awaitAssert(stored.syncStatus.connectivityStatus must equalTo(
+                    ConnectivityStatus.Degraded),
+                  3.seconds)
+      stored.syncStatus.currentIssue.map(_.errorCode) must beSome(
+        "connection_error")
+
+      (2 to 5).foreach(_ => statusActor ! result(config, success = false))
+      awaitAssert(stored.syncStatus.connectivityStatus must equalTo(
+                    ConnectivityStatus.Failed),
+                  5.seconds)
+
+      statusActor ! result(config, success = true)
+      awaitAssert(stored.syncStatus.connectivityStatus must equalTo(
+                    ConnectivityStatus.Healthy),
+                  3.seconds)
+      stored.syncStatus.currentIssue must beNone
+    }
+
+    "notify the administrators only when the status changes" in new ActorTestScope {
+      private val stored         = new StoredConfig(planeConfig())
+      private val config         = stored.config.get()
+      private val clientReceiver = mock[ClientReceiver]
+      private val admin          = mock[User]
+      admin.id.returns(UserId())
+      private val statusActor = monitor(this,
+                                        stored.repository,
+                                        administrators(Seq(admin)),
+                                        clientReceiver)
+
+      statusActor ! result(config, success = false)
+      statusActor ! result(config, success = false)
+      awaitAssert(stored.syncStatus.projectStats.map(_.consecutiveFailures) must
+                    equalTo(Seq(2)),
+                  3.seconds)
+
+      there.was(
+        one(clientReceiver).send(any[UserId], any[OutEvent], any[List[UserId]]))
+    }
+
+    "send no notice for a config without administrators" in new ActorTestScope {
+      private val stored         = new StoredConfig(planeConfig())
+      private val clientReceiver = mock[ClientReceiver]
+
+      monitor(this,
+              stored.repository,
+              administrators(Seq.empty),
+              clientReceiver) ! result(stored.config.get(), success = false)
+      awaitAssert(stored.syncStatus.connectivityStatus must equalTo(
+                    ConnectivityStatus.Degraded),
+                  3.seconds)
+
+      there.was(noCallsTo(clientReceiver))
     }
   }
 }

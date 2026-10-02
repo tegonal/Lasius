@@ -47,14 +47,8 @@ object IssueImporterStatusMonitor {
       reactiveMongoApi
     )
 
-  case class UpdateConnectivityStatus(
-      configId: IssueImporterConfigId,
-      organisationId: OrganisationId,
-      status: ConnectivityStatus,
-      issue: Option[ConnectivityIssue]
-  )
-
-  case class UpdateProjectSyncStats(
+  /** The result of one sync of a project mapping. */
+  final case class UpdateProjectSyncStats(
       configId: IssueImporterConfigId,
       organisationId: OrganisationId,
       projectId: ProjectId,
@@ -67,6 +61,10 @@ object IssueImporterStatusMonitor {
   private case object SyncStatusWritten
 }
 
+/** Keeps the sync status of each importer config. The status of a config
+  * follows the project with the most failed syncs in a row, and the
+  * administrators get a notice when the status changes.
+  */
 class IssueImporterStatusMonitor(
     repository: IssueImporterConfigRepository,
     userRepository: UserRepository,
@@ -86,33 +84,12 @@ class IssueImporterStatusMonitor(
 
   val receive: Receive = idle
 
-  private def idle: Receive = {
-    case UpdateConnectivityStatus(configId, orgId, status, issue) =>
-      writeSyncStatus(configId, orgId) {
-        _.copy(connectivityStatus = status,
-               lastConnectivityCheck = Some(DateTime.now),
-               currentIssue = issue)
-      }
-
-    case UpdateProjectSyncStats(configId,
-                                orgId,
-                                projectId,
-                                projectName,
-                                issueCount,
-                                success,
-                                error) =>
-      writeSyncStatus(configId, orgId) {
-        calculateUpdatedStats(_,
-                              projectId,
-                              projectName,
-                              issueCount,
-                              success,
-                              error)
-      }
+  private def idle: Receive = { case result: UpdateProjectSyncStats =>
+    writeSyncStatus(result)
   }
 
-  /** Holds the next update until the current write completes, because each
-    * update starts from the status that the previous one wrote.
+  /** Holds the next result until the current write completes, because each
+    * result starts from the status that the previous one wrote.
     */
   private def writing: Receive = {
     case SyncStatusWritten =>
@@ -121,16 +98,17 @@ class IssueImporterStatusMonitor(
     case _ => stash()
   }
 
-  private def writeSyncStatus(configId: IssueImporterConfigId,
-                              orgId: OrganisationId)(
-      update: ConfigSyncStatus => ConfigSyncStatus): Unit = {
+  private def writeSyncStatus(result: UpdateProjectSyncStats): Unit = {
+    val configId = result.configId
     withDBSession() { implicit dbSession =>
       repository.findById(configId).flatMap {
         case Some(config) =>
-          val syncStatus = update(config.syncStatus)
-          repository.updateSyncStatus(configId, syncStatus).map { _ =>
-            log.debug(s"Updated the sync status of config $configId")
-            broadcastStatusChange(config, syncStatus, orgId)
+          val syncStatus = withProjectResult(config.syncStatus, result)
+          repository.updateSyncStatus(configId, syncStatus).flatMap {
+            case true
+                if syncStatus.connectivityStatus != config.syncStatus.connectivityStatus =>
+              notifyAdministrators(config, syncStatus, result.organisationId)
+            case _ => Future.unit
           }
 
         case None =>
@@ -144,132 +122,92 @@ class IssueImporterStatusMonitor(
     context.become(writing)
   }
 
-  private def calculateUpdatedStats(
-      currentStats: ConfigSyncStatus,
-      projectId: ProjectId,
-      projectName: String,
-      issueCount: Int,
-      success: Boolean,
-      error: Option[ConnectivityIssue]
-  ): ConfigSyncStatus = {
-
-    val circuitBreakerConfig =
+  /** Applies one sync result. A config without failed syncs is Healthy. Below
+    * the failure threshold of the circuit breaker it is Degraded, and from the
+    * threshold on it is Failed.
+    */
+  private def withProjectResult(
+      current: ConfigSyncStatus,
+      result: UpdateProjectSyncStats): ConfigSyncStatus = {
+    val circuitBreaker =
       systemServices.lasiusConfig.issueImporters.circuitBreaker
+    val now = DateTime.now
 
-    val existingProjectStats =
-      currentStats.projectStats.find(_.projectId == projectId)
-
-    val updatedProjectStats = existingProjectStats match {
-      case Some(existing) =>
-        if (success) {
-          existing.copy(
-            projectName = projectName,
-            lastSyncAt = Some(DateTime.now),
-            lastSyncIssueCount = issueCount,
-            totalIssuesSynced = issueCount,
+    val projectStats =
+      current.projectStats.find(_.projectId == result.projectId) match {
+        case Some(previous) if result.success =>
+          previous.copy(
+            projectName = result.projectName,
+            lastSyncAt = Some(now),
+            lastSyncIssueCount = result.issueCount,
+            totalIssuesSynced = result.issueCount,
             consecutiveFailures = 0,
             lastError = None
           )
-        } else {
-          existing.copy(
-            consecutiveFailures = existing.consecutiveFailures + 1,
-            lastError = error
+        case Some(previous) =>
+          previous.copy(
+            consecutiveFailures = previous.consecutiveFailures + 1,
+            lastError = result.error
           )
-        }
+        case None =>
+          ProjectSyncStats(
+            projectId = result.projectId,
+            projectName = result.projectName,
+            lastSyncAt = Option.when(result.success)(now),
+            lastSyncIssueCount = result.issueCount,
+            totalIssuesSynced = if (result.success) result.issueCount else 0,
+            consecutiveFailures = if (result.success) 0 else 1,
+            lastError = if (result.success) None else result.error
+          )
+      }
 
-      case None =>
-        ProjectSyncStats(
-          projectId = projectId,
-          projectName = projectName,
-          lastSyncAt = if (success) Some(DateTime.now) else None,
-          lastSyncIssueCount = issueCount,
-          totalIssuesSynced = if (success) issueCount else 0,
-          consecutiveFailures = if (success) 0 else 1,
-          lastError = if (success) None else error
-        )
-    }
-
-    val allProjectStats = currentStats.projectStats
-      .filterNot(_.projectId == projectId) :+ updatedProjectStats
-
-    val totalIssues        = allProjectStats.map(_.totalIssuesSynced.toLong).sum
-    val lastSuccessfulSync = allProjectStats
-      .flatMap(_.lastSyncAt)
-      .maxByOption(_.getMillis)
-
-    // Determine connectivity status based on circuit breaker
-    val maxConsecutiveFailures =
+    val allProjectStats =
+      current.projectStats.filterNot(_.projectId == result.projectId) :+
+        projectStats
+    val maxFailures =
       allProjectStats.map(_.consecutiveFailures).maxOption.getOrElse(0)
-    val connectivityStatus = if (success) {
-      ConnectivityStatus.Healthy
-    } else if (circuitBreakerConfig.isCircuitOpen(maxConsecutiveFailures)) {
-      log.warning(
-        s"Circuit breaker opened for config with max consecutive failures: $maxConsecutiveFailures")
-      ConnectivityStatus.Failed
-    } else if (maxConsecutiveFailures > 0) {
-      ConnectivityStatus.Degraded
-    } else {
-      currentStats.connectivityStatus
-    }
+    val backoffMillis = circuitBreaker.calculateBackoffMillis(maxFailures)
 
-    // Calculate next scheduled sync with backoff if circuit is degraded/failed
-    val backoffMillis =
-      circuitBreakerConfig.calculateBackoffMillis(maxConsecutiveFailures)
-    val nextScheduledSync = if (backoffMillis > 0) {
-      Some(DateTime.now.plusMillis(backoffMillis.toInt))
-    } else {
-      None
-    }
-
-    currentStats.copy(
+    current.copy(
+      connectivityStatus =
+        if (maxFailures == 0) ConnectivityStatus.Healthy
+        else if (circuitBreaker.isCircuitOpen(maxFailures))
+          ConnectivityStatus.Failed
+        else ConnectivityStatus.Degraded,
+      lastConnectivityCheck = Some(now),
+      currentIssue = allProjectStats
+        .filter(_.consecutiveFailures > 0)
+        .flatMap(_.lastError)
+        .maxByOption(_.timestamp.getMillis),
       projectStats = allProjectStats,
       totalProjectsMapped = allProjectStats.size,
-      totalIssuesSynced = totalIssues,
-      lastSuccessfulSync = lastSuccessfulSync,
-      connectivityStatus = connectivityStatus,
-      nextScheduledSync = nextScheduledSync
+      totalIssuesSynced = allProjectStats.map(_.totalIssuesSynced.toLong).sum,
+      lastSuccessfulSync =
+        allProjectStats.flatMap(_.lastSyncAt).maxByOption(_.getMillis),
+      nextScheduledSync =
+        Option.when(backoffMillis > 0)(now.plusMillis(backoffMillis.toInt))
     )
   }
 
-  private def broadcastStatusChange(
-      config: IssueImporterConfig,
-      syncStatus: ConfigSyncStatus,
-      orgId: OrganisationId
-  ): Unit = {
-    // Only send notifications for negative outcomes (Failed, Degraded, Unknown)
-    // Don't notify for Healthy status
-    val shouldNotify = syncStatus.connectivityStatus match {
-      case ConnectivityStatus.Failed   => true
-      case ConnectivityStatus.Degraded => true
-      case ConnectivityStatus.Unknown  => true
-      case ConnectivityStatus.Healthy  => false
-    }
-
-    if (shouldNotify) {
-      withDBSession() { implicit dbSession =>
-        userRepository.findAdministratorsByOrganisation(orgId).map { admins =>
-          if (admins.nonEmpty) {
-            val event = IssueImporterSyncStatsChanged(
+  private def notifyAdministrators(config: IssueImporterConfig,
+                                   syncStatus: ConfigSyncStatus,
+                                   orgId: OrganisationId): Future[Unit] =
+    withDBSession() { implicit dbSession =>
+      userRepository.findAdministratorsByOrganisation(orgId).map { admins =>
+        // An empty receiver list sends the event to every client, so a config
+        // without administrators sends nothing.
+        if (admins.nonEmpty)
+          clientReceiver.send(
+            systemServices.systemUser,
+            IssueImporterSyncStatsChanged(
               configId = config.id,
               organisationId = orgId,
               importerType = config.importerType,
               configName = config.name,
               syncStatus = syncStatus
-            )
-            val adminUserIds = admins.map(_.id).toList
-            log.warning(
-              s"Sending ${syncStatus.connectivityStatus.value} status notification for config ${config.id} to ${adminUserIds.size} organization administrators")
-            clientReceiver.send(systemServices.systemUser, event, adminUserIds)
-          } else {
-            log.warning(
-              s"No active administrators found for organisation ${orgId.value}, cannot send ${syncStatus.connectivityStatus.value} notification")
-          }
-        }
+            ),
+            admins.map(_.id).toList
+          )
       }
-      ()
-    } else {
-      log.debug(
-        s"Skipping notification for healthy status on config ${config.id}")
     }
-  }
 }

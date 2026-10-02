@@ -21,10 +21,7 @@
 
 package actors.scheduler
 
-import actors.IssueImporterStatusMonitor.{
-  UpdateConnectivityStatus,
-  UpdateProjectSyncStats
-}
+import actors.IssueImporterStatusMonitor.UpdateProjectSyncStats
 import actors.TagCache.TagsUpdated
 import actors.scheduler.TagParseWorker.Parse
 import actors.scheduler.TagParseWorkerSpec.TestWorker
@@ -70,9 +67,7 @@ class TagParseWorkerSpec extends Specification with Mockito {
       private val stats = probes.monitor.expectMsgType[UpdateProjectSyncStats]
       stats.success must beTrue
       stats.issueCount must equalTo(1)
-      probes.monitor
-        .expectMsgType[UpdateConnectivityStatus]
-        .status must equalTo(ConnectivityStatus.Healthy)
+      probes.monitor.expectNoMessage(100.millis)
     }
 
     "report a failed load with a message and load again after the frequency" in new ActorTestScope {
@@ -90,9 +85,6 @@ class TagParseWorkerSpec extends Specification with Mockito {
       private val stats = probes.monitor.expectMsgType[UpdateProjectSyncStats]
       stats.success must beFalse
       stats.error.map(_.message) must beSome("ClosedChannelException")
-      probes.monitor
-        .expectMsgType[UpdateConnectivityStatus]
-        .status must equalTo(ConnectivityStatus.Failed)
       probes.monitor.expectMsgType[UpdateProjectSyncStats](3.seconds)
       loads.get must beGreaterThanOrEqualTo(2)
       probes.tagCache.expectNoMessage(100.millis)
@@ -113,7 +105,6 @@ class TagParseWorkerSpec extends Specification with Mockito {
       probes.monitor
         .expectMsgType[UpdateProjectSyncStats]
         .success must beFalse
-      probes.monitor.expectMsgType[UpdateConnectivityStatus]
       probes.monitor.expectMsgType[UpdateProjectSyncStats](3.seconds)
       loads.get must beGreaterThanOrEqualTo(2)
     }
