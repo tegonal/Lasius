@@ -22,6 +22,7 @@
 package repositories
 
 import core.DBSession
+import core.Validation.ValidationFailedException
 import models._
 import mongo.EmbedMongo
 import play.api.libs.json.Json.JsValueWrapper
@@ -181,6 +182,20 @@ class IssueImporterConfigRepositorySpec extends EmbedMongo {
                                         ProjectMappingId(),
                                         UpdateProjectMapping()))
         .awaitResult() must beNone
+    }
+
+    "reject a change to the pair of projects of another mapping" in {
+      val moved  = mapping(firstProject, "plane-1")
+      val config = storedConfig(moved, mapping(firstProject, "plane-2"))
+
+      withDBSession()(implicit dbSession =>
+        repository.updateProjectMapping(config.id,
+                                        moved.id,
+                                        UpdateProjectMapping(planeProjectId =
+                                          Some("plane-2"))))
+        .awaitResult() must throwA[ValidationFailedException]
+      pairs(reload(config)) must equalTo(
+        Set(firstProject -> "plane-1", firstProject -> "plane-2"))
     }
   }
 

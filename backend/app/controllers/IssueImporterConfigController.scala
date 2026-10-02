@@ -936,13 +936,14 @@ class IssueImporterConfigController @Inject() (
     systemServices.pluginHandler ! PluginHandler.StopMappingWorker(config.id,
                                                                    mappingId)
 
-  /** A worker reads the URL, the check frequency and the credentials once, when
-    * it starts.
+  /** A worker reads the URL, the check frequency, the Plane workspace and the
+    * credentials once, when it starts.
     */
   private def requiresWorkerRestart(
       update: UpdateIssueImporterConfig): Boolean = {
     update.baseUrl.isDefined ||
     update.checkFrequency.isDefined ||
+    update.workspace.isDefined ||
     update.accessToken.isDefined ||
     update.consumerKey.isDefined ||
     update.privateKey.isDefined ||

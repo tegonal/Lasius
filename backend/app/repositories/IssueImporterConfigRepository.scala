@@ -23,6 +23,7 @@ package repositories
 
 import com.google.inject.ImplementedBy
 import core.DBSession
+import core.Validation.ValidationFailedException
 import models._
 import play.api.Logging
 import play.api.libs.json.Json.JsValueWrapper
@@ -262,11 +263,24 @@ class IssueImporterConfigMongoRepository @Inject() (
       config  <- findById(id).noneToFailed(s"Config ${id.value} not found")
       matched <- config.mapping(mappingId).fold(Future.successful(0)) {
         current =>
-          val updated = mappingJson(withUpdatedSettings(current, mapping))
-          updateFirst(
-            Json.obj("id" -> id, "projects.id" -> mappingId),
-            Json.obj(
-              "$set" -> Json.obj("projects.$.settings" -> updated("settings"))))
+          val updated   = withUpdatedSettings(current, mapping)
+          val otherPair = pairSelector(updated) ++
+            Json.obj("id" -> Json.obj("$ne" -> mappingId))
+          if (config.projects.exists(other =>
+              other.id != mappingId && isSamePair(updated)(other)))
+            Future.failed(ValidationFailedException(
+              s"Another mapping of config ${id.value} links the same projects"))
+          else
+            // The pair check repeats in the selector for a concurrent save.
+            updateFirst(
+              Json.obj("id"          -> id,
+                       "projects.id" -> mappingId,
+                       "projects"    -> Json.obj(
+                         "$not" -> Json.obj("$elemMatch" -> otherPair))),
+              Json.obj(
+                "$set" -> Json.obj(
+                  "projects.$.settings" -> mappingJson(updated)("settings")))
+            )
       }
       saved <- if (matched == 0) Future.successful(None) else findById(id)
     } yield saved
