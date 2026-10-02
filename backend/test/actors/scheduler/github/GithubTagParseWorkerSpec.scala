@@ -61,9 +61,9 @@ class GithubTagParseWorkerSpec extends Specification {
 
   private def loadAll(github: StubPages[GithubIssuesSearchResult]): Set[Int] =
     Await
-      .result(GithubTagParseWorker.loadAllPages(maxResults = 2)(
-                github.loadPage),
-              5.seconds)
+      .result(
+        GithubTagParseWorker.loadAllPages(maxResults = 2)(github.loadPage),
+        5.seconds)
       .map(_.number)
 
   "GithubTagParseWorker.loadAllPages" should {

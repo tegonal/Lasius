@@ -66,7 +66,8 @@ class GitlabTagParseWorkerSpec extends Specification {
     )
 
   /** A page without the total headers, so only the next page ends the load. */
-  private def page(nextPage: Option[Int], iids: Int*): GitlabIssuesSearchResult =
+  private def page(nextPage: Option[Int],
+                   iids: Int*): GitlabIssuesSearchResult =
     GitlabIssuesSearchResult(issues = iids.map(issue),
                              totalNumberOfItems = None,
                              totalPages = None,
