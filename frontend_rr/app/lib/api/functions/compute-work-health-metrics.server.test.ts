@@ -55,4 +55,22 @@ describe('computeWorkHealthMetrics', () => {
     expect(burnoutMetrics?.consecutiveDays).toBe(2)
     expect(burnoutMetrics?.weeklyHours).toBe(1)
   })
+
+  it('keeps a week across the turn of the year together', () => {
+    // Week 1 of 2027 starts on Monday, 28 December 2026.
+    const { burnoutMetrics, weeklyData } = computeWorkHealthMetrics(
+      [
+        booking('2026-12-28T09:00:00.000', '2026-12-28T10:00:00.000'),
+        booking('2027-01-01T09:00:00.000', '2027-01-01T10:00:00.000'),
+      ],
+      40,
+      1,
+      '2026-12-30',
+    )
+
+    expect(weeklyData).toEqual([
+      { hours: 2, plannedHours: 40, weekLabel: 'W1/2027', weekNumber: 1, year: 2027 },
+    ])
+    expect(burnoutMetrics?.consecutiveDays).toBe(2)
+  })
 })
