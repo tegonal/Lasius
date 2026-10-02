@@ -29,10 +29,10 @@ import java.time.{Clock, Instant, ZoneId, ZoneOffset}
 class WsTicketStoreSpec extends Specification {
 
   private class SettableClock(var now: Instant) extends Clock {
-    override def getZone: ZoneId                    = ZoneOffset.UTC
-    override def withZone(zone: ZoneId): Clock      = this
-    override def instant(): Instant                 = now
-    def advanceSeconds(seconds: Long): Unit         = now = now.plusSeconds(seconds)
+    override def getZone: ZoneId               = ZoneOffset.UTC
+    override def withZone(zone: ZoneId): Clock = this
+    override def instant(): Instant            = now
+    def advanceSeconds(seconds: Long): Unit    = now = now.plusSeconds(seconds)
   }
 
   private val userId    = UserId()

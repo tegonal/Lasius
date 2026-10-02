@@ -40,8 +40,7 @@ object WsTicketStore {
 }
 
 /** Keeps the single-use tickets that authenticate a websocket connection.
-  * `remove` redeems a ticket atomically, so a ticket opens one connection
-  * only.
+  * `remove` redeems a ticket atomically, so a ticket opens one connection only.
   */
 class WsTicketStore(clock: Clock) {
   import WsTicketStore._
