@@ -54,9 +54,8 @@ import services.{
   TimeBookingViewService
 }
 
-import java.time.{Clock, Instant}
+import java.time.Clock
 import java.util.UUID
-import java.util.concurrent.ConcurrentHashMap
 import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext}
@@ -221,37 +220,15 @@ class DefaultSystemServices @Inject() (
   // initialize login handler
   LoginHandler.subscribe(loginHandler, system.eventStream)
 
-  private val WsTicketTtlSeconds: Long = 60L
-  private val wsTicketStore
-      : ConcurrentHashMap[String, (UserId, UserReference, Instant)] =
-    new ConcurrentHashMap()
+  private val wsTicketStore = new WsTicketStore(clock)
 
   override def createWsTicket(userId: UserId,
-                              userReference: UserReference): String = {
-    evictExpiredTickets()
-    val ticket = UUID.randomUUID().toString
-    wsTicketStore.put(ticket, (userId, userReference, Instant.now(clock)))
-    ticket
-  }
-
-  private def evictExpiredTickets(): Unit = {
-    val now = Instant.now(clock).getEpochSecond
-    wsTicketStore.entrySet().removeIf { entry =>
-      now - entry.getValue._3.getEpochSecond > WsTicketTtlSeconds
-    }
-  }
+                              userReference: UserReference): String =
+    wsTicketStore.create(userId, userReference)
 
   override def consumeWsTicket(
-      ticket: String): Option[(UserId, UserReference)] = {
-    Option(wsTicketStore.remove(ticket)).flatMap { case (uid, ref, created) =>
-      if (Instant
-          .now(clock)
-          .getEpochSecond - created.getEpochSecond <= WsTicketTtlSeconds)
-        Some((uid, ref))
-      else
-        None
-    }
-  }
+      ticket: String): Option[(UserId, UserReference)] =
+    wsTicketStore.consume(ticket)
 
   override def initialize(): Unit = {
 
