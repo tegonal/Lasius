@@ -26,6 +26,7 @@ import {
 } from '@headlessui/react'
 import { Check, ChevronDown } from 'lucide-react'
 import { Fragment } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { cn } from '~/lib/utils/cn'
@@ -58,17 +59,20 @@ export const MultiSelect = ({
   onChange,
   options,
   optionsClassName,
-  placeholder = 'Select options',
+  placeholder,
   value,
 }: MultiSelectProperties) => {
+  const { t } = useTranslation('common')
   const selectedOptions = options.filter((option) => value.includes(option.value))
 
   const displayText =
     selectedOptions.length === 0
-      ? placeholder
+      ? (placeholder ?? t('forms.multiSelect.placeholder', 'Select options'))
       : selectedOptions.length === 1
         ? selectedOptions[0]?.label
-        : `${selectedOptions.length} selected`
+        : t('forms.multiSelect.selectedCount', '{{count}} selected', {
+            count: selectedOptions.length,
+          })
 
   return (
     <Listbox disabled={disabled} multiple name={name} onChange={onChange} value={value}>

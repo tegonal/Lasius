@@ -197,6 +197,11 @@
     "email": "Email",
     "firstName": "First name",
     "lastName": "Last name",
+    "multiSelect": {
+      "placeholder": "Select options",
+      "selectedCount_one": "{{count}} selected",
+      "selectedCount_other": "{{count}} selected"
+    },
     "name": "Name",
     "password": "Password"
   },
