@@ -61,13 +61,11 @@ class UserTimeBookingStatisticsView(
     bookingByTagRepository: BookingByTagRepository,
     userReference: UserReference,
     override val reactiveMongoApi: ReactiveMongoApi)
-    extends JournalReadingView
+    extends UserTimeBookingView
     with ActorLogging
     with DBSupport {
 
   override val supportTransaction: Boolean = systemServices.supportTransaction
-
-  val persistenceId: String = s"user-time-booking-${userReference.id.value}"
 
   private val waitTime = 5.seconds
 

@@ -50,12 +50,10 @@ object CurrentUserTimeBookingsView {
 
 class CurrentUserTimeBookingsView(val clientReceiver: ClientReceiver,
                                   userReference: UserReference)
-    extends JournalReadingView
+    extends UserTimeBookingView
     with ActorLogging {
 
   import domain.views.CurrentUserTimeBookingsView._
-
-  val persistenceId: String = s"user-time-booking-${userReference.id.value}"
 
   var state: CurrentTimeBookings =
     CurrentTimeBookings(None, LocalDate.now, Map())
@@ -67,7 +65,7 @@ class CurrentUserTimeBookingsView(val clientReceiver: ClientReceiver,
     case InitializeCurrentTimeBooking(state) =>
       this.state = state
       context.become(live)
-      sender() ! JournalReadingViewIsLive
+      sender() ! ViewIsLive
     case GetCurrentTimeBooking(_) =>
       // Handle query even before full initialization (e.g., when no bookings exist)
       sender() ! currentUserTimeBookings

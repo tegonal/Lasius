@@ -304,11 +304,10 @@ class UserTimeBookingAggregate(
     }
   }
 
-  override protected def afterRecoveryCompleted(sequenceNr: Long,
-                                                state: State): Unit = {
+  override protected def afterRecoveryCompleted(state: State): Unit = {
     state match {
       case s: UserTimeBooking =>
-        sendToUserServices(RestoreViewFromState(userReference, sequenceNr, s))
+        sendToUserServices(RestoreViewFromState(userReference, s))
     }
   }
 

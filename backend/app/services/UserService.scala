@@ -21,11 +21,7 @@
 
 package services
 
-import domain.AggregateRoot.{
-  ForwardPersistentEvent,
-  InitializeViewLive,
-  RestoreViewFromState
-}
+import domain.AggregateRoot.{ForwardPersistentEvent, RestoreViewFromState}
 import models.UserId.UserReference
 import org.apache.pekko.actor.{Actor, ActorLogging, ActorRef, Props}
 
@@ -79,12 +75,6 @@ abstract class UserService[C] extends Actor with ActorLogging {
       s"restoreViewFromSnapshot -> aggregateId:${restoreViewFromState.userReference.id.value}")
     findOrCreate(restoreViewFromState.userReference).forward(
       restoreViewFromState)
-  }
-
-  def initializeViewLive(initializeViewLive: InitializeViewLive): Unit = {
-    log.debug(
-      s"restoreViewFromSnapshot -> aggregateId:${initializeViewLive.userReference.id.value}")
-    findOrCreate(initializeViewLive.userReference).forward(initializeViewLive)
   }
 
   def forwardPersistentEvent(

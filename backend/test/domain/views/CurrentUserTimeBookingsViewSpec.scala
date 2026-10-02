@@ -73,8 +73,8 @@ class CurrentUserTimeBookingsViewSpec extends Specification with Mockito {
                               projectReference,
                               Set(tag1, tag2))
 
-      probe.send(actorRef, InitializeViewLive(userReference, 0))
-      probe.expectMsg(JournalReadingViewIsLive)
+      probe.send(actorRef, InitializeViewLive(userReference))
+      probe.expectMsg(ViewIsLive)
 
       val state = CurrentUserTimeBookingEvent(
         CurrentUserTimeBooking(userReference,
@@ -110,8 +110,8 @@ class CurrentUserTimeBookingsViewSpec extends Specification with Mockito {
       val actorRef       = system.actorOf(
         CurrentUserTimeBookingsViewMock.props(userReference, clientReceiver))
 
-      probe.send(actorRef, InitializeViewLive(userReference, 0))
-      probe.expectMsg(JournalReadingViewIsLive)
+      probe.send(actorRef, InitializeViewLive(userReference))
+      probe.expectMsg(ViewIsLive)
 
       val day   = LocalDate.now()
       val start = day
@@ -172,8 +172,8 @@ class CurrentUserTimeBookingsViewSpec extends Specification with Mockito {
       val actorRef       = system.actorOf(
         CurrentUserTimeBookingsViewMock.props(userReference, clientReceiver))
 
-      probe.send(actorRef, InitializeViewLive(userReference, 0))
-      probe.expectMsg(JournalReadingViewIsLive)
+      probe.send(actorRef, InitializeViewLive(userReference))
+      probe.expectMsg(ViewIsLive)
 
       val day = LocalDate.now()
       val end = day
@@ -229,8 +229,8 @@ class CurrentUserTimeBookingsViewSpec extends Specification with Mockito {
       val actorRef       = system.actorOf(
         CurrentUserTimeBookingsViewMock.props(userReference, clientReceiver))
 
-      probe.send(actorRef, InitializeViewLive(userReference, 0))
-      probe.expectMsg(JournalReadingViewIsLive)
+      probe.send(actorRef, InitializeViewLive(userReference))
+      probe.expectMsg(ViewIsLive)
 
       val day = LocalDate.now()
       val end = day
@@ -338,7 +338,7 @@ class CurrentUserTimeBookingsViewSpec extends Specification with Mockito {
                               dailyBookingsMap =
                                 Map(booking2.createStub -> duration)))
       )
-      probe.expectMsg(JournalReadingViewIsLive)
+      probe.expectMsg(ViewIsLive)
 
       // remove stopped booking
       probe.send(actorRef, UserTimeBookingRemovedV2(booking2))
@@ -410,7 +410,7 @@ class CurrentUserTimeBookingsViewSpec extends Specification with Mockito {
                               dailyBookingsMap =
                                 Map(booking2.createStub -> duration)))
       )
-      probe.expectMsg(JournalReadingViewIsLive)
+      probe.expectMsg(ViewIsLive)
 
       // remove current booking
       probe.send(actorRef, UserTimeBookingRemovedV2(booking))

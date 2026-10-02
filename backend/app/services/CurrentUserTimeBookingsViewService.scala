@@ -22,11 +22,7 @@
 package services
 
 import actors.ClientReceiver
-import domain.AggregateRoot.{
-  ForwardPersistentEvent,
-  InitializeViewLive,
-  RestoreViewFromState
-}
+import domain.AggregateRoot.{ForwardPersistentEvent, RestoreViewFromState}
 import domain.views.CurrentUserTimeBookingsView
 import domain.views.CurrentUserTimeBookingsView._
 import models.UserId.UserReference
@@ -53,8 +49,6 @@ class CurrentUserTimeBookingsViewService(clientReceiver: ClientReceiver)
       restoreViewFromState(r)
     case f: ForwardPersistentEvent =>
       forwardPersistentEvent(f)
-    case i: InitializeViewLive =>
-      initializeViewLive(i)
     case c =>
       log.debug(s"CurrentUserTimeBookingsViewService -> unknown command:$c")
   }

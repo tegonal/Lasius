@@ -25,7 +25,6 @@ import actors.ClientReceiver
 import pekko.PersistentActorTestScope
 import org.apache.pekko.actor.{ActorSystem, Props}
 import org.apache.pekko.pattern.StatusReply.Ack
-import org.apache.pekko.persistence.PersistentActor
 import org.apache.pekko.testkit._
 import core.{DBSession, SystemServices}
 import domain.AggregateRoot.{InitializeViewLive, RestoreViewFromState}
@@ -87,7 +86,6 @@ class UserTimeBookingStatisticsViewSpec
 
       probe.send(actorRef,
                  RestoreViewFromState(userReference,
-                                      0,
                                       UserTimeBooking(userReference, Seq())))
       probe.expectMsg(RestoreViewFromStateSuccess)
 
@@ -103,26 +101,14 @@ class UserTimeBookingStatisticsViewSpec
   }
 
   "UserTimeBookingStatisticsView RestoreViewFromState" should {
-    "count each booking of the restored state once" in new PersistentActorTestScope {
+    "give no answer to a failed rebuild, and then go live" in new PersistentActorTestScope {
       val userReference = EntityReference(UserId(), "noob")
-      val booking       = BookingV2(
-        BookingId(),
-        DateTime.parse("2000-01-01T08:00").toLocalDateTimeWithZone(),
-        Some(DateTime.parse("2000-01-01T10:00").toLocalDateTimeWithZone()),
-        userReference,
-        EntityReference(OrganisationId(), "team1"),
-        EntityReference(ProjectId(), "proj"),
-        Set()
-      )
-      val probe = TestProbe()
-
-      val journal = system.actorOf(
-        JournalWriter.props(s"user-time-booking-${userReference.id.value}"))
-      probe.send(journal, UserTimeBookingAddedV2(booking))
-      probe.expectMsg(Ack)
-
+      val probe         = TestProbe()
       val (bookingByProjectRepository, bookingByTagRepository) =
         statisticsRepositories()
+      bookingByProjectRepository
+        .bulkInsert(any[List[BookingByProject]])(any[DBSession])
+        .returns(Future.failed(new IllegalStateException("write failed")))
       val actorRef = system.actorOf(
         UserTimeBookingStatisticsViewMock.props(userReference,
                                                 bookingByProjectRepository,
@@ -131,23 +117,14 @@ class UserTimeBookingStatisticsViewSpec
 
       probe.send(actorRef,
                  RestoreViewFromState(userReference,
-                                      1,
-                                      UserTimeBooking(userReference,
-                                                      Seq(booking))))
-      probe.expectMsg(RestoreViewFromStateSuccess)
-      // A replay of the journal reaches the view after the answer, so the
-      // check for a second count must wait.
-      probe.expectNoMessage(500.millis)
+                                      UserTimeBooking(userReference, Seq())))
+      probe.expectNoMessage(300.millis)
 
-      there.was(one(bookingByProjectRepository).bulkInsert {
-        beLike[List[BookingByProject]] { case List(stats) =>
-          stats.duration must equalTo(Duration.standardHours(2))
-        }
-      }(any[DBSession]))
-      there.was(
-        no(bookingByProjectRepository).add(any[BookingByProject])(
-          any[Writes[BookingByProjectId]],
-          any[DBSession]))
+      probe.send(actorRef,
+                 UserTimeBookingStartTimeChanged(BookingId(),
+                                                 DateTime.now(),
+                                                 DateTime.now()))
+      probe.expectMsg(Ack)
     }
 
     "sum the restored bookings per day and project, and per day and tag" in new PersistentActorTestScope {
@@ -181,7 +158,6 @@ class UserTimeBookingStatisticsViewSpec
         actorRef,
         RestoreViewFromState(
           userReference,
-          2,
           UserTimeBooking(userReference,
                           Seq(booking("08:00", "10:00", Set(tag1, tag2)),
                               booking("13:00", "14:00", Set(tag1))))
@@ -202,6 +178,10 @@ class UserTimeBookingStatisticsViewSpec
                 tag2.id -> Duration.standardHours(2)))
         }
       }(any[DBSession]))
+      there.was(
+        no(bookingByProjectRepository).add(any[BookingByProject])(
+          any[Writes[BookingByProjectId]],
+          any[DBSession]))
     }
   }
 
@@ -279,8 +259,8 @@ class UserTimeBookingStatisticsViewSpec
       val duration2 = Duration.standardHours(24)
       val duration3 = Duration.standardHours(10)
 
-      probe.send(actorRef, InitializeViewLive(userReference, 0))
-      probe.expectMsg(JournalReadingViewIsLive)
+      probe.send(actorRef, InitializeViewLive(userReference))
+      probe.expectMsg(ViewIsLive)
 
       probe.send(actorRef,
                  UserTimeBookingStartTimeChanged(bookingId, start, newStart))
@@ -304,8 +284,8 @@ class UserTimeBookingStatisticsViewSpec
                                                 bookingByTagRepository,
                                                 reactiveMongoApi))
 
-      probe.send(actorRef, InitializeViewLive(userReference, 0))
-      probe.expectMsg(JournalReadingViewIsLive)
+      probe.send(actorRef, InitializeViewLive(userReference))
+      probe.expectMsg(ViewIsLive)
 
       // days from 23. to 28.
       val day1 = DateTime.parse("2015-04-23")
@@ -946,8 +926,8 @@ class UserTimeBookingStatisticsViewSpec
                             projectReference,
                             Set(tag1, tag2))
 
-    probe.send(actorRef, InitializeViewLive(userReference, 0))
-    probe.expectMsg(JournalReadingViewIsLive)
+    probe.send(actorRef, InitializeViewLive(userReference))
+    probe.expectMsg(ViewIsLive)
 
     probe.send(actorRef, eventFactory(booking))
     probe.expectMsg(Ack)
@@ -1364,8 +1344,8 @@ class UserTimeBookingStatisticsViewSpec
                             projectReference,
                             Set(tag1, tag2))
 
-    probe.send(actorRef, InitializeViewLive(userReference, 0))
-    probe.expectMsg(JournalReadingViewIsLive)
+    probe.send(actorRef, InitializeViewLive(userReference))
+    probe.expectMsg(ViewIsLive)
 
     probe.send(actorRef, eventFactory(booking))
     probe.expectMsg(Ack)
@@ -1410,8 +1390,8 @@ class UserTimeBookingStatisticsViewSpec
                             projectReference,
                             Set(tag1, tag2))
 
-    probe.send(actorRef, InitializeViewLive(userReference, 0))
-    probe.expectMsg(JournalReadingViewIsLive)
+    probe.send(actorRef, InitializeViewLive(userReference))
+    probe.expectMsg(ViewIsLive)
 
     probe.send(actorRef, eventFactory(booking))
     probe.expectMsg(Ack)
@@ -1424,21 +1404,6 @@ class UserTimeBookingStatisticsViewSpec
       no(bookingByTagRepository)
         .add(any[BookingByTag])(any[Writes[BookingByTagId]], any[DBSession]))
   }
-}
-
-/** Writes events to the journal of one persistence id, as an aggregate does. */
-class JournalWriter(override val persistenceId: String)
-    extends PersistentActor {
-  override def receiveRecover: Receive = { case _ => }
-
-  override def receiveCommand: Receive = { case event: PersistedEvent =>
-    persist(event)(_ => sender() ! Ack)
-  }
-}
-
-object JournalWriter {
-  def props(persistenceId: String): Props =
-    Props(classOf[JournalWriter], persistenceId)
 }
 
 object UserTimeBookingStatisticsViewMock extends Mockito {

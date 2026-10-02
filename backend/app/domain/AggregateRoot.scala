@@ -47,13 +47,10 @@ object AggregateRoot {
       extends Command
 
   case class RestoreViewFromState(userReference: UserReference,
-                                  sequenceNr: Long,
                                   state: UserTimeBooking)
       extends Command
 
-  case class InitializeViewLive(userReference: UserReference,
-                                fromSequenceNr: Long)
-      extends Command
+  case class InitializeViewLive(userReference: UserReference) extends Command
 
   case object Removed extends State
 
@@ -108,8 +105,8 @@ trait AggregateRoot extends PersistentActor with ActorLogging {
   protected def publish(event: PersistedEvent): Unit =
     context.system.eventStream.publish(event)
 
-  protected def afterRecoveryCompleted(sequenceNr: Long,
-                                       state: State): Unit = {}
+  /** Runs once the state holds every journal event. */
+  protected def afterRecoveryCompleted(state: State): Unit = {}
 
   protected val defaultReceive: Receive = {
     case StatusReply.Ack        =>
@@ -147,6 +144,6 @@ trait AggregateRoot extends PersistentActor with ActorLogging {
       saveSnapshot(state)
     }
     recovering = false
-    afterRecoveryCompleted(lastSequenceNr, state)
+    afterRecoveryCompleted(state)
   }
 }

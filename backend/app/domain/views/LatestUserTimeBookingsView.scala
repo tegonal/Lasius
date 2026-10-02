@@ -46,13 +46,10 @@ object LatestUserTimeBookingsView {
 
 class LatestUserTimeBookingsView(clientReceiver: ClientReceiver,
                                  userReference: UserReference)
-    extends JournalReadingView
+    extends UserTimeBookingView
     with ActorLogging {
 
   import domain.views.LatestUserTimeBookingsView._
-
-  val persistenceId: String = s"user-time-booking-${userReference.id.value}"
-  // val viewId = userId.value + "-latest-time-bookings"
 
   private val oldDateTime: DateTime = DateTime.parse("2000-01-01")
   private val maxInternalHistory    = 100

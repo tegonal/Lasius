@@ -23,11 +23,7 @@ package services
 
 import actors.ClientReceiver
 import core.SystemServices
-import domain.AggregateRoot.{
-  ForwardPersistentEvent,
-  InitializeViewLive,
-  RestoreViewFromState
-}
+import domain.AggregateRoot.{ForwardPersistentEvent, RestoreViewFromState}
 import domain.views.UserTimeBookingStatisticsView
 import models.UserId.UserReference
 import org.apache.pekko.actor.Props
@@ -68,8 +64,6 @@ class TimeBookingStatisticsViewService(
       restoreViewFromState(r)
     case f: ForwardPersistentEvent =>
       forwardPersistentEvent(f)
-    case i: InitializeViewLive =>
-      initializeViewLive(i)
     case c => log.debug(s"TimeBookingHistoryViewService -> unknown command:$c")
   }
 
