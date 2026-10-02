@@ -23,9 +23,11 @@ package actors
 
 import actors.TagCache.{CachedTags, GetTags, TagsUpdated}
 import models._
-import org.apache.pekko.testkit.ImplicitSender
+import org.apache.pekko.testkit.{ImplicitSender, TestProbe}
 import org.specs2.mutable.Specification
 import pekko.ActorTestScope
+
+import scala.concurrent.duration.DurationInt
 
 class TagCacheSpec extends Specification {
 
@@ -64,6 +66,41 @@ class TagCacheSpec extends Specification {
       cache ! GetTags(projectId)
 
       expectMsg(CachedTags(projectId, Set.empty[Tag]))
+    }
+
+    "remove the tags of a worker that stops" in new ActorTestScope
+      with ImplicitSender {
+      val projectId = ProjectId()
+      val cache     = system.actorOf(TagCache.props)
+      val worker    = TestProbe()
+
+      worker.send(cache,
+                  TagsUpdated("plane-project", projectId, Set(tag("LAS-1"))))
+      cache ! TagsUpdated("github-repo", projectId, Set(tag("GH-1")))
+      system.stop(worker.ref)
+
+      awaitAssert {
+        cache ! GetTags(projectId)
+        expectMsg(CachedTags(projectId, Set[Tag](tag("GH-1"))))
+      }
+    }
+
+    "keep the tags that the next worker of a mapping wrote" in new ActorTestScope
+      with ImplicitSender {
+      val projectId = ProjectId()
+      val cache     = system.actorOf(TagCache.props)
+      val previous  = TestProbe()
+      val next      = TestProbe()
+
+      previous.send(cache,
+                    TagsUpdated("plane-project", projectId, Set(tag("LAS-1"))))
+      next.send(cache,
+                TagsUpdated("plane-project", projectId, Set(tag("LAS-1"))))
+      system.stop(previous.ref)
+      expectNoMessage(200.millis)
+
+      cache ! GetTags(projectId)
+      expectMsg(CachedTags(projectId, Set[Tag](tag("LAS-1"))))
     }
   }
 }

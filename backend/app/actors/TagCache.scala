@@ -37,10 +37,14 @@ object TagCache {
   }
 
   def props: Props = Props(classOf[TagCache])
+
+  private final case class WorkerTags(worker: ActorRef, tags: Set[Tag])
 }
 
 /** Holds the imported issue tags of each Lasius project in memory. Clients read
-  * them through the tag endpoint; the cache sends no notification.
+  * them through the tag endpoint; the cache sends no notification. The tags of
+  * a worker go when the worker stops, so a removed or changed mapping leaves no
+  * old tags.
   */
 class TagCache extends Actor with ActorLogging {
 
@@ -48,12 +52,20 @@ class TagCache extends Actor with ActorLogging {
 
   /** Tags by Lasius project, by external project, and by tag type. */
   private var tagCache
-      : Map[ProjectId, Map[String, Map[Manifest[_], Set[Tag]]]] =
+      : Map[ProjectId, Map[String, Map[Manifest[_], WorkerTags]]] =
     Map.empty
 
   val receive: Receive = {
     case update @ TagsUpdated(externalProjectId, projectId, tags) =>
-      updateTags(update.manifest, externalProjectId, projectId, tags.toSet[Tag])
+      val worker = sender()
+      if (worker != context.system.deadLetters) context.watch(worker)
+      updateTags(WorkerTags(worker, tags.toSet[Tag]),
+                 update.manifest,
+                 externalProjectId,
+                 projectId)
+
+    case Terminated(worker) =>
+      removeTagsOf(worker)
 
     case GetTags(projectId) =>
       val projectTags =
@@ -61,24 +73,38 @@ class TagCache extends Actor with ActorLogging {
           .getOrElse(projectId, Map.empty)
           .values
           .flatMap(_.values)
-          .flatten
+          .flatMap(_.tags)
       sender() ! CachedTags(projectId, projectTags.toSet)
   }
 
-  private def updateTags(tagType: Manifest[_],
+  private def updateTags(update: WorkerTags,
+                         tagType: Manifest[_],
                          externalProjectId: String,
-                         projectId: ProjectId,
-                         tags: Set[Tag]): Unit = {
+                         projectId: ProjectId): Unit = {
     val projectTags  = tagCache.getOrElse(projectId, Map.empty)
     val externalTags = projectTags.getOrElse(externalProjectId, Map.empty)
-    val current      = externalTags.getOrElse(tagType, Set.empty)
+    val current      = externalTags.get(tagType)
 
-    if (current != tags) {
-      if (log.isDebugEnabled)
+    // A new worker of the same mapping takes over the entry, also with equal
+    // tags, so the stop of the old worker does not remove it.
+    if (!current.contains(update)) {
+      val currentTags = current.fold(Set.empty[Tag])(_.tags)
+      if (log.isDebugEnabled && currentTags != update.tags)
         log.debug(
-          s"TagCache updated for project $projectId: removed=${(current -- tags).size}, added=${(tags -- current).size}")
+          s"TagCache updated for project $projectId: removed=${(currentTags -- update.tags).size}, added=${(update.tags -- currentTags).size}")
       tagCache += projectId ->
-        (projectTags + (externalProjectId -> (externalTags + (tagType -> tags))))
+        (projectTags + (externalProjectId -> (externalTags + (tagType -> update))))
     }
   }
+
+  private def removeTagsOf(worker: ActorRef): Unit =
+    tagCache = tagCache.flatMap { case (projectId, externalTags) =>
+      val kept = externalTags.flatMap { case (externalProjectId, typedTags) =>
+        val keptTypes = typedTags.filter { case (_, entry) =>
+          entry.worker != worker
+        }
+        Option.when(keptTypes.nonEmpty)(externalProjectId -> keptTypes)
+      }
+      Option.when(kept.nonEmpty)(projectId -> kept)
+    }
 }
