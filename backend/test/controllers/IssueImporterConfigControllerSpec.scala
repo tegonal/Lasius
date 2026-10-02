@@ -31,7 +31,7 @@ import play.api.mvc._
 import play.api.test._
 import repositories.ProjectMongoRepository
 
-import java.net.URL
+import java.net.URI
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import org.mockito.ArgumentMatchers.{any, anyString}
@@ -247,7 +247,7 @@ class IssueImporterConfigControllerSpec
       val createData = CreateIssueImporterConfig(
         importerType = ImporterType.Gitlab,
         name = "New GitLab",
-        baseUrl = new URL("https://gitlab.new.com"),
+        baseUrl = URI.create("https://gitlab.new.com").toURL,
         checkFrequency = 600000L,
         accessToken = Some("new-token"),
         consumerKey = None,
@@ -263,7 +263,8 @@ class IssueImporterConfigControllerSpec
       status(result) must equalTo(CREATED)
       val gitlabConfig = contentAsJson(result).as[GitlabConfigResponse]
       gitlabConfig.name must equalTo("New GitLab")
-      gitlabConfig.baseUrl must equalTo(new URL("https://gitlab.new.com"))
+      gitlabConfig.baseUrl must equalTo(
+        URI.create("https://gitlab.new.com").toURL)
     }
 
     "return 400 when name is blank" in new WithTestApplication {
@@ -279,7 +280,7 @@ class IssueImporterConfigControllerSpec
       val createData = CreateIssueImporterConfig(
         importerType = ImporterType.Gitlab,
         name = "",
-        baseUrl = new URL("https://gitlab.new.com"),
+        baseUrl = URI.create("https://gitlab.new.com").toURL,
         checkFrequency = 600000L,
         accessToken = Some("new-token"),
         consumerKey = None,
@@ -309,7 +310,7 @@ class IssueImporterConfigControllerSpec
       val createData = CreateIssueImporterConfig(
         importerType = ImporterType.Gitlab,
         name = "New GitLab",
-        baseUrl = new URL("https://gitlab.new.com"),
+        baseUrl = URI.create("https://gitlab.new.com").toURL,
         checkFrequency = 600000L,
         accessToken = None,
         consumerKey = None,
@@ -342,7 +343,7 @@ class IssueImporterConfigControllerSpec
       val createData = CreateIssueImporterConfig(
         importerType = ImporterType.Gitlab,
         name = "New GitLab",
-        baseUrl = new URL("https://gitlab.new.com"),
+        baseUrl = URI.create("https://gitlab.new.com").toURL,
         checkFrequency = 600000L,
         accessToken = Some("new-token"),
         consumerKey = None,
@@ -785,7 +786,7 @@ class IssueImporterConfigControllerSpec
       val createData = CreateIssueImporterConfig(
         importerType = ImporterType.Github,
         name = "New GitHub",
-        baseUrl = new URL("https://api.github.com"),
+        baseUrl = URI.create("https://api.github.com").toURL,
         checkFrequency = 600000L,
         accessToken = Some("ghp_new-token"),
         consumerKey = None,
@@ -803,7 +804,8 @@ class IssueImporterConfigControllerSpec
       status(result) must equalTo(CREATED)
       val githubConfig = contentAsJson(result).as[GithubConfigResponse]
       githubConfig.name must equalTo("New GitHub")
-      githubConfig.baseUrl must equalTo(new URL("https://api.github.com"))
+      githubConfig.baseUrl must equalTo(
+        URI.create("https://api.github.com").toURL)
     }
 
     "return 400 when accessToken is missing for GitHub" in new WithTestApplication {
@@ -819,7 +821,7 @@ class IssueImporterConfigControllerSpec
       val createData = CreateIssueImporterConfig(
         importerType = ImporterType.Github,
         name = "New GitHub",
-        baseUrl = new URL("https://api.github.com"),
+        baseUrl = URI.create("https://api.github.com").toURL,
         checkFrequency = 600000L,
         accessToken = None,
         consumerKey = None,
@@ -872,7 +874,7 @@ class IssueImporterConfigControllerSpec
       val gitlabConfig = CreateIssueImporterConfig(
         importerType = ImporterType.Gitlab,
         name = "Test GitLab",
-        baseUrl = new URL("https://gitlab.test.com"),
+        baseUrl = URI.create("https://gitlab.test.com").toURL,
         checkFrequency = 300000L,
         accessToken = Some("test-token"),
         consumerKey = None,
@@ -923,7 +925,7 @@ class IssueImporterConfigControllerSpec
       val gitlabConfig = CreateIssueImporterConfig(
         importerType = ImporterType.Gitlab,
         name = "Test GitLab",
-        baseUrl = new URL("https://gitlab.test.com"),
+        baseUrl = URI.create("https://gitlab.test.com").toURL,
         checkFrequency = 300000L,
         accessToken = Some("invalid-token"),
         consumerKey = None,
@@ -974,7 +976,7 @@ class IssueImporterConfigControllerSpec
       val planeConfig = CreateIssueImporterConfig(
         importerType = ImporterType.Plane,
         name = "Test Plane",
-        baseUrl = new URL("https://plane.test.com"),
+        baseUrl = URI.create("https://plane.test.com").toURL,
         checkFrequency = 300000L,
         accessToken = None,
         consumerKey = None,
@@ -1026,7 +1028,7 @@ class IssueImporterConfigControllerSpec
       val githubConfig = CreateIssueImporterConfig(
         importerType = ImporterType.Github,
         name = "Test GitHub",
-        baseUrl = new URL("https://api.github.com"),
+        baseUrl = URI.create("https://api.github.com").toURL,
         checkFrequency = 300000L,
         accessToken = Some("ghp_test-token"),
         consumerKey = None,
@@ -1078,7 +1080,7 @@ class IssueImporterConfigControllerSpec
       val gitlabConfig = CreateIssueImporterConfig(
         importerType = ImporterType.Gitlab,
         name = "Test GitLab",
-        baseUrl = new URL("https://gitlab.test.com"),
+        baseUrl = URI.create("https://gitlab.test.com").toURL,
         checkFrequency = 300000L,
         accessToken = Some("test-token"),
         consumerKey = None,

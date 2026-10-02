@@ -32,7 +32,7 @@ import play.modules.reactivemongo.ReactiveMongoApi
 import repositories._
 import util.{Awaitable, MockAwaitable}
 
-import java.net.URL
+import java.net.URI
 import scala.concurrent.ExecutionContext
 
 class IssueImporterConfigControllerMock(
@@ -68,7 +68,7 @@ class IssueImporterConfigControllerMock(
     id = IssueImporterConfigId(),
     organisationReference = organisation.getReference,
     name = "Test GitLab",
-    baseUrl = new URL("https://gitlab.test.com"),
+    baseUrl = URI.create("https://gitlab.test.com").toURL,
     auth = GitlabAuth("test-token"),
     settings = GitlabSettings(checkFrequency = 300000L),
     projects = Seq(
@@ -95,7 +95,7 @@ class IssueImporterConfigControllerMock(
     id = IssueImporterConfigId(),
     organisationReference = organisation.getReference,
     name = "Test Jira",
-    baseUrl = new URL("https://jira.test.com"),
+    baseUrl = URI.create("https://jira.test.com").toURL,
     auth = JiraAuth(
       consumerKey = "test-consumer",
       privateKey = "test-private-key",
@@ -119,7 +119,7 @@ class IssueImporterConfigControllerMock(
     id = IssueImporterConfigId(),
     organisationReference = organisation.getReference,
     name = "Test Plane",
-    baseUrl = new URL("https://plane.test.com"),
+    baseUrl = URI.create("https://plane.test.com").toURL,
     auth = PlaneAuth("test-api-key"),
     settings = PlaneSettings(
       checkFrequency = 300000L,
@@ -150,7 +150,7 @@ class IssueImporterConfigControllerMock(
     id = IssueImporterConfigId(),
     organisationReference = organisation.getReference,
     name = "Test GitHub",
-    baseUrl = new URL("https://api.github.com"),
+    baseUrl = URI.create("https://api.github.com").toURL,
     auth = GithubAuth("test-github-token"),
     settings = GithubSettings(checkFrequency = 300000L),
     projects = Seq(
