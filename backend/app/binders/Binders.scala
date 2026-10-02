@@ -265,13 +265,13 @@ object Binders {
         } yield {
           dateStr match {
             case Right(dateStr) =>
-              // Accept full ISO 8601 with timezone (e.g. 2026-03-22T14:30:00.000+01:00),
-              // falling back to the strict local pattern without timezone.
+              // The bookings store the wall time of the user, so an offset in
+              // the value must not shift it to the server zone.
               val withTz    = DateTimeFormat.forPattern(dateTimePattern)
               val withoutTz = DateTimeFormat.forPattern(localDateTimePattern)
-              Try(withTz.parseDateTime(dateStr))
-                .orElse(Try(withoutTz.parseDateTime(dateStr))) match {
-                case Success(result) => Right(result.toLocalDateTime)
+              Try(withTz.parseLocalDateTime(dateStr))
+                .orElse(Try(withoutTz.parseLocalDateTime(dateStr))) match {
+                case Success(result) => Right(result)
                 case Failure(e)      =>
                   Left(
                     "Cannot parse parameter " + key + " as LocalDateTime: " + e.getMessage)
@@ -298,14 +298,13 @@ object Binders {
         } yield {
           dateStr match {
             case Right(dateStr) =>
-              // Accept full ISO 8601 with timezone, local datetime, or plain date.
               val withTz    = DateTimeFormat.forPattern(dateTimePattern)
               val withoutTz = DateTimeFormat.forPattern(localDateTimePattern)
               val dateOnly  = DateTimeFormat.forPattern(localDatePattern)
-              Try(withTz.parseDateTime(dateStr))
-                .orElse(Try(withoutTz.parseDateTime(dateStr)))
-                .orElse(Try(dateOnly.parseDateTime(dateStr))) match {
-                case Success(result) => Right(result.toLocalDate)
+              Try(withTz.parseLocalDate(dateStr))
+                .orElse(Try(withoutTz.parseLocalDate(dateStr)))
+                .orElse(Try(dateOnly.parseLocalDate(dateStr))) match {
+                case Success(result) => Right(result)
                 case Failure(e)      =>
                   Left(
                     "Cannot parse parameter " + key + " as LocalDate: " + e.getMessage)
