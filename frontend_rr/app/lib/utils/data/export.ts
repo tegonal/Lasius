@@ -17,7 +17,7 @@
  *
  */
 
-import { differenceInDays, parseISO } from 'date-fns'
+import { differenceInDays, format as formatDate, parseISO } from 'date-fns'
 import * as XLSX from 'xlsx'
 
 import { getExtendedModelsBookingList } from '~/lib/api/functions/get-extended-models-booking-list'
@@ -71,7 +71,7 @@ const generateExportFilename = (format: ExportFormat, options?: ExportOptions): 
       parts.push(date)
     }
   } else {
-    parts.push(new Date().toISOString().split('T', 1)[0] ?? '')
+    parts.push(formatDate(new Date(), 'yyyy-MM-dd'))
   }
 
   return `${parts.join('-')}.${format}`

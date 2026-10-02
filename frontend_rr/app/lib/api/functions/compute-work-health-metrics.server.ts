@@ -17,7 +17,7 @@
  *
  */
 
-import { getWeek, subWeeks } from 'date-fns'
+import { format, getWeek, subWeeks } from 'date-fns'
 
 import { durationInHoursAsNumber } from '~/lib/utils/duration'
 import { type ModelsBooking } from '~/services/api/lasius/modelsBooking'
@@ -74,7 +74,7 @@ export const computeWorkHealthMetrics = (
     const weekNumber = getWeek(bookingDate, { weekStartsOn: 1 })
     const year = bookingDate.getFullYear()
     const weekKey = `${year}-W${weekNumber}`
-    const dateKey = bookingDate.toISOString().split('T', 1)[0] ?? ''
+    const dateKey = format(bookingDate, 'yyyy-MM-dd')
 
     if (!weekMap.has(weekKey)) {
       weekMap.set(weekKey, { dates: new Set(), hours: 0 })
