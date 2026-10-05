@@ -15,13 +15,6 @@ echo "--- Backend (sbt) ---"
 cd "$REPO_ROOT/backend"
 sbt compile
 
-# Frontend (legacy)
-echo ""
-echo "--- Frontend legacy (yarn) ---"
-cd "$REPO_ROOT/frontend"
-corepack enable
-yarn install
-
 # Frontend RR7 (active)
 echo ""
 echo "--- Frontend RR7 (yarn) ---"
