@@ -66,12 +66,12 @@ class TimeBookingHistoryControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: TimeBookingHistoryControllerMock =
-        controllers.TimeBookingHistoryControllerMock(config,
-                                                     systemServices,
-                                                     authConfig,
-                                                     reactiveMongoApi,
-                                                     organisationRole =
-                                                       OrganisationAdministrator)
+        controllers.TimeBookingHistoryControllerMock(
+          config,
+          systemServices,
+          authConfig,
+          reactiveMongoApi,
+          organisationRole = OrganisationAdministrator)
 
       val foreignProject: Project = Project(
         id = ProjectId(),
@@ -98,14 +98,13 @@ class TimeBookingHistoryControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: TimeBookingHistoryControllerMock =
-        controllers.TimeBookingHistoryControllerMock(config,
-                                                     systemServices,
-                                                     authConfig,
-                                                     reactiveMongoApi,
-                                                     organisationRole =
-                                                       OrganisationAdministrator,
-                                                     projectRole =
-                                                       ProjectMember)
+        controllers.TimeBookingHistoryControllerMock(
+          config,
+          systemServices,
+          authConfig,
+          reactiveMongoApi,
+          organisationRole = OrganisationAdministrator,
+          projectRole = ProjectMember)
 
       val result: Future[Result] =
         getHistoryByProject(controller, controller.project.id)
@@ -120,14 +119,13 @@ class TimeBookingHistoryControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: TimeBookingHistoryControllerMock =
-        controllers.TimeBookingHistoryControllerMock(config,
-                                                     systemServices,
-                                                     authConfig,
-                                                     reactiveMongoApi,
-                                                     organisationRole =
-                                                       OrganisationAdministrator,
-                                                     projectRole =
-                                                       ProjectAdministrator)
+        controllers.TimeBookingHistoryControllerMock(
+          config,
+          systemServices,
+          authConfig,
+          reactiveMongoApi,
+          organisationRole = OrganisationAdministrator,
+          projectRole = ProjectAdministrator)
 
       // An accepted project invitation stores a project of another
       // organisation under the organisation that the invited user selects.
@@ -147,14 +145,13 @@ class TimeBookingHistoryControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: TimeBookingHistoryControllerMock =
-        controllers.TimeBookingHistoryControllerMock(config,
-                                                     systemServices,
-                                                     authConfig,
-                                                     reactiveMongoApi,
-                                                     organisationRole =
-                                                       OrganisationAdministrator,
-                                                     projectRole =
-                                                       ProjectMember)
+        controllers.TimeBookingHistoryControllerMock(
+          config,
+          systemServices,
+          authConfig,
+          reactiveMongoApi,
+          organisationRole = OrganisationAdministrator,
+          projectRole = ProjectMember)
 
       upsertProject(controller,
                     controller.project.copy(organisationReference =
@@ -174,14 +171,13 @@ class TimeBookingHistoryControllerSpec
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
       val controller: TimeBookingHistoryControllerMock =
-        controllers.TimeBookingHistoryControllerMock(config,
-                                                     systemServices,
-                                                     authConfig,
-                                                     reactiveMongoApi,
-                                                     organisationRole =
-                                                       OrganisationAdministrator,
-                                                     projectRole =
-                                                       ProjectMember)
+        controllers.TimeBookingHistoryControllerMock(
+          config,
+          systemServices,
+          authConfig,
+          reactiveMongoApi,
+          organisationRole = OrganisationAdministrator,
+          projectRole = ProjectMember)
 
       val result: Future[Result] = getHistoryByProject(controller, ProjectId())
 
