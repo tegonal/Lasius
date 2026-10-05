@@ -48,7 +48,7 @@ val reactiveMongoPlayVersion = "1.1.0-play30.RC20"
 // Play framework 3.x is still bound to older guice version
 val guiceVersion      = "6.0.0"
 val pureConfigVersion = "0.17.10"
-val jacksonVersion    = "2.21.1"
+val jacksonVersion    = "2.21.7"
 
 libraryDependencies ++= Seq(
   "org.reactivemongo" %% "play2-reactivemongo" % reactiveMongoPlayVersion,
@@ -81,8 +81,9 @@ libraryDependencies ++= Seq(
 
   // basic jwt token and jwks support
   // "com.github.jwt-scala" %% "jwt-play" % "10.0.1",
-  "com.auth0" % "java-jwt" % "4.5.1",
-  "com.auth0" % "jwks-rsa" % "0.23.0",
+  // java-jwt 4.6+ pulls jackson 2.22, which conflicts with the 2.21 pin below.
+  "com.auth0" % "java-jwt" % "4.5.2",
+  "com.auth0" % "jwks-rsa" % "0.24.1",
 
   // oauth2 provider dependencies
   // oauth2 provider dependencies to be able to provide a simple oauth server packed with lasius
@@ -92,7 +93,7 @@ libraryDependencies ++= Seq(
   ws,
   specs2 % Test,
   guice,
-  "org.webjars" % "swagger-ui" % "5.32.1"
+  "org.webjars" % "swagger-ui" % "5.33.1"
 )
 
 dependencyOverrides ++= Seq(
