@@ -43,7 +43,7 @@ resolvers += "Tegonal releases".at(
 resolvers += "Sonatype OSS Releases".at(
   "https://oss.sonatype.org/content/repositories/releases")
 
-val pekkoVersion             = "1.4.0"
+val pekkoVersion             = "1.7.1"
 val reactiveMongoPlayVersion = "1.1.0-play30.RC20"
 // Play framework 3.x is still bound to older guice version
 val guiceVersion      = "6.0.0"
@@ -52,7 +52,7 @@ val jacksonVersion    = "2.21.7"
 
 libraryDependencies ++= Seq(
   "org.reactivemongo" %% "play2-reactivemongo" % reactiveMongoPlayVersion,
-  "com.github.scullxbones"      %% "pekko-persistence-mongodb" % "1.4.0",
+  "com.github.scullxbones"      %% "pekko-persistence-mongodb" % "1.5.0",
   "com.tegonal"                 %% "play-json-typedid"         % "2.0.0",
   "org.julienrf"                %% "play-json-derived-codecs"  % "11.0.0",
   "org.playframework"           %% "play-json-joda"            % "3.0.6",
