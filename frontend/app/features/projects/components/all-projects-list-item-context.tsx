@@ -129,6 +129,7 @@ export const AllProjectsListItemContext = ({ item }: Properties) => {
             <ContextButtonWrapper variant="compact">
               <Button
                 aria-label={t('bookings:showLists', 'Show bookings')}
+                data-testid="org-project-ctx-lists-btn"
                 fullWidth={false}
                 onClick={() => showLists()}
                 shape="circle"

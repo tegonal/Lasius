@@ -17,11 +17,12 @@
  *
  */
 
-import { data } from 'react-router'
+import { data, redirect } from 'react-router'
 
 import {
   countDistinctUsers,
   findProjectInProfile,
+  getProjectsPath,
   getProjectStatsView,
   getStatsSource,
   type ProjectStatsScope,
@@ -91,9 +92,10 @@ export const loadProjectStats = async (
       : await loadStatsContext(request, url)
   const { auth, from, headers, organisations, selectedOrgId, to } = context
 
+  // An organisation switch reloads this page with a project of the previous organisation.
   const project = findProjectInProfile(organisations, selectedOrgId, params.projectId ?? '')
   if (!project) {
-    throw new Response('Not Found', { headers: statsResponseHeaders(auth), status: 404 })
+    throw redirect(getProjectsPath(scope), { headers: statsResponseHeaders(auth) })
   }
 
   const view = getProjectStatsView(url.searchParams)

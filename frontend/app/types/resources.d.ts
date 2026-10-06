@@ -1002,7 +1002,6 @@ export default interface Resources {
     title: 'Projects'
     total: 'Total'
     warnings: {
-      inactiveProjectContext: 'Viewing stats from inactive project'
       inactiveProjectFilter: 'Showing data for inactive project'
       projectNotInActiveList: 'This project is not in your active projects list. It may be inactive or from another organization.'
       projectUnavailable: 'This project is no longer in your profile. You may have been removed from it.'

@@ -17,27 +17,38 @@
  *
  */
 
-import { expect, type Page, test } from '@playwright/test'
+import { expect, type Locator, type Page, test } from '@playwright/test'
+
+// The demo seed makes demo1 ProjectAdministrator of Lasius and ProjectMember of Marketing.
+const ADMINISTERED_PROJECT = 'Lasius'
+const MEMBER_PROJECT = 'Marketing'
 
 // The app layout renders a mobile copy and a desktop copy of the page.
 const visible = (page: Page, testId: string) =>
   page.getByTestId(testId).locator('visible=true').first()
 
-const openStatsFromMenu = async (page: Page, openBtnId: string, statsBtnId: string) => {
-  const openBtn = page.getByTestId(openBtnId).first()
-  if (!(await openBtn.isVisible({ timeout: 10000 }).catch(() => false))) return false
+const projectRow = (page: Page, name: string) =>
+  page.getByTestId('project-card').locator('visible=true').filter({ hasText: name }).first()
 
-  // The menu shows the statistics entry only to a project administrator.
-  const isOpened = await expect(async () => {
-    await openBtn.click()
-    await expect(page.getByTestId(statsBtnId)).toBeVisible({ timeout: 1000 })
-  })
-    .toPass({ timeout: 10000 })
+// Another spec can switch demo1 to another organisation, so a missing row skips the test.
+const findRowOrSkip = async (page: Page, path: string, name: string) => {
+  await page.goto(path)
+  const row = projectRow(page, name)
+  const hasRow = await row
+    .waitFor({ timeout: 15000 })
     .then(() => true)
     .catch(() => false)
-  if (!isOpened) return false
-  await page.getByTestId(statsBtnId).click()
-  return true
+  test.skip(!hasRow, `demo1 has no ${name} row in the selected organisation`)
+  return row
+}
+
+// The open button toggles the menu, so the retry clicks only while the menu is closed.
+const openMenu = async (page: Page, row: Locator, openBtnId: string, entryId: string) => {
+  const openBtn = row.getByTestId(openBtnId)
+  await expect(async () => {
+    if ((await openBtn.getAttribute('aria-expanded')) !== 'true') await openBtn.click()
+    await expect(visible(page, entryId)).toBeVisible({ timeout: 1000 })
+  }).toPass({ timeout: 15000 })
 }
 
 const expectProjectStatsPage = async (page: Page, scope: 'organisation' | 'user') => {
@@ -45,7 +56,7 @@ const expectProjectStatsPage = async (page: Page, scope: 'organisation' | 'user'
     timeout: 15000,
   })
   await expect(visible(page, 'project-stats-page')).toBeVisible({ timeout: 15000 })
-  await expect(visible(page, 'stats-filter-project')).not.toBeEmpty()
+  await expect(visible(page, 'stats-filter-project')).toHaveText(ADMINISTERED_PROJECT)
   await expect(visible(page, 'stats-tab-tags')).toHaveAttribute('aria-current', 'page')
 
   await visible(page, 'stats-tab-users').click()
@@ -55,11 +66,9 @@ const expectProjectStatsPage = async (page: Page, scope: 'organisation' | 'user'
 
 test.describe('Project statistics @stats', () => {
   test('opens the project statistics from my projects and goes back', async ({ page }) => {
-    await page.goto('/user/projects')
-    if (!(await openStatsFromMenu(page, 'project-ctx-open-btn', 'project-ctx-stats-btn'))) {
-      test.skip()
-      return
-    }
+    const row = await findRowOrSkip(page, '/user/projects', ADMINISTERED_PROJECT)
+    await openMenu(page, row, 'project-ctx-open-btn', 'project-ctx-stats-btn')
+    await visible(page, 'project-ctx-stats-btn').click()
 
     await expectProjectStatsPage(page, 'user')
 
@@ -70,17 +79,28 @@ test.describe('Project statistics @stats', () => {
   })
 
   test('opens the project statistics from the organisation projects', async ({ page }) => {
-    await page.goto('/organisation/projects')
-    if (!(await openStatsFromMenu(page, 'org-project-ctx-open-btn', 'org-project-ctx-stats-btn'))) {
-      test.skip()
-      return
-    }
+    const row = await findRowOrSkip(page, '/organisation/projects', ADMINISTERED_PROJECT)
+    await openMenu(page, row, 'org-project-ctx-open-btn', 'org-project-ctx-stats-btn')
+    await visible(page, 'org-project-ctx-stats-btn').click()
 
     await expectProjectStatsPage(page, 'organisation')
   })
 
-  test('answers 404 for a project the user cannot see', async ({ page }) => {
-    const response = await page.goto('/user/stats/project/00000000-0000-0000-0000-000000000001')
-    expect(response?.status()).toBe(404)
+  test('hides and refuses the statistics of a project without the admin role', async ({ page }) => {
+    const row = await findRowOrSkip(page, '/organisation/projects', MEMBER_PROJECT)
+    // The lists entry is always present, so it proves that the menu opened.
+    await openMenu(page, row, 'org-project-ctx-open-btn', 'org-project-ctx-lists-btn')
+    await expect(page.getByTestId('org-project-ctx-stats-btn').locator('visible=true')).toHaveCount(
+      0,
+    )
+
+    await visible(page, 'org-project-ctx-lists-btn').click()
+    await expect(page).toHaveURL(/projectId=/, { timeout: 10000 })
+    const projectId = new URL(page.url()).searchParams.get('projectId')
+
+    await page.goto(`/organisation/stats/project/${projectId}`)
+    await expect(page).toHaveURL(/\/organisation\/projects/, { timeout: 15000 })
+    await page.goto(`/user/stats/project/${projectId}`)
+    await expect(page).toHaveURL(/\/user\/projects/, { timeout: 15000 })
   })
 })
