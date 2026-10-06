@@ -21,7 +21,13 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { type ModelsTag } from '~/services/api/lasius'
 
-import { getTagSummary, getTagText, getTagVariant, openIssueLink } from './tag-display'
+import {
+  getIssueLink,
+  getTagSummary,
+  getTagText,
+  getTagVariant,
+  openIssueLink,
+} from './tag-display'
 
 const simpleTag: ModelsTag = { id: 'Billable', type: 'SimpleTag' }
 const tagGroup: ModelsTag = { id: 'Support', relatedTags: [], type: 'TagGroup' }
@@ -59,6 +65,19 @@ describe('getTagSummary and getTagText', () => {
   })
 })
 
+describe('getIssueLink', () => {
+  it('returns an absolute http or https link', () => {
+    expect(getIssueLink(issueTag)).toBe('https://gitlab.example.com/lasius/-/issues/42')
+    expect(getIssueLink({ ...issueTag, issueLink: 'https://jira.local/browse/LAS-1' })).toBe(
+      'https://jira.local/browse/LAS-1',
+    )
+  })
+
+  it('returns null for a tag type without a link', () => {
+    expect(getIssueLink(simpleTag)).toBeNull()
+  })
+})
+
 describe('openIssueLink', () => {
   afterEach(() => {
     vi.unstubAllGlobals()
@@ -75,6 +94,19 @@ describe('openIssueLink', () => {
       '_blank',
       'noopener,noreferrer',
     )
+  })
+
+  it.each([
+    ['an empty link', ''],
+    ['a javascript link', 'javascript:alert(1)'],
+    ['a relative link', '/issues/42'],
+  ])('opens nothing for %s', (_case, issueLink) => {
+    const open = vi.fn()
+    vi.stubGlobal('window', { open })
+
+    openIssueLink({ ...issueTag, issueLink })
+
+    expect(open).not.toHaveBeenCalled()
   })
 
   it('opens nothing for a tag without a link', () => {

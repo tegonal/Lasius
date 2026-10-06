@@ -51,9 +51,21 @@ export const getTagText = (tag: ModelsTag): string => {
   return summary ? `${tag.id}: ${summary}` : tag.id
 }
 
-// The issue tracker supplies the link, so the new tab gets no window.opener reference to this tab.
+// The issue tracker supplies the link. Only an absolute http or https URL opens, and without a
+// window.opener reference to this tab.
+export const getIssueLink = (tag: ModelsTag): null | string => {
+  if (!('issueLink' in tag) || !tag.issueLink) return null
+  try {
+    const url = new URL(tag.issueLink)
+    return url.protocol === 'http:' || url.protocol === 'https:' ? url.href : null
+  } catch {
+    return null
+  }
+}
+
 export const openIssueLink = (tag: ModelsTag): void => {
-  if ('issueLink' in tag) {
-    window.open(tag.issueLink, '_blank', 'noopener,noreferrer')
+  const link = getIssueLink(tag)
+  if (link) {
+    window.open(link, '_blank', 'noopener,noreferrer')
   }
 }
