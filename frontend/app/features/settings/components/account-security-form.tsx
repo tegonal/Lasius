@@ -39,41 +39,42 @@ import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { preventEnterOnForm } from '~/components/ui/forms/input/prevent-enter-on-form'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { useGuardedSubmit } from '~/features/settings/hooks/use-guarded-submit'
+import { requiredString } from '~/lib/conform-helpers'
 import { type SchemaTranslationFunction, untyped } from '~/lib/i18n-types'
 import { useUpdateUserPassword } from '~/services/api/lasius-hooks/oauth2-provider/oauth2-provider'
 
 const createPasswordChangeSchema = (t: SchemaTranslationFunction) =>
   z
     .object({
-      confirmPassword: z.string().min(1, {
-        error: t('validation.confirmPasswordRequired', 'Please confirm your password'),
-      }),
-      newPassword: z.string().superRefine((value, context) => {
-        if (value.length < 9) {
-          context.addIssue({
-            code: 'custom',
-            error: t('validation.passwordTooShort', 'Minimum 9 characters'),
-          })
-        }
-        if (!/[A-Z]/.test(value)) {
-          context.addIssue({
-            code: 'custom',
-            error: t('validation.missingUppercase', 'Must contain uppercase letter'),
-          })
-        }
-        if (!/\d/.test(value)) {
-          context.addIssue({
-            code: 'custom',
-            error: t('validation.missingNumber', 'Must contain a number'),
-          })
-        }
-      }),
-      password: z.string().min(1, {
-        error: t('validation.passwordRequired', 'Password is required'),
-      }),
+      confirmPassword: requiredString(
+        t('common:validation.confirmPasswordRequired', 'Please confirm your password'),
+      ),
+      newPassword: z
+        .string({ error: t('common:validation.passwordTooShort', 'Minimum 9 characters') })
+        .superRefine((value, context) => {
+          if (value.length < 9) {
+            context.addIssue({
+              code: 'custom',
+              error: t('common:validation.passwordTooShort', 'Minimum 9 characters'),
+            })
+          }
+          if (!/[A-Z]/.test(value)) {
+            context.addIssue({
+              code: 'custom',
+              error: t('common:validation.missingUppercase', 'Must contain uppercase letter'),
+            })
+          }
+          if (!/\d/.test(value)) {
+            context.addIssue({
+              code: 'custom',
+              error: t('common:validation.missingNumber', 'Must contain a number'),
+            })
+          }
+        }),
+      password: requiredString(t('common:validation.passwordRequired', 'Password is required')),
     })
     .refine((data) => data.newPassword === data.confirmPassword, {
-      error: t('validation.passwordMismatch', 'Passwords do not match'),
+      error: t('common:validation.passwordMismatch', 'Passwords do not match'),
       path: ['confirmPassword'],
     })
 

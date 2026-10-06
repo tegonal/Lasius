@@ -37,11 +37,12 @@ import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
 import { TagConfigForm } from '~/features/integrations/components/shared/tag-config-form'
 import { type TagConfig } from '~/features/integrations/lib/mapping-helpers'
 import { getDefaultTagConfig } from '~/features/integrations/lib/tag-config-defaults'
+import { requiredString } from '~/lib/conform-helpers'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 import { type ModelsExternalProject } from '~/services/api/lasius'
 
 const mappingSchema = z.object({
-  projectId: z.string().min(1, 'Project is required'),
+  projectId: requiredString('Project is required'),
 })
 
 type Properties = {

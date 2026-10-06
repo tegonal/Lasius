@@ -17,9 +17,30 @@
  *
  */
 
+import { parseWithZod } from '@conform-to/zod/v4'
 import { describe, expect, it } from 'vitest'
+import { z } from 'zod'
 
-import { mergeErrors } from './conform-helpers'
+import { mergeErrors, requiredString } from './conform-helpers'
+
+const requiredErrorsFor = (value: string) => {
+  const formData = new FormData()
+  formData.set('name', value)
+  const submission = parseWithZod(formData, {
+    schema: z.object({ name: requiredString('Name is required') }),
+  })
+  return submission.status === 'success' ? undefined : submission.error?.name
+}
+
+describe('requiredString', () => {
+  it('reports the message for an empty field, which Conform submits as undefined', () => {
+    expect(requiredErrorsFor('')).toEqual(['Name is required'])
+  })
+
+  it('accepts a non-empty value', () => {
+    expect(requiredErrorsFor('Lasius')).toBeUndefined()
+  })
+})
 
 describe('mergeErrors', () => {
   it('returns undefined when both inputs are undefined', () => {

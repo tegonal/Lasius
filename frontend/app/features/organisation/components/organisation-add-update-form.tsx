@@ -54,9 +54,9 @@ const createOrganisationSchema = (t: SchemaTranslationFunction) =>
   z.object({
     organisationName: z
       .string({
-        error: t('validation.organisationNameRequired', 'Organisation name is required'),
+        error: t('common:validation.organisationNameRequired', 'Organisation name is required'),
       })
-      .min(1, t('validation.organisationNameRequired', 'Organisation name is required')),
+      .min(1, t('common:validation.organisationNameRequired', 'Organisation name is required')),
   })
 
 export const OrganisationAddUpdateForm = ({ mode, onCancel, onSave }: Properties) => {

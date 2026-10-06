@@ -20,14 +20,18 @@
 import { isBefore, isFuture } from 'date-fns'
 import { z } from 'zod'
 
+import { requiredString } from '~/lib/conform-helpers'
 import { type SchemaTranslationFunction } from '~/lib/i18n-types'
+
+const requiredField = (t: SchemaTranslationFunction) =>
+  requiredString(t('common:validation.required', 'Required'))
 
 /**
  * Schema for the booking start form (projectId + tags only).
  */
 export const createBookingStartSchema = (t: SchemaTranslationFunction) =>
   z.object({
-    projectId: z.string().min(1, t('validation.required', 'Required')),
+    projectId: requiredField(t),
     tags: z.string().optional(),
   })
 
@@ -38,8 +42,8 @@ export const createBookingStartSchema = (t: SchemaTranslationFunction) =>
 export const createBookingEditRunningSchema = (t: SchemaTranslationFunction) =>
   z
     .object({
-      projectId: z.string().min(1, t('validation.required', 'Required')),
-      start: z.string().min(1, t('validation.required', 'Required')),
+      projectId: requiredField(t),
+      start: requiredField(t),
       tags: z.string().optional(),
     })
     .refine(
@@ -60,9 +64,9 @@ export const createBookingEditRunningSchema = (t: SchemaTranslationFunction) =>
 export const createBookingSchema = (t: SchemaTranslationFunction) =>
   z
     .object({
-      end: z.string().min(1, t('validation.required', 'Required')),
-      projectId: z.string().min(1, t('validation.required', 'Required')),
-      start: z.string().min(1, t('validation.required', 'Required')),
+      end: requiredField(t),
+      projectId: requiredField(t),
+      start: requiredField(t),
       tags: z.string().optional(),
     })
     .refine(

@@ -17,6 +17,14 @@
  *
  */
 
+import { z } from 'zod'
+
+/**
+ * A required string field for a Conform form. Conform submits an empty field as undefined,
+ * so Zod reports a type error before min(1) runs. Both checks get the message.
+ */
+export const requiredString = (message: string) => z.string({ error: message }).min(1, message)
+
 /**
  * Merge Conform field errors with server-side errors (e.g. from API responses).
  * Returns a combined string[] suitable for FormFieldErrors.

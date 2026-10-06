@@ -21,7 +21,7 @@ import { getFormProps, getInputProps, useForm, useInputControl } from '@conform-
 import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { z } from 'zod'
+import { type z } from 'zod'
 
 import { Input } from '~/components/primitives/inputs/input'
 import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
@@ -29,29 +29,13 @@ import { DurationInput } from '~/components/ui/forms/input/duration-input'
 import { ProviderInstructions } from '~/features/integrations/components/shared/provider-instructions'
 import { CreateCredentialFields } from '~/features/integrations/components/wizard/steps/create-credential-fields'
 import { type WizardFormData } from '~/features/integrations/hooks/use-wizard-state'
-import { createConfigSchema } from '~/features/integrations/lib/config-schemas'
+import {
+  allFieldsConstraintSchema,
+  createConfigSchema,
+} from '~/features/integrations/lib/config-schemas'
 import { getImporterTypeLabel } from '~/features/integrations/lib/importer-type-labels'
 import { untyped } from '~/lib/i18n-types'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
-import { ModelsCreateIssueImporterConfigResourceOwnerType } from '~/services/api/lasius/modelsCreateIssueImporterConfigResourceOwnerType'
-
-/**
- * Superset schema containing all possible fields across all importer types.
- * Used only for Conform type inference (getZodConstraint) — actual validation
- * uses the platform-specific schema from createConfigSchema.
- */
-const allFieldsConstraintSchema = z.object({
-  accessToken: z.string().optional(),
-  apiKey: z.string().optional(),
-  baseUrl: z.url(),
-  checkFrequency: z.number(),
-  consumerKey: z.string().optional(),
-  name: z.string(),
-  privateKey: z.string().optional(),
-  resourceOwner: z.string().optional(),
-  resourceOwnerType: z.enum(ModelsCreateIssueImporterConfigResourceOwnerType).optional(),
-  workspace: z.string().optional(),
-})
 
 type Properties = {
   formData: WizardFormData

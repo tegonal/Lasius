@@ -20,28 +20,42 @@
 import { type TFunction } from 'i18next'
 import { z } from 'zod'
 
+import { requiredString } from '~/lib/conform-helpers'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
+import { ModelsCreateIssueImporterConfigResourceOwnerType } from '~/services/api/lasius/modelsCreateIssueImporterConfigResourceOwnerType'
+
+/**
+ * Superset schema containing all possible fields across all importer types.
+ * Used only for Conform type inference and constraints — actual validation
+ * uses the platform-specific schema from createConfigSchema.
+ */
+export const allFieldsConstraintSchema = z.object({
+  accessToken: z.string().optional(),
+  apiKey: z.string().optional(),
+  baseUrl: z.url(),
+  checkFrequency: z.number(),
+  consumerKey: z.string().optional(),
+  name: z.string(),
+  privateKey: z.string().optional(),
+  resourceOwner: z.string().optional(),
+  resourceOwnerType: z.enum(ModelsCreateIssueImporterConfigResourceOwnerType).optional(),
+  workspace: z.string().optional(),
+})
 
 /**
  * Base schema shared by all issue importer platforms
  */
 const createBaseConfigSchema = (t: TFunction<'common' | 'integrations'>) => ({
-  baseUrl: z
-    .url({
-      // A missing value keeps the default Zod message, as the former z.string() base did.
-      error: (issue) =>
-        issue.code === 'invalid_type'
-          ? undefined
-          : t('issueImporters.validation.invalidUrl', {
-              defaultValue: 'Invalid URL',
-            }),
-    })
-    .min(
-      1,
-      t('issueImporters.validation.baseUrlRequired', {
-        defaultValue: 'Base URL is required',
-      }),
-    ),
+  baseUrl: z.url({
+    error: (issue) =>
+      issue.code === 'invalid_type'
+        ? t('issueImporters.validation.baseUrlRequired', {
+            defaultValue: 'Base URL is required',
+          })
+        : t('issueImporters.validation.invalidUrl', {
+            defaultValue: 'Invalid URL',
+          }),
+  }),
   checkFrequency: z
     .number()
     .min(
@@ -56,8 +70,7 @@ const createBaseConfigSchema = (t: TFunction<'common' | 'integrations'>) => ({
         defaultValue: 'Maximum 24 hours',
       }),
     ),
-  name: z.string().min(
-    1,
+  name: requiredString(
     t('issueImporters.validation.nameRequired', {
       defaultValue: 'Name is required',
     }),
@@ -71,8 +84,7 @@ const credentialSchemas = {
   accessToken: (t: TFunction<'common' | 'integrations'>, isEdit: boolean) =>
     isEdit
       ? z.string().optional()
-      : z.string().min(
-          1,
+      : requiredString(
           t('issueImporters.validation.accessTokenRequired', {
             defaultValue: 'Access token is required',
           }),
@@ -81,16 +93,14 @@ const credentialSchemas = {
   apiKey: (t: TFunction<'common' | 'integrations'>, isEdit: boolean) =>
     isEdit
       ? z.string().optional()
-      : z.string().min(
-          1,
+      : requiredString(
           t('issueImporters.validation.apiKeyRequired', {
             defaultValue: 'API key is required',
           }),
         ),
 
   consumerKey: (t: TFunction<'common' | 'integrations'>) =>
-    z.string().min(
-      1,
+    requiredString(
       t('issueImporters.validation.consumerKeyRequired', {
         defaultValue: 'Consumer key is required',
       }),
@@ -99,8 +109,7 @@ const credentialSchemas = {
   privateKey: (t: TFunction<'common' | 'integrations'>, isEdit: boolean) =>
     isEdit
       ? z.string().optional()
-      : z.string().min(
-          1,
+      : requiredString(
           t('issueImporters.validation.privateKeyRequired', {
             defaultValue: 'Private key is required',
           }),
@@ -127,8 +136,7 @@ export const createConfigSchema = (
       return z.object({
         ...baseSchema,
         accessToken: credentialSchemas.accessToken(t, isEdit),
-        resourceOwner: z.string().min(
-          1,
+        resourceOwner: requiredString(
           t('issueImporters.validation.resourceOwnerRequired', {
             defaultValue: 'Resource owner is required',
           }),
@@ -157,8 +165,7 @@ export const createConfigSchema = (
       return z.object({
         ...baseSchema,
         apiKey: credentialSchemas.apiKey(t, isEdit),
-        workspace: z.string().min(
-          1,
+        workspace: requiredString(
           t('issueImporters.validation.workspaceRequired', {
             defaultValue: 'Workspace is required',
           }),

@@ -74,6 +74,7 @@ export const ManageUserInviteByEmailForm = ({
   const schema = useMemo(() => createInviteSchema(untyped(t)), [t])
 
   const [showResultState, setShowResultState] = useState(false)
+  const [resetKey, setResetKey] = useState(0)
   const [invitationResult, setInvitationResult] = useState<ModelsInvitationResult | null>(null)
 
   const handleInviteSuccess = useCallback((result: ModelsInvitationResult) => {
@@ -96,6 +97,7 @@ export const ManageUserInviteByEmailForm = ({
       organisationRole: 'OrganisationMember',
       projectRole: 'ProjectMember',
     },
+    id: `invite-by-email-${resetKey}`,
     onSubmit(event, { submission }) {
       event.preventDefault()
       if (submission?.status !== 'success') return
@@ -131,7 +133,8 @@ export const ManageUserInviteByEmailForm = ({
   const orgRoleControl = useInputControl(fields.organisationRole)
 
   const handleCloseResult = () => {
-    form.reset()
+    // The result view replaces the form, and form.reset() throws without a mounted form element.
+    setResetKey((key) => key + 1)
     setShowResultState(false)
     setInvitationResult(null)
     onSave()

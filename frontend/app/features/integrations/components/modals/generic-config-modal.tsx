@@ -22,7 +22,7 @@ import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
 import { useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useRevalidator } from 'react-router'
-import { z } from 'zod'
+import { type z } from 'zod'
 
 import { Input } from '~/components/primitives/inputs/input'
 import { useToast } from '~/components/ui/feedback/use-toast'
@@ -39,31 +39,16 @@ import { PlaneFields } from '~/features/integrations/components/modals/config-fi
 import { ConnectionTestPanel } from '~/features/integrations/components/modals/connection-test-panel'
 import { ProviderInstructions } from '~/features/integrations/components/shared/provider-instructions'
 import { useConnectionTest } from '~/features/integrations/hooks/use-connection-test'
-import { createConfigSchema } from '~/features/integrations/lib/config-schemas'
+import {
+  allFieldsConstraintSchema,
+  createConfigSchema,
+} from '~/features/integrations/lib/config-schemas'
 import { getImporterTypeLabel } from '~/features/integrations/lib/importer-type-labels'
 import { untyped } from '~/lib/i18n-types'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 import { useUpdateConfig } from '~/services/api/lasius-hooks/issue-importers/issue-importers'
 import { type ModelsIssueImporterConfigResponse } from '~/services/api/lasius/modelsIssueImporterConfigResponse'
 import { type ModelsUpdateIssueImporterConfig } from '~/services/api/lasius/modelsUpdateIssueImporterConfig'
-
-/**
- * Superset schema containing all possible fields across all importer types.
- * Used only for Conform type inference — actual validation uses the
- * platform-specific schema from createConfigSchema.
- */
-const allFieldsConstraintSchema = z.object({
-  accessToken: z.string().optional(),
-  apiKey: z.string().optional(),
-  baseUrl: z.url(),
-  checkFrequency: z.number(),
-  consumerKey: z.string().optional(),
-  name: z.string(),
-  privateKey: z.string().optional(),
-  resourceOwner: z.string().optional(),
-  resourceOwnerType: z.string().optional(),
-  workspace: z.string().optional(),
-})
 
 type Properties = {
   config: ModelsIssueImporterConfigResponse | null

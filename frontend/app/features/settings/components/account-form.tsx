@@ -43,14 +43,14 @@ const createAccountSchema = (t: SchemaTranslationFunction) =>
   z.object({
     firstName: z
       .string({
-        error: t('validation.firstNameRequired', 'First name is required'),
+        error: t('common:validation.firstNameRequired', 'First name is required'),
       })
-      .min(1, t('validation.firstNameRequired', 'First name is required')),
+      .min(1, t('common:validation.firstNameRequired', 'First name is required')),
     lastName: z
       .string({
-        error: t('validation.lastNameRequired', 'Last name is required'),
+        error: t('common:validation.lastNameRequired', 'Last name is required'),
       })
-      .min(1, t('validation.lastNameRequired', 'Last name is required')),
+      .min(1, t('common:validation.lastNameRequired', 'Last name is required')),
   })
 
 interface AccountFormProperties {

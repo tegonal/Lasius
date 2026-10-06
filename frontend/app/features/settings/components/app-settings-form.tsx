@@ -56,13 +56,13 @@ const createAppSettingsSchema = (t: SchemaTranslationFunction) =>
   z.object({
     language: z.string().min(
       1,
-      t('validation.languageRequired', {
+      t('common:validation.languageRequired', {
         defaultValue: 'Language is required',
       }),
     ),
     showOnboarding: z.string().optional(),
     theme: z.enum(['light', 'dark', 'system'], {
-      message: t('validation.themeRequired', {
+      message: t('common:validation.themeRequired', {
         defaultValue: 'Theme is required',
       }),
     }),
