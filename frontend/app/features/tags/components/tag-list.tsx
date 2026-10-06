@@ -17,46 +17,17 @@
  *
  */
 
-import { cva, type VariantProps } from 'class-variance-authority'
-import { XIcon } from 'lucide-react'
-
-import { Badge } from '~/components/ui/data-display/badge'
-import { LucideIcon } from '~/components/ui/icons/lucide-icon'
-import { ImporterTypeIcon } from '~/features/issue-importers/importer-type-icon'
-import { cn } from '~/lib/utils/cn'
+import { PlatformTag } from '~/features/tags/components/platform-tag'
+import { SimpleTag } from '~/features/tags/components/simple-tag'
+import {
+  getTagSummary,
+  getTagText,
+  getTagVariant,
+  openIssueLink,
+  type TagWidth,
+} from '~/features/tags/lib/tag-display'
 import { getImporterTypeFromTag } from '~/lib/utils/tag-helpers'
 import { type ModelsTag } from '~/services/api/lasius'
-
-const tagLabelVariants = cva('block overflow-hidden text-ellipsis whitespace-nowrap', {
-  defaultVariants: { width: 'md' },
-  variants: {
-    width: {
-      lg: 'max-w-[50ch]',
-      md: 'max-w-[35ch]',
-      sm: 'max-w-[23ch]',
-      xs: 'max-w-[18ch]',
-    },
-  },
-})
-
-type TagWidth = VariantProps<typeof tagLabelVariants>['width']
-
-const ItemLabel = ({
-  label,
-  summary,
-  width,
-}: {
-  label: string
-  summary: string
-  width?: TagWidth
-}) => {
-  const fullText = summary ? `${label}: ${summary}` : label
-  return (
-    <span className={cn(tagLabelVariants({ width }))} title={fullText}>
-      {fullText}
-    </span>
-  )
-}
 
 type TagProperties = {
   active?: boolean
@@ -74,103 +45,37 @@ export const Tag = ({
   width = 'md',
 }: TagProperties) => {
   const isClickable = !!clickHandler
-  const isClickableAndRemovable = !!clickHandler && !hideRemoveIcon
+  const isRemovable = isClickable && !hideRemoveIcon
+  const handleClick = () => (clickHandler ? clickHandler(item) : openIssueLink(item))
 
-  let tagVariant: 'tagSimpleTag' | 'tagTagGroup' | 'tagWithSummary'
-
-  if (item.type === 'SimpleTag') {
-    tagVariant = 'tagSimpleTag'
-  } else if (item.type === 'TagGroup') {
-    tagVariant = 'tagTagGroup'
-  } else if ('summary' in item) {
-    tagVariant = 'tagWithSummary'
-  } else {
-    tagVariant = 'tagSimpleTag'
-  }
-
-  const summary = 'summary' in item && item.summary ? item.summary : ''
+  const summary = getTagSummary(item)
   const importerType = getImporterTypeFromTag(item)
-  const isPlatformTag = !!importerType
 
-  function clickTag(tag: ModelsTag) {
-    if (clickHandler) {
-      clickHandler(tag)
-    } else if ('issueLink' in tag) {
-      window.open(tag.issueLink, '_blank')
-    }
-  }
-
-  const fullText = summary ? `${item.id}: ${summary}` : item.id
-
-  // Platform tags: Use join with multiple Badge components
-  if (isPlatformTag && summary) {
+  if (importerType && summary) {
     return (
-      <div className={cn(tagLabelVariants({ width }), 'join group inline-flex')} title={fullText}>
-        {importerType && (
-          <Badge
-            className={cn(
-              'join-item !rounded-l-badge group-hover:bg-neutral group-hover:text-neutral-content rounded-r-none px-1',
-              active && 'bg-neutral text-neutral-content',
-            )}
-            clickable={isClickable}
-            onClick={() => clickTag(item)}
-            style={
-              active
-                ? undefined
-                : {
-                    background: 'oklch(from var(--color-secondary) calc(l - 0.3) c h)',
-                  }
-            }
-            variant="tagWithSummary">
-            <ImporterTypeIcon className="h-4 w-4" type={importerType} />
-          </Badge>
-        )}
-        <Badge
-          className={cn(
-            'join-item group-hover:bg-neutral group-hover:text-neutral-content rounded-none px-1',
-            active && 'bg-neutral text-neutral-content',
-          )}
-          clickable={isClickable}
-          onClick={() => clickTag(item)}
-          style={
-            active
-              ? undefined
-              : {
-                  background: 'oklch(from var(--color-secondary) calc(l - 0.15) c h)',
-                }
-          }
-          variant="tagWithSummary">
-          {item.id}
-        </Badge>
-        <Badge
-          className={cn(
-            'join-item !rounded-r-badge group-hover:bg-neutral group-hover:text-neutral-content min-w-0 rounded-l-none',
-            active && 'bg-neutral text-neutral-content',
-          )}
-          clickable={isClickable}
-          onClick={() => clickTag(item)}
-          variant="tagWithSummary">
-          <span
-            className="block w-full overflow-hidden text-ellipsis whitespace-nowrap"
-            title={summary}>
-            {summary}
-          </span>
-          {isClickableAndRemovable && <LucideIcon icon={XIcon} size={16} strokeWidth={2} />}
-        </Badge>
-      </div>
+      <PlatformTag
+        active={active}
+        clickable={isClickable}
+        id={item.id}
+        importerType={importerType}
+        onClick={handleClick}
+        removable={isRemovable}
+        summary={summary}
+        width={width}
+      />
     )
   }
 
-  // Simple tags: Single Badge
   return (
-    <Badge
-      className={active ? 'bg-neutral text-neutral-content' : undefined}
+    <SimpleTag
+      active={active}
       clickable={isClickable}
-      onClick={() => clickTag(item)}
-      variant={tagVariant}>
-      <ItemLabel label={item.id} summary={summary} width={width} />
-      {isClickableAndRemovable && <LucideIcon icon={XIcon} size={16} strokeWidth={2} />}
-    </Badge>
+      onClick={handleClick}
+      removable={isRemovable}
+      text={getTagText(item)}
+      variant={getTagVariant(item)}
+      width={width}
+    />
   )
 }
 
