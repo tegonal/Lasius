@@ -23,6 +23,7 @@ import { roundToNearestMinutes } from 'date-fns'
 import { Timer } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { type z } from 'zod'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { ButtonGroup } from '~/components/ui/forms/button-group'
@@ -63,10 +64,32 @@ export const BookingStart = ({ onSuccess, selectedOrgId }: Properties) => {
   const schema = createBookingStartSchema(t as unknown as SchemaTranslationFunction)
   const [resetKey, setResetKey] = useState(0)
 
-  const [form, fields] = useForm({
+  const resetComponent = () => {
+    setResetKey((k) => k + 1)
+    previousProjectKeyReference.current = ''
+  }
+
+  const [form, fields] = useForm<z.input<typeof schema>, z.output<typeof schema>>({
     constraint: getZodConstraint(schema),
     defaultValue: { projectId: '', tags: '' },
     id: `booking-start-${resetKey}`,
+    onSubmit(event, { submission }) {
+      event.preventDefault()
+      if (submission?.status !== 'success') return
+
+      const { projectId, tags: tagsJson } = submission.value
+      const tags = parseTagsFromFormData(tagsJson) as unknown as ModelsTag[]
+      const start = formatISOLocale(roundToNearestMinutes(new Date(), { roundingMethod: 'floor' }))
+
+      stopAndStart.submit({
+        orgId: selectedOrgId,
+        projectId,
+        start,
+        tags,
+      })
+      resetComponent()
+      onSuccess?.()
+    },
     onValidate({ formData }) {
       return parseWithZod(formData, { schema })
     },
@@ -88,35 +111,6 @@ export const BookingStart = ({ onSuccess, selectedOrgId }: Properties) => {
 
   const projectTags = tagsData ?? []
 
-  const resetComponent = () => {
-    setResetKey((k) => k + 1)
-    previousProjectKeyReference.current = ''
-  }
-
-  const onSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const formData = new FormData(event.currentTarget)
-    const result = parseWithZod(formData, { schema })
-    if (result.status !== 'success') return
-
-    const { projectId, tags: tagsJson } = result.value
-    const tags = parseTagsFromFormData(tagsJson) as unknown as ModelsTag[]
-    const start = formatISOLocale(
-      roundToNearestMinutes(new Date(), {
-        roundingMethod: 'floor',
-      }),
-    )
-
-    stopAndStart.submit({
-      orgId: selectedOrgId,
-      projectId,
-      start,
-      tags,
-    })
-    resetComponent()
-    onSuccess?.()
-  }
-
   // Auto-focus tags when project changes
   useEffect(() => {
     if (projectIdControl.value && fields.tags.id) {
@@ -126,7 +120,7 @@ export const BookingStart = ({ onSuccess, selectedOrgId }: Properties) => {
 
   return (
     <div className="relative w-full">
-      <form {...getFormProps(form)} onSubmit={onSubmit}>
+      <form {...getFormProps(form)}>
         <FormBody>
           <FieldSet>
             <FormElement

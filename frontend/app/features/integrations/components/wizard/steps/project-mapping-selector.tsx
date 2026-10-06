@@ -37,7 +37,6 @@ import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
 import { TagConfigForm } from '~/features/integrations/components/shared/tag-config-form'
 import { type TagConfig } from '~/features/integrations/lib/mapping-helpers'
 import { getDefaultTagConfig } from '~/features/integrations/lib/tag-config-defaults'
-import { validateFormData } from '~/lib/conform-helpers'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 import { type ModelsExternalProject } from '~/services/api/lasius'
 
@@ -72,10 +71,15 @@ export const ProjectMappingSelector = ({
     () => existingTagConfig ?? getDefaultTagConfig(importerType),
   )
 
-  const [form, fields] = useForm({
+  const [form, fields] = useForm<z.input<typeof mappingSchema>, z.output<typeof mappingSchema>>({
     constraint: getZodConstraint(mappingSchema),
     defaultValue: {
       projectId: selectedProjectId || '',
+    },
+    onSubmit(event, { submission }) {
+      event.preventDefault()
+      if (submission?.status !== 'success') return
+      onSelect(submission.value.projectId, tagConfig)
     },
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: mappingSchema })
@@ -101,17 +105,8 @@ export const ProjectMappingSelector = ({
     [suggestions, projectIdControl.value],
   )
 
-  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
-    event.preventDefault()
-
-    const result = validateFormData(event.currentTarget, mappingSchema)
-    if (result.status !== 'success') return
-
-    onSelect(result.value.projectId, tagConfig)
-  }
-
   return (
-    <form {...getFormProps(form)} className="flex h-full flex-col" onSubmit={handleSubmit}>
+    <form {...getFormProps(form)} className="flex h-full flex-col">
       <ModalCloseButton onClose={onCancel} />
 
       <div className="flex h-full flex-col">

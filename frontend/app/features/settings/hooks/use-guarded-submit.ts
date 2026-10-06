@@ -18,25 +18,24 @@
  */
 
 import { useTranslation } from 'react-i18next'
-import { type z } from 'zod'
 
 import { useToast } from '~/components/ui/feedback/use-toast'
-import { validateFormData } from '~/lib/conform-helpers'
+
+type SubmitContext<Value> = {
+  submission?: { status: 'error' | undefined } | { status: 'success'; value: Value }
+}
 
 /**
- * Returns the submit handler of an account form. It validates the form with the schema and passes
- * the value to `onValid`. In demo mode it shows an error toast and sends nothing.
+ * Returns the `onSubmit` option for `useForm` of an account form. Conform calls it only after a
+ * successful validation. In demo mode it shows an error toast and sends nothing.
  */
-export const useGuardedSubmit = <Schema extends z.ZodType>(
-  isDemoMode: boolean,
-  schema: Schema,
-  onValid: (value: z.output<Schema>) => void,
-) => {
+export const useGuardedSubmit = <Value>(isDemoMode: boolean, onValid: (value: Value) => void) => {
   const { t } = useTranslation('settings')
   const { addToast } = useToast()
 
-  return (event: React.SubmitEvent<HTMLFormElement>) => {
+  return (event: React.SyntheticEvent<HTMLFormElement>, { submission }: SubmitContext<Value>) => {
     event.preventDefault()
+    if (submission?.status !== 'success') return
     if (isDemoMode) {
       addToast({
         message: t(
@@ -47,8 +46,6 @@ export const useGuardedSubmit = <Schema extends z.ZodType>(
       })
       return
     }
-
-    const result = validateFormData(event.currentTarget, schema)
-    if (result.status === 'success') onValid(result.value)
+    onValid(submission.value)
   }
 }

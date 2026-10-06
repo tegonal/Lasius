@@ -17,9 +17,6 @@
  *
  */
 
-import { parseWithZod } from '@conform-to/zod/v4'
-import { type z } from 'zod'
-
 /**
  * Merge Conform field errors with server-side errors (e.g. from API responses).
  * Returns a combined string[] suitable for FormFieldErrors.
@@ -30,16 +27,4 @@ export function mergeErrors(
 ): string[] | undefined {
   const combined = [...(conformErrors ?? []), ...(serverErrors ?? [])]
   return combined.length > 0 ? combined : undefined
-}
-
-/**
- * Parse and validate form data against a Zod schema (client-side).
- * Returns the typed submission result from Conform.
- */
-export function validateFormData<Schema extends z.ZodType>(
-  formElement: HTMLFormElement,
-  schema: Schema,
-) {
-  const formData = new FormData(formElement)
-  return parseWithZod(formData, { schema })
 }

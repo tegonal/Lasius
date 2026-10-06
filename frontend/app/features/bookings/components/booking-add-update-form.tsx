@@ -23,6 +23,7 @@ import { addHours, getHours, getMinutes, isToday, setHours, setMinutes } from 'd
 import { ArrowDownToLine, ArrowRight, ArrowUpToLine, HelpCircle } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { type z } from 'zod'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { ButtonGroup } from '~/components/ui/forms/button-group'
@@ -173,9 +174,36 @@ export const BookingAddUpdateForm = ({
     previousEndDate.current = initialValues.end
   }, [initialValues.end])
 
-  const [form, fields] = useForm({
+  const [form, fields] = useForm<z.input<typeof schema>, z.output<typeof schema>>({
     constraint: getZodConstraint(schema),
     defaultValue: initialValues,
+    onSubmit(event, { submission }) {
+      event.preventDefault()
+      if (submission?.status !== 'success') return
+
+      const { end, projectId, start, tags: tagsJson } = submission.value
+      if (!projectId) return
+
+      const tags = parseTagsFromFormData(tagsJson) as ModelsTag[]
+
+      if (mode === 'add' || mode === 'addBetween') {
+        bookingAdditionApi.submit({
+          body: { end, projectId, start, tags },
+          orgId: selectedOrgId,
+        })
+      } else if (mode === 'update' && itemUpdate) {
+        updateBookingApi.submit({
+          body: {
+            end: end || undefined,
+            projectId,
+            start: start || undefined,
+            tags,
+          },
+          bookingId: itemUpdate.id,
+          orgId: selectedOrgId,
+        })
+      }
+    },
     onValidate({ formData }) {
       return parseWithZod(formData, { schema })
     },
@@ -293,38 +321,6 @@ export const BookingAddUpdateForm = ({
     [endControl],
   )
 
-  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
-    event.preventDefault()
-
-    const formData = new FormData(event.currentTarget)
-    const result = parseWithZod(formData, { schema })
-    if (result.status !== 'success') return
-
-    const { end, projectId, start, tags: tagsJson } = result.value
-
-    if (!projectId) return
-
-    const tags = parseTagsFromFormData(tagsJson) as ModelsTag[]
-
-    if (mode === 'add' || mode === 'addBetween') {
-      bookingAdditionApi.submit({
-        body: { end, projectId, start, tags },
-        orgId: selectedOrgId,
-      })
-    } else if (mode === 'update' && itemUpdate) {
-      updateBookingApi.submit({
-        body: {
-          end: end || undefined,
-          projectId,
-          start: start || undefined,
-          tags,
-        },
-        bookingId: itemUpdate.id,
-        orgId: selectedOrgId,
-      })
-    }
-  }
-
   return (
     <div className="relative w-full overflow-x-hidden">
       <div
@@ -334,7 +330,7 @@ export const BookingAddUpdateForm = ({
         }}>
         {/* Form content */}
         <div className="w-1/2">
-          <form {...getFormProps(form)} onSubmit={handleSubmit}>
+          <form {...getFormProps(form)}>
             <FormBody>
               <FieldSet>
                 <div className="mb-4 flex gap-2">

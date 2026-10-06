@@ -31,9 +31,9 @@ import { CreateCredentialFields } from '~/features/integrations/components/wizar
 import { type WizardFormData } from '~/features/integrations/hooks/use-wizard-state'
 import { createConfigSchema } from '~/features/integrations/lib/config-schemas'
 import { getImporterTypeLabel } from '~/features/integrations/lib/importer-type-labels'
-import { validateFormData } from '~/lib/conform-helpers'
 import { untyped } from '~/lib/i18n-types'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
+import { ModelsCreateIssueImporterConfigResourceOwnerType } from '~/services/api/lasius/modelsCreateIssueImporterConfigResourceOwnerType'
 
 /**
  * Superset schema containing all possible fields across all importer types.
@@ -49,7 +49,7 @@ const allFieldsConstraintSchema = z.object({
   name: z.string(),
   privateKey: z.string().optional(),
   resourceOwner: z.string().optional(),
-  resourceOwnerType: z.string().optional(),
+  resourceOwnerType: z.enum(ModelsCreateIssueImporterConfigResourceOwnerType).optional(),
   workspace: z.string().optional(),
 })
 
@@ -66,11 +66,19 @@ export const ConfigFormStep = ({ formData, formRef, onSubmit, selectedOrgId }: P
 
   const schema = useMemo(() => createConfigSchema(t, importerType, false), [t, importerType])
 
-  const [form, fields] = useForm({
+  const [form, fields] = useForm<
+    z.input<typeof allFieldsConstraintSchema>,
+    z.output<typeof allFieldsConstraintSchema>
+  >({
     constraint: getZodConstraint(allFieldsConstraintSchema),
     defaultValue: {
       ...formData,
       checkFrequency: String(formData.checkFrequency),
+    },
+    onSubmit(event, { submission }) {
+      event.preventDefault()
+      if (submission?.status !== 'success') return
+      onSubmit({ ...formData, ...submission.value })
     },
     onValidate({ formData: fd }) {
       // Cast to superset type for field inference; actual validation uses platform-specific schema
@@ -85,15 +93,6 @@ export const ConfigFormStep = ({ formData, formRef, onSubmit, selectedOrgId }: P
   const accessTokenControl = useInputControl(fields.accessToken)
   const baseUrlControl = useInputControl(fields.baseUrl)
   const checkFrequencyControl = useInputControl(fields.checkFrequency)
-
-  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
-    event.preventDefault()
-
-    const result = validateFormData(event.currentTarget, schema)
-    if (result.status !== 'success') return
-
-    onSubmit({ ...formData, ...result.value })
-  }
 
   const checkFrequencyMs = Number(checkFrequencyControl.value) || formData.checkFrequency
 
@@ -114,7 +113,7 @@ export const ConfigFormStep = ({ formData, formRef, onSubmit, selectedOrgId }: P
 
       <div className="mt-6 grid flex-1 grid-cols-1 gap-8 md:grid-cols-2">
         {/* Left column: Form fields */}
-        <form {...getFormProps(form)} className="space-y-4" onSubmit={handleSubmit} ref={formRef}>
+        <form {...getFormProps(form)} className="space-y-4" ref={formRef}>
           {/* Name */}
           <fieldset className="fieldset">
             <label className="label" htmlFor={fields.name.id}>

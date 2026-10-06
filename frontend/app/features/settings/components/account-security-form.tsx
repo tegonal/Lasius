@@ -88,19 +88,11 @@ export const AccountSecurityForm = ({ demoMode }: AccountSecurityFormProperties)
 
   const schema = useMemo(() => createPasswordChangeSchema(untyped(t)), [t])
 
-  const [form, fields] = useForm({
-    constraint: getZodConstraint(schema),
-    defaultValue: { confirmPassword: '', newPassword: '', password: '' },
-    onValidate({ formData }) {
-      return parseWithZod(formData, { schema })
-    },
-    shouldRevalidate: 'onInput',
-    shouldValidate: 'onSubmit',
-  })
-
+  // A new form id clears the fields after a successful change (pitfalls/rr7-conform-form-in-modal).
+  const [resetKey, setResetKey] = useState(0)
   const passwordApi = useUpdateUserPassword({
     onSuccess: () => {
-      form.reset()
+      setResetKey((key) => key + 1)
       addToast({
         message: t('account.status.passwordUpdated', 'Password updated'),
         type: 'SUCCESS',
@@ -108,8 +100,23 @@ export const AccountSecurityForm = ({ demoMode }: AccountSecurityFormProperties)
     },
   })
 
-  const handleSubmit = useGuardedSubmit(demoMode, schema, ({ newPassword, password }) => {
-    passwordApi.submit({ body: { newPassword, password } })
+  const onSubmit = useGuardedSubmit<z.output<typeof schema>>(
+    demoMode,
+    ({ newPassword, password }) => {
+      passwordApi.submit({ body: { newPassword, password } })
+    },
+  )
+
+  const [form, fields] = useForm({
+    constraint: getZodConstraint(schema),
+    defaultValue: { confirmPassword: '', newPassword: '', password: '' },
+    id: `account-password-${resetKey}`,
+    onSubmit,
+    onValidate({ formData }) {
+      return parseWithZod(formData, { schema })
+    },
+    shouldRevalidate: 'onInput',
+    shouldValidate: 'onSubmit',
   })
 
   const handleTogglePasswordsVisible = (event: { preventDefault: () => void }) => {
@@ -123,7 +130,7 @@ export const AccountSecurityForm = ({ demoMode }: AccountSecurityFormProperties)
     <div className="mx-auto w-full max-w-2xl">
       <Card>
         <CardBody className="p-6">
-          <form {...getFormProps(form)} onSubmit={handleSubmit}>
+          <form {...getFormProps(form)}>
             <div onKeyDown={preventEnterOnForm} role="presentation">
               <FormBody>
                 <FieldSet>

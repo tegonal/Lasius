@@ -38,7 +38,6 @@ import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-but
 import { ModalDescription } from '~/components/ui/overlays/modal/modal-description'
 import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
 import { UserRoles } from '~/config/dynamic-translation-strings'
-import { validateFormData } from '~/lib/conform-helpers'
 import { type SchemaTranslationFunction, untyped } from '~/lib/i18n-types'
 import { useInviteOrganisationUser } from '~/services/api/lasius-hooks/organisations/organisations'
 import { useInviteProjectUser } from '~/services/api/lasius-hooks/projects/projects'
@@ -90,12 +89,36 @@ export const ManageUserInviteByEmailForm = ({
   })
   const isSubmitting = inviteProjectApi.isLoading || inviteOrgApi.isLoading
 
-  const [form, fields] = useForm({
+  const [form, fields] = useForm<z.input<typeof schema>, z.output<typeof schema>>({
     constraint: getZodConstraint(schema),
     defaultValue: {
       inviteMemberByEmailAddress: '',
       organisationRole: 'OrganisationMember',
       projectRole: 'ProjectMember',
+    },
+    onSubmit(event, { submission }) {
+      event.preventDefault()
+      if (submission?.status !== 'success') return
+
+      const { inviteMemberByEmailAddress, organisationRole, projectRole } = submission.value
+      if (project && organisation) {
+        inviteProjectApi.submit({
+          body: {
+            email: inviteMemberByEmailAddress,
+            role: projectRole as ModelsUserToProjectAssignmentRole,
+          },
+          orgId: organisation,
+          projectId: project,
+        })
+      } else if (organisation) {
+        inviteOrgApi.submit({
+          body: {
+            email: inviteMemberByEmailAddress,
+            role: organisationRole as ModelsUserToOrganisationAssignmentRole,
+          },
+          orgId: organisation,
+        })
+      }
     },
     onValidate({ formData }) {
       return parseWithZod(formData, { schema })
@@ -112,34 +135,6 @@ export const ManageUserInviteByEmailForm = ({
     setShowResultState(false)
     setInvitationResult(null)
     onSave()
-  }
-
-  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
-    event.preventDefault()
-
-    const result = validateFormData(event.currentTarget, schema)
-    if (result.status !== 'success') return
-
-    const { inviteMemberByEmailAddress, organisationRole, projectRole } = result.value
-
-    if (project && organisation) {
-      inviteProjectApi.submit({
-        body: {
-          email: inviteMemberByEmailAddress,
-          role: projectRole as ModelsUserToProjectAssignmentRole,
-        },
-        orgId: organisation,
-        projectId: project,
-      })
-    } else if (organisation) {
-      inviteOrgApi.submit({
-        body: {
-          email: inviteMemberByEmailAddress,
-          role: organisationRole as ModelsUserToOrganisationAssignmentRole,
-        },
-        orgId: organisation,
-      })
-    }
   }
 
   const registrationLink = (invitationId: string) => {
@@ -188,7 +183,7 @@ export const ManageUserInviteByEmailForm = ({
   return (
     <>
       {!showResultState && (
-        <form {...getFormProps(form)} onSubmit={handleSubmit}>
+        <form {...getFormProps(form)}>
           <FormBody>
             <ModalCloseButton onClose={handleClose} />
 

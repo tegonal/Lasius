@@ -41,7 +41,6 @@ import { ProviderInstructions } from '~/features/integrations/components/shared/
 import { useConnectionTest } from '~/features/integrations/hooks/use-connection-test'
 import { createConfigSchema } from '~/features/integrations/lib/config-schemas'
 import { getImporterTypeLabel } from '~/features/integrations/lib/importer-type-labels'
-import { validateFormData } from '~/lib/conform-helpers'
 import { untyped } from '~/lib/i18n-types'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 import { useUpdateConfig } from '~/services/api/lasius-hooks/issue-importers/issue-importers'
@@ -121,10 +120,65 @@ export const GenericConfigModal = ({ config, onClose, open, selectedOrgId }: Pro
     [config],
   )
 
-  const [form, fields] = useForm({
+  const updateApi = useUpdateConfig({
+    onError: () => {
+      addToast({
+        message: t('issueImporters.errors.updateFailed', {
+          defaultValue: 'Failed to update integration',
+        }),
+        type: 'ERROR',
+      })
+    },
+    onSuccess: () => {
+      onClose()
+      void revalidator.revalidate()
+      addToast({
+        message: t('issueImporters.success.configUpdated', {
+          defaultValue: 'Integration updated successfully',
+        }),
+        type: 'SUCCESS',
+      })
+    },
+  })
+
+  const isSaving = updateApi.isSubmitting
+
+  const [form, fields] = useForm<
+    z.input<typeof allFieldsConstraintSchema>,
+    z.output<typeof allFieldsConstraintSchema>
+  >({
     constraint: getZodConstraint(allFieldsConstraintSchema),
     defaultValue,
     id: open && config ? `edit-config-${config.id}` : undefined,
+    onSubmit(event, { submission }) {
+      event.preventDefault()
+      if (!config || submission?.status !== 'success') return
+
+      const data = submission.value as Record<string, unknown>
+
+      const body: ModelsUpdateIssueImporterConfig = {
+        baseUrl: data.baseUrl as string,
+        checkFrequency: data.checkFrequency as number,
+        name: data.name as string,
+      }
+
+      // Only include credential fields if changed (non-empty)
+      if (data.accessToken) body.accessToken = data.accessToken as string
+      if (data.consumerKey) body.consumerKey = data.consumerKey as string
+      if (data.privateKey) body.privateKey = data.privateKey as string
+      if (data.apiKey) body.apiKey = data.apiKey as string
+
+      // Always include non-credential config fields so they can be updated/cleared
+      body.workspace = (data.workspace as string) || null
+      body.resourceOwner = (data.resourceOwner as string) || null
+      if (data.resourceOwnerType) body.resourceOwnerType = data.resourceOwnerType as never
+
+      updateApi.submit({
+        body,
+        configId: config.id,
+        orgId: selectedOrgId,
+      })
+    },
     onValidate({ formData: fd }) {
       return parseWithZod(fd, {
         schema: schema as typeof allFieldsConstraintSchema,
@@ -159,63 +213,6 @@ export const GenericConfigModal = ({ config, onClose, open, selectedOrgId }: Pro
     }
   }, [config, open, resetTestState])
 
-  // Update config hook
-  const updateApi = useUpdateConfig({
-    onError: () => {
-      addToast({
-        message: t('issueImporters.errors.updateFailed', {
-          defaultValue: 'Failed to update integration',
-        }),
-        type: 'ERROR',
-      })
-    },
-    onSuccess: () => {
-      onClose()
-      void revalidator.revalidate()
-      addToast({
-        message: t('issueImporters.success.configUpdated', {
-          defaultValue: 'Integration updated successfully',
-        }),
-        type: 'SUCCESS',
-      })
-    },
-  })
-
-  const isSaving = updateApi.isSubmitting
-
-  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    if (!config) return
-
-    const result = validateFormData(event.currentTarget, schema)
-    if (result.status !== 'success') return
-
-    const data = result.value as Record<string, unknown>
-
-    const body: ModelsUpdateIssueImporterConfig = {
-      baseUrl: data.baseUrl as string,
-      checkFrequency: data.checkFrequency as number,
-      name: data.name as string,
-    }
-
-    // Only include credential fields if changed (non-empty)
-    if (data.accessToken) body.accessToken = data.accessToken as string
-    if (data.consumerKey) body.consumerKey = data.consumerKey as string
-    if (data.privateKey) body.privateKey = data.privateKey as string
-    if (data.apiKey) body.apiKey = data.apiKey as string
-
-    // Always include non-credential config fields so they can be updated/cleared
-    body.workspace = (data.workspace as string) || null
-    body.resourceOwner = (data.resourceOwner as string) || null
-    if (data.resourceOwnerType) body.resourceOwnerType = data.resourceOwnerType as never
-
-    updateApi.submit({
-      body,
-      configId: config.id,
-      orgId: selectedOrgId,
-    })
-  }
-
   const checkFrequencyMs = Number(checkFrequencyControl.value) || config?.checkFrequency || 300_000
 
   if (!config) return null
@@ -240,11 +237,7 @@ export const GenericConfigModal = ({ config, onClose, open, selectedOrgId }: Pro
 
         <ModalBody>
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-            <form
-              {...getFormProps(form)}
-              className="space-y-4"
-              onSubmit={handleSubmit}
-              ref={formReference}>
+            <form {...getFormProps(form)} className="space-y-4" ref={formReference}>
               {/* Name */}
               <fieldset className="fieldset">
                 <label className="label" htmlFor={fields.name.id}>

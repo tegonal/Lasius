@@ -35,7 +35,6 @@ import { Select, type SelectOption } from '~/components/ui/forms/input/select'
 import { ToggleSwitch } from '~/components/ui/forms/input/toggle-switch'
 import { API_ROUTES } from '~/config/constants'
 import { DEFAULT_LOCALE, LOCALE_LABELS, LOCALES } from '~/i18n-config'
-import { validateFormData } from '~/lib/conform-helpers'
 import { type SchemaTranslationFunction, untyped } from '~/lib/i18n-types'
 import {
   useAppSettingsActions,
@@ -105,12 +104,56 @@ export const AppSettingsForm = () => {
     },
   ]
 
-  const [form, fields] = useForm({
+  const [form, fields] = useForm<z.input<typeof schema>, z.output<typeof schema>>({
     constraint: getZodConstraint(schema),
     defaultValue: {
       language: i18n.language || DEFAULT_LOCALE,
       showOnboarding: isOnboardingDismissed ? '' : 'on',
       theme: theme,
+    },
+    onSubmit(event, { submission }) {
+      event.preventDefault()
+      if (submission?.status !== 'success') return
+
+      const data = submission.value
+      const currentLocale = i18n.language || DEFAULT_LOCALE
+      const isLanguageChanged = data.language !== currentLocale
+
+      // Update locale cookie via server action
+      if (isLanguageChanged) {
+        void localeFetcher.submit(
+          { locale: data.language },
+          { action: API_ROUTES.LOCALE, method: 'post' },
+        )
+      }
+
+      // Save theme to store
+      setTheme(data.theme)
+
+      // Update theme cookie via server action (for SSR)
+      if (data.theme === 'system') {
+        if (globalThis.window !== undefined && typeof matchMedia === 'function') {
+          const isPrefersDark = matchMedia('(prefers-color-scheme: dark)').matches
+          const systemTheme = isPrefersDark ? 'dark' : 'light'
+          document.documentElement.dataset.theme = systemTheme
+          void themeFetcher.submit(
+            { theme: systemTheme },
+            { action: API_ROUTES.THEME, method: 'post' },
+          )
+        }
+      } else {
+        const dataTheme = themeModeToDataTheme[data.theme] || 'light'
+        document.documentElement.dataset.theme = dataTheme
+        void themeFetcher.submit(
+          { theme: data.theme },
+          { action: API_ROUTES.THEME, method: 'post' },
+        )
+      }
+
+      // Reload after locale cookie is persisted (watched by useEffect above)
+      if (isLanguageChanged) {
+        pendingLocaleReload.current = true
+      }
     },
     onValidate({ formData }) {
       return parseWithZod(formData, { schema })
@@ -140,55 +183,11 @@ export const AppSettingsForm = () => {
     }
   }
 
-  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
-    event.preventDefault()
-
-    const result = validateFormData(event.currentTarget, schema)
-    if (result.status !== 'success') return
-
-    const data = result.value
-    const currentLocale = i18n.language || DEFAULT_LOCALE
-    const isLanguageChanged = data.language !== currentLocale
-
-    // Update locale cookie via server action
-    if (isLanguageChanged) {
-      void localeFetcher.submit(
-        { locale: data.language },
-        { action: API_ROUTES.LOCALE, method: 'post' },
-      )
-    }
-
-    // Save theme to store
-    setTheme(data.theme)
-
-    // Update theme cookie via server action (for SSR)
-    if (data.theme === 'system') {
-      if (globalThis.window !== undefined && typeof matchMedia === 'function') {
-        const isPrefersDark = matchMedia('(prefers-color-scheme: dark)').matches
-        const systemTheme = isPrefersDark ? 'dark' : 'light'
-        document.documentElement.dataset.theme = systemTheme
-        void themeFetcher.submit(
-          { theme: systemTheme },
-          { action: API_ROUTES.THEME, method: 'post' },
-        )
-      }
-    } else {
-      const dataTheme = themeModeToDataTheme[data.theme] || 'light'
-      document.documentElement.dataset.theme = dataTheme
-      void themeFetcher.submit({ theme: data.theme }, { action: API_ROUTES.THEME, method: 'post' })
-    }
-
-    // Reload after locale cookie is persisted (watched by useEffect above)
-    if (isLanguageChanged) {
-      pendingLocaleReload.current = true
-    }
-  }
-
   return (
     <div className="mx-auto mt-6 w-full max-w-2xl">
       <Card>
         <CardBody className="p-6">
-          <form {...getFormProps(form)} onSubmit={handleSubmit}>
+          <form {...getFormProps(form)}>
             <FormBody>
               <FieldSet>
                 <FormElement

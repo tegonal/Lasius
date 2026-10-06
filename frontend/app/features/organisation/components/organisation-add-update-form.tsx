@@ -36,7 +36,7 @@ import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-but
 import { ModalDescription } from '~/components/ui/overlays/modal/modal-description'
 import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
-import { mergeErrors, validateFormData } from '~/lib/conform-helpers'
+import { mergeErrors } from '~/lib/conform-helpers'
 import { type SchemaTranslationFunction, untyped } from '~/lib/i18n-types'
 import { logger } from '~/lib/logger'
 import {
@@ -100,10 +100,24 @@ export const OrganisationAddUpdateForm = ({ mode, onCancel, onSave }: Properties
 
   const isSubmitting = organisationCreationApi.isLoading || updateApi.isLoading
 
-  const [form, fields] = useForm({
+  const [form, fields] = useForm<z.input<typeof schema>, z.output<typeof schema>>({
     constraint: getZodConstraint(schema),
     defaultValue: {
       organisationName: mode === 'update' ? (selectedOrganisationKey ?? '') : '',
+    },
+    onSubmit(event, { submission }) {
+      event.preventDefault()
+      if (submission?.status !== 'success') return
+
+      const { organisationName } = submission.value
+      if (mode === 'add' && organisationName) {
+        organisationCreationApi.submit({ body: { key: organisationName } })
+      } else if (selectedOrganisation) {
+        updateApi.submit({
+          body: { key: organisationName },
+          orgId: selectedOrganisation.organisationReference.id,
+        })
+      }
     },
     onValidate({ formData }) {
       setServerErrors({})
@@ -113,28 +127,10 @@ export const OrganisationAddUpdateForm = ({ mode, onCancel, onSave }: Properties
     shouldValidate: 'onSubmit',
   })
 
-  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
-    event.preventDefault()
-
-    const result = validateFormData(event.currentTarget, schema)
-    if (result.status !== 'success') return
-
-    const { organisationName } = result.value
-
-    if (mode === 'add' && organisationName) {
-      organisationCreationApi.submit({ body: { key: organisationName } })
-    } else if (selectedOrganisation) {
-      updateApi.submit({
-        body: { key: organisationName },
-        orgId: selectedOrganisation.organisationReference.id,
-      })
-    }
-  }
-
   const nameErrors = mergeErrors(fields.organisationName.errors, serverErrors.organisationName)
 
   return (
-    <form {...getFormProps(form)} onSubmit={handleSubmit}>
+    <form {...getFormProps(form)}>
       <FormBody>
         <ModalCloseButton onClose={onCancel} />
 

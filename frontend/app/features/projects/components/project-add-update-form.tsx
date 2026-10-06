@@ -36,7 +36,7 @@ import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-but
 import { ModalDescription } from '~/components/ui/overlays/modal/modal-description'
 import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
-import { mergeErrors, validateFormData } from '~/lib/conform-helpers'
+import { mergeErrors } from '~/lib/conform-helpers'
 import { type SchemaTranslationFunction, untyped } from '~/lib/i18n-types'
 import { logger } from '~/lib/logger'
 import { useCreateProject, useUpdateProject } from '~/services/api/lasius-hooks/projects/projects'
@@ -120,10 +120,28 @@ export const ProjectAddUpdateForm = ({ item, mode, onCancel, onSave }: Propertie
 
   const schema = useMemo(() => createProjectSchema(untyped(t)), [t])
 
-  const [form, fields] = useForm({
+  const [form, fields] = useForm<z.input<typeof schema>, z.output<typeof schema>>({
     constraint: getZodConstraint(schema),
     defaultValue: {
       projectKey: getProjectKey(item),
+    },
+    onSubmit(event, { submission }) {
+      event.preventDefault()
+      if (submission?.status !== 'success') return
+
+      const { projectKey } = submission.value
+      if (mode === 'add') {
+        projectCreationApi.submit({
+          body: { bookingCategories: [], key: projectKey },
+          orgId: selectedOrganisationId,
+        })
+      } else {
+        updateProjectApi.submit({
+          body: { key: projectKey },
+          orgId: selectedOrganisationId,
+          projectId: getProjectId(item),
+        })
+      }
     },
     onValidate({ formData }) {
       setServerErrors({})
@@ -132,28 +150,6 @@ export const ProjectAddUpdateForm = ({ item, mode, onCancel, onSave }: Propertie
     shouldRevalidate: 'onInput',
     shouldValidate: 'onSubmit',
   })
-
-  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
-    event.preventDefault()
-
-    const result = validateFormData(event.currentTarget, schema)
-    if (result.status !== 'success') return
-
-    const { projectKey } = result.value
-
-    if (mode === 'add') {
-      projectCreationApi.submit({
-        body: { bookingCategories: [], key: projectKey },
-        orgId: selectedOrganisationId,
-      })
-    } else {
-      updateProjectApi.submit({
-        body: { key: projectKey },
-        orgId: selectedOrganisationId,
-        projectId: getProjectId(item),
-      })
-    }
-  }
 
   const nameErrors = mergeErrors(fields.projectKey.errors, serverErrors.projectKey)
 
@@ -173,7 +169,7 @@ export const ProjectAddUpdateForm = ({ item, mode, onCancel, onSave }: Propertie
           : t('projects:description.edit', 'Update the project details.')}
       </ModalDescription>
 
-      <form {...getFormProps(form)} onSubmit={handleSubmit}>
+      <form {...getFormProps(form)}>
         <FormBody>
           <Alert className="mb-4" variant="info">
             {t(

@@ -21,8 +21,9 @@ import { getFormProps, useForm, useInputControl } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
 import { addSeconds } from 'date-fns'
 import { ArrowDownToLine } from 'lucide-react'
-import { useCallback, useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { type z } from 'zod'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { ButtonGroup } from '~/components/ui/forms/button-group'
@@ -71,12 +72,31 @@ export const BookingEditRunning = ({
 
   const schema = createBookingEditRunningSchema(t as unknown as SchemaTranslationFunction)
 
-  const [form, fields] = useForm({
+  const [form, fields] = useForm<z.input<typeof schema>, z.output<typeof schema>>({
     constraint: getZodConstraint(schema),
     defaultValue: {
       projectId: booking?.projectReference.id ?? '',
       start: booking ? formatISOLocale(new Date(booking.start.dateTime)) : '',
       tags: booking?.tags ? JSON.stringify(booking.tags) : '',
+    },
+    onSubmit(event, { submission }) {
+      event.preventDefault()
+      if (submission?.status !== 'success') return
+
+      const { projectId, start, tags: tagsJson } = submission.value
+      if (!projectId || !booking) return
+
+      const tags = parseTagsFromFormData(tagsJson) as unknown as ModelsTag[]
+
+      updateBookingApi.submit({
+        body: {
+          projectId,
+          start: start || undefined,
+          tags,
+        },
+        bookingId: booking.id,
+        orgId: selectedOrgId,
+      })
     },
     onValidate({ formData }) {
       return parseWithZod(formData, { schema })
@@ -91,11 +111,25 @@ export const BookingEditRunning = ({
   // Tags via shared hook
   const { projectTags } = useProjectTags(selectedOrgId, projectIdControl.value)
 
-  // Re-initialize form values when booking changes
+  // Conform returns a new form proxy and new controls on each render, and form.update re-renders.
+  // The ref limits the re-initialization to a changed booking, so the effect cannot loop.
+  const appliedBookingKey = useRef('')
+
   useEffect(() => {
     if (!booking) {
       return
     }
+
+    const bookingKey = JSON.stringify([
+      booking.id,
+      booking.projectReference.id,
+      booking.tags,
+      booking.start.dateTime,
+    ])
+    if (appliedBookingKey.current === bookingKey) {
+      return
+    }
+    appliedBookingKey.current = bookingKey
 
     projectIdControl.change(booking.projectReference.id)
     form.update({
@@ -132,35 +166,9 @@ export const BookingEditRunning = ({
       }
     : {}
 
-  const onSubmit = useCallback(
-    (event: React.SubmitEvent<HTMLFormElement>) => {
-      event.preventDefault()
-      const formData = new FormData(event.currentTarget)
-      const result = parseWithZod(formData, { schema })
-      if (result.status !== 'success') return
-
-      const { projectId, start, tags: tagsJson } = result.value
-
-      if (!projectId || !booking) return
-
-      const tags = parseTagsFromFormData(tagsJson) as unknown as ModelsTag[]
-
-      updateBookingApi.submit({
-        body: {
-          projectId,
-          start: start || undefined,
-          tags,
-        },
-        bookingId: booking.id,
-        orgId: selectedOrgId,
-      })
-    },
-    [selectedOrgId, booking, updateBookingApi, schema],
-  )
-
   return (
     <div className="relative w-full">
-      <form {...getFormProps(form)} onSubmit={onSubmit}>
+      <form {...getFormProps(form)}>
         <FormBody>
           <FieldSet>
             <FormElement

@@ -74,21 +74,25 @@ export const AccountForm = ({ demoMode }: AccountFormProperties) => {
 
   const schema = useMemo(() => createAccountSchema(untyped(t)), [t])
 
+  const onSubmit = useGuardedSubmit<z.output<typeof schema>>(
+    demoMode,
+    ({ firstName, lastName }) => {
+      profileApi.submit({ body: { firstName, lastName } })
+    },
+  )
+
   const [form, fields] = useForm({
     constraint: getZodConstraint(schema),
     defaultValue: {
       firstName: user?.firstName ?? '',
       lastName: user?.lastName ?? '',
     },
+    onSubmit,
     onValidate({ formData }) {
       return parseWithZod(formData, { schema })
     },
     shouldRevalidate: 'onInput',
     shouldValidate: 'onSubmit',
-  })
-
-  const handleSubmit = useGuardedSubmit(demoMode, schema, ({ firstName, lastName }) => {
-    profileApi.submit({ body: { firstName, lastName } })
   })
 
   return (
@@ -104,7 +108,7 @@ export const AccountForm = ({ demoMode }: AccountFormProperties) => {
               'Manage your personal information and account details.',
             )}
           </p>
-          <form {...getFormProps(form)} onSubmit={handleSubmit}>
+          <form {...getFormProps(form)}>
             <div onKeyDown={preventEnterOnForm} role="presentation">
               <FormBody>
                 <FieldSet>
