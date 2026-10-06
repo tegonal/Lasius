@@ -15,10 +15,10 @@ echo "--- Backend (sbt) ---"
 cd "$REPO_ROOT/backend"
 sbt compile
 
-# Frontend RR7 (active)
+# Frontend
 echo ""
-echo "--- Frontend RR7 (yarn) ---"
-cd "$REPO_ROOT/frontend_rr"
+echo "--- Frontend (yarn) ---"
+cd "$REPO_ROOT/frontend"
 corepack enable
 yarn install
 
@@ -35,6 +35,6 @@ echo "=== Installation complete ==="
 echo ""
 echo "Next steps:"
 echo "  1. Copy frontend/.env.template to frontend/.env.local (if not done)"
-echo "     (frontend_rr will auto-symlink to it when running dev.sh)"
+echo "     (dev.sh also loads this file into the backend)"
 echo "  2. Start services: cd services && yarn services:start"
 echo "  3. Start dev servers: ./dev.sh"

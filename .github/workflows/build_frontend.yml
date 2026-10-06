@@ -9,7 +9,7 @@ on:
   #pull_request:
   push:
     paths:
-      - "frontend_rr/**"
+      - "frontend/**"
     branches:
       - "**"
     tags-ignore:
@@ -27,9 +27,9 @@ jobs:
         with:
           node-version: 24
           cache: yarn
-          cache-dependency-path: frontend_rr/yarn.lock
+          cache-dependency-path: frontend/yarn.lock
       - name: build frontend
-        working-directory: ./frontend_rr
+        working-directory: ./frontend
         run: |
           yarn --version
           yarn install --immutable
