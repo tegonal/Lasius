@@ -51,7 +51,9 @@
         "reason": "Accepted key handler. A split adds functions but not fewer cases, and no test covers the handler. Decision: rr8-segmented-input-key-handlers."
       },
       {
-        "files": ["app/components/ui/forms/input/date-picker/segmented-duration-input-connected.tsx"],
+        "files": [
+          "app/components/ui/forms/input/date-picker/segmented-duration-input-connected.tsx"
+        ],
         "functions": ["handleKeyDown"],
         "maxCyclomatic": 34,
         "maxCognitive": 49,
@@ -65,6 +67,11 @@
         "maxCognitive": 28,
         "maxCrap": 463,
         "reason": "Accepted key handler. A split adds functions but not fewer cases, and no test covers the handler. Decision: rr8-segmented-input-key-handlers."
+      },
+      {
+        "files": ["app/**/*.tsx", "app/**/use-*.ts"],
+        "maxCrap": 1000000,
+        "reason": "Unit tests run in Node without React (core/unit-testing), so a component or hook keeps 0 coverage and CRAP only repeats the complexity limits."
       }
     ]
   },
