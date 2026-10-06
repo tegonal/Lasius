@@ -22,7 +22,7 @@ import { useCallback } from 'react'
 
 import { type ToastData, type ToastType } from './toast-manager'
 
-type AddToastOptions = {
+export type AddToastOptions = {
   action?: {
     href: string
     label: string

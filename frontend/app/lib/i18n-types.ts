@@ -26,7 +26,7 @@ import { type Namespace, type TFunction } from 'i18next'
 
 export type SchemaTranslationFunction = (
   key: string,
-  defaultValue: string | { defaultValue: string },
+  defaultValue: (Record<string, unknown> & { defaultValue: string }) | string,
 ) => string
 
 /**

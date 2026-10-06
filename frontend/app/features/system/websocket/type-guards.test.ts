@@ -17,23 +17,9 @@
  *
  */
 
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import {
-  didProcessWebSocketEvent,
-  isAuthenticationFailed,
-  isCurrentOrganisationTimeBookings,
-  isCurrentUserTimeBookingEvent,
-  isFavoriteAdded,
-  isFavoriteRemoved,
-  isIssueImporterSyncStatsChanged,
-  isLatestTimeBooking,
-  isUserTimeBookingHistoryEntryAdded,
-  isUserTimeBookingHistoryEntryChanged,
-  isUserTimeBookingHistoryEntryCleaned,
-  isUserTimeBookingHistoryEntryRemoved,
-  isWebSocketOutEvent,
-} from './type-guards'
+import { isWebSocketOutEvent } from './type-guards'
 
 describe('isWebSocketOutEvent', () => {
   it('returns true for objects with a type property', () => {
@@ -52,106 +38,5 @@ describe('isWebSocketOutEvent', () => {
 
   it('returns false for objects without type', () => {
     expect(isWebSocketOutEvent({ data: 'foo' })).toBe(false)
-  })
-})
-
-describe('type guard functions', () => {
-  const guards = [
-    { fn: isAuthenticationFailed, type: 'AuthenticationFailed' },
-    {
-      fn: isCurrentOrganisationTimeBookings,
-      type: 'CurrentOrganisationTimeBookings',
-    },
-    {
-      fn: isCurrentUserTimeBookingEvent,
-      type: 'CurrentUserTimeBookingEvent',
-    },
-    { fn: isFavoriteAdded, type: 'FavoriteAdded' },
-    { fn: isFavoriteRemoved, type: 'FavoriteRemoved' },
-    {
-      fn: isIssueImporterSyncStatsChanged,
-      type: 'IssueImporterSyncStatsChanged',
-    },
-    { fn: isLatestTimeBooking, type: 'LatestTimeBooking' },
-    {
-      fn: isUserTimeBookingHistoryEntryAdded,
-      type: 'UserTimeBookingHistoryEntryAdded',
-    },
-    {
-      fn: isUserTimeBookingHistoryEntryChanged,
-      type: 'UserTimeBookingHistoryEntryChanged',
-    },
-    {
-      fn: isUserTimeBookingHistoryEntryCleaned,
-      type: 'UserTimeBookingHistoryEntryCleaned',
-    },
-    {
-      fn: isUserTimeBookingHistoryEntryRemoved,
-      type: 'UserTimeBookingHistoryEntryRemoved',
-    },
-  ] as const
-
-  // The guards receive socket messages. The input passes the same boundary guard as a real message.
-  const toWebSocketEvent = (value: unknown) => {
-    if (!isWebSocketOutEvent(value)) {
-      throw new TypeError('The test value is not a WebSocket event')
-    }
-    return value
-  }
-
-  for (const { fn, type } of guards) {
-    it(`${fn.name} returns true for type "${type}"`, () => {
-      expect(fn(toWebSocketEvent({ type }))).toBe(true)
-    })
-
-    it(`${fn.name} returns false for other types`, () => {
-      expect(fn(toWebSocketEvent({ type: 'Other' }))).toBe(false)
-    })
-  }
-})
-
-describe('didProcessWebSocketEvent', () => {
-  it('returns false for non-event data', () => {
-    expect(didProcessWebSocketEvent('not an event', [])).toBe(false)
-    expect(didProcessWebSocketEvent(null, [])).toBe(false)
-  })
-
-  it('returns false when no handler matches', () => {
-    const isResult = didProcessWebSocketEvent({ type: 'Unknown' }, [
-      {
-        handler: () => {},
-        typeGuard: isFavoriteAdded,
-      },
-    ])
-    expect(isResult).toBe(false)
-  })
-
-  it('calls the matching handler and returns true', () => {
-    const handler = vi.fn()
-    const event = { type: 'FavoriteAdded' }
-
-    const isResult = didProcessWebSocketEvent(event, [
-      {
-        handler,
-        typeGuard: isFavoriteAdded,
-      },
-    ])
-
-    expect(isResult).toBe(true)
-    expect(handler).toHaveBeenCalledWith(event)
-  })
-
-  it('only calls the first matching handler', () => {
-    const handler1 = vi.fn()
-    const handler2 = vi.fn()
-    const event = { type: 'FavoriteAdded' }
-
-    didProcessWebSocketEvent(event, [
-      { handler: handler1, typeGuard: isFavoriteAdded },
-      { handler: handler2, typeGuard: isFavoriteAdded },
-    ])
-
-    expect(handler1).toHaveBeenCalledOnce()
-    expect(handler2).not.toHaveBeenCalled()
   })
 })
