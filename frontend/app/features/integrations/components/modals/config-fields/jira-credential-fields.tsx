@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Input } from '~/components/primitives/inputs/input'
 import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
+import { AccessTokenInput } from '~/features/integrations/components/modals/config-fields/access-token-input'
 
 export type InputControl = {
   blur: () => void
@@ -98,24 +99,14 @@ export const JiraCredentialFields = ({
             defaultValue: 'Access Token (leave empty to keep current)',
           })}
         </label>
-        <Input
-          {...getInputProps(fields.accessToken, {
-            type: 'password',
-          })}
-          autoComplete="off"
-          data-1p-ignore
-          data-form-type="other"
-          data-lpignore="true"
-          key={fields.accessToken.key}
-          onChange={(event) => {
-            accessTokenControl.change(event.target.value)
-            resetTestState()
-          }}
+        <AccessTokenInput
+          control={accessTokenControl}
+          field={fields.accessToken}
+          onValueChange={resetTestState}
           placeholder={t('issueImporters.fields.credentialPlaceholder', {
             defaultValue: 'Enter new value to update',
           })}
         />
-        <FormFieldErrors errors={fields.accessToken.errors} />
       </fieldset>
     </>
   )

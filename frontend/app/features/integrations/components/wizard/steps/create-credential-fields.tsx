@@ -23,6 +23,10 @@ import { useTranslation } from 'react-i18next'
 import { Input } from '~/components/primitives/inputs/input'
 import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { ModalHelpButton } from '~/features/help/components/help-button'
+import {
+  AccessTokenInput,
+  noPasswordManager,
+} from '~/features/integrations/components/modals/config-fields/access-token-input'
 import { GithubResourceOwnerField } from '~/features/integrations/components/modals/config-fields/github-resource-owner-field'
 import { type InputControl } from '~/features/integrations/components/modals/config-fields/jira-credential-fields'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
@@ -44,38 +48,6 @@ type CreateCredentialFieldsProperties = {
 }
 
 type CredentialField = FieldMetadata<string | undefined>
-
-// Password managers must not fill or save the credentials of an external platform.
-const noPasswordManager = {
-  autoComplete: 'off',
-  'data-1p-ignore': true,
-  'data-form-type': 'other',
-  'data-lpignore': 'true',
-} as const
-
-type AccessTokenInputProperties = {
-  control: InputControl
-  field: CredentialField
-  placeholder: string
-}
-
-const AccessTokenInput = ({ control, field, placeholder }: AccessTokenInputProperties) => (
-  <>
-    <input name={field.name} type="hidden" value={control.value ?? ''} />
-    <Input
-      {...noPasswordManager}
-      id={field.id}
-      key={field.key}
-      onBlur={() => control.blur()}
-      onChange={(event) => control.change(event.target.value)}
-      onFocus={() => control.focus()}
-      placeholder={placeholder}
-      type="password"
-      value={control.value ?? ''}
-    />
-    <FormFieldErrors errors={field.errors} />
-  </>
-)
 
 /**
  * The platform-specific credential fields of the integration wizard, in create mode. The edit modal

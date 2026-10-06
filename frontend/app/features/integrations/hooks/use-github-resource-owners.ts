@@ -19,6 +19,7 @@
 
 import { useEffect, useMemo, useRef } from 'react'
 
+import { DEFAULT_CHECK_FREQUENCY_MS } from '~/features/integrations/lib/config-defaults'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 import { useListGithubResourceOwners } from '~/services/api/lasius-hooks/issue-importers/issue-importers'
 
@@ -52,7 +53,7 @@ export const useGithubResourceOwners = ({
           body: {
             accessToken,
             baseUrl,
-            checkFrequency: 300_000,
+            checkFrequency: DEFAULT_CHECK_FREQUENCY_MS,
             importerType: 'github',
             name: 'resource-owner-lookup',
           },

@@ -49,10 +49,10 @@ const createBaseConfigSchema = (t: TFunction<'common' | 'integrations'>) => ({
   baseUrl: z.url({
     error: (issue) =>
       issue.code === 'invalid_type'
-        ? t('issueImporters.validation.baseUrlRequired', {
+        ? t('common:issueImporters.validation.baseUrlRequired', {
             defaultValue: 'Base URL is required',
           })
-        : t('issueImporters.validation.invalidUrl', {
+        : t('common:issueImporters.validation.invalidUrl', {
             defaultValue: 'Invalid URL',
           }),
   }),
@@ -60,18 +60,18 @@ const createBaseConfigSchema = (t: TFunction<'common' | 'integrations'>) => ({
     .number()
     .min(
       60_000,
-      t('issueImporters.validation.minInterval', {
+      t('common:issueImporters.validation.minInterval', {
         defaultValue: 'Minimum 1 minute',
       }),
     )
     .max(
       86_400_000,
-      t('issueImporters.validation.maxInterval', {
+      t('common:issueImporters.validation.maxInterval', {
         defaultValue: 'Maximum 24 hours',
       }),
     ),
   name: requiredString(
-    t('issueImporters.validation.nameRequired', {
+    t('common:issueImporters.validation.nameRequired', {
       defaultValue: 'Name is required',
     }),
   ),
@@ -85,7 +85,7 @@ const credentialSchemas = {
     isEdit
       ? z.string().optional()
       : requiredString(
-          t('issueImporters.validation.accessTokenRequired', {
+          t('common:issueImporters.validation.accessTokenRequired', {
             defaultValue: 'Access token is required',
           }),
         ),
@@ -94,14 +94,14 @@ const credentialSchemas = {
     isEdit
       ? z.string().optional()
       : requiredString(
-          t('issueImporters.validation.apiKeyRequired', {
+          t('common:issueImporters.validation.apiKeyRequired', {
             defaultValue: 'API key is required',
           }),
         ),
 
   consumerKey: (t: TFunction<'common' | 'integrations'>) =>
     requiredString(
-      t('issueImporters.validation.consumerKeyRequired', {
+      t('common:issueImporters.validation.consumerKeyRequired', {
         defaultValue: 'Consumer key is required',
       }),
     ),
@@ -110,7 +110,7 @@ const credentialSchemas = {
     isEdit
       ? z.string().optional()
       : requiredString(
-          t('issueImporters.validation.privateKeyRequired', {
+          t('common:issueImporters.validation.privateKeyRequired', {
             defaultValue: 'Private key is required',
           }),
         ),
@@ -137,7 +137,7 @@ export const createConfigSchema = (
         ...baseSchema,
         accessToken: credentialSchemas.accessToken(t, isEdit),
         resourceOwner: requiredString(
-          t('issueImporters.validation.resourceOwnerRequired', {
+          t('common:issueImporters.validation.resourceOwnerRequired', {
             defaultValue: 'Resource owner is required',
           }),
         ),
@@ -166,7 +166,7 @@ export const createConfigSchema = (
         ...baseSchema,
         apiKey: credentialSchemas.apiKey(t, isEdit),
         workspace: requiredString(
-          t('issueImporters.validation.workspaceRequired', {
+          t('common:issueImporters.validation.workspaceRequired', {
             defaultValue: 'Workspace is required',
           }),
         ),

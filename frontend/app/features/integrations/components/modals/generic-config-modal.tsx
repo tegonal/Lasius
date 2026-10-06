@@ -17,64 +17,45 @@
  *
  */
 
-import { getFormProps, getInputProps, useForm, useInputControl } from '@conform-to/react'
+import { getFormProps, useForm, useInputControl } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
 import { useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useRevalidator } from 'react-router'
 import { type z } from 'zod'
 
-import { Input } from '~/components/primitives/inputs/input'
+import { Button } from '~/components/primitives/buttons/button'
 import { useToast } from '~/components/ui/feedback/use-toast'
-import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
-import { DurationInput } from '~/components/ui/forms/input/duration-input'
 import { Modal } from '~/components/ui/overlays/modal/modal'
 import { ModalBody } from '~/components/ui/overlays/modal/modal-body'
 import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
 import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
 import { ModalHelpButton } from '~/features/help/components/help-button'
-import { GithubResourceOwnerField } from '~/features/integrations/components/modals/config-fields/github-resource-owner-field'
-import { JiraCredentialFields } from '~/features/integrations/components/modals/config-fields/jira-credential-fields'
-import { PlaneFields } from '~/features/integrations/components/modals/config-fields/plane-fields'
+import { EditCredentialFields } from '~/features/integrations/components/modals/config-fields/edit-credential-fields'
 import { ConnectionTestPanel } from '~/features/integrations/components/modals/connection-test-panel'
+import { CheckFrequencyField } from '~/features/integrations/components/shared/check-frequency-field'
+import { ConfigBaseUrlField } from '~/features/integrations/components/shared/config-base-url-field'
+import { ConfigNameField } from '~/features/integrations/components/shared/config-name-field'
 import { ProviderInstructions } from '~/features/integrations/components/shared/provider-instructions'
 import { useConnectionTest } from '~/features/integrations/hooks/use-connection-test'
+import {
+  buildConfigUpdateBody,
+  DEFAULT_CHECK_FREQUENCY_MS,
+  getEditConfigDefaults,
+  getImporterTypeOfConfig,
+} from '~/features/integrations/lib/config-defaults'
 import {
   allFieldsConstraintSchema,
   createConfigSchema,
 } from '~/features/integrations/lib/config-schemas'
-import { getImporterTypeLabel } from '~/features/integrations/lib/importer-type-labels'
-import { untyped } from '~/lib/i18n-types'
-import { type ImporterType } from '~/lib/utils/tag-helpers'
 import { useUpdateConfig } from '~/services/api/lasius-hooks/issue-importers/issue-importers'
 import { type ModelsIssueImporterConfigResponse } from '~/services/api/lasius/modelsIssueImporterConfigResponse'
-import { type ModelsUpdateIssueImporterConfig } from '~/services/api/lasius/modelsUpdateIssueImporterConfig'
 
 type Properties = {
   config: ModelsIssueImporterConfigResponse | null
   onClose: () => void
   open: boolean
   selectedOrgId: string
-}
-
-const IMPORTER_TYPES: readonly string[] = [
-  'github',
-  'gitlab',
-  'jira',
-  'plane',
-] satisfies ImporterType[]
-
-const isImporterType = (value: string): value is ImporterType => IMPORTER_TYPES.includes(value)
-
-const getImporterType = (config: ModelsIssueImporterConfigResponse): ImporterType => {
-  if ('importerType' in config) {
-    const raw = config.importerType as string
-    const normalized = raw.replace(/Config$/, '').toLowerCase()
-    if (isImporterType(normalized)) {
-      return normalized
-    }
-  }
-  return 'gitlab'
 }
 
 export const GenericConfigModal = ({ config, onClose, open, selectedOrgId }: Properties) => {
@@ -84,26 +65,10 @@ export const GenericConfigModal = ({ config, onClose, open, selectedOrgId }: Pro
   const formReference = useRef<HTMLFormElement>(null)
   const nameInputReference = useRef<HTMLInputElement>(null)
 
-  const importerType = config ? getImporterType(config) : 'gitlab'
+  const importerType = config ? getImporterTypeOfConfig(config) : 'gitlab'
 
   const schema = useMemo(() => createConfigSchema(t, importerType, true), [t, importerType])
-
-  const defaultValue = useMemo(
-    () => ({
-      accessToken: '',
-      apiKey: '',
-      baseUrl: config ? config.baseUrl : '',
-      checkFrequency: config ? String(config.checkFrequency) : '300000',
-      consumerKey: '',
-      name: config?.name ?? '',
-      privateKey: '',
-      resourceOwner: config && 'resourceOwner' in config ? (config.resourceOwner ?? '') : '',
-      resourceOwnerType:
-        config && 'resourceOwnerType' in config ? (config.resourceOwnerType ?? '') : '',
-      workspace: config && 'workspace' in config ? (config.workspace ?? '') : '',
-    }),
-    [config],
-  )
+  const defaultValue = useMemo(() => getEditConfigDefaults(config), [config])
 
   const updateApi = useUpdateConfig({
     onError: () => {
@@ -139,32 +104,14 @@ export const GenericConfigModal = ({ config, onClose, open, selectedOrgId }: Pro
       event.preventDefault()
       if (!config || submission?.status !== 'success') return
 
-      const data = submission.value as Record<string, unknown>
-
-      const body: ModelsUpdateIssueImporterConfig = {
-        baseUrl: data.baseUrl as string,
-        checkFrequency: data.checkFrequency as number,
-        name: data.name as string,
-      }
-
-      // Only include credential fields if changed (non-empty)
-      if (data.accessToken) body.accessToken = data.accessToken as string
-      if (data.consumerKey) body.consumerKey = data.consumerKey as string
-      if (data.privateKey) body.privateKey = data.privateKey as string
-      if (data.apiKey) body.apiKey = data.apiKey as string
-
-      // Always include non-credential config fields so they can be updated/cleared
-      body.workspace = (data.workspace as string) || null
-      body.resourceOwner = (data.resourceOwner as string) || null
-      if (data.resourceOwnerType) body.resourceOwnerType = data.resourceOwnerType as never
-
       updateApi.submit({
-        body,
+        body: buildConfigUpdateBody(submission.value),
         configId: config.id,
         orgId: selectedOrgId,
       })
     },
     onValidate({ formData: fd }) {
+      // The platform schema validates; the superset type only gives Conform the field names.
       return parseWithZod(fd, {
         schema: schema as typeof allFieldsConstraintSchema,
       })
@@ -173,10 +120,10 @@ export const GenericConfigModal = ({ config, onClose, open, selectedOrgId }: Pro
     shouldValidate: 'onSubmit',
   })
 
-  const checkFrequencyControl = useInputControl(fields.checkFrequency)
   const accessTokenControl = useInputControl(fields.accessToken)
+  const baseUrlControl = useInputControl(fields.baseUrl)
+  const checkFrequencyControl = useInputControl(fields.checkFrequency)
 
-  // Connection test hook
   const {
     connectionTestMessage,
     connectionTestResult,
@@ -198,20 +145,15 @@ export const GenericConfigModal = ({ config, onClose, open, selectedOrgId }: Pro
     }
   }, [config, open, resetTestState])
 
-  const checkFrequencyMs = Number(checkFrequencyControl.value) || config?.checkFrequency || 300_000
-
   if (!config) return null
 
   return (
     <Modal initialFocus={nameInputReference} onClose={onClose} open={open} size="xl">
       <div className="flex min-h-0 flex-1 flex-col">
-        {/* Header */}
         <div className="flex-shrink-0">
           <ModalCloseButton onClose={onClose} />
           <ModalHeader actionSlot={<ModalHelpButton helpKey="modal-importer-config" />}>
-            {t('issueImporters.titles.edit', {
-              defaultValue: 'Edit Integration',
-            })}
+            {t('issueImporters.titles.edit', { defaultValue: 'Edit Integration' })}
           </ModalHeader>
           <p className="text-base-content/60 mb-6 text-sm">
             {t('issueImporters.descriptions.edit', {
@@ -223,156 +165,29 @@ export const GenericConfigModal = ({ config, onClose, open, selectedOrgId }: Pro
         <ModalBody>
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
             <form {...getFormProps(form)} className="space-y-4" ref={formReference}>
-              {/* Name */}
-              <fieldset className="fieldset">
-                <label className="label" htmlFor={fields.name.id}>
-                  {t('issueImporters.fields.name', {
-                    defaultValue: 'Configuration Name',
-                  })}
-                </label>
-                <Input
-                  {...getInputProps(fields.name, { type: 'text' })}
-                  key={fields.name.key}
-                  placeholder={t(`issueImporters.fields.namePlaceholder.${importerType}`, {
-                    defaultValue: `e.g., Company ${getImporterTypeLabel(importerType, untyped(t))}`,
-                  })}
-                  ref={nameInputReference}
-                />
-                <FormFieldErrors errors={fields.name.errors} />
-              </fieldset>
-
-              {/* Base URL */}
-              <fieldset className="fieldset">
-                <label className="label" htmlFor={fields.baseUrl.id}>
-                  {t('issueImporters.fields.baseUrl', {
-                    defaultValue: 'Base URL',
-                  })}
-                </label>
-                <Input
-                  {...getInputProps(fields.baseUrl, { type: 'text' })}
-                  key={fields.baseUrl.key}
-                  placeholder={t(`issueImporters.fields.baseUrlPlaceholder.${importerType}`, {
-                    defaultValue: 'https://...',
-                  })}
-                />
-                <FormFieldErrors errors={fields.baseUrl.errors} />
-              </fieldset>
-
-              {/* GitHub / GitLab: Access Token */}
-              {(importerType === 'github' || importerType === 'gitlab') && (
-                <fieldset className="fieldset">
-                  <div className="flex items-center gap-1">
-                    <label className="label" htmlFor={fields.accessToken.id}>
-                      {t('issueImporters.fields.accessTokenEdit', {
-                        defaultValue: 'Access Token (leave empty to keep current)',
-                      })}
-                    </label>
-                    <ModalHelpButton helpKey={`setup-${importerType}`} />
-                  </div>
-                  <Input
-                    {...getInputProps(fields.accessToken, { type: 'password' })}
-                    autoComplete="off"
-                    data-1p-ignore
-                    data-form-type="other"
-                    data-lpignore="true"
-                    key={fields.accessToken.key}
-                    onChange={(event) => {
-                      accessTokenControl.change(event.target.value)
-                      resetTestState()
-                    }}
-                    placeholder={t('issueImporters.fields.credentialPlaceholder', {
-                      defaultValue: 'Enter new value to update',
-                    })}
-                  />
-                  <FormFieldErrors errors={fields.accessToken.errors} />
-                </fieldset>
-              )}
-
-              {/* GitHub: Resource Owner */}
-              {importerType === 'github' && (
-                <GithubResourceOwnerField
-                  accessTokenValue={accessTokenControl.value ?? ''}
-                  baseUrl={config.baseUrl}
-                  fields={{
-                    resourceOwner: fields.resourceOwner,
-                    resourceOwnerType: fields.resourceOwnerType,
-                  }}
-                  importerType={importerType}
-                  selectedOrgId={selectedOrgId}
-                />
-              )}
-
-              {/* Jira fields */}
-              {importerType === 'jira' && (
-                <div>
-                  <div className="mb-2 flex items-center gap-1">
-                    <span className="label">
-                      {t('issueImporters.jira.credentialsLabel', {
-                        defaultValue: 'Jira Credentials',
-                      })}
-                    </span>
-                    <ModalHelpButton helpKey="setup-jira" />
-                  </div>
-                  <JiraCredentialFields
-                    accessTokenControl={accessTokenControl}
-                    fields={{
-                      accessToken: fields.accessToken,
-                      consumerKey: fields.consumerKey,
-                      privateKey: fields.privateKey,
-                    }}
-                    resetTestState={resetTestState}
-                  />
-                </div>
-              )}
-
-              {/* Plane fields */}
-              {importerType === 'plane' && (
-                <div>
-                  <div className="mb-2 flex items-center gap-1">
-                    <span className="label">
-                      {t('issueImporters.plane.credentialsLabel', {
-                        defaultValue: 'Plane Credentials',
-                      })}
-                    </span>
-                    <ModalHelpButton helpKey="setup-plane" />
-                  </div>
-                  <PlaneFields
-                    fields={{
-                      apiKey: fields.apiKey,
-                      workspace: fields.workspace,
-                    }}
-                    resetTestState={resetTestState}
-                  />
-                </div>
-              )}
-
-              {/* Check Frequency */}
-              <fieldset className="fieldset">
-                <label className="label" htmlFor="edit-checkFrequency">
-                  {t('issueImporters.checkInterval', {
-                    defaultValue: 'Check Interval',
-                  })}
-                </label>
-                <input
-                  name={fields.checkFrequency.name}
-                  type="hidden"
-                  value={checkFrequencyControl.value ?? String(config.checkFrequency || 300_000)}
-                />
-                <div>
-                  <DurationInput
-                    error={!!fields.checkFrequency.errors?.length}
-                    id="edit-checkFrequency"
-                    onChange={(ms) => checkFrequencyControl.change(String(ms))}
-                    value={checkFrequencyMs}
-                  />
-                </div>
-                <FormFieldErrors errors={fields.checkFrequency.errors} />
-                <p className="text-base-content/60 mt-1 text-xs">
-                  {t('issueImporters.checkIntervalHelp', {
-                    defaultValue: 'How often to check for new issues',
-                  })}
-                </p>
-              </fieldset>
+              <ConfigNameField
+                field={fields.name}
+                importerType={importerType}
+                inputRef={nameInputReference}
+              />
+              <ConfigBaseUrlField
+                control={baseUrlControl}
+                field={fields.baseUrl}
+                importerType={importerType}
+              />
+              <EditCredentialFields
+                accessTokenControl={accessTokenControl}
+                baseUrl={config.baseUrl}
+                fields={fields}
+                importerType={importerType}
+                resetTestState={resetTestState}
+                selectedOrgId={selectedOrgId}
+              />
+              <CheckFrequencyField
+                control={checkFrequencyControl}
+                fallbackMs={config.checkFrequency || DEFAULT_CHECK_FREQUENCY_MS}
+                field={fields.checkFrequency}
+              />
 
               <ConnectionTestPanel
                 connectionTestMessage={connectionTestMessage}
@@ -382,28 +197,25 @@ export const GenericConfigModal = ({ config, onClose, open, selectedOrgId }: Pro
                 isTestingConnection={isTestingConnection}
               />
 
-              {/* Divider + Action buttons */}
               <div className="border-base-300 border-t pt-4">
                 <div className="flex gap-2">
-                  <button className="btn btn-primary" disabled={isSaving} type="submit">
+                  <Button disabled={isSaving} fullWidth={false} type="submit" variant="primary">
                     {isSaving
                       ? t('actions.saving', { defaultValue: 'Saving...' })
-                      : t('issueImporters.actions.update', {
-                          defaultValue: 'Update',
-                        })}
-                  </button>
-                  <button
-                    className="btn btn-ghost"
+                      : t('issueImporters.actions.update', { defaultValue: 'Update' })}
+                  </Button>
+                  <Button
                     disabled={isSaving}
+                    fullWidth={false}
                     onClick={onClose}
-                    type="button">
+                    type="button"
+                    variant="ghost">
                     {t('actions.cancel', { defaultValue: 'Cancel' })}
-                  </button>
+                  </Button>
                 </div>
               </div>
             </form>
 
-            {/* Right column: Provider instructions */}
             <div className="hidden lg:block">
               <ProviderInstructions importerType={importerType} />
             </div>

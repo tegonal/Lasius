@@ -19,6 +19,7 @@
 
 import { useState } from 'react'
 
+import { DEFAULT_CHECK_FREQUENCY_MS } from '~/features/integrations/lib/config-defaults'
 import {
   type ModelsCreateIssueImporterConfigResourceOwnerType,
   type ModelsExternalProject,
@@ -64,7 +65,7 @@ const createInitialState = (): WizardState => ({
   currentStep: 'platform',
   formData: {
     baseUrl: '',
-    checkFrequency: 300_000, // 5 minutes default
+    checkFrequency: DEFAULT_CHECK_FREQUENCY_MS,
     name: '',
   },
 })
