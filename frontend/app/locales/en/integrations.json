@@ -50,6 +50,7 @@
     "emptyState": "No integrations configured yet. Add one to get started.",
     "errors": {
       "deleteFailed": "Failed to delete integration",
+      "deleteHasMappings": "This integration still has project mappings. Remove all mappings first.",
       "invalidMappingData": "Invalid mapping data",
       "mappingRemoveFailed": "Failed to remove project mapping",
       "mappingSaveFailed": "Failed to save project mapping",

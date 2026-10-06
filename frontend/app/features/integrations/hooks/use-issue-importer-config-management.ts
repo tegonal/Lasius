@@ -22,11 +22,16 @@ import { useTranslation } from 'react-i18next'
 import { useRevalidator } from 'react-router'
 
 import { useToast } from '~/components/ui/feedback/use-toast'
+import { logger } from '~/lib/logger'
 import { type ModelsIssueImporterConfigResponse } from '~/services/api/lasius'
 import {
   useDeleteConfig,
   useRefreshTags,
 } from '~/services/api/lasius-hooks/issue-importers/issue-importers'
+
+// The backend answers 409 when the configuration still has project mappings. The list can be
+// stale, because another session can add a mapping after the confirm dialog opened.
+const HTTP_CONFLICT = 409
 
 type ModalType = 'configEdit' | 'configInfo' | 'deleteConfirm' | 'projectMappings' | 'wizard' | null
 
@@ -57,11 +62,18 @@ export function useIssueImporterConfigManagement(
   )
 
   const configDeletionApi = useDeleteConfig({
-    onError: () => {
+    onError: ({ error, status }) => {
+      logger.warn('Failed to delete integration', { error, status })
       addToast({
-        message: t('issueImporters.errors.deleteFailed', {
-          defaultValue: 'Failed to delete integration',
-        }),
+        message:
+          status === HTTP_CONFLICT
+            ? t('issueImporters.errors.deleteHasMappings', {
+                defaultValue:
+                  'This integration still has project mappings. Remove all mappings first.',
+              })
+            : t('issueImporters.errors.deleteFailed', {
+                defaultValue: 'Failed to delete integration',
+              }),
         type: 'ERROR',
       })
     },

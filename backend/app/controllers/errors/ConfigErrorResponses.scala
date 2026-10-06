@@ -69,16 +69,15 @@ object ConfigErrorResponses {
       ))
   }
 
-  /** Config has project dependencies and cannot be deleted (500). */
-  def hasDependencies(config: IssueImporterConfig): String =
-    Json.stringify(
-      Json.obj(
-        "error" -> "has_dependencies",
-        "message" -> "Cannot delete configuration that still has project mappings. Remove all project mappings first.",
-        "configId"     -> config.id.value.toString,
-        "projectCount" -> config.projects.size,
-        "projectIds"   -> config.projects.map(_.projectId.value).mkString(", ")
-      ))
+  /** Config has project dependencies and cannot be deleted (409). */
+  def hasDependencies(config: IssueImporterConfig): JsObject =
+    Json.obj(
+      "error" -> "has_dependencies",
+      "message" -> "Cannot delete configuration that still has project mappings. Remove all project mappings first.",
+      "configId"     -> config.id.value.toString,
+      "projectCount" -> config.projects.size,
+      "projectIds"   -> config.projects.map(_.projectId.value).mkString(", ")
+    )
 
   /** Validation failed for config creation/update. */
   def validationFailed(field: String,

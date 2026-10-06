@@ -430,7 +430,7 @@ class IssueImporterConfigControllerSpec
       status(getResult) must equalTo(NOT_FOUND)
     }
 
-    "return 500 when trying to delete config with dependencies" in new WithTestApplication {
+    "return 409 when trying to delete config with dependencies" in new WithTestApplication {
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
       val systemServices: SystemServices              = inject[SystemServices]
       val authConfig: AuthConfig                      = inject[AuthConfig]
@@ -447,8 +447,11 @@ class IssueImporterConfigControllerSpec
       val result: Future[Result] =
         controller.deleteConfig(controller.organisation.id, configId)(request)
 
-      status(result) must equalTo(INTERNAL_SERVER_ERROR)
-      contentAsString(result) must contain("has_dependencies")
+      status(result) must equalTo(CONFLICT)
+      (contentAsJson(result) \ "error").as[String] must equalTo(
+        "has_dependencies")
+      (contentAsJson(result) \ "projectCount").as[Int] must equalTo(
+        controller.gitlabConfig.projects.size)
     }
   }
 

@@ -51,6 +51,7 @@
     "emptyState": "Aún no hay integraciones configuradas. Añade una para empezar.",
     "errors": {
       "deleteFailed": "Error al eliminar la integración",
+      "deleteHasMappings": "Esta integración todavía tiene asignaciones de proyecto. Primero hay que eliminar todas las asignaciones.",
       "invalidMappingData": "Datos de correspondencia inválidos",
       "mappingRemoveFailed": "Error al eliminar la correspondencia de proyecto",
       "mappingSaveFailed": "Error al guardar las correspondencias de proyecto",

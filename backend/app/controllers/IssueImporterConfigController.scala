@@ -160,9 +160,14 @@ class IssueImporterConfigController @Inject() (
               .noneToFailed(ConfigErrorResponses.configNotFound(configId))
             _ <- validateConfigOwnership(config,
                                          userOrg.organisationReference.id)
-            _ <- validateNoProjectDependencies(config)
-            _ <- issueImporterRepository.removeById(configId)
-          } yield NoContent
+            result <-
+              if (config.projects.nonEmpty) {
+                Future.successful(
+                  Conflict(ConfigErrorResponses.hasDependencies(config)))
+              } else {
+                issueImporterRepository.removeById(configId).map(_ => NoContent)
+              }
+          } yield result
         }
     }
 
@@ -638,24 +643,6 @@ class IssueImporterConfigController @Inject() (
       config.organisationReference.id == orgId,
       ConfigErrorResponses.accessDenied(config.id)
     )
-  }
-
-  /** Validates that a config has no project dependencies before deletion.
-    *
-    * @param config
-    *   The config to check
-    * @return
-    *   Future[Result] that fails with error if config still has project
-    *   mappings
-    */
-  private def validateNoProjectDependencies(
-      config: IssueImporterConfig): Future[Result] = {
-    if (config.projects.nonEmpty) {
-      Future.failed(
-        new IllegalStateException(ConfigErrorResponses.hasDependencies(config)))
-    } else {
-      success()
-    }
   }
 
   private def validateConfigForType(

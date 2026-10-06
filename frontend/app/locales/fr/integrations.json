@@ -51,6 +51,7 @@
     "emptyState": "Aucune intégration configurée. Ajoutez-en une pour commencer.",
     "errors": {
       "deleteFailed": "Échec de la suppression de l'intégration",
+      "deleteHasMappings": "Cette intégration a encore des associations de projet. Toutes les associations doivent d’abord être supprimées.",
       "invalidMappingData": "Données de correspondance invalides",
       "mappingRemoveFailed": "Échec de la suppression de la correspondance de projet",
       "mappingSaveFailed": "Échec de l'enregistrement des correspondances de projet",

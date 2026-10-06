@@ -51,6 +51,7 @@
     "emptyState": "Noch keine Integrationen konfiguriert. Füge eine hinzu, um zu starten.",
     "errors": {
       "deleteFailed": "Integration konnte nicht gelöscht werden",
+      "deleteHasMappings": "Diese Integration hat noch Projektzuordnungen. Entferne zuerst alle Zuordnungen.",
       "invalidMappingData": "Ungültige Zuordnungsdaten",
       "mappingRemoveFailed": "Projekt-Zuordnung konnte nicht entfernt werden",
       "mappingSaveFailed": "Projekt-Zuordnungen konnten nicht gespeichert werden",

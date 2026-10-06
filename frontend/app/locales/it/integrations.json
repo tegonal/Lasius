@@ -51,6 +51,7 @@
     "emptyState": "Nessuna integrazione configurata. Aggiungine una per iniziare.",
     "errors": {
       "deleteFailed": "Eliminazione integrazione non riuscita",
+      "deleteHasMappings": "Questa integrazione ha ancora associazioni di progetto. Tutte le associazioni devono prima essere rimosse.",
       "invalidMappingData": "Dati di mappatura non validi",
       "mappingRemoveFailed": "Impossibile rimuovere la mappatura del progetto",
       "mappingSaveFailed": "Impossibile salvare le mappature del progetto",

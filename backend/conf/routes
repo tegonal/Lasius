@@ -1532,6 +1532,24 @@ PUT /organisations/:orgId/issue-importers/:configId                             
 #                type: string
 #              configId:
 #                type: string
+#    409:
+#      description: configuration still has project mappings
+#      content:
+#        application/json:
+#          schema:
+#            type: object
+#            properties:
+#              error:
+#                type: string
+#                example: has_dependencies
+#              message:
+#                type: string
+#              configId:
+#                type: string
+#              projectCount:
+#                type: integer
+#              projectIds:
+#                type: string
 ###
 DELETE /organisations/:orgId/issue-importers/:configId                                          controllers.IssueImporterConfigController.deleteConfig(orgId: models.OrganisationId, configId: models.IssueImporterConfigId)
 
