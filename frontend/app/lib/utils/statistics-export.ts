@@ -108,6 +108,46 @@ const transformAggregatedData = (stats: ModelsBookingStats[] | undefined) => {
     .toSorted((a, b) => b.Hours - a.Hours)
 }
 
+const formatSummaryDate = (dateString: string) => {
+  try {
+    return formatDate(parseISO(dateString), 'dd.MM.yyyy')
+  } catch {
+    return dateString
+  }
+}
+
+const summaryRows = (summary: StatisticsExportData['summary']): (number | string)[][] => [
+  ['Time Period', `${formatSummaryDate(summary.from)} to ${formatSummaryDate(summary.to)}`],
+  ['Total Hours', summary.totalHours],
+  ['Total Bookings', summary.totalBookings],
+  ...(summary.totalUsers ? [['Total Users', summary.totalUsers]] : []),
+  ...(summary.totalProjects ? [['Total Projects', summary.totalProjects]] : []),
+]
+
+const appendByDaySheets = (wb: XLSX.WorkBook, sources: StatisticsExportData['byDayAndSource']) => {
+  for (const { data: stats, source } of sources) {
+    const tableData = transformByDayData(stats)
+    if (tableData.length === 0) continue
+
+    const ws = XLSX.utils.json_to_sheet(tableData)
+    ws['!cols'] = Object.keys(tableData[0] ?? {}).map((key) => ({
+      wch: clamp(key.length, 12, 30),
+    }))
+    XLSX.utils.book_append_sheet(wb, ws, `By ${capitalize(source)} & Day`.slice(0, 31))
+  }
+}
+
+const appendAggregatedSheets = (wb: XLSX.WorkBook, sources: StatisticsExportData['aggregated']) => {
+  for (const { data: stats, source } of sources) {
+    const tableData = transformAggregatedData(stats)
+    if (tableData.length === 0) continue
+
+    const ws = XLSX.utils.json_to_sheet(tableData)
+    ws['!cols'] = [{ wch: 30 }, { wch: 15 }, { wch: 15 }]
+    XLSX.utils.book_append_sheet(wb, ws, `${capitalize(source)} Totals`)
+  }
+}
+
 /**
  * Generates a statistics spreadsheet buffer.
  * Server-only — uses XLSX.write() to return a buffer instead of writing to disk.
@@ -118,63 +158,12 @@ export const exportStatistics = (
 ): { buffer: Uint8Array; filename: string } => {
   const wb = XLSX.utils.book_new()
 
-  const formatSummaryDate = (dateString: string) => {
-    try {
-      return formatDate(parseISO(dateString), 'dd.MM.yyyy')
-    } catch {
-      return dateString
-    }
-  }
-
-  const summaryData: (number | string)[][] = [
-    [
-      'Time Period',
-      `${formatSummaryDate(data.summary.from)} to ${formatSummaryDate(data.summary.to)}`,
-    ],
-    ['Total Hours', data.summary.totalHours],
-    ['Total Bookings', data.summary.totalBookings],
-  ]
-
-  if (data.summary.totalUsers !== undefined && data.summary.totalUsers > 0) {
-    summaryData.push(['Total Users', data.summary.totalUsers])
-  }
-  if (data.summary.totalProjects !== undefined && data.summary.totalProjects > 0) {
-    summaryData.push(['Total Projects', data.summary.totalProjects])
-  }
-
-  const summarySheet = XLSX.utils.aoa_to_sheet(summaryData)
+  const summarySheet = XLSX.utils.aoa_to_sheet(summaryRows(data.summary))
   summarySheet['!cols'] = [{ wch: 20 }, { wch: 40 }]
   XLSX.utils.book_append_sheet(wb, summarySheet, 'Summary')
 
-  for (const { data: stats, source } of data.byDayAndSource) {
-    if (!stats || stats.length === 0) continue
-
-    const tableData = transformByDayData(stats)
-    if (tableData.length === 0) continue
-
-    const ws = XLSX.utils.json_to_sheet(tableData)
-
-    const colWidths = Object.keys(tableData[0] || {}).map((key) => ({
-      wch: clamp(key.length, 12, 30),
-    }))
-    ws['!cols'] = colWidths
-
-    const sheetName = `By ${capitalize(source)} & Day`
-    XLSX.utils.book_append_sheet(wb, ws, sheetName.slice(0, 31))
-  }
-
-  for (const { data: stats, source } of data.aggregated) {
-    if (!stats || stats.length === 0) continue
-
-    const tableData = transformAggregatedData(stats)
-    if (tableData.length === 0) continue
-
-    const ws = XLSX.utils.json_to_sheet(tableData)
-    ws['!cols'] = [{ wch: 30 }, { wch: 15 }, { wch: 15 }]
-
-    const sheetName = `${capitalize(source)} Totals`
-    XLSX.utils.book_append_sheet(wb, ws, sheetName)
-  }
+  appendByDaySheets(wb, data.byDayAndSource)
+  appendAggregatedSheets(wb, data.aggregated)
 
   const fromDate = data.summary.from.split('T', 1)[0]
   const toDate = data.summary.to.split('T', 1)[0]
