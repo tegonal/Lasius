@@ -427,6 +427,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day1`,
                                   `tagId1`,
                                   `duration1`) =>
@@ -434,6 +435,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day1`,
                                   `tagId2`,
                                   `duration1`) =>
@@ -441,6 +443,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day1`,
                                   `tagId3`,
                                   `duration1`) =>
@@ -448,6 +451,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day2`,
                                   `tagId1`,
                                   `duration2`) =>
@@ -455,6 +459,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day2`,
                                   `tagId2`,
                                   `duration2`) =>
@@ -462,6 +467,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day2`,
                                   `tagId3`,
                                   `duration2`) =>
@@ -469,6 +475,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day3`,
                                   `tagId1`,
                                   `duration3`) =>
@@ -476,6 +483,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day3`,
                                   `tagId2`,
                                   `duration3`) =>
@@ -483,6 +491,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day3`,
                                   `tagId3`,
                                   `duration3`) =>
@@ -544,6 +553,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day1`,
                                   `tagId1`,
                                   `duration1`) =>
@@ -551,6 +561,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day1`,
                                   `tagId2`,
                                   `duration1`) =>
@@ -558,6 +569,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day1`,
                                   `tagId3`,
                                   `duration1`) =>
@@ -565,6 +577,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day2`,
                                   `tagId1`,
                                   `duration2`) =>
@@ -572,6 +585,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day2`,
                                   `tagId2`,
                                   `duration2`) =>
@@ -579,6 +593,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day2`,
                                   `tagId3`,
                                   `duration2`) =>
@@ -586,6 +601,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day3`,
                                   `tagId1`,
                                   `duration3`) =>
@@ -593,6 +609,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day3`,
                                   `tagId2`,
                                   `duration3`) =>
@@ -600,6 +617,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day3`,
                                   `tagId3`,
                                   `duration3`) =>
@@ -676,6 +694,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day1`,
                                   `tagId1`,
                                   `duration1`) =>
@@ -683,6 +702,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day1`,
                                   `tagId2`,
                                   `duration1`) =>
@@ -690,6 +710,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day1`,
                                   `tagId3`,
                                   `duration1`) =>
@@ -697,6 +718,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day2`,
                                   `tagId1`,
                                   `duration2`) =>
@@ -704,6 +726,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day2`,
                                   `tagId2`,
                                   `duration2`) =>
@@ -711,6 +734,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day2`,
                                   `tagId3`,
                                   `duration2`) =>
@@ -718,6 +742,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day3`,
                                   `tagId1`,
                                   `duration3`) =>
@@ -725,6 +750,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day3`,
                                   `tagId2`,
                                   `duration3`) =>
@@ -732,6 +758,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day3`,
                                   `tagId3`,
                                   `duration3`) =>
@@ -782,6 +809,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day1`,
                                   `tagId1`,
                                   `newDuration1`) =>
@@ -789,6 +817,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day1`,
                                   `tagId2`,
                                   `newDuration1`) =>
@@ -796,6 +825,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day1`,
                                   `tagId3`,
                                   `newDuration1`) =>
@@ -803,6 +833,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day2`,
                                   `tagId1`,
                                   `duration2`) =>
@@ -810,6 +841,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day2`,
                                   `tagId2`,
                                   `duration2`) =>
@@ -817,6 +849,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day2`,
                                   `tagId3`,
                                   `duration2`) =>
@@ -824,6 +857,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day3`,
                                   `tagId1`,
                                   `newDuration3`) =>
@@ -831,6 +865,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day3`,
                                   `tagId2`,
                                   `newDuration3`) =>
@@ -838,6 +873,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day3`,
                                   `tagId3`,
                                   `newDuration3`) =>
@@ -845,6 +881,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day4`,
                                   `tagId1`,
                                   `newDuration4`) =>
@@ -852,6 +889,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day4`,
                                   `tagId2`,
                                   `newDuration4`) =>
@@ -859,6 +897,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day4`,
                                   `tagId3`,
                                   `newDuration4`) =>
@@ -980,6 +1019,7 @@ class UserTimeBookingStatisticsViewSpec
             case BookingByTag(_,
                               `userReference`,
                               `teamReference`,
+                              `projectReference`,
                               `day`,
                               `tagId1`,
                               `duration`) =>
@@ -987,6 +1027,7 @@ class UserTimeBookingStatisticsViewSpec
             case BookingByTag(_,
                               `userReference`,
                               `teamReference`,
+                              `projectReference`,
                               `day`,
                               `tagId2`,
                               `duration`) =>
@@ -994,6 +1035,7 @@ class UserTimeBookingStatisticsViewSpec
             case BookingByTag(_,
                               `userReference`,
                               `teamReference`,
+                              `projectReference`,
                               `day`,
                               `tagId3`,
                               `duration`) =>
@@ -1032,6 +1074,7 @@ class UserTimeBookingStatisticsViewSpec
             case BookingByTag(_,
                               `userReference`,
                               `teamReference`,
+                              `projectReference`,
                               `day`,
                               `tagId1`,
                               `duration`) =>
@@ -1039,6 +1082,7 @@ class UserTimeBookingStatisticsViewSpec
             case BookingByTag(_,
                               `userReference`,
                               `teamReference`,
+                              `projectReference`,
                               `day`,
                               `tagId2`,
                               `duration`) =>
@@ -1046,6 +1090,7 @@ class UserTimeBookingStatisticsViewSpec
             case BookingByTag(_,
                               `userReference`,
                               `teamReference`,
+                              `projectReference`,
                               `day`,
                               `tagId3`,
                               `duration`) =>
@@ -1093,6 +1138,7 @@ class UserTimeBookingStatisticsViewSpec
             case BookingByTag(_,
                               `userReference`,
                               `teamReference`,
+                              `projectReference`,
                               `day`,
                               `tagId1`,
                               `duration`) =>
@@ -1100,6 +1146,7 @@ class UserTimeBookingStatisticsViewSpec
             case BookingByTag(_,
                               `userReference`,
                               `teamReference`,
+                              `projectReference`,
                               `day`,
                               `tagId2`,
                               `duration`) =>
@@ -1107,6 +1154,7 @@ class UserTimeBookingStatisticsViewSpec
             case BookingByTag(_,
                               `userReference`,
                               `teamReference`,
+                              `projectReference`,
                               `day`,
                               `tagId3`,
                               `duration`) =>
@@ -1132,6 +1180,7 @@ class UserTimeBookingStatisticsViewSpec
             case BookingByTag(_,
                               `userReference`,
                               `teamReference`,
+                              `projectReference`,
                               `day`,
                               `tagId1`,
                               `newDuration`) =>
@@ -1139,6 +1188,7 @@ class UserTimeBookingStatisticsViewSpec
             case BookingByTag(_,
                               `userReference`,
                               `teamReference`,
+                              `projectReference`,
                               `day`,
                               `tagId2`,
                               `newDuration`) =>
@@ -1146,6 +1196,7 @@ class UserTimeBookingStatisticsViewSpec
             case BookingByTag(_,
                               `userReference`,
                               `teamReference`,
+                              `projectReference`,
                               `day`,
                               `tagId3`,
                               `newDuration`) =>
@@ -1164,7 +1215,7 @@ class UserTimeBookingStatisticsViewSpec
         booking.copy(tags = booking.tags + SimpleTag(tagId4)))) {
       (_,
        bookingByTagRepository,
-       _,
+       projectReference,
        tagId1,
        tagId2,
        tagId3,
@@ -1178,6 +1229,7 @@ class UserTimeBookingStatisticsViewSpec
             case BookingByTag(_,
                               `userReference`,
                               `teamReference`,
+                              `projectReference`,
                               `day`,
                               `tagId1`,
                               `duration`) =>
@@ -1185,6 +1237,7 @@ class UserTimeBookingStatisticsViewSpec
             case BookingByTag(_,
                               `userReference`,
                               `teamReference`,
+                              `projectReference`,
                               `day`,
                               `tagId2`,
                               `duration`) =>
@@ -1192,6 +1245,7 @@ class UserTimeBookingStatisticsViewSpec
             case BookingByTag(_,
                               `userReference`,
                               `teamReference`,
+                              `projectReference`,
                               `day`,
                               `tagId3`,
                               `duration`) =>
@@ -1207,6 +1261,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day`,
                                   `tagId1`,
                                   `duration`) =>
@@ -1214,6 +1269,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day`,
                                   `tagId2`,
                                   `duration`) =>
@@ -1221,6 +1277,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day`,
                                   `tagId3`,
                                   `duration`) =>
@@ -1228,6 +1285,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day`,
                                   `tagId4`,
                                   `duration`) =>
@@ -1245,7 +1303,7 @@ class UserTimeBookingStatisticsViewSpec
         booking.copy(tags = booking.tags.filter(_.isInstanceOf[SimpleTag])))) {
       (_,
        bookingByTagRepository,
-       _,
+       projectReference,
        tagId1,
        tagId2,
        tagId3,
@@ -1259,6 +1317,7 @@ class UserTimeBookingStatisticsViewSpec
             case BookingByTag(_,
                               `userReference`,
                               `teamReference`,
+                              `projectReference`,
                               `day`,
                               `tagId1`,
                               `duration`) =>
@@ -1266,6 +1325,7 @@ class UserTimeBookingStatisticsViewSpec
             case BookingByTag(_,
                               `userReference`,
                               `teamReference`,
+                              `projectReference`,
                               `day`,
                               `tagId2`,
                               `duration`) =>
@@ -1273,6 +1333,7 @@ class UserTimeBookingStatisticsViewSpec
             case BookingByTag(_,
                               `userReference`,
                               `teamReference`,
+                              `projectReference`,
                               `day`,
                               `tagId3`,
                               `duration`) =>
@@ -1288,6 +1349,7 @@ class UserTimeBookingStatisticsViewSpec
                 case BookingByTag(_,
                                   `userReference`,
                                   `teamReference`,
+                                  `projectReference`,
                                   `day`,
                                   `tagId1`,
                                   `duration`) =>

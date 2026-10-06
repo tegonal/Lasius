@@ -89,14 +89,18 @@ class UserTimeBookingStatisticsView(
 
     val bookingsByTag = durations
       .collect { case b: BookingByTag => b }
-      .groupBy(b => (b.day, b.organisationReference, b.tagId))
-      .map { case ((day, organisationReference, tagId), bookings) =>
-        BookingByTag(BookingByTagId(),
-                     userReference,
-                     organisationReference,
-                     day,
-                     tagId,
-                     duration = bookings.map(_.duration).reduce(_ plus _))
+      .groupBy(b =>
+        (b.day, b.organisationReference, b.projectReference, b.tagId))
+      .map {
+        case ((day, organisationReference, projectReference, tagId),
+              bookings) =>
+          BookingByTag(BookingByTagId(),
+                       userReference,
+                       organisationReference,
+                       projectReference,
+                       day,
+                       tagId,
+                       duration = bookings.map(_.duration).reduce(_ plus _))
       }
 
     withinTransaction { implicit dbSession =>
@@ -302,6 +306,7 @@ class UserTimeBookingStatisticsView(
         BookingByTag(BookingByTagId(),
                      booking.userReference,
                      booking.organisationReference,
+                     booking.projectReference,
                      day,
                      tagId,
                      duration)

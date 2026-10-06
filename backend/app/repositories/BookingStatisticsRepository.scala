@@ -255,9 +255,12 @@ class BookingByTagMongoRepository @Inject() (
     dbSession.db.collection[BSONCollection]("BookingByTag", failoverStrategy)
 
   override def getUniqueContraint(model: BookingByTag): JsObject = {
-    Json.obj("userReference"         -> model.userReference,
-             "organisationReference" -> model.organisationReference,
-             "day"                   -> model.day,
-             "tagId"                 -> model.tagId)
+    Json.obj(
+      "userReference"         -> model.userReference,
+      "organisationReference" -> model.organisationReference,
+      "projectReference"      -> model.projectReference,
+      "day"                   -> model.day,
+      "tagId"                 -> model.tagId
+    )
   }
 }

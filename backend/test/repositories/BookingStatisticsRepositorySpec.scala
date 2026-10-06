@@ -366,4 +366,52 @@ class BookingStatisticsRepositorySpec
       }
     }
   }
+
+  "BookingByTag findAggregatedByProjectAndRange" should {
+    "sum the tag durations of the requested project only" in {
+      val tagRepository = new BookingByTagMongoRepository()
+      val user          =
+        EntityReference(UserId(), "userBookingStatisticsRepositorySpec")
+      val organisation = EntityReference(OrganisationId(), "organisation1")
+      val project      = EntityReference(ProjectId(), "tagProject1")
+      val otherProject = EntityReference(ProjectId(), "tagProject2")
+      val tagId        = TagId("tagOfTwoProjects")
+      val day          = date("03.03.2003")
+
+      withDBSession() { implicit dbSession =>
+        for {
+          _ <- tagRepository.add(
+            BookingByTag(BookingByTagId(),
+                         user,
+                         organisation,
+                         project,
+                         day,
+                         tagId,
+                         Duration.standardHours(1)))
+          _ <- tagRepository.add(
+            BookingByTag(BookingByTagId(),
+                         user,
+                         organisation,
+                         otherProject,
+                         day,
+                         tagId,
+                         Duration.standardHours(2)))
+        } yield ()
+      }.awaitResult()
+
+      val result = withDBSession()(implicit dbSession =>
+        tagRepository.findAggregatedByProjectAndRange(project.id,
+                                                      day,
+                                                      day,
+                                                      "tagId",
+                                                      All))
+        .awaitResult()
+
+      result.flatMap(_.values) must
+        contain(
+          exactly(
+            BookingStatsByCategory(Some(tagId.value),
+                                   Some(Duration.standardHours(1).getMillis))))
+    }
+  }
 }

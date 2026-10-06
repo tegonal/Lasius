@@ -22,6 +22,7 @@
 package models
 
 import models.OrganisationId.OrganisationReference
+import models.ProjectId.ProjectReference
 import models.UserId.UserReference
 import org.joda.time.{DateTime, Duration, LocalDate, LocalDateTime}
 import play.api.libs.json._
@@ -30,6 +31,7 @@ import models.BaseFormat._
 case class BookingByTag(_id: BookingByTagId,
                         userReference: UserReference,
                         organisationReference: OrganisationReference,
+                        projectReference: ProjectReference,
                         day: LocalDate,
                         tagId: TagId,
                         duration: Duration)
@@ -41,12 +43,7 @@ case class BookingByTag(_id: BookingByTagId,
   }
 
   def invert: BookingByTag = {
-    BookingByTag(id,
-                 userReference,
-                 organisationReference,
-                 day,
-                 tagId,
-                 Duration.ZERO.minus(duration))
+    copy(duration = Duration.ZERO.minus(duration))
   }
 }
 
