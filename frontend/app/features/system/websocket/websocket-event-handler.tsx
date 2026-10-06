@@ -24,6 +24,7 @@ import { useRevalidator } from 'react-router'
 import { useToast } from '~/components/ui/feedback/use-toast'
 import { ROUTES } from '~/config/routes.constants'
 import { logger } from '~/lib/logger'
+import { clearLoaderCache } from '~/lib/utils/loader-cache'
 import { stringHash } from '~/lib/utils/string-hash'
 import { ModelsConnectivityStatus } from '~/services/api/lasius/modelsConnectivityStatus'
 
@@ -87,7 +88,11 @@ export const WebSocketEventHandler = () => {
     logger.info('[WebSocketEventHandler]', lastMessage)
 
     const toast = latestAddToastReference.current
-    const revalidate = () => void revalidatorReference.current.revalidate()
+    // The event reports a change from another tab or device, so a cached loader result is stale.
+    const revalidate = () => {
+      clearLoaderCache()
+      void revalidatorReference.current.revalidate()
+    }
     // i18next-cli extracts only calls named t(). Integration keys name their namespace.
     const t = tReference.current
 

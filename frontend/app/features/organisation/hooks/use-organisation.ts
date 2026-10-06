@@ -20,6 +20,7 @@
 import { useFetcher } from 'react-router'
 
 import { useLayoutLoaderData } from '~/hooks/use-layout-loader-data'
+import { clearLoaderCache } from '~/lib/utils/loader-cache'
 import { type ModelsEntityReference } from '~/services/api/lasius/modelsEntityReference'
 import { type ModelsUserOrganisation } from '~/services/api/lasius/modelsUserOrganisation'
 import { ModelsUserOrganisationRole } from '~/services/api/lasius/modelsUserOrganisationRole'
@@ -65,15 +66,19 @@ export const useOrganisation = () => {
   const fetcher = useFetcher()
 
   const setSelectedOrganisation = (organisationReference: ModelsEntityReference) => {
-    if (organisationReference) {
-      void fetcher.submit(
-        {
-          organisationId: organisationReference.id,
-          organisationKey: organisationReference.key,
-        },
-        { action: '/api/org-switch', method: 'post' },
-      )
+    if (!organisationReference) {
+      return
     }
+
+    // The organisation is not part of the URL, so a cached loader result belongs to the old one.
+    clearLoaderCache()
+    void fetcher.submit(
+      {
+        organisationId: organisationReference.id,
+        organisationKey: organisationReference.key,
+      },
+      { action: '/api/org-switch', method: 'post' },
+    )
   }
 
   return {

@@ -26,6 +26,7 @@
 import { LOADER_CACHE_DEFAULT_TTL_MS } from '~/config/constants'
 
 const cache = new Map<string, { data: unknown; timestamp: number }>()
+const state = { generation: 0 }
 
 export async function cachedServerLoader<T>(
   request: Request,
@@ -40,7 +41,20 @@ export async function cachedServerLoader<T>(
     return cached.data as T
   }
 
+  const startGeneration = state.generation
   const data = await serverLoader()
-  cache.set(cacheKey, { data, timestamp: Date.now() })
+  // A clear during the request means the data can predate a change, so it is not stored.
+  if (state.generation === startGeneration) {
+    cache.set(cacheKey, { data, timestamp: Date.now() })
+  }
   return data
+}
+
+/**
+ * Call before a request that changes backend data. React Router revalidates directly after the
+ * request, and the revalidation must not get a cached result for the same URL.
+ */
+export function clearLoaderCache() {
+  state.generation += 1
+  cache.clear()
 }

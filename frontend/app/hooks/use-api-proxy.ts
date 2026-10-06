@@ -20,6 +20,7 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { useFetcher } from 'react-router'
 
+import { clearLoaderCache } from '~/lib/utils/loader-cache'
 import { type ProxyEnvelope } from '~/routes/api.proxy'
 
 export type ApiProxyOptions<TResponse> = {
@@ -105,6 +106,7 @@ export function useApiProxy<TResponse, TBody = undefined, TParameters = Record<s
       }
 
       submittedReference.current = true
+      if (config.method !== 'GET') clearLoaderCache()
 
       void fetcherSubmit(payload, {
         action: '/api/proxy',
