@@ -92,14 +92,26 @@ describe('computeStreamChartData', () => {
     expect(data.every((row) => !('Week 16' in row))).toBe(true)
   })
 
-  it('sorts the keys as text, so week 10 comes before week 9', () => {
+  it('lists the keys in calendar order', () => {
     const { keys } = computeStreamChartData(
       [
-        booking('2026-03-01T09:00:00.000', '2026-03-01T10:00:00.000'),
         booking('2026-03-02T09:00:00.000', '2026-03-02T10:00:00.000'),
+        booking('2026-03-01T09:00:00.000', '2026-03-01T10:00:00.000'),
       ],
       MARCH,
     )
-    expect(keys).toEqual(['Week 10', 'Week 9'])
+    expect(keys).toEqual(['Week 9', 'Week 10'])
+  })
+
+  it('keeps week 1 of the next year after the December weeks', () => {
+    // Monday 28 December 2026 starts the week that holds 1 January 2027.
+    const { keys } = computeStreamChartData(
+      [
+        booking('2026-12-29T09:00:00.000', '2026-12-29T10:00:00.000'),
+        booking('2026-12-01T09:00:00.000', '2026-12-01T10:00:00.000'),
+      ],
+      '2026-12-15',
+    )
+    expect(keys).toEqual(['Week 49', 'Week 1'])
   })
 })

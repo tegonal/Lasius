@@ -51,9 +51,8 @@ export const computeStreamChartData = (bookings: ModelsBooking[], selectedDate: 
       weekLabels.map((week) => [week, Number((hours.get(`${day}|${week}`) ?? 0).toFixed(2))]),
     ),
   )
-  const keys = weekLabels
-    .filter((week) => data.some((row) => (row[week] ?? 0) > 0))
-    .toSorted((a, b) => a.localeCompare(b))
+  // weekLabels is in calendar order, also across the turn of the year.
+  const keys = weekLabels.filter((week) => data.some((row) => (row[week] ?? 0) > 0))
 
   return { data, keys }
 }
