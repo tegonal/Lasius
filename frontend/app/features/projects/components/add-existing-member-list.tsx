@@ -35,7 +35,8 @@ import { ModalBody } from '~/components/ui/overlays/modal/modal-body'
 import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
 import { ModalDescription } from '~/components/ui/overlays/modal/modal-description'
 import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
-import { UserRoles } from '~/config/dynamic-translation-strings'
+import { getRoleOptions } from '~/features/projects/lib/role-labels'
+import { untyped } from '~/lib/i18n-types'
 import { type ModelsUserStub } from '~/services/api/lasius'
 import { useGetOrganisationUserList } from '~/services/api/lasius-hooks/organisations/organisations'
 import { useInviteProjectUser } from '~/services/api/lasius-hooks/projects/projects'
@@ -184,16 +185,7 @@ export const AddExistingMemberList = ({
                 <DataListField>
                   <Select
                     onChange={(value) => handleRoleChange(user.id, value)}
-                    options={[
-                      {
-                        label: UserRoles.ProjectMember || 'Member',
-                        value: 'ProjectMember',
-                      },
-                      {
-                        label: UserRoles.ProjectAdministrator || 'Administrator',
-                        value: 'ProjectAdministrator',
-                      },
-                    ]}
+                    options={getRoleOptions('project', untyped(t))}
                     value={roles[user.id] || 'ProjectMember'}
                   />
                 </DataListField>

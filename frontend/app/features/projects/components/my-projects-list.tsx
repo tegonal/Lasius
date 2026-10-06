@@ -26,13 +26,14 @@ import { DataListField } from '~/components/ui/data-display/data-list/data-list-
 import { DataListHeaderItem } from '~/components/ui/data-display/data-list/data-list-header-item'
 import { DataListRow } from '~/components/ui/data-display/data-list/data-list-row'
 import { ROLES } from '~/config/constants'
-import { UserRoles } from '~/config/dynamic-translation-strings'
 import { ContextMenuProvider } from '~/features/context-menu/hooks/use-context-menu'
 import { type ProjectStatusFilter } from '~/features/projects/components/all-projects-list'
 import { EmptyStateProjects } from '~/features/projects/components/empty-state-projects'
 import { MyProjectsListItemAdminContext } from '~/features/projects/components/my-projects-list-item-admin-context'
 import { MyProjectsListItemMemberContext } from '~/features/projects/components/my-projects-list-item-member-context'
 import { ProjectLastActivity } from '~/features/projects/components/project-last-activity'
+import { getRoleLabel } from '~/features/projects/lib/role-labels'
+import { untyped } from '~/lib/i18n-types'
 import { type UserProjectWithActivity } from '~/types/common'
 
 type Properties = {
@@ -76,7 +77,7 @@ export const MyProjectsList = ({ projects, searchTerm }: Properties) => {
               <span>{item.projectReference.key}</span>
             </DataListField>
             <DataListField>
-              <span>{UserRoles[item.role]}</span>
+              <span>{getRoleLabel(item.role, untyped(t))}</span>
             </DataListField>
             <DataListField>
               <ProjectLastActivity lastActivityDate={item.lastActivityDate} />
