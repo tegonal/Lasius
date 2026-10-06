@@ -71,7 +71,10 @@ export const WebSocketEventHandler = () => {
 
     if (!isWebSocketOutEvent(lastMessage)) return
 
-    logger.info('[WebSocketEventHandler]', lastMessage)
+    // A message can hold booking data and the names of all organisation members.
+    if (import.meta.env.DEV) {
+      logger.info('[WebSocketEventHandler]', lastMessage)
+    }
 
     const reaction = getWebSocketEventReaction(lastMessage, untyped(tReference.current))
     if (!reaction || reaction.ignored) {
