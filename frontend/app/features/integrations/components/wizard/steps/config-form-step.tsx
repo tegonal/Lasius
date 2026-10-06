@@ -27,6 +27,7 @@ import { Input } from '~/components/primitives/inputs/input'
 import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { DurationInput } from '~/components/ui/forms/input/duration-input'
 import { ModalHelpButton } from '~/features/help/components/help-button'
+import { ProviderInstructions } from '~/features/integrations/components/shared/provider-instructions'
 import { useGithubResourceOwners } from '~/features/integrations/hooks/use-github-resource-owners'
 import { type WizardFormData } from '~/features/integrations/hooks/use-wizard-state'
 import { createConfigSchema } from '~/features/integrations/lib/config-schemas'
@@ -414,6 +415,11 @@ export const ConfigFormStep = ({ formData, formRef, onSubmit, selectedOrgId }: P
             </p>
           </fieldset>
         </form>
+
+        {/* Right column: Provider instructions */}
+        <div className="hidden md:block">
+          <ProviderInstructions importerType={importerType} />
+        </div>
       </div>
     </div>
   )

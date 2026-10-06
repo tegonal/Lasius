@@ -37,6 +37,7 @@ import { GithubResourceOwnerField } from '~/features/integrations/components/mod
 import { JiraCredentialFields } from '~/features/integrations/components/modals/config-fields/jira-credential-fields'
 import { PlaneFields } from '~/features/integrations/components/modals/config-fields/plane-fields'
 import { ConnectionTestPanel } from '~/features/integrations/components/modals/connection-test-panel'
+import { ProviderInstructions } from '~/features/integrations/components/shared/provider-instructions'
 import { useConnectionTest } from '~/features/integrations/hooks/use-connection-test'
 import { createConfigSchema } from '~/features/integrations/lib/config-schemas'
 import { getImporterTypeLabel } from '~/features/integrations/lib/importer-type-labels'
@@ -220,7 +221,7 @@ export const GenericConfigModal = ({ config, onClose, open, selectedOrgId }: Pro
   if (!config) return null
 
   return (
-    <Modal initialFocus={nameInputReference} onClose={onClose} open={open} size="lg">
+    <Modal initialFocus={nameInputReference} onClose={onClose} open={open} size="xl">
       <div className="flex min-h-0 flex-1 flex-col">
         {/* Header */}
         <div className="flex-shrink-0">
@@ -238,190 +239,197 @@ export const GenericConfigModal = ({ config, onClose, open, selectedOrgId }: Pro
         </div>
 
         <ModalBody>
-          <form
-            {...getFormProps(form)}
-            className="space-y-4"
-            onSubmit={handleSubmit}
-            ref={formReference}>
-            {/* Name */}
-            <fieldset className="fieldset">
-              <label className="label" htmlFor={fields.name.id}>
-                {t('issueImporters.fields.name', {
-                  defaultValue: 'Configuration Name',
-                })}
-              </label>
-              <Input
-                {...getInputProps(fields.name, { type: 'text' })}
-                key={fields.name.key}
-                placeholder={t(`issueImporters.fields.namePlaceholder.${importerType}`, {
-                  defaultValue: `e.g., Company ${getImporterTypeLabel(importerType, untyped(t))}`,
-                })}
-                ref={nameInputReference}
-              />
-              <FormFieldErrors errors={fields.name.errors} />
-            </fieldset>
-
-            {/* Base URL */}
-            <fieldset className="fieldset">
-              <label className="label" htmlFor={fields.baseUrl.id}>
-                {t('issueImporters.fields.baseUrl', {
-                  defaultValue: 'Base URL',
-                })}
-              </label>
-              <Input
-                {...getInputProps(fields.baseUrl, { type: 'text' })}
-                key={fields.baseUrl.key}
-                placeholder={t(`issueImporters.fields.baseUrlPlaceholder.${importerType}`, {
-                  defaultValue: 'https://...',
-                })}
-              />
-              <FormFieldErrors errors={fields.baseUrl.errors} />
-            </fieldset>
-
-            {/* GitHub / GitLab: Access Token */}
-            {(importerType === 'github' || importerType === 'gitlab') && (
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+            <form
+              {...getFormProps(form)}
+              className="space-y-4"
+              onSubmit={handleSubmit}
+              ref={formReference}>
+              {/* Name */}
               <fieldset className="fieldset">
-                <div className="flex items-center gap-1">
-                  <label className="label" htmlFor={fields.accessToken.id}>
-                    {t('issueImporters.fields.accessTokenEdit', {
-                      defaultValue: 'Access Token (leave empty to keep current)',
-                    })}
-                  </label>
-                  <ModalHelpButton helpKey={`setup-${importerType}`} />
-                </div>
+                <label className="label" htmlFor={fields.name.id}>
+                  {t('issueImporters.fields.name', {
+                    defaultValue: 'Configuration Name',
+                  })}
+                </label>
                 <Input
-                  {...getInputProps(fields.accessToken, { type: 'password' })}
-                  autoComplete="off"
-                  data-1p-ignore
-                  data-form-type="other"
-                  data-lpignore="true"
-                  key={fields.accessToken.key}
-                  onChange={(event) => {
-                    accessTokenControl.change(event.target.value)
-                    resetTestState()
-                  }}
-                  placeholder={t('issueImporters.fields.credentialPlaceholder', {
-                    defaultValue: 'Enter new value to update',
+                  {...getInputProps(fields.name, { type: 'text' })}
+                  key={fields.name.key}
+                  placeholder={t(`issueImporters.fields.namePlaceholder.${importerType}`, {
+                    defaultValue: `e.g., Company ${getImporterTypeLabel(importerType, untyped(t))}`,
+                  })}
+                  ref={nameInputReference}
+                />
+                <FormFieldErrors errors={fields.name.errors} />
+              </fieldset>
+
+              {/* Base URL */}
+              <fieldset className="fieldset">
+                <label className="label" htmlFor={fields.baseUrl.id}>
+                  {t('issueImporters.fields.baseUrl', {
+                    defaultValue: 'Base URL',
+                  })}
+                </label>
+                <Input
+                  {...getInputProps(fields.baseUrl, { type: 'text' })}
+                  key={fields.baseUrl.key}
+                  placeholder={t(`issueImporters.fields.baseUrlPlaceholder.${importerType}`, {
+                    defaultValue: 'https://...',
                   })}
                 />
-                <FormFieldErrors errors={fields.accessToken.errors} />
+                <FormFieldErrors errors={fields.baseUrl.errors} />
               </fieldset>
-            )}
 
-            {/* GitHub: Resource Owner */}
-            {importerType === 'github' && (
-              <GithubResourceOwnerField
-                accessTokenValue={accessTokenControl.value ?? ''}
-                baseUrl={config.baseUrl}
-                fields={{
-                  resourceOwner: fields.resourceOwner,
-                  resourceOwnerType: fields.resourceOwnerType,
-                }}
-                importerType={importerType}
-                selectedOrgId={selectedOrgId}
-              />
-            )}
-
-            {/* Jira fields */}
-            {importerType === 'jira' && (
-              <div>
-                <div className="mb-2 flex items-center gap-1">
-                  <span className="label">
-                    {t('issueImporters.jira.credentialsLabel', {
-                      defaultValue: 'Jira Credentials',
-                    })}
-                  </span>
-                  <ModalHelpButton helpKey="setup-jira" />
-                </div>
-                <JiraCredentialFields
-                  accessTokenControl={accessTokenControl}
-                  fields={{
-                    accessToken: fields.accessToken,
-                    consumerKey: fields.consumerKey,
-                    privateKey: fields.privateKey,
-                  }}
-                  resetTestState={resetTestState}
-                />
-              </div>
-            )}
-
-            {/* Plane fields */}
-            {importerType === 'plane' && (
-              <div>
-                <div className="mb-2 flex items-center gap-1">
-                  <span className="label">
-                    {t('issueImporters.plane.credentialsLabel', {
-                      defaultValue: 'Plane Credentials',
-                    })}
-                  </span>
-                  <ModalHelpButton helpKey="setup-plane" />
-                </div>
-                <PlaneFields
-                  fields={{
-                    apiKey: fields.apiKey,
-                    workspace: fields.workspace,
-                  }}
-                  resetTestState={resetTestState}
-                />
-              </div>
-            )}
-
-            {/* Check Frequency */}
-            <fieldset className="fieldset">
-              <label className="label" htmlFor="edit-checkFrequency">
-                {t('issueImporters.checkInterval', {
-                  defaultValue: 'Check Interval',
-                })}
-              </label>
-              <input
-                name={fields.checkFrequency.name}
-                type="hidden"
-                value={checkFrequencyControl.value ?? String(config.checkFrequency || 300_000)}
-              />
-              <div>
-                <DurationInput
-                  error={!!fields.checkFrequency.errors?.length}
-                  id="edit-checkFrequency"
-                  onChange={(ms) => checkFrequencyControl.change(String(ms))}
-                  value={checkFrequencyMs}
-                />
-              </div>
-              <FormFieldErrors errors={fields.checkFrequency.errors} />
-              <p className="text-base-content/60 mt-1 text-xs">
-                {t('issueImporters.checkIntervalHelp', {
-                  defaultValue: 'How often to check for new issues',
-                })}
-              </p>
-            </fieldset>
-
-            <ConnectionTestPanel
-              connectionTestMessage={connectionTestMessage}
-              connectionTestResult={connectionTestResult}
-              handleTestConnection={handleTestConnection}
-              isSaving={isSaving}
-              isTestingConnection={isTestingConnection}
-            />
-
-            {/* Divider + Action buttons */}
-            <div className="border-base-300 border-t pt-4">
-              <div className="flex gap-2">
-                <button className="btn btn-primary" disabled={isSaving} type="submit">
-                  {isSaving
-                    ? t('actions.saving', { defaultValue: 'Saving...' })
-                    : t('issueImporters.actions.update', {
-                        defaultValue: 'Update',
+              {/* GitHub / GitLab: Access Token */}
+              {(importerType === 'github' || importerType === 'gitlab') && (
+                <fieldset className="fieldset">
+                  <div className="flex items-center gap-1">
+                    <label className="label" htmlFor={fields.accessToken.id}>
+                      {t('issueImporters.fields.accessTokenEdit', {
+                        defaultValue: 'Access Token (leave empty to keep current)',
                       })}
-                </button>
-                <button
-                  className="btn btn-ghost"
-                  disabled={isSaving}
-                  onClick={onClose}
-                  type="button">
-                  {t('actions.cancel', { defaultValue: 'Cancel' })}
-                </button>
+                    </label>
+                    <ModalHelpButton helpKey={`setup-${importerType}`} />
+                  </div>
+                  <Input
+                    {...getInputProps(fields.accessToken, { type: 'password' })}
+                    autoComplete="off"
+                    data-1p-ignore
+                    data-form-type="other"
+                    data-lpignore="true"
+                    key={fields.accessToken.key}
+                    onChange={(event) => {
+                      accessTokenControl.change(event.target.value)
+                      resetTestState()
+                    }}
+                    placeholder={t('issueImporters.fields.credentialPlaceholder', {
+                      defaultValue: 'Enter new value to update',
+                    })}
+                  />
+                  <FormFieldErrors errors={fields.accessToken.errors} />
+                </fieldset>
+              )}
+
+              {/* GitHub: Resource Owner */}
+              {importerType === 'github' && (
+                <GithubResourceOwnerField
+                  accessTokenValue={accessTokenControl.value ?? ''}
+                  baseUrl={config.baseUrl}
+                  fields={{
+                    resourceOwner: fields.resourceOwner,
+                    resourceOwnerType: fields.resourceOwnerType,
+                  }}
+                  importerType={importerType}
+                  selectedOrgId={selectedOrgId}
+                />
+              )}
+
+              {/* Jira fields */}
+              {importerType === 'jira' && (
+                <div>
+                  <div className="mb-2 flex items-center gap-1">
+                    <span className="label">
+                      {t('issueImporters.jira.credentialsLabel', {
+                        defaultValue: 'Jira Credentials',
+                      })}
+                    </span>
+                    <ModalHelpButton helpKey="setup-jira" />
+                  </div>
+                  <JiraCredentialFields
+                    accessTokenControl={accessTokenControl}
+                    fields={{
+                      accessToken: fields.accessToken,
+                      consumerKey: fields.consumerKey,
+                      privateKey: fields.privateKey,
+                    }}
+                    resetTestState={resetTestState}
+                  />
+                </div>
+              )}
+
+              {/* Plane fields */}
+              {importerType === 'plane' && (
+                <div>
+                  <div className="mb-2 flex items-center gap-1">
+                    <span className="label">
+                      {t('issueImporters.plane.credentialsLabel', {
+                        defaultValue: 'Plane Credentials',
+                      })}
+                    </span>
+                    <ModalHelpButton helpKey="setup-plane" />
+                  </div>
+                  <PlaneFields
+                    fields={{
+                      apiKey: fields.apiKey,
+                      workspace: fields.workspace,
+                    }}
+                    resetTestState={resetTestState}
+                  />
+                </div>
+              )}
+
+              {/* Check Frequency */}
+              <fieldset className="fieldset">
+                <label className="label" htmlFor="edit-checkFrequency">
+                  {t('issueImporters.checkInterval', {
+                    defaultValue: 'Check Interval',
+                  })}
+                </label>
+                <input
+                  name={fields.checkFrequency.name}
+                  type="hidden"
+                  value={checkFrequencyControl.value ?? String(config.checkFrequency || 300_000)}
+                />
+                <div>
+                  <DurationInput
+                    error={!!fields.checkFrequency.errors?.length}
+                    id="edit-checkFrequency"
+                    onChange={(ms) => checkFrequencyControl.change(String(ms))}
+                    value={checkFrequencyMs}
+                  />
+                </div>
+                <FormFieldErrors errors={fields.checkFrequency.errors} />
+                <p className="text-base-content/60 mt-1 text-xs">
+                  {t('issueImporters.checkIntervalHelp', {
+                    defaultValue: 'How often to check for new issues',
+                  })}
+                </p>
+              </fieldset>
+
+              <ConnectionTestPanel
+                connectionTestMessage={connectionTestMessage}
+                connectionTestResult={connectionTestResult}
+                handleTestConnection={handleTestConnection}
+                isSaving={isSaving}
+                isTestingConnection={isTestingConnection}
+              />
+
+              {/* Divider + Action buttons */}
+              <div className="border-base-300 border-t pt-4">
+                <div className="flex gap-2">
+                  <button className="btn btn-primary" disabled={isSaving} type="submit">
+                    {isSaving
+                      ? t('actions.saving', { defaultValue: 'Saving...' })
+                      : t('issueImporters.actions.update', {
+                          defaultValue: 'Update',
+                        })}
+                  </button>
+                  <button
+                    className="btn btn-ghost"
+                    disabled={isSaving}
+                    onClick={onClose}
+                    type="button">
+                    {t('actions.cancel', { defaultValue: 'Cancel' })}
+                  </button>
+                </div>
               </div>
+            </form>
+
+            {/* Right column: Provider instructions */}
+            <div className="hidden lg:block">
+              <ProviderInstructions importerType={importerType} />
             </div>
-          </form>
+          </div>
         </ModalBody>
       </div>
     </Modal>
