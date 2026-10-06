@@ -106,8 +106,9 @@ class OrganisationMongoRepository @Inject() (
         for {
           _                    <- validateNonBlankString("key", key)
           existingOrganisation <- findByKey(key)
-          result               <- validate(existingOrganisation.isEmpty,
-                             s"Cannot create organisation with same key $key")
+          result               <- validate(
+            existingOrganisation.forall(_.id == organisationReference.id),
+            s"Cannot update organisation with duplicate key $key")
         } yield result
       }
       _ <- validate(

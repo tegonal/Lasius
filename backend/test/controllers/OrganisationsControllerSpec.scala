@@ -594,7 +594,29 @@ class OrganisationsControllerSpec
 
       status(result) must equalTo(BAD_REQUEST)
       contentAsString(result) must equalTo(
-        s"Cannot create organisation with same key $organisation2Key")
+        s"Cannot update organisation with duplicate key $organisation2Key")
+    }
+
+    "successful if the organisation keeps its own key" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: OrganisationsControllerMock     =
+        controllers.OrganisationsControllerMock(config,
+                                                systemServices,
+                                                authConfig,
+                                                reactiveMongoApi)
+
+      val request: FakeRequest[UpdateOrganisation] =
+        FakeRequest().withBody(
+          UpdateOrganisation(key = Some(controller.organisation.key)))
+      val result: Future[Result] =
+        controller.updateOrganisation(controller.organisationId)(request)
+
+      status(result) must equalTo(OK)
+      contentAsJson(result).as[Organisation].key must equalTo(
+        controller.organisation.key)
     }
 
     "successful updated key in all references of main-entities" in new WithTestApplication {
