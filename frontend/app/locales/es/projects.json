@@ -47,7 +47,6 @@
   "title": "Proyectos",
   "total": "Total",
   "warnings": {
-    "inactiveProjectContext": "Viendo estadísticas de proyecto inactivo",
     "inactiveProjectFilter": "Mostrando datos de proyecto inactivo",
     "projectNotInActiveList": "Este proyecto no está en tu lista de proyectos activos. Puede estar inactivo o ser de otra organización.",
     "projectUnavailable": "Este proyecto ya no está en tu perfil. Es posible que hayas sido eliminado del mismo."

@@ -152,7 +152,7 @@ test.describe('Project context menu actions @projects', () => {
     }
 
     await statsBtn.click()
-    await expect(page).toHaveURL(/\/user\/stats/, { timeout: 15000 })
+    await expect(page).toHaveURL(/\/user\/stats\/project\//, { timeout: 15000 })
   })
 
   test('edit tags opens modal', async ({ page }) => {

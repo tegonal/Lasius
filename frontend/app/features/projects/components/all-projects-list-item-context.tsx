@@ -37,6 +37,8 @@ import { ContextButtonWrapper } from '~/features/context-menu/context-button-wra
 import { useContextMenu } from '~/features/context-menu/hooks/use-context-menu'
 import { ManageProjectMembers } from '~/features/projects/components/manage-members'
 import { ProjectAddUpdateForm } from '~/features/projects/components/project-add-update-form'
+import { useProjects } from '~/features/projects/hooks/use-projects'
+import { findAdministeredProject, getProjectStatsPath } from '~/features/stats/lib/project-stats'
 import { ProjectAddUpdateTagsForm } from '~/features/tag-manager/components/project-add-update-tags-form'
 import { useDeactivateProject } from '~/services/api/lasius-hooks/projects/projects'
 import { type ModelsProject } from '~/services/api/lasius/modelsProject'
@@ -54,6 +56,8 @@ export const AllProjectsListItemContext = ({ item }: Properties) => {
   const navigate = useNavigate()
   const revalidator = useRevalidator()
   const { submit: deactivateProject } = useDeactivateProject()
+  const { userProjects } = useProjects()
+  const canShowStats = findAdministeredProject(userProjects, item.id) !== null
 
   const { t } = useTranslation()
 
@@ -63,9 +67,7 @@ export const AllProjectsListItemContext = ({ item }: Properties) => {
   const handleDeactivateConfirmClose = () => setIsDeactivateConfirmOpen(false)
 
   const showStats = () => {
-    void navigate(
-      `/organisation/stats?projectId=${item.id}&projectName=${encodeURIComponent(item.key)}`,
-    )
+    void navigate(getProjectStatsPath('organisation', item.id))
     handleCloseAll()
   }
 
@@ -108,7 +110,7 @@ export const AllProjectsListItemContext = ({ item }: Properties) => {
   return (
     <>
       <ContextBody hash={item.id} variant="compact">
-        <ContextButtonOpen />
+        <ContextButtonOpen data-testid="org-project-ctx-open-btn" />
         <ContextAnimatePresence variant="compact">
           <ContextBar>
             {item.active && (
@@ -135,17 +137,20 @@ export const AllProjectsListItemContext = ({ item }: Properties) => {
                 <LucideIcon icon={List} size={24} />
               </Button>
             </ContextButtonWrapper>
-            <ContextButtonWrapper variant="compact">
-              <Button
-                aria-label={t('stats:showStatistics', 'Show statistics')}
-                fullWidth={false}
-                onClick={() => showStats()}
-                shape="circle"
-                title={t('stats:showStatistics', 'Show statistics')}
-                variant="contextIcon">
-                <LucideIcon icon={PieChart} size={24} />
-              </Button>
-            </ContextButtonWrapper>
+            {canShowStats && (
+              <ContextButtonWrapper variant="compact">
+                <Button
+                  aria-label={t('stats:showStatistics', 'Show statistics')}
+                  data-testid="org-project-ctx-stats-btn"
+                  fullWidth={false}
+                  onClick={() => showStats()}
+                  shape="circle"
+                  title={t('stats:showStatistics', 'Show statistics')}
+                  variant="contextIcon">
+                  <LucideIcon icon={PieChart} size={24} />
+                </Button>
+              </ContextButtonWrapper>
+            )}
             <ContextButtonWrapper variant="compact">
               {!item.active && item.deactivatedBy ? (
                 <span

@@ -17,29 +17,21 @@
  *
  */
 
-import { ArrowLeft } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate, useSearchParams } from 'react-router'
+import { useSearchParams } from 'react-router'
 
-import { Button } from '~/components/primitives/buttons/button'
 import { Heading } from '~/components/primitives/typography/heading'
 import { FormBody } from '~/components/ui/forms/form-body'
 import { FormElement } from '~/components/ui/forms/form-element'
 import { InputDateStandalone } from '~/components/ui/forms/input/input-date-standalone'
 import { Select, type SelectOption } from '~/components/ui/forms/input/select'
-import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { untyped } from '~/lib/i18n-types'
 import { dateOptions } from '~/lib/utils/date/date-options'
 import { formatISOLocale } from '~/lib/utils/dates'
 
-type StatsFilterProperties = {
-  inactiveProject?: null | { id: string; key: string }
-}
-
-export const StatsFilter = ({ inactiveProject = null }: StatsFilterProperties) => {
+export const StatsFilter = () => {
   const { t } = useTranslation('common')
-  const navigate = useNavigate()
   const [searchParameters, setSearchParameters] = useSearchParams()
   const [selectedRange, setSelectedRange] = useState(
     () => searchParameters.get('dateRange') || dateOptions[0]?.name || '',
@@ -112,37 +104,11 @@ export const StatsFilter = ({ inactiveProject = null }: StatsFilterProperties) =
     )
   }
 
-  const handleBackToProjects = () => {
-    void navigate('/user/projects')
-  }
-
   const currentFrom = searchParameters.get('from') || formatISOLocale(new Date())
   const currentTo = searchParameters.get('to') || formatISOLocale(new Date())
 
   return (
     <div className="w-full" data-testid="stats-filter">
-      {inactiveProject && (
-        <div className="alert alert-warning mb-4">
-          <div className="flex w-full items-center justify-between">
-            <span>
-              {t('projects:warnings.inactiveProjectContext', {
-                defaultValue: 'Viewing stats from inactive project',
-              })}
-            </span>
-            <Button
-              aria-label={t('actions.back', {
-                defaultValue: 'Back',
-              })}
-              fullWidth={false}
-              onClick={handleBackToProjects}
-              size="sm"
-              variant="ghost">
-              <LucideIcon icon={ArrowLeft} size={16} />
-              {t('actions.back', { defaultValue: 'Back' })}
-            </Button>
-          </div>
-        </div>
-      )}
       <div className="relative">
         <Heading variant="section">{t('filter.title', { defaultValue: 'Filter' })}</Heading>
         {hasChanges && (

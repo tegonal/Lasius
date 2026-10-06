@@ -17,12 +17,10 @@
  *
  */
 
-import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { href, NavLink, useLocation, useSearchParams } from 'react-router'
+import { href, useLocation, useSearchParams } from 'react-router'
 
-import { SlidingIndicator } from '~/components/ui/animations/sliding-indicator'
-import { cn } from '~/lib/utils/cn'
+import { UnderlineTabs } from '~/components/ui/navigation/underline-tabs'
 
 export const DashboardTabs = () => {
   const { t } = useTranslation('common')
@@ -30,7 +28,6 @@ export const DashboardTabs = () => {
   const location = useLocation()
   const dateParameter = searchParameters.get('date')
   const search = dateParameter ? `?${new URLSearchParams({ date: dateParameter })}` : ''
-  const itemReferences = useRef<(HTMLElement | null)[]>([])
 
   const tabs = [
     {
@@ -63,33 +60,10 @@ export const DashboardTabs = () => {
   const selectedIndex = tabs.findIndex((tab) => location.pathname.endsWith(tab.to))
 
   return (
-    <div className="border-base-content/20 relative flex flex-shrink-0 flex-row justify-start gap-3 border-b">
-      <SlidingIndicator
-        className="!top-auto !bottom-0 !h-[2px]"
-        itemRefs={itemReferences}
-        radiusOn="bottom"
-        selectedIndex={selectedIndex}
-      />
-      {tabs.map((tab, index) => (
-        <div
-          className="relative z-10"
-          key={tab.to}
-          ref={(element) => {
-            itemReferences.current[index] = element
-          }}>
-          <NavLink
-            className={({ isActive }) =>
-              cn(
-                'btn btn-ghost relative z-20 rounded-none hover:bg-transparent hover:shadow-[inset_0_-2px_0_0_currentColor]',
-                isActive ? 'text-base-content' : 'text-base-content/60',
-              )
-            }
-            data-testid={`dashboard-tab-${tab.id}`}
-            to={`${tab.to}${search}`}>
-            {tab.label}
-          </NavLink>
-        </div>
-      ))}
-    </div>
+    <UnderlineTabs
+      selectedIndex={selectedIndex}
+      tabs={tabs.map((tab) => ({ href: `${tab.to}${search}`, id: tab.id, label: tab.label }))}
+      testIdPrefix="dashboard-tab"
+    />
   )
 }

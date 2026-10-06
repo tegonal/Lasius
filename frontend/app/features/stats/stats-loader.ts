@@ -46,6 +46,18 @@ export const statsShouldRevalidate = ({
 }
 
 /**
+ * The project stats page loads one chart set per view, so a view change also reloads it.
+ * Client-safe — must NOT be in a .server.ts file.
+ */
+export const projectStatsShouldRevalidate = (arguments_: ShouldRevalidateFunctionArgs) => {
+  const { currentUrl, defaultShouldRevalidate, nextUrl } = arguments_
+  if (currentUrl.searchParams.get('view') !== nextUrl.searchParams.get('view')) {
+    return defaultShouldRevalidate
+  }
+  return statsShouldRevalidate(arguments_)
+}
+
+/**
  * Shared client loader for all stats child routes.
  * Client-safe — must NOT be in a .server.ts file.
  */

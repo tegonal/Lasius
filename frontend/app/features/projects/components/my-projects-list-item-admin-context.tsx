@@ -36,6 +36,7 @@ import { ContextButtonWrapper } from '~/features/context-menu/context-button-wra
 import { useContextMenu } from '~/features/context-menu/hooks/use-context-menu'
 import { ManageProjectMembers } from '~/features/projects/components/manage-members'
 import { ProjectAddUpdateForm } from '~/features/projects/components/project-add-update-form'
+import { getProjectStatsPath } from '~/features/stats/lib/project-stats'
 import { ProjectAddUpdateTagsForm } from '~/features/tag-manager/components/project-add-update-tags-form'
 import { type ModelsUserProject } from '~/services/api/lasius/modelsUserProject'
 
@@ -57,9 +58,7 @@ export const MyProjectsListItemAdminContext = ({ item }: Properties) => {
   const handleTagClose = () => setIsTagOpen(false)
 
   const showStats = () => {
-    void navigate(
-      `/user/stats?projectId=${item.projectReference.id}&projectName=${encodeURIComponent(item.projectReference.key)}`,
-    )
+    void navigate(getProjectStatsPath('user', item.projectReference.id))
     handleCloseAll()
   }
 

@@ -36,6 +36,7 @@ const userStatsRoutes = prefix('stats', [
     route('projects', 'routes/user.stats.projects.tsx'),
     route('tags', 'routes/user.stats.tags.tsx'),
   ]),
+  route('project/:projectId', 'routes/user.stats.project.$projectId.tsx'),
 ])
 
 const userRoutes = prefix('user', [
@@ -55,6 +56,7 @@ const organisationStatsRoutes = prefix('stats', [
     route('users', 'routes/organisation.stats.users.tsx'),
     route('tags', 'routes/organisation.stats.tags.tsx'),
   ]),
+  route('project/:projectId', 'routes/organisation.stats.project.$projectId.tsx'),
 ])
 
 const organisationRoutes = prefix('organisation', [
