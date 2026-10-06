@@ -89,5 +89,3 @@ export const BarsTags = ({ stats }: Properties) => {
     />
   )
 }
-
-export default BarsTags

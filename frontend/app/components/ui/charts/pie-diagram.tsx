@@ -73,5 +73,3 @@ export const PieDiagram = ({ stats }: Properties) => {
     />
   )
 }
-
-export default PieDiagram

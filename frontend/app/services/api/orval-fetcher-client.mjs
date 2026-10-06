@@ -185,5 +185,3 @@ export const fetcherClientBuilder = () => ({
   dependencies: getFetcherDependencies,
   header: generateFetcherHeader,
 })
-
-export default fetcherClientBuilder

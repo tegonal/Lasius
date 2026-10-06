@@ -1,15 +1,18 @@
 {
   "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
   "ignorePatterns": [
-    "app/services/api/lasius/**",
-    "app/services/api/lasius-hooks/**",
     "app/services/api/orval-fetcher-client.ts",
     ".react-router/**",
-    "public/help/**",
-    "orval.config.mjs"
+    "public/help/**"
   ],
-  "entry": ["app/routes.ts"],
-  "ignoreDependencies": ["@nivo/core", "daisyui", "immer", "typescript-eslint"],
+  "entry": ["app/routes.ts", "orval.config.mjs"],
+  "ignoreDependencies": [
+    "@nivo/core",
+    "babel-plugin-react-remove-properties",
+    "daisyui",
+    "immer",
+    "typescript-eslint"
+  ],
   "rules": {
     "unused-files": "warn",
     "unused-exports": "warn",

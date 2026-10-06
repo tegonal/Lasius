@@ -48,13 +48,13 @@ const textVariants = cva('', {
   },
 })
 
-export interface TextProperties
+type TextElement = 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'label' | 'p' | 'span'
+
+interface TextProperties
   extends Omit<React.HTMLAttributes<HTMLElement>, 'as'>, VariantProps<typeof textVariants> {
   as?: TextElement
   children: React.ReactNode
 }
-
-type TextElement = 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'label' | 'p' | 'span'
 
 export const Text = React.forwardRef<HTMLElement, TextProperties>(
   ({ as: Component = 'p', children, className, variant, ...properties }, reference) => {
@@ -86,5 +86,3 @@ export const Text = React.forwardRef<HTMLElement, TextProperties>(
 )
 
 Text.displayName = 'Text'
-
-export type TextVariant = VariantProps<typeof textVariants>['variant']

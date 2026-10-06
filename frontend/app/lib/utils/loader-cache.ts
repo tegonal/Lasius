@@ -44,15 +44,3 @@ export async function cachedServerLoader<T>(
   cache.set(cacheKey, { data, timestamp: Date.now() })
   return data
 }
-
-export function invalidateLoaderCache(pathPrefix?: string) {
-  if (!pathPrefix) {
-    cache.clear()
-    return
-  }
-  for (const key of cache.keys()) {
-    if (key.startsWith(pathPrefix)) {
-      cache.delete(key)
-    }
-  }
-}

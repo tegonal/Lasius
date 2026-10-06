@@ -51,14 +51,14 @@ export type WizardFormData = {
   workspace?: string
 }
 
-export type WizardState = {
+export type WizardStep = 'config' | 'platform' | 'projects' | 'test'
+
+type WizardState = {
   availableProjects?: ModelsExternalProject[]
   createdConfig?: ModelsIssueImporterConfigResponse
   currentStep: WizardStep
   formData: WizardFormData
 }
-
-export type WizardStep = 'config' | 'platform' | 'projects' | 'test'
 
 const createInitialState = (): WizardState => ({
   currentStep: 'platform',

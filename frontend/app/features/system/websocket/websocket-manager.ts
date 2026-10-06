@@ -31,12 +31,12 @@ export enum ConnectionStatus {
   ERROR = 'ERROR',
 }
 
-export type TicketFetcher = () => Promise<string>
-
 export type WebSocketSubscriber = {
   onMessage: (data: unknown) => void
   onStatusChange: (status: ConnectionStatus) => void
 }
+
+type TicketFetcher = () => Promise<string>
 
 class WebSocketManager {
   private intentionallyClosed = false

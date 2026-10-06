@@ -57,7 +57,7 @@ const cardVariants = cva('card', {
   },
 })
 
-export interface CardProperties
+interface CardProperties
   extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof cardVariants> {
   children: React.ReactNode
 }
@@ -77,7 +77,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProperties>(
 
 Card.displayName = 'Card'
 
-export interface CardBodyProperties extends React.HTMLAttributes<HTMLDivElement> {
+interface CardBodyProperties extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
 }
 
@@ -92,8 +92,3 @@ export const CardBody = React.forwardRef<HTMLDivElement, CardBodyProperties>(
 )
 
 CardBody.displayName = 'CardBody'
-
-export type CardLayout = VariantProps<typeof cardVariants>['layout']
-export type CardShadow = VariantProps<typeof cardVariants>['shadow']
-export type CardSize = VariantProps<typeof cardVariants>['size']
-export type CardVariant = VariantProps<typeof cardVariants>['variant']

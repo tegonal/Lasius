@@ -91,8 +91,11 @@ export const lasiusFetch = async <T>(url: string, init: RequestInit): Promise<T>
   return result as T
 }
 
+// Orval reads BodyType and ErrorType from the mutator file by name (Orval custom-client guide).
+// fallow-ignore-next-line unused-type
 export type BodyType<BodyData> = BodyData
 
+// fallow-ignore-next-line unused-type
 export type ErrorType<Error> = ApiError & { data?: Error }
 
 /**

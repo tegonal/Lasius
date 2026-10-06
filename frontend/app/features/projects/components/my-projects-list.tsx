@@ -28,13 +28,12 @@ import { DataListRow } from '~/components/ui/data-display/data-list/data-list-ro
 import { ROLES } from '~/config/constants'
 import { UserRoles } from '~/config/dynamic-translation-strings'
 import { ContextMenuProvider } from '~/features/context-menu/hooks/use-context-menu'
+import { type ProjectStatusFilter } from '~/features/projects/components/all-projects-list'
 import { EmptyStateProjects } from '~/features/projects/components/empty-state-projects'
 import { MyProjectsListItemAdminContext } from '~/features/projects/components/my-projects-list-item-admin-context'
 import { MyProjectsListItemMemberContext } from '~/features/projects/components/my-projects-list-item-member-context'
 import { ProjectLastActivity } from '~/features/projects/components/project-last-activity'
 import { type UserProjectWithActivity } from '~/types/common'
-
-export type ProjectStatusFilter = 'active' | 'both' | 'inactive'
 
 type Properties = {
   projects: UserProjectWithActivity[]

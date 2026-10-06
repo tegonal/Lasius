@@ -51,7 +51,7 @@ const dividerVariants = cva('divider', {
   },
 })
 
-export interface DividerProperties
+interface DividerProperties
   extends Omit<HTMLAttributes<HTMLDivElement>, 'color'>, VariantProps<typeof dividerVariants> {
   text?: string
 }

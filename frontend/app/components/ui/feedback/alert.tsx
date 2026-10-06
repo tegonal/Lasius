@@ -47,7 +47,7 @@ const iconMap = {
   warning: AlertTriangle,
 } as const
 
-export interface AlertProperties
+interface AlertProperties
   extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof alertVariants> {
   children: React.ReactNode
   hideIcon?: boolean
@@ -78,5 +78,3 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProperties>(
 )
 
 Alert.displayName = 'Alert'
-
-export type AlertVariant = VariantProps<typeof alertVariants>['variant']

@@ -83,7 +83,7 @@ const buttonVariants = cva(
   },
 )
 
-export interface ButtonProperties
+interface ButtonProperties
   extends
     React.ButtonHTMLAttributes<HTMLButtonElement>,
     Omit<VariantProps<typeof buttonVariants>, 'disabled'> {
@@ -136,8 +136,3 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProperties>(
 )
 
 Button.displayName = 'Button'
-
-export type ButtonShape = VariantProps<typeof buttonVariants>['shape']
-export type ButtonSize = VariantProps<typeof buttonVariants>['size']
-// Export the variant type for use in other components
-export type ButtonVariant = VariantProps<typeof buttonVariants>['variant']

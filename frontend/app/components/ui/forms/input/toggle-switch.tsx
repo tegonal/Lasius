@@ -52,7 +52,7 @@ const toggleSwitchVariants = cva('toggle', {
   },
 })
 
-export interface ToggleSwitchProperties
+interface ToggleSwitchProperties
   extends
     Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'type'>,
     VariantProps<typeof toggleSwitchVariants> {

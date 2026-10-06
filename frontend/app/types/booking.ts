@@ -25,7 +25,3 @@ export type ExtendedHistoryBooking = ModelsBooking & {
   durationString: string
   fromTo: string
 }
-
-export type OrganisationBookingSource = 'project' | 'tag' | 'user'
-export type OrganisationPieChartSource = 'project' | 'user'
-export type UserBookingSource = 'project' | 'tag'

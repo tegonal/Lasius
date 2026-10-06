@@ -24,11 +24,8 @@ import {
   type ModelsWorkingHours,
 } from '~/services/api/lasius'
 
-export type Granularity = 'All' | 'Day' | 'Month' | 'Week' | 'Year'
 export type ModelsTags = ModelsTag
-export type ModelsTagWithSummary = ModelsTag & { summary?: string }
 export type ModelsWorkingHoursWeekdays = keyof ModelsWorkingHours
-export type NivoChartDataType = Array<{ [x: string]: number | string }>
 
 export type ProjectWithActivity = ModelsProject & {
   lastActivityDate: null | string

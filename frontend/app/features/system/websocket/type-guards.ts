@@ -30,11 +30,6 @@ import { type WebSocketUserTimeBookingHistoryEntryChanged } from '~/services/api
 import { type WebSocketUserTimeBookingHistoryEntryCleaned } from '~/services/api/lasius/webSocketUserTimeBookingHistoryEntryCleaned'
 import { type WebSocketUserTimeBookingHistoryEntryRemoved } from '~/services/api/lasius/webSocketUserTimeBookingHistoryEntryRemoved'
 
-export type WebSocketEventHandler<T extends WebSocketOutEvent> = {
-  handler: (event: T) => void
-  typeGuard: (event: WebSocketOutEvent) => event is T
-}
-
 // A union with one handler type for each event type.
 // The mapped form lets TypeScript correlate the type guard and the handler of one entry.
 type AnyWebSocketEventHandler<Type extends WebSocketEventType = WebSocketEventType> = {
@@ -43,6 +38,11 @@ type AnyWebSocketEventHandler<Type extends WebSocketEventType = WebSocketEventTy
 
 type WebSocketEventByType = {
   [Event in WebSocketOutEvent as Event['type']]: Event
+}
+
+type WebSocketEventHandler<T extends WebSocketOutEvent> = {
+  handler: (event: T) => void
+  typeGuard: (event: WebSocketOutEvent) => event is T
 }
 
 type WebSocketEventType = keyof WebSocketEventByType

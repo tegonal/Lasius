@@ -124,5 +124,3 @@ export const BarsHours = ({ groupMode, indexBy, stats }: Properties) => {
     />
   )
 }
-
-export default BarsHours

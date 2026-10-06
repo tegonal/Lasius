@@ -68,7 +68,7 @@ const labelVariants = cva(
   },
 )
 
-export interface LabelProperties
+interface LabelProperties
   extends React.LabelHTMLAttributes<HTMLLabelElement>, VariantProps<typeof labelVariants> {
   as?: 'label' | 'span'
   children: React.ReactNode
@@ -110,8 +110,3 @@ export const Label = React.forwardRef<HTMLLabelElement, LabelProperties>(
 )
 
 Label.displayName = 'Label'
-
-export type LabelSize = VariantProps<typeof labelVariants>['size']
-// Export the variant types for use in other components
-export type LabelVariant = VariantProps<typeof labelVariants>['variant']
-export type LabelWeight = VariantProps<typeof labelVariants>['weight']

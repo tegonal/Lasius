@@ -39,7 +39,7 @@ const dateFormats = {
   year: 'yyyy',
 } as const
 
-export type DateFormatKey = keyof typeof dateFormats
+type DateFormatKey = keyof typeof dateFormats
 
 // ─── Component ───────────────────────────────────────────────────────────────
 

@@ -24,8 +24,6 @@ import { immer } from 'zustand/middleware/immer'
 
 const APP_SETTINGS_STORAGE_KEY = 'lasius-app-settings'
 
-export type ThemeMode = 'dark' | 'light' | 'system'
-
 interface AppSettingsStore {
   dismissOnboarding: () => void
   markChecklistReached: () => void
@@ -35,6 +33,8 @@ interface AppSettingsStore {
   setTheme: (theme: ThemeMode) => void
   theme: ThemeMode
 }
+
+type ThemeMode = 'dark' | 'light' | 'system'
 
 const appSettingsState = immer<AppSettingsStore>((set) => ({
   dismissOnboarding: () =>

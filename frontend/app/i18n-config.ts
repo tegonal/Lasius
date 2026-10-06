@@ -65,10 +65,7 @@ export const NAMESPACES = [
   'working-hours',
 ] as const
 
-/** Namespace type derived from the NAMESPACES array */
-export type Namespace = (typeof NAMESPACES)[number]
-
-export const defaultNS = 'common' as const
+const defaultNS = 'common' as const
 
 export const i18nConfig = {
   defaultNS,

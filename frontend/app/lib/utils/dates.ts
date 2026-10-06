@@ -18,7 +18,6 @@
  */
 
 import {
-  differenceInCalendarDays,
   eachDayOfInterval,
   endOfDay,
   endOfMonth,
@@ -26,7 +25,6 @@ import {
   format,
   isValid,
   parseISO,
-  roundToNearestMinutes,
   startOfDay,
   startOfMonth,
   startOfWeek,
@@ -34,7 +32,7 @@ import {
 import { fromZonedTime, toZonedTime } from 'date-fns-tz'
 
 import { type ModelsLocalDateTimeWithTimeZone } from '~/services/api/lasius'
-import { type Granularity, type ModelsWorkingHoursWeekdays } from '~/types/common'
+import { type ModelsWorkingHoursWeekdays } from '~/types/common'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -43,7 +41,7 @@ export type IsoDateString = string
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-export const apiUrlDateParameterFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS"
+const apiUrlDateParameterFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS"
 
 // ─── Core date utilities ─────────────────────────────────────────────────────
 
@@ -173,7 +171,7 @@ export const apiTimespanFromTo = (
   }
 }
 
-export const apiUrlDateFormat = 'yyyy-MM-dd'
+const apiUrlDateFormat = 'yyyy-MM-dd'
 
 export const formatDateToURLParameter = (date: Date): ApiDateParameter =>
   format(date, apiUrlDateFormat)
@@ -190,26 +188,6 @@ export const apiDatespanFromTo = (
     from: formatDateToURLParameter(startOfDay(fromDate)),
     to: formatDateToURLParameter(endOfDay(toDate)),
   }
-}
-
-export const granularityFromDatespanFromTo = (
-  from: IsoDateString,
-  to: IsoDateString,
-): Granularity => {
-  const days = differenceInCalendarDays(new Date(to), new Date(from))
-  if (!days) {
-    return 'Day'
-  }
-  if (days > 400) {
-    return 'Year'
-  }
-  if (days > 95) {
-    return 'Month'
-  }
-  if (days > 15) {
-    return 'Week'
-  }
-  return 'Day'
 }
 
 export const modelsLocalDateTimeWithTimeZoneToString = (
@@ -233,15 +211,6 @@ export const decimalHoursToObject = (value: number): { hours: number; minutes: n
   hours: Math.floor(value),
   minutes: Math.round((value % 1) * 60),
 })
-
-/**
- * Converts decimal hours to an IsoDateString rounded to nearest 5 minutes.
- */
-export const decimalHoursToDate = (decimalHours: number): IsoDateString => {
-  const date = new Date(0, 0, 0, 0, 0)
-  date.setMinutes(decimalHours * 60)
-  return formatISOLocale(roundToNearestMinutes(date, { nearestTo: 5 }))
-}
 
 /**
  * Gets the weekday name (lowercase) from an IsoDateString.

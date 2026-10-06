@@ -167,8 +167,3 @@ export const createConfigSchema = (
     }
   }
 }
-
-/**
- * Type helper to infer form data type from schema
- */
-export type ConfigFormData = z.infer<ReturnType<typeof createConfigSchema>>
