@@ -18,20 +18,20 @@
  */
 
 import { type FieldMetadata } from '@conform-to/react'
-import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
-import { isEqual } from 'date-fns'
-import { CalendarIcon, type LucideIcon as LucideIconType, RotateCcw, X } from 'lucide-react'
-import React, { useCallback, useEffect, useMemo, useRef } from 'react'
+import { type LucideIcon as LucideIconType, RotateCcw } from 'lucide-react'
+import React, { useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
-import { CalendarDisplay } from '~/components/ui/forms/input/calendar/calendar-display'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
-import { formatISOLocale, type IsoDateString } from '~/lib/utils/dates'
+import { type IsoDateString } from '~/lib/utils/dates'
 
+import { CalendarPopover } from './calendar-popover'
+import { type DatePreset, PresetButton } from './preset-button'
 import { SegmentedDateInputConnected } from './segmented-date-input-connected'
 import { SegmentedTimeInputConnected } from './segmented-time-input-connected'
+import { type ResetCheckValue, shouldShowResetButton } from './shared/reset-visibility'
 import {
   createDatePickerStore,
   DatePickerStoreContext,
@@ -144,23 +144,14 @@ const DatePickerBridge = ({
 // Shared UI (pure presentation)
 // ---------------------------------------------------------------------------
 
-type DatePickerUIProperties = SharedPickerProperties & {
+type DatePickerUIProperties = {
   onPresetClick: () => void
-  resetToInitial: () => void
-  value: {
-    date: Date | null
-    dateString: string
-    isPartial: boolean
-    isValid: boolean
-    timeString: string
-  }
-}
-
-type SharedPickerProperties = {
   onRenderLabelAction?: (resetButton: React.ReactNode) => void
   presetDate?: IsoDateString
   presetIcon?: LucideIconType
   presetLabel?: string
+  resetToInitial: () => void
+  value: ResetCheckValue
   withDate?: boolean
   withTime?: boolean
 }
@@ -169,7 +160,7 @@ const DatePickerUI = ({
   onPresetClick,
   onRenderLabelAction,
   presetDate,
-  presetIcon: PresetIcon,
+  presetIcon,
   presetLabel,
   resetToInitial,
   value,
@@ -178,33 +169,18 @@ const DatePickerUI = ({
 }: DatePickerUIProperties) => {
   const { t } = useTranslation('common')
   const { initialValue, setFromISOString } = useDatePickerStore()
-  const initialDate = initialValue.date
 
-  const hasPreset = presetDate && presetLabel && PresetIcon
-
-  const handleCalendarDateChange = (selectedDate: IsoDateString, close: () => void) => {
-    setFromISOString(selectedDate)
-    close()
-  }
-
-  const handleReset = useCallback(() => {
-    resetToInitial()
-  }, [resetToInitial])
-
-  const dateTimeHasChanged =
-    initialDate && value.date && value.isValid && !isEqual(initialDate, value.date)
-
-  const showResetButton =
-    dateTimeHasChanged ||
-    (!value.isValid && !value.isPartial && (value.dateString || value.timeString))
+  const preset: DatePreset | null =
+    presetDate && presetLabel && presetIcon ? { icon: presetIcon, label: presetLabel } : null
+  const isShowResetButton = shouldShowResetButton(initialValue.date, value)
 
   const resetButtonElement = useMemo(
     () =>
-      showResetButton ? (
+      isShowResetButton ? (
         <Button
           aria-label={t('actions.resetToInitial', 'Reset to initial value')}
           fullWidth={false}
-          onClick={handleReset}
+          onClick={resetToInitial}
           shape="circle"
           size="sm"
           title={t('actions.resetToInitial', 'Reset to initial value')}
@@ -213,67 +189,24 @@ const DatePickerUI = ({
           <LucideIcon icon={RotateCcw} size={16} />
         </Button>
       ) : null,
-    [showResetButton, handleReset, t],
+    [isShowResetButton, resetToInitial, t],
   )
 
   useEffect(() => {
-    if (onRenderLabelAction) {
-      onRenderLabelAction(resetButtonElement)
-    }
+    onRenderLabelAction?.(resetButtonElement)
   }, [resetButtonElement, onRenderLabelAction])
 
   return (
     <div className="flex w-full flex-col gap-2">
-      {/* Input fields */}
       <div className="flex items-start gap-2">
         {withDate && (
           <div className="flex items-start gap-2">
             <SegmentedDateInputConnected
               afterSlot={
                 <>
-                  <Popover>
-                    <PopoverButton
-                      as={Button}
-                      className="px-2"
-                      fullWidth={false}
-                      join
-                      type="button"
-                      variant="neutral">
-                      <LucideIcon icon={CalendarIcon} size={20} />
-                    </PopoverButton>
-                    <PopoverPanel
-                      anchor="bottom start"
-                      className="bg-base-100 border-base-300 z-50 w-[360px] rounded-lg border shadow-lg [--anchor-gap:8px]">
-                      {({ close }) => (
-                        <div className="relative p-4 pr-12">
-                          <button
-                            aria-label={t('actions.close', 'Close')}
-                            className="btn btn-ghost btn-sm btn-circle absolute top-2 right-2"
-                            onClick={() => close()}>
-                            <LucideIcon icon={X} size={16} />
-                          </button>
-                          <CalendarDisplay
-                            onChange={(date) => handleCalendarDateChange(date, close)}
-                            value={formatISOLocale(value.date || new Date())}
-                          />
-                        </div>
-                      )}
-                    </PopoverPanel>
-                  </Popover>
-                  {/* Show preset button next to date if no time input */}
-                  {!withTime && hasPreset && PresetIcon && (
-                    <Button
-                      aria-label={presetLabel}
-                      className="p-0"
-                      fullWidth={false}
-                      join
-                      onClick={onPresetClick}
-                      size="sm"
-                      title={presetLabel}
-                      type="button"
-                      variant="ghost">
-                      <LucideIcon icon={PresetIcon} size={20} />
-                    </Button>
+                  <CalendarPopover date={value.date} onSelect={setFromISOString} />
+                  {!withTime && preset && (
+                    <PresetButton compact onClick={onPresetClick} preset={preset} />
                   )}
                 </>
               }
@@ -283,22 +216,7 @@ const DatePickerUI = ({
         {withDate && withTime && <div className="w-2" />}
         {withTime && (
           <SegmentedTimeInputConnected
-            afterSlot={
-              hasPreset &&
-              PresetIcon && (
-                <Button
-                  aria-label={presetLabel}
-                  className="px-2"
-                  fullWidth={false}
-                  join
-                  onClick={onPresetClick}
-                  title={presetLabel}
-                  type="button"
-                  variant="neutral">
-                  <LucideIcon icon={PresetIcon} size={20} />
-                </Button>
-              )
-            }
+            afterSlot={preset && <PresetButton onClick={onPresetClick} preset={preset} />}
           />
         )}
       </div>

@@ -30,6 +30,18 @@ import {
   parseDateTimeStrings,
 } from '../shared/date-time-helpers'
 
+export type DateTimeValue = {
+  // Internal storage for partial/invalid input during editing
+  _inputDateString: string
+  _inputTimeString: string
+  date: Date | null
+  // Derived getters for complete values
+  get dateString(): string
+  isPartial: boolean
+  isValid: boolean
+  get timeString(): string
+}
+
 type DatePickerState = {
   getISOString: () => null | string
   incrementDays: (amount: number) => void
@@ -47,18 +59,6 @@ type DatePickerState = {
   setTimeFromString: (timeString: string) => void
   setValue: (value: Partial<DateTimeValue>) => void
   value: DateTimeValue
-}
-
-type DateTimeValue = {
-  // Internal storage for partial/invalid input during editing
-  _inputDateString: string
-  _inputTimeString: string
-  date: Date | null
-  // Derived getters for complete values
-  get dateString(): string
-  isPartial: boolean
-  isValid: boolean
-  get timeString(): string
 }
 
 // Helper to create DateTimeValue with getters
