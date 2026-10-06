@@ -170,4 +170,34 @@ describe('parseDateTimeStrings', () => {
     expect(result.date!.getMonth()).toBe(2)
     expect(result.date!.getDate()).toBe(24)
   })
+
+  it('returns isPartial when the date is the placeholder and the time is complete', () => {
+    expect(parseDateTimeStrings('__.__.____', '14:30')).toEqual({
+      date: null,
+      isPartial: true,
+      isValid: true,
+    })
+  })
+
+  it('combines a date with a single-digit hour and clears seconds', () => {
+    const result = parseDateTimeStrings('24.03.2026', '9:05')
+    expect(result.isValid).toBe(true)
+    expect(result.date).toEqual(new Date(2026, 2, 24, 9, 5, 0, 0))
+  })
+
+  it('returns isValid false for an invalid time without a date', () => {
+    expect(parseDateTimeStrings('', '25:99')).toEqual({
+      date: null,
+      isPartial: false,
+      isValid: false,
+    })
+  })
+
+  it('returns isValid false for an invalid date before it reads the time', () => {
+    expect(parseDateTimeStrings('31.02.2026', '10:00')).toEqual({
+      date: null,
+      isPartial: false,
+      isValid: false,
+    })
+  })
 })

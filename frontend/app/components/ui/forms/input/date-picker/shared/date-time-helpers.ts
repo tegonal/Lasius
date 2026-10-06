@@ -54,108 +54,58 @@ export function formatTimeString(date: Date): string {
   return `${h}:${m}`
 }
 
+const DATE_PLACEHOLDER = '__.__.____'
+const TIME_PLACEHOLDER = '__:__'
+const DATE_FORMATS = ['d.M.yyyy', 'd.M.yy']
+const TIME_FORMATS = ['HH:mm', 'H:mm']
+
+type ParseResult = { date: Date | null; isPartial: boolean; isValid: boolean }
+
+const invalid = (): ParseResult => ({ date: null, isPartial: false, isValid: false })
+
 /**
  * Parse date and time strings into a Date object with validation
  */
-export function parseDateTimeStrings(
-  dateString: string,
-  timeString: string,
-): { date: Date | null; isPartial: boolean; isValid: boolean } {
-  if (!dateString && !timeString) {
-    return { date: null, isPartial: false, isValid: true }
-  }
-
-  // Check for placeholders
-  const hasDate = Boolean(dateString) && dateString !== '__.__.____'
-  const hasTime = Boolean(timeString) && timeString !== '__:__'
+export function parseDateTimeStrings(dateString: string, timeString: string): ParseResult {
+  const hasDate = Boolean(dateString) && dateString !== DATE_PLACEHOLDER
+  const hasTime = Boolean(timeString) && timeString !== TIME_PLACEHOLDER
 
   if (!hasDate && !hasTime) {
     return { date: null, isPartial: false, isValid: true }
   }
-
-  // Check if input is partial (contains underscores)
-  const hasDatePlaceholder = dateString?.includes('_')
-  const hasTimePlaceholder = timeString?.includes('_')
-
-  if (hasDatePlaceholder || hasTimePlaceholder) {
+  // An underscore marks a segment that the user has not filled in yet.
+  if (dateString.includes('_') || timeString.includes('_')) {
     return { date: null, isPartial: true, isValid: true }
   }
 
-  let parsedDate: Date | null = null
+  const date = hasDate ? parseFirstValid(normalizeShortYear(dateString), DATE_FORMATS) : null
+  if (hasDate && !date) return invalid()
+  if (!hasTime) return { date, isPartial: false, isValid: true }
 
-  // Parse date if provided
-  if (hasDate) {
-    // Normalize short years (1-3 digits) to current century
-    let normalizedDateString = dateString
-    const dateParts = dateString.split('.')
-    if (dateParts.length === 3) {
-      const yearPart = dateParts[2]
-      // If year has 1-3 digits, assume current century (20XX)
-      if (yearPart && /^\d{1,3}$/.test(yearPart)) {
-        const currentCentury = Math.floor(new Date().getFullYear() / 100) * 100
-        const normalizedYear = currentCentury + Number(yearPart)
-        dateParts[2] = normalizedYear.toString()
-        normalizedDateString = dateParts.join('.')
-      }
-    }
+  const time = parseFirstValid(timeString, TIME_FORMATS)
+  if (!time) return invalid()
+  if (!date) return { date: time, isPartial: false, isValid: true }
 
-    const dateFormats = [
-      'd.M.yyyy', // Full format: 1.1.2025
-      'd.M.yy', // Short year: 1.1.25
-    ]
+  date.setHours(time.getHours(), time.getMinutes(), 0, 0)
+  return { date, isPartial: false, isValid: true }
+}
 
-    for (const format of dateFormats) {
-      const parsed = parse(normalizedDateString, format, new Date())
-      if (isValid(parsed)) {
-        parsedDate = parsed
-        break
-      }
-    }
+/**
+ * Expand a year of 1 to 3 digits to the current century, so `1.1.25` becomes `1.1.2025`.
+ */
+function normalizeShortYear(dateString: string): string {
+  const parts = dateString.split('.')
+  const year = parts[2]
+  if (parts.length !== 3 || !year || !/^\d{1,3}$/.test(year)) return dateString
+  const currentCentury = Math.floor(new Date().getFullYear() / 100) * 100
+  parts[2] = String(currentCentury + Number(year))
+  return parts.join('.')
+}
 
-    if (!parsedDate) {
-      return { date: null, isPartial: false, isValid: false }
-    }
+function parseFirstValid(value: string, formats: string[]): Date | null {
+  for (const format of formats) {
+    const parsed = parse(value, format, new Date())
+    if (isValid(parsed)) return parsed
   }
-
-  // Parse time and combine with date if both provided
-  if (hasTime && parsedDate) {
-    const timeFormats = [
-      'HH:mm', // Two digit format: 09:30
-      'H:mm', // Single digit hour: 9:30
-    ]
-
-    let parsedTime: Date | null = null
-    for (const format of timeFormats) {
-      const parsed = parse(timeString, format, new Date())
-      if (isValid(parsed)) {
-        parsedTime = parsed
-        break
-      }
-    }
-
-    if (!parsedTime) {
-      return { date: null, isPartial: false, isValid: false }
-    }
-
-    // Combine date and time
-    parsedDate.setHours(parsedTime.getHours(), parsedTime.getMinutes(), 0, 0)
-  } else if (hasTime && !hasDate) {
-    // Time only (use today's date)
-    const timeFormats = ['HH:mm', 'H:mm']
-    const today = new Date()
-
-    for (const format of timeFormats) {
-      const parsed = parse(timeString, format, today)
-      if (isValid(parsed)) {
-        parsedDate = parsed
-        break
-      }
-    }
-
-    if (!parsedDate) {
-      return { date: null, isPartial: false, isValid: false }
-    }
-  }
-
-  return { date: parsedDate, isPartial: false, isValid: true }
+  return null
 }
