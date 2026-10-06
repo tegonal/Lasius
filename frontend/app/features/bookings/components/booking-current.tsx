@@ -22,11 +22,11 @@ import { ClockIcon, SquareIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
-import { TagList } from '~/components/ui/data-display/tag-list'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { useHomeLoaderData } from '~/features/bookings/hooks/use-home-loader-data'
 import { useStopBooking } from '~/features/bookings/hooks/use-stop-booking'
 import { ContextMenuProvider } from '~/features/context-menu/hooks/use-context-menu'
+import { TagList } from '~/features/tags/components/tag-list'
 import { formatISOLocale } from '~/lib/utils/dates'
 import { type ModelsBooking, type ModelsCurrentUserTimeBooking } from '~/services/api/lasius'
 

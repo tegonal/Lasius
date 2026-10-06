@@ -18,7 +18,7 @@
  */
 
 import { AvatarUser } from '~/components/ui/data-display/avatar/avatar-user'
-import { TagList } from '~/components/ui/data-display/tag-list'
+import { TagList } from '~/features/tags/components/tag-list'
 import { cn } from '~/lib/utils/cn'
 import { type ModelsCurrentUserTimeBooking, type ModelsUserStub } from '~/services/api/lasius'
 

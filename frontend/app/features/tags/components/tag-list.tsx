@@ -20,13 +20,12 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 import { XIcon } from 'lucide-react'
 
+import { Badge } from '~/components/ui/data-display/badge'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { ImporterTypeIcon } from '~/features/issue-importers/importer-type-icon'
 import { cn } from '~/lib/utils/cn'
 import { getImporterTypeFromTag } from '~/lib/utils/tag-helpers'
 import { type ModelsTag } from '~/services/api/lasius'
-
-import { Badge } from './badge'
 
 const tagLabelVariants = cva('block overflow-hidden text-ellipsis whitespace-nowrap', {
   defaultVariants: { width: 'md' },

@@ -31,7 +31,6 @@ import { FieldSet } from '~/components/ui/forms/field-set'
 import { FormBody } from '~/components/ui/forms/form-body'
 import { FormElement } from '~/components/ui/forms/form-element'
 import { InputDatePicker } from '~/components/ui/forms/input/date-picker/input-date-picker'
-import { InputTagsAutocomplete } from '~/components/ui/forms/input/input-tags-autocomplete'
 import { ProjectSelect } from '~/components/ui/forms/input/project-select'
 import { useProjectTags } from '~/features/bookings/hooks/use-project-tags'
 import {
@@ -39,6 +38,7 @@ import {
   parseTagsFromFormData,
 } from '~/features/bookings/lib/booking-schemas'
 import { useProjects } from '~/features/projects/hooks/use-projects'
+import { InputTagsAutocomplete } from '~/features/tags/components/input-tags-autocomplete'
 import { type SchemaTranslationFunction } from '~/lib/i18n-types'
 import { formatISOLocale } from '~/lib/utils/dates'
 import { type ModelsCurrentUserTimeBooking, type ModelsTag } from '~/services/api/lasius'

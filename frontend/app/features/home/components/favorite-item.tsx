@@ -17,8 +17,8 @@
  *
  */
 
-import { TagList } from '~/components/ui/data-display/tag-list'
 import { BookingName } from '~/features/bookings/components/booking-name'
+import { TagList } from '~/features/tags/components/tag-list'
 import { type ModelsBookingStub } from '~/services/api/lasius'
 
 import { FavoriteItemContext } from './favorite-item-context'

@@ -23,9 +23,9 @@ import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { Badge } from '~/components/ui/data-display/badge'
-import { Tag } from '~/components/ui/data-display/tag-list'
-import { InputTagsAdmin } from '~/components/ui/forms/input/input-tags-admin'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+import { InputTagsAdmin } from '~/features/tags/components/input-tags-admin'
+import { Tag } from '~/features/tags/components/tag-list'
 import { type ModelsTag } from '~/services/api/lasius/modelsTag'
 import { type ModelsTagGroup } from '~/services/api/lasius/modelsTagGroup'
 
