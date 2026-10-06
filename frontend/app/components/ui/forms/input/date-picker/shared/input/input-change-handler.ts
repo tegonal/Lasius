@@ -33,6 +33,14 @@ type InputChangeHandlerParameters<T extends string> = {
   updateStore: (value: string) => void
 }
 
+type SegmentEdit<T extends string> = {
+  /** Cursor position after the typed digits, when the segment is not complete yet */
+  cursorPos: null | number
+  /** Segment to select next, when the edited segment is complete */
+  nextSegment: null | T
+  updatedValue: string
+}
+
 /**
  * Generic handler for input changes in segmented inputs
  * Handles smart segment replacement and auto-advance on overflow
@@ -59,66 +67,67 @@ export function createInputChangeHandler<T extends string>(
       newValue = newValue.replaceAll('.', ':')
     }
 
-    const previousValue = inputValue
-
     // Smart input validation: only allow configured characters
     const pattern = new RegExp(`^${config.allowedCharsPattern.source}*$`)
     if (newValue && !pattern.test(newValue)) {
       return
     }
 
-    // Check if we're editing a segment
-    if (selectedSegment && inputRef.current) {
-      const bounds = getSegmentBounds(previousValue, config.delimiter, config.segments)
-      if (bounds) {
-        const segmentIndex = config.segments.indexOf(selectedSegment)
-        const previousParts = previousValue.split(config.delimiter)
-        const newParts = newValue.split(config.delimiter)
-        const previousSegmentValue = previousParts[segmentIndex]
-        const newSegmentValue = newParts[segmentIndex]
+    const edit =
+      selectedSegment && inputRef.current
+        ? resolveSegmentEdit(config, inputValue, newValue, selectedSegment)
+        : null
 
-        // If the segment value changed and we got a digit
-        if (
-          newSegmentValue !== previousSegmentValue &&
-          newSegmentValue &&
-          /^\d+$/.test(newSegmentValue)
-        ) {
-          const requiredLength = config.segmentPlaceholders[selectedSegment].length
-
-          // Build the corrected value with the segment change
-          const parts = [...previousParts]
-          parts[segmentIndex] = newSegmentValue
-          const updatedValue = parts.join(config.delimiter)
-
-          setInputValue(updatedValue)
-          updateStore(updatedValue)
-
-          // Auto-advance only if we've reached the required length for this segment
-          if (newSegmentValue.length >= requiredLength) {
-            // Segment is complete, advance to next
-            const nextIndex = segmentIndex + 1
-            const nextSegment = config.segments[nextIndex]
-            if (nextIndex < config.segments.length && nextSegment) {
-              setTimeout(() => selectSegmentFn(nextSegment), 0)
-            }
-          } else {
-            // Still typing in this segment, position cursor after the last digit
-            let cursorPos = 0
-            for (let index = 0; index < segmentIndex; index++) {
-              cursorPos += (parts[index] ?? '').length + config.delimiter.length
-            }
-            cursorPos += (parts[segmentIndex] ?? '').length
-            if (setCursorPosition) {
-              setCursorPosition(cursorPos)
-            }
-          }
-          return
-        }
-      }
+    if (!edit) {
+      setInputValue(newValue)
+      updateStore(newValue)
+      return
     }
 
-    // Default behavior
-    setInputValue(newValue)
-    updateStore(newValue)
+    setInputValue(edit.updatedValue)
+    updateStore(edit.updatedValue)
+    const { cursorPos, nextSegment } = edit
+    if (nextSegment) setTimeout(() => selectSegmentFn(nextSegment), 0)
+    if (cursorPos !== null) setCursorPosition?.(cursorPos)
   }
+}
+
+/**
+ * Apply a digit edit of the selected segment to the previous value. Returns null when the change is
+ * not a digit edit of that segment, so the caller keeps the plain new value.
+ */
+function resolveSegmentEdit<T extends string>(
+  config: SegmentConfig<T>,
+  previousValue: string,
+  newValue: string,
+  selectedSegment: T,
+): null | SegmentEdit<T> {
+  if (!getSegmentBounds(previousValue, config.delimiter, config.segments)) return null
+
+  const segmentIndex = config.segments.indexOf(selectedSegment)
+  const parts = previousValue.split(config.delimiter)
+  const newSegmentValue = newValue.split(config.delimiter)[segmentIndex]
+  if (
+    !newSegmentValue ||
+    newSegmentValue === parts[segmentIndex] ||
+    !/^\d+$/.test(newSegmentValue)
+  ) {
+    return null
+  }
+
+  parts[segmentIndex] = newSegmentValue
+  const updatedValue = parts.join(config.delimiter)
+
+  if (newSegmentValue.length >= config.segmentPlaceholders[selectedSegment].length) {
+    return { cursorPos: null, nextSegment: config.segments[segmentIndex + 1] ?? null, updatedValue }
+  }
+
+  const cursorPos = parts
+    .slice(0, segmentIndex + 1)
+    .reduce(
+      (pos, part, index) =>
+        pos + part.length + (index < segmentIndex ? config.delimiter.length : 0),
+      0,
+    )
+  return { cursorPos, nextSegment: null, updatedValue }
 }
