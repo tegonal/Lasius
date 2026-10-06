@@ -23,22 +23,22 @@ import { type ImporterType } from '~/lib/utils/tag-helpers'
 export const getImporterTypeLabel = (type: ImporterType, t: SchemaTranslationFunction): string => {
   switch (type) {
     case 'github': {
-      return t('issueImporters.typeLabels.github', {
+      return t('common:issueImporters.typeLabels.github', {
         defaultValue: 'GitHub',
       })
     }
     case 'gitlab': {
-      return t('issueImporters.typeLabels.gitlab', {
+      return t('common:issueImporters.typeLabels.gitlab', {
         defaultValue: 'GitLab',
       })
     }
     case 'jira': {
-      return t('issueImporters.typeLabels.jira', {
+      return t('common:issueImporters.typeLabels.jira', {
         defaultValue: 'Jira',
       })
     }
     case 'plane': {
-      return t('issueImporters.typeLabels.plane', {
+      return t('common:issueImporters.typeLabels.plane', {
         defaultValue: 'Plane',
       })
     }
