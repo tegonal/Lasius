@@ -133,6 +133,7 @@
       "name": "Name",
       "nextScheduledSync": "Nächster geplanter Sync",
       "noConfig": "Keine Konfiguration ausgewählt.",
+      "notAvailable": "k. A.",
       "pendingFirstSync": "Erster Sync ausstehend",
       "projectStats": "Projektstatistiken",
       "title": "Konfigurationsinfo",

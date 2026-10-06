@@ -132,6 +132,7 @@
       "name": "Name",
       "nextScheduledSync": "Next Scheduled Sync",
       "noConfig": "No configuration selected.",
+      "notAvailable": "N/A",
       "pendingFirstSync": "Pending first sync",
       "projectStats": "Project Statistics",
       "title": "Configuration Info",

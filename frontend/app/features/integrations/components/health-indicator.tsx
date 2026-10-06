@@ -19,6 +19,12 @@
 
 import { useTranslation } from 'react-i18next'
 
+import {
+  getConnectivityStatusLabel,
+  getConnectivityStatusStyle,
+} from '~/features/integrations/lib/connectivity-status'
+import { untyped } from '~/lib/i18n-types'
+import { cn } from '~/lib/utils/cn'
 import { type ModelsConnectivityStatus } from '~/services/api/lasius'
 
 type Properties = {
@@ -29,53 +35,13 @@ type Properties = {
 export const HealthIndicator = ({ size = 'sm', status }: Properties) => {
   const { t } = useTranslation('integrations')
 
-  const getStatusColor = () => {
-    switch (status) {
-      case 'degraded': {
-        return 'bg-warning'
-      }
-      case 'failed': {
-        return 'bg-error'
-      }
-      case 'healthy': {
-        return 'bg-success'
-      }
-      case 'unknown': {
-        return 'bg-base-content/30'
-      }
-    }
-  }
-
-  const getStatusLabel = () => {
-    switch (status) {
-      case 'degraded': {
-        return t('issueImporters.healthStatus.degraded', {
-          defaultValue: 'Degraded',
-        })
-      }
-      case 'failed': {
-        return t('issueImporters.healthStatus.failed', {
-          defaultValue: 'Failed',
-        })
-      }
-      case 'healthy': {
-        return t('issueImporters.healthStatus.healthy', {
-          defaultValue: 'Healthy',
-        })
-      }
-      case 'unknown': {
-        return t('issueImporters.healthStatus.unknown', {
-          defaultValue: 'Unknown',
-        })
-      }
-    }
-  }
-
   const dotSize = size === 'sm' ? 'h-2 w-2' : 'h-3 w-3'
 
   return (
-    <div className="tooltip" data-tip={getStatusLabel()}>
-      <div className={`${dotSize} ${getStatusColor()} rounded-full`} />
+    <div className="tooltip" data-tip={getConnectivityStatusLabel(status, untyped(t))}>
+      <div
+        className={cn(dotSize, getConnectivityStatusStyle(status).dotClassName, 'rounded-full')}
+      />
     </div>
   )
 }
