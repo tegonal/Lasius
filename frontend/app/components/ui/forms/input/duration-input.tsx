@@ -27,7 +27,10 @@ import {
   DURATION_SEGMENT_CONFIG,
   type DurationSegment,
 } from './date-picker/shared/core/segment-config'
-import { selectSegment as selectSegmentHelper } from './date-picker/shared/core/segment-selection'
+import {
+  createHandleClick,
+  selectSegment as selectSegmentHelper,
+} from './date-picker/shared/core/segment-selection'
 import { formatDuration, parseDuration } from './date-picker/shared/duration-utilities'
 import { createInputChangeHandler } from './date-picker/shared/input/input-change-handler'
 import { isValidInputChar } from './date-picker/shared/input/input-validation'
@@ -37,6 +40,7 @@ import {
   didHandleSeparatorKey,
 } from './date-picker/shared/input/keyboard-handlers'
 import { SegmentedInputWrapper } from './date-picker/shared/segmented-input-wrapper'
+import { useRestoreCursorPosition } from './date-picker/shared/use-restore-cursor-position'
 
 type DurationInputProperties = {
   error?: boolean
@@ -56,7 +60,6 @@ export const DurationInput = ({ error, id, onChange, value }: DurationInputPrope
   const focusFromArrowReference = useRef<boolean>(false)
   const focusFromMouseReference = useRef<boolean>(false)
   const initialDurationReference = useRef<number>(0)
-  const pendingCursorPosReference = useRef<null | number>(null)
 
   const config = DURATION_SEGMENT_CONFIG
 
@@ -65,6 +68,7 @@ export const DurationInput = ({ error, id, onChange, value }: DurationInputPrope
   const durationString = formatDuration(durationMinutes)
 
   const [inputValue, setInputValue] = useState<string>(durationString)
+  const setCursorPosition = useRestoreCursorPosition(inputReference, inputValue)
 
   // Store initial duration when component mounts or value changes externally
   useEffect(() => {
@@ -79,17 +83,6 @@ export const DurationInput = ({ error, id, onChange, value }: DurationInputPrope
       setInputValue(durationString)
     }
   }, [durationString])
-
-  // Restore cursor position after inputValue changes
-  React.useLayoutEffect(() => {
-    if (pendingCursorPosReference.current === null || !inputReference.current?.matches(':focus')) {
-      return
-    }
-
-    const pos = pendingCursorPosReference.current
-    pendingCursorPosReference.current = null
-    inputReference.current.setSelectionRange(pos, pos)
-  }, [inputValue])
 
   // Select a segment
   const selectSegment = (segment: DurationSegment): void => {
@@ -109,21 +102,15 @@ export const DurationInput = ({ error, id, onChange, value }: DurationInputPrope
   }
 
   // Handle click
-  const handleClick = () => {
-    setTimeout(() => {
-      const position = inputReference.current?.selectionStart
-      if (typeof position === 'number' && inputValue && inputValue !== config.placeholder) {
-        const segment = getSegmentFromPosition(
-          position,
-          inputValue,
-          config.delimiter,
-          config.segments,
-        )
-        if (segment) {
-          selectSegment(segment)
-        }
-      }
-    }, 0)
+  const handleClick = (event: React.MouseEvent<HTMLInputElement>) => {
+    createHandleClick(
+      inputReference,
+      inputValue,
+      config.placeholder,
+      config.delimiter,
+      config.segments,
+      selectSegment,
+    )(event)
   }
 
   // Update duration
@@ -147,9 +134,7 @@ export const DurationInput = ({ error, id, onChange, value }: DurationInputPrope
       inputValue,
       selectedSegment,
       selectSegmentFn: selectSegment,
-      setCursorPosition: (pos) => {
-        pendingCursorPosReference.current = pos
-      },
+      setCursorPosition,
       setInputValue,
       updateStore: (value_: string) => {
         const minutes = parseDuration(value_)

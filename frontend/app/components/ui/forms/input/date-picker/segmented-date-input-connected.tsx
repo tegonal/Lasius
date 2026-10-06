@@ -38,6 +38,7 @@ import {
   didHandleSeparatorKey,
 } from './shared/input/keyboard-handlers'
 import { SegmentedInputWrapper } from './shared/segmented-input-wrapper'
+import { useRestoreCursorPosition } from './shared/use-restore-cursor-position'
 import { DatePickerStoreContext, useDatePickerStore } from './store/use-date-picker-store'
 
 export const SegmentedDateInputConnected = ({ afterSlot }: { afterSlot?: React.ReactNode }) => {
@@ -55,7 +56,7 @@ export const SegmentedDateInputConnected = ({ afterSlot }: { afterSlot?: React.R
   const [selectedSegment, setSelectedSegment] = useState<DateSegment | null>(null)
   const inputReference = useRef<HTMLInputElement>(null)
   const focusFromMouseReference = useRef<boolean>(false)
-  const pendingCursorPosReference = useRef<null | number>(null)
+  const setCursorPosition = useRestoreCursorPosition(inputReference, inputValue)
 
   const config = DATE_SEGMENT_CONFIG
 
@@ -74,17 +75,6 @@ export const SegmentedDateInputConnected = ({ afterSlot }: { afterSlot?: React.R
       setInputValue(value.dateString || config.placeholder)
     }
   }, [value.dateString, inputValue, config.placeholder])
-
-  // Restore cursor position after inputValue changes (runs synchronously before paint)
-  React.useLayoutEffect(() => {
-    if (pendingCursorPosReference.current === null || !inputReference.current?.matches(':focus')) {
-      return
-    }
-
-    const pos = pendingCursorPosReference.current
-    pendingCursorPosReference.current = null
-    inputReference.current.setSelectionRange(pos, pos)
-  }, [inputValue])
 
   // Select a segment using helper
   const selectSegment = (segment: DateSegment): void => {
@@ -122,9 +112,7 @@ export const SegmentedDateInputConnected = ({ afterSlot }: { afterSlot?: React.R
       inputValue,
       selectedSegment,
       selectSegmentFn: selectSegment,
-      setCursorPosition: (pos) => {
-        pendingCursorPosReference.current = pos
-      },
+      setCursorPosition,
       setInputValue,
       updateStore: setDateFromString,
     })(event)
