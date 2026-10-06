@@ -41,6 +41,46 @@ export type WeekData = {
   year: number
 }
 
+type WeekTotals = { dates: Set<string>; hours: number }
+
+const weekOf = (date: Date) => {
+  const weekNumber = getWeek(date, { weekStartsOn: 1 })
+  const year = getWeekYear(date, { weekStartsOn: 1 })
+  return { key: `${year}-W${weekNumber}`, weekNumber, year }
+}
+
+const groupBookingsByWeek = (bookings: ModelsBooking[]): Map<string, WeekTotals> => {
+  const weekMap = new Map<string, WeekTotals>()
+  for (const booking of bookings) {
+    const startDateTime = booking.start?.dateTime
+    const endDateTime = booking.end?.dateTime
+    if (!startDateTime || !endDateTime) continue
+
+    const bookingDate = new Date(startDateTime)
+    const { key } = weekOf(bookingDate)
+    const totals = weekMap.get(key) ?? { dates: new Set<string>(), hours: 0 }
+    totals.hours += durationInHoursAsNumber(startDateTime, endDateTime)
+    totals.dates.add(format(bookingDate, 'yyyy-MM-dd'))
+    weekMap.set(key, totals)
+  }
+  return weekMap
+}
+
+const burnoutLevel = (
+  weeklyHours: number,
+  plannedWeeklyHours: number,
+  workingDays: number,
+  averageDailyHours: number,
+): BurnoutLevel => {
+  if (weeklyHours > plannedWeeklyHours * 1.25 || workingDays >= 7 || averageDailyHours > 10) {
+    return 'risk'
+  }
+  if (weeklyHours > plannedWeeklyHours * 1.1 || workingDays >= 6 || averageDailyHours >= 9) {
+    return 'warning'
+  }
+  return 'healthy'
+}
+
 /**
  * Compute work health metrics including burnout indicators and weekly trends.
  * Pure server-side function ported from the useWorkHealthMetrics client hook.
@@ -60,90 +100,45 @@ export const computeWorkHealthMetrics = (
     return { burnoutMetrics: null, weeklyData: [] }
   }
 
-  const referenceDate_ = new Date(referenceDate)
-
-  // Group bookings by week
-  const weekMap = new Map<string, { dates: Set<string>; hours: number }>()
-
-  for (const booking of bookings) {
-    const startDateTime = booking.start?.dateTime
-    const endDateTime = booking.end?.dateTime
-    if (!startDateTime || !endDateTime) continue
-
-    const bookingDate = new Date(startDateTime)
-    const weekNumber = getWeek(bookingDate, { weekStartsOn: 1 })
-    const year = getWeekYear(bookingDate, { weekStartsOn: 1 })
-    const weekKey = `${year}-W${weekNumber}`
-    const dateKey = format(bookingDate, 'yyyy-MM-dd')
-
-    if (!weekMap.has(weekKey)) {
-      weekMap.set(weekKey, { dates: new Set(), hours: 0 })
-    }
-
-    const weekData = weekMap.get(weekKey)!
-    weekData.hours += durationInHoursAsNumber(startDateTime, endDateTime)
-    weekData.dates.add(dateKey)
-  }
-
-  // Create weekly data array
-  const weeks: WeekData[] = []
-  for (let index = weeksToAnalyze - 1; index >= 0; index--) {
-    const weekDate = subWeeks(referenceDate_, index)
-    const weekNumber = getWeek(weekDate, { weekStartsOn: 1 })
-    const year = getWeekYear(weekDate, { weekStartsOn: 1 })
-    const weekKey = `${year}-W${weekNumber}`
-    const weekData = weekMap.get(weekKey)
-
-    weeks.push({
-      hours: weekData?.hours || 0,
+  const weekMap = groupBookingsByWeek(bookings)
+  const weeks: WeekData[] = Array.from({ length: weeksToAnalyze }, (_, index) => {
+    const { key, weekNumber, year } = weekOf(
+      subWeeks(new Date(referenceDate), weeksToAnalyze - 1 - index),
+    )
+    return {
+      hours: weekMap.get(key)?.hours || 0,
       plannedHours: plannedWeeklyHours,
       weekLabel: `W${weekNumber}/${year}`,
-      weekNumber: weekNumber,
+      weekNumber,
       year,
-    })
-  }
+    }
+  })
 
-  // Calculate burnout metrics for current week (last item in array)
+  // The burnout metrics describe the current week, which is the last entry.
   const currentWeek = weeks.at(-1)
   if (!currentWeek) {
     return { burnoutMetrics: null, weeklyData: weeks }
   }
 
-  const overtimePercentage = (currentWeek.hours / plannedWeeklyHours) * 100 - 100
-
-  // Calculate consecutive working days (simplified - using current week's date count)
-  const currentWeekKey = `${currentWeek.year}-W${currentWeek.weekNumber}`
-  const currentWeekData = weekMap.get(currentWeekKey)
-  const consecutiveDays = currentWeekData?.dates.size || 0
-
-  // Calculate average daily hours for current week
+  // The number of working days of the current week stands in for consecutive days.
+  const consecutiveDays =
+    weekMap.get(`${currentWeek.year}-W${currentWeek.weekNumber}`)?.dates.size || 0
   const averageDailyHours = consecutiveDays > 0 ? currentWeek.hours / consecutiveDays : 0
 
-  // Determine burnout level
-  let level: BurnoutLevel = 'healthy'
-
-  if (
-    currentWeek.hours > plannedWeeklyHours * 1.25 || // >125% planned
-    consecutiveDays >= 7 ||
-    averageDailyHours > 10
-  ) {
-    level = 'risk'
-  } else if (
-    currentWeek.hours > plannedWeeklyHours * 1.1 || // >110% planned
-    consecutiveDays >= 6 ||
-    averageDailyHours >= 9
-  ) {
-    level = 'warning'
+  return {
+    burnoutMetrics: {
+      averageDailyHours,
+      consecutiveDays,
+      level: burnoutLevel(
+        currentWeek.hours,
+        plannedWeeklyHours,
+        consecutiveDays,
+        averageDailyHours,
+      ),
+      overtimePercentage: (currentWeek.hours / plannedWeeklyHours) * 100 - 100,
+      plannedHours: plannedWeeklyHours,
+      weeklyHours: currentWeek.hours,
+    },
+    weeklyData: weeks,
   }
-
-  const metrics: BurnoutMetrics = {
-    averageDailyHours,
-    consecutiveDays,
-    level,
-    overtimePercentage,
-    plannedHours: plannedWeeklyHours,
-    weeklyHours: currentWeek.hours,
-  }
-
-  return { burnoutMetrics: metrics, weeklyData: weeks }
 }

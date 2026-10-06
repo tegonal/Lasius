@@ -73,4 +73,80 @@ describe('computeWorkHealthMetrics', () => {
     ])
     expect(burnoutMetrics?.consecutiveDays).toBe(2)
   })
+
+  // Monday 28 September 2026 to Sunday 4 October 2026 is week 40.
+  const WEEK_40 = [
+    '2026-09-28',
+    '2026-09-29',
+    '2026-09-30',
+    '2026-10-01',
+    '2026-10-02',
+    '2026-10-03',
+    '2026-10-04',
+  ]
+  const pad = (value: number) => String(value).padStart(2, '0')
+  const workday = (date: string, hours: number, minutes = 0) =>
+    booking(`${date}T08:00:00.000`, `${date}T${pad(8 + hours)}:${pad(minutes)}:00.000`)
+  const day = (dayOfMonth: number, hours: number) => workday(`2026-09-${pad(dayOfMonth)}`, hours)
+  const week = (days: number, hours: number, minutes = 0) =>
+    WEEK_40.slice(0, days).map((date) => workday(date, hours, minutes))
+  const levelOf = (bookings: ModelsBooking[]) =>
+    computeWorkHealthMetrics(bookings, 40, 1, '2026-09-30').burnoutMetrics?.level
+
+  it('returns no metrics and no weeks without bookings', () => {
+    expect(computeWorkHealthMetrics([], 40, 4, '2026-09-30')).toEqual({
+      burnoutMetrics: null,
+      weeklyData: [],
+    })
+  })
+
+  it('ignores a booking without an end and lists one entry per analysed week', () => {
+    const open: ModelsBooking = { ...day(28, 4), end: undefined }
+    const { burnoutMetrics, weeklyData } = computeWorkHealthMetrics(
+      [open, day(29, 4)],
+      40,
+      3,
+      '2026-09-30',
+    )
+    expect(weeklyData.map((w) => [w.weekLabel, w.hours])).toEqual([
+      ['W38/2026', 0],
+      ['W39/2026', 0],
+      ['W40/2026', 4],
+    ])
+    expect(burnoutMetrics).toEqual({
+      averageDailyHours: 4,
+      consecutiveDays: 1,
+      level: 'healthy',
+      overtimePercentage: -90,
+      plannedHours: 40,
+      weeklyHours: 4,
+    })
+  })
+
+  it('classifies a normal week as healthy', () => {
+    expect(levelOf(week(5, 8))).toBe('healthy')
+  })
+
+  it('classifies more than 110 % of the planned hours as warning', () => {
+    // 5 days of 8 h 48 min are 44 h, exactly 110 %. 8 h 54 min a day are 44.5 h.
+    expect(levelOf(week(5, 8, 48))).toBe('healthy')
+    expect(levelOf(week(5, 8, 54))).toBe('warning')
+  })
+
+  it('classifies more than 125 % of the planned hours as risk', () => {
+    // 6 days of 8 h 30 min are 51 h. Six days alone would only be a warning.
+    expect(levelOf(week(6, 8, 30))).toBe('risk')
+  })
+
+  it('classifies 6 working days as warning and 7 as risk', () => {
+    expect(levelOf(week(5, 1))).toBe('healthy')
+    expect(levelOf(week(6, 1))).toBe('warning')
+    expect(levelOf(week(7, 1))).toBe('risk')
+  })
+
+  it('classifies an average of 9 hours a day as warning and more than 10 as risk', () => {
+    expect(levelOf([day(28, 9)])).toBe('warning')
+    expect(levelOf([day(28, 10)])).toBe('warning')
+    expect(levelOf([day(28, 11)])).toBe('risk')
+  })
 })
