@@ -26,9 +26,8 @@ import { z } from 'zod'
 import { Input } from '~/components/primitives/inputs/input'
 import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { DurationInput } from '~/components/ui/forms/input/duration-input'
-import { ModalHelpButton } from '~/features/help/components/help-button'
 import { ProviderInstructions } from '~/features/integrations/components/shared/provider-instructions'
-import { useGithubResourceOwners } from '~/features/integrations/hooks/use-github-resource-owners'
+import { CreateCredentialFields } from '~/features/integrations/components/wizard/steps/create-credential-fields'
 import { type WizardFormData } from '~/features/integrations/hooks/use-wizard-state'
 import { createConfigSchema } from '~/features/integrations/lib/config-schemas'
 import { getImporterTypeLabel } from '~/features/integrations/lib/importer-type-labels'
@@ -86,15 +85,6 @@ export const ConfigFormStep = ({ formData, formRef, onSubmit, selectedOrgId }: P
   const accessTokenControl = useInputControl(fields.accessToken)
   const baseUrlControl = useInputControl(fields.baseUrl)
   const checkFrequencyControl = useInputControl(fields.checkFrequency)
-  const resourceOwnerControl = useInputControl(fields.resourceOwner)
-  const resourceOwnerTypeControl = useInputControl(fields.resourceOwnerType)
-
-  const { isLoadingResourceOwners, resourceOwners } = useGithubResourceOwners({
-    accessToken: accessTokenControl.value ?? '',
-    baseUrl: baseUrlControl.value ?? '',
-    importerType,
-    orgId: selectedOrgId,
-  })
 
   const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -165,227 +155,13 @@ export const ConfigFormStep = ({ formData, formRef, onSubmit, selectedOrgId }: P
             <FormFieldErrors errors={fields.baseUrl.errors} />
           </fieldset>
 
-          {/* GitHub / GitLab: Access Token */}
-          {(importerType === 'github' || importerType === 'gitlab') && (
-            <fieldset className="fieldset">
-              <div className="flex items-center gap-1">
-                <label className="label" htmlFor={fields.accessToken.id}>
-                  {t('issueImporters.fields.accessToken', {
-                    defaultValue: 'Access Token',
-                  })}
-                </label>
-                <ModalHelpButton helpKey={`setup-${importerType}`} />
-              </div>
-              <input
-                name={fields.accessToken.name}
-                type="hidden"
-                value={accessTokenControl.value ?? ''}
-              />
-              <Input
-                autoComplete="off"
-                data-1p-ignore
-                data-form-type="other"
-                data-lpignore="true"
-                id={fields.accessToken.id}
-                key={fields.accessToken.key}
-                onBlur={() => accessTokenControl.blur()}
-                onChange={(event) => accessTokenControl.change(event.target.value)}
-                onFocus={() => accessTokenControl.focus()}
-                placeholder={
-                  importerType === 'github' ? 'github_pat_xxxxxxxxxxxxx' : 'glpat-xxxxxxxxxxxxx'
-                }
-                type="password"
-                value={accessTokenControl.value ?? ''}
-              />
-              <FormFieldErrors errors={fields.accessToken.errors} />
-            </fieldset>
-          )}
-
-          {/* GitHub: Resource Owner */}
-          {importerType === 'github' && (
-            <>
-              <fieldset className="fieldset">
-                <label className="label" htmlFor={fields.resourceOwner.id}>
-                  {t('issueImporters.fields.resourceOwner', {
-                    defaultValue: 'Resource Owner',
-                  })}
-                </label>
-                <input
-                  name={fields.resourceOwner.name}
-                  type="hidden"
-                  value={resourceOwnerControl.value ?? ''}
-                />
-                <select
-                  className="select select-bordered w-full"
-                  disabled={resourceOwners.length === 0 || isLoadingResourceOwners}
-                  id={fields.resourceOwner.id}
-                  onChange={(event) => {
-                    resourceOwnerControl.change(event.target.value)
-                    const selectedOwner = resourceOwners.find(
-                      (owner) => owner.id === event.target.value,
-                    )
-                    if (selectedOwner?.ownerType) {
-                      resourceOwnerTypeControl.change(selectedOwner.ownerType)
-                    }
-                  }}
-                  value={resourceOwnerControl.value || ''}>
-                  <option disabled value="">
-                    {isLoadingResourceOwners
-                      ? t('issueImporters.fields.resourceOwnerLoading', {
-                          defaultValue: 'Loading organizations...',
-                        })
-                      : resourceOwners.length === 0 && !accessTokenControl.value
-                        ? t('issueImporters.fields.resourceOwnerPlaceholder', {
-                            defaultValue: 'Enter access token above to load organizations',
-                          })
-                        : resourceOwners.length === 0
-                          ? t('issueImporters.fields.resourceOwnerNoResults', {
-                              defaultValue: 'No organizations found',
-                            })
-                          : t('issueImporters.fields.resourceOwnerSelect', {
-                              defaultValue: 'Select an organization',
-                            })}
-                  </option>
-                  {resourceOwners.map((owner) => (
-                    <option key={owner.id} value={owner.id}>
-                      {owner.name}
-                    </option>
-                  ))}
-                </select>
-                <FormFieldErrors errors={fields.resourceOwner.errors} />
-                <p className="text-base-content/60 mt-1 text-xs">
-                  {t('issueImporters.fields.resourceOwnerHelp', {
-                    defaultValue:
-                      'Select the GitHub user or organization that owns the repositories you want to access.',
-                  })}
-                </p>
-              </fieldset>
-              <input
-                name={fields.resourceOwnerType.name}
-                type="hidden"
-                value={resourceOwnerTypeControl.value ?? ''}
-              />
-            </>
-          )}
-
-          {/* Jira fields */}
-          {importerType === 'jira' && (
-            <>
-              <fieldset className="fieldset">
-                <div className="flex items-center gap-1">
-                  <label className="label" htmlFor={fields.consumerKey.id}>
-                    {t('issueImporters.fields.consumerKey', {
-                      defaultValue: 'OAuth Consumer Key',
-                    })}
-                  </label>
-                  <ModalHelpButton helpKey="setup-jira" />
-                </div>
-                <Input
-                  {...getInputProps(fields.consumerKey, { type: 'text' })}
-                  key={fields.consumerKey.key}
-                  placeholder="jira-oauth-consumer"
-                />
-                <FormFieldErrors errors={fields.consumerKey.errors} />
-              </fieldset>
-
-              <fieldset className="fieldset">
-                <label className="label" htmlFor={fields.privateKey.id}>
-                  {t('issueImporters.fields.privateKey', {
-                    defaultValue: 'OAuth Private Key',
-                  })}
-                </label>
-                <textarea
-                  autoComplete="off"
-                  className="textarea textarea-bordered w-full font-mono text-sm"
-                  data-1p-ignore
-                  data-form-type="other"
-                  data-lpignore="true"
-                  id={fields.privateKey.id}
-                  key={fields.privateKey.key}
-                  name={fields.privateKey.name}
-                  placeholder="-----BEGIN RSA PRIVATE KEY-----"
-                  rows={4}
-                />
-                <FormFieldErrors errors={fields.privateKey.errors} />
-              </fieldset>
-
-              <fieldset className="fieldset">
-                <label className="label" htmlFor={fields.accessToken.id}>
-                  {t('issueImporters.fields.oauthAccessToken', {
-                    defaultValue: 'OAuth Access Token',
-                  })}
-                </label>
-                <input
-                  name={fields.accessToken.name}
-                  type="hidden"
-                  value={accessTokenControl.value ?? ''}
-                />
-                <Input
-                  autoComplete="off"
-                  data-1p-ignore
-                  data-form-type="other"
-                  data-lpignore="true"
-                  id={fields.accessToken.id}
-                  key={fields.accessToken.key}
-                  onBlur={() => accessTokenControl.blur()}
-                  onChange={(event) => accessTokenControl.change(event.target.value)}
-                  onFocus={() => accessTokenControl.focus()}
-                  placeholder="your-oauth-access-token"
-                  type="password"
-                  value={accessTokenControl.value ?? ''}
-                />
-                <FormFieldErrors errors={fields.accessToken.errors} />
-              </fieldset>
-            </>
-          )}
-
-          {/* Plane fields */}
-          {importerType === 'plane' && (
-            <>
-              <fieldset className="fieldset">
-                <div className="flex items-center gap-1">
-                  <label className="label" htmlFor={fields.apiKey.id}>
-                    {t('issueImporters.fields.apiKey', {
-                      defaultValue: 'API Key',
-                    })}
-                  </label>
-                  <ModalHelpButton helpKey="setup-plane" />
-                </div>
-                <Input
-                  {...getInputProps(fields.apiKey, { type: 'password' })}
-                  autoComplete="off"
-                  data-1p-ignore
-                  data-form-type="other"
-                  data-lpignore="true"
-                  key={fields.apiKey.key}
-                  placeholder="plane-api-key-xxxxxxxxxxxxx"
-                />
-                <FormFieldErrors errors={fields.apiKey.errors} />
-              </fieldset>
-
-              <fieldset className="fieldset">
-                <label className="label" htmlFor={fields.workspace.id}>
-                  {t('issueImporters.fields.workspace', {
-                    defaultValue: 'Workspace',
-                  })}
-                </label>
-                <Input
-                  {...getInputProps(fields.workspace, { type: 'text' })}
-                  key={fields.workspace.key}
-                  placeholder={t('issueImporters.fields.workspacePlaceholder', {
-                    defaultValue: 'e.g., my-company',
-                  })}
-                />
-                <FormFieldErrors errors={fields.workspace.errors} />
-                <p className="text-base-content/60 mt-1 text-xs">
-                  {t('issueImporters.fields.workspaceHelp', {
-                    defaultValue:
-                      'The workspace slug from your Plane URL (e.g., "my-company" from https://app.plane.so/my-company)',
-                  })}
-                </p>
-              </fieldset>
-            </>
-          )}
+          <CreateCredentialFields
+            accessTokenControl={accessTokenControl}
+            baseUrl={baseUrlControl.value ?? ''}
+            fields={fields}
+            importerType={importerType}
+            selectedOrgId={selectedOrgId}
+          />
 
           {/* Check Frequency */}
           <fieldset className="fieldset">

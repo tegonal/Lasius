@@ -24,7 +24,7 @@ import { useTranslation } from 'react-i18next'
 import { Input } from '~/components/primitives/inputs/input'
 import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 
-type InputControl = {
+export type InputControl = {
   blur: () => void
   change: Dispatch<SetStateAction<string | undefined>>
   focus: () => void
