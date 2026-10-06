@@ -1,6 +1,8 @@
 {
   "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
   "ignorePatterns": [
+    "app/services/api/lasius/**",
+    "app/services/api/lasius-hooks/**",
     "app/services/api/orval-fetcher-client.ts",
     ".react-router/**",
     "public/help/**"
@@ -77,16 +79,12 @@
   },
   "overrides": [
     {
-      "files": ["app/services/api/lasius/**", "app/services/api/lasius-hooks/**"],
-      "rules": {
-        "unused-files": "off",
-        "unused-exports": "off",
-        "unused-types": "off",
-        "duplicate-exports": "off"
-      }
-    },
-    {
-      "files": ["app/services/api/orval-fetcher-client.ts", "orval.config.mjs", "public/help/**"],
+      "files": [
+        "app/hooks/use-api-proxy.ts",
+        "app/services/api/orval-fetcher-client.ts",
+        "orval.config.mjs",
+        "public/help/**"
+      ],
       "rules": {
         "unused-files": "off"
       }

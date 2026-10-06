@@ -12,7 +12,7 @@
     "start": "react-router-serve build/server/index.js",
     "typecheck": "react-router typegen && tsc --build --noEmit",
     "check": "yarn typecheck && yarn lint:fix && yarn prettier && echo '✓ Frontend check passed!'",
-    "fallow": "fallow check",
+    "fallow": "fallow",
     "fallow:health": "yarn test:coverage && fallow health --coverage coverage/coverage-final.json",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage --coverage.reporter=json --coverage.include='app/**/*.ts'",
