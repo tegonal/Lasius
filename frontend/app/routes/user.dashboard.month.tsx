@@ -17,7 +17,7 @@
  *
  */
 
-import { eachWeekOfInterval, endOfMonth, format, getWeek, startOfMonth } from 'date-fns'
+import { endOfMonth, format, startOfMonth } from 'date-fns'
 import { useTranslation } from 'react-i18next'
 import { data } from 'react-router'
 
@@ -30,12 +30,11 @@ import {
   dashboardResponseHeaders,
   loadDashboardContext,
 } from '~/features/dashboard/dashboard-loader.server'
+import { computeStreamChartData } from '~/features/dashboard/month-stream-chart-data'
 import { MonthStreamChart } from '~/features/stats/components/month-stream-chart'
 import { aggregateProjectHours } from '~/lib/api/functions/aggregate-project-hours'
-import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
 import { getPlannedHoursForRange } from '~/lib/api/functions/get-planned-working-hours'
 import { apiTimespanMonth } from '~/lib/utils/dates'
-import { type ModelsBooking } from '~/services/api/lasius'
 import {
   getUserBookingAggregatedStatsByOrganisation,
   getUserBookingListByOrganisation,
@@ -48,68 +47,6 @@ import { type Route } from './+types/user.dashboard.month'
 export const clientLoader = async (arguments_: Route.ClientLoaderArgs) =>
   dashboardClientLoader(arguments_)
 clientLoader.hydrate = false
-
-// ─── Stream chart computation ────────────────────────────────────────────────
-
-const computeStreamChartData = (bookings: ModelsBooking[], selectedDate: string) => {
-  const dateObject = new Date(selectedDate)
-  const monthStart = startOfMonth(dateObject)
-  const monthEnd = endOfMonth(dateObject)
-
-  const weeks = eachWeekOfInterval({ end: monthEnd, start: monthStart }, { weekStartsOn: 1 })
-  const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-
-  // Create a map to store hours by day and week
-  const hoursMap = new Map<string, Map<string, number>>()
-  for (const day of weekDays) {
-    const weekMap = new Map<string, number>()
-    for (const weekStart of weeks) {
-      const weekNumber = getWeek(weekStart, { weekStartsOn: 1 })
-      weekMap.set(`Week ${weekNumber}`, 0)
-    }
-    hoursMap.set(day, weekMap)
-  }
-
-  // Process bookings and aggregate by day and week
-  for (const booking of bookings) {
-    const bookingDate = new Date(booking.start.dateTime)
-    const dayName = format(bookingDate, 'EEE')
-    const weekNumber = getWeek(bookingDate, { weekStartsOn: 1 })
-    const weekLabel = `Week ${weekNumber}`
-
-    const dayMap = hoursMap.get(dayName)
-    if (dayMap && dayMap.has(weekLabel)) {
-      const hours = getModelsBookingSummary([booking]).hours
-      dayMap.set(weekLabel, (dayMap.get(weekLabel) ?? 0) + hours)
-    }
-  }
-
-  // Convert map to Nivo format: array of 7 objects (one per weekday)
-  const streamData: Record<string, number>[] = []
-  for (const day of weekDays) {
-    const dayData: Record<string, number> = {}
-    const dayMap = hoursMap.get(day)
-    if (dayMap) {
-      for (const [weekLabel, value] of dayMap) {
-        dayData[weekLabel] = Number(value.toFixed(2))
-      }
-    }
-    streamData.push(dayData)
-  }
-
-  // Only include weeks that have non-zero booking hours
-  const allKeys = new Set<string>()
-  for (const dayData of streamData) {
-    for (const key of Object.keys(dayData)) {
-      if (key.startsWith('Week') && streamData.some((d) => (d[key] as number) > 0)) {
-        allKeys.add(key)
-      }
-    }
-  }
-  const streamKeys = [...allKeys].toSorted((a, b) => a.localeCompare(b))
-
-  return { data: streamData, keys: streamKeys }
-}
 
 // ─── Loader ──────────────────────────────────────────────────────────────────
 
