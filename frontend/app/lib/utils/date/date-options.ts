@@ -36,16 +36,13 @@ import {
   startOfYesterday,
 } from 'date-fns'
 
+import { type SchemaTranslationFunction } from '~/lib/i18n-types'
 import { formatISOLocale } from '~/lib/utils/dates'
-
-/**
- * Stub `t` function — at module level we just return the defaultValue (or key).
- * The real `t()` runs in the component where `useTranslation` is available.
- */
-const t = (key: string, options?: { defaultValue?: string }) => options?.defaultValue ?? key
 
 export interface DateOption {
   dateRangeFn: (day: Date) => { from: string; to: string }
+  label: (t: SchemaTranslationFunction) => string
+  // The English name is the stored value of a range field, so it never changes with the language.
   name: string
 }
 
@@ -60,35 +57,40 @@ export const dateOptions: DateOption[] = [
       from: formatISOLocale(startOfYesterday()),
       to: formatISOLocale(endOfYesterday()),
     }),
-    name: t('time.yesterday', { defaultValue: 'Yesterday' }),
+    label: (t) => t('common:time.yesterday', { defaultValue: 'Yesterday' }),
+    name: 'Yesterday',
   },
   {
     dateRangeFn: (day: Date) => ({
       from: formatISOLocale(startOfWeek(day, { weekStartsOn: 1 })),
       to: formatISOLocale(endOfWeek(day, { weekStartsOn: 1 })),
     }),
-    name: t('time.thisWeek', { defaultValue: 'This week' }),
+    label: (t) => t('common:time.thisWeek', { defaultValue: 'This week' }),
+    name: 'This week',
   },
   {
     dateRangeFn: (day: Date) => ({
       from: formatISOLocale(startOfMonth(day)),
       to: formatISOLocale(endOfMonth(day)),
     }),
-    name: t('time.thisMonth', { defaultValue: 'This month' }),
+    label: (t) => t('common:time.thisMonth', { defaultValue: 'This month' }),
+    name: 'This month',
   },
   {
     dateRangeFn: (day: Date) => ({
       from: formatISOLocale(startOfQuarter(day)),
       to: formatISOLocale(endOfQuarter(day)),
     }),
-    name: t('time.thisQuarter', { defaultValue: 'This quarter' }),
+    label: (t) => t('common:time.thisQuarter', { defaultValue: 'This quarter' }),
+    name: 'This quarter',
   },
   {
     dateRangeFn: (day: Date) => ({
       from: formatISOLocale(startOfYear(day)),
       to: formatISOLocale(endOfYear(day)),
     }),
-    name: t('time.thisYear', { defaultValue: 'This year' }),
+    label: (t) => t('common:time.thisYear', { defaultValue: 'This year' }),
+    name: 'This year',
   },
   {
     dateRangeFn: (day: Date) => {
@@ -98,7 +100,8 @@ export const dateOptions: DateOption[] = [
         to: formatISOLocale(endOfWeek(reference, { weekStartsOn: 1 })),
       }
     },
-    name: t('time.lastWeek', { defaultValue: 'Last week' }),
+    label: (t) => t('common:time.lastWeek', { defaultValue: 'Last week' }),
+    name: 'Last week',
   },
   {
     dateRangeFn: (day: Date) => {
@@ -108,7 +111,8 @@ export const dateOptions: DateOption[] = [
         to: formatISOLocale(endOfMonth(reference)),
       }
     },
-    name: t('time.lastMonth', { defaultValue: 'Last month' }),
+    label: (t) => t('common:time.lastMonth', { defaultValue: 'Last month' }),
+    name: 'Last month',
   },
   {
     dateRangeFn: (day: Date) => {
@@ -118,7 +122,8 @@ export const dateOptions: DateOption[] = [
         to: formatISOLocale(endOfQuarter(reference)),
       }
     },
-    name: t('time.lastQuarter', { defaultValue: 'Last quarter' }),
+    label: (t) => t('common:time.lastQuarter', { defaultValue: 'Last quarter' }),
+    name: 'Last quarter',
   },
   {
     dateRangeFn: (day: Date) => {
@@ -128,13 +133,15 @@ export const dateOptions: DateOption[] = [
         to: formatISOLocale(endOfYear(reference)),
       }
     },
-    name: t('time.lastYear', { defaultValue: 'Last year' }),
+    label: (t) => t('common:time.lastYear', { defaultValue: 'Last year' }),
+    name: 'Last year',
   },
   {
     dateRangeFn: (day: Date) => ({
       from: formatISOLocale(startOfDay(day)),
       to: formatISOLocale(endOfDay(day)),
     }),
-    name: t('custom', { defaultValue: 'Custom' }),
+    label: (t) => t('common:custom', { defaultValue: 'Custom' }),
+    name: 'Custom',
   },
 ]

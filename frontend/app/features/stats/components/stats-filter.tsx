@@ -29,6 +29,7 @@ import { FormElement } from '~/components/ui/forms/form-element'
 import { InputDateStandalone } from '~/components/ui/forms/input/input-date-standalone'
 import { Select, type SelectOption } from '~/components/ui/forms/input/select'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+import { untyped } from '~/lib/i18n-types'
 import { dateOptions } from '~/lib/utils/date/date-options'
 import { formatISOLocale } from '~/lib/utils/dates'
 
@@ -49,7 +50,7 @@ export const StatsFilter = ({ inactiveProject = null }: StatsFilterProperties) =
   const hasChanges = selectedRange !== defaultDateRange
 
   const selectOptions: SelectOption[] = dateOptions.map((option) => ({
-    label: t(option.name as never),
+    label: option.label(untyped(t)),
     value: option.name,
   }))
 

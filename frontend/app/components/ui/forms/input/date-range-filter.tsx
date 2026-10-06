@@ -25,6 +25,7 @@ import { FormBody } from '~/components/ui/forms/form-body'
 import { FormElement } from '~/components/ui/forms/form-element'
 import { InputDatePicker } from '~/components/ui/forms/input/date-picker/input-date-picker'
 import { Select, type SelectOption } from '~/components/ui/forms/input/select'
+import { untyped } from '~/lib/i18n-types'
 import { dateOptions } from '~/lib/utils/date/date-options'
 
 export type DateRangeFilterProperties = {
@@ -42,7 +43,7 @@ export const DateRangeFilter = ({ fromField, rangeField, toField }: DateRangeFil
   const selectOptions: SelectOption[] = useMemo(
     () =>
       dateOptions.map((option) => ({
-        label: t(option.name as never),
+        label: option.label(untyped(t)),
         value: option.name,
       })),
     [t],
