@@ -19,9 +19,10 @@
 
 import { Select as BaseSelect } from '@base-ui/react/select'
 import { Check, ChevronDown } from 'lucide-react'
-import { type ReactNode, useEffect, useRef, useState } from 'react'
+import { type ReactNode } from 'react'
 
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+import { useDialogPortalContainer } from '~/components/ui/overlays/use-dialog-portal-container'
 import { cn } from '~/lib/utils/cn'
 
 type ListboxTriggerProperties = {
@@ -63,23 +64,12 @@ type ListboxOptionListProperties = {
 
 /** The option list of `Select` and `MultiSelect`, with a check mark on each selected option. */
 export const ListboxOptionList = ({ options, optionsClassName }: ListboxOptionListProperties) => {
-  const anchorReference = useRef<HTMLSpanElement>(null)
-  const [dialogContainer, setDialogContainer] = useState<HTMLElement | null>(null)
-
-  // Inside a modal dialog, the portal must render in the dialog focus trap.
-  // Decision: rr7-context-menu-popover.
-  useEffect(() => {
-    const dialog = anchorReference.current?.closest('[role="dialog"]')
-    if (dialog instanceof HTMLElement) {
-      setDialogContainer(dialog)
-    }
-  }, [])
+  const { anchorReference, container } = useDialogPortalContainer()
 
   return (
     <>
       <span className="hidden" ref={anchorReference} />
-      {/* Base UI renders no portal for a null container; undefined means document.body. */}
-      <BaseSelect.Portal container={dialogContainer ?? undefined}>
+      <BaseSelect.Portal container={container}>
         <BaseSelect.Positioner
           alignItemWithTrigger={false}
           className="z-50 w-[var(--anchor-width)]"

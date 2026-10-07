@@ -17,27 +17,39 @@
  *
  */
 
-import { type ReactNode } from 'react'
+import { Combobox } from '@base-ui/react/combobox'
+import { type ComponentProps } from 'react'
 
+import { useDialogPortalContainer } from '~/components/ui/overlays/use-dialog-portal-container'
 import { cn } from '~/lib/utils/cn'
 
+/** The option list of a Base UI combobox, at the width of its input group. */
 export const DropdownList = ({
   children,
   className,
 }: {
-  children: ReactNode
+  children: ComponentProps<typeof Combobox.List>['children']
   className?: string
 }) => {
+  const { anchorReference, container } = useDialogPortalContainer()
+
   return (
-    <div
-      className={cn(
-        'bg-base-100 border-base-content/20 absolute mt-1 rounded-lg border',
-        'h-auto max-h-[240px] w-full overflow-auto py-1',
-        'z-50 shadow-lg',
-        'scrollbar-thumb-base-content/20 scrollbar-thin scrollbar-track-transparent',
-        className,
-      )}>
-      {children}
-    </div>
+    <>
+      <span className="hidden" ref={anchorReference} />
+      <Combobox.Portal container={container}>
+        <Combobox.Positioner className="z-50 w-[var(--anchor-width)]" sideOffset={4}>
+          <Combobox.Popup
+            className={cn(
+              'bg-base-100 border-base-content/20 rounded-lg border',
+              'h-auto max-h-[240px] w-full overflow-auto py-1',
+              'shadow-lg',
+              'scrollbar-thumb-base-content/20 scrollbar-thin scrollbar-track-transparent',
+              className,
+            )}>
+            <Combobox.List>{children}</Combobox.List>
+          </Combobox.Popup>
+        </Combobox.Positioner>
+      </Combobox.Portal>
+    </>
   )
 }

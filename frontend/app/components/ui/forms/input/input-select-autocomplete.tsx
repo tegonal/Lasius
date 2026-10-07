@@ -17,13 +17,7 @@
  *
  */
 
-import {
-  Combobox,
-  ComboboxButton,
-  ComboboxInput,
-  ComboboxOption,
-  ComboboxOptions,
-} from '@headlessui/react'
+import { Combobox } from '@base-ui/react/combobox'
 import { ChevronDown, ChevronUp, X } from 'lucide-react'
 import React, { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -92,6 +86,7 @@ const ComboboxCore = ({
   const [inputText, setInputText] = useState<string>('')
   const [selected, setSelected] = useState<'' | SelectAutocompleteSuggestionType>('')
   const [filterText, setFilterText] = useState<string>('')
+  const [isOpen, setIsOpen] = useState(false)
 
   const resetSelection = () => {
     setSelected('')
@@ -136,9 +131,20 @@ const ComboboxCore = ({
   return (
     <>
       <div className="relative">
-        <Combobox
-          as="div"
-          onChange={(change: null | SelectAutocompleteSuggestionType) => {
+        <Combobox.Root
+          filter={null}
+          inputValue={inputText}
+          isItemEqualToValue={(item, current) => item.id === current.id}
+          items={availableSuggestions}
+          itemToStringLabel={(item: SelectAutocompleteSuggestionType) => item?.key || ''}
+          onInputValueChange={(text, details) => {
+            // Base UI also writes the label on select and on close. Only typing changes the filter.
+            if (details.reason !== 'input-change') return
+            setInputText(text)
+            setFilterText(text)
+          }}
+          onOpenChange={setIsOpen}
+          onValueChange={(change: null | SelectAutocompleteSuggestionType) => {
             if (!change?.id) {
               return
             }
@@ -151,71 +157,61 @@ const ComboboxCore = ({
               inputReference.current?.blur()
             }, 0)
           }}
+          open={isOpen}
           value={selected || null}>
-          {({ open }) => (
-            <>
-              <div className="join w-full">
-                <ComboboxButton as="div" className="join-item flex-1">
-                  <ComboboxInput
-                    as={Input}
-                    autoCapitalize="off"
-                    autoComplete="off"
-                    autoCorrect="off"
-                    className="mb-0 w-full text-sm"
-                    displayValue={(item: SelectAutocompleteSuggestionType) => item?.key || ''}
-                    id={id || fieldId}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                      const newValue = event.currentTarget.value
-                      setInputText(newValue)
-                      setFilterText(newValue)
-                    }}
-                    onFocus={() => {
-                      if (selected && inputText === selected?.key) {
-                        setFilterText('')
-                      }
-                    }}
-                    placeholder={t('projects.selectProject', 'Select project')}
-                    ref={inputReference}
-                    spellCheck={false}
-                    value={inputText}
-                  />
-                </ComboboxButton>
+          <Combobox.InputGroup className="join w-full">
+            <div className="join-item flex-1">
+              <Combobox.Input
+                autoCapitalize="off"
+                autoComplete="off"
+                autoCorrect="off"
+                id={id || fieldId}
+                onFocus={() => {
+                  if (selected && inputText === selected?.key) {
+                    setFilterText('')
+                  }
+                }}
+                placeholder={t('projects.selectProject', 'Select project')}
+                ref={inputReference}
+                render={<Input className="mb-0 w-full text-sm" />}
+                spellCheck={false}
+              />
+            </div>
 
-                {(selected || inputText) && (
-                  <button
-                    className="btn btn-neutral join-item px-2"
-                    onClick={resetSelection}
-                    type="button">
-                    <LucideIcon icon={X} size={20} />
-                  </button>
-                )}
+            {(selected || inputText) && (
+              <button
+                className="btn btn-neutral join-item px-2"
+                onClick={resetSelection}
+                type="button">
+                <LucideIcon icon={X} size={20} />
+              </button>
+            )}
 
-                <ComboboxButton className="btn btn-neutral join-item px-2">
-                  <LucideIcon icon={open ? ChevronUp : ChevronDown} size={20} />
-                </ComboboxButton>
-              </div>
-              <ComboboxOptions as="div">
-                {open && availableSuggestions.length > 0 && (
-                  <DropdownList>
-                    {availableSuggestions.map((suggestion) => (
-                      <ComboboxOption as="div" key={suggestion.key} value={suggestion}>
-                        {({ focus, selected: isSelected }) => (
-                          <DropdownListItem
-                            active={focus}
-                            itemSearchString={inputText}
-                            itemValue={suggestion.key}
-                            key={suggestion.id}
-                            selected={isSelected}
-                          />
-                        )}
-                      </ComboboxOption>
-                    ))}
-                  </DropdownList>
-                )}
-              </ComboboxOptions>
-            </>
+            <Combobox.Trigger className="btn btn-neutral join-item px-2">
+              <LucideIcon icon={isOpen ? ChevronUp : ChevronDown} size={20} />
+            </Combobox.Trigger>
+          </Combobox.InputGroup>
+          {availableSuggestions.length > 0 && (
+            <DropdownList>
+              {(suggestion: SelectAutocompleteSuggestionType) => (
+                <Combobox.Item
+                  key={suggestion.id}
+                  render={(itemProperties, state) => (
+                    <div {...itemProperties}>
+                      <DropdownListItem
+                        active={state.highlighted}
+                        itemSearchString={inputText}
+                        itemValue={suggestion.key}
+                        selected={state.selected}
+                      />
+                    </div>
+                  )}
+                  value={suggestion}
+                />
+              )}
+            </DropdownList>
           )}
-        </Combobox>
+        </Combobox.Root>
       </div>
       {statusMessage && (
         <div className={`${alertVariantClass[statusMessage.variant] || 'alert'} mt-2`}>

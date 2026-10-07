@@ -17,8 +17,8 @@
  *
  */
 
+import { Combobox } from '@base-ui/react/combobox'
 import { type FieldMetadata, useInputControl } from '@conform-to/react'
-import { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react'
 import { XCircleIcon } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -85,6 +85,7 @@ const TagsComboboxCore = ({
   const { t } = useTranslation('common')
   const [inputText, setInputText] = useState<string>('')
   const [isFocused, setIsFocused] = useState<boolean>(false)
+  const [isOpen, setIsOpen] = useState<boolean>(false)
 
   const filteredSuggestions = differenceById(
     suggestions as ModelsTagWithSummary[],
@@ -133,11 +134,12 @@ const TagsComboboxCore = ({
   const isDisplayCreateTag =
     inputText.length > 0 && selectedTags.every((s) => !(s && s.id === inputText))
 
-  const hasAnySuggestions = nonPlatformTags.length > 0 || platformTags.length > 0
-
-  const inputValueChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInputText(event.currentTarget.value)
-  }
+  // The custom tag option comes first, then the tags without and with an importer platform.
+  const listItems: ModelsTag[] = [
+    ...(isDisplayCreateTag ? [inputTag] : []),
+    ...nonPlatformTags,
+    ...platformTags,
+  ]
 
   return (
     <div>
@@ -147,73 +149,83 @@ const TagsComboboxCore = ({
         </div>
       )}
       <div className="relative">
-        <Combobox multiple onChange={handleChange} value={selectedTags}>
-          {({ open }) => (
-            <>
-              <ComboboxInput
-                autoComplete="off"
-                className="input input-bordered w-full pr-10 text-sm"
-                displayValue={() => inputText}
-                id={id}
-                onBlur={() => setIsFocused(false)}
-                onChange={inputValueChanged}
-                onFocus={() => setIsFocused(true)}
-                placeholder={t('tag-manager:chooseOrEnter', {
-                  defaultValue: 'Choose or enter tags',
-                })}
-                ref={inputRef}
-                value={inputText}
-              />
-              {inputText && (
-                <div
-                  className="hover:text-accent absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer"
-                  onClick={() => setInputText('')}>
-                  <LucideIcon icon={XCircleIcon} size={20} />
-                </div>
-              )}
-              <ComboboxOptions as="div" static={isFocused && !!projectId && !open}>
-                {(open || (isFocused && projectId)) &&
-                  (isDisplayCreateTag || hasAnySuggestions) && (
-                    <DropdownList className="flex flex-wrap gap-0 px-2">
-                      {isDisplayCreateTag && (
-                        <ComboboxOption
-                          as="div"
-                          className="mb-2 flex w-fit basis-full items-center gap-2 p-1"
-                          key="create_tag"
-                          value={inputTag}>
-                          {({ focus }) => (
-                            <>
-                              <div className="text-sm">{`${t('tag-manager:customTag', { defaultValue: 'Custom tag' })}: `}</div>
-                              <Tag
-                                active={focus}
-                                clickHandler={noop}
-                                hideRemoveIcon
-                                item={inputTag}
-                              />
-                            </>
-                          )}
-                        </ComboboxOption>
-                      )}
-                      {nonPlatformTags.map((item: ModelsTag) => (
-                        <ComboboxOption as="div" className="w-fit p-1" key={item.id} value={item}>
-                          {({ focus }: { focus: boolean }) => (
-                            <Tag active={focus} clickHandler={noop} hideRemoveIcon item={item} />
-                          )}
-                        </ComboboxOption>
-                      ))}
-                      {platformTags.map((item: ModelsTag) => (
-                        <ComboboxOption as="div" className="w-fit p-1" key={item.id} value={item}>
-                          {({ focus }: { focus: boolean }) => (
-                            <Tag active={focus} clickHandler={noop} hideRemoveIcon item={item} />
-                          )}
-                        </ComboboxOption>
-                      ))}
-                    </DropdownList>
-                  )}
-              </ComboboxOptions>
-            </>
+        <Combobox.Root
+          filter={null}
+          inputValue={inputText}
+          isItemEqualToValue={(item: ModelsTag, current: ModelsTag) => item.id === current.id}
+          items={listItems}
+          itemToStringLabel={(item: ModelsTag) => item.id}
+          multiple
+          onInputValueChange={(text, details) => {
+            // Base UI also clears the text on select. handleChange does that itself.
+            if (details.reason === 'input-change') setInputText(text)
+          }}
+          onOpenChange={setIsOpen}
+          onValueChange={handleChange}
+          // The list also shows while the input has the focus and a project is set.
+          open={isOpen || (isFocused && !!projectId)}
+          value={selectedTags}>
+          <Combobox.InputGroup>
+            <Combobox.Input
+              autoComplete="off"
+              className="input input-bordered w-full pr-10 text-sm"
+              id={id}
+              onBlur={() => setIsFocused(false)}
+              onFocus={() => setIsFocused(true)}
+              placeholder={t('tag-manager:chooseOrEnter', {
+                defaultValue: 'Choose or enter tags',
+              })}
+              ref={inputRef}
+            />
+            {inputText && (
+              <div
+                className="hover:text-accent absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer"
+                onClick={() => setInputText('')}>
+                <LucideIcon icon={XCircleIcon} size={20} />
+              </div>
+            )}
+          </Combobox.InputGroup>
+          {listItems.length > 0 && (
+            <DropdownList className="flex flex-wrap gap-0 px-2">
+              {(item: ModelsTag, index: number) =>
+                isDisplayCreateTag && index === 0 ? (
+                  <Combobox.Item
+                    className="mb-2 flex w-fit basis-full items-center gap-2 p-1"
+                    key="create_tag"
+                    render={(itemProperties, state) => (
+                      <div {...itemProperties}>
+                        <div className="text-sm">{`${t('tag-manager:customTag', { defaultValue: 'Custom tag' })}: `}</div>
+                        <Tag
+                          active={state.highlighted}
+                          clickHandler={noop}
+                          hideRemoveIcon
+                          item={inputTag}
+                        />
+                      </div>
+                    )}
+                    value={inputTag}
+                  />
+                ) : (
+                  <Combobox.Item
+                    className="w-fit p-1"
+                    key={`${isImporterTag(item) ? 'platform' : 'tag'}-${item.id}`}
+                    render={(itemProperties, state) => (
+                      <div {...itemProperties}>
+                        <Tag
+                          active={state.highlighted}
+                          clickHandler={noop}
+                          hideRemoveIcon
+                          item={item}
+                        />
+                      </div>
+                    )}
+                    value={item}
+                  />
+                )
+              }
+            </DropdownList>
           )}
-        </Combobox>
+        </Combobox.Root>
       </div>
     </div>
   )
