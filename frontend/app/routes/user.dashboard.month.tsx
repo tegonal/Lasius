@@ -34,7 +34,7 @@ import { computeStreamChartData } from '~/features/dashboard/month-stream-chart-
 import { MonthStreamChart } from '~/features/stats/components/month-stream-chart'
 import { aggregateProjectHours } from '~/lib/api/functions/aggregate-project-hours'
 import { getPlannedHoursForRange } from '~/lib/api/functions/get-planned-working-hours'
-import { apiTimespanMonth } from '~/lib/utils/dates'
+import { apiTimespanMonth, toCalendarDay } from '~/lib/utils/dates'
 import {
   getUserBookingAggregatedStatsByOrganisation,
   getUserBookingListByOrganisation,
@@ -55,7 +55,7 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
   const { headers, plannedHours, selectedDate, selectedOrgId } = context
 
   const monthTimespan = apiTimespanMonth(selectedDate)
-  const dateObject = new Date(selectedDate)
+  const dateObject = toCalendarDay(selectedDate)
   const monthStartDate = startOfMonth(dateObject)
   const monthEndDate = endOfMonth(dateObject)
 
@@ -100,7 +100,7 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
 export default function DashboardMonth({ loaderData }: Route.ComponentProps) {
   const { t } = useTranslation('common')
   const { selectedDate, stats, streamChart, topProjects } = loaderData
-  const dateObject = new Date(selectedDate)
+  const dateObject = toCalendarDay(selectedDate)
 
   return (
     <div className="@container space-y-6 px-4 py-6 sm:px-8">

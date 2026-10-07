@@ -37,7 +37,8 @@ import {
   getPlannedHoursForRange,
   getWeeklyPlannedHours,
 } from '~/lib/api/functions/get-planned-working-hours'
-import { formatDateTimeToURLParameter } from '~/lib/utils/dates'
+import { getUserClock } from '~/lib/cookies/time-zone-cookie.server'
+import { formatDateTimeToURLParameter, toCalendarDay } from '~/lib/utils/dates'
 import {
   getUserBookingAggregatedStatsByOrganisation,
   getUserBookingListByOrganisation,
@@ -60,8 +61,8 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
   const yearMode = url.searchParams.get('year') || 'rolling'
   const isCalendarYear = yearMode === 'calendar'
 
-  const dateObject = new Date(selectedDate)
-  const today = new Date()
+  const dateObject = toCalendarDay(selectedDate)
+  const today = getUserClock(request).now
 
   // Compute date range based on year mode
   let rangeStart: Date
@@ -131,7 +132,7 @@ export default function DashboardYear({ loaderData }: Route.ComponentProps) {
   const { t } = useTranslation('common')
   const [, setSearchParameters] = useSearchParams()
   const { isCalendarYear, selectedDate, stats, topProjects, weeklyData } = loaderData
-  const dateObject = new Date(selectedDate)
+  const dateObject = toCalendarDay(selectedDate)
 
   const toggleCalendarYear = () => {
     setSearchParameters((previous) => {

@@ -281,6 +281,25 @@ const themeInitScript = `
 })();
 `
 
+/**
+ * Inline script that writes the IANA time zone of the browser to the `tz` cookie.
+ * Server loaders read it with getUserClock(), so "today" is the day of the user.
+ */
+const timeZoneInitScript = `
+(function() {
+  try {
+    var zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (!zone) return;
+    var expected = 'tz=' + encodeURIComponent(zone);
+    var cookies = document.cookie.split(';');
+    for (var i = 0; i < cookies.length; i++) {
+      if (cookies[i].trim() === expected) return;
+    }
+    document.cookie = expected + ';path=/;max-age=31536000;samesite=lax' + (location.protocol === 'https:' ? ';secure' : '');
+  } catch (e) {}
+})();
+`
+
 export const Layout = ({ children }: PropsWithChildren) => {
   const { i18n } = useTranslation()
   const rootData = useRouteLoaderData<typeof loader>('root')
@@ -302,6 +321,7 @@ export const Layout = ({ children }: PropsWithChildren) => {
         <meta content="dark light" name="color-scheme" />
         <meta content="width=device-width, initial-scale=1" name="viewport" />
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        <script dangerouslySetInnerHTML={{ __html: timeZoneInitScript }} />
         <Links />
         <Meta />
       </head>

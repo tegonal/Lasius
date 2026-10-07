@@ -29,15 +29,16 @@ import { CalendarDay } from '~/features/calendar/components/calendar-day'
 import { useCalendarNavigation } from '~/features/calendar/hooks/use-calendar-navigation'
 import { useCalendarSelection } from '~/features/calendar/hooks/use-calendar-selection'
 import { usePersistedSearchParameter } from '~/hooks/use-persisted-search-parameter'
+import { useToday } from '~/hooks/use-today'
 import { cn } from '~/lib/utils/cn'
-import { formatDateToURLParameter } from '~/lib/utils/dates'
+import { toCalendarDay } from '~/lib/utils/dates'
 
 // ─── CalendarWeek ───────────────────────────────────────────────────────────
 
 /** Reads its bookings from the CalendarDataProvider that app-layout.tsx places around both headers. */
 export const CalendarWeek = () => {
   const { t } = useTranslation(['calendar', 'common'])
-  const selectedDate = usePersistedSearchParameter('date', formatDateToURLParameter(new Date()))
+  const selectedDate = usePersistedSearchParameter('date', useToday())
   const dayReferences = useRef<(HTMLElement | null)[]>([])
 
   const { next, period: week, previous } = useCalendarNavigation(selectedDate, 'week')
@@ -55,7 +56,7 @@ export const CalendarWeek = () => {
       <div className="min-w-0 flex-1 overflow-hidden md:max-w-[500px]">
         <div className="border-base-content/50 grid min-h-[22px] w-full grid-cols-3 border-b text-sm">
           <div>{week[0] && <FormatDate date={week[0]} format="monthNameLong" />}</div>
-          {isToday(new Date(selectedDay)) ? (
+          {isToday(toCalendarDay(selectedDay)) ? (
             <div />
           ) : (
             <Button

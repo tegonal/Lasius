@@ -27,7 +27,7 @@ import { useCalendarDaySummary } from '~/features/calendar/hooks/use-calendar-da
 import { useCalendarMonth } from '~/features/calendar/hooks/use-calendar-month'
 import { cn } from '~/lib/utils/cn'
 import { getDateLocale } from '~/lib/utils/date-locale'
-import { formatISOLocale, type IsoDateString } from '~/lib/utils/dates'
+import { formatISOLocale, type IsoDateString, toCalendarDay } from '~/lib/utils/dates'
 
 type CalendarDayCompactProperties = {
   day: IsoDateString
@@ -82,7 +82,7 @@ type Properties = {
 export const CalendarMonthCompact = ({ date, onDateChange }: Properties) => {
   const { i18n } = useTranslation('common')
   const locale = getDateLocale(i18n.language)
-  const selectedDate = new Date(date)
+  const selectedDate = toCalendarDay(date)
 
   const [viewDate, setViewDate] = useState(() => startOfMonth(selectedDate))
   const { monthDays, startOffset, weekDays } = useCalendarMonth(viewDate)

@@ -36,7 +36,7 @@ import {
   getPlannedHoursForRange,
   getWeeklyPlannedHours,
 } from '~/lib/api/functions/get-planned-working-hours'
-import { formatDateTimeToURLParameter } from '~/lib/utils/dates'
+import { formatDateTimeToURLParameter, toCalendarDay } from '~/lib/utils/dates'
 import {
   getUserBookingAggregatedStatsByOrganisation,
   getUserBookingListByOrganisation,
@@ -56,7 +56,7 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
   const context = await loadDashboardContext(request, url)
   const { headers, plannedHours, selectedDate, selectedOrgId } = context
 
-  const dateObject = new Date(selectedDate)
+  const dateObject = toCalendarDay(selectedDate)
   const rangeStart = subWeeks(dateObject, 26)
 
   // Build timespan for 26-week range

@@ -32,7 +32,7 @@ import {
 } from '~/features/dashboard/dashboard-loader.server'
 import { aggregateProjectHours } from '~/lib/api/functions/aggregate-project-hours'
 import { getPlannedHoursForDay } from '~/lib/api/functions/get-planned-working-hours'
-import { apiTimespanDay } from '~/lib/utils/dates'
+import { apiTimespanDay, toCalendarDay } from '~/lib/utils/dates'
 import {
   getUserBookingAggregatedStatsByOrganisation,
   getUserBookingListByOrganisation,
@@ -53,7 +53,7 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
   const { headers, plannedHours, selectedDate, selectedOrgId } = context
 
   const dayTimespan = apiTimespanDay(selectedDate)
-  const dateObject = new Date(selectedDate)
+  const dateObject = toCalendarDay(selectedDate)
   const dayDate = format(dateObject, 'yyyy-MM-dd')
 
   // Fetch day bookings and aggregated project stats in parallel
@@ -94,7 +94,7 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
 export default function DashboardDay({ loaderData }: Route.ComponentProps) {
   const { t } = useTranslation('common')
   const { projects, selectedDate, stats } = loaderData
-  const dateObject = new Date(selectedDate)
+  const dateObject = toCalendarDay(selectedDate)
 
   return (
     <div className="@container space-y-6 px-4 py-6 sm:px-8">

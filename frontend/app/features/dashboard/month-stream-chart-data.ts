@@ -20,6 +20,7 @@
 import { eachWeekOfInterval, endOfMonth, format, getWeek, startOfMonth } from 'date-fns'
 
 import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
+import { toCalendarDay } from '~/lib/utils/dates'
 import { type ModelsBooking } from '~/services/api/lasius'
 
 const WEEK_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
@@ -31,7 +32,7 @@ const weekLabel = (date: Date) => `Week ${getWeek(date, { weekStartsOn: 1 })}`
  * format. The keys list only the weeks that have booked hours.
  */
 export const computeStreamChartData = (bookings: ModelsBooking[], selectedDate: string) => {
-  const dateObject = new Date(selectedDate)
+  const dateObject = toCalendarDay(selectedDate)
   const weekLabels = eachWeekOfInterval(
     { end: endOfMonth(dateObject), start: startOfMonth(dateObject) },
     { weekStartsOn: 1 },

@@ -29,8 +29,9 @@ import { OnboardingTutorial } from '~/features/onboarding/components/onboarding-
 import { augmentBookingsList } from '~/lib/api/functions/augment-bookings-list'
 import { getExpectedVsBookedPercentage } from '~/lib/api/functions/get-expected-vs-booked-percentage'
 import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
+import { getUserClock } from '~/lib/cookies/time-zone-cookie.server'
 import { loadOrganisationContext } from '~/lib/organisation-helpers.server'
-import { apiTimespanDay, formatISOLocale } from '~/lib/utils/dates'
+import { apiTimespanDay, getWorkingHoursWeekdayString, isoDateOrFallback } from '~/lib/utils/dates'
 import { getOrganisationUserList } from '~/services/api/lasius/organisations/organisations'
 import {
   getUserBookingCurrent,
@@ -46,12 +47,7 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
   // The profile gives the planned working hours and the selected organisation
   const { auth, headers, selectedOrg, selectedOrgId } = await loadOrganisationContext(request, url)
 
-  // Read selected date from URL search param, fall back to today
-  const dateParameter = url.searchParams.get('date')
-  const selectedDate =
-    dateParameter && !Number.isNaN(new Date(dateParameter).getTime())
-      ? dateParameter
-      : formatISOLocale(new Date())
+  const selectedDate = isoDateOrFallback(url.searchParams.get('date'), getUserClock(request).today)
   const dayTimespan = apiTimespanDay(selectedDate)
 
   // Fetch day bookings, current booking, favorites, org current bookings, and users in parallel
@@ -75,20 +71,9 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
   const orgCurrentBookings = orgCurrentBookingsResponse.data?.timeBookings ?? []
   const orgUsers = orgUsersResponse.data ?? []
 
-  // Compute planned working hours for the selected day's weekday
-  const plannedHours = selectedOrg?.plannedWorkingHours
-  const weekdayNames: Record<number, string> = {
-    0: 'sunday',
-    1: 'monday',
-    2: 'tuesday',
-    3: 'wednesday',
-    4: 'thursday',
-    5: 'friday',
-    6: 'saturday',
-  }
-  const selectedWeekday = weekdayNames[new Date(selectedDate).getDay()] ?? 'monday'
+  // An organisation without planned hours gets 0, not the 8-hour default of the stats pages
   const plannedHoursDay =
-    (plannedHours as Record<string, number> | undefined)?.[selectedWeekday] ?? 0
+    selectedOrg?.plannedWorkingHours[getWorkingHoursWeekdayString(selectedDate)] ?? 0
 
   // Compute day summary
   const daySummary = getModelsBookingSummary(dayBookings)

@@ -21,6 +21,7 @@ import { data } from 'react-router'
 
 import { innerGridClasses } from '~/components/ui/layouts/layout-columns'
 import { BookingHistoryLayout } from '~/features/booking-history/components/booking-history-layout'
+import { getUserClock } from '~/lib/cookies/time-zone-cookie.server'
 import { loadOrganisationContext } from '~/lib/organisation-helpers.server'
 import { getListDateRange } from '~/lib/utils/date/list-date-range'
 import { apiTimespanFromTo } from '~/lib/utils/dates'
@@ -41,7 +42,8 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
     throw new Response('Unauthorized', { headers: mergeAuthHeaders(auth), status: 401 })
   }
 
-  const dateRange = getListDateRange(url.searchParams, new Date())
+  const clock = getUserClock(request)
+  const dateRange = getListDateRange(url.searchParams, clock.now, clock.formatISO)
   const timespan = apiTimespanFromTo(dateRange.from, dateRange.to)
 
   const [bookingsResponse, usersResponse, projectsResponse] = await Promise.all([

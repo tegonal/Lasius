@@ -31,7 +31,7 @@ import {
 } from '~/features/dashboard/dashboard-loader.server'
 import { aggregateProjectHours } from '~/lib/api/functions/aggregate-project-hours'
 import { getPlannedHoursForRange } from '~/lib/api/functions/get-planned-working-hours'
-import { apiTimespanWeek } from '~/lib/utils/dates'
+import { apiTimespanWeek, toCalendarDay } from '~/lib/utils/dates'
 import {
   getUserBookingAggregatedStatsByOrganisation,
   getUserBookingListByOrganisation,
@@ -52,7 +52,7 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
   const { headers, plannedHours, selectedDate, selectedOrgId } = context
 
   const weekTimespan = apiTimespanWeek(selectedDate)
-  const dateObject = new Date(selectedDate)
+  const dateObject = toCalendarDay(selectedDate)
   const weekStartDate = startOfWeek(dateObject, { weekStartsOn: 1 })
   const endOfWeekDate = endOfWeek(dateObject, { weekStartsOn: 1 })
 

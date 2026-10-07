@@ -17,11 +17,11 @@
  *
  */
 
-import { format, toDate } from 'date-fns'
+import { format } from 'date-fns'
 import { useCallback } from 'react'
 import { useSearchParams } from 'react-router'
 
-import { formatISOLocale, type IsoDateString } from '~/lib/utils/dates'
+import { formatISOLocale, type IsoDateString, toCalendarDay } from '~/lib/utils/dates'
 
 /** Simple yyyy-MM-dd format safe for URL search params (no +/: characters) */
 const toDateParameter = (d: Date): string => format(d, 'yyyy-MM-dd')
@@ -38,7 +38,7 @@ export const useCalendarSelection = (selectedDate: IsoDateString) => {
     (day: IsoDateString) => {
       setSearchParameters(
         (previous) => {
-          previous.set('date', toDateParameter(new Date(day)))
+          previous.set('date', toDateParameter(toCalendarDay(day)))
           return previous
         },
         { preventScrollReset: true },
@@ -52,7 +52,7 @@ export const useCalendarSelection = (selectedDate: IsoDateString) => {
   }, [selectDay])
 
   const getDay = (string_: IsoDateString) => {
-    return toDate(new Date(string_)).getDate()
+    return toCalendarDay(string_).getDate()
   }
 
   const isDaySelected = (day: IsoDateString) => {

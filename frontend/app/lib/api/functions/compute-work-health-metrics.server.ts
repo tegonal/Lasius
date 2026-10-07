@@ -19,6 +19,7 @@
 
 import { format, getWeek, getWeekYear, subWeeks } from 'date-fns'
 
+import { toCalendarDay } from '~/lib/utils/dates'
 import { durationInHoursAsNumber } from '~/lib/utils/duration'
 import { type ModelsBooking } from '~/services/api/lasius/modelsBooking'
 
@@ -103,7 +104,7 @@ export const computeWorkHealthMetrics = (
   const weekMap = groupBookingsByWeek(bookings)
   const weeks: WeekData[] = Array.from({ length: weeksToAnalyze }, (_, index) => {
     const { key, weekNumber, year } = weekOf(
-      subWeeks(new Date(referenceDate), weeksToAnalyze - 1 - index),
+      subWeeks(toCalendarDay(referenceDate), weeksToAnalyze - 1 - index),
     )
     return {
       hours: weekMap.get(key)?.hours || 0,

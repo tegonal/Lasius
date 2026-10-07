@@ -17,6 +17,7 @@
  *
  */
 
+import { getUserClock } from '~/lib/cookies/time-zone-cookie.server'
 import { loadOrganisationContext } from '~/lib/organisation-helpers.server'
 import { dateOptions } from '~/lib/utils/date/date-options'
 import { ModelsUserOrganisationRole } from '~/services/api/lasius/modelsUserOrganisationRole'
@@ -35,7 +36,8 @@ export const loadStatsContext = async (request: Request, url: URL) => {
   let to = url.searchParams.get('to')
 
   if (!from || !to) {
-    const defaultRange = dateOptions[0]?.dateRangeFn(new Date())
+    const clock = getUserClock(request)
+    const defaultRange = dateOptions[0]?.dateRangeFn(clock.now, clock.formatISO)
     from = defaultRange?.from ?? ''
     to = defaultRange?.to ?? ''
   }

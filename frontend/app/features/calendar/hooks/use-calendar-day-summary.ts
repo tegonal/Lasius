@@ -23,7 +23,7 @@ import { useMemo } from 'react'
 
 import { useCalendarData } from '~/features/calendar/calendar-data-provider'
 import { getExpectedVsBookedPercentage } from '~/lib/api/functions/get-expected-vs-booked-percentage'
-import { type IsoDateString } from '~/lib/utils/dates'
+import { type IsoDateString, toCalendarDay } from '~/lib/utils/dates'
 
 const DEFAULT_PLANNED_HOURS = 8
 
@@ -52,7 +52,7 @@ const durationInHours = (start: string, end: string): number => {
 export const useCalendarDaySummary = (date: IsoDateString) => {
   const { bookings } = useCalendarData()
   const plannedWorkingHours = DEFAULT_PLANNED_HOURS
-  const targetDate = useMemo(() => new Date(date), [date])
+  const targetDate = useMemo(() => toCalendarDay(date), [date])
 
   // Filter bookings for this specific day
   const dayBookings = useMemo(() => {

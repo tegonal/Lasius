@@ -20,7 +20,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { loadOrganisationContext } from '~/lib/organisation-helpers.server'
-import { formatISOLocale } from '~/lib/utils/dates'
 
 import { loadDashboardContext } from './dashboard-loader.server'
 
@@ -72,10 +71,24 @@ describe('loadDashboardContext', () => {
   it.each([
     ['an invalid date', '?date=not-a-date'],
     ['no date', ''],
-  ])('falls back to today with %s', async (_label, search) => {
+  ])('falls back to today in the default zone with %s', async (_label, search) => {
     const context = await loadDashboardContext(request, urlWith(search))
 
-    expect(context.selectedDate).toBe(formatISOLocale(new Date(2026, 9, 7, 12, 0, 0)))
+    expect(context.selectedDate).toBe('2026-10-07')
+  })
+
+  it('falls back to today in the zone of the tz cookie', async () => {
+    // 02:00 UTC is 04:00 on 7 October in Zurich and 22:00 on 6 October in New York.
+    vi.setSystemTime(new Date('2026-10-07T02:00:00.000Z'))
+    const newYorkRequest = new Request('http://localhost/user/home', {
+      headers: { Cookie: 'tz=America%2FNew_York' },
+    })
+
+    const zurich = await loadDashboardContext(request, urlWith(''))
+    const newYork = await loadDashboardContext(newYorkRequest, urlWith(''))
+
+    expect(zurich.selectedDate).toBe('2026-10-07')
+    expect(newYork.selectedDate).toBe('2026-10-06')
   })
 
   it('returns null planned hours for an organisation without planned hours', async () => {

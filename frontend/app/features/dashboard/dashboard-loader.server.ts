@@ -19,8 +19,9 @@
 
 import { getExpectedVsBookedPercentage } from '~/lib/api/functions/get-expected-vs-booked-percentage'
 import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
+import { getUserClock } from '~/lib/cookies/time-zone-cookie.server'
 import { loadOrganisationContext } from '~/lib/organisation-helpers.server'
-import { formatISOLocale } from '~/lib/utils/dates'
+import { isoDateOrFallback } from '~/lib/utils/dates'
 import { type ModelsBooking } from '~/services/api/lasius'
 import { mergeAuthHeaders, type requireUser } from '~/services/auth/auth-helpers.server'
 
@@ -36,12 +37,7 @@ export const loadDashboardContext = async (request: Request, url: URL) => {
     ? { ...selectedOrg.plannedWorkingHours }
     : null
 
-  // Read selected date from URL search param, fall back to today
-  const dateParameter = url.searchParams.get('date')
-  const selectedDate =
-    dateParameter && !Number.isNaN(new Date(dateParameter).getTime())
-      ? dateParameter
-      : formatISOLocale(new Date())
+  const selectedDate = isoDateOrFallback(url.searchParams.get('date'), getUserClock(request).today)
 
   return {
     auth,

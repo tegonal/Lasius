@@ -22,7 +22,7 @@ import { memo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { getDateLocale } from '~/lib/utils/date-locale'
-import { formatISOLocale, type IsoDateString } from '~/lib/utils/dates'
+import { formatISOLocale, type IsoDateString, toLocalDate } from '~/lib/utils/dates'
 
 // ─── Format map ──────────────────────────────────────────────────────────────
 
@@ -53,7 +53,7 @@ export const FormatDate = memo(function FormatDate({
   const { i18n } = useTranslation('common')
   const locale = getDateLocale(i18n.language)
   const dateString = typeof date === 'string' ? date : formatISOLocale(date)
-  const formatted = format(new Date(dateString), dateFormats[formatKey], {
+  const formatted = format(toLocalDate(dateString), dateFormats[formatKey], {
     locale,
   })
   return <>{formatted}</>

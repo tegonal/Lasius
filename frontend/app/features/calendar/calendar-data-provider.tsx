@@ -23,7 +23,8 @@ import { useFetcher } from 'react-router'
 import {
   apiTimespanMonth,
   apiTimespanWeek,
-  formatISOLocale,
+  formatDateToURLParameter,
+  isoDateOrFallback,
   type IsoDateString,
 } from '~/lib/utils/dates'
 import { type ModelsBooking } from '~/services/api/lasius/modelsBooking'
@@ -61,7 +62,7 @@ export const CalendarDataProvider = ({
 }) => {
   const fetcher = useFetcher<{ bookings: ModelsBooking[] }>()
 
-  const safeDate = Number.isNaN(new Date(date).getTime()) ? formatISOLocale(new Date()) : date
+  const safeDate = isoDateOrFallback(date, formatDateToURLParameter(new Date()))
 
   const timespan = useMemo(
     () => (period === 'week' ? apiTimespanWeek(safeDate) : apiTimespanMonth(safeDate)),

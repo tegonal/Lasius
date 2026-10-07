@@ -40,8 +40,8 @@ import { TermsOfServiceDialog } from '~/features/terms-of-service/components/ter
 import { loadTermsOfService } from '~/features/terms-of-service/terms-of-service.server'
 import { usePersistedSearchParameter } from '~/hooks/use-persisted-search-parameter'
 import { DEFAULT_LOCALE, isLocale } from '~/i18n-config'
+import { getUserClock } from '~/lib/cookies/time-zone-cookie.server'
 import { getDeduplicatedUserProfile } from '~/lib/organisation-helpers.server'
-import { formatDateToURLParameter } from '~/lib/utils/dates'
 import { getLocale } from '~/middleware/i18next'
 import { getUserBookingCurrent } from '~/services/api/lasius/user-bookings/user-bookings'
 import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
@@ -80,6 +80,8 @@ export const loader = async ({ context, request, url }: Route.LoaderArgs) => {
     {
       currentBooking: currentBookingResponse.data,
       termsOfService,
+      // The fallback for a missing ?date= param. The server render and the hydration then use the same day.
+      today: getUserClock(request).today,
       tokenIssuer: auth.session.tokenIssuer,
       user: profile.data,
       websocketUrl: process.env.LASIUS_API_WEBSOCKET_URL || '',
@@ -91,7 +93,7 @@ export const loader = async ({ context, request, url }: Route.LoaderArgs) => {
 export default function AppLayout({ loaderData }: Route.ComponentProps) {
   const { t } = useTranslation('common')
   const { selectedOrganisationId } = useOrganisation()
-  const selectedDate = usePersistedSearchParameter('date', formatDateToURLParameter(new Date()))
+  const selectedDate = usePersistedSearchParameter('date', loaderData.today)
   const hasActiveBooking = Boolean(loaderData.currentBooking?.booking)
 
   return (

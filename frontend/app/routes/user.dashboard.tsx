@@ -17,7 +17,7 @@
  *
  */
 
-import { endOfWeek, format, startOfWeek, subWeeks } from 'date-fns'
+import { endOfWeek, format, isValid, startOfWeek, subWeeks } from 'date-fns'
 import { data, Outlet, type ShouldRevalidateFunctionArgs, useSearchParams } from 'react-router'
 
 import { ColumnCenter, ColumnRight, innerGridClasses } from '~/components/ui/layouts/layout-columns'
@@ -31,7 +31,7 @@ import {
 } from '~/features/dashboard/dashboard-loader.server'
 import { computeWorkHealthMetrics } from '~/lib/api/functions/compute-work-health-metrics.server'
 import { getWeeklyPlannedHours } from '~/lib/api/functions/get-planned-working-hours'
-import { formatDateTimeToURLParameter } from '~/lib/utils/dates'
+import { formatDateTimeToURLParameter, toCalendarDay } from '~/lib/utils/dates'
 import { getUserBookingListByOrganisation } from '~/services/api/lasius/user-bookings/user-bookings'
 
 import { type Route } from './+types/user.dashboard'
@@ -60,7 +60,7 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
   const weeklyPlannedHours = getWeeklyPlannedHours(plannedHours)
 
   // Fetch 12-week booking data for burnout metrics
-  const referenceDate = new Date(selectedDate)
+  const referenceDate = toCalendarDay(selectedDate)
   const from = formatDateTimeToURLParameter(
     startOfWeek(subWeeks(referenceDate, WEEKS_TO_ANALYZE - 1), {
       weekStartsOn: 1,
@@ -99,12 +99,10 @@ const DashboardLayout = ({ loaderData }: Route.ComponentProps) => {
   const [searchParameters, setSearchParameters] = useSearchParams()
   const dateParameter = searchParameters.get('date')
   const date =
-    dateParameter && !Number.isNaN(new Date(dateParameter).getTime())
-      ? dateParameter
-      : loaderData.selectedDate
+    dateParameter && isValid(toCalendarDay(dateParameter)) ? dateParameter : loaderData.selectedDate
 
   const handleDateChange = (newDate: string) => {
-    const safe = format(new Date(newDate), 'yyyy-MM-dd')
+    const safe = format(toCalendarDay(newDate), 'yyyy-MM-dd')
     setSearchParameters((previous) => {
       const next = new URLSearchParams(previous)
       next.set('date', safe)

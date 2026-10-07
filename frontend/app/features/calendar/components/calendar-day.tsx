@@ -25,7 +25,7 @@ import { FormatDate } from '~/components/ui/data-display/format-date'
 import { ProgressBarSmall } from '~/components/ui/data-display/progress-bar-small'
 import { useCalendarDaySummary } from '~/features/calendar/hooks/use-calendar-day-summary'
 import { cn } from '~/lib/utils/cn'
-import { type IsoDateString } from '~/lib/utils/dates'
+import { type IsoDateString, toCalendarDay } from '~/lib/utils/dates'
 
 export const CalendarDay = ({
   date,
@@ -52,7 +52,7 @@ const CalendarDayContent = ({
   isSelected: boolean
   onClick: (arguments_: IsoDateString) => void
 }) => {
-  const day = new Date(date)
+  const day = toCalendarDay(date)
   const { progressBarPercentage } = useCalendarDaySummary(date)
 
   return (

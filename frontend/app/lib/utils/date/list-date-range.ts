@@ -22,11 +22,12 @@ import { formatISOLocale } from '~/lib/utils/dates'
 
 /**
  * The date range of a booking list: the `from` and `to` search params when both are set, else the
- * range of the first date option.
+ * range of the first date option. A loader passes `getUserClock(request)` as `now` and `formatDate`.
  */
 export const getListDateRange = (
   searchParameters: URLSearchParams,
   now: Date,
+  formatDate: (date: Date) => string = formatISOLocale,
 ): { from: string; to: string } => {
   const fromParameter = searchParameters.get('from')
   const toParameter = searchParameters.get('to')
@@ -37,6 +38,6 @@ export const getListDateRange = (
 
   const firstOption = dateOptions[0]
   return firstOption
-    ? firstOption.dateRangeFn(now)
-    : { from: formatISOLocale(now), to: formatISOLocale(now) }
+    ? firstOption.dateRangeFn(now, formatDate)
+    : { from: formatDate(now), to: formatDate(now) }
 }

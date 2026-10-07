@@ -18,6 +18,7 @@
  */
 
 import {
+  addDays,
   addMonths,
   addQuarters,
   addWeeks,
@@ -27,20 +28,20 @@ import {
   endOfQuarter,
   endOfWeek,
   endOfYear,
-  endOfYesterday,
   startOfDay,
   startOfMonth,
   startOfQuarter,
   startOfWeek,
   startOfYear,
-  startOfYesterday,
 } from 'date-fns'
 
 import { type SchemaTranslationFunction } from '~/lib/i18n-types'
 import { formatISOLocale } from '~/lib/utils/dates'
 
 export interface DateOption {
-  dateRangeFn: (day: Date) => { from: string; to: string }
+  // A server loader passes the user clock: `day` holds the user's wall time, and formatDate adds
+  // the user's offset instead of the server offset.
+  dateRangeFn: (day: Date, formatDate?: (date: Date) => string) => { from: string; to: string }
   label: (t: SchemaTranslationFunction) => string
   // The English name is the stored value of a range field, so it never changes with the language.
   name: string
@@ -53,93 +54,93 @@ export interface DateOption {
  */
 export const dateOptions: DateOption[] = [
   {
-    dateRangeFn: (_day: Date) => ({
-      from: formatISOLocale(startOfYesterday()),
-      to: formatISOLocale(endOfYesterday()),
+    dateRangeFn: (day: Date, formatDate = formatISOLocale) => ({
+      from: formatDate(startOfDay(addDays(day, -1))),
+      to: formatDate(endOfDay(addDays(day, -1))),
     }),
     label: (t) => t('common:time.yesterday', { defaultValue: 'Yesterday' }),
     name: 'Yesterday',
   },
   {
-    dateRangeFn: (day: Date) => ({
-      from: formatISOLocale(startOfWeek(day, { weekStartsOn: 1 })),
-      to: formatISOLocale(endOfWeek(day, { weekStartsOn: 1 })),
+    dateRangeFn: (day: Date, formatDate = formatISOLocale) => ({
+      from: formatDate(startOfWeek(day, { weekStartsOn: 1 })),
+      to: formatDate(endOfWeek(day, { weekStartsOn: 1 })),
     }),
     label: (t) => t('common:time.thisWeek', { defaultValue: 'This week' }),
     name: 'This week',
   },
   {
-    dateRangeFn: (day: Date) => ({
-      from: formatISOLocale(startOfMonth(day)),
-      to: formatISOLocale(endOfMonth(day)),
+    dateRangeFn: (day: Date, formatDate = formatISOLocale) => ({
+      from: formatDate(startOfMonth(day)),
+      to: formatDate(endOfMonth(day)),
     }),
     label: (t) => t('common:time.thisMonth', { defaultValue: 'This month' }),
     name: 'This month',
   },
   {
-    dateRangeFn: (day: Date) => ({
-      from: formatISOLocale(startOfQuarter(day)),
-      to: formatISOLocale(endOfQuarter(day)),
+    dateRangeFn: (day: Date, formatDate = formatISOLocale) => ({
+      from: formatDate(startOfQuarter(day)),
+      to: formatDate(endOfQuarter(day)),
     }),
     label: (t) => t('common:time.thisQuarter', { defaultValue: 'This quarter' }),
     name: 'This quarter',
   },
   {
-    dateRangeFn: (day: Date) => ({
-      from: formatISOLocale(startOfYear(day)),
-      to: formatISOLocale(endOfYear(day)),
+    dateRangeFn: (day: Date, formatDate = formatISOLocale) => ({
+      from: formatDate(startOfYear(day)),
+      to: formatDate(endOfYear(day)),
     }),
     label: (t) => t('common:time.thisYear', { defaultValue: 'This year' }),
     name: 'This year',
   },
   {
-    dateRangeFn: (day: Date) => {
+    dateRangeFn: (day: Date, formatDate = formatISOLocale) => {
       const reference = addWeeks(day, -1)
       return {
-        from: formatISOLocale(startOfWeek(reference, { weekStartsOn: 1 })),
-        to: formatISOLocale(endOfWeek(reference, { weekStartsOn: 1 })),
+        from: formatDate(startOfWeek(reference, { weekStartsOn: 1 })),
+        to: formatDate(endOfWeek(reference, { weekStartsOn: 1 })),
       }
     },
     label: (t) => t('common:time.lastWeek', { defaultValue: 'Last week' }),
     name: 'Last week',
   },
   {
-    dateRangeFn: (day: Date) => {
+    dateRangeFn: (day: Date, formatDate = formatISOLocale) => {
       const reference = addMonths(day, -1)
       return {
-        from: formatISOLocale(startOfMonth(reference)),
-        to: formatISOLocale(endOfMonth(reference)),
+        from: formatDate(startOfMonth(reference)),
+        to: formatDate(endOfMonth(reference)),
       }
     },
     label: (t) => t('common:time.lastMonth', { defaultValue: 'Last month' }),
     name: 'Last month',
   },
   {
-    dateRangeFn: (day: Date) => {
+    dateRangeFn: (day: Date, formatDate = formatISOLocale) => {
       const reference = addQuarters(day, -1)
       return {
-        from: formatISOLocale(startOfQuarter(reference)),
-        to: formatISOLocale(endOfQuarter(reference)),
+        from: formatDate(startOfQuarter(reference)),
+        to: formatDate(endOfQuarter(reference)),
       }
     },
     label: (t) => t('common:time.lastQuarter', { defaultValue: 'Last quarter' }),
     name: 'Last quarter',
   },
   {
-    dateRangeFn: (day: Date) => {
+    dateRangeFn: (day: Date, formatDate = formatISOLocale) => {
       const reference = addYears(day, -1)
       return {
-        from: formatISOLocale(startOfYear(reference)),
-        to: formatISOLocale(endOfYear(reference)),
+        from: formatDate(startOfYear(reference)),
+        to: formatDate(endOfYear(reference)),
       }
     },
     label: (t) => t('common:time.lastYear', { defaultValue: 'Last year' }),
     name: 'Last year',
   },
   {
-    dateRangeFn: (day: Date) => ({
-      from: formatISOLocale(startOfDay(day)),
-      to: formatISOLocale(endOfDay(day)),
+    dateRangeFn: (day: Date, formatDate = formatISOLocale) => ({
+      from: formatDate(startOfDay(day)),
+      to: formatDate(endOfDay(day)),
     }),
     label: (t) => t('common:custom', { defaultValue: 'Custom' }),
     name: 'Custom',

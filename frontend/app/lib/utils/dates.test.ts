@@ -28,7 +28,122 @@ import {
   formatISOLocale,
   getMonthOfDate,
   getWeekOfDate,
+  getWorkingHoursWeekdayString,
+  isoDateOrFallback,
+  toCalendarDay,
+  toLocalDate,
 } from './dates'
+
+describe('isoDateOrFallback', () => {
+  const fallback = '2024-01-15'
+
+  it('returns a valid ISO date unchanged', () => {
+    expect(isoDateOrFallback('2024-03-01', fallback)).toBe('2024-03-01')
+    expect(isoDateOrFallback('2024-03-01T08:00:00.000+01:00', fallback)).toBe(
+      '2024-03-01T08:00:00.000+01:00',
+    )
+  })
+
+  it('returns the fallback for a missing, empty or invalid value', () => {
+    expect(isoDateOrFallback(null, fallback)).toBe(fallback)
+    expect(isoDateOrFallback('', fallback)).toBe(fallback)
+    expect(isoDateOrFallback('not-a-date', fallback)).toBe(fallback)
+    expect(isoDateOrFallback('2024-13-45', fallback)).toBe(fallback)
+  })
+
+  it('accepts ISO forms that only parseISO reads and non-ISO forms that only new Date reads', () => {
+    for (const value of ['2024-W10', '20240303', '2024/03/03']) {
+      expect(isoDateOrFallback(value, fallback)).toBe(value)
+      expect(() => apiTimespanDay(value)).not.toThrow()
+    }
+  })
+})
+
+// A UTC parse of "2026-10-05" gives 4 October west of UTC. Run with TZ=America/New_York to check.
+describe('a date-only string is a local date', () => {
+  const monday = '2026-10-05'
+
+  it('getWorkingHoursWeekdayString', () => {
+    expect(getWorkingHoursWeekdayString(monday)).toBe('monday')
+  })
+
+  it('apiTimespanDay', () => {
+    expect(apiTimespanDay(monday)).toEqual({
+      from: '2026-10-05T00:00:00.000',
+      to: '2026-10-05T23:59:59.999',
+    })
+  })
+
+  it('apiTimespanWeek', () => {
+    expect(apiTimespanWeek(monday)).toEqual({
+      from: '2026-10-05T00:00:00.000',
+      to: '2026-10-11T23:59:59.999',
+    })
+  })
+
+  it('apiTimespanMonth on the first day of the month', () => {
+    expect(apiTimespanMonth('2026-10-01')).toEqual({
+      from: '2026-10-01T00:00:00.000',
+      to: '2026-10-31T23:59:59.999',
+    })
+  })
+
+  it('apiTimespanFromTo and apiDatespanFromTo', () => {
+    expect(apiTimespanFromTo(monday, monday)).toEqual({
+      from: '2026-10-05T00:00:00.000',
+      to: '2026-10-05T23:59:59.999',
+    })
+    expect(apiDatespanFromTo(monday, monday)).toEqual({ from: '2026-10-05', to: '2026-10-05' })
+  })
+
+  it('getWeekOfDate and getMonthOfDate', () => {
+    const week = getWeekOfDate(monday)
+    expect([week[0]?.slice(0, 10), week[6]?.slice(0, 10)]).toEqual(['2026-10-05', '2026-10-11'])
+    const month = getMonthOfDate('2026-10-01')
+    expect([month[0]?.slice(0, 10), month.length]).toEqual(['2026-10-01', 31])
+  })
+})
+
+// A range bound carries the offset of the browser that wrote it. The server must keep the written day.
+describe('a range bound with an offset keeps its written day', () => {
+  it.each([
+    ['Tokyo', '+09:00'],
+    ['New York', '-04:00'],
+    ['Zurich', '+02:00'],
+  ])('apiTimespanFromTo and apiDatespanFromTo for %s', (_zone, offset) => {
+    const from = `2026-10-07T00:00:00.000${offset}`
+    const to = `2026-10-07T23:59:59.999${offset}`
+    expect(apiTimespanFromTo(from, to)).toEqual({
+      from: '2026-10-07T00:00:00.000',
+      to: '2026-10-07T23:59:59.999',
+    })
+    expect(apiDatespanFromTo(from, to)).toEqual({ from: '2026-10-07', to: '2026-10-07' })
+  })
+
+  it('apiTimespanDay and getWeekOfDate', () => {
+    expect(apiTimespanDay('2026-10-05T23:30:00.000+09:00').from).toBe('2026-10-05T00:00:00.000')
+    expect(getWeekOfDate('2026-10-05T01:00:00.000-04:00')[0]?.slice(0, 10)).toBe('2026-10-05')
+  })
+})
+
+describe('toCalendarDay and toLocalDate', () => {
+  it('toCalendarDay returns local midnight of the written day', () => {
+    const day = toCalendarDay('2026-10-05T23:30:00.000+09:00')
+    expect([day.getFullYear(), day.getMonth(), day.getDate(), day.getHours()]).toEqual([
+      2026, 9, 5, 0,
+    ])
+  })
+
+  it('toLocalDate keeps the instant of a string with an offset', () => {
+    const instant = '2026-10-05T23:30:00.000+09:00'
+    expect(toLocalDate(instant).getTime()).toBe(new Date(instant).getTime())
+  })
+
+  it('both read non-ISO input like new Date', () => {
+    expect(toCalendarDay('2024/03/03').getTime()).toBe(new Date('2024/03/03').getTime())
+    expect(toLocalDate('2024/03/03').getTime()).toBe(new Date('2024/03/03').getTime())
+  })
+})
 
 describe('formatISOLocale', () => {
   it('formats a valid date to ISO string with timezone offset', () => {

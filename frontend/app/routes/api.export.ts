@@ -26,7 +26,7 @@ import { filterModelsBookingListProjectId } from '~/lib/api/functions/filter-mod
 import { filterModelsBookingListUserId } from '~/lib/api/functions/filter-models-booking-list-user-id'
 import { logger } from '~/lib/logger'
 import { exportBookingList, type ExportFormat } from '~/lib/utils/data/export'
-import { apiTimespanFromTo } from '~/lib/utils/dates'
+import { apiTimespanFromTo, toCalendarDay } from '~/lib/utils/dates'
 import { exportStatistics } from '~/lib/utils/statistics-export'
 import { type ModelsBookingStats } from '~/services/api/lasius/modelsBookingStats'
 import {
@@ -44,13 +44,13 @@ import { type Route } from './+types/api.export'
 const apiDateFormat = 'yyyy-MM-dd'
 
 const formatDateParameter = (dateString: string): string => {
-  const date = new Date(dateString)
+  const date = toCalendarDay(dateString)
   if (!isValid(date)) return dateString
   return format(startOfDay(date), apiDateFormat)
 }
 
 const formatDateParameterEnd = (dateString: string): string => {
-  const date = new Date(dateString)
+  const date = toCalendarDay(dateString)
   if (!isValid(date)) return dateString
   return format(endOfDay(date), apiDateFormat)
 }

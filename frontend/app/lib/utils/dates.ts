@@ -80,11 +80,39 @@ export const formatISOLocale = (d: Date): string => {
 }
 
 /**
+ * Parses a date string in the local time zone. new Date reads a date-only ISO string such as
+ * "2026-10-05" as UTC midnight, which is the day before west of UTC. Non-ISO input keeps the
+ * new Date parse.
+ */
+export const toLocalDate = (date: Date | IsoDateString): Date => {
+  if (typeof date !== 'string') return date
+  const parsed = parseISO(date)
+  return isValid(parsed) ? parsed : new Date(date)
+}
+
+/**
+ * Local midnight of the calendar day at the start of the string. The offset belongs to the zone of
+ * the browser that wrote the string, so it never moves the day. Use it for a date param or a range bound.
+ */
+export const toCalendarDay = (date: Date | IsoDateString): Date => {
+  if (typeof date !== 'string') return date
+  const day = /^\d{4}-\d{2}-\d{2}/.exec(date)?.[0]
+  return day ? parseISO(day) : toLocalDate(date)
+}
+
+/**
+ * Returns the value when it is a valid date, else the fallback. Use it for a date search param,
+ * which the user can edit. On the server, pass `getUserClock(request).today` as the fallback.
+ */
+export const isoDateOrFallback = (value: null | string, fallback: IsoDateString): IsoDateString =>
+  value && isValid(toCalendarDay(value)) ? value : fallback
+
+/**
  * Get an array of IsoDateStrings that represent the days of the week that date is in
  * @param date
  */
 export const getWeekOfDate = (date: Date | IsoDateString): IsoDateString[] => {
-  const localDate = typeof date === 'string' ? new Date(date) : date
+  const localDate = toCalendarDay(date)
   return eachDayOfInterval({
     end: endOfWeek(localDate, { weekStartsOn: 1 }),
     start: startOfWeek(localDate, { weekStartsOn: 1 }),
@@ -96,7 +124,7 @@ export const getWeekOfDate = (date: Date | IsoDateString): IsoDateString[] => {
  * @param date
  */
 export const getMonthOfDate = (date: Date | IsoDateString): IsoDateString[] => {
-  const localDate = typeof date === 'string' ? new Date(date) : date
+  const localDate = toCalendarDay(date)
   return eachDayOfInterval({
     end: endOfMonth(localDate),
     start: startOfMonth(localDate),
@@ -119,7 +147,7 @@ export const formatDateTimeToURLParameter = (date: Date): ApiDateParameter => {
 export const apiTimespanWeek = (
   date: IsoDateString,
 ): { from: ApiDateParameter; to: ApiDateParameter } => {
-  const dateObject = new Date(date)
+  const dateObject = toCalendarDay(date)
   return {
     from: formatDateTimeToURLParameter(startOfDay(startOfWeek(dateObject, { weekStartsOn: 1 }))),
     to: formatDateTimeToURLParameter(endOfDay(endOfWeek(dateObject, { weekStartsOn: 1 }))),
@@ -133,7 +161,7 @@ export const apiTimespanWeek = (
 export const apiTimespanMonth = (
   date: IsoDateString,
 ): { from: ApiDateParameter; to: ApiDateParameter } => {
-  const dateObject = new Date(date)
+  const dateObject = toCalendarDay(date)
   return {
     from: formatDateTimeToURLParameter(startOfDay(startOfMonth(dateObject))),
     to: formatDateTimeToURLParameter(endOfDay(endOfMonth(dateObject))),
@@ -146,7 +174,7 @@ export const apiTimespanMonth = (
 export const apiTimespanDay = (
   date: IsoDateString,
 ): { from: ApiDateParameter; to: ApiDateParameter } => {
-  const dateObject = new Date(date)
+  const dateObject = toCalendarDay(date)
   return {
     from: formatDateTimeToURLParameter(startOfDay(dateObject)),
     to: formatDateTimeToURLParameter(endOfDay(dateObject)),
@@ -163,8 +191,8 @@ const spanFromTo = (
   formatParameter: (date: Date) => ApiDateParameter,
 ): null | { from: ApiDateParameter; to: ApiDateParameter } => {
   if (!from || !to) return null
-  const fromDate = new Date(from)
-  const toDate = new Date(to)
+  const fromDate = toCalendarDay(from)
+  const toDate = toCalendarDay(to)
   if (!isValid(fromDate) || !isValid(toDate)) return null
   return {
     from: formatParameter(startOfDay(fromDate)),
@@ -216,6 +244,5 @@ export const decimalHoursToObject = (value: number): { hours: number; minutes: n
  * Returns the English weekday name matching ModelsWorkingHoursWeekdays.
  */
 export const getWorkingHoursWeekdayString = (date: IsoDateString): ModelsWorkingHoursWeekdays => {
-  const parsed = typeof date === 'string' ? parseISO(date) : date
-  return format(parsed, 'EEEE', {}).toLowerCase() as ModelsWorkingHoursWeekdays
+  return format(toCalendarDay(date), 'EEEE', {}).toLowerCase() as ModelsWorkingHoursWeekdays
 }
