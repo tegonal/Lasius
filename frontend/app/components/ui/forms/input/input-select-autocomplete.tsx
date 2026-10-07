@@ -19,16 +19,20 @@
 
 import { Combobox } from '@base-ui/react/combobox'
 import { ChevronDown, ChevronUp, X } from 'lucide-react'
-import React, { useRef, useState } from 'react'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Input } from '~/components/primitives/inputs/input'
 import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { guardComboboxKey } from '~/components/ui/forms/input/shared/combobox-key-guard'
+import {
+  ComboboxStatusAlert,
+  type ComboboxStatusMessage,
+} from '~/components/ui/forms/input/shared/combobox-status-alert'
 import { DropdownList } from '~/components/ui/forms/input/shared/dropdown-list'
 import { DropdownListItem } from '~/components/ui/forms/input/shared/dropdown-list-item'
+import { useComboboxSelection } from '~/components/ui/forms/input/shared/use-combobox-selection'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
-import { cleanStringForComparison } from '~/lib/utils/strings'
 import { type ModelsEntityReference } from '~/services/api/lasius'
 
 export type SelectAutocompleteSuggestionType = ModelsEntityReference
@@ -43,19 +47,10 @@ type InputSelectAutocompleteProperties = {
   /** Called when the selected value changes (receives the entity ID or empty string) */
   onChange: (value: string) => void
   selectedItem?: null | SelectAutocompleteSuggestionType
-  statusMessage?: null | {
-    text: string
-    variant: 'error' | 'info' | 'warning'
-  }
+  statusMessage?: ComboboxStatusMessage | null
   suggestions: SelectAutocompleteSuggestionType[]
   /** Current value (entity ID) — controlled by parent's useInputControl */
   value: string
-}
-
-const alertVariantClass: Record<string, string> = {
-  error: 'alert alert-error',
-  info: 'alert alert-info',
-  warning: 'alert alert-warning',
 }
 
 /**
@@ -74,60 +69,23 @@ const ComboboxCore = ({
   id?: string
   onChange: (change: null | SelectAutocompleteSuggestionType) => void
   selectedItem?: null | SelectAutocompleteSuggestionType
-  statusMessage?: null | {
-    text: string
-    variant: 'error' | 'info' | 'warning'
-  }
+  statusMessage?: ComboboxStatusMessage | null
   suggestions: SelectAutocompleteSuggestionType[]
   value: string
 }) => {
   const { t } = useTranslation('common')
-  const inputReference = useRef<HTMLInputElement>(null)
-
-  const [inputText, setInputText] = useState<string>('')
-  const [selected, setSelected] = useState<'' | SelectAutocompleteSuggestionType>('')
-  const [filterText, setFilterText] = useState<string>('')
-  const [isOpen, setIsOpen] = useState(false)
-
-  const resetSelection = () => {
-    setSelected('')
-    setInputText('')
-    setFilterText('')
-    onChange(null)
-    setTimeout(() => {
-      inputReference.current?.focus()
-    }, 0)
-  }
-
-  // Sync the local combobox state when the parent value or the selected item changes
-  const [syncedProperties, setSyncedProperties] = useState<null | {
-    selectedItem: typeof selectedItem
-    value: string
-  }>(null)
-  if (syncedProperties?.value !== value || syncedProperties.selectedItem !== selectedItem) {
-    setSyncedProperties({ selectedItem, value })
-    if (value && selectedItem) {
-      setSelected(selectedItem)
-      setInputText(selectedItem.key)
-      setFilterText(selectedItem.key)
-    } else if (value) {
-      setSelected('')
-      setInputText(`[${value}]`)
-      setFilterText('')
-    } else {
-      setSelected('')
-      setInputText('')
-      setFilterText('')
-    }
-  }
-
-  const availableSuggestions = (
-    filterText
-      ? suggestions.filter((item) =>
-          cleanStringForComparison(item.key).includes(cleanStringForComparison(filterText)),
-        )
-      : suggestions
-  ).toSorted((a, b) => (a.key ?? '').localeCompare(b.key ?? ''))
+  const {
+    availableSuggestions,
+    handleFocus,
+    handleInputValueChange,
+    handleValueChange,
+    inputReference,
+    inputText,
+    isOpen,
+    resetSelection,
+    selected,
+    setIsOpen,
+  } = useComboboxSelection({ onChange, selectedItem, suggestions, value })
 
   return (
     <>
@@ -138,26 +96,9 @@ const ComboboxCore = ({
           isItemEqualToValue={(item, current) => item.id === current.id}
           items={availableSuggestions}
           itemToStringLabel={(item: SelectAutocompleteSuggestionType) => item?.key || ''}
-          onInputValueChange={(text, details) => {
-            // Base UI also writes the label on select and on close. Only typing changes the filter.
-            if (details.reason !== 'input-change') return
-            setInputText(text)
-            setFilterText(text)
-          }}
+          onInputValueChange={(text, details) => handleInputValueChange(text, details.reason)}
           onOpenChange={setIsOpen}
-          onValueChange={(change: null | SelectAutocompleteSuggestionType) => {
-            if (!change?.id) {
-              return
-            }
-
-            setSelected(change)
-            setInputText(change.key)
-            setFilterText(change.key)
-            onChange(change)
-            setTimeout(() => {
-              inputReference.current?.blur()
-            }, 0)
-          }}
+          onValueChange={handleValueChange}
           open={isOpen}
           value={selected || null}>
           <Combobox.InputGroup className="join w-full">
@@ -167,11 +108,7 @@ const ComboboxCore = ({
                 autoComplete="off"
                 autoCorrect="off"
                 id={id || fieldId}
-                onFocus={() => {
-                  if (selected && inputText === selected?.key) {
-                    setFilterText('')
-                  }
-                }}
+                onFocus={handleFocus}
                 onKeyDown={(event) => guardComboboxKey(event, isOpen)}
                 placeholder={t('projects.selectProject', 'Select project')}
                 ref={inputReference}
@@ -215,11 +152,7 @@ const ComboboxCore = ({
           )}
         </Combobox.Root>
       </div>
-      {statusMessage && (
-        <div className={`${alertVariantClass[statusMessage.variant] || 'alert'} mt-2`}>
-          {statusMessage.text}
-        </div>
-      )}
+      <ComboboxStatusAlert message={statusMessage} />
     </>
   )
 }
