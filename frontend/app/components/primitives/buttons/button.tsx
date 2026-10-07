@@ -104,6 +104,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProperties>(
       loading,
       shape,
       size,
+      // HTML makes a button in a form a submit button. A submit button sets type="submit".
+      type = 'button',
       variant,
       ...properties
     },
@@ -127,6 +129,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProperties>(
         )}
         disabled={isDisabled}
         ref={reference}
+        type={type}
         {...properties}>
         {loading && <span className="loading loading-spinner loading-sm" />}
         {children}

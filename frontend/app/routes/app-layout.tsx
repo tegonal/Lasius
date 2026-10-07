@@ -126,6 +126,7 @@ export default function AppLayout({ loaderData }: Route.ComponentProps) {
                     data-testid="auth-logout-btn"
                     fullWidth={false}
                     shape="circle"
+                    type="submit"
                     variant="ghost">
                     <LucideIcon icon={LogOutIcon} size={20} />
                   </Button>
