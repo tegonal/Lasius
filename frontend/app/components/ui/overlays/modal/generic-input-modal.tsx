@@ -17,7 +17,6 @@
  *
  */
 
-import { type FieldMetadata, getInputProps } from '@conform-to/react'
 import React, { useRef } from 'react'
 
 import { Button } from '~/components/primitives/buttons/button'
@@ -25,109 +24,25 @@ import { Input } from '~/components/primitives/inputs/input'
 import { Label } from '~/components/primitives/typography/label'
 import { ButtonGroup } from '~/components/ui/forms/button-group'
 import { FormElement } from '~/components/ui/forms/form-element'
-import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 
 import { Modal } from './modal'
 import { ModalCloseButton } from './modal-close-button'
 
-type ConformProperties = SharedProperties & {
-  /** @deprecated Use field prop instead */
-  error?: never
-  field: FieldMetadata<string>
-  /** @deprecated Use field prop instead */
-  fieldName?: never
-  onChange?: never
-  /** @deprecated Use field prop instead */
-  register?: never
-  value?: never
-}
-
-type ControlledProperties = SharedProperties & {
-  error?: never
-  field?: never
-  fieldName?: never
-  onChange: (value: string) => void
-  register?: never
-  value: string
-}
-
-type GenericInputModalProperties = ConformProperties | ControlledProperties
-
-type SharedProperties = {
+type GenericInputModalProperties = {
   cancelLabel?: string
   confirmLabel: string
   enableEnterKey?: boolean
   label: string
+  onChange: (value: string) => void
   onClose: () => void
   onConfirm: () => void
   open: boolean
   placeholder: string
+  value: string
 }
 
-/**
- * Generic input modal component for text input with form validation.
- * Supports both Conform (field prop) and Controlled (value/onChange props) modes.
- */
-export const GenericInputModal = (properties: GenericInputModalProperties) => {
-  if (properties.field) {
-    return <ConformInputModal {...properties} field={properties.field} />
-  }
-  return (
-    <ControlledInputModal {...properties} onChange={properties.onChange} value={properties.value} />
-  )
-}
-
-const ConformInputModal = ({
-  cancelLabel = 'Close',
-  confirmLabel,
-  enableEnterKey = false,
-  field,
-  label,
-  onClose,
-  onConfirm,
-  open,
-  placeholder,
-}: SharedProperties & { field: FieldMetadata<string> }) => {
-  const inputReference = useRef<HTMLInputElement>(null)
-
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (!(enableEnterKey && event.key === 'Enter')) {
-      return
-    }
-
-    event.preventDefault()
-    onConfirm()
-  }
-
-  return (
-    <Modal initialFocus={inputReference} onClose={onClose} open={open}>
-      <ModalCloseButton onClose={onClose} />
-      <FormElement>
-        <Label htmlFor={field.id}>{label}</Label>
-        <Input
-          {...getInputProps(field, { type: 'text' })}
-          autoComplete="off"
-          key={field.key}
-          onKeyDown={enableEnterKey ? handleKeyDown : undefined}
-          placeholder={placeholder}
-          ref={inputReference}
-        />
-        <FormFieldErrors errors={field.errors} />
-      </FormElement>
-      <ButtonGroup>
-        <Button onClick={onConfirm} type="button" variant="primary">
-          {confirmLabel}
-        </Button>
-        <Button onClick={onClose} type="button" variant="secondary">
-          {cancelLabel}
-        </Button>
-      </ButtonGroup>
-    </Modal>
-  )
-}
-
-/** Controlled mode — value/onChange props */
-const ControlledInputModal = ({
+/** Modal with one controlled text input and a confirm and a cancel button. */
+export const GenericInputModal = ({
   cancelLabel = 'Close',
   confirmLabel,
   enableEnterKey = false,
@@ -138,7 +53,7 @@ const ControlledInputModal = ({
   open,
   placeholder,
   value,
-}: SharedProperties & { onChange: (value: string) => void; value: string }) => {
+}: GenericInputModalProperties) => {
   const inputReference = useRef<HTMLInputElement>(null)
 
   const handleKeyDown = (event: React.KeyboardEvent) => {

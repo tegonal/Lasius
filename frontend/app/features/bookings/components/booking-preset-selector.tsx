@@ -74,11 +74,9 @@ const PresetButton = ({
   </button>
 )
 
-const BookingPresetItem = ({
-  item,
-}: {
-  item: { projectReference: { id: string; key: string }; tags: ModelsTag[] }
-}) => (
+type PresetItem = { projectReference: { id: string; key: string }; tags: ModelsTag[] }
+
+const BookingPresetItem = ({ item }: { item: PresetItem }) => (
   <div className="flex-1 space-y-1">
     <div className="text-sm font-medium">
       {item.projectReference.key || item.projectReference.id}
@@ -98,6 +96,45 @@ const AnimatedItem = ({ children, index }: { children: React.ReactNode; index: n
     {children}
   </div>
 )
+
+const PresetList = <T extends PresetItem>({
+  getAriaLabel,
+  items,
+  onSelect,
+  renderLeading,
+}: {
+  // Each list passes its own t() call, so the translation key stays static.
+  getAriaLabel: (values: { projectName: string; tags: string }) => string
+  items: T[]
+  onSelect: (preset: PresetSelection) => void
+  renderLeading?: (item: T) => React.ReactNode
+}) => {
+  if (items.length === 0) return <EmptyState />
+
+  return (
+    <AnimatedList>
+      {items.map((item, index) => {
+        const projectName = item.projectReference.key || item.projectReference.id
+
+        return (
+          <AnimatedItem index={index} key={stringHash(item)}>
+            <PresetButton
+              ariaLabel={getAriaLabel({
+                projectName,
+                tags: item.tags.length > 0 ? ` with ${item.tags.length} tags` : '',
+              })}
+              onClick={() =>
+                onSelect({ projectId: item.projectReference.id, projectName, tags: item.tags })
+              }>
+              {renderLeading?.(item)}
+              <BookingPresetItem item={item} />
+            </PresetButton>
+          </AnimatedItem>
+        )
+      })}
+    </AnimatedList>
+  )
+}
 
 const deduplicateBookings = (items: ModelsBooking[], limit = 20) => {
   const seen = new Set<string>()
@@ -142,36 +179,14 @@ const RecentBookingsList = ({
     })
   }, [selectedOrgId, submitRecentBookings])
 
-  const items = recentBookings ?? []
-  const unique = deduplicateBookings(items)
-
-  if (unique.length === 0) return <EmptyState />
-
   return (
-    <AnimatedList>
-      {unique.map((item, index) => (
-        <AnimatedItem index={index} key={stringHash(item)}>
-          <PresetButton
-            ariaLabel={t(
-              'bookings:presets.selectRecent',
-              'Select recent booking: {{projectName}}{{tags}}',
-              {
-                projectName: item.projectReference.key || item.projectReference.id,
-                tags: item.tags.length > 0 ? ` with ${item.tags.length} tags` : '',
-              },
-            )}
-            onClick={() =>
-              onSelect({
-                projectId: item.projectReference.id,
-                projectName: item.projectReference.key || item.projectReference.id,
-                tags: item.tags,
-              })
-            }>
-            <BookingPresetItem item={item} />
-          </PresetButton>
-        </AnimatedItem>
-      ))}
-    </AnimatedList>
+    <PresetList
+      getAriaLabel={(values) =>
+        t('bookings:presets.selectRecent', 'Select recent booking: {{projectName}}{{tags}}', values)
+      }
+      items={deduplicateBookings(recentBookings ?? [])}
+      onSelect={onSelect}
+    />
   )
 }
 
@@ -193,35 +208,14 @@ const FavoritesList = ({
     }
   }, [selectedOrgId, submitFavoriteBookings])
 
-  const items = favoriteBookings?.favorites ?? []
-
-  if (items.length === 0) return <EmptyState />
-
   return (
-    <AnimatedList>
-      {items.map((item, index) => (
-        <AnimatedItem index={index} key={stringHash(item)}>
-          <PresetButton
-            ariaLabel={t(
-              'bookings:presets.selectFavorite',
-              'Select favorite: {{projectName}}{{tags}}',
-              {
-                projectName: item.projectReference.key || item.projectReference.id,
-                tags: item.tags.length > 0 ? ` with ${item.tags.length} tags` : '',
-              },
-            )}
-            onClick={() =>
-              onSelect({
-                projectId: item.projectReference.id,
-                projectName: item.projectReference.key || item.projectReference.id,
-                tags: item.tags,
-              })
-            }>
-            <BookingPresetItem item={item} />
-          </PresetButton>
-        </AnimatedItem>
-      ))}
-    </AnimatedList>
+    <PresetList
+      getAriaLabel={(values) =>
+        t('bookings:presets.selectFavorite', 'Select favorite: {{projectName}}{{tags}}', values)
+      }
+      items={favoriteBookings?.favorites ?? []}
+      onSelect={onSelect}
+    />
   )
 }
 
@@ -250,41 +244,21 @@ const TeamBookingsList = ({
     })
   }, [selectedOrgId, submitTeamBookings])
 
-  const items = teamBookings ?? []
-  const unique = deduplicateBookings(items)
-
-  if (unique.length === 0) return <EmptyState />
-
   return (
-    <AnimatedList>
-      {unique.map((item, index) => (
-        <AnimatedItem index={index} key={stringHash(item)}>
-          <PresetButton
-            ariaLabel={t(
-              'bookings:presets.selectTeam',
-              'Select team booking: {{projectName}}{{tags}}',
-              {
-                projectName: item.projectReference.key || item.projectReference.id,
-                tags: item.tags.length > 0 ? ` with ${item.tags.length} tags` : '',
-              },
-            )}
-            onClick={() =>
-              onSelect({
-                projectId: item.projectReference.id,
-                projectName: item.projectReference.key || item.projectReference.id,
-                tags: item.tags,
-              })
-            }>
-            <AvatarUser
-              firstName={item.userReference?.key?.split(' ', 1)[0] ?? '?'}
-              lastName={item.userReference?.key?.split(' ', 2)[1] ?? ''}
-              size={32}
-            />
-            <BookingPresetItem item={item} />
-          </PresetButton>
-        </AnimatedItem>
-      ))}
-    </AnimatedList>
+    <PresetList
+      getAriaLabel={(values) =>
+        t('bookings:presets.selectTeam', 'Select team booking: {{projectName}}{{tags}}', values)
+      }
+      items={deduplicateBookings(teamBookings ?? [])}
+      onSelect={onSelect}
+      renderLeading={(item) => (
+        <AvatarUser
+          firstName={item.userReference?.key?.split(' ', 1)[0] ?? '?'}
+          lastName={item.userReference?.key?.split(' ', 2)[1] ?? ''}
+          size={32}
+        />
+      )}
+    />
   )
 }
 

@@ -22,12 +22,10 @@ import { useTranslation } from 'react-i18next'
 import { useRevalidator } from 'react-router'
 
 import { useToast } from '~/components/ui/feedback/use-toast'
+import { useRefreshTagsWithToasts } from '~/features/integrations/hooks/use-refresh-tags-with-toasts'
 import { logger } from '~/lib/logger'
 import { type ModelsIssueImporterConfigResponse } from '~/services/api/lasius'
-import {
-  useDeleteConfig,
-  useRefreshTags,
-} from '~/services/api/lasius-hooks/issue-importers/issue-importers'
+import { useDeleteConfig } from '~/services/api/lasius-hooks/issue-importers/issue-importers'
 
 // The backend answers 409 when the configuration still has project mappings. The list can be
 // stale, because another session can add a mapping after the confirm dialog opened.
@@ -120,24 +118,7 @@ export function useIssueImporterConfigManagement(
     setSelectedConfig(null)
   }, [])
 
-  const refreshTagsApi = useRefreshTags({
-    onError: () => {
-      addToast({
-        message: t('issueImporters.errors.tagsRefreshFailed', {
-          defaultValue: 'Failed to refresh tags',
-        }),
-        type: 'ERROR',
-      })
-    },
-    onSuccess: () => {
-      addToast({
-        message: t('issueImporters.success.tagsRefreshed', {
-          defaultValue: 'Tags refresh triggered successfully',
-        }),
-        type: 'SUCCESS',
-      })
-    },
-  })
+  const refreshTagsApi = useRefreshTagsWithToasts()
 
   const handleDelete = useCallback(() => {
     if (!selectedConfig) return

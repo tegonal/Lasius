@@ -21,16 +21,14 @@ import { UserMinus } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { Button } from '~/components/primitives/buttons/button'
-import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { GenericConfirmModal } from '~/components/ui/overlays/modal/generic-confirm-modal'
+import { ContextButtonAction } from '~/features/context-menu/buttons/context-button-action'
 import { ContextButtonClose } from '~/features/context-menu/buttons/context-button-close'
 import { ContextButtonOpen } from '~/features/context-menu/buttons/context-button-open'
 import { ContextAnimatePresence } from '~/features/context-menu/context-animate-presence'
 import { ContextBar } from '~/features/context-menu/context-bar'
 import { ContextBarDivider } from '~/features/context-menu/context-bar-divider'
 import { ContextBody } from '~/features/context-menu/context-body'
-import { ContextButtonWrapper } from '~/features/context-menu/context-button-wrapper'
 import { useContextMenu } from '~/features/context-menu/hooks/use-context-menu'
 import { type ModelsUserStub } from '~/services/api/lasius'
 import { useRemoveOrganisationUser } from '~/services/api/lasius-hooks/organisations/organisations'
@@ -70,17 +68,12 @@ export const OrganisationMemberActions = ({ onRemoveComplete, orgId, user }: Pro
         <ContextButtonOpen />
         <ContextAnimatePresence variant="compact">
           <ContextBar>
-            <ContextButtonWrapper variant="compact">
-              <Button
-                aria-label={t('members.actions.remove', 'Remove member')}
-                fullWidth={false}
-                onClick={showRemoveConfirm}
-                shape="circle"
-                title={t('members.actions.remove', 'Remove member')}
-                variant="contextIcon">
-                <LucideIcon icon={UserMinus} size={24} />
-              </Button>
-            </ContextButtonWrapper>
+            <ContextButtonAction
+              icon={UserMinus}
+              label={t('members.actions.remove', 'Remove member')}
+              onClick={showRemoveConfirm}
+              variant="compact"
+            />
             <ContextBarDivider />
             <ContextButtonClose variant="compact" />
           </ContextBar>

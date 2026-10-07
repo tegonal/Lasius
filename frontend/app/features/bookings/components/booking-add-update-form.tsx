@@ -32,13 +32,13 @@ import { FormBody } from '~/components/ui/forms/form-body'
 import { FormElement } from '~/components/ui/forms/form-element'
 import { InputDatePicker } from '~/components/ui/forms/input/date-picker/input-date-picker'
 import { InputDatePickerDuration } from '~/components/ui/forms/input/date-picker/input-date-picker-duration'
-import { ProjectSelect } from '~/components/ui/forms/input/project-select'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+import { BookingProjectTagsFields } from '~/features/bookings/components/booking-project-tags-fields'
+import { useFocusTagsOnProjectChange } from '~/features/bookings/hooks/use-focus-tags-on-project-change'
 import { useProjectTags } from '~/features/bookings/hooks/use-project-tags'
 import { createBookingSchema, parseTagsFromFormData } from '~/features/bookings/lib/booking-schemas'
 import { ModalHelpButton } from '~/features/help/components/help-button'
 import { useProjects } from '~/features/projects/hooks/use-projects'
-import { InputTagsAutocomplete } from '~/features/tags/components/input-tags-autocomplete'
 import { untyped } from '~/lib/i18n-types'
 import { formatISOLocale } from '~/lib/utils/dates'
 import { type ModelsBooking, type ModelsTag } from '~/services/api/lasius'
@@ -229,12 +229,7 @@ export const BookingAddUpdateForm = ({
   }, [startControl.value, endControl.value])
   const isShowDurationWarning = durationHours > 8
 
-  // Auto-focus tags after project selection
-  useEffect(() => {
-    if (projectIdControl.value && fields.tags.id) {
-      document.querySelector<HTMLElement>(`#${fields.tags.id}`)?.focus()
-    }
-  }, [projectIdControl.value, fields.tags.id])
+  useFocusTagsOnProjectChange(projectIdControl.value, fields.tags.id)
 
   // Auto-adjust end date when start changes — preserve time offset
   const previousStartReference = useRef(startControl.value)
@@ -345,29 +340,15 @@ export const BookingAddUpdateForm = ({
                   </Button>
                   <ModalHelpButton helpKey="modal-add-edit-booking" />
                 </div>
-                <FormElement
-                  htmlFor={fields.projectId.id}
-                  label={t('projects:label', 'Project')}
-                  required>
-                  <ProjectSelect
-                    errors={fields.projectId.errors}
-                    fallbackProject={itemUpdate?.projectReference}
-                    id={fields.projectId.id}
-                    name={fields.projectId.name}
-                    onChange={(id) => projectIdControl.change(id)}
-                    projects={projects}
-                    value={projectIdControl.value ?? ''}
-                  />
-                </FormElement>
-                <FormElement htmlFor={fields.tags.id} label={t('tag-manager:label', 'Tags')}>
-                  <InputTagsAutocomplete
-                    field={fields.tags}
-                    id={fields.tags.id}
-                    key={fields.tags.key}
-                    projectId={projectIdControl.value}
-                    suggestions={projectTags}
-                  />
-                </FormElement>
+                <BookingProjectTagsFields
+                  fallbackProject={itemUpdate?.projectReference}
+                  onProjectChange={(id) => projectIdControl.change(id)}
+                  projectField={fields.projectId}
+                  projectId={projectIdControl.value}
+                  projects={projects}
+                  projectTags={projectTags}
+                  tagsField={fields.tags}
+                />
               </FieldSet>
 
               <FieldSet className="flex items-start gap-4">

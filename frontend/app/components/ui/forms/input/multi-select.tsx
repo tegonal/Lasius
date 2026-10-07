@@ -17,18 +17,10 @@
  *
  */
 
-import {
-  Listbox,
-  ListboxButton,
-  ListboxOption,
-  ListboxOptions,
-  Transition,
-} from '@headlessui/react'
-import { Check, ChevronDown } from 'lucide-react'
-import { Fragment } from 'react'
+import { Listbox } from '@headlessui/react'
 import { useTranslation } from 'react-i18next'
 
-import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+import { ListboxOptionList, ListboxTrigger } from '~/components/ui/forms/input/listbox-parts'
 import { cn } from '~/lib/utils/cn'
 
 export interface MultiSelectOption {
@@ -77,71 +69,13 @@ export const MultiSelect = ({
   return (
     <Listbox disabled={disabled} multiple name={name} onChange={onChange} value={value}>
       <div className={cn('join relative w-full', className)}>
-        <ListboxButton
-          className={cn(
-            'input input-bordered join-item w-full text-left',
-            'focus-visible:border-primary focus:outline-none',
-            'disabled:bg-base-200 disabled:text-base-content/50',
-            buttonClassName,
-          )}
-          id={id}>
-          <span
-            className={cn(
-              'block truncate',
-              selectedOptions.length === 0 && 'text-base-content/50',
-            )}>
-            {displayText}
-          </span>
-        </ListboxButton>
-        <ListboxButton className="btn btn-neutral join-item px-2">
-          <LucideIcon aria-hidden="true" icon={ChevronDown} size={20} />
-        </ListboxButton>
-        <Transition
-          as={Fragment}
-          leave="transition ease-in duration-100"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0">
-          <ListboxOptions
-            className={cn(
-              'absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-lg',
-              'bg-base-100 ring-base-300 py-1 shadow-lg ring-1',
-              'focus:outline-none',
-              optionsClassName,
-            )}>
-            {options.map((option) => (
-              <ListboxOption
-                className={({ focus }) =>
-                  cn(
-                    'relative cursor-pointer py-2 pr-4 pl-10 select-none',
-                    focus
-                      ? 'bg-primary text-primary-content dark:bg-primary/10 dark:text-primary'
-                      : 'text-base-content',
-                    option.disabled && 'cursor-not-allowed opacity-50',
-                  )
-                }
-                disabled={option.disabled}
-                key={option.value}
-                value={option.value}>
-                {({ selected }) => (
-                  <>
-                    <span
-                      className={cn(
-                        'block truncate text-base',
-                        selected ? 'font-medium' : 'font-normal',
-                      )}>
-                      {option.label}
-                    </span>
-                    {selected && (
-                      <span className="text-base-content absolute inset-y-0 left-0 flex items-center pl-3">
-                        <LucideIcon aria-hidden="true" icon={Check} size={20} />
-                      </span>
-                    )}
-                  </>
-                )}
-              </ListboxOption>
-            ))}
-          </ListboxOptions>
-        </Transition>
+        <ListboxTrigger
+          buttonClassName={buttonClassName}
+          id={id}
+          isPlaceholder={selectedOptions.length === 0}>
+          {displayText}
+        </ListboxTrigger>
+        <ListboxOptionList options={options} optionsClassName={optionsClassName} />
       </div>
     </Listbox>
   )

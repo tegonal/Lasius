@@ -29,6 +29,7 @@ import {
 } from '~/features/integrations/components/modals/config-fields/access-token-input'
 import { GithubResourceOwnerField } from '~/features/integrations/components/modals/config-fields/github-resource-owner-field'
 import { type InputControl } from '~/features/integrations/components/modals/config-fields/jira-credential-fields'
+import { PlaneWorkspaceField } from '~/features/integrations/components/modals/config-fields/plane-workspace-field'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 
 type CreateCredentialFieldsProperties = {
@@ -162,25 +163,7 @@ export const CreateCredentialFields = ({
         <FormFieldErrors errors={fields.apiKey.errors} />
       </fieldset>
 
-      <fieldset className="fieldset">
-        <label className="label" htmlFor={fields.workspace.id}>
-          {t('issueImporters.fields.workspace', { defaultValue: 'Workspace' })}
-        </label>
-        <Input
-          {...getInputProps(fields.workspace, { type: 'text' })}
-          key={fields.workspace.key}
-          placeholder={t('issueImporters.fields.workspacePlaceholder', {
-            defaultValue: 'e.g., my-company',
-          })}
-        />
-        <FormFieldErrors errors={fields.workspace.errors} />
-        <p className="text-base-content/60 mt-1 text-xs">
-          {t('issueImporters.fields.workspaceHelp', {
-            defaultValue:
-              'The workspace slug from your Plane URL (e.g., "my-company" from https://app.plane.so/my-company)',
-          })}
-        </p>
-      </fieldset>
+      <PlaneWorkspaceField field={fields.workspace} />
     </>
   )
 }

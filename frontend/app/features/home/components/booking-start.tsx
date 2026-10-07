@@ -29,16 +29,15 @@ import { Button } from '~/components/primitives/buttons/button'
 import { ButtonGroup } from '~/components/ui/forms/button-group'
 import { FieldSet } from '~/components/ui/forms/field-set'
 import { FormBody } from '~/components/ui/forms/form-body'
-import { FormElement } from '~/components/ui/forms/form-element'
-import { ProjectSelect } from '~/components/ui/forms/input/project-select'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+import { BookingProjectTagsFields } from '~/features/bookings/components/booking-project-tags-fields'
+import { useFocusTagsOnProjectChange } from '~/features/bookings/hooks/use-focus-tags-on-project-change'
 import { useStopAndStart } from '~/features/bookings/hooks/use-stop-and-start'
 import {
   createBookingStartSchema,
   parseTagsFromFormData,
 } from '~/features/bookings/lib/booking-schemas'
 import { useProjects } from '~/features/projects/hooks/use-projects'
-import { InputTagsAutocomplete } from '~/features/tags/components/input-tags-autocomplete'
 import { type SchemaTranslationFunction } from '~/lib/i18n-types'
 import { formatISOLocale } from '~/lib/utils/dates'
 import { type ModelsTag } from '~/services/api/lasius'
@@ -111,40 +110,21 @@ export const BookingStart = ({ onSuccess, selectedOrgId }: Properties) => {
 
   const projectTags = tagsData ?? []
 
-  // Auto-focus tags when project changes
-  useEffect(() => {
-    if (projectIdControl.value && fields.tags.id) {
-      document.querySelector<HTMLElement>(`#${fields.tags.id}`)?.focus()
-    }
-  }, [projectIdControl.value, fields.tags.id])
+  useFocusTagsOnProjectChange(projectIdControl.value, fields.tags.id)
 
   return (
     <div className="relative w-full">
       <form {...getFormProps(form)}>
         <FormBody>
           <FieldSet>
-            <FormElement
-              htmlFor={fields.projectId.id}
-              label={t('projects:label', 'Project')}
-              required>
-              <ProjectSelect
-                errors={fields.projectId.errors}
-                id={fields.projectId.id}
-                name={fields.projectId.name}
-                onChange={(id) => projectIdControl.change(id)}
-                projects={projects}
-                value={projectIdControl.value ?? ''}
-              />
-            </FormElement>
-            <FormElement htmlFor={fields.tags.id} label={t('tag-manager:label', 'Tags')}>
-              <InputTagsAutocomplete
-                field={fields.tags}
-                id={fields.tags.id}
-                key={fields.tags.key}
-                projectId={projectIdControl.value}
-                suggestions={projectTags}
-              />
-            </FormElement>
+            <BookingProjectTagsFields
+              onProjectChange={(id) => projectIdControl.change(id)}
+              projectField={fields.projectId}
+              projectId={projectIdControl.value}
+              projects={projects}
+              projectTags={projectTags}
+              tagsField={fields.tags}
+            />
           </FieldSet>
           <ButtonGroup>
             <Button

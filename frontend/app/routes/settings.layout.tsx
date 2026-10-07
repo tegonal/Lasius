@@ -17,36 +17,8 @@
  *
  */
 
-import { Suspense } from 'react'
-import { Outlet } from 'react-router'
-
-import { ColumnLeft, outerGridClasses } from '~/components/ui/layouts/layout-columns'
-import { NavigationMenuTabs } from '~/features/navigation/components/navigation-menu-tabs'
+import { SideNavigationLayout } from '~/features/navigation/components/side-navigation-layout'
 
 export default function SettingsLayout() {
-  return (
-    <>
-      {/* Desktop: left nav + content area (children use ColumnCenter/ColumnRight) */}
-      <section className="hidden size-full overflow-auto md:block">
-        <div className={outerGridClasses}>
-          <ColumnLeft>
-            <NavigationMenuTabs />
-          </ColumnLeft>
-          <Suspense
-            fallback={
-              <div className="flex h-full flex-1 items-center justify-center">
-                <span className="loading loading-spinner loading-lg text-primary" />
-              </div>
-            }>
-            <Outlet />
-          </Suspense>
-        </div>
-      </section>
-
-      {/* Mobile: single column */}
-      <section className="h-full w-full overflow-hidden md:hidden">
-        <Outlet />
-      </section>
-    </>
-  )
+  return <SideNavigationLayout />
 }

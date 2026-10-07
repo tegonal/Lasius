@@ -17,16 +17,9 @@
  *
  */
 
-import { orderBy } from 'es-toolkit'
-import { useTranslation } from 'react-i18next'
 import { useRouteLoaderData } from 'react-router'
 
-import { AvatarUser } from '~/components/ui/data-display/avatar/avatar-user'
-import { Badge } from '~/components/ui/data-display/badge'
-import { DataList } from '~/components/ui/data-display/data-list/data-list'
-import { DataListField } from '~/components/ui/data-display/data-list/data-list-field'
-import { DataListHeaderItem } from '~/components/ui/data-display/data-list/data-list-header-item'
-import { DataListRow } from '~/components/ui/data-display/data-list/data-list-row'
+import { MemberDataList } from '~/components/ui/data-display/member-data-list'
 import { ContextMenuProvider } from '~/features/context-menu/hooks/use-context-menu'
 import { EmptyStateMembers } from '~/features/projects/components/empty-state-members'
 import { isAdminOfProject } from '~/lib/api/functions/is-admin-of-project'
@@ -49,7 +42,6 @@ export const ProjectMembersList = ({
   projectOrganisationId,
   users,
 }: Properties) => {
-  const { t } = useTranslation()
   const loaderData = useRouteLoaderData<typeof loader>('routes/app-layout')
   const userId = loaderData?.user?.id
 
@@ -75,44 +67,17 @@ export const ProjectMembersList = ({
 
   return (
     <ContextMenuProvider>
-      <DataList>
-        <DataListRow>
-          <DataListHeaderItem />
-          <DataListHeaderItem>{t('forms.firstName', 'First name')}</DataListHeaderItem>
-          <DataListHeaderItem>{t('forms.lastName', 'Last name')}</DataListHeaderItem>
-          <DataListHeaderItem>{t('forms.email', 'Email')}</DataListHeaderItem>
-          <DataListHeaderItem>{t('status.label', 'Status')}</DataListHeaderItem>
-          <DataListHeaderItem />
-        </DataListRow>
-        {orderBy(users, [(user) => user.lastName, (user) => user.firstName], ['asc', 'asc']).map(
-          (user) => (
-            <DataListRow key={user.id}>
-              <DataListField width={90}>
-                <AvatarUser firstName={user.firstName} lastName={user.lastName} />
-              </DataListField>
-              <DataListField>
-                <span>{user.firstName}</span>
-              </DataListField>
-              <DataListField>
-                <span>{user.lastName}</span>
-              </DataListField>
-              <DataListField>
-                <span>{user.email}</span>
-              </DataListField>
-              <DataListField>
-                {user.id === userId && <Badge variant="tag">{t('you', 'You')}</Badge>}
-              </DataListField>
-              <DataListField>
-                <ProjectMemberListItemContext
-                  canRemove={isAmIAdmin && users.length > 1}
-                  onRemove={() => handleUserRemove(user.id)}
-                  user={user}
-                />
-              </DataListField>
-            </DataListRow>
-          ),
+      <MemberDataList
+        currentUserId={userId}
+        renderActions={(user) => (
+          <ProjectMemberListItemContext
+            canRemove={isAmIAdmin && users.length > 1}
+            onRemove={() => handleUserRemove(user.id)}
+            user={user}
+          />
         )}
-      </DataList>
+        users={users}
+      />
     </ContextMenuProvider>
   )
 }

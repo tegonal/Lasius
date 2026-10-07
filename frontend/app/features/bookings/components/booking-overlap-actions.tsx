@@ -83,61 +83,65 @@ export const BookingOverlapActions = ({ currentItem, onEdit, overlappingItem }: 
     collapse()
   }
 
+  const actionButtons = (
+    <>
+      <Button
+        aria-label={t(
+          'bookings:actions.adjustOverlappingEnd',
+          'Adjust overlapping booking to end at current booking start',
+        )}
+        fullWidth={false}
+        onClick={handleAdjustOverlappingToCurrentStart}
+        shape="circle"
+        size="sm"
+        title={t(
+          'bookings:actions.adjustOverlappingEnd',
+          'Adjust overlapping booking to end at current booking start',
+        )}
+        type="button"
+        variant="icon">
+        <LucideIcon className="text-warning" icon={ArrowUpToLine} size={16} />
+      </Button>
+
+      <Button
+        aria-label={t('bookings:actions.editOverlapping', 'Edit booking to resolve overlap')}
+        fullWidth={false}
+        onClick={handleEdit}
+        shape="circle"
+        size="sm"
+        title={t('bookings:actions.editOverlapping', 'Edit booking to resolve overlap')}
+        type="button"
+        variant="icon">
+        <LucideIcon className="text-warning" icon={Edit2} size={16} />
+      </Button>
+
+      <Button
+        aria-label={t(
+          'bookings:actions.adjustCurrentStart',
+          'Adjust current booking to start at overlapping booking end',
+        )}
+        fullWidth={false}
+        onClick={handleAdjustCurrentToOverlappingEnd}
+        shape="circle"
+        size="sm"
+        title={t(
+          'bookings:actions.adjustCurrentStart',
+          'Adjust current booking to start at overlapping booking end',
+        )}
+        type="button"
+        variant="icon">
+        <LucideIcon className="text-warning" icon={ArrowDownToLine} size={16} />
+      </Button>
+    </>
+  )
+
   return (
     <>
       {isExpanded && (
         <dialog
           className="absolute top-full left-1/2 m-0 -translate-x-1/2 -translate-y-1/2 transform bg-transparent p-0"
           ref={dialogRef}>
-          <div className="bg-base-100 flex gap-1 rounded-full p-1">
-            <Button
-              aria-label={t(
-                'bookings:actions.adjustOverlappingEnd',
-                'Adjust overlapping booking to end at current booking start',
-              )}
-              fullWidth={false}
-              onClick={handleAdjustOverlappingToCurrentStart}
-              shape="circle"
-              size="sm"
-              title={t(
-                'bookings:actions.adjustOverlappingEnd',
-                'Adjust overlapping booking to end at current booking start',
-              )}
-              type="button"
-              variant="icon">
-              <LucideIcon className="text-warning" icon={ArrowUpToLine} size={16} />
-            </Button>
-
-            <Button
-              aria-label={t('bookings:actions.editOverlapping', 'Edit booking to resolve overlap')}
-              fullWidth={false}
-              onClick={handleEdit}
-              shape="circle"
-              size="sm"
-              title={t('bookings:actions.editOverlapping', 'Edit booking to resolve overlap')}
-              type="button"
-              variant="icon">
-              <LucideIcon className="text-warning" icon={Edit2} size={16} />
-            </Button>
-
-            <Button
-              aria-label={t(
-                'bookings:actions.adjustCurrentStart',
-                'Adjust current booking to start at overlapping booking end',
-              )}
-              fullWidth={false}
-              onClick={handleAdjustCurrentToOverlappingEnd}
-              shape="circle"
-              size="sm"
-              title={t(
-                'bookings:actions.adjustCurrentStart',
-                'Adjust current booking to start at overlapping booking end',
-              )}
-              type="button"
-              variant="icon">
-              <LucideIcon className="text-warning" icon={ArrowDownToLine} size={16} />
-            </Button>
-          </div>
+          <div className="bg-base-100 flex gap-1 rounded-full p-1">{actionButtons}</div>
         </dialog>
       )}
 
@@ -149,58 +153,7 @@ export const BookingOverlapActions = ({ currentItem, onEdit, overlappingItem }: 
           <div
             className={`bg-base-100 absolute flex gap-1 rounded-full p-1 transition-all duration-200 ${showExpanded ? 'z-20' : 'z-10'}`}>
             {showExpanded ? (
-              <>
-                <Button
-                  aria-label={t(
-                    'bookings:actions.adjustOverlappingEnd',
-                    'Adjust overlapping booking to end at current booking start',
-                  )}
-                  fullWidth={false}
-                  onClick={handleAdjustOverlappingToCurrentStart}
-                  shape="circle"
-                  size="sm"
-                  title={t(
-                    'bookings:actions.adjustOverlappingEnd',
-                    'Adjust overlapping booking to end at current booking start',
-                  )}
-                  type="button"
-                  variant="icon">
-                  <LucideIcon className="text-warning" icon={ArrowUpToLine} size={16} />
-                </Button>
-
-                <Button
-                  aria-label={t(
-                    'bookings:actions.editOverlapping',
-                    'Edit booking to resolve overlap',
-                  )}
-                  fullWidth={false}
-                  onClick={handleEdit}
-                  shape="circle"
-                  size="sm"
-                  title={t('bookings:actions.editOverlapping', 'Edit booking to resolve overlap')}
-                  type="button"
-                  variant="icon">
-                  <LucideIcon className="text-warning" icon={Edit2} size={16} />
-                </Button>
-
-                <Button
-                  aria-label={t(
-                    'bookings:actions.adjustCurrentStart',
-                    'Adjust current booking to start at overlapping booking end',
-                  )}
-                  fullWidth={false}
-                  onClick={handleAdjustCurrentToOverlappingEnd}
-                  shape="circle"
-                  size="sm"
-                  title={t(
-                    'bookings:actions.adjustCurrentStart',
-                    'Adjust current booking to start at overlapping booking end',
-                  )}
-                  type="button"
-                  variant="icon">
-                  <LucideIcon className="text-warning" icon={ArrowDownToLine} size={16} />
-                </Button>
-              </>
+              actionButtons
             ) : (
               <Button
                 fullWidth={false}

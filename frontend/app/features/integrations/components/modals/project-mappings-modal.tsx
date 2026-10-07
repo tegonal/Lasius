@@ -29,6 +29,7 @@ import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
 import { ModalHelpButton } from '~/features/help/components/help-button'
 import { ProjectMappingDataList } from '~/features/integrations/components/shared/project-mapping-data-list'
 import { useMappingState } from '~/features/integrations/hooks/use-mapping-state'
+import { useRefreshTagsWithToasts } from '~/features/integrations/hooks/use-refresh-tags-with-toasts'
 import { getImporterTypeLabel } from '~/features/integrations/lib/importer-type-labels'
 import {
   buildMappingPayload,
@@ -49,7 +50,6 @@ import {
 import {
   useAddProjectMapping,
   useListProjects,
-  useRefreshTags,
   useRemoveProjectMapping,
 } from '~/services/api/lasius-hooks/issue-importers/issue-importers'
 
@@ -147,24 +147,7 @@ export const ProjectMappingsModal = ({ config, onClose, open, selectedOrgId }: P
     },
   })
 
-  const refreshTagsApi = useRefreshTags({
-    onError: () => {
-      addToast({
-        message: t('issueImporters.errors.tagsRefreshFailed', {
-          defaultValue: 'Failed to refresh tags',
-        }),
-        type: 'ERROR',
-      })
-    },
-    onSuccess: () => {
-      addToast({
-        message: t('issueImporters.success.tagsRefreshed', {
-          defaultValue: 'Tags refresh triggered successfully',
-        }),
-        type: 'SUCCESS',
-      })
-    },
-  })
+  const refreshTagsApi = useRefreshTagsWithToasts()
 
   // Build initial mappings from config.projects (supports multiple mappings per external project)
   useEffect(() => {

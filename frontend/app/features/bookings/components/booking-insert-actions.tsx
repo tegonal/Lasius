@@ -104,61 +104,65 @@ export const BookingInsertActions = ({ currentItem, nextItem, onAddBetween }: Pr
     collapse()
   }
 
+  const actionButtons = (
+    <>
+      <Button
+        aria-label={t(
+          'bookings:actions.adjustLowerEnd',
+          'Extend lower booking end to upper booking start',
+        )}
+        fullWidth={false}
+        onClick={handleAdjustNextEnd}
+        shape="circle"
+        size="sm"
+        title={t(
+          'bookings:actions.adjustLowerEnd',
+          'Extend lower booking end to upper booking start',
+        )}
+        type="button"
+        variant="iconPrimaryHover">
+        <LucideIcon icon={ArrowUpToLine} size={16} />
+      </Button>
+
+      <Button
+        aria-label={t('bookings:actions.insert', 'Insert booking')}
+        fullWidth={false}
+        onClick={handleAddBetween}
+        shape="circle"
+        size="sm"
+        title={t('bookings:actions.insert', 'Insert booking')}
+        type="button"
+        variant="iconPrimaryHover">
+        <LucideIcon icon={Plus} size={16} />
+      </Button>
+
+      <Button
+        aria-label={t(
+          'bookings:actions.adjustUpperStart',
+          'Move upper booking start to lower booking end',
+        )}
+        fullWidth={false}
+        onClick={handleAdjustCurrentStartWithClose}
+        shape="circle"
+        size="sm"
+        title={t(
+          'bookings:actions.adjustUpperStart',
+          'Move upper booking start to lower booking end',
+        )}
+        type="button"
+        variant="iconPrimaryHover">
+        <LucideIcon icon={ArrowDownToLine} size={16} />
+      </Button>
+    </>
+  )
+
   return (
     <>
       {isExpanded && (
         <dialog
           className="absolute top-full left-1/2 m-0 -translate-x-1/2 -translate-y-1/2 transform bg-transparent p-0"
           ref={dialogRef}>
-          <div className="bg-base-100 flex gap-1 rounded-full p-1">
-            <Button
-              aria-label={t(
-                'bookings:actions.adjustLowerEnd',
-                'Extend lower booking end to upper booking start',
-              )}
-              fullWidth={false}
-              onClick={handleAdjustNextEnd}
-              shape="circle"
-              size="sm"
-              title={t(
-                'bookings:actions.adjustLowerEnd',
-                'Extend lower booking end to upper booking start',
-              )}
-              type="button"
-              variant="iconPrimaryHover">
-              <LucideIcon icon={ArrowUpToLine} size={16} />
-            </Button>
-
-            <Button
-              aria-label={t('bookings:actions.insert', 'Insert booking')}
-              fullWidth={false}
-              onClick={handleAddBetween}
-              shape="circle"
-              size="sm"
-              title={t('bookings:actions.insert', 'Insert booking')}
-              type="button"
-              variant="iconPrimaryHover">
-              <LucideIcon icon={Plus} size={16} />
-            </Button>
-
-            <Button
-              aria-label={t(
-                'bookings:actions.adjustUpperStart',
-                'Move upper booking start to lower booking end',
-              )}
-              fullWidth={false}
-              onClick={handleAdjustCurrentStartWithClose}
-              shape="circle"
-              size="sm"
-              title={t(
-                'bookings:actions.adjustUpperStart',
-                'Move upper booking start to lower booking end',
-              )}
-              type="button"
-              variant="iconPrimaryHover">
-              <LucideIcon icon={ArrowDownToLine} size={16} />
-            </Button>
-          </div>
+          <div className="bg-base-100 flex gap-1 rounded-full p-1">{actionButtons}</div>
         </dialog>
       )}
 
@@ -172,55 +176,7 @@ export const BookingInsertActions = ({ currentItem, nextItem, onAddBetween }: Pr
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}>
             {showExpanded ? (
-              <>
-                <Button
-                  aria-label={t(
-                    'bookings:actions.adjustLowerEnd',
-                    'Extend lower booking end to upper booking start',
-                  )}
-                  fullWidth={false}
-                  onClick={handleAdjustNextEnd}
-                  shape="circle"
-                  size="sm"
-                  title={t(
-                    'bookings:actions.adjustLowerEnd',
-                    'Extend lower booking end to upper booking start',
-                  )}
-                  type="button"
-                  variant="iconPrimaryHover">
-                  <LucideIcon icon={ArrowUpToLine} size={16} />
-                </Button>
-
-                <Button
-                  aria-label={t('bookings:actions.insert', 'Insert booking')}
-                  fullWidth={false}
-                  onClick={handleAddBetween}
-                  shape="circle"
-                  size="sm"
-                  title={t('bookings:actions.insert', 'Insert booking')}
-                  type="button"
-                  variant="iconPrimaryHover">
-                  <LucideIcon icon={Plus} size={16} />
-                </Button>
-
-                <Button
-                  aria-label={t(
-                    'bookings:actions.adjustUpperStart',
-                    'Move upper booking start to lower booking end',
-                  )}
-                  fullWidth={false}
-                  onClick={handleAdjustCurrentStartWithClose}
-                  shape="circle"
-                  size="sm"
-                  title={t(
-                    'bookings:actions.adjustUpperStart',
-                    'Move upper booking start to lower booking end',
-                  )}
-                  type="button"
-                  variant="iconPrimaryHover">
-                  <LucideIcon icon={ArrowDownToLine} size={16} />
-                </Button>
-              </>
+              actionButtons
             ) : (
               <Button
                 fullWidth={false}

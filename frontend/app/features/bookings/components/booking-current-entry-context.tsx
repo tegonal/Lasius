@@ -21,11 +21,10 @@ import { ArrowDownToLineIcon, PencilIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { Button } from '~/components/primitives/buttons/button'
-import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { Modal } from '~/components/ui/overlays/modal/modal'
 import { BookingEditRunning } from '~/features/bookings/components/booking-edit-running'
 import { useHomeLoaderData } from '~/features/bookings/hooks/use-home-loader-data'
+import { ContextButtonAction } from '~/features/context-menu/buttons/context-button-action'
 import { ContextButtonAddFavorite } from '~/features/context-menu/buttons/context-button-add-favorite'
 import { ContextButtonClose } from '~/features/context-menu/buttons/context-button-close'
 import { ContextButtonOpen } from '~/features/context-menu/buttons/context-button-open'
@@ -33,7 +32,6 @@ import { ContextAnimatePresence } from '~/features/context-menu/context-animate-
 import { ContextBar } from '~/features/context-menu/context-bar'
 import { ContextBarDivider } from '~/features/context-menu/context-bar-divider'
 import { ContextBody } from '~/features/context-menu/context-body'
-import { ContextButtonWrapper } from '~/features/context-menu/context-button-wrapper'
 import { useContextMenu } from '~/features/context-menu/hooks/use-context-menu'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { formatISOLocale } from '~/lib/utils/dates'
@@ -120,37 +118,22 @@ export const BookingCurrentEntryContext = ({
         <ContextButtonOpen data-testid="booking-current-ctx-open-btn" />
         <ContextAnimatePresence>
           <ContextBar>
-            <ContextButtonWrapper>
-              <Button
-                aria-label={t('bookings:actions.edit', 'Edit booking')}
-                data-testid="booking-current-edit-btn"
-                fullWidth={false}
-                onClick={editCurrentBooking}
-                shape="circle"
-                title={t('bookings:actions.edit', 'Edit booking')}
-                variant="contextIcon">
-                <LucideIcon icon={PencilIcon} size={24} />
-              </Button>
-            </ContextButtonWrapper>
+            <ContextButtonAction
+              data-testid="booking-current-edit-btn"
+              icon={PencilIcon}
+              label={t('bookings:actions.edit', 'Edit booking')}
+              onClick={editCurrentBooking}
+            />
             {shouldShowStartAdjustment && (
-              <ContextButtonWrapper>
-                <Button
-                  aria-label={t(
-                    'bookings:actions.adjustStartToPrevious',
-                    'Adjust start to previous booking',
-                  )}
-                  data-testid="booking-current-adjust-start-btn"
-                  fullWidth={false}
-                  onClick={adjustStartToPrevious}
-                  shape="circle"
-                  title={t(
-                    'bookings:actions.adjustStartToPrevious',
-                    'Adjust start to previous booking',
-                  )}
-                  variant="contextIcon">
-                  <LucideIcon icon={ArrowDownToLineIcon} size={24} />
-                </Button>
-              </ContextButtonWrapper>
+              <ContextButtonAction
+                data-testid="booking-current-adjust-start-btn"
+                icon={ArrowDownToLineIcon}
+                label={t(
+                  'bookings:actions.adjustStartToPrevious',
+                  'Adjust start to previous booking',
+                )}
+                onClick={adjustStartToPrevious}
+              />
             )}
             <ContextButtonAddFavorite
               data-testid="booking-current-favorite-btn"

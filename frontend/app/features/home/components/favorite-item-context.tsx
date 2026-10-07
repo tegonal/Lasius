@@ -21,9 +21,8 @@ import { roundToNearestMinutes } from 'date-fns'
 import { Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-import { Button } from '~/components/primitives/buttons/button'
-import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { useStopAndStart } from '~/features/bookings/hooks/use-stop-and-start'
+import { ContextButtonAction } from '~/features/context-menu/buttons/context-button-action'
 import { ContextButtonClose } from '~/features/context-menu/buttons/context-button-close'
 import { ContextButtonOpen } from '~/features/context-menu/buttons/context-button-open'
 import { ContextButtonStartBooking } from '~/features/context-menu/buttons/context-button-start-booking'
@@ -31,7 +30,6 @@ import { ContextAnimatePresence } from '~/features/context-menu/context-animate-
 import { ContextBar } from '~/features/context-menu/context-bar'
 import { ContextBarDivider } from '~/features/context-menu/context-bar-divider'
 import { ContextBody } from '~/features/context-menu/context-body'
-import { ContextButtonWrapper } from '~/features/context-menu/context-button-wrapper'
 import { useContextMenu } from '~/features/context-menu/hooks/use-context-menu'
 import { formatISOLocale } from '~/lib/utils/dates'
 import { stringHash } from '~/lib/utils/string-hash'
@@ -85,18 +83,13 @@ export const FavoriteItemContext = ({ item, selectedOrgId }: Properties) => {
             onStart={handleStart}
             variant="compact"
           />
-          <ContextButtonWrapper variant="compact">
-            <Button
-              aria-label={t('favorites.actions.delete', 'Delete favorite')}
-              data-testid="favorite-ctx-delete-btn"
-              fullWidth={false}
-              onClick={deleteFavorite}
-              shape="circle"
-              title={t('favorites.actions.delete', 'Delete favorite')}
-              variant="contextIcon">
-              <LucideIcon icon={Trash2} size={24} />
-            </Button>
-          </ContextButtonWrapper>
+          <ContextButtonAction
+            data-testid="favorite-ctx-delete-btn"
+            icon={Trash2}
+            label={t('favorites.actions.delete', 'Delete favorite')}
+            onClick={deleteFavorite}
+            variant="compact"
+          />
           <ContextBarDivider />
           <ContextButtonClose variant="compact" />
         </ContextBar>

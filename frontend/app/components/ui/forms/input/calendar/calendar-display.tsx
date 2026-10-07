@@ -27,10 +27,10 @@ import {
   startOfMonth,
   subMonths,
 } from 'date-fns'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { CalendarMonthHeader } from '~/components/ui/forms/input/calendar/calendar-month-header'
 import { useCalendarMonth } from '~/features/calendar/hooks/use-calendar-month'
 import { cn } from '~/lib/utils/cn'
 import { getDateLocale } from '~/lib/utils/date-locale'
@@ -41,22 +41,10 @@ type CalendarDisplayProperties = {
   value: IsoDateString
 }
 
-// useCalendarMonth returns the weekday labels from Monday to Sunday.
-// A narrow label repeats (T, S), so the column key comes from this list.
-const WEEKDAY_IDS = [
-  'monday',
-  'tuesday',
-  'wednesday',
-  'thursday',
-  'friday',
-  'saturday',
-  'sunday',
-] as const
-
 const getTimeOfDay = (date: Date) => [date.getHours(), date.getMinutes()]
 
 export const CalendarDisplay = ({ onChange, value }: CalendarDisplayProperties) => {
-  const { i18n, t } = useTranslation('common')
+  const { i18n } = useTranslation('common')
   const locale = getDateLocale(i18n.language)
   const selectedDate = new Date(value)
   const [originalTime, setOriginalTime] = useState<number[]>(() =>
@@ -97,47 +85,15 @@ export const CalendarDisplay = ({ onChange, value }: CalendarDisplayProperties) 
 
   return (
     <div className="w-full select-none">
-      <div className="mb-3 flex items-center justify-between">
-        <button
-          aria-label={t('calendar.navigation.previousMonth', {
-            defaultValue: 'Previous month',
-          })}
-          className="btn btn-ghost btn-sm btn-circle"
-          onClick={handlePreviousMonth}>
-          <ChevronLeft size={16} />
-        </button>
-        <div className="flex flex-col items-center">
-          <div className="text-sm font-medium">{format(viewDate, 'MMMM', { locale })}</div>
-          <div className="text-base-content/60 text-xs">{format(viewDate, 'yyyy')}</div>
-        </div>
-        <button
-          aria-label={t('calendar.navigation.nextMonth', {
-            defaultValue: 'Next month',
-          })}
-          className="btn btn-ghost btn-sm btn-circle"
-          onClick={handleNextMonth}>
-          <ChevronRight size={16} />
-        </button>
-      </div>
-
-      {isShowTodayButton && (
-        <div className="mb-2 flex justify-center">
-          <button
-            aria-label={t('time.today', 'Today')}
-            className="btn btn-ghost btn-xs"
-            onClick={handleToday}>
-            {t('time.today', 'Today')}
-          </button>
-        </div>
-      )}
-
-      <div className="mb-1 grid grid-cols-7 gap-1 text-center">
-        {WEEKDAY_IDS.map((weekdayId, index) => (
-          <div className="text-base-content/60 text-xs font-medium" key={weekdayId}>
-            {weekDays[index]}
-          </div>
-        ))}
-      </div>
+      <CalendarMonthHeader
+        locale={locale}
+        onNextMonth={handleNextMonth}
+        onPreviousMonth={handlePreviousMonth}
+        onToday={handleToday}
+        showTodayButton={isShowTodayButton}
+        viewDate={viewDate}
+        weekDays={weekDays}
+      />
 
       <div className="grid w-full grid-cols-7 gap-1">
         {Array.from({ length: startOffset }, (_, index) => (

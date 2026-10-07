@@ -17,17 +17,11 @@
  *
  */
 
-import { orderBy } from 'es-toolkit'
 import { Users } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-import { AvatarUser } from '~/components/ui/data-display/avatar/avatar-user'
-import { Badge } from '~/components/ui/data-display/badge'
-import { DataList } from '~/components/ui/data-display/data-list/data-list'
-import { DataListField } from '~/components/ui/data-display/data-list/data-list-field'
-import { DataListHeaderItem } from '~/components/ui/data-display/data-list/data-list-header-item'
-import { DataListRow } from '~/components/ui/data-display/data-list/data-list-row'
 import { EmptyState } from '~/components/ui/data-display/empty-state'
+import { MemberDataList } from '~/components/ui/data-display/member-data-list'
 import { ContextMenuProvider } from '~/features/context-menu/hooks/use-context-menu'
 import { OrganisationMemberActions } from '~/features/organisation/components/organisation-member-actions'
 import { useLayoutLoaderData } from '~/hooks/use-layout-loader-data'
@@ -51,46 +45,16 @@ export const OrganisationMembers = ({ isAdmin, onRefresh, orgId, users }: Proper
 
   return (
     <ContextMenuProvider>
-      <DataList>
-        <DataListRow>
-          <DataListHeaderItem />
-          <DataListHeaderItem>{t('forms.firstName', 'First name')}</DataListHeaderItem>
-          <DataListHeaderItem>{t('forms.lastName', 'Last name')}</DataListHeaderItem>
-          <DataListHeaderItem>{t('forms.email', 'Email')}</DataListHeaderItem>
-          <DataListHeaderItem>{t('status.label', 'Status')}</DataListHeaderItem>
-          <DataListHeaderItem />
-        </DataListRow>
-        {orderBy(users, [(user) => user.lastName, (user) => user.firstName], ['asc', 'asc']).map(
-          (user) => (
-            <DataListRow key={user.id}>
-              <DataListField width={90}>
-                <AvatarUser firstName={user.firstName} lastName={user.lastName} />
-              </DataListField>
-              <DataListField>
-                <span>{user.firstName}</span>
-              </DataListField>
-              <DataListField>
-                <span>{user.lastName}</span>
-              </DataListField>
-              <DataListField>
-                <span>{user.email}</span>
-              </DataListField>
-              <DataListField>
-                {user.id === userId && <Badge variant="tag">{t('you', 'You')}</Badge>}
-              </DataListField>
-              <DataListField>
-                {isAdmin && user.id !== userId && (
-                  <OrganisationMemberActions
-                    onRemoveComplete={onRefresh}
-                    orgId={orgId}
-                    user={user}
-                  />
-                )}
-              </DataListField>
-            </DataListRow>
-          ),
-        )}
-      </DataList>
+      <MemberDataList
+        currentUserId={userId}
+        renderActions={(user) =>
+          isAdmin &&
+          user.id !== userId && (
+            <OrganisationMemberActions onRemoveComplete={onRefresh} orgId={orgId} user={user} />
+          )
+        }
+        users={users}
+      />
     </ContextMenuProvider>
   )
 }

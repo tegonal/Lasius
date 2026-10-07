@@ -23,6 +23,8 @@ import { useTranslation } from 'react-i18next'
 import { Input } from '~/components/primitives/inputs/input'
 import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 
+import { PlaneWorkspaceField } from './plane-workspace-field'
+
 type Properties = {
   fields: {
     apiKey: FieldMetadata<string | undefined>
@@ -59,30 +61,12 @@ export const PlaneFields = ({ fields, resetTestState }: Properties) => {
         <FormFieldErrors errors={fields.apiKey.errors} />
       </fieldset>
 
-      <fieldset className="fieldset">
-        <label className="label" htmlFor={fields.workspace.id}>
-          {t('issueImporters.fields.workspace', {
-            defaultValue: 'Workspace',
-          })}
-        </label>
-        <Input
-          {...getInputProps(fields.workspace, { type: 'text' })}
-          key={fields.workspace.key}
-          onChange={() => {
-            resetTestState()
-          }}
-          placeholder={t('issueImporters.fields.workspacePlaceholder', {
-            defaultValue: 'e.g., my-company',
-          })}
-        />
-        <FormFieldErrors errors={fields.workspace.errors} />
-        <p className="text-base-content/60 mt-1 text-xs">
-          {t('issueImporters.fields.workspaceHelp', {
-            defaultValue:
-              'The workspace slug from your Plane URL (e.g., "my-company" from https://app.plane.so/my-company)',
-          })}
-        </p>
-      </fieldset>
+      <PlaneWorkspaceField
+        field={fields.workspace}
+        onChange={() => {
+          resetTestState()
+        }}
+      />
     </>
   )
 }

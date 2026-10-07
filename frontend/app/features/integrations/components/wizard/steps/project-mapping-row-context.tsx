@@ -21,16 +21,15 @@ import { FolderOpen, RefreshCw, X } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { GenericConfirmModal } from '~/components/ui/overlays/modal/generic-confirm-modal'
 import { Modal } from '~/components/ui/overlays/modal/modal'
+import { ContextButtonAction } from '~/features/context-menu/buttons/context-button-action'
 import { ContextButtonClose } from '~/features/context-menu/buttons/context-button-close'
 import { ContextAnimatePresence } from '~/features/context-menu/context-animate-presence'
 import { ContextBar } from '~/features/context-menu/context-bar'
 import { ContextBarDivider } from '~/features/context-menu/context-bar-divider'
 import { ContextBody } from '~/features/context-menu/context-body'
-import { ContextButtonWrapper } from '~/features/context-menu/context-button-wrapper'
 import { useContextMenu } from '~/features/context-menu/hooks/use-context-menu'
 import { ProjectMappingSelector } from '~/features/integrations/components/wizard/steps/project-mapping-selector'
 import {
@@ -114,24 +113,15 @@ export const ProjectMappingRowContext = ({
         <ContextAnimatePresence inModal variant="compact">
           <ContextBar>
             {onRefreshTags && mapping.id && (
-              <ContextButtonWrapper variant="compact">
-                <Button
-                  aria-label={t('issueImporters.actions.refreshTags', {
-                    defaultValue: 'Refresh tags',
-                  })}
-                  fullWidth={false}
-                  onClick={() => {
-                    onRefreshTags(mapping.id!.value)
-                    handleCloseAll()
-                  }}
-                  shape="circle"
-                  title={t('issueImporters.actions.refreshTags', {
-                    defaultValue: 'Refresh tags',
-                  })}
-                  variant="contextIcon">
-                  <LucideIcon icon={RefreshCw} size={24} />
-                </Button>
-              </ContextButtonWrapper>
+              <ContextButtonAction
+                icon={RefreshCw}
+                label={t('issueImporters.actions.refreshTags', { defaultValue: 'Refresh tags' })}
+                onClick={() => {
+                  onRefreshTags(mapping.id!.value)
+                  handleCloseAll()
+                }}
+                variant="compact"
+              />
             )}
             <ContextBarDivider />
             <ContextButtonClose variant="compact" />

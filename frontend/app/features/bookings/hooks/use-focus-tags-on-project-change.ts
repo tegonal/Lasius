@@ -17,8 +17,16 @@
  *
  */
 
-import { SideNavigationLayout } from '~/features/navigation/components/side-navigation-layout'
+import { useEffect } from 'react'
 
-export default function OrganisationLayout() {
-  return <SideNavigationLayout />
+/** Moves the focus to the tags input when a project is selected. */
+export const useFocusTagsOnProjectChange = (
+  projectId: string | undefined,
+  tagsInputId: string | undefined,
+): void => {
+  useEffect(() => {
+    if (projectId && tagsInputId) {
+      document.querySelector<HTMLElement>(`#${tagsInputId}`)?.focus()
+    }
+  }, [projectId, tagsInputId])
 }

@@ -17,10 +17,34 @@
  *
  */
 
-import { Calendar, Settings, UserCircle, Users } from 'lucide-react'
+import {
+  Calendar,
+  type LucideIcon as LucideIconType,
+  Settings,
+  UserCircle,
+  Users,
+} from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+
+type IconItem = { description: string; icon: LucideIconType; title: string }
+
+const IconItemList = ({ items }: { items: IconItem[] }) => (
+  <div className="space-y-3">
+    {items.map((item) => (
+      <div className="flex items-start gap-3" key={item.title}>
+        <div className="bg-primary/10 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
+          <LucideIcon icon={item.icon} size={20} />
+        </div>
+        <div>
+          <div className="font-semibold">{item.title}</div>
+          <p className="text-base-content/60">{item.description}</p>
+        </div>
+      </div>
+    ))}
+  </div>
+)
 
 export const SlideNavigation = () => {
   const { t } = useTranslation('onboarding')
@@ -85,38 +109,14 @@ export const SlideNavigation = () => {
           <div className="mb-3 font-semibold">
             {t('navigation.mainNavigation', 'Main Navigation')}
           </div>
-          <div className="space-y-3">
-            {navigationItems.map((item) => (
-              <div className="flex items-start gap-3" key={item.title}>
-                <div className="bg-primary/10 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
-                  <LucideIcon icon={item.icon} size={20} />
-                </div>
-                <div>
-                  <div className="font-semibold">{item.title}</div>
-                  <p className="text-base-content/60">{item.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <IconItemList items={navigationItems} />
         </div>
 
         <div className="border-base-300 border-t pt-4">
           <div className="mb-3 font-semibold">
             {t('navigation.importantUI', 'Important UI Elements')}
           </div>
-          <div className="space-y-3">
-            {uiElements.map((item) => (
-              <div className="flex items-start gap-3" key={item.title}>
-                <div className="bg-primary/10 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
-                  <LucideIcon icon={item.icon} size={20} />
-                </div>
-                <div>
-                  <div className="font-semibold">{item.title}</div>
-                  <p className="text-base-content/60">{item.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <IconItemList items={uiElements} />
         </div>
       </div>
     </div>

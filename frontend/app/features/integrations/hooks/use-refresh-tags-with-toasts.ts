@@ -17,35 +17,32 @@
  *
  */
 
-import { Timer } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-import { type ModelsBooking, type ModelsBookingStub } from '~/services/api/lasius'
+import { useToast } from '~/components/ui/feedback/use-toast'
+import { useRefreshTags } from '~/services/api/lasius-hooks/issue-importers/issue-importers'
 
-import { ContextButtonAction } from './context-button-action'
+/** The tag refresh of an issue importer, with an error toast and a success toast. */
+export const useRefreshTagsWithToasts = () => {
+  const { t } = useTranslation('integrations')
+  const { addToast } = useToast()
 
-type Properties = {
-  'data-testid'?: string
-  item: ModelsBooking | ModelsBookingStub
-  onStart?: () => void
-  variant?: 'compact' | 'default'
-}
-
-export const ContextButtonStartBooking = ({
-  'data-testid': testId,
-  item: _item,
-  onStart,
-  variant = 'default',
-}: Properties) => {
-  const { t } = useTranslation('bookings')
-
-  return (
-    <ContextButtonAction
-      data-testid={testId}
-      icon={Timer}
-      label={t('actions.start', 'Start booking')}
-      onClick={onStart}
-      variant={variant}
-    />
-  )
+  return useRefreshTags({
+    onError: () => {
+      addToast({
+        message: t('issueImporters.errors.tagsRefreshFailed', {
+          defaultValue: 'Failed to refresh tags',
+        }),
+        type: 'ERROR',
+      })
+    },
+    onSuccess: () => {
+      addToast({
+        message: t('issueImporters.success.tagsRefreshed', {
+          defaultValue: 'Tags refresh triggered successfully',
+        }),
+        type: 'SUCCESS',
+      })
+    },
+  })
 }

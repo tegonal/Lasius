@@ -20,11 +20,9 @@
 import { Star } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-import { Button } from '~/components/primitives/buttons/button'
-import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { type ModelsBooking } from '~/services/api/lasius'
 
-import { ContextButtonWrapper } from '../context-button-wrapper'
+import { ContextButtonAction } from './context-button-action'
 
 type Properties = {
   'data-testid'?: string
@@ -42,17 +40,12 @@ export const ContextButtonAddFavorite = ({
   const { t } = useTranslation('home')
 
   return (
-    <ContextButtonWrapper variant={variant}>
-      <Button
-        aria-label={t('favorites.actions.add', 'Add as favorite')}
-        data-testid={testId}
-        fullWidth={false}
-        onClick={onAddFavorite}
-        shape="circle"
-        title={t('favorites.actions.add', 'Add as favorite')}
-        variant="contextIcon">
-        <LucideIcon icon={Star} size={24} />
-      </Button>
-    </ContextButtonWrapper>
+    <ContextButtonAction
+      data-testid={testId}
+      icon={Star}
+      label={t('favorites.actions.add', 'Add as favorite')}
+      onClick={onAddFavorite}
+      variant={variant}
+    />
   )
 }

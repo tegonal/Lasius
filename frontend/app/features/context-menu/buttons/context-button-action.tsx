@@ -17,35 +17,40 @@
  *
  */
 
-import { Timer } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
+import { type LucideIcon as LucideIconType } from 'lucide-react'
 
-import { type ModelsBooking, type ModelsBookingStub } from '~/services/api/lasius'
+import { Button } from '~/components/primitives/buttons/button'
+import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 
-import { ContextButtonAction } from './context-button-action'
+import { ContextButtonWrapper } from '../context-button-wrapper'
 
 type Properties = {
   'data-testid'?: string
-  item: ModelsBooking | ModelsBookingStub
-  onStart?: () => void
+  icon: LucideIconType
+  // Serves as the accessible name and as the tooltip.
+  label: string
+  onClick?: () => void
   variant?: 'compact' | 'default'
 }
 
-export const ContextButtonStartBooking = ({
+/** One round icon button in a context bar. */
+export const ContextButtonAction = ({
   'data-testid': testId,
-  item: _item,
-  onStart,
-  variant = 'default',
-}: Properties) => {
-  const { t } = useTranslation('bookings')
-
-  return (
-    <ContextButtonAction
+  icon,
+  label,
+  onClick,
+  variant,
+}: Properties) => (
+  <ContextButtonWrapper variant={variant}>
+    <Button
+      aria-label={label}
       data-testid={testId}
-      icon={Timer}
-      label={t('actions.start', 'Start booking')}
-      onClick={onStart}
-      variant={variant}
-    />
-  )
-}
+      fullWidth={false}
+      onClick={onClick}
+      shape="circle"
+      title={label}
+      variant="contextIcon">
+      <LucideIcon icon={icon} size={24} />
+    </Button>
+  </ContextButtonWrapper>
+)
