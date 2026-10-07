@@ -42,24 +42,19 @@
     "ignore": ["app/services/api/lasius/**", "app/services/api/lasius-hooks/**"],
     "thresholdOverrides": [
       {
-        "files": [
-          "app/components/ui/forms/input/date-picker/segmented-time-input-connected.tsx",
-          "app/components/ui/forms/input/duration-input.tsx"
-        ],
+        "files": ["app/components/ui/forms/input/date-picker/segmented-time-input-connected.tsx"],
         "functions": ["handleKeyDown"],
-        "maxCyclomatic": 36,
-        "maxCognitive": 51,
-        "maxCrap": 1333,
+        "maxCyclomatic": 23,
+        "maxCognitive": 26,
+        "maxCrap": 552,
         "reason": "Accepted key handler. A split adds functions but not fewer cases, and no test covers the handler. Decision: rr8-segmented-input-key-handlers."
       },
       {
-        "files": [
-          "app/components/ui/forms/input/date-picker/segmented-duration-input-connected.tsx"
-        ],
+        "files": ["app/components/ui/forms/input/date-picker/shared/duration-segment-input.tsx"],
         "functions": ["handleKeyDown"],
-        "maxCyclomatic": 34,
-        "maxCognitive": 49,
-        "maxCrap": 1191,
+        "maxCyclomatic": 22,
+        "maxCognitive": 24,
+        "maxCrap": 506,
         "reason": "Accepted key handler. A split adds functions but not fewer cases, and no test covers the handler. Decision: rr8-segmented-input-key-handlers."
       },
       {

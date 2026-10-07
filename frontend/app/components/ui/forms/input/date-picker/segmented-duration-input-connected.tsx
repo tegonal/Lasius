@@ -17,33 +17,10 @@
  *
  */
 
-import { useEffect, useRef, useState } from 'react'
-import { useTranslation } from 'react-i18next'
-
-import { Input } from '~/components/primitives/inputs/input'
 import { formatISOLocale } from '~/lib/utils/dates'
 
-import { getSegmentBounds, getSegmentFromPosition } from './shared/core/segment-bounds'
-import { DURATION_SEGMENT_CONFIG, type DurationSegment } from './shared/core/segment-config'
-import {
-  createHandleClick,
-  selectSegment as selectSegmentHelper,
-} from './shared/core/segment-selection'
-import {
-  addMinutesToDate,
-  calculateDurationMinutes,
-  formatDuration,
-  parseDuration,
-} from './shared/duration-utilities'
-import { createInputChangeHandler } from './shared/input/input-change-handler'
-import { isValidInputChar } from './shared/input/input-validation'
-import {
-  didHandleBackspaceDelete,
-  didHandleEscapeKey,
-  didHandleSeparatorKey,
-} from './shared/input/keyboard-handlers'
-import { SegmentedInputWrapper } from './shared/segmented-input-wrapper'
-import { useRestoreCursorPosition } from './shared/use-restore-cursor-position'
+import { DurationSegmentInput } from './shared/duration-segment-input'
+import { addMinutesToDate, calculateDurationMinutes } from './shared/duration-utilities'
 
 export type SegmentedDurationInputConnectedProperties = {
   endValue: string
@@ -51,349 +28,28 @@ export type SegmentedDurationInputConnectedProperties = {
   startValue: string
 }
 
+/** Edits the end time of a booking through its duration from the start time. */
 export const SegmentedDurationInputConnected = ({
   endValue,
   onEndChange,
   startValue,
 }: SegmentedDurationInputConnectedProperties) => {
-  return (
-    <DurationInputCore
-      endValue={endValue}
-      getStartEndValues={() => ({ end: endValue, start: startValue })}
-      onEndChange={onEndChange}
-      startValue={startValue}
-    />
-  )
-}
-
-/** Shared core logic — receives reactive values and callbacks */
-const DurationInputCore = ({
-  endValue,
-  getStartEndValues,
-  onEndChange,
-  startValue,
-}: {
-  endValue: string
-  getStartEndValues: () => { end: string; start: string }
-  onEndChange: (isoString: string) => void
-  startValue: string
-}) => {
-  const { t } = useTranslation('common')
-  const inputReference = useRef<HTMLInputElement>(null)
-  const [selectedSegment, setSelectedSegment] = useState<DurationSegment | null>(null)
-  const focusFromArrowReference = useRef<boolean>(false)
-  const focusFromMouseReference = useRef<boolean>(false)
-  const initialDurationReference = useRef<number>(0)
-
-  const config = DURATION_SEGMENT_CONFIG
-
   const durationMinutes = calculateDurationMinutes(
     startValue ? new Date(startValue) : null,
     endValue ? new Date(endValue) : null,
   )
-  const durationString = formatDuration(durationMinutes)
-
-  const [inputValue, setInputValue] = useState<string>(durationString)
-  const setCursorPosition = useRestoreCursorPosition(inputReference, inputValue)
-
-  useEffect(() => {
-    if (!inputReference.current?.matches(':focus')) {
-      initialDurationReference.current = durationMinutes
-    }
-  }, [durationMinutes])
-
-  useEffect(() => {
-    if (!inputReference.current?.matches(':focus')) {
-      setInputValue(durationString)
-    }
-  }, [durationString])
-
-  const selectSegment = (segment: DurationSegment): void => {
-    selectSegmentHelper(
-      segment,
-      inputValue,
-      config.delimiter,
-      config.segments,
-      inputReference,
-      setSelectedSegment,
-    )
-  }
-
-  const handleMouseDown = () => {
-    focusFromMouseReference.current = true
-  }
-
-  const handleClick = (event: React.MouseEvent<HTMLInputElement>) => {
-    createHandleClick(
-      inputReference,
-      inputValue,
-      config.placeholder,
-      config.delimiter,
-      config.segments,
-      (segment) => {
-        selectSegment(segment)
-      },
-    )(event)
-  }
 
   const updateEndTime = (newDurationMinutes: number) => {
-    if (!(startValue && newDurationMinutes >= 0)) {
-      return
-    }
-
-    const startDate = new Date(startValue)
-    const newEndDate = addMinutesToDate(startDate, newDurationMinutes)
+    if (!startValue) return
+    const newEndDate = addMinutesToDate(new Date(startValue), newDurationMinutes)
     onEndChange(formatISOLocale(newEndDate))
   }
 
-  const resetToInitial = () => {
-    updateEndTime(initialDurationReference.current)
-    setInputValue(formatDuration(initialDurationReference.current))
-  }
-
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    createInputChangeHandler({
-      config,
-      inputRef: inputReference,
-      inputValue,
-      selectedSegment,
-      selectSegmentFn: selectSegment,
-      setCursorPosition,
-      setInputValue,
-      updateStore: (value: string) => {
-        const minutes = parseDuration(value)
-        if (minutes !== null) {
-          updateEndTime(minutes)
-        }
-      },
-    })(event)
-  }
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>): void => {
-    const bounds = getSegmentBounds(inputValue, config.delimiter, config.segments)
-    if (!bounds) return
-
-    if (!isValidInputChar(event.key, config.allowedCharsPattern)) {
-      event.preventDefault()
-      return
-    }
-
-    if (didHandleEscapeKey(event, inputReference, resetToInitial)) {
-      return
-    }
-
-    if (
-      didHandleBackspaceDelete(
-        event,
-        inputReference,
-        inputValue,
-        config.delimiter,
-        config.segments,
-        bounds,
-        config.segmentPlaceholders,
-        setInputValue,
-        (value) => {
-          const minutes = parseDuration(value)
-          if (minutes !== null) {
-            updateEndTime(minutes)
-          }
-        },
-        selectSegment,
-      )
-    ) {
-      return
-    }
-
-    if (
-      didHandleSeparatorKey(
-        event,
-        config.separatorKeys,
-        inputReference,
-        inputValue,
-        config.delimiter,
-        config.segments,
-        selectSegment,
-      )
-    ) {
-      return
-    }
-
-    if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-      event.preventDefault()
-      const position = inputReference.current?.selectionStart
-      if (typeof position === 'number') {
-        const segment = getSegmentFromPosition(
-          position,
-          inputValue,
-          config.delimiter,
-          config.segments,
-        )
-        if (!segment) return
-
-        const baseIncrement = event.key === 'ArrowUp' ? 1 : -1
-        let newMinutes = durationMinutes
-
-        newMinutes += baseIncrement * (segment === 'hour' ? 60 : 5)
-
-        if (newMinutes >= 0) {
-          updateEndTime(newMinutes)
-          const formatted = formatDuration(newMinutes)
-          setInputValue(formatted)
-          setTimeout(() => selectSegment(segment), 0)
-        }
-      }
-    }
-
-    if (event.key === 'Tab' && !event.shiftKey) {
-      const position = inputReference.current?.selectionStart
-      if (typeof position === 'number') {
-        const segment = getSegmentFromPosition(
-          position,
-          inputValue,
-          config.delimiter,
-          config.segments,
-        )
-        if (segment === 'hour') {
-          event.preventDefault()
-          selectSegment('minute')
-        }
-      }
-    }
-
-    if (event.key === 'Tab' && event.shiftKey) {
-      const position = inputReference.current?.selectionStart
-      if (typeof position === 'number') {
-        const segment = getSegmentFromPosition(
-          position,
-          inputValue,
-          config.delimiter,
-          config.segments,
-        )
-        if (segment === 'minute') {
-          event.preventDefault()
-          selectSegment('hour')
-        }
-      }
-    }
-
-    if (event.key === 'ArrowLeft') {
-      const position = inputReference.current?.selectionStart
-      if (typeof position === 'number') {
-        const segment = getSegmentFromPosition(
-          position,
-          inputValue,
-          config.delimiter,
-          config.segments,
-        )
-        if (segment === 'minute' && position === bounds.minute.start) {
-          event.preventDefault()
-          selectSegment('hour')
-        }
-      }
-    } else if (event.key === 'ArrowRight') {
-      const position = inputReference.current?.selectionStart
-      if (typeof position === 'number') {
-        const segment = getSegmentFromPosition(
-          position,
-          inputValue,
-          config.delimiter,
-          config.segments,
-        )
-        if (segment === 'hour' && position === bounds.hour.end) {
-          event.preventDefault()
-          selectSegment('minute')
-        }
-      }
-    }
-  }
-
-  const handleBlur = (event: React.FocusEvent<HTMLInputElement>): void => {
-    const relatedTarget = event.relatedTarget as HTMLElement
-    if (relatedTarget?.tagName === 'BUTTON' && relatedTarget.tabIndex === -1) {
-      return
-    }
-    setSelectedSegment(null)
-
-    const minutes = parseDuration(inputValue)
-    if (minutes === null) {
-      setInputValue(durationString)
-    } else {
-      setInputValue(formatDuration(minutes))
-    }
-  }
-
-  const handleFocus = (): void => {
-    if (inputValue === config.placeholder) {
-      setInputValue('')
-    } else if (inputValue && !focusFromArrowReference.current && !focusFromMouseReference.current) {
-      setTimeout(() => selectSegment('hour'), 0)
-    }
-    focusFromArrowReference.current = false
-    focusFromMouseReference.current = false
-  }
-
-  const handleArrowClick = (direction: 'down' | 'up') => {
-    const { end, start } = getStartEndValues()
-
-    const currentDurationMinutes = calculateDurationMinutes(
-      start ? new Date(start) : null,
-      end ? new Date(end) : null,
-    )
-
-    let targetSegment: DurationSegment
-    let incrementAmount: number
-
-    if (selectedSegment === 'hour') {
-      targetSegment = 'hour'
-      incrementAmount = 60
-    } else {
-      targetSegment = 'minute'
-      incrementAmount = 5
-    }
-
-    const baseIncrement = direction === 'up' ? 1 : -1
-    const newMinutes = currentDurationMinutes + baseIncrement * incrementAmount
-
-    if (newMinutes >= 0) {
-      updateEndTime(newMinutes)
-      const formatted = formatDuration(newMinutes)
-      setInputValue(formatted)
-
-      focusFromArrowReference.current = true
-
-      setTimeout(() => {
-        if (inputReference.current && !inputReference.current.matches(':focus')) {
-          inputReference.current.focus()
-        }
-        selectSegment(targetSegment)
-      }, 10)
-    }
-  }
-
-  const isInvalid = durationMinutes < 0
-
   return (
-    <SegmentedInputWrapper
-      hasSelection={!!selectedSegment}
-      label={t('formats.durationFormat', 'HH:MM')}
-      onArrowClick={handleArrowClick}>
-      <Input
-        className={`selection:bg-secondary selection:text-secondary-content join-item m-0 font-mono ${isInvalid ? 'text-error' : ''}`}
-        fullWidth={false}
-        onBlur={handleBlur}
-        onChange={handleInputChange}
-        onClick={handleClick}
-        onFocus={handleFocus}
-        onKeyDown={handleKeyDown}
-        onMouseDown={handleMouseDown}
-        placeholder={t('formats.durationFormat', 'HH:MM')}
-        ref={inputReference}
-        size="md"
-        style={{ fontSize: '0.95rem', width: 'calc(5ch + 1.6rem)' }}
-        type="text"
-        value={inputValue}
-        variant={isInvalid ? 'error' : 'default'}
-      />
-    </SegmentedInputWrapper>
+    <DurationSegmentInput
+      durationMinutes={durationMinutes}
+      isInvalid={durationMinutes < 0}
+      onDurationChange={updateEndTime}
+    />
   )
 }
