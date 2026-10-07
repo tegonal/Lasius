@@ -121,6 +121,7 @@ export const BookingHistoryFilter = ({
               fullWidth={false}
               onClick={handleBackToProjects}
               size="sm"
+              type="button"
               variant="ghost">
               <LucideIcon icon={ArrowLeft} size={16} />
               {t('actions.back', 'Back')}
@@ -132,7 +133,7 @@ export const BookingHistoryFilter = ({
         <Heading variant="section">{t('filter.title', 'Filter')}</Heading>
         {hasChanges && (
           <div className="absolute top-3 right-0">
-            <Button fullWidth={false} onClick={resetForm} size="xs" variant="ghost">
+            <Button fullWidth={false} onClick={resetForm} size="xs" type="button" variant="ghost">
               {t('actions.reset', 'Reset')}
             </Button>
           </div>
