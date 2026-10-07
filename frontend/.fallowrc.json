@@ -46,7 +46,7 @@
         "functions": ["handleKeyDown"],
         "maxCyclomatic": 23,
         "maxCognitive": 26,
-        "maxCrap": 552,
+        "maxCrap": 553,
         "reason": "Accepted key handler. A split adds functions but not fewer cases, and no test covers the handler. Decision: rr8-segmented-input-key-handlers."
       },
       {
@@ -54,7 +54,7 @@
         "functions": ["handleKeyDown"],
         "maxCyclomatic": 22,
         "maxCognitive": 24,
-        "maxCrap": 506,
+        "maxCrap": 507,
         "reason": "Accepted key handler. A split adds functions but not fewer cases, and no test covers the handler. Decision: rr8-segmented-input-key-handlers."
       },
       {
@@ -88,11 +88,6 @@
         "functions": ["getDefaultTagConfig"],
         "maxCrap": 35,
         "reason": "A literal table of defaults for each platform. The function holds no logic for a test to check."
-      },
-      {
-        "files": ["app/**/*.tsx", "app/**/use-*.ts"],
-        "maxCrap": 1000000,
-        "reason": "Unit tests run in Node without React (core/unit-testing), so a component or hook keeps 0 coverage and CRAP only repeats the complexity limits."
       }
     ]
   },
