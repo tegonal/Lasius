@@ -46,4 +46,30 @@ describe('GitLab profile', () => {
     expect((init.headers as Record<string, string>).Authorization).toBe('Bearer the-token')
     expect(profile).toEqual({ email: 'jane@example.com', userId: '42' })
   })
+
+  it('accepts an email that the provider marks as verified', async () => {
+    fetchMock.mockResolvedValue(
+      Response.json({ email: 'jane@example.com', email_verified: true, sub: '42' }),
+    )
+    const profile = await createGitLabProvider().getUserProfile('the-token')
+    expect(profile.email).toBe('jane@example.com')
+  })
+
+  it('rejects email_verified sent as the string false', async () => {
+    fetchMock.mockResolvedValue(
+      Response.json({ email: 'victim@example.com', email_verified: 'false', sub: '42' }),
+    )
+    await expect(createGitLabProvider().getUserProfile('the-token')).rejects.toThrow(
+      'GitLab email address is not verified',
+    )
+  })
+
+  it('rejects an email that the provider marks as unverified', async () => {
+    fetchMock.mockResolvedValue(
+      Response.json({ email: 'victim@example.com', email_verified: false, sub: '42' }),
+    )
+    await expect(createGitLabProvider().getUserProfile('the-token')).rejects.toThrow(
+      'GitLab email address is not verified',
+    )
+  })
 })

@@ -20,7 +20,7 @@
 import { getServerEnvironmentRequired } from '~/lib/environment.server'
 
 import { type OAuthProvider } from '../types'
-import { createOAuth2Provider, fetchProfile } from './oauth2-client.server'
+import { createOAuth2Provider, fetchOidcUserProfile } from './oauth2-client.server'
 
 export function createKeycloakProvider(): OAuthProvider {
   const baseUrl = `${getServerEnvironmentRequired('KEYCLOAK_OAUTH_URL')}/protocol/openid-connect`
@@ -31,14 +31,8 @@ export function createKeycloakProvider(): OAuthProvider {
       clientId: getServerEnvironmentRequired('KEYCLOAK_OAUTH_CLIENT_ID'),
       clientSecret: getServerEnvironmentRequired('KEYCLOAK_OAUTH_CLIENT_SECRET'),
     },
-    async getUserProfile(accessToken) {
-      const profile = await fetchProfile<{ email: string; sub: string }>(
-        'Keycloak',
-        `${baseUrl}/userinfo`,
-        accessToken,
-      )
-      return { email: profile.email, userId: profile.sub }
-    },
+    getUserProfile: (accessToken) =>
+      fetchOidcUserProfile('Keycloak', `${baseUrl}/userinfo`, accessToken),
     label: 'Keycloak',
     provider: 'keycloak',
     revokeUrl: `${baseUrl}/revoke`,

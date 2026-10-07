@@ -111,6 +111,27 @@ export function exchangeAuthorizationCode(
   })
 }
 
+/**
+ * Reads the OIDC userinfo of GitLab or Keycloak. It throws for an email that the provider marks as
+ * unverified, because the backend finds the Lasius user by email. A missing claim stays accepted.
+ */
+export async function fetchOidcUserProfile(
+  label: string,
+  url: string,
+  accessToken: string,
+): Promise<{ email: string; userId: string }> {
+  const profile = await fetchProfile<{
+    email: string
+    email_verified?: boolean | string
+    sub: string
+  }>(label, url, accessToken)
+  // Some issuers send the claim as the string "false".
+  if (profile.email_verified === false || profile.email_verified === 'false') {
+    throw new Error(`${label} email address is not verified`)
+  }
+  return { email: profile.email, userId: profile.sub }
+}
+
 /** Fetches a profile document with the access token. Throws on an error status. */
 export async function fetchProfile<T>(label: string, url: string, accessToken: string): Promise<T> {
   const response = await fetch(url, {

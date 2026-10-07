@@ -191,27 +191,46 @@ class OIDCTokenValidator extends AuthTokenValidator with Logging {
       token: String,
       response: WSResponse)(implicit ec: ExecutionContext): Future[UserInfo] = {
     logger.debug(s"userInfo: request succeeded: ${response.json}")
-    Future.successful(
-      UserInfo(
-        key = (response.json \ "email").as[String],
-        email = (response.json \ "email").as[String],
-        firstName = (response.json \ "given_name")
-          .asOpt[String]
-          .orElse((response.json \ "firstname").asOpt[String])
-          .orElse((response.json \ "name").asOpt[String]),
-        lastName = (response.json \ "family_name")
-          .asOpt[String]
-          .orElse((response.json \ "lastname").asOpt[String])
-      ))
+    // The backend finds the Lasius user by email, so an address that the provider marks as
+    // unverified must never sign in. A provider that omits the claim stays accepted.
+    val emailVerified = response.json \ "email_verified"
+    if (emailVerified.asOpt[Boolean].contains(false) ||
+      emailVerified.asOpt[String].contains("false")) {
+      Future.failed(
+        ExternalServiceCallFailed(
+          "userInfo: the email address is not verified"))
+    } else
+      Future.successful(
+        UserInfo(
+          key = (response.json \ "email").as[String],
+          email = (response.json \ "email").as[String],
+          firstName = (response.json \ "given_name")
+            .asOpt[String]
+            .orElse((response.json \ "firstname").asOpt[String])
+            .orElse((response.json \ "name").asOpt[String]),
+          lastName = (response.json \ "family_name")
+            .asOpt[String]
+            .orElse((response.json \ "lastname").asOpt[String])
+        ))
   }
 }
 
-class GithubTokenValidator extends AuthTokenValidator {
-
-  case class GithubEmail(email: String, primary: Boolean)
+object GithubTokenValidator {
+  case class GithubEmail(email: String, primary: Boolean, verified: Boolean)
   object GithubEmail {
     implicit val format: Format[GithubEmail] = Json.format[GithubEmail]
   }
+
+  /** The verified primary address, else the first verified address. */
+  def selectVerifiedEmail(emails: Seq[GithubEmail]): Option[String] =
+    emails
+      .find(e => e.primary && e.verified)
+      .orElse(emails.find(_.verified))
+      .map(_.email)
+}
+
+class GithubTokenValidator extends AuthTokenValidator {
+  import GithubTokenValidator._
 
   override def createIntrospectionPayload(config: OpaqueTokenIssuerConfig,
                                           token: String): JsObject = Json.obj(
@@ -267,9 +286,10 @@ class GithubTokenValidator extends AuthTokenValidator {
       .flatMap { response =>
         response.status match {
           case 200 =>
-            val emails = response.json.as[Seq[GithubEmail]]
-            val email  = emails.find(_.primary).getOrElse(emails.head)
-            Future.successful(email.email)
+            selectVerifiedEmail(response.json.as[Seq[GithubEmail]]).fold(
+              Future.failed[String](ExternalServiceCallFailed(
+                "userInfoEmail: the account has no verified email address")))(
+              Future.successful)
           case code =>
             logger.debug(
               s"userInfoEmail: request failed, response code $code, ${response.body}")

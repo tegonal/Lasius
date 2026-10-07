@@ -20,7 +20,7 @@
 import { getServerEnvironment, getServerEnvironmentRequired } from '~/lib/environment.server'
 
 import { type OAuthProvider } from '../types'
-import { createOAuth2Provider, fetchProfile } from './oauth2-client.server'
+import { createOAuth2Provider, fetchOidcUserProfile } from './oauth2-client.server'
 
 export function createGitLabProvider(): OAuthProvider {
   const baseUrl = getServerEnvironment('GITLAB_OAUTH_URL', 'https://gitlab.com')!
@@ -32,14 +32,8 @@ export function createGitLabProvider(): OAuthProvider {
       clientSecret: getServerEnvironmentRequired('GITLAB_OAUTH_CLIENT_SECRET'),
     },
     // The OIDC userinfo endpoint works with the `openid` scope; `/api/v4/user` needs `read_user`.
-    async getUserProfile(accessToken) {
-      const profile = await fetchProfile<{ email: string; sub: string }>(
-        'GitLab',
-        `${baseUrl}/oauth/userinfo`,
-        accessToken,
-      )
-      return { email: profile.email, userId: profile.sub }
-    },
+    getUserProfile: (accessToken) =>
+      fetchOidcUserProfile('GitLab', `${baseUrl}/oauth/userinfo`, accessToken),
     label: 'GitLab',
     provider: 'gitlab',
     revokeUrl: `${baseUrl}/oauth/revoke`,
