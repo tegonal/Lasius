@@ -22,6 +22,9 @@ import { data } from 'react-router'
 import { getConfiguration } from '~/services/api/lasius/general/general'
 import { getAuthSecret } from '~/services/auth/auth-secret.server'
 
+// A health check that waits for a hung backend blocks the container probe, so the probe gives up early.
+const BACKEND_PROBE_TIMEOUT_MS = 3000
+
 export type HealthResponse = {
   backend: 'connected' | 'disconnected'
   status: 'error' | 'ok'
@@ -40,7 +43,7 @@ export async function loader() {
 
   let backend: HealthResponse['backend']
   try {
-    await getConfiguration()
+    await getConfiguration({ signal: AbortSignal.timeout(BACKEND_PROBE_TIMEOUT_MS) })
     backend = 'connected'
   } catch {
     backend = 'disconnected'

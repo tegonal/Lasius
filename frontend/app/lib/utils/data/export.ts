@@ -17,7 +17,7 @@
  *
  */
 
-import { differenceInDays, format as formatDate, parseISO } from 'date-fns'
+import { format as formatDate } from 'date-fns'
 import * as XLSX from 'xlsx'
 
 import { getExtendedModelsBookingList } from '~/lib/api/functions/get-extended-models-booking-list'
@@ -44,37 +44,47 @@ export type ExportOptions = {
   to?: string
 }
 
+const MAX_COLUMN_WIDTH = 50
+
+const datePart = (isoDate: string): string => isoDate.split('T', 1)[0] ?? ''
+
+/**
+ * Returns one date for a range inside one calendar day, else `from-to-to`.
+ * Without a range, returns today.
+ */
+const formatFilenameTimespan = (from?: string, to?: string): string => {
+  if (!from || !to) return formatDate(new Date(), 'yyyy-MM-dd')
+  const fromDate = datePart(from)
+  const toDate = datePart(to)
+  return fromDate === toDate ? fromDate : `${fromDate}-to-${toDate}`
+}
+
 /**
  * Generates a filename for the export based on context and timespan.
  */
-const generateExportFilename = (format: ExportFormat, options?: ExportOptions): string => {
-  const parts = ['lasius']
-
-  if (options?.context) {
-    parts.push(options.context)
-  }
-
-  parts.push('bookings')
-
-  if (options?.contextName) {
-    parts.push(options.contextName)
-  }
-
-  if (options?.from && options.to) {
-    const daysDiff = differenceInDays(parseISO(options.to), parseISO(options.from))
-    if (daysDiff > 1) {
-      const fromDate = options.from.split('T', 1)[0]
-      const toDate = options.to.split('T', 1)[0]
-      parts.push(`${fromDate}-to-${toDate}`)
-    } else {
-      const date = options.from.split('T', 1)[0] ?? ''
-      parts.push(date)
-    }
-  } else {
-    parts.push(formatDate(new Date(), 'yyyy-MM-dd'))
-  }
+export const generateExportFilename = (format: ExportFormat, options?: ExportOptions): string => {
+  const parts = [
+    'lasius',
+    options?.context,
+    'bookings',
+    options?.contextName,
+    formatFilenameTimespan(options?.from, options?.to),
+  ].filter(Boolean)
 
   return `${parts.join('-')}.${format}`
+}
+
+/**
+ * Returns one column width per key: the longest of the header and every value, plus 2, capped at 50.
+ */
+export const computeColumnWidths = (rows: Record<string, number | string>[]): { wch: number }[] => {
+  const widths = new Map<string, number>()
+  for (const row of rows) {
+    for (const [key, value] of Object.entries(row)) {
+      widths.set(key, Math.max(widths.get(key) ?? key.length, String(value).length))
+    }
+  }
+  return Array.from(widths.values(), (width) => ({ wch: Math.min(width + 2, MAX_COLUMN_WIDTH) }))
 }
 
 /**
@@ -119,28 +129,12 @@ export const exportBookingList = (
   const wb = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(wb, ws, 'Bookings')
 
-  const init: Record<string, number> = {}
-  const maxLengths = data.reduce((accumulator, row) => {
-    for (const key of Object.keys(row)) {
-      const value = String(row[key as keyof typeof row] || '')
-      accumulator[key] = Math.max(
-        (accumulator[key] ?? 0) > 0 ? (accumulator[key] ?? 0) : key.length,
-        value.length,
-      )
-    }
-    return accumulator
-  }, init)
+  ws['!cols'] = computeColumnWidths(data)
 
-  ws['!cols'] = Object.values(maxLengths).map((value) => ({
-    wch: Math.min((value ?? 0) + 2, 50),
-  }))
-
-  const bookTypeMap: Record<string, string> = { csv: 'csv', xlsx: 'xlsx' }
-  const bookType = bookTypeMap[format] ?? 'ods'
   const filename = generateExportFilename(format, options)
 
   const buffer = XLSX.write(wb, {
-    bookType: bookType as XLSX.BookType,
+    bookType: format,
     compression: format !== 'csv',
     type: 'array',
   }) as Uint8Array

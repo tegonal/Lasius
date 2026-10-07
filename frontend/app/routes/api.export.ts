@@ -18,6 +18,7 @@
  */
 
 import { endOfDay, format, isValid, startOfDay } from 'date-fns'
+import { z } from 'zod'
 
 import { getAdaptiveGranularity, type Granularity } from '~/lib/api/config/granularity-config'
 import { filterModelsBookingListByTags } from '~/lib/api/functions/filter-models-booking-list-by-tags'
@@ -54,7 +55,7 @@ const formatDateParameterEnd = (dateString: string): string => {
   return format(endOfDay(date), apiDateFormat)
 }
 
-const contentTypeMap: Record<string, string> = {
+const contentTypeMap: Record<ExportFormat, string> = {
   csv: 'text/csv',
   ods: 'application/vnd.oasis.opendocument.spreadsheet',
   xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -87,67 +88,73 @@ export async function loader({ request, url }: Route.LoaderArgs) {
   return response
 }
 
-async function createExportResponse(url: URL, headers: HeadersInit): Promise<Response> {
-  const type = url.searchParams.get('type')
-  const formatParameter = url.searchParams.get('format') as ExportFormat | null
-  const orgId = url.searchParams.get('orgId')
-  const from = url.searchParams.get('from')
-  const to = url.searchParams.get('to')
+const requiredParameter = z.string().min(1)
 
-  if (!type || !formatParameter || !orgId || !from || !to) {
-    return new Response('Missing required parameters', { status: 400 })
+const requiredParametersSchema = z.object({
+  format: requiredParameter,
+  from: requiredParameter,
+  orgId: requiredParameter,
+  to: requiredParameter,
+  type: requiredParameter,
+})
+
+const totalParameter = z.coerce.number().default(0)
+
+const exportParametersSchema = z.discriminatedUnion('type', [
+  z.object({
+    context: z.enum(['organisation', 'project', 'user']).default('user'),
+    format: z.enum(['csv', 'ods', 'xlsx']),
+    from: requiredParameter,
+    orgId: requiredParameter,
+    projectId: z.string().default(''),
+    tags: z.string().default(''),
+    to: requiredParameter,
+    type: z.literal('bookings'),
+    userId: z.string().default(''),
+  }),
+  z.object({
+    // exportStatistics writes workbooks with several sheets, so it does not support CSV.
+    format: z.enum(['ods', 'xlsx']),
+    from: requiredParameter,
+    orgId: requiredParameter,
+    scope: z.enum(['organisation', 'user']).default('user'),
+    to: requiredParameter,
+    totalBookings: totalParameter,
+    totalHours: totalParameter,
+    totalProjects: totalParameter,
+    totalUsers: totalParameter,
+    type: z.literal('statistics'),
+  }),
+])
+
+export type ParseExportParametersResult =
+  { error: string; ok: false } | { ok: true; parameters: ExportParameters }
+type BookingsExportParameters = Omit<Extract<ExportParameters, { type: 'bookings' }>, 'type'>
+type ExportParameters = z.infer<typeof exportParametersSchema>
+
+type StatisticsExportParameters = Omit<Extract<ExportParameters, { type: 'statistics' }>, 'type'>
+
+/**
+ * Validates the query of GET /api/export. An invalid query gets an error message for a 400 response.
+ */
+export const parseExportParameters = (
+  searchParameters: URLSearchParams,
+): ParseExportParametersResult => {
+  const raw = Object.fromEntries(searchParameters)
+  if (!requiredParametersSchema.safeParse(raw).success) {
+    return { error: 'Missing required parameters', ok: false }
   }
 
-  try {
-    if (type === 'bookings') {
-      return await handleBookingsExport({
-        context: (url.searchParams.get('context') as 'organisation' | 'project' | 'user') ?? 'user',
-        format: formatParameter,
-        from,
-        headers,
-        orgId,
-        projectId: url.searchParams.get('projectId') ?? '',
-        tags: url.searchParams.get('tags') ?? '',
-        to,
-        userId: url.searchParams.get('userId') ?? '',
-      })
-    }
+  const result = exportParametersSchema.safeParse(raw)
+  if (result.success) return { ok: true, parameters: result.data }
 
-    if (type === 'statistics') {
-      return await handleStatisticsExport({
-        format: formatParameter as 'ods' | 'xlsx',
-        from,
-        headers,
-        orgId,
-        scope: (url.searchParams.get('scope') as 'organisation' | 'user') ?? 'user',
-        summary: {
-          totalBookings: Number(url.searchParams.get('totalBookings') ?? 0),
-          totalHours: Number(url.searchParams.get('totalHours') ?? 0),
-          totalProjects: Number(url.searchParams.get('totalProjects') ?? 0),
-          totalUsers: Number(url.searchParams.get('totalUsers') ?? 0),
-        },
-        to,
-      })
-    }
-
-    return new Response('Invalid export type', { status: 400 })
-  } catch (error) {
-    logger.error('Export failed', error)
-    return new Response('Export failed', { status: 500 })
-  }
+  const isInvalidType = result.error.issues.some((issue) => issue.path[0] === 'type')
+  return { error: isInvalidType ? 'Invalid export type' : 'Invalid export parameters', ok: false }
 }
 
-async function handleBookingsExport(parameters: {
-  context: 'organisation' | 'project' | 'user'
-  format: ExportFormat
-  from: string
-  headers: HeadersInit
-  orgId: string
-  projectId: string
-  tags: string
-  to: string
-  userId: string
-}) {
+export async function handleBookingsExport(
+  parameters: BookingsExportParameters & { headers: HeadersInit },
+) {
   const timespan = apiTimespanFromTo(parameters.from, parameters.to)
   if (!timespan) {
     return new Response('Invalid date range', { status: 400 })
@@ -180,26 +187,43 @@ async function handleBookingsExport(parameters: {
   return new Response(buffer as Uint8Array<ArrayBuffer>, {
     headers: {
       'Content-Disposition': `attachment; filename="${filename}"`,
-      'Content-Type': contentTypeMap[parameters.format] ?? 'application/octet-stream',
+      'Content-Type': contentTypeMap[parameters.format],
     },
   })
 }
 
-async function handleStatisticsExport(parameters: {
-  format: 'ods' | 'xlsx'
-  from: string
-  headers: HeadersInit
-  orgId: string
-  scope: 'organisation' | 'user'
-  summary: {
-    totalBookings: number
-    totalHours: number
-    totalProjects: number
-    totalUsers: number
+async function createExportResponse(url: URL, headers: HeadersInit): Promise<Response> {
+  const parsed = parseExportParameters(url.searchParams)
+  if (!parsed.ok) {
+    return new Response(parsed.error, { status: 400 })
   }
-  to: string
-}) {
-  const { format: exportFormat, from, headers: requestHeaders, orgId, scope, to } = parameters
+
+  const { parameters } = parsed
+  try {
+    return parameters.type === 'bookings'
+      ? await handleBookingsExport({ ...parameters, headers })
+      : await handleStatisticsExport({ ...parameters, headers })
+  } catch (error) {
+    logger.error('Export failed', error)
+    return new Response('Export failed', { status: 500 })
+  }
+}
+
+async function handleStatisticsExport(
+  parameters: StatisticsExportParameters & { headers: HeadersInit },
+) {
+  const {
+    format: exportFormat,
+    from,
+    headers: requestHeaders,
+    orgId,
+    scope,
+    to,
+    totalBookings,
+    totalHours,
+    totalProjects,
+    totalUsers,
+  } = parameters
   const granularity = getAdaptiveGranularity(from, to)
   const apiFrom = formatDateParameter(from)
   const apiTo = formatDateParameterEnd(to)
@@ -264,7 +288,7 @@ async function handleStatisticsExport(parameters: {
       aggregated,
       byDayAndSource,
       scope,
-      summary: { from, to, ...parameters.summary },
+      summary: { from, to, totalBookings, totalHours, totalProjects, totalUsers },
     },
     exportFormat,
   )
@@ -272,7 +296,7 @@ async function handleStatisticsExport(parameters: {
   return new Response(buffer as Uint8Array<ArrayBuffer>, {
     headers: {
       'Content-Disposition': `attachment; filename="${filename}"`,
-      'Content-Type': contentTypeMap[exportFormat] ?? 'application/octet-stream',
+      'Content-Type': contentTypeMap[exportFormat],
     },
   })
 }

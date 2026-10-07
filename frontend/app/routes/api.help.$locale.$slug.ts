@@ -22,6 +22,8 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { data } from 'react-router'
 
+import { logger } from '~/lib/logger'
+
 import { type Route } from './+types/api.help.$locale.$slug'
 
 /**
@@ -66,7 +68,8 @@ export async function loader({ params }: Route.LoaderArgs) {
         },
       },
     )
-  } catch {
+  } catch (error) {
+    logger.error(`Failed to compile help file ${safeLocale}/${safeSlug}`, error)
     return data({ error: 'Failed to compile MDX' }, { status: 500 })
   }
 }
