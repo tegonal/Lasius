@@ -17,8 +17,19 @@
  *
  */
 
+import { stringHash } from '~/lib/utils/string-hash'
 import { type WebSocketOutEvent } from '~/services/api/lasius/webSocketOutEvent'
 
 export function isWebSocketOutEvent(data?: unknown): data is WebSocketOutEvent {
   return typeof data === 'object' && data !== null && 'type' in data
+}
+
+// The socket can deliver the same message again after a re-render, so the hash skips a repeat.
+export const getNewOutEvent = (
+  message: unknown,
+  previousHash: null | string,
+): null | { event: WebSocketOutEvent; hash: string } => {
+  if (!isWebSocketOutEvent(message)) return null
+  const hash = stringHash(message)
+  return hash === previousHash ? null : { event: message, hash }
 }

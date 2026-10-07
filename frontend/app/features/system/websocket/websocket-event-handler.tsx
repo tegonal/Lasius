@@ -25,11 +25,10 @@ import { useToast } from '~/components/ui/feedback/use-toast'
 import { untyped } from '~/lib/i18n-types'
 import { logger } from '~/lib/logger'
 import { clearLoaderCache } from '~/lib/utils/loader-cache'
-import { stringHash } from '~/lib/utils/string-hash'
 
-import { isWebSocketOutEvent } from './type-guards'
+import { getNewOutEvent } from './type-guards'
 import { useLasiusWebsocket } from './use-lasius-websocket'
-import { getWebSocketEventReaction } from './websocket-event-reactions'
+import { getWebSocketEventReaction, type WebSocketEventReaction } from './websocket-event-reactions'
 
 // The backend sends these event types, but the generated WebSocketOutEvent union does not list them.
 const IGNORED_EVENTS = new Set([
@@ -39,6 +38,37 @@ const IGNORED_EVENTS = new Set([
   'UserTimeBookingByTagEntryAdded',
   'UserTimeBookingByTagEntryRemoved',
 ])
+
+// A message can hold booking data and the names of all organisation members, so production logs none.
+const logDevelopmentInfo: (...arguments_: unknown[]) => void = import.meta.env.DEV
+  ? (...arguments_) => logger.info(...arguments_)
+  : () => {}
+
+const logSkippedEvent = (messageType: string, isIgnored: boolean, message: unknown) => {
+  if (isIgnored || IGNORED_EVENTS.has(messageType)) {
+    logDevelopmentInfo('[WebSocketEventHandler][IgnoredEvent]', messageType)
+    return
+  }
+  logger.warn('[WebSocketEventHandler][UnhandledEvent]', messageType, message)
+}
+
+const applyReaction = (
+  reaction: WebSocketEventReaction,
+  revalidate: () => Promise<void>,
+  addToast: (toast: NonNullable<WebSocketEventReaction['toast']>) => void,
+) => {
+  if (reaction.errorLog) {
+    logger.error(reaction.errorLog.tag, reaction.errorLog.message)
+  }
+  if (reaction.revalidate) {
+    // The event reports a change from another tab or device, so a cached loader result is stale.
+    clearLoaderCache()
+    void revalidate()
+  }
+  if (reaction.toast) {
+    addToast(reaction.toast)
+  }
+}
 
 export const WebSocketEventHandler = () => {
   const { lastMessage } = useLasiusWebsocket()
@@ -63,43 +93,24 @@ export const WebSocketEventHandler = () => {
   }, [translate])
 
   useEffect(() => {
-    if (!lastMessage) return
+    const next = getNewOutEvent(lastMessage, lastMessageHashReference.current)
+    if (!next) return
+    lastMessageHashReference.current = next.hash
+    const { event } = next
 
-    const hash = stringHash(lastMessage)
-    if (hash === lastMessageHashReference.current) return
-    lastMessageHashReference.current = hash
+    logDevelopmentInfo('[WebSocketEventHandler]', event)
 
-    if (!isWebSocketOutEvent(lastMessage)) return
-
-    // A message can hold booking data and the names of all organisation members.
-    if (import.meta.env.DEV) {
-      logger.info('[WebSocketEventHandler]', lastMessage)
-    }
-
-    const reaction = getWebSocketEventReaction(lastMessage, untyped(tReference.current))
+    const reaction = getWebSocketEventReaction(event, untyped(tReference.current))
     if (!reaction || reaction.ignored) {
-      const messageType = lastMessage.type as string
-      if (reaction?.ignored || IGNORED_EVENTS.has(messageType)) {
-        if (import.meta.env.DEV) {
-          logger.info('[WebSocketEventHandler][IgnoredEvent]', messageType)
-        }
-      } else {
-        logger.warn('[WebSocketEventHandler][UnhandledEvent]', messageType, lastMessage)
-      }
+      logSkippedEvent(event.type, reaction?.ignored === true, event)
       return
     }
 
-    if (reaction.errorLog) {
-      logger.error(reaction.errorLog.tag, reaction.errorLog.message)
-    }
-    if (reaction.revalidate) {
-      // The event reports a change from another tab or device, so a cached loader result is stale.
-      clearLoaderCache()
-      void revalidatorReference.current.revalidate()
-    }
-    if (reaction.toast) {
-      latestAddToastReference.current(reaction.toast)
-    }
+    applyReaction(
+      reaction,
+      revalidatorReference.current.revalidate,
+      latestAddToastReference.current,
+    )
   }, [lastMessage])
 
   return null

@@ -19,7 +19,24 @@
 
 import { describe, expect, it } from 'vitest'
 
-import { isWebSocketOutEvent } from './type-guards'
+import { getNewOutEvent, isWebSocketOutEvent } from './type-guards'
+
+describe('getNewOutEvent', () => {
+  it('returns the event and its hash for a new message', () => {
+    const result = getNewOutEvent({ type: 'Pong' }, null)
+    expect(result?.event).toEqual({ type: 'Pong' })
+    expect(result?.hash).toEqual(expect.any(String))
+  })
+
+  it('returns null for the message of the previous hash', () => {
+    const first = getNewOutEvent({ type: 'Pong' }, null)
+    expect(getNewOutEvent({ type: 'Pong' }, first?.hash ?? null)).toBeNull()
+  })
+
+  it('returns null for a message without a type', () => {
+    expect(getNewOutEvent({ data: 'foo' }, null)).toBeNull()
+  })
+})
 
 describe('isWebSocketOutEvent', () => {
   it('returns true for objects with a type property', () => {
