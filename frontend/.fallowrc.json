@@ -66,6 +66,30 @@
         "reason": "Accepted key handler. A split adds functions but not fewer cases, and no test covers the handler. Decision: rr8-segmented-input-key-handlers."
       },
       {
+        "files": ["app/routes/internal-oauth.register.tsx"],
+        "functions": ["InternalOAuthRegister"],
+        "maxCognitive": 16,
+        "reason": "Legacy internal OAuth provider for dev, demo and E2E only. auth/register.unauth.spec.ts covers the form with six tests."
+      },
+      {
+        "files": ["app/services/auth/providers/internal.server.ts"],
+        "functions": ["loginWithCredentials"],
+        "maxCrap": 45,
+        "reason": "Legacy internal OAuth provider for dev, demo and E2E only. Every E2E sign-in runs this function."
+      },
+      {
+        "files": ["app/services/auth/providers/index.ts"],
+        "functions": ["createProvider"],
+        "maxCrap": 35,
+        "reason": "A flat factory switch with one case for each provider. A unit test repeats the switch and finds no defect."
+      },
+      {
+        "files": ["app/features/integrations/lib/tag-config-defaults.ts"],
+        "functions": ["getDefaultTagConfig"],
+        "maxCrap": 35,
+        "reason": "A literal table of defaults for each platform. The function holds no logic for a test to check."
+      },
+      {
         "files": ["app/**/*.tsx", "app/**/use-*.ts"],
         "maxCrap": 1000000,
         "reason": "Unit tests run in Node without React (core/unit-testing), so a component or hook keeps 0 coverage and CRAP only repeats the complexity limits."
