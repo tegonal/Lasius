@@ -207,9 +207,6 @@ export const ProjectMappingsModal = ({ config, onClose, open, selectedOrgId }: P
 
   const handleMappingUpsert = useCallback(
     (externalProjectId: string, lasiusProjectId: string, tagConfig: TagConfig | undefined) => {
-      upsertMapping(externalProjectId, lasiusProjectId, tagConfig)
-
-      // Add/update via API
       const externalProject = projectsReference.current.find((p) => p.id === externalProjectId)
 
       const result = buildMappingPayload(
@@ -231,6 +228,7 @@ export const ProjectMappingsModal = ({ config, onClose, open, selectedOrgId }: P
         return
       }
 
+      upsertMapping(externalProjectId, lasiusProjectId, tagConfig)
       mappingAdditionApi.submit({
         body: result.payload,
         configId,

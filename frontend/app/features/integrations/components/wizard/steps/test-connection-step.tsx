@@ -17,18 +17,17 @@
  *
  */
 
-import { CheckCircle, Loader2, RefreshCw, XCircle } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { Button } from '~/components/primitives/buttons/button'
-import { LucideIcon } from '~/components/ui/icons/lucide-icon'
-import { type WizardFormData } from '~/features/integrations/hooks/use-wizard-state'
-import { logger } from '~/lib/logger'
 import {
-  type ModelsCreateIssueImporterConfig,
-  type ModelsIssueImporterConfigResponse,
-} from '~/services/api/lasius'
+  type TestStatus,
+  TestStatusView,
+} from '~/features/integrations/components/wizard/steps/test-status-view'
+import { type WizardFormData } from '~/features/integrations/hooks/use-wizard-state'
+import { buildConfigBody } from '~/features/integrations/lib/wizard-config-body'
+import { logger } from '~/lib/logger'
+import { type ModelsIssueImporterConfigResponse } from '~/services/api/lasius'
 import {
   useCreateConfig,
   useTestConnectivity,
@@ -41,30 +40,6 @@ type Properties = {
   onConfigCreated: (config: ModelsIssueImporterConfigResponse) => void
   onNext: () => void
   selectedOrgId: string
-}
-
-type TestStatus = 'error' | 'idle' | 'saving' | 'success' | 'testing'
-
-function buildConfigBody(formData: WizardFormData): ModelsCreateIssueImporterConfig {
-  return {
-    accessToken: formData.accessToken,
-    baseUrl: formData.baseUrl,
-    checkFrequency: formData.checkFrequency,
-    importerType: formData.importerType!,
-    name: formData.name,
-    ...(formData.importerType === 'github' && {
-      resourceOwner: formData.resourceOwner,
-      resourceOwnerType: formData.resourceOwnerType,
-    }),
-    ...(formData.importerType === 'jira' && {
-      consumerKey: formData.consumerKey,
-      privateKey: formData.privateKey,
-    }),
-    ...(formData.importerType === 'plane' && {
-      apiKey: formData.apiKey,
-      workspace: formData.workspace,
-    }),
-  }
 }
 
 export const TestConnectionStep = ({
@@ -81,61 +56,54 @@ export const TestConnectionStep = ({
   const hasTestedReference = useRef(false)
   const successTimeoutReference = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
-  const testConnectivity = useTestConnectivity({
-    onError: (error) => {
-      logger.error('[TestConnectionStep] Connection test failed:', error)
-      setTestStatus('error')
-      setErrorMessage(
-        t('issueImporters.wizard.test.failed', {
-          defaultValue: 'Connection test failed. Please check your credentials and URL.',
-        }),
-      )
-      hasTestedReference.current = false
-    },
-    onSuccess: (data) => {
-      if (data.status === 'success') {
-        if (existingConfig) {
-          // Config already created from a previous pass — skip creation
-          setTestStatus('success')
-          onConfigCreated(existingConfig)
-          successTimeoutReference.current = setTimeout(() => {
-            onNext()
-          }, 1500)
-        } else {
-          setTestStatus('saving')
-          const body = buildConfigBody(formData)
-          configCreation.submit({ body, orgId: selectedOrgId })
-        }
-      } else {
-        setTestStatus('error')
-        setErrorMessage(
-          data.message ||
-            t('issueImporters.wizard.test.failed', {
-              defaultValue: 'Connection test failed. Please check your credentials and URL.',
-            }),
-        )
-        hasTestedReference.current = false
-      }
-    },
+  const testFailedMessage = t('issueImporters.wizard.test.failed', {
+    defaultValue: 'Connection test failed. Please check your credentials and URL.',
   })
 
-  const configCreation = useCreateConfig({
+  // A failure clears the guard, so that a retry can run the test again.
+  const failWith = (message: string) => {
+    setTestStatus('error')
+    setErrorMessage(message)
+    hasTestedReference.current = false
+  }
+
+  const succeed = (config: ModelsIssueImporterConfigResponse) => {
+    setTestStatus('success')
+    onConfigCreated(config)
+    successTimeoutReference.current = setTimeout(() => {
+      onNext()
+    }, 1500)
+  }
+
+  const { reset: resetCreate, submit: submitCreate } = useCreateConfig({
     onError: (error) => {
       logger.error('[TestConnectionStep] Config creation failed:', error)
-      setTestStatus('error')
-      setErrorMessage(
+      failWith(
         t('issueImporters.wizard.test.createFailed', {
           defaultValue: 'Connection succeeded but failed to save configuration.',
         }),
       )
-      hasTestedReference.current = false
     },
-    onSuccess: (config) => {
-      setTestStatus('success')
-      onConfigCreated(config)
-      successTimeoutReference.current = setTimeout(() => {
-        onNext()
-      }, 1500)
+    onSuccess: succeed,
+  })
+
+  const { reset: resetTest, submit: submitTest } = useTestConnectivity({
+    onError: (error) => {
+      logger.error('[TestConnectionStep] Connection test failed:', error)
+      failWith(testFailedMessage)
+    },
+    onSuccess: (data) => {
+      if (data.status !== 'success') {
+        failWith(data.message || testFailedMessage)
+        return
+      }
+      // A config from a previous pass already exists, so the step skips the creation.
+      if (existingConfig) {
+        succeed(existingConfig)
+        return
+      }
+      setTestStatus('saving')
+      submitCreate({ body: buildConfigBody(formData), orgId: selectedOrgId })
     },
   })
 
@@ -146,25 +114,23 @@ export const TestConnectionStep = ({
     setTestStatus('testing')
     setErrorMessage(undefined)
 
-    const body = buildConfigBody(formData)
-    testConnectivity.submit({ body, orgId: selectedOrgId })
-  }, [formData, selectedOrgId, testConnectivity])
+    submitTest({ body: buildConfigBody(formData), orgId: selectedOrgId })
+  }, [formData, selectedOrgId, submitTest])
 
   const handleRetry = useCallback(() => {
     hasTestedReference.current = false
-    testConnectivity.reset()
-    configCreation.reset()
+    resetTest()
+    resetCreate()
     runTest()
-  }, [runTest, testConnectivity, configCreation])
+  }, [runTest, resetTest, resetCreate])
 
   // Auto-test on mount (ref guard prevents re-runs)
   useEffect(() => {
     runTest()
   }, [runTest])
 
-  // Clean up success timeout on unmount only — must be separate from the
-  // auto-test effect because runTest changes identity when testConnectivity
-  // state changes, which would clear the navigation timeout prematurely.
+  // Clean up the success timeout on unmount only. The auto-test effect re-runs when runTest
+  // changes identity, so its cleanup would cancel the navigation timeout too early.
   useEffect(() => {
     return () => {
       if (successTimeoutReference.current) {
@@ -174,66 +140,11 @@ export const TestConnectionStep = ({
   }, [])
 
   return (
-    <div className="flex h-full flex-col items-center justify-center">
-      <div className="flex flex-col items-center">
-        {(testStatus === 'testing' || testStatus === 'saving') && (
-          <>
-            <LucideIcon className="text-primary animate-spin" icon={Loader2} size={64} />
-            <p className="text-base-content/70 mt-4">
-              {testStatus === 'testing'
-                ? t('issueImporters.wizard.test.testing', {
-                    defaultValue: 'Testing connection...',
-                  })
-                : t('issueImporters.wizard.test.saving', {
-                    defaultValue: 'Saving configuration...',
-                  })}
-            </p>
-          </>
-        )}
-
-        {testStatus === 'success' && (
-          <>
-            <LucideIcon className="text-success" icon={CheckCircle} size={64} />
-            <p className="text-success mt-4 font-semibold">
-              {t('issueImporters.wizard.test.success', {
-                defaultValue: 'Connection successful!',
-              })}
-            </p>
-            <p className="text-base-content/70 mt-2 text-sm">
-              {t('issueImporters.wizard.test.successDescription', {
-                defaultValue: 'Proceeding to next step...',
-              })}
-            </p>
-          </>
-        )}
-
-        {testStatus === 'error' && (
-          <>
-            <LucideIcon className="text-error" icon={XCircle} size={64} />
-            <p className="text-error mt-4 font-semibold">
-              {t('issueImporters.wizard.test.error', {
-                defaultValue: 'Connection failed',
-              })}
-            </p>
-            {errorMessage && (
-              <div className="alert alert-error mt-4">
-                <p className="text-sm">{errorMessage}</p>
-              </div>
-            )}
-            <div className="mt-6 flex gap-3">
-              <Button fullWidth={false} onClick={onBack} size="sm" variant="ghost">
-                {t('actions.back', { defaultValue: 'Back' })}
-              </Button>
-              <Button fullWidth={false} onClick={handleRetry} size="sm" variant="primary">
-                <LucideIcon icon={RefreshCw} size={16} />
-                {t('issueImporters.wizard.test.retry', {
-                  defaultValue: 'Retry Connection Test',
-                })}
-              </Button>
-            </div>
-          </>
-        )}
-      </div>
-    </div>
+    <TestStatusView
+      errorMessage={errorMessage}
+      onBack={onBack}
+      onRetry={handleRetry}
+      testStatus={testStatus}
+    />
   )
 }

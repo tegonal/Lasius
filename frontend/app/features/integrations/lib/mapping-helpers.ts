@@ -58,6 +58,42 @@ export type ProjectMapping =
 export type TagConfig =
   ModelsGithubTagConfiguration | ModelsGitlabTagConfiguration | ModelsPlaneTagConfiguration
 
+type PlatformFields = Partial<ModelsCreateProjectMapping>
+
+type PlatformFieldsResult = { error: string } | { fields: PlatformFields }
+
+const INVALID_GITHUB_REPO = 'Invalid GitHub repository format. Expected "owner/repo"'
+const MISSING_EXTERNAL_PROJECT_ID = 'Missing external project id'
+
+const githubFields = (externalProjectId: string, tagConfig?: TagConfig): PlatformFieldsResult => {
+  const parts = externalProjectId.split('/')
+  const [owner, repo] = parts
+  if (parts.length !== 2 || !owner || !repo) {
+    return { error: INVALID_GITHUB_REPO }
+  }
+  return {
+    fields: {
+      githubRepoName: repo,
+      githubRepoOwner: owner,
+      githubTagConfig: tagConfig as ModelsGithubTagConfiguration | undefined,
+    },
+  }
+}
+
+const PLATFORM_FIELDS: Record<
+  ImporterType,
+  (externalProjectId: string, tagConfig?: TagConfig) => PlatformFieldsResult
+> = {
+  github: githubFields,
+  gitlab: (externalProjectId, tagConfig) => ({
+    fields: { gitlabProjectId: externalProjectId, gitlabTagConfig: tagConfig },
+  }),
+  jira: (externalProjectId) => ({ fields: { jiraProjectKey: externalProjectId } }),
+  plane: (externalProjectId, tagConfig) => ({
+    fields: { planeProjectId: externalProjectId, planeTagConfig: tagConfig },
+  }),
+}
+
 /**
  * Build platform-specific project mapping payload
  */
@@ -68,6 +104,15 @@ export const buildMappingPayload = (
   tagConfig?: TagConfig,
   externalProjectName?: string,
 ): MappingPayloadResult => {
+  if (externalProjectId.trim() === '') {
+    return { error: MISSING_EXTERNAL_PROJECT_ID, success: false }
+  }
+
+  const result = PLATFORM_FIELDS[importerType](externalProjectId, tagConfig)
+  if ('error' in result) {
+    return { error: result.error, success: false }
+  }
+
   const payload: ModelsCreateProjectMapping = {
     externalProjectName: externalProjectName || null,
     githubRepoName: null,
@@ -82,51 +127,25 @@ export const buildMappingPayload = (
     planeTagConfig: undefined,
     projectId: lasiusProjectId,
     projectKeyPrefix: null,
-  }
-
-  switch (importerType) {
-    case 'github': {
-      const [owner, repo] = externalProjectId.split('/')
-      if (!owner || !repo) {
-        return {
-          error: 'Invalid GitHub repository format. Expected "owner/repo"',
-          success: false,
-        }
-      }
-      payload.githubRepoOwner = owner
-      payload.githubRepoName = repo
-      if (tagConfig) {
-        payload.githubTagConfig = tagConfig as ModelsGithubTagConfiguration
-      }
-      break
-    }
-
-    case 'gitlab': {
-      payload.gitlabProjectId = externalProjectId
-      if (tagConfig) {
-        payload.gitlabTagConfig = tagConfig
-      }
-      break
-    }
-
-    case 'jira': {
-      payload.jiraProjectKey = externalProjectId
-      break
-    }
-
-    case 'plane': {
-      payload.planeProjectId = externalProjectId
-      if (tagConfig) {
-        payload.planeTagConfig = tagConfig
-      }
-      break
-    }
+    ...result.fields,
   }
 
   return {
     payload,
     success: true,
   }
+}
+
+const githubProjectId = (mapping: ProjectMapping): null | string => {
+  const { githubRepoName, githubRepoOwner } = (mapping as ModelsGithubProjectMapping).settings
+  return githubRepoOwner && githubRepoName ? `${githubRepoOwner}/${githubRepoName}` : null
+}
+
+const EXTERNAL_PROJECT_ID: Record<ImporterType, (mapping: ProjectMapping) => null | string> = {
+  github: githubProjectId,
+  gitlab: (mapping) => (mapping as ModelsGitlabProjectMapping).settings.gitlabProjectId || null,
+  jira: (mapping) => (mapping as ModelsJiraProjectMapping).settings.jiraProjectKey || null,
+  plane: (mapping) => (mapping as ModelsPlaneProjectMapping).settings.planeProjectId || null,
 }
 
 /**
@@ -139,27 +158,7 @@ export const extractExternalProjectId = (
   if (!mapping?.settings) {
     return null
   }
-
-  switch (importerType) {
-    case 'github': {
-      const settings = (mapping as ModelsGithubProjectMapping).settings
-      return settings.githubRepoOwner && settings.githubRepoName
-        ? `${settings.githubRepoOwner}/${settings.githubRepoName}`
-        : null
-    }
-
-    case 'gitlab': {
-      return (mapping as ModelsGitlabProjectMapping).settings.gitlabProjectId || null
-    }
-
-    case 'jira': {
-      return (mapping as ModelsJiraProjectMapping).settings.jiraProjectKey || null
-    }
-
-    case 'plane': {
-      return (mapping as ModelsPlaneProjectMapping).settings.planeProjectId || null
-    }
-  }
+  return EXTERNAL_PROJECT_ID[importerType](mapping)
 }
 
 export type MappingStatEntry = {

@@ -22,6 +22,10 @@ import { useTranslation } from 'react-i18next'
 
 import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
 import { useGithubResourceOwners } from '~/features/integrations/hooks/use-github-resource-owners'
+import {
+  getResourceOwnerPlaceholderState,
+  type ResourceOwnerPlaceholderState,
+} from '~/features/integrations/lib/resource-owner-placeholder'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 
 type Properties = {
@@ -53,6 +57,34 @@ export const GithubResourceOwnerField = ({
     orgId: selectedOrgId,
   })
 
+  const placeholderLabels: Record<ResourceOwnerPlaceholderState, string> = {
+    empty: t('issueImporters.fields.resourceOwnerNoResults', {
+      defaultValue: 'No organizations found',
+    }),
+    loading: t('issueImporters.fields.resourceOwnerLoading', {
+      defaultValue: 'Loading organizations...',
+    }),
+    needsToken: t('issueImporters.fields.resourceOwnerPlaceholder', {
+      defaultValue: 'Enter access token above to load organizations',
+    }),
+    select: t('issueImporters.fields.resourceOwnerSelect', {
+      defaultValue: 'Select an organization',
+    }),
+  }
+  const placeholderState = getResourceOwnerPlaceholderState({
+    hasAccessToken: !!accessTokenValue,
+    isLoading: isLoadingResourceOwners,
+    ownerCount: resourceOwners.length,
+  })
+
+  const handleOwnerChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    resourceOwnerControl.change(event.target.value)
+    const selectedOwner = resourceOwners.find((owner) => owner.id === event.target.value)
+    if (selectedOwner?.ownerType) {
+      resourceOwnerTypeControl.change(selectedOwner.ownerType)
+    }
+  }
+
   return (
     <>
       <fieldset className="fieldset">
@@ -67,33 +99,13 @@ export const GithubResourceOwnerField = ({
           value={resourceOwnerControl.value ?? ''}
         />
         <select
-          className="select select-bordered w-full"
+          className="select w-full"
           disabled={resourceOwners.length === 0 || isLoadingResourceOwners}
           id={fields.resourceOwner.id}
-          onChange={(event) => {
-            resourceOwnerControl.change(event.target.value)
-            const selectedOwner = resourceOwners.find((owner) => owner.id === event.target.value)
-            if (selectedOwner?.ownerType) {
-              resourceOwnerTypeControl.change(selectedOwner.ownerType)
-            }
-          }}
+          onChange={handleOwnerChange}
           value={resourceOwnerControl.value || ''}>
           <option disabled value="">
-            {isLoadingResourceOwners
-              ? t('issueImporters.fields.resourceOwnerLoading', {
-                  defaultValue: 'Loading organizations...',
-                })
-              : resourceOwners.length === 0 && !accessTokenValue
-                ? t('issueImporters.fields.resourceOwnerPlaceholder', {
-                    defaultValue: 'Enter access token above to load organizations',
-                  })
-                : resourceOwners.length === 0
-                  ? t('issueImporters.fields.resourceOwnerNoResults', {
-                      defaultValue: 'No organizations found',
-                    })
-                  : t('issueImporters.fields.resourceOwnerSelect', {
-                      defaultValue: 'Select an organization',
-                    })}
+            {placeholderLabels[placeholderState]}
           </option>
           {resourceOwners.map((owner) => (
             <option key={owner.id} value={owner.id}>

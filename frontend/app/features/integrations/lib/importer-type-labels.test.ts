@@ -17,15 +17,31 @@
  *
  */
 
+import { describe, expect, it } from 'vitest'
+
 import { type SchemaTranslationFunction } from '~/lib/i18n-types'
-import { type ImporterType } from '~/lib/utils/tag-helpers'
 
-const IMPORTER_TYPE_LABELS: Record<ImporterType, (t: SchemaTranslationFunction) => string> = {
-  github: (t) => t('common:issueImporters.typeLabels.github', { defaultValue: 'GitHub' }),
-  gitlab: (t) => t('common:issueImporters.typeLabels.gitlab', { defaultValue: 'GitLab' }),
-  jira: (t) => t('common:issueImporters.typeLabels.jira', { defaultValue: 'Jira' }),
-  plane: (t) => t('common:issueImporters.typeLabels.plane', { defaultValue: 'Plane' }),
-}
+import { getImporterTypeLabel } from './importer-type-labels'
 
-export const getImporterTypeLabel = (type: ImporterType, t: SchemaTranslationFunction): string =>
-  IMPORTER_TYPE_LABELS[type](t)
+const englishT: SchemaTranslationFunction = (_key, options) =>
+  typeof options === 'string' ? options : options.defaultValue
+
+const keyT: SchemaTranslationFunction = (key) => key
+
+describe('getImporterTypeLabel', () => {
+  it.each([
+    ['github', 'GitHub'],
+    ['gitlab', 'GitLab'],
+    ['jira', 'Jira'],
+    ['plane', 'Plane'],
+  ] as const)('returns the English default for %s', (type, label) => {
+    expect(getImporterTypeLabel(type, englishT)).toBe(label)
+  })
+
+  it.each(['github', 'gitlab', 'jira', 'plane'] as const)(
+    'uses the common namespace key for %s',
+    (type) => {
+      expect(getImporterTypeLabel(type, keyT)).toBe(`common:issueImporters.typeLabels.${type}`)
+    },
+  )
+})

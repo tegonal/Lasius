@@ -17,15 +17,35 @@
  *
  */
 
-import { type SchemaTranslationFunction } from '~/lib/i18n-types'
-import { type ImporterType } from '~/lib/utils/tag-helpers'
+// tsconfig has no allowJs, so the unit test reads the types of the Orval generator from this file.
 
-const IMPORTER_TYPE_LABELS: Record<ImporterType, (t: SchemaTranslationFunction) => string> = {
-  github: (t) => t('common:issueImporters.typeLabels.github', { defaultValue: 'GitHub' }),
-  gitlab: (t) => t('common:issueImporters.typeLabels.gitlab', { defaultValue: 'GitLab' }),
-  jira: (t) => t('common:issueImporters.typeLabels.jira', { defaultValue: 'Jira' }),
-  plane: (t) => t('common:issueImporters.typeLabels.plane', { defaultValue: 'Plane' }),
+type GeneratedHook = {
+  implementation: string
+  imports: { name: string }[]
 }
 
-export const getImporterTypeLabel = (type: ImporterType, t: SchemaTranslationFunction): string =>
-  IMPORTER_TYPE_LABELS[type](t)
+type GeneratorDependency = {
+  dependency: string
+  exports: { name: string; values: boolean }[]
+}
+
+type GeneratorProperty = {
+  definition: string
+  name: string
+  type: string
+}
+
+type GeneratorVerbOptions = {
+  body?: { definition: string }
+  operationName: string
+  props: GeneratorProperty[]
+  queryParams?: { schema: { name: string } }
+  response: { definition: { success: string } }
+  verb: string
+}
+
+export declare const fetcherClientBuilder: () => {
+  client: (verbOptions: GeneratorVerbOptions, options: { route: string }) => GeneratedHook
+  dependencies: () => GeneratorDependency[]
+  header: () => string
+}

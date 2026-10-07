@@ -52,8 +52,7 @@ export const ListProjectsStep = ({
 
   const [projects, setProjects] = useState<ModelsExternalProject[]>([])
   const [fetchError, setFetchError] = useState<null | string>(null)
-  const hasFetchedReference = useRef(false)
-  const lastConfigIdReference = useRef(configId)
+  const fetchedForConfigIdReference = useRef<ModelsIssueImporterConfigId | null>(null)
   const onProjectsLoadedReference = useRef(onProjectsLoaded)
   useEffect(() => {
     onProjectsLoadedReference.current = onProjectsLoaded
@@ -73,21 +72,11 @@ export const ListProjectsStep = ({
     },
   })
 
-  // Reset fetch flag when configId changes
+  // Fetch once per config. An orgId change alone does not fetch again.
   useEffect(() => {
-    if (lastConfigIdReference.current === configId) {
-      return
-    }
+    if (fetchedForConfigIdReference.current === configId) return
 
-    hasFetchedReference.current = false
-    lastConfigIdReference.current = configId
-  }, [configId])
-
-  // Fetch projects on mount
-  useEffect(() => {
-    if (hasFetchedReference.current) return
-
-    hasFetchedReference.current = true
+    fetchedForConfigIdReference.current = configId
     submit({ configId, orgId })
   }, [configId, orgId, submit])
 

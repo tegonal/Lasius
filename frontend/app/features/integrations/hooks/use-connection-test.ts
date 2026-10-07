@@ -33,7 +33,6 @@ type UseConnectionTestOptions = {
   config: ModelsIssueImporterConfigResponse | null
   formRef: RefObject<HTMLFormElement | null>
   importerType: ImporterType
-  open: boolean
   selectedOrgId: string
 }
 
@@ -41,23 +40,12 @@ export const useConnectionTest = ({
   config,
   formRef,
   importerType,
-  open,
   selectedOrgId,
 }: UseConnectionTestOptions) => {
   const { t } = useTranslation('integrations')
 
   const [connectionTestResult, setConnectionTestResult] = useState<ConnectionTestResult>(null)
   const [connectionTestMessage, setConnectionTestMessage] = useState('')
-
-  // Reset when modal closes
-  const [wasOpen, setWasOpen] = useState(open)
-  if (open !== wasOpen) {
-    setWasOpen(open)
-    if (!open) {
-      setConnectionTestResult(null)
-      setConnectionTestMessage('')
-    }
-  }
 
   const testExistingApi = useTestExistingConfig({
     onError: (error) => {

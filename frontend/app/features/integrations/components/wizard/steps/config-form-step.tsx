@@ -17,22 +17,18 @@
  *
  */
 
-import { getFormProps, useForm, useInputControl } from '@conform-to/react'
-import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
+import { getFormProps } from '@conform-to/react'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { type z } from 'zod'
 
 import { CheckFrequencyField } from '~/features/integrations/components/shared/check-frequency-field'
 import { ConfigBaseUrlField } from '~/features/integrations/components/shared/config-base-url-field'
 import { ConfigNameField } from '~/features/integrations/components/shared/config-name-field'
 import { ProviderInstructions } from '~/features/integrations/components/shared/provider-instructions'
 import { CreateCredentialFields } from '~/features/integrations/components/wizard/steps/create-credential-fields'
+import { useImporterConfigForm } from '~/features/integrations/hooks/use-importer-config-form'
 import { type WizardFormData } from '~/features/integrations/hooks/use-wizard-state'
-import {
-  allFieldsConstraintSchema,
-  createConfigSchema,
-} from '~/features/integrations/lib/config-schemas'
+import { createConfigSchema } from '~/features/integrations/lib/config-schemas'
 import { getImporterTypeLabel } from '~/features/integrations/lib/importer-type-labels'
 import { untyped } from '~/lib/i18n-types'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
@@ -50,33 +46,17 @@ export const ConfigFormStep = ({ formData, formRef, onSubmit, selectedOrgId }: P
 
   const schema = useMemo(() => createConfigSchema(t, importerType, false), [t, importerType])
 
-  const [form, fields] = useForm<
-    z.input<typeof allFieldsConstraintSchema>,
-    z.output<typeof allFieldsConstraintSchema>
-  >({
-    constraint: getZodConstraint(allFieldsConstraintSchema),
-    defaultValue: {
-      ...formData,
-      checkFrequency: String(formData.checkFrequency),
-    },
-    onSubmit(event, { submission }) {
-      event.preventDefault()
-      if (submission?.status !== 'success') return
-      onSubmit({ ...formData, ...submission.value })
-    },
-    onValidate({ formData: fd }) {
-      // Cast to superset type for field inference; actual validation uses platform-specific schema
-      return parseWithZod(fd, {
-        schema: schema as typeof allFieldsConstraintSchema,
-      })
-    },
-    shouldRevalidate: 'onInput',
-    shouldValidate: 'onSubmit',
-  })
-
-  const accessTokenControl = useInputControl(fields.accessToken)
-  const baseUrlControl = useInputControl(fields.baseUrl)
-  const checkFrequencyControl = useInputControl(fields.checkFrequency)
+  const { accessTokenControl, baseUrlControl, checkFrequencyControl, fields, form } =
+    useImporterConfigForm({
+      defaultValue: {
+        ...formData,
+        checkFrequency: String(formData.checkFrequency),
+      },
+      onValidSubmit: (value) => {
+        onSubmit({ ...formData, ...value })
+      },
+      schema,
+    })
 
   return (
     <div className="flex h-full flex-col">

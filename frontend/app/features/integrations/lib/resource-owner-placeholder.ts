@@ -17,15 +17,21 @@
  *
  */
 
-import { type SchemaTranslationFunction } from '~/lib/i18n-types'
-import { type ImporterType } from '~/lib/utils/tag-helpers'
+export type ResourceOwnerPlaceholderState = 'empty' | 'loading' | 'needsToken' | 'select'
 
-const IMPORTER_TYPE_LABELS: Record<ImporterType, (t: SchemaTranslationFunction) => string> = {
-  github: (t) => t('common:issueImporters.typeLabels.github', { defaultValue: 'GitHub' }),
-  gitlab: (t) => t('common:issueImporters.typeLabels.gitlab', { defaultValue: 'GitLab' }),
-  jira: (t) => t('common:issueImporters.typeLabels.jira', { defaultValue: 'Jira' }),
-  plane: (t) => t('common:issueImporters.typeLabels.plane', { defaultValue: 'Plane' }),
+type ResourceOwnerPlaceholderInput = {
+  hasAccessToken: boolean
+  isLoading: boolean
+  ownerCount: number
 }
 
-export const getImporterTypeLabel = (type: ImporterType, t: SchemaTranslationFunction): string =>
-  IMPORTER_TYPE_LABELS[type](t)
+export const getResourceOwnerPlaceholderState = ({
+  hasAccessToken,
+  isLoading,
+  ownerCount,
+}: ResourceOwnerPlaceholderInput): ResourceOwnerPlaceholderState => {
+  if (isLoading) return 'loading'
+  if (ownerCount === 0 && !hasAccessToken) return 'needsToken'
+  if (ownerCount === 0) return 'empty'
+  return 'select'
+}
