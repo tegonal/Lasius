@@ -26,6 +26,11 @@ import { Modal } from '~/components/ui/overlays/modal/modal'
 import { BookingAddUpdateForm } from '~/features/bookings/components/booking-add-update-form'
 import { useHomeLoaderData, useSelectedOrgId } from '~/features/bookings/hooks/use-home-loader-data'
 import { useStopAndStart } from '~/features/bookings/hooks/use-stop-and-start'
+import {
+  bookingProjectAndTags,
+  buildAdjustEndBody,
+  buildAdjustStartBody,
+} from '~/features/bookings/lib/booking-adjustments'
 import { ContextButtonAction } from '~/features/context-menu/buttons/context-button-action'
 import { ContextButtonAddFavorite } from '~/features/context-menu/buttons/context-button-add-favorite'
 import { ContextButtonClose } from '~/features/context-menu/buttons/context-button-close'
@@ -38,7 +43,6 @@ import { ContextBody } from '~/features/context-menu/context-body'
 import { useContextMenu } from '~/features/context-menu/hooks/use-context-menu'
 import { type AugmentedBooking } from '~/lib/api/functions/augment-bookings-list'
 import { formatISOLocale } from '~/lib/utils/dates'
-import { areTimesWithinOneMinute } from '~/lib/utils/time'
 import { type ModelsBooking } from '~/services/api/lasius'
 import {
   useDeleteUserBooking,
@@ -79,14 +83,10 @@ export const BookingItemContext = ({ item }: Properties) => {
   const favoriteAdditionApi = useAddFavoriteBooking()
   const stopAndStartApi = useStopAndStart()
 
-  const shouldShowStartAdjustment =
-    !!previousBooking?.end?.dateTime &&
-    !areTimesWithinOneMinute(item.start.dateTime, previousBooking.end.dateTime)
-
-  const shouldShowEndAdjustment =
-    !!nextBooking?.start?.dateTime &&
-    !!item.end &&
-    !areTimesWithinOneMinute(item.end.dateTime, nextBooking.start.dateTime)
+  const adjustStartBody = buildAdjustStartBody(item, previousBooking)
+  const adjustEndBody = buildAdjustEndBody(item, nextBooking)
+  const shouldShowStartAdjustment = adjustStartBody !== null
+  const shouldShowEndAdjustment = adjustEndBody !== null
 
   const deleteItem = () => {
     bookingDeletionApi.submit({ bookingId: item.id, orgId: selectedOrgId })
@@ -94,59 +94,39 @@ export const BookingItemContext = ({ item }: Properties) => {
   }
 
   const adjustStartToPrevious = () => {
-    if (!previousBooking?.end?.dateTime) {
+    if (!adjustStartBody) {
       return
     }
 
-    updateBookingApi.submit({
-      body: {
-        end: item.end ? formatISOLocale(new Date(item.end.dateTime)) : undefined,
-        projectId: item.projectReference?.id || '',
-        start: formatISOLocale(new Date(previousBooking.end.dateTime)),
-        tags: item.tags || [],
-      },
-      bookingId: item.id,
-      orgId: selectedOrgId,
-    })
+    updateBookingApi.submit({ body: adjustStartBody, bookingId: item.id, orgId: selectedOrgId })
     handleCloseAll()
   }
 
   const adjustEndToNext = () => {
-    if (!(nextBooking?.start?.dateTime && item.end)) {
+    if (!adjustEndBody) {
       return
     }
 
-    updateBookingApi.submit({
-      body: {
-        end: formatISOLocale(new Date(nextBooking.start.dateTime)),
-        projectId: item.projectReference?.id || '',
-        start: formatISOLocale(new Date(item.start.dateTime)),
-        tags: item.tags || [],
-      },
-      bookingId: item.id,
-      orgId: selectedOrgId,
-    })
+    updateBookingApi.submit({ body: adjustEndBody, bookingId: item.id, orgId: selectedOrgId })
     handleCloseAll()
   }
 
   const startBooking = () => {
     const now = roundToNearestMinutes(new Date(), { roundingMethod: 'floor' })
+    const { projectId, tags } = bookingProjectAndTags(item)
     stopAndStartApi.submit({
       currentBookingId,
       orgId: selectedOrgId,
-      projectId: item.projectReference?.id || '',
+      projectId,
       start: formatISOLocale(now),
-      tags: item.tags || [],
+      tags,
     })
     handleCloseAll()
   }
 
   const addFavorite = () => {
     favoriteAdditionApi.submit({
-      body: {
-        projectId: item.projectReference?.id || '',
-        tags: item.tags || [],
-      },
+      body: bookingProjectAndTags(item),
       orgId: selectedOrgId,
     })
     handleCloseAll()

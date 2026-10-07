@@ -21,12 +21,12 @@ import { orderBy } from 'es-toolkit'
 import { type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { AvatarUser } from '~/components/ui/data-display/avatar/avatar-user'
 import { Badge } from '~/components/ui/data-display/badge'
 import { DataList } from '~/components/ui/data-display/data-list/data-list'
 import { DataListField } from '~/components/ui/data-display/data-list/data-list-field'
 import { DataListHeaderItem } from '~/components/ui/data-display/data-list/data-list-header-item'
 import { DataListRow } from '~/components/ui/data-display/data-list/data-list-row'
+import { MemberNameFields } from '~/components/ui/data-display/member-name-fields'
 import { type ModelsUserStub } from '~/services/api/lasius'
 
 type MemberDataListProperties = {
@@ -56,15 +56,7 @@ export const MemberDataList = ({
       {orderBy(users, [(user) => user.lastName, (user) => user.firstName], ['asc', 'asc']).map(
         (user) => (
           <DataListRow key={user.id}>
-            <DataListField width={90}>
-              <AvatarUser firstName={user.firstName} lastName={user.lastName} />
-            </DataListField>
-            <DataListField>
-              <span>{user.firstName}</span>
-            </DataListField>
-            <DataListField>
-              <span>{user.lastName}</span>
-            </DataListField>
+            <MemberNameFields user={user} />
             <DataListField>
               <span>{user.email}</span>
             </DataListField>

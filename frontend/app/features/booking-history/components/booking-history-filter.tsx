@@ -19,7 +19,6 @@
 
 import { type FieldMetadata } from '@conform-to/react'
 import { ArrowLeft } from 'lucide-react'
-import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
 
@@ -32,11 +31,18 @@ import { ProjectSelect } from '~/components/ui/forms/input/project-select'
 import { UserSelect } from '~/components/ui/forms/input/user-select'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { type BookingHistoryControls } from '~/features/booking-history/components/booking-history-layout'
+import {
+  getFilterDefaults,
+  getFilterResetValues,
+  hasFilterChanges,
+  projectsPathFor,
+} from '~/features/booking-history/lib/booking-history-filter-state'
+import { useFocusTagsOnProjectChange } from '~/features/bookings/hooks/use-focus-tags-on-project-change'
+import { useProjectTags } from '~/features/bookings/hooks/use-project-tags'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { InputTagsAutocomplete } from '~/features/tags/components/input-tags-autocomplete'
 import { dateOptions } from '~/lib/utils/date/date-options'
 import { type ModelsEntityReference, type ModelsUserStub } from '~/services/api/lasius'
-import { useGetTagsByProject } from '~/services/api/lasius-hooks/user-organisations/user-organisations'
 
 type Properties = {
   controls: BookingHistoryControls
@@ -68,61 +74,39 @@ export const BookingHistoryFilter = ({
   const navigate = useNavigate()
   const { selectedOrganisationId } = useOrganisation()
 
-  // Tags via Orval hook
-  const { data: tagsData, submit: submitTags } = useGetTagsByProject()
-  const previousProjectKeyReference = useRef('')
-
   const projectId = controls.projectId.value ?? ''
+  const { projectTags } = useProjectTags(selectedOrganisationId, projectId)
+  useFocusTagsOnProjectChange(projectId, fields.tags.id)
 
   const isShowUserFilter = dataSource === 'organisationBookings'
 
   const firstDateOption = dateOptions[0]
 
-  // Load tags when project changes
-  useEffect(() => {
-    const key = `${selectedOrganisationId}:${projectId}`
-    if (selectedOrganisationId && projectId && key !== previousProjectKeyReference.current) {
-      previousProjectKeyReference.current = key
-      submitTags({ orgId: selectedOrganisationId, projectId })
-    }
-  }, [projectId, selectedOrganisationId, submitTags])
-
-  const projectTags = tagsData ?? []
-
   const handleBackToProjects = () => {
-    const isUserContext = dataSource === 'userBookings'
-    const projectsPath = isUserContext ? '/user/projects' : '/organisation/projects'
-    void navigate(projectsPath)
+    void navigate(projectsPathFor(dataSource))
   }
 
-  const defaultProjectId = ''
-  const defaultUserId = ''
-  const defaultDateRange = firstDateOption?.name ?? ''
-
-  const hasChanges =
-    (controls.projectId.value ?? '') !== defaultProjectId ||
-    (controls.userId.value ?? '') !== defaultUserId ||
-    !!controls.tags.value ||
-    (controls.dateRange.value ?? '') !== defaultDateRange
+  const hasChanges = hasFilterChanges(
+    {
+      dateRange: controls.dateRange.value,
+      projectId: controls.projectId.value,
+      tags: controls.tags.value,
+      userId: controls.userId.value,
+    },
+    getFilterDefaults(firstDateOption),
+  )
 
   const resetForm = () => {
-    if (firstDateOption) {
-      const { from, to } = firstDateOption.dateRangeFn(new Date())
-      controls.from.change(from)
-      controls.to.change(to)
+    const reset = getFilterResetValues(firstDateOption, new Date())
+    if (reset.range) {
+      controls.from.change(reset.range.from)
+      controls.to.change(reset.range.to)
     }
-    controls.dateRange.change(defaultDateRange)
-    controls.projectId.change(defaultProjectId)
-    controls.userId.change(defaultUserId)
-    controls.tags.change('')
+    controls.dateRange.change(reset.dateRange)
+    controls.projectId.change(reset.projectId)
+    controls.userId.change(reset.userId)
+    controls.tags.change(reset.tags)
   }
-
-  // Auto-focus tags after project selection
-  useEffect(() => {
-    if (projectId && fields.tags.id) {
-      document.querySelector<HTMLElement>(`#${fields.tags.id}`)?.focus()
-    }
-  }, [projectId, fields.tags.id])
 
   return (
     <div className="w-full" data-testid="lists-filter">

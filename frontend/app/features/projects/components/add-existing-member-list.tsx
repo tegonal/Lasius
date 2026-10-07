@@ -17,28 +17,27 @@
  *
  */
 
-import { orderBy } from 'es-toolkit'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
-import { AvatarUser } from '~/components/ui/data-display/avatar/avatar-user'
 import { DataList } from '~/components/ui/data-display/data-list/data-list'
-import { DataListField } from '~/components/ui/data-display/data-list/data-list-field'
 import { DataListHeaderItem } from '~/components/ui/data-display/data-list/data-list-header-item'
 import { DataListRow } from '~/components/ui/data-display/data-list/data-list-row'
 import { useToast } from '~/components/ui/feedback/use-toast'
 import { ButtonGroup } from '~/components/ui/forms/button-group'
 import { FormBody } from '~/components/ui/forms/form-body'
-import { Select } from '~/components/ui/forms/input/select'
 import { ModalBody } from '~/components/ui/overlays/modal/modal-body'
 import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
 import { ModalDescription } from '~/components/ui/overlays/modal/modal-description'
 import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
-import { getRoleOptions } from '~/features/projects/lib/role-labels'
-import { untyped } from '~/lib/i18n-types'
+import { AddExistingMemberRow } from '~/features/projects/components/add-existing-member-row'
+import { useOrganisationUsers } from '~/features/projects/hooks/use-organisation-users'
+import {
+  getMemberListView,
+  selectAvailableMembers,
+} from '~/features/projects/lib/available-members'
 import { type ModelsUserStub } from '~/services/api/lasius'
-import { useGetOrganisationUserList } from '~/services/api/lasius-hooks/organisations/organisations'
 import { useInviteProjectUser } from '~/services/api/lasius-hooks/projects/projects'
 import { type ModelsUserToProjectAssignmentRole } from '~/services/api/lasius/modelsUserToProjectAssignmentRole'
 
@@ -60,17 +59,11 @@ export const AddExistingMemberList = ({
   const { t } = useTranslation()
   const { addToast } = useToast()
 
-  const [orgUsers, setOrgUsers] = useState<ModelsUserStub[]>([])
+  const { isLoading, orgUsers } = useOrganisationUsers(orgId)
   const [addedUserIds, setAddedUserIds] = useState<Set<string>>(new Set())
   const [roles, setRoles] = useState<Record<string, string>>({})
   const [addingUserId, setAddingUserId] = useState<null | string>(null)
   const addingUserIdReference = useRef<null | string>(null)
-
-  const orgUserListApi = useGetOrganisationUserList({
-    onSuccess: useCallback((data: ModelsUserStub[]) => {
-      setOrgUsers(Array.isArray(data) ? data : [])
-    }, []),
-  })
 
   const inviteApi = useInviteProjectUser({
     onError: useCallback(() => {
@@ -99,22 +92,11 @@ export const AddExistingMemberList = ({
     }, [onMemberAdded, addToast, t]),
   })
 
-  const submitOrgUserList = orgUserListApi.submit
-  useEffect(() => {
-    submitOrgUserList({ orgId })
-  }, [orgId, submitOrgUserList])
-
-  const projectUserIds = useMemo(() => new Set(projectUsers.map((u) => u.id)), [projectUsers])
-
   const availableMembers = useMemo(
-    () =>
-      orderBy(
-        orgUsers.filter((u) => !projectUserIds.has(u.id) && !addedUserIds.has(u.id)),
-        [(u) => u.lastName, (u) => u.firstName],
-        ['asc', 'asc'],
-      ),
-    [orgUsers, projectUserIds, addedUserIds],
+    () => selectAvailableMembers(orgUsers, new Set(projectUsers.map((u) => u.id)), addedUserIds),
+    [orgUsers, projectUsers, addedUserIds],
   )
+  const view = getMemberListView(isLoading, availableMembers.length)
 
   const handleRoleChange = (userId: string, role: string) => {
     setRoles((previous) => ({ ...previous, [userId]: role }))
@@ -147,13 +129,13 @@ export const AddExistingMemberList = ({
       </ModalDescription>
 
       <ModalBody>
-        {orgUserListApi.isLoading && (
+        {view === 'loading' && (
           <div className="flex justify-center py-8">
             <span className="loading loading-spinner loading-md" />
           </div>
         )}
 
-        {!orgUserListApi.isLoading && availableMembers.length === 0 && (
+        {view === 'empty' && (
           <p className="text-base-content/60 py-8 text-center">
             {t(
               'invitation:addExistingMembers.empty',
@@ -162,7 +144,7 @@ export const AddExistingMemberList = ({
           </p>
         )}
 
-        {!orgUserListApi.isLoading && availableMembers.length > 0 && (
+        {view === 'list' && (
           <DataList>
             <DataListRow>
               <DataListHeaderItem />
@@ -172,36 +154,15 @@ export const AddExistingMemberList = ({
               <DataListHeaderItem />
             </DataListRow>
             {availableMembers.map((user) => (
-              <DataListRow key={user.id}>
-                <DataListField width={90}>
-                  <AvatarUser firstName={user.firstName} lastName={user.lastName} />
-                </DataListField>
-                <DataListField>
-                  <span>{user.firstName}</span>
-                </DataListField>
-                <DataListField>
-                  <span>{user.lastName}</span>
-                </DataListField>
-                <DataListField>
-                  <Select
-                    onChange={(value) => handleRoleChange(user.id, value)}
-                    options={getRoleOptions('project', untyped(t))}
-                    value={roles[user.id] || 'ProjectMember'}
-                  />
-                </DataListField>
-                <DataListField>
-                  <Button
-                    disabled={!!addingUserId}
-                    fullWidth={false}
-                    onClick={() => handleAdd(user)}
-                    size="sm"
-                    variant="primary">
-                    {addingUserId === user.id
-                      ? t('actions.adding', 'Adding...')
-                      : t('invitation:addExistingMembers.addButton', 'Add')}
-                  </Button>
-                </DataListField>
-              </DataListRow>
+              <AddExistingMemberRow
+                isAdding={addingUserId === user.id}
+                isDisabled={!!addingUserId}
+                key={user.id}
+                onAdd={() => handleAdd(user)}
+                onRoleChange={(value) => handleRoleChange(user.id, value)}
+                role={roles[user.id] || 'ProjectMember'}
+                user={user}
+              />
             ))}
           </DataList>
         )}

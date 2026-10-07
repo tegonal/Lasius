@@ -19,7 +19,7 @@
 
 import { getFormProps, useForm, useInputControl } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
-import { useEffect, useMemo, useRef } from 'react'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useFetcher } from 'react-router'
 import { z } from 'zod'
@@ -34,6 +34,8 @@ import { FormElement } from '~/components/ui/forms/form-element'
 import { Select, type SelectOption } from '~/components/ui/forms/input/select'
 import { ToggleSwitch } from '~/components/ui/forms/input/toggle-switch'
 import { API_ROUTES } from '~/config/constants'
+import { useLocaleReload } from '~/features/settings/hooks/use-locale-reload'
+import { resolveThemeCookieValue } from '~/features/settings/lib/resolve-theme'
 import { DEFAULT_LOCALE, LOCALE_LABELS, LOCALES } from '~/i18n-config'
 import { type SchemaTranslationFunction, untyped } from '~/lib/i18n-types'
 import {
@@ -46,11 +48,6 @@ const LANGUAGE_OPTIONS: SelectOption[] = LOCALES.map((locale) => ({
   label: LOCALE_LABELS[locale],
   value: locale,
 }))
-
-const themeModeToDataTheme: Record<string, string> = {
-  dark: 'dark',
-  light: 'light',
-}
 
 const createAppSettingsSchema = (t: SchemaTranslationFunction) =>
   z.object({
@@ -73,19 +70,9 @@ export const AppSettingsForm = () => {
   const theme = useTheme()
   const isOnboardingDismissed = useIsOnboardingDismissed()
   const { dismissOnboarding, resetOnboarding, setTheme } = useAppSettingsActions()
-  const localeFetcher = useFetcher()
-  const themeFetcher = useFetcher()
-  const pendingLocaleReload = useRef(false)
-
   // Reload after locale cookie has been set by the server
-  useEffect(() => {
-    if (!(pendingLocaleReload.current && localeFetcher.state === 'idle')) {
-      return
-    }
-
-    pendingLocaleReload.current = false
-    location.reload()
-  }, [localeFetcher.state])
+  const { localeFetcher, requestLocaleReload } = useLocaleReload()
+  const themeFetcher = useFetcher()
 
   const schema = useMemo(() => createAppSettingsSchema(untyped(t)), [t])
 
@@ -130,29 +117,22 @@ export const AppSettingsForm = () => {
       // Save theme to store
       setTheme(data.theme)
 
-      // Update theme cookie via server action (for SSR)
-      if (data.theme === 'system') {
-        if (globalThis.window !== undefined && typeof matchMedia === 'function') {
-          const isPrefersDark = matchMedia('(prefers-color-scheme: dark)').matches
-          const systemTheme = isPrefersDark ? 'dark' : 'light'
-          document.documentElement.dataset.theme = systemTheme
-          void themeFetcher.submit(
-            { theme: systemTheme },
-            { action: API_ROUTES.THEME, method: 'post' },
-          )
-        }
-      } else {
-        const dataTheme = themeModeToDataTheme[data.theme] || 'light'
-        document.documentElement.dataset.theme = dataTheme
+      // Update theme cookie via server action (for SSR).
+      // Without matchMedia, a 'system' choice sets no attribute and posts no cookie.
+      const canMatchMedia = globalThis.window !== undefined && typeof matchMedia === 'function'
+      if (data.theme !== 'system' || canMatchMedia) {
+        const isPrefersDark = canMatchMedia && matchMedia('(prefers-color-scheme: dark)').matches
+        const resolvedTheme = resolveThemeCookieValue(data.theme, isPrefersDark)
+        document.documentElement.dataset.theme = resolvedTheme
         void themeFetcher.submit(
-          { theme: data.theme },
+          { theme: resolvedTheme },
           { action: API_ROUTES.THEME, method: 'post' },
         )
       }
 
-      // Reload after locale cookie is persisted (watched by useEffect above)
+      // Reload after locale cookie is persisted (watched by useLocaleReload)
       if (isLanguageChanged) {
-        pendingLocaleReload.current = true
+        requestLocaleReload()
       }
     },
     onValidate({ formData }) {
@@ -165,6 +145,8 @@ export const AppSettingsForm = () => {
   const languageControl = useInputControl(fields.language)
   const themeControl = useInputControl(fields.theme)
   const onboardingControl = useInputControl(fields.showOnboarding)
+  const languageValue = languageControl.value ?? DEFAULT_LOCALE
+  const themeValue = themeControl.value ?? 'system'
 
   const handleLanguageChange = (value: string) => {
     languageControl.change(value)
@@ -193,29 +175,21 @@ export const AppSettingsForm = () => {
                 <FormElement
                   htmlFor={fields.language.id}
                   label={t('app.language', 'Interface Language')}>
-                  <input
-                    name={fields.language.name}
-                    type="hidden"
-                    value={languageControl.value ?? DEFAULT_LOCALE}
-                  />
+                  <input name={fields.language.name} type="hidden" value={languageValue} />
                   <Select
                     id={fields.language.id}
                     onChange={handleLanguageChange}
                     options={LANGUAGE_OPTIONS}
-                    value={languageControl.value ?? DEFAULT_LOCALE}
+                    value={languageValue}
                   />
                 </FormElement>
                 <FormElement htmlFor={fields.theme.id} label={t('app.theme', 'Theme')}>
-                  <input
-                    name={fields.theme.name}
-                    type="hidden"
-                    value={themeControl.value ?? 'system'}
-                  />
+                  <input name={fields.theme.name} type="hidden" value={themeValue} />
                   <Select
                     id={fields.theme.id}
                     onChange={handleThemeChange}
                     options={THEMES}
-                    value={themeControl.value ?? 'system'}
+                    value={themeValue}
                   />
                 </FormElement>
                 <FormElement>
