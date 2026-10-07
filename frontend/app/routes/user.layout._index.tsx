@@ -29,10 +29,7 @@ import { OnboardingTutorial } from '~/features/onboarding/components/onboarding-
 import { augmentBookingsList } from '~/lib/api/functions/augment-bookings-list'
 import { getExpectedVsBookedPercentage } from '~/lib/api/functions/get-expected-vs-booked-percentage'
 import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
-import {
-  getDeduplicatedUserProfile,
-  getSelectedOrganisationId,
-} from '~/lib/organisation-helpers.server'
+import { loadOrganisationContext } from '~/lib/organisation-helpers.server'
 import { apiTimespanDay, formatISOLocale } from '~/lib/utils/dates'
 import { getOrganisationUserList } from '~/services/api/lasius/organisations/organisations'
 import {
@@ -41,19 +38,13 @@ import {
   getUserBookingListByOrganisation,
 } from '~/services/api/lasius/user-bookings/user-bookings'
 import { getFavoriteBookingList } from '~/services/api/lasius/user-favorites/user-favorites'
-import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
+import { mergeAuthHeaders } from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/user.layout._index'
 
 export const loader = async ({ request, url }: Route.LoaderArgs) => {
-  const auth = await requireUser(request, url)
-  const headers = authHeaders(auth.session)
-
-  // Get user profile for planned working hours + org selection
-  const profile = await getDeduplicatedUserProfile({ headers })
-  const user = profile.data
-  const organisations = user.organisations ?? []
-  const selectedOrgId = getSelectedOrganisationId(user)
+  // The profile gives the planned working hours and the selected organisation
+  const { auth, headers, selectedOrg, selectedOrgId } = await loadOrganisationContext(request, url)
 
   // Read selected date from URL search param, fall back to today
   const dateParameter = url.searchParams.get('date')
@@ -85,7 +76,6 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
   const orgUsers = orgUsersResponse.data ?? []
 
   // Compute planned working hours for the selected day's weekday
-  const selectedOrg = organisations.find((o) => o.organisationReference.id === selectedOrgId)
   const plannedHours = selectedOrg?.plannedWorkingHours
   const weekdayNames: Record<number, string> = {
     0: 'sunday',

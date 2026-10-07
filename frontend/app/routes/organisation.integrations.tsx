@@ -20,29 +20,21 @@
 import { data, redirect } from 'react-router'
 
 import { IntegrationsLayout } from '~/features/integrations/components/integrations-layout'
-import {
-  getDeduplicatedUserProfile,
-  getSelectedOrganisationId,
-} from '~/lib/organisation-helpers.server'
+import { loadOrganisationContext } from '~/lib/organisation-helpers.server'
 import { getConfigs } from '~/services/api/lasius/issue-importers/issue-importers'
-import { ModelsUserOrganisationRole } from '~/services/api/lasius/modelsUserOrganisationRole'
 import { getProjectList } from '~/services/api/lasius/projects/projects'
-import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
+import { mergeAuthHeaders } from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/organisation.integrations'
 
 export const loader = async ({ request, url }: Route.LoaderArgs) => {
-  const auth = await requireUser(request, url)
-  const headers = authHeaders(auth.session)
-
-  const profile = await getDeduplicatedUserProfile({ headers })
-  const user = profile.data
-  const organisations = user.organisations ?? []
-  const selectedOrgId = getSelectedOrganisationId(user)
+  const { auth, headers, isOrganisationAdmin, selectedOrgId } = await loadOrganisationContext(
+    request,
+    url,
+  )
 
   // Admin guard: only organisation administrators can access this page
-  const selectedOrg = organisations.find((o) => o.organisationReference.id === selectedOrgId)
-  if (selectedOrg?.role !== ModelsUserOrganisationRole.OrganisationAdministrator) {
+  if (!isOrganisationAdmin) {
     throw redirect('/user/home', { headers: mergeAuthHeaders(auth) })
   }
 

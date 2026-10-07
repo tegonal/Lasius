@@ -19,31 +19,19 @@
 
 import { getExpectedVsBookedPercentage } from '~/lib/api/functions/get-expected-vs-booked-percentage'
 import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
-import {
-  getDeduplicatedUserProfile,
-  getSelectedOrganisationId,
-} from '~/lib/organisation-helpers.server'
+import { loadOrganisationContext } from '~/lib/organisation-helpers.server'
 import { formatISOLocale } from '~/lib/utils/dates'
 import { type ModelsBooking } from '~/services/api/lasius'
-import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
+import { mergeAuthHeaders, type requireUser } from '~/services/auth/auth-helpers.server'
 
 /**
  * Shared context extracted from all dashboard period loaders.
  * Handles auth, profile, org selection, planned hours, and date parsing.
  */
 export const loadDashboardContext = async (request: Request, url: URL) => {
-  const auth = await requireUser(request, url)
-  const headers = authHeaders(auth.session)
-
-  const profile = await getDeduplicatedUserProfile({ headers })
-  const user = profile.data
-
-  // Determine selected org
-  const organisations = user.organisations ?? []
-  const selectedOrgId = getSelectedOrganisationId(user)
+  const { auth, headers, selectedOrg, selectedOrgId } = await loadOrganisationContext(request, url)
 
   // Extract planned working hours for the selected org
-  const selectedOrg = organisations.find((o) => o.organisationReference.id === selectedOrgId)
   const plannedHours = selectedOrg?.plannedWorkingHours
     ? { ...selectedOrg.plannedWorkingHours }
     : null

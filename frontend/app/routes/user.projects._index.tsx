@@ -20,27 +20,16 @@
 import { data } from 'react-router'
 
 import { MyProjectsLayout } from '~/features/projects/components/my-projects-layout'
-import {
-  getDeduplicatedUserProfile,
-  getSelectedOrganisationId,
-} from '~/lib/organisation-helpers.server'
+import { loadOrganisationContext } from '~/lib/organisation-helpers.server'
 import { getProjectLastActivityDate } from '~/services/api/lasius/projects/projects'
-import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
+import { mergeAuthHeaders } from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/user.projects._index'
 
 export const loader = async ({ request, url }: Route.LoaderArgs) => {
-  const auth = await requireUser(request, url)
-  const headers = authHeaders(auth.session)
-
-  // Get user profile — projects are embedded in the user's org memberships
-  const profile = await getDeduplicatedUserProfile({ headers })
-  const user = profile.data
-  const organisations = user.organisations ?? []
-  const selectedOrgId = getSelectedOrganisationId(user)
+  const { auth, headers, selectedOrg, selectedOrgId } = await loadOrganisationContext(request, url)
 
   // Get projects from the user's org membership (no admin-only API call needed)
-  const selectedOrg = organisations.find((o) => o.organisationReference.id === selectedOrgId)
   const projects = selectedOrg?.projects ?? []
 
   // Fetch last activity dates for all projects in parallel

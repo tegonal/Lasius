@@ -18,7 +18,9 @@
  */
 
 import { type ModelsUser } from '~/services/api/lasius'
+import { ModelsUserOrganisationRole } from '~/services/api/lasius/modelsUserOrganisationRole'
 import { getUserProfile, type getUserProfileResponse } from '~/services/api/lasius/user/user'
+import { authHeaders, requireUser } from '~/services/auth/auth-helpers.server'
 
 /**
  * In-flight deduplication for getUserProfile.
@@ -64,4 +66,29 @@ export function getSelectedOrganisationId(user: ModelsUser): string {
     organisations[0]?.organisationReference.id ??
     ''
   )
+}
+
+/**
+ * The common start of a loader: the signed-in user, the auth headers for API calls, and the
+ * selected organisation with the role of the user in it.
+ */
+export async function loadOrganisationContext(request: Request, url: URL) {
+  const auth = await requireUser(request, url)
+  const headers = authHeaders(auth.session)
+
+  const profile = await getDeduplicatedUserProfile({ headers })
+  const user = profile.data
+  const selectedOrgId = getSelectedOrganisationId(user)
+  const selectedOrg = (user.organisations ?? []).find(
+    (o) => o.organisationReference.id === selectedOrgId,
+  )
+
+  return {
+    auth,
+    headers,
+    isOrganisationAdmin: selectedOrg?.role === ModelsUserOrganisationRole.OrganisationAdministrator,
+    selectedOrg,
+    selectedOrgId,
+    user,
+  }
 }

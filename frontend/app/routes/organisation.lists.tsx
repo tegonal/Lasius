@@ -21,53 +21,27 @@ import { data } from 'react-router'
 
 import { innerGridClasses } from '~/components/ui/layouts/layout-columns'
 import { BookingHistoryLayout } from '~/features/booking-history/components/booking-history-layout'
-import {
-  getDeduplicatedUserProfile,
-  getSelectedOrganisationId,
-} from '~/lib/organisation-helpers.server'
-import { dateOptions } from '~/lib/utils/date/date-options'
-import { apiTimespanFromTo, formatISOLocale } from '~/lib/utils/dates'
-import { ModelsUserOrganisationRole } from '~/services/api/lasius/modelsUserOrganisationRole'
+import { loadOrganisationContext } from '~/lib/organisation-helpers.server'
+import { getListDateRange } from '~/lib/utils/date/list-date-range'
+import { apiTimespanFromTo } from '~/lib/utils/dates'
 import { getOrganisationBookingList } from '~/services/api/lasius/organisation-bookings/organisation-bookings'
 import { getOrganisationUserList } from '~/services/api/lasius/organisations/organisations'
 import { getProjectList } from '~/services/api/lasius/projects/projects'
-import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
+import { mergeAuthHeaders } from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/organisation.lists'
 
 export const loader = async ({ request, url }: Route.LoaderArgs) => {
-  const auth = await requireUser(request, url)
-  const headers = authHeaders(auth.session)
+  const { auth, headers, isOrganisationAdmin, selectedOrgId } = await loadOrganisationContext(
+    request,
+    url,
+  )
 
-  const profile = await getDeduplicatedUserProfile({ headers })
-  const user = profile.data
-
-  const organisations = user.organisations ?? []
-  const selectedOrgId = getSelectedOrganisationId(user)
-
-  // Check admin role
-  const selectedOrg = organisations.find((o) => o.organisationReference.id === selectedOrgId)
-  const isAdmin = selectedOrg?.role === ModelsUserOrganisationRole.OrganisationAdministrator
-
-  if (!isAdmin) {
+  if (!isOrganisationAdmin) {
     throw new Response('Unauthorized', { headers: mergeAuthHeaders(auth), status: 401 })
   }
 
-  // Read date range from search params: from/to (set by filter), or default
-  const fromParameter = url.searchParams.get('from')
-  const toParameter = url.searchParams.get('to')
-
-  let dateRange: { from: string; to: string }
-  if (fromParameter && toParameter) {
-    dateRange = { from: fromParameter, to: toParameter }
-  } else {
-    const firstOption = dateOptions[0]
-    const now = new Date()
-    dateRange = firstOption
-      ? firstOption.dateRangeFn(now)
-      : { from: formatISOLocale(now), to: formatISOLocale(now) }
-  }
-
+  const dateRange = getListDateRange(url.searchParams, new Date())
   const timespan = apiTimespanFromTo(dateRange.from, dateRange.to)
 
   const [bookingsResponse, usersResponse, projectsResponse] = await Promise.all([

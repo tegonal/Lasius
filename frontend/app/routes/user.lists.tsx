@@ -21,40 +21,18 @@ import { data } from 'react-router'
 
 import { innerGridClasses } from '~/components/ui/layouts/layout-columns'
 import { BookingHistoryLayout } from '~/features/booking-history/components/booking-history-layout'
-import {
-  getDeduplicatedUserProfile,
-  getSelectedOrganisationId,
-} from '~/lib/organisation-helpers.server'
-import { dateOptions } from '~/lib/utils/date/date-options'
-import { apiTimespanFromTo, formatISOLocale } from '~/lib/utils/dates'
+import { loadOrganisationContext } from '~/lib/organisation-helpers.server'
+import { getListDateRange } from '~/lib/utils/date/list-date-range'
+import { apiTimespanFromTo } from '~/lib/utils/dates'
 import { getUserBookingListByOrganisation } from '~/services/api/lasius/user-bookings/user-bookings'
-import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
+import { mergeAuthHeaders } from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/user.lists'
 
 export const loader = async ({ request, url }: Route.LoaderArgs) => {
-  const auth = await requireUser(request, url)
-  const headers = authHeaders(auth.session)
+  const { auth, headers, selectedOrgId } = await loadOrganisationContext(request, url)
 
-  const profile = await getDeduplicatedUserProfile({ headers })
-  const user = profile.data
-  const selectedOrgId = getSelectedOrganisationId(user)
-
-  // Read date range from search params: from/to (set by filter), or default
-  const fromParameter = url.searchParams.get('from')
-  const toParameter = url.searchParams.get('to')
-
-  let dateRange: { from: string; to: string }
-  if (fromParameter && toParameter) {
-    dateRange = { from: fromParameter, to: toParameter }
-  } else {
-    const firstOption = dateOptions[0]
-    const now = new Date()
-    dateRange = firstOption
-      ? firstOption.dateRangeFn(now)
-      : { from: formatISOLocale(now), to: formatISOLocale(now) }
-  }
-
+  const dateRange = getListDateRange(url.searchParams, new Date())
   const timespan = apiTimespanFromTo(dateRange.from, dateRange.to)
 
   const bookingsResponse = await getUserBookingListByOrganisation(

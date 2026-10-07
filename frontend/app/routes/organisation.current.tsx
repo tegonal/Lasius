@@ -29,24 +29,16 @@ import { OrganisationRightColumn } from '~/features/organisation/components/orga
 import { OrganisationStats } from '~/features/organisation/components/organisation-stats'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { ManageUserInviteByEmailForm } from '~/features/projects/components/manage-user-invite-by-email-form'
-import {
-  getDeduplicatedUserProfile,
-  getSelectedOrganisationId,
-} from '~/lib/organisation-helpers.server'
+import { loadOrganisationContext } from '~/lib/organisation-helpers.server'
 import { type ModelsUserStub } from '~/services/api/lasius'
 import { useGetOrganisationUserList } from '~/services/api/lasius-hooks/organisations/organisations'
 import { getOrganisationUserList } from '~/services/api/lasius/organisations/organisations'
-import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
+import { mergeAuthHeaders } from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/organisation.current'
 
 export const loader = async ({ request, url }: Route.LoaderArgs) => {
-  const auth = await requireUser(request, url)
-  const headers = authHeaders(auth.session)
-
-  const profile = await getDeduplicatedUserProfile({ headers })
-  const user = profile.data
-  const selectedOrgId = getSelectedOrganisationId(user)
+  const { auth, headers, selectedOrgId } = await loadOrganisationContext(request, url)
 
   const usersResponse = await getOrganisationUserList(selectedOrgId, {
     headers,
