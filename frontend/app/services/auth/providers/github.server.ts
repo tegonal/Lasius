@@ -82,14 +82,13 @@ export function createGitHubProvider(): OAuthProvider {
 
       const userId = user.id.toString()
 
-      let email = ''
-      if (emailsResponse.ok) {
-        const emails = (await emailsResponse.json()) as GitHubEmail[]
-        const primary = emails.find((githubEmail) => githubEmail.primary && githubEmail.verified)
-        email = primary?.email ?? emails[0]?.email ?? ''
+      if (!emailsResponse.ok) {
+        logger.warn('GitHub /user/emails request failed', { status: emailsResponse.status })
+        return { email: '', userId }
       }
 
-      return { email, userId }
+      const emails = (await emailsResponse.json()) as GitHubEmail[]
+      return { email: selectVerifiedEmail(emails), userId }
     },
 
     provider: 'github',
@@ -116,4 +115,10 @@ export function createGitHubProvider(): OAuthProvider {
       }
     },
   }
+}
+
+// An unverified address can belong to someone else, so the app never signs a user in with one.
+function selectVerifiedEmail(emails: GitHubEmail[]): string {
+  const verified = emails.filter((githubEmail) => githubEmail.verified)
+  return (verified.find((githubEmail) => githubEmail.primary) ?? verified[0])?.email ?? ''
 }

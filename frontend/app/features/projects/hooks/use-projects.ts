@@ -21,6 +21,7 @@ import { orderBy } from 'es-toolkit'
 import { useMemo } from 'react'
 
 import { useLayoutLoaderData } from '~/hooks/use-layout-loader-data'
+import { selectOrganisation } from '~/lib/organisation-selection'
 import { type ModelsEntityReference } from '~/services/api/lasius/modelsEntityReference'
 import { type ModelsUserProject } from '~/services/api/lasius/modelsUserProject'
 
@@ -37,13 +38,8 @@ export const useProjects = () => {
   const user = loaderData?.user
 
   const projects = useMemo((): ModelsUserProject[] => {
-    if (user?.organisations) {
-      const org = user.organisations.find(
-        (item) => item.organisationReference.id === user.settings?.lastSelectedOrganisation?.id,
-      )
-      return orderBy(org?.projects || [], [(data) => data.projectReference.key], ['asc'])
-    }
-    return []
+    const org = selectOrganisation(user)
+    return orderBy(org?.projects ?? [], [(data) => data.projectReference.key], ['asc'])
   }, [user])
 
   /**

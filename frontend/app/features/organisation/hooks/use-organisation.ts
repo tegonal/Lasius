@@ -20,6 +20,7 @@
 import { useFetcher } from 'react-router'
 
 import { useLayoutLoaderData } from '~/hooks/use-layout-loader-data'
+import { selectOrganisation } from '~/lib/organisation-selection'
 import { clearLoaderCache } from '~/lib/utils/loader-cache'
 import { type ModelsEntityReference } from '~/services/api/lasius/modelsEntityReference'
 import { type ModelsUserOrganisation } from '~/services/api/lasius/modelsUserOrganisation'
@@ -44,18 +45,9 @@ export const useOrganisation = () => {
   const loaderData = useLayoutLoaderData()
   const user = loaderData?.user
   const organisations: ModelsUserOrganisation[] = user?.organisations ?? []
-  const settings = user?.settings
 
-  // Derive selected org: settings > private org > first org
-  const selectedOrganisationId =
-    settings?.lastSelectedOrganisation?.id ??
-    organisations.find((o) => o.private)?.organisationReference.id ??
-    organisations[0]?.organisationReference.id ??
-    ''
-
-  const selectedOrganisation = organisations.find(
-    (o) => o.organisationReference.id === selectedOrganisationId,
-  )
+  const selectedOrganisation = selectOrganisation(user)
+  const selectedOrganisationId = selectedOrganisation?.organisationReference.id ?? ''
 
   const selectedOrganisationKey = selectedOrganisation?.organisationReference?.key ?? ''
 

@@ -17,28 +17,18 @@
  *
  */
 
-import {
-  getDeduplicatedUserProfile,
-  getSelectedOrganisationId,
-} from '~/lib/organisation-helpers.server'
+import { loadOrganisationContext } from '~/lib/organisation-helpers.server'
 import { dateOptions } from '~/lib/utils/date/date-options'
 import { ModelsUserOrganisationRole } from '~/services/api/lasius/modelsUserOrganisationRole'
-import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
+import { mergeAuthHeaders, type requireUser } from '~/services/auth/auth-helpers.server'
 
 /**
  * Shared context for user stats routes.
  * Handles auth, profile, org selection, and date range parsing.
  */
 export const loadStatsContext = async (request: Request, url: URL) => {
-  const auth = await requireUser(request, url)
-  const headers = authHeaders(auth.session)
-
-  const profile = await getDeduplicatedUserProfile({ headers })
-  const user = profile.data
-
-  // Determine selected org
+  const { auth, headers, selectedOrgId, user } = await loadOrganisationContext(request, url)
   const organisations = user.organisations ?? []
-  const selectedOrgId = getSelectedOrganisationId(user)
 
   // Read date range from URL search params or compute defaults
   let from = url.searchParams.get('from')

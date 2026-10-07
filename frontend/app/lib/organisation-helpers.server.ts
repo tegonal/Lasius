@@ -17,6 +17,7 @@
  *
  */
 
+import { selectOrganisation } from '~/lib/organisation-selection'
 import { type ModelsUser } from '~/services/api/lasius'
 import { ModelsUserOrganisationRole } from '~/services/api/lasius/modelsUserOrganisationRole'
 import { getUserProfile, type getUserProfileResponse } from '~/services/api/lasius/user/user'
@@ -53,19 +54,9 @@ export async function getDeduplicatedUserProfile(options: {
   }
 }
 
-/**
- * Extract the selected organisation ID from a user profile.
- *
- * Priority: lastSelectedOrganisation > private org > first org > empty string
- */
+/** The id of the organisation that `selectOrganisation` picks, or an empty string. */
 export function getSelectedOrganisationId(user: ModelsUser): string {
-  const organisations = user.organisations ?? []
-  return (
-    user.settings?.lastSelectedOrganisation?.id ??
-    organisations.find((o) => o.private)?.organisationReference.id ??
-    organisations[0]?.organisationReference.id ??
-    ''
-  )
+  return selectOrganisation(user)?.organisationReference.id ?? ''
 }
 
 /**
