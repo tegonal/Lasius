@@ -113,6 +113,7 @@ export const ProjectMappingsModalContent = ({ config, onClose, selectedOrgId }: 
       </ModalHeader>
 
       <ProjectMappingDataList
+        importerConfig={{ configId, orgId: selectedOrgId }}
         importerType={importerType}
         isError={isListError || !!fetchError}
         isLoading={isListLoading}

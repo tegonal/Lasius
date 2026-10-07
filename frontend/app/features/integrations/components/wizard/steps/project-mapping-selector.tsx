@@ -35,6 +35,7 @@ import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-but
 import { ModalDescription } from '~/components/ui/overlays/modal/modal-description'
 import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
 import { TagConfigForm } from '~/features/integrations/components/shared/tag-config-form'
+import { type ImporterConfigReference } from '~/features/integrations/hooks/use-external-project-metadata'
 import { type TagConfig } from '~/features/integrations/lib/mapping-helpers'
 import { getDefaultTagConfig } from '~/features/integrations/lib/tag-config-defaults'
 import { requiredString } from '~/lib/conform-helpers'
@@ -49,6 +50,7 @@ type Properties = {
   excludeProjectIds?: string[]
   existingTagConfig?: TagConfig
   externalProject: ModelsExternalProject
+  importerConfig: ImporterConfigReference
   importerType: ImporterType
   lasiusProjects: Array<{ id: string; key: string }>
   onCancel: () => void
@@ -60,6 +62,7 @@ export const ProjectMappingSelector = ({
   excludeProjectIds,
   existingTagConfig,
   externalProject,
+  importerConfig,
   importerType,
   lasiusProjects,
   onCancel,
@@ -169,6 +172,7 @@ export const ProjectMappingSelector = ({
             {projectIdControl.value && tagConfig && importerType !== 'jira' && (
               <TagConfigForm
                 externalProject={externalProject}
+                importerConfig={importerConfig}
                 importerType={importerType}
                 onChange={setTagConfig}
                 value={tagConfig}

@@ -24,6 +24,11 @@ import { FormBody } from '~/components/ui/forms/form-body'
 import { FormElement } from '~/components/ui/forms/form-element'
 import { MultiSelect, type MultiSelectOption } from '~/components/ui/forms/input/multi-select'
 import { Select, type SelectOption } from '~/components/ui/forms/input/select'
+import { TagConfigMetadataStatus } from '~/features/integrations/components/shared/tag-config-metadata-status'
+import {
+  type ImporterConfigReference,
+  useExternalProjectMetadata,
+} from '~/features/integrations/hooks/use-external-project-metadata'
 import { type TagConfig } from '~/features/integrations/lib/mapping-helpers'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 import {
@@ -32,14 +37,23 @@ import {
 } from '~/services/api/lasius'
 
 type Properties = {
-  externalProject?: ModelsExternalProject
+  externalProject: ModelsExternalProject
+  importerConfig: ImporterConfigReference
   importerType: ImporterType
   onChange: (value: TagConfig) => void
   value: TagConfig
 }
 
-export const TagConfigForm = ({ externalProject, importerType, onChange, value }: Properties) => {
+export const TagConfigForm = ({
+  externalProject,
+  importerConfig,
+  importerType,
+  onChange,
+  value,
+}: Properties) => {
   const { t } = useTranslation('integrations')
+  const metadata = useExternalProjectMetadata(importerConfig, externalProject.id)
+  const { availableLabels, availableStates } = metadata
 
   const tagFieldOptions: MultiSelectOption[] = useMemo(() => {
     const options: MultiSelectOption[] = [
@@ -102,15 +116,6 @@ export const TagConfigForm = ({ externalProject, importerType, onChange, value }
     } satisfies TagConfig)
   }
 
-  const availableLabels = useMemo(
-    () => externalProject?.availableLabels ?? [],
-    [externalProject?.availableLabels],
-  )
-  const availableStates = useMemo(
-    () => externalProject?.availableStates ?? [],
-    [externalProject?.availableStates],
-  )
-
   const labelOptions: MultiSelectOption[] = useMemo(
     () => availableLabels.map((label) => ({ label, value: label })),
     [availableLabels],
@@ -144,6 +149,12 @@ export const TagConfigForm = ({ externalProject, importerType, onChange, value }
           })}
         </p>
       </FormElement>
+
+      <TagConfigMetadataStatus
+        isError={metadata.isError}
+        isLoading={metadata.isLoading}
+        onRetry={metadata.reload}
+      />
 
       {selectedTagFields.includes('useLabels') && 'labelFilter' in value && (
         <FormElement

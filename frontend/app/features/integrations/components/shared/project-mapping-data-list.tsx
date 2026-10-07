@@ -35,6 +35,7 @@ import { Modal } from '~/components/ui/overlays/modal/modal'
 import { ContextMenuProvider } from '~/features/context-menu/hooks/use-context-menu'
 import { ProjectMappingRowContext } from '~/features/integrations/components/wizard/steps/project-mapping-row-context'
 import { ProjectMappingSelector } from '~/features/integrations/components/wizard/steps/project-mapping-selector'
+import { type ImporterConfigReference } from '~/features/integrations/hooks/use-external-project-metadata'
 import { useProjectMappingList } from '~/features/integrations/hooks/use-project-mapping-list'
 import { getImporterTypeLabel } from '~/features/integrations/lib/importer-type-labels'
 import {
@@ -47,6 +48,7 @@ import { type ImporterType } from '~/lib/utils/tag-helpers'
 import { type ModelsExternalProject } from '~/services/api/lasius'
 
 type ProjectMappingDataListProperties = {
+  importerConfig: ImporterConfigReference
   importerType: ImporterType
   isError: boolean
   isLoading: boolean
@@ -58,6 +60,7 @@ type ProjectMappingDataListProperties = {
 }
 
 export const ProjectMappingDataList = ({
+  importerConfig,
   importerType,
   isError,
   isLoading,
@@ -218,6 +221,7 @@ export const ProjectMappingDataList = ({
                           name: externalId,
                           ownerType: 'User',
                         }}
+                        importerConfig={importerConfig}
                         importerType={importerType}
                         key={`${mapping.projectId}-${mapping.id?.value ?? 'new'}`}
                         lasiusProjects={lasiusProjects}
@@ -258,6 +262,7 @@ export const ProjectMappingDataList = ({
                       <ProjectMappingRowContext
                         excludeProjectIds={getMappedProjectIdsForExternal(project.id)}
                         externalProject={project}
+                        importerConfig={importerConfig}
                         importerType={importerType}
                         key={`${mapping.projectId}-${mapping.id?.value ?? 'new'}`}
                         lasiusProjects={lasiusProjects}
@@ -302,6 +307,7 @@ export const ProjectMappingDataList = ({
           <ProjectMappingSelector
             excludeProjectIds={getMappedProjectIdsForExternal(projectForNewMapping.id)}
             externalProject={projectForNewMapping}
+            importerConfig={importerConfig}
             importerType={importerType}
             lasiusProjects={lasiusProjects}
             onCancel={() => setProjectForNewMapping(null)}

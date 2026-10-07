@@ -32,6 +32,7 @@ import { ContextBarDivider } from '~/features/context-menu/context-bar-divider'
 import { ContextBody } from '~/features/context-menu/context-body'
 import { useContextMenu } from '~/features/context-menu/hooks/use-context-menu'
 import { ProjectMappingSelector } from '~/features/integrations/components/wizard/steps/project-mapping-selector'
+import { type ImporterConfigReference } from '~/features/integrations/hooks/use-external-project-metadata'
 import {
   type MappingWithTagConfig,
   type TagConfig,
@@ -43,6 +44,7 @@ import { type ModelsExternalProject } from '~/services/api/lasius'
 type Properties = {
   excludeProjectIds: string[]
   externalProject: ModelsExternalProject
+  importerConfig: ImporterConfigReference
   importerType: ImporterType
   lasiusProjects: Array<{ id: string; key: string }>
   mapping: MappingWithTagConfig
@@ -54,6 +56,7 @@ type Properties = {
 export const ProjectMappingRowContext = ({
   excludeProjectIds,
   externalProject,
+  importerConfig,
   importerType,
   lasiusProjects,
   mapping,
@@ -133,6 +136,7 @@ export const ProjectMappingRowContext = ({
           excludeProjectIds={excludeProjectIds}
           existingTagConfig={mapping.tagConfig}
           externalProject={externalProject}
+          importerConfig={importerConfig}
           importerType={importerType}
           lasiusProjects={lasiusProjects}
           onCancel={handleSelectorClose}

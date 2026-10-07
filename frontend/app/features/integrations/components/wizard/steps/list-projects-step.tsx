@@ -100,6 +100,7 @@ export const ListProjectsStep = ({
       </Heading>
 
       <ProjectMappingDataList
+        importerConfig={{ configId, orgId }}
         importerType={importerType}
         isError={isError || !!fetchError}
         isLoading={isLoading}
