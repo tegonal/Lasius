@@ -22,6 +22,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLayoutLoaderData } from '~/hooks/use-layout-loader-data'
 
 import { useIsWindowFocused } from './use-is-window-focused'
+import { buildWebsocketUrl, fetchWsTicket, shouldDropLastMessage } from './websocket-hook-helpers'
 import {
   ConnectionStatus,
   getWebSocketManager,
@@ -36,17 +37,7 @@ export function useLasiusWebsocket() {
   const isWindowFocused = useIsWindowFocused()
   const appLayoutData = useLayoutLoaderData()
 
-  const websocketUrl =
-    !IS_SERVER && appLayoutData?.websocketUrl
-      ? `${appLayoutData.websocketUrl}/messaging/websocket`
-      : null
-
-  const fetchTicket = useCallback(async () => {
-    const r = await fetch('/api/ws-ticket')
-    const d: { ticket: null | string } = await r.json()
-    if (!d.ticket) throw new Error('No ticket received')
-    return d.ticket
-  }, [])
+  const websocketUrl = buildWebsocketUrl(IS_SERVER, appLayoutData?.websocketUrl)
 
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(
     ConnectionStatus.DISCONNECTED,
@@ -64,6 +55,8 @@ export function useLasiusWebsocket() {
 
     const manager = getWebSocketManager(websocketUrl)
     managerReference.current = manager
+    // Each URL has its own manager, so a changed URL needs the fetcher too. Without it the manager skips HelloServer.
+    manager.setTicketFetcher(fetchWsTicket)
 
     const subscriber: WebSocketSubscriber = {
       onMessage: (data) => {
@@ -82,13 +75,6 @@ export function useLasiusWebsocket() {
     }
   }, [websocketUrl])
 
-  // Pass ticket fetcher to the manager
-  useEffect(() => {
-    if (managerReference.current) {
-      managerReference.current.setTicketFetcher(fetchTicket)
-    }
-  }, [fetchTicket])
-
   // Active reconnect on window refocus
   useEffect(() => {
     if (isWindowFocused && managerReference.current) {
@@ -106,7 +92,7 @@ export function useLasiusWebsocket() {
     focusAndStatus.isWindowFocused !== isWindowFocused
   ) {
     setFocusAndStatus({ connectionStatus, isWindowFocused })
-    if (!isWindowFocused && connectionStatus !== ConnectionStatus.CONNECTED) {
+    if (shouldDropLastMessage(isWindowFocused, connectionStatus)) {
       setLastMessage(null)
     }
   }

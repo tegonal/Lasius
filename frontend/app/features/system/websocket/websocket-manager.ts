@@ -135,63 +135,71 @@ class WebSocketManager {
     this.intentionallyClosed = false
     this.setStatus(ConnectionStatus.CONNECTING)
 
+    let ws: WebSocket
     try {
-      this.ws = createWebSocket(this.url)
+      ws = createWebSocket(this.url)
     } catch (error) {
       logger.error('[WebSocketManager] Failed to create WebSocket', error)
       this.setStatus(ConnectionStatus.ERROR)
       this.scheduleReconnect()
       return
     }
+    this.ws = ws
 
-    this.ws.addEventListener('open', () => {
-      logger.info('[WebSocketManager] Connected')
-      this.reconnectAttempt = 0
-      this.setStatus(ConnectionStatus.CONNECTED)
-      void this.sendHelloServer()
-      this.startPing()
+    // close() cannot remove these listeners. A replaced socket can still fire, and it must not
+    // touch the state of the current socket.
+    ws.addEventListener('open', () => {
+      if (this.ws === ws) this.handleOpen()
     })
-
-    this.ws.onmessage = (event: MessageEvent) => {
-      let parsed: unknown
-      try {
-        parsed = JSON.parse(event.data as string)
-      } catch {
-        logger.warn('[WebSocketManager] Failed to parse message', event.data)
-        return
-      }
-      for (const subscriber of this.subscribers) {
-        try {
-          subscriber.onMessage(parsed)
-        } catch (error) {
-          logger.error('[WebSocketManager] Subscriber onMessage threw', error)
-        }
-      }
+    ws.addEventListener('close', (event: CloseEvent) => {
+      if (this.ws === ws) this.handleClose(event)
+    })
+    ws.onmessage = (event: MessageEvent) => {
+      if (this.ws === ws) this.handleMessage(event)
     }
-
-    this.ws.addEventListener('close', (event: CloseEvent) => {
-      logger.info('[WebSocketManager] Closed', {
-        code: event.code,
-        reason: event.reason,
-      })
-      this.stopPing()
-      this.ws = null
-
-      if (this.intentionallyClosed) {
-        this.setStatus(ConnectionStatus.DISCONNECTED)
-        return
-      }
-
-      // Normal close (1000) without intention = server closed, reconnect
-      this.setStatus(ConnectionStatus.DISCONNECTED)
-      this.scheduleReconnect()
-    })
-
-    this.ws.onerror = (event: Event) => {
+    ws.onerror = (event: Event) => {
+      if (this.ws !== ws) return
       logger.error('[WebSocketManager] Error', event)
+      // The close event follows the error event and schedules the reconnect.
       this.setStatus(ConnectionStatus.ERROR)
-      // onclose fires after onerror — reconnect is handled there
     }
+  }
+
+  private handleClose(event: CloseEvent): void {
+    logger.info('[WebSocketManager] Closed', {
+      code: event.code,
+      reason: event.reason,
+    })
+    this.stopPing()
+    this.ws = null
+    // close() detaches the socket before its close event, so every close here is unintentional.
+    this.setStatus(ConnectionStatus.DISCONNECTED)
+    this.scheduleReconnect()
+  }
+
+  private handleMessage(event: MessageEvent): void {
+    let parsed: unknown
+    try {
+      parsed = JSON.parse(event.data as string)
+    } catch {
+      logger.warn('[WebSocketManager] Failed to parse message', event.data)
+      return
+    }
+    for (const subscriber of this.subscribers) {
+      try {
+        subscriber.onMessage(parsed)
+      } catch (error) {
+        logger.error('[WebSocketManager] Subscriber onMessage threw', error)
+      }
+    }
+  }
+
+  private handleOpen(): void {
+    logger.info('[WebSocketManager] Connected')
+    this.reconnectAttempt = 0
+    this.setStatus(ConnectionStatus.CONNECTED)
+    void this.sendHelloServer()
+    this.startPing()
   }
 
   private scheduleReconnect(): void {
