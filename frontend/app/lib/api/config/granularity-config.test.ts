@@ -19,7 +19,12 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getAdaptiveGranularity, shouldUseBarChart } from './granularity-config'
+import {
+  getAdaptiveGranularity,
+  getCategoryLabel,
+  type Granularity,
+  shouldUseBarChart,
+} from './granularity-config'
 
 describe('granularity by past days', () => {
   beforeEach(() => {
@@ -52,5 +57,22 @@ describe('granularity by past days', () => {
     ['2026-10-01', '2026-10-31', true],
   ])('shouldUseBarChart(%s, %s) is %s', (from, to, expected) => {
     expect(shouldUseBarChart(from, to)).toBe(expected)
+  })
+})
+
+describe('getCategoryLabel', () => {
+  const category = { day: 5, month: 10, week: 41, year: 2026 }
+
+  it.each([
+    ['Day', '5.10'],
+    ['Week', 'W 41'],
+    ['Month', '10.2026'],
+    ['Year', '2026'],
+  ] as const)('formats %s as %s', (granularity, expected) => {
+    expect(getCategoryLabel(category, granularity)).toBe(expected)
+  })
+
+  it('returns an empty label for an unknown granularity', () => {
+    expect(getCategoryLabel(category, 'All' as Granularity)).toBe('')
   })
 })

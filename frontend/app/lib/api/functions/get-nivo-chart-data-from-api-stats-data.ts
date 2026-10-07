@@ -21,12 +21,13 @@ import { lastDayOfMonth, lastDayOfWeek } from 'date-fns'
 
 import { getCategoryLabel, type Granularity } from '~/lib/api/config/granularity-config'
 import {
+  getPlannedHoursForDay,
   getPlannedHoursForRange,
   type PlannedWorkingHours,
 } from '~/lib/api/functions/get-planned-working-hours'
 import { type ModelsBookingStats, type ModelsBookingStatsCategory } from '~/services/api/lasius'
 
-import { formatISOLocale, millisToHours } from '../../utils/dates'
+import { millisToHours } from '../../utils/dates'
 
 export type NivoChartDataType = Record<string, number | string>[]
 
@@ -49,30 +50,20 @@ const getCeilingValues = (
 ): number => {
   if (!plannedWorkingHours) return 0
 
-  const getWeekdayString = (isoDate: string): string => {
-    const weekdayNames: Record<number, string> = {
-      0: 'sunday',
-      1: 'monday',
-      2: 'tuesday',
-      3: 'wednesday',
-      4: 'thursday',
-      5: 'friday',
-      6: 'saturday',
-    }
-    return weekdayNames[new Date(isoDate).getDay()] ?? 'monday'
-  }
+  // Each date uses the Date(year, monthIndex, day) form. A 'YYYY-MM-DD' string parses as UTC midnight,
+  // which is the previous day west of UTC.
+  const year = item.year as number
+  const month = item.month as number
 
   switch (granularity) {
     case 'Day': {
-      const weekday = getWeekdayString(
-        formatISOLocale(
-          new Date(item.year as number, (item.month as number) - 1, item.day as number),
-        ),
+      return getPlannedHoursForDay(
+        new Date(year, month - 1, item.day as number),
+        plannedWorkingHours,
       )
-      return plannedWorkingHours[weekday] ?? 0
     }
     case 'Month': {
-      const dateOfMonth = new Date(`${item.year}-${String(item.month).padStart(2, '0')}-01`)
+      const dateOfMonth = new Date(year, month - 1, 1)
       return getPlannedHoursForRange(dateOfMonth, lastDayOfMonth(dateOfMonth), plannedWorkingHours)
     }
     case 'Week': {
@@ -84,9 +75,11 @@ const getCeilingValues = (
       )
     }
     case 'Year': {
-      const start = new Date(`${item.year}-01-01`)
-      const end = new Date(`${item.year}-12-31`)
-      return getPlannedHoursForRange(start, end, plannedWorkingHours)
+      return getPlannedHoursForRange(
+        new Date(year, 0, 1),
+        new Date(year, 11, 31),
+        plannedWorkingHours,
+      )
     }
     default: {
       return 0
