@@ -20,6 +20,11 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { useFetcher } from 'react-router'
 
+import {
+  type ApiProxyConfig,
+  buildProxyPayload,
+  readProxyEnvelope,
+} from '~/lib/api/api-proxy-request'
 import { clearLoaderCache } from '~/lib/utils/loader-cache'
 import { type ProxyEnvelope } from '~/routes/api.proxy'
 
@@ -27,21 +32,6 @@ export type ApiProxyOptions<TResponse> = {
   fetcherKey?: string
   onError?: (error: { error: string; status: number }) => void
   onSuccess?: (data: TResponse) => void
-}
-
-type ApiProxyConfig<TParameters> = {
-  getUrl: (parameters: TParameters) => string
-  method: string
-  skipAuth?: boolean
-}
-
-type JsonValue = boolean | JsonValue[] | null | number | string | { [key: string]: JsonValue }
-
-type ProxyPayload = {
-  body?: JsonValue
-  method: string
-  skipAuth?: boolean
-  url: string
 }
 
 type SubmitArguments<TBody, TParameters> = (TBody extends undefined
@@ -73,11 +63,6 @@ export function useApiProxy<TResponse, TBody = undefined, TParameters = Record<s
   const envelope = fetcher.data
   const isIdle = fetcher.state === 'idle'
 
-  // Derive typed data and error from envelope
-  const data = envelope?.ok === true ? envelope.data : undefined
-  const error =
-    envelope?.ok === false ? { error: envelope.error, status: envelope.status } : undefined
-
   // Fire callbacks when request completes
   useEffect(() => {
     if (!isIdle || !submittedReference.current || !envelope) return
@@ -92,18 +77,7 @@ export function useApiProxy<TResponse, TBody = undefined, TParameters = Record<s
 
   const submit = useCallback(
     (arguments_?: SubmitArguments<TBody, TParameters>) => {
-      const { body, skipAuth, ...parameters } = (arguments_ ?? {}) as Record<string, unknown>
-
-      const payload: ProxyPayload = {
-        method: config.method,
-        url: config.getUrl(parameters as TParameters),
-      }
-      if (body !== undefined) {
-        payload.body = body as JsonValue
-      }
-      if (skipAuth ?? config.skipAuth) {
-        payload.skipAuth = true
-      }
+      const payload = buildProxyPayload(config, arguments_ as Record<string, unknown> | undefined)
 
       submittedReference.current = true
       if (config.method !== 'GET') clearLoaderCache()
@@ -118,14 +92,10 @@ export function useApiProxy<TResponse, TBody = undefined, TParameters = Record<s
   )
 
   return {
-    data,
-    error,
-    isError: envelope?.ok === false,
+    ...readProxyEnvelope(envelope),
     isIdle,
     isLoading: fetcher.state !== 'idle',
-    isSubmitted: envelope !== undefined,
     isSubmitting: fetcher.state === 'submitting',
-    isSuccess: envelope?.ok === true,
     reset: fetcher.reset,
     state: fetcher.state,
     submit,

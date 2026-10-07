@@ -23,6 +23,7 @@ import { cn } from '~/lib/utils/cn'
 import { type ModelsCurrentUserTimeBooking, type ModelsUserStub } from '~/services/api/lasius'
 
 import { BookingName } from '../../bookings/components/booking-name'
+import { resolveAvatarName } from '../lib/resolve-avatar-name'
 import { OrganisationItemContext } from './organisation-item-context'
 
 type Properties = {
@@ -34,11 +35,10 @@ type Properties = {
 export const OrganisationItem = ({ item, selectedOrgId, users }: Properties) => {
   if (!item?.userReference?.id) return null
 
-  const userData = users.find((u) => u.id === item.userReference.id)
-
-  const userKey = item.userReference.key || ''
-  const firstName = userData?.firstName || userKey.split('.', 1)[0] || userKey[0] || ''
-  const lastName = userData?.lastName || userKey.split('.', 2)[1] || userKey[1] || ''
+  const { firstName, lastName } = resolveAvatarName(
+    item.userReference.key || '',
+    users.find((u) => u.id === item.userReference.id),
+  )
 
   const { booking } = item
   return (

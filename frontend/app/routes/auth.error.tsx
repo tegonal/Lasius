@@ -34,111 +34,109 @@ export default function AuthError() {
   const { error } = useLoaderData<typeof loader>()
   const { t } = useTranslation('common')
 
-  const getErrorDetails = (errorCode: null | string): { message: string; title: string } => {
-    if (!errorCode) {
-      return {
-        message: t('auth.errors.unknown.message', {
-          defaultValue: 'An unexpected error occurred during authentication.',
-        }),
-        title: t('auth.errors.unknown.title', {
-          defaultValue: 'Authentication Error',
-        }),
-      }
-    }
-
-    switch (errorCode) {
-      case 'AccessDenied': {
-        return {
-          message: t('auth.errors.accessDenied.message', {
-            defaultValue:
-              'You do not have permission to sign in. Please contact your administrator.',
-          }),
-          title: t('auth.errors.accessDenied.title', {
-            defaultValue: 'Access Denied',
-          }),
-        }
-      }
-      case 'Configuration': {
-        return {
-          message: t('auth.errors.configuration.message', {
-            defaultValue:
-              'There is a problem with the server configuration. Please contact your administrator.',
-          }),
-          title: t('auth.errors.configuration.title', {
-            defaultValue: 'Configuration Error',
-          }),
-        }
-      }
-      case 'CredentialsSignin': {
-        return {
-          message: t('auth.errors.credentials.message', {
-            defaultValue: 'The credentials you provided are incorrect. Please try again.',
-          }),
-          title: t('auth.errors.credentials.title', {
-            defaultValue: 'Sign In Failed',
-          }),
-        }
-      }
-      case 'EmailCreateAccount':
-      case 'EmailSignin': {
-        return {
-          message: t('auth.errors.email.message', {
-            defaultValue: 'Could not send sign-in email. Please try again later.',
-          }),
-          title: t('auth.errors.email.title', {
-            defaultValue: 'Email Error',
-          }),
-        }
-      }
-      case 'OAuthAccountNotLinked':
-      case 'OAuthCallback':
-      case 'OAuthCreateAccount':
-      case 'OAuthSignin': {
-        return {
-          message: t('auth.errors.oauth.message', {
-            defaultValue:
-              'An error occurred during OAuth authentication. Please try again or use a different sign-in method.',
-          }),
-          title: t('auth.errors.oauth.title', {
-            defaultValue: 'OAuth Error',
-          }),
-        }
-      }
-      case 'SessionRequired': {
-        return {
-          message: t('auth.errors.sessionRequired.message', {
-            defaultValue: 'Please sign in to continue.',
-          }),
-          title: t('auth.errors.sessionRequired.title', {
-            defaultValue: 'Session Required',
-          }),
-        }
-      }
-      case 'Verification': {
-        return {
-          message: t('auth.errors.verification.message', {
-            defaultValue:
-              'The verification token has expired or has already been used. Please try signing in again.',
-          }),
-          title: t('auth.errors.verification.title', {
-            defaultValue: 'Verification Failed',
-          }),
-        }
-      }
-      default: {
-        return {
-          message: t('auth.errors.default.message', {
-            defaultValue: 'An error occurred during authentication. Please try again.',
-          }),
-          title: t('auth.errors.default.title', {
-            defaultValue: 'Authentication Error',
-          }),
-        }
-      }
-    }
+  const emailError = {
+    message: t('auth.errors.email.message', {
+      defaultValue: 'Could not send sign-in email. Please try again later.',
+    }),
+    title: t('auth.errors.email.title', {
+      defaultValue: 'Email Error',
+    }),
+  }
+  const oauthError = {
+    message: t('auth.errors.oauth.message', {
+      defaultValue:
+        'An error occurred during OAuth authentication. Please try again or use a different sign-in method.',
+    }),
+    title: t('auth.errors.oauth.title', {
+      defaultValue: 'OAuth Error',
+    }),
   }
 
-  const errorDetails = getErrorDetails(error)
+  // A Map, because the error code comes from the URL and a plain object also matches "constructor"
+  const errorDetailsByCode = new Map<string, { message: string; title: string }>([
+    [
+      'AccessDenied',
+      {
+        message: t('auth.errors.accessDenied.message', {
+          defaultValue: 'You do not have permission to sign in. Please contact your administrator.',
+        }),
+        title: t('auth.errors.accessDenied.title', {
+          defaultValue: 'Access Denied',
+        }),
+      },
+    ],
+    [
+      'Configuration',
+      {
+        message: t('auth.errors.configuration.message', {
+          defaultValue:
+            'There is a problem with the server configuration. Please contact your administrator.',
+        }),
+        title: t('auth.errors.configuration.title', {
+          defaultValue: 'Configuration Error',
+        }),
+      },
+    ],
+    [
+      'CredentialsSignin',
+      {
+        message: t('auth.errors.credentials.message', {
+          defaultValue: 'The credentials you provided are incorrect. Please try again.',
+        }),
+        title: t('auth.errors.credentials.title', {
+          defaultValue: 'Sign In Failed',
+        }),
+      },
+    ],
+    ['EmailCreateAccount', emailError],
+    ['EmailSignin', emailError],
+    ['OAuthAccountNotLinked', oauthError],
+    ['OAuthCallback', oauthError],
+    ['OAuthCreateAccount', oauthError],
+    ['OAuthSignin', oauthError],
+    [
+      'SessionRequired',
+      {
+        message: t('auth.errors.sessionRequired.message', {
+          defaultValue: 'Please sign in to continue.',
+        }),
+        title: t('auth.errors.sessionRequired.title', {
+          defaultValue: 'Session Required',
+        }),
+      },
+    ],
+    [
+      'Verification',
+      {
+        message: t('auth.errors.verification.message', {
+          defaultValue:
+            'The verification token has expired or has already been used. Please try signing in again.',
+        }),
+        title: t('auth.errors.verification.title', {
+          defaultValue: 'Verification Failed',
+        }),
+      },
+    ],
+  ])
+
+  const unknownError = {
+    message: t('auth.errors.unknown.message', {
+      defaultValue: 'An unexpected error occurred during authentication.',
+    }),
+    title: t('auth.errors.unknown.title', {
+      defaultValue: 'Authentication Error',
+    }),
+  }
+  const defaultError = {
+    message: t('auth.errors.default.message', {
+      defaultValue: 'An error occurred during authentication. Please try again.',
+    }),
+    title: t('auth.errors.default.title', {
+      defaultValue: 'Authentication Error',
+    }),
+  }
+
+  const errorDetails = error ? (errorDetailsByCode.get(error) ?? defaultError) : unknownError
 
   return (
     <AuthLayout infoPanel={<LoginInfoPanel />}>
