@@ -157,19 +157,26 @@ export const apiTimespanDay = (
  * Get from and to spanning start-of-from-day to end-of-to-day.
  * Returns null for empty/invalid dates (skip API call).
  */
-export const apiTimespanFromTo = (
+const spanFromTo = (
   from: IsoDateString,
   to: IsoDateString,
+  formatParameter: (date: Date) => ApiDateParameter,
 ): null | { from: ApiDateParameter; to: ApiDateParameter } => {
   if (!from || !to) return null
   const fromDate = new Date(from)
   const toDate = new Date(to)
   if (!isValid(fromDate) || !isValid(toDate)) return null
   return {
-    from: formatDateTimeToURLParameter(startOfDay(fromDate)),
-    to: formatDateTimeToURLParameter(endOfDay(toDate)),
+    from: formatParameter(startOfDay(fromDate)),
+    to: formatParameter(endOfDay(toDate)),
   }
 }
+
+export const apiTimespanFromTo = (
+  from: IsoDateString,
+  to: IsoDateString,
+): null | { from: ApiDateParameter; to: ApiDateParameter } =>
+  spanFromTo(from, to, formatDateTimeToURLParameter)
 
 const apiUrlDateFormat = 'yyyy-MM-dd'
 
@@ -179,16 +186,8 @@ export const formatDateToURLParameter = (date: Date): ApiDateParameter =>
 export const apiDatespanFromTo = (
   from: IsoDateString,
   to: IsoDateString,
-): null | { from: ApiDateParameter; to: ApiDateParameter } => {
-  if (!from || !to) return null
-  const fromDate = new Date(from)
-  const toDate = new Date(to)
-  if (!isValid(fromDate) || !isValid(toDate)) return null
-  return {
-    from: formatDateToURLParameter(startOfDay(fromDate)),
-    to: formatDateToURLParameter(endOfDay(toDate)),
-  }
-}
+): null | { from: ApiDateParameter; to: ApiDateParameter } =>
+  spanFromTo(from, to, formatDateToURLParameter)
 
 export const modelsLocalDateTimeWithTimeZoneToString = (
   m: ModelsLocalDateTimeWithTimeZone,

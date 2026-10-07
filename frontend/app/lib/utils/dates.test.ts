@@ -20,6 +20,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  apiDatespanFromTo,
   apiTimespanDay,
   apiTimespanFromTo,
   apiTimespanMonth,
@@ -125,5 +126,25 @@ describe('apiTimespanFromTo', () => {
 
   it('returns null for empty strings', () => {
     expect(apiTimespanFromTo('', '')).toBeNull()
+  })
+
+  it('returns null for an invalid date', () => {
+    expect(apiTimespanFromTo('2026-03-01T10:00:00.000+01:00', 'not-a-date')).toBeNull()
+  })
+})
+
+describe('apiDatespanFromTo', () => {
+  it('returns the dates of the from-day and the to-day', () => {
+    expect(
+      apiDatespanFromTo('2026-03-01T10:00:00.000+01:00', '2026-03-15T10:00:00.000+01:00'),
+    ).toEqual({ from: '2026-03-01', to: '2026-03-15' })
+  })
+
+  it('returns null for empty strings', () => {
+    expect(apiDatespanFromTo('', '2026-03-15T10:00:00.000+01:00')).toBeNull()
+  })
+
+  it('returns null for an invalid date', () => {
+    expect(apiDatespanFromTo('not-a-date', '2026-03-15T10:00:00.000+01:00')).toBeNull()
   })
 })

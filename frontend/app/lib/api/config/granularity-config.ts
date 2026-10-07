@@ -23,24 +23,28 @@ import { type ModelsBookingStatsCategory } from '~/services/api/lasius'
 
 export type Granularity = 'Day' | 'Month' | 'Week' | 'Year'
 
+// Counts the days from `from` up to `to` or today, whichever comes first.
+// Returns null when the range starts in the future.
+const countPastDays = (from: string, to: string): null | number => {
+  const today = new Date()
+  const fromDate = new Date(from)
+
+  if (fromDate > today) {
+    return null
+  }
+
+  const effectiveToDate = Math.min(new Date(to).getTime(), today.getTime())
+  return differenceInCalendarDays(effectiveToDate, fromDate)
+}
+
 /**
  * Determines the appropriate granularity based on the date range.
  * Only counts days in the past (up to today), future days are ignored.
  */
 export const getAdaptiveGranularity = (from: string, to: string): Granularity => {
-  const today = new Date()
-  const fromDate = new Date(from)
-  const toDate = new Date(to)
+  const days = countPastDays(from, to)
 
-  const effectiveToDate = Math.min(toDate.getTime(), today.getTime())
-
-  if (fromDate > today) {
-    return 'Day'
-  }
-
-  const days = differenceInCalendarDays(effectiveToDate, fromDate)
-
-  if (days <= 14) {
+  if (days === null || days <= 14) {
     return 'Day'
   }
   if (days <= 60) {
@@ -57,17 +61,8 @@ export const getAdaptiveGranularity = (from: string, to: string): Granularity =>
  * Bar charts are better for very short time periods (<=2 past days).
  */
 export const shouldUseBarChart = (from: string, to: string): boolean => {
-  const today = new Date()
-  const fromDate = new Date(from)
-  const toDate = new Date(to)
-  const effectiveToDate = Math.min(toDate.getTime(), today.getTime())
-
-  if (fromDate > today) {
-    return true
-  }
-
-  const days = differenceInCalendarDays(effectiveToDate, fromDate)
-  return days <= 2
+  const days = countPastDays(from, to)
+  return days === null || days <= 2
 }
 
 /**
