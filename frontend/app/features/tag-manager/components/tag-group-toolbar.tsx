@@ -43,7 +43,13 @@ export const TagGroupToolbar = ({
   return (
     <div className="mb-4 flex flex-shrink-0 flex-wrap items-center justify-between gap-2">
       <div className="flex gap-2">
-        <Button fullWidth={false} onClick={onAddGroup} size="sm" type="button" variant="secondary">
+        <Button
+          data-testid="tag-manager-add-group-btn"
+          fullWidth={false}
+          onClick={onAddGroup}
+          size="sm"
+          type="button"
+          variant="secondary">
           {t('actions.addTagGroup', 'Add tag group')}
         </Button>
         <Button

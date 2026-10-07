@@ -72,6 +72,7 @@ export const GenericInputModal = ({
         <Label>{label}</Label>
         <Input
           autoComplete="off"
+          data-testid="input-modal-input"
           onChange={(event) => onChange(event.target.value)}
           onKeyDown={enableEnterKey ? handleKeyDown : undefined}
           placeholder={placeholder}
@@ -80,7 +81,11 @@ export const GenericInputModal = ({
         />
       </FormElement>
       <ButtonGroup>
-        <Button onClick={onConfirm} type="button" variant="primary">
+        <Button
+          data-testid="input-modal-confirm-btn"
+          onClick={onConfirm}
+          type="button"
+          variant="primary">
           {confirmLabel}
         </Button>
         <Button onClick={onClose} type="button" variant="secondary">

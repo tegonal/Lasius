@@ -55,7 +55,9 @@ export const TagGroupItem = ({
   const { t } = useTranslation('tag-manager')
 
   return (
-    <div className="bg-base-200 group border-base-300 overflow-hidden rounded-lg border">
+    <div
+      className="bg-base-200 group border-base-300 overflow-hidden rounded-lg border"
+      data-testid={`tag-group-${tagGroup.id}`}>
       {/* Group Header */}
       <div className="flex items-center gap-2 p-3">
         <button
@@ -74,6 +76,7 @@ export const TagGroupItem = ({
         <div className="ml-auto flex flex-shrink-0 items-center gap-2">
           <Button
             className="text-error hover:bg-error/10 opacity-0 transition-opacity group-hover:opacity-100"
+            data-testid="tag-group-delete-btn"
             fullWidth={false}
             onClick={onDelete}
             shape="circle"
@@ -101,6 +104,7 @@ export const TagGroupItem = ({
           {/* Column 2: Action Buttons */}
           <div className="flex flex-col gap-2">
             <Button
+              data-testid="tag-group-add-tag-btn"
               fullWidth={false}
               onClick={onAddTag}
               shape="circle"

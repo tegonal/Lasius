@@ -17,7 +17,7 @@
  *
  */
 
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
@@ -32,22 +32,14 @@ import { ModalBody } from '~/components/ui/overlays/modal/modal-body'
 import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
 import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
 import { ModalHelpButton } from '~/features/help/components/help-button'
-import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { InputTagsAdmin } from '~/features/tags/components/input-tags-admin'
 import { logger } from '~/lib/logger'
 import { useUpdateProject } from '~/services/api/lasius-hooks/projects/projects'
-import { useGetTagsByProject } from '~/services/api/lasius-hooks/user-organisations/user-organisations'
 import { type ModelsProject } from '~/services/api/lasius/modelsProject'
-import { type ModelsSimpleTag } from '~/services/api/lasius/modelsSimpleTag'
-import { type ModelsTag } from '~/services/api/lasius/modelsTag'
-import { type ModelsTagGroup } from '~/services/api/lasius/modelsTagGroup'
 import { type ModelsUserProject } from '~/services/api/lasius/modelsUserProject'
 
-import { useTagGroupOperations } from '../hooks/use-tag-group-operations'
-import { useUnsavedChanges } from '../hooks/use-unsaved-changes'
-import { TagGroupEmptyState } from './tag-group-empty-state'
-import { TagGroupItem } from './tag-group-item'
-import { TagGroupToolbar } from './tag-group-toolbar'
+import { useProjectTagsEditor } from '../hooks/use-project-tags-editor'
+import { TagGroupsTab } from './tag-groups-tab'
 
 type Properties = {
   item: ModelsProject | ModelsUserProject
@@ -56,29 +48,34 @@ type Properties = {
   onSave: () => void
 }
 
+/** The one dialog that the form shows on top of itself, or null. */
+type TagDialog =
+  | null
+  | { groupIndex: number; groupName: string; kind: 'deleteGroup' }
+  | { groupIndex: number; kind: 'addTag' }
+  | { kind: 'addGroup' }
+  | { kind: 'cancel' }
+
 export const ProjectAddUpdateTagsForm = ({ item, mode, onCancel, onSave }: Properties) => {
   const { t } = useTranslation(['tag-manager', 'projects'])
 
-  const [tagGroups, setTagGroups] = useState<ModelsTagGroup[]>([])
-  const [simpleTags, setSimpleTags] = useState<ModelsSimpleTag[]>([])
-  const [newTagGroupName, setNewTagGroupName] = useState('')
-  const [newTagName, setNewTagName] = useState('')
-
-  const [showAddGroupModal, setShowAddGroupModal] = useState(false)
-  const [showAddTagModal, setShowAddTagModal] = useState<null | {
-    groupIndex: number
-  }>(null)
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState<null | {
-    groupIndex: number
-    groupName: string
-  }>(null)
-  const [showCancelConfirm, setShowCancelConfirm] = useState(false)
-
-  const { selectedOrganisationId } = useOrganisation()
+  const [dialog, setDialog] = useState<TagDialog>(null)
   const { addToast } = useToast()
+  const {
+    bookingCategories,
+    changeSimpleTags,
+    hasUnsavedChanges,
+    newTagGroupName,
+    newTagName,
+    operations,
+    references: { organisationId, projectId, projectKey },
+    setNewTagGroupName,
+    setNewTagName,
+    simpleTags,
+    tagGroups,
+  } = useProjectTagsEditor(item)
 
-  const tagsFetcher = useGetTagsByProject()
-  const updateProjectFetcher = useUpdateProject({
+  const { isLoading: isSubmitting, submit: submitProject } = useUpdateProject({
     onSuccess: () => {
       addToast({
         message: t('projects:status.updated', 'Project updated'),
@@ -87,194 +84,80 @@ export const ProjectAddUpdateTagsForm = ({ item, mode, onCancel, onSave }: Prope
       onSave()
     },
   })
-  const isSubmitting = updateProjectFetcher.isLoading
 
-  // Custom hooks
-  const { hasUnsavedChanges, setHasUnsavedChanges } = useUnsavedChanges()
-  const {
-    addTagToGroup,
-    addTemplate,
-    collapseAll,
-    copiedTags,
-    copyTags,
-    createTagGroup,
-    expandAll,
-    expandedGroups,
-    pasteTags,
-    removeTagGroup,
-    setExpandedGroups,
-    toggleGroup,
-    updateTagGroupTags,
-  } = useTagGroupOperations(
-    {
-      newTagGroupName,
-      newTagName,
-      setNewTagGroupName,
-      setNewTagName,
-      setSimpleTags,
-      setTagGroups,
-      simpleTags,
-      tagGroups,
-    },
-    setHasUnsavedChanges,
-  )
-
-  // Initialize state when tags arrive
-  const [initializedTags, setInitializedTags] = useState<typeof tagsFetcher.data>()
-  if (tagsFetcher.isSuccess && tagsFetcher.data && tagsFetcher.data !== initializedTags) {
-    const tags = tagsFetcher.data
-    setInitializedTags(tags)
-
-    const groups = tags.filter((tag) => tag.type === 'TagGroup') as [] | ModelsTagGroup[]
-
-    const simple = tags.filter((tag) => tag.type === 'SimpleTag') as [] | ModelsSimpleTag[]
-
-    setTagGroups(groups)
-    setSimpleTags(simple)
-    setNewTagGroupName('')
-    setNewTagName('')
-    setExpandedGroups(new Set(groups.map((g) => g.id)))
-  }
-
-  const projectId = ('projectReference' in item ? item.projectReference : item).id
-  const projectKey = ('projectReference' in item ? item.projectReference : item).key
-  const projectOrganisationId =
-    'organisationReference' in item
-      ? (item as unknown as { organisationReference: { id: string } }).organisationReference.id
-      : selectedOrganisationId
-
-  // Load tags via Orval hook
-  const loadedReference = useRef(false)
-  useEffect(() => {
-    if (!item || !selectedOrganisationId || !projectId || loadedReference.current) return
-    loadedReference.current = true
-    tagsFetcher.submit({
-      orgId: selectedOrganisationId,
-      projectId,
-    })
-  }, [item, projectId, selectedOrganisationId, tagsFetcher])
-
-  // Form submit via Orval hook
   const onSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault()
-
-    const bookingCategories = [...tagGroups, ...simpleTags]
-
     logger.info('Updating tags', { bookingCategories, projectId })
-
-    updateProjectFetcher.submit({
-      body: { bookingCategories },
-      orgId: projectOrganisationId,
-      projectId,
-    })
+    submitProject({ body: { bookingCategories }, orgId: organisationId, projectId })
   }
+
+  const closeDialog = () => setDialog(null)
 
   const handleCancel = () => {
     if (hasUnsavedChanges) {
-      setShowCancelConfirm(true)
+      setDialog({ kind: 'cancel' })
     } else {
       onCancel()
     }
   }
 
-  const confirmCancel = () => {
-    setShowCancelConfirm(false)
-    onCancel()
-  }
-
   const handleAddGroupConfirm = () => {
-    const isSuccess = createTagGroup()
-    if (isSuccess) {
-      setShowAddGroupModal(false)
-    }
+    if (operations.createTagGroup()) closeDialog()
   }
 
   const handleAddTagConfirm = () => {
-    if (!showAddTagModal) return
-    const isSuccess = addTagToGroup(showAddTagModal.groupIndex)
-    if (isSuccess) {
-      setShowAddTagModal(null)
-    }
+    if (dialog?.kind !== 'addTag') return
+    if (operations.addTagToGroup(dialog.groupIndex)) closeDialog()
   }
 
   const handleDeleteConfirm = () => {
-    if (!showDeleteConfirm) return
-    removeTagGroup(showDeleteConfirm.groupIndex)
-    setShowDeleteConfirm(null)
+    if (dialog?.kind !== 'deleteGroup') return
+    operations.removeTagGroup(dialog.groupIndex)
+    closeDialog()
   }
-
-  const confirmDeleteTagGroup = (index: number, groupName: string) => {
-    setShowDeleteConfirm({ groupIndex: index, groupName })
-  }
-
-  const handleSimpleTagsChange = (tags: ModelsTag[]) => {
-    setSimpleTags(tags as ModelsSimpleTag[])
-    setHasUnsavedChanges(true)
-  }
-
-  // Sort tag groups alphabetically
-  const sortedTagGroups = [...tagGroups].toSorted((a, b) => a.id.localeCompare(b.id))
-
-  // Tab content
-  const tagGroupsContent = (
-    <div className="flex min-h-0 flex-1 flex-col">
-      <TagGroupToolbar
-        allExpanded={expandedGroups.size === sortedTagGroups.length}
-        onAddGroup={() => setShowAddGroupModal(true)}
-        onAddPresets={addTemplate}
-        onToggleAll={expandedGroups.size === sortedTagGroups.length ? collapseAll : expandAll}
-        showToggleAll={sortedTagGroups.length > 0}
-      />
-
-      <ModalBody className="min-h-0 flex-1 pr-2">
-        <div className="space-y-2 pb-4">
-          {sortedTagGroups.length === 0 && <TagGroupEmptyState />}
-
-          {sortedTagGroups.map((tagGroup: ModelsTagGroup) => {
-            const index = tagGroups.findIndex((g) => g.id === tagGroup.id)
-            const isExpanded = expandedGroups.has(tagGroup.id)
-
-            return (
-              <TagGroupItem
-                isExpanded={isExpanded}
-                key={tagGroup.id}
-                onAddTag={() => setShowAddTagModal({ groupIndex: index })}
-                onCopyTags={() => copyTags(tagGroup.id, tagGroup.relatedTags || [])}
-                onDelete={() => confirmDeleteTagGroup(index, tagGroup.id)}
-                onPasteTags={() => pasteTags(index)}
-                onTagsChange={(tags) => updateTagGroupTags(index, tags as ModelsSimpleTag[])}
-                onToggle={() => toggleGroup(tagGroup.id)}
-                showPasteButton={!!copiedTags && copiedTags.fromGroupId !== tagGroup.id}
-                tagGroup={tagGroup}
-              />
-            )
-          })}
-        </div>
-      </ModalBody>
-    </div>
-  )
-
-  const simpleTagsContent = (
-    <ModalBody className="min-h-0 flex-1 pr-2">
-      <div className="space-y-6 pb-4">
-        <Alert variant="info">
-          <p>{t('simpleTagsDescription', 'Tags that are not part of any group')}</p>
-        </Alert>
-        <InputTagsAdmin onTagsChange={handleSimpleTagsChange} tags={simpleTags} />
-      </div>
-    </ModalBody>
-  )
 
   const tabs = [
     {
-      component: tagGroupsContent,
+      component: (
+        <TagGroupsTab
+          copiedFromGroupId={operations.copiedTags?.fromGroupId ?? null}
+          expandedGroups={operations.expandedGroups}
+          onAddGroup={() => setDialog({ kind: 'addGroup' })}
+          onAddPresets={operations.addTemplate}
+          onAddTag={(groupIndex) => setDialog({ groupIndex, kind: 'addTag' })}
+          onCollapseAll={operations.collapseAll}
+          onCopyTags={(group) => operations.copyTags(group.id, group.relatedTags || [])}
+          onDeleteGroup={(groupIndex, groupName) =>
+            setDialog({ groupIndex, groupName, kind: 'deleteGroup' })
+          }
+          onExpandAll={operations.expandAll}
+          onPasteTags={operations.pasteTags}
+          onTagsChange={operations.updateTagGroupTags}
+          onToggleGroup={operations.toggleGroup}
+          tagGroups={tagGroups}
+        />
+      ),
       label: t('tagGroups', 'Tag groups'),
     },
     {
-      component: simpleTagsContent,
+      component: (
+        <ModalBody className="min-h-0 flex-1 pr-2">
+          <div className="space-y-6 pb-4">
+            <Alert variant="info">
+              <p>{t('simpleTagsDescription', 'Tags that are not part of any group')}</p>
+            </Alert>
+            <InputTagsAdmin onTagsChange={changeSimpleTags} tags={simpleTags} />
+          </div>
+        </ModalBody>
+      ),
       label: t('simpleTags', 'Simple tags'),
     },
   ]
+
+  const title =
+    mode === 'add'
+      ? t('actions.addTags', 'Add tags')
+      : t('actions.editForProject', 'Edit tags for {{projectKey}}', { projectKey })
 
   return (
     <>
@@ -285,29 +168,30 @@ export const ProjectAddUpdateTagsForm = ({ item, mode, onCancel, onSave }: Prope
           role="presentation">
           <div className="flex min-h-0 flex-1 flex-col">
             <ModalCloseButton onClose={handleCancel} />
-
             <ModalHeader
               actionSlot={<ModalHelpButton helpKey="modal-edit-tags" />}
               className="mb-4">
-              {mode === 'add'
-                ? t('actions.addTags', 'Add tags')
-                : t('actions.editForProject', 'Edit tags for {{projectKey}}', {
-                    projectKey,
-                  })}
+              {title}
             </ModalHeader>
-
             <div className="flex min-h-0 flex-1 flex-col">
               <Tabs tabs={tabs} />
             </div>
           </div>
 
-          {/* Footer Actions */}
           <div className="border-base-300 mt-auto flex-shrink-0 border-t pt-4">
             <ButtonGroup>
-              <Button className="relative z-0" disabled={isSubmitting} type="submit">
+              <Button
+                className="relative z-0"
+                data-testid="tag-manager-save-btn"
+                disabled={isSubmitting}
+                type="submit">
                 {t('actions.save', 'Save')}
               </Button>
-              <Button onClick={handleCancel} type="button" variant="secondary">
+              <Button
+                data-testid="tag-manager-cancel-btn"
+                onClick={handleCancel}
+                type="button"
+                variant="secondary">
                 {t('actions.cancel', 'Cancel')}
               </Button>
             </ButtonGroup>
@@ -315,17 +199,16 @@ export const ProjectAddUpdateTagsForm = ({ item, mode, onCancel, onSave }: Prope
         </div>
       </form>
 
-      {/* Modals */}
       <GenericInputModal
         confirmLabel={t('actions.createTagGroup', 'Create tag group')}
         label={t('actions.addTagGroup', 'Add tag group')}
         onChange={setNewTagGroupName}
         onClose={() => {
-          setShowAddGroupModal(false)
+          closeDialog()
           setNewTagGroupName('')
         }}
         onConfirm={handleAddGroupConfirm}
-        open={showAddGroupModal}
+        open={dialog?.kind === 'addGroup'}
         placeholder={t('forms.name', 'Name')}
         value={newTagGroupName}
       />
@@ -337,31 +220,31 @@ export const ProjectAddUpdateTagsForm = ({ item, mode, onCancel, onSave }: Prope
         label={t('actions.addTag', 'Add a tag')}
         onChange={setNewTagName}
         onClose={() => {
-          setShowAddTagModal(null)
+          closeDialog()
           setNewTagName('')
         }}
         onConfirm={handleAddTagConfirm}
-        open={!!showAddTagModal}
+        open={dialog?.kind === 'addTag'}
         placeholder={t('enterTagName', 'Enter tag name')}
         value={newTagName}
       />
 
-      {showDeleteConfirm && (
+      {dialog?.kind === 'deleteGroup' && (
         <GenericConfirmModal
           cancelLabel={t('actions.close', 'Close')}
           confirmLabel={t('actions.delete', 'Delete')}
           message={t(
             'confirmDeleteGroup',
             'Are you sure you want to delete the tag group "{{groupName}}"?',
-            { groupName: showDeleteConfirm.groupName },
+            { groupName: dialog.groupName },
           )}
-          onClose={() => setShowDeleteConfirm(null)}
+          onClose={closeDialog}
           onConfirm={handleDeleteConfirm}
           open
         />
       )}
 
-      {showCancelConfirm && (
+      {dialog?.kind === 'cancel' && (
         <GenericConfirmModal
           cancelLabel={t('actions.keepEditing', 'Keep editing')}
           confirmLabel={t('actions.discardChanges', 'Discard changes')}
@@ -369,8 +252,11 @@ export const ProjectAddUpdateTagsForm = ({ item, mode, onCancel, onSave }: Prope
             'confirmUnsavedChanges',
             'You have unsaved changes. Are you sure you want to cancel?',
           )}
-          onClose={() => setShowCancelConfirm(false)}
-          onConfirm={confirmCancel}
+          onClose={closeDialog}
+          onConfirm={() => {
+            closeDialog()
+            onCancel()
+          }}
           open
         />
       )}
