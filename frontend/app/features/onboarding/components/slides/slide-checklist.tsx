@@ -84,6 +84,7 @@ export const SlideChecklist = ({ onNavigateToSlide }: SlideChecklistProperties) 
               className={`flex w-full items-start gap-3 rounded-lg p-3 text-left transition-all ${
                 item.completed ? 'bg-success/10' : 'bg-base-200'
               } ${onNavigateToSlide ? 'cursor-pointer hover:scale-[1.02] hover:shadow-md' : ''}`}
+              data-testid={`onboarding-checklist-${item.id}`}
               disabled={!onNavigateToSlide}
               key={item.id}
               onClick={() => onNavigateToSlide?.(item.id)}
