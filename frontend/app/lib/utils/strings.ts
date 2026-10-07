@@ -29,3 +29,6 @@
  * cleanStringForComparison('test') === cleanStringForComparison('TEST') // true
  */
 export const cleanStringForComparison = (text: string) => (text ?? '').trim().toUpperCase()
+
+/** Returns the value, or an empty string for a missing one. */
+export const orEmpty = (value: null | string | undefined): string => value ?? ''

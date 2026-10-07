@@ -23,9 +23,9 @@ import {
   applyFilterParameters,
   areFilterValuesEqual,
   type FilterUrlValues,
-  orEmpty,
   parseTagsParameter,
 } from '~/features/booking-history/lib/booking-history-search-parameters'
+import { orEmpty } from '~/lib/utils/strings'
 
 const values: FilterUrlValues = {
   from: '2026-10-06T00:00:00.000+02:00',

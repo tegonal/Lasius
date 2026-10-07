@@ -27,9 +27,6 @@ export type FilterUrlValues = {
   userId: string
 }
 
-/** Returns the value, or an empty string for a missing one. */
-export const orEmpty = (value: null | string | undefined): string => value ?? ''
-
 const setOrDelete = (parameters: URLSearchParams, key: string, value: string) => {
   if (value) {
     parameters.set(key, value)

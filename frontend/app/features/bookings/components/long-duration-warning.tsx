@@ -17,31 +17,27 @@
  *
  */
 
-import { useState } from 'react'
+import { HelpCircle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-import { Button } from '~/components/primitives/buttons/button'
-import { Modal } from '~/components/ui/overlays/modal/modal'
-import { BookingAddUpdateForm } from '~/features/bookings/components/booking-add-update-form'
+import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 
-type Properties = {
-  selectedOrgId: string
-}
-
-export const BookingAddButton = ({ selectedOrgId }: Properties) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const { t } = useTranslation('bookings')
-
-  const handleClose = () => setIsOpen(false)
-
+export const LongDurationWarning = () => {
+  const { t } = useTranslation('common')
   return (
-    <>
-      <Button data-testid="booking-create-btn" onClick={() => setIsOpen(true)} variant="secondary">
-        {t('actions.create', 'Create a booking')}
-      </Button>
-      <Modal onClose={handleClose} open={isOpen}>
-        <BookingAddUpdateForm mode="add" onClose={handleClose} selectedOrgId={selectedOrgId} />
-      </Modal>
-    </>
+    <div className="alert alert-warning mb-4" role="alert">
+      <LucideIcon icon={HelpCircle} size={20} />
+      <div className="flex flex-col gap-1">
+        <div className="font-semibold">
+          {t('bookings:warnings.longDuration', 'Long duration detected')}
+        </div>
+        <div className="text-sm">
+          {t(
+            'bookings:warnings.longDurationDescription',
+            'This booking is longer than a typical 8-hour work day. Please verify that the start and end times are correct.',
+          )}
+        </div>
+      </div>
+    </div>
   )
 }

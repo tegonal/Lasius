@@ -27,10 +27,10 @@ import {
   applyFilterParameters,
   areFilterValuesEqual,
   type FilterUrlValues,
-  orEmpty,
   parseTagsParameter,
 } from '~/features/booking-history/lib/booking-history-search-parameters'
 import { dateOptions } from '~/lib/utils/date/date-options'
+import { orEmpty } from '~/lib/utils/strings'
 import { type ModelsTag } from '~/services/api/lasius'
 
 import { type BookingHistoryControls } from '../components/booking-history-layout'
