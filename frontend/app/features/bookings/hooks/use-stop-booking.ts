@@ -40,6 +40,7 @@ type StopBookingPayload = {
  * Stops a booking. If the booking spans midnight, splits it:
  * stops at end of start day, then adds a next-day booking.
  * Chains useStopUserBookingCurrent → useAddUserBookingByOrganisation (conditional).
+ * Call it only from StopBookingProvider, because the add runs after the stop revalidates.
  */
 export function useStopBooking() {
   const bookingAdditionApi = useAddUserBookingByOrganisation()
@@ -52,6 +53,9 @@ export function useStopBooking() {
   }>(null)
 
   const stopApi = useStopUserBookingCurrent({
+    onError: () => {
+      pendingAddReference.current = null
+    },
     onSuccess: () => {
       if (!pendingAddReference.current) {
         return
@@ -65,6 +69,7 @@ export function useStopBooking() {
       })
     },
   })
+  const { submit: stopSubmit } = stopApi
 
   const submit = useCallback(
     (payload: StopBookingPayload) => {
@@ -85,20 +90,20 @@ export function useStopBooking() {
           start: nextDayStart,
           tags,
         }
-        stopApi.submit({
+        stopSubmit({
           body: { end: eod },
           bookingId,
           orgId,
         })
       } else {
-        stopApi.submit({
+        stopSubmit({
           body: { end },
           bookingId,
           orgId,
         })
       }
     },
-    [stopApi],
+    [stopSubmit],
   )
 
   const state =

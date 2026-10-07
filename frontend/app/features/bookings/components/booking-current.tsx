@@ -24,7 +24,7 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { useHomeLoaderData } from '~/features/bookings/hooks/use-home-loader-data'
-import { useStopBooking } from '~/features/bookings/hooks/use-stop-booking'
+import { useStopBookingContext } from '~/features/bookings/stop-booking-provider'
 import { ContextMenuProvider } from '~/features/context-menu/hooks/use-context-menu'
 import { TagList } from '~/features/tags/components/tag-list'
 import { formatISOLocale } from '~/lib/utils/dates'
@@ -88,13 +88,13 @@ const CurrentBookingEntry = ({
   selectedOrgId: string
 }) => {
   const { t } = useTranslation('common')
-  const stopBookingApi = useStopBooking()
+  const { state: stopState, submit: stopBooking } = useStopBookingContext()
 
   const stop = () => {
     const endTime = roundToNearestMinutes(new Date(), {
       roundingMethod: 'floor',
     })
-    stopBookingApi.submit({
+    stopBooking({
       bookingId: booking.id,
       end: formatISOLocale(endTime),
       orgId: selectedOrgId,
@@ -108,6 +108,7 @@ const CurrentBookingEntry = ({
     <div className="grid h-full w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 lg:gap-4">
       <Button
         data-testid="booking-current-stop-btn"
+        disabled={stopState !== 'idle'}
         fullWidth={false}
         onClick={stop}
         title={t('bookings:actions.stopRecording', 'Stop recording current time booking')}

@@ -63,6 +63,7 @@ export const BookingItem = ({ item, nextItem }: Properties) => {
           : 'border-base-content/20 border-b',
         item.isMostRecent && 'border-base-content/20 border-t',
       )}
+      data-booking-start={item.start.dateTime}
       data-testid="booking-item">
       <div className="flex w-full min-w-0 flex-col gap-3">
         <BookingName item={item} />

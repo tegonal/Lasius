@@ -27,6 +27,7 @@ import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { TegonalFooter } from '~/components/ui/navigation/tegonal-footer'
 import { TokenWatcher } from '~/features/auth/components/token-watcher'
 import { BookingCurrent } from '~/features/bookings/components/booking-current'
+import { StopBookingProvider } from '~/features/bookings/stop-booking-provider'
 import { CalendarDataProvider } from '~/features/calendar/calendar-data-provider'
 import { CalendarWeek } from '~/features/calendar/components/calendar-week'
 import { HelpButton } from '~/features/help/components/help-button'
@@ -97,86 +98,88 @@ export default function AppLayout({ loaderData }: Route.ComponentProps) {
   const hasActiveBooking = Boolean(loaderData.currentBooking?.booking)
 
   return (
-    <div className="container mx-auto grid size-full grid-rows-[116px_auto] gap-0 md:grid-rows-[148px_auto] md:pb-4">
-      {/* One provider for both headers, so each week loads once. */}
-      <CalendarDataProvider
-        date={selectedDate}
-        organisationId={selectedOrganisationId}
-        period="week">
-        {/* Desktop header */}
-        <div className="hidden md:block">
-          <section className="h-full w-full overflow-visible">
-            <div className="grid h-full w-full grid-cols-[minmax(200px,310px)_minmax(max-content,auto)_minmax(200px,310px)] gap-0 overflow-visible 2xl:grid-cols-[minmax(200px,340px)_minmax(max-content,auto)_minmax(200px,340px)]">
-              <div className="hover:text-info flex cursor-pointer items-center justify-start gap-8 pl-8">
-                <Link to={href('/')}>
-                  <Logo />
-                </Link>
+    <StopBookingProvider>
+      <div className="container mx-auto grid size-full grid-rows-[116px_auto] gap-0 md:grid-rows-[148px_auto] md:pb-4">
+        {/* One provider for both headers, so each week loads once. */}
+        <CalendarDataProvider
+          date={selectedDate}
+          organisationId={selectedOrganisationId}
+          period="week">
+          {/* Desktop header */}
+          <div className="hidden md:block">
+            <section className="h-full w-full overflow-visible">
+              <div className="grid h-full w-full grid-cols-[minmax(200px,310px)_minmax(max-content,auto)_minmax(200px,310px)] gap-0 overflow-visible 2xl:grid-cols-[minmax(200px,340px)_minmax(max-content,auto)_minmax(200px,340px)]">
+                <div className="hover:text-info flex cursor-pointer items-center justify-start gap-8 pl-8">
+                  <Link to={href('/')}>
+                    <Logo />
+                  </Link>
+                </div>
+
+                <div className="flex h-full w-full items-center justify-center gap-8">
+                  <CalendarWeek />
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pr-8">
+                  <OrgSwitcher />
+                  <HelpButton />
+                  <Form action="/logout" method="post">
+                    <Button
+                      aria-label={t('auth.actions.signOut', {
+                        defaultValue: 'Sign out',
+                      })}
+                      data-testid="auth-logout-btn"
+                      fullWidth={false}
+                      shape="circle"
+                      type="submit"
+                      variant="ghost">
+                      <LucideIcon icon={LogOutIcon} size={20} />
+                    </Button>
+                  </Form>
+                </div>
               </div>
+            </section>
+          </div>
 
-              <div className="flex h-full w-full items-center justify-center gap-8">
-                <CalendarWeek />
+          {/* Mobile header — matches original: Calendar or BookingCurrent, no Logo/Logout */}
+          <div className="overflow-hidden md:hidden">
+            <section className="flex h-full w-full items-center gap-2 overflow-hidden">
+              <div className="min-w-0 flex-1 overflow-hidden">
+                {hasActiveBooking ? (
+                  <BookingCurrent
+                    currentBooking={loaderData.currentBooking}
+                    selectedOrgId={selectedOrganisationId}
+                  />
+                ) : (
+                  <CalendarWeek />
+                )}
               </div>
+            </section>
+          </div>
+        </CalendarDataProvider>
 
-              <div className="flex items-center justify-end gap-2 pr-8">
-                <OrgSwitcher />
-                <HelpButton />
-                <Form action="/logout" method="post">
-                  <Button
-                    aria-label={t('auth.actions.signOut', {
-                      defaultValue: 'Sign out',
-                    })}
-                    data-testid="auth-logout-btn"
-                    fullWidth={false}
-                    shape="circle"
-                    type="submit"
-                    variant="ghost">
-                    <LucideIcon icon={LogOutIcon} size={20} />
-                  </Button>
-                </Form>
-              </div>
-            </div>
-          </section>
-        </div>
-
-        {/* Mobile header — matches original: Calendar or BookingCurrent, no Logo/Logout */}
-        <div className="overflow-hidden md:hidden">
-          <section className="flex h-full w-full items-center gap-2 overflow-hidden">
-            <div className="min-w-0 flex-1 overflow-hidden">
-              {hasActiveBooking ? (
-                <BookingCurrent
-                  currentBooking={loaderData.currentBooking}
-                  selectedOrgId={selectedOrganisationId}
-                />
-              ) : (
-                <CalendarWeek />
-              )}
-            </div>
-          </section>
-        </div>
-      </CalendarDataProvider>
-
-      {/* Content area — single Outlet for unique test IDs */}
-      {/* overflow-clip, not overflow-hidden: a clipped box is no scroll container, so a focus
+        {/* Content area — single Outlet for unique test IDs */}
+        {/* overflow-clip, not overflow-hidden: a clipped box is no scroll container, so a focus
           change cannot scroll the hidden footer tooltips into view and shift the layout.
           A clipped grid item keeps its content height as minimum, so min-h-0 holds the box
           inside the grid row. Without it, the box grows past the window and no list scrolls. */}
-      <div className="bg-base-200 border-base-content/20 h-full min-h-0 w-full overflow-clip md:flex md:flex-col md:rounded-xl md:border md:shadow-2xl">
-        <div className="h-full w-full overflow-auto">
-          <Outlet />
+        <div className="bg-base-200 border-base-content/20 h-full min-h-0 w-full overflow-clip md:flex md:flex-col md:rounded-xl md:border md:shadow-2xl">
+          <div className="h-full w-full overflow-auto">
+            <Outlet />
+          </div>
+
+          {/* Desktop footer */}
+          <footer className="border-base-content/20 bg-base-100 hidden items-center justify-between border-t px-3 py-2 md:flex">
+            <TegonalFooter variant="compact" />
+          </footer>
         </div>
 
-        {/* Desktop footer */}
-        <footer className="border-base-content/20 bg-base-100 hidden items-center justify-between border-t px-3 py-2 md:flex">
-          <TegonalFooter variant="compact" />
-        </footer>
+        <MobileFloatingActionButton />
+        <TermsOfServiceDialog termsOfService={loaderData.termsOfService} />
+        <DevelopmentInfoBadge />
+        <TokenWatcher />
+        <WebSocketEventHandler />
+        <HealthMonitor />
       </div>
-
-      <MobileFloatingActionButton />
-      <TermsOfServiceDialog termsOfService={loaderData.termsOfService} />
-      <DevelopmentInfoBadge />
-      <TokenWatcher />
-      <WebSocketEventHandler />
-      <HealthMonitor />
-    </div>
+    </StopBookingProvider>
   )
 }
