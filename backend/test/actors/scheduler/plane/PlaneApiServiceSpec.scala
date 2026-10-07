@@ -23,23 +23,18 @@ package actors.scheduler.plane
 
 import actors.scheduler.{
   ApiKeyAuthentication,
+  HttpStatusException,
   ServiceAuthentication,
   ServiceConfiguration
 }
-import org.mockito.ArgumentMatchers.{any, anyString}
-import org.mockito.Mockito.when
-import org.mockito.invocation.InvocationOnMock
-import org.mockito.stubbing.Answer
-import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import play.api.libs.json._
-import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
+import play.api.libs.ws.WSClient
 
-import scala.collection.mutable
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext}
 
-class PlaneApiServiceSpec extends Specification with Mockito {
+class PlaneApiServiceSpec extends Specification {
 
   implicit val executionContext: ExecutionContext = ExecutionContext.global
   implicit val auth: ServiceAuthentication        = ApiKeyAuthentication("key")
@@ -62,47 +57,8 @@ class PlaneApiServiceSpec extends Specification with Mockito {
                    nextCursor: String,
                    hasNext: Boolean,
                    total: Int,
-                   totalPages: Int): JsObject = Json.obj(
-    "grouped_by"        -> JsNull,
-    "next_cursor"       -> nextCursor,
-    "prev_cursor"       -> "",
-    "next_page_results" -> hasNext,
-    "prev_page_results" -> false,
-    "count"             -> ids.size,
-    "total_pages"       -> totalPages,
-    "total_results"     -> total,
-    "extra_stats"       -> Json.obj(),
-    "results"           -> JsArray(ids.map(issue))
-  )
-
-  /** A WSClient that answers each request with `respond(url)` and records the
-    * URLs.
-    */
-  private def stubClient(
-      respond: String => (Int, JsValue)): (WSClient, mutable.Buffer[String]) = {
-    val requested = mutable.Buffer[String]()
-    val client    = mock[WSClient]
-    when(client.url(anyString)).thenAnswer(new Answer[WSRequest] {
-      override def answer(invocation: InvocationOnMock): WSRequest = {
-        val url = invocation.getArgument[String](0)
-        requested.synchronized(requested += url)
-        val (status, json) = respond(url)
-        val response       = mock[WSResponse]
-        when(response.status).thenReturn(status)
-        when(response.statusText)
-          .thenReturn(if (status == 404) "Not Found" else "OK")
-        when(response.json).thenReturn(json)
-        when(response.headers)
-          .thenReturn(Map.empty[String, scala.collection.Seq[String]])
-        val request = mock[WSRequest]
-        when(request.addHttpHeaders(any[(String, String)]()))
-          .thenReturn(request)
-        when(request.get()).thenReturn(Future.successful(response))
-        request
-      }
-    })
-    (client, requested)
-  }
+                   totalPages: Int): JsObject =
+    StubPlaneClient.page(ids.map(issue), nextCursor, hasNext, total, totalPages)
 
   private def findIssues(client: WSClient): Seq[PlaneIssue] =
     Await.result(
@@ -128,7 +84,7 @@ class PlaneApiServiceSpec extends Specification with Mockito {
 
   "PlaneApiServiceImpl.findIssues" should {
     "fetch every page by the next_cursor of the previous answer" in {
-      val (client, requested) = stubClient { url =>
+      val (client, requested) = StubPlaneClient { url =>
         if (url.contains("cursor=100%3A0%3A0"))
           (200, page(1 to 100, "100:1:0", hasNext = true, 150, 2))
         else if (url.contains("cursor=100%3A1%3A0"))
@@ -144,7 +100,7 @@ class PlaneApiServiceSpec extends Specification with Mockito {
     }
 
     "stop and keep each issue once when Plane answers every page with the first" in {
-      val (client, requested) = stubClient { _ =>
+      val (client, requested) = StubPlaneClient { _ =>
         (200, page(1 to 100, "100:1:0", hasNext = true, 290, 3))
       }
 
@@ -156,7 +112,7 @@ class PlaneApiServiceSpec extends Specification with Mockito {
     }
 
     "fall back to /issues/ when the work-items endpoint answers 404" in {
-      val (client, requested) = stubClient { url =>
+      val (client, requested) = StubPlaneClient { url =>
         if (url.contains("/work-items/")) (404, JsNull)
         else (200, page(1 to 5, "100:1:0", hasNext = false, 5, 1))
       }
@@ -176,6 +132,65 @@ class PlaneApiServiceSpec extends Specification with Mockito {
       run() must haveSize(5)
       requested.count(_.contains("/work-items/")) must equalTo(1)
       requested.count(_.contains("/issues/")) must equalTo(2)
+    }
+  }
+
+  "PlaneApiServiceImpl on a 429 answer" should {
+    def service(client: WSClient) =
+      new PlaneApiServiceImpl(client,
+                              ServiceConfiguration("https://plane.test"),
+                              rateLimitWait = (_, _) => 10.millis)
+
+    def labelPage =
+      StubPlaneClient.page(Seq(Json.obj("id" -> "l1", "name" -> "bug")),
+                           "100:1:0",
+                           hasNext = false,
+                           total = 1,
+                           totalPages = 1)
+
+    "load the page again after the wait" in {
+      var calls               = 0
+      val (client, requested) = StubPlaneClient { _ =>
+        calls += 1
+        if (calls == 1) (429, JsNull) else (200, labelPage)
+      }
+
+      Await.result(service(client).getLabels(100, "ws", "p1"),
+                   5.seconds) must equalTo(Set(PlaneLabel("l1", "bug")))
+      requested must haveSize(2)
+    }
+
+    "fail after the last retry" in {
+      val (client, requested) = StubPlaneClient(_ => (429, JsNull))
+
+      Await.result(service(client).getLabels(100, "ws", "p1"),
+                   5.seconds) must throwA[HttpStatusException]
+      requested must haveSize(PlaneApiServiceImpl.MaxRateLimitRetries + 1)
+    }
+  }
+
+  "PlaneApiServiceImpl.rateLimitWait" should {
+    val now = 1700000000000L
+
+    def waitFor(reset: String) =
+      PlaneApiServiceImpl.rateLimitWait(Map("x-ratelimit-reset" -> Seq(reset)),
+                                        now)
+
+    "wait until the X-RateLimit-Reset time" in {
+      waitFor("1700000005") must equalTo(5.seconds)
+    }
+
+    "wait at least one second for a reset time in the past" in {
+      waitFor("1699999990") must equalTo(1.second)
+    }
+
+    "wait at most one quota window" in {
+      waitFor("1700003600") must equalTo(60.seconds)
+    }
+
+    "wait one quota window without a readable reset header" in {
+      waitFor("soon") must equalTo(60.seconds)
+      PlaneApiServiceImpl.rateLimitWait(Map.empty, now) must equalTo(60.seconds)
     }
   }
 }

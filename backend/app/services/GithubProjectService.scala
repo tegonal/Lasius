@@ -218,51 +218,11 @@ class GithubProjectService(wsClient: WSClient)(implicit ec: ExecutionContext)
           .debug(
             s"Config ${config.id.value} authenticated as GitHub user: ${githubUsername}")
 
-        // GitHub uses Link headers for pagination (RFC 5988)
-        def fetchPage(url: String,
-                      accumulated: Seq[ExternalProject] = Seq.empty)
-            : Future[Seq[ExternalProject]] = {
-          wsClient
-            .url(url)
-            .addHttpHeaders(
-              "Authorization" -> s"Bearer ${config.auth.accessToken}")
-            .withRequestTimeout(ProjectListTimeout)
-            .get()
-            .flatMap { response =>
-              response.status match {
-                case 200 =>
-                  val repos = (response.json.as[JsArray].value).map { repo =>
-                    val fullName = (repo \ "full_name").as[String]
-                    val name     = (repo \ "name").as[String]
-                    ExternalProject(fullName, name)
-                  }
-                  val allRepos = accumulated ++ repos
-
-                  // Check for next page in Link header
-                  response.header("Link") match {
-                    case Some(linkHeader) =>
-                      // Parse Link header: <url>; rel="next"
-                      val nextPageRegex = """<([^>]+)>;\s*rel="next"""".r
-                      nextPageRegex.findFirstMatchIn(linkHeader) match {
-                        case Some(m) =>
-                          val nextUrl = m.group(1)
-                          fetchPage(nextUrl, allRepos)
-                        case None =>
-                          Future.successful(allRepos)
-                      }
-                    case None =>
-                      Future.successful(allRepos)
-                  }
-
-                case _ =>
-                  throw new Exception(
-                    s"Failed to fetch GitHub repositories: HTTP ${response.status}")
-              }
-            }
-        }
-
-        // Fetch all pages and enrich with labels
-        fetchPage(initialReposUrl).flatMap { repos =>
+        fetchAllLinkPages(wsClient, initialReposUrl, authHeader(config))(
+          _.as[JsArray].value.toSeq.map { repo =>
+            ExternalProject((repo \ "full_name").as[String],
+                            (repo \ "name").as[String])
+          }).map { repos =>
           // Debug: Log all repo names
           val repoNames = repos.map(_.id).mkString(", ")
           play.api
@@ -283,49 +243,35 @@ class GithubProjectService(wsClient: WSClient)(implicit ec: ExecutionContext)
             .Logger(getClass)
             .debug(s"Config ${config.id.value} token type: ${tokenType}")
 
-          // Enrich each repository with available labels
-          Future
-            .sequence(repos.map { repo =>
-              enrichProjectWithLabels(config, repo)
-            })
-            .map(_.sortBy(_.name))
+          repos.sortBy(_.name)
         }
       }
   }
 
-  private def enrichProjectWithLabels(
-      config: GithubConfig,
-      project: ExternalProject): Future[ExternalProject] = {
-    fetchProjectLabels(config, project.id).map { labels =>
-      project.copy(
-        availableLabels = if (labels.nonEmpty) Some(labels) else None,
-        availableStates =
-          Some(Seq("open", "closed", "all")) // GitHub fixed states
-      )
+  override def getProjectMetadata(
+      config: IssueImporterConfig,
+      externalProjectId: String): Future[ExternalProjectMetadata] =
+    config match {
+      case c: GithubConfig =>
+        for {
+          repoFullName <- validateExternalProjectId(
+            externalProjectId,
+            "[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+".r)
+          labels <- fetchAllLinkPages(
+            wsClient,
+            s"${c.baseUrl}/repos/$repoFullName/labels?per_page=100",
+            authHeader(c))(_.as[JsArray].value.toSeq.map(label =>
+            (label \ "name").as[String]))
+        } yield ExternalProjectMetadata(labels.sorted, GithubStates)
+      case _ =>
+        Future.failed(
+          new IllegalArgumentException(
+            "GithubProjectService requires GithubConfig"))
     }
-  }
 
-  private def fetchProjectLabels(config: GithubConfig,
-                                 repoFullName: String): Future[Seq[String]] = {
-    val labelsUrl =
-      s"${config.baseUrl}/repos/$repoFullName/labels?per_page=100"
+  // GitHub issue states are fixed, unlike the labels of a repository.
+  private val GithubStates = Seq("open", "closed", "all")
 
-    wsClient
-      .url(labelsUrl)
-      .addHttpHeaders("Authorization" -> s"Bearer ${config.auth.accessToken}")
-      .withRequestTimeout(ProjectListTimeout)
-      .get()
-      .map { response =>
-        response.status match {
-          case 200 =>
-            response.json
-              .as[JsArray]
-              .value
-              .map(label => (label \ "name").as[String])
-              .toSeq
-          case _ => Seq.empty // Gracefully handle failures
-        }
-      }
-      .recover { case _ => Seq.empty } // Gracefully handle errors
-  }
+  private def authHeader(config: GithubConfig): (String, String) =
+    "Authorization" -> s"Bearer ${config.auth.accessToken}"
 }

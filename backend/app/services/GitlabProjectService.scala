@@ -26,13 +26,15 @@ import models._
 import play.api.libs.json.JsArray
 import play.api.libs.ws.WSClient
 
-import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
 /** Service for GitLab API interactions.
   */
 class GitlabProjectService(wsClient: WSClient)(implicit ec: ExecutionContext)
     extends ExternalProjectService {
+
+  // GitLab issue states are fixed, unlike the labels of a project.
+  private val GitlabStates = Seq("opened", "closed", "all")
 
   override def testConnectivity(
       config: CreateIssueImporterConfig): Future[ConnectivityTestResult] = {
@@ -59,108 +61,43 @@ class GitlabProjectService(wsClient: WSClient)(implicit ec: ExecutionContext)
   }
 
   override def listProjects(
-      config: IssueImporterConfig): Future[ListProjectsResponse] = {
+      config: IssueImporterConfig): Future[ListProjectsResponse] =
+    withGitlabConfig(config) { c =>
+      fetchAllLinkPages(
+        wsClient,
+        c.baseUrl.toString + "/api/v4/projects?membership=true&archived=false&per_page=100",
+        authHeader(c)
+      )(_.as[JsArray].value.toSeq.map { project =>
+        ExternalProject((project \ "id").as[Long].toString,
+                        (project \ "name").as[String])
+      }).map(projects =>
+        ListProjectsResponse(projects = Some(projects.sortBy(_.name))))
+    }
+
+  override def getProjectMetadata(
+      config: IssueImporterConfig,
+      externalProjectId: String): Future[ExternalProjectMetadata] =
+    withGitlabConfig(config) { c =>
+      for {
+        projectId <- validateExternalProjectId(externalProjectId, "\\d+".r)
+        labels    <- fetchAllLinkPages(
+          wsClient,
+          s"${c.baseUrl}/api/v4/projects/$projectId/labels?per_page=100",
+          authHeader(c))(_.as[JsArray].value.toSeq.map(label =>
+          (label \ "name").as[String]))
+      } yield ExternalProjectMetadata(labels.sorted, GitlabStates)
+    }
+
+  private def authHeader(config: GitlabConfig): (String, String) =
+    "PRIVATE-TOKEN" -> config.auth.accessToken
+
+  private def withGitlabConfig[T](config: IssueImporterConfig)(
+      f: GitlabConfig => Future[T]): Future[T] =
     config match {
-      case c: GitlabConfig =>
-        listGitlabProjects(c).map { projects =>
-          ListProjectsResponse(projects = Some(projects))
-        }
-      case _ =>
+      case c: GitlabConfig => f(c)
+      case _               =>
         Future.failed(
           new IllegalArgumentException(
             "GitlabProjectService requires GitlabConfig"))
     }
-  }
-
-  private def listGitlabProjects(
-      config: GitlabConfig): Future[Seq[ExternalProject]] = {
-    // GitLab uses Link headers for pagination (RFC 5988)
-    // We'll fetch all pages recursively
-    def fetchPage(url: String, accumulated: Seq[ExternalProject] = Seq.empty)
-        : Future[Seq[ExternalProject]] = {
-      wsClient
-        .url(url)
-        .addHttpHeaders("PRIVATE-TOKEN" -> config.auth.accessToken)
-        .withRequestTimeout(ProjectListTimeout)
-        .get()
-        .flatMap { response =>
-          response.status match {
-            case 200 =>
-              val projects = (response.json.as[JsArray].value).map { project =>
-                val id   = (project \ "id").as[Long].toString
-                val name = (project \ "name").as[String]
-                ExternalProject(id, name)
-              }
-              val allProjects = accumulated ++ projects
-
-              // Check for next page in Link header
-              response.header("Link") match {
-                case Some(linkHeader) =>
-                  // Parse Link header: <url>; rel="next"
-                  val nextPageRegex = """<([^>]+)>;\s*rel="next"""".r
-                  nextPageRegex.findFirstMatchIn(linkHeader) match {
-                    case Some(m) =>
-                      val nextUrl = m.group(1)
-                      fetchPage(nextUrl, allProjects)
-                    case None =>
-                      Future.successful(allProjects)
-                  }
-                case None =>
-                  Future.successful(allProjects)
-              }
-
-            case _ =>
-              throw new Exception(
-                s"Failed to fetch GitLab projects: HTTP ${response.status}")
-          }
-        }
-    }
-
-    val initialUrl =
-      config.baseUrl.toString + "/api/v4/projects?membership=true&archived=false&per_page=100"
-
-    for {
-      projects <- fetchPage(initialUrl)
-      // Enrich each project with available labels
-      enrichedProjects <- Future.sequence(projects.map { project =>
-        enrichProjectWithLabels(config, project)
-      })
-    } yield enrichedProjects.sortBy(_.name)
-  }
-
-  private def enrichProjectWithLabels(
-      config: GitlabConfig,
-      project: ExternalProject): Future[ExternalProject] = {
-    fetchProjectLabels(config, project.id).map { labels =>
-      project.copy(
-        availableLabels = if (labels.nonEmpty) Some(labels) else None,
-        availableStates =
-          Some(Seq("opened", "closed", "all")) // GitLab fixed states
-      )
-    }
-  }
-
-  private def fetchProjectLabels(config: GitlabConfig,
-                                 projectId: String): Future[Seq[String]] = {
-    val labelsUrl =
-      s"${config.baseUrl}/api/v4/projects/$projectId/labels?per_page=100"
-
-    wsClient
-      .url(labelsUrl)
-      .addHttpHeaders("PRIVATE-TOKEN" -> config.auth.accessToken)
-      .withRequestTimeout(ProjectListTimeout)
-      .get()
-      .map { response =>
-        response.status match {
-          case 200 =>
-            response.json
-              .as[JsArray]
-              .value
-              .map(label => (label \ "name").as[String])
-              .toSeq
-          case _ => Seq.empty // Gracefully handle failures
-        }
-      }
-      .recover { case _ => Seq.empty } // Gracefully handle errors
-  }
 }

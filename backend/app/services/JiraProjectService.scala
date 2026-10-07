@@ -86,6 +86,12 @@ class JiraProjectService(wsClient: WSClient)(implicit ec: ExecutionContext)
     }
   }
 
+  // The Jira tag configuration has no label or state filter.
+  override def getProjectMetadata(
+      config: IssueImporterConfig,
+      externalProjectId: String): Future[ExternalProjectMetadata] =
+    Future.successful(ExternalProjectMetadata(Seq.empty, Seq.empty))
+
   private def listJiraProjects(
       config: JiraConfig): Future[Seq[ExternalProject]] = {
     implicit val auth: OAuthAuthentication = OAuthAuthentication(

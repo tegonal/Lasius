@@ -478,6 +478,37 @@ class IssueImporterConfigController @Inject() (
         }
     }
 
+  def getExternalProjectMetadata(orgId: OrganisationId,
+                                 configId: IssueImporterConfigId,
+                                 externalProjectId: String): Action[Unit] =
+    HasUserRole(FreeUser, parse.empty, withinTransaction = false) {
+      implicit dbSession => _ => user => implicit request =>
+        HasOrganisationRole(user, orgId, OrganisationMember) { _ =>
+          issueImporterRepository
+            .findById(configId)
+            .flatMap {
+              case None =>
+                Future.successful(
+                  NotFound(ConfigErrorResponses.External.notFound(configId)))
+
+              case Some(config) =>
+                validateConfigOwnership(config, orgId).flatMap { _ =>
+                  ExternalProjectService
+                    .forType(config.importerType, wsClient)
+                    .getProjectMetadata(config, externalProjectId)
+                    .map(metadata => Ok(Json.toJson(metadata)))
+                    .recover { case e: Exception =>
+                      logger.error(
+                        s"Failed to load metadata of external project $externalProjectId for config ${configId.value}",
+                        e)
+                      BadRequest(
+                        ConfigErrorResponses.External.projectMetadataFailed(e))
+                    }
+                }
+            }
+        }
+    }
+
   /** Lists available resource owners (user + organizations) for a GitHub token.
     * This is GitHub-specific and helps users select the correct resource owner
     * when creating organization-scoped fine-grained tokens.

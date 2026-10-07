@@ -110,6 +110,14 @@ object ConfigErrorResponses {
       )
     }
 
+    def projectMetadataFailed(e: Exception): JsObject = {
+      Json.obj(
+        "status"  -> "error",
+        "message" -> e.getMessage,
+        "error"   -> "project_metadata_failed"
+      )
+    }
+
     def connectionFailed(e: Exception): JsObject = {
       Json.obj(
         "status"  -> "error",

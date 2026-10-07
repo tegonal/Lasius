@@ -371,3 +371,16 @@ object ListProjectsResponse {
   implicit val format: Format[ListProjectsResponse] =
     Json.format[ListProjectsResponse]
 }
+
+/** The labels and states of one external project, which the tag filter of a
+  * project mapping offers.
+  */
+case class ExternalProjectMetadata(
+    availableLabels: Seq[String],
+    availableStates: Seq[String]
+)
+
+object ExternalProjectMetadata {
+  implicit val format: Format[ExternalProjectMetadata] =
+    Json.format[ExternalProjectMetadata]
+}

@@ -30,7 +30,9 @@ import actors.scheduler.{
 import play.api.libs.json.Reads
 import play.api.libs.ws.WSClient
 
-import scala.concurrent.{ExecutionContext, Future}
+import java.util.concurrent.{Executors, ScheduledExecutorService, TimeUnit}
+import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future, Promise}
 
 trait PlaneApiService {
 
@@ -53,10 +55,19 @@ trait PlaneApiService {
   def getStates(maxResults: Int, workspace: String, projectId: String)(implicit
       auth: ServiceAuthentication,
       executionContext: ExecutionContext): Future[Set[PlaneState]]
+
+  def getProjects(maxResults: Int, workspace: String)(implicit
+      auth: ServiceAuthentication,
+      executionContext: ExecutionContext): Future[Seq[PlaneWorkspaceProject]]
 }
 
-class PlaneApiServiceImpl(override val ws: WSClient,
-                          override val config: ServiceConfiguration)
+class PlaneApiServiceImpl(
+    override val ws: WSClient,
+    override val config: ServiceConfiguration,
+    override val requestTimeout: Option[FiniteDuration] = None,
+    maxRateLimitRetries: Int = PlaneApiServiceImpl.MaxRateLimitRetries,
+    rateLimitWait: (Map[String, scala.collection.Seq[String]],
+                    Long) => FiniteDuration = PlaneApiServiceImpl.rateLimitWait)
     extends PlaneApiService
     with ApiServiceBase {
 
@@ -81,6 +92,13 @@ class PlaneApiServiceImpl(override val ws: WSClient,
     loadAllPages[PlaneState, PlaneStatesQueryResult](
       resourcePath(workspace, projectId, "states"),
       maxResults).map(_.toSet)
+
+  def getProjects(maxResults: Int, workspace: String)(implicit
+      auth: ServiceAuthentication,
+      executionContext: ExecutionContext): Future[Seq[PlaneWorkspaceProject]] =
+    loadAllPages[PlaneWorkspaceProject, PlaneProjectsQueryResult](
+      s"/api/v1/workspaces/$workspace/projects/?",
+      maxResults)
 
   def findIssues(workspace: String,
                  projectId: String,
@@ -136,7 +154,7 @@ class PlaneApiServiceImpl(override val ws: WSClient,
         params :+ getParam("cursor", cursor) :+ getParam("per_page",
                                                          perPage): _*)
       logger.debug(s"loadPage: $url")
-      getSingleValue[P](url).flatMap { case (result, _) =>
+      retryOnRateLimit()(getSingleValue[P](url)).flatMap { case (result, _) =>
         val newResults = result.results
           .filterNot(r => loadedIds.contains(r.id))
           .distinctBy(_.id)
@@ -160,5 +178,57 @@ class PlaneApiServiceImpl(override val ws: WSClient,
              page = 0,
              loaded = Vector.empty,
              loadedIds = Set.empty)
+  }
+
+  /** Plane answers 429 when an API key exceeds its request quota. The call
+    * waits for the quota reset and tries again.
+    */
+  private def retryOnRateLimit[T](attempt: Int = 1)(call: => Future[T])(implicit
+      executionContext: ExecutionContext): Future[T] =
+    call.recoverWith {
+      case e: HttpStatusException
+          if e.status == 429 && attempt <= maxRateLimitRetries =>
+        val wait = rateLimitWait(e.headers, System.currentTimeMillis())
+        logger.info(
+          s"Plane at ${config.baseUrl} hit the rate limit, retry $attempt in $wait")
+        PlaneApiServiceImpl.after(wait)(retryOnRateLimit(attempt + 1)(call))
+    }
+}
+
+object PlaneApiServiceImpl {
+
+  val MaxRateLimitRetries = 3
+
+  // The Plane docs give a quota of 60 requests per minute for each API key.
+  private val QuotaWindow = 60.seconds
+
+  /** The time until the X-RateLimit-Reset of a 429 answer (epoch seconds),
+    * limited to one quota window.
+    */
+  def rateLimitWait(headers: Map[String, scala.collection.Seq[String]],
+                    nowMillis: Long): FiniteDuration =
+    headers
+      .collectFirst {
+        case (name, values) if name.equalsIgnoreCase("X-RateLimit-Reset") =>
+          values.headOption.flatMap(_.trim.toLongOption)
+      }
+      .flatten
+      .map(reset => (reset * 1000 - nowMillis).millis.max(1.second))
+      .fold(QuotaWindow)(_.min(QuotaWindow))
+
+  private lazy val scheduler: ScheduledExecutorService =
+    Executors.newSingleThreadScheduledExecutor { runnable =>
+      val thread = new Thread(runnable, "plane-rate-limit")
+      thread.setDaemon(true)
+      thread
+    }
+
+  private def after[T](delay: FiniteDuration)(f: => Future[T])(implicit
+      executionContext: ExecutionContext): Future[T] = {
+    val elapsed = Promise[Unit]()
+    scheduler.schedule(new Runnable { def run(): Unit = elapsed.success(()) },
+                       delay.toMillis,
+                       TimeUnit.MILLISECONDS)
+    elapsed.future.flatMap(_ => f)
   }
 }

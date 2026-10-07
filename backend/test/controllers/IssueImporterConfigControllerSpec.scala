@@ -21,6 +21,7 @@
 
 package controllers
 
+import actors.scheduler.plane.StubPlaneClient
 import core.{SystemServices, TestApplication}
 import models._
 import mongo.EmbedMongo
@@ -1167,12 +1168,13 @@ class IssueImporterConfigControllerSpec
 
       // Plane API fetches projects for the configured workspace
       // The planeConfig in the mock has workspace: "test-workspace"
-      val projectsJson = Json.obj(
-        "results" -> Json.arr(
-          Json.obj("id" -> "proj-1", "name" -> "Project 1"),
-          Json.obj("id" -> "proj-2", "name" -> "Project 2")
-        )
-        // No "next" field = no pagination
+      val projectsJson = StubPlaneClient.page(
+        Seq(Json.obj("id" -> "proj-1", "name" -> "Project 1"),
+            Json.obj("id" -> "proj-2", "name" -> "Project 2")),
+        nextCursor = "100:1:0",
+        hasNext = false,
+        total = 2,
+        totalPages = 1
       )
 
       when(mockWsClient.url(anyString)).thenReturn(mockWsRequest)
@@ -1342,6 +1344,121 @@ class IssueImporterConfigControllerSpec
       status(result) must equalTo(BAD_REQUEST)
       val json = contentAsJson(result)
       (json \ "error").as[String] must equalTo("list_projects_failed")
+    }
+  }
+
+  // ===== External Project Metadata Tests =====
+
+  "get external project metadata" should {
+
+    def metadataController(app: play.api.Application)(
+        respond: String => (Int, JsValue))
+        : (IssueImporterConfigControllerMock, scala.collection.Seq[String]) = {
+      implicit val executionContext: ExecutionContext =
+        app.injector.instanceOf[ExecutionContext]
+      val (client, requested) = StubPlaneClient(respond)
+      val controller          = IssueImporterConfigControllerMock(
+        app.configuration.underlying,
+        app.injector.instanceOf[SystemServices],
+        app.injector.instanceOf[AuthConfig],
+        reactiveMongoApi,
+        organisationRole = OrganisationMember,
+        wsClient = Some(client)
+      )
+      (controller, requested)
+    }
+
+    val planeProjectId = "8b7a3c4e-0000-4000-8000-000000000001"
+
+    def namedPage(names: String*): JsObject =
+      StubPlaneClient.page(names.map(n => Json.obj("id" -> n, "name" -> n)),
+                           nextCursor = "100:1:0",
+                           hasNext = false,
+                           total = names.size,
+                           totalPages = 1)
+
+    "return 200 with the labels and states of a Plane project" in new WithTestApplication {
+      val (controller, requested) = metadataController(app) { url =>
+        if (url.contains("/labels/")) (200, namedPage("feature", "bug"))
+        else (200, namedPage("Todo", "Done"))
+      }
+
+      val result: Future[Result] =
+        controller.getExternalProjectMetadata(
+          controller.organisation.id,
+          controller.planeConfig.id,
+          planeProjectId)(FakeRequest().withBody(()))
+
+      status(result) must equalTo(OK)
+      contentAsJson(result).as[ExternalProjectMetadata] must equalTo(
+        ExternalProjectMetadata(Seq("bug", "feature"), Seq("Done", "Todo")))
+      requested.forall(_.contains(s"/projects/$planeProjectId/")) must beTrue
+    }
+
+    "return 200 with the labels and fixed states of a GitLab project" in new WithTestApplication {
+      val (controller, _) = metadataController(app) { _ =>
+        (200, Json.arr(Json.obj("name" -> "bug")))
+      }
+
+      val result: Future[Result] =
+        controller.getExternalProjectMetadata(controller.organisation.id,
+                                              controller.gitlabConfig.id,
+                                              "42")(FakeRequest().withBody(()))
+
+      status(result) must equalTo(OK)
+      contentAsJson(result).as[ExternalProjectMetadata] must equalTo(
+        ExternalProjectMetadata(Seq("bug"), Seq("opened", "closed", "all")))
+    }
+
+    "return 400 and send no request for an id with a path segment" in new WithTestApplication {
+      val (controller, requested) = metadataController(app)(_ => (200, JsNull))
+
+      val result: Future[Result] =
+        controller.getExternalProjectMetadata(
+          controller.organisation.id,
+          controller.gitlabConfig.id,
+          "42/../../../user")(FakeRequest().withBody(()))
+
+      status(result) must equalTo(BAD_REQUEST)
+      (contentAsJson(result) \ "error").as[String] must equalTo(
+        "project_metadata_failed")
+      requested must beEmpty
+    }
+
+    "return 400 when the external API fails" in new WithTestApplication {
+      val (controller, _) = metadataController(app)(_ => (401, JsNull))
+
+      val result: Future[Result] =
+        controller.getExternalProjectMetadata(controller.organisation.id,
+                                              controller.gitlabConfig.id,
+                                              "42")(FakeRequest().withBody(()))
+
+      status(result) must equalTo(BAD_REQUEST)
+      (contentAsJson(result) \ "error").as[String] must equalTo(
+        "project_metadata_failed")
+    }
+
+    "return 404 when config does not exist" in new WithTestApplication {
+      val (controller, _) = metadataController(app)(_ => (200, JsNull))
+
+      val result: Future[Result] =
+        controller.getExternalProjectMetadata(controller.organisation.id,
+                                              IssueImporterConfigId(),
+                                              "42")(FakeRequest().withBody(()))
+
+      status(result) must equalTo(NOT_FOUND)
+    }
+
+    "return 403 when config belongs to different organization" in new WithTestApplication {
+      val (controller, requested) = metadataController(app)(_ => (200, JsNull))
+
+      val result: Future[Result] =
+        controller.getExternalProjectMetadata(OrganisationId(),
+                                              controller.gitlabConfig.id,
+                                              "42")(FakeRequest().withBody(()))
+
+      status(result) must equalTo(FORBIDDEN)
+      requested must beEmpty
     }
   }
 

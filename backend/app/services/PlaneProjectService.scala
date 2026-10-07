@@ -21,18 +21,24 @@
 
 package services
 
-import actors.scheduler.ServiceConfiguration
+import actors.scheduler.plane.{PlaneApiService, PlaneApiServiceImpl}
+import actors.scheduler.{
+  ApiKeyAuthentication,
+  ServiceAuthentication,
+  ServiceConfiguration
+}
 import models._
-import play.api.libs.json.JsArray
 import play.api.libs.ws.WSClient
 
-import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
 /** Service for Plane API interactions.
   */
 class PlaneProjectService(wsClient: WSClient)(implicit ec: ExecutionContext)
     extends ExternalProjectService {
+
+  // Plane answers at most 100 items per page.
+  private val PageSize = 100
 
   override def testConnectivity(
       config: CreateIssueImporterConfig): Future[ConnectivityTestResult] = {
@@ -56,146 +62,51 @@ class PlaneProjectService(wsClient: WSClient)(implicit ec: ExecutionContext)
   }
 
   override def listProjects(
-      config: IssueImporterConfig): Future[ListProjectsResponse] = {
+      config: IssueImporterConfig): Future[ListProjectsResponse] =
+    withPlaneApi(config) { (api, workspace, auth) =>
+      // Plane configs have one workspace per config (stored at config level)
+      api
+        .getProjects(PageSize, workspace)(auth, ec)
+        .map(projects =>
+          ListProjectsResponse(projects = Some(
+            projects.map(p => ExternalProject(p.id, p.name)).sortBy(_.name))))
+    }
+
+  override def getProjectMetadata(
+      config: IssueImporterConfig,
+      externalProjectId: String): Future[ExternalProjectMetadata] =
+    withPlaneApi(config) { (api, workspace, auth) =>
+      for {
+        projectId <- validateExternalProjectId(externalProjectId,
+                                               "[0-9a-fA-F-]+".r)
+        labelsF = api.getLabels(PageSize, workspace, projectId)(auth, ec)
+        statesF = api.getStates(PageSize, workspace, projectId)(auth, ec)
+        labels <- labelsF
+        states <- statesF
+      } yield ExternalProjectMetadata(labels.toSeq.map(_.name).sorted,
+                                      states.toSeq.map(_.name).sorted)
+    }
+
+  private def withPlaneApi[T](config: IssueImporterConfig)(
+      f: (PlaneApiService, String, ServiceAuthentication) => Future[T])
+      : Future[T] =
     config match {
       case c: PlaneConfig =>
-        listPlaneProjects(c).map { projects =>
-          // Return flat project list like GitLab/Jira (one workspace per config)
-          ListProjectsResponse(projects = Some(projects))
-        }
+        f(
+          new PlaneApiServiceImpl(
+            wsClient,
+            ServiceConfiguration(c.baseUrl.toString),
+            requestTimeout = Some(ProjectListTimeout),
+            // The browser request closes before a wait for
+            // the rate limit ends. The user retries instead.
+            maxRateLimitRetries = 0
+          ),
+          c.settings.workspace,
+          ApiKeyAuthentication(c.auth.apiKey)
+        )
       case _ =>
         Future.failed(
           new IllegalArgumentException(
             "PlaneProjectService requires PlaneConfig"))
     }
-  }
-
-  private def listPlaneProjects(
-      config: PlaneConfig): Future[Seq[ExternalProject]] = {
-    // Plane configs have one workspace per config (stored at config level)
-    val workspaceSlug = config.settings.workspace
-    for {
-      workspace <- fetchProjectsForWorkspace(config, workspaceSlug)
-      // Enrich each project with available labels and states
-      enrichedProjects <- Future.sequence(workspace.projects.map { project =>
-        enrichProjectWithMetadata(config, workspaceSlug, project)
-      })
-    } yield enrichedProjects.sortBy(_.name)
-  }
-
-  private def fetchProjectsForWorkspace(
-      config: PlaneConfig,
-      workspaceSlug: String): Future[ExternalWorkspace] = {
-    val serviceConfig = ServiceConfiguration(config.baseUrl.toString)
-    val projectsUrl   =
-      s"${serviceConfig.baseUrl}/api/v1/workspaces/$workspaceSlug/projects/"
-
-    wsClient
-      .url(projectsUrl)
-      .addHttpHeaders("X-API-Key" -> config.auth.apiKey)
-      .withRequestTimeout(ProjectListTimeout)
-      .get()
-      .map { response =>
-        response.status match {
-          case 200 =>
-            val results  = (response.json \ "results").as[JsArray]
-            val projects = results.value.map { project =>
-              val id   = (project \ "id").as[String]
-              val name = (project \ "name").as[String]
-              ExternalProject(id, name)
-            }
-            ExternalWorkspace(
-              id = workspaceSlug,
-              name = workspaceSlug,
-              projects = projects.toSeq
-            )
-          case _ =>
-            throw new Exception(
-              s"Failed to fetch Plane projects for workspace $workspaceSlug: HTTP ${response.status}")
-        }
-      }
-  }
-
-  private def enrichProjectWithMetadata(
-      config: PlaneConfig,
-      workspaceSlug: String,
-      project: ExternalProject): Future[ExternalProject] = {
-    val serviceConfig = ServiceConfiguration(config.baseUrl.toString)
-
-    // Fetch labels and states in parallel
-    val labelsF = fetchProjectLabels(config, workspaceSlug, project.id)
-    val statesF = fetchProjectStates(config, workspaceSlug, project.id)
-
-    for {
-      labels <- labelsF
-      states <- statesF
-    } yield project.copy(
-      availableLabels = if (labels.nonEmpty) Some(labels) else None,
-      availableStates = if (states.nonEmpty) Some(states) else None
-    )
-  }
-
-  private def fetchProjectLabels(config: PlaneConfig,
-                                 workspaceSlug: String,
-                                 projectId: String): Future[Seq[String]] = {
-    val serviceConfig = ServiceConfiguration(config.baseUrl.toString)
-    val labelsUrl     =
-      s"${serviceConfig.baseUrl}/api/v1/workspaces/$workspaceSlug/projects/$projectId/labels/"
-
-    wsClient
-      .url(labelsUrl)
-      .addHttpHeaders("X-API-Key" -> config.auth.apiKey)
-      .withRequestTimeout(ProjectListTimeout)
-      .get()
-      .map { response =>
-        response.status match {
-          case 200 =>
-            // Response is wrapped in "results" like states
-            val results = (response.json \ "results").as[JsArray]
-            val labels  = results.value
-              .map(label => (label \ "name").as[String])
-              .toSeq
-            play.api
-              .Logger(getClass)
-              .debug(
-                s"Fetched ${labels.size} labels for project $projectId: ${labels.mkString(", ")}")
-            labels
-          case status =>
-            play.api
-              .Logger(getClass)
-              .warn(
-                s"Failed to fetch labels for project $projectId: HTTP $status - ${response.body}")
-            Seq.empty
-        }
-      }
-      .recover { case ex =>
-        play.api
-          .Logger(getClass)
-          .error(s"Error fetching labels for project $projectId", ex)
-        Seq.empty
-      }
-  }
-
-  private def fetchProjectStates(config: PlaneConfig,
-                                 workspaceSlug: String,
-                                 projectId: String): Future[Seq[String]] = {
-    val serviceConfig = ServiceConfiguration(config.baseUrl.toString)
-    val statesUrl     =
-      s"${serviceConfig.baseUrl}/api/v1/workspaces/$workspaceSlug/projects/$projectId/states/"
-
-    wsClient
-      .url(statesUrl)
-      .addHttpHeaders("X-API-Key" -> config.auth.apiKey)
-      .withRequestTimeout(ProjectListTimeout)
-      .get()
-      .map { response =>
-        response.status match {
-          case 200 =>
-            val results = (response.json \ "results").as[JsArray]
-            results.value.map(state => (state \ "name").as[String]).toSeq
-          case _ => Seq.empty // Gracefully handle failures
-        }
-      }
-      .recover { case _ => Seq.empty } // Gracefully handle errors
-  }
 }

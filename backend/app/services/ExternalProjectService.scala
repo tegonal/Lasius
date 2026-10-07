@@ -21,11 +21,14 @@
 
 package services
 
+import actors.scheduler.HttpStatusException
 import models._
+import play.api.libs.json.JsValue
 import play.api.libs.ws.WSClient
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.matching.Regex
 
 /** Service for interacting with external issue tracking systems.
   */
@@ -49,6 +52,13 @@ trait ExternalProjectService {
     *   Sequence of external projects
     */
   def listProjects(config: IssueImporterConfig): Future[ListProjectsResponse]
+
+  /** Loads the labels and states of one external project for the tag filter.
+    * The future fails when the id has an invalid format or the request fails.
+    */
+  def getProjectMetadata(
+      config: IssueImporterConfig,
+      externalProjectId: String): Future[ExternalProjectMetadata]
 
   // Configuration constants
   protected val ConnectivityTestTimeout: FiniteDuration = 10000.millis
@@ -87,6 +97,60 @@ trait ExternalProjectService {
         )
     }
   }
+
+  /** Loads every page of a list that names its next page in the Link header, as
+    * GitLab and GitHub do. The load ends at a next link equal to the current
+    * URL, and at a page without a new item.
+    */
+  protected def fetchAllLinkPages[T](wsClient: WSClient,
+                                     firstUrl: String,
+                                     headers: (String, String)*)(
+      parse: JsValue => Seq[T])(implicit
+      ec: ExecutionContext): Future[Seq[T]] = {
+    val nextPageRegex = """<([^>]+)>;\s*rel="next"""".r
+
+    def fetchPage(url: String, loaded: Vector[T]): Future[Seq[T]] =
+      wsClient
+        .url(url)
+        .addHttpHeaders(headers: _*)
+        .withRequestTimeout(ProjectListTimeout)
+        .get()
+        .flatMap { response =>
+          if (response.status != 200)
+            Future.failed(
+              new HttpStatusException(
+                response.status,
+                s"Http status:${response.status}:${response.statusText}"))
+          else {
+            val newItems = parse(response.json).filterNot(loaded.contains)
+            val all      = loaded ++ newItems
+            response
+              .header("Link")
+              .flatMap(nextPageRegex.findFirstMatchIn(_))
+              .map(_.group(1))
+              .filter(next => next != url && newItems.nonEmpty) match {
+              case Some(nextUrl) => fetchPage(nextUrl, all)
+              case None          => Future.successful(all)
+            }
+          }
+        }
+
+    fetchPage(firstUrl, Vector.empty)
+  }
+
+  /** Fails unless the external project id matches the format of the tracker.
+    * The id becomes a path segment of an API URL, so a value such as "../user"
+    * would reach another endpoint with the stored credentials.
+    */
+  protected def validateExternalProjectId(externalProjectId: String,
+                                          format: Regex): Future[String] =
+    if (format.matches(externalProjectId) &&
+      !externalProjectId.split('/').exists(_.matches("\\.+")))
+      Future.successful(externalProjectId)
+    else
+      Future.failed(
+        new IllegalArgumentException(
+          s"Invalid external project id: $externalProjectId"))
 
   /** Helper method to validate base URL format.
     *

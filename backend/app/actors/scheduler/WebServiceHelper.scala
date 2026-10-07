@@ -28,25 +28,34 @@ import play.api.libs.json.JsValue
 import play.api.libs.oauth._
 import play.api.libs.ws.WSClient
 
+import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
 /** A non-200 answer of an issue tracker API. The message keeps the text "Http
   * status:<code>", which older error checks read.
   */
-class HttpStatusException(val status: Int, message: String)
+class HttpStatusException(
+    val status: Int,
+    message: String,
+    val headers: Map[String, scala.collection.Seq[String]] = Map.empty)
     extends IOException(message)
 
 object WebServiceHelper {
 
-  def call(wsClient: WSClient, config: ServiceConfiguration, url: String)(
-      implicit
+  /** Only the API key call applies `requestTimeout`. The other calls use the
+    * play-ws default.
+    */
+  def call(wsClient: WSClient,
+           config: ServiceConfiguration,
+           url: String,
+           requestTimeout: Option[FiniteDuration] = None)(implicit
       auth: ServiceAuthentication,
       executionContext: ExecutionContext)
       : Future[Try[(JsValue, Map[String, scala.collection.Seq[String]])]] = {
     auth match {
       case apiKey: ApiKeyAuthentication =>
-        callWithApiKey(wsClient, config, url, apiKey)
+        callWithApiKey(wsClient, config, url, apiKey, requestTimeout)
       case oauth: OAuthAuthentication =>
         callWithOAuth(wsClient, config, url, oauth)
       case oauth2: OAuth2Authentication =>
@@ -72,12 +81,15 @@ object WebServiceHelper {
   def callWithApiKey(wsClient: WSClient,
                      config: ServiceConfiguration,
                      url: String,
-                     auth: ApiKeyAuthentication)(implicit
+                     auth: ApiKeyAuthentication,
+                     requestTimeout: Option[FiniteDuration] = None)(implicit
       executionContext: ExecutionContext)
       : Future[Try[(JsValue, Map[String, scala.collection.Seq[String]])]] = {
-    wsClient
+    val request = wsClient
       .url(url)
       .addHttpHeaders(s"X-API-Key" -> s"${auth.apiKey}")
+    requestTimeout
+      .fold(request)(request.withRequestTimeout)
       .get()
       .map { result =>
         result.status match {
@@ -86,7 +98,8 @@ object WebServiceHelper {
             Failure(
               new HttpStatusException(
                 error,
-                s"Http status:$error:${result.statusText}"))
+                s"Http status:$error:${result.statusText}",
+                result.headers))
         }
       }
   }

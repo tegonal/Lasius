@@ -27,6 +27,7 @@ import play.api.Logging
 import play.api.libs.json.{JsArray, JsPath, Json, JsonValidationError, Reads}
 import play.api.libs.ws.WSClient
 
+import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -39,6 +40,7 @@ class ApiParseException(message: String) extends RuntimeException(message)
 trait ApiServiceBase extends Logging {
   val ws: WSClient
   val config: ServiceConfiguration
+  def requestTimeout: Option[FiniteDuration] = None
 
   def getParamList(params: Option[String]*): String = {
     params.flatten.mkString("&")
@@ -59,7 +61,7 @@ trait ApiServiceBase extends Logging {
       : Future[(Seq[T], Map[String, scala.collection.Seq[String]])] = {
     val url = config.baseUrl + relUrl
     logger.debug(s"getList(url:$url")
-    WebServiceHelper.call(ws, config, url).flatMap {
+    WebServiceHelper.call(ws, config, url, requestTimeout).flatMap {
       case Success((json: JsArray, headers)) =>
         logger.debug(s"getList:Success (JsArray, ${json.value.size} items)")
         Json
@@ -89,7 +91,7 @@ trait ApiServiceBase extends Logging {
       : Future[(T, Map[String, scala.collection.Seq[String]])] = {
     val url = config.baseUrl + relUrl
     logger.debug(s"getSingleValue(url:$url")
-    WebServiceHelper.call(ws, config, url).flatMap {
+    WebServiceHelper.call(ws, config, url, requestTimeout).flatMap {
       case Success((json, headers)) =>
         logger.debug(s"getOption:Success (json) from $relUrl")
         Json

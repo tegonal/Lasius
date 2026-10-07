@@ -39,6 +39,10 @@ final case class PlaneState(id: String, name: String) extends PlaneEntity
 
 final case class PlaneProject(id: String, identifier: String)
 
+/** A project of the workspace project list, which the config wizard shows. */
+final case class PlaneWorkspaceProject(id: String, name: String)
+    extends PlaneEntity
+
 final case class PlaneIssue(
     id: String,
     name: String,
@@ -88,6 +92,13 @@ final case class PlaneStatesQueryResult(next_cursor: String,
                                         results: Seq[PlaneState])
     extends PaginatedQueryResult[PlaneState]
 
+final case class PlaneProjectsQueryResult(next_cursor: String,
+                                          next_page_results: Boolean,
+                                          total_pages: Int,
+                                          total_results: Int,
+                                          results: Seq[PlaneWorkspaceProject])
+    extends PaginatedQueryResult[PlaneWorkspaceProject]
+
 object PlaneLabel {
   implicit val reads: Reads[PlaneLabel] = Json.reads[PlaneLabel]
 }
@@ -98,6 +109,11 @@ object PlaneState {
 
 object PlaneProject {
   implicit val reads: Reads[PlaneProject] = Json.reads[PlaneProject]
+}
+
+object PlaneWorkspaceProject {
+  implicit val reads: Reads[PlaneWorkspaceProject] =
+    Json.reads[PlaneWorkspaceProject]
 }
 
 object PlaneIssue {
@@ -117,4 +133,9 @@ object PlaneLabelsQueryResult {
 object PlaneStatesQueryResult {
   implicit val reads: Reads[PlaneStatesQueryResult] =
     Json.reads[PlaneStatesQueryResult]
+}
+
+object PlaneProjectsQueryResult {
+  implicit val reads: Reads[PlaneProjectsQueryResult] =
+    Json.reads[PlaneProjectsQueryResult]
 }

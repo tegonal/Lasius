@@ -1329,7 +1329,7 @@ POST /organisations/:orgId/issue-importers/:configId/test                       
 #  tags:
 #    - issue-importers
 #  summary: List available projects from external service
-#  description: Fetches list of accessible projects from the configured external service (GitLab/Jira/Plane/GitHub). Returns flat list of projects for all importer types. GitLab/GitHub/Plane projects include available labels and states to help configure filters. GitLab states are "opened", "closed", "all". GitHub states are "open", "closed", "all". Plane states are custom per project. Jira returns basic project information only. Requires only OrganisationMember role since it only reads from external API.
+#  description: Fetches list of accessible projects from the configured external service (GitLab/Jira/Plane/GitHub). Returns flat list of projects with id and name for all importer types. The labels and states of one project come from getExternalProjectMetadata. Requires only OrganisationMember role since it only reads from external API.
 #  operationId: listProjects
 #  parameters:
 #    - name: orgId
@@ -1375,6 +1375,64 @@ POST /organisations/:orgId/issue-importers/:configId/test                       
 #      description: Configuration not found
 ###
 GET /organisations/:orgId/issue-importers/:configId/projects                                    controllers.IssueImporterConfigController.listProjects(orgId: models.OrganisationId, configId: models.IssueImporterConfigId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - issue-importers
+#  summary: Get the labels and states of one external project
+#  description: Fetches the labels and states that the tag filter of a project mapping offers for one external project. GitLab states are "opened", "closed", "all". GitHub states are "open", "closed", "all". Plane states are custom per project. Jira returns empty lists. The external project id is a query parameter, because a GitHub id such as owner/repo contains a slash. Requires only OrganisationMember role since it only reads from external API.
+#  operationId: getExternalProjectMetadata
+#  parameters:
+#    - name: orgId
+#      in: path
+#      required: true
+#      schema:
+#        type: string
+#        format: uuid
+#      description: Organisation ID
+#    - name: configId
+#      in: path
+#      required: true
+#      schema:
+#        type: string
+#        format: uuid
+#      description: Issue importer configuration ID
+#    - name: externalProjectId
+#      in: query
+#      required: true
+#      schema:
+#        type: string
+#      description: Id of the external project, as listProjects returns it
+#  responses:
+#    200:
+#      description: The labels and states of the external project
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.ExternalProjectMetadata'
+#    400:
+#      description: Invalid external project id, or the request to the external API failed
+#      content:
+#        application/json:
+#          schema:
+#            type: object
+#            properties:
+#              status:
+#                type: string
+#                enum: [error]
+#              message:
+#                type: string
+#              error:
+#                type: string
+#                enum: [project_metadata_failed]
+#    403:
+#      description: Configuration does not belong to organization
+#    404:
+#      description: Configuration not found
+###
+GET /organisations/:orgId/issue-importers/:configId/project-metadata                            controllers.IssueImporterConfigController.getExternalProjectMetadata(orgId: models.OrganisationId, configId: models.IssueImporterConfigId, externalProjectId: String)
 
 ###
 #  security:
