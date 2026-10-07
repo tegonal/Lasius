@@ -17,7 +17,7 @@
  *
  */
 
-import { Listbox } from '@headlessui/react'
+import { Select as BaseSelect } from '@base-ui/react/select'
 import { useTranslation } from 'react-i18next'
 
 import { ListboxOptionList, ListboxTrigger } from '~/components/ui/forms/input/listbox-parts'
@@ -67,8 +67,13 @@ export const MultiSelect = ({
           })
 
   return (
-    <Listbox disabled={disabled} multiple name={name} onChange={onChange} value={value}>
-      <div className={cn('join relative w-full', className)}>
+    <BaseSelect.Root
+      disabled={disabled}
+      multiple
+      name={name}
+      onValueChange={onChange}
+      value={value}>
+      <div className={cn('relative w-full', className)}>
         <ListboxTrigger
           buttonClassName={buttonClassName}
           id={id}
@@ -77,6 +82,6 @@ export const MultiSelect = ({
         </ListboxTrigger>
         <ListboxOptionList options={options} optionsClassName={optionsClassName} />
       </div>
-    </Listbox>
+    </BaseSelect.Root>
   )
 }

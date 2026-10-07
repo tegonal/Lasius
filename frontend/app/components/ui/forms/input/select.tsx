@@ -17,7 +17,7 @@
  *
  */
 
-import { Listbox } from '@headlessui/react'
+import { Select as BaseSelect } from '@base-ui/react/select'
 
 import { ListboxOptionList, ListboxTrigger } from '~/components/ui/forms/input/listbox-parts'
 import { cn } from '~/lib/utils/cn'
@@ -56,13 +56,19 @@ export const Select = ({
   const selectedOption = options.find((option) => option.value === value)
 
   return (
-    <Listbox disabled={disabled} name={name} onChange={onChange} value={value}>
-      <div className={cn('join relative w-full', className)}>
+    <BaseSelect.Root
+      disabled={disabled}
+      name={name}
+      onValueChange={(selected) => {
+        if (selected !== null) onChange(selected)
+      }}
+      value={value}>
+      <div className={cn('relative w-full', className)}>
         <ListboxTrigger buttonClassName={buttonClassName} id={id} isPlaceholder={!selectedOption}>
           {selectedOption?.label || placeholder}
         </ListboxTrigger>
         <ListboxOptionList options={options} optionsClassName={optionsClassName} />
       </div>
-    </Listbox>
+    </BaseSelect.Root>
   )
 }
