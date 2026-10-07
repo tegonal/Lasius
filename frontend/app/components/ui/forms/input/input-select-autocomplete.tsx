@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Input } from '~/components/primitives/inputs/input'
 import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
+import { guardComboboxKey } from '~/components/ui/forms/input/shared/combobox-key-guard'
 import { DropdownList } from '~/components/ui/forms/input/shared/dropdown-list'
 import { DropdownListItem } from '~/components/ui/forms/input/shared/dropdown-list-item'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
@@ -171,6 +172,7 @@ const ComboboxCore = ({
                     setFilterText('')
                   }
                 }}
+                onKeyDown={(event) => guardComboboxKey(event, isOpen)}
                 placeholder={t('projects.selectProject', 'Select project')}
                 ref={inputReference}
                 render={<Input className="mb-0 w-full text-sm" />}

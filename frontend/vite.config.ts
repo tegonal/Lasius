@@ -37,7 +37,7 @@ export default defineConfig(({ mode }) => ({
             {
               name: 'vendor-ui',
               priority: 15,
-              test: /node_modules[\\/](@headlessui|@base-ui|@floating-ui)[\\/]/,
+              test: /node_modules[\\/](@base-ui|@floating-ui)[\\/]/,
             },
             {
               name: 'vendor-i18n',

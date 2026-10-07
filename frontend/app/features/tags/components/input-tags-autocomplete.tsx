@@ -24,6 +24,7 @@ import { useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { FormFieldErrors } from '~/components/ui/forms/form-field-errors'
+import { guardComboboxKey } from '~/components/ui/forms/input/shared/combobox-key-guard'
 import { DropdownList } from '~/components/ui/forms/input/shared/dropdown-list'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { Tag, TagList } from '~/features/tags/components/tag-list'
@@ -172,6 +173,7 @@ const TagsComboboxCore = ({
               id={id}
               onBlur={() => setIsFocused(false)}
               onFocus={() => setIsFocused(true)}
+              onKeyDown={(event) => guardComboboxKey(event, isOpen)}
               placeholder={t('tag-manager:chooseOrEnter', {
                 defaultValue: 'Choose or enter tags',
               })}
