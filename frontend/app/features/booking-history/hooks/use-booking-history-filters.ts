@@ -23,6 +23,13 @@ import { useEffect, useMemo, useRef } from 'react'
 import { useSearchParams } from 'react-router'
 import { z } from 'zod'
 
+import {
+  applyFilterParameters,
+  areFilterValuesEqual,
+  type FilterUrlValues,
+  orEmpty,
+  parseTagsParameter,
+} from '~/features/booking-history/lib/booking-history-search-parameters'
 import { dateOptions } from '~/lib/utils/date/date-options'
 import { type ModelsTag } from '~/services/api/lasius'
 
@@ -43,18 +50,18 @@ const defaultDateRange = dateOptions[0]
  * Manages filter state, Conform form binding, and URL sync for booking history.
  */
 export function useBookingHistoryFilters() {
-  const [searchParameters] = useSearchParams()
+  const [searchParameters, setSearchParameters] = useSearchParams()
 
-  const projectIdFromUrl = searchParameters.get('projectId') ?? ''
-  const userIdFromUrl = searchParameters.get('userId') ?? ''
-  const tagsFromUrl = searchParameters.get('tags') ?? ''
+  const projectIdFromUrl = orEmpty(searchParameters.get('projectId'))
+  const userIdFromUrl = orEmpty(searchParameters.get('userId'))
+  const tagsFromUrl = orEmpty(searchParameters.get('tags'))
 
   const initialRange = getInitialDateRange(searchParameters)
 
   const [form, fields] = useForm({
     constraint: getZodConstraint(filterSchema),
     defaultValue: {
-      dateRange: defaultDateRange?.name ?? '',
+      dateRange: orEmpty(defaultDateRange?.name),
       from: initialRange.from,
       projectId: projectIdFromUrl,
       tags: tagsFromUrl,
@@ -69,101 +76,51 @@ export function useBookingHistoryFilters() {
   })
 
   // Read values reactively from fields.xxx.value (subscribes per-field via useSyncExternalStore)
-  const fromValue = fields.from.value ?? ''
-  const toValue = fields.to.value ?? ''
-  const dateRangeValue = fields.dateRange.value ?? ''
-  const projectIdValue = fields.projectId.value ?? ''
-  const userIdValue = fields.userId.value ?? ''
-  const tagsValue = fields.tags.value ?? ''
+  const fromValue = orEmpty(fields.from.value)
+  const toValue = orEmpty(fields.to.value)
+  const dateRangeValue = orEmpty(fields.dateRange.value)
+  const projectIdValue = orEmpty(fields.projectId.value)
+  const userIdValue = orEmpty(fields.userId.value)
+  const tagsValue = orEmpty(fields.tags.value)
 
   const noop = () => {}
+  const makeControl = (name: string, value: string) => ({
+    blur: noop,
+    change: (v: string) => form.update({ name, value: v }),
+    focus: noop,
+    value,
+  })
   const controls: BookingHistoryControls = {
-    dateRange: {
-      blur: noop,
-      change: (v) => form.update({ name: fields.dateRange.name, value: v }),
-      focus: noop,
-      value: dateRangeValue,
-    },
-    from: {
-      blur: noop,
-      change: (v) => form.update({ name: fields.from.name, value: v }),
-      focus: noop,
-      value: fromValue,
-    },
-    projectId: {
-      blur: noop,
-      change: (v) => form.update({ name: fields.projectId.name, value: v }),
-      focus: noop,
-      value: projectIdValue,
-    },
-    tags: {
-      blur: noop,
-      change: (v) => form.update({ name: fields.tags.name, value: v }),
-      focus: noop,
-      value: tagsValue,
-    },
-    to: {
-      blur: noop,
-      change: (v) => form.update({ name: fields.to.name, value: v }),
-      focus: noop,
-      value: toValue,
-    },
-    userId: {
-      blur: noop,
-      change: (v) => form.update({ name: fields.userId.name, value: v }),
-      focus: noop,
-      value: userIdValue,
-    },
+    dateRange: makeControl(fields.dateRange.name, dateRangeValue),
+    from: makeControl(fields.from.name, fromValue),
+    projectId: makeControl(fields.projectId.name, projectIdValue),
+    tags: makeControl(fields.tags.name, tagsValue),
+    to: makeControl(fields.to.name, toValue),
+    userId: makeControl(fields.userId.name, userIdValue),
   }
 
   // Sync filter values to URL search params so the loader refetches and filters are shareable
-  const [, setSearchParameters] = useSearchParams()
-  const previousFrom = useRef(fromValue)
-  const previousTo = useRef(toValue)
-  const previousProjectId = useRef(projectIdValue)
-  const previousUserId = useRef(userIdValue)
-  const previousTags = useRef(tagsValue)
+  const previousValues = useRef<FilterUrlValues>({
+    from: fromValue,
+    projectId: projectIdValue,
+    tags: tagsValue,
+    to: toValue,
+    userId: userIdValue,
+  })
 
   useEffect(() => {
     if (!fromValue || !toValue) return
-    if (
-      fromValue === previousFrom.current &&
-      toValue === previousTo.current &&
-      projectIdValue === previousProjectId.current &&
-      userIdValue === previousUserId.current &&
-      tagsValue === previousTags.current
-    )
-      return
+    const values: FilterUrlValues = {
+      from: fromValue,
+      projectId: projectIdValue,
+      tags: tagsValue,
+      to: toValue,
+      userId: userIdValue,
+    }
+    if (areFilterValuesEqual(values, previousValues.current)) return
 
-    previousFrom.current = fromValue
-    previousTo.current = toValue
-    previousProjectId.current = projectIdValue
-    previousUserId.current = userIdValue
-    previousTags.current = tagsValue
-
-    setSearchParameters(
-      (previous) => {
-        previous.set('from', fromValue)
-        previous.set('to', toValue)
-        if (projectIdValue) {
-          previous.set('projectId', projectIdValue)
-        } else {
-          previous.delete('projectId')
-        }
-        if (userIdValue) {
-          previous.set('userId', userIdValue)
-        } else {
-          previous.delete('userId')
-        }
-        if (tagsValue) {
-          previous.set('tags', tagsValue)
-        } else {
-          previous.delete('tags')
-        }
-        return previous
-      },
-      { replace: true },
-    )
+    previousValues.current = values
+    setSearchParameters((previous) => applyFilterParameters(previous, values), { replace: true })
   }, [fromValue, toValue, projectIdValue, userIdValue, tagsValue, setSearchParameters])
 
   // Set initial search params on mount if missing
@@ -184,15 +141,7 @@ export function useBookingHistoryFilters() {
     }
   }, [searchParameters, setSearchParameters, initialRange.from, initialRange.to])
 
-  // Parse tags for filtering
-  const tags: ModelsTag[] = useMemo(() => {
-    if (!tagsValue) return []
-    try {
-      return JSON.parse(tagsValue) as ModelsTag[]
-    } catch {
-      return []
-    }
-  }, [tagsValue])
+  const tags: ModelsTag[] = useMemo(() => parseTagsParameter(tagsValue), [tagsValue])
 
   return {
     controls,

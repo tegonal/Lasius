@@ -133,7 +133,13 @@ export const BookingHistoryFilter = ({
         <Heading variant="section">{t('filter.title', 'Filter')}</Heading>
         {hasChanges && (
           <div className="absolute top-3 right-0">
-            <Button fullWidth={false} onClick={resetForm} size="xs" type="button" variant="ghost">
+            <Button
+              data-testid="lists-filter-reset-btn"
+              fullWidth={false}
+              onClick={resetForm}
+              size="xs"
+              type="button"
+              variant="ghost">
               {t('actions.reset', 'Reset')}
             </Button>
           </div>

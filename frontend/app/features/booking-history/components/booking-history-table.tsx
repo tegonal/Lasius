@@ -24,6 +24,7 @@ import { DataList } from '~/components/ui/data-display/data-list/data-list'
 import { DataListField } from '~/components/ui/data-display/data-list/data-list-field'
 import { DataListHeaderItem } from '~/components/ui/data-display/data-list/data-list-header-item'
 import { DataListRow } from '~/components/ui/data-display/data-list/data-list-row'
+import { parseTagsParameter } from '~/features/booking-history/lib/booking-history-search-parameters'
 import { TagList } from '~/features/tags/components/tag-list'
 import { sortExtendedBookingsByDate } from '~/lib/api/functions/sort-bookings-by-date'
 import { type ModelsBooking, type ModelsTag } from '~/services/api/lasius'
@@ -55,15 +56,7 @@ export const BookingHistoryTable = ({
       return
     }
 
-    const currentTagsJson = controls.tags.value
-    let currentTags: ModelsTag[] = []
-    if (currentTagsJson) {
-      try {
-        currentTags = JSON.parse(currentTagsJson) as ModelsTag[]
-      } catch {
-        currentTags = []
-      }
-    }
+    const currentTags = parseTagsParameter(controls.tags.value ?? '')
     controls.tags.change(JSON.stringify([...currentTags, tag]))
   }
 
