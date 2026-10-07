@@ -17,32 +17,28 @@
  *
  */
 
-import { ArrowLeft, ArrowRight, CheckCircle2, Circle } from 'lucide-react'
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useRevalidator } from 'react-router'
 
-import { Button } from '~/components/primitives/buttons/button'
 import { useToast } from '~/components/ui/feedback/use-toast'
-import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { Modal } from '~/components/ui/overlays/modal/modal'
 import { ModalBody } from '~/components/ui/overlays/modal/modal-body'
 import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
 import { ModalHeader } from '~/components/ui/overlays/modal/modal-header'
 import { ModalHelpButton } from '~/features/help/components/help-button'
-import { ConfigFormStep } from '~/features/integrations/components/wizard/steps/config-form-step'
-import { ListProjectsStep } from '~/features/integrations/components/wizard/steps/list-projects-step'
-import { SelectPlatformStep } from '~/features/integrations/components/wizard/steps/select-platform-step'
-import { TestConnectionStep } from '~/features/integrations/components/wizard/steps/test-connection-step'
-import { useWizardState, type WizardStep } from '~/features/integrations/hooks/use-wizard-state'
+import { WizardFooter } from '~/features/integrations/components/wizard/wizard-footer'
+import { WizardProgress } from '~/features/integrations/components/wizard/wizard-progress'
+import { WizardStepContent } from '~/features/integrations/components/wizard/wizard-step-content'
+import { useMappingSaveQueue } from '~/features/integrations/hooks/use-mapping-save-queue'
+import { useWizardState } from '~/features/integrations/hooks/use-wizard-state'
+import { type MappingsByExternalProject } from '~/features/integrations/lib/mapping-helpers'
 import {
-  buildMappingPayload,
-  type MappingsByExternalProject,
-  type MappingWithTagConfig,
-} from '~/features/integrations/lib/mapping-helpers'
+  flattenMappings,
+  getPreviousStep,
+  STEP_IDS,
+} from '~/features/integrations/lib/wizard-steps'
 import { logger } from '~/lib/logger'
-import { type ImporterType } from '~/lib/utils/tag-helpers'
-import { useAddProjectMapping } from '~/services/api/lasius-hooks/issue-importers/issue-importers'
 
 type Properties = {
   onClose: () => void
@@ -50,32 +46,16 @@ type Properties = {
   selectedOrgId: string
 }
 
-const STEP_IDS: WizardStep[] = ['platform', 'config', 'test', 'projects']
-
 export const IssueImporterWizard = ({ onClose, open, selectedOrgId }: Properties) => {
   const { t } = useTranslation('integrations')
   const { addToast } = useToast()
-  const {
-    resetWizard,
-    setAvailableProjects,
-    setCreatedConfig,
-    setCurrentStep,
-    state,
-    updateFormData,
-  } = useWizardState()
+  const revalidator = useRevalidator()
+  const wizard = useWizardState()
+  const { resetWizard, setCurrentStep, state } = wizard
+  const { createdConfig, currentStep, formData } = state
 
   const [projectMappings, setProjectMappings] = useState<MappingsByExternalProject>({})
-  const [isSaving, setIsSaving] = useState(false)
-  const revalidator = useRevalidator()
-  const mappingsQueueReference = useRef<
-    Array<{
-      externalProjectId: string
-      mapping: MappingWithTagConfig
-    }>
-  >([])
-  const mappingsQueueIndexReference = useRef(0)
   const configFormReference = useRef<HTMLFormElement>(null)
-  const submitNextMappingReference = useRef<() => void>(() => {})
 
   const handleClose = useCallback(() => {
     resetWizard()
@@ -83,370 +63,89 @@ export const IssueImporterWizard = ({ onClose, open, selectedOrgId }: Properties
     onClose()
   }, [resetWizard, onClose])
 
-  const { submit: submitAddMapping } = useAddProjectMapping({
-    onError: () => {
-      logger.error('[IssueImporterWizard] Failed to save project mapping')
-      addToast({
-        message: t('issueImporters.errors.mappingSaveFailed', {
-          defaultValue: 'Failed to save project mapping',
-        }),
-        type: 'ERROR',
-      })
-      // Continue with next mapping instead of stopping
-      mappingsQueueIndexReference.current += 1
-      if (mappingsQueueIndexReference.current < mappingsQueueReference.current.length) {
-        submitNextMappingReference.current()
-      } else {
-        setIsSaving(false)
-        void revalidator.revalidate()
-        handleClose()
-      }
-    },
-    onSuccess: () => {
-      // Process next mapping in queue
-      mappingsQueueIndexReference.current += 1
-      if (mappingsQueueIndexReference.current < mappingsQueueReference.current.length) {
-        submitNextMappingReference.current()
-      } else {
-        // All mappings saved
-        setIsSaving(false)
-        void revalidator.revalidate()
+  const { isSaving, saveAll } = useMappingSaveQueue({
+    availableProjects: state.availableProjects,
+    configId: createdConfig?.id,
+    importerType: formData.importerType,
+    onDone: (isLastSaved) => {
+      void revalidator.revalidate()
+      if (isLastSaved) {
         addToast({
           message: t('issueImporters.success.configCreated', {
             defaultValue: 'Integration created successfully',
           }),
           type: 'SUCCESS',
         })
-        handleClose()
       }
+      handleClose()
     },
-  })
-
-  const submitNextMapping = useCallback(() => {
-    const entry = mappingsQueueReference.current[mappingsQueueIndexReference.current]
-    if (!entry || !state.createdConfig || !state.formData.importerType) return
-
-    const externalProject = state.availableProjects?.find((p) => p.id === entry.externalProjectId)
-
-    const result = buildMappingPayload(
-      state.formData.importerType,
-      entry.externalProjectId,
-      entry.mapping.projectId,
-      entry.mapping.tagConfig,
-      externalProject?.name,
-    )
-
-    if (!result.success) {
-      logger.error('[IssueImporterWizard] Mapping payload build failed:', result.error)
-      // Skip this mapping and process next
-      mappingsQueueIndexReference.current += 1
-      if (mappingsQueueIndexReference.current < mappingsQueueReference.current.length) {
-        submitNextMappingReference.current()
-      } else {
-        setIsSaving(false)
-        void revalidator.revalidate()
-        handleClose()
-      }
-      return
-    }
-
-    submitAddMapping({
-      body: result.payload,
-      configId: state.createdConfig.id,
-      orgId: selectedOrgId,
-    })
-  }, [
-    state.createdConfig,
-    state.formData.importerType,
-    state.availableProjects,
-    submitAddMapping,
     selectedOrgId,
-    revalidator,
-    handleClose,
-  ])
-  // A layout effect runs before the passive callback effect of useAddProjectMapping.
-  // onSuccess and onError therefore call the submitNextMapping of the current render.
-  useLayoutEffect(() => {
-    submitNextMappingReference.current = submitNextMapping
   })
 
-  const translatedSteps = useMemo(
-    () => [
-      {
-        id: 'platform' as WizardStep,
-        label: t('issueImporters.wizard.steps.platform', {
-          defaultValue: 'Platform',
-        }),
-      },
-      {
-        id: 'config' as WizardStep,
-        label: t('issueImporters.wizard.steps.config', {
-          defaultValue: 'Configure',
-        }),
-      },
-      {
-        id: 'test' as WizardStep,
-        label: t('issueImporters.wizard.steps.test', {
-          defaultValue: 'Test',
-        }),
-      },
-      {
-        id: 'projects' as WizardStep,
-        label: t('issueImporters.wizard.steps.projects', {
-          defaultValue: 'Projects',
-        }),
-      },
-    ],
-    [t],
-  )
+  const currentStepIndex = STEP_IDS.indexOf(currentStep)
 
-  const currentStepIndex = STEP_IDS.indexOf(state.currentStep)
-
-  const isLastStep = currentStepIndex === STEP_IDS.length - 1
-
-  const getStepClassName = (index: number, current: number): string => {
-    if (index < current) return 'text-success'
-    if (index === current) return 'text-primary font-medium'
-    return 'text-base-content/40'
+  const handlePrevious = () => {
+    const previous = getPreviousStep(currentStep, !!createdConfig)
+    if (previous) setCurrentStep(previous)
   }
 
-  const handleSelectPlatform = useCallback(
-    (type: ImporterType) => {
-      const baseUrls: Record<ImporterType, string> = {
-        github: 'https://api.github.com',
-        gitlab: 'https://gitlab.com',
-        jira: 'https://your-company.atlassian.net',
-        plane: 'https://app.plane.so',
-      }
-
-      updateFormData({
-        baseUrl: baseUrls[type],
-        importerType: type,
-      })
-      setCurrentStep('config')
-    },
-    [updateFormData, setCurrentStep],
-  )
-
-  const handleConfigCreated = useCallback(
-    (config: Parameters<typeof setCreatedConfig>[0]) => {
-      setCreatedConfig(config)
-    },
-    [setCreatedConfig],
-  )
-
-  const handleConfigSubmit = useCallback(
-    (data: Parameters<typeof updateFormData>[0]) => {
-      updateFormData(data)
-      setCurrentStep('test')
-    },
-    [updateFormData, setCurrentStep],
-  )
-
-  const handleTestNext = useCallback(() => {
-    setCurrentStep('projects')
-  }, [setCurrentStep])
-
-  const handlePrevious = useCallback(() => {
-    switch (state.currentStep) {
-      case 'config': {
-        setCurrentStep('platform')
-
-        break
-      }
-      case 'platform': {
-        // The platform step is the first step and has no previous step.
-        break
-      }
-      case 'projects': {
-        // Skip test step when going back if config already exists
-        if (state.createdConfig) {
-          setCurrentStep('config')
-        } else {
-          setCurrentStep('test')
-        }
-
-        break
-      }
-      case 'test': {
-        setCurrentStep('config')
-
-        break
-      }
-      // No default
+  const handleNext = () => {
+    if (currentStep === 'config') {
+      configFormReference.current?.requestSubmit()
+      return
     }
-  }, [state.currentStep, state.createdConfig, setCurrentStep])
+    const nextStep = STEP_IDS[currentStepIndex + 1]
+    if (nextStep) setCurrentStep(nextStep)
+  }
 
-  const handleMappingsChange = useCallback((mappings: MappingsByExternalProject) => {
-    setProjectMappings(mappings)
-  }, [])
-
-  const handleFinish = useCallback(() => {
-    if (!state.createdConfig || !state.formData.importerType) {
+  const handleFinish = () => {
+    if (!createdConfig || !formData.importerType) {
       logger.error('[IssueImporterWizard] Cannot save mappings: missing config or importer type')
       return
     }
-
-    const mappingEntries = Object.entries(projectMappings)
-
-    if (mappingEntries.length === 0) {
-      // No mappings to save, just close
+    const entries = flattenMappings(projectMappings)
+    if (entries.length === 0) {
       void revalidator.revalidate()
       handleClose()
       return
     }
+    saveAll(entries)
+  }
 
-    setIsSaving(true)
-    mappingsQueueReference.current = mappingEntries.flatMap(([externalProjectId, array]) =>
-      array.map((mapping) => ({ externalProjectId, mapping })),
-    )
-    mappingsQueueIndexReference.current = 0
-    submitNextMapping()
-  }, [
-    state.createdConfig,
-    state.formData.importerType,
-    projectMappings,
-    revalidator,
-    handleClose,
-    submitNextMapping,
-  ])
-
-  const canGoPrevious = state.currentStep !== 'platform'
-
-  const modalSize = state.currentStep === 'config' || state.currentStep === 'projects' ? 'xl' : 'lg'
+  const modalSize = currentStep === 'config' || currentStep === 'projects' ? 'xl' : 'lg'
 
   return (
     <Modal onClose={handleClose} open={open} size={modalSize}>
       <ModalCloseButton onClose={handleClose} />
       <div className="flex min-h-0 flex-1 flex-col">
-        {/* Header */}
         <div className="flex-shrink-0 pb-4">
           <ModalHeader
             actionSlot={<ModalHelpButton helpKey="modal-importer-wizard" />}
             className="mb-0">
-            {t('issueImporters.wizard.title', {
-              defaultValue: 'Add Integration',
-            })}
+            {t('issueImporters.wizard.title', { defaultValue: 'Add Integration' })}
           </ModalHeader>
-
-          {/* Progress indicator */}
-          <div className="mt-4 flex items-center justify-center gap-1">
-            {translatedSteps.map((step, index) => (
-              <div className="flex items-center" key={step.id}>
-                <button
-                  className={`flex items-center gap-1.5 rounded-full px-2 py-1 text-xs transition-colors ${getStepClassName(index, currentStepIndex)} ${index >= currentStepIndex ? 'cursor-not-allowed' : 'hover:bg-base-200 cursor-pointer'}`}
-                  disabled={index >= currentStepIndex}
-                  onClick={() => {
-                    if (index < currentStepIndex) {
-                      setCurrentStep(step.id)
-                    }
-                  }}
-                  type="button">
-                  {index < currentStepIndex ? (
-                    <LucideIcon icon={CheckCircle2} size={16} />
-                  ) : (
-                    <LucideIcon icon={Circle} size={16} />
-                  )}
-                  <span>{step.label}</span>
-                </button>
-                {index < STEP_IDS.length - 1 && (
-                  <div className="bg-base-content/20 mx-1 h-px w-4" />
-                )}
-              </div>
-            ))}
-          </div>
+          <WizardProgress currentStepIndex={currentStepIndex} onSelectStep={setCurrentStep} />
         </div>
 
-        {/* Step content */}
         <ModalBody className="relative">
-          {state.currentStep === 'platform' && (
-            <SelectPlatformStep onSelectPlatform={handleSelectPlatform} />
-          )}
-
-          {state.currentStep === 'config' && state.formData.importerType && (
-            <ConfigFormStep
-              formData={state.formData}
-              formRef={configFormReference}
-              onSubmit={handleConfigSubmit}
-              selectedOrgId={selectedOrgId}
-            />
-          )}
-
-          {state.currentStep === 'test' && state.formData.importerType && (
-            <TestConnectionStep
-              existingConfig={state.createdConfig}
-              formData={state.formData}
-              onBack={handlePrevious}
-              onConfigCreated={handleConfigCreated}
-              onNext={handleTestNext}
-              selectedOrgId={selectedOrgId}
-            />
-          )}
-
-          {state.currentStep === 'projects' &&
-            state.formData.importerType &&
-            state.createdConfig && (
-              <ListProjectsStep
-                configId={state.createdConfig.id}
-                importerType={state.formData.importerType}
-                onMappingsChange={handleMappingsChange}
-                onProjectsLoaded={setAvailableProjects}
-                orgId={selectedOrgId}
-              />
-            )}
+          <WizardStepContent
+            configFormRef={configFormReference}
+            onBack={handlePrevious}
+            onMappingsChange={setProjectMappings}
+            selectedOrgId={selectedOrgId}
+            wizard={wizard}
+          />
         </ModalBody>
 
-        {/* Footer navigation */}
-        {state.currentStep !== 'test' && (
-          <div className="mt-6 flex flex-shrink-0 items-center justify-between">
-            <Button
-              disabled={!canGoPrevious}
-              fullWidth={false}
-              onClick={handlePrevious}
-              size="sm"
-              variant="ghost">
-              <LucideIcon icon={ArrowLeft} size={16} />
-              {t('actions.back', { defaultValue: 'Back' })}
-            </Button>
-
-            <div className="text-base-content/50 text-sm">
-              {currentStepIndex + 1} / {STEP_IDS.length}
-            </div>
-
-            {isLastStep ? (
-              <Button
-                disabled={isSaving}
-                fullWidth={false}
-                onClick={handleFinish}
-                size="sm"
-                variant="primary">
-                {isSaving
-                  ? t('actions.saving', {
-                      defaultValue: 'Saving...',
-                    })
-                  : t('actions.finish', {
-                      defaultValue: 'Finish',
-                    })}
-              </Button>
-            ) : (
-              <Button
-                disabled={state.currentStep === 'platform'}
-                fullWidth={false}
-                onClick={() => {
-                  if (state.currentStep === 'config') {
-                    configFormReference.current?.requestSubmit()
-                    return
-                  }
-                  const nextStep = STEP_IDS[currentStepIndex + 1]
-                  if (nextStep) setCurrentStep(nextStep)
-                }}
-                size="sm"
-                variant="primary">
-                {t('actions.next', { defaultValue: 'Next' })}
-                <LucideIcon icon={ArrowRight} size={16} />
-              </Button>
-            )}
-          </div>
+        {currentStep !== 'test' && (
+          <WizardFooter
+            currentStepIndex={currentStepIndex}
+            isNextDisabled={currentStep === 'platform'}
+            isSaving={isSaving}
+            onBack={handlePrevious}
+            onFinish={handleFinish}
+            onNext={handleNext}
+          />
         )}
       </div>
     </Modal>

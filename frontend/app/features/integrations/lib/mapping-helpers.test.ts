@@ -20,6 +20,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  buildInitialMappings,
   buildMappingPayload,
   extractExternalProjectId,
   type ProjectMapping,
@@ -122,6 +123,38 @@ describe('buildMappingPayload', () => {
       success: false,
     })
     expect(buildMappingPayload(type, '  ', 'p').success).toBe(false)
+  })
+})
+
+describe('buildInitialMappings', () => {
+  const gitlabMapping = (id: string, projectId: string, gitlabProjectId: string) =>
+    ({
+      id,
+      projectId,
+      settings: { gitlabProjectId, tagConfiguration: tagConfig },
+    }) as unknown as ProjectMapping
+
+  it('groups several Lasius projects under one external project', () => {
+    const result = buildInitialMappings('gitlab', [
+      gitlabMapping('m1', 'lasius-1', '42'),
+      gitlabMapping('m2', 'lasius-2', '42'),
+      gitlabMapping('m3', 'lasius-3', '7'),
+    ])
+    expect(result).toEqual({
+      '7': [{ id: 'm3', projectId: 'lasius-3', tagConfig }],
+      '42': [
+        { id: 'm1', projectId: 'lasius-1', tagConfig },
+        { id: 'm2', projectId: 'lasius-2', tagConfig },
+      ],
+    })
+  })
+
+  it('skips a mapping without an external id or without a Lasius project', () => {
+    const result = buildInitialMappings('gitlab', [
+      mappingOf(undefined),
+      gitlabMapping('m2', '', '42'),
+    ])
+    expect(result).toEqual({})
   })
 })
 

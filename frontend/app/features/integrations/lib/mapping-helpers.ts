@@ -161,6 +161,28 @@ export const extractExternalProjectId = (
   return EXTERNAL_PROJECT_ID[importerType](mapping)
 }
 
+/**
+ * Groups the saved mappings of a config by external project. One external project can map to
+ * several Lasius projects (decision be-project-mapping-id).
+ */
+export const buildInitialMappings = (
+  importerType: ImporterType,
+  projects: ProjectMapping[],
+): MappingsByExternalProject => {
+  const result: MappingsByExternalProject = {}
+  for (const mapping of projects) {
+    const externalId = extractExternalProjectId(importerType, mapping)
+    if (!externalId || !mapping.projectId) continue
+    const tagConfig = (mapping.settings as unknown as { tagConfiguration?: TagConfig })
+      ?.tagConfiguration
+    result[externalId] = [
+      ...(result[externalId] ?? []),
+      { id: mapping.id, projectId: mapping.projectId, tagConfig },
+    ]
+  }
+  return result
+}
+
 export type MappingStatEntry = {
   projectId: string
   stat?: ModelsProjectSyncStats
