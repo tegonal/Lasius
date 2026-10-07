@@ -223,7 +223,7 @@ export const ProjectMappingDataList = ({
                         }}
                         importerConfig={importerConfig}
                         importerType={importerType}
-                        key={`${mapping.projectId}-${mapping.id?.value ?? 'new'}`}
+                        key={`${mapping.projectId}-${mapping.id ?? 'new'}`}
                         lasiusProjects={lasiusProjects}
                         mapping={mapping}
                         onMappingRemove={onMappingRemove}
@@ -264,7 +264,7 @@ export const ProjectMappingDataList = ({
                         externalProject={project}
                         importerConfig={importerConfig}
                         importerType={importerType}
-                        key={`${mapping.projectId}-${mapping.id?.value ?? 'new'}`}
+                        key={`${mapping.projectId}-${mapping.id ?? 'new'}`}
                         lasiusProjects={lasiusProjects}
                         mapping={mapping}
                         onMappingRemove={onMappingRemove}

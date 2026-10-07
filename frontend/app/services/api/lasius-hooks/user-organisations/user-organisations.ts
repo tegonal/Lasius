@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+341-4c873927+20261007-1714
+ * OpenAPI spec version: 2.2.2+345-80ac1ed7+20261007-2104
  */
 import type { ModelsTag, ModelsUpdateUserOrganisation, ModelsUser } from '../../lasius'
 

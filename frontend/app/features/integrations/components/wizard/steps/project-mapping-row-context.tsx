@@ -120,7 +120,7 @@ export const ProjectMappingRowContext = ({
                 icon={RefreshCw}
                 label={t('issueImporters.actions.refreshTags', { defaultValue: 'Refresh tags' })}
                 onClick={() => {
-                  onRefreshTags(mapping.id!.value)
+                  onRefreshTags(mapping.id!)
                   handleCloseAll()
                 }}
                 variant="compact"

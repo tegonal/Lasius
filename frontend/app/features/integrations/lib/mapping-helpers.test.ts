@@ -129,9 +129,9 @@ describe('buildMappingPayload', () => {
 })
 
 describe('upsertMappingEntry', () => {
-  const m1 = { value: 'm1' }
-  const m2 = { value: 'm2' }
-  const m3 = { value: 'm3' }
+  const m1 = 'm1'
+  const m2 = 'm2'
+  const m3 = 'm3'
 
   it('keeps the id of a replaced mapping and changes its tag config', () => {
     const result = upsertMappingEntry(
@@ -161,11 +161,11 @@ describe('upsertMappingEntry', () => {
 })
 
 describe('applySavedIds', () => {
-  const saved = { '42': [{ id: { value: 'm1' }, projectId: 'p1' }] }
+  const saved = { '42': [{ id: 'm1', projectId: 'p1' }] }
 
   it('copies the backend id into a local row without one', () => {
     expect(applySavedIds({ '42': [{ projectId: 'p1' }] }, saved)).toEqual({
-      '42': [{ id: { value: 'm1' }, projectId: 'p1' }],
+      '42': [{ id: 'm1', projectId: 'p1' }],
     })
   })
 
@@ -175,8 +175,8 @@ describe('applySavedIds', () => {
   })
 
   it('keeps an id that the local row already has', () => {
-    const local = { '42': [{ id: { value: 'local' }, projectId: 'p1' }] }
-    expect(applySavedIds(local, saved)['42']?.[0]?.id).toEqual({ value: 'local' })
+    const local = { '42': [{ id: 'local', projectId: 'p1' }] }
+    expect(applySavedIds(local, saved)['42']?.[0]?.id).toBe('local')
   })
 })
 

@@ -47,6 +47,10 @@ components:
       type: string
       format: uuid
       description: UUID identifier for issue importer configurations
+    models.ProjectMappingId:
+      type: string
+      format: uuid
+      description: UUID identifier for a project mapping of an issue importer configuration
     models.GitlabConfigResponse:
       type: object
       properties:

@@ -153,7 +153,7 @@ export const useProjectMappingActions = ({
   }
 
   const refreshTags = (mappingIdValue: string) => {
-    refreshTagsOfMapping({ configId, mappingId: { value: mappingIdValue }, orgId: selectedOrgId })
+    refreshTagsOfMapping({ configId, mappingId: mappingIdValue, orgId: selectedOrgId })
   }
 
   return { refreshTags, removeMapping: remove, upsertMapping: upsert }
