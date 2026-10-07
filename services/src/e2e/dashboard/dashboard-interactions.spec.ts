@@ -90,7 +90,9 @@ test.describe('Dashboard interactions @dashboard', () => {
     await todayBtn.click()
 
     // After clicking today, the URL should update (date param changes to today)
-    const today = new Date().toISOString().slice(0, 10)
+    // The app sets the date param from the local date. toISOString() returns the UTC date.
+    const now = new Date()
+    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
     await expect(page).toHaveURL(new RegExp(`date=${today}`), { timeout: 10000 })
   })
 

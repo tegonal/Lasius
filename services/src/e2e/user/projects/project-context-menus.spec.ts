@@ -117,12 +117,12 @@ test.describe('Project context menu actions @projects', () => {
         return
       }
       await membersBtn.click()
-      await expect(page.getByRole('dialog')).toBeVisible({ timeout: 3000 })
+      await expect(page.getByTestId('modal-dialog')).toBeVisible({ timeout: 3000 })
     }).toPass({ timeout: 20000 })
 
     // Close the modal
     await page.keyboard.press('Escape')
-    await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 10000 })
+    await expect(page.getByTestId('modal-dialog')).not.toBeVisible({ timeout: 10000 })
   })
 
   test('show bookings navigates to lists page', async ({ page }) => {
@@ -167,7 +167,7 @@ test.describe('Project context menu actions @projects', () => {
         return
       }
       await tagsBtn.click()
-      await expect(page.getByRole('dialog')).toBeVisible({ timeout: 3000 })
+      await expect(page.getByTestId('modal-dialog')).toBeVisible({ timeout: 3000 })
     }).toPass({ timeout: 20000 })
 
     // Close the modal

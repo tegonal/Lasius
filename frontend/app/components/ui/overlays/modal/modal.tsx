@@ -79,6 +79,7 @@ export const Modal = ({
         <Dialog.Backdrop className="fixed inset-0 z-50 bg-black/40 backdrop-blur-[5px] transition-opacity duration-300 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0" />
         <Dialog.Popup
           className={cn('fixed inset-0 z-50 flex items-center justify-center')}
+          data-testid="modal-dialog"
           initialFocus={initialFocus}>
           <div
             className={cn(
