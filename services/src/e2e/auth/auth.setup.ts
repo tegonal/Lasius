@@ -51,6 +51,15 @@ setup('authenticate via Internal Lasius Sign-in', async ({ page }) => {
   // Verify we're logged in
   await expect(page.locator('body')).toBeVisible()
 
+  // A fresh context has no persisted app settings, so the onboarding tutorial covers every page.
+  // The key and the shape come from the Zustand persist store in app-settings-store.ts.
+  await page.evaluate(() => {
+    localStorage.setItem(
+      'lasius-app-settings',
+      JSON.stringify({ state: { onboardingDismissed: true }, version: 0 }),
+    )
+  })
+
   // Save authentication state
   await page.context().storageState({ path: authFile })
 })
