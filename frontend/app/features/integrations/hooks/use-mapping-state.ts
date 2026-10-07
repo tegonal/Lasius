@@ -22,6 +22,7 @@ import { useCallback, useState } from 'react'
 import {
   type MappingsByExternalProject,
   type TagConfig,
+  upsertMappingEntry,
 } from '~/features/integrations/lib/mapping-helpers'
 
 export const useMappingState = (initialMappings: MappingsByExternalProject = {}) => {
@@ -29,14 +30,9 @@ export const useMappingState = (initialMappings: MappingsByExternalProject = {})
 
   const upsertMapping = useCallback(
     (externalProjectId: string, lasiusProjectId: string, tagConfig: TagConfig | undefined) => {
-      setMappings((previous) => {
-        const array = previous[externalProjectId] ?? []
-        const filtered = array.filter((m) => m.projectId !== lasiusProjectId)
-        return {
-          ...previous,
-          [externalProjectId]: [...filtered, { projectId: lasiusProjectId, tagConfig }],
-        }
-      })
+      setMappings((previous) =>
+        upsertMappingEntry(previous, externalProjectId, lasiusProjectId, tagConfig),
+      )
     },
     [],
   )

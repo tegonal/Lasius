@@ -17,6 +17,8 @@
  *
  */
 
+import { useState } from 'react'
+
 import { Modal } from '~/components/ui/overlays/modal/modal'
 import { type ModelsIssueImporterConfigResponse } from '~/services/api/lasius'
 
@@ -29,14 +31,26 @@ type Properties = {
   selectedOrgId: string
 }
 
-export const ProjectMappingsModal = ({ config, onClose, open, selectedOrgId }: Properties) => (
-  <Modal onClose={onClose} open={open} size="lg">
-    {config && (
-      <ProjectMappingsModalContent
-        config={config}
-        onClose={onClose}
-        selectedOrgId={selectedOrgId}
-      />
-    )}
-  </Modal>
-)
+export const ProjectMappingsModal = ({ config, onClose, open, selectedOrgId }: Properties) => {
+  // The parent clears the config when the modal closes. The last config keeps the content
+  // visible while the popup plays its exit transition.
+  const [lastConfig, setLastConfig] = useState(config)
+  if (config && config !== lastConfig) {
+    setLastConfig(config)
+  }
+  const shownConfig = config ?? lastConfig
+
+  return (
+    <Modal onClose={onClose} open={open} size="lg">
+      {shownConfig && (
+        <ProjectMappingsModalContent
+          config={shownConfig}
+          // A new config remounts the content, so a reopen during the exit transition fetches again.
+          key={shownConfig.id}
+          onClose={onClose}
+          selectedOrgId={selectedOrgId}
+        />
+      )}
+    </Modal>
+  )
+}

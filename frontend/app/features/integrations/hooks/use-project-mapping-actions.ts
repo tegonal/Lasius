@@ -29,7 +29,10 @@ import {
 } from '~/features/integrations/lib/mapping-helpers'
 import { logger } from '~/lib/logger'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
-import { type ModelsExternalProject } from '~/services/api/lasius'
+import {
+  type ModelsExternalProject,
+  type ModelsIssueImporterConfigResponse,
+} from '~/services/api/lasius'
 import {
   useAddProjectMapping,
   useRemoveProjectMapping,
@@ -42,6 +45,8 @@ type UseProjectMappingActionsOptions = {
   projects: ModelsExternalProject[]
   removeMapping: (externalProjectId: string, lasiusProjectId: string) => void
   selectedOrgId: string
+  /** Takes the backend ids of the saved mappings into the local state. */
+  syncFromConfig: (config: ModelsIssueImporterConfigResponse) => void
   upsertMapping: (
     externalProjectId: string,
     lasiusProjectId: string,
@@ -57,6 +62,7 @@ export const useProjectMappingActions = ({
   projects,
   removeMapping,
   selectedOrgId,
+  syncFromConfig,
   upsertMapping,
 }: UseProjectMappingActionsOptions) => {
   const { t } = useTranslation('integrations')
@@ -72,7 +78,8 @@ export const useProjectMappingActions = ({
         type: 'ERROR',
       })
     },
-    onSuccess: () => {
+    onSuccess: (config) => {
+      syncFromConfig(config)
       void revalidator.revalidate()
       addToast({
         message: t('issueImporters.success.mappingSaved', {
@@ -92,7 +99,8 @@ export const useProjectMappingActions = ({
         type: 'ERROR',
       })
     },
-    onSuccess: () => {
+    onSuccess: (config) => {
+      syncFromConfig(config)
       void revalidator.revalidate()
       addToast({
         message: t('issueImporters.success.mappingRemoved', {

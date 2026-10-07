@@ -162,6 +162,46 @@ export const extractExternalProjectId = (
 }
 
 /**
+ * Adds or replaces the mapping of one Lasius project under one external project. A replaced
+ * mapping keeps its id, so a later removal can still delete it in the backend.
+ */
+export const upsertMappingEntry = (
+  mappings: MappingsByExternalProject,
+  externalProjectId: string,
+  lasiusProjectId: string,
+  tagConfig: TagConfig | undefined,
+): MappingsByExternalProject => {
+  const entries = mappings[externalProjectId] ?? []
+  const existing = entries.find((m) => m.projectId === lasiusProjectId)
+  return {
+    ...mappings,
+    [externalProjectId]: [
+      ...entries.filter((m) => m.projectId !== lasiusProjectId),
+      { id: existing?.id, projectId: lasiusProjectId, tagConfig },
+    ],
+  }
+}
+
+/**
+ * Copies the backend id of each saved mapping into the local entry for the same pair. The local
+ * rows stay as they are, so a late response can neither drop nor restore a row.
+ */
+export const applySavedIds = (
+  local: MappingsByExternalProject,
+  saved: MappingsByExternalProject,
+): MappingsByExternalProject =>
+  Object.fromEntries(
+    Object.entries(local).map(([externalProjectId, entries]) => [
+      externalProjectId,
+      entries.map((entry) => {
+        if (entry.id) return entry
+        const match = saved[externalProjectId]?.find((s) => s.projectId === entry.projectId)
+        return match?.id ? { ...entry, id: match.id } : entry
+      }),
+    ]),
+  )
+
+/**
  * Groups the saved mappings of a config by external project. One external project can map to
  * several Lasius projects (decision be-project-mapping-id).
  */

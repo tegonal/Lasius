@@ -20,11 +20,13 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  applySavedIds,
   buildInitialMappings,
   buildMappingPayload,
   extractExternalProjectId,
   type ProjectMapping,
   type TagConfig,
+  upsertMappingEntry,
 } from './mapping-helpers'
 
 const tagConfig: TagConfig = {
@@ -123,6 +125,58 @@ describe('buildMappingPayload', () => {
       success: false,
     })
     expect(buildMappingPayload(type, '  ', 'p').success).toBe(false)
+  })
+})
+
+describe('upsertMappingEntry', () => {
+  const m1 = { value: 'm1' }
+  const m2 = { value: 'm2' }
+  const m3 = { value: 'm3' }
+
+  it('keeps the id of a replaced mapping and changes its tag config', () => {
+    const result = upsertMappingEntry(
+      {
+        '42': [
+          { id: m1, projectId: 'lasius-1' },
+          { id: m2, projectId: 'lasius-2' },
+        ],
+      },
+      '42',
+      'lasius-1',
+      tagConfig,
+    )
+    expect(result['42']).toEqual([
+      { id: m2, projectId: 'lasius-2' },
+      { id: m1, projectId: 'lasius-1', tagConfig },
+    ])
+  })
+
+  it('adds a new mapping without an id and keeps the other external projects', () => {
+    const result = upsertMappingEntry({ '7': [{ id: m3, projectId: 'p3' }] }, '42', 'p1', undefined)
+    expect(result).toEqual({
+      '7': [{ id: m3, projectId: 'p3' }],
+      '42': [{ id: undefined, projectId: 'p1', tagConfig: undefined }],
+    })
+  })
+})
+
+describe('applySavedIds', () => {
+  const saved = { '42': [{ id: { value: 'm1' }, projectId: 'p1' }] }
+
+  it('copies the backend id into a local row without one', () => {
+    expect(applySavedIds({ '42': [{ projectId: 'p1' }] }, saved)).toEqual({
+      '42': [{ id: { value: 'm1' }, projectId: 'p1' }],
+    })
+  })
+
+  it('keeps a local row that the saved state lacks, and adds no saved row', () => {
+    const local = { '7': [{ projectId: 'p9' }] }
+    expect(applySavedIds(local, saved)).toEqual({ '7': [{ projectId: 'p9' }] })
+  })
+
+  it('keeps an id that the local row already has', () => {
+    const local = { '42': [{ id: { value: 'local' }, projectId: 'p1' }] }
+    expect(applySavedIds(local, saved)['42']?.[0]?.id).toEqual({ value: 'local' })
   })
 })
 

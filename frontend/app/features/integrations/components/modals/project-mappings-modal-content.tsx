@@ -28,7 +28,7 @@ import { ProjectMappingDataList } from '~/features/integrations/components/share
 import { useMappingState } from '~/features/integrations/hooks/use-mapping-state'
 import { useProjectMappingActions } from '~/features/integrations/hooks/use-project-mapping-actions'
 import { getImporterTypeLabel } from '~/features/integrations/lib/importer-type-labels'
-import { buildInitialMappings } from '~/features/integrations/lib/mapping-helpers'
+import { applySavedIds, buildInitialMappings } from '~/features/integrations/lib/mapping-helpers'
 import { untyped } from '~/lib/i18n-types'
 import {
   type ModelsExternalProject,
@@ -92,6 +92,10 @@ export const ProjectMappingsModalContent = ({ config, onClose, selectedOrgId }: 
     projects,
     removeMapping,
     selectedOrgId,
+    syncFromConfig: (saved) =>
+      setMappings((local) =>
+        applySavedIds(local, buildInitialMappings(importerType, saved.projects ?? [])),
+      ),
     upsertMapping,
   })
 
