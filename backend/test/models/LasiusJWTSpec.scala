@@ -32,9 +32,8 @@ class LasiusJWTSpec extends Specification {
       build: com.auth0.jwt.JWTCreator.Builder => com.auth0.jwt.JWTCreator.Builder)
       : LasiusJWT =
     LasiusJWT(
-      JWT.decode(
-        build(JWT.create().withSubject("subject-1"))
-          .sign(Algorithm.HMAC256("secret"))))
+      JWT.decode(build(JWT.create().withSubject("subject-1"))
+        .sign(Algorithm.HMAC256("secret"))))
 
   "LasiusJWT.toUserInfo" should {
     "accept a token with a verified email" in {
@@ -56,7 +55,8 @@ class LasiusJWTSpec extends Specification {
 
     "reject a token that sends email_verified as the string false" in {
       val jwt = decode(
-        _.withClaim("email", "a@lasius.ch").withClaim("email_verified", "false"))
+        _.withClaim("email", "a@lasius.ch").withClaim("email_verified",
+                                                      "false"))
       jwt.toUserInfo must throwA[UnauthorizedException]
     }
 
@@ -66,7 +66,7 @@ class LasiusJWTSpec extends Specification {
 
     "return no names when the name claims are missing" in {
       val info = decode(identity).toUserInfo
-      (info.firstName === None) and (info.lastName === None)
+      (info.firstName === None).and(info.lastName === None)
     }
   }
 }

@@ -26,7 +26,7 @@ import org.specs2.mock.Mockito
 import org.specs2.mutable._
 import play.api.libs.json.Json
 import play.api.libs.ws.{WSClient, WSResponse}
-import services.GithubTokenValidator.{GithubEmail, selectVerifiedEmail}
+import services.GithubTokenValidator.{selectVerifiedEmail, GithubEmail}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext}
