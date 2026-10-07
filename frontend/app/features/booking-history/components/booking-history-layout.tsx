@@ -144,7 +144,7 @@ export const BookingHistoryLayout = ({
       <ContextMenuProvider>
         <ColumnCenter>
           <div className="flex h-full flex-col overflow-hidden">
-            <div className="bg-base-200 flex flex-shrink-0 items-start justify-between p-4">
+            <div className="bg-base-200 flex flex-shrink-0 flex-wrap items-start justify-between gap-4 p-4">
               <BookingHistoryStats
                 bookings={summary.elements}
                 hours={summary.hours}

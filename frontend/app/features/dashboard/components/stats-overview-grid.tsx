@@ -49,7 +49,7 @@ export const StatsOverviewGrid = ({
     : t('time.hours', 'Hours')
 
   return (
-    <div className="flex-1 space-y-3">
+    <div className="flex-1 space-y-3 @max-lg:[&_.stat]:px-3 @max-lg:[&_.stat-title]:whitespace-normal">
       <div className="stats grid w-full grid-cols-2">
         <div className="stat">
           <div className="stat-title">{t('bookings:title', 'Bookings')}</div>

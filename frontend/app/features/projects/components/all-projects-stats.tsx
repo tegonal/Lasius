@@ -37,7 +37,7 @@ export const AllProjectsStats = ({ onCreateProject, projects }: Properties) => {
   const inactiveCount = totalCount - activeCount
 
   return (
-    <div className="bg-base-200 flex items-start justify-between gap-4 p-4">
+    <div className="bg-base-200 flex flex-wrap items-start justify-between gap-4 p-4">
       <StatsGroup>
         <StatsTileNumber
           label={t('projects:total', 'Total')}

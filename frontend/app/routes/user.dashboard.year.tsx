@@ -146,7 +146,7 @@ export default function DashboardYear({ loaderData }: Route.ComponentProps) {
   }
 
   return (
-    <div className="space-y-6 px-8 py-6">
+    <div className="@container space-y-6 px-4 py-6 sm:px-8">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">
           {isCalendarYear ? (
@@ -166,7 +166,7 @@ export default function DashboardYear({ loaderData }: Route.ComponentProps) {
           />
         </label>
       </div>
-      <div className="flex gap-4">
+      <div className="flex flex-col gap-4 @2xl:flex-row">
         <StatsOverviewGrid {...stats} />
         <TopProjectsCard
           emptyMessage={t('stats:noProjectsForYear', 'No projects for this period')}

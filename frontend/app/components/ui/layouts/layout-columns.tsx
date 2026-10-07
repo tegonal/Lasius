@@ -45,7 +45,7 @@ export const innerGridClasses =
 
 export const ColumnCenter = ({ children }: { children: ReactNode }) => {
   return (
-    <div className="border-base-100 bg-base-100 text-base-content h-full min-w-0 overflow-auto border-l">
+    <div className="border-base-100 bg-base-100 text-base-content @container h-full min-w-0 overflow-auto border-l">
       {children}
     </div>
   )

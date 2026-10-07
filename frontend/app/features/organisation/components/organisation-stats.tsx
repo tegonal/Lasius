@@ -21,6 +21,7 @@ import { ChevronDown } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
+import { StatsGroup } from '~/features/stats/components/stats-group'
 import { StatsTileNumber } from '~/features/stats/components/stats-tile-number'
 
 type Properties = {
@@ -41,8 +42,8 @@ export const OrganisationStats = ({ memberCount, onCreate, onEdit, onInvite }: P
   const isPrivate = selectedOrganisation?.private
 
   return (
-    <div className="bg-base-200 flex items-start justify-between gap-4 p-4">
-      <div className="stats shadow">
+    <div className="bg-base-200 flex flex-wrap items-start justify-between gap-4 p-4">
+      <StatsGroup className="shadow">
         <div className="stat h-fit">
           <div className="stat-title">{t('organisationName', 'Organisation')}</div>
           <div className="stat-value text-2xl">{organisationName}</div>
@@ -52,7 +53,7 @@ export const OrganisationStats = ({ memberCount, onCreate, onEdit, onInvite }: P
           standalone={false}
           value={memberCount}
         />
-      </div>
+      </StatsGroup>
       <div className="dropdown dropdown-end">
         <button
           className="btn btn-sm btn-neutral w-auto"

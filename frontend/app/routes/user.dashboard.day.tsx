@@ -97,11 +97,11 @@ export default function DashboardDay({ loaderData }: Route.ComponentProps) {
   const dateObject = new Date(selectedDate)
 
   return (
-    <div className="space-y-6 px-8 py-6">
+    <div className="@container space-y-6 px-4 py-6 sm:px-8">
       <h2 className="text-lg font-semibold">
         <FormatDate date={dateObject} format="fullDateShort" />
       </h2>
-      <div className="flex gap-4">
+      <div className="flex flex-col gap-4 @2xl:flex-row">
         <StatsOverviewGrid {...stats} period="day" />
         <TopProjectsCard
           emptyMessage={t('stats:noProjectsForDay', 'No projects for this day')}

@@ -32,7 +32,11 @@ type Properties = {
  */
 export const StatsGroup = ({ children, className }: Properties) => {
   return (
-    <div className={cn('stats stats-vertical lg:stats-horizontal overflow-visible', className)}>
+    <div
+      className={cn(
+        'stats stats-horizontal max-w-full overflow-visible @max-lg:[&_.stat]:px-3 @max-lg:[&_.stat-title]:whitespace-normal',
+        className,
+      )}>
       {children}
     </div>
   )

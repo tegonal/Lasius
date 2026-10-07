@@ -99,11 +99,11 @@ export default function DashboardWeek({ loaderData }: Route.ComponentProps) {
   const { stats, topProjects, weekNumber } = loaderData
 
   return (
-    <div className="space-y-6 px-8 py-6">
+    <div className="@container space-y-6 px-4 py-6 sm:px-8">
       <h2 className="text-lg font-semibold">
         {t('time.week', 'Week')} {weekNumber}
       </h2>
-      <div className="flex gap-4">
+      <div className="flex flex-col gap-4 @2xl:flex-row">
         <StatsOverviewGrid {...stats} period="week" />
         <TopProjectsCard
           emptyMessage={t('stats:noProjectsForWeek', 'No projects for this week')}

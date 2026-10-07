@@ -100,7 +100,7 @@ const OrgStatsLayout = ({ loaderData }: Route.ComponentProps) => {
       <ColumnCenter>
         <div className="flex h-full flex-col overflow-hidden">
           <div className="bg-base-200 flex-shrink-0 px-6 py-4">
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex flex-wrap items-start justify-between gap-4">
               <div className="flex-1">
                 <StatsOverview
                   distinctProjects={distinctProjects}

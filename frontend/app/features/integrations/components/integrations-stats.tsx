@@ -35,7 +35,7 @@ export const IntegrationsStats = ({ configs, onAddClick }: Properties) => {
   const totalConfigs = configs.length
 
   return (
-    <div className="bg-base-200 flex items-start justify-between gap-4 p-4">
+    <div className="bg-base-200 flex flex-wrap items-start justify-between gap-4 p-4">
       <StatsGroup>
         <div className="stat h-fit">
           <div className="stat-title">

@@ -34,7 +34,7 @@ export const BookingHistoryStats = ({ bookings, hours, projects, users }: Proper
   const { t } = useTranslation('common')
 
   return (
-    <StatsGroup className="flex gap-4">
+    <StatsGroup>
       <StatsTileHours label={t('units.hours', 'Hours')} standalone={false} value={hours} />
       <StatsTileNumber
         label={t('bookings:title', 'Bookings')}

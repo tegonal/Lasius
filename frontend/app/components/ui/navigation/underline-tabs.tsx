@@ -39,7 +39,7 @@ export const UnderlineTabs = ({ selectedIndex, tabs, testIdPrefix }: UnderlineTa
   const itemReferences = useRef<(HTMLElement | null)[]>([])
 
   return (
-    <div className="border-base-content/20 relative flex flex-shrink-0 flex-row justify-start gap-3 border-b">
+    <div className="border-base-content/20 relative flex flex-shrink-0 flex-row justify-start gap-0 border-b @sm:gap-1 @lg:gap-3">
       <SlidingIndicator
         className="!top-auto !bottom-0 !h-[2px]"
         itemRefs={itemReferences}
@@ -56,7 +56,7 @@ export const UnderlineTabs = ({ selectedIndex, tabs, testIdPrefix }: UnderlineTa
           <Link
             aria-current={index === selectedIndex ? 'page' : undefined}
             className={cn(
-              'btn btn-ghost relative z-20 rounded-none hover:bg-transparent hover:shadow-[inset_0_-2px_0_0_currentColor]',
+              'btn btn-ghost relative z-20 rounded-none px-1.5 whitespace-nowrap hover:bg-transparent hover:shadow-[inset_0_-2px_0_0_currentColor] @sm:px-2.5 @lg:px-4',
               index === selectedIndex ? 'text-base-content' : 'text-base-content/60',
             )}
             data-testid={`${testIdPrefix}-${tab.id}`}
