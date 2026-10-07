@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next'
 import { useRevalidator } from 'react-router'
 
 import { useToast } from '~/components/ui/feedback/use-toast'
-import { useRefreshTagsWithToasts } from '~/features/integrations/hooks/use-refresh-tags-with-toasts'
+import { useRefreshAllTags } from '~/features/integrations/hooks/use-refresh-all-tags'
 import { logger } from '~/lib/logger'
 import { type ModelsIssueImporterConfigResponse } from '~/services/api/lasius'
 import { useDeleteConfig } from '~/services/api/lasius-hooks/issue-importers/issue-importers'
@@ -118,7 +118,7 @@ export function useIssueImporterConfigManagement(
     setSelectedConfig(null)
   }, [])
 
-  const refreshTagsApi = useRefreshTagsWithToasts()
+  const { refreshAll } = useRefreshAllTags()
 
   const handleDelete = useCallback(() => {
     if (!selectedConfig) return
@@ -132,17 +132,13 @@ export function useIssueImporterConfigManagement(
     (config: ModelsIssueImporterConfigResponse) => {
       const projects = 'projects' in config && Array.isArray(config.projects) ? config.projects : []
 
-      for (const mapping of projects) {
-        if (mapping.id) {
-          refreshTagsApi.submit({
-            configId: config.id,
-            mappingId: mapping.id,
-            orgId: selectedOrgId,
-          })
-        }
-      }
+      refreshAll(
+        projects.flatMap((mapping) =>
+          mapping.id ? [{ configId: config.id, mappingId: mapping.id, orgId: selectedOrgId }] : [],
+        ),
+      )
     },
-    [selectedOrgId, refreshTagsApi],
+    [selectedOrgId, refreshAll],
   )
 
   return {
