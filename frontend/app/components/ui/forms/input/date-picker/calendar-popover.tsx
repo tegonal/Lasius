@@ -17,8 +17,9 @@
  *
  */
 
-import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
+import { Popover } from '@base-ui/react/popover'
 import { CalendarIcon, X } from 'lucide-react'
+import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
@@ -31,42 +32,53 @@ type CalendarPopoverProperties = {
   onSelect: (date: IsoDateString) => void
 }
 
+/** A calendar button that opens a month calendar and closes it after a day is picked. */
 export const CalendarPopover = ({ date, onSelect }: CalendarPopoverProperties) => {
   const { t } = useTranslation('common')
+  const [isOpen, setIsOpen] = useState(false)
+  const triggerReference = useRef<HTMLButtonElement>(null)
+  const [container, setContainer] = useState<HTMLElement | null>(null)
+
+  const handleOpenChange = (isNextOpen: boolean) => {
+    // Inside a modal dialog, the portal must render in the dialog focus trap.
+    // Decision: rr7-context-menu-popover.
+    if (isNextOpen) {
+      setContainer(triggerReference.current?.closest<HTMLElement>('[role="dialog"]') ?? null)
+    }
+    setIsOpen(isNextOpen)
+  }
 
   return (
-    <Popover>
-      <PopoverButton
-        as={Button}
-        className="px-2"
-        fullWidth={false}
-        join
-        type="button"
-        variant="neutral">
-        <LucideIcon icon={CalendarIcon} size={20} />
-      </PopoverButton>
-      <PopoverPanel
-        anchor="bottom start"
-        className="bg-base-100 border-base-300 z-50 w-[360px] rounded-lg border shadow-lg [--anchor-gap:8px]">
-        {({ close }) => (
-          <div className="relative p-4 pr-12">
-            <button
-              aria-label={t('actions.close', 'Close')}
-              className="btn btn-ghost btn-sm btn-circle absolute top-2 right-2"
-              onClick={() => close()}
-              type="button">
-              <LucideIcon icon={X} size={16} />
-            </button>
-            <CalendarDisplay
-              onChange={(selected) => {
-                onSelect(selected)
-                close()
-              }}
-              value={formatISOLocale(date || new Date())}
-            />
-          </div>
-        )}
-      </PopoverPanel>
-    </Popover>
+    <Popover.Root onOpenChange={handleOpenChange} open={isOpen}>
+      <Popover.Trigger
+        ref={triggerReference}
+        render={
+          <Button className="px-2" fullWidth={false} join type="button" variant="neutral">
+            <LucideIcon icon={CalendarIcon} size={20} />
+          </Button>
+        }
+      />
+      {/* Base UI renders no portal for a null container; undefined means document.body. */}
+      <Popover.Portal container={container ?? undefined}>
+        <Popover.Positioner align="start" className="z-50" side="bottom" sideOffset={8}>
+          <Popover.Popup className="bg-base-100 border-base-300 w-[360px] rounded-lg border shadow-lg">
+            <div className="relative p-4 pr-12">
+              <Popover.Close
+                aria-label={t('actions.close', 'Close')}
+                className="btn btn-ghost btn-sm btn-circle absolute top-2 right-2">
+                <LucideIcon icon={X} size={16} />
+              </Popover.Close>
+              <CalendarDisplay
+                onChange={(selected) => {
+                  onSelect(selected)
+                  setIsOpen(false)
+                }}
+                value={formatISOLocale(date || new Date())}
+              />
+            </div>
+          </Popover.Popup>
+        </Popover.Positioner>
+      </Popover.Portal>
+    </Popover.Root>
   )
 }

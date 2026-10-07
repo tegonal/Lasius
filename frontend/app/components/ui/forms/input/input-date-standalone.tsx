@@ -17,14 +17,7 @@
  *
  */
 
-import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
-import { CalendarIcon, X } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
-
-import { Button } from '~/components/primitives/buttons/button'
-import { CalendarDisplay } from '~/components/ui/forms/input/calendar/calendar-display'
-import { LucideIcon } from '~/components/ui/icons/lucide-icon'
-import { formatISOLocale } from '~/lib/utils/dates'
+import { CalendarPopover } from '~/components/ui/forms/input/date-picker/calendar-popover'
 
 type InputDateStandaloneProperties = {
   id?: string
@@ -32,55 +25,19 @@ type InputDateStandaloneProperties = {
   value: string
 }
 
-export const InputDateStandalone = ({ id, onChange, value }: InputDateStandaloneProperties) => {
-  const { t } = useTranslation('common')
-
-  const handleCalendarChange = (isoDateString: string, close: () => void) => {
-    const datePart = isoDateString.split('T', 1)[0] || ''
-    onChange(datePart)
-    close()
-  }
-
-  const calendarValue = formatISOLocale(value ? new Date(value) : new Date())
-
-  return (
-    <Popover>
-      <div className="join w-full">
-        <input
-          className="input input-bordered join-item w-full"
-          id={id}
-          onChange={(event) => onChange(event.target.value)}
-          type="date"
-          value={value}
-        />
-        <PopoverButton
-          as={Button}
-          className="px-2"
-          fullWidth={false}
-          join
-          type="button"
-          variant="neutral">
-          <LucideIcon icon={CalendarIcon} size={20} />
-        </PopoverButton>
-      </div>
-      <PopoverPanel
-        anchor="bottom start"
-        className="bg-base-100 border-base-300 z-50 w-[360px] rounded-lg border shadow-lg [--anchor-gap:8px]">
-        {({ close }) => (
-          <div className="relative p-4 pr-12">
-            <button
-              aria-label={t('actions.close', 'Close')}
-              className="btn btn-ghost btn-sm btn-circle absolute top-2 right-2"
-              onClick={() => close()}>
-              <LucideIcon icon={X} size={16} />
-            </button>
-            <CalendarDisplay
-              onChange={(date) => handleCalendarChange(date, close)}
-              value={calendarValue}
-            />
-          </div>
-        )}
-      </PopoverPanel>
-    </Popover>
-  )
-}
+/** A native date input with a calendar button. The value is a `yyyy-MM-dd` string. */
+export const InputDateStandalone = ({ id, onChange, value }: InputDateStandaloneProperties) => (
+  <div className="join w-full">
+    <input
+      className="input input-bordered join-item w-full"
+      id={id}
+      onChange={(event) => onChange(event.target.value)}
+      type="date"
+      value={value}
+    />
+    <CalendarPopover
+      date={value ? new Date(value) : null}
+      onSelect={(isoDateString) => onChange(isoDateString.split('T', 1)[0] || '')}
+    />
+  </div>
+)
