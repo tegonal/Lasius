@@ -42,6 +42,12 @@
     "ignore": ["app/services/api/lasius/**", "app/services/api/lasius-hooks/**"],
     "thresholdOverrides": [
       {
+        "files": ["app/routes/**"],
+        "functions": ["loader", "action"],
+        "maxCrap": 80,
+        "reason": "Temporary since 2026-10-08. Route loaders and actions have no unit tests yet, and Playwright covers them. The ceiling of 80 keeps a loader that grows further visible."
+      },
+      {
         "files": ["app/routes/internal-oauth.register.tsx"],
         "functions": ["InternalOAuthRegister"],
         "maxCognitive": 16,

@@ -500,20 +500,12 @@
     },
     "app/routes/internal-oauth.login.tsx": {
       "crap_high": {
-        "count": 2
-      },
-      "crap_moderate": {
-        "count": 1
-      }
-    },
-    "app/routes/internal-oauth.register.tsx": {
-      "crap_high": {
         "count": 1
       }
     },
     "app/routes/join.$invitationId.tsx": {
       "crap_high": {
-        "count": 2
+        "count": 1
       }
     },
     "app/routes/login.tsx": {
@@ -521,52 +513,7 @@
         "count": 1
       }
     },
-    "app/routes/oauth.callback.tsx": {
-      "crap_high": {
-        "count": 1
-      }
-    },
     "app/routes/organisation.projects._index.tsx": {
-      "crap_moderate": {
-        "count": 1
-      }
-    },
-    "app/routes/organisation.stats.projects.tsx": {
-      "crap_moderate": {
-        "count": 1
-      }
-    },
-    "app/routes/organisation.stats.tags.tsx": {
-      "crap_moderate": {
-        "count": 1
-      }
-    },
-    "app/routes/organisation.stats.users.tsx": {
-      "crap_moderate": {
-        "count": 1
-      }
-    },
-    "app/routes/user.dashboard.year.tsx": {
-      "crap_moderate": {
-        "count": 1
-      }
-    },
-    "app/routes/user.layout._index.tsx": {
-      "crap_high": {
-        "count": 1
-      }
-    },
-    "app/routes/user.projects._index.tsx": {
-      "crap_high": {
-        "count": 1
-      }
-    },
-    "app/routes/user.stats.projects.tsx": {
-      "crap_moderate": {
-        "count": 1
-      }
-    },
-    "app/routes/user.stats.tags.tsx": {
       "crap_moderate": {
         "count": 1
       }
