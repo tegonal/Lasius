@@ -83,15 +83,10 @@ export function useLasiusWebsocket() {
   }, [isWindowFocused, connectionStatus])
 
   // Drop the last message when the window loses focus without a connection
-  const [focusAndStatus, setFocusAndStatus] = useState({
-    connectionStatus,
-    isWindowFocused,
-  })
-  if (
-    focusAndStatus.connectionStatus !== connectionStatus ||
-    focusAndStatus.isWindowFocused !== isWindowFocused
-  ) {
-    setFocusAndStatus({ connectionStatus, isWindowFocused })
+  const focusAndStatus = `${connectionStatus}:${isWindowFocused}`
+  const [seenFocusAndStatus, setSeenFocusAndStatus] = useState(focusAndStatus)
+  if (seenFocusAndStatus !== focusAndStatus) {
+    setSeenFocusAndStatus(focusAndStatus)
     if (shouldDropLastMessage(isWindowFocused, connectionStatus)) {
       setLastMessage(null)
     }

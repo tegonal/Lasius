@@ -19,10 +19,35 @@
 
 import { describe, expect, it } from 'vitest'
 
-import { getOrganisationState, selectOrganisation } from '~/lib/organisation-selection'
+import {
+  findProjectReference,
+  getOrganisationState,
+  selectOrganisation,
+} from '~/lib/organisation-selection'
 import { type ModelsUserOrganisation } from '~/services/api/lasius/modelsUserOrganisation'
 import { ModelsUserOrganisationRole } from '~/services/api/lasius/modelsUserOrganisationRole'
 import { type ModelsUserSettings } from '~/services/api/lasius/modelsUserSettings'
+
+describe('findProjectReference', () => {
+  const withProjects = (id: string, projectIds: string[]): ModelsUserOrganisation => ({
+    ...org(id),
+    projects: projectIds.map((projectId) => ({
+      projectReference: { id: projectId, key: `${id}-${projectId}` },
+    })) as ModelsUserOrganisation['projects'],
+  })
+  const organisations = [withProjects('a', ['p1']), withProjects('b', ['p2', 'p1'])]
+
+  it('finds a project in any organisation and takes the first match', () => {
+    expect(findProjectReference(organisations, 'p2')).toEqual({ id: 'p2', key: 'b-p2' })
+    expect(findProjectReference(organisations, 'p1')).toEqual({ id: 'p1', key: 'a-p1' })
+  })
+
+  it('gives undefined for an unknown id, an empty id or no organisations', () => {
+    expect(findProjectReference(organisations, 'x')).toBeUndefined()
+    expect(findProjectReference(organisations, '')).toBeUndefined()
+    expect(findProjectReference(undefined, 'p1')).toBeUndefined()
+  })
+})
 
 describe('getOrganisationState', () => {
   it('gives empty values without a user', () => {

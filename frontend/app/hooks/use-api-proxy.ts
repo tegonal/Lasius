@@ -46,19 +46,18 @@ export function useApiProxy<TResponse, TBody = undefined, TParameters = Record<s
   config: ApiProxyConfig<TParameters>,
   options?: ApiProxyOptions<TResponse>,
 ) {
-  const fetcher = useFetcher<ProxyEnvelope<TResponse>>(
-    options?.fetcherKey ? { key: options.fetcherKey } : undefined,
-  )
+  const { fetcherKey, onError, onSuccess } = options ?? {}
+  const fetcher = useFetcher<ProxyEnvelope<TResponse>>(fetcherKey ? { key: fetcherKey } : undefined)
   const fetcherSubmit = fetcher.submit
   const submittedReference = useRef(false)
-  const onSuccessReference = useRef(options?.onSuccess)
-  const onErrorReference = useRef(options?.onError)
+  const onSuccessReference = useRef(onSuccess)
+  const onErrorReference = useRef(onError)
 
   // This effect must stay above the callback effect. Effects run in declaration order,
   // so the callback effect then reads the callbacks of the current render.
   useEffect(() => {
-    onSuccessReference.current = options?.onSuccess
-    onErrorReference.current = options?.onError
+    onSuccessReference.current = onSuccess
+    onErrorReference.current = onError
   })
 
   const envelope = fetcher.data

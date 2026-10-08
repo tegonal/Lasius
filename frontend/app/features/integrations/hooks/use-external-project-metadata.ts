@@ -30,6 +30,14 @@ export type ImporterConfigReference = {
 
 const NO_VALUES: string[] = []
 
+/** The labels and states of a response. A missing list is one shared empty array, so a memo keeps its value. */
+export const getMetadataValues = (
+  data: undefined | { availableLabels?: string[]; availableStates?: string[] },
+) => ({
+  availableLabels: data?.availableLabels ?? NO_VALUES,
+  availableStates: data?.availableStates ?? NO_VALUES,
+})
+
 // The project list does not carry labels and states. See
 // .claude/rules/project/decisions/be-importer-metadata-on-demand.md.
 export const useExternalProjectMetadata = (
@@ -48,8 +56,7 @@ export const useExternalProjectMetadata = (
   }, [load])
 
   return {
-    availableLabels: data?.availableLabels ?? NO_VALUES,
-    availableStates: data?.availableStates ?? NO_VALUES,
+    ...getMetadataValues(data),
     isError,
     isLoading,
     reload: load,

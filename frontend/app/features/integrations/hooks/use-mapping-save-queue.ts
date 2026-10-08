@@ -21,8 +21,7 @@ import { useLayoutEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useToast } from '~/components/ui/feedback/use-toast'
-import { buildMappingPayload } from '~/features/integrations/lib/mapping-helpers'
-import { type MappingQueueEntry } from '~/features/integrations/lib/wizard-steps'
+import { getQueueStep, type MappingQueueEntry } from '~/features/integrations/lib/wizard-steps'
 import { logger } from '~/lib/logger'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 import { type ModelsExternalProject } from '~/services/api/lasius'
@@ -80,22 +79,19 @@ export const useMappingSaveQueue = ({
   })
 
   const submitNext = () => {
-    const entry = queueReference.current[indexReference.current]
-    if (!entry || !configId || !importerType) return
-    const externalProject = availableProjects?.find((p) => p.id === entry.externalProjectId)
-    const result = buildMappingPayload(
+    const step = getQueueStep(
+      queueReference.current[indexReference.current],
+      configId,
       importerType,
-      entry.externalProjectId,
-      entry.mapping.projectId,
-      entry.mapping.tagConfig,
-      externalProject?.name,
+      availableProjects,
     )
-    if (!result.success) {
-      logger.error('[IssueImporterWizard] Mapping payload build failed:', result.error)
+    if (step.kind === 'stop') return
+    if (step.kind === 'invalid') {
+      logger.error('[IssueImporterWizard] Mapping payload build failed:', step.error)
       advance(false)
       return
     }
-    submitAddMapping({ body: result.payload, configId, orgId: selectedOrgId })
+    submitAddMapping({ body: step.payload, configId: step.configId, orgId: selectedOrgId })
   }
 
   // A layout effect runs before the passive callback effect of useAddProjectMapping.

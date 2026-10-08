@@ -54,3 +54,11 @@ export const buildConnectivityBody = (importerType: ImporterType, values: FormVa
   resourceOwnerType: values.resourceOwnerType || undefined,
   workspace: values.workspace || undefined,
 })
+
+export type ConnectionTestResponse = undefined | { message?: string; status?: string }
+
+/** The result and the message of a test response. A response without a message gets the given text. */
+export const getConnectionTestOutcome = (data: ConnectionTestResponse, successMessage: string) => ({
+  message: data?.message ?? successMessage,
+  result: data?.status === 'success' ? ('success' as const) : ('error' as const),
+})

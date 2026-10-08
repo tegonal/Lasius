@@ -22,8 +22,33 @@ import { describe, expect, it } from 'vitest'
 import {
   flattenMappings,
   getPreviousStep,
+  getQueueStep,
   getStepClassName,
 } from '~/features/integrations/lib/wizard-steps'
+
+describe('getQueueStep', () => {
+  const entry = (externalProjectId: string) => ({
+    externalProjectId,
+    mapping: { projectId: 'lasius-1' },
+  })
+
+  it('stops without an entry, a config id or an importer type', () => {
+    expect(getQueueStep(undefined, 'c1', 'gitlab', [])).toEqual({ kind: 'stop' })
+    expect(getQueueStep(entry('101'), undefined, 'gitlab', [])).toEqual({ kind: 'stop' })
+    expect(getQueueStep(entry('101'), 'c1', undefined, [])).toEqual({ kind: 'stop' })
+  })
+
+  it('sends the payload of a valid entry with the config id', () => {
+    const step = getQueueStep(entry('101'), 'c1', 'gitlab', [{ id: '101', name: 'Alpha' }])
+    expect(step).toMatchObject({ configId: 'c1', kind: 'send' })
+  })
+
+  it('marks an entry whose payload cannot be built as invalid', () => {
+    expect(getQueueStep(entry('no-slash'), 'c1', 'github', undefined)).toMatchObject({
+      kind: 'invalid',
+    })
+  })
+})
 
 describe('getPreviousStep', () => {
   it('goes back one step from config and test, and not from the first step', () => {

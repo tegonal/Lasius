@@ -19,7 +19,34 @@
 
 import { describe, expect, it } from 'vitest'
 
-import { buildConnectivityBody, hasNewCredentials } from './connection-test'
+import {
+  buildConnectivityBody,
+  getConnectionTestOutcome,
+  hasNewCredentials,
+} from './connection-test'
+
+describe('getConnectionTestOutcome', () => {
+  it('reports success with the message of the backend', () => {
+    expect(getConnectionTestOutcome({ message: 'Hello', status: 'success' }, 'OK')).toEqual({
+      message: 'Hello',
+      result: 'success',
+    })
+  })
+
+  it('uses the given text when the backend sends no message', () => {
+    expect(getConnectionTestOutcome({ status: 'success' }, 'OK')).toEqual({
+      message: 'OK',
+      result: 'success',
+    })
+    expect(getConnectionTestOutcome(undefined, 'OK')).toEqual({ message: 'OK', result: 'error' })
+  })
+
+  it('reports an error for every other status', () => {
+    expect(getConnectionTestOutcome({ message: 'Denied', status: 'error' }, 'OK').result).toBe(
+      'error',
+    )
+  })
+})
 
 describe('hasNewCredentials', () => {
   it('checks the access token for GitHub and GitLab', () => {

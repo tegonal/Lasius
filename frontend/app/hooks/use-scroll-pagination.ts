@@ -19,6 +19,25 @@
 
 import { type UIEvent, useState } from 'react'
 
+/** The number of items to show after a scroll, or null when the number stays. */
+export const getNextShownCount = ({
+  remainingScroll,
+  scrollBeforeEnd,
+  shown,
+  step,
+  total,
+}: {
+  remainingScroll: number
+  scrollBeforeEnd: number
+  shown: number
+  step: number
+  total: number
+}): null | number => {
+  if (remainingScroll >= scrollBeforeEnd || total <= shown) return null
+  const next = Math.min(shown + step, total)
+  return next > shown ? next : null
+}
+
 interface UseScrollPagination<E> {
   onScroll: (event: UIEvent<HTMLDivElement>) => void
   visibleElements: E[]
@@ -65,14 +84,14 @@ export const useScrollPagination = <E>(
   const onScroll = (event: UIEvent<HTMLDivElement>) => {
     if (!event.target) return
     const { clientHeight, scrollHeight, scrollTop } = event.target as HTMLDivElement
-    const scroll = scrollHeight - scrollTop - clientHeight
-
-    if (scroll < scrollBeforeEnd && elements.length > shownNumberOfItems) {
-      const newNumberOfItems = Math.min(shownNumberOfItems + showItemsPerStep, elements.length)
-      if (newNumberOfItems > shownNumberOfItems) {
-        setShownNumberOfItems(newNumberOfItems)
-      }
-    }
+    const nextCount = getNextShownCount({
+      remainingScroll: scrollHeight - scrollTop - clientHeight,
+      scrollBeforeEnd,
+      shown: shownNumberOfItems,
+      step: showItemsPerStep,
+      total: elements.length,
+    })
+    if (nextCount !== null) setShownNumberOfItems(nextCount)
   }
 
   return { onScroll, visibleElements: elements.slice(0, shownNumberOfItems) }

@@ -18,8 +18,20 @@
  */
 
 import { type ModelsUser } from '~/services/api/lasius'
+import { type ModelsEntityReference } from '~/services/api/lasius/modelsEntityReference'
 import { type ModelsUserOrganisation } from '~/services/api/lasius/modelsUserOrganisation'
 import { ModelsUserOrganisationRole } from '~/services/api/lasius/modelsUserOrganisationRole'
+
+/** The reference of a project in any organisation of the user, also of an inactive project. */
+export function findProjectReference(
+  organisations: ModelsUserOrganisation[] | undefined,
+  projectId: string,
+): ModelsEntityReference | undefined {
+  if (!projectId) return undefined
+  return (organisations ?? [])
+    .flatMap((organisation) => organisation.projects)
+    .find((project) => project.projectReference.id === projectId)?.projectReference
+}
 
 /** The organisation values that useOrganisation returns. A missing id or key is an empty text. */
 export function getOrganisationState(

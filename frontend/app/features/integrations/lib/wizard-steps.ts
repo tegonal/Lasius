@@ -19,10 +19,12 @@
 
 import { type WizardStep } from '~/features/integrations/hooks/use-wizard-state'
 import {
+  buildMappingPayload,
   type MappingsByExternalProject,
   type MappingWithTagConfig,
 } from '~/features/integrations/lib/mapping-helpers'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
+import { type ModelsCreateProjectMapping, type ModelsExternalProject } from '~/services/api/lasius'
 
 export const STEP_IDS: WizardStep[] = ['platform', 'config', 'test', 'projects']
 
@@ -53,3 +55,32 @@ export const flattenMappings = (mappings: MappingsByExternalProject): MappingQue
   Object.entries(mappings).flatMap(([externalProjectId, list]) =>
     list.map((mapping) => ({ externalProjectId, mapping })),
   )
+
+export type QueueStep =
+  | { configId: string; kind: 'send'; payload: ModelsCreateProjectMapping }
+  | { error: string; kind: 'invalid' }
+  | { kind: 'stop' }
+
+/**
+ * What the save queue does with an entry. Without an entry, a config id or an importer type, the
+ * queue stops. An entry whose payload cannot be built is invalid.
+ */
+export const getQueueStep = (
+  entry: MappingQueueEntry | undefined,
+  configId: string | undefined,
+  importerType: ImporterType | undefined,
+  availableProjects: ModelsExternalProject[] | undefined,
+): QueueStep => {
+  if (!entry || !configId || !importerType) return { kind: 'stop' }
+  const externalProject = availableProjects?.find((p) => p.id === entry.externalProjectId)
+  const result = buildMappingPayload(
+    importerType,
+    entry.externalProjectId,
+    entry.mapping.projectId,
+    entry.mapping.tagConfig,
+    externalProject?.name,
+  )
+  return result.success
+    ? { configId, kind: 'send', payload: result.payload }
+    : { error: result.error, kind: 'invalid' }
+}

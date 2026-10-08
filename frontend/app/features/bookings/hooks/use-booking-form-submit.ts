@@ -33,8 +33,10 @@ export const useBookingFormSubmit = (selectedOrgId: string, onClose: () => void)
   })
 
   const send = (request: BookingSubmit | null) => {
-    if (request?.kind === 'add') submitAdd({ body: request.body, orgId: selectedOrgId })
-    if (request?.kind === 'update') {
+    if (!request) return
+    if (request.kind === 'add') {
+      submitAdd({ body: request.body, orgId: selectedOrgId })
+    } else {
       submitUpdate({ body: request.body, bookingId: request.bookingId, orgId: selectedOrgId })
     }
   }

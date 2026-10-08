@@ -24,6 +24,9 @@ import { logger } from '~/lib/logger'
 import { type HealthResponse } from '~/routes/api.health'
 import { useUIStore } from '~/stores/ui-store'
 
+export const toBackendStatus = (isOffline: boolean) =>
+  isOffline ? ('disconnected' as const) : ('connected' as const)
+
 /**
  * The first real server version becomes the client version. A later different version is a drift.
  * A missing version and the version `dev` change nothing.
@@ -49,7 +52,7 @@ export const useHealthMonitor = () => {
       clearTimeout(debounceReference.current)
     }
     debounceReference.current = setTimeout(() => {
-      useUIStore.getState().setBackendStatus(isOffline ? 'disconnected' : 'connected')
+      useUIStore.getState().setBackendStatus(toBackendStatus(isOffline))
     }, HEALTH_STATUS_DEBOUNCE_MS)
   }, [])
 
@@ -68,7 +71,7 @@ export const useHealthMonitor = () => {
 
       // Backend connectivity — immediate for indicator, debounced for modal
       const isDisconnected = health.backend === 'disconnected'
-      useUIStore.getState().setBackendStatus(isDisconnected ? 'disconnected' : 'connected')
+      useUIStore.getState().setBackendStatus(toBackendStatus(isDisconnected))
       scheduleDebouncedOffline(isDisconnected)
 
       // Version drift detection

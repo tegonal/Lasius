@@ -21,7 +21,7 @@ import { orderBy } from 'es-toolkit'
 import { useMemo } from 'react'
 
 import { useLayoutLoaderData } from '~/hooks/use-layout-loader-data'
-import { selectOrganisation } from '~/lib/organisation-selection'
+import { findProjectReference, selectOrganisation } from '~/lib/organisation-selection'
 import { type ModelsEntityReference } from '~/services/api/lasius/modelsEntityReference'
 import { type ModelsUserProject } from '~/services/api/lasius/modelsUserProject'
 
@@ -49,19 +49,8 @@ export const useProjects = () => {
    * @param projectId - The ID of the project to find
    * @returns The project reference or undefined if not found
    */
-  const findProjectById = (projectId: string): ModelsEntityReference | undefined => {
-    if (!user?.organisations || !projectId) return undefined
-
-    // Search through all organizations (not just the selected one)
-    for (const org of user.organisations) {
-      const project = org.projects.find((p) => p.projectReference.id === projectId)
-      if (project) {
-        return project.projectReference
-      }
-    }
-
-    return undefined
-  }
+  const findProjectById = (projectId: string): ModelsEntityReference | undefined =>
+    findProjectReference(user?.organisations, projectId)
 
   return {
     findProjectById,

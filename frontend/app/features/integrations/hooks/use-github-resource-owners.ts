@@ -23,6 +23,10 @@ import { DEFAULT_CHECK_FREQUENCY_MS } from '~/features/integrations/lib/config-d
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 import { useListGithubResourceOwners } from '~/services/api/lasius-hooks/issue-importers/issue-importers'
 
+/** Only GitHub has resource owners, and the lookup needs an access token. */
+export const shouldLookUpResourceOwners = (importerType: ImporterType, accessToken: string) =>
+  importerType === 'github' && accessToken.length > 0
+
 type UseGithubResourceOwnersOptions = {
   accessToken: string
   baseUrl: string
@@ -47,7 +51,7 @@ export const useGithubResourceOwners = ({
   const debounceReference = useRef<ReturnType<typeof setTimeout>>(null)
   useEffect(() => {
     if (debounceReference.current) clearTimeout(debounceReference.current)
-    if (importerType === 'github' && accessToken && accessToken.length > 0) {
+    if (shouldLookUpResourceOwners(importerType, accessToken)) {
       debounceReference.current = setTimeout(() => {
         submitResourceOwners({
           body: {

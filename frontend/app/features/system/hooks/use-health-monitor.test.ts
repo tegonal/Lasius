@@ -19,7 +19,14 @@
 
 import { describe, expect, it } from 'vitest'
 
-import { checkVersion } from './use-health-monitor'
+import { checkVersion, toBackendStatus } from './use-health-monitor'
+
+describe('toBackendStatus', () => {
+  it('maps the offline flag to the store status', () => {
+    expect(toBackendStatus(true)).toBe('disconnected')
+    expect(toBackendStatus(false)).toBe('connected')
+  })
+})
 
 describe('checkVersion', () => {
   it('records the first real version', () => {

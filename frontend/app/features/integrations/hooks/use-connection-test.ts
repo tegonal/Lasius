@@ -22,6 +22,8 @@ import { useTranslation } from 'react-i18next'
 
 import {
   buildConnectivityBody,
+  type ConnectionTestResponse,
+  getConnectionTestOutcome,
   hasNewCredentials,
 } from '~/features/integrations/lib/connection-test'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
@@ -51,37 +53,25 @@ export const useConnectionTest = ({
   const [connectionTestResult, setConnectionTestResult] = useState<ConnectionTestResult>(null)
   const [connectionTestMessage, setConnectionTestMessage] = useState('')
 
-  const testExistingApi = useTestExistingConfig({
-    onError: (error) => {
+  const callbacks = {
+    onError: (error: { error: string }) => {
       setConnectionTestResult('error')
       setConnectionTestMessage(error.error)
     },
-    onSuccess: (data) => {
-      setConnectionTestResult(data?.status === 'success' ? 'success' : 'error')
-      setConnectionTestMessage(
-        data?.message ??
-          t('issueImporters.testConnection.success', {
-            defaultValue: 'Connection successful',
-          }),
+    onSuccess: (data: ConnectionTestResponse) => {
+      const outcome = getConnectionTestOutcome(
+        data,
+        t('issueImporters.testConnection.success', {
+          defaultValue: 'Connection successful',
+        }),
       )
+      setConnectionTestResult(outcome.result)
+      setConnectionTestMessage(outcome.message)
     },
-  })
+  }
 
-  const testConnectivityApi = useTestConnectivity({
-    onError: (error) => {
-      setConnectionTestResult('error')
-      setConnectionTestMessage(error.error)
-    },
-    onSuccess: (data) => {
-      setConnectionTestResult(data?.status === 'success' ? 'success' : 'error')
-      setConnectionTestMessage(
-        data?.message ??
-          t('issueImporters.testConnection.success', {
-            defaultValue: 'Connection successful',
-          }),
-      )
-    },
-  })
+  const testExistingApi = useTestExistingConfig(callbacks)
+  const testConnectivityApi = useTestConnectivity(callbacks)
 
   const isTestingConnection = testExistingApi.isSubmitting || testConnectivityApi.isSubmitting
 

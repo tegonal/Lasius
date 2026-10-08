@@ -1,66 +1,6 @@
 {
-  "finding_counts": {
-    "app/features/bookings/hooks/use-booking-form-submit.ts": {
-      "crap_moderate": {
-        "count": 1
-      }
-    },
-    "app/features/calendar/hooks/use-calendar-navigation.ts": {
-      "crap_moderate": {
-        "count": 1
-      }
-    },
-    "app/features/integrations/hooks/use-connection-test.ts": {
-      "crap_moderate": {
-        "count": 2
-      }
-    },
-    "app/features/integrations/hooks/use-external-project-metadata.ts": {
-      "crap_moderate": {
-        "count": 1
-      }
-    },
-    "app/features/integrations/hooks/use-github-resource-owners.ts": {
-      "crap_moderate": {
-        "count": 1
-      }
-    },
-    "app/features/integrations/hooks/use-mapping-save-queue.ts": {
-      "crap_moderate": {
-        "count": 1
-      }
-    },
-    "app/features/projects/hooks/use-projects.ts": {
-      "crap_moderate": {
-        "count": 1
-      }
-    },
-    "app/features/system/hooks/use-health-monitor.ts": {
-      "crap_moderate": {
-        "count": 1
-      }
-    },
-    "app/features/system/websocket/use-lasius-websocket.ts": {
-      "crap_moderate": {
-        "count": 1
-      }
-    },
-    "app/features/tag-manager/hooks/use-project-tags-editor.ts": {
-      "crap_moderate": {
-        "count": 1
-      }
-    },
-    "app/hooks/use-api-proxy.ts": {
-      "crap_moderate": {
-        "count": 1
-      }
-    },
-    "app/hooks/use-scroll-pagination.ts": {
-      "crap_moderate": {
-        "count": 1
-      }
-    }
-  },
   "runtime_coverage_findings": [],
-  "target_keys": []
+  "target_keys": [
+    "app/lib/organisation-selection.ts:high impact"
+  ]
 }

@@ -79,7 +79,7 @@ export const useProjectTagsEditor = (item: ModelsProject | ModelsUserProject) =>
 
   const loadedReference = useRef(false)
   useEffect(() => {
-    if (!item || !selectedOrganisationId || !projectId || loadedReference.current) return
+    if (!selectedOrganisationId || !projectId || loadedReference.current) return
     loadedReference.current = true
     submitTags({ orgId: selectedOrganisationId, projectId })
   }, [item, projectId, selectedOrganisationId, submitTags])
