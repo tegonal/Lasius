@@ -19,9 +19,6 @@
 
 import { getFormProps, useForm, useInputControl } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
-import { addSeconds } from 'date-fns'
-import { ArrowDownToLine } from 'lucide-react'
-import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { type z } from 'zod'
 
@@ -32,15 +29,19 @@ import { FormBody } from '~/components/ui/forms/form-body'
 import { FormElement } from '~/components/ui/forms/form-element'
 import { InputDatePicker } from '~/components/ui/forms/input/date-picker/input-date-picker'
 import { BookingProjectTagsFields } from '~/features/bookings/components/booking-project-tags-fields'
+import { useApplyRunningBooking } from '~/features/bookings/hooks/use-apply-running-booking'
 import { useFocusTagsOnProjectChange } from '~/features/bookings/hooks/use-focus-tags-on-project-change'
 import { useProjectTags } from '~/features/bookings/hooks/use-project-tags'
 import {
   createBookingEditRunningSchema,
   parseTagsFromFormData,
 } from '~/features/bookings/lib/booking-schemas'
+import {
+  getRunningBookingDefaults,
+  getStartPreset,
+} from '~/features/bookings/lib/running-booking-form'
 import { useProjects } from '~/features/projects/hooks/use-projects'
 import { type SchemaTranslationFunction } from '~/lib/i18n-types'
-import { formatISOLocale } from '~/lib/utils/dates'
 import { type ModelsCurrentUserTimeBooking, type ModelsTag } from '~/services/api/lasius'
 import { useUpdateUserBooking } from '~/services/api/lasius-hooks/user-bookings/user-bookings'
 
@@ -74,11 +75,7 @@ export const BookingEditRunning = ({
 
   const [form, fields] = useForm<z.input<typeof schema>, z.output<typeof schema>>({
     constraint: getZodConstraint(schema),
-    defaultValue: {
-      projectId: booking?.projectReference.id ?? '',
-      start: booking ? formatISOLocale(new Date(booking.start.dateTime)) : '',
-      tags: booking?.tags ? JSON.stringify(booking.tags) : '',
-    },
+    defaultValue: getRunningBookingDefaults(booking),
     onSubmit(event, { submission }) {
       event.preventDefault()
       if (submission?.status !== 'success') return
@@ -111,55 +108,16 @@ export const BookingEditRunning = ({
   // Tags via shared hook
   const { projectTags } = useProjectTags(selectedOrgId, projectIdControl.value)
 
-  // Conform returns a new form proxy and new controls on each render, and form.update re-renders.
-  // The ref limits the re-initialization to a changed booking, so the effect cannot loop.
-  const appliedBookingKey = useRef('')
-
-  useEffect(() => {
-    if (!booking) {
-      return
-    }
-
-    const bookingKey = JSON.stringify([
-      booking.id,
-      booking.projectReference.id,
-      booking.tags,
-      booking.start.dateTime,
-    ])
-    if (appliedBookingKey.current === bookingKey) {
-      return
-    }
-    appliedBookingKey.current = bookingKey
-
-    projectIdControl.change(booking.projectReference.id)
-    form.update({
-      name: fields.tags.name,
-      value: booking.tags.length > 0 ? JSON.stringify(booking.tags) : '',
-    })
-    startControl.change(formatISOLocale(new Date(booking.start.dateTime)))
-  }, [
-    booking,
-    booking?.projectReference.id,
-    booking?.tags,
-    booking?.start.dateTime,
-    projectIdControl,
-    startControl,
-    form,
-    fields.tags.name,
-  ])
-
+  useApplyRunningBooking(booking, form, fields.tags.name, projectIdControl, startControl)
   useFocusTagsOnProjectChange(projectIdControl.value, fields.tags.id)
 
-  const presetStart = latestBooking?.end
-    ? {
-        presetDate: formatISOLocale(addSeconds(new Date(latestBooking.end.dateTime), 1)),
-        presetIcon: ArrowDownToLine,
-        presetLabel: t(
-          'bookings:hints.useEndTimeOfLatest',
-          'Use end time of latest booking as start time for this one',
-        ),
-      }
-    : {}
+  const presetStart = getStartPreset(
+    latestBooking,
+    t(
+      'bookings:hints.useEndTimeOfLatest',
+      'Use end time of latest booking as start time for this one',
+    ),
+  )
 
   return (
     <div className="relative w-full">

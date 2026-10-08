@@ -36,9 +36,6 @@
       }
     },
     "app/components/ui/forms/input/date-picker/input-date-picker.tsx": {
-      "crap_critical": {
-        "count": 1
-      },
       "crap_high": {
         "count": 1
       }
@@ -56,11 +53,6 @@
     "app/components/ui/forms/input/date-picker/shared/duration-segment-input.tsx": {
       "crap_moderate": {
         "count": 3
-      }
-    },
-    "app/components/ui/forms/input/date-picker/shared/segmented-input-wrapper.tsx": {
-      "crap_critical": {
-        "count": 1
       }
     },
     "app/components/ui/forms/input/date-range-filter.tsx": {
@@ -150,9 +142,6 @@
       }
     },
     "app/features/bookings/components/booking-edit-running.tsx": {
-      "crap_critical": {
-        "count": 1
-      },
       "crap_moderate": {
         "count": 1
       }
@@ -213,14 +202,6 @@
         "count": 1
       }
     },
-    "app/features/help/components/help-drawer.tsx": {
-      "crap_critical": {
-        "count": 1
-      },
-      "crap_high": {
-        "count": 1
-      }
-    },
     "app/features/home/components/organisation-item.tsx": {
       "crap_high": {
         "count": 1
@@ -277,14 +258,6 @@
       }
     },
     "app/features/integrations/components/shared/provider-instructions.tsx": {
-      "crap_moderate": {
-        "count": 1
-      }
-    },
-    "app/features/integrations/components/shared/tag-config-form.tsx": {
-      "crap_critical": {
-        "count": 1
-      },
       "crap_moderate": {
         "count": 1
       }
@@ -433,11 +406,6 @@
         "count": 1
       }
     },
-    "app/features/settings/components/account-form.tsx": {
-      "crap_critical": {
-        "count": 1
-      }
-    },
     "app/features/settings/components/account-security-form.tsx": {
       "crap_moderate": {
         "count": 1
@@ -451,11 +419,6 @@
     "app/features/settings/components/working-hours-grid.tsx": {
       "crap_moderate": {
         "count": 2
-      }
-    },
-    "app/features/stats/components/month-stream-chart.tsx": {
-      "crap_critical": {
-        "count": 1
       }
     },
     "app/features/stats/components/project-stream-chart-impl.tsx": {
@@ -508,11 +471,6 @@
         "count": 1
       }
     },
-    "app/features/tag-manager/components/project-add-update-tags-form.tsx": {
-      "crap_critical": {
-        "count": 1
-      }
-    },
     "app/features/tag-manager/components/tag-group-item.tsx": {
       "crap_high": {
         "count": 1
@@ -552,9 +510,6 @@
       }
     },
     "app/root.tsx": {
-      "crap_critical": {
-        "count": 1
-      },
       "crap_moderate": {
         "count": 1
       }
@@ -568,9 +523,6 @@
       }
     },
     "app/routes/internal-oauth.register.tsx": {
-      "crap_critical": {
-        "count": 1
-      },
       "crap_high": {
         "count": 1
       }

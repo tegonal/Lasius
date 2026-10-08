@@ -17,7 +17,7 @@
  *
  */
 
-import { getFormProps, getInputProps, useForm } from '@conform-to/react'
+import { type FieldMetadata, getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { parseWithZod } from '@conform-to/zod/v4'
 import { ChevronLeft, Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
@@ -46,6 +46,7 @@ import { Logo } from '~/components/ui/icons/logo'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { RegisterInfoPanel } from '~/features/auth/auth-info-panels'
 import { AuthLayout } from '~/features/auth/auth-layout'
+import { getRegisterDefaults, type RegisterFormValues } from '~/features/auth/lib/register-form'
 import { type SchemaTranslationFunction, untyped } from '~/lib/i18n-types'
 import { logger } from '~/lib/logger'
 import { toApiError } from '~/services/api/lasius-fetch-instance'
@@ -117,6 +118,11 @@ const serverRegisterSchema = createRegisterSchema((_, defaultValue) =>
   typeof defaultValue === 'string' ? defaultValue : defaultValue.defaultValue,
 )
 
+type RegisterAlertsProperties = {
+  invitationId: string
+  serverError: null | string | undefined
+}
+
 export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData()
   const submission = parseWithZod(formData, { schema: serverRegisterSchema })
@@ -169,7 +175,7 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export default function InternalOAuthRegister() {
-  const { email: prefilledEmail, invitationId, returnTo } = useLoaderData<typeof loader>()
+  const { email, invitationId, returnTo } = useLoaderData<typeof loader>()
   const actionData = useActionData<typeof action>()
   const navigation = useNavigation()
   const { t } = useTranslation('common')
@@ -182,24 +188,8 @@ export default function InternalOAuthRegister() {
 
   const registerSchema = createRegisterSchema(untyped(t))
 
-  const [form, fields] = useForm<{
-    confirmPassword: string
-    email: string
-    firstName: string
-    invitationId?: string
-    lastName: string
-    password: string
-    returnTo?: string
-  }>({
-    defaultValue: {
-      confirmPassword: '',
-      email: prefilledEmail,
-      firstName: '',
-      invitationId: invitationId || undefined,
-      lastName: '',
-      password: '',
-      returnTo: returnTo || undefined,
-    },
+  const [form, fields] = useForm<RegisterFormValues>({
+    defaultValue: getRegisterDefaults({ email, invitationId, returnTo }),
     lastResult: actionData?.lastResult,
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: registerSchema })
@@ -208,37 +198,11 @@ export default function InternalOAuthRegister() {
     shouldValidate: 'onBlur',
   })
 
-  const isSubmitting = navigation.state !== 'idle'
-
-  const getErrorMessage = (errorCode: string): string => {
-    if (errorCode === 'user_already_registered') {
-      return t('auth.errors.userAlreadyRegistered', {
-        defaultValue: 'User already registered',
-      })
-    }
-    return t('auth.errors.registerUnknown', {
-      defaultValue: 'Unknown registration error',
-    })
-  }
+  const passwordType = showPasswords ? 'text' : 'password'
 
   return (
     <AuthLayout infoPanel={<RegisterInfoPanel />}>
-      {actionData?.serverError && (
-        <Alert
-          className="animate-[fadeIn_0.4s_ease-out]"
-          data-testid="auth-register-error"
-          variant="warning">
-          {getErrorMessage(actionData.serverError)}
-        </Alert>
-      )}
-      {invitationId && (
-        <Alert className="animate-[fadeIn_0.4s_ease-out]" variant="info">
-          {t('invitation:createAccountMessage', {
-            defaultValue:
-              'You have been invited to create an account so that you can use Lasius to track your working hours.',
-          })}
-        </Alert>
-      )}
+      <RegisterAlerts invitationId={invitationId} serverError={actionData?.serverError} />
       <Card className="bg-base-100/80 border-0 shadow-2xl backdrop-blur-sm">
         <CardBody className="p-8 lg:p-10">
           <Link className="flex items-center gap-1 self-center text-sm" to={backToLoginHref}>
@@ -263,124 +227,69 @@ export default function InternalOAuthRegister() {
             </p>
           </div>
           <Form method="post" {...getFormProps(form)}>
-            {returnTo && (
-              <input
-                {...getInputProps(fields.returnTo, { type: 'hidden' })}
-                key={fields.returnTo.key}
-              />
-            )}
-            {invitationId && (
-              <input
-                {...getInputProps(fields.invitationId, { type: 'hidden' })}
-                key={fields.invitationId.key}
-              />
-            )}
+            <RegisterHiddenFields
+              invitationField={fields.invitationId}
+              invitationId={invitationId}
+              returnTo={returnTo}
+              returnToField={fields.returnTo}
+            />
             <FormBody>
               <FieldSet>
-                <FormElement
-                  htmlFor={fields.email.id}
+                <RegisterField
+                  autoComplete="email"
+                  field={fields.email}
                   label={t('forms.email', {
                     defaultValue: 'Email',
                   })}
-                  required>
-                  <Input
-                    autoComplete="email"
-                    data-testid="auth-register-email-input"
-                    error={!!fields.email.errors?.length}
-                    {...getInputProps(fields.email, { type: 'email' })}
-                    key={fields.email.key}
-                  />
-                  <FormFieldErrors errors={fields.email.errors} />
-                </FormElement>
-                <FormElement
-                  htmlFor={fields.firstName.id}
+                  testId="auth-register-email-input"
+                  type="email"
+                />
+                <RegisterField
+                  autoComplete="given-name"
+                  field={fields.firstName}
                   label={t('forms.firstName', {
                     defaultValue: 'First name',
                   })}
-                  required>
-                  <Input
-                    autoComplete="given-name"
-                    data-testid="auth-register-firstname-input"
-                    error={!!fields.firstName.errors?.length}
-                    {...getInputProps(fields.firstName, { type: 'text' })}
-                    key={fields.firstName.key}
-                  />
-                  <FormFieldErrors errors={fields.firstName.errors} />
-                </FormElement>
-                <FormElement
-                  htmlFor={fields.lastName.id}
+                  testId="auth-register-firstname-input"
+                  type="text"
+                />
+                <RegisterField
+                  autoComplete="family-name"
+                  field={fields.lastName}
                   label={t('forms.lastName', {
                     defaultValue: 'Last name',
                   })}
-                  required>
-                  <Input
-                    autoComplete="family-name"
-                    data-testid="auth-register-lastname-input"
-                    error={!!fields.lastName.errors?.length}
-                    {...getInputProps(fields.lastName, { type: 'text' })}
-                    key={fields.lastName.key}
-                  />
-                  <FormFieldErrors errors={fields.lastName.errors} />
-                </FormElement>
-                <FormElement
-                  htmlFor={fields.password.id}
+                  testId="auth-register-lastname-input"
+                  type="text"
+                />
+                <RegisterField
+                  autoComplete="new-password"
+                  field={fields.password}
                   label={t('forms.password', {
                     defaultValue: 'Password',
                   })}
-                  required>
-                  <Input
-                    autoComplete="new-password"
-                    data-testid="auth-register-password-input"
-                    error={!!fields.password.errors?.length}
-                    {...getInputProps(fields.password, {
-                      type: showPasswords ? 'text' : 'password',
-                    })}
-                    key={fields.password.key}
-                  />
-                  <FormFieldErrors errors={fields.password.errors} />
-                </FormElement>
-                <FormElement
-                  htmlFor={fields.confirmPassword.id}
+                  testId="auth-register-password-input"
+                  type={passwordType}
+                />
+                <RegisterField
+                  autoComplete="new-password"
+                  field={fields.confirmPassword}
                   label={t('forms.confirmPassword', {
                     defaultValue: 'Confirm password',
                   })}
-                  required>
-                  <Input
-                    autoComplete="new-password"
-                    data-testid="auth-register-confirmpassword-input"
-                    error={!!fields.confirmPassword.errors?.length}
-                    {...getInputProps(fields.confirmPassword, {
-                      type: showPasswords ? 'text' : 'password',
-                    })}
-                    key={fields.confirmPassword.key}
-                  />
-                  <FormFieldErrors errors={fields.confirmPassword.errors} />
-                </FormElement>
+                  testId="auth-register-confirmpassword-input"
+                  type={passwordType}
+                />
               </FieldSet>
               <ButtonGroup>
-                <Button
-                  className="justify-start gap-2"
-                  fullWidth
-                  onClick={(event) => {
-                    event.preventDefault()
-                    setShowPasswords(!showPasswords)
-                  }}
-                  variant="ghost">
-                  <LucideIcon icon={showPasswords ? Eye : EyeOff} size={24} />
-                  <span>
-                    {showPasswords
-                      ? t('ui.hidePasswords', {
-                          defaultValue: 'Hide passwords',
-                        })
-                      : t('ui.showPasswords', {
-                          defaultValue: 'Show passwords',
-                        })}
-                  </span>
-                </Button>
+                <ShowPasswordsButton
+                  isShown={showPasswords}
+                  onToggle={() => setShowPasswords(!showPasswords)}
+                />
                 <Button
                   data-testid="auth-register-submit-btn"
                   fullWidth
-                  loading={isSubmitting}
+                  loading={navigation.state !== 'idle'}
                   type="submit">
                   {t('actions.signUp', {
                     defaultValue: 'Sign up',
@@ -392,6 +301,105 @@ export default function InternalOAuthRegister() {
         </CardBody>
       </Card>
     </AuthLayout>
+  )
+}
+
+const RegisterAlerts = ({ invitationId, serverError }: RegisterAlertsProperties) => {
+  const { t } = useTranslation('common')
+  return (
+    <>
+      {serverError && (
+        <Alert
+          className="animate-[fadeIn_0.4s_ease-out]"
+          data-testid="auth-register-error"
+          variant="warning">
+          {serverError === 'user_already_registered'
+            ? t('auth.errors.userAlreadyRegistered', {
+                defaultValue: 'User already registered',
+              })
+            : t('auth.errors.registerUnknown', {
+                defaultValue: 'Unknown registration error',
+              })}
+        </Alert>
+      )}
+      {invitationId && (
+        <Alert className="animate-[fadeIn_0.4s_ease-out]" variant="info">
+          {t('invitation:createAccountMessage', {
+            defaultValue:
+              'You have been invited to create an account so that you can use Lasius to track your working hours.',
+          })}
+        </Alert>
+      )}
+    </>
+  )
+}
+
+type RegisterHiddenFieldsProperties = {
+  invitationField: FieldMetadata<string | undefined>
+  invitationId: string
+  returnTo: string
+  returnToField: FieldMetadata<string | undefined>
+}
+
+const RegisterHiddenFields = ({
+  invitationField,
+  invitationId,
+  returnTo,
+  returnToField,
+}: RegisterHiddenFieldsProperties) => (
+  <>
+    {returnTo && (
+      <input {...getInputProps(returnToField, { type: 'hidden' })} key={returnToField.key} />
+    )}
+    {invitationId && (
+      <input {...getInputProps(invitationField, { type: 'hidden' })} key={invitationField.key} />
+    )}
+  </>
+)
+
+type RegisterFieldProperties = {
+  autoComplete: string
+  field: FieldMetadata<string>
+  label: string
+  testId: string
+  type: 'email' | 'password' | 'text'
+}
+
+const RegisterField = ({ autoComplete, field, label, testId, type }: RegisterFieldProperties) => (
+  <FormElement htmlFor={field.id} label={label} required>
+    <Input
+      autoComplete={autoComplete}
+      data-testid={testId}
+      error={!!field.errors?.length}
+      {...getInputProps(field, { type })}
+      key={field.key}
+    />
+    <FormFieldErrors errors={field.errors} />
+  </FormElement>
+)
+
+const ShowPasswordsButton = ({ isShown, onToggle }: { isShown: boolean; onToggle: () => void }) => {
+  const { t } = useTranslation('common')
+  return (
+    <Button
+      className="justify-start gap-2"
+      fullWidth
+      onClick={(event) => {
+        event.preventDefault()
+        onToggle()
+      }}
+      variant="ghost">
+      <LucideIcon icon={isShown ? Eye : EyeOff} size={24} />
+      <span>
+        {isShown
+          ? t('ui.hidePasswords', {
+              defaultValue: 'Hide passwords',
+            })
+          : t('ui.showPasswords', {
+              defaultValue: 'Show passwords',
+            })}
+      </span>
+    </Button>
   )
 }
 

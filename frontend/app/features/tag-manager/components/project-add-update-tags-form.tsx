@@ -39,6 +39,7 @@ import { type ModelsProject } from '~/services/api/lasius/modelsProject'
 import { type ModelsUserProject } from '~/services/api/lasius/modelsUserProject'
 
 import { useProjectTagsEditor } from '../hooks/use-project-tags-editor'
+import { getTagDialogFlags, type TagDialog } from '../lib/tag-dialog'
 import { TagGroupsTab } from './tag-groups-tab'
 
 type Properties = {
@@ -48,13 +49,7 @@ type Properties = {
   onSave: () => void
 }
 
-/** The one dialog that the form shows on top of itself, or null. */
-type TagDialog =
-  | null
-  | { groupIndex: number; groupName: string; kind: 'deleteGroup' }
-  | { groupIndex: number; kind: 'addTag' }
-  | { kind: 'addGroup' }
-  | { kind: 'cancel' }
+type TagsEditor = ReturnType<typeof useProjectTagsEditor>
 
 export const ProjectAddUpdateTagsForm = ({ item, mode, onCancel, onSave }: Properties) => {
   const { t } = useTranslation(['tag-manager', 'projects'])
@@ -116,6 +111,136 @@ export const ProjectAddUpdateTagsForm = ({ item, mode, onCancel, onSave }: Prope
     closeDialog()
   }
 
+  const dialogFlags = getTagDialogFlags(dialog)
+
+  return (
+    <>
+      <form className="flex min-h-0 flex-1 flex-col" onSubmit={onSubmit}>
+        <div
+          className="flex min-h-0 flex-1 flex-col"
+          onKeyDown={preventEnterOnForm}
+          role="presentation">
+          <div className="flex min-h-0 flex-1 flex-col">
+            <ModalCloseButton onClose={handleCancel} />
+            <ModalHeader
+              actionSlot={<ModalHelpButton helpKey="modal-edit-tags" />}
+              className="mb-4">
+              <TagFormTitle mode={mode} projectKey={projectKey} />
+            </ModalHeader>
+            <div className="flex min-h-0 flex-1 flex-col">
+              <TagManagerTabs
+                changeSimpleTags={changeSimpleTags}
+                operations={operations}
+                setDialog={setDialog}
+                simpleTags={simpleTags}
+                tagGroups={tagGroups}
+              />
+            </div>
+          </div>
+
+          <div className="border-base-300 mt-auto flex-shrink-0 border-t pt-4">
+            <ButtonGroup>
+              <Button
+                className="relative z-0"
+                data-testid="tag-manager-save-btn"
+                disabled={isSubmitting}
+                type="submit">
+                {t('actions.save', 'Save')}
+              </Button>
+              <Button
+                data-testid="tag-manager-cancel-btn"
+                onClick={handleCancel}
+                type="button"
+                variant="secondary">
+                {t('actions.cancel', 'Cancel')}
+              </Button>
+            </ButtonGroup>
+          </div>
+        </div>
+      </form>
+
+      <GenericInputModal
+        confirmLabel={t('actions.createTagGroup', 'Create tag group')}
+        label={t('actions.addTagGroup', 'Add tag group')}
+        onChange={setNewTagGroupName}
+        onClose={() => {
+          closeDialog()
+          setNewTagGroupName('')
+        }}
+        onConfirm={handleAddGroupConfirm}
+        open={dialogFlags.isAddGroupOpen}
+        placeholder={t('forms.name', 'Name')}
+        value={newTagGroupName}
+      />
+
+      <GenericInputModal
+        cancelLabel={t('actions.close', 'Close')}
+        confirmLabel={t('actions.add', 'Add')}
+        enableEnterKey
+        label={t('actions.addTag', 'Add a tag')}
+        onChange={setNewTagName}
+        onClose={() => {
+          closeDialog()
+          setNewTagName('')
+        }}
+        onConfirm={handleAddTagConfirm}
+        open={dialogFlags.isAddTagOpen}
+        placeholder={t('enterTagName', 'Enter tag name')}
+        value={newTagName}
+      />
+
+      {dialogFlags.deleteGroupName !== null && (
+        <GenericConfirmModal
+          cancelLabel={t('actions.close', 'Close')}
+          confirmLabel={t('actions.delete', 'Delete')}
+          message={t(
+            'confirmDeleteGroup',
+            'Are you sure you want to delete the tag group "{{groupName}}"?',
+            { groupName: dialogFlags.deleteGroupName },
+          )}
+          onClose={closeDialog}
+          onConfirm={handleDeleteConfirm}
+          open
+        />
+      )}
+
+      {dialogFlags.isCancelOpen && (
+        <GenericConfirmModal
+          cancelLabel={t('actions.keepEditing', 'Keep editing')}
+          confirmLabel={t('actions.discardChanges', 'Discard changes')}
+          message={t(
+            'confirmUnsavedChanges',
+            'You have unsaved changes. Are you sure you want to cancel?',
+          )}
+          onClose={closeDialog}
+          onConfirm={() => {
+            closeDialog()
+            onCancel()
+          }}
+          open
+        />
+      )}
+    </>
+  )
+}
+
+const TagFormTitle = ({ mode, projectKey }: { mode: 'add' | 'update'; projectKey: string }) => {
+  const { t } = useTranslation(['tag-manager', 'projects'])
+  return mode === 'add'
+    ? t('actions.addTags', 'Add tags')
+    : t('actions.editForProject', 'Edit tags for {{projectKey}}', { projectKey })
+}
+
+const TagManagerTabs = ({
+  changeSimpleTags,
+  operations,
+  setDialog,
+  simpleTags,
+  tagGroups,
+}: Pick<TagsEditor, 'changeSimpleTags' | 'operations' | 'simpleTags' | 'tagGroups'> & {
+  setDialog: (dialog: TagDialog) => void
+}) => {
+  const { t } = useTranslation(['tag-manager', 'projects'])
   const tabs = [
     {
       component: (
@@ -153,113 +278,5 @@ export const ProjectAddUpdateTagsForm = ({ item, mode, onCancel, onSave }: Prope
       label: t('simpleTags', 'Simple tags'),
     },
   ]
-
-  const title =
-    mode === 'add'
-      ? t('actions.addTags', 'Add tags')
-      : t('actions.editForProject', 'Edit tags for {{projectKey}}', { projectKey })
-
-  return (
-    <>
-      <form className="flex min-h-0 flex-1 flex-col" onSubmit={onSubmit}>
-        <div
-          className="flex min-h-0 flex-1 flex-col"
-          onKeyDown={preventEnterOnForm}
-          role="presentation">
-          <div className="flex min-h-0 flex-1 flex-col">
-            <ModalCloseButton onClose={handleCancel} />
-            <ModalHeader
-              actionSlot={<ModalHelpButton helpKey="modal-edit-tags" />}
-              className="mb-4">
-              {title}
-            </ModalHeader>
-            <div className="flex min-h-0 flex-1 flex-col">
-              <Tabs tabs={tabs} />
-            </div>
-          </div>
-
-          <div className="border-base-300 mt-auto flex-shrink-0 border-t pt-4">
-            <ButtonGroup>
-              <Button
-                className="relative z-0"
-                data-testid="tag-manager-save-btn"
-                disabled={isSubmitting}
-                type="submit">
-                {t('actions.save', 'Save')}
-              </Button>
-              <Button
-                data-testid="tag-manager-cancel-btn"
-                onClick={handleCancel}
-                type="button"
-                variant="secondary">
-                {t('actions.cancel', 'Cancel')}
-              </Button>
-            </ButtonGroup>
-          </div>
-        </div>
-      </form>
-
-      <GenericInputModal
-        confirmLabel={t('actions.createTagGroup', 'Create tag group')}
-        label={t('actions.addTagGroup', 'Add tag group')}
-        onChange={setNewTagGroupName}
-        onClose={() => {
-          closeDialog()
-          setNewTagGroupName('')
-        }}
-        onConfirm={handleAddGroupConfirm}
-        open={dialog?.kind === 'addGroup'}
-        placeholder={t('forms.name', 'Name')}
-        value={newTagGroupName}
-      />
-
-      <GenericInputModal
-        cancelLabel={t('actions.close', 'Close')}
-        confirmLabel={t('actions.add', 'Add')}
-        enableEnterKey
-        label={t('actions.addTag', 'Add a tag')}
-        onChange={setNewTagName}
-        onClose={() => {
-          closeDialog()
-          setNewTagName('')
-        }}
-        onConfirm={handleAddTagConfirm}
-        open={dialog?.kind === 'addTag'}
-        placeholder={t('enterTagName', 'Enter tag name')}
-        value={newTagName}
-      />
-
-      {dialog?.kind === 'deleteGroup' && (
-        <GenericConfirmModal
-          cancelLabel={t('actions.close', 'Close')}
-          confirmLabel={t('actions.delete', 'Delete')}
-          message={t(
-            'confirmDeleteGroup',
-            'Are you sure you want to delete the tag group "{{groupName}}"?',
-            { groupName: dialog.groupName },
-          )}
-          onClose={closeDialog}
-          onConfirm={handleDeleteConfirm}
-          open
-        />
-      )}
-
-      {dialog?.kind === 'cancel' && (
-        <GenericConfirmModal
-          cancelLabel={t('actions.keepEditing', 'Keep editing')}
-          confirmLabel={t('actions.discardChanges', 'Discard changes')}
-          message={t(
-            'confirmUnsavedChanges',
-            'You have unsaved changes. Are you sure you want to cancel?',
-          )}
-          onClose={closeDialog}
-          onConfirm={() => {
-            closeDialog()
-            onCancel()
-          }}
-          open
-        />
-      )}
-    </>
-  )
+  return <Tabs tabs={tabs} />
 }

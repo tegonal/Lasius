@@ -22,7 +22,6 @@ import { useTranslation } from 'react-i18next'
 import {
   data,
   href,
-  isRouteErrorResponse,
   Links,
   type LinksFunction,
   Meta,
@@ -45,6 +44,7 @@ const LazyHelpDrawer = lazy(async () => {
 })
 import { localeCookie } from '~/lib/cookies/i18next-cookie.server'
 import { parseThemeCookie } from '~/lib/cookies/theme-cookie.server'
+import { type ErrorPage, getErrorPage } from '~/lib/error-page'
 import { logger } from '~/lib/logger'
 import { DEFAULT_TIME_ZONE } from '~/lib/utils/time-zone'
 import { getLocale, i18nextMiddleware } from '~/middleware/i18next'
@@ -118,8 +118,118 @@ const ErrorActions = ({ showTryAgain = true }: { showTryAgain?: boolean }) => {
   )
 }
 
-export const ErrorBoundary = () => {
+type ErrorCardProperties = PropsWithChildren<{
+  code: number | string
+  codeClassName: string
+  isWide?: boolean
+  message: string
+  title: string
+}>
+
+const ErrorCard = ({
+  children,
+  code,
+  codeClassName,
+  isWide,
+  message,
+  title,
+}: ErrorCardProperties) => (
+  <div className="flex min-h-screen items-center justify-center p-4">
+    <div
+      className={
+        isWide
+          ? 'card bg-base-200 w-full max-w-lg shadow-lg'
+          : 'card bg-base-200 w-full max-w-md shadow-lg'
+      }>
+      <div className="card-body items-center text-center">
+        <div className={codeClassName}>{code}</div>
+        <h1 className="card-title mt-2 text-xl">{title}</h1>
+        <p className="text-base-content/60 text-sm">{message}</p>
+        {children}
+      </div>
+    </div>
+  </div>
+)
+
+const StatusErrorCard = ({ page }: { page: Exclude<ErrorPage, { kind: 'unexpected' }> }) => {
   const { t } = useTranslation('common')
+  const content = {
+    forbidden: {
+      actions: <ErrorActions showTryAgain={false} />,
+      message: t('errors.page.forbidden.message', 'You do not have permission to view this page.'),
+      title: t('errors.page.forbidden.title', 'Access denied'),
+    },
+    notFound: {
+      actions: <ErrorActions showTryAgain={false} />,
+      message: t('errors.page.notFound.message', 'The page you are looking for does not exist.'),
+      title: t('errors.page.notFound.title', 'Page not found'),
+    },
+    status: {
+      actions: <ErrorActions />,
+      message: page.message ?? t('errors.page.generic.message', 'An error occurred.'),
+      title: page.statusText ?? t('errors.page.generic.title', 'Something went wrong'),
+    },
+    unauthorized: {
+      actions: (
+        <div className="card-actions mt-6">
+          <a className="btn btn-primary btn-sm" href={href('/login')}>
+            {t('auth.signIn', 'Sign in')}
+          </a>
+        </div>
+      ),
+      message: t('errors.page.unauthorized.message', 'You need to sign in to access this page.'),
+      title: t('errors.page.unauthorized.title', 'Unauthorized'),
+    },
+  }[page.kind]
+
+  return (
+    <ErrorCard
+      code={page.status}
+      codeClassName="text-base-content/30 text-6xl font-black"
+      message={content.message}
+      title={content.title}>
+      {content.actions}
+    </ErrorCard>
+  )
+}
+
+const UnexpectedErrorCard = ({
+  details,
+}: {
+  details: null | { message: string; stack: null | string }
+}) => {
+  const { t } = useTranslation('common')
+  return (
+    <ErrorCard
+      code="!"
+      codeClassName="text-error/30 text-6xl font-black"
+      isWide
+      message={t(
+        'errors.page.unexpected.message',
+        'Something went wrong. Please try again or return to the home page.',
+      )}
+      title={t('errors.page.unexpected.title', 'Unexpected error')}>
+      {details && (
+        <details className="collapse-arrow bg-base-300 collapse mt-4 w-full text-left">
+          <summary className="collapse-title text-sm font-medium">
+            {t('errors.page.details', 'Error details')}
+          </summary>
+          <div className="collapse-content">
+            <p className="text-error font-mono text-sm">{details.message}</p>
+            {details.stack && (
+              <pre className="bg-base-100 mt-2 overflow-auto rounded-lg p-3 text-xs">
+                {details.stack}
+              </pre>
+            )}
+          </div>
+        </details>
+      )}
+      <ErrorActions />
+    </ErrorCard>
+  )
+}
+
+export const ErrorBoundary = () => {
   const error = useRouteError()
 
   // Log errors client-side only
@@ -127,122 +237,11 @@ export const ErrorBoundary = () => {
     logger.error('ErrorBoundary caught error', error)
   }
 
-  if (isRouteErrorResponse(error)) {
-    if (error.status === 401) {
-      return (
-        <div className="flex min-h-screen items-center justify-center p-4">
-          <div className="card bg-base-200 w-full max-w-md shadow-lg">
-            <div className="card-body items-center text-center">
-              <div className="text-base-content/30 text-6xl font-black">401</div>
-              <h1 className="card-title mt-2 text-xl">
-                {t('errors.page.unauthorized.title', 'Unauthorized')}
-              </h1>
-              <p className="text-base-content/60 text-sm">
-                {t('errors.page.unauthorized.message', 'You need to sign in to access this page.')}
-              </p>
-              <div className="card-actions mt-6">
-                <a className="btn btn-primary btn-sm" href={href('/login')}>
-                  {t('auth.signIn', 'Sign in')}
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      )
-    }
-
-    if (error.status === 403) {
-      return (
-        <div className="flex min-h-screen items-center justify-center p-4">
-          <div className="card bg-base-200 w-full max-w-md shadow-lg">
-            <div className="card-body items-center text-center">
-              <div className="text-base-content/30 text-6xl font-black">403</div>
-              <h1 className="card-title mt-2 text-xl">
-                {t('errors.page.forbidden.title', 'Access denied')}
-              </h1>
-              <p className="text-base-content/60 text-sm">
-                {t(
-                  'errors.page.forbidden.message',
-                  'You do not have permission to view this page.',
-                )}
-              </p>
-              <ErrorActions showTryAgain={false} />
-            </div>
-          </div>
-        </div>
-      )
-    }
-
-    if (error.status === 404) {
-      return (
-        <div className="flex min-h-screen items-center justify-center p-4">
-          <div className="card bg-base-200 w-full max-w-md shadow-lg">
-            <div className="card-body items-center text-center">
-              <div className="text-base-content/30 text-6xl font-black">404</div>
-              <h1 className="card-title mt-2 text-xl">
-                {t('errors.page.notFound.title', 'Page not found')}
-              </h1>
-              <p className="text-base-content/60 text-sm">
-                {t('errors.page.notFound.message', 'The page you are looking for does not exist.')}
-              </p>
-              <ErrorActions showTryAgain={false} />
-            </div>
-          </div>
-        </div>
-      )
-    }
-
-    return (
-      <div className="flex min-h-screen items-center justify-center p-4">
-        <div className="card bg-base-200 w-full max-w-md shadow-lg">
-          <div className="card-body items-center text-center">
-            <div className="text-base-content/30 text-6xl font-black">{error.status}</div>
-            <h1 className="card-title mt-2 text-xl">
-              {error.statusText || t('errors.page.generic.title', 'Something went wrong')}
-            </h1>
-            <p className="text-base-content/60 text-sm">
-              {error.data?.toString() ?? t('errors.page.generic.message', 'An error occurred.')}
-            </p>
-            <ErrorActions />
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      <div className="card bg-base-200 w-full max-w-lg shadow-lg">
-        <div className="card-body items-center text-center">
-          <div className="text-error/30 text-6xl font-black">!</div>
-          <h1 className="card-title mt-2 text-xl">
-            {t('errors.page.unexpected.title', 'Unexpected error')}
-          </h1>
-          <p className="text-base-content/60 text-sm">
-            {t(
-              'errors.page.unexpected.message',
-              'Something went wrong. Please try again or return to the home page.',
-            )}
-          </p>
-          {process.env.NODE_ENV === 'development' && error instanceof Error && (
-            <details className="collapse-arrow bg-base-300 collapse mt-4 w-full text-left">
-              <summary className="collapse-title text-sm font-medium">
-                {t('errors.page.details', 'Error details')}
-              </summary>
-              <div className="collapse-content">
-                <p className="text-error font-mono text-sm">{error.message}</p>
-                {error.stack && (
-                  <pre className="bg-base-100 mt-2 overflow-auto rounded-lg p-3 text-xs">
-                    {error.stack}
-                  </pre>
-                )}
-              </div>
-            </details>
-          )}
-          <ErrorActions />
-        </div>
-      </div>
-    </div>
+  const page = getErrorPage(error, process.env.NODE_ENV === 'development')
+  return page.kind === 'unexpected' ? (
+    <UnexpectedErrorCard details={page.details} />
+  ) : (
+    <StatusErrorCard page={page} />
   )
 }
 

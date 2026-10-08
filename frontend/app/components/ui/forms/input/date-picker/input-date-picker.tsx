@@ -31,6 +31,7 @@ import { CalendarPopover } from './calendar-popover'
 import { type DatePreset, PresetButton } from './preset-button'
 import { SegmentedDateInputConnected } from './segmented-date-input-connected'
 import { SegmentedTimeInputConnected } from './segmented-time-input-connected'
+import { getDatePickerLayout } from './shared/date-picker-layout'
 import { type ResetCheckValue, shouldShowResetButton } from './shared/reset-visibility'
 import {
   createDatePickerStore,
@@ -167,13 +168,40 @@ const DatePickerUI = ({
   withDate = true,
   withTime = true,
 }: DatePickerUIProperties) => {
-  const { t } = useTranslation('common')
   const { initialValue, setFromISOString } = useDatePickerStore()
+  const layout = getDatePickerLayout({ presetDate, presetIcon, presetLabel, withDate, withTime })
 
-  const preset: DatePreset | null =
-    presetDate && presetLabel && presetIcon ? { icon: presetIcon, label: presetLabel } : null
-  const isShowResetButton = shouldShowResetButton(initialValue.date, value)
+  useResetLabelAction(
+    shouldShowResetButton(initialValue.date, value),
+    resetToInitial,
+    onRenderLabelAction,
+  )
 
+  return (
+    <div className="flex w-full flex-col gap-2">
+      <div className="flex items-start gap-2">
+        {layout.showDate && (
+          <DateField
+            date={value.date}
+            onPresetClick={onPresetClick}
+            onSelect={setFromISOString}
+            preset={layout.datePreset}
+          />
+        )}
+        {layout.showSpacer && <div className="w-2" />}
+        {layout.showTime && <TimeField onPresetClick={onPresetClick} preset={layout.timePreset} />}
+      </div>
+    </div>
+  )
+}
+
+// Hands the reset button to the label of the form field, or null when the value is unchanged.
+const useResetLabelAction = (
+  isShowResetButton: boolean,
+  resetToInitial: () => void,
+  onRenderLabelAction?: (resetButton: React.ReactNode) => void,
+) => {
+  const { t } = useTranslation('common')
   const resetButtonElement = useMemo(
     () =>
       isShowResetButton ? (
@@ -195,31 +223,39 @@ const DatePickerUI = ({
   useEffect(() => {
     onRenderLabelAction?.(resetButtonElement)
   }, [resetButtonElement, onRenderLabelAction])
-
-  return (
-    <div className="flex w-full flex-col gap-2">
-      <div className="flex items-start gap-2">
-        {withDate && (
-          <div className="flex items-start gap-2">
-            <SegmentedDateInputConnected
-              afterSlot={
-                <>
-                  <CalendarPopover date={value.date} onSelect={setFromISOString} />
-                  {!withTime && preset && (
-                    <PresetButton compact onClick={onPresetClick} preset={preset} />
-                  )}
-                </>
-              }
-            />
-          </div>
-        )}
-        {withDate && withTime && <div className="w-2" />}
-        {withTime && (
-          <SegmentedTimeInputConnected
-            afterSlot={preset && <PresetButton onClick={onPresetClick} preset={preset} />}
-          />
-        )}
-      </div>
-    </div>
-  )
 }
+
+const DateField = ({
+  date,
+  onPresetClick,
+  onSelect,
+  preset,
+}: {
+  date: Date | null
+  onPresetClick: () => void
+  onSelect: (isoString: string) => void
+  preset: DatePreset | null
+}) => (
+  <div className="flex items-start gap-2">
+    <SegmentedDateInputConnected
+      afterSlot={
+        <>
+          <CalendarPopover date={date} onSelect={onSelect} />
+          {preset && <PresetButton compact onClick={onPresetClick} preset={preset} />}
+        </>
+      }
+    />
+  </div>
+)
+
+const TimeField = ({
+  onPresetClick,
+  preset,
+}: {
+  onPresetClick: () => void
+  preset: DatePreset | null
+}) => (
+  <SegmentedTimeInputConnected
+    afterSlot={preset && <PresetButton onClick={onPresetClick} preset={preset} />}
+  />
+)

@@ -31,10 +31,9 @@ import { InlineIcon } from '~/features/help/components/mdx/inline-icon'
 import { Note } from '~/features/help/components/mdx/note'
 import { Tip } from '~/features/help/components/mdx/tip'
 import { Warning } from '~/features/help/components/mdx/warning'
+import { fetchHelpCode, getHelpView } from '~/features/help/lib/help-content'
 import { routeToHelpFile } from '~/features/help/lib/route-to-help-file'
 import { useHelpStore } from '~/features/help/store/help-store'
-
-const FALLBACK_LOCALE = 'en'
 
 /** MDX components for styling help content */
 const mdxComponents = {
@@ -108,25 +107,12 @@ export const HelpDrawer = () => {
       setIsFallbackLanguage(false)
 
       try {
-        const helpFileName = customHelpFile ?? routeToHelpFile(location.pathname)
-        const locale = i18n.language
-
-        // Try user's locale first
-        let response = await fetch(`/api/help/${locale}/${helpFileName}`)
-
-        // Fallback to English if locale not found
-        if (!response.ok && locale !== FALLBACK_LOCALE) {
-          response = await fetch(`/api/help/${FALLBACK_LOCALE}/${helpFileName}`)
-          if (response.ok) {
-            setIsFallbackLanguage(true)
-          }
-        }
-
-        if (!response.ok) {
-          throw new Error('Help file not found')
-        }
-
-        const { code } = await response.json()
+        const { code, isFallbackLanguage: isFallback } = await fetchHelpCode(
+          fetch,
+          i18n.language,
+          customHelpFile ?? routeToHelpFile(location.pathname),
+        )
+        setIsFallbackLanguage(isFallback)
 
         // Run the compiled MDX code to get a React component
         const { default: MdxComponent } = await run(code, {
@@ -145,6 +131,8 @@ export const HelpDrawer = () => {
 
     void loadHelpContent()
   }, [isOpen, location.pathname, i18n.language, customHelpFile])
+
+  const view = getHelpView({ error, hasContent: !!mdxContent, isFallbackLanguage, loading })
 
   return (
     <Dialog.Root modal onOpenChange={handleOpenChange} open={isOpen}>
@@ -180,37 +168,12 @@ export const HelpDrawer = () => {
 
                   {/* Content */}
                   <div className="flex-1 overflow-y-auto px-8 py-6">
-                    {loading && (
-                      <div className="flex items-center justify-center py-12">
-                        <span className="loading loading-spinner loading-lg" />
-                      </div>
-                    )}
-
-                    {error && !loading && (
-                      <div className="alert alert-warning">
-                        <p>
-                          {t(
-                            'errors.helpNotAvailable',
-                            'Help content not available for this page.',
-                          )}
-                        </p>
-                      </div>
-                    )}
-
-                    {isFallbackLanguage && !loading && !error && (
-                      <div className="alert alert-info mb-4">
-                        <p>
-                          {t(
-                            'info.helpFallbackLanguage',
-                            'This help content is not available in your selected language yet. Showing English version.',
-                          )}
-                        </p>
-                      </div>
-                    )}
-
-                    {mdxContent && !loading && !error && (
-                      <div className="prose prose-sm max-w-none">{mdxContent}</div>
-                    )}
+                    <HelpStatus showError={view.showError} showSpinner={view.showSpinner} />
+                    <HelpArticle
+                      content={mdxContent}
+                      showContent={view.showContent}
+                      showFallbackNotice={view.showFallbackNotice}
+                    />
                   </div>
                 </div>
               </Dialog.Popup>
@@ -219,5 +182,52 @@ export const HelpDrawer = () => {
         </div>
       </Dialog.Portal>
     </Dialog.Root>
+  )
+}
+
+const HelpStatus = ({ showError, showSpinner }: { showError: boolean; showSpinner: boolean }) => {
+  const { t } = useTranslation('common')
+  return (
+    <>
+      {showSpinner && (
+        <div className="flex items-center justify-center py-12">
+          <span className="loading loading-spinner loading-lg" />
+        </div>
+      )}
+
+      {showError && (
+        <div className="alert alert-warning">
+          <p>{t('errors.helpNotAvailable', 'Help content not available for this page.')}</p>
+        </div>
+      )}
+    </>
+  )
+}
+
+const HelpArticle = ({
+  content,
+  showContent,
+  showFallbackNotice,
+}: {
+  content: React.ReactNode
+  showContent: boolean
+  showFallbackNotice: boolean
+}) => {
+  const { t } = useTranslation('common')
+  return (
+    <>
+      {showFallbackNotice && (
+        <div className="alert alert-info mb-4">
+          <p>
+            {t(
+              'info.helpFallbackLanguage',
+              'This help content is not available in your selected language yet. Showing English version.',
+            )}
+          </p>
+        </div>
+      )}
+
+      {showContent && <div className="prose prose-sm max-w-none">{content}</div>}
+    </>
   )
 }

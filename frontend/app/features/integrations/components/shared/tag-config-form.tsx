@@ -30,11 +30,14 @@ import {
   useExternalProjectMetadata,
 } from '~/features/integrations/hooks/use-external-project-metadata'
 import { type TagConfig } from '~/features/integrations/lib/mapping-helpers'
-import { type ImporterType } from '~/lib/utils/tag-helpers'
 import {
-  type ModelsExternalProject,
-  type ModelsGithubTagConfiguration,
-} from '~/services/api/lasius'
+  applyTagFields,
+  getSelectedTagFields,
+  getTagConfigFilters,
+  getTagFieldKeys,
+} from '~/features/integrations/lib/tag-config-fields'
+import { type ImporterType } from '~/lib/utils/tag-helpers'
+import { type ModelsExternalProject } from '~/services/api/lasius'
 
 type Properties = {
   externalProject: ModelsExternalProject
@@ -56,64 +59,31 @@ export const TagConfigForm = ({
   const { availableLabels, availableStates } = metadata
 
   const tagFieldOptions: MultiSelectOption[] = useMemo(() => {
-    const options: MultiSelectOption[] = [
-      {
-        label: t('issueImporters.tagConfiguration.useTitle', {
-          defaultValue: 'Use issue title as tag',
-        }),
-        value: 'useTitle',
-      },
-      {
-        label: t('issueImporters.tagConfiguration.useLabels', {
-          defaultValue: 'Use labels as tags',
-        }),
-        value: 'useLabels',
-      },
-      {
-        label: t('issueImporters.tagConfiguration.useMilestone', {
-          defaultValue: 'Use milestone as tag',
-        }),
-        value: 'useMilestone',
-      },
-    ]
-
-    if (importerType === 'github') {
-      options.push({
-        label: t('issueImporters.tagConfiguration.useAssignees', {
-          defaultValue: 'Use assignees as tags',
-        }),
-        value: 'useAssignees',
-      })
+    const labels = {
+      useAssignees: t('issueImporters.tagConfiguration.useAssignees', {
+        defaultValue: 'Use assignees as tags',
+      }),
+      useLabels: t('issueImporters.tagConfiguration.useLabels', {
+        defaultValue: 'Use labels as tags',
+      }),
+      useMilestone: t('issueImporters.tagConfiguration.useMilestone', {
+        defaultValue: 'Use milestone as tag',
+      }),
+      useTitle: t('issueImporters.tagConfiguration.useTitle', {
+        defaultValue: 'Use issue title as tag',
+      }),
     }
-
-    return options
+    return getTagFieldKeys(importerType).map((field) => ({ label: labels[field], value: field }))
   }, [importerType, t])
 
-  const selectedTagFields = useMemo(() => {
-    const selected: string[] = []
-    if (value.useTitle) selected.push('useTitle')
-    if (value.useLabels) selected.push('useLabels')
-    if (value.useMilestone) selected.push('useMilestone')
-    if (importerType === 'github' && (value as ModelsGithubTagConfiguration).useAssignees) {
-      selected.push('useAssignees')
-    }
-    return selected
-  }, [value, importerType])
+  const selectedTagFields = useMemo(
+    () => getSelectedTagFields(value, importerType),
+    [value, importerType],
+  )
 
   const handleTagFieldsChange = (selectedValues: string[]) => {
-    if (selectedValues.length === 0) {
-      return
-    }
-
-    onChange({
-      ...value,
-      useLabels: selectedValues.includes('useLabels'),
-      useMilestone: selectedValues.includes('useMilestone'),
-      useTitle: selectedValues.includes('useTitle'),
-      ...(importerType === 'github' && {
-        useAssignees: selectedValues.includes('useAssignees'),
-      }),
-    } satisfies TagConfig)
+    const next = applyTagFields(value, selectedValues, importerType)
+    if (next) onChange(next)
   }
 
   const labelOptions: MultiSelectOption[] = useMemo(
@@ -125,6 +95,8 @@ export const TagConfigForm = ({
     () => availableStates.map((state) => ({ label: state, value: state })),
     [availableStates],
   )
+
+  const filters = getTagConfigFilters(value, selectedTagFields)
 
   return (
     <FormBody>
@@ -156,113 +128,141 @@ export const TagConfigForm = ({
         onRetry={metadata.reload}
       />
 
-      {selectedTagFields.includes('useLabels') && 'labelFilter' in value && (
-        <FormElement
-          htmlFor="label-filter-select"
-          label={t('issueImporters.tagConfiguration.labelFilterLabel', {
-            defaultValue: 'Import only specific labels',
-          })}>
-          <MultiSelect
-            disabled={availableLabels.length === 0}
-            id="label-filter-select"
-            onChange={(selectedLabels) =>
-              onChange({
-                ...value,
-                labelFilter: selectedLabels,
-              })
-            }
-            options={labelOptions}
-            placeholder={t('issueImporters.tagConfiguration.labelFilterPlaceholder', {
-              defaultValue: 'All labels (or select specific labels...)',
-            })}
-            value={value.labelFilter || []}
-          />
-          <p className="text-base-content/60 text-xs">
-            {t('issueImporters.tagConfiguration.labelFilterHelp', {
-              defaultValue:
-                'Leave empty to import all labels, or select specific labels to import only those.',
-            })}
-          </p>
-        </FormElement>
-      )}
+      <LabelFilterField
+        help={t('issueImporters.tagConfiguration.labelFilterHelp', {
+          defaultValue:
+            'Leave empty to import all labels, or select specific labels to import only those.',
+        })}
+        id="label-filter-select"
+        label={t('issueImporters.tagConfiguration.labelFilterLabel', {
+          defaultValue: 'Import only specific labels',
+        })}
+        onChange={(selectedLabels) => onChange({ ...value, labelFilter: selectedLabels })}
+        options={labelOptions}
+        placeholder={t('issueImporters.tagConfiguration.labelFilterPlaceholder', {
+          defaultValue: 'All labels (or select specific labels...)',
+        })}
+        value={filters.labelFilter}
+      />
 
-      {'includeOnlyIssuesWithLabels' in value && (
-        <FormElement
-          htmlFor="issue-label-filter-select"
-          label={t('issueImporters.tagConfiguration.issueLabelFilterLabel', {
-            defaultValue: 'Import only issues with specific labels',
-          })}>
-          <MultiSelect
-            disabled={availableLabels.length === 0}
-            id="issue-label-filter-select"
-            onChange={(selectedLabels) =>
-              onChange({
-                ...value,
-                includeOnlyIssuesWithLabels: selectedLabels,
-              })
-            }
-            options={labelOptions}
-            placeholder={t('issueImporters.tagConfiguration.issueLabelFilterPlaceholder', {
-              defaultValue: 'All issues (or select labels to filter...)',
-            })}
-            value={value.includeOnlyIssuesWithLabels || []}
-          />
-          <p className="text-base-content/60 text-xs">
-            {t('issueImporters.tagConfiguration.issueLabelFilterHelp', {
-              defaultValue:
-                'Leave empty to import all issues, or select labels to import only issues that have at least one of these labels.',
-            })}
-          </p>
-        </FormElement>
-      )}
+      <LabelFilterField
+        help={t('issueImporters.tagConfiguration.issueLabelFilterHelp', {
+          defaultValue:
+            'Leave empty to import all issues, or select labels to import only issues that have at least one of these labels.',
+        })}
+        id="issue-label-filter-select"
+        label={t('issueImporters.tagConfiguration.issueLabelFilterLabel', {
+          defaultValue: 'Import only issues with specific labels',
+        })}
+        onChange={(selectedLabels) =>
+          onChange({ ...value, includeOnlyIssuesWithLabels: selectedLabels })
+        }
+        options={labelOptions}
+        placeholder={t('issueImporters.tagConfiguration.issueLabelFilterPlaceholder', {
+          defaultValue: 'All issues (or select labels to filter...)',
+        })}
+        value={filters.issueLabels}
+      />
 
-      {'includeOnlyIssuesWithState' in value && (
-        <FormElement
-          htmlFor="issue-state-filter-select"
-          label={t('issueImporters.tagConfiguration.issueStateFilterLabel', {
-            defaultValue: 'Import only issues with specific states',
-          })}>
-          {importerType === 'plane' ? (
-            <MultiSelect
-              disabled={availableStates.length === 0}
-              id="issue-state-filter-select"
-              onChange={(selectedStates) =>
-                onChange({
-                  ...value,
-                  includeOnlyIssuesWithState: selectedStates,
-                })
-              }
-              options={stateOptions}
-              placeholder={t('issueImporters.tagConfiguration.issueStateFilterPlaceholder', {
-                defaultValue: 'All states (or select specific states...)',
-              })}
-              value={value.includeOnlyIssuesWithState || []}
-            />
-          ) : (
-            <Select
-              disabled={availableStates.length === 0}
-              id="issue-state-filter-select"
-              onChange={(selectedState) =>
-                onChange({
-                  ...value,
-                  includeOnlyIssuesWithState: selectedState ? [selectedState] : [],
-                })
-              }
-              options={stateOptions}
-              placeholder={t('issueImporters.tagConfiguration.issueStateFilterPlaceholder', {
-                defaultValue: 'All states (or select specific states...)',
-              })}
-              value={value.includeOnlyIssuesWithState?.[0] || ''}
-            />
-          )}
-          <p className="text-base-content/60 text-xs">
-            {t('issueImporters.tagConfiguration.issueStateFilterHelp', {
-              defaultValue:
-                'Leave empty to import all issues, or select states to import only issues in those states.',
-            })}
-          </p>
-        </FormElement>
-      )}
+      <IssueStateFilterField
+        importerType={importerType}
+        onChange={(selectedStates) =>
+          onChange({ ...value, includeOnlyIssuesWithState: selectedStates })
+        }
+        options={stateOptions}
+        value={filters.issueStates}
+      />
     </FormBody>
+  )
+}
+
+type LabelFilterFieldProperties = {
+  help: string
+  id: string
+  label: string
+  onChange: (selectedLabels: string[]) => void
+  options: MultiSelectOption[]
+  placeholder: string
+  /** Null hides the field, because the config has no such filter. */
+  value: null | string[]
+}
+
+const LabelFilterField = ({
+  help,
+  id,
+  label,
+  onChange,
+  options,
+  placeholder,
+  value,
+}: LabelFilterFieldProperties) => {
+  if (!value) return null
+  return (
+    <FormElement htmlFor={id} label={label}>
+      <MultiSelect
+        disabled={options.length === 0}
+        id={id}
+        onChange={onChange}
+        options={options}
+        placeholder={placeholder}
+        value={value}
+      />
+      <p className="text-base-content/60 text-xs">{help}</p>
+    </FormElement>
+  )
+}
+
+type IssueStateFilterFieldProperties = {
+  importerType: ImporterType
+  onChange: (selectedStates: string[]) => void
+  options: (MultiSelectOption | SelectOption)[]
+  /** Null hides the field, because the config has no such filter. */
+  value: null | string[]
+}
+
+// Plane filters by several states. The other platforms filter by one state.
+const IssueStateFilterField = ({
+  importerType,
+  onChange,
+  options,
+  value,
+}: IssueStateFilterFieldProperties) => {
+  const { t } = useTranslation('integrations')
+  if (!value) return null
+  const placeholder = t('issueImporters.tagConfiguration.issueStateFilterPlaceholder', {
+    defaultValue: 'All states (or select specific states...)',
+  })
+  return (
+    <FormElement
+      htmlFor="issue-state-filter-select"
+      label={t('issueImporters.tagConfiguration.issueStateFilterLabel', {
+        defaultValue: 'Import only issues with specific states',
+      })}>
+      {importerType === 'plane' ? (
+        <MultiSelect
+          disabled={options.length === 0}
+          id="issue-state-filter-select"
+          onChange={onChange}
+          options={options}
+          placeholder={placeholder}
+          value={value}
+        />
+      ) : (
+        <Select
+          disabled={options.length === 0}
+          id="issue-state-filter-select"
+          onChange={(selectedState) => onChange(selectedState ? [selectedState] : [])}
+          options={options}
+          placeholder={placeholder}
+          value={value[0] || ''}
+        />
+      )}
+      <p className="text-base-content/60 text-xs">
+        {t('issueImporters.tagConfiguration.issueStateFilterHelp', {
+          defaultValue:
+            'Leave empty to import all issues, or select states to import only issues in those states.',
+        })}
+      </p>
+    </FormElement>
   )
 }

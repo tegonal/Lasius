@@ -35,6 +35,7 @@ import { FormElement } from '~/components/ui/forms/form-element'
 import { FormElementSpacer } from '~/components/ui/forms/form-element-spacer'
 import { preventEnterOnForm } from '~/components/ui/forms/input/prevent-enter-on-form'
 import { useGuardedSubmit } from '~/features/settings/hooks/use-guarded-submit'
+import { getAccountFields } from '~/features/settings/lib/account-fields'
 import { useLayoutLoaderData } from '~/hooks/use-layout-loader-data'
 import { type SchemaTranslationFunction, untyped } from '~/lib/i18n-types'
 import { useUpdateUserProfile } from '~/services/api/lasius-hooks/user/user'
@@ -59,8 +60,7 @@ interface AccountFormProperties {
 
 export const AccountForm = ({ demoMode }: AccountFormProperties) => {
   const { t } = useTranslation('settings')
-  const layoutData = useLayoutLoaderData()
-  const user = layoutData?.user
+  const account = getAccountFields(useLayoutLoaderData()?.user)
   const { addToast } = useToast()
 
   const profileApi = useUpdateUserProfile({
@@ -83,10 +83,7 @@ export const AccountForm = ({ demoMode }: AccountFormProperties) => {
 
   const [form, fields] = useForm({
     constraint: getZodConstraint(schema),
-    defaultValue: {
-      firstName: user?.firstName ?? '',
-      lastName: user?.lastName ?? '',
-    },
+    defaultValue: { firstName: account.firstName, lastName: account.lastName },
     onSubmit,
     onValidate({ formData }) {
       return parseWithZod(formData, { schema })
@@ -113,7 +110,7 @@ export const AccountForm = ({ demoMode }: AccountFormProperties) => {
               <FormBody>
                 <FieldSet>
                   <FormElement htmlFor="role" label={t('forms.role', 'Role')}>
-                    <Input disabled id="role" readOnly tabIndex={-1} value={user?.role || ''} />
+                    <Input disabled id="role" readOnly tabIndex={-1} value={account.role} />
                   </FormElement>
                   <FormField
                     autoComplete="given-name"
@@ -130,7 +127,7 @@ export const AccountForm = ({ demoMode }: AccountFormProperties) => {
                   <FormElementSpacer />
                   {/* The backend finds the user by this email at sign-in, so it refuses a change. */}
                   <FormElement htmlFor="email" label={t('forms.email', 'Email')}>
-                    <Input disabled id="email" readOnly tabIndex={-1} value={user?.email ?? ''} />
+                    <Input disabled id="email" readOnly tabIndex={-1} value={account.email} />
                   </FormElement>
                 </FieldSet>
                 <ButtonGroup className="justify-end">

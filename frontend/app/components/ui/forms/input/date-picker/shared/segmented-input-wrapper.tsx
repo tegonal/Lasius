@@ -24,6 +24,8 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 
+import { getArrowVisibilityClasses } from './segmented-input-classes'
+
 type SegmentedInputWrapperProperties = {
   children: React.ReactElement
   hasSelection: boolean
@@ -40,6 +42,7 @@ export const SegmentedInputWrapper = ({
   const { t } = useTranslation('common')
   const [isHovered, setIsHovered] = useState(false)
   const containerReference = useRef<HTMLDivElement>(null)
+  const classes = getArrowVisibilityClasses(hasSelection || isHovered)
 
   return (
     <div
@@ -49,11 +52,7 @@ export const SegmentedInputWrapper = ({
       ref={containerReference}>
       {/* Up Arrow - positioned above input */}
       <div
-        className={`absolute -top-6 right-0 left-0 flex justify-center transition-opacity ${
-          hasSelection || isHovered
-            ? 'opacity-60 hover:opacity-100'
-            : 'pointer-events-none opacity-0'
-        }`}>
+        className={`absolute -top-6 right-0 left-0 flex justify-center transition-opacity ${classes.up}`}>
         <Button
           aria-label={t('aria.increment', 'Increment')}
           className="cursor-pointer rounded-t-full rounded-b-none"
@@ -71,14 +70,10 @@ export const SegmentedInputWrapper = ({
       <div className="join">{children}</div>
       {/* Down Arrow - positioned below input */}
       <div
-        className={`absolute right-0 -bottom-10 left-0 flex flex-col items-center ${
-          hasSelection || isHovered ? '' : 'pointer-events-none'
-        }`}>
+        className={`absolute right-0 -bottom-10 left-0 flex flex-col items-center ${classes.downContainer}`}>
         <Button
           aria-label={t('aria.decrement', 'Decrement')}
-          className={`cursor-pointer rounded-t-none rounded-b-full transition-opacity ${
-            hasSelection || isHovered ? 'opacity-60 hover:opacity-100' : 'opacity-0'
-          }`}
+          className={`cursor-pointer rounded-t-none rounded-b-full transition-opacity ${classes.downButton}`}
           onMouseDown={(event) => {
             event.preventDefault()
             onArrowClick('down')
@@ -91,9 +86,7 @@ export const SegmentedInputWrapper = ({
         </Button>
         {label && (
           <span
-            className={`text-base-content/60 mt-1 text-xs whitespace-nowrap transition-opacity ${
-              hasSelection || isHovered ? 'opacity-100' : 'opacity-0'
-            }`}>
+            className={`text-base-content/60 mt-1 text-xs whitespace-nowrap transition-opacity ${classes.label}`}>
             {label}
           </span>
         )}
