@@ -46,6 +46,7 @@ const LazyHelpDrawer = lazy(async () => {
 import { localeCookie } from '~/lib/cookies/i18next-cookie.server'
 import { parseThemeCookie } from '~/lib/cookies/theme-cookie.server'
 import { logger } from '~/lib/logger'
+import { DEFAULT_TIME_ZONE } from '~/lib/utils/time-zone'
 import { getLocale, i18nextMiddleware } from '~/middleware/i18next'
 import { legacyAuthCookieMiddleware } from '~/middleware/legacy-auth-cookies'
 
@@ -283,7 +284,8 @@ const themeInitScript = `
 
 /**
  * Inline script that writes the IANA time zone of the browser to the `tz` cookie.
- * Server loaders read it with getUserClock(), so "today" is the day of the user.
+ * Server loaders read it with getUserClock(), so "today" is the day of the user. When the server
+ * rendered this page in another zone, the script reloads it once, before hydration.
  */
 const timeZoneInitScript = `
 (function() {
@@ -291,11 +293,18 @@ const timeZoneInitScript = `
     var zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     if (!zone) return;
     var expected = 'tz=' + encodeURIComponent(zone);
+    var serverZone = ${JSON.stringify(DEFAULT_TIME_ZONE)};
     var cookies = document.cookie.split(';');
     for (var i = 0; i < cookies.length; i++) {
-      if (cookies[i].trim() === expected) return;
+      var c = cookies[i].trim();
+      if (c === expected) return;
+      if (c.indexOf('tz=') === 0) serverZone = decodeURIComponent(c.substring(3));
     }
     document.cookie = expected + ';path=/;max-age=31536000;samesite=lax' + (location.protocol === 'https:' ? ';secure' : '');
+    if (serverZone === zone || document.cookie.split(';').map(function(x) { return x.trim(); }).indexOf(expected) === -1) return;
+    if (sessionStorage.getItem('lasius:tz-reload') === zone) return;
+    sessionStorage.setItem('lasius:tz-reload', zone);
+    location.reload();
   } catch (e) {}
 })();
 `

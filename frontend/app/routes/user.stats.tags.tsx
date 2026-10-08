@@ -44,9 +44,9 @@ clientLoader.hydrate = false
 
 export const loader = async ({ request, url }: Route.LoaderArgs) => {
   const context = await loadStatsContext(request, url)
-  const { from, headers, selectedOrgId, to } = context
+  const { from, headers, selectedOrgId, to, today } = context
 
-  const granularity = getAdaptiveGranularity(from, to)
+  const granularity = getAdaptiveGranularity(from, to, today)
 
   // Compute API params
   const datespan = apiDatespanFromTo(from, to)

@@ -17,6 +17,7 @@
  *
  */
 
+import { format } from 'date-fns'
 import { formatInTimeZone, fromZonedTime, toZonedTime } from 'date-fns-tz'
 
 import { formatDateToURLParameter } from '~/lib/utils/dates'
@@ -49,8 +50,11 @@ export type UserClock = {
 export const createUserClock = (timeZone: string, instant: Date = new Date()): UserClock => {
   const now = toZonedTime(instant, timeZone)
   return {
+    // The wall time stays as written. A midnight that a DST change skips, as in America/Santiago,
+    // would otherwise move to 23:00 of the day before.
     formatISO: (wallTime) =>
-      formatInTimeZone(fromZonedTime(wallTime, timeZone), timeZone, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"),
+      format(wallTime, "yyyy-MM-dd'T'HH:mm:ss.SSS") +
+      formatInTimeZone(fromZonedTime(wallTime, timeZone), timeZone, 'xxx'),
     now,
     today: formatDateToURLParameter(now),
   }

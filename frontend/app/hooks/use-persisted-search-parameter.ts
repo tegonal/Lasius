@@ -20,12 +20,15 @@
 import { useEffect } from 'react'
 import { useSearchParams } from 'react-router'
 
+import { nextPersistedParameter, readPersistedParameter } from '~/lib/utils/persisted-parameter'
+
 const STORAGE_PREFIX = 'lasius:'
 
 /**
  * Syncs a URL search param to localStorage.
  *
- * - On mount: if the search param is missing, restores it from localStorage.
+ * - On mount: if the search param is missing, restores it from localStorage. The stored value
+ *   counts only while the fallback is unchanged, so a date selection lasts until the next day.
  * - On change: persists the search param value to localStorage.
  *
  * @param key - The search param name (also used as localStorage key with prefix)
@@ -41,8 +44,8 @@ export const usePersistedSearchParameter = (key: string, fallback: string): stri
   useEffect(() => {
     if (parameterValue) return
 
-    const stored = globalThis.window === undefined ? null : localStorage.getItem(storageKey)
-    const valueToSet = stored || fallback
+    const raw = globalThis.window === undefined ? null : localStorage.getItem(storageKey)
+    const valueToSet = readPersistedParameter(raw, fallback) ?? fallback
 
     setSearchParameters(
       (previous) => {
@@ -53,12 +56,12 @@ export const usePersistedSearchParameter = (key: string, fallback: string): stri
     )
   }, []) // eslint-disable-line react-hooks/exhaustive-deps -- intentionally runs once on mount
 
-  // On change: persist to localStorage
+  // On change: persist to localStorage. An unchanged value keeps its stored fallback.
   useEffect(() => {
-    if (parameterValue && globalThis.window !== undefined) {
-      localStorage.setItem(storageKey, parameterValue)
-    }
-  }, [parameterValue, storageKey])
+    if (!parameterValue || globalThis.window === undefined) return
+    const next = nextPersistedParameter(localStorage.getItem(storageKey), parameterValue, fallback)
+    if (next) localStorage.setItem(storageKey, next)
+  }, [fallback, parameterValue, storageKey])
 
   return parameterValue || fallback
 }

@@ -28,6 +28,7 @@ import {
   endOfQuarter,
   endOfWeek,
   endOfYear,
+  isSameDay,
   startOfDay,
   startOfMonth,
   startOfQuarter,
@@ -36,7 +37,17 @@ import {
 } from 'date-fns'
 
 import { type SchemaTranslationFunction } from '~/lib/i18n-types'
-import { formatISOLocale } from '~/lib/utils/dates'
+import { formatISOLocale, toCalendarDay } from '~/lib/utils/dates'
+
+type DateRange = { from: string; to: string }
+
+/**
+ * Compares two ranges by their calendar days. The server and the browser write a range bound with
+ * different offsets, and on a DST change at midnight also with a different time.
+ */
+export const isSameDateRange = (a: DateRange, b: DateRange): boolean =>
+  isSameDay(toCalendarDay(a.from), toCalendarDay(b.from)) &&
+  isSameDay(toCalendarDay(a.to), toCalendarDay(b.to))
 
 export interface DateOption {
   // A server loader passes the user clock: `day` holds the user's wall time, and formatDate adds

@@ -31,18 +31,19 @@ export const loadStatsContext = async (request: Request, url: URL) => {
   const { auth, headers, selectedOrgId, user } = await loadOrganisationContext(request, url)
   const organisations = user.organisations ?? []
 
+  const clock = getUserClock(request)
+
   // Read date range from URL search params or compute defaults
   let from = url.searchParams.get('from')
   let to = url.searchParams.get('to')
 
   if (!from || !to) {
-    const clock = getUserClock(request)
     const defaultRange = dateOptions[0]?.dateRangeFn(clock.now, clock.formatISO)
     from = defaultRange?.from ?? ''
     to = defaultRange?.to ?? ''
   }
 
-  return { auth, from, headers, organisations, selectedOrgId, to }
+  return { auth, from, headers, organisations, selectedOrgId, to, today: clock.now }
 }
 
 /**

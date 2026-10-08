@@ -20,7 +20,7 @@
 import { startOfDay } from 'date-fns'
 import { describe, expect, it } from 'vitest'
 
-import { dateOptions } from '~/lib/utils/date/date-options'
+import { dateOptions, isSameDateRange } from '~/lib/utils/date/date-options'
 import { formatISOLocale } from '~/lib/utils/dates'
 
 import { createUserClock, isValidTimeZone } from './time-zone'
@@ -62,6 +62,36 @@ describe('createUserClock', () => {
     const processZone = new Intl.DateTimeFormat().resolvedOptions().timeZone
     const clock = createUserClock(processZone, instant)
     expect(clock.formatISO(startOfDay(clock.now))).toBe(formatISOLocale(startOfDay(instant)))
+  })
+})
+
+describe('a DST change at midnight', () => {
+  // America/Santiago skips 00:00 on 6 September 2026. 12:00 UTC is 09:00 there.
+  const santiago = createUserClock('America/Santiago', new Date('2026-09-06T12:00:00.000Z'))
+
+  it('keeps the written day of a skipped midnight', () => {
+    expect(santiago.formatISO(startOfDay(santiago.now)).slice(0, 10)).toBe('2026-09-06')
+  })
+
+  it('marks the same range as the browser in that zone', () => {
+    const range = dateOptions
+      .find((o) => o.name === 'Custom')
+      ?.dateRangeFn(santiago.now, santiago.formatISO)
+    // The browser in Santiago writes the skipped midnight as 01:00 with the summer offset.
+    const browserRange = {
+      from: '2026-09-06T01:00:00.000-03:00',
+      to: '2026-09-06T23:59:59.999-03:00',
+    }
+    expect(range && isSameDateRange(range, browserRange)).toBe(true)
+  })
+})
+
+describe('isSameDateRange', () => {
+  it('compares the calendar days, not the offsets', () => {
+    const zurich = { from: '2026-10-07T00:00:00.000+02:00', to: '2026-10-07T23:59:59.999+02:00' }
+    expect(isSameDateRange(zurich, { from: '2026-10-07', to: '2026-10-07' })).toBe(true)
+    expect(isSameDateRange(zurich, { from: '2026-10-06', to: '2026-10-07' })).toBe(false)
+    expect(isSameDateRange(zurich, { from: '2026-10-07', to: '2026-10-08' })).toBe(false)
   })
 })
 

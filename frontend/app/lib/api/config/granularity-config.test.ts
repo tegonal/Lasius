@@ -60,6 +60,34 @@ describe('granularity by past days', () => {
   })
 })
 
+describe('granularity with the user clock', () => {
+  // The server runs in Zurich. A user in Tokyo has 15 past days, a user in Los Angeles 14.
+  const tokyoToday = new Date(2026, 9, 16, 9, 0)
+  const losAngelesToday = new Date(2026, 9, 15, 17, 0)
+
+  it('counts the days up to today of the user', () => {
+    expect(getAdaptiveGranularity('2026-10-01', '2026-10-31', tokyoToday)).toBe('Week')
+    expect(getAdaptiveGranularity('2026-10-01', '2026-10-31', losAngelesToday)).toBe('Day')
+  })
+
+  it('reads a range bound with an offset as its written day', () => {
+    expect(
+      getAdaptiveGranularity(
+        '2026-10-01T00:00:00.000+09:00',
+        '2026-10-31T23:59:59.999+09:00',
+        tokyoToday,
+      ),
+    ).toBe('Week')
+    expect(
+      shouldUseBarChart(
+        '2026-10-14T00:00:00.000-07:00',
+        '2026-10-31T23:59:59.999-07:00',
+        losAngelesToday,
+      ),
+    ).toBe(true)
+  })
+})
+
 describe('getCategoryLabel', () => {
   const category = { day: 5, month: 10, week: 41, year: 2026 }
 

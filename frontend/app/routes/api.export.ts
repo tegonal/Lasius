@@ -24,6 +24,7 @@ import { getAdaptiveGranularity, type Granularity } from '~/lib/api/config/granu
 import { filterModelsBookingListByTags } from '~/lib/api/functions/filter-models-booking-list-by-tags'
 import { filterModelsBookingListProjectId } from '~/lib/api/functions/filter-models-booking-list-project-id'
 import { filterModelsBookingListUserId } from '~/lib/api/functions/filter-models-booking-list-user-id'
+import { getUserClock } from '~/lib/cookies/time-zone-cookie.server'
 import { logger } from '~/lib/logger'
 import { exportBookingList, type ExportFormat } from '~/lib/utils/data/export'
 import { apiTimespanFromTo, toCalendarDay } from '~/lib/utils/dates'
@@ -79,7 +80,11 @@ const contentTypeMap: Record<ExportFormat, string> = {
  */
 export async function loader({ request, url }: Route.LoaderArgs) {
   const auth = await requireUser(request, url)
-  const response = await createExportResponse(url, authHeaders(auth.session))
+  const response = await createExportResponse(
+    url,
+    authHeaders(auth.session),
+    getUserClock(request).now,
+  )
 
   const sessionCookie = mergeAuthHeaders(auth).get('Set-Cookie')
   if (sessionCookie) {
@@ -192,7 +197,11 @@ export async function handleBookingsExport(
   })
 }
 
-async function createExportResponse(url: URL, headers: HeadersInit): Promise<Response> {
+async function createExportResponse(
+  url: URL,
+  headers: HeadersInit,
+  today: Date,
+): Promise<Response> {
   const parsed = parseExportParameters(url.searchParams)
   if (!parsed.ok) {
     return new Response(parsed.error, { status: 400 })
@@ -202,7 +211,7 @@ async function createExportResponse(url: URL, headers: HeadersInit): Promise<Res
   try {
     return parameters.type === 'bookings'
       ? await handleBookingsExport({ ...parameters, headers })
-      : await handleStatisticsExport({ ...parameters, headers })
+      : await handleStatisticsExport({ ...parameters, headers, today })
   } catch (error) {
     logger.error('Export failed', error)
     return new Response('Export failed', { status: 500 })
@@ -210,7 +219,7 @@ async function createExportResponse(url: URL, headers: HeadersInit): Promise<Res
 }
 
 async function handleStatisticsExport(
-  parameters: StatisticsExportParameters & { headers: HeadersInit },
+  parameters: StatisticsExportParameters & { headers: HeadersInit; today: Date },
 ) {
   const {
     format: exportFormat,
@@ -219,12 +228,13 @@ async function handleStatisticsExport(
     orgId,
     scope,
     to,
+    today,
     totalBookings,
     totalHours,
     totalProjects,
     totalUsers,
   } = parameters
-  const granularity = getAdaptiveGranularity(from, to)
+  const granularity = getAdaptiveGranularity(from, to, today)
   const apiFrom = formatDateParameter(from)
   const apiTo = formatDateParameterEnd(to)
 

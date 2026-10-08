@@ -26,7 +26,7 @@ import { FormElement } from '~/components/ui/forms/form-element'
 import { InputDatePicker } from '~/components/ui/forms/input/date-picker/input-date-picker'
 import { Select, type SelectOption } from '~/components/ui/forms/input/select'
 import { untyped } from '~/lib/i18n-types'
-import { dateOptions } from '~/lib/utils/date/date-options'
+import { dateOptions, isSameDateRange } from '~/lib/utils/date/date-options'
 
 export type DateRangeFilterProperties = {
   fromField: FieldMetadata<string>
@@ -67,8 +67,10 @@ export const DateRangeFilter = ({ fromField, rangeField, toField }: DateRangeFil
     const today = new Date()
     const option = dateOptions.find((opt) => {
       if (!opt.dateRangeFn) return true
-      const dateRange = opt.dateRangeFn(today)
-      return dateRange.from === fromControl.value && dateRange.to === toControl.value
+      return isSameDateRange(opt.dateRangeFn(today), {
+        from: fromControl.value ?? '',
+        to: toControl.value ?? '',
+      })
     })
 
     if (option && rangeControl.value !== option.name) {

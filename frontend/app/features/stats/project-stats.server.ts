@@ -90,7 +90,7 @@ export const loadProjectStats = async (
     scope === 'organisation'
       ? await loadOrgStatsContext(request, url)
       : await loadStatsContext(request, url)
-  const { auth, from, headers, organisations, selectedOrgId, to } = context
+  const { auth, from, headers, organisations, selectedOrgId, to, today } = context
 
   // An organisation switch reloads this page with a project of the previous organisation.
   const project = findProjectInProfile(organisations, selectedOrgId, params.projectId ?? '')
@@ -99,7 +99,7 @@ export const loadProjectStats = async (
   }
 
   const view = getProjectStatsView(url.searchParams)
-  const granularity = getAdaptiveGranularity(from, to)
+  const granularity = getAdaptiveGranularity(from, to, today)
   const { aggregated, bookings, byPeriod } = await fetchProjectData({
     from,
     granularity,
@@ -120,7 +120,7 @@ export const loadProjectStats = async (
       project,
       scope,
       to,
-      useBarChart: shouldUseBarChart(from, to),
+      useBarChart: shouldUseBarChart(from, to, today),
       view,
     },
     { headers: statsResponseHeaders(auth) },

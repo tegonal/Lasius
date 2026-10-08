@@ -17,32 +17,36 @@
  *
  */
 
-import { differenceInCalendarDays } from 'date-fns'
+import { differenceInCalendarDays, min, startOfDay } from 'date-fns'
 
+import { toCalendarDay } from '~/lib/utils/dates'
 import { type ModelsBookingStatsCategory } from '~/services/api/lasius'
 
 export type Granularity = 'Day' | 'Month' | 'Week' | 'Year'
 
-// Counts the days from `from` up to `to` or today, whichever comes first.
-// Returns null when the range starts in the future.
-const countPastDays = (from: string, to: string): null | number => {
-  const today = new Date()
-  const fromDate = new Date(from)
+// Counts the calendar days from `from` up to `to` or today, whichever comes first.
+// Returns null when the range starts after today. A server loader passes the user clock as `today`.
+const countPastDays = (from: string, to: string, today: Date): null | number => {
+  const fromDay = toCalendarDay(from)
+  const todayDay = startOfDay(today)
 
-  if (fromDate > today) {
+  if (fromDay > todayDay) {
     return null
   }
 
-  const effectiveToDate = Math.min(new Date(to).getTime(), today.getTime())
-  return differenceInCalendarDays(effectiveToDate, fromDate)
+  return differenceInCalendarDays(min([toCalendarDay(to), todayDay]), fromDay)
 }
 
 /**
  * Determines the appropriate granularity based on the date range.
  * Only counts days in the past (up to today), future days are ignored.
  */
-export const getAdaptiveGranularity = (from: string, to: string): Granularity => {
-  const days = countPastDays(from, to)
+export const getAdaptiveGranularity = (
+  from: string,
+  to: string,
+  today: Date = new Date(),
+): Granularity => {
+  const days = countPastDays(from, to, today)
 
   if (days === null || days <= 14) {
     return 'Day'
@@ -60,8 +64,8 @@ export const getAdaptiveGranularity = (from: string, to: string): Granularity =>
  * Determines if bar chart should be used instead of stream chart.
  * Bar charts are better for very short time periods (<=2 past days).
  */
-export const shouldUseBarChart = (from: string, to: string): boolean => {
-  const days = countPastDays(from, to)
+export const shouldUseBarChart = (from: string, to: string, today: Date = new Date()): boolean => {
+  const days = countPastDays(from, to, today)
   return days === null || days <= 2
 }
 
