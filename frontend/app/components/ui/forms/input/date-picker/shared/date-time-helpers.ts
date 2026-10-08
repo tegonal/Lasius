@@ -109,3 +109,16 @@ function parseFirstValid(value: string, formats: string[]): Date | null {
   }
   return null
 }
+
+/**
+ * The value that the picker sends to its parent, or null for no update. A complete valid entry
+ * sends its ISO string. An empty date and an empty time send an empty text.
+ */
+export const getParentValue = (
+  value: { dateString: string; isPartial: boolean; isValid: boolean; timeString: string },
+  isoString: null | string,
+): null | string => {
+  if (value.isValid && !value.isPartial) return isoString || null
+  if (!value.dateString && !value.timeString) return ''
+  return null
+}

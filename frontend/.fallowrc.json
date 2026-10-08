@@ -42,10 +42,15 @@
     "ignore": ["app/services/api/lasius/**", "app/services/api/lasius-hooks/**"],
     "thresholdOverrides": [
       {
+        "files": ["app/**/*.tsx"],
+        "maxCrap": 100,
+        "reason": "Vitest runs on Node only, so no component has coverage, and CRAP flags every component above cyclomatic 4. The ceiling of 100 still reports cyclomatic 10 and more. Logic in .ts files keeps the default of 30."
+      },
+      {
         "files": ["app/routes/**"],
         "functions": ["loader", "action"],
         "maxCrap": 80,
-        "reason": "Temporary since 2026-10-08. Route loaders and actions have no unit tests yet, and Playwright covers them. The ceiling of 80 keeps a loader that grows further visible."
+        "reason": "Temporary since 2026-10-08. Route loaders and actions have no unit tests yet, and Playwright covers them. The ceiling of 80 keeps a loader that grows further visible. The last matching override wins, so this entry follows the component entry."
       },
       {
         "files": ["app/routes/internal-oauth.register.tsx"],

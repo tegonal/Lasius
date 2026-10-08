@@ -23,6 +23,7 @@ import { useFetcher } from 'react-router'
 import {
   type ApiProxyConfig,
   buildProxyPayload,
+  notifyProxyResult,
   readProxyEnvelope,
 } from '~/lib/api/api-proxy-request'
 import { clearLoaderCache } from '~/lib/utils/loader-cache'
@@ -67,12 +68,10 @@ export function useApiProxy<TResponse, TBody = undefined, TParameters = Record<s
   useEffect(() => {
     if (!isIdle || !submittedReference.current || !envelope) return
     submittedReference.current = false
-
-    if (envelope.ok) {
-      onSuccessReference.current?.(envelope.data)
-    } else {
-      onErrorReference.current?.({ error: envelope.error, status: envelope.status })
-    }
+    notifyProxyResult(envelope, {
+      onError: onErrorReference.current,
+      onSuccess: onSuccessReference.current,
+    })
   }, [isIdle, envelope])
 
   const submit = useCallback(

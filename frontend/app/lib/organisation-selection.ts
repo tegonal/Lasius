@@ -19,6 +19,22 @@
 
 import { type ModelsUser } from '~/services/api/lasius'
 import { type ModelsUserOrganisation } from '~/services/api/lasius/modelsUserOrganisation'
+import { ModelsUserOrganisationRole } from '~/services/api/lasius/modelsUserOrganisationRole'
+
+/** The organisation values that useOrganisation returns. A missing id or key is an empty text. */
+export function getOrganisationState(
+  user: Pick<ModelsUser, 'organisations' | 'settings'> | undefined,
+) {
+  const selectedOrganisation = selectOrganisation(user)
+  return {
+    isAdministrator:
+      selectedOrganisation?.role === ModelsUserOrganisationRole.OrganisationAdministrator,
+    organisations: user?.organisations ?? [],
+    selectedOrganisation,
+    selectedOrganisationId: selectedOrganisation?.organisationReference.id ?? '',
+    selectedOrganisationKey: selectedOrganisation?.organisationReference?.key ?? '',
+  }
+}
 
 /**
  * The selected organisation of a user: the last selected one, else the private one, else the first.

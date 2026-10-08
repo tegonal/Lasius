@@ -64,3 +64,18 @@ export const readProxyEnvelope = <TResponse>(envelope: ProxyEnvelope<TResponse> 
   isSubmitted: envelope !== undefined,
   isSuccess: envelope?.ok === true,
 })
+
+/** Calls onSuccess with the data of a success envelope, or onError with the error and the status. */
+export const notifyProxyResult = <TResponse>(
+  envelope: ProxyEnvelope<TResponse>,
+  callbacks: {
+    onError?: (error: { error: string; status: number }) => void
+    onSuccess?: (data: TResponse) => void
+  },
+) => {
+  if (envelope.ok) {
+    callbacks.onSuccess?.(envelope.data)
+  } else {
+    callbacks.onError?.({ error: envelope.error, status: envelope.status })
+  }
+}

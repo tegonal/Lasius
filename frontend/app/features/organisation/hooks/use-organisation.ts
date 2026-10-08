@@ -20,11 +20,9 @@
 import { useFetcher } from 'react-router'
 
 import { useLayoutLoaderData } from '~/hooks/use-layout-loader-data'
-import { selectOrganisation } from '~/lib/organisation-selection'
+import { getOrganisationState } from '~/lib/organisation-selection'
 import { clearLoaderCache } from '~/lib/utils/loader-cache'
 import { type ModelsEntityReference } from '~/services/api/lasius/modelsEntityReference'
-import { type ModelsUserOrganisation } from '~/services/api/lasius/modelsUserOrganisation'
-import { ModelsUserOrganisationRole } from '~/services/api/lasius/modelsUserOrganisationRole'
 
 /**
  * Custom hook for managing organisation selection and organisation-related data.
@@ -43,16 +41,13 @@ import { ModelsUserOrganisationRole } from '~/services/api/lasius/modelsUserOrga
  */
 export const useOrganisation = () => {
   const loaderData = useLayoutLoaderData()
-  const user = loaderData?.user
-  const organisations: ModelsUserOrganisation[] = user?.organisations ?? []
-
-  const selectedOrganisation = selectOrganisation(user)
-  const selectedOrganisationId = selectedOrganisation?.organisationReference.id ?? ''
-
-  const selectedOrganisationKey = selectedOrganisation?.organisationReference?.key ?? ''
-
-  const isAdministrator =
-    selectedOrganisation?.role === ModelsUserOrganisationRole.OrganisationAdministrator
+  const {
+    isAdministrator,
+    organisations,
+    selectedOrganisation,
+    selectedOrganisationId,
+    selectedOrganisationKey,
+  } = getOrganisationState(loaderData?.user)
 
   // Use fetcher to switch org without full navigation
   const fetcher = useFetcher()

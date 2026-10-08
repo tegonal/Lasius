@@ -32,6 +32,7 @@ import { type DatePreset, PresetButton } from './preset-button'
 import { SegmentedDateInputConnected } from './segmented-date-input-connected'
 import { SegmentedTimeInputConnected } from './segmented-time-input-connected'
 import { getDatePickerLayout } from './shared/date-picker-layout'
+import { getParentValue } from './shared/date-time-helpers'
 import { type ResetCheckValue, shouldShowResetButton } from './shared/reset-visibility'
 import {
   createDatePickerStore,
@@ -101,15 +102,8 @@ const DatePickerBridge = ({
   // Update parent when store produces a valid date
   useEffect(() => {
     if (!isInitializedReference.current) return
-
-    if (value.isValid && !value.isPartial) {
-      const isoString = getISOString()
-      if (isoString && onChange) {
-        onChange(isoString)
-      }
-    } else if (!value.dateString && !value.timeString) {
-      onChange?.('')
-    }
+    const parentValue = getParentValue(value, getISOString())
+    if (parentValue !== null) onChange?.(parentValue)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getISOString()])
 

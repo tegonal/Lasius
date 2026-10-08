@@ -24,8 +24,36 @@ import {
   formatDateString,
   formatTime,
   formatTimeString,
+  getParentValue,
   parseDateTimeStrings,
 } from './date-time-helpers'
+
+describe('getParentValue', () => {
+  const entry = { dateString: '08.10.2026', isPartial: false, isValid: true, timeString: '10:00' }
+
+  it('sends the ISO string of a complete valid entry', () => {
+    expect(getParentValue(entry, '2026-10-08T10:00:00.000+02:00')).toBe(
+      '2026-10-08T10:00:00.000+02:00',
+    )
+  })
+
+  it('sends nothing for a valid entry without an ISO string', () => {
+    expect(getParentValue(entry, '')).toBeNull()
+    expect(getParentValue(entry, null)).toBeNull()
+  })
+
+  it('sends nothing for a partial or an invalid entry with text', () => {
+    expect(getParentValue({ ...entry, isPartial: true }, 'x')).toBeNull()
+    expect(getParentValue({ ...entry, isValid: false }, 'x')).toBeNull()
+    expect(getParentValue({ ...entry, dateString: '', isValid: false }, 'x')).toBeNull()
+  })
+
+  it('sends an empty text when the date and the time are empty', () => {
+    expect(getParentValue({ ...entry, dateString: '', isValid: false, timeString: '' }, '')).toBe(
+      '',
+    )
+  })
+})
 
 describe('formatDate', () => {
   it('formats a date as DD.MM.YYYY', () => {

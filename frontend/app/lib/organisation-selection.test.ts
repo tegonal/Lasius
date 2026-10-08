@@ -19,9 +19,42 @@
 
 import { describe, expect, it } from 'vitest'
 
-import { selectOrganisation } from '~/lib/organisation-selection'
+import { getOrganisationState, selectOrganisation } from '~/lib/organisation-selection'
 import { type ModelsUserOrganisation } from '~/services/api/lasius/modelsUserOrganisation'
+import { ModelsUserOrganisationRole } from '~/services/api/lasius/modelsUserOrganisationRole'
 import { type ModelsUserSettings } from '~/services/api/lasius/modelsUserSettings'
+
+describe('getOrganisationState', () => {
+  it('gives empty values without a user', () => {
+    expect(getOrganisationState(undefined)).toEqual({
+      isAdministrator: false,
+      organisations: [],
+      selectedOrganisation: undefined,
+      selectedOrganisationId: '',
+      selectedOrganisationKey: '',
+    })
+  })
+
+  it('gives the id, the key and the admin flag of the selected organisation', () => {
+    const team: ModelsUserOrganisation = {
+      ...org('team'),
+      role: ModelsUserOrganisationRole.OrganisationAdministrator,
+    }
+    const user = userWith([org('private', true), team], 'team')
+    expect(getOrganisationState(user)).toMatchObject({
+      isAdministrator: true,
+      organisations: user.organisations,
+      selectedOrganisation: team,
+      selectedOrganisationId: 'team',
+      selectedOrganisationKey: 'team',
+    })
+  })
+
+  it('gives no admin flag for a member', () => {
+    const user = userWith([{ ...org('team'), role: ModelsUserOrganisationRole.OrganisationMember }])
+    expect(getOrganisationState(user).isAdministrator).toBe(false)
+  })
+})
 
 const org = (id: string, isPrivate = false) =>
   ({

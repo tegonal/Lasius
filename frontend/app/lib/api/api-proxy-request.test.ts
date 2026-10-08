@@ -17,9 +17,32 @@
  *
  */
 
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
-import { buildProxyPayload, readProxyEnvelope } from './api-proxy-request'
+import { buildProxyPayload, notifyProxyResult, readProxyEnvelope } from './api-proxy-request'
+
+describe('notifyProxyResult', () => {
+  it('calls only onSuccess with the data of a success envelope', () => {
+    const onError = vi.fn()
+    const onSuccess = vi.fn()
+    notifyProxyResult({ data: { id: 1 }, ok: true }, { onError, onSuccess })
+    expect(onSuccess).toHaveBeenCalledExactlyOnceWith({ id: 1 })
+    expect(onError).not.toHaveBeenCalled()
+  })
+
+  it('calls only onError with the error and the status of an error envelope', () => {
+    const onError = vi.fn()
+    const onSuccess = vi.fn()
+    notifyProxyResult({ error: 'Forbidden', ok: false, status: 403 }, { onError, onSuccess })
+    expect(onError).toHaveBeenCalledExactlyOnceWith({ error: 'Forbidden', status: 403 })
+    expect(onSuccess).not.toHaveBeenCalled()
+  })
+
+  it('accepts missing callbacks', () => {
+    expect(() => notifyProxyResult({ data: null, ok: true }, {})).not.toThrow()
+    expect(() => notifyProxyResult({ error: 'x', ok: false, status: 500 }, {})).not.toThrow()
+  })
+})
 
 const config = {
   getUrl: ({ orgId }: { orgId: string }) => `/organisations/${orgId}`,
