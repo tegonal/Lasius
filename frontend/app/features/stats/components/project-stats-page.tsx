@@ -46,8 +46,10 @@ type ProjectStatsPageProperties = {
   bookingSummary: ReturnType<typeof getModelsBookingSummary>
   byPeriodChart: ReturnType<typeof getNivoChartDataFromApiStatsData>
   distinctUsers: number
+  from: string
   project: StatsProject
   scope: ProjectStatsScope
+  to: string
   useBarChart: boolean
   view: ProjectStatsView
 }
@@ -57,8 +59,10 @@ export const ProjectStatsPage = ({
   bookingSummary,
   byPeriodChart,
   distinctUsers,
+  from,
   project,
   scope,
+  to,
   useBarChart,
   view,
 }: ProjectStatsPageProperties) => {
@@ -115,7 +119,7 @@ export const ProjectStatsPage = ({
         <ScrollArea className="h-full">
           <div className="p-4">
             <StatsProjectHeader backTo={getProjectsPath(scope)} project={project} />
-            <StatsFilter />
+            <StatsFilter from={from} to={to} />
           </div>
         </ScrollArea>
       </ColumnRight>

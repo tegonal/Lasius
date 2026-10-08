@@ -135,7 +135,7 @@ const OrgStatsLayout = ({ loaderData }: Route.ComponentProps) => {
       <ColumnRight>
         <ScrollArea className="h-full">
           <div className="p-4">
-            <StatsFilter />
+            <StatsFilter from={from} to={to} />
           </div>
         </ScrollArea>
       </ColumnRight>

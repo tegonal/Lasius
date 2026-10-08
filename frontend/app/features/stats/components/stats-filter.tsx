@@ -28,9 +28,14 @@ import { InputDateStandalone } from '~/components/ui/forms/input/input-date-stan
 import { Select, type SelectOption } from '~/components/ui/forms/input/select'
 import { untyped } from '~/lib/i18n-types'
 import { dateOptions } from '~/lib/utils/date/date-options'
-import { formatISOLocale } from '~/lib/utils/dates'
 
-export const StatsFilter = () => {
+type StatsFilterProperties = {
+  /** The range that the loader applied: the URL params, or the default range in the user zone. */
+  from: string
+  to: string
+}
+
+export const StatsFilter = ({ from: currentFrom, to: currentTo }: StatsFilterProperties) => {
   const { t } = useTranslation('common')
   const [searchParameters, setSearchParameters] = useSearchParams()
   const [selectedRange, setSelectedRange] = useState(
@@ -103,9 +108,6 @@ export const StatsFilter = () => {
       { replace: true },
     )
   }
-
-  const currentFrom = searchParameters.get('from') || formatISOLocale(new Date())
-  const currentTo = searchParameters.get('to') || formatISOLocale(new Date())
 
   return (
     <div className="w-full" data-testid="stats-filter">
