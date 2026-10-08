@@ -22,21 +22,14 @@ import { useTranslation } from 'react-i18next'
 
 import { Input } from '~/components/primitives/inputs/input'
 
-import { getSegmentBounds, getSegmentFromPosition } from './shared/core/segment-bounds'
 import { TIME_SEGMENT_CONFIG, type TimeSegment } from './shared/core/segment-config'
-import { getArrowKeyTarget, getTabTarget } from './shared/core/segment-navigation'
 import {
   createHandleClick,
   selectSegment as selectSegmentHelper,
 } from './shared/core/segment-selection'
 import { formatTimeString } from './shared/date-time-helpers'
 import { createInputChangeHandler } from './shared/input/input-change-handler'
-import { isValidInputChar } from './shared/input/input-validation'
-import {
-  didHandleBackspaceDelete,
-  didHandleEscapeKey,
-  didHandleSeparatorKey,
-} from './shared/input/keyboard-handlers'
+import { handleSegmentKeyDown } from './shared/input/segment-key-down'
 import { SegmentedInputWrapper } from './shared/segmented-input-wrapper'
 import { useRestoreCursorPosition } from './shared/use-restore-cursor-position'
 import { DatePickerStoreContext, useDatePickerStore } from './store/use-date-picker-store'
@@ -107,106 +100,35 @@ export const SegmentedTimeInputConnected = ({ afterSlot }: { afterSlot?: React.R
     })(event)
   }
 
-  // Handle keyboard navigation
+  // Hours step by 1, minutes by 5. The input shows the new store value at once.
+  const incrementSegment = (segment: TimeSegment, direction: -1 | 1): void => {
+    if (segment === 'hour') {
+      incrementHours(direction)
+    } else {
+      incrementMinutes(direction * 5)
+    }
+    if (store) {
+      setInputValue(store.getState().value.timeString)
+    }
+  }
+
+  const stepSegment = (segment: null | TimeSegment, direction: -1 | 1): void => {
+    if (!value.date || !segment) return
+    incrementSegment(segment, direction)
+    setTimeout(() => selectSegment(segment), 0)
+  }
+
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>): void => {
-    const bounds = getSegmentBounds(inputValue, config.delimiter, config.segments)
-    if (!bounds) return
-
-    if (!isValidInputChar(event.key, config.allowedCharsPattern)) {
-      event.preventDefault()
-      return
-    }
-
-    if (didHandleEscapeKey(event, inputReference, resetToInitial)) {
-      return
-    }
-
-    if (
-      didHandleBackspaceDelete(
-        event,
-        inputReference,
-        inputValue,
-        config.delimiter,
-        config.segments,
-        bounds,
-        config.segmentPlaceholders,
-        setInputValue,
-        setTimeFromString,
-        selectSegment,
-      )
-    ) {
-      return
-    }
-
-    if (
-      didHandleSeparatorKey(
-        event,
-        config.separatorKeys,
-        inputReference,
-        inputValue,
-        config.delimiter,
-        config.segments,
-        selectSegment,
-      )
-    ) {
-      return
-    }
-
-    const position = inputReference.current?.selectionStart
-    const segment =
-      typeof position === 'number'
-        ? getSegmentFromPosition(position, inputValue, config.delimiter, config.segments)
-        : null
-
-    switch (event.key) {
-      case 'ArrowDown':
-      case 'ArrowUp': {
-        // Arrow keys for increment/decrement
-        event.preventDefault()
-        if (!value.date || !segment) return
-
-        const baseIncrement = event.key === 'ArrowUp' ? 1 : -1
-
-        if (segment === 'hour') {
-          incrementHours(baseIncrement)
-        } else {
-          incrementMinutes(baseIncrement * 5)
-        }
-
-        if (store) {
-          setInputValue(store.getState().value.timeString)
-        }
-
-        setTimeout(() => selectSegment(segment), 0)
-
-        break
-      }
-      case 'ArrowLeft':
-      case 'ArrowRight': {
-        // Arrow key navigation between segments at boundaries
-        const target =
-          typeof position === 'number' && segment
-            ? getArrowKeyTarget(event.key, position, segment, bounds, config.segments)
-            : null
-        if (target) {
-          event.preventDefault()
-          selectSegment(target)
-        }
-
-        break
-      }
-      case 'Tab': {
-        // Tab navigation between segments
-        const target = segment ? getTabTarget(event.shiftKey, segment, config.segments) : null
-        if (target) {
-          event.preventDefault()
-          selectSegment(target)
-        }
-
-        break
-      }
-      // No default
-    }
+    handleSegmentKeyDown(event, {
+      config,
+      inputRef: inputReference,
+      inputValue,
+      resetToInitial,
+      selectSegment,
+      setInputValue,
+      stepSegment,
+      updateFromString: setTimeFromString,
+    })
   }
 
   // Format on blur
@@ -244,19 +166,7 @@ export const SegmentedTimeInputConnected = ({ afterSlot }: { afterSlot?: React.R
   // Handle arrow button clicks
   const handleArrowClick = (direction: 'down' | 'up') => {
     const targetSegment: TimeSegment = selectedSegment === 'hour' ? 'hour' : 'minute'
-    const baseIncrement = direction === 'up' ? 1 : -1
-
-    if (targetSegment === 'hour') {
-      incrementHours(baseIncrement)
-    } else {
-      incrementMinutes(baseIncrement * 5)
-    }
-
-    if (store) {
-      const updatedValue = store.getState().value
-      setInputValue(updatedValue.timeString)
-    }
-
+    incrementSegment(targetSegment, direction === 'up' ? 1 : -1)
     focusFromArrowReference.current = true
 
     setTimeout(() => {

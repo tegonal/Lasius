@@ -22,21 +22,14 @@ import { useTranslation } from 'react-i18next'
 
 import { Input } from '~/components/primitives/inputs/input'
 
-import { getSegmentBounds, getSegmentFromPosition } from './shared/core/segment-bounds'
 import { DATE_SEGMENT_CONFIG, type DateSegment } from './shared/core/segment-config'
-import { getArrowKeyTarget, getTabTarget } from './shared/core/segment-navigation'
 import {
   createHandleClick,
   selectSegment as selectSegmentHelper,
 } from './shared/core/segment-selection'
 import { formatDate } from './shared/date-time-helpers'
 import { createInputChangeHandler } from './shared/input/input-change-handler'
-import { isValidInputChar } from './shared/input/input-validation'
-import {
-  didHandleBackspaceDelete,
-  didHandleEscapeKey,
-  didHandleSeparatorKey,
-} from './shared/input/keyboard-handlers'
+import { handleSegmentKeyDown } from './shared/input/segment-key-down'
 import { SegmentedInputWrapper } from './shared/segmented-input-wrapper'
 import { useRestoreCursorPosition } from './shared/use-restore-cursor-position'
 import { DatePickerStoreContext, useDatePickerStore } from './store/use-date-picker-store'
@@ -118,113 +111,26 @@ export const SegmentedDateInputConnected = ({ afterSlot }: { afterSlot?: React.R
     })(event)
   }
 
-  // Handle keyboard navigation
+  const stepSegment = (segment: DateSegment | null, direction: -1 | 1): void => {
+    if (!value.date || !segment) return
+    incrementBySegment(segment, direction)
+    if (store) {
+      setInputValue(store.getState().value.dateString)
+    }
+    setTimeout(() => selectSegment(segment), 0)
+  }
+
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>): void => {
-    const bounds = getSegmentBounds(inputValue, config.delimiter, config.segments)
-    if (!bounds) return
-
-    // Block invalid characters to prevent selection loss
-    if (!isValidInputChar(event.key, config.allowedCharsPattern)) {
-      event.preventDefault()
-      return
-    }
-
-    // Escape key - reset to initial value
-    if (didHandleEscapeKey(event, inputReference, resetToInitial)) {
-      return
-    }
-
-    // Backspace/Delete handling
-    if (
-      didHandleBackspaceDelete(
-        event,
-        inputReference,
-        inputValue,
-        config.delimiter,
-        config.segments,
-        bounds,
-        config.segmentPlaceholders,
-        setInputValue,
-        setDateFromString,
-        selectSegment,
-      )
-    ) {
-      return
-    }
-
-    // Period/Dot key to move to next segment
-    if (
-      didHandleSeparatorKey(
-        event,
-        config.separatorKeys,
-        inputReference,
-        inputValue,
-        config.delimiter,
-        config.segments,
-        selectSegment,
-      )
-    ) {
-      return
-    }
-
-    // Helper: resolve segment at cursor position
-    const segmentAtCursor = (): DateSegment | null => {
-      const position = inputReference.current?.selectionStart
-      if (typeof position !== 'number') return null
-      return getSegmentFromPosition(position, inputValue, config.delimiter, config.segments)
-    }
-
-    switch (event.key) {
-      case 'ArrowDown':
-      case 'ArrowUp': {
-        // Arrow keys for increment/decrement
-        event.preventDefault()
-        if (!value.date) return
-        const segment = segmentAtCursor()
-        if (!segment) return
-
-        const increment = event.key === 'ArrowUp' ? 1 : -1
-        incrementBySegment(segment, increment)
-
-        if (store) {
-          setInputValue(store.getState().value.dateString)
-        }
-        setTimeout(() => selectSegment(segment), 0)
-
-        break
-      }
-      case 'ArrowLeft':
-      case 'ArrowRight': {
-        // Arrow key navigation between segments at boundaries
-        const position = inputReference.current?.selectionStart
-        if (typeof position === 'number') {
-          const segment = segmentAtCursor()
-          if (segment) {
-            const target = getArrowKeyTarget(event.key, position, segment, bounds, config.segments)
-            if (target) {
-              event.preventDefault()
-              selectSegment(target)
-            }
-          }
-        }
-
-        break
-      }
-      case 'Tab': {
-        // Tab navigation between segments
-        const segment = segmentAtCursor()
-        if (segment) {
-          const target = getTabTarget(event.shiftKey, segment, config.segments)
-          if (target) {
-            event.preventDefault()
-            selectSegment(target)
-          }
-        }
-
-        break
-      }
-      // No default
-    }
+    handleSegmentKeyDown(event, {
+      config,
+      inputRef: inputReference,
+      inputValue,
+      resetToInitial,
+      selectSegment,
+      setInputValue,
+      stepSegment,
+      updateFromString: setDateFromString,
+    })
   }
 
   // Format on blur

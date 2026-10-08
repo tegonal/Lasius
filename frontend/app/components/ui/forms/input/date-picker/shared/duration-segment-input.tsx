@@ -22,18 +22,11 @@ import { useTranslation } from 'react-i18next'
 
 import { Input } from '~/components/primitives/inputs/input'
 
-import { getSegmentBounds, getSegmentFromPosition } from './core/segment-bounds'
 import { DURATION_SEGMENT_CONFIG, type DurationSegment } from './core/segment-config'
-import { getArrowKeyTarget, getTabTarget } from './core/segment-navigation'
 import { createHandleClick, selectSegment as selectSegmentHelper } from './core/segment-selection'
 import { formatDuration, parseDuration } from './duration-utilities'
 import { createInputChangeHandler } from './input/input-change-handler'
-import { isValidInputChar } from './input/input-validation'
-import {
-  didHandleBackspaceDelete,
-  didHandleEscapeKey,
-  didHandleSeparatorKey,
-} from './input/keyboard-handlers'
+import { handleSegmentKeyDown } from './input/segment-key-down'
 import { SegmentedInputWrapper } from './segmented-input-wrapper'
 import { useRestoreCursorPosition } from './use-restore-cursor-position'
 
@@ -141,97 +134,26 @@ export const DurationSegmentInput = ({
     })(event)
   }
 
+  const stepSegment = (segment: DurationSegment | null, direction: -1 | 1): void => {
+    if (!segment) return
+    const newMinutes = durationMinutes + direction * (segment === 'hour' ? 60 : 5)
+    if (newMinutes < 0) return
+    updateDuration(newMinutes)
+    setInputValue(formatDuration(newMinutes))
+    setTimeout(() => selectSegment(segment), 0)
+  }
+
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>): void => {
-    const bounds = getSegmentBounds(inputValue, config.delimiter, config.segments)
-    if (!bounds) return
-
-    if (!isValidInputChar(event.key, config.allowedCharsPattern)) {
-      event.preventDefault()
-      return
-    }
-
-    if (didHandleEscapeKey(event, inputReference, resetToInitial)) {
-      return
-    }
-
-    if (
-      didHandleBackspaceDelete(
-        event,
-        inputReference,
-        inputValue,
-        config.delimiter,
-        config.segments,
-        bounds,
-        config.segmentPlaceholders,
-        setInputValue,
-        updateDurationFromString,
-        selectSegment,
-      )
-    ) {
-      return
-    }
-
-    if (
-      didHandleSeparatorKey(
-        event,
-        config.separatorKeys,
-        inputReference,
-        inputValue,
-        config.delimiter,
-        config.segments,
-        selectSegment,
-      )
-    ) {
-      return
-    }
-
-    const position = inputReference.current?.selectionStart
-    const segment =
-      typeof position === 'number'
-        ? getSegmentFromPosition(position, inputValue, config.delimiter, config.segments)
-        : null
-
-    switch (event.key) {
-      case 'ArrowDown':
-      case 'ArrowUp': {
-        event.preventDefault()
-        if (!segment) return
-
-        const baseIncrement = event.key === 'ArrowUp' ? 1 : -1
-        const newMinutes = durationMinutes + baseIncrement * (segment === 'hour' ? 60 : 5)
-
-        if (newMinutes >= 0) {
-          updateDuration(newMinutes)
-          setInputValue(formatDuration(newMinutes))
-          setTimeout(() => selectSegment(segment), 0)
-        }
-
-        break
-      }
-      case 'ArrowLeft':
-      case 'ArrowRight': {
-        const target =
-          typeof position === 'number' && segment
-            ? getArrowKeyTarget(event.key, position, segment, bounds, config.segments)
-            : null
-        if (target) {
-          event.preventDefault()
-          selectSegment(target)
-        }
-
-        break
-      }
-      case 'Tab': {
-        const target = segment ? getTabTarget(event.shiftKey, segment, config.segments) : null
-        if (target) {
-          event.preventDefault()
-          selectSegment(target)
-        }
-
-        break
-      }
-      // No default
-    }
+    handleSegmentKeyDown(event, {
+      config,
+      inputRef: inputReference,
+      inputValue,
+      resetToInitial,
+      selectSegment,
+      setInputValue,
+      stepSegment,
+      updateFromString: updateDurationFromString,
+    })
   }
 
   const handleBlur = (event: React.FocusEvent<HTMLInputElement>): void => {

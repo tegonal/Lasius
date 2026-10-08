@@ -50,7 +50,7 @@
     },
     "app/components/ui/forms/input/date-picker/segmented-time-input-connected.tsx": {
       "crap_moderate": {
-        "count": 3
+        "count": 2
       }
     },
     "app/components/ui/forms/input/date-picker/shared/duration-segment-input.tsx": {
@@ -350,11 +350,6 @@
         "count": 1
       }
     },
-    "app/features/integrations/hooks/use-issue-importer-config-management.ts": {
-      "crap_moderate": {
-        "count": 1
-      }
-    },
     "app/features/integrations/hooks/use-mapping-save-queue.ts": {
       "crap_moderate": {
         "count": 1
@@ -483,7 +478,7 @@
       }
     },
     "app/features/stats/components/stats-filter.tsx": {
-      "crap_high": {
+      "crap_moderate": {
         "count": 1
       }
     },

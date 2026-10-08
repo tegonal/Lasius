@@ -42,30 +42,6 @@
     "ignore": ["app/services/api/lasius/**", "app/services/api/lasius-hooks/**"],
     "thresholdOverrides": [
       {
-        "files": ["app/components/ui/forms/input/date-picker/segmented-time-input-connected.tsx"],
-        "functions": ["handleKeyDown"],
-        "maxCyclomatic": 23,
-        "maxCognitive": 26,
-        "maxCrap": 553,
-        "reason": "Accepted key handler. A split adds functions but not fewer cases, and no test covers the handler. Decision: rr8-segmented-input-key-handlers."
-      },
-      {
-        "files": ["app/components/ui/forms/input/date-picker/shared/duration-segment-input.tsx"],
-        "functions": ["handleKeyDown"],
-        "maxCyclomatic": 22,
-        "maxCognitive": 24,
-        "maxCrap": 507,
-        "reason": "Accepted key handler. A split adds functions but not fewer cases, and no test covers the handler. Decision: rr8-segmented-input-key-handlers."
-      },
-      {
-        "files": ["app/components/ui/forms/input/date-picker/segmented-date-input-connected.tsx"],
-        "functions": ["handleKeyDown"],
-        "maxCyclomatic": 21,
-        "maxCognitive": 28,
-        "maxCrap": 463,
-        "reason": "Accepted key handler. A split adds functions but not fewer cases, and no test covers the handler. Decision: rr8-segmented-input-key-handlers."
-      },
-      {
         "files": ["app/routes/internal-oauth.register.tsx"],
         "functions": ["InternalOAuthRegister"],
         "maxCognitive": 16,
