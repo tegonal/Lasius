@@ -4,7 +4,7 @@ Lasius is an open source time tracking solution that includes a comprehensive se
 
 We welcome your feedback! Please use the issue tracker of this repository.
 
-Lasius is a modern web application with a backend written in Scala and a NextJS React frontend.
+Lasius is a modern web application with a backend written in Scala and a React Router frontend.
 
 # Features
 
@@ -91,7 +91,7 @@ containers, containing secrets that only might be available during CI/CD.
 | MONGO_INITDB_ROOT_PASSWORD      | Password of root user of mongoDB                                                                                        | admin                    |
 | MONGO_INITDB_ROOT_USERNAME      | Username of root user of mongoDB                                                                                        | admin                    |
 | MONGO_INITDB_USERNAME           | Username of mongoDB user                                                                                                | lasius                   |
-| NEXT_AUTH_SECRET                | Hash for next-auth session salting, e.g. the output of `openssl rand -base64 32`                                        | random string            |
+| AUTH_SECRET                     | Secret that signs the session cookie of the frontend, e.g. the output of `openssl rand -base64 32`                      |                          |
 | TRAEFIK_CERT_EMAIL              | E-mail address to use when fetching a certificate from LE                                                               | ssladmin@lasius.ch       |
 | TRAEFIK_CERT_RESOLVER           | LetsEncrypt resolver, use `letsencrpyt` in production, empty value for testing (mind the LE rate limit)                 | letsencrypt              |
 | TZ                              | Your desired timezone                                                                                                   | CET                      |
@@ -116,14 +116,34 @@ Specific to `backend` container:
 
 Specific to `frontend` container:
 
-| Variable name                            | Description                                                                                                     | Default value |
-| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ------------- |
-| ENVIRONMENT                              | `production` - any other value runs NextJS in dev mode. Not suggested in deployments.                           | production    |
-| NEXT_AUTH_SECRET                         | Hash for next-auth session salting, e.g. the output of `openssl rand -base64 32`                                | random string |
-| LASIUS_DEMO_MODE                         | Enables or disables demo mode                                                                                   | `false`       |
-| LASIUS_TELEMETRY_PLAUSIBLE_HOST          | Hostname/FQDN of a matomo instance to collect anonymous usage data, e.g. `stats.domain.com`                     | undefined     |
-| LASIUS_TELEMETRY_PLAUSIBLE_SOURCE_DOMAIN | Matomo site ID, e.g. `42`                                                                                       | undefined     |
-| LASIUS_TERMSOFSERVICE_VERSION            | Enables the Terms of Service dialog. You also need to provide the terms in `public/termsofservice/<lang>.html`. | undefined     |
+| Variable name                 | Description                                                                                                                                  | Default value             |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| PORT                          | The port of the HTTP server in the container.                                                                                                | 3000                      |
+| AUTH_SECRET                   | Required. The secret that signs the session cookie, e.g. the output of `openssl rand -base64 32`. When it is unset, the frontend reads `NEXTAUTH_SECRET` of Lasius 2.x. |                           |
+| LASIUS_API_URL                | Required. The public URL of the backend, with the `/backend` path, e.g. `https://<hostname>/backend`.                                       |                           |
+| LASIUS_API_URL_INTERNAL       | The URL of the backend for requests from the frontend server, e.g. `http://backend:9000/backend` in a compose network.                     | `LASIUS_API_URL`          |
+| LASIUS_API_WEBSOCKET_URL      | The public WebSocket URL of the backend, e.g. `wss://<hostname>/backend`. Live updates need it.                                              | empty                     |
+| LASIUS_OAUTH_CLIENT_ID        | The client id of the internal OAuth provider. A value enables the provider on the login page.                                               |                           |
+| LASIUS_OAUTH_CLIENT_SECRET    | The client secret of the internal OAuth provider.                                                                                            |                           |
+| KEYCLOAK_OAUTH_CLIENT_ID      | The client id of the Keycloak client. A value enables Keycloak on the login page.                                                           |                           |
+| KEYCLOAK_OAUTH_CLIENT_SECRET  | The client secret of the Keycloak client.                                                                                                    |                           |
+| KEYCLOAK_OAUTH_URL            | The URL of the Keycloak realm, e.g. `https://<keycloak-host>/realms/lasius`.                                                                 |                           |
+| KEYCLOAK_OAUTH_PROVIDER_NAME  | The name of the Keycloak button on the login page.                                                                                           | Keycloak                  |
+| GITLAB_OAUTH_CLIENT_ID        | The application id of the GitLab application. A value enables GitLab on the login page.                                                     |                           |
+| GITLAB_OAUTH_CLIENT_SECRET    | The secret of the GitLab application.                                                                                                        |                           |
+| GITLAB_OAUTH_URL              | The URL of a self-hosted GitLab instance.                                                                                                    | `https://gitlab.com`      |
+| GITHUB_OAUTH_CLIENT_ID        | The client id of the GitHub OAuth app. A value enables GitHub on the login page.                                                            |                           |
+| GITHUB_OAUTH_CLIENT_SECRET    | The client secret of the GitHub OAuth app.                                                                                                   |                           |
+| LASIUS_DEMO_MODE              | `true` enables the demo mode.                                                                                                                | `false`                   |
+| LASIUS_TERMSOFSERVICE_VERSION | Enables the Terms of Service dialog. You also need to provide the terms in `public/termsofservice/<lang>.html`.                              | undefined                 |
+| TZ                            | The time zone of the frontend server.                                                                                                        | Europe/Zurich             |
+
+Lasius 3 does not read `ENVIRONMENT`, `NEXTAUTH_URL`, `NEXTAUTH_URL_INTERNAL`, `LASIUS_TELEMETRY_PLAUSIBLE_HOST` and
+`LASIUS_TELEMETRY_PLAUSIBLE_SOURCE_DOMAIN`. You can remove them from an existing setup.
+
+The frontend builds the OAuth callback URL from the `X-Forwarded-Host` and `X-Forwarded-Proto` headers of the
+request. A reverse proxy in front of the frontend must send both headers. Without `X-Forwarded-Proto`, the callback
+URL starts with `http://`, and the identity provider rejects it. See [Auth](docs/Auth.md#reverse-proxy).
 
 We suggest you use a `.env` file and save it in the same directory as the `docker-compose.yml` for build dependent configuration and edit all other variables in the `docker-compose.yml` file directly if they are not dependent on CI/CD variables.
 

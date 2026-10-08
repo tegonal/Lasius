@@ -22,6 +22,22 @@ Provider-specific credentials are available through corresponding environment va
 In the frontend, the available authentication providers are automatically enabled if the corresponding environment variables are available at startup.
 In the example backend configuration, care has been taken to ensure that the providers are also configured whit the same environment variables, so that the same `.env` file can be used for both the backend and the frontend.
 
+#### Reverse proxy
+
+The frontend builds the OAuth callback URL from the request headers `X-Forwarded-Host` and `X-Forwarded-Proto`.
+A reverse proxy or a TLS termination in front of the frontend must send both headers.
+
+- Without `X-Forwarded-Proto`, the callback URL starts with `http://`. The identity provider then rejects the login, because the registered callback URL starts with `https://`.
+- Without `X-Forwarded-Host`, the callback URL contains the internal host name of the frontend container.
+
+Check the documentation of your proxy for its default headers. For nginx, add these lines to the `location` block of the frontend:
+
+```nginx
+proxy_set_header Host $host;
+proxy_set_header X-Forwarded-Host $host;
+proxy_set_header X-Forwarded-Proto $scheme;
+```
+
 ## Providers
 
 ### Lasius internal OAuth2 provider
@@ -95,4 +111,3 @@ Additionally, the integration in the frontend can be customized using the follow
 | Environment variable | Description |
 |---|--|
 | KEYCLOAK_OAUTH_PROVIDER_NAME | Name in the list of authentication providers |
-| KEYCLOAK_OAUTH_PROVIDER_ICON | Path to a specific icon. This must be included in the frontend, either through a custom build or by including a local file when starting a Docker image |

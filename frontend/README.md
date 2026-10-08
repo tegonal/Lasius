@@ -103,18 +103,18 @@ Copy `.env.template` to `.env.local` and configure:
 
 | Variable                        | Required | Description                                                         |
 | ------------------------------- | -------- | ------------------------------------------------------------------- |
-| `ENVIRONMENT`                   | Yes      | `development` or `production`                                       |
 | `LASIUS_API_URL`                | Yes      | Backend API URL (default: `http://localhost:3000/backend`)          |
-| `LASIUS_API_WEBSOCKET_URL`      | Yes      | WebSocket URL (default: `ws://localhost:3000/backend`)              |
-| `LASIUS_API_URL_INTERNAL`       | Yes      | Internal API URL for SSR (default: `http://localhost:3000/backend`) |
+| `LASIUS_API_WEBSOCKET_URL`      | No       | WebSocket URL for live updates (e.g. `ws://localhost:3000/backend`) |
+| `LASIUS_API_URL_INTERNAL`       | No       | Backend URL for SSR requests (falls back to `LASIUS_API_URL`)       |
 | `AUTH_SECRET`                   | Yes      | Session cookie signing secret                                       |
-| `KEYCLOAK_OAUTH_*`              | Yes      | Keycloak OAuth credentials (client ID, secret, URL)                 |
+| `LASIUS_OAUTH_*`                | No       | Internal OAuth provider (client ID, secret)                         |
+| `KEYCLOAK_OAUTH_*`              | No       | Keycloak provider (client ID, secret, realm URL, button name)       |
 | `GITHUB_OAUTH_*`                | No       | GitHub OAuth provider                                               |
 | `GITLAB_OAUTH_*`                | No       | GitLab OAuth provider                                               |
 | `LASIUS_TERMSOFSERVICE_VERSION` | No       | Require ToS acceptance (e.g., `1.0`)                                |
-| `LASIUS_SHOW_LOGIN_CREDENTIALS` | No       | Show demo credentials on login page                                 |
-| `MATOMO_URL` / `MATOMO_SITE_ID` | No       | Anonymous usage analytics                                           |
-| `LASIUS_DEBUG`                  | No       | Enable debug logging                                                |
+| `LASIUS_DEMO_MODE`              | No       | `true` shows the demo credentials on the login page                 |
+
+A provider shows on the login page when its `*_CLIENT_ID` variable has a value. At least one provider is required.
 
 ## Vite Configuration
 
