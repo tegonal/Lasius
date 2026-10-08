@@ -330,12 +330,6 @@
       }
     },
     "app/features/integrations/hooks/use-connection-test.ts": {
-      "crap_critical": {
-        "count": 1
-      },
-      "crap_high": {
-        "count": 1
-      },
       "crap_moderate": {
         "count": 2
       }
@@ -380,11 +374,6 @@
     },
     "app/features/onboarding/components/slides/slide-checklist.tsx": {
       "crap_moderate": {
-        "count": 1
-      }
-    },
-    "app/features/onboarding/hooks/use-onboarding-status.ts": {
-      "crap_critical": {
         "count": 1
       }
     },
@@ -455,9 +444,6 @@
       }
     },
     "app/features/settings/components/app-settings-form.tsx": {
-      "crap_critical": {
-        "count": 1
-      },
       "crap_moderate": {
         "count": 1
       }

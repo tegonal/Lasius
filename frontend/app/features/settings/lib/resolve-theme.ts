@@ -32,3 +32,21 @@ export const resolveThemeCookieValue = (
   }
   return isPrefersDark ? 'dark' : 'light'
 }
+
+/** The colour scheme of the device, or null without matchMedia. */
+export const readPrefersDark = (): boolean | null =>
+  globalThis.window !== undefined && typeof matchMedia === 'function'
+    ? matchMedia('(prefers-color-scheme: dark)').matches
+    : null
+
+/**
+ * The theme to set on the page and in the cookie. It is null for 'system' when the colour scheme
+ * of the device is unknown, so the form then sets no attribute and posts no cookie.
+ */
+export const themeToApply = (
+  choice: ThemeChoice,
+  prefersDark: boolean | null,
+): 'dark' | 'light' | null =>
+  choice === 'system' && prefersDark === null
+    ? null
+    : resolveThemeCookieValue(choice, prefersDark ?? false)

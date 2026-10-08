@@ -17,6 +17,7 @@
  *
  */
 
+import { hasPlannedWorkingHours } from '~/features/onboarding/lib/onboarding-status'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { useProjects } from '~/features/projects/hooks/use-projects'
 
@@ -32,19 +33,7 @@ export const useOnboardingStatus = () => {
 
   const hasProjects = userProjects.length > 0
 
-  const hasWorkingHours = (() => {
-    const hours = selectedOrganisation?.plannedWorkingHours
-    if (!hours) return false
-    const total =
-      (hours.monday || 0) +
-      (hours.tuesday || 0) +
-      (hours.wednesday || 0) +
-      (hours.thursday || 0) +
-      (hours.friday || 0) +
-      (hours.saturday || 0) +
-      (hours.sunday || 0)
-    return total > 0
-  })()
+  const hasWorkingHours = hasPlannedWorkingHours(selectedOrganisation?.plannedWorkingHours)
 
   return {
     hasMultipleOrganisations,

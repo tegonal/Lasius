@@ -20,6 +20,10 @@
 import { type RefObject, useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import {
+  buildConnectivityBody,
+  hasNewCredentials,
+} from '~/features/integrations/lib/connection-test'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 import {
   useTestConnectivity,
@@ -81,64 +85,24 @@ export const useConnectionTest = ({
 
   const isTestingConnection = testExistingApi.isSubmitting || testConnectivityApi.isSubmitting
 
-  const getFormValues = useCallback((): Record<string, string> => {
-    if (!formRef.current) return {}
-    const fd = new FormData(formRef.current)
-    return Object.fromEntries(fd) as Record<string, string>
-  }, [formRef])
-
-  const hasNewCredentials = useCallback(() => {
-    const values = getFormValues()
-    switch (importerType) {
-      case 'github':
-      case 'gitlab': {
-        return !!values.accessToken
-      }
-      case 'jira': {
-        return !!values.accessToken || !!values.consumerKey || !!values.privateKey
-      }
-      case 'plane': {
-        return !!values.apiKey
-      }
-    }
-  }, [getFormValues, importerType])
+  const { submit: submitConnectivityTest } = testConnectivityApi
+  const { submit: submitExistingTest } = testExistingApi
 
   const handleTestConnection = useCallback(() => {
     if (!config) return
+    const values = formRef.current
+      ? (Object.fromEntries(new FormData(formRef.current)) as Record<string, string>)
+      : {}
 
-    if (hasNewCredentials()) {
-      const values = getFormValues()
-      testConnectivityApi.submit({
-        body: {
-          accessToken: values.accessToken || undefined,
-          apiKey: values.apiKey || undefined,
-          baseUrl: values.baseUrl,
-          checkFrequency: Number(values.checkFrequency),
-          consumerKey: values.consumerKey || undefined,
-          importerType: importerType as unknown as never,
-          name: values.name,
-          privateKey: values.privateKey || undefined,
-          resourceOwner: values.resourceOwner || undefined,
-          resourceOwnerType: values.resourceOwnerType || undefined,
-          workspace: values.workspace || undefined,
-        } as unknown as never,
+    if (hasNewCredentials(importerType, values)) {
+      submitConnectivityTest({
+        body: buildConnectivityBody(importerType, values) as unknown as never,
         orgId: selectedOrgId,
       })
     } else {
-      testExistingApi.submit({
-        configId: config.id,
-        orgId: selectedOrgId,
-      })
+      submitExistingTest({ configId: config.id, orgId: selectedOrgId })
     }
-  }, [
-    config,
-    getFormValues,
-    hasNewCredentials,
-    importerType,
-    selectedOrgId,
-    testConnectivityApi,
-    testExistingApi,
-  ])
+  }, [config, formRef, importerType, selectedOrgId, submitConnectivityTest, submitExistingTest])
 
   const resetTestState = useCallback(() => {
     setConnectionTestResult(null)
