@@ -27,6 +27,7 @@ import { Logo } from '~/components/ui/icons/logo'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { LoadingInfoPanel, LoginInfoPanel } from '~/features/auth/auth-info-panels'
 import { AuthLayout } from '~/features/auth/auth-layout'
+import { getLoginErrorKind, type LoginErrorKind } from '~/features/auth/lib/login-error'
 import { HelpButton } from '~/features/help/components/help-button'
 import { getServerEnvironment } from '~/lib/environment.server'
 import { redirectIfSignedIn } from '~/services/auth/auth-helpers.server'
@@ -60,40 +61,33 @@ export default function Login({
   const { t } = useTranslation('common')
 
   const getErrorMessage = (errorCode: string): string => {
-    switch (errorCode) {
-      case 'Callback': {
-        return t('auth:errors.callback', 'Authentication callback failed. Please try again.')
-      }
-      case 'fetchProfileFailed': {
-        return t(
+    const messages: Record<LoginErrorKind, () => string> = {
+      callback: () =>
+        t('auth:errors.callback', 'Authentication callback failed. Please try again.'),
+      fetchProfileFailed: () =>
+        t(
           'auth:errors.fetchProfileFailed',
           "Couldn't load user profile. Please try logging in again.",
-        )
-      }
-      case 'no_code':
-      case 'OAuthCallback':
-      case 'OAuthCallbackError': {
-        return t('auth.errors.oauthCallback', {
-          defaultValue: 'Authentication failed. Please try again.',
-        })
-      }
-      case 'SessionRequired': {
-        return t('auth.errors.sessionRequired.message', {
-          defaultValue: 'Please sign in to continue.',
-        })
-      }
-      case 'state_mismatch': {
-        return t('auth.errors.stateMismatch', {
-          defaultValue: 'Authentication failed: invalid state. Please try again.',
-        })
-      }
-      default: {
-        return t('auth.errors.general', {
+        ),
+      general: () =>
+        t('auth.errors.general', {
           defaultValue: 'Authentication error. Please try again.',
           error: errorCode,
-        })
-      }
+        }),
+      oauthCallback: () =>
+        t('auth.errors.oauthCallback', {
+          defaultValue: 'Authentication failed. Please try again.',
+        }),
+      sessionRequired: () =>
+        t('auth.errors.sessionRequired.message', {
+          defaultValue: 'Please sign in to continue.',
+        }),
+      stateMismatch: () =>
+        t('auth.errors.stateMismatch', {
+          defaultValue: 'Authentication failed: invalid state. Please try again.',
+        }),
     }
+    return messages[getLoginErrorKind(errorCode)]()
   }
 
   // Single provider: show loading state and auto-redirect

@@ -19,6 +19,12 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+/** The dialog method that makes the open state of the dialog match the expanded state, or null. */
+export const getDialogSync = (isExpanded: boolean, isOpen: boolean): 'close' | 'show' | null => {
+  if (isExpanded === isOpen) return null
+  return isExpanded ? 'show' : 'close'
+}
+
 /**
  * Manages dialog expand/collapse with hover, ESC, and click-outside behavior.
  *
@@ -43,11 +49,10 @@ export const useDialogActions = () => {
 
   // Sync dialog open/close with isExpanded state
   useEffect(() => {
-    if (isExpanded && dialogReference.current && !dialogReference.current.open) {
-      dialogReference.current.show()
-    } else if (!isExpanded && dialogReference.current?.open) {
-      dialogReference.current.close()
-    }
+    const dialog = dialogReference.current
+    if (!dialog) return
+    const method = getDialogSync(isExpanded, dialog.open)
+    if (method) dialog[method]()
   }, [isExpanded])
 
   // Handle dialog close event (triggered by ESC key)

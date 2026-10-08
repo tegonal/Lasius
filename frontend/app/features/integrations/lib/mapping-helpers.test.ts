@@ -25,9 +25,30 @@ import {
   buildMappingPayload,
   extractExternalProjectId,
   type ProjectMapping,
+  sortMappedFirst,
   type TagConfig,
   upsertMappingEntry,
 } from './mapping-helpers'
+
+describe('sortMappedFirst', () => {
+  const projects = [{ id: 'a' }, { id: 'b' }, { id: 'c' }, { id: 'd' }]
+  const mapped = [{ projectId: 'lasius-1' }]
+
+  it('moves the mapped projects first and keeps the order in each group', () => {
+    expect(sortMappedFirst(projects, { b: [], c: mapped, d: mapped })).toEqual([
+      { id: 'c' },
+      { id: 'd' },
+      { id: 'a' },
+      { id: 'b' },
+    ])
+  })
+
+  it('keeps the order without mappings and leaves the input unchanged', () => {
+    const result = sortMappedFirst(projects, {})
+    expect(result).toEqual(projects)
+    expect(result).not.toBe(projects)
+  })
+})
 
 const tagConfig: TagConfig = {
   includeOnlyIssuesWithLabels: [],

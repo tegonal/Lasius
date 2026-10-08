@@ -22,6 +22,7 @@ import { useMemo } from 'react'
 import {
   type MappingsByExternalProject,
   type MappingWithTagConfig,
+  sortMappedFirst,
 } from '~/features/integrations/lib/mapping-helpers'
 import { type ModelsExternalProject } from '~/services/api/lasius'
 
@@ -63,16 +64,10 @@ export const useProjectMappingList = ({
     return orphaned
   }, [projects, mappings])
 
-  const sortedProjects = useMemo(() => {
-    return [...filteredProjects].toSorted((a, b) => {
-      const isAMapped = (mappings[a.id]?.length ?? 0) > 0
-      const isBMapped = (mappings[b.id]?.length ?? 0) > 0
-
-      if (isAMapped && !isBMapped) return -1
-      if (!isAMapped && isBMapped) return 1
-      return 0
-    })
-  }, [filteredProjects, mappings])
+  const sortedProjects = useMemo(
+    () => sortMappedFirst(filteredProjects, mappings),
+    [filteredProjects, mappings],
+  )
 
   const mappedCount = useMemo(
     () => Object.values(mappings).reduce((sum, array) => sum + array.length, 0),

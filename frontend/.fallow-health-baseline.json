@@ -152,11 +152,8 @@
       }
     },
     "app/features/bookings/components/booking-insert-actions.tsx": {
-      "crap_high": {
-        "count": 2
-      },
       "crap_moderate": {
-        "count": 1
+        "count": 2
       }
     },
     "app/features/bookings/components/booking-item-context.tsx": {
@@ -170,9 +167,6 @@
       }
     },
     "app/features/bookings/components/booking-overlap-actions.tsx": {
-      "crap_high": {
-        "count": 2
-      },
       "crap_moderate": {
         "count": 1
       }
@@ -322,11 +316,6 @@
         "count": 1
       }
     },
-    "app/features/integrations/hooks/use-project-mapping-list.ts": {
-      "crap_high": {
-        "count": 1
-      }
-    },
     "app/features/invitation/components/invitation-user-confirm.tsx": {
       "crap_high": {
         "count": 1
@@ -457,7 +446,7 @@
       }
     },
     "app/features/system/hooks/use-health-monitor.ts": {
-      "crap_high": {
+      "crap_moderate": {
         "count": 1
       }
     },
@@ -499,11 +488,6 @@
         "count": 1
       }
     },
-    "app/hooks/use-dialog-actions.ts": {
-      "crap_high": {
-        "count": 1
-      }
-    },
     "app/hooks/use-scroll-pagination.ts": {
       "crap_moderate": {
         "count": 1
@@ -534,7 +518,7 @@
     },
     "app/routes/login.tsx": {
       "crap_high": {
-        "count": 2
+        "count": 1
       }
     },
     "app/routes/oauth.callback.tsx": {

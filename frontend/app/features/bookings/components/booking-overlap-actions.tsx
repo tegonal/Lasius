@@ -23,9 +23,9 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { useSelectedOrgId } from '~/features/bookings/hooks/use-home-loader-data'
+import { getAdjustedBookingBody } from '~/features/bookings/lib/booking-adjust'
 import { useDialogActions } from '~/hooks/use-dialog-actions'
 import { type AugmentedBooking } from '~/lib/api/functions/augment-bookings-list'
-import { formatISOLocale } from '~/lib/utils/dates'
 import { type ModelsBooking } from '~/services/api/lasius'
 import { useUpdateUserBooking } from '~/services/api/lasius-hooks/user-bookings/user-bookings'
 
@@ -48,14 +48,7 @@ export const BookingOverlapActions = ({ currentItem, onEdit, overlappingItem }: 
     if (!overlappingItem.end?.dateTime || !selectedOrgId) return
 
     updateCurrentBooking.submit({
-      body: {
-        end: currentItem.end?.dateTime
-          ? formatISOLocale(new Date(currentItem.end.dateTime))
-          : undefined,
-        projectId: currentItem.projectReference?.id || '',
-        start: formatISOLocale(new Date(overlappingItem.end.dateTime)),
-        tags: currentItem.tags || [],
-      },
+      body: getAdjustedBookingBody(currentItem, { start: overlappingItem.end.dateTime }),
       bookingId: currentItem.id,
       orgId: selectedOrgId,
     })
@@ -66,12 +59,7 @@ export const BookingOverlapActions = ({ currentItem, onEdit, overlappingItem }: 
     if (!currentItem.start?.dateTime || !selectedOrgId) return
 
     updateOverlappingBooking.submit({
-      body: {
-        end: formatISOLocale(new Date(currentItem.start.dateTime)),
-        projectId: overlappingItem.projectReference?.id || '',
-        start: formatISOLocale(new Date(overlappingItem.start.dateTime)),
-        tags: overlappingItem.tags || [],
-      },
+      body: getAdjustedBookingBody(overlappingItem, { end: currentItem.start.dateTime }),
       bookingId: overlappingItem.id,
       orgId: selectedOrgId,
     })

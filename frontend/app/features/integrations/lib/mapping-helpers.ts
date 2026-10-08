@@ -248,3 +248,15 @@ export const buildMappingStatsGroups = (
 
   return groups
 }
+
+const hasMapping = (mappings: MappingsByExternalProject, externalId: string) =>
+  (mappings[externalId]?.length ?? 0) > 0
+
+/** Mapped projects come first. The sort is stable, so each group keeps its order. */
+export const sortMappedFirst = <T extends { id: string }>(
+  projects: T[],
+  mappings: MappingsByExternalProject,
+): T[] =>
+  projects.toSorted(
+    (a, b) => Number(hasMapping(mappings, b.id)) - Number(hasMapping(mappings, a.id)),
+  )

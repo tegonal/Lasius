@@ -34,7 +34,7 @@ import {
   TooltipContainer,
   TooltipItem,
 } from '~/components/ui/charts/chart-tooltips'
-import { useNivoColors } from '~/components/ui/charts/nivo-theme'
+import { nivoTheme, useNivoColors } from '~/components/ui/charts/nivo-theme'
 import { EmptyStateStats } from '~/features/stats/components/empty-state-stats'
 import {
   type MonthlyWeekStreamData,
@@ -167,59 +167,14 @@ export const MonthStreamChart = ({
   )
 }
 
-// Theme using DaisyUI CSS variables for proper dark/light mode support
+// The stream chart takes only these blocks of the shared theme. The other keys of nivoTheme would change the rendered chart.
 const MONTH_STREAM_THEME = {
-  axis: {
-    domain: {
-      line: {
-        stroke: 'var(--color-base-content)',
-        strokeOpacity: 0.3,
-        strokeWidth: 1,
-      },
-    },
-    legend: {
-      text: {
-        fill: 'var(--color-base-content)',
-        fillOpacity: 0.9,
-        fontSize: 14, // text-sm equivalent
-        fontWeight: 500,
-      },
-    },
-    ticks: {
-      line: {
-        stroke: 'var(--color-base-content)',
-        strokeOpacity: 0.2,
-        strokeWidth: 1,
-      },
-      text: {
-        fill: 'var(--color-base-content)',
-        fillOpacity: 0.8,
-        fontSize: 14, // text-sm equivalent
-      },
-    },
-  },
-  grid: {
-    line: {
-      stroke: 'var(--color-base-content)',
-      strokeOpacity: 0.1,
-      strokeWidth: 1,
-    },
-  },
+  axis: nivoTheme.axis,
+  grid: nivoTheme.grid,
   text: {
     fill: 'var(--color-base-content)',
     fillOpacity: 0.8,
     fontSize: 14, // text-sm equivalent
   },
-  tooltip: {
-    container: {
-      background: 'var(--color-base-200)',
-      border: '1px solid var(--color-base-content)',
-      borderOpacity: 0.1,
-      borderRadius: 'var(--rounded-box, 0.5rem)',
-      boxShadow: '0 10px 40px rgba(0, 0, 0, 0.2)',
-      color: 'var(--color-base-content)',
-      fontSize: 14, // text-sm equivalent
-      padding: '8px 12px',
-    },
-  },
+  tooltip: { container: nivoTheme.tooltip.container },
 }

@@ -25,6 +25,16 @@ import { type HealthResponse } from '~/routes/api.health'
 import { useUIStore } from '~/stores/ui-store'
 
 /**
+ * The first real server version becomes the client version. A later different version is a drift.
+ * A missing version and the version `dev` change nothing.
+ */
+export const checkVersion = (initialVersion: null | string, version: string | undefined) => {
+  if (!version || version === 'dev') return { initialVersion, isDrift: false }
+  if (initialVersion === null) return { initialVersion: version, isDrift: false }
+  return { initialVersion, isDrift: version !== initialVersion }
+}
+
+/**
  * Polls /api/health every 10s (pauses when tab is unfocused).
  * Writes backend status and version drift to the UI store.
  * Mount once in app-layout — consumers read from the store via selectors.
@@ -62,16 +72,14 @@ export const useHealthMonitor = () => {
       scheduleDebouncedOffline(isDisconnected)
 
       // Version drift detection
-      if (health.version && health.version !== 'dev') {
-        if (initialVersionReference.current === null) {
-          initialVersionReference.current = health.version
-        } else if (health.version !== initialVersionReference.current) {
-          logger.info('[HealthMonitor] Version drift detected', {
-            client: initialVersionReference.current,
-            server: health.version,
-          })
-          useUIStore.getState().setVersionDrift(true)
-        }
+      const versionCheck = checkVersion(initialVersionReference.current, health.version)
+      initialVersionReference.current = versionCheck.initialVersion
+      if (versionCheck.isDrift) {
+        logger.info('[HealthMonitor] Version drift detected', {
+          client: versionCheck.initialVersion,
+          server: health.version,
+        })
+        useUIStore.getState().setVersionDrift(true)
       }
     } catch {
       logger.warn('[HealthMonitor] Health check network error')
