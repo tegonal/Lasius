@@ -41,7 +41,7 @@ setup('authenticate via Keycloak', async ({ page }) => {
   await page.getByRole('button', { name: /sign in/i }).click()
 
   // Wait for redirect back to the app after login (OAuth callback + SSR can be slow on cold start)
-  await page.waitForURL(/.*localhost:3000\/user\/.*/, { timeout: 30000 })
+  await page.waitForURL((url) => url.pathname.startsWith('/user/'), { timeout: 30000 })
 
   // Verify we're logged in
   await expect(page.locator('body')).toBeVisible()

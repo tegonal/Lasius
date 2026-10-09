@@ -69,7 +69,7 @@ async function loginAsKeycloakUser(page: Page, email: string, password: string) 
   await page.getByLabel('Email').fill(email)
   await page.locator('input#password').fill(password)
   await page.getByRole('button', { name: /sign in/i }).click()
-  await page.waitForURL(/.*localhost:3000\/user\/.*/, { timeout: 30000 })
+  await page.waitForURL((url) => url.pathname.startsWith('/user/'), { timeout: 30000 })
 }
 
 /**
@@ -155,7 +155,7 @@ async function registerViaKeycloak(
   await page.goto(verificationLink)
 
   // After verification, Keycloak redirects back to the app
-  await page.waitForURL(/.*localhost:3000\/user\/.*/, { timeout: 30000 })
+  await page.waitForURL((url) => url.pathname.startsWith('/user/'), { timeout: 30000 })
 }
 
 test.describe.serial('Keycloak Organisation + Invitation lifecycle @org @keycloak', () => {
@@ -280,25 +280,17 @@ test.describe.serial('Keycloak Organisation + Invitation lifecycle @org @keycloa
     // Explicitly clear storageState — browser.newContext() in the keycloak project
     // inherits storageState from the project config, which includes Keycloak SSO
     // cookies that would auto-authenticate as e2e@lasius.ch.
-    const loginContext = await browser.newContext({
+    const context = await browser.newContext({
       storageState: { cookies: [], origins: [] },
     })
-    const loginPage = await loginContext.newPage()
-
-    try {
-      await forceKeycloakLoginPrompt(loginPage)
-      await loginAsKeycloakUser(loginPage, 'e2e2@lasius.ch', 'e2e-test')
-      await acceptTosIfVisible(loginPage, 15000)
-      await loginContext.storageState({ path: '.auth/keycloak-e2e2.json' })
-    } finally {
-      await loginContext.close()
-    }
-
-    // Phase 2: Use saved session to visit the invite link
-    const context = await browser.newContext({ storageState: '.auth/keycloak-e2e2.json' })
     const freshPage = await context.newPage()
 
     try {
+      await forceKeycloakLoginPrompt(freshPage)
+      await loginAsKeycloakUser(freshPage, 'e2e2@lasius.ch', 'e2e-test')
+      await acceptTosIfVisible(freshPage, 15000)
+
+      // Phase 2: visit the invite link in the same signed-in context
       // Visit a protected page first to ensure auth middleware refreshes tokens
       await freshPage.goto('/user/home')
       await freshPage.waitForURL(/.*\/user\/.*/, { timeout: 15000 })
@@ -311,10 +303,12 @@ test.describe.serial('Keycloak Organisation + Invitation lifecycle @org @keycloa
       await expect(freshPage.getByTestId('invite-accept-btn')).toBeVisible({ timeout: 15000 })
 
       // Accept the invitation
-      await freshPage.getByTestId('invite-accept-btn').click()
-
-      // After accepting, the app navigates away from the join page
-      await freshPage.waitForURL((url) => !url.pathname.startsWith('/join/'), { timeout: 15000 })
+      // After accepting, the app navigates away from the join page. A click before hydration does
+      // nothing, so the click repeats, as in invite.spec.ts.
+      await expect(async () => {
+        await freshPage.getByTestId('invite-accept-btn').click()
+        await freshPage.waitForURL((url) => !url.pathname.startsWith('/join/'), { timeout: 5000 })
+      }).toPass({ timeout: 30000 })
     } finally {
       await context.close()
     }
@@ -377,10 +371,12 @@ test.describe.serial('Keycloak Organisation + Invitation lifecycle @org @keycloa
       await expect(freshPage.getByTestId('invite-accept-btn')).toBeVisible({ timeout: 10000 })
 
       // Accept the invitation
-      await freshPage.getByTestId('invite-accept-btn').click()
-
-      // After accepting, the app navigates away from the join page
-      await freshPage.waitForURL((url) => !url.pathname.startsWith('/join/'), { timeout: 15000 })
+      // After accepting, the app navigates away from the join page. A click before hydration does
+      // nothing, so the click repeats, as in invite.spec.ts.
+      await expect(async () => {
+        await freshPage.getByTestId('invite-accept-btn').click()
+        await freshPage.waitForURL((url) => !url.pathname.startsWith('/join/'), { timeout: 5000 })
+      }).toPass({ timeout: 30000 })
     } finally {
       await context.close()
     }

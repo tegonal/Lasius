@@ -92,8 +92,11 @@ const openFavoriteContextMenu = async (page: Page, index = 0) => {
 const stopBookingIfRunning = async (page: Page) => {
   const stopBtn = page.getByTestId('booking-current-stop-btn').locator('visible=true').first()
   if (await stopBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
-    await stopBtn.click()
-    await expect(stopBtn).not.toBeVisible({ timeout: 10000 })
+    // A click before hydration does nothing, so the click repeats until the booking stops.
+    await expect(async () => {
+      if (await stopBtn.isVisible()) await stopBtn.click()
+      await expect(stopBtn).not.toBeVisible({ timeout: 3000 })
+    }).toPass({ timeout: 15000 })
   }
 }
 
