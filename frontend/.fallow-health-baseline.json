@@ -1,6 +1,4 @@
 {
   "runtime_coverage_findings": [],
-  "target_keys": [
-    "app/lib/organisation-selection.ts:high impact"
-  ]
+  "target_keys": ["app/lib/organisation-selection.ts:high impact"]
 }
