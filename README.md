@@ -137,9 +137,17 @@ Specific to `frontend` container:
 | LASIUS_DEMO_MODE              | `true` enables the demo mode.                                                                                                                | `false`                   |
 | LASIUS_TERMSOFSERVICE_VERSION | Enables the Terms of Service dialog. You also need to provide the terms in `public/termsofservice/<lang>.html`.                              | undefined                 |
 | TZ                            | The time zone of the frontend server.                                                                                                        | Europe/Zurich             |
+| LASIUS_TELEMETRY_PLAUSIBLE_HOST | The URL of a Plausible instance, e.g. `https://plausible.example.com`. With both Plausible variables set, the frontend sends page views. | unset                     |
+| LASIUS_TELEMETRY_PLAUSIBLE_SOURCE_DOMAIN | The site domain in Plausible, e.g. `time.example.com`.                                                                            | unset                     |
 
-Lasius 3 does not read `ENVIRONMENT`, `NEXTAUTH_URL`, `NEXTAUTH_URL_INTERNAL`, `LASIUS_TELEMETRY_PLAUSIBLE_HOST` and
-`LASIUS_TELEMETRY_PLAUSIBLE_SOURCE_DOMAIN`. You can remove them from an existing setup.
+Lasius 3 does not read `ENVIRONMENT`, `NEXTAUTH_URL` and `NEXTAUTH_URL_INTERNAL`. You can remove them from an
+existing setup.
+
+Without both Plausible variables, the frontend sends no tracking request. With both, the frontend server sends each
+page view to Plausible itself. The browser never contacts Plausible. A page view
+holds the route pattern, for example `/join/:invitationId`, and never an ID. The frontend sends the visitor IP in
+the `X-Plausible-IP` header. It takes the IP from the last entry of `X-Forwarded-For`, so the reverse proxy in
+front of the frontend must set that header.
 
 The frontend builds the OAuth callback URL from the `X-Forwarded-Host` and `X-Forwarded-Proto` headers of the
 request. A reverse proxy in front of the frontend must send both headers. Without `X-Forwarded-Proto`, the callback
@@ -414,8 +422,8 @@ all bookings stay unchanged. Every user signs in again once.
 - Frontend: set `AUTH_SECRET`. Without it, the frontend reads `NEXTAUTH_SECRET` of Lasius 2.x. Set `PORT`,
   `LASIUS_API_URL` and the provider variables as described in [Environment Variables](#environment-variables).
   The frontend container must reach the public `LASIUS_API_URL`.
-- Frontend: Lasius 3 does not read `ENVIRONMENT`, `NEXTAUTH_URL`, `NEXTAUTH_URL_INTERNAL` and the Plausible
-  variables. Keep the `NEXTAUTH_*` variables until you no longer need a rollback.
+- Frontend: Lasius 3 does not read `ENVIRONMENT`, `NEXTAUTH_URL` and `NEXTAUTH_URL_INTERNAL`. Keep the
+  `NEXTAUTH_*` variables until you no longer need a rollback. The Plausible variables keep their names.
 - Reverse proxy: send `X-Forwarded-Host` and `X-Forwarded-Proto` to the frontend. The frontend builds the
   OAuth callback URL from them.
 - Backend: `LASIUS_INITIALIZE_DATA` now takes effect. With `false`, an empty database gets no initial admin user.

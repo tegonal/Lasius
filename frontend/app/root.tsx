@@ -36,6 +36,7 @@ import {
 import { ToastProvider } from '~/components/ui/feedback/toasts'
 import { useHelpStore } from '~/features/help/store/help-store'
 import { DataLoadingProgress } from '~/features/system/components/data-loading-progress'
+import { usePageViewTracking } from '~/features/system/hooks/use-page-view-tracking'
 import { NAMESPACES } from '~/i18n-config'
 
 const LazyHelpDrawer = lazy(async () => {
@@ -46,6 +47,7 @@ import { localeCookie } from '~/lib/cookies/i18next-cookie.server'
 import { parseThemeCookie } from '~/lib/cookies/theme-cookie.server'
 import { type ErrorPage, getErrorPage } from '~/lib/error-page'
 import { logger } from '~/lib/logger'
+import { getPlausibleConfig } from '~/lib/plausible-config.server'
 import { DEFAULT_TIME_ZONE } from '~/lib/utils/time-zone'
 import { getLocale, i18nextMiddleware } from '~/middleware/i18next'
 import { legacyAuthCookieMiddleware } from '~/middleware/legacy-auth-cookies'
@@ -92,10 +94,14 @@ export const loader = async ({ context, request }: Route.LoaderArgs) => {
   const headers = new Headers()
   headers.append('Set-Cookie', await localeCookie.serialize(locale))
 
-  return data({ locale, theme }, { headers })
+  return data(
+    { isPageViewTrackingEnabled: getPlausibleConfig() !== undefined, locale, theme },
+    { headers },
+  )
 }
 
-export default function App({ loaderData: _loaderData }: Route.ComponentProps) {
+export default function App({ loaderData }: Route.ComponentProps) {
+  usePageViewTracking(loaderData.isPageViewTrackingEnabled)
   return <Outlet />
 }
 

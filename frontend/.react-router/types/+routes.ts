@@ -91,6 +91,9 @@ type Pages = {
   "/api/export": {
     params: {};
   };
+  "/api/event": {
+    params: {};
+  };
   "/user/home": {
     params: {};
   };
@@ -178,7 +181,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/login" | "/logout" | "/join/:invitationId" | "/auth/error" | "/internal-oauth/login" | "/internal-oauth/register" | "/oauth/:provider/login" | "/oauth/callback" | "/internal_oauth/*" | "/api/auth/*" | "/api/session-status" | "/api/locales/:lang/:ns" | "/api/help/:locale/:slug" | "/api/theme" | "/api/calendar-bookings" | "/api/org-switch" | "/api/proxy" | "/api/ws-ticket" | "/api/locale" | "/api/health" | "/api/export" | "/user/home" | "/user/dashboard" | "/user/dashboard/day" | "/user/dashboard/week" | "/user/dashboard/month" | "/user/dashboard/6months" | "/user/dashboard/year" | "/user/lists" | "/user/stats" | "/user/stats/projects" | "/user/stats/tags" | "/user/stats/project/:projectId" | "/user/projects" | "/organisation/current" | "/organisation/integrations" | "/organisation/lists" | "/organisation/projects" | "/organisation/stats" | "/organisation/stats/projects" | "/organisation/stats/users" | "/organisation/stats/tags" | "/organisation/stats/project/:projectId" | "/settings/account" | "/settings/account-security" | "/settings/app" | "/settings/working-hours";
+    page: "/" | "/login" | "/logout" | "/join/:invitationId" | "/auth/error" | "/internal-oauth/login" | "/internal-oauth/register" | "/oauth/:provider/login" | "/oauth/callback" | "/internal_oauth/*" | "/api/auth/*" | "/api/session-status" | "/api/locales/:lang/:ns" | "/api/help/:locale/:slug" | "/api/theme" | "/api/calendar-bookings" | "/api/org-switch" | "/api/proxy" | "/api/ws-ticket" | "/api/locale" | "/api/health" | "/api/export" | "/api/event" | "/user/home" | "/user/dashboard" | "/user/dashboard/day" | "/user/dashboard/week" | "/user/dashboard/month" | "/user/dashboard/6months" | "/user/dashboard/year" | "/user/lists" | "/user/stats" | "/user/stats/projects" | "/user/stats/tags" | "/user/stats/project/:projectId" | "/user/projects" | "/organisation/current" | "/organisation/integrations" | "/organisation/lists" | "/organisation/projects" | "/organisation/stats" | "/organisation/stats/projects" | "/organisation/stats/users" | "/organisation/stats/tags" | "/organisation/stats/project/:projectId" | "/settings/account" | "/settings/account-security" | "/settings/app" | "/settings/working-hours";
   };
   "routes/login.tsx": {
     id: "routes/login";
@@ -263,6 +266,10 @@ type RouteFiles = {
   "routes/api.export.ts": {
     id: "routes/api.export";
     page: "/api/export";
+  };
+  "routes/api.event.ts": {
+    id: "routes/api.event";
+    page: "/api/event";
   };
   "routes/app-layout.tsx": {
     id: "routes/app-layout";
@@ -429,6 +436,7 @@ type RouteModules = {
   "routes/api.locale": typeof import("./app/routes/api.locale.ts");
   "routes/api.health": typeof import("./app/routes/api.health.ts");
   "routes/api.export": typeof import("./app/routes/api.export.ts");
+  "routes/api.event": typeof import("./app/routes/api.event.ts");
   "routes/app-layout": typeof import("./app/routes/app-layout.tsx");
   "routes/index-redirect": typeof import("./app/routes/index-redirect.ts");
   "routes/user.layout": typeof import("./app/routes/user.layout.tsx");

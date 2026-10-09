@@ -110,6 +110,7 @@ export default [
     route('locale', 'routes/api.locale.ts'),
     route('health', 'routes/api.health.ts'),
     route('export', 'routes/api.export.ts'),
+    route('event', 'routes/api.event.ts'),
   ]),
 
   // Authenticated app routes — requireUser redirects to /login if unauthenticated

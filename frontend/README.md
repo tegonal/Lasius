@@ -101,18 +101,23 @@ Regenerate with `yarn orval` (requires the backend running at `localhost:9000`).
 
 Copy `.env.template` to `.env.local` and configure:
 
-| Variable                        | Required | Description                                                         |
-| ------------------------------- | -------- | ------------------------------------------------------------------- |
-| `LASIUS_API_URL`                | Yes      | Backend API URL (default: `http://localhost:3000/backend`)          |
-| `LASIUS_API_WEBSOCKET_URL`      | No       | WebSocket URL for live updates (e.g. `ws://localhost:3000/backend`) |
-| `LASIUS_API_URL_INTERNAL`       | No       | Backend URL for SSR requests (falls back to `LASIUS_API_URL`)       |
-| `AUTH_SECRET`                   | Yes      | Session cookie signing secret                                       |
-| `LASIUS_OAUTH_*`                | No       | Internal OAuth provider (client ID, secret)                         |
-| `KEYCLOAK_OAUTH_*`              | No       | Keycloak provider (client ID, secret, realm URL, button name)       |
-| `GITHUB_OAUTH_*`                | No       | GitHub OAuth provider                                               |
-| `GITLAB_OAUTH_*`                | No       | GitLab OAuth provider                                               |
-| `LASIUS_TERMSOFSERVICE_VERSION` | No       | Require ToS acceptance (e.g., `1.0`)                                |
-| `LASIUS_DEMO_MODE`              | No       | `true` shows the demo credentials on the login page                 |
+| Variable                                   | Required | Description                                                         |
+| ------------------------------------------ | -------- | ------------------------------------------------------------------- |
+| `LASIUS_API_URL`                           | Yes      | Backend API URL (default: `http://localhost:3000/backend`)          |
+| `LASIUS_API_WEBSOCKET_URL`                 | No       | WebSocket URL for live updates (e.g. `ws://localhost:3000/backend`) |
+| `LASIUS_API_URL_INTERNAL`                  | No       | Backend URL for SSR requests (falls back to `LASIUS_API_URL`)       |
+| `AUTH_SECRET`                              | Yes      | Session cookie signing secret                                       |
+| `LASIUS_OAUTH_*`                           | No       | Internal OAuth provider (client ID, secret)                         |
+| `KEYCLOAK_OAUTH_*`                         | No       | Keycloak provider (client ID, secret, realm URL, button name)       |
+| `GITHUB_OAUTH_*`                           | No       | GitHub OAuth provider                                               |
+| `GITLAB_OAUTH_*`                           | No       | GitLab OAuth provider                                               |
+| `LASIUS_TERMSOFSERVICE_VERSION`            | No       | Require ToS acceptance (e.g., `1.0`)                                |
+| `LASIUS_DEMO_MODE`                         | No       | `true` shows the demo credentials on the login page                 |
+| `LASIUS_TELEMETRY_PLAUSIBLE_HOST`          | No       | URL of the Plausible instance, e.g. `https://plausible.example.com` |
+| `LASIUS_TELEMETRY_PLAUSIBLE_SOURCE_DOMAIN` | No       | Site domain in Plausible, e.g. `time.example.com`                   |
+
+Page views go to Plausible only when both Plausible variables have a value. Without them, the browser sends no
+tracking request.
 
 A provider shows on the login page when its `*_CLIENT_ID` variable has a value. At least one provider is required.
 
