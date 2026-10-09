@@ -19,6 +19,7 @@
 
 import { useState } from 'react'
 
+import { useLayoutLoaderData } from '~/hooks/use-layout-loader-data'
 import { useIsClient } from '~/lib/hooks/use-is-client'
 import { useAppSettingsStore, useIsOnboardingDismissed } from '~/stores/app-settings-store'
 
@@ -31,8 +32,10 @@ export const OnboardingTutorial = () => {
   // During hydration the store returns its initial state, not the persisted one. The dialog
   // mounts after hydration, so its slide state starts from the persisted checklist flag.
   const isMounted = useIsClient()
+  // The terms of service come first. The app-layout loader returns no terms after the acceptance.
+  const isTermsPending = Boolean(useLayoutLoaderData()?.termsOfService)
 
-  if (!isMounted || isOnboardingDismissed || dismissed) return null
+  if (!isMounted || isOnboardingDismissed || dismissed || isTermsPending) return null
 
   return (
     <OnboardingTutorialDialog
