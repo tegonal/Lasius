@@ -396,6 +396,50 @@ To enable and configure those authentication providers you need to either manual
 
 We bumped to the latest available mongo database version 8.x. If you consider migrating you current installation to this release, please follow the [migration documentation](https://www.mongodb.com/docs/manual/release-notes/8.0-upgrade-replica-set/) of mongodb.
 
+## Migration to 3.0.x
+
+Lasius 3 replaces the frontend. The image keeps the name `tegonal/lasius-frontend`. The event journal and
+all bookings stay unchanged. Every user signs in again once.
+
+### 1. Before the upgrade
+
+- Take a full `mongodump` of the database.
+- Register the new OAuth callback `https://<hostname>/oauth/callback` at each provider: Keycloak, GitLab and
+  GitHub. Keep the old callback `/api/auth/callback/<provider>` until you no longer need a rollback. See
+  [Auth](docs/Auth.md).
+- Make sure that `LASIUS_CLEAN_DATABASE_ON_STARTUP` is not set. It drops the database at startup.
+
+### 2. Environment changes
+
+- Frontend: set `AUTH_SECRET`. Without it, the frontend reads `NEXTAUTH_SECRET` of Lasius 2.x. Set `PORT`,
+  `LASIUS_API_URL` and the provider variables as described in [Environment Variables](#environment-variables).
+  The frontend container must reach the public `LASIUS_API_URL`.
+- Frontend: Lasius 3 does not read `ENVIRONMENT`, `NEXTAUTH_URL`, `NEXTAUTH_URL_INTERNAL` and the Plausible
+  variables. Keep the `NEXTAUTH_*` variables until you no longer need a rollback.
+- Reverse proxy: send `X-Forwarded-Host` and `X-Forwarded-Proto` to the frontend. The frontend builds the
+  OAuth callback URL from them.
+- Backend: `LASIUS_INITIALIZE_DATA` now takes effect. With `false`, an empty database gets no initial admin user.
+- Backend: the image does not read `LASIUS_START_PARAMS`. Pass JVM options and `-Dconfig.file` in `JAVA_OPTS`.
+- The terms of service files stay at the same mount path, `/app/public/termsofservice`.
+
+### 3. Upgrade
+
+1. Stop every backend instance of Lasius 2.x. Old and new backends must never run against the same
+   database at the same time, so do not use a rolling deploy.
+2. Start one backend instance of Lasius 3. Run one backend instance only.
+3. Check that the backend added an id to every issue-importer mapping. This query must return 0:
+   `db.IssueImporterConfig.countDocuments({projects: {$elemMatch: {id: {$exists: false}}}})`
+4. Start the new frontend, and sign in once with each provider.
+
+### 4. Rollback
+
+- Never restore the journal from the backup. That deletes every booking made after the upgrade.
+- For the frontend only: start `tegonal/lasius-frontend` 2.x again with the `NEXTAUTH_*` variables.
+- For the backend as well: stop the backend of Lasius 3 completely, then start the 2.x backend.
+  - Lasius 2.x removes the ids of the issue-importer mappings again.
+  - Lasius 3 allows several mappings for one external project. Lasius 2.x merges or deletes them on the next
+    edit of the mapping, so reduce them to one mapping before the rollback.
+
 ## Wiki / Documentation
 
 The wiki documentation of this project is part of the main repository and will be published on every build of the main branch. Therefore, don't edit the wiki online as those changes will be overwritten on the next build.
