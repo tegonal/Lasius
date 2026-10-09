@@ -60,7 +60,8 @@ class LinkPagedProjectServiceSpec extends Specification {
   private def labels(names: String*): JsArray =
     JsArray(names.map(n => Json.obj("name" -> n)))
 
-  private def next(url: String): Option[String] = Some(s"""<$url>; rel="next"""")
+  private def next(url: String): Option[String] = Some(
+    s"""<$url>; rel="next"""")
 
   "GitlabProjectService.getProjectMetadata" should {
     "load every label page that the Link header names" in {
@@ -80,9 +81,8 @@ class LinkPagedProjectServiceSpec extends Specification {
     }
 
     "stop when the next link repeats the current page" in {
-      val (client, requested) = StubPlaneClient(
-        _ => (200, labels("a")),
-        url => next(url))
+      val (client, requested) =
+        StubPlaneClient(_ => (200, labels("a")), url => next(url))
 
       Await
         .result(new GitlabProjectService(client)
@@ -93,12 +93,13 @@ class LinkPagedProjectServiceSpec extends Specification {
     }
 
     "stop at a page without a new label, although its next link is new" in {
-      var page = 0
+      var page                = 0
       val (client, requested) = StubPlaneClient(
         _ => (200, labels("a")),
         _ => {
           page += 1
-          next(s"https://gitlab.test/api/v4/projects/42/labels?page=${page + 1}")
+          next(
+            s"https://gitlab.test/api/v4/projects/42/labels?page=${page + 1}")
         })
 
       Await
@@ -123,10 +124,10 @@ class LinkPagedProjectServiceSpec extends Specification {
     "load the labels of an owner/repo id" in {
       val (client, requested) = StubPlaneClient(_ => (200, labels("bug")))
 
-      val result = Await.result(
-        new GithubProjectService(client)
-          .getProjectMetadata(githubConfig, "tegonal/lasius"),
-        5.seconds)
+      val result =
+        Await.result(new GithubProjectService(client)
+                       .getProjectMetadata(githubConfig, "tegonal/lasius"),
+                     5.seconds)
 
       result must equalTo(
         ExternalProjectMetadata(Seq("bug"), Seq("open", "closed", "all")))

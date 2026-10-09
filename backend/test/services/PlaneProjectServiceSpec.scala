@@ -75,10 +75,9 @@ class PlaneProjectServiceSpec extends Specification {
       respond: String => (Int, JsValue))
       : (ExternalProjectMetadata, Seq[String]) = {
     val (client, requested) = StubPlaneClient(respond)
-    val result              = Await.result(
-      new PlaneProjectService(client)
-        .getProjectMetadata(config, externalProjectId),
-      5.seconds)
+    val result              = Await.result(new PlaneProjectService(client)
+                                .getProjectMetadata(config, externalProjectId),
+                              5.seconds)
     (result, requested.toSeq)
   }
 
@@ -115,11 +114,12 @@ class PlaneProjectServiceSpec extends Specification {
       result.availableLabels must beSorted
       result.availableStates must equalTo(
         Seq("state 001", "state 002", "state 003"))
-      requested.map(_.replaceAll("\\?.*", "")).distinct must containTheSameElementsAs(
-        Seq(
-          s"https://plane.test/api/v1/workspaces/ws/projects/$projectId/labels/",
-          s"https://plane.test/api/v1/workspaces/ws/projects/$projectId/states/"
-        ))
+      requested
+        .map(_.replaceAll("\\?.*", ""))
+        .distinct must containTheSameElementsAs(Seq(
+        s"https://plane.test/api/v1/workspaces/ws/projects/$projectId/labels/",
+        s"https://plane.test/api/v1/workspaces/ws/projects/$projectId/states/"
+      ))
     }
 
     "fail when the label request fails" in {
