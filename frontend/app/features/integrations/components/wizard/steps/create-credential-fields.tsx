@@ -32,6 +32,9 @@ import { type InputControl } from '~/features/integrations/components/modals/con
 import { PlaneWorkspaceField } from '~/features/integrations/components/modals/config-fields/plane-workspace-field'
 import { type ImporterType } from '~/lib/utils/tag-helpers'
 
+// The PEM header is a fixed format marker, so it stays untranslated.
+const PEM_KEY_PLACEHOLDER = '-----BEGIN RSA PRIVATE KEY-----'
+
 type CreateCredentialFieldsProperties = {
   accessTokenControl: InputControl
   baseUrl: string
@@ -125,7 +128,7 @@ export const CreateCredentialFields = ({
             id={fields.privateKey.id}
             key={fields.privateKey.key}
             name={fields.privateKey.name}
-            placeholder="-----BEGIN RSA PRIVATE KEY-----"
+            placeholder={PEM_KEY_PLACEHOLDER}
             rows={4}
           />
           <FormFieldErrors errors={fields.privateKey.errors} />

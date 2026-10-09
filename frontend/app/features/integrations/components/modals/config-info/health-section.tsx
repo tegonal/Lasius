@@ -70,7 +70,7 @@ export const HealthSection = ({ syncStatus }: HealthSectionProperties) => {
               </p>
               {currentIssue.message && <p className="mt-1 text-xs">{currentIssue.message}</p>}
               {currentIssue.httpStatus && (
-                <p className="mt-1 text-xs">HTTP {currentIssue.httpStatus}</p>
+                <p className="mt-1 text-xs">{`HTTP ${currentIssue.httpStatus}`}</p>
               )}
             </div>
           </Alert>
