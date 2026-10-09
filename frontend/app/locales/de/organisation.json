@@ -18,11 +18,6 @@
   "errors": {
     "duplicateKey": "Eine Organisation mit diesem Namen existiert bereits"
   },
-  "forms": {
-    "email": "E-Mail",
-    "firstName": "Vorname",
-    "lastName": "Nachname"
-  },
   "info": {
     "uniqueNameRequired": "Organisationsnamen müssen eindeutig sein."
   },
@@ -43,7 +38,6 @@
     },
     "confirmRemove": "Bist du sicher, dass du dieses Mitglied aus dem Projekt entfernen möchtest?",
     "description_one": "Dieses Projekt hat {{count}} Mitglied.",
-    "description_many": "Dieses Projekt hat {{count}} Mitglieder.",
     "description_other": "Dieses Projekt hat {{count}} Mitglieder.",
     "empty": "Keine Mitglieder gefunden",
     "emptyState": "Keine Mitglieder gefunden",
@@ -56,9 +50,5 @@
   "organizationName": "Organisationsname",
   "privateDescription": "Diese Organisation ist nur für dich sichtbar. Nutze sie für private Projekte. Um mit anderen zusammenzuarbeiten, erstelle oder verwende eine andere Organisation.",
   "selected": "Ausgewählt",
-  "selectOrganisation": "Organisation auswählen",
-  "status": {
-    "label": "Status"
-  },
-  "you": "Du"
+  "selectOrganisation": "Organisation auswählen"
 }

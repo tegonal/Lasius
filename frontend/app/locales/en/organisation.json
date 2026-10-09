@@ -18,11 +18,6 @@
   "errors": {
     "duplicateKey": "An organisation with this name already exists"
   },
-  "forms": {
-    "email": "Email",
-    "firstName": "First name",
-    "lastName": "Last name"
-  },
   "info": {
     "uniqueNameRequired": "Organisation names must be unique."
   },
@@ -55,9 +50,5 @@
   "organizationName": "Organisation name",
   "privateDescription": "This organisation is only visible to you. You can use it to track private projects that you do not want others to have access to. If you want to invite people, invite them to an existing organisation or create a new one.",
   "selected": "Selected",
-  "selectOrganisation": "Select organisation",
-  "status": {
-    "label": "Status"
-  },
-  "you": "You"
+  "selectOrganisation": "Select organisation"
 }

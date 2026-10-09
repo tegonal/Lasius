@@ -18,11 +18,6 @@
   "errors": {
     "duplicateKey": "Un'organizzazione con questo nome esiste già"
   },
-  "forms": {
-    "email": "Email",
-    "firstName": "Nome",
-    "lastName": "Cognome"
-  },
   "info": {
     "uniqueNameRequired": "I nomi delle organizzazioni devono essere univoci."
   },
@@ -56,9 +51,5 @@
   "organizationName": "Nome organizzazione",
   "privateDescription": "Questa organizzazione è visibile solo a te. Usala per monitorare progetti privati. Per collaborare con altri, crea o usa un'organizzazione diversa.",
   "selected": "Selezionato",
-  "selectOrganisation": "Seleziona organizzazione",
-  "status": {
-    "label": "Stato"
-  },
-  "you": "Tu"
+  "selectOrganisation": "Seleziona organizzazione"
 }

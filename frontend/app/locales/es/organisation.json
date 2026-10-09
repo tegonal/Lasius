@@ -18,11 +18,6 @@
   "errors": {
     "duplicateKey": "Ya existe una organización con este nombre"
   },
-  "forms": {
-    "email": "Correo electrónico",
-    "firstName": "Nombre",
-    "lastName": "Apellidos"
-  },
   "info": {
     "uniqueNameRequired": "Los nombres de las organizaciones deben ser únicos."
   },
@@ -56,9 +51,5 @@
   "organizationName": "Nombre de la organización",
   "privateDescription": "Esta organización solo es visible para ti. Úsala para realizar un seguimiento de proyectos privados. Para colaborar con otros, crea o usa una organización diferente.",
   "selected": "Seleccionado",
-  "selectOrganisation": "Seleccionar organización",
-  "status": {
-    "label": "Estado"
-  },
-  "you": "Tú"
+  "selectOrganisation": "Seleccionar organización"
 }

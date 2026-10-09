@@ -42,7 +42,6 @@
     "checkIntervalHelp": "Wie oft nach neuen Issues gesucht werden soll",
     "configListItem": {
       "projectCount_one": "{{count}} Zuordnung",
-      "projectCount_many": "{{count}} Zuordnungen",
       "projectCount_other": "{{count}} Zuordnungen"
     },
     "descriptions": {
@@ -184,6 +183,9 @@
       "labelFilterHelp": "Leer lassen, um alle Labels zu importieren, oder bestimmte Labels auswählen, um nur diese zu importieren.",
       "labelFilterLabel": "Nur bestimmte Labels importieren",
       "labelFilterPlaceholder": "Alle Labels (oder bestimmte Labels auswählen...)",
+      "metadataError": "Die Labels und Status dieses Projekts konnten nicht geladen werden.",
+      "metadataLoading": "Labels und Status werden geladen...",
+      "metadataRetry": "Erneut versuchen",
       "tagFieldsLabel": "Zu importierende Tag-Felder",
       "tagFieldsPlaceholder": "Felder auswählen...",
       "useAssignees": "Beauftragte als Tags verwenden",
@@ -218,7 +220,6 @@
         "loading": "Projekte von {{platform}} werden geladen...",
         "mappingDescription": "Verknüpfe dieses externe Projekt mit einem Lasius-Projekt, um Issues automatisch als Zeiterfassungs-Tags zu synchronisieren.",
         "mappingDescription_one": "{{count}} Projekt von {{platform}} gefunden. Ordne es deinen Lasius-Projekten zu, um Issues zu importieren. {{mapped}} von {{total}} zugeordnet.",
-        "mappingDescription_many": "{{count}} Projekte von {{platform}} gefunden. Ordne sie deinen Lasius-Projekten zu, um Issues zu importieren. {{mapped}} von {{total}} zugeordnet.",
         "mappingDescription_other": "{{count}} Projekte von {{platform}} gefunden. Ordne sie deinen Lasius-Projekten zu, um Issues zu importieren. {{mapped}} von {{total}} zugeordnet.",
         "noProjects": "Keine Projekte in {{platform}} gefunden",
         "notMapped": "Nicht zugeordnet",

@@ -124,6 +124,11 @@ type Pages = {
   "/user/stats/tags": {
     params: {};
   };
+  "/user/stats/project/:projectId": {
+    params: {
+      "projectId": string;
+    };
+  };
   "/user/projects": {
     params: {};
   };
@@ -151,6 +156,11 @@ type Pages = {
   "/organisation/stats/tags": {
     params: {};
   };
+  "/organisation/stats/project/:projectId": {
+    params: {
+      "projectId": string;
+    };
+  };
   "/settings/account": {
     params: {};
   };
@@ -168,7 +178,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/login" | "/logout" | "/join/:invitationId" | "/auth/error" | "/internal-oauth/login" | "/internal-oauth/register" | "/oauth/:provider/login" | "/oauth/callback" | "/internal_oauth/*" | "/api/auth/*" | "/api/session-status" | "/api/locales/:lang/:ns" | "/api/help/:locale/:slug" | "/api/theme" | "/api/calendar-bookings" | "/api/org-switch" | "/api/proxy" | "/api/ws-ticket" | "/api/locale" | "/api/health" | "/api/export" | "/user/home" | "/user/dashboard" | "/user/dashboard/day" | "/user/dashboard/week" | "/user/dashboard/month" | "/user/dashboard/6months" | "/user/dashboard/year" | "/user/lists" | "/user/stats" | "/user/stats/projects" | "/user/stats/tags" | "/user/projects" | "/organisation/current" | "/organisation/integrations" | "/organisation/lists" | "/organisation/projects" | "/organisation/stats" | "/organisation/stats/projects" | "/organisation/stats/users" | "/organisation/stats/tags" | "/settings/account" | "/settings/account-security" | "/settings/app" | "/settings/working-hours";
+    page: "/" | "/login" | "/logout" | "/join/:invitationId" | "/auth/error" | "/internal-oauth/login" | "/internal-oauth/register" | "/oauth/:provider/login" | "/oauth/callback" | "/internal_oauth/*" | "/api/auth/*" | "/api/session-status" | "/api/locales/:lang/:ns" | "/api/help/:locale/:slug" | "/api/theme" | "/api/calendar-bookings" | "/api/org-switch" | "/api/proxy" | "/api/ws-ticket" | "/api/locale" | "/api/health" | "/api/export" | "/user/home" | "/user/dashboard" | "/user/dashboard/day" | "/user/dashboard/week" | "/user/dashboard/month" | "/user/dashboard/6months" | "/user/dashboard/year" | "/user/lists" | "/user/stats" | "/user/stats/projects" | "/user/stats/tags" | "/user/stats/project/:projectId" | "/user/projects" | "/organisation/current" | "/organisation/integrations" | "/organisation/lists" | "/organisation/projects" | "/organisation/stats" | "/organisation/stats/projects" | "/organisation/stats/users" | "/organisation/stats/tags" | "/organisation/stats/project/:projectId" | "/settings/account" | "/settings/account-security" | "/settings/app" | "/settings/working-hours";
   };
   "routes/login.tsx": {
     id: "routes/login";
@@ -256,7 +266,7 @@ type RouteFiles = {
   };
   "routes/app-layout.tsx": {
     id: "routes/app-layout";
-    page: "/" | "/user/home" | "/user/dashboard" | "/user/dashboard/day" | "/user/dashboard/week" | "/user/dashboard/month" | "/user/dashboard/6months" | "/user/dashboard/year" | "/user/lists" | "/user/stats" | "/user/stats/projects" | "/user/stats/tags" | "/user/projects" | "/organisation/current" | "/organisation/integrations" | "/organisation/lists" | "/organisation/projects" | "/organisation/stats" | "/organisation/stats/projects" | "/organisation/stats/users" | "/organisation/stats/tags" | "/settings/account" | "/settings/account-security" | "/settings/app" | "/settings/working-hours";
+    page: "/" | "/user/home" | "/user/dashboard" | "/user/dashboard/day" | "/user/dashboard/week" | "/user/dashboard/month" | "/user/dashboard/6months" | "/user/dashboard/year" | "/user/lists" | "/user/stats" | "/user/stats/projects" | "/user/stats/tags" | "/user/stats/project/:projectId" | "/user/projects" | "/organisation/current" | "/organisation/integrations" | "/organisation/lists" | "/organisation/projects" | "/organisation/stats" | "/organisation/stats/projects" | "/organisation/stats/users" | "/organisation/stats/tags" | "/organisation/stats/project/:projectId" | "/settings/account" | "/settings/account-security" | "/settings/app" | "/settings/working-hours";
   };
   "routes/index-redirect.ts": {
     id: "routes/index-redirect";
@@ -264,7 +274,7 @@ type RouteFiles = {
   };
   "routes/user.layout.tsx": {
     id: "routes/user.layout";
-    page: "/user/home" | "/user/dashboard" | "/user/dashboard/day" | "/user/dashboard/week" | "/user/dashboard/month" | "/user/dashboard/6months" | "/user/dashboard/year" | "/user/lists" | "/user/stats" | "/user/stats/projects" | "/user/stats/tags";
+    page: "/user/home" | "/user/dashboard" | "/user/dashboard/day" | "/user/dashboard/week" | "/user/dashboard/month" | "/user/dashboard/6months" | "/user/dashboard/year" | "/user/lists" | "/user/stats" | "/user/stats/projects" | "/user/stats/tags" | "/user/stats/project/:projectId";
   };
   "routes/user.layout._index.tsx": {
     id: "routes/user.layout._index";
@@ -318,6 +328,10 @@ type RouteFiles = {
     id: "routes/user.stats.tags";
     page: "/user/stats/tags";
   };
+  "routes/user.stats.project.$projectId.tsx": {
+    id: "routes/user.stats.project.$projectId";
+    page: "/user/stats/project/:projectId";
+  };
   "routes/user.projects.tsx": {
     id: "routes/user.projects";
     page: "/user/projects";
@@ -328,7 +342,7 @@ type RouteFiles = {
   };
   "routes/organisation.layout.tsx": {
     id: "routes/organisation.layout";
-    page: "/organisation/current" | "/organisation/integrations" | "/organisation/lists" | "/organisation/projects" | "/organisation/stats" | "/organisation/stats/projects" | "/organisation/stats/users" | "/organisation/stats/tags";
+    page: "/organisation/current" | "/organisation/integrations" | "/organisation/lists" | "/organisation/projects" | "/organisation/stats" | "/organisation/stats/projects" | "/organisation/stats/users" | "/organisation/stats/tags" | "/organisation/stats/project/:projectId";
   };
   "routes/organisation.current.tsx": {
     id: "routes/organisation.current";
@@ -365,6 +379,10 @@ type RouteFiles = {
   "routes/organisation.stats.tags.tsx": {
     id: "routes/organisation.stats.tags";
     page: "/organisation/stats/tags";
+  };
+  "routes/organisation.stats.project.$projectId.tsx": {
+    id: "routes/organisation.stats.project.$projectId";
+    page: "/organisation/stats/project/:projectId";
   };
   "routes/settings.layout.tsx": {
     id: "routes/settings.layout";
@@ -427,6 +445,7 @@ type RouteModules = {
   "routes/user.stats._index": typeof import("./app/routes/user.stats._index.tsx");
   "routes/user.stats.projects": typeof import("./app/routes/user.stats.projects.tsx");
   "routes/user.stats.tags": typeof import("./app/routes/user.stats.tags.tsx");
+  "routes/user.stats.project.$projectId": typeof import("./app/routes/user.stats.project.$projectId.tsx");
   "routes/user.projects": typeof import("./app/routes/user.projects.tsx");
   "routes/user.projects._index": typeof import("./app/routes/user.projects._index.tsx");
   "routes/organisation.layout": typeof import("./app/routes/organisation.layout.tsx");
@@ -439,6 +458,7 @@ type RouteModules = {
   "routes/organisation.stats.projects": typeof import("./app/routes/organisation.stats.projects.tsx");
   "routes/organisation.stats.users": typeof import("./app/routes/organisation.stats.users.tsx");
   "routes/organisation.stats.tags": typeof import("./app/routes/organisation.stats.tags.tsx");
+  "routes/organisation.stats.project.$projectId": typeof import("./app/routes/organisation.stats.project.$projectId.tsx");
   "routes/settings.layout": typeof import("./app/routes/settings.layout.tsx");
   "routes/settings.account": typeof import("./app/routes/settings.account.tsx");
   "routes/settings.account-security": typeof import("./app/routes/settings.account-security.tsx");

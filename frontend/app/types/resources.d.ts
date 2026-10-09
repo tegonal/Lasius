@@ -78,9 +78,7 @@ export default interface Resources {
   }
   calendar: {
     navigation: {
-      nextMonth: 'Next month'
       nextWeek: 'Next week'
-      previousMonth: 'Previous month'
       previousWeek: 'Previous week'
     }
     time: {
@@ -292,6 +290,11 @@ export default interface Resources {
       email: 'Email'
       firstName: 'First name'
       lastName: 'Last name'
+      multiSelect: {
+        placeholder: 'Select options'
+        selectedCount_one: '{{count}} selected'
+        selectedCount_other: '{{count}} selected'
+      }
       name: 'Name'
       password: 'Password'
     }
@@ -518,6 +521,7 @@ export default interface Resources {
       emptyState: 'No integrations configured yet. Add one to get started.'
       errors: {
         deleteFailed: 'Failed to delete integration'
+        deleteHasMappings: 'This integration still has project mappings. Remove all mappings first.'
         invalidMappingData: 'Invalid mapping data'
         mappingRemoveFailed: 'Failed to remove project mapping'
         mappingSaveFailed: 'Failed to save project mapping'
@@ -600,6 +604,7 @@ export default interface Resources {
         name: 'Name'
         nextScheduledSync: 'Next Scheduled Sync'
         noConfig: 'No configuration selected.'
+        notAvailable: 'N/A'
         pendingFirstSync: 'Pending first sync'
         projectStats: 'Project Statistics'
         title: 'Configuration Info'
@@ -649,6 +654,9 @@ export default interface Resources {
         labelFilterHelp: 'Leave empty to import all labels, or select specific labels to import only those.'
         labelFilterLabel: 'Import only specific labels'
         labelFilterPlaceholder: 'All labels (or select specific labels...)'
+        metadataError: 'Failed to load the labels and states of this project.'
+        metadataLoading: 'Loading labels and states...'
+        metadataRetry: 'Retry'
         tagFieldsLabel: 'Tag fields to import'
         tagFieldsPlaceholder: 'Select fields...'
         useAssignees: 'Use assignees as tags'
@@ -910,11 +918,6 @@ export default interface Resources {
     errors: {
       duplicateKey: 'An organisation with this name already exists'
     }
-    forms: {
-      email: 'Email'
-      firstName: 'First name'
-      lastName: 'Last name'
-    }
     info: {
       uniqueNameRequired: 'Organisation names must be unique.'
     }
@@ -948,10 +951,6 @@ export default interface Resources {
     privateDescription: 'This organisation is only visible to you. You can use it to track private projects that you do not want others to have access to. If you want to invite people, invite them to an existing organisation or create a new one.'
     selectOrganisation: 'Select organisation'
     selected: 'Selected'
-    status: {
-      label: 'Status'
-    }
-    you: 'You'
   }
   projects: {
     actions: {
