@@ -38,6 +38,8 @@ playwright-transform-cache-*/
 .memory/
 .serena/
 .clauderc
+.cbmignore
+WIKI.md
 .playwright*
 playwright_*
 CLAUDE.md

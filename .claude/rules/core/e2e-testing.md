@@ -1,5 +1,5 @@
 ---
-version: 1.5.0
+version: 1.5.1
 applies: playwright | "@playwright/test"
 target: rules
 paths:
@@ -25,7 +25,6 @@ tags: [testing, e2e, playwright, selectors, test]
 | API reference | https://playwright.dev/docs/api/class-playwright | Full API |
 | Best practices | https://playwright.dev/docs/best-practices | Official recommendations |
 | Locators | https://playwright.dev/docs/locators | Selector strategies |
-| Context7 | `/microsoft/playwright` | Good coverage |
 | GitHub | https://github.com/microsoft/playwright | Source, issues |
 
 ## Selector Strategy: data-testid
@@ -222,5 +221,3 @@ test("POST /api/journeys", async ({ request }) => {
 - **Dialogs** — use `page.getByRole("dialog")` not text selectors
 - **Dropdown menus** — use `role="menu"` + `role="menuitem"` hierarchy
 - **Flaky waits** — prefer `waitForURL`, `toBeVisible()`, `toBeHidden()` over `waitForTimeout`
-
-See `project/e2e-pitfalls` for Lasius-specific patterns and gotchas.
