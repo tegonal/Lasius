@@ -268,6 +268,19 @@ services:
 Always set `mem_limit`. The JVM calculates the heap size from the container limit. Without a limit,
 the JVM uses the memory of the whole VM.
 
+**The profile fits only a small database.** At startup the backend replays the whole event journal.
+With a larger heap limit, the replay also used more heap. Measured with a production copy of 213,000
+journal events:
+
+| Setting | Startup |
+|---|---|
+| `mem_limit: 512m`, profile `small` (heap about 154 MiB) | `OutOfMemoryError` and a restart loop |
+| `mem_limit: 1g`, `-Xmx512m` | 30 s of full GCs; 3 user aggregates failed with `RecoveryTimedOut` |
+| `mem_limit: 1536m`, `-Xmx1g`, no profile | Peak live heap 751 MiB, no recovery error; about 200 MiB live after the replay |
+
+For an instance with real data, set `mem_limit: 1536m` and `JAVA_OPTS: -Xmx1g`, and leave
+`LASIUS_RESOURCE_PROFILE` unset.
+
 #### Backend options
 
 `LASIUS_RESOURCE_PROFILE=small` adds these options:

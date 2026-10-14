@@ -31,6 +31,7 @@ import { getExpectedVsBookedPercentage } from '~/lib/api/functions/get-expected-
 import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
 import { getUserClock } from '~/lib/cookies/time-zone-cookie.server'
 import { loadOrganisationContext } from '~/lib/organisation-helpers.server'
+import { createServerTiming } from '~/lib/server-timing.server'
 import { apiTimespanDay, getWorkingHoursWeekdayString, isoDateOrFallback } from '~/lib/utils/dates'
 import { getOrganisationUserList } from '~/services/api/lasius/organisations/organisations'
 import {
@@ -44,8 +45,12 @@ import { mergeAuthHeaders } from '~/services/auth/auth-helpers.server'
 import { type Route } from './+types/user.layout._index'
 
 export const loader = async ({ request, url }: Route.LoaderArgs) => {
+  const timing = createServerTiming()
   // The profile gives the planned working hours and the selected organisation
-  const { auth, headers, selectedOrg, selectedOrgId } = await loadOrganisationContext(request, url)
+  const { auth, headers, selectedOrg, selectedOrgId } = await timing.measure(
+    'context',
+    loadOrganisationContext(request, url),
+  )
 
   const selectedDate = isoDateOrFallback(url.searchParams.get('date'), getUserClock(request).today)
   const dayTimespan = apiTimespanDay(selectedDate)
@@ -58,11 +63,17 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
     orgCurrentBookingsResponse,
     orgUsersResponse,
   ] = await Promise.all([
-    getUserBookingListByOrganisation(selectedOrgId, dayTimespan, { headers }),
-    getUserBookingCurrent({ headers }),
-    getFavoriteBookingList(selectedOrgId, { headers }),
-    getUserBookingCurrentListByOrganisation(selectedOrgId, { headers }),
-    getOrganisationUserList(selectedOrgId, { headers }),
+    timing.measure(
+      'day',
+      getUserBookingListByOrganisation(selectedOrgId, dayTimespan, { headers }),
+    ),
+    timing.measure('current', getUserBookingCurrent({ headers })),
+    timing.measure('favorites', getFavoriteBookingList(selectedOrgId, { headers })),
+    timing.measure(
+      'orgCurrent',
+      getUserBookingCurrentListByOrganisation(selectedOrgId, { headers }),
+    ),
+    timing.measure('orgUsers', getOrganisationUserList(selectedOrgId, { headers })),
   ])
 
   const dayBookings = dayBookingsResponse.data ?? []
@@ -101,8 +112,14 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
       selectedDate,
       selectedOrgId,
     },
-    { headers: mergeAuthHeaders(auth) },
+    { headers: mergeAuthHeaders(auth, { 'Server-Timing': timing.header() }) },
   )
+}
+
+// React Router sends a loader header only through this export, for the page and for its .data request.
+export function headers({ loaderHeaders }: Route.HeadersArgs) {
+  const serverTiming = loaderHeaders.get('Server-Timing')
+  return serverTiming ? { 'Server-Timing': serverTiming } : {}
 }
 
 export default function HomeIndex({ loaderData }: Route.ComponentProps) {
