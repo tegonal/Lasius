@@ -21,7 +21,6 @@
     "incremental": true,
     "allowImportingTsExtensions": true,
     "noUncheckedIndexedAccess": true,
-    "baseUrl": ".",
     "types": ["@react-router/node", "vite/client"],
     "paths": {
       "~/*": ["./app/*"],

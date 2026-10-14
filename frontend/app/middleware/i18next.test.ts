@@ -43,7 +43,6 @@ describe('i18nextMiddleware', () => {
       defaultNS: i18nConfig.defaultNS,
       fallbackLng: [i18nConfig.fallbackLng],
       returnEmptyString: i18nConfig.returnEmptyString,
-      showSupportNotice: false,
       supportedLngs: expect.arrayContaining(i18nConfig.supportedLngs),
     })
   })

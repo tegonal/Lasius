@@ -124,10 +124,10 @@ export function useBookingHistoryFilters() {
   }, [fromValue, toValue, projectIdValue, userIdValue, tagsValue, setSearchParameters])
 
   // Set initial search params on mount if missing
-  const didSetInitialParameters = useRef(false)
+  const initialParametersSetReference = useRef(false)
   useEffect(() => {
-    if (didSetInitialParameters.current) return
-    didSetInitialParameters.current = true
+    if (initialParametersSetReference.current) return
+    initialParametersSetReference.current = true
 
     if (!searchParameters.has('from') || !searchParameters.has('to')) {
       setSearchParameters(

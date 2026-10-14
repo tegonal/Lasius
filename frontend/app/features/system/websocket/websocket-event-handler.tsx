@@ -40,8 +40,8 @@ const IGNORED_EVENTS = new Set([
 ])
 
 // A message can hold booking data and the names of all organisation members, so production logs none.
-const logDevelopmentInfo: (...arguments_: unknown[]) => void = import.meta.env.DEV
-  ? (...arguments_) => logger.info(...arguments_)
+const logDevelopmentInfo: (message: string, ...arguments_: unknown[]) => void = import.meta.env.DEV
+  ? (message, ...arguments_) => logger.info(message, ...arguments_)
   : () => {}
 
 const logSkippedEvent = (messageType: string, isIgnored: boolean, message: unknown) => {

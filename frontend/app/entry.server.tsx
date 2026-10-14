@@ -88,7 +88,7 @@ export default async function handleRequest(
       {
         onError(error: unknown) {
           responseStatusCode = 500
-          if (isShellRendered) logger.error(error)
+          if (isShellRendered) logger.error('The stream render failed after the shell', error)
         },
         onShellError(error: unknown) {
           reject(

@@ -74,7 +74,5 @@ export const i18nConfig = {
   ns: [...NAMESPACES] as string[],
   /** Treat empty strings as missing translations — fall back to fallbackLng */
   returnEmptyString: false,
-  /** Suppress i18next sponsorship/Locize banner */
-  showSupportNotice: false,
   supportedLngs: [...LOCALES] as string[],
 }
