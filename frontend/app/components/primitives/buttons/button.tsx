@@ -65,8 +65,10 @@ const buttonVariants = cva(
         iconPrimaryHover: 'btn-ghost btn-square hover:bg-primary hover:text-primary-content',
         info: 'btn-info',
         link: 'btn-link',
-        navigation: 'btn-ghost h-auto justify-start gap-3 p-3 text-left',
-        navigationActive: 'btn-ghost bg-base-content/10 h-auto justify-start gap-3 p-3 text-left',
+        navigation:
+          'btn-ghost hover:bg-base-content/5 h-auto justify-start gap-3 p-3 text-left hover:border-transparent',
+        navigationActive:
+          'btn-ghost bg-base-content/10 hover:bg-base-content/10 h-auto justify-start gap-3 p-3 text-left hover:border-transparent',
         neutral: 'btn-neutral',
         outline: 'btn-outline',
         primary: 'bg-primary-gradient hover:bg-primary-gradient-hover border-none text-white',

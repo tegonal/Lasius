@@ -18,7 +18,6 @@
  */
 
 import { ArrowDownToLine, ArrowUpDown, ArrowUpToLine, Plus } from 'lucide-react'
-import { useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
@@ -39,24 +38,16 @@ type Properties = {
 
 export const BookingInsertActions = ({ currentItem, nextItem, onAddBetween }: Properties) => {
   const { t } = useTranslation('common')
-  const { collapse, dialogRef, handleToggle, isExpanded, setIsHovered, showExpanded } =
-    useDialogActions()
-  const hoverTimeoutReference = useRef<null | ReturnType<typeof setTimeout>>(null)
+  const {
+    collapse,
+    dialogRef,
+    handleMouseEnter,
+    handleMouseLeave,
+    handleToggle,
+    isExpanded,
+    showExpanded,
+  } = useDialogActions()
   const selectedOrgId = useSelectedOrgId()
-
-  const handleMouseEnter = useCallback(() => {
-    if (hoverTimeoutReference.current) {
-      clearTimeout(hoverTimeoutReference.current)
-      hoverTimeoutReference.current = null
-    }
-    setIsHovered(true)
-  }, [setIsHovered])
-
-  const handleMouseLeave = useCallback(() => {
-    hoverTimeoutReference.current = setTimeout(() => {
-      collapse()
-    }, 300)
-  }, [collapse])
 
   const updateCurrentBooking = useUpdateUserBooking()
   const updateNextBooking = useUpdateUserBooking()
@@ -156,10 +147,11 @@ export const BookingInsertActions = ({ currentItem, nextItem, onAddBetween }: Pr
 
       {!isExpanded && (
         <div className="absolute inset-x-0 -bottom-3 z-10 flex items-center justify-center py-3 text-center">
+          {/* The open control gets a fixed area. The expanded buttons are smaller than the icon, so an area that fits them loses the pointer. */}
           <div
             className={cn(
-              'absolute flex gap-1 rounded-full p-3 transition-all duration-200',
-              showExpanded ? 'z-20' : 'z-10',
+              'absolute flex items-center justify-center gap-1 rounded-full',
+              showExpanded ? 'z-20 h-14 w-44' : 'z-10 p-3',
             )}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}>

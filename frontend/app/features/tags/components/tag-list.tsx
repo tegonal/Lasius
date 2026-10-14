@@ -20,6 +20,7 @@
 import { PlatformTag } from '~/features/tags/components/platform-tag'
 import { SimpleTag } from '~/features/tags/components/simple-tag'
 import {
+  getIssueLink,
   getTagSummary,
   getTagText,
   getTagVariant,
@@ -44,8 +45,9 @@ export const Tag = ({
   item,
   width = 'md',
 }: TagProperties) => {
-  const isClickable = !!clickHandler
-  const isRemovable = isClickable && !hideRemoveIcon
+  const isRemovable = !!clickHandler && !hideRemoveIcon
+  // Without a handler, a click opens the issue on its platform, so a tag with a link is clickable too.
+  const isClickable = !!clickHandler || !!getIssueLink(item)
   const handleClick = () => (clickHandler ? clickHandler(item) : openIssueLink(item))
 
   const summary = getTagSummary(item)

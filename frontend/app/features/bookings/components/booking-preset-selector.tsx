@@ -67,7 +67,7 @@ const PresetButton = ({
 }) => (
   <button
     aria-label={ariaLabel}
-    className="hover:bg-base-200 flex w-full cursor-pointer items-start gap-2 rounded-lg p-3 text-left transition-colors"
+    className="hover:bg-base-200 border-base-content/20 flex w-full cursor-pointer items-center gap-2 border-b px-2 py-2 text-left transition-colors"
     onClick={onClick}
     type="button">
     {children}
@@ -77,11 +77,11 @@ const PresetButton = ({
 type PresetItem = { projectReference: { id: string; key: string }; tags: ModelsTag[] }
 
 const BookingPresetItem = ({ item }: { item: PresetItem }) => (
-  <div className="flex-1 space-y-1">
-    <div className="text-sm font-medium">
+  <div className="flex flex-1 flex-col">
+    <div className="leading-normal font-bold">
       {item.projectReference.key || item.projectReference.id}
     </div>
-    {item.tags.length > 0 && <TagList items={item.tags} />}
+    {item.tags.length > 0 && <TagList items={item.tags} width="sm" />}
   </div>
 )
 

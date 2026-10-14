@@ -19,6 +19,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+const HOVER_LEAVE_DELAY_MS = 600
+
 /** The dialog method that makes the open state of the dialog match the expanded state, or null. */
 export const getDialogSync = (isExpanded: boolean, isOpen: boolean): 'close' | 'show' | null => {
   if (isExpanded === isOpen) return null
@@ -46,6 +48,30 @@ export const useDialogActions = () => {
     setIsExpanded(false)
     setIsHovered(false)
   }, [])
+
+  const leaveTimeoutReference = useRef<null | ReturnType<typeof setTimeout>>(null)
+
+  const clearLeaveTimeout = useCallback(() => {
+    if (!leaveTimeoutReference.current) {
+      return
+    }
+
+    clearTimeout(leaveTimeoutReference.current)
+    leaveTimeoutReference.current = null
+  }, [])
+
+  const handleMouseEnter = useCallback(() => {
+    clearLeaveTimeout()
+    setIsHovered(true)
+  }, [clearLeaveTimeout])
+
+  // The delay lets the pointer cross a gap between the buttons, or leave for a moment, without a close.
+  const handleMouseLeave = useCallback(() => {
+    clearLeaveTimeout()
+    leaveTimeoutReference.current = setTimeout(collapse, HOVER_LEAVE_DELAY_MS)
+  }, [clearLeaveTimeout, collapse])
+
+  useEffect(() => clearLeaveTimeout, [clearLeaveTimeout])
 
   // Sync dialog open/close with isExpanded state
   useEffect(() => {
@@ -97,10 +123,11 @@ export const useDialogActions = () => {
   return {
     collapse,
     dialogRef: dialogReference,
+    handleMouseEnter,
+    handleMouseLeave,
     handleToggle,
     isExpanded,
     isHovered,
-    setIsHovered,
     showExpanded: isShowExpanded,
   }
 }

@@ -26,6 +26,7 @@ import { useSelectedOrgId } from '~/features/bookings/hooks/use-home-loader-data
 import { getAdjustedBookingBody } from '~/features/bookings/lib/booking-adjust'
 import { useDialogActions } from '~/hooks/use-dialog-actions'
 import { type AugmentedBooking } from '~/lib/api/functions/augment-bookings-list'
+import { cn } from '~/lib/utils/cn'
 import { type ModelsBooking } from '~/services/api/lasius'
 import { useUpdateUserBooking } from '~/services/api/lasius-hooks/user-bookings/user-bookings'
 
@@ -37,8 +38,15 @@ type Properties = {
 
 export const BookingOverlapActions = ({ currentItem, onEdit, overlappingItem }: Properties) => {
   const { t } = useTranslation('common')
-  const { collapse, dialogRef, handleToggle, isExpanded, setIsHovered, showExpanded } =
-    useDialogActions()
+  const {
+    collapse,
+    dialogRef,
+    handleMouseEnter,
+    handleMouseLeave,
+    handleToggle,
+    isExpanded,
+    showExpanded,
+  } = useDialogActions()
   const selectedOrgId = useSelectedOrgId()
 
   const updateCurrentBooking = useUpdateUserBooking()
@@ -134,28 +142,33 @@ export const BookingOverlapActions = ({ currentItem, onEdit, overlappingItem }: 
       )}
 
       {!isExpanded && (
-        <div
-          className="absolute inset-x-0 bottom-0 z-10 flex items-center justify-center text-center"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => collapse()}>
+        <div className="absolute inset-x-0 bottom-0 z-10 flex items-center justify-center text-center">
+          {/* The open control gets a fixed area, as in booking-insert-actions.tsx, so the smaller pill keeps the pointer. */}
           <div
-            className={`bg-base-100 absolute flex gap-1 rounded-full p-1 transition-all duration-200 ${showExpanded ? 'z-20' : 'z-10'}`}>
-            {showExpanded ? (
-              actionButtons
-            ) : (
-              <Button
-                fullWidth={false}
-                onClick={handleToggle}
-                shape="circle"
-                title={t(
-                  'bookings:overlapsWarning',
-                  'These two bookings overlap. Tap to see adjustment options.',
-                )}
-                type="button"
-                variant="icon">
-                <LucideIcon icon={AlertTriangle} size={18} />
-              </Button>
+            className={cn(
+              'absolute flex items-center justify-center',
+              showExpanded ? 'z-20 h-14 w-44' : 'z-10',
             )}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}>
+            <div className="bg-base-100 flex gap-1 rounded-full p-1">
+              {showExpanded ? (
+                actionButtons
+              ) : (
+                <Button
+                  fullWidth={false}
+                  onClick={handleToggle}
+                  shape="circle"
+                  title={t(
+                    'bookings:overlapsWarning',
+                    'These two bookings overlap. Tap to see adjustment options.',
+                  )}
+                  type="button"
+                  variant="icon">
+                  <LucideIcon icon={AlertTriangle} size={18} />
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       )}

@@ -431,6 +431,15 @@
     }
   }
 
+  /* An input in a join group with buttons shows one focus outline around the whole group. */
+  .join:has(> .input:focus) {
+    @apply outline-secondary rounded-field outline-2 outline-offset-0;
+  }
+
+  .join > .input:focus {
+    @apply outline-none;
+  }
+
   /* Override 1Password + browser autofill styling in dark mode.
    * 1Password has a bug where oklch() colors (used by Tailwind v4)
    * break its theme detection, always applying light-mode autofill.

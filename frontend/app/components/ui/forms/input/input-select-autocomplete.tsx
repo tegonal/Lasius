@@ -102,20 +102,18 @@ const ComboboxCore = ({
           open={isOpen}
           value={selected || null}>
           <Combobox.InputGroup className="join w-full">
-            <div className="join-item flex-1">
-              <Combobox.Input
-                autoCapitalize="off"
-                autoComplete="off"
-                autoCorrect="off"
-                id={id || fieldId}
-                onFocus={handleFocus}
-                onKeyDown={(event) => guardComboboxKey(event, isOpen)}
-                placeholder={t('projects.selectProject', 'Select project')}
-                ref={inputReference}
-                render={<Input className="mb-0 w-full text-sm" />}
-                spellCheck={false}
-              />
-            </div>
+            <Combobox.Input
+              autoCapitalize="off"
+              autoComplete="off"
+              autoCorrect="off"
+              id={id || fieldId}
+              onFocus={handleFocus}
+              onKeyDown={(event) => guardComboboxKey(event, isOpen)}
+              placeholder={t('projects.selectProject', 'Select project')}
+              ref={inputReference}
+              render={<Input className="join-item mb-0 min-w-0 flex-1 text-sm" />}
+              spellCheck={false}
+            />
 
             {(selected || inputText) && (
               <button
