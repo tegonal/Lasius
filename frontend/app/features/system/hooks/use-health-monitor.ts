@@ -17,9 +17,15 @@
  *
  */
 
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { API_ROUTES, HEALTH_POLL_INTERVAL_MS, HEALTH_STATUS_DEBOUNCE_MS } from '~/config/constants'
+import {
+  API_ROUTES,
+  HEALTH_POLL_INTERVAL_MS,
+  HEALTH_RETRY_BASE_MS,
+  HEALTH_RETRY_MAX_MS,
+  HEALTH_STATUS_DEBOUNCE_MS,
+} from '~/config/constants'
 import { logger } from '~/lib/logger'
 import { type HealthResponse } from '~/routes/api.health'
 import { useUIStore } from '~/stores/ui-store'
@@ -37,15 +43,54 @@ export const checkVersion = (initialVersion: null | string, version: string | un
   return { initialVersion, isDrift: version !== initialVersion }
 }
 
+/** The delay before the next health check after `failures` failed checks in a row. */
+export const getRetryDelay = (failures: number) => {
+  if (failures <= 0) return HEALTH_POLL_INTERVAL_MS
+  return Math.min(HEALTH_RETRY_BASE_MS * 2 ** (failures - 1), HEALTH_RETRY_MAX_MS)
+}
+
+/** The whole seconds from `now` to `target`, never below 0. */
+export const secondsUntil = (target: number, now: number) =>
+  Math.max(0, Math.ceil((target - now) / 1000))
+
+type HealthCheckResult = { isOffline: boolean; version?: string }
+
+// A request that never returns would block every later check. The server probe gives up after 3 s.
+const HEALTH_REQUEST_TIMEOUT_MS = 5000
+
+const checkHealth = async (): Promise<HealthCheckResult> => {
+  try {
+    const response = await fetch(API_ROUTES.HEALTH, {
+      signal: AbortSignal.timeout(HEALTH_REQUEST_TIMEOUT_MS),
+    })
+    if (!response.ok) {
+      logger.warn('[HealthMonitor] Health check request failed', response.status)
+      return { isOffline: true }
+    }
+    const health: HealthResponse = await response.json()
+    return { isOffline: health.backend === 'disconnected', version: health.version }
+  } catch {
+    logger.warn('[HealthMonitor] Health check network error')
+    return { isOffline: true }
+  }
+}
+
 /**
- * Polls /api/health every 10s (pauses when tab is unfocused).
- * Writes backend status and version drift to the UI store.
- * Mount once in app-layout — consumers read from the store via selectors.
+ * Checks /api/health every 10 s while the tab is visible. After a failed check it retries with an
+ * exponential backoff. Writes the backend status and a version drift to the UI store.
+ * Mount once in app-layout. The returned values drive the offline overlay.
  */
 export const useHealthMonitor = () => {
   const initialVersionReference = useRef<null | string>(null)
   const debounceReference = useRef<null | ReturnType<typeof setTimeout>>(null)
-  const intervalReference = useRef<null | ReturnType<typeof setInterval>>(null)
+  const timeoutReference = useRef<null | ReturnType<typeof setTimeout>>(null)
+  const failuresReference = useRef(0)
+  const isCheckingReference = useRef(false)
+  const isDisposedReference = useRef(false)
+  // The scheduled check reads poll through this ref, because poll cannot name itself.
+  const pollReference = useRef<() => Promise<void>>(() => Promise.resolve())
+  const [nextCheckAt, setNextCheckAt] = useState<null | number>(null)
+  const [isManualCheck, setIsManualCheck] = useState(false)
 
   const scheduleDebouncedOffline = useCallback((isOffline: boolean) => {
     if (debounceReference.current) {
@@ -56,73 +101,83 @@ export const useHealthMonitor = () => {
     }, HEALTH_STATUS_DEBOUNCE_MS)
   }, [])
 
+  const clearScheduledCheck = useCallback(() => {
+    if (!timeoutReference.current) return
+    clearTimeout(timeoutReference.current)
+    timeoutReference.current = null
+  }, [])
+
   const poll = useCallback(async () => {
-    try {
-      const response = await fetch(API_ROUTES.HEALTH)
+    if (isCheckingReference.current) return
+    isCheckingReference.current = true
+    clearScheduledCheck()
 
-      if (!response.ok) {
-        logger.warn('[HealthMonitor] Health check request failed', response.status)
-        useUIStore.getState().setBackendStatus('disconnected')
-        scheduleDebouncedOffline(true)
-        return
-      }
+    const result = await checkHealth()
+    isCheckingReference.current = false
+    // The monitor can unmount during the request, for example on a redirect to the login page.
+    if (isDisposedReference.current) return
 
-      const health: HealthResponse = await response.json()
+    useUIStore.getState().setBackendStatus(toBackendStatus(result.isOffline))
+    scheduleDebouncedOffline(result.isOffline)
 
-      // Backend connectivity — immediate for indicator, debounced for modal
-      const isDisconnected = health.backend === 'disconnected'
-      useUIStore.getState().setBackendStatus(toBackendStatus(isDisconnected))
-      scheduleDebouncedOffline(isDisconnected)
-
-      // Version drift detection
-      const versionCheck = checkVersion(initialVersionReference.current, health.version)
-      initialVersionReference.current = versionCheck.initialVersion
-      if (versionCheck.isDrift) {
-        logger.info('[HealthMonitor] Version drift detected', {
-          client: versionCheck.initialVersion,
-          server: health.version,
-        })
-        useUIStore.getState().setVersionDrift(true)
-      }
-    } catch {
-      logger.warn('[HealthMonitor] Health check network error')
-      useUIStore.getState().setBackendStatus('disconnected')
-      scheduleDebouncedOffline(true)
+    const versionCheck = checkVersion(initialVersionReference.current, result.version)
+    initialVersionReference.current = versionCheck.initialVersion
+    if (versionCheck.isDrift) {
+      logger.info('[HealthMonitor] Version drift detected', {
+        client: versionCheck.initialVersion,
+        server: result.version,
+      })
+      useUIStore.getState().setVersionDrift(true)
     }
-  }, [scheduleDebouncedOffline])
+
+    failuresReference.current = result.isOffline ? failuresReference.current + 1 : 0
+    setIsManualCheck(false)
+
+    // A hidden tab checks again when it becomes visible.
+    if (document.hidden) {
+      setNextCheckAt(null)
+      return
+    }
+    const delay = getRetryDelay(failuresReference.current)
+    setNextCheckAt(result.isOffline ? Date.now() + delay : null)
+    timeoutReference.current = setTimeout(() => void pollReference.current(), delay)
+  }, [clearScheduledCheck, scheduleDebouncedOffline])
 
   useEffect(() => {
+    pollReference.current = poll
+  }, [poll])
+
+  const retryNow = useCallback(() => {
+    setIsManualCheck(true)
     void poll()
+  }, [poll])
 
-    const startInterval = () => {
-      if (intervalReference.current) clearInterval(intervalReference.current)
-      intervalReference.current = setInterval(() => void poll(), HEALTH_POLL_INTERVAL_MS)
-    }
+  useEffect(() => {
+    isDisposedReference.current = false
+    timeoutReference.current = setTimeout(() => void pollReference.current(), 0)
 
-    const handleFocus = () => {
-      void poll()
-      startInterval()
-    }
-
-    const handleBlur = () => {
-      if (!intervalReference.current) {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        clearScheduledCheck()
         return
       }
-
-      clearInterval(intervalReference.current)
-      intervalReference.current = null
+      void poll()
     }
+    const handleWake = () => void poll()
 
-    startInterval()
-
-    window.addEventListener('focus', handleFocus)
-    window.addEventListener('blur', handleBlur)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    window.addEventListener('focus', handleWake)
+    window.addEventListener('online', handleWake)
 
     return () => {
-      if (intervalReference.current) clearInterval(intervalReference.current)
+      isDisposedReference.current = true
+      clearScheduledCheck()
       if (debounceReference.current) clearTimeout(debounceReference.current)
-      window.removeEventListener('focus', handleFocus)
-      window.removeEventListener('blur', handleBlur)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      window.removeEventListener('focus', handleWake)
+      window.removeEventListener('online', handleWake)
     }
-  }, [poll])
+  }, [clearScheduledCheck, poll])
+
+  return { isManualCheck, nextCheckAt, retryNow }
 }

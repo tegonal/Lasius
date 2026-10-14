@@ -5,6 +5,14 @@
   "backendUnreachable": "El servidor parece estar inaccesible",
   "connectedToBackend": "Conectado al servidor",
   "connectingToBackend": "Conectando al servidor",
+  "offline": {
+    "checking": "Comprobando la conexión…",
+    "nextCheck_one": "Próxima comprobación en {{count}} segundo",
+    "nextCheck_many": "Próxima comprobación en {{count}} segundos",
+    "nextCheck_other": "Próxima comprobación en {{count}} segundos",
+    "retryNow": "Reintentar ahora",
+    "title": "Lasius no está disponible"
+  },
   "offlineMessage": "Lasius está actualmente sin conexión o en mantenimiento. Volveremos en breve.",
   "pwa": {
     "reloadApplication": "Recargar aplicación",

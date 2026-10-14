@@ -1082,6 +1082,13 @@ export default interface Resources {
     backendUnreachable: 'Backend seems to be unreachable'
     connectedToBackend: 'Connected to backend'
     connectingToBackend: 'Connecting to backend'
+    offline: {
+      checking: 'Checking the connection…'
+      nextCheck_one: 'Next check in {{count}} second'
+      nextCheck_other: 'Next check in {{count}} seconds'
+      retryNow: 'Try again now'
+      title: 'Lasius is not reachable'
+    }
     offlineMessage: 'Lasius is currently offline or undergoing maintenance. We will be back shortly.'
     pwa: {
       reloadApplication: 'Reload application'

@@ -50,6 +50,12 @@ export const HEALTH_POLL_INTERVAL_MS = 10_000
 /** Debounce window for health status changes to avoid UI flicker on transient failures. */
 export const HEALTH_STATUS_DEBOUNCE_MS = 2000
 
+/** The first retry delay after a failed health check. Each further failure doubles it. */
+export const HEALTH_RETRY_BASE_MS = 2000
+
+/** The longest delay between two health checks while the backend is offline. */
+export const HEALTH_RETRY_MAX_MS = 30_000
+
 /** Default time-to-live for cached loader responses. Prevents redundant fetches within a session. */
 export const LOADER_CACHE_DEFAULT_TTL_MS = 5 * 60 * 1000
 

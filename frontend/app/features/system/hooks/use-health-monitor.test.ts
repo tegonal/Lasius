@@ -19,7 +19,41 @@
 
 import { describe, expect, it } from 'vitest'
 
-import { checkVersion, toBackendStatus } from './use-health-monitor'
+import {
+  HEALTH_POLL_INTERVAL_MS,
+  HEALTH_RETRY_BASE_MS,
+  HEALTH_RETRY_MAX_MS,
+} from '~/config/constants'
+
+import { checkVersion, getRetryDelay, secondsUntil, toBackendStatus } from './use-health-monitor'
+
+describe('getRetryDelay', () => {
+  it('uses the normal poll interval without a failure', () => {
+    expect(getRetryDelay(0)).toBe(HEALTH_POLL_INTERVAL_MS)
+  })
+
+  it('doubles the delay after each failure', () => {
+    expect(getRetryDelay(1)).toBe(HEALTH_RETRY_BASE_MS)
+    expect(getRetryDelay(2)).toBe(HEALTH_RETRY_BASE_MS * 2)
+    expect(getRetryDelay(3)).toBe(HEALTH_RETRY_BASE_MS * 4)
+  })
+
+  it('never waits longer than the maximum', () => {
+    expect(getRetryDelay(5)).toBe(HEALTH_RETRY_MAX_MS)
+    expect(getRetryDelay(50)).toBe(HEALTH_RETRY_MAX_MS)
+  })
+})
+
+describe('secondsUntil', () => {
+  it('rounds a part of a second up', () => {
+    expect(secondsUntil(10_001, 0)).toBe(11)
+    expect(secondsUntil(10_000, 0)).toBe(10)
+  })
+
+  it('returns 0 for a time in the past', () => {
+    expect(secondsUntil(1000, 5000)).toBe(0)
+  })
+})
 
 describe('toBackendStatus', () => {
   it('maps the offline flag to the store status', () => {

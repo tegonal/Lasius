@@ -20,10 +20,10 @@
 import { useTranslation } from 'react-i18next'
 
 import { GenericConfirmModal } from '~/components/ui/overlays/modal/generic-confirm-modal'
-import { Modal } from '~/components/ui/overlays/modal/modal'
 import { useBackendStatus, useHasVersionDrift } from '~/stores/ui-store'
 
 import { useHealthMonitor } from '../hooks/use-health-monitor'
+import { BackendOfflineModal } from './backend-offline-modal'
 
 /**
  * Monitors backend connectivity and app version drift.
@@ -34,7 +34,7 @@ export const HealthMonitor = () => {
   const { t } = useTranslation('system')
 
   // Start the polling loop (writes to UI store)
-  useHealthMonitor()
+  const { isManualCheck, nextCheckAt, retryNow } = useHealthMonitor()
 
   // Read state from store
   const backendStatus = useBackendStatus()
@@ -43,20 +43,12 @@ export const HealthMonitor = () => {
 
   return (
     <>
-      {/* Backend offline — blocking, dismissible */}
-      <Modal
-        blockViewport
-        onClose={() => {
-          /* dismissible via backdrop — will reappear on next poll if still offline */
-        }}
-        open={isBackendOffline}>
-        <div>
-          {t(
-            'system:offlineMessage',
-            'Lasius is currently offline or undergoing maintenance. We will be back shortly.',
-          )}
-        </div>
-      </Modal>
+      <BackendOfflineModal
+        isManualCheck={isManualCheck}
+        nextCheckAt={nextCheckAt}
+        onRetry={retryNow}
+        open={isBackendOffline}
+      />
 
       {/* Version drift — confirm to reload */}
       {isVersionDrift && (
