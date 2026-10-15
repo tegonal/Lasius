@@ -19,6 +19,8 @@
 
 import { expect, type Page, test } from '@playwright/test'
 
+import { clickStartAfterProjectPick } from '../../helpers/booking-start'
+
 /**
  * Starts a booking via quick-start form. Assumes /user/home is loaded.
  */
@@ -45,7 +47,7 @@ const startBookingViaQuickStart = async (page: Page) => {
   if (optionCount === 0) return false
 
   await page.locator('[role="option"]').first().click()
-  await page.getByTestId('booking-start-submit-btn').click()
+  await clickStartAfterProjectPick(page)
   await expect(
     page.getByTestId('booking-current-stop-btn').locator('visible=true').first(),
   ).toBeVisible({

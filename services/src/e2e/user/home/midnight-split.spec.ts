@@ -19,6 +19,8 @@
 
 import { expect, type Page, type Request, test } from '@playwright/test'
 
+import { clickStartAfterProjectPick } from '../../helpers/booking-start'
+
 type ProxyPayload = { body?: { end?: string; start?: string }; method: string; url: string }
 
 const readProxyPayload = (request: Request): ProxyPayload | undefined => {
@@ -109,7 +111,7 @@ test('stopping a booking from the previous day adds the part after midnight @cru
     return
   }
   await page.locator('[role="option"]').first().click()
-  await page.getByTestId('booking-start-submit-btn').click()
+  await clickStartAfterProjectPick(page)
   await expect(visibleStopButton(page)).toBeVisible({ timeout: 10000 })
 
   await page.clock.setSystemTime(new Date())

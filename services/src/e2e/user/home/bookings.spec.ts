@@ -19,6 +19,8 @@
 
 import { expect, type Page, test } from '@playwright/test'
 
+import { clickStartAfterProjectPick } from '../../helpers/booking-start'
+
 /**
  * Opens the context menu for a booking item by clicking the ⋮ button.
  * Retries the click until the menu actually appears (handles SSR hydration timing).
@@ -69,7 +71,7 @@ test.describe.serial('Booking lifecycle @crud', () => {
 
     await page.locator('[role="option"]').first().click()
 
-    await page.getByTestId('booking-start-submit-btn').click()
+    await clickStartAfterProjectPick(page)
 
     // Running booking should appear
     await expect(
