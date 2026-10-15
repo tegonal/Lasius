@@ -23,6 +23,8 @@ import { type SchemaTranslationFunction } from '~/lib/i18n-types'
 import { type WebSocketOutEvent } from '~/services/api/lasius/webSocketOutEvent'
 
 export type WebSocketEventReaction = {
+  /** Clears the client loader cache without a revalidation. The next navigation loads fresh data. */
+  clearCache?: boolean
   errorLog?: { message: string; tag: string }
   ignored?: boolean
   revalidate: boolean
@@ -103,7 +105,8 @@ const REACTIONS: ReactionTable = {
       type: 'ERROR',
     },
   }),
-  CurrentOrganisationTimeBookings: () => IGNORED,
+  // A colleague started or stopped a booking. A cached page must not show the old team state again.
+  CurrentOrganisationTimeBookings: () => ({ clearCache: true, revalidate: false }),
   CurrentUserTimeBookingEvent: () => ({ revalidate: true }),
   FavoriteAdded: (_event, t) =>
     revalidateWithToast(

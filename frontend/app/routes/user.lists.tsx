@@ -25,6 +25,7 @@ import { getUserClock } from '~/lib/cookies/time-zone-cookie.server'
 import { loadOrganisationContext } from '~/lib/organisation-helpers.server'
 import { getListDateRange } from '~/lib/utils/date/list-date-range'
 import { apiTimespanFromTo } from '~/lib/utils/dates'
+import { cachedServerLoader } from '~/lib/utils/loader-cache'
 import { getUserBookingListByOrganisation } from '~/services/api/lasius/user-bookings/user-bookings'
 import { mergeAuthHeaders } from '~/services/auth/auth-helpers.server'
 
@@ -58,5 +59,12 @@ const UserListsPage = ({ loaderData }: Route.ComponentProps) => {
     </div>
   )
 }
+
+export const clientLoader = ({ request, serverLoader }: Route.ClientLoaderArgs) =>
+  cachedServerLoader(request, serverLoader)
+clientLoader.hydrate = false
+
+// The loader reads only the date range. The project, user and tag filters work on the client.
+export { statsShouldRevalidate as shouldRevalidate } from '~/features/stats/stats-loader'
 
 export default UserListsPage

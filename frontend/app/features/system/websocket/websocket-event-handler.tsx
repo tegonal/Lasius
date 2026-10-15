@@ -60,9 +60,11 @@ const applyReaction = (
   if (reaction.errorLog) {
     logger.error(reaction.errorLog.tag, reaction.errorLog.message)
   }
-  if (reaction.revalidate) {
+  if (reaction.revalidate || reaction.clearCache) {
     // The event reports a change from another tab or device, so a cached loader result is stale.
     clearLoaderCache()
+  }
+  if (reaction.revalidate) {
     void revalidate()
   }
   if (reaction.toast) {

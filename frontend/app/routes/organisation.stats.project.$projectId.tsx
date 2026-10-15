@@ -19,6 +19,7 @@
 
 import { ProjectStatsPage } from '~/features/stats/components/project-stats-page'
 import { loadProjectStats } from '~/features/stats/project-stats.server'
+import { statsClientLoader } from '~/features/stats/stats-loader'
 
 import { type Route } from './+types/organisation.stats.project.$projectId'
 
@@ -28,6 +29,9 @@ export const loader = async (arguments_: Route.LoaderArgs) =>
 const OrganisationProjectStats = ({ loaderData }: Route.ComponentProps) => (
   <ProjectStatsPage {...loaderData} />
 )
+
+export const clientLoader = (arguments_: Route.ClientLoaderArgs) => statsClientLoader(arguments_)
+clientLoader.hydrate = false
 
 export default OrganisationProjectStats
 

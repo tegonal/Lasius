@@ -33,6 +33,7 @@ import { getUserClock } from '~/lib/cookies/time-zone-cookie.server'
 import { loadOrganisationContext } from '~/lib/organisation-helpers.server'
 import { createServerTiming } from '~/lib/server-timing.server'
 import { apiTimespanDay, getWorkingHoursWeekdayString, isoDateOrFallback } from '~/lib/utils/dates'
+import { cachedServerLoader } from '~/lib/utils/loader-cache'
 import { getOrganisationUserList } from '~/services/api/lasius/organisations/organisations'
 import {
   getUserBookingCurrent,
@@ -115,6 +116,11 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
     { headers: mergeAuthHeaders(auth, { 'Server-Timing': timing.header() }) },
   )
 }
+
+// A day that the user saw before shows at once. A change request or a WebSocket event clears the cache.
+export const clientLoader = ({ request, serverLoader }: Route.ClientLoaderArgs) =>
+  cachedServerLoader(request, serverLoader)
+clientLoader.hydrate = false
 
 // React Router sends a loader header only through this export, for the page and for its .data request.
 export function headers({ loaderHeaders }: Route.HeadersArgs) {

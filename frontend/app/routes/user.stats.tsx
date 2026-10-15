@@ -29,9 +29,14 @@ import { StatsTabs } from '~/features/stats/components/stats-tabs'
 import { loadStatsContext, statsResponseHeaders } from '~/features/stats/stats-loader.server'
 import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
 import { apiTimespanFromTo } from '~/lib/utils/dates'
+import { cachedServerLoader } from '~/lib/utils/loader-cache'
 import { getUserBookingListByOrganisation } from '~/services/api/lasius/user-bookings/user-bookings'
 
 import { type Route } from './+types/user.stats'
+
+export const clientLoader = ({ request, serverLoader }: Route.ClientLoaderArgs) =>
+  cachedServerLoader(request, serverLoader)
+clientLoader.hydrate = false
 
 // ─── Revalidation ────────────────────────────────────────────────────────────
 

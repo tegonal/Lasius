@@ -21,6 +21,10 @@ import { type ShouldRevalidateFunctionArgs } from 'react-router'
 
 import { cachedServerLoader } from '~/lib/utils/loader-cache'
 
+/** True when both URLs have the same path and search, as React Router passes them for a revalidation. */
+export const isSameLocation = (currentUrl: URL, nextUrl: URL) =>
+  currentUrl.pathname + currentUrl.search === nextUrl.pathname + nextUrl.search
+
 /**
  * Only revalidate when date range search params (from/to/dateRange) change.
  * Shared across all stats layout and child routes.
@@ -33,6 +37,8 @@ export const statsShouldRevalidate = ({
   nextUrl,
 }: ShouldRevalidateFunctionArgs) => {
   if (formMethod) return defaultShouldRevalidate
+  // The same URL means a revalidation, for example after a WebSocket event, not a navigation.
+  if (isSameLocation(currentUrl, nextUrl)) return defaultShouldRevalidate
   const currentFrom = currentUrl.searchParams.get('from')
   const currentTo = currentUrl.searchParams.get('to')
   const currentDateRange = currentUrl.searchParams.get('dateRange')

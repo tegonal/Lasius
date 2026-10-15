@@ -89,12 +89,16 @@ describe('getWebSocketEventReaction', () => {
     expect(reaction?.toast).toMatchObject({ ttl: 10_000, type: 'ERROR' })
   })
 
-  it.each(['Pong', 'HelloClient', 'CurrentOrganisationTimeBookings'])(
-    'does nothing for %s',
-    (type) => {
-      expect(reactionFor({ type })).toEqual({ ignored: true, revalidate: false })
-    },
-  )
+  it.each(['Pong', 'HelloClient'])('does nothing for %s', (type) => {
+    expect(reactionFor({ type })).toEqual({ ignored: true, revalidate: false })
+  })
+
+  it('clears the cache without a revalidation for CurrentOrganisationTimeBookings', () => {
+    expect(reactionFor({ type: 'CurrentOrganisationTimeBookings' })).toEqual({
+      clearCache: true,
+      revalidate: false,
+    })
+  })
 
   it('returns undefined for an event type that the API types do not know', () => {
     expect(reactionFor({ type: 'UserLoggedOutV2' })).toBeUndefined()

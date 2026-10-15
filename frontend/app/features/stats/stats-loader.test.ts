@@ -44,6 +44,11 @@ describe('statsShouldRevalidate', () => {
   it('reloads when the date range changes', () => {
     expect(statsShouldRevalidate(navigation('?from=a&to=b', '?from=a&to=c'))).toBe(true)
   })
+
+  // A WebSocket event calls revalidate(), and React Router passes the same URL twice.
+  it('keeps the default for a revalidation of the same URL', () => {
+    expect(statsShouldRevalidate(navigation('?from=a&to=b', '?from=a&to=b'))).toBe(true)
+  })
 })
 
 describe('projectStatsShouldRevalidate', () => {
@@ -53,11 +58,19 @@ describe('projectStatsShouldRevalidate', () => {
     ).toBe(true)
   })
 
-  it('skips the reload when the view and the date range stay the same', () => {
+  it('skips the reload when only another param changes', () => {
+    expect(
+      projectStatsShouldRevalidate(
+        navigation('?from=a&to=b&view=users', '?from=a&to=b&view=users&chart=bar'),
+      ),
+    ).toBe(false)
+  })
+
+  it('keeps the default for a revalidation of the same URL', () => {
     expect(
       projectStatsShouldRevalidate(
         navigation('?from=a&to=b&view=users', '?from=a&to=b&view=users'),
       ),
-    ).toBe(false)
+    ).toBe(true)
   })
 })

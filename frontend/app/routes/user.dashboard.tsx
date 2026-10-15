@@ -29,12 +29,18 @@ import {
   dashboardResponseHeaders,
   loadDashboardContext,
 } from '~/features/dashboard/dashboard-loader.server'
+import { isSameLocation } from '~/features/stats/stats-loader'
 import { computeWorkHealthMetrics } from '~/lib/api/functions/compute-work-health-metrics.server'
 import { getWeeklyPlannedHours } from '~/lib/api/functions/get-planned-working-hours'
 import { formatDateTimeToURLParameter, toCalendarDay } from '~/lib/utils/dates'
+import { cachedServerLoader } from '~/lib/utils/loader-cache'
 import { getUserBookingListByOrganisation } from '~/services/api/lasius/user-bookings/user-bookings'
 
 import { type Route } from './+types/user.dashboard'
+
+export const clientLoader = ({ request, serverLoader }: Route.ClientLoaderArgs) =>
+  cachedServerLoader(request, serverLoader)
+clientLoader.hydrate = false
 
 // ─── Revalidation ────────────────────────────────────────────────────────────
 
@@ -46,6 +52,7 @@ export const shouldRevalidate = ({
   nextUrl,
 }: ShouldRevalidateFunctionArgs) => {
   if (formMethod) return defaultShouldRevalidate
+  if (isSameLocation(currentUrl, nextUrl)) return defaultShouldRevalidate
   const currentDate = currentUrl.searchParams.get('date')
   const nextDate = nextUrl.searchParams.get('date')
   if (currentDate === nextDate) return false

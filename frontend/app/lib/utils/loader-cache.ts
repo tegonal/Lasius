@@ -45,6 +45,7 @@ export async function cachedServerLoader<T>(
   const data = await serverLoader()
   // A clear during the request means the data can predate a change, so it is not stored.
   if (state.generation === startGeneration) {
+    removeExpiredEntries(ttl)
     cache.set(cacheKey, { data, timestamp: Date.now() })
   }
   return data
@@ -57,4 +58,12 @@ export async function cachedServerLoader<T>(
 export function clearLoaderCache() {
   state.generation += 1
   cache.clear()
+}
+
+// A list page stores a full booking list per URL, so expired entries must not stay until the next clear.
+function removeExpiredEntries(ttl: number) {
+  const now = Date.now()
+  for (const [key, entry] of cache) {
+    if (now - entry.timestamp >= ttl) cache.delete(key)
+  }
 }
