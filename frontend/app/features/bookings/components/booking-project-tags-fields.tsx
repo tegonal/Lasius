@@ -29,6 +29,8 @@ import { type ModelsEntityReference, type ModelsTag } from '~/services/api/lasiu
 type Properties = {
   fallbackProject?: SelectAutocompleteSuggestionType
   onProjectChange: (projectId: string) => void
+  /** Opens the tag list after a project pick. Only the quick start form sets it. */
+  openTagsOnProjectPick?: boolean
   projectField: Pick<FieldMetadata<string>, 'errors' | 'id' | 'name'>
   projectId: string | undefined
   projects: ModelsEntityReference[]
@@ -40,6 +42,7 @@ type Properties = {
 export const BookingProjectTagsFields = ({
   fallbackProject,
   onProjectChange,
+  openTagsOnProjectPick = false,
   projectField,
   projectId,
   projects,
@@ -66,6 +69,7 @@ export const BookingProjectTagsFields = ({
           field={tagsField}
           id={tagsField.id}
           key={tagsField.key}
+          openOnFocus={openTagsOnProjectPick}
           projectId={projectId}
           suggestions={projectTags}
         />

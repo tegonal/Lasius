@@ -119,6 +119,7 @@ export const BookingStart = ({ onSuccess, selectedOrgId }: Properties) => {
           <FieldSet>
             <BookingProjectTagsFields
               onProjectChange={(id) => projectIdControl.change(id)}
+              openTagsOnProjectPick
               projectField={fields.projectId}
               projectId={projectIdControl.value}
               projects={projects}

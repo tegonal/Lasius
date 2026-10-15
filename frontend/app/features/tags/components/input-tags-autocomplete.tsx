@@ -60,7 +60,8 @@ const uniqById = (array: ModelsTag[]): ModelsTag[] => {
 type InputTagsAutocompleteProperties = {
   field: FieldMetadata<string>
   id?: string
-  /** Context value for projectId — in Conform mode there's no shared form context */
+  /** Opens the list while the input has the focus and a project is set. The quick start form uses it. */
+  openOnFocus?: boolean
   projectId?: string
   suggestions: ModelsTag[] | undefined
 }
@@ -72,6 +73,7 @@ const TagsComboboxCore = ({
   id,
   inputRef,
   onTagsChange,
+  openOnFocus,
   projectId,
   selectedTags,
   suggestions = NO_SUGGESTIONS,
@@ -79,6 +81,7 @@ const TagsComboboxCore = ({
   id?: string
   inputRef: React.RefObject<HTMLInputElement | null>
   onTagsChange: (tags: ModelsTag[]) => void
+  openOnFocus: boolean
   projectId: string | undefined
   selectedTags: ModelsTag[]
   suggestions: ModelsTag[] | undefined
@@ -163,8 +166,9 @@ const TagsComboboxCore = ({
           }}
           onOpenChange={setIsOpen}
           onValueChange={handleChange}
-          // The list also shows while the input has the focus and a project is set.
-          open={isOpen || (isFocused && !!projectId)}
+          // The list opens on a click or on typing. With openOnFocus, it also opens on the focus that
+          // follows a project pick. Edit forms leave it closed, so an existing booking shows no list.
+          open={isOpen || (openOnFocus && isFocused && !!projectId)}
           value={selectedTags}>
           <Combobox.InputGroup>
             <Combobox.Input
@@ -236,6 +240,7 @@ const TagsComboboxCore = ({
 export const InputTagsAutocomplete = ({
   field,
   id,
+  openOnFocus = false,
   projectId,
   suggestions,
 }: InputTagsAutocompleteProperties) => {
@@ -262,6 +267,7 @@ export const InputTagsAutocomplete = ({
         id={id || field.id}
         inputRef={inputReference}
         onTagsChange={handleTagsChange}
+        openOnFocus={openOnFocus}
         projectId={projectId}
         selectedTags={selectedTags}
         suggestions={suggestions}

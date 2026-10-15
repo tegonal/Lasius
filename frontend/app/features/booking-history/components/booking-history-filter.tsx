@@ -171,7 +171,6 @@ export const BookingHistoryFilter = ({
             field={fields.tags}
             id={fields.tags.id}
             key={fields.tags.key}
-            projectId={controls.projectId.value}
             suggestions={projectTags}
           />
         </FormElement>
