@@ -40,8 +40,9 @@ export const UnderlineTabs = ({ selectedIndex, tabs, testIdPrefix }: UnderlineTa
 
   return (
     <div className="border-base-content/20 relative flex flex-shrink-0 flex-row justify-start gap-0 border-b @sm:gap-1 @lg:gap-3">
+      {/* z-30 puts the line above the tab links. A focused link has a background that covers it. */}
       <SlidingIndicator
-        className="!top-auto !bottom-0 !h-[2px]"
+        className="!top-auto !bottom-0 z-30 !h-[2px]"
         itemRefs={itemReferences}
         radiusOn="bottom"
         selectedIndex={selectedIndex}
