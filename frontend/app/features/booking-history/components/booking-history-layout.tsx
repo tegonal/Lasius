@@ -24,17 +24,19 @@ import { ColumnList } from '~/components/ui/layouts/column-list'
 import { ColumnCenter, ColumnRight } from '~/components/ui/layouts/layout-columns'
 import { ScrollArea } from '~/components/ui/layouts/scroll-area'
 import { useBookingHistoryFilters } from '~/features/booking-history/hooks/use-booking-history-filters'
-import { ContextMenuProvider } from '~/features/context-menu/hooks/use-context-menu'
-import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
-import { useProjects } from '~/features/projects/hooks/use-projects'
-import { useScrollPagination } from '~/hooks/use-scroll-pagination'
-import { filterModelsBookingListByTags } from '~/lib/api/functions/filter-models-booking-list-by-tags'
-import { filterModelsBookingListProjectId } from '~/lib/api/functions/filter-models-booking-list-project-id'
-import { filterModelsBookingListUserId } from '~/lib/api/functions/filter-models-booking-list-user-id'
-import { getExtendedModelsBookingList } from '~/lib/api/functions/get-extended-models-booking-list'
-import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
 import {
-  type ModelsBooking,
+  type BookingPageQuery,
+  useBookingPages,
+} from '~/features/booking-history/hooks/use-booking-pages'
+import { ContextMenuProvider } from '~/features/context-menu/hooks/use-context-menu'
+import { useProjects } from '~/features/projects/hooks/use-projects'
+import { getExtendedModelsBookingList } from '~/lib/api/functions/get-extended-models-booking-list'
+import {
+  EMPTY_BOOKING_SUMMARY,
+  getBookingSummaryFromApi,
+} from '~/lib/api/functions/get-models-booking-summary'
+import {
+  type ModelsBookingPage,
   type ModelsEntityReference,
   type ModelsUserStub,
 } from '~/services/api/lasius'
@@ -61,23 +63,24 @@ type InputControl = {
 }
 
 type Properties = {
-  bookings: ModelsBooking[]
-  dataSource: 'organisationBookings' | 'userBookings'
-  isLoading?: boolean
+  dataSource: BookingPageQuery['dataSource']
+  firstPage: ModelsBookingPage
   projects?: ModelsEntityReference[]
+  query: BookingPageQuery
+  signature: string
   users?: ModelsUserStub[]
 }
 
 const NO_USERS: ModelsUserStub[] = []
 
 export const BookingHistoryLayout = ({
-  bookings,
   dataSource,
-  isLoading = false,
+  firstPage,
   projects: projectsProperty,
+  query,
+  signature,
   users = NO_USERS,
 }: Properties) => {
-  const { selectedOrganisationId: _selectedOrganisationId } = useOrganisation()
   const { findProjectById, userProjects } = useProjects()
 
   const projectSuggestions: ModelsEntityReference[] = useMemo(() => {
@@ -97,31 +100,11 @@ export const BookingHistoryLayout = ({
     userId,
   } = useBookingHistoryFilters()
 
-  const processedItems = useMemo(() => {
-    const taggedBookings = filterModelsBookingListByTags(bookings, tags)
-    return getExtendedModelsBookingList(
-      filterModelsBookingListUserId(
-        filterModelsBookingListProjectId(taggedBookings, projectId),
-        userId,
-      ),
-    )
-  }, [bookings, tags, projectId, userId])
+  const { isLoading, items, onScroll, total } = useBookingPages({ firstPage, query, signature })
+  const extendedItems = useMemo(() => getExtendedModelsBookingList(items), [items])
 
-  const summary = useMemo(() => getModelsBookingSummary(processedItems), [processedItems])
-
-  const distinctUsers = useMemo(() => {
-    const userSet = new Set(processedItems.map((item) => item.userReference?.key).filter(Boolean))
-    return userSet.size
-  }, [processedItems])
-
-  const distinctProjects = useMemo(() => {
-    const projectSet = new Set(
-      processedItems.map((item) => item.projectReference?.key).filter(Boolean),
-    )
-    return projectSet.size
-  }, [processedItems])
-
-  const { onScroll, visibleElements } = useScrollPagination(processedItems)
+  const filteredSummary = firstPage.summary ?? EMPTY_BOOKING_SUMMARY
+  const summary = getBookingSummaryFromApi(filteredSummary)
 
   const isAllowEdit = dataSource === 'userBookings'
   const isAllowDelete = dataSource === 'userBookings'
@@ -148,29 +131,29 @@ export const BookingHistoryLayout = ({
               <BookingHistoryStats
                 bookings={summary.elements}
                 hours={summary.hours}
-                projects={distinctProjects}
-                users={distinctUsers}
+                projects={filteredSummary.distinctProjects}
+                users={filteredSummary.distinctUsers}
               />
               <BookingHistoryExport
                 context={exportContext}
                 from={fromValue}
-                hasBookings={processedItems.length > 0}
+                hasBookings={total > 0}
                 projectId={projectId}
-                tags={tags.length > 0 ? tags.map((tag) => tag.id).join(',') : undefined}
+                tagIds={tags.map((tag) => tag.id)}
                 to={toValue}
                 userId={userId}
               />
             </div>
-            {bookings.length === 0 && isLoading && <Loading />}
             <ScrollArea className="min-h-0 flex-1" onScroll={onScroll}>
               <div className="pt-4">
                 <BookingHistoryTable
                   allowDelete={isAllowDelete}
                   allowEdit={isAllowEdit}
                   controls={controls}
-                  items={visibleElements}
+                  items={extendedItems}
                   showUserColumn={isShowUserColumn}
                 />
+                {isLoading && <Loading />}
               </div>
             </ScrollArea>
           </div>

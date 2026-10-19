@@ -17,8 +17,9 @@
  *
  */
 
-import { data } from 'react-router'
+import { data, type ShouldRevalidateFunctionArgs } from 'react-router'
 
+import { isProxyReadRequest } from '~/lib/api/proxy-revalidation'
 import { getUserBookingDailyTotals } from '~/services/api/lasius/user-bookings/user-bookings'
 import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
 
@@ -48,3 +49,7 @@ export async function loader({ request, url }: Route.LoaderArgs) {
 
   return data({ dailyTotals: result.data }, { headers: mergeAuthHeaders(auth) })
 }
+
+// React Router reloads a loaded fetcher after each fetcher POST. A read through the proxy changes no total.
+export const shouldRevalidate = (arguments_: ShouldRevalidateFunctionArgs) =>
+  isProxyReadRequest(arguments_) ? false : arguments_.defaultShouldRevalidate

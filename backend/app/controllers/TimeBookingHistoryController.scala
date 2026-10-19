@@ -48,6 +48,8 @@ class TimeBookingHistoryController @Inject() (
 
   implicit val timeout: Timeout = systemServices.timeout
 
+  private val defaultPageSize = 100
+
   def getTimeBookingHistoryByUser(orgId: OrganisationId,
                                   from: LocalDateTime,
                                   to: LocalDateTime,
@@ -137,6 +139,57 @@ class TimeBookingHistoryController @Inject() (
           bookingHistoryRepository
             .dailyTotalsByRange(subject.userReference, orgId, from, to)
             .map(totals => Ok(Json.toJson(totals)))
+        }
+    }
+
+  def getUserBookingPage(orgId: OrganisationId,
+                         from: LocalDateTime,
+                         to: LocalDateTime,
+                         projectId: Option[String],
+                         tagId: List[String],
+                         limit: Option[Int],
+                         skip: Option[Int],
+                         withSummary: Option[Boolean]): Action[Unit] =
+    HasUserRole(FreeUser, parse.empty, withinTransaction = false) {
+      implicit dbSession => implicit subject => user => implicit request =>
+        HasOrganisationRole(user, orgId, OrganisationMember) { _ =>
+          bookingHistoryRepository
+            .pageByRange(
+              Some(subject.userReference),
+              orgId,
+              BookingPageFilter(projectId, userId = None, tagIds = tagId),
+              from,
+              to,
+              limit.getOrElse(defaultPageSize),
+              skip.getOrElse(0),
+              withSummary.getOrElse(true)
+            )
+            .map(page => Ok(Json.toJson(page)))
+        }
+    }
+
+  def getOrganisationBookingPage(orgId: OrganisationId,
+                                 from: LocalDateTime,
+                                 to: LocalDateTime,
+                                 projectId: Option[String],
+                                 userId: Option[String],
+                                 tagId: List[String],
+                                 limit: Option[Int],
+                                 skip: Option[Int],
+                                 withSummary: Option[Boolean]): Action[Unit] =
+    HasUserRole(FreeUser, parse.empty, withinTransaction = false) {
+      implicit dbSession => implicit subject => user => implicit request =>
+        HasOrganisationRole(user, orgId, OrganisationAdministrator) { _ =>
+          bookingHistoryRepository
+            .pageByRange(None,
+                         orgId,
+                         BookingPageFilter(projectId, userId, tagIds = tagId),
+                         from,
+                         to,
+                         limit.getOrElse(defaultPageSize),
+                         skip.getOrElse(0),
+                         withSummary.getOrElse(true))
+            .map(page => Ok(Json.toJson(page)))
         }
     }
 

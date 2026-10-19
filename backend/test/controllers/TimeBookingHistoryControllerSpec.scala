@@ -277,6 +277,65 @@ class TimeBookingHistoryControllerSpec
       contentAsJson(result) must equalTo(Json.arr())
     }
 
+    "successful for the user page if OrganisationMember" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: TimeBookingHistoryControllerMock =
+        controllers.TimeBookingHistoryControllerMock(config,
+                                                     systemServices,
+                                                     authConfig,
+                                                     reactiveMongoApi,
+                                                     organisationRole =
+                                                       OrganisationMember,
+                                                     projectRole =
+                                                       ProjectMember)
+
+      val result: Future[Result] =
+        controller.getUserBookingPage(controller.organisationId,
+                                      from,
+                                      to,
+                                      None,
+                                      Nil,
+                                      None,
+                                      None,
+                                      None)(FakeRequest().withBody(()))
+
+      status(result) must equalTo(OK)
+      contentAsJson(result) must equalTo(
+        Json.toJson(BookingPage(Nil, 0, Some(BookingSummary.empty))))
+    }
+
+    "forbidden for the organisation page if OrganisationMember" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: TimeBookingHistoryControllerMock =
+        controllers.TimeBookingHistoryControllerMock(config,
+                                                     systemServices,
+                                                     authConfig,
+                                                     reactiveMongoApi,
+                                                     organisationRole =
+                                                       OrganisationMember,
+                                                     projectRole =
+                                                       ProjectAdministrator)
+
+      val result: Future[Result] =
+        controller.getOrganisationBookingPage(controller.organisationId,
+                                              from,
+                                              to,
+                                              None,
+                                              None,
+                                              Nil,
+                                              None,
+                                              None,
+                                              None)(FakeRequest().withBody(()))
+
+      status(result) must equalTo(FORBIDDEN)
+    }
+
     "forbidden for the organisation summary if OrganisationMember" in new WithTestApplication {
 
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]

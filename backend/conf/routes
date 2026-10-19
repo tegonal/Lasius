@@ -523,6 +523,23 @@ GET /user-bookings/organisations/:orgId/bookings/daily-totals       controllers.
 #    - bearerHttpAuthentication: []
 #  tags:
 #    - user-bookings
+#  summary: Get one page of the current user's finished bookings for selected organisation within the selected timeframe, newest first. A booking must hold every tagId. limit is at most 1000
+#  operationId: getUserBookingPage
+#  responses:
+#    200:
+#      description: success
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.BookingPage'
+###
+GET /user-bookings/organisations/:orgId/bookings/page               controllers.TimeBookingHistoryController.getUserBookingPage(orgId: models.OrganisationId,from:org.joda.time.LocalDateTime, to:org.joda.time.LocalDateTime, projectId: Option[String], tagId: List[String] ?= Nil, limit: Option[Int], skip: Option[Int], withSummary: Option[Boolean])
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - user-bookings
 #  summary: Get aggregated stats for current user in selected organisation
 #  operationId: getUserBookingAggregatedStatsByOrganisation
 #  responses:
@@ -687,6 +704,23 @@ GET /organisation-bookings/organisations/:orgId/bookings/history                
 #            $ref: '#/components/schemas/models.BookingSummary'
 ###
 GET /organisation-bookings/organisations/:orgId/bookings/summary                                           controllers.TimeBookingHistoryController.getOrganisationBookingSummary(orgId: models.OrganisationId, from:org.joda.time.LocalDateTime, to:org.joda.time.LocalDateTime)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - organisation-bookings
+#  summary: Get one page of the finished bookings of the selected organisation within the selected timeframe, newest first. A booking must hold every tagId. limit is at most 1000
+#  operationId: getOrganisationBookingPage
+#  responses:
+#    200:
+#      description: success
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.BookingPage'
+###
+GET /organisation-bookings/organisations/:orgId/bookings/page                                              controllers.TimeBookingHistoryController.getOrganisationBookingPage(orgId: models.OrganisationId, from:org.joda.time.LocalDateTime, to:org.joda.time.LocalDateTime, projectId: Option[String], userId: Option[String], tagId: List[String] ?= Nil, limit: Option[Int], skip: Option[Int], withSummary: Option[Boolean])
 
 ###
 #  security:

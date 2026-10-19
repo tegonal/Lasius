@@ -29,5 +29,6 @@ import play.api.libs.json.{Format, Json}
 case class DailyBookingTotal(date: LocalDate, durationMs: Long, bookings: Int)
 
 object DailyBookingTotal {
-  implicit val format: Format[DailyBookingTotal] = Json.format[DailyBookingTotal]
+  implicit val format: Format[DailyBookingTotal] =
+    Json.format[DailyBookingTotal]
 }

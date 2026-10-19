@@ -21,18 +21,18 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import * as XLSX from 'xlsx'
 
 import { type ModelsBooking } from '~/services/api/lasius'
-import { getOrganisationBookingList } from '~/services/api/lasius/organisation-bookings/organisation-bookings'
-import { getUserBookingListByOrganisation } from '~/services/api/lasius/user-bookings/user-bookings'
+import { getOrganisationBookingPage } from '~/services/api/lasius/organisation-bookings/organisation-bookings'
+import { getUserBookingPage } from '~/services/api/lasius/user-bookings/user-bookings'
 
 import { handleBookingsExport, parseExportParameters } from './api.export'
 
 vi.mock('~/services/api/lasius/organisation-bookings/organisation-bookings', () => ({
   getOrganisationBookingAggregatedStats: vi.fn(),
-  getOrganisationBookingList: vi.fn(),
+  getOrganisationBookingPage: vi.fn(),
 }))
 vi.mock('~/services/api/lasius/user-bookings/user-bookings', () => ({
   getUserBookingAggregatedStatsByOrganisation: vi.fn(),
-  getUserBookingListByOrganisation: vi.fn(),
+  getUserBookingPage: vi.fn(),
 }))
 
 const FROM = '2026-10-05T00:00:00.000+02:00'
@@ -60,7 +60,11 @@ const bookings = [
   makeBooking('b3', 'p2', 'u1', []),
 ]
 
-const listResponse = { data: bookings, headers: new Headers(), status: 200 as const }
+const pageResponse = (items: ModelsBooking[]) => ({
+  data: { items, total: items.length },
+  headers: new Headers(),
+  status: 200 as const,
+})
 
 const bookingsParameters = {
   context: 'user' as const,
@@ -69,7 +73,7 @@ const bookingsParameters = {
   headers: { Authorization: 'Bearer token' },
   orgId: 'o1',
   projectId: '',
-  tags: '',
+  tagIds: [] as string[],
   to: TO,
   userId: '',
 }
@@ -129,7 +133,7 @@ describe('parseExportParameters', () => {
         from: FROM,
         orgId: 'o1',
         projectId: '',
-        tags: '',
+        tagIds: [],
         to: TO,
         type: 'bookings',
         userId: '',
@@ -137,18 +141,19 @@ describe('parseExportParameters', () => {
     })
   })
 
-  it('keeps the bookings filters', () => {
-    const result = parse({
+  it('keeps the bookings filters, with one tag id per tagId param', () => {
+    const query = new URLSearchParams({
       ...required,
       context: 'organisation',
       projectId: 'p1',
-      tags: 't1,t2',
       type: 'bookings',
       userId: 'u1',
     })
-    expect(result).toMatchObject({
+    query.append('tagId', 't1')
+    query.append('tagId', 'a,b')
+    expect(parseExportParameters(query)).toMatchObject({
       ok: true,
-      parameters: { context: 'organisation', projectId: 'p1', tags: 't1,t2', userId: 'u1' },
+      parameters: { context: 'organisation', projectId: 'p1', tagIds: ['t1', 'a,b'], userId: 'u1' },
     })
   })
 
@@ -187,49 +192,67 @@ describe('parseExportParameters', () => {
 
 describe('handleBookingsExport', () => {
   beforeEach(() => {
-    vi.mocked(getOrganisationBookingList).mockReset().mockResolvedValue(listResponse)
-    vi.mocked(getUserBookingListByOrganisation).mockReset().mockResolvedValue(listResponse)
+    vi.mocked(getOrganisationBookingPage).mockReset().mockResolvedValue(pageResponse(bookings))
+    vi.mocked(getUserBookingPage).mockReset().mockResolvedValue(pageResponse(bookings))
   })
 
   it('answers 400 for an invalid date range', async () => {
     const response = await handleBookingsExport({ ...bookingsParameters, from: 'not-a-date' })
     expect(response.status).toBe(400)
     expect(await response.text()).toBe('Invalid date range')
-    expect(getUserBookingListByOrganisation).not.toHaveBeenCalled()
+    expect(getUserBookingPage).not.toHaveBeenCalled()
   })
 
-  it('loads the organisation list for the organisation context', async () => {
-    await handleBookingsExport({ ...bookingsParameters, context: 'organisation' })
-    expect(getOrganisationBookingList).toHaveBeenCalledWith('o1', expect.any(Object), {
-      headers: bookingsParameters.headers,
+  it('loads the organisation pages with every filter for the organisation context', async () => {
+    await handleBookingsExport({
+      ...bookingsParameters,
+      context: 'organisation',
+      projectId: 'p1',
+      tagIds: ['t1', 'a,b'],
+      userId: 'u2',
     })
-    expect(getUserBookingListByOrganisation).not.toHaveBeenCalled()
+    expect(getOrganisationBookingPage).toHaveBeenCalledWith(
+      'o1',
+      expect.objectContaining({
+        limit: 1000,
+        projectId: 'p1',
+        skip: 0,
+        tagId: ['t1', 'a,b'],
+        userId: 'u2',
+        withSummary: false,
+      }),
+      { headers: bookingsParameters.headers },
+    )
+    expect(getUserBookingPage).not.toHaveBeenCalled()
   })
 
   it.each(['user', 'project'] as const)(
-    'loads the user list for the %s context',
+    'loads the user pages for the %s context',
     async (context) => {
       await handleBookingsExport({ ...bookingsParameters, context })
-      expect(getUserBookingListByOrganisation).toHaveBeenCalledWith('o1', expect.any(Object), {
+      expect(getUserBookingPage).toHaveBeenCalledWith('o1', expect.any(Object), {
         headers: bookingsParameters.headers,
       })
-      expect(getOrganisationBookingList).not.toHaveBeenCalled()
+      expect(getOrganisationBookingPage).not.toHaveBeenCalled()
     },
   )
 
-  it('exports every booking without filters', async () => {
+  it('exports the newest-first pages oldest first', async () => {
     const response = await handleBookingsExport(bookingsParameters)
-    expect(await readIds(response)).toEqual(['u1', 'u2', 'u1'])
+    expect(await readIds(response)).toEqual(['u1', 'u2', 'u1'].toReversed())
   })
 
-  it('applies the tag, project and user filters', async () => {
-    const byTags = await handleBookingsExport({ ...bookingsParameters, tags: 't1,t2' })
-    const byProject = await handleBookingsExport({ ...bookingsParameters, projectId: 'p2' })
-    const byUser = await handleBookingsExport({ ...bookingsParameters, userId: 'u2' })
-
-    expect(await readIds(byTags)).toEqual(['u2'])
-    expect(await readIds(byProject)).toEqual(['u1'])
-    expect(await readIds(byUser)).toEqual(['u2'])
+  it('loads the next page while a page is full', async () => {
+    const fullPage = Array.from({ length: 1000 }, (_, index) =>
+      makeBooking(`f${index}`, 'p1', 'u1', []),
+    )
+    vi.mocked(getUserBookingPage)
+      .mockResolvedValueOnce(pageResponse(fullPage))
+      .mockResolvedValueOnce(pageResponse(bookings))
+    await handleBookingsExport(bookingsParameters)
+    expect(vi.mocked(getUserBookingPage).mock.calls.map(([, query]) => query.skip)).toEqual([
+      0, 1000,
+    ])
   })
 
   it.each([

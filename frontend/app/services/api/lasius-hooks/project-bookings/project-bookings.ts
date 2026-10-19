@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 3.0.0-beta5+13-9fd7c35c+20261020-0009
+ * OpenAPI spec version: 3.0.0-beta5+16-5626b86e+20261020-0038
  */
 import type {
   GetAggregatedStatisticsByProjectParams,
@@ -25,7 +25,9 @@ function getGetProjectBookingListUrl(
 ) {
   const normalizedParams = new URLSearchParams()
   Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
+    if (Array.isArray(value)) {
+      value.forEach((item) => normalizedParams.append(key, String(item)))
+    } else if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
   })
@@ -58,7 +60,9 @@ function getGetProjectBookingSummaryUrl(
 ) {
   const normalizedParams = new URLSearchParams()
   Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
+    if (Array.isArray(value)) {
+      value.forEach((item) => normalizedParams.append(key, String(item)))
+    } else if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
   })
@@ -89,7 +93,9 @@ function getGetAggregatedStatisticsByProjectUrl(
 ) {
   const normalizedParams = new URLSearchParams()
   Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
+    if (Array.isArray(value)) {
+      value.forEach((item) => normalizedParams.append(key, String(item)))
+    } else if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
   })

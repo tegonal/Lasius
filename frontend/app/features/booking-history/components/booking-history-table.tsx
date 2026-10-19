@@ -17,7 +17,6 @@
  *
  */
 
-import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { DataList } from '~/components/ui/data-display/data-list/data-list'
@@ -26,7 +25,6 @@ import { DataListHeaderItem } from '~/components/ui/data-display/data-list/data-
 import { DataListRow } from '~/components/ui/data-display/data-list/data-list-row'
 import { parseTagsParameter } from '~/features/booking-history/lib/booking-history-search-parameters'
 import { TagList } from '~/features/tags/components/tag-list'
-import { sortExtendedBookingsByDate } from '~/lib/api/functions/sort-bookings-by-date'
 import { type ModelsBooking, type ModelsTag } from '~/services/api/lasius'
 import { type ExtendedHistoryBooking } from '~/types/booking'
 
@@ -50,6 +48,9 @@ export const BookingHistoryTable = ({
   showUserColumn = false,
 }: Properties) => {
   const { t } = useTranslation('common')
+
+  // The backend returns the newest booking first, so the table keeps the order of `items`.
+  if (items.length === 0) return <EmptyStateBookingHistory />
 
   const tagClickHandler = (tag: ModelsTag) => {
     if (!tag) {
@@ -78,10 +79,6 @@ export const BookingHistoryTable = ({
     }
   }
 
-  const sortedList = useMemo(() => sortExtendedBookingsByDate(items), [items])
-
-  if (sortedList.length === 0) return <EmptyStateBookingHistory />
-
   return (
     <DataList>
       <DataListRow>
@@ -92,7 +89,7 @@ export const BookingHistoryTable = ({
         <DataListHeaderItem>{t('bookings:duration', 'Duration')}</DataListHeaderItem>
         <DataListHeaderItem />
       </DataListRow>
-      {sortedList.map((booking) => (
+      {items.map((booking) => (
         <DataListRow key={booking.id}>
           {showUserColumn && (
             <DataListField className="whitespace-nowrap">

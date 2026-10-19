@@ -18,14 +18,8 @@
  */
 
 import { type ModelsBooking } from '~/services/api/lasius'
-import { type ExtendedHistoryBooking } from '~/types/booking'
 
 export const sortBookingsByDate = (bookings: ModelsBooking[]): ModelsBooking[] =>
   [...bookings].toSorted(
     (a, b) => new Date(b.start.dateTime).getTime() - new Date(a.start.dateTime).getTime(),
   )
-
-export const sortExtendedBookingsByDate = (
-  bookings: ExtendedHistoryBooking[],
-): ExtendedHistoryBooking[] =>
-  [...bookings].toSorted((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())

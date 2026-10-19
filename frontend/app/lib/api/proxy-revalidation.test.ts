@@ -19,25 +19,23 @@
 
 import { describe, expect, it } from 'vitest'
 
-import { getNextShownCount } from './use-scroll-pagination'
+import { isProxyReadRequest } from './proxy-revalidation'
 
-const near = { remainingScroll: 10, scrollBeforeEnd: 50, shown: 30, step: 30, total: 100 }
-
-describe('getNextShownCount', () => {
-  it('shows one more step near the end', () => {
-    expect(getNextShownCount(near)).toBe(60)
+describe('isProxyReadRequest', () => {
+  it('accepts a GET call through the proxy', () => {
+    expect(
+      isProxyReadRequest({ formAction: '/api/proxy', json: { method: 'GET', url: '/x' } }),
+    ).toBe(true)
   })
 
-  it('stops at the total', () => {
-    expect(getNextShownCount({ ...near, total: 45 })).toBe(45)
-  })
-
-  it('keeps the number far from the end or when all items show', () => {
-    expect(getNextShownCount({ ...near, remainingScroll: 50 })).toBeNull()
-    expect(getNextShownCount({ ...near, total: 30 })).toBeNull()
-  })
-
-  it('keeps the number for a step of 0', () => {
-    expect(getNextShownCount({ ...near, step: 0 })).toBeNull()
+  it('rejects a change through the proxy and a submission to another action', () => {
+    expect(
+      isProxyReadRequest({ formAction: '/api/proxy', json: { method: 'POST', url: '/x' } }),
+    ).toBe(false)
+    expect(isProxyReadRequest({ formAction: '/api/org-switch', json: { method: 'GET' } })).toBe(
+      false,
+    )
+    expect(isProxyReadRequest({ formAction: '/api/proxy', json: undefined })).toBe(false)
+    expect(isProxyReadRequest({ formAction: undefined, json: undefined })).toBe(false)
   })
 })

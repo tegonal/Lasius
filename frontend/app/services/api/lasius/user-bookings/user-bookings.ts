@@ -3,17 +3,19 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 3.0.0-beta5+14-1ebaab02+20261020-0022
+ * OpenAPI spec version: 3.0.0-beta5+16-5626b86e+20261020-0038
  */
 import type {
   GetUserBookingAggregatedStatsByOrganisationParams,
   GetUserBookingDailyTotalsParams,
   GetUserBookingLatestListByOrganisationParams,
   GetUserBookingListByOrganisationParams,
+  GetUserBookingPageParams,
   GetUserBookingSummaryByOrganisationParams,
   ModelsAddBookingRequest,
   ModelsBooking,
   ModelsBookingChangeStartRequest,
+  ModelsBookingPage,
   ModelsBookingStats,
   ModelsBookingSummary,
   ModelsCurrentOrganisationTimeBookings,
@@ -452,6 +454,55 @@ export const getUserBookingDailyTotals = async (
       method: 'GET',
     },
   )
+}
+
+export type getUserBookingPageResponse200 = {
+  data: ModelsBookingPage
+  status: 200
+}
+
+export type getUserBookingPageResponseSuccess = getUserBookingPageResponse200 & {
+  headers: Headers
+}
+export type getUserBookingPageResponse = getUserBookingPageResponseSuccess
+
+export const getGetUserBookingPageUrl = (orgId: string, params: GetUserBookingPageParams) => {
+  const normalizedParams = new URLSearchParams()
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    const explodeParameters = ['tagId']
+
+    if (Array.isArray(value) && explodeParameters.includes(key)) {
+      value.forEach((v) => {
+        normalizedParams.append(key, v === null ? 'null' : String(v))
+      })
+      return
+    }
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  })
+
+  const stringifiedParams = normalizedParams.toString()
+
+  return stringifiedParams.length > 0
+    ? `/user-bookings/organisations/${orgId}/bookings/page?${stringifiedParams}`
+    : `/user-bookings/organisations/${orgId}/bookings/page`
+}
+
+/**
+ * @summary Get one page of the current user's finished bookings for selected organisation within the selected timeframe, newest first. A booking must hold every tagId. limit is at most 1000
+ */
+export const getUserBookingPage = async (
+  orgId: string,
+  params: GetUserBookingPageParams,
+  options?: Parameters<typeof lasiusFetch>[1],
+): Promise<getUserBookingPageResponse> => {
+  return lasiusFetch<getUserBookingPageResponse>(getGetUserBookingPageUrl(orgId, params), {
+    ...options,
+    method: 'GET',
+  })
 }
 
 export type getUserBookingAggregatedStatsByOrganisationResponse200 = {

@@ -29,7 +29,7 @@ type Properties = {
   from?: string
   hasBookings: boolean
   projectId?: string
-  tags?: string
+  tagIds: string[]
   to?: string
   userId?: string
 }
@@ -39,7 +39,7 @@ export const BookingHistoryExport = ({
   from,
   hasBookings,
   projectId,
-  tags,
+  tagIds,
   to,
   userId,
 }: Properties) => {
@@ -57,7 +57,8 @@ export const BookingHistoryExport = ({
     if (to) parameters.set('to', to)
     if (projectId) parameters.set('projectId', projectId)
     if (userId) parameters.set('userId', userId)
-    if (tags) parameters.set('tags', tags)
+    // One param per tag id, so a tag id with a comma stays one id.
+    for (const tagId of tagIds) parameters.append('tagId', tagId)
 
     window.open(`/api/export?${parameters.toString()}`, '_blank')
   }

@@ -43,6 +43,7 @@ import { TermsOfServiceDialog } from '~/features/terms-of-service/components/ter
 import { loadTermsOfService } from '~/features/terms-of-service/terms-of-service.server'
 import { usePersistedSearchParameter } from '~/hooks/use-persisted-search-parameter'
 import { DEFAULT_LOCALE, isLocale } from '~/i18n-config'
+import { isProxyReadRequest } from '~/lib/api/proxy-revalidation'
 import { getUserClock } from '~/lib/cookies/time-zone-cookie.server'
 import { getDeduplicatedUserProfile } from '~/lib/organisation-helpers.server'
 import { cn } from '~/lib/utils/cn'
@@ -53,12 +54,11 @@ import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth
 import { type Route } from './+types/app-layout'
 
 /** Skip revalidation for same-page navigations, but allow action-triggered revalidation */
-export const shouldRevalidate = ({
-  currentUrl,
-  defaultShouldRevalidate,
-  formMethod,
-  nextUrl,
-}: ShouldRevalidateFunctionArgs) => {
+export const shouldRevalidate = (arguments_: ShouldRevalidateFunctionArgs) => {
+  const { currentUrl, defaultShouldRevalidate, formMethod, nextUrl } = arguments_
+  if (isProxyReadRequest(arguments_)) {
+    return false
+  }
   if (formMethod) {
     return defaultShouldRevalidate
   }

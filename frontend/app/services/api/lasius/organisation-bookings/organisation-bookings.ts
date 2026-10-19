@@ -3,13 +3,15 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 3.0.0-beta5+13-9fd7c35c+20261020-0009
+ * OpenAPI spec version: 3.0.0-beta5+16-5626b86e+20261020-0038
  */
 import type {
   GetOrganisationBookingAggregatedStatsParams,
   GetOrganisationBookingListParams,
+  GetOrganisationBookingPageParams,
   GetOrganisationBookingSummaryParams,
   ModelsBooking,
+  ModelsBookingPage,
   ModelsBookingStats,
   ModelsBookingSummary,
 } from './..'
@@ -102,6 +104,61 @@ export const getOrganisationBookingSummary = async (
 ): Promise<getOrganisationBookingSummaryResponse> => {
   return lasiusFetch<getOrganisationBookingSummaryResponse>(
     getGetOrganisationBookingSummaryUrl(orgId, params),
+    {
+      ...options,
+      method: 'GET',
+    },
+  )
+}
+
+export type getOrganisationBookingPageResponse200 = {
+  data: ModelsBookingPage
+  status: 200
+}
+
+export type getOrganisationBookingPageResponseSuccess = getOrganisationBookingPageResponse200 & {
+  headers: Headers
+}
+export type getOrganisationBookingPageResponse = getOrganisationBookingPageResponseSuccess
+
+export const getGetOrganisationBookingPageUrl = (
+  orgId: string,
+  params: GetOrganisationBookingPageParams,
+) => {
+  const normalizedParams = new URLSearchParams()
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    const explodeParameters = ['tagId']
+
+    if (Array.isArray(value) && explodeParameters.includes(key)) {
+      value.forEach((v) => {
+        normalizedParams.append(key, v === null ? 'null' : String(v))
+      })
+      return
+    }
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  })
+
+  const stringifiedParams = normalizedParams.toString()
+
+  return stringifiedParams.length > 0
+    ? `/organisation-bookings/organisations/${orgId}/bookings/page?${stringifiedParams}`
+    : `/organisation-bookings/organisations/${orgId}/bookings/page`
+}
+
+/**
+ * @summary Get one page of the finished bookings of the selected organisation within the selected timeframe, newest first. A booking must hold every tagId. limit is at most 1000
+ */
+export const getOrganisationBookingPage = async (
+  orgId: string,
+  params: GetOrganisationBookingPageParams,
+  options?: Parameters<typeof lasiusFetch>[1],
+): Promise<getOrganisationBookingPageResponse> => {
+  return lasiusFetch<getOrganisationBookingPageResponse>(
+    getGetOrganisationBookingPageUrl(orgId, params),
     {
       ...options,
       method: 'GET',

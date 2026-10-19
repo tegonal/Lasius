@@ -3,13 +3,15 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 3.0.0-beta5+13-9fd7c35c+20261020-0009
+ * OpenAPI spec version: 3.0.0-beta5+16-5626b86e+20261020-0038
  */
 import type {
   GetOrganisationBookingAggregatedStatsParams,
   GetOrganisationBookingListParams,
+  GetOrganisationBookingPageParams,
   GetOrganisationBookingSummaryParams,
   ModelsBooking,
+  ModelsBookingPage,
   ModelsBookingStats,
   ModelsBookingSummary,
 } from '../../lasius'
@@ -24,7 +26,9 @@ function getGetOrganisationBookingListUrl(
 ) {
   const normalizedParams = new URLSearchParams()
   Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
+    if (Array.isArray(value)) {
+      value.forEach((item) => normalizedParams.append(key, String(item)))
+    } else if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
   })
@@ -55,7 +59,9 @@ function getGetOrganisationBookingSummaryUrl(
 ) {
   const normalizedParams = new URLSearchParams()
   Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
+    if (Array.isArray(value)) {
+      value.forEach((item) => normalizedParams.append(key, String(item)))
+    } else if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
   })
@@ -78,6 +84,39 @@ export function useGetOrganisationBookingSummary(options?: ApiProxyOptions<Model
     options,
   )
 } /**
+ * @summary Get one page of the finished bookings of the selected organisation within the selected timeframe, newest first. A booking must hold every tagId. limit is at most 1000
+ */
+function getGetOrganisationBookingPageUrl(
+  orgId: string,
+  params?: GetOrganisationBookingPageParams,
+) {
+  const normalizedParams = new URLSearchParams()
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (Array.isArray(value)) {
+      value.forEach((item) => normalizedParams.append(key, String(item)))
+    } else if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  })
+  const query = normalizedParams.toString()
+  return query
+    ? `/organisation-bookings/organisations/${orgId}/bookings/page` + '?' + query
+    : `/organisation-bookings/organisations/${orgId}/bookings/page`
+}
+
+export function useGetOrganisationBookingPage(options?: ApiProxyOptions<ModelsBookingPage>) {
+  return useApiProxy<
+    ModelsBookingPage,
+    undefined,
+    { orgId: string; params?: GetOrganisationBookingPageParams }
+  >(
+    {
+      getUrl: ({ orgId, params }) => getGetOrganisationBookingPageUrl(orgId, params),
+      method: 'GET',
+    },
+    options,
+  )
+} /**
  * @summary Get aggregated statistics about bookings for the selected organisation within the selected timeframe
  */
 function getGetOrganisationBookingAggregatedStatsUrl(
@@ -86,7 +125,9 @@ function getGetOrganisationBookingAggregatedStatsUrl(
 ) {
   const normalizedParams = new URLSearchParams()
   Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
+    if (Array.isArray(value)) {
+      value.forEach((item) => normalizedParams.append(key, String(item)))
+    } else if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
   })

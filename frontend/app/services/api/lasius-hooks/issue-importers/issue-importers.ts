@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+345-80ac1ed7+20261007-2104
+ * OpenAPI spec version: 3.0.0-beta5+16-5626b86e+20261020-0038
  */
 import type {
   GetConfigsParams,
@@ -29,7 +29,9 @@ import { type ApiProxyOptions, useApiProxy } from '~/hooks/use-api-proxy'
 function getGetConfigsUrl(orgId: string, params?: GetConfigsParams) {
   const normalizedParams = new URLSearchParams()
   Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
+    if (Array.isArray(value)) {
+      value.forEach((item) => normalizedParams.append(key, String(item)))
+    } else if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
   })
@@ -197,7 +199,9 @@ function getGetExternalProjectMetadataUrl(
 ) {
   const normalizedParams = new URLSearchParams()
   Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
+    if (Array.isArray(value)) {
+      value.forEach((item) => normalizedParams.append(key, String(item)))
+    } else if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
   })

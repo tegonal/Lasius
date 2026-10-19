@@ -207,6 +207,112 @@ class BookingHistoryRepositorySpec extends EmbedMongo {
       repository.bulkInsert(bookings.toList)
     }.awaitResult()
 
+  "pageByRange" should {
+    val noFilter = BookingPageFilter(None, None, Nil)
+
+    def page(user: Option[EntityReference[UserId]],
+             org: OrganisationId,
+             filter: BookingPageFilter,
+             limit: Int = 100,
+             skip: Int = 0,
+             withSummary: Boolean = true): BookingPage =
+      withDBSession() { implicit dbSession =>
+        repository.pageByRange(user,
+                               org,
+                               filter,
+                               rangeFrom,
+                               rangeTo,
+                               limit,
+                               skip,
+                               withSummary)
+      }.awaitResult()
+
+    def tagged(base: BookingV2, tags: Tag*): BookingV2 =
+      base.copy(tags = tags.toSet)
+
+    "require every selected tag, after trim and upper case" in {
+      val user    = EntityReference(UserId(), "tagUser")
+      val org     = EntityReference(OrganisationId(), "tagOrg")
+      val project = EntityReference(ProjectId(), "tagProject")
+      val start   = date("03.01.2000").plusHours(8)
+      val both    = tagged(booking(user, org, project, start, 1),
+                        SimpleTag(TagId(" Billable ")),
+                        SimpleTag(TagId("Meeting")))
+      val one = tagged(booking(user, org, project, start.plusHours(2), 1),
+                       SimpleTag(TagId("billable")))
+      val group =
+        tagged(booking(user, org, project, start.plusHours(4), 1),
+               TagGroup(TagId("Support"), Seq(SimpleTag(TagId("Billable")))))
+      val dollar = tagged(booking(user, org, project, start.plusHours(6), 1),
+                          SimpleTag(TagId("$tags")))
+      insert(both, one, group, dollar)
+
+      def ids(tagIds: String*): Seq[BookingId] =
+        page(None, org.id, BookingPageFilter(None, None, tagIds)).items
+          .map(_.id)
+
+      ids("BILLABLE ", "meeting") must equalTo(Seq(both.id))
+      ids("billable") must equalTo(Seq(one.id, both.id))
+      ids("support") must equalTo(Seq(group.id))
+      ids("$tags") must equalTo(Seq(dollar.id))
+      ids(" ") must haveSize(4)
+    }
+
+    "filter by user and project, and count the filtered set" in {
+      val user1    = EntityReference(UserId(), "pageUser1")
+      val user2    = EntityReference(UserId(), "pageUser2")
+      val org      = EntityReference(OrganisationId(), "pageOrg")
+      val project1 = EntityReference(ProjectId(), "pageProject1")
+      val project2 = EntityReference(ProjectId(), "pageProject2")
+      insert(
+        booking(user1, org, project1, date("03.01.2000").plusHours(8), 2),
+        booking(user1, org, project2, date("04.01.2000").plusHours(8), 3),
+        booking(user2, org, project1, date("05.01.2000").plusHours(8), 4)
+      )
+
+      val byUser =
+        page(None,
+             org.id,
+             BookingPageFilter(None, Some(user1.id.value.toString), Nil))
+      byUser.total must equalTo(2)
+      byUser.summary must beSome(
+        BookingSummary(5L * 3600000,
+                       2,
+                       distinctUsers = 1,
+                       distinctProjects = 2))
+
+      val byProject =
+        page(Some(user1),
+             org.id,
+             BookingPageFilter(Some(project1.id.value.toString), None, Nil))
+      byProject.items.map(_.projectReference) must equalTo(Seq(project1))
+      byProject.total must equalTo(1)
+
+      page(None, org.id, noFilter, withSummary = false).summary must beNone
+    }
+
+    "return the newest booking first, with a stable order across pages" in {
+      val user    = EntityReference(UserId(), "orderUser")
+      val org     = EntityReference(OrganisationId(), "orderOrg")
+      val project = EntityReference(ProjectId(), "orderProject")
+      val start   = date("10.01.2000").plusHours(8)
+      // Three bookings share a start time, so only the _id tiebreak orders them.
+      val bookings = Seq(0, 0, 0, 1, 2).map(hours =>
+        booking(user, org, project, start.plusHours(hours), 1))
+      insert(bookings: _*)
+
+      val all   = page(None, org.id, noFilter).items.map(_.id)
+      val paged = (0 until 5 by 2).flatMap(skip =>
+        page(None, org.id, noFilter, limit = 2, skip = skip).items.map(_.id))
+
+      all must haveSize(5)
+      paged must equalTo(all)
+      page(None, org.id, noFilter).items.head.start.dateTime must equalTo(
+        start.plusHours(2).toLocalDateTime)
+      page(None, org.id, noFilter, limit = 5000).total must equalTo(5)
+    }
+  }
+
   "dailyTotalsByRange" should {
 
     "group the bookings of the user by start day, in date order" in {

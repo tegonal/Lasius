@@ -160,7 +160,9 @@ function urlSource(operationName, route, pathParameters, queryParameters) {
 function ${urlBuilderName}(${urlBuilderParameters}) {
 \tconst normalizedParams = new URLSearchParams()
 \tObject.entries(params || {}).forEach(([key, value]) => {
-\t\tif (value !== undefined) {
+\t\tif (Array.isArray(value)) {
+\t\t\tvalue.forEach((item) => normalizedParams.append(key, String(item)))
+\t\t} else if (value !== undefined) {
 \t\t\tnormalizedParams.append(key, value === null ? 'null' : value.toString())
 \t\t}
 \t})

@@ -92,6 +92,19 @@ trait BookingHistoryRepository
                          to: LocalDateTime)(implicit
       dbSession: DBSession): Future[Seq[DailyBookingTotal]]
 
+  /** Returns one page of the bookings of `orgId`, newest first. `userReference`
+    * limits the page to the bookings of one user.
+    */
+  def pageByRange(userReference: Option[UserReference],
+                  orgId: OrganisationId,
+                  filter: BookingPageFilter,
+                  from: LocalDateTime,
+                  to: LocalDateTime,
+                  limit: Int,
+                  skip: Int,
+                  withSummary: Boolean)(implicit
+      dbSession: DBSession): Future[BookingPage]
+
   def updateBooking(newBooking: BookingV2)(implicit
       format: Format[BookingV2],
       dbSession: DBSession): Future[Boolean]
@@ -100,6 +113,8 @@ trait BookingHistoryRepository
 }
 
 object BookingHistoryMongoRepository {
+
+  val maxPageSize = 1000
 
   /** Each index ends with `_id`, so that the sort of `findByRange` and a paged
     * read with an `_id` tiebreak use the index without an in-memory sort.
@@ -264,13 +279,78 @@ class BookingHistoryMongoRepository @Inject() ()(
                               projectId: Option[ProjectId],
                               from: LocalDateTime,
                               to: LocalDateTime)(implicit
+      dbSession: DBSession): Future[BookingSummary] =
+    summaryOf(
+      ValueConverters.toDocument(
+        rangeSelector(userReference, orgId, projectId, from, to)))
+
+  override def pageByRange(userReference: Option[UserReference],
+                           orgId: OrganisationId,
+                           filter: BookingPageFilter,
+                           from: LocalDateTime,
+                           to: LocalDateTime,
+                           limit: Int,
+                           skip: Int,
+                           withSummary: Boolean)(implicit
+      dbSession: DBSession): Future[BookingPage] = {
+    val sel        = pageSelector(userReference, orgId, filter, from, to)
+    val selBson    = ValueConverters.toDocument(sel)
+    val boundLimit = limit.max(1).min(BookingHistoryMongoRepository.maxPageSize)
+
+    val itemsFuture = find(sel = sel,
+                           sort = Json.obj("start.dateTime" -> -1, "_id" -> -1),
+                           limit = boundLimit,
+                           skip = skip.max(0)).map(_.map(_._1).toSeq)
+    val totalFuture   = coll.count(selector = Some(selBson)).map(_.toInt)
+    val summaryFuture =
+      if (withSummary) summaryOf(selBson).map(Some(_))
+      else Future.successful(None)
+
+    for {
+      items   <- itemsFuture
+      total   <- totalFuture
+      summary <- summaryFuture
+    } yield BookingPage(items, total, summary)
+  }
+
+  private def pageSelector(userReference: Option[UserReference],
+                           orgId: OrganisationId,
+                           filter: BookingPageFilter,
+                           from: LocalDateTime,
+                           to: LocalDateTime): JsObject = {
+    // A tag id is user input, so $literal keeps an id that starts with "$"
+    // from reading as a field path. $toUpper and $trim normalise both sides.
+    def normalised(value: JsValue): JsObject =
+      Json.obj("$toUpper" -> Json.obj("$trim" -> Json.obj("input" -> value)))
+    val tagIds       = filter.tagIds.map(_.trim).filter(_.nonEmpty).distinct
+    val tagCondition =
+      if (tagIds.isEmpty) Json.obj()
+      else
+        Json.obj(
+          "$expr" -> Json.obj("$setIsSubset" -> Json.arr(
+            JsArray(tagIds.map(id => normalised(Json.obj("$literal" -> id)))),
+            Json.obj(
+              "$map" -> Json.obj(
+                "input" -> Json.obj("$ifNull" -> Json.arr("$tags", Json.arr())),
+                "as"    -> "tag",
+                "in"    -> normalised(JsString("$$tag.id"))
+              ))
+          )))
+
+    val filterConditions = Seq[Option[(String, JsValueWrapper)]](
+      filter.projectId.filter(_.nonEmpty).map("projectReference.id" -> _),
+      filter.userId.filter(_.nonEmpty).map("userReference.id" -> _)
+    ).flatten
+
+    rangeSelector(userReference, Some(orgId), None, from, to) ++
+      Json.obj(filterConditions: _*) ++ tagCondition
+  }
+
+  private def summaryOf(sel: BSONDocument)(implicit
       dbSession: DBSession): Future[BookingSummary] = {
     val collection = coll
     import collection.AggregationFramework._
     import reactivemongo.api.bson._
-
-    val sel = ValueConverters.toDocument(
-      rangeSelector(userReference, orgId, projectId, from, to))
 
     val pipeline = List(
       Match(sel),

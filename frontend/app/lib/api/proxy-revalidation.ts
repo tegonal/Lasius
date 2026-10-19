@@ -17,7 +17,18 @@
  *
  */
 
-import { type ModelsBooking } from '~/services/api/lasius'
+import { type ShouldRevalidateFunctionArgs } from 'react-router'
 
-export const filterModelsBookingListProjectId = (list: ModelsBooking[], projectId: string) =>
-  list.filter((booking) => (projectId ? booking.projectReference.id === projectId : true))
+/**
+ * True for a GET call that a generated hook sends through `/api/proxy`. The fetcher POST of
+ * that call changes no data, so a loader needs no revalidation after it.
+ */
+export const isProxyReadRequest = ({
+  formAction,
+  json,
+}: Pick<ShouldRevalidateFunctionArgs, 'formAction' | 'json'>) =>
+  formAction === '/api/proxy' &&
+  typeof json === 'object' &&
+  json !== null &&
+  'method' in json &&
+  json.method === 'GET'

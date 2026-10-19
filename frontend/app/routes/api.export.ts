@@ -21,22 +21,20 @@ import { endOfDay, format, isValid, startOfDay } from 'date-fns'
 import { z } from 'zod'
 
 import { getAdaptiveGranularity, type Granularity } from '~/lib/api/config/granularity-config'
-import { filterModelsBookingListByTags } from '~/lib/api/functions/filter-models-booking-list-by-tags'
-import { filterModelsBookingListProjectId } from '~/lib/api/functions/filter-models-booking-list-project-id'
-import { filterModelsBookingListUserId } from '~/lib/api/functions/filter-models-booking-list-user-id'
 import { getUserClock } from '~/lib/cookies/time-zone-cookie.server'
 import { logger } from '~/lib/logger'
 import { exportBookingList, type ExportFormat } from '~/lib/utils/data/export'
 import { apiTimespanFromTo, toCalendarDay } from '~/lib/utils/dates'
 import { exportStatistics } from '~/lib/utils/statistics-export'
+import { type ModelsBooking } from '~/services/api/lasius'
 import { type ModelsBookingStats } from '~/services/api/lasius/modelsBookingStats'
 import {
   getOrganisationBookingAggregatedStats,
-  getOrganisationBookingList,
+  getOrganisationBookingPage,
 } from '~/services/api/lasius/organisation-bookings/organisation-bookings'
 import {
   getUserBookingAggregatedStatsByOrganisation,
-  getUserBookingListByOrganisation,
+  getUserBookingPage,
 } from '~/services/api/lasius/user-bookings/user-bookings'
 import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
 
@@ -105,6 +103,8 @@ const requiredParametersSchema = z.object({
 
 const totalParameter = z.coerce.number().default(0)
 
+const tagIdsParameter = z.array(z.string()).default([])
+
 const exportParametersSchema = z.discriminatedUnion('type', [
   z.object({
     context: z.enum(['organisation', 'project', 'user']).default('user'),
@@ -112,7 +112,7 @@ const exportParametersSchema = z.discriminatedUnion('type', [
     from: requiredParameter,
     orgId: requiredParameter,
     projectId: z.string().default(''),
-    tags: z.string().default(''),
+    tagIds: tagIdsParameter,
     to: requiredParameter,
     type: z.literal('bookings'),
     userId: z.string().default(''),
@@ -145,7 +145,8 @@ type StatisticsExportParameters = Omit<Extract<ExportParameters, { type: 'statis
 export const parseExportParameters = (
   searchParameters: URLSearchParams,
 ): ParseExportParametersResult => {
-  const raw = Object.fromEntries(searchParameters)
+  // Object.fromEntries keeps only the last value of a repeated param, so the tag ids come from getAll.
+  const raw = { ...Object.fromEntries(searchParameters), tagIds: searchParameters.getAll('tagId') }
   if (!requiredParametersSchema.safeParse(raw).success) {
     return { error: 'Missing required parameters', ok: false }
   }
@@ -165,23 +166,7 @@ export async function handleBookingsExport(
     return new Response('Invalid date range', { status: 400 })
   }
 
-  const response =
-    parameters.context === 'organisation'
-      ? await getOrganisationBookingList(parameters.orgId, timespan, {
-          headers: parameters.headers,
-        })
-      : await getUserBookingListByOrganisation(parameters.orgId, timespan, {
-          headers: parameters.headers,
-        })
-
-  // Apply client-side filters (same logic as booking-history-layout)
-  const tagFilters = parameters.tags
-    ? parameters.tags.split(',').map((id) => ({ id, type: 'SimpleTag' as const }))
-    : []
-  let bookings = response.data
-  bookings = filterModelsBookingListByTags(bookings, tagFilters)
-  bookings = filterModelsBookingListProjectId(bookings, parameters.projectId)
-  bookings = filterModelsBookingListUserId(bookings, parameters.userId)
+  const bookings = await loadAllBookingPages(parameters, timespan)
 
   const { buffer, filename } = exportBookingList(bookings, parameters.format, {
     context: parameters.context,
@@ -195,6 +180,42 @@ export async function handleBookingsExport(
       'Content-Type': contentTypeMap[parameters.format],
     },
   })
+}
+
+const EXPORT_PAGE_SIZE = 1000
+const EXPORT_MAX_PAGES = 100
+
+/**
+ * Loads every filtered booking in pages, and returns them oldest first as the history did.
+ * The page limit stops the loop at 100000 bookings.
+ */
+const loadAllBookingPages = async (
+  parameters: BookingsExportParameters & { headers: HeadersInit },
+  timespan: { from: string; to: string },
+) => {
+  const { context, headers, orgId, projectId, tagIds, userId } = parameters
+  const filter = { projectId: projectId || undefined, tagId: tagIds }
+  const bookings: ModelsBooking[] = []
+  for (let pageIndex = 0; pageIndex < EXPORT_MAX_PAGES; pageIndex++) {
+    const query = {
+      ...timespan,
+      ...filter,
+      limit: EXPORT_PAGE_SIZE,
+      skip: pageIndex * EXPORT_PAGE_SIZE,
+      withSummary: false,
+    }
+    const response =
+      context === 'organisation'
+        ? await getOrganisationBookingPage(
+            orgId,
+            { ...query, userId: userId || undefined },
+            { headers },
+          )
+        : await getUserBookingPage(orgId, query, { headers })
+    bookings.push(...response.data.items)
+    if (response.data.items.length < EXPORT_PAGE_SIZE) break
+  }
+  return bookings.toReversed()
 }
 
 async function createExportResponse(

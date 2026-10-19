@@ -21,12 +21,18 @@ import { data } from 'react-router'
 
 import { innerGridClasses } from '~/components/ui/layouts/layout-columns'
 import { BookingHistoryLayout } from '~/features/booking-history/components/booking-history-layout'
+import { type BookingPageQuery } from '~/features/booking-history/hooks/use-booking-pages'
+import {
+  BOOKING_PAGE_SIZE,
+  getBookingListFilter,
+  getBookingListSignature,
+} from '~/features/booking-history/lib/booking-list-query'
 import { getUserClock } from '~/lib/cookies/time-zone-cookie.server'
 import { loadOrganisationContext } from '~/lib/organisation-helpers.server'
 import { getListDateRange } from '~/lib/utils/date/list-date-range'
 import { apiTimespanFromTo } from '~/lib/utils/dates'
 import { cachedServerLoader } from '~/lib/utils/loader-cache'
-import { getUserBookingListByOrganisation } from '~/services/api/lasius/user-bookings/user-bookings'
+import { getUserBookingPage } from '~/services/api/lasius/user-bookings/user-bookings'
 import { mergeAuthHeaders } from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/user.lists'
@@ -36,17 +42,27 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
 
   const clock = getUserClock(request)
   const dateRange = getListDateRange(url.searchParams, clock.now, clock.formatISO)
-  const timespan = apiTimespanFromTo(dateRange.from, dateRange.to)
+  const timespan = apiTimespanFromTo(dateRange.from, dateRange.to) ?? { from: '', to: '' }
+  const { projectId, tagId } = getBookingListFilter(url.searchParams)
 
-  const bookingsResponse = await getUserBookingListByOrganisation(
+  const pageResponse = await getUserBookingPage(
     selectedOrgId,
-    timespan ?? { from: '', to: '' },
+    { ...timespan, limit: BOOKING_PAGE_SIZE, projectId, skip: 0, tagId, withSummary: true },
     { headers },
   )
 
+  const query: BookingPageQuery = {
+    dataSource: 'userBookings',
+    orgId: selectedOrgId,
+    projectId,
+    tagId,
+    ...timespan,
+  }
   return data(
     {
-      bookings: bookingsResponse.data,
+      firstPage: pageResponse.data,
+      query,
+      signature: getBookingListSignature(url.searchParams),
     },
     { headers: mergeAuthHeaders(auth) },
   )
@@ -55,7 +71,12 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
 const UserListsPage = ({ loaderData }: Route.ComponentProps) => {
   return (
     <div className={innerGridClasses} data-testid="lists-page">
-      <BookingHistoryLayout bookings={loaderData.bookings} dataSource="userBookings" />
+      <BookingHistoryLayout
+        dataSource="userBookings"
+        firstPage={loaderData.firstPage}
+        query={loaderData.query}
+        signature={loaderData.signature}
+      />
     </div>
   )
 }
@@ -64,7 +85,6 @@ export const clientLoader = ({ request, serverLoader }: Route.ClientLoaderArgs) 
   cachedServerLoader('routes/user.lists', request, serverLoader)
 clientLoader.hydrate = false
 
-// The loader reads only the date range. The project, user and tag filters work on the client.
-export { statsShouldRevalidate as shouldRevalidate } from '~/features/stats/stats-loader'
+export { listShouldRevalidate as shouldRevalidate } from '~/features/booking-history/lib/booking-list-query'
 
 export default UserListsPage

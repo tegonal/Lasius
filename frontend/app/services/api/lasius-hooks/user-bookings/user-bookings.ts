@@ -3,17 +3,19 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 3.0.0-beta5+14-1ebaab02+20261020-0022
+ * OpenAPI spec version: 3.0.0-beta5+16-5626b86e+20261020-0038
  */
 import type {
   GetUserBookingAggregatedStatsByOrganisationParams,
   GetUserBookingDailyTotalsParams,
   GetUserBookingLatestListByOrganisationParams,
   GetUserBookingListByOrganisationParams,
+  GetUserBookingPageParams,
   GetUserBookingSummaryByOrganisationParams,
   ModelsAddBookingRequest,
   ModelsBooking,
   ModelsBookingChangeStartRequest,
+  ModelsBookingPage,
   ModelsBookingStats,
   ModelsBookingSummary,
   ModelsCurrentOrganisationTimeBookings,
@@ -104,7 +106,9 @@ function getGetUserBookingListByOrganisationUrl(
 ) {
   const normalizedParams = new URLSearchParams()
   Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
+    if (Array.isArray(value)) {
+      value.forEach((item) => normalizedParams.append(key, String(item)))
+    } else if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
   })
@@ -135,7 +139,9 @@ function getGetUserBookingSummaryByOrganisationUrl(
 ) {
   const normalizedParams = new URLSearchParams()
   Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
+    if (Array.isArray(value)) {
+      value.forEach((item) => normalizedParams.append(key, String(item)))
+    } else if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
   })
@@ -165,7 +171,9 @@ export function useGetUserBookingSummaryByOrganisation(
 function getGetUserBookingDailyTotalsUrl(orgId: string, params?: GetUserBookingDailyTotalsParams) {
   const normalizedParams = new URLSearchParams()
   Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
+    if (Array.isArray(value)) {
+      value.forEach((item) => normalizedParams.append(key, String(item)))
+    } else if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
   })
@@ -188,6 +196,36 @@ export function useGetUserBookingDailyTotals(options?: ApiProxyOptions<ModelsDai
     options,
   )
 } /**
+ * @summary Get one page of the current user's finished bookings for selected organisation within the selected timeframe, newest first. A booking must hold every tagId. limit is at most 1000
+ */
+function getGetUserBookingPageUrl(orgId: string, params?: GetUserBookingPageParams) {
+  const normalizedParams = new URLSearchParams()
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (Array.isArray(value)) {
+      value.forEach((item) => normalizedParams.append(key, String(item)))
+    } else if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  })
+  const query = normalizedParams.toString()
+  return query
+    ? `/user-bookings/organisations/${orgId}/bookings/page` + '?' + query
+    : `/user-bookings/organisations/${orgId}/bookings/page`
+}
+
+export function useGetUserBookingPage(options?: ApiProxyOptions<ModelsBookingPage>) {
+  return useApiProxy<
+    ModelsBookingPage,
+    undefined,
+    { orgId: string; params?: GetUserBookingPageParams }
+  >(
+    {
+      getUrl: ({ orgId, params }) => getGetUserBookingPageUrl(orgId, params),
+      method: 'GET',
+    },
+    options,
+  )
+} /**
  * @summary Get aggregated stats for current user in selected organisation
  */
 function getGetUserBookingAggregatedStatsByOrganisationUrl(
@@ -196,7 +234,9 @@ function getGetUserBookingAggregatedStatsByOrganisationUrl(
 ) {
   const normalizedParams = new URLSearchParams()
   Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
+    if (Array.isArray(value)) {
+      value.forEach((item) => normalizedParams.append(key, String(item)))
+    } else if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
   })
@@ -254,7 +294,9 @@ function getGetUserBookingLatestListByOrganisationUrl(
 ) {
   const normalizedParams = new URLSearchParams()
   Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
+    if (Array.isArray(value)) {
+      value.forEach((item) => normalizedParams.append(key, String(item)))
+    } else if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
   })
