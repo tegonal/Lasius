@@ -21,33 +21,44 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { cachedServerLoader, clearLoaderCache } from './loader-cache'
 
+const WEEK_ROUTE = 'routes/user.dashboard.week'
+const WEEK_URL = 'http://test/user/dashboard/week?date=1'
+
 const request = (url: string) => new Request(url)
 
 describe('cachedServerLoader', () => {
   beforeEach(() => clearLoaderCache())
 
-  it('returns the cached result for the same URL', async () => {
+  it('returns the cached result for the same route and URL', async () => {
     const serverLoader = vi.fn().mockResolvedValueOnce('first').mockResolvedValueOnce('second')
 
-    await cachedServerLoader(request('http://test/user/dashboard/week?date=1'), serverLoader)
-    const result = await cachedServerLoader(
-      request('http://test/user/dashboard/week?date=1'),
-      serverLoader,
-    )
+    await cachedServerLoader(WEEK_ROUTE, request(WEEK_URL), serverLoader)
+    const result = await cachedServerLoader(WEEK_ROUTE, request(WEEK_URL), serverLoader)
 
     expect(result).toBe('first')
     expect(serverLoader).toHaveBeenCalledTimes(1)
   })
 
+  it('keeps a layout route and its child route apart for the same URL', async () => {
+    const url = 'http://test/user/stats/projects?from=a&to=b'
+    const childLoader = vi.fn().mockResolvedValue('child')
+    const layoutLoader = vi.fn().mockResolvedValue('layout')
+
+    await cachedServerLoader('routes/user.stats.projects', request(url), childLoader)
+    await cachedServerLoader('routes/user.stats', request(url), layoutLoader)
+    const result = await cachedServerLoader('routes/user.stats.projects', request(url), childLoader)
+
+    expect(result).toBe('child')
+    expect(childLoader).toHaveBeenCalledTimes(1)
+    expect(layoutLoader).toHaveBeenCalledTimes(1)
+  })
+
   it('calls the server loader again after clearLoaderCache', async () => {
     const serverLoader = vi.fn().mockResolvedValueOnce('first').mockResolvedValueOnce('second')
 
-    await cachedServerLoader(request('http://test/user/dashboard/week?date=1'), serverLoader)
+    await cachedServerLoader(WEEK_ROUTE, request(WEEK_URL), serverLoader)
     clearLoaderCache()
-    const result = await cachedServerLoader(
-      request('http://test/user/dashboard/week?date=1'),
-      serverLoader,
-    )
+    const result = await cachedServerLoader(WEEK_ROUTE, request(WEEK_URL), serverLoader)
 
     expect(result).toBe('second')
     expect(serverLoader).toHaveBeenCalledTimes(2)
@@ -60,18 +71,12 @@ describe('cachedServerLoader', () => {
       .mockReturnValueOnce(new Promise<string>((resolve) => (resolveFirst = resolve)))
       .mockResolvedValueOnce('fresh')
 
-    const pending = cachedServerLoader(
-      request('http://test/user/dashboard/week?date=1'),
-      serverLoader,
-    )
+    const pending = cachedServerLoader(WEEK_ROUTE, request(WEEK_URL), serverLoader)
     clearLoaderCache()
     resolveFirst('stale')
     expect(await pending).toBe('stale')
 
-    const result = await cachedServerLoader(
-      request('http://test/user/dashboard/week?date=1'),
-      serverLoader,
-    )
+    const result = await cachedServerLoader(WEEK_ROUTE, request(WEEK_URL), serverLoader)
     expect(result).toBe('fresh')
   })
 })

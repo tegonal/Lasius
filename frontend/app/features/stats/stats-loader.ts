@@ -67,10 +67,13 @@ export const projectStatsShouldRevalidate = (arguments_: ShouldRevalidateFunctio
  * Shared client loader for all stats child routes.
  * Client-safe — must NOT be in a .server.ts file.
  */
-export const statsClientLoader = async <T>({
-  request,
-  serverLoader,
-}: {
-  request: Request
-  serverLoader: () => Promise<T>
-}) => cachedServerLoader(request, serverLoader)
+export const statsClientLoader = async <T>(
+  routeId: string,
+  {
+    request,
+    serverLoader,
+  }: {
+    request: Request
+    serverLoader: () => Promise<T>
+  },
+) => cachedServerLoader(routeId, request, serverLoader)

@@ -19,7 +19,7 @@
 
 /**
  * Simple client-side cache for loader data.
- * Caches server loader responses keyed by route + search params.
+ * Caches server loader responses keyed by route id + path + search params.
  * Cache is bypassed on full page loads (SSR) — only used on client navigations.
  */
 
@@ -28,13 +28,18 @@ import { LOADER_CACHE_DEFAULT_TTL_MS } from '~/config/constants'
 const cache = new Map<string, { data: unknown; timestamp: number }>()
 const state = { generation: 0 }
 
+/**
+ * A layout route and its child route get the same request URL, so the URL alone does not
+ * identify the loader. `routeId` is the React Router route id, for example `routes/user.stats`.
+ */
 export async function cachedServerLoader<T>(
+  routeId: string,
   request: Request,
   serverLoader: () => Promise<T>,
   ttl = LOADER_CACHE_DEFAULT_TTL_MS,
 ): Promise<T> {
   const url = new URL(request.url)
-  const cacheKey = `${url.pathname}${url.search}`
+  const cacheKey = `${routeId} ${url.pathname}${url.search}`
   const cached = cache.get(cacheKey)
 
   if (cached && Date.now() - cached.timestamp < ttl) {

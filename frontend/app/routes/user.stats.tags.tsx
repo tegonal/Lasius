@@ -37,7 +37,7 @@ import { type Route } from './+types/user.stats.tags'
 // ─── Client Loader (cache unless full-page refresh) ──────────────────────────
 
 export const clientLoader = async (arguments_: Route.ClientLoaderArgs) =>
-  statsClientLoader(arguments_)
+  statsClientLoader('routes/user.stats.tags', arguments_)
 clientLoader.hydrate = false
 
 // ─── Loader ──────────────────────────────────────────────────────────────────

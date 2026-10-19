@@ -49,7 +49,7 @@ import { type Route } from './+types/user.dashboard.year'
 // ─── Client Loader (cache unless full-page refresh) ──────────────────────────
 
 export const clientLoader = async (arguments_: Route.ClientLoaderArgs) =>
-  dashboardClientLoader(arguments_)
+  dashboardClientLoader('routes/user.dashboard.year', arguments_)
 clientLoader.hydrate = false
 
 // ─── Loader ──────────────────────────────────────────────────────────────────

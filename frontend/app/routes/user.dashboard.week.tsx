@@ -42,7 +42,7 @@ import { type Route } from './+types/user.dashboard.week'
 // ─── Client Loader (cache unless full-page refresh) ──────────────────────────
 
 export const clientLoader = async (arguments_: Route.ClientLoaderArgs) =>
-  dashboardClientLoader(arguments_)
+  dashboardClientLoader('routes/user.dashboard.week', arguments_)
 clientLoader.hydrate = false
 
 // ─── Loader ──────────────────────────────────────────────────────────────────

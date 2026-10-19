@@ -119,7 +119,7 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
 
 // A day that the user saw before shows at once. A change request or a WebSocket event clears the cache.
 export const clientLoader = ({ request, serverLoader }: Route.ClientLoaderArgs) =>
-  cachedServerLoader(request, serverLoader)
+  cachedServerLoader('routes/user.layout._index', request, serverLoader)
 clientLoader.hydrate = false
 
 // React Router sends a loader header only through this export, for the page and for its .data request.

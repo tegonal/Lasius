@@ -39,7 +39,7 @@ import { getUserBookingListByOrganisation } from '~/services/api/lasius/user-boo
 import { type Route } from './+types/user.dashboard'
 
 export const clientLoader = ({ request, serverLoader }: Route.ClientLoaderArgs) =>
-  cachedServerLoader(request, serverLoader)
+  cachedServerLoader('routes/user.dashboard', request, serverLoader)
 clientLoader.hydrate = false
 
 // ─── Revalidation ────────────────────────────────────────────────────────────

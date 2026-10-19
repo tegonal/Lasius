@@ -56,6 +56,11 @@ export default defineConfig(({ mode }) => ({
     },
     sourcemap: false,
   },
+  // The React Compiler inserts this import during the transform, so the dependency scan does not see it.
+  // A late discovery re-bundles all dependencies and reloads the open page.
+  optimizeDeps: {
+    include: ['react/compiler-runtime'],
+  },
   plugins: [
     tailwindcss(),
     reactRouter(),

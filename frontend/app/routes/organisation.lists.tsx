@@ -80,7 +80,7 @@ const OrganisationListsPage = ({ loaderData }: Route.ComponentProps) => {
 }
 
 export const clientLoader = ({ request, serverLoader }: Route.ClientLoaderArgs) =>
-  cachedServerLoader(request, serverLoader)
+  cachedServerLoader('routes/organisation.lists', request, serverLoader)
 clientLoader.hydrate = false
 
 // The loader reads only the date range. The project, user and tag filters work on the client.

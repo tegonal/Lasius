@@ -30,7 +30,8 @@ const OrganisationProjectStats = ({ loaderData }: Route.ComponentProps) => (
   <ProjectStatsPage {...loaderData} />
 )
 
-export const clientLoader = (arguments_: Route.ClientLoaderArgs) => statsClientLoader(arguments_)
+export const clientLoader = (arguments_: Route.ClientLoaderArgs) =>
+  statsClientLoader('routes/organisation.stats.project.$projectId', arguments_)
 clientLoader.hydrate = false
 
 export default OrganisationProjectStats
