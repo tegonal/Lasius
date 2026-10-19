@@ -22,12 +22,13 @@
 package controllers
 
 import core.{SystemServices, TestApplication}
+import models.LocalDateTimeWithTimeZone.DateTimeHelper
 import models._
 import mongo.EmbedMongo
-import org.joda.time.LocalDateTime
+import org.joda.time.{DateTime, LocalDateTime}
 import org.specs2.mock.Mockito
 import org.specs2.mock.mockito.MockitoMatchers
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
 import play.api.test._
 
@@ -225,6 +226,58 @@ class TimeBookingHistoryControllerSpec
         getHistoryByProject(controller, controller.project.id)
 
       status(result) must equalTo(FORBIDDEN)
+    }
+  }
+
+  "get time booking history by user" should {
+
+    "return at most the default limit without a limit, and clamp an explicit limit" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: TimeBookingHistoryControllerMock =
+        controllers.TimeBookingHistoryControllerMock(config,
+                                                     systemServices,
+                                                     authConfig,
+                                                     reactiveMongoApi,
+                                                     organisationRole =
+                                                       OrganisationMember,
+                                                     projectRole =
+                                                       ProjectMember)
+
+      val start: DateTime           = DateTime.now().minusDays(2)
+      val bookings: List[BookingV2] =
+        (0 to TimeBookingHistoryController.maxHistoryLimit).toList.map {
+          index =>
+            val bookingStart = start.plusSeconds(index)
+            BookingV2(
+              BookingId(),
+              bookingStart.toLocalDateTimeWithZone(),
+              Some(bookingStart.plusSeconds(1).toLocalDateTimeWithZone()),
+              controller.userReference,
+              EntityReference(controller.organisationId, "org"),
+              controller.project.getReference,
+              Set()
+            )
+        }
+      withDBSession()(implicit dbSession =>
+        new repositories.BookingHistoryMongoRepository().bulkInsert(bookings))
+        .awaitResult()
+
+      def count(limit: Option[Int]): Int =
+        contentAsJson(
+          controller.getTimeBookingHistoryByUser(
+            controller.organisationId,
+            from,
+            to,
+            limit,
+            None)(FakeRequest().withBody(()))).as[Seq[JsValue]].size
+
+      count(None) must equalTo(TimeBookingHistoryController.defaultHistoryLimit)
+      count(Some(Int.MaxValue)) must equalTo(
+        TimeBookingHistoryController.maxHistoryLimit)
+      count(Some(3)) must equalTo(3)
     }
   }
 

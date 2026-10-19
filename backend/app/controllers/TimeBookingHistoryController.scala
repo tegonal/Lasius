@@ -36,6 +36,11 @@ import repositories.{BookingHistoryRepository, ProjectRepository}
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
+object TimeBookingHistoryController {
+  val defaultHistoryLimit = 1000
+  val maxHistoryLimit     = 5000
+}
+
 class TimeBookingHistoryController @Inject() (
     override val conf: Config,
     override val controllerComponents: ControllerComponents,
@@ -52,6 +57,16 @@ class TimeBookingHistoryController @Inject() (
   private val defaultRecentLimit = 20
   private val maxRecentLimit     = 100
 
+  /** The raw history lists have no paging in the frontend, so an absent limit
+    * gets a default and an explicit limit gets a maximum.
+    */
+  private def historyLimit(limit: Option[Int]): Option[Int] =
+    Some(
+      limit
+        .getOrElse(TimeBookingHistoryController.defaultHistoryLimit)
+        .max(1)
+        .min(TimeBookingHistoryController.maxHistoryLimit))
+
   def getTimeBookingHistoryByUser(orgId: OrganisationId,
                                   from: LocalDateTime,
                                   to: LocalDateTime,
@@ -67,7 +82,7 @@ class TimeBookingHistoryController @Inject() (
                                 subject.userReference,
                                 from,
                                 to,
-                                limit,
+                                historyLimit(limit),
                                 skip)
             .map { bookings =>
               Ok(Json.toJson(bookings))
@@ -86,7 +101,11 @@ class TimeBookingHistoryController @Inject() (
           logger.debug(
             s"getTimeBookingHistory, userId:${subject.userReference.id.value}, from:$from, to:$to")
           bookingHistoryRepository
-            .findByOrganisationAndRange(orgId, from, to, limit, skip)
+            .findByOrganisationAndRange(orgId,
+                                        from,
+                                        to,
+                                        historyLimit(limit),
+                                        skip)
             .map { bookings =>
               Ok(Json.toJson(bookings))
             }
@@ -109,7 +128,11 @@ class TimeBookingHistoryController @Inject() (
           logger.debug(
             s"getTimeBookingHistory, userId:${subject.userReference.id.value}, from:$from, to:$to")
           bookingHistoryRepository
-            .findByProjectAndRange(projectId, from, to, limit, skip)
+            .findByProjectAndRange(projectId,
+                                   from,
+                                   to,
+                                   historyLimit(limit),
+                                   skip)
             .map { bookings =>
               Ok(Json.toJson(bookings))
             }
