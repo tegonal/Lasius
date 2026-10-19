@@ -186,6 +186,86 @@ class BookingHistoryRepositorySpec extends EmbedMongo {
     }
   }
 
+  "summaryByRange" should {
+    val from = date("01.01.2000").toLocalDateTime
+    val to   = date("01.02.2000").toLocalDateTime
+
+    def booking(user: EntityReference[UserId],
+                org: EntityReference[OrganisationId],
+                project: EntityReference[ProjectId],
+                start: DateTime,
+                hours: Int): BookingV2 =
+      BookingV2(BookingId(),
+                start.toLocalDateTimeWithZone(),
+                Some(start.plusHours(hours).toLocalDateTimeWithZone()),
+                user,
+                org,
+                project,
+                Set())
+
+    def insert(bookings: BookingV2*): Unit =
+      withDBSession() { implicit dbSession =>
+        repository.bulkInsert(bookings.toList)
+      }.awaitResult()
+
+    def summary(user: Option[EntityReference[UserId]],
+                org: Option[OrganisationId],
+                project: Option[ProjectId]): BookingSummary =
+      withDBSession() { implicit dbSession =>
+        repository.summaryByRange(user, org, project, from, to)
+      }.awaitResult()
+
+    "return zero values for a range without bookings" in {
+      summary(None, Some(OrganisationId()), None) must equalTo(
+        BookingSummary.empty)
+    }
+
+    "count a booking over the range edge with its full duration" in {
+      val user    = EntityReference(UserId(), "edgeUser")
+      val org     = EntityReference(OrganisationId(), "edgeOrg")
+      val project = EntityReference(ProjectId(), "edgeProject")
+      insert(booking(user, org, project, date("31.12.1999").plusHours(22), 6))
+
+      summary(Some(user), Some(org.id), None) must equalTo(
+        BookingSummary(durationMs = 6L * 3600 * 1000,
+                       bookings = 1,
+                       distinctUsers = 1,
+                       distinctProjects = 1))
+    }
+
+    "count the distinct users and projects and exclude other organisations" in {
+      val user1    = EntityReference(UserId(), "user1")
+      val user2    = EntityReference(UserId(), "user2")
+      val org      = EntityReference(OrganisationId(), "org")
+      val otherOrg = EntityReference(OrganisationId(), "otherOrg")
+      val project1 = EntityReference(ProjectId(), "project1")
+      val project2 = EntityReference(ProjectId(), "project2")
+      insert(
+        booking(user1, org, project1, date("03.01.2000").plusHours(8), 2),
+        booking(user1, org, project2, date("04.01.2000").plusHours(8), 3),
+        booking(user2, org, project1, date("05.01.2000").plusHours(8), 4),
+        booking(user2, otherOrg, project1, date("05.01.2000").plusHours(8), 5),
+        booking(user2, org, project2, date("05.02.2000").plusHours(8), 7)
+      )
+
+      summary(None, Some(org.id), None) must equalTo(
+        BookingSummary(durationMs = 9L * 3600 * 1000,
+                       bookings = 3,
+                       distinctUsers = 2,
+                       distinctProjects = 2))
+      summary(Some(user1), Some(org.id), None) must equalTo(
+        BookingSummary(durationMs = 5L * 3600 * 1000,
+                       bookings = 2,
+                       distinctUsers = 1,
+                       distinctProjects = 2))
+      summary(None, None, Some(project1.id)) must equalTo(
+        BookingSummary(durationMs = 11L * 3600 * 1000,
+                       bookings = 3,
+                       distinctUsers = 2,
+                       distinctProjects = 1))
+    }
+  }
+
   "ensureIndexes" should {
 
     def indexNames(): Set[String] = withDBSession() { implicit dbSession =>

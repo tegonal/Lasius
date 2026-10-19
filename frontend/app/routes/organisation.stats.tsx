@@ -27,10 +27,13 @@ import { StatsFilter } from '~/features/stats/components/stats-filter'
 import { StatsOverview } from '~/features/stats/components/stats-overview'
 import { StatsTabs } from '~/features/stats/components/stats-tabs'
 import { loadOrgStatsContext, statsResponseHeaders } from '~/features/stats/stats-loader.server'
-import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
+import {
+  EMPTY_BOOKING_SUMMARY,
+  getBookingSummaryFromApi,
+} from '~/lib/api/functions/get-models-booking-summary'
 import { apiTimespanFromTo } from '~/lib/utils/dates'
 import { cachedServerLoader } from '~/lib/utils/loader-cache'
-import { getOrganisationBookingList } from '~/services/api/lasius/organisation-bookings/organisation-bookings'
+import { getOrganisationBookingSummary } from '~/services/api/lasius/organisation-bookings/organisation-bookings'
 
 import { type Route } from './+types/organisation.stats'
 
@@ -49,18 +52,13 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
   // Compute API params
   const timespan = apiTimespanFromTo(from, to)
 
-  // Fetch bookings for overview summary
-  const bookingsResponse = timespan
-    ? await getOrganisationBookingList(selectedOrgId, timespan, { headers })
-    : { data: [] }
+  const summaryResponse = timespan
+    ? await getOrganisationBookingSummary(selectedOrgId, timespan, { headers })
+    : undefined
+  const summary = summaryResponse?.data ?? EMPTY_BOOKING_SUMMARY
 
-  const bookings = bookingsResponse.data ?? []
-
-  // Transform data server-side
-  const bookingSummary = getModelsBookingSummary(bookings)
-
-  const distinctUsers = new Set(bookings.map((b) => b.userReference?.id).filter(Boolean)).size
-  const distinctProjects = new Set(bookings.map((b) => b.projectReference?.id).filter(Boolean)).size
+  const bookingSummary = getBookingSummaryFromApi(summary)
+  const { distinctProjects, distinctUsers } = summary
 
   return data(
     {

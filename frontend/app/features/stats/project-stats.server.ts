@@ -20,7 +20,6 @@
 import { data, redirect } from 'react-router'
 
 import {
-  countDistinctUsers,
   findProjectInProfile,
   getProjectsPath,
   getProjectStatsView,
@@ -37,13 +36,16 @@ import {
   type Granularity,
   shouldUseBarChart,
 } from '~/lib/api/config/granularity-config'
-import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
+import {
+  EMPTY_BOOKING_SUMMARY,
+  getBookingSummaryFromApi,
+} from '~/lib/api/functions/get-models-booking-summary'
 import { getNivoChartDataFromApiStatsData } from '~/lib/api/functions/get-nivo-chart-data-from-api-stats-data'
 import { getTransformedChartDataAggregate } from '~/lib/api/functions/get-transformed-chart-data-aggregate'
 import { apiDatespanFromTo, apiTimespanFromTo } from '~/lib/utils/dates'
 import {
   getAggregatedStatisticsByProject,
-  getProjectBookingList,
+  getProjectBookingSummary,
 } from '~/services/api/lasius/project-bookings/project-bookings'
 
 type ProjectDataRequest = {
@@ -66,11 +68,12 @@ const fetchProjectData = async (request: ProjectDataRequest) => {
   const { from, granularity, headers, orgId, projectId, source, to } = request
   const timespan = apiTimespanFromTo(from, to)
   const datespan = apiDatespanFromTo(from, to)
-  if (!timespan || !datespan) return { aggregated: [], bookings: [], byPeriod: [] }
+  if (!timespan || !datespan)
+    return { aggregated: [], byPeriod: [], summary: EMPTY_BOOKING_SUMMARY }
 
   const range = { from: datespan.from, source, to: datespan.to }
-  const [bookings, byPeriod, aggregated] = await Promise.all([
-    getProjectBookingList(orgId, projectId, timespan, { headers }),
+  const [summary, byPeriod, aggregated] = await Promise.all([
+    getProjectBookingSummary(orgId, projectId, timespan, { headers }),
     getAggregatedStatisticsByProject(orgId, projectId, { ...range, granularity }, { headers }),
     getAggregatedStatisticsByProject(
       orgId,
@@ -79,7 +82,7 @@ const fetchProjectData = async (request: ProjectDataRequest) => {
       { headers },
     ),
   ])
-  return { aggregated: aggregated.data, bookings: bookings.data, byPeriod: byPeriod.data }
+  return { aggregated: aggregated.data, byPeriod: byPeriod.data, summary: summary.data }
 }
 
 export const loadProjectStats = async (
@@ -100,7 +103,7 @@ export const loadProjectStats = async (
 
   const view = getProjectStatsView(url.searchParams)
   const granularity = getAdaptiveGranularity(from, to, today)
-  const { aggregated, bookings, byPeriod } = await fetchProjectData({
+  const { aggregated, byPeriod, summary } = await fetchProjectData({
     from,
     granularity,
     headers,
@@ -113,9 +116,9 @@ export const loadProjectStats = async (
   return data(
     {
       aggregatedChart: getTransformedChartDataAggregate(aggregated),
-      bookingSummary: getModelsBookingSummary(bookings),
+      bookingSummary: getBookingSummaryFromApi(summary),
       byPeriodChart: getNivoChartDataFromApiStatsData(byPeriod, granularity),
-      distinctUsers: countDistinctUsers(bookings),
+      distinctUsers: summary.distinctUsers,
       from,
       project,
       rangeName,

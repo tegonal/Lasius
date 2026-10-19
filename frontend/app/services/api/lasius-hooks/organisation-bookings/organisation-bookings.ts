@@ -3,13 +3,15 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+345-80ac1ed7+20261007-2104
+ * OpenAPI spec version: 3.0.0-beta5+13-9fd7c35c+20261020-0009
  */
 import type {
   GetOrganisationBookingAggregatedStatsParams,
   GetOrganisationBookingListParams,
+  GetOrganisationBookingSummaryParams,
   ModelsBooking,
   ModelsBookingStats,
+  ModelsBookingSummary,
 } from '../../lasius'
 
 import { type ApiProxyOptions, useApiProxy } from '~/hooks/use-api-proxy'
@@ -40,6 +42,37 @@ export function useGetOrganisationBookingList(options?: ApiProxyOptions<ModelsBo
   >(
     {
       getUrl: ({ orgId, params }) => getGetOrganisationBookingListUrl(orgId, params),
+      method: 'GET',
+    },
+    options,
+  )
+} /**
+ * @summary Get the total duration and the counts of the finished bookings of the selected organisation within the selected timeframe
+ */
+function getGetOrganisationBookingSummaryUrl(
+  orgId: string,
+  params?: GetOrganisationBookingSummaryParams,
+) {
+  const normalizedParams = new URLSearchParams()
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  })
+  const query = normalizedParams.toString()
+  return query
+    ? `/organisation-bookings/organisations/${orgId}/bookings/summary` + '?' + query
+    : `/organisation-bookings/organisations/${orgId}/bookings/summary`
+}
+
+export function useGetOrganisationBookingSummary(options?: ApiProxyOptions<ModelsBookingSummary>) {
+  return useApiProxy<
+    ModelsBookingSummary,
+    undefined,
+    { orgId: string; params?: GetOrganisationBookingSummaryParams }
+  >(
+    {
+      getUrl: ({ orgId, params }) => getGetOrganisationBookingSummaryUrl(orgId, params),
       method: 'GET',
     },
     options,

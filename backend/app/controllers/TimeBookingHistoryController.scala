@@ -111,4 +111,49 @@ class TimeBookingHistoryController @Inject() (
             }
         }
     }
+
+  def getUserBookingSummary(orgId: OrganisationId,
+                            from: LocalDateTime,
+                            to: LocalDateTime): Action[Unit] =
+    HasUserRole(FreeUser, parse.empty, withinTransaction = false) {
+      implicit dbSession => implicit subject => user => implicit request =>
+        HasOrganisationRole(user, orgId, OrganisationMember) { _ =>
+          bookingHistoryRepository
+            .summaryByRange(Some(subject.userReference),
+                            Some(orgId),
+                            None,
+                            from,
+                            to)
+            .map(summary => Ok(Json.toJson(summary)))
+        }
+    }
+
+  def getOrganisationBookingSummary(orgId: OrganisationId,
+                                    from: LocalDateTime,
+                                    to: LocalDateTime): Action[Unit] =
+    HasUserRole(FreeUser, parse.empty, withinTransaction = false) {
+      implicit dbSession => implicit subject => user => implicit request =>
+        HasOrganisationRole(user, orgId, OrganisationAdministrator) { _ =>
+          bookingHistoryRepository
+            .summaryByRange(None, Some(orgId), None, from, to)
+            .map(summary => Ok(Json.toJson(summary)))
+        }
+    }
+
+  def getProjectBookingSummary(orgId: OrganisationId,
+                               projectId: ProjectId,
+                               from: LocalDateTime,
+                               to: LocalDateTime): Action[Unit] =
+    HasUserRole(FreeUser, parse.empty, withinTransaction = false) {
+      implicit dbSession => implicit subject => user => implicit request =>
+        isOrgAdminOrHasProjectRoleInOrganisation(user,
+                                                 orgId,
+                                                 projectId,
+                                                 ProjectAdministrator,
+                                                 projectRepository) { _ =>
+          bookingHistoryRepository
+            .summaryByRange(None, None, Some(projectId), from, to)
+            .map(summary => Ok(Json.toJson(summary)))
+        }
+    }
 }

@@ -21,7 +21,7 @@ import { describe, expect, it } from 'vitest'
 
 import { type ModelsBooking } from '~/services/api/lasius'
 
-import { getModelsBookingSummary } from './get-models-booking-summary'
+import { getBookingSummaryFromApi, getModelsBookingSummary } from './get-models-booking-summary'
 
 const makeBooking = (
   overrides: Partial<ModelsBooking> & { start: ModelsBooking['start'] },
@@ -76,5 +76,29 @@ describe('getModelsBookingSummary', () => {
     const result = getModelsBookingSummary([a, b, c])
     expect(result.elements).toBe(3)
     expect(result.hours).toBe(3.25)
+  })
+})
+
+describe('getBookingSummaryFromApi', () => {
+  it('converts the duration to hours rounded to 2 decimals', () => {
+    expect(
+      getBookingSummaryFromApi({
+        bookings: 3,
+        distinctProjects: 2,
+        distinctUsers: 1,
+        durationMs: 3.256 * 60 * 60 * 1000,
+      }),
+    ).toEqual({ elements: 3, hours: 3.26 })
+  })
+
+  it('returns zero elements and zero hours for an empty summary', () => {
+    expect(
+      getBookingSummaryFromApi({
+        bookings: 0,
+        distinctProjects: 0,
+        distinctUsers: 0,
+        durationMs: 0,
+      }),
+    ).toEqual({ elements: 0, hours: 0 })
   })
 })

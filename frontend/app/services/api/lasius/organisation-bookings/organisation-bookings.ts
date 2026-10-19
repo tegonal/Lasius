@@ -3,13 +3,15 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+345-80ac1ed7+20261007-2104
+ * OpenAPI spec version: 3.0.0-beta5+13-9fd7c35c+20261020-0009
  */
 import type {
   GetOrganisationBookingAggregatedStatsParams,
   GetOrganisationBookingListParams,
+  GetOrganisationBookingSummaryParams,
   ModelsBooking,
   ModelsBookingStats,
+  ModelsBookingSummary,
 } from './..'
 
 import { lasiusFetch } from '../../lasius-fetch-instance.ts'
@@ -53,6 +55,53 @@ export const getOrganisationBookingList = async (
 ): Promise<getOrganisationBookingListResponse> => {
   return lasiusFetch<getOrganisationBookingListResponse>(
     getGetOrganisationBookingListUrl(orgId, params),
+    {
+      ...options,
+      method: 'GET',
+    },
+  )
+}
+
+export type getOrganisationBookingSummaryResponse200 = {
+  data: ModelsBookingSummary
+  status: 200
+}
+
+export type getOrganisationBookingSummaryResponseSuccess =
+  getOrganisationBookingSummaryResponse200 & {
+    headers: Headers
+  }
+export type getOrganisationBookingSummaryResponse = getOrganisationBookingSummaryResponseSuccess
+
+export const getGetOrganisationBookingSummaryUrl = (
+  orgId: string,
+  params: GetOrganisationBookingSummaryParams,
+) => {
+  const normalizedParams = new URLSearchParams()
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  })
+
+  const stringifiedParams = normalizedParams.toString()
+
+  return stringifiedParams.length > 0
+    ? `/organisation-bookings/organisations/${orgId}/bookings/summary?${stringifiedParams}`
+    : `/organisation-bookings/organisations/${orgId}/bookings/summary`
+}
+
+/**
+ * @summary Get the total duration and the counts of the finished bookings of the selected organisation within the selected timeframe
+ */
+export const getOrganisationBookingSummary = async (
+  orgId: string,
+  params: GetOrganisationBookingSummaryParams,
+  options?: Parameters<typeof lasiusFetch>[1],
+): Promise<getOrganisationBookingSummaryResponse> => {
+  return lasiusFetch<getOrganisationBookingSummaryResponse>(
+    getGetOrganisationBookingSummaryUrl(orgId, params),
     {
       ...options,
       method: 'GET',

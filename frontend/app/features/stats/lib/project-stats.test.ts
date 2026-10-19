@@ -19,10 +19,9 @@
 
 import { describe, expect, it } from 'vitest'
 
-import { type ModelsBooking, type ModelsUserOrganisation } from '~/services/api/lasius'
+import { type ModelsUserOrganisation } from '~/services/api/lasius'
 
 import {
-  countDistinctUsers,
   findAdministeredProject,
   findProjectInProfile,
   getProjectsPath,
@@ -62,17 +61,6 @@ describe('getStatsSource', () => {
   it('maps the view to the API source', () => {
     expect(getStatsSource('users')).toBe('user')
     expect(getStatsSource('tags')).toBe('tag')
-  })
-})
-
-describe('countDistinctUsers', () => {
-  it('counts each user once', () => {
-    const bookings = [
-      { userReference: { id: 'u-1', key: 'a' } },
-      { userReference: { id: 'u-1', key: 'a' } },
-      { userReference: { id: 'u-2', key: 'b' } },
-    ] as unknown as ModelsBooking[]
-    expect(countDistinctUsers(bookings)).toBe(2)
   })
 })
 

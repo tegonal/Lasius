@@ -487,6 +487,23 @@ GET /user-bookings/organisations/:orgId/bookings/history            controllers.
 #    - bearerHttpAuthentication: []
 #  tags:
 #    - user-bookings
+#  summary: Get the total duration and the counts of the current user's finished bookings for selected organisation within the selected timeframe
+#  operationId: getUserBookingSummaryByOrganisation
+#  responses:
+#    200:
+#      description: success
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.BookingSummary'
+###
+GET /user-bookings/organisations/:orgId/bookings/summary            controllers.TimeBookingHistoryController.getUserBookingSummary(orgId: models.OrganisationId,from:org.joda.time.LocalDateTime, to:org.joda.time.LocalDateTime)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - user-bookings
 #  summary: Get aggregated stats for current user in selected organisation
 #  operationId: getUserBookingAggregatedStatsByOrganisation
 #  responses:
@@ -640,6 +657,23 @@ GET /organisation-bookings/organisations/:orgId/bookings/history                
 #    - bearerHttpAuthentication: []
 #  tags:
 #    - organisation-bookings
+#  summary: Get the total duration and the counts of the finished bookings of the selected organisation within the selected timeframe
+#  operationId: getOrganisationBookingSummary
+#  responses:
+#    200:
+#      description: success
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.BookingSummary'
+###
+GET /organisation-bookings/organisations/:orgId/bookings/summary                                           controllers.TimeBookingHistoryController.getOrganisationBookingSummary(orgId: models.OrganisationId, from:org.joda.time.LocalDateTime, to:org.joda.time.LocalDateTime)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - organisation-bookings
 #  summary: Get aggregated statistics about bookings for the selected organisation within the selected timeframe
 #  operationId: getOrganisationBookingAggregatedStats
 #  responses:
@@ -676,6 +710,23 @@ GET /organisation-bookings/organisations/:orgId/bookings/stats/aggregated       
 #              $ref: '#/components/schemas/models.BookingV2'
 ###
 GET /organisations/:orgId/projects/:projectId/bookings/history                       controllers.TimeBookingHistoryController.getTimeBookingHistoryByProject(orgId: models.OrganisationId, projectId: models.ProjectId, from:org.joda.time.LocalDateTime, to:org.joda.time.LocalDateTime, limit: Option[Int], skip: Option[Int])
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - project-bookings
+#  summary: Get the total duration and the counts of the finished bookings of the selected project within the selected timeframe
+#  operationId: getProjectBookingSummary
+#  responses:
+#    200:
+#      description: success
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/models.BookingSummary'
+###
+GET /organisations/:orgId/projects/:projectId/bookings/summary                       controllers.TimeBookingHistoryController.getProjectBookingSummary(orgId: models.OrganisationId, projectId: models.ProjectId, from:org.joda.time.LocalDateTime, to:org.joda.time.LocalDateTime)
 
 ###
 #  security:

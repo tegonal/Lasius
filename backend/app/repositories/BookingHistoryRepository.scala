@@ -32,6 +32,7 @@ import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
 import reactivemongo.api.bson.collection.BSONCollection
 import reactivemongo.api.indexes.{Index, IndexType}
+import reactivemongo.play.json.compat.ValueConverters
 import repositories.MongoDBCommandSet._
 
 import javax.inject.Inject
@@ -65,6 +66,16 @@ trait BookingHistoryRepository
 
   def findLastActivityDateByProjects(projectIds: Seq[ProjectId])(implicit
       dbSession: DBSession): Future[Map[ProjectId, LocalDateTime]]
+
+  /** Sums the bookings that `findByRange` returns for the same arguments. A
+    * booking that overlaps the range counts with its full duration.
+    */
+  def summaryByRange(userReference: Option[UserReference],
+                     orgId: Option[OrganisationId],
+                     projectId: Option[ProjectId],
+                     from: LocalDateTime,
+                     to: LocalDateTime)(implicit
+      dbSession: DBSession): Future[BookingSummary]
 
   def updateBooking(newBooking: BookingV2)(implicit
       format: Format[BookingV2],
@@ -172,6 +183,73 @@ class BookingHistoryMongoRepository @Inject() ()(
     }
   }
 
+  private def rangeSelector(userReference: Option[UserReference],
+                            orgId: Option[OrganisationId],
+                            projectId: Option[ProjectId],
+                            from: LocalDateTime,
+                            to: LocalDateTime): JsObject = {
+    val conditions = Seq[Option[(String, JsValueWrapper)]](
+      Some("start.dateTime" -> Json.obj(LowerOrEqualsThan -> to)),
+      Some("end.dateTime"   -> Json.obj(GreaterOrEqualsThan -> from)),
+      userReference.map(ref => "userReference.id" -> ref.id),
+      orgId.map(ref => "organisationReference.id" -> ref),
+      projectId.map(ref => "projectReference.id" -> ref)
+    )
+    Json.obj(conditions.flatten: _*)
+  }
+
+  override def summaryByRange(userReference: Option[UserReference],
+                              orgId: Option[OrganisationId],
+                              projectId: Option[ProjectId],
+                              from: LocalDateTime,
+                              to: LocalDateTime)(implicit
+      dbSession: DBSession): Future[BookingSummary] = {
+    val collection = coll
+    import collection.AggregationFramework._
+    import reactivemongo.api.bson._
+
+    val sel = ValueConverters.toDocument(
+      rangeSelector(userReference, orgId, projectId, from, to))
+
+    // Without a timezone, $dateFromString reads the local time as UTC. The
+    // difference then equals the browser computation, and an unknown zone
+    // name cannot fail the aggregation.
+    def instant(field: String): BSONDocument =
+      BSONDocument(
+        "$dateFromString" -> BSONDocument("dateString" -> s"$$$field.dateTime"))
+
+    val pipeline = List(
+      Match(sel),
+      Group(BSONNull)(
+        "durationMs" -> Sum(
+          BSONDocument(
+            "$subtract" -> BSONArray(instant("end"), instant("start")))),
+        "bookings" -> Sum(BSONInteger(1)),
+        "users"    -> AddFieldToSet("userReference.id"),
+        "projects" -> AddFieldToSet("projectReference.id")
+      ),
+      Project(
+        BSONDocument(
+          "durationMs"       -> BSONDocument("$toLong" -> "$durationMs"),
+          "bookings"         -> 1,
+          "distinctUsers"    -> BSONDocument("$size" -> "$users"),
+          "distinctProjects" -> BSONDocument("$size" -> "$projects")
+        ))
+    )
+
+    collection
+      .aggregateWith[BSONDocument]()(_ => pipeline)
+      .headOption
+      .map(_.fold(BookingSummary.empty) { doc =>
+        BookingSummary(
+          durationMs = doc.getAsOpt[Long]("durationMs").getOrElse(0L),
+          bookings = doc.getAsOpt[Int]("bookings").getOrElse(0),
+          distinctUsers = doc.getAsOpt[Int]("distinctUsers").getOrElse(0),
+          distinctProjects = doc.getAsOpt[Int]("distinctProjects").getOrElse(0)
+        )
+      })
+  }
+
   private def findByRange(userReference: Option[UserReference],
                           orgId: Option[OrganisationId],
                           projectId: Option[ProjectId],
@@ -181,15 +259,7 @@ class BookingHistoryMongoRepository @Inject() ()(
                           skip: Option[Int])(implicit
       dbSession: DBSession): Future[Iterable[BookingV2]] = {
 
-    val conditions = Seq[Option[(String, JsValueWrapper)]](
-      Some("start.dateTime" -> Json.obj(LowerOrEqualsThan -> to)),
-      Some("end.dateTime"   -> Json.obj(GreaterOrEqualsThan -> from)),
-      userReference.map(ref => "userReference.id" -> ref.id),
-      orgId.map(ref => "organisationReference.id" -> ref),
-      projectId.map(ref => "projectReference.id" -> ref)
-    )
-
-    val sel = Json.obj(conditions.flatten: _*)
+    val sel = rangeSelector(userReference, orgId, projectId, from, to)
 
     // The selector fixes the user, organisation and project ids, so a sort
     // key on them changes no order. It only stops the index from serving the sort.

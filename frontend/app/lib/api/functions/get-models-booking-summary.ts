@@ -17,18 +17,34 @@
  *
  */
 
-import { type ModelsBooking } from '~/services/api/lasius'
+import { type ModelsBooking, type ModelsBookingSummary } from '~/services/api/lasius'
 
 import { getExtendedModelsBookingList } from './get-extended-models-booking-list'
 
+const MS_PER_HOUR = 1000 * 60 * 60
+
+const roundHours = (hours: number) => Math.round(hours * 100) / 100
+
 export const getModelsBookingSummary = (list: ModelsBooking[]) => {
-  const hours =
-    Math.round(
-      getExtendedModelsBookingList(list).reduce(
-        (accumulator, item) => accumulator + item.duration,
-        0,
-      ) * 100,
-    ) / 100
+  const hours = roundHours(
+    getExtendedModelsBookingList(list).reduce(
+      (accumulator, item) => accumulator + item.duration,
+      0,
+    ),
+  )
   const elements = list.length
   return { elements, hours }
 }
+
+export const EMPTY_BOOKING_SUMMARY: ModelsBookingSummary = {
+  bookings: 0,
+  distinctProjects: 0,
+  distinctUsers: 0,
+  durationMs: 0,
+}
+
+/** Gives the summary of the backend the shape of `getModelsBookingSummary`. */
+export const getBookingSummaryFromApi = (summary: ModelsBookingSummary) => ({
+  elements: summary.bookings,
+  hours: roundHours(summary.durationMs / MS_PER_HOUR),
+})

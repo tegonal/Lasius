@@ -227,4 +227,156 @@ class TimeBookingHistoryControllerSpec
       status(result) must equalTo(FORBIDDEN)
     }
   }
+
+  "get booking summary" should {
+
+    "successful for the user summary if OrganisationMember" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: TimeBookingHistoryControllerMock =
+        controllers.TimeBookingHistoryControllerMock(config,
+                                                     systemServices,
+                                                     authConfig,
+                                                     reactiveMongoApi,
+                                                     organisationRole =
+                                                       OrganisationMember,
+                                                     projectRole =
+                                                       ProjectMember)
+
+      val result: Future[Result] =
+        controller.getUserBookingSummary(controller.organisationId, from, to)(
+          FakeRequest().withBody(()))
+
+      status(result) must equalTo(OK)
+      contentAsJson(result) must equalTo(Json.toJson(BookingSummary.empty))
+    }
+
+    "forbidden for the organisation summary if OrganisationMember" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: TimeBookingHistoryControllerMock =
+        controllers.TimeBookingHistoryControllerMock(config,
+                                                     systemServices,
+                                                     authConfig,
+                                                     reactiveMongoApi,
+                                                     organisationRole =
+                                                       OrganisationMember,
+                                                     projectRole =
+                                                       ProjectAdministrator)
+
+      val result: Future[Result] =
+        controller.getOrganisationBookingSummary(controller.organisationId,
+                                                 from,
+                                                 to)(FakeRequest().withBody(()))
+
+      status(result) must equalTo(FORBIDDEN)
+    }
+
+    "successful for the organisation summary if OrganisationAdministrator" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: TimeBookingHistoryControllerMock =
+        controllers.TimeBookingHistoryControllerMock(
+          config,
+          systemServices,
+          authConfig,
+          reactiveMongoApi,
+          organisationRole = OrganisationAdministrator,
+          projectRole = ProjectMember)
+
+      val result: Future[Result] =
+        controller.getOrganisationBookingSummary(controller.organisationId,
+                                                 from,
+                                                 to)(FakeRequest().withBody(()))
+
+      status(result) must equalTo(OK)
+    }
+
+    "badrequest for the project summary of a project of another organisation" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: TimeBookingHistoryControllerMock =
+        controllers.TimeBookingHistoryControllerMock(
+          config,
+          systemServices,
+          authConfig,
+          reactiveMongoApi,
+          organisationRole = OrganisationAdministrator)
+
+      val foreignProject: Project = Project(
+        id = ProjectId(),
+        key = "foreignProject",
+        organisationReference = EntityReference(OrganisationId(), "otherOrg"),
+        bookingCategories = Set(),
+        active = true,
+        createdBy = EntityReference(UserId(), "otherUser"),
+        deactivatedBy = None
+      )
+      upsertProject(controller, foreignProject)
+
+      val result: Future[Result] =
+        controller.getProjectBookingSummary(controller.organisationId,
+                                            foreignProject.id,
+                                            from,
+                                            to)(FakeRequest().withBody(()))
+
+      status(result) must equalTo(BAD_REQUEST)
+    }
+
+    "forbidden for the project summary if OrganisationMember is only ProjectMember" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: TimeBookingHistoryControllerMock =
+        controllers.TimeBookingHistoryControllerMock(config,
+                                                     systemServices,
+                                                     authConfig,
+                                                     reactiveMongoApi,
+                                                     organisationRole =
+                                                       OrganisationMember,
+                                                     projectRole =
+                                                       ProjectMember)
+
+      val result: Future[Result] =
+        controller.getProjectBookingSummary(controller.organisationId,
+                                            controller.project.id,
+                                            from,
+                                            to)(FakeRequest().withBody(()))
+
+      status(result) must equalTo(FORBIDDEN)
+    }
+
+    "successful for the project summary if OrganisationMember is ProjectAdministrator" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: TimeBookingHistoryControllerMock =
+        controllers.TimeBookingHistoryControllerMock(config,
+                                                     systemServices,
+                                                     authConfig,
+                                                     reactiveMongoApi,
+                                                     organisationRole =
+                                                       OrganisationMember,
+                                                     projectRole =
+                                                       ProjectAdministrator)
+
+      val result: Future[Result] =
+        controller.getProjectBookingSummary(controller.organisationId,
+                                            controller.project.id,
+                                            from,
+                                            to)(FakeRequest().withBody(()))
+
+      status(result) must equalTo(OK)
+    }
+  }
 }

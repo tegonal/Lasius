@@ -17,11 +17,7 @@
  *
  */
 
-import {
-  type ModelsBooking,
-  type ModelsUserOrganisation,
-  type ModelsUserProject,
-} from '~/services/api/lasius'
+import { type ModelsUserOrganisation, type ModelsUserProject } from '~/services/api/lasius'
 import { type ModelsEntityReference } from '~/services/api/lasius/modelsEntityReference'
 import { ModelsUserProjectRole } from '~/services/api/lasius/modelsUserProjectRole'
 
@@ -36,9 +32,6 @@ export const getProjectStatsView = (searchParameters: URLSearchParams): ProjectS
 
 export const getStatsSource = (view: ProjectStatsView): 'tag' | 'user' =>
   view === 'users' ? 'user' : 'tag'
-
-export const countDistinctUsers = (bookings: ModelsBooking[]): number =>
-  new Set(bookings.map((booking) => booking.userReference.id)).size
 
 // The aggregated statistics endpoint accepts only a project administrator, also for an organisation administrator.
 export const findAdministeredProject = (
