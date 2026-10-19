@@ -26,7 +26,8 @@ import models.{EntityReference, _}
 import mongo.EmbedMongo
 import org.joda.time.{DateTime, LocalDateTime}
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
-import reactivemongo.api.bson.BSONObjectID
+import reactivemongo.api.bson._
+import reactivemongo.api.{FailoverStrategy, ReadPreference}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -182,6 +183,96 @@ class BookingHistoryRepositorySpec extends EmbedMongo {
         result must have size 2
         result.head.start.dateTime === start.plusMonths(1).toLocalDateTime
       }
+    }
+  }
+
+  "ensureIndexes" should {
+
+    def indexNames(): Set[String] = withDBSession() { implicit dbSession =>
+      repository.coll.indexesManager.list().map(_.flatMap(_.name).toSet)
+    }.awaitResult()
+
+    /** Returns the stage names and the index names of the winning plan.
+      */
+    def explainRangeQuery(sel: BSONDocument): (Seq[String], Seq[String]) =
+      withDBSession() { implicit dbSession =>
+        dbSession.db
+          .runCommand(
+            BSONDocument(
+              "explain" -> BSONDocument(
+                "find"   -> "BookingHistory",
+                "filter" -> sel,
+                "sort"   -> BSONDocument("start.dateTime" -> 1, "_id" -> 1)),
+              "verbosity" -> "queryPlanner"
+            ),
+            FailoverStrategy.default
+          )
+          .one[BSONDocument](ReadPreference.primary)
+          .map { explain =>
+            def collect(value: BSONValue): Seq[(String, String)] =
+              value match {
+                case doc: BSONDocument =>
+                  doc.elements.flatMap { element =>
+                    (element.name, element.value) match {
+                      case (key @ ("stage" | "indexName"), BSONString(v)) =>
+                        Seq(key -> v)
+                      case (_, nested) => collect(nested)
+                    }
+                  }
+                case array: BSONArray => array.values.flatMap(collect)
+                case _                => Seq.empty
+              }
+            val plan = collect(
+              explain
+                .getAsOpt[BSONDocument]("queryPlanner")
+                .flatMap(_.getAsOpt[BSONDocument]("winningPlan"))
+                .getOrElse(BSONDocument()))
+            (plan.collect { case ("stage", v) => v },
+             plan.collect { case ("indexName", v) => v })
+          }
+      }.awaitResult()
+
+    "create the three range indexes, also on a second call" in {
+      withDBSession() { implicit dbSession =>
+        repository.ensureIndexes().flatMap(_ => repository.ensureIndexes())
+      }.awaitResult()
+
+      indexNames() must containAllOf(
+        BookingHistoryMongoRepository.indexes.map(_._1))
+    }
+
+    "serve the user range query and its sort from an index" in {
+      withDBSession() { implicit dbSession =>
+        repository.ensureIndexes()
+      }.awaitResult()
+
+      val (stages, indexes) = explainRangeQuery(
+        BSONDocument(
+          "organisationReference.id" -> OrganisationId().value.toString,
+          "userReference.id"         -> UserId().value.toString,
+          "start.dateTime"           -> BSONDocument("$lte" -> "2000-12-31"),
+          "end.dateTime"             -> BSONDocument("$gte" -> "2000-01-01")
+        ))
+
+      indexes must contain("organisation_user_start")
+      stages must not(contain("SORT"))
+      stages must not(contain("COLLSCAN"))
+    }
+
+    "serve the project range query and its sort from an index" in {
+      withDBSession() { implicit dbSession =>
+        repository.ensureIndexes()
+      }.awaitResult()
+
+      val (stages, indexes) = explainRangeQuery(
+        BSONDocument(
+          "projectReference.id" -> ProjectId().value.toString,
+          "start.dateTime"      -> BSONDocument("$lte" -> "2000-12-31"),
+          "end.dateTime"        -> BSONDocument("$gte" -> "2000-01-01")
+        ))
+
+      indexes must contain("project_start")
+      stages must not(contain("SORT"))
     }
   }
 }

@@ -31,6 +31,7 @@ import play.api.Logging
 import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
 import reactivemongo.api.bson.collection.BSONCollection
+import reactivemongo.api.indexes.{Index, IndexType}
 import repositories.MongoDBCommandSet._
 
 import javax.inject.Inject
@@ -68,6 +69,25 @@ trait BookingHistoryRepository
   def updateBooking(newBooking: BookingV2)(implicit
       format: Format[BookingV2],
       dbSession: DBSession): Future[Boolean]
+
+  def ensureIndexes()(implicit dbSession: DBSession): Future[Unit]
+}
+
+object BookingHistoryMongoRepository {
+
+  /** Each index ends with `_id`, so that the sort of `findByRange` and a paged
+    * read with an `_id` tiebreak use the index without an in-memory sort.
+    */
+  val indexes: Seq[(String, Seq[String])] = Seq(
+    "organisation_user_start" -> Seq("organisationReference.id",
+                                     "userReference.id",
+                                     "start.dateTime",
+                                     "_id"),
+    "organisation_start" -> Seq("organisationReference.id",
+                                "start.dateTime",
+                                "_id"),
+    "project_start" -> Seq("projectReference.id", "start.dateTime", "_id")
+  )
 }
 
 class BookingHistoryMongoRepository @Inject() ()(
@@ -171,14 +191,9 @@ class BookingHistoryMongoRepository @Inject() ()(
 
     val sel = Json.obj(conditions.flatten: _*)
 
-    val sortConditions = Seq[Option[(String, JsValueWrapper)]](
-      Some("start.dateTime" -> 1),
-      userReference.map(_ => "userReference.id" -> 1),
-      orgId.map(_ => "organisationReference.id" -> 1),
-      projectId.map(_ => "projectReference.id" -> 1),
-      Some("_id" -> 1)
-    )
-    val sort = Json.obj(sortConditions.flatten: _*)
+    // The selector fixes the user, organisation and project ids, so a sort
+    // key on them changes no order. It only stops the index from serving the sort.
+    val sort = Json.obj("start.dateTime" -> 1, "_id" -> 1)
 
     logger.debug(s"findByUserAndRange:$sel")
     find(sel = sel,
@@ -202,5 +217,15 @@ class BookingHistoryMongoRepository @Inject() ()(
     logger.debug(s"updateBooking[$newBooking], json:$bookingJson")
 
     update(Json.obj("id" -> newBooking.id), bookingJson, upsert = false)
+  }
+
+  override def ensureIndexes()(implicit dbSession: DBSession): Future[Unit] = {
+    val manager = coll.indexesManager
+    Future
+      .traverse(BookingHistoryMongoRepository.indexes) { case (name, fields) =>
+        manager.ensure(
+          Index(key = fields.map(_ -> IndexType.Ascending), name = Some(name)))
+      }
+      .map(_ => ())
   }
 }

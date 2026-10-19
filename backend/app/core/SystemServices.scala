@@ -60,6 +60,7 @@ import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext}
 import scala.language.postfixOps
+import scala.util.Try
 
 @ImplementedBy(classOf[DefaultSystemServices])
 trait SystemServices {
@@ -255,6 +256,14 @@ class DefaultSystemServices @Inject() (
             .asInstanceOf[Class[InitialDataLoader]])
       Await.result(dataLoader.initializeData(supportTransaction), 1.minute)
     }
+
+    // The history queries work without the indexes, only slower. A failed
+    // index build therefore logs an error and does not stop the startup.
+    Try(
+      Await.result(withDBSession()(implicit dbSession =>
+                     bookingHistoryRepository.ensureIndexes()),
+                   5.minutes)).failed.foreach(ex =>
+      logger.error(s"Could not ensure the BookingHistory indexes", ex))
 
     // start plugin-handler
     pluginHandler ! PluginHandler.Startup
