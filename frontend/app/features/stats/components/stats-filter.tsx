@@ -27,22 +27,26 @@ import { FormElement } from '~/components/ui/forms/form-element'
 import { InputDateStandalone } from '~/components/ui/forms/input/input-date-standalone'
 import { Select, type SelectOption } from '~/components/ui/forms/input/select'
 import { untyped } from '~/lib/i18n-types'
-import { dateOptions } from '~/lib/utils/date/date-options'
+import { CUSTOM_RANGE, dateOptions, defaultDateOption } from '~/lib/utils/date/date-options'
 
 type StatsFilterProperties = {
   /** The range that the loader applied: the URL params, or the default range in the user zone. */
   from: string
+  /** The preset name of that range. The loader picks it with the user clock. */
+  rangeName: string
   to: string
 }
 
-export const StatsFilter = ({ from: currentFrom, to: currentTo }: StatsFilterProperties) => {
+export const StatsFilter = ({
+  from: currentFrom,
+  rangeName,
+  to: currentTo,
+}: StatsFilterProperties) => {
   const { t } = useTranslation('common')
-  const [searchParameters, setSearchParameters] = useSearchParams()
-  const [selectedRange, setSelectedRange] = useState(
-    () => searchParameters.get('dateRange') || dateOptions[0]?.name || '',
-  )
+  const [, setSearchParameters] = useSearchParams()
+  const [selectedRange, setSelectedRange] = useState(rangeName)
 
-  const defaultDateRange = dateOptions[0]?.name || ''
+  const defaultDateRange = defaultDateOption.name
 
   const hasChanges = selectedRange !== defaultDateRange
 
@@ -53,6 +57,8 @@ export const StatsFilter = ({ from: currentFrom, to: currentTo }: StatsFilterPro
 
   const handleRangeChange = (value: string) => {
     setSelectedRange(value)
+    // "Custom" keeps the current dates for the user to edit.
+    if (value === CUSTOM_RANGE) return
 
     const option = dateOptions.find((opt) => opt.name === value)
     if (!option?.dateRangeFn) return
@@ -73,30 +79,28 @@ export const StatsFilter = ({ from: currentFrom, to: currentTo }: StatsFilterPro
     setSearchParameters(
       (previous) => {
         previous.set('from', value)
-        previous.set('dateRange', t('custom', { defaultValue: 'Custom' }))
+        previous.set('dateRange', CUSTOM_RANGE)
         return previous
       },
       { replace: true },
     )
-    setSelectedRange(t('custom', { defaultValue: 'Custom' }))
+    setSelectedRange(CUSTOM_RANGE)
   }
 
   const handleToChange = (value: string) => {
     setSearchParameters(
       (previous) => {
         previous.set('to', value)
-        previous.set('dateRange', t('custom', { defaultValue: 'Custom' }))
+        previous.set('dateRange', CUSTOM_RANGE)
         return previous
       },
       { replace: true },
     )
-    setSelectedRange(t('custom', { defaultValue: 'Custom' }))
+    setSelectedRange(CUSTOM_RANGE)
   }
 
   const resetForm = () => {
-    const firstOption = dateOptions[0]
-    if (!firstOption) return
-    const { from, to } = firstOption.dateRangeFn(new Date())
+    const { from, to } = defaultDateOption.dateRangeFn(new Date())
     setSelectedRange(defaultDateRange)
     setSearchParameters(
       (previous) => {

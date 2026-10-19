@@ -17,12 +17,12 @@
  *
  */
 
-import { dateOptions } from '~/lib/utils/date/date-options'
+import { defaultDateOption } from '~/lib/utils/date/date-options'
 import { formatISOLocale } from '~/lib/utils/dates'
 
 /**
  * The date range of a booking list: the `from` and `to` search params when both are set, else the
- * range of the first date option. A loader passes `getUserClock(request)` as `now` and `formatDate`.
+ * range of the default date option. A loader passes `getUserClock(request)` as `now` and `formatDate`.
  */
 export const getListDateRange = (
   searchParameters: URLSearchParams,
@@ -36,8 +36,5 @@ export const getListDateRange = (
     return { from: fromParameter, to: toParameter }
   }
 
-  const firstOption = dateOptions[0]
-  return firstOption
-    ? firstOption.dateRangeFn(now, formatDate)
-    : { from: formatDate(now), to: formatDate(now) }
+  return defaultDateOption.dateRangeFn(now, formatDate)
 }

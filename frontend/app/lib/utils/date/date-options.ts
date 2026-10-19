@@ -41,6 +41,9 @@ import { formatISOLocale, toCalendarDay } from '~/lib/utils/dates'
 
 type DateRange = { from: string; to: string }
 
+/** The stored name of a range that matches no preset. */
+export const CUSTOM_RANGE = 'Custom'
+
 /**
  * Compares two ranges by their calendar days. The server and the browser write a range bound with
  * different offsets, and on a DST change at midnight also with a different time.
@@ -58,20 +61,35 @@ export interface DateOption {
   name: string
 }
 
+const todayOption: DateOption = {
+  dateRangeFn: (day: Date, formatDate = formatISOLocale) => ({
+    from: formatDate(startOfDay(day)),
+    to: formatDate(endOfDay(day)),
+  }),
+  label: (t) => t('common:time.today', { defaultValue: 'Today' }),
+  name: 'Today',
+}
+
+const yesterdayOption: DateOption = {
+  dateRangeFn: (day: Date, formatDate = formatISOLocale) => ({
+    from: formatDate(startOfDay(addDays(day, -1))),
+    to: formatDate(endOfDay(addDays(day, -1))),
+  }),
+  label: (t) => t('common:time.yesterday', { defaultValue: 'Yesterday' }),
+  name: 'Yesterday',
+}
+
+/** The range that a filter applies when the URL names none. It is not the first list entry. */
+export const defaultDateOption = yesterdayOption
+
 /**
  * Predefined date range options for date pickers and filters.
- * Includes common time periods like "Yesterday", "This Week", "This Month", etc.
+ * Includes common time periods like "Today", "This Week", "This Month", etc.
  * Each option provides a function that returns ISO date strings for the range.
  */
 export const dateOptions: DateOption[] = [
-  {
-    dateRangeFn: (day: Date, formatDate = formatISOLocale) => ({
-      from: formatDate(startOfDay(addDays(day, -1))),
-      to: formatDate(endOfDay(addDays(day, -1))),
-    }),
-    label: (t) => t('common:time.yesterday', { defaultValue: 'Yesterday' }),
-    name: 'Yesterday',
-  },
+  todayOption,
+  yesterdayOption,
   {
     dateRangeFn: (day: Date, formatDate = formatISOLocale) => ({
       from: formatDate(startOfWeek(day, { weekStartsOn: 1 })),
@@ -149,11 +167,15 @@ export const dateOptions: DateOption[] = [
     name: 'Last year',
   },
   {
-    dateRangeFn: (day: Date, formatDate = formatISOLocale) => ({
-      from: formatDate(startOfDay(day)),
-      to: formatDate(endOfDay(day)),
-    }),
+    // A filter keeps its current dates on "Custom", so this range applies only as a fallback.
+    dateRangeFn: todayOption.dateRangeFn,
     label: (t) => t('common:custom', { defaultValue: 'Custom' }),
-    name: 'Custom',
+    name: CUSTOM_RANGE,
   },
 ]
+
+/** The first preset whose range has the calendar days of `range` on `today`, else "Custom". */
+export const findDateOptionName = (range: DateRange, today: Date): string =>
+  dateOptions.find(
+    (option) => option.name !== CUSTOM_RANGE && isSameDateRange(option.dateRangeFn(today), range),
+  )?.name ?? CUSTOM_RANGE

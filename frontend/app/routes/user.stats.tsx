@@ -44,7 +44,7 @@ clientLoader.hydrate = false
 
 export const loader = async ({ request, url }: Route.LoaderArgs) => {
   const context = await loadStatsContext(request, url)
-  const { from, headers, selectedOrgId, to } = context
+  const { from, headers, rangeName, selectedOrgId, to } = context
 
   // Compute API params
   const timespan = apiTimespanFromTo(from, to)
@@ -70,6 +70,7 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
       distinctProjects,
       distinctUsers,
       from,
+      rangeName,
       selectedOrgId,
       to,
     },
@@ -82,7 +83,8 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
 const UserStatsLayout = ({ loaderData }: Route.ComponentProps) => {
   const { t } = useTranslation()
 
-  const { bookingSummary, distinctProjects, distinctUsers, from, selectedOrgId, to } = loaderData
+  const { bookingSummary, distinctProjects, distinctUsers, from, rangeName, selectedOrgId, to } =
+    loaderData
 
   const tabs = [
     {
@@ -136,7 +138,7 @@ const UserStatsLayout = ({ loaderData }: Route.ComponentProps) => {
       <ColumnRight>
         <ScrollArea className="h-full">
           <div className="p-4">
-            <StatsFilter from={from} to={to} />
+            <StatsFilter from={from} rangeName={rangeName} to={to} />
           </div>
         </ScrollArea>
       </ColumnRight>

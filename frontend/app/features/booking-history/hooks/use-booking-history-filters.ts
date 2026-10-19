@@ -29,7 +29,7 @@ import {
   type FilterUrlValues,
   parseTagsParameter,
 } from '~/features/booking-history/lib/booking-history-search-parameters'
-import { dateOptions } from '~/lib/utils/date/date-options'
+import { defaultDateOption } from '~/lib/utils/date/date-options'
 import { orEmpty } from '~/lib/utils/strings'
 import { type ModelsTag } from '~/services/api/lasius'
 
@@ -44,7 +44,7 @@ const filterSchema = z.object({
   userId: z.string().optional(),
 })
 
-const defaultDateRange = dateOptions[0]
+const defaultDateRange = defaultDateOption
 
 /**
  * Manages filter state, Conform form binding, and URL sync for booking history.

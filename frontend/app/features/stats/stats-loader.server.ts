@@ -19,7 +19,7 @@
 
 import { getUserClock } from '~/lib/cookies/time-zone-cookie.server'
 import { loadOrganisationContext } from '~/lib/organisation-helpers.server'
-import { dateOptions } from '~/lib/utils/date/date-options'
+import { defaultDateOption, findDateOptionName } from '~/lib/utils/date/date-options'
 import { ModelsUserOrganisationRole } from '~/services/api/lasius/modelsUserOrganisationRole'
 import { mergeAuthHeaders, type requireUser } from '~/services/auth/auth-helpers.server'
 
@@ -38,12 +38,15 @@ export const loadStatsContext = async (request: Request, url: URL) => {
   let to = url.searchParams.get('to')
 
   if (!from || !to) {
-    const defaultRange = dateOptions[0]?.dateRangeFn(clock.now, clock.formatISO)
-    from = defaultRange?.from ?? ''
-    to = defaultRange?.to ?? ''
+    const defaultRange = defaultDateOption.dateRangeFn(clock.now, clock.formatISO)
+    from = defaultRange.from
+    to = defaultRange.to
   }
 
-  return { auth, from, headers, organisations, selectedOrgId, to, today: clock.now }
+  // The filter label must match on the server and in the browser, so the user clock picks it here.
+  const rangeName = url.searchParams.get('dateRange') || findDateOptionName({ from, to }, clock.now)
+
+  return { auth, from, headers, organisations, rangeName, selectedOrgId, to, today: clock.now }
 }
 
 /**

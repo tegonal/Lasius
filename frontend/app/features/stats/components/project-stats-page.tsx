@@ -48,6 +48,7 @@ type ProjectStatsPageProperties = {
   distinctUsers: number
   from: string
   project: StatsProject
+  rangeName: string
   scope: ProjectStatsScope
   to: string
   useBarChart: boolean
@@ -61,6 +62,7 @@ export const ProjectStatsPage = ({
   distinctUsers,
   from,
   project,
+  rangeName,
   scope,
   to,
   useBarChart,
@@ -119,7 +121,7 @@ export const ProjectStatsPage = ({
         <ScrollArea className="h-full">
           <div className="p-4">
             <StatsProjectHeader backTo={getProjectsPath(scope)} project={project} />
-            <StatsFilter from={from} to={to} />
+            <StatsFilter from={from} rangeName={rangeName} to={to} />
           </div>
         </ScrollArea>
       </ColumnRight>

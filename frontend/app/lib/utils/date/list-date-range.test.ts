@@ -19,7 +19,7 @@
 
 import { describe, expect, it } from 'vitest'
 
-import { dateOptions } from './date-options'
+import { defaultDateOption } from './date-options'
 import { getListDateRange } from './list-date-range'
 
 const now = new Date(2026, 8, 29, 14, 30)
@@ -31,13 +31,13 @@ describe('getListDateRange', () => {
     expect(getListDateRange(parameters, now)).toEqual({ from: '2026-09-01', to: '2026-09-02' })
   })
 
-  it('uses the range of the first date option when no param is set', () => {
-    expect(getListDateRange(new URLSearchParams(), now)).toEqual(dateOptions[0]?.dateRangeFn(now))
+  it('uses the range of the default date option when no param is set', () => {
+    expect(getListDateRange(new URLSearchParams(), now)).toEqual(defaultDateOption.dateRangeFn(now))
   })
 
   it('ignores a from param without a to param', () => {
     const parameters = new URLSearchParams({ from: '2026-09-01' })
 
-    expect(getListDateRange(parameters, now)).toEqual(dateOptions[0]?.dateRangeFn(now))
+    expect(getListDateRange(parameters, now)).toEqual(defaultDateOption.dateRangeFn(now))
   })
 })

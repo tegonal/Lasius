@@ -26,7 +26,12 @@ import { FormElement } from '~/components/ui/forms/form-element'
 import { InputDatePicker } from '~/components/ui/forms/input/date-picker/input-date-picker'
 import { Select, type SelectOption } from '~/components/ui/forms/input/select'
 import { untyped } from '~/lib/i18n-types'
-import { dateOptions, isSameDateRange } from '~/lib/utils/date/date-options'
+import {
+  CUSTOM_RANGE,
+  dateOptions,
+  defaultDateOption,
+  findDateOptionName,
+} from '~/lib/utils/date/date-options'
 
 export type DateRangeFilterProperties = {
   fromField: FieldMetadata<string>
@@ -49,14 +54,13 @@ export const DateRangeFilter = ({ fromField, rangeField, toField }: DateRangeFil
     [t],
   )
 
-  // Initialize with first date option
+  // Initialize with the default date option
   useEffect(() => {
-    const firstOption = dateOptions[0]
-    if (!firstOption || fromControl.value) return
-    const range = firstOption.dateRangeFn(new Date())
+    if (fromControl.value) return
+    const range = defaultDateOption.dateRangeFn(new Date())
     fromControl.change(range.from)
     toControl.change(range.to)
-    rangeControl.change(firstOption.name)
+    rangeControl.change(defaultDateOption.name)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -64,23 +68,17 @@ export const DateRangeFilter = ({ fromField, rangeField, toField }: DateRangeFil
   useEffect(() => {
     if (!fromControl.value || !toControl.value) return
 
-    const today = new Date()
-    const option = dateOptions.find((opt) => {
-      if (!opt.dateRangeFn) return true
-      return isSameDateRange(opt.dateRangeFn(today), {
-        from: fromControl.value ?? '',
-        to: toControl.value ?? '',
-      })
-    })
-
-    if (option && rangeControl.value !== option.name) {
-      rangeControl.change(option.name)
+    const name = findDateOptionName({ from: fromControl.value, to: toControl.value }, new Date())
+    if (rangeControl.value !== name) {
+      rangeControl.change(name)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fromControl.value, toControl.value])
 
   const handleRangeChange = (rangeName: string) => {
     rangeControl.change(rangeName)
+    // "Custom" keeps the current dates for the user to edit.
+    if (rangeName === CUSTOM_RANGE) return
     const option = dateOptions.find((opt) => opt.name === rangeName)
     if (!option?.dateRangeFn) return
     const { from, to } = option.dateRangeFn(new Date())
@@ -97,7 +95,7 @@ export const DateRangeFilter = ({ fromField, rangeField, toField }: DateRangeFil
           onChange={handleRangeChange}
           options={selectOptions}
           placeholder={t('time.selectRange', 'Select time range')}
-          value={rangeControl.value || dateOptions[0]?.name || ''}
+          value={rangeControl.value || defaultDateOption.name}
         />
       </FormElement>
       <FormElement htmlFor={fromField.id} label={t('time.from', 'From')}>

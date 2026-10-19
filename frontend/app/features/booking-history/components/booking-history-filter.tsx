@@ -41,7 +41,7 @@ import { useFocusTagsOnProjectChange } from '~/features/bookings/hooks/use-focus
 import { useProjectTags } from '~/features/bookings/hooks/use-project-tags'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { InputTagsAutocomplete } from '~/features/tags/components/input-tags-autocomplete'
-import { dateOptions } from '~/lib/utils/date/date-options'
+import { defaultDateOption } from '~/lib/utils/date/date-options'
 import { type ModelsEntityReference, type ModelsUserStub } from '~/services/api/lasius'
 
 type Properties = {
@@ -80,8 +80,6 @@ export const BookingHistoryFilter = ({
 
   const isShowUserFilter = dataSource === 'organisationBookings'
 
-  const firstDateOption = dateOptions[0]
-
   const handleBackToProjects = () => {
     void navigate(projectsPathFor(dataSource))
   }
@@ -93,11 +91,11 @@ export const BookingHistoryFilter = ({
       tags: controls.tags.value,
       userId: controls.userId.value,
     },
-    getFilterDefaults(firstDateOption),
+    getFilterDefaults(defaultDateOption),
   )
 
   const resetForm = () => {
-    const reset = getFilterResetValues(firstDateOption, new Date())
+    const reset = getFilterResetValues(defaultDateOption, new Date())
     if (reset.range) {
       controls.from.change(reset.range.from)
       controls.to.change(reset.range.to)

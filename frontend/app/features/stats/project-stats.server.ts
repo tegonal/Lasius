@@ -90,7 +90,7 @@ export const loadProjectStats = async (
     scope === 'organisation'
       ? await loadOrgStatsContext(request, url)
       : await loadStatsContext(request, url)
-  const { auth, from, headers, organisations, selectedOrgId, to, today } = context
+  const { auth, from, headers, organisations, rangeName, selectedOrgId, to, today } = context
 
   // An organisation switch reloads this page with a project of the previous organisation.
   const project = findProjectInProfile(organisations, selectedOrgId, params.projectId ?? '')
@@ -118,6 +118,7 @@ export const loadProjectStats = async (
       distinctUsers: countDistinctUsers(bookings),
       from,
       project,
+      rangeName,
       scope,
       to,
       useBarChart: shouldUseBarChart(from, to, today),
