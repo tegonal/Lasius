@@ -233,6 +233,7 @@
     }
   },
   "navigation": {
+    "home": "Home",
     "openMenu": "Open menu",
     "settings": "Settings"
   },

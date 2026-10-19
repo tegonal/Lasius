@@ -233,6 +233,7 @@
     }
   },
   "navigation": {
+    "home": "Startseite",
     "openMenu": "Menü öffnen",
     "settings": "Einstellungen"
   },

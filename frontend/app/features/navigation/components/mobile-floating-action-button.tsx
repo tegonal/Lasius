@@ -20,7 +20,7 @@
 import { Building2, LogOut, Menu, Play, PlusCircle, Settings, Star, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useFetcher } from 'react-router'
+import { href, useFetcher, useNavigate } from 'react-router'
 
 import { Button } from '~/components/primitives/buttons/button'
 import {
@@ -28,6 +28,7 @@ import {
   FloatingActionButton,
 } from '~/components/primitives/buttons/floating-action-button'
 import { ButtonGroup } from '~/components/ui/forms/button-group'
+import { LogoMark } from '~/components/ui/icons/logo'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { Modal } from '~/components/ui/overlays/modal/modal'
 import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
@@ -60,6 +61,7 @@ export const MobileFloatingActionButton = () => {
   const [openModal, setOpenModal] = useState<ModalId>(null)
   const { t } = useTranslation('common')
   const fetcher = useFetcher()
+  const navigate = useNavigate()
   const { selectedOrganisationId } = useOrganisation()
   // The add form below opens on today, so only a booking that ends today is a valid preset.
   const latestBooking = useLatestEndedBooking(new Date())
@@ -72,6 +74,12 @@ export const MobileFloatingActionButton = () => {
   const handleFavoritesOpen = () => {
     setOpenModal('favorites')
     favoritesApi.submit({ orgId: selectedOrganisationId })
+  }
+
+  const handleHome = () => {
+    // The DaisyUI FAB stays open while it has the focus.
+    ;(document.activeElement as HTMLElement | null)?.blur()
+    void navigate(href('/user/home'))
   }
 
   const handleSignOut = () => {
@@ -138,6 +146,15 @@ export const MobileFloatingActionButton = () => {
       label: t('auth.actions.signOut', { defaultValue: 'Sign out' }),
       onClick: handleSignOut,
       variant: 'secondary',
+    },
+    // The FAB stacks its actions upward, so the last action shows at the top.
+    {
+      ariaLabel: t('navigation.home', { defaultValue: 'Home' }),
+      icon: <LogoMark className="h-6 w-8" />,
+      id: 'home',
+      label: t('navigation.home', { defaultValue: 'Home' }),
+      onClick: handleHome,
+      variant: 'primary',
     },
   ]
 

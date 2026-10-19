@@ -234,6 +234,7 @@
     }
   },
   "navigation": {
+    "home": "Accueil",
     "openMenu": "Ouvrir le menu",
     "settings": "Paramètres"
   },
