@@ -69,7 +69,8 @@ object LazyMongo {
       override def net(): Transition[Net] =
         Start.to(classOf[Net]).initializedWith(Net.defaults.withPort(port))
     }
-    mongod.start(Version.Main.V7_0)
+    // The deployments run mongo:8.2.5. flapdoodle 4.24.0 knows 8.2 patches only up to 8.2.3.
+    mongod.start(Version.V8_2_3)
 
     implicit lazy val app: Application = new GuiceApplicationBuilder()
       .configure(
