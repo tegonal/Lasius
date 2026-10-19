@@ -21,12 +21,12 @@ import { format } from 'date-fns'
 import { useMemo } from 'react'
 
 import { useCalendarData } from '~/features/calendar/calendar-data-provider'
+import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
 import { getExpectedVsBookedPercentage } from '~/lib/api/functions/get-expected-vs-booked-percentage'
 import { getDailyTotalsSummary } from '~/lib/api/functions/get-models-booking-summary'
+import { getPlannedHoursForDay } from '~/lib/api/functions/get-planned-working-hours'
 import { type IsoDateString, toCalendarDay } from '~/lib/utils/dates'
 import { type ModelsDailyBookingTotal } from '~/services/api/lasius'
-
-const DEFAULT_PLANNED_HOURS = 8
 
 /** Returns the booking count and the rounded hours of the day that `date` names. */
 export const getDaySummary = (
@@ -42,13 +42,18 @@ export const getDaySummary = (
  *
  * Performance: No API calls - all data comes from context
  *
- * Note: plannedWorkingHours uses a fixed 8h default for now.
+ * The target of the day is the planned hours of the user in the selected organisation.
  *
  * @param date - ISO date string for the day to summarize
  */
 export const useCalendarDaySummary = (date: IsoDateString) => {
   const { dailyTotals } = useCalendarData()
-  const plannedWorkingHours = DEFAULT_PLANNED_HOURS
+  const { selectedOrganisation } = useOrganisation()
+  const plannedHours = selectedOrganisation?.plannedWorkingHours
+  const plannedWorkingHours = getPlannedHoursForDay(
+    toCalendarDay(date),
+    plannedHours ? { ...plannedHours } : null,
+  )
 
   const { elements, hours } = useMemo(() => getDaySummary(dailyTotals, date), [dailyTotals, date])
 
