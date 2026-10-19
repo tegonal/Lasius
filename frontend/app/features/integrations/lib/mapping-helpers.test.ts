@@ -23,6 +23,7 @@ import {
   applySavedIds,
   buildInitialMappings,
   buildMappingPayload,
+  buildMappingStatsGroups,
   extractExternalProjectId,
   type ProjectMapping,
   sortMappedFirst,
@@ -230,6 +231,34 @@ describe('buildInitialMappings', () => {
       gitlabMapping('m2', '', '42'),
     ])
     expect(result).toEqual({})
+  })
+})
+
+describe('buildMappingStatsGroups', () => {
+  const planeMapping = (projectId: string, planeProjectId: string, externalProjectName?: string) =>
+    ({ projectId, settings: { externalProjectName, planeProjectId } }) as unknown as ProjectMapping
+
+  it('names each group with the stored external project name', () => {
+    const stat = { lastSyncAt: null, projectId: 'lasius-1', totalIssuesSynced: 26 }
+    const result = buildMappingStatsGroups(
+      'plane',
+      [planeMapping('lasius-1', 'uuid-1', 'Contributions'), planeMapping('lasius-2', 'uuid-1')],
+      [stat] as never,
+    )
+    expect(result).toEqual({
+      'uuid-1': {
+        entries: [
+          { projectId: 'lasius-1', stat },
+          { projectId: 'lasius-2', stat: undefined },
+        ],
+        name: 'Contributions',
+      },
+    })
+  })
+
+  it('falls back to the external id when no mapping stored a name', () => {
+    const result = buildMappingStatsGroups('plane', [planeMapping('lasius-1', 'uuid-1')], [])
+    expect(result['uuid-1']?.name).toBe('uuid-1')
   })
 })
 

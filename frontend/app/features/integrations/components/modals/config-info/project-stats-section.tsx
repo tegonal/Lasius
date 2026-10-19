@@ -65,9 +65,9 @@ export const ProjectStatsSection = ({ config }: ProjectStatsSectionProperties) =
     <InfoSection
       title={t('issueImporters.info.projectStats', { defaultValue: 'Project Statistics' })}>
       <div className="space-y-3">
-        {Object.entries(groups).map(([externalName, entries]) => (
-          <InfoCard key={externalName}>
-            <p className="mb-2 text-sm font-medium">{externalName}</p>
+        {Object.entries(groups).map(([externalId, { entries, name }]) => (
+          <InfoCard key={externalId}>
+            <p className="mb-2 text-sm font-medium">{name}</p>
             <table className="table-sm table">
               <thead>
                 <tr>

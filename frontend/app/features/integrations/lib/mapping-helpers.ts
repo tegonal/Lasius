@@ -228,22 +228,32 @@ export type MappingStatEntry = {
   stat?: ModelsProjectSyncStats
 }
 
+export type MappingStatGroup = {
+  entries: MappingStatEntry[]
+  name: string
+}
+
+/**
+ * Groups the sync stats by external project id. The group name is the external project name
+ * that the mapping stored. A mapping without a stored name shows the external id.
+ */
 export const buildMappingStatsGroups = (
   importerType: ImporterType,
   mappings: ProjectMapping[],
   stats: ModelsProjectSyncStats[],
-): Record<string, MappingStatEntry[]> => {
+): Record<string, MappingStatGroup> => {
   const statsByProjectId = new Map(stats.map((s) => [s.projectId, s]))
-  const groups: Record<string, MappingStatEntry[]> = {}
+  const groups: Record<string, MappingStatGroup> = {}
 
   for (const mapping of mappings) {
-    const externalName = extractExternalProjectId(importerType, mapping) ?? mapping.projectId
-    const entries = groups[externalName] ?? []
-    entries.push({
+    const externalId = extractExternalProjectId(importerType, mapping) ?? mapping.projectId
+    const group = groups[externalId] ?? { entries: [], name: externalId }
+    group.name = mapping.settings?.externalProjectName || group.name
+    group.entries.push({
       projectId: mapping.projectId,
       stat: statsByProjectId.get(mapping.projectId),
     })
-    groups[externalName] = entries
+    groups[externalId] = group
   }
 
   return groups
