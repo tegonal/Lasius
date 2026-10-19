@@ -3,13 +3,14 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 3.0.0-beta5+16-5626b86e+20261020-0038
+ * OpenAPI spec version: 3.0.0-beta5+18-b5655255+20261020-0105
  */
 import type {
   GetOrganisationBookingAggregatedStatsParams,
   GetOrganisationBookingListParams,
   GetOrganisationBookingPageParams,
   GetOrganisationBookingSummaryParams,
+  GetOrganisationRecentBookingsParams,
   ModelsBooking,
   ModelsBookingPage,
   ModelsBookingStats,
@@ -159,6 +160,53 @@ export const getOrganisationBookingPage = async (
 ): Promise<getOrganisationBookingPageResponse> => {
   return lasiusFetch<getOrganisationBookingPageResponse>(
     getGetOrganisationBookingPageUrl(orgId, params),
+    {
+      ...options,
+      method: 'GET',
+    },
+  )
+}
+
+export type getOrganisationRecentBookingsResponse200 = {
+  data: ModelsBooking[]
+  status: 200
+}
+
+export type getOrganisationRecentBookingsResponseSuccess =
+  getOrganisationRecentBookingsResponse200 & {
+    headers: Headers
+  }
+export type getOrganisationRecentBookingsResponse = getOrganisationRecentBookingsResponseSuccess
+
+export const getGetOrganisationRecentBookingsUrl = (
+  orgId: string,
+  params: GetOrganisationRecentBookingsParams,
+) => {
+  const normalizedParams = new URLSearchParams()
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  })
+
+  const stringifiedParams = normalizedParams.toString()
+
+  return stringifiedParams.length > 0
+    ? `/organisation-bookings/organisations/${orgId}/bookings/recent?${stringifiedParams}`
+    : `/organisation-bookings/organisations/${orgId}/bookings/recent`
+}
+
+/**
+ * @summary Get the newest finished booking for each combination of project and tags in the selected organisation and timeframe, newest first. limit defaults to 20 and is at most 100
+ */
+export const getOrganisationRecentBookings = async (
+  orgId: string,
+  params: GetOrganisationRecentBookingsParams,
+  options?: Parameters<typeof lasiusFetch>[1],
+): Promise<getOrganisationRecentBookingsResponse> => {
+  return lasiusFetch<getOrganisationRecentBookingsResponse>(
+    getGetOrganisationRecentBookingsUrl(orgId, params),
     {
       ...options,
       method: 'GET',

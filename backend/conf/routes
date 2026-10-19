@@ -523,6 +523,25 @@ GET /user-bookings/organisations/:orgId/bookings/daily-totals       controllers.
 #    - bearerHttpAuthentication: []
 #  tags:
 #    - user-bookings
+#  summary: Get the newest finished booking of the current user for each combination of project and tags in the selected organisation and timeframe, newest first. limit defaults to 20 and is at most 100
+#  operationId: getUserRecentBookings
+#  responses:
+#    200:
+#      description: success
+#      content:
+#        application/json:
+#          schema:
+#            type: array
+#            items:
+#              $ref: '#/components/schemas/models.BookingV2'
+###
+GET /user-bookings/organisations/:orgId/bookings/recent            controllers.TimeBookingHistoryController.getUserRecentBookings(orgId: models.OrganisationId,from:org.joda.time.LocalDateTime, to:org.joda.time.LocalDateTime, limit: Option[Int])
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - user-bookings
 #  summary: Get one page of the current user's finished bookings for selected organisation within the selected timeframe, newest first. A booking must hold every tagId. limit is at most 1000
 #  operationId: getUserBookingPage
 #  responses:
@@ -721,6 +740,25 @@ GET /organisation-bookings/organisations/:orgId/bookings/summary                
 #            $ref: '#/components/schemas/models.BookingPage'
 ###
 GET /organisation-bookings/organisations/:orgId/bookings/page                                              controllers.TimeBookingHistoryController.getOrganisationBookingPage(orgId: models.OrganisationId, from:org.joda.time.LocalDateTime, to:org.joda.time.LocalDateTime, projectId: Option[String], userId: Option[String], tagId: List[String] ?= Nil, limit: Option[Int], skip: Option[Int], withSummary: Option[Boolean])
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - organisation-bookings
+#  summary: Get the newest finished booking for each combination of project and tags in the selected organisation and timeframe, newest first. limit defaults to 20 and is at most 100
+#  operationId: getOrganisationRecentBookings
+#  responses:
+#    200:
+#      description: success
+#      content:
+#        application/json:
+#          schema:
+#            type: array
+#            items:
+#              $ref: '#/components/schemas/models.BookingV2'
+###
+GET /organisation-bookings/organisations/:orgId/bookings/recent                                            controllers.TimeBookingHistoryController.getOrganisationRecentBookings(orgId: models.OrganisationId, from:org.joda.time.LocalDateTime, to:org.joda.time.LocalDateTime, limit: Option[Int])
 
 ###
 #  security:

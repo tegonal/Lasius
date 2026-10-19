@@ -48,7 +48,9 @@ class TimeBookingHistoryController @Inject() (
 
   implicit val timeout: Timeout = systemServices.timeout
 
-  private val defaultPageSize = 100
+  private val defaultPageSize    = 100
+  private val defaultRecentLimit = 20
+  private val maxRecentLimit     = 100
 
   def getTimeBookingHistoryByUser(orgId: OrganisationId,
                                   from: LocalDateTime,
@@ -192,6 +194,39 @@ class TimeBookingHistoryController @Inject() (
             .map(page => Ok(Json.toJson(page)))
         }
     }
+
+  def getUserRecentBookings(orgId: OrganisationId,
+                            from: LocalDateTime,
+                            to: LocalDateTime,
+                            limit: Option[Int]): Action[Unit] =
+    HasUserRole(FreeUser, parse.empty, withinTransaction = false) {
+      implicit dbSession => implicit subject => user => implicit request =>
+        HasOrganisationRole(user, orgId, OrganisationMember) { _ =>
+          bookingHistoryRepository
+            .recentCombinations(Some(subject.userReference),
+                                orgId,
+                                from,
+                                to,
+                                recentLimit(limit))
+            .map(bookings => Ok(Json.toJson(bookings)))
+        }
+    }
+
+  def getOrganisationRecentBookings(orgId: OrganisationId,
+                                    from: LocalDateTime,
+                                    to: LocalDateTime,
+                                    limit: Option[Int]): Action[Unit] =
+    HasUserRole(FreeUser, parse.empty, withinTransaction = false) {
+      implicit dbSession => implicit subject => user => implicit request =>
+        HasOrganisationRole(user, orgId, OrganisationAdministrator) { _ =>
+          bookingHistoryRepository
+            .recentCombinations(None, orgId, from, to, recentLimit(limit))
+            .map(bookings => Ok(Json.toJson(bookings)))
+        }
+    }
+
+  private def recentLimit(limit: Option[Int]): Int =
+    limit.getOrElse(defaultRecentLimit).max(1).min(maxRecentLimit)
 
   def getOrganisationBookingSummary(orgId: OrganisationId,
                                     from: LocalDateTime,

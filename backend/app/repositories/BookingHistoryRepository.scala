@@ -105,6 +105,16 @@ trait BookingHistoryRepository
                   withSummary: Boolean)(implicit
       dbSession: DBSession): Future[BookingPage]
 
+  /** Returns the newest booking for each combination of project and tags in the
+    * range, newest first, up to `limit`.
+    */
+  def recentCombinations(userReference: Option[UserReference],
+                         orgId: OrganisationId,
+                         from: LocalDateTime,
+                         to: LocalDateTime,
+                         limit: Int)(implicit
+      dbSession: DBSession): Future[Seq[BookingV2]]
+
   def updateBooking(newBooking: BookingV2)(implicit
       format: Format[BookingV2],
       dbSession: DBSession): Future[Boolean]
@@ -115,6 +125,16 @@ trait BookingHistoryRepository
 object BookingHistoryMongoRepository {
 
   val maxPageSize = 1000
+
+  /** Keeps the first booking of each project and tag set. The input must be
+    * ordered newest first.
+    */
+  def distinctCombinations(newestFirst: Seq[BookingV2],
+                           limit: Int): Seq[BookingV2] =
+    newestFirst
+      .distinctBy(booking =>
+        (booking.projectReference.id, booking.tags.map(_.id.value)))
+      .take(limit.max(0))
 
   /** Each index ends with `_id`, so that the sort of `findByRange` and a paged
     * read with an `_id` tiebreak use the index without an in-memory sort.
@@ -307,6 +327,19 @@ class BookingHistoryMongoRepository @Inject() ()(
       summary <- summaryFuture
     } yield BookingPage(items, total, summary)
   }
+
+  override def recentCombinations(userReference: Option[UserReference],
+                                  orgId: OrganisationId,
+                                  from: LocalDateTime,
+                                  to: LocalDateTime,
+                                  limit: Int)(implicit
+      dbSession: DBSession): Future[Seq[BookingV2]] =
+    find(sel = rangeSelector(userReference, Some(orgId), None, from, to),
+         sort = Json.obj("start.dateTime" -> -1, "_id" -> -1))
+      .map(found =>
+        BookingHistoryMongoRepository.distinctCombinations(
+          found.map(_._1).toSeq,
+          limit))
 
   private def pageSelector(userReference: Option[UserReference],
                            orgId: OrganisationId,

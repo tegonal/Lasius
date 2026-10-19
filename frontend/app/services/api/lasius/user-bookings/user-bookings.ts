@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 3.0.0-beta5+16-5626b86e+20261020-0038
+ * OpenAPI spec version: 3.0.0-beta5+18-b5655255+20261020-0105
  */
 import type {
   GetUserBookingAggregatedStatsByOrganisationParams,
@@ -12,6 +12,7 @@ import type {
   GetUserBookingListByOrganisationParams,
   GetUserBookingPageParams,
   GetUserBookingSummaryByOrganisationParams,
+  GetUserRecentBookingsParams,
   ModelsAddBookingRequest,
   ModelsBooking,
   ModelsBookingChangeStartRequest,
@@ -454,6 +455,46 @@ export const getUserBookingDailyTotals = async (
       method: 'GET',
     },
   )
+}
+
+export type getUserRecentBookingsResponse200 = {
+  data: ModelsBooking[]
+  status: 200
+}
+
+export type getUserRecentBookingsResponseSuccess = getUserRecentBookingsResponse200 & {
+  headers: Headers
+}
+export type getUserRecentBookingsResponse = getUserRecentBookingsResponseSuccess
+
+export const getGetUserRecentBookingsUrl = (orgId: string, params: GetUserRecentBookingsParams) => {
+  const normalizedParams = new URLSearchParams()
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  })
+
+  const stringifiedParams = normalizedParams.toString()
+
+  return stringifiedParams.length > 0
+    ? `/user-bookings/organisations/${orgId}/bookings/recent?${stringifiedParams}`
+    : `/user-bookings/organisations/${orgId}/bookings/recent`
+}
+
+/**
+ * @summary Get the newest finished booking of the current user for each combination of project and tags in the selected organisation and timeframe, newest first. limit defaults to 20 and is at most 100
+ */
+export const getUserRecentBookings = async (
+  orgId: string,
+  params: GetUserRecentBookingsParams,
+  options?: Parameters<typeof lasiusFetch>[1],
+): Promise<getUserRecentBookingsResponse> => {
+  return lasiusFetch<getUserRecentBookingsResponse>(getGetUserRecentBookingsUrl(orgId, params), {
+    ...options,
+    method: 'GET',
+  })
 }
 
 export type getUserBookingPageResponse200 = {

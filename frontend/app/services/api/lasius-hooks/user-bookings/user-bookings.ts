@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 3.0.0-beta5+16-5626b86e+20261020-0038
+ * OpenAPI spec version: 3.0.0-beta5+18-b5655255+20261020-0105
  */
 import type {
   GetUserBookingAggregatedStatsByOrganisationParams,
@@ -12,6 +12,7 @@ import type {
   GetUserBookingListByOrganisationParams,
   GetUserBookingPageParams,
   GetUserBookingSummaryByOrganisationParams,
+  GetUserRecentBookingsParams,
   ModelsAddBookingRequest,
   ModelsBooking,
   ModelsBookingChangeStartRequest,
@@ -191,6 +192,36 @@ export function useGetUserBookingDailyTotals(options?: ApiProxyOptions<ModelsDai
   >(
     {
       getUrl: ({ orgId, params }) => getGetUserBookingDailyTotalsUrl(orgId, params),
+      method: 'GET',
+    },
+    options,
+  )
+} /**
+ * @summary Get the newest finished booking of the current user for each combination of project and tags in the selected organisation and timeframe, newest first. limit defaults to 20 and is at most 100
+ */
+function getGetUserRecentBookingsUrl(orgId: string, params?: GetUserRecentBookingsParams) {
+  const normalizedParams = new URLSearchParams()
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (Array.isArray(value)) {
+      value.forEach((item) => normalizedParams.append(key, String(item)))
+    } else if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  })
+  const query = normalizedParams.toString()
+  return query
+    ? `/user-bookings/organisations/${orgId}/bookings/recent` + '?' + query
+    : `/user-bookings/organisations/${orgId}/bookings/recent`
+}
+
+export function useGetUserRecentBookings(options?: ApiProxyOptions<ModelsBooking[]>) {
+  return useApiProxy<
+    ModelsBooking[],
+    undefined,
+    { orgId: string; params?: GetUserRecentBookingsParams }
+  >(
+    {
+      getUrl: ({ orgId, params }) => getGetUserRecentBookingsUrl(orgId, params),
       method: 'GET',
     },
     options,

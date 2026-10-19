@@ -21,7 +21,7 @@ import { describe, expect, it } from 'vitest'
 
 import { type ModelsBooking } from '~/services/api/lasius/modelsBooking'
 
-import { deduplicateBookings } from './recent-bookings'
+import { sortRecentBookings } from './recent-bookings'
 
 const reference = (id: string) => ({ id, key: id })
 
@@ -40,13 +40,14 @@ const booking = (
   userReference: reference('user'),
 })
 
-describe('deduplicateBookings', () => {
+// BookingHistoryRepositorySpec § recentCombinations covers the deduplication and the limit.
+describe('sortRecentBookings', () => {
   it('orders the bookings by project name', () => {
     const beta = booking('beta', 'Beta', [], '19T08:00')
     const alpha = booking('alpha', 'alpha', [], '12T08:00')
     const gamma = booking('gamma', 'Gamma', [], '15T08:00')
 
-    expect(deduplicateBookings([beta, gamma, alpha]).map((b) => b.id)).toEqual([
+    expect(sortRecentBookings([beta, gamma, alpha]).map((b) => b.id)).toEqual([
       'alpha',
       'beta',
       'gamma',
@@ -57,30 +58,10 @@ describe('deduplicateBookings', () => {
     const old = booking('old', 'p1', ['a'], '12T08:00')
     const recent = booking('recent', 'p1', [], '19T08:00')
 
-    expect(deduplicateBookings([old, recent]).map((b) => b.id)).toEqual(['recent', 'old'])
-  })
-
-  it('keeps one booking for the same project and tags in any tag order', () => {
-    const newest = booking('newest', 'p1', ['a', 'b'], '19T10:00')
-    const older = booking('older', 'p1', ['b', 'a'], '18T10:00')
-
-    expect(deduplicateBookings([older, newest]).map((b) => b.id)).toEqual(['newest'])
-  })
-
-  it('keeps bookings of the same project with different tags', () => {
-    const withTag = booking('with-tag', 'p1', ['a'], '19T10:00')
-    const without = booking('without', 'p1', [], '18T10:00')
-
-    expect(deduplicateBookings([withTag, without])).toHaveLength(2)
-  })
-
-  it('keeps the newest bookings at the limit', () => {
-    const items = ['10', '11', '12'].map((day) => booking(day, `p${day}`, [], `${day}T08:00`))
-
-    expect(deduplicateBookings(items, 2).map((b) => b.id)).toEqual(['11', '12'])
+    expect(sortRecentBookings([old, recent]).map((b) => b.id)).toEqual(['recent', 'old'])
   })
 
   it('returns an empty list for no bookings', () => {
-    expect(deduplicateBookings([])).toEqual([])
+    expect(sortRecentBookings([])).toEqual([])
   })
 })

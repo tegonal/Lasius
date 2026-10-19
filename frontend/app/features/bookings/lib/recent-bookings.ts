@@ -20,37 +20,19 @@
 import { type ModelsBooking } from '~/services/api/lasius/modelsBooking'
 
 export const RECENT_BOOKINGS_DAYS = 7
-const RECENT_BOOKINGS_LIMIT = 20
-
-const presetKey = (booking: ModelsBooking) =>
-  `${booking.projectReference.id}-${booking.tags
-    .map((tag) => tag.id)
-    .toSorted((a, b) => a.localeCompare(b))
-    .join(',')}`
 
 const newestFirst = (a: ModelsBooking, b: ModelsBooking) =>
   b.start.dateTime.localeCompare(a.start.dateTime)
 
 /**
- * Returns the newest booking for each combination of project and tags, up to `limit`.
- * The result is ordered by project name, and the newest comes first inside one project.
+ * Orders the recent bookings of the backend by project name, with the newest first inside one
+ * project. The backend keeps one booking per combination of project and tags.
  * The `dateTime` strings have the form yyyy-MM-ddTHH:mm:ss.SSS, so a string compare orders them.
  */
-export const deduplicateBookings = (items: ModelsBooking[], limit = RECENT_BOOKINGS_LIMIT) => {
-  const seen = new Set<string>()
-  const unique: ModelsBooking[] = []
-  for (const booking of items.toSorted(newestFirst)) {
-    const key = presetKey(booking)
-    if (!seen.has(key)) {
-      seen.add(key)
-      unique.push(booking)
-      if (unique.length >= limit) break
-    }
-  }
-  return unique.toSorted(
+export const sortRecentBookings = (items: ModelsBooking[]) =>
+  items.toSorted(
     (a, b) =>
       a.projectReference.key.localeCompare(b.projectReference.key, undefined, {
         sensitivity: 'base',
       }) || newestFirst(a, b),
   )
-}

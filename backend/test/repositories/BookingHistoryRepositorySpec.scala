@@ -313,6 +313,39 @@ class BookingHistoryRepositorySpec extends EmbedMongo {
     }
   }
 
+  "recentCombinations" should {
+
+    "keep the newest booking per project and tag set, newest first, up to the limit" in {
+      val user     = EntityReference(UserId(), "recentUser")
+      val other    = EntityReference(UserId(), "recentOther")
+      val org      = EntityReference(OrganisationId(), "recentOrg")
+      val project1 = EntityReference(ProjectId(), "recentProject1")
+      val project2 = EntityReference(ProjectId(), "recentProject2")
+      val start    = date("10.01.2000").plusHours(8)
+      def at(project: EntityReference[ProjectId],
+             hours: Int,
+             tags: String*): BookingV2 =
+        booking(user, org, project, start.plusHours(hours), 1)
+          .copy(tags = tags.map(id => SimpleTag(TagId(id)): Tag).toSet)
+
+      val oldAB   = at(project1, 0, "a", "b")
+      val newBA   = at(project1, 2, "b", "a")
+      val onlyA   = at(project1, 1, "a")
+      val noTags  = at(project2, 3)
+      val ofOther = booking(other, org, project2, start.plusHours(4), 1)
+      insert(oldAB, newBA, onlyA, noTags, ofOther)
+
+      def recent(user: Option[EntityReference[UserId]], limit: Int) =
+        withDBSession() { implicit dbSession =>
+          repository.recentCombinations(user, org.id, rangeFrom, rangeTo, limit)
+        }.awaitResult().map(_.id)
+
+      recent(Some(user), 20) must equalTo(Seq(noTags.id, newBA.id, onlyA.id))
+      recent(Some(user), 2) must equalTo(Seq(noTags.id, newBA.id))
+      recent(None, 20) must equalTo(Seq(ofOther.id, newBA.id, onlyA.id))
+    }
+  }
+
   "dailyTotalsByRange" should {
 
     "group the bookings of the user by start day, in date order" in {

@@ -26,7 +26,8 @@ import org.joda.time.LocalDateTime
 import play.api.libs.json.{Format, Json}
 
 /** The start of the newest finished booking of a project. */
-case class ProjectLastActivity(projectId: ProjectId, lastActivity: LocalDateTime)
+case class ProjectLastActivity(projectId: ProjectId,
+                               lastActivity: LocalDateTime)
 
 object ProjectLastActivity {
   implicit val format: Format[ProjectLastActivity] =

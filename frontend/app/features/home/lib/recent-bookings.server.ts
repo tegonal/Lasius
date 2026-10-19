@@ -19,19 +19,19 @@
 
 import { subDays } from 'date-fns'
 
-import { deduplicateBookings, RECENT_BOOKINGS_DAYS } from '~/features/bookings/lib/recent-bookings'
+import { RECENT_BOOKINGS_DAYS, sortRecentBookings } from '~/features/bookings/lib/recent-bookings'
 import { type UserClock } from '~/lib/utils/time-zone'
-import { getUserBookingListByOrganisation } from '~/services/api/lasius/user-bookings/user-bookings'
+import { getUserRecentBookings } from '~/services/api/lasius/user-bookings/user-bookings'
 
 export const loadRecentBookings = async (
   orgId: string,
   clock: UserClock,
-  options: Parameters<typeof getUserBookingListByOrganisation>[2],
+  options: Parameters<typeof getUserRecentBookings>[2],
 ) => {
   const timespan = {
     from: clock.formatISO(subDays(clock.now, RECENT_BOOKINGS_DAYS)),
     to: clock.formatISO(clock.now),
   }
-  const response = await getUserBookingListByOrganisation(orgId, timespan, options)
-  return deduplicateBookings(response.data ?? [])
+  const response = await getUserRecentBookings(orgId, timespan, options)
+  return sortRecentBookings(response.data ?? [])
 }

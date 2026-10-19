@@ -26,12 +26,12 @@ import { Button } from '~/components/primitives/buttons/button'
 import { AvatarUser } from '~/components/ui/data-display/avatar/avatar-user'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { IconTabs, type IconTabsItem } from '~/components/ui/navigation/icon-tabs'
-import { deduplicateBookings, RECENT_BOOKINGS_DAYS } from '~/features/bookings/lib/recent-bookings'
+import { RECENT_BOOKINGS_DAYS, sortRecentBookings } from '~/features/bookings/lib/recent-bookings'
 import { TagList } from '~/features/tags/components/tag-list'
 import { formatISOLocale } from '~/lib/utils/dates'
 import { stringHash } from '~/lib/utils/string-hash'
-import { useGetOrganisationBookingList } from '~/services/api/lasius-hooks/organisation-bookings/organisation-bookings'
-import { useGetUserBookingListByOrganisation } from '~/services/api/lasius-hooks/user-bookings/user-bookings'
+import { useGetOrganisationRecentBookings } from '~/services/api/lasius-hooks/organisation-bookings/organisation-bookings'
+import { useGetUserRecentBookings } from '~/services/api/lasius-hooks/user-bookings/user-bookings'
 import { useGetFavoriteBookingList } from '~/services/api/lasius-hooks/user-favorites/user-favorites'
 import { type ModelsTag } from '~/services/api/lasius/modelsTag'
 
@@ -144,8 +144,7 @@ const RecentBookingsList = ({
   selectedOrgId: string
 }) => {
   const { t } = useTranslation()
-  const { data: recentBookings, submit: submitRecentBookings } =
-    useGetUserBookingListByOrganisation()
+  const { data: recentBookings, submit: submitRecentBookings } = useGetUserRecentBookings()
 
   useEffect(() => {
     if (!selectedOrgId) {
@@ -167,7 +166,7 @@ const RecentBookingsList = ({
       getAriaLabel={(values) =>
         t('bookings:presets.selectRecent', 'Select recent booking: {{projectName}}{{tags}}', values)
       }
-      items={deduplicateBookings(recentBookings ?? [])}
+      items={sortRecentBookings(recentBookings ?? [])}
       onSelect={onSelect}
     />
   )
@@ -210,7 +209,7 @@ const TeamBookingsList = ({
   selectedOrgId: string
 }) => {
   const { t } = useTranslation()
-  const { data: teamBookings, submit: submitTeamBookings } = useGetOrganisationBookingList()
+  const { data: teamBookings, submit: submitTeamBookings } = useGetOrganisationRecentBookings()
 
   useEffect(() => {
     if (!selectedOrgId) {
@@ -221,7 +220,7 @@ const TeamBookingsList = ({
     submitTeamBookings({
       orgId: selectedOrgId,
       params: {
-        from: formatISOLocale(subDays(now, 7)),
+        from: formatISOLocale(subDays(now, RECENT_BOOKINGS_DAYS)),
         to: formatISOLocale(now),
       },
     })
@@ -232,7 +231,7 @@ const TeamBookingsList = ({
       getAriaLabel={(values) =>
         t('bookings:presets.selectTeam', 'Select team booking: {{projectName}}{{tags}}', values)
       }
-      items={deduplicateBookings(teamBookings ?? [])}
+      items={sortRecentBookings(teamBookings ?? [])}
       onSelect={onSelect}
       renderLeading={(item) => (
         <AvatarUser

@@ -336,6 +336,38 @@ class TimeBookingHistoryControllerSpec
       status(result) must equalTo(FORBIDDEN)
     }
 
+    "successful for the user recent bookings, forbidden for the organisation ones, if OrganisationMember" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: TimeBookingHistoryControllerMock =
+        controllers.TimeBookingHistoryControllerMock(config,
+                                                     systemServices,
+                                                     authConfig,
+                                                     reactiveMongoApi,
+                                                     organisationRole =
+                                                       OrganisationMember,
+                                                     projectRole =
+                                                       ProjectAdministrator)
+
+      val userResult: Future[Result] =
+        controller.getUserRecentBookings(controller.organisationId,
+                                         from,
+                                         to,
+                                         None)(FakeRequest().withBody(()))
+      val organisationResult: Future[Result] =
+        controller.getOrganisationRecentBookings(
+          controller.organisationId,
+          from,
+          to,
+          None)(FakeRequest().withBody(()))
+
+      status(userResult) must equalTo(OK)
+      contentAsJson(userResult) must equalTo(Json.arr())
+      status(organisationResult) must equalTo(FORBIDDEN)
+    }
+
     "forbidden for the organisation summary if OrganisationMember" in new WithTestApplication {
 
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
