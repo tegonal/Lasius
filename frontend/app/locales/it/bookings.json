@@ -16,6 +16,7 @@
     "insert": "Inserisci registrazione",
     "start": "Avvia registrazione",
     "startFromFavorite": "Avvia registrazione da preferito",
+    "startFromRecent": "Avvia registrazione da registrazione recente",
     "startFromTeamMember": "Avvia registrazione da membro del team",
     "stopRecording": "Interrompi registrazione tempo corrente"
   },

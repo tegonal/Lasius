@@ -17,13 +17,14 @@
  *
  */
 
-import { Clock, Star, Users } from 'lucide-react'
+import { Clock, History, Star, Users } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Divider } from '~/components/primitives/divider'
 import { IconTabs, type IconTabsItem } from '~/components/ui/navigation/icon-tabs'
 import {
+  type ModelsBooking,
   type ModelsBookingStub,
   type ModelsCurrentUserTimeBooking,
   type ModelsUserStub,
@@ -33,15 +34,23 @@ import { BookingAddButton } from './booking-add-button'
 import { BookingStart } from './booking-start'
 import { FavoriteListCompact } from './favorite-list-compact'
 import { OrganisationListCompact } from './organisation-list-compact'
+import { RecentListCompact } from './recent-list-compact'
 
 type Properties = {
   favorites: ModelsBookingStub[]
   orgBookings: ModelsCurrentUserTimeBooking[]
+  recentBookings: ModelsBooking[]
   selectedOrgId: string
   users: ModelsUserStub[]
 }
 
-export const IndexColumnTabs = ({ favorites, orgBookings, selectedOrgId, users }: Properties) => {
+export const IndexColumnTabs = ({
+  favorites,
+  orgBookings,
+  recentBookings,
+  selectedOrgId,
+  users,
+}: Properties) => {
   const { t } = useTranslation('bookings')
   const [selectedTab, setSelectedTab] = useState(0)
 
@@ -57,6 +66,14 @@ export const IndexColumnTabs = ({ favorites, orgBookings, selectedOrgId, users }
       icon: Clock,
       id: 'bookingStart',
       name: t('actions.start', 'Start booking'),
+    },
+    {
+      component: (
+        <RecentListCompact recentBookings={recentBookings} selectedOrgId={selectedOrgId} />
+      ),
+      icon: History,
+      id: 'bookingStartRecent',
+      name: t('actions.startFromRecent', 'Start booking from recent bookings'),
     },
     {
       component: <FavoriteListCompact favorites={favorites} selectedOrgId={selectedOrgId} />,

@@ -17,11 +17,10 @@
  *
  */
 
-import { roundToNearestMinutes } from 'date-fns'
 import { Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-import { useStopAndStart } from '~/features/bookings/hooks/use-stop-and-start'
+import { useStartBookingNow } from '~/features/bookings/hooks/use-start-booking-now'
 import { ContextButtonAction } from '~/features/context-menu/buttons/context-button-action'
 import { ContextButtonClose } from '~/features/context-menu/buttons/context-button-close'
 import { ContextButtonOpen } from '~/features/context-menu/buttons/context-button-open'
@@ -31,7 +30,6 @@ import { ContextBar } from '~/features/context-menu/context-bar'
 import { ContextBarDivider } from '~/features/context-menu/context-bar-divider'
 import { ContextBody } from '~/features/context-menu/context-body'
 import { useContextMenu } from '~/features/context-menu/hooks/use-context-menu'
-import { formatISOLocale } from '~/lib/utils/dates'
 import { stringHash } from '~/lib/utils/string-hash'
 import { type ModelsBookingStub } from '~/services/api/lasius'
 import { useDeleteFavoriteBooking } from '~/services/api/lasius-hooks/user-favorites/user-favorites'
@@ -44,7 +42,7 @@ type Properties = {
 export const FavoriteItemContext = ({ item, selectedOrgId }: Properties) => {
   const { t } = useTranslation('home')
   const favoriteDeletionApi = useDeleteFavoriteBooking()
-  const stopAndStart = useStopAndStart()
+  const startBookingNow = useStartBookingNow(selectedOrgId)
 
   const itemHash = stringHash(item)
   const { handleCloseAll } = useContextMenu()
@@ -62,13 +60,7 @@ export const FavoriteItemContext = ({ item, selectedOrgId }: Properties) => {
   }
 
   const handleStart = () => {
-    const start = formatISOLocale(roundToNearestMinutes(new Date(), { roundingMethod: 'floor' }))
-    stopAndStart.submit({
-      orgId: selectedOrgId,
-      projectId: item.projectReference.id,
-      start,
-      tags: item.tags,
-    })
+    startBookingNow(item)
     handleCloseAll()
   }
 

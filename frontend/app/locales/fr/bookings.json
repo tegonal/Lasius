@@ -16,6 +16,7 @@
     "insert": "Insérer une réservation",
     "start": "Démarrer la réservation",
     "startFromFavorite": "Démarrer la réservation à partir d'un favori",
+    "startFromRecent": "Démarrer la réservation à partir d'une réservation récente",
     "startFromTeamMember": "Démarrer la réservation à partir d'un membre de l'équipe",
     "stopRecording": "Arrêter l'enregistrement de la réservation en cours"
   },

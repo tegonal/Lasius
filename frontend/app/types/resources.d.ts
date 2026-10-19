@@ -35,6 +35,7 @@ export default interface Resources {
       insert: 'Insert booking'
       start: 'Start booking'
       startFromFavorite: 'Start booking from favorite'
+      startFromRecent: 'Start booking from recent bookings'
       startFromTeamMember: 'Start booking from team member'
       stopRecording: 'Stop recording current time booking'
     }
@@ -467,6 +468,9 @@ export default interface Resources {
         delete: 'Delete favorite'
       }
       empty: 'No favorites yet'
+    }
+    recent: {
+      empty: 'No bookings in the last 7 days'
     }
   }
   integrations: {

@@ -18,7 +18,7 @@
  */
 
 import { subDays } from 'date-fns'
-import { ArrowLeft, Clock, Star, Users } from 'lucide-react'
+import { ArrowLeft, History, Star, Users } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -26,13 +26,13 @@ import { Button } from '~/components/primitives/buttons/button'
 import { AvatarUser } from '~/components/ui/data-display/avatar/avatar-user'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { IconTabs, type IconTabsItem } from '~/components/ui/navigation/icon-tabs'
+import { deduplicateBookings, RECENT_BOOKINGS_DAYS } from '~/features/bookings/lib/recent-bookings'
 import { TagList } from '~/features/tags/components/tag-list'
 import { formatISOLocale } from '~/lib/utils/dates'
 import { stringHash } from '~/lib/utils/string-hash'
 import { useGetOrganisationBookingList } from '~/services/api/lasius-hooks/organisation-bookings/organisation-bookings'
 import { useGetUserBookingListByOrganisation } from '~/services/api/lasius-hooks/user-bookings/user-bookings'
 import { useGetFavoriteBookingList } from '~/services/api/lasius-hooks/user-favorites/user-favorites'
-import { type ModelsBooking } from '~/services/api/lasius/modelsBooking'
 import { type ModelsTag } from '~/services/api/lasius/modelsTag'
 
 type PresetSelection = {
@@ -92,7 +92,7 @@ const AnimatedList = ({ children }: { children: React.ReactNode }) => (
 const AnimatedItem = ({ children, index }: { children: React.ReactNode; index: number }) => (
   <div
     className="animate-in fade-in"
-    style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'both' }}>
+    style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'backwards' }}>
     {children}
   </div>
 )
@@ -136,23 +136,6 @@ const PresetList = <T extends PresetItem>({
   )
 }
 
-const deduplicateBookings = (items: ModelsBooking[], limit = 20) => {
-  const seen = new Set<string>()
-  const unique: ModelsBooking[] = []
-  for (const booking of items) {
-    const key = `${booking.projectReference.id}-${booking.tags
-      .map((tag) => tag.id)
-      .toSorted((a, b) => a.localeCompare(b))
-      .join(',')}`
-    if (!seen.has(key)) {
-      seen.add(key)
-      unique.push(booking)
-      if (unique.length >= limit) break
-    }
-  }
-  return unique
-}
-
 const RecentBookingsList = ({
   onSelect,
   selectedOrgId,
@@ -173,7 +156,7 @@ const RecentBookingsList = ({
     submitRecentBookings({
       orgId: selectedOrgId,
       params: {
-        from: formatISOLocale(subDays(now, 7)),
+        from: formatISOLocale(subDays(now, RECENT_BOOKINGS_DAYS)),
         to: formatISOLocale(now),
       },
     })
@@ -269,7 +252,7 @@ export const BookingPresetSelector = ({ onBack, onSelect, selectedOrgId }: Prope
   const tabs: IconTabsItem[] = [
     {
       component: <RecentBookingsList onSelect={onSelect} selectedOrgId={selectedOrgId} />,
-      icon: Clock,
+      icon: History,
       id: 'recent',
       name: t('bookings:presets.recent', 'Recent bookings'),
     },

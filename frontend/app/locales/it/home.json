@@ -5,5 +5,8 @@
       "delete": "Elimina preferito"
     },
     "empty": "Nessun preferito ancora"
+  },
+  "recent": {
+    "empty": "Nessuna registrazione negli ultimi 7 giorni"
   }
 }

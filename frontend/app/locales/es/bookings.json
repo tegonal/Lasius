@@ -16,6 +16,7 @@
     "insert": "Insertar registro",
     "start": "Iniciar registro",
     "startFromFavorite": "Iniciar registro desde favorito",
+    "startFromRecent": "Iniciar registro desde registro reciente",
     "startFromTeamMember": "Iniciar registro desde miembro del equipo",
     "stopRecording": "Detener el registro de tiempo actual"
   },

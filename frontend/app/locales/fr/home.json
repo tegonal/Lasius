@@ -5,5 +5,8 @@
       "delete": "Supprimer le favori"
     },
     "empty": "Aucun favori pour le moment"
+  },
+  "recent": {
+    "empty": "Aucune réservation au cours des 7 derniers jours"
   }
 }

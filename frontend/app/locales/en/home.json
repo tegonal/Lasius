@@ -5,5 +5,8 @@
       "delete": "Delete favorite"
     },
     "empty": "No favorites yet"
+  },
+  "recent": {
+    "empty": "No bookings in the last 7 days"
   }
 }

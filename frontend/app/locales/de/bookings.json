@@ -16,6 +16,7 @@
     "insert": "Buchung einfügen",
     "start": "Buchung starten",
     "startFromFavorite": "Buchung aus Favorit starten",
+    "startFromRecent": "Buchung aus letzten Buchungen starten",
     "startFromTeamMember": "Buchung von Teammitglied starten",
     "stopRecording": "Aufzeichnung der aktuellen Buchung stoppen"
   },

@@ -25,6 +25,7 @@ import { BookingCurrent } from '~/features/bookings/components/booking-current'
 import { BookingListSelectedDay } from '~/features/bookings/components/booking-list-selected-day'
 import { BookingDayStatsProgressBar } from '~/features/home/components/booking-day-stats-progress-bar'
 import { IndexColumnTabs } from '~/features/home/components/index-column-tabs'
+import { loadRecentBookings } from '~/features/home/lib/recent-bookings.server'
 import { OnboardingTutorial } from '~/features/onboarding/components/onboarding-tutorial'
 import { augmentBookingsList } from '~/lib/api/functions/augment-bookings-list'
 import { getExpectedVsBookedPercentage } from '~/lib/api/functions/get-expected-vs-booked-percentage'
@@ -53,12 +54,14 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
     loadOrganisationContext(request, url),
   )
 
-  const selectedDate = isoDateOrFallback(url.searchParams.get('date'), getUserClock(request).today)
+  const clock = getUserClock(request)
+  const selectedDate = isoDateOrFallback(url.searchParams.get('date'), clock.today)
   const dayTimespan = apiTimespanDay(selectedDate)
 
-  // Fetch day bookings, current booking, favorites, org current bookings, and users in parallel
+  // Fetch day bookings, recent bookings, current booking, favorites, org current bookings, and users in parallel
   const [
     dayBookingsResponse,
+    recentBookings,
     currentBookingResponse,
     favoritesResponse,
     orgCurrentBookingsResponse,
@@ -68,6 +71,7 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
       'day',
       getUserBookingListByOrganisation(selectedOrgId, dayTimespan, { headers }),
     ),
+    timing.measure('recent', loadRecentBookings(selectedOrgId, clock, { headers })),
     timing.measure('current', getUserBookingCurrent({ headers })),
     timing.measure('favorites', getFavoriteBookingList(selectedOrgId, { headers })),
     timing.measure(
@@ -110,6 +114,7 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
       favorites,
       orgCurrentBookings,
       orgUsers,
+      recentBookings,
       selectedDate,
       selectedOrgId,
     },
@@ -129,7 +134,7 @@ export function headers({ loaderHeaders }: Route.HeadersArgs) {
 }
 
 export default function HomeIndex({ loaderData }: Route.ComponentProps) {
-  const { favorites, orgCurrentBookings, orgUsers, selectedOrgId } = loaderData
+  const { favorites, orgCurrentBookings, orgUsers, recentBookings, selectedOrgId } = loaderData
 
   return (
     <div className={innerGridClasses}>
@@ -149,6 +154,7 @@ export default function HomeIndex({ loaderData }: Route.ComponentProps) {
         <IndexColumnTabs
           favorites={favorites}
           orgBookings={orgCurrentBookings}
+          recentBookings={recentBookings}
           selectedOrgId={selectedOrgId}
           users={orgUsers}
         />

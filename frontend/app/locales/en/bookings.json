@@ -16,6 +16,7 @@
     "insert": "Insert booking",
     "start": "Start booking",
     "startFromFavorite": "Start booking from favorite",
+    "startFromRecent": "Start booking from recent bookings",
     "startFromTeamMember": "Start booking from team member",
     "stopRecording": "Stop recording current time booking"
   },
