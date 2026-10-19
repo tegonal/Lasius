@@ -23,6 +23,8 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '~/components/primitives/buttons/button'
 import { Modal } from '~/components/ui/overlays/modal/modal'
 import { BookingAddUpdateForm } from '~/features/bookings/components/booking-add-update-form'
+import { useHomeLoaderData } from '~/features/bookings/hooks/use-home-loader-data'
+import { toLocalDate } from '~/lib/utils/dates'
 
 type Properties = {
   selectedOrgId: string
@@ -31,6 +33,7 @@ type Properties = {
 export const BookingAddButton = ({ selectedOrgId }: Properties) => {
   const [isOpen, setIsOpen] = useState(false)
   const { t } = useTranslation('bookings')
+  const selectedDay = useHomeLoaderData()?.selectedDate
 
   const handleClose = () => setIsOpen(false)
 
@@ -40,7 +43,12 @@ export const BookingAddButton = ({ selectedOrgId }: Properties) => {
         {t('actions.create', 'Create a booking')}
       </Button>
       <Modal onClose={handleClose} open={isOpen}>
-        <BookingAddUpdateForm mode="add" onClose={handleClose} selectedOrgId={selectedOrgId} />
+        <BookingAddUpdateForm
+          mode="add"
+          onClose={handleClose}
+          selectedDate={selectedDay ? toLocalDate(selectedDay) : undefined}
+          selectedOrgId={selectedOrgId}
+        />
       </Modal>
     </>
   )
