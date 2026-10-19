@@ -48,7 +48,8 @@ export const BookingListSelectedDay = () => {
             style={{
               animationDelay: `${index * 0.12}s`,
               animationDuration: '0.5s',
-              animationFillMode: 'both',
+              // A fill that outlasts the animation keeps a stacking context. The next item then covers the insert actions.
+              animationFillMode: 'backwards',
             }}>
             <BookingItem item={item} nextItem={bookings[index + 1]} />
           </div>

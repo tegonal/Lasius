@@ -33,7 +33,7 @@ export const AnimateList = ({ children }: Properties) => {
           key={child.key ?? index}
           style={{
             animationDelay: `${index * 50}ms`,
-            animationFillMode: 'both',
+            animationFillMode: 'backwards',
           }}>
           {child}
         </div>
