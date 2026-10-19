@@ -386,6 +386,41 @@
     animation: slideInFromLeft 0.3s ease-out;
   }
 
+  /* Week strip slide. Both panels sit in one flex row and move by their own width. */
+  @keyframes weekSlideNext {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-100%);
+    }
+  }
+
+  @keyframes weekSlidePrevious {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  .animate-week-slide-next {
+    animation: weekSlideNext 250ms ease-out both;
+  }
+
+  .animate-week-slide-previous {
+    animation: weekSlidePrevious 250ms ease-out both;
+  }
+
+  /* A 1ms animation still fires animationend, which removes the outgoing week. */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-week-slide-next,
+    .animate-week-slide-previous {
+      animation-duration: 1ms;
+    }
+  }
+
   @keyframes gradientShift {
     0% {
       background-position: 0% 50%;

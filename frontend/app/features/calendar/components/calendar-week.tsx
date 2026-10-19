@@ -19,7 +19,7 @@
 
 import { isToday } from 'date-fns'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { useRef } from 'react'
+import { type AnimationEvent, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
@@ -28,24 +28,32 @@ import { FormatDate } from '~/components/ui/data-display/format-date'
 import { CalendarDay } from '~/features/calendar/components/calendar-day'
 import { useCalendarNavigation } from '~/features/calendar/hooks/use-calendar-navigation'
 import { useCalendarSelection } from '~/features/calendar/hooks/use-calendar-selection'
+import { useWeekSlide, type WeekSlide } from '~/features/calendar/hooks/use-week-slide'
 import { usePersistedSearchParameter } from '~/hooks/use-persisted-search-parameter'
 import { useToday } from '~/hooks/use-today'
 import { cn } from '~/lib/utils/cn'
-import { toCalendarDay } from '~/lib/utils/dates'
+import { type IsoDateString, toCalendarDay } from '~/lib/utils/dates'
 
 // ─── CalendarWeek ───────────────────────────────────────────────────────────
+
+const dayGridClasses =
+  'grid w-max grid-cols-[repeat(7,62px)] gap-1 sm:gap-2 md:w-full md:grid-cols-[repeat(7,1fr)] lg:gap-3'
+
+const panelClasses = 'relative min-w-full shrink-0'
 
 /** Reads its bookings from the CalendarDataProvider that app-layout.tsx places around both headers. */
 export const CalendarWeek = () => {
   const { t } = useTranslation(['calendar', 'common'])
   const selectedDate = usePersistedSearchParameter('date', useToday())
-  const dayReferences = useRef<(HTMLElement | null)[]>([])
 
   const { next, period: week, previous } = useCalendarNavigation(selectedDate, 'week')
   const { isDaySelected, selectDay, selectedDay, selectToday } = useCalendarSelection(selectedDate)
+  const { endSlide, slide } = useWeekSlide(week)
+
+  const outgoingPanel = slide && <OutgoingWeekPanel slide={slide} />
 
   return (
-    <div className="flex min-w-0 items-center justify-center overflow-hidden">
+    <div className="flex w-full min-w-0 items-center justify-center overflow-hidden">
       <div className="flex flex-shrink-0 items-center justify-center pt-3">
         <ButtonLeft
           aria-label={t('calendar:navigation.previousWeek', 'Previous week')}
@@ -54,48 +62,20 @@ export const CalendarWeek = () => {
         />
       </div>
       <div className="min-w-0 flex-1 overflow-hidden md:max-w-[500px]">
-        <div className="border-base-content/50 grid min-h-[22px] w-full grid-cols-3 border-b text-sm">
-          <div>{week[0] && <FormatDate date={week[0]} format="monthNameLong" />}</div>
-          {isToday(toCalendarDay(selectedDay)) ? (
-            <div />
-          ) : (
-            <Button
-              aria-label={t('time.today', 'Today')}
-              data-testid="calendar-week-today-btn"
-              onClick={selectToday}
-              size="xs"
-              variant="unstyled">
-              {t('time.today', 'Today')}
-            </Button>
-          )}
-          <div className="text-right">{week[0] && <FormatDate date={week[0]} format="year" />}</div>
-        </div>
-        <div className="min-h-[82px] w-full overflow-x-auto">
-          <div className="relative">
-            <div className="grid w-max grid-cols-[repeat(7,62px)] gap-1 sm:gap-2 md:w-full md:grid-cols-[repeat(7,1fr)] lg:gap-3">
-              {week.map((day, index) => (
-                <div
-                  className={cn(
-                    'relative',
-                    isDaySelected(day) ? 'text-neutral-content' : 'text-base-content',
-                  )}
-                  key={day}
-                  ref={(element) => {
-                    dayReferences.current[index] = element
-                  }}>
-                  <CalendarDay
-                    date={day}
-                    isSelected={isDaySelected(day)}
-                    onClick={() => selectDay(day)}
-                  />
-                </div>
-              ))}
-            </div>
-            <SlidingIndicator
-              itemRefs={dayReferences}
-              radiusOn="bottom"
-              selectedIndex={week.findIndex((day) => isDaySelected(day))}
+        <WeekHeaderRow onSelectToday={selectToday} selectedDay={selectedDay} weekStart={week[0]} />
+        {/* The scroll container clips during a slide, so the outgoing week adds no scrollbar. */}
+        <div className={cn('min-h-[82px] w-full', slide ? 'overflow-x-hidden' : 'overflow-x-auto')}>
+          <div className="flex">
+            {slide?.direction === 'next' && outgoingPanel}
+            <CurrentWeekPanel
+              animationClass={slide?.animationClass}
+              isDaySelected={isDaySelected}
+              key={week[0]}
+              onAnimationEnd={endSlide}
+              onSelectDay={selectDay}
+              week={week}
             />
+            {slide?.direction === 'previous' && outgoingPanel}
           </div>
         </div>
       </div>
@@ -109,6 +89,100 @@ export const CalendarWeek = () => {
     </div>
   )
 }
+
+// ─── Week header row ────────────────────────────────────────────────────────
+
+interface WeekHeaderRowProperties {
+  onSelectToday: () => void
+  selectedDay: IsoDateString
+  weekStart?: IsoDateString
+}
+
+/** The month, the Today button and the year above the days. */
+const WeekHeaderRow = ({ onSelectToday, selectedDay, weekStart }: WeekHeaderRowProperties) => {
+  const { t } = useTranslation('common')
+
+  return (
+    <div className="border-base-content/50 grid min-h-[22px] w-full grid-cols-3 border-b text-sm">
+      <div>{weekStart && <FormatDate date={weekStart} format="monthNameLong" />}</div>
+      {isToday(toCalendarDay(selectedDay)) ? (
+        <div />
+      ) : (
+        <Button
+          aria-label={t('time.today', 'Today')}
+          data-testid="calendar-week-today-btn"
+          onClick={onSelectToday}
+          size="xs"
+          variant="unstyled">
+          {t('time.today', 'Today')}
+        </Button>
+      )}
+      <div className="text-right">{weekStart && <FormatDate date={weekStart} format="year" />}</div>
+    </div>
+  )
+}
+
+// ─── Week panels ────────────────────────────────────────────────────────────
+
+interface CurrentWeekPanelProperties {
+  animationClass?: string
+  isDaySelected: (day: IsoDateString) => boolean
+  onAnimationEnd: (event: AnimationEvent<HTMLElement>) => void
+  onSelectDay: (day: IsoDateString) => void
+  week: IsoDateString[]
+}
+
+const CurrentWeekPanel = ({
+  animationClass,
+  isDaySelected,
+  onAnimationEnd,
+  onSelectDay,
+  week,
+}: CurrentWeekPanelProperties) => {
+  const dayReferences = useRef<(HTMLElement | null)[]>([])
+
+  return (
+    <div className={cn(panelClasses, animationClass)} onAnimationEnd={onAnimationEnd}>
+      <div className={dayGridClasses}>
+        {week.map((day, index) => (
+          <div
+            className={cn(
+              'relative',
+              isDaySelected(day) ? 'text-neutral-content' : 'text-base-content',
+            )}
+            key={day}
+            ref={(element) => {
+              dayReferences.current[index] = element
+            }}>
+            <CalendarDay
+              date={day}
+              isSelected={isDaySelected(day)}
+              onClick={() => onSelectDay(day)}
+            />
+          </div>
+        ))}
+      </div>
+      <SlidingIndicator
+        itemRefs={dayReferences}
+        radiusOn="bottom"
+        selectedIndex={week.findIndex((day) => isDaySelected(day))}
+      />
+    </div>
+  )
+}
+
+/** The week that moves out. It is a copy for the animation only, so it takes no input. */
+const OutgoingWeekPanel = ({ slide }: { slide: WeekSlide }) => (
+  <div aria-hidden className={cn(panelClasses, slide.animationClass)} inert>
+    <div className={dayGridClasses}>
+      {slide.from.map((day) => (
+        <div className="text-base-content relative" key={day}>
+          <CalendarDay date={day} onClick={() => {}} />
+        </div>
+      ))}
+    </div>
+  </div>
+)
 
 function ButtonLeft(properties: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return (

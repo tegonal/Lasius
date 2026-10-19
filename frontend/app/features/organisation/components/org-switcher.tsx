@@ -37,7 +37,7 @@ export const OrgSwitcher = () => {
   return (
     <>
       <button
-        className="btn btn-ghost hidden md:flex"
+        className="btn btn-ghost hidden lg:flex"
         data-testid="org-selector-btn"
         onClick={() => setIsOpen(true)}
         type="button">
@@ -48,15 +48,29 @@ export const OrgSwitcher = () => {
             : selectedOrganisationKey}
         </span>
       </button>
-      <Modal onClose={handleClose} open={isOpen}>
-        <ModalCloseButton onClose={handleClose} />
-        <OrgSwitcherModal onClose={handleClose} />
-        <ButtonGroup>
-          <button className="btn btn-secondary" onClick={handleClose} type="button">
-            {t('actions.close', 'Close')}
-          </button>
-        </ButtonGroup>
-      </Modal>
+      <OrgSwitcherDialog isOpen={isOpen} onClose={handleClose} />
     </>
+  )
+}
+
+interface OrgSwitcherDialogProperties {
+  isOpen: boolean
+  onClose: () => void
+}
+
+/** The organisation list in a modal. The header button and the tablet header menu open it. */
+export const OrgSwitcherDialog = ({ isOpen, onClose }: OrgSwitcherDialogProperties) => {
+  const { t } = useTranslation('organisation')
+
+  return (
+    <Modal onClose={onClose} open={isOpen}>
+      <ModalCloseButton onClose={onClose} />
+      <OrgSwitcherModal onClose={onClose} />
+      <ButtonGroup>
+        <button className="btn btn-secondary" onClick={onClose} type="button">
+          {t('actions.close', 'Close')}
+        </button>
+      </ButtonGroup>
+    </Modal>
   )
 }

@@ -23,6 +23,7 @@ import { useLocation } from 'react-router'
 
 import { IconTabs, type IconTabsItem } from '~/components/ui/navigation/icon-tabs'
 import { createNavigation } from '~/config/navigation'
+import { NavigationRail } from '~/features/navigation/components/navigation-rail'
 import { NavigationTabContent } from '~/features/navigation/components/navigation-tab-content'
 
 export const NavigationMenuTabs = () => {
@@ -47,9 +48,17 @@ export const NavigationMenuTabs = () => {
   }))
 
   return (
-    <div className="h-full w-full px-2 pt-1 lg:px-4 lg:pt-4 xl:px-6 xl:pt-6">
-      <IconTabs onSelect={setManualTab} position="left" selected={selected} tabs={tabs} />
-    </div>
+    <>
+      <NavigationRail
+        className="lg:hidden"
+        navigation={navigation}
+        onSelect={setManualTab}
+        selected={selected}
+      />
+      <div className="hidden h-full w-full lg:block lg:px-4 lg:pt-4 xl:px-6 xl:pt-6">
+        <IconTabs onSelect={setManualTab} position="left" selected={selected} tabs={tabs} />
+      </div>
+    </>
   )
 }
 

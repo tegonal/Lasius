@@ -63,7 +63,7 @@ const CalendarDayContent = ({
         isSelected && 'shadow-none hover:bg-transparent hover:text-current',
       )}
       onClick={() => onClick(date)}>
-      <div className="pt-1 text-center text-xs leading-none font-normal uppercase">
+      <div className="pt-1.5 text-center text-xs leading-none font-normal uppercase">
         <FormatDate date={day} format="dayNameShort" />
       </div>
       <div className="text-2xl leading-none font-normal">
@@ -85,7 +85,7 @@ const CalendarDayContent = ({
 
 function CalendarDaySkeleton() {
   return (
-    <div className="flex min-h-[78px] w-full min-w-[56px] flex-col items-center justify-start pt-1">
+    <div className="flex min-h-[78px] w-full min-w-[56px] flex-col items-center justify-start pt-1.5">
       <div className="skeleton h-3 w-6 rounded" />
       <div className="skeleton mt-2 h-7 w-8 rounded" />
     </div>

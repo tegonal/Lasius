@@ -232,6 +232,10 @@
       "workspaceRequired": "Arbeitsbereich ist erforderlich"
     }
   },
+  "layout": {
+    "openSidePanel": "Seitenbereich öffnen",
+    "sidePanel": "Seitenbereich"
+  },
   "navigation": {
     "home": "Startseite",
     "openMenu": "Menü öffnen",

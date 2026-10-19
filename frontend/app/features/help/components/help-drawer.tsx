@@ -17,16 +17,13 @@
  *
  */
 
-import { Dialog } from '@base-ui/react/dialog'
 import { run } from '@mdx-js/mdx'
-import { X } from 'lucide-react'
 import { Fragment, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router'
 import * as jsxRuntime from 'react/jsx-runtime'
 
-import { Button } from '~/components/primitives/buttons/button'
-import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+import { Drawer } from '~/components/ui/overlays/drawer'
 import { InlineIcon } from '~/features/help/components/mdx/inline-icon'
 import { Note } from '~/features/help/components/mdx/note'
 import { Tip } from '~/features/help/components/mdx/tip'
@@ -135,53 +132,21 @@ export const HelpDrawer = () => {
   const view = getHelpView({ error, hasContent: !!mdxContent, isFallbackLanguage, loading })
 
   return (
-    <Dialog.Root modal onOpenChange={handleOpenChange} open={isOpen}>
-      <Dialog.Portal>
-        <Dialog.Backdrop className="fixed inset-0 z-50 bg-black/20 transition-opacity duration-300 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0" />
-        <div className="fixed inset-0 z-50 overflow-hidden">
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full">
-              <Dialog.Popup
-                className="pointer-events-auto w-screen max-w-[90vw] transform transition-transform duration-300 data-[ending-style]:translate-x-full data-[starting-style]:translate-x-full sm:max-w-[500px] md:max-w-[600px] lg:max-w-[700px]"
-                data-testid="help-drawer">
-                <div className="bg-base-100 flex h-full flex-col shadow-2xl">
-                  {/* Header */}
-                  <div className="border-base-300 border-b px-6 py-4">
-                    <div className="flex items-center justify-between">
-                      <Dialog.Title className="text-lg font-semibold">
-                        {t('actions.help', 'Help')}
-                      </Dialog.Title>
-                      <Dialog.Close
-                        render={
-                          <Button
-                            aria-label={t('actions.close', 'Close')}
-                            fullWidth={false}
-                            shape="circle"
-                            size="sm"
-                            variant="ghost">
-                            <LucideIcon icon={X} size={20} />
-                          </Button>
-                        }
-                      />
-                    </div>
-                  </div>
-
-                  {/* Content */}
-                  <div className="flex-1 overflow-y-auto px-8 py-6">
-                    <HelpStatus showError={view.showError} showSpinner={view.showSpinner} />
-                    <HelpArticle
-                      content={mdxContent}
-                      showContent={view.showContent}
-                      showFallbackNotice={view.showFallbackNotice}
-                    />
-                  </div>
-                </div>
-              </Dialog.Popup>
-            </div>
-          </div>
-        </div>
-      </Dialog.Portal>
-    </Dialog.Root>
+    <Drawer
+      bodyClassName="overflow-y-auto px-8 py-6"
+      closeLabel={t('actions.close', 'Close')}
+      isOpen={isOpen}
+      onOpenChange={handleOpenChange}
+      popupClassName="sm:max-w-[500px] md:max-w-[600px] lg:max-w-[700px]"
+      testId="help-drawer"
+      title={t('actions.help', 'Help')}>
+      <HelpStatus showError={view.showError} showSpinner={view.showSpinner} />
+      <HelpArticle
+        content={mdxContent}
+        showContent={view.showContent}
+        showFallbackNotice={view.showFallbackNotice}
+      />
+    </Drawer>
   )
 }
 

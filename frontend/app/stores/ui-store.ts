@@ -37,8 +37,11 @@ interface UIStore {
   // Global loading state
   globalLoading: boolean
   removeToast: (id: string) => void
+  // The right column drawer of the tablet layout (written by the header button, read by ColumnRight)
+  rightDrawerOpen: boolean
   setBackendStatus: (status: BackendConnectionStatus) => void
   setGlobalLoading: (isLoading: boolean) => void
+  setRightDrawerOpen: (isOpen: boolean) => void
   // Session expiry state (written by TokenWatcher, read by DevelopmentInfoBadge)
   setTokenExpiresAt: (expiresAt: null | number) => void
   setVersionDrift: (hasDrift: boolean) => void
@@ -80,6 +83,7 @@ const uiStoreState = immer<UIStore>((set) => ({
     set((state) => {
       state.toastViews = state.toastViews.filter((t) => t.id !== id)
     }),
+  rightDrawerOpen: false,
   setBackendStatus: (status) =>
     set((state) => {
       state.backendStatus = status
@@ -87,6 +91,10 @@ const uiStoreState = immer<UIStore>((set) => ({
   setGlobalLoading: (isLoading) =>
     set((state) => {
       state.globalLoading = isLoading
+    }),
+  setRightDrawerOpen: (isOpen) =>
+    set((state) => {
+      state.rightDrawerOpen = isOpen
     }),
   setTokenExpiresAt: (expiresAt) =>
     set((state) => {
@@ -131,3 +139,4 @@ export const useShouldShowStatsTileTimeAsDecimals = () =>
 export const useBackendStatus = () => useUIStore((state) => state.backendStatus)
 export const useTokenExpiresAt = () => useUIStore((state) => state.tokenExpiresAt)
 export const useHasVersionDrift = () => useUIStore((state) => state.versionDrift)
+export const useIsRightDrawerOpen = () => useUIStore((state) => state.rightDrawerOpen)

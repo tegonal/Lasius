@@ -17,17 +17,13 @@
  *
  */
 
-import { useLocation, useNavigate } from 'react-router'
-
 import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+import { type NavigationRouteType, type NavigationSection } from '~/config/navigation'
 import {
-  getNavigation,
-  type NavigationRouteType,
-  type NavigationSection,
-} from '~/config/navigation'
-import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
-import { useLayoutLoaderData } from '~/hooks/use-layout-loader-data'
+  useNavigateToRoute,
+  useSectionRoutes,
+} from '~/features/navigation/hooks/use-navigation-routes'
 
 export const NavigationTabContent = ({
   branch,
@@ -36,17 +32,11 @@ export const NavigationTabContent = ({
   branch: string
   navigation: NavigationSection[]
 }) => {
-  const { isAdministrator } = useOrganisation()
-  const loaderData = useLayoutLoaderData()
+  const routes = useSectionRoutes(branch, navigation)
 
   return (
     <div className="flex flex-col items-start justify-start gap-3">
-      {getNavigation({
-        id: branch,
-        isOrganisationAdministrator: isAdministrator,
-        isUserOfInternalOAuthProvider: loaderData?.tokenIssuer === 'internal',
-        navigation,
-      }).map((item) => (
+      {routes.map((item) => (
         <NavigationButton item={item} key={item.name} />
       ))}
     </div>
@@ -54,19 +44,13 @@ export const NavigationTabContent = ({
 }
 
 const NavigationButton = ({ item }: { item: NavigationRouteType }) => {
-  const navigate = useNavigate()
-  const location = useLocation()
-
-  const isActive = location.pathname === item.route
-
-  const handleClick = () => {
-    const dateParameter = new URLSearchParams(location.search).get('date')
-    const search = dateParameter ? `?date=${dateParameter}` : ''
-    void navigate(`${item.route}${search}`)
-  }
+  const { isActive, navigateTo } = useNavigateToRoute()
 
   return (
-    <Button fullWidth onClick={handleClick} variant={isActive ? 'navigationActive' : 'navigation'}>
+    <Button
+      fullWidth
+      onClick={() => navigateTo(item.route)}
+      variant={isActive(item.route) ? 'navigationActive' : 'navigation'}>
       <LucideIcon icon={item.icon} size={24} />
       <div>{item.name}</div>
     </Button>

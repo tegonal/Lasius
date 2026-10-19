@@ -233,6 +233,10 @@
       "workspaceRequired": "Spazio di lavoro richiesto"
     }
   },
+  "layout": {
+    "openSidePanel": "Apri il pannello laterale",
+    "sidePanel": "Pannello laterale"
+  },
   "navigation": {
     "home": "Pagina iniziale",
     "openMenu": "Apri menu",

@@ -22,8 +22,9 @@ import { useTranslation } from 'react-i18next'
 import { data, Form, href, Link, Outlet, type ShouldRevalidateFunctionArgs } from 'react-router'
 
 import { Button } from '~/components/primitives/buttons/button'
-import { Logo } from '~/components/ui/icons/logo'
+import { Logo, LogoMark } from '~/components/ui/icons/logo'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+import { ColumnRightToggle, headerGridClasses } from '~/components/ui/layouts/layout-columns'
 import { TegonalFooter } from '~/components/ui/navigation/tegonal-footer'
 import { TokenWatcher } from '~/features/auth/components/token-watcher'
 import { BookingCurrent } from '~/features/bookings/components/booking-current'
@@ -31,6 +32,7 @@ import { StopBookingProvider } from '~/features/bookings/stop-booking-provider'
 import { CalendarDataProvider } from '~/features/calendar/calendar-data-provider'
 import { CalendarWeek } from '~/features/calendar/components/calendar-week'
 import { HelpButton } from '~/features/help/components/help-button'
+import { HeaderActionsMenu } from '~/features/navigation/components/header-actions-menu'
 import { MobileFloatingActionButton } from '~/features/navigation/components/mobile-floating-action-button'
 import { OrgSwitcher } from '~/features/organisation/components/org-switcher'
 import { useOrganisation } from '~/features/organisation/hooks/use-organisation'
@@ -43,6 +45,7 @@ import { usePersistedSearchParameter } from '~/hooks/use-persisted-search-parame
 import { DEFAULT_LOCALE, isLocale } from '~/i18n-config'
 import { getUserClock } from '~/lib/cookies/time-zone-cookie.server'
 import { getDeduplicatedUserProfile } from '~/lib/organisation-helpers.server'
+import { cn } from '~/lib/utils/cn'
 import { getLocale } from '~/middleware/i18next'
 import { getUserBookingCurrent } from '~/services/api/lasius/user-bookings/user-bookings'
 import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
@@ -108,33 +111,41 @@ export default function AppLayout({ loaderData }: Route.ComponentProps) {
           {/* Desktop header */}
           <div className="hidden md:block">
             <section className="h-full w-full overflow-visible">
-              <div className="grid h-full w-full grid-cols-[minmax(200px,310px)_minmax(max-content,auto)_minmax(200px,310px)] gap-0 overflow-visible 2xl:grid-cols-[minmax(200px,340px)_minmax(max-content,auto)_minmax(200px,340px)]">
-                <div className="hover:text-info flex cursor-pointer items-center justify-start gap-8 pl-8">
+              <div className={cn(headerGridClasses, 'relative gap-0 overflow-visible')}>
+                <div className="hover:text-info flex cursor-pointer items-center justify-center gap-8 lg:justify-start lg:pl-8">
                   <Link to={href('/')}>
-                    <Logo />
+                    <Logo className="hidden lg:block" />
+                    <LogoMark className="h-8 w-11 lg:hidden" />
                   </Link>
                 </div>
 
-                <div className="flex h-full w-full items-center justify-center gap-8">
+                <div className="flex h-full w-full min-w-0 items-center justify-center gap-8">
                   <CalendarWeek />
                 </div>
 
-                <div className="flex items-center justify-end gap-2 pr-8">
-                  <OrgSwitcher />
-                  <HelpButton />
-                  <Form action="/logout" method="post">
-                    <Button
-                      aria-label={t('auth.actions.signOut', {
-                        defaultValue: 'Sign out',
-                      })}
-                      data-testid="auth-logout-btn"
-                      fullWidth={false}
-                      shape="circle"
-                      type="submit"
-                      variant="ghost">
-                      <LucideIcon icon={LogOutIcon} size={20} />
-                    </Button>
-                  </Form>
+                {/* Below lg the actions leave the grid, so the week strip centres over the centre column. */}
+                <div className="flex items-center justify-end gap-2 pr-4 max-lg:absolute max-lg:inset-y-0 max-lg:right-0 lg:pr-8">
+                  <div className="hidden items-center gap-2 lg:flex">
+                    <OrgSwitcher />
+                    <HelpButton />
+                    <Form action="/logout" method="post">
+                      <Button
+                        aria-label={t('auth.actions.signOut', {
+                          defaultValue: 'Sign out',
+                        })}
+                        data-testid="auth-logout-btn"
+                        fullWidth={false}
+                        shape="circle"
+                        type="submit"
+                        variant="ghost">
+                        <LucideIcon icon={LogOutIcon} size={20} />
+                      </Button>
+                    </Form>
+                  </div>
+                  <div className="lg:hidden">
+                    <HeaderActionsMenu />
+                  </div>
+                  <ColumnRightToggle />
                 </div>
               </div>
             </section>

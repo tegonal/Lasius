@@ -232,6 +232,10 @@
       "workspaceRequired": "Workspace is required"
     }
   },
+  "layout": {
+    "openSidePanel": "Open side panel",
+    "sidePanel": "Side panel"
+  },
   "navigation": {
     "home": "Home",
     "openMenu": "Open menu",

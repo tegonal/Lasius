@@ -23,29 +23,26 @@ import { Outlet } from 'react-router'
 import { ColumnLeft, outerGridClasses } from '~/components/ui/layouts/layout-columns'
 import { NavigationMenuTabs } from '~/features/navigation/components/navigation-menu-tabs'
 
-/** Layout route body: the side navigation next to the child route on desktop, one column on mobile. */
+/**
+ * Layout route body: the side navigation next to the child route from md, one column on mobile.
+ * One Outlet only, so a child route and its right column drawer mount once.
+ */
 export const SideNavigationLayout = () => (
-  <>
-    {/* Desktop: left nav + content area (children use ColumnCenter/ColumnRight) */}
-    <section className="hidden size-full overflow-auto md:block">
-      <div className={outerGridClasses}>
+  <section className="size-full overflow-auto max-md:overflow-hidden">
+    <div className={`${outerGridClasses} max-md:!grid-cols-[1fr]`}>
+      <div className="hidden md:block">
         <ColumnLeft>
           <NavigationMenuTabs />
         </ColumnLeft>
-        <Suspense
-          fallback={
-            <div className="flex h-full flex-1 items-center justify-center">
-              <span className="loading loading-spinner loading-lg text-primary" />
-            </div>
-          }>
-          <Outlet />
-        </Suspense>
       </div>
-    </section>
-
-    {/* Mobile: single column */}
-    <section className="h-full w-full overflow-hidden md:hidden">
-      <Outlet />
-    </section>
-  </>
+      <Suspense
+        fallback={
+          <div className="flex h-full flex-1 items-center justify-center">
+            <span className="loading loading-spinner loading-lg text-primary" />
+          </div>
+        }>
+        <Outlet />
+      </Suspense>
+    </div>
+  </section>
 )
