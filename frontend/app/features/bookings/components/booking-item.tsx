@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { Modal } from '~/components/ui/overlays/modal/modal'
+import { useAdjacentBookings } from '~/features/bookings/hooks/use-day-bookings'
 import { useSelectedOrgId } from '~/features/bookings/hooks/use-home-loader-data'
 import { TagList } from '~/features/tags/components/tag-list'
 import { type AugmentedBooking } from '~/lib/api/functions/augment-bookings-list'
@@ -49,6 +50,7 @@ export const BookingItem = ({ item, nextItem }: Properties) => {
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [isAddBetweenOpen, setIsAddBetweenOpen] = useState(false)
   const selectedOrgId = useSelectedOrgId()
+  const adjacent = useAdjacentBookings(item)
 
   const handleEditClose = () => setIsEditOpen(false)
   const handleAddClose = () => setIsAddOpen(false)
@@ -112,6 +114,8 @@ export const BookingItem = ({ item, nextItem }: Properties) => {
       )}
       <Modal onClose={handleEditClose} open={isEditOpen}>
         <BookingAddUpdateForm
+          bookingAfter={adjacent.next}
+          bookingBefore={adjacent.previous}
           itemUpdate={item}
           mode="update"
           onClose={handleEditClose}
@@ -121,6 +125,7 @@ export const BookingItem = ({ item, nextItem }: Properties) => {
       <Modal onClose={handleAddClose} open={isAddOpen}>
         <BookingAddUpdateForm
           itemReference={item}
+          latestBooking={item}
           mode="add"
           onClose={handleAddClose}
           selectedOrgId={selectedOrgId}

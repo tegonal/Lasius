@@ -37,7 +37,7 @@ export const getRunningBookingDefaults = (booking: RunningBooking) => ({
  * latest booking, the picker gets no preset.
  */
 export const getStartPreset = (
-  latestBooking: null | undefined | { end?: { dateTime: string } },
+  latestBooking: null | undefined | { end?: null | { dateTime: string } },
   presetLabel: string,
 ) =>
   latestBooking?.end

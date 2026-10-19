@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '~/components/primitives/buttons/button'
 import { Modal } from '~/components/ui/overlays/modal/modal'
 import { BookingAddUpdateForm } from '~/features/bookings/components/booking-add-update-form'
+import { useLatestEndedBooking } from '~/features/bookings/hooks/use-day-bookings'
 import { useHomeLoaderData } from '~/features/bookings/hooks/use-home-loader-data'
 import { toLocalDate } from '~/lib/utils/dates'
 
@@ -34,6 +35,8 @@ export const BookingAddButton = ({ selectedOrgId }: Properties) => {
   const [isOpen, setIsOpen] = useState(false)
   const { t } = useTranslation('bookings')
   const selectedDay = useHomeLoaderData()?.selectedDate
+  const formDay = selectedDay ? toLocalDate(selectedDay) : new Date()
+  const latestBooking = useLatestEndedBooking(formDay)
 
   const handleClose = () => setIsOpen(false)
 
@@ -44,6 +47,7 @@ export const BookingAddButton = ({ selectedOrgId }: Properties) => {
       </Button>
       <Modal onClose={handleClose} open={isOpen}>
         <BookingAddUpdateForm
+          latestBooking={latestBooking}
           mode="add"
           onClose={handleClose}
           selectedDate={selectedDay ? toLocalDate(selectedDay) : undefined}

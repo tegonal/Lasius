@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Modal } from '~/components/ui/overlays/modal/modal'
 import { BookingAddUpdateForm } from '~/features/bookings/components/booking-add-update-form'
+import { useAdjacentBookings } from '~/features/bookings/hooks/use-day-bookings'
 import { useHomeLoaderData, useSelectedOrgId } from '~/features/bookings/hooks/use-home-loader-data'
 import { useStopAndStart } from '~/features/bookings/hooks/use-stop-and-start'
 import {
@@ -43,7 +44,6 @@ import { ContextBody } from '~/features/context-menu/context-body'
 import { useContextMenu } from '~/features/context-menu/hooks/use-context-menu'
 import { type AugmentedBooking } from '~/lib/api/functions/augment-bookings-list'
 import { formatISOLocale } from '~/lib/utils/dates'
-import { type ModelsBooking } from '~/services/api/lasius'
 import {
   useDeleteUserBooking,
   useUpdateUserBooking,
@@ -59,23 +59,11 @@ const useCurrentBookingId = (): string | undefined => {
   return loaderData?.currentBooking?.booking?.id
 }
 
-const useGetAdjacentBookings = (item: ModelsBooking) => {
-  const loaderData = useHomeLoaderData()
-
-  const bookings = loaderData?.augmentedBookings ?? []
-  const index = bookings.findIndex((b) => b.id === item.id)
-
-  return {
-    next: index > 0 ? bookings[index - 1] : null,
-    previous: index < bookings.length - 1 ? bookings[index + 1] : null,
-  }
-}
-
 export const BookingItemContext = ({ item }: Properties) => {
   const { t } = useTranslation('common')
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const { handleCloseAll } = useContextMenu()
-  const { next: nextBooking, previous: previousBooking } = useGetAdjacentBookings(item)
+  const { next: nextBooking, previous: previousBooking } = useAdjacentBookings(item)
   const selectedOrgId = useSelectedOrgId()
   const currentBookingId = useCurrentBookingId()
   const bookingDeletionApi = useDeleteUserBooking()
@@ -189,8 +177,8 @@ export const BookingItemContext = ({ item }: Properties) => {
       </ContextBody>
       <Modal onClose={() => setIsEditModalOpen(false)} open={isEditModalOpen}>
         <BookingAddUpdateForm
-          bookingAfter={nextBooking ?? undefined}
-          bookingBefore={previousBooking ?? undefined}
+          bookingAfter={nextBooking}
+          bookingBefore={previousBooking}
           itemUpdate={item}
           mode="update"
           onClose={() => setIsEditModalOpen(false)}

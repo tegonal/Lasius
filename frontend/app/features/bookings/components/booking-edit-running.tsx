@@ -47,7 +47,7 @@ import { useUpdateUserBooking } from '~/services/api/lasius-hooks/user-bookings/
 
 type BookingEditRunningProperties = {
   item: ModelsCurrentUserTimeBooking
-  latestBooking?: null | { end?: { dateTime: string } }
+  latestBooking?: null | { end?: null | { dateTime: string } }
   onClose: () => void
   selectedOrgId: string
 }

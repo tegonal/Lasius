@@ -32,6 +32,7 @@ import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { Modal } from '~/components/ui/overlays/modal/modal'
 import { ModalCloseButton } from '~/components/ui/overlays/modal/modal-close-button'
 import { BookingAddUpdateForm } from '~/features/bookings/components/booking-add-update-form'
+import { useLatestEndedBooking } from '~/features/bookings/hooks/use-day-bookings'
 import { BookingStart } from '~/features/home/components/booking-start'
 import { FavoriteListCompact } from '~/features/home/components/favorite-list-compact'
 import { OrgSwitcherModal } from '~/features/organisation/components/org-switcher-modal'
@@ -60,6 +61,8 @@ export const MobileFloatingActionButton = () => {
   const { t } = useTranslation('common')
   const fetcher = useFetcher()
   const { selectedOrganisationId } = useOrganisation()
+  // The add form below opens on today, so only a booking that ends today is a valid preset.
+  const latestBooking = useLatestEndedBooking(new Date())
   const favoritesApi = useGetFavoriteBookingList({
     fetcherKey: selectedOrganisationId ? `favorites:${selectedOrganisationId}` : undefined,
   })
@@ -168,6 +171,7 @@ export const MobileFloatingActionButton = () => {
       <Modal onClose={closeModal} open={openModal === 'add'}>
         <ModalCloseButton onClose={closeModal} />
         <BookingAddUpdateForm
+          latestBooking={latestBooking}
           mode="add"
           onClose={closeModal}
           selectedOrgId={selectedOrganisationId}

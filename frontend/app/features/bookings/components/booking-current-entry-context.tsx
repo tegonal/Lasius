@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Modal } from '~/components/ui/overlays/modal/modal'
 import { BookingEditRunning } from '~/features/bookings/components/booking-edit-running'
+import { useLatestEndedBooking } from '~/features/bookings/hooks/use-day-bookings'
 import { useHomeLoaderData } from '~/features/bookings/hooks/use-home-loader-data'
 import { ContextButtonAction } from '~/features/context-menu/buttons/context-button-action'
 import { ContextButtonAddFavorite } from '~/features/context-menu/buttons/context-button-add-favorite'
@@ -53,14 +54,6 @@ const useCurrentBooking = (): ModelsCurrentUserTimeBooking | undefined => {
   return loaderData?.currentBooking
 }
 
-const useGetPreviousBooking = (item: ModelsBooking) => {
-  const loaderData = useHomeLoaderData()
-
-  const bookings = loaderData?.augmentedBookings ?? []
-  const index = bookings.findIndex((b) => b.id === item.id)
-  return index < bookings.length - 1 ? bookings[index + 1] : null
-}
-
 export const BookingCurrentEntryContext = ({
   currentBookingOverride,
   item,
@@ -69,7 +62,8 @@ export const BookingCurrentEntryContext = ({
   const { t } = useTranslation('common')
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const { handleCloseAll } = useContextMenu()
-  const previousBooking = useGetPreviousBooking(item)
+  // The day list holds no running booking, so the reference is the newest finished booking before it.
+  const previousBooking = useLatestEndedBooking(new Date(item.start.dateTime), item.start.dateTime)
   const { selectedOrganisationId } = useOrganisation()
   const homeCurrentBooking = useCurrentBooking()
   const currentBooking = currentBookingOverride ?? homeCurrentBooking
@@ -149,6 +143,7 @@ export const BookingCurrentEntryContext = ({
         <Modal onClose={() => setIsEditModalOpen(false)} open={isEditModalOpen}>
           <BookingEditRunning
             item={currentBooking}
+            latestBooking={previousBooking}
             onClose={() => setIsEditModalOpen(false)}
             selectedOrgId={selectedOrgId}
           />
