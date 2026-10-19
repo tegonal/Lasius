@@ -182,7 +182,7 @@ corepack enable
 cp frontend/.env.template frontend/.env.local
 
 # 3. Start dev services (MongoDB, Keycloak, Mailpit, Caddy proxy)
-cd services && yarn services:start
+cd services && yarn start
 
 # 4. Start backend + frontend in tmux
 ./dev.sh
@@ -193,11 +193,11 @@ cd services && yarn services:start
 Dev services are managed from the `services/` directory:
 
 ```bash
-yarn services:start    # Start all dev services (MongoDB, Keycloak, Mailpit, Caddy)
-yarn services:stop     # Stop all dev services
-yarn services:clean    # Stop and remove all data volumes
-yarn services:logs     # Stream service logs
-yarn services:status   # Show service status
+yarn start    # Start all dev services (MongoDB, Keycloak, Mailpit, Caddy)
+yarn stop     # Stop all dev services
+yarn clean    # Stop and remove all data volumes
+yarn logs     # Stream service logs
+yarn status   # Show service status
 ```
 
 ### Ports

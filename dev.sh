@@ -3,7 +3,7 @@
 set -euo pipefail
 
 # Lasius development server launcher (backend + frontend in tmux)
-# Prerequisites: services must be running (cd services && yarn services:start)
+# Prerequisites: services must be running (cd services && yarn start)
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 SESSION="lasius-dev"
@@ -54,7 +54,7 @@ export TERM=xterm-256color
 
 # Create tmux session with backend in first pane
 tmux new-session -d -s "$SESSION" -c "$ROOT/backend" \
-  "set -a; [ -f $ROOT/frontend/.env.local ] && . $ROOT/frontend/.env.local; set +a; LASIUS_CLEAN_DATABASE_ON_STARTUP=false sbt run -Dconfig.resource=dev-large.conf; code=\$?; echo \"[dev.sh] backend exited with code \$code at \$(date)\"; read -p 'Press Enter to close...'"
+  "set -a; [ -f $ROOT/frontend/.env.local ] && . $ROOT/frontend/.env.local; set +a; LASIUS_CLEAN_DATABASE_ON_STARTUP=false sbt run -Dconfig.resource=dev.conf; code=\$?; echo \"[dev.sh] backend exited with code \$code at \$(date)\"; read -p 'Press Enter to close...'"
 
 # Split: frontend RR7 (waits for backend via port check)
 tmux split-window -t "$SESSION" -v -c "$ROOT/frontend" \
