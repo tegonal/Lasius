@@ -17,31 +17,28 @@
  *
  */
 
-import { differenceInMilliseconds, isSameDay, parseISO } from 'date-fns'
-import { sumBy } from 'es-toolkit'
+import { format } from 'date-fns'
 import { useMemo } from 'react'
 
 import { useCalendarData } from '~/features/calendar/calendar-data-provider'
 import { getExpectedVsBookedPercentage } from '~/lib/api/functions/get-expected-vs-booked-percentage'
+import { getDailyTotalsSummary } from '~/lib/api/functions/get-models-booking-summary'
 import { type IsoDateString, toCalendarDay } from '~/lib/utils/dates'
+import { type ModelsDailyBookingTotal } from '~/services/api/lasius'
 
 const DEFAULT_PLANNED_HOURS = 8
 
-/**
- * Compute duration in hours from start to end ISO date strings.
- */
-const durationInHours = (start: string, end: string): number => {
-  const ms = differenceInMilliseconds(new Date(end), new Date(start))
-  return Math.round((ms / 1000 / 60 / 60) * 1000) / 1000
+/** Returns the booking count and the rounded hours of the day that `date` names. */
+export const getDaySummary = (
+  dailyTotals: ModelsDailyBookingTotal[] | undefined,
+  date: IsoDateString,
+) => {
+  const dayKey = format(toCalendarDay(date), 'yyyy-MM-dd')
+  return getDailyTotalsSummary((dailyTotals ?? []).filter((total) => total.date === dayKey))
 }
 
 /**
  * useCalendarDaySummary - Computes booking summary for a specific day from bulk calendar data
- *
- * This hook:
- * - Takes the pre-fetched bulk booking data from CalendarDataProvider
- * - Filters bookings for the specific day
- * - Computes summary statistics (hours, progress, etc.)
  *
  * Performance: No API calls - all data comes from context
  *
@@ -50,29 +47,10 @@ const durationInHours = (start: string, end: string): number => {
  * @param date - ISO date string for the day to summarize
  */
 export const useCalendarDaySummary = (date: IsoDateString) => {
-  const { bookings } = useCalendarData()
+  const { dailyTotals } = useCalendarData()
   const plannedWorkingHours = DEFAULT_PLANNED_HOURS
-  const targetDate = useMemo(() => toCalendarDay(date), [date])
 
-  // Filter bookings for this specific day
-  const dayBookings = useMemo(() => {
-    if (!bookings) return []
-
-    return bookings.filter((booking) => {
-      const bookingDate = parseISO(booking.start.dateTime)
-      return isSameDay(bookingDate, targetDate)
-    })
-  }, [bookings, targetDate])
-
-  // Calculate total hours for this day
-  const hours = useMemo(() => {
-    const total = sumBy(dayBookings, (booking) =>
-      booking.end?.dateTime ? durationInHours(booking.start.dateTime, booking.end.dateTime) : 0,
-    )
-    return Math.round(total * 100) / 100
-  }, [dayBookings])
-
-  const elements = dayBookings.length
+  const { elements, hours } = useMemo(() => getDaySummary(dailyTotals, date), [dailyTotals, date])
 
   // Calculate progress percentages
   const { fulfilledPercentage, progressBarPercentage } = useMemo(

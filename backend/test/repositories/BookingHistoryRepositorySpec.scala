@@ -24,7 +24,7 @@ package repositories
 import models.LocalDateTimeWithTimeZone.DateTimeHelper
 import models.{EntityReference, _}
 import mongo.EmbedMongo
-import org.joda.time.{DateTime, LocalDateTime}
+import org.joda.time.{DateTime, LocalDate, LocalDateTime}
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 import reactivemongo.api.bson._
 import reactivemongo.api.{FailoverStrategy, ReadPreference}
@@ -186,27 +186,59 @@ class BookingHistoryRepositorySpec extends EmbedMongo {
     }
   }
 
-  "summaryByRange" should {
-    val from = date("01.01.2000").toLocalDateTime
-    val to   = date("01.02.2000").toLocalDateTime
+  private val rangeFrom = date("01.01.2000").toLocalDateTime
+  private val rangeTo   = date("01.02.2000").toLocalDateTime
 
-    def booking(user: EntityReference[UserId],
-                org: EntityReference[OrganisationId],
-                project: EntityReference[ProjectId],
-                start: DateTime,
-                hours: Int): BookingV2 =
-      BookingV2(BookingId(),
-                start.toLocalDateTimeWithZone(),
-                Some(start.plusHours(hours).toLocalDateTimeWithZone()),
-                user,
-                org,
-                project,
-                Set())
+  private def booking(user: EntityReference[UserId],
+                      org: EntityReference[OrganisationId],
+                      project: EntityReference[ProjectId],
+                      start: DateTime,
+                      hours: Int): BookingV2 =
+    BookingV2(BookingId(),
+              start.toLocalDateTimeWithZone(),
+              Some(start.plusHours(hours).toLocalDateTimeWithZone()),
+              user,
+              org,
+              project,
+              Set())
 
-    def insert(bookings: BookingV2*): Unit =
-      withDBSession() { implicit dbSession =>
-        repository.bulkInsert(bookings.toList)
+  private def insert(bookings: BookingV2*): Unit =
+    withDBSession() { implicit dbSession =>
+      repository.bulkInsert(bookings.toList)
+    }.awaitResult()
+
+  "dailyTotalsByRange" should {
+
+    "group the bookings of the user by start day, in date order" in {
+      val user    = EntityReference(UserId(), "dailyUser")
+      val other   = EntityReference(UserId(), "otherUser")
+      val org     = EntityReference(OrganisationId(), "dailyOrg")
+      val project = EntityReference(ProjectId(), "dailyProject")
+      insert(
+        booking(user, org, project, date("31.12.1999").plusHours(22), 4),
+        booking(user, org, project, date("05.01.2000").plusHours(13), 2),
+        booking(user, org, project, date("05.01.2000").plusHours(8), 3),
+        booking(user, org, project, date("03.01.2000").plusHours(8), 1),
+        booking(other, org, project, date("03.01.2000").plusHours(8), 5),
+        booking(user, org, project, date("05.02.2000").plusHours(8), 6)
+      )
+
+      val totals = withDBSession() { implicit dbSession =>
+        repository.dailyTotalsByRange(user, org.id, rangeFrom, rangeTo)
       }.awaitResult()
+
+      totals must equalTo(
+        Seq(
+          DailyBookingTotal(LocalDate.parse("1999-12-31"), 4L * 3600000, 1),
+          DailyBookingTotal(LocalDate.parse("2000-01-03"), 1L * 3600000, 1),
+          DailyBookingTotal(LocalDate.parse("2000-01-05"), 5L * 3600000, 2)
+        ))
+    }
+  }
+
+  "summaryByRange" should {
+    val from = rangeFrom
+    val to   = rangeTo
 
     def summary(user: Option[EntityReference[UserId]],
                 org: Option[OrganisationId],

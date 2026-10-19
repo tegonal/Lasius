@@ -37,7 +37,7 @@ import { getPlannedHoursForRange } from '~/lib/api/functions/get-planned-working
 import { apiTimespanMonth, toCalendarDay } from '~/lib/utils/dates'
 import {
   getUserBookingAggregatedStatsByOrganisation,
-  getUserBookingListByOrganisation,
+  getUserBookingDailyTotals,
 } from '~/services/api/lasius/user-bookings/user-bookings'
 
 import { type Route } from './+types/user.dashboard.month'
@@ -60,8 +60,8 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
   const monthEndDate = endOfMonth(dateObject)
 
   // Fetch month bookings and aggregated project stats in parallel
-  const [monthBookingsResponse, projectStatsResponse] = await Promise.all([
-    getUserBookingListByOrganisation(selectedOrgId, monthTimespan, {
+  const [dailyTotalsResponse, projectStatsResponse] = await Promise.all([
+    getUserBookingDailyTotals(selectedOrgId, monthTimespan, {
       headers,
     }),
     getUserBookingAggregatedStatsByOrganisation(
@@ -76,18 +76,18 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
     ),
   ])
 
-  const monthBookings = monthBookingsResponse.data ?? []
+  const dailyTotals = dailyTotalsResponse.data ?? []
   const projectStats = projectStatsResponse.data ?? []
 
   // Compute month summary
   const expectedHours = getPlannedHoursForRange(monthStartDate, monthEndDate, plannedHours)
-  const stats = computeDashboardStats(monthBookings, expectedHours)
+  const stats = computeDashboardStats(dailyTotals, expectedHours)
 
   // Aggregate top projects
   const topProjects = aggregateProjectHours(projectStats, 5)
 
   // Compute stream chart data
-  const streamChart = computeStreamChartData(monthBookings, selectedDate)
+  const streamChart = computeStreamChartData(dailyTotals, selectedDate)
 
   return data(
     { selectedDate, stats, streamChart, topProjects },

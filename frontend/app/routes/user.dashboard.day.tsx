@@ -35,7 +35,7 @@ import { getPlannedHoursForDay } from '~/lib/api/functions/get-planned-working-h
 import { apiTimespanDay, toCalendarDay } from '~/lib/utils/dates'
 import {
   getUserBookingAggregatedStatsByOrganisation,
-  getUserBookingListByOrganisation,
+  getUserBookingDailyTotals,
 } from '~/services/api/lasius/user-bookings/user-bookings'
 
 import { type Route } from './+types/user.dashboard.day'
@@ -57,8 +57,8 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
   const dayDate = format(dateObject, 'yyyy-MM-dd')
 
   // Fetch day bookings and aggregated project stats in parallel
-  const [dayBookingsResponse, projectStatsResponse] = await Promise.all([
-    getUserBookingListByOrganisation(selectedOrgId, dayTimespan, {
+  const [dailyTotalsResponse, projectStatsResponse] = await Promise.all([
+    getUserBookingDailyTotals(selectedOrgId, dayTimespan, {
       headers,
     }),
     getUserBookingAggregatedStatsByOrganisation(
@@ -73,12 +73,12 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
     ),
   ])
 
-  const dayBookings = dayBookingsResponse.data ?? []
+  const dailyTotals = dailyTotalsResponse.data ?? []
   const projectStats = projectStatsResponse.data ?? []
 
   // Compute day summary
   const expectedHours = getPlannedHoursForDay(dateObject, plannedHours)
-  const stats = computeDashboardStats(dayBookings, expectedHours)
+  const stats = computeDashboardStats(dailyTotals, expectedHours)
 
   // Aggregate ALL projects (day shows all, no topN limit)
   const projects = aggregateProjectHours(projectStats)

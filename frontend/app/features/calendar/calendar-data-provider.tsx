@@ -27,10 +27,10 @@ import {
   isoDateOrFallback,
   type IsoDateString,
 } from '~/lib/utils/dates'
-import { type ModelsBooking } from '~/services/api/lasius/modelsBooking'
+import { type ModelsDailyBookingTotal } from '~/services/api/lasius'
 
 type CalendarDataContextValue = {
-  bookings: ModelsBooking[] | undefined
+  dailyTotals: ModelsDailyBookingTotal[] | undefined
   error: unknown
   isLoading: boolean
 }
@@ -40,7 +40,7 @@ type CalendarPeriod = 'month' | 'week'
 const CalendarDataContext = createContext<CalendarDataContextValue | undefined>(undefined)
 
 /**
- * CalendarDataProvider - Fetches booking data for an entire calendar period (week/month)
+ * CalendarDataProvider - Fetches the booked time per day for an entire calendar period (week/month)
  * instead of making individual API calls per day.
  *
  * This provider:
@@ -60,7 +60,7 @@ export const CalendarDataProvider = ({
   organisationId: string
   period: CalendarPeriod
 }) => {
-  const fetcher = useFetcher<{ bookings: ModelsBooking[] }>()
+  const fetcher = useFetcher<{ dailyTotals: ModelsDailyBookingTotal[] }>()
 
   const safeDate = isoDateOrFallback(date, formatDateToURLParameter(new Date()))
 
@@ -81,8 +81,8 @@ export const CalendarDataProvider = ({
 
   const value = useMemo<CalendarDataContextValue>(
     () => ({
-      bookings: fetcher.data?.bookings,
-      error: fetcher.data && !('bookings' in fetcher.data) ? fetcher.data : undefined,
+      dailyTotals: fetcher.data?.dailyTotals,
+      error: fetcher.data && !('dailyTotals' in fetcher.data) ? fetcher.data : undefined,
       isLoading: fetcher.state === 'loading',
     }),
     [fetcher.data, fetcher.state],

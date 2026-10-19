@@ -19,9 +19,9 @@
 
 import { eachWeekOfInterval, endOfMonth, format, getWeek, startOfMonth } from 'date-fns'
 
-import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
+import { durationMsToHours } from '~/lib/api/functions/get-models-booking-summary'
 import { toCalendarDay } from '~/lib/utils/dates'
-import { type ModelsBooking } from '~/services/api/lasius'
+import { type ModelsDailyBookingTotal } from '~/services/api/lasius'
 
 const WEEK_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
@@ -31,7 +31,10 @@ const weekLabel = (date: Date) => `Week ${getWeek(date, { weekStartsOn: 1 })}`
  * Hours per weekday (one row each, Monday first) and per week of the month, in the Nivo stream
  * format. The keys list only the weeks that have booked hours.
  */
-export const computeStreamChartData = (bookings: ModelsBooking[], selectedDate: string) => {
+export const computeStreamChartData = (
+  dailyTotals: ModelsDailyBookingTotal[],
+  selectedDate: string,
+) => {
   const dateObject = toCalendarDay(selectedDate)
   const weekLabels = eachWeekOfInterval(
     { end: endOfMonth(dateObject), start: startOfMonth(dateObject) },
@@ -39,12 +42,12 @@ export const computeStreamChartData = (bookings: ModelsBooking[], selectedDate: 
   ).map((weekStart) => weekLabel(weekStart))
 
   const hours = new Map<string, number>()
-  for (const booking of bookings) {
-    const bookingDate = new Date(booking.start.dateTime)
-    const week = weekLabel(bookingDate)
+  for (const dailyTotal of dailyTotals) {
+    const day = toCalendarDay(dailyTotal.date)
+    const week = weekLabel(day)
     if (!weekLabels.includes(week)) continue
-    const key = `${format(bookingDate, 'EEE')}|${week}`
-    hours.set(key, (hours.get(key) ?? 0) + getModelsBookingSummary([booking]).hours)
+    const key = `${format(day, 'EEE')}|${week}`
+    hours.set(key, (hours.get(key) ?? 0) + durationMsToHours(dailyTotal.durationMs))
   }
 
   const data = WEEK_DAYS.map((day) =>

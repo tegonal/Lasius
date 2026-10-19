@@ -34,7 +34,7 @@ import { computeWorkHealthMetrics } from '~/lib/api/functions/compute-work-healt
 import { getWeeklyPlannedHours } from '~/lib/api/functions/get-planned-working-hours'
 import { formatDateTimeToURLParameter, toCalendarDay } from '~/lib/utils/dates'
 import { cachedServerLoader } from '~/lib/utils/loader-cache'
-import { getUserBookingListByOrganisation } from '~/services/api/lasius/user-bookings/user-bookings'
+import { getUserBookingDailyTotals } from '~/services/api/lasius/user-bookings/user-bookings'
 
 import { type Route } from './+types/user.dashboard'
 
@@ -75,7 +75,7 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
   )
   const to = formatDateTimeToURLParameter(endOfWeek(referenceDate, { weekStartsOn: 1 }))
 
-  const bookingsResponse = await getUserBookingListByOrganisation(
+  const dailyTotalsResponse = await getUserBookingDailyTotals(
     selectedOrgId,
     { from, to },
     { headers },
@@ -83,7 +83,7 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
 
   // Compute burnout metrics server-side
   const { burnoutMetrics, weeklyData } = computeWorkHealthMetrics(
-    bookingsResponse.data,
+    dailyTotalsResponse.data,
     weeklyPlannedHours,
     WEEKS_TO_ANALYZE,
     selectedDate,

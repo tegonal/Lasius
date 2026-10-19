@@ -34,7 +34,7 @@ import { getPlannedHoursForRange } from '~/lib/api/functions/get-planned-working
 import { apiTimespanWeek, toCalendarDay } from '~/lib/utils/dates'
 import {
   getUserBookingAggregatedStatsByOrganisation,
-  getUserBookingListByOrganisation,
+  getUserBookingDailyTotals,
 } from '~/services/api/lasius/user-bookings/user-bookings'
 
 import { type Route } from './+types/user.dashboard.week'
@@ -57,8 +57,8 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
   const endOfWeekDate = endOfWeek(dateObject, { weekStartsOn: 1 })
 
   // Fetch week bookings and aggregated project stats in parallel
-  const [weekBookingsResponse, projectStatsResponse] = await Promise.all([
-    getUserBookingListByOrganisation(selectedOrgId, weekTimespan, {
+  const [dailyTotalsResponse, projectStatsResponse] = await Promise.all([
+    getUserBookingDailyTotals(selectedOrgId, weekTimespan, {
       headers,
     }),
     getUserBookingAggregatedStatsByOrganisation(
@@ -73,12 +73,12 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
     ),
   ])
 
-  const weekBookings = weekBookingsResponse.data ?? []
+  const dailyTotals = dailyTotalsResponse.data ?? []
   const projectStats = projectStatsResponse.data ?? []
 
   // Compute week summary
   const expectedHours = getPlannedHoursForRange(weekStartDate, endOfWeekDate, plannedHours)
-  const stats = computeDashboardStats(weekBookings, expectedHours)
+  const stats = computeDashboardStats(dailyTotals, expectedHours)
 
   // Aggregate top 5 projects
   const topProjects = aggregateProjectHours(projectStats, 5)

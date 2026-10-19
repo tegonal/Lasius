@@ -26,10 +26,16 @@ import core.DBSession
 import models.BaseFormat._
 import models.UserId.UserReference
 import models._
-import org.joda.time.LocalDateTime
+import org.joda.time.{LocalDate, LocalDateTime}
 import play.api.Logging
 import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
+import reactivemongo.api.bson.{
+  BSONArray,
+  BSONDocument,
+  BSONInteger,
+  BSONNumberLike
+}
 import reactivemongo.api.bson.collection.BSONCollection
 import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.play.json.compat.ValueConverters
@@ -76,6 +82,15 @@ trait BookingHistoryRepository
                      from: LocalDateTime,
                      to: LocalDateTime)(implicit
       dbSession: DBSession): Future[BookingSummary]
+
+  /** Groups the bookings of `findByRange` by their start day. A booking that
+    * starts before `from` and ends in the range keeps its earlier start day.
+    */
+  def dailyTotalsByRange(userReference: UserReference,
+                         orgId: OrganisationId,
+                         from: LocalDateTime,
+                         to: LocalDateTime)(implicit
+      dbSession: DBSession): Future[Seq[DailyBookingTotal]]
 
   def updateBooking(newBooking: BookingV2)(implicit
       format: Format[BookingV2],
@@ -198,6 +213,52 @@ class BookingHistoryMongoRepository @Inject() ()(
     Json.obj(conditions.flatten: _*)
   }
 
+  // Without a timezone, $dateFromString reads the local time as UTC. The
+  // difference then equals the browser computation, and an unknown zone name
+  // cannot fail the aggregation.
+  private val durationMsExpression: BSONDocument = {
+    def instant(field: String): BSONDocument =
+      BSONDocument(
+        "$dateFromString" -> BSONDocument("dateString" -> s"$$$field.dateTime"))
+    BSONDocument("$subtract" -> BSONArray(instant("end"), instant("start")))
+  }
+
+  override def dailyTotalsByRange(userReference: UserReference,
+                                  orgId: OrganisationId,
+                                  from: LocalDateTime,
+                                  to: LocalDateTime)(implicit
+      dbSession: DBSession): Future[Seq[DailyBookingTotal]] = {
+    val collection = coll
+    import collection.AggregationFramework._
+
+    val sel = ValueConverters.toDocument(
+      rangeSelector(Some(userReference), Some(orgId), None, from, to))
+
+    // The first 10 characters of the stored local time are the start day.
+    val pipeline = List(
+      Match(sel),
+      Group(
+        BSONDocument("$substrBytes" -> BSONArray("$start.dateTime", 0, 10)))(
+        "durationMs" -> Sum(durationMsExpression),
+        "bookings"   -> Sum(BSONInteger(1))
+      ),
+      Sort(Ascending("_id"))
+    )
+
+    collection
+      .aggregateWith[BSONDocument]()(_ => pipeline)
+      .collect[List]()
+      .map(_.flatMap { doc =>
+        for {
+          date       <- doc.getAsOpt[String]("_id")
+          durationMs <- doc.getAsOpt[BSONNumberLike]("durationMs")
+          bookings   <- doc.getAsOpt[Int]("bookings")
+        } yield DailyBookingTotal(LocalDate.parse(date),
+                                  durationMs.toLong.getOrElse(0L),
+                                  bookings)
+      })
+  }
+
   override def summaryByRange(userReference: Option[UserReference],
                               orgId: Option[OrganisationId],
                               projectId: Option[ProjectId],
@@ -211,22 +272,13 @@ class BookingHistoryMongoRepository @Inject() ()(
     val sel = ValueConverters.toDocument(
       rangeSelector(userReference, orgId, projectId, from, to))
 
-    // Without a timezone, $dateFromString reads the local time as UTC. The
-    // difference then equals the browser computation, and an unknown zone
-    // name cannot fail the aggregation.
-    def instant(field: String): BSONDocument =
-      BSONDocument(
-        "$dateFromString" -> BSONDocument("dateString" -> s"$$$field.dateTime"))
-
     val pipeline = List(
       Match(sel),
       Group(BSONNull)(
-        "durationMs" -> Sum(
-          BSONDocument(
-            "$subtract" -> BSONArray(instant("end"), instant("start")))),
-        "bookings" -> Sum(BSONInteger(1)),
-        "users"    -> AddFieldToSet("userReference.id"),
-        "projects" -> AddFieldToSet("projectReference.id")
+        "durationMs" -> Sum(durationMsExpression),
+        "bookings"   -> Sum(BSONInteger(1)),
+        "users"      -> AddFieldToSet("userReference.id"),
+        "projects"   -> AddFieldToSet("projectReference.id")
       ),
       Project(
         BSONDocument(

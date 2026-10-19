@@ -17,7 +17,11 @@
  *
  */
 
-import { type ModelsBooking, type ModelsBookingSummary } from '~/services/api/lasius'
+import {
+  type ModelsBooking,
+  type ModelsBookingSummary,
+  type ModelsDailyBookingTotal,
+} from '~/services/api/lasius'
 
 import { getExtendedModelsBookingList } from './get-extended-models-booking-list'
 
@@ -43,8 +47,18 @@ export const EMPTY_BOOKING_SUMMARY: ModelsBookingSummary = {
   durationMs: 0,
 }
 
+export const durationMsToHours = (durationMs: number) => durationMs / MS_PER_HOUR
+
+/** Sums the daily totals before the rounding, as `getModelsBookingSummary` sums the bookings. */
+export const getDailyTotalsSummary = (totals: ModelsDailyBookingTotal[]) => ({
+  elements: totals.reduce((accumulator, total) => accumulator + total.bookings, 0),
+  hours: roundHours(
+    durationMsToHours(totals.reduce((accumulator, total) => accumulator + total.durationMs, 0)),
+  ),
+})
+
 /** Gives the summary of the backend the shape of `getModelsBookingSummary`. */
 export const getBookingSummaryFromApi = (summary: ModelsBookingSummary) => ({
   elements: summary.bookings,
-  hours: roundHours(summary.durationMs / MS_PER_HOUR),
+  hours: roundHours(durationMsToHours(summary.durationMs)),
 })

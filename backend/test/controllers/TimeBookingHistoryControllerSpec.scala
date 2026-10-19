@@ -253,6 +253,30 @@ class TimeBookingHistoryControllerSpec
       contentAsJson(result) must equalTo(Json.toJson(BookingSummary.empty))
     }
 
+    "successful for the daily totals if OrganisationMember" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: TimeBookingHistoryControllerMock =
+        controllers.TimeBookingHistoryControllerMock(config,
+                                                     systemServices,
+                                                     authConfig,
+                                                     reactiveMongoApi,
+                                                     organisationRole =
+                                                       OrganisationMember,
+                                                     projectRole =
+                                                       ProjectMember)
+
+      val result: Future[Result] =
+        controller.getUserBookingDailyTotals(controller.organisationId,
+                                             from,
+                                             to)(FakeRequest().withBody(()))
+
+      status(result) must equalTo(OK)
+      contentAsJson(result) must equalTo(Json.arr())
+    }
+
     "forbidden for the organisation summary if OrganisationMember" in new WithTestApplication {
 
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]

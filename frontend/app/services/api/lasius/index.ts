@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 3.0.0-beta5+13-9fd7c35c+20261020-0009
+ * OpenAPI spec version: 3.0.0-beta5+14-1ebaab02+20261020-0022
  */
 
 export * from './auth/auth.ts'
@@ -29,6 +29,7 @@ export * from './getProjectBookingListParams.ts'
 export * from './getProjectBookingSummaryParams.ts'
 export * from './getUserBookingAggregatedStatsByOrganisationGranularity.ts'
 export * from './getUserBookingAggregatedStatsByOrganisationParams.ts'
+export * from './getUserBookingDailyTotalsParams.ts'
 export * from './getUserBookingLatestListByOrganisationParams.ts'
 export * from './getUserBookingListByOrganisationParams.ts'
 export * from './getUserBookingSummaryByOrganisationParams.ts'
@@ -69,6 +70,7 @@ export * from './modelsCreateProjectMapping.ts'
 export * from './modelsCsrfToken.ts'
 export * from './modelsCurrentOrganisationTimeBookings.ts'
 export * from './modelsCurrentUserTimeBooking.ts'
+export * from './modelsDailyBookingTotal.ts'
 export * from './modelsEditBookingRequest.ts'
 export * from './modelsEntityReference.ts'
 export * from './modelsEntityReferenceModelsOrganisationId.ts'

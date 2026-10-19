@@ -19,7 +19,7 @@
 
 import { data } from 'react-router'
 
-import { getUserBookingListByOrganisation } from '~/services/api/lasius/user-bookings/user-bookings'
+import { getUserBookingDailyTotals } from '~/services/api/lasius/user-bookings/user-bookings'
 import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/api.calendar-bookings'
@@ -27,7 +27,7 @@ import { type Route } from './+types/api.calendar-bookings'
 /**
  * GET /api/calendar-bookings?orgId=xxx&from=xxx&to=xxx
  *
- * Resource route loader that fetches booking data for a date range.
+ * Resource route loader that fetches the booked time per day for a date range.
  * Called by CalendarDataProvider via useFetcher.load().
  */
 export async function loader({ request, url }: Route.LoaderArgs) {
@@ -37,14 +37,14 @@ export async function loader({ request, url }: Route.LoaderArgs) {
   const to = url.searchParams.get('to')
 
   if (!orgId || !from || !to) {
-    return data({ bookings: [] }, { headers: mergeAuthHeaders(auth), status: 400 })
+    return data({ dailyTotals: [] }, { headers: mergeAuthHeaders(auth), status: 400 })
   }
 
-  const result = await getUserBookingListByOrganisation(
+  const result = await getUserBookingDailyTotals(
     orgId,
     { from, to },
     { headers: authHeaders(auth.session) },
   )
 
-  return data({ bookings: result.data }, { headers: mergeAuthHeaders(auth) })
+  return data({ dailyTotals: result.data }, { headers: mergeAuthHeaders(auth) })
 }

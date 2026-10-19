@@ -17,11 +17,11 @@
  *
  */
 
-import { format, getWeek, getWeekYear, subWeeks } from 'date-fns'
+import { getWeek, getWeekYear, subWeeks } from 'date-fns'
 
+import { durationMsToHours } from '~/lib/api/functions/get-models-booking-summary'
 import { toCalendarDay } from '~/lib/utils/dates'
-import { durationInHoursAsNumber } from '~/lib/utils/duration'
-import { type ModelsBooking } from '~/services/api/lasius/modelsBooking'
+import { type ModelsDailyBookingTotal } from '~/services/api/lasius'
 
 export type BurnoutLevel = 'healthy' | 'risk' | 'warning'
 
@@ -50,18 +50,15 @@ const weekOf = (date: Date) => {
   return { key: `${year}-W${weekNumber}`, weekNumber, year }
 }
 
-const groupBookingsByWeek = (bookings: ModelsBooking[]): Map<string, WeekTotals> => {
+const groupDailyTotalsByWeek = (
+  dailyTotals: ModelsDailyBookingTotal[],
+): Map<string, WeekTotals> => {
   const weekMap = new Map<string, WeekTotals>()
-  for (const booking of bookings) {
-    const startDateTime = booking.start?.dateTime
-    const endDateTime = booking.end?.dateTime
-    if (!startDateTime || !endDateTime) continue
-
-    const bookingDate = new Date(startDateTime)
-    const { key } = weekOf(bookingDate)
+  for (const dailyTotal of dailyTotals) {
+    const { key } = weekOf(toCalendarDay(dailyTotal.date))
     const totals = weekMap.get(key) ?? { dates: new Set<string>(), hours: 0 }
-    totals.hours += durationInHoursAsNumber(startDateTime, endDateTime)
-    totals.dates.add(format(bookingDate, 'yyyy-MM-dd'))
+    totals.hours += durationMsToHours(dailyTotal.durationMs)
+    totals.dates.add(dailyTotal.date)
     weekMap.set(key, totals)
   }
   return weekMap
@@ -86,22 +83,22 @@ const burnoutLevel = (
  * Compute work health metrics including burnout indicators and weekly trends.
  * Pure server-side function ported from the useWorkHealthMetrics client hook.
  *
- * @param bookings - Booking records for the analysis period
+ * @param dailyTotals - Booked time per start day for the analysis period
  * @param plannedWeeklyHours - Weekly planned hours
  * @param weeksToAnalyze - Number of weeks to analyze
  * @param referenceDate - ISO date string used as reference point
  */
 export const computeWorkHealthMetrics = (
-  bookings: ModelsBooking[],
+  dailyTotals: ModelsDailyBookingTotal[],
   plannedWeeklyHours: number,
   weeksToAnalyze: number,
   referenceDate: string,
 ): { burnoutMetrics: BurnoutMetrics | null; weeklyData: WeekData[] } => {
-  if (!bookings || bookings.length === 0) {
+  if (dailyTotals.length === 0) {
     return { burnoutMetrics: null, weeklyData: [] }
   }
 
-  const weekMap = groupBookingsByWeek(bookings)
+  const weekMap = groupDailyTotalsByWeek(dailyTotals)
   const weeks: WeekData[] = Array.from({ length: weeksToAnalyze }, (_, index) => {
     const { key, weekNumber, year } = weekOf(
       subWeeks(toCalendarDay(referenceDate), weeksToAnalyze - 1 - index),

@@ -128,6 +128,18 @@ class TimeBookingHistoryController @Inject() (
         }
     }
 
+  def getUserBookingDailyTotals(orgId: OrganisationId,
+                                from: LocalDateTime,
+                                to: LocalDateTime): Action[Unit] =
+    HasUserRole(FreeUser, parse.empty, withinTransaction = false) {
+      implicit dbSession => implicit subject => user => implicit request =>
+        HasOrganisationRole(user, orgId, OrganisationMember) { _ =>
+          bookingHistoryRepository
+            .dailyTotalsByRange(subject.userReference, orgId, from, to)
+            .map(totals => Ok(Json.toJson(totals)))
+        }
+    }
+
   def getOrganisationBookingSummary(orgId: OrganisationId,
                                     from: LocalDateTime,
                                     to: LocalDateTime): Action[Unit] =

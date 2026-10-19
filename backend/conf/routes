@@ -504,6 +504,25 @@ GET /user-bookings/organisations/:orgId/bookings/summary            controllers.
 #    - bearerHttpAuthentication: []
 #  tags:
 #    - user-bookings
+#  summary: Get the total duration and the count of the current user's finished bookings per start day for selected organisation within the selected timeframe
+#  operationId: getUserBookingDailyTotals
+#  responses:
+#    200:
+#      description: success
+#      content:
+#        application/json:
+#          schema:
+#            type: array
+#            items:
+#              $ref: '#/components/schemas/models.DailyBookingTotal'
+###
+GET /user-bookings/organisations/:orgId/bookings/daily-totals       controllers.TimeBookingHistoryController.getUserBookingDailyTotals(orgId: models.OrganisationId,from:org.joda.time.LocalDateTime, to:org.joda.time.LocalDateTime)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
+#  tags:
+#    - user-bookings
 #  summary: Get aggregated stats for current user in selected organisation
 #  operationId: getUserBookingAggregatedStatsByOrganisation
 #  responses:

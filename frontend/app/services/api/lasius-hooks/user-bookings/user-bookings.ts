@@ -3,10 +3,11 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 3.0.0-beta5+13-9fd7c35c+20261020-0009
+ * OpenAPI spec version: 3.0.0-beta5+14-1ebaab02+20261020-0022
  */
 import type {
   GetUserBookingAggregatedStatsByOrganisationParams,
+  GetUserBookingDailyTotalsParams,
   GetUserBookingLatestListByOrganisationParams,
   GetUserBookingListByOrganisationParams,
   GetUserBookingSummaryByOrganisationParams,
@@ -17,6 +18,7 @@ import type {
   ModelsBookingSummary,
   ModelsCurrentOrganisationTimeBookings,
   ModelsCurrentUserTimeBooking,
+  ModelsDailyBookingTotal,
   ModelsEditBookingRequest,
   ModelsStartBookingRequest,
   ModelsStopBookingRequest,
@@ -153,6 +155,34 @@ export function useGetUserBookingSummaryByOrganisation(
   >(
     {
       getUrl: ({ orgId, params }) => getGetUserBookingSummaryByOrganisationUrl(orgId, params),
+      method: 'GET',
+    },
+    options,
+  )
+} /**
+ * @summary Get the total duration and the count of the current user's finished bookings per start day for selected organisation within the selected timeframe
+ */
+function getGetUserBookingDailyTotalsUrl(orgId: string, params?: GetUserBookingDailyTotalsParams) {
+  const normalizedParams = new URLSearchParams()
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  })
+  const query = normalizedParams.toString()
+  return query
+    ? `/user-bookings/organisations/${orgId}/bookings/daily-totals` + '?' + query
+    : `/user-bookings/organisations/${orgId}/bookings/daily-totals`
+}
+
+export function useGetUserBookingDailyTotals(options?: ApiProxyOptions<ModelsDailyBookingTotal[]>) {
+  return useApiProxy<
+    ModelsDailyBookingTotal[],
+    undefined,
+    { orgId: string; params?: GetUserBookingDailyTotalsParams }
+  >(
+    {
+      getUrl: ({ orgId, params }) => getGetUserBookingDailyTotalsUrl(orgId, params),
       method: 'GET',
     },
     options,

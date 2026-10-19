@@ -19,24 +19,17 @@
 
 import { describe, expect, it } from 'vitest'
 
-import { type ModelsBooking } from '~/services/api/lasius'
+import { type ModelsDailyBookingTotal } from '~/services/api/lasius'
 
 import { computeStreamChartData } from './month-stream-chart-data'
 
-// The production container runs with TZ=Europe/Zurich.
-process.env.TZ = 'Europe/Zurich'
+// A date-only string parses as UTC midnight. West of UTC that falls on the previous day.
+process.env.TZ = 'America/New_York'
 
-const reference = { id: 'ref', key: 'ref' }
-
-const booking = (start: string, end: string): ModelsBooking => ({
-  bookingHash: 0,
-  end: { dateTime: end, zone: 'Europe/Zurich' },
-  id: start,
-  organisationReference: reference,
-  projectReference: reference,
-  start: { dateTime: start, zone: 'Europe/Zurich' },
-  tags: [],
-  userReference: reference,
+const total = (date: string, minutes: number): ModelsDailyBookingTotal => ({
+  bookings: 1,
+  date,
+  durationMs: minutes * 60 * 1000,
 })
 
 // March 2026 spans the ISO weeks 9 (Monday 23 February) to 14 (Monday 30 March).
@@ -54,50 +47,31 @@ describe('computeStreamChartData', () => {
     expect(keys).toEqual([])
   })
 
-  it('adds the hours of a booking to its weekday and week', () => {
-    const { data, keys } = computeStreamChartData(
-      [booking('2026-03-02T09:00:00.000', '2026-03-02T11:30:00.000')],
-      MARCH,
-    )
+  it('adds the hours of a day to its weekday and week', () => {
+    const { data, keys } = computeStreamChartData([total('2026-03-02', 150)], MARCH)
     expect(data[0]?.['Week 10']).toBe(2.5)
     expect(keys).toEqual(['Week 10'])
   })
 
-  it('sums the per-booking hours, which getModelsBookingSummary rounds to two decimals', () => {
-    // Two bookings of 20 minutes give 0.33 + 0.33, not 40 minutes as 0.67.
-    const { data } = computeStreamChartData(
-      [
-        booking('2026-03-04T09:00:00.000', '2026-03-04T09:20:00.000'),
-        booking('2026-03-04T10:00:00.000', '2026-03-04T10:20:00.000'),
-      ],
-      MARCH,
-    )
-    expect(data[2]?.['Week 10']).toBe(0.66)
+  it('rounds the hours of a day to two decimals', () => {
+    const { data } = computeStreamChartData([total('2026-03-04', 40)], MARCH)
+    expect(data[2]?.['Week 10']).toBe(0.67)
   })
 
-  it('puts a Sunday booking into the last row', () => {
-    const { data } = computeStreamChartData(
-      [booking('2026-03-01T09:00:00.000', '2026-03-01T10:00:00.000')],
-      MARCH,
-    )
+  it('puts a Sunday into the last row', () => {
+    const { data } = computeStreamChartData([total('2026-03-01', 60)], MARCH)
     expect(data[6]?.['Week 9']).toBe(1)
   })
 
-  it('ignores a booking in a week outside the month', () => {
-    const { data, keys } = computeStreamChartData(
-      [booking('2026-04-15T09:00:00.000', '2026-04-15T10:00:00.000')],
-      MARCH,
-    )
+  it('ignores a day in a week outside the month', () => {
+    const { data, keys } = computeStreamChartData([total('2026-04-15', 60)], MARCH)
     expect(keys).toEqual([])
     expect(data.every((row) => !('Week 16' in row))).toBe(true)
   })
 
   it('lists the keys in calendar order', () => {
     const { keys } = computeStreamChartData(
-      [
-        booking('2026-03-02T09:00:00.000', '2026-03-02T10:00:00.000'),
-        booking('2026-03-01T09:00:00.000', '2026-03-01T10:00:00.000'),
-      ],
+      [total('2026-03-02', 60), total('2026-03-01', 60)],
       MARCH,
     )
     expect(keys).toEqual(['Week 9', 'Week 10'])
@@ -106,10 +80,7 @@ describe('computeStreamChartData', () => {
   it('keeps week 1 of the next year after the December weeks', () => {
     // Monday 28 December 2026 starts the week that holds 1 January 2027.
     const { keys } = computeStreamChartData(
-      [
-        booking('2026-12-29T09:00:00.000', '2026-12-29T10:00:00.000'),
-        booking('2026-12-01T09:00:00.000', '2026-12-01T10:00:00.000'),
-      ],
+      [total('2026-12-29', 60), total('2026-12-01', 60)],
       '2026-12-15',
     )
     expect(keys).toEqual(['Week 49', 'Week 1'])

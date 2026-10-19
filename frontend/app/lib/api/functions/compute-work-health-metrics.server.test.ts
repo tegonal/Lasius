@@ -19,34 +19,25 @@
 
 import { describe, expect, it } from 'vitest'
 
-import { type ModelsBooking } from '~/services/api/lasius/modelsBooking'
+import { type ModelsDailyBookingTotal } from '~/services/api/lasius'
 
 import { computeWorkHealthMetrics } from './compute-work-health-metrics.server'
 
-// The production container runs with TZ=Europe/Zurich. Zurich is 2 hours ahead of UTC in
-// September, so a booking after midnight has a UTC date of the previous day.
-process.env.TZ = 'Europe/Zurich'
+// A date-only string parses as UTC midnight. West of UTC that falls on the previous day.
+process.env.TZ = 'America/New_York'
 
-const reference = { id: 'ref', key: 'ref' }
+const MS_PER_MINUTE = 60 * 1000
 
-const booking = (start: string, end: string): ModelsBooking => ({
-  bookingHash: 0,
-  end: { dateTime: end, zone: 'Europe/Zurich' },
-  id: start,
-  organisationReference: reference,
-  projectReference: reference,
-  start: { dateTime: start, zone: 'Europe/Zurich' },
-  tags: [],
-  userReference: reference,
+const total = (date: string, hours: number, minutes = 0): ModelsDailyBookingTotal => ({
+  bookings: 1,
+  date,
+  durationMs: (hours * 60 + minutes) * MS_PER_MINUTE,
 })
 
 describe('computeWorkHealthMetrics', () => {
-  it('counts a booking after midnight for its own day', () => {
+  it('counts each day with bookings once for its own week', () => {
     const { burnoutMetrics } = computeWorkHealthMetrics(
-      [
-        booking('2026-09-28T23:00:00.000', '2026-09-28T23:30:00.000'),
-        booking('2026-09-29T00:30:00.000', '2026-09-29T01:00:00.000'),
-      ],
+      [total('2026-09-28', 0, 30), total('2026-09-29', 0, 30)],
       40,
       1,
       '2026-09-30',
@@ -59,10 +50,7 @@ describe('computeWorkHealthMetrics', () => {
   it('keeps a week across the turn of the year together', () => {
     // Week 1 of 2027 starts on Monday, 28 December 2026.
     const { burnoutMetrics, weeklyData } = computeWorkHealthMetrics(
-      [
-        booking('2026-12-28T09:00:00.000', '2026-12-28T10:00:00.000'),
-        booking('2027-01-01T09:00:00.000', '2027-01-01T10:00:00.000'),
-      ],
+      [total('2026-12-28', 1), total('2027-01-01', 1)],
       40,
       1,
       '2026-12-30',
@@ -85,13 +73,11 @@ describe('computeWorkHealthMetrics', () => {
     '2026-10-04',
   ]
   const pad = (value: number) => String(value).padStart(2, '0')
-  const workday = (date: string, hours: number, minutes = 0) =>
-    booking(`${date}T08:00:00.000`, `${date}T${pad(8 + hours)}:${pad(minutes)}:00.000`)
-  const day = (dayOfMonth: number, hours: number) => workday(`2026-09-${pad(dayOfMonth)}`, hours)
+  const day = (dayOfMonth: number, hours: number) => total(`2026-09-${pad(dayOfMonth)}`, hours)
   const week = (days: number, hours: number, minutes = 0) =>
-    WEEK_40.slice(0, days).map((date) => workday(date, hours, minutes))
-  const levelOf = (bookings: ModelsBooking[]) =>
-    computeWorkHealthMetrics(bookings, 40, 1, '2026-09-30').burnoutMetrics?.level
+    WEEK_40.slice(0, days).map((date) => total(date, hours, minutes))
+  const levelOf = (totals: ModelsDailyBookingTotal[]) =>
+    computeWorkHealthMetrics(totals, 40, 1, '2026-09-30').burnoutMetrics?.level
 
   it('returns no metrics and no weeks without bookings', () => {
     expect(computeWorkHealthMetrics([], 40, 4, '2026-09-30')).toEqual({
@@ -100,10 +86,9 @@ describe('computeWorkHealthMetrics', () => {
     })
   })
 
-  it('ignores a booking without an end and lists one entry per analysed week', () => {
-    const open: ModelsBooking = { ...day(28, 4), end: undefined }
+  it('lists one entry per analysed week and ignores days before the first week', () => {
     const { burnoutMetrics, weeklyData } = computeWorkHealthMetrics(
-      [open, day(29, 4)],
+      [total('2026-09-01', 4), day(29, 4)],
       40,
       3,
       '2026-09-30',

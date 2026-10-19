@@ -19,15 +19,38 @@
 
 import { describe, expect, it } from 'vitest'
 
-// The pure functions are module-private in use-calendar-day-summary.ts.
-// We re-implement them here for unit testing since the module only exports a hook.
-// These tests validate the calculation logic used by useCalendarDaySummary.
+import { getDaySummary } from './use-calendar-day-summary'
 
-const durationInHours = (start: string, end: string): number => {
-  const ms = new Date(end).getTime() - new Date(start).getTime()
-  return Math.round((ms / 1000 / 60 / 60) * 1000) / 1000
-}
+// A date-only string parses as UTC midnight. West of UTC that falls on the previous day.
+process.env.TZ = 'America/New_York'
 
+const HOUR_MS = 60 * 60 * 1000
+
+describe('getDaySummary', () => {
+  const dailyTotals = [
+    { bookings: 2, date: '2026-01-14', durationMs: 3 * HOUR_MS },
+    { bookings: 3, date: '2026-01-15', durationMs: (8 * 60 + 20) * 60 * 1000 },
+  ]
+
+  it('reads the total of the day that a date names', () => {
+    expect(getDaySummary(dailyTotals, '2026-01-15')).toEqual({ elements: 3, hours: 8.33 })
+  })
+
+  it('reads the day of a date-time string', () => {
+    expect(getDaySummary(dailyTotals, '2026-01-14T09:00:00.000-05:00')).toEqual({
+      elements: 2,
+      hours: 3,
+    })
+  })
+
+  it('returns zero for a day without a total and for missing data', () => {
+    expect(getDaySummary(dailyTotals, '2026-01-16')).toEqual({ elements: 0, hours: 0 })
+    expect(getDaySummary(undefined, '2026-01-15')).toEqual({ elements: 0, hours: 0 })
+  })
+})
+
+// The percentage function is module-private in use-calendar-day-summary.ts, so this file
+// re-implements it to test the calculation.
 const getExpectedVsBookedPercentage = (expected: number, worked: number) => {
   let fulfilledPercentage = 0
   if (expected === 0 && worked > 0) fulfilledPercentage = 100
@@ -40,32 +63,6 @@ const getExpectedVsBookedPercentage = (expected: number, worked: number) => {
 
   return { fulfilledPercentage, progressBarPercentage }
 }
-
-describe('durationInHours', () => {
-  it('returns 1 for a 1-hour duration', () => {
-    expect(durationInHours('2026-01-15T09:00:00.000+01:00', '2026-01-15T10:00:00.000+01:00')).toBe(
-      1,
-    )
-  })
-
-  it('returns 0.5 for a 30-minute duration', () => {
-    expect(durationInHours('2026-01-15T09:00:00.000+01:00', '2026-01-15T09:30:00.000+01:00')).toBe(
-      0.5,
-    )
-  })
-
-  it('returns 8 for a full workday', () => {
-    expect(durationInHours('2026-01-15T08:00:00.000+01:00', '2026-01-15T16:00:00.000+01:00')).toBe(
-      8,
-    )
-  })
-
-  it('returns 0 when start equals end', () => {
-    expect(durationInHours('2026-01-15T09:00:00.000+01:00', '2026-01-15T09:00:00.000+01:00')).toBe(
-      0,
-    )
-  })
-})
 
 describe('getExpectedVsBookedPercentage', () => {
   it('returns 0% when no hours worked', () => {

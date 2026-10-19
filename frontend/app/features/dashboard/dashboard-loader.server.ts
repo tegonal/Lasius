@@ -18,11 +18,11 @@
  */
 
 import { getExpectedVsBookedPercentage } from '~/lib/api/functions/get-expected-vs-booked-percentage'
-import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-summary'
+import { getDailyTotalsSummary } from '~/lib/api/functions/get-models-booking-summary'
 import { getUserClock } from '~/lib/cookies/time-zone-cookie.server'
 import { loadOrganisationContext } from '~/lib/organisation-helpers.server'
 import { isoDateOrFallback } from '~/lib/utils/dates'
-import { type ModelsBooking } from '~/services/api/lasius'
+import { type ModelsDailyBookingTotal } from '~/services/api/lasius'
 import { mergeAuthHeaders, type requireUser } from '~/services/auth/auth-helpers.server'
 
 /**
@@ -49,10 +49,13 @@ export const loadDashboardContext = async (request: Request, url: URL) => {
 }
 
 /**
- * Compute the standard stats object from bookings and expected hours.
+ * Compute the standard stats object from the daily totals and the expected hours.
  */
-export const computeDashboardStats = (bookings: ModelsBooking[], expectedHours: number) => {
-  const summary = getModelsBookingSummary(bookings)
+export const computeDashboardStats = (
+  dailyTotals: ModelsDailyBookingTotal[],
+  expectedHours: number,
+) => {
+  const summary = getDailyTotalsSummary(dailyTotals)
   const { fulfilledPercentage } = getExpectedVsBookedPercentage(expectedHours, summary.hours)
   return {
     bookings: summary.elements,

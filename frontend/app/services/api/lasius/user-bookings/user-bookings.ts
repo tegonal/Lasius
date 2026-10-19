@@ -3,10 +3,11 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 3.0.0-beta5+13-9fd7c35c+20261020-0009
+ * OpenAPI spec version: 3.0.0-beta5+14-1ebaab02+20261020-0022
  */
 import type {
   GetUserBookingAggregatedStatsByOrganisationParams,
+  GetUserBookingDailyTotalsParams,
   GetUserBookingLatestListByOrganisationParams,
   GetUserBookingListByOrganisationParams,
   GetUserBookingSummaryByOrganisationParams,
@@ -17,6 +18,7 @@ import type {
   ModelsBookingSummary,
   ModelsCurrentOrganisationTimeBookings,
   ModelsCurrentUserTimeBooking,
+  ModelsDailyBookingTotal,
   ModelsEditBookingRequest,
   ModelsStartBookingRequest,
   ModelsStopBookingRequest,
@@ -399,6 +401,52 @@ export const getUserBookingSummaryByOrganisation = async (
 ): Promise<getUserBookingSummaryByOrganisationResponse> => {
   return lasiusFetch<getUserBookingSummaryByOrganisationResponse>(
     getGetUserBookingSummaryByOrganisationUrl(orgId, params),
+    {
+      ...options,
+      method: 'GET',
+    },
+  )
+}
+
+export type getUserBookingDailyTotalsResponse200 = {
+  data: ModelsDailyBookingTotal[]
+  status: 200
+}
+
+export type getUserBookingDailyTotalsResponseSuccess = getUserBookingDailyTotalsResponse200 & {
+  headers: Headers
+}
+export type getUserBookingDailyTotalsResponse = getUserBookingDailyTotalsResponseSuccess
+
+export const getGetUserBookingDailyTotalsUrl = (
+  orgId: string,
+  params: GetUserBookingDailyTotalsParams,
+) => {
+  const normalizedParams = new URLSearchParams()
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  })
+
+  const stringifiedParams = normalizedParams.toString()
+
+  return stringifiedParams.length > 0
+    ? `/user-bookings/organisations/${orgId}/bookings/daily-totals?${stringifiedParams}`
+    : `/user-bookings/organisations/${orgId}/bookings/daily-totals`
+}
+
+/**
+ * @summary Get the total duration and the count of the current user's finished bookings per start day for selected organisation within the selected timeframe
+ */
+export const getUserBookingDailyTotals = async (
+  orgId: string,
+  params: GetUserBookingDailyTotalsParams,
+  options?: Parameters<typeof lasiusFetch>[1],
+): Promise<getUserBookingDailyTotalsResponse> => {
+  return lasiusFetch<getUserBookingDailyTotalsResponse>(
+    getGetUserBookingDailyTotalsUrl(orgId, params),
     {
       ...options,
       method: 'GET',
