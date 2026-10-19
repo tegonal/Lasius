@@ -28,15 +28,18 @@ const presetKey = (booking: ModelsBooking) =>
     .toSorted((a, b) => a.localeCompare(b))
     .join(',')}`
 
+const newestFirst = (a: ModelsBooking, b: ModelsBooking) =>
+  b.start.dateTime.localeCompare(a.start.dateTime)
+
 /**
- * Returns one booking for each combination of project and tags, the newest first.
+ * Returns the newest booking for each combination of project and tags, up to `limit`.
+ * The result is ordered by project name, and the newest comes first inside one project.
  * The `dateTime` strings have the form yyyy-MM-ddTHH:mm:ss.SSS, so a string compare orders them.
  */
 export const deduplicateBookings = (items: ModelsBooking[], limit = RECENT_BOOKINGS_LIMIT) => {
   const seen = new Set<string>()
   const unique: ModelsBooking[] = []
-  const newestFirst = items.toSorted((a, b) => b.start.dateTime.localeCompare(a.start.dateTime))
-  for (const booking of newestFirst) {
+  for (const booking of items.toSorted(newestFirst)) {
     const key = presetKey(booking)
     if (!seen.has(key)) {
       seen.add(key)
@@ -44,5 +47,10 @@ export const deduplicateBookings = (items: ModelsBooking[], limit = RECENT_BOOKI
       if (unique.length >= limit) break
     }
   }
-  return unique
+  return unique.toSorted(
+    (a, b) =>
+      a.projectReference.key.localeCompare(b.projectReference.key, undefined, {
+        sensitivity: 'base',
+      }) || newestFirst(a, b),
+  )
 }

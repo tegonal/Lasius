@@ -41,9 +41,21 @@ const booking = (
 })
 
 describe('deduplicateBookings', () => {
-  it('returns the newest booking first', () => {
-    const old = booking('old', 'p1', [], '12T08:00')
-    const recent = booking('recent', 'p2', [], '19T08:00')
+  it('orders the bookings by project name', () => {
+    const beta = booking('beta', 'Beta', [], '19T08:00')
+    const alpha = booking('alpha', 'alpha', [], '12T08:00')
+    const gamma = booking('gamma', 'Gamma', [], '15T08:00')
+
+    expect(deduplicateBookings([beta, gamma, alpha]).map((b) => b.id)).toEqual([
+      'alpha',
+      'beta',
+      'gamma',
+    ])
+  })
+
+  it('returns the newest booking first inside one project', () => {
+    const old = booking('old', 'p1', ['a'], '12T08:00')
+    const recent = booking('recent', 'p1', [], '19T08:00')
 
     expect(deduplicateBookings([old, recent]).map((b) => b.id)).toEqual(['recent', 'old'])
   })
@@ -62,10 +74,10 @@ describe('deduplicateBookings', () => {
     expect(deduplicateBookings([withTag, without])).toHaveLength(2)
   })
 
-  it('stops at the limit', () => {
+  it('keeps the newest bookings at the limit', () => {
     const items = ['10', '11', '12'].map((day) => booking(day, `p${day}`, [], `${day}T08:00`))
 
-    expect(deduplicateBookings(items, 2).map((b) => b.id)).toEqual(['12', '11'])
+    expect(deduplicateBookings(items, 2).map((b) => b.id)).toEqual(['11', '12'])
   })
 
   it('returns an empty list for no bookings', () => {
