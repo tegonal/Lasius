@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 3.0.0-beta5+16-5626b86e+20261020-0038
+ * OpenAPI spec version: 3.0.0-beta5+17-feca8723+20261020-0100
  */
 
 export * from './auth/auth.ts'
@@ -135,6 +135,7 @@ export * from './modelsPlaneProjectMapping.ts'
 export * from './modelsPlaneProjectSettings.ts'
 export * from './modelsPlaneTagConfiguration.ts'
 export * from './modelsProject.ts'
+export * from './modelsProjectLastActivity.ts'
 export * from './modelsProjectMappingId.ts'
 export * from './modelsProjectSyncStats.ts'
 export * from './modelsSimpleTag.ts'

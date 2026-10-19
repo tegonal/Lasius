@@ -20,8 +20,9 @@
 import { data, redirect } from 'react-router'
 
 import { AllProjectsLayout } from '~/features/projects/components/all-projects-layout'
+import { loadLastActivityDates } from '~/features/projects/last-activity.server'
 import { loadOrganisationContext } from '~/lib/organisation-helpers.server'
-import { getProjectLastActivityDate, getProjectList } from '~/services/api/lasius/projects/projects'
+import { getProjectList } from '~/services/api/lasius/projects/projects'
 import { mergeAuthHeaders } from '~/services/auth/auth-helpers.server'
 import { type ProjectWithActivity } from '~/types/common'
 
@@ -38,19 +39,13 @@ export const loader = async ({ request, url }: Route.LoaderArgs) => {
     throw redirect('/user/home', { headers: mergeAuthHeaders(auth) })
   }
 
-  const projectsResponse = await getProjectList(selectedOrgId, { headers })
-  const projects = projectsResponse.data ?? []
-
-  // Fetch last activity dates for all projects in parallel
-  const lastActivityResults = await Promise.allSettled(
-    projects.map((p) => getProjectLastActivityDate(selectedOrgId, p.id, { headers })),
+  const [projectsResponse, lastActivityDates] = await Promise.all([
+    getProjectList(selectedOrgId, { headers }),
+    loadLastActivityDates(selectedOrgId, headers),
+  ])
+  const projectsWithActivity: ProjectWithActivity[] = (projectsResponse.data ?? []).map(
+    (project) => ({ ...project, lastActivityDate: lastActivityDates[project.id] ?? null }),
   )
-  const projectsWithActivity: ProjectWithActivity[] = projects.map((project, index) => {
-    const result = lastActivityResults[index]
-    const lastActivityDate =
-      result?.status === 'fulfilled' && result.value?.status === 200 ? result.value.data : null
-    return { ...project, lastActivityDate }
-  })
 
   return data(
     {

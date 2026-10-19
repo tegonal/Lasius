@@ -205,11 +205,6 @@ class BookingHistoryMongoRepository @Inject() ()(
             } yield projectId -> lastActivity
           }.toMap
         }
-        .recover { case ex =>
-          logger.error(s"Error finding last activity dates: ${ex.getMessage}",
-                       ex)
-          Map.empty[ProjectId, LocalDateTime]
-        }
     }
   }
 

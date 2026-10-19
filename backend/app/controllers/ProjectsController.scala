@@ -140,6 +140,30 @@ class ProjectsController @Inject() (
         }
     }
 
+  /** An organisation administrator gets every project of `orgId`, and every
+    * user gets the projects of the user, shared projects included. This matches
+    * the access of `getLastActivityDate`.
+    */
+  def getProjectsLastActivity(orgId: OrganisationId): Action[Unit] =
+    HasUserRole(FreeUser, parse.empty, withinTransaction = false) {
+      implicit dbSession => implicit subject => user => implicit request =>
+        HasOrganisationRole(user, orgId, OrganisationMember) { userOrg =>
+          val userProjectIds = userOrg.projects.map(_.projectReference.id)
+          for {
+            organisationProjectIds <-
+              if (userOrg.role == OrganisationAdministrator)
+                projectRepository
+                  .findByOrganisation(userOrg.organisationReference)
+                  .map(_.map(_.id))
+              else Future.successful(Seq.empty)
+            dates <- bookingHistoryRepository.findLastActivityDateByProjects(
+              (userProjectIds ++ organisationProjectIds).distinct)
+          } yield Ok(Json.toJson(dates.toSeq.map { case (projectId, date) =>
+            ProjectLastActivity(projectId, date)
+          }))
+        }
+    }
+
   def getLastActivityDate(orgId: OrganisationId,
                           projectId: ProjectId): Action[Unit] =
     HasUserRole(FreeUser, parse.empty, withinTransaction = false) {

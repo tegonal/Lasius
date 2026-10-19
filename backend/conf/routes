@@ -823,6 +823,25 @@ GET /organisations/:orgId/projects                                      controll
 ###
 #  security:
 #    - bearerHttpAuthentication: []
+#  tags:
+#    - projects
+#  summary: Get the start of the newest finished booking for each project that the user may see in the organisation. A project without bookings is missing from the list
+#  operationId: getProjectsLastActivity
+#  responses:
+#    200:
+#      description: success
+#      content:
+#        application/json:
+#          schema:
+#            type: array
+#            items:
+#              $ref: '#/components/schemas/models.ProjectLastActivity'
+###
+GET /organisations/:orgId/projects/last-activity                        controllers.ProjectsController.getProjectsLastActivity(orgId: models.OrganisationId)
+
+###
+#  security:
+#    - bearerHttpAuthentication: []
 #  tags: 
 #    - projects
 #  requestBody:

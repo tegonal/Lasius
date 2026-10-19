@@ -3,12 +3,13 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+345-80ac1ed7+20261007-2104
+ * OpenAPI spec version: 3.0.0-beta5+17-feca8723+20261020-0100
  */
 import type {
   ModelsCreateProject,
   ModelsInvitationResult,
   ModelsProject,
+  ModelsProjectLastActivity,
   ModelsUpdateProject,
   ModelsUserStub,
   ModelsUserToProjectAssignment,
@@ -29,6 +30,17 @@ export function useCreateProject(options?: ApiProxyOptions<ModelsProject>) {
     {
       getUrl: ({ orgId }) => `/organisations/${orgId}/projects`,
       method: 'POST',
+    },
+    options,
+  )
+} /**
+ * @summary Get the start of the newest finished booking for each project that the user may see in the organisation. A project without bookings is missing from the list
+ */
+export function useGetProjectsLastActivity(options?: ApiProxyOptions<ModelsProjectLastActivity[]>) {
+  return useApiProxy<ModelsProjectLastActivity[], undefined, { orgId: string }>(
+    {
+      getUrl: ({ orgId }) => `/organisations/${orgId}/projects/last-activity`,
+      method: 'GET',
     },
     options,
   )

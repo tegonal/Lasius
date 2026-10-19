@@ -22,6 +22,7 @@
 package controllers
 
 import core.{SystemServices, TestApplication}
+import models.LocalDateTimeWithTimeZone.DateTimeHelper
 import models._
 import mongo.EmbedMongo
 import org.joda.time.DateTime
@@ -1427,6 +1428,105 @@ class ProjectsControllerSpec
           request)
 
       status(result) must equalTo(NO_CONTENT)
+    }
+  }
+
+  "get last activity of all projects" should {
+
+    /** Stores a second project of the organisation, which the user is not
+      * assigned to, and one finished booking for each of the two projects.
+      */
+    def setUp(controller: ProjectsControllerMock): Project = {
+      val otherProject =
+        controller.project.copy(id = ProjectId(), key = "otherProject")
+      def booking(project: Project, start: DateTime) =
+        BookingV2(
+          BookingId(),
+          start.toLocalDateTimeWithZone(),
+          Some(start.plusHours(1).toLocalDateTimeWithZone()),
+          controller.userReference,
+          EntityReference(controller.organisationId, "org"),
+          project.getReference,
+          Set()
+        )
+      withDBSession() { implicit dbSession =>
+        for {
+          _ <- controller.projectRepository.upsert(otherProject)
+          _ <- new repositories.BookingHistoryMongoRepository().bulkInsert(
+            List(booking(controller.project, DateTime.now().minusDays(2)),
+                 booking(otherProject, DateTime.now().minusDays(1))))
+        } yield ()
+      }.awaitResult()
+      otherProject
+    }
+
+    def projectIds(result: Future[Result]): Set[String] =
+      (contentAsJson(result) \\ "projectId").map(_.as[String]).toSet
+
+    "list only the assigned projects for an OrganisationMember" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: ProjectsControllerMock          =
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
+                                           authConfig,
+                                           reactiveMongoApi,
+                                           organisationRole =
+                                             OrganisationMember,
+                                           projectRole = ProjectMember)
+      setUp(controller)
+
+      val result: Future[Result] =
+        controller.getProjectsLastActivity(controller.organisationId)(
+          FakeRequest().withBody(()))
+
+      status(result) must equalTo(OK)
+      projectIds(result) must equalTo(Set(controller.project.id.value.toString))
+    }
+
+    "list every project of the organisation for an OrganisationAdministrator" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: ProjectsControllerMock          =
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
+                                           authConfig,
+                                           reactiveMongoApi,
+                                           organisationRole =
+                                             OrganisationAdministrator,
+                                           projectRole = ProjectMember)
+      val otherProject: Project = setUp(controller)
+
+      val result: Future[Result] =
+        controller.getProjectsLastActivity(controller.organisationId)(
+          FakeRequest().withBody(()))
+
+      status(result) must equalTo(OK)
+      projectIds(result) must equalTo(
+        Set(controller.project.id.value.toString,
+            otherProject.id.value.toString))
+    }
+
+    "forbidden if the user is not assigned to the organisation" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: ProjectsControllerMock          =
+        controllers.ProjectsControllerMock(config,
+                                           systemServices,
+                                           authConfig,
+                                           reactiveMongoApi)
+
+      val result: Future[Result] =
+        controller.getProjectsLastActivity(OrganisationId())(
+          FakeRequest().withBody(()))
+
+      status(result) must equalTo(FORBIDDEN)
     }
   }
 }

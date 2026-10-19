@@ -20,32 +20,16 @@
 import { data } from 'react-router'
 
 import { MyProjectsLayout } from '~/features/projects/components/my-projects-layout'
+import { loadLastActivityDates } from '~/features/projects/last-activity.server'
 import { loadOrganisationContext } from '~/lib/organisation-helpers.server'
-import { getProjectLastActivityDate } from '~/services/api/lasius/projects/projects'
 import { mergeAuthHeaders } from '~/services/auth/auth-helpers.server'
 
 import { type Route } from './+types/user.projects._index'
 
 export const loader = async ({ request, url }: Route.LoaderArgs) => {
-  const { auth, headers, selectedOrg, selectedOrgId } = await loadOrganisationContext(request, url)
+  const { auth, headers, selectedOrgId } = await loadOrganisationContext(request, url)
 
-  // Get projects from the user's org membership (no admin-only API call needed)
-  const projects = selectedOrg?.projects ?? []
-
-  // Fetch last activity dates for all projects in parallel
-  const lastActivityResults = await Promise.allSettled(
-    projects.map((p) =>
-      getProjectLastActivityDate(selectedOrgId, p.projectReference.id, {
-        headers,
-      }),
-    ),
-  )
-  const lastActivityDates: Record<string, null | string> = {}
-  for (const [index, project] of projects.entries()) {
-    const result = lastActivityResults[index]
-    lastActivityDates[project.projectReference.id] =
-      result?.status === 'fulfilled' && result.value?.status === 200 ? result.value.data : null
-  }
+  const lastActivityDates = await loadLastActivityDates(selectedOrgId, headers)
 
   return data(
     {

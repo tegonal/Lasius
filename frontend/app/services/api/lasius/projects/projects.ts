@@ -3,12 +3,13 @@
  * Do not edit manually.
  * Lasius API
  * Track your time
- * OpenAPI spec version: 2.2.2+345-80ac1ed7+20261007-2104
+ * OpenAPI spec version: 3.0.0-beta5+17-feca8723+20261020-0100
  */
 import type {
   ModelsCreateProject,
   ModelsInvitationResult,
   ModelsProject,
+  ModelsProjectLastActivity,
   ModelsUpdateProject,
   ModelsUserStub,
   ModelsUserToProjectAssignment,
@@ -83,6 +84,33 @@ export const createProject = async (
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(modelsCreateProject),
+  })
+}
+
+export type getProjectsLastActivityResponse200 = {
+  data: ModelsProjectLastActivity[]
+  status: 200
+}
+
+export type getProjectsLastActivityResponseSuccess = getProjectsLastActivityResponse200 & {
+  headers: Headers
+}
+export type getProjectsLastActivityResponse = getProjectsLastActivityResponseSuccess
+
+export const getGetProjectsLastActivityUrl = (orgId: string) => {
+  return `/organisations/${orgId}/projects/last-activity`
+}
+
+/**
+ * @summary Get the start of the newest finished booking for each project that the user may see in the organisation. A project without bookings is missing from the list
+ */
+export const getProjectsLastActivity = async (
+  orgId: string,
+  options?: Parameters<typeof lasiusFetch>[1],
+): Promise<getProjectsLastActivityResponse> => {
+  return lasiusFetch<getProjectsLastActivityResponse>(getGetProjectsLastActivityUrl(orgId), {
+    ...options,
+    method: 'GET',
   })
 }
 

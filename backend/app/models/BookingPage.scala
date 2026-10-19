@@ -23,8 +23,8 @@ package models
 
 import play.api.libs.json.{Format, Json}
 
-/** One page of the filtered bookings, newest first. `total` and `summary`
-  * cover the whole filtered set, not only the page.
+/** One page of the filtered bookings, newest first. `total` and `summary` cover
+  * the whole filtered set, not only the page.
   */
 case class BookingPage(items: Seq[BookingV2],
                        total: Int,
