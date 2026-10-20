@@ -29,16 +29,17 @@ import org.apache.pekko.util.Timeout
 import org.joda.time._
 import play.api.cache.SyncCacheApi
 import play.api.libs.json._
-import play.api.mvc.{Action, ControllerComponents}
+import play.api.mvc.{Action, ControllerComponents, Result}
 import play.modules.reactivemongo.ReactiveMongoApi
 import repositories.{BookingHistoryRepository, ProjectRepository}
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 object TimeBookingHistoryController {
   val defaultHistoryLimit = 1000
   val maxHistoryLimit     = 5000
+  val maxRecentDays       = 31
 }
 
 class TimeBookingHistoryController @Inject() (
@@ -225,13 +226,15 @@ class TimeBookingHistoryController @Inject() (
     HasUserRole(FreeUser, parse.empty, withinTransaction = false) {
       implicit dbSession => implicit subject => user => implicit request =>
         HasOrganisationRole(user, orgId, OrganisationMember) { _ =>
-          bookingHistoryRepository
-            .recentCombinations(Some(subject.userReference),
-                                orgId,
-                                from,
-                                to,
-                                recentLimit(limit))
-            .map(bookings => Ok(Json.toJson(bookings)))
+          withRecentRange(from, to) {
+            bookingHistoryRepository
+              .recentCombinations(Some(subject.userReference),
+                                  orgId,
+                                  from,
+                                  to,
+                                  recentLimit(limit))
+              .map(bookings => Ok(Json.toJson(bookings)))
+          }
         }
     }
 
@@ -242,14 +245,26 @@ class TimeBookingHistoryController @Inject() (
     HasUserRole(FreeUser, parse.empty, withinTransaction = false) {
       implicit dbSession => implicit subject => user => implicit request =>
         HasOrganisationRole(user, orgId, OrganisationAdministrator) { _ =>
-          bookingHistoryRepository
-            .recentCombinations(None, orgId, from, to, recentLimit(limit))
-            .map(bookings => Ok(Json.toJson(bookings)))
+          withRecentRange(from, to) {
+            bookingHistoryRepository
+              .recentCombinations(None, orgId, from, to, recentLimit(limit))
+              .map(bookings => Ok(Json.toJson(bookings)))
+          }
         }
     }
 
   private def recentLimit(limit: Option[Int]): Int =
     limit.getOrElse(defaultRecentLimit).max(1).min(maxRecentLimit)
+
+  /** The recent combinations load the whole range before the limit applies, so
+    * a range longer than 31 days gets 400.
+    */
+  private def withRecentRange(from: LocalDateTime, to: LocalDateTime)(
+      load: => Future[Result]): Future[Result] =
+    if (to.isAfter(from.plusDays(TimeBookingHistoryController.maxRecentDays)))
+      Future.successful(BadRequest(
+        s"The range of recent bookings is at most ${TimeBookingHistoryController.maxRecentDays} days"))
+    else load
 
   def getOrganisationBookingSummary(orgId: OrganisationId,
                                     from: LocalDateTime,

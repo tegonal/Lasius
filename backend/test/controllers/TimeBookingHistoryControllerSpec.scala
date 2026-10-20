@@ -421,6 +421,43 @@ class TimeBookingHistoryControllerSpec
       status(organisationResult) must equalTo(FORBIDDEN)
     }
 
+    "badrequest for recent bookings over a range longer than 31 days" in new WithTestApplication {
+
+      implicit val executionContext: ExecutionContext = inject[ExecutionContext]
+      val systemServices: SystemServices              = inject[SystemServices]
+      val authConfig: AuthConfig                      = inject[AuthConfig]
+      val controller: TimeBookingHistoryControllerMock =
+        controllers.TimeBookingHistoryControllerMock(
+          config,
+          systemServices,
+          authConfig,
+          reactiveMongoApi,
+          organisationRole = OrganisationAdministrator,
+          projectRole = ProjectMember)
+
+      val longFrom: LocalDateTime    = to.minusDays(32)
+      val userResult: Future[Result] =
+        controller.getUserRecentBookings(controller.organisationId,
+                                         longFrom,
+                                         to,
+                                         None)(FakeRequest().withBody(()))
+      val organisationResult: Future[Result] =
+        controller.getOrganisationRecentBookings(
+          controller.organisationId,
+          longFrom,
+          to,
+          None)(FakeRequest().withBody(()))
+      val monthResult: Future[Result] =
+        controller.getUserRecentBookings(controller.organisationId,
+                                         to.minusDays(31),
+                                         to,
+                                         None)(FakeRequest().withBody(()))
+
+      status(userResult) must equalTo(BAD_REQUEST)
+      status(organisationResult) must equalTo(BAD_REQUEST)
+      status(monthResult) must equalTo(OK)
+    }
+
     "forbidden for the organisation summary if OrganisationMember" in new WithTestApplication {
 
       implicit val executionContext: ExecutionContext = inject[ExecutionContext]
