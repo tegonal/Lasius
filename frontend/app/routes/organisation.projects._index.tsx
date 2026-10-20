@@ -17,11 +17,11 @@
  *
  */
 
-import { data, redirect } from 'react-router'
+import { data } from 'react-router'
 
 import { AllProjectsLayout } from '~/features/projects/components/all-projects-layout'
 import { loadLastActivityDates } from '~/features/projects/last-activity.server'
-import { loadOrganisationContext } from '~/lib/organisation-helpers.server'
+import { loadOrganisationAdminContext } from '~/lib/organisation-helpers.server'
 import { getProjectList } from '~/services/api/lasius/projects/projects'
 import { mergeAuthHeaders } from '~/services/auth/auth-helpers.server'
 import { type ProjectWithActivity } from '~/types/common'
@@ -29,15 +29,7 @@ import { type ProjectWithActivity } from '~/types/common'
 import { type Route } from './+types/organisation.projects._index'
 
 export const loader = async ({ request, url }: Route.LoaderArgs) => {
-  const { auth, headers, isOrganisationAdmin, selectedOrgId } = await loadOrganisationContext(
-    request,
-    url,
-  )
-
-  // Admin guard: only organisation administrators can access this page
-  if (!isOrganisationAdmin) {
-    throw redirect('/user/home', { headers: mergeAuthHeaders(auth) })
-  }
+  const { auth, headers, selectedOrgId } = await loadOrganisationAdminContext(request, url)
 
   const [projectsResponse, lastActivityDates] = await Promise.all([
     getProjectList(selectedOrgId, { headers }),

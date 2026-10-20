@@ -17,11 +17,13 @@
  *
  */
 
+import { redirect } from 'react-router'
+
 import { selectOrganisation } from '~/lib/organisation-selection'
 import { type ModelsUser } from '~/services/api/lasius'
 import { ModelsUserOrganisationRole } from '~/services/api/lasius/modelsUserOrganisationRole'
 import { getUserProfile, type getUserProfileResponse } from '~/services/api/lasius/user/user'
-import { authHeaders, requireUser } from '~/services/auth/auth-helpers.server'
+import { authHeaders, mergeAuthHeaders, requireUser } from '~/services/auth/auth-helpers.server'
 
 /**
  * In-flight deduplication for getUserProfile.
@@ -57,6 +59,15 @@ export async function getDeduplicatedUserProfile(options: {
 /** The id of the organisation that `selectOrganisation` picks, or an empty string. */
 export function getSelectedOrganisationId(user: ModelsUser): string {
   return selectOrganisation(user)?.organisationReference.id ?? ''
+}
+
+/** Loads the organisation context, and sends a user who is not an administrator to the home page. */
+export async function loadOrganisationAdminContext(request: Request, url: URL) {
+  const context = await loadOrganisationContext(request, url)
+  if (!context.isOrganisationAdmin) {
+    throw redirect('/user/home', { headers: mergeAuthHeaders(context.auth) })
+  }
+  return context
 }
 
 /**

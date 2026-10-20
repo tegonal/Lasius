@@ -17,10 +17,10 @@
  *
  */
 
-import { data, redirect } from 'react-router'
+import { data } from 'react-router'
 
 import { IntegrationsLayout } from '~/features/integrations/components/integrations-layout'
-import { loadOrganisationContext } from '~/lib/organisation-helpers.server'
+import { loadOrganisationAdminContext } from '~/lib/organisation-helpers.server'
 import { getConfigs } from '~/services/api/lasius/issue-importers/issue-importers'
 import { getProjectList } from '~/services/api/lasius/projects/projects'
 import { mergeAuthHeaders } from '~/services/auth/auth-helpers.server'
@@ -28,15 +28,7 @@ import { mergeAuthHeaders } from '~/services/auth/auth-helpers.server'
 import { type Route } from './+types/organisation.integrations'
 
 export const loader = async ({ request, url }: Route.LoaderArgs) => {
-  const { auth, headers, isOrganisationAdmin, selectedOrgId } = await loadOrganisationContext(
-    request,
-    url,
-  )
-
-  // Admin guard: only organisation administrators can access this page
-  if (!isOrganisationAdmin) {
-    throw redirect('/user/home', { headers: mergeAuthHeaders(auth) })
-  }
+  const { auth, headers, selectedOrgId } = await loadOrganisationAdminContext(request, url)
 
   // Fetch configs and projects in parallel
   const [configsResponse, projectsResponse] = await Promise.all([
