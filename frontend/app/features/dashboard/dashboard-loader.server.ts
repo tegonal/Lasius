@@ -17,12 +17,24 @@
  *
  */
 
+import { format } from 'date-fns'
+
+import { aggregateProjectHours } from '~/lib/api/functions/aggregate-project-hours'
+import { computeWorkHealthMetrics } from '~/lib/api/functions/compute-work-health-metrics.server'
 import { getExpectedVsBookedPercentage } from '~/lib/api/functions/get-expected-vs-booked-percentage'
 import { getDailyTotalsSummary } from '~/lib/api/functions/get-models-booking-summary'
+import {
+  getPlannedHoursForRange,
+  getWeeklyPlannedHours,
+} from '~/lib/api/functions/get-planned-working-hours'
 import { getUserClock } from '~/lib/cookies/time-zone-cookie.server'
 import { loadOrganisationContext } from '~/lib/organisation-helpers.server'
-import { isoDateOrFallback } from '~/lib/utils/dates'
+import { formatDateTimeToURLParameter, isoDateOrFallback } from '~/lib/utils/dates'
 import { type ModelsDailyBookingTotal } from '~/services/api/lasius'
+import {
+  getUserBookingAggregatedStatsByOrganisation,
+  getUserBookingDailyTotals,
+} from '~/services/api/lasius/user-bookings/user-bookings'
 import { mergeAuthHeaders, type requireUser } from '~/services/auth/auth-helpers.server'
 
 /**
@@ -62,6 +74,48 @@ export const computeDashboardStats = (
     expectedHours,
     fulfilledPercentage,
     hours: summary.hours,
+  }
+}
+
+/**
+ * Loads the stats, the top 5 projects and the weekly trend of a range of several weeks, for the
+ * 6-month and the year dashboard.
+ */
+export const loadWeeklyRangeDashboard = async (
+  context: Awaited<ReturnType<typeof loadDashboardContext>>,
+  range: { end: Date; start: Date; weeks: number },
+) => {
+  const { headers, plannedHours, selectedDate, selectedOrgId } = context
+  const timespan = {
+    from: formatDateTimeToURLParameter(range.start),
+    to: formatDateTimeToURLParameter(range.end),
+  }
+  const [dailyTotalsResponse, projectStatsResponse] = await Promise.all([
+    getUserBookingDailyTotals(selectedOrgId, timespan, { headers }),
+    getUserBookingAggregatedStatsByOrganisation(
+      selectedOrgId,
+      {
+        from: format(range.start, 'yyyy-MM-dd'),
+        granularity: 'Week',
+        source: 'project',
+        to: format(range.end, 'yyyy-MM-dd'),
+      },
+      { headers },
+    ),
+  ])
+  const dailyTotals = dailyTotalsResponse.data ?? []
+
+  const { weeklyData } = computeWorkHealthMetrics(
+    dailyTotals,
+    getWeeklyPlannedHours(plannedHours),
+    range.weeks,
+    selectedDate,
+  )
+  const expectedHours = getPlannedHoursForRange(range.start, range.end, plannedHours)
+  return {
+    stats: computeDashboardStats(dailyTotals, expectedHours),
+    topProjects: aggregateProjectHours(projectStatsResponse.data ?? [], 5),
+    weeklyData,
   }
 }
 

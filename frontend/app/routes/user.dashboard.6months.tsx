@@ -17,7 +17,7 @@
  *
  */
 
-import { format, subWeeks } from 'date-fns'
+import { subWeeks } from 'date-fns'
 import { useTranslation } from 'react-i18next'
 import { data } from 'react-router'
 
@@ -25,22 +25,12 @@ import { StatsOverviewGrid } from '~/features/dashboard/components/stats-overvie
 import { TopProjectsCard } from '~/features/dashboard/components/top-projects-card'
 import { dashboardClientLoader } from '~/features/dashboard/dashboard-loader'
 import {
-  computeDashboardStats,
   dashboardResponseHeaders,
   loadDashboardContext,
+  loadWeeklyRangeDashboard,
 } from '~/features/dashboard/dashboard-loader.server'
 import { WeeklyTrendChart } from '~/features/stats/components/weekly-trend-chart'
-import { aggregateProjectHours } from '~/lib/api/functions/aggregate-project-hours'
-import { computeWorkHealthMetrics } from '~/lib/api/functions/compute-work-health-metrics.server'
-import {
-  getPlannedHoursForRange,
-  getWeeklyPlannedHours,
-} from '~/lib/api/functions/get-planned-working-hours'
-import { formatDateTimeToURLParameter, toCalendarDay } from '~/lib/utils/dates'
-import {
-  getUserBookingAggregatedStatsByOrganisation,
-  getUserBookingDailyTotals,
-} from '~/services/api/lasius/user-bookings/user-bookings'
+import { toCalendarDay } from '~/lib/utils/dates'
 
 import { type Route } from './+types/user.dashboard.6months'
 
@@ -54,47 +44,14 @@ clientLoader.hydrate = false
 
 export const loader = async ({ request, url }: Route.LoaderArgs) => {
   const context = await loadDashboardContext(request, url)
-  const { headers, plannedHours, selectedDate, selectedOrgId } = context
+  const { selectedDate } = context
 
   const dateObject = toCalendarDay(selectedDate)
-  const rangeStart = subWeeks(dateObject, 26)
-
-  // Build timespan for 26-week range
-  const timespan = {
-    from: formatDateTimeToURLParameter(rangeStart),
-    to: formatDateTimeToURLParameter(dateObject),
-  }
-
-  // Fetch bookings and aggregated project stats in parallel
-  const [dailyTotalsResponse, projectStatsResponse] = await Promise.all([
-    getUserBookingDailyTotals(selectedOrgId, timespan, {
-      headers,
-    }),
-    getUserBookingAggregatedStatsByOrganisation(
-      selectedOrgId,
-      {
-        from: format(rangeStart, 'yyyy-MM-dd'),
-        granularity: 'Week',
-        source: 'project',
-        to: format(dateObject, 'yyyy-MM-dd'),
-      },
-      { headers },
-    ),
-  ])
-
-  const dailyTotals = dailyTotalsResponse.data ?? []
-  const projectStats = projectStatsResponse.data ?? []
-
-  // Compute work health metrics
-  const weeklyPlannedHours = getWeeklyPlannedHours(plannedHours)
-  const { weeklyData } = computeWorkHealthMetrics(dailyTotals, weeklyPlannedHours, 26, selectedDate)
-
-  // Compute summary stats
-  const expectedHours = getPlannedHoursForRange(rangeStart, dateObject, plannedHours)
-  const stats = computeDashboardStats(dailyTotals, expectedHours)
-
-  // Aggregate top 5 projects
-  const topProjects = aggregateProjectHours(projectStats, 5)
+  const { stats, topProjects, weeklyData } = await loadWeeklyRangeDashboard(context, {
+    end: dateObject,
+    start: subWeeks(dateObject, 26),
+    weeks: 26,
+  })
 
   return data(
     { selectedDate, stats, topProjects, weeklyData },
