@@ -100,12 +100,17 @@ const RailButton = ({
       aria-current={!isSection && isActive ? 'page' : undefined}
       aria-label={label}
       aria-pressed={isSection ? isActive : undefined}
+      className={cn(
+        // The navigation variant sets h-auto and p-3, so btn-square alone gives no square.
+        'h-12 w-12 justify-center p-0',
+        isSection && isActive && 'bg-red-gradient hover:bg-red-gradient text-white',
+      )}
       data-testid={testId}
       fullWidth={false}
       onClick={onClick}
       shape="square"
       variant={isActive ? 'navigationActive' : 'navigation'}>
-      <LucideIcon icon={icon} size={22} />
+      <LucideIcon icon={icon} size={24} />
     </Button>
   </Tooltip>
 )
