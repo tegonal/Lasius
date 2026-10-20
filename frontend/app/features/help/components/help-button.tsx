@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+import { Tooltip } from '~/components/ui/overlays/tooltip'
 import { useHelpStore } from '~/features/help/store/help-store'
 
 /**
@@ -32,7 +33,7 @@ export const HelpButton = () => {
   const { toggleHelp } = useHelpStore()
 
   return (
-    <div className="tooltip tooltip-bottom" data-tip={t('actions.help', 'Help')}>
+    <Tooltip label={t('actions.help', 'Help')} side="bottom">
       <Button
         aria-label={t('actions.help', 'Help')}
         data-testid="help-btn"
@@ -42,7 +43,7 @@ export const HelpButton = () => {
         variant="ghost">
         <LucideIcon icon={HelpCircleIcon} size={20} />
       </Button>
-    </div>
+    </Tooltip>
   )
 }
 

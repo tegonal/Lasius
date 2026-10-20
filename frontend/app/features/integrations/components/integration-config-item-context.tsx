@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Button } from '~/components/primitives/buttons/button'
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+import { Tooltip } from '~/components/ui/overlays/tooltip'
 import { ContextButtonClose } from '~/features/context-menu/buttons/context-button-close'
 import { ContextButtonOpen } from '~/features/context-menu/buttons/context-button-open'
 import { ContextAnimatePresence } from '~/features/context-menu/context-animate-presence'
@@ -149,23 +150,25 @@ export const IntegrationConfigItemContext = ({
           )}
           <ContextButtonWrapper variant="compact">
             {hasProjects ? (
-              <div
-                className="tooltip"
-                data-tip={t('issueImporters.actions.deleteDisabled', {
+              <Tooltip
+                label={t('issueImporters.actions.deleteDisabled', {
                   defaultValue: 'Cannot delete: remove all project mappings first',
                 })}>
-                <Button
-                  aria-label={t('issueImporters.actions.delete', {
-                    defaultValue: 'Delete configuration',
-                  })}
-                  disabled
-                  fullWidth={false}
-                  onClick={handleDelete}
-                  shape="circle"
-                  variant="contextIcon">
-                  <LucideIcon icon={Trash2} size={24} />
-                </Button>
-              </div>
+                {/* A disabled button gets no pointer events, so the wrapper is the trigger. */}
+                <div className="inline-block">
+                  <Button
+                    aria-label={t('issueImporters.actions.delete', {
+                      defaultValue: 'Delete configuration',
+                    })}
+                    disabled
+                    fullWidth={false}
+                    onClick={handleDelete}
+                    shape="circle"
+                    variant="contextIcon">
+                    <LucideIcon icon={Trash2} size={24} />
+                  </Button>
+                </div>
+              </Tooltip>
             ) : (
               <Button
                 aria-label={t('issueImporters.actions.delete', {

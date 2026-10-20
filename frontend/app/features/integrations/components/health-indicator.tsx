@@ -19,6 +19,7 @@
 
 import { useTranslation } from 'react-i18next'
 
+import { Tooltip } from '~/components/ui/overlays/tooltip'
 import {
   getConnectivityStatusLabel,
   getConnectivityStatusStyle,
@@ -38,10 +39,12 @@ export const HealthIndicator = ({ size = 'sm', status }: Properties) => {
   const dotSize = size === 'sm' ? 'h-2 w-2' : 'h-3 w-3'
 
   return (
-    <div className="tooltip" data-tip={getConnectivityStatusLabel(status, untyped(t))}>
-      <div
-        className={cn(dotSize, getConnectivityStatusStyle(status).dotClassName, 'rounded-full')}
-      />
-    </div>
+    <Tooltip label={getConnectivityStatusLabel(status, untyped(t))}>
+      <div className="inline-block">
+        <div
+          className={cn(dotSize, getConnectivityStatusStyle(status).dotClassName, 'rounded-full')}
+        />
+      </div>
+    </Tooltip>
   )
 }

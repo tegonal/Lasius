@@ -21,6 +21,7 @@ import { RadioTowerIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+import { Tooltip } from '~/components/ui/overlays/tooltip'
 import {
   ConnectionStatus,
   useLasiusWebsocket,
@@ -52,16 +53,13 @@ export const WebsocketStatus = () => {
   }
 
   return (
-    <div
-      className="tooltip tooltip-top"
-      data-testid="websocket-status"
-      data-tip={labels[connectionStatus]}>
-      <div className="relative inline-flex">
+    <Tooltip label={labels[connectionStatus]}>
+      <div className="relative inline-flex" data-testid="websocket-status">
         <LucideIcon icon={RadioTowerIcon} size={14} />
         <span
           className={`absolute -top-1 -right-1 size-2 rounded-full ${statusDotClass[connectionStatus]}`}
         />
       </div>
-    </div>
+    </Tooltip>
   )
 }

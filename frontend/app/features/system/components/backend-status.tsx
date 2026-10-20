@@ -21,6 +21,7 @@ import { ServerIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { LucideIcon } from '~/components/ui/icons/lucide-icon'
+import { Tooltip } from '~/components/ui/overlays/tooltip'
 import { useIsClient } from '~/lib/hooks/use-is-client'
 import { type BackendConnectionStatus, useBackendStatus } from '~/stores/ui-store'
 
@@ -44,13 +45,13 @@ export const BackendStatus = () => {
   }
 
   return (
-    <div className="tooltip tooltip-top" data-testid="backend-status" data-tip={labels[status]}>
-      <div className="relative inline-flex">
+    <Tooltip label={labels[status]}>
+      <div className="relative inline-flex" data-testid="backend-status">
         <LucideIcon icon={ServerIcon} size={14} />
         <span
           className={`absolute -top-1 -right-1 size-2 rounded-full ${statusDotClass[status]}`}
         />
       </div>
-    </div>
+    </Tooltip>
   )
 }
