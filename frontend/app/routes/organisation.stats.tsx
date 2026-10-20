@@ -18,20 +18,11 @@
  */
 
 import { useTranslation } from 'react-i18next'
-import { data, href, Outlet } from 'react-router'
+import { href } from 'react-router'
 
-import { ColumnCenter, ColumnRight, innerGridClasses } from '~/components/ui/layouts/layout-columns'
-import { ScrollArea } from '~/components/ui/layouts/scroll-area'
-import { StatsExport } from '~/features/stats/components/stats-export'
-import { StatsFilter } from '~/features/stats/components/stats-filter'
-import { StatsOverview } from '~/features/stats/components/stats-overview'
-import { StatsTabs } from '~/features/stats/components/stats-tabs'
-import { loadOrgStatsContext, statsResponseHeaders } from '~/features/stats/stats-loader.server'
-import {
-  EMPTY_BOOKING_SUMMARY,
-  getBookingSummaryFromApi,
-} from '~/lib/api/functions/get-models-booking-summary'
-import { apiTimespanFromTo } from '~/lib/utils/dates'
+import { StatsOverviewLayout } from '~/features/stats/components/stats-overview-layout'
+import { loadOrgStatsContext } from '~/features/stats/stats-loader.server'
+import { loadStatsOverview } from '~/features/stats/stats-overview-loader.server'
 import { cachedServerLoader } from '~/lib/utils/loader-cache'
 import { getOrganisationBookingSummary } from '~/services/api/lasius/organisation-bookings/organisation-bookings'
 
@@ -41,46 +32,11 @@ export const clientLoader = ({ request, serverLoader }: Route.ClientLoaderArgs) 
   cachedServerLoader('routes/organisation.stats', request, serverLoader)
 clientLoader.hydrate = false
 
-// ─── Revalidation ────────────────────────────────────────────────────────────
-
-// ─── Loader ──────────────────────────────────────────────────────────────────
-
-export const loader = async ({ request, url }: Route.LoaderArgs) => {
-  const context = await loadOrgStatsContext(request, url)
-  const { from, headers, rangeName, selectedOrgId, to } = context
-
-  // Compute API params
-  const timespan = apiTimespanFromTo(from, to)
-
-  const summaryResponse = timespan
-    ? await getOrganisationBookingSummary(selectedOrgId, timespan, { headers })
-    : undefined
-  const summary = summaryResponse?.data ?? EMPTY_BOOKING_SUMMARY
-
-  const bookingSummary = getBookingSummaryFromApi(summary)
-  const { distinctProjects, distinctUsers } = summary
-
-  return data(
-    {
-      bookingSummary,
-      distinctProjects,
-      distinctUsers,
-      from,
-      rangeName,
-      selectedOrgId,
-      to,
-    },
-    { headers: statsResponseHeaders(context.auth) },
-  )
-}
-
-// ─── Component ───────────────────────────────────────────────────────────────
+export const loader = async ({ request, url }: Route.LoaderArgs) =>
+  loadStatsOverview(await loadOrgStatsContext(request, url), getOrganisationBookingSummary)
 
 const OrgStatsLayout = ({ loaderData }: Route.ComponentProps) => {
   const { t } = useTranslation('organisation')
-
-  const { bookingSummary, distinctProjects, distinctUsers, from, rangeName, selectedOrgId, to } =
-    loaderData
 
   const tabs = [
     {
@@ -101,50 +57,7 @@ const OrgStatsLayout = ({ loaderData }: Route.ComponentProps) => {
   ]
 
   return (
-    <div className={innerGridClasses} data-testid="org-stats-page">
-      <ColumnCenter>
-        <div className="flex h-full flex-col overflow-hidden">
-          <div className="bg-base-200 flex-shrink-0 px-6 py-4">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div className="flex-1">
-                <StatsOverview
-                  distinctProjects={distinctProjects}
-                  distinctUsers={distinctUsers}
-                  elements={bookingSummary.elements}
-                  hours={bookingSummary.hours}
-                />
-              </div>
-              <div className="flex-shrink-0">
-                <StatsExport
-                  bookingList={bookingSummary}
-                  distinctProjects={distinctProjects}
-                  distinctUsers={distinctUsers}
-                  from={from}
-                  scope="organisation"
-                  selectedOrgId={selectedOrgId}
-                  to={to}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="border-base-200 border-b px-6 pt-2">
-            <StatsTabs tabs={tabs} />
-          </div>
-          <ScrollArea className="min-h-0 flex-1">
-            <div className="pt-4">
-              <Outlet />
-            </div>
-          </ScrollArea>
-        </div>
-      </ColumnCenter>
-      <ColumnRight>
-        <ScrollArea className="h-full">
-          <div className="p-4">
-            <StatsFilter from={from} rangeName={rangeName} to={to} />
-          </div>
-        </ScrollArea>
-      </ColumnRight>
-    </div>
+    <StatsOverviewLayout {...loaderData} scope="organisation" tabs={tabs} testId="org-stats-page" />
   )
 }
 
