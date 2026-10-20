@@ -22,6 +22,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { Trans, useTranslation } from 'react-i18next'
 
 import { TegonalIcon } from '~/components/ui/icons/tegonal-icon'
+import { TooltipProvider } from '~/components/ui/overlays/tooltip'
 import { BackendStatus } from '~/features/system/components/backend-status'
 import { WebsocketStatus } from '~/features/system/components/websocket-status'
 
@@ -68,8 +69,10 @@ export const TegonalFooter = ({ variant }: TegonalFooterProperties) => {
                 })}
               />
             </a>
-            <BackendStatus />
-            <WebsocketStatus />
+            <TooltipProvider>
+              <BackendStatus />
+              <WebsocketStatus />
+            </TooltipProvider>
           </div>
         ) : (
           <Trans
