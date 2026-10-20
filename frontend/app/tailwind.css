@@ -18,11 +18,11 @@
  */
 
 @import 'tailwindcss';
-/* Configure DaisyUI settings */
+/* The built-in light and dark themes share their names and selectors with the Lasius themes below.
+   A built-in theme then wins in some builds, so only the Lasius themes exist.
+   root.tsx always sets data-theme, so no prefers-color-scheme fallback is needed. */
 @plugin 'daisyui' {
-  themes:
-    light --default,
-    dark --prefersdark;
+  themes: false;
   logs: false;
 }
 
