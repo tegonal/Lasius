@@ -17,29 +17,56 @@
  *
  */
 
+import { useSyncExternalStore } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useRouteLoaderData } from 'react-router'
 
 import { ProgressBar } from '~/components/ui/data-display/progress-bar'
+import { getDayProgress } from '~/features/home/lib/day-progress'
 import { decimalHoursToDurationString } from '~/lib/utils/duration'
+import { type loader } from '~/routes/user.layout._index'
+
+const TICK_INTERVAL_MS = 25_000
+const MS_PER_MINUTE = 60_000
+
+const subscribeToTicks = (onTick: () => void) => {
+  const interval = setInterval(onTick, TICK_INTERVAL_MS)
+  return () => clearInterval(interval)
+}
+
+// The snapshot changes once per minute, so a render between two ticks reads the same value.
+const getCurrentMinute = () => Math.floor(Date.now() / MS_PER_MINUTE)
+
+// The server clock differs from the browser clock, so the server render shows no running time.
+const getServerMinute = () => null
 
 export const BookingDayStatsProgressBar = () => {
   const { t } = useTranslation('common')
-  const loaderData = useRouteLoaderData('routes/user.layout._index')
+  const loaderData = useRouteLoaderData<typeof loader>('routes/user.layout._index')
+  const currentMinute = useSyncExternalStore(subscribeToTicks, getCurrentMinute, getServerMinute)
 
   const daySummary = loaderData?.daySummary
   if (!daySummary) return null
 
-  const selectedDate = loaderData?.selectedDate
+  const { currentBooking, selectedDate, selectedOrgId } = loaderData
+  const running = currentBooking?.booking
+  const progress = getDayProgress({
+    bookedHours: daySummary.hours,
+    now: currentMinute === null ? new Date(0) : new Date(currentMinute * MS_PER_MINUTE),
+    plannedWorkingHours: daySummary.plannedWorkingHours,
+    runningStart:
+      running?.organisationReference.id === selectedOrgId ? running.start.dateTime : undefined,
+    selectedDate,
+  })
 
-  const label = `${daySummary.fulfilledPercentage}% (${decimalHoursToDurationString(daySummary.hours)} ${t(
+  const label = `${progress.fulfilledPercentage}% (${decimalHoursToDurationString(progress.hours)} ${t(
     'of',
     { defaultValue: 'of' },
   )} ${decimalHoursToDurationString(daySummary.plannedWorkingHours)})`
 
   return (
     <div className="w-full">
-      <ProgressBar key={selectedDate} label={label} percentage={daySummary.fulfilledPercentage} />
+      <ProgressBar key={selectedDate} label={label} percentage={progress.fulfilledPercentage} />
     </div>
   )
 }
