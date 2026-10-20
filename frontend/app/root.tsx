@@ -17,7 +17,7 @@
  *
  */
 
-import { lazy, type PropsWithChildren, Suspense, useState } from 'react'
+import { lazy, type PropsWithChildren, Suspense, useLayoutEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   data,
@@ -30,10 +30,10 @@ import {
   ScrollRestoration,
   type ShouldRevalidateFunctionArgs,
   useRouteError,
-  useRouteLoaderData,
 } from 'react-router'
 
 import { ToastProvider } from '~/components/ui/feedback/toasts'
+import { API_ROUTES } from '~/config/constants'
 import { useHelpStore } from '~/features/help/store/help-store'
 import { DataLoadingProgress } from '~/features/system/components/data-loading-progress'
 import { usePageViewTracking } from '~/features/system/hooks/use-page-view-tracking'
@@ -61,8 +61,11 @@ export const middleware = [legacyAuthCookieMiddleware, i18nextMiddleware]
 export const shouldRevalidate = ({
   currentUrl,
   defaultShouldRevalidate,
+  formAction,
   nextUrl,
 }: ShouldRevalidateFunctionArgs) => {
+  // The settings form reads the theme choice from this loader.
+  if (formAction === API_ROUTES.THEME) return true
   if (currentUrl.pathname === nextUrl.pathname) {
     return false
   }
@@ -89,13 +92,13 @@ export const loader = async ({ context, request }: Route.LoaderArgs) => {
   const locale = getLocale(context)
 
   const cookieHeader = request.headers.get('Cookie')
-  const theme = parseThemeCookie(cookieHeader) ?? 'light'
+  const themePreference = parseThemeCookie(cookieHeader) ?? 'system'
 
   const headers = new Headers()
   headers.append('Set-Cookie', await localeCookie.serialize(locale))
 
   return data(
-    { isPageViewTrackingEnabled: getPlausibleConfig() !== undefined, locale, theme },
+    { isPageViewTrackingEnabled: getPlausibleConfig() !== undefined, locale, themePreference },
     { headers },
   )
 }
@@ -252,37 +255,40 @@ export const ErrorBoundary = () => {
 }
 
 /**
- * Inline script that runs before first paint to prevent FOUC.
- * 1. Reads the `theme` cookie (not httpOnly, so JS can access it)
- * 2. If no cookie, detects system preference and writes the cookie
- * 3. Sets data-theme on <html> — overrides the server default ('light')
- *    with the actual system preference on first visit
- *
- * The server always renders data-theme="light"|"dark" (from cookie, defaulting
- * to "light"). This script corrects to system preference before paint if needed,
- * and sets the cookie so the server gets it right on the next request.
+ * Inline script that sets data-theme on <html> before the first paint. Only this script and the
+ * settings form write the attribute, so React never resets it after a root revalidation.
+ * A `theme` cookie of 'system' or no cookie follows the colour scheme of the device, also when it changes.
  */
 const themeInitScript = `
 (function() {
-  try {
-    var theme = null;
+  var root = document.documentElement;
+  var media = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+  var readPreference = function() {
     var cookies = document.cookie.split(';');
     for (var i = 0; i < cookies.length; i++) {
       var c = cookies[i].trim();
-      if (c.indexOf('theme=') === 0) {
-        theme = decodeURIComponent(c.substring(6));
-        break;
-      }
+      if (c.indexOf('theme=') === 0) return decodeURIComponent(c.substring(6));
     }
-    if (theme !== 'light' && theme !== 'dark') {
-      theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
-        ? 'dark'
-        : 'light';
-      document.cookie = 'theme=' + theme + ';path=/;max-age=31536000;samesite=lax' + (location.protocol === 'https:' ? ';secure' : '');
+    return 'system';
+  };
+  var apply = function() {
+    var preference = readPreference();
+    var theme = preference === 'light' || preference === 'dark'
+      ? preference
+      : (media && media.matches ? 'dark' : 'light');
+    root.setAttribute('data-theme', theme);
+  };
+  try {
+    apply();
+    window.lasiusApplyTheme = apply;
+    if (media && media.addEventListener) {
+      media.addEventListener('change', function() {
+        var preference = readPreference();
+        if (preference !== 'light' && preference !== 'dark') apply();
+      });
     }
-    document.documentElement.setAttribute('data-theme', theme);
   } catch (e) {
-    document.documentElement.setAttribute('data-theme', 'light');
+    root.setAttribute('data-theme', 'light');
   }
 })();
 `
@@ -314,22 +320,25 @@ const timeZoneInitScript = `
 })();
 `
 
+declare global {
+  interface Window {
+    lasiusApplyTheme?: () => void
+  }
+}
+
 export const Layout = ({ children }: PropsWithChildren) => {
   const { i18n } = useTranslation()
-  const rootData = useRouteLoaderData<typeof loader>('root')
-  const theme = rootData?.theme ?? 'light'
-
+  // A client render of the root removes every <html> attribute that React does not render.
+  useLayoutEffect(() => {
+    if (!document.documentElement.dataset.theme) window.lasiusApplyTheme?.()
+  })
   const isHelpOpen = useHelpStore((s) => s.isOpen)
   // Mount the help drawer on the first open, and keep it mounted afterwards
   const [helpMounted, setHelpMounted] = useState(false)
   if (isHelpOpen && !helpMounted) setHelpMounted(true)
 
   return (
-    <html
-      data-theme={theme}
-      dir={i18n.dir(i18n.language)}
-      lang={i18n.language}
-      suppressHydrationWarning>
+    <html dir={i18n.dir(i18n.language)} lang={i18n.language} suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta content="dark light" name="color-scheme" />

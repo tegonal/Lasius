@@ -17,24 +17,12 @@
  *
  */
 
-import { useEffect, useMemo, useState, useSyncExternalStore } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { TOKEN_TIME_UPDATE_INTERVAL_MS } from '~/config/constants'
+import { useDataTheme } from '~/hooks/use-data-theme'
 import { useTokenExpiresAt } from '~/stores/ui-store'
-
-const subscribeToTheme = (onThemeChange: () => void) => {
-  const observer = new MutationObserver(onThemeChange)
-  observer.observe(document.documentElement, {
-    attributeFilter: ['data-theme'],
-    attributes: true,
-  })
-  return () => observer.disconnect()
-}
-
-const getTheme = () => document.documentElement.dataset.theme || 'light'
-
-const getServerTheme = () => 'light'
 
 /**
  * Dev-only overlay badge showing current breakpoint, language, theme, and token time remaining.
@@ -44,7 +32,7 @@ export const DevelopmentInfoBadge = () => {
   const { i18n } = useTranslation()
   const expiresAt = useTokenExpiresAt()
   const [now, setNow] = useState(() => Date.now())
-  const colorMode = useSyncExternalStore(subscribeToTheme, getTheme, getServerTheme)
+  const colorMode = useDataTheme()
 
   // Tick a local clock to update the countdown display
   useEffect(() => {

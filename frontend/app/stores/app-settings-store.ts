@@ -22,6 +22,9 @@ import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
 
+import { API_ROUTES } from '~/config/constants'
+import { logger } from '~/lib/logger'
+
 const APP_SETTINGS_STORAGE_KEY = 'lasius-app-settings'
 
 interface AppSettingsStore {
@@ -30,11 +33,7 @@ interface AppSettingsStore {
   onboardingChecklistReached: boolean
   onboardingDismissed: boolean
   resetOnboarding: () => void
-  setTheme: (theme: ThemeMode) => void
-  theme: ThemeMode
 }
-
-type ThemeMode = 'dark' | 'light' | 'system'
 
 const appSettingsState = immer<AppSettingsStore>((set) => ({
   dismissOnboarding: () =>
@@ -52,17 +51,34 @@ const appSettingsState = immer<AppSettingsStore>((set) => ({
       state.onboardingDismissed = false
       state.onboardingChecklistReached = false
     }),
-  setTheme: (theme) =>
-    set((state) => {
-      state.theme = theme
-    }),
-  theme: 'system',
 }))
+
+/**
+ * The old inline script wrote the resolved light or dark to the `theme` cookie, so a stored
+ * 'system' choice was only in this store. This puts the choice back into the cookie.
+ */
+const restoreSystemThemeChoice = () => {
+  void fetch(API_ROUTES.THEME, {
+    body: new URLSearchParams({ theme: 'system' }),
+    method: 'POST',
+  }).catch((error: unknown) => {
+    logger.warn('Failed to restore the system theme choice', error)
+  })
+  const isPrefersDark = matchMedia('(prefers-color-scheme: dark)').matches
+  document.documentElement.dataset.theme = isPrefersDark ? 'dark' : 'light'
+}
 
 export const useAppSettingsStore = create<AppSettingsStore>()(
   devtools(
     persist(appSettingsState, {
+      // Version 0 also stored the theme. The `theme` cookie holds it now, so the migration drops it.
+      migrate: (persisted) => {
+        const { theme, ...rest } = (persisted ?? {}) as Record<string, unknown>
+        if (theme === 'system') restoreSystemThemeChoice()
+        return rest as Partial<AppSettingsStore> as AppSettingsStore
+      },
       name: APP_SETTINGS_STORAGE_KEY,
+      version: 1,
     }),
     {
       name: 'lasius-app-settings-devtools',
@@ -70,11 +86,9 @@ export const useAppSettingsStore = create<AppSettingsStore>()(
   ),
 )
 
-export const useTheme = () => useAppSettingsStore((state) => state.theme)
 export const useIsOnboardingDismissed = () =>
   useAppSettingsStore((state) => state.onboardingDismissed)
 export const useAppSettingsActions = () => {
-  const setTheme = useAppSettingsStore((state) => state.setTheme)
   const dismissOnboarding = useAppSettingsStore((state) => state.dismissOnboarding)
   const resetOnboarding = useAppSettingsStore((state) => state.resetOnboarding)
   const markChecklistReached = useAppSettingsStore((state) => state.markChecklistReached)
@@ -84,8 +98,7 @@ export const useAppSettingsActions = () => {
       dismissOnboarding,
       markChecklistReached,
       resetOnboarding,
-      setTheme,
     }),
-    [dismissOnboarding, markChecklistReached, resetOnboarding, setTheme],
+    [dismissOnboarding, markChecklistReached, resetOnboarding],
   )
 }

@@ -19,7 +19,7 @@
 
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { readPrefersDark, resolveThemeCookieValue, themeToApply } from './resolve-theme'
+import { readPrefersDark, resolveTheme, themeToApply } from './resolve-theme'
 
 describe('themeToApply', () => {
   it('applies an explicit choice also without a known colour scheme', () => {
@@ -51,16 +51,16 @@ describe('readPrefersDark', () => {
   })
 })
 
-describe('resolveThemeCookieValue', () => {
+describe('resolveTheme', () => {
   it('keeps an explicit choice, whatever the device prefers', () => {
-    expect(resolveThemeCookieValue('light', true)).toBe('light')
-    expect(resolveThemeCookieValue('light', false)).toBe('light')
-    expect(resolveThemeCookieValue('dark', true)).toBe('dark')
-    expect(resolveThemeCookieValue('dark', false)).toBe('dark')
+    expect(resolveTheme('light', true)).toBe('light')
+    expect(resolveTheme('light', false)).toBe('light')
+    expect(resolveTheme('dark', true)).toBe('dark')
+    expect(resolveTheme('dark', false)).toBe('dark')
   })
 
   it('resolves the system choice to the colour scheme of the device', () => {
-    expect(resolveThemeCookieValue('system', true)).toBe('dark')
-    expect(resolveThemeCookieValue('system', false)).toBe('light')
+    expect(resolveTheme('system', true)).toBe('dark')
+    expect(resolveTheme('system', false)).toBe('light')
   })
 })

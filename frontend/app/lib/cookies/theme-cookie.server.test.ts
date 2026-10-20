@@ -30,8 +30,8 @@ describe('isValidTheme', () => {
     expect(isValidTheme('dark')).toBe(true)
   })
 
-  it('rejects "system"', () => {
-    expect(isValidTheme('system')).toBe(false)
+  it('accepts "system"', () => {
+    expect(isValidTheme('system')).toBe(true)
   })
 
   it('rejects null', () => {
@@ -58,6 +58,10 @@ describe('parseThemeCookie', () => {
 
   it('parses "dark" from cookie header', () => {
     expect(parseThemeCookie('theme=dark')).toBe('dark')
+  })
+
+  it('parses "system" from cookie header', () => {
+    expect(parseThemeCookie('theme=system')).toBe('system')
   })
 
   it('returns null for invalid theme value', () => {

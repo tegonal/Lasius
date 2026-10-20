@@ -21,7 +21,6 @@ import { getFormProps, useForm, useInputControl } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useFetcher } from 'react-router'
 import { z } from 'zod'
 
 import { Button } from '~/components/primitives/buttons/button'
@@ -35,14 +34,11 @@ import { Select, type SelectOption } from '~/components/ui/forms/input/select'
 import { ToggleSwitch } from '~/components/ui/forms/input/toggle-switch'
 import { API_ROUTES } from '~/config/constants'
 import { useLocaleReload } from '~/features/settings/hooks/use-locale-reload'
-import { readPrefersDark, themeToApply } from '~/features/settings/lib/resolve-theme'
+import { useThemeChoice } from '~/features/settings/hooks/use-theme-choice'
 import { DEFAULT_LOCALE, LOCALE_LABELS, LOCALES } from '~/i18n-config'
+import { useIsClient } from '~/lib/hooks/use-is-client'
 import { type SchemaTranslationFunction, untyped } from '~/lib/i18n-types'
-import {
-  useAppSettingsActions,
-  useIsOnboardingDismissed,
-  useTheme,
-} from '~/stores/app-settings-store'
+import { useAppSettingsActions, useIsOnboardingDismissed } from '~/stores/app-settings-store'
 
 const LANGUAGE_OPTIONS: SelectOption[] = LOCALES.map((locale) => ({
   label: LOCALE_LABELS[locale],
@@ -65,14 +61,19 @@ const createAppSettingsSchema = (t: SchemaTranslationFunction) =>
     }),
   })
 
-export const AppSettingsForm = () => {
+/**
+ * The persisted store gives its initial state during hydration, so the form mounts after it.
+ * See the pitfall persisted-store-initial-state-during-hydration.
+ */
+export const AppSettingsForm = () => (useIsClient() ? <AppSettingsFormContent /> : null)
+
+const AppSettingsFormContent = () => {
   const { i18n, t } = useTranslation('settings')
-  const theme = useTheme()
+  const { applyTheme, theme } = useThemeChoice()
   const isOnboardingDismissed = useIsOnboardingDismissed()
-  const { dismissOnboarding, resetOnboarding, setTheme } = useAppSettingsActions()
+  const { dismissOnboarding, resetOnboarding } = useAppSettingsActions()
   // Reload after locale cookie has been set by the server
   const { localeFetcher, requestLocaleReload } = useLocaleReload()
-  const themeFetcher = useFetcher()
 
   const schema = useMemo(() => createAppSettingsSchema(untyped(t)), [t])
 
@@ -98,15 +99,6 @@ export const AppSettingsForm = () => {
       void localeFetcher.submit({ locale: language }, { action: API_ROUTES.LOCALE, method: 'post' })
     }
     return isLanguageChanged
-  }
-
-  // Stores the theme, and sets the attribute and the cookie for the server render.
-  const applyTheme = (choice: 'dark' | 'light' | 'system'): void => {
-    setTheme(choice)
-    const resolvedTheme = themeToApply(choice, readPrefersDark())
-    if (!resolvedTheme) return
-    document.documentElement.dataset.theme = resolvedTheme
-    void themeFetcher.submit({ theme: resolvedTheme }, { action: API_ROUTES.THEME, method: 'post' })
   }
 
   const [form, fields] = useForm<z.input<typeof schema>, z.output<typeof schema>>({

@@ -19,6 +19,8 @@
 
 import { useMemo } from 'react'
 
+import { useDataTheme } from '~/hooks/use-data-theme'
+
 // ─── Nivo Theme ──────────────────────────────────────────────────────────────
 // Uses DaisyUI CSS variables for dark/light mode support
 
@@ -220,13 +222,10 @@ export function getConsistentColor(key: string, isDark: boolean): string {
 
 /**
  * Hook to get the Nivo color function that responds to theme changes.
- * Reads the current data-theme attribute from the document element.
  * Returns a memoized function that stays stable across renders.
  */
 export function useNivoColors() {
-  // Read theme from the data-theme attribute set on <html>
-  const isDark =
-    typeof document === 'undefined' ? false : document.documentElement.dataset.theme === 'dark'
+  const isDark = useDataTheme() === 'dark'
 
   // Memoize the function so it only changes when theme changes
   return useMemo(

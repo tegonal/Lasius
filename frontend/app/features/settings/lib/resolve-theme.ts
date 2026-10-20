@@ -19,14 +19,8 @@
 
 type ThemeChoice = 'dark' | 'light' | 'system'
 
-/**
- * Returns the theme for the `theme` cookie and the `data-theme` attribute.
- * The cookie never holds 'system', so 'system' resolves to the colour scheme of the device.
- */
-export const resolveThemeCookieValue = (
-  choice: ThemeChoice,
-  isPrefersDark: boolean,
-): 'dark' | 'light' => {
+/** Returns the theme for the `data-theme` attribute. 'system' resolves to the colour scheme of the device. */
+export const resolveTheme = (choice: ThemeChoice, isPrefersDark: boolean): 'dark' | 'light' => {
   if (choice !== 'system') {
     return choice
   }
@@ -40,13 +34,11 @@ export const readPrefersDark = (): boolean | null =>
     : null
 
 /**
- * The theme to set on the page and in the cookie. It is null for 'system' when the colour scheme
- * of the device is unknown, so the form then sets no attribute and posts no cookie.
+ * The theme to set on the page. It is null for 'system' when the colour scheme of the device is
+ * unknown, so the form then leaves the attribute as it is.
  */
 export const themeToApply = (
   choice: ThemeChoice,
   prefersDark: boolean | null,
 ): 'dark' | 'light' | null =>
-  choice === 'system' && prefersDark === null
-    ? null
-    : resolveThemeCookieValue(choice, prefersDark ?? false)
+  choice === 'system' && prefersDark === null ? null : resolveTheme(choice, prefersDark ?? false)

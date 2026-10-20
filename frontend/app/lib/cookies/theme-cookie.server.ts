@@ -21,12 +21,15 @@ import { parseCookie, stringifySetCookie } from 'cookie'
 
 import { COOKIE_MAX_AGE_1_YEAR } from '~/config/constants'
 
-export type Theme = 'dark' | 'light'
+/** The choice of the user. The inline script in root.tsx resolves 'system' to light or dark. */
+export type Theme = 'dark' | 'light' | 'system'
 
 const COOKIE_NAME = 'theme'
 
+const THEMES: readonly unknown[] = ['dark', 'light', 'system'] satisfies Theme[]
+
 export function isValidTheme(value?: unknown): value is Theme {
-  return value === 'light' || value === 'dark'
+  return THEMES.includes(value)
 }
 
 /**
