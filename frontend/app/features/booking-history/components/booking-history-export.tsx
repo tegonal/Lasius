@@ -78,7 +78,7 @@ export const BookingHistoryExport = ({
       </button>
       <ul
         aria-label={t('export.menu.label', 'Export format selection')}
-        className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+        className="dropdown-content menu bg-base-100 rounded-box z-10 w-52 p-2 shadow"
         role="menu"
         tabIndex={0}>
         <li role="none">
