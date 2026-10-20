@@ -20,11 +20,16 @@
 import { type UIEvent, useCallback, useEffect, useRef, useState } from 'react'
 
 import {
-  appendBookingPage,
   BOOKING_PAGE_SIZE,
   type BookingListFilter,
 } from '~/features/booking-history/lib/booking-list-query'
-import { type ModelsBooking, type ModelsBookingPage } from '~/services/api/lasius'
+import {
+  applyPage,
+  initialPagesState,
+  type PageRequestMode,
+  syncFirstPage,
+} from '~/features/booking-history/lib/booking-pages-state'
+import { type ModelsBookingPage } from '~/services/api/lasius'
 import { useGetOrganisationBookingPage } from '~/services/api/lasius-hooks/organisation-bookings/organisation-bookings'
 import { useGetUserBookingPage } from '~/services/api/lasius-hooks/user-bookings/user-bookings'
 
@@ -37,23 +42,32 @@ export type BookingPageQuery = BookingListFilter & {
   to: string
 }
 
-type PagesState = {
-  firstPage: ModelsBookingPage
-  items: ModelsBooking[]
-  // The number of rows to load again after a revalidation of the first page.
-  reloadLimit?: number
-  signature: string
-  total: number
+/** Sends one page request of the user or the organisation list. */
+const useBookingPageRequest = (
+  query: BookingPageQuery,
+  onSuccess: (page: ModelsBookingPage) => void,
+) => {
+  const { isLoading: isUserPageLoading, submit: submitUserPage } = useGetUserBookingPage({
+    onSuccess,
+  })
+  const { isLoading: isOrganisationPageLoading, submit: submitOrganisationPage } =
+    useGetOrganisationBookingPage({ onSuccess })
+
+  const { dataSource, from, orgId, projectId, tagId, to, userId } = query
+  const requestPage = useCallback(
+    (skip: number, limit: number) => {
+      const parameters = { from, limit, projectId, skip, tagId, to, withSummary: false }
+      if (dataSource === 'organisationBookings') {
+        submitOrganisationPage({ orgId, params: { ...parameters, userId } })
+      } else {
+        submitUserPage({ orgId, params: parameters })
+      }
+    },
+    [dataSource, from, orgId, projectId, submitOrganisationPage, submitUserPage, tagId, to, userId],
+  )
+
+  return { isLoading: isUserPageLoading || isOrganisationPageLoading, requestPage }
 }
-
-type PendingRequest = { mode: 'append' | 'replace'; signature: string }
-
-const fromFirstPage = (firstPage: ModelsBookingPage, signature: string): PagesState => ({
-  firstPage,
-  items: firstPage.items,
-  signature,
-  total: firstPage.total,
-})
 
 /**
  * Shows the first page of the loader and loads the next pages on scroll. A response for an old
@@ -68,54 +82,23 @@ export const useBookingPages = ({
   query: BookingPageQuery
   signature: string
 }) => {
-  const [state, setState] = useState(() => fromFirstPage(firstPage, signature))
-  const pendingReference = useRef<null | PendingRequest>(null)
+  const [state, setState] = useState(() => initialPagesState(firstPage, signature))
+  const pendingReference = useRef<null | { mode: PageRequestMode; signature: string }>(null)
   const signatureReference = useRef(signature)
   useEffect(() => {
     signatureReference.current = signature
   })
 
-  if (state.signature !== signature) {
-    setState(fromFirstPage(firstPage, signature))
-  } else if (state.firstPage !== firstPage) {
-    setState({
-      ...fromFirstPage(firstPage, signature),
-      items: appendBookingPage(firstPage.items, state.items.slice(firstPage.items.length)),
-      reloadLimit: state.items.length > firstPage.items.length ? state.items.length : undefined,
-    })
-  }
+  const synced = syncFirstPage(state, firstPage, signature)
+  if (synced) setState(synced)
 
   const onSuccess = (page: ModelsBookingPage) => {
     const pending = pendingReference.current
     pendingReference.current = null
-    if (!pending || pending.signature !== signatureReference.current) return
-    setState((previous) => ({
-      ...previous,
-      items:
-        pending.mode === 'replace' ? page.items : appendBookingPage(previous.items, page.items),
-      reloadLimit: pending.mode === 'replace' ? undefined : previous.reloadLimit,
-      total: page.total,
-    }))
+    if (pending?.signature !== signatureReference.current) return
+    setState((previous) => applyPage(previous, page, pending.mode))
   }
-  const { isLoading: isUserPageLoading, submit: submitUserPage } = useGetUserBookingPage({
-    onSuccess,
-  })
-  const { isLoading: isOrganisationPageLoading, submit: submitOrganisationPage } =
-    useGetOrganisationBookingPage({ onSuccess })
-  const isLoading = isUserPageLoading || isOrganisationPageLoading
-
-  const { dataSource, from, orgId, projectId, tagId, to, userId } = query
-  const requestPage = useCallback(
-    (skip: number, limit: number) => {
-      const parameters = { from, limit, projectId, skip, tagId, to, withSummary: false }
-      if (dataSource === 'organisationBookings') {
-        submitOrganisationPage({ orgId, params: { ...parameters, userId } })
-      } else {
-        submitUserPage({ orgId, params: parameters })
-      }
-    },
-    [dataSource, from, orgId, projectId, submitOrganisationPage, submitUserPage, tagId, to, userId],
-  )
+  const { isLoading, requestPage } = useBookingPageRequest(query, onSuccess)
 
   const { reloadLimit } = state
   useEffect(() => {
