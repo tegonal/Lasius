@@ -18,7 +18,9 @@
  */
 
 import { type UIEvent, useCallback, useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
+import { useToast } from '~/components/ui/feedback/use-toast'
 import {
   BOOKING_PAGE_SIZE,
   type BookingListFilter,
@@ -46,12 +48,14 @@ export type BookingPageQuery = BookingListFilter & {
 const useBookingPageRequest = (
   query: BookingPageQuery,
   onSuccess: (page: ModelsBookingPage) => void,
+  onError: () => void,
 ) => {
   const { isLoading: isUserPageLoading, submit: submitUserPage } = useGetUserBookingPage({
+    onError,
     onSuccess,
   })
   const { isLoading: isOrganisationPageLoading, submit: submitOrganisationPage } =
-    useGetOrganisationBookingPage({ onSuccess })
+    useGetOrganisationBookingPage({ onError, onSuccess })
 
   const { dataSource, from, orgId, projectId, tagId, to, userId } = query
   const requestPage = useCallback(
@@ -82,6 +86,8 @@ export const useBookingPages = ({
   query: BookingPageQuery
   signature: string
 }) => {
+  const { t } = useTranslation()
+  const { addToast } = useToast()
   const [state, setState] = useState(() => initialPagesState(firstPage, signature))
   const pendingReference = useRef<null | { mode: PageRequestMode; signature: string }>(null)
   const signatureReference = useRef(signature)
@@ -98,7 +104,14 @@ export const useBookingPages = ({
     if (pending?.signature !== signatureReference.current) return
     setState((previous) => applyPage(previous, page, pending.mode))
   }
-  const { isLoading, requestPage } = useBookingPageRequest(query, onSuccess)
+  const onError = () => {
+    pendingReference.current = null
+    addToast({
+      message: t('bookings:history.loadFailed', 'The bookings could not be loaded'),
+      type: 'ERROR',
+    })
+  }
+  const { isLoading, requestPage } = useBookingPageRequest(query, onSuccess, onError)
 
   const { reloadLimit } = state
   useEffect(() => {
