@@ -20,6 +20,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import * as XLSX from 'xlsx'
 
+import { logger } from '~/lib/logger'
 import { type ModelsBooking } from '~/services/api/lasius'
 import { getOrganisationBookingPage } from '~/services/api/lasius/organisation-bookings/organisation-bookings'
 import { getUserBookingPage } from '~/services/api/lasius/user-bookings/user-bookings'
@@ -30,6 +31,7 @@ vi.mock('~/services/api/lasius/organisation-bookings/organisation-bookings', () 
   getOrganisationBookingAggregatedStats: vi.fn(),
   getOrganisationBookingPage: vi.fn(),
 }))
+vi.mock('~/lib/logger', () => ({ logger: { error: vi.fn(), warn: vi.fn() } }))
 vi.mock('~/services/api/lasius/user-bookings/user-bookings', () => ({
   getUserBookingAggregatedStatsByOrganisation: vi.fn(),
   getUserBookingPage: vi.fn(),
@@ -253,6 +255,28 @@ describe('handleBookingsExport', () => {
     expect(vi.mocked(getUserBookingPage).mock.calls.map(([, query]) => query.skip)).toEqual([
       0, 1000,
     ])
+  })
+
+  it('exports a booking once when a write moves it into the next page', async () => {
+    const fullPage = Array.from({ length: 1000 }, (_, index) =>
+      makeBooking(`f${index}`, 'p1', 'u1', []),
+    )
+    const lastOfFirstPage = fullPage.at(-1)!
+    vi.mocked(getUserBookingPage)
+      .mockResolvedValueOnce(pageResponse(fullPage))
+      .mockResolvedValueOnce(pageResponse([lastOfFirstPage]))
+    const response = await handleBookingsExport(bookingsParameters)
+    expect(await readIds(response)).toHaveLength(1000)
+  })
+
+  it('stops at 100 full pages and logs a warning', async () => {
+    const fullPage = Array.from({ length: 1000 }, (_, index) =>
+      makeBooking(`f${index}`, 'p1', 'u1', []),
+    )
+    vi.mocked(getUserBookingPage).mockResolvedValue(pageResponse(fullPage))
+    await handleBookingsExport(bookingsParameters)
+    expect(getUserBookingPage).toHaveBeenCalledTimes(100)
+    expect(logger.warn).toHaveBeenCalledWith('The export stops at 100 pages of 1000 bookings')
   })
 
   it.each([

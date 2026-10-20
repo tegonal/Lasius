@@ -20,6 +20,7 @@
 import { endOfDay, format, isValid, startOfDay } from 'date-fns'
 import { z } from 'zod'
 
+import { appendBookingPage } from '~/features/booking-history/lib/booking-list-query'
 import { getAdaptiveGranularity, type Granularity } from '~/lib/api/config/granularity-config'
 import { getUserClock } from '~/lib/cookies/time-zone-cookie.server'
 import { logger } from '~/lib/logger'
@@ -187,7 +188,8 @@ const EXPORT_MAX_PAGES = 100
 
 /**
  * Loads every filtered booking in pages, and returns them oldest first as the history did.
- * The page limit stops the loop at 100000 bookings.
+ * A booking that a write moves across a page boundary appears once. The page limit stops the
+ * loop at 100000 bookings.
  */
 const loadAllBookingPages = async (
   parameters: BookingsExportParameters & { headers: HeadersInit },
@@ -195,8 +197,12 @@ const loadAllBookingPages = async (
 ) => {
   const { context, headers, orgId, projectId, tagIds, userId } = parameters
   const filter = { projectId: projectId || undefined, tagId: tagIds }
-  const bookings: ModelsBooking[] = []
-  for (let pageIndex = 0; pageIndex < EXPORT_MAX_PAGES; pageIndex++) {
+  let bookings: ModelsBooking[] = []
+  for (let pageIndex = 0; ; pageIndex++) {
+    if (pageIndex === EXPORT_MAX_PAGES) {
+      logger.warn(`The export stops at ${EXPORT_MAX_PAGES} pages of ${EXPORT_PAGE_SIZE} bookings`)
+      break
+    }
     const query = {
       ...timespan,
       ...filter,
@@ -212,7 +218,7 @@ const loadAllBookingPages = async (
             { headers },
           )
         : await getUserBookingPage(orgId, query, { headers })
-    bookings.push(...response.data.items)
+    bookings = appendBookingPage(bookings, response.data.items)
     if (response.data.items.length < EXPORT_PAGE_SIZE) break
   }
   return bookings.toReversed()
