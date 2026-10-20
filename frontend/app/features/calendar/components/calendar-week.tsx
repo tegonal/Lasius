@@ -26,6 +26,7 @@ import { Button } from '~/components/primitives/buttons/button'
 import { SlidingIndicator } from '~/components/ui/animations/sliding-indicator'
 import { FormatDate } from '~/components/ui/data-display/format-date'
 import { CalendarDay } from '~/features/calendar/components/calendar-day'
+import { CalendarWeekProgressBar } from '~/features/calendar/components/calendar-week-progress-bar'
 import { useCalendarNavigation } from '~/features/calendar/hooks/use-calendar-navigation'
 import { useCalendarSelection } from '~/features/calendar/hooks/use-calendar-selection'
 import { useWeekSlide, type WeekSlide } from '~/features/calendar/hooks/use-week-slide'
@@ -63,6 +64,7 @@ export const CalendarWeek = () => {
       </div>
       <div className="min-w-0 flex-1 overflow-hidden md:max-w-[500px]">
         <WeekHeaderRow onSelectToday={selectToday} selectedDay={selectedDay} weekStart={week[0]} />
+        <CalendarWeekProgressBar key={week[0]} week={week} />
         {/* The scroll container clips during a slide, so the outgoing week adds no scrollbar. */}
         <div className={cn('min-h-[82px] w-full', slide ? 'overflow-x-hidden' : 'overflow-x-auto')}>
           <div className="flex">
@@ -103,7 +105,7 @@ const WeekHeaderRow = ({ onSelectToday, selectedDay, weekStart }: WeekHeaderRowP
   const { t } = useTranslation('common')
 
   return (
-    <div className="border-base-content/50 grid min-h-[22px] w-full grid-cols-3 border-b text-sm">
+    <div className="grid min-h-[22px] w-full grid-cols-3 text-sm">
       <div>{weekStart && <FormatDate date={weekStart} format="monthNameLong" />}</div>
       {isToday(toCalendarDay(selectedDay)) ? (
         <div />

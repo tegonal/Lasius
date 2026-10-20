@@ -17,12 +17,8 @@
  *
  */
 
-import { differenceInMilliseconds, isSameDay, max, startOfDay } from 'date-fns'
-
-import { getExpectedVsBookedPercentage } from '~/lib/api/functions/get-expected-vs-booked-percentage'
-import { toCalendarDay, toLocalDate } from '~/lib/utils/dates'
-
-const MS_PER_HOUR = 1000 * 60 * 60
+import { toCalendarDay } from '~/lib/utils/dates'
+import { getPeriodProgress } from '~/lib/utils/period-progress'
 
 type DayProgressInput = {
   // The finished hours of the selected day, from the booking history.
@@ -33,23 +29,8 @@ type DayProgressInput = {
   selectedDate: string
 }
 
-/**
- * Adds the running booking to the finished hours when the selected day is today. A booking that
- * started before midnight counts from midnight, as the midnight split stores it.
- */
-export const getDayProgress = ({
-  bookedHours,
-  now,
-  plannedWorkingHours,
-  runningStart,
-  selectedDate,
-}: DayProgressInput) => {
+/** Adds the running booking to the finished hours when the selected day is today. */
+export const getDayProgress = ({ selectedDate, ...input }: DayProgressInput) => {
   const day = toCalendarDay(selectedDate)
-  let runningHours = 0
-  if (runningStart && isSameDay(day, now)) {
-    const countedFrom = max([toLocalDate(runningStart), startOfDay(day)])
-    runningHours = Math.max(0, differenceInMilliseconds(now, countedFrom) / MS_PER_HOUR)
-  }
-  const hours = bookedHours + runningHours
-  return { hours, ...getExpectedVsBookedPercentage(plannedWorkingHours, hours) }
+  return getPeriodProgress({ ...input, firstDay: day, lastDay: day })
 }

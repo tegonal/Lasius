@@ -17,8 +17,29 @@
  *
  */
 
+import { cva, type VariantProps } from 'class-variance-authority'
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+
+const barVariants = cva('', {
+  defaultVariants: { size: 'md' },
+  variants: { size: { md: 'space-y-[2px]', sm: 'space-y-px' } },
+})
+
+const mainLineVariants = cva('bg-base-content/25 relative w-full overflow-visible text-[10px]', {
+  defaultVariants: { size: 'md' },
+  variants: { size: { md: 'h-[5px]', sm: 'h-[3px]' } },
+})
+
+const overflowLineVariants = cva('bg-base-content/15 w-full overflow-hidden', {
+  defaultVariants: { size: 'md' },
+  variants: { size: { md: 'h-[3px]', sm: 'h-px' } },
+})
+
+type ProgressBarProperties = VariantProps<typeof barVariants> & {
+  label: string
+  percentage: number
+}
 
 const STAR_COUNT = 10
 const STAR_ANIMATION_DURATION = 800
@@ -91,7 +112,7 @@ const StarExplosion = ({ stars }: { stars: StarParticle[] }) => {
   )
 }
 
-export const ProgressBar = memo(({ label, percentage }: { label: string; percentage: number }) => {
+export const ProgressBar = memo(({ label, percentage, size }: ProgressBarProperties) => {
   const [animated, setAnimated] = useState(false)
   const [stars, setStars] = useState<null | StarParticle[]>(null)
   const fillReference = useRef<HTMLDivElement>(null)
@@ -131,9 +152,9 @@ export const ProgressBar = memo(({ label, percentage }: { label: string; percent
 
   return (
     <div className="relative w-full" title={label}>
-      <div className="space-y-[2px]">
+      <div className={barVariants({ size })}>
         {/* Main progress bar */}
-        <div className="bg-base-content/25 relative h-[5px] w-full overflow-visible text-[10px]">
+        <div className={mainLineVariants({ size })}>
           <div className="absolute inset-0 overflow-hidden">
             <div
               className="bg-secondary dark:bg-base-content/75 h-full max-w-full"
@@ -148,7 +169,7 @@ export const ProgressBar = memo(({ label, percentage }: { label: string; percent
           </div>
         </div>
         {/* Overflow bar — fills when > 100% */}
-        <div className="bg-base-content/15 h-[3px] w-full overflow-hidden">
+        <div className={overflowLineVariants({ size })}>
           {percentage > 100 && (
             <div
               className="bg-warning h-full max-w-full"
