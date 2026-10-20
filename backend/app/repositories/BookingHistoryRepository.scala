@@ -126,6 +126,10 @@ object BookingHistoryMongoRepository {
 
   val maxPageSize = 1000
 
+  /** Escapes every regex metacharacter, so the text matches only itself. */
+  def escapeRegex(text: String): String =
+    text.replaceAll("""[\\^$.|?*+()\[\]{}]""", """\\$0""")
+
   /** Keeps the first booking of each project and tag set. The input must be
     * ordered newest first.
     */
@@ -346,24 +350,18 @@ class BookingHistoryMongoRepository @Inject() ()(
                            filter: BookingPageFilter,
                            from: LocalDateTime,
                            to: LocalDateTime): JsObject = {
-    // A tag id is user input, so $literal keeps an id that starts with "$"
-    // from reading as a field path. $toUpper and $trim normalise both sides.
-    def normalised(value: JsValue): JsObject =
-      Json.obj("$toUpper" -> Json.obj("$trim" -> Json.obj("input" -> value)))
+    // A booking needs every selected tag. The case-insensitive regex also
+    // folds non-ASCII letters, which $toUpper does not. The id is escaped,
+    // because it is user input.
     val tagIds       = filter.tagIds.map(_.trim).filter(_.nonEmpty).distinct
     val tagCondition =
       if (tagIds.isEmpty) Json.obj()
       else
-        Json.obj(
-          "$expr" -> Json.obj("$setIsSubset" -> Json.arr(
-            JsArray(tagIds.map(id => normalised(Json.obj("$literal" -> id)))),
-            Json.obj(
-              "$map" -> Json.obj(
-                "input" -> Json.obj("$ifNull" -> Json.arr("$tags", Json.arr())),
-                "as"    -> "tag",
-                "in"    -> normalised(JsString("$$tag.id"))
-              ))
-          )))
+        Json.obj("$and" -> JsArray(tagIds.map { id =>
+          Json.obj("tags" -> Json.obj("$elemMatch" -> Json.obj("id" -> Json.obj(
+            "$regex" -> s"^\\s*${BookingHistoryMongoRepository.escapeRegex(id)}\\s*$$",
+            "$options" -> "i"))))
+        }))
 
     val filterConditions = Seq[Option[(String, JsValueWrapper)]](
       filter.projectId.filter(_.nonEmpty).map("projectReference.id" -> _),

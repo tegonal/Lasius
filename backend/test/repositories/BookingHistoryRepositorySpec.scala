@@ -258,6 +258,19 @@ class BookingHistoryRepositorySpec extends EmbedMongo {
       ids(" ") must haveSize(4)
     }
 
+    "match a tag that differs in the case of a non-ASCII letter" in {
+      val user    = EntityReference(UserId(), "umlautUser")
+      val org     = EntityReference(OrganisationId(), "umlautOrg")
+      val project = EntityReference(ProjectId(), "umlautProject")
+      val umlaut  =
+        booking(user, org, project, date("03.01.2000").plusHours(8), 1)
+          .copy(tags = Set(SimpleTag(TagId("LÖSUNG"))))
+      insert(umlaut)
+
+      page(None, org.id, BookingPageFilter(None, None, Seq("Lösung"))).items
+        .map(_.id) must equalTo(Seq(umlaut.id))
+    }
+
     "filter by user and project, and count the filtered set" in {
       val user1    = EntityReference(UserId(), "pageUser1")
       val user2    = EntityReference(UserId(), "pageUser2")
