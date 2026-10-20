@@ -51,6 +51,7 @@ export default interface Resources {
     }
     history: {
       empty: 'No bookings found for the selected filters'
+      loadFailed: 'The bookings could not be loaded'
     }
     noBookingsToday: 'No bookings for this day'
     or: 'or'
@@ -326,7 +327,12 @@ export default interface Resources {
         workspaceRequired: 'Workspace is required'
       }
     }
+    layout: {
+      openSidePanel: 'Open side panel'
+      sidePanel: 'Side panel'
+    }
     navigation: {
+      home: 'Home'
       openMenu: 'Open menu'
       settings: 'Settings'
     }

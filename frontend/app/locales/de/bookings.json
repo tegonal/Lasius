@@ -31,7 +31,8 @@
     "useStartTimeOfNext": "Startzeit der nächsten Buchung als Endzeit für diese verwenden"
   },
   "history": {
-    "empty": "Keine Buchungen für die ausgewählten Filter gefunden"
+    "empty": "Keine Buchungen für die ausgewählten Filter gefunden",
+    "loadFailed": "Die Buchungen konnten nicht geladen werden"
   },
   "noBookingsToday": "Keine Buchungen für diesen Tag",
   "or": "oder",

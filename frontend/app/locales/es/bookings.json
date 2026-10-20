@@ -31,7 +31,8 @@
     "useStartTimeOfNext": "Usar la hora de inicio del siguiente registro como hora de finalización para este"
   },
   "history": {
-    "empty": "No se encontraron registros para los filtros seleccionados"
+    "empty": "No se encontraron registros para los filtros seleccionados",
+    "loadFailed": "No se pudieron cargar las reservas"
   },
   "noBookingsToday": "No hay registros para este día",
   "or": "o",

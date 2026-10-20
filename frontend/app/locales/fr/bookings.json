@@ -31,7 +31,8 @@
     "useStartTimeOfNext": "Utiliser l'heure de début de la réservation suivante comme heure de fin pour celle-ci"
   },
   "history": {
-    "empty": "Aucune réservation trouvée pour les filtres sélectionnés"
+    "empty": "Aucune réservation trouvée pour les filtres sélectionnés",
+    "loadFailed": "Les réservations n'ont pas pu être chargées"
   },
   "noBookingsToday": "Aucune réservation pour ce jour",
   "or": "ou",
