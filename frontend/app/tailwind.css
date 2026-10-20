@@ -299,6 +299,21 @@
       oklch(from var(--brand-palette-1) calc(l * 0.65) c h) 100%
     );
   }
+  /* The light theme uses a brighter green. */
+  :root:not([data-theme='dark']) .bg-primary-gradient {
+    background: linear-gradient(
+      180deg,
+      oklch(from var(--brand-palette-1) calc(l * 0.9) c h) 0%,
+      oklch(from var(--brand-palette-1) calc(l * 0.8) c h) 100%
+    );
+  }
+  :root:not([data-theme='dark']) .hover\:bg-primary-gradient-hover:hover {
+    background: linear-gradient(
+      180deg,
+      oklch(from var(--brand-palette-1) calc(l * 0.8) c h) 0%,
+      oklch(from var(--brand-palette-1) calc(l * 0.7) c h) 100%
+    );
+  }
 
   /* Gray gradients for secondary buttons */
   .bg-neutral-gradient {
