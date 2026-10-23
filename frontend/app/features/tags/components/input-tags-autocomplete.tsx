@@ -154,6 +154,8 @@ const TagsComboboxCore = ({
       )}
       <div className="relative">
         <Combobox.Root
+          // The first item is the typed text as a custom tag, so Enter adds the typed tag.
+          autoHighlight
           filter={null}
           inputValue={inputText}
           isItemEqualToValue={(item: ModelsTag, current: ModelsTag) => item.id === current.id}
@@ -177,7 +179,8 @@ const TagsComboboxCore = ({
               id={id}
               onBlur={() => setIsFocused(false)}
               onFocus={() => setIsFocused(true)}
-              onKeyDown={(event) => guardComboboxKey(event, isOpen)}
+              // A typed text always shows the list. The quick start form shows it on focus, so isOpen stays false.
+              onKeyDown={(event) => guardComboboxKey(event, isOpen || inputText.length > 0)}
               placeholder={t('tag-manager:chooseOrEnter', {
                 defaultValue: 'Choose or enter tags',
               })}
