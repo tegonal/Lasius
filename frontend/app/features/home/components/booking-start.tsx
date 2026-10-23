@@ -21,7 +21,7 @@ import { getFormProps, useForm, useInputControl } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod/v4'
 import { roundToNearestMinutes } from 'date-fns'
 import { Timer } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { type z } from 'zod'
 
@@ -61,6 +61,9 @@ export const BookingStart = ({ onSuccess, selectedOrgId }: Properties) => {
   const previousProjectKeyReference = useRef('')
 
   const schema = createBookingStartSchema(t as unknown as SchemaTranslationFunction)
+  // The home page and the mobile FAB modal can render this form at the same time.
+  // Conform rejects a submit when a second form in the document has the same id.
+  const instanceId = useId()
   const [resetKey, setResetKey] = useState(0)
 
   const resetComponent = () => {
@@ -71,7 +74,7 @@ export const BookingStart = ({ onSuccess, selectedOrgId }: Properties) => {
   const [form, fields] = useForm<z.input<typeof schema>, z.output<typeof schema>>({
     constraint: getZodConstraint(schema),
     defaultValue: { projectId: '', tags: '' },
-    id: `booking-start-${resetKey}`,
+    id: `booking-start-${instanceId}-${resetKey}`,
     onSubmit(event, { submission }) {
       event.preventDefault()
       if (submission?.status !== 'success') return
