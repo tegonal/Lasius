@@ -52,9 +52,9 @@ export const SlidePrivateOrg = () => {
           </p>
         </div>
 
-        <div className="bg-info/10 text-info-content rounded-lg p-4">
+        <div className="bg-info/10 text-base-content rounded-lg p-4">
           <div className="font-semibold">{t('privateOrganisation.tip', 'Good to Know')}</div>
-          <p className="text-info-content/80 mt-1">
+          <p className="text-base-content/80 mt-1">
             {t(
               'privateOrganisation.tipDesc',
               'If you want to work with team members, you can create or join additional organizations.',
