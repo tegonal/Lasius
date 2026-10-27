@@ -27,7 +27,6 @@ import { LucideIcon } from '~/components/ui/icons/lucide-icon'
 import { ColumnRightToggle, headerGridClasses } from '~/components/ui/layouts/layout-columns'
 import { TegonalFooter } from '~/components/ui/navigation/tegonal-footer'
 import { TokenWatcher } from '~/features/auth/components/token-watcher'
-import { BookingCurrent } from '~/features/bookings/components/booking-current'
 import { StopBookingProvider } from '~/features/bookings/stop-booking-provider'
 import { CalendarDataProvider } from '~/features/calendar/calendar-data-provider'
 import { CalendarWeek } from '~/features/calendar/components/calendar-week'
@@ -98,7 +97,6 @@ export default function AppLayout({ loaderData }: Route.ComponentProps) {
   const { t } = useTranslation('common')
   const { selectedOrganisationId } = useOrganisation()
   const selectedDate = usePersistedSearchParameter('date', loaderData.today)
-  const hasActiveBooking = Boolean(loaderData.currentBooking?.booking)
 
   return (
     <StopBookingProvider>
@@ -151,18 +149,11 @@ export default function AppLayout({ loaderData }: Route.ComponentProps) {
             </section>
           </div>
 
-          {/* Mobile header — matches original: Calendar or BookingCurrent, no Logo/Logout */}
+          {/* Mobile header — the week strip only. The home page shows the running booking, as on desktop. */}
           <div className="overflow-hidden md:hidden">
             <section className="flex h-full w-full items-center gap-2 overflow-hidden">
               <div className="min-w-0 flex-1 overflow-hidden">
-                {hasActiveBooking ? (
-                  <BookingCurrent
-                    currentBooking={loaderData.currentBooking}
-                    selectedOrgId={selectedOrganisationId}
-                  />
-                ) : (
-                  <CalendarWeek />
-                )}
+                <CalendarWeek />
               </div>
             </section>
           </div>

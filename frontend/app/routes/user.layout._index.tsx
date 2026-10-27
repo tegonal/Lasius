@@ -33,6 +33,7 @@ import { getModelsBookingSummary } from '~/lib/api/functions/get-models-booking-
 import { getUserClock } from '~/lib/cookies/time-zone-cookie.server'
 import { loadOrganisationContext } from '~/lib/organisation-helpers.server'
 import { createServerTiming } from '~/lib/server-timing.server'
+import { cn } from '~/lib/utils/cn'
 import { apiTimespanDay, getWorkingHoursWeekdayString, isoDateOrFallback } from '~/lib/utils/dates'
 import { cachedServerLoader } from '~/lib/utils/loader-cache'
 import { getOrganisationUserList } from '~/services/api/lasius/organisations/organisations'
@@ -135,14 +136,20 @@ export function headers({ loaderHeaders }: Route.HeadersArgs) {
 
 export default function HomeIndex({ loaderData }: Route.ComponentProps) {
   const { favorites, orgCurrentBookings, orgUsers, recentBookings, selectedOrgId } = loaderData
+  const hasActiveBooking = Boolean(loaderData.currentBooking?.booking)
 
   return (
     <div className={innerGridClasses}>
       <OnboardingTutorial />
       <ColumnCenter>
-        <div className="grid h-full w-full grid-rows-[min-content_min-content_auto] gap-1 pb-20 max-md:grid-rows-[min-content_auto] md:pb-0">
+        <div
+          className={cn(
+            'grid h-full w-full grid-rows-[min-content_min-content_auto] gap-1 pb-20 md:pb-0',
+            !hasActiveBooking && 'max-md:grid-rows-[min-content_auto]',
+          )}>
           <BookingDayStatsProgressBar />
-          <div className="hidden md:block">
+          {/* Mobile has little height, so it hides the "not booking" placeholder. */}
+          <div className={cn(!hasActiveBooking && 'hidden md:block')}>
             <BookingCurrent />
           </div>
           <ScrollArea>
