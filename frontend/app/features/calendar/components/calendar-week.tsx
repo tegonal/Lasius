@@ -65,8 +65,13 @@ export const CalendarWeek = () => {
       <div className="min-w-0 flex-1 overflow-hidden md:max-w-[500px]">
         <WeekHeaderRow onSelectToday={selectToday} selectedDay={selectedDay} weekStart={week[0]} />
         <CalendarWeekProgressBar key={week[0]} week={week} />
-        {/* The scroll container clips during a slide, so the outgoing week adds no scrollbar. */}
-        <div className={cn('min-h-[82px] w-full', slide ? 'overflow-x-hidden' : 'overflow-x-auto')}>
+        {/* Only a narrow screen scrolls the days. overflow-x-auto also sets overflow-y to auto, so a
+          sub-pixel overflow showed scrollbars. A slide clips, so the outgoing week adds no scrollbar. */}
+        <div
+          className={cn(
+            'min-h-[82px] w-full overflow-y-hidden md:overflow-x-hidden',
+            slide ? 'overflow-x-hidden' : 'overflow-x-auto',
+          )}>
           <div className="flex">
             {slide?.direction === 'next' && outgoingPanel}
             <CurrentWeekPanel
