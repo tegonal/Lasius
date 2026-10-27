@@ -38,6 +38,62 @@ const openEditDialog = async (page: Page) => {
   return { dialog, tagsInput }
 }
 
+const pickFirstProject = async (page: Page) => {
+  const projectInput = page.getByRole('combobox', { name: /project/i })
+  const chevron = projectInput
+    .locator('xpath=ancestor::div[contains(@class,"join")]//button[contains(@class,"join-item")]')
+    .last()
+  await expect(async () => {
+    if ((await projectInput.getAttribute('aria-expanded')) !== 'true') await chevron.click()
+    await expect(page.locator('[role="option"]').first()).toBeVisible({ timeout: 3000 })
+  }).toPass({ timeout: 15000 })
+  await page.locator('[role="option"]').first().click()
+}
+
+test.describe('Escape, Tab and typing in the tags input @bookings', () => {
+  test('the quick start form', async ({ page }) => {
+    await page.goto('/user/home')
+    await pickFirstProject(page)
+    const tagsInput = page.getByRole('combobox', { name: /tags/i }).locator('visible=true').first()
+    await expect(tagsInput).toBeFocused({ timeout: 5000 })
+    await expect(tagsInput).toHaveAttribute('aria-expanded', 'true')
+
+    await tagsInput.press('Escape')
+    await expect(tagsInput).toHaveAttribute('aria-expanded', 'false')
+    await expect(tagsInput).toBeFocused()
+
+    await tagsInput.press('a')
+    await expect(tagsInput).toHaveAttribute('aria-expanded', 'true')
+
+    await tagsInput.press('Tab')
+    await expect(tagsInput).not.toBeFocused()
+    await expect(tagsInput).toHaveAttribute('aria-expanded', 'false')
+  })
+
+  test('the edit dialog', async ({ page }) => {
+    const edit = await openEditDialog(page)
+    if (!edit) {
+      test.skip()
+      return
+    }
+    await edit.tagsInput.press('a')
+    await expect(edit.tagsInput).toHaveAttribute('aria-expanded', 'true')
+
+    await edit.tagsInput.press('Escape')
+    await expect(edit.tagsInput).toHaveAttribute('aria-expanded', 'false')
+    await expect(edit.dialog).toBeVisible()
+    await expect(edit.tagsInput).toBeFocused()
+
+    await edit.tagsInput.press('b')
+    await expect(edit.tagsInput).toHaveAttribute('aria-expanded', 'true')
+
+    await edit.tagsInput.press('Tab')
+    await expect(edit.tagsInput).not.toBeFocused()
+    await expect(edit.tagsInput).toHaveAttribute('aria-expanded', 'false')
+    await expect(edit.dialog).toBeVisible()
+  })
+})
+
 test.describe('Enter in the tags input @bookings', () => {
   test('the quick start form adds the typed tag and does not submit', async ({ page }) => {
     await page.goto('/user/home')
@@ -74,6 +130,34 @@ test.describe('Enter in the tags input @bookings', () => {
     await expect(edit.dialog).toBeVisible()
     await expect(edit.dialog.locator('input[type=hidden][name=tags]')).toHaveValue(new RegExp(tag))
     await expect(edit.tagsInput).toHaveValue('')
+  })
+
+  test('a second Enter on the empty input submits and adds no suggestion', async ({ page }) => {
+    const edit = await openEditDialog(page)
+    if (!edit) {
+      test.skip()
+      return
+    }
+    const tags = edit.dialog.locator('input[type=hidden][name=tags]')
+    const tag = `entertag${Date.now()}`
+    await edit.tagsInput.pressSequentially(tag)
+    await expect(page.locator('[role="option"]').first()).toBeVisible({ timeout: 5000 })
+    await edit.tagsInput.press('Enter')
+    await expect(tags).toHaveValue(new RegExp(tag))
+    const tagsAfterFirstEnter = await tags.inputValue()
+
+    // The test saves nothing: the proxy aborts the update, so only the submit itself is visible.
+    await page.route('**/api/proxy**', (route) => route.abort())
+    // A read through the proxy also posts to /api/proxy, so only a non-GET call counts as the submit.
+    const submit = page.waitForRequest(
+      (request) =>
+        request.url().includes('/api/proxy') &&
+        !(request.postData() ?? '').includes('"method":"GET"'),
+    )
+    await edit.tagsInput.press('Enter')
+
+    await submit
+    await expect(tags).toHaveValue(tagsAfterFirstEnter)
   })
 
   test('Arrow Down and Enter select an existing suggestion', async ({ page }) => {

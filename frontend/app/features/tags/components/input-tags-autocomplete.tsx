@@ -88,8 +88,10 @@ const TagsComboboxCore = ({
 }) => {
   const { t } = useTranslation('common')
   const [inputText, setInputText] = useState<string>('')
-  const [isFocused, setIsFocused] = useState<boolean>(false)
-  const [isOpen, setIsOpen] = useState<boolean>(false)
+  // 'focus' marks a list that the focus opened. Enter on an empty input then still submits the form.
+  const [openReason, setOpenReason] = useState<'focus' | 'user' | null>(null)
+  // autoHighlight also marks the first suggestion. Only a keyboard or pointer highlight is a user choice.
+  const [hasUserHighlight, setHasUserHighlight] = useState(false)
 
   const filteredSuggestions = differenceById(
     suggestions as ModelsTagWithSummary[],
@@ -166,21 +168,39 @@ const TagsComboboxCore = ({
             // Base UI also clears the text on select. handleChange does that itself.
             if (details.reason === 'input-change') setInputText(text)
           }}
-          onOpenChange={setIsOpen}
+          onItemHighlighted={(item, details) =>
+            setHasUserHighlight(item !== undefined && details.reason !== 'none')
+          }
+          onOpenChange={(open) => setOpenReason(open ? 'user' : null)}
           onValueChange={handleChange}
           // The list opens on a click or on typing. With openOnFocus, it also opens on the focus that
           // follows a project pick. Edit forms leave it closed, so an existing booking shows no list.
-          open={isOpen || (openOnFocus && isFocused && !!projectId)}
+          open={openReason !== null}
           value={selectedTags}>
           <Combobox.InputGroup>
             <Combobox.Input
               autoComplete="off"
               className="input input-bordered w-full pr-10 text-sm"
               id={id}
-              onBlur={() => setIsFocused(false)}
-              onFocus={() => setIsFocused(true)}
-              // A typed text always shows the list. The quick start form shows it on focus, so isOpen stays false.
-              onKeyDown={(event) => guardComboboxKey(event, isOpen || inputText.length > 0)}
+              // Base UI does not close the list when the focus leaves to the page body.
+              onBlur={() => setOpenReason((reason) => (reason === 'focus' ? null : reason))}
+              onFocus={() => {
+                if (openOnFocus && projectId) setOpenReason('focus')
+              }}
+              onKeyDown={(event) => {
+                if (event.key !== 'Enter') {
+                  guardComboboxKey(event, openReason !== null)
+                  return
+                }
+                // Enter adds the typed text or the tag that the user highlighted, and does not submit.
+                // Base UI keeps the highlight state after a close, so only an open list counts.
+                if (inputText.length > 0 || (openReason !== null && hasUserHighlight)) {
+                  event.preventDefault()
+                  return
+                }
+                // On an empty input, Enter submits the form and never picks the auto-highlighted tag.
+                event.preventBaseUIHandler()
+              }}
               placeholder={t('tag-manager:chooseOrEnter', {
                 defaultValue: 'Choose or enter tags',
               })}
