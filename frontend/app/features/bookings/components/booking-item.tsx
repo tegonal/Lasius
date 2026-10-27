@@ -133,6 +133,7 @@ export const BookingItem = ({ item, nextItem }: Properties) => {
       </Modal>
       <Modal onClose={handleAddBetweenClose} open={isAddBetweenOpen}>
         <BookingAddUpdateForm
+          bookingBefore={nextItem}
           itemReference={item}
           mode="addBetween"
           onClose={handleAddBetweenClose}
