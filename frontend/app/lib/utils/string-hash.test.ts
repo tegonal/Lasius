@@ -48,6 +48,25 @@ describe('stringHash', () => {
     expect(hash).toBe(stringHash(nested))
   })
 
+  it('returns different hashes for objects that differ only in a nested value', () => {
+    const row = (userId: string) => ({
+      day: '2026-10-26',
+      userReference: { id: userId, key: userId },
+    })
+    expect(stringHash(row('mc'))).not.toBe(stringHash(row('ms')))
+  })
+
+  it('returns different hashes for objects that differ only in a value inside an array', () => {
+    expect(stringHash({ tags: [{ id: 'TT' }] })).not.toBe(stringHash({ tags: [{ id: 'Remote' }] }))
+  })
+
+  it('ignores the key order at every level', () => {
+    // JSON strings keep the key order. The lint autofix sorts the keys of an object literal.
+    const first: unknown = JSON.parse('{"a":{"x":1,"y":2},"b":1}')
+    const second: unknown = JSON.parse('{"b":1,"a":{"y":2,"x":1}}')
+    expect(stringHash(first)).toBe(stringHash(second))
+  })
+
   it('handles arrays', () => {
     const array = [1, 2, 3]
     const hash = stringHash(array)

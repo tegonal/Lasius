@@ -38,16 +38,17 @@ function hashCode(text: string | undefined) {
   return hash
 }
 
+// A key array as the replacer filters every nesting level, so the hash ignored all nested values.
+const sortKeys = (_key: string, value: unknown): unknown =>
+  value && typeof value === 'object' && !Array.isArray(value)
+    ? Object.fromEntries(Object.entries(value).toSorted(([a], [b]) => a.localeCompare(b)))
+    : value
+
 /**
- * Hashes anything to a string by JSON-serializing with sorted keys.
+ * Hashes anything to a string by JSON-serializing with sorted keys at every level.
  * @param anything - The value to hash.
  * @returns A string representation of the 32-bit hash.
  */
 export const stringHash = (anything: unknown): string => {
-  return hashCode(
-    JSON.stringify(
-      anything,
-      Object.keys(anything as object).toSorted((a, b) => a.localeCompare(b)),
-    ),
-  ).toString()
+  return hashCode(JSON.stringify(anything, sortKeys)).toString()
 }
