@@ -28,6 +28,8 @@ jobs:
         uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
         with:
           context: "{{defaultContext}}:frontend"
+          # node:24-alpine floats. The pull gets the latest Node 24 release instead of a cached base image.
+          pull: true
           build-args: |
             LASIUS_VERSION=${{github.ref_name}}
             COMMIT_SHORT_SHA=${{env.COMMIT_SHORT_SHA}}
