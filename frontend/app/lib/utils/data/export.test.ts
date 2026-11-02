@@ -140,8 +140,9 @@ describe('exportBookingList', () => {
       tags: 'tag1,tag2',
       user: 'user1',
     })
-    expect(ws['A2']?.v).toBeCloseTo(1.5 / 24)
-    expect(ws['A2']?.z).toBe('[h]:mm')
+    expect(ws['G1']?.v).toBe('duration')
+    expect(ws['G2']?.v).toBeCloseTo(1.5 / 24)
+    expect(ws['G2']?.z).toBe('[h]:mm')
   })
 
   it('writes a CSV with a header line and one data line', () => {
@@ -153,7 +154,22 @@ describe('exportBookingList', () => {
 
     expect(filename).toBe('lasius-bookings-2026-10-05.csv')
     expect(lines).toHaveLength(2)
-    expect(lines[0]).toBe('duration,durationString,end,organisation,project,start,tags,user')
+    expect(lines[0]).toBe('user,organisation,project,tags,start,end,duration,durationString')
+  })
+
+  it('writes the CSV duration as decimal hours, not as a repeat of durationString', () => {
+    const { buffer } = exportBookingList([booking], 'csv')
+    const [, line] = new TextDecoder().decode(buffer).trim().split('\n')
+
+    expect(line?.split(',').slice(-2)).toEqual(['1.5', '01:30'])
+  })
+
+  it('rounds the CSV duration to two decimals', () => {
+    const tenMinutes = { ...booking, end: { dateTime: '2026-10-05T10:10:00.000Z', zone: 'UTC' } }
+    const { buffer } = exportBookingList([tenMinutes], 'csv')
+    const [, line] = new TextDecoder().decode(buffer).trim().split('\n')
+
+    expect(line?.split(',').at(-2)).toBe('0.17')
   })
 
   it('passes the options through to the filename', () => {

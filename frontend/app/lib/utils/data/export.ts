@@ -46,6 +46,18 @@ export type ExportOptions = {
 
 const MAX_COLUMN_WIDTH = 50
 
+// The column order of Lasius 2.x. The lint rule perfectionist/sort-objects sorts object keys, but not an array.
+const BOOKING_COLUMNS = [
+  'user',
+  'organisation',
+  'project',
+  'tags',
+  'start',
+  'end',
+  'duration',
+  'durationString',
+] as const
+
 const datePart = (isoDate: string): string => isoDate.split('T', 1)[0] ?? ''
 
 /**
@@ -99,9 +111,13 @@ export const exportBookingList = (
   options?: ExportOptions,
 ): { buffer: Uint8Array; filename: string } => {
   const bookings = getExtendedModelsBookingList(rawBookings)
+  const isCsv = format === 'csv'
 
   const data = bookings.map((item) => ({
-    duration: Math.round(item.duration * 60) / 60 / 24,
+    // CSV writes the formatted text of a cell, so [h]:mm repeats durationString. CSV gets decimal hours.
+    duration: isCsv
+      ? Math.round(item.duration * 100) / 100
+      : Math.round(item.duration * 60) / 60 / 24,
     durationString: item.durationString,
     end: item.end ? modelsLocalDateTimeWithTimeZoneToString(item.end) : '',
     organisation: item.organisationReference.key,
@@ -111,11 +127,10 @@ export const exportBookingList = (
     user: item.userReference.key,
   }))
 
-  const ws = XLSX.utils.json_to_sheet(data)
+  const ws = XLSX.utils.json_to_sheet(data, { header: [...BOOKING_COLUMNS] })
 
-  const keys = Object.keys(data[0] || {})
-  const durationCol = keys.indexOf('duration')
-  if (durationCol !== -1 && ws['!ref']) {
+  const durationCol = BOOKING_COLUMNS.indexOf('duration')
+  if (!isCsv && ws['!ref']) {
     const range = XLSX.utils.decode_range(ws['!ref'])
     for (let row = range.s.r + 1; row <= range.e.r; row++) {
       const addr = XLSX.utils.encode_cell({ c: durationCol, r: row })
@@ -129,7 +144,9 @@ export const exportBookingList = (
   const wb = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(wb, ws, 'Bookings')
 
-  ws['!cols'] = computeColumnWidths(data)
+  ws['!cols'] = computeColumnWidths(
+    data.map((row) => Object.fromEntries(BOOKING_COLUMNS.map((key) => [key, row[key]]))),
+  )
 
   const filename = generateExportFilename(format, options)
 
